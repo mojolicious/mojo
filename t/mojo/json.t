@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
+use utf8;
 
 use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;
-plan tests => 116;
+plan tests => 118;
 
 use Mojo::ByteStream 'b';
 
@@ -244,7 +244,7 @@ is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
 # Huge string
 $string = $json->encode(['a' x 32768]);
 is_deeply $json->decode($string), ['a' x 32768], 'successful roundtrip';
-is $json->error, undef, 'no errors';
+is $json->error, undef, 'no error';
 
 # u2028 and u2029
 $string = $json->encode(["\x{2028}test\x{2029}123"]);
@@ -258,6 +258,8 @@ $string = $json->encode([b('test')]);
 is_deeply $json->decode($string), ['test'], 'right roundtrip';
 
 # Errors
+is $json->decode('["♥"]'), undef, 'wide character in input';
+is $json->error, 'Wide character in input.', 'right error';
 is $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE')), undef,
   'missing high surrogate';
 is $json->error,

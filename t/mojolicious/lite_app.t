@@ -1,17 +1,16 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
-# Disable IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
-  $ENV{MOJO_MODE} = 'development';
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER}  = 'Mojo::IOWatcher';
+  $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 826;
+use Test::More tests => 890;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -34,7 +33,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # User agent
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, app => app);
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 
 # Missing plugin
 eval { plugin 'does_not_exist'; };
@@ -89,6 +88,26 @@ get '/conditional' => (
 
 # GET /
 get '/' => 'root';
+
+# GET /alternatives/☃
+# GET /alternatives/♥
+get '/alternatives/:char' => [char => [qw/☃ ♥/]] => sub {
+  my $self = shift;
+  $self->render_text($self->url_for);
+};
+
+# GET /alterformat
+# GET /alterformat.json
+get '/alterformat' => [format => ['json']] => {format => 'json'} => sub {
+  my $self = shift;
+  $self->render_text($self->stash('format'));
+};
+
+# GET /noformat
+get '/noformat' => [format => 0] => {format => 'xml'} => sub {
+  my $self = shift;
+  $self->render_text($self->stash('format') . $self->url_for);
+};
 
 # DELETE /
 del sub { shift->render(text => 'Hello!') };
@@ -234,8 +253,11 @@ get '/finished' => sub {
 get '/привет/мир' =>
   sub { shift->render(text => 'привет мир') };
 
-# GET /root
+# GET /root.html
 get '/root.html' => 'root_path';
+
+# GET /root
+get '/root' => sub { shift->render_text('root fallback!') };
 
 # GET /template.txt
 get '/template.txt' => 'template';
@@ -512,28 +534,28 @@ get '/subrequest_simple' => sub {
   $self->render_text($self->ua->post('/template')->res->body);
 };
 
-# GET /subrequest_sync
-get '/subrequest_sync' => sub {
+# GET /subrequest_blocking
+get '/subrequest_blocking' => sub {
   my $self = shift;
   $self->ua->post('/template');
   $self->render_text($self->ua->post('/template')->res->body);
 };
 
-# Make sure hook runs async
-hook after_dispatch => sub { shift->stash->{async} = 'broken!' };
+# Make sure hook runs non-blocking
+hook after_dispatch => sub { shift->stash->{nb} = 'broken!' };
 
-# GET /subrequest_async
-my $async;
-get '/subrequest_async' => sub {
+# GET /subrequest_non_blocking
+my $nb;
+get '/subrequest_non_blocking' => sub {
   my $self = shift;
   $self->ua->post(
     '/template' => sub {
       my $tx = pop;
-      $self->render_text($tx->res->body . $self->stash->{'async'});
-      $async = $self->stash->{async};
+      $self->render_text($tx->res->body . $self->stash->{nb});
+      $nb = $self->stash->{nb};
     }
   );
-  $self->stash->{'async'} = 'success!';
+  $self->stash->{nb} = 'success!';
 };
 
 # GET /redirect_url
@@ -645,7 +667,7 @@ under sub {
 
   # Not authenticated
   $self->render('param_auth_denied');
-  undef;
+  return;
 };
 
 # GET /param_auth
@@ -726,19 +748,22 @@ get '/works' => sub { shift->render(text => 'prefix works!') };
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
 my $t = Test::Mojo->new;
 
+# Application is already available
+is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
+
 # User agent timer
-my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop, app => app);
+my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop)->app(app);
 my $timer;
 $tua->ioloop->timer(
   '0.1' => sub {
-    my $async = '';
+    my $nb = '';
     $tua->get(
       '/' => sub {
         my $tx = pop;
-        $timer = $tx->res->body . $async;
+        $timer = $tx->res->body . $nb;
       }
     );
-    $async = 'works!';
+    $nb = 'works!';
   }
 );
 
@@ -791,6 +816,59 @@ $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # POST /
 $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Bye!');
+
+# GET /alternatives/☃
+$t->get_ok('/alternatives/☃')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/alternatives/%E2%98%83');
+
+# GET /alternatives/♥
+$t->get_ok('/alternatives/♥')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/alternatives/%E2%99%A5');
+
+# GET /alternatives/☃23 (invalid alternative)
+$t->get_ok('/alternatives/☃23')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# GET /alternatives (invalid alternative)
+$t->get_ok('/alternatives')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# GET /alternatives/test (invalid alternative)
+$t->get_ok('/alternatives/test')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# GET /alterformat
+$t->get_ok('/alterformat')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('json');
+
+# GET /alterformat.json
+$t->get_ok('/alterformat.json')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('json');
+
+# GET /alterformat.html (invalid format)
+$t->get_ok('/alterformat.html')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
+
+# GET /noformat
+$t->get_ok('/noformat')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('xml/noformat');
+
+# GET /noformat.xml
+$t->get_ok('/noformat.xml')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
 
 # POST /multipart/form ("application/x-www-form-urlencoded")
 $t->post_form_ok('/multipart/form', {test => [1 .. 5]})->status_is(200)
@@ -981,7 +1059,7 @@ $t->get_ok('/regex/in/template')->status_is(200)
 
 # GET /stream (with basic auth)
 $t->get_ok(
-  $t->build_url->userinfo('sri:foo')->path('/stream')->query(foo => 'bar'))
+  $t->test_server->userinfo('sri:foo')->path('/stream')->query(foo => 'bar'))
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/^foobarsri\:foohttp:\/\/localhost\:\d+\/stream$/);
@@ -1008,10 +1086,21 @@ $t->get_ok('/привет/мир')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is('привет мир');
 
-# GET /root
+# GET /root.html
 $t->get_ok('/root.html')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("/\n");
+
+# GET /root (fallback route without format)
+$t->get_ok('/root')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('root fallback!');
+
+# GET /root.txt (fallback route without format)
+$t->get_ok('/root.txt')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('root fallback!');
 
 # GET /.html
 $t->get_ok('/.html')->status_is(200)
@@ -1414,18 +1503,18 @@ $t->get_ok('/subrequest_simple')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
 
-# GET /subrequest_sync
-$t->get_ok('/subrequest_sync')->status_is(200)
+# GET /subrequest_blocking
+$t->get_ok('/subrequest_blocking')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
 
-# GET /subrequest_async
-$t->get_ok('/subrequest_async')->status_is(200)
+# GET /subrequest_non_blocking
+$t->get_ok('/subrequest_non_blocking')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!success!');
-is $async, 'broken!', 'right text';
+is $nb, 'broken!', 'right text';
 
 # GET /redirect_url
 $t->get_ok('/redirect_url')->status_is(302)
@@ -1473,7 +1562,7 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->text_is('div' => 'Redirect works!')->text_unlike('[id="foo"]' => qr/Foo/)
   ->text_like('[id="foo"]' => qr/^Redirect/);
 $t->max_redirects(0);
-Test::Mojo->new(tx => $t->tx->previous)->status_is(302)
+Test::Mojo->new->tx($t->tx->previous)->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_like(Location => qr/\/template.txt$/)->content_is('Redirecting!');
@@ -1610,7 +1699,7 @@ $t->get_ok('/bridge2stash')->status_is(200)
 # GET /bridge2stash (broken session cookie)
 $t->reset_session;
 my $session = b("☃☃☃☃☃")->b64_encode('');
-my $hmac    = $session->clone->hmac_md5_sum($t->ua->app->secret);
+my $hmac    = $session->clone->hmac_md5_sum($t->app->secret);
 my $broken  = "\$Version=1; mojolicious=$session--$hmac; \$Path=/";
 $t->get_ok('/bridge2stash' => {Cookie => $broken})->status_is(200)
   ->content_is("stash too!!!!!!!/!\n");
@@ -1620,11 +1709,13 @@ $t->reset_session;
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!!\n");
 
-# GET /favicon.ico (random static requests)
-$t->get_ok('/favicon.ico')->status_is(200);
+# GET /mojolicious-white.png
+# GET /mojolicious-black.png
+# (random static requests)
 $t->get_ok('/mojolicious-white.png')->status_is(200);
 $t->get_ok('/mojolicious-black.png')->status_is(200);
-$t->get_ok('/favicon.ico')->status_is(200);
+$t->get_ok('/mojolicious-white.png')->status_is(200);
+$t->get_ok('/mojolicious-black.png')->status_is(200);
 
 # GET /bridge2stash (with cookies, session and flash again)
 $t->get_ok('/bridge2stash')->status_is(200)
@@ -1721,6 +1812,9 @@ $t->get_ok('/captures/♥/☃')->status_is(200)
   ->content_is('/captures/%E2%99%A5/%E2%98%83');
 is b($t->tx->res->body)->url_unescape->decode('UTF-8'),
   '/captures/♥/☃', 'right result';
+
+# GET /favicon.ico (bundled file in DATA section)
+$t->get_ok('/favicon.ico')->status_is(200)->content_is("Not a favicon!\n\n");
 
 # User agent timer
 $tua->ioloop->one_tick('0.1');
@@ -1941,6 +2035,9 @@ Possible!
 
 @@ impossible.html.ep
 Impossible
+
+@@ favicon.ico
+Not a favicon!
 
 __END__
 This is not a template!

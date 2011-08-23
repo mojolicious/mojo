@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 # Use bundled libraries
 use FindBin;
@@ -52,7 +50,7 @@ Mojo::IOLoop->listen(
 print <<'EOF';
 Starting server on port 3000.
 Try something like "ab -c 30 -n 100000 -k http://127.0.0.1:3000/" for testing.
-On a MacBook Pro 13" this results in about 25k req/s.
+On a MacBook Pro 13" this results in about 20k req/s.
 EOF
 
 # Start loop

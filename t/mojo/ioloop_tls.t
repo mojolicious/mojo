@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 # To regenerate all required certificates run these commands
 # openssl genrsa -out ca.key 1024
@@ -27,14 +28,17 @@ BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
 # openssl req -x509 -days 7300 -key badclient.key -in badclient.csr \
 #   -out badclient.crt
 use Test::More;
-use Mojo::IOLoop;
+use Mojo::IOLoop::Server;
+use Mojo::IOLoop::Stream;
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.43 required for this test!'
-  unless Mojo::IOLoop::TLS;
+  unless Mojo::IOLoop::Server::TLS;
 plan skip_all => 'Windows is too fragile for this test!'
-  if Mojo::IOLoop::WINDOWS;
+  if Mojo::IOLoop::Stream::WINDOWS;
 plan tests => 16;
+
+use Mojo::IOLoop;
 
 # "To the panic room!
 #  We don't have a panic room.
@@ -147,7 +151,7 @@ $id = $loop->connect(
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok $error,  'has error';
+ok !$error, 'no error';
 ok $cerror, 'has error';
 
 # Valid client certificate accepted by callback
@@ -196,7 +200,7 @@ $id = $loop->connect(
 );
 $loop->connection_timeout($id => '0.5');
 $loop->start;
-ok $error,  'has error';
+ok !$error, 'no error';
 ok $cerror, 'has error';
 
 # Invalid certificate authority
@@ -225,5 +229,5 @@ $id = $loop->connect(
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok $error,  'has error';
+ok !$error, 'no error';
 ok $cerror, 'has error';

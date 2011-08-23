@@ -1,8 +1,261 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.49    2011-06-24 00:00:00
+1.89    2011-08-23 00:00:00
         - Improved documentation.
+
+1.88    2011-08-23 00:00:00
+        - Added EXPERIMENTAL split method to Mojo::ByteStream.
+        - Improved documentation.
+        - Fixed small bug in Mojo::JSON.
+
+1.87    2011-08-23 00:00:00
+        - Added EXPERIMENTAL app method to Mojo::Command.
+        - Added EXPERIMENTAL t helper to Mojolicious::Plugin::TagHelpers.
+        - Made tag helper a little smarter.
+        - Made camelize a little smarter.
+        - Improved documentation.
+        - Fixed small route rendering bug.
+
+1.86    2011-08-21 00:00:00
+        - Deprecated camel case command modules and lowercased all the
+          built-in ones.
+        - Added EXPERIMENTAL support for testing WebSockets with Test::Mojo.
+        - Added GET/POST parameter support to respond_to.
+        - Made class_to_file slightly smarter.
+        - Improved documentation.
+
+1.85    2011-08-20 00:00:00
+        - Fixed a url_for bug where captures would be ignored.
+
+1.84    2011-08-19 00:00:00
+        - Added EXPERIMENTAL first, reverse, shuffle and sort methods to
+          Mojo::Collection.
+        - Improved documentation.
+        - Fixed small test portablity bug.
+
+1.83    2011-08-19 00:00:00
+        - Renamed filter method in Mojo::Collection to grep.
+        - Improved documentation.
+
+1.82    2011-08-19 00:00:00
+        - Added EXPERIMENTAL filter method to Mojo::Collection.
+        - Removed while and until methods from Mojo::Collection.
+        - Improved documentation.
+
+1.81    2011-08-19 00:00:00
+        - Renamed Mojo::DOM::Collection to Mojo::Collection and added a few
+          new methods.
+        - Made Mojolicious::Plugins loader quite a bit smarter.
+        - Improved documentation.
+        - Improved Test::Mojo diagnostics.
+
+1.80    2011-08-17 00:00:00
+        - Deprecated Mojolicious::Plugin::EpRenderer in favor of
+          Mojolicious::Plugin::EPRenderer.
+        - Deprecated Mojolicious::Plugin::EplRenderer in favor of
+          Mojolicious::Plugin::EPLRenderer.
+        - Deprecated Mojolicious::Plugin::I18n in favor of
+          Mojolicious::Plugin::I18N.
+        - Deprecated Mojolicious::Plugin::JsonConfig in favor of
+          Mojolicious::Plugin::JSONConfig.
+        - Deprecated Mojolicious::Plugin::PodRenderer in favor of
+          Mojolicious::Plugin::PODRenderer.
+
+1.79    2011-08-17 00:00:00
+        - Added support for upper case relative plugin names. (lammel)
+        - Improved documentation.
+
+1.78    2011-08-16 00:00:00
+        - Added EXPERIMENTAL modules Mojolicious::Command::Cpanify and
+          Mojolicious::Command::Generate::Plugin. (sri, yko, tempire)
+        - Improved documentation.
+        - Fixed "websocket_lite_app.t" to require Perl 5.10+.
+        - Fixed small empty cookie bug.
+        - Fixed small command bug.
+
+1.77    2011-08-14 00:00:00
+        - Deprecated Mojo::Path->append in favor of using Mojo::Path->parts
+          directly.
+        - Improved handling of preformatted text in Mojo::DOM.
+        - Improved Mojo::DOM to allow smart whitespace trimming to be
+          disabled. (akron)
+        - Improved documentation.
+        - Fixed small unicode bug in get command.
+
+1.76    2011-08-12 00:00:00
+        - Fixed small Mojo::URL escaping bug.
+
+1.75    2011-08-12 00:00:00
+        - Added secure_compare function to Mojo::Util as a precaution against
+          timing attacks in the future. (judofyr)
+        - Added EXPERIMENTAL CSS4 selector subject support to Mojo::DOM::CSS.
+        - Improved documentation.
+        - Fixed typos.
+
+1.74    2011-08-09 00:00:00
+        - Added EXPERIMENTAL --verbose flag to Morbo.
+        - Made "ioloop.t" easier to debug and added more tests.
+        - Improved documentation.
+        - Fixed typos.
+
+1.73    2011-08-09 00:00:00
+        - Added EXPERIMENTAL -strict flag to Mojo::Base.
+        - Added EXPERIMENTAL respond_to method to Mojolicious::Controller.
+        - Added EXPERIMENTAL detect method to Mojolicious::Types.
+        - Added accept method to Mojo::Headers.
+        - Made Mojo::UserAgent slightly more efficient.
+        - Improved get command to autoflush STDOUT.
+        - Improved documentation.
+
+1.72    2011-08-05 00:00:00
+        - Changed default keep alive timeout in Mojo::Server::Daemon from 5
+          to 15 seconds.
+        - Improved documentation.
+        - Fixed small alternative placeholder value bug in routes.
+        - Fixed small bug in Mojo::IOWatcher.
+        - Fixed small bug in Mojo::IOLoop::Client.
+
+1.71    2011-08-05 00:00:00
+        - Improved Mojo::IOWatcher to use higher resolution timers.
+
+1.70    2011-08-04 00:00:00
+        - Added EXPERIMENTAL defer method to Mojo::IOLoop.
+        - Added extended callback support to Mojo::IOLoop::Trigger.
+        - Improved documentation.
+        - Improved tests.
+        - Fixed a few small bugs in Mojo::URL. (sshaw)
+
+1.69    2011-08-03 00:00:00
+        - Added EXPERIMENTAL module Mojo::IOLoop::Trigger.
+        - Modernized Mojo::HelloWorld.
+        - Improved HTML healing capabilities of Mojo::DOM::HTML.
+        - Improved HTML rendering in Mojo::DOM::HTML.
+        - Improved 64bit support in Mojo::Transaction::WebSocket.
+        - Improved documentation.
+        - Fixed memory leak in Mojo::IOLoop::Client.
+        - Fixed memory leak in Mojolicious.
+        - Fixed small bug in Mojo::IOLoop::Server.
+
+1.68    2011-07-29 00:00:00
+        - Moved is_ipv4 and is_ipv6 methods from Mojo::URL to
+          Mojo::IOLoop::Resolver.
+        - Improved documentation.
+
+1.67    2011-07-27 00:00:00
+        - Improved documentation.
+        - Fixed version command.
+        - Fixed small Mojo::DOM bug. (akron)
+
+1.66    2011-07-27 00:00:00
+        - Added EXPERIMENTAL detect method to Mojo::IOWatcher.
+        - Improved Mojo::IOLoop::Resolver efficiency.
+        - Improved documentation.
+        - Fixed typos. (crab)
+
+1.65    2011-07-25 00:00:00
+        - Added EXPERIMENTAL modules Mojo::IOLoop::Client,
+          Mojo::IOLoop::EventEmitter, Mojo::IOLoop::Server and
+          Mojo::IOLoop::Stream, which contain extracted functionality from
+          Mojo::IOLoop.
+        - Added EXPERIMENTAL module Mojo::IOWatcher::EV. (xantus)
+        - Removed modules Mojo::IOWatcher::Epoll and Mojo::IOWatcher::KQueue,
+          since Mojo::IOWatcher::EV is a much better alternative.
+        - Renamed Mojo::Resolver to Mojo::IOLoop::Resolver.
+        - Improved Mojolicious::Routes to automatically disable the routing
+          cache if conditions are used.
+        - Improved route constraint alternatives.
+        - Improved documentation browser CSS. (judofyr)
+        - Improved documentation.
+        - Fixed small bug in get command.
+
+1.64    2011-07-10 00:00:00
+        - Added EXPERIMENTAL module Mojo::DOM::HTML.
+        - Improved documentation.
+
+1.63    2011-07-10 00:00:00
+        - Added EXPERIMENTAL modules Mojo::DOM::CSS and
+          Mojo::DOM::Collection.
+        - Renamed Mojo::Transactor to Mojo::UserAgent::Transactor.
+
+1.62    2011-07-10 00:00:00
+        - Merged Mojo::HTML into Mojo::DOM again.
+        - Improved documentation.
+
+1.61    2011-07-09 00:00:00
+        - Added module Mojo::HTML, which contains extracted functionality
+          from Mojo::DOM.
+        - Improved documentation.
+
+1.60    2011-07-08 00:00:00
+        - Added xsl MIME type. (shiftycow)
+        - Improved documentation.
+        - Fixed Windows portability issue.
+
+1.59    2011-07-08 00:00:00
+        - Added peer method to Mojo::Transactor.
+        - Deprecated Test::Mojo->new(app => 'MyApp') in favor of
+          Test::Mojo->new('MyApp').
+        - Made $t->app always return the application instance in tests.
+        - Fixed typos.
+
+1.58    2011-07-07 00:00:00
+        - Improved documentation.
+        - Fixed fork bug in Mojo::IOLoop.
+        - Fixed small Hypnotoad issues.
+        - Fixed typos.
+
+1.57    2011-07-07 00:00:00
+        - Added --stop option to Hypnotoad.
+        - Made hot deployment with Hypnotoad even easier.
+        - Improved documentation.
+
+1.56    2011-07-04 00:00:00
+        - Fixed small memory leaks in Hypnotoad and Mojo::IOLoop.
+
+1.55    2011-07-04 00:00:00
+        - Improved documentation.
+        - Fixed some portability issues in tests.
+
+1.54    2011-07-03 00:00:00
+        - Fixed small Windows issue.
+
+1.53    2011-07-02 00:00:00
+        - Added EXPERIMENTAL format method to Mojo::Log and simplified the
+          default log file format.
+        - Improved include helper argument localization. (miyagawa)
+        - Fixed typos.
+
+1.52    2011-07-01 00:00:00
+        - Fixed typos.
+        - Fixed small static file in DATA section bug.
+
+1.51    2011-07-01 00:00:00
+        - Renamed build_url method in Test::Mojo to test_server.
+        - Improved test_server method in Mojo::UserAgent.
+        - Fixed small timing issue in "morbo.t".
+
+1.50    2011-07-01 00:00:00
+        - Removed idle event from Mojo::IOLoop.
+        - Updated jQuery to version 1.6.2.
+        - Fixed typos.
+        - Fixed small routes bug that prevented some false values from
+          disabling format detection.
+
+1.49    2011-06-30 00:00:00
+        - Added EXPERIMENTAL modules Mojo::IOWatcher and Mojo::Resolver,
+          which contain extracted functionality from Mojo::IOLoop.
+        - Added EXPERIMENTAL module Mojo::Transactor, which contains
+          extracted functionality from Mojo::UserAgent.
+        - Added EXPERIMENTAL support for simple alternative placeholder
+          values to routes.
+        - Improved Morbo restarter to also check for changed file size in
+          addition to mtime.
+        - Improved documentation.
+        - Fixed many small routes bugs.
+        - Fixed small reparse bug in Mojo::Parameters. (dmw397)
         - Fixed url_for to incorporate trailing slash for current route.
+        - Fixed a few small error reporting bugs around Mojo::UserAgent.
+        - Fixed portability issue in "command.t".
 
 1.48    2011-06-24 00:00:00
         - Added debug log message for missing action to router.
@@ -219,7 +472,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL xml attribute to Mojo::DOM.
         - Added EXPERIMENTAL build_url method to Test::Mojo.
         - Added EXPERIMENTAL dnt (Do Not Track) method to Mojo::Headers.
-        - Added WOFF mime type. (reezer)
+        - Added WOFF MIME type. (reezer)
         - Updated WebSocket implementation to ietf-06. (sri, crab)
         - Updated jQuery to version 1.5.2.
         - Improved documentation.
@@ -254,7 +507,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a serious Mojo::DOM bug. (moritz)
 
 1.14    2011-03-17 00:00:00
-        - Added support for multiple dns servers to Mojo::IOLoop.
+        - Added support for multiple DNS servers to Mojo::IOLoop.
         - Added config helper to Mojolicious::Plugin::Config.
         - Changed resolv.conf parser in Mojo::IOLoop to use the first
           nameserver.
@@ -863,7 +1116,6 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added transparent kqueue and epoll support to daemons and client.
         - Added support for listening to multiple locations to the daemons.
               mojo daemon --listen http://127.0.0.1:3000
-              mojo daemon --listen http://127.0.0.1:3000,file:///tmp/my.sock
               mojo daemon --listen http://*:3000,http://*:3001,http://*:3002
               mojo daemon --listen http://[::1]:3000
               mojo daemon --listen https://*:443:/x/server.crt:/x/server.key
@@ -936,7 +1188,7 @@ This file documents the revision history for Perl extension Mojolicious.
           param decoding.
         - Fixed format detection bug. (marcus)
         - Fixed named url_for and added tests. (marcus)
-        - Fixed decamelize of multiple uppercase characters.
+        - Fixed decamelize of multiple upper case characters.
         - Fixed plugins and commands to work with multiple namespaces and
           reloading.
         - Fixed multiple process calls in Mojo::Client.
@@ -1304,7 +1556,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added name and value filters to Mojo::Headers. (acajou)
         - Added clean multiline value handling to Mojo::Headers.
         - Added prepare/finalize methods to Mojolicious.
-        - Added some additional mime types to MojoX::Types.
+        - Added some additional MIME types to MojoX::Types.
         - Renamed method add_line to add in Mojo::Headers.
         - Updated generator scripts to play nice with MM->parse_version.
 

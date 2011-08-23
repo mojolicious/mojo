@@ -18,7 +18,7 @@ use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has [qw/backlog group listen silent user/];
 has ioloop => sub { Mojo::IOLoop->singleton };
-has keep_alive_timeout => 5;
+has keep_alive_timeout => 15;
 has max_clients        => 1000;
 has max_requests       => 25;
 has websocket_timeout  => 300;
@@ -39,13 +39,13 @@ my $SOCKET_RE = qr/^
 sub DESTROY {
   my $self = shift;
 
-  # Cleanup connections
+  # Clean up connections
   return unless my $loop = $self->ioloop;
-  my $cs = $self->{_cs} || {};
+  my $cs = $self->{connections} || {};
   for my $id (keys %$cs) { $loop->drop($id) }
 
-  # Cleanup listen sockets
-  return unless my $listen = $self->{_listen};
+  # Clean up listen sockets
+  return unless my $listen = $self->{listening};
   for my $id (@$listen) { $loop->drop($id) }
 }
 
@@ -104,7 +104,7 @@ sub setuidgid {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub _build_tx {
@@ -153,7 +153,7 @@ sub _build_tx {
   # Kept alive if we have more than one request on the connection
   $tx->kept_alive(1) if $c->{requests} > 1;
 
-  $tx;
+  return $tx;
 }
 
 sub _close {
@@ -165,11 +165,11 @@ sub _drop {
   my ($self, $id) = @_;
 
   # Finish gracefully
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{connections}->{$id};
   if (my $tx = $c->{websocket} || $c->{transaction}) { $tx->server_close }
 
   # Drop connection
-  delete $self->{_cs}->{$id};
+  delete $self->{connections}->{$id};
 }
 
 sub _error {
@@ -188,7 +188,7 @@ sub _finish {
   }
 
   # Finish transaction
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{connections}->{$id};
   delete $c->{transaction};
   $tx->server_close;
 
@@ -234,23 +234,16 @@ sub _listen {
   my ($self, $listen) = @_;
   return unless $listen;
 
-  # UNIX domain socket
+  # Check listen value
+  croak qq/Invalid listen value "$listen"/ unless $listen =~ $SOCKET_RE;
   my $options = {};
   my $tls;
-  if ($listen =~ /^file\:\/\/(.+)$/) { unlink $options->{file} = $1 }
-
-  # Internet socket
-  elsif ($listen =~ $SOCKET_RE) {
-    $tls = $options->{tls} = 1 if $1 eq 'https';
-    $options->{address}  = $2 if $2 ne '*';
-    $options->{port}     = $3;
-    $options->{tls_cert} = $4 if $4;
-    $options->{tls_key}  = $5 if $5;
-    $options->{tls_ca}   = $6 if $6;
-  }
-
-  # Invalid
-  else { croak qq/Invalid listen value "$listen"/ }
+  $tls = $options->{tls} = 1 if $1 eq 'https';
+  $options->{address}  = $2 if $2 ne '*';
+  $options->{port}     = $3;
+  $options->{tls_cert} = $4 if $4;
+  $options->{tls_key}  = $5 if $5;
+  $options->{tls_ca}   = $6 if $6;
 
   # Listen backlog size
   my $backlog = $self->backlog;
@@ -262,7 +255,7 @@ sub _listen {
     my ($loop, $id) = @_;
 
     # Add new connection
-    $self->{_cs}->{$id} = {tls => $tls};
+    $self->{connections}->{$id} = {tls => $tls};
 
     # Keep alive timeout
     $loop->connection_timeout($id => $self->keep_alive_timeout);
@@ -273,8 +266,8 @@ sub _listen {
 
   # Listen
   my $id = $self->ioloop->listen($options);
-  $self->{_listen} ||= [];
-  push @{$self->{_listen}}, $id;
+  $self->{listening} ||= [];
+  push @{$self->{listening}}, $id;
 
   # Bonjour
   if (BONJOUR && (my $p = Net::Rendezvous::Publish->new)) {
@@ -300,7 +293,7 @@ sub _read {
   warn "< $chunk\n" if DEBUG;
 
   # Make sure we have a transaction
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{connections}->{$id};
   my $tx = $c->{transaction} || $c->{websocket};
   $tx = $c->{transaction} = $self->_build_tx($id, $c) unless $tx;
 
@@ -325,7 +318,7 @@ sub _upgrade {
   return unless $tx->req->headers->upgrade =~ /WebSocket/i;
 
   # WebSocket handshake handler
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{connections}->{$id};
   my $ws = $c->{websocket} = $self->on_websocket->($self, $tx);
 
   # Not resumable yet
@@ -336,7 +329,7 @@ sub _write {
   my ($self, $id) = @_;
 
   # Not writing
-  my $c = $self->{_cs}->{$id};
+  my $c = $self->{connections}->{$id};
   return unless my $tx = $c->{transaction} || $c->{websocket};
   return unless $tx->is_writing;
 
@@ -368,7 +361,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
+Mojo::Server::Daemon - Non-Blocking I/O HTTP 1.1 And WebSocket Server
 
 =head1 SYNOPSIS
 
@@ -394,12 +387,12 @@ Mojo::Server::Daemon - Async IO HTTP 1.1 And WebSocket Server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Daemon> is a full featured async io HTTP 1.1 and WebSocket
-server with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll> and C<kqueue> support.
+L<Mojo::Server::Daemon> is a full featured non-blocking I/O HTTP 1.1 and
+WebSocket server with C<IPv6>, C<TLS>, C<Bonjour> and C<libev> support.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
-L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
-transparently and used if installed.
+Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and
+L<Net::Rendezvous::Publish> are supported transparently and used if
+installed.
 
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
 
@@ -427,22 +420,31 @@ Group for server process.
   my $loop = $daemon->ioloop;
   $daemon  = $daemon->ioloop(Mojo::IOLoop->new);
 
-Event loop for server IO, defaults to the global L<Mojo::IOLoop> singleton.
+Event loop for server I/O, defaults to the global L<Mojo::IOLoop> singleton.
 
 =head2 C<keep_alive_timeout>
 
   my $keep_alive_timeout = $daemon->keep_alive_timeout;
-  $daemon                = $daemon->keep_alive_timeout(15);
+  $daemon                = $daemon->keep_alive_timeout(5);
 
 Maximum amount of time in seconds a connection can be inactive before being
-dropped, defaults to C<5>.
+dropped, defaults to C<15>.
 
 =head2 C<listen>
 
   my $listen = $daemon->listen;
   $daemon    = $daemon->listen(['https://localhost:3000']);
 
-List of ports and files to listen on, defaults to C<http://*:3000>.
+List of one or more locations to listen on, defaults to C<http://*:3000>.
+
+  # Listen on two ports with HTTP and HTTPS at the same time
+  $daemon->listen(['http://*:3000', 'https://*:4000']);
+
+  # Use a custom certificate and key
+  $daemon->listen(['https://*:3000:/x/server.crt:/y/server.key']);
+
+  # Or even a custom certificate authority
+  $daemon->listen(['https://*:3000:/x/server.crt:/y/server.key:/z/ca.crt']);
 
 =head2 C<max_clients>
 

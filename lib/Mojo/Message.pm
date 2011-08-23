@@ -36,7 +36,7 @@ sub at_least_version {
     if $search_major == $current_major && $search_minor <= $current_minor;
 
   # Version is older
-  undef;
+  return;
 }
 
 sub body {
@@ -65,14 +65,14 @@ sub body {
   # Set text content
   elsif (length $new) { $content->asset->add_chunk($new) }
 
-  $self;
+  return $self;
 }
 
 sub body_params {
   my $self = shift;
 
   # Cached
-  return $self->{_body_params} if $self->{_body_params};
+  return $self->{body_params} if $self->{body_params};
 
   # Charset
   my $params = Mojo::Parameters->new;
@@ -104,7 +104,7 @@ sub body_params {
   }
 
   # Cache
-  $self->{_body_params} = $params;
+  return $self->{body_params} = $params;
 }
 
 sub body_size { shift->content->body_size }
@@ -116,9 +116,9 @@ sub body_size { shift->content->body_size }
 sub build_body {
   my $self = shift;
   my $body = $self->content->build_body(@_);
-  $self->{_state} = 'done';
+  $self->{state} = 'done';
   if (my $cb = $self->on_finish) { $self->$cb }
-  $body;
+  return $body;
 }
 
 sub build_headers {
@@ -128,7 +128,7 @@ sub build_headers {
   return '' if $self->version eq '0.9';
 
   $self->fix_headers;
-  $self->content->build_headers;
+  return $self->content->build_headers;
 }
 
 sub build_start_line {
@@ -150,7 +150,7 @@ sub build_start_line {
     $startline .= $chunk;
   }
 
-  $startline;
+  return $startline;
 }
 
 sub cookie {
@@ -158,7 +158,7 @@ sub cookie {
   return unless $name;
 
   # Map
-  unless ($self->{_cookies}) {
+  unless ($self->{cookies}) {
     my $cookies = {};
     for my $cookie (@{$self->cookies}) {
       my $cookie_name = $cookie->name;
@@ -175,15 +175,15 @@ sub cookie {
     }
 
     # Cache
-    $self->{_cookies} = $cookies;
+    $self->{cookies} = $cookies;
   }
 
   # Multiple
-  my $cookies = $self->{_cookies}->{$name};
+  my $cookies = $self->{cookies}->{$name};
   my @cookies;
   @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies) if $cookies;
 
-  wantarray ? @cookies : $cookies[0];
+  return wantarray ? @cookies : $cookies[0];
 }
 
 sub dom {
@@ -203,7 +203,7 @@ sub dom {
   # Find right away
   return $dom->find(@_) if @_;
 
-  $dom;
+  return $dom;
 }
 
 sub error {
@@ -211,15 +211,15 @@ sub error {
 
   # Get
   unless (@_) {
-    return unless my $error = $self->{_error};
+    return unless my $error = $self->{error};
     return wantarray ? @$error : $error->[0];
   }
 
   # Set
-  $self->{_error} = [@_];
-  $self->{_state} = 'done';
+  $self->{error} = [@_];
+  $self->{state} = 'done';
 
-  $self;
+  return $self;
 }
 
 sub fix_headers {
@@ -236,7 +236,7 @@ sub fix_headers {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub get_body_chunk {
@@ -250,10 +250,10 @@ sub get_body_chunk {
   return $chunk if !defined $chunk || length $chunk;
 
   # Finish
-  $self->{_state} = 'done';
+  $self->{state} = 'done';
   if (my $cb = $self->on_finish) { $self->$cb }
 
-  $chunk;
+  return $chunk;
 }
 
 sub get_header_chunk {
@@ -265,7 +265,7 @@ sub get_header_chunk {
   # HTTP 0.9 has no headers
   return '' if $self->version eq '0.9';
 
-  $self->content->get_header_chunk(@_);
+  return $self->content->get_header_chunk(@_);
 }
 
 sub get_start_line_chunk {
@@ -275,8 +275,8 @@ sub get_start_line_chunk {
   if (my $cb = $self->on_progress) { $self->$cb('start_line', @_) }
 
   # Get chunk
-  my $copy = $self->{_buffer} ||= $self->_build_start_line;
-  substr $copy, $offset, CHUNK_SIZE;
+  my $copy = $self->{buffer} ||= $self->_build_start_line;
+  return substr $copy, $offset, CHUNK_SIZE;
 }
 
 sub has_leftovers { shift->content->has_leftovers }
@@ -284,27 +284,23 @@ sub has_leftovers { shift->content->has_leftovers }
 sub header_size {
   my $self = shift;
   $self->fix_headers;
-  $self->content->header_size;
+  return $self->content->header_size;
 }
 
 sub headers {
   my $self = shift;
-
-  # Set
   if (@_) {
     $self->content->headers(@_);
     return $self;
   }
-
-  # Get
-  $self->content->headers(@_);
+  return $self->content->headers(@_);
 }
 
 sub is_chunked { shift->content->is_chunked }
 
 sub is_done {
-  return 1 if (shift->{_state} || '') eq 'done';
-  undef;
+  return 1 if (shift->{state} || '') eq 'done';
+  return;
 }
 
 sub is_dynamic { shift->content->is_dynamic }
@@ -313,7 +309,7 @@ sub is_limit_exceeded {
   my $self = shift;
   return unless my $code = ($self->error)[1];
   return unless $code eq '413';
-  1;
+  return 1;
 }
 
 sub is_multipart { shift->content->is_multipart }
@@ -321,7 +317,7 @@ sub is_multipart { shift->content->is_multipart }
 sub json {
   my $self = shift;
   return if $self->is_multipart;
-  $self->json_class->new->decode($self->body);
+  return $self->json_class->new->decode($self->body);
 }
 
 sub leftovers { shift->content->leftovers }
@@ -331,7 +327,7 @@ sub max_line_size { shift->headers->max_line_size(@_) }
 sub param {
   my $self = shift;
   $self->{body_params} ||= $self->body_params;
-  $self->{body_params}->param(@_);
+  return $self->{body_params}->param(@_);
 }
 
 sub parse            { shift->_parse(0, @_) }
@@ -349,7 +345,7 @@ sub upload {
   return unless $name;
 
   # Map
-  unless ($self->{_uploads}) {
+  unless ($self->{uploads}) {
     my $uploads = {};
     for my $upload (@{$self->uploads}) {
       my $uname = $upload->name;
@@ -366,15 +362,15 @@ sub upload {
     }
 
     # Cache
-    $self->{_uploads} = $uploads;
+    $self->{uploads} = $uploads;
   }
 
   # Multiple
-  my $uploads = $self->{_uploads}->{$name};
+  my $uploads = $self->{uploads}->{$name};
   my @uploads;
   @uploads = ref $uploads eq 'ARRAY' ? @$uploads : ($uploads) if $uploads;
 
-  wantarray ? @uploads : $uploads[0];
+  return wantarray ? @uploads : $uploads[0];
 }
 
 sub uploads {
@@ -403,7 +399,7 @@ sub uploads {
     push @uploads, $upload;
   }
 
-  \@uploads;
+  return \@uploads;
 }
 
 sub write       { shift->content->write(@_) }
@@ -417,25 +413,25 @@ sub _parse {
   my ($self, $until_body, $chunk) = @_;
 
   # Buffer
-  $self->{_buffer}   = '' unless defined $self->{_buffer};
-  $self->{_raw_size} = 0  unless exists $self->{_raw_size};
+  $self->{buffer}   = '' unless defined $self->{buffer};
+  $self->{raw_size} = 0  unless exists $self->{raw_size};
 
   # Add chunk
   if (defined $chunk) {
-    $self->{_raw_size} += length $chunk;
-    $self->{_buffer} .= $chunk;
+    $self->{raw_size} += length $chunk;
+    $self->{buffer} .= $chunk;
   }
 
   # Check message size
   return $self->error('Maximum message size exceeded.', 413)
-    if $self->{_raw_size} > $self->max_message_size;
+    if $self->{raw_size} > $self->max_message_size;
 
   # Start line
-  unless ($self->{_state}) {
+  unless ($self->{state}) {
 
     # Check line size
-    my $len = index $self->{_buffer}, "\x0a";
-    $len = length $self->{_buffer} if $len < 0;
+    my $len = index $self->{buffer}, "\x0a";
+    $len = length $self->{buffer} if $len < 0;
     return $self->error('Maximum line size exceeded.', 413)
       if $len > $self->max_line_size;
 
@@ -444,13 +440,13 @@ sub _parse {
   }
 
   # Content
-  my $state = $self->{_state} || '';
+  my $state = $self->{state} || '';
   if ($state eq 'body' || $state eq 'content' || $state eq 'done') {
     my $content = $self->content;
 
     # Empty buffer
-    my $buffer = $self->{_buffer};
-    $self->{_buffer} = '';
+    my $buffer = $self->{buffer};
+    $self->{buffer} = '';
 
     # Until body
     if ($until_body) {
@@ -458,7 +454,7 @@ sub _parse {
     }
 
     # CGI
-    elsif ($self->{_state} eq 'body') {
+    elsif ($self->{state} eq 'body') {
       $self->content($content->parse_body($buffer));
     }
 
@@ -476,7 +472,7 @@ sub _parse {
     if $self->headers->is_limit_exceeded;
 
   # Done
-  $self->{_state} = 'done' if $self->content->is_done;
+  $self->{state} = 'done' if $self->content->is_done;
 
   # Progress
   if (my $cb = $self->on_progress) { $self->$cb }
@@ -484,7 +480,7 @@ sub _parse {
   # Finished
   if ((my $cb = $self->on_finish) && $self->is_done) { $self->$cb }
 
-  $self;
+  return $self;
 }
 
 sub _parse_start_line {
@@ -556,7 +552,7 @@ sub _parse_formdata {
     push @formdata, [$name, $filename, $value];
   }
 
-  \@formdata;
+  return \@formdata;
 }
 
 1;

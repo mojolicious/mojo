@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
@@ -9,7 +7,7 @@ use utf8;
 use Mojolicious::Lite;
 
 # Load plugin
-plugin 'config';
+plugin 'Config';
 
 # GET /
 get '/' => 'index';

@@ -67,7 +67,7 @@ sub _tokenize {
   # No separator
   push @tree, [@token] if @token;
 
-  @tree;
+  return @tree;
 }
 
 1;

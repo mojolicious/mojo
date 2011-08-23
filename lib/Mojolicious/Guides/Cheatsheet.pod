@@ -164,15 +164,15 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 
 =head2 C<MOJO_CHUNK_SIZE>
 
-Chunk size used for IO operations in bytes, a bigger chunk size speeds up IO
-operations but will also use more memory, defaults to C<131072>.
+Chunk size used for I/O operations in bytes, a bigger chunk size speeds up
+I/O operations but will also use more memory, defaults to C<131072>.
 
   MOJO_CHUNK_SIZE=1024
 
 =head2 C<MOJO_CONFIG>
 
 Config file to be used by L<Mojolicious::Plugin::Config> and
-L<Mojolicious::Plugin::JsonConfig>, quite useful for testing.
+L<Mojolicious::Plugin::JSONConfig>, quite useful for testing.
 
    MOJO_CONFIG=myapp.conf
 
@@ -188,6 +188,12 @@ Home directory for the L<Mojolicious> application, should always contain a
 path like C</home/sri/myapp>.
 
   MOJO_HOME=/home/sri/myapp
+
+=head2 C<MOJO_IOWATCHER>
+
+Alternative L<Mojo::IOWatcher> implementation to try.
+
+  MOJO_IOWATCHER=Mojo::IOWatcher::EV
 
 =head2 C<MOJO_KEY_FILE>
 
@@ -273,13 +279,6 @@ Note that L<IO::Socket::SSL> must be installed for TLS support.
 
   MOJO_NO_TLS=1
 
-=head2 C<MOJO_POLL>
-
-Force poll mainloop for IO operations, this should only be used for testing
-since other mainloops are generally faster and scale better.
-
-  MOJO_POLL=1
-
 =head2 C<MOJO_PROXY>
 
 Enable automatic HTTP and HTTPS proxy detection in L<Mojo::UserAgent>, for
@@ -311,8 +310,8 @@ defaults to C<main>.
 
 =head2 C<MOJO_TMPDIR>
 
-Directory for temporary files like huge uploads, by default a random platform
-specific temporary directory will be used.
+Directory for temporary files like huge uploads, defaults to using a random
+platform specific temporary directory.
 
   MOJO_TMPDIR=/tmp/mojo
 

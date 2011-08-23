@@ -38,10 +38,10 @@ Mojolicious::Plugin::Charset - Charset Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin(charset => {charset => 'Shift_JIS'});
+  $self->plugin(Charset => {charset => 'Shift_JIS'});
 
   # Mojolicious::Lite
-  plugin charset => {charset => 'Shift_JIS'};
+  plugin Charset => {charset => 'Shift_JIS'};
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ and encoding on all layers of L<Mojolicious>.
 =head2 C<charset>
 
   # Mojolicious::Lite
-  plugin charset => {charset => 'Shift_JIS'};
+  plugin Charset => {charset => 'Shift_JIS'};
 
 Application charset.
 

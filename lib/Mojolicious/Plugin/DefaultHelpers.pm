@@ -8,8 +8,23 @@ require Data::Dumper;
 sub register {
   my ($self, $app) = @_;
 
-  # Add "app" helper
-  $app->helper(app => sub { shift->app });
+  # Controller alias helpers
+  for my $name (qw/app flash param stash session url_for/) {
+    $app->helper($name => sub { shift->$name(@_) });
+  }
+
+  # Stash key shortcuts
+  for my $name (qw/extends layout title/) {
+    $app->helper(
+      $name => sub {
+        my $self  = shift;
+        my $stash = $self->stash;
+        $stash->{$name} = shift if @_;
+        $self->stash(@_) if @_;
+        return $stash->{$name};
+      }
+    );
+  }
 
   # Add "content" helper
   $app->helper(content => sub { shift->render_content(@_) });
@@ -27,23 +42,9 @@ sub register {
   $app->helper(
     dumper => sub {
       shift;
-      Data::Dumper->new([@_])->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
+      Data::Dumper->new([@_])->Indent(1)->Terse(1)->Dump;
     }
   );
-
-  # Add "extends" helper
-  $app->helper(
-    extends => sub {
-      my $self  = shift;
-      my $stash = $self->stash;
-      $stash->{extends} = shift if @_;
-      $self->stash(@_) if @_;
-      $stash->{extends};
-    }
-  );
-
-  # Add "flash" helper
-  $app->helper(flash => sub { shift->flash(@_) });
 
   # Add "include" helper
   $app->helper(
@@ -58,26 +59,10 @@ sub register {
       my $extends = delete $args->{extends};
 
       # Localize arguments
-      my @keys  = keys %$args;
-      my $i     = 0;
-      my $stash = $self->stash;
-    START:
-      local $stash->{$keys[$i]} = $args->{$keys[$i]};
-      $i++;
-      goto START unless $i >= @keys;
+      my @keys = keys %$args;
+      local @{$self->stash}{@keys} = @{$args}{@keys};
 
-      $self->render_partial(layout => $layout, extend => $extends);
-    }
-  );
-
-  # Add "layout" helper
-  $app->helper(
-    layout => sub {
-      my $self  = shift;
-      my $stash = $self->stash;
-      $stash->{layout} = shift if @_;
-      $self->stash(@_) if @_;
-      $stash->{layout};
+      return $self->render_partial(layout => $layout, extend => $extends);
     }
   );
 
@@ -114,31 +99,6 @@ sub register {
       $memorize->{$name}->{content} = $cb->();
     }
   );
-
-  # Add "param" helper
-  $app->helper(
-    param => sub { wantarray ? (shift->param(@_)) : scalar shift->param(@_); }
-  );
-
-  # Add "session" helper
-  $app->helper(session => sub { shift->session(@_) });
-
-  # Add "stash" helper
-  $app->helper(stash => sub { shift->stash(@_) });
-
-  # Add "title" helper
-  $app->helper(
-    title => sub {
-      my $self  = shift;
-      my $stash = $self->stash;
-      $stash->{title} = shift if @_;
-      $self->stash(@_) if @_;
-      $stash->{title};
-    }
-  );
-
-  # Add "url_for" helper
-  $app->helper(url_for => sub { shift->url_for(@_) });
 }
 
 1;
@@ -151,10 +111,10 @@ Mojolicious::Plugin::DefaultHelpers - Default Helpers Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('default_helpers');
+  $self->plugin('DefaultHelpers');
 
   # Mojolicious::Lite
-  plugin 'default_helpers';
+  plugin 'DefaultHelpers';
 
 =head1 DESCRIPTION
 
@@ -164,6 +124,12 @@ This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.
 
 =head1 HELPERS
+
+=head2 C<app>
+
+  <%= app->secret %>
+
+Alias for L<Mojolicious::Controller/"app">.
 
 =head2 C<content>
 
@@ -204,7 +170,7 @@ Extend a template.
 
   <%= flash 'foo' %>
 
-Access flash values.
+Alias for L<Mojolicious::Controller/"flash">.
 
 =head2 C<include>
 
@@ -241,20 +207,20 @@ Memorize block result in memory and prevent future execution.
 
   <%= param 'foo' %>
 
-Access GET/POST parameters and route captures.
+Alias for L<Mojolicious::Controller/"param">.
 
 =head2 C<session>
 
   <%= session 'foo' %>
 
-Access session values.
+Alias for L<Mojolicious::Controller/"session">.
 
 =head2 C<stash>
 
   <%= stash 'foo' %>
   <% stash foo => 'bar'; %>
 
-Access stash values.
+Alias for L<Mojolicious::Controller/"stash">.
 
 =head2 C<title>
 
@@ -265,19 +231,9 @@ Page title.
 
 =head2 C<url_for>
 
-  <%= url_for %>
-  <%= url_for controller => 'bar', action => 'baz' %>
   <%= url_for 'named', controller => 'bar', action => 'baz' %>
-  <%= url_for '/perldoc' %>
-  <%= url_for 'http://mojolicio.us/perldoc' %>
 
-Generate a portable L<Mojo::URL> object with base for a route, path or URL.
-
-  %# "/perldoc" if application is deployed under "/"
-  %= url_for '/perldoc'
-
-  %# "/myapp/perldoc" if application is deployed under "/myapp"
-  %= url_for '/perldoc'
+Alias for L<Mojolicious::Controller/"url_for">.
 
 =head1 METHODS
 

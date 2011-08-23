@@ -31,7 +31,8 @@ has trim_mark       => '=';
 my $HELPERS = <<'EOF';
 use Mojo::ByteStream 'b';
 use Mojo::Util;
-no strict 'refs'; no warnings 'redefine';
+no strict 'refs';
+no warnings 'redefine';
 sub capture;
 *capture = sub { shift->(@_) };
 sub escape;
@@ -45,7 +46,7 @@ sub escape;
   Mojo::Util::xml_escape $v;
   $v;
 };
-use strict; use warnings;
+use Mojo::Base -strict;
 EOF
 $HELPERS =~ s/\n//g;
 
@@ -146,7 +147,7 @@ sub build {
   $self->code(join "\n", @lines);
   $self->tree([]);
 
-  $self;
+  return $self;
 }
 
 sub compile {
@@ -162,7 +163,7 @@ sub compile {
     if $@;
 
   $self->compiled($compiled);
-  undef;
+  return;
 }
 
 sub interpret {
@@ -177,7 +178,7 @@ sub interpret {
   return unless $compiled;
 
   # Stacktrace
-  local $SIG{__DIE__} = local $SIG{__DIE__} = sub {
+  local $SIG{__DIE__} = sub {
     CORE::die($_[0]) if ref $_[0];
     Mojo::Exception->throw(shift, [$self->template, $self->code],
       $self->name);
@@ -189,7 +190,7 @@ sub interpret {
     Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
     if $@;
 
-  $output;
+  return $output;
 }
 
 # "I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T..."
@@ -417,7 +418,7 @@ sub parse {
     push @{$self->tree}, \@token;
   }
 
-  $self;
+  return $self;
 }
 
 sub render {
@@ -435,29 +436,25 @@ sub render {
   return $e if $e;
 
   # Interpret
-  $self->interpret(@_);
+  return $self->interpret(@_);
 }
 
 sub render_file {
   my $self = shift;
   my $path = shift;
 
-  # Open file
-  $self->name($path) unless defined $self->{name};
-  my $file = IO::File->new;
-  $file->open("< $path") or croak "Can't open template '$path': $!";
-
   # Slurp file
+  $self->name($path) unless defined $self->{name};
+  croak "Can't open template '$path': $!"
+    unless my $file = IO::File->new("< $path");
   my $tmpl = '';
   while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) {
     $tmpl .= $buffer;
   }
 
-  # Encoding
+  # Decode and render
   $tmpl = decode($self->encoding, $tmpl) if $self->encoding;
-
-  # Render
-  $self->render($tmpl, @_);
+  return $self->render($tmpl, @_);
 }
 
 sub render_file_to_file {
@@ -470,7 +467,7 @@ sub render_file_to_file {
   return $output if ref $output;
 
   # Write to file
-  $self->_write_file($tpath, $output);
+  return $self->_write_file($tpath, $output);
 }
 
 sub render_to_file {
@@ -483,7 +480,7 @@ sub render_to_file {
   return $output if ref $output;
 
   # Write to file
-  $self->_write_file($path, $output);
+  return $self->_write_file($path, $output);
 }
 
 sub _trim_line {
@@ -514,23 +511,19 @@ sub _trim_line {
     return 1 if length $value;
   }
 
-  undef;
+  return;
 }
 
 sub _write_file {
   my ($self, $path, $output) = @_;
 
-  # Open file
-  my $file = IO::File->new;
-  $file->open("> $path") or croak "Can't open file '$path': $!";
-
-  # Encoding
+  # Encode and write to file
+  croak "Can't open file '$path': $!"
+    unless my $file = IO::File->new("> $path");
   $output = encode($self->encoding, $output) if $self->encoding;
-
-  # Write to file
   $file->syswrite($output) or croak "Can't write to file '$path': $!";
 
-  undef;
+  return;
 }
 
 1;

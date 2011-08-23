@@ -151,16 +151,16 @@ application class.
 The renderer will always try to detect the right template but you can also
 use the C<template> stash value to render a specific one.
 
-  $self->render(template => 'foo');
+  $self->render(template => 'foo/bar');
 
 Choosing a specific C<format> and C<handler> is just as easy.
 
-  $self->render(template => 'foo', format => 'txt', handler => 'epl');
+  $self->render(template => 'foo/bar', format => 'txt', handler => 'epl');
 
 Because rendering a specific template is the most common task it also has a
 shortcut.
 
-  $self->render('foo');
+  $self->render('foo/bar');
 
 All values passed to the C<render> call are only temporarily assigned to the
 stash and get reset again once rendering is finished.
@@ -255,6 +255,46 @@ Since everything is just Perl normal control structures just work.
     <%= $app %> is a <%= $description %>.
   <% } %>
 
+=head2 Content Negotiation
+
+For resources with different representations and that require truly
+C<RESTful> content negotiation you can also use C<respond_to> instead of
+C<render>.
+
+  # "Accept: application/json" -> "json"
+  # "Accept: text/xml"         -> "xml"
+  $self->respond_to(
+    json => {json => {hello => 'world'}},
+    xml  => {text => '<hello>world</hello>'}
+  );
+
+The best possible representation will be automatically selected from the
+C<Accept> request header, C<format> stash value or C<format> GET/POST
+parameter.
+
+  $self->respond_to(
+    json => {json => {hello => 'world'}},
+    html => sub {
+      $self->content_for(head => '<meta name="author" content="sri" />');
+      $self->render(template => 'hello', message => 'world')
+    }
+  );
+
+Callbacks can be used for representations that are too complex to fit into a
+single C<render> call.
+
+  # "Accept: application/json" -> "json"
+  # "Accept: text/html"        -> "html"
+  # "Accept: image/png"        -> "any"
+  $self->respond_to(
+    json => {json => {hello => 'world'}},
+    html => {template => 'hello', message => 'world'},
+    any  => {text => '', status => 204}
+  );
+
+And if no viable representation could be found, the C<any> fallback will be
+used.
+
 =head2 Helpers
 
 Helpers are little functions you can use in templates and controller code.
@@ -308,6 +348,26 @@ You can also pass along normal stash values to the C<layout> helper.
     <body><%= content %></body>
   </html>
 
+Instead of the C<layout> helper you could also just use the C<layout> stash
+value, or call C<render> with the C<layout> argument.
+
+  $self->render(template => 'mytemplate', layout => 'mylayout');
+
+To set a C<layout> stash value application wide you can use C<defaults>.
+
+  # Application
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
+
+  sub startup {
+    my $self = shift;
+
+    # Default layout
+    $self->defaults(layout => 'mylayout');
+  }
+
+  1;
+
 =head2 Including Partial Templates
 
 Like most helpers the C<include> helper is just a shortcut to make your life
@@ -334,7 +394,9 @@ argument.
   @@ header.html.ep
   <head><title>Howdy!</title></head>
 
-Of course you can also pass stash values.
+But there is one small difference between the two, if you pass stash values
+to C<include>, they will get localized automatically and are only available
+in the partial template.
 
   @@ foo/bar.html.ep
   <!doctype html><html>
@@ -407,7 +469,7 @@ of the template to the layout.
 Inheritance takes the layout concept above one step further.
 Unlike C<content_for> the C<content> helper does not allow appending to
 existing values, this makes it possible to overload whole template sections.
-The only difference between C<layout> and the C<extends> is that extended
+The only difference between C<layout> and C<extends> is that extended
 templates don't get prefixed with C<layouts/>.
 
   @@ first.html.ep
@@ -446,6 +508,104 @@ executed more than once.
   <%= memorize begin %>
     This template was compiled at <%= localtime time %>.
   <% end %>
+
+=head2 Adding Helpers
+
+Adding and redefining helpers is very easy, you can use them to do pretty
+much everything.
+
+  use Mojolicious::Lite;
+
+  helper debug => sub {
+    my ($self, $string) = @_;
+    $self->app->log->debug($string);
+  };
+
+  get '/' => sub {
+    my $self = shift;
+    $self->debug('action');
+  } => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  % debug 'template';
+
+Helpers can also accept template blocks as last argument, this for example
+allows very pleasant to use tag helpers and filters.
+
+  use Mojolicious::Lite;
+  use Mojo::ByteStream;
+
+  helper trim_newline => sub {
+    my ($self, $block) = @_;
+    my $result = $block->();
+    $result =~ s/\n//g;
+    return Mojo::ByteStream->new($result);
+  };
+
+  get '/' => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <%= trim_newline begin %>
+    Some text.
+    <%= 1 + 1 %>
+    More text.
+  <% end %>
+
+Wrapping the helper result into a L<Mojo::ByteStream> object can prevent
+accidental double escaping.
+
+=head2 Helper Plugins
+
+Some helpers might be useful enough for you to share them between multiple
+applications, plugins make that very simple.
+
+  package Mojolicious::Plugin::DebugHelper;
+  use Mojo::Base 'Mojolicious::Plugin';
+
+  sub register {
+    my ($self, $app) = @_;
+    $app->helper(debug => sub {
+      my ($self, $string) = @_;
+      $self->app->log->debug($string);
+    });
+  }
+
+  1;
+
+The C<register> method will be called when you load the plugin.
+
+  use Mojolicious::Lite;
+
+  plugin 'DebugHelper';
+
+  get '/' => sub {
+    my $self = shift;
+    $self->debug('It works.');
+    $self->render_text('Hello!');
+  };
+
+  app->start;
+
+A skeleton for a full C<CPAN> compatible plugin distribution can be
+automatically generated.
+
+  $ mojo generate plugin DebugHelper
+
+And if you have a C<PAUSE> account (which can be requested at
+L<http://pause.perl.org>), you are only a few commands away from relasing it
+to C<CPAN>.
+
+  $ perl Makefile.PL
+  $ make test
+  $ make manifest
+  $ make dist
+  $ mojo cpanify -u USER -p PASS Mojolicious-Plugin-DebugHelper-0.01.tar.gz
 
 =head2 Mode Specific C<exception> And C<not_found> Templates
 
@@ -545,7 +705,7 @@ The C<inflate> command will write all templates and static files from the
 C<DATA> section into actual files in the C<templates> and C<public>
 directories.
 
-  % ./myapp.pl inflate
+  $ ./myapp.pl inflate
 
 =head2 Customizing The Template Syntax
 
@@ -554,7 +714,7 @@ plugin with a custom configuration.
 
   use Mojolicious::Lite;
 
-  plugin ep_renderer => {
+  plugin EPRenderer => {
     name     => 'mustache',
     template => {
       tag_start => '{{',
@@ -571,57 +731,6 @@ plugin with a custom configuration.
   Hello {{= $name }}.
 
 L<Mojo::Template> contains the whole list of available options.
-
-=head2 Adding Helpers
-
-Adding and redefining helpers is very easy, you can use them to do pretty
-much everything.
-
-  use Mojolicious::Lite;
-
-  helper debug => sub {
-    my ($self, $string) = @_;
-    $self->app->log->debug($string);
-  };
-
-  get '/' => sub {
-    my $self = shift;
-    $self->debug('action');
-  } => 'index';
-
-  app->start;
-  __DATA__
-
-  @@ index.html.ep
-  % debug 'template';
-
-Helpers can also accept template blocks as last argument, this for example
-allows very pleasant to use tag helpers and filters.
-
-  use Mojolicious::Lite;
-  use Mojo::ByteStream;
-
-  helper trim_newline => sub {
-    my ($self, $block) = @_;
-    my $result = $block->();
-    $result =~ s/\n//g;
-    return Mojo::ByteStream->new($result);
-  };
-
-  get '/' => 'index';
-
-  app->start;
-  __DATA__
-
-  @@ index.html.ep
-  <%= trim_newline begin %>
-    Some text.
-    <%= 1 + 1 %>
-    More text.
-  <% end %>
-
-Wrapping the helper result into a L<Mojo::ByteStream> object can prevent
-accidental double escaping.
 
 =head2 Adding Your Favorite Template System
 

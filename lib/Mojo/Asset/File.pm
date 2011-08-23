@@ -41,7 +41,7 @@ has handle => sub {
   # Open for read/write access
   $handle->fdopen(fileno($fh), "+>") or croak qq/Can't open file "$name": $!/;
 
-  $handle;
+  return $handle;
 };
 has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
 
@@ -69,7 +69,7 @@ sub add_chunk {
   utf8::encode $chunk if utf8::is_utf8 $chunk;
   $self->handle->syswrite($chunk, length $chunk);
 
-  $self;
+  return $self;
 }
 
 sub contains {
@@ -103,7 +103,7 @@ sub contains {
     substr $window, 0, $read, '';
   }
 
-  -1;
+  return -1;
 }
 
 sub get_chunk {
@@ -127,7 +127,7 @@ sub get_chunk {
   }
   else { $self->handle->sysread($buffer, $size) }
 
-  $buffer;
+  return $buffer;
 }
 
 sub move_to {
@@ -146,7 +146,7 @@ sub move_to {
   # Don't clean up a moved file
   $self->cleanup(0);
 
-  $self;
+  return $self;
 }
 
 sub size {
@@ -156,7 +156,7 @@ sub size {
   my $file = $self->path;
   return -s $file if $file;
 
-  0;
+  return 0;
 }
 
 sub slurp {
@@ -169,7 +169,7 @@ sub slurp {
   my $content = '';
   while ($self->handle->sysread(my $buffer, 131072)) { $content .= $buffer }
 
-  $content;
+  return $content;
 }
 
 1;

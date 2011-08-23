@@ -31,7 +31,7 @@ sub load {
     return Mojo::Exception->new($@);
   }
 
-  undef;
+  return;
 }
 
 # "This is the worst thing you've ever done.
@@ -63,8 +63,7 @@ sub search {
     }
   }
 
-  return unless @$modules;
-  $modules;
+  return $modules;
 }
 
 1;
@@ -78,9 +77,14 @@ Mojo::Loader - Loader
 
   use Mojo::Loader;
 
+  # Find modules in a namespace
   my $loader = Mojo::Loader->new;
-  my $modules = $loader->search('Some::Namespace');
-  $loader->load($modules->[0]);
+  for my $module (@{$loader->search('Some::Namespace')}) {
+
+    # And load them safely
+    my $e = $loader->load($module);
+    warn qq/Loading "$module" failed: $e/ if ref $e;
+  }
 
 =head1 DESCRIPTION
 
@@ -108,8 +112,6 @@ loaded.
   my $modules = $loader->search('MyApp::Namespace');
 
 Search for modules in a namespace non-recursively.
-
-  $loader->load($_) for @{$loader->search('MyApp::Namespace')};
 
 =head1 SEE ALSO
 

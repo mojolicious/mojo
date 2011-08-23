@@ -1,9 +1,7 @@
 #!/usr/bin/env perl
 
 package MyTemplateExporter;
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 sub import {
   my $caller = caller;
@@ -12,20 +10,16 @@ sub import {
 }
 
 package MyTemplateException;
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 sub exception { die 'ohoh' }
 
 package main;
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 165;
+use Test::More tests => 188;
 
 use File::Spec;
 use File::Temp;
@@ -592,22 +586,22 @@ test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/ohoh/, 'right message';
-is $output->lines_before->[0]->[0], 14, 'right number';
-is $output->lines_before->[0]->[1], 'package MyTemplateException;',
+is $output->lines_before->[0]->[0], 10,  'right number';
+is $output->lines_before->[0]->[1], '}', 'right line';
+is $output->lines_before->[1]->[0], 11,  'right number';
+is $output->lines_before->[1]->[1], '',  'right line';
+is $output->lines_before->[2]->[0], 12,  'right number';
+is $output->lines_before->[2]->[1], 'package MyTemplateException;',
   'right line';
-is $output->lines_before->[1]->[0], 15,              'right number';
-is $output->lines_before->[1]->[1], '',              'right line';
-is $output->lines_before->[2]->[0], 16,              'right number';
-is $output->lines_before->[2]->[1], 'use strict;',   'right line';
-is $output->lines_before->[3]->[0], 17,              'right number';
-is $output->lines_before->[3]->[1], 'use warnings;', 'right line';
-is $output->lines_before->[4]->[0], 18,              'right number';
-is $output->lines_before->[4]->[1], '',              'right line';
-is $output->line->[0], 19, 'right number';
+is $output->lines_before->[3]->[0], 13,                        'right number';
+is $output->lines_before->[3]->[1], 'use Mojo::Base -strict;', 'right line';
+is $output->lines_before->[4]->[0], 14,                        'right number';
+is $output->lines_before->[4]->[1], '',                        'right line';
+is $output->line->[0], 15, 'right number';
 is $output->line->[1], "sub exception { die 'ohoh' }", 'right line';
-is $output->lines_after->[0]->[0], 20,              'right number';
+is $output->lines_after->[0]->[0], 16,              'right number';
 is $output->lines_after->[0]->[1], '',              'right line';
-is $output->lines_after->[1]->[0], 21,              'right number';
+is $output->lines_after->[1]->[0], 17,              'right number';
 is $output->lines_after->[1]->[1], 'package main;', 'right line';
 like "$output", qr/ohoh/, 'right result';
 
@@ -634,6 +628,43 @@ is $output->lines_after->[1]->[0], 5,          'right number';
 is $output->lines_after->[1]->[1], 'test',     'right line';
 like "$output", qr/oops\! at template line 3, near "%= 1 \+ 1"./,
   'right result';
+
+# Exception in template (empty perl lines)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+test
+123
+%
+% die 'oops!';
+%
+  %
+%
+%= 1 + 1
+test
+EOF
+isa_ok $output, 'Mojo::Exception', 'right exception';
+like $output->message, qr/oops\!/, 'right message';
+is $output->lines_before->[0]->[0], 1,      'right number';
+is $output->lines_before->[0]->[1], 'test', 'right line';
+ok $output->lines_before->[0]->[2], 'contains code';
+is $output->lines_before->[1]->[0], 2,      'right number';
+is $output->lines_before->[1]->[1], '123',  'right line';
+ok $output->lines_before->[1]->[2], 'contains code';
+is $output->lines_before->[2]->[0], 3,      'right number';
+is $output->lines_before->[2]->[1], '%',    'right line';
+is $output->lines_before->[2]->[2], '',     'right code';
+is $output->line->[0], 4, 'right number';
+is $output->line->[1], "% die 'oops!';", 'right line';
+is $output->lines_after->[0]->[0], 5,     'right number';
+is $output->lines_after->[0]->[1], '%',   'right line';
+is $output->lines_after->[0]->[2], '',    'right code';
+is $output->lines_after->[1]->[0], 6,     'right number';
+is $output->lines_after->[1]->[1], '  %', 'right line';
+is $output->lines_after->[1]->[2], '',    'right code';
+is $output->lines_after->[2]->[0], 7,     'right number';
+is $output->lines_after->[2]->[1], '%',   'right line';
+is $output->lines_after->[2]->[2], '',    'right code';
+like "$output", qr/oops\! at template line 4, near "%"./, 'right result';
 
 # Exception in nested template
 $mt = Mojo::Template->new;

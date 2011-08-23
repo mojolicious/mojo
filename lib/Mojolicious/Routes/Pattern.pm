@@ -16,14 +16,14 @@ has [qw/format pattern regex/];
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  $self;
+  return $self;
 }
 
 sub match {
   my ($self, $path) = @_;
   my $result = $self->shape_match(\$path);
   return $result if !$path || $path eq '/';
-  undef;
+  return;
 }
 
 sub parse {
@@ -34,18 +34,22 @@ sub parse {
   return $self if !defined $pattern || $pattern eq '/';
   $pattern = "/$pattern" unless $pattern =~ /^\//;
 
-  # Format
-  if ($pattern =~ /\.([^\/\)]+)$/) { $self->format($1) }
-
   # Requirements
   my $reqs = ref $_[0] eq 'HASH' ? $_[0] : {@_};
   $self->reqs($reqs);
+
+  # Format in pattern
+  if ($pattern =~ s/\.([^\/\)]+)$//) {
+    $reqs->{format}           = quotemeta $1;
+    $self->defaults->{format} = $1;
+    $self->{strict}           = 1;
+  }
 
   # Tokenize
   $self->pattern($pattern);
   $self->_tokenize;
 
-  $self;
+  return $self;
 }
 
 sub render {
@@ -79,15 +83,14 @@ sub render {
       $rendered = $values->{$name};
       $rendered = '' unless defined $rendered;
       my $default = $self->defaults->{$name};
-      $default = '' unless defined $default;
-      $optional = 0 unless $default eq $rendered;
-      $rendered = '' if $optional && $default eq $rendered;
+      if (!defined $default || ($default ne $rendered)) { $optional = 0 }
+      elsif ($optional) { $rendered = '' }
     }
 
     $string = "$rendered$string";
   }
 
-  $string || '/';
+  return $string || '/';
 }
 
 sub shape_match {
@@ -110,19 +113,36 @@ sub shape_match {
       my $capture = shift @captures;
       $result->{$symbol} = $capture if defined $capture;
     }
+
+    # Format
+    my $format = $self->format;
+    if ($format && $$pathref =~ s/$format//) { $result->{format} ||= $1 }
+    elsif ($self->reqs->{format}) {
+      return if !$result->{format} || $self->{strict};
+    }
+
     return $result;
   }
 
-  undef;
+  return;
 }
 
 sub _compile {
   my $self = shift;
 
+  # Compile format regular expression
+  my $reqs = $self->reqs;
+  if (!exists $reqs->{format} || $reqs->{format}) {
+    my $format =
+      defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^\/]+)';
+    $self->format(qr/^\/?\.$format$/);
+  }
+
   # Compile tree to regular expression
   my $block    = '';
   my $regex    = '';
   my $optional = 1;
+  my $defaults = $self->defaults;
   for my $token (reverse @{$self->tree}) {
     my $op       = $token->[0];
     my $compiled = '';
@@ -132,10 +152,8 @@ sub _compile {
 
       # Full block
       $block = $optional ? "(?:/$block)?" : "/$block";
-
       $regex = "$block$regex";
       $block = '';
-
       next;
     }
 
@@ -160,11 +178,11 @@ sub _compile {
       elsif ($op eq 'wildcard') { $compiled = '(.+)' }
 
       # Custom regex
-      my $req = $self->reqs->{$name};
-      $compiled = "($req)" if $req;
+      my $req = $reqs->{$name};
+      $compiled = _compile_req($req) if $req;
 
       # Optional placeholder
-      $optional = 0 unless exists $self->defaults->{$name};
+      $optional = 0 unless exists $defaults->{$name};
       $compiled .= '?' if $optional;
     }
 
@@ -175,10 +193,17 @@ sub _compile {
   # Not rooted with a slash
   $regex = "$block$regex" if $block;
 
+  # Compile
   $regex = qr/^$regex/;
   $self->regex($regex);
 
-  $regex;
+  return $regex;
+}
+
+sub _compile_req {
+  my $req = shift;
+  return "($req)" if !ref $req || ref $req ne 'ARRAY';
+  return '(' . join('|', map {quotemeta} reverse sort @$req) . ')';
 }
 
 sub _tokenize {
@@ -271,7 +296,7 @@ sub _tokenize {
   }
   $self->tree($tree);
 
-  $self;
+  return $self;
 }
 
 1;
@@ -301,6 +326,14 @@ L<Mojolicious::Routes::Pattern> implements the following attributes.
 
 Default parameters.
 
+=head2 C<format>
+
+  my $regex = $pattern->format;
+  $pattern  = $pattern->format($regex);
+
+Compiled regex for format matching.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head2 C<pattern>
 
   my $pattern = $pattern->pattern;
@@ -325,7 +358,7 @@ Character indicating the start of a quoted placeholder, defaults to C<(>.
 =head2 C<regex>
 
   my $regex = $pattern->regex;
-  $pattern  = $pattern->regex(qr/\/foo/);
+  $pattern  = $pattern->regex($regex);
 
 Pattern in compiled regex form.
 

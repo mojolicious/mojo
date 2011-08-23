@@ -1,32 +1,31 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
-
-use Test::More tests => 11;
-
-use_ok 'Mojo::IOLoop';
-
-use IO::Handle;
+use Test::More tests => 13;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
 #  besides occasionally wearing the underwear,
 #  which as we discussed, is strictly a comfort thing."
-my $loop = Mojo::IOLoop->new;
+use_ok 'Mojo::IOLoop';
 
-# Readonly handle
-my $ro = IO::Handle->new;
-$ro->fdopen(fileno(DATA), 'r');
-my $error;
-$loop->connect(
-  handle   => $ro,
-  on_read  => sub { },
-  on_error => sub { $error = pop }
-);
+# Custom watcher
+package MyWatcher;
+use Mojo::Base 'Mojo::IOWatcher';
+
+package main;
+Mojo::IOLoop->singleton->iowatcher(MyWatcher->new);
+
+# Watcher inheritance
+my $loop = Mojo::IOLoop->new;
+Mojo::IOLoop->iowatcher(MyWatcher->new);
+is ref $loop->iowatcher, 'MyWatcher', 'right class';
 
 # Ticks
 my $ticks = 0;
@@ -61,18 +60,11 @@ is $flag, 23, 'recursive timer works';
 # HiRes timer
 is $hiresflag, 42, 'hires timer';
 
-# Idle callback
-my $idle = 0;
-$loop->idle(sub { $idle++ });
-
 # Another tick
 $loop->one_tick;
 
 # Ticks
 ok $ticks > 2, 'more than two ticks';
-
-# Idle callback
-is $idle, 1, 'one idle event';
 
 # Run again without first tick event handler
 my $before = $ticks;
@@ -81,16 +73,17 @@ $loop->recurring(0 => sub { $after++ });
 $loop->drop($id);
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok $after > 2, 'more than two ticks';
+$loop->one_tick;
+ok $after > 1, 'more than one tick';
 is $ticks, $before, 'no additional ticks';
-
 
 # Recurring timer
 my $count = 0;
 $loop->recurring(0.5 => sub { $count++ });
 $loop->timer(3 => sub { shift->stop });
 $loop->start;
-ok $count > 4, 'more than four recurring events';
+$loop->one_tick;
+ok $count > 3, 'more than three recurring events';
 
 # Handle
 my $port = Mojo::IOLoop->generate_port;
@@ -114,13 +107,40 @@ $loop->connect(
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
 
-# Readonly handle
-is $error, undef, 'no error';
-
-# Idle
-$idle = 0;
-Mojo::IOLoop->idle(sub { Mojo::IOLoop->stop if $idle++ });
-Mojo::IOLoop->start;
-is $idle, 2, 'two idle ticks';
-
-__DATA__
+# Dropped listen socket
+$port = Mojo::IOLoop->generate_port;
+$id = $loop->listen(port => $port);
+my ($connected, $error);
+$loop->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    my $loop = shift;
+    $loop->drop($id);
+    $loop->stop;
+    $connected = 1;
+  },
+  on_error => sub {
+    shift->stop;
+    $error = pop;
+  }
+);
+$loop->start;
+ok $connected, 'connected';
+ok !$error, 'no error';
+$connected = $error = undef;
+$loop->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    shift->stop;
+    $connected = 1;
+  },
+  on_error => sub {
+    shift->stop;
+    $error = pop;
+  }
+);
+$loop->start;
+ok !$connected, 'not connected';
+ok $error, 'has error';

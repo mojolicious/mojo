@@ -49,19 +49,19 @@ sub new {
     }
   );
 
-  $self;
+  return $self;
 }
 
 sub add_handler {
   my ($self, $name, $cb) = @_;
   $self->handlers->{$name} = $cb;
-  $self;
+  return $self;
 }
 
 sub add_helper {
   my ($self, $name, $cb) = @_;
   $self->helpers->{$name} = $cb;
-  $self;
+  return $self;
 }
 
 sub get_data_template {
@@ -156,7 +156,7 @@ sub render {
     encode $encoding, $output if $encoding && $output && !$json && !$data;
   }
 
-  ($output, $c->app->types->type($format) || 'text/plain');
+  return $output, $c->app->types->type($format) || 'text/plain';
 }
 
 sub template_name {
@@ -168,13 +168,13 @@ sub template_name {
   my $file    = "$template.$format";
   $file = "$file.$handler" if defined $handler;
 
-  $file;
+  return $file;
 }
 
 sub template_path {
   my $self = shift;
   return unless my $name = $self->template_name(shift);
-  File::Spec->catfile($self->root, split '/', $name);
+  return File::Spec->catfile($self->root, split '/', $name);
 }
 
 sub _detect_handler {
@@ -184,15 +184,15 @@ sub _detect_handler {
   return unless $self->detect_templates;
 
   # Templates
-  my $templates = $self->{_templates};
+  my $templates = $self->{templates};
   unless ($templates) {
-    $templates = $self->{_templates} =
+    $templates = $self->{templates} =
       Mojo::Home->new->parse($self->root)->list_files;
   }
 
   # DATA templates
   my $class  = $self->_detect_template_class($options);
-  my $inline = $self->{_data_templates}->{$class}
+  my $inline = $self->{data_templates}->{$class}
     ||= $self->_list_data_templates($class);
 
   # Detect
@@ -202,7 +202,7 @@ sub _detect_handler {
     if ($template =~ /^$file\.(\w+)$/) { return $1 }
   }
 
-  undef;
+  return;
 }
 
 # "You are hereby conquered.
@@ -221,13 +221,13 @@ sub _extends {
   if (my $layout = delete $stash->{layout}) {
     $stash->{extends} ||= $self->layout_prefix . '/' . $layout;
   }
-  delete $stash->{extends};
+  return delete $stash->{extends};
 }
 
 sub _list_data_templates {
   my ($self, $class) = @_;
   my $all = Mojo::Command->new->get_all_data($class);
-  [keys %$all];
+  return [keys %$all];
 }
 
 # "Well, at least here you'll be treated with dignity.
@@ -253,7 +253,7 @@ sub _render_template {
   return unless $renderer->($self, $c, $output, $options);
 
   # Success!
-  1;
+  return 1;
 }
 
 1;
@@ -284,7 +284,7 @@ L<Mojolicious::Renderer> implements the following attributes.
   my $cache = $renderer->cache;
   $renderer = $renderer->cache(Mojo::Cache->new);
 
-Renderer cache, by default a L<Mojo::Cache> object.
+Renderer cache, defaults to a L<Mojo::Cache> object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<default_format>
@@ -307,11 +307,11 @@ detection doesn't work, like for C<inline> templates.
 
 =item epl
 
-C<Embedded Perl Lite> handled by L<Mojolicious::Plugin::EplRenderer>.
+C<Embedded Perl Lite> handled by L<Mojolicious::Plugin::EPLRenderer>.
 
 =item ep
 
-C<Embedded Perl> handled by L<Mojolicious::Plugin::EpRenderer>.
+C<Embedded Perl> handled by L<Mojolicious::Plugin::EPRenderer>.
 
 =back
 
@@ -382,14 +382,14 @@ Construct a new renderer.
   $renderer = $renderer->add_handler(epl => sub {...});
     
 Add a new handler to the renderer.
-See L<Mojolicious::Plugin::EpRenderer> for a sample renderer.
+See L<Mojolicious::Plugin::EPRenderer> for a sample renderer.
 
 =head2 C<add_helper>
 
   $renderer = $renderer->add_helper(url_for => sub {...});
 
 Add a new helper to the renderer.
-See L<Mojolicious::Plugin::EpRenderer> for sample helpers.
+See L<Mojolicious::Plugin::EPRenderer> for sample helpers.
 
 =head2 C<get_data_template>
 

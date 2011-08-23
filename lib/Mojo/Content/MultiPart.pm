@@ -16,7 +16,7 @@ sub body_contains {
     $found += $part->body_contains($chunk);
   }
 
-  $found ? 1 : 0;
+  return $found ? 1 : 0;
 }
 
 sub body_size {
@@ -42,7 +42,7 @@ sub body_size {
     $len += $boundary_length;
   }
 
-  $len;
+  return $len;
 }
 
 sub build_boundary {
@@ -75,7 +75,7 @@ sub build_boundary {
   my $after  = $2 || '';
   $headers->content_type("$before; boundary=$boundary$after");
 
-  $boundary;
+  return $boundary;
 }
 
 sub get_body_chunk {
@@ -131,12 +131,12 @@ sub parse {
   return $self if $self->on_read;
 
   # Upgrade state
-  $self->{_multi_state} ||= 'multipart_preamble';
+  $self->{multi_state} ||= 'multipart_preamble';
 
   # Parse multipart content
   $self->_parse_multipart;
 
-  $self;
+  return $self;
 }
 
 sub _parse_multipart {
@@ -150,17 +150,17 @@ sub _parse_multipart {
     last if $self->is_done;
 
     # Preamble
-    if (($self->{_multi_state} || '') eq 'multipart_preamble') {
+    if (($self->{multi_state} || '') eq 'multipart_preamble') {
       last unless $self->_parse_multipart_preamble($boundary);
     }
 
     # Boundary
-    elsif (($self->{_multi_state} || '') eq 'multipart_boundary') {
+    elsif (($self->{multi_state} || '') eq 'multipart_boundary') {
       last unless $self->_parse_multipart_boundary($boundary);
     }
 
     # Body
-    elsif (($self->{_multi_state} || '') eq 'multipart_body') {
+    elsif (($self->{multi_state} || '') eq 'multipart_body') {
       last unless $self->_parse_multipart_body($boundary);
     }
   }
@@ -170,64 +170,64 @@ sub _parse_multipart_body {
   my ($self, $boundary) = @_;
 
   # Whole part in buffer
-  my $pos = index $self->{_b2}, "\x0d\x0a--$boundary";
+  my $pos = index $self->{b2}, "\x0d\x0a--$boundary";
   if ($pos < 0) {
-    my $len = length($self->{_b2}) - (length($boundary) + 8);
+    my $len = length($self->{b2}) - (length($boundary) + 8);
     return unless $len > 0;
 
     # Store chunk
-    my $chunk = substr $self->{_b2}, 0, $len, '';
+    my $chunk = substr $self->{b2}, 0, $len, '';
     $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
     return;
   }
 
   # Store chunk
-  my $chunk = substr $self->{_b2}, 0, $pos, '';
+  my $chunk = substr $self->{b2}, 0, $pos, '';
   $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
-  $self->{_multi_state} = 'multipart_boundary';
-  1;
+  $self->{multi_state} = 'multipart_boundary';
+  return 1;
 }
 
 sub _parse_multipart_boundary {
   my ($self, $boundary) = @_;
 
   # Boundary begins
-  if ((index $self->{_b2}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
-    substr $self->{_b2}, 0, length($boundary) + 6, '';
+  if ((index $self->{b2}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
+    substr $self->{b2}, 0, length($boundary) + 6, '';
 
     # New part
     push @{$self->parts}, Mojo::Content::Single->new(relaxed => 1);
-    $self->{_multi_state} = 'multipart_body';
+    $self->{multi_state} = 'multipart_body';
     return 1;
   }
 
   # Boundary ends
   my $end = "\x0d\x0a--$boundary--";
-  if ((index $self->{_b2}, $end) == 0) {
-    substr $self->{_b2}, 0, length $end, '';
+  if ((index $self->{b2}, $end) == 0) {
+    substr $self->{b2}, 0, length $end, '';
 
     # Done
-    $self->{_state} = $self->{_multi_state} = 'done';
+    $self->{state} = $self->{multi_state} = 'done';
   }
 
-  undef;
+  return;
 }
 
 sub _parse_multipart_preamble {
   my ($self, $boundary) = @_;
 
   # Replace preamble with carriage return and line feed
-  my $pos = index $self->{_b2}, "--$boundary";
+  my $pos = index $self->{b2}, "--$boundary";
   unless ($pos < 0) {
-    substr $self->{_b2}, 0, $pos, "\x0d\x0a";
+    substr $self->{b2}, 0, $pos, "\x0d\x0a";
 
     # Parse boundary
-    $self->{_multi_state} = 'multipart_boundary';
+    $self->{multi_state} = 'multipart_boundary';
     return 1;
   }
 
   # No boundary yet
-  undef;
+  return;
 }
 
 1;

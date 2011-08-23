@@ -1,15 +1,16 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 68;
+plan tests => 73;
 
 use_ok 'Mojo::UserAgent';
 
@@ -69,7 +70,7 @@ $ENV{https_proxy} = $backup5;
 $ENV{no_proxy}    = $backup6;
 
 # User agent
-$ua = Mojo::UserAgent->new(app => app);
+$ua = Mojo::UserAgent->new->app(app);
 
 # Server
 my $port   = Mojo::IOLoop->generate_port;
@@ -158,7 +159,7 @@ is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
 # Fresh blocking user agent
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton, app => app);
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 
 # GET / (missing Content-Lengt header)
 $tx = $ua->get("http://localhost:$port2/");
@@ -184,7 +185,7 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
-Mojo::IOLoop->singleton->_drop_immediately($last);
+Mojo::IOLoop->singleton->_drop($last);
 
 # GET / (mock server closed connection)
 $tx = $ua->get("http://localhost:$port/mock");
@@ -201,7 +202,7 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # Close connection (bypassing safety net)
-Mojo::IOLoop->singleton->_drop_immediately($last);
+Mojo::IOLoop->singleton->_drop($last);
 
 # GET / (mock server closed connection)
 $tx = $ua->get("http://localhost:$port/mock");
@@ -245,6 +246,12 @@ ok $tx->success, 'successful';
 is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
+
+# GET / (built-in server)
+$tx = $ua->get('/');
+ok $tx->success, 'successful';
+is $tx->res->code, 200,     'right status';
+is $tx->res->body, 'works', 'right content';
 
 # Nested keep alive
 my @kept_alive;
@@ -294,3 +301,13 @@ $ua->get(
 );
 Mojo::IOLoop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';
+
+# Premature connection close
+$port = Mojo::IOLoop->generate_port;
+$id   = Mojo::IOLoop->listen(
+  port      => $port,
+  on_accept => sub { shift->drop(shift) }
+);
+$tx = $ua->get("http://localhost:$port/");
+ok !$tx->success, 'not successful';
+is $tx->error, 'Premature connection close.', 'right error';

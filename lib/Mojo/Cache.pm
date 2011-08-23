@@ -4,7 +4,7 @@ use Mojo::Base -base;
 has 'max_keys' => 100;
 
 # "If at first you don't succeed, give up."
-sub get { (shift->{_cache} || {})->{shift()} }
+sub get { (shift->{cache} || {})->{shift()} }
 
 # "Maybe I should hook up with you guys.
 #  After all, how long do any of us have to live?
@@ -16,13 +16,13 @@ sub set {
 
   # Cache with size limit
   my $keys  = $self->max_keys;
-  my $cache = $self->{_cache} ||= {};
-  my $stack = $self->{_stack} ||= [];
+  my $cache = $self->{cache} ||= {};
+  my $stack = $self->{stack} ||= [];
   delete $cache->{shift @$stack} while @$stack >= $keys;
   push @$stack, $key;
   $cache->{$key} = $value;
 
-  $self;
+  return $self;
 }
 
 1;

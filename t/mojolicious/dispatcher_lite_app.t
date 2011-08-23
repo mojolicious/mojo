@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 use Test::More tests => 9;
 

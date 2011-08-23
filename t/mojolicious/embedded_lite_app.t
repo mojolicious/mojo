@@ -1,14 +1,13 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
-# Disable IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
-  $ENV{MOJO_MODE} = 'testing';
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER}  = 'Mojo::IOWatcher';
+  $ENV{MOJO_MODE}       = 'testing';
 }
 
 use Test::More tests => 113;
@@ -46,17 +45,17 @@ get '/yada' => sub {
 
 # GET /bye (embedded)
 get '/bye' => sub {
-  my $self  = shift;
-  my $name  = $self->stash('name');
-  my $async = '';
+  my $self = shift;
+  my $name = $self->stash('name');
+  my $nb   = '';
   $self->render_later;
   $self->ua->app(main::app())->get(
     '/hello/hello' => sub {
       my $tx = pop;
-      $self->render_text($tx->res->body . "$name! $async");
+      $self->render_text($tx->res->body . "$name! $nb");
     }
   );
-  $async .= 'success!';
+  $nb .= 'success!';
 };
 
 package MyTestApp::Test2;
@@ -88,15 +87,15 @@ plugin 'PluginWithEmbeddedApp';
 
 app->routes->namespace('MyTestApp');
 
-# Mount full external application twice
+# Mount full external application a few times
 use FindBin;
 my $external = "$FindBin::Bin/external/myapp.pl";
-plugin mount => {'/x/1' => $external};
-plugin(mount => ('/x/♥' => $external))->to(message => 'works 2!');
-plugin mount => {'mojolicious.org' => $external};
-plugin mount => {'MOJOLICIO.US/'   => $external};
-plugin mount => {'*.kraih.com'     => $external};
-plugin(mount => ('*.foo-bar.de/♥/123' => $external))
+plugin Mount => {'/x/1' => $external};
+plugin(Mount => ('/x/♥' => $external))->to(message => 'works 2!');
+plugin Mount => {'mojolicious.org' => $external};
+plugin Mount => {'MOJOLICIO.US/'   => $external};
+plugin Mount => {'*.kraih.com'     => $external};
+plugin(Mount => ('*.foo-bar.de/♥/123' => $external))
   ->to(message => 'works 3!');
 
 # GET /hello

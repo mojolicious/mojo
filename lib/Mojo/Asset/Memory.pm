@@ -10,14 +10,14 @@ use IO::File;
 sub new {
   my $self = shift->SUPER::new(@_);
   $self->{content} = '';
-  $self;
+  return $self;
 }
 
 sub add_chunk {
   my ($self, $chunk) = @_;
   utf8::encode $chunk if utf8::is_utf8 $chunk;
   $self->{content} .= $chunk if defined $chunk;
-  $self;
+  return $self;
 }
 
 sub contains {
@@ -29,7 +29,7 @@ sub contains {
   my $end = $self->end_range;
 
   return -1 if $end && $pos >= $end;
-  $pos;
+  return $pos;
 }
 
 sub get_chunk {
@@ -41,15 +41,15 @@ sub get_chunk {
     $size = $end + 1 - $start if ($start + $size) > $end;
   }
 
-  substr shift->{content}, $start, $size;
+  return substr shift->{content}, $start, $size;
 }
 
 sub move_to {
   my ($self, $path) = @_;
-  my $file = IO::File->new;
-  $file->open("> $path") or croak qq/Can't open file "$path": $!/;
+  croak qq/Can't open file "$path": $!/
+    unless my $file = IO::File->new("> $path");
   $file->syswrite($self->{content});
-  $self;
+  return $self;
 }
 
 sub size { length shift->{content} }

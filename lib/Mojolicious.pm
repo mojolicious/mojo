@@ -10,6 +10,7 @@ use Mojolicious::Routes;
 use Mojolicious::Sessions;
 use Mojolicious::Static;
 use Mojolicious::Types;
+use Scalar::Util 'weaken';
 
 has controller_class => 'Mojolicious::Controller';
 has mode             => sub { ($ENV{MOJO_MODE} || 'development') };
@@ -26,14 +27,14 @@ has secret   => sub {
   $self->log->debug('Your secret passphrase needs to be changed!!!');
 
   # Default to application name
-  ref $self;
+  return ref $self;
 };
 has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.49';
+our $VERSION  = '1.89';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -48,7 +49,7 @@ sub AUTOLOAD {
     unless my $helper = $self->renderer->helpers->{$method};
 
   # Call helper with fresh controller
-  $self->controller_class->new(app => $self)->$helper(@_);
+  return $self->controller_class->new(app => $self)->$helper(@_);
 }
 
 sub DESTROY { }
@@ -64,7 +65,7 @@ sub new {
       my $self = shift;
       my $tx   = Mojo::Transaction::HTTP->new;
       $self->plugins->run_hook(after_build_tx => ($tx, $self));
-      $tx;
+      return $tx;
     }
   );
 
@@ -91,14 +92,14 @@ sub new {
     if -w $home->rel_file('log');
 
   # Load default plugins
-  $self->plugin('callback_condition');
-  $self->plugin('header_condition');
-  $self->plugin('default_helpers');
-  $self->plugin('tag_helpers');
-  $self->plugin('epl_renderer');
-  $self->plugin('ep_renderer');
-  $self->plugin('request_timer');
-  $self->plugin('powered_by');
+  $self->plugin('CallbackCondition');
+  $self->plugin('HeaderCondition');
+  $self->plugin('DefaultHelpers');
+  $self->plugin('TagHelpers');
+  $self->plugin('EPLRenderer');
+  $self->plugin('EPRenderer');
+  $self->plugin('RequestTimer');
+  $self->plugin('PoweredBy');
 
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';
@@ -110,7 +111,7 @@ sub new {
   # Startup
   $self->startup(@_);
 
-  $self;
+  return $self;
 }
 
 # "Amy, technology isn't intrinsically good or evil. It's how it's used.
@@ -131,7 +132,7 @@ sub defaults {
     $self->{defaults}->{$key} = $values->{$key};
   }
 
-  $self;
+  return $self;
 }
 
 # The default dispatchers with exception handling
@@ -176,6 +177,7 @@ sub handler {
   @{$stash}{keys %$defaults} = values %$defaults;
   my $c =
     $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
+  weaken $c->{app};
   unless (eval { $self->on_process->($self, $c); 1 }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);
@@ -234,126 +236,41 @@ __END__
 
 =head1 NAME
 
-Mojolicious - The Web In A Box!
+Mojolicious - Duct Tape For The Web!
 
 =head1 SYNOPSIS
 
-  # Mojolicious application
+  # Application
   package MyApp;
   use Mojo::Base 'Mojolicious';
 
+  # Route
   sub startup {
     my $self = shift;
-
-    # Routes
-    my $r = $self->routes;
-
-    # Default route
-    $r->route('/:controller/:action/:id')->to('foo#welcome');
+    $self->routes->get('/hello')->to('foo#hello');
   }
 
-  # Mojolicious controller
+  # Controller
   package MyApp::Foo;
   use Mojo::Base 'Mojolicious::Controller';
 
-  # Say hello
-  sub welcome {
+  # Action
+  sub hello {
     my $self = shift;
-    $self->render_text('Hi there!');
+    $self->render_text('Hello World!');
   }
 
-  # Say goodbye from a template (foo/bye.html.ep)
-  sub bye { shift->render }
-
 =head1 DESCRIPTION
-
-Back in the early days of the web, many people learned Perl because of a
-wonderful Perl library called L<CGI>.
-It was simple enough to get started without knowing much about the language
-and powerful enough to keep you going, learning by doing was much fun.
-While most of the techniques used are outdated now, the idea behind it is not.
-L<Mojolicious> is a new attempt at implementing this idea using state of the
-art technology.
-
-=head2 Features
-
-=over 2
-
-=item *
-
-An amazing MVC web framework supporting a simplified single file mode through
-L<Mojolicious::Lite>.
-
-=over 2
-
-Powerful out of the box with RESTful routes, plugins, Perl-ish templates,
-session management, signed cookies, testing framework, static file server,
-I18N, first class unicode support and much more for you to discover.
-
-=back
-
-=item *
-
-Very clean, portable and Object Oriented pure Perl API without any hidden
-magic and no requirements besides Perl 5.8.7 (although 5.10+ is recommended).
-
-=item *
-
-Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
-TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
-
-=item *
-
-Built-in async IO web server supporting epoll, kqueue, UNIX domain sockets
-and hot deployment, perfect for embedding.
-
-=item *
-
-Automatic CGI, FastCGI and L<PSGI> detection.
-
-=item *
-
-JSON and XML/HTML5 parser with CSS3 selector support.
-
-=item *
-
-Fresh code based upon years of experience developing L<Catalyst>.
-
-=back
-
-=head2 Installation
-
-All you need is a oneliner.
-
-  sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
-
-=head2 Getting Started
-
-These three lines are a whole web application.
-
-  use Mojolicious::Lite;
-
-  get '/' => sub { shift->render_text('Hello World!') };
-
-  app->start;
-
-To run this example with the built-in development web server just put the
-code into a file and execute it with C<perl>.
-
-  % perl hello.pl daemon
-  Server available at http://127.0.0.1:3000.
-
-  % curl http://127.0.0.1:3000/
-  Hello World!
-
-=head2 Duct Tape For The HTML5 Web
 
 Web development for humans, making hard things possible and everything fun.
 
   use Mojolicious::Lite;
 
   # Simple plain text response
-  get '/' => sub { shift->render_text('Hello World!') };
+  get '/' => sub {
+    my $self = shift;
+    $self->render_text('Hello World!');
+  };
 
   # Route associating the "/time" URL to template in DATA section
   get '/time' => 'clock';
@@ -385,12 +302,11 @@ Web development for humans, making hard things possible and everything fun.
   __DATA__
 
   @@ clock.html.ep
-  % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
+  % use Time::Piece;
+  % my $now = localtime;
   <%= link_to clock => begin %>
-    The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
+    The time is <%= $now->hms %>.
   <% end %>
-
-=head2 Growing
 
 Single file prototypes can easily grow into well-structured applications.
 A controller collects several actions together.
@@ -399,10 +315,13 @@ A controller collects several actions together.
   use Mojo::Base 'Mojolicious::Controller';
 
   # Plain text response
-  sub hello { shift->render_text('Hello World!') }
+  sub hello {
+    my $self = shift;
+    $self->render_text('Hello World!');
+  }
 
   # Render external template "templates/example/clock.html.ep"
-  sub clock { shift->render }
+  sub clock { }
 
   # RESTful web service sending JSON responses
   sub restful {
@@ -460,7 +379,7 @@ especially when working in a team.
     # All common HTTP verbs are supported
     $example->post('/title')->to('#title');
 
-    # ... and much, much more
+    # ...and much, much more
     # (including multiple, auto-discovered controllers)
     $r->websocket('/echo')->to('realtime#echo');
   }
@@ -470,15 +389,20 @@ especially when working in a team.
 Through all of these changes, your action code and templates can stay almost
 exactly the same.
 
-  % my ($second, $minute, $hour) = (localtime(time))[0, 1, 2];
+  % use Time::Piece;
+  % my $now = localtime;
   <%= link_to clock => begin %>
-    The time is <%= $hour %>:<%= $minute %>:<%= $second %>.
+    The time is <%= $now->hms %>.
   <% end %>
 
 Mojolicious has been designed from the ground up for a fun and unique
 workflow.
 
-=head2 Have Some Cake
+=head2 Want To Know More?
+
+Take a look at our excellent documentation in L<Mojolicious::Guides>!
+
+=head1 ARCHITECTURE
 
 Loosely coupled building blocks, use what you like and just ignore the rest.
 
@@ -498,9 +422,6 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
   |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
   '-------' '-----------' '--------' '------------' '-------------'
 
-For more documentation see L<Mojolicious::Guides> and the tutorial in
-L<Mojolicious::Lite>!
-
 =head1 ATTRIBUTES
 
 L<Mojolicious> inherits all attributes from L<Mojo> and implements the
@@ -519,22 +440,25 @@ L<Mojolicious::Controller>.
   my $mode = $app->mode;
   $app     = $app->mode('production');
 
-The operating mode for your application.
-It defaults to the value of the environment variable C<MOJO_MODE> or
-C<development>.
-Mojo will name the log file after the current mode and modes other than
-C<development> will result in limited log output.
-
-If you want to add per mode logic to your application, you can add a sub
-to your application named C<$mode_mode>.
+The operating mode for your application, defaults to the value of the
+C<MOJO_MODE> environment variable or C<development>.
+You can also add per mode logic to your application by defining methods named
+C<${mode}_mode> in the application class, which will be called right before
+C<startup>.
 
   sub development_mode {
     my $self = shift;
+    ...
   }
 
   sub production_mode {
     my $self = shift;
+    ...
   }
+
+Right before calling C<startup> and mode specific methods, L<Mojolicious>
+will pick up the current mode, name the log file after it and raise the log
+level from C<debug> to C<info> if it has a value other than C<development>.
 
 =head2 C<on_process>
 
@@ -555,26 +479,26 @@ the sledgehammer in your toolbox.
   my $plugins = $app->plugins;
   $app        = $app->plugins(Mojolicious::Plugins->new);
 
-The plugin loader, by default a L<Mojolicious::Plugins> object.
+The plugin loader, defaults to a L<Mojolicious::Plugins> object.
 You can usually leave this alone, see L<Mojolicious::Plugin> if you want to
-write a plugin.
+write a plugin or the C<plugin> method below if you want to load a plugin.
 
 =head2 C<renderer>
 
   my $renderer = $app->renderer;
   $app         = $app->renderer(Mojolicious::Renderer->new);
 
-Used in your application to render content, by default a
+Used in your application to render content, defaults to a
 L<Mojolicious::Renderer> object.
-The two main renderer plugins L<Mojolicious::Plugin::EpRenderer> and
-L<Mojolicious::Plugin::EplRenderer> contain more specific information.
+The two main renderer plugins L<Mojolicious::Plugin::EPRenderer> and
+L<Mojolicious::Plugin::EPLRenderer> contain more information.
 
 =head2 C<routes>
 
   my $routes = $app->routes;
   $app       = $app->routes(Mojolicious::Routes->new);
 
-The routes dispatcher, by default a L<Mojolicious::Routes> object.
+The routes dispatcher, defaults to a L<Mojolicious::Routes> object.
 You use this in your startup method to define the url endpoints for your
 application.
 
@@ -600,15 +524,17 @@ the log file reminding you to change your passphrase.
   my $sessions = $app->sessions;
   $app         = $app->sessions(Mojolicious::Sessions->new);
 
-Simple signed cookie based sessions, by default a L<Mojolicious::Sessions>
+Simple signed cookie based sessions, defaults to a L<Mojolicious::Sessions>
 object.
+You can usually leave this alone, see L<Mojolicious::Controller/"session">
+for more information about working with session data.
 
 =head2 C<static>
 
   my $static = $app->static;
   $app       = $app->static(Mojolicious::Static->new);
 
-For serving static assets from your C<public> directory, by default a
+For serving static assets from your C<public> directory, defaults to a
 L<Mojolicious::Static> object.
 
 =head2 C<types>
@@ -616,11 +542,10 @@ L<Mojolicious::Static> object.
   my $types = $app->types;
   $app      = $app->types(Mojolicious::Types->new);
 
-Responsible for tracking the types of content you want to serve in your
-application, by default a L<Mojolicious::Types> object.
-You can easily register new types.
+Responsible for connecting file extensions with MIME types, defaults to a
+L<Mojolicious::Types> object.
 
-  $app->types->type(twitter => 'text/tweet');
+  $app->types->type(twt => 'text/tweet');
 
 =head1 METHODS
 
@@ -692,7 +617,7 @@ The following events are available and run in the listed order.
 =item after_build_tx
 
 Triggered right after the transaction is built and before the HTTP request
-gets parsed.
+gets parsed, the callbacks of this hook run in the order they were added.
 One use case would be upload progress bars.
 (Passed the transaction and application instances)
 
@@ -702,7 +627,8 @@ One use case would be upload progress bars.
 
 =item before_dispatch
 
-Triggered right before the static and routes dispatchers start their work.
+Triggered right before the static and routes dispatchers start their work,
+the callbacks of this hook run in the order they were added.
 Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller instance)
 
@@ -724,7 +650,8 @@ Mostly used for custom dispatchers and postprocessing static file responses.
 
 =item before_render
 
-Triggered right before the renderer turns the stash into a response.
+Triggered right before the renderer turns the stash into a response, the
+callbacks of this hook run in the order they were added.
 Very useful for making adjustments to the stash right before rendering.
 (Passed the current controller instance and argument hash)
 
@@ -751,14 +678,17 @@ Useful for all kinds of postprocessing tasks.
 
 =head2 C<plugin>
 
-  $app->plugin('something');
-  $app->plugin('something', foo => 23);
-  $app->plugin('something', {foo => 23});
-  $app->plugin('Foo::Bar');
-  $app->plugin('Foo::Bar', foo => 23);
-  $app->plugin('Foo::Bar', {foo => 23});
+  $app->plugin('some_thing');
+  $app->plugin('some_thing', foo => 23);
+  $app->plugin('some_thing', {foo => 23});
+  $app->plugin('SomeThing');
+  $app->plugin('SomeThing', foo => 23);
+  $app->plugin('SomeThing', {foo => 23});
+  $app->plugin('MyApp::Plugin::SomeThing');
+  $app->plugin('MyApp::Plugin::SomeThing', foo => 23);
+  $app->plugin('MyApp::Plugin::SomeThing', {foo => 23});
 
-Load a plugin.
+Load a plugin with L<Mojolicious::Plugins/"register_plugin">.
 
 The following plugins are included in the L<Mojolicious> distribution as
 examples.
@@ -781,11 +711,11 @@ Perl-ish configuration files.
 
 General purpose helper collection.
 
-=item L<Mojolicious::Plugin::EplRenderer>
+=item L<Mojolicious::Plugin::EPLRenderer>
 
 Renderer for plain embedded Perl templates.
 
-=item L<Mojolicious::Plugin::EpRenderer>
+=item L<Mojolicious::Plugin::EPRenderer>
 
 Renderer for more sophisiticated embedded Perl templates.
 
@@ -793,11 +723,11 @@ Renderer for more sophisiticated embedded Perl templates.
 
 Route condition for all kinds of headers.
 
-=item L<Mojolicious::Plugin::I18n>
+=item L<Mojolicious::Plugin::I18N>
 
 Internationalization helpers.
 
-=item L<Mojolicious::Plugin::JsonConfig>
+=item L<Mojolicious::Plugin::JSONConfig>
 
 JSON configuration files.
 
@@ -805,7 +735,7 @@ JSON configuration files.
 
 Mount whole L<Mojolicious> applications.
 
-=item L<Mojolicious::Plugin::PodRenderer>
+=item L<Mojolicious::Plugin::PODRenderer>
 
 Renderer for POD files and documentation browser.
 
@@ -842,6 +772,15 @@ startup.
     my $self = shift;
   }
 
+=head1 HELPERS
+
+In addition to the attributes and methods above you can also call helpers on
+instances of L<Mojolicious>.
+This includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers>.
+
+  $app->log->debug($app->dumper({foo => 'bar'}));
+
 =head1 SUPPORT
 
 =head2 Web
@@ -876,7 +815,7 @@ L<http://creativecommons.org/licenses/by-sa/3.0>.
 
 =head2 jQuery
 
-  Version 1.6.1
+  Version 1.6.2
 
 jQuery is a fast and concise JavaScript Library that simplifies HTML document
 traversing, event handling, animating, and Ajax interactions for rapid web
@@ -920,16 +859,6 @@ that have been used in the past.
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>.
-
-=head1 CORE DEVELOPERS EMERITUS
-
-Retired members of the core team, we thank you dearly for your service.
-
-=over 2
-
-Viacheslav Tykhanovskyi, C<vti@cpan.org>.
-
-=back
 
 =head1 CREDITS
 
@@ -1031,6 +960,8 @@ Lars Balker Rasmussen
 
 Leon Brocard
 
+Magnus Holm
+
 Maik Fischer
 
 Marcus Ramberg
@@ -1042,6 +973,8 @@ Matthew Lineen
 Maksym Komar
 
 Maxim Vuets
+
+Michael Harris
 
 Mirko Westermeier
 
@@ -1087,6 +1020,8 @@ Simone Tampieri
 
 Shu Cho
 
+Skye Shaw
+
 Stanis Trendelenburg
 
 Tatsuhiko Miyagawa
@@ -1102,6 +1037,8 @@ Ulrich Habel
 Ulrich Kautz
 
 Uwe Voelker
+
+Viacheslav Tykhanovskyi
 
 Victor Engmark
 

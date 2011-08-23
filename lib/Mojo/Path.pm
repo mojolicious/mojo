@@ -8,28 +8,24 @@ use overload
 use Mojo::Util qw/url_escape url_unescape/;
 use Mojo::URL;
 
-has [qw/leading_slash trailing_slash/] => 0;
+has [qw/leading_slash trailing_slash/];
 has parts => sub { [] };
 
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  $self;
+  return $self;
 }
 
+# DEPRECATED in Smiling Face With Sunglasses!
 sub append {
+  warn <<EOF;
+Mojo::Path->append is DEPRECATED in favor of using Mojo::Path->parts
+directly!!!
+EOF
   my $self = shift;
-
-  for (@_) {
-    my $value = "$_";
-
-    # *( pchar / "/" / "?" )
-    url_escape $value, $Mojo::URL::PCHAR;
-
-    push @{$self->parts}, $value;
-  }
-
-  $self;
+  push @{$self->parts}, @_;
+  return $self;
 }
 
 sub canonicalize {
@@ -57,7 +53,7 @@ sub canonicalize {
   }
   $self->parts(\@path);
 
-  $self;
+  return $self;
 }
 
 # "Homer, the plant called.
@@ -71,7 +67,7 @@ sub clone {
   $clone->leading_slash($self->leading_slash);
   $clone->trailing_slash($self->trailing_slash);
 
-  $clone;
+  return $clone;
 }
 
 sub parse {
@@ -79,8 +75,8 @@ sub parse {
 
   # Leading and trailing slash
   $path = '' unless defined $path;
-  $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(0);
-  $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(0);
+  $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(undef);
+  $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(undef);
 
   # Parse
   url_unescape $path;
@@ -97,13 +93,13 @@ sub parse {
   }
   $self->parts(\@parts);
 
-  $self;
+  return $self;
 }
 
 sub to_abs_string {
   my $self = shift;
   return $self->to_string if $self->leading_slash;
-  '/' . $self->to_string;
+  return '/' . $self->to_string;
 }
 
 sub to_string {
@@ -112,10 +108,8 @@ sub to_string {
   # Escape
   my @path;
   for my $part (@{$self->parts}) {
-
-    # *( pchar / "/" / "?" )
     my $escaped = $part;
-    url_escape $escaped, $Mojo::URL::PCHAR;
+    url_escape $escaped, "$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@";
     push @path, $escaped;
   }
 
@@ -124,7 +118,7 @@ sub to_string {
   $path = "/$path" if $self->leading_slash;
   $path = "$path/" if @path && $self->trailing_slash;
 
-  $path;
+  return $path;
 }
 
 1;
@@ -160,7 +154,7 @@ Path has a leading slash.
 =head2 C<parts>
 
   my $parts = $path->parts;
-  $path     = $path->parts(qw/foo bar baz/);
+  $path     = $path->parts([qw/foo bar baz/]);
 
 The path parts.
 
@@ -182,12 +176,6 @@ following new ones.
   my $path = Mojo::Path->new('/foo/bar%3B/baz.html');
 
 Construct a new L<Mojo::Path> object.
-
-=head2 C<append>
-
-  $path = $path->append(qw/foo bar/);
-
-Append parts to path.
 
 =head2 C<canonicalize>
 

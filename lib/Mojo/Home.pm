@@ -6,6 +6,7 @@ use overload
   fallback => 1;
 
 use Cwd 'abs_path';
+use File::Find 'find';
 use File::Spec;
 use FindBin;
 use Mojo::Command;
@@ -25,7 +26,7 @@ sub detect {
   # Environment variable
   if ($ENV{MOJO_HOME}) {
     my @parts = File::Spec->splitdir(abs_path $ENV{MOJO_HOME});
-    $self->{_parts} = \@parts;
+    $self->{parts} = \@parts;
     return $self;
   }
 
@@ -52,90 +53,68 @@ sub detect {
       }
 
       # Turn into absolute path
-      $self->{_parts} =
+      $self->{parts} =
         [File::Spec->splitdir(abs_path(File::Spec->catdir(@home) || '.'))];
     }
   }
 
   # FindBin fallback
-  $self->{_parts} = [split /\//, $FindBin::Bin] unless $self->{_parts};
+  $self->{parts} = [split /\//, $FindBin::Bin] unless $self->{parts};
 
-  $self;
+  return $self;
 }
 
 sub lib_dir {
   my $self = shift;
 
   # Directory found
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   my $path = File::Spec->catdir(@$parts, 'lib');
   return $path if -d $path;
 
   # No lib directory
-  undef;
+  return;
 }
 
 sub list_files {
   my ($self, $dir) = @_;
 
-  # Build portable directory
-  my $parts = $self->{_parts} || [];
+  # Files relative to directory
+  my $parts = $self->{parts} || [];
   my $root = File::Spec->catdir(@$parts);
   $dir = File::Spec->catdir($root, split '/', ($dir || ''));
+  return [] unless -d $dir;
+  my @files;
+  find sub {
+    push @files, join '/',
+      File::Spec->splitdir(File::Spec->abs2rel($File::Find::name, $dir));
+  }, $dir;
 
-  # Read directory
-  my (@files, @dirs);
-  opendir DIR, $dir or return [];
-  for my $file (readdir DIR) {
-
-    # Hidden file
-    next if $file =~ /^\./;
-
-    # File
-    my $path = File::Spec->catfile($dir, $file);
-    my $rel = File::Spec->abs2rel($path, $root);
-    if (-f $path) {
-      push @files, join '/', File::Spec->splitdir($rel);
-    }
-
-    # Directory
-    elsif (-d $path) { push @dirs, join('/', File::Spec->splitdir($rel)) }
-  }
-  closedir DIR;
-
-  # Walk directories
-  for my $path (@dirs) {
-    my $new = $self->list_files($path);
-    push @files, @$new;
-  }
-
-  [sort @files];
+  return [sort @files];
 }
 
-# "And now to create an unstoppable army of between one million and two
-#  million zombies!"
 sub parse {
   my ($self, $path) = @_;
   my @parts = File::Spec->splitdir($path);
-  $self->{_parts} = \@parts;
-  $self;
+  $self->{parts} = \@parts;
+  return $self;
 }
 
 sub rel_dir {
   my $self = shift;
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   File::Spec->catdir(@$parts, split '/', shift);
 }
 
 sub rel_file {
   my $self = shift;
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   File::Spec->catfile(@$parts, split '/', shift);
 }
 
 sub to_string {
   my $self = shift;
-  my $parts = $self->{_parts} || [];
+  my $parts = $self->{parts} || [];
   File::Spec->catdir(@$parts);
 }
 

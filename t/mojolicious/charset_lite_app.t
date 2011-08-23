@@ -1,12 +1,13 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 use Test::More tests => 39;
 
@@ -19,7 +20,7 @@ my $yatta      = 'やった';
 my $yatta_sjis = b($yatta)->encode('shift_jis')->to_string;
 
 # Charset plugin
-plugin charset => {charset => 'Shift_JIS'};
+plugin Charset => {charset => 'Shift_JIS'};
 
 # UTF-8 text renderer
 app->renderer->add_handler(

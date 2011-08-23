@@ -47,14 +47,14 @@ sub run {
   }
 
   # Response body
-  my $body = Mojo::Server::PSGI::_Handle->new(_res => $res);
+  my $body = Mojo::Server::PSGI::_Handle->new(res => $res);
 
   # Finish transaction
   $tx->on_finish->($tx);
 
   # PSGI response
   my $code = $res->code || 404;
-  [$code, \@headers, $body];
+  return [$code, \@headers, $body];
 }
 
 package Mojo::Server::PSGI::_Handle;
@@ -66,10 +66,10 @@ sub getline {
   my $self = shift;
 
   # Blocking read
-  $self->{_offset} = 0 unless defined $self->{_offset};
-  my $offset = $self->{_offset};
+  $self->{offset} = 0 unless defined $self->{offset};
+  my $offset = $self->{offset};
   while (1) {
-    my $chunk = $self->{_res}->get_body_chunk($offset);
+    my $chunk = $self->{res}->get_body_chunk($offset);
 
     # No content yet, try again
     unless (defined $chunk) {
@@ -82,11 +82,11 @@ sub getline {
 
     # Content
     $offset += length $chunk;
-    $self->{_offset} = $offset;
+    $self->{offset} = $offset;
     return $chunk;
   }
 
-  undef;
+  return;
 }
 
 1;

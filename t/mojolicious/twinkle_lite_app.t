@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!'
@@ -30,10 +31,10 @@ my $twinkle = {
 };
 
 # Plugins
-plugin ep_renderer => {name => 'twinkle', template => $twinkle};
-plugin 'pod_renderer';
-plugin pod_renderer => {name => 'teapod', preprocess => 'twinkle'};
-my $config = plugin json_config =>
+plugin EPRenderer => {name => 'twinkle', template => $twinkle};
+plugin 'PODRenderer';
+plugin PODRenderer => {name => 'teapod', preprocess => 'twinkle'};
+my $config = plugin JSONConfig =>
   {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
 is $config->{foo},  'bar', 'right value';
 is $config->{test}, 23,    'right value';

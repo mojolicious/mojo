@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use Test::More tests => 411;
 
@@ -9,9 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 package BaseTest;
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use base 'BaseTest::Base2';
 

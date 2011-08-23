@@ -25,7 +25,7 @@ my $FLAG_RE = qr/(?:Secure|HttpOnly)/i;
 sub expires {
   my ($self, $expires) = @_;
 
-  # Set
+  # New expires value
   if (defined $expires) {
     $self->{expires} = $expires;
     return $self;
@@ -37,7 +37,7 @@ sub expires {
   $self->{expires} = Mojo::Date->new($self->{expires})
     unless ref $self->{expires};
 
-  $self->{expires};
+  return $self->{expires};
 }
 
 # "Remember the time he ate my goldfish?
@@ -59,6 +59,7 @@ sub parse {
       if (not $i) {
         push @cookies, Mojo::Cookie::Response->new;
         $cookies[-1]->name($name);
+        $value = '' unless defined $value;
         $cookies[-1]->value($value);
         next;
       }
@@ -75,7 +76,7 @@ sub parse {
     }
   }
 
-  \@cookies;
+  return \@cookies;
 }
 
 sub to_string {
@@ -85,7 +86,7 @@ sub to_string {
   return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
-  $cookie .= "=$value" if defined $value && length $value;
+  $cookie .= defined $value ? "=$value" : '=';
   $cookie .= sprintf "; Version=%d", ($self->version || 1);
 
   # Domain
@@ -116,7 +117,7 @@ sub to_string {
   # Comment
   if (my $comment = $self->comment) { $cookie .= "; Comment=$comment" }
 
-  $cookie;
+  return $cookie;
 }
 
 1;

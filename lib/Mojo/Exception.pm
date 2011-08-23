@@ -21,7 +21,7 @@ sub new {
   return $self unless @_;
 
   # Detect
-  $self->_detect(@_);
+  return $self->_detect(@_);
 }
 
 sub throw {
@@ -49,7 +49,7 @@ sub trace {
   }
   $e->frames(\@frames);
 
-  $e;
+  return $e;
 }
 
 sub _detect {
@@ -96,7 +96,7 @@ sub _detect {
   my @lines;
   for my $lines (@$files) { push @lines, [split /\n/, $lines] }
 
-  # Cleanup plain messages
+  # Clean up plain messages
   return $self unless my $name = shift;
   unless (ref $message) {
     my $filter = sub {
@@ -129,7 +129,7 @@ sub _detect {
   # Context
   $self->_parse_context($line, \@lines) if $line;
 
-  $self;
+  return $self;
 }
 
 # "You killed zombie Flanders!
@@ -158,7 +158,7 @@ sub to_string {
     $string .= $line->[0] . ': ' . $line->[1] . "\n";
   }
 
-  $string;
+  return $string;
 }
 
 sub _parse_context {
@@ -207,7 +207,7 @@ sub _parse_context {
     }
   }
 
-  $self;
+  return $self;
 }
 
 1;

@@ -81,6 +81,7 @@ for my $name (@HEADERS) {
   $NORMALCASE_HEADERS{$lowercase} = $name;
 }
 
+sub accept          { scalar shift->header(Accept            => @_) }
 sub accept_language { scalar shift->header('Accept-Language' => @_) }
 sub accept_ranges   { scalar shift->header('Accept-Ranges'   => @_) }
 sub authorization   { scalar shift->header(Authorization     => @_) }
@@ -96,12 +97,13 @@ sub add {
   $name = $lcname;
 
   # Add lines
-  push @{$self->{_headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
+  push @{$self->{headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
     for @_;
 
-  $self;
+  return $self;
 }
 
+sub cache_control       { scalar shift->header('Cache-Control'       => @_) }
 sub connection          { scalar shift->header(Connection            => @_) }
 sub content_disposition { scalar shift->header('Content-Disposition' => @_) }
 sub content_length      { scalar shift->header('Content-Length'      => @_) }
@@ -116,6 +118,7 @@ sub cookie       { scalar shift->header(Cookie         => @_) }
 sub date         { scalar shift->header(Date           => @_) }
 sub dnt          { scalar shift->header(DNT            => @_) }
 sub expect       { scalar shift->header(Expect         => @_) }
+sub expires      { scalar shift->header(Expires        => @_) }
 
 sub from_hash {
   my $self = shift;
@@ -123,7 +126,7 @@ sub from_hash {
 
   # Empty hash deletes all headers
   if (keys %{$hash} == 0) {
-    $self->{_headers} = {};
+    $self->{headers} = {};
     return $self;
   }
 
@@ -132,7 +135,7 @@ sub from_hash {
     $self->add($header => ref $value eq 'ARRAY' ? @$value : $value);
   }
 
-  $self;
+  return $self;
 }
 
 # "Will you be my mommy? You smell like dead bunnies..."
@@ -146,25 +149,25 @@ sub header {
     return $self->add($name, @_);
   }
 
-  return unless my $headers = $self->{_headers}->{lc $name};
+  return unless my $headers = $self->{headers}->{lc $name};
 
   # String
   return join ', ', map { join ', ', @$_ } @$headers unless wantarray;
 
   # Array
-  @$headers;
+  return @$headers;
 }
 
 sub host { scalar shift->header(Host => @_) }
 sub if_modified_since { scalar shift->header('If-Modified-Since' => @_) }
 
-sub is_done { (shift->{_state} || '') eq 'done' }
+sub is_done { (shift->{state} || '') eq 'done' }
 
-sub is_limit_exceeded { shift->{_limit} }
+sub is_limit_exceeded { shift->{limit} }
 
 sub last_modified { scalar shift->header('Last-Modified' => @_) }
 
-sub leftovers { shift->{_buffer} }
+sub leftovers { shift->{buffer} }
 
 sub location { scalar shift->header(Location => @_) }
 
@@ -173,30 +176,30 @@ sub names {
 
   # Normal case
   my @headers;
-  for my $name (keys %{$self->{_headers}}) {
+  for my $name (keys %{$self->{headers}}) {
     push @headers, $NORMALCASE_HEADERS{$name} || $name;
   }
 
-  \@headers;
+  return \@headers;
 }
 
 sub parse {
   my ($self, $chunk) = @_;
 
   # Parse headers with size limit
-  $self->{_state} = 'headers';
-  $self->{_buffer} = '' unless defined $self->{_buffer};
-  $self->{_buffer} .= $chunk if defined $chunk;
-  my $headers = $self->{_cache} || [];
+  $self->{state} = 'headers';
+  $self->{buffer} = '' unless defined $self->{buffer};
+  $self->{buffer} .= $chunk if defined $chunk;
+  my $headers = $self->{cache} || [];
   my $max = $self->max_line_size;
-  while (defined(my $line = get_line $self->{_buffer})) {
+  while (defined(my $line = get_line $self->{buffer})) {
 
     # Check line size
     if (length $line > $max) {
 
       # Abort
-      $self->{_state} = 'done';
-      $self->{_limit} = 1;
+      $self->{state} = 'done';
+      $self->{limit} = 1;
       return $self;
     }
 
@@ -215,22 +218,22 @@ sub parse {
       }
 
       # Done
-      $self->{_state} = 'done';
-      $self->{_cache} = [];
+      $self->{state} = 'done';
+      $self->{cache} = [];
       return $self;
     }
   }
-  $self->{_cache} = $headers;
+  $self->{cache} = $headers;
 
   # Check line size
-  if (length $self->{_buffer} > $max) {
+  if (length $self->{buffer} > $max) {
 
     # Abort
-    $self->{_state} = 'done';
-    $self->{_limit} = 1;
+    $self->{state} = 'done';
+    $self->{limit} = 1;
   }
 
-  $self;
+  return $self;
 }
 
 sub proxy_authenticate  { scalar shift->header('Proxy-Authenticate'  => @_) }
@@ -240,8 +243,8 @@ sub referrer            { scalar shift->header(Referer               => @_) }
 
 sub remove {
   my ($self, $name) = @_;
-  delete $self->{_headers}->{lc $name};
-  $self;
+  delete $self->{headers}->{lc $name};
+  return $self;
 }
 
 sub sec_websocket_accept {
@@ -288,7 +291,7 @@ sub to_hash {
     }
   }
 
-  $hash;
+  return $hash;
 }
 
 sub to_string {
@@ -307,7 +310,7 @@ sub to_string {
 
   # Format headers
   my $headers = join "\x0d\x0a", @headers;
-  length $headers ? $headers : undef;
+  return length $headers ? $headers : undef;
 }
 
 sub trailer           { scalar shift->header(Trailer             => @_) }
@@ -352,6 +355,13 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 L<Mojo::Headers> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 C<accept>
+
+  my $accept = $headers->accept;
+  $headers   = $headers->accept('application/json');
+
+Shortcut for the C<Accept> header.
+
 =head2 C<accept_language>
 
   my $accept_language = $headers->accept_language;
@@ -378,6 +388,13 @@ Add one or more header lines.
   $headers          = $headers->authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Authorization> header.
+
+=head2 C<cache_control>
+
+  my $cache_control = $headers->cache_control;
+  $headers          = $headers->cache_control('max-age=1, no-cache');
+
+Shortcut for the C<Cache-Control> header.
 
 =head2 C<connection>
 
@@ -449,6 +466,13 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $headers   = $headers->expect('100-continue');
 
 Shortcut for the C<Expect> header.
+
+=head2 C<expires>
+
+  my $expires = $headers->expires;
+  $headers    = $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
+
+Shortcut for the C<Expires> header.
 
 =head2 C<from_hash>
 

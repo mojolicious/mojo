@@ -21,12 +21,12 @@ use constant DEBUG => $ENV{HYPNOTOAD_DEBUG} || 0;
 sub DESTROY {
   my $self = shift;
 
-  # Worker
-  return if $ENV{HYPNOTOAD_WORKER};
+  # Worker or command
+  return unless $self->{done};
 
   # Manager
-  return unless my $file = $self->{_config}->{pid_file};
-  unlink $file if -f $file;
+  return unless my $file = $self->{config}->{pid_file};
+  unlink $file if -w $file;
 }
 
 # "Marge? Since I'm not talking to Lisa,
@@ -47,7 +47,7 @@ sub run {
   my ($self, $app, $config) = @_;
 
   # No windows support
-  die "Hypnotoad not available for Windows.\n"
+  _exit('Hypnotoad not available for Windows.')
     if $^O eq 'MSWin32' || $^O =~ /cygwin/;
 
   # Application
@@ -67,7 +67,7 @@ sub run {
   exec $ENV{HYPNOTOAD_EXE} unless $ENV{HYPNOTOAD_REV}++;
 
   # Preload application
-  my $daemon = $self->{_daemon} = Mojo::Server::Daemon->new;
+  my $daemon = $self->{daemon} = Mojo::Server::Daemon->new;
   warn "APPLICATION $ENV{HYPNOTOAD_APP}\n" if DEBUG;
   $daemon->load_app($ENV{HYPNOTOAD_APP});
 
@@ -75,16 +75,22 @@ sub run {
   $self->_config;
 
   # Testing
-  die "Everything looks good!\n" if $ENV{HYPNOTOAD_TEST};
+  _exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
+
+  # Stop running server
+  $self->_stop if $ENV{HYPNOTOAD_STOP};
+
+  # Initiate hot deployment
+  $self->_hot_deploy unless $ENV{HYPNOTOAD_PID};
 
   # Prepare loop
   $daemon->prepare_ioloop;
 
   # Pipe for worker communication
-  pipe($self->{_reader}, $self->{_writer})
+  pipe($self->{reader}, $self->{writer})
     or croak "Can't create pipe: $!";
-  $self->{_poll} = IO::Poll->new;
-  $self->{_poll}->mask($self->{_reader}, POLLIN);
+  $self->{poll} = IO::Poll->new;
+  $self->{poll}->mask($self->{reader}, POLLIN);
 
   # Daemonize
   if (!DEBUG && !$ENV{HYPNOTOAD_FOREGROUND}) {
@@ -100,20 +106,19 @@ sub run {
     open STDERR, '>&STDOUT';
   }
 
-  # Manager signals
-  my $c = $self->{_config};
-  $SIG{INT} = $SIG{TERM} = sub { $self->{_done} = 1 };
+  # Manager environment
+  my $c = $self->{config};
+  $SIG{INT} = $SIG{TERM} = sub { $self->{done} = 1 };
   $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }
   };
-  $SIG{QUIT} = sub { $self->{_done} = $self->{_graceful} = 1 };
-  $SIG{USR2} = sub { $self->{_upgrade} ||= time };
+  $SIG{QUIT} = sub { $self->{done} = $self->{graceful} = 1 };
+  $SIG{USR2} = sub { $self->{upgrade} ||= time };
   $SIG{TTIN} = sub { $c->{workers}++ };
   $SIG{TTOU} = sub {
     return unless $c->{workers};
     $c->{workers}--;
-    $self->{_workers}->{shuffle keys %{$self->{_workers}}}->{graceful}
-      ||= time;
+    $self->{workers}->{shuffle keys %{$self->{workers}}}->{graceful} ||= time;
   };
 
   # Mainloop
@@ -136,12 +141,12 @@ sub _config {
         unless ref $c eq 'HASH';
     }
   }
-  $self->{_config} = $c;
+  $self->{config} = $c;
 
   # Hypnotoad settings
   $c->{graceful_timeout}   ||= 30;
   $c->{heartbeat_interval} ||= 5;
-  $c->{heartbeat_timeout}  ||= 2;
+  $c->{heartbeat_timeout}  ||= 5;
   $c->{lock_file}
     ||= File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
     "hypnotoad.$$.lock");
@@ -152,7 +157,7 @@ sub _config {
 
   # Daemon settings
   $ENV{MOJO_REVERSE_PROXY} = 1 if $c->{proxy};
-  my $daemon = $self->{_daemon};
+  my $daemon = $self->{daemon};
   $daemon->backlog($c->{backlog}) if defined $c->{backlog};
   $daemon->max_clients($c->{clients} || 1000);
   $daemon->group($c->{group}) if $c->{group};
@@ -166,38 +171,52 @@ sub _config {
   $daemon->listen($listen);
 }
 
+sub _exit { print shift, "\n" and exit 0 }
+
 sub _heartbeat {
   my $self = shift;
 
   # Poll for heartbeats
-  my $poll = $self->{_poll};
+  my $poll = $self->{poll};
   $poll->poll(1);
   return unless $poll->handles(POLLIN);
-  return unless $self->{_reader}->sysread(my $chunk, 4194304);
+  return unless $self->{reader}->sysread(my $chunk, 4194304);
 
-  # Heartbeats
+  # Update heartbeats
   while ($chunk =~ /(\d+)\n/g) {
     my $pid = $1;
-    $self->{_workers}->{$pid}->{time} = time if $self->{_workers}->{$pid};
+    $self->{workers}->{$pid}->{time} = time if $self->{workers}->{$pid};
   }
+}
+
+sub _hot_deploy {
+  my $self = shift;
+
+  # Make sure server is running
+  return unless my $pid = $self->_pid;
+  return unless kill 0, $pid;
+
+  # Start hot deployment
+  kill 'USR2', $pid;
+  _exit("Starting hot deployment for Hypnotoad server $pid.");
 }
 
 sub _manage {
   my $self = shift;
 
   # Housekeeping
-  my $c = $self->{_config};
-  if (!$self->{_done}) {
+  my $c = $self->{config};
+  if (!$self->{done}) {
 
     # Spawn more workers
-    $self->_spawn while keys %{$self->{_workers}} < $c->{workers};
+    $self->_spawn while keys %{$self->{workers}} < $c->{workers};
 
     # Check PID file
-    $self->_pid;
+    $self->_pid_file;
   }
 
   # Shutdown
-  elsif (!keys %{$self->{_workers}}) { exit 0 }
+  elsif (!keys %{$self->{workers}}) { exit 0 }
 
   # Upgraded
   if ($ENV{HYPNOTOAD_PID} && $ENV{HYPNOTOAD_PID} ne $$) {
@@ -210,27 +229,23 @@ sub _manage {
   $self->_heartbeat;
 
   # Upgrade
-  if ($self->{_upgrade} && !$self->{_done}) {
+  if ($self->{upgrade} && !$self->{done}) {
 
-    # Start
-    unless ($self->{_new}) {
-
-      # Fork
+    # Fresh start
+    unless ($self->{new}) {
       warn "UPGRADING\n" if DEBUG;
       croak "Can't fork: $!" unless defined(my $pid = fork);
-      $self->{_new} = $pid if $pid;
-
-      # Fresh start
+      $self->{new} = $pid if $pid;
       exec $ENV{HYPNOTOAD_EXE} unless $pid;
     }
 
     # Timeout
-    kill 'TERM', $self->{_new}
-      if $self->{_upgrade} + $c->{upgrade_timeout} <= time;
+    kill 'KILL', $self->{new}
+      if $self->{upgrade} + $c->{upgrade_timeout} <= time;
   }
 
   # Workers
-  while (my ($pid, $w) = each %{$self->{_workers}}) {
+  while (my ($pid, $w) = each %{$self->{workers}}) {
 
     # No heartbeat
     my $interval = $c->{heartbeat_interval};
@@ -243,10 +258,8 @@ sub _manage {
     }
 
     # Graceful stop
-    $w->{graceful} ||= time if $self->{_graceful};
+    $w->{graceful} ||= time if $self->{graceful};
     if ($w->{graceful}) {
-
-      # Kill
       warn "QUIT $pid\n" if DEBUG;
       kill 'QUIT', $pid;
 
@@ -256,26 +269,37 @@ sub _manage {
     }
 
     # Normal stop
-    if (($self->{_done} && !$self->{_graceful}) || $w->{force}) {
+    if (($self->{done} && !$self->{graceful}) || $w->{force}) {
 
       # Kill
-      warn "TERM $pid\n" if DEBUG;
-      kill 'TERM', $pid;
+      warn "KILL $pid\n" if DEBUG;
+      kill 'KILL', $pid;
     }
   }
 }
 
 sub _pid {
   my $self = shift;
+  return unless my $file = IO::File->new($self->{config}->{pid_file}, '<');
+  my $pid = <$file>;
+  chomp $pid;
+  return $pid;
+}
 
-  # Check PID file
-  my $file = $self->{_config}->{pid_file};
+sub _pid_file {
+  my $self = shift;
+
+  # Don't need a PID file anymore
+  return if $self->{done};
+
+  # Check if PID file already exists
+  my $file = $self->{config}->{pid_file};
   return if -e $file;
-  warn "PID $file\n" if DEBUG;
 
-  # Create one if it doesn't exist
-  my $pid = IO::File->new($file, O_WRONLY | O_CREAT | O_EXCL, 0644)
-    or croak qq/Can't create PID file "$file": $!/;
+  # Create PID file
+  warn "PID $file\n" if DEBUG;
+  croak qq/Can't create PID file "$file": $!/
+    unless my $pid = IO::File->new($file, '>', 0644);
   print $pid $$;
 }
 
@@ -285,17 +309,17 @@ sub _pid {
 sub _reap {
   my ($self, $pid) = @_;
 
-  # Cleanup failed upgrade
-  if (($self->{_new} || '') eq $pid) {
+  # Clean up failed upgrade
+  if (($self->{new} || '') eq $pid) {
     warn "UPGRADE FAILED\n" if DEBUG;
-    delete $self->{_upgrade};
-    delete $self->{_new};
+    delete $self->{upgrade};
+    delete $self->{new};
   }
 
-  # Cleanup worker
+  # Clean up worker
   else {
     warn "WORKER DIED $pid\n" if DEBUG;
-    delete $self->{_workers}->{$pid};
+    delete $self->{workers}->{$pid};
   }
 }
 
@@ -307,13 +331,12 @@ sub _spawn {
   croak "Can't fork: $!" unless defined(my $pid = fork);
 
   # Manager
-  return $self->{_workers}->{$pid} = {time => time} if $pid;
+  return $self->{workers}->{$pid} = {time => time} if $pid;
 
   # Worker
-  $ENV{HYPNOTOAD_WORKER} = 1;
-  my $daemon = $self->{_daemon};
+  my $daemon = $self->{daemon};
   my $loop   = $daemon->ioloop;
-  my $c      = $self->{_config};
+  my $c      = $self->{config};
 
   # Prepare lock file
   my $file = $c->{lock_file};
@@ -342,40 +365,38 @@ sub _spawn {
       # Non blocking
       else { $l = flock $lock, LOCK_EX | LOCK_NB }
 
-      $l;
+      return $l;
     }
   );
   $loop->on_unlock(sub { flock $lock, LOCK_UN });
 
   # Heartbeat
   weaken $self;
-  my $cb;
-  $cb = sub {
-    my $loop = shift;
-    $loop->timer($c->{heartbeat} => $cb) if $loop->max_connections;
-    $self->{_writer}->syswrite("$$\n") or exit 0;
-  };
-  $cb->($loop);
-  weaken $cb;
+  $loop->recurring(
+    $c->{heartbeat_interval} => sub {
+      return unless shift->max_connections;
+      $self->{writer}->syswrite("$$\n") or exit 0;
+    }
+  );
 
-  # Worker signals
+  # Clean worker environment
   $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = $SIG{USR2} = $SIG{TTIN} = $SIG{TTOU} =
     'DEFAULT';
   $SIG{QUIT} = sub { $loop->max_connections(0) };
-
-  # Cleanup
-  delete $self->{_reader};
-  delete $self->{_poll};
-
-  # User and group
+  delete $self->{reader};
+  delete $self->{poll};
   $daemon->setuidgid;
 
   # Start
   warn "WORKER STARTED $$\n" if DEBUG;
   $loop->start;
-
-  # Shutdown
   exit 0;
+}
+
+sub _stop {
+  _exit('Hypnotoad server not running.') unless my $pid = shift->_pid;
+  kill 'QUIT', $pid;
+  _exit("Stopping Hypnotoad server $pid gracefully.");
 }
 
 1;
@@ -394,18 +415,27 @@ Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Hypnotoad> is a full featured UNIX optimized preforking async
-io HTTP 1.1 and WebSocket server built around the very well tested and
-reliable L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour>, C<epoll>,
-C<kqueue> and hot deployment support that just works.
+L<Mojo::Server::Hypnotoad> is a full featured UNIX optimized preforking
+non-blocking I/O HTTP 1.1 and WebSocket server built around the very well
+tested and reliable L<Mojo::Server::Daemon> with C<IPv6>, C<TLS>, C<Bonjour>,
+C<libev> and hot deployment support that just works.
 
 To start applications with it you can use the L<hypnotoad> script.
 
-  % hypnotoad myapp.pl
+  $ hypnotoad myapp.pl
+  Server available at http://127.0.0.1:8080.
 
-Optional modules L<IO::KQueue>, L<IO::Epoll>, L<IO::Socket::IP>,
-L<IO::Socket::SSL> and L<Net::Rendezvous::Publish> are supported
-transparently and used if installed.
+You can run the exact same command again for automatic hot deployment.
+
+  $ hypnotoad myapp.pl
+  Starting hot deployment for Hypnotoad server 31841.
+
+For L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
+C<production> mode.
+
+Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and
+L<Net::Rendezvous::Publish> are supported transparently and used if
+installed.
 
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
 
@@ -520,10 +550,10 @@ Heartbeat interval in seconds, defaults to C<5>.
 
 =head2 C<heartbeat_timeout>
 
-  heartbeat_timeout => 5
+  heartbeat_timeout => 2
 
 Time in seconds before a worker without a heartbeat will be stopped, defaults
-to C<2>.
+to C<5>.
 
 =head2 C<keep_alive_requests>
 
@@ -536,13 +566,14 @@ Number of keep alive requests per connection, defaults to C<25>.
   keep_alive_timeout => 10
 
 Maximum amount of time in seconds a connection can be inactive before being
-dropped, defaults to C<5>.
+dropped, defaults to C<15>.
 
 =head2 C<listen>
 
   listen => ['http://*:80']
 
-List of ports and files to listen on, defaults to C<http://*:8080>.
+List of one or more locations to listen on, defaults to C<http://*:8080>.
+See also L<Mojo::Server::Daemon/"listen"> for more examples.
 
 =head2 C<lock_file>
 
@@ -562,7 +593,7 @@ the application.
   proxy => 1
 
 Activate reverse proxy support, defaults to the value of
-C<MOJO_REVERSE_PROXY>.
+the C<MOJO_REVERSE_PROXY> environment variable.
 
 =head2 C<upgrade_timeout>
 
@@ -575,7 +606,7 @@ aborted, defaults to C<30>.
 
   user => 'sri'
 
-User name for worker processes.
+Username for worker processes.
 
 =head2 C<websocket_timeout>
 

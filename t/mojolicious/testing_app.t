@@ -1,12 +1,11 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
-  $ENV{MOJO_MODE} = 'testing';
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER}  = 'Mojo::IOWatcher';
+  $ENV{MOJO_MODE}       = 'testing';
 }
 
 use Test::More tests => 26;
@@ -19,7 +18,7 @@ use Test::Mojo;
 # "Anything less than immortality is a complete waste of time!"
 use_ok 'MojoliciousTest';
 
-my $t = Test::Mojo->new(app => 'MojoliciousTest');
+my $t = Test::Mojo->new('MojoliciousTest');
 
 # SyntaxError::foo in testing mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)

@@ -8,16 +8,9 @@ use Scalar::Util 'blessed';
 
 has app => sub {
   my $self = shift;
-
-  # App in environment
   return $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
-
-  # Load
-  if (my $e = Mojo::Loader->load($self->app_class)) {
-    die $e if ref $e;
-  }
-
-  $self->app_class->new;
+  if (my $e = Mojo::Loader->load($self->app_class)) { die $e if ref $e }
+  return $self->app_class->new;
 };
 has app_class =>
   sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' };
@@ -44,7 +37,7 @@ has on_websocket => sub {
 sub load_app {
   my ($self, $file) = @_;
 
-  # Cleanup environment
+  # Clean up environment
   local $ENV{MOJO_APP_LOADER} = 1;
   local $ENV{MOJO_APP};
   local $ENV{MOJO_EXE};
@@ -66,7 +59,7 @@ EOF
   die qq/"$file" is not a valid application.\n/
     unless blessed $app && $app->isa('Mojo');
   $self->app($app);
-  $app;
+  return $app;
 }
 
 # "Are you saying you're never going to eat any animal again? What about

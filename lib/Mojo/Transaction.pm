@@ -19,30 +19,30 @@ sub error {
   return $req->error if $req->error;
   my $res = $self->res;
   return $res->error if $res->error;
-  undef;
+  return;
 }
 
 sub is_done {
-  return 1 if (shift->{_state} || '') eq 'done';
-  undef;
+  return 1 if (shift->{state} || '') eq 'done';
+  return;
 }
 
 sub is_websocket {0}
 
 sub is_writing {
-  return 1 unless my $state = shift->{_state};
+  return 1 unless my $state = shift->{state};
   return 1
     if $state eq 'write'
       || $state eq 'write_start_line'
       || $state eq 'write_headers'
       || $state eq 'write_body';
-  undef;
+  return;
 }
 
 sub remote_address {
   my ($self, $address) = @_;
 
-  # Set
+  # New address
   if ($address) {
     $self->{remote_address} = $address;
     return $self;
@@ -52,7 +52,7 @@ sub remote_address {
   if ($ENV{MOJO_REVERSE_PROXY}) {
 
     # Forwarded
-    my $forwarded = $self->{_forwarded_for};
+    my $forwarded = $self->{forwarded_for};
     return $forwarded if $forwarded;
 
     # Reverse proxy
@@ -60,14 +60,13 @@ sub remote_address {
 
       # Real address
       if ($forwarded =~ /([^,\s]+)$/) {
-        $self->{_forwarded_for} = $1;
+        $self->{forwarded_for} = $1;
         return $1;
       }
     }
   }
 
-  # Get
-  $self->{remote_address};
+  return $self->{remote_address};
 }
 
 sub req { croak 'Method "req" not implemented by subclass' }
@@ -77,23 +76,23 @@ sub resume {
   my $self = shift;
 
   # Delayed
-  if (($self->{_state} || '') eq 'paused') {
-    $self->{_state} = 'write_body';
+  if (($self->{state} || '') eq 'paused') {
+    $self->{state} = 'write_body';
   }
 
   # Writing
-  elsif (!$self->is_writing) { $self->{_state} = 'write' }
+  elsif (!$self->is_writing) { $self->{state} = 'write' }
 
   # Callback
   $self->on_resume->($self);
 
-  $self;
+  return $self;
 }
 
 sub server_close {
   my $self = shift;
   $self->on_finish->($self);
-  $self;
+  return $self;
 }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
@@ -102,7 +101,7 @@ sub server_write { croak 'Method "server_write" not implemented by subclass' }
 sub success {
   my $self = shift;
   return $self->res unless $self->error;
-  undef;
+  return;
 }
 
 1;

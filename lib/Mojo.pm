@@ -21,10 +21,10 @@ has ua => sub {
 
   # Fresh user agent
   require Mojo::UserAgent;
-  my $ua = Mojo::UserAgent->new(app => $self, log => $self->log);
+  my $ua = Mojo::UserAgent->new(log => $self->log)->app($self);
   weaken $ua->{app};
 
-  $ua;
+  return $ua;
 };
 
 # "Oh, so they have internet on computers now!"
@@ -38,7 +38,7 @@ sub new {
   $self->log->path($self->home->rel_file('log/mojo.log'))
     if -w $self->home->rel_file('log');
 
-  $self;
+  return $self;
 }
 
 # "D’oh."
@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-Mojo - The Box!
+Mojo - The Duct Tape!
 
 =head1 SYNOPSIS
 
@@ -90,22 +90,26 @@ L<Mojo> implements the following attributes.
   my $home = $app->home;
   $app     = $app->home(Mojo::Home->new);
 
-The home directory of your application, by default a L<Mojo::Home> object
+The home directory of your application, defaults to a L<Mojo::Home> object
 which stringifies to the actual path.
+
+  my $path = $app->home->rel_file('data/important.txt');
 
 =head2 C<log>
 
   my $log = $app->log;
   $app    = $app->log(Mojo::Log->new);
     
-The logging layer of your application, by default a L<Mojo::Log> object.
+The logging layer of your application, defaults to a L<Mojo::Log> object.
+
+  $app->log->debug('It works!');
 
 =head2 C<on_transaction>
 
   my $cb = $app->on_transaction;
   $app   = $app->on_transaction(sub {...});
 
-Callback to be invoked when a new transaction is needed, by default it builds
+Callback to be invoked when a new transaction is needed, defaults to building
 a L<Mojo::Transaction::HTTP> object.
 
 =head2 C<on_websocket>
@@ -113,16 +117,15 @@ a L<Mojo::Transaction::HTTP> object.
   my $cb = $app->on_websocket;
   $app   = $app->on_websocket(sub {...});
 
-Callback to be invoked for WebSocket handshakes, by default it builds a
-L<Mojo::Transaction::WebSocket> object and handles the response for the
-handshake request.
+Callback to be invoked for WebSocket handshakes, defaults to building a
+L<Mojo::Transaction::WebSocket> object.
 
 =head2 C<ua>
 
   my $ua = $app->ua;
   $app   = $app->ua(Mojo::UserAgent->new);
 
-A full featured HTTP 1.1 user agent for use in your applications, by default
+A full featured HTTP 1.1 user agent for use in your applications, defaults to
 a L<Mojo::UserAgent> object.
 
 =head1 METHODS
@@ -136,15 +139,15 @@ new ones.
 
 Construct a new L<Mojo> application.
 Will automatically detect your home directory and set up logging to
-C<log/mojo.log> if there's a log directory.
+C<log/mojo.log> if there's a C<log> directory.
 
 =head2 C<handler>
 
   $tx = $app->handler($tx);
 
 The handler is the main entry point to your application or framework and
-will be called for each new transaction, usually a L<Mojo::Transaction::HTTP>
-or L<Mojo::Transaction::WebSocket> object.
+will be called for each new transaction, which will usually be a
+L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 
   sub handler {
     my ($self, $tx) = @_;

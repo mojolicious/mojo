@@ -1,12 +1,11 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
-  $ENV{MOJO_MODE} = 'development';
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER}  = 'Mojo::IOWatcher';
+  $ENV{MOJO_MODE}       = 'development';
 }
 
 use Test::More tests => 32;
@@ -87,7 +86,7 @@ $t->get_ok('/dead_action')->status_is(500)->content_like(qr/32\./)
   ->content_like(qr/dead\ action!/);
 
 # GET /double_dead_action
-$t->get_ok('/double_dead_action')->status_is(500)->content_like(qr/30\./)
+$t->get_ok('/double_dead_action')->status_is(500)->content_like(qr/36\./)
   ->content_like(qr/double\ dead\ action!/);
 
 # GET /trapped

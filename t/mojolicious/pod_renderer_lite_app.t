@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 use Test::More;
 plan skip_all => 'Perl 5.10 or Pod::Simple required for this test!'
@@ -18,7 +19,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # POD renderer plugin
-plugin 'pod_renderer';
+plugin 'PODRenderer';
 
 # GET /
 get '/' => sub {

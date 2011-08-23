@@ -1,14 +1,13 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
-# Disable IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
-  $ENV{MOJO_MODE} = 'testing';
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER}  = 'Mojo::IOWatcher';
+  $ENV{MOJO_MODE}       = 'testing';
 }
 
 # "Who are you, and why should I care?"

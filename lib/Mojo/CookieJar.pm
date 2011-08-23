@@ -31,21 +31,21 @@ sub add {
     next if length(defined $value ? $value : '') > $self->max_cookie_size;
 
     # Check if we already have a similar cookie
-    $self->{_jar}->{$domain} ||= [];
+    $self->{jar}->{$domain} ||= [];
     my @new;
-    for my $old (@{$self->{_jar}->{$domain}}) {
+    for my $old (@{$self->{jar}->{$domain}}) {
       push @new, $old unless $old->path eq $path && $old->name eq $name;
     }
 
     # Yummy!
     push @new, $cookie;
-    $self->{_jar}->{$domain} = \@new;
+    $self->{jar}->{$domain} = \@new;
   }
 
-  $self;
+  return $self;
 }
 
-sub empty { shift->{_jar} = {} }
+sub empty { shift->{jar} = {} }
 
 sub extract {
   my ($self, $tx) = @_;
@@ -68,7 +68,7 @@ sub find {
   my $path = $url->path->to_string || '/';
   my @found;
   while ($domain =~ /[^\.]+\.[^\.]+|localhost$/) {
-    next unless my $jar = $self->{_jar}->{$domain};
+    next unless my $jar = $self->{jar}->{$domain};
 
     # Grab cookies
     my @new;
@@ -96,20 +96,20 @@ sub find {
         ) if $path =~ /^$cpath/;
     }
 
-    $self->{_jar}->{$domain} = \@new;
+    $self->{jar}->{$domain} = \@new;
   }
 
   # Remove another part
   continue { $domain =~ s/^(?:\.?[^\.]+)// }
 
-  @found;
+  return @found;
 }
 
 sub inject {
   my ($self, $tx) = @_;
 
   # Take delicious cookies from the jar
-  return unless keys %{$self->{_jar}};
+  return unless keys %{$self->{jar}};
   my $req = $tx->req;
   my $url = $req->url->clone;
   if (my $host = $req->headers->host) { $url->host($host) }

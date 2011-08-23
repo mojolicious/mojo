@@ -293,10 +293,10 @@ my %ENCODE;
 
 # "Bart, stop pestering Satan!"
 our @EXPORT_OK = qw/b64_decode b64_encode camelize decamelize decode encode/;
-push @EXPORT_OK, qw/get_line hmac_md5_sum hmac_sha1_sum/;
-push @EXPORT_OK, qw/html_escape html_unescape md5_bytes md5_sum/;
-push @EXPORT_OK, qw/punycode_decode punycode_encode qp_decode qp_encode/;
-push @EXPORT_OK, qw/quote sha1_bytes sha1_sum trim unquote/;
+push @EXPORT_OK, qw/get_line hmac_md5_sum hmac_sha1_sum html_escape/;
+push @EXPORT_OK, qw/html_unescape md5_bytes md5_sum punycode_decode/;
+push @EXPORT_OK, qw/punycode_encode qp_decode qp_encode quote/;
+push @EXPORT_OK, qw/secure_compare sha1_bytes sha1_sum trim unquote/;
 push @EXPORT_OK, qw/url_escape url_unescape xml_escape/;
 
 sub b64_decode { $_[0] = MIME::Base64::decode_base64($_[0]); }
@@ -307,28 +307,29 @@ sub b64_encode {
 }
 
 sub camelize {
+  return if $_[0] =~ /^[A-Z]/;
 
   # Module parts
   my @parts;
   for my $part (split /-/, $_[0]) {
     next unless $part;
 
-    # Camelcase words
+    # Camel case words
     my @words = split /_/, $part;
-    @words = map {ucfirst} map {lc} @words;
+    @words = map { ucfirst lc } @words;
     push @parts, join '', @words;
   }
   $_[0] = join '::', @parts;
 }
 
 sub decamelize {
-  return if $_[0] !~ /^[A-Z\:]+/;
+  return if $_[0] !~ /^[A-Z]/;
 
   # Module parts
   my @parts;
   for my $part (split /\:\:/, $_[0]) {
 
-    # Camelcase words
+    # Camel case words
     my @words;
     push @words, $1 while ($part =~ s/([A-Z]{1}[^A-Z]*)//);
     @words = map {lc} @words;
@@ -376,7 +377,7 @@ sub get_line {
   my $line = substr $_[0], 0, $pos + 1, '';
   $line =~ s/\x0d?\x0a$//;
 
-  $line;
+  return $line;
 }
 
 sub hmac_md5_sum { _hmac(\&_md5, @_) }
@@ -568,6 +569,14 @@ sub quote {
   $_[0] = '"' . $_[0] . '"';
 }
 
+sub secure_compare {
+  my ($a, $b) = @_;
+  return if length $a != length $b;
+  my $r = 0;
+  $r |= ord(substr $a, $_) ^ ord(substr $b, $_) for 0 .. length($a) - 1;
+  return $r == 0 ? 1 : undef;
+}
+
 sub sha1_bytes {
   my $data = shift;
   utf8::encode $data if utf8::is_utf8 $data;
@@ -661,7 +670,7 @@ sub _hmac {
   # HMAC
   my $ipad = $secret ^ (chr(0x36) x 64);
   my $opad = $secret ^ (chr(0x5c) x 64);
-  unpack 'H*', $_[0]->($opad . $_[0]->($ipad . $_[1]));
+  return unpack 'H*', $_[0]->($opad . $_[0]->($ipad . $_[1]));
 }
 
 # Helper for md5_bytes
@@ -682,7 +691,7 @@ sub _unescape {
     return chr hex $_[0] if substr($_[0], 0, 1) eq 'x';
     return chr $_[0];
   }
-  exists $ENTITIES{$_[1]} ? chr $ENTITIES{$_[1]} : "&$_[1];";
+  return exists $ENTITIES{$_[1]} ? chr $ENTITIES{$_[1]} : "&$_[1];";
 }
 
 1;
@@ -725,17 +734,19 @@ Base64 encode in-place.
 
   camelize $string;
 
-Camelize string in-place.
+Convert snake case string to camel case and replace C<-> with C<::> in-place.
 
-  foo_bar -> FooBar
+  foo_bar     -> FooBar
+  foo_bar-baz -> FooBar::Baz
 
 =head2 C<decamelize>
 
   decamelize $string;
 
-Decamelize string in-place.
+Convert camel case string to snake case and replace C<::> with C<-> in-place.
 
-  FooBar -> foo_bar
+  FooBar      -> foo_bar
+  FooBar::Baz -> foo_bar-baz
 
 =head2 C<decode>
 
@@ -822,6 +833,12 @@ Quoted Printable decode in-place.
   qp_encode $string;
 
 Quoted Printable encode in-place.
+
+=head2 C<secure_compare>
+
+  my $success = secure_compare $string1, $string2;
+
+Constant time comparison algorithm to prevent timing attacks.
 
 =head2 C<sha1_bytes>
 

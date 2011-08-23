@@ -1,16 +1,17 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable epoll, kqueue and TLS
-BEGIN { $ENV{MOJO_POLL} = $ENV{MOJO_NO_TLS} = 1 }
+# Disable libev and TLS
+BEGIN {
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+  $ENV{MOJO_NO_TLS}    = 1;
+}
 
 use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 96;
+plan tests => 104;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -22,24 +23,20 @@ use_ok 'ojo';
 # Make sure user agents dont taint the ioloop
 my $loop = Mojo::IOLoop->singleton;
 my $ua   = Mojo::UserAgent->new;
-my $code;
+my ($id, $code);
 $ua->get(
   'http://cpan.org' => sub {
     my $tx = pop;
+    $id   = $tx->connection;
     $code = $tx->res->code;
     $loop->stop;
   }
 );
 $loop->start;
 $ua = undef;
-my $ticks     = 0;
-my $recurring = $loop->recurring(sub { $ticks++ });
-my $idle      = $loop->idle(sub { $loop->stop });
-$loop->start;
-$loop->drop($recurring);
-$loop->drop($idle);
-is $ticks, 1,   'loop not tainted';
-is $code,  301, 'right status';
+$loop->one_tick(0);
+ok !$loop->handle($id), 'loop not tainted';
+is $code, 301, 'right status';
 
 # Fresh user agent
 $ua = Mojo::UserAgent->new;
@@ -158,6 +155,18 @@ is $tx->req->headers->content_length, 17, 'right content length';
 is $tx->req->body,   'query=mojolicious', 'right content';
 like $tx->res->body, qr/Mojolicious/,     'right content';
 is $tx->res->code,   200,                 'right status';
+is $tx->keep_alive, 1, 'connection will be kept alive';
+
+# Simple keep alive form post
+$tx =
+  $ua->post_form('http://search.cpan.org/search' => {query => 'mojolicious'});
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->url, 'http://search.cpan.org/search', 'right url';
+is $tx->req->headers->content_length, 17, 'right content length';
+is $tx->req->body,   'query=mojolicious', 'right content';
+like $tx->res->body, qr/Mojolicious/,     'right content';
+is $tx->res->code,   200,                 'right status';
+is $tx->kept_alive, 1, 'connection was kept alive';
 
 # Simple request
 $tx = $ua->get('http://www.apache.org');

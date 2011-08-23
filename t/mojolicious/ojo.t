@@ -1,17 +1,16 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
-# Disable IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
-  $ENV{MOJO_MODE} = 'development';
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER}  = 'Mojo::IOWatcher';
+  $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 # "What do you mean 'we', flesh-tube?"
 use_ok 'ojo';
@@ -44,5 +43,8 @@ is f('/' => {foo => 'bar'})->body, 'POSTbar', 'right content';
 # Parse XML
 is x('<title>works</title>')->at('title')->text, 'works', 'right text';
 
-# Bytestream
+# ByteStream
 is b('<foo>')->url_escape, '%3Cfoo%3E', 'right result';
+
+# Collection
+is c(1, 2, 3)->join('-'), '1-2-3', 'right result';

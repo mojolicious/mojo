@@ -12,11 +12,17 @@ updates.
 
 =head1 TUTORIAL
 
+=over 2
+
+=item L<Mojolicious::Lite>
+
 A really fast and fun way to get started developing web applications with
-Mojolicious is the tutorial in L<Mojolicious::Lite>.
+Mojolicious is the L<Mojolicious::Lite> tutorial.
 Almost everything you learn there can also be applied to normal
 L<Mojolicious> applications and is considered a prerequisite for the guides.
 You should definitely take a look!
+
+=back
 
 =head1 GUIDES
 
@@ -64,11 +70,11 @@ ones.
 
 =item L<Mojo::UserAgent>
 
-Full featured async io HTTP 1.1 and WebSocket user agent.
+Full featured non-blocking I/O HTTP 1.1 and WebSocket user agent.
 
 =item L<Mojo::DOM>
 
-Very fun and minimalistic XML/HTML5 DOM parser with CSS3 selector support.
+Very fun and minimalistic HTML5/XML DOM parser with CSS3 selector support.
 
 =item L<Mojo::JSON>
 
@@ -76,13 +82,15 @@ Minimalistic JSON implementation that just works.
 
 =item L<Mojo::Server::Daemon>
 
-Highly portable async io HTTP 1.1 and WebSocket server with self-restart
-support through L<Mojo::Server::Morbo>, perfect for development and testing.
+Highly portable non-blocking I/O HTTP 1.1 and WebSocket server with
+self-restart support through L<Mojo::Server::Morbo>, perfect for development
+and testing.
 
 =item L<Mojo::Server::Hypnotoad>
 
-Full featured UNIX optimized preforking async io HTTP 1.1 and WebSocket
-server with support for zero downtime software upgrades (hot deployment).
+Full featured UNIX optimized preforking non-blocking I/O HTTP 1.1 and
+WebSocket server with support for zero downtime software upgrades
+(hot deployment).
 
 =item L<Mojo::Server::CGI>, L<Mojo::Server::FastCGI>, L<Mojo::Server::PSGI>
 

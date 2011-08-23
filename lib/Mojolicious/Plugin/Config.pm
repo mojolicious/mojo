@@ -17,7 +17,7 @@ sub load {
   my $content = do { local $/; <$handle> };
 
   # Process
-  $self->parse($content, $file, $conf, $app);
+  return $self->parse($content, $file, $conf, $app);
 }
 
 sub parse {
@@ -30,7 +30,7 @@ sub parse {
   die qq/Config file "$file" did not return a hashref.\n/
     unless ref $config && ref $config eq 'HASH';
 
-  $config;
+  return $config;
 }
 
 sub register {
@@ -95,7 +95,7 @@ sub register {
   # Add default stash value
   $app->defaults(($conf->{stash_key} || 'config') => $config);
 
-  $config;
+  return $config;
 }
 
 1;
@@ -114,16 +114,16 @@ Mojolicious::Plugin::Config - Perlish Configuration Plugin
   };
 
   # Mojolicious
-  my $config = $self->plugin('config');
+  my $config = $self->plugin('Config');
 
   # Mojolicious::Lite
-  my $config = plugin 'config';
+  my $config = plugin 'Config';
 
   # Reads myapp.conf by default and puts the parsed version into the stash
   my $config = $self->stash('config');
 
   # Everything can be customized with options
-  my $config = plugin config => {
+  my $config = plugin Config => {
     file      => '/etc/myapp.stuff',
     stash_key => 'conf'
   };
@@ -140,30 +140,30 @@ ones like C<myapp.$mode.conf>.
 =head2 C<default>
 
   # Mojolicious::Lite
-  plugin config => {default => {foo => 'bar'}};
+  plugin Config => {default => {foo => 'bar'}};
 
 Default configuration.
 
 =head2 C<ext>
 
   # Mojolicious::Lite
-  plugin config => {ext => 'stuff'};
+  plugin Config => {ext => 'stuff'};
 
 File extension of config file, defaults to C<conf>.
 
 =head2 C<file>
 
   # Mojolicious::Lite
-  plugin config => {file => 'myapp.conf'};
-  plugin config => {file => '/etc/foo.stuff'};
+  plugin Config => {file => 'myapp.conf'};
+  plugin Config => {file => '/etc/foo.stuff'};
 
-Configuration file, defaults to the value of C<MOJO_CONFIG> or C<myapp.conf>
-in the application home directory.
+Configuration file, defaults to the value of the C<MOJO_CONFIG> environment
+variable or C<myapp.conf> in the application home directory.
 
 =head2 C<stash_key>
 
   # Mojolicious::Lite
-  plugin config => {stash_key => 'conf'};
+  plugin Config => {stash_key => 'conf'};
 
 Configuration stash key.
 

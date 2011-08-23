@@ -17,36 +17,18 @@ our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
 our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
 our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
-# IPv4 regex (RFC 3986)
-my $DEC_OCTET_RE = qr/(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])/;
-our $IPV4_RE =
-  qr/^$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE\.$DEC_OCTET_RE$/;
-
-# IPv6 regex (RFC 3986)
-my $H16_RE  = qr/[0-9A-Fa-f]{1,4}/;
-my $LS32_RE = qr/(?:$H16_RE:$H16_RE|$IPV4_RE)/;
-our $IPV6_RE = qr/(?:
-                                           (?: $H16_RE : ){6} $LS32_RE
-  |                                     :: (?: $H16_RE : ){5} $LS32_RE
-  | (?:                      $H16_RE )? :: (?: $H16_RE : ){4} $LS32_RE
-  | (?: (?: $H16_RE : ){0,1} $H16_RE )? :: (?: $H16_RE : ){3} $LS32_RE
-  | (?: (?: $H16_RE : ){0,2} $H16_RE )? :: (?: $H16_RE : ){2} $LS32_RE
-  | (?: (?: $H16_RE : ){0,3} $H16_RE )? ::     $H16_RE :      $LS32_RE
-  | (?: (?: $H16_RE : ){0,4} $H16_RE )? ::                    $LS32_RE
-  | (?: (?: $H16_RE : ){0,5} $H16_RE )? ::                    $H16_RE
-  | (?: (?: $H16_RE : ){0,6} $H16_RE )? ::
-)/x;
-
+# "Homer, it's easy to criticize.
+#  Fun, too."
 sub new {
   my $self = shift->SUPER::new();
   $self->parse(@_);
-  $self;
+  return $self;
 }
 
 sub authority {
   my ($self, $authority) = @_;
 
-  # Set
+  # New authority
   if (defined $authority) {
     my $userinfo = '';
     my $host     = $authority;
@@ -87,7 +69,7 @@ sub authority {
   $authority .= lc($host || '');
   $authority .= ":$port" if $port;
 
-  $authority;
+  return $authority;
 }
 
 sub clone {
@@ -101,13 +83,13 @@ sub clone {
   $clone->fragment($self->fragment);
   $clone->base($self->base->clone) if $self->{base};
 
-  $clone;
+  return $clone;
 }
 
 sub ihost {
   my ($self, $host) = @_;
 
-  # Set
+  # Generate host
   if (defined $host) {
 
     # Decode parts
@@ -138,23 +120,13 @@ sub ihost {
     push @encoded, $part;
   }
 
-  join '.', @encoded;
+  return join '.', @encoded;
 }
 
 sub is_abs {
   my $self = shift;
   return 1 if $self->scheme && $self->authority;
-  undef;
-}
-
-sub is_ipv4 {
-  return 1 if shift->host =~ $IPV4_RE;
-  undef;
-}
-
-sub is_ipv6 {
-  return 1 if shift->host =~ $IPV6_RE;
-  undef;
+  return;
 }
 
 sub parse {
@@ -170,16 +142,14 @@ sub parse {
   $self->query($query);
   $self->fragment($fragment);
 
-  $self;
+  return $self;
 }
 
 sub path {
   my ($self, $path) = @_;
 
-  # Set
+  # New path
   if ($path) {
-
-    # Plain path
     if (!ref $path) {
 
       # Absolute path
@@ -200,15 +170,13 @@ sub path {
     return $self;
   }
 
-  # Get
-  $self->{path} ||= Mojo::Path->new;
-  $self->{path};
+  return $self->{path} ||= Mojo::Path->new;
 }
 
 sub query {
   my $self = shift;
 
-  # Set
+  # Merge or replace parameters
   if (@_) {
 
     # Replace with list
@@ -237,9 +205,7 @@ sub query {
     return $self;
   }
 
-  # Get
-  $self->{query} ||= Mojo::Parameters->new;
-  $self->{query};
+  return $self->{query} ||= Mojo::Parameters->new;
 }
 
 sub to_abs {
@@ -249,8 +215,6 @@ sub to_abs {
   # Absolute URL
   my $abs = $self->clone;
   return $abs if $abs->is_abs;
-
-  # Add scheme and authority
   $abs->scheme($base->scheme);
   $abs->authority($base->authority);
 
@@ -267,45 +231,43 @@ sub to_abs {
 
     # Characters after the right-most '/' need to go
     pop @{$new->parts} unless $new->trailing_slash;
-
-    $new->append($_) for @{$old->parts};
+    push @{$new->parts}, @{$old->parts};
   }
 
-  # Update
+  # Absolute path
+  $new->canonicalize;
   $new->leading_slash(1);
   $new->trailing_slash($old->trailing_slash);
   $abs->path($new);
 
-  $abs;
+  return $abs;
 }
 
 sub to_rel {
   my $self = shift;
   my $base = shift || $self->base->clone;
 
-  # Relative
+  # Relative URL
   my $rel = $self->clone;
-  return $rel unless $rel->is_abs;
-
-  # Different locations
-  return $rel
-    unless lc $base->scheme eq lc $rel->scheme
-      && $base->authority eq $rel->authority;
-
-  # Remove scheme and authority
+  $rel->base($base);
   $rel->scheme('');
   $rel->authority('');
 
-  # Characters after the right-most '/' need to go
-  $rel->base($base->clone);
-  my $splice = @{$base->path->parts};
-  $splice -= 1 unless $base->path->trailing_slash;
-  my $path = $rel->path->clone;
-  splice @{$path->parts}, 0, $splice if $splice;
-  $rel->path($path);
-  $rel->path->leading_slash(0);
+  # Build relative path
+  my @rel_parts  = @{$rel->path->parts};
+  my $base_path  = $base->path;
+  my @base_parts = @{$base_path->parts};
+  pop @base_parts unless $base_path->trailing_slash;
+  while (@rel_parts && @base_parts && $rel_parts[0] eq $base_parts[0]) {
+    shift @rel_parts;
+    shift @base_parts;
+  }
+  $rel->path(Mojo::Path->new);
+  my $rel_path = $rel->path;
+  $rel_path->parts([('..') x @base_parts, @rel_parts]);
+  $rel_path->trailing_slash(1) if $self->path->trailing_slash;
 
-  $rel;
+  return $rel;
 }
 
 # "Dad, what's a Muppet?
@@ -336,13 +298,11 @@ sub to_string {
 
   # Fragment
   if (my $fragment = $self->fragment) {
-
-    # *( pchar / "/" / "?" )
     url_escape $fragment, "$PCHAR\/\?";
     $url .= "#$fragment";
   }
 
-  $url;
+  return $url;
 }
 
 1;
@@ -468,20 +428,6 @@ Host part of this URL in punycode format.
   my $is_abs = $url->is_abs;
 
 Check if URL is absolute.
-
-=head2 C<is_ipv4>
-
-  my $is_ipv4 = $url->is_ipv4;
-
-Check if C<host> is an C<IPv4> address.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<is_ipv6>
-
-  my $is_ipv6 = $url->is_ipv6;
-
-Check if C<host> is an C<IPv6> address.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<parse>
 

@@ -12,7 +12,7 @@ sub new {
   my $self = shift->SUPER::new();
 
   # Method
-  $self->{_method} = lc shift;
+  $self->{method} = lc shift;
 
   # Path
   my $path = shift;
@@ -20,12 +20,12 @@ sub new {
   my $backup = $path;
   decode 'UTF-8', $path;
   $path = $backup unless defined $path;
-  $self->{_path} = $path;
+  $self->{path} = $path;
 
   # WebSocket
-  $self->{_websocket} = shift;
+  $self->{websocket} = shift;
 
-  $self;
+  return $self;
 }
 
 # "Life can be hilariously cruel."
@@ -35,12 +35,12 @@ sub match {
 
   # Match
   $self->root($r) unless $self->root;
-  my $dictionary = $self->{_dictionary} ||= $r->dictionary;
-  my $path       = $self->{_path};
+  my $dictionary = $self->{dictionary} ||= $r->dictionary;
+  my $path       = $self->{path};
   my $pattern    = $r->pattern;
   my $captures   = $pattern->shape_match(\$path);
   return unless $captures;
-  $self->{_path} = $path;
+  $self->{path} = $path;
 
   # Merge captures
   $captures = {%{$self->captures}, %$captures};
@@ -48,7 +48,7 @@ sub match {
 
   # Method
   if (my $methods = $r->via) {
-    my $method = lc $self->{_method};
+    my $method = lc $self->{method};
     $method = 'get' if $method eq 'head';
     my $found = 0;
     for my $m (@$methods) { ++$found and last if $method eq $m }
@@ -70,7 +70,7 @@ sub match {
   }
 
   # WebSocket
-  return if $r->is_websocket && !$self->{_websocket};
+  return if $r->is_websocket && !$self->{websocket};
 
   # Empty path
   my $empty = !length $path || $path eq '/' ? 1 : 0;
@@ -82,15 +82,8 @@ sub match {
     $empty = 1;
   }
 
-  # Format
-  my $endpoint = $r->is_endpoint;
-  if ($endpoint && !$pattern->format && $path =~ /^\/?\.([^\/]+)$/) {
-    $captures->{format} = $1;
-    $empty = 1;
-  }
-  $captures->{format} ||= $pattern->format if $pattern->format;
-
   # Update stack
+  my $endpoint = $r->is_endpoint;
   if ($r->inline || ($endpoint && $empty)) {
     push @{$self->stack}, {%$captures};
     delete $captures->{cb};
@@ -115,7 +108,7 @@ sub match {
     return $self if $self->endpoint;
 
     # Reset path
-    $self->{_path} = $path;
+    $self->{path} = $path;
 
     # Reset stack
     if ($r->parent) { $self->stack([@$snapshot]) }
@@ -125,7 +118,7 @@ sub match {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub path_for {
@@ -171,14 +164,11 @@ sub path_for {
   my $captures = $self->captures;
   my $endpoint;
   if ($name && $name eq 'current' || !$name) {
-    return undef unless $endpoint = $self->endpoint;
+    return unless $endpoint = $self->endpoint;
   }
 
   # Find endpoint
   else {
-    $captures = {};
-
-    # Find
     my @children = ($self->root);
     my $candidate;
     while (my $child = shift @children) {
@@ -200,11 +190,17 @@ sub path_for {
 
   # Merge values
   $values = {%$captures, format => undef, %$values};
+  my $pattern = $endpoint->pattern;
+  $values->{format} =
+    defined $captures->{format}
+    ? $captures->{format}
+    : $pattern->defaults->{format}
+    if $pattern->reqs->{format};
 
   # Render
   my $path = $endpoint->render('', $values);
   utf8::downgrade $path, 1;
-  wantarray ? ($path, $endpoint->has_websocket) : $path;
+  return wantarray ? ($path, $endpoint->has_websocket) : $path;
 }
 
 1;

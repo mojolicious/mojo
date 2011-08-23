@@ -1,20 +1,18 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
+# Disable Bonjour, IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1;
-  $ENV{MOJO_MODE} = 'development';
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER}  = 'Mojo::IOWatcher';
+  $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 249;
+use Test::More tests => 260;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use File::stat;
 use File::Spec;
 use Mojo::Date;
 use Mojo::Transaction::HTTP;
@@ -25,10 +23,13 @@ use Mojolicious;
 #  Amy's rich, she's probably got other characteristics..."
 use_ok 'MojoliciousTest';
 
-my $t = Test::Mojo->new(app => 'MojoliciousTest');
+my $t = Test::Mojo->new('MojoliciousTest');
+
+# Application is already available
+is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 
 # Foo::fun
-my $url = $t->build_url;
+my $url = $t->test_server;
 $url->path('/fun/time');
 $t->get_ok($url, {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
   ->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
@@ -97,7 +98,7 @@ $t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
   ->content_is('Have fun!');
 
 # Foo::fun
-$url = $t->build_url;
+$url = $t->test_server;
 $url->path('/fun/time');
 $t->get_ok($url, {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
@@ -206,15 +207,15 @@ $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
 
 # Check Last-Modified header for static files
 my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
-my $stat  = stat($path);
-my $mtime = Mojo::Date->new(stat($path)->mtime)->to_string;
+my $size  = (stat $path)[7];
+my $mtime = Mojo::Date->new((stat $path)[9])->to_string;
 
 # Static file /hello.txt
 $t->get_ok('/hello.txt')->status_is(200)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Last-Modified'  => $mtime)
-  ->header_is('Content-Length' => $stat->size)->content_type_is('text/plain')
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Last-Modified' => $mtime)->header_is('Content-Length' => $size)
+  ->content_type_is('text/plain')
   ->content_like(qr/Hello Mojo from a development static file!/);
 
 # Try to access a file which is not under the web root via path
@@ -260,7 +261,7 @@ is $tx->res->code, 200, 'right status';
 like $tx->res->body, qr/Hello Mojo from the template \/foo! Hello World!/,
   'right content';
 
-$t = Test::Mojo->new(app => 'SingleFileTestApp');
+$t = Test::Mojo->new('SingleFileTestApp');
 
 # SingleFileTestApp::Foo::index
 $t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -291,7 +292,19 @@ $t->get_ok('/foo/bar')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/foo/bar');
 
-$t = Test::Mojo->new(app => 'MojoliciousTest');
+$t = Test::Mojo->new('MojoliciousTest');
+
+# MojoliciousTestController::Foo::plugin_upper_case
+$t->get_ok('/plugin/upper_case')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('WELCOME aboard!');
+
+# MojoliciousTestController::Foo::plugin_camel_case
+$t->get_ok('/plugin/camel_case')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Welcome aboard!');
 
 # MojoliciousTestController::Foo::stage2
 $t->get_ok('/staged', {'X-Pass' => '1'})->status_is(200)

@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use Test::More tests => 18;
 
@@ -9,7 +7,7 @@ use Mojo::JSON;
 
 # "We need some more secret sauce. Put the mayonnaise in the sun."
 use_ok 'Mojo::Server::PSGI';
-use_ok 'Mojolicious::Command::Psgi';
+use_ok 'Mojolicious::Command::psgi';
 
 # Binding
 my $psgi    = Mojo::Server::PSGI->new;
@@ -36,7 +34,7 @@ my $env = {
 my $res = $app->($env);
 is $res->[0], 200, 'right status';
 my %headers = @{$res->[1]};
-is keys(%headers), 3, 'right number of headers';
+ok keys(%headers) >= 3, 'enough headers';
 ok $headers{Date}, 'right "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
@@ -71,11 +69,11 @@ $env = {
   'psgi.multiprocess' => 1,
   'psgi.run_once'     => 0
 };
-$app = Mojolicious::Command::Psgi->new->run;
+$app = Mojolicious::Command::psgi->new->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
-is keys(%headers), 3, 'right number of headers';
+ok keys(%headers) >= 3, 'enough headers';
 ok $headers{Date}, 'right "Date" value';
 is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
@@ -108,10 +106,10 @@ $env = {
   'psgi.multiprocess' => 1,
   'psgi.run_once'     => 0
 };
-$app = Mojolicious::Command::Psgi->new->run;
+$app = Mojolicious::Command::psgi->new->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
-is scalar @{$res->[1]}, 10, 'right number of values';
+ok scalar @{$res->[1]} >= 10, 'enough headers';
 my $i = 0;
 for my $header (@{$res->[1]}) { $i++ if $header eq 'Set-Cookie' }
 is $i, 2, 'right number of "Set-Cookie" headers';

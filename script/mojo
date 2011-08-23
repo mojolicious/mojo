@@ -28,7 +28,7 @@ mojo - The Mojolicious Command System
 
 =head1 SYNOPSIS
 
-  % mojo --help
+  $ mojo --help
 
 =head1 DESCRIPTION
 

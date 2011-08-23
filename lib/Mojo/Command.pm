@@ -33,12 +33,14 @@ has usage      => "usage: $0\n";
 # Cache
 my $CACHE = {};
 
+sub app { Mojo::Server->new->app }
+
 sub chmod_file {
   my ($self, $path, $mod) = @_;
   chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
   $mod = sprintf '%lo', $mod;
   print "  [chmod] $path $mod\n" unless $self->quiet;
-  $self;
+  return $self;
 }
 
 sub chmod_rel_file {
@@ -49,14 +51,15 @@ sub chmod_rel_file {
 sub class_to_file {
   my ($self, $class) = @_;
   $class =~ s/:://g;
+  $class =~ s/([A-Z])([A-Z]*)/$1.lc($2)/gex;
   decamelize $class;
-  $class;
+  return $class;
 }
 
 sub class_to_path {
   my ($self, $class) = @_;
   my $path = join '/', split /::/, $class;
-  "$path.pm";
+  return "$path.pm";
 }
 
 sub create_dir {
@@ -71,7 +74,7 @@ sub create_dir {
   # Create
   File::Path::mkpath($path) or croak qq/Can't make directory "$path": $!/;
   print "  [mkdir] $path\n" unless $self->quiet;
-  $self;
+  return $self;
 }
 
 sub create_rel_dir {
@@ -79,6 +82,8 @@ sub create_rel_dir {
   $self->create_dir($self->rel_dir($path));
 }
 
+# "Olive oil? Asparagus? If your mother wasn't so fancy,
+#  we could just shop at the gas station like normal people."
 sub detect {
   my ($self, $guess) = @_;
 
@@ -93,10 +98,13 @@ sub detect {
   return $guess if $guess;
 
   # FastCGI (detect absence of WINDIR for Windows and USER for UNIX)
-  return 'fastcgi' if !defined $ENV{WINDIR} && !defined $ENV{USER};
+  return 'fastcgi'
+    if !defined $ENV{WINDIR}
+      && !defined $ENV{USER}
+      && !defined $ENV{HARNESS_ACTIVE};
 
   # Nothing
-  undef;
+  return;
 }
 
 sub get_all_data {
@@ -128,13 +136,13 @@ sub get_all_data {
     $all->{$name} = $content;
   }
 
-  $all;
+  return $all;
 }
 
 sub get_data {
   my ($self, $data, $class) = @_;
   my $all = $self->get_all_data($class);
-  $all->{$data};
+  return $all->{$data};
 }
 
 # "You don’t like your job, you don’t strike.
@@ -142,19 +150,19 @@ sub get_data {
 sub help {
   my $self = shift;
   print $self->usage;
-  exit;
+  exit 0;
 }
 
 sub rel_dir {
   my ($self, $path) = @_;
   my @parts = split /\//, $path;
-  File::Spec->catdir(Cwd::getcwd(), @parts);
+  return File::Spec->catdir(Cwd::getcwd(), @parts);
 }
 
 sub rel_file {
   my ($self, $path) = @_;
   my @parts = split /\//, $path;
-  File::Spec->catfile(Cwd::getcwd(), @parts);
+  return File::Spec->catfile(Cwd::getcwd(), @parts);
 }
 
 sub render_data {
@@ -168,7 +176,7 @@ sub render_to_file {
   my $data = shift;
   my $path = shift;
   $self->write_file($path, $self->render_data($data, @_));
-  $self;
+  return $self;
 }
 
 sub render_to_rel_file {
@@ -178,11 +186,13 @@ sub render_to_rel_file {
   $self->render_to_file($data, $self->rel_dir($path), @_);
 }
 
+# "The only thing I asked you to do for this party was put on clothes,
+#  and you didn't do it."
 sub run {
   my ($self, $name, @args) = @_;
 
   # Application loader
-  return Mojo::Server->new->app if defined $ENV{MOJO_APP_LOADER};
+  return $self->app if defined $ENV{MOJO_APP_LOADER};
 
   # Try to detect environment
   $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};
@@ -197,29 +207,13 @@ sub run {
 
     # Try all namespaces
     my $module;
+    my $class = $name;
+    camelize $class;
     for my $namespace (@{$self->namespaces}) {
+      last if $module = _command("${namespace}::$name");
 
-      # Generate module
-      my $camelized = $name;
-      camelize $camelized;
-      my $try = "$namespace\::$camelized";
-
-      # Load
-      if (my $e = Mojo::Loader->load($try)) {
-
-        # Module missing
-        next unless ref $e;
-
-        # Real error
-        die $e;
-      }
-
-      # Module is a command
-      next unless $try->can('new') && $try->can('run');
-
-      # Found
-      $module = $try;
-      last;
+      # DEPRECATED in Smiling Face With Sunglasses!
+      last if $module = _command("${namespace}::$class");
     }
 
     # Command missing
@@ -232,27 +226,18 @@ sub run {
   }
 
   # Test
-  return $self if $ENV{HARNESS_ACTIVE};
+  return 1 if $ENV{HARNESS_ACTIVE};
 
   # Try all namespaces
   my $commands = [];
   my $seen     = {};
   for my $namespace (@{$self->namespaces}) {
-
-    # Search
-    if (my $modules = Mojo::Loader->search($namespace)) {
-      for my $module (@$modules) {
-
-        # Load
-        if (my $e = Mojo::Loader->load($module)) { die $e }
-
-        # Seen
-        my $command = $module;
-        $command =~ s/^$namespace\:://;
-        push @$commands, [$command => $module]
-          unless $seen->{$command};
-        $seen->{$command} = 1;
-      }
+    for my $module (@{Mojo::Loader->search($namespace)}) {
+      next unless my $command = _command($module);
+      $command =~ s/^$namespace\:://;
+      push @$commands, [$command => $module]
+        unless $seen->{$command};
+      $seen->{$command} = 1;
     }
   }
 
@@ -263,13 +248,8 @@ sub run {
   my $list = [];
   my $len  = 0;
   foreach my $command (@$commands) {
-
-    # Generate name
     my $name = $command->[0];
-    decamelize $name;
-
-    # Add to list
-    my $l = length $name;
+    my $l    = length $name;
     $len = $l if $l > $len;
     push @$list, [$name, $command->[1]->new->description];
   }
@@ -282,8 +262,7 @@ sub run {
     print "  $name$padding   $description";
   }
   print $self->hint;
-
-  $self;
+  return 1;
 }
 
 sub start {
@@ -306,20 +285,30 @@ sub write_file {
   my $dir = File::Spec->catdir(@parts);
   $self->create_dir($dir);
 
-  # Open file
-  my $file = IO::File->new;
-  $file->open(">$path") or croak qq/Can't open file "$path": $!/;
-
   # Write unbuffered
+  croak qq/Can't open file "$path": $!/
+    unless my $file = IO::File->new("> $path");
   $file->syswrite($data);
   print "  [write] $path\n" unless $self->quiet;
 
-  $self;
+  return $self;
 }
 
 sub write_rel_file {
   my ($self, $path, $data) = @_;
   $self->write_file($self->rel_file($path), $data);
+}
+
+sub _command {
+  my $module = shift;
+
+  if (my $e = Mojo::Loader->load($module)) {
+    return unless ref $e;
+    die $e;
+  }
+  return unless $module->isa('Mojo::Command');
+
+  return $module;
 }
 
 1;
@@ -331,8 +320,8 @@ Mojo::Command - Command Base Class
 
 =head1 SYNOPSIS
 
-  # Camel case command name
-  package Mojo::Command::Mycommand;
+  # Lower case command name
+  package Mojolicious::Command::mycommand;
 
   # Subclass
   use Mojo::Base 'Mojo::Command';
@@ -358,7 +347,7 @@ Mojo::Command - Command Base Class
     my $self = shift;
 
     # Handle options
-    local @ARGV = @_ if @_;
+    local @ARGV = @_;
     GetOptions('something' => sub { $something = 1 });
 
     # Magic here! :)
@@ -422,6 +411,13 @@ Usage information for command, used for the help screen.
 L<Mojo::Command> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 C<app>
+
+  my $app = $command->app;
+
+Currently active application, defaults to a L<Mojo::HelloWorld> object.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<chmod_file>
 
   $command = $command->chmod_file('/foo/bar.txt', 0644);
@@ -440,7 +436,10 @@ Portably change mode of a relative file.
 
 Convert a class name to a file.
 
-  FooBar -> foo_bar
+  Foo::Bar -> foo_bar
+  FOO::Bar -> foobar
+  FooBar   -> foo_bar
+  FOOBar   -> foobar
 
 =head2 C<class_to_path>
 

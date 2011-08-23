@@ -37,7 +37,7 @@ sub build_body {
     $body .= $chunk;
   }
 
-  $body;
+  return $body;
 }
 
 sub build_headers {
@@ -60,7 +60,7 @@ sub build_headers {
     $headers .= $chunk;
   }
 
-  $headers;
+  return $headers;
 }
 
 # "Aren't we forgetting the true meaning of Christmas?
@@ -69,20 +69,20 @@ sub generate_body_chunk {
   my ($self, $offset) = @_;
 
   # Callback
-  if (!delete $self->{_delay} && !length $self->{_b2}) {
-    my $cb = delete $self->{_drain};
+  if (!delete $self->{delay} && !length $self->{b2}) {
+    my $cb = delete $self->{drain};
     $self->$cb($offset) if $cb;
   }
 
   # Get chunk
-  my $chunk = $self->{_b2};
+  my $chunk = $self->{b2};
   $chunk = '' unless defined $chunk;
-  $self->{_b2} = '';
+  $self->{b2} = '';
 
   # EOF or delay
-  return $self->{_eof} ? '' : undef unless length $chunk;
+  return $self->{eof} ? '' : undef unless length $chunk;
 
-  $chunk;
+  return $chunk;
 }
 
 sub get_body_chunk {
@@ -93,14 +93,14 @@ sub get_header_chunk {
   my ($self, $offset) = @_;
 
   # Normal headers
-  my $copy = $self->{_b1} ||= $self->_build_headers;
-  substr($copy, $offset, CHUNK_SIZE);
+  my $copy = $self->{b1} ||= $self->_build_headers;
+  return substr($copy, $offset, CHUNK_SIZE);
 }
 
 sub has_leftovers {
   my $self = shift;
-  return 1 if length $self->{_b2} || length $self->{_b1};
-  undef;
+  return 1 if length $self->{b2} || length $self->{b1};
+  return;
 }
 
 sub header_size { length shift->build_headers }
@@ -108,18 +108,18 @@ sub header_size { length shift->build_headers }
 sub is_chunked {
   my $self = shift;
   my $encoding = $self->headers->transfer_encoding || '';
-  $encoding =~ /chunked/i ? 1 : 0;
+  return $encoding =~ /chunked/i ? 1 : 0;
 }
 
 sub is_done {
-  return 1 if (shift->{_state} || '') eq 'done';
-  undef;
+  return 1 if (shift->{state} || '') eq 'done';
+  return;
 }
 
 sub is_dynamic {
   my $self = shift;
   return 1 if $self->on_read && !defined $self->headers->content_length;
-  undef;
+  return;
 }
 
 sub is_multipart {
@@ -127,12 +127,12 @@ sub is_multipart {
   my $type = $self->headers->content_type || '';
   $type =~ /multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+)/i
     and return $1;
-  undef;
+  return;
 }
 
 sub is_parsing_body {
-  return 1 if (shift->{_state} || '') eq 'body';
-  undef;
+  return 1 if (shift->{state} || '') eq 'body';
+  return;
 }
 
 sub leftovers {
@@ -140,10 +140,10 @@ sub leftovers {
 
   # Chunked leftovers are in the chunked buffer, and so are those from a
   # HEAD request
-  return $self->{_b1} if length $self->{_b1};
+  return $self->{b1} if length $self->{b1};
 
   # Normal leftovers
-  $self->{_b2};
+  return $self->{b2};
 }
 
 sub parse {
@@ -153,7 +153,7 @@ sub parse {
   $self->parse_until_body(@_);
 
   # Still parsing headers
-  return $self if $self->{_state} eq 'headers';
+  return $self if $self->{state} eq 'headers';
 
   # Relaxed parsing for wonky web servers
   if ($self->auto_relax) {
@@ -167,17 +167,17 @@ sub parse {
   }
 
   # Parse chunked content
-  $self->{_real_size} = 0 unless exists $self->{_real_size};
-  if ($self->is_chunked && ($self->{_state} || '') ne 'headers') {
+  $self->{real_size} = 0 unless exists $self->{real_size};
+  if ($self->is_chunked && ($self->{state} || '') ne 'headers') {
     $self->_parse_chunked;
-    $self->{_state} = 'done' if ($self->{_chunked} || '') eq 'done';
+    $self->{state} = 'done' if ($self->{chunked} || '') eq 'done';
   }
 
   # Not chunked, pass through to second buffer
   else {
-    $self->{_real_size} += length $self->{_b1};
-    $self->{_b2} .= $self->{_b1};
-    $self->{_b1} = '';
+    $self->{real_size} += length $self->{b1};
+    $self->{b2} .= $self->{b1};
+    $self->{b1} = '';
   }
 
   # Custom body parser callback
@@ -185,9 +185,9 @@ sub parse {
 
     # Chunked or relaxed content
     if ($self->is_chunked || $self->relaxed) {
-      $self->{_b2} = '' unless defined $self->{_b2};
-      $self->$cb($self->{_b2});
-      $self->{_b2} = '';
+      $self->{b2} = '' unless defined $self->{b2};
+      $self->$cb($self->{b2});
+      $self->{b2} = '';
     }
 
     # Normal content
@@ -195,35 +195,35 @@ sub parse {
 
       # Bytes needed
       my $len = $self->headers->content_length || 0;
-      $self->{_size} ||= 0;
-      my $need = $len - $self->{_size};
+      $self->{size} ||= 0;
+      my $need = $len - $self->{size};
 
       # Slurp
       if ($need > 0) {
-        my $chunk = substr $self->{_b2}, 0, $need, '';
-        $self->{_size} = $self->{_size} + length $chunk;
+        my $chunk = substr $self->{b2}, 0, $need, '';
+        $self->{size} = $self->{size} + length $chunk;
         $self->$cb($chunk);
       }
 
       # Done
-      $self->{_state} = 'done' if $len <= $self->progress;
+      $self->{state} = 'done' if $len <= $self->progress;
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub parse_body {
   my $self = shift;
-  $self->{_state} = 'body';
+  $self->{state} = 'body';
   $self->parse(@_);
 }
 
 sub parse_body_once {
   my $self = shift;
   $self->parse_body(@_);
-  $self->{_state} = 'done';
-  $self;
+  $self->{state} = 'done';
+  return $self;
 }
 
 # "Quick Smithers. Bring the mind eraser device!
@@ -233,34 +233,34 @@ sub parse_until_body {
   my ($self, $chunk) = @_;
 
   # Prepare first buffer
-  $self->{_b1}       = '' unless defined $self->{_b1};
-  $self->{_raw_size} = 0  unless exists $self->{_raw_size};
+  $self->{b1}       = '' unless defined $self->{b1};
+  $self->{raw_size} = 0  unless exists $self->{raw_size};
 
   # Add chunk
   if (defined $chunk) {
-    $self->{_raw_size} += length $chunk;
-    $self->{_b1} .= $chunk;
+    $self->{raw_size} += length $chunk;
+    $self->{b1} .= $chunk;
   }
 
   # Parser started
-  unless ($self->{_state}) {
+  unless ($self->{state}) {
 
     # Update size
-    $self->{_header_size} = $self->{_raw_size} - length $self->{_b1};
+    $self->{header_size} = $self->{raw_size} - length $self->{b1};
 
     # Headers
-    $self->{_state} = 'headers';
+    $self->{state} = 'headers';
   }
 
   # Parse headers
-  $self->_parse_headers if ($self->{_state} || '') eq 'headers';
+  $self->_parse_headers if ($self->{state} || '') eq 'headers';
 
-  $self;
+  return $self;
 }
 
 sub progress {
   my $self = shift;
-  $self->{_raw_size} - ($self->{_header_size} || 0);
+  return $self->{raw_size} - ($self->{header_size} || 0);
 }
 
 sub write {
@@ -271,18 +271,18 @@ sub write {
 
   # Add chunk
   if (defined $chunk) {
-    $self->{_b2} = '' unless defined $self->{_b2};
-    $self->{_b2} .= $chunk;
+    $self->{b2} = '' unless defined $self->{b2};
+    $self->{b2} .= $chunk;
   }
 
   # Delay
-  else { $self->{_delay} = 1 }
+  else { $self->{delay} = 1 }
 
   # Drain callback
-  $self->{_drain} = $cb if $cb;
+  $self->{drain} = $cb if $cb;
 
   # Finish
-  $self->{_eof} = 1 if defined $chunk && $chunk eq '';
+  $self->{eof} = 1 if defined $chunk && $chunk eq '';
 }
 
 # "Here's to alcohol, the cause of—and solution to—all life's problems."
@@ -296,7 +296,7 @@ sub write_chunk {
   $self->write(defined $chunk ? $self->_build_chunk($chunk) : $chunk, $cb);
 
   # Finish
-  $self->{_eof} = 1 if defined $chunk && $chunk eq '';
+  $self->{eof} = 1 if defined $chunk && $chunk eq '';
 }
 
 sub _build_chunk {
@@ -310,55 +310,55 @@ sub _build_chunk {
   else {
 
     # First chunk has no leading CRLF
-    $formatted = "\x0d\x0a" if $self->{_chunks};
-    $self->{_chunks} = 1;
+    $formatted = "\x0d\x0a" if $self->{chunks};
+    $self->{chunks} = 1;
 
     # Chunk
     $formatted .= sprintf('%x', length $chunk) . "\x0d\x0a$chunk";
   }
 
-  $formatted;
+  return $formatted;
 }
 
 sub _build_headers {
   my $self    = shift;
   my $headers = $self->headers->to_string;
   return "\x0d\x0a" unless $headers;
-  "$headers\x0d\x0a\x0d\x0a";
+  return "$headers\x0d\x0a\x0d\x0a";
 }
 
 sub _parse_chunked {
   my $self = shift;
 
   # Trailing headers
-  if (($self->{_chunked} || '') eq 'trailing_headers') {
+  if (($self->{chunked} || '') eq 'trailing_headers') {
     $self->_parse_chunked_trailing_headers;
     return $self;
   }
 
   # New chunk (ignore the chunk extension)
-  while ($self->{_b1} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
+  while ($self->{b1} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
     my $header = $1;
     my $len    = hex($2);
 
     # Whole chunk
-    if (length($self->{_b1}) >= (length($header) + $len)) {
+    if (length($self->{b1}) >= (length($header) + $len)) {
 
       # Remove header
-      substr $self->{_b1}, 0, length $header, '';
+      substr $self->{b1}, 0, length $header, '';
 
       # Last chunk
       if ($len == 0) {
-        $self->{_chunked} = 'trailing_headers';
+        $self->{chunked} = 'trailing_headers';
         last;
       }
 
       # Remove payload
-      $self->{_real_size} += $len;
-      $self->{_b2} .= substr $self->{_b1}, 0, $len, '';
+      $self->{real_size} += $len;
+      $self->{b2} .= substr $self->{b1}, 0, $len, '';
 
       # Remove newline at end of chunk
-      $self->{_b1} =~ s/^(\x0d?\x0a)//;
+      $self->{b1} =~ s/^(\x0d?\x0a)//;
     }
 
     # Not a whole chunk, wait for more data
@@ -367,7 +367,7 @@ sub _parse_chunked {
 
   # Trailing headers
   $self->_parse_chunked_trailing_headers
-    if ($self->{_chunked} || '') eq 'trailing_headers';
+    if ($self->{chunked} || '') eq 'trailing_headers';
 }
 
 sub _parse_chunked_trailing_headers {
@@ -375,8 +375,8 @@ sub _parse_chunked_trailing_headers {
 
   # Parse
   my $headers = $self->headers;
-  $headers->parse($self->{_b1});
-  $self->{_b1} = '';
+  $headers->parse($self->{b1});
+  $self->{b1} = '';
 
   # Done
   if ($headers->is_done) {
@@ -388,9 +388,9 @@ sub _parse_chunked_trailing_headers {
     $encoding
       ? $headers->transfer_encoding($encoding)
       : $headers->remove('Transfer-Encoding');
-    $headers->content_length($self->{_real_size});
+    $headers->content_length($self->{real_size});
 
-    $self->{_chunked} = 'done';
+    $self->{chunked} = 'done';
   }
 }
 
@@ -399,15 +399,15 @@ sub _parse_headers {
 
   # Parse
   my $headers = $self->headers;
-  $headers->parse($self->{_b1});
-  $self->{_b1} = '';
+  $headers->parse($self->{b1});
+  $self->{b1} = '';
 
   # Done
   if ($headers->is_done) {
     my $leftovers = $headers->leftovers;
-    $self->{_header_size} = $self->{_raw_size} - length $leftovers;
-    $self->{_b1}          = $leftovers;
-    $self->{_state}       = 'body';
+    $self->{header_size} = $self->{raw_size} - length $leftovers;
+    $self->{b1}          = $leftovers;
+    $self->{state}       = 'body';
   }
 }
 

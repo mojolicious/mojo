@@ -11,6 +11,7 @@
         background-color: #f5f6f8;
         color: #333;
         font: 0.9em Verdana, sans-serif;
+        line-height: 1.5;
         margin: 0;
         text-shadow: #ddd 0 1px 0;
       }
@@ -51,6 +52,10 @@
         padding-top: 7em;
       }
       #perldoc > ul:first-of-type a { text-decoration: none; }
+      #wrapperlicious {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
     % end
   </head>
   <body onload="prettyPrint()">
@@ -58,25 +63,27 @@
     % my $link = begin
       %= link_to shift, shift, class => "mojoscroll"
     % end
-    <div id="perldoc">
-      <h1><a id="toc">TABLE OF CONTENTS</a></h1>
-      <ul>
-        % for my $section (@$sections) {
-          <li>
-            %= $link->(splice @$section, 0, 2)
-            % if (@$section) {
-              <ul>
-                % while (@$section) {
-                  <li>
-                    %= $link->(splice @$section, 0, 2)
-                  </li>
-                % }
-              </ul>
-            % }
-          </li>
-        % }
-      </ul>
-      %= content_for 'perldoc'
+    <div id="wrapperlicious">
+      <div id="perldoc">
+        <h1><a id="toc">TABLE OF CONTENTS</a></h1>
+        <ul>
+          % for my $section (@$sections) {
+            <li>
+              %= $link->(splice @$section, 0, 2)
+              % if (@$section) {
+                <ul>
+                  % while (@$section) {
+                    <li>
+                      %= $link->(splice @$section, 0, 2)
+                    </li>
+                  % }
+                </ul>
+              % }
+            </li>
+          % }
+        </ul>
+        %= content_for 'perldoc'
+      </div>
     </div>
     <div id="footer">
       %= link_to 'http://mojolicio.us' => begin

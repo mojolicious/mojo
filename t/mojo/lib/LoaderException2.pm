@@ -1,7 +1,5 @@
 package LoaderException2;
-
-use warnings;
-use strict;
+use Mojo::Base -strict;
 
 LoaderException2_2::throw_error();
 

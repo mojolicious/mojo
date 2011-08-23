@@ -1,12 +1,13 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 use Test::More tests => 16;
 
@@ -17,7 +18,7 @@ use Test::Mojo;
 
 # Load plugin
 my $config =
-  plugin json_config => {default => {foo => 'baz', hello => 'there'}};
+  plugin j_s_o_n_config => {default => {foo => 'baz', hello => 'there'}};
 is $config->{foo},   'bar',    'right value';
 is $config->{hello}, 'there',  'right value';
 is $config->{utf},   'утф', 'right value';
@@ -38,13 +39,13 @@ $t->get_ok('/')->status_is(200)->content_is("barbarbar\n");
 
 # No config file, default only
 $config =
-  plugin json_config => {file => 'nonexisted', default => {foo => 'qux'}};
+  plugin JSONConfig => {file => 'nonexisted', default => {foo => 'qux'}};
 is $config->{foo}, 'qux', 'right value';
 is app->config->{foo}, 'qux', 'right value';
 is app->config('foo'), 'qux', 'right value';
 
 # No config file, no default
-ok !(eval { plugin json_config => {file => 'nonexisted'} }), 'no config file';
+ok !(eval { plugin JSONConfig => {file => 'nonexisted'} }), 'no config file';
 
 __DATA__
 @@ index.html.ep

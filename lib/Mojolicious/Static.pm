@@ -2,7 +2,6 @@ package Mojolicious::Static;
 use Mojo::Base -base;
 
 use File::Basename 'dirname';
-use File::stat;
 use File::Spec;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
@@ -39,7 +38,7 @@ sub dispatch {
     return 1;
   }
 
-  1;
+  return 1;
 }
 
 sub serve {
@@ -47,50 +46,43 @@ sub serve {
 
   # Append path to root
   $root = $self->root unless defined $root;
-  my $file = File::Spec->catfile($root, split('/', $rel));
+  my $path = File::Spec->catfile($root, split('/', $rel));
 
   # Extension
-  $file =~ /\.(\w+)$/;
+  $path =~ /\.(\w+)$/;
   my $ext = $1;
 
-  # Bundled file
-  $self->{_root}
+  # Root for bundled files
+  $self->{bundled}
     ||= File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
-  my $bundled = File::Spec->catfile($self->{_root}, split('/', $rel));
 
-  # Files
-  my $res      = $c->res;
-  my $modified = $self->{_modified} ||= time;
-  my $size     = 0;
+  # Normal file
   my $asset;
-  for my $path ($file, $bundled) {
+  my $modified = $self->{modified} ||= time;
+  my $size     = 0;
+  my $res      = $c->res;
+  if (my $file = $self->_get_file($path)) {
+    if (@$file) { ($asset, $size, $modified) = @$file }
 
-    # Exists
-    if (-f $path) {
-
-      # Readable
-      if (-r $path) {
-        my $stat = stat($path);
-        $modified = $stat->mtime;
-        $size     = $stat->size;
-        $asset    = Mojo::Asset::File->new(path => $path);
-      }
-
-      # Exists, but is forbidden
-      else {
-        $c->app->log->debug(qq/File "$rel" forbidden./);
-        $res->code(403) and return 1;
-      }
-
-      # Done
-      last;
+    # Exists but is forbidden
+    else {
+      $c->app->log->debug(qq/File "$rel" is forbidden./);
+      $res->code(403) and return;
     }
   }
 
   # DATA file
-  if (!$asset && defined(my $file = $self->_get_data_file($c, $rel))) {
-    $size  = length $file;
-    $asset = Mojo::Asset::Memory->new->add_chunk($file);
+  elsif (!$asset && defined(my $data = $self->_get_data_file($c, $rel))) {
+    $size  = length $data;
+    $asset = Mojo::Asset::Memory->new->add_chunk($data);
+  }
+
+  # Bundled file
+  else {
+    $path = File::Spec->catfile($self->{bundled}, split('/', $rel));
+    if (my $bundled = $self->_get_file($path)) {
+      ($asset, $size, $modified) = @$bundled if @$bundled;
+    }
   }
 
   # Found
@@ -112,11 +104,9 @@ sub serve {
       }
     }
 
-    # Start and end
+    # Range
     my $start = 0;
     my $end = $size - 1 >= 0 ? $size - 1 : 0;
-
-    # Range
     if (my $range = $rqh->range) {
       if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
         $start = $1;
@@ -144,7 +134,7 @@ sub serve {
     return 1;
   }
 
-  undef;
+  return;
 }
 
 sub _get_data_file {
@@ -161,13 +151,20 @@ sub _get_data_file {
     || 'main';
 
   # Find DATA file
-  my $data = $self->{_data_files}->{$class}
+  my $data = $self->{data_files}->{$class}
     ||= [keys %{Mojo::Command->new->get_all_data($class) || {}}];
   for my $path (@$data) {
     return Mojo::Command->new->get_data($path, $class) if $path eq $rel;
   }
 
-  undef;
+  return;
+}
+
+sub _get_file {
+  my ($self, $path, $rel) = @_;
+  return unless -f $path;
+  return [] unless -r $path;
+  return [Mojo::Asset::File->new(path => $path), (stat $path)[7, 9]];
 }
 
 1;

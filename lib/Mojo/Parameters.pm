@@ -23,9 +23,9 @@ sub new {
   if (@_ > 1) { $self->append(@_) }
 
   # String
-  else { $self->{_string} = $_[0] }
+  else { $self->{string} = $_[0] }
 
-  $self;
+  return $self;
 }
 
 sub append {
@@ -39,22 +39,22 @@ sub append {
   }
   push @{$self->params}, map { defined $_ ? "$_" : '' } @params;
 
-  $self;
+  return $self;
 }
 
 sub clone {
   my $self  = shift;
   my $clone = Mojo::Parameters->new;
   $clone->pair_separator($self->pair_separator);
-  if (defined $self->{_string}) { $clone->{_string} = $self->{_string} }
-  else                          { $clone->params([@{$self->params}]) }
-  $clone;
+  if (defined $self->{string}) { $clone->{string} = $self->{string} }
+  else                         { $clone->params([@{$self->params}]) }
+  return $clone;
 }
 
 sub merge {
   my $self = shift;
   push @{$self->params}, @{$_->params} for @_;
-  $self;
+  return $self;
 }
 
 sub param {
@@ -75,21 +75,22 @@ sub param {
     push @values, $params->[$i + 1] if $params->[$i] eq $name;
   }
 
-  wantarray ? @values : $values[0];
+  return wantarray ? @values : $values[0];
 }
 
 sub params {
   my ($self, $params) = @_;
-  if ($params) { $self->{_params} = $params }
-  elsif (defined $self->{_string}) { $self->parse }
-  $self->{_params} ||= [];
+  if ($params) { $self->{params} = $params }
+  elsif (defined $self->{string}) { $self->parse }
+  return $self->{params} ||= [];
 }
 
 sub parse {
   my ($self, $string) = @_;
-  $string = delete $self->{_string} unless defined $string;
+  $string = $self->{string} unless defined $string;
 
   # Clear
+  delete $self->{string};
   $self->params([]);
 
   # Detect pair separator for reconstruction
@@ -128,7 +129,7 @@ sub parse {
     push @{$self->params}, $name, $value;
   }
 
-  $self;
+  return $self;
 }
 
 # "Don't kid yourself, Jimmy. If a cow ever got the chance,
@@ -145,7 +146,7 @@ sub remove {
   }
   $self->params($params);
 
-  $self;
+  return $self;
 }
 
 sub to_hash {
@@ -169,7 +170,7 @@ sub to_hash {
     else { $params{$name} = $value }
   }
 
-  \%params;
+  return \%params;
 }
 
 sub to_string {
@@ -177,7 +178,7 @@ sub to_string {
 
   # String
   my $charset = $self->charset;
-  if (defined(my $string = $self->{_string})) {
+  if (defined(my $string = $self->{string})) {
 
     # Escape
     encode $charset, $string if $charset;
@@ -211,7 +212,7 @@ sub to_string {
 
   # Concatenate pairs
   my $separator = $self->pair_separator;
-  join $separator, @params;
+  return join $separator, @params;
 }
 
 1;

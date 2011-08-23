@@ -14,13 +14,13 @@ has handle => sub {
     return \*STDERR;
   }
 
-  # Open
-  my $file = IO::File->new;
+  # Append to file
   my $path = $self->path;
-  $file->open(">> $path") or croak qq/Can't open log file "$path": $!/;
+  croak qq/Can't open log file "$path": $!/
+    unless my $file = IO::File->new(">> $path");
   binmode $file, ':utf8';
 
-  $file;
+  return $file;
 };
 has level => 'debug';
 has 'path';
@@ -32,7 +32,15 @@ my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 sub debug { shift->log('debug', @_) }
 sub error { shift->log('error', @_) }
 sub fatal { shift->log('fatal', @_) }
-sub info  { shift->log('info',  @_) }
+
+sub format {
+  my ($self, $level, @msgs) = @_;
+  my $msgs = join "\n",
+    map { utf8::decode $_ unless utf8::is_utf8 $_; $_ } @msgs;
+  return '[' . localtime(time) . "] [$level] $msgs\n";
+}
+
+sub info { shift->log('info', @_) }
 
 sub is_debug { shift->is_level('debug') }
 sub is_error { shift->is_level('error') }
@@ -44,7 +52,7 @@ sub is_level {
   return unless $level;
   $level = lc $level;
   my $current = $ENV{MOJO_LOG_LEVEL} || $self->level;
-  $LEVEL->{$level} >= $LEVEL->{$current};
+  return $LEVEL->{$level} >= $LEVEL->{$current};
 }
 
 sub is_warn { shift->is_level('warn') }
@@ -58,24 +66,17 @@ sub log {
   $level = lc $level;
   return $self unless $level && $self->is_level($level);
 
-  # Caller
-  my ($pkg, $line) = (caller())[0, 2];
-  ($pkg, $line) = (caller(1))[0, 2] if $pkg eq ref $self;
-
   # Lock
   my $handle = $self->handle;
   flock $handle, LOCK_EX;
 
-  # Log messages
-  my $time = localtime(time);
-  my $msgs = join "\n",
-    map { utf8::decode $_ unless utf8::is_utf8 $_; $_ } @msgs;
-  $handle->syswrite("$time $level $pkg:$line [$$]: $msgs\n");
+  # Format and log messages
+  $handle->syswrite($self->format($level, @msgs));
 
   # Unlock
   flock $handle, LOCK_UN;
 
-  $self;
+  return $self;
 }
 
 sub warn { shift->log('warn', @_) }
@@ -157,6 +158,14 @@ Log error message.
   $log = $log->fatal('Its over...');
 
 Log fatal message.
+
+=head2 C<format>
+
+  my $message = $log->format('debug', 'Hi there!');
+  my $message = $log->format('debug', 'Hi', 'there!');
+
+Format log message.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<info>
 

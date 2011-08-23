@@ -1,11 +1,9 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
+use Test::More tests => 24;
 
-use Test::More tests => 17;
-
-use Cwd 'getcwd';
+use Cwd 'cwd';
 use File::Spec;
 use File::Temp;
 
@@ -13,6 +11,9 @@ use File::Temp;
 use_ok 'Mojo::Command';
 
 my $command = Mojo::Command->new;
+
+# Application
+isa_ok $command->app, 'Mojo', 'right application';
 
 # UNIX DATA templates
 my $unix = "@@ template1\nFirst Template\n@@ template2\r\nSecond Template\n";
@@ -41,8 +42,16 @@ is_deeply [sort keys %{$command->get_all_data('Example::Package::Windows')}],
   [qw/template3 template4/], 'right DATA files';
 close $data;
 
-# Class to file and path
-is $command->class_to_file('Foo::Bar'), 'foo_bar',    'right file';
+# Class to file
+is $command->class_to_file('Foo::Bar'), 'foo_bar', 'right file';
+is $command->class_to_file('FooBar'),   'foo_bar', 'right file';
+is $command->class_to_file('FOOBar'),   'foobar',  'right file';
+is $command->class_to_file('FOOBAR'),   'foobar',  'right file';
+is $command->class_to_file('FOO::Bar'), 'foobar',  'right file';
+is $command->class_to_file('FooBAR'),   'foo_bar', 'right file';
+is $command->class_to_file('Foo::BAR'), 'foo_bar', 'right file';
+
+# Class to path
 is $command->class_to_path('Foo::Bar'), 'Foo/Bar.pm', 'right path';
 
 # Environment detection
@@ -64,8 +73,8 @@ is $command->class_to_path('Foo::Bar'), 'Foo/Bar.pm', 'right path';
 }
 
 # Generating files
+my $cwd = cwd;
 my $dir = File::Temp::tempdir(CLEANUP => 1);
-my $cwd = getcwd;
 chdir $dir;
 $command->create_rel_dir('foo/bar');
 is -d File::Spec->catdir($dir, qw/foo bar/), 1, 'directory exists';
@@ -76,7 +85,7 @@ no strict 'refs';
 $command->render_to_rel_file('foo_bar', 'bar/baz.txt');
 open my $txt, '<', $command->rel_file('bar/baz.txt');
 is join('', <$txt>), "just works!\n", 'right result';
-$command->chmod_rel_file('bar/baz.txt', 700);
+$command->chmod_rel_file('bar/baz.txt', 0700);
 is -e $command->rel_file('bar/baz.txt'), 1, 'file is executable';
 $command->write_rel_file('123.xml', "seems\nto\nwork");
 open my $xml, '<', $command->rel_file('123.xml');

@@ -49,7 +49,7 @@ sub cookies {
   }
 
   # No cookies
-  [];
+  return [];
 }
 
 sub fix_headers {
@@ -80,7 +80,7 @@ sub fix_headers {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub is_secure {
@@ -88,27 +88,27 @@ sub is_secure {
   my $url    = $self->url;
   my $scheme = $url->scheme || $url->base->scheme || '';
   return 1 if $scheme eq 'https';
-  undef;
+  return;
 }
 
 sub is_xhr {
   my $self = shift;
   return unless my $with = $self->headers->header('X-Requested-With');
   return 1 if $with =~ /XMLHttpRequest/i;
-  undef;
+  return;
 }
 
 sub param {
   my $self = shift;
-  $self->{_params} = $self->params unless $self->{_params};
-  $self->{_params}->param(@_);
+  $self->{params} = $self->params unless $self->{params};
+  return $self->{params}->param(@_);
 }
 
 sub params {
   my $self   = shift;
   my $params = Mojo::Parameters->new;
   $params->merge($self->body_params, $self->query_params);
-  $params;
+  return $params;
 }
 
 sub parse {
@@ -116,8 +116,8 @@ sub parse {
 
   # CGI like environment
   my $env;
-  if   (exists $_[1]) { $env = {@_} }
-  else                { $env = $_[0] if ref $_[0] eq 'HASH' }
+  if   (@_ > 1) { $env = {@_} }
+  else          { $env = $_[0] if ref $_[0] eq 'HASH' }
 
   # Parse CGI like environment
   my $chunk;
@@ -130,7 +130,7 @@ sub parse {
   $self->SUPER::parse($chunk);
 
   # Fix things we only know after parsing headers
-  if (!$self->{_state} || $self->{_state} ne 'headers') {
+  if (!$self->{state} || $self->{state} ne 'headers') {
 
     # Base URL
     my $base = $self->url->base;
@@ -170,7 +170,7 @@ sub parse {
     }
   }
 
-  $self;
+  return $self;
 }
 
 sub proxy {
@@ -188,7 +188,7 @@ sub proxy {
     return $self;
   }
 
-  $self->{proxy};
+  return $self->{proxy};
 }
 
 sub query_params { shift->url->query }
@@ -225,7 +225,7 @@ sub _build_start_line {
   return "$method $path\x0d\x0a" if $version eq '0.9';
 
   # HTTP 1.0 and above
-  "$method $path HTTP/$version\x0d\x0a";
+  return "$method $path HTTP/$version\x0d\x0a";
 }
 
 sub _parse_basic_auth {
@@ -233,7 +233,7 @@ sub _parse_basic_auth {
   return unless $header =~ /Basic (.+)$/;
   my $auth = $1;
   b64_decode $auth;
-  $auth;
+  return $auth;
 }
 
 sub _parse_env {
@@ -332,7 +332,7 @@ sub _parse_env {
 
   # There won't be a start line or header when you parse environment
   # variables
-  $self->{_state} = 'body';
+  $self->{state} = 'body';
 }
 
 # "Bart, with $10,000, we'd be millionaires!
@@ -341,9 +341,9 @@ sub _parse_start_line {
   my $self = shift;
 
   # Ignore any leading empty lines
-  my $line = get_line $self->{_buffer};
+  my $line = get_line $self->{buffer};
   while ((defined $line) && ($line =~ m/^\s*$/)) {
-    $line = get_line $self->{_buffer};
+    $line = get_line $self->{buffer};
   }
 
   # We have a (hopefully) full request line
@@ -358,15 +358,15 @@ sub _parse_start_line {
       # HTTP 0.9 is identified by the missing version
       if (defined $3) {
         $self->version($3);
-        $self->{_state} = 'content';
+        $self->{state} = 'content';
       }
       else {
         $self->version('0.9');
-        $self->{_state} = 'done';
+        $self->{state} = 'done';
 
         # HTTP 0.9 has no headers or body and does not support
         # pipelining
-        $self->{_buffer} = '';
+        $self->{buffer} = '';
       }
     }
     else { $self->error('Bad request start line.', 400) }

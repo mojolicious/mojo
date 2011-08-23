@@ -22,6 +22,9 @@ sub import {
   # Base
   if ($flag eq '-base') { $flag = $class }
 
+  # Strict
+  elsif ($flag eq '-strict') { $flag = undef }
+
   # Module
   else {
     my $file = $flag;
@@ -30,11 +33,13 @@ sub import {
   }
 
   # ISA
-  my $caller = caller;
-  push @{"${caller}::ISA"}, $flag;
+  if ($flag) {
+    my $caller = caller;
+    push @{"${caller}::ISA"}, $flag;
 
-  # Can haz?
-  *{"${caller}::has"} = sub { attr($caller, @_) };
+    # Can haz?
+    *{"${caller}::has"} = sub { attr($caller, @_) };
+  }
 
   # Mojo modules are strict!
   strict->import;
@@ -46,9 +51,7 @@ sub import {
 
 sub new {
   my $class = shift;
-  bless
-    exists $_[0] ? exists $_[1] ? {@_} : {%{$_[0]}} : {},
-    ref $class || $class;
+  bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 }
 
 # Performance is very important for something as often used as accessors,
@@ -161,16 +164,17 @@ Mojo::Base - Minimal Base Class For Mojo Projects
 
 L<Mojo::Base> is a simple base class for L<Mojo> projects.
 
-=head1 FUNCTIONS
-
-L<Mojo::Base> exports the following functions if imported with the C<-base>
-flag or a base class.
-
   # Automatically enables "strict" and "warnings"
+  use Mojo::Base -strict;
   use Mojo::Base -base;
   use Mojo::Base 'SomeBaseClass';
 
-Both forms save a lot of typing.
+All three forms save a lot of typing.
+
+  # use Mojo::Base -strict;
+  use strict;
+  use warnings;
+  use feature ':5.10';
 
   # use Mojo::Base -base;
   use strict;
@@ -188,6 +192,11 @@ Both forms save a lot of typing.
   push @ISA, 'SomeBaseClass';
   use Mojo::Base;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+
+=head1 FUNCTIONS
+
+L<Mojo::Base> exports the following functions if imported with the C<-base>
+flag or a base class.
 
 =head2 C<has>
 

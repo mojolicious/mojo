@@ -66,7 +66,7 @@ sub decode {
 
   # Wide characters
   $self->error('Wide character in input.') and return
-    unless utf8::downgrade($_, 1);
+    unless utf8::downgrade($string, 1);
 
   # Detect and decode unicode
   my $encoding = 'UTF-8';
@@ -110,14 +110,14 @@ sub decode {
     $self->error($e);
   }
 
-  $res;
+  return $res;
 }
 
 sub encode {
   my ($self, $ref) = @_;
   my $string = _encode_values($ref);
   Mojo::Util::encode 'UTF-8', $string;
-  $string;
+  return $string;
 }
 
 sub false {$FALSE}
@@ -140,7 +140,7 @@ sub _decode_array {
     _exception('Expected comma or right square bracket while parsing array');
   }
 
-  \@array;
+  return \@array;
 }
 
 sub _decode_object {
@@ -171,7 +171,7 @@ sub _decode_object {
     _exception(q/Expected comma or right curly bracket while parsing object/);
   }
 
-  \%hash;
+  return \%hash;
 }
 
 sub _decode_string {
@@ -231,7 +231,7 @@ sub _decode_string {
   # The rest
   $buffer .= substr $str, pos($str), length($str);
 
-  $buffer;
+  return $buffer;
 }
 
 # "Eternity with nerds.
@@ -278,7 +278,7 @@ sub _encode_array {
 
   # Stringify
   my $string = join ',', @array;
-  "[$string]";
+  return "[$string]";
 }
 
 sub _encode_object {
@@ -294,7 +294,7 @@ sub _encode_object {
 
   # Stringify
   my $string = join ',', @values;
-  "{$string}";
+  return "{$string}";
 }
 
 sub _encode_string {
@@ -305,7 +305,7 @@ sub _encode_string {
     =~ s/([\x00-\x1F\x7F\x{2028}\x{2029}\\\"\/\b\f\n\r\t])/$REVERSE{$1}/gs;
 
   # Stringify
-  "\"$string\"";
+  return "\"$string\"";
 }
 
 sub _encode_values {
@@ -360,11 +360,11 @@ sub _exception {
 package Mojo::JSON::_Bool;
 use Mojo::Base -base;
 use overload
-  '0+'     => sub { $_[0]->{_value} },
-  '""'     => sub { $_[0]->{_value} },
+  '0+'     => sub { $_[0]->{value} },
+  '""'     => sub { $_[0]->{value} },
   fallback => 1;
 
-sub new { shift->SUPER::new(_value => shift) }
+sub new { shift->SUPER::new(value => shift) }
 
 1;
 __END__

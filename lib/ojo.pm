@@ -1,11 +1,10 @@
 package ojo;
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 # "I heard beer makes you stupid.
 #  No I'm... doesn't."
 use Mojo::ByteStream 'b';
+use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::UserAgent;
 
@@ -38,6 +37,7 @@ sub import {
 
   # Functions
   *{"${caller}::Oo"} = *{"${caller}::b"} = \&b;
+  *{"${caller}::c"} = \&c;
   *{"${caller}::oO"} = sub { _request(@_) };
   *{"${caller}::a"} =
     sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
@@ -69,7 +69,7 @@ sub _request {
   my ($message, $code) = $tx->error;
   warn qq/Problem loading URL "$_[0]". ($message)\n/ if $message && !$code;
 
-  $tx->res;
+  return $tx->res;
 }
 
 1;
@@ -104,9 +104,16 @@ the application.
 
   my $stream = b('lalala');
 
-Turn input into a L<Mojo::ByteStream> object.
+Turn string into a L<Mojo::ByteStream> object.
 
   perl -Mojo -e 'b(g("mojolicio.us")->body)->html_unescape->say'
+
+=head2 C<c>
+
+  my $collection = c(1, 2, 3);
+
+Turn list into a L<Mojo::Collection> object.
+Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<d>
 

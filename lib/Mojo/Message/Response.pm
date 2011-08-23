@@ -101,7 +101,7 @@ sub cookies {
   }
 
   # No cookies
-  $cookies;
+  return $cookies;
 }
 
 sub default_message { $MESSAGES{$_[1] || $_[0]->code || 404} || '' }
@@ -114,14 +114,14 @@ sub fix_headers {
   my $headers = $self->headers;
   $headers->date(Mojo::Date->new->to_string) unless $headers->date;
 
-  $self;
+  return $self;
 }
 
 sub is_status_class {
   my ($self, $class) = @_;
   return unless my $code = $self->code;
   return 1 if $code >= $class && $code < ($class + 100);
-  undef;
+  return;
 }
 
 sub _build_start_line {
@@ -134,7 +134,7 @@ sub _build_start_line {
   # HTTP 1.0 and above
   my $code    = $self->code    || 404;
   my $message = $self->message || $self->default_message;
-  "HTTP/$version $code $message\x0d\x0a";
+  return "HTTP/$version $code $message\x0d\x0a";
 }
 
 # "Weaseling out of things is important to learn.
@@ -143,10 +143,10 @@ sub _parse_start_line {
   my $self = shift;
 
   # HTTP 0.9 responses have no start line
-  return $self->{_state} = 'content' if $self->version eq '0.9';
+  return $self->{state} = 'content' if $self->version eq '0.9';
 
   # Try to detect HTTP 0.9
-  if ($self->{_buffer} =~ /^\s*(\S+\s*)/) {
+  if ($self->{buffer} =~ /^\s*(\S+\s*)/) {
     my $string = $1;
 
     # HTTP 0.9 will most likely not start with "HTTP/"
@@ -157,20 +157,20 @@ sub _parse_start_line {
     # Detected!
     if ($string !~ /^\s*$match/) {
       $self->version('0.9');
-      $self->{_state} = 'content';
+      $self->{state} = 'content';
       $self->content->relaxed(1);
       return 1;
     }
   }
 
   # We have a full HTTP 1.0+ response line
-  my $line = get_line $self->{_buffer};
+  my $line = get_line $self->{buffer};
   if (defined $line) {
     if ($line =~ m/$START_LINE_RE/o) {
       $self->version($1);
       $self->code($2);
       $self->message($3);
-      $self->{_state} = 'content';
+      $self->{state} = 'content';
       $self->content->auto_relax(1);
     }
     else { $self->error('Bad response start line.') }

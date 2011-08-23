@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
-
-use strict;
-use warnings;
+use Mojo::Base -strict;
 
 use utf8;
 
@@ -12,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 112;
+plan tests => 139;
 
 use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
@@ -21,11 +19,15 @@ use_ok 'Mojo::ByteStream', 'b';
 my $stream = b('foo_bar_baz');
 is $stream->camelize, 'FooBarBaz', 'right camelized result';
 $stream = b('FooBarBaz');
-is $stream->camelize, 'Foobarbaz', 'right camelized result';
+is $stream->camelize, 'FooBarBaz', 'right camelized result';
 $stream = b('foo_b_b');
 is $stream->camelize, 'FooBB', 'right camelized result';
 $stream = b('foo-b_b');
 is $stream->camelize, 'Foo::BB', 'right camelized result';
+$stream = b('FooBar');
+is $stream->camelize, 'FooBar', 'already camlized';
+$stream = b('Foo::Bar');
+is $stream->camelize, 'Foo::Bar', 'already camelized';
 
 # decamelize
 $stream = b('FooBarBaz');
@@ -357,6 +359,20 @@ is "$stream", "la\nla la", 'right trimmed result';
 $stream = b(" \nla\nla\nla\n ")->trim;
 is "$stream", "la\nla\nla", 'right trimmed result';
 
+# split
+$stream = b('1,2,3,4,5');
+is_deeply [$stream->split(',')->each],   [1, 2, 3, 4, 5], 'right elements';
+is_deeply [$stream->split(qr/,/)->each], [1, 2, 3, 4, 5], 'right elements';
+is_deeply [b('54321')->split('')->each], [5, 4, 3, 2, 1], 'right elements';
+is_deeply [b('')->split('')->each],    [], 'no elements';
+is_deeply [b('')->split(',')->each],   [], 'no elements';
+is_deeply [b('')->split(qr/,/)->each], [], 'no elements';
+$stream = b('1/2/3');
+is $stream->split('/')->map(sub { $_->quote })->join(', '),
+  '"1", "2", "3"', 'right result';
+is $stream->split('/')->map(sub { shift->quote })->join(', '),
+  '"1", "2", "3"', 'right result';
+
 # say and autojoin
 my $buffer = '';
 open my $handle, '>', \$buffer;
@@ -372,3 +388,22 @@ $stream = b(b('test'));
 ok !ref $stream->to_string, 'nested bytestream stringified';
 $stream = Mojo::ByteStream->new(Mojo::ByteStream->new('test'));
 ok !ref $stream->to_string, 'nested bytestream stringified';
+
+# Secure compare
+is b('hello')->secure_compare('hello'), 1,     'values are equal';
+is b('hell')->secure_compare('hello'),  undef, 'values are not equal';
+is b('hallo')->secure_compare('hello'), undef, 'values are not equal';
+is b('0')->secure_compare('0'),         1,     'values are equal';
+is b('1')->secure_compare('1'),         1,     'values are equal';
+is b('1')->secure_compare('0'),         undef, 'values are not equal';
+is b('0')->secure_compare('1'),         undef, 'values are not equal';
+is b('00')->secure_compare('00'),       1,     'values are equal';
+is b('11')->secure_compare('11'),       1,     'values are equal';
+is b('11')->secure_compare('00'),       undef, 'values are not equal';
+is b('00')->secure_compare('11'),       undef, 'values are not equal';
+is b('♥')->secure_compare('♥'),     1,     'values are equal';
+is b('0♥')->secure_compare('0♥'),   1,     'values are equal';
+is b('♥1')->secure_compare('♥1'),   1,     'values are equal';
+is b('♥')->secure_compare('♥0'),    undef, 'values are not equal';
+is b('0♥')->secure_compare('♥'),    undef, 'values are not equal';
+is b('0♥1')->secure_compare('1♥0'), undef, 'values are not equal';

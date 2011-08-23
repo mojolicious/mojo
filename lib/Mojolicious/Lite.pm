@@ -14,13 +14,6 @@ use File::Spec;
 sub import {
   my $class = shift;
 
-  # Lite apps are strict!
-  strict->import;
-  warnings->import;
-
-  # Lite apps are modern!
-  feature->import(':5.10') if $] >= 5.010;
-
   # Executable
   $ENV{MOJO_EXE} ||= (caller)[1];
 
@@ -30,22 +23,21 @@ sub import {
     unless $ENV{MOJO_HOME};
 
   # Initialize app
+  no strict 'refs';
+  my $caller = caller;
+  push @{"${caller}::ISA"}, $class;
   my $app = $class->new;
 
   # Initialize routes
   my $routes = $app->routes;
   $routes->namespace('');
 
-  # Prepare exports
-  my $caller = caller;
-  no strict 'refs';
-  no warnings 'redefine';
-
   # Default static and template class
   $app->static->default_static_class($caller);
   $app->renderer->default_template_class($caller);
 
   # Export
+  no warnings 'redefine';
   my $root = $routes;
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
   *{"${caller}::any"}    = sub { $routes->any(@_) };
@@ -65,6 +57,9 @@ sub import {
 
   # Shagadelic!
   *{"${caller}::shagadelic"} = sub { $app->start(@_) };
+
+  # Lite apps are strict!
+  Mojo::Base->import(-strict);
 }
 
 1;
@@ -101,16 +96,18 @@ applications.
 
 =head2 Hello World!
 
-A minimal Hello World application looks like this, L<strict> and L<warnings>
-are automatically enabled and a few functions imported when you use
-L<Mojolicious::Lite>, turning your script into a full featured web
+A simple Hello World application can look like this, L<strict> and
+L<warnings> are automatically enabled and a few functions imported when you
+use L<Mojolicious::Lite>, turning your script into a full featured web
 application.
 
   #!/usr/bin/env perl
-
   use Mojolicious::Lite;
 
-  get '/' => sub { shift->render(text => 'Hello World!') };
+  get '/' => sub {
+    my $self = shift;
+    $self->render(text => 'Hello World!');
+  };
 
   app->start;
 
@@ -118,28 +115,27 @@ application.
 
 There is also a helper command to generate a small example application.
 
-  % mojo generate lite_app
+  $ mojo generate lite_app
 
 =head2 Commands
 
-All the normal L<Mojolicious command options|Mojolicious::Commands> are
-available from the command line.
+All the normal L<Mojolicious::Commands> are available from the command line.
 Note that CGI, FastCGI and PSGI environments can usually be auto detected and
 will just work without commands.
 
-  % ./myapp.pl daemon
+  $ ./myapp.pl daemon
   Server available at http://127.0.0.1:3000.
 
-  % ./myapp.pl daemon --listen http://*:8080
+  $ ./myapp.pl daemon --listen http://*:8080
   Server available at http://127.0.0.1:8080.
 
-  % ./myapp.pl cgi
+  $ ./myapp.pl cgi
   ...CGI output...
 
-  % ./myapp.pl fastcgi
+  $ ./myapp.pl fastcgi
   ...Blocking FastCGI main loop...
 
-  % ./myapp.pl
+  $ ./myapp.pl
   ...List of available commands (or automatically detected environment)...
 
 =head2 Start
@@ -155,7 +151,7 @@ Your application will automatically reload itself if you start it with the
 C<morbo> development web server, so you don't have to restart the server
 after every change.
 
-  % morbo myapp.pl
+  $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
 =head2 Routes
@@ -352,8 +348,8 @@ C<param>.
     $self->render(text => "Our :bar placeholder matched $bar");
   };
 
-  # /test/foo
-  # /test123/foo
+  # /testsomething/foo
+  # /test123something/foo
   get '/(:bar)something/foo' => sub {
     my $self = shift;
     my $bar  = $self->param('bar');
@@ -399,32 +395,6 @@ Routes can be restricted to specific request methods.
     $self->render(text => "You called /baz with $method");
   };
 
-=head2 Route Constraints
-
-All placeholders get compiled to a regex internally, with regex constraints
-this process can be easily customized.
-
-  # /1
-  # /123
-  any '/:foo' => [foo => qr/\d+/] => sub {
-    my $self = shift;
-    my $foo  = $self->param('foo');
-    $self->render(text => "Our :foo placeholder matched $foo");
-  };
-
-  # /test
-  # /test.123
-  # /test/1.2.3
-  any '/:bar' => [bar => qr/.*/] => sub {
-    my $self = shift;
-    my $bar  = $self->param('bar');
-    $self->render(text => "Our :bar placeholder matched $bar");
-  };
-
-Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
-placeholders become part of a larger regular expression internally,
-C<(?:...)> is fine though.
-
 =head2 Optional Placeholders
 
 Routes allow default values to make placeholders optional.
@@ -441,71 +411,86 @@ Routes allow default values to make placeholders optional.
   @@ groovy.txt.ep
   My name is <%= $name %>.
 
-=head2 A Little Bit Of Everything
+=head2 Restrictive Placeholders
 
-All those features can be easily used together.
+The easiest way to make placeholders more restrictive are alternatives, you
+just make a list of possible values.
 
-  # /everything?name=Sebastian
-  # /everything/123?name=Sebastian
-  get '/everything/:stuff' => [stuff => qr/\d+/] => {stuff => 23} => sub {
-    shift->render('welcome');
+  # /test
+  # /123
+  any '/:foo' => [foo => [qw/test 123/]] => sub {
+    my $self = shift;
+    my $foo  = $self->param('foo');
+    $self->render(text => "Our :foo placeholder matched $foo");
+  };
+
+All placeholders get compiled to a regex internally, this process can also be
+easily customized.
+
+  # /1
+  # /123
+  any '/:bar' => [bar => qr/\d+/] => sub {
+    my $self = shift;
+    my $bar  = $self->param('bar');
+    $self->render(text => "Our :bar placeholder matched $bar");
+  };
+
+Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
+placeholders become part of a larger regular expression internally,
+C<(?:...)> is fine though.
+
+=head2 Formats
+
+Formats can be automatically detected by looking at file extensions.
+
+  # /detection.html
+  # /detection.txt
+  get '/detection' => sub {
+    my $self = shift;
+    $self->render('detected');
   };
 
   __DATA__
 
-  @@ welcome.html.ep
-  Stuff is <%= $stuff %>.
-  Query param name is <%= param 'name' %>.
-
-Here's a fully functional example for a html form handling application using
-multiple features at once.
-
-  #!/usr/bin/env perl
-
-  use Mojolicious::Lite;
-
-  get '/' => 'index';
-
-  post '/test' => sub {
-    my $self = shift;
-
-    my $groovy = $self->param('groovy') || 'Austin Powers';
-    $groovy =~ s/[^\w\s]+//g;
-
-    $self->render(
-      template => 'welcome',
-      title    => 'Welcome!',
-      layout   => 'funky',
-      groovy   => $groovy
-    );
-  } => 'test';
-
-  app->start;
-  __DATA__
-
-  @@ index.html.ep
-  % title 'Groovy!';
-  % layout 'funky';
-  Who is groovy?
-  <%= form_for test => (method => 'post') => begin %>
-    <%= text_field 'groovy' %>
-    <%= submit_button 'Woosh!' %>
-  <% end %>
-
-  @@ welcome.html.ep
-  <%= $groovy %> is groovy!
-  <%= include 'menu' %>
-
-  @@ menu.html.ep
-  <%= link_to index => begin %>
-    Try again
-  <% end %>
-
-  @@ layouts/funky.html.ep
+  @@ detected.html.ep
   <!doctype html><html>
-    <head><title><%= title %></title></head>
-    <body><%= content %></body>
+    <head><title>Detected!</title></head>
+    <body>HTML was detected.</body>
   </html>
+
+  @@ detected.txt.ep
+  TXT was detected.
+
+Restrictive placeholders can also be used for format detection.
+
+  # /hello.json
+  # /hello.txt
+  get '/hello' => [format => [qw/json txt/]] => sub {
+    my $self = shift;
+    return $self->render_json({hello => 'world!'})
+      if $self->stash('format') eq 'json';
+    $self->render_text('hello world!');
+  };
+
+=head2 Content Negotiation
+
+For resources with different representations and that require truly
+C<RESTful> content negotiation you can also use C<respond_to>.
+
+  # /hello (Accept: application/json)
+  # /hello (Accept: text/xml)
+  # /hello.json
+  # /hello.xml
+  # /hello?format=json
+  # /hello?format=xml
+  get '/hello' => sub {
+    my $self = shift;
+    $self->respond_to(
+      json => {json => {hello => 'world'}},
+      xml  => {text => '<hello>world</hello>'},
+      any  => {data => '', status => 204}
+    );
+  };
 
 =head2 Under
 
@@ -577,34 +562,6 @@ constructs.
     shift->render(text => 'Hello Mojolicious!');
   };
 
-However you might want to disable automatic route caching in case there are
-routes responding to the same path without conditions attached, since those
-would otherwise get precedence once cached.
-
-  app->routes->cache(0);
-
-=head2 Formats
-
-Formats can be automatically detected by looking at file extensions.
-
-  # /detection.html
-  # /detection.txt
-  get '/detection' => sub {
-    my $self = shift;
-    $self->render('detected');
-  };
-
-  __DATA__
-
-  @@ detected.html.ep
-  <!doctype html><html>
-    <head><title>Detected!</title></head>
-    <body>HTML was detected.</body>
-  </html>
-
-  @@ detected.txt.ep
-  TXT was detected.
-
 =head2 Sessions
 
 Signed cookie based sessions just work out of the box as soon as you start
@@ -617,25 +574,26 @@ request), this is very useful in combination with C<redirect_to>.
 
   get '/login' => sub {
     my $self = shift;
+
     my $name = $self->param('name') || '';
     my $pass = $self->param('pass') || '';
     return $self->render unless $name eq 'sebastian' && $pass eq '1234';
+
     $self->session(name => $name);
     $self->flash(message => 'Thanks for logging in!');
     $self->redirect_to('index');
-  } => 'login';
+  };
 
   get '/' => sub {
     my $self = shift;
-    return $self->redirect_to('login') unless $self->session('name');
-    $self->render;
+    $self->redirect_to('login') unless $self->session('name');
   } => 'index';
 
   get '/logout' => sub {
     my $self = shift;
     $self->session(expires => 1);
     $self->redirect_to('index');
-  } => 'logout';
+  };
 
   app->start;
   __DATA__
@@ -766,8 +724,8 @@ Static files will be automatically served from the C<DATA> section
   @@ test.txt (base64)
   dGVzdCAxMjMKbGFsYWxh
 
-  % mkdir public
-  % mv something.js public/something.js
+  $ mkdir public
+  $ mv something.js public/something.js
 
 =head2 Testing
 
@@ -785,7 +743,7 @@ it with normal Perl unit tests.
 
 Run all unit tests with the C<test> command.
 
-  % ./myapp.pl test
+  $ ./myapp.pl test
 
 To make your tests more noisy and show you all log messages you can also
 change the application log level directly in your test files.
@@ -797,14 +755,14 @@ change the application log level directly in your test files.
 To disable debug messages later in a production setup you can change the
 L<Mojolicious> mode, default will be C<development>.
 
-  % ./myapp.pl --mode production
+  $ ./myapp.pl --mode production
 
 =head2 Logging
 
-L<Mojo::Log> messages will be automatically written to a C<log/$mode.log>
-file if a C<log> directory exists.
+L<Mojo::Log> messages will be automatically written to C<STDERR> or a
+C<log/$mode.log> file if a C<log> directory exists.
 
-  % mkdir log
+  $ mkdir log
 
 For more control the L<Mojolicious> instance can be accessed directly.
 
@@ -841,7 +799,7 @@ L<Mojolicious::Lite> and L<Mojolicious> applications.
 Both share about 99% of the same code, so almost everything you learned in
 this tutorial applies there too. :)
 
-  % mojo generate app
+  $ mojo generate app
 
 =head2 More
 
@@ -884,38 +842,21 @@ See also the tutorial above for more argument variations.
 
   helper foo => sub {...};
 
-Add a new helper that will be available as a method of the controller object
-and the application object, as well as a function in C<ep> templates.
-
-  # Helper
-  helper add => sub { $_[1] + $_[2] };
-
-  # Controller/Application
-  my $result = $self->add(2, 3);
-
-  # Template
-  <%= add 2, 3 %>
-
+Alias for L<Mojolicious/"helper">.
 Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<hook>
 
   hook after_dispatch => sub {...};
 
-Add hooks to named events, see L<Mojolicious> for a list of all available
-events.
+Alias for L<Mojolicious/"hook">.
 Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<plugin>
 
-  plugin 'something';
-  plugin 'something', foo => 23;
-  plugin 'something', {foo => 23};
-  plugin 'Foo::Bar';
-  plugin 'Foo::Bar', foo => 23;
-  plugin 'Foo::Bar', {foo => 23};
+  plugin 'SomeThing';
 
-Load plugins, see L<Mojolicious> for a list of all included example plugins.
+Alias for L<Mojolicious/"plugin">.
 
 =head2 C<post>
 

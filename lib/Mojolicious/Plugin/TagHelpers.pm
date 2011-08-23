@@ -44,7 +44,7 @@ sub register {
       # Captures
       push @url, shift if ref $_[0] eq 'HASH';
 
-      $self->_tag('form', action => $c->url_for(@url), @_);
+      return $self->_tag('form', action => $c->url_for(@url), @_);
     }
   );
 
@@ -89,7 +89,7 @@ sub register {
       my %attrs = @_;
       $attrs{src} = $c->url_for($src) if $src;
 
-      $self->_tag('script', type => 'text/javascript', %attrs, $cb);
+      return $self->_tag('script', type => 'text/javascript', %attrs, $cb);
     }
   );
 
@@ -110,7 +110,7 @@ sub register {
       # Captures
       push @url, shift if ref $_[0] eq 'HASH';
 
-      $self->_tag('a', href => $c->url_for(@url), @_);
+      return $self->_tag('a', href => $c->url_for(@url), @_);
     }
   );
 
@@ -183,7 +183,7 @@ sub register {
             else { $parts .= $cb->($o) }
           }
 
-          $parts;
+          return $parts;
         }
       );
     }
@@ -219,7 +219,7 @@ sub register {
       ) if $href;
 
       # Style
-      $self->_tag('style', type => 'text/css', %attrs, $cb);
+      return $self->_tag('style', type => 'text/css', %attrs, $cb);
     }
   );
 
@@ -229,9 +229,12 @@ sub register {
       my $c     = shift;
       my $value = shift;
       $value = 'Ok' unless defined $value;
-      $self->_tag('input', value => $value, type => 'submit', @_);
+      return $self->_tag('input', value => $value, type => 'submit', @_);
     }
   );
+
+  # Add "t" helper
+  $app->helper(t => sub { shift; $self->_tag(@_) });
 
   # Add "tag" helper
   $app->helper(tag => sub { shift; $self->_tag(@_) });
@@ -248,7 +251,7 @@ sub register {
         $cb = sub {$value}
       }
 
-      $self->_tag('textarea', name => $name, @_, $cb);
+      return $self->_tag('textarea', name => $name, @_, $cb);
     }
   );
 
@@ -294,7 +297,7 @@ sub _input {
   }
 
   # Empty tag
-  $self->_tag('input', name => $name, %attrs);
+  return $self->_tag('input', name => $name, %attrs);
 }
 
 # "We’ve lost power of the forward Gameboy! Mario not responding!"
@@ -304,7 +307,8 @@ sub _tag {
 
   # Callback
   my $cb = defined $_[-1] && ref($_[-1]) eq 'CODE' ? pop @_ : undef;
-  pop if @_ % 2;
+  my $content = pop if @_ % 2;
+  xml_escape $content if defined $content;
 
   # Tag
   my $tag = "<$name";
@@ -319,9 +323,9 @@ sub _tag {
   }
 
   # Block
-  if ($cb) {
+  if ($cb || defined $content) {
     $tag .= '>';
-    $tag .= $cb->();
+    $tag .= $cb ? $cb->() : $content;
     $tag .= "<\/$name>";
   }
 
@@ -329,7 +333,7 @@ sub _tag {
   else { $tag .= ' />' }
 
   # Prevent escaping
-  b($tag);
+  return b($tag);
 }
 
 1;
@@ -342,10 +346,10 @@ Mojolicious::Plugin::TagHelpers - Tag Helpers Plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('tag_helpers');
+  $self->plugin('TagHelpers');
 
   # Mojolicious::Lite
-  plugin 'tag_helpers';
+  plugin 'TagHelpers';
 
 =head1 DESCRIPTION
 
@@ -493,8 +497,8 @@ Generate script tag for C<Javascript> asset.
   <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => $foo) => begin %>Retry<% end %>
 
-Generate link to route, path or URL, by default the capitalized link target
-will be used as content.
+Generate link to route, path or URL, defaults to using the capitalized link
+target as content.
 
   <a href="/path/to/index">Home</a>
   <a href="/path/to/index">Home</a>
@@ -582,17 +586,28 @@ Generate submit input element.
   <input type="submit" value="Ok" />
   <input id="foo" type="submit" value="Ok!" />
 
+=head2 C<t>
+
+  <%=t div => 'some & content' %>
+
+Alias for C<tag>.
+Note that this helper is EXPERIMENTAL and might change without warning!
+
+  <div>some &amp; content</div>
+
 =head2 C<tag>
 
   <%= tag 'div' %>
   <%= tag 'div', id => 'foo' %>
-  <%= tag div => begin %>Content<% end %>
+  <%= tag div => 'some & content' %>
+  <%= tag div => begin %>some & content<% end %>
 
 HTML5 tag generator.
 
   <div />
   <div id="foo" />
-  <div>Content</div>
+  <div>some &amp; content</div>
+  <div>some & content</div>
 
 Very useful for reuse in more specific tag helpers.
 

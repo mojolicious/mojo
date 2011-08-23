@@ -102,8 +102,8 @@ all characters except C</> and C<.>.
   /sebastian23/hello  -> /:name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /:name/hello -> {name => 'sebastian 23'}
 
-A generic placeholder can be surrounded by brackets to separate it from the
-surrounding text.
+A generic placeholder can be surrounded by parentheses to separate it from
+the surrounding text.
 
   /hello             -> /(:name)hello -> undef
   /sebastian/23hello -> /(:name)hello -> undef
@@ -127,7 +127,7 @@ absolutely everything.
 =head2 Relaxed Placeholders
 
 Relaxed placeholders are similar to the two placeholders above, but always
-require brackets and match all characters except C</>.
+require parentheses and match all characters except C</>.
 
   /hello              -> /(.name)/hello -> undef
   /sebastian/23/hello -> /(.name)/hello -> undef
@@ -283,7 +283,7 @@ The C<controller> is always appended to the C<namespace> if available.
   # /bye -> MyApp::Controller::Foo->bye
   $r->route('/bye')->to('foo#bye', namespace => 'MyApp::Controller');
 
-You can also change the default namespace for all routes.
+You can also change the default namespace for all routes in the application.
 
   $r->namespace('MyApp::Controller');
 
@@ -300,6 +300,36 @@ callback instead.
 This technique is the foundation of L<Mojolicious::Lite>, you can learn more
 about it from the included tutorial.
 
+=head2 More Restrictive Placeholders
+
+A very easy way to make placeholders more restrictive are alternatives, you
+just make a list of possible values.
+
+  # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
+  # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
+  # /fry    -> undef
+  $r->route('/:name', name => [qw/bender leela/])
+    ->to(controller => 'foo', action => 'bar');
+
+You can also adjust the regular expressions behind placeholders to better
+suit your needs.
+Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
+placeholders become part of a larger regular expression internally,
+C<(?:...)> is fine though.
+
+  # /23   -> {controller => 'foo', action => 'bar', number => 23}
+  # /test -> undef
+  $r->route('/:number', number => qr/\d+/)
+    ->to(controller => 'foo', action => 'bar');
+
+  # /23   -> undef
+  # /test -> {controller => 'foo', action => 'bar', name => 'test'}
+  $r->route('/:name', name => qr/[a-zA-Z]+/)
+    ->to(controller => 'foo', action => 'bar');
+
+This way you get easily readable routes and the raw power of regular
+expressions.
+
 =head2 Formats
 
 File extensions like C<.html> and C<.txt> at the end of a route are
@@ -312,6 +342,29 @@ automatically detected and stored in the stash value C<format>.
 
 This for example allows multiple templates for different formats to share the
 same code.
+You can also mention a format in the route pattern to only match one, just
+make sure the more specific routes go first.
+
+  # /foo.txt -> {controller => 'foo', action => 'text', format => 'txt'}
+  $r->route('/foo.txt')->to(controller => 'foo', action => 'text');
+
+  # /foo      -> {controller => 'foo', action => 'hyper'}
+  # /foo.html -> {controller => 'foo', action => 'hyper', format => 'html'}
+  $r->route('/foo')->to(controller => 'foo', action => 'hyper');
+
+Restrictive placeholders can also be used for format detection.
+
+  # /foo.rss -> {controller => 'foo', action => 'feed', format => 'rss'}
+  # /foo.xml -> {controller => 'foo', action => 'feed', format => 'xml'}
+  # /foo.txt -> undef
+  $r->route('/foo', format => [qw/rss xml/])
+    ->to(controller => 'foo', action => 'feed');
+
+Or you can just disable format detection.
+
+  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo.html -> undef
+  $r->route('/foo', format => 0)->to(controller => 'foo', action => 'bar');
 
 =head2 Placeholders And Destinations
 
@@ -414,41 +467,6 @@ ones.
   $foo->route('/baz')->to(action => 'baz');
   $foo->route('/cde');
 
-=head2 Mojolicious::Lite routes
-
-L<Mojolicious::Lite> routes are in fact just a small convenience layer around
-everything described above and also part of the normal router.
-
-  # GET /foo -> {controller => 'foo', action => 'abc'}
-  $r->get('/foo')->to(controller => 'foo', action => 'abc');
-
-This makes the process of growing your L<Mojolicious::Lite> prototypes into
-full L<Mojolicious> applications very straightforward.
-
-  # POST /bar
-  $r->post('/bar' => sub {
-    my $self = shift;
-    $self->render(text => 'Just like a Mojolicious::Lite action!');
-  });
-
-Even the more abstract concepts are available.
-
-  # GET  /yada
-  # POST /yada
-  my $yada = $r->under('/yada');
-  $yada->get(sub {
-    my $self = shift;
-    $self->render(text => 'Hello!');
-  });
-  $yada->post(sub {
-    my $self = shift;
-    $self->render(text => 'Go away!');
-  });
-
-=head1 ADVANCED
-
-Less commonly used and more powerful features.
-
 =head2 Waypoints
 
 Waypoints are very similar to normal nested routes but can match even if they
@@ -489,26 +507,36 @@ will be broken, this makes bridges a very powerful tool for authentication.
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 
-=head2 More Restrictive Placeholders
+=head2 Mojolicious::Lite routes
 
-You can adjust the regular expressions behind placeholders to better suit
-your needs.
-Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
-placeholders become part of a larger regular expression internally,
-C<(?:...)> is fine though.
+L<Mojolicious::Lite> routes are in fact just a small convenience layer around
+everything described above and also part of the normal router.
 
-  # /23   -> {controller => 'foo', action => 'bar', number => 23}
-  # /test -> undef
-  $r->route('/:number', number => qr/\d+/)
-    ->to(controller => 'foo', action => 'bar');
+  # GET /foo -> {controller => 'foo', action => 'abc'}
+  $r->get('/foo')->to(controller => 'foo', action => 'abc');
 
-  # /23   -> undef
-  # /test -> {controller => 'foo', action => 'bar', name => 'test'}
-  $r->route('/:name', name => qr/[a-zA-Z]+/)
-    ->to(controller => 'foo', action => 'bar');
+This makes the process of growing your L<Mojolicious::Lite> prototypes into
+full L<Mojolicious> applications very straightforward.
 
-This way you get easily readable routes and the raw power of regular
-expressions.
+  # POST /bar
+  $r->post('/bar' => sub {
+    my $self = shift;
+    $self->render(text => 'Just like a Mojolicious::Lite action!');
+  });
+
+Even the more abstract concepts are available.
+
+  # GET  /yada
+  # POST /yada
+  my $yada = $r->under('/yada');
+  $yada->get(sub {
+    my $self = shift;
+    $self->render(text => 'Hello!');
+  });
+  $yada->post(sub {
+    my $self = shift;
+    $self->render(text => 'Go away!');
+  });
 
 =head2 Shortcuts
 
@@ -536,6 +564,10 @@ You can also add your own shortcuts to make route generation more expressive.
 
 Shortcuts can lead to anything, routes, bridges or maybe even both.
 And watch out for quicksand!
+
+=head1 ADVANCED
+
+Less commonly used and more powerful features.
 
 =head2 Conditions
 
@@ -607,7 +639,7 @@ applications.
     my $self = shift;
 
     # Plugin
-    $self->plugin('werewolf_condition');
+    $self->plugin('WerewolfCondition');
 
     # Routes
     my $r = $self->routes;
@@ -667,7 +699,7 @@ self-contained applications under a prefix.
   use Mojolicious::Lite;
 
   # Whole application mounted under "/prefix"
-  plugin mount => {'/prefix' => '/home/sri/myapp.pl'};
+  plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
 
   # Normal route
   get '/' => sub { shift->render_text('Hello World!') };
@@ -711,7 +743,7 @@ Now just load the plugin and you're done.
     my $self = shift;
 
     # Plugin
-    $self->plugin('my_embedded_app');
+    $self->plugin('MyEmbeddedApp');
   }
 
   1;
@@ -756,7 +788,7 @@ snowman very sad.
 The C<routes> command can be used from the command line to list all available
 routes together with name and underlying regular expressions.
 
-  % script/myapp routes
+  $ script/myapp routes
   /foo/:name        GET   fooname        (?-xism:^/foo/([^\/\.]+))
   /baz/*everything  POST  bazeverything  (?-xism:^/baz/(.+))
   /bar/(.test)      *     bartest        (?-xism:^/bar/([^\/]+))

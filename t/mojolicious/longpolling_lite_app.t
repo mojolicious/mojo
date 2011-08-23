@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
 use Test::More tests => 113;
 
@@ -218,7 +219,7 @@ get '/too_long' => sub {
   $self->res->headers->content_length(12);
   $self->write('how');
   Mojo::IOLoop->timer(
-    '5' => sub {
+    5 => sub {
       $self->write(
         sub {
           my $self = shift;
@@ -270,7 +271,7 @@ is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll (interrupted)
 $longpoll = undef;
-my $port = $t->ua->test_server;
+my $port = $t->test_server->port;
 Mojo::IOLoop->connect(
   address    => 'localhost',
   port       => $port,

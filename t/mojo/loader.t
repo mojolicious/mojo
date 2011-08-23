@@ -1,9 +1,7 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
-
-use Test::More tests => 34;
+use Test::More tests => 36;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -43,12 +41,14 @@ like $e->message, qr/Exception/, 'right message';
 is $e->lines_before->[0]->[0], 1,                           'right line';
 is $e->lines_before->[0]->[1], 'package LoaderException2;', 'right value';
 is $e->lines_before->[1]->[0], 2,                           'right line';
-is $e->lines_before->[1]->[1], '',                          'right value';
-is $e->line->[0], 6, 'right line';
+is $e->lines_before->[1]->[1], 'use Mojo::Base -strict;',   'right value';
+is $e->lines_before->[2]->[0], 3,                           'right line';
+is $e->lines_before->[2]->[1], '',                          'right value';
+is $e->line->[0], 4, 'right line';
 is $e->line->[1], 'LoaderException2_2::throw_error();', 'right value';
-is $e->lines_after->[0]->[0], 7,    'right line';
+is $e->lines_after->[0]->[0], 5,    'right line';
 is $e->lines_after->[0]->[1], '',   'right value';
-is $e->lines_after->[1]->[0], 8,    'right line';
+is $e->lines_after->[1]->[0], 6,    'right line';
 is $e->lines_after->[1]->[1], '1;', 'right value';
 like "$e", qr/Exception/, 'right message';
 

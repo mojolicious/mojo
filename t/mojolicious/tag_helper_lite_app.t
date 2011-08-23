@@ -1,12 +1,13 @@
 #!/usr/bin/env perl
+use Mojo::Base -strict;
 
-use strict;
-use warnings;
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+}
 
-# Disable IPv6, epoll and kqueue
-BEGIN { $ENV{MOJO_NO_IPV6} = $ENV{MOJO_POLL} = 1 }
-
-use Test::More tests => 45;
+use Test::More tests => 51;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -14,6 +15,12 @@ use Test::Mojo;
 
 # GET /tags
 get 'tags';
+
+# GET /more_tags
+get 'more_tags';
+
+# GET /small_tags
+get 'small_tags';
 
 # GET /links
 get 'links';
@@ -43,6 +50,24 @@ $t->get_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="t&lt;wo" three="four">Hello</foo>
+EOF
+
+# GET /more_tags
+$t->get_ok('/more_tags')->status_is(200)->content_is(<<EOF);
+<bar>b&lt;a&gt;z</bar>
+<bar>0</bar>
+<bar class="test">0</bar>
+<bar class="test"></bar>
+EOF
+
+# GET /small_tags
+$t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
+<div>some &amp; content</div>
+<div>
+  <p id="0">just</p>
+  <p>0</p>
+</div>
+<div>works</div>
 EOF
 
 # GET /links
@@ -276,6 +301,20 @@ __DATA__
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
 <%= tag 'foo', one => 't<wo', three => 'four' => begin %>Hello<% end %>
+
+@@ more_tags.html.ep
+%= tag bar => 'b<a>z'
+%= tag bar => 0
+%= tag 'bar', class => 'test', 0
+%= tag 'bar', class => 'test', ''
+
+@@ small_tags.html.ep
+%=t div => 'some & content'
+%=t div => begin
+  %=t p => (id => 0) => 'just'
+  %=t p => 0
+%= end
+%=t div => 'works'
 
 @@ links.html.ep
 <%= link_to 'Pa<th' => '/path' %>

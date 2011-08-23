@@ -66,7 +66,7 @@ sub decode {
 
   # Wide characters
   $self->error('Wide character in input.') and return
-    unless utf8::downgrade($_, 1);
+    unless utf8::downgrade($string, 1);
 
   # Detect and decode unicode
   my $encoding = 'UTF-8';

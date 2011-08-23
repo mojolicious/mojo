@@ -1,9 +1,11 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
+use utf8;
+
 use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;
-plan tests => 116;
+plan tests => 118;
 
 use Mojo::ByteStream 'b';
 
@@ -256,6 +258,8 @@ $string = $json->encode([b('test')]);
 is_deeply $json->decode($string), ['test'], 'right roundtrip';
 
 # Errors
+is $json->decode('["♥"]'), undef, 'wide character in input';
+is $json->error, 'Wide character in input.', 'right error';
 is $json->decode(b("\x{feff}[\"\\ud800\"]")->encode('UTF-16LE')), undef,
   'missing high surrogate';
 is $json->error,

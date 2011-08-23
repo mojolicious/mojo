@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 137;
+plan tests => 139;
 
 use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
@@ -367,6 +367,11 @@ is_deeply [b('54321')->split('')->each], [5, 4, 3, 2, 1], 'right elements';
 is_deeply [b('')->split('')->each],    [], 'no elements';
 is_deeply [b('')->split(',')->each],   [], 'no elements';
 is_deeply [b('')->split(qr/,/)->each], [], 'no elements';
+$stream = b('1/2/3');
+is $stream->split('/')->map(sub { $_->quote })->join(', '),
+  '"1", "2", "3"', 'right result';
+is $stream->split('/')->map(sub { shift->quote })->join(', '),
+  '"1", "2", "3"', 'right result';
 
 # say and autojoin
 my $buffer = '';

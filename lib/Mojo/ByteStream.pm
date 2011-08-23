@@ -164,8 +164,8 @@ sub sha1_sum {
 sub size { length shift->{bytestream} }
 
 sub split {
-  my ($self, $pattern) = @_;
-  Mojo::Collection->new(split $pattern, $self->{bytestream});
+  my ($self, $p) = @_;
+  Mojo::Collection->new(map { $self->new($_) } split $p, $self->{bytestream});
 }
 
 sub to_string { shift->{bytestream} }
@@ -401,7 +401,7 @@ Size of bytestream.
 Turn bytestream into L<Mojo::Collection>.
 Note that this method is EXPERIMENTAL and might change without warning!
 
-  $stream->split(',')->join("\n")->say;
+  $stream->split(',')->map(sub { $_->quote })->join("\n")->say;
 
 =head2 C<to_string>
 

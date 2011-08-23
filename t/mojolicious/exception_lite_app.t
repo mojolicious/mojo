@@ -116,7 +116,7 @@ $t->get_ok('/missing_template')->status_is(404)
 $t->get_ok('/missing_template.xml')->status_is(404)
   ->content_type_is('text/xml')->content_is("<somewhat>bad</somewhat>\n");
 
-# GET /missing_template (unsupported format)
+# GET /missing_template.json (unsupported format)
 $t->get_ok('/missing_template.json')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Not Found/);
 

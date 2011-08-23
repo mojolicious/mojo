@@ -164,8 +164,8 @@ sub sha1_sum {
 sub size { length shift->{bytestream} }
 
 sub split {
-  my ($self, $p) = @_;
-  Mojo::Collection->new(split defined $p ? $p : '', $self->{bytestream});
+  my ($self, $pattern) = @_;
+  Mojo::Collection->new(split $pattern, $self->{bytestream});
 }
 
 sub to_string { shift->{bytestream} }

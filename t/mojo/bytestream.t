@@ -363,8 +363,8 @@ is "$stream", "la\nla\nla", 'right trimmed result';
 $stream = b('1,2,3,4,5');
 is_deeply [$stream->split(',')->each],   [1, 2, 3, 4, 5], 'right elements';
 is_deeply [$stream->split(qr/,/)->each], [1, 2, 3, 4, 5], 'right elements';
-is_deeply [b('54321')->split->each],     [5, 4, 3, 2, 1], 'right elements';
-is_deeply [b('')->split->each],        [], 'no elements';
+is_deeply [b('54321')->split('')->each], [5, 4, 3, 2, 1], 'right elements';
+is_deeply [b('')->split('')->each],    [], 'no elements';
 is_deeply [b('')->split(',')->each],   [], 'no elements';
 is_deeply [b('')->split(qr/,/)->each], [], 'no elements';
 

@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.89';
+our $VERSION  = '1.90';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -398,11 +398,7 @@ exactly the same.
 Mojolicious has been designed from the ground up for a fun and unique
 workflow.
 
-=head2 Want To Know More?
-
-Take a look at our excellent documentation in L<Mojolicious::Guides>!
-
-=head1 ARCHITECTURE
+=head2 Architecture
 
 Loosely coupled building blocks, use what you like and just ignore the rest.
 
@@ -421,6 +417,10 @@ Loosely coupled building blocks, use what you like and just ignore the rest.
   .-------. .-----------. .--------. .------------. .-------------.
   |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
   '-------' '-----------' '--------' '------------' '-------------'
+
+=head2 Want To Know More?
+
+Take a look at our excellent documentation in L<Mojolicious::Guides>!
 
 =head1 ATTRIBUTES
 

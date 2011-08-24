@@ -139,5 +139,5 @@ works!
 @@ exception.xml.ep
 <very>bad</very>
 
-@@ not_found.xml.ep
+@@ not_found.development.xml.ep
 <somewhat>bad</somewhat>

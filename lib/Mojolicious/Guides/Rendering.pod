@@ -293,7 +293,7 @@ single C<render> call.
   );
 
 And if no viable representation could be found, the C<any> fallback will be
-used.
+used or an empty C<204> response rendered automatically.
 
 =head2 Helpers
 

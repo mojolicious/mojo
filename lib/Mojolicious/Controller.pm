@@ -479,13 +479,12 @@ sub respond_to {
 
   # Fallback
   unless ($target) {
-    return unless $target = $args->{any};
+    return $self->rendered(204) unless $target = $args->{any};
     delete $stash->{format};
   }
 
   # Dispatch
   ref $target eq 'CODE' ? $target->($self) : $self->render($target);
-  return 1;
 }
 
 sub send_message {
@@ -956,14 +955,15 @@ Usually refers to a L<Mojo::Message::Response> object.
 
 =head2 C<respond_to>
 
-  my $success = $c->respond_to(
+  $c->respond_to(
     json => sub {...},
     xml  => {text => 'hello!'},
     any  => sub {...}
   );
 
 Automatically select best possible representation for resource from C<Accept>
-request header, C<format> stash value or C<format> GET/POST parameter.
+request header, C<format> stash value or C<format> GET/POST parameter,
+defaults to rendering an empty C<204> response.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   $c->respond_to(

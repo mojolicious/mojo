@@ -45,8 +45,8 @@ sub grep {
 }
 
 sub join {
-  my ($self, $e) = @_;
-  Mojo::ByteStream->new(join $e, map({"$_"} @$self));
+  my ($self, $expression) = @_;
+  Mojo::ByteStream->new(join $expression, map({"$_"} @$self));
 }
 
 sub map {

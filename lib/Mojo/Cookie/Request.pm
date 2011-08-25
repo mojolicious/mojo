@@ -87,8 +87,7 @@ Mojo::Cookie::Request - HTTP 1.1 Request Cookie Container
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie::Request> is a container for HTTP 1.1 request cookies as
-described in RFC 2965.
+L<Mojo::Cookie::Request> is a container for HTTP 1.1 request cookies.
 
 =head1 ATTRIBUTES
 

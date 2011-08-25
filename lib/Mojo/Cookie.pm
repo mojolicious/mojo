@@ -6,7 +6,6 @@ use overload
   fallback => 1;
 
 use Carp 'croak';
-use Mojo::Util 'unquote';
 
 has [qw/name path value version/];
 
@@ -21,7 +20,15 @@ my $NAME_RE             = qr/
   \s*
 /x;
 my $SEPARATOR_RE = qr/^\s*\;\s*/;
-my $VALUE_RE     = qr/^([^\;\,]+)\s*/;
+my $VALUE_RE     = qr/
+  ^
+  (
+    "(?:\\\\|\\"|[^"])+"   # Quoted
+  |
+    [^\;\,]+               # Unquoted
+  )
+  \s*
+/x;
 
 # "My Homer is not a communist.
 #  He may be a liar, a pig, an idiot, a communist,
@@ -83,8 +90,7 @@ Mojo::Cookie - HTTP 1.1 Cookie Base Class
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie> is an abstract base class for HTTP 1.1 cookies as described
-in RFC 2965.
+L<Mojo::Cookie> is an abstract base class for HTTP 1.1 cookies.
 
 =head1 ATTRIBUTES
 

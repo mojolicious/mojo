@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 130;
+use Test::More tests => 139;
 
 # "What good is money if it can't inspire terror in your fellow man?"
 use_ok 'Mojo::Cookie::Request';
@@ -46,6 +46,20 @@ is $cookies->[0]->value,   'bar',   'right value';
 is $cookies->[0]->path,    '/test', 'right path';
 is $cookies->[0]->version, '1',     'right version';
 is $cookies->[1], undef, 'no more cookies';
+
+# Parse request cookies from multiple header values
+$cookie  = Mojo::Cookie::Request->new;
+$cookies = $cookie->parse(
+  '$Version=1; foo=bar; $Path="/test", $Version=2; baz=yada; $Path="/tset"');
+is $cookies->[0]->name,    'foo',   'right name';
+is $cookies->[0]->value,   'bar',   'right value';
+is $cookies->[0]->path,    '/test', 'right path';
+is $cookies->[0]->version, '1',     'right version';
+is $cookies->[1]->name,    'baz',   'right name';
+is $cookies->[1]->value,   'yada',  'right value';
+is $cookies->[1]->path,    '/tset', 'right path';
+is $cookies->[1]->version, '2',     'right version';
+is $cookies->[2], undef, 'no more cookies';
 
 # Parse request cookie (Netscape)
 $cookie  = Mojo::Cookie::Request->new;

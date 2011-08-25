@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 145;
+use Test::More tests => 175;
 
 use File::Spec;
 use FindBin;
@@ -40,7 +40,7 @@ $tx = $t->form('http://kraih.com/foo' => {test => 123});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
-  'no "Content-Type" value';
+  'right "Content-Type" value';
 is $tx->req->body, 'test=123', 'right content';
 
 # UTF-8 form
@@ -48,7 +48,7 @@ $tx = $t->form('http://kraih.com/foo', 'UTF-8', {test => 123});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
-  'no "Content-Type" value';
+  'right "Content-Type" value';
 is $tx->req->body, 'test=123', 'right content';
 
 # UTF-8 form with header
@@ -57,8 +57,8 @@ $tx =
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
-  'no "Content-Type" value';
-is $tx->req->headers->accept, '*/*', 'no "Accept" value';
+  'right "Content-Type" value';
+is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'test=123', 'right content';
 
 # Multipart form with real file
@@ -68,9 +68,9 @@ $tx =
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
-  'no "Content-Type" value';
+  'right "Content-Type" value';
 like $tx->req->content->parts->[0]->headers->content_disposition, qr/mytext/,
-  'no "Content-Disposition" value';
+  'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
@@ -79,9 +79,9 @@ $tx = $t->form('http://kraih.com/foo', {mytext => {content => 'lalala'}});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
-  'no "Content-Type" value';
+  'right "Content-Type" value';
 like $tx->req->content->parts->[0]->headers->content_disposition, qr/mytext/,
-  'no "Content-Disposition" value';
+  'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 'lalala', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
@@ -92,10 +92,10 @@ $tx =
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
-  'no "Content-Type" value';
+  'right "Content-Type" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
   qr/foo\.zip/,
-  'no "Content-Disposition" value';
+  'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 'whatever', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
@@ -211,6 +211,34 @@ is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
+# 303 redirect (additional headers)
+$tx = $t->tx(
+  POST => 'http://mojolico.us/foo' => {
+    Accept  => 'application/json',
+    Cookie  => 'one',
+    Host    => 'two',
+    Referer => 'three'
+  }
+);
+$tx->res->code(303);
+$tx->res->headers->location('http://kraih.com/bar');
+is $tx->req->headers->accept,   'application/json', 'right "Accept" value';
+is $tx->req->headers->cookie,   'one',              'right "Cookie" value';
+is $tx->req->headers->host,     'two',              'right "Host" value';
+is $tx->req->headers->referrer, 'three',            'right "Referer" value';
+is $tx->req->body, '', 'no content';
+$tx = $t->redirect($tx);
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
+is $tx->req->headers->accept,   undef,                  'no "Accept" value';
+is $tx->req->headers->cookie,   undef,                  'no "Cookie" value';
+is $tx->req->headers->host,     undef,                  'no "Host" value';
+is $tx->req->headers->location, undef,                  'no "Location" value';
+is $tx->req->headers->referrer, undef,                  'no "Referer" value';
+is $tx->req->body, '',    'no content';
+is $tx->res->code, undef, 'no status';
+is $tx->res->headers->location, undef, 'no "Location" value';
+
 # Simple 301 redirect
 $tx =
   $t->tx(POST => 'http://mojolico.us/foo', {Accept => 'application/json'});
@@ -235,9 +263,9 @@ is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
-is $tx->req->headers->accept,   '*/*',                  'no "Accept" value';
-is $tx->req->headers->location, undef,                  'no "Location" value';
+is $tx->req->url->to_abs, 'http://kraih.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, 'whatever', 'right content';
 is $tx->res->code, undef,      'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -258,9 +286,9 @@ is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
-is $tx->req->headers->accept,   'application/json',     'no "Accept" value';
-is $tx->req->headers->location, undef,                  'no "Location" value';
+is $tx->req->url->to_abs,     'http://kraih.com/bar', 'right URL';
+is $tx->req->headers->accept, 'application/json',     'right "Accept" value';
+is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -273,9 +301,9 @@ is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'whatever', 'right content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
-is $tx->req->headers->accept,   '*/*',                  'no "Accept" value';
-is $tx->req->headers->location, undef,                  'no "Location" value';
+is $tx->req->url->to_abs, 'http://kraih.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, 'whatever', 'right content';
 is $tx->res->code, undef,      'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -286,6 +314,34 @@ $tx->res->code(307);
 $tx->res->headers->location('http://kraih.com/bar');
 $tx->req->write_chunk('whatever', sub { shift->finish });
 is $t->redirect($tx), undef, 'unsupported redirect';
+
+# 307 redirect (additional headers)
+$tx = $t->tx(
+  POST => 'http://mojolico.us/foo' => {
+    Accept  => 'application/json',
+    Cookie  => 'one',
+    Host    => 'two',
+    Referer => 'three'
+  }
+);
+$tx->res->code(307);
+$tx->res->headers->location('http://kraih.com/bar');
+is $tx->req->headers->accept,   'application/json', 'right "Accept" value';
+is $tx->req->headers->cookie,   'one',              'right "Cookie" value';
+is $tx->req->headers->host,     'two',              'right "Host" value';
+is $tx->req->headers->referrer, 'three',            'right "Referer" value';
+is $tx->req->body, '', 'no content';
+$tx = $t->redirect($tx);
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->url->to_abs,     'http://kraih.com/bar', 'right URL';
+is $tx->req->headers->accept, 'application/json',     'right "Accept" value';
+is $tx->req->headers->cookie, undef,                  'no "Cookie" value';
+is $tx->req->headers->host,   undef,                  'no "Host" value';
+is $tx->req->headers->location, undef, 'no "Location" value';
+is $tx->req->headers->referrer, undef, 'no "Referer" value';
+is $tx->req->body, '',    'no content';
+is $tx->res->code, undef, 'no status';
+is $tx->res->headers->location, undef, 'no "Location" value';
 
 # 308 redirect (unsupported)
 $tx =

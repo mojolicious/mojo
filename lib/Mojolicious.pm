@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.91';
+our $VERSION  = '1.92';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -262,6 +262,24 @@ Mojolicious - Duct Tape For The Web!
 
 =head1 DESCRIPTION
 
+Loosely coupled building blocks, use what you like and just ignore the rest.
+
+  .---------------------------------------------------------------.
+  |                                                               |
+  |                .----------------------------------------------'
+  |                | .--------------------------------------------.
+  |   Application  | |              Mojolicious::Lite             |
+  |                | '--------------------------------------------'
+  |                | .--------------------------------------------.
+  |                | |                 Mojolicious                |
+  '----------------' '--------------------------------------------'
+  .---------------------------------------------------------------.
+  |                             Mojo                              |
+  '---------------------------------------------------------------'
+  .-------. .-----------. .--------. .------------. .-------------.
+  |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
+  '-------' '-----------' '--------' '------------' '-------------'
+
 Web development for humans, making hard things possible and everything fun.
 
   use Mojolicious::Lite;
@@ -397,26 +415,6 @@ exactly the same.
 
 Mojolicious has been designed from the ground up for a fun and unique
 workflow.
-
-=head2 Architecture
-
-Loosely coupled building blocks, use what you like and just ignore the rest.
-
-  .---------------------------------------------------------------.
-  |                                                               |
-  |                .----------------------------------------------'
-  |                | .--------------------------------------------.
-  |   Application  | |              Mojolicious::Lite             |
-  |                | '--------------------------------------------'
-  |                | .--------------------------------------------.
-  |                | |                 Mojolicious                |
-  '----------------' '--------------------------------------------'
-  .---------------------------------------------------------------.
-  |                             Mojo                              |
-  '---------------------------------------------------------------'
-  .-------. .-----------. .--------. .------------. .-------------.
-  |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
-  '-------' '-----------' '--------' '------------' '-------------'
 
 =head2 Want To Know More?
 

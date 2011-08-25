@@ -63,6 +63,12 @@ sub build_headers {
   return $headers;
 }
 
+sub clone {
+  my $self = shift;
+  return if $self->is_dynamic;
+  return $self->new(headers => $self->headers->clone);
+}
+
 # "Aren't we forgetting the true meaning of Christmas?
 #  You know, the birth of Santa."
 sub generate_body_chunk {
@@ -492,6 +498,13 @@ Render whole body.
   my $string = $content->build_headers;
 
 Render all headers.
+
+=head2 C<clone>
+
+  my $clone = $content->clone;
+
+Clone content if possible.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<generate_body_chunk>
 

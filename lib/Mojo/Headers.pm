@@ -103,7 +103,16 @@ sub add {
   return $self;
 }
 
-sub cache_control       { scalar shift->header('Cache-Control'       => @_) }
+sub cache_control { scalar shift->header('Cache-Control' => @_) }
+
+sub clone {
+  my $self  = shift;
+  my $clone = $self->new;
+  $clone->{headers}->{$_} = [@{$self->{headers}->{$_}}]
+    for keys %{$self->{headers}};
+  return $clone;
+}
+
 sub connection          { scalar shift->header(Connection            => @_) }
 sub content_disposition { scalar shift->header('Content-Disposition' => @_) }
 sub content_length      { scalar shift->header('Content-Length'      => @_) }
@@ -395,6 +404,13 @@ Shortcut for the C<Authorization> header.
   $headers          = $headers->cache_control('max-age=1, no-cache');
 
 Shortcut for the C<Cache-Control> header.
+
+=head2 C<clone>
+
+  my $clone = $headers->clone;
+
+Clone headers.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<connection>
 

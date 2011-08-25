@@ -500,7 +500,6 @@ sub _test_server {
   return $self->{server};
 }
 
-# "Once the government approves something, it's no longer immoral!"
 sub _upgrade {
   my ($self, $id) = @_;
 

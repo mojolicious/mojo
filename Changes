@@ -1,5 +1,12 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.91    2011-08-25 00:00:00
+        - Added EXPERIMENTAL support for cloning Mojo::Message::Request
+          objects.
+        - Improved redirect support in Mojo::UserAgent to be closer to
+          commonly used browsers.
+        - Improved documentation.
+
 1.90    2011-08-24 00:00:00
         - Improved respond_to to automatically render an empty 204 response
           for unknown formats.

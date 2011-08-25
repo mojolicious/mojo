@@ -25,6 +25,24 @@ my $START_LINE_RE = qr/
 # Host regex
 my $HOST_RE = qr/^([^\:]*)\:?(.*)$/;
 
+sub clone {
+  my $self = shift;
+
+  # Dynamic requests cannot be cloned
+  return unless my $content = $self->content->clone;
+  my $clone = $self->new(
+    content     => $content,
+    method      => $self->method,
+    on_progress => $self->on_progress,
+    on_finish   => $self->on_finish,
+    url         => $self->url->clone,
+    version     => $self->version
+  );
+  $clone->{proxy} = $self->{proxy}->clone if $self->{proxy};
+
+  return $clone;
+}
+
 sub cookies {
   my $self = shift;
 
@@ -433,6 +451,13 @@ HTTP request URL, defaults to a L<Mojo::URL> object.
 
 L<Mojo::Message::Request> inherits all methods from L<Mojo::Message> and
 implements the following new ones.
+
+=head2 C<clone>
+
+  my $clone = $req->clone;
+
+Clone request if possible.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<cookies>
 

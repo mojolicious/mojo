@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 974;
+use Test::More tests => 1122;
 
 use File::Spec;
 use File::Temp;
@@ -655,6 +655,64 @@ is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->expect, '100-continue',             'right "Expect" value';
 is $req->headers->host,   '127.0.0.1',                'right "Host" value';
 
+# Build HTTP 1.1 start line and header (with clone)
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->headers->expect('100-continue');
+my $clone = $req->clone;
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
+is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect, '100-continue',             'right "Expect" value';
+is $req->headers->host,   '127.0.0.1',                'right "Host" value';
+$clone = Mojo::Message::Request->new->parse($clone->to_string);
+ok $clone->is_done, 'request is done';
+is $clone->method,  'GET', 'right method';
+is $clone->version, '1.1', 'right version';
+is $clone->at_least_version('1.0'), 1,     'at least version 1.0';
+is $clone->at_least_version('1.2'), undef, 'not version 1.2';
+is $clone->url, '/foo/bar', 'right URL';
+is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->headers->expect, '100-continue', 'right "Expect" value';
+is $clone->headers->host,   '127.0.0.1',    'right "Host" value';
+
+# Build HTTP 1.1 start line and header (with clone and changes)
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->headers->expect('100-continue');
+$clone = $req->clone;
+$clone->method('POST');
+$clone->headers->expect('nothing');
+$clone->version('1.2');
+push @{$clone->url->path->parts}, 'baz';
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
+is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect, '100-continue',             'right "Expect" value';
+is $req->headers->host,   '127.0.0.1',                'right "Host" value';
+$clone = Mojo::Message::Request->new->parse($clone->to_string);
+ok $clone->is_done, 'request is done';
+is $clone->method,  'POST', 'right method';
+is $clone->version, '1.2', 'right version';
+is $clone->at_least_version('1.0'), 1, 'at least version 1.0';
+is $clone->at_least_version('1.2'), 1, 'at least version 1.2';
+is $clone->url, '/foo/bar/baz', 'right URL';
+is $clone->url->to_abs, 'http://127.0.0.1/foo/bar/baz', 'right absolute URL';
+is $clone->headers->expect, 'nothing',   'right "Expect" value';
+is $clone->headers->host,   '127.0.0.1', 'right "Host" value';
+
 # Build full HTTP 1.1 request
 $req      = Mojo::Message::Request->new;
 $finished = undef;
@@ -677,6 +735,45 @@ is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 ok $finished, 'finish callback was called';
 ok $req->is_done, 'request is done';
+
+# Build full HTTP 1.1 request (with clone)
+$req      = Mojo::Message::Request->new;
+$finished = undef;
+$req->on_finish(sub { $finished = shift->is_done });
+$req->method('get');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->headers->expect('100-continue');
+$req->body("Hello World!\n");
+$clone = $req->clone;
+$req   = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
+is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect, '100-continue',             'right "Expect" value';
+is $req->headers->host,   '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->body, "Hello World!\n", 'right content';
+ok $finished, 'finish callback was called';
+ok $req->is_done, 'request is done';
+$finished = undef;
+$clone    = Mojo::Message::Request->new->parse($clone->to_string);
+ok $clone->is_done, 'request is done';
+is $clone->method,  'GET', 'right method';
+is $clone->version, '1.1', 'right version';
+is $clone->at_least_version('1.0'), 1,     'at least version 1.0';
+is $clone->at_least_version('1.2'), undef, 'not version 1.2';
+is $clone->url, '/foo/bar', 'right URL';
+is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->headers->expect, '100-continue', 'right "Expect" value';
+is $clone->headers->host,   '127.0.0.1',    'right "Host" value';
+is $clone->headers->content_length, '13', 'right "Content-Length" value';
+is $clone->body, "Hello World!\n", 'right content';
+ok $finished, 'finish callback was called';
+ok $clone->is_done, 'request is done';
 
 # Build HTTP 1.1 request body
 $req      = Mojo::Message::Request->new;
@@ -719,6 +816,53 @@ is $req->headers->sec_websocket_protocol, 'sample',
 is $req->body, '', 'no content';
 ok $finished, 'finish callback was called';
 ok $req->is_done, 'request is done';
+
+# Build WebSocket handshake request (with clone)
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://example.com/demo');
+$req->headers->host('example.com');
+$req->headers->connection('Upgrade');
+$req->headers->sec_websocket_accept('abcdef=');
+$req->headers->sec_websocket_protocol('sample');
+$req->headers->upgrade('WebSocket');
+$clone = $req->clone;
+$req   = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/demo', 'right URL';
+is $req->url->to_abs, 'http://example.com/demo', 'right absolute URL';
+is $req->headers->connection, 'Upgrade',     'right "Connection" value';
+is $req->headers->upgrade,    'WebSocket',   'right "Upgrade" value';
+is $req->headers->host,       'example.com', 'right "Host" value';
+is $req->headers->content_length, 0, 'right "Content-Length" value';
+is $req->headers->sec_websocket_accept, 'abcdef=',
+  'right "Sec-WebSocket-Key" value';
+is $req->headers->sec_websocket_protocol, 'sample',
+  'right "Sec-WebSocket-Protocol" value';
+is $req->body, '', 'no content';
+ok $req->is_done, 'request is done';
+$clone = Mojo::Message::Request->new->parse($clone->to_string);
+ok $clone->is_done, 'request is done';
+is $clone->method,  'GET', 'right method';
+is $clone->version, '1.1', 'right version';
+is $clone->at_least_version('1.0'), 1,     'at least version 1.0';
+is $clone->at_least_version('1.2'), undef, 'not version 1.2';
+is $clone->url, '/demo', 'right URL';
+is $clone->url->to_abs, 'http://example.com/demo', 'right absolute URL';
+is $clone->headers->connection, 'Upgrade',     'right "Connection" value';
+is $clone->headers->upgrade,    'WebSocket',   'right "Upgrade" value';
+is $clone->headers->host,       'example.com', 'right "Host" value';
+is $clone->headers->content_length, 0, 'right "Content-Length" value';
+is $clone->headers->sec_websocket_accept, 'abcdef=',
+  'right "Sec-WebSocket-Key" value';
+is $clone->headers->sec_websocket_protocol, 'sample',
+  'right "Sec-WebSocket-Protocol" value';
+is $clone->body, '', 'no content';
+ok $clone->is_done, 'request is done';
 
 # Build full HTTP 1.1 proxy request
 $req = Mojo::Message::Request->new;
@@ -764,6 +908,49 @@ is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Proxy-Authorization" value';
 is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
+
+# Build full HTTP 1.1 proxy request with basic authorization (and clone)
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://Aladdin:open%20sesame@127.0.0.1/foo/bar');
+$req->headers->expect('100-continue');
+$req->body("Hello World!\n");
+$req->proxy('http://Aladdin:open%20sesame@127.0.0.2:8080');
+$clone = $req->clone;
+$req   = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, 'http://127.0.0.1/foo/bar', 'right URL';
+is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->proxy->userinfo, 'Aladdin:open sesame',      'right proxy userinfo';
+is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+  'right "Authorization" value';
+is $req->headers->expect, '100-continue', 'right "Expect" value';
+is $req->headers->host,   '127.0.0.1',    'right "Host" value';
+is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+  'right "Proxy-Authorization" value';
+is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->body, "Hello World!\n", 'right content';
+$clone = Mojo::Message::Request->new->parse($clone->to_string);
+ok $clone->is_done, 'request is done';
+is $clone->method,  'GET', 'right method';
+is $clone->version, '1.1', 'right version';
+is $clone->at_least_version('1.0'), 1,     'at least version 1.0';
+is $clone->at_least_version('1.2'), undef, 'not version 1.2';
+is $clone->url, 'http://127.0.0.1/foo/bar', 'right URL';
+is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
+is $clone->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+  'right "Authorization" value';
+is $clone->headers->expect, '100-continue', 'right "Expect" value';
+is $clone->headers->host,   '127.0.0.1',    'right "Host" value';
+is $clone->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+  'right "Proxy-Authorization" value';
+is $clone->headers->content_length, '13', 'right "Content-Length" value';
+is $clone->body, "Hello World!\n", 'right content';
 
 # Build full HTTP 1.1 proxy connect request with basic authorization
 $req = Mojo::Message::Request->new;
@@ -819,6 +1006,56 @@ is $req->content->parts->[1]->headers->content_type, 'text/plain',
 is $req->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
   'right content';
 
+# Build HTTP 1.1 multipart request (with clone)
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->content(Mojo::Content::MultiPart->new);
+$req->headers->content_type('multipart/mixed; boundary=7am1X');
+push @{$req->content->parts}, Mojo::Content::Single->new;
+$req->content->parts->[-1]->asset->add_chunk('Hallo Welt lalalala!');
+$content = Mojo::Content::Single->new;
+$content->asset->add_chunk("lala\nfoobar\nperl rocks\n");
+$content->headers->content_type('text/plain');
+push @{$req->content->parts}, $content;
+$clone = $req->clone;
+$req   = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
+is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->host, '127.0.0.1', 'right "Host" value';
+is $req->headers->content_length, '104', 'right "Content-Length" value';
+is $req->headers->content_type, 'multipart/mixed; boundary=7am1X',
+  'right "Content-Type" value';
+is $req->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
+  'right content';
+is $req->content->parts->[1]->headers->content_type, 'text/plain',
+  'right "Content-Type" value';
+is $req->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
+  'right content';
+$clone = Mojo::Message::Request->new->parse($clone->to_string);
+ok $clone->is_done, 'request is done';
+is $clone->method,  'GET', 'right method';
+is $clone->version, '1.1', 'right version';
+is $clone->at_least_version('1.0'), 1,     'at least version 1.0';
+is $clone->at_least_version('1.2'), undef, 'not version 1.2';
+is $clone->url, '/foo/bar', 'right URL';
+is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->headers->host, '127.0.0.1', 'right "Host" value';
+is $clone->headers->content_length, '104', 'right "Content-Length" value';
+is $clone->headers->content_type, 'multipart/mixed; boundary=7am1X',
+  'right "Content-Type" value';
+is $clone->content->parts->[0]->asset->slurp, 'Hallo Welt lalalala!',
+  'right content';
+is $clone->content->parts->[1]->headers->content_type, 'text/plain',
+  'right "Content-Type" value';
+is $clone->content->parts->[1]->asset->slurp, "lala\nfoobar\nperl rocks\n",
+  'right content';
+
 # Build HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
 $req->method('GET');
@@ -836,6 +1073,7 @@ $req->write_chunk(
     );
   }
 );
+is $req->clone, undef, 'dynamic requests cannot be cloned';
 $req = Mojo::Message::Request->new->parse($req->to_string);
 ok $req->is_done, 'request is done';
 is $req->method,  'GET', 'right method';
@@ -856,6 +1094,7 @@ $req->url->parse('http://127.0.0.1/foo/bar');
 $req->write_chunk('hello world!');
 $req->write_chunk("hello world2!\n\n");
 $req->write_chunk('');
+is $req->clone, undef, 'dynamic requests cannot be cloned';
 $req = Mojo::Message::Request->new->parse($req->to_string);
 ok $req->is_done, 'request is done';
 is $req->method,  'GET', 'right method';

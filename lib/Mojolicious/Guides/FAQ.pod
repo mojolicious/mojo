@@ -127,10 +127,6 @@ Quite possibly this oneliner.
 
   $ sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
 
-=head2 I think L<Mojolicious> is awesome, how can i support you guys?
-
-Share your success story via blog or twitter, get more people hooked! :)
-
 =head2 I think i have found a bug, what should i do now?
 
 First make sure you are using the latest version of L<Mojolicious>, it is

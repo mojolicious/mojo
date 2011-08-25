@@ -2,7 +2,7 @@
 use Mojo::Base -strict;
 
 # "Remember, you can always find East by staring directly at the sun."
-use Test::More tests => 41;
+use Test::More tests => 47;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -36,6 +36,23 @@ $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
 $headers->cache_control('public');
 is $headers->expires, 'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
 is $headers->cache_control, 'public', 'right value';
+
+# Clone
+$headers = Mojo::Headers->new;
+$headers->add('Connection', 'close');
+$headers->add('Connection', 'keep-alive');
+is $headers->header('Connection'), 'close, keep-alive', 'right value';
+my $clone = $headers->clone;
+$headers->connection('nothing');
+is $headers->header('Connection'), 'nothing',           'right value';
+is $clone->header('Connection'),   'close, keep-alive', 'right value';
+$headers = Mojo::Headers->new;
+$headers->expect('100-continue');
+is $headers->expect, '100-continue', 'right value';
+$clone = $headers->clone;
+$clone->expect('nothing');
+is $headers->expect, '100-continue', 'right value';
+is $clone->expect,   'nothing',      'right value';
 
 # Multiline values
 $headers = Mojo::Headers->new;

@@ -78,6 +78,13 @@ sub build_boundary {
   return $boundary;
 }
 
+sub clone {
+  my $self = shift;
+  return unless my $clone = $self->SUPER::clone();
+  $clone->parts($self->parts);
+  return $clone;
+}
+
 sub get_body_chunk {
   my ($self, $offset) = @_;
 
@@ -284,6 +291,13 @@ Content size in bytes.
   my $boundary = $content->build_boundary;
 
 Generate a suitable boundary for content.
+
+=head2 C<clone>
+
+  my $clone = $content->clone;
+
+Clone content if possible.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<get_body_chunk>
 

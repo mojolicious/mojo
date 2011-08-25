@@ -19,6 +19,13 @@ sub body_size {
   return $self->asset->size;
 }
 
+sub clone {
+  my $self = shift;
+  return unless my $clone = $self->SUPER::clone();
+  $clone->asset($self->asset);
+  return $clone;
+}
+
 sub get_body_chunk {
   my ($self, $offset) = @_;
 
@@ -125,6 +132,13 @@ Check if content contains a specific string.
   my $size = $content->body_size;
 
 Content size in bytes.
+
+=head2 C<clone>
+
+  my $clone = $content->clone;
+
+Clone content if possible.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<get_body_chunk>
 

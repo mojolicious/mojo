@@ -11,7 +11,7 @@ sub parse {
 
   # Walk tree
   my @cookies;
-  my $version = 1;
+  my $version = 0;
   for my $knot ($self->_tokenize($string)) {
     for my $token (@{$knot}) {
       my ($name, $value) = @{$token};

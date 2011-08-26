@@ -50,7 +50,7 @@ is $cookies->[1], undef, 'no more cookies';
 # Parse request cookies from multiple header values
 $cookie  = Mojo::Cookie::Request->new;
 $cookies = $cookie->parse(
-  '$Version=1; foo=bar; $Path="/test", $Version=2; baz=yada; $Path="/tset"');
+  '$Version=1; foo=bar; $Path="/test", $Version=0; baz=yada; $Path="/tset"');
 is $cookies->[0]->name,    'foo',   'right name';
 is $cookies->[0]->value,   'bar',   'right value';
 is $cookies->[0]->path,    '/test', 'right path';
@@ -58,7 +58,7 @@ is $cookies->[0]->version, '1',     'right version';
 is $cookies->[1]->name,    'baz',   'right name';
 is $cookies->[1]->value,   'yada',  'right value';
 is $cookies->[1]->path,    '/tset', 'right path';
-is $cookies->[1]->version, '2',     'right version';
+is $cookies->[1]->version, '0',     'right version';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse request cookie (Netscape)
@@ -66,7 +66,7 @@ $cookie  = Mojo::Cookie::Request->new;
 $cookies = $cookie->parse('CUSTOMER=WILE_E_COYOTE');
 is $cookies->[0]->name,    'CUSTOMER',      'right name';
 is $cookies->[0]->value,   'WILE_E_COYOTE', 'right value';
-is $cookies->[0]->version, '1',             'right version';
+is $cookies->[0]->version, '0',             'right version';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse multiple request cookies (Netscape)
@@ -75,10 +75,10 @@ $cookies =
   $cookie->parse('CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001');
 is $cookies->[0]->name,    'CUSTOMER',             'right name';
 is $cookies->[0]->value,   'WILE_E_COYOTE',        'right value';
-is $cookies->[0]->version, '1',                    'right version';
+is $cookies->[0]->version, '0',                    'right version';
 is $cookies->[1]->name,    'PART_NUMBER',          'right name';
 is $cookies->[1]->value,   'ROCKET_LAUNCHER_0001', 'right value';
-is $cookies->[1]->version, '1',                    'right version';
+is $cookies->[1]->version, '0',                    'right version';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse multiple request cookies from multiple header values (Netscape)
@@ -87,10 +87,10 @@ $cookies =
   $cookie->parse('CUSTOMER=WILE_E_COYOTE, PART_NUMBER=ROCKET_LAUNCHER_0001');
 is $cookies->[0]->name,    'CUSTOMER',             'right name';
 is $cookies->[0]->value,   'WILE_E_COYOTE',        'right value';
-is $cookies->[0]->version, '1',                    'right version';
+is $cookies->[0]->version, '0',                    'right version';
 is $cookies->[1]->name,    'PART_NUMBER',          'right name';
 is $cookies->[1]->value,   'ROCKET_LAUNCHER_0001', 'right value';
-is $cookies->[1]->version, '1',                    'right version';
+is $cookies->[1]->version, '0',                    'right version';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse request cookie without value

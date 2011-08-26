@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.92    2011-08-25 00:00:00
+1.92    2011-08-26 00:00:00
         - Improved documentation.
         - Fixed quoting bug in Mojo::Cookie.
 

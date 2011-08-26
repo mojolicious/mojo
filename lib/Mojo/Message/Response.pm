@@ -89,19 +89,16 @@ sub cookies {
   }
 
   # Set-Cookie2
+  my @cookies;
   my $headers = $self->headers;
-  my $cookies = [];
-  if (my $cookie2 = $headers->set_cookie2) {
-    push @$cookies, @{Mojo::Cookie::Response->parse($cookie2)};
-  }
+  push @cookies, @{Mojo::Cookie::Response->parse($_)}
+    for $headers->set_cookie2;
 
   # Set-Cookie
-  if (my $cookie = $headers->set_cookie) {
-    push @$cookies, @{Mojo::Cookie::Response->parse($cookie)};
-  }
+  push @cookies, @{Mojo::Cookie::Response->parse($_)}
+    for $headers->set_cookie;
 
-  # No cookies
-  return $cookies;
+  return \@cookies;
 }
 
 sub default_message { $MESSAGES{$_[1] || $_[0]->code || 404} || '' }

@@ -62,12 +62,10 @@ sub cookies {
   }
 
   # Cookie
-  if (my $cookie = $self->headers->cookie) {
-    return Mojo::Cookie::Request->parse($cookie);
-  }
-
-  # No cookies
-  return [];
+  my @cookies;
+  push @cookies, @{Mojo::Cookie::Request->parse($_)}
+    for $self->headers->cookie;
+  return \@cookies;
 }
 
 sub fix_headers {

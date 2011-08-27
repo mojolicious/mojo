@@ -19,7 +19,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 188;
+use Test::More tests => 196;
 
 use File::Spec;
 use File::Temp;
@@ -73,6 +73,56 @@ is $output, '<html>', 'expression tags trimmed';
 $mt     = Mojo::Template->new;
 $output = $mt->render('    <%= capture begin =%><html><%== end =%>    ');
 is $output, '<html>', 'expression tags trimmed';
+
+# Replace tag
+$mt     = Mojo::Template->new;
+$output = $mt->render('<%% 1 + 1 %>');
+is $output, "<% 1 + 1 %>\n", 'tag has been replaced';
+
+# Replace expression tag
+$mt     = Mojo::Template->new;
+$output = $mt->render('<%%= 1 + 1 %>');
+is $output, "<%= 1 + 1 %>\n", 'expression tag has been replaced';
+
+# Replace expression tag (alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(' lalala <%%= 1 + 1 %> 1234 ');
+is $output, " lalala <%= 1 + 1 %> 1234 \n",
+  'expression tag has been replaced';
+
+# Replace expression tag (another alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<EOF);
+lalala <%%= 1 +
+ 1 %> 12
+34
+EOF
+is $output, "lalala <%= 1 +\n 1 %> 12\n34\n",
+  'expression tag has been replaced';
+
+# Replace line
+$mt     = Mojo::Template->new;
+$output = $mt->render('%% my $foo = 23;');
+is $output, "% my \$foo = 23;\n", 'line has been replaced';
+
+# Replace expression line
+$mt     = Mojo::Template->new;
+$output = $mt->render('  %%= 1 + 1');
+is $output, "  %= 1 + 1\n", 'expression line has been replaced';
+
+# Replace expression line (alternative)
+$mt     = Mojo::Template->new;
+$output = $mt->render('%%= 1 + 1');
+is $output, "%= 1 + 1\n", 'expression line has been replaced';
+
+# Replace mixed
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+%% my $number = <%= 20 + 3%>;
+The number is <%%= $number %>.
+EOF
+is $output, "% my \$number = 23;\nThe number is <%= \$number %>.\n",
+  'mixed lines have been replaced';
 
 # Catched exception
 $mt     = Mojo::Template->new;

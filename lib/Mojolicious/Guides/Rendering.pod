@@ -59,10 +59,12 @@ set of special tags and line start characters.
   <%= Perl expression, replaced with XML escaped result %>
   <%== Perl expression, replaced with raw result %>
   <%# Comment, useful for debugging %>
+  <%% Replace with "<%" and keep parsing, useful for generating templates %>
   % Perl line
   %= Perl expression line, replaced with XML escaped result
   %== Perl expression line, replaced with raw result
   %# Comment line, useful for debugging
+  %% Replace with "%" and keep parsing, useful for generating templates
 
 The simplest form is used to insert raw Perl code.
 Tags and lines work pretty much the same, but depending on context one will

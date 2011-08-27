@@ -43,9 +43,6 @@ EOF
   $self->render_to_rel_file('static', "$name/public/index.html");
 
   # Layout and Templates
-  $self->renderer->line_start('%%');
-  $self->renderer->tag_start('<%%');
-  $self->renderer->tag_end('%%>');
   $self->render_to_rel_file('layout',
     "$name/templates/layouts/default.html.ep");
   $self->render_to_rel_file('welcome',
@@ -141,18 +138,18 @@ $t->get_ok('/welcome')->status_is(200)->content_like(qr/Mojolicious/i);
 
 @@ layout
 <!doctype html><html>
-  <head><title><%= title %></title></head>
-  <body><%= content %></body>
+  <head><title><%%= title %></title></head>
+  <body><%%= content %></body>
 </html>
 
 @@ welcome
-% layout 'default';
-% title 'Welcome';
-<h2><%= $message %></h2>
+%% layout 'default';
+%% title 'Welcome';
+<h2><%%= $message %></h2>
 This page was generated from the template
 "templates/example/welcome.html.ep" and the layout
 "templates/layouts/default.html.ep",
-<a href="<%== url_for %>">click here</a>
+<a href="<%%== url_for %>">click here</a>
 to reload the page or
 <a href="/index.html">here</a>
 to move forward to a static page.

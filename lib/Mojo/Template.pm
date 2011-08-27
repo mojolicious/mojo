@@ -21,6 +21,7 @@ has expression_mark => '=';
 has line_start      => '%';
 has name            => 'template';
 has namespace       => 'Mojo::Template::SandBox';
+has replace_mark    => '%';
 has tag_start       => '<%';
 has tag_end         => '%>';
 has template        => '';
@@ -196,25 +197,31 @@ sub interpret {
 # "I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T..."
 sub parse {
   my ($self, $tmpl) = @_;
-  $self->template($tmpl);
 
   # Clean start
+  $self->template($tmpl);
   delete $self->{tree};
 
-  # Tags
-  my $line_start    = quotemeta $self->line_start;
-  my $tag_start     = quotemeta $self->tag_start;
-  my $tag_end       = quotemeta $self->tag_end;
-  my $cmnt          = quotemeta $self->comment_mark;
-  my $escp          = quotemeta $self->escape_mark;
-  my $expr          = quotemeta $self->expression_mark;
-  my $trim          = quotemeta $self->trim_mark;
-  my $capture_start = quotemeta $self->capture_start;
-  my $capture_end   = quotemeta $self->capture_end;
+  # Token
+  my $raw_line_start = $self->line_start;
+  my $raw_tag_start  = $self->tag_start;
+  my $raw_replace    = $self->replace_mark;
+  my $line_start     = quotemeta $raw_line_start;
+  my $tag_start      = quotemeta $raw_tag_start;
+  my $tag_end        = quotemeta $self->tag_end;
+  my $cmnt           = quotemeta $self->comment_mark;
+  my $escp           = quotemeta $self->escape_mark;
+  my $expr           = quotemeta $self->expression_mark;
+  my $trim           = quotemeta $self->trim_mark;
+  my $capture_start  = quotemeta $self->capture_start;
+  my $capture_end    = quotemeta $self->capture_end;
+  my $replace        = quotemeta $raw_replace;
 
-  # Mixed
+  # Mixed line regex
   my $mixed_re = qr/
     (
+    $tag_start$replace                    # Replace
+    |
     $tag_start$expr$escp\s*$capture_end   # Escaped expression (end)
     |
     $tag_start$expr$escp                  # Escaped expression
@@ -243,28 +250,23 @@ sub parse {
 
   # Capture end regex
   my $capture_end_re = qr/
-    ^(
-    $tag_start        # Start
-    )
-    (?:
-    $expr             # Expression
-    )?
-    (?:
-    $escp             # Escaped expression
-    )?
+    ^
+    ($tag_start)      # Start
+    (?:$expr)?        # Expression
+    (?:$escp)?        # Escaped expression
     \s*$capture_end   # (end)
   /x;
 
   # Tag end regex
   my $end_re = qr/
-    ^(
-    $capture_start\s*$trim$tag_end   # Trim end (start)
-    )|(
-    $capture_start\s*$tag_end        # End (start)
-    )|(
-    $trim$tag_end                    # Trim end
-    )|
-    $tag_end                         # End
+    ^
+    ($capture_start\s*$trim$tag_end)   # Trim end (start)
+    |
+    ($capture_start\s*$tag_end)        # End (start)
+    |
+    ($trim$tag_end)                    # Trim end
+    |
+    $tag_end                           # End
     $
   /x;
 
@@ -281,6 +283,9 @@ sub parse {
     $
   /x;
 
+  # Replace line regex
+  my $replace_re = qr/^(\s*)$line_start$replace/;
+
   # Tokenize
   my $state = 'text';
   my @capture_token;
@@ -288,7 +293,7 @@ sub parse {
   for my $line (split /\n/, $tmpl) {
 
     # Perl line
-    if ($line =~ /$line_re/) {
+    if ($line !~ s/$replace_re/$1$raw_line_start/ && $line =~ $line_re) {
       my @token = ();
 
       # Capture end
@@ -316,19 +321,17 @@ sub parse {
       next;
     }
 
-    # Comment line, dummy token needed for line count
-    if ($line =~ /^\s*$line_start$cmnt(.+)?$/) {
-      next;
-    }
+    # Comment line
+    next if $line =~ /^\s*$line_start$cmnt(?:.+)?$/;
 
     # Escaped line ending
     if ($line =~ /(\\+)$/) {
       my $len = length $1;
 
-      # Newline escaped
+      # Escaped newline
       if ($len == 1) { $line =~ s/\\$// }
 
-      # Backslash escaped
+      # Escaped backslash
       if ($len >= 2) {
         $line =~ s/\\\\$/\\/;
         $line .= "\n";
@@ -350,16 +353,14 @@ sub parse {
         if $token =~ s/$capture_end_re/$1/;
 
       # End
-      if ($state ne 'text' && $token =~ /$end_re/) {
+      if ($state ne 'text' && $token =~ $end_re) {
 
         # Capture start
         splice @token, -2, 0, 'cpst', undef if $1 || $2;
 
-        # Trim previous text
+        # Trim current line
         if ($1 || $3) {
           $trimming = 1;
-
-          # Trim current line
           unless ($self->_trim_line(\@token, 4)) {
 
             # Trim previous lines
@@ -395,6 +396,9 @@ sub parse {
       # Value
       else {
 
+        # Replace
+        $token = $raw_tag_start if $token eq "$raw_tag_start$raw_replace";
+
         # Trimming
         if ($trimming) {
           if ($token =~ s/^(\s+)//) {
@@ -409,8 +413,6 @@ sub parse {
 
         # Comments are ignored
         next if $state eq 'cmnt';
-
-        # Store value
         push @token, @capture_token, $state, $token;
         @capture_token = ();
       }
@@ -571,10 +573,14 @@ like that.
   <%= Perl expression, replaced with result %>
   <%== Perl expression, replaced with XML escaped result %>
   <%# Comment, useful for debugging %>
+  <%% Replace with "<%" and keep parsing, useful for generating templates %>
   % Perl line
   %= Perl expression line, replaced with result
   %== Perl expression line, replaced with XML escaped result
   %# Comment line, useful for debugging
+  %% Replace with "%" and keep parsing, useful for generating templates
+
+=head2 Automatic Escaping
 
 Automatic escaping behavior can be reversed with the C<auto_escape>
 attribute, this is the default in L<Mojolicious> C<.ep> templates for
@@ -589,9 +595,13 @@ L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 
   <%= b('<div>excluded!</div>') %>
 
+=head2 Trimming
+
 Whitespace characters around tags can be trimmed with a special tag ending.
 
   <%= All whitespace characters around this expression will be trimmed =%>
+
+=head2 Blocks
 
 You can capture whole template blocks for reuse later with the C<begin> and
 C<end> keywords.
@@ -603,6 +613,8 @@ C<end> keywords.
   <%= $block->('Baerbel') %>
   <%= $block->('Wolfgang') %>
 
+=head2 Indenting
+
 Perl lines can also be indented freely.
 
   % my $block = begin
@@ -612,6 +624,8 @@ Perl lines can also be indented freely.
   %= $block->('Baerbel')
   %= $block->('Wolfgang')
 
+=head2 Arguments
+
 L<Mojo::Template> templates work just like Perl subs (actually they get
 compiled to a Perl sub internally).
 That means you can access arguments simply via C<@_>.
@@ -620,33 +634,26 @@ That means you can access arguments simply via C<@_>.
   % my $x = shift;
   test 123 <%= $foo %>
 
-Note that you can't escape L<Mojo::Template> tags, instead we just replace
-them if necessary.
+=head2 More Escaping
 
-  my $mt = Mojo::Template->new;
-  $mt->line_start('@@');
-  $mt->tag_start('[@@');
-  $mt->tag_end('@@]');
-  $mt->expression_mark('&');
-  $mt->escape_mark('&');
-  my $output = $mt->render(<<'EOF', 23);
-  @@ my $i = shift;
-  <% no code just text [@@&& $i @@]
-  EOF
+You can use escaped tags and lines to generate templates.
 
-There is only one case that we can escape with a backslash, and that's a
-newline at the end of a template line.
+  %% my $number = <%= 20 + 3 %>;
+  The number is <%%= $number %>
+
+A newline can be escaped with a backslash.
 
   This is <%= 23 * 3 %> a\
   single line
 
-If for some strange reason you absolutely need a backslash in front of a
-newline you can escape the backslash with another backslash.
+And a backslash in front of a newline can be escaped with another backslash.
 
   % use Data::Dumper;
   This will\\
   result <%=  Dumper {foo => 'bar'} %>\\
   in multiple lines
+
+=head2 Exceptions
 
 Templates get compiled to Perl code internally, this can make debugging a bit
 tricky.
@@ -659,6 +666,8 @@ to error messages with context.
   4: % my $i = 2; xx
   5: %= $i * 2
   6: </body>
+
+=head2 Caching
 
 L<Mojo::Template> does not support caching by itself, but you can easily
 build a wrapper around it.
@@ -786,6 +795,15 @@ Namespace used to compile templates, defaults to C<Mojo::Template::SandBox>.
   $mt      = $mt->prepend('my $self = shift;');
 
 Prepend Perl code to compiled template.
+
+=head2 C<replace_mark>
+
+  my $replace_mark = $mt->replace_mark;
+  $mt              = $mt->replace_mark('%');
+
+Character used for escaping the start of a tag or line, defaults to C<%>.
+
+  <%% my $foo = 23; %>
 
 =head2 C<tag_start>
 

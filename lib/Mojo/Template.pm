@@ -283,9 +283,6 @@ sub parse {
     $
   /x;
 
-  # Replace line regex
-  my $replace_re = qr/^(\s*)$line_start$replace/;
-
   # Tokenize
   my $state = 'text';
   my @capture_token;
@@ -293,36 +290,38 @@ sub parse {
   for my $line (split /\n/, $tmpl) {
 
     # Perl line
-    if ($line !~ s/$replace_re/$1$raw_line_start/ && $line =~ $line_re) {
-      my @token = ();
+    unless ($line =~ s/^(\s*)$line_start$replace/$1$raw_line_start/) {
+      if ($line =~ $line_re) {
+        my @token = ();
 
-      # Capture end
-      push @token, 'cpen', undef if $4;
+        # Capture end
+        push @token, 'cpen', undef if $4;
 
-      # Capture start
-      push @token, 'cpst', undef if $6;
+        # Capture start
+        push @token, 'cpst', undef if $6;
 
-      # Expression
-      if ($2) {
-        unshift @token, 'text', $1;
-        push @token, $3 ? 'escp' : 'expr', $5;
+        # Expression
+        if ($2) {
+          unshift @token, 'text', $1;
+          push @token, $3 ? 'escp' : 'expr', $5;
 
-        # Hint at end
-        push @token, 'text', '';
+          # Hint at end
+          push @token, 'text', '';
 
-        # Line ending
-        push @token, 'text', "\n";
+          # Line ending
+          push @token, 'text', "\n";
+        }
+
+        # Code
+        else { push @token, 'code', $5 }
+
+        push @{$self->tree}, \@token;
+        next;
       }
 
-      # Code
-      else { push @token, 'code', $5 }
-
-      push @{$self->tree}, \@token;
-      next;
+      # Comment line
+      elsif ($line =~ /^\s*$line_start$cmnt/) {next}
     }
-
-    # Comment line
-    next if $line =~ /^\s*$line_start$cmnt(?:.+)?$/;
 
     # Escaped line ending
     if ($line =~ /(\\+)$/) {

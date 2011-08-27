@@ -19,7 +19,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 196;
+use Test::More tests => 198;
 
 use File::Spec;
 use File::Temp;
@@ -100,6 +100,11 @@ EOF
 is $output, "lalala <%= 1 +\n 1 %> 12\n34\n",
   'expression tag has been replaced';
 
+# Replace comment tag
+$mt     = Mojo::Template->new;
+$output = $mt->render('<%%# 1 + 1 %>');
+is $output, "<%# 1 + 1 %>\n", 'comment tag has been replaced';
+
 # Replace line
 $mt     = Mojo::Template->new;
 $output = $mt->render('%% my $foo = 23;');
@@ -114,6 +119,11 @@ is $output, "  %= 1 + 1\n", 'expression line has been replaced';
 $mt     = Mojo::Template->new;
 $output = $mt->render('%%= 1 + 1');
 is $output, "%= 1 + 1\n", 'expression line has been replaced';
+
+# Replace comment line
+$mt     = Mojo::Template->new;
+$output = $mt->render('  %%# 1 + 1');
+is $output, "  %# 1 + 1\n", 'comment line has been replaced';
 
 # Replace mixed
 $mt     = Mojo::Template->new;

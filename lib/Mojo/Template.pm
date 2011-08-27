@@ -203,124 +203,67 @@ sub parse {
   delete $self->{tree};
 
   # Token
-  my $raw_line_start = $self->line_start;
-  my $raw_tag_start  = $self->tag_start;
-  my $raw_replace    = $self->replace_mark;
-  my $line_start     = quotemeta $raw_line_start;
-  my $tag_start      = quotemeta $raw_tag_start;
-  my $tag_end        = quotemeta $self->tag_end;
-  my $cmnt           = quotemeta $self->comment_mark;
-  my $escp           = quotemeta $self->escape_mark;
-  my $expr           = quotemeta $self->expression_mark;
-  my $trim           = quotemeta $self->trim_mark;
-  my $capture_start  = quotemeta $self->capture_start;
-  my $capture_end    = quotemeta $self->capture_end;
-  my $replace        = quotemeta $raw_replace;
+  my $raw_start     = $self->line_start;
+  my $raw_tag_start = $self->tag_start;
+  my $raw_tag_end   = $self->tag_end;
+  my $raw_expr      = $self->expression_mark;
+  my $raw_trim      = $self->trim_mark;
+  my $raw_replace   = $self->replace_mark;
+  my $start         = quotemeta $raw_start;
+  my $tag_start     = quotemeta $raw_tag_start;
+  my $tag_end       = quotemeta $raw_tag_end;
+  my $cmnt          = quotemeta $self->comment_mark;
+  my $escp          = quotemeta $self->escape_mark;
+  my $expr          = quotemeta $raw_expr;
+  my $trim          = quotemeta $raw_trim;
+  my $cpst          = quotemeta $self->capture_start;
+  my $cpen          = quotemeta $self->capture_end;
+  my $replace       = quotemeta $raw_replace;
 
   # Mixed line regex
   my $mixed_re = qr/
     (
-    $tag_start$replace                    # Replace
+    $tag_start$replace             # Replace
     |
-    $tag_start$expr$escp\s*$capture_end   # Escaped expression (end)
+    $tag_start$expr$escp\s*$cpen   # Escaped expression (end)
     |
-    $tag_start$expr$escp                  # Escaped expression
+    $tag_start$expr$escp           # Escaped expression
     |
-    $tag_start$expr\s*$capture_end        # Expression (end)
+    $tag_start$expr\s*$cpen        # Expression (end)
     |
-    $tag_start$expr                       # Expression
+    $tag_start$expr                # Expression
     |
-    $tag_start$cmnt\s*$capture_end        # Comment (end)
+    $tag_start$cmnt\s*$cpen        # Comment (end)
     |
-    $tag_start$cmnt                       # Comment
+    $tag_start$cmnt                # Comment
     |
-    $tag_start\s*$capture_end             # Code (end)
+    $tag_start\s*$cpen             # Code (end)
     |
-    $tag_start                            # Code
+    $tag_start                     # Code
     |
-    $capture_start\s*$trim$tag_end        # Trim end (start)
+    $cpst\s*$trim$tag_end          # Trim end (start)
     |
-    $trim$tag_end                         # Trim end
+    $trim$tag_end                  # Trim end
     |
-    $capture_start\s*$tag_end             # End (start)
+    $cpst\s*$tag_end               # End (start)
     |
-    $tag_end                              # End
+    $tag_end                       # End
     )
   /x;
 
-  # Capture end regex
-  my $capture_end_re = qr/
-    ^
-    ($tag_start)      # Start
-    (?:$expr)?        # Expression
-    (?:$escp)?        # Escaped expression
-    \s*$capture_end   # (end)
-  /x;
-
-  # Tag end regex
-  my $end_re = qr/
-    ^
-    ($capture_start\s*$trim$tag_end)   # Trim end (start)
-    |
-    ($capture_start\s*$tag_end)        # End (start)
-    |
-    ($trim$tag_end)                    # Trim end
-    |
-    $tag_end                           # End
-    $
-  /x;
-
-  # Perl line regex
-  my $line_re = qr/
-    ^
-    (\s*)
-    $line_start            # Line start
-    ($expr)?               # Expression
-    ($escp)?               # Escaped expression
-    (\s*$capture_end)?     # End
-    ([^\#\>]{1}.*?)?       # Code
-    ($capture_start\s*)?   # Start
-    $
-  /x;
-
-  # Tokenize
+  # Split lines
   my $state = 'text';
   my @capture_token;
   my $trimming = 0;
   for my $line (split /\n/, $tmpl) {
+    $trimming = 0 if $state eq 'text';
 
     # Perl line
-    unless ($line =~ s/^(\s*)$line_start$replace/$1$raw_line_start/) {
-      if ($line =~ $line_re) {
-        my @token = ();
-
-        # Capture end
-        push @token, 'cpen', undef if $4;
-
-        # Capture start
-        push @token, 'cpst', undef if $6;
-
-        # Expression
-        if ($2) {
-          unshift @token, 'text', $1;
-          push @token, $3 ? 'escp' : 'expr', $5;
-
-          # Hint at end
-          push @token, 'text', '';
-
-          # Line ending
-          push @token, 'text', "\n";
-        }
-
-        # Code
-        else { push @token, 'code', $5 }
-
-        push @{$self->tree}, \@token;
-        next;
+    if ($state eq 'text' && $line !~ s/^(\s*)$start$replace/$1$raw_start/) {
+      if ($state eq 'text' && $line =~ s/^(\s*)$start($expr)?(.*)$//) {
+        $line = $2 ? "$1$raw_tag_start$2$3 " : "$raw_tag_start$3 $raw_trim";
+        $line .= $raw_tag_end;
       }
-
-      # Comment line
-      elsif ($line =~ /^\s*$line_start$cmnt/) {next}
     }
 
     # Escaped line ending
@@ -340,54 +283,39 @@ sub parse {
     # Normal line ending
     else { $line .= "\n" }
 
-    # Mixed line
+    # Tokenize
     my @token;
     for my $token (split /$mixed_re/, $line) {
 
-      # Done trimming
-      $trimming = 0 if $trimming && $state ne 'text';
-
       # Capture end
       @capture_token = ('cpen', undef)
-        if $token =~ s/$capture_end_re/$1/;
+        if $token =~ s/^($tag_start)(?:$expr)?(?:$escp)?\s*$cpen/$1/;
 
       # End
-      if ($state ne 'text' && $token =~ $end_re) {
+      if ($state ne 'text' && $token =~ /^(?:($cpst)\s*)?($trim)?$tag_end$/) {
+        $state = 'text';
 
         # Capture start
-        splice @token, -2, 0, 'cpst', undef if $1 || $2;
+        splice @token, -2, 0, 'cpst', undef if $1;
 
-        # Trim current line
-        if ($1 || $3) {
+        # Trim previous text
+        if ($2) {
           $trimming = 1;
-          unless ($self->_trim_line(\@token, 4)) {
-
-            # Trim previous lines
-            for my $l (reverse @{$self->tree}) {
-              last if $self->_trim_line($l);
-            }
-          }
+          $self->_trim(\@token);
         }
 
         # Hint at end
         push @token, 'text', '';
-
-        # Back to business as usual
-        $state = 'text';
       }
 
       # Code
       elsif ($token =~ /^$tag_start$/) { $state = 'code' }
 
       # Expression
-      elsif ($token =~ /^$tag_start$expr$/) {
-        $state = 'expr';
-      }
+      elsif ($token =~ /^$tag_start$expr$/) { $state = 'expr' }
 
       # Expression that needs to be escaped
-      elsif ($token =~ /^$tag_start$expr$escp$/) {
-        $state = 'escp';
-      }
+      elsif ($token =~ /^$tag_start$expr$escp$/) { $state = 'escp' }
 
       # Comment
       elsif ($token =~ /^$tag_start$cmnt$/) { $state = 'cmnt' }
@@ -398,16 +326,10 @@ sub parse {
         # Replace
         $token = $raw_tag_start if $token eq "$raw_tag_start$raw_replace";
 
-        # Trimming
-        if ($trimming) {
-          if ($token =~ s/^(\s+)//) {
-
-            # Convert whitespace text to line noise
-            push @token, 'code', $1;
-
-            # Done with trimming
-            $trimming = 0 if length $token;
-          }
+        # Convert whitespace text to line noise
+        if ($trimming && $token =~ s/^(\s+)//) {
+          push @token, 'code', $1;
+          $trimming = 0;
         }
 
         # Comments are ignored
@@ -484,35 +406,28 @@ sub render_to_file {
   return $self->_write_file($path, $output);
 }
 
-sub _trim_line {
-  my ($self, $line, $offset) = @_;
+sub _trim {
+  my ($self, $line) = @_;
 
   # Walk line backwards
-  $offset ||= 2;
-  for (my $j = @$line - $offset; $j >= 0; $j -= 2) {
+  for (my $j = @$line - 4; $j >= 0; $j -= 2) {
 
     # Skip capture
     next if $line->[$j] eq 'cpst' || $line->[$j] eq 'cpen';
 
     # Only trim text
-    return 1 unless $line->[$j] eq 'text';
+    return unless $line->[$j] eq 'text';
 
-    # Trim
+    # Convert whitespace text to line noise
     my $value = $line->[$j + 1];
     if ($line->[$j + 1] =~ s/(\s+)$//) {
-
-      # Value
       $value = $line->[$j + 1];
-
-      # Convert whitespace text to line noise
       splice @$line, $j, 0, 'code', $1;
     }
 
     # Text left
-    return 1 if length $value;
+    return if length $value;
   }
-
-  return;
 }
 
 sub _write_file {

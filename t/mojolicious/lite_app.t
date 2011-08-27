@@ -1222,27 +1222,28 @@ $t->post_ok('/with/body/and/headers/desc', {with => 'header'}, 'body', 'desc')
 $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("This\nseems\nto\nHello    world!\n\nwork!\n");
+  ->content_is("This\n\nseems\nto\nHello    world!\n\nwork!\n");
 
 # GET /template_inheritance
 $t->get_ok('/template_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
-  "<title>Works!</title>\n<br>Sidebar!Hello World!\nDefault footer!");
+  "<title>Works!</title>\n<br>\nSidebar!\nHello World!\n\nDefault footer!\n");
 
 # GET /layout_without_inheritance
 $t->get_ok('/layout_without_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
-  "<title></title>\nDefault header!Default sidebar!Default footer!");
+  "<title></title>\nDefault header!\nDefault sidebar!\n\nDefault footer!\n");
 
 # GET /double_inheritance
 $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("<title>Works!</title>\n<br>Sidebar too!Default footer!");
+  ->content_is(
+  "<title>Works!</title>\n<br>\nSidebar too!\n\nDefault footer!\n");
 
 # GET /plugin_with_template
 $t->get_ok('/plugin_with_template')->status_is(200)
@@ -1326,7 +1327,7 @@ $t->post_ok('/template')->status_is(200)
 $t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/\d+a\d+b\d+c\d+d\d+e\d+/);
+  ->content_like(qr/\d+a\d+b\d+c\d+\nd\d+\ne\d+/);
 my $memorized = $t->tx->res->body;
 
 # GET /memorized
@@ -1344,7 +1345,7 @@ sleep 2;
 $t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/\d+a\d+b\d+c\d+d\d+e\d+/)->content_isnt($memorized);
+  ->content_like(qr/\d+a\d+b\d+c\d+\nd\d+\ne\d+/)->content_isnt($memorized);
 
 # GET /something
 $t->get_ok('/something')->status_is(200)

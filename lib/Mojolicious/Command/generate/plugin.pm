@@ -48,13 +48,13 @@ sub register {
 }
 
 1;
-<%%>__END__
+<% %>__END__
 
-<%%>=head1 NAME
+<% %>=head1 NAME
 
 <%= $class %> - Mojolicious Plugin
 
-<%%>=head1 SYNOPSIS
+<% %>=head1 SYNOPSIS
 
   # Mojolicious
   $self->plugin('<%= $name %>');
@@ -62,26 +62,26 @@ sub register {
   # Mojolicious::Lite
   plugin '<%= $name %>';
 
-<%%>=head1 DESCRIPTION
+<% %>=head1 DESCRIPTION
 
 L<<%= $class %>> is a L<Mojolicious> plugin.
 
-<%%>=head1 METHODS
+<% %>=head1 METHODS
 
 L<<%= $class %>> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
-<%%>=head2 C<register>
+<% %>=head2 C<register>
 
   $plugin->register;
 
 Register plugin in L<Mojolicious> application.
 
-<%%>=head1 SEE ALSO
+<% %>=head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
-<%%>=cut
+<% %>=cut
 
 @@ test
 % my $name = shift;
@@ -116,7 +116,7 @@ WriteMakefile(
   NAME         => '<%= $class %>',
   VERSION_FROM => 'lib/<%= $path %>',
   AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-  PREREQ_PM    => {'Mojolicious' => '1.80'},
+  PREREQ_PM    => {'Mojolicious' => '1.90'},
   test         => {TESTS => 't/*.t'}
 );
 

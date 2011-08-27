@@ -13,9 +13,6 @@ EOF
 sub run {
   my ($self, $name) = @_;
   $name ||= 'myapp.pl';
-  $self->renderer->line_start('%%');
-  $self->renderer->tag_start('<%%');
-  $self->renderer->tag_end('%%>');
   $self->render_to_rel_file('liteapp', $name);
   $self->chmod_file($name, 0744);
 }
@@ -24,7 +21,7 @@ sub run {
 __DATA__
 
 @@ liteapp
-%% my $class = shift;
+% my $class = shift;
 #!/usr/bin/env perl
 use Mojolicious::Lite;
 
@@ -37,17 +34,17 @@ get '/welcome' => sub {
 };
 
 app->start;
-<%%%%>__DATA__
+<% %>__DATA__
 
-<%%%%>@@ index.html.ep
-% layout 'default';
-% title 'Welcome';
+<% %>@@ index.html.ep
+%% layout 'default';
+%% title 'Welcome';
 Welcome to Mojolicious!
 
-<%%%%>@@ layouts/default.html.ep
+<% %>@@ layouts/default.html.ep
 <!doctype html><html>
-  <head><title><%= title %></title></head>
-  <body><%= content %></body>
+  <head><title><%%= title %></title></head>
+  <body><%%= content %></body>
 </html>
 
 __END__

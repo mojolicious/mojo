@@ -220,8 +220,8 @@ sub parse {
   my $cpen          = quotemeta $self->capture_end;
   my $replace       = quotemeta $raw_replace;
 
-  # Mixed line regex
-  my $mixed_re = qr/
+  # Token regex
+  my $token_re = qr/
     (
     $tag_start$replace             # Replace
     |
@@ -285,7 +285,7 @@ sub parse {
 
     # Tokenize
     my @token;
-    for my $token (split /$mixed_re/, $line) {
+    for my $token (split /$token_re/, $line) {
 
       # Capture end
       @capture_token = ('cpen', undef)

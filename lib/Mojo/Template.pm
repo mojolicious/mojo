@@ -573,12 +573,12 @@ like that.
   <%= Perl expression, replaced with result %>
   <%== Perl expression, replaced with XML escaped result %>
   <%# Comment, useful for debugging %>
-  <%% Replace with "<%" and keep parsing, useful for generating templates %>
+  <%% Replaced with "<%", useful for generating templates %>
   % Perl line
   %= Perl expression line, replaced with result
   %== Perl expression line, replaced with XML escaped result
   %# Comment line, useful for debugging
-  %% Replace with "%" and keep parsing, useful for generating templates
+  %% Replaced with "%", useful for generating templates
 
 =head2 Automatic Escaping
 

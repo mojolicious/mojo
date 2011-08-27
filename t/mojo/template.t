@@ -119,7 +119,7 @@ is $output, "%= 1 + 1\n", 'expression line has been replaced';
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 %% my $number = <%= 20 + 3%>;
-The number is <%%= $number %>.
+The number is <%%= <%= '$' %>number %>.
 EOF
 is $output, "% my \$number = 23;\nThe number is <%= \$number %>.\n",
   'mixed lines have been replaced';

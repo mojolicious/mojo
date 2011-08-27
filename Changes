@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.93    2011-08-26 00:00:00
+1.93    2011-08-27 00:00:00
         - Added EXPERIMENTAL support for escaped tags to Mojo::Template.
         - Improved documentation.
         - Fixed trimming bug in Mojo::Template.

@@ -87,8 +87,9 @@ sub list_files {
   my @files;
   find {
     wanted => sub {
-      push @files, join '/',
+      my @parts =
         File::Spec->splitdir(File::Spec->abs2rel($File::Find::name, $dir));
+      push @files, join '/', @parts unless $parts[-1] =~ /^\./;
     },
     no_chdir => 1
   }, $dir;

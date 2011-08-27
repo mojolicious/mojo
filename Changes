@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+1.95    2011-08-27 00:00:00
+        - Fixed typos.
+
 1.94    2011-08-27 00:00:00
         - Fixed lite_app and plugin generators.
         - Fixed typos.

@@ -260,20 +260,20 @@ sub parse {
 
     # Perl line
     if ($state eq 'text' && $line !~ s/^(\s*)$start$replace/$1$raw_start/) {
-      if ($state eq 'text' && $line =~ s/^(\s*)$start($expr)?(.*)$//) {
-        $line = $2 ? "$1$raw_tag_start$2$3 " : "$raw_tag_start$3 $raw_trim";
-        $line .= $raw_tag_end;
-      }
+      $line =~ s/^(\s*)$start($expr)?// and $line =
+        $2
+        ? "$1$raw_tag_start$2$line $raw_tag_end"
+        : "$raw_tag_start$line $raw_trim$raw_tag_end";
     }
 
     # Escaped line ending
     if ($line =~ /(\\+)$/) {
       my $len = length $1;
 
-      # Escaped newline
+      # Newline
       if ($len == 1) { $line =~ s/\\$// }
 
-      # Escaped backslash
+      # Backslash
       if ($len >= 2) {
         $line =~ s/\\\\$/\\/;
         $line .= "\n";

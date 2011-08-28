@@ -447,7 +447,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Template - Perlish Templates!
+Mojo::Template - Perl-ish Templates!
 
 =head1 SYNOPSIS
 
@@ -483,27 +483,24 @@ projects.
 Like preprocessing a config file, generating text from heredocs and stuff
 like that.
 
-  <% Inline Perl %>
+  <% Perl code %>
   <%= Perl expression, replaced with result %>
   <%== Perl expression, replaced with XML escaped result %>
   <%# Comment, useful for debugging %>
   <%% Replaced with "<%", useful for generating templates %>
-  % Perl line
-  %= Perl expression line, replaced with result
-  %== Perl expression line, replaced with XML escaped result
-  %# Comment line, useful for debugging
+  % Perl code line, treated as "<% line =%>"
+  %= Perl expression line, treated as "<%= line %>"
+  %== Perl expression line, treated as "<%== line %>"
+  %# Comment line, treated as "<%# line =%>"
   %% Replaced with "%", useful for generating templates
 
 =head2 Automatic Escaping
 
-Automatic escaping behavior can be reversed with the C<auto_escape>
-attribute, this is the default in L<Mojolicious> C<.ep> templates for
-example.
+Escaping behavior can be reversed with the C<auto_escape> attribute, this is
+the default in L<Mojolicious> C<.ep> templates for example.
 
   <%= Perl expression, replaced with XML escaped result %>
   <%== Perl expression, replaced with result %>
-  %= Perl expression line, replaced with XML escaped result
-  %== Perl expression line, replaced with result
 
 L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 
@@ -527,7 +524,7 @@ C<end> keywords.
   <%= $block->('Baerbel') %>
   <%= $block->('Wolfgang') %>
 
-=head2 Indenting
+=head2 Indentation
 
 Perl lines can also be indented freely.
 

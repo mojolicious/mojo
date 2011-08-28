@@ -98,7 +98,7 @@ Transparent CGI, FastCGI and PSGI support out of the box.
 
 =item L<Mojo::Template>
 
-Very perlish and minimalistic template system.
+Very Perl-ish and minimalistic template system.
 
 =item L<Mojo::ByteStream>
 

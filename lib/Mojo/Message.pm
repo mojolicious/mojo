@@ -837,13 +837,13 @@ Render whole message.
   my $upload  = $message->upload('foo');
   my @uploads = $message->upload('foo');
 
-Access file uploads, usually L<Mojo::Upload> objects.
+Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 
 =head2 C<uploads>
 
   my $uploads = $message->uploads;
 
-All file uploads, usually L<Mojo::Upload> objects.
+All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 
 =head2 C<version>
 

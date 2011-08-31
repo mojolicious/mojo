@@ -685,8 +685,7 @@ An C<E> element whose attributes match all following attribute selectors.
 
 =head2 C<E $F G>
 
-An C<F> element descendant of an C<E> element and ancestor of an C<G>
-element.
+An C<F> element descendant of an C<E> element and ancestor of a C<G> element.
 
   my $wrappers = $css->select('$div.wrapper > :checked');
 

@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.95';
+our $VERSION  = '1.96';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -815,7 +815,7 @@ L<http://creativecommons.org/licenses/by-sa/3.0>.
 
 =head2 jQuery
 
-  Version 1.6.2
+  Version 1.6.3
 
 jQuery is a fast and concise JavaScript Library that simplifies HTML document
 traversing, event handling, animating, and Ajax interactions for rapid web

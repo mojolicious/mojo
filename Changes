@@ -1,9 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.95    2011-09-01 00:00:00
-        - Improved cookie generation slightly.
+        - Improved cookie generation slightly. (cosimo, sri)
         - Improved documentation.
-        - Fixed typos.
+        - Fixed typos. (akron)
 
 1.94    2011-08-27 00:00:00
         - Fixed lite_app and plugin generators.

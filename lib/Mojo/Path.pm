@@ -199,7 +199,7 @@ Parse path.
 
   my $string = $path->to_abs_string;
 
-Turn path into absolute string.
+Turn path into an absolute string.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<to_string>

@@ -51,9 +51,6 @@ sub new {
   # Start from scratch
   else { $self = $class->SUPER::new(@_) }
 
-  # Ignore PIPE signal
-  $SIG{PIPE} = 'IGNORE';
-
   return $self;
 }
 

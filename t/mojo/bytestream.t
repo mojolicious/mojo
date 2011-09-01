@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'Perl 5.10 or Digest::SHA required for this test!'
   unless eval { require Digest::SHA; 1 };
-plan tests => 139;
+plan tests => 141;
 
 use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
@@ -105,10 +105,14 @@ is $stream->qp_decode, "foo\x{99}bar$%^&3217", 'right qp decoded result';
 # quote
 $stream = b('foo; 23 "bar');
 is $stream->quote, '"foo; 23 \"bar"', 'right quoted result';
+$stream = b('"foo; 23 "bar"');
+is $stream->quote, '"\"foo; 23 \"bar\""', 'right quoted result';
 
 # unquote
 $stream = b('"foo 23 \"bar"');
 is $stream->unquote, 'foo 23 "bar', 'right unquoted result';
+$stream = b('"\"foo 23 \"bar\""');
+is $stream->unquote, '"foo 23 "bar"', 'right unquoted result';
 
 # md5_bytes
 $original = 'foo bar baz ♥';

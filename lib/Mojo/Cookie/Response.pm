@@ -2,7 +2,7 @@ package Mojo::Cookie::Response;
 use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Date;
-use Mojo::Util 'unquote';
+use Mojo::Util qw/quote unquote/;
 
 has [qw/comment domain httponly max_age port secure/];
 
@@ -51,8 +51,6 @@ sub parse {
   for my $knot ($self->_tokenize($string)) {
     for my $i (0 .. $#{$knot}) {
       my ($name, $value) = @{$knot->[$i]};
-
-      # Value might be quoted
       unquote $value if $value;
 
       # This will only run once
@@ -86,7 +84,11 @@ sub to_string {
   return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
-  $cookie .= defined $value ? "=$value" : '=';
+  if (defined $value) {
+    quote $value if $value =~ /[,;"]/;
+    $cookie .= "=$value";
+  }
+  else { $cookie .= '=' }
   $cookie .= sprintf "; Version=%d", ($self->version || 1);
 
   # Domain

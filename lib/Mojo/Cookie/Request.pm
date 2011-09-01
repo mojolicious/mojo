@@ -1,7 +1,7 @@
 package Mojo::Cookie::Request;
 use Mojo::Base 'Mojo::Cookie';
 
-use Mojo::Util 'unquote';
+use Mojo::Util qw/quote unquote/;
 
 # "Lisa, would you like a donut?
 #  No thanks. Do you have any fruit?
@@ -15,8 +15,6 @@ sub parse {
   for my $knot ($self->_tokenize($string)) {
     for my $token (@{$knot}) {
       my ($name, $value) = @{$token};
-
-      # Value might be quoted
       unquote $value if $value;
 
       # Path
@@ -29,7 +27,6 @@ sub parse {
       else {
         push @cookies, Mojo::Cookie::Request->new;
         $cookies[-1]->name($name);
-        unquote $value if $value;
         $value = '' unless defined $value;
         $cookies[-1]->value($value);
         $cookies[-1]->version($version);
@@ -53,7 +50,11 @@ sub to_string {
   return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
-  $cookie .= defined $value ? "=$value" : '=';
+  if (defined $value) {
+    quote $value if $value =~ /[,;"]/;
+    $cookie .= "=$value";
+  }
+  else { $cookie .= '=' }
   if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
   return $cookie;

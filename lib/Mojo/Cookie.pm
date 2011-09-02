@@ -47,7 +47,7 @@ sub _tokenize {
       my $name = $1;
 
       # "expires" is a special case, thank you Netscape...
-      $string =~ s/^([^\;\,]+\,?[^\;\,]+)/"$1"/ if $name =~ /expires/i;
+      $string =~ s/^([^\;\,]+\,?[^\;\,]+)/"$1"/ if $name =~ /^expires$/i;
 
       # Value
       my $value;

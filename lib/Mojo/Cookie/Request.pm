@@ -1,7 +1,7 @@
 package Mojo::Cookie::Request;
 use Mojo::Base 'Mojo::Cookie';
 
-use Mojo::Util qw/quote unquote/;
+use Mojo::Util 'quote';
 
 # "Lisa, would you like a donut?
 #  No thanks. Do you have any fruit?
@@ -15,7 +15,6 @@ sub parse {
   for my $knot ($self->_tokenize($string)) {
     for my $token (@{$knot}) {
       my ($name, $value) = @{$token};
-      unquote $value if $value;
 
       # Path
       if ($name =~ /^\$Path$/i) { $cookies[-1]->path($value) }
@@ -46,7 +45,6 @@ sub prefix {
 sub to_string {
   my $self = shift;
 
-  # Render
   return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
@@ -61,9 +59,7 @@ sub to_string {
 }
 
 sub to_string_with_prefix {
-  my $self = shift;
-
-  # Render with prefix
+  my $self   = shift;
   my $prefix = $self->prefix;
   my $cookie = $self->to_string;
   return "$prefix; $cookie";

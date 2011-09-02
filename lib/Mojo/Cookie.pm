@@ -6,12 +6,12 @@ use overload
   fallback => 1;
 
 use Carp 'croak';
+use Mojo::Util 'unquote';
 
 has [qw/name path value version/];
 
 # Regex
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
-my $EXPIRES_RE          = qr/^([^\;\,]+\,?[^\;\,]+)\s*/;
 my $NAME_RE             = qr/
   ^\s*
   ([^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace
@@ -45,21 +45,22 @@ sub _tokenize {
     # Name
     if ($string =~ s/$NAME_RE//o) {
       my $name = $1;
-      my $value;
 
       # "expires" is a special case, thank you Netscape...
-      if ($name =~ /expires/i && $string =~ s/$EXPIRES_RE//o) { $value = $1 }
+      $string =~ s/^([^\;\,]+\,?[^\;\,]+)/"$1"/ if $name =~ /expires/i;
 
       # Value
-      elsif ($string =~ s/$VALUE_RE//o) { $value = $1 }
+      my $value;
+      if ($string =~ s/$VALUE_RE//o) {
+        $value = $1;
+        unquote $value;
+      }
 
       # Token
       push @token, [$name, $value];
 
       # Separator
       $string =~ s/$SEPARATOR_RE//o;
-
-      # Cookie separator
       if ($string =~ s/$COOKIE_SEPARATOR_RE//o) {
         push @tree, [@token];
         @token = ();

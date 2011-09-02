@@ -2,24 +2,13 @@ package Mojo::Cookie::Response;
 use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Date;
-use Mojo::Util qw/quote unquote/;
+use Mojo::Util 'quote';
 
 has [qw/comment domain httponly max_age port secure/];
 
 # Regex
-my $FIELD_RE = qr/
-  (
-    Comment
-  | Domain
-  | expires
-  | HttpOnly   # IE6 FF3 Opera 9.5
-  | Max-Age
-  | Path
-  | Port
-  | Secure
-  | Version
-  )
-/xmsi;
+my $FIELD_RE =
+  qr/(Comment|Domain|expires|HttpOnly|Max-Age|Path|Port|Secure|Version)/msi;
 my $FLAG_RE = qr/(?:Secure|HttpOnly)/i;
 
 sub expires {
@@ -31,9 +20,8 @@ sub expires {
     return $self;
   }
 
-  return unless defined $self->{expires};
-
   # Upgrade
+  return unless defined $self->{expires};
   $self->{expires} = Mojo::Date->new($self->{expires})
     unless ref $self->{expires};
 
@@ -51,7 +39,6 @@ sub parse {
   for my $knot ($self->_tokenize($string)) {
     for my $i (0 .. $#{$knot}) {
       my ($name, $value) = @{$knot->[$i]};
-      unquote $value if $value;
 
       # This will only run once
       if (not $i) {
@@ -98,14 +85,10 @@ sub to_string {
   if (my $path = $self->path) { $cookie .= "; Path=$path" }
 
   # Max-Age
-  if (defined(my $max_age = $self->max_age)) {
-    $cookie .= "; Max-Age=$max_age";
-  }
+  if (defined(my $m = $self->max_age)) { $cookie .= "; Max-Age=$m" }
 
   # Expires
-  if (defined(my $expires = $self->expires)) {
-    $cookie .= "; expires=$expires";
-  }
+  if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
 
   # Port
   if (my $port = $self->port) { $cookie .= qq/; Port="$port"/ }

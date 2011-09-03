@@ -139,7 +139,7 @@ sub run {
 
   # Error
   my ($message, $code) = $tx->error;
-  utf8::encode $url if utf8::is_utf8 $url;
+  utf8::encode $url;
   warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
   # Charset

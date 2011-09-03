@@ -96,7 +96,7 @@ sub parse {
 
   # Decode
   my $charset = $self->charset;
-  decode $charset, $html if $charset && !utf8::is_utf8 $html;
+  decode $charset, $html if $charset;
 
   # Tokenize
   my $tree    = ['root'];

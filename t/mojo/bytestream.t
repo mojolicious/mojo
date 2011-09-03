@@ -60,7 +60,7 @@ $stream = b("Zm9vYmFyJCVeJjMyMTc=\n");
 is $stream->b64_decode, 'foobar$%^&3217', 'right base64 decoded result';
 
 # utf8 b64_encode
-$stream = b("foo\x{df}\x{0100}bar%23\x{263a}")->b64_encode;
+$stream = b("foo\x{df}\x{0100}bar%23\x{263a}")->encode->b64_encode;
 is "$stream", "Zm9vw5/EgGJhciUyM+KYug==\n", 'right base64 encoded result';
 
 # utf8 b64_decode
@@ -87,7 +87,7 @@ $stream = b('business%3B23');
 is $stream->url_unescape, 'business;23', 'right url unescaped result';
 
 # utf8 url_escape
-$stream = b("foo\x{df}\x{0100}bar\x{263a}")->url_escape;
+$stream = b("foo\x{df}\x{0100}bar\x{263a}")->encode->url_escape;
 is "$stream", 'foo%C3%9F%C4%80bar%E2%98%BA', 'right url escaped result';
 
 # utf8 url_unescape
@@ -115,7 +115,7 @@ $stream = b('"\"foo 23 \"bar\""');
 is $stream->unquote, '"foo 23 "bar"', 'right unquoted result';
 
 # md5_bytes
-$original = 'foo bar baz ♥';
+$original = b('foo bar baz ♥')->encode->to_string;
 my $copy = $original;
 $stream = b($copy);
 is unpack('H*', $stream->md5_bytes), "a740aeb6e066f158cbf19fd92e890d2d",

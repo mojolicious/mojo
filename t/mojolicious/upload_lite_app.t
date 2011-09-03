@@ -101,7 +101,7 @@ post '/uploadlimit' => sub {
   $self->res->body("called, $body");
   return if $self->req->is_limit_exceeded;
   if (my $u = $self->req->upload('Вячеслав')) {
-    $self->res->body($self->res->body . $u->filename . $u->size);
+    $self->res->body($self->res->body . b($u->filename)->encode . $u->size);
   }
 };
 
@@ -175,7 +175,7 @@ $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
 $tx                         = Mojo::Transaction::HTTP->new;
 $part                       = Mojo::Content::Single->new;
-$name                       = b('Вячеслав')->url_escape;
+$name                       = b('Вячеслав')->encode->url_escape;
 $part->headers->content_disposition(
   qq/form-data; name="$name"; filename="$name.jpg"/);
 $part->headers->content_type('image/jpeg');

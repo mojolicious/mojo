@@ -139,7 +139,6 @@ sub quote {
 sub say {
   my ($self, $handle) = @_;
   $handle ||= \*STDOUT;
-  utf8::encode $$self if utf8::is_utf8 $$self;
   print $handle "$$self\n";
 }
 

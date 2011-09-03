@@ -35,8 +35,7 @@ sub fatal { shift->log('fatal', @_) }
 
 sub format {
   my ($self, $level, @msgs) = @_;
-  my $msgs = join "\n",
-    map { utf8::decode $_ unless utf8::is_utf8 $_; $_ } @msgs;
+  my $msgs = join "\n", @msgs;
   return '[' . localtime(time) . "] [$level] $msgs\n";
 }
 

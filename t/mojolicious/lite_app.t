@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 890;
+use Test::More tests => 893;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -64,8 +64,8 @@ get '/☃' => sub {
   $self->render_text($self->url_for . $self->url_for('current'));
 };
 
-# GET /unicode/a%E4b
-get '/unicode/aäb' => sub {
+# GET /uni/a%E4b
+get '/uni/aäb' => sub {
   my $self = shift;
   $self->render(text => $self->url_for);
 };
@@ -773,8 +773,11 @@ $t->get_ok('/☃')->status_is(200)->content_is('/%E2%98%83/%E2%98%83');
 # GET /☃ (with trailing slash)
 $t->get_ok('/☃/')->status_is(200)->content_is('/%E2%98%83//%E2%98%83/');
 
-# GET /unicode/a%E4b
-$t->get_ok('/unicode/a%E4b')->status_is(200)->content_is('/unicode/a%E4b');
+# GET /uni/aäb
+$t->get_ok('/uni/aäb')->status_is(200)->content_is('/uni/a%C3%A4b');
+
+# GET /uni/a%E4b
+$t->get_ok('/uni/a%E4b')->status_is(200)->content_is('/uni/a%C3%A4b');
 
 # GET /unicode/☃
 $t->get_ok('/unicode/☃')->status_is(200)
@@ -1157,7 +1160,7 @@ $t->get_ok('/inline/ep/too')->status_is(200)->content_is("0\n");
 
 # GET /inline/ep/partial
 $t->get_ok('/inline/ep/partial')->status_is(200)
-  ->content_is("♥just ♥\nworks!\n");
+  ->content_is(b("♥just ♥\nworks!\n")->encode);
 
 # GET /source
 $t->get_ok('/source')->status_is(200)->content_like(qr/get_ok\('\/source/);
@@ -1699,7 +1702,7 @@ $t->get_ok('/bridge2stash')->status_is(200)
 
 # GET /bridge2stash (broken session cookie)
 $t->reset_session;
-my $session = b("☃☃☃☃☃")->b64_encode('');
+my $session = b("☃☃☃☃☃")->encode->b64_encode('');
 my $hmac    = $session->clone->hmac_md5_sum($t->app->secret);
 my $broken  = "\$Version=1; mojolicious=$session--$hmac; \$Path=/";
 $t->get_ok('/bridge2stash' => {Cookie => $broken})->status_is(200)

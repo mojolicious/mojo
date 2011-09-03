@@ -45,7 +45,7 @@ sub run {
     my $prefix  = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
     my $path    = $self->rel_file("$prefix/$file");
     my $content = $all->{$file};
-    utf8::encode $content if utf8::is_utf8 $content;
+    utf8::encode $content;
     $self->write_file($path, $content);
   }
 }

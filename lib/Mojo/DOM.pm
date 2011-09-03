@@ -218,9 +218,8 @@ sub parent {
 }
 
 sub parse {
-  my ($self, $xml) = @_;
-  $self->charset(undef) if utf8::is_utf8 $xml;
-  $self->[0]->parse($xml);
+  my $self = shift;
+  $self->[0]->parse(@_);
   return $self;
 }
 

@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 893;
+use Test::More tests => 896;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -778,6 +778,9 @@ $t->get_ok('/uni/aäb')->status_is(200)->content_is('/uni/a%C3%A4b');
 
 # GET /uni/a%E4b
 $t->get_ok('/uni/a%E4b')->status_is(200)->content_is('/uni/a%C3%A4b');
+
+# GET /uni/a%C3%A4b
+$t->get_ok('/uni/a%C3%A4b')->status_is(200)->content_is('/uni/a%C3%A4b');
 
 # GET /unicode/☃
 $t->get_ok('/unicode/☃')->status_is(200)

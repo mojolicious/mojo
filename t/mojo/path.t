@@ -1,7 +1,9 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 91;
+use utf8;
+
+use Test::More tests => 105;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -19,6 +21,24 @@ is $path->parts->[0], 'path', 'right part';
 is $path->parts->[1], undef,  'no part';
 is $path->leading_slash,  undef, 'no leading slash';
 is $path->trailing_slash, 1,     'has trailing slash';
+
+# Unicode
+is $path->parse('/foo/♥/bar')->to_string, '/foo/%E2%99%A5/bar',
+  'right path';
+is $path->parts->[0], 'foo', 'right part';
+is $path->parts->[1], '♥', 'right part';
+is $path->parts->[2], 'bar', 'right part';
+is $path->parts->[3], undef, 'no part';
+is $path->leading_slash,  1,     'has leading slash';
+is $path->trailing_slash, undef, 'no trailing slash';
+is $path->parse('/foo/%E2%99%A5/bar')->to_string, '/foo/%E2%99%A5/bar',
+  'right path';
+is $path->parts->[0], 'foo', 'right part';
+is $path->parts->[1], '♥', 'right part';
+is $path->parts->[2], 'bar', 'right part';
+is $path->parts->[3], undef, 'no part';
+is $path->leading_slash,  1,     'has leading slash';
+is $path->trailing_slash, undef, 'no trailing slash';
 
 # Zero in path
 is $path->parse('/path/0')->to_string, '/path/0', 'right path';

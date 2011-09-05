@@ -23,7 +23,7 @@ my $SEPARATOR_RE = qr/^\s*\;\s*/;
 my $VALUE_RE     = qr/
   ^
   (
-    "(?:\\\\|\\"|[^"])+"   # Quoted
+    "(?:[^"\\]++|\\.)*+"   # Quoted
   |
     [^\;\,]+               # Unquoted
   )

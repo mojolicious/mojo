@@ -385,7 +385,7 @@ sub html_escape {
   my $escaped = '';
   for (1 .. length $_[0]) {
 
-    # Escape
+    # Escape entities
     my $char = substr $_[0], 0, 1, '';
     my $num = unpack 'U', $char;
     my $named = $REVERSE_ENTITIES{$num};

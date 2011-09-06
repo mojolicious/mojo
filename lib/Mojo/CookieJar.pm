@@ -31,6 +31,7 @@ sub add {
     next if length(defined $value ? $value : '') > $self->max_cookie_size;
 
     # Check if we already have a similar cookie
+    $domain =~ s/^\.//;
     $self->{jar}->{$domain} ||= [];
     my @new;
     for my $old (@{$self->{jar}->{$domain}}) {
@@ -100,7 +101,7 @@ sub find {
   }
 
   # Remove another part
-  continue { $domain =~ s/^(?:\.?[^\.]+)// }
+  continue { $domain =~ s/^(?:[^\.]\.?+)// }
 
   return @found;
 }

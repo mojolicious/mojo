@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 83;
+use Test::More tests => 89;
 
 # "Hello, my name is Mr. Burns. I believe you have a letter for me.
 #  Okay Mr. Burns, what’s your first name.
@@ -116,6 +116,33 @@ is $cookies[0]->value, 'baz', 'right value';
 is $cookies[1]->name,  'foo', 'right name';
 is $cookies[1]->value, 'bar', 'right value';
 is $cookies[2], undef, 'no third cookie';
+
+# Random top-level domain
+$jar = Mojo::CookieJar->new;
+$jar->add(
+  Mojo::Cookie::Response->new(
+    domain => 'com',
+    path   => '/foo',
+    name   => 'foo',
+    value  => 'bar'
+  )
+);
+$jar->add(
+  Mojo::Cookie::Response->new(
+    domain => 'kraih.com',
+    path   => '/foo',
+    name   => 'bar',
+    value  => 'baz'
+  )
+);
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+is $cookies[0]->name,  'bar', 'right name';
+is $cookies[0]->value, 'baz', 'right value';
+is $cookies[1], undef, 'no second cookie';
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+is $cookies[0]->name,  'bar', 'right name';
+is $cookies[0]->value, 'baz', 'right value';
+is $cookies[1], undef, 'no second cookie';
 
 # Huge cookie
 $jar = Mojo::CookieJar->new;

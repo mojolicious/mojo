@@ -207,12 +207,12 @@ sub run {
 
     # Try all namespaces
     my $module;
-    my $class = $name;
-    camelize $class;
     for my $namespace (@{$self->namespaces}) {
       last if $module = _command("${namespace}::$name");
 
       # DEPRECATED in Smiling Face With Sunglasses!
+      my $class = $name;
+      camelize $class;
       last if $module = _command("${namespace}::$class");
     }
 

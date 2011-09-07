@@ -8,15 +8,14 @@
     %= stylesheet '/css/prettify-mojo.css'
     %= javascript '/js/prettify.js'
     %= stylesheet begin
-      a img { border: 0; }
+      a img { border: 0 }
       body {
         background-color: #f5f6f8;
-        color: #333;
-        font: 0.9em Verdana, sans-serif;
+        color: #445555;
+        font: 0.9em 'Helvetica Neue', 'Helvetica', sans-serif;
         margin-left: 3em;
         margin-right: 3em;
         margin-top: 0;
-        text-shadow: #ddd 0 1px 0;
       }
       pre {
         margin: 0;
@@ -28,7 +27,7 @@
         margin-bottom: 1em;
         width: 100%;
       }
-      td { padding: 0.3em; }
+      td { padding: 0.3em }
       .box {
         background-color: #fff;
         -moz-box-shadow: 0px 0px 2px #ccc;
@@ -48,9 +47,10 @@
         margin-bottom: 0.5em;
         margin-top: 1em;
       }
-      .important { background-color: rgba(47, 48, 50, .75); }
-      .infobox tr:nth-child(odd) .value { background-color: #ddeeff; }
-      .infobox tr:nth-child(even) .value { background-color: #eef9ff; }
+      .important { background-color: rgba(47, 48, 50, .75) }
+      .infobox { color: #333 }
+      .infobox tr:nth-child(odd) .value { background-color: #ddeeff }
+      .infobox tr:nth-child(even) .value { background-color: #eef9ff }
       .key {
         text-align: right;
         text-weight: bold;
@@ -66,6 +66,7 @@
       .tap {
         font: 0.5em Verdana, sans-serif;
         text-align: center;
+        text-shadow: #ddd 0 1px 0;
       }
       .value {
         padding-left: 1em;

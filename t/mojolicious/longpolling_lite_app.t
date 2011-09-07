@@ -58,7 +58,7 @@ get '/longpoll' => sub {
   $self->write_chunk('hi ');
   Mojo::IOLoop->timer(
     '0.5' => sub {
-      $self->write_chunk('there,', sub { shift->write_chunk(' whats up?'); });
+      $self->write_chunk('there,', sub { shift->write_chunk(' whats up?') });
       shift->timer('0.5' => sub { $self->finish });
     }
   );
@@ -74,7 +74,7 @@ get '/longpoll/nolength' => sub {
   $self->write('hi ');
   Mojo::IOLoop->timer(
     '0.5' => sub {
-      $self->write('there,', sub { shift->write(' what length?'); });
+      $self->write('there,', sub { shift->write(' what length?') });
       shift->timer('0.5' => sub { $self->finish });
     }
   );

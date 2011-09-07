@@ -36,7 +36,7 @@ use Test::Mojo;
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 
 # Missing plugin
-eval { plugin 'does_not_exist'; };
+eval { plugin 'does_not_exist' };
 is $@, "Plugin \"does_not_exist\" missing, maybe you need to install it?\n",
   'right error';
 
@@ -688,7 +688,7 @@ under sub {
 
 # GET /bridge2stash
 get '/bridge2stash' =>
-  sub { shift->render(template => 'bridge2stash', handler => 'ep'); };
+  sub { shift->render(template => 'bridge2stash', handler => 'ep') };
 
 # Make sure after_dispatch can make session changes
 hook after_dispatch => sub {

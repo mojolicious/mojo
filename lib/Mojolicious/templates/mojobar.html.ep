@@ -24,7 +24,6 @@
       overflow: hidden;
       position: absolute;
       text-align: right;
-      text-shadow: 0;
       vertical-align: middle;
       width: 100%;
       z-index: 1000;
@@ -42,15 +41,19 @@
       margin-top: 1.5em;
     }
     #mojobar-links a {
-      color: #ccc;
-      font: 1.1em Georgia, Times, serif;
+      color: #999;
+      font: 1em 'Helvetica Neue', 'Helvetica', sans-serif;
+      font-weight: lighter;
       margin-left: 0.5em;
       padding-bottom: 1em;
       padding-top: 1em;
       text-decoration: none;
-      text-shadow: 0px -1px 0px #555;
+      -webkit-transition: all 200ms ease-in-out;
+      -moz-transition: all 200ms ease-in-out;
+      -o-transition: all 200ms ease-in-out;
+      transition: all 200ms ease-in-out;
     }
-    #mojobar-links a:hover { color: #fff; }
+    #mojobar-links a:hover { color: #fff }
   % end
 % end
 <div id="mojobar">

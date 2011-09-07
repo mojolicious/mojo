@@ -5,23 +5,25 @@
     %= javascript '/js/prettify.js'
     %= content_for 'header'
     %= stylesheet begin
-      a { color: inherit; }
-      a img { border: 0; }
+      a { color: inherit }
+      a:hover { color: #2a2a2a }
+      a img { border: 0 }
       body {
         background-color: #f5f6f8;
-        color: #333;
-        font: 0.9em Verdana, sans-serif;
+        color: #445555;
+        font: 0.9em 'Helvetica Neue', 'Helvetica', sans-serif;
+        font-weight: normal;
         line-height: 1.5;
         margin: 0;
-        text-shadow: #ddd 0 1px 0;
       }
       h1, h2, h3 {
-        font: 1.5em Georgia, Times, serif;
+        color: #2a2a2a;
+        font-size: 1.5em;
         margin: 0;
       }
-      h1 a, h2 a, h3 a { text-decoration: none; }
+      h1 a, h2 a, h3 a { text-decoration: none }
       pre {
-        background-color: #1a1a1a;
+        background-color: #eee;
         background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
         -moz-border-radius: 5px;
         border-radius: 5px;
@@ -51,7 +53,7 @@
         padding: 3em;
         padding-top: 7em;
       }
-      #perldoc > ul:first-of-type a { text-decoration: none; }
+      #perldoc > ul:first-of-type a { text-decoration: none }
       #wrapperlicious {
         max-width: 1000px;
         margin: 0 auto;

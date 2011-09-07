@@ -19,7 +19,6 @@
       -moz-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
       -webkit-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
       box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
-      color: #eee;
       height: 60px;
       overflow: hidden;
       position: absolute;
@@ -41,7 +40,7 @@
       margin-top: 1.5em;
     }
     #mojobar-links a {
-      color: #999;
+      color: #ccc;
       font: 1em 'Helvetica Neue', 'Helvetica', sans-serif;
       font-weight: 300;
       margin-left: 0.5em;

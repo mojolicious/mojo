@@ -160,29 +160,6 @@ You can even use middleware right in your application.
       app->start;
   };
 
-=head2 Apache/mod_perl (PSGI/Plack)
-
-C<mod_perl> is a good example for a L<PSGI> adapter that is used without
-C<plackup>, note that setting the C<PLACK_ENV> environment variable is
-required for L<Mojolicious> L<PSGI> detection.
-
-  <VirtualHost *:80>
-    ServerName localhost
-    DocumentRoot /home/sri/myapp/public
-
-    <Perl>
-      $ENV{PLACK_ENV} = 'production';
-      $ENV{MOJO_HOME} = '/home/sri/myapp';
-      $ENV{MOJO_MODE} = 'deployment';
-    </Perl>
-
-    <Location /myapp>
-      SetHandler perl-script
-      PerlHandler Plack::Handler::Apache2
-      PerlSetVar psgi_app /home/sri/myapp/script/myapp
-    </Location>
-  </VirtualHost>
-
 =head2 Rewriting
 
 Sometimes you might have to deploy your application in a blackbox environment

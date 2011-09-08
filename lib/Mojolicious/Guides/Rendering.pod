@@ -116,8 +116,7 @@ Stash values that don't have invalid characters in their name get
 automatically initialized as normal variables in the template and the
 controller instance as C<$self>.
 
-  $r->route('/foo/:name')
-    ->to(controller => 'foo', action => 'bar', name => 'tester');
+  $self->stash(name => 'tester');
 
   Hello <%= $name %>.
 
@@ -689,6 +688,18 @@ can be easily changed.
 
 All templates from the DATA section are bound to the encoding of the Perl
 script, so don't forget to use the L<utf8> pragma if necessary.
+
+  use Mojolicious::Lite;
+  use utf8;
+
+  get '/heart';
+
+  app->start;
+  __DATA__
+
+  @@ heart.html.ep
+  I ♥ Mojolicious!
+  
 
 =head2 Base64 Encoded DATA Files
 

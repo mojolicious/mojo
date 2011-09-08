@@ -195,6 +195,9 @@ C<DATA> section.
   @@ baz.html.ep
   The magic numbers are <%= $one %> and <%= $two %>.
 
+For more information about templates see also
+L<Mojolicious::Guides::Rendering/"Embedded Perl">.
+
 =head2 HTTP
 
 L<Mojo::Message::Request> and L<Mojo::Message::Response> give you full access
@@ -547,17 +550,17 @@ Conditions such as C<agent> and C<host> from
 L<Mojolicious::Plugin::HeaderCondition> allow even more powerful route
 constructs.
 
-  # /foo
+  # /foo (Firefox)
   get '/foo' => (agent => qr/Firefox/) => sub {
     shift->render(text => 'Congratulations, you are using a cool browser!');
   };
 
-  # /foo
+  # /foo (Internet Explorer)
   get '/foo' => (agent => qr/Internet Explorer/) => sub {
     shift->render(text => 'Dude, you really need to upgrade to Firefox!');
   };
 
-  # /bar
+  # http://mojolicio.us/bar
   get '/bar' => (host => 'mojolicio.us') => sub {
     shift->render(text => 'Hello Mojolicious!');
   };
@@ -566,68 +569,19 @@ constructs.
 
 Signed cookie based sessions just work out of the box as soon as you start
 using them.
-The C<flash> can be used to store values that will only be available for the
-next request (unlike C<stash>, which is only available for the current
-request), this is very useful in combination with C<redirect_to>.
 
   use Mojolicious::Lite;
 
-  get '/login' => sub {
+  get '/counter' => sub {
     my $self = shift;
-
-    my $name = $self->param('name') || '';
-    my $pass = $self->param('pass') || '';
-    return $self->render unless $name eq 'sebastian' && $pass eq '1234';
-
-    $self->session(name => $name);
-    $self->flash(message => 'Thanks for logging in!');
-    $self->redirect_to('index');
-  };
-
-  get '/' => sub {
-    my $self = shift;
-    $self->redirect_to('login') unless $self->session('name');
-  } => 'index';
-
-  get '/logout' => sub {
-    my $self = shift;
-    $self->session(expires => 1);
-    $self->redirect_to('index');
+    $self->render(counter => ++$self->session->{counter});
   };
 
   app->start;
   __DATA__
 
-  @@ layouts/default.html.ep
-  <!doctype html><html>
-    <head><title><%= title %></title></head>
-    <body><%= content %></body>
-  </html>
-
-  @@ login.html.ep
-  % layout 'default';
-  % title 'Login';
-  <%= form_for login => begin %>
-    <% if (param 'name') { %>
-      <b>Wrong name or password, please try again.</b><br>
-    <% } %>
-    Name:<br>
-    <%= text_field 'name' %><br>
-    Password:<br>
-    <%= password_field 'pass' %><br>
-    <%= submit_button 'Login' %>
-  <% end %>
-
-  @@ index.html.ep
-  % layout 'default';
-  % title 'Welcome';
-  <% if (my $message = flash 'message' ) { %>
-    <b><%= $message %></b><br>
-  <% } %>
-  Welcome <%= session 'name' %>!<br>
-  <%= link_to logout => begin %>
-    Logout
-  <% end %>
+  @@ counter.html.ep
+  Counter: <%= $counter %>
 
 =head2 Secret
 

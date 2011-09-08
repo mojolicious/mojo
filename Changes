@@ -2,7 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 1.98    2011-09-06 00:00:00
         - Improved CSS of all built in templates.
-        - Improved documentation.
+        - Improved documentation. (rhaen, sri)
         - Improved tests.
         - Fixed small bug in cookie jar.
         - Fixed Hypnotoad to clean up lock files.

@@ -67,6 +67,14 @@ connection, just by running the command above again.
   $ hypnotoad script/myapp
   Starting hot deployment for Hypnotoad server 31841.
 
+You might also want to enable proxy support if you're using Hypnotoad behind
+a reverse proxy.
+This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
+C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
+
+  # hypnotoad.conf
+  {proxy => 1};
+
 =head2 Nginx
 
 One of the most popular setups these days is the built-in web server behind a
@@ -87,12 +95,22 @@ Nginx reverse proxy.
     }
   }
 
-You might also want to enable reverse proxy support in C<hypnotoad>.
-This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
-C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
+=head2 Apache/mod_proxy
 
-  # hypnotoad.conf
-  {proxy => 1};
+Another good reverse proxy is Apache with C<mod_proxy>, the configuration
+looks very similar to the Nginx one above.
+
+  <VirtualHost *:80>
+    ServerName localhost
+    <Proxy *>
+      Order deny,allow
+      Allow from all
+    </Proxy>
+    ProxyRequests Off
+    ProxyPreserveHost On
+    ProxyPass / http://localhost:8080 keepalive=On
+    ProxyPassReverse / http://localhost:8080/
+  </VirtualHost>
 
 =head2 Apache/CGI
 

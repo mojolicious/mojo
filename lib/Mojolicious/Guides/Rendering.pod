@@ -83,10 +83,10 @@ usually look a bit better.
   % }
   Text after.
 
-You can also insert results from actual Perl code using expressions, by
-default the characters C<E<lt>>, C<E<gt>>, C<&>, C<'> and C<"> will be
-escaped to prevent XSS attacks against your application.
 Semicolons get automatically appended to all expressions.
+An additional equal sign can be used to disable escaping of the characters
+C<E<lt>>, C<E<gt>>, C<&>, C<'> and C<"> in results from Perl expressions,
+which is the default to prevent XSS attacks against your application.
 
   <%= 'lalala' %>
   <%== '<p>test</p>' %>
@@ -119,8 +119,9 @@ controller instance as C<$self>.
 
   Hello <%= $name %>.
 
-There are also many built-in helper functions such as C<url_for>, which
-allows you to generate the URL of a specific route just from its name.
+There are also many built-in helper functions such as C<url_for>, a full list
+can be found in L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers>.
 
   <%= url_for 'some_route' %>
 

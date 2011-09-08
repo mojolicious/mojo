@@ -85,7 +85,8 @@
         border-top-right-radius: 5px;
       }
       #showcase pre {
-        font: 1.5em Georgia, Times, serif;
+        font: 1.5em 'Helvetica Neue', 'Helvetica', sans-serif;
+        font-weight: 300;
         margin: 0;
         text-shadow: #333 0 1px 0;
       }

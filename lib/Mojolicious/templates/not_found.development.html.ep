@@ -12,16 +12,14 @@
       body {
         background-color: #f5f6f8;
         color: #333;
-        font: 0.9em Verdana, sans-serif;
         margin: 0;
         text-align: center;
-        text-shadow: #ddd 0 1px 0;
       }
       h1 {
-        font: 1.5em Georgia, Times, serif;
+        font: 1.5em 'Helvetica Neue', 'Helvetica', sans-serif;
+        font-weight: 300;
         margin-bottom: 1em;
         margin-top: 1em;
-        text-shadow: #666 0 1px 0;
       }
       #footer {
         background-color: #caecf6;
@@ -62,6 +60,7 @@
         padding: 0.5em;
         padding-left: 1em;
         text-align: left;
+        text-shadow: #333 0 1px 0;
         width: 500px;
       }
       #suggestion {
@@ -69,7 +68,6 @@
         color: #eee;
         padding-bottom: 20em;
         padding-top: 20em;
-        text-shadow: #333 0 1px 0;
       }
     % end
   </head>

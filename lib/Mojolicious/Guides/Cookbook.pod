@@ -110,6 +110,7 @@ looks very similar to the Nginx one above.
     ProxyPreserveHost On
     ProxyPass / http://localhost:8080 keepalive=On
     ProxyPassReverse / http://localhost:8080/
+    RequestHeader set X-Forwarded-HTTPS "0"
   </VirtualHost>
 
 =head2 Apache/CGI

@@ -178,7 +178,7 @@ All C<GET> and C<POST> parameters are accessible via C<param>.
     $self->render(text => "Hello $user!");
   };
 
-=head2 Stash
+=head2 Stash And Templates
 
 The C<stash> is used to pass data to templates, which can be inlined in the
 C<DATA> section.

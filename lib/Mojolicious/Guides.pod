@@ -28,6 +28,11 @@ You should definitely take a look!
 
 =over 2
 
+=item L<Mojolicious::Guides::Growing>
+
+Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
+well structured L<Mojolicious> application.
+
 =item L<Mojolicious::Guides::Routing>
 
 Simple and fun introduction to the L<Mojolicious> router.
@@ -35,11 +40,6 @@ Simple and fun introduction to the L<Mojolicious> router.
 =item L<Mojolicious::Guides::Rendering>
 
 Generating content with the L<Mojolicious> renderer.
-
-=item L<Mojolicious::Guides::Growing>
-
-Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
-well structured L<Mojolicious> application.
 
 =item L<Mojolicious::Guides::Cookbook>
 

@@ -66,7 +66,6 @@ set of special tags and line start characters.
   %# Comment line, treated as "<%# line =%>"
   %% Replaced with "%", useful for generating templates
 
-The simplest form is used to insert raw Perl code.
 Tags and lines work pretty much the same, but depending on context one will
 usually look a bit better.
 
@@ -122,8 +121,6 @@ controller instance as C<$self>.
 
 There are also many built-in helper functions such as C<url_for>, which
 allows you to generate the URL of a specific route just from its name.
-
-  $r->route('/foo/:name')->to('foo#bar')->name('some_route');
 
   <%= url_for 'some_route' %>
 
@@ -218,7 +215,8 @@ mapping of the C<format> stash value.
 
   $self->render(text => 'Hello!', format => 'txt');
 
-These mappings can be easily extended or changed.
+These mappings can be easily extended or changed through
+L<Mojolicious::Types>.
 
   # Application
   package MyApp;

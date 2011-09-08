@@ -357,12 +357,8 @@ sub _dispatch_callback {
 
   # Dispatch
   my $continue;
-  unless (eval { $continue = $field->{cb}->($c); 1 }) {
-    my $e = Mojo::Exception->new($@);
-    $c->app->log->error($e);
-    return $e;
-  }
-
+  return Mojo::Exception->new($@)
+    unless eval { $continue = $field->{cb}->($c); 1 };
   return 1 if !$staging || $continue;
   return;
 }
@@ -389,7 +385,6 @@ sub _dispatch_controller {
       }
 
       # Error
-      $c->app->log->error($e);
       return $e;
     }
 
@@ -448,7 +443,6 @@ sub _dispatch_controller {
   # Controller error
   unless ($success) {
     my $e = Mojo::Exception->new($@);
-    $c->app->log->error($e);
     $app->render_exception($e) if $app->can('render_exception');
     return $e;
   }

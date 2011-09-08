@@ -308,7 +308,8 @@ sub render_data { shift->render(data => shift, @_) }
 sub render_exception {
   my ($self, $e) = @_;
   $e = Mojo::Exception->new($e);
-  $self->app->log->error($e);
+  my $app = $self->app;
+  $app->log->error($e);
 
   # Recursion
   return if $self->stash->{'mojo.exception'};
@@ -323,7 +324,7 @@ sub render_exception {
   }
 
   # Render with fallbacks
-  my $mode    = $self->app->mode;
+  my $mode    = $app->mode;
   my $options = {
     template         => "exception.$mode",
     format           => $stash->{format} || 'html',

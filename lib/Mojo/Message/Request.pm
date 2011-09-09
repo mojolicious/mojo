@@ -259,61 +259,53 @@ sub _parse_env {
   # Make environment accessible
   $self->env($env);
 
-  # Extract headers from environment
+  # Extract headers
   my $headers = $self->headers;
   my $url     = $self->url;
   my $base    = $url->base;
   for my $name (keys %$env) {
+    next unless $name =~ /^HTTP_/i;
+    my $value = $env->{$name};
+    $name =~ s/^HTTP_//i;
+    $name =~ s/_/-/g;
+    $headers->header($name, $value);
 
-    # Header
-    if ($name =~ /^HTTP_/i) {
-      my $value = $env->{$name};
-      $name =~ s/^HTTP_//i;
-      $name =~ s/_/-/g;
-      $headers->header($name, $value);
-
-      # Host/Port
-      if ($name eq 'HOST') {
-        my $host = $value;
-        my $port = undef;
-
-        if ($host =~ $HOST_RE) {
-          $host = $1;
-          $port = $2;
-        }
-
-        $base->host($host);
-        $base->port($port);
+    # Host/Port
+    if ($name eq 'HOST') {
+      my $host = $value;
+      my $port = undef;
+      if ($host =~ $HOST_RE) {
+        $host = $1;
+        $port = $2;
       }
+      $base->host($host);
+      $base->port($port);
     }
   }
 
   # Content-Type is a special case on some servers
-  if (my $value = $env->{CONTENT_TYPE}) { $headers->content_type($value) }
+  $headers->content_type($env->{CONTENT_TYPE}) if $env->{CONTENT_TYPE};
 
   # Content-Length is a special case on some servers
-  if (my $value = $env->{CONTENT_LENGTH}) {
-    $headers->content_length($value);
-  }
+  $headers->content_length($env->{CONTENT_LENGTH}) if $env->{CONTENT_LENGTH};
 
   # Path is a special case on some servers
-  if (my $value = $env->{REQUEST_URI}) { $url->parse($value) }
+  $url->parse($env->{REQUEST_URI}) if $env->{REQUEST_URI};
 
   # Query
-  if (my $value = $env->{QUERY_STRING}) { $url->query->parse($value) }
+  $url->query->parse($env->{QUERY_STRING}) if $env->{QUERY_STRING};
 
   # Method
-  if (my $value = $env->{REQUEST_METHOD}) { $self->method($value) }
+  $self->method($env->{REQUEST_METHOD}) if $env->{REQUEST_METHOD};
 
   # Scheme/Version
-  if (my $value = $env->{SERVER_PROTOCOL}) {
-    $value =~ /^([^\/]*)\/*(.*)$/;
-    $base->scheme($1)  if $1;
-    $self->version($2) if $2;
+  if (($env->{SERVER_PROTOCOL} || '') =~ /^([^\/]+)\/([^\/]+)$/) {
+    $base->scheme($1);
+    $self->version($2);
   }
 
   # HTTPS
-  if ($env->{HTTPS}) { $base->scheme('https') }
+  $base->scheme('https') if $env->{HTTPS};
 
   # Base path
   my $base_path = $base->path;
@@ -321,7 +313,6 @@ sub _parse_env {
 
     # Make sure there is a trailing slash (important for merging)
     $value .= '/' unless $value =~ /\/$/;
-
     $base_path->parse($value);
   }
 
@@ -330,11 +321,9 @@ sub _parse_env {
   if   (my $value = $env->{PATH_INFO}) { $path->parse($value) }
   else                                 { $path->parse('') }
 
-  # Path buffer
+  # Fix paths for broken CGI environments
   my $base_buffer = $base_path->to_string;
   my $buffer      = $path->to_string;
-
-  # Fix paths for broken CGI environments
   if (defined $buffer && defined $base_buffer && length $base_buffer) {
 
     # Remove SCRIPT_NAME prefix if it's there
@@ -342,12 +331,10 @@ sub _parse_env {
     $base_buffer =~ s/\/$//;
     $buffer      =~ s/^\/?$base_buffer\/?//;
     $buffer      =~ s/^\///;
-
     $path->parse($buffer);
   }
 
-  # There won't be a start line or header when you parse environment
-  # variables
+  # There won't be a start line or headers
   $self->{state} = 'body';
 }
 

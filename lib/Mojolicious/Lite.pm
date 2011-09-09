@@ -248,7 +248,7 @@ Templates can have layouts.
   @@ with_layout.html.ep
   % title 'Green!';
   % layout 'green';
-  We've got content!
+  Hello World!
 
   @@ layouts/green.html.ep
   <!doctype html><html>
@@ -297,7 +297,7 @@ content.
   <% content_for header => begin %>
     <meta http-equiv="Pragma" content="no-cache">
   <% end %>
-  We've got content!
+  Hello World!
   <% content_for header => begin %>
     <meta http-equiv="Expires" content="-1">
   <% end %>

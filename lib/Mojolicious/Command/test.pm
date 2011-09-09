@@ -54,7 +54,7 @@ sub run {
   }
 
   # Run tests
-  runtests(@tests);
+  runtests(sort @tests);
 }
 
 1;

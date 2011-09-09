@@ -16,21 +16,27 @@ sub register {
 
   # "host" condition
   $app->routes->add_condition(
-    host => sub { _headers(@_[0 .. 2], {'Host' => $_[3]}) });
+    host => sub { _check($_[1]->req->url->to_abs->host, $_[3]) });
 }
 
 # "Wow, there's a million aliens! I've never seen something so mind-blowing!
 #  Ooh, a reception table with muffins!"
+sub _check {
+  my ($value, $pattern) = @_;
+  return 1
+    if $value && $pattern && ref $pattern eq 'Regexp' && $value =~ $pattern;
+  return 1 if $value && defined $pattern && $pattern eq $value;
+  return;
+}
+
 sub _headers {
   my ($r, $c, $captures, $patterns) = @_;
   return unless $patterns && ref $patterns eq 'HASH' && keys %$patterns;
 
   # All headers need to match
-  while (my ($k, $v) = each %$patterns) {
-    my $header = $c->req->headers->header($k);
-    if ($header && $v && ref $v eq 'Regexp' && $header =~ $v) {next}
-    elsif ($header && defined $v && $v eq $header) {next}
-    else                                           {return}
+  my $headers = $c->req->headers;
+  while (my ($name, $pattern) = each %$patterns) {
+    return unless _check(scalar $headers->header($name), $pattern);
   }
   return 1;
 }
@@ -62,7 +68,8 @@ Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
   # The "agent" condition is a shortcut for the "User-Agent" header
   get '/' => (agent => qr/Firefox/) => sub {...};
 
-  # The "host" condition is a shortcut for the "Host" header
+  # The "host" condition is a shortcut for the detected host
+  # (usually the "Host" or "X-Forwarded-Host" header)
   get '/' => (host => qr/mojolicio\.us/) => sub {...};
 
 =head1 DESCRIPTION

@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'testing';
 }
 
-use Test::More tests => 113;
+use Test::More tests => 122;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -227,9 +227,28 @@ $t->get_ok('/host')->status_is(200)->content_is('main application!');
 $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is("works!\n\ntoo!works!!!\n");
 
+# GET / (full external application with domain and reverse proxy)
+my $backup = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
+$t->get_ok('/' => {'X-Forwarded-Host' => 'mojolicious.org'})->status_is(200)
+  ->content_is("works!\n\ntoo!works!!!\n");
+$ENV{MOJO_REVERSE_PROXY} = $backup;
+
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is('mojolicious.org');
+
+# GET /host (full external application with domain and reverse proxy)
+$backup = $ENV{MOJO_REVERSE_PROXY};
+$ENV{MOJO_REVERSE_PROXY} = 1;
+$t->get_ok('/host' => {'X-Forwarded-Host' => 'mojolicious.org'})
+  ->status_is(200)->content_is('mojolicious.org');
+$ENV{MOJO_REVERSE_PROXY} = $backup;
+
+# GET /host (full external application with domain and no reverse proxy)
+$t->get_ok(
+  '/host' => {Host => 'mojolicious.org', 'X-Forwarded-Host' => 'kraih.com'})
+  ->status_is(200)->content_is('mojolicious.org');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)

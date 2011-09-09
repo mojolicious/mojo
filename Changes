@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.98    2011-09-09 00:00:00
+        - Improved host condition to work in more environments.
         - Improved CSS of all built in templates.
         - Improved documentation. (rhaen, sri)
         - Improved tests.

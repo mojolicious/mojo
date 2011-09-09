@@ -1,7 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.98    2011-09-09 00:00:00
-        - Added EXPERIMENTAL --mode flag to Morbo.
         - Improved CSS of all built in templates.
         - Improved documentation. (rhaen, sri)
         - Improved tests.

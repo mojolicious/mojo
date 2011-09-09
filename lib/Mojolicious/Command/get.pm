@@ -27,10 +27,10 @@ usage: $0 get [OPTIONS] URL [SELECTOR] [COMMANDS]
 
 These options are available:
   --charset <charset>     Charset of HTML5/XML content, defaults to auto
-                          detection or UTF-8.
+                          detection or "UTF-8".
   --content <content>     Content to send with request.
   --header <name:value>   Additional HTTP header.
-  --method <method>       HTTP method to use.
+  --method <method>       HTTP method to use, defaults to "GET".
   --redirect              Follow up to 5 redirects.
   --verbose               Print verbose debug information to STDERR.
 EOF

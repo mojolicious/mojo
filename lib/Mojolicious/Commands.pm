@@ -12,7 +12,7 @@ These options are available for all commands:
     --home <path>   Path to your applications home directory, defaults to
                     the value of MOJO_HOME or auto detection.
     --mode <name>   Run mode of your application, defaults to the value of
-                    MOJO_MODE or development.
+                    MOJO_MODE or "development".
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF

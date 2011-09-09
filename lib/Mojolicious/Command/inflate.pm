@@ -13,22 +13,20 @@ usage: $0 inflate [OPTIONS]
 These options are available:
   --class <class>      Class to inflate.
   --public <path>      Path prefix for generated static files, defaults to
-                       public.
+                       "public".
   --templates <path>   Path prefix for generated template files, defaults to
-                       templates.
+                       "templates".
 EOF
 
 # "Come on stem cells! Work your astounding scientific nonsense!"
 sub run {
   my $self = shift;
 
-  # Class
+  # Options
+  local @ARGV = @_;
   my $class     = 'main';
   my $public    = 'public';
   my $templates = 'templates';
-
-  # Options
-  local @ARGV = @_;
   GetOptions(
     'class=s'     => sub { $class     = $_[1] },
     'public=s'    => sub { $public    = $_[1] },

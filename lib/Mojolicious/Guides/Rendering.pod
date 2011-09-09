@@ -70,18 +70,22 @@ Tags and lines work pretty much the same, but depending on context one will
 usually look a bit better.
 
   <% my $i = 10; %>
-  Text before.
-  <% for my $j (1 .. $i) { %>
-    <%= $j %>
-  <% } %>
-  Text after.
+  <ul>
+    <% for my $j (1 .. $i) { %>
+      <li>
+        <%= $j %>
+      </li>
+    <% } %>
+  </ul>
 
   % my $i = 10;
-  Text before.
-  % for my $j (1 .. $i) {
-    %= $j
-  % }
-  Text after.
+  <ul>
+    % for my $j (1 .. $i) {
+      <li>
+        %= $j
+      </li>
+    % }
+  </ul>
 
 Semicolons get automatically appended to all expressions.
 An additional equal sign can be used to disable escaping of the characters

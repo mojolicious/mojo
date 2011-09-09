@@ -1042,6 +1042,8 @@ Viacheslav Tykhanovskyi
 
 Victor Engmark
 
+Viliam Pucik
+
 Yaroslav Korshak
 
 Yuki Kimoto

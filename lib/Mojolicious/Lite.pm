@@ -495,6 +495,11 @@ C<RESTful> content negotiation you can also use C<respond_to>.
     );
   };
 
+MIME type mappings can be extended or changed easily with
+L<Mojolicious/"types">.
+
+  app->types->type(rdf => 'application/rdf+xml');
+
 =head2 Under
 
 Authentication and code shared between multiple routes can be realized easily

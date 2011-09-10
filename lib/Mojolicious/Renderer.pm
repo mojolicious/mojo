@@ -293,7 +293,8 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   $renderer   = $renderer->default_format('html');
 
 The default format to render if C<format> is not set in the stash.
-The renderer will use L<Mojolicious::Types> to look up the content MIME type.
+The renderer will use L<Mojolicious/"types"> to look up the content MIME
+type.
 
 =head2 C<default_handler>
 

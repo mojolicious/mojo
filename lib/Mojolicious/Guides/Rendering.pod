@@ -68,6 +68,7 @@ set of special tags and line start characters.
 
 Tags and lines work pretty much the same, but depending on context one will
 usually look a bit better.
+Semicolons get automatically appended to all expressions.
 
   <% my $i = 10; %>
   <ul>
@@ -87,7 +88,6 @@ usually look a bit better.
     % }
   </ul>
 
-Semicolons get automatically appended to all expressions.
 An additional equal sign can be used to disable escaping of the characters
 C<E<lt>>, C<E<gt>>, C<&>, C<'> and C<"> in results from Perl expressions,
 which is the default to prevent XSS attacks against your application.
@@ -107,27 +107,17 @@ without ruining the result.
     <%= $foo =%>
   <% } %>
 
-Comment tags and lines are very useful to deactivate code for debugging
-purposes.
-
-  % my $foo = 'lalala';
-  <%# if ($foo) { %>
-    <%= $foo =%>
-  <%# } %>
-
 Stash values that don't have invalid characters in their name get
-automatically initialized as normal variables in the template and the
+automatically initialized as normal variables in the template, and the
 controller instance as C<$self>.
 
   $self->stash(name => 'tester');
 
-  Hello <%= $name %>.
+  Hello <%= $name %> from <%= $self->tx->remote_address %>.
 
-There are also many built-in helper functions such as C<url_for>, a full list
-can be found in L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers>.
+There are also many helper functions available, but more about that later.
 
-  <%= url_for 'some_route' %>
+  <%= dumper {foo => 'bar'} %>
 
 =head1 BASICS
 
@@ -318,8 +308,9 @@ used to generate C<HTML> tags.
     var a = 'b';
   <% end %>
 
-The plugins L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers> contain all of them.
+A list of all built-in helpers can be found in
+L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers>.
 
 =head2 Layouts
 

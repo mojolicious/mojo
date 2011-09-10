@@ -454,7 +454,7 @@ like this.
   Welcome <%= session 'user' %>!<br>
   <%= link_to Logout => 'logout' %>
 
-More information about built-in template helpers can be found in
+A list of all built-in helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 

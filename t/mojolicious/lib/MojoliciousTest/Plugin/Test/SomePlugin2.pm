@@ -1,4 +1,4 @@
-package MojoliciousTest::Plugin::TestPlugin;
+package MojoliciousTest::Plugin::Test::SomePlugin2;
 use Mojo::Base 'Mojolicious::Plugin';
 
 # "Space: It seems to go on and on forever...
@@ -6,8 +6,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app) = @_;
 
-  # Add "test_plugin" helper
-  $app->helper(test_plugin => sub {'Welcome aboard!'});
+  # Add "some_plugin" helper
+  $app->helper(some_plugin => sub {'Welcome aboard!'});
 }
 
 1;

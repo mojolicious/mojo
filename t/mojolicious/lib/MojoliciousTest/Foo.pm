@@ -23,7 +23,7 @@ sub index {
 
 sub plugin_camel_case {
   my $self = shift;
-  $self->render_text($self->test_plugin);
+  $self->render_text($self->some_plugin);
 }
 
 sub plugin_upper_case {
@@ -56,7 +56,7 @@ sub stage1 {
 
 sub stage2 {
   my $self = shift;
-  $self->render_text($self->test_plugin);
+  $self->render_text($self->some_plugin);
 }
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }

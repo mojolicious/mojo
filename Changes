@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
           (viliampucik)
         - Improved tests.
         - Fixed small bug in cookie jar.
+        - Fixed small plugin loader bug.
         - Fixed Hypnotoad to clean up lock files.
         - Fixed small bug that caused exceptions to be logged twice.
 

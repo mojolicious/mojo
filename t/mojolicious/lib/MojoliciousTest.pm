@@ -15,7 +15,7 @@ sub startup {
   # Plugins in custom namespace
   unshift @{$self->plugins->namespaces},
     $self->routes->namespace . '::Plugin';
-  $self->plugin('test_plugin');
+  $self->plugin('test-some_plugin2');
   $self->plugin('UPPERCASETestPlugin');
 
   # Templateless renderer

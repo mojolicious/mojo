@@ -11,13 +11,13 @@ sub startup {
   $self->log->level('fatal');
 
   # Plugin
-  $self->plugin('MojoliciousTest::Plugin::TestPlugin');
+  $self->plugin('MojoliciousTest::Plugin::Test::SomePlugin2');
 
   # Helper route
   $self->routes->route('/helper')->to(
     cb => sub {
       my $self = shift;
-      $self->render(text => $self->test_plugin);
+      $self->render(text => $self->some_plugin);
     }
   );
 

@@ -313,8 +313,8 @@ content.
 
 =head2 Helpers
 
-You can also extend L<Mojolicious> with your own helpers, a list of all built
-in ones can be found in L<Mojolicious::Plugin::DefaultHelpers> and
+You can also extend L<Mojolicious> with your own helpers, a list of all
+built-in ones can be found in L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
   # "whois" helper

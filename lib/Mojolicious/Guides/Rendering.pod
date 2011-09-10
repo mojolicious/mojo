@@ -220,8 +220,7 @@ mapping of the C<format> stash value.
 
   $self->render(text => 'Hello!', format => 'txt');
 
-These mappings can be easily extended or changed through
-L<Mojolicious::Types>.
+These mappings can be easily extended or changed with L<Mojolicious/"types">.
 
   # Application
   package MyApp;

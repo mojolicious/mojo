@@ -1,12 +1,12 @@
 package Mojolicious::Static;
 use Mojo::Base -base;
 
-use File::Basename 'dirname';
 use File::Spec;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Command;
 use Mojo::Content::Single;
+use Mojo::Home;
 use Mojo::Path;
 
 has [qw/default_static_class root/];
@@ -53,8 +53,8 @@ sub serve {
   my $ext = $1;
 
   # Root for bundled files
-  $self->{bundled}
-    ||= File::Spec->catdir(File::Spec->splitdir(dirname(__FILE__)), 'public');
+  $self->{bundled} ||= Mojo::Home->new(Mojo::Home->mojo_lib_dir)
+    ->rel_dir('Mojolicious/public');
 
   # Normal file
   my $asset;

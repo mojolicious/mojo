@@ -6,9 +6,11 @@ use overload
   fallback => 1;
 
 use Cwd 'abs_path';
+use File::Basename 'dirname';
 use File::Find 'find';
 use File::Spec;
 use FindBin;
+use Mojo::Asset::File;
 use Mojo::Command;
 use Mojo::Loader;
 
@@ -16,6 +18,12 @@ has app_class => 'Mojo::HelloWorld';
 
 # "I'm normally not a praying man, but if you're up there,
 #  please save me Superman."
+sub new {
+  my $self = shift->SUPER::new();
+  $self->parse(@_) if @_;
+  return $self;
+}
+
 sub detect {
   my ($self, $class) = @_;
 
@@ -97,10 +105,11 @@ sub list_files {
   return [sort @files];
 }
 
+sub mojo_lib_dir { File::Spec->catdir(dirname(__FILE__), '..') }
+
 sub parse {
   my ($self, $path) = @_;
-  my @parts = File::Spec->splitdir($path);
-  $self->{parts} = \@parts;
+  $self->{parts} = [File::Spec->splitdir($path)];
   return $self;
 }
 
@@ -114,6 +123,10 @@ sub rel_file {
   my $self = shift;
   my $parts = $self->{parts} || [];
   File::Spec->catfile(@$parts, split '/', shift);
+}
+
+sub slurp_rel_file {
+  Mojo::Asset::File->new(path => shift->rel_file(@_))->slurp;
 }
 
 sub to_string {
@@ -156,6 +169,13 @@ Application class.
 L<Mojo::Home> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 C<new>
+
+  my $home = Mojo::Home->new;
+  my $home = Mojo::Home->new('/foo/bar');
+
+Construct a new L<Mojo::Home> object.
+
 =head2 C<detect>
 
   $home = $home->detect;
@@ -176,6 +196,13 @@ Path to C<lib> directory.
 
 List all files in directory and subdirectories recursively.
 
+=head2 C<mojo_lib_dir>
+
+  my $path = $home->mojo_lib_dir;
+
+Path to C<lib> directory in which L<Mojolicious> is installed.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<parse>
 
   $home = $home->parse('/foo/bar');
@@ -193,6 +220,13 @@ Generate absolute path for relative directory.
   my $path = $home->rel_file('foo/bar.html');
 
 Generate absolute path for relative file.
+
+=head2 C<slurp_rel_file>
+
+  my $string = $home->slurp_rel_file('foo/bar.html');
+
+Read all file data at once.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<to_string>
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 13;
+use Test::More tests => 16;
 
 use Cwd qw/cwd realpath/;
 use File::Spec;
@@ -42,7 +42,7 @@ is_deeply [split /\\|\//,
   [split /\\|\//, $home], 'right path detected';
 
 # Path generation
-$home = Mojo::Home->new->parse($FindBin::Bin);
+$home = Mojo::Home->new($FindBin::Bin);
 is $home->lib_dir,
   File::Spec->catdir(File::Spec->splitdir($FindBin::Bin), 'lib'),
   'right path';
@@ -66,3 +66,11 @@ is first(sub { $_ =~ /Base2\.pm$/ }, @{$home->list_files('lib')}),
   'BaseTest/Base2.pm', 'right result';
 is first(sub { $_ =~ /Base3\.pm$/ }, @{$home->list_files('lib')}),
   'BaseTest/Base3.pm', 'right result';
+
+# Slurp files
+like $home->slurp_rel_file('lib/BaseTest/Base1.pm'), qr/Base1/,
+  'right content';
+like $home->slurp_rel_file('lib/BaseTest/Base2.pm'), qr/Base2/,
+  'right content';
+like $home->slurp_rel_file('lib/BaseTest/Base3.pm'), qr/Base3/,
+  'right content';

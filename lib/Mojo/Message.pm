@@ -103,7 +103,6 @@ sub body_params {
     }
   }
 
-  # Cache
   return $self->{body_params} = $params;
 }
 
@@ -174,7 +173,6 @@ sub cookie {
       else { $cookies->{$cookie_name} = $cookie }
     }
 
-    # Cache
     $self->{cookies} = $cookies;
   }
 
@@ -189,15 +187,11 @@ sub cookie {
 sub dom {
   my $self = shift;
 
-  # Multipart
+  # Parse
   return if $self->is_multipart;
-
-  # Charset
   my $charset;
   ($self->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
     and $charset = $1;
-
-  # Parse
   my $dom = $self->dom_class->new(charset => $charset)->parse($self->body);
 
   # Find right away
@@ -361,7 +355,6 @@ sub upload {
       else { $uploads->{$uname} = $upload }
     }
 
-    # Cache
     $self->{uploads} = $uploads;
   }
 
@@ -412,11 +405,9 @@ sub _build_start_line {
 sub _parse {
   my ($self, $until_body, $chunk) = @_;
 
-  # Buffer
+  # Add chunk
   $self->{buffer}   = '' unless defined $self->{buffer};
   $self->{raw_size} = 0  unless exists $self->{raw_size};
-
-  # Add chunk
   if (defined $chunk) {
     $self->{raw_size} += length $chunk;
     $self->{buffer} .= $chunk;
@@ -494,8 +485,6 @@ sub _parse_formdata {
   my @formdata;
   my $content = $self->content;
   return \@formdata unless $content->is_multipart;
-
-  # Default charset
   my $default = $self->default_charset;
   ($self->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
     and $default = $1;
@@ -522,12 +511,8 @@ sub _parse_formdata {
     my ($name)     = $disposition =~ /\ name="?([^\";]+)"?/;
     my ($filename) = $disposition =~ /\ filename="?([^\"]*)"?/;
     my $value      = $part;
-
-    # Unescape
     url_unescape $name     if $name;
     url_unescape $filename if $filename;
-
-    # Decode
     if ($charset) {
       my $backup = $name;
       decode $charset, $name if $name;
@@ -540,8 +525,6 @@ sub _parse_formdata {
     # Form value
     unless ($filename) {
       $value = $part->asset->slurp;
-
-      # Decode
       if ($charset && !$part->headers->content_transfer_encoding) {
         my $backup = $value;
         decode $charset, $value;

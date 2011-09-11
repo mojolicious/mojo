@@ -95,8 +95,7 @@ sub detect {
     if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
 
   # Nothing
-  return $guess if $guess;
-  return;
+  return $guess;
 }
 
 sub get_all_data {

@@ -121,6 +121,9 @@ sub match {
   return $self;
 }
 
+# "I'm not a robot!
+#  I don't like having discs crammed into me, unless they're Oreos.
+#  And then, only in the mouth."
 sub path_for {
   my $self   = shift;
   my $values = {};

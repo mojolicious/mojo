@@ -22,13 +22,14 @@ sub run {
 
   # Request body
   while (!$req->is_done) {
-    my $read = STDIN->sysread(my $buffer, CHUNK_SIZE, 0);
+    my $read = STDIN->read(my $buffer, CHUNK_SIZE, 0);
     last unless $read;
     $req->parse($buffer);
   }
 
   # Handle
   $self->on_request->($self, $tx);
+  STDOUT->autoflush(1);
 
   # Response start line
   my $res    = $tx->res;
@@ -48,21 +49,16 @@ sub run {
 
       # Start line
       return unless STDOUT->opened;
-      my $written = STDOUT->syswrite($chunk);
-      return unless defined $written;
-      $offset += $written;
+      print STDOUT $chunk;
+      $offset += length $chunk;
     }
   }
 
-  # Fix headers
+  # Response headers
   $res->fix_headers;
-
-  # Status
   my $code    = $res->code    || 404;
   my $message = $res->message || $res->default_message;
   $res->headers->header(Status => "$code $message") unless $self->nph;
-
-  # Response headers
   $offset = 0;
   while (1) {
     my $chunk = $res->get_header_chunk($offset);
@@ -78,9 +74,8 @@ sub run {
 
     # Headers
     return unless STDOUT->opened;
-    my $written = STDOUT->syswrite($chunk);
-    return unless defined $written;
-    $offset += $written;
+    print STDOUT $chunk;
+    $offset += length $chunk;
   }
 
   # Response body
@@ -99,9 +94,8 @@ sub run {
 
     # Content
     return unless STDOUT->opened;
-    my $written = STDOUT->syswrite($chunk);
-    return unless defined $written;
-    $offset += $written;
+    print STDOUT $chunk;
+    $offset += length $chunk;
   }
 
   # Finish transaction

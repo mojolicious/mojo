@@ -200,6 +200,7 @@ sub _compile {
   return $regex;
 }
 
+# "Interesting... Oh no wait, the other thing, tedious."
 sub _compile_req {
   my $req = shift;
   return "($req)" if !ref $req || ref $req ne 'ARRAY';

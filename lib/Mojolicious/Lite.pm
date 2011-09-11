@@ -120,8 +120,8 @@ There is also a helper command to generate a small example application.
 =head2 Commands
 
 All the normal L<Mojolicious::Commands> are available from the command line.
-Note that CGI, FastCGI and PSGI environments can usually be auto detected and
-will just work without commands.
+Note that CGI and PSGI environments can usually be auto detected and will
+just work without commands.
 
   $ ./myapp.pl daemon
   Server available at http://127.0.0.1:3000.
@@ -131,9 +131,6 @@ will just work without commands.
 
   $ ./myapp.pl cgi
   ...CGI output...
-
-  $ ./myapp.pl fastcgi
-  ...Blocking FastCGI main loop...
 
   $ ./myapp.pl
   ...List of available commands (or automatically detected environment)...

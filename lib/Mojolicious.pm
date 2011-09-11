@@ -12,6 +12,7 @@ use Mojolicious::Static;
 use Mojolicious::Types;
 use Scalar::Util 'weaken';
 
+# "Robots don't have any emotions, and sometimes that makes me very sad."
 has controller_class => 'Mojolicious::Controller';
 has mode             => sub { ($ENV{MOJO_MODE} || 'development') };
 has on_process       => sub {
@@ -401,26 +402,6 @@ workflow.
 =head2 Want To Know More?
 
 Take a look at our excellent documentation in L<Mojolicious::Guides>!
-
-=head1 ARCHITECTURE
-
-Loosely coupled building blocks, use what you like and just ignore the rest.
-
-  .---------------------------------------------------------------.
-  |                                                               |
-  |                .----------------------------------------------'
-  |                | .--------------------------------------------.
-  |   Application  | |              Mojolicious::Lite             |
-  |                | '--------------------------------------------'
-  |                | .--------------------------------------------.
-  |                | |                 Mojolicious                |
-  '----------------' '--------------------------------------------'
-  .---------------------------------------------------------------.
-  |                             Mojo                              |
-  '---------------------------------------------------------------'
-  .-------. .-----------. .--------. .------------. .-------------.
-  |  CGI  | |  FastCGI  | |  PSGI  | |  HTTP 1.1  | |  WebSocket  |
-  '-------' '-----------' '--------' '------------' '-------------'
 
 =head1 ATTRIBUTES
 

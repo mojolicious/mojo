@@ -120,16 +120,6 @@ automatically detect that it is executed as a C<CGI> script.
 
   ScriptAlias / /home/sri/myapp/script/myapp/
 
-=head2 Apache/FastCGI
-
-C<FastCGI> is also supported out of the box and your L<Mojolicious>
-application will automatically detect that it is executed as a C<FastCGI>
-script.
-
-  FastCgiIpcDir /home/sri/myapp
-  FastCgiServer /home/sri/myapp/script/myapp -processes 1
-  Alias / /home/sri/myapp/script/myapp/
-
 =head2 PSGI/Plack
 
 L<PSGI> is an interface between Perl web frameworks and web servers, and

@@ -45,7 +45,7 @@ perfect for embedding.
 
 =item *
 
-Automatic CGI, FastCGI and L<PSGI> detection.
+Automatic CGI and L<PSGI> detection.
 
 =item *
 

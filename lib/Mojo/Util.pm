@@ -604,6 +604,7 @@ sub url_escape {
   $_[0] =~ s/([^$pattern])/sprintf('%%%02X',ord($1))/ge;
 }
 
+# "I've gone back in time to when dinosaurs weren't just confined to zoos."
 sub url_unescape {
   return if index($_[0], '%') == -1;
   $_[0] =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;

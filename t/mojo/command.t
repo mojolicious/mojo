@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 24;
+use Test::More tests => 23;
 
 use Cwd 'cwd';
 use File::Spec;
@@ -66,10 +66,6 @@ is $command->class_to_path('Foo::Bar'), 'Foo/Bar.pm', 'right path';
 {
   local $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
   is $command->detect, 'cgi', 'right environment';
-}
-{
-  local %ENV = ();
-  is $command->detect, 'fastcgi', 'right environment';
 }
 
 # Generating files

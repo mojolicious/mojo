@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.98    2011-09-11 00:00:00
+        - Removed Mojo::Server::FastCGI so it can be maintained as a separate
+          distribution.
         - Added EXPERIMENTAL mojo_lib_dir and slurp_rel_file methods to
           Mojo::Home.
         - Improved host condition to work in more environments.

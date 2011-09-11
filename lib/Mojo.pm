@@ -55,8 +55,8 @@ Mojo - The Duct Tape!
 
   use Mojo::Base 'Mojo';
 
-  # All the complexities of CGI, FastCGI, PSGI, HTTP and WebSockets get
-  # reduced to a single method call!
+  # All the complexities of CGI, PSGI, HTTP and WebSockets get reduced to a
+  # single method call!
   sub handler {
     my ($self, $tx) = @_;
 

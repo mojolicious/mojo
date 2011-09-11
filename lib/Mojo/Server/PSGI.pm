@@ -57,6 +57,9 @@ sub run {
   return [$code, \@headers, $body];
 }
 
+# "Wow! Homer must have got one of those robot cars!
+#  *Car crashes in background*
+#  Yeah, one of those AMERICAN robot cars."
 package Mojo::Server::PSGI::_Handle;
 use Mojo::Base -base;
 

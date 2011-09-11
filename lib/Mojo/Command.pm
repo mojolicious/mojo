@@ -20,8 +20,8 @@ has description => 'No description.';
 has message     => <<"EOF";
 usage: $0 COMMAND [OPTIONS]
 
-Tip: CGI, FastCGI and PSGI environments can be automatically detected very
-     often and work without commands.
+Tip: CGI and PSGI environments can be automatically detected very often and
+     work without commands.
 
 These commands are currently available:
 EOF
@@ -94,16 +94,8 @@ sub detect {
   return 'cgi'
     if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
 
-  # No further detection if we have a guess
-  return $guess if $guess;
-
-  # FastCGI (detect absence of WINDIR for Windows and USER for UNIX)
-  return 'fastcgi'
-    if !defined $ENV{WINDIR}
-      && !defined $ENV{USER}
-      && !defined $ENV{HARNESS_ACTIVE};
-
   # Nothing
+  return $guess if $guess;
   return;
 }
 

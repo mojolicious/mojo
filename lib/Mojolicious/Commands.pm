@@ -85,13 +85,6 @@ Start application with standalone HTTP 1.1 server backend.
 
 Run code against application.
 
-=head2 C<fastcgi>
-
-  $ mojo fastcgi
-  $ script/myapp fastcgi
-
-Start application with FastCGI backend.
-
 =head2 C<generate>
 
   $ mojo generate

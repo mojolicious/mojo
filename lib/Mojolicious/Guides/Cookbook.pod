@@ -154,7 +154,7 @@ variable.
 
 =head2 Plack Middleware
 
-You can even use middleware right in your application.
+You can use middleware right in your application.
 
   use Mojolicious::Lite;
   use Plack::Builder;
@@ -167,6 +167,17 @@ You can even use middleware right in your application.
   builder {
       enable 'Deflater';
       app->start;
+  };
+
+For more control you can even use deployment specific wrappers like
+C<myapp.fcgi>.
+
+  #!/usr/bin/env plackup -s FCGI
+  use Plack::Builder;
+
+  builder {
+    enable 'Deflater';
+    require 'myapp.pl';
   };
 
 =head2 Rewriting

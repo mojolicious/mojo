@@ -511,6 +511,8 @@ sub _parse_formdata {
     my ($name)     = $disposition =~ /\ name="?([^\";]+)"?/;
     my ($filename) = $disposition =~ /\ filename="?([^\"]*)"?/;
     my $value      = $part;
+
+    # Unescape
     url_unescape $name     if $name;
     url_unescape $filename if $filename;
     if ($charset) {

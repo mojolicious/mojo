@@ -160,13 +160,13 @@ You can use middleware right in your application.
   use Plack::Builder;
 
   get '/welcome' => sub {
-      my $self = shift;
-      $self->render(text => 'Hello Mojo!');
+    my $self = shift;
+    $self->render(text => 'Hello Mojo!');
   };
 
   builder {
-      enable 'Deflater';
-      app->start;
+    enable 'Deflater';
+    app->start;
   };
 
 For more control you can even use deployment specific wrappers like

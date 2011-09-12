@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 17;
+use Test::More tests => 16;
 
 use Mojo::Message::Response;
 
@@ -98,8 +98,3 @@ is $res->headers->content_type, 'application/json',
 is $res->headers->content_length, 27, 'right "Content-Length" value';
 is $res->json->{lalala}, 23,    'right value';
 is $res->json->{bar},    'baz', 'right value';
-
-# Test closed STDOUT
-my $cgi = Mojo::Server::CGI->new;
-close(STDOUT);
-ok((not defined $cgi->run), 'working with closed STDOUT');

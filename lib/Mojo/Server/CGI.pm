@@ -21,6 +21,7 @@ sub run {
   $tx->local_port($ENV{SERVER_PORT});
 
   # Request body
+  binmode STDIN;
   while (!$req->is_done) {
     my $read = STDIN->read(my $buffer, CHUNK_SIZE, 0);
     last unless $read;
@@ -29,9 +30,10 @@ sub run {
 
   # Handle
   $self->on_request->($self, $tx);
-  STDOUT->autoflush(1);
 
   # Response start line
+  STDOUT->autoflush(1);
+  binmode STDOUT;
   my $res    = $tx->res;
   my $offset = 0;
   if ($self->nph) {

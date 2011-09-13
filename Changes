@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation. (rhaen, sri)
         - Improved test command to run tests in alphabetical order.
           (viliampucik)
+        - Improved non-blocking resolver by allowing it to be disabled.
         - Improved tests.
         - Fixed small bug in cookie jar.
         - Fixed small plugin loader bug.

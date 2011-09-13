@@ -271,6 +271,13 @@ Note that L<IO::Socket::IP> must be installed for IPv6 support.
 
   MOJO_NO_IPV6=1
 
+=head2 C<MOJO_NO_RESOLVER>
+
+Disable non-blocking resolver support and fall back to blocking system
+resolver.
+
+  MOJO_NO_RESOLVER=1
+
 =head2 C<MOJO_NO_TLS>
 
 Disable TLS support, this might result in slightly better performance and

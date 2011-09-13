@@ -135,7 +135,10 @@ sub resolve {
   my $loop   = $self->ioloop;
   weaken $self;
   return $loop->defer(sub { $self->$cb([]) })
-    if !$server || !$t || ($t ne $DNS_TYPES->{PTR} && ($v4 || $v6));
+    if $ENV{MOJO_NO_RESOLVER}
+      || !$server
+      || !$t
+      || ($t ne $DNS_TYPES->{PTR} && ($v4 || $v6));
 
   # Build request
   warn "RESOLVE $type $name ($server)\n" if DEBUG;

@@ -11,7 +11,7 @@ use Test::More;
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
 plan skip_all => 'Perl 5.12 required for this test!' unless $] >= 5.012;
-plan tests => 18;
+plan tests => 20;
 
 use_ok 'Mojo::IOLoop';
 
@@ -38,6 +38,35 @@ ok keys %types > 1, 'multiple record types';
 
 # Lookup
 my $result;
+$r->lookup(
+  'google.com',
+  sub {
+    my ($self, $address) = @_;
+    $result = $address;
+    Mojo::IOLoop->stop;
+  }
+);
+Mojo::IOLoop->start;
+ok $result, 'got an address';
+
+# Lookup with disabled resolver
+$result = undef;
+my $backup = $ENV{MOJO_NO_RESOLVER};
+$ENV{MOJO_NO_RESOLVER} = 1;
+$r->lookup(
+  'google.com',
+  sub {
+    my ($self, $address) = @_;
+    $result = $address;
+    Mojo::IOLoop->stop;
+  }
+);
+Mojo::IOLoop->start;
+ok !$result, 'got no address';
+$ENV{MOJO_NO_RESOLVER} = $backup;
+
+# Lookup again
+$result = undef;
 $r->lookup(
   'google.com',
   sub {

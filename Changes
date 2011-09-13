@@ -12,6 +12,7 @@ This file documents the revision history for Perl extension Mojolicious.
           (viliampucik)
         - Improved non-blocking resolver by allowing it to be disabled.
         - Improved tests.
+        - Fixed small name generation bug in Mojolicious::Plugin::Config.
         - Fixed small bug in cookie jar.
         - Fixed small plugin loader bug.
         - Fixed Hypnotoad to clean up lock files.

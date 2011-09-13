@@ -1,8 +1,9 @@
 package Mojolicious::Plugin::Config;
 use Mojo::Base 'Mojolicious::Plugin';
 
-require File::Basename;
-require File::Spec;
+use File::Basename 'basename';
+use File::Spec;
+use Mojo::Util 'decamelize';
 
 use constant DEBUG => $ENV{MOJO_CONFIG_DEBUG} || 0;
 
@@ -37,15 +38,19 @@ sub register {
   my ($self, $app, $conf) = @_;
   $conf ||= {};
 
-  # File
+  # Config file
   my $file = $conf->{file} || $ENV{MOJO_CONFIG};
   unless ($file) {
+    $file = $ENV{MOJO_APP};
 
-    # Basename
-    $file = File::Basename::basename($ENV{MOJO_EXE} || $0);
+    # Class
+    if ($file && !ref $file) { decamelize $file }
 
-    # Remove .pl, .p6 and .t extentions
-    $file =~ s/(?:\.p(?:l|6))|\.t$//i;
+    # File
+    else { $file = basename($ENV{MOJO_EXE} || $0) }
+
+    # Remove .pl and .t extentions
+    $file =~ s/\.(?:pl|t)$//i;
 
     # Default extension
     $file .= '.' . ($conf->{ext} || 'conf');

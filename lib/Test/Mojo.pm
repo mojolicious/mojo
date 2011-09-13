@@ -37,9 +37,10 @@ EOF
 }
 
 sub app {
-  my $self = shift;
-  return $self->ua->app unless @_;
-  $self->ua->app(@_);
+  my ($self, $app) = @_;
+  return $self->ua->app unless $app;
+  $ENV{MOJO_APP} ||= $app;
+  $self->ua->app($app);
   return $self;
 }
 

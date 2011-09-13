@@ -13,8 +13,6 @@ BEGIN {
 # "Who are you, and why should I care?"
 use Test::More tests => 15;
 
-# "Of all the parasites I've had over the years,
-#  these worms are among the best."
 use FindBin;
 require "$FindBin::Bin/external/myapp.pl";
 use Test::Mojo;

@@ -230,8 +230,6 @@ sub _list_data_templates {
   return [keys %$all];
 }
 
-# "Well, at least here you'll be treated with dignity.
-#  Now strip naked and get on the probulator."
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 

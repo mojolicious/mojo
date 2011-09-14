@@ -5,8 +5,9 @@ Mojolicious::Guides::Growing - Growing
 
 =head1 OVERVIEW
 
-Starting a L<Mojolicious::Lite> prototype from scratch and growing it into a
-well structured L<Mojolicious> application.
+This document explains the process of starting a L<Mojolicious::Lite>
+prototype from scratch and growing it into a well structured L<Mojolicious>
+application.
 
 =head1 CONCEPTS
 

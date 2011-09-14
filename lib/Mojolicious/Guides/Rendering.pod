@@ -7,7 +7,7 @@ Mojolicious::Guides::Rendering - Rendering
 
 =head1 OVERVIEW
 
-Generating content with the L<Mojolicious> renderer.
+This document explains content generation with the L<Mojolicious> renderer.
 
 =head1 CONCEPTS
 

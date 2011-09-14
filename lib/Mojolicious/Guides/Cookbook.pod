@@ -5,7 +5,7 @@ Mojolicious::Guides::Cookbook - Cookbook
 
 =head1 OVERVIEW
 
-Cooking with L<Mojolicious>, recipes for every taste.
+This document cotains many fun recipes for cooking with L<Mojolicious>.
 
 =head1 DEPLOYMENT
 

@@ -8,7 +8,7 @@ Mojolicious::Guides::CodingGuidelines - Coding Guidelines
 This document describes the coding guidelines that are the foundations
 of L<Mojo> and L<Mojolicious> development.
 
-Please don't send patches unless you agree with them.
+Please do not send patches unless you agree with them.
 
 =head1 MISSION STATEMENT
 

@@ -16,7 +16,7 @@ my $command = Mojo::Command->new;
 isa_ok $command->app, 'Mojo', 'right application';
 
 # UNIX DATA templates
-my $unix = "@@ template1\nFirst Template\n@@ template2\r\nSecond Template\n";
+my $unix = "@@ template1\nFirst Template\n@\@template2\r\nSecond Template\n";
 open my $data, '<', \$unix;
 no strict 'refs';
 *{"Example::Package::UNIX::DATA"} = $data;
@@ -30,7 +30,7 @@ close $data;
 
 # Windows DATA templates
 my $windows =
-  "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
+  "@@ template3\r\nThird Template\r\n@\@template4\r\nFourth Template\r\n";
 open $data, '<', \$windows;
 no strict 'refs';
 *{"Example::Package::Windows::DATA"} = $data;

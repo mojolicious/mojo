@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved test command to run tests in alphabetical order.
           (viliampucik)
         - Improved non-blocking resolver by allowing it to be disabled.
+        - Improved DATA templates by removing a whitespace requirement.
         - Improved tests.
         - Fixed small name generation bug in Mojolicious::Plugin::Config.
         - Fixed small bug in cookie jar.

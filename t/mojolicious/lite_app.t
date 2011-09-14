@@ -1957,7 +1957,7 @@ Not Bender!
 @@ localized_partial.html.ep
 <%= $test %>
 
-@@ layouts/localized1.html.ep
+@@layouts/localized1.html.ep
 localized1 <%= content %>
 
 @@ layouts/localized2.html.ep

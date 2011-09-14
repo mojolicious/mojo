@@ -116,7 +116,7 @@ sub get_all_data {
   $content =~ s/\n__END__\r?\n.*$/\n/s;
 
   # Split
-  my @data = split /^@@\s+(.+?)\s*\r?\n/m, $content;
+  my @data = split /^@@\s*(.+?)\s*\r?\n/m, $content;
   shift @data;
 
   # Find data

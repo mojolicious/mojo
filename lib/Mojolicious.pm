@@ -759,6 +759,9 @@ In addition to the attributes and methods above you can also call helpers on
 instances of L<Mojolicious>.
 This includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
+Note that application helpers are always called with a new
+C<controller_class> instance, so they can't depend on or change controller
+state, which includes request, response and stash.
 
   $app->log->debug($app->dumper({foo => 'bar'}));
 

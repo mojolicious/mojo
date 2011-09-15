@@ -188,10 +188,11 @@ sub param {
 sub redirect_to {
   my $self = shift;
 
-  my $headers = $self->res->headers;
+  # Don't override 3xx status
+  my $res     = $self->res;
+  my $headers = $res->headers;
   $headers->location($self->url_for(@_)->to_abs);
-  $headers->content_length(0);
-  $self->rendered($self->res->is_status_class(300) ? undef : 302);
+  $self->rendered($res->is_status_class(300) ? undef : 302);
 
   return $self;
 }

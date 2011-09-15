@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 902;
+use Test::More tests => 903;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -584,6 +584,7 @@ get '/redirect_callback' => sub {
   Mojo::IOLoop->defer(
     sub {
       $self->res->code(301);
+      $self->res->body('Whatever!');
       $self->redirect_to('http://127.0.0.1/foo');
     }
   );
@@ -1567,8 +1568,8 @@ $t->get_ok('/redirect_no_render')->status_is(302)
 $t->get_ok('/redirect_callback')->status_is(301)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 0)
-  ->header_is(Location         => 'http://127.0.0.1/foo');
+  ->header_is('Content-Length' => 9)
+  ->header_is(Location => 'http://127.0.0.1/foo')->content_is('Whatever!');
 
 # GET /static_render
 $t->get_ok('/static_render')->status_is(200)

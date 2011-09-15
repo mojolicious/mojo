@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 675;
+use Test::More tests => 698;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1963,3 +1963,32 @@ is $dom->find('entry')->[1]->addresses->formatted->text(0),
   'right text';
 is $dom->find('entry')->[2], undef, 'no result';
 is $dom->find('entry')->size, 2, 'right number of elements';
+
+# Find "0" attribute value
+$dom = Mojo::DOM->new(<<EOF);
+<a accesskey="0">Zero</a>
+<a accesskey="1">One</a>
+EOF
+is $dom->find('a[accesskey]')->[0]->text, 'Zero', 'right text';
+is $dom->find('a[accesskey]')->[1]->text, 'One',  'right text';
+is $dom->find('a[accesskey]')->[2], undef, 'no result';
+is $dom->find('a[accesskey="0"]')->[0]->text, 'Zero', 'right text';
+is $dom->find('a[accesskey="0"]')->[1], undef, 'no result';
+is $dom->find('a[accesskey^="0"]')->[0]->text, 'Zero', 'right text';
+is $dom->find('a[accesskey^="0"]')->[1], undef, 'no result';
+is $dom->find('a[accesskey$="0"]')->[0]->text, 'Zero', 'right text';
+is $dom->find('a[accesskey$="0]')->[1], undef, 'no result';
+is $dom->find('a[accesskey~="0"]')->[0]->text, 'Zero', 'right text';
+is $dom->find('a[accesskey~="0]')->[1], undef, 'no result';
+is $dom->find('a[accesskey*="0"]')->[0]->text, 'Zero', 'right text';
+is $dom->find('a[accesskey*="0]')->[1], undef, 'no result';
+is $dom->find('a[accesskey="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey="1"]')->[1], undef, 'no result';
+is $dom->find('a[accesskey^="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey^="1"]')->[1], undef, 'no result';
+is $dom->find('a[accesskey$="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey$="1]')->[1], undef, 'no result';
+is $dom->find('a[accesskey~="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey~="1]')->[1], undef, 'no result';
+is $dom->find('a[accesskey*="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey*="1]')->[1], undef, 'no result';

@@ -287,7 +287,7 @@ sub _equation {
 
 sub _regex {
   my ($self, $op, $value) = @_;
-  return unless $value;
+  return unless defined $value;
   $value = quotemeta $self->_unescape($value);
 
   # "~=" (word)
@@ -340,8 +340,8 @@ sub _selector {
       my $found = 0;
       for my $name (keys %$attrs) {
         if ($name =~ /\:?$key$/) {
-          ++$found and last
-            if !$regex || ($attrs->{$name} || '') =~ /$regex/;
+          next unless defined(my $value = $attrs->{$name});
+          ++$found and last if !$regex || $value =~ $regex;
         }
       }
       next if $found;

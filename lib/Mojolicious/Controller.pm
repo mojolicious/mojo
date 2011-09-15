@@ -191,7 +191,7 @@ sub redirect_to {
   my $headers = $self->res->headers;
   $headers->location($self->url_for(@_)->to_abs);
   $headers->content_length(0);
-  $self->rendered(302);
+  $self->rendered($self->res->is_status_class(300) ? undef : 302);
 
   return $self;
 }

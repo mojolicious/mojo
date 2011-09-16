@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 1.99    2011-09-16 00:00:00
+        - Deprecated direct hash access to the flash in
+          Mojolicious::Controller.
         - Added EXPERIMENTAL profile helper.
         - Improved documentation.
         - Fixed small redirect_to bug. (judofyr, sri)

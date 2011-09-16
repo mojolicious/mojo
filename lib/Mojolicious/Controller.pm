@@ -123,8 +123,9 @@ sub flash {
   $flash = {} unless $flash && ref $flash eq 'HASH';
   $session->{new_flash} = $flash;
 
-  # Hash
-  return $flash unless @_;
+  # DEPRECATED in Smiling Face With Sunglasses!
+  warn "Direct hash access to the flash is DEPRECATED!!!\n" and return $flash
+    unless @_;
 
   # Set
   my $values = @_ > 1 ? {@_} : $_[0];
@@ -760,7 +761,6 @@ Gracefully end WebSocket connection or long poll stream.
 
 =head2 C<flash>
 
-  my $flash = $c->flash;
   my $foo   = $c->flash('foo');
   $c        = $c->flash({foo => 'bar'});
   $c        = $c->flash(foo => 'bar');

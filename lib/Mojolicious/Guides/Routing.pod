@@ -420,11 +420,12 @@ equal to the route itself without non-word characters.
   # Generate URL "/foo/bar"
   $self->url_for('foobar');
 
-To refer to the current route you can always use the reserved name
-C<current>.
+To refer to the current route you can use the reserved name C<current> or no
+name at all.
 
   # Generate URL for current route
   $self->url_for('current');
+  $self->url_for;
 
 =head2 HTTP Methods
 

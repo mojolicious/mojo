@@ -1032,8 +1032,8 @@ A L<Mojo::UserAgent> prepared for the current environment.
 =head2 C<url_for>
 
   my $url = $c->url_for;
-  my $url = $c->url_for(controller => 'bar', action => 'baz');
-  my $url = $c->url_for('named', controller => 'bar', action => 'baz');
+  my $url = $c->url_for(name => 'sebastian');
+  my $url = $c->url_for('test', name => 'sebastian');
   my $url = $c->url_for('/perldoc');
   my $url = $c->url_for('http://mojolicio.us/perldoc');
 

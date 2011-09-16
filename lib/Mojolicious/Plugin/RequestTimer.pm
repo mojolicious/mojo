@@ -8,25 +8,14 @@ use Time::HiRes qw/gettimeofday tv_interval/;
 sub register {
   my ($self, $app) = @_;
 
-  # Add "start_timer" helper
+  # Add "profile" helper
   $app->helper(
-    start_timer => sub {
+    profile => sub {
       my ($self, $name) = @_;
-      $self->stash->{'mojo.timer'}->{$name} = [gettimeofday()];
-    }
-  );
-
-  # Add "stop_timer" helper
-  $app->helper(
-    stop_timer => sub {
-      my ($self, $name) = @_;
-      my $elapsed = sprintf '%f',
-        tv_interval($self->stash->{'mojo.timer'}->{$name} || [0, 0],
-        [gettimeofday()]);
-      return
-        wantarray
-        ? ($elapsed, $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed)
-        : $elapsed;
+      my $profile = $self->stash->{'mojo.time'}->{$name} ||= [gettimeofday()];
+      my $elapsed = sprintf '%f', tv_interval($profile, [gettimeofday()]);
+      return $elapsed unless wantarray;
+      return $elapsed, $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
     }
   );
 
@@ -42,7 +31,7 @@ sub register {
       my $path   = $req->url->path->to_abs_string;
       my $ua     = $req->headers->user_agent || 'Anonymojo';
       $self->app->log->debug("$method $path ($ua).");
-      $self->start_timer('request');
+      $self->profile('mojo.request');
     }
   );
 
@@ -56,7 +45,7 @@ sub register {
       my $res     = $self->res;
       my $code    = $res->code || 200;
       my $message = $res->message || $res->default_message($code);
-      my ($elapsed, $rps) = $self->stop_timer('request');
+      my ($elapsed, $rps) = $self->profile('mojo.request');
       $self->app->log->debug("$code $message (${elapsed}s, $rps/s).");
     }
   );
@@ -88,19 +77,13 @@ example for learning to build new plugins.
 
 L<Mojolicious::Plugin::RequestTimer> implements the following helpers.
 
-=head2 C<start_timer>
+=head2 C<profile>
 
-  <% start_timer 'page'; %>
+  <% profile 'page'; %>
+  <%= profile 'page' %>
+  <%= my ($elapsed, $rps) = profile 'page'; %>
 
-Start timer.
-Note that this helper is EXPERIMENTAL and might change without warning!
-
-=head2 C<stop_timer>
-
-  <%= stop_timer 'page' %>
-  <%= my ($elapsed, $rps) = stop_timer 'page'; %>
-
-Stop timer and return elapsed time in seconds.
+Start profile and return results.
 Note that this helper is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

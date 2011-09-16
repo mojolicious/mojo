@@ -44,7 +44,7 @@ get 'form/:test' => 'form';
 put 'selection';
 
 # GET /timed
-get '/timed' => sub { shift->start_timer('page') };
+get '/timed' => sub { shift->profile('page') };
 
 # GET /rps
 get '/rps';
@@ -407,9 +407,9 @@ __DATA__
 %= end
 
 @@ timed.html.ep
-<%= stop_timer "page" %> seconds
+<%= profile "page" %> seconds
 
 @@ rps.html.ep
-% start_timer 'foo';
+% profile 'foo';
 lalala
-<%= (stop_timer('foo'))[0] %>s (<%= (stop_timer('foo'))[1] %>/s)
+<%= (profile('foo'))[0] %>s (<%= (profile('foo'))[1] %>/s)

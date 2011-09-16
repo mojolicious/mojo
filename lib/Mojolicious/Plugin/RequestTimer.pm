@@ -21,7 +21,8 @@ sub register {
     stop_timer => sub {
       my ($self, $name) = @_;
       my $elapsed = sprintf '%f',
-        tv_interval($self->stash->{'mojo.timer'}->{$name}, [gettimeofday()]);
+        tv_interval($self->stash->{'mojo.timer'}->{$name} || [0, 0],
+        [gettimeofday()]);
       return
         wantarray
         ? ($elapsed, $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed)
@@ -97,7 +98,7 @@ Note that this helper is EXPERIMENTAL and might change without warning!
 =head2 C<stop_timer>
 
   <%= stop_timer 'page' %>
-  <%= (stop_timer('page'))[1] %>
+  <%= my ($elapsed, $rps) = stop_timer 'page'; %>
 
 Stop timer and return elapsed time in seconds.
 Note that this helper is EXPERIMENTAL and might change without warning!

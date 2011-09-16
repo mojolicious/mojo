@@ -44,11 +44,7 @@ get 'form/:test' => 'form';
 put 'selection';
 
 # GET /timed
-get '/timed' => sub {
-  my $self = shift;
-  $self->start_timer('page');
-  $self->render(inline => '<%= stop_timer "page" %> seconds');
-};
+get '/timed' => sub { shift->start_timer('page') };
 
 # GET /rps
 get '/rps';
@@ -307,7 +303,7 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d')->status_is(200)
     . "\n");
 
 # GET /timed
-$t->get_ok('/timed')->status_is(200)->content_like(qr/\d+\.\d+\ seconds$/);
+$t->get_ok('/timed')->status_is(200)->content_like(qr/\d+\.\d+\ seconds/);
 
 # GET /rps
 $t->get_ok('/rps')->status_is(200)
@@ -409,6 +405,9 @@ __DATA__
   %= select_field bar => [['D' => 'd', disabled => 'disabled'], 'baz']
   %= submit_button
 %= end
+
+@@ timed.html.ep
+<%= stop_timer "page" %> seconds
 
 @@ rps.html.ep
 % start_timer 'foo';

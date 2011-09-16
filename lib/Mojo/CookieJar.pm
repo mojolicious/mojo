@@ -154,7 +154,7 @@ following new ones.
 
   $jar = $jar->add(@cookies);
 
-Add multiple cookies to the jar.
+Add multiple L<Mojo::Cookie::Response> objects to the jar.
 
 =head2 C<empty>
 
@@ -166,19 +166,19 @@ Empty the jar.
 
   $jar = $jar->extract($tx);
 
-Extract cookies from transaction.
+Extract response cookies from transaction.
 
 =head2 C<find>
 
   my @cookies = $jar->find($url);
 
-Find cookies in the jar.
+Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 
 =head2 C<inject>
 
   $jar = $jar->inject($tx);
 
-Inject cookies into transaction.
+Inject request cookies into transaction.
 
 =head1 SEE ALSO
 

@@ -49,7 +49,7 @@ sub client_handshake {
   $headers->connection('Upgrade') unless $headers->connection;
   $headers->sec_websocket_protocol('mojo')
     unless $headers->sec_websocket_protocol;
-  $headers->sec_websocket_version(8) unless $headers->sec_websocket_version;
+  $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
   # Generate challenge
   my $key = pack 'N*', int(rand 9999999);
@@ -378,7 +378,7 @@ Mojo::Transaction::WebSocket - WebSocket Transaction Container
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions as
 described in
-L<http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-13.txt>.
+L<http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-14.txt>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

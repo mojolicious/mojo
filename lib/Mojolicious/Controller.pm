@@ -765,11 +765,7 @@ Gracefully end WebSocket connection or long poll stream.
   $c        = $c->flash({foo => 'bar'});
   $c        = $c->flash(foo => 'bar');
 
-Data storage persistent for the next request, stored in the session.
-
-  $c->flash->{foo} = 'bar';
-  my $foo = $c->flash->{foo};
-  delete $c->flash->{foo};
+Data storage persistent only for the next request, stored in the session.
 
 =head2 C<on_finish>
 

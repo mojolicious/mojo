@@ -50,6 +50,8 @@ and encoding on all layers of L<Mojolicious>.
 
 =head1 OPTIONS
 
+L<Mojolicious::Plugin::Charset> supports the following options.
+
 =head2 C<charset>
 
   # Mojolicious::Lite

@@ -190,6 +190,8 @@ rawr!
 
 =head1 OPTIONS
 
+L<Mojolicious::Plugin::PODRenderer> supports the following options.
+
 =head2 C<name>
 
   # Mojolicious::Lite
@@ -213,6 +215,8 @@ Note that this option is EXPERIMENTAL and might change without warning!
 Handler name of preprocessor.
 
 =head1 HELPERS
+
+L<Mojolicious::Plugin::PODRenderer> implements the following helpers.
 
 =head2 C<pod_to_html>
 

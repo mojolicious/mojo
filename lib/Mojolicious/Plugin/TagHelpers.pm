@@ -370,6 +370,8 @@ always be generated automatically.
 
 =head1 HELPERS
 
+L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
+
 =head2 C<base_tag>
 
   <%= base_tag %>

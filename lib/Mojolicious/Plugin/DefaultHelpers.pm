@@ -125,6 +125,8 @@ example for learning to build new plugins.
 
 =head1 HELPERS
 
+L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
+
 =head2 C<app>
 
   <%= app->secret %>

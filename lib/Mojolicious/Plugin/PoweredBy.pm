@@ -43,6 +43,8 @@ example for learning to build new plugins.
 
 =head1 OPTIONS
 
+L<Mojolicious::Plugin::PoweredBy> supports the following options.
+
 =head2 C<powered_by>
 
   plugin PoweredBy => (name => 'MyApp 1.0');

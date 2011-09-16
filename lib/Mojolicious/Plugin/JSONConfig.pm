@@ -92,8 +92,8 @@ ones like C<myapp.$mode.json>.
 
 =head1 OPTIONS
 
-L<Mojolicious::Plugin::JSONConfig> accepts the same options as
-L<Mojolicious::Plugin::Config> and the following new ones.
+L<Mojolicious::Plugin::JSONConfig> inherits all options from
+L<Mojolicious::Plugin::Config> and supports the following new ones.
 
 =head2 C<template>
 
@@ -104,7 +104,7 @@ Template options.
 
 =head1 HELPERS
 
-L<Mojolicious::Plugin::JSONConfig> defines the same helpers as
+L<Mojolicious::Plugin::JSONConfig> inherits all helpers from
 L<Mojolicious::Plugin::Config>.
 
 =head1 METHODS

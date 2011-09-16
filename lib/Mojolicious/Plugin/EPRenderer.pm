@@ -119,6 +119,8 @@ example for learning to build new plugins.
 
 =head1 OPTIONS
 
+L<Mojolicious::Plugin::EPRenderer> supports the following options.
+
 =head2 C<name>
 
   # Mojolicious::Lite

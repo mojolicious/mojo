@@ -127,6 +127,8 @@ The default lexicon class will only be generated if it doesn't already exist.
 
 =head1 OPTIONS
 
+L<Mojolicious::Plugin::I18N> supports the following options.
+
 =head2 C<default>
 
   # Mojolicious::Lite
@@ -142,6 +144,8 @@ Default language, defaults to C<en>.
 Lexicon namespace, defaults to the application class followed by C<::I18N>.
 
 =head1 HELPERS
+
+L<Mojolicious::Plugin::I18N> implements the following helpers.
 
 =head2 C<l>
 

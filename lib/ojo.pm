@@ -95,8 +95,8 @@ L<ojo> implements the following functions.
 
   my $app = a('/' => sub { shift->render(json => {hello => 'world'}) });
 
-Create a L<Mojolicious::Lite> route accepting all request methods and return
-the application.
+Create a route with L<Mojolicious::Lite/"any"> and return the current
+L<Mojolicious::Lite> object.
 
   perl -Mojo -e 'a("/" => {text => "Hello Mojo!"})->start' daemon
 
@@ -118,53 +118,23 @@ Note that this function is EXPERIMENTAL and might change without warning!
 =head2 C<d>
 
   my $res = d('http://mojolicio.us');
-  my $res = d('http://mojolicio.us', {'X-Bender' => 'X_x'});
-  my $res = d(
-      'http://mojolicio.us',
-      {'Content-Type' => 'text/plain'},
-      'Hello!'
-  );
 
-Perform C<DELETE> request and turn response into a L<Mojo::Message::Response>
-object.
+Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return
+resulting L<Mojo::Message::Response> object.
 
 =head2 C<f>
 
   my $res = f('http://kraih.com/foo' => {test => 123});
-  my $res = f('http://kraih.com/foo', 'UTF-8', {test => 123});
-  my $res = f(
-    'http://kraih.com/foo',
-    {test => 123},
-    {'Content-Type' => 'multipart/form-data'}
-  );
-  my $res = f(
-    'http://kraih.com/foo',
-    'UTF-8',
-    {test => 123},
-    {'Content-Type' => 'multipart/form-data'}
-  );
-  my $res = f('http://kraih.com/foo', {file => {file => '/foo/bar.txt'}});
-  my $res = f('http://kraih.com/foo', {file => {content => 'lalala'}});
-  my $res = f(
-    'http://kraih.com/foo',
-    {myzip => {file => $asset, filename => 'foo.zip'}}
-  );
 
-Perform a C<POST> request for a form and turn response into a
-L<Mojo::Message::Response> object.
+Perform C<POST> form request with L<Mojo::UserAgent/"post_form"> and return
+resulting L<Mojo::Message::Response> object.
 
 =head2 C<g>
 
   my $res = g('http://mojolicio.us');
-  my $res = g('http://mojolicio.us', {'X-Bender' => 'X_x'});
-  my $res = g(
-    'http://mojolicio.us',
-    {'Content-Type' => 'text/plain'},
-    'Hello!'
-  );
 
-Perform C<GET> request and turn response into a L<Mojo::Message::Response>
-object.
+Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
+L<Mojo::Message::Response> object.
 One redirect will be followed by default, you can change this behavior with
 the C<MOJO_MAX_REDIRECTS> environment variable.
 
@@ -173,41 +143,23 @@ the C<MOJO_MAX_REDIRECTS> environment variable.
 =head2 C<h>
 
   my $res = h('http://mojolicio.us');
-  my $res = h('http://mojolicio.us', {'X-Bender' => 'X_x'});
-  my $res = h(
-    'http://mojolicio.us',
-    {'Content-Type' => 'text/plain'},
-    'Hello!'
-  );
 
-Perform C<HEAD> request and turn response into a L<Mojo::Message::Response>
-object.
+Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
+L<Mojo::Message::Response> object.
 
 =head2 C<p>
 
   my $res = p('http://mojolicio.us');
-  my $res = p('http://mojolicio.us', {'X-Bender' => 'X_x'});
-  my $res = p(
-    'http://mojolicio.us',
-    {'Content-Type' => 'text/plain'},
-    'Hello!'
-  );
 
-Perform C<POST> request and turn response into a L<Mojo::Message::Response>
-object.
+Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
+L<Mojo::Message::Response> object.
 
 =head2 C<u>
 
   my $res = u('http://mojolicio.us');
-  my $res = u('http://mojolicio.us', {'X-Bender' => 'X_x'});
-  my $res = u(
-    'http://mojolicio.us',
-    {'Content-Type' => 'text/plain'},
-    'Hello!'
-  );
 
-Perform C<PUT> request and turn response into a L<Mojo::Message::Response>
-object.
+Perform C<PUT> request with L<Mojo::UserAgent/"put"> and return resulting
+L<Mojo::Message::Response> object.
 
 =head2 C<x>
 

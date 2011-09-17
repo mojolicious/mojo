@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojolicious.
 1.99    2011-09-17 00:00:00
         - Deprecated direct hash access to the flash in
           Mojolicious::Controller.
+        - Added EXPERIMENTAL build_frame and parse_frame methods to
+          Mojo::Transaction::WebSocket.
         - Added EXPERIMENTAL profile helper.
         - Added EXPERIMENTAL binary support to Mojo::Transaction::WebSocket.
         - Updated WebSocket implementation to ietf-14.

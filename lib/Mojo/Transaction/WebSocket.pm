@@ -29,6 +29,64 @@ has handshake => sub { Mojo::Transaction::HTTP->new };
 has [qw/masked on_message/];
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
+sub build_frame {
+  my ($self, $fin, $op, $payload) = @_;
+  warn "BUILDING FRAME\n" if DEBUG;
+
+  # Head
+  my $frame = 0;
+  vec($frame, 0, 8) = $op | 0b10000000 if $fin;
+
+  # Mask payload
+  warn "PAYLOAD: $payload\n" if DEBUG;
+  my $masked = $self->masked;
+  if ($masked) {
+    warn "MASKING PAYLOAD\n" if DEBUG;
+    my $mask = pack 'N', int(rand 9999999);
+    $payload = $mask . _xor_mask($payload, $mask);
+  }
+
+  # Length
+  my $len = length $payload;
+  $len -= 4 if $masked;
+
+  # Empty prefix
+  my $prefix = 0;
+
+  # Small payload
+  if ($len < 126) {
+    vec($prefix, 0, 8) = $masked ? ($len | 0b10000000) : $len;
+    $frame .= $prefix;
+  }
+
+  # Extended payload (16bit)
+  elsif ($len < 65536) {
+    vec($prefix, 0, 8) = $masked ? (126 | 0b10000000) : 126;
+    $frame .= $prefix;
+    $frame .= pack 'n', $len;
+  }
+
+  # Extended payload (64bit)
+  else {
+    vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
+    $frame .= $prefix;
+    $frame .=
+      $Config{ivsize} > 4
+      ? pack('Q>', $len)
+      : pack('NN', $len >> 32, $len & 0xFFFFFFFF);
+  }
+
+  if (DEBUG) {
+    warn 'HEAD: ' . unpack('B*', $frame) . "\n";
+    warn "OPCODE: $op\n";
+  }
+
+  # Payload
+  $frame .= $payload;
+
+  return $frame;
+}
+
 sub client_challenge {
   my $self = shift;
 
@@ -77,8 +135,83 @@ sub finish {
 
 sub is_websocket {1}
 
-sub local_address  { shift->handshake->local_address }
-sub local_port     { shift->handshake->local_port }
+sub local_address { shift->handshake->local_address }
+sub local_port    { shift->handshake->local_port }
+
+sub parse_frame {
+  my ($self, $buffer) = @_;
+  warn "PARSING FRAME\n" if DEBUG;
+
+  # Head
+  my $clone = $$buffer;
+  return unless length $clone > 2;
+  my $head = substr $clone, 0, 2;
+  warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
+
+  # FIN
+  my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
+  warn "FIN: $fin\n" if DEBUG;
+
+  # Opcode
+  my $op = vec($head, 0, 8) & 0b00001111;
+  warn "OPCODE: $op\n" if DEBUG;
+
+  # Length
+  my $len = vec($head, 1, 8) & 0b01111111;
+  warn "LENGTH: $len\n" if DEBUG;
+
+  # No payload
+  my $hlen = 2;
+  if ($len == 0) { warn "NOTHING\n" if DEBUG }
+
+  # Small payload
+  elsif ($len < 126) { warn "SMALL\n" if DEBUG }
+
+  # Extended payload (16bit)
+  elsif ($len == 126) {
+    return unless length $clone > 4;
+    $hlen = 4;
+    my $ext = substr $clone, 2, 2;
+    $len = unpack 'n', $ext;
+    warn "EXTENDED (16bit): $len\n" if DEBUG;
+  }
+
+  # Extended payload (64bit)
+  elsif ($len == 127) {
+    return unless length $clone > 10;
+    $hlen = 10;
+    my $ext = substr $clone, 2, 8;
+    $len =
+      $Config{ivsize} > 4
+      ? unpack('Q>', $ext)
+      : unpack('N', substr($ext, 4, 4));
+    warn "EXTENDED (64bit): $len\n" if DEBUG;
+  }
+
+  # Check message size
+  $self->finish and return if $len > $self->max_websocket_size;
+
+  # Check if whole packet has arrived
+  my $masked = vec($head, 1, 8) & 0b10000000;
+  return if length $clone < ($len + $hlen + $masked ? 4 : 0);
+  substr $clone, 0, $hlen, '';
+
+  # Payload
+  $len += 4 if $masked;
+  return if length $clone < $len;
+  my $payload = $len ? substr($clone, 0, $len, '') : '';
+
+  # Unmask payload
+  if ($masked) {
+    warn "UNMASKING PAYLOAD\n" if DEBUG;
+    $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
+  }
+  warn "PAYLOAD: $payload\n" if DEBUG;
+  $$buffer = $clone;
+
+  return [$fin, $op, $payload];
+}
+
 sub remote_address { shift->handshake->remote_address }
 sub remote_port    { shift->handshake->remote_port }
 sub req            { shift->handshake->req(@_) }
@@ -122,8 +255,6 @@ sub server_handshake {
   return $self;
 }
 
-# "Being eaten by crocodile is just like going to sleep...
-#  in a giant blender."
 sub server_read {
   my ($self, $chunk) = @_;
 
@@ -131,11 +262,9 @@ sub server_read {
   $self->{read} = '' unless defined $self->{read};
   $self->{read} .= $chunk if defined $chunk;
 
-  # Message buffer
-  $self->{message} = '' unless defined $self->{message};
-
   # Full frames
-  while (my $frame = $self->_parse_frame) {
+  $self->{message} = '' unless defined $self->{message};
+  while (my $frame = $self->parse_frame(\$self->{read})) {
     my $op = $frame->[1] || CONTINUATION;
 
     # Ping
@@ -194,64 +323,6 @@ sub server_write {
   return $write;
 }
 
-sub _build_frame {
-  my ($self, $op, $payload) = @_;
-  warn "BUILDING FRAME\n" if DEBUG;
-
-  # Head
-  my $frame = 0;
-  vec($frame, 0, 8) = $op | 0b10000000;
-
-  # Mask payload
-  warn "PAYLOAD: $payload\n" if DEBUG;
-  my $masked = $self->masked;
-  if ($masked) {
-    warn "MASKING PAYLOAD\n" if DEBUG;
-    my $mask = pack 'N', int(rand 9999999);
-    $payload = $mask . _xor_mask($payload, $mask);
-  }
-
-  # Length
-  my $len = length $payload;
-  $len -= 4 if $masked;
-
-  # Empty prefix
-  my $prefix = 0;
-
-  # Small payload
-  if ($len < 126) {
-    vec($prefix, 0, 8) = $masked ? ($len | 0b10000000) : $len;
-    $frame .= $prefix;
-  }
-
-  # Extended payload (16bit)
-  elsif ($len < 65536) {
-    vec($prefix, 0, 8) = $masked ? (126 | 0b10000000) : 126;
-    $frame .= $prefix;
-    $frame .= pack 'n', $len;
-  }
-
-  # Extended payload (64bit)
-  else {
-    vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
-    $frame .= $prefix;
-    $frame .=
-      $Config{ivsize} > 4
-      ? pack('Q>', $len)
-      : pack('NN', $len >> 32, $len & 0xFFFFFFFF);
-  }
-
-  if (DEBUG) {
-    warn 'HEAD: ' . unpack('B*', $frame) . "\n";
-    warn "OPCODE: $op\n";
-  }
-
-  # Payload
-  $frame .= $payload;
-
-  return $frame;
-}
-
 sub _challenge {
   my ($self, $key) = @_;
 
@@ -267,86 +338,12 @@ sub _challenge {
   return $challenge;
 }
 
-sub _parse_frame {
-  my $self = shift;
-  warn "PARSING FRAME\n" if DEBUG;
-
-  # Head
-  my $buffer = $self->{read};
-  return unless length $buffer > 2;
-  my $head = substr $buffer, 0, 2;
-  warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
-
-  # FIN
-  my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
-  warn "FIN: $fin\n" if DEBUG;
-
-  # Opcode
-  my $op = vec($head, 0, 8) & 0b00001111;
-  warn "OPCODE: $op\n" if DEBUG;
-
-  # Length
-  my $len = vec($head, 1, 8) & 0b01111111;
-  warn "LENGTH: $len\n" if DEBUG;
-
-  # No payload
-  my $hlen = 2;
-  if ($len == 0) { warn "NOTHING\n" if DEBUG }
-
-  # Small payload
-  elsif ($len < 126) { warn "SMALL\n" if DEBUG }
-
-  # Extended payload (16bit)
-  elsif ($len == 126) {
-    return unless length $buffer > 4;
-    $hlen = 4;
-    my $ext = substr $buffer, 2, 2;
-    $len = unpack 'n', $ext;
-    warn "EXTENDED (16bit): $len\n" if DEBUG;
-  }
-
-  # Extended payload (64bit)
-  elsif ($len == 127) {
-    return unless length $buffer > 10;
-    $hlen = 10;
-    my $ext = substr $buffer, 2, 8;
-    $len =
-      $Config{ivsize} > 4
-      ? unpack('Q>', $ext)
-      : unpack('N', substr($ext, 4, 4));
-    warn "EXTENDED (64bit): $len\n" if DEBUG;
-  }
-
-  # Check message size
-  $self->finish and return if $len > $self->max_websocket_size;
-
-  # Check if whole packet has arrived
-  my $masked = vec($head, 1, 8) & 0b10000000;
-  return if length $buffer < ($len + $hlen + $masked ? 4 : 0);
-  substr $buffer, 0, $hlen, '';
-
-  # Payload
-  $len += 4 if $masked;
-  return if length $buffer < $len;
-  my $payload = $len ? substr($buffer, 0, $len, '') : '';
-
-  # Unmask payload
-  if ($masked) {
-    warn "UNMASKING PAYLOAD\n" if DEBUG;
-    $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
-  }
-  warn "PAYLOAD: $payload\n" if DEBUG;
-  $self->{read} = $buffer;
-
-  return [$fin, $op, $payload];
-}
-
 sub _send_frame {
   my ($self, $op, $payload) = @_;
 
   # Build frame
   $self->{write} = '' unless defined $self->{write};
-  $self->{write} .= $self->_build_frame($op, $payload);
+  $self->{write} .= $self->build_frame(1, $op, $payload);
 
   # Writing
   $self->{state} = 'write';
@@ -430,6 +427,12 @@ Callback to be invoked for each decoded message.
 L<Mojo::Transaction::WebSocket> inherits all methods from
 L<Mojo::Transaction> and implements the following new ones.
 
+=head2 C<build_frame>
+
+  my $bytes = $ws->build_frame($fin, $op, $payload);
+
+Build WebSocket frame.
+
 =head2 C<client_challenge>
 
   my $success = $ws->client_challenge;
@@ -489,6 +492,12 @@ The local address of this WebSocket.
   my $local_port = $ws->local_port;
 
 The local port of this WebSocket.
+
+=head2 C<parse_frame>
+
+  my $frame = $ws->parse_frame(\$bytes);
+
+Parse WebSocket frame.
 
 =head2 C<remote_address>
 

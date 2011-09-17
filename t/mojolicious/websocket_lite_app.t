@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
+use utf8;
+
 # Disable Bonjour, IPv6 and libev
 BEGIN {
   $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
@@ -9,9 +11,10 @@ BEGIN {
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
-use Test::More tests => 41;
+use Test::More tests => 59;
 
 # "Your mistletoe is no match for my *tow* missile."
+use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -37,6 +40,28 @@ websocket '/push' => sub {
   $self->on_finish(sub { Mojo::IOLoop->drop($id) });
 };
 
+# WebSocket /unicode
+websocket '/unicode' => sub {
+  my $self = shift;
+  $self->on_message(
+    sub {
+      my ($self, $message) = @_;
+      $self->send_message("♥: $message");
+    }
+  );
+};
+
+# WebSocket /bytes
+websocket '/bytes' => sub {
+  my $self = shift;
+  $self->on_message(
+    sub {
+      my ($self, $message) = @_;
+      $self->send_message([$message]);
+    }
+  );
+};
+
 # "I was a hero to broken robots 'cause I was one of them, but how can I sing
 #  about being damaged if I'm not?
 #  That's like Christina Aguilera singing Spanish.
@@ -51,6 +76,10 @@ $t->websocket_ok('/echo')->send_message_ok('hello')->message_is('echo: hello')
 $t->websocket_ok('/echo')->send_message_ok('hello again')
   ->message_is('echo: hello again')->send_message_ok('and one more time')
   ->message_is('echo: and one more time')->finish_ok;
+
+# WebSocket /echo (zero)
+$t->websocket_ok('/echo')->send_message_ok(0)->message_is('echo: 0')
+  ->finish_ok;
 
 # GET /plain
 $t->get_ok('/plain')->status_is(200)->content_is('Nothing to see here!');
@@ -77,3 +106,17 @@ $t->websocket_ok('/echo')->send_message_ok('this')->send_message_ok('just')
 
 # GET /plain (and again)
 $t->get_ok('/plain')->status_is(200)->content_is('Nothing to see here!');
+
+# WebSocket /unicode
+$t->websocket_ok('/unicode')->send_message_ok('hello')
+  ->message_is('♥: hello')->finish_ok;
+
+# WebSocket /unicode (multiple times)
+$t->websocket_ok('/unicode')->send_message_ok('hello again')
+  ->message_is('♥: hello again')->send_message_ok('and one ☃ more time')
+  ->message_is('♥: and one ☃ more time')->finish_ok;
+
+# WebSocket /bytes
+my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
+$t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
+  ->finish_ok;

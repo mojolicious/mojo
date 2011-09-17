@@ -782,6 +782,7 @@ Callback to be invoked when the transaction has been finished.
   $c = $c->on_message(sub {...});
 
 Callback to be invoked when new WebSocket messages arrive.
+Note that this method is EXPERIMENTAL and might change without warning!
 
   $c->on_message(sub {
     my ($c, $message) = @_;
@@ -959,9 +960,12 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
   $c = $c->send_message('Hi there!');
   $c = $c->send_message('Hi there!', sub {...});
+  $c = $c->send_message([$bytes]);
+  $c = $c->send_message([$bytes], sub {...});
 
 Send a message via WebSocket, only works if there is currently a WebSocket
 connection in progress.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<session>
 

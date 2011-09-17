@@ -92,8 +92,13 @@ sub resume {
 
 sub send_message {
   my ($self, $message, $cb) = @_;
+
+  # Binary
   $self->{drain} = $cb if $cb;
   $message = '' unless defined $message;
+  return $self->_send_frame(BINARY, $message->[0]) if ref $message;
+
+  # Text
   encode 'UTF-8', $message;
   $self->_send_frame(TEXT, $message);
 }
@@ -148,6 +153,7 @@ sub server_read {
     }
 
     # Append chunk and check message size
+    $self->{op} = $op unless exists $self->{op};
     $self->{message} .= $frame->[2];
     $self->finish and last
       if length $self->{message} > $self->max_websocket_size;
@@ -158,7 +164,7 @@ sub server_read {
     # Callback
     my $message = $self->{message};
     $self->{message} = '';
-    decode 'UTF-8', $message if $message;
+    decode 'UTF-8', $message if $message && delete $self->{op} == TEXT;
     return $self->finish unless my $cb = $self->on_message;
     $self->$cb($message);
   }
@@ -518,6 +524,8 @@ Resume transaction.
 
   $ws->send_message('Hi there!');
   $ws->send_message('Hi there!', sub {...});
+  $ws->send_message([$bytes]);
+  $ws->send_message([$bytes], sub {...});
 
 Send a message over the WebSocket, encoding and framing will be handled
 transparently.

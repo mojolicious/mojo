@@ -11,7 +11,7 @@ BEGIN {
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
-use Test::More tests => 59;
+use Test::More tests => 65;
 
 # "Your mistletoe is no match for my *tow* missile."
 use Mojo::ByteStream 'b';
@@ -120,3 +120,7 @@ $t->websocket_ok('/unicode')->send_message_ok('hello again')
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
 $t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
   ->finish_ok;
+
+# WebSocket /bytes (multiple times)
+$t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
+  ->send_message_ok([$bytes])->message_is($bytes)->finish_ok;

@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename 'dirname';
+use File::Spec;
+
+# "Behold, a time traveling machine.
+#  Time? I can't go back there!
+#  Ah, but this machine only goes forward in time.
+#  That way you can't accidentally change history or do something disgusting
+#  like sleep with your own grandmother.
+#  I wouldn't want to do that again."
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
+
+# Check if Mojolicious is installed
+eval 'use Mojolicious::Commands';
+die <<EOF if $@;
+It looks like you don't have the Mojolicious Framework installed.
+Please visit http://mojolicio.us for detailed installation instructions.
+
+EOF
+
+# Application
+$ENV{MOJO_APP} ||= 'MyApp';
+
+# Start commands
+Mojolicious::Commands->start;

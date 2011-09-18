@@ -579,12 +579,6 @@ sub stash {
 
 sub ua { shift->app->ua }
 
-# "Behold, a time traveling machine.
-#  Time? I can't go back there!
-#  Ah, but this machine only goes forward in time.
-#  That way you can't accidentally change history or do something disgusting
-#  like sleep with your own grandmother.
-#  I wouldn't want to do that again."
 sub url_for {
   my $self = shift;
   my $target = shift || '';
@@ -643,7 +637,6 @@ sub url_for {
   return $url;
 }
 
-# "I wax my rocket every day!"
 sub write {
   my ($self, $chunk, $cb) = @_;
 

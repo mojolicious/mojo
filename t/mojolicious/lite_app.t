@@ -1004,13 +1004,13 @@ $t->get_ok('/static.txt', {'Range' => 'bytes=2-5'})->status_is(206)
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)
   ->content_is('st s');
 
-# GET /static.txt (base 64 static inline file)
+# GET /static.txt (base64 static inline file)
 $t->get_ok('/static2.txt')->status_is(200)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
 
-# GET /static.txt (base 64 static inline file, If-Modified-Since)
+# GET /static.txt (base64 static inline file, If-Modified-Since)
 $modified = Mojo::Date->new->epoch(time - 3600);
 $t->get_ok('/static2.txt', {'If-Modified-Since' => $modified})->status_is(200)
   ->header_is(Server          => 'Mojolicious (Perl)')
@@ -1021,7 +1021,7 @@ $t->get_ok('/static2.txt', {'If-Modified-Since' => $modified})->status_is(304)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
 
-# GET /static.txt (base 64 partial inline file)
+# GET /static.txt (base64 partial inline file)
 $t->get_ok('/static2.txt', {'Range' => 'bytes=2-5'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')

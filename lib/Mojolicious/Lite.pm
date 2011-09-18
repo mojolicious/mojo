@@ -672,7 +672,7 @@ directory.
 =head2 Static Files
 
 Static files will be automatically served from the C<DATA> section
-(even Base 64 encoded) or a C<public> directory if it exists.
+(even Base64 encoded) or a C<public> directory if it exists.
 
   @@ something.js
   alert('hello!');

@@ -90,7 +90,7 @@ sub build_frame {
 sub client_challenge {
   my $self = shift;
 
-  # WebSocket challenge
+  # Solve WebSocket challenge
   my $solution = $self->_challenge($self->req->headers->sec_websocket_key);
   return unless $solution eq $self->res->headers->sec_websocket_accept;
   return 1;
@@ -109,7 +109,7 @@ sub client_handshake {
     unless $headers->sec_websocket_protocol;
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
-  # Generate challenge
+  # Generate WebSocket challenge
   my $key = pack 'N*', int(rand 9999999);
   b64_encode $key, '';
   $headers->sec_websocket_key($key) unless $headers->sec_websocket_key;
@@ -123,13 +123,8 @@ sub connection   { shift->handshake->connection(@_) }
 
 sub finish {
   my $self = shift;
-
-  # Send closing handshake
   $self->_send_frame(CLOSE, '');
-
-  # Finish after writing
   $self->{finished} = 1;
-
   return $self;
 }
 
@@ -239,7 +234,7 @@ sub send_message {
 sub server_handshake {
   my $self = shift;
 
-  # Handshake
+  # WebSocket handshake
   my $res         = $self->res;
   my $res_headers = $res->headers;
   $res->code(101);
@@ -258,19 +253,15 @@ sub server_handshake {
 sub server_read {
   my ($self, $chunk) = @_;
 
-  # Add chunk
+  # Parse frames
   $self->{read} = '' unless defined $self->{read};
   $self->{read} .= $chunk if defined $chunk;
-
-  # Full frames
   $self->{message} = '' unless defined $self->{message};
   while (my $frame = $self->parse_frame(\$self->{read})) {
     my $op = $frame->[1] || CONTINUATION;
 
     # Ping
     if ($op == PING) {
-
-      # Pong
       $self->_send_frame(PONG, $frame->[2]);
       next;
     }
@@ -320,6 +311,7 @@ sub server_write {
   # Empty buffer
   my $write = $self->{write};
   $self->{write} = '';
+
   return $write;
 }
 
@@ -329,10 +321,8 @@ sub _challenge {
   # No key or SHA1 support
   return '' unless $key && SHA1;
 
-  # Checksum
+  # Base64 checksum
   my $challenge = sha1_bytes($key . GUID);
-
-  # Accept
   b64_encode $challenge, '';
 
   return $challenge;
@@ -341,14 +331,10 @@ sub _challenge {
 sub _send_frame {
   my ($self, $op, $payload) = @_;
 
-  # Build frame
+  # Build frame and resume
   $self->{write} = '' unless defined $self->{write};
   $self->{write} .= $self->build_frame(1, $op, $payload);
-
-  # Writing
   $self->{state} = 'write';
-
-  # Resume
   $self->on_resume->($self);
 }
 
@@ -357,8 +343,6 @@ sub _xor_mask {
 
   # 512 byte mask
   $mask = $mask x 128;
-
-  # Mask
   my $output = '';
   $output .= $_ ^ $mask while length($_ = substr($input, 0, 512, '')) == 512;
   $output .= $_ ^ substr($mask, 0, length, '');

@@ -374,7 +374,7 @@ L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
 
 =head2 C<base_tag>
 
-  <%= base_tag %>
+  %= base_tag
 
 Generate C<base> tag refering to the current base URL.
 
@@ -382,8 +382,8 @@ Generate C<base> tag refering to the current base URL.
 
 =head2 C<check_box>
 
-  <%= check_box employed => 1 %>
-  <%= check_box employed => 1, id => 'foo' %>
+  %= check_box employed => 1
+  %= check_box employed => 1, id => 'foo'
 
 Generate checkbox input element.
 Previous input values will automatically get picked up and shown as default.
@@ -393,8 +393,8 @@ Previous input values will automatically get picked up and shown as default.
 
 =head2 C<file_field>
 
-  <%= file_field 'avatar' %>
-  <%= file_field 'avatar', id => 'foo' %>
+  %= file_field 'avatar'
+  %= file_field 'avatar', id => 'foo'
 
 Generate file input element.
 
@@ -403,22 +403,22 @@ Generate file input element.
 
 =head2 C<form_for>
 
-  <%= form_for login => (method => 'post') => begin %>
-    <%= text_field 'first_name' %>
-    <%= submit_button %>
-  <% end %>
-  <%= form_for login => {foo => 'bar'} => (method => 'post') => begin %>
-    <%= text_field 'first_name' %>
-    <%= submit_button %>
-  <% end %>
-  <%= form_for '/login' => (method => 'post') => begin %>
-    <%= text_field 'first_name' %>
-    <%= submit_button %>
-  <% end %>
-  <%= form_for 'http://kraih.com/login' => (method => 'post') => begin %>
-    <%= text_field 'first_name' %>
-    <%= submit_button %>
-  <% end %>
+  %= form_for login => (method => 'post') => begin
+    %= text_field 'first_name'
+    %= submit_button
+  % end
+  %= form_for login => {foo => 'bar'} => (method => 'post') => begin
+    %= text_field 'first_name'
+    %= submit_button
+  % end
+  %= form_for '/login' => (method => 'post') => begin
+    %= text_field 'first_name'
+    %= submit_button
+  % end
+  %= form_for 'http://kraih.com/login' => (method => 'post') => begin
+    %= text_field 'first_name'
+    %= submit_button
+  % end
 
 Generate form for route, path or URL.
 
@@ -441,8 +441,8 @@ Generate form for route, path or URL.
 
 =head2 C<hidden_field>
 
-  <%= hidden_field foo => 'bar' %>
-  <%= hidden_field foo => 'bar', id => 'bar' %>
+  %= hidden_field foo => 'bar'
+  %= hidden_field foo => 'bar', id => 'bar'
 
 Generate hidden input element.
 
@@ -451,8 +451,8 @@ Generate hidden input element.
 
 =head2 C<image>
 
-  <%= image '/images/foo.png' %>
-  <%= image '/images/foo.png', alt => 'Foo' %>
+  %= image '/images/foo.png'
+  %= image '/images/foo.png', alt => 'Foo'
 
 Generate image tag.
 
@@ -461,9 +461,9 @@ Generate image tag.
 
 =head2 C<input_tag>
 
-  <%= input_tag 'first_name' %>
-  <%= input_tag first_name => 'Default name' %>
-  <%= input_tag 'employed', type => 'checkbox' %>
+  %= input_tag 'first_name'
+  %= input_tag first_name => 'Default name'
+  %= input_tag 'employed', type => 'checkbox'
 
 Generate form input element.
 Previous input values will automatically get picked up and shown as default.
@@ -474,10 +474,10 @@ Previous input values will automatically get picked up and shown as default.
 
 =head2 C<javascript>
 
-  <%= javascript '/script.js' %>
-  <%= javascript begin %>
+  %= javascript '/script.js'
+  %= javascript begin
     var a = 'b';
-  <% end %>
+  % end
 
 Generate script tag for C<Javascript> asset.
 
@@ -488,11 +488,11 @@ Generate script tag for C<Javascript> asset.
 
 =head2 C<link_to>
 
-  <%= link_to Home => 'index' %>
-  <%= link_to index => begin %>Home<% end %>
-  <%= link_to index => {foo => 'bar'} => (class => 'links') => begin %>
+  %= link_to Home => 'index'
+  %= link_to index => {foo => 'bar'} => (class => 'links') => begin
     Home
-  <% end %>
+  % end
+  <%= link_to index => begin %>Home<% end %>
   <%= link_to '/path/to/file' => begin %>File<% end %>
   <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => $foo) => begin %>Retry<% end %>
@@ -501,16 +501,16 @@ Generate link to route, path or URL, defaults to using the capitalized link
 target as content.
 
   <a href="/path/to/index">Home</a>
-  <a href="/path/to/index">Home</a>
   <a class="links" href="/path/to/index/bar">Home</a>
+  <a href="/path/to/index">Home</a>
   <a href="/path/to/file">File</a>
   <a href="http://mojolicio.us">Mojolicious</a>
   <a href="/current/path?foo=something">Retry</a>
 
 =head2 C<password_field>
 
-  <%= password_field 'pass' %>
-  <%= password_field 'pass', id => 'foo' %>
+  %= password_field 'pass'
+  %= password_field 'pass', id => 'foo'
 
 Generate password input element.
 
@@ -519,8 +519,8 @@ Generate password input element.
 
 =head2 C<radio_button>
 
-  <%= radio_button country => 'germany' %>
-  <%= radio_button country => 'germany', id => 'foo' %>
+  %= radio_button country => 'germany'
+  %= radio_button country => 'germany', id => 'foo'
 
 Generate radio input element.
 Previous input values will automatically get picked up and shown as default.
@@ -530,11 +530,11 @@ Previous input values will automatically get picked up and shown as default.
 
 =head2 C<select_field>
 
-  <%= select_field language => [qw/de en/] %>
-  <%= select_field language => [qw/de en/], id => 'lang' %>
-  <%= select_field country => [[Germany => 'de'], 'en'] %>
-  <%= select_field country => [{Europe => [[Germany => 'de'], 'en']}] %>
-  <%= select_field country => [[Germany => 'de', class => 'europe'], 'en'] %>
+  %= select_field language => [qw/de en/]
+  %= select_field language => [qw/de en/], id => 'lang'
+  %= select_field country => [[Germany => 'de'], 'en']
+  %= select_field country => [{Europe => [[Germany => 'de'], 'en']}]
+  %= select_field country => [[Germany => 'de', class => 'europe'], 'en']
 
 Generate select, option and optgroup elements.
 Previous input values will automatically get picked up and shown as default.
@@ -564,10 +564,10 @@ Previous input values will automatically get picked up and shown as default.
 
 =head2 C<stylesheet>
 
-  <%= stylesheet '/foo.css' %>
-  <%= stylesheet begin %>
+  %= stylesheet '/foo.css'
+  %= stylesheet begin
     body {color: #000}
-  <% end %>
+  % end
 
 Generate style or link tag for C<CSS> asset.
 
@@ -578,8 +578,8 @@ Generate style or link tag for C<CSS> asset.
 
 =head2 C<submit_button>
 
-  <%= submit_button %>
-  <%= submit_button 'Ok!', id => 'foo' %>
+  %= submit_button
+  %= submit_button 'Ok!', id => 'foo'
 
 Generate submit input element.
 
@@ -588,7 +588,7 @@ Generate submit input element.
 
 =head2 C<t>
 
-  <%=t div => 'some & content' %>
+  %=t div => 'some & content'
 
 Alias for C<tag>.
 Note that this helper is EXPERIMENTAL and might change without warning!
@@ -597,9 +597,9 @@ Note that this helper is EXPERIMENTAL and might change without warning!
 
 =head2 C<tag>
 
-  <%= tag 'div' %>
-  <%= tag 'div', id => 'foo' %>
-  <%= tag div => 'some & content' %>
+  %= tag 'div'
+  %= tag 'div', id => 'foo'
+  %= tag div => 'some & content'
   <%= tag div => begin %>some & content<% end %>
 
 HTML5 tag generator.
@@ -620,9 +620,9 @@ accidental double escaping.
 
 =head2 C<text_field>
 
-  <%= text_field 'first_name' %>
-  <%= text_field first_name => 'Default name' %>
-  <%= text_field first_name => 'Default name', class => 'user' %>
+  %= text_field 'first_name'
+  %= text_field first_name => 'Default name'
+  %= text_field first_name => 'Default name', class => 'user'
 
 Generate text input element.
 Previous input values will automatically get picked up and shown as default.
@@ -633,10 +633,10 @@ Previous input values will automatically get picked up and shown as default.
 
 =head2 C<text_area>
 
-  <%= text_area 'foo' %>
-  <%= text_area foo => begin %>
+  %= text_area 'foo'
+  %= text_area foo => begin
     Default!
-  <% end %>
+  % end
 
 Generate textarea element.
 Previous input values will automatically get picked up and shown as default.

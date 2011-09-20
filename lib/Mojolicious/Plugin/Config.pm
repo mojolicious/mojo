@@ -180,8 +180,8 @@ L<Mojolicious::Plugin::Config> implements the following helpers.
 
 =head2 C<config>
 
-  <%= config 'something' %>
-  <%= config->{something} %>
+  %= config 'something'
+  %= config->{something}
 
 Access config values.
 

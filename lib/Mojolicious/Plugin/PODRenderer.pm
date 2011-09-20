@@ -174,14 +174,14 @@ Mojolicious::Plugin::PODRenderer - POD Renderer Plugin
   $self->plugin(PODRenderer => {name => 'foo'});
   $self->plugin(PODRenderer => {preprocess => 'epl'});
   $self->render('some_template', handler => 'pod');
-  <%= pod_to_html "=head1 TEST\n\nC<123>" %>
+  %= pod_to_html "=head1 TEST\n\nC<123>"
 
   # Mojolicious::Lite
   plugin 'PODRenderer';
   plugin PODRenderer => {name => 'foo'};
   plugin PODRenderer => {preprocess => 'epl'};
   $self->render('some_template', handler => 'pod');
-  <%= pod_to_html "=head1 TEST\n\nC<123>" %>
+  %= pod_to_html "=head1 TEST\n\nC<123>"
 
 =head1 DESCRIPTION
 
@@ -220,7 +220,7 @@ L<Mojolicious::Plugin::PODRenderer> implements the following helpers.
 
 =head2 C<pod_to_html>
 
-  <%= pod_to_html '=head2 lalala' %>
+  %= pod_to_html '=head2 lalala'
   <%= pod_to_html begin %>=head2 lalala<% end %>
 
 Render POD to HTML.

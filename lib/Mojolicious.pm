@@ -305,9 +305,9 @@ Web development for humans, making hard things possible and everything fun.
   @@ clock.html.ep
   % use Time::Piece;
   % my $now = localtime;
-  <%= link_to clock => begin %>
+  %= link_to clock => begin
     The time is <%= $now->hms %>.
-  <% end %>
+  % end
 
 Single file prototypes can easily grow into well-structured applications.
 A controller collects several actions together.
@@ -392,9 +392,9 @@ exactly the same.
 
   % use Time::Piece;
   % my $now = localtime;
-  <%= link_to clock => begin %>
+  %= link_to clock => begin
     The time is <%= $now->hms %>.
-  <% end %>
+  % end
 
 Mojolicious has been designed from the ground up for a fun and unique
 workflow.
@@ -583,7 +583,7 @@ and the application object, as well as a function in C<ep> templates.
   my $result = $self->add(2, 3);
 
   # Template
-  <%= add 2, 3 %>
+  %= add 2, 3
 
 =head2 C<hook>
 

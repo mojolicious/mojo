@@ -436,24 +436,25 @@ like this.
 
   @@ index.html.ep
   % layout 'default';
-  <%= form_for index => begin %>
-    <% if (param 'user') { %>
+  %= form_for index => begin
+    % if (param 'user') {
       <b>Wrong name or password, please try again.</b><br>
-    <% } %>
+    % }
     Name:<br>
-    <%= text_field 'user' %><br>
-    Password:<br>
-    <%= password_field 'pass' %><br>
-    <%= submit_button 'Login' %>
-  <% end %>
+    %= text_field 'user'
+    <br>Password:<br>
+    %= password_field 'pass'
+    <br>
+    %= submit_button 'Login'
+  % end
 
   @@ protected.html.ep
   % layout 'default';
-  <% if (my $message = flash 'message') { %>
+  % if (my $message = flash 'message') {
     <b><%= $message %></b><br>
-  <% } %>
+  % }
   Welcome <%= session 'user' %>!<br>
-  <%= link_to Logout => 'logout' %>
+  %= link_to Logout => 'logout'
 
 A list of all built-in helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and

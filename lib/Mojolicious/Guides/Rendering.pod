@@ -234,19 +234,19 @@ Perl data types.
   $self->stash(frameworks => [qw/Catalyst Mojolicious/]);
   $self->stash(examples => {tweetylicious => 'a microblogging app'});
 
-  <%= $author %>
-  <%= $frameworks->[1] %>
-  <%= $examples->{tweetylicious} %>
+  %= $author
+  %= $frameworks->[1]
+  %= $examples->{tweetylicious}
 
 Since everything is just Perl normal control structures just work.
 
-  <% for my $framework (@$frameworks) { %>
+  % for my $framework (@$frameworks) {
     <%= $framework %> was written by <%= $author %>.
-  <% } %>
+  % }
 
-  <% while (my ($app, $description) = each %$examples) { %>
+  % while (my ($app, $description) = each %$examples) {
     <%= $app %> is a <%= $description %>.
-  <% } %>
+  % }
 
 =head2 Content Negotiation
 
@@ -292,7 +292,7 @@ used or an empty C<204> response rendered automatically.
 
 Helpers are little functions you can use in templates and controller code.
 
-  <%= dumper [1, 2, 3] %>
+  %= dumper [1, 2, 3]
 
   my $serialized = $self->dumper([1, 2, 3]);
 
@@ -302,11 +302,11 @@ We differentiate between C<default helpers> which are more general purpose
 like C<dumper> and C<tag helpers>, which are template specific and mostly
 used to generate C<HTML> tags.
 
-  <%= javascript '/script.js' %>
+  %= javascript '/script.js'
 
-  <%= javascript begin %>
+  %= javascript begin
     var a = 'b';
-  <% end %>
+  % end
 
 A list of all built-in helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and
@@ -369,7 +369,7 @@ a little easier.
 
   @@ foo/bar.html.ep
   <!doctype html><html>
-    <%= include 'header' %>
+    %= include 'header'
     <body>Bar!</body>
   </html>
 
@@ -381,7 +381,7 @@ argument.
 
   @@ foo/bar.html.ep
   <!doctype html><html>
-    <%= $self->render('header', partial => 1) %>
+    %= $self->render('header', partial => 1)
     <body>Bar!</body>
   </html>
 
@@ -394,7 +394,7 @@ in the partial template.
 
   @@ foo/bar.html.ep
   <!doctype html><html>
-    <%= include 'header', title => 'Hello!' %>
+    %= include 'header', title => 'Hello!'
     <body>Bar!</body>
   </html>
 
@@ -444,13 +444,13 @@ of the template to the layout.
 
   @@ foo/bar.html.ep
   % layout 'mylayout';
-  <% content_for header => begin %>
+  % content_for header => begin
     <title>MyApp!</title>
-  <% end %>
+  % end
   Hello World!
-  <% content_for header => begin %>
+  % content_for header => begin
     <meta http-equiv="Pragma" content="no-cache">
-  <% end %>
+  % end
 
   @@ layouts/mylayout.html.ep
   <!doctype html><html>
@@ -469,27 +469,27 @@ templates don't get prefixed with C<layouts/>.
   @@ first.html.ep
   %# "<div>First header!First footer!</div>"
   <div>
-  <%= content header => begin %>
+  %= content header => begin
     First header!
-  <% end %>
-  <%= content footer => begin %>
+  % end
+  %= content footer => begin
     First footer!
-  <% end %>
+  % end
   </div>
 
   @@ second.html.ep
   %# "<div>Second header!First footer!</div>"
   % extends 'first';
-  <% content header => begin %>
+  % content header => begin
     Second header!
-  <% end %>
+  % end
 
   @@ third.html.ep
   %# "<div>Second header!Third footer!</div>"
   % extends 'second';
-  <% content footer => begin %>
+  % content footer => begin
     Third footer!
-  <% end %>
+  % end
 
 This chain could go on and on to allow a very high level of template reuse.
 
@@ -499,9 +499,9 @@ Compiled templates are always cached in memory, but with the C<memorize>
 helper you can go one step further and prevent template blocks from being
 executed more than once.
 
-  <%= memorize begin %>
+  %= memorize begin
     This template was compiled at <%= localtime time %>.
-  <% end %>
+  % end %>
 
 =head2 Adding Helpers
 
@@ -545,11 +545,11 @@ allows very pleasant to use tag helpers and filters.
   __DATA__
 
   @@ index.html.ep
-  <%= trim_newline begin %>
+  %= trim_newline begin
     Some text.
-    <%= 1 + 1 %>
+    %= 1 + 1
     More text.
-  <% end %>
+  % end
 
 Wrapping the helper result into a L<Mojo::ByteStream> object can prevent
 accidental double escaping.

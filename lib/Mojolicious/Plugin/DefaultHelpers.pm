@@ -129,111 +129,111 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
 
 =head2 C<app>
 
-  <%= app->secret %>
+  %= app->secret
 
 Alias for L<Mojolicious::Controller/"app">.
 
 =head2 C<content>
 
-  <%= content %>
+  %= content
 
 Insert content into a layout template.
 
 =head2 C<content_for>
 
-  <% content_for foo => begin %>
+  % content_for foo => begin
     test
-  <% end %>
-  <%= content_for 'foo' %>
+  % end
+  %= content_for 'foo'
 
 Append content to named buffer and retrieve it.
 
-  <% content_for message => begin %>
+  % content_for message => begin
     Hello
-  <% end %>
-  <% content_for message => begin %>
+  % end
+  % content_for message => begin
     world!
-  <% end %>
-  <%= content_for 'message' %>
+  % end
+  %= content_for 'message'
 
 =head2 C<dumper>
 
-  <%= dumper $foo %>
+  %= dumper $foo
 
 Dump a Perl data structure using L<Data::Dumper>.
 
 =head2 C<extends>
 
-  <% extends 'foo'; %>
+  % extends 'foo';
 
 Extend a template.
 
 =head2 C<flash>
 
-  <%= flash 'foo' %>
+  %= flash 'foo'
 
 Alias for L<Mojolicious::Controller/"flash">.
 
 =head2 C<include>
 
-  <%= include 'menubar' %>
-  <%= include 'menubar', format => 'txt' %>
+  %= include 'menubar'
+  %= include 'menubar', format => 'txt'
 
 Include a partial template, all arguments get localized automatically and are
 only available in the partial template.
 
 =head2 C<layout>
 
-  <% layout 'green'; %>
+  % layout 'green';
 
 Render this template with a layout.
 
 =head2 C<memorize>
 
-  <%= memorize begin %>
-    <%= time %>
-  <% end %>
-  <%= memorize {expires => time + 1} => begin %>
-    <%= time %>
-  <% end %>
-  <%= memorize foo => begin %>
-    <%= time %>
-  <% end %>
-  <%= memorize foo => {expires => time + 1} => begin %>
-    <%= time %>
-  <% end %>
+  %= memorize begin
+    %= time
+  % end
+  %= memorize {expires => time + 1} => begin
+    %= time
+  % end
+  %= memorize foo => begin
+    %= time
+  % end
+  %= memorize foo => {expires => time + 1} => begin
+    %= time
+  % end
 
 Memorize block result in memory and prevent future execution.
 
 =head2 C<param>
 
-  <%= param 'foo' %>
+  %= param 'foo'
 
 Alias for L<Mojolicious::Controller/"param">.
 
 =head2 C<session>
 
-  <%= session 'foo' %>
+  %= session 'foo'
 
 Alias for L<Mojolicious::Controller/"session">.
 
 =head2 C<stash>
 
-  <%= stash 'foo' %>
-  <% stash foo => 'bar'; %>
+  %= stash 'foo'
+  % stash foo => 'bar';
 
 Alias for L<Mojolicious::Controller/"stash">.
 
 =head2 C<title>
 
-  <% title 'Welcome!'; %>
-  <%= title %>
+  % title 'Welcome!';
+  %= title
 
 Page title.
 
 =head2 C<url_for>
 
-  <%= url_for 'named', controller => 'bar', action => 'baz' %>
+  %= url_for 'named', controller => 'bar', action => 'baz'
 
 Alias for L<Mojolicious::Controller/"url_for">.
 

@@ -634,14 +634,14 @@ time to time.
 
   <%= javascript
     'http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js' %>
-  <%= javascript begin %>
+  %= javascript begin
     if (typeof jQuery == 'undefined') {
       var e = document.createElement('script');
       e.src = '/js/jquery.js';
       e.type = 'text/javascript';
       document.getElementsByTagName("head")[0].appendChild(e);
     }
-  <% end %>
+  % end
 
 =head1 MORE
 

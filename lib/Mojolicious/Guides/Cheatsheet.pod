@@ -48,12 +48,6 @@ Controller to dispatch to.
 
 Turn raw bytes into a response.
 
-=head2 C<exception>
-
-  <%= $exception %>
-
-L<Mojo::Exception> object for exception templates.
-
 =head2 C<extends>
 
   $self->render(extends => 'template');

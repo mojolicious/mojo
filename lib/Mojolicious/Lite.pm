@@ -264,15 +264,15 @@ delimited by the C<begin> and C<end> keywords.
   __DATA__
 
   @@ block.html.ep
-  <% my $link = begin %>
-    <% my ($url, $name) = @_; %>
+  % my $link = begin
+    % my ($url, $name) = @_;
     Try <%= link_to $url => begin %><%= $name %><% end %>!
-  <% end %>
+  % end
   <!doctype html><html>
     <head><title>Sebastians Frameworks!</title></head>
     <body>
-      <%= $link->('http://mojolicio.us', 'Mojolicious') %>
-      <%= $link->('http://catalystframework.org', 'Catalyst') %>
+      %= $link->('http://mojolicio.us', 'Mojolicious')
+      %= $link->('http://catalystframework.org', 'Catalyst')
     </body>
   </html>
 
@@ -291,19 +291,19 @@ content.
 
   @@ captured.html.ep
   % layout 'blue', title => 'Green!';
-  <% content_for header => begin %>
+  % content_for header => begin
     <meta http-equiv="Pragma" content="no-cache">
-  <% end %>
+  % end
   Hello World!
-  <% content_for header => begin %>
+  % content_for header => begin
     <meta http-equiv="Expires" content="-1">
-  <% end %>
+  % end
 
   @@ layouts/blue.html.ep
   <!doctype html><html>
     <head>
       <title><%= title %></title>
-      <%= content_for 'header' %>
+      %= content_for 'header'
     </head>
     <body><%= content %></body>
   </html>
@@ -617,11 +617,11 @@ C<250KB> will be automatically streamed into a temporary file.
   <!doctype html><html>
     <head><title>Upload</title></head>
     <body>
-      <%= form_for upload =>
-            (method => 'post', enctype => 'multipart/form-data') => begin %>
-        <%= file_field 'example' %>
-        <%= submit_button 'Upload' %>
-      <% end %>
+      % my @attrs = (method => 'POST', enctype => 'multipart/form-data');
+      %= form_for upload => @attrs => begin
+        %= file_field 'example'
+        %= submit_button 'Upload'
+      % end
     </body>
   </html>
 

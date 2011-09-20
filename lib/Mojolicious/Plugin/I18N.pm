@@ -87,11 +87,11 @@ Mojolicious::Plugin::I18N - Internationalization Plugin
   # Mojolicious
   $self->plugin('I18N');
   % languages 'de';
-  <%=l 'hello' %>
+  %=l 'hello'
 
   # Mojolicious::Lite
   plugin I18N => {namespace => 'MyApp::I18N'};
-  <%=l 'hello' %>
+  %=l 'hello'
 
   # Lexicon
   package MyApp::I18N::de;
@@ -149,14 +149,14 @@ L<Mojolicious::Plugin::I18N> implements the following helpers.
 
 =head2 C<l>
 
-  <%=l 'hello' %>
+  %=l 'hello'
   $self->l('hello');
 
 Translate sentence.
 
 =head2 C<languages>
 
-  <% languages 'de'; %>
+  % languages 'de';
   $self->languages('de');
 
 Change languages.

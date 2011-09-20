@@ -79,9 +79,9 @@ L<Mojolicious::Plugin::RequestTimer> implements the following helpers.
 
 =head2 C<profile>
 
-  <% profile 'page'; %>
-  <%= profile 'page' %>
-  <%= my ($elapsed, $rps) = profile 'page'; %>
+  % profile 'page';
+  %= profile 'page'
+  % my ($elapsed, $rps) = profile 'page';
 
 Start profile and return results.
 Note that this helper is EXPERIMENTAL and might change without warning!

@@ -363,10 +363,10 @@ show them as default.
 You can also use C<param> to set them manually and let necessary attributes
 always be generated automatically.
 
-  <% param country => 'germany' unless param 'country' %>
-  <%= radio_button 'country', value => 'germany' %> Germany
-  <%= radio_button 'country', value => 'france'  %> France
-  <%= radio_button 'country', value => 'uk'      %> UK
+  % param country => 'germany' unless param 'country';
+  <%= radio_button country => 'germany' %> Germany
+  <%= radio_button country => 'france'  %> France
+  <%= radio_button country => 'uk'      %> UK
 
 =head1 HELPERS
 
@@ -464,7 +464,6 @@ Generate image tag.
   <%= input_tag 'first_name' %>
   <%= input_tag first_name => 'Default name' %>
   <%= input_tag 'employed', type => 'checkbox' %>
-  <%= input_tag 'country', type => 'radio', value => 'germany' %>
 
 Generate form input element.
 Previous input values will automatically get picked up and shown as default.
@@ -472,7 +471,6 @@ Previous input values will automatically get picked up and shown as default.
   <input name="first_name" />
   <input name="first_name" value="Default name" />
   <input name="employed" type="checkbox" />
-  <input name="country" type="radio" value="germany" />
 
 =head2 C<javascript>
 

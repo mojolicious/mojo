@@ -501,7 +501,7 @@ executed more than once.
 
   %= memorize begin
     This template was compiled at <%= localtime time %>.
-  % end %>
+  % end
 
 =head2 Adding Helpers
 

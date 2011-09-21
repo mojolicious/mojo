@@ -47,9 +47,14 @@ sub import {
   *{"${caller}::hook"}   = sub { $app->hook(@_) };
   *{"${caller}::under"}  = *{"${caller}::ladder"} =
     sub { $routes = $root->under(@_) };
-  *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
-  *{"${caller}::post"}      = sub { $routes->post(@_) };
-  *{"${caller}::put"}       = sub { $routes->put(@_) };
+  *{"${caller}::plugin"} = sub { $app->plugin(@_) };
+  *{"${caller}::post"}   = sub { $routes->post(@_) };
+  *{"${caller}::put"}    = sub { $routes->put(@_) };
+  *{"${caller}::routes"} = sub (&) {
+    my $old = $root;
+    $_[0]->($root = $routes);
+    $root = $old;
+  };
   *{"${caller}::websocket"} = sub { $routes->websocket(@_) };
 
   # We are most likely the app in a lite environment
@@ -557,6 +562,39 @@ Prefixing multiple routes is another good use for C<under>.
 
   app->start;
 
+Route blocks allow multiple C<under> statements to be nested and related
+routes to be grouped.
+
+  use Mojolicious::Lite;
+
+  # Global logic shared by all routes
+  under sub {
+    my $self = shift;
+    return 1 if $self->req->headers->header('X-Bender');
+    $self->render(text => "You're not Bender!");
+    return;
+  };
+
+  # Admin section
+  routes {
+
+    # Local logic shared only by routes in this block
+    under '/admin' => sub {
+      my $self = shift;
+      return 1 if $self->req->heaers->header('X-Awesome');
+      $self->render(text => "You're not awesome enough!");
+      return;
+    };
+
+    # GET /admin/dashboard
+    get '/dashboard' => {text => 'Nothing to see here yet!'};
+  };
+
+  # GET /welcome
+  get '/welcome' => {text => 'Hi Bender!'};
+
+  app->start;
+
 =head2 Conditions
 
 Conditions such as C<agent> and C<host> from
@@ -847,6 +885,13 @@ See also the tutorial above for more argument variations.
 
 Generate route matching only C<PUT> requests.
 See also the tutorial above for more argument variations.
+
+=head2 C<routes>
+
+  routes {...};
+
+Start a new route block.
+Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<under>
 

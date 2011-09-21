@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 914;
+use Test::More tests => 925;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -766,10 +766,33 @@ get '/foo' => {inline => '<%= $message %>!'};
 get '/bar' => {inline => 'also <%= $message %>!'};
 
 # Reset
-under '/';
+under '/' => {foo => 'one'};
 
 # GET /reset
 get '/reset' => {text => 'reset works!'};
+
+# Block
+routes {
+
+  # /block
+  under '/block' => {bar => 'two'};
+
+  # GET /block
+  get {inline => '<%= $foo %><%= $bar %>!'};
+
+  # Nested block
+  routes {
+
+    # /block/nested
+    under '/nested' => {baz => 'three'};
+
+    # GET /block/nested
+    get {inline => '<%= $baz %><%= $bar %><%= $foo %>!'};
+
+    # GET /block/nested/whatever
+    get '/whatever' => {inline => '<%= $foo %><%= $bar %><%= $baz %>!'};
+  };
+};
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -1845,6 +1868,19 @@ $t->get_ok('/reset')->status_is(200)->content_is('reset works!');
 
 # GET /prefix/reset
 $t->get_ok('/prefix/reset')->status_is(404);
+
+# GET /block
+$t->get_ok('/block')->status_is(200)->content_is("onetwo!\n");
+
+# GET /block/nested
+$t->get_ok('/block/nested')->status_is(200)->content_is("threetwoone!\n");
+
+# GET /block/nested/whatever
+$t->get_ok('/block/nested/whatever')->status_is(200)
+  ->content_is("onetwothree!\n");
+
+# GET /block/nested/something
+$t->get_ok('/block/nested/something')->status_is(404);
 
 # GET /captures/foo/bar
 $t->get_ok('/captures/foo/bar')->status_is(200)

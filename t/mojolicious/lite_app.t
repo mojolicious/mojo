@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 908;
+use Test::More tests => 914;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -744,17 +744,26 @@ under sub {
 # GET /impossible
 get '/impossible' => 'impossible';
 
-# Prefix
+# /prefix (prefix)
 under '/prefix';
 
-# GET
+# GET /prefix
 get sub { shift->render(text => 'prefixed GET works!') };
 
-# POST
+# POST /prefix
 post sub { shift->render(text => 'prefixed POST works!') };
 
 # GET /prefix/works
 get '/works' => sub { shift->render(text => 'prefix works!') };
+
+# /prefix2 (another prefix)
+under '/prefix2' => {message => 'prefixed'};
+
+# GET /prefix2/foo
+get '/foo' => {inline => '<%= $message %>!'};
+
+# GET /prefix2/bar
+get '/bar' => {inline => 'also <%= $message %>!'};
 
 # Reset
 under;
@@ -1824,6 +1833,12 @@ $t->get_ok('/prefix/works')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('prefix works!');
+
+# GET /prefix2/foo
+$t->get_ok('/prefix2/foo')->status_is(200)->content_is("prefixed!\n");
+
+# GET /prefix2/bar
+$t->get_ok('/prefix2/bar')->status_is(200)->content_is("also prefixed!\n");
 
 # GET /reset
 $t->get_ok('/reset')->status_is(200)->content_is('reset works!');

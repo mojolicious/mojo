@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 903;
+use Test::More tests => 908;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -755,6 +755,12 @@ post sub { shift->render(text => 'prefixed POST works!') };
 
 # GET /prefix/works
 get '/works' => sub { shift->render(text => 'prefix works!') };
+
+# Reset
+under;
+
+# GET /reset
+get '/reset' => {text => 'reset works!'};
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -1818,6 +1824,12 @@ $t->get_ok('/prefix/works')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('prefix works!');
+
+# GET /reset
+$t->get_ok('/reset')->status_is(200)->content_is('reset works!');
+
+# GET /prefix/reset
+$t->get_ok('/prefix/reset')->status_is(404);
 
 # GET /captures/foo/bar
 $t->get_ok('/captures/foo/bar')->status_is(200)

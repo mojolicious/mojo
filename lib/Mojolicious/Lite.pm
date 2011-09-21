@@ -46,7 +46,7 @@ sub import {
   *{"${caller}::helper"} = sub { $app->helper(@_) };
   *{"${caller}::hook"}   = sub { $app->hook(@_) };
   *{"${caller}::under"}  = *{"${caller}::ladder"} =
-    sub { $routes = $root->under(@_) };
+    sub { $routes = @_ ? $root->under(@_) : $root };
   *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
   *{"${caller}::post"}      = sub { $routes->post(@_) };
   *{"${caller}::put"}       = sub { $routes->put(@_) };
@@ -546,6 +546,27 @@ Prefixing multiple routes is another good use for C<under>.
 
   app->start;
 
+You can also reset C<under> again.
+
+  use Mojolicious::Lite;
+
+  # /bar (put a message into the stash)
+  under '/bar' => {message => 'prefixed'};
+
+  # GET /bar/baz
+  get '/baz' => {inline => '<%= $message %>!'};
+
+  # GET /bar/yada
+  get '/yada' => {inline => 'also <%= $message %>!'};
+
+  # / (reset)
+  under;
+
+  # GET /baz
+  get '/baz' => {text => 'not prefixed!'};
+
+  app->start;
+
 =head2 Conditions
 
 Conditions such as C<agent> and C<host> from
@@ -830,6 +851,7 @@ See also the tutorial above for more argument variations.
 
 =head2 C<under>
 
+  my $root  = under;
   my $route = under sub {...};
   my $route = under '/:foo';
 

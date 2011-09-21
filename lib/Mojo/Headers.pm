@@ -718,7 +718,7 @@ Shortcut for the C<User-Agent> header.
 =head2 C<www_authenticate>
 
   my $authenticate = $headers->www_authenticate;
-  $headers         = $headers->www_authenticate('Basic "realm"');
+  $headers         = $headers->www_authenticate('Basic realm="realm"');
 
 Shortcut for the C<WWW-Authenticate> header.
 

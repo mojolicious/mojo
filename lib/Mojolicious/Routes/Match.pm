@@ -41,10 +41,7 @@ sub match {
   my $captures   = $pattern->shape_match(\$path);
   return unless $captures;
   $self->{path} = $path;
-
-  # Merge captures
   $captures = {%{$self->captures}, %$captures};
-  $self->captures($captures);
 
   # Method
   if (my $methods = $r->via) {
@@ -72,10 +69,8 @@ sub match {
   # WebSocket
   return if $r->is_websocket && !$self->{websocket};
 
-  # Empty path
-  my $empty = !length $path || $path eq '/' ? 1 : 0;
-
   # Partial
+  my $empty = !length $path || $path eq '/' ? 1 : 0;
   if ($r->partial) {
     $captures->{path} = $path;
     $self->endpoint($r);
@@ -83,6 +78,7 @@ sub match {
   }
 
   # Update stack
+  $self->captures($captures);
   my $endpoint = $r->is_endpoint;
   if ($r->inline || ($endpoint && $empty)) {
     push @{$self->stack}, {%$captures};

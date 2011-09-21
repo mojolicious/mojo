@@ -11,7 +11,7 @@ BEGIN {
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
-use Test::More tests => 65;
+use Test::More tests => 78;
 
 # "Your mistletoe is no match for my *tow* missile."
 use Mojo::ByteStream 'b';
@@ -28,6 +28,9 @@ websocket '/echo' => sub {
     }
   );
 };
+
+# GET /echo
+get '/echo' => {text => 'plain echo!'};
 
 # GET /plain
 get '/plain' => {text => 'Nothing to see here!'};
@@ -62,6 +65,26 @@ websocket '/bytes' => sub {
   );
 };
 
+# /nested
+under '/nested';
+
+# WebSocket /nested
+websocket sub {
+  my $self = shift;
+  $self->on_message(
+    sub {
+      my ($self, $message) = @_;
+      $self->send_message("nested echo: $message");
+    }
+  );
+};
+
+# GET /nested
+get {text => 'plain nested!'};
+
+# POST /nested
+post {data => 'plain nested too!'};
+
 # "I was a hero to broken robots 'cause I was one of them, but how can I sing
 #  about being damaged if I'm not?
 #  That's like Christina Aguilera singing Spanish.
@@ -80,6 +103,9 @@ $t->websocket_ok('/echo')->send_message_ok('hello again')
 # WebSocket /echo (zero)
 $t->websocket_ok('/echo')->send_message_ok(0)->message_is('echo: 0')
   ->finish_ok;
+
+# GET /echo (plain alternative)
+$t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
 
 # GET /plain
 $t->get_ok('/plain')->status_is(200)->content_is('Nothing to see here!');
@@ -124,3 +150,13 @@ $t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
 # WebSocket /bytes (multiple times)
 $t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
   ->send_message_ok([$bytes])->message_is($bytes)->finish_ok;
+
+# WebSocket /nested
+$t->websocket_ok('/nested')->send_message_ok('hello')
+  ->message_is('nested echo: hello')->finish_ok;
+
+# GET /nested (plain alternative)
+$t->get_ok('/nested')->status_is(200)->content_is('plain nested!');
+
+# POST /nested (another plain alternative)
+$t->post_ok('/nested')->status_is(200)->content_is('plain nested too!');

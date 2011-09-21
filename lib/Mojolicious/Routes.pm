@@ -343,7 +343,7 @@ sub waypoint { shift->route(@_)->block(1) }
 
 sub websocket {
   my $self  = shift;
-  my $route = $self->any(@_);
+  my $route = $self->get(@_);
   $route->{websocket} = 1;
   return $route;
 }

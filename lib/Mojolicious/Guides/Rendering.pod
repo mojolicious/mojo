@@ -231,7 +231,7 @@ Data can be passed to templates through the C<stash> in any of the native
 Perl data types.
 
   $self->stash(author => 'Sebastian');
-  $self->stash(frameworks => [qw/Catalyst Mojolicious/]);
+  $self->stash(frameworks => ['Catalyst', 'Mojolicious']);
   $self->stash(examples => {tweetylicious => 'a microblogging app'});
 
   %= $author

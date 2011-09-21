@@ -10,6 +10,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL binary support to Mojo::Transaction::WebSocket.
         - Updated WebSocket implementation to ietf-15.
         - Improved documentation.
+        - Improved CSS of some built-in templates.
+        - Fixed CSS of built-in exception template.
         - Fixed small redirect_to bug. (judofyr, sri)
         - Fixed small attribute selector bug in Mojo::DOM::CSS.
         - Fixed a few small route bugs.
@@ -22,7 +24,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL mojo_lib_dir and slurp_rel_file methods to
           Mojo::Home.
         - Improved host condition to work in more environments.
-        - Improved CSS of all built in templates.
+        - Improved CSS of all built-in templates.
         - Improved documentation. (rhaen, sri)
         - Improved test command to run tests in alphabetical order.
           (viliampucik)

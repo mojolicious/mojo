@@ -308,7 +308,7 @@ just make a list of possible values.
   # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
   # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
   # /fry    -> undef
-  $r->route('/:name', name => [qw/bender leela/])
+  $r->route('/:name', name => ['bender', 'leela'])
     ->to(controller => 'foo', action => 'bar');
 
 You can also adjust the regular expressions behind placeholders to better
@@ -357,7 +357,7 @@ Restrictive placeholders can also be used for format detection.
   # /foo.rss -> {controller => 'foo', action => 'feed', format => 'rss'}
   # /foo.xml -> {controller => 'foo', action => 'feed', format => 'xml'}
   # /foo.txt -> undef
-  $r->route('/foo', format => [qw/rss xml/])
+  $r->route('/foo', format => ['rss', 'xml'])
     ->to(controller => 'foo', action => 'feed');
 
 Or you can just disable format detection.
@@ -440,7 +440,7 @@ pass.
   # GET /bye    -> {controller => 'foo', action => 'bye'}
   # POST /bye   -> {controller => 'foo', action => 'bye'}
   # DELETE /bye -> undef
-  $r->route('/bye')->via(qw/get post/)
+  $r->route('/bye')->via('get', 'post')
     ->to(controller => 'foo', action => 'bye');
 
 =head2 Nested Routes

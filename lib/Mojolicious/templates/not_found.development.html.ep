@@ -52,8 +52,7 @@
         background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
         -moz-border-radius: 5px;
         border-radius: 5px;
-        font-family: 'Menlo', 'Monaco', Courier, monospace !important;
-        font-size: 1.5em;
+        font: 1.5em 'Menlo', 'Monaco', Courier, monospace;
         margin: 0;
         margin-left: auto;
         margin-right: auto;

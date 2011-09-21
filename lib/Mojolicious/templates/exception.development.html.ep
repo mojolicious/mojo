@@ -84,7 +84,7 @@
         -moz-border-radius-topright: 5px;
         border-top-right-radius: 5px;
       }
-      #showcase pre {
+      #showcase > pre {
         font: 1.5em 'Helvetica Neue', 'Helvetica', sans-serif;
         font-weight: 300;
         margin: 0;
@@ -106,15 +106,12 @@
     % end
   </head>
   <body onload="prettyPrint()">
-    % my $code = begin
-      <code class="prettyprint"><%= shift %></code>
-    % end
     % my $cv = begin
       % my ($key, $value, $i) = @_;
       %= tag 'tr', $i ? (class => 'important') : undef, begin
         <td class="key"><%= $key %>.</td>
         <td class="value">
-          %= $code->($value)
+          <pre class="prettyprint"><%= $value %></pre>
         </td>
       % end
     % end
@@ -180,7 +177,7 @@
               <div class="file"><%= $frame->[1] %></div>
               <div class="code preview">
                 %= "$frame->[2]."
-                %= $code->($line)
+                <code class="prettyprint"><%= $line %></code>
               </div>
             % }
           % }

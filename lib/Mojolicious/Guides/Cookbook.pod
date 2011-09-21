@@ -388,7 +388,7 @@ useful, because you can keep many parallel connections active at the same
 time.
 
   # FIFO queue
-  my @urls = qw/google.com/;
+  my @urls = ('google.com');
 
   # User agent following up to 5 redirects
   my $ua = Mojo::UserAgent->new(max_redirects => 5);

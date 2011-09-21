@@ -28,7 +28,7 @@
         -moz-border-radius: 5px;
         border-radius: 5px;
         color: #eee;
-        font-family: 'Menlo', 'Monaco', Courier, monospace !important;
+        font: 0.8em 'Menlo', 'Monaco', Courier, monospace;
         text-align: left;
         text-shadow: #333 0 1px 0;
         padding-bottom: 1.5em;

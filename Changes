@@ -7,8 +7,6 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::Transaction::WebSocket.
         - Added EXPERIMENTAL profile helper.
         - Added EXPERIMENTAL binary support to Mojo::Transaction::WebSocket.
-        - Added EXPERIMENTAL support for resetting under to
-          Mojolicious::Lite.
         - Updated WebSocket implementation to ietf-15.
         - Improved documentation.
         - Fixed small redirect_to bug. (judofyr, sri)

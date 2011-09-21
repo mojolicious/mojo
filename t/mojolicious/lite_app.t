@@ -766,7 +766,7 @@ get '/foo' => {inline => '<%= $message %>!'};
 get '/bar' => {inline => 'also <%= $message %>!'};
 
 # Reset
-under;
+under '/';
 
 # GET /reset
 get '/reset' => {text => 'reset works!'};

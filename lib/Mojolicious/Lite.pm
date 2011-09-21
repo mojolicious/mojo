@@ -46,7 +46,7 @@ sub import {
   *{"${caller}::helper"} = sub { $app->helper(@_) };
   *{"${caller}::hook"}   = sub { $app->hook(@_) };
   *{"${caller}::under"}  = *{"${caller}::ladder"} =
-    sub { $routes = @_ ? $root->under(@_) : $root };
+    sub { $routes = $root->under(@_) };
   *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
   *{"${caller}::post"}      = sub { $routes->post(@_) };
   *{"${caller}::put"}       = sub { $routes->put(@_) };
@@ -364,9 +364,7 @@ C</> and C<.>.
   # /hello/test
   # /hello/test123
   # /hello/test.123/test/123
-  get '/hello/*you' => sub {
-    shift->render('groovy');
-  };
+  get '/hello/*you' => 'groovy';
 
   __DATA__
 
@@ -378,14 +376,21 @@ C</> and C<.>.
 Routes can be restricted to specific request methods.
 
   # GET /bye
-  get '/bye' => sub { shift->render(text => 'Bye!') };
+  get '/bye' => sub {
+    my $self = shift;
+    $self->render(text => 'Bye!');
+  };
 
   # POST /bye
-  post '/bye' => sub { shift->render(text => 'Bye!') };
+  post '/bye' => sub {
+    my $self = shift;
+    $self->render(text => 'Bye!');
+  };
 
   # GET|POST|DELETE /bye
   any [qw/get post delete/] => '/bye' => sub {
-    shift->render(text => 'Bye!');
+    my $self = shift;
+    $self->render(text => 'Bye!');
   };
 
   # * /baz
@@ -539,31 +544,16 @@ Prefixing multiple routes is another good use for C<under>.
   under '/foo';
 
   # /foo/bar
-  get '/bar' => sub { shift->render(text => 'bar!') };
+  get '/bar' => {text => 'foo bar!'};
 
   # /foo/baz
-  get '/baz' => sub { shift->render(text => 'baz!') };
+  get '/baz' => {text => 'foo baz!'};
 
-  app->start;
+  # /
+  under '/' => {message => 'whatever'};
 
-You can also reset C<under> again.
-
-  use Mojolicious::Lite;
-
-  # /bar (put a message into the stash)
-  under '/bar' => {message => 'prefixed'};
-
-  # GET /bar/baz
-  get '/baz' => {inline => '<%= $message %>!'};
-
-  # GET /bar/yada
-  get '/yada' => {inline => 'also <%= $message %>!'};
-
-  # / (reset)
-  under;
-
-  # GET /baz
-  get '/baz' => {text => 'not prefixed!'};
+  # /bar
+  get '/bar' => {inline => '<%= $message %> works!'};
 
   app->start;
 
@@ -575,17 +565,20 @@ constructs.
 
   # /foo (Firefox)
   get '/foo' => (agent => qr/Firefox/) => sub {
-    shift->render(text => 'Congratulations, you are using a cool browser!');
+    my $self = shift;
+    $self->render(text => 'Congratulations, you are using a cool browser!');
   };
 
   # /foo (Internet Explorer)
   get '/foo' => (agent => qr/Internet Explorer/) => sub {
-    shift->render(text => 'Dude, you really need to upgrade to Firefox!');
+    my $self = shift;
+    $self->render(text => 'Dude, you really need to upgrade to Firefox!');
   };
 
   # http://mojolicio.us/bar
   get '/bar' => (host => 'mojolicio.us') => sub {
-    shift->render(text => 'Hello Mojolicious!');
+    my $self = shift;
+    $self->render(text => 'Hello Mojolicious!');
   };
 
 =head2 Sessions
@@ -758,12 +751,18 @@ can be easily mixed to make the transition process very smooth.
   package MyApp::Foo;
   use Mojo::Base 'Mojolicious::Controller';
 
-  sub index { shift->render(text => 'It works!') }
+  sub index {
+    my $self = shift;
+    $self->render(text => 'It works!');
+  }
 
   package main;
   use Mojolicious::Lite;
 
-  get '/bar' => sub { shift->render(text => 'This too!') };
+  get '/bar' => sub {
+    my $self = shift;
+    $self->render(text => 'This too!');
+  };
 
   app->routes->namespace('MyApp');
   app->routes->route('/foo/:action')->via('get')->to('foo#index');
@@ -851,7 +850,6 @@ See also the tutorial above for more argument variations.
 
 =head2 C<under>
 
-  my $root  = under;
   my $route = under sub {...};
   my $route = under '/:foo';
 

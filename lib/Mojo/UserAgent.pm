@@ -554,7 +554,7 @@ __END__
 
 =head1 NAME
 
-Mojo::UserAgent - Non-Blocking I/O HTTP 1.1 And WebSocket User Agent
+Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
 
 =head1 SYNOPSIS
 

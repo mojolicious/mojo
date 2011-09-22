@@ -679,7 +679,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Util - Portable Utility Functions
+Mojo::Util - Portable utility functions
 
 =head1 SYNOPSIS
 

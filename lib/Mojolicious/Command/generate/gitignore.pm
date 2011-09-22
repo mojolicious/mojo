@@ -37,7 +37,7 @@ pm_to_blib
 __END__
 =head1 NAME
 
-Mojolicious::Command::generate::gitignore - Gitignore Generator Command
+Mojolicious::Command::generate::gitignore - Gitignore generator command
 
 =head1 SYNOPSIS
 

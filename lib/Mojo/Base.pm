@@ -135,7 +135,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Base - Minimal Base Class For Mojo Projects
+Mojo::Base - Minimal base class for Mojo projects
 
 =head1 SYNOPSIS
 

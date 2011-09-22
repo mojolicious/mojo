@@ -220,7 +220,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Parameters - Parameter Container
+Mojo::Parameters - Parameter container
 
 =head1 SYNOPSIS
 

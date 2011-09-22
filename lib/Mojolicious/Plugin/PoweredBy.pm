@@ -22,7 +22,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::PoweredBy - Powered By Plugin
+Mojolicious::Plugin::PoweredBy - Powered by plugin
 
 =head1 SYNOPSIS
 

@@ -140,7 +140,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Home - Detect And Access The Project Root Directory In Mojo
+Mojo::Home - Detect and access the project root directory in Mojo
 
 =head1 SYNOPSIS
 

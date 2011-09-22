@@ -165,7 +165,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::PODRenderer - POD Renderer Plugin
+Mojolicious::Plugin::PODRenderer - POD renderer plugin
 
 =head1 SYNOPSIS
 

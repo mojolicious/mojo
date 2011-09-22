@@ -113,7 +113,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Date - HTTP 1.1 Date Container
+Mojo::Date - HTTP 1.1 date container
 
 =head1 SYNOPSIS
 

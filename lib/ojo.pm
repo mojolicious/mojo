@@ -77,7 +77,7 @@ __END__
 
 =head1 NAME
 
-ojo - Fun Oneliners With Mojo!
+ojo - Fun Oneliners with Mojo!
 
 =head1 SYNOPSIS
 

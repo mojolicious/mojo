@@ -62,7 +62,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Types - MIME Types
+Mojolicious::Types - MIME types
 
 =head1 SYNOPSIS
 

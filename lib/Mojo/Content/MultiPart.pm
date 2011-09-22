@@ -242,7 +242,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Content::MultiPart - HTTP 1.1 MultiPart Content Container
+Mojo::Content::MultiPart - HTTP 1.1 multipart content container
 
 =head1 SYNOPSIS
 

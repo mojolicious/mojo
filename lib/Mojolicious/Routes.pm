@@ -590,7 +590,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Routes - Always Find Your Destination With Routes
+Mojolicious::Routes - Always find your destination with routes
 
 =head1 SYNOPSIS
 

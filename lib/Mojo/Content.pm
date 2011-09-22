@@ -422,7 +422,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Content - HTTP 1.1 Content Base Class
+Mojo::Content - HTTP 1.1 content base class
 
 =head1 SYNOPSIS
 

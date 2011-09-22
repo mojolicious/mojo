@@ -176,7 +176,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Asset::File - File Asset
+Mojo::Asset::File - File asset
 
 =head1 SYNOPSIS
 

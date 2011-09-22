@@ -29,7 +29,7 @@ __DATA__
 __END__
 =head1 NAME
 
-Mojolicious::Command::generate::hypnotoad - Hypnotoad Generator Command
+Mojolicious::Command::generate::hypnotoad - Hypnotoad generator command
 
 =head1 SYNOPSIS
 

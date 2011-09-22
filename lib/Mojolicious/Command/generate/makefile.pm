@@ -43,7 +43,7 @@ WriteMakefile(
 __END__
 =head1 NAME
 
-Mojolicious::Command::generate::makefile - Makefile Generator Command
+Mojolicious::Command::generate::makefile - Makefile generator command
 
 =head1 SYNOPSIS
 

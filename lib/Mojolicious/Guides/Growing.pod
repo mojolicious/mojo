@@ -42,7 +42,7 @@ But note that this pattern is just a guideline that most of the time results
 in cleaner more maintainable code, not a rule that should be followed at all
 costs.
 
-=head2 Representational State Transfer
+=head2 REpresentational State Transfer
 
 REST is a software architectural style for distributed hypermedia systems
 such as the web.
@@ -341,7 +341,7 @@ Quick C<GET> requests can be performed right from the command line.
 
   Welcome sri!
 
-=head2 State Keeping
+=head2 State keeping
 
 Sessions in L<Mojolicious> pretty much just work out of the box and there is
 no setup required, but we suggest using a more secure C<secret> passphrase.
@@ -368,7 +368,7 @@ message after a 302 redirect, you can use the C<flash>.
 Just remember that everything is stored in C<HMAC-MD5> signed cookies, so
 there is usually a 4096 byte limit, depending on the browser.
 
-=head2 Final Prototype
+=head2 Final prototype
 
 A final C<myapp.pl> prototype passing all of the unit tests above could look
 like this.
@@ -466,7 +466,7 @@ Due to the flexibility of L<Mojolicious> there are many variations of the
 actual growing process, but this should give you a good overview of the
 possibilities.
 
-=head2 Inflating Templates
+=head2 Inflating templates
 
 All templates and static files inlined in the C<DATA> section can be
 automatically turned into separate files in the C<templates> and C<public>
@@ -477,7 +477,7 @@ directories.
 Those directories always get priority, so inflating can also be a great way
 to allow your users to customize their applications.
 
-=head2 Simplified Application Class
+=head2 Simplified application class
 
 This is the heart of every full L<Mojolicious> application and always gets
 instantiated during server startup.
@@ -533,7 +533,7 @@ actual action code needs to be changed.
 The C<startup> method of L<Mojolicious> gets called right after instantiation
 and is the place where the whole application gets set up.
 
-=head2 Simplified Application Script
+=head2 Simplified application script
 
 C<myapp.pl> itself can now be turned into a simplified application script to
 allow running unit tests again.
@@ -552,7 +552,7 @@ allow running unit tests again.
   # Start commands
   Mojolicious::Commands->start;
 
-=head2 Controller Class
+=head2 Controller class
 
 Hybrid routes are a nice intermediate step, but to maximize maintainability
 it makes sense to split our action code from its routing information.
@@ -594,7 +594,7 @@ Once again the actual action code does not change at all.
 All L<Mojolicious::Controller> controllers are plain old Perl classes and get
 instantiated on demand.
 
-=head2 Application Class
+=head2 Application class
 
 The application class C<lib/MyApp.pm> can now be reduced to model and routing
 information.
@@ -668,7 +668,7 @@ environments.
   # Start commands
   Mojolicious::Commands->start;
 
-=head2 Simplified Tests
+=head2 Simplified tests
 
 Normal L<Mojolicious> applications are a little easier to test and don't need
 help with home directory detection, so C<t/login.t> can be simplified.

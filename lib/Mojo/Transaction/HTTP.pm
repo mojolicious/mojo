@@ -374,7 +374,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Transaction::HTTP - HTTP 1.1 Transaction Container
+Mojo::Transaction::HTTP - HTTP 1.1 transaction container
 
 =head1 SYNOPSIS
 

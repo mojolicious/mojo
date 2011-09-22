@@ -307,7 +307,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Command - Command Base Class
+Mojo::Command - Command base class
 
 =head1 SYNOPSIS
 

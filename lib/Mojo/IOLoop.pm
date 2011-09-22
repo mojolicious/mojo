@@ -416,7 +416,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop - Minimalistic Reactor For Non-Blocking TCP Clients And Servers
+Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
 
 =head1 SYNOPSIS
 

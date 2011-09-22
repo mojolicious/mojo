@@ -361,7 +361,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server::Daemon - Non-Blocking I/O HTTP 1.1 And WebSocket Server
+Mojo::Server::Daemon - Non-blocking I/O HTTP 1.1 and WebSocket server
 
 =head1 SYNOPSIS
 

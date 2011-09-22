@@ -269,7 +269,7 @@ __END__
 
 =head1 NAME
 
-Mojo::UserAgent::Transactor - User Agent Transactor
+Mojo::UserAgent::Transactor - User agent transactor
 
 =head1 SYNOPSIS
 

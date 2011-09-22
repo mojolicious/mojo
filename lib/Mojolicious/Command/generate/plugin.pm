@@ -123,7 +123,7 @@ WriteMakefile(
 __END__
 =head1 NAME
 
-Mojolicious::Command::generate::plugin - Plugin Generator Command
+Mojolicious::Command::generate::plugin - Plugin generator command
 
 =head1 SYNOPSIS
 

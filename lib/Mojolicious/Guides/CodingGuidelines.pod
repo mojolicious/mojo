@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides::CodingGuidelines - Coding Guidelines
+Mojolicious::Guides::CodingGuidelines - Coding guidelines
 
 =head1 OVERVIEW
 

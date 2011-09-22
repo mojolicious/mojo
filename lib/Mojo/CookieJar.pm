@@ -122,7 +122,7 @@ __END__
 
 =head1 NAME
 
-Mojo::CookieJar - Cookie Jar For HTTP 1.1 User Agents
+Mojo::CookieJar - Cookie jar for HTTP 1.1 user agents
 
 =head1 SYNOPSIS
 

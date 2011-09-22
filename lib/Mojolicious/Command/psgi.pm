@@ -28,7 +28,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::psgi - PSGI Command
+Mojolicious::Command::psgi - PSGI command
 
 =head1 SYNOPSIS
 

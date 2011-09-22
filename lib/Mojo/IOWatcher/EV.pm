@@ -99,7 +99,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOWatcher::EV - EV Non-Blocking I/O Watcher
+Mojo::IOWatcher::EV - EV non-blocking I/O watcher
 
 =head1 SYNOPSIS
 

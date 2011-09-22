@@ -381,7 +381,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Message::Request - HTTP 1.1 Request Container
+Mojo::Message::Request - HTTP 1.1 request container
 
 =head1 SYNOPSIS
 

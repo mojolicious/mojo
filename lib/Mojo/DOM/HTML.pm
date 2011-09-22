@@ -429,7 +429,7 @@ __END__
 
 =head1 NAME
 
-Mojo::DOM::HTML - HTML5/XML Engine
+Mojo::DOM::HTML - HTML5/XML engine
 
 =head1 SYNOPSIS
 

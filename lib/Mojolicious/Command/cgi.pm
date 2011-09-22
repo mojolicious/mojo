@@ -28,7 +28,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::cgi - CGI Command
+Mojolicious::Command::cgi - CGI command
 
 =head1 SYNOPSIS
 

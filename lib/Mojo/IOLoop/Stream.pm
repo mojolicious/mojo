@@ -153,7 +153,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Stream - IOLoop Stream
+Mojo::IOLoop::Stream - IOLoop stream
 
 =head1 SYNOPSIS
 

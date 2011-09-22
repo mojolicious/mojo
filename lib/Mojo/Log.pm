@@ -85,7 +85,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Log - Simple Logger For Mojo
+Mojo::Log - Simple logger for Mojo
 
 =head1 SYNOPSIS
 

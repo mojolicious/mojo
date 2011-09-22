@@ -46,7 +46,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::HeaderCondition - Header Condition Plugin
+Mojolicious::Plugin::HeaderCondition - Header condition plugin
 
 =head1 SYNOPSIS
 

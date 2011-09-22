@@ -57,7 +57,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::JSONConfig - JSON Configuration Plugin
+Mojolicious::Plugin::JSONConfig - JSON configuration plugin
 
 =head1 SYNOPSIS
 

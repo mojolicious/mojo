@@ -71,7 +71,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::version - Version Command
+Mojolicious::Command::version - Version command
 
 =head1 SYNOPSIS
 

@@ -73,7 +73,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::EventEmitter - IOLoop Event Emitter
+Mojo::IOLoop::EventEmitter - IOLoop event emitter
 
 =head1 SYNOPSIS
 

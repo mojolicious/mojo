@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-Mojolicious::Guides - Mojolicious Guide To The Galaxy
+Mojolicious::Guides - Mojolicious guide to the galaxy
 
 =head1 DON'T PANIC!
 

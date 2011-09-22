@@ -62,7 +62,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::test - Test Command
+Mojolicious::Command::test - Test command
 
 =head1 SYNOPSIS
 

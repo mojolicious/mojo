@@ -63,7 +63,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::cpanify - Cpanify Command
+Mojolicious::Command::cpanify - Cpanify command
 
 =head1 SYNOPSIS
 

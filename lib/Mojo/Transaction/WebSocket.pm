@@ -355,7 +355,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Transaction::WebSocket - WebSocket Transaction Container
+Mojo::Transaction::WebSocket - WebSocket transaction container
 
 =head1 SYNOPSIS
 

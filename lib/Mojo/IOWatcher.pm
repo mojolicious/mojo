@@ -144,7 +144,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOWatcher - Non-Blocking I/O Watcher
+Mojo::IOWatcher - Non-blocking I/O watcher
 
 =head1 SYNOPSIS
 

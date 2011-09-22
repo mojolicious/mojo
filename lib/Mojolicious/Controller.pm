@@ -691,7 +691,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Controller - Controller Base Class
+Mojolicious::Controller - Controller base class
 
 =head1 SYNOPSIS
 

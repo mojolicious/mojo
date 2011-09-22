@@ -207,7 +207,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Routes::Match - Routes Visitor
+Mojolicious::Routes::Match - Routes visitor
 
 =head1 SYNOPSIS
 

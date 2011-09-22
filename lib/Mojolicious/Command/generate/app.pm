@@ -157,7 +157,7 @@ to move forward to a static page.
 __END__
 =head1 NAME
 
-Mojolicious::Command::generate::app - App Generator Command
+Mojolicious::Command::generate::app - App generator command
 
 =head1 SYNOPSIS
 

@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Mount - Application Mount Plugin
+Mojolicious::Plugin::Mount - Application mount plugin
 
 =head1 SYNOPSIS
 

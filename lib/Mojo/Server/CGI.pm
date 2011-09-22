@@ -111,7 +111,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server::CGI - CGI Server
+Mojo::Server::CGI - CGI server
 
 =head1 SYNOPSIS
 

@@ -83,7 +83,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Cookie - HTTP 1.1 Cookie Base Class
+Mojo::Cookie - HTTP 1.1 cookie base class
 
 =head1 SYNOPSIS
 

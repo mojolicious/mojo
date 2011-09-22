@@ -89,7 +89,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::EPRenderer - Embedded Perl Renderer Plugin
+Mojolicious::Plugin::EPRenderer - Embedded Perl renderer plugin
 
 =head1 SYNOPSIS
 

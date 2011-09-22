@@ -305,7 +305,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Routes::Pattern - Routes Pattern
+Mojolicious::Routes::Pattern - Routes pattern
 
 =head1 SYNOPSIS
 

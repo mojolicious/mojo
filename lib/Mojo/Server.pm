@@ -77,7 +77,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server - HTTP Server Base Class
+Mojo::Server - HTTP server base class
 
 =head1 SYNOPSIS
 

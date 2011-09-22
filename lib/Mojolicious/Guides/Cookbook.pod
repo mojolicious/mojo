@@ -12,7 +12,7 @@ This document cotains many fun recipes for cooking with L<Mojolicious>.
 Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on
 different platforms.
 
-=head2 Built-in Server
+=head2 Built-in server
 
 L<Mojolicious> contains a very portable HTTP 1.1 compliant web server.
 It is usually used during development but is solid and fast enough for small
@@ -152,7 +152,7 @@ can just point them at your application script because it will automatically
 act like one if it detects the presence of a C<PLACK_ENV> environment
 variable.
 
-=head2 Plack Middleware
+=head2 Plack middleware
 
 Wrapper scripts like C<myapp.fcgi> are a great way to separate deployment and
 application logic.
@@ -233,7 +233,7 @@ into alien environments like foreign event loops.
 
 When we say L<Mojolicious> is a web framework we actually mean it.
 
-=head2 Web Scraping
+=head2 Web scraping
 
 Scraping information from web sites has never been this much fun before.
 The built-in HTML5/XML parser L<Mojo::DOM> supports all CSS3 selectors that
@@ -254,7 +254,7 @@ make sense for a standalone parser.
 Especially for unit testing your L<Mojolicious> applications this can be a
 very powerful tool.
 
-=head2 JSON Web Services
+=head2 JSON web services
 
 Most web services these days are based on the JSON data-interchange format.
 That's why L<Mojolicious> comes with the possibly fastest pure-Perl
@@ -279,14 +279,14 @@ implementation L<Mojo::JSON> built right in.
     print $result;
   }
 
-=head2 Basic Authentication
+=head2 Basic authentication
 
 You can just add username and password to the URL.
 
   my $ua = Mojo::UserAgent->new;
   print $ua->get('https://sri:secret@mojolicio.us/hideout')->res->body;
 
-=head2 Decorating Followup Requests
+=head2 Decorating followup requests
 
 L<Mojo::UserAgent> can automatically follow redirects, the C<on_start>
 callback allows you direct access to each transaction right after they have
@@ -308,7 +308,7 @@ been initialized and before a connection gets associated with them.
 
 This even works for proxy C<CONNECT> requests.
 
-=head2 Streaming Response
+=head2 Streaming response
 
 Receiving a streaming response can be really tricky in most HTTP clients,
 L<Mojo::UserAgent> makes it actually easy.
@@ -321,7 +321,7 @@ L<Mojo::UserAgent> makes it actually easy.
 The C<body> callback will be called for every chunk of data that is received,
 even C<chunked> encoding will be handled transparently if necessary.
 
-=head2 Streaming Request
+=head2 Streaming request
 
 Sending a streaming request is almost just as easy.
 
@@ -342,7 +342,7 @@ Sending a streaming request is almost just as easy.
 The drain callback passed to C<write> will be invoked whenever the entire
 previous chunk has been written to the kernel send buffer.
 
-=head2 Large File Downloads
+=head2 Large file downloads
 
 When downloading large files with L<Mojo::UserAgent> you don't have to worry
 about memory usage at all, because it will automatically stream everything
@@ -360,7 +360,7 @@ environment variable.
   # Increase limit to 1GB
   $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
 
-=head2 Large File Upload
+=head2 Large file upload
 
 Uploading a large file is even easier.
 
@@ -379,7 +379,7 @@ streamed directly from the file.
   $tx->req->content->asset($asset);
   $ua->start($tx);
 
-=head2 Non-Blocking
+=head2 Non-blocking
 
 L<Mojo::UserAgent> has been designed from the ground up to be non-blocking,
 the whole blocking API is just a simple convenience wrapper.
@@ -432,7 +432,7 @@ time.
 
 You can take full control of the L<Mojo::IOLoop> event loop.
 
-=head2 Parallel Blocking Requests
+=head2 Parallel blocking requests
 
 You can emulate blocking behavior by using a L<Mojo::IOLoop> trigger to
 synchronize multiple non-blocking requests.
@@ -446,7 +446,7 @@ synchronize multiple non-blocking requests.
 
 Just be aware that the resulting transactions will be in random order.
 
-=head2 Command Line
+=head2 Command line
 
 Don't you hate checking huge HTML files from the command line?
 Thanks to the C<mojo get> command that is about to change.
@@ -488,7 +488,7 @@ This can be an invaluable tool for testing your applications.
 
 Fun hacks you might not use very often but that might come in handy some day.
 
-=head2 Faster Tests
+=head2 Faster tests
 
 Don't you hate waiting for C<make test> to finally finish?
 In newer Perl versions you can set the C<HARNESS_OPTIONS> environment
@@ -500,7 +500,7 @@ variable to take advantage of multiple cpu cores and run tests parallel.
 The C<j5> allows 5 tests to run at the same time, which makes for example the
 L<Mojolicious> test suite finish 3 times as fast on a dual core laptop!
 
-=head2 Adding Commands To Mojolicious
+=head2 Adding commands to Mojolicious
 
 By now you've propably used many of the built-in commands described in
 L<Mojolicious::Commands>, but did you know that you can just add new ones and
@@ -530,7 +530,7 @@ you can use or overload.
   $ ./myapp.pl spy secret
   The secret of this application is "secr3t".
 
-=head2 Running Code Against Your Application
+=head2 Running code against your application
 
 Ever thought about running a quick oneliner against your L<Mojolicious>
 application to test something?
@@ -544,7 +544,7 @@ The C<verbose> option will automatically print the return value to C<STDOUT>.
 
   $ ./myapp.pl eval -v 'app->static->root'
 
-=head2 Making Your Application Installable
+=head2 Making your application installable
 
 Ever thought about releasing your L<Mojolicious> application to CPAN?
 It's actually much easier than you might think.
@@ -615,7 +615,7 @@ rendering kicks in even if no actual code gets executed by the router.
 The renderer just picks up the C<text> value from the stash and generates a
 response.
 
-=head2 Hello World Oneliner
+=head2 Hello World oneliner
 
 The C<Hello World> example above can get even a little bit shorter in an
 L<ojo> oneliner.

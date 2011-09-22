@@ -341,7 +341,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::TagHelpers - Tag Helpers Plugin
+Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 
 =head1 SYNOPSIS
 

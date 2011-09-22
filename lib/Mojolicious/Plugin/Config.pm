@@ -108,7 +108,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Config - Perl-ish Configuration Plugin
+Mojolicious::Plugin::Config - Perl-ish configuration plugin
 
 =head1 SYNOPSIS
 

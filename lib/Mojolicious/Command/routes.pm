@@ -102,7 +102,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::routes - Routes Command
+Mojolicious::Command::routes - Routes command
 
 =head1 SYNOPSIS
 

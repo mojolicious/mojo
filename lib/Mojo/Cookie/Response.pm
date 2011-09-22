@@ -110,7 +110,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Cookie::Response - HTTP 1.1 Response Cookie Container
+Mojo::Cookie::Response - HTTP 1.1 response cookie container
 
 =head1 SYNOPSIS
 

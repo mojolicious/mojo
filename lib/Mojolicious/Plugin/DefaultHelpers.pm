@@ -106,7 +106,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::DefaultHelpers - Default Helpers Plugin
+Mojolicious::Plugin::DefaultHelpers - Default helpers plugin
 
 =head1 SYNOPSIS
 

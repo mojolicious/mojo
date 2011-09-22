@@ -97,7 +97,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Server::PSGI - PSGI Server
+Mojo::Server::PSGI - PSGI server
 
 =head1 SYNOPSIS
 

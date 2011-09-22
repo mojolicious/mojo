@@ -468,7 +468,7 @@ __END__
 
 =head1 NAME
 
-Mojo::DOM::CSS - CSS3 Selector Engine
+Mojo::DOM::CSS - CSS3 selector engine
 
 =head1 SYNOPSIS
 

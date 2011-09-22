@@ -172,7 +172,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Static - Serve Static Files
+Mojolicious::Static - Serve static files
 
 =head1 SYNOPSIS
 

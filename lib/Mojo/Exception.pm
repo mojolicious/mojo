@@ -215,7 +215,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Exception - Exceptions With Context
+Mojo::Exception - Exceptions with context
 
 =head1 SYNOPSIS
 

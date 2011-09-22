@@ -47,7 +47,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::eval - Eval Command
+Mojolicious::Command::eval - Eval command
 
 =head1 SYNOPSIS
 

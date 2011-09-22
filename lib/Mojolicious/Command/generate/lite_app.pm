@@ -50,7 +50,7 @@ Welcome to Mojolicious!
 __END__
 =head1 NAME
 
-Mojolicious::Command::generate::lite_app - Lite App Generator Command
+Mojolicious::Command::generate::lite_app - Lite app generator command
 
 =head1 SYNOPSIS
 

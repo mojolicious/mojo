@@ -56,7 +56,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::RequestTimer - Request Timer Plugin
+Mojolicious::Plugin::RequestTimer - Request timer plugin
 
 =head1 SYNOPSIS
 

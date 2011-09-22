@@ -51,12 +51,12 @@ $t->post_ok('/block')->status_is(200)
 # Perldoc browser (Welcome)
 $t->get_ok('/perldoc')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
   ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
-  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/Galaxy/);
+  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/galaxy/);
 
 # Perldoc browser (Welcome with slash)
 $t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
   ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
-  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/Galaxy/);
+  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/galaxy/);
 
 # Perldoc browser (Mojolicious)
 $t->get_ok('/perldoc/Mojolicious')->status_is(200)

@@ -22,7 +22,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Upload - Upload Container
+Mojo::Upload - Upload container
 
 =head1 SYNOPSIS
 

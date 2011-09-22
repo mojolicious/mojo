@@ -22,7 +22,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::CallbackCondition - Callback Condition Plugin
+Mojolicious::Plugin::CallbackCondition - Callback condition plugin
 
 =head1 SYNOPSIS
 

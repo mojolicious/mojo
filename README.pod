@@ -82,7 +82,7 @@ code into a file and start it with C<morbo>.
   $ curl http://127.0.0.1:3000/
   Hello World!
 
-=head2 Duct Tape For The HTML5 Web
+=head2 Duct tape for the HTML5 web
 
 Web development for humans, making hard things possible and everything fun.
 
@@ -134,7 +134,7 @@ Web development for humans, making hard things possible and everything fun.
 Single file prototypes like this one can easily grow into well-structured
 applications.
 
-=head2 Want To Know More?
+=head2 Want to know more?
 
 Take a look at our excellent documentation at L<http://mojolicio.us/perldoc>!
 

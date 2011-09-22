@@ -30,7 +30,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Cache - Naive In-Memory Cache
+Mojo::Cache - Naive in-memory cache
 
 =head1 SYNOPSIS
 

@@ -60,7 +60,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Asset::Memory - In-Memory Asset
+Mojo::Asset::Memory - In-memory asset
 
 =head1 SYNOPSIS
 

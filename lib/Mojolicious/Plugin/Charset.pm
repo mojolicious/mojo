@@ -33,7 +33,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Charset - Charset Plugin
+Mojolicious::Plugin::Charset - Charset plugin
 
 =head1 SYNOPSIS
 

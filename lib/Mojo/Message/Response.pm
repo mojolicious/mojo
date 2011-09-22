@@ -179,7 +179,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Message::Response - HTTP 1.1 Response Container
+Mojo::Message::Response - HTTP 1.1 response container
 
 =head1 SYNOPSIS
 

@@ -30,7 +30,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Trigger - IOLoop Trigger
+Mojo::IOLoop::Trigger - IOLoop trigger
 
 =head1 SYNOPSIS
 

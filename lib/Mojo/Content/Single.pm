@@ -90,7 +90,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Content::Single - HTTP 1.1 Content Container
+Mojo::Content::Single - HTTP 1.1 content container
 
 =head1 SYNOPSIS
 

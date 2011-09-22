@@ -109,7 +109,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Transaction - Transaction Base Class
+Mojo::Transaction - Transaction base class
 
 =head1 SYNOPSIS
 

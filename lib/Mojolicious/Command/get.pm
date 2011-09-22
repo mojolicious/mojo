@@ -200,7 +200,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::get - Get Command
+Mojolicious::Command::get - Get command
 
 =head1 SYNOPSIS
 

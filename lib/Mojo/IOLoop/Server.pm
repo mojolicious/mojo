@@ -262,7 +262,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Server - IOLoop Socket Server
+Mojo::IOLoop::Server - IOLoop socket server
 
 =head1 SYNOPSIS
 

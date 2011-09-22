@@ -25,7 +25,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::generate - Generator Command
+Mojolicious::Command::generate - Generator command
 
 =head1 SYNOPSIS
 

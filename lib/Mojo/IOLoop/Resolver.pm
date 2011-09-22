@@ -343,7 +343,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Resolver - IOLoop DNS Stub Resolver
+Mojo::IOLoop::Resolver - IOLoop DNS stub resolver
 
 =head1 SYNOPSIS
 

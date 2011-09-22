@@ -10,7 +10,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin - Plugin Base Class
+Mojolicious::Plugin - Plugin base class
 
 =head1 SYNOPSIS
 

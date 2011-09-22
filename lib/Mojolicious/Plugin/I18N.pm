@@ -80,7 +80,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::I18N - Internationalization Plugin
+Mojolicious::Plugin::I18N - Internationalization plugin
 
 =head1 SYNOPSIS
 

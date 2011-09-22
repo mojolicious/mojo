@@ -19,7 +19,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Asset - Asset Base Class
+Mojo::Asset - Asset base class
 
 =head1 SYNOPSIS
 

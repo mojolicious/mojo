@@ -447,7 +447,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Template - Perl-ish Templates!
+Mojo::Template - Perl-ish templates!
 
 =head1 SYNOPSIS
 

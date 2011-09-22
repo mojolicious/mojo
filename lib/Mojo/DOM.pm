@@ -435,7 +435,7 @@ __END__
 
 =head1 NAME
 
-Mojo::DOM - Minimalistic HTML5/XML DOM Parser With CSS3 Selectors
+Mojo::DOM - Minimalistic HTML5/XML DOM parser with CSS3 selectors
 
 =head1 SYNOPSIS
 

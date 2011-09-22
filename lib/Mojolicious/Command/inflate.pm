@@ -53,7 +53,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::inflate - inflate Command
+Mojolicious::Command::inflate - Inflate command
 
 =head1 SYNOPSIS
 

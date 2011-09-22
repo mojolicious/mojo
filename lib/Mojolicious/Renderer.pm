@@ -259,7 +259,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Renderer - MIME Type Based Renderer
+Mojolicious::Renderer - MIME type based renderer
 
 =head1 SYNOPSIS
 

@@ -86,7 +86,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Sessions - Signed Cookie Based Sessions
+Mojolicious::Sessions - Signed cookie based sessions
 
 =head1 SYNOPSIS
 

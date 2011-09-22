@@ -545,7 +545,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Message - HTTP 1.1 Message Base Class
+Mojo::Message - HTTP 1.1 message base class
 
 =head1 SYNOPSIS
 

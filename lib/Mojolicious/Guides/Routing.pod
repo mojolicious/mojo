@@ -90,7 +90,7 @@ any time.
   /sebastian -> /:name -> {name => 'sebastian'}
   {name => 'sebastian'} -> /:name -> /sebastian
 
-=head2 Generic Placeholders
+=head2 Generic placeholders
 
 Generic placeholders are the simplest form of placeholders and match
 all characters except C</> and C<.>.
@@ -112,7 +112,7 @@ the surrounding text.
   /sebastian23hello  -> /(:name)hello -> {name => 'sebastian23'}
   /sebastian 23hello -> /(:name)hello -> {name => 'sebastian 23'}
 
-=head2 Wildcard Placeholders
+=head2 Wildcard placeholders
 
 Wildcard placeholders are just like generic placeholders, but match
 absolutely everything.
@@ -124,7 +124,7 @@ absolutely everything.
   /sebastian23/hello  -> /*name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /*name/hello -> {name => 'sebastian 23'}
 
-=head2 Relaxed Placeholders
+=head2 Relaxed placeholders
 
 Relaxed placeholders are similar to the two placeholders above, but always
 require parentheses and match all characters except C</>.
@@ -140,7 +140,7 @@ require parentheses and match all characters except C</>.
 
 Most commonly used features every L<Mojolicious> developer should know about.
 
-=head2 Minimal Route
+=head2 Minimal route
 
 Every L<Mojolicious> application has a router object you can use to generate
 routes structures.
@@ -181,7 +181,7 @@ C<MyApp::Foo> and call its C<welcome> method.
 Routes are usually configured in the C<startup> method of the application
 class, but the router can be accessed from everywhere (even at runtime).
 
-=head2 Routing Destination
+=head2 Routing destination
 
 After you start a new route with the C<route> method you can also give it a
 destination in the form of a hash using the chained C<to> method.
@@ -218,7 +218,7 @@ Once dispatched the whole stash content can be changed at any time.
     $self->stash(mymessage => 'Welcome!');
   }
 
-=head2 Special Stash Values (C<controller> and C<action>)
+=head2 Special stash values (C<controller> and C<action>)
 
 When the dispatcher sees C<controller> and C<action> values in the stash it
 will always try to turn them into a class and method to dispatch to.
@@ -270,7 +270,7 @@ C<controller> hierarchies.
   # / -> {controller => 'foo-bar', action => 'hi'} -> MyApp::Foo::Bar->hi
   $r->route('/')->to('foo-bar#hi');
 
-=head2 Route To Class (C<namespace>)
+=head2 Route to class (C<namespace>)
 
 From time to time you might want to dispatch to a whole different C<namespace>.
 
@@ -287,7 +287,7 @@ You can also change the default namespace for all routes in the application.
 
   $r->namespace('MyApp::Controller');
 
-=head2 Route To Callback (C<cb>)
+=head2 Route to callback (C<cb>)
 
 You can use the C<cb> stash value to bypass controllers and execute a
 callback instead.
@@ -300,7 +300,7 @@ callback instead.
 This technique is the foundation of L<Mojolicious::Lite>, you can learn more
 about it from the included tutorial.
 
-=head2 More Restrictive Placeholders
+=head2 More restrictive placeholders
 
 A very easy way to make placeholders more restrictive are alternatives, you
 just make a list of possible values.
@@ -366,7 +366,7 @@ Or you can just disable format detection.
   # /foo.html -> undef
   $r->route('/foo', format => 0)->to(controller => 'foo', action => 'bar');
 
-=head2 Placeholders And Destinations
+=head2 Placeholders and destinations
 
 Extracted placeholder values will simply redefine older stash values if they
 already exist.
@@ -396,7 +396,7 @@ not separated by other characters than C</>.
 Special stash values like C<controller> and C<action> can also be
 placeholders, this allows for extremely flexible routes constructs.
 
-=head2 Named Routes
+=head2 Named routes
 
 Naming your routes will allow backreferencing in many kinds of helpers
 throughout the whole framework.
@@ -427,7 +427,7 @@ name at all.
   $self->url_for('current');
   $self->url_for;
 
-=head2 HTTP Methods
+=head2 HTTP methods
 
 The C<via> method of the route object allows only specific HTTP methods to
 pass.
@@ -443,7 +443,7 @@ pass.
   $r->route('/bye')->via('get', 'post')
     ->to(controller => 'foo', action => 'bye');
 
-=head2 Nested Routes
+=head2 Nested routes
 
 It is also possible to build tree structures from routes to remove repetitive
 code.
@@ -601,7 +601,7 @@ This is where conditions come into play, they are basically router plugins.
 The method C<add_condition> registers the new condition in the router while
 C<over> actually applies it to the route.
 
-=head2 Condition Plugins
+=head2 Condition plugins
 
 You can also package your conditions as reusable plugins.
 
@@ -653,7 +653,7 @@ applications.
 
   1;
 
-=head2 Embedding Applications
+=head2 Embedding applications
 
 You can easily embed whole applications simply by using them instead of a
 controller.
@@ -708,7 +708,7 @@ self-contained applications under a prefix.
 
   app->start;
 
-=head2 Application Plugins
+=head2 Application plugins
 
 Embedding L<Mojolicious> applications is easy, but it gets even easier if you
 package the whole thing as a self contained reusable plugin.

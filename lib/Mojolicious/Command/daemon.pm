@@ -58,7 +58,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Command::daemon - Daemon Command
+Mojolicious::Command::daemon - Daemon command
 
 =head1 SYNOPSIS
 

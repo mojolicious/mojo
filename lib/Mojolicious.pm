@@ -237,7 +237,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious - Duct Tape For The HTML5 Web!
+Mojolicious - Duct tape for the HTML5 web!
 
 =head1 SYNOPSIS
 
@@ -262,10 +262,6 @@ Mojolicious - Duct Tape For The HTML5 Web!
   }
 
 =head1 DESCRIPTION
-
-Web development for humans, making hard things possible and everything fun.
-
-=head2 Want To Know More?
 
 Take a look at our excellent documentation in L<Mojolicious::Guides>!
 

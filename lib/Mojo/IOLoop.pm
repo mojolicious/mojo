@@ -91,14 +91,16 @@ sub connect {
       # Events
       $stream->on(
         close => sub {
+          my $c = $self->{connections}->{$id};
+          $c->{finish} = 1;
           $c->{close}->($self, $id) if $c->{close};
           $self->drop($id);
         }
       );
-      weaken $c;
       $stream->on(
         error => sub {
-          my $c = delete $self->{connections}->{$id};
+          my $c = $self->{connections}->{$id};
+          $c->{finish} = 1;
           $c->{error}->($self, $id, pop) if $c->{error};
         }
       );
@@ -199,13 +201,15 @@ sub listen {
       $c->{read}  = $read;
       $stream->on(
         close => sub {
-          my $c = delete $self->{connections}->{$id};
+          my $c = $self->{connections}->{$id};
+          $c->{finish} = 1;
           $c->{close}->($self, $id) if $c->{close};
         }
       );
       $stream->on(
         error => sub {
-          my $c = delete $self->{connections}->{$id};
+          my $c = $self->{connections}->{$id};
+          $c->{finish} = 1;
           $c->{error}->($self, $id, pop) if $c->{error};
         }
       );
@@ -365,7 +369,10 @@ sub _drop {
   return $self unless my $watcher = $self->iowatcher;
   return $self if $watcher->cancel($id);
   if (delete $self->{servers}->{$id}) { delete $self->{listening} }
-  else { delete((delete($self->{connections}->{$id}) || {})->{stream}) }
+  else {
+    delete(($self->{connections}->{$id} || {})->{stream});
+    delete $self->{connections}->{$id};
+  }
   return $self;
 }
 

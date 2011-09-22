@@ -10,7 +10,7 @@ BEGIN {
 use Test::More;
 plan skip_all => 'Windows is too fragile for this test!'
   if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 73;
+plan tests => 76;
 
 use_ok 'Mojo::UserAgent';
 
@@ -23,6 +23,15 @@ app->log->level('fatal');
 
 # GET /
 get '/' => {text => 'works'};
+
+# GET /timeout
+my $timeout = undef;
+get '/timeout' => sub {
+  my $self = shift;
+  Mojo::IOLoop->singleton->connection_timeout($self->tx->connection => '0.5');
+  $self->on_finish(sub { $timeout = 1 });
+  $self->render_later;
+};
 
 # Proxy detection
 my $ua      = Mojo::UserAgent->new;
@@ -252,6 +261,12 @@ $tx = $ua->get('/');
 ok $tx->success, 'successful';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';
+
+# GET / (built-in server times out)
+$tx = $ua->get('/timeout');
+ok !$tx->success, 'not successful';
+is $tx->error, 'Premature connection close.', 'right error';
+is $timeout, 1, 'on_finish was called';
 
 # Nested keep alive
 my @kept_alive;

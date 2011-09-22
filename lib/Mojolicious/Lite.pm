@@ -53,7 +53,8 @@ sub import {
   *{"${caller}::routes"} = sub (&) {
     my $old = $root;
     $_[0]->($root = $routes);
-    $root = $old;
+    $routes = $root;
+    $root   = $old;
   };
   *{"${caller}::websocket"} = sub { $routes->websocket(@_) };
 

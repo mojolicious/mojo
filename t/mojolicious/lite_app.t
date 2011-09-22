@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 925;
+use Test::More tests => 934;
 
 # Pollution
 123 =~ m/(\d+)/;
@@ -793,6 +793,24 @@ routes {
     get '/whatever' => {inline => '<%= $foo %><%= $bar %><%= $baz %>!'};
   };
 };
+
+# Authentication block
+routes {
+
+  # Check "ok" parameter
+  under sub {
+    my $self = shift;
+    return 1 if $self->req->param('ok');
+    $self->render(text => "You're not ok.");
+    return;
+  };
+
+  # GET /authblock
+  get '/authblock' => {text => "You're ok."};
+};
+
+# GET /noauthblock
+get '/noauthblock' => {inline => 'Whatever <%= $foo %>.'};
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -1881,6 +1899,15 @@ $t->get_ok('/block/nested/whatever')->status_is(200)
 
 # GET /block/nested/something
 $t->get_ok('/block/nested/something')->status_is(404);
+
+# GET /authblock?ok=1
+$t->get_ok('/authblock?ok=1')->status_is(200)->content_is("You're ok.");
+
+# GET /authblock
+$t->get_ok('/authblock')->status_is(200)->content_is("You're not ok.");
+
+# GET /noauthblock
+$t->get_ok('/noauthblock')->status_is(200)->content_is("Whatever one.\n");
 
 # GET /captures/foo/bar
 $t->get_ok('/captures/foo/bar')->status_is(200)

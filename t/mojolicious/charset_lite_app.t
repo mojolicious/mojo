@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 39;
+use Test::More tests => 41;
 
 # "In the game of chess you can never let your adversary see your pieces."
 use Mojo::ByteStream 'b';
@@ -97,6 +97,9 @@ $t->get_ok('/unicode')->status_is(200)->content_type_is('text/plain')
 # and those in separate files in Shift_JIS (Mojo will do the decoding)
 $t->get_ok('/')->status_is(200)->content_type_like(qr/Shift_JIS/)
   ->content_like(qr/$yatta/);
+
+# Unicode format
+$t->get_ok("/.$yatta")->status_is(404);
 
 # Send and receive raw Shift_JIS octets (like browsers do)
 $t->post_ok('/data', $yatta_sjis)->status_is(200)->content_is($yatta_sjis);

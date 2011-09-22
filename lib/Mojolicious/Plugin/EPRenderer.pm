@@ -32,8 +32,9 @@ sub register {
       # Generate name
       my $path = $r->template_path($options) || $options->{inline};
       return unless defined $path;
-      my $list = join ', ', sort keys %{$c->stash};
-      my $key = $options->{cache} = md5_sum "$path($list)";
+      my $id = join ', ', $path, sort keys %{$c->stash};
+      utf8::encode $id;
+      my $key = $options->{cache} = md5_sum $id;
 
       # Cache
       my $cache = $r->cache;

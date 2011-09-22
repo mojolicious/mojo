@@ -14,6 +14,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed CSS of built-in exception template.
         - Fixed small redirect_to bug. (judofyr, sri)
         - Fixed small attribute selector bug in Mojo::DOM::CSS.
+        - Fixed small unicode bug in Mojolicious::Plugin::EPRenderer.
         - Fixed a few small route bugs.
         - Fixed Perl 5.8.7 compatibility.
         - Fixed typos.

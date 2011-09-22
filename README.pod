@@ -82,7 +82,59 @@ code into a file and start it with C<morbo>.
   $ curl http://127.0.0.1:3000/
   Hello World!
 
-=head2 Want to know more?
+=head2 Duct Tape For The Web
+
+Web development for humans, making hard things possible and everything fun.
+
+  use Mojolicious::Lite;
+
+  # Simple plain text response
+  get '/' => {text => 'Hello World!'};
+
+  # Route associating "/time" with template in DATA section
+  get '/time' => 'clock';
+
+  # RESTful web service with JSON and text representation
+  get '/list/:offset' => sub {
+    my $self = shift;
+    my $numbers = [0 .. $self->param('offset')];
+    $self->respond_to(
+      json => {json => $numbers}},
+      txt  => {text => join(',', @$numbers)}
+    );
+  };
+
+  # Scrape information from remote sites
+  post '/title' => sub {
+    my $self = shift;
+    my $url  = $self->param('url') || 'http://mojolicio.us';
+    $self->render_text(
+      $self->ua->get($url)->res->dom->html->head->title->text);
+  };
+
+  # WebSocket echo service
+  websocket '/echo' => sub {
+    my $self = shift;
+    $self->on_message(sub {
+      my ($self, $message) = @_;
+      $self->send_message("echo: $message");
+    });
+  };
+
+  app->start;
+  __DATA__
+
+  @@ clock.html.ep
+  % use Time::Piece;
+  % my $now = localtime;
+  %= link_to clock => begin
+    The time is <%= $now->hms %>.
+  % end
+
+Single file prototypes like this one can easily grow into well-structured
+applications.
+
+=head2 Want To Know More?
 
 Take a look at our excellent documentation at L<http://mojolicio.us/perldoc>!
 

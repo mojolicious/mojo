@@ -170,7 +170,7 @@ HTTP request and response.
     $self->render(text => 'Hello World!');
   };
 
-=head2 GET/POST Parameters
+=head2 GET/POST parameters
 
 All C<GET> and C<POST> parameters are accessible via C<param>.
 
@@ -181,7 +181,7 @@ All C<GET> and C<POST> parameters are accessible via C<param>.
     $self->render(text => "Hello $user!");
   };
 
-=head2 Stash And Templates
+=head2 Stash and templates
 
 The C<stash> is used to pass data to templates, which can be inlined in the
 C<DATA> section.
@@ -213,7 +213,7 @@ to all HTTP features and information.
     $self->render(text => $self->req->headers->user_agent);
   };
 
-=head2 Route Names
+=head2 Route names
 
 All routes can have a name associated with them, this allows automatic
 template detection and back referencing with C<url_for>, C<link_to> and
@@ -282,7 +282,7 @@ delimited by the C<begin> and C<end> keywords.
     </body>
   </html>
 
-=head2 Captured Content
+=head2 Captured content
 
 The C<content_for> helper can be used to pass around blocks of captured
 content.
@@ -362,7 +362,7 @@ C<param>.
     $self->render(text => "Our :bar placeholder matched $bar");
   };
 
-=head2 Wildcard Placeholders
+=head2 Wildcard placeholders
 
 Wildcard placeholders allow matching absolutely everything, including
 C</> and C<.>.
@@ -377,7 +377,7 @@ C</> and C<.>.
   @@ groovy.html.ep
   Your name is <%= $you %>.
 
-=head2 HTTP Methods
+=head2 HTTP methods
 
 Routes can be restricted to specific request methods.
 
@@ -406,7 +406,7 @@ Routes can be restricted to specific request methods.
     $self->render(text => "You called /baz with $method");
   };
 
-=head2 Optional Placeholders
+=head2 Optional placeholders
 
 Routes allow default values to make placeholders optional.
 
@@ -422,7 +422,7 @@ Routes allow default values to make placeholders optional.
   @@ groovy.txt.ep
   My name is <%= $name %>.
 
-=head2 Restrictive Placeholders
+=head2 Restrictive placeholders
 
 The easiest way to make placeholders more restrictive are alternatives, you
 just make a list of possible values.
@@ -483,7 +483,7 @@ Restrictive placeholders can also be used for format detection.
     $self->render_text('hello world!');
   };
 
-=head2 Content Negotiation
+=head2 Content negotiation
 
 For resources with different representations and that require truly
 C<RESTful> content negotiation you can also use C<respond_to>.
@@ -645,7 +645,7 @@ secure.
 
   app->secret('My secret passphrase here!');
 
-=head2 File Uploads
+=head2 File uploads
 
 All files uploaded via C<multipart/form-data> request are automatically
 available as L<Mojo::Upload> instances.
@@ -685,7 +685,7 @@ environment variable.
   # Increase limit to 1GB
   $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
 
-=head2 User Agent
+=head2 User agent
 
 With L<Mojo::UserAgent> there's a full featured HTTP 1.1 and WebSocket user
 agent built right in.
@@ -709,7 +709,7 @@ WebSocket applications have never been this easy before.
     });
   };
 
-=head2 External Templates
+=head2 External templates
 
 External templates will be searched by the renderer in a C<templates>
 directory.
@@ -722,7 +722,7 @@ directory.
     $self->render('foo/bar');
   };
 
-=head2 Static Files
+=head2 Static files
 
 Static files will be automatically served from the C<DATA> section
 (even Base64 encoded) or a C<public> directory if it exists.

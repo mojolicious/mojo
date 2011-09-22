@@ -494,7 +494,7 @@ like that.
   %# Comment line, treated as "<%# line =%>"
   %% Replaced with "%", useful for generating templates
 
-=head2 Automatic Escaping
+=head2 Automatic escaping
 
 Escaping behavior can be reversed with the C<auto_escape> attribute, this is
 the default in L<Mojolicious> C<.ep> templates for example.
@@ -545,7 +545,7 @@ That means you can access arguments simply via C<@_>.
   % my $x = shift;
   test 123 <%= $foo %>
 
-=head2 More Escaping
+=head2 More escaping
 
 You can use escaped tags and lines to generate templates.
 

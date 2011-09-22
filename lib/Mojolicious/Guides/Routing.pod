@@ -504,6 +504,7 @@ will be broken, this makes bridges a very powerful tool for authentication.
     return 1 if $self->req->headers->header('X-Bender');
 
     # Not authenticated
+    $self->render(text => "You're not Bender!");
     return;
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');

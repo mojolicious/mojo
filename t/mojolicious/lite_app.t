@@ -771,31 +771,31 @@ under '/' => {foo => 'one'};
 # GET /reset
 get '/reset' => {text => 'reset works!'};
 
-# Block
-routes {
+# Group
+group {
 
-  # /block
-  under '/block' => {bar => 'two'};
+  # /group
+  under '/group' => {bar => 'two'};
 
-  # GET /block
+  # GET /group
   get {inline => '<%= $foo %><%= $bar %>!'};
 
-  # Nested block
-  routes {
+  # Nested group
+  group {
 
-    # /block/nested
+    # /group/nested
     under '/nested' => {baz => 'three'};
 
-    # GET /block/nested
+    # GET /group/nested
     get {inline => '<%= $baz %><%= $bar %><%= $foo %>!'};
 
-    # GET /block/nested/whatever
+    # GET /group/nested/whatever
     get '/whatever' => {inline => '<%= $foo %><%= $bar %><%= $baz %>!'};
   };
 };
 
-# Authentication block
-routes {
+# Authentication group
+group {
 
   # Check "ok" parameter
   under sub {
@@ -805,12 +805,12 @@ routes {
     return;
   };
 
-  # GET /authblock
-  get '/authblock' => {text => "You're ok."};
+  # GET /authgroup
+  get '/authgroup' => {text => "You're ok."};
 };
 
-# GET /noauthblock
-get '/noauthblock' => {inline => 'Whatever <%= $foo %>.'};
+# GET /noauthgroup
+get '/noauthgroup' => {inline => 'Whatever <%= $foo %>.'};
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -1887,27 +1887,27 @@ $t->get_ok('/reset')->status_is(200)->content_is('reset works!');
 # GET /prefix/reset
 $t->get_ok('/prefix/reset')->status_is(404);
 
-# GET /block
-$t->get_ok('/block')->status_is(200)->content_is("onetwo!\n");
+# GET /group
+$t->get_ok('/group')->status_is(200)->content_is("onetwo!\n");
 
-# GET /block/nested
-$t->get_ok('/block/nested')->status_is(200)->content_is("threetwoone!\n");
+# GET /group/nested
+$t->get_ok('/group/nested')->status_is(200)->content_is("threetwoone!\n");
 
-# GET /block/nested/whatever
-$t->get_ok('/block/nested/whatever')->status_is(200)
+# GET /group/nested/whatever
+$t->get_ok('/group/nested/whatever')->status_is(200)
   ->content_is("onetwothree!\n");
 
-# GET /block/nested/something
-$t->get_ok('/block/nested/something')->status_is(404);
+# GET /group/nested/something
+$t->get_ok('/group/nested/something')->status_is(404);
 
-# GET /authblock?ok=1
-$t->get_ok('/authblock?ok=1')->status_is(200)->content_is("You're ok.");
+# GET /authgroup?ok=1
+$t->get_ok('/authgroup?ok=1')->status_is(200)->content_is("You're ok.");
 
-# GET /authblock
-$t->get_ok('/authblock')->status_is(200)->content_is("You're not ok.");
+# GET /authgroup
+$t->get_ok('/authgroup')->status_is(200)->content_is("You're not ok.");
 
-# GET /noauthblock
-$t->get_ok('/noauthblock')->status_is(200)->content_is("Whatever one.\n");
+# GET /noauthgroup
+$t->get_ok('/noauthgroup')->status_is(200)->content_is("Whatever one.\n");
 
 # GET /captures/foo/bar
 $t->get_ok('/captures/foo/bar')->status_is(200)

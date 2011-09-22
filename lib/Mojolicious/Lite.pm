@@ -40,22 +40,22 @@ sub import {
   no warnings 'redefine';
   my $root = $routes;
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
-  *{"${caller}::any"}    = sub { $routes->any(@_) };
-  *{"${caller}::del"}    = sub { $routes->del(@_) };
-  *{"${caller}::get"}    = sub { $routes->get(@_) };
-  *{"${caller}::helper"} = sub { $app->helper(@_) };
-  *{"${caller}::hook"}   = sub { $app->hook(@_) };
-  *{"${caller}::under"}  = *{"${caller}::ladder"} =
-    sub { $routes = $root->under(@_) };
-  *{"${caller}::plugin"} = sub { $app->plugin(@_) };
-  *{"${caller}::post"}   = sub { $routes->post(@_) };
-  *{"${caller}::put"}    = sub { $routes->put(@_) };
-  *{"${caller}::routes"} = sub (&) {
+  *{"${caller}::any"} = sub { $routes->any(@_) };
+  *{"${caller}::del"} = sub { $routes->del(@_) };
+  *{"${caller}::get"} = sub { $routes->get(@_) };
+  *{"${caller}::group"} = sub (&) {
     my $old = $root;
     $_[0]->($root = $routes);
     $routes = $root;
     $root   = $old;
   };
+  *{"${caller}::helper"} = sub { $app->helper(@_) };
+  *{"${caller}::hook"}   = sub { $app->hook(@_) };
+  *{"${caller}::under"}  = *{"${caller}::ladder"} =
+    sub { $routes = $root->under(@_) };
+  *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
+  *{"${caller}::post"}      = sub { $routes->post(@_) };
+  *{"${caller}::put"}       = sub { $routes->put(@_) };
   *{"${caller}::websocket"} = sub { $routes->websocket(@_) };
 
   # We are most likely the app in a lite environment
@@ -563,8 +563,8 @@ Prefixing multiple routes is another good use for C<under>.
 
   app->start;
 
-Route blocks allow multiple C<under> statements to be nested and related
-routes to be grouped.
+You can also C<group> related routes, which allows nesting of multiple
+C<under> statements.
 
   use Mojolicious::Lite;
 
@@ -577,9 +577,9 @@ routes to be grouped.
   };
 
   # Admin section
-  routes {
+  group {
 
-    # Local logic shared only by routes in this block
+    # Local logic shared only by routes in this group
     under '/admin' => sub {
       my $self = shift;
       return 1 if $self->req->heaers->header('X-Awesome');
@@ -853,6 +853,13 @@ See also the tutorial above for more argument variations.
 Generate route matching only C<GET> requests.
 See also the tutorial above for more argument variations.
 
+=head2 C<group>
+
+  group {...};
+
+Start a new route group.
+Note that this function is EXPERIMENTAL and might change without warning!
+
 =head2 C<helper>
 
   helper foo => sub {...};
@@ -886,13 +893,6 @@ See also the tutorial above for more argument variations.
 
 Generate route matching only C<PUT> requests.
 See also the tutorial above for more argument variations.
-
-=head2 C<routes>
-
-  routes {...};
-
-Start a new route block.
-Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<under>
 

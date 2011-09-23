@@ -629,14 +629,14 @@ using them.
 
   get '/counter' => sub {
     my $self = shift;
-    $self->render(counter => ++$self->session->{counter});
+    $self->session->{counter}++;
   };
 
   app->start;
   __DATA__
 
   @@ counter.html.ep
-  Counter: <%= $counter %>
+  Counter: <%= session 'counter' %>
 
 =head2 Secret
 

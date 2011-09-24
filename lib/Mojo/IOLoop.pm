@@ -401,8 +401,8 @@ sub _not_listening {
   my $self = shift;
 
   # Check if we are listening
-  return unless delete $self->{listening};
   return unless my $cb = $self->on_unlock;
+  return unless delete $self->{listening};
   $self->$cb();
 
   # Stop listening

@@ -393,10 +393,8 @@ sub _listening {
   return unless $i < $max;
   if (my $cb = $self->on_lock) { return unless $self->$cb(!$i) }
 
-  # Try to guess the ideal number of accepts and start listening
-  my $accepts = $self->{accepts};
-  $accepts = 10 unless defined $accepts && $accepts > 0 && $accepts < 10;
-  $_->resume($max > 1 ? $accepts : 1) for values %$servers;
+  # Check if multi-accept is desirable and start listening
+  $_->resume($max > 1 ? 10 : 1) for values %$servers;
   $self->{listening} = 1;
 }
 

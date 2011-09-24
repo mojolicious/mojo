@@ -122,6 +122,7 @@ sub listen {
     $reuse = ",$reuse" if length $ENV{MOJO_REUSE};
     $ENV{MOJO_REUSE} .= "$reuse:$fd";
   }
+  $handle->blocking(0);
   $self->{handle} = $handle;
 
   # TLS
@@ -167,19 +168,17 @@ sub pause {
 }
 
 sub resume {
-  my $self = shift;
+  my ($self, $accepts) = @_;
   weaken $self;
   $self->iowatcher->add($self->{handle},
-    on_readable => sub { $self->_accept });
+    on_readable => sub { $self->_accept for 1 .. $accepts });
 }
 
 sub _accept {
   my $self = shift;
 
   # Accept
-  my $handle = $self->{handle}->accept;
-
-  # Non-blocking
+  return unless my $handle = $self->{handle}->accept;
   $handle->blocking(0);
 
   # Disable Nagle's algorithm
@@ -274,7 +273,7 @@ Mojo::IOLoop::Server - IOLoop socket server
   $server->listen(port => 3000);
 
   # Start and stop accepting connections
-  $server->resume;
+  $server->resume(1);
   $server->pause;
 
 =head1 DESCRIPTION
@@ -364,7 +363,7 @@ Stop accepting connections.
 
 =head2 C<resume>
 
-  $server->resume;
+  $server->resume(10);
 
 Start accepting connections.
 

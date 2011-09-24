@@ -388,12 +388,15 @@ sub _listening {
   return if $self->{listening};
   my $servers = $self->{servers} ||= {};
   return unless keys %$servers;
-  my $i = keys %{$self->{connections}};
-  return unless $i < $self->max_connections;
+  my $i   = keys %{$self->{connections}};
+  my $max = $self->max_connections;
+  return unless $i < $max;
   if (my $cb = $self->on_lock) { return unless $self->$cb(!$i) }
 
-  # Start listening
-  $_->resume for values %$servers;
+  # Try to guess the ideal number of accepts and start listening
+  my $accepts = $self->{accepts};
+  $accepts = 10 unless defined $accepts && $accepts > 0 && $accepts < 10;
+  $_->resume($max > 1 ? $accepts : 1) for values %$servers;
   $self->{listening} = 1;
 }
 

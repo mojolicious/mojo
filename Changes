@@ -9,10 +9,10 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL profile helper.
         - Added EXPERIMENTAL binary support to Mojo::Transaction::WebSocket.
         - Updated WebSocket implementation to ietf-15.
+        - Improved accept performance of all built-in servers by up to 1000%
+          with the EV backend.
         - Improved documentation.
         - Improved CSS of some built-in templates.
-        - Improved accept performance of the standalone daemon with EV
-          backend by up to 1000%.
         - Fixed CSS of built-in exception template.
         - Fixed close event bug in Mojo::IOLoop.
         - Fixed small redirect_to bug. (judofyr, sri)

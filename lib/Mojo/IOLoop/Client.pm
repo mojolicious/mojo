@@ -81,8 +81,6 @@ sub _connect {
     # IPv6 needs an early start
     $handle->connect if IPV6;
   }
-
-  # Non-blocking
   $handle->blocking(0);
 
   # Disable Nagle's algorithm

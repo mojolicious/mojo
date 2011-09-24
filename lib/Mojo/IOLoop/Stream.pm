@@ -27,7 +27,6 @@ sub DESTROY {
 sub new {
   my $self = shift->SUPER::new;
   $self->{handle} = shift;
-  $self->{handle}->blocking(0);
   $self->{buffer} = '';
   return $self;
 }

@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.99    2011-09-22 00:00:00
+1.99    2011-09-24 00:00:00
         - Deprecated direct hash access to the flash in
           Mojolicious::Controller.
         - Added EXPERIMENTAL group function to Mojolicious::Lite.
@@ -11,6 +11,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Updated WebSocket implementation to ietf-15.
         - Improved documentation.
         - Improved CSS of some built-in templates.
+        - Improved accept performance of the standalone daemon with EV
+          backend by up to 1000%.
         - Fixed CSS of built-in exception template.
         - Fixed close event bug in Mojo::IOLoop.
         - Fixed small redirect_to bug. (judofyr, sri)

@@ -16,8 +16,7 @@ sub not_writing {
 
   my $fd = fileno $handle;
   my $h  = $self->{handles}->{$fd};
-  my $w  = $h->{watcher};
-  if ($w) { $w->set($fd, EV::READ) if delete $h->{writing} }
+  if (my $w = $h->{watcher}) { $w->set($fd, EV::READ) }
   else {
     weaken $self;
     $h->{watcher} = EV::io($fd, EV::READ, sub { $self->_io($fd, @_) });
@@ -50,14 +49,12 @@ sub writing {
 
   my $fd = fileno $handle;
   my $h  = $self->{handles}->{$fd};
-  my $w  = $h->{watcher};
-  if ($w) { $w->set($fd, EV::WRITE | EV::READ) }
+  if (my $w = $h->{watcher}) { $w->set($fd, EV::WRITE | EV::READ) }
   else {
     weaken $self;
     $h->{watcher} =
       EV::io($fd, EV::WRITE | EV::READ, sub { $self->_io($fd, @_) });
   }
-  $h->{writing} = 1;
 
   return $self;
 }

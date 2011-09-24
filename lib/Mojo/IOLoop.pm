@@ -21,9 +21,7 @@ has iowatcher       => sub {
 };
 has max_accepts     => 0;
 has max_connections => 1000;
-has [qw/on_lock on_unlock/] => sub {
-  sub {1}
-};
+has [qw/on_lock on_unlock/];
 has resolver => sub {
   my $resolver = Mojo::IOLoop::Resolver->new(ioloop => shift);
   weaken $resolver->{ioloop};
@@ -392,7 +390,7 @@ sub _listening {
   return unless keys %$servers;
   my $i = keys %{$self->{connections}};
   return unless $i < $self->max_connections;
-  return unless $self->on_lock->($self, !$i);
+  if (my $cb = $self->on_lock) { return unless $self->$cb(!$i) }
 
   # Start listening
   $_->resume for values %$servers;
@@ -404,7 +402,8 @@ sub _not_listening {
 
   # Check if we are listening
   return unless delete $self->{listening};
-  $self->on_unlock->($self);
+  return unless my $cb = $self->on_unlock;
+  $self->$cb();
 
   # Stop listening
   $_->pause for values %{$self->{servers} || {}};

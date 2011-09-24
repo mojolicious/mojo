@@ -401,13 +401,12 @@ sub _not_listening {
   my $self = shift;
 
   # Check if we are listening
-  return unless my $cb = $self->on_unlock;
   return unless delete $self->{listening};
+  return unless my $cb = $self->on_unlock;
   $self->$cb();
 
   # Stop listening
   $_->pause for values %{$self->{servers} || {}};
-  delete $self->{listening};
 }
 
 1;

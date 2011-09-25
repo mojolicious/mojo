@@ -153,7 +153,7 @@ sub _config {
   $c->{lock_file} .= ".$$";
   $c->{pid_file}
     ||= File::Spec->catfile(dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid');
-  $c->{upgrade_timeout} ||= 30;
+  $c->{upgrade_timeout} ||= 60;
   $c->{workers}         ||= 4;
 
   # Daemon settings
@@ -598,10 +598,10 @@ the C<MOJO_REVERSE_PROXY> environment variable.
 
 =head2 C<upgrade_timeout>
 
-  upgrade_timeout => 15
+  upgrade_timeout => 30
 
 Time in seconds a zero downtime software upgrade may take before being
-aborted, defaults to C<30>.
+aborted, defaults to C<60>.
 
 =head2 C<user>
 

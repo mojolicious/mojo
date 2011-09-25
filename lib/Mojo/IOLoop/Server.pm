@@ -66,6 +66,7 @@ AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
 -----END RSA PRIVATE KEY-----
 EOF
 
+has accepts   => 10;
 has iowatcher => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton->iowatcher;
@@ -168,10 +169,10 @@ sub pause {
 }
 
 sub resume {
-  my ($self, $accepts) = @_;
+  my $self = shift;
   weaken $self;
   $self->iowatcher->add($self->{handle},
-    on_readable => sub { $self->_accept for 1 .. $accepts });
+    on_readable => sub { $self->_accept for 1 .. $self->accepts });
 }
 
 sub _accept {
@@ -273,7 +274,7 @@ Mojo::IOLoop::Server - IOLoop socket server
   $server->listen(port => 3000);
 
   # Start and stop accepting connections
-  $server->resume(1);
+  $server->resume;
   $server->pause;
 
 =head1 DESCRIPTION
@@ -293,6 +294,13 @@ Emitted for each accepted connection.
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop::Server> implements the following attributes.
+
+=head2 C<accepts>
+
+  my $accepts = $server->accepts;
+  $server     = $server->accepts(10);
+
+Number of connections to accept at once, defaults to C<10>.
 
 =head2 C<iowatcher>
 
@@ -363,7 +371,7 @@ Stop accepting connections.
 
 =head2 C<resume>
 
-  $server->resume(10);
+  $server->resume;
 
 Start accepting connections.
 

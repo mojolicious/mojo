@@ -405,7 +405,7 @@ sub _listening {
   if (my $cb = $self->on_lock) { return unless $self->$cb(!$i) }
 
   # Check if multi-accept is desirable and start listening
-  $_->resume($max > 1 ? 10 : 1) for values %$servers;
+  $_->accepts($max > 1 ? 10 : 1)->resume for values %$servers;
   $self->{listening} = 1;
 }
 

@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL group function to Mojolicious::Lite.
         - Added EXPERIMENTAL build_frame and parse_frame methods to
           Mojo::Transaction::WebSocket.
+        - Added EXPERIMENTAL accepts attribute to Mojo::IOLoop::Server.
         - Added EXPERIMENTAL profile helper.
         - Added EXPERIMENTAL binary support to Mojo::Transaction::WebSocket.
         - Updated WebSocket implementation to ietf-15.

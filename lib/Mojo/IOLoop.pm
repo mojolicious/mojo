@@ -134,8 +134,9 @@ sub connection_timeout {
   my ($self, $id, $timeout) = @_;
   $self = $self->singleton unless ref $self;
   return unless my $c = $self->{connections}->{$id};
-  $c->{timeout} = $timeout and return $self if defined $timeout;
-  $c->{timeout};
+  return $c->{timeout} unless defined $timeout;
+  $c->{timeout} = $timeout;
+  return $self;
 }
 
 sub defer { shift->timer(0 => @_) }

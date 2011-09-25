@@ -31,7 +31,6 @@ sub one_tick {
   my ($self, $timeout) = @_;
   my $w = EV::timer($timeout, 0, sub { EV::unloop(EV::BREAK_ONE) });
   EV::loop;
-  undef $w;
 }
 
 sub recurring { shift->_timer(shift, 1, @_) }

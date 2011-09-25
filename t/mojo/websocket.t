@@ -12,7 +12,7 @@ use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;
 plan skip_all => 'This test does not work on some older versions of FreeBSD!'
   if $^O =~ /freebsd/;
-plan tests => 41;
+plan tests => 42;
 
 # "I can't believe it! Reading and writing actually paid off!"
 use IO::Socket::INET;
@@ -55,8 +55,9 @@ websocket '/' => sub {
 
 # GET /something/else
 get '/something/else' => sub {
-  my $self    = shift;
-  my $timeout = Mojo::IOLoop->connection_timeout($self->tx->connection);
+  my $self = shift;
+  my $timeout =
+    Mojo::IOLoop->singleton->connection_timeout($self->tx->connection);
   $self->render(text => "${timeout}failed!");
 };
 
@@ -227,6 +228,7 @@ $loop->start;
 ok $result =~ /^lalala(\d+)$/, 'right result';
 ok $1 > 100, 'right timeout';
 ok $local, 'local port';
+is $loop->handle($tx->connection), $socket, 'right connection id';
 
 # WebSocket /early_start (server directly sends a message)
 my $flag2;

@@ -28,7 +28,7 @@ get '/' => {text => 'works'};
 my $timeout = undef;
 get '/timeout' => sub {
   my $self = shift;
-  Mojo::IOLoop->singleton->connection_timeout($self->tx->connection => '0.5');
+  Mojo::IOLoop->connection_timeout($self->tx->connection => '0.5');
   $self->on_finish(sub { $timeout = 1 });
   $self->render_later;
 };

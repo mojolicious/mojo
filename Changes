@@ -12,6 +12,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Changed default upgrade timeout of Hypnotoad from 30 to 60 seconds.
         - Improved accept performance of all built-in servers by up to 1000%
           with the EV backend.
+        - Improved connection_timeout method in Mojo::IOLoop by allowing it
+          to be called as a class method.
         - Improved documentation.
         - Improved CSS of some built-in templates.
         - Fixed CSS of built-in exception template.

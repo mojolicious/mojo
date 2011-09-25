@@ -132,6 +132,7 @@ sub connect {
 
 sub connection_timeout {
   my ($self, $id, $timeout) = @_;
+  $self = $self->singleton unless ref $self;
   return unless my $c = $self->{connections}->{$id};
   $c->{timeout} = $timeout and return $self if defined $timeout;
   $c->{timeout};
@@ -338,10 +339,12 @@ sub timer {
 sub trigger {
   my ($self, $cb) = @_;
   $self = $self->singleton unless ref $self;
+
   my $t = Mojo::IOLoop::Trigger->new;
   $t->ioloop($self);
   weaken $t->{ioloop};
   $t->once(done => $cb) if $cb;
+
   return $t;
 }
 
@@ -364,13 +367,20 @@ sub write {
 
 sub _drop {
   my ($self, $id) = @_;
+
+  # Timer
   return $self unless my $watcher = $self->iowatcher;
   return $self if $watcher->cancel($id);
+
+  # Listen socket
   if (delete $self->{servers}->{$id}) { delete $self->{listening} }
+
+  # Connection
   else {
     delete(($self->{connections}->{$id} || {})->{stream});
     delete $self->{connections}->{$id};
   }
+
   return $self;
 }
 
@@ -668,6 +678,8 @@ Path to the TLS key file.
 
 =head2 C<connection_timeout>
 
+  my $timeout = Mojo::IOLoop->connection_timeout($id);
+  $loop       = Mojo::IOLoop->connection_timeout($id => 45);
   my $timeout = $loop->connection_timeout($id);
   $loop       = $loop->connection_timeout($id => 45);
 

@@ -127,9 +127,7 @@ Web development for humans, making hard things possible and everything fun.
   @@ clock.html.ep
   % use Time::Piece;
   % my $now = localtime;
-  %= link_to clock => begin
-    The time is <%= $now->hms %>.
-  % end
+  The time is <%= $now->hms %>.
 
 Single file prototypes like this one can easily grow into well-structured
 applications.

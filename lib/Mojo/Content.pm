@@ -75,15 +75,15 @@ sub generate_body_chunk {
   my ($self, $offset) = @_;
 
   # Callback
-  if (!delete $self->{delay} && !length $self->{b2}) {
+  if (!delete $self->{delay} && !length $self->{body_buffer}) {
     my $cb = delete $self->{drain};
     $self->$cb($offset) if $cb;
   }
 
   # Get chunk
-  my $chunk = $self->{b2};
+  my $chunk = $self->{body_buffer};
   $chunk = '' unless defined $chunk;
-  $self->{b2} = '';
+  $self->{body_buffer} = '';
 
   # EOF or delay
   return $self->{eof} ? '' : undef unless length $chunk;
@@ -99,13 +99,13 @@ sub get_header_chunk {
   my ($self, $offset) = @_;
 
   # Normal headers
-  my $copy = $self->{b1} ||= $self->_build_headers;
+  my $copy = $self->{header_buffer} ||= $self->_build_headers;
   return substr($copy, $offset, CHUNK_SIZE);
 }
 
 sub has_leftovers {
   my $self = shift;
-  return 1 if length $self->{b2} || length $self->{b1};
+  return 1 if length $self->{buffer} || length $self->{pre_buffer};
   return;
 }
 
@@ -146,10 +146,10 @@ sub leftovers {
 
   # Chunked leftovers are in the chunked buffer, and so are those from a
   # HEAD request
-  return $self->{b1} if length $self->{b1};
+  return $self->{pre_buffer} if length $self->{pre_buffer};
 
   # Normal leftovers
-  return $self->{b2};
+  return $self->{buffer};
 }
 
 sub parse {
@@ -181,9 +181,9 @@ sub parse {
 
   # Not chunked, pass through to second buffer
   else {
-    $self->{real_size} += length $self->{b1};
-    $self->{b2} .= $self->{b1};
-    $self->{b1} = '';
+    $self->{real_size} += length $self->{pre_buffer};
+    $self->{buffer} .= $self->{pre_buffer};
+    $self->{pre_buffer} = '';
   }
 
   # Custom body parser callback
@@ -191,9 +191,9 @@ sub parse {
 
     # Chunked or relaxed content
     if ($self->is_chunked || $self->relaxed) {
-      $self->{b2} = '' unless defined $self->{b2};
-      $self->$cb($self->{b2});
-      $self->{b2} = '';
+      $self->{buffer} = '' unless defined $self->{buffer};
+      $self->$cb($self->{buffer});
+      $self->{buffer} = '';
     }
 
     # Normal content
@@ -206,7 +206,7 @@ sub parse {
 
       # Slurp
       if ($need > 0) {
-        my $chunk = substr $self->{b2}, 0, $need, '';
+        my $chunk = substr $self->{buffer}, 0, $need, '';
         $self->{size} = $self->{size} + length $chunk;
         $self->$cb($chunk);
       }
@@ -239,20 +239,20 @@ sub parse_until_body {
   my ($self, $chunk) = @_;
 
   # Prepare first buffer
-  $self->{b1}       = '' unless defined $self->{b1};
-  $self->{raw_size} = 0  unless exists $self->{raw_size};
+  $self->{pre_buffer} = '' unless defined $self->{pre_buffer};
+  $self->{raw_size}   = 0  unless exists $self->{raw_size};
 
   # Add chunk
   if (defined $chunk) {
     $self->{raw_size} += length $chunk;
-    $self->{b1} .= $chunk;
+    $self->{pre_buffer} .= $chunk;
   }
 
   # Parser started
   unless ($self->{state}) {
 
     # Update size
-    $self->{header_size} = $self->{raw_size} - length $self->{b1};
+    $self->{header_size} = $self->{raw_size} - length $self->{pre_buffer};
 
     # Headers
     $self->{state} = 'headers';
@@ -277,8 +277,8 @@ sub write {
 
   # Add chunk
   if (defined $chunk) {
-    $self->{b2} = '' unless defined $self->{b2};
-    $self->{b2} .= $chunk;
+    $self->{body_buffer} = '' unless defined $self->{body_buffer};
+    $self->{body_buffer} .= $chunk;
   }
 
   # Delay
@@ -343,15 +343,15 @@ sub _parse_chunked {
   }
 
   # New chunk (ignore the chunk extension)
-  while ($self->{b1} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
+  while ($self->{pre_buffer} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
     my $header = $1;
     my $len    = hex($2);
 
     # Whole chunk
-    if (length($self->{b1}) >= (length($header) + $len)) {
+    if (length($self->{pre_buffer}) >= (length($header) + $len)) {
 
       # Remove header
-      substr $self->{b1}, 0, length $header, '';
+      substr $self->{pre_buffer}, 0, length $header, '';
 
       # Last chunk
       if ($len == 0) {
@@ -361,10 +361,10 @@ sub _parse_chunked {
 
       # Remove payload
       $self->{real_size} += $len;
-      $self->{b2} .= substr $self->{b1}, 0, $len, '';
+      $self->{buffer} .= substr $self->{pre_buffer}, 0, $len, '';
 
       # Remove newline at end of chunk
-      $self->{b1} =~ s/^(\x0d?\x0a)//;
+      $self->{pre_buffer} =~ s/^(\x0d?\x0a)//;
     }
 
     # Not a whole chunk, wait for more data
@@ -381,8 +381,8 @@ sub _parse_chunked_trailing_headers {
 
   # Parse
   my $headers = $self->headers;
-  $headers->parse($self->{b1});
-  $self->{b1} = '';
+  $headers->parse($self->{pre_buffer});
+  $self->{pre_buffer} = '';
 
   # Done
   if ($headers->is_done) {
@@ -405,14 +405,14 @@ sub _parse_headers {
 
   # Parse
   my $headers = $self->headers;
-  $headers->parse($self->{b1});
-  $self->{b1} = '';
+  $headers->parse($self->{pre_buffer});
+  $self->{pre_buffer} = '';
 
   # Done
   if ($headers->is_done) {
     my $leftovers = $headers->leftovers;
     $self->{header_size} = $self->{raw_size} - length $leftovers;
-    $self->{b1}          = $leftovers;
+    $self->{pre_buffer}  = $leftovers;
     $self->{state}       = 'body';
   }
 }

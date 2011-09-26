@@ -177,19 +177,19 @@ sub _parse_multipart_body {
   my ($self, $boundary) = @_;
 
   # Whole part in buffer
-  my $pos = index $self->{b2}, "\x0d\x0a--$boundary";
+  my $pos = index $self->{buffer}, "\x0d\x0a--$boundary";
   if ($pos < 0) {
-    my $len = length($self->{b2}) - (length($boundary) + 8);
+    my $len = length($self->{buffer}) - (length($boundary) + 8);
     return unless $len > 0;
 
     # Store chunk
-    my $chunk = substr $self->{b2}, 0, $len, '';
+    my $chunk = substr $self->{buffer}, 0, $len, '';
     $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
     return;
   }
 
   # Store chunk
-  my $chunk = substr $self->{b2}, 0, $pos, '';
+  my $chunk = substr $self->{buffer}, 0, $pos, '';
   $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
   $self->{multi_state} = 'multipart_boundary';
   return 1;
@@ -199,8 +199,8 @@ sub _parse_multipart_boundary {
   my ($self, $boundary) = @_;
 
   # Boundary begins
-  if ((index $self->{b2}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
-    substr $self->{b2}, 0, length($boundary) + 6, '';
+  if ((index $self->{buffer}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
+    substr $self->{buffer}, 0, length($boundary) + 6, '';
 
     # New part
     push @{$self->parts}, Mojo::Content::Single->new(relaxed => 1);
@@ -210,8 +210,8 @@ sub _parse_multipart_boundary {
 
   # Boundary ends
   my $end = "\x0d\x0a--$boundary--";
-  if ((index $self->{b2}, $end) == 0) {
-    substr $self->{b2}, 0, length $end, '';
+  if ((index $self->{buffer}, $end) == 0) {
+    substr $self->{buffer}, 0, length $end, '';
 
     # Done
     $self->{state} = $self->{multi_state} = 'done';
@@ -224,9 +224,9 @@ sub _parse_multipart_preamble {
   my ($self, $boundary) = @_;
 
   # Replace preamble with carriage return and line feed
-  my $pos = index $self->{b2}, "--$boundary";
+  my $pos = index $self->{buffer}, "--$boundary";
   unless ($pos < 0) {
-    substr $self->{b2}, 0, $pos, "\x0d\x0a";
+    substr $self->{buffer}, 0, $pos, "\x0d\x0a";
 
     # Parse boundary
     $self->{multi_state} = 'multipart_boundary';

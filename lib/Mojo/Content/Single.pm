@@ -65,8 +65,8 @@ sub parse {
 
   # Chunked body or relaxed content
   if ($self->is_chunked || $self->relaxed) {
-    $self->asset->add_chunk($self->{b2});
-    $self->{b2} = '';
+    $self->asset->add_chunk($self->{buffer});
+    $self->{buffer} = '';
   }
 
   # Normal body
@@ -76,7 +76,7 @@ sub parse {
     my $len   = $self->headers->content_length || 0;
     my $asset = $self->asset;
     my $need  = $len - $asset->size;
-    $asset->add_chunk(substr $self->{b2}, 0, $need, '') if $need > 0;
+    $asset->add_chunk(substr $self->{buffer}, 0, $need, '') if $need > 0;
 
     # Done
     $self->{state} = 'done' if $len <= $self->progress;

@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-Mojo - The duct tape!
+Mojo - Duct tape for the HTML5 web!
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,8 @@ Mojo - The duct tape!
 
 =head1 DESCRIPTION
 
-Mojo provides a flexible runtime environment for Perl web frameworks.
+Mojo provides a flexible runtime environment for Perl real-time web
+frameworks.
 It provides all the basic tools and helpers needed to write simple web
 applications and higher level web frameworks such as L<Mojolicious>.
 

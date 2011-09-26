@@ -15,8 +15,8 @@ art technology.
 
 =item *
 
-An amazing MVC web framework supporting a simplified single file mode through
-L<Mojolicious::Lite>.
+An amazing real-time web framework supporting a simplified single file mode
+through L<Mojolicious::Lite>.
 
 =over 2
 

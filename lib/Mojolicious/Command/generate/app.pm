@@ -108,16 +108,19 @@ sub welcome {
   my $self = shift;
 
   # Render template "example/welcome.html.ep" with message
-  $self->render(message => 'Welcome to the Mojolicious Web Framework!');
+  $self->render(
+    message => 'Welcome to the Mojolicious Real-Time Web Framework!');
 }
 
 1;
 
 @@ static
 <!doctype html><html>
-  <head><title>Welcome to the Mojolicious Web Framework!</title></head>
+  <head>
+    <title>Welcome to the Mojolicious Real-Time Web Framework!</title>
+  </head>
   <body>
-    <h2>Welcome to the Mojolicious Web Framework!</h2>
+    <h2>Welcome to the Mojolicious Real-Time Web Framework!</h2>
     This is the static document "public/index.html",
     <a href="/welcome">click here</a> to get back to the start.
   </body>

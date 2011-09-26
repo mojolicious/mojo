@@ -237,7 +237,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious - Duct tape for the HTML5 web!
+Mojolicious - Real-Time Web Framework
 
 =head1 SYNOPSIS
 

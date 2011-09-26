@@ -73,7 +73,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Lite - Micro Web Framework
+Mojolicious::Lite - Micro Real-Time Web Framework
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,8 @@ Mojolicious::Lite - Micro Web Framework
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Lite> is a micro web framework built around L<Mojolicious>.
+L<Mojolicious::Lite> is a micro real-time web framework built around
+L<Mojolicious>.
 
 =head1 TUTORIAL
 

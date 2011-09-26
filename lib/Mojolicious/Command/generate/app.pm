@@ -66,7 +66,7 @@ use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
 # Check if Mojolicious is installed
 eval 'use Mojolicious::Commands';
 die <<EOF if $@;
-It looks like you don't have the Mojolicious Framework installed.
+It looks like you don't have the Mojolicious framework installed.
 Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
@@ -109,7 +109,7 @@ sub welcome {
 
   # Render template "example/welcome.html.ep" with message
   $self->render(
-    message => 'Welcome to the Mojolicious Real-Time Web Framework!');
+    message => 'Welcome to the Mojolicious real-time web framework!');
 }
 
 1;
@@ -117,10 +117,10 @@ sub welcome {
 @@ static
 <!doctype html><html>
   <head>
-    <title>Welcome to the Mojolicious Real-Time Web Framework!</title>
+    <title>Welcome to the Mojolicious real-time web framework!</title>
   </head>
   <body>
-    <h2>Welcome to the Mojolicious Real-Time Web Framework!</h2>
+    <h2>Welcome to the Mojolicious real-time web framework!</h2>
     This is the static document "public/index.html",
     <a href="/welcome">click here</a> to get back to the start.
   </body>

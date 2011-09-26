@@ -1871,7 +1871,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed some typos.
 
 0.7     2008-10-11 00:00:00
-        - Added the Mojolicious Web Framework example.
+        - Added the Mojolicious web framework example.
         - Added upload and GET/POST parameter helpers to Mojo::Message.
         - Hooks for upload progress and stuff added.
         - Refactored transfer encoding code into Mojo::Filter and

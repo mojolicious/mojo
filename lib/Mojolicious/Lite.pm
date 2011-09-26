@@ -73,7 +73,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Lite - Micro Real-Time Web Framework
+Mojolicious::Lite - Micro real-time web framework
 
 =head1 SYNOPSIS
 
@@ -276,7 +276,7 @@ delimited by the C<begin> and C<end> keywords.
     Try <%= link_to $url => begin %><%= $name %><% end %>!
   % end
   <!doctype html><html>
-    <head><title>Sebastians Frameworks!</title></head>
+    <head><title>Sebastians frameworks!</title></head>
     <body>
       %= $link->('http://mojolicio.us', 'Mojolicious')
       %= $link->('http://catalystframework.org', 'Catalyst')

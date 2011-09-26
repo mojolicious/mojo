@@ -237,7 +237,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious - Real-Time Web Framework
+Mojolicious - Real-time web framework
 
 =head1 SYNOPSIS
 

@@ -1069,7 +1069,7 @@ once all data has been written to the kernel send buffer or equivalent.
   });
 
 For Comet (C<long polling>) you might also want to increase the connection
-inactivity timeout.
+timeout, which usually defaults to C<15> seconds.
 
   # Increase timeout for current connection to 300 seconds
   Mojo::IOLoop->connection_timeout($c->tx->connection => 300);

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1148;
+use Test::More tests => 1176;
 
 use File::Spec;
 use File::Temp;
@@ -774,6 +774,43 @@ is $clone->headers->content_length, '13', 'right "Content-Length" value';
 is $clone->body, "Hello World!\n", 'right content';
 ok $finished, 'finish callback was called';
 ok $clone->is_done, 'request is done';
+
+# Build full HTTP 1.1 request (roundtrip)
+$req = Mojo::Message::Request->new;
+$req->method('GET');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->headers->expect('100-continue');
+$req->body("Hello World!\n");
+$req = Mojo::Message::Request->new->parse($req->to_string);
+ok $req->is_done, 'request is done';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar', 'right URL';
+is $req->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->headers->expect, '100-continue',             'right "Expect" value';
+is $req->headers->host,   '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->body, "Hello World!\n", 'right content';
+my $req2 = Mojo::Message::Request->new->parse($req->to_string);
+is $req->has_leftovers,  undef, 'has no leftovers';
+is $req->leftovers,      '',    'no leftovers';
+is $req->error,          undef, 'no error';
+is $req2->has_leftovers, undef, 'has no leftovers';
+is $req2->leftovers,     '',    'no leftovers';
+is $req2->error,         undef, 'no error';
+ok $req2->is_done,       'request is done';
+is $req2->method,        'GET', 'right method';
+is $req2->version,       '1.1', 'right version';
+is $req2->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req2->at_least_version('1.2'), undef, 'not version 1.2';
+is $req2->url, '/foo/bar', 'right URL';
+is $req2->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req2->headers->expect, '100-continue',             'right "Expect" value';
+is $req2->headers->host,   '127.0.0.1',                'right "Host" value';
+is $req->headers->content_length, '13', 'right "Content-Length" value';
+is $req->body, "Hello World!\n", 'right content';
 
 # Build HTTP 1.1 request body
 $req      = Mojo::Message::Request->new;
@@ -2080,7 +2117,7 @@ $req->cookies(
 );
 $req->body("Hello World!\n");
 ok !!$req->to_string, 'message built';
-my $req2 = Mojo::Message::Request->new;
+$req2 = Mojo::Message::Request->new;
 $req2->parse($req->to_string);
 ok $req2->is_done, 'request is done';
 is $req2->method,  'GET', 'right method';

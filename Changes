@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-1.99    2011-09-27 00:00:00
+1.99    2011-09-29 00:00:00
         - Deprecated direct hash access to the flash in
           Mojolicious::Controller.
         - Added EXPERIMENTAL group function to Mojolicious::Lite.
@@ -9,7 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL accepts attribute to Mojo::IOLoop::Server.
         - Added EXPERIMENTAL profile helper.
         - Added EXPERIMENTAL binary support to Mojo::Transaction::WebSocket.
-        - Updated WebSocket implementation to ietf-15.
+        - Updated WebSocket implementation to ietf-16.
         - Changed default upgrade timeout of Hypnotoad from 30 to 60 seconds.
         - Improved accept performance of all built-in servers by up to 1000%
           with the EV backend.

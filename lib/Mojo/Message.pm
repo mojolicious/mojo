@@ -264,13 +264,9 @@ sub get_header_chunk {
 
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
-
-  # Progress
   if (my $cb = $self->on_progress) { $self->$cb('start_line', @_) }
-
-  # Get chunk
-  my $copy = $self->{buffer} ||= $self->_build_start_line;
-  return substr $copy, $offset, CHUNK_SIZE;
+  return substr $self->{buffer} ||= $self->_build_start_line, $offset,
+    CHUNK_SIZE;
 }
 
 sub has_leftovers { shift->content->has_leftovers }

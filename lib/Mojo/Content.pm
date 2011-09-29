@@ -98,9 +98,13 @@ sub get_body_chunk {
 sub get_header_chunk {
   my ($self, $offset) = @_;
 
-  # Normal headers
-  my $copy = $self->{header_buffer} ||= $self->_build_headers;
-  return substr($copy, $offset, CHUNK_SIZE);
+  unless (defined $self->{header_buffer}) {
+    my $headers = $self->headers->to_string;
+    $self->{header_buffer} =
+      $headers ? "$headers\x0d\x0a\x0d\x0a" : "\x0d\x0a";
+  }
+
+  return substr $self->{header_buffer}, $offset, CHUNK_SIZE;
 }
 
 sub has_leftovers {
@@ -324,13 +328,6 @@ sub _build_chunk {
   }
 
   return $formatted;
-}
-
-sub _build_headers {
-  my $self    = shift;
-  my $headers = $self->headers->to_string;
-  return "\x0d\x0a" unless $headers;
-  return "$headers\x0d\x0a\x0d\x0a";
 }
 
 sub _parse_chunked {

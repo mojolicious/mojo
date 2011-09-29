@@ -234,10 +234,8 @@ sub _build_start_line {
     $path = "$host:$port";
   }
 
-  # Version
-  my $version = $self->version;
-
   # HTTP 0.9
+  my $version = $self->version;
   return "$method $path\x0d\x0a" if $version eq '0.9';
 
   # HTTP 1.0 and above

@@ -34,8 +34,8 @@ has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
-our $CODENAME = 'Smiling Face With Sunglasses';
-our $VERSION  = '1.99';
+our $CODENAME = 'Leaf Fluttering In Wind';
+our $VERSION  = '2.0';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -687,6 +687,8 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 
 Every major release of L<Mojolicious> has a code name, these are the ones
 that have been used in the past.
+
+2.0, C<Leaf Fluttering In Wind> (u1F343)
 
 1.4, C<Smiling Face With Sunglasses> (u1F60E)
 

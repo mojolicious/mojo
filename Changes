@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.0     2011-09-30 00:00:00
+        - Code name "Leaf Fluttering In Wind", this is a major release.
+        - Improved Mojo::Headers parser performance slightly.
+        - Fixed small formatting bug in Mojo::Headers.
+
 1.99    2011-09-29 00:00:00
         - Deprecated direct hash access to the flash in
           Mojolicious::Controller.

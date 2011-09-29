@@ -153,14 +153,10 @@ sub header {
   my $name = shift;
 
   # Replace
-  if (@_) {
-    $self->remove($name);
-    return $self->add($name, @_);
-  }
-
-  return unless my $headers = $self->{headers}->{lc $name};
+  return $self->remove($name)->add($name, @_) if @_;
 
   # String
+  return unless my $headers = $self->{headers}->{lc $name};
   return join ', ', map { join ', ', @$_ } @$headers unless wantarray;
 
   # Array
@@ -181,14 +177,8 @@ sub leftovers { shift->{buffer} }
 sub location { scalar shift->header(Location => @_) }
 
 sub names {
-  my $self = shift;
-
-  # Normal case
   my @headers;
-  for my $name (keys %{$self->{headers}}) {
-    push @headers, $NORMALCASE_HEADERS{$name} || $name;
-  }
-
+  push @headers, $NORMALCASE_HEADERS{$_} || $_ for keys %{shift->{headers}};
   return \@headers;
 }
 
@@ -199,45 +189,33 @@ sub parse {
   $self->{state} = 'headers';
   $self->{buffer} = '' unless defined $self->{buffer};
   $self->{buffer} .= $chunk if defined $chunk;
-  my $headers = $self->{cache} || [];
+  my $headers = $self->{cache} ||= [];
   my $max = $self->max_line_size;
   while (defined(my $line = get_line $self->{buffer})) {
 
-    # Check line size
+    # Check line size limit
     if (length $line > $max) {
-
-      # Abort
       $self->{state} = 'done';
       $self->{limit} = 1;
       return $self;
     }
 
     # New header
-    if ($line =~ /^(\S+)\s*:\s*(.*)/) { push @$headers, $1, $2 }
+    if ($line =~ /^(\S+)\s*:\s*(.*)$/) { push @$headers, $1, $2 }
 
     # Multiline
     elsif (@$headers && $line =~ s/^\s+//) { $headers->[-1] .= " $line" }
 
     # Empty line
     else {
-
-      # Store headers
-      for (my $i = 0; $i < @$headers; $i += 2) {
-        $self->add($headers->[$i], $headers->[$i + 1]);
-      }
-
-      # Done
+      $self->add(splice @$headers, 0, 2) while @$headers;
       $self->{state} = 'done';
-      $self->{cache} = [];
       return $self;
     }
   }
-  $self->{cache} = $headers;
 
-  # Check line size
+  # Check line size limit
   if (length $self->{buffer} > $max) {
-
-    # Abort
     $self->{state} = 'done';
     $self->{limit} = 1;
   }
@@ -306,20 +284,15 @@ sub to_hash {
 sub to_string {
   my $self = shift;
 
-  # Prepare headers
+  # Format multiline values
   my @headers;
   for my $name (@{$self->names}) {
-
-    # Multiline value
-    for my $values ($self->header($name)) {
-      my $value = join "\x0d\x0a ", @$values;
-      push @headers, "$name: $value";
-    }
+    push @headers, "$name: " . join("\x0d\x0a ", @$_)
+      for $self->header($name);
   }
 
   # Format headers
-  my $headers = join "\x0d\x0a", @headers;
-  return length $headers ? $headers : undef;
+  return join "\x0d\x0a", @headers;
 }
 
 sub trailer           { scalar shift->header(Trailer             => @_) }

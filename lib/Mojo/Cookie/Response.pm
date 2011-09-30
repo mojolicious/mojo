@@ -50,13 +50,13 @@ sub parse {
       }
 
       # Field
-      if (my @match = $name =~ m/$FIELD_RE/o) {
+      if (my @match = $name =~ $FIELD_RE) {
 
         # Underscore
         (my $id = lc $match[0]) =~ tr/-/_/;
 
         # Flag
-        $cookies[-1]->$id($id =~ m/$FLAG_RE/o ? 1 : $value);
+        $cookies[-1]->$id($id =~ $FLAG_RE ? 1 : $value);
       }
     }
   }

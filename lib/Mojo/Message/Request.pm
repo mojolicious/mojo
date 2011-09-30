@@ -343,35 +343,25 @@ sub _parse_start_line {
 
   # Ignore any leading empty lines
   my $line = get_line $self->{buffer};
-  while ((defined $line) && ($line =~ m/^\s*$/)) {
-    $line = get_line $self->{buffer};
-  }
+  $line = get_line $self->{buffer}
+    while ((defined $line) && ($line =~ m/^\s*$/));
+  return unless defined $line;
 
   # We have a (hopefully) full request line
-  if (defined $line) {
-    if ($line =~ m/$START_LINE_RE/o) {
-      $self->method($1);
-      my $url = $self->url;
-      $self->method eq 'CONNECT'
-        ? $url->authority($2)
-        : $url->parse($2);
+  return $self->error('Bad request start line.', 400)
+    unless $line =~ $START_LINE_RE;
+  $self->method($1);
+  my $url = $self->url;
+  $1 eq 'CONNECT'
+    ? $url->authority($2)
+    : $url->parse($2);
 
-      # HTTP 0.9 is identified by the missing version
-      if (defined $3) {
-        $self->version($3);
-        $self->{state} = 'content';
-      }
-      else {
-        $self->version('0.9');
-        $self->{state} = 'done';
-
-        # HTTP 0.9 has no headers or body and does not support
-        # pipelining
-        $self->{buffer} = '';
-      }
-    }
-    else { $self->error('Bad request start line.', 400) }
-  }
+  # HTTP 0.9 is identified by the missing version
+  $self->{state} = 'content';
+  return $self->version($3) if defined $3;
+  $self->version('0.9');
+  $self->{state}  = 'done';
+  $self->{buffer} = '';
 }
 
 1;

@@ -139,39 +139,22 @@ sub _build_start_line {
 sub _parse_start_line {
   my $self = shift;
 
-  # HTTP 0.9 responses have no start line
-  return $self->{state} = 'content' if $self->version eq '0.9';
-
   # Try to detect HTTP 0.9
-  if ($self->{buffer} =~ /^\s*(\S+\s*)/) {
-    my $string = $1;
-
-    # HTTP 0.9 will most likely not start with "HTTP/"
-    my $match = "\/PTTH";
-    substr $match, 0, 5 - length $string, '' if length $string < 5;
-    $match = reverse $match;
-
-    # Detected!
-    if ($string !~ /^\s*$match/) {
-      $self->version('0.9');
-      $self->{state} = 'content';
-      $self->content->relaxed(1);
-      return 1;
-    }
+  $self->{state} = 'content';
+  if ($self->{buffer} !~ /^\s*HTTP\//) {
+    $self->version('0.9');
+    return $self->content->relaxed(1);
   }
 
   # We have a full HTTP 1.0+ response line
   my $line = get_line $self->{buffer};
-  if (defined $line) {
-    if ($line =~ m/$START_LINE_RE/o) {
-      $self->version($1);
-      $self->code($2);
-      $self->message($3);
-      $self->{state} = 'content';
-      $self->content->auto_relax(1);
-    }
-    else { $self->error('Bad response start line.') }
-  }
+  return unless defined $line;
+  return $self->error('Bad response start line.')
+    unless $line =~ $START_LINE_RE;
+  $self->version($1);
+  $self->code($2);
+  $self->message($3);
+  $self->content->auto_relax(1);
 }
 
 1;

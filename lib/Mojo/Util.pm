@@ -475,7 +475,7 @@ sub punycode_encode {
   my $len    = length $_[0];
 
   # Remove non basic characters
-  $output =~ s/[^\x00-\x7f]+//ogs;
+  $output =~ s/[^\x00-\x7f]+//gs;
 
   # Non basic characters in input
   my $h = my $b = length $output;

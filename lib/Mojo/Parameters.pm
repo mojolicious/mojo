@@ -175,6 +175,7 @@ sub to_hash {
 
 sub to_string {
   my $self = shift;
+  my $sort = shift;
 
   # String
   my $charset = $self->charset;
@@ -191,7 +192,7 @@ sub to_string {
   my $params = $self->params;
   return '' unless @{$self->params};
   my @params;
-  for (my $i = 0; $i < @$params; $i += 2) {
+  for (my $i = 0; $i < ($sort ? sort @$params : @$params); $i += 2) {
     my $name  = $params->[$i];
     my $value = $params->[$i + 1];
 

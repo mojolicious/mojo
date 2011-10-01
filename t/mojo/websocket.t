@@ -12,6 +12,8 @@ use Test::More;
 plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;
 plan skip_all => 'This test does not work on some older versions of FreeBSD!'
   if $^O =~ /freebsd/;
+plan skip_all => 'Perl 5.14 required for this test on Windows!'
+  if ($^O eq 'MSWin32' || $^O =~ /cygwin/) && $] < 5.014;
 plan tests => 42;
 
 # "I can't believe it! Reading and writing actually paid off!"

@@ -11,7 +11,10 @@ BEGIN {
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
 #  Well, that’s love for you."
-use Test::More tests => 78;
+use Test::More;
+plan skip_all => 'Perl 5.14 required for this test on Windows!'
+  if ($^O eq 'MSWin32' || $^O =~ /cygwin/) && $] < 5.014;
+plan tests => 78;
 
 # "Your mistletoe is no match for my *tow* missile."
 use Mojo::ByteStream 'b';

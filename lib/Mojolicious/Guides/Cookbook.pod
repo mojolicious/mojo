@@ -274,7 +274,7 @@ implementation L<Mojo::JSON> built right in.
     my $user = $tweet->{from_user};
 
     # Show both
-    my $result = "$text --$user\n\n";
+    my $result = "$text --$user";
     utf8::encode $result;
     say $result;
   }

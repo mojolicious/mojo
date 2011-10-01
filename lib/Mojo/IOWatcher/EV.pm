@@ -4,12 +4,12 @@ use Mojo::Base 'Mojo::IOWatcher';
 use EV;
 use Scalar::Util 'weaken';
 
-my $SINGLETON;
+my $EV;
 
-sub DESTROY { undef $SINGLETON }
+sub DESTROY { undef $EV }
 
 # We have to fall back to Mojo::IOWatcher, since EV is unique
-sub new { $SINGLETON++ ? Mojo::IOWatcher->new : shift->SUPER::new }
+sub new { $EV++ ? Mojo::IOWatcher->new : shift->SUPER::new }
 
 sub not_writing {
   my ($self, $handle) = @_;

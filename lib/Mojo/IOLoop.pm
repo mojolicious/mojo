@@ -34,23 +34,13 @@ has timeout      => '0.025';
 # Ignore PIPE signal
 $SIG{PIPE} = 'IGNORE';
 
-# Singleton
-our $LOOP;
-
 sub new {
   my $class = shift;
 
   # Build new loop from singleton and inherit watcher
-  my $loop = $LOOP;
-  local $LOOP = undef;
-  my $self;
-  if ($loop) {
-    $self = $loop->new(@_);
-    $self->iowatcher($loop->iowatcher->new);
-  }
-
-  # Start from scratch
-  else { $self = $class->SUPER::new(@_) }
+  my $loop = $class->singleton;
+  my $self = $loop->SUPER::new(@_);
+  $self->iowatcher($loop->iowatcher->new);
 
   return $self;
 }
@@ -288,7 +278,7 @@ sub remote_info {
   return {address => $handle->peerhost, port => $handle->peerport};
 }
 
-sub singleton { $LOOP ||= shift->new(@_) }
+sub singleton { state $loop ||= shift->SUPER::new }
 
 sub start {
   my $self = shift;

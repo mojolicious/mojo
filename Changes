@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Increased Perl version requirement to 5.10.1.
         - Disabled some more tests on Windows with older Perl versions.
         - Improved message parser performance slightly.
+        - Improved resolver tests.
         - Fixed small formatting bug in Mojo::Headers.
 
 1.99    2011-09-29 00:00:00

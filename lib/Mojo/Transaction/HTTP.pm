@@ -169,7 +169,7 @@ sub keep_alive {
     if $req_connection =~ /^close$/i || $res_connection =~ /^close$/i;
 
   # Default
-  $self->{keep_alive} = 1 unless defined $self->{keep_alive};
+  $self->{keep_alive} //= 1;
 
   return $self->{keep_alive};
 }

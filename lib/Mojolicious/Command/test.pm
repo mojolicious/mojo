@@ -28,7 +28,7 @@ sub run {
     # Test dirctory in the directory above "mojo" (../t)
     $path = File::Spec->catdir(@base, '..', 't') unless -d $path;
     unless (-d $path) {
-      print "Can't find test directory.\n";
+      say "Can't find test directory.";
       return;
     }
 
@@ -50,7 +50,7 @@ sub run {
     }
 
     $path = Cwd::realpath($path);
-    print "Running tests from '$path'.\n";
+    say "Running tests from '$path'.";
   }
 
   # Run tests

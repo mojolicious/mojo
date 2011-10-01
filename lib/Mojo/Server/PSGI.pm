@@ -69,8 +69,7 @@ sub getline {
   my $self = shift;
 
   # Blocking read
-  $self->{offset} = 0 unless defined $self->{offset};
-  my $offset = $self->{offset};
+  my $offset = $self->{offset} //= 0;
   while (1) {
     my $chunk = $self->{res}->get_body_chunk($offset);
 

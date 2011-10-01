@@ -8,13 +8,7 @@ use Mojo::DOM;
 use Mojo::Home;
 use Mojo::Util 'url_escape';
 
-# Core module since Perl 5.9.3, so it might not always be present
-BEGIN {
-  die <<'EOF' unless eval { require Pod::Simple::HTML; 1 } }
-Module "Pod::Simple" not present in this version of Perl.
-Please install it manually or upgrade Perl to at least version 5.10.
-EOF
-
+use Pod::Simple::HTML;
 use Pod::Simple::Search;
 
 # Paths

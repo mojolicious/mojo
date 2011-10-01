@@ -98,9 +98,8 @@ sub to_string {
   my $self = shift;
 
   # RFC 822/1123
-  my $epoch = $self->epoch;
-  $epoch = time unless defined $epoch;
-  my ($second, $minute, $hour, $mday, $month, $year, $wday) = gmtime $epoch;
+  my ($second, $minute, $hour, $mday, $month, $year, $wday) =
+    gmtime($self->epoch // time);
   return sprintf(
     "%s, %02d %s %04d %02d:%02d:%02d GMT",
     $DAYS[$wday], $mday, $MONTHS[$month], $year + 1900,

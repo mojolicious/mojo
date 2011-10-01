@@ -80,8 +80,8 @@ Start application with standalone HTTP 1.1 server backend.
 
 =head2 C<eval>
 
-  $ mojo eval 'print app->home'
-  $ script/myapp eval 'print app->home'
+  $ mojo eval 'say app->home'
+  $ script/myapp eval 'say app->home'
 
 Run code against application.
 

@@ -108,7 +108,7 @@ sub listen {
   # New socket
   else {
     my %options = (
-      Listen    => $args->{backlog} || SOMAXCONN,
+      Listen => $args->{backlog} // SOMAXCONN,
       LocalAddr => $args->{address} || '0.0.0.0',
       LocalPort => $port,
       Proto     => 'tcp',

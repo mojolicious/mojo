@@ -167,7 +167,7 @@ L<Mojo::Message::Response> object.
 
 Turn HTML5/XML input into L<Mojo::DOM> object.
 
-  print x('<div>Hello!</div>')->at('div')->text;
+  say x('<div>Hello!</div>')->at('div')->text;
 
 =head1 SEE ALSO
 

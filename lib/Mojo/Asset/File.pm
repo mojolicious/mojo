@@ -1,8 +1,6 @@
 package Mojo::Asset::File;
 use Mojo::Base 'Mojo::Asset';
 
-# We can't use File::Temp because there is no seek support in the version
-# shipped with Perl 5.8
 use Carp 'croak';
 use Errno;
 use Fcntl;
@@ -65,7 +63,7 @@ sub add_chunk {
   $self->handle->sysseek(0, SEEK_END);
 
   # Append to file
-  $chunk = '' unless defined $chunk;
+  $chunk //= '';
   $self->handle->syswrite($chunk, length $chunk);
 
   return $self;
@@ -76,7 +74,7 @@ sub contains {
 
   # Seek to start
   $self->handle->sysseek($self->start_range, SEEK_SET);
-  my $end = defined $self->end_range ? $self->end_range : $self->size;
+  my $end = $self->end_range // $self->size;
   my $window_size = length($pattern) * 2;
   $window_size = $end - $self->start_range
     if $window_size > $end - $self->start_range;
@@ -184,10 +182,10 @@ Mojo::Asset::File - File asset
 
   my $asset = Mojo::Asset::File->new;
   $asset->add_chunk('foo bar baz');
-  print $asset->slurp;
+  say $asset->slurp;
 
   my $asset = Mojo::Asset::File->new(path => '/foo/bar/baz.txt');
-  print $asset->slurp;
+  say $asset->slurp;
 
 =head1 DESCRIPTION
 

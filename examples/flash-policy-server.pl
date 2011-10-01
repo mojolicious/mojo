@@ -34,7 +34,7 @@ Mojo::IOLoop->listen(
   }
 ) or die "Couldn't create listen socket!\n";
 
-print "Starting server on port 843.\n";
+say 'Starting server on port 843.';
 
 # Start loop
 Mojo::IOLoop->start;

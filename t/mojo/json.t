@@ -3,9 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More;
-plan skip_all => 'Perl 5.10 required for this test!' unless $] >= 5.010;
-plan tests => 118;
+use Test::More tests => 118;
 
 use Mojo::ByteStream 'b';
 

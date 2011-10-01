@@ -100,10 +100,9 @@ sub fix_headers {
 }
 
 sub is_secure {
-  my $self   = shift;
-  my $url    = $self->url;
-  my $scheme = $url->scheme || $url->base->scheme || '';
-  return 1 if $scheme eq 'https';
+  my $self = shift;
+  my $url  = $self->url;
+  return 1 if ($url->scheme || $url->base->scheme || '') eq 'https';
   return;
 }
 
@@ -381,13 +380,13 @@ Mojo::Message::Request - HTTP 1.1 request container
   $req->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
   $req->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");
   $req->parse('Hello World!');
-  print $req->body;
+  say $req->body;
 
   # Build
   my $req = Mojo::Message::Request->new;
   $req->url->parse('http://127.0.0.1/foo/bar');
   $req->method('GET');
-  print $req->to_string;
+  say $req->to_string;
 
 =head1 DESCRIPTION
 

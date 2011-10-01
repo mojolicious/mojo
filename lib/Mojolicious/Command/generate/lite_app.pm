@@ -25,7 +25,7 @@ __DATA__
 #!/usr/bin/env perl
 use Mojolicious::Lite;
 
-# Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
+# Documentation browser under "/perldoc"
 plugin 'PODRenderer';
 
 get '/welcome' => sub {

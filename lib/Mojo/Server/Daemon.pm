@@ -285,7 +285,7 @@ sub _listen {
   return if $self->silent;
   $self->app->log->info("Server listening ($listen)");
   $listen =~ s/^(https?\:\/\/)\*/${1}127.0.0.1/i;
-  print "Server available at $listen.\n";
+  say "Server available at $listen.";
 }
 
 sub _read {

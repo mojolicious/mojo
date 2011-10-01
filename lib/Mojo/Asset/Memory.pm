@@ -68,7 +68,7 @@ Mojo::Asset::Memory - In-memory asset
 
   my $asset = Mojo::Asset::Memory->new;
   $asset->add_chunk('foo bar baz');
-  print $asset->slurp;
+  say $asset->slurp;
 
 =head1 DESCRIPTION
 

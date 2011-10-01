@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # Mojo modules are modern!
-require feature if $] >= 5.010;
+require feature;
 
 # No imports because we get subclassed, a lot!
 require Carp;
@@ -44,9 +44,7 @@ sub import {
   # Mojo modules are strict!
   strict->import;
   warnings->import;
-
-  # Mojo modules are modern!
-  feature->import(':5.10') if $] >= 5.010;
+  feature->import(':5.10');
 }
 
 sub new {
@@ -154,11 +152,11 @@ Mojo::Base - Minimal base class for Mojo projects
   package main;
 
   my $mew = Cat->new(mouse => 'Mickey');
-  print $mew->paws;
-  print $mew->paws(5)->paws;
+  say $mew->paws;
+  say $mew->paws(5)->paws;
 
   my $rawr = Tiger->new(stripes => 23);
-  print $rawr->ears * $rawr->stripes;
+  say $rawr->ears * $rawr->stripes;
 
 =head1 DESCRIPTION
 

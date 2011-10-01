@@ -220,10 +220,10 @@ sub resume {
 
 sub send_message {
   my ($self, $message, $cb) = @_;
+  $message //= '';
 
   # Binary
   $self->{drain} = $cb if $cb;
-  $message = '' unless defined $message;
   return $self->_send_frame(BINARY, $message->[0]) if ref $message;
 
   # Text
@@ -254,9 +254,9 @@ sub server_read {
   my ($self, $chunk) = @_;
 
   # Parse frames
-  $self->{read} = '' unless defined $self->{read};
+  $self->{read} //= '';
   $self->{read} .= $chunk if defined $chunk;
-  $self->{message} = '' unless defined $self->{message};
+  $self->{message} //= '';
   while (my $frame = $self->parse_frame(\$self->{read})) {
     my $op = $frame->[1] || CONTINUATION;
 
@@ -299,7 +299,7 @@ sub server_write {
   my $self = shift;
 
   # Not writing anymore
-  $self->{write} = '' unless defined $self->{write};
+  $self->{write} //= '';
   unless (length $self->{write}) {
     $self->{state} = $self->{finished} ? 'done' : 'read';
 
@@ -332,7 +332,7 @@ sub _send_frame {
   my ($self, $op, $payload) = @_;
 
   # Build frame and resume
-  $self->{write} = '' unless defined $self->{write};
+  $self->{write} //= '';
   $self->{write} .= $self->build_frame(1, $op, $payload);
   $self->{state} = 'write';
   $self->on_resume->($self);

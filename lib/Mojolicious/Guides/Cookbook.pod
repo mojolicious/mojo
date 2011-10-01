@@ -207,7 +207,7 @@ other scripts, with this little mock server you can just embed them.
   my $app = $server->load_app('./myapp.pl');
 
   # Access fully initialized application
-  print $app->static->root;
+  say $app->static->root;
 
 You can also use the built-in web server to embed L<Mojolicious> applications
 into alien environments like foreign event loops.
@@ -244,11 +244,11 @@ make sense for a standalone parser.
   my $tx = $ua->get('mojolicio.us/perldoc');
 
   # Extract title
-  print 'Title: ', $tx->res->dom->at('head > title')->text, "\n";
+  say 'Title: ', $tx->res->dom->at('head > title')->text;
 
   # Extract headings
   $tx->res->dom('h1, h2, h3')->each(sub {
-    print 'Heading: ', shift->all_text, "\n";
+    say 'Heading: ', shift->all_text;
   });
 
 Especially for unit testing your L<Mojolicious> applications this can be a
@@ -276,7 +276,7 @@ implementation L<Mojo::JSON> built right in.
     # Show both
     my $result = "$text --$user\n\n";
     utf8::encode $result;
-    print $result;
+    say $result;
   }
 
 =head2 Basic authentication
@@ -284,7 +284,7 @@ implementation L<Mojo::JSON> built right in.
 You can just add username and password to the URL.
 
   my $ua = Mojo::UserAgent->new;
-  print $ua->get('https://sri:secret@mojolicio.us/hideout')->res->body;
+  say $ua->get('https://sri:secret@mojolicio.us/hideout')->res->body;
 
 =head2 Decorating followup requests
 
@@ -299,12 +299,11 @@ been initialized and before a connection gets associated with them.
   $ua->on_start(sub {
     my ($self, $tx) = @_;
     $tx->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-    print 'Request: ', $tx->req->url->clone->to_abs, "\n";
+    say 'Request: ', $tx->req->url->clone->to_abs;
   });
 
   # Request that will most likely get redirected
-  print 'Title: ',
-    $ua->get('google.com')->res->dom->at('head > title')->text, "\n";
+  say 'Title: ', $ua->get('google.com')->res->dom->at('head > title')->text;
 
 This even works for proxy C<CONNECT> requests.
 
@@ -315,7 +314,7 @@ L<Mojo::UserAgent> makes it actually easy.
 
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://mojolicio.us');
-  $tx->res->body(sub { print $_[1] });
+  $tx->res->body(sub { say $_[1] });
   $ua->start($tx);
 
 The C<body> callback will be called for every chunk of data that is received,
@@ -407,13 +406,13 @@ time.
       my ($self, $tx) = @_;
 
       # Extract URLs
-      print "[$id] $url\n";
+      say "[$id] $url";
       $tx->res->dom('a[href]')->each(sub {
         my $e = shift;
 
         # Build absolute URL
         my $url = Mojo::URL->new($e->{href})->to_abs($tx->req->url);
-        print " -> $url\n";
+        say " -> $url";
 
         # Enqueue
         push @urls, $url;
@@ -515,7 +514,7 @@ that they will be picked up automatically by the command line interface?
     # Leak secret passphrase
     if ($whatever eq 'secret') {
       my $secret = $self->app->secret;
-      print qq/The secret of this application is "$secret".\n/;
+      say qq/The secret of this application is "$secret"./;
     }
   }
 
@@ -538,7 +537,7 @@ Thanks to the C<eval> command you can do just that, the application instance
 itself can be accessed via C<app>.
 
   $ mojo generate lite_app
-  $ ./myapp.pl eval 'print app->static->root, "\n"'
+  $ ./myapp.pl eval 'say app->static->root'
 
 The C<verbose> option will automatically print the return value to C<STDOUT>.
 

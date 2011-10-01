@@ -38,11 +38,11 @@ Mojo::IOLoop::Trigger - IOLoop trigger
 
   # Synchronize multiple events
   my $t = Mojo::IOLoop::Trigger->new;
-  $t->on(done => sub { print "BOOM!\n" });
+  $t->on(done => sub { say 'BOOM!' });
   for my $i (1 .. 10) {
     $t->begin;
     Mojo::IOLoop->timer($i => sub {
-      print 10 - $i, "\n";
+      say 10 - $i;
       $t->end;
     });
   }

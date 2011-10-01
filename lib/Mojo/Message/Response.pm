@@ -174,14 +174,14 @@ Mojo::Message::Response - HTTP 1.1 response container
   $res->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
   $res->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");
   $res->parse('Hello World!');
-  print $res->body;
+  say $res->body;
 
   # Build
   my $res = Mojo::Message::Response->new;
   $res->code(200);
   $res->headers->content_type('text/plain');
   $res->body('Hello World!');
-  print $res->to_string;
+  say $res->to_string;
 
 =head1 DESCRIPTION
 

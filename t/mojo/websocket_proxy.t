@@ -71,7 +71,7 @@ $loop->listen(
     if (my $server = $c->{$client}->{connection}) {
       return $loop->write($server, $chunk);
     }
-    $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
+    $c->{$client}->{client} //= '';
     $c->{$client}->{client} .= $chunk if defined $chunk;
     if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
       my $buffer = $c->{$client}->{client};

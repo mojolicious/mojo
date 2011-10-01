@@ -1,15 +1,11 @@
 package Mojo::Util;
 use Mojo::Base 'Exporter';
 
-# These are core modules since 5.8, no need for pure-Perl implementations
-# (even though they would be simple)
 require Digest::MD5;
+require Digest::SHA;
 require Encode;
 require MIME::Base64;
 require MIME::QuotedPrint;
-
-# Core module since Perl 5.9.3
-use constant SHA1 => eval 'use Digest::SHA (); 1';
 
 # Punycode bootstring parameters
 use constant {
@@ -565,13 +561,7 @@ sub secure_compare {
 
 sub sha1_bytes { _sha1(@_) }
 
-sub sha1_sum {
-  die <<'EOF' unless SHA1;
-Module "Digest::SHA" not present in this version of Perl.
-Please install it manually or upgrade Perl to at least version 5.10.
-EOF
-  Digest::SHA::sha1_hex(@_);
-}
+sub sha1_sum { Digest::SHA::sha1_hex(@_) }
 
 sub trim {
   for ($_[0]) {
@@ -657,13 +647,7 @@ sub _hmac {
 sub _md5 { Digest::MD5::md5(shift) }
 
 # Helper for sha1_bytes
-sub _sha1 {
-  die <<'EOF' unless SHA1;
-Module "Digest::SHA" not present in this version of Perl.
-Please install it manually or upgrade Perl to at least version 5.10.
-EOF
-  Digest::SHA::sha1(shift);
-}
+sub _sha1 { Digest::SHA::sha1(shift) }
 
 # Helper for html_unescape
 sub _unescape {
@@ -758,7 +742,6 @@ Generate HMAC-MD5 checksum for string.
   my $checksum = hmac_sha1_sum $string, $secret;
 
 Generate HMAC-SHA1 checksum for string.
-Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 =head2 C<html_escape>
 
@@ -825,14 +808,12 @@ Constant time comparison algorithm to prevent timing attacks.
   my $checksum = sha1_bytes $string;
 
 Generate binary SHA1 checksum.
-Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 =head2 C<sha1_sum>
 
   my $checksum = sha1_sum $string;
 
 Generate SHA1 checksum.
-Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 =head2 C<trim>
 

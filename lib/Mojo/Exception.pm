@@ -33,7 +33,7 @@ sub throw {
 
 sub trace {
   my ($e, $start) = @_;
-  $start = 1 unless defined $start;
+  $start //= 1;
 
   # Trace
   my @frames;

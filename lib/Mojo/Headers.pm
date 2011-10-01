@@ -187,7 +187,7 @@ sub parse {
 
   # Parse headers with size limit
   $self->{state} = 'headers';
-  $self->{buffer} = '' unless defined $self->{buffer};
+  $self->{buffer} //= '';
   $self->{buffer} .= $chunk if defined $chunk;
   my $headers = $self->{cache} ||= [];
   my $max = $self->max_line_size;
@@ -481,11 +481,11 @@ into a single one in scalar context.
 
   # Multiple headers with the same name
   for my $header ($headers->header('Set-Cookie')) {
-    print "Set-Cookie:\n";
+    say 'Set-Cookie:';
 
     # Each header contains an array of lines
-    for my line (@$header) {
-      print "line\n";
+    for my $line (@$header) {
+      say $line;
     }
   }
 

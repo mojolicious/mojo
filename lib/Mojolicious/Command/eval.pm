@@ -10,7 +10,7 @@ EOF
 has usage => <<"EOF";
 usage: $0 eval [OPTIONS] CODE
 
-  mojo eval 'print app->ua->get("/")->res->body'
+  mojo eval 'say app->ua->get("/")->res->body'
   mojo eval -v 'app->home'
 
 These options are available:
@@ -37,7 +37,7 @@ sub run {
   # Run code against application
   no warnings;
   my $result = eval "package main; sub app { \$app }; $code";
-  print "$result\n" if $verbose && defined $result;
+  say $result if $verbose && defined $result;
   die $@ if $@;
   return $result;
 }

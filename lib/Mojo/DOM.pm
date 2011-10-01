@@ -446,25 +446,25 @@ Mojo::DOM - Minimalistic HTML5/XML DOM parser with CSS3 selectors
 
   # Find
   my $b = $dom->at('#b');
-  print $b->text;
+  say $b->text;
 
   # Walk
-  print $dom->div->p->[0]->text;
-  print $dom->div->p->[1]->{id};
+  say $dom->div->p->[0]->text;
+  say $dom->div->p->[1]->{id};
 
   # Iterate
-  $dom->find('p[id]')->each(sub { print shift->{id} });
+  $dom->find('p[id]')->each(sub { say shift->{id} });
 
   # Loop
   for my $e ($dom->find('p[id]')->each) {
-    print $e->text;
+    say $e->text;
   }
 
   # Modify
   $dom->div->p->[1]->append('<p id="c">C</p>');
 
   # Render
-  print $dom;
+  say $dom;
 
 =head1 DESCRIPTION
 
@@ -479,15 +479,15 @@ L<Mojo::DOM> defaults to HTML5 semantics, that means all tags and attributes
 are lowercased and selectors need to be lowercase as well.
 
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
-  print $dom->at('p')->text;
-  print $dom->p->{id};
+  say $dom->at('p')->text;
+  say $dom->p->{id};
 
 If XML processing instructions are found, the parser will automatically
 switch into XML mode and everything becomes case sensitive.
 
   my $dom = Mojo::DOM->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
-  print $dom->at('P')->text;
-  print $dom->P->{ID};
+  say $dom->at('P')->text;
+  say $dom->P->{ID};
 
 XML detection can be also deactivated with the C<xml> method.
 
@@ -556,8 +556,8 @@ All selectors from L<Mojo::DOM::CSS> are supported.
 Element attributes.
 
   # Direct hash access to attributes is also available
-  print $dom->{foo};
-  print $dom->div->{id};
+  say $dom->{foo};
+  say $dom->div->{id};
 
 =head2 C<charset>
 
@@ -575,9 +575,9 @@ Return a L<Mojo::Collection> object containing the children of this element,
 similar to C<find>.
 
   # Child elements are also automatically available as object methods
-  print $dom->div->text;
-  print $dom->div->[23]->text;
-  $dom->div->each(sub { print $_->text });
+  say $dom->div->text;
+  say $dom->div->[23]->text;
+  $dom->div->each(sub { say $_->text });
 
 =head2 C<content_xml>
 

@@ -154,7 +154,7 @@ Mojo::IOWatcher - Non-blocking I/O watcher
   $watcher->timer(15 => sub {
     my $watcher = shift;
     $watcher->remove($handle);
-    print "Timeout!\n";
+    say "Timeout!";
   });
 
   # And loop!

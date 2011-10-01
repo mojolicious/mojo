@@ -20,9 +20,8 @@ sub dispatch {
 
   # Canonical path
   my $stash = $c->stash;
-  my $path  = $stash->{path};
-  $path = $c->req->url->path->clone->canonicalize->to_string
-    unless defined $path;
+  my $path  = $stash->{path}
+    || $c->req->url->path->clone->canonicalize->to_string;
 
   # Split parts
   my @parts = @{Mojo::Path->new->parse($path)->parts};
@@ -43,9 +42,9 @@ sub dispatch {
 
 sub serve {
   my ($self, $c, $rel, $root) = @_;
+  $root //= $self->root;
 
   # Append path to root
-  $root = $self->root unless defined $root;
   my $path = File::Spec->catfile($root, split('/', $rel));
 
   # Extension

@@ -86,7 +86,7 @@ Mojo::Collection - Collection
   my $collection = Mojo::Collection->new(qw/just works/);
   $collection->map(sub { ucfirst })->each(sub {
     my ($word, $count) = @_;
-    print "$count: $word\n";
+    say "$count: $word";
   });
 
   # Use the alternative constructor
@@ -118,7 +118,7 @@ Evaluate closure for each element in collection.
 
   $collection->each(sub {
     my ($e, $count) = @_;
-    print "$count: $e\n";
+    say "$count: $e";
   });
 
 =head2 C<first>

@@ -19,7 +19,7 @@ Mojo::IOLoop->listen(
     if (my $server = $c->{$client}->{connection}) {
       return $loop->write($server, $chunk);
     }
-    $c->{$client}->{client} = '' unless defined $c->{$client}->{client};
+    $c->{$client}->{client} //= '';
     $c->{$client}->{client} .= $chunk if defined $chunk;
     if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
       my $buffer = $c->{$client}->{client};
@@ -32,7 +32,7 @@ Mojo::IOLoop->listen(
           port       => $port,
           on_connect => sub {
             my ($loop, $server) = @_;
-            print "Forwarding to $address:$port.\n";
+            say "Forwarding to $address:$port.";
             $c->{$client}->{connection} = $server;
             $loop->write($client,
                   "HTTP/1.1 200 OK\x0d\x0a"

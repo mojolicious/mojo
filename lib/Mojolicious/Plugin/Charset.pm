@@ -6,9 +6,9 @@ use Mojo::Base 'Mojolicious::Plugin';
 #  It also opened my calendar to Friday and ordered me some french fries."
 sub register {
   my ($self, $app, $conf) = @_;
+  $conf ||= {};
 
   # Got a charset
-  $conf ||= {};
   if (my $charset = $conf->{charset}) {
 
     # Add charset to text/html content type

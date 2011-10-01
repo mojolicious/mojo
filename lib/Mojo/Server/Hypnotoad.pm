@@ -172,7 +172,7 @@ sub _config {
   $daemon->listen($listen);
 }
 
-sub _exit { print shift, "\n" and exit 0 }
+sub _exit { say shift and exit 0 }
 
 sub _heartbeat {
   my $self = shift;

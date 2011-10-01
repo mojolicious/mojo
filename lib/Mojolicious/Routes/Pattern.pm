@@ -54,9 +54,9 @@ sub parse {
 
 sub render {
   my ($self, $values) = @_;
+  $values ||= {};
 
   # Merge values with defaults
-  $values ||= {};
   $values = {%{$self->defaults}, %$values};
 
   # Turn pattern into path
@@ -67,9 +67,7 @@ sub render {
     my $rendered = '';
 
     # Slash
-    if ($op eq 'slash') {
-      $rendered = '/' unless $optional;
-    }
+    if ($op eq 'slash') { $rendered = '/' unless $optional }
 
     # Text
     elsif ($op eq 'text') {
@@ -80,8 +78,7 @@ sub render {
     # Relaxed, symbol or wildcard
     elsif ($op eq 'relaxed' || $op eq 'symbol' || $op eq 'wildcard') {
       my $name = $token->[1];
-      $rendered = $values->{$name};
-      $rendered = '' unless defined $rendered;
+      $rendered = $values->{$name} // '';
       my $default = $self->defaults->{$name};
       if (!defined $default || ($default ne $rendered)) { $optional = 0 }
       elsif ($optional) { $rendered = '' }

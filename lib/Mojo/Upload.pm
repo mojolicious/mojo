@@ -29,7 +29,7 @@ Mojo::Upload - Upload container
   use Mojo::Upload;
 
   my $upload = Mojo::Upload->new;
-  print $upload->filename;
+  say $upload->filename;
   $upload->move_to('/foo/bar/baz.txt');
 
 =head1 DESCRIPTION

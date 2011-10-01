@@ -64,11 +64,10 @@ sub cookie {
       if length $value > 4096;
 
     # Create new cookie
-    $options ||= {};
     my $cookie = Mojo::Cookie::Response->new(
       name  => $name,
       value => $value,
-      %$options
+      %{$options || {}}
     );
     $self->res->cookies($cookie);
     return $self;
@@ -257,15 +256,12 @@ sub render {
 # "She's built like a steakhouse, but she handles like a bistro!"
 sub render_content {
   my $self    = shift;
-  my $name    = shift;
+  my $name    = shift || 'content';
   my $content = pop;
 
-  # Initialize
+  # Set
   my $stash = $self->stash;
   my $c = $stash->{'mojo.content'} ||= {};
-  $name ||= 'content';
-
-  # Set
   if (defined $content) {
 
     # Reset with multiple values
@@ -277,14 +273,11 @@ sub render_content {
     }
 
     # First come
-    else {
-      $c->{$name} ||= ref $content eq 'CODE' ? $content->() : $content;
-    }
+    else { $c->{$name} ||= ref $content eq 'CODE' ? $content->() : $content }
   }
 
   # Get
-  $content = $c->{$name};
-  $content = '' unless defined $content;
+  $content = $c->{$name} // '';
   return Mojo::ByteStream->new("$content");
 }
 
@@ -608,7 +601,7 @@ sub url_for {
       Mojo::Util::url_unescape($real);
       my $backup = $real;
       Mojo::Util::decode('UTF-8', $real);
-      $real = $backup unless defined $real;
+      $real //= $backup;
       $real =~ s/\/?$e$/$target/;
       $target = $real;
     }
@@ -1037,10 +1030,10 @@ A L<Mojo::UserAgent> prepared for the current environment.
 Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 
   # "/perldoc" if application is deployed under "/"
-  print $c->url_for('/perldoc');
+  say $c->url_for('/perldoc');
 
   # "/myapp/perldoc" if application is deployed under "/myapp"
-  print $c->url_for('/perldoc');
+  say $c->url_for('/perldoc');
 
 =head2 C<write>
 

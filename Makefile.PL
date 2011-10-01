@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.008007;
+use 5.010001;
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker;
 my ($mm) = $ExtUtils::MakeMaker::VERSION =~ /^([^_]+)/;
 
 # We only use core modules, so you shouldn't have to install anything besides
-# Perl 5.8.7!
+# Perl 5.10.1!
 WriteMakefile(
   NAME         => 'Mojolicious',
   VERSION_FROM => 'lib/Mojolicious.pm',
@@ -25,7 +25,7 @@ WriteMakefile(
     ? ()
     : (
       META_MERGE => {
-        requires  => {perl => '5.008007'},
+        requires  => {perl => '5.010001'},
         resources => {
           homepage    => 'http://mojolicio.us',
           license     => 'http://dev.perl.org/licenses/',
@@ -83,20 +83,3 @@ WriteMakefile(
   },
   test => {TESTS => 't/*.t t/*/*.t'}
 );
-
-# Using Perl 5.8.x is a bad idea though
-warn <<'EOF' unless $] >= 5.010;
-
-*******************************************************************************
-You are using Perl 5.8, a version that has reached the end of its life a few
-years ago and which is no longer getting updated by the community.
-It contains very serious flaws, especially around the regular expression
-engine, that will never get fixed and are likely to put your applications at
-risk.
-While your operating system vendor might keep it compiling on their platform,
-they will not fix these issues.
-
-Therefore we highly recommend that you upgrade as soon as possible!
-*******************************************************************************
-
-EOF

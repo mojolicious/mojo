@@ -81,8 +81,7 @@ sub generate_body_chunk {
   }
 
   # Get chunk
-  my $chunk = $self->{body_buffer};
-  $chunk = '' unless defined $chunk;
+  my $chunk = $self->{body_buffer} // '';
   $self->{body_buffer} = '';
 
   # EOF or delay
@@ -169,8 +168,7 @@ sub parse {
   if ($self->auto_relax) {
     my $headers    = $self->headers;
     my $connection = $headers->connection || '';
-    my $len        = $headers->content_length;
-    $len = '' unless defined $len;
+    my $len        = $headers->content_length // '';
     $self->relaxed(1)
       if !length $len
         && ($connection =~ /close/i || $headers->content_type);
@@ -195,8 +193,7 @@ sub parse {
 
     # Chunked or relaxed content
     if ($self->is_chunked || $self->relaxed) {
-      $self->{buffer} = '' unless defined $self->{buffer};
-      $self->$cb($self->{buffer});
+      $self->$cb($self->{buffer} //= '');
       $self->{buffer} = '';
     }
 
@@ -243,8 +240,8 @@ sub parse_until_body {
   my ($self, $chunk) = @_;
 
   # Prepare first buffer
-  $self->{pre_buffer} = '' unless defined $self->{pre_buffer};
-  $self->{raw_size}   = 0  unless exists $self->{raw_size};
+  $self->{pre_buffer} //= '';
+  $self->{raw_size}   //= 0;
 
   # Add chunk
   if (defined $chunk) {
@@ -281,7 +278,7 @@ sub write {
 
   # Add chunk
   if (defined $chunk) {
-    $self->{body_buffer} = '' unless defined $self->{body_buffer};
+    $self->{body_buffer} //= '';
     $self->{body_buffer} .= $chunk;
   }
 
@@ -457,7 +454,7 @@ Callback to be invoked when new content arrives.
 
   $content = $content->on_read(sub {
     my ($self, $chunk) = @_;
-    print $chunk;
+    say $chunk;
   });
 
 =head2 C<relaxed>

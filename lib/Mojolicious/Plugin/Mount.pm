@@ -12,8 +12,7 @@ sub register {
   if ($prefix =~ /^(\*\.)?([^\/]+)(\/.*)?$/) {
     $host = quotemeta $2;
     $host = "(?:.*\\.)?$host" if $1;
-    $path = $3;
-    $path = '/' unless defined $path;
+    $path = defined $3 ? $3 : '/';
     $host = qr/^$host$/i;
   }
   else { $path = $prefix }

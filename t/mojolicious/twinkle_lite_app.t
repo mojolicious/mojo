@@ -7,10 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More;
-plan skip_all => 'Perl 5.10 required for this test!'
-  unless eval { require Pod::Simple::HTML; 1 };
-plan tests => 17;
+use Test::More tests => 17;
 
 # "Pizza delivery for...
 #  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the

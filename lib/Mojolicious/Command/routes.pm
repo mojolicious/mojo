@@ -72,7 +72,7 @@ sub _draw {
     my $mp = ' ' x ($ml - length $methods);
 
     # Route
-    print "$pattern$pp  $methods$mp  $name$np  $regex\n";
+    say "$pattern$pp  $methods$mp  $name$np  $regex";
   }
 }
 

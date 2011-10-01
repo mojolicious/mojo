@@ -139,7 +139,7 @@ sub quote {
 sub say {
   my ($self, $handle) = @_;
   $handle ||= \*STDOUT;
-  print $handle "$$self\n";
+  say $handle $$self;
 }
 
 sub secure_compare {
@@ -210,12 +210,12 @@ Mojo::ByteStream - ByteStream
   # Manipulate bytestreams
   use Mojo::ByteStream;
   my $stream = Mojo::ByteStream->new('foo_bar_baz');
-  print $stream->camelize;
+  say $stream->camelize;
 
   # Chain methods
   my $stream = Mojo::ByteStream->new('foo bar baz')->quote;
   $stream = $stream->unquote->encode('UTF-8')->b64_encode;
-  print "$stream";
+  say $stream;
 
   # Use the alternative constructor
   use Mojo::ByteStream 'b';
@@ -303,7 +303,6 @@ Turn bytestream into HMAC-MD5 checksum of old content.
   $stream = $stream->hmac_sha1_sum($secret);
 
 Turn bytestream into HMAC-SHA1 checksum of old content.
-Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 =head2 C<html_escape>
 
@@ -377,14 +376,12 @@ Constant time comparison algorithm to prevent timing attacks.
   $stream = $stream->sha1_bytes;
 
 Turn bytestream into binary SHA1 checksum of old content.
-Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 =head2 C<sha1_sum>
 
   $stream = $stream->sha1_sum;
 
 Turn bytestream into SHA1 checksum of old content.
-Note that Perl 5.10 or L<Digest::SHA> are required for C<SHA1> support.
 
 =head2 C<size>
 

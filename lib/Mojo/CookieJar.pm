@@ -28,7 +28,7 @@ sub add {
 
     # Check cookie size
     my $value = $cookie->value;
-    next if length(defined $value ? $value : '') > $self->max_cookie_size;
+    next if length($value //= '') > $self->max_cookie_size;
 
     # Check if we already have a similar cookie
     $domain =~ s/^\.//;

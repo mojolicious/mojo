@@ -26,8 +26,7 @@ sub parse {
       else {
         push @cookies, Mojo::Cookie::Request->new;
         $cookies[-1]->name($name);
-        $value = '' unless defined $value;
-        $cookies[-1]->value($value);
+        $cookies[-1]->value($value //= '');
         $cookies[-1]->version($version);
       }
     }
@@ -80,7 +79,7 @@ Mojo::Cookie::Request - HTTP 1.1 request cookie container
   $cookie->name('foo');
   $cookie->value('bar');
 
-  print "$cookie";
+  say $cookie;
 
 =head1 DESCRIPTION
 

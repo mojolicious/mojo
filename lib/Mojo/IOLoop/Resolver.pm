@@ -411,7 +411,7 @@ Lookup C<IPv4> or C<IPv6> address for domain.
 
   $resolver->lookup('mojolicio.us' => sub {
     my ($loop, $address) = @_;
-    print "Address: $address\n";
+    say "Address: $address";
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;

@@ -72,9 +72,9 @@ sub clone {
 
 sub parse {
   my ($self, $path) = @_;
+  $path //= '';
 
   # Leading and trailing slash
-  $path = '' unless defined $path;
   $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(undef);
   $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(undef);
 
@@ -85,11 +85,7 @@ sub parse {
   for my $part (split '/', $path) {
 
     # Empty parts before the first are garbage
-    next unless length $part or scalar @parts;
-
-    # Empty parts behind the first are ok
-    $part = '' unless defined $part;
-
+    next unless length $part or @parts;
     push @parts, $part;
   }
   $self->parts(\@parts);
@@ -136,7 +132,7 @@ Mojo::Path - Path
 
   my $path = Mojo::Path->new('/foo/bar%3B/baz.html');
   shift @{$path->parts};
-  print "$path";
+  say $path;
 
 =head1 DESCRIPTION
 

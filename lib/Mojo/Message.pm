@@ -265,8 +265,8 @@ sub get_header_chunk {
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
   if (my $cb = $self->on_progress) { $self->$cb('start_line', @_) }
-  return substr $self->{buffer} ||= $self->_build_start_line, $offset,
-    CHUNK_SIZE;
+  return substr $self->{start_line_buffer} //= $self->_build_start_line,
+    $offset, CHUNK_SIZE;
 }
 
 sub has_leftovers { shift->content->has_leftovers }
@@ -402,8 +402,8 @@ sub _parse {
   my ($self, $until_body, $chunk) = @_;
 
   # Add chunk
-  $self->{buffer}   = '' unless defined $self->{buffer};
-  $self->{raw_size} = 0  unless exists $self->{raw_size};
+  $self->{buffer}   //= '';
+  $self->{raw_size} //= 0;
   if (defined $chunk) {
     $self->{raw_size} += length $chunk;
     $self->{buffer} .= $chunk;
@@ -514,10 +514,10 @@ sub _parse_formdata {
     if ($charset) {
       my $backup = $name;
       decode $charset, $name if $name;
-      $name = $backup unless defined $name;
+      $name //= $backup;
       $backup = $filename;
       decode $charset, $filename if $filename;
-      $filename = $backup unless defined $filename;
+      $filename //= $backup;
     }
 
     # Form value
@@ -526,7 +526,7 @@ sub _parse_formdata {
       if ($charset && !$part->headers->content_transfer_encoding) {
         my $backup = $value;
         decode $charset, $value;
-        $value = $backup unless defined $value;
+        $value //= $backup;
       }
     }
 

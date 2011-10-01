@@ -19,7 +19,7 @@ sub new {
   url_unescape $path;
   my $backup = $path;
   decode 'UTF-8', $path;
-  $path = $backup unless defined $path;
+  $path //= $backup;
   $self->{path} = $path;
 
   # WebSocket
@@ -222,7 +222,7 @@ Mojolicious::Routes::Match - Routes visitor
   # Match
   my $m = Mojolicious::Routes::Match->new(GET => '/bar');
   $m->match($r);
-  print $m->captures->{action};
+  say $m->captures->{action};
 
 =head1 DESCRIPTION
 

@@ -44,8 +44,7 @@ sub parse {
       if (not $i) {
         push @cookies, Mojo::Cookie::Response->new;
         $cookies[-1]->name($name);
-        $value = '' unless defined $value;
-        $cookies[-1]->value($value);
+        $cookies[-1]->value($value //= '');
         next;
       }
 
@@ -120,7 +119,7 @@ Mojo::Cookie::Response - HTTP 1.1 response cookie container
   $cookie->name('foo');
   $cookie->value('bar');
 
-  print "$cookie";
+  say $cookie;
 
 =head1 DESCRIPTION
 

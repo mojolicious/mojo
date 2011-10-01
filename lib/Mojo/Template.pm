@@ -63,11 +63,8 @@ sub build {
     # New line
     push @lines, '';
     for (my $j = 0; $j < @{$line}; $j += 2) {
-      my $type  = $line->[$j];
-      my $value = $line->[$j + 1];
-
-      # Need to fix line ending
-      $value ||= '';
+      my $type    = $line->[$j];
+      my $value   = $line->[$j + 1] || '';
       my $newline = chomp $value;
 
       # Capture end
@@ -461,7 +458,7 @@ Mojo::Template - Perl-ish templates!
     <body>Time: <%= localtime(time) %></body>
   </html>
   EOF
-  print $output;
+  say $output;
 
   # More complicated
   my $output = $mt->render(<<'EOF', 23, 'foo bar');
@@ -473,7 +470,7 @@ Mojo::Template - Perl-ish templates!
   * some text <%= $i++ %>
   % }
   EOF
-  print $output;
+  say $output;
 
 =head1 DESCRIPTION
 

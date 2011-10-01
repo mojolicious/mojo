@@ -156,7 +156,7 @@ following new ones.
 Load application from script.
 Note that this method is EXPERIMENTAL and might change without warning!
 
-  print Mojo::Server->new->load_app('./myapp.pl')->home;
+  say Mojo::Server->new->load_app('./myapp.pl')->home;
 
 =head2 C<run>
 

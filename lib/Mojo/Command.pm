@@ -39,7 +39,7 @@ sub chmod_file {
   my ($self, $path, $mod) = @_;
   chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
   $mod = sprintf '%lo', $mod;
-  print "  [chmod] $path $mod\n" unless $self->quiet;
+  say "  [chmod] $path $mod" unless $self->quiet;
   return $self;
 }
 
@@ -67,13 +67,13 @@ sub create_dir {
 
   # Exists
   if (-d $path) {
-    print "  [exist] $path\n" unless $self->quiet;
+    say "  [exist] $path" unless $self->quiet;
     return $self;
   }
 
   # Create
   File::Path::mkpath($path) or croak qq/Can't make directory "$path": $!/;
-  print "  [mkdir] $path\n" unless $self->quiet;
+  say "  [mkdir] $path" unless $self->quiet;
   return $self;
 }
 
@@ -280,7 +280,7 @@ sub write_file {
   croak qq/Can't open file "$path": $!/
     unless my $file = IO::File->new("> $path");
   $file->syswrite($data);
-  print "  [write] $path\n" unless $self->quiet;
+  say "  [write] $path" unless $self->quiet;
 
   return $self;
 }

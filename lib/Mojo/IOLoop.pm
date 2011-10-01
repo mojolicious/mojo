@@ -250,7 +250,7 @@ sub on_read  { shift->_event(read  => @_) }
 
 sub one_tick {
   my ($self, $timeout) = @_;
-  $timeout = $self->timeout unless defined $timeout;
+  $timeout //= $self->timeout;
 
   # Housekeeping
   $self->_listening;
@@ -439,7 +439,7 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
       my ($self, $id, $chunk) = @_;
 
       # Process input
-      print $chunk;
+      say $chunk;
 
       # Got some data, time to write
       $self->write($id, 'HTTP/1.1 200 OK');
@@ -461,7 +461,7 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
       my ($self, $id, $chunk) = @_;
 
       # Process input
-      print $chunk;
+      say $chunk;
     }
   );
 
@@ -944,11 +944,11 @@ Get L<Mojo::IOLoop::Trigger> remote control for the loop.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   # Synchronize multiple events
-  my $t = Mojo::IOLoop->trigger(sub { print "BOOM!\n" });
+  my $t = Mojo::IOLoop->trigger(sub { say 'BOOM!' });
   for my $i (1 .. 10) {
     $t->begin;
     Mojo::IOLoop->timer($i => sub {
-      print 10 - $i,"\n";
+      say 10 - $i;
       $t->end;
     });
   }

@@ -320,13 +320,13 @@ Mojo::URL - Uniform Resource Locator
   my $url = Mojo::URL->new(
     'http://sri:foobar@kraih.com:3000/foo/bar?foo=bar#23'
   );
-  print $url->scheme;
-  print $url->userinfo;
-  print $url->host;
-  print $url->port;
-  print $url->path;
-  print $url->query;
-  print $url->fragment;
+  say $url->scheme;
+  say $url->userinfo;
+  say $url->host;
+  say $url->port;
+  say $url->path;
+  say $url->query;
+  say $url->fragment;
 
   # Build
   my $url = Mojo::URL->new;
@@ -338,7 +338,7 @@ Mojo::URL - Uniform Resource Locator
   $url->path('baz');
   $url->query->param(foo => 'bar');
   $url->fragment(23);
-  print "$url";
+  say $url;
 
 =head1 DESCRIPTION
 

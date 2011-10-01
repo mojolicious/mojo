@@ -217,8 +217,7 @@ sub parse {
   $self->pattern->parse(@_);
 
   # Default name
-  my $name = $self->pattern->pattern;
-  $name = '' unless defined $name;
+  my $name = $self->pattern->pattern // '';
   $name =~ s/\W+//g;
   $self->{name}   = $name;
   $self->{custom} = 0;
@@ -465,7 +464,7 @@ sub _generate_class {
   # Namespace
   my $namespace = $field->{namespace};
   return unless $class || $namespace;
-  $namespace = $self->namespace unless defined $namespace;
+  $namespace //= $self->namespace;
   $class = length $class ? "${namespace}::$class" : $namespace
     if length $namespace;
 

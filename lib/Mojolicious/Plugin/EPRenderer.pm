@@ -10,19 +10,18 @@ use Mojo::Util 'md5_sum';
 #  Wishful thinking. We have long since evolved beyond the need for asses."
 sub register {
   my ($self, $app, $conf) = @_;
+  $conf ||= {};
 
   # Config
-  $conf ||= {};
   my $name     = $conf->{name}     || 'ep';
   my $template = $conf->{template} || {};
 
   # Custom sandbox
-  $template->{namespace} =
-    'Mojo::Template::SandBox::' . md5_sum(($ENV{MOJO_EXE} || ref $app) . $$)
-    unless defined $template->{namespace};
+  $template->{namespace} //=
+    'Mojo::Template::SandBox::' . md5_sum(($ENV{MOJO_EXE} || ref $app) . $$);
 
   # Auto escape by default to prevent XSS attacks
-  $template->{auto_escape} = 1 unless defined $template->{auto_escape};
+  $template->{auto_escape} //= 1;
 
   # Add "ep" handler
   $app->renderer->add_handler(

@@ -154,7 +154,7 @@ sub run {
 sub _say {
   return unless length(my $value = shift);
   utf8::encode $value;
-  print "$value\n";
+  say $value;
 }
 
 sub _select {

@@ -285,15 +285,15 @@ Connection and parser errors have only a message in C<error>, 400 and 500
 responses also a code.
 
   if (my $res = $tx->success) {
-    print $res->body;
+    say $res->body;
   }
   else {
     my ($message, $code) = $tx->error;
     if ($code) {
-      print "$code $message response.\n";
+      say "$code $message response.";
     }
     else {
-      print "Connection error: $message\n";
+      say "Connection error: $message";
     }
   }
 

@@ -7,10 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More;
-plan skip_all => 'Perl 5.10 or Pod::Simple required for this test!'
-  unless eval { require Pod::Simple::HTML; 1 };
-plan tests => 28;
+use Test::More tests => 28;
 
 # "Amy get your pants back on and get to work.
 #  They think were making out.

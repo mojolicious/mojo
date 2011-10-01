@@ -145,9 +145,7 @@ sub parse {
       my $attrs = {};
       while ($attr =~ /$ATTR_RE/g) {
         my $key = $cs ? $1 : lc($1);
-        my $value = $2;
-        $value = $3 unless defined $value;
-        $value = $4 unless defined $value;
+        my $value = $2 // $3 // $4;
 
         # Empty tag
         next if $key eq '/';

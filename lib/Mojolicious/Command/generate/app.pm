@@ -86,7 +86,7 @@ use Mojo::Base 'Mojolicious';
 sub startup {
   my $self = shift;
 
-  # Documentation browser under "/perldoc" (this plugin requires Perl 5.10)
+  # Documentation browser under "/perldoc"
   $self->plugin('PODRenderer');
 
   # Routes

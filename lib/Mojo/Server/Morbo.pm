@@ -72,7 +72,7 @@ sub _manage {
     warn "CHECKING $file\n" if DEBUG;
     next unless $self->check_file($file);
     warn "MODIFIED $file\n" if DEBUG;
-    print qq/File "$file" changed, restarting.\n/ if $ENV{MORBO_VERBOSE};
+    say qq/File "$file" changed, restarting./ if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{running} if $self->{running};
     $self->{modified} = 1;
   }

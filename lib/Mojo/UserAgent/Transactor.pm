@@ -324,7 +324,7 @@ implements the following new ones.
 Versatile L<Mojo::Transaction::HTTP> builder for form requests.
 
   my $tx = $t->form('http://kraih.com/foo' => {test => 123});
-  $tx->res->body(sub { print $_[1] });
+  $tx->res->body(sub { say $_[1] });
   $ua->start($tx);
 
 While the "multipart/form-data" content type will be automatically used
@@ -368,7 +368,7 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 
   # Streaming response
   my $tx = $t->tx(GET => 'http://mojolicio.us');
-  $tx->res->body(sub { print $_[1] });
+  $tx->res->body(sub { say $_[1] });
   $ua->start($tx);
 
   # Custom socket

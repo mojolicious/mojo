@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 76;
+use Test::More tests => 64;
 
 use_ok 'Mojo::UserAgent';
 
@@ -221,35 +221,6 @@ is $tx->res->body, 'works!', 'right content';
 $tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
 is $tx->kept_alive, 1, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# Taint connection
-Mojo::IOLoop->singleton->write($last => 'broken!');
-sleep 1;
-
-# GET / (mock server tainted connection)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-is $tx->kept_alive, undef, 'kept connection not alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# GET / (mock server again)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-is $tx->kept_alive, 1, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# Taint connection
-Mojo::IOLoop->singleton->write($last => 'broken!');
-sleep 1;
-
-# GET / (mock server tainted connection)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-is $tx->kept_alive, undef, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 

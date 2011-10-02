@@ -7,12 +7,11 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-# FreeBSD 8.0 and 8.1 are known to cause problems
+# FreeBSD 8.0/8.1 and Perl 5.12.3 are known to cause problems
 use Test::More;
 plan skip_all => 'This test does not work on some older versions of FreeBSD!'
   if $^O =~ /freebsd/;
-plan skip_all => 'Perl 5.14 required for this test on Windows!'
-  if ($^O eq 'MSWin32' || $^O =~ /cygwin/) && $] < 5.014;
+plan skip_all => 'Perl 5.14 required for this test!' if $] < 5.014;
 plan tests => 42;
 
 # "I can't believe it! Reading and writing actually paid off!"

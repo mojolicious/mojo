@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
+# "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
+#  Well, that’s love for you."
 use utf8;
 
 # Disable Bonjour, IPv6 and libev
@@ -9,9 +11,10 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-# "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
-#  Well, that’s love for you."
+# FreeBSD 8.0 and 8.1 are known to cause problems
 use Test::More;
+plan skip_all => 'This test does not work on some older versions of FreeBSD!'
+  if $^O =~ /freebsd/;
 plan skip_all => 'Perl 5.14 required for this test on Windows!'
   if ($^O eq 'MSWin32' || $^O =~ /cygwin/) && $] < 5.014;
 plan tests => 78;

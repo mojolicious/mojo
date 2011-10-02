@@ -7,7 +7,6 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved message parser performance slightly.
         - Improved resolver tests.
         - Fixed small formatting bug in Mojo::Headers.
-        - Fixed FreeBSD and Perl 5.12.3 portability issues in tests.
 
 1.99    2011-09-29 00:00:00
         - Deprecated direct hash access to the flash in

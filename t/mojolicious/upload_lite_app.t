@@ -9,10 +9,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More;
-plan skip_all => 'Windows is too fragile for this test!'
-  if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 31;
+use Test::More tests => 31;
 
 # "Um, Leela,
 #  Armondo and I are going to the back seat of his car for coffee."

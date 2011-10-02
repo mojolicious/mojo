@@ -34,8 +34,6 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.43 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan skip_all => 'Windows is too fragile for this test!'
-  if Mojo::IOLoop::Stream::WINDOWS;
 plan tests => 16;
 
 use Mojo::IOLoop;

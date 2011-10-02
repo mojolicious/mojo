@@ -7,10 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More;
-plan skip_all => 'Windows is too fragile for this test!'
-  if $^O eq 'MSWin32' || $^O =~ /cygwin/;
-plan tests => 76;
+use Test::More tests => 76;
 
 use_ok 'Mojo::UserAgent';
 

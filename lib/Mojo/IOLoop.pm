@@ -7,6 +7,7 @@ use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::IOLoop::Trigger;
 use Mojo::IOWatcher;
+use Mojo::Util 'md5_sum';
 use Scalar::Util 'weaken';
 use Time::HiRes 'time';
 
@@ -52,9 +53,8 @@ sub connect {
 
   # New client
   my $client = $self->client_class->new;
-  (my $id) = "$client" =~ /0x([\da-f]+)/;
-  $id = $args->{id} if $args->{id};
-  my $c = $self->{connections}->{$id} ||= {};
+  my $id     = $args->{id} ? $args->{id} : $self->_id;
+  my $c      = $self->{connections}->{$id} ||= {};
   $c->{client} = $client;
   $client->resolver($self->resolver);
   weaken $client->{resolver};
@@ -162,7 +162,7 @@ sub listen {
 
   # New server
   my $server = $self->server_class->new;
-  (my $id) = "$server" =~ /0x([\da-f]+)/;
+  my $id     = $self->_id;
   $self->{servers}->{$id} = $server;
   $server->iowatcher($self->iowatcher);
   weaken $server->{iowatcher};
@@ -179,8 +179,8 @@ sub listen {
 
       # New stream
       my $stream = $self->stream_class->new($handle);
-      (my $id) = "$stream" =~ /0x([\da-f]+)/;
-      my $c = $self->{connections}->{$id} ||= {};
+      my $id     = $self->_id;
+      my $c      = $self->{connections}->{$id} ||= {};
       $c->{stream} = $stream;
       $stream->iowatcher($self->iowatcher);
       weaken $stream->{iowatcher};
@@ -380,6 +380,14 @@ sub _event {
   return unless my $c = $self->{connections}->{$id};
   $c->{$event} = $cb if $cb;
   return $self;
+}
+
+sub _id {
+  my $self = shift;
+  while (1) {
+    my $id = md5_sum('c' . time . rand 999999999);
+    return $id if !$self->{connections}->{$id} && !$self->{servers}->{$id};
+  }
 }
 
 sub _listening {

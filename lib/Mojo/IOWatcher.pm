@@ -2,6 +2,7 @@ package Mojo::IOWatcher;
 use Mojo::Base -base;
 
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
+use Mojo::Util 'md5_sum';
 use Time::HiRes qw/time usleep/;
 
 use constant DEBUG => $ENV{MOJO_IOWATCHER_DEBUG} || 0;
@@ -118,7 +119,11 @@ sub _timer {
   my $self = shift;
   my $cb   = shift;
   my $t    = {cb => $cb, @_};
-  (my $id) = "$t" =~ /0x([\da-f]+)/;
+  my $id;
+  while (1) {
+    $id = md5_sum('t' . time . rand 999999999);
+    last unless $self->{timers}->{$id};
+  }
   $self->{timers}->{$id} = $t;
   return $id;
 }

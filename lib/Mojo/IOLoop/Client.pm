@@ -2,6 +2,7 @@ package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::IOLoop::EventEmitter';
 
 use IO::Socket::INET;
+use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP SO_ERROR TCP_NODELAY/;
 
 # IPv6 support requires IO::Socket::IP
@@ -25,11 +26,7 @@ has resolver => sub {
 sub DESTROY {
   my $self = shift;
   return if $self->{connected};
-  return unless my $resolver = $self->{resolver};
-  return unless my $loop     = $resolver->ioloop;
-  return unless my $watcher  = $loop->iowatcher;
-  $watcher->cancel($self->{timer})  if $self->{timer};
-  $watcher->remove($self->{handle}) if $self->{handle};
+  $self->_cleanup;
 }
 
 sub connect {
@@ -50,6 +47,15 @@ sub connect {
   else {
     $self->resolver->ioloop->defer(sub { $self->_connect($args) });
   }
+}
+
+sub _cleanup {
+  my $self = shift;
+  return unless my $resolver = $self->{resolver};
+  return unless my $loop     = $resolver->ioloop;
+  return unless my $watcher  = $loop->iowatcher;
+  $watcher->cancel($self->{timer})  if $self->{timer};
+  $watcher->remove($self->{handle}) if $self->{handle};
 }
 
 sub _connect {
@@ -86,6 +92,7 @@ sub _connect {
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
   # TLS
+  weaken $self;
   if ($args->{tls}) {
 
     # No TLS support
@@ -97,11 +104,8 @@ sub _connect {
     my %options = (
       SSL_startHandshake => 0,
       SSL_error_trap     => sub {
-        my $handle  = delete $self->{handle};
-        my $watcher = $self->resolver->ioloop->iowatcher;
-        $watcher->remove($handle);
-        $watcher->cancel($self->{timer});
-        close $handle;
+        $self->_cleanup;
+        close delete $self->{handle};
         $self->emit(error => $_[1]);
       },
       SSL_cert_file   => $args->{tls_cert},
@@ -147,8 +151,7 @@ sub _connecting {
 
   # Connected
   $self->{connected} = 1;
-  $watcher->cancel($self->{timer}) if $self->{timer};
-  $watcher->remove($handle);
+  $self->_cleanup;
   $self->emit(connect => $handle);
 }
 

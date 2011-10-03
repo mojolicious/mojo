@@ -40,14 +40,9 @@ sub register {
       unless ($cache->get($key)) {
         my $mt = Mojo::Template->new($template);
 
-        # Self
-        my $prepend = 'my $self = shift;';
-
-        # Weaken
-        $prepend .= q/use Scalar::Util 'weaken'; weaken $self;/;
-
         # Be a bit more relaxed for helpers
-        $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
+        my $prepend = q/my $self = shift; use Scalar::Util 'weaken';/
+          . q/weaken $self; no strict 'refs'; no warnings 'redefine';/;
 
         # Helpers
         $prepend .= 'my $_H = $self->app->renderer->helpers;';

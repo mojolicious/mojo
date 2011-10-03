@@ -45,7 +45,7 @@ get '/broken_redirect' => sub {
 # GET /proxy
 get '/proxy' => sub {
   my $self = shift;
-  $self->render_text($self->req->url);
+  $self->render_text($self->req->url->to_abs);
 };
 
 # WebSocket /test
@@ -62,12 +62,12 @@ websocket '/test' => sub {
 };
 
 # HTTP server for testing
-my $ua     = Mojo::UserAgent->new;
-my $loop   = Mojo::IOLoop->singleton;
-my $server = Mojo::Server::Daemon->new(app => app, ioloop => $loop);
-my $port   = Mojo::IOLoop->new->generate_port;
-$server->listen(["https://*:$port"]);
-$server->prepare_ioloop;
+my $ua = Mojo::UserAgent->new;
+my $daemon =
+  Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+my $port = Mojo::IOLoop->new->generate_port;
+$daemon->listen(["https://*:$port"]);
+$daemon->prepare_ioloop;
 
 # Connect proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;
@@ -79,7 +79,7 @@ my $nf =
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.0 200 OK\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
-$loop->listen(
+Mojo::IOLoop->listen(
   port    => $proxy,
   on_read => sub {
     my ($loop, $client, $chunk) = @_;
@@ -130,10 +130,10 @@ my $result;
 $ua->get(
   "https://localhost:$port/" => sub {
     $result = pop->success->body;
-    $loop->stop;
+    Mojo::IOLoop->stop;
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $result, "Hello World! / https://localhost:$port/", 'right content';
 
 # GET /broken_redirect (broken redirect)
@@ -151,10 +151,10 @@ $ua->max_redirects(3)->get(
     my $tx = pop;
     $result = $tx->success->body;
     $works  = $tx->res->headers->header('X-Works');
-    $loop->stop;
+    Mojo::IOLoop->stop;
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $result, "Hello World! / https://localhost:$port/", 'right content';
 is $works,  'it does!',                                'right header';
 is $start,  2,                                         'redirected once';
@@ -165,7 +165,7 @@ $result = undef;
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
     my $tx = pop;
-    $tx->on_finish(sub { $loop->stop });
+    $tx->on_finish(sub { Mojo::IOLoop->stop });
     $tx->on_message(
       sub {
         my ($tx, $message) = @_;
@@ -176,7 +176,7 @@ $ua->websocket(
     $tx->send_message('test1');
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
 # GET /proxy (proxy request)
@@ -185,10 +185,10 @@ $result = undef;
 $ua->get(
   "https://localhost:$port/proxy" => sub {
     $result = pop->success->body;
-    $loop->stop;
+    Mojo::IOLoop->stop;
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $result, "https://localhost:$port/proxy", 'right content';
 
 # GET /proxy (kept alive proxy request)
@@ -199,10 +199,10 @@ $ua->get(
     my $tx = pop;
     $result     = $tx->success->body;
     $kept_alive = $tx->kept_alive;
-    $loop->stop;
+    Mojo::IOLoop->stop;
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $result, "https://localhost:$port/proxy", 'right content';
 is $kept_alive, 1, 'kept alive';
 
@@ -214,7 +214,7 @@ $ua->websocket(
   "wss://localhost:$port/test" => sub {
     my $tx = pop;
     $kept_alive = $tx->kept_alive;
-    $tx->on_finish(sub { $loop->stop });
+    $tx->on_finish(sub { Mojo::IOLoop->stop });
     $tx->on_message(
       sub {
         my ($tx, $message) = @_;
@@ -225,7 +225,7 @@ $ua->websocket(
     $tx->send_message('test1');
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $kept_alive, 1,                 'kept alive';
 is $connected,  "localhost:$port", 'connected';
 is $result,     'test1test2',      'right result';
@@ -241,9 +241,9 @@ $ua->websocket(
     my $tx = pop;
     $success = $tx->success;
     $error   = $tx->error;
-    $loop->stop;
+    Mojo::IOLoop->stop;
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $success, undef, 'no success';
 is $error, 'Proxy connection failed.', 'right message';

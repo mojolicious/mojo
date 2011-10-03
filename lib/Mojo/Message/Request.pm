@@ -218,19 +218,21 @@ sub _build_start_line {
   $path .= "?$query" if $query;
   $path = "/$path" unless $path =~ /^\//;
 
-  # Proxy
-  if ($self->proxy) {
-    my $clone = $url = $url->clone;
-    $clone->userinfo(undef);
-    $path = $clone;
-  }
-
   # CONNECT
   my $method = uc $self->method;
   if ($method eq 'CONNECT') {
     my $host = $url->host;
     my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
     $path = "$host:$port";
+  }
+
+  # Proxy
+  elsif ($self->proxy) {
+    my $clone = $url = $url->clone;
+    $clone->userinfo(undef);
+    $path = $clone
+      unless ($self->headers->upgrade || '') eq 'websocket'
+      || ($url->scheme || '') eq 'https';
   }
 
   # HTTP 0.9

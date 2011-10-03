@@ -216,11 +216,11 @@ sub _connect {
   my ($self, $tx, $cb) = @_;
 
   # Keep alive connection
-  weaken $self;
   my $loop = $self->_loop;
   my $id   = $tx->connection;
   my ($scheme, $host, $port) = $self->transactor->peer($tx);
   $id ||= $self->_cache("$scheme:$host:$port");
+  weaken $self;
   if ($id && !ref $id) {
     warn "KEEP ALIVE CONNECTION ($scheme:$host:$port)\n" if DEBUG;
     $self->{connections}->{$id} = {cb => $cb, transaction => $tx};

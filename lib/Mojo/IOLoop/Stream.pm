@@ -6,9 +6,6 @@ use Scalar::Util 'weaken';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
-# Windows
-use constant WINDOWS => $^O eq 'MSWin32' || $^O =~ /cygwin/ ? 1 : 0;
-
 has iowatcher => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton->iowatcher;
@@ -69,12 +66,6 @@ sub write {
   # Prepare chunk for writing
   $self->{buffer} .= $chunk;
 
-  # UNIX only quick write
-  unless (WINDOWS) {
-    local $self->{quick} = 1 if $cb;
-    $self->_write;
-  }
-
   # Write with roundtrip
   if ($cb) { $self->once(drain => $cb) }
   else     { return unless length $self->{buffer} }
@@ -114,7 +105,7 @@ sub _write {
   my $self = shift;
 
   # Handle drain
-  $self->emit('drain') if !length $self->{buffer} && !$self->{quick};
+  $self->emit('drain') if !length $self->{buffer};
 
   # Write as much as possible
   my $handle = $self->{handle};
@@ -140,10 +131,7 @@ sub _write {
   }
 
   # Stop writing
-  return
-    if length $self->{buffer}
-      || $self->{quick}
-      || @{$self->subscribers('drain')};
+  return if length $self->{buffer} || @{$self->subscribers('drain')};
   $self->iowatcher->not_writing($handle);
 }
 

@@ -4,12 +4,10 @@ use Mojolicious::Lite;
 # "Don't worry, son.
 #  I'm sure he's up in heaven right now laughing it up with all the other
 #  celebrities: John Dilinger, Ty Cobb, Joseph Stalin."
-use Scalar::Util 'weaken';
-
-# "Does whisky count as beer?"
 app->log->level('error');
 app->log->path(undef);
 
+# "Does whisky count as beer?"
 under '/diag' => sub {
   shift->on_finish(sub { $ENV{MOJO_HELLO} = 'world' });
 };
@@ -74,7 +72,6 @@ any '/proxy' => sub {
     return $self->render_text('This is a blocking deployment environment!')
       unless Mojo::IOLoop->is_running;
     $self->render_later;
-    weaken $self;
     $self->ua->get(
       $non_blocking => sub {
         my $res2 = pop->res;

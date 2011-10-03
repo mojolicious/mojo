@@ -47,12 +47,12 @@ websocket '/test' => sub {
 };
 
 # HTTP server for testing
-my $ua     = Mojo::UserAgent->new;
-my $loop   = Mojo::IOLoop->singleton;
-my $server = Mojo::Server::Daemon->new(app => app, ioloop => $loop);
-my $port   = Mojo::IOLoop->new->generate_port;
-$server->listen(["http://*:$port"]);
-$server->prepare_ioloop;
+my $ua = Mojo::UserAgent->new;
+my $daemon =
+  Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+my $port = Mojo::IOLoop->new->generate_port;
+$daemon->listen(["http://*:$port"]);
+$daemon->prepare_ioloop;
 
 # Connect proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;
@@ -64,7 +64,7 @@ my $nf =
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
-$loop->listen(
+Mojo::IOLoop->listen(
   port    => $proxy,
   on_read => sub {
     my ($loop, $client, $chunk) = @_;
@@ -115,10 +115,10 @@ my $result;
 $ua->get(
   "http://localhost:$port/" => sub {
     $result = pop->success->body;
-    $loop->stop;
+    Mojo::IOLoop->stop;
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $result, "Hello World! / http://localhost:$port/", 'right content';
 
 # WebSocket /test (normal websocket)
@@ -126,7 +126,7 @@ $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
     my $tx = pop;
-    $tx->on_finish(sub { $loop->stop });
+    $tx->on_finish(sub { Mojo::IOLoop->stop });
     $tx->on_message(
       sub {
         my ($tx, $message) = @_;
@@ -137,7 +137,7 @@ $ua->websocket(
     $tx->send_message('test1');
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
 # GET http://kraih.com/proxy (proxy request)
@@ -146,10 +146,10 @@ $result = undef;
 $ua->get(
   "http://kraih.com/proxy" => sub {
     $result = pop->success->body;
-    $loop->stop;
+    Mojo::IOLoop->stop;
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $result, 'http://kraih.com/proxy', 'right content';
 
 # WebSocket /test (proxy websocket)
@@ -158,7 +158,7 @@ $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
     my $tx = pop;
-    $tx->on_finish(sub { $loop->stop });
+    $tx->on_finish(sub { Mojo::IOLoop->stop });
     $tx->on_message(
       sub {
         my ($tx, $message) = @_;
@@ -169,7 +169,7 @@ $ua->websocket(
     $tx->send_message('test1');
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $connected, "localhost:$port", 'connected';
 is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
@@ -184,9 +184,9 @@ $ua->websocket(
     my $tx = pop;
     $success = $tx->success;
     $error   = $tx->error;
-    $loop->stop;
+    Mojo::IOLoop->stop;
   }
 );
-$loop->start;
+Mojo::IOLoop->start;
 is $success, undef, 'no success';
 is $error, 'Proxy connection failed.', 'right message';

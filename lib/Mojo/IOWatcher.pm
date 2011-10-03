@@ -120,10 +120,7 @@ sub _timer {
   my $cb   = shift;
   my $t    = {cb => $cb, @_};
   my $id;
-  while (1) {
-    $id = md5_sum('t' . time . rand 999999999);
-    last unless $self->{timers}->{$id};
-  }
+  do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}->{$id};
   $self->{timers}->{$id} = $t;
   return $id;
 }

@@ -143,7 +143,7 @@ sub resolve {
   # Build request
   warn "RESOLVE $type $name ($server)\n" if DEBUG;
   my $tx;
-  do { $tx = int rand 0x10000 } while ($self->{requests}->{$tx});
+  do { $tx = int rand 0x10000 } while $self->{requests}->{$tx};
 
   # Header (one question with recursion)
   my $req = pack 'nnnnnn', $tx, 0x0100, 1, 0, 0, 0;
@@ -231,7 +231,7 @@ sub _bind {
       my $content = $packet[6];
       for (1 .. $packet[2]) {
         my $n;
-        do { ($n, $content) = unpack 'C/aa*', $content } while ($n ne '');
+        do { ($n, $content) = unpack 'C/aa*', $content } while $n ne '';
         $content = (unpack 'nna*', $content)[2];
       }
 

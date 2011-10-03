@@ -384,10 +384,10 @@ sub _event {
 
 sub _id {
   my $self = shift;
-  while (1) {
-    my $id = md5_sum('c' . time . rand 999999999);
-    return $id if !$self->{connections}->{$id} && !$self->{servers}->{$id};
-  }
+  my $id;
+  do { $id = md5_sum('c' . time . rand 999) }
+    while $self->{connections}->{$id} || $self->{servers}->{$id};
+  return $id;
 }
 
 sub _listening {

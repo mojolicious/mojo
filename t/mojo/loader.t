@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 36;
+use Test::More tests => 38;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -67,4 +67,8 @@ ok !!LoaderTest::B->can('new'), 'loaded successfully';
 ok !!LoaderTest::C->can('new'), 'loaded successfully';
 
 # Class does not exist
-ok $loader->load('LoaderTest'), 'nothing to load';
+ok !!$loader->load('LoaderTest'), 'nothing to load';
+
+# Invalid class
+ok !!$loader->load('Mojolicious/Lite'), 'nothing to load';
+ok !$loader->load('Mojolicious::Lite'), 'loaded successfully';

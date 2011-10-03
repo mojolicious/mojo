@@ -58,7 +58,7 @@ sub class_to_file {
 
 sub class_to_path {
   my ($self, $class) = @_;
-  my $path = join '/', split /::/, $class;
+  my $path = join '/', split /::|'/, $class;
   return "$path.pm";
 }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 27;
+use Test::More tests => 32;
 
 use Cwd 'cwd';
 use File::Spec;
@@ -67,7 +67,12 @@ is $command->class_to_file('FooBAR'),   'foo_bar', 'right file';
 is $command->class_to_file('Foo::BAR'), 'foo_bar', 'right file';
 
 # Class to path
-is $command->class_to_path('Foo::Bar'), 'Foo/Bar.pm', 'right path';
+is $command->class_to_path('Foo::Bar'),      'Foo/Bar.pm',     'right path';
+is $command->class_to_path("Foo'Bar"),       'Foo/Bar.pm',     'right path';
+is $command->class_to_path("Foo'Bar::Baz"),  'Foo/Bar/Baz.pm', 'right path';
+is $command->class_to_path("Foo::Bar'Baz"),  'Foo/Bar/Baz.pm', 'right path';
+is $command->class_to_path("Foo::Bar::Baz"), 'Foo/Bar/Baz.pm', 'right path';
+is $command->class_to_path("Foo'Bar'Baz"),   'Foo/Bar/Baz.pm', 'right path';
 
 # Environment detection
 {

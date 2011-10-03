@@ -118,10 +118,6 @@ sub _write {
       # Retry
       return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
-      # Close
-      return $self->emit('close')
-        if $handle->can('connected') && !$handle->connected;
-
       # Write error
       return $self->emit(error => $!);
     }

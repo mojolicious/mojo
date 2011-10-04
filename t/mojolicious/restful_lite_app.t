@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 317;
+use Test::More tests => 333;
 
 # "Woohoo, time to go clubbin'! Baby seals here I come!"
 use Mojolicious::Lite;
@@ -401,3 +401,29 @@ $t->post_ok('/rest.png?format=json')->status_is(201)
 
 # GET /nothing (does not exist)
 $t->get_ok('/nothing', {Accept => 'image/png'})->status_is(404);
+
+# GET /rest.html (Internet Explorer)
+my $ie =
+  'image/jpeg, application/x-ms-application, image/gif, application/xaml+xml'
+  . ', image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash'
+  . ', application/msword, */*';
+$t->get_ok('/rest.html' => {Accept => $ie})->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->text_is('html > body', 'works');
+
+# GET /rest (Internet Explorer with query)
+$t->get_ok('/rest?format=html' => {Accept => $ie})->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->text_is('html > body', 'works');
+
+# GET /rest.html (WebKit)
+my $webkit = 'application/xml,application/xhtml+xml,text/html;q=0.9'
+  . ', text/plain;q=0.8,image/png,*/*;q=0.5';
+$t->get_ok('/rest.html' => {Accept => $webkit})->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->text_is('html > body', 'works');
+
+# GET /rest (WebKit with query)
+$t->get_ok('/rest?format=html' => {Accept => $webkit})->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->text_is('html > body', 'works');

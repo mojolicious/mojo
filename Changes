@@ -7,9 +7,10 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojo::IOLoop to die if started twice.
         - Improved documentation.
         - Improved tests.
+        - Fixed many portability issues.
         - Fixed small formatting bug in Mojo::Headers.
         - Fixed small proxy message generation bug.
-        - Fixed many portability issues.
+        - Fixed small detection bug in Mojolicious::Types.
 
 1.99    2011-09-29 00:00:00
         - Deprecated direct hash access to the flash in

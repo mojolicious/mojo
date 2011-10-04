@@ -39,9 +39,9 @@ sub detect {
   my $pattern = $1;
   my @exts;
   my $types = $self->types;
-  for my $ext (keys %$types) {
-    my $type = $types->{$ext};
-    $type =~ s/\;.*$//;
+  for my $ext (sort keys %$types) {
+    my $type = quotemeta $types->{$ext};
+    $type =~ s/\\\;.*$//;
     push @exts, $ext if $pattern =~ /^$type$/i;
   }
 

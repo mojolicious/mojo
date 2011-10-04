@@ -402,7 +402,7 @@ $t->post_ok('/rest.png?format=json')->status_is(201)
 # GET /nothing (does not exist)
 $t->get_ok('/nothing', {Accept => 'image/png'})->status_is(404);
 
-# GET /rest.html (Internet Explorer)
+# GET /rest.html (Internet Explorer 8)
 my $ie =
   'image/jpeg, application/x-ms-application, image/gif, application/xaml+xml'
   . ', image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash'
@@ -411,19 +411,19 @@ $t->get_ok('/rest.html' => {Accept => $ie})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');
 
-# GET /rest (Internet Explorer with query)
+# GET /rest (Internet Explorer 8 with query)
 $t->get_ok('/rest?format=html' => {Accept => $ie})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');
 
-# GET /rest.html (WebKit)
-my $webkit = 'application/xml,application/xhtml+xml,text/html;q=0.9'
+# GET /rest.html (Chrome 11)
+my $chrome = 'application/xml,application/xhtml+xml,text/html;q=0.9'
   . ',text/plain;q=0.8,image/png,*/*;q=0.5';
-$t->get_ok('/rest.html' => {Accept => $webkit})->status_is(200)
+$t->get_ok('/rest.html' => {Accept => $chrome})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');
 
-# GET /rest (WebKit with query)
-$t->get_ok('/rest?format=html' => {Accept => $webkit})->status_is(200)
+# GET /rest (Chrome 11 with query)
+$t->get_ok('/rest?format=html' => {Accept => $chrome})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');

@@ -13,7 +13,6 @@ BEGIN {
 
 use Test::More tests => 78;
 
-# "Your mistletoe is no match for my *tow* missile."
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
 use Test::Mojo;

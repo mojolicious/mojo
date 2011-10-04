@@ -81,29 +81,8 @@ sub run {
 
 sub setuidgid {
   my $self = shift;
-
-  # Group
-  if (my $group = $self->group) {
-    if (my $gid = (getgrnam($group))[2]) {
-
-      # Switch
-      undef $!;
-      $) = $gid;
-      croak qq/Can't switch to effective group "$group": $!/ if $!;
-    }
-  }
-
-  # User
-  if (my $user = $self->user) {
-    if (my $uid = (getpwnam($user))[2]) {
-
-      # Switch
-      undef $!;
-      $> = $uid;
-      croak qq/Can't switch to effective user "$user": $!/ if $!;
-    }
-  }
-
+  $self->_group;
+  $self->_user;
   return $self;
 }
 
@@ -230,6 +209,16 @@ sub _finish {
   }
 }
 
+sub _group {
+  my $self = shift;
+  return unless my $group = $self->group;
+  croak qq/Group "$group" does not exist/
+    unless defined(my $gid = (getgrnam($group))[2]);
+  undef $!;
+  $( = $) = $gid;
+  croak qq/Can't switch to group "$group": $!/ if $!;
+}
+
 sub _listen {
   my ($self, $listen) = @_;
   return unless $listen;
@@ -323,6 +312,16 @@ sub _upgrade {
 
   # Not resumable yet
   $ws->on_resume(sub {1});
+}
+
+sub _user {
+  my $self = shift;
+  return unless my $user = $self->user;
+  croak qq/User "$user" does not exist/
+    unless defined(my $uid = (getpwnam($self->user))[2]);
+  undef $!;
+  $< = $> = $uid;
+  croak qq/Can't switch to user "$user": $!/ if $!;
 }
 
 sub _write {

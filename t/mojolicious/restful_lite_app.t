@@ -418,7 +418,7 @@ $t->get_ok('/rest?format=html' => {Accept => $ie})->status_is(200)
 
 # GET /rest.html (WebKit)
 my $webkit = 'application/xml,application/xhtml+xml,text/html;q=0.9'
-  . ', text/plain;q=0.8,image/png,*/*;q=0.5';
+  . ',text/plain;q=0.8,image/png,*/*;q=0.5';
 $t->get_ok('/rest.html' => {Accept => $webkit})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');

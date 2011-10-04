@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 # "Pizza delivery for...
 #  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
@@ -29,8 +29,9 @@ my $twinkle = {
 
 # Plugins
 plugin EPRenderer => {name => 'twinkle', template => $twinkle};
-plugin 'PODRenderer';
-plugin PODRenderer => {name => 'teapod', preprocess => 'twinkle'};
+plugin PODRenderer => {no_perldoc => 1};
+plugin PODRenderer =>
+  {name => 'teapod', preprocess => 'twinkle', no_perldoc => 1};
 my $config = plugin JSONConfig =>
   {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
 is $config->{foo},  'bar', 'right value';
@@ -68,6 +69,9 @@ $t->get_ok('/docs2')->status_is(200)->content_like(qr/<h2>snowman<\/h2>/);
 
 # GET /docs3
 $t->get_ok('/docs3')->status_is(200)->content_like(qr/<h3><\/h3>/);
+
+# GET /perldoc (disabled)
+$t->get_ok('/perldoc')->status_is(404);
 
 __DATA__
 @@ index.html.twinkle

@@ -28,7 +28,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # I18N plugin
-plugin I18N => {namespace => 'MyTestApp::I18N'};
+plugin I18N => {default => 'de', namespace => 'MyTestApp::I18N'};
 
 # GET /
 get '/' => 'index';
@@ -71,7 +71,7 @@ $t->get_ok('/mixed' => {'Accept-Language' => 'de, en-US'})->status_is(200)
   ->content_is("Hallo Weltde\nHello Worlden\n");
 
 # Nothing
-$t->get_ok('/nothing')->status_is(200)->content_is("Hello Worlden\n");
+$t->get_ok('/nothing')->status_is(200)->content_is("Hallo Weltde\n");
 
 # Unknown (manual)
 $t->get_ok('/unknown')->status_is(200)->content_is("unknownde\nunknownen\n");

@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -26,6 +26,18 @@ Mojo::IOLoop->singleton->iowatcher(MyWatcher->new);
 my $loop = Mojo::IOLoop->new;
 Mojo::IOLoop->iowatcher(MyWatcher->new);
 is ref $loop->iowatcher, 'MyWatcher', 'right class';
+
+# Double start
+my $error;
+Mojo::IOLoop->defer(
+  sub {
+    eval { Mojo::IOLoop->start };
+    $error = $@;
+    Mojo::IOLoop->stop;
+  }
+);
+Mojo::IOLoop->start;
+like $error, qr/^Mojo::IOLoop already running/, 'right error';
 
 # Ticks
 my $ticks = 0;
@@ -108,9 +120,10 @@ $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
 
 # Dropped listen socket
-$port = Mojo::IOLoop->generate_port;
-$id = $loop->listen(port => $port);
-my ($connected, $error);
+$port  = Mojo::IOLoop->generate_port;
+$id    = $loop->listen(port => $port);
+$error = undef;
+my $connected;
 $loop->connect(
   address    => 'localhost',
   port       => $port,

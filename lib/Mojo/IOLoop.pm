@@ -1,6 +1,7 @@
 package Mojo::IOLoop;
 use Mojo::Base -base;
 
+use Carp 'croak';
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Resolver;
 use Mojo::IOLoop::Server;
@@ -285,8 +286,7 @@ sub start {
   $self = $self->singleton unless ref $self;
 
   # Check if we are already running
-  return if $self->{running};
-  $self->{running} = 1;
+  croak 'Mojo::IOLoop already running' if $self->{running}++;
 
   # Mainloop
   $self->one_tick while $self->{running};

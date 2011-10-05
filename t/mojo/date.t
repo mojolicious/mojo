@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 17;
+use Test::More tests => 21;
 
 # "Can't we have one meeting that doesn't end with digging up a corpse?"
 use_ok 'Mojo::Date';
@@ -25,9 +25,16 @@ is Mojo::Date->new('Fri May 13 10:00:24 2011')->epoch,
   1305280824, 'right epoch value';
 
 # Invalid string
+is Mojo::Date->new('')->epoch,        undef, 'no epoch value';
 is Mojo::Date->new('123 abc')->epoch, undef, 'no epoch value';
 is Mojo::Date->new('abc')->epoch,     undef, 'no epoch value';
 is Mojo::Date->new('Xxx, 00 Xxx 0000 00:00:00 XXX')->epoch, undef,
+  'no epoch value';
+is Mojo::Date->new('Sun, 06 Nov 1994 08:49:37 GMT GARBAGE')->epoch, undef,
+  'no epoch value';
+is Mojo::Date->new('Sunday, 06-Nov-94 08:49:37 GMT GARBAGE')->epoch, undef,
+  'no epoch value';
+is Mojo::Date->new('Sun Nov  6 08:49:37 1994 GARBAGE')->epoch, undef,
   'no epoch value';
 
 # to_string

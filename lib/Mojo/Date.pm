@@ -12,6 +12,12 @@ has 'epoch';
 # Days and months
 my @DAYS   = qw/Sun Mon Tue Wed Thu Fri Sat/;
 my @MONTHS = qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/;
+my $ZONE   = qr/(?:(?:GM|U)|(?:([ECMP])([SD])))T/;
+my %ZONE   = ( E => 4,
+	       C => 5,
+	       M => 6,
+	       P => 7 );
+
 my %MONTHS;
 {
   my $i = 0;
@@ -41,11 +47,18 @@ sub parse {
     return $self;
   }
 
-  # Remove spaces, weekdays and timezone
+  # Remove spaces and weekdays
   $date =~ s/^\s+//;
   my $re = join '|', @DAYS;
   $date =~ s/^(?:$re)[a-z]*,?\s*//i;
-  $date =~ s/GMT\s*$//i;
+
+  # Set timezone offset
+  my $offset = 0;
+  if ($date =~ s/$ZONE\s*$// && $1) {
+    $offset = $ZONE{$1};
+    $offset++ if $2 eq 'S';
+  }
+
   $date =~ s/\s+$//;
 
   # RFC 822/1123 - Sun, 06 Nov 1994 08:49:37 GMT
@@ -89,6 +102,9 @@ sub parse {
       Time::Local::timegm($second, $minute, $hour, $day, $month, $year);
   };
   return $self if $@ || $epoch < 0;
+
+  $epoch += ($offset * 60 * 60);
+
   $self->epoch($epoch);
 
   return $self;

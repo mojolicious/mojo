@@ -15,7 +15,7 @@ sub load {
   my ($self, $module) = @_;
 
   # Check module name
-  return 1 if !$module || $module !~ /^[\w\:\']+$/;
+  return 1 if !$module || $module !~ /^\w[\w\:\']+\w$/;
 
   # Already loaded
   return if $module->can('new');

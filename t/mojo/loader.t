@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 41;
+use Test::More tests => 44;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -67,11 +67,14 @@ ok !!LoaderTest::B->can('new'), 'loaded successfully';
 ok !!LoaderTest::C->can('new'), 'loaded successfully';
 
 # Class does not exist
-ok !!$loader->load('LoaderTest'), 'nothing to load';
+is $loader->load('LoaderTest'), 1, 'nothing to load';
 
 # Invalid class
-ok !!$loader->load('Mojolicious/Lite'),    'nothing to load';
-ok !!$loader->load('Mojolicious/Lite.pm'), 'nothing to load';
-ok !!$loader->load('Mojolicious\Lite'),    'nothing to load';
-ok !!$loader->load('Mojolicious\Lite.pm'), 'nothing to load';
-ok !$loader->load('Mojolicious::Lite'),    'loaded successfully';
+is $loader->load('Mojolicious/Lite'),      1,     'nothing to load';
+is $loader->load('Mojolicious/Lite.pm'),   1,     'nothing to load';
+is $loader->load('Mojolicious\Lite'),      1,     'nothing to load';
+is $loader->load('Mojolicious\Lite.pm'),   1,     'nothing to load';
+is $loader->load('::Mojolicious::Lite'),   1,     'nothing to load';
+is $loader->load('Mojolicious::Lite::'),   1,     'nothing to load';
+is $loader->load('::Mojolicious::Lite::'), 1,     'nothing to load';
+is $loader->load('Mojolicious::Lite'),     undef, 'loaded successfully';

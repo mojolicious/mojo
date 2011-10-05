@@ -71,8 +71,7 @@ sub write {
   else     { return unless length $self->{buffer} }
 
   # Start writing
-  return unless my $handle = $self->{handle};
-  $self->iowatcher->writing($handle);
+  $self->iowatcher->writing($self->{handle}) if $self->{handle};
 }
 
 sub _read {
@@ -104,9 +103,6 @@ sub _read {
 sub _write {
   my $self = shift;
 
-  # Handle drain
-  $self->emit('drain') if !length $self->{buffer};
-
   # Write as much as possible
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
@@ -125,6 +121,9 @@ sub _write {
     # Remove written chunk from buffer
     substr $self->{buffer}, 0, $written, '';
   }
+
+  # Handle drain
+  $self->emit('drain') if !length $self->{buffer};
 
   # Stop writing
   return if length $self->{buffer} || @{$self->subscribers('drain')};
@@ -243,6 +242,7 @@ Steal handle from stream and prevent it from getting closed automatically.
 =head2 C<write>
 
   $stream->write('Hello!');
+  $stream->write('Hello!', sub {...});
 
 Write data to stream, the optional drain callback will be invoked once all
 data has been written.

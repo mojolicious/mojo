@@ -292,10 +292,8 @@ sub _read {
   $tx->res->headers->connection('close')
     if ($c->{requests} || 0) >= $self->max_requests;
 
-  # Finish
+  # Finish or start writing
   if ($tx->is_done) { $self->_finish($id, $tx) }
-
-  # Writing
   elsif ($tx->is_writing) { $self->_write($id) }
 }
 
@@ -332,23 +330,15 @@ sub _write {
   # Get chunk
   my $chunk = $tx->server_write;
 
-  # Callback
-  weaken $self;
-  my $cb = sub { $self->_write($id) };
-
-  # Done
-  if ($tx->is_done) {
-    $self->_finish($id, $tx);
-
-    # No followup
-    $cb = undef unless $c->{transaction} || $c->{websocket};
-  }
-
-  # Not writing
-  elsif (!$tx->is_writing) { $cb = undef }
-
   # Write
-  $self->ioloop->write($id, $chunk, $cb);
+  weaken $self;
+  my $done = $tx->is_done;
+  $self->ioloop->write(
+    $id => $chunk => sub {
+      $self->_finish($id, $tx) if $done;
+      $self->_write($id);
+    }
+  );
   warn "> $chunk\n" if DEBUG;
 }
 

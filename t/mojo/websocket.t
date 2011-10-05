@@ -282,7 +282,7 @@ $ua->websocket(
     $tx->on_finish(
       sub {
         $finished += 4;
-        $loop->stop;
+        $loop->timer('0.5' => sub { shift->stop });
       }
     );
   }

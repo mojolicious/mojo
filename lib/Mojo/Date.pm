@@ -15,17 +15,10 @@ my @MONTHS = qw/Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec/;
 my %MONTHS;
 {
   my $i = 0;
-  for my $month (@MONTHS) {
-    $MONTHS{$month} = $i;
-    $i++;
-  }
+  $MONTHS{$_} = $i++ for @MONTHS;
 }
 
-sub new {
-  my $self = shift->SUPER::new();
-  $self->parse(@_);
-  return $self;
-}
+sub new { shift->SUPER::new->parse(@_) }
 
 # "I suggest you leave immediately.
 #  Or what? You'll release the dogs or the bees?
@@ -35,61 +28,32 @@ sub parse {
   my ($self, $date) = @_;
   return $self unless defined $date;
 
-  # epoch - 784111777
-  if ($date =~ /^\d+$/) {
-    $self->epoch($date);
-    return $self;
+  # epoch (784111777)
+  $self->epoch($date) and return $self if $date =~ /^\d+$/;
+
+  # RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
+  my ($day, $month, $year, $h, $m, $s);
+  if ($date =~ /^\w+\,\s+(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+GMT$/) {
+    ($day, $month, $year, $h, $m, $s) = ($1, $MONTHS{$2}, $3, $4, $5, $6);
   }
 
-  # Remove spaces, weekdays and timezone
-  $date =~ s/^\s+//;
-  my $re = join '|', @DAYS;
-  $date =~ s/^(?:$re)[a-z]*,?\s*//i;
-  $date =~ s/GMT\s*$//i;
-  $date =~ s/\s+$//;
-
-  # RFC 822/1123 - Sun, 06 Nov 1994 08:49:37 GMT
-  my ($day, $month, $year, $hour, $minute, $second);
-  if ($date =~ /^(\d+)\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)$/) {
-    $day    = $1;
-    $month  = $MONTHS{$2};
-    $year   = $3;
-    $hour   = $4;
-    $minute = $5;
-    $second = $6;
+  # RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
+  elsif ($date =~ /^\w+\,\s+(\d+)-(\w+)-(\d+)\s+(\d+):(\d+):(\d+)\s+GMT$/) {
+    ($day, $month, $year, $h, $m, $s) = ($1, $MONTHS{$2}, $3, $4, $5, $6);
   }
 
-  # RFC 850/1036 - Sunday, 06-Nov-94 08:49:37 GMT
-  elsif ($date =~ /^(\d+)-(\w+)-(\d+)\s+(\d+):(\d+):(\d+)$/) {
-    $day    = $1;
-    $month  = $MONTHS{$2};
-    $year   = $3;
-    $hour   = $4;
-    $minute = $5;
-    $second = $6;
+  # ANSI C asctime() (Sun Nov  6 08:49:37 1994)
+  elsif ($date =~ /^\w+\s+(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+(\d+)$/) {
+    ($month, $day, $h, $m, $s, $year) = ($MONTHS{$1}, $2, $3, $4, $5, $6);
   }
 
-  # ANSI C asctime() - Sun Nov  6 08:49:37 1994
-  elsif ($date =~ /^(\w+)\s+(\d+)\s+(\d+):(\d+):(\d+)\s+(\d+)$/) {
-    $month  = $MONTHS{$1};
-    $day    = $2;
-    $hour   = $3;
-    $minute = $4;
-    $second = $5;
-    $year   = $6;
-  }
-
-  # Invalid format
+  # Invalid
   else { return $self }
 
   # Prevent crash
   my $epoch;
-  eval {
-    $epoch =
-      Time::Local::timegm($second, $minute, $hour, $day, $month, $year);
-  };
-  return $self if $@ || $epoch < 0;
-  $self->epoch($epoch);
+  $epoch = eval { Time::Local::timegm($s, $m, $h, $day, $month, $year) };
+  $self->epoch($epoch) if !$@ && $epoch >= 0;
 
   return $self;
 }
@@ -97,14 +61,10 @@ sub parse {
 sub to_string {
   my $self = shift;
 
-  # RFC 822/1123
-  my ($second, $minute, $hour, $mday, $month, $year, $wday) =
-    gmtime($self->epoch // time);
-  return sprintf(
-    "%s, %02d %s %04d %02d:%02d:%02d GMT",
-    $DAYS[$wday], $mday, $MONTHS[$month], $year + 1900,
-    $hour, $minute, $second
-  );
+  # RFC 2616 (Sun, 06 Nov 1994 08:49:37 GMT)
+  my ($s, $m, $h, $mday, $month, $year, $wday) = gmtime($self->epoch // time);
+  return sprintf "%s, %02d %s %04d %02d:%02d:%02d GMT", $DAYS[$wday], $mday,
+    $MONTHS[$month], $year + 1900, $h, $m, $s;
 }
 
 1;

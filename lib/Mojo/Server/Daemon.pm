@@ -2,9 +2,6 @@ package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
 use Carp 'croak';
-use File::Spec;
-use IO::File;
-use Mojo::Command;
 use Mojo::IOLoop;
 use POSIX;
 use Scalar::Util 'weaken';

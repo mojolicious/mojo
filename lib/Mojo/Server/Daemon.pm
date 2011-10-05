@@ -6,6 +6,7 @@ use File::Spec;
 use IO::File;
 use Mojo::Command;
 use Mojo::IOLoop;
+use POSIX;
 use Scalar::Util 'weaken';
 use Sys::Hostname;
 
@@ -214,9 +215,7 @@ sub _group {
   return unless my $group = $self->group;
   croak qq/Group "$group" does not exist/
     unless defined(my $gid = (getgrnam($group))[2]);
-  undef $!;
-  $( = $) = $gid;
-  croak qq/Can't switch to group "$group": $!/ if $!;
+  POSIX::setgid($gid) or croak qq/Can't switch to group "$group": $!/;
 }
 
 sub _listen {
@@ -319,9 +318,7 @@ sub _user {
   return unless my $user = $self->user;
   croak qq/User "$user" does not exist/
     unless defined(my $uid = (getpwnam($self->user))[2]);
-  undef $!;
-  $< = $> = $uid;
-  croak qq/Can't switch to user "$user": $!/ if $!;
+  POSIX::setuid($uid) or croak qq/Can't switch to user "$user": $!/;
 }
 
 sub _write {

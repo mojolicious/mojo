@@ -64,26 +64,20 @@ sub getline {
   my $self = shift;
 
   # Blocking read
-  my $offset = $self->{offset} //= 0;
+  my $res = $self->{tx}->res;
   while (1) {
-    my $chunk = $self->{tx}->res->get_body_chunk($offset);
+    my $chunk = $res->get_body_chunk($self->{offset} //= 0);
 
     # No content yet, try again
-    unless (defined $chunk) {
-      sleep 1;
-      next;
-    }
+    sleep 1 and next unless defined $chunk;
 
     # End of content
-    last unless length $chunk;
+    return unless length $chunk;
 
     # Content
-    $offset += length $chunk;
-    $self->{offset} = $offset;
+    $self->{offset} += length $chunk;
     return $chunk;
   }
-
-  return;
 }
 
 1;

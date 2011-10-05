@@ -41,10 +41,7 @@ sub run {
       my $chunk = $res->get_start_line_chunk($offset);
 
       # No start line yet, try again
-      unless (defined $chunk) {
-        sleep 1;
-        next;
-      }
+      sleep 1 and next unless defined $chunk;
 
       # End of start line
       last unless length $chunk;
@@ -66,10 +63,7 @@ sub run {
     my $chunk = $res->get_header_chunk($offset);
 
     # No headers yet, try again
-    unless (defined $chunk) {
-      sleep 1;
-      next;
-    }
+    sleep 1 and next unless defined $chunk;
 
     # End of headers
     last unless length $chunk;
@@ -86,10 +80,7 @@ sub run {
     my $chunk = $res->get_body_chunk($offset);
 
     # No content yet, try again
-    unless (defined $chunk) {
-      sleep 1;
-      next;
-    }
+    sleep 1 and next unless defined $chunk;
 
     # End of content
     last unless length $chunk;

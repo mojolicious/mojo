@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 18;
+use Test::More tests => 21;
 
 use Mojo::JSON;
 
@@ -40,13 +40,11 @@ is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
+is $ENV{MOJO_HELLO}, undef, 'on_finish not yet called';
+$res->[2]->close;
+is delete $ENV{MOJO_HELLO}, 'world', 'on_finish called';
 $params = Mojo::JSON->new->decode($params);
-is_deeply $params,
-  {
-  bar    => 'baz',
-  hello  => 'world',
-  lalala => 23
-  },
+is_deeply $params, {bar => 'baz', hello => 'world', lalala => 23},
   'right structure';
 
 # Command
@@ -79,15 +77,12 @@ is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
+is $ENV{MOJO_HELLO}, undef, 'on_finish not yet called';
+$res->[2]->close;
+is delete $ENV{MOJO_HELLO}, 'world', 'on_finish called';
 $params = Mojo::JSON->new->decode($params);
-is_deeply $params,
-  {
-  bar    => 'baz',
-  world  => 'hello',
-  lalala => 23
-  },
+is_deeply $params, {bar => 'baz', world => 'hello', lalala => 23},
   'right structure';
-is $ENV{MOJO_HELLO}, 'world', 'on_finish callback';
 
 # Cookies
 $env = {

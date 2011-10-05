@@ -33,11 +33,9 @@ sub run {
   # Handle
   $self->on_request->($self, $tx);
 
-  # Fix headers
+  # Response headers
   my $res = $tx->res;
   $res->fix_headers;
-
-  # Response headers
   my $headers = $res->content->headers;
   my @headers;
   for my $name (@{$headers->names}) {
@@ -46,24 +44,21 @@ sub run {
     }
   }
 
-  # Response body
-  my $body = Mojo::Server::PSGI::_Handle->new(res => $res);
-
-  # Finish transaction
-  $tx->on_finish->($tx);
-
   # PSGI response
-  my $code = $res->code || 404;
-  return [$code, \@headers, $body];
+  return [$res->code || 404,
+    \@headers, Mojo::Server::PSGI::_IO->new(tx => $tx)];
 }
 
 # "Wow! Homer must have got one of those robot cars!
 #  *Car crashes in background*
 #  Yeah, one of those AMERICAN robot cars."
-package Mojo::Server::PSGI::_Handle;
+package Mojo::Server::PSGI::_IO;
 use Mojo::Base -base;
 
-sub close { }
+sub close {
+  my $tx = shift->{tx};
+  $tx->on_finish->($tx);
+}
 
 sub getline {
   my $self = shift;
@@ -71,7 +66,7 @@ sub getline {
   # Blocking read
   my $offset = $self->{offset} //= 0;
   while (1) {
-    my $chunk = $self->{res}->get_body_chunk($offset);
+    my $chunk = $self->{tx}->res->get_body_chunk($offset);
 
     # No content yet, try again
     unless (defined $chunk) {

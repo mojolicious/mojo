@@ -147,14 +147,14 @@ my $ua = $t->ua;
 
 # POST /uploadlimit (huge upload without appropriate max message size)
 my $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 2048;
+$ENV{MOJO_MAX_MESSAGE_SIZE} = 655360;
 my $tx   = Mojo::Transaction::HTTP->new;
 my $part = Mojo::Content::Single->new;
 my $name = b('Вячеслав')->url_escape;
 $part->headers->content_disposition(
   qq/form-data; name="$name"; filename="$name.jpg"/);
 $part->headers->content_type('image/jpeg');
-$part->asset->add_chunk('1234' x 1024);
+$part->asset->add_chunk('1234' x 1310720);
 my $content = Mojo::Content::MultiPart->new;
 $content->headers($tx->req->headers);
 $content->headers->content_type('multipart/form-data');
@@ -176,7 +176,7 @@ $name                       = b('Вячеслав')->encode->url_escape;
 $part->headers->content_disposition(
   qq/form-data; name="$name"; filename="$name.jpg"/);
 $part->headers->content_type('image/jpeg');
-$part->asset->add_chunk('1234' x 1024);
+$part->asset->add_chunk('1234' x 1310720);
 $content = Mojo::Content::MultiPart->new;
 $content->headers($tx->req->headers);
 $content->headers->content_type('multipart/form-data');
@@ -188,5 +188,5 @@ $ua->start($tx);
 ok $tx->is_done, 'transaction is done';
 is $tx->res->code, 200, 'right status';
 is b($tx->res->body)->decode('UTF-8')->to_string,
-  'called, Вячеслав.jpg4096', 'right content';
+  'called, Вячеслав.jpg5242880', 'right content';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;

@@ -1,13 +1,14 @@
 package Mojolicious::Routes;
 use Mojo::Base -base;
 
+use Carp 'croak';
 use Mojo::Cache;
 use Mojo::Exception;
 use Mojo::Loader;
 use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
 use Mojolicious::Routes::Pattern;
-use Scalar::Util 'weaken';
+use Scalar::Util qw/blessed weaken/;
 
 has [qw/block inline parent partial namespace/];
 has cache => sub { Mojo::Cache->new };
@@ -24,9 +25,11 @@ sub AUTOLOAD {
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+  croak qq/Undefined subroutine &${package}::$method called/
+    unless blessed $self && $self->isa(__PACKAGE__);
 
   # Call shortcut
-  Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
+  croak qq/Can't locate object method "$method" via package "$package"/
     unless my $shortcut = $self->shortcuts->{$method};
   return $self->$shortcut(@_);
 }

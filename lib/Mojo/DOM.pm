@@ -10,12 +10,15 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
+use Scalar::Util 'blessed';
 
 sub AUTOLOAD {
   my $self = shift;
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+  croak qq/Undefined subroutine &${package}::$method called/
+    unless blessed $self && $self->isa(__PACKAGE__);
 
   # Search children
   my $children = $self->children($method);

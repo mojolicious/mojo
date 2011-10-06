@@ -10,7 +10,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Scalar::Util 'blessed';
+use Scalar::Util qw/blessed weaken/;
 
 sub AUTOLOAD {
   my $self = shift;
@@ -372,7 +372,10 @@ sub _parent {
   my ($children, $parent) = @_;
   my @new;
   for my $e (@$children[1 .. $#$children]) {
-    $e->[3] = $parent if $e->[0] eq 'tag';
+    if ($e->[0] eq 'tag') {
+      $e->[3] = $parent;
+      weaken $e->[3];
+    }
     push @new, $e;
   }
   return \@new;

@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved tests.
         - Fixed many portability issues.
         - Fixed on_finish callback to work consistently with all servers.
+        - Fixed small memory leak in Mojo::DOM.
         - Fixed small formatting bug in Mojo::Headers.
         - Fixed small proxy message generation bug.
         - Fixed small detection bug in Mojolicious::Types.

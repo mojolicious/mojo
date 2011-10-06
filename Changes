@@ -6,7 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved message parser performance slightly.
         - Improved Mojo::IOLoop to die if started twice.
         - Improved setuidgid in Mojo::Server::Daemon.
-        - Improved Mojo::IOWatcher backend detection slightly.
+        - Improved Mojo::IOWatcher backend detection.
         - Improved documentation.
         - Improved tests.
         - Fixed many portability issues.

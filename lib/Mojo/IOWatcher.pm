@@ -2,6 +2,7 @@ package Mojo::IOWatcher;
 use Mojo::Base -base;
 
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
+use Mojo::Loader;
 use Mojo::Util 'md5_sum';
 use Time::HiRes qw/time usleep/;
 
@@ -33,7 +34,7 @@ sub cancel {
 
 sub detect {
   my $try = $ENV{MOJO_IOWATCHER} || 'Mojo::IOWatcher::EV';
-  return $try if $try->can('new') || eval "use $try; 1";
+  return $try unless Mojo::Loader->load($try);
   return 'Mojo::IOWatcher';
 }
 

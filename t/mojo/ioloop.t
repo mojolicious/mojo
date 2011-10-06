@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -22,8 +22,11 @@ use Mojo::Base 'Mojo::IOWatcher';
 package main;
 
 # Watcher detection
-$ENV{MOJO_IOWATCHER} = 'MyWatcher';
+$ENV{MOJO_IOWATCHER} = 'MyWatcherDoesNotExist';
 my $loop = Mojo::IOLoop->new;
+is ref $loop->iowatcher, 'Mojo::IOWatcher', 'right class';
+$ENV{MOJO_IOWATCHER} = 'MyWatcher';
+$loop = Mojo::IOLoop->new;
 is ref $loop->iowatcher, 'MyWatcher', 'right class';
 
 # Double start

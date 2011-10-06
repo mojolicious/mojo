@@ -10,6 +10,7 @@ use Mojo::URL;
 use Mojo::Util;
 
 require Carp;
+require Scalar::Util;
 
 # "Scalpel... blood bucket... priest."
 has [qw/app match/];
@@ -40,6 +41,8 @@ sub AUTOLOAD {
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+  Carp::croak(qq/Undefined subroutine &${package}::$method called/)
+    unless Scalar::Util::blessed($self) && $self->isa(__PACKAGE__);
 
   # Call helper
   Carp::croak(qq/Can't locate object method "$method" via package "$package"/)

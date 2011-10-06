@@ -10,7 +10,7 @@ use Mojolicious::Routes;
 use Mojolicious::Sessions;
 use Mojolicious::Static;
 use Mojolicious::Types;
-use Scalar::Util 'weaken';
+use Scalar::Util qw/blessed weaken/;
 
 # "Robots don't have any emotions, and sometimes that makes me very sad."
 has controller_class => 'Mojolicious::Controller';
@@ -44,6 +44,8 @@ sub AUTOLOAD {
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+  croak qq/Undefined subroutine &${package}::$method called/
+    unless blessed $self && $self->isa(__PACKAGE__);
 
   # Check for helper
   croak qq/Can't locate object method "$method" via package "$package"/

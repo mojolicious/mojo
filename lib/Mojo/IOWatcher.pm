@@ -33,7 +33,7 @@ sub cancel {
 
 sub detect {
   my $try = $ENV{MOJO_IOWATCHER} || 'Mojo::IOWatcher::EV';
-  return $try if eval "use $try; 1";
+  return $try if $try->can('new') || eval "use $try; 1";
   return 'Mojo::IOWatcher';
 }
 

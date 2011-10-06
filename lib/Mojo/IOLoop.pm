@@ -36,17 +36,6 @@ has timeout      => '0.025';
 # Ignore PIPE signal
 $SIG{PIPE} = 'IGNORE';
 
-sub new {
-  my $class = shift;
-
-  # Build new loop from singleton and inherit watcher
-  my $loop = $class->singleton;
-  my $self = $loop->SUPER::new(@_);
-  $self->iowatcher($loop->iowatcher->new);
-
-  return $self;
-}
-
 sub connect {
   my $self = shift;
   $self = $self->singleton unless ref $self;
@@ -513,11 +502,7 @@ dropped, defaults to C<3>.
 
 Low level event watcher, usually a L<Mojo::IOWatcher> or
 L<Mojo::IOWatcher::EV> object.
-Replacing the event watcher of the singleton loop makes all new loops use the
-same type of event watcher.
 Note that this attribute is EXPERIMENTAL and might change without warning!
-
-  Mojo::IOLoop->singleton->iowatcher(MyWatcher->new);
 
 =head2 C<max_accepts>
 
@@ -605,14 +590,6 @@ Note that a value of C<0> would make the loop non-blocking.
 
 L<Mojo::IOLoop> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
-
-=head2 C<new>
-
-  my $loop = Mojo::IOLoop->new;
-
-Construct a new L<Mojo::IOLoop> object.
-Multiple of these will block each other, so use C<singleton> instead if
-possible.
 
 =head2 C<connect>
 

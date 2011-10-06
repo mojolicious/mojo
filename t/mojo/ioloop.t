@@ -20,11 +20,10 @@ package MyWatcher;
 use Mojo::Base 'Mojo::IOWatcher';
 
 package main;
-Mojo::IOLoop->singleton->iowatcher(MyWatcher->new);
 
-# Watcher inheritance
+# Watcher detection
+$ENV{MOJO_IOWATCHER} = 'MyWatcher';
 my $loop = Mojo::IOLoop->new;
-Mojo::IOLoop->iowatcher(MyWatcher->new);
 is ref $loop->iowatcher, 'MyWatcher', 'right class';
 
 # Double start

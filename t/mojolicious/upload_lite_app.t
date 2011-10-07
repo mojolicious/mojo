@@ -22,26 +22,21 @@ use Test::Mojo;
 my $cache = {};
 app->hook(
   after_build_tx => sub {
-    my $tx = shift;
-    $tx->req->on_progress(
+    shift->req->on_progress(
       sub {
         my $req = shift;
 
-        # Upload id parameter
+        # Check for id
         return unless my $id = $req->url->query->param('upload_id');
 
-        # Expected content length
+        # Check for content length
         return
           unless my $len = $req->headers->content_length;
 
-        # Current progress
+        # Update cache with current progress
         my $progress = $req->content->progress;
-
-        # Update cache
-        my $c = $cache->{$id} ||= [0];
-        push @$c, $progress == $len
-          ? 100
-          : int($progress / ($len / 100));
+        push @{$cache->{$id} ||= [0]},
+          $progress == $len ? 100 : int($progress / ($len / 100));
       }
     );
   }

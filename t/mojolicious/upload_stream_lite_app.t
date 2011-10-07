@@ -19,8 +19,7 @@ use Test::Mojo;
 my $cache = {};
 app->hook(
   after_build_tx => sub {
-    my $tx = shift;
-    $tx->req->on_progress(
+    shift->req->on_progress(
       sub {
         my $req = shift;
 

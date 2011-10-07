@@ -29,7 +29,7 @@ app->hook(
         $req->on_progress(sub { });
 
         # Trigger early request for streaming uploads
-        $tx->on_request->($tx) if $req->url->path =~ /^\/upload/;
+        $tx->on_request->($tx) if $req->url->path->parts ~~ ['upload'];
       }
     );
   }
@@ -42,7 +42,7 @@ post '/upload' => sub {
 
   # First invocation, prepare streaming upload
   $self->req->body(sub { $uploads->{shift->url->query->param('id')} .= pop });
-  return unless $self->tx->req->is_done;
+  return unless $self->req->is_done;
 
   # Second invocation, render response
   $self->render(data => $uploads->{$self->param('id')});

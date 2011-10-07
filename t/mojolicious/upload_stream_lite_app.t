@@ -10,45 +10,65 @@ BEGIN {
 # "On the count of three, you will awaken feeling refreshed,
 #  as if Futurama had never been canceled by idiots,
 #  then brought back by bigger idiots. One. Two."
-use Test::More tests => 6;
+use Test::More tests => 15;
 
 use Mojolicious::Lite;
+use Scalar::Util 'weaken';
 use Test::Mojo;
 
-# Stream uploads into cache
-my $cache = {};
 app->hook(
   after_build_tx => sub {
-    shift->req->on_progress(
+    my $tx = shift;
+    weaken $tx;
+    $tx->req->on_progress(
       sub {
         my $req = shift;
 
         # Check if we've reached the body yet
         return unless $req->content->is_parsing_body;
+        $req->on_progress(sub { });
 
-        # Check if we are already streaming
-        return unless my $id = $req->url->query->param('id');
-        return if exists $cache->{$id};
-
-        # Use body callback for streaming
-        $req->body(sub { $cache->{$id} .= pop });
+        # Trigger early request for streaming uploads
+        $tx->on_request->($tx) if $req->url->path =~ /^\/upload/;
       }
     );
   }
 );
 
-# POST /upload_stream
-post '/upload_stream' => sub {
+# POST /upload
+my $uploads = {};
+post '/upload' => sub {
   my $self = shift;
-  $self->render(data => $cache->{$self->param('id')});
+
+  # First invocation, prepare streaming upload
+  $self->req->body(sub { $uploads->{shift->url->query->param('id')} .= pop });
+  return unless $self->tx->req->is_done;
+
+  # Second invocation, render response
+  $self->render(data => $uploads->{$self->param('id')});
+};
+
+# GET /download
+get '/download' => sub {
+  my $self = shift;
+  $self->render(data => $uploads->{$self->param('id')});
 };
 
 my $t = Test::Mojo->new;
 
-# POST /upload_stream
-$t->post_ok('/upload_stream?id=23' => 'whatever')->status_is(200)
+# POST /upload (small upload)
+$t->post_ok('/upload?id=23' => 'whatever')->status_is(200)
   ->content_is('whatever');
 
-# POST /upload_stream (big content)
-$t->post_ok('/upload_stream?id=24' => '1234' x 131072)->status_is(200)
+# GET /download (small download)
+$t->get_ok('/download?id=23')->status_is(200)->content_is('whatever');
+
+# POST /upload (big upload)
+$t->post_ok('/upload?id=24' => '1234' x 131072)->status_is(200)
   ->content_is('1234' x 131072);
+
+# GET /download (big download)
+$t->get_ok('/download?id=24')->status_is(200)->content_is('1234' x 131072);
+
+# GET /download (small download again)
+$t->get_ok('/download?id=23')->status_is(200)->content_is('whatever');

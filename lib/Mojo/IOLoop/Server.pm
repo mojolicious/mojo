@@ -189,7 +189,7 @@ sub _accept {
   return $self->emit(accept => $handle) unless my $tls = $self->{tls};
   weaken $self;
   $tls->{SSL_error_trap} = sub {
-    my $handle = delete $self->{handles}->{$handle};
+    my $handle = delete $self->{handles}->{shift()};
     $self->iowatcher->remove($handle);
     close $handle;
   };

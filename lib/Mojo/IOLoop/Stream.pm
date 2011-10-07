@@ -18,7 +18,9 @@ has iowatcher => sub {
 sub DESTROY {
   my $self = shift;
   $self->pause if $self->{iowatcher};
-  $self->emit('close') if $self->{handle};
+  return unless my $handle = $self->{handle};
+  close $handle;
+  $self->emit('close');
 }
 
 sub new {

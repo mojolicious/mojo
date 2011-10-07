@@ -8,7 +8,7 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 has [qw/auto_relax relaxed/] => 0;
 has headers => sub { Mojo::Headers->new };
-has 'on_read';
+has [qw/on_body on_read/];
 
 sub body_contains {
   croak 'Method "body_contains" not implemented by subclass';
@@ -408,6 +408,7 @@ sub _parse_headers {
     $self->{header_size} = $self->{raw_size} - length $leftovers;
     $self->{pre_buffer}  = $leftovers;
     $self->{state}       = 'body';
+    if (my $cb = $self->on_body) { $self->$cb }
   }
 }
 
@@ -444,6 +445,15 @@ Try to detect broken web servers and turn on relaxed parsing automatically.
   $content    = $content->headers(Mojo::Headers->new);
 
 Content headers, defaults to a L<Mojo::Headers> object.
+
+=head2 C<on_body>
+
+  my $cb   = $content->on_body;
+  $content = $content->on_body(sub {...});
+
+Callback to be invoked once all headers have been parsed and the content
+starts.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<on_read>
 

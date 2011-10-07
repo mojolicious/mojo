@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.0     2011-10-06 00:00:00
         - Code name "Leaf Fluttering In Wind", this is a major release.
         - Increased Perl version requirement to 5.10.1.
+        - Added EXPERIMENTAL on_body attribute to Mojo::Content.
         - Improved message parser performance slightly.
         - Improved Mojo::IOLoop to die if started twice.
         - Improved setuidgid in Mojo::Server::Daemon.
@@ -12,6 +13,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed many portability issues.
         - Fixed on_finish callback to work consistently with all servers.
         - Fixed small memory leak in Mojo::DOM.
+        - Foxed small memory leak in Mojo::Message.
         - Fixed small formatting bug in Mojo::Headers.
         - Fixed small proxy message generation bug.
         - Fixed small detection bug in Mojolicious::Types.

@@ -30,9 +30,6 @@ app->hook(
         # Upload id parameter
         return unless my $id = $req->url->query->param('upload_id');
 
-        # Cache
-        my $c = $cache->{$id} ||= [0];
-
         # Expected content length
         return
           unless my $len = $req->headers->content_length;
@@ -41,6 +38,7 @@ app->hook(
         my $progress = $req->content->progress;
 
         # Update cache
+        my $c = $cache->{$id} ||= [0];
         push @$c, $progress == $len
           ? 100
           : int($progress / ($len / 100));
@@ -49,7 +47,7 @@ app->hook(
   }
 );
 
-# GET /upload
+# POST /upload
 post '/upload' => sub {
   my $self = shift;
   my $file = $self->req->upload('file');

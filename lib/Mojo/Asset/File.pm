@@ -113,7 +113,7 @@ sub get_chunk {
   my $buffer;
 
   # Chunk size
-  my $size = $ENV{MOJO_CHUNK_SIZE} || 262144;
+  my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
 
   # Range support
   if (defined $end) {

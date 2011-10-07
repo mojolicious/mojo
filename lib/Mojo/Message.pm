@@ -9,6 +9,7 @@ use Mojo::JSON;
 use Mojo::Parameters;
 use Mojo::Upload;
 use Mojo::Util qw/decode url_unescape/;
+use Scalar::Util 'weaken';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
@@ -48,7 +49,7 @@ sub body {
 
   # Get
   my $content = $self->content;
-  return $content->on_read ? $content->on_read : $self->content->asset->slurp
+  return $content->on_read ? $content->on_read : $content->asset->slurp
     unless @_;
 
   # New content
@@ -59,6 +60,7 @@ sub body {
 
   # Callback
   if (ref $new eq 'CODE') {
+    weaken $self;
     $content->on_read(sub { shift and $self->$new(@_) });
   }
 
@@ -435,6 +437,12 @@ sub _parse {
     my $buffer = $self->{buffer};
     $self->{buffer} = '';
 
+    # Progress
+    if (my $cb = $self->on_progress) {
+      weaken $self;
+      $content->on_body(sub { $self->$cb });
+    }
+
     # Until body
     if ($until_body) {
       $self->content($content->parse_until_body($buffer));
@@ -596,21 +604,26 @@ Maximum message size in bytes, defaults to C<5242880>.
 =head2 C<on_finish>
 
   my $cb   = $message->on_finish;
-  $message = $message->on_finish(sub {
-    my $self = shift;
-  });
+  $message = $message->on_finish(sub {...});
 
 Callback to be invoked after message building or parsing is finished.
+
+  $message->on_finish(sub {
+    my $self = shift;
+    say 'Finihsed!';
+  });
 
 =head2 C<on_progress>
 
   my $cb   = $message->on_progress;
-  $message = $message->on_progress(sub {
-    my $self = shift;
-    print '+';
-  });
+  $message = $message->on_progress(sub {...});
 
 Callback to be invoked on progress.
+
+  $message->on_progress(sub {
+    my $self = shift;
+    say 'Progress!';
+  });
 
 =head1 METHODS
 

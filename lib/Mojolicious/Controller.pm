@@ -405,9 +405,6 @@ sub render_static {
 
 sub render_text { shift->render(text => shift, @_) }
 
-# "On the count of three, you will awaken feeling refreshed,
-#  as if Futurama had never been canceled by idiots,
-#  then brought back by bigger idiots. One. Two."
 sub rendered {
   my ($self, $status) = @_;
 

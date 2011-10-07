@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1213;
+use Test::More tests => 1219;
 
 use File::Spec;
 use File::Temp;
@@ -403,18 +403,31 @@ is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->content->asset->size, 13, 'right size';
 is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
-# Parse HTTP 1.1 chunked request with callback
+# Parse HTTP 1.1 chunked request with callbacks
 $req = Mojo::Message::Request->new;
-my $buffer = '';
-$req->body(sub { $buffer .= pop });
+my $progress = my $buffer = my $finish = '';
+$req->on_progress(
+  sub {
+    my $self = shift;
+    $progress ||= $self->url->path if $self->content->is_parsing_body;
+  }
+);
+$req->body(sub      { $buffer .= shift->url->query->param('foo') . shift });
+$req->on_finish(sub { $finish .= shift->url->fragment });
 $req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+is $progress, '', 'no progress';
 $req->parse("Content-Type: text/plain\x0d\x0a");
+is $progress, '', 'no progress';
 $req->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
+is $progress, '/foo/bar/baz.html', 'made progress';
 $req->parse("4\x0d\x0a");
 $req->parse("abcd\x0d\x0a");
 $req->parse("9\x0d\x0a");
 $req->parse("abcdefghi\x0d\x0a");
+is $finish, '', 'not finished yet';
 $req->parse("0\x0d\x0a\x0d\x0a");
+is $finish, '23', 'finished';
+is $progress, '/foo/bar/baz.html', 'made progress';
 ok $req->is_done, 'request is done';
 is $req->method,  'POST', 'right method';
 is $req->version, '1.1', 'right version';
@@ -423,7 +436,7 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_length, 13, 'right "Content-Length" value';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $buffer, 'abcdabcdefghi', 'right content';
+is $buffer, '131313abcd1313abcdefghi13', 'right content';
 
 # Parse HTTP 1.1 "x-application-urlencoded"
 $req = Mojo::Message::Request->new;
@@ -1184,8 +1197,8 @@ $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1:8080/foo/bar');
 $req->headers->transfer_encoding('chunked');
-my $counter2 = 0;
-$req->on_progress(sub { $counter2++ });
+my $counter = 0;
+$req->on_progress(sub { $counter++ });
 $req->write_chunk(
   'hello world!' => sub {
     shift->write_chunk(
@@ -1208,7 +1221,7 @@ is $req->url->to_abs, 'http://127.0.0.1:8080/foo/bar', 'right absolute URL';
 is $req->headers->host, '127.0.0.1:8080', 'right "Host" value';
 is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $req->body, "hello world!hello world2!\n\n", 'right content';
-ok $counter2, 'right counter';
+ok $counter, 'right counter';
 
 # Build HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
@@ -2228,8 +2241,8 @@ is $req2->cookie('bar')->value, 'baz',      'right value';
 is $req2->body, "Hello World!\n", 'right content';
 
 # Parse full HTTP 1.0 request with cookies and progress callback
-$req = Mojo::Message::Request->new;
-my $counter = 0;
+$req     = Mojo::Message::Request->new;
+$counter = 0;
 $req->on_progress(sub { $counter++ });
 is $counter, 0, 'right count';
 is $req->content->is_parsing_body, undef, 'is not parsing body';
@@ -2259,11 +2272,11 @@ is $counter, 6, 'right count';
 is $req->content->is_parsing_body, undef, 'is not parsing body';
 is $req->is_done, undef, 'request is not done';
 $req->parse("Content-Length: 27\x0d\x0a\x0d\x0aHell");
-is $counter, 7, 'right count';
+is $counter, 8, 'right count';
 is $req->content->is_parsing_body, 1, 'is parsing body';
 is $req->is_done, undef, 'request is not done';
 $req->parse("o World!\n1234\nlalalala\n");
-is $counter, 8, 'right count';
+is $counter, 9, 'right count';
 is $req->content->is_parsing_body, undef, 'is not parsing body';
 is $req->is_done, 1,     'request is done';
 ok $req->is_done, 'request is done';

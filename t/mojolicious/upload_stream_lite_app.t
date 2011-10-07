@@ -26,9 +26,8 @@ app->hook(
 
         # Check if we've reached the body yet
         return unless $req->content->is_parsing_body;
-        $req->on_progress(sub { });
 
-        # Trigger early request for streaming uploads
+        # Trigger early request for everything under "/upload"
         $tx->on_request->($tx) if $req->url->path->parts ~~ ['upload'];
       }
     );
@@ -36,22 +35,23 @@ app->hook(
 );
 
 # POST /upload
-my $uploads = {};
+my $cache = {};
 post '/upload' => sub {
   my $self = shift;
 
   # First invocation, prepare streaming upload
-  $self->req->body(sub { $uploads->{shift->url->query->param('id')} .= pop });
-  return unless $self->req->is_done;
+  my $id = $self->param('id');
+  $self->req->body(sub { $cache->{$id} .= pop });
+  return unless $self->req->on_progress(undef)->is_done;
 
   # Second invocation, render response
-  $self->render(data => $uploads->{$self->param('id')});
+  $self->render(data => $cache->{$id});
 };
 
 # GET /download
 get '/download' => sub {
   my $self = shift;
-  $self->render(data => $uploads->{$self->param('id')});
+  $self->render(data => $cache->{$self->param('id')});
 };
 
 my $t = Test::Mojo->new;

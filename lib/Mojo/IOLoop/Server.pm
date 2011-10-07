@@ -16,7 +16,7 @@ use constant IPV6 => $ENV{MOJO_NO_IPV6}
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.43 "inet4"; 1';
+  : eval 'use IO::Socket::SSL 1.37 "inet4"; 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -128,7 +128,7 @@ sub listen {
 
   # TLS
   return unless $args->{tls};
-  croak "IO::Socket::SSL 1.43 required for TLS support" unless TLS;
+  croak "IO::Socket::SSL 1.37 required for TLS support" unless TLS;
 
   # Options
   my %options = (

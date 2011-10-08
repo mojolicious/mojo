@@ -111,9 +111,7 @@ sub _connect {
       SSL_cert_file   => $args->{tls_cert},
       SSL_key_file    => $args->{tls_key},
       SSL_verify_mode => 0x00,
-      SSL_create_ctx_callback =>
-        sub { Net::SSLeay::CTX_sess_set_cache_size(shift, 128) },
-      Timeout => $timeout,
+      Timeout         => $timeout,
       %{$args->{tls_args} || {}}
     );
     $self->{tls} = 1;

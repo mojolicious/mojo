@@ -695,8 +695,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_running>
 
-  my $running = Mojo::IOLoop->is_running;
-  my $running = $loop->is_running;
+  my $success = Mojo::IOLoop->is_running;
+  my $success = $loop->is_running;
 
 Check if loop is running.
 

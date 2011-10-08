@@ -223,19 +223,19 @@ Parser errors and codes.
 
 =head2 C<is_done>
 
-  my $done = $tx->is_done;
+  my $success = $tx->is_done;
 
 Check if transaction is done.
 
 =head2 C<is_websocket>
 
-  my $is_websocket = $tx->is_websocket;
+  my $success = $tx->is_websocket;
 
 Check if transaction is a WebSocket.
 
 =head2 C<is_writing>
 
-  my $writing = $tx->is_writing;
+  my $success = $tx->is_writing;
 
 Check if transaction is writing.
 

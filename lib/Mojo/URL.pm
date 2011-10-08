@@ -425,7 +425,7 @@ Host part of this URL in punycode format.
 
 =head2 C<is_abs>
 
-  my $is_abs = $url->is_abs;
+  my $success = $url->is_abs;
 
 Check if URL is absolute.
 

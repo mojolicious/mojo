@@ -725,7 +725,7 @@ Get a chunk of start line data starting from a specific position.
 
 =head2 C<has_leftovers>
 
-  my $leftovers = $message->has_leftovers;
+  my $success = $message->has_leftovers;
 
 Check if message parser has leftover data.
 
@@ -744,33 +744,33 @@ Message headers, defaults to a L<Mojo::Headers> object.
 
 =head2 C<is_chunked>
 
-  my $chunked = $message->is_chunked;
+  my $success = $message->is_chunked;
 
 Check if message content is chunked.
 
 =head2 C<is_done>
 
-  my $done = $message->is_done;
+  my $success = $message->is_done;
 
 Check if parser is done.
 
 =head2 C<is_dynamic>
 
-  my $dynamic = $message->is_dynamic;
+  my $success = $message->is_dynamic;
 
 Check if message content will be dynamic.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_limit_exceeded>
 
-  my $limit = $message->is_limit_exceeded;
+  my $success = $message->is_limit_exceeded;
 
 Check if message has exceeded C<max_line_size> or C<max_message_size>.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_multipart>
 
-  my $multipart = $message->is_multipart;
+  my $success = $message->is_multipart;
 
 Check if message content is multipart.
 

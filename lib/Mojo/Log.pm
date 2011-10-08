@@ -174,37 +174,37 @@ Log info message.
 
 =head2 C<is_level>
 
-  my $is = $log->is_level('debug');
+  my $success = $log->is_level('debug');
 
 Check log level.
 
 =head2 C<is_debug>
 
-  my $is = $log->is_debug;
+  my $success = $log->is_debug;
 
 Check for debug log level.
 
 =head2 C<is_error>
 
-  my $is = $log->is_error;
+  my $success = $log->is_error;
 
 Check for error log level.
 
 =head2 C<is_fatal>
 
-  my $is = $log->is_fatal;
+  my $success = $log->is_fatal;
 
 Check for fatal log level.
 
 =head2 C<is_info>
 
-  my $is = $log->is_info;
+  my $success = $log->is_info;
 
 Check for info log level.
 
 =head2 C<is_warn>
 
-  my $is = $log->is_warn;
+  my $success = $log->is_warn;
 
 Check for warn log level.
 

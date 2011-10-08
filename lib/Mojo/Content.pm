@@ -530,7 +530,7 @@ Get a chunk of the headers starting from a specfic position.
 
 =head2 C<has_leftovers>
 
-  my $leftovers = $content->has_leftovers;
+  my $success = $content->has_leftovers;
 
 Check if there are leftovers.
 
@@ -542,32 +542,32 @@ Size of headers in bytes.
 
 =head2 C<is_chunked>
 
-  my $chunked = $content->is_chunked;
+  my $success = $content->is_chunked;
 
 Check if content is chunked.
 
 =head2 C<is_done>
 
-  my $done = $content->is_done;
+  my $success = $content->is_done;
 
 Check if parser is done.
 
 =head2 C<is_dynamic>
 
-  my $dynamic = $content->is_dynamic;
+  my $success = $content->is_dynamic;
 
 Check if content will be dynamic.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_multipart>
 
-  my $multipart = $content->is_multipart;
+  my $success = $content->is_multipart;
 
 Check if content is multipart.
 
 =head2 C<is_parsing_body>
 
-  my $body = $content->is_parsing_body;
+  my $success = $content->is_parsing_body;
 
 Check if body parsing started yet.
 

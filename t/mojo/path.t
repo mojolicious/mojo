@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 117;
+use Test::More tests => 120;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -150,3 +150,7 @@ is $path->match('/foo♥'),  undef, 'no match';
 $path = Mojo::Path->new('/');
 is $path->match('/'),    1,     'match';
 is $path->match('/foo'), undef, 'no match';
+$path = Mojo::Path->new('/0');
+is $path->match('/'),    1,     'match';
+is $path->match('/0'),   1,     'match';
+is $path->match('/0/0'), undef, 'no match';

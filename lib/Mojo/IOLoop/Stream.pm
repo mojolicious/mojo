@@ -219,7 +219,7 @@ Get handle for stream.
 
 =head2 C<is_finished>
 
-  my $finished = $stream->is_finished;
+  my $success = $stream->is_finished;
 
 Check if stream is in a state where it is safe to close or steal the handle.
 

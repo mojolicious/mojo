@@ -234,7 +234,7 @@ Make sure message has all required headers for the current HTTP version.
 
 =head2 C<is_status_class>
 
-  my $is_2xx = $res->is_status_class(200);
+  my $success = $res->is_status_class(200);
 
 Check response status class.
 

@@ -829,21 +829,21 @@ See also the L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<has_conditions>
 
-  my $has_conditions = $r->has_conditions;
+  my $success = $r->has_conditions;
 
 Returns true if this route contains conditions.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<has_custom_name>
 
-  my $has_custom_name = $r->has_custom_name;
+  my $success = $r->has_custom_name;
 
 Returns true if this route has a custom user defined name.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<has_websocket>
 
-  my $has_websocket = $r->has_websocket;
+  my $success = $r->has_websocket;
 
 Returns true if this route has a WebSocket ancestor.
 Note that this method is EXPERIMENTAL and might change without warning!
@@ -856,13 +856,13 @@ Hide controller method or attribute from routes.
 
 =head2 C<is_endpoint>
 
-  my $is_endpoint = $r->is_endpoint;
+  my $success = $r->is_endpoint;
 
 Returns true if this route qualifies as an endpoint.
 
 =head2 C<is_websocket>
 
-  my $is_websocket = $r->is_websocket;
+  my $success = $r->is_websocket;
 
 Returns true if this route is a WebSocket.
 Note that this method is EXPERIMENTAL and might change without warning!

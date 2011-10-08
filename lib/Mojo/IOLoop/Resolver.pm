@@ -393,13 +393,13 @@ implements the following new ones.
 
 =head2 C<is_ipv4>
 
-  my $is_ipv4 = $resolver->is_ipv4('127.0.0.1');
+  my $success = $resolver->is_ipv4('127.0.0.1');
 
 Check if value is a valid C<IPv4> address.
 
 =head2 C<is_ipv6>
 
-  my $is_ipv6 = $resolver->is_ipv6('::1');
+  my $success = $resolver->is_ipv6('::1');
 
 Check if value is a valid C<IPv6> address.
 

@@ -449,13 +449,13 @@ Make sure message has all required headers for the current HTTP version.
 
 =head2 C<is_secure>
 
-  my $secure = $req->is_secure;
+  my $success = $req->is_secure;
 
 Check if connection is secure.
 
 =head2 C<is_xhr>
 
-  my $xhr = $req->is_xhr;
+  my $success = $req->is_xhr;
 
 Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 

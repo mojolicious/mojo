@@ -211,7 +211,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_readable>
 
-  my $readable = $watcher->is_readable($handle);
+  my $success = $watcher->is_readable($handle);
 
 Quick check if a handle is readable, useful for identifying tainted
 sockets.

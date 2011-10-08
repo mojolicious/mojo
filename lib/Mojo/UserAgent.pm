@@ -575,13 +575,17 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   $ua->max_redirects(5)->get('www.reddit.com/r/perl/')
     ->res->dom('p.title > a.title')->each(sub { say $_->text });
 
-  # Form post with exception handling
+  # Form POST with exception handling
   my $tx = $ua->post_form('search.cpan.org/search' => {q => 'mojo'});
   if (my $res = $tx->success) { say $res->body }
   else {
     my ($message, $code) = $tx->error;
     say "Error: $message";
   }
+
+  # PUT request with content
+  my $tx = $ua->put(
+    'mojolicio.us' => {'Content-Type' => 'text/plain'} => 'Hello World!');
 
   # Grab the latest Mojolicious release :)
   $ua->max_redirects(5)->get('latest.mojolicio.us')

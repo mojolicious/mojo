@@ -146,7 +146,7 @@ is $tx->req->headers->content_length, 9, 'right content length';
 is $tx->req->body, 'Hi there!', 'right content';
 is $tx->res->code, 200,         'right status';
 
-# Simple form post
+# Simple form POST
 $tx =
   $ua->post_form('http://search.cpan.org/search' => {query => 'mojolicious'});
 is $tx->req->method, 'POST', 'right method';
@@ -157,7 +157,7 @@ like $tx->res->body, qr/Mojolicious/,     'right content';
 is $tx->res->code,   200,                 'right status';
 is $tx->keep_alive, 1, 'connection will be kept alive';
 
-# Simple keep alive form post
+# Simple keep alive form POST
 $tx =
   $ua->post_form('http://search.cpan.org/search' => {query => 'mojolicious'});
 is $tx->req->method, 'POST', 'right method';

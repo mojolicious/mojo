@@ -70,6 +70,16 @@ sub clone {
   return $clone;
 }
 
+sub match {
+  my ($self, $path) = @_;
+  my $parts = $self->new($path)->parts;
+  for my $part (@{$self->parts}) {
+    return 1 unless defined(my $match = shift @$parts);
+    return unless $part eq $match;
+  }
+  return @$parts ? undef : 1;
+}
+
 sub parse {
   my ($self, $path) = @_;
   $path //= '';
@@ -186,6 +196,13 @@ Canonicalize path.
   my $clone = $path->clone;
 
 Clone path.
+
+=head2 C<match>
+
+  my $success = $path->match('/foo');
+
+Check if path matches given prefix.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<parse>
 

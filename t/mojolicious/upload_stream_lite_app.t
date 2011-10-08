@@ -28,7 +28,7 @@ app->hook(
         return unless $req->content->is_parsing_body;
 
         # Trigger early request for everything under "/upload"
-        $tx->on_request->($tx) if $req->url->path->parts ~~ ['upload'];
+        $tx->on_request->($tx) if $req->url->path->match('/upload');
       }
     );
   }
@@ -39,7 +39,7 @@ my $cache = {};
 post '/upload' => sub {
   my $self = shift;
 
-  # First invocation, prepare streaming upload
+  # First invocation, prepare streaming
   my $id = $self->param('id');
   $self->req->body(sub { $cache->{$id} .= pop });
   return unless $self->req->on_progress(undef)->is_done;

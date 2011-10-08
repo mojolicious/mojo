@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 105;
+use Test::More tests => 117;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -133,3 +133,20 @@ is $path->parts->[2], 'passwd', 'right part';
 is $path->parts->[3], undef,    'no part';
 is $path->leading_slash,  1,     'has leading slash';
 is $path->trailing_slash, undef, 'no trailing slash';
+
+# Match
+$path = Mojo::Path->new('/foo/bar');
+is $path->match('/'),            1,     'match';
+is $path->match('/foo'),         1,     'match';
+is $path->match('/foo/bar'),     1,     'match';
+is $path->match('/foobar'),      undef, 'no match';
+is $path->match('/foo/b'),       undef, 'no match';
+is $path->match('/foo/bar/baz'), undef, 'no match';
+$path = Mojo::Path->new('/♥/bar');
+is $path->match('/♥'),     1,     'match';
+is $path->match('/♥/bar'), 1,     'match';
+is $path->match('/♥foo'),  undef, 'no match';
+is $path->match('/foo♥'),  undef, 'no match';
+$path = Mojo::Path->new('/');
+is $path->match('/'),    1,     'match';
+is $path->match('/foo'), undef, 'no match';

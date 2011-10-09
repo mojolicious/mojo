@@ -28,7 +28,7 @@ app->hook(
         return unless $req->content->is_parsing_body;
 
         # Trigger early request for everything under "/upload"
-        $tx->on_request->($tx) if $req->url->path->match('/upload');
+        $tx->on_request->($tx) if $req->url->path->contains('/upload');
       }
     );
   }

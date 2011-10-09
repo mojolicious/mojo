@@ -70,13 +70,13 @@ sub clone {
   return $clone;
 }
 
-sub match {
+sub contains {
   my ($self, $path) = @_;
 
   my $parts = $self->new($path)->parts;
   for my $part (@{$self->parts}) {
-    return 1 unless defined(my $match = shift @$parts);
-    return unless $part eq $match;
+    return 1 unless defined(my $try = shift @$parts);
+    return unless $part eq $try;
   }
 
   return @$parts ? undef : 1;
@@ -199,11 +199,11 @@ Canonicalize path.
 
 Clone path.
 
-=head2 C<match>
+=head2 C<contains>
 
-  my $success = $path->match('/foo');
+  my $success = $path->contains('/foo');
 
-Check if path matches given prefix.
+Check if path contains given prefix.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<parse>

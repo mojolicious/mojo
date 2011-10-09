@@ -19,7 +19,7 @@ app->hook(
   before_dispatch => sub {
     my $self = shift;
     $self->render_text($self->param('a'), status => 205)
-      if $self->req->url->path->match('/custom');
+      if $self->req->url->path->contains('/custom');
   }
 );
 
@@ -28,7 +28,7 @@ app->hook(
   after_static_dispatch => sub {
     my $self = shift;
     $self->render_text('this works too')
-      if $self->req->url->path->match('/custom_too');
+      if $self->req->url->path->contains('/custom_too');
   }
 );
 

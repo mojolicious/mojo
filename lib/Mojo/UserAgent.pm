@@ -332,7 +332,6 @@ sub _handle {
   my $c   = $self->{connections}->{$id};
   my $old = $c->{transaction};
   if ($old && $old->is_websocket) {
-    $old->client_close;
     $self->{processing} -= 1;
     delete $self->{connections}->{$id};
     $self->_drop($id, $close);
@@ -358,7 +357,8 @@ sub _handle {
       unless $self->_redirect($c, $old);
   }
 
-  # Stop loop
+  # Close and stop loop
+  $old->client_close;
   $self->ioloop->stop if !$self->{nb} && !$self->{processing};
 }
 

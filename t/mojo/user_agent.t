@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 64;
+use Test::More tests => 68;
 
 use_ok 'Mojo::UserAgent';
 
@@ -135,6 +135,22 @@ Mojo::IOLoop->listen(
 # GET /
 my $tx = $ua->get('/');
 ok $tx->success, 'successful';
+is $tx->res->code, 200,     'right status';
+is $tx->res->body, 'works', 'right content';
+
+# GET / (callbacks)
+my $finished;
+$tx = $ua->build_tx(GET => '/');
+$ua->on_start(
+  sub {
+    my ($self, $tx) = @_;
+    $tx->on_finish(sub { $finished++ });
+  }
+);
+$tx = $ua->start($tx);
+$ua->on_start(undef);
+ok $tx->success, 'successful';
+is $finished, 1, 'finish callback was called';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';
 

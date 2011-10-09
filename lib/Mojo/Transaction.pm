@@ -10,6 +10,8 @@ has [qw/on_finish on_resume/] => sub {
 has keep_alive => 0;
 
 # "Please don't eat me! I have a wife and kids. Eat them!"
+sub client_close { shift->server_close(@_) }
+
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
 
@@ -201,6 +203,12 @@ Remote interface port.
 
 L<Mojo::Transaction> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
+
+=head2 C<client_close>
+
+  $tx = $tx->client_close;
+
+Transaction closed.
 
 =head2 C<client_read>
 

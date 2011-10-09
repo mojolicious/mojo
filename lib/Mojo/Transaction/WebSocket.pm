@@ -96,8 +96,6 @@ sub client_challenge {
   return 1;
 }
 
-sub client_close { shift->server_close(@_) }
-
 sub client_handshake {
   my $self = shift;
 
@@ -421,31 +419,25 @@ Build WebSocket frame.
 
   my $success = $ws->client_challenge;
 
-Check WebSocket handshake challenge, only used by client.
-
-=head2 C<client_close>
-
-  $ws = $ws->client_close;
-
-Connection got closed, only used by clients.
+Check WebSocket handshake challenge.
 
 =head2 C<client_handshake>
 
   $ws = $ws->client_handshake;
 
-WebSocket handshake, only used by clients.
+WebSocket handshake.
 
 =head2 C<client_read>
 
   $ws = $ws->client_read($data);
 
-Read raw WebSocket data, only used by clients.
+Read raw WebSocket data.
 
 =head2 C<client_write>
 
   my $chunk = $ws->client_write;
 
-Raw WebSocket data to write, only used by clients.
+Raw WebSocket data to write.
 
 =head2 C<connection>
 
@@ -527,19 +519,19 @@ transparently.
 
   $ws = $ws->server_handshake;
 
-WebSocket handshake, only used by servers.
+WebSocket handshake.
 
 =head2 C<server_read>
 
   $ws = $ws->server_read($data);
 
-Read raw WebSocket data, only used by servers.
+Read raw WebSocket data.
 
 =head2 C<server_write>
 
   my $chunk = $ws->server_write;
 
-Raw WebSocket data to write, only used by servers.
+Raw WebSocket data to write.
 
 =head1 DEBUGGING
 

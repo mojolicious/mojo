@@ -72,11 +72,13 @@ sub clone {
 
 sub match {
   my ($self, $path) = @_;
+
   my $parts = $self->new($path)->parts;
   for my $part (@{$self->parts}) {
     return 1 unless defined(my $match = shift @$parts);
     return unless $part eq $match;
   }
+
   return @$parts ? undef : 1;
 }
 

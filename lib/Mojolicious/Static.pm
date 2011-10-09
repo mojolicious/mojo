@@ -16,7 +16,7 @@ sub dispatch {
   my ($self, $c) = @_;
 
   # Already rendered
-  return 1 if $c->res->code;
+  return if $c->res->code;
 
   # Canonical path
   my $stash = $c->stash;
@@ -31,23 +31,18 @@ sub dispatch {
   return if $parts[0] eq '..';
 
   # Serve static file
-  if ($self->serve($c, join('/', @parts))) {
-    $stash->{'mojo.static'} = 1;
-    $c->rendered;
-    return 1;
-  }
+  return unless $self->serve($c, join('/', @parts));
+  $stash->{'mojo.static'} = 1;
+  $c->rendered;
 
   return 1;
 }
 
 sub serve {
-  my ($self, $c, $rel, $root) = @_;
-  $root //= $self->root;
+  my ($self, $c, $rel) = @_;
 
-  # Append path to root
-  my $path = File::Spec->catfile($root, split('/', $rel));
-
-  # Extension
+  # Path and extension
+  my $path = File::Spec->catfile($self->root, split('/', $rel));
   $path =~ /\.(\w+)$/;
   my $ext = $1;
 
@@ -84,56 +79,50 @@ sub serve {
     }
   }
 
-  # Found
-  if ($asset) {
+  # Not a static file
+  return unless $asset;
 
-    # If modified since
-    my $rqh = $c->req->headers;
-    my $rsh = $res->headers;
-    if (my $date = $rqh->if_modified_since) {
+  # If modified since
+  my $rqh = $c->req->headers;
+  my $rsh = $res->headers;
+  if (my $date = $rqh->if_modified_since) {
 
-      # Not modified
-      my $since = Mojo::Date->new($date)->epoch;
-      if (defined $since && $since == $modified) {
-        $res->code(304);
-        $rsh->remove('Content-Type');
-        $rsh->remove('Content-Length');
-        $rsh->remove('Content-Disposition');
-        return 1;
-      }
+    # Not modified
+    my $since = Mojo::Date->new($date)->epoch;
+    if (defined $since && $since == $modified) {
+      $rsh->remove('Content-Type');
+      $rsh->remove('Content-Length');
+      $rsh->remove('Content-Disposition');
+      $res->code(304) and return 1;
     }
-
-    # Range
-    my $start = 0;
-    my $end = $size - 1 >= 0 ? $size - 1 : 0;
-    if (my $range = $rqh->range) {
-      if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
-        $start = $1;
-        $end = $2 if defined $2 && $2 <= $end;
-        $res->code(206);
-        $rsh->content_length($end - $start + 1);
-        $rsh->content_range("bytes $start-$end/$size");
-      }
-      else {
-
-        # Not satisfiable
-        $res->code(416);
-        return 1;
-      }
-    }
-    $asset->start_range($start);
-    $asset->end_range($end);
-
-    # Prepare response
-    $res->code(200) unless $res->code;
-    $res->content->asset($asset);
-    $rsh->content_type($c->app->types->type($ext) || 'text/plain');
-    $rsh->accept_ranges('bytes');
-    $rsh->last_modified(Mojo::Date->new($modified));
-    return 1;
   }
 
-  return;
+  # Range
+  my $start = 0;
+  my $end = $size - 1 >= 0 ? $size - 1 : 0;
+  if (my $range = $rqh->range) {
+    if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
+      $start = $1;
+      $end = $2 if defined $2 && $2 <= $end;
+      $res->code(206);
+      $rsh->content_length($end - $start + 1);
+      $rsh->content_range("bytes $start-$end/$size");
+    }
+
+    # Not satisfiable
+    else { $res->code(416) and return 1 }
+  }
+  $asset->start_range($start);
+  $asset->end_range($end);
+
+  # Serve file
+  $res->code(200) unless $res->code;
+  $res->content->asset($asset);
+  $rsh->content_type($c->app->types->type($ext) || 'text/plain');
+  $rsh->accept_ranges('bytes');
+  $rsh->last_modified(Mojo::Date->new($modified));
+
+  return 1;
 }
 
 sub _get_data_file {

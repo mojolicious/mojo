@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 44;
+use Test::More tests => 47;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -14,9 +14,14 @@ use IO::File;
 #  Ow. OW. Oh, they're defending themselves somehow."
 use_ok 'Mojo::Loader';
 
-# Exception
+# Single character core module
 my $loader = Mojo::Loader->new;
-my $e      = $loader->load('LoaderException');
+ok !UNIVERSAL::can(B => 'svref_2object');
+ok !$loader->load('B');
+ok !!UNIVERSAL::can(B => 'svref_2object');
+
+# Exception
+my $e = $loader->load('LoaderException');
 isa_ok $e, 'Mojo::Exception', 'right object';
 like $e->message, qr/Missing right curly/, 'right message';
 is $e->lines_before->[0]->[0],   5,         'right line';

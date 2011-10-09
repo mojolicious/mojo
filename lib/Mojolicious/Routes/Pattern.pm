@@ -302,16 +302,22 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Routes::Pattern - Routes pattern
+Mojolicious::Routes::Pattern - Routes pattern engine
 
 =head1 SYNOPSIS
 
   use Mojolicious::Routes::Pattern;
 
+  # Create pattern
+  my $pattern = Mojolicious::Routes::Pattern->new('/test/:name');
+
+  # Match routes
+  my $result  = $pattern->match('/test/sebastian');
+  say $result->{name};
+
 =head1 DESCRIPTION
 
-L<Mojolicious::Routes::Pattern> is a container for routes pattern which are
-used to match paths against.
+L<Mojolicious::Routes::Pattern> is the core of L<Mojolicious::Routes>.
 
 =head1 ATTRIBUTES
 

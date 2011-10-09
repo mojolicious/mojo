@@ -362,6 +362,7 @@ or C<307> redirect response if possible.
   my $tx = $t->tx(GET  => 'mojolicio.us');
   my $tx = $t->tx(POST => 'http://mojolicio.us');
   my $tx = $t->tx(GET  => 'http://kraih.com' => {Accept => '*/*'});
+  my $tx = $t->tx(PUT  => 'http://kraih.com' => 'Hi!');
   my $tx = $t->tx(POST => 'http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.

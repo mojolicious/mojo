@@ -94,27 +94,28 @@ __END__
 
 =head1 NAME
 
-Mojo::EventEmitter - IOLoop event emitter
+Mojo::EventEmitter - Event emitter base class
 
 =head1 SYNOPSIS
 
-  use Mojo::EventEmitter;
+  # Subclass
+  package Cat;
+  use Mojo::Base 'Mojo::EventEmitter';
 
-  # Create new event emitter
-  my $e = Mojo::EventEmitter->new;
+  package main;
 
-  # Subscribe to events
-  $e->on(test => sub {
-    my ($self, $message) = @_;
-    say "test: $message";
+  my $tiger = Cat->new;
+
+  $tiger->on(roar => sub {
+    my ($self, $times) = @_;
+    say 'RAWR!' for 1 .. $times;
   });
 
-  # Emit events
-  $e->emit(test => 'Hello!');
+  $tiger->emit(roar => 5);
 
 =head1 DESCRIPTION
 
-L<Mojo::EventEmitter> is the event emitter used by L<Mojo::IOLoop>.
+L<Mojo::EventEmitter> is a simple base class for event emitting objects.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

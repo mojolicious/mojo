@@ -1,5 +1,5 @@
 package Mojo::Content;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Mojo::Headers;
@@ -8,7 +8,6 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 has [qw/auto_relax relaxed/] => 0;
 has headers => sub { Mojo::Headers->new };
-has [qw/on_body on_read/];
 
 sub body_contains {
   croak 'Method "body_contains" not implemented by subclass';
@@ -81,7 +80,7 @@ sub clone {
 sub generate_body_chunk {
   my ($self, $offset) = @_;
 
-  # Callback
+  # Drain
   if (!delete $self->{delay} && !length $self->{body_buffer}) {
     my $cb = delete $self->{drain};
     $self->$cb($offset) if $cb;
@@ -134,7 +133,7 @@ sub is_done {
 
 sub is_dynamic {
   my $self = shift;
-  return 1 if $self->on_read && !defined $self->headers->content_length;
+  return 1 if $self->{dynamic} && !defined $self->headers->content_length;
   return;
 }
 
@@ -155,6 +154,9 @@ sub leftovers {
   # Normal leftovers
   return $self->{buffer};
 }
+
+sub on_body { shift->on(body => shift) }
+sub on_read { shift->on(read => shift) }
 
 sub parse {
   my $self = shift;
@@ -188,12 +190,12 @@ sub parse {
     $self->{buffer} .= delete $self->{pre_buffer};
   }
 
-  # Custom body parser callback
-  if (my $cb = $self->on_read) {
+  # Custom body parser
+  if ($self->has_subscribers('read')) {
 
     # Chunked or relaxed content
     if ($self->is_chunked || $self->relaxed) {
-      $self->$cb($self->{buffer} //= '');
+      $self->emit(read => $self->{buffer} //= '');
       $self->{buffer} = '';
     }
 
@@ -209,7 +211,7 @@ sub parse {
       if ($need > 0) {
         my $chunk = substr $self->{buffer}, 0, $need, '';
         $self->{size} = $self->{size} + length $chunk;
-        $self->$cb($chunk);
+        $self->emit(read => $chunk);
       }
 
       # Done
@@ -274,7 +276,7 @@ sub write {
   my ($self, $chunk, $cb) = @_;
 
   # Dynamic content
-  $self->on_read(sub { });
+  $self->{dynamic} = 1;
 
   # Add chunk
   if (defined $chunk) {
@@ -285,7 +287,7 @@ sub write {
   # Delay
   else { $self->{delay} = 1 }
 
-  # Drain callback
+  # Drain
   $self->{drain} = $cb if $cb;
 
   # Finish
@@ -404,7 +406,7 @@ sub _parse_headers {
     $self->{header_size} = $self->{raw_size} - length $leftovers;
     $self->{pre_buffer}  = $leftovers;
     $self->{state}       = 'body';
-    if (my $cb = $self->on_body) { $self->$cb }
+    $self->emit('body');
   }
 }
 
@@ -424,6 +426,26 @@ Mojo::Content - HTTP 1.1 content base class
 L<Mojo::Content> is an abstract base class for HTTP 1.1 content as described
 in RFC 2616.
 
+=head1 EVENTS
+
+L<Mojo::Content> can emit the following events.
+
+=head2 C<body>
+
+  $content->on(body => sub {
+    my $content = shift;
+  });
+
+Emitted once all headers have been parsed and the content starts.
+
+=head2 C<read>
+
+  $content->on(read => sub {
+    my ($content, $chunk) = @_;
+  });
+
+Emitted when new content arrives.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Content> implements the following attributes.
@@ -442,27 +464,6 @@ Try to detect broken web servers and turn on relaxed parsing automatically.
 
 Content headers, defaults to a L<Mojo::Headers> object.
 
-=head2 C<on_body>
-
-  my $cb   = $content->on_body;
-  $content = $content->on_body(sub {...});
-
-Callback to be invoked once all headers have been parsed and the content
-starts.
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
-=head2 C<on_read>
-
-  my $cb   = $content->on_read;
-  $content = $content->on_read(sub {...});
-
-Callback to be invoked when new content arrives.
-
-  $content = $content->on_read(sub {
-    my ($self, $chunk) = @_;
-    say $chunk;
-  });
-
 =head2 C<relaxed>
 
   my $relaxed = $content->relaxed;
@@ -472,8 +473,8 @@ Activate relaxed parsing for HTTP 0.9 and broken web servers.
 
 =head1 METHODS
 
-L<Mojo::Content> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Content> inherits all methods from L<Mojo::EventEmitter> and
+implements the following new ones.
 
 =head2 C<body_contains>
 
@@ -579,6 +580,24 @@ Check if body parsing started yet.
   my $bytes = $content->leftovers;
 
 Remove leftover data from content parser.
+
+=head2 C<on_body>
+
+  $content->on_body(sub {...});
+
+Register C<body> event.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<on_read>
+
+  $content->on_read(sub {...});
+
+Register C<read> event.
+
+  $content->on_read(sub {
+    my ($self, $chunk) = @_;
+    say $chunk;
+  });
 
 =head2 C<parse>
 

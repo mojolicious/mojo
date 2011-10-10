@@ -26,7 +26,7 @@ use constant {
 use constant SHA1 => eval 'use Digest::SHA (); 1';
 
 has handshake => sub { Mojo::Transaction::HTTP->new };
-has [qw/masked on_message/];
+has 'masked';
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
 sub build_frame {
@@ -130,6 +130,8 @@ sub is_websocket {1}
 
 sub local_address { shift->handshake->local_address }
 sub local_port    { shift->handshake->local_port }
+
+sub on_message { shift->on(message => shift) }
 
 sub parse_frame {
   my ($self, $buffer) = @_;
@@ -279,16 +281,16 @@ sub server_read {
     # No FIN bit (Continuation)
     next unless $frame->[0];
 
-    # Callback
+    # Message
     my $message = $self->{message};
     $self->{message} = '';
     decode 'UTF-8', $message if $message && delete $self->{op} == TEXT;
-    return $self->finish unless my $cb = $self->on_message;
-    $self->$cb($message);
+    return $self->finish unless $self->has_subscribers('message');
+    $self->emit(message => $message);
   }
 
   # Resume
-  $self->on_resume->($self);
+  $self->emit('resume');
 
   return $self;
 }
@@ -296,12 +298,10 @@ sub server_read {
 sub server_write {
   my $self = shift;
 
-  # Not writing anymore
+  # Drain
   $self->{write} //= '';
   unless (length $self->{write}) {
     $self->{state} = $self->{finished} ? 'done' : 'read';
-
-    # Drain callback
     my $cb = delete $self->{drain};
     $self->$cb if $cb;
   }
@@ -333,7 +333,7 @@ sub _send_frame {
   $self->{write} //= '';
   $self->{write} .= $self->build_frame(1, $op, $payload);
   $self->{state} = 'write';
-  $self->on_resume->($self);
+  $self->emit('resume');
 }
 
 sub _xor_mask {
@@ -366,6 +366,19 @@ described in
 L<http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-16.txt>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
+=head1 EVENTS
+
+L<Mojo::Transaction::WebSocket> inherits all events from L<Mojo::Transaction>
+and can emit the following new ones.
+
+=head2 C<message>
+
+  $ws->on(message => sub {
+    my ($ws, $message) = @_;
+  });
+
+Emitted when a new message arrives.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Transaction::WebSocket> inherits all attributes from
@@ -392,17 +405,6 @@ Mask outgoing frames with XOR cipher and a random 32bit key.
   $ws      = $ws->max_websocket_size(1024);
 
 Maximum WebSocket message size in bytes, defaults to C<262144>.
-
-=head2 C<on_message>
-
-  my $cb = $ws->on_message;
-  $ws    = $ws->on_message(sub {...});
-
-Callback to be invoked for each decoded message.
-
-  $ws->on_message(sub {
-    my ($self, $message) = @_;
-  });
 
 =head1 METHODS
 
@@ -468,6 +470,16 @@ The local address of this WebSocket.
   my $local_port = $ws->local_port;
 
 The local port of this WebSocket.
+
+=head2 C<on_message>
+
+  $ws->on_message(sub {...});
+
+Register C<message> event.
+
+  $ws->on_message(sub {
+    my ($self, $message) = @_;
+  });
 
 =head2 C<parse_frame>
 

@@ -10,13 +10,7 @@ use Scalar::Util 'weaken';
 
 has home => sub { Mojo::Home->new };
 has log  => sub { Mojo::Log->new };
-has on_transaction => sub {
-  sub { Mojo::Transaction::HTTP->new }
-};
-has on_websocket => sub {
-  sub { Mojo::Transaction::WebSocket->new(handshake => pop) }
-};
-has ua => sub {
+has ua   => sub {
   my $self = shift;
 
   # Fresh user agent
@@ -43,6 +37,10 @@ sub new {
 
 # "D’oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
+
+sub transaction { Mojo::Transaction::HTTP->new }
+
+sub upgrade { Mojo::Transaction::WebSocket->new(handshake => pop) }
 
 1;
 __END__
@@ -105,22 +103,6 @@ The logging layer of your application, defaults to a L<Mojo::Log> object.
 
   $app->log->debug('It works!');
 
-=head2 C<on_transaction>
-
-  my $cb = $app->on_transaction;
-  $app   = $app->on_transaction(sub {...});
-
-Callback to be invoked when a new transaction is needed, defaults to building
-a L<Mojo::Transaction::HTTP> object.
-
-=head2 C<on_websocket>
-
-  my $cb = $app->on_websocket;
-  $app   = $app->on_websocket(sub {...});
-
-Callback to be invoked for WebSocket handshakes, defaults to building a
-L<Mojo::Transaction::WebSocket> object.
-
 =head2 C<ua>
 
   my $ua = $app->ua;
@@ -153,6 +135,20 @@ L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
   sub handler {
     my ($self, $tx) = @_;
   }
+
+=head2 C<transaction>
+
+  my $tx = $app->transaction;
+
+Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
+object.
+
+=head2 C<upgrade>
+
+  my $ws = $app->upgrade(tx);
+
+Upgrade transaction, defaults to building a L<Mojo::Transaction::WebSocket>
+object.
 
 =head1 SEE ALSO
 

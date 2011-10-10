@@ -1,5 +1,5 @@
 package Mojo::Server;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Mojo::Loader;
@@ -14,25 +14,28 @@ has app => sub {
 };
 has app_class =>
   sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' };
-has on_request => sub {
-  sub {
-    my $app = shift->app;
-    my $tx  = shift;
-    $app->handler($tx);
-  };
-};
-has on_transaction => sub {
-  sub {
-    my $self = shift;
-    $self->app->on_transaction->($self->app);
-  };
-};
-has on_websocket => sub {
-  sub {
-    my $self = shift;
-    $self->app->on_websocket->($self->app, @_)->server_handshake;
-  };
-};
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+
+  # Events
+  $self->on_request(sub { shift->app->handler(shift) });
+  $self->on_transaction(
+    sub {
+      my ($self, $txref) = @_;
+      $$txref = $self->app->transaction;
+    }
+  );
+  $self->on_upgrade(
+    sub {
+      my ($self, $txref) = @_;
+      $$txref = $self->app->upgrade($$txref);
+      $$txref->server_handshake;
+    }
+  );
+
+  return $self;
+}
 
 sub load_app {
   my ($self, $file) = @_;
@@ -62,6 +65,10 @@ EOF
   return $app;
 }
 
+sub on_request     { shift->on(request     => shift) }
+sub on_transaction { shift->on(transaction => shift) }
+sub on_upgrade     { shift->on(upgrade     => shift) }
+
 # "Are you saying you're never going to eat any animal again? What about
 #  bacon?
 #  No.
@@ -87,15 +94,43 @@ Mojo::Server - HTTP server base class
     my $self = shift;
 
     # Get a transaction
-    my $tx = $self->on_transaction->($self);
+    $self->emit(transaction => \(my $tx));
 
-    # Call the handler
-    $tx = $self->on_request->($self);
+    # Emit request
+    $self->emit(request => $tx);
   }
 
 =head1 DESCRIPTION
 
 L<Mojo::Server> is an abstract HTTP server base class.
+
+=head1 EVENTS
+
+L<Mojo::Server> can emit the following events.
+
+=head2 C<request>
+
+  $server->on(request => sub {
+    my ($server, $tx) = @_;
+  });
+
+Emitted for requests that need a response.
+
+=head2 C<transaction>
+
+  $server->on(request => sub {
+    my ($server, $txref) = @_;
+  });
+
+Emitted when a new transaction is needed.
+
+=head2 C<upgrade>
+
+  $server->on(upgrade => sub {
+    my ($server, $txref) = @_;
+  });
+
+Emitted when a transaction needs to be upgraded.
 
 =head1 ATTRIBUTES
 
@@ -116,38 +151,16 @@ Application this server handles, defaults to a L<Mojo::HelloWorld> object.
 Class of the application this server handles, defaults to
 L<Mojo::HelloWorld>.
 
-=head2 C<on_request>
-
-  my $handler = $server->on_request;
-  $server     = $server->on_request(sub {
-    my ($self, $tx) = @_;
-  });
-
-Callback to be invoked for requests that need a response.
-
-=head2 C<on_transaction>
-
-  my $btx = $server->on_transaction;
-  $server = $server->on_transaction(sub {
-    my $self = shift;
-    return Mojo::Transaction::HTTP->new;
-  });
-
-Callback to be invoked when a new transaction is needed.
-
-=head2 C<on_websocket>
-
-  my $handshake = $server->on_websocket;
-  $server       = $server->on_websocket(sub {
-    my ($self, $tx) = @_;
-  });
-
-Callback to be invoked for WebSocket handshakes.
-
 =head1 METHODS
 
-L<Mojo::Server> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Server> inherits all methods from L<Mojo::EventEmitter> and
+implements the following new ones.
+
+=head2 C<new>
+
+  my $server = Mojo::Server->new;
+
+Construct a new L<Mojo::Server> object.
 
 =head2 C<load_app>
 
@@ -157,6 +170,24 @@ Load application from script.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   say Mojo::Server->new->load_app('./myapp.pl')->home;
+
+=head2 C<on_request>
+
+  $server->on_request(sub {...});
+
+Register C<request> event.
+
+=head2 C<on_transaction>
+
+  $server->on_transaction(sub {...});
+
+Register C<transaction> event.
+
+=head2 C<on_upgrade>
+
+  $server->on_upgrade(sub {...});
+
+Register C<upgrade> event.
 
 =head2 C<run>
 

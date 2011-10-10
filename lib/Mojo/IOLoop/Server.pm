@@ -1,5 +1,5 @@
 package Mojo::IOLoop::Server;
-use Mojo::Base 'Mojo::IOLoop::EventEmitter';
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use File::Spec;
@@ -186,7 +186,7 @@ sub _accept {
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
   # Start TLS handshake
-  return $self->emit(accept => $handle) unless my $tls = $self->{tls};
+  return $self->emit_safe(accept => $handle) unless my $tls = $self->{tls};
   weaken $self;
   $tls->{SSL_error_trap} = sub {
     return unless my $handle = delete $self->{handles}->{shift()};
@@ -245,7 +245,7 @@ sub _tls {
   if ($handle->accept_SSL) {
     $self->iowatcher->remove($handle);
     delete $self->{handles}->{$handle};
-    return $self->emit(accept => $handle);
+    return $self->emit_safe(accept => $handle);
   }
 
   # Switch between reading and writing
@@ -289,6 +289,10 @@ L<Mojo::IOLoop::Server> can emit the following events.
 
 =head2 C<accept>
 
+  $server->on(accept => sub {
+    my ($server, $handle) = @_;
+  });
+
 Emitted for each accepted connection.
 
 =head1 ATTRIBUTES
@@ -312,8 +316,8 @@ L<Mojo::IOWatcher::EV> object.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Server> inherits all methods from
-L<Mojo::IOLoop::EventEmitter> and implements the following new ones.
+L<Mojo::IOLoop::Server> inherits all methods from L<Mojo::EventEmitter> and
+implements the following new ones.
 
 =head2 C<listen>
 

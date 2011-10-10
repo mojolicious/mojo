@@ -188,6 +188,10 @@ Mojo::Message::Response - HTTP 1.1 response container
 L<Mojo::Message::Response> is a container for HTTP 1.1 responses as described
 in RFC 2616.
 
+=head1 EVENTS
+
+L<Mojo::Message::Response> inherits all events from L<Mojo::Message>.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Message::Response> inherits all attributes from L<Mojo::Message>

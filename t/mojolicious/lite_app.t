@@ -1148,7 +1148,7 @@ $t->get_ok('/maybe/ajax', {'X-Requested-With' => 'XMLHttpRequest'})
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('is ajax');
 
-# GET /finished (with on_finish callback)
+# GET /finished (with finish event)
 $t->get_ok('/finished')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')

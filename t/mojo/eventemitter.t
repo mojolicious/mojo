@@ -1,17 +1,22 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 36;
+use Test::More tests => 42;
 
 # "Hi, Super Nintendo Chalmers!"
-use_ok 'Mojo::IOLoop::EventEmitter';
+use_ok 'Mojo::EventEmitter';
 
 # Normal event
-my $e      = Mojo::IOLoop::EventEmitter->new;
+my $e      = Mojo::EventEmitter->new;
 my $called = 0;
 $e->on(test1 => sub { $called++ });
 $e->emit('test1');
 is $called, 1, 'event was emitted once';
+
+# Error
+$e->on(die => sub { die "works!\n" });
+eval { $e->emit('die') };
+is $@, "works!\n", 'right error';
 
 # Error fallback
 my ($echo, $error);
@@ -25,14 +30,14 @@ $e->on(
 );
 my $cb = sub { $echo .= 'echo2: ' . pop };
 $e->on(test2 => $cb);
-$e->emit('test2', 'works!');
+$e->emit_safe('test2', 'works!');
 is $echo, 'echo: works!echo2: works!', 'right echo';
 is $error, qq/Event "test2" failed: test2: works!\n/, 'right error';
 $echo = $error = undef;
 is scalar @{$e->subscribers('test2')}, 3, 'three subscribers';
 $e->unsubscribe(test2 => $cb);
 is scalar @{$e->subscribers('test2')}, 2, 'two subscribers';
-$e->emit('test2', 'works!');
+$e->emit_safe('test2', 'works!');
 is $echo, 'echo: works!', 'right echo';
 is $error, qq/Event "test2" failed: test2: works!\n/, 'right error';
 
@@ -62,6 +67,17 @@ $e->emit('one_time');
 is $once, 1, 'event was not emitted again';
 $e->emit('one_time');
 is $once, 1, 'event was not emitted again';
+$e->once(
+  one_more_time => sub {
+    shift->once(one_more_time => sub { $once++ });
+  }
+);
+$e->emit('one_more_time');
+is $once, 1, 'event was emitted once';
+$e->emit('one_more_time');
+is $once, 2, 'event was emitted again';
+$e->emit('one_more_time');
+is $once, 2, 'event was not emitted again';
 
 # Nested one time events
 $once = 0;
@@ -92,7 +108,7 @@ $e->emit('one_time');
 is $once, 1, 'event was not emitted again';
 
 # Unsubscribe
-$e = Mojo::IOLoop::EventEmitter->new;
+$e = Mojo::EventEmitter->new;
 my $counter = 0;
 $cb = $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
@@ -105,7 +121,9 @@ $e->unsubscribe(foo => $cb);
 is scalar @{$e->subscribers('foo')}, 2, 'two subscribers';
 $e->emit('foo');
 is $counter, 5, 'event was emitted two times';
-$e->unsubscribe(foo => $_) for @{$e->subscribers('foo')};
+is $e->has_subscribers('foo'), 1, 'has subscribers';
+$e->unsubscribe_all('foo');
+is $e->has_subscribers('foo'), undef, 'no subscribers';
 is scalar @{$e->subscribers('foo')}, 0, 'no subscribers';
 $e->emit('foo');
 is $counter, 5, 'event was not emitted again';

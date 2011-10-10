@@ -16,20 +16,13 @@ use Mojolicious::Lite;
 use Scalar::Util 'weaken';
 use Test::Mojo;
 
+# Trigger early request for everything under "/upload"
 app->hook(
   after_build_tx => sub {
     my $tx = shift;
     weaken $tx;
-    $tx->req->on_progress(
-      sub {
-        my $req = shift;
-
-        # Check if we've reached the body yet
-        return unless $req->content->is_parsing_body;
-
-        # Trigger early request for everything under "/upload"
-        $tx->on_request->($tx) if $req->url->path->contains('/upload');
-      }
+    $tx->req->content->on_body(
+      sub { $tx->emit('request') if $tx->req->url->path->contains('/upload') }
     );
   }
 );
@@ -42,7 +35,7 @@ post '/upload' => sub {
   # First invocation, prepare streaming
   my $id = $self->param('id');
   $self->req->body(sub { $cache->{$id} .= pop });
-  return unless $self->req->on_progress(undef)->is_done;
+  return unless $self->req->is_done;
 
   # Second invocation, render response
   $self->render(data => $cache->{$id});

@@ -1,5 +1,5 @@
 package Mojo::UserAgent;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Mojo::CookieJar;
@@ -16,7 +16,7 @@ use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 # "You can't let a single bad experience scare you away from drugs."
 has cert       => sub { $ENV{MOJO_CERT_FILE} };
 has cookie_jar => sub { Mojo::CookieJar->new };
-has [qw/http_proxy https_proxy no_proxy on_start/];
+has [qw/http_proxy https_proxy no_proxy/];
 has ioloop => sub { Mojo::IOLoop->new };
 has keep_alive_timeout => 15;
 has key                => sub { $ENV{MOJO_KEY_FILE} };
@@ -81,6 +81,8 @@ sub need_proxy {
   $host =~ /\Q$_\E$/ and return for @$no;
   return 1;
 }
+
+sub on_start { shift->on(start => shift) }
 
 sub post {
   my $self = shift;
@@ -250,7 +252,7 @@ sub _connect {
     $self->{connections}->{$id} = {cb => $cb, transaction => $tx};
   }
 
-  # Callbacks
+  # Events
   $loop->on_close($id => sub { $self->_handle(pop, 1) });
   $loop->on_error($id => sub { $self->_error(@_) });
   $loop->on_read($id => sub { $self->_read(@_) });
@@ -465,7 +467,7 @@ sub _start {
   if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
   # Connect
-  if (my $start = $self->on_start) { $self->$start($tx) }
+  $self->emit(start => $tx);
   return unless my $id = $self->_connect($tx, $cb);
   weaken $self;
   $tx->on_resume(sub { $self->_write($id) });
@@ -626,6 +628,19 @@ user agent with C<IPv6>, C<TLS> and C<libev> support.
 Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
 supported transparently and used if installed.
 
+=head1 EVENTS
+
+L<Mojo::UserAgent> can emit the following events.
+
+=head2 C<start>
+
+  $ua->on(start => sub {
+    my ($ua, $tx) = @_;
+  });
+
+Emitted whenever a new transaction is about to start, this includes
+automatically prepared proxy C<CONNECT> requests and followed redirects.
+
 =head1 ATTRIBUTES
 
 L<Mojo::UserAgent> implements the following attributes.
@@ -724,20 +739,6 @@ Value for C<User-Agent> request header, defaults to C<Mojolicious (Perl)>.
 Domains that don't require a proxy server to be used.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
-=head2 C<on_start>
-
-  my $cb = $ua->on_start;
-  $ua    = $ua->on_start(sub {...});
-
-Callback to be invoked whenever a new transaction is about to start, this
-includes automatically prepared proxy C<CONNECT> requests and followed
-redirects.
-
-  $ua->on_start(sub {
-    my ($ua, $tx) = @_;
-    $tx->req->headers->header('X-Bender', 'Bite my shiny metal ass!');
-  });
-
 =head2 C<transactor>
 
   my $t = $ua->transactor;
@@ -756,8 +757,8 @@ before being dropped, defaults to C<300>.
 
 =head1 METHODS
 
-L<Mojo::UserAgent> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::UserAgent> inherits all methods from L<Mojo::EventEmitter> and
+implements the following new ones.
 
 =head2 C<app>
 
@@ -851,6 +852,17 @@ You can also append a callback to perform requests non-blocking.
 
 Check if request for domain would use a proxy server.
 Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<on_start>
+
+  $ua->on_start(sub {...});
+
+Register C<start> event.
+
+  $ua->on_start(sub {
+    my ($ua, $tx) = @_;
+    $tx->req->headers->header('X-Bender', 'Bite my shiny metal ass!');
+  });
 
 =head2 C<post>
 

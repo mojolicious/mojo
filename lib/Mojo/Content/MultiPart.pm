@@ -89,7 +89,7 @@ sub get_body_chunk {
   my ($self, $offset) = @_;
 
   # Body generator
-  return $self->generate_body_chunk($offset) if $self->on_read;
+  return $self->generate_body_chunk($offset) if $self->{dynamic};
 
   # First boundary
   my $boundary        = $self->build_boundary;
@@ -137,7 +137,7 @@ sub parse {
   $self->SUPER::parse(@_);
 
   # Custom body parser
-  return $self if $self->on_read;
+  return $self if $self->has_subscribers('read');
 
   # Parse multipart content
   $self->_parse_multipart;
@@ -253,6 +253,10 @@ Mojo::Content::MultiPart - HTTP 1.1 multipart content container
 
 L<Mojo::Content::MultiPart> is a container for HTTP 1.1 multipart content as
 described in RFC 2616.
+
+=head1 EVENTS
+
+L<Mojo::Content::Multipart> inherits all events from L<Mojo::Content>.
 
 =head1 ATTRIBUTES
 

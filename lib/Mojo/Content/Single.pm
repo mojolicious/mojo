@@ -16,7 +16,7 @@ sub body_contains {
 
 sub body_size {
   my $self = shift;
-  return ($self->headers->content_length || 0) if $self->on_read;
+  return ($self->headers->content_length || 0) if $self->{dynamic};
   return $self->asset->size;
 }
 
@@ -31,7 +31,7 @@ sub get_body_chunk {
   my ($self, $offset) = @_;
 
   # Body generator
-  return $self->generate_body_chunk($offset) if $self->on_read;
+  return $self->generate_body_chunk($offset) if $self->{dynamic};
 
   # Normal content
   return $self->asset->get_chunk($offset);
@@ -44,7 +44,8 @@ sub parse {
   $self->SUPER::parse(@_);
 
   # Still parsing headers or using a custom body parser
-  return $self if ($self->{state} || '') eq 'headers' || $self->on_read;
+  return $self
+    if ($self->{state} || '') eq 'headers' || $self->has_subscribers('read');
 
   # Content needs to be upgraded to multipart
   if ($self->auto_upgrade && defined($self->boundary)) {
@@ -95,6 +96,11 @@ Mojo::Content::Single - HTTP 1.1 content container
 
 L<Mojo::Content::Single> is a container for HTTP 1.1 content as described in
 RFC 2616.
+
+=head1 EVENTS
+
+L<Mojo::Content::Single> inherits all events from L<Mojo::Content> and can
+emit the following new ones.
 
 =head1 ATTRIBUTES
 

@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::Transaction';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-has [qw/on_upgrade on_request/];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
@@ -174,6 +173,9 @@ sub keep_alive {
   return $self->{keep_alive};
 }
 
+sub on_request { shift->on(request => shift) }
+sub on_upgrade { shift->on(upgrade => shift) }
+
 sub server_leftovers {
   my $self = shift;
 
@@ -201,8 +203,8 @@ sub server_read {
   my $handled = $self->{handled};
   if ($req->error && !$handled) {
 
-    # Handler callback
-    $self->on_request->($self);
+    # Handle
+    $self->emit('request');
 
     # Close connection
     $res->headers->connection('close');
@@ -214,12 +216,12 @@ sub server_read {
   # EOF
   elsif ((length $chunk == 0) || ($req->is_done && !$handled)) {
 
-    # Upgrade callback
-    my $ws;
-    $ws = $self->on_upgrade->($self) if $req->headers->upgrade;
+    # Upgrade
+    my $ws = $self;
+    $self->emit(upgrade => \$ws) if $req->headers->upgrade;
 
-    # Handler callback
-    $self->on_request->($ws ? ($ws, $self) : $self);
+    # Handle request
+    $self->emit(request => $ws->is_websocket ? $ws : $self);
 
     # Protect handler from incoming pipelined requests
     $self->{handled} = 1;
@@ -392,24 +394,31 @@ Mojo::Transaction::HTTP - HTTP 1.1 transaction container
 L<Mojo::Transaction::HTTP> is a container for HTTP 1.1 transactions as
 described in RFC 2616.
 
+=head1 EVENTS
+
+L<Mojo::Transaction::HTTP> inherits all events from L<Mojo::Transaction> and
+can emit the following new ones.
+
+=head2 C<request>
+
+  $tx->on(request => sub {
+    my ($tx, $upgraded) = @_;
+  });
+
+Emitted when a request needs to be handled.
+
+=head2 C<upgrade>
+
+  $tx->on(upgrade => sub {
+    my ($tx, $txref) = @_;
+  });
+
+Emitted when a connection needs to be upgraded.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>
 and implements the following new ones.
-
-=head2 C<on_upgrade>
-
-  my $cb = $tx->on_upgrade;
-  $tx    = $tx->on_upgrade(sub {...});
-
-Callback to be invoked for WebSocket upgrades.
-
-=head2 C<on_request>
-
-  my $cb = $tx->on_request;
-  $tx    = $tx->on_request(sub {...});
-
-Callback to be invoked for requests.
 
 =head2 C<req>
 
@@ -448,6 +457,18 @@ Write client data.
   $tx            = $tx->keep_alive(1);
 
 Connection can be kept alive.
+
+=head2 C<on_request>
+
+  $tx->on_request(sub {...});
+
+Register C<request> event.
+
+=head2 C<on_upgrade>
+
+  $tx->on_upgrade(sub {...});
+
+Register C<upgrade> event.
 
 =head2 C<server_leftovers>
 

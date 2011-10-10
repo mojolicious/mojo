@@ -12,7 +12,7 @@ sub run {
   my $self = shift;
 
   # Environment
-  my $tx  = $self->on_transaction->($self);
+  $self->emit(transaction => \(my $tx));
   my $req = $tx->req;
   $req->parse(\%ENV);
 
@@ -29,7 +29,7 @@ sub run {
   }
 
   # Handle
-  $self->on_request->($self, $tx);
+  $self->emit(request => $tx);
 
   # Response start line
   STDOUT->autoflush(1);
@@ -92,7 +92,7 @@ sub run {
   }
 
   # Finish transaction
-  $tx->on_finish->($tx);
+  $tx->server_close;
 
   return $res->code;
 }
@@ -109,6 +109,7 @@ Mojo::Server::CGI - CGI server
   use Mojo::Server::CGI;
 
   my $cgi = Mojo::Server::CGI->new;
+  $cgi->unsubscribe_all('request')
   $cgi->on_request(sub {
     my ($self, $tx) = @_;
 
@@ -131,6 +132,10 @@ Mojo::Server::CGI - CGI server
 L<Mojo::Server::CGI> is a simple and portable implementation of RFC 3875.
 
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
+
+=head1 EVENTS
+
+L<Mojo::Server::CGI> inherits all events from L<Mojo::Server>.
 
 =head1 ATTRIBUTES
 

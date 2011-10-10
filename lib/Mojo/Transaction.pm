@@ -1,12 +1,9 @@
 package Mojo::Transaction;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 
 has [qw/connection kept_alive local_address local_port previous remote_port/];
-has [qw/on_finish on_resume/] => sub {
-  sub {1}
-};
 has keep_alive => 0;
 
 # "Please don't eat me! I have a wife and kids. Eat them!"
@@ -40,6 +37,9 @@ sub is_writing {
       || $state eq 'write_body';
   return;
 }
+
+sub on_finish { shift->on(finish => shift) }
+sub on_resume { shift->on(resume => shift) }
 
 sub remote_address {
   my ($self, $address) = @_;
@@ -78,22 +78,20 @@ sub resume {
   my $self = shift;
 
   # Delayed
-  if (($self->{state} || '') eq 'paused') {
-    $self->{state} = 'write_body';
-  }
+  if (($self->{state} || '') eq 'paused') { $self->{state} = 'write_body' }
 
   # Writing
   elsif (!$self->is_writing) { $self->{state} = 'write' }
 
-  # Callback
-  $self->on_resume->($self);
+  # Resume
+  $self->emit('resume');
 
   return $self;
 }
 
 sub server_close {
   my $self = shift;
-  $self->on_finish->($self);
+  $self->emit('finish');
   return $self;
 }
 
@@ -120,6 +118,26 @@ Mojo::Transaction - Transaction base class
 =head1 DESCRIPTION
 
 L<Mojo::Transaction> is an abstract base class for transactions.
+
+=head1 EVENTS
+
+L<Mojo::Transaction> can emit the following events.
+
+=head2 C<finish>
+
+  $tx->on(finish => sub {
+    my $tx = shift;
+  });
+
+Emitted when a transaction is finished.
+
+=head2 C<resume>
+
+  $tx->on(resume => sub {
+    my $tx = shift;
+  });
+
+Emitted when a transaction is resumed.
 
 =head1 ATTRIBUTES
 
@@ -160,24 +178,6 @@ Local interface address.
 
 Local interface port.
 
-=head2 C<on_finish>
-
-  my $cb = $tx->on_finish;
-  $tx    = $tx->on_finish(sub {...});
-
-Callback to be invoked when the transaction has been finished.
-
-  $tx->on_finish(sub {
-    my $self = shift;
-  });
-
-=head2 C<on_resume>
-
-  my $cb = $tx->on_resume;
-  $tx    = $tx->on_resume(sub {...});
-
-Callback to be invoked whenever the transaction is resumed.
-
 =head2 C<previous>
 
   my $previous = $tx->previous;
@@ -201,8 +201,8 @@ Remote interface port.
 
 =head1 METHODS
 
-L<Mojo::Transaction> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojo::Transaction> inherits all methods from L<Mojo::EventEmitter> and
+implements the following new ones.
 
 =head2 C<client_close>
 
@@ -246,6 +246,22 @@ False.
   my $success = $tx->is_writing;
 
 Check if transaction is writing.
+
+=head2 C<on_finish>
+
+  $tx->on_finish(sub {...});
+
+Register C<finish> event.
+
+  $tx->on_finish(sub {
+    my $self = shift;
+  });
+
+=head2 C<on_resume>
+
+  $tx->on_resume(sub {...});
+
+Register C<resume> event.
 
 =head2 C<req>
 

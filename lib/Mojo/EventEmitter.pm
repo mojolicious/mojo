@@ -1,4 +1,4 @@
-package Mojo::IOLoop::EventEmitter;
+package Mojo::EventEmitter;
 use Mojo::Base -base;
 
 use Scalar::Util 'weaken';
@@ -12,30 +12,23 @@ use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 #  Are we there yet?
 #  No
 #  ...Where are we going?"
-sub emit {
-  my $self = shift;
-  my $name = shift;
+sub emit      { shift->_emit(0, @_) }
+sub emit_safe { shift->_emit(1, @_) }
 
-  # Emit event sequentially to all subscribers
-  my @subscribers = @{$self->subscribers($name)};
-  warn "EMIT $name (" . scalar(@subscribers) . ")\n" if DEBUG;
-  for my $cb (@subscribers) {
-    $self->emit('error', qq/Event "$name" failed: $@/)
-      if !eval { $self->$cb(@_); 1 } && $name ne 'error';
-  }
-
-  return $self;
+sub has_subscribers {
+  return 1 if @{shift->subscribers(shift)};
+  return;
 }
 
 sub on {
   my ($self, $name, $cb) = @_;
-  my $subscribers = $self->{events}->{$name} ||= [];
-  push @$subscribers, $cb;
+  push @{$self->{events}->{$name} ||= []}, $cb;
   return $cb;
 }
 
 sub once {
   my ($self, $name, $cb) = @_;
+
   my $wrapper;
   $wrapper = sub {
     my $self = shift;
@@ -44,27 +37,55 @@ sub once {
   };
   $self->on($name => $wrapper);
   weaken $wrapper;
+
   return $wrapper;
 }
 
-sub subscribers {
-  my ($self, $name) = @_;
-  $self->{events}->{error} ||= [sub { warn $_[1] }] if $name eq 'error';
-  return [@{$self->{events}->{$name} || []}];
-}
+sub subscribers { shift->{events}->{shift()} || [] }
 
 # "Back you robots!
 #  Nobody ruins my family vacation but me!
 #  And maybe the boy."
 sub unsubscribe {
   my ($self, $name, $cb) = @_;
-  my $subscribers = $self->{events}->{$name} || [];
+
   my @callbacks;
-  for my $subscriber (@$subscribers) {
+  for my $subscriber (@{$self->subscribers($name)}) {
     next if $cb eq $subscriber;
     push @callbacks, $subscriber;
   }
   $self->{events}->{$name} = \@callbacks;
+
+  return $self;
+}
+
+sub unsubscribe_all {
+  my ($self, $name) = @_;
+  $self->unsubscribe($name => $_) for @{$self->subscribers($name)};
+  return $self;
+}
+
+sub _emit {
+  my $self = shift;
+  my $safe = shift;
+  return $self unless exists $self->{events}->{my $name = shift};
+
+  # Emit event sequentially to all subscribers
+  my @subscribers = @{$self->subscribers($name)};
+  warn "EMIT $name (" . scalar(@subscribers) . ")\n" if DEBUG;
+  for my $cb (@subscribers) {
+
+    # Unsafe
+    if (!$safe) { $self->$cb(@_) }
+
+    # Safe
+    elsif (!eval { $self->$cb(@_); 1 } && $name ne 'error') {
+      $self->once(error => sub { warn $_[1] })
+        unless $self->has_subscribers('error');
+      $self->emit_safe('error', qq/Event "$name" failed: $@/);
+    }
+  }
+
   return $self;
 }
 
@@ -73,23 +94,19 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::EventEmitter - IOLoop event emitter
+Mojo::EventEmitter - IOLoop event emitter
 
 =head1 SYNOPSIS
 
-  use Mojo::IOLoop::EventEmitter;
+  use Mojo::EventEmitter;
 
   # Create new event emitter
-  my $e = Mojo::IOLoop::EventEmitter->new;
+  my $e = Mojo::EventEmitter->new;
 
   # Subscribe to events
-  $e->on(error => sub {
-    my ($self, $error) = @_;
-    warn "Catched: $error";
-  });
   $e->on(test => sub {
     my ($self, $message) = @_;
-    die "test: $message";
+    say "test: $message";
   });
 
   # Emit events
@@ -97,12 +114,12 @@ Mojo::IOLoop::EventEmitter - IOLoop event emitter
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::EventEmitter> is the event emitter used by L<Mojo::IOLoop>.
+L<Mojo::EventEmitter> is the event emitter used by L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 
-L<Mojo::IOLoop::EventEmitter> inherits all methods from L<Mojo::Base> and
+L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
 =head2 C<emit>
@@ -111,6 +128,19 @@ implements the following new ones.
   $e->emit('foo', 123);
 
 Emit event.
+
+=head2 C<emit_safe>
+
+  $e->emit_safe('foo');
+  $e->emit_safe('foo', 123);
+
+Emit event safely.
+
+=head2 C<has_subscribers>
+
+  my $success = $e->has_subscribers('foo');
+
+Check if event has subscribers.
 
 =head2 C<on>
 
@@ -135,6 +165,12 @@ All subscribers for event.
   $e->unsubscribe(foo => $cb);
 
 Unsubscribe from event.
+
+=head2 C<unsubscribe_all>
+
+  $e->unsubscribe_all('foo');
+
+Remove all subscribers from event.
 
 =head1 DEBUGGING
 

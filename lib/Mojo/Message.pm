@@ -1,5 +1,5 @@
 package Mojo::Message;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Mojo::Asset::Memory;
@@ -19,7 +19,6 @@ has dom_class        => 'Mojo::DOM';
 has json_class       => 'Mojo::JSON';
 has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 };
 has version          => '1.1';
-has [qw/on_finish on_progress/];
 
 # "I'll keep it short and sweet. Family. Religion. Friendship.
 #  These are the three demons you must slay if you wish to succeed in
@@ -49,12 +48,12 @@ sub body {
 
   # Get
   my $content = $self->content;
-  return $content->on_read ? $content->on_read : $content->asset->slurp
+  return $content->has_subscribers('read') ? undef : $content->asset->slurp
     unless @_;
 
   # New content
   my $new = shift;
-  $content->on_read(undef);
+  $content->unsubscribe_all('read');
   $content->asset(Mojo::Asset::Memory->new);
   return $self unless defined $new;
 
@@ -118,7 +117,7 @@ sub build_body {
   my $self = shift;
   my $body = $self->content->build_body(@_);
   $self->{state} = 'done';
-  if (my $cb = $self->on_finish) { $self->$cb }
+  $self->emit('finish');
   return $body;
 }
 
@@ -239,7 +238,7 @@ sub get_body_chunk {
   my $self = shift;
 
   # Progress
-  if (my $cb = $self->on_progress) { $self->$cb('body', @_) }
+  $self->emit(progress => 'body', @_);
 
   # Chunk
   my $chunk = $self->content->get_body_chunk(@_);
@@ -247,7 +246,7 @@ sub get_body_chunk {
 
   # Finish
   $self->{state} = 'done';
-  if (my $cb = $self->on_finish) { $self->$cb }
+  $self->emit('finish');
 
   return $chunk;
 }
@@ -256,7 +255,7 @@ sub get_header_chunk {
   my $self = shift;
 
   # Progress
-  if (my $cb = $self->on_progress) { $self->$cb('headers', @_) }
+  $self->emit(progress => 'headers', @_);
 
   # HTTP 0.9 has no headers
   return '' if $self->version eq '0.9';
@@ -266,7 +265,7 @@ sub get_header_chunk {
 
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
-  if (my $cb = $self->on_progress) { $self->$cb('start_line', @_) }
+  $self->emit(progress => 'start_line', @_);
   return substr $self->{start_line_buffer} //= $self->_build_start_line,
     $offset, CHUNK_SIZE;
 }
@@ -315,6 +314,9 @@ sub json {
 sub leftovers { shift->content->leftovers }
 
 sub max_line_size { shift->headers->max_line_size(@_) }
+
+sub on_finish   { shift->on(finish   => shift) }
+sub on_progress { shift->on(progress => shift) }
 
 sub param {
   my $self = shift;
@@ -431,22 +433,11 @@ sub _parse {
   # Content
   my $state = $self->{state} || '';
   if ($state eq 'body' || $state eq 'content' || $state eq 'done') {
-    my $content = $self->content;
-
-    # Empty buffer
-    my $buffer = $self->{buffer};
-    $self->{buffer} = '';
-
-    # Progress
-    if (my $cb = $self->on_progress) {
-      weaken $self;
-      $content->on_body(sub { $self->$cb });
-    }
 
     # Until body
-    if ($until_body) {
-      $self->content($content->parse_until_body($buffer));
-    }
+    my $content = $self->content;
+    my $buffer  = delete $self->{buffer};
+    if ($until_body) { $self->content($content->parse_until_body($buffer)) }
 
     # CGI
     elsif ($self->{state} eq 'body') {
@@ -470,10 +461,10 @@ sub _parse {
   $self->{state} = 'done' if $self->content->is_done;
 
   # Progress
-  if (my $cb = $self->on_progress) { $self->$cb }
+  $self->emit('progress');
 
   # Finished
-  if ((my $cb = $self->on_finish) && $self->is_done) { $self->$cb }
+  $self->emit('finish') if $self->is_done;
 
   return $self;
 }
@@ -560,6 +551,26 @@ Mojo::Message - HTTP 1.1 message base class
 L<Mojo::Message> is an abstract base class for HTTP 1.1 messages as described
 in RFC 2616 and RFC 2388.
 
+=head1 EVENTS
+
+L<Mojo::Message> can emit the following events.
+
+=head2 C<finish>
+
+  $message->on(finish => sub {
+    my $message = shift;
+  });
+
+Emitted after message building or parsing is finished.
+
+=head2 C<progress>
+
+  $message->on(progress => sub {
+    my $message = shift;
+  });
+
+Emitted on progress.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Message> implements the following attributes.
@@ -601,34 +612,10 @@ to L<Mojo::JSON>.
 
 Maximum message size in bytes, defaults to C<5242880>.
 
-=head2 C<on_finish>
-
-  my $cb   = $message->on_finish;
-  $message = $message->on_finish(sub {...});
-
-Callback to be invoked after message building or parsing is finished.
-
-  $message->on_finish(sub {
-    my $self = shift;
-    say 'Finihsed!';
-  });
-
-=head2 C<on_progress>
-
-  my $cb   = $message->on_progress;
-  $message = $message->on_progress(sub {...});
-
-Callback to be invoked on progress.
-
-  $message->on_progress(sub {
-    my $self = shift;
-    say 'Progress!';
-  });
-
 =head1 METHODS
 
-L<Mojo::Message> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Message> inherits all methods from L<Mojo::EventEmitter> and
+implements the following new ones.
 
 =head2 C<at_least_version>
 
@@ -794,6 +781,28 @@ Remove leftover data from message parser.
 
 Maximum line size in bytes.
 Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<on_finish>
+
+  $message->on_finish(sub {...});
+
+Register C<finish> event.
+
+  $message->on_finish(sub {
+    my $self = shift;
+    say 'Finihsed!';
+  });
+
+=head2 C<on_progress>
+
+  $message->on_progress(sub {...});
+
+Register C<progress> event.
+
+  $message->on_progress(sub {
+    my $self = shift;
+    say 'Progress!';
+  });
 
 =head2 C<param>
 

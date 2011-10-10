@@ -1,5 +1,5 @@
 package Mojo::IOLoop::Stream;
-use Mojo::Base 'Mojo::IOLoop::EventEmitter';
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno qw/EAGAIN EINTR ECONNRESET EWOULDBLOCK/;
 use Scalar::Util 'weaken';
@@ -20,7 +20,7 @@ sub DESTROY {
   $self->pause if $self->{iowatcher};
   return unless my $handle = $self->{handle};
   close $handle;
-  $self->emit('close');
+  $self->emit_safe('close');
 }
 
 sub new {
@@ -89,17 +89,17 @@ sub _read {
     return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
     # Connection reset
-    return $self->emit('close') if $! == ECONNRESET;
+    return $self->emit_safe('close') if $! == ECONNRESET;
 
     # Read error
-    return $self->emit(error => $!);
+    return $self->emit_safe(error => $!);
   }
 
   # EOF
-  return $self->emit('close') if $read == 0;
+  return $self->emit_safe('close') if $read == 0;
 
   # Handle read
-  $self->emit(read => $buffer);
+  $self->emit_safe(read => $buffer);
 }
 
 sub _write {
@@ -117,7 +117,7 @@ sub _write {
       return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
       # Write error
-      return $self->emit(error => $!);
+      return $self->emit_safe(error => $!);
     }
 
     # Remove written chunk from buffer
@@ -125,7 +125,7 @@ sub _write {
   }
 
   # Handle drain
-  $self->emit('drain') if !length $self->{buffer};
+  $self->emit_safe('drain') if !length $self->{buffer};
 
   # Stop writing
   return if length $self->{buffer} || @{$self->subscribers('drain')};
@@ -174,17 +174,33 @@ L<Mojo::IOLoop::Stream> can emit the following events.
 
 =head2 C<close>
 
+  $stream->on(close => sub {
+    my $stream = shift;
+  });
+
 Emitted if the stream gets closed.
 
 =head2 C<drain>
+
+  $stream->on(drain => sub {
+    my $stream = shift;
+  });
 
 Emitted once all data has been written.
 
 =head2 C<error>
 
+  $stream->on(error => sub {
+    my ($stream, $error) = @_;
+  });
+
 Emitted if an error happens on the stream.
 
 =head2 C<read>
+
+  $stream->on(read => sub {
+    my ($stream, $chunk) = @_;
+  });
 
 Emitted if new data arrives on the stream.
 
@@ -202,8 +218,8 @@ L<Mojo::IOWatcher::EV> object.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Stream> inherits all methods from
-L<Mojo::IOLoop::EventEmitter> and implements the following new ones.
+L<Mojo::IOLoop::Stream> inherits all methods from L<Mojo::EventEmitter> and
+implements the following new ones.
 
 =head2 C<new>
 

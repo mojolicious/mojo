@@ -31,12 +31,10 @@ sub clone {
   # Dynamic requests cannot be cloned
   return unless my $content = $self->content->clone;
   my $clone = $self->new(
-    content     => $content,
-    method      => $self->method,
-    on_progress => $self->on_progress,
-    on_finish   => $self->on_finish,
-    url         => $self->url->clone,
-    version     => $self->version
+    content => $content,
+    method  => $self->method,
+    url     => $self->url->clone,
+    version => $self->version
   );
   $clone->{proxy} = $self->{proxy}->clone if $self->{proxy};
 
@@ -394,6 +392,10 @@ Mojo::Message::Request - HTTP 1.1 request container
 
 L<Mojo::Message::Request> is a container for HTTP 1.1 requests as described
 in RFC 2616.
+
+=head1 EVENTS
+
+L<Mojo::Message::Request> inherits all events from L<Mojo::Message>.
 
 =head1 ATTRIBUTES
 

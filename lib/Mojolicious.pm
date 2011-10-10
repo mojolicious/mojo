@@ -62,16 +62,6 @@ sub DESTROY { }
 sub new {
   my $self = shift->SUPER::new(@_);
 
-  # Transaction builder
-  $self->on_transaction(
-    sub {
-      my $self = shift;
-      my $tx   = Mojo::Transaction::HTTP->new;
-      $self->plugins->run_hook(after_build_tx => ($tx, $self));
-      return $tx;
-    }
-  );
-
   # Root directories
   my $home = $self->home;
   $self->renderer->root($home->rel_dir('templates'));
@@ -233,6 +223,13 @@ sub start {
 
 # This will run once at startup
 sub startup { }
+
+sub transaction {
+  my $self = shift;
+  my $tx   = Mojo::Transaction::HTTP->new;
+  $self->plugins->run_hook(after_build_tx => $tx, $self);
+  return $tx;
+}
 
 1;
 __END__
@@ -616,6 +613,13 @@ startup.
   sub startup {
     my $self = shift;
   }
+
+=head2 C<transaction>
+
+  my $tx = $app->transaction;
+
+Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
+object.
 
 =head1 HELPERS
 

@@ -88,7 +88,7 @@ sub _build_tx {
   my ($self, $id, $c) = @_;
 
   # Build transaction
-  my $tx = $self->on_transaction->($self);
+  $self->emit(transaction => \(my $tx));
   $tx->connection($id);
 
   # Identify
@@ -106,22 +106,18 @@ sub _build_tx {
   # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
 
-  # Handler callback
+  # Handle
   weaken $self;
   $tx->on_request(
     sub {
-      my $tx = shift;
-
-      # Handler
-      $self->on_request->($self, $tx);
-
-      # Resume callback
+      my $tx = pop;
+      $self->emit(request => $tx);
       $tx->on_resume(sub { $self->_write($id) });
     }
   );
 
-  # Upgrade callback
-  $tx->on_upgrade(sub { $self->_upgrade($id, @_) });
+  # Upgrade
+  $tx->on_upgrade(sub { $self->_upgrade($id, pop) });
 
   # New request on the connection
   $c->{requests} ||= 0;
@@ -182,7 +178,7 @@ sub _finish {
       # Upgrade connection timeout
       $self->ioloop->connection_timeout($id, $self->websocket_timeout);
 
-      # Resume callback
+      # Resume
       weaken $self;
       $ws->on_resume(sub { $self->_write($id) });
     }
@@ -234,7 +230,7 @@ sub _listen {
   my $backlog = $self->backlog;
   $options->{backlog} = $backlog if $backlog;
 
-  # Callbacks
+  # Events
   weaken $self;
   $options->{on_accept} = sub {
     my ($loop, $id) = @_;
@@ -295,17 +291,11 @@ sub _read {
 }
 
 sub _upgrade {
-  my ($self, $id, $tx) = @_;
-
-  # WebSocket
-  return unless $tx->req->headers->upgrade =~ /WebSocket/i;
-
-  # WebSocket handshake handler
+  my ($self, $id, $txref) = @_;
+  return unless $$txref->req->headers->upgrade =~ /WebSocket/i;
   my $c = $self->{connections}->{$id};
-  my $ws = $c->{websocket} = $self->on_websocket->($self, $tx);
-
-  # Not resumable yet
-  $ws->on_resume(sub {1});
+  $self->emit(upgrade => $txref);
+  $c->{websocket} = $$txref;
 }
 
 sub _user {
@@ -351,7 +341,8 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP 1.1 and WebSocket server
   use Mojo::Server::Daemon;
 
   my $daemon = Mojo::Server::Daemon->new(listen => ['http://*:8080']);
-  $daemon->on_request(sub {
+  $daemon->unsubscribe_all('request');
+  $daemon->on(request => sub {
     my ($self, $tx) = @_;
 
     # Request
@@ -378,6 +369,10 @@ L<Net::Rendezvous::Publish> are supported transparently and used if
 installed.
 
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
+
+=head1 EVENTS
+
+L<Mojo::Server::Daemon> inherits all events from L<Mojo::Server>.
 
 =head1 ATTRIBUTES
 

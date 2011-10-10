@@ -148,9 +148,9 @@ $ua->on_start(
   }
 );
 $tx = $ua->start($tx);
-$ua->on_start(undef);
+$ua->unsubscribe_all('start');
 ok $tx->success, 'successful';
-is $finished, 1, 'finish callback was called';
+is $finished, 1, 'finish event has been emitted';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';
 

@@ -223,8 +223,8 @@ $ua->start(
   }
 );
 $loop->start;
-is $finished, 1, 'finish callback was called';
-is $early,    1, 'finish callback was called at the right time';
+is $finished, 1, 'finish event has been emitted';
+is $early,    1, 'finish event has been emitted at the right time';
 ok $result =~ /^lalala(\d+)$/, 'right result';
 ok $1 > 100, 'right timeout';
 ok $local, 'local port';
@@ -254,7 +254,7 @@ $ua->websocket(
 );
 $loop->start;
 is $result, 'test3test2', 'right result';
-is $flag2,  23,           'finished callback';
+is $flag2,  23,           'finish event has been emitted';
 
 # WebSocket /denied (connection denied)
 $code = undef;
@@ -368,7 +368,7 @@ $ua->websocket(
 );
 $loop->start;
 is $result, 'hi!there!', 'right result';
-is $flag2,  25,          'finished callback';
+is $flag2,  25,          'finish event has been emitted';
 
 # WebSocket /double_echo (server side drain callback)
 $flag2   = undef;
@@ -396,7 +396,7 @@ $ua->websocket(
 );
 $loop->start;
 is $result, 'hi!hi!', 'right result';
-is $flag2,  24,       'finished callback';
+is $flag2,  24,       'finish event has been emitted';
 
 # WebSocket /dead (dies)
 $code = undef;
@@ -443,7 +443,7 @@ $ua->websocket(
 $loop->start;
 
 # Server side "finished" callback
-is $flag, 24, 'finished callback';
+is $flag, 24, 'finish event has been emitted';
 
 # WebSocket /echo (16bit length)
 $result = undef;

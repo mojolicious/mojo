@@ -11,7 +11,7 @@ sub run {
   my ($self, $env) = @_;
 
   # Environment
-  my $tx  = $self->on_transaction->($self);
+  $self->emit(transaction => \(my $tx));
   my $req = $tx->req;
   $req->parse($env);
 
@@ -31,7 +31,7 @@ sub run {
   }
 
   # Handle
-  $self->on_request->($self, $tx);
+  $self->emit(request => $tx);
 
   # Response headers
   my $res = $tx->res;
@@ -55,10 +55,7 @@ sub run {
 package Mojo::Server::PSGI::_IO;
 use Mojo::Base -base;
 
-sub close {
-  my $tx = shift->{tx};
-  $tx->on_finish->($tx);
-}
+sub close { shift->{tx}->server_close }
 
 sub getline {
   my $self = shift;
@@ -92,6 +89,7 @@ Mojo::Server::PSGI - PSGI server
   use Mojo::Server::PSGI;
 
   my $psgi = Mojo::Server::PSGI->new;
+  $psgi->unsubscribe_all('request');
   $psgi->on_request(sub {
     my ($self, $tx) = @_;
 
@@ -107,7 +105,7 @@ Mojo::Server::PSGI - PSGI server
     # Resume transaction
     $tx->resume;
   });
-  my $app  = sub { $psgi->run(@_) };
+  my $app = sub { $psgi->run(@_) };
 
 =head1 DESCRIPTION
 
@@ -115,6 +113,10 @@ L<Mojo::Server::PSGI> allows L<Mojo> applications to run on all PSGI
 compatible servers.
 
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
+
+=head1 EVENTS
+
+L<Mojo::Server::PSGI> inherits all events from L<Mojo::Server>.
 
 =head1 METHODS
 

@@ -139,7 +139,7 @@ sub flash {
 # "My parents may be evil, but at least they're stupid."
 sub on_finish {
   my ($self, $cb) = @_;
-  $self->tx->on_finish(sub { shift and $self->$cb(@_) });
+  return $self->tx->on_finish(sub { shift and $self->$cb(@_) });
 }
 
 # "I like being a women.
@@ -150,11 +150,9 @@ sub on_message {
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to receive messages from')
     unless $tx->is_websocket;
-  my $cb = shift;
-  $tx->on_message(sub { shift and $self->$cb(@_) });
   $self->rendered(101);
-
-  return $self;
+  my $cb = shift;
+  return $tx->on_message(sub { shift and $self->$cb(@_) });
 }
 
 # "Just make a simple cake. And this time, if someone's going to jump out of
@@ -755,9 +753,10 @@ Data storage persistent only for the next request, stored in the session.
 
 =head2 C<on_finish>
 
-  $c->on_finish(sub {...});
+  my $cb = $c->on_finish(sub {...});
 
-Callback to be invoked when the transaction has been finished.
+Register C<finish> event, which will be emitted when the transaction has been
+finished.
 
   $c->on_finish(sub {
     my $c = shift;
@@ -765,9 +764,10 @@ Callback to be invoked when the transaction has been finished.
 
 =head2 C<on_message>
 
-  $c = $c->on_message(sub {...});
+  my $cb = $c->on_message(sub {...});
 
-Callback to be invoked when new WebSocket messages arrive.
+Register C<message> event, which will be emitted when new WebSocket messages
+arrive.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   $c->on_message(sub {

@@ -1,12 +1,14 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.0     2011-10-10 00:00:00
+2.0     2011-10-11 00:00:00
         - Code name "Leaf Fluttering In Wind", this is a major release.
         - Increased Perl version requirement to 5.10.1.
+        - Renamed Mojo::IOLoop::EventEmitter to Mojo::EventEmitter.
         - Added EXPERIMENTAL on_body attribute to Mojo::Content.
         - Added EXPERIMENTAL contains method to Mojo::Path.
         - Added EXPERIMENTAL auto_upgrade attribute to Mojo::Content::Single.
         - Added EXPERIMENTAL boundary method to Mojo::Content.
+        - Improved many modules to use events instead of callbacks.
         - Improved message parser performance slightly.
         - Improved Mojo::IOLoop to die if started twice.
         - Improved setuidgid in Mojo::Server::Daemon.

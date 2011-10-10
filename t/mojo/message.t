@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1233;
+use Test::More tests => 1237;
 
 use File::Spec;
 use File::Temp;
@@ -343,7 +343,7 @@ $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
 $req->parse("o World!\n123");
 $req->parse('0');
 $req->parse("\nlalalala\n");
-ok $finished, 'finish callback was called';
+ok $finished, 'finish event has been emitted';
 ok $req->is_done, 'request is done';
 is $req->method,  'GET', 'right method';
 is $req->version, '1.0', 'right version';
@@ -822,7 +822,7 @@ is $req->headers->expect, '100-continue',             'right "Expect" value';
 is $req->headers->host,   '127.0.0.1',                'right "Host" value';
 is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
-ok $finished, 'finish callback was called';
+ok $finished, 'finish event has been emitted';
 ok $req->is_done, 'request is done';
 
 # Build full HTTP 1.1 request (with clone)
@@ -846,7 +846,7 @@ is $req->headers->expect, '100-continue',             'right "Expect" value';
 is $req->headers->host,   '127.0.0.1',                'right "Host" value';
 is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
-ok $finished, 'finish callback was called';
+ok $finished, 'finish event has been emitted';
 ok $req->is_done, 'request is done';
 $finished = undef;
 $clone    = Mojo::Message::Request->new->parse($clone->to_string);
@@ -861,7 +861,7 @@ is $clone->headers->expect, '100-continue', 'right "Expect" value';
 is $clone->headers->host,   '127.0.0.1',    'right "Host" value';
 is $clone->headers->content_length, '13', 'right "Content-Length" value';
 is $clone->body, "Hello World!\n", 'right content';
-ok $finished, 'finish callback was called';
+ok !$finished, 'finish event has been emitted';
 ok $clone->is_done, 'request is done';
 
 # Build full HTTP 1.1 request (roundtrip)
@@ -911,7 +911,7 @@ $req->headers->expect('100-continue');
 $req->body("Hello World!\n");
 my $i = 0;
 while (my $chunk = $req->get_body_chunk($i)) { $i += length $chunk }
-ok $finished, 'finish callback was called';
+ok $finished, 'finish event has been emitted';
 ok $req->is_done, 'request is done';
 
 # Build WebSocket handshake request
@@ -940,7 +940,7 @@ is $req->headers->sec_websocket_accept, 'abcdef=',
 is $req->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
 is $req->body, '', 'no content';
-ok $finished, 'finish callback was called';
+ok $finished, 'finish event has been emitted';
 ok $req->is_done, 'request is done';
 
 # Build WebSocket handshake request (with clone)
@@ -1017,7 +1017,7 @@ is $req->headers->sec_websocket_accept, 'abcdef=',
 is $req->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
 is $req->body, '', 'no content';
-ok $finished, 'finish callback was called';
+ok $finished, 'finish event has been emitted';
 ok $req->is_done, 'request is done';
 
 # Build full HTTP 1.1 proxy request
@@ -2312,11 +2312,11 @@ is $counter, 6, 'right count';
 is $req->content->is_parsing_body, undef, 'is not parsing body';
 is $req->is_done, undef, 'request is not done';
 $req->parse("Content-Length: 27\x0d\x0a\x0d\x0aHell");
-is $counter, 8, 'right count';
+is $counter, 7, 'right count';
 is $req->content->is_parsing_body, 1, 'is parsing body';
 is $req->is_done, undef, 'request is not done';
 $req->parse("o World!\n1234\nlalalala\n");
-is $counter, 9, 'right count';
+is $counter, 8, 'right count';
 is $req->content->is_parsing_body, undef, 'is not parsing body';
 is $req->is_done, 1,     'request is done';
 ok $req->is_done, 'request is done';
@@ -2593,17 +2593,21 @@ $req->body('hi there!');
 is $req->body, 'hi there!', 'right content';
 $req->body(undef);
 is $req->body, '', 'right content';
+is $req->content->has_subscribers('read'), undef, 'no subscribers';
 $req->body(sub { });
-isa_ok $req->body, 'CODE', 'body is callback';
+is $req->content->has_subscribers('read'), 1, 'has subscribers';
 $req->body(undef);
+is $req->content->has_subscribers('read'), undef, 'no subscribers';
 is $req->body, '', 'right content';
 $req->body(0);
 is $req->body, 0, 'right content';
+is $req->content->has_subscribers('read'), undef, 'no subscribers';
 $req->body(sub { });
-isa_ok $req->body, 'CODE', 'body is callback';
+is $req->content->has_subscribers('read'), 1, 'has subscribers';
 $req->body('hello!');
+is $req->content->has_subscribers('read'), undef, 'no subscribers';
 is $req->body, 'hello!', 'right content';
-is $req->content->on_read, undef, 'no read callback';
+is $req->content->has_subscribers('read'), undef, 'no subscribers';
 $req->content(Mojo::Content::MultiPart->new);
 $req->body('hi!');
 is $req->body, 'hi!', 'right content';

@@ -128,6 +128,8 @@ sub get_body_chunk {
   }
 }
 
+sub is_multipart {1}
+
 sub parse {
   my $self = shift;
 
@@ -148,7 +150,7 @@ sub _parse_multipart {
 
   # Parse
   $self->{multi_state} ||= 'multipart_preamble';
-  my $boundary = $self->is_multipart;
+  my $boundary = $self->boundary;
   while (!$self->is_done) {
 
     # Preamble
@@ -299,6 +301,12 @@ Note that this method is EXPERIMENTAL and might change without warning!
   my $chunk = $content->get_body_chunk(0);
 
 Get a chunk of content starting from a specfic position.
+
+=head2 C<is_multipart>
+
+  my $true = $content->is_multipart;
+
+True.
 
 =head2 C<parse>
 

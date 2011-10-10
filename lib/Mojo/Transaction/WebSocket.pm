@@ -453,7 +453,7 @@ Finish the WebSocket connection gracefully.
 
 =head2 C<is_websocket>
 
-  my $success = $ws->is_websocket;
+  my $true = $ws->is_websocket;
 
 True.
 

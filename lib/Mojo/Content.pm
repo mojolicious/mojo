@@ -16,6 +16,13 @@ sub body_contains {
 
 sub body_size { croak 'Method "body_size" not implemented by subclass' }
 
+sub boundary {
+  return
+    unless (shift->headers->content_type || '')
+    =~ /multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+)/i;
+  return $1;
+}
+
 # "Operator! Give me the number for 911!"
 sub build_body {
   my $self = shift;
@@ -131,13 +138,7 @@ sub is_dynamic {
   return;
 }
 
-sub is_multipart {
-  my $self = shift;
-  my $type = $self->headers->content_type || '';
-  $type =~ /multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+)/i
-    and return $1;
-  return;
-}
+sub is_multipart {undef}
 
 sub is_parsing_body {
   return 1 if (shift->{state} || '') eq 'body';
@@ -486,6 +487,13 @@ Check if content contains a specific string.
 
 Content size in bytes.
 
+=head2 C<boundary>
+
+  my $boundary = $content->boundary;
+
+Extract multipart boundary from content type header.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<build_body>
 
   my $string = $content->build_body;
@@ -556,9 +564,9 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_multipart>
 
-  my $success = $content->is_multipart;
+  my $false = $content->is_multipart;
 
-Check if content is multipart.
+False.
 
 =head2 C<is_parsing_body>
 

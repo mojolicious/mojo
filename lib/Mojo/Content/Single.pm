@@ -47,7 +47,7 @@ sub parse {
   return $self if ($self->{state} || '') eq 'headers' || $self->on_read;
 
   # Content needs to be upgraded to multipart
-  if ($self->auto_upgrade && $self->is_multipart) {
+  if ($self->auto_upgrade && defined($self->boundary)) {
     return $self if $self->isa('Mojo::Content::MultiPart');
     return Mojo::Content::MultiPart->new($self)->parse;
   }

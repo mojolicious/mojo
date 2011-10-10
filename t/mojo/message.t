@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1231;
+use Test::More tests => 1233;
 
 use File::Spec;
 use File::Temp;
@@ -612,9 +612,10 @@ $req->parse("use strict;\n");
 $req->parse("use warnings;\n\n");
 $req->parse("print \"Hello World :)\\n\"\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
-ok $req->is_done, 'request is done';
-is $req->method,  'GET', 'right method';
-is $req->version, '1.1', 'right version';
+ok $req->is_done,      'request is done';
+is $req->is_multipart, 1, 'multipart content';
+is $req->method,       'GET', 'right method';
+is $req->version,      '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo13#23', 'right URL';
@@ -660,9 +661,10 @@ $req->parse("use strict;\n");
 $req->parse("use warnings;\n\n");
 $req->parse("print \"Hello World :)\\n\"\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
-ok $req->is_done, 'request is done';
-is $req->method,  'GET', 'right method';
-is $req->version, '1.1', 'right version';
+ok $req->is_done,      'request is done';
+is $req->is_multipart, undef, 'no multipart content';
+is $req->method,       'GET', 'right method';
+is $req->version,      '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo13#23', 'right URL';

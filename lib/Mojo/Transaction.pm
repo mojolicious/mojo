@@ -29,7 +29,7 @@ sub is_done {
   return;
 }
 
-sub is_websocket {0}
+sub is_websocket {undef}
 
 sub is_writing {
   return 1 unless my $state = shift->{state};
@@ -237,9 +237,9 @@ Check if transaction is done.
 
 =head2 C<is_websocket>
 
-  my $success = $tx->is_websocket;
+  my $false = $tx->is_websocket;
 
-Check if transaction is a WebSocket.
+False.
 
 =head2 C<is_writing>
 

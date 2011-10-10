@@ -772,7 +772,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
   my $success = $message->is_multipart;
 
-Check if message content is multipart.
+Check if message content is a L<Mojo::Content::MultiPart> object.
 
 =head2 C<json>
 

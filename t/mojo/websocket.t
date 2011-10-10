@@ -191,8 +191,8 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $ws,   0,   'not a websocket';
-is $code, 426, 'right code';
+is $ws,   undef, 'not a websocket';
+is $code, 426,   'right code';
 ok $body =~ /^(\d+)failed!$/, 'right content';
 ok $1 < 100, 'right timeout';
 
@@ -413,7 +413,7 @@ $ua->websocket(
 );
 $loop->start;
 is $done,      1,                       'transaction is done';
-is $websocket, 0,                       'no websocket';
+is $websocket, undef,                   'no websocket';
 is $code,      500,                     'right status';
 is $message,   'Internal Server Error', 'right message';
 
@@ -429,7 +429,7 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $websocket, 0,              'no websocket';
+is $websocket, undef,          'no websocket';
 is $code,      403,            'right status';
 is $message,   "i'm a teapot", 'right message';
 

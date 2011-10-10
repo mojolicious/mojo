@@ -137,9 +137,6 @@ sub parse {
   # Custom body parser
   return $self if $self->on_read;
 
-  # Upgrade state
-  $self->{multi_state} ||= 'multipart_preamble';
-
   # Parse multipart content
   $self->_parse_multipart;
 
@@ -150,6 +147,7 @@ sub _parse_multipart {
   my $self = shift;
 
   # Parse
+  $self->{multi_state} ||= 'multipart_preamble';
   my $boundary = $self->is_multipart;
   while (!$self->is_done) {
 

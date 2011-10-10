@@ -335,12 +335,12 @@ sub _handle {
     $self->{processing} -= 1;
     delete $self->{connections}->{$id};
     $self->_drop($id, $close);
+    $old->client_close;
   }
 
   # Upgrade connection to WebSocket
   elsif ($old && (my $new = $self->_upgrade($id))) {
-
-    # Finish transaction and parse leftovers
+    $old->client_close;
     $self->_finish($new, $c->{cb});
     $new->client_read($old->res->leftovers);
   }
@@ -351,14 +351,14 @@ sub _handle {
     return unless $old;
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
     $self->{processing} -= 1;
+    $old->client_close;
 
-    # Redirect or callback
+    # Handle redirects
     $self->_finish($new || $old, $c->{cb}, $close)
       unless $self->_redirect($c, $old);
   }
 
-  # Close and stop loop
-  $old->client_close;
+  # Stop loop
   $self->ioloop->stop if !$self->{nb} && !$self->{processing};
 }
 

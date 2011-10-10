@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 42;
+use Test::More tests => 44;
 
 # "I can't believe it! Reading and writing actually paid off!"
 use IO::Socket::INET;
@@ -197,17 +197,20 @@ ok $body =~ /^(\d+)failed!$/, 'right content';
 ok $1 < 100, 'right timeout';
 
 # WebSocket /socket (using an already prepared socket)
-my $port = $ua->test_server->port;
-$result = '';
-my $tx = $ua->build_websocket_tx('ws://lalala/socket');
+my $port     = $ua->test_server->port;
+my $tx       = $ua->build_websocket_tx('ws://lalala/socket');
+my $finished = 0;
+$tx->on_finish(sub { $finished++ });
 my $socket =
   IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $socket->blocking(0);
 $tx->connection($socket);
-my $local;
+$result = '';
+my ($local, $early);
 $ua->start(
   $tx => sub {
     my $tx = pop;
+    $early = $finished;
     $tx->on_finish(sub { $loop->stop });
     $tx->on_message(
       sub {
@@ -220,6 +223,8 @@ $ua->start(
   }
 );
 $loop->start;
+is $finished, 1, 'finish callback was called';
+is $early,    1, 'finish callback was called at the right time';
 ok $result =~ /^lalala(\d+)$/, 'right result';
 ok $1 > 100, 'right timeout';
 ok $local, 'local port';
@@ -265,7 +270,7 @@ is $handshake, 2,   'finished handshake';
 is $denied,    1,   'finished websocket';
 
 # WebSocket /subreq
-my $finished = 0;
+$finished = 0;
 ($code, $result) = undef;
 $ua->websocket(
   '/subreq' => sub {

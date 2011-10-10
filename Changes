@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Increased Perl version requirement to 5.10.1.
         - Added EXPERIMENTAL on_body attribute to Mojo::Content.
         - Added EXPERIMENTAL contains method to Mojo::Path.
+        - Added EXPERIMENTAL auto_upgrade attribute to Mojo::Content::Single.
         - Improved message parser performance slightly.
         - Improved Mojo::IOLoop to die if started twice.
         - Improved setuidgid in Mojo::Server::Daemon.

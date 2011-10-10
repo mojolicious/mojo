@@ -184,8 +184,7 @@ sub parse {
   # Not chunked, pass through to second buffer
   else {
     $self->{real_size} += length $self->{pre_buffer};
-    $self->{buffer} .= $self->{pre_buffer};
-    $self->{pre_buffer} = '';
+    $self->{buffer} .= delete $self->{pre_buffer};
   }
 
   # Custom body parser callback
@@ -331,10 +330,8 @@ sub _parse_chunked {
   my $self = shift;
 
   # Trailing headers
-  if (($self->{chunked} || '') eq 'trailing_headers') {
-    $self->_parse_chunked_trailing_headers;
-    return $self;
-  }
+  return $self->_parse_chunked_trailing_headers
+    if ($self->{chunked} || '') eq 'trailing_headers';
 
   # New chunk (ignore the chunk extension)
   while ($self->{pre_buffer} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
@@ -375,8 +372,7 @@ sub _parse_chunked_trailing_headers {
 
   # Parse
   my $headers = $self->headers;
-  $headers->parse($self->{pre_buffer});
-  $self->{pre_buffer} = '';
+  $headers->parse(delete $self->{pre_buffer});
 
   # Done
   if ($headers->is_done) {
@@ -399,8 +395,7 @@ sub _parse_headers {
 
   # Parse
   my $headers = $self->headers;
-  $headers->parse($self->{pre_buffer});
-  $self->{pre_buffer} = '';
+  $headers->parse(delete $self->{pre_buffer});
 
   # Done
   if ($headers->is_done) {

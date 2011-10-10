@@ -99,8 +99,7 @@ RFC 2616.
 
 =head1 EVENTS
 
-L<Mojo::Content::Single> inherits all events from L<Mojo::Content> and can
-emit the following new ones.
+L<Mojo::Content::Single> inherits all events from L<Mojo::Content>.
 
 =head1 ATTRIBUTES
 

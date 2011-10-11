@@ -319,13 +319,12 @@ sub _write {
 
   # Write
   weaken $self;
-  my $done = $tx->is_done;
-  $self->ioloop->write(
-    $id => $chunk => sub {
-      $self->_finish($id, $tx) if $done;
-      $self->_write($id);
-    }
-  );
+  my $cb = sub { $self->_write($id) };
+  if ($tx->is_done) {
+    $self->_finish($id, $tx);
+    $cb = undef unless $c->{transaction} || $c->{websocket};
+  }
+  $self->ioloop->write($id, $chunk, $cb);
   warn "> $chunk\n" if DEBUG;
 }
 

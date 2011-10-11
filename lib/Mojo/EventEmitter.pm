@@ -98,20 +98,24 @@ Mojo::EventEmitter - Event emitter base class
 
 =head1 SYNOPSIS
 
-  # Subclass
   package Cat;
   use Mojo::Base 'Mojo::EventEmitter';
 
+  # Emit events
+  sub poke {
+    my $self = shift;
+    $self->emit(roar => 3);
+  }
+
   package main;
 
+  # Subscribe to events
   my $tiger = Cat->new;
-
   $tiger->on(roar => sub {
     my ($self, $times) = @_;
     say 'RAWR!' for 1 .. $times;
   });
-
-  $tiger->emit(roar => 5);
+  $tiger->poke;
 
 =head1 DESCRIPTION
 
@@ -125,17 +129,17 @@ implements the following new ones.
 
 =head2 C<emit>
 
-  $e->emit('foo');
-  $e->emit('foo', 123);
+  $e = $e->emit('foo');
+  $e = $e->emit('foo', 123);
 
 Emit event.
 
 =head2 C<emit_safe>
 
-  $e->emit_safe('foo');
-  $e->emit_safe('foo', 123);
+  $e = $e->emit_safe('foo');
+  $e = $e->emit_safe('foo', 123);
 
-Emit event safely.
+Emit event safely and emit C<error> event on failure.
 
 =head2 C<has_subscribers>
 

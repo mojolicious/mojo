@@ -187,7 +187,8 @@ sub parse {
   # Not chunked, pass through to second buffer
   else {
     $self->{real_size} += length $self->{pre_buffer};
-    $self->{buffer} .= delete $self->{pre_buffer};
+    $self->{buffer} .= $self->{pre_buffer};
+    $self->{pre_buffer} = '';
   }
 
   # Custom body parser
@@ -375,7 +376,8 @@ sub _parse_chunked_trailing_headers {
 
   # Parse
   my $headers = $self->headers;
-  $headers->parse(delete $self->{pre_buffer});
+  $headers->parse($self->{pre_buffer});
+  $self->{pre_buffer} = '';
 
   # Done
   if ($headers->is_done) {
@@ -398,7 +400,8 @@ sub _parse_headers {
 
   # Parse
   my $headers = $self->headers;
-  $headers->parse(delete $self->{pre_buffer});
+  $headers->parse($self->{pre_buffer});
+  $self->{pre_buffer} = '';
 
   # Done
   if ($headers->is_done) {

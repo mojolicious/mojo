@@ -599,7 +599,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 Register C<read> event.
 
   $content->on_read(sub {
-    my ($message, $chunk) = @_;
+    my ($content, $chunk) = @_;
     say $chunk;
   });
 

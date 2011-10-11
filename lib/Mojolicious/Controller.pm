@@ -145,13 +145,11 @@ sub on_finish {
 # "I like being a women.
 #  Now when I say something stupid, everyone laughs and buys me things."
 sub on_message {
-  my $self = shift;
-
+  my ($self, $cb) = @_;
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to receive messages from')
     unless $tx->is_websocket;
   $self->rendered(101);
-  my $cb = shift;
   return $tx->on_message(sub { shift and $self->$cb(@_) });
 }
 
@@ -755,8 +753,8 @@ Data storage persistent only for the next request, stored in the session.
 
   my $cb = $c->on_finish(sub {...});
 
-Register C<finish> event, which will be emitted when the transaction has been
-finished.
+Register C<finish> event with transaction, which will be emitted when the
+transaction has been finished.
 
   $c->on_finish(sub {
     my $c = shift;
@@ -766,8 +764,8 @@ finished.
 
   my $cb = $c->on_message(sub {...});
 
-Register C<message> event, which will be emitted when new WebSocket messages
-arrive.
+Register C<message> event with transaction, which will be emitted when new
+WebSocket messages arrive.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   $c->on_message(sub {

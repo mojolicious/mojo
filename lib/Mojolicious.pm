@@ -171,6 +171,7 @@ sub handler {
   my $c =
     $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{app};
+  weaken $c->{tx};
   unless (eval { $self->on_process->($self, $c); 1 }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);

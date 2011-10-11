@@ -52,14 +52,19 @@ get '/shortpoll/nolength' => sub {
 my $longpoll;
 get '/longpoll' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->write_chunk('hi ');
-  Mojo::IOLoop->timer(
+  my $id = Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->write_chunk('there,', sub { shift->write_chunk(' whats up?') });
       shift->timer('0.5' => sub { $self->finish });
+    }
+  );
+  $self->on_finish(
+    sub {
+      Mojo::IOLoop->drop($id);
+      $longpoll = 'finished!';
     }
   );
 };

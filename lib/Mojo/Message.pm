@@ -43,28 +43,20 @@ sub body {
   my $self = shift;
 
   # Downgrade multipart content
-  $self->content(Mojo::Content::Single->new)
-    if $self->content->isa('Mojo::Content::MultiPart');
+  $self->content(Mojo::Content::Single->new) if $self->content->is_multipart;
+  my $content = $self->content;
 
   # Get
-  my $content = $self->content;
-  return $content->has_subscribers('read') ? undef : $content->asset->slurp
-    unless @_;
-
-  # New content
-  my $new = shift;
-  $content->unsubscribe_all('read');
-  $content->asset(Mojo::Asset::Memory->new);
-  return $self unless defined $new;
+  return $content->asset->slurp unless defined(my $new = shift);
 
   # Callback
   if (ref $new eq 'CODE') {
     weaken $self;
-    $content->on_read(sub { shift and $self->$new(@_) });
+    return $content->on_read(sub { $self->$new(pop) });
   }
 
   # Set text content
-  elsif (length $new) { $content->asset->add_chunk($new) }
+  else { $content->asset(Mojo::Asset::Memory->new->add_chunk($new)) }
 
   return $self;
 }
@@ -315,7 +307,6 @@ sub leftovers { shift->content->leftovers }
 
 sub max_line_size { shift->headers->max_line_size(@_) }
 
-sub on_body     { shift->on(body     => shift) }
 sub on_finish   { shift->on(finish   => shift) }
 sub on_progress { shift->on(progress => shift) }
 
@@ -435,15 +426,9 @@ sub _parse {
   my $state = $self->{state} || '';
   if ($state eq 'body' || $state eq 'content' || $state eq 'done') {
 
-    # Body event
-    my $content = $self->content;
-    if ($self->has_subscribers('body') && !$self->{body}++) {
-      weaken $self;
-      $content->on_body(sub { $self->emit('body') });
-    }
-
     # Until body
-    my $buffer = delete $self->{buffer};
+    my $content = $self->content;
+    my $buffer  = delete $self->{buffer};
     if ($until_body) { $self->content($content->parse_until_body($buffer)) }
 
     # CGI
@@ -562,15 +547,6 @@ in RFC 2616 and RFC 2388.
 
 L<Mojo::Message> can emit the following events.
 
-=head2 C<body>
-
-  $message->on(body => sub {
-    my $message = shift;
-  });
-
-Emitted once all headers have been parsed and the content starts.
-Note that this event is EXPERIMENTAL and might change without warning!
-
 =head2 C<finish>
 
   $message->on(finish => sub {
@@ -643,9 +619,10 @@ Check if message is at least a specific version.
 
   my $string = $message->body;
   $message   = $message->body('Hello!');
-  $message   = $message->body(sub {...});
+  my $cb     = $message->body(sub {...});
 
-Simple C<content> access.
+Access and replace text content or register C<read> event with content, which
+will be emitted when new content arrives.
 
 =head2 C<body_params>
 
@@ -796,13 +773,6 @@ Remove leftover data from message parser.
   $message->max_line_size(1024);
 
 Maximum line size in bytes.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<on_body>
-
-  $message->on_body(sub {...});
-
-Register C<body> event.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<on_finish>

@@ -107,6 +107,13 @@ sub new {
   return $self;
 }
 
+sub build_tx {
+  my $self = shift;
+  my $tx   = Mojo::Transaction::HTTP->new;
+  $self->plugins->run_hook(after_build_tx => $tx, $self);
+  return $tx;
+}
+
 # "Amy, technology isn't intrinsically good or evil. It's how it's used.
 #  Like the Death Ray."
 sub defaults {
@@ -224,13 +231,6 @@ sub start {
 
 # This will run once at startup
 sub startup { }
-
-sub transaction {
-  my $self = shift;
-  my $tx   = Mojo::Transaction::HTTP->new;
-  $self->plugins->run_hook(after_build_tx => $tx, $self);
-  return $tx;
-}
 
 1;
 __END__
@@ -403,6 +403,13 @@ Construct a new L<Mojolicious> application.
 Will automatically detect your home directory and set up logging based on
 your current operating mode.
 Also sets up the renderer, static dispatcher and a default set of plugins.
+
+=head2 C<build_tx>
+
+  my $tx = $app->build_tx;
+
+Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
+object.
 
 =head2 C<defaults>
 
@@ -614,13 +621,6 @@ startup.
   sub startup {
     my $self = shift;
   }
-
-=head2 C<transaction>
-
-  my $tx = $app->transaction;
-
-Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
-object.
 
 =head1 HELPERS
 

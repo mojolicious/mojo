@@ -35,12 +35,12 @@ sub new {
   return $self;
 }
 
+sub build_tx { Mojo::Transaction::HTTP->new }
+
 # "D’oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
-sub transaction { Mojo::Transaction::HTTP->new }
-
-sub upgrade { Mojo::Transaction::WebSocket->new(handshake => pop) }
+sub upgrade_tx { Mojo::Transaction::WebSocket->new(handshake => pop) }
 
 1;
 __END__
@@ -124,6 +124,13 @@ Construct a new L<Mojo> application.
 Will automatically detect your home directory and set up logging to
 C<log/mojo.log> if there's a C<log> directory.
 
+=head2 C<build_tx>
+
+  my $tx = $app->build_tx;
+
+Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
+object.
+
 =head2 C<handler>
 
   $tx = $app->handler($tx);
@@ -136,16 +143,9 @@ L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
     my ($self, $tx) = @_;
   }
 
-=head2 C<transaction>
+=head2 C<upgrade_tx>
 
-  my $tx = $app->transaction;
-
-Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
-object.
-
-=head2 C<upgrade>
-
-  my $ws = $app->upgrade(tx);
+  my $ws = $app->upgrade_tx(tx);
 
 Upgrade transaction, defaults to building a L<Mojo::Transaction::WebSocket>
 object.

@@ -23,13 +23,13 @@ sub new {
   $self->on_transaction(
     sub {
       my ($self, $txref) = @_;
-      $$txref = $self->app->transaction;
+      $$txref = $self->app->build_tx;
     }
   );
   $self->on_upgrade(
     sub {
       my ($self, $txref) = @_;
-      $$txref = $self->app->upgrade($$txref);
+      $$txref = $self->app->upgrade_tx($$txref);
       $$txref->server_handshake;
     }
   );

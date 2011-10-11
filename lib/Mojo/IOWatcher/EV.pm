@@ -1,7 +1,7 @@
 package Mojo::IOWatcher::EV;
 use Mojo::Base 'Mojo::IOWatcher';
 
-use EV;
+use EV 4.0;
 use Scalar::Util 'weaken';
 
 my $EV;
@@ -25,14 +25,6 @@ sub not_writing {
   return $self;
 }
 
-# "Wow, Barney. You brought a whole beer keg.
-#  Yeah... where do I fill it up?"
-sub one_tick {
-  my ($self, $timeout) = @_;
-  my $w = EV::timer($timeout, 0, sub { EV::unloop(EV::BREAK_ONE) });
-  EV::loop;
-}
-
 sub recurring { shift->_timer(shift, 1, @_) }
 
 sub remove {
@@ -40,6 +32,12 @@ sub remove {
   delete $self->{handles}->{fileno $handle};
   return $self;
 }
+
+# "Wow, Barney. You brought a whole beer keg.
+#  Yeah... where do I fill it up?"
+sub start {EV::run}
+
+sub stop { EV::break(EV::BREAK_ONE) }
 
 sub timer { shift->_timer(shift, 0, @_) }
 
@@ -124,12 +122,6 @@ Construct a new L<Mojo::IOWatcher::EV> object.
 
 Only watch handle for readable events.
 
-=head2 C<one_tick>
-
-  $watcher->one_tick('0.25');
-
-Run for exactly one tick and watch for I/O and timer events.
-
 =head2 C<recurring>
 
   my $id = $watcher->recurring(3 => sub {...});
@@ -142,6 +134,18 @@ amount of seconds.
   $watcher = $watcher->remove($handle);
 
 Remove handle.
+
+=head2 C<start>
+
+  $watcher->start;
+
+Start watching for I/O and timer events.
+
+=head2 C<stop>
+
+  $watcher->stop;
+
+Stop watching for I/O and timer events.
 
 =head2 C<timer>
 

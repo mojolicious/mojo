@@ -60,12 +60,12 @@ sub not_writing {
 }
 
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
-sub one_tick {
-  my ($self, $timeout) = @_;
+sub _one_tick {
+  my $self = shift;
 
   # I/O
   my $poll = $self->_poll;
-  $poll->poll($timeout);
+  $poll->poll('0.025');
   my $handles = $self->{handles};
   $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_)
     for $poll->handles(POLLIN | POLLHUP | POLLERR);
@@ -73,7 +73,7 @@ sub one_tick {
     for $poll->handles(POLLOUT);
 
   # Wait for timeout
-  usleep 1000000 * $timeout unless keys %{$self->{handles}};
+  usleep 1000000 * '0.025' unless keys %{$self->{handles}};
 
   # Timers
   my $timers = $self->{timers} || {};
@@ -103,6 +103,14 @@ sub remove {
   $self->_poll->remove($handle);
   return $self;
 }
+
+sub start {
+  my $self = shift;
+  $self->{running}++;
+  $self->_one_tick while $self->{running};
+}
+
+sub stop { delete shift->{running} }
 
 # "Bart, how did you get a cellphone?
 #  The same way you got me, by accident on a golf course."
@@ -160,8 +168,9 @@ Mojo::IOWatcher - Non-blocking I/O watcher
     say "Timeout!";
   });
 
-  # And loop!
-  $watcher->one_tick('0.25') while 1;
+  # Start and stop watcher
+  $watcher->start;
+  $watcher->stop;
 
 =head1 DESCRIPTION
 
@@ -222,12 +231,6 @@ sockets.
 
 Only watch handle for readable events.
 
-=head2 C<one_tick>
-
-  $watcher->one_tick('0.25');
-
-Run for exactly one tick and watch for I/O and timer events.
-
 =head2 C<recurring>
 
   my $id = $watcher->recurring(3 => sub {...});
@@ -240,6 +243,18 @@ amount of seconds.
   $watcher = $watcher->remove($handle);
 
 Remove handle.
+
+=head2 C<start>
+
+  $watcher->start;
+
+Start watching for I/O and timer events.
+
+=head2 C<stop>
+
+  $watcher->stop;
+
+Stop watching for I/O and timer events.
 
 =head2 C<timer>
 

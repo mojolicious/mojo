@@ -229,30 +229,9 @@ sub on_error { shift->_event(error => @_) }
 sub on_read  { shift->_event(read  => @_) }
 
 sub one_tick {
-  my ($self, $timeout) = @_;
-  $timeout //= $self->timeout;
-
-  # Housekeeping
-  $self->_listening;
-  my $connections = $self->{connections} ||= {};
-  while (my ($id, $c) = each %$connections) {
-
-    # Connection needs to be finished
-    if ($c->{finish} && (!$c->{stream} || $c->{stream}->is_finished)) {
-      $self->_drop($id);
-      next;
-    }
-
-    # Connection timeout
-    $self->_drop($id)
-      if (time - ($c->{active} || time)) >= ($c->{timeout} || 15);
-  }
-
-  # Graceful shutdown
-  $self->stop if $self->max_connections == 0 && keys %$connections == 0;
-
-  # Watcher
-  $self->iowatcher->one_tick($timeout);
+  my $self = shift;
+  $self->timer(shift // $self->timeout => sub { shift->stop });
+  $self->start;
 }
 
 sub recurring {
@@ -278,7 +257,9 @@ sub start {
   croak 'Mojo::IOLoop already running' if $self->{running}++;
 
   # Mainloop
-  $self->one_tick while $self->{running};
+  my $id = $self->recurring(0 => sub { shift->_manage });
+  $self->iowatcher->start;
+  $self->drop($id);
 
   return $self;
 }
@@ -300,6 +281,7 @@ sub stop {
   my $self = shift;
   $self = $self->singleton unless ref $self;
   delete $self->{running};
+  $self->iowatcher->stop;
 }
 
 sub test {
@@ -394,6 +376,29 @@ sub _listening {
   # Check if multi-accept is desirable and start listening
   $_->accepts($max > 1 ? 10 : 1)->resume for values %$servers;
   $self->{listening} = 1;
+}
+
+sub _manage {
+  my $self = shift;
+
+  # Housekeeping
+  $self->_listening;
+  my $connections = $self->{connections} ||= {};
+  while (my ($id, $c) = each %$connections) {
+
+    # Connection needs to be finished
+    if ($c->{finish} && (!$c->{stream} || $c->{stream}->is_finished)) {
+      $self->_drop($id);
+      next;
+    }
+
+    # Connection timeout
+    $self->_drop($id)
+      if (time - ($c->{active} || time)) >= ($c->{timeout} || 15);
+  }
+
+  # Graceful shutdown
+  $self->stop if $self->max_connections == 0 && keys %$connections == 0;
 }
 
 sub _not_listening {

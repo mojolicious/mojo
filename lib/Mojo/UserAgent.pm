@@ -129,7 +129,6 @@ sub start {
   # Start loop
   my $loop = $self->ioloop;
   $loop->start;
-  $loop->one_tick(0);
 
   return $tx;
 }

@@ -34,7 +34,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 16;
+plan tests => 20;
 
 use Mojo::IOLoop;
 
@@ -50,14 +50,12 @@ $loop->listen(
   on_accept => sub {
     shift->write(shift, 'test', sub { shift->write(shift, '321') });
   },
-  on_close => sub { $server .= 'close' },
-  on_read  => sub { $server .= pop }
+  on_read => sub { $server .= pop }
 );
 my $id = $loop->connect(
   address    => 'localhost',
   port       => $port,
   tls        => 1,
-  on_close   => sub { $client .= 'close' },
   on_connect => sub {
     shift->write(shift, 'tset', sub { shift->write(shift, '123') });
   },
@@ -72,6 +70,7 @@ is $client, 'test321', 'right content';
 $loop   = Mojo::IOLoop->singleton;
 $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
+my $server_close = my $client_close = 0;
 my ($drop, $running);
 Mojo::IOLoop->drop(Mojo::IOLoop->recurring(0 => sub { $drop++ }));
 my $error = '';
@@ -85,9 +84,9 @@ $loop->listen(
     shift->write(shift, 'test', sub { shift->write(shift, '321') });
     $running = Mojo::IOLoop->is_running;
   },
-  on_close => sub { $server .= 'close' },
+  on_close => sub { $server_close++ },
   on_error => sub { $error = pop },
-  on_read => sub { $server .= pop }
+  on_read  => sub { $server .= pop }
 );
 $id = $loop->connect(
   address    => 'localhost',
@@ -95,7 +94,7 @@ $id = $loop->connect(
   tls        => 1,
   tls_cert   => 't/mojo/certs/client.crt',
   tls_key    => 't/mojo/certs/client.key',
-  on_close   => sub { shift->stop },
+  on_close   => sub { $client_close++ },
   on_connect => sub {
     shift->write(shift, 'tset', sub { shift->write(shift, '123') });
   },
@@ -104,9 +103,11 @@ $id = $loop->connect(
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-is $server, 'tset123close', 'right content';
-is $client, 'test321',      'right content';
-ok $running, 'loop was running';
+is $server, 'tset123', 'right content';
+is $client, 'test321', 'right content';
+ok $server_close, 'close event has been emitted';
+ok $client_close, 'close event has been emitted';
+ok $running,      'loop was running';
 ok !$drop,  'event dropped successfully';
 ok !$error, 'no error';
 
@@ -153,9 +154,10 @@ ok !$error, 'no error';
 ok $cerror, 'has error';
 
 # Valid client certificate accepted by callback
-$loop   = Mojo::IOLoop->new;
-$port   = Mojo::IOLoop->generate_port;
-$server = $client = '';
+$loop         = Mojo::IOLoop->new;
+$port         = Mojo::IOLoop->generate_port;
+$server       = $client = '';
+$server_close = $client_close = 0;
 $loop->listen(
   port       => $port,
   tls        => 1,
@@ -166,9 +168,9 @@ $loop->listen(
   on_accept  => sub {
     shift->write(shift, 'test', sub { shift->write(shift, '321') });
   },
-  on_close => sub { $server .= 'close' },
+  on_close => sub { $server_close++ },
   on_error => sub { $error = pop },
-  on_read => sub { $server .= pop }
+  on_read  => sub { $server .= pop }
 );
 $id = $loop->connect(
   address    => 'localhost',
@@ -176,7 +178,7 @@ $id = $loop->connect(
   tls        => 1,
   tls_cert   => 't/mojo/certs/client.crt',
   tls_key    => 't/mojo/certs/client.key',
-  on_close   => sub { shift->stop },
+  on_close   => sub { $client_close++ },
   on_connect => sub {
     shift->write(shift, 'tset', sub { shift->write(shift, '123') });
   },
@@ -185,8 +187,10 @@ $id = $loop->connect(
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-is $server, 'tset123close', 'right content';
-is $client, 'test321',      'right content';
+is $server, 'tset123', 'right content';
+is $client, 'test321', 'right content';
+ok $server_close, 'close event has been emitted';
+ok $client_close, 'close event has been emitted';
 
 # Missing client certificate
 $error = $cerror = '';
@@ -197,6 +201,7 @@ $id = $loop->connect(
   on_error => sub { $cerror = pop }
 );
 $loop->connection_timeout($id => '0.5');
+$loop->timer(1 => sub { shift->stop });
 $loop->start;
 ok !$error, 'no error';
 ok $cerror, 'has error';

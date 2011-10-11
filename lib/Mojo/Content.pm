@@ -440,6 +440,7 @@ L<Mojo::Content> can emit the following events.
   });
 
 Emitted once all headers have been parsed and the content starts.
+Note that this event is EXPERIMENTAL and might change without warning!
 
 =head2 C<read>
 

@@ -436,14 +436,14 @@ sub _parse {
   if ($state eq 'body' || $state eq 'content' || $state eq 'done') {
 
     # Body event
+    my $content = $self->content;
     if ($self->has_subscribers('body') && !$self->{body}++) {
       weaken $self;
-      $self->content->on_body(sub { $self->emit('body') });
+      $content->on_body(sub { $self->emit('body') });
     }
 
     # Until body
-    my $content = $self->content;
-    my $buffer  = delete $self->{buffer};
+    my $buffer = delete $self->{buffer};
     if ($until_body) { $self->content($content->parse_until_body($buffer)) }
 
     # CGI
@@ -569,6 +569,7 @@ L<Mojo::Message> can emit the following events.
   });
 
 Emitted once all headers have been parsed and the content starts.
+Note that this event is EXPERIMENTAL and might change without warning!
 
 =head2 C<finish>
 

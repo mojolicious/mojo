@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1237;
+use Test::More tests => 1240;
 
 use File::Spec;
 use File::Temp;
@@ -2281,9 +2281,10 @@ is $req2->cookie('bar')->value, 'baz',      'right value';
 is $req2->body, "Hello World!\n", 'right content';
 
 # Parse full HTTP 1.0 request with cookies and progress callback
-$req     = Mojo::Message::Request->new;
-$counter = 0;
+$req = Mojo::Message::Request->new;
+my $counter2 = $counter = 0;
 $req->on_progress(sub { $counter++ });
+$req->on_body(sub     { $counter2++ });
 is $counter, 0, 'right count';
 is $req->content->is_parsing_body, undef, 'is not parsing body';
 is $req->is_done, undef, 'request is not done';
@@ -2311,12 +2312,15 @@ $req->parse("est/23\x0d\x0a");
 is $counter, 6, 'right count';
 is $req->content->is_parsing_body, undef, 'is not parsing body';
 is $req->is_done, undef, 'request is not done';
+is $counter2, 0, 'right count';
 $req->parse("Content-Length: 27\x0d\x0a\x0d\x0aHell");
 is $counter, 7, 'right count';
 is $req->content->is_parsing_body, 1, 'is parsing body';
 is $req->is_done, undef, 'request is not done';
+is $counter2, 1, 'right count';
 $req->parse("o World!\n1234\nlalalala\n");
-is $counter, 8, 'right count';
+is $counter,  8, 'right count';
+is $counter2, 1, 'right count';
 is $req->content->is_parsing_body, undef, 'is not parsing body';
 is $req->is_done, 1,     'request is done';
 ok $req->is_done, 'request is done';

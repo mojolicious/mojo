@@ -21,9 +21,8 @@ app->hook(
   after_build_tx => sub {
     my $tx = shift;
     weaken $tx;
-    $tx->req->content->on_body(
-      sub { $tx->emit('request') if $tx->req->url->path->contains('/upload') }
-    );
+    $tx->req->on_body(
+      sub { $tx->emit('request') if shift->url->path->contains('/upload') });
   }
 );
 

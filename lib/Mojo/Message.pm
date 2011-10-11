@@ -315,6 +315,7 @@ sub leftovers { shift->content->leftovers }
 
 sub max_line_size { shift->headers->max_line_size(@_) }
 
+sub on_body     { shift->on(body     => shift) }
 sub on_finish   { shift->on(finish   => shift) }
 sub on_progress { shift->on(progress => shift) }
 
@@ -433,6 +434,12 @@ sub _parse {
   # Content
   my $state = $self->{state} || '';
   if ($state eq 'body' || $state eq 'content' || $state eq 'done') {
+
+    # Body event
+    if ($self->has_subscribers('body') && !$self->{body}++) {
+      weaken $self;
+      $self->content->on_body(sub { $self->emit('body') });
+    }
 
     # Until body
     my $content = $self->content;
@@ -554,6 +561,14 @@ in RFC 2616 and RFC 2388.
 =head1 EVENTS
 
 L<Mojo::Message> can emit the following events.
+
+=head2 C<body>
+
+  $message->on(body => sub {
+    my $message = shift;
+  });
+
+Emitted once all headers have been parsed and the content starts.
 
 =head2 C<finish>
 
@@ -780,6 +795,13 @@ Remove leftover data from message parser.
   $message->max_line_size(1024);
 
 Maximum line size in bytes.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<on_body>
+
+  $message->on_body(sub {...});
+
+Register C<body> event.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<on_finish>

@@ -64,8 +64,8 @@ websocket '/bytes' => sub {
   );
 };
 
-# WebSocket /double
-websocket '/double' => sub {
+# WebSocket /once
+websocket '/once' => sub {
   my $self = shift;
   $self->on_message(
     sub {
@@ -73,12 +73,10 @@ websocket '/double' => sub {
       $self->send_message("ONE: $message");
     }
   );
-  my $cb;
-  $cb = $self->on_message(
-    sub {
-      my ($self, $message) = @_;
+  $self->tx->once(
+    message => sub {
+      my ($tx, $message) = @_;
       $self->send_message("TWO: $message");
-      $self->tx->unsubscribe(message => $cb);
     }
   );
 };
@@ -169,11 +167,11 @@ $t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
 $t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
   ->send_message_ok([$bytes])->message_is($bytes)->finish_ok;
 
-# WebSocket /double
-$t->websocket_ok('/double')->send_message_ok('hello')
-  ->message_is('ONE: hello')->message_is('TWO: hello')
-  ->send_message_ok('hello')->message_is('ONE: hello')
-  ->send_message_ok('hello')->message_is('ONE: hello')->finish_ok;
+# WebSocket /once
+$t->websocket_ok('/once')->send_message_ok('hello')->message_is('ONE: hello')
+  ->message_is('TWO: hello')->send_message_ok('hello')
+  ->message_is('ONE: hello')->send_message_ok('hello')
+  ->message_is('ONE: hello')->finish_ok;
 
 # WebSocket /nested
 $t->websocket_ok('/nested')->send_message_ok('hello')

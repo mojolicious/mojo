@@ -60,41 +60,6 @@ sub not_writing {
 }
 
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
-sub _one_tick {
-  my $self = shift;
-
-  # I/O
-  my $poll = $self->_poll;
-  $poll->poll('0.025');
-  my $handles = $self->{handles};
-  $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_)
-    for $poll->handles(POLLIN | POLLHUP | POLLERR);
-  $self->_sandbox('Write', $handles->{fileno $_}->{on_writable}, $_)
-    for $poll->handles(POLLOUT);
-
-  # Wait for timeout
-  usleep 1000000 * '0.025' unless keys %{$self->{handles}};
-
-  # Timers
-  my $timers = $self->{timers} || {};
-  for my $id (keys %$timers) {
-    my $t = $timers->{$id};
-    my $after = $t->{after} || 0;
-    if ($after <= time - ($t->{started} || $t->{recurring} || 0)) {
-      warn "TIMER $id\n" if DEBUG;
-
-      # Normal timer
-      if ($t->{started}) { $self->cancel($id) }
-
-      # Recurring timer
-      elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
-
-      # Handle timer
-      if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb, $id) }
-    }
-  }
-}
-
 sub recurring { shift->_timer(pop, after => pop, recurring => time) }
 
 sub remove {
@@ -106,7 +71,7 @@ sub remove {
 
 sub start {
   my $self = shift;
-  $self->{running}++;
+  return if $self->{running}++;
   $self->_one_tick while $self->{running};
 }
 
@@ -132,6 +97,41 @@ sub _timer {
   do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}->{$id};
   $self->{timers}->{$id} = $t;
   return $id;
+}
+
+sub _one_tick {
+  my $self = shift;
+
+  # I/O
+  my $poll = $self->_poll;
+  $poll->poll('0.025');
+  my $handles = $self->{handles};
+  $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_)
+    for $poll->handles(POLLIN | POLLHUP | POLLERR);
+  $self->_sandbox('Write', $handles->{fileno $_}->{on_writable}, $_)
+    for $poll->handles(POLLOUT);
+
+  # Wait for timeout
+  usleep 25000 unless keys %{$self->{handles}};
+
+  # Timers
+  my $timers = $self->{timers} || {};
+  for my $id (keys %$timers) {
+    my $t = $timers->{$id};
+    my $after = $t->{after} || 0;
+    if ($after <= time - ($t->{started} || $t->{recurring} || 0)) {
+      warn "TIMER $id\n" if DEBUG;
+
+      # Normal timer
+      if ($t->{started}) { $self->cancel($id) }
+
+      # Recurring timer
+      elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
+
+      # Handle timer
+      if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb, $id) }
+    }
+  }
 }
 
 sub _poll { shift->{poll} ||= IO::Poll->new }

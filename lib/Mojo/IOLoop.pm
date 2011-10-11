@@ -825,7 +825,8 @@ Callback to be invoked if new data arrives on the connection.
   $loop->one_tick('0.25');
   $loop->one_tick(0);
 
-Run reactor for exactly one tick.
+Run reactor for roughly one tick and try not to block longer than the given
+amount of time in seconds.
 
 =head2 C<recurring>
 
@@ -881,8 +882,7 @@ singleton.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the loop, this will block until C<stop> is called or return immediately
-if the loop is already running.
+Start the loop, this will block until C<stop> is called.
 
 =head2 C<start_tls>
 

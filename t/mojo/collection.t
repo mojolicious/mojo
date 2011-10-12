@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 40;
+use Test::More tests => 48;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 use_ok 'Mojo::Collection', 'c';
@@ -94,3 +94,14 @@ $collection = c();
 is_deeply [$collection->sort->each], [], 'no elements';
 is_deeply [$collection->sort(sub { $_[1] cmp $_[0] })->each], [],
   'no elements';
+
+# Slice
+$collection = c(1, 2, 3, 4, 5, 6, 7, 10, 9, 8);
+is_deeply [$collection->slice(0)->each],  [1], 'right result';
+is_deeply [$collection->slice(1)->each],  [2], 'right result';
+is_deeply [$collection->slice(2)->each],  [3], 'right result';
+is_deeply [$collection->slice(-1)->each], [8], 'right result';
+is_deeply [$collection->slice(-3, -5)->each], [10, 6], 'right result';
+is_deeply [$collection->slice(1, 2, 3)->each], [2, 3, 4], 'right result';
+is_deeply [$collection->slice(6, 1, 4)->each], [7, 2, 5], 'right result';
+is_deeply [$collection->slice(6 .. 9)->each], [7, 10, 9, 8], 'right result';

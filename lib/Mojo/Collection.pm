@@ -66,6 +66,11 @@ sub shuffle {
 
 sub size { scalar @{$_[0]} }
 
+sub slice {
+  my $self = shift;
+  $self->new(@$self[@_]);
+}
+
 sub sort {
   my ($self, $cb) = @_;
   return $self->new(sort @$self) unless $cb;
@@ -162,6 +167,12 @@ from the results.
   my $new = $collection->reverse;
 
 Create a new collection with all elements in reverse order.
+
+=head2 C<slice>
+
+  my $new = $collection->slice(4 .. 7);
+
+Create a new collection with all selected elements.
 
 =head2 C<shuffle>
 

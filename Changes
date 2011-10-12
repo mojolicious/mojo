@@ -9,6 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL contains method to Mojo::Path.
         - Added EXPERIMENTAL auto_upgrade attribute to Mojo::Content::Single.
         - Added EXPERIMENTAL boundary method to Mojo::Content.
+        - Added EXPERIMENTAL slice method to Mojo::Collection.
         - Improved many modules to use events instead of callbacks.
         - Improved message parser performance slightly.
         - Improved Mojo::IOLoop to die if started twice.

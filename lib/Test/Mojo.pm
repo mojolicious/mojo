@@ -321,8 +321,8 @@ sub websocket_ok {
     $url, @_,
     sub {
       $self->tx(my $tx = pop);
-      $tx->on_finish(sub { $self->{finished} = 1 });
-      $tx->on_message(sub { push @{$self->{messages}}, pop });
+      $tx->on(finish => sub { $self->{finished} = 1 });
+      $tx->on(message => sub { push @{$self->{messages}}, pop });
       Mojo::IOLoop->stop;
     }
   );

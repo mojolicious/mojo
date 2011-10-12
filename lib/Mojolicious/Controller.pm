@@ -139,7 +139,7 @@ sub flash {
 # "My parents may be evil, but at least they're stupid."
 sub on_finish {
   my ($self, $cb) = @_;
-  return $self->tx->on_finish(sub { shift and $self->$cb(@_) });
+  return $self->tx->on(finish => sub { shift and $self->$cb(@_) });
 }
 
 # "I like being a women.
@@ -150,7 +150,7 @@ sub on_message {
   Carp::croak('No WebSocket connection to receive messages from')
     unless $tx->is_websocket;
   $self->rendered(101);
-  return $tx->on_message(sub { shift and $self->$cb(@_) });
+  return $tx->on(message => sub { shift and $self->$cb(@_) });
 }
 
 # "Just make a simple cake. And this time, if someone's going to jump out of

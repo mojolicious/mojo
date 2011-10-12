@@ -21,8 +21,10 @@ app->hook(
   after_build_tx => sub {
     my $tx = shift;
     weaken $tx;
-    $tx->req->content->on_body(
-      sub { $tx->emit('request') if $tx->req->url->path->contains('/upload') }
+    $tx->req->content->on(
+      body => sub {
+        $tx->emit('request') if $tx->req->url->path->contains('/upload');
+      }
     );
   }
 );
@@ -34,7 +36,7 @@ post '/upload' => sub {
 
   # First invocation, prepare streaming
   my $id = $self->param('id');
-  $self->req->content->on_read(sub { $cache->{$id} .= pop });
+  $self->req->content->on(read => sub { $cache->{$id} .= pop });
   return unless $self->req->is_done;
 
   # Second invocation, render response

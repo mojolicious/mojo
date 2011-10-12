@@ -138,8 +138,8 @@ is $result, "Hello World! / https://localhost:$port/", 'right content';
 
 # GET /broken_redirect (broken redirect)
 my $start = 0;
-$ua->on_start(
-  sub {
+$ua->on(
+  start => sub {
     $start++;
     pop->req->headers->header('X-Works', 'it does!');
   }
@@ -165,9 +165,9 @@ $result = undef;
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
     my $tx = pop;
-    $tx->on_finish(sub { Mojo::IOLoop->stop });
-    $tx->on_message(
-      sub {
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result = $message;
         $tx->finish;
@@ -214,9 +214,9 @@ $ua->websocket(
   "wss://localhost:$port/test" => sub {
     my $tx = pop;
     $kept_alive = $tx->kept_alive;
-    $tx->on_finish(sub { Mojo::IOLoop->stop });
-    $tx->on_message(
-      sub {
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result = $message;
         $tx->finish;

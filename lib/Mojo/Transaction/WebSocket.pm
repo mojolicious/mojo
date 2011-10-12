@@ -131,7 +131,14 @@ sub is_websocket {1}
 sub local_address { shift->handshake->local_address }
 sub local_port    { shift->handshake->local_port }
 
-sub on_message { shift->on(message => shift) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_message {
+  warn <<EOF;
+Mojo::Transaction::WebSocket->on_message is DEPRECATED in favor of using
+Mojo::Transaction::WebSocket->on!!!
+EOF
+  shift->on(message => shift);
+}
 
 sub parse_frame {
   my ($self, $buffer) = @_;
@@ -470,16 +477,6 @@ The local address of this WebSocket.
   my $local_port = $ws->local_port;
 
 The local port of this WebSocket.
-
-=head2 C<on_message>
-
-  $ws->on_message(sub {...});
-
-Register C<message> event.
-
-  $ws->on_message(sub {
-    my ($self, $message) = @_;
-  });
 
 =head2 C<parse_frame>
 

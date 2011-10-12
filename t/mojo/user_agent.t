@@ -141,10 +141,10 @@ is $tx->res->body, 'works', 'right content';
 # GET / (callbacks)
 my $finished;
 $tx = $ua->build_tx(GET => '/');
-$ua->on_start(
-  sub {
+$ua->on(
+  start => sub {
     my ($self, $tx) = @_;
-    $tx->on_finish(sub { $finished++ });
+    $tx->on(finish => sub { $finished++ });
   }
 );
 $tx = $ua->start($tx);

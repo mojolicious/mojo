@@ -83,8 +83,8 @@ sub run {
   # Start
   my $v;
   my $buffer = '';
-  $ua->on_start(
-    sub {
+  $ua->on(
+    start => sub {
       my $tx = pop;
 
       # Prepare request information
@@ -115,7 +115,7 @@ sub run {
       };
 
       # Progress
-      $tx->res->on_progress(sub { $cb->(shift) });
+      $tx->res->on(progress => sub { $cb->(shift) });
 
       # Stream content
       $tx->res->body(

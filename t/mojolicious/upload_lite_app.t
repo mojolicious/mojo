@@ -22,8 +22,8 @@ use Test::Mojo;
 my $cache = {};
 app->hook(
   after_build_tx => sub {
-    shift->req->on_progress(
-      sub {
+    shift->req->on(
+      progress => sub {
         my $req = shift;
 
         # Check for id

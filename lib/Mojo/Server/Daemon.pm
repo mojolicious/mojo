@@ -108,16 +108,16 @@ sub _build_tx {
 
   # Handle
   weaken $self;
-  $tx->on_request(
-    sub {
+  $tx->on(
+    request => sub {
       my $tx = pop;
       $self->emit(request => $tx);
-      $tx->on_resume(sub { $self->_write($id) });
+      $tx->on(resume => sub { $self->_write($id) });
     }
   );
 
   # Upgrade
-  $tx->on_upgrade(sub { $self->_upgrade($id, pop) });
+  $tx->on(upgrade => sub { $self->_upgrade($id, pop) });
 
   # New request on the connection
   $c->{requests} ||= 0;
@@ -180,7 +180,7 @@ sub _finish {
 
       # Resume
       weaken $self;
-      $ws->on_resume(sub { $self->_write($id) });
+      $ws->on(resume => sub { $self->_write($id) });
     }
 
     # Failed upgrade

@@ -38,8 +38,23 @@ sub is_writing {
   return;
 }
 
-sub on_finish { shift->on(finish => shift) }
-sub on_resume { shift->on(resume => shift) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_finish {
+  warn <<EOF;
+Mojo::Transaction->on_finish is DEPRECATED in favor of using
+Mojo::Transaction->on!!!
+EOF
+  shift->on(finish => shift);
+}
+
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_resume {
+  warn <<EOF;
+Mojo::Transaction->on_resume is DEPRECATED in favor of using
+Mojo::Transaction->on!!!
+EOF
+  shift->on(resume => shift);
+}
 
 sub remote_address {
   my ($self, $address) = @_;
@@ -246,22 +261,6 @@ False.
   my $success = $tx->is_writing;
 
 Check if transaction is writing.
-
-=head2 C<on_finish>
-
-  $tx->on_finish(sub {...});
-
-Register C<finish> event.
-
-  $tx->on_finish(sub {
-    my $self = shift;
-  });
-
-=head2 C<on_resume>
-
-  $tx->on_resume(sub {...});
-
-Register C<resume> event.
 
 =head2 C<req>
 

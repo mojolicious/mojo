@@ -87,8 +87,8 @@ websocket '/early_start' => sub {
 my ($handshake, $denied) = 0;
 websocket '/denied' => sub {
   my $self = shift;
-  $self->tx->handshake->on_finish(sub { $handshake += 2 });
-  $self->on_finish(sub                { $denied    += 1 });
+  $self->tx->handshake->on(finish => sub { $handshake += 2 });
+  $self->on_finish(sub { $denied += 1 });
   $self->render(text => 'denied', status => 403);
 };
 
@@ -99,8 +99,8 @@ websocket '/subreq' => sub {
   $self->ua->websocket(
     '/echo' => sub {
       my $tx = pop;
-      $tx->on_message(
-        sub {
+      $tx->on(
+        message => sub {
           my ($tx, $message) = @_;
           $self->send_message($message);
           $tx->finish;
@@ -165,9 +165,9 @@ my $result;
 $ua->websocket(
   '/' => sub {
     my $tx = pop;
-    $tx->on_finish(sub { $loop->stop });
-    $tx->on_message(
-      sub {
+    $tx->on(finish => sub { $loop->stop });
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result = $message;
         $tx->finish;
@@ -200,7 +200,7 @@ ok $1 < 100, 'right timeout';
 my $port     = $ua->test_server->port;
 my $tx       = $ua->build_websocket_tx('ws://lalala/socket');
 my $finished = 0;
-$tx->on_finish(sub { $finished++ });
+$tx->on(finish => sub { $finished++ });
 my $socket =
   IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $socket->blocking(0);
@@ -211,9 +211,9 @@ $ua->start(
   $tx => sub {
     my $tx = pop;
     $early = $finished;
-    $tx->on_finish(sub { $loop->stop });
-    $tx->on_message(
-      sub {
+    $tx->on(finish => sub { $loop->stop });
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $tx->finish if length $result;
         $result .= $message;
@@ -236,14 +236,14 @@ $result = undef;
 $ua->websocket(
   '/early_start' => sub {
     my $tx = pop;
-    $tx->on_finish(
-      sub {
+    $tx->on(
+      finish => sub {
         $flag2 += 5;
         $loop->stop;
       }
     );
-    $tx->on_message(
-      sub {
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result = $message;
         $tx->send_message('test3');
@@ -277,15 +277,15 @@ $ua->websocket(
     my $tx = pop;
     $code   = $tx->res->code;
     $result = '';
-    $tx->on_message(
-      sub {
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result .= $message;
         $tx->finish if $message eq 'test1';
       }
     );
-    $tx->on_finish(
-      sub {
+    $tx->on(
+      finish => sub {
         $finished += 4;
         $loop->timer('0.5' => sub { shift->stop });
       }
@@ -307,15 +307,15 @@ $ua->websocket(
     my $tx = pop;
     $code   = $tx->res->code;
     $result = '';
-    $tx->on_message(
-      sub {
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result .= $message;
         $tx->finish and $running-- if $message eq 'test1';
         $loop->timer('0.5' => sub { $loop->stop }) unless $running;
       }
     );
-    $tx->on_finish(sub { $finished += 1 });
+    $tx->on(finish => sub { $finished += 1 });
   }
 );
 $ua->websocket(
@@ -323,15 +323,15 @@ $ua->websocket(
     my $tx = pop;
     $code2   = $tx->res->code;
     $result2 = '';
-    $tx->on_message(
-      sub {
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result2 .= $message;
         $tx->finish and $running-- if $message eq 'test1';
         $loop->timer('0.5' => sub { $loop->stop }) unless $running;
       }
     );
-    $tx->on_finish(sub { $finished += 2 });
+    $tx->on(finish => sub { $finished += 2 });
   }
 );
 $loop->start;
@@ -349,14 +349,14 @@ my $counter = 0;
 $ua->websocket(
   '/echo' => sub {
     my $tx = pop;
-    $tx->on_finish(
-      sub {
+    $tx->on(
+      finish => sub {
         $flag2 += 5;
         $loop->stop;
       }
     );
-    $tx->on_message(
-      sub {
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result .= $message;
         $tx->finish if ++$counter == 2;
@@ -377,14 +377,14 @@ $counter = 0;
 $ua->websocket(
   '/double_echo' => sub {
     my $tx = pop;
-    $tx->on_finish(
-      sub {
+    $tx->on(
+      finish => sub {
         $flag2 += 5;
         $loop->stop;
       }
     );
-    $tx->on_message(
-      sub {
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result .= $message;
         $tx->finish if ++$counter == 2;
@@ -450,9 +450,9 @@ $result = undef;
 $ua->websocket(
   '/echo' => sub {
     my $tx = pop;
-    $tx->on_finish(sub { $loop->stop });
-    $tx->on_message(
-      sub {
+    $tx->on(finish => sub { $loop->stop });
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result = $message;
         $tx->finish;
@@ -470,9 +470,9 @@ $ua->websocket(
   '/echo' => sub {
     my $tx = pop;
     $tx->max_websocket_size(500000);
-    $tx->on_finish(sub { $loop->stop });
-    $tx->on_message(
-      sub {
+    $tx->on(finish => sub { $loop->stop });
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result = $message;
         $tx->finish;

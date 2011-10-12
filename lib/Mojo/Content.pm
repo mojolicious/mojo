@@ -155,8 +155,13 @@ sub leftovers {
   return $self->{buffer};
 }
 
-sub on_body { shift->on(body => shift) }
-sub on_read { shift->on(read => shift) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_read {
+  warn <<EOF;
+Mojo::Content->on_read is DEPRECATED in favor of using Mojo::Content->on!!!
+EOF
+  shift->on(read => shift);
+}
 
 sub parse {
   my $self = shift;
@@ -584,24 +589,6 @@ Check if body parsing started yet.
   my $bytes = $content->leftovers;
 
 Remove leftover data from content parser.
-
-=head2 C<on_body>
-
-  $content->on_body(sub {...});
-
-Register C<body> event.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<on_read>
-
-  $content->on_read(sub {...});
-
-Register C<read> event.
-
-  $content->on_read(sub {
-    my ($content, $chunk) = @_;
-    say $chunk;
-  });
 
 =head2 C<parse>
 

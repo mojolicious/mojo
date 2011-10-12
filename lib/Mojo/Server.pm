@@ -17,7 +17,7 @@ has app_class =>
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->on_request(sub { shift->app->handler(shift) });
+  $self->on(request => sub { shift->app->handler(shift) });
   return $self;
 }
 
@@ -53,7 +53,13 @@ EOF
   return $app;
 }
 
-sub on_request { shift->on(request => shift) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_request {
+  warn <<EOF;
+Mojo::Server->on_request is DEPRECATED in favor of using Mojo::Server->on!!!
+EOF
+  shift->on(request => shift);
+}
 
 # "Are you saying you're never going to eat any animal again? What about
 #  bacon?
@@ -146,12 +152,6 @@ Load application from script.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   say Mojo::Server->new->load_app('./myapp.pl')->home;
-
-=head2 C<on_request>
-
-  $server->on_request(sub {...});
-
-Register C<request> event.
 
 =head2 C<run>
 

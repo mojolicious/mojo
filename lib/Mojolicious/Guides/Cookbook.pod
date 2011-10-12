@@ -296,7 +296,7 @@ been initialized and before a connection gets associated with them.
   my $ua = Mojo::UserAgent->new(max_redirects => 10);
 
   # Add a witty header to every request
-  $ua->on_start(sub {
+  $ua->on(start => sub {
     my ($self, $tx) = @_;
     $tx->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
     say 'Request: ', $tx->req->url->clone->to_abs;

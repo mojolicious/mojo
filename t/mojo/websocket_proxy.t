@@ -126,9 +126,9 @@ $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
     my $tx = pop;
-    $tx->on_finish(sub { Mojo::IOLoop->stop });
-    $tx->on_message(
-      sub {
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result = $message;
         $tx->finish;
@@ -158,9 +158,9 @@ $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
     my $tx = pop;
-    $tx->on_finish(sub { Mojo::IOLoop->stop });
-    $tx->on_message(
-      sub {
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(
+      message => sub {
         my ($tx, $message) = @_;
         $result = $message;
         $tx->finish;

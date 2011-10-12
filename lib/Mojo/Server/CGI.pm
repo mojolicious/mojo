@@ -110,7 +110,7 @@ Mojo::Server::CGI - CGI server
 
   my $cgi = Mojo::Server::CGI->new;
   $cgi->unsubscribe_all('request')
-  $cgi->on_request(sub {
+  $cgi->on(request => sub {
     my ($self, $tx) = @_;
 
     # Request

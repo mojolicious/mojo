@@ -82,7 +82,14 @@ sub need_proxy {
   return 1;
 }
 
-sub on_start { shift->on(start => shift) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_start {
+  warn <<EOF;
+Mojo::UserAgent->on_start is DEPRECATED in favor of using
+Mojo::UserAgent->on!!!
+EOF
+  shift->on(start => shift);
+}
 
 sub post {
   my $self = shift;
@@ -469,7 +476,7 @@ sub _start {
   $self->emit(start => $tx);
   return unless my $id = $self->_connect($tx, $cb);
   weaken $self;
-  $tx->on_resume(sub { $self->_write($id) });
+  $tx->on(resume => sub { $self->_write($id) });
   $self->{processing} ||= 0;
   $self->{processing} += 1;
 
@@ -521,7 +528,7 @@ sub _upgrade {
   $c->{transaction} = $new;
   $self->_loop->connection_timeout($id, $self->websocket_timeout);
   weaken $self;
-  $new->on_resume(sub { $self->_write($id) });
+  $new->on(resume => sub { $self->_write($id) });
 
   return $new;
 }
@@ -609,8 +616,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   # WebSocket request
   $ua->websocket('ws://websockets.org:8787' => sub {
     my ($self, $tx) = @_;
-    $tx->on_finish(sub { Mojo::IOLoop->stop });
-    $tx->on_message(sub {
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
+    $tx->on(message => sub {
       my ($tx, $message) = @_;
       say $message;
       $tx->finish;
@@ -639,6 +646,11 @@ L<Mojo::UserAgent> can emit the following events.
 
 Emitted whenever a new transaction is about to start, this includes
 automatically prepared proxy C<CONNECT> requests and followed redirects.
+
+  $ua->on(start => sub {
+    my ($ua, $tx) = @_;
+    $tx->req->headers->header('X-Bender', 'Bite my shiny metal ass!');
+  });
 
 =head1 ATTRIBUTES
 
@@ -852,17 +864,6 @@ You can also append a callback to perform requests non-blocking.
 Check if request for domain would use a proxy server.
 Note that this method is EXPERIMENTAL and might change without warning!
 
-=head2 C<on_start>
-
-  $ua->on_start(sub {...});
-
-Register C<start> event.
-
-  $ua->on_start(sub {
-    my ($ua, $tx) = @_;
-    $tx->req->headers->header('X-Bender', 'Bite my shiny metal ass!');
-  });
-
 =head2 C<post>
 
   my $tx = $ua->post('http://kraih.com');
@@ -944,8 +945,8 @@ the exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($self, $tx) = @_;
-    $tx->on_finish(sub  { Mojo::IOLoop->stop });
-    $tx->on_message(sub {
+    $tx->on(finish  => sub  { Mojo::IOLoop->stop });
+    $tx->on(message => sub {
       my ($tx, $message) = @_;
       say "$message\n";
     });

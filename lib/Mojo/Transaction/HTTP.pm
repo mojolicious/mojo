@@ -173,8 +173,23 @@ sub keep_alive {
   return $self->{keep_alive};
 }
 
-sub on_request { shift->on(request => shift) }
-sub on_upgrade { shift->on(upgrade => shift) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_request {
+  warn <<EOF;
+Mojo::Transaction::HTTP->on_request is DEPRECATED in favor of using
+Mojo::Transaction::HTTP->on!!!
+EOF
+  shift->on(request => shift);
+}
+
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_upgrade {
+  warn <<EOF;
+Mojo::Transaction::HTTP->on_upgrade is DEPRECATED in favor of using
+Mojo::Transaction::HTTP->on!!!
+EOF
+  shift->on(upgrade => shift);
+}
 
 sub server_leftovers {
   my $self = shift;
@@ -457,18 +472,6 @@ Write client data.
   $tx            = $tx->keep_alive(1);
 
 Connection can be kept alive.
-
-=head2 C<on_request>
-
-  $tx->on_request(sub {...});
-
-Register C<request> event.
-
-=head2 C<on_upgrade>
-
-  $tx->on_upgrade(sub {...});
-
-Register C<upgrade> event.
 
 =head2 C<server_leftovers>
 

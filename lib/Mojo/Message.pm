@@ -52,7 +52,7 @@ sub body {
   # Callback
   if (ref $new eq 'CODE') {
     weaken $self;
-    return $content->on_read(sub { $self->$new(pop) });
+    return $content->on(read => sub { $self->$new(pop) });
   }
 
   # Set text content
@@ -307,8 +307,22 @@ sub leftovers { shift->content->leftovers }
 
 sub max_line_size { shift->headers->max_line_size(@_) }
 
-sub on_finish   { shift->on(finish   => shift) }
-sub on_progress { shift->on(progress => shift) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_finish {
+  warn <<EOF;
+Mojo::Message->on_finish is DEPRECATED in favor of using Mojo::Message->on!!!
+EOF
+  shift->on(finish => shift);
+}
+
+# DEPRECATED in Smiling Face With Sunglasses!
+sub on_progress {
+  warn <<EOF;
+Mojo::Message->on_progress is DEPRECATED in favor of using
+Mojo::Message->on!!!
+EOF
+  shift->on(progress => shift);
+}
 
 sub param {
   my $self = shift;
@@ -774,28 +788,6 @@ Remove leftover data from message parser.
 
 Maximum line size in bytes.
 Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<on_finish>
-
-  $message->on_finish(sub {...});
-
-Register C<finish> event.
-
-  $message->on_finish(sub {
-    my $self = shift;
-    say 'Finihsed!';
-  });
-
-=head2 C<on_progress>
-
-  $message->on_progress(sub {...});
-
-Register C<progress> event.
-
-  $message->on_progress(sub {
-    my $self = shift;
-    say 'Progress!';
-  });
 
 =head2 C<param>
 

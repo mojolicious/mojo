@@ -945,7 +945,7 @@ the exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($self, $tx) = @_;
-    $tx->on(finish  => sub  { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub {
       my ($tx, $message) = @_;
       say "$message\n";

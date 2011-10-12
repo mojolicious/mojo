@@ -221,7 +221,7 @@ sub server_read {
     $self->emit(upgrade => \$ws) if $req->headers->upgrade;
 
     # Handle request
-    $self->emit(request => $ws->is_websocket ? $ws : $self);
+    $self->emit(request => $ws);
 
     # Protect handler from incoming pipelined requests
     $self->{handled} = 1;

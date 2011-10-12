@@ -12,7 +12,7 @@ sub run {
   my $self = shift;
 
   # Environment
-  $self->emit(transaction => \(my $tx));
+  my $tx  = $self->build_tx;
   my $req = $tx->req;
   $req->parse(\%ENV);
 

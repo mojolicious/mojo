@@ -11,7 +11,7 @@ sub run {
   my ($self, $env) = @_;
 
   # Environment
-  $self->emit(transaction => \(my $tx));
+  my $tx  = $self->build_tx;
   my $req = $tx->req;
   $req->parse($env);
 

@@ -88,7 +88,7 @@ sub _build_tx {
   my ($self, $id, $c) = @_;
 
   # Build transaction
-  $self->emit(transaction => \(my $tx));
+  my $tx = $self->build_tx;
   $tx->connection($id);
 
   # Identify
@@ -294,8 +294,7 @@ sub _upgrade {
   my ($self, $id, $txref) = @_;
   return unless $$txref->req->headers->upgrade =~ /WebSocket/i;
   my $c = $self->{connections}->{$id};
-  $self->emit(upgrade => $txref);
-  $c->{websocket} = $$txref;
+  $c->{websocket} = $$txref = $self->upgrade_tx($$txref);
 }
 
 sub _user {

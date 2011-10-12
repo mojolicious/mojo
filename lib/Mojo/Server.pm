@@ -17,25 +17,13 @@ has app_class =>
 
 sub new {
   my $self = shift->SUPER::new(@_);
-
-  # Events
   $self->on_request(sub { shift->app->handler(shift) });
-  $self->on_transaction(
-    sub {
-      my ($self, $txref) = @_;
-      $$txref = $self->app->build_tx;
-    }
-  );
-  $self->on_upgrade(
-    sub {
-      my ($self, $txref) = @_;
-      $$txref = $self->app->upgrade_tx($$txref);
-      $$txref->server_handshake;
-    }
-  );
-
   return $self;
 }
+
+sub build_tx { shift->app->build_tx }
+
+sub upgrade_tx { shift->app->upgrade_tx(shift)->server_handshake }
 
 sub load_app {
   my ($self, $file) = @_;
@@ -65,9 +53,7 @@ EOF
   return $app;
 }
 
-sub on_request     { shift->on(request     => shift) }
-sub on_transaction { shift->on(transaction => shift) }
-sub on_upgrade     { shift->on(upgrade     => shift) }
+sub on_request { shift->on(request => shift) }
 
 # "Are you saying you're never going to eat any animal again? What about
 #  bacon?
@@ -94,7 +80,7 @@ Mojo::Server - HTTP server base class
     my $self = shift;
 
     # Get a transaction
-    $self->emit(transaction => \(my $tx));
+    my $tx = $self->build_tx;
 
     # Emit request
     $self->emit(request => $tx);
@@ -115,22 +101,6 @@ L<Mojo::Server> can emit the following events.
   });
 
 Emitted for requests that need a response.
-
-=head2 C<transaction>
-
-  $server->on(request => sub {
-    my ($server, $txref) = @_;
-  });
-
-Emitted when a new transaction is needed.
-
-=head2 C<upgrade>
-
-  $server->on(upgrade => sub {
-    my ($server, $txref) = @_;
-  });
-
-Emitted when a transaction needs to be upgraded.
 
 =head1 ATTRIBUTES
 
@@ -162,6 +132,12 @@ implements the following new ones.
 
 Construct a new L<Mojo::Server> object.
 
+=head2 C<build_tx>
+
+  my $tx = $server->build_tx;
+
+Let application build a transaction.
+
 =head2 C<load_app>
 
   my $app = $server->load_app('./myapp.pl');
@@ -177,23 +153,17 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Register C<request> event.
 
-=head2 C<on_transaction>
-
-  $server->on_transaction(sub {...});
-
-Register C<transaction> event.
-
-=head2 C<on_upgrade>
-
-  $server->on_upgrade(sub {...});
-
-Register C<upgrade> event.
-
 =head2 C<run>
 
   $server->run;
 
 Start server.
+
+=head2 C<upgrade_tx>
+
+  my $ws = $server->upgrade_tx(tx);
+
+Let application upgrade transaction.
 
 =head1 SEE ALSO
 

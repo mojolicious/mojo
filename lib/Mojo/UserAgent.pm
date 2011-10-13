@@ -942,6 +942,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Open a non-blocking WebSocket connection with transparent handshake, takes
 the exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
+Note that this method is EXPERIMENTAL and might change without warning!
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($self, $tx) = @_;

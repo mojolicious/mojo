@@ -385,6 +385,7 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 
 Versatile L<Mojo::Transaction::WebSocket> builder for WebSocket handshake
 requests.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

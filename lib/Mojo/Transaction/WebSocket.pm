@@ -131,15 +131,6 @@ sub is_websocket {1}
 sub local_address { shift->handshake->local_address }
 sub local_port    { shift->handshake->local_port }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_message {
-  warn <<EOF;
-Mojo::Transaction::WebSocket->on_message is DEPRECATED in favor of using
-Mojo::Transaction::WebSocket->on!!!
-EOF
-  shift->on(message => shift);
-}
-
 sub parse_frame {
   my ($self, $buffer) = @_;
   warn "PARSING FRAME\n" if DEBUG;

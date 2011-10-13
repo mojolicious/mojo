@@ -1,7 +1,7 @@
 package Mojo::IOLoop::Stream;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Errno qw/EAGAIN EINTR ECONNRESET EWOULDBLOCK/;
+use Errno qw/EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK/;
 use Scalar::Util 'weaken';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
@@ -88,7 +88,7 @@ sub _read {
     # Retry
     return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
-    # Connection reset
+    # Closed
     return $self->emit_safe('close') if $! == ECONNRESET;
 
     # Read error
@@ -115,6 +115,9 @@ sub _write {
 
       # Retry
       return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
+
+      # Closed
+      return $self->emit_safe('close') if $! == ECONNRESET || $! == EPIPE;
 
       # Write error
       return $self->emit_safe(error => $!);

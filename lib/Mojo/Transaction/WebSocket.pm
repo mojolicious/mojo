@@ -512,8 +512,10 @@ Resume transaction.
   $ws->send_message([$bytes]);
   $ws->send_message([$bytes], sub {...});
 
-Send a message over the WebSocket, encoding and framing will be handled
-transparently.
+Send a message non-blocking via WebSocket, encoding and framing will be
+handled transparently.
+The optional drain callback will be invoked once all data has been written to
+the kernel send buffer or equivalent.
 
 =head2 C<server_handshake>
 

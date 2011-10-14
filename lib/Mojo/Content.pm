@@ -628,16 +628,16 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $content->write('Hello!');
   $content->write('Hello!', sub {...});
 
-Write dynamic content, the optional drain callback will be invoked once all
-data has been written.
+Write dynamic content non-blocking, the optional drain callback will be
+invoked once all data has been written.
 
 =head2 C<write_chunk>
 
   $content->write_chunk('Hello!');
   $content->write_chunk('Hello!', sub {...});
 
-Write chunked content, the optional drain callback will be invoked once all
-data has been written.
+Write dynamic content non-blocking with the C<chunked> transfer encoding, the
+optional drain callback will be invoked once all data has been written.
 
 =head1 SEE ALSO
 

@@ -845,16 +845,16 @@ HTTP version of message.
   $message->write('Hello!');
   $message->write('Hello!', sub {...});
 
-Write dynamic content, the optional drain callback will be invoked once all
-data has been written.
+Write dynamic content non-blocking, the optional drain callback will be
+invoked once all data has been written.
 
 =head2 C<write_chunk>
 
   $message->write_chunk('Hello!');
   $message->write_chunk('Hello!', sub {...});
 
-Write chunked content, the optional drain callback will be invoked once all
-data has been written.
+Write dynamic content non-blocking with the C<chunked> transfer encoding, the
+optional drain callback will be invoked once all data has been written.
 
 =head1 SEE ALSO
 

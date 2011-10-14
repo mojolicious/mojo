@@ -3,8 +3,8 @@ use Mojo::Base -strict;
 
 use Test::More;
 
-eval "use Test::Pod::Coverage 1.04";
-plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!' if $@;
+plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!'
+  unless eval 'use Test::Pod::Coverage 1.04; 1';
 plan skip_all => 'set TEST_POD to enable this test (developer only!)'
   unless $ENV{TEST_POD};
 

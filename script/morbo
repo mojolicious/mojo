@@ -10,8 +10,7 @@ use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
 use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
 
 # Check if Mojolicious is installed
-eval 'use Mojo::Server::Morbo';
-die <<EOF if $@;
+die <<EOF unless eval 'use Mojo::Server::Morbo; 1';
 It looks like you don't have the Mojolicious framework installed.
 Please visit http://mojolicio.us for detailed installation instructions.
 

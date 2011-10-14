@@ -339,7 +339,7 @@ Sending a streaming request is almost just as easy.
   $ua->start($tx);
 
 The drain callback passed to C<write> will be invoked whenever the entire
-previous chunk has been written to the kernel send buffer.
+previous chunk has actually been written.
 
 =head2 Large file downloads
 

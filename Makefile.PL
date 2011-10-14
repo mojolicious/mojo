@@ -11,12 +11,10 @@ use ExtUtils::MakeMaker;
 
 my ($mm) = $ExtUtils::MakeMaker::VERSION =~ /^([^_]+)/;
 
-# We only use core modules, so you shouldn't have to install anything besides
-# Perl 5.10.1!
 WriteMakefile(
   NAME         => 'Mojolicious',
   VERSION_FROM => 'lib/Mojolicious.pm',
-  ABSTRACT     => 'Duct Tape For The HTML5 Web!',
+  ABSTRACT     => 'Real-time web framework',
   AUTHOR       => 'Sebastian Riedel <sri@cpan.org>',
 
   ($mm < 6.3002 ? () : ('LICENSE' => 'artistic_2')),

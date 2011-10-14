@@ -947,8 +947,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $c = $c->send_message([$bytes]);
   $c = $c->send_message([$bytes], sub {...});
 
-Send a message via WebSocket, only works if there is currently a WebSocket
-connection in progress.
+Send a message non-blocking via WebSocket, only works if a WebSocket
+connection has been established.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<session>
@@ -1040,8 +1040,9 @@ Generate a portable L<Mojo::URL> object with base for a route, path or URL.
   $c->write(sub {...});
   $c->write('Hello!', sub {...});
 
-Write dynamic content chunk wise, the optional drain callback will be invoked
-once all data has been written to the kernel send buffer or equivalent.
+Write dynamic content non-blocking, the optional drain callback will be
+invoked once all data has been written to the kernel send buffer or
+equivalent.
 
   # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
@@ -1072,10 +1073,10 @@ timeout, which usually defaults to C<15> seconds.
   $c->write_chunk(sub {...});
   $c->write_chunk('Hello!', sub {...});
 
-Write dynamic content chunk wise with the C<chunked> C<Transfer-Encoding>
-which doesn't require a C<Content-Length> header, the optional drain callback
-will be invoked once all data has been written to the kernel send buffer or
-equivalent.
+Write dynamic content non-blocking with the C<chunked> transfer encoding,
+which doesn't require a C<Content-Length> header.
+The optional drain callback will be invoked once all data has been written to
+the kernel send buffer or equivalent.
 
   $c->write_chunk('He', sub {
     my $c = shift;

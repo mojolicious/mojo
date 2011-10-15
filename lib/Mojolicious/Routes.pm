@@ -89,7 +89,16 @@ sub auto_render {
 
 sub bridge { shift->route(@_)->inline(1) }
 
-sub del { shift->_generate_route('delete', @_) }
+# DEPRECATED in Smiling Face With Sunglasses!
+sub del {
+  warn <<EOF;
+Mojolicious::Routes->del is DEPRECATED in favor of
+Mojolicious::Routes->delete!!!
+EOF
+  shift->delete(@_);
+}
+
+sub delete { shift->_generate_route('delete', @_) }
 
 sub detour {
   my $self = shift;
@@ -790,9 +799,9 @@ Automatic rendering.
 
 Add a new bridge to this route as a nested child.
 
-=head2 C<del>
+=head2 C<delete>
 
-  my $del = $route->del('/:foo' => sub {...});
+  my $del = $route->delete('/:foo' => sub {...});
 
 Generate route matching only C<DELETE> requests.
 See also the L<Mojolicious::Lite> tutorial for more argument variations.
@@ -949,9 +958,9 @@ See also the L<Mojolicious::Lite> tutorial for more argument variations.
 =head2 C<via>
 
   my $methods = $r->via;
-  $r          = $r->via('get');
-  $r          = $r->via(qw/get post/);
-  $r          = $r->via([qw/get post/]);
+  $r          = $r->via('GET');
+  $r          = $r->via(qw/GET POST/);
+  $r          = $r->via([qw/GET POST/]);
 
 Restrict HTTP methods this route is allowed to handle, defaults to no
 restrictions.

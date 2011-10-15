@@ -38,7 +38,7 @@ sub import {
   my $root = $routes;
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
   *{"${caller}::any"} = sub { $routes->any(@_) };
-  *{"${caller}::del"} = sub { $routes->del(@_) };
+  *{"${caller}::del"} = sub { $routes->delete(@_) };
   *{"${caller}::get"} = sub { $routes->get(@_) };
   *{"${caller}::group"} = sub (&) {
     my $old = $root;
@@ -774,7 +774,7 @@ C<log/$mode.log> file if a C<log> directory exists.
 For more control the L<Mojolicious> instance can be accessed directly.
 
   app->log->level('error');
-  app->routes->route('/foo/:bar')->via('get')->to(cb => sub {
+  app->routes->route('/foo/:bar')->via('GET')->to(cb => sub {
     my $self = shift;
     $self->app->log->debug('Got a request for "Hello Mojo!".');
     $self->render(text => 'Hello Mojo!');
@@ -802,7 +802,7 @@ can be easily mixed to make the transition process very smooth.
   };
 
   app->routes->namespace('MyApp');
-  app->routes->route('/foo/:action')->via('get')->to('foo#index');
+  app->routes->route('/foo/:action')->via('GET')->to('foo#index');
 
   app->start;
 

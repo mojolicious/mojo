@@ -435,12 +435,12 @@ pass.
   # GET /bye    -> {controller => 'foo', action => 'bye'}
   # POST /bye   -> undef
   # DELETE /bye -> undef
-  $r->route('/bye')->via('get')->to(controller => 'foo', action => 'bye');
+  $r->route('/bye')->via('GET')->to(controller => 'foo', action => 'bye');
 
   # GET /bye    -> {controller => 'foo', action => 'bye'}
   # POST /bye   -> {controller => 'foo', action => 'bye'}
   # DELETE /bye -> undef
-  $r->route('/bye')->via('get', 'post')
+  $r->route('/bye')->via('GET', 'POST')
     ->to(controller => 'foo', action => 'bye');
 
 =head2 Nested routes

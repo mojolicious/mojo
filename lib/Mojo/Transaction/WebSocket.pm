@@ -361,7 +361,7 @@ Mojo::Transaction::WebSocket - WebSocket transaction container
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions as
 described in
-L<http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-16.txt>.
+L<http://www.ietf.org/id/draft-ietf-hybi-thewebsocketprotocol-17.txt>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS

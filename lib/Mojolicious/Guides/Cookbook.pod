@@ -91,6 +91,8 @@ Nginx reverse proxy.
       proxy_pass http://myapp;
       proxy_set_header Host $host;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # If listening on anything but port 80 use the following
+      # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for:$server_port;
       proxy_set_header X-Forwarded-HTTPS 0;
     }
   }

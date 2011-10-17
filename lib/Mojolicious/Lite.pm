@@ -70,7 +70,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Lite - Micro real-time web framework
+Mojolicious::Lite - Real-time micro web framework
 
 =head1 SYNOPSIS
 

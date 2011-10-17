@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 
 has [qw/connection kept_alive local_address local_port previous remote_port/];
-has keep_alive => 0;
 
 # "Please don't eat me! I have a wife and kids. Eat them!"
 sub client_close { shift->server_close(@_) }
@@ -30,11 +29,7 @@ sub is_websocket {undef}
 
 sub is_writing {
   return 1 unless my $state = shift->{state};
-  return 1
-    if $state eq 'write'
-      || $state eq 'write_start_line'
-      || $state eq 'write_headers'
-      || $state eq 'write_body';
+  return 1 if $state ~~ [qw/write write_start_line write_headers write_body/];
   return;
 }
 
@@ -67,20 +62,9 @@ sub remote_address {
 
   # Reverse proxy
   if ($ENV{MOJO_REVERSE_PROXY}) {
-
-    # Forwarded
-    my $forwarded = $self->{forwarded_for};
-    return $forwarded if $forwarded;
-
-    # Reverse proxy
-    if ($forwarded = $self->req->headers->header('X-Forwarded-For')) {
-
-      # Real address
-      if ($forwarded =~ /([^,\s]+)$/) {
-        $self->{forwarded_for} = $1;
-        return $1;
-      }
-    }
+    return $self->{forwarded_for} if $self->{forwarded_for};
+    return $self->{forwarded_for} = $1
+      if ($self->req->headers->x_forwarded_for || '') =~ /([^,\s]+)$/;
   }
 
   return $self->{remote_address};
@@ -91,16 +75,9 @@ sub res { croak 'Method "res" not implemented by subclass' }
 
 sub resume {
   my $self = shift;
-
-  # Delayed
   if (($self->{state} || '') eq 'paused') { $self->{state} = 'write_body' }
-
-  # Writing
   elsif (!$self->is_writing) { $self->{state} = 'write' }
-
-  # Resume
   $self->emit('resume');
-
   return $self;
 }
 
@@ -164,13 +141,6 @@ L<Mojo::Transaction> implements the following attributes.
   $tx            = $tx->connection($connection);
 
 Connection identifier or socket.
-
-=head2 C<keep_alive>
-
-  my $keep_alive = $tx->keep_alive;
-  $tx            = $tx->keep_alive(1);
-
-Connection can be kept alive.
 
 =head2 C<kept_alive>
 

@@ -437,8 +437,7 @@ sub _parse {
   }
 
   # Content
-  my $state = $self->{state} || '';
-  if ($state eq 'body' || $state eq 'content' || $state eq 'done') {
+  if (($self->{state} || '') ~~ [qw/body content done/]) {
 
     # Until body
     my $content = $self->content;

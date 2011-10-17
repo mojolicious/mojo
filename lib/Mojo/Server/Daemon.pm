@@ -172,9 +172,6 @@ sub _finish {
     # Successful upgrade
     if ($ws->res->code eq '101') {
 
-      # Make sure connection stays active
-      $tx->keep_alive(1);
-
       # Upgrade connection timeout
       $self->ioloop->connection_timeout($id, $self->websocket_timeout);
 

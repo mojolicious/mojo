@@ -300,6 +300,7 @@ sub transfer_encoding { scalar shift->header('Transfer-Encoding' => @_) }
 sub upgrade           { scalar shift->header(Upgrade             => @_) }
 sub user_agent        { scalar shift->header('User-Agent'        => @_) }
 sub www_authenticate  { scalar shift->header('WWW-Authenticate'  => @_) }
+sub x_forwarded_for   { scalar shift->header('X-Forwarded-For'   => @_) }
 
 1;
 __END__
@@ -694,6 +695,13 @@ Shortcut for the C<User-Agent> header.
   $headers         = $headers->www_authenticate('Basic realm="realm"');
 
 Shortcut for the C<WWW-Authenticate> header.
+
+=head2 C<x_forwarded_for>
+
+  my $x_forwarded_for = $headers->x_forwarded_for;
+  $headers            = $headers->x_forwarded_for('127.0.0.1');
+
+Shortcut for the C<X-Forwarded-For> header.
 
 =head1 SEE ALSO
 

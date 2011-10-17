@@ -120,34 +120,23 @@ sub client_write {
 }
 
 sub keep_alive {
-  my ($self, $ka) = @_;
-
-  # Change default
-  if ($ka) {
-    $self->{ka} = $ka;
-    return $self;
-  }
-
-  my $req      = $self->req;
-  my $res      = $self->res;
-  my $req_conn = $req->headers->connection || '';
-  my $res_conn = $res->headers->connection || '';
-  my $req_ver  = $req->version;
-  my $res_ver  = $res->version;
+  my $self = shift;
 
   # Close
-  if ($req_conn =~ /^close$/i || $res_conn =~ /^close$/i) { $self->{ka} = 0 }
+  my $req      = $self->req;
+  my $res      = $self->res;
+  my $req_conn = lc($req->headers->connection || '');
+  my $res_conn = lc($res->headers->connection || '');
+  return 0 if $req_conn eq 'close' || $res_conn eq 'close';
 
   # Keep alive
-  elsif ($req_conn =~ /^keep-alive$/i || $res_conn =~ /^keep-alive$/i) {
-    $self->{ka} = 1;
-  }
+  return 1 if $req_conn eq 'keep-alive' || $res_conn eq 'keep-alive';
 
   # No keep alive for 0.9 and 1.0
-  elsif ($req_ver eq '0.9' || $req_ver eq '1.0') { $self->{ka} ||= 0 }
-  elsif ($res_ver eq '0.9' || $res_ver eq '1.0') { $self->{ka} ||= 0 }
+  return 0 if $req->version ~~ [qw/0.9 1.0/];
+  return 0 if $res->version ~~ [qw/0.9 1.0/];
 
-  return $self->{ka} //= 1;
+  return 1;
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!
@@ -412,9 +401,8 @@ Write client data.
 =head2 C<keep_alive>
 
   my $keep_alive = $tx->keep_alive;
-  $tx            = $tx->keep_alive(1);
 
-Connection can be kept alive.
+Check if connection can be kept alive.
 
 =head2 C<server_leftovers>
 

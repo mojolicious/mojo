@@ -222,11 +222,7 @@ sub _tokenize {
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
     # Inside a symbol
-    my $symbol = 0;
-    $symbol = 1
-      if $state eq 'relaxed'
-        || $state eq 'symbol'
-        || $state eq 'wildcard';
+    my $symbol = $state ~~ [qw/relaxed symbol wildcard/] ? 1 : 0;
 
     # Quote start
     if ($char eq $quote_start) {

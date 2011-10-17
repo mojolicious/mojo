@@ -163,7 +163,7 @@ sub parse {
         if (!$self->xml && $VOID{$start}) || $attr =~ /\/\s*$/;
 
       # Relaxed "script" or "style"
-      if ($start eq 'script' || $start eq 'style') {
+      if ($start ~~ [qw/script style/]) {
         if ($html =~ /\G(.*?)<\s*\/\s*$start\s*>/gcsi) {
           $self->_raw($1, \$current);
           $self->_end($start, \$current);
@@ -371,7 +371,7 @@ sub _start {
     elsif ($start eq 'optgroup') { $self->_end('optgroup', $current) }
 
     # "<option>"
-    elsif ($start eq 'option' || $start eq 'optgroup') {
+    elsif ($start ~~ [qw/option optgroup/]) {
       $self->_end('option', $current);
       $self->_end('optgroup', $current) if $start eq 'optgroup';
     }
@@ -392,19 +392,19 @@ sub _start {
     elsif ($start eq 'tr') { $self->_close($current, {tr => 1}) }
 
     # "<th>" and "<td>"
-    elsif ($start eq 'th' || $start eq 'td') {
+    elsif ($start ~~ [qw/th td/]) {
       $self->_close($current, {th => 1});
       $self->_close($current, {td => 1});
     }
 
     # "<dt>" and "<dd>"
-    elsif ($start eq 'dt' || $start eq 'dd') {
+    elsif ($start ~~ [qw/dt dd/]) {
       $self->_end('dt', $current);
       $self->_end('dd', $current);
     }
 
     # "<rt>" and "<rp>"
-    elsif ($start eq 'rt' || $start eq 'rp') {
+    elsif ($start ~~ [qw/rt rp/]) {
       $self->_end('rt', $current);
       $self->_end('rp', $current);
     }

@@ -86,7 +86,7 @@ sub _read {
   unless (defined $read) {
 
     # Retry
-    return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
+    return if $! ~~ [EAGAIN, EINTR, EWOULDBLOCK];
 
     # Closed
     return $self->emit_safe('close') if $! == ECONNRESET;
@@ -114,10 +114,10 @@ sub _write {
     unless (defined $written) {
 
       # Retry
-      return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
+      return if $! ~~ [EAGAIN, EINTR, EWOULDBLOCK];
 
       # Closed
-      return $self->emit_safe('close') if $! == ECONNRESET || $! == EPIPE;
+      return $self->emit_safe('close') if $! ~~ [ECONNRESET, EPIPE];
 
       # Write error
       return $self->emit_safe(error => $!);

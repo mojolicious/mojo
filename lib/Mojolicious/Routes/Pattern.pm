@@ -76,7 +76,7 @@ sub render {
     }
 
     # Relaxed, symbol or wildcard
-    elsif ($op eq 'relaxed' || $op eq 'symbol' || $op eq 'wildcard') {
+    elsif ($op ~~ [qw/relaxed symbol wildcard/]) {
       my $name = $token->[1];
       $rendered = $values->{$name} // '';
       my $default = $self->defaults->{$name};
@@ -161,7 +161,7 @@ sub _compile {
     }
 
     # Symbol
-    elsif ($op eq 'relaxed' || $op eq 'symbol' || $op eq 'wildcard') {
+    elsif ($op ~~ [qw/relaxed symbol wildcard/]) {
       my $name = $token->[1];
       unshift @{$self->symbols}, $name;
 

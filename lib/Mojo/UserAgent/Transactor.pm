@@ -188,7 +188,7 @@ sub redirect {
   # Commonly used codes
   my $res = $old->res;
   my $code = $res->code || 0;
-  return unless $code == 301 || $code == 302 || $code == 303 || $code == 307;
+  return unless $code ~~ [301, 302, 303, 307];
 
   # Fix broken location without authority and/or scheme
   return unless my $location = $res->headers->location;
@@ -201,7 +201,7 @@ sub redirect {
   # Clone request if necessary
   my $new    = Mojo::Transaction::HTTP->new;
   my $method = $req->method;
-  if ($code == 301 || $code == 307) {
+  if ($code ~~ [301, 307]) {
     return unless $req = $req->clone;
     $new->req($req);
     my $headers = $req->headers;

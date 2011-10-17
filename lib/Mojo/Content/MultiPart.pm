@@ -7,16 +7,11 @@ has parts => sub { [] };
 
 sub body_contains {
   my ($self, $chunk) = @_;
-
-  # Check parts
-  my $found = 0;
   for my $part (@{$self->parts}) {
-    my $headers = $part->build_headers;
-    $found += 1 if $headers =~ /$chunk/g;
-    $found += $part->body_contains($chunk);
+    return 1 if index($part->build_headers, $chunk) >= 0;
+    return 1 if $part->body_contains($chunk);
   }
-
-  return $found ? 1 : 0;
+  return;
 }
 
 sub body_size {
@@ -277,7 +272,7 @@ implements the following new ones.
 
 =head2 C<body_contains>
 
-  my $found = $content->body_contains('foobarbaz');
+  my $success = $content->body_contains('foobarbaz');
 
 Check if content parts contain a specific string.
 

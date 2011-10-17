@@ -487,7 +487,7 @@ implements the following new ones.
 
 =head2 C<body_contains>
 
-  my $found = $content->body_contains('foo bar baz');
+  my $success = $content->body_contains('foo bar baz');
 
 Check if content contains a specific string.
 

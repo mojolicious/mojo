@@ -30,6 +30,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small memory leak in Mojolicious.
         - Fixed small memory leak in Mojo::DOM.
         - Fixed small memory leak in Mojo::Message.
+        - Fixed small boundary bug in Mojo::Content::MultiPart.
         - Fixed small formatting bug in Mojo::Headers.
         - Fixed small proxy message generation bug.
         - Fixed small detection bug in Mojolicious::Types.

@@ -127,14 +127,14 @@ sub keep_alive {
   my $res      = $self->res;
   my $req_conn = lc($req->headers->connection || '');
   my $res_conn = lc($res->headers->connection || '');
-  return 0 if $req_conn eq 'close' || $res_conn eq 'close';
+  return if $req_conn eq 'close' || $res_conn eq 'close';
 
   # Keep alive
   return 1 if $req_conn eq 'keep-alive' || $res_conn eq 'keep-alive';
 
   # No keep alive for 0.9 and 1.0
-  return 0 if $req->version ~~ [qw/0.9 1.0/];
-  return 0 if $res->version ~~ [qw/0.9 1.0/];
+  return if $req->version ~~ [qw/0.9 1.0/];
+  return if $res->version ~~ [qw/0.9 1.0/];
 
   return 1;
 }
@@ -400,7 +400,7 @@ Write client data.
 
 =head2 C<keep_alive>
 
-  my $keep_alive = $tx->keep_alive;
+  my $success = $tx->keep_alive;
 
 Check if connection can be kept alive.
 

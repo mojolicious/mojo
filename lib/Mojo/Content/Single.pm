@@ -9,9 +9,8 @@ has asset => sub { Mojo::Asset::Memory->new };
 has auto_upgrade => 1;
 
 sub body_contains {
-  my ($self, $chunk) = @_;
-  return 1 if $self->asset->contains($chunk) >= 0;
-  return 0;
+  return 1 if shift->asset->contains(shift) >= 0;
+  return;
 }
 
 sub body_size {
@@ -129,7 +128,7 @@ implements the following new ones.
 
 =head2 C<body_contains>
 
-  my $found = $content->body_contains('1234567');
+  my $success = $content->body_contains('1234567');
 
 Check if content contains a specific string.
 

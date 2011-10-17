@@ -112,7 +112,7 @@ Mojo::EventEmitter - Event emitter base class
   # Subscribe to events
   my $tiger = Cat->new;
   $tiger->on(roar => sub {
-    my ($self, $times) = @_;
+    my ($tiger, $times) = @_;
     say 'RAWR!' for 1 .. $times;
   });
   $tiger->poke;

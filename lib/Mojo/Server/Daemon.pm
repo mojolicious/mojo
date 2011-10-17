@@ -338,7 +338,7 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP 1.1 and WebSocket server
   my $daemon = Mojo::Server::Daemon->new(listen => ['http://*:8080']);
   $daemon->unsubscribe_all('request');
   $daemon->on(request => sub {
-    my ($self, $tx) = @_;
+    my ($daemon, $tx) = @_;
 
     # Request
     my $method = $tx->req->method;

@@ -428,13 +428,13 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
   Mojo::IOLoop->listen(
     port => 3000,
     on_read => sub {
-      my ($self, $id, $chunk) = @_;
+      my ($loop, $id, $chunk) = @_;
 
       # Process input
       say $chunk;
 
       # Got some data, time to write
-      $self->write($id, 'HTTP/1.1 200 OK');
+      $loop->write($id, 'HTTP/1.1 200 OK');
     }
   );
 
@@ -444,13 +444,13 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
     port => 3000,
     tls => 1,
     on_connect => sub {
-      my ($self, $id) = @_;
+      my ($loop, $id) = @_;
 
       # Write request
-      $self->write($id, "GET / HTTP/1.1\r\n\r\n");
+      $loop->write($id, "GET / HTTP/1.1\r\n\r\n");
     },
     on_read => sub {
-      my ($self, $id, $chunk) = @_;
+      my ($loop, $id, $chunk) = @_;
 
       # Process input
       say $chunk;
@@ -459,8 +459,8 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
 
   # Add a timer
   Mojo::IOLoop->timer(5 => sub {
-    my $self = shift;
-    $self->drop($id);
+    my $loop = shift;
+    $loop->drop($id);
   });
 
   # Start and stop loop

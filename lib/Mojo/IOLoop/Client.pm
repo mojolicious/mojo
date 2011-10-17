@@ -167,11 +167,11 @@ Mojo::IOLoop::Client - IOLoop socket client
   # Create socket connection
   my $client = Mojo::IOLoop::Client->new;
   $client->on(connect => sub {
-    my ($self, $handle) = @_;
+    my ($client, $handle) = @_;
     ...
   });
   $client->on(error => sub {
-    my ($self, $error) = @_;
+    my ($client, $error) = @_;
     ...
   });
   $client->connect(address => 'mojolicio.us', port => 80);

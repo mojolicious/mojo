@@ -91,7 +91,7 @@ Mojo::Server::PSGI - PSGI server
   my $psgi = Mojo::Server::PSGI->new;
   $psgi->unsubscribe_all('request');
   $psgi->on(request => sub {
-    my ($self, $tx) = @_;
+    my ($psgi, $tx) = @_;
 
     # Request
     my $method = $tx->req->method;

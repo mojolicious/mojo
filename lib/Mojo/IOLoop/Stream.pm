@@ -149,15 +149,15 @@ Mojo::IOLoop::Stream - IOLoop stream
   # Create stream
   my $stream = Mojo::IOLoop::Stream->new($handle);
   $stream->on(read => sub {
-    my ($self, $chunk) = @_;
+    my ($stream, $chunk) = @_;
     ...
   });
   $stream->on(close => sub {
-    my $self = shift;
+    my $stream = shift;
     ...
   });
   $stream->on(error => sub {
-    my ($self, $error) = @_;
+    my ($stream, $error) = @_;
     ...
   });
 

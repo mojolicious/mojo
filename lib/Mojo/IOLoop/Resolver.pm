@@ -361,13 +361,13 @@ Mojo::IOLoop::Resolver - IOLoop DNS stub resolver
   # Lookup address
   my $resolver = Mojo::IOLoop::Resolver->new;
   $resolver->lookup('mojolicio.us' => sub {
-    my ($self, $address) = @_;
+    my ($resolver, $address) = @_;
     ...
   });
 
   # Resolve "MX" records
   $resolver->resolve('mojolicio.us', 'MX', sub {
-    my ($self, $records) = @_;
+    my ($resolver, $records) = @_;
     ...
   });
 

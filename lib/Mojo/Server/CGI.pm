@@ -111,7 +111,7 @@ Mojo::Server::CGI - CGI server
   my $cgi = Mojo::Server::CGI->new;
   $cgi->unsubscribe_all('request')
   $cgi->on(request => sub {
-    my ($self, $tx) = @_;
+    my ($cgi, $tx) = @_;
 
     # Request
     my $method = $tx->req->method;

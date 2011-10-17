@@ -268,7 +268,7 @@ Mojo::IOLoop::Server - IOLoop socket server
   # Create listen socket
   my $server = Mojo::IOLoop::Server->new;
   $server->on(accept => sub {
-    my ($self, $handle) = @_;
+    my ($server, $handle) = @_;
     ...
   });
   $server->listen(port => 3000);

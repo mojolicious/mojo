@@ -1000,7 +1000,7 @@ A L<Mojo::UserAgent> prepared for the current environment.
 
   # Non-blocking
   $c->ua->get('http://mojolicio.us' => sub {
-    my ($self, $tx) = @_;
+    my ($ua, $tx) = @_;
     $c->render_data($tx->res->body);
   });
 
@@ -1012,7 +1012,7 @@ A L<Mojo::UserAgent> prepared for the current environment.
   for my $url ('http://mojolicio.us', 'https://metacpan.org') {
     $t->begin;
     $c->ua->get($url => sub {
-      my ($self, $tx) = @_;
+      my ($ua, $tx) = @_;
       $t->end($tx->res->dom->html->head->title->text);
     });
   }

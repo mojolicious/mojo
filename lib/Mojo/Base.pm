@@ -162,7 +162,7 @@ Mojo::Base - Minimal base class for Mojo projects
 
 L<Mojo::Base> is a simple base class for L<Mojo> projects.
 
-  # Automatically enables "strict" and "warnings"
+  # Automatically enables "strict", "warnings" and Perl 5.10 features
   use Mojo::Base -strict;
   use Mojo::Base -base;
   use Mojo::Base 'SomeBaseClass';

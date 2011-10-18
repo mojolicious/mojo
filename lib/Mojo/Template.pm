@@ -55,8 +55,7 @@ sub build {
   my $self = shift;
 
   # Compile
-  my @lines;
-  my $cpst;
+  my (@lines, $cpst);
   my $multi = 0;
   for my $line (@{$self->tree}) {
 
@@ -84,7 +83,6 @@ sub build {
         # Quote and fix line ending
         $value = quotemeta($value);
         $value .= '\n' if $newline;
-
         $lines[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
       }
 
@@ -123,11 +121,7 @@ sub build {
       }
 
       # Capture start
-      if ($type eq 'cpst') {
-
-        # Start block
-        $cpst = " sub { my \$_M = ''; ";
-      }
+      if ($type eq 'cpst') { $cpst = " sub { my \$_M = ''; " }
     }
   }
 
@@ -141,7 +135,7 @@ sub build {
     . $lines[0];
   $lines[-1] .= "$append; \$_M; } };";
 
-  # Done
+  # Final code
   $self->code(join "\n", @lines);
   $self->tree([]);
 

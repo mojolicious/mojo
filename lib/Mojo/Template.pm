@@ -536,6 +536,13 @@ That means you can access arguments simply via C<@_>.
   % my $x = shift;
   test 123 <%= $foo %>
 
+=head2 Comments
+
+Because comments are treated as "<%# line =%>", you should avoid using
+tags within comments, as these will be parsed and will affect performance
+and potentially cause L<Mojo::Template> to return L<Mojo::Exception> if
+the tags are incomplete or invalid.
+
 =head2 More escaping
 
 You can use escaped tags and lines to generate templates.

@@ -611,14 +611,15 @@ to C<CPAN>.
   $ make dist
   $ mojo cpanify -u USER -p PASS Mojolicious-Plugin-DebugHelper-0.01.tar.gz
 
-=head2 Mode specific C<exception> and C<not_found> templates
+=head2 Custom C<exception> and C<not_found> templates
 
 While the built-in C<exception> and C<not_found> templates are very useful
 during development, you most likely want to show your users something more
 related to your application in production.
 That's why L<Mojolicious> will always try to render
-C<exception.$mode.$format.*> or C<not_found.$mode.$format.*> before falling
-back to the built-in default templates.
+C<exception.$mode.$format.*>/C<not_found.$mode.$format.*> or
+C<exception.$format.*>/C<not_found.$format.*> before falling back to the
+built-in default templates.
 
   @@ exception.production.html.ep
   <!doctype html><html>

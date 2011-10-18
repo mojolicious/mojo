@@ -844,8 +844,8 @@ will not be encoded.
   $c->render_exception('Oops!');
   $c->render_exception(Mojo::Exception->new('Oops!'));
 
-Render the exception template C<exception.$mode.$format.$handler> or
-C<exception.$format.$handler> and set the response status code to C<500>.
+Render the exception template C<exception.$mode.$format.*> or
+C<exception.$format.*> and set the response status code to C<500>.
 
 =head2 C<render_json>
 
@@ -870,8 +870,8 @@ Disable auto rendering, especially for long polling this can be quite useful.
   $c->render_not_found;
   $c->render_not_found($resource);
     
-Render the not found template C<not_found.$mode.html.$handler> or
-C<not_found.html.$handler> and set the response status code to C<404>.
+Render the not found template C<not_found.$mode.$format.*> or
+C<not_found.$format.*> and set the response status code to C<404>.
 
 =head2 C<render_partial>
 

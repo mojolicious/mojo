@@ -117,7 +117,7 @@ sub _build_tx {
   );
 
   # Upgrade
-  $tx->on(upgrade => sub { $self->_upgrade($id, pop) });
+  $tx->on(upgrade => sub { $self->_upgrade($id, $_[1]) });
 
   # New request on the connection
   $c->{requests} ||= 0;
@@ -288,10 +288,10 @@ sub _read {
 }
 
 sub _upgrade {
-  my ($self, $id, $txref) = @_;
-  return unless $$txref->req->headers->upgrade =~ /WebSocket/i;
-  my $c = $self->{connections}->{$id};
-  $c->{websocket} = $$txref = $self->upgrade_tx($$txref);
+  my $self = shift;
+  return unless $_[1]->req->headers->upgrade =~ /WebSocket/i;
+  my $c = $self->{connections}->{$_[0]};
+  $c->{websocket} = $_[1] = $self->upgrade_tx($_[1]);
 }
 
 sub _user {

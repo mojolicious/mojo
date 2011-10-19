@@ -110,18 +110,19 @@ sub _build_tx {
   weaken $self;
   $tx->on(
     request => sub {
-      my $tx = pop;
-      $self->emit(request => $tx);
-      $tx->on(resume => sub { $self->_write($id) });
-    }
-  );
+      my ($tx, $ws) = @_;
 
-  # Upgrade
-  $tx->on(
-    upgrade => sub {
-      return unless $_[1]->req->headers->upgrade eq 'websocket';
-      $self->{connections}->{$id}->{websocket} = $_[1] =
-        $self->upgrade_tx($_[1]);
+      # WebSocket
+      if ($ws) {
+        $self->{connections}->{$id}->{websocket} = $ws->server_handshake;
+        $self->emit(request => $ws);
+      }
+
+      # HTTP
+      $self->emit(request => $tx);
+
+      # Resume
+      $tx->on(resume => sub { $self->_write($id) });
     }
   );
 

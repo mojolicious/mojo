@@ -5,7 +5,6 @@ use Carp 'croak';
 use Mojo::Home;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
-use Mojo::Transaction::WebSocket;
 use Scalar::Util 'weaken';
 
 has home => sub { Mojo::Home->new };
@@ -39,8 +38,6 @@ sub build_tx { Mojo::Transaction::HTTP->new }
 
 # "D’oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
-
-sub upgrade_tx { Mojo::Transaction::WebSocket->new(handshake => pop) }
 
 1;
 __END__
@@ -142,13 +139,6 @@ L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
   sub handler {
     my ($self, $tx) = @_;
   }
-
-=head2 C<upgrade_tx>
-
-  my $ws = $app->upgrade_tx(tx);
-
-Upgrade transaction, defaults to building a L<Mojo::Transaction::WebSocket>
-object.
 
 =head1 SEE ALSO
 

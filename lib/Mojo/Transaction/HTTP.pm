@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::Transaction';
 
 use Mojo::Message::Request;
 use Mojo::Message::Response;
+use Mojo::Transaction::WebSocket;
 
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
@@ -148,15 +149,6 @@ EOF
   shift->on(request => shift);
 }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_upgrade {
-  warn <<EOF;
-Mojo::Transaction::HTTP->on_upgrade is DEPRECATED in favor of using
-Mojo::Transaction::HTTP->on!!!
-EOF
-  shift->on(upgrade => shift);
-}
-
 sub server_leftovers {
   my $self = shift;
 
@@ -185,9 +177,15 @@ sub server_read {
 
   # EOF
   elsif ((length $chunk == 0) || ($req->is_done && !$self->{handled}++)) {
-    my $upgraded = $self;
-    $self->emit(upgrade => $upgraded) if $req->headers->upgrade;
-    $self->emit(request => $upgraded);
+
+    # WebSocket
+    if (($req->headers->upgrade || '') eq 'websocket') {
+      $self->emit(
+        request => Mojo::Transaction::WebSocket->new(handshake => $self));
+    }
+
+    # HTTP
+    else { $self->emit('request') }
   }
 
   # Expect 100 Continue
@@ -342,18 +340,12 @@ can emit the following new ones.
 =head2 C<request>
 
   $tx->on(request => sub {
-    my ($tx, $upgraded) = @_;
+    my ($tx, $ws) = @_;
   });
 
-Emitted when a request is ready and needs to be handled.
-
-=head2 C<upgrade>
-
-  $tx->on(upgrade => sub {
-    my ($tx, $upgraded) = @_;
-  });
-
-Emitted when the transaction can be upgraded.
+Emitted when a request is ready and needs to be handled, an optional
+L<Mojo::Transaction::WebSocket> object will be passed for WebSocket handshake
+requests.
 
 =head1 ATTRIBUTES
 

@@ -23,8 +23,6 @@ sub new {
 
 sub build_tx { shift->app->build_tx }
 
-sub upgrade_tx { shift->app->upgrade_tx(shift)->server_handshake }
-
 sub load_app {
   my ($self, $file) = @_;
 
@@ -158,12 +156,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $server->run;
 
 Start server.
-
-=head2 C<upgrade_tx>
-
-  my $upgraded = $server->upgrade_tx(tx);
-
-Let application upgrade transaction.
 
 =head1 SEE ALSO
 

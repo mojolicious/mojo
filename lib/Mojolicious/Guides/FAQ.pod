@@ -13,7 +13,7 @@ L<Mojolicious> together with the right answers.
 =head2 How does Mojolicious compare to other Perl web frameworks?
 
 The short answer is "it doesn't", because we interpret the words
-"web framework" much more literal than others.
+"web framework" much more literally than others.
 With the emergence of the C<Real-time Web> and new technologies such as
 C<WebSockets>, we are facing new challenges that go way beyond what commonly
 used modules like L<LWP> were designed for.

@@ -709,7 +709,7 @@ controller, defaults to a L<Mojolicious> object.
   my $m = $c->match;
   $c    = $c->match(Mojolicious::Routes::Match->new);
 
-Routes results for the current request, defaults to a
+Routes dispatcher results for the current request, defaults to a
 L<Mojolicious::Routes::Match> object.
 
 =head2 C<tx>

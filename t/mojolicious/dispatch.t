@@ -27,16 +27,15 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 67;
+use Test::More tests => 68;
 
 use Mojolicious;
 use Mojo::Transaction::HTTP;
 use Mojolicious::Controller;
 use Mojolicious::Routes;
 
-my $c = Mojolicious::Controller->new;
-
 # Set
+my $c = Mojolicious::Controller->new;
 $c->stash(foo => 'bar');
 is $c->stash('foo'), 'bar', 'set and return a stash value';
 
@@ -74,6 +73,9 @@ is_deeply $c->stash, {}, 'elements can be deleted';
 $c->stash({a => 1, b => 2});
 $stash = $c->stash;
 is_deeply $stash, {a => 1, b => 2}, 'set via hashref';
+
+# Rendering
+is $c->render(text => 'works', partial => 1), 'works', 'rendering works';
 
 $c = Test::Controller->new(app => Mojolicious->new);
 $c->app->log->path(undef);

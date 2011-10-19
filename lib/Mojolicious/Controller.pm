@@ -8,12 +8,17 @@ use Mojo::Home;
 use Mojo::Transaction::HTTP;
 use Mojo::URL;
 use Mojo::Util;
+use Mojolicious;
+use Mojolicious::Routes::Match;
 
 require Carp;
 require Scalar::Util;
 
 # "Scalpel... blood bucket... priest."
-has [qw/app match/];
+has app => sub { Mojolicious->new };
+has match => sub {
+  Mojolicious::Routes::Match->new(get => '/')->root(shift->app->routes);
+};
 has tx => sub { Mojo::Transaction::HTTP->new };
 
 # Bundled files
@@ -227,7 +232,7 @@ sub render {
     }
 
     # Try the route name if we don't have controller and action
-    elsif ($self->match && $self->match->endpoint) {
+    elsif ($self->match->endpoint) {
       $self->stash->{template} = $self->match->endpoint->name;
     }
   }
@@ -575,13 +580,6 @@ sub url_for {
   # Absolute URL
   return Mojo::URL->new($target) if $target =~ /^\w+\:\/\//;
 
-  # Make sure we have a match for named routes
-  my $match;
-  unless ($match = $self->match) {
-    $match = Mojolicious::Routes::Match->new(get => '/');
-    $match->root($self->app->routes);
-  }
-
   # Base
   my $url = Mojo::URL->new;
   my $req = $self->req;
@@ -606,7 +604,7 @@ sub url_for {
 
   # Route
   else {
-    my ($p, $ws) = $match->path_for($target, @_);
+    my ($p, $ws) = $self->match->path_for($target, @_);
     $path->parse($p) if $p;
 
     # Fix trailing slash
@@ -704,18 +702,20 @@ implements the following new ones.
   $c      = $c->app(Mojolicious->new);
 
 A reference back to the L<Mojolicious> application that dispatched to this
-controller.
+controller, defaults to a L<Mojolicious> object.
 
 =head2 C<match>
 
   my $m = $c->match;
+  $c    = $c->match(Mojolicious::Routes::Match->new);
 
-A L<Mojolicious::Routes::Match> object containing the routes results for the
-current request.
+Routes results for the current request, defaults to a
+L<Mojolicious::Routes::Match> object.
 
 =head2 C<tx>
 
   my $tx = $c->tx;
+  $c     = $c->tx(Mojo::Transaction::HTTP->new);
 
 The transaction that is currently being processed, usually a
 L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.

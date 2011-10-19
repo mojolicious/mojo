@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1236;
+use Test::More tests => 1258;
 
 use File::Spec;
 use File::Temp;
@@ -639,6 +639,87 @@ my $file = File::Spec->catfile(File::Temp::tempdir(CLEANUP => 1),
   ("MOJO_TMP." . time . ".txt"));
 ok $req->upload('upload')->move_to($file), 'moved file';
 is unlink($file), 1, 'unlinked file';
+
+# Parse HTTP 1.1 multipart request (with callbacks and stream)
+$req = Mojo::Message::Request->new;
+my $stream = '';
+$req->content->on(
+  body => sub {
+    my $content = shift;
+    $content->on(
+      upgrade => sub {
+        my ($content, $multipart) = @_;
+        $multipart->on(
+          part => sub {
+            my ($multipart, $part) = @_;
+            $part->on(
+              body => sub {
+                my $part = shift;
+                return
+                  unless $part->headers->content_disposition =~ /hello\.pl/;
+                $part->on(
+                  read => sub {
+                    my ($part, $chunk) = @_;
+                    $stream .= $chunk;
+                  }
+                );
+              }
+            );
+          }
+        );
+      }
+    );
+  }
+);
+$req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 418\x0d\x0a");
+$req->parse('Content-Type: multipart/form-data; bo');
+$req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
+$req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$req->parse("Content-Disposition: form-data; name=\"text1\"\x0d\x0a");
+$req->parse("\x0d\x0ahallo welt test123\n");
+$req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$req->parse("Content-Disposition: form-data; name=\"text2\"\x0d\x0a");
+$req->parse("\x0d\x0a\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$req->parse('Content-Disposition: form-data; name="upload"; file');
+$req->parse("name=\"hello.pl\"\x0d\x0a");
+$req->parse("Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+is $stream, '', 'no content';
+$req->parse("#!/usr/bin/perl\n\n");
+is $stream, '', 'no content';
+$req->parse("use strict;\n");
+is $stream, '', 'no content';
+$req->parse("use warnings;\n\n");
+is $stream, '#!/usr/bin/', 'right content';
+$req->parse("print \"Hello World :)\\n\"\n");
+is $stream, "#!/usr/bin/perl\n\nuse strict;\nuse war", 'right content';
+$req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
+ok $req->is_done,      'request is done';
+is $req->is_multipart, 1, 'multipart content';
+is $req->method,       'GET', 'right method';
+is $req->version,      '1.1', 'right version';
+is $req->at_least_version('1.0'), 1,     'at least version 1.0';
+is $req->at_least_version('1.2'), undef, 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo13#23', 'right URL';
+is $req->query_params, 'foo13', 'right parameters';
+is $req->headers->content_type,
+  'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
+  'right "Content-Type" value';
+is $req->headers->content_length, 418, 'right "Content-Type" value';
+isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
+isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
+isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
+is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
+  'right content';
+is_deeply $req->body_params->to_hash->{text1}, "hallo welt test123\n",
+  'right value';
+is_deeply $req->body_params->to_hash->{text2}, '', 'right value';
+is $stream,
+    "#!/usr/bin/perl\n\n"
+  . "use strict;\n"
+  . "use warnings;\n\n"
+  . "print \"Hello World :)\\n\"\n",
+  'right content';
 
 # Parse HTTP 1.1 multipart request (without upgrade)
 $req = Mojo::Message::Request->new;

@@ -49,7 +49,9 @@ sub parse {
   # Content needs to be upgraded to multipart
   if ($self->auto_upgrade && defined($self->boundary)) {
     return $self if $self->isa('Mojo::Content::MultiPart');
-    return Mojo::Content::MultiPart->new($self)->parse;
+    my $multipart = Mojo::Content::MultiPart->new($self)->parse;
+    $self->emit(upgrade => $multipart);
+    return $multipart;
   }
 
   # Don't waste memory and upgrade to file based storage on demand
@@ -98,7 +100,17 @@ RFC 2616.
 
 =head1 EVENTS
 
-L<Mojo::Content::Single> inherits all events from L<Mojo::Content>.
+L<Mojo::Content::Single> inherits all events from L<Mojo::Content> and can
+emit the following new ones.
+
+=head2 C<upgrade>
+
+  $content->on(upgrade => sub {
+    my ($content, $multipart) = @_;
+  });
+
+Emitted when content gets upgraded.
+Note that this event is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 

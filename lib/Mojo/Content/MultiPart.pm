@@ -195,7 +195,8 @@ sub _parse_multipart_boundary {
     substr $self->{buffer}, 0, length($boundary) + 6, '';
 
     # New part
-    push @{$self->parts}, Mojo::Content::Single->new(relaxed => 1);
+    $self->emit(part => my $part = Mojo::Content::Single->new(relaxed => 1));
+    push @{$self->parts}, $part;
     $self->{multi_state} = 'multipart_body';
     return 1;
   }
@@ -251,7 +252,17 @@ described in RFC 2616.
 
 =head1 EVENTS
 
-L<Mojo::Content::Multipart> inherits all events from L<Mojo::Content>.
+L<Mojo::Content::Multipart> inherits all events from L<Mojo::Content> and can
+emit the following new ones.
+
+=head2 C<part>
+
+  $content->on(part => sub {
+    my ($content, $part) = @_;
+  });
+
+Emitted when a new part starts.
+Note that this event is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 

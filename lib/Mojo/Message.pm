@@ -568,6 +568,12 @@ L<Mojo::Message> can emit the following events.
 
 Emitted after message building or parsing is finished.
 
+  my $before = time;
+  $message->on(finish => sub {
+    my $message = shift;
+    $message->headers->header('X-Parser-Time' => time - $before);
+  });
+
 =head2 C<progress>
 
   $message->on(progress => sub {

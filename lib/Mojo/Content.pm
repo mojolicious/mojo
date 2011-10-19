@@ -447,6 +447,11 @@ L<Mojo::Content> can emit the following events.
 Emitted once all headers have been parsed and the body starts.
 Note that this event is EXPERIMENTAL and might change without warning!
 
+  $content->on(body => sub {
+    my $content = shift;
+    $content->auto_upgrade(0) if $content->headers->header('X-No-MultiPart');
+  });
+
 =head2 C<read>
 
   $content->on(read => sub {
@@ -455,6 +460,11 @@ Note that this event is EXPERIMENTAL and might change without warning!
 
 Emitted when a new chunk of content arrives, also disables normal content
 storage in asset objects.
+
+  $content->on(read => sub {
+    my ($content, $chunk) = @_;
+    say "STREAMING: $chunk";
+  });
 
 =head1 ATTRIBUTES
 

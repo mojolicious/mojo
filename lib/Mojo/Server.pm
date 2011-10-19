@@ -161,7 +161,7 @@ Start server.
 
 =head2 C<upgrade_tx>
 
-  my $ws = $server->upgrade_tx(tx);
+  my $upgraded = $server->upgrade_tx(tx);
 
 Let application upgrade transaction.
 

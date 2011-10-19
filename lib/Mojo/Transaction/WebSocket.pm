@@ -375,7 +375,7 @@ and can emit the following new ones.
     my ($ws, $message) = @_;
   });
 
-Emitted when a new message arrives.
+Emitted when a new WebSocket message arrives.
 
 =head1 ATTRIBUTES
 

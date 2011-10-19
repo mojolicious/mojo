@@ -574,7 +574,7 @@ Emitted after message building or parsing is finished.
     my $message = shift;
   });
 
-Emitted on progress.
+Emitted when message building or parsing makes progress.
 
 =head1 ATTRIBUTES
 

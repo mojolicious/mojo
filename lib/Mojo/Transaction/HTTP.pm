@@ -185,9 +185,9 @@ sub server_read {
 
   # EOF
   elsif ((length $chunk == 0) || ($req->is_done && !$self->{handled}++)) {
-    my $ws = $self;
-    $self->emit(upgrade => $ws) if $req->headers->upgrade;
-    $self->emit(request => $ws);
+    my $upgraded = $self;
+    $self->emit(upgrade => $upgraded) if $req->headers->upgrade;
+    $self->emit(request => $upgraded);
   }
 
   # Expect 100 Continue
@@ -345,15 +345,15 @@ can emit the following new ones.
     my ($tx, $upgraded) = @_;
   });
 
-Emitted when a request needs to be handled.
+Emitted when a request is ready and needs to be handled.
 
 =head2 C<upgrade>
 
   $tx->on(upgrade => sub {
-    my ($tx, $ws) = @_;
+    my ($tx, $upgraded) = @_;
   });
 
-Emitted when a connection needs to be upgraded.
+Emitted when the transaction can be upgraded.
 
 =head1 ATTRIBUTES
 

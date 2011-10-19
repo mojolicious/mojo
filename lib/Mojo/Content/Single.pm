@@ -107,7 +107,7 @@ emit the following new ones.
     my ($single, $multi) = @_;
   });
 
-Emitted when content gets upgraded.
+Emitted when content gets upgraded to a L<Mojo::Content::MultiPart> object.
 Note that this event is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

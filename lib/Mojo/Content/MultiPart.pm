@@ -258,10 +258,10 @@ emit the following new ones.
 =head2 C<part>
 
   $multi->on(part => sub {
-    my ($multi, $part) = @_;
+    my ($multi, $single) = @_;
   });
 
-Emitted when a new part starts.
+Emitted when a new L<Mojo::Content::Single> part starts.
 Note that this event is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

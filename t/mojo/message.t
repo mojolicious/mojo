@@ -645,13 +645,13 @@ $req = Mojo::Message::Request->new;
 my $stream = '';
 $req->content->on(
   body => sub {
-    my $content = shift;
-    $content->on(
+    my $single = shift;
+    $single->on(
       upgrade => sub {
-        my ($content, $multipart) = @_;
-        $multipart->on(
+        my ($single, $multi) = @_;
+        $multi->on(
           part => sub {
-            my ($multipart, $part) = @_;
+            my ($multi, $part) = @_;
             $part->on(
               body => sub {
                 my $part = shift;

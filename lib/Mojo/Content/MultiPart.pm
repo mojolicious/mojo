@@ -241,9 +241,9 @@ Mojo::Content::MultiPart - HTTP 1.1 multipart content container
 
   use Mojo::Content::MultiPart;
 
-  my $content = Mojo::Content::MultiPart->new;
-  $content->parse('Content-Type: multipart/mixed; boundary=---foobar');
-  my $part = $content->parts->[4];
+  my $multi = Mojo::Content::MultiPart->new;
+  $multi->parse('Content-Type: multipart/mixed; boundary=---foobar');
+  my $part = $multi->parts->[4];
 
 =head1 DESCRIPTION
 
@@ -257,8 +257,8 @@ emit the following new ones.
 
 =head2 C<part>
 
-  $content->on(part => sub {
-    my ($content, $part) = @_;
+  $multi->on(part => sub {
+    my ($multi, $part) = @_;
   });
 
 Emitted when a new part starts.
@@ -271,7 +271,8 @@ and implements the following new ones.
 
 =head2 C<parts>
 
-  my $parts = $content->parts;
+  my $parts = $multi->parts;
+  $multi    = $multi->parts([]);
 
 Content parts embedded in this multipart content, usually
 L<Mojo::Content::Single> objects.
@@ -283,44 +284,44 @@ implements the following new ones.
 
 =head2 C<body_contains>
 
-  my $success = $content->body_contains('foobarbaz');
+  my $success = $multi->body_contains('foobarbaz');
 
 Check if content parts contain a specific string.
 
 =head2 C<body_size>
 
-  my $size = $content->body_size;
+  my $size = $multi->body_size;
 
 Content size in bytes.
 
 =head2 C<build_boundary>
 
-  my $boundary = $content->build_boundary;
+  my $boundary = $multi->build_boundary;
 
 Generate a suitable boundary for content.
 
 =head2 C<clone>
 
-  my $clone = $content->clone;
+  my $clone = $multi->clone;
 
 Clone content if possible.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<get_body_chunk>
 
-  my $chunk = $content->get_body_chunk(0);
+  my $chunk = $multi->get_body_chunk(0);
 
 Get a chunk of content starting from a specfic position.
 
 =head2 C<is_multipart>
 
-  my $true = $content->is_multipart;
+  my $true = $multi->is_multipart;
 
 True.
 
 =head2 C<parse>
 
-  $content = $content->parse('Content-Type: multipart/mixed');
+  $multi = $multi->parse('Content-Type: multipart/mixed');
 
 Parse content chunk.
 

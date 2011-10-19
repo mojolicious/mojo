@@ -48,10 +48,8 @@ sub parse {
 
   # Content needs to be upgraded to multipart
   if ($self->auto_upgrade && defined($self->boundary)) {
-    return $self if $self->isa('Mojo::Content::MultiPart');
-    my $multipart = Mojo::Content::MultiPart->new($self)->parse;
-    $self->emit(upgrade => $multipart);
-    return $multipart;
+    $self->emit(upgrade => my $multi = Mojo::Content::MultiPart->new($self));
+    return $multi->parse;
   }
 
   # Don't waste memory and upgrade to file based storage on demand
@@ -90,8 +88,8 @@ Mojo::Content::Single - HTTP 1.1 content container
 
   use Mojo::Content::Single;
 
-  my $content = Mojo::Content::Single->new;
-  $content->parse("Content-Length: 12\r\n\r\nHello World!");
+  my $single = Mojo::Content::Single->new;
+  $single->parse("Content-Length: 12\r\n\r\nHello World!");
 
 =head1 DESCRIPTION
 
@@ -105,8 +103,8 @@ emit the following new ones.
 
 =head2 C<upgrade>
 
-  $content->on(upgrade => sub {
-    my ($content, $multipart) = @_;
+  $single->on(upgrade => sub {
+    my ($single, $multi) = @_;
   });
 
 Emitted when content gets upgraded.
@@ -119,15 +117,15 @@ implements the following new ones.
 
 =head2 C<asset>
 
-  my $asset = $content->asset;
-  $content  = $content->asset(Mojo::Asset::Memory->new);
+  my $asset = $single->asset;
+  $single   = $single->asset(Mojo::Asset::Memory->new);
 
 The actual content, defaults to a L<Mojo::Asset::Memory> object.
 
 =head2 C<auto_upgrade>
 
-  my $upgrade = $content->auto_upgrade;
-  $content    = $content->auto_upgrade(0);
+  my $upgrade = $single->auto_upgrade;
+  $single     = $single->auto_upgrade(0);
 
 Try to detect multipart content and automatically upgrade to a
 L<Mojo::Content::MultiPart> object, defaults to C<1>.
@@ -140,32 +138,32 @@ implements the following new ones.
 
 =head2 C<body_contains>
 
-  my $success = $content->body_contains('1234567');
+  my $success = $single->body_contains('1234567');
 
 Check if content contains a specific string.
 
 =head2 C<body_size>
 
-  my $size = $content->body_size;
+  my $size = $single->body_size;
 
 Content size in bytes.
 
 =head2 C<clone>
 
-  my $clone = $content->clone;
+  my $clone = $single->clone;
 
 Clone content if possible.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<get_body_chunk>
 
-  my $chunk = $content->get_body_chunk(0);
+  my $chunk = $single->get_body_chunk(0);
 
 Get a chunk of content starting from a specfic position.
 
 =head2 C<parse>
 
-  $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
+  $single = $single->parse("Content-Length: 12\r\n\r\nHello World!");
 
 Parse content chunk.
 

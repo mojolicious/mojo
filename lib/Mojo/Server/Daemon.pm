@@ -117,7 +117,13 @@ sub _build_tx {
   );
 
   # Upgrade
-  $tx->on(upgrade => sub { $self->_upgrade($id, $_[1]) });
+  $tx->on(
+    upgrade => sub {
+      return unless $_[1]->req->headers->upgrade eq 'websocket';
+      $self->{connections}->{$id}->{websocket} = $_[1] =
+        $self->upgrade_tx($_[1]);
+    }
+  );
 
   # New request on the connection
   $c->{requests} ||= 0;
@@ -285,13 +291,6 @@ sub _read {
   # Finish or start writing
   if ($tx->is_done) { $self->_finish($id, $tx) }
   elsif ($tx->is_writing) { $self->_write($id) }
-}
-
-sub _upgrade {
-  my $self = shift;
-  return unless $_[1]->req->headers->upgrade =~ /WebSocket/i;
-  my $c = $self->{connections}->{$_[0]};
-  $c->{websocket} = $_[1] = $self->upgrade_tx($_[1]);
 }
 
 sub _user {

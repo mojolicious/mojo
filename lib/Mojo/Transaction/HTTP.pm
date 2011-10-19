@@ -329,13 +329,6 @@ Mojo::Transaction::HTTP - HTTP 1.1 transaction container
 
   use Mojo::Transaction::HTTP;
 
-  my $tx = Mojo::Transaction::HTTP->new;
-
-  my $req = $tx->req;
-  my $res = $tx->res;
-
-  my $keep_alive = $tx->keep_alive;
-
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::HTTP> is a container for HTTP 1.1 transactions as

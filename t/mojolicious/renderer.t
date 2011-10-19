@@ -1,15 +1,20 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 
+# "Actually, she wasn't really my girlfriend,
+#  she just lived nextdoor and never closed her curtains."
 use Mojolicious;
 use Mojolicious::Controller;
 use Mojolicious::Renderer;
 
-# "Actually, she wasn't really my girlfriend,
-#  she just lived nextdoor and never closed her curtains."
-my $c = Mojolicious::Controller->new(app => Mojolicious->new);
+# Fresh controller
+my $c = Mojolicious::Controller->new;
+is $c->render(text => 'works', partial => 1), 'works', 'renderer is working';
+
+# Controller with application
+$c = Mojolicious::Controller->new(app => Mojolicious->new);
 $c->app->log->path(undef);
 $c->app->log->level('fatal');
 my $r = Mojolicious::Renderer->new(default_format => 'debug');

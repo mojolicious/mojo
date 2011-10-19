@@ -34,8 +34,11 @@ use Mojo::Transaction::HTTP;
 use Mojolicious::Controller;
 use Mojolicious::Routes;
 
-# Set
+# Fresh controller
 my $c = Mojolicious::Controller->new;
+is $c->url_for('/'), '/', 'routes are working';
+
+# Set
 $c->stash(foo => 'bar');
 is $c->stash('foo'), 'bar', 'set and return a stash value';
 
@@ -74,15 +77,12 @@ $c->stash({a => 1, b => 2});
 $stash = $c->stash;
 is_deeply $stash, {a => 1, b => 2}, 'set via hashref';
 
-# Rendering
-is $c->render(text => 'works', partial => 1), 'works', 'rendering works';
-
+# Controller with application and routes
 $c = Test::Controller->new(app => Mojolicious->new);
 $c->app->log->path(undef);
 $c->app->log->level('fatal');
 my $d = Mojolicious::Routes->new;
 ok $d, 'initialized';
-
 $d->namespace('Test');
 $d->route('/')->to(controller => 'foo', action => 'home');
 $d->route('/foo/(capture)')->to(controller => 'foo', action => 'bar');

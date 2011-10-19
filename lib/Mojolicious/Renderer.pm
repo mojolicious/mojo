@@ -86,15 +86,14 @@ sub render {
 
   # Extract important stash values
   my $template = delete $stash->{template};
-  my $class    = $stash->{template_class};
   my $format   = $stash->{format} || $self->default_format;
-  my $handler  = $stash->{handler};
   my $data     = delete $stash->{data};
   my $json     = delete $stash->{json};
   my $text     = delete $stash->{text};
   my $inline   = delete $stash->{inline};
 
   # Pick handler
+  my $handler = $stash->{handler};
   $handler = $self->default_handler if defined $inline && !defined $handler;
   my $options = {
     template       => $template,
@@ -102,7 +101,7 @@ sub render {
     handler        => $handler,
     encoding       => $self->encoding,
     inline         => $inline,
-    template_class => $class
+    template_class => $stash->{template_class}
   };
 
   # Text
@@ -138,15 +137,10 @@ sub render {
 
   # Extends
   while ((my $extends = $self->_extends($c)) && !$json && !$data) {
-    my $stash = $c->stash;
-    $class                     = $stash->{template_class};
-    $options->{template_class} = $class;
-    $handler                   = $stash->{handler};
-    $options->{handler}        = $handler;
-    $format                    = $stash->{format} || $self->default_format;
-    $options->{format}         = $format;
+    $options->{template_class} = $stash->{template_class};
+    $options->{handler}        = $stash->{handler};
+    $options->{format}         = $stash->{format} || $self->default_format;
     $options->{template}       = $extends;
-
     $self->_render_template($c, \$output, $options);
   }
 
@@ -233,25 +227,20 @@ sub _list_data_templates {
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
-  # Renderer
+  # Render
   my $handler =
        $options->{handler}
     || $self->_detect_handler($options)
     || $self->default_handler;
   $options->{handler} = $handler;
-  my $renderer = $self->handlers->{$handler};
-
-  # No handler
-  unless ($renderer) {
-    $c->app->log->error(qq/No handler for "$handler" available./);
-    return;
+  if (my $renderer = $self->handlers->{$handler}) {
+    return 1 if $renderer->($self, $c, $output, $options);
   }
 
-  # Render
-  return unless $renderer->($self, $c, $output, $options);
+  # No handler
+  else { $c->app->log->error(qq/No handler for "$handler" available./) }
 
-  # Success!
-  return 1;
+  return;
 }
 
 1;
@@ -265,12 +254,9 @@ Mojolicious::Renderer - MIME type based renderer
 
   use Mojolicious::Renderer;
 
-  my $renderer = Mojolicious::Renderer->new;
-
 =head1 DESCRIPTION
 
 L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer.
-It turns your stashed data structures into content.
 See L<Mojolicious::Guides::Rendering> for more.
 
 =head1 ATTRIBUTES
@@ -410,7 +396,7 @@ Render output through one of the Mojo renderers.
 This renderer requires some configuration, at the very least you will need to
 have a default C<format> and a default C<handler> as well as a C<template> or
 C<text>/C<json>.
-See L<Mojolicious::Controller> for a more user friendly interface.
+See L<Mojolicious::Controller/"render"> for a more user friendly interface.
 
 =head2 C<template_name>
 

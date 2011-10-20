@@ -1,9 +1,12 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.04    2011-10-20 00:00:00
+        - Fixed typos.
+
 2.03    2011-10-20 00:00:00
         - Deprecated all is_done methods in favor of is_finished.
         - Renamed done event in Mojo::IOLoop::Trigger to finish.
-        - Added EXPERIMETNAL support for new HTTP status codes from
+        - Added EXPERIMENTAL support for new HTTP status codes from
           draft-nottingham-http-new-status.
         - Improved documentation.
         - Fixed small bug in "upload_lite_app.t".

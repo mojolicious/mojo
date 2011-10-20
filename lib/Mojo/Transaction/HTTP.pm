@@ -347,6 +347,11 @@ Emitted when a request is ready and needs to be handled, an optional
 L<Mojo::Transaction::WebSocket> object will be passed for WebSocket handshake
 requests.
 
+  $tx->on(request => sub {
+    my $tx = shift;
+    $tx->res->headers->header('X-Bender', 'Bite my shiny metal ass!');
+  });
+
 =head1 ATTRIBUTES
 
 L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>

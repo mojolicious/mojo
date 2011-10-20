@@ -582,6 +582,14 @@ Emitted after message building or parsing is finished.
 
 Emitted when message building or parsing makes progress.
 
+  $message->on(progress => sub {
+    my $message  = shift;
+    my $len      = $message->headers->content_length;
+    my $progress = $message->content->progress;
+    say 'Progress: ',
+      $progress == $len ? 100 : int($progress / ($len / 100)), '%';
+  });
+
 =head1 ATTRIBUTES
 
 L<Mojo::Message> implements the following attributes.

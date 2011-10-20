@@ -463,7 +463,7 @@ storage in asset objects.
 
   $content->on(read => sub {
     my ($content, $chunk) = @_;
-    say "STREAMING: $chunk";
+    say "Streaming: $chunk";
   });
 
 =head1 ATTRIBUTES

@@ -26,6 +26,9 @@ app->hook(
       progress => sub {
         my $req = shift;
 
+        # Check if we've reached the body yet
+        return unless $req->content->is_parsing_body || $req->is_done;
+
         # Check for id
         return unless my $id = $req->url->query->param('upload_id');
 

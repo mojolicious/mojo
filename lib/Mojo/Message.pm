@@ -583,8 +583,9 @@ Emitted after message building or parsing is finished.
 Emitted when message building or parsing makes progress.
 
   $message->on(progress => sub {
-    my $message  = shift;
-    my $len      = $message->headers->content_length;
+    my $message = shift;
+    return unless $message->content->is_parsing_body || $message->is_done;
+    return unless my $len = $message->headers->content_length;
     my $progress = $message->content->progress;
     say 'Progress: ',
       $progress == $len ? 100 : int($progress / ($len / 100)), '%';

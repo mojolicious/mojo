@@ -377,6 +377,11 @@ and can emit the following new ones.
 
 Emitted when a new WebSocket message arrives.
 
+  $ws->on(message => sub {
+    my ($ws, $message) = @_;
+    say "Message: $message";
+  });
+
 =head1 ATTRIBUTES
 
 L<Mojo::Transaction::WebSocket> inherits all attributes from

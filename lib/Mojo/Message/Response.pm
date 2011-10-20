@@ -18,7 +18,7 @@ my $START_LINE_RE = qr/
   $
 /x;
 
-# Umarked codes are from RFC 2616 (mostly taken from LWP)
+# Umarked codes are from RFC 2616
 my %MESSAGES = (
   100 => 'Continue',
   101 => 'Switching Protocols',
@@ -62,6 +62,9 @@ my %MESSAGES = (
   424 => 'Failed Dependency',               # RFC 2518 (WebDAV)
   425 => 'Unordered Colection',             # RFC 3648 (WebDav)
   426 => 'Upgrade Required',                # RFC 2817
+  428 => 'Precondition Required',           # draft-nottingham-http-new-status
+  429 => 'Too Many Requests',               # draft-nottingham-http-new-status
+  431 => 'Request Header Fields Too Large', # draft-nottingham-http-new-status
   449 => 'Retry With',                      # unofficial Microsoft
   500 => 'Internal Server Error',
   501 => 'Not Implemented',
@@ -72,7 +75,8 @@ my %MESSAGES = (
   506 => 'Variant Also Negotiates',         # RFC 2295
   507 => 'Insufficient Storage',            # RFC 2518 (WebDAV)
   509 => 'Bandwidth Limit Exceeded',        # unofficial
-  510 => 'Not Extended'                     # RFC 2774
+  510 => 'Not Extended',                    # RFC 2774
+  511 => 'Network Authentication Required', # draft-nottingham-http-new-status
 );
 
 sub cookies {

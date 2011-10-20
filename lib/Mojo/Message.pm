@@ -291,7 +291,7 @@ sub is_dynamic { shift->content->is_dynamic }
 sub is_limit_exceeded {
   my $self = shift;
   return unless my $code = ($self->error)[1];
-  return unless $code eq '413';
+  return unless $code ~~ [413, 431];
   return 1;
 }
 
@@ -429,7 +429,7 @@ sub _parse {
     # Check line size
     my $len = index $self->{buffer}, "\x0a";
     $len = length $self->{buffer} if $len < 0;
-    return $self->error('Maximum line size exceeded.', 413)
+    return $self->error('Maximum line size exceeded.', 431)
       if $len > $self->max_line_size;
 
     # Parse
@@ -459,7 +459,7 @@ sub _parse {
   }
 
   # Check line size
-  return $self->error('Maximum line size exceeded.', 413)
+  return $self->error('Maximum line size exceeded.', 431)
     if $self->headers->is_limit_exceeded;
 
   # Done

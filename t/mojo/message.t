@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1258;
+use Test::More tests => 1263;
 
 use File::Spec;
 use File::Temp;
@@ -248,7 +248,8 @@ $ENV{MOJO_MAX_LINE_SIZE} = 5;
 $req->parse('GET /foo/bar/baz.html HTTP/1');
 ok $req->is_done, 'request is done';
 is(($req->error)[0], 'Maximum line size exceeded.', 'right error');
-is(($req->error)[1], 413, 'right status');
+is(($req->error)[1], 431, 'right status');
+is $req->is_limit_exceeded, 1, 'limit is exceeded';
 $ENV{MOJO_MAX_LINE_SIZE} = $backup;
 
 # Parse HTTP 1.0 start line and headers (with line size limit)
@@ -259,7 +260,8 @@ $req->parse("GET / HTTP/1.0\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
 ok $req->is_done, 'request is done';
 is(($req->error)[0], 'Maximum line size exceeded.', 'right error');
-is(($req->error)[1], 413, 'right status');
+is(($req->error)[1], 431, 'right status');
+is $req->is_limit_exceeded, 1, 'limit is exceeded';
 $ENV{MOJO_MAX_LINE_SIZE} = $backup;
 
 # Parse HTTP 1.0 start line (with message size limit)
@@ -270,6 +272,7 @@ $req->parse('GET /foo/bar/baz.html HTTP/1');
 ok $req->is_done, 'request is done';
 is(($req->error)[0], 'Maximum message size exceeded.', 'right error');
 is(($req->error)[1], 413, 'right status');
+is $req->is_limit_exceeded, 1, 'limit is exceeded';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # Parse HTTP 1.0 start line and headers (with message size limit)
@@ -281,6 +284,7 @@ $req->parse("Content-Type: text/plain\x0d\x0a");
 ok $req->is_done, 'request is done';
 is(($req->error)[0], 'Maximum message size exceeded.', 'right error');
 is(($req->error)[1], 413, 'right status');
+is $req->is_limit_exceeded, 1, 'limit is exceeded';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # Parse HTTP 1.0 start line, headers and body (with message size limit)
@@ -294,6 +298,7 @@ $req->parse('Hello World!');
 ok $req->is_done, 'request is done';
 is(($req->error)[0], 'Maximum message size exceeded.', 'right error');
 is(($req->error)[1], 413, 'right status');
+is $req->is_limit_exceeded, 1, 'limit is exceeded';
 $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # Parse full HTTP 1.0 request

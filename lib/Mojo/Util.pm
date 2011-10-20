@@ -547,7 +547,7 @@ sub qp_encode { $_[0] = MIME::QuotedPrint::encode_qp($_[0]) }
 sub quote {
 
   # Escape and quote
-  $_[0] =~ s/([\"\\])/\\$1/g;
+  $_[0] =~ s/(["\\])/\\$1/g;
   $_[0] = '"' . $_[0] . '"';
 }
 
@@ -573,14 +573,14 @@ sub trim {
 sub unquote {
 
   # Not quoted
-  return unless $_[0] =~ /^\".*\"$/g;
+  return unless $_[0] =~ /^".*"$/g;
 
   # Unquote
   for ($_[0]) {
-    s/^\"//g;
-    s/\"$//g;
+    s/^"//g;
+    s/"$//g;
     s/\\\\/\\/g;
-    s/\\\"/\"/g;
+    s/\\"/"/g;
   }
 }
 

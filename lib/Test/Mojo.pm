@@ -338,7 +338,7 @@ sub _get_content {
 
   # Charset
   my $charset;
-  ($tx->res->headers->content_type || '') =~ /charset=\"?([^"\s]+)\"?/
+  ($tx->res->headers->content_type || '') =~ /charset="?([^"\s]+)"?/
     and $charset = $1;
 
   # Content

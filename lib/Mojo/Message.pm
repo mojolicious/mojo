@@ -71,7 +71,7 @@ sub body_params {
   my $params = Mojo::Parameters->new;
   my $type = $self->headers->content_type || '';
   $params->charset($self->default_charset);
-  $type =~ /charset=\"?(\S+)\"?/ and $params->charset($1);
+  $type =~ /charset="?(\S+)"?/ and $params->charset($1);
 
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
   if ($type =~ /(?:x-application|application\/x-www-form)-urlencoded/i) {
@@ -183,7 +183,7 @@ sub dom {
   # Parse
   return if $self->is_multipart;
   my $charset;
-  ($self->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
+  ($self->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/
     and $charset = $1;
   my $dom = $self->dom_class->new(charset => $charset)->parse($self->body);
 
@@ -493,7 +493,7 @@ sub _parse_formdata {
   my $content = $self->content;
   return \@formdata unless $content->is_multipart;
   my $default = $self->default_charset;
-  ($self->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
+  ($self->headers->content_type || '') =~ /charset="?(\S+)"?/
     and $default = $1;
 
   # Walk the tree
@@ -509,14 +509,14 @@ sub _parse_formdata {
 
     # Charset
     my $charset = $default;
-    ($part->headers->content_type || '') =~ /charset=\"?(\S+)\"?/
+    ($part->headers->content_type || '') =~ /charset="?(\S+)"?/
       and $charset = $1;
 
     # "Content-Disposition"
     my $disposition = $part->headers->content_disposition;
     next unless $disposition;
-    my ($name)     = $disposition =~ /\ name="?([^\";]+)"?/;
-    my ($filename) = $disposition =~ /\ filename="?([^\"]*)"?/;
+    my ($name)     = $disposition =~ /\ name="?([^";]+)"?/;
+    my ($filename) = $disposition =~ /\ filename="?([^"]*)"?/;
     my $value      = $part;
 
     # Unescape

@@ -143,7 +143,7 @@ sub run {
   warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
   # Charset
-  ($tx->res->headers->content_type || '') =~ /charset=\"?([^\"\s;]+)\"?/
+  ($tx->res->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/
     and $charset = $1
     unless defined $charset;
 

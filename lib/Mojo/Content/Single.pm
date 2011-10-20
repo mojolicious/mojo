@@ -110,6 +110,12 @@ emit the following new ones.
 Emitted when content gets upgraded to a L<Mojo::Content::MultiPart> object.
 Note that this event is EXPERIMENTAL and might change without warning!
 
+  $single->on(upgrade => sub {
+    my ($single, $multi) = @_;
+    return unless $multi->headers->content_type =~ /multipart\/([^;]+)/i;
+    say "Multipart: $1";
+  });
+
 =head1 ATTRIBUTES
 
 L<Mojo::Content::Single> inherits all attributes from L<Mojo::Content> and

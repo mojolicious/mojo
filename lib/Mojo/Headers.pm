@@ -166,7 +166,15 @@ sub header {
 sub host { scalar shift->header(Host => @_) }
 sub if_modified_since { scalar shift->header('If-Modified-Since' => @_) }
 
-sub is_done { (shift->{state} || '') eq 'done' }
+# DEPRECATED in Leaf Fluttering In Wind!
+sub is_done {
+  warn <<EOF;
+Mojo::Headers->is_done is DEPRECATED in favor of Mojo::Headers->is_finished!
+EOF
+  shift->is_finished;
+}
+
+sub is_finished { (shift->{state} || '') eq 'finished' }
 
 sub is_limit_exceeded { shift->{limit} }
 
@@ -195,7 +203,7 @@ sub parse {
 
     # Check line size limit
     if (length $line > $max) {
-      $self->{state} = 'done';
+      $self->{state} = 'finished';
       $self->{limit} = 1;
       return $self;
     }
@@ -209,14 +217,14 @@ sub parse {
     # Empty line
     else {
       $self->add(splice @$headers, 0, 2) while @$headers;
-      $self->{state} = 'done';
+      $self->{state} = 'finished';
       return $self;
     }
   }
 
   # Check line size limit
   if (length $self->{buffer} > $max) {
-    $self->{state} = 'done';
+    $self->{state} = 'finished';
     $self->{limit} = 1;
   }
 
@@ -504,11 +512,11 @@ Shortcut for the C<Host> header.
 
 Shortcut for the C<If-Modified-Since> header.
 
-=head2 C<is_done>
+=head2 C<is_finished>
 
-  my $success = $headers->is_done;
+  my $success = $headers->is_finished;
 
-Check if header parser is done.
+Check if header parser is finished.
 
 =head2 C<is_limit_exceeded>
 

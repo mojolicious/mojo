@@ -27,23 +27,23 @@ is_deeply \@results, [0, 0], 'right results';
 
 # Everything
 $t = Mojo::IOLoop::Trigger->new;
-my $done;
-$t->on(done => sub { shift; $done = [@_, 'works!'] });
+my $finished;
+$t->on(finish => sub { shift; $finished = [@_, 'works!'] });
 for my $i (0, 0) {
   $t->begin;
   Mojo::IOLoop->defer(sub { $t->end($i) });
 }
 @results = $t->start;
-is_deeply $done, [0, 0, 'works!'], 'right results';
+is_deeply $finished, [0, 0, 'works!'], 'right results';
 is_deeply \@results, [0, 0], 'right results';
 
 # Mojo::IOLoop
-$done = undef;
-$t = Mojo::IOLoop->trigger(sub { shift; $done = [@_, 'too!'] });
+$finished = undef;
+$t = Mojo::IOLoop->trigger(sub { shift; $finished = [@_, 'too!'] });
 for my $i (1, 1) {
   my $cb = $t->begin;
   Mojo::IOLoop->defer(sub { $t->$cb($i) });
 }
 @results = $t->start;
-is_deeply $done, [1, 1, 'too!'], 'right results';
+is_deeply $finished, [1, 1, 'too!'], 'right results';
 is_deeply \@results, [1, 1], 'right results';

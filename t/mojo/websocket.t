@@ -399,12 +399,12 @@ is $result, 'hi!hi!', 'right result';
 is $flag2,  24,       'finish event has been emitted';
 
 # WebSocket /dead (dies)
-$code = undef;
-my ($done, $websocket, $message);
+$finished = $code = undef;
+my ($websocket, $message);
 $ua->websocket(
   '/dead' => sub {
     my $tx = pop;
-    $done      = $tx->is_done;
+    $finished  = $tx->is_finished;
     $websocket = $tx->is_websocket;
     $code      = $tx->res->code;
     $message   = $tx->res->message;
@@ -412,7 +412,7 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $done,      1,                       'transaction is done';
+is $finished,  1,                       'transaction is finished';
 is $websocket, undef,                   'no websocket';
 is $code,      500,                     'right status';
 is $message,   'Internal Server Error', 'right message';

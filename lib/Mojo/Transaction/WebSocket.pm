@@ -299,7 +299,7 @@ sub server_write {
   # Drain
   $self->{write} //= '';
   unless (length $self->{write}) {
-    $self->{state} = $self->{finished} ? 'done' : 'read';
+    $self->{state} = $self->{finished} ? 'finished' : 'read';
     my $cb = delete $self->{drain};
     $self->$cb if $cb;
   }

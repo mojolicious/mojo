@@ -70,8 +70,8 @@ sub parse {
     my $need = $len - $asset->size;
     $asset->add_chunk(substr $self->{buffer}, 0, $need, '') if $need > 0;
 
-    # Done
-    $self->{state} = 'done' if $len <= $self->progress;
+    # Finished
+    $self->{state} = 'finished' if $len <= $self->progress;
   }
 
   return $self;

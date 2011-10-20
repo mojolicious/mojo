@@ -30,7 +30,7 @@ sub load_plugin {
     pod_renderer => 'PODRenderer'
   );
   if (my $new = $special{$name}) {
-    warn qq/Plugin "$name" is DEPRECATED in favor of "$new"!!!\n/;
+    warn qq/Plugin "$name" is DEPRECATED in favor of "$new"!\n/;
     $name = $new;
   }
 

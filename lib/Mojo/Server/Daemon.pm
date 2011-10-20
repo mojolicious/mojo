@@ -290,7 +290,7 @@ sub _read {
     if ($c->{requests} || 0) >= $self->max_requests;
 
   # Finish or start writing
-  if ($tx->is_done) { $self->_finish($id, $tx) }
+  if ($tx->is_finished) { $self->_finish($id, $tx) }
   elsif ($tx->is_writing) { $self->_write($id) }
 }
 
@@ -316,7 +316,7 @@ sub _write {
   # Write
   weaken $self;
   my $cb = sub { $self->_write($id) };
-  if ($tx->is_done) {
+  if ($tx->is_finished) {
     $self->_finish($id, $tx);
     $cb = undef unless $c->{transaction} || $c->{websocket};
   }

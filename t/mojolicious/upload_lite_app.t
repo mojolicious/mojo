@@ -27,7 +27,7 @@ app->hook(
         my $req = shift;
 
         # Check if we've reached the body yet
-        return unless $req->content->is_parsing_body || $req->is_done;
+        return unless $req->content->is_parsing_body || $req->is_finished;
 
         # Check for id
         return unless my $id = $req->url->query->param('upload_id');
@@ -181,7 +181,7 @@ $tx->req->method('POST');
 $tx->req->url->parse('/uploadlimit');
 $tx->req->content($content);
 $ua->start($tx);
-ok $tx->is_done, 'transaction is done';
+ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200, 'right status';
 is b($tx->res->body)->decode('UTF-8')->to_string,
   'called, Вячеслав.jpg5242880', 'right content';

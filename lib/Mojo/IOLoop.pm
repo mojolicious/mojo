@@ -305,7 +305,7 @@ sub trigger {
   my $t = Mojo::IOLoop::Trigger->new;
   $t->ioloop($self);
   weaken $t->{ioloop};
-  $t->once(done => $cb) if $cb;
+  $t->once(finish => $cb) if $cb;
 
   return $t;
 }
@@ -933,7 +933,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
     });
   }
 
-  # Stop automatically when done
+  # Stop automatically when finished
   $t->start;
 
 =head2 C<write>

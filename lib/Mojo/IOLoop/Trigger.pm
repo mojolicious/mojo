@@ -15,12 +15,12 @@ sub begin {
 sub end {
   my $self = shift;
   push @{$self->{args} ||= []}, @_;
-  $self->emit_safe('done', @{$self->{args}}) if --$self->{counter} <= 0;
+  $self->emit_safe('finish', @{$self->{args}}) if --$self->{counter} <= 0;
 }
 
 sub start {
   my $self = shift;
-  $self->once(done => sub { shift->ioloop->stop });
+  $self->once(finish => sub { shift->ioloop->stop });
   $self->ioloop->start;
   return @{$self->{args}};
 }
@@ -38,7 +38,7 @@ Mojo::IOLoop::Trigger - IOLoop trigger
 
   # Synchronize multiple events
   my $t = Mojo::IOLoop::Trigger->new;
-  $t->on(done => sub { say 'BOOM!' });
+  $t->on(finish => sub { say 'BOOM!' });
   for my $i (1 .. 10) {
     $t->begin;
     Mojo::IOLoop->timer($i => sub {
@@ -47,7 +47,7 @@ Mojo::IOLoop::Trigger - IOLoop trigger
     });
   }
 
-  # Stop automatically when done
+  # Stop automatically when finished
   $t->start;
 
 =head1 DESCRIPTION
@@ -59,9 +59,9 @@ Note that this module is EXPERIMENTAL and might change without warning!
 
 L<Mojo::IOLoop::Trigger> can emit the following events.
 
-=head2 C<done>
+=head2 C<finish>
 
-  $trigger->on(done => sub {
+  $trigger->on(finish => sub {
     my $trigger = shift;
   });
 
@@ -105,7 +105,7 @@ Decrement active event counter.
 
   my @args = $t->start;
 
-Start C<ioloop> and register C<done> event that stops it again once the
+Start C<ioloop> and register C<finish> event that stops it again once the
 active event counter reaches zero.
 
 =head1 SEE ALSO

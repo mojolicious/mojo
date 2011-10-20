@@ -21,7 +21,7 @@ sub new {
 sub append {
   warn <<EOF;
 Mojo::Path->append is DEPRECATED in favor of using Mojo::Path->parts
-directly!!!
+directly!
 EOF
   my $self = shift;
   push @{$self->parts}, @_;

@@ -328,7 +328,7 @@ sub render_exception {
 sub render_inner {
   warn <<EOF;
 Mojolicious::Controller->render_inner is DEPRECATED in favor of
-Mojolicious::Controller->render_content!!!
+Mojolicious::Controller->render_content!
 EOF
   shift->render_content(@_);
 }
@@ -1050,7 +1050,7 @@ invoked once all data has been written.
     $c->write('lo!')
   });
 
-  # Close connection when done (without Content-Length header)
+  # Close connection when finished (without Content-Length header)
   $c->write('Hel', sub {
     my $c = shift;
     $c->write('lo!', sub {

@@ -108,7 +108,7 @@ sub body_size { shift->content->body_size }
 sub build_body {
   my $self = shift;
   my $body = $self->content->build_body(@_);
-  $self->{state} = 'done';
+  $self->{state} = 'finished';
   $self->emit('finish');
   return $body;
 }
@@ -204,7 +204,7 @@ sub error {
 
   # Set
   $self->{error} = [@_];
-  $self->{state} = 'done';
+  $self->{state} = 'finished';
 
   return $self;
 }
@@ -237,7 +237,7 @@ sub get_body_chunk {
   return $chunk if !defined $chunk || length $chunk;
 
   # Finish
-  $self->{state} = 'done';
+  $self->{state} = 'finished';
   $self->emit('finish');
 
   return $chunk;
@@ -281,12 +281,20 @@ sub headers {
 
 sub is_chunked { shift->content->is_chunked }
 
+# DEPRECATED in Leaf Fluttering In Wind!
 sub is_done {
-  return 1 if (shift->{state} || '') eq 'done';
-  return;
+  warn <<EOF;
+Mojo::Message->is_done is DEPRECATED in favor of Mojo::Message->is_finished!
+EOF
+  shift->is_finished;
 }
 
 sub is_dynamic { shift->content->is_dynamic }
+
+sub is_finished {
+  return 1 if (shift->{state} || '') eq 'finished';
+  return;
+}
 
 sub is_limit_exceeded {
   my $self = shift;
@@ -310,7 +318,7 @@ sub max_line_size { shift->headers->max_line_size(@_) }
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_finish {
   warn <<EOF;
-Mojo::Message->on_finish is DEPRECATED in favor of using Mojo::Message->on!!!
+Mojo::Message->on_finish is DEPRECATED in favor of using Mojo::Message->on!
 EOF
   shift->on(finish => shift);
 }
@@ -318,8 +326,7 @@ EOF
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_progress {
   warn <<EOF;
-Mojo::Message->on_progress is DEPRECATED in favor of using
-Mojo::Message->on!!!
+Mojo::Message->on_progress is DEPRECATED in favor of using Mojo::Message->on!
 EOF
   shift->on(progress => shift);
 }
@@ -437,7 +444,7 @@ sub _parse {
   }
 
   # Content
-  if (($self->{state} || '') ~~ [qw/body content done/]) {
+  if (($self->{state} || '') ~~ [qw/body content finished/]) {
 
     # Until body
     my $content = $self->content;
@@ -462,14 +469,14 @@ sub _parse {
   return $self->error('Maximum line size exceeded.', 431)
     if $self->headers->is_limit_exceeded;
 
-  # Done
-  $self->{state} = 'done' if $self->content->is_done;
+  # Finished
+  $self->{state} = 'finished' if $self->content->is_finished;
 
   # Progress
   $self->emit('progress');
 
   # Finished
-  $self->emit('finish') if $self->is_done;
+  $self->emit('finish') if $self->is_finished;
 
   return $self;
 }
@@ -584,9 +591,14 @@ Emitted when message building or parsing makes progress.
 
   $message->on(progress => sub {
     my $message = shift;
-    return unless $message->content->is_parsing_body || $message->is_done;
+
+    # Make sure we have enough information
+    return
+      unless $message->content->is_parsing_body || $message->is_finished;
     return unless my $len = $message->headers->content_length;
     my $progress = $message->content->progress;
+
+    # Calculate progress
     say 'Progress: ',
       $progress == $len ? 100 : int($progress / ($len / 100)), '%';
   });
@@ -756,18 +768,18 @@ Message headers, defaults to a L<Mojo::Headers> object.
 
 Check if message content is chunked.
 
-=head2 C<is_done>
-
-  my $success = $message->is_done;
-
-Check if parser is done.
-
 =head2 C<is_dynamic>
 
   my $success = $message->is_dynamic;
 
 Check if message content will be dynamic.
 Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<is_finished>
+
+  my $success = $message->is_finished;
+
+Check if parser is finished.
 
 =head2 C<is_limit_exceeded>
 

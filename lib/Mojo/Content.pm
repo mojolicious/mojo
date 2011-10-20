@@ -126,14 +126,22 @@ sub is_chunked {
   return $encoding =~ /chunked/i ? 1 : 0;
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
 sub is_done {
-  return 1 if (shift->{state} || '') eq 'done';
-  return;
+  warn <<EOF;
+Mojo::Content->is_done is DEPRECATED in favor of Mojo::Content->is_finished!
+EOF
+  shift->is_finished;
 }
 
 sub is_dynamic {
   my $self = shift;
   return 1 if $self->{dynamic} && !defined $self->headers->content_length;
+  return;
+}
+
+sub is_finished {
+  return 1 if (shift->{state} || '') eq 'finished';
   return;
 }
 
@@ -158,7 +166,7 @@ sub leftovers {
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_read {
   warn <<EOF;
-Mojo::Content->on_read is DEPRECATED in favor of using Mojo::Content->on!!!
+Mojo::Content->on_read is DEPRECATED in favor of using Mojo::Content->on!
 EOF
   shift->on(read => shift);
 }
@@ -186,7 +194,7 @@ sub parse {
   $self->{real_size} = 0 unless exists $self->{real_size};
   if ($self->is_chunked && ($self->{state} || '') ne 'headers') {
     $self->_parse_chunked;
-    $self->{state} = 'done' if ($self->{chunked} || '') eq 'done';
+    $self->{state} = 'finished' if ($self->{chunked} || '') eq 'finished';
   }
 
   # Not chunked, pass through to second buffer
@@ -220,8 +228,8 @@ sub parse {
         $self->emit(read => $chunk);
       }
 
-      # Done
-      $self->{state} = 'done' if $len <= $self->progress;
+      # Finished
+      $self->{state} = 'finished' if $len <= $self->progress;
     }
   }
 
@@ -237,7 +245,7 @@ sub parse_body {
 sub parse_body_once {
   my $self = shift;
   $self->parse_body(@_);
-  $self->{state} = 'done';
+  $self->{state} = 'finished';
   return $self;
 }
 
@@ -384,8 +392,8 @@ sub _parse_chunked_trailing_headers {
   $headers->parse($self->{pre_buffer});
   $self->{pre_buffer} = '';
 
-  # Done
-  if ($headers->is_done) {
+  # Finished
+  if ($headers->is_finished) {
 
     # Remove Transfer-Encoding
     my $headers  = $self->headers;
@@ -396,7 +404,7 @@ sub _parse_chunked_trailing_headers {
       : $headers->remove('Transfer-Encoding');
     $headers->content_length($self->{real_size});
 
-    $self->{chunked} = 'done';
+    $self->{chunked} = 'finished';
   }
 }
 
@@ -408,8 +416,8 @@ sub _parse_headers {
   $headers->parse($self->{pre_buffer});
   $self->{pre_buffer} = '';
 
-  # Done
-  if ($headers->is_done) {
+  # Finished
+  if ($headers->is_finished) {
     my $leftovers = $headers->leftovers;
     $self->{header_size} = $self->{raw_size} - length $leftovers;
     $self->{pre_buffer}  = $leftovers;
@@ -570,18 +578,18 @@ Size of headers in bytes.
 
 Check if content is chunked.
 
-=head2 C<is_done>
-
-  my $success = $content->is_done;
-
-Check if parser is done.
-
 =head2 C<is_dynamic>
 
   my $success = $content->is_dynamic;
 
 Check if content will be dynamic.
 Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<is_finished>
+
+  my $success = $content->is_finished;
+
+Check if parser is finished.
 
 =head2 C<is_multipart>
 

@@ -20,8 +20,17 @@ sub error {
   return;
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
 sub is_done {
-  return 1 if (shift->{state} || '') eq 'done';
+  warn <<EOF;
+Mojo::Transaction->is_done is DEPRECATED in favor of
+Mojo::Transaction->is_finished!
+EOF
+  shift->is_finished;
+}
+
+sub is_finished {
+  return 1 if (shift->{state} || '') eq 'finished';
   return;
 }
 
@@ -37,7 +46,7 @@ sub is_writing {
 sub on_finish {
   warn <<EOF;
 Mojo::Transaction->on_finish is DEPRECATED in favor of using
-Mojo::Transaction->on!!!
+Mojo::Transaction->on!
 EOF
   shift->on(finish => shift);
 }
@@ -46,7 +55,7 @@ EOF
 sub on_resume {
   warn <<EOF;
 Mojo::Transaction->on_resume is DEPRECATED in favor of using
-Mojo::Transaction->on!!!
+Mojo::Transaction->on!
 EOF
   shift->on(resume => shift);
 }
@@ -214,11 +223,11 @@ Write client data.
 
 Parser errors and codes.
 
-=head2 C<is_done>
+=head2 C<is_finished>
 
-  my $success = $tx->is_done;
+  my $success = $tx->is_finished;
 
-Check if transaction is done.
+Check if transaction is finished.
 
 =head2 C<is_websocket>
 

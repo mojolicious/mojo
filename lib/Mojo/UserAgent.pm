@@ -86,7 +86,7 @@ sub need_proxy {
 sub on_start {
   warn <<EOF;
 Mojo::UserAgent->on_start is DEPRECATED in favor of using
-Mojo::UserAgent->on!!!
+Mojo::UserAgent->on!
 EOF
   shift->on(start => shift);
 }
@@ -416,7 +416,7 @@ sub _read {
 
   # Process incoming data
   $tx->client_read($chunk);
-  if ($tx->is_done) { $self->_handle($id) }
+  if ($tx->is_finished) { $self->_handle($id) }
   elsif ($c->{transaction}->is_writing) { $self->_write($id) }
 }
 
@@ -552,7 +552,7 @@ sub _write {
   # Write data
   $self->_loop->write($id, $chunk, $cb);
   warn "> $chunk\n"   if DEBUG;
-  $self->_handle($id) if $tx->is_done;
+  $self->_handle($id) if $tx->is_finished;
 }
 
 1;

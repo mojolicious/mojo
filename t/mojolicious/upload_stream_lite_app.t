@@ -48,7 +48,7 @@ post '/upload/:id' => sub {
       );
     }
   );
-  return unless $self->req->is_done;
+  return unless $self->req->is_finished;
 
   # Second invocation, render response
   $self->render(data => $cache->{$id});

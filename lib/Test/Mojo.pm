@@ -25,7 +25,7 @@ sub new {
   elsif (@_) {
     warn <<EOF;
 Test::Mojo->new(app => 'MyApp') is DEPRECATED in favor of
-Test::Mojo->new('MyApp')!!!
+Test::Mojo->new('MyApp')!
 EOF
     my $args = {@_};
     for my $key (qw/app max_redirects tx ua/) {
@@ -233,7 +233,7 @@ sub post_form_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   my $desc = "post $url";
   utf8::encode $desc;
-  Test::More::ok $self->tx->is_done, $desc;
+  Test::More::ok $self->tx->is_finished, $desc;
 
   return $self;
 }

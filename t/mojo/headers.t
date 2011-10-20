@@ -79,7 +79,7 @@ Cache-control: public
 Expires: Thu, 01 Dec 1994 16:00:00 GMT
 
 EOF
-ok $headers->is_done,       'parser is done';
+ok $headers->is_finished,   'parser is finished';
 is $headers->content_type,  'text/plain', 'right value';
 is $headers->expect,        '100-continue', 'right value';
 is $headers->cache_control, 'public', 'right value';
@@ -112,17 +112,17 @@ $headers = Mojo::Headers->new;
 isa_ok $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 Content-Type: text/plain
 EOF
-ok !$headers->is_done, 'parser is not done';
+ok !$headers->is_finished, 'parser is not finished';
 ok !defined($headers->content_type), 'no value';
 isa_ok $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 X-Bender: Bite my shiny
 EOF
-ok !$headers->is_done, 'parser is not done';
+ok !$headers->is_finished, 'parser is not finished';
 ok !defined($headers->connection), 'no value';
 isa_ok $headers->parse(<<EOF), 'Mojo::Headers', 'right return value';
 X-Bender: metal ass!
 
 EOF
-ok $headers->is_done, 'parser is done';
+ok $headers->is_finished, 'parser is finished';
 is $headers->content_type, 'text/plain', 'right value';
 is $headers->header('X-Bender'), 'Bite my shiny, metal ass!', 'right value';

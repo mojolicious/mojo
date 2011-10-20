@@ -39,12 +39,12 @@ sub run {
   # Watch files and manage worker
   $SIG{CHLD} = sub { $self->_reap };
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub {
-    $self->{done} = 1;
+    $self->{finished} = 1;
     kill 'TERM', $self->{running} if $self->{running};
   };
   unshift @{$self->watch}, $app;
   $self->{modified} = 1;
-  $self->_manage while !$self->{done} || $self->{running};
+  $self->_manage while !$self->{finished} || $self->{running};
   exit 0;
 }
 
@@ -110,7 +110,7 @@ sub _spawn {
   # Worker
   warn "WORKER STARTED $$\n" if DEBUG;
   $SIG{CHLD} = 'DEFAULT';
-  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{done} = 1 };
+  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{finished} = 1 };
   my $daemon = Mojo::Server::Daemon->new;
   $daemon->load_app($self->watch->[0]);
   $daemon->silent(1) if $ENV{MORBO_REV} > 1;
@@ -118,7 +118,7 @@ sub _spawn {
   $daemon->prepare_ioloop;
   my $loop = $daemon->ioloop;
   $loop->recurring(
-    1 => sub { shift->stop if !kill(0, $manager) || $self->{done} });
+    1 => sub { shift->stop if !kill(0, $manager) || $self->{finished} });
   $loop->start;
   exit 0;
 }

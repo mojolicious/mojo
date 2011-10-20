@@ -53,17 +53,14 @@ sub new {
 
 # DEPRECATED in Smiling Face With Sunglasses!
 sub add_after {
-  warn <<EOF;
-Mojo::DOM->add_after is DEPRECATED in favor of Mojo::DOM->append!!!
-EOF
+  warn "Mojo::DOM->add_after is DEPRECATED in favor of Mojo::DOM->append!\n";
   shift->append(@_);
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!
 sub add_before {
-  warn <<EOF;
-Mojo::DOM->add_before is DEPRECATED in favor of Mojo::DOM->prepend!!!
-EOF
+  warn
+    "Mojo::DOM->add_before is DEPRECATED in favor of Mojo::DOM->prepend!\n";
   shift->prepend(@_);
 }
 
@@ -171,7 +168,7 @@ sub find {
 # DEPRECATED in Smiling Face With Sunglasses!
 sub inner_xml {
   warn <<EOF;
-Mojo::DOM->inner_xml is DEPRECATED in favor of Mojo::DOM->content_xml!!!
+Mojo::DOM->inner_xml is DEPRECATED in favor of Mojo::DOM->content_xml!
 EOF
   shift->content_xml(@_);
 }
@@ -284,7 +281,7 @@ sub replace_content {
 sub replace_inner {
   warn <<EOF;
 Mojo::DOM->replace_inner is DEPRECATED in favor of
-Mojo::DOM->replace_content!!!
+Mojo::DOM->replace_content!
 EOF
   shift->content_xml(@_);
 }

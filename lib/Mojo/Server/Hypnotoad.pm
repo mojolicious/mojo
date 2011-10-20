@@ -22,7 +22,7 @@ sub DESTROY {
   my $self = shift;
 
   # Worker or command
-  return unless $self->{done};
+  return unless $self->{finished};
 
   # Manager
   if (my $file = $self->{config}->{pid_file})  { unlink $file if -w $file }
@@ -108,11 +108,11 @@ sub run {
 
   # Manager environment
   my $c = $self->{config};
-  $SIG{INT} = $SIG{TERM} = sub { $self->{done} = 1 };
+  $SIG{INT} = $SIG{TERM} = sub { $self->{finished} = 1 };
   $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }
   };
-  $SIG{QUIT} = sub { $self->{done} = $self->{graceful} = 1 };
+  $SIG{QUIT} = sub { $self->{finished} = $self->{graceful} = 1 };
   $SIG{USR2} = sub { $self->{upgrade} ||= time };
   $SIG{TTIN} = sub { $c->{workers}++ };
   $SIG{TTOU} = sub {
@@ -207,7 +207,7 @@ sub _manage {
 
   # Housekeeping
   my $c = $self->{config};
-  if (!$self->{done}) {
+  if (!$self->{finished}) {
 
     # Spawn more workers
     $self->_spawn while keys %{$self->{workers}} < $c->{workers};
@@ -230,7 +230,7 @@ sub _manage {
   $self->_heartbeat;
 
   # Upgrade
-  if ($self->{upgrade} && !$self->{done}) {
+  if ($self->{upgrade} && !$self->{finished}) {
 
     # Fresh start
     unless ($self->{new}) {
@@ -270,7 +270,7 @@ sub _manage {
     }
 
     # Normal stop
-    if (($self->{done} && !$self->{graceful}) || $w->{force}) {
+    if (($self->{finished} && !$self->{graceful}) || $w->{force}) {
 
       # Kill
       warn "KILL $pid\n" if DEBUG;
@@ -291,7 +291,7 @@ sub _pid_file {
   my $self = shift;
 
   # Don't need a PID file anymore
-  return if $self->{done};
+  return if $self->{finished};
 
   # Check if PID file already exists
   my $file = $self->{config}->{pid_file};

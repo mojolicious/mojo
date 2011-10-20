@@ -359,7 +359,7 @@ sub _parse_start_line {
   $self->{state} = 'content';
   return $self->version($3) if defined $3;
   $self->version('0.9');
-  $self->{state}  = 'done';
+  $self->{state}  = 'finished';
   $self->{buffer} = '';
 }
 

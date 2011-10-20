@@ -149,8 +149,8 @@ $ua->start($tx);
 $ua->start($tx2);
 ok defined $tx->connection,  'has connection id';
 ok defined $tx2->connection, 'has connection id';
-ok $tx->is_done,  'transaction is done';
-ok $tx2->is_done, 'transaction is done';
+ok $tx->is_finished,  'transaction is finished';
+ok $tx2->is_finished, 'transaction is finished';
 
 # Form with chunked response
 my $params = {};
@@ -175,12 +175,12 @@ $ua->get('/13/', $t->begin);
 $ua->post('/14/', {Expect => 'fun'}, 'bar baz foo' x 128, $t->begin);
 $ua->get('/15/', $t->begin);
 ($tx, $tx2, my $tx3) = $t->start;
-ok $tx->is_done, 'transaction is done';
+ok $tx->is_finished, 'transaction is finished';
 is $tx->res->body, 'Your Mojo is working!', 'right content';
 ok !$tx->error, 'no error';
-ok $tx2->is_done, 'transaction is done';
+ok $tx2->is_finished, 'transaction is finished';
 is $tx2->res->body, 'Your Mojo is working!', 'right content';
 ok !$tx2->error, 'no error';
-ok $tx3->is_done, 'transaction is done';
+ok $tx3->is_finished, 'transaction is finished';
 is $tx3->res->body, 'Your Mojo is working!', 'right content';
 ok !$tx3->error, 'no error';

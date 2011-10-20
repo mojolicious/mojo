@@ -14,6 +14,9 @@ my @sunglasses = (
   qw/on_request on_resume on_start render_inner replace_inner/,
 );
 
+# DEPRECATED in Leaf Fluttering In Wind!
+my @leaf = ('is_done');
+
 # "Marge, I'm going to miss you so much. And it's not just the sex.
 #  It's also the food preparation."
-all_pod_coverage_ok({also_private => ['inet_pton', @sunglasses]});
+all_pod_coverage_ok({also_private => ['inet_pton', @leaf, @sunglasses]});

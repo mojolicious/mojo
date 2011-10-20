@@ -63,33 +63,33 @@ my $ua = Mojo::UserAgent->new;
 
 # Application is alive
 my $tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, undef, 'connection was not kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  undef, 'connection was not kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Application is alive (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, undef, 'connection was not kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  undef, 'connection was not kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Same result
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, 1, 'connection was not kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  1, 'connection was not kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Same result (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, 1, 'connection was not kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  1, 'connection was not kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
@@ -107,17 +107,17 @@ open my $hot_deploy, '-|', $^X, "$prefix/hypnotoad", $script;
 
 # Connection did not get lost
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, 1, 'connection was kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  1, 'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Connection did not get lost (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, 1, 'connection was kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  1, 'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
@@ -133,33 +133,33 @@ while (1) {
 
 # Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, undef, 'connection was not kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  undef, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
 # Application has been reloaded (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, undef, 'connection was not kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  undef, 'connection was not kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
 # Same result
 $tx = $ua->get("http://127.0.0.1:$port1/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, 1, 'connection was kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  1, 'connection was kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
 # Same result (second port)
 $tx = $ua->get("http://127.0.0.1:$port2/hello");
-ok $tx->is_done,    'transaction is done';
-is $tx->keep_alive, 1, 'connection will be kept alive';
-is $tx->kept_alive, 1, 'connection was kept alive';
+ok $tx->is_finished, 'transaction is finished';
+is $tx->keep_alive,  1, 'connection will be kept alive';
+is $tx->kept_alive,  1, 'connection was kept alive';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 

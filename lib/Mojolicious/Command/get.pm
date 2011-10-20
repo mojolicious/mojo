@@ -98,7 +98,7 @@ sub run {
         my $res = shift;
 
         # Wait for headers
-        return unless $v && $res->headers->is_done;
+        return unless $v && $res->headers->is_finished;
 
         # Request
         warn "$startline$headers";
@@ -110,7 +110,7 @@ sub run {
         warn "HTTP/$version $code $message\n",
           $res->headers->to_string, "\n\n";
 
-        # Done
+        # Finished
         $v = 0;
       };
 
@@ -165,7 +165,7 @@ sub _select {
   my $results = $dom->find($selector);
 
   # Commands
-  my $done = 0;
+  my $finished = 0;
   while (defined(my $command = shift @ARGV)) {
 
     # Number
@@ -188,11 +188,11 @@ sub _select {
 
     # Unknown
     else { die qq/Unknown command "$command".\n/ }
-    $done++;
+    $finished++;
   }
 
   # Render
-  unless ($done) { _say($_) for @$results }
+  unless ($finished) { _say($_) for @$results }
 }
 
 1;

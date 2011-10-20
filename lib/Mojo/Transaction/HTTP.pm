@@ -15,29 +15,29 @@ sub client_read {
 
   # EOF
   my $preserved = $self->{state};
-  $self->{state} = 'done' if length $chunk == 0;
+  $self->{state} = 'finished' if length $chunk == 0;
 
   # HEAD response
   my $res = $self->res;
   if ($self->req->method =~ /^HEAD$/i) {
     $res->parse_until_body($chunk);
-    $self->{state} = 'done' if $res->content->is_parsing_body;
+    $self->{state} = 'finished' if $res->content->is_parsing_body;
   }
 
   # Normal response
   else {
     $res->parse($chunk);
-    $self->{state} = 'done' if $res->is_done;
+    $self->{state} = 'finished' if $res->is_finished;
   }
 
   # Unexpected 100 Continue
-  if ($self->{state} eq 'done' && ($res->code || '') eq '100') {
+  if ($self->{state} eq 'finished' && ($res->code || '') eq '100') {
     $self->res($res->new);
     $self->{state} = $preserved;
   }
 
   # Check for errors
-  $self->{state} = 'done' if $self->error;
+  $self->{state} = 'finished' if $self->error;
 
   return $self;
 }
@@ -144,7 +144,7 @@ sub keep_alive {
 sub on_request {
   warn <<EOF;
 Mojo::Transaction::HTTP->on_request is DEPRECATED in favor of using
-Mojo::Transaction::HTTP->on!!!
+Mojo::Transaction::HTTP->on!
 EOF
   shift->on(request => shift);
 }
@@ -155,7 +155,7 @@ sub server_leftovers {
   # Check for leftovers
   my $req = $self->req;
   return unless $req->has_leftovers;
-  $req->{state} = 'done';
+  $req->{state} = 'finished';
 
   return $req->leftovers;
 }
@@ -176,7 +176,7 @@ sub server_read {
   }
 
   # EOF
-  elsif ((length $chunk == 0) || ($req->is_done && !$self->{handled}++)) {
+  elsif ((length $chunk == 0) || ($req->is_finished && !$self->{handled}++)) {
 
     # WebSocket
     if (($req->headers->upgrade || '') eq 'websocket') {
@@ -257,7 +257,7 @@ sub server_write {
     if ($self->{write} <= 0) {
 
       # HEAD request
-      if ($self->req->method =~ /^head$/i) { $self->{state} = 'done' }
+      if ($self->req->method =~ /^head$/i) { $self->{state} = 'finished' }
 
       # Body
       else {
@@ -275,15 +275,15 @@ sub server_write {
     # 100 Continue
     if ($self->{write} <= 0) {
 
-      # Continue done
+      # Continued
       if (defined $self->{continued} && $self->{continued} == 0) {
         $self->{continued} = 1;
         $self->{state}     = 'read';
         $self->res($res->new);
       }
 
-      # Everything done
-      elsif (!defined $self->{continued}) { $self->{state} = 'done' }
+      # Finished
+      elsif (!defined $self->{continued}) { $self->{state} = 'finished' }
     }
 
     # Normal body
@@ -307,8 +307,8 @@ sub server_write {
         $self->{delay} = 1 unless $delay;
       }
 
-      # Done
-      $self->{state} = 'done'
+      # Finished
+      $self->{state} = 'finished'
         if $self->{write} <= 0 || (defined $buffer && !length $buffer);
     }
   }

@@ -93,7 +93,7 @@ sub bridge { shift->route(@_)->inline(1) }
 sub del {
   warn <<EOF;
 Mojolicious::Routes->del is DEPRECATED in favor of
-Mojolicious::Routes->delete!!!
+Mojolicious::Routes->delete!
 EOF
   shift->delete(@_);
 }

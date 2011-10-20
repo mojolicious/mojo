@@ -60,13 +60,13 @@ my $ua = Mojo::UserAgent->new;
 
 # Application is alive
 my $tx = $ua->get("http://127.0.0.1:$port/hello");
-ok $tx->is_done, 'transaction is done';
+ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Morbo!', 'right content';
 
 # Same result
 $tx = $ua->get("http://127.0.0.1:$port/hello");
-ok $tx->is_done, 'transaction is done';
+ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello Morbo!', 'right content';
 
@@ -94,13 +94,13 @@ sleep 1
 
 # Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port/hello");
-ok $tx->is_done, 'transaction is done';
+ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
 # Same result
 $tx = $ua->get("http://127.0.0.1:$port/hello");
-ok $tx->is_done, 'transaction is done';
+ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
@@ -130,13 +130,13 @@ sleep 1
 
 # Application has been reloaded again
 $tx = $ua->get("http://127.0.0.1:$port/hello");
-ok $tx->is_done, 'transaction is done';
+ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'Hello!', 'right content';
 
 # Same result
 $tx = $ua->get("http://127.0.0.1:$port/hello");
-ok $tx->is_done, 'transaction is done';
+ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'Hello!', 'right content';
 

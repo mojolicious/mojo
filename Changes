@@ -1,7 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.04    2011-10-20 00:00:00
+2.04    2011-10-21 00:00:00
         - Improved documentation.
+        - Fixed small HTTP response parser bug.
 
 2.03    2011-10-20 00:00:00
         - Deprecated all is_done methods in favor of is_finished.

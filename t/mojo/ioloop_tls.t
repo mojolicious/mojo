@@ -34,7 +34,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 20;
+plan tests => 28;
 
 use Mojo::IOLoop;
 
@@ -111,6 +111,38 @@ ok $running,      'loop was running';
 ok !$drop,  'event dropped successfully';
 ok !$error, 'no error';
 
+# Delayed TLS handshake with valid client certificate
+$server       = $client       = '';
+$server_close = $client_close = 0;
+$id           = $loop->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    my ($loop, $id) = @_;
+    $loop->start_tls(
+      $id => {
+        on_close   => sub { $client_close++ },
+        on_connect => sub {
+          shift->write(shift, 'tset', sub { shift->write(shift, '123') });
+        },
+        on_read => sub { $client .= pop },
+        tls_cert => 't/mojo/certs/client.crt',
+        tls_key  => 't/mojo/certs/client.key'
+      }
+    );
+  }
+);
+$loop->connection_timeout($id => '0.5');
+$loop->timer(1 => sub { shift->stop });
+$loop->start;
+is $server, 'tset123', 'right content';
+is $client, 'test321', 'right content';
+ok $server_close, 'close event has been emitted';
+ok $client_close, 'close event has been emitted';
+ok $running,      'loop was running';
+ok !$drop,  'event dropped successfully';
+ok !$error, 'no error';
+
 # Invalid client certificate
 $error = '';
 $id    = $loop->connect(
@@ -120,6 +152,28 @@ $id    = $loop->connect(
   tls_cert => 't/mojo/certs/badcert.key',
   tls_key  => 't/mojo/certs/badcert.crt',
   on_error => sub { $error = pop },
+);
+$loop->connection_timeout($id => '0.5');
+$loop->timer(1 => sub { shift->stop });
+$loop->start;
+ok $error, 'has error';
+
+# Delayed TLS handshake with invalid client certificate
+$error = '';
+$id    = $loop->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_connect => sub {
+    my ($loop, $id) = @_;
+    $loop->start_tls(
+      $id => {
+        tls_cert => 't/mojo/certs/badcert.key',
+        tls_key  => 't/mojo/certs/badcert.crt',
+        on_error => sub { $error = pop },
+      }
+    );
+  },
+  on_error => sub { }
 );
 $loop->connection_timeout($id => '0.5');
 $loop->timer(1 => sub { shift->stop });

@@ -50,10 +50,10 @@ sub connect {
   weaken $client->{resolver};
 
   # Events
-  $c->{close}   ||= delete $args->{on_close};
-  $c->{connect} ||= delete $args->{on_connect};
-  $c->{error}   ||= delete $args->{on_error};
-  $c->{read}    ||= delete $args->{on_read};
+  $c->{close}   = delete $args->{on_close}   if $args->{on_close};
+  $c->{connect} = delete $args->{on_connect} if $args->{on_connect};
+  $c->{error}   = delete $args->{on_error}   if $args->{on_error};
+  $c->{read}    = delete $args->{on_read}    if $args->{on_read};
   weaken $self;
   $client->on(
     connect => sub {
@@ -606,6 +606,10 @@ following new ones.
     address => '127.0.0.1',
     port    => 3000
   );
+  my $id = $loop->connect({
+    address => '127.0.0.1',
+    port    => 3000
+  });
 
 Open a TCP connection to a remote host.
 Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
@@ -711,6 +715,7 @@ Check if loop is running.
 
   my $id = Mojo::IOLoop->listen(port => 3000);
   my $id = $loop->listen(port => 3000);
+  my $id = $loop->listen({port => 3000});
 
 Create a new listen socket.
 Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
@@ -883,6 +888,10 @@ Start the loop, this will block until C<stop> is called.
     tls_cert => '/foo/client.cert',
     tls_key  => '/foo/client.key'
   ));
+  $loop->start_tls($id => {
+    tls_cert => '/foo/client.cert',
+    tls_key  => '/foo/client.key'
+  });
 
 Start new TLS connection inside old connection.
 Note that TLS support depends on L<IO::Socket::SSL>.
@@ -890,6 +899,22 @@ Note that TLS support depends on L<IO::Socket::SSL>.
 These options are currently available:
 
 =over 2
+
+=item C<on_connect>
+
+Callback to be invoked once the connection is established.
+
+=item C<on_close>
+
+Callback to be invoked if the connection gets closed.
+
+=item C<on_error>
+
+Callback to be invoked if an error happens on the connection.
+
+=item C<on_read>
+
+Callback to be invoked if new data arrives on the connection.
 
 =item C<tls_cert>
 

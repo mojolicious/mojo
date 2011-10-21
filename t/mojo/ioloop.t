@@ -123,10 +123,10 @@ isa_ok $handle, 'IO::Socket', 'right reference';
 
 # Dropped listen socket
 $port  = Mojo::IOLoop->generate_port;
-$id    = $loop->listen(port => $port);
+$id    = $loop->listen({port => $port});
 $error = undef;
 my $connected;
-$loop->connect(
+my %args = (
   address    => 'localhost',
   port       => $port,
   on_connect => sub {
@@ -140,6 +140,7 @@ $loop->connect(
     $error = pop;
   }
 );
+$loop->connect(\%args);
 $loop->start;
 ok $connected, 'connected';
 ok !$error, 'no error';

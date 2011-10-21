@@ -65,8 +65,10 @@ websocket '/test' => sub {
 my $ua = Mojo::UserAgent->new;
 my $daemon =
   Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
-my $port = Mojo::IOLoop->new->generate_port;
-$daemon->listen(["https://*:$port"]);
+my $port   = Mojo::IOLoop->new->generate_port;
+my $listen = "https://*:$port:t/mojo/certs/server.crt"
+  . ':t/mojo/certs/server.key:t/mojo/certs/ca.crt';
+$daemon->listen([$listen]);
 $daemon->prepare_ioloop;
 
 # Connect proxy server for testing
@@ -127,7 +129,7 @@ Mojo::IOLoop->listen(
 
 # GET / (normal request)
 my $result;
-$ua->get(
+$ua->cert('t/mojo/certs/client.crt')->key('t/mojo/certs/client.key')->get(
   "https://localhost:$port/" => sub {
     $result = pop->success->body;
     Mojo::IOLoop->stop;

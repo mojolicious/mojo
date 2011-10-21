@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.05    2011-10-22 00:00:00
+        - Fixed HTTPS proxy bug in Mojo::UserAgent.
+
 2.04    2011-10-21 00:00:00
         - Improved documentation.
         - Fixed small HTTP response parser bug.

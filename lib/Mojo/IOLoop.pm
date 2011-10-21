@@ -887,9 +887,27 @@ Start the loop, this will block until C<stop> is called.
 =head2 C<start_tls>
 
   $loop->start_tls($id);
+  $loop->start_tls($id => {
+    tls_cert => '/foo/client.cert',
+    tls_key  => '/foo/client.key'
+  });
 
 Start new TLS connection inside old connection.
 Note that TLS support depends on L<IO::Socket::SSL>.
+
+These options are currently available:
+
+=over 2
+
+=item C<tls_cert>
+
+Path to the TLS certificate file.
+
+=item C<tls_key>
+
+Path to the TLS key file.
+
+=back
 
 =head2 C<stop>
 

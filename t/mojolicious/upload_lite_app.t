@@ -1,49 +1,19 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use utf8;
-
 # Disable Bonjour, IPv6 and libev
 BEGIN {
   $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 31;
+use Test::More tests => 18;
 
 # "Um, Leela,
 #  Armondo and I are going to the back seat of his car for coffee."
 use Mojo::Asset::File;
-use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
 use Test::Mojo;
-
-# Upload progress
-my $cache = {};
-app->hook(
-  after_build_tx => sub {
-    shift->req->on(
-      progress => sub {
-        my $req = shift;
-
-        # Check if we've reached the body yet
-        return unless $req->content->is_parsing_body || $req->is_finished;
-
-        # Check for id
-        return unless my $id = $req->url->query->param('upload_id');
-
-        # Check for content length
-        return
-          unless my $len = $req->headers->content_length;
-
-        # Update cache with current progress
-        my $progress = $req->content->progress;
-        push @{$cache->{$id} ||= [0]},
-          $progress == $len ? 100 : int($progress / ($len / 100));
-      }
-    );
-  }
-);
 
 # POST /upload
 post '/upload' => sub {
@@ -79,25 +49,6 @@ post '/multi' => sub {
       . $file2->asset->slurp);
 };
 
-# GET /progress
-get '/progress/:id' => sub {
-  my $self = shift;
-  my $id   = $self->param('id');
-  $self->render_text(($cache->{$id}->[-1] || 0) . '%');
-};
-
-# POST /uploadlimit
-post '/uploadlimit' => sub {
-  my $self = shift;
-  $self->rendered;
-  my $body = $self->res->body || '';
-  $self->res->body("called, $body");
-  return if $self->req->is_limit_exceeded;
-  if (my $u = $self->req->upload('Вячеслав')) {
-    $self->res->body($self->res->body . b($u->filename)->encode . $u->size);
-  }
-};
-
 my $t = Test::Mojo->new;
 
 # POST /upload (asset and filename)
@@ -119,11 +70,6 @@ my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
 $t->post_form_ok('/upload', {file => $hash, test => 'tset'})->status_is(200)
   ->content_is('filealalaltsetfoo/barY');
 
-# POST /upload (with progress)
-$t->post_form_ok('/upload?upload_id=23',
-  {file => {content => 'alalal'}, test => 'tset'})->status_is(200)
-  ->content_is('filealalaltsetapplication/octet-stream');
-
 # POST /multi_reverse
 $t->post_form_ok('/multi_reverse',
   {file1 => {content => '1111'}, file2 => {content => '11112222'},})
@@ -133,56 +79,3 @@ $t->post_form_ok('/multi_reverse',
 $t->post_form_ok('/multi',
   {file1 => {content => '1111'}, file2 => {content => '11112222'},})
   ->status_is(200)->content_is('file11111file211112222');
-
-# GET/progress/23
-$t->get_ok('/progress/23')->status_is(200)->content_is('100%');
-ok @{$cache->{23}} > 1, 'made progress';
-ok $cache->{23}->[0] < $cache->{23}->[-1], 'progress increased';
-
-my $ua = $t->ua;
-
-# POST /uploadlimit (huge upload without appropriate max message size)
-my $backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 655360;
-my $tx   = Mojo::Transaction::HTTP->new;
-my $part = Mojo::Content::Single->new;
-my $name = b('Вячеслав')->url_escape;
-$part->headers->content_disposition(
-  qq/form-data; name="$name"; filename="$name.jpg"/);
-$part->headers->content_type('image/jpeg');
-$part->asset->add_chunk('1234' x 1310720);
-my $content = Mojo::Content::MultiPart->new;
-$content->headers($tx->req->headers);
-$content->headers->content_type('multipart/form-data');
-$content->parts([$part]);
-$tx->req->method('POST');
-$tx->req->url->parse('/uploadlimit');
-$tx->req->content($content);
-$ua->start($tx);
-is $tx->res->code, 413,        'right status';
-is $tx->res->body, 'called, ', 'right content';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
-
-# POST /uploadlimit (huge upload with appropriate max message size)
-$backup = $ENV{MOJO_MAX_MESSAGE_SIZE} || '';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
-$tx                         = Mojo::Transaction::HTTP->new;
-$part                       = Mojo::Content::Single->new;
-$name                       = b('Вячеслав')->encode->url_escape;
-$part->headers->content_disposition(
-  qq/form-data; name="$name"; filename="$name.jpg"/);
-$part->headers->content_type('image/jpeg');
-$part->asset->add_chunk('1234' x 1310720);
-$content = Mojo::Content::MultiPart->new;
-$content->headers($tx->req->headers);
-$content->headers->content_type('multipart/form-data');
-$content->parts([$part]);
-$tx->req->method('POST');
-$tx->req->url->parse('/uploadlimit');
-$tx->req->content($content);
-$ua->start($tx);
-ok $tx->is_finished, 'transaction is finished';
-is $tx->res->code, 200, 'right status';
-is b($tx->res->body)->decode('UTF-8')->to_string,
-  'called, Вячеслав.jpg5242880', 'right content';
-$ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;

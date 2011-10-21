@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1310;
+use Test::More tests => 1322;
 
 use File::Spec;
 use File::Temp;
@@ -253,13 +253,19 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 my $backup = $ENV{MOJO_MAX_MEMORY_SIZE} || '';
 $ENV{MOJO_MAX_MEMORY_SIZE} = 12;
 $req = Mojo::Message::Request->new;
+is $req->content->progress, 0, 'right progress';
 $req->parse('GET /foo/bar/baz.html?fo');
+is $req->content->progress, 0, 'right progress';
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
+is $req->content->progress, 0, 'right progress';
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
+is $req->content->progress, 4, 'right progress';
 $req->parse("o World!\n");
+is $req->content->progress, 13, 'right progress';
 is $req->content->asset->isa('Mojo::Asset::Memory'), 1, 'stored in memory';
 $req->parse("1234\nlalalala\n");
+is $req->content->progress, 27, 'right progress';
 is $req->content->asset->isa('Mojo::Asset::File'), 1, 'stored in file';
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
@@ -643,11 +649,16 @@ is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
 # Parse HTTP 1.1 multipart request
 $req = Mojo::Message::Request->new;
+is $req->content->progress, 0, 'right progress';
 $req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
+is $req->content->progress, 0, 'right progress';
 $req->parse("Content-Length: 418\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
+is $req->content->progress, 0, 'right progress';
 $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
+is $req->content->progress, 0, 'right progress';
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+is $req->content->progress, 31, 'right progress';
 $req->parse("Content-Disposition: form-data; name=\"text1\"\x0d\x0a");
 $req->parse("\x0d\x0ahallo welt test123\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
@@ -661,6 +672,7 @@ $req->parse("use strict;\n");
 $req->parse("use warnings;\n\n");
 $req->parse("print \"Hello World :)\\n\"\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
+is $req->content->progress, 418, 'right progress';
 ok $req->is_finished,  'request is finished';
 is $req->is_multipart, 1, 'multipart content';
 is $req->method,       'GET', 'right method';

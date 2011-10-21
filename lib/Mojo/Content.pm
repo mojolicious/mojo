@@ -283,6 +283,7 @@ sub parse_until_body {
 
 sub progress {
   my $self = shift;
+  return 0 unless ($self->{state} || '') ~~ [qw/body finished/];
   return $self->{raw_size} - ($self->{header_size} || 0);
 }
 
@@ -637,9 +638,9 @@ Parse chunk and stop after headers.
 
 =head2 C<progress>
 
-  my $bytes = $content->progress;
+  my $size = $content->progress;
 
-Number of bytes already received from message content.
+Size of content already received from message in bytes.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<write>

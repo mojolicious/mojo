@@ -591,16 +591,9 @@ Emitted when message building or parsing makes progress.
 
   $message->on(progress => sub {
     my $message = shift;
-
-    # Make sure we have enough information
-    return
-      unless $message->content->is_parsing_body || $message->is_finished;
     return unless my $len = $message->headers->content_length;
-    my $progress = $message->content->progress;
-
-    # Calculate progress
-    say 'Progress: ',
-      $progress == $len ? 100 : int($progress / ($len / 100)), '%';
+    my $size = $message->content->progress;
+    say 'Progress: ', $size == $len ? 100 : int($size / ($len / 100)), '%';
   });
 
 =head1 ATTRIBUTES

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1322;
+use Test::More tests => 1330;
 
 use File::Spec;
 use File::Temp;
@@ -439,14 +439,22 @@ is $req->url, '/', 'right URL';
 
 # Parse HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
+is $req->content->progress, 0, 'right progress';
 $req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+is $req->content->progress, 0, 'right progress';
 $req->parse("Content-Type: text/plain\x0d\x0a");
 $req->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
+is $req->content->progress, 0, 'right progress';
 $req->parse("4\x0d\x0a");
+is $req->content->progress, 3, 'right progress';
 $req->parse("abcd\x0d\x0a");
+is $req->content->progress, 9, 'right progress';
 $req->parse("9\x0d\x0a");
+is $req->content->progress, 12, 'right progress';
 $req->parse("abcdefghi\x0d\x0a");
+is $req->content->progress, 23, 'right progress';
 $req->parse("0\x0d\x0a\x0d\x0a");
+is $req->content->progress, 28, 'right progress';
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';

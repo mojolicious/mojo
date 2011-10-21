@@ -681,7 +681,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Drop anything with an id.
 Connections will be dropped gracefully by allowing them to finish writing all
-data in their write buffer.
+data in their write buffers.
 
 =head2 C<generate_port>
 

@@ -50,10 +50,8 @@ sub connect {
   weaken $client->{resolver};
 
   # Events
-  $c->{close}   = delete $args->{on_close}   if $args->{on_close};
-  $c->{connect} = delete $args->{on_connect} if $args->{on_connect};
-  $c->{error}   = delete $args->{on_error}   if $args->{on_error};
-  $c->{read}    = delete $args->{on_read}    if $args->{on_read};
+  $c->{$_} = delete($args->{"on_$_"}) || $c->{$_}
+    for qw/close connect error read/;
   weaken $self;
   $client->on(
     connect => sub {
@@ -269,12 +267,9 @@ sub start_tls {
   my $id   = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  # Steal handle and upgrade to TLS
-  my $stream = delete $self->{connections}->{$id}->{stream};
-  $args->{handle} = $stream->steal_handle;
-  $args->{id}     = $id;
-  $args->{tls}    = 1;
-  $self->connect($args);
+  # Steal handle and start TLS handshake
+  my $handle = delete($self->{connections}->{$id}->{stream})->steal_handle;
+  $self->connect({%$args, handle => $handle, id => $id, tls => 1});
 }
 
 sub stop {
@@ -426,7 +421,7 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
 
   # Listen on port 3000
   Mojo::IOLoop->listen(
-    port => 3000,
+    port    => 3000,
     on_read => sub {
       my ($loop, $id, $chunk) = @_;
 
@@ -440,9 +435,9 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
 
   # Connect to port 3000 with TLS activated
   my $id = Mojo::IOLoop->connect(
-    address => 'localhost',
-    port => 3000,
-    tls => 1,
+    address    => 'localhost',
+    port       => 3000,
+    tls        => 1,
     on_connect => sub {
       my ($loop, $id) = @_;
 
@@ -686,7 +681,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Drop anything with an id.
 Connections will be dropped gracefully by allowing them to finish writing all
-data in its write buffer.
+data in their write buffer.
 
 =head2 C<generate_port>
 

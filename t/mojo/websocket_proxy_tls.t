@@ -66,8 +66,8 @@ my $ua = Mojo::UserAgent->new;
 my $daemon =
   Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
 my $port   = Mojo::IOLoop->new->generate_port;
-my $listen = "https://*:$port:t/mojo/certs/server.crt"
-  . ':t/mojo/certs/server.key:t/mojo/certs/ca.crt';
+my $listen = "https://*:$port"
+  . ':t/mojo/certs/server.crt:t/mojo/certs/server.key:t/mojo/certs/ca.crt';
 $daemon->listen([$listen]);
 $daemon->prepare_ioloop;
 

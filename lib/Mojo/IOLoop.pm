@@ -711,13 +711,6 @@ Check if loop is running.
 
   my $id = Mojo::IOLoop->listen(port => 3000);
   my $id = $loop->listen(port => 3000);
-  my $id = $loop->listen({port => 3000});
-  my $id = $loop->listen(
-    port     => 443,
-    tls      => 1,
-    tls_cert => '/foo/server.cert',
-    tls_key  => '/foo/server.key'
-  );
 
 Create a new listen socket.
 Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
@@ -886,11 +879,10 @@ Start the loop, this will block until C<stop> is called.
 
 =head2 C<start_tls>
 
-  $loop->start_tls($id);
-  $loop->start_tls($id => {
+  $loop->start_tls($id => (
     tls_cert => '/foo/client.cert',
     tls_key  => '/foo/client.key'
-  });
+  ));
 
 Start new TLS connection inside old connection.
 Note that TLS support depends on L<IO::Socket::SSL>.

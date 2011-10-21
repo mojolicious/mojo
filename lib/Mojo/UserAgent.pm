@@ -394,7 +394,7 @@ sub _proxy_connect {
       if ($tx->req->url->scheme eq 'https') {
         return unless my $id = $tx->connection;
         $self->_loop->start_tls(
-          $id => {tls_cert => $self->cert, tls_key => $self->key});
+          $id => (tls_cert => $self->cert, tls_key => $self->key));
         $old->req->proxy(undef);
       }
 

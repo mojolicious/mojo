@@ -5,6 +5,8 @@ use Carp 'croak';
 use IO::File;
 use Mojo::Asset::File;
 
+has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };
+
 # "There's your giraffe, little girl.
 #  I'm a boy.
 #  That's the spirit. Never give up."
@@ -18,7 +20,7 @@ sub add_chunk {
   my ($self, $chunk) = @_;
   $self->{content} .= $chunk if defined $chunk;
   return Mojo::Asset::File->new->add_chunk($self->slurp)
-    if $self->size > ($ENV{MOJO_MAX_MEMORY_SIZE} || 262144);
+    if $self->size > $self->max_memory_size;
   return $self;
 }
 
@@ -77,6 +79,21 @@ Mojo::Asset::Memory - In-memory asset
 
 L<Mojo::Asset::Memory> is a container for in-memory assets.
 
+=head1 ATTRIBUTES
+
+L<Mojo::Asset::Memory> inherits all attributes from L<Mojo::Asset> and
+implements the following new ones.
+
+=head2 C<max_memory_size>
+
+  my $size = $mem->max_memory_size;
+  $mem     = $mem->max_memory_size(1024);
+
+Maximum asset size in bytes, only attempt upgrading to a L<Mojo::Asset::File>
+object after reaching this limit, defaults to the value of
+C<MOJO_MAX_MEMORY_SIZE> or C<5262144>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
+
 =head1 METHODS
 
 L<Mojo::Asset::Memory> inherits all methods from L<Mojo::Asset> and
@@ -121,7 +138,7 @@ Size of asset data in bytes.
 
 =head2 C<slurp>
 
-  my $string = $file->slurp;
+  my $string = mem->slurp;
 
 Read all asset data at once.
 

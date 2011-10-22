@@ -193,7 +193,8 @@ L<Mojo::Asset::File> is a container for file assets.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Asset::File> implements the following attributes.
+L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and
+implements the following new ones.
 
 =head2 C<cleanup>
 

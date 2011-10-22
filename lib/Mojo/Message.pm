@@ -635,7 +635,8 @@ to L<Mojo::JSON>.
   my $size = $message->max_message_size;
   $message = $message->max_message_size(1024);
 
-Maximum message size in bytes, defaults to C<5242880>.
+Maximum message size in bytes, defaults to the value of
+C<MOJO_MAX_MESSAGE_SIZE> or C<5242880>.
 
 =head1 METHODS
 
@@ -805,7 +806,7 @@ Remove leftover data from message parser.
 
   $message->max_line_size(1024);
 
-Maximum line size in bytes.
+Alias for L<Mojo::Headers/"max_line_size">.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<param>

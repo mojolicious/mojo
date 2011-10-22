@@ -84,7 +84,7 @@ Size of asset data in bytes.
 
 =head2 C<slurp>
 
-  my $string = $file->slurp;
+  my $string = $asset->slurp;
 
 Read all asset data at once.
 

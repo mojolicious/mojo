@@ -407,7 +407,8 @@ Mask outgoing frames with XOR cipher and a random 32bit key.
   my $size = $ws->max_websocket_size;
   $ws      = $ws->max_websocket_size(1024);
 
-Maximum WebSocket message size in bytes, defaults to C<262144>.
+Maximum WebSocket message size in bytes, defaults to the value of
+C<MOJO_MAX_WEBSOCKET_SIZE> or C<262144>.
 
 =head1 METHODS
 

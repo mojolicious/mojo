@@ -7,12 +7,23 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 9;
+use Test::More tests => 12;
 
 # "Just once I'd like to eat dinner with a celebrity who isn't bound and
 #  gagged."
 use Mojolicious::Lite;
 use Test::Mojo;
+
+# Wrap whole application
+my $old = app->on_process;
+app->on_process(
+  sub {
+    my ($self, $c) = @_;
+    return $c->render(text => 'Wrapped!')
+      if $c->req->url->path->contains('/wrap');
+    $self->$old($c);
+  }
+);
 
 # Custom dispatchers /custom
 app->hook(
@@ -48,3 +59,6 @@ $t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
 
 # GET /custom_too
 $t->get_ok('/custom_too')->status_is(200)->content_is('this works too');
+
+# GET /wrap
+$t->get_ok('/wrap')->status_is(200)->content_is('Wrapped!');

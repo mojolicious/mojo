@@ -35,7 +35,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.05';
+our $VERSION  = '2.06';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -312,9 +312,12 @@ Request processing callback, defaults to calling the C<dispatch> method.
 Generally you will use a plugin or controller instead of this, consider it
 the sledgehammer in your toolbox.
 
+  my $old = $app->on_process;
   $app->on_process(sub {
     my ($self, $c) = @_;
-    $self->dispatch($c);
+    return $c->render(text => 'Hello world!')
+      if $c->req->url->path->contains('/hello');
+    $self->$old($c);
   });
 
 =head2 C<plugins>

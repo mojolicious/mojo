@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.06    2011-10-23 00:00:00
+        - Improved documentation.
+
 2.05    2011-10-22 00:00:00
         - Added EXPERIMENTAL max_memory_size attribute to
           Mojo::Asset::Memory.

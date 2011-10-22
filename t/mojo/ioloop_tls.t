@@ -29,18 +29,17 @@ BEGIN {
 #   -out badclient.crt
 use Test::More;
 use Mojo::IOLoop::Server;
-use Mojo::IOLoop::Stream;
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 28;
-
-use Mojo::IOLoop;
+plan tests => 29;
 
 # "To the panic room!
 #  We don't have a panic room.
 #  To the panic room store!"
+use_ok 'Mojo::IOLoop';
+
 my $loop = Mojo::IOLoop->new;
 my $port = Mojo::IOLoop->generate_port;
 my ($server, $client) = '';

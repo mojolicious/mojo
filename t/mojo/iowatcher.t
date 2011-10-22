@@ -7,14 +7,14 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-# "I don't mind being called a liar when I'm lying, or about to lie,
-#  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 use Test::More tests => 50;
 
-use_ok 'Mojo::IOWatcher';
-
+# "I don't mind being called a liar when I'm lying, or about to lie,
+#  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 use IO::Socket::INET;
 use Mojo::IOLoop;
+
+use_ok 'Mojo::IOWatcher';
 
 # Listen
 my $port   = Mojo::IOLoop->generate_port;

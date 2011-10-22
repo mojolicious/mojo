@@ -13,16 +13,15 @@ plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
 plan skip_all => 'Perl 5.12 required for this test!' unless $] >= 5.012;
 plan tests => 20;
 
-use_ok 'Mojo::IOLoop';
-
-use List::Util 'first';
-
 # "Your guilty consciences may make you vote Democratic, but secretly you all
 #  yearn for a Republican president to lower taxes, brutalize criminals, and
 #  rule you like a king!"
-my $r = Mojo::IOLoop->singleton->resolver;
+use List::Util 'first';
+
+use_ok 'Mojo::IOLoop';
 
 # Resolve all record
+my $r = Mojo::IOLoop->singleton->resolver;
 my %types;
 $r->resolve(
   'www.google.com',

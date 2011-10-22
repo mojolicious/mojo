@@ -6,16 +6,16 @@ BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1 }
 
 use Test::More;
 
-# "Oh well. At least we'll die doing what we love: inhaling molten rock."
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
 plan tests => 50;
 
-use_ok 'Mojo::IOWatcher::EV';
-
 use IO::Socket::INET;
 use Mojo::IOLoop;
+
+# "Oh well. At least we'll die doing what we love: inhaling molten rock."
+use_ok 'Mojo::IOWatcher::EV';
 
 # Listen
 my $port   = Mojo::IOLoop->generate_port;

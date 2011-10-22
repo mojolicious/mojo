@@ -13,10 +13,12 @@ BEGIN {
 # "Of all the parasites I've had over the years,
 #  these worms are among the best."
 use Test::More tests => 9;
-use Test::Mojo;
 
 use FindBin;
 use lib "$FindBin::Bin/external/lib";
+
+use Test::Mojo;
+
 my $t = Test::Mojo->new('MyApp');
 
 # GET /

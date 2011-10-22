@@ -15,6 +15,7 @@ use Test::More tests => 15;
 
 use FindBin;
 require "$FindBin::Bin/external/myapp.pl";
+
 use Test::Mojo;
 
 my $t = Test::Mojo->new;

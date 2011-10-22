@@ -3,13 +3,13 @@ use Mojo::Base -strict;
 
 use Test::More tests => 87;
 
-use_ok 'Mojo::CookieJar';
-
 # "Hello, my name is Mr. Burns. I believe you have a letter for me.
 #  Okay Mr. Burns, what’s your first name.
 #  I don’t know."
 use Mojo::Cookie::Response;
 use Mojo::URL;
+
+use_ok 'Mojo::CookieJar';
 
 # Session cookie
 my $jar = Mojo::CookieJar->new;

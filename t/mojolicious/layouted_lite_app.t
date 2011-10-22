@@ -9,14 +9,15 @@ BEGIN {
 
 use Test::More tests => 82;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 # "We're certainly not building anything sinster, if that's what you mean.
 #  Now come on, something sinister won't build itself."
 use Mojolicious::Lite;
 use Test::Mojo;
 
 # Plugin with a template
-use FindBin;
-use lib "$FindBin::Bin/lib";
 plugin 'PluginWithTemplate';
 
 app->renderer->root(app->home->rel_dir('does_not_exist'));

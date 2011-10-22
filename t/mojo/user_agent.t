@@ -9,11 +9,11 @@ BEGIN {
 
 use Test::More tests => 68;
 
-use_ok 'Mojo::UserAgent';
-
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
 use Mojolicious::Lite;
+
+use_ok 'Mojo::UserAgent';
 
 # Silence
 app->log->level('fatal');

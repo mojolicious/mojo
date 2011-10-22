@@ -9,9 +9,6 @@ BEGIN {
 
 use Test::More tests => 44;
 
-use_ok 'Mojo';
-use_ok 'Mojo::HelloWorld';
-
 # "I was so bored I cut the pony tail off the guy in front of us.
 #  Look at me, I'm a grad student.
 #  I'm 30 years old and I made $600 last year.
@@ -20,6 +17,9 @@ use_ok 'Mojo::HelloWorld';
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
+
+use_ok 'Mojo';
+use_ok 'Mojo::HelloWorld';
 
 # Logger
 my $logger = Mojo::Log->new;

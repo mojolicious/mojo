@@ -9,15 +9,14 @@ BEGIN {
 
 use Test::More tests => 29;
 
-use_ok 'Mojo::IOLoop::Resolver';
-
 # "Oh, I'm in no condition to drive. Wait a minute.
 #  I don't have to listen to myself. I'm drunk."
 use Mojo::IOLoop;
 
-my $r = Mojo::IOLoop->singleton->resolver;
+use_ok 'Mojo::IOLoop::Resolver';
 
 # Check IPv4 and IPv6 addresses
+my $r = Mojo::IOLoop->singleton->resolver;
 is $r->is_ipv4('mojolicio.us'),   undef, 'not an IPv4 address';
 is $r->is_ipv6('mojolicio.us'),   undef, 'not an IPv6 address';
 is $r->is_ipv4('[::1]'),          undef, 'not an IPv4 address';

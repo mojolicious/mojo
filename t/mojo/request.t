@@ -5,17 +5,16 @@ use utf8;
 
 use Test::More tests => 863;
 
-use File::Spec;
-use File::Temp;
-
-use_ok 'Mojo::Message::Request';
-
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
 #  they're on TV!"
+use File::Spec;
+use File::Temp;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Cookie::Request;
+
+use_ok 'Mojo::Message::Request';
 
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding all limits
 my $req = Mojo::Message::Request->new;

@@ -9,6 +9,10 @@ BEGIN {
 
 use Test::More;
 
+plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
+  unless $ENV{TEST_MORBO};
+plan tests => 27;
+
 use Cwd 'cwd';
 use File::Temp;
 use FindBin;
@@ -16,10 +20,6 @@ use IO::Socket::INET;
 use Mojo::Command;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
-
-plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
-  unless $ENV{TEST_MORBO};
-plan tests => 27;
 
 # "Morbo wishes these stalwart nomads peace among the Dutch tulips.
 #  At least all those windmills will keep them cool.

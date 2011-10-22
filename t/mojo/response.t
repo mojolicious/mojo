@@ -3,8 +3,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 270;
 
-use_ok 'Mojo::Message::Response';
-
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
 #  Precisely."
@@ -13,6 +11,8 @@ use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Cookie::Response;
 use Mojo::Headers;
+
+use_ok 'Mojo::Message::Response';
 
 # Status code and message
 my $res = Mojo::Message::Response->new;

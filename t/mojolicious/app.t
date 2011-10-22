@@ -16,8 +16,8 @@ use lib "$FindBin::Bin/lib";
 use File::Spec;
 use Mojo::Date;
 use Mojo::Transaction::HTTP;
-use Test::Mojo;
 use Mojolicious;
+use Test::Mojo;
 
 # "Congratulations Fry, you've snagged the perfect girlfriend.
 #  Amy's rich, she's probably got other characteristics..."

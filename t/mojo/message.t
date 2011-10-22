@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1330;
+use Test::More tests => 1340;
 
 use File::Spec;
 use File::Temp;
@@ -413,9 +413,9 @@ $req = Mojo::Message::Request->new;
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: application/');
-$req->parse("x-www-form-urlencoded\x0d\x0aContent-Length: 53");
+$req->parse("x-www-form-urlencoded\x0d\x0aContent-Length: 14");
 $req->parse("\x0d\x0a\x0d\x0a");
-$req->parse('name=%D0%92%D1%8F%D1%87%D0%B5%D1%81%D0%BB%D0%B0%D0%B2');
+$req->parse('name=%E2%98%83');
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
@@ -424,8 +424,8 @@ is $req->at_least_version('1.2'), undef, 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
-is $req->headers->content_length, 53, 'right "Content-Length" value';
-is $req->param('name'), 'Вячеслав', 'right value';
+is $req->headers->content_length, 14, 'right "Content-Length" value';
+is $req->param('name'), '☃', 'right value';
 
 # Parse HTTP 0.9 request
 $req = Mojo::Message::Request->new;
@@ -1926,6 +1926,7 @@ is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 
 # Parse Apache 2.2 (win32) like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
+is $req->content->progress, 0, 'right progress';
 $req->parse(
   CONTENT_LENGTH  => 87,
   CONTENT_TYPE    => 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -1936,8 +1937,11 @@ $req->parse(
   HTTP_HOST       => 'test1',
   SERVER_PROTOCOL => 'HTTP/1.1'
 );
+is $req->content->progress, 0, 'right progress';
 $req->parse('request=&ajax=true&login=test&password=111&');
+is $req->content->progress, 43, 'right progress';
 $req->parse('edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
+is $req->content->progress, 87, 'right progress';
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
 is $req->url->path, '', 'right path';
@@ -2169,6 +2173,7 @@ is $req->url->to_abs->to_string,
 # Parse Apache mod_fastcgi like CGI environment variables
 # (multipart file upload)
 $req = Mojo::Message::Request->new;
+is $req->content->progress, 0, 'right progress';
 $req->parse(
   SCRIPT_NAME      => '',
   SERVER_NAME      => '127.0.0.1',
@@ -2195,12 +2200,17 @@ $req->parse(
   PATH_TRANSLATED   => '/tmp/test.fcgi/diag/upload',
   HTTP_HOST         => '127.0.0.1:13028'
 );
+is $req->content->progress, 0, 'right progress';
 $req->parse("--8jXGX\x0d\x0a");
+is $req->content->progress, 9, 'right progress';
 $req->parse(
   "Content-Disposition: form-data; name=\"file\"; filename=\"file\"\x0d\x0a"
     . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+is $req->content->progress, 113, 'right progress';
 $req->parse('11023456789');
+is $req->content->progress, 124, 'right progress';
 $req->parse("\x0d\x0a--8jXGX--");
+is $req->content->progress, 135, 'right progress';
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
 is $req->url->base->host, '127.0.0.1', 'right base host';

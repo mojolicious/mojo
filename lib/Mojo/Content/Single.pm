@@ -1,7 +1,6 @@
 package Mojo::Content::Single;
 use Mojo::Base 'Mojo::Content';
 
-use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
 
@@ -52,15 +51,10 @@ sub parse {
     return $multi->parse;
   }
 
-  # Don't waste memory and upgrade to file based storage on demand
-  my $asset = $self->asset;
-  $self->asset($asset = Mojo::Asset::File->new->add_chunk($asset->slurp))
-    if $asset->isa('Mojo::Asset::Memory')
-      && $asset->size > ($ENV{MOJO_MAX_MEMORY_SIZE} || 262144);
-
   # Chunked body or relaxed content
+  my $asset = $self->asset;
   if ($self->is_chunked || $self->relaxed) {
-    $asset->add_chunk($self->{buffer});
+    $self->asset($asset->add_chunk($self->{buffer}));
     $self->{buffer} = '';
   }
 
@@ -68,7 +62,8 @@ sub parse {
   else {
     my $len = $self->headers->content_length || 0;
     my $need = $len - $asset->size;
-    $asset->add_chunk(substr $self->{buffer}, 0, $need, '') if $need > 0;
+    $self->asset($asset->add_chunk(substr $self->{buffer}, 0, $need, ''))
+      if $need > 0;
 
     # Finished
     $self->{state} = 'finished' if $len <= $self->progress;
@@ -169,9 +164,11 @@ Get a chunk of content starting from a specfic position.
 
 =head2 C<parse>
 
-  $single = $single->parse("Content-Length: 12\r\n\r\nHello World!");
+  $single   = $single->parse("Content-Length: 12\r\n\r\nHello World!");
+  my $multi = $single->parse("Content-Type: multipart/form-data\r\n\r\n");
 
-Parse content chunk.
+Parse content chunk and upgrade to L<Mojo::Content::MultiPart> object if
+possible.
 
 =head1 SEE ALSO
 

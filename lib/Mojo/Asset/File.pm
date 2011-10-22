@@ -180,12 +180,12 @@ Mojo::Asset::File - File asset
 
   use Mojo::Asset::File;
 
-  my $asset = Mojo::Asset::File->new;
-  $asset->add_chunk('foo bar baz');
-  say $asset->slurp;
+  my $file = Mojo::Asset::File->new;
+  $file->add_chunk('foo bar baz');
+  say $file->slurp;
 
-  my $asset = Mojo::Asset::File->new(path => '/foo/bar/baz.txt');
-  say $asset->slurp;
+  my $file = Mojo::Asset::File->new(path => '/foo/bar/baz.txt');
+  say $file->slurp;
 
 =head1 DESCRIPTION
 
@@ -197,29 +197,29 @@ L<Mojo::Asset::File> implements the following attributes.
 
 =head2 C<cleanup>
 
-  my $cleanup = $asset->cleanup;
-  $asset      = $asset->cleanup(1);
+  my $cleanup = $file->cleanup;
+  $file       = $file->cleanup(1);
 
 Delete file automatically once it's not used anymore.
 
 =head2 C<handle>
 
-  my $handle = $asset->handle;
-  $asset     = $asset->handle(IO::File->new);
+  my $handle = $file->handle;
+  $file      = $file->handle(IO::File->new);
 
 Actual file handle.
 
 =head2 C<path>
 
-  my $path = $asset->path;
-  $asset   = $asset->path('/foo/bar/baz.txt');
+  my $path = $file->path;
+  $file    = $file->path('/foo/bar/baz.txt');
 
 Actual file path.
 
 =head2 C<tmpdir>
 
-  my $tmpdir = $asset->tmpdir;
-  $asset     = $asset->tmpdir('/tmp');
+  my $tmpdir = $file->tmpdir;
+  $file      = $file->tmpdir('/tmp');
 
 Temporary directory.
 
@@ -230,31 +230,31 @@ the following new ones.
 
 =head2 C<add_chunk>
 
-  $asset = $asset->add_chunk('foo bar baz');
+  $file = $file->add_chunk('foo bar baz');
 
-Add chunk of data to asset.
+Add chunk of data.
 
 =head2 C<contains>
 
-  my $position = $asset->contains('bar');
+  my $position = $file->contains('bar');
 
 Check if asset contains a specific string.
 
 =head2 C<get_chunk>
 
-  my $chunk = $asset->get_chunk($start);
+  my $chunk = $file->get_chunk($start);
 
 Get chunk of data starting from a specific position.
 
 =head2 C<move_to>
 
-  $asset = $asset->move_to('/foo/bar/baz.txt');
+  $file = $file->move_to('/foo/bar/baz.txt');
 
 Move asset data into a specific file.
 
 =head2 C<size>
 
-  my $size = $asset->size;
+  my $size = $file->size;
 
 Size of asset data in bytes.
 

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 1340;
+use Test::More tests => 1341;
 
 use File::Spec;
 use File::Temp;
@@ -261,9 +261,10 @@ $req->parse('-Type: text/');
 is $req->content->progress, 0, 'right progress';
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
 is $req->content->progress, 4, 'right progress';
+is $req->content->asset->isa('Mojo::Asset::Memory'), 1, 'stored in memory';
 $req->parse("o World!\n");
 is $req->content->progress, 13, 'right progress';
-is $req->content->asset->isa('Mojo::Asset::Memory'), 1, 'stored in memory';
+is $req->content->asset->isa('Mojo::Asset::File'), 1, 'stored in file';
 $req->parse("1234\nlalalala\n");
 is $req->content->progress, 27, 'right progress';
 is $req->content->asset->isa('Mojo::Asset::File'), 1, 'stored in file';

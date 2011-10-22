@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::Asset';
 
 use Carp 'croak';
 use IO::File;
+use Mojo::Asset::File;
 
 # "There's your giraffe, little girl.
 #  I'm a boy.
@@ -16,6 +17,8 @@ sub new {
 sub add_chunk {
   my ($self, $chunk) = @_;
   $self->{content} .= $chunk if defined $chunk;
+  return Mojo::Asset::File->new->add_chunk($self->slurp)
+    if $self->size > ($ENV{MOJO_MAX_MEMORY_SIZE} || 262144);
   return $self;
 }
 
@@ -66,9 +69,9 @@ Mojo::Asset::Memory - In-memory asset
 
   use Mojo::Asset::Memory;
 
-  my $asset = Mojo::Asset::Memory->new;
-  $asset->add_chunk('foo bar baz');
-  say $asset->slurp;
+  my $mem = Mojo::Asset::Memory->new;
+  $mem->add_chunk('foo bar baz');
+  say $mem->slurp;
 
 =head1 DESCRIPTION
 
@@ -81,37 +84,38 @@ implements the following new ones.
 
 =head2 C<new>
 
-  my $asset = Mojo::Asset::Memory->new;
+  my $mem = Mojo::Asset::Memory->new;
 
 Construct a new L<Mojo::Asset::Memory> object.
 
 =head2 C<add_chunk>
 
-  $asset = $asset->add_chunk('foo bar baz');
+  $mem     = $mem->add_chunk('foo bar baz');
+  my $file = $mem->add_chunk('abc' x 262144);
 
-Add chunk of data to asset.
+Add chunk of data and upgrade to L<Mojo::Asset::File> object if necessary.
 
 =head2 C<contains>
 
-  my $position = $asset->contains('bar');
+  my $position = $mem->contains('bar');
 
 Check if asset contains a specific string.
 
 =head2 C<get_chunk>
 
-  my $chunk = $asset->get_chunk($offset);
+  my $chunk = $mem->get_chunk($offset);
 
 Get chunk of data starting from a specific position.
 
 =head2 C<move_to>
 
-  $asset = $asset->move_to('/foo/bar/baz.txt');
+  $mem = $mem->move_to('/foo/bar/baz.txt');
 
 Move asset data into a specific file.
 
 =head2 C<size>
 
-  my $size = $asset->size;
+  my $size = $mem->size;
 
 Size of asset data in bytes.
 

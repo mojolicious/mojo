@@ -7,12 +7,13 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 30;
+use Test::More tests => 29;
+
+use_ok 'Mojo::IOLoop::Resolver';
 
 # "Oh, I'm in no condition to drive. Wait a minute.
 #  I don't have to listen to myself. I'm drunk."
-use_ok 'Mojo::IOLoop';
-use_ok 'Mojo::IOLoop::Resolver';
+use Mojo::IOLoop;
 
 my $r = Mojo::IOLoop->singleton->resolver;
 

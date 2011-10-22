@@ -10,10 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 934;
-
-# Pollution
-123 =~ m/(\d+)/;
+use Test::More tests => 727;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -21,8 +18,6 @@ use Test::More tests => 934;
 #  Well, ok but I don't want people thinking we're robosexuals,
 #  so if anyone asks you're my debugger."
 use Mojo::ByteStream 'b';
-use Mojo::Content::MultiPart;
-use Mojo::Content::Single;
 use Mojo::Cookie::Response;
 use Mojo::Date;
 use Mojo::IOLoop;
@@ -39,11 +34,6 @@ my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 eval { plugin 'does_not_exist' };
 is $@, "Plugin \"does_not_exist\" missing, maybe you need to install it?\n",
   'right error';
-
-# Plugin with a template
-use FindBin;
-use lib "$FindBin::Bin/lib";
-plugin 'PluginWithTemplate';
 
 # Default
 app->defaults(default => 23);
@@ -344,78 +334,6 @@ post '/with/body/and/headers/desc' => sub {
   $self->render_text('bar');
 };
 
-# GET /content_for
-get '/content_for';
-
-# GET /template_inheritance
-get '/template_inheritance' => sub { shift->render('template_inheritance') };
-
-# GET /layout_without_inheritance
-get '/layout_without_inheritance' => sub {
-  shift->render(
-    template => 'layouts/template_inheritance',
-    handler  => 'ep'
-  );
-};
-
-# GET /double_inheritance
-get '/double_inheritance' =>
-  sub { shift->render(template => 'double_inheritance') };
-
-# GET /nested-includes
-get '/nested-includes' => sub {
-  my $self = shift;
-  $self->render(
-    template => 'nested-includes',
-    layout   => 'layout',
-    handler  => 'ep'
-  );
-};
-
-# GET /localized/include
-get '/localized/include' => sub {
-  my $self = shift;
-  $self->render('localized', test => 'foo');
-};
-
-# GET /outerlayout
-get '/outerlayout' => sub {
-  my $self = shift;
-  $self->render(
-    template => 'outerlayout',
-    layout   => 'layout',
-    handler  => 'ep'
-  );
-};
-
-# GET /outerlayouttwo
-get '/outerlayouttwo' => {layout => 'layout'} => sub {
-  my $self = shift;
-  is($self->stash->{layout}, 'layout', 'right value');
-  $self->render(handler => 'ep');
-  is($self->stash->{layout}, 'layout', 'right value');
-} => 'outerlayout';
-
-# GET /outerinnerlayout
-get '/outerinnerlayout' => sub {
-  my $self = shift;
-  $self->render(
-    template => 'outerinnerlayout',
-    layout   => 'layout',
-    handler  => 'ep'
-  );
-};
-
-# GET /withblocklayout
-get '/withblocklayout' => sub {
-  my $self = shift;
-  $self->render(
-    template => 'index',
-    layout   => 'with_block',
-    handler  => 'epl'
-  );
-};
-
 # GET /session_cookie
 get '/session_cookie' => sub {
   my $self = shift;
@@ -649,168 +567,6 @@ get '/redirect/condition/0' => (redirect => 0) => sub {
 # GET /redirect/condition/1
 get '/redirect/condition/1' => (redirect => 1) =>
   {text => 'condition works too!'};
-
-under sub {
-  my $self = shift;
-  return unless $self->req->headers->header('X-Bender');
-  $self->res->headers->add('X-Under' => 23);
-  $self->res->headers->add('X-Under' => 24);
-  1;
-};
-
-# GET /with_under
-get '/with_under' => sub {
-  my $self = shift;
-  $self->render_text('Unders are cool!');
-};
-
-# GET /with_under_too
-get '/with_under_too' => sub {
-  my $self = shift;
-  $self->render_text('Unders are cool too!');
-};
-
-under sub {
-  my $self = shift;
-
-  # Authenticated
-  my $name = $self->param('name') || '';
-  return 1 if $name eq 'Bender';
-
-  # Not authenticated
-  $self->render('param_auth_denied');
-  return;
-};
-
-# GET /param_auth
-get '/param_auth';
-
-# GET /param_auth/too
-get '/param_auth/too' =>
-  sub { shift->render_text('You could be Bender too!') };
-
-under sub {
-  my $self = shift;
-  $self->stash(_name => 'stash');
-  $self->cookie(foo => 'cookie', {expires => (time + 60)});
-  $self->signed_cookie(bar => 'signed_cookie', {expires => (time + 120)});
-  $self->cookie(bad => 'bad_cookie--12345678');
-  1;
-};
-
-# GET /bridge2stash
-get '/bridge2stash' =>
-  sub { shift->render(template => 'bridge2stash', handler => 'ep') };
-
-# Make sure after_dispatch can make session changes
-hook after_dispatch => sub {
-  my $self = shift;
-  return unless $self->req->url->path->contains('/late/session');
-  $self->session(late => 'works!');
-};
-
-# GET /late/session
-get '/late/session' => sub {
-  my $self = shift;
-  my $late = $self->session('late') || 'not yet!';
-  $self->render_text($late);
-};
-
-# Counter
-my $under = 0;
-under sub {
-  shift->res->headers->header('X-Under' => ++$under);
-  1;
-};
-
-# GET /with_under_count
-get '/with/under/count';
-
-# Everything gets past this
-under sub {
-  shift->res->headers->header('X-Possible' => 1);
-  1;
-};
-
-# GET /possible
-get '/possible' => 'possible';
-
-# Nothing gets past this
-under sub {
-  shift->res->headers->header('X-Impossible' => 1);
-  0;
-};
-
-# GET /impossible
-get '/impossible' => 'impossible';
-
-# /prefix (prefix)
-under '/prefix';
-
-# GET /prefix
-get sub { shift->render(text => 'prefixed GET works!') };
-
-# POST /prefix
-post sub { shift->render(text => 'prefixed POST works!') };
-
-# GET /prefix/works
-get '/works' => sub { shift->render(text => 'prefix works!') };
-
-# /prefix2 (another prefix)
-under '/prefix2' => {message => 'prefixed'};
-
-# GET /prefix2/foo
-get '/foo' => {inline => '<%= $message %>!'};
-
-# GET /prefix2/bar
-get '/bar' => {inline => 'also <%= $message %>!'};
-
-# Reset
-under '/' => {foo => 'one'};
-
-# GET /reset
-get '/reset' => {text => 'reset works!'};
-
-# Group
-group {
-
-  # /group
-  under '/group' => {bar => 'two'};
-
-  # GET /group
-  get {inline => '<%= $foo %><%= $bar %>!'};
-
-  # Nested group
-  group {
-
-    # /group/nested
-    under '/nested' => {baz => 'three'};
-
-    # GET /group/nested
-    get {inline => '<%= $baz %><%= $bar %><%= $foo %>!'};
-
-    # GET /group/nested/whatever
-    get '/whatever' => {inline => '<%= $foo %><%= $bar %><%= $baz %>!'};
-  };
-};
-
-# Authentication group
-group {
-
-  # Check "ok" parameter
-  under sub {
-    my $self = shift;
-    return 1 if $self->req->param('ok');
-    $self->render(text => "You're not ok.");
-    return;
-  };
-
-  # GET /authgroup
-  get '/authgroup' => {text => "You're ok."};
-};
-
-# GET /noauthgroup
-get '/noauthgroup' => {inline => 'Whatever <%= $foo %>.'};
 
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
@@ -1292,74 +1048,6 @@ $t->post_ok('/with/body/and/desc', 'body', 'desc')->status_is(200)
 $t->post_ok('/with/body/and/headers/desc', {with => 'header'}, 'body', 'desc')
   ->status_is(200)->content_is('bar');
 
-# GET /content_for
-$t->get_ok('/content_for')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("This\n\nseems\nto\nHello    world!\n\nwork!\n");
-
-# GET /template_inheritance
-$t->get_ok('/template_inheritance')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-  "<title>Works!</title>\n<br>\nSidebar!\nHello World!\n\nDefault footer!\n");
-
-# GET /layout_without_inheritance
-$t->get_ok('/layout_without_inheritance')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-  "<title></title>\nDefault header!\nDefault sidebar!\n\nDefault footer!\n");
-
-# GET /double_inheritance
-$t->get_ok('/double_inheritance')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-  "<title>Works!</title>\n<br>\nSidebar too!\n\nDefault footer!\n");
-
-# GET /plugin_with_template
-$t->get_ok('/plugin_with_template')->status_is(200)
-  ->content_is("layout_with_template\nwith template\n\n");
-
-# GET /nested-includes
-$t->get_ok('/nested-includes')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("layouted Nested Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
-
-# GET /localized/include
-$t->get_ok('/localized/include')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("localized1 foo\nlocalized2 321\n\n\nfoo\n\n");
-
-# GET /outerlayout
-$t->get_ok('/outerlayout')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
-
-# GET /outerlayouttwo
-$t->get_ok('/outerlayouttwo')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
-
-# GET /outerinnerlayout
-$t->get_ok('/outerinnerlayout')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-  "layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
-
-# GET /withblocklayout
-$t->get_ok('/withblocklayout')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("\nwith_block \n\nOne: one\nTwo: two\n\n");
-
 # GET /session_cookie
 $t->get_ok('/session_cookie')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1659,50 +1347,6 @@ $t->get_ok('/koi8-r')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/html; charset=koi8-r')->content_like(qr/^$koi8/);
 
-# GET /with_under
-$t->get_ok('/with_under', {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
-  ->content_is('Unders are cool!');
-
-# GET /with_under_too
-$t->get_ok('/with_under_too', {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
-  ->content_is('Unders are cool too!');
-
-# GET /with_under_too
-$t->get_ok('/with_under_too')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Oops!/);
-
-# GET /param_auth
-$t->get_ok('/param_auth')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Not Bender!\n");
-
-# GET /param_auth?name=Bender
-$t->get_ok('/param_auth?name=Bender')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Bender!\n");
-
-# GET /param_auth/too
-$t->get_ok('/param_auth/too')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Not Bender!\n");
-
-# GET /param_auth/too?name=Bender
-$t->get_ok('/param_auth/too?name=Bender')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('You could be Bender too!');
-
 # GET /hello.txt (static file)
 $t->get_ok('/hello.txt')->status_is(200)
   ->header_is(Server          => 'Mojolicious (Perl)')
@@ -1768,146 +1412,6 @@ $t->get_ok('/redirect/condition/1' => {'X-Condition-Test' => 1})
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('condition works too!');
-
-# GET /bridge2stash
-$t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!!\n");
-
-# GET /bridge2stash (with cookies, session and flash)
-$t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
-
-# GET /bridge2stash (broken session cookie)
-$t->reset_session;
-my $session = b("☃☃☃☃☃")->encode->b64_encode('');
-my $hmac    = $session->clone->hmac_md5_sum($t->app->secret);
-my $broken  = "\$Version=1; mojolicious=$session--$hmac; \$Path=/";
-$t->get_ok('/bridge2stash' => {Cookie => $broken})->status_is(200)
-  ->content_is("stash too!!!!!!!/!\n");
-
-# GET /bridge2stash (fresh start)
-$t->reset_session;
-$t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!!\n");
-
-# GET /mojolicious-white.png
-# GET /mojolicious-black.png
-# (random static requests)
-$t->get_ok('/mojolicious-white.png')->status_is(200);
-$t->get_ok('/mojolicious-black.png')->status_is(200);
-$t->get_ok('/mojolicious-white.png')->status_is(200);
-$t->get_ok('/mojolicious-black.png')->status_is(200);
-
-# GET /bridge2stash (with cookies, session and flash again)
-$t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
-
-# GET /bridge2stash (with cookies and session but no flash)
-$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
-  ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
-
-# GET /bridge2stash (with cookies and session cleared)
-$t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!!\n");
-
-# GET /late/session (late session does not affect rendering)
-$t->get_ok('/late/session')->status_is(200)->content_is('not yet!');
-
-# GET /late/session (previous late session does affect rendering)
-$t->get_ok('/late/session')->status_is(200)->content_is('works!');
-
-# GET /late/session (previous late session does affect rendering again)
-$t->get_ok('/late/session')->status_is(200)->content_is('works!');
-
-# GET /with/under/count
-$t->get_ok('/with/under/count', {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => 1)->content_is("counter\n");
-
-# GET /bridge2stash (again)
-$t->get_ok('/bridge2stash', {'X-Flash' => 1})->status_is(200)
-  ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
-
-# GET /bridge2stash (with cookies, session and flash)
-$t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
-
-# GET /bridge2stash (with cookies and session but no flash)
-$t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
-  ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
-
-# GET /possible
-$t->get_ok('/possible')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Possible'   => 1)->header_is('X-Impossible' => undef)
-  ->content_is("Possible!\n");
-
-# GET /impossible
-$t->get_ok('/impossible')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Possible'   => undef)->header_is('X-Impossible' => 1)
-  ->content_is("Oops!\n");
-
-# GET /prefix
-$t->get_ok('/prefix')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('prefixed GET works!');
-
-# POST /prefix
-$t->post_ok('/prefix')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('prefixed POST works!');
-
-# GET /prefix/works
-$t->get_ok('/prefix/works')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('prefix works!');
-
-# GET /prefix2/foo
-$t->get_ok('/prefix2/foo')->status_is(200)->content_is("prefixed!\n");
-
-# GET /prefix2/bar
-$t->get_ok('/prefix2/bar')->status_is(200)->content_is("also prefixed!\n");
-
-# GET /reset
-$t->get_ok('/reset')->status_is(200)->content_is('reset works!');
-
-# GET /prefix/reset
-$t->get_ok('/prefix/reset')->status_is(404);
-
-# GET /group
-$t->get_ok('/group')->status_is(200)->content_is("onetwo!\n");
-
-# GET /group/nested
-$t->get_ok('/group/nested')->status_is(200)->content_is("threetwoone!\n");
-
-# GET /group/nested/whatever
-$t->get_ok('/group/nested/whatever')->status_is(200)
-  ->content_is("onetwothree!\n");
-
-# GET /group/nested/something
-$t->get_ok('/group/nested/something')->status_is(404);
-
-# GET /authgroup?ok=1
-$t->get_ok('/authgroup?ok=1')->status_is(200)->content_is("You're ok.");
-
-# GET /authgroup
-$t->get_ok('/authgroup')->status_is(200)->content_is("You're not ok.");
-
-# GET /noauthgroup
-$t->get_ok('/noauthgroup')->status_is(200)->content_is("Whatever one.\n");
 
 # GET /captures/foo/bar
 $t->get_ok('/captures/foo/bar')->status_is(200)
@@ -1991,61 +1495,6 @@ dGVzdCAxMjMKbGFsYWxh
 @@ with_header_condition.html.ep
 Test ok<%= base_tag %>
 
-@@ content_for.html.ep
-This
-<% content_for message => begin =%>Hello<% end %>
-seems
-% content_for message => begin
-    world!
-% end
-to
-<%= content_for 'message' %>
-work!
-
-@@ template_inheritance.html.ep
-% layout 'template_inheritance';
-% title 'Works!';
-<% content header => begin =%>
-<%= b('<br>') %>
-<% end =%>
-<% content sidebar => begin =%>
-Sidebar!
-<% end =%>
-Hello World!
-
-@@ layouts/template_inheritance.html.ep
-<title><%= title %></title>
-% stash foo => 'Default';
-<%= content header => begin =%>
-Default header!
-<% end =%>
-<%= content sidebar => begin =%>
-<%= stash 'foo' %> sidebar!
-<% end =%>
-%= content
-<%= content footer => begin =%>
-Default footer!
-<% end =%>
-
-@@ double_inheritance.html.ep
-% extends 'template_inheritance';
-<% content sidebar => begin =%>
-Sidebar too!
-<% end =%>
-
-@@ layouts/plugin_with_template.html.ep
-layout_with_template
-<%= content %>
-
-@@ nested-includes.html.ep
-Nested <%= include 'outerlayout' %>
-
-@@ param_auth.html.epl
-Bender!
-
-@@ param_auth_denied.html.epl
-Not Bender!
-
 @@ root.html.epl
 % my $self = shift;
 %== $self->url_for('root_path')
@@ -2056,33 +1505,6 @@ Not Bender!
 
 @@ root_path.html.epl
 %== shift->url_for('root');
-
-@@ localized.html.ep
-% layout 'localized1';
-<%= $test %>
-<%= include 'localized_partial', test => 321, layout => 'localized2' %>
-<%= $test %>
-
-@@ localized_partial.html.ep
-<%= $test %>
-
-@@ layouts/localized1.html.ep
-localized1 <%= content %>
-
-@@ layouts/localized2.html.ep
-localized2 <%= content %>
-
-@@ outerlayout.html.ep
-Hello
-<%= include 'outermenu' %>
-
-@@ outermenu.html.ep
-% stash test => 'there';
-<%= dumper [1, 2] %><%= stash 'test' %><br>!
-
-@@ outerinnerlayout.html.ep
-Hello
-<%= include 'outermenu', layout => 'layout' %>
 
 @@ not_found.html.epl
 Oops!
@@ -2108,14 +1530,6 @@ Just works!\
 @@ layouts/layout.html.ep
 layouted <%== content %>
 
-@@ layouts/with_block.html.epl
-<% my $block = begin %>
-<% my ($one, $two) = @_; %>
-One: <%= $one %>
-Two: <%= $two %>
-<% end %>
-with_block <%= $block->('one', 'two') %>
-
 @@ layouts/app23.html.ep
 app layout <%= content %><%= app->mode %>
 
@@ -2131,26 +1545,6 @@ app layout <%= content %><%= app->mode %>
 
 @@ eperror.html.ep
 %= $c->foo('bar');
-
-@@ bridge2stash.html.ep
-% my $cookie = $self->req->cookie('mojolicious');
-<%= stash('_name') %> too!<%= $self->cookie('foo') %>!\
-<%= $self->signed_cookie('bar')%>!<%= $self->signed_cookie('bad')%>!\
-<%= $self->cookie('bad') %>!<%= session 'foo' %>!\
-<%= flash 'foo' %>!<%= $cookie->path if $cookie %>!
-% $self->session(foo => 'session');
-% my $headers = $self->req->headers;
-% $self->flash(foo => 'flash') if $headers->header('X-Flash');
-% $self->session(expires => 1) if $headers->header('X-Flash2');
-
-@@ withundercount.html.ep
-counter
-
-@@ possible.html.ep
-Possible!
-
-@@ impossible.html.ep
-Impossible
 
 @@ favicon.ico
 Not a favicon!

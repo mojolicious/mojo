@@ -75,8 +75,6 @@ sub clone {
   return $self->new(headers => $self->headers->clone);
 }
 
-# "Aren't we forgetting the true meaning of Christmas?
-#  You know, the birth of Santa."
 sub generate_body_chunk {
   my ($self, $offset) = @_;
 
@@ -249,9 +247,6 @@ sub parse_body_once {
   return $self;
 }
 
-# "Quick Smithers. Bring the mind eraser device!
-#  You mean the revolver, sir?
-#  Precisely."
 sub parse_until_body {
   my ($self, $chunk) = @_;
 

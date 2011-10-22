@@ -11,14 +11,15 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 104;
+plan tests => 101;
+
+use_ok 'Mojo::UserAgent';
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
-use_ok 'Mojo::IOLoop';
-use_ok 'Mojo::Transaction::HTTP';
-use_ok 'Mojo::UserAgent';
-use_ok 'ojo';
+use Mojo::IOLoop;
+use Mojo::Transaction::HTTP;
+use ojo;
 
 # Make sure user agents dont taint the ioloop
 my $loop = Mojo::IOLoop->singleton;

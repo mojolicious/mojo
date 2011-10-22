@@ -1,14 +1,15 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 89;
+use Test::More tests => 87;
+
+use_ok 'Mojo::CookieJar';
 
 # "Hello, my name is Mr. Burns. I believe you have a letter for me.
 #  Okay Mr. Burns, what’s your first name.
 #  I don’t know."
-use_ok 'Mojo::CookieJar';
-use_ok 'Mojo::Cookie::Response';
-use_ok 'Mojo::URL';
+use Mojo::Cookie::Response;
+use Mojo::URL;
 
 # Session cookie
 my $jar = Mojo::CookieJar->new;

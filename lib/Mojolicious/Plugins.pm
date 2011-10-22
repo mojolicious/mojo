@@ -49,7 +49,6 @@ sub load_plugin {
   die qq/Plugin "$name" missing, maybe you need to install it?\n/;
 }
 
-# "Let's see how crazy I am now, Nixon. The correct answer is very."
 sub register_plugin {
   my $self = shift;
   my $name = shift;

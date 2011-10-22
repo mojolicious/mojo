@@ -3,13 +3,13 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 698;
+use Test::More tests => 697;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
 use_ok 'Mojo::DOM';
-use_ok 'ojo';
 
+use ojo;
 use Mojo::Util 'encode';
 
 # ojo

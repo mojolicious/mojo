@@ -10,9 +10,12 @@ has start_range => 0;
 sub add_chunk { croak 'Method "add_chunk" not implemented by subclass' }
 sub contains  { croak 'Method "contains" not implemented by subclass' }
 sub get_chunk { croak 'Method "get_chunk" not implemented by subclass' }
-sub move_to   { croak 'Method "move_to" not implemented by subclass' }
-sub size      { croak 'Method "size" not implemented by subclass' }
-sub slurp     { croak 'Method "slurp" not implemented by subclass' }
+
+sub is_file {undef}
+
+sub move_to { croak 'Method "move_to" not implemented by subclass' }
+sub size    { croak 'Method "size" not implemented by subclass' }
+sub slurp   { croak 'Method "slurp" not implemented by subclass' }
 
 1;
 __END__
@@ -69,6 +72,13 @@ Check if asset contains a specific string.
   my $chunk = $asset->get_chunk($offset);
 
 Get chunk of data starting from a specific position.
+
+=head2 C<is_file>
+
+  my $false = $asset->is_file;
+
+False.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<move_to>
 

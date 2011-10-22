@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojolicious.
 2.05    2011-10-22 00:00:00
         - Added EXPERIMENTAL max_memory_size attribute to
           Mojo::Asset::Memory.
+        - Added EXPERIMENTAL is_file method to Mojo::Asset and
+          Mojo::Asset::File.
         - Improved start_tls method in Mojo::IOLoop by allowing it to accept
           more options.
         - Improved MOJO_MAX_MEMORY_SIZE handling by moving it from

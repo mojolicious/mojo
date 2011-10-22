@@ -127,6 +127,8 @@ sub get_chunk {
   return $buffer;
 }
 
+sub is_file {1}
+
 sub move_to {
   my ($self, $path) = @_;
 
@@ -246,6 +248,13 @@ Check if asset contains a specific string.
   my $chunk = $file->get_chunk($start);
 
 Get chunk of data starting from a specific position.
+
+=head2 C<is_file>
+
+  my $true = $file->is_file;
+
+True.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<move_to>
 

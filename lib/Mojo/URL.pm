@@ -445,6 +445,12 @@ Parse URL.
 Path part of this URL, relative paths will be appended to the existing path,
 defaults to a L<Mojo::Path> object.
 
+  # "http://mojolicio.us/Mojo/DOM"
+  say Mojo::URL->new('http://mojolicio.us/perldoc')->path('/Mojo/DOM');
+
+  # "http://mojolicio.us/perldoc/Mojo/DOM"
+  say Mojo::URL->new('http://mojolicio.us/perldoc')->path('Mojo/DOM');
+
 =head2 C<query>
 
   my $query = $url->query;
@@ -454,6 +460,15 @@ defaults to a L<Mojo::Path> object.
   $url      = $url->query(Mojo::Parameters->new);
 
 Query part of this URL, defaults to a L<Mojo::Parameters> object.
+
+  # "http://mojolicio.us?a=2&c=3"
+  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => 2, c => 3);
+
+  # "http://mojolicio.us?a=2&b=2&c=3"
+  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => 2, c => 3]);
+
+  # "http://mojolicio.us?a=1&b=2&a=2&c=3"
+  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query({a => 2, c => 3});
 
 =head2 C<to_abs>
 

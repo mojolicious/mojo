@@ -141,11 +141,9 @@ my %args = (
   }
 );
 $loop->connect(\%args);
-$ENV{MOJO_REUSE} =~ /(?:^|\,)($port\:\d)/;
-my $reuse = $1;
-ok $reuse, 'file descriptor can be reused';
+like $ENV{MOJO_REUSE}, qr/(?:^|\,)$port\:/, 'file descriptor can be reused';
 $loop->start;
-unlike $ENV{MOJO_REUSE}, qr/$reuse/, 'environment has been cleaned up';
+unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)$port\:/, 'environment is clean';
 ok $connected, 'connected';
 ok !$error, 'no error';
 $connected = $error = undef;

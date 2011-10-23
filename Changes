@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.10    2011-10-23 00:00:00
+        - Improved tests.
+
 2.09    2011-10-23 00:00:00
         - Fixed small environment cleanup bug in Mojo::IOLoop::Server.
 

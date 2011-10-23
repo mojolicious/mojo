@@ -162,20 +162,17 @@ sub get { shift->_generate_route('get', @_) }
 sub has_conditions {
   my $self = shift;
   return 1 if @{$self->conditions};
-  if (my $parent = $self->parent) { return $parent->has_conditions }
-  return;
+  return unless my $parent = $self->parent;
+  return $parent->has_conditions;
 }
 
-sub has_custom_name {
-  return 1 if shift->{custom};
-  return;
-}
+sub has_custom_name { shift->{custom} }
 
 sub has_websocket {
   my $self = shift;
   return 1 if $self->is_websocket;
-  if (my $parent = $self->parent) { return $parent->is_websocket }
-  return;
+  return unless my $parent = $self->parent;
+  return $parent->is_websocket;
 }
 
 sub hide { push @{shift->hidden}, @_ }
@@ -184,14 +181,10 @@ sub is_endpoint {
   my $self = shift;
   return   if $self->inline;
   return 1 if $self->block;
-  return   if @{$self->children};
-  return 1;
+  return !@{$self->children};
 }
 
-sub is_websocket {
-  return 1 if shift->{websocket};
-  return;
-}
+sub is_websocket { shift->{websocket} }
 
 sub name {
   my $self = shift;

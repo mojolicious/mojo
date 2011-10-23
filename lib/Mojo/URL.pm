@@ -125,8 +125,7 @@ sub ihost {
 
 sub is_abs {
   my $self = shift;
-  return 1 if $self->scheme && $self->authority;
-  return;
+  return $self->scheme && $self->authority;
 }
 
 sub parse {

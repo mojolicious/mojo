@@ -15,10 +15,7 @@ use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 sub emit      { shift->_emit(0, @_) }
 sub emit_safe { shift->_emit(1, @_) }
 
-sub has_subscribers {
-  return 1 if @{shift->subscribers(shift)};
-  return;
-}
+sub has_subscribers { scalar @{shift->subscribers(shift)} }
 
 sub on {
   my ($self, $name, $cb) = @_;

@@ -509,7 +509,7 @@ while (1) {
 }
 $res->fix_headers;
 is $res->headers->connection, undef, 'no "Connection" value';
-is $res->is_dynamic, undef, 'no dynamic content';
+ok !$res->is_dynamic, 'no dynamic content';
 is $count, length($body), 'right length';
 is $full, $body, 'right content';
 
@@ -530,7 +530,7 @@ while (1) {
   $count++;
 }
 is $res->headers->connection, 'close', 'right "Connection" value';
-is $res->is_dynamic, 1, 'dynamic content';
+ok $res->is_dynamic, 'dynamic content';
 is $count, length($body), 'right length';
 is $full, $body, 'right content';
 
@@ -542,23 +542,23 @@ $res->body('');
 is $res->body, '', 'right content';
 $res->body('hi there!');
 is $res->body, 'hi there!', 'right content';
-is $res->content->has_subscribers('read'), undef, 'no subscribers';
+ok !$res->content->has_subscribers('read'), 'no subscribers';
 $cb = $res->body(sub { });
-is $res->content->has_subscribers('read'), 1, 'has subscribers';
+ok $res->content->has_subscribers('read'), 'has subscribers';
 $res->content->unsubscribe(read => $cb);
-is $res->content->has_subscribers('read'), undef, 'no subscribers';
+ok !$res->content->has_subscribers('read'), 'no subscribers';
 $res->body('');
 is $res->body, '', 'right content';
 $res->body(0);
 is $res->body, 0, 'right content';
-is $res->content->has_subscribers('read'), undef, 'no subscribers';
+ok !$res->content->has_subscribers('read'), 'no subscribers';
 $cb = $res->body(sub { });
-is $res->content->has_subscribers('read'), 1, 'has subscribers';
+ok $res->content->has_subscribers('read'), 'has subscribers';
 $res->content->unsubscribe(read => $cb);
 $res->body('hello!');
-is $res->content->has_subscribers('read'), undef, 'no subscribers';
+ok !$res->content->has_subscribers('read'), 'no subscribers';
 is $res->body, 'hello!', 'right content';
-is $res->content->has_subscribers('read'), undef, 'no subscribers';
+ok !$res->content->has_subscribers('read'), 'no subscribers';
 $res->content(Mojo::Content::MultiPart->new);
 $res->body('hi!');
 is $res->body, 'hi!', 'right content';

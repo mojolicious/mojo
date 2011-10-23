@@ -111,15 +111,9 @@ sub build {
   return $req;
 }
 
-sub is_ipv4 {
-  return 1 if pop =~ $IPV4_RE;
-  return;
-}
+sub is_ipv4 { pop =~ $IPV4_RE }
 
-sub is_ipv6 {
-  return 1 if pop =~ $IPV6_RE;
-  return;
-}
+sub is_ipv6 { pop =~ $IPV6_RE }
 
 sub lookup {
   my ($self, $name, $cb) = @_;

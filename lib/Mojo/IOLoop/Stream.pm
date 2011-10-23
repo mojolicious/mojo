@@ -34,9 +34,7 @@ sub handle { shift->{handle} }
 
 sub is_finished {
   my $self = shift;
-  return if length $self->{buffer};
-  return if @{$self->subscribers('drain')};
-  return 1;
+  return !length($self->{buffer}) && !@{$self->subscribers('drain')};
 }
 
 sub pause {

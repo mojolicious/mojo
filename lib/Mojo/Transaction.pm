@@ -29,17 +29,13 @@ EOF
   shift->is_finished;
 }
 
-sub is_finished {
-  return 1 if (shift->{state} || '') eq 'finished';
-  return;
-}
+sub is_finished { (shift->{state} || '') eq 'finished' }
 
 sub is_websocket {undef}
 
 sub is_writing {
   return 1 unless my $state = shift->{state};
-  return 1 if $state ~~ [qw/write write_start_line write_headers write_body/];
-  return;
+  return $state ~~ [qw/write write_start_line write_headers write_body/];
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!

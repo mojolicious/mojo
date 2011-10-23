@@ -245,8 +245,8 @@ is $req->url->base->path, '/diag/upload/', 'right base path';
 is $req->version, '1.1', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
-is $req->is_secure, undef,         'not secure';
-is $req->body,      'hello=world', 'right content';
+ok !$req->is_secure, 'not secure';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/diag/upload',
   'right absolute URL';
@@ -273,8 +273,8 @@ is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->version, '1.0', 'right version';
 is $req->at_least_version('1.0'), 1,     'at least version 1.0';
 is $req->at_least_version('1.2'), undef, 'not version 1.2';
-is $req->is_secure, 1,             'is secure';
-is $req->body,      'hello=world', 'right content';
+ok $req->is_secure, 'is secure';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'https://localhost/test/index.cgi/foo/bar',
   'right absolute URL';

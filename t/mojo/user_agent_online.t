@@ -224,26 +224,26 @@ $tx->req->write_chunk(
   }
 );
 $ua->start($tx);
-is_deeply([$tx->error],      ['Bad Request', 400], 'right error');
-is_deeply([$tx->res->error], ['Bad Request', 400], 'right error');
+is_deeply [$tx->error],      ['Bad Request', 400], 'right error';
+is_deeply [$tx->res->error], ['Bad Request', 400], 'right error';
 
 # Custom requests with keep alive
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
-ok(!$tx->kept_alive, 'connection was not kept alive');
+ok !$tx->kept_alive, 'connection was not kept alive';
 $ua->start($tx);
-ok($tx->is_finished, 'transaction is finished');
-ok($tx->kept_alive,  'connection was kept alive');
+ok $tx->is_finished, 'transaction is finished';
+ok $tx->kept_alive,  'connection was kept alive';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.apache.org');
-ok(!$tx->kept_alive, 'connection was not kept alive');
+ok !$tx->kept_alive, 'connection was not kept alive';
 $ua->start($tx);
-ok($tx->is_finished,    'transaction is finished');
-ok($tx->kept_alive,     'connection was kept alive');
-ok($tx->local_address,  'has local address');
-ok($tx->local_port > 0, 'has local port');
+ok $tx->is_finished,   'transaction is finished';
+ok $tx->kept_alive,    'connection was kept alive';
+ok $tx->local_address, 'has local address';
+ok $tx->local_port > 0, 'has local port';
 
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -258,13 +258,13 @@ $tx3->req->url->parse('http://www.apache.org');
 $ua->start($tx);
 $ua->start($tx2);
 $ua->start($tx3);
-ok($tx->is_finished,  'transaction is finished');
-ok($tx2->is_finished, 'transaction is finished');
-ok($tx3->is_finished, 'transaction is finished');
-is($tx->res->code,  200, 'right status');
-is($tx2->res->code, 200, 'right status');
-is($tx3->res->code, 200, 'right status');
-like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
+ok $tx->is_finished,  'transaction is finished';
+ok $tx2->is_finished, 'transaction is finished';
+ok $tx3->is_finished, 'transaction is finished';
+is $tx->res->code,  200, 'right status';
+is $tx2->res->code, 200, 'right status';
+is $tx3->res->code, 200, 'right status';
+like $tx2->res->content->asset->slurp, qr/Apache/, 'right content';
 
 # Mixed HEAD and GET requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -275,11 +275,11 @@ $tx2->req->method('GET');
 $tx2->req->url->parse('http://www.apache.org');
 $ua->start($tx);
 $ua->start($tx2);
-ok($tx->is_finished,  'transaction is finished');
-ok($tx2->is_finished, 'transaction is finished');
-is($tx->res->code,  200, 'right status');
-is($tx2->res->code, 200, 'right status');
-like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
+ok $tx->is_finished,  'transaction is finished';
+ok $tx2->is_finished, 'transaction is finished';
+is $tx->res->code,  200, 'right status';
+is $tx2->res->code, 200, 'right status';
+like $tx2->res->content->asset->slurp, qr/Apache/, 'right content';
 
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
@@ -298,12 +298,12 @@ $ua->start($tx);
 $ua->start($tx2);
 $ua->start($tx3);
 $ua->start($tx4);
-ok($tx->is_finished,  'transaction is finished');
-ok($tx2->is_finished, 'transaction is finished');
-ok($tx3->is_finished, 'transaction is finished');
-ok($tx4->is_finished, 'transaction is finished');
-is($tx->res->code,  200, 'right status');
-is($tx2->res->code, 200, 'right status');
-is($tx3->res->code, 200, 'right status');
-is($tx4->res->code, 200, 'right status');
-like($tx2->res->content->asset->slurp, qr/Apache/, 'right content');
+ok $tx->is_finished,  'transaction is finished';
+ok $tx2->is_finished, 'transaction is finished';
+ok $tx3->is_finished, 'transaction is finished';
+ok $tx4->is_finished, 'transaction is finished';
+is $tx->res->code,  200, 'right status';
+is $tx2->res->code, 200, 'right status';
+is $tx3->res->code, 200, 'right status';
+is $tx4->res->code, 200, 'right status';
+like $tx2->res->content->asset->slurp, qr/Apache/, 'right content';

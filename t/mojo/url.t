@@ -18,14 +18,14 @@ is "$url", 'http://kraih.com', 'right format';
 # Advanced
 $url = Mojo::URL->new(
   'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
-is $url->is_abs,   1,                  'is absolute';
-is $url->scheme,   'http',             'right scheme';
-is $url->userinfo, 'sri:foobar',       'right userinfo';
-is $url->host,     'kraih.com',        'right host';
-is $url->port,     '8080',             'right port';
+ok $url->is_abs,   'is absolute';
+is $url->scheme,   'http', 'right scheme';
+is $url->userinfo, 'sri:foobar', 'right userinfo';
+is $url->host,     'kraih.com', 'right host';
+is $url->port,     '8080', 'right port';
 is $url->path,     '/test/index.html', 'right path';
 is $url->query,    'monkey=biz&foo=1', 'right query';
-is $url->fragment, '23',               'right fragment';
+is $url->fragment, '23', 'right fragment';
 is "$url",
   'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23',
   'right format';
@@ -36,12 +36,12 @@ is "$url", 'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#23',
 # Parameters
 $url = Mojo::URL->new(
   'http://sri:foobar@kraih.com:8080?_monkey=biz%3B&_monkey=23#23');
-is $url->is_abs,   1,                           'is absolute';
-is $url->scheme,   'http',                      'right scheme';
-is $url->userinfo, 'sri:foobar',                'right userinfo';
-is $url->host,     'kraih.com',                 'right host';
-is $url->port,     '8080',                      'right port';
-is $url->path,     '',                          'no path';
+ok $url->is_abs,   'is absolute';
+is $url->scheme,   'http', 'right scheme';
+is $url->userinfo, 'sri:foobar', 'right userinfo';
+is $url->host,     'kraih.com', 'right host';
+is $url->port,     '8080', 'right port';
+is $url->path,     '', 'no path';
 is $url->query,    '_monkey=biz%3B&_monkey=23', 'right query';
 is_deeply $url->query->to_hash, {_monkey => ['biz;', 23]}, 'right structure';
 is $url->fragment, '23', 'right fragment';
@@ -62,12 +62,12 @@ is "$url", 'http://sri:foobar@kraih.com:8080?foo=bar#23', 'right format';
 # Query string
 $url = Mojo::URL->new(
   'http://sri:foobar@kraih.com:8080?_monkeybiz%3B&_monkey;23#23');
-is $url->is_abs,   1,                          'is absolute';
-is $url->scheme,   'http',                     'right scheme';
-is $url->userinfo, 'sri:foobar',               'right userinfo';
-is $url->host,     'kraih.com',                'right host';
-is $url->port,     '8080',                     'right port';
-is $url->path,     '',                         'no path';
+ok $url->is_abs,   'is absolute';
+is $url->scheme,   'http', 'right scheme';
+is $url->userinfo, 'sri:foobar', 'right userinfo';
+is $url->host,     'kraih.com', 'right host';
+is $url->port,     '8080', 'right port';
+is $url->path,     '', 'no path';
 is $url->query,    '_monkeybiz%3B&_monkey;23', 'right query';
 is_deeply $url->query->params, ['_monkeybiz;', '', '_monkey', '', 23, ''],
   'right structure';
@@ -78,14 +78,14 @@ is "$url", 'http://sri:foobar@kraih.com:8080?_monkeybiz%3B=&_monkey=&23=#23',
 
 # Relative
 $url = Mojo::URL->new('foo?foo=bar#23');
-is $url->is_abs, undef, 'is not absolute';
+ok !$url->is_abs, 'is not absolute';
 is "$url", 'foo?foo=bar#23', 'right relative version';
 $url = Mojo::URL->new('/foo?foo=bar#23');
-is $url->is_abs, undef, 'is not absolute';
+ok !$url->is_abs, 'is not absolute';
 is "$url", '/foo?foo=bar#23', 'right relative version';
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/');
-is $url->is_abs, 1, 'is absolute';
+ok $url->is_abs, 'is absolute';
 is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
 
 # Relative (base without trailing slash)
@@ -107,7 +107,7 @@ $url = Mojo::URL->new('http://kraih.com/foo/index.html?foo=bar#23');
 $url->base->parse('http://kraih.com/foo/');
 my $rel = $url->to_rel;
 is $rel, 'index.html?foo=bar#23', 'right format';
-is $rel->is_abs, undef, 'not absolute';
+ok !$rel->is_abs, 'not absolute';
 is $rel->to_abs, 'http://kraih.com/foo/index.html?foo=bar#23',
   'right absolute version';
 
@@ -175,23 +175,23 @@ is "$url", 'http://kraih.com/baz?foo=bar#23', 'right canonicalized path';
 # Absolute (base without trailing slash)
 $url = Mojo::URL->new('/foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar');
-is $url->is_abs, undef, 'not absolute';
+ok !$url->is_abs, 'not absolute';
 is $url->to_abs, 'http://kraih.com/foo?foo=bar#23', 'right absolute version';
 $url = Mojo::URL->new('../cages/birds.gif');
 $url->base->parse('http://www.aviary.com/products/intro.html');
-is $url->is_abs, undef, 'not absolute';
+ok !$url->is_abs, 'not absolute';
 is $url->to_abs, 'http://www.aviary.com/cages/birds.gif',
   'right absolute version';
 $url = Mojo::URL->new('.././cages/./birds.gif');
 $url->base->parse('http://www.aviary.com/./products/./intro.html');
-is $url->is_abs, undef, 'not absolute';
+ok !$url->is_abs, 'not absolute';
 is $url->to_abs, 'http://www.aviary.com/cages/birds.gif',
   'right absolute version';
 
 # Absolute with path
 $url = Mojo::URL->new('../foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar/baz/');
-is $url->is_abs, undef, 'not absolute';
+ok !$url->is_abs, 'not absolute';
 is $url->to_abs, 'http://kraih.com/bar/foo?foo=bar#23',
   'right absolute version';
 is $url->to_abs->to_rel, '../foo?foo=bar#23', 'right relative version';
@@ -202,11 +202,11 @@ is $url->to_abs->base, 'http://kraih.com/bar/baz/', 'right base';
 # Real world tests
 $url = Mojo::URL->new('http://acme.s3.amazonaws.com'
     . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
-is $url->is_abs,   1,                                       'is absolute';
-is $url->scheme,   'http',                                  'right scheme';
-is $url->userinfo, undef,                                   'no userinfo';
-is $url->host,     'acme.s3.amazonaws.com',                 'right host';
-is $url->port,     undef,                                   'no port';
+ok $url->is_abs,   'is absolute';
+is $url->scheme,   'http', 'right scheme';
+is $url->userinfo, undef, 'no userinfo';
+is $url->host,     'acme.s3.amazonaws.com', 'right host';
+is $url->port,     undef, 'no port';
 is $url->path,     '/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb', 'right path';
 ok !$url->query->to_string, 'no query';
 is_deeply $url->query->to_hash, {}, 'right structure';
@@ -219,14 +219,14 @@ is "$url",
 $url = Mojo::URL->new(
   'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23');
 my $clone = $url->clone;
-is $clone->is_abs,   1,                  'is absolute';
-is $clone->scheme,   'http',             'right scheme';
-is $clone->userinfo, 'sri:foobar',       'right userinfo';
-is $clone->host,     'kraih.com',        'right host';
-is $clone->port,     '8080',             'right port';
+ok $clone->is_abs,   'is absolute';
+is $clone->scheme,   'http', 'right scheme';
+is $clone->userinfo, 'sri:foobar', 'right userinfo';
+is $clone->host,     'kraih.com', 'right host';
+is $clone->port,     '8080', 'right port';
 is $clone->path,     '/test/index.html', 'right path';
 is $clone->query,    'monkey=biz&foo=1', 'right query';
-is $clone->fragment, '23',               'right fragment';
+is $clone->fragment, '23', 'right fragment';
 is "$clone",
   'http://sri:foobar@kraih.com:8080/test/index.html?monkey=biz&foo=1#23',
   'right format';
@@ -240,7 +240,7 @@ $url->base->parse('http://127.0.0.1');
 is "$url", '/test/index.html', 'right format';
 $clone = $url->clone;
 is "$url", '/test/index.html', 'right format';
-is $clone->is_abs, undef, 'not absolute';
+ok !$clone->is_abs, 'not absolute';
 is $clone->scheme, undef, 'no scheme';
 is $clone->host,   '',    'no host';
 is $clone->base->scheme, 'http',      'right base scheme';
@@ -255,7 +255,7 @@ $url->base->parse('http://127.0.0.1/foo/');
 is "$url", 'test/index.html', 'right format';
 $clone = $url->clone;
 is "$url", 'test/index.html', 'right format';
-is $clone->is_abs, undef, 'not absolute';
+ok !$clone->is_abs, 'not absolute';
 is $clone->scheme, undef, 'no scheme';
 is $clone->host,   '',    'no host';
 is $clone->base->scheme, 'http',      'right base scheme';
@@ -266,30 +266,30 @@ is $clone->to_abs->to_string, 'http://127.0.0.1/foo/test/index.html',
 
 # IPv6
 $url = Mojo::URL->new('http://[::1]:3000/');
-is $url->is_abs, 1,       'is absolute';
-is $url->scheme, 'http',  'right scheme';
+ok $url->is_abs, 'is absolute';
+is $url->scheme, 'http', 'right scheme';
 is $url->host,   '[::1]', 'right host';
-is $url->port,   3000,    'right port';
-is $url->path,   '/',     'right path';
+is $url->port,   3000, 'right port';
+is $url->path,   '/', 'right path';
 is "$url", 'http://[::1]:3000/', 'right format';
 
 # IDNA
 $url = Mojo::URL->new('http://bücher.ch:3000/foo');
-is $url->is_abs, 1,                  'is absolute';
-is $url->scheme, 'http',             'right scheme';
-is $url->host,   'bücher.ch',       'right host';
+ok $url->is_abs, 'is absolute';
+is $url->scheme, 'http', 'right scheme';
+is $url->host,   'bücher.ch', 'right host';
 is $url->ihost,  'xn--bcher-kva.ch', 'right internationalized host';
-is $url->port,   3000,               'right port';
-is $url->path,   '/foo',             'right path';
+is $url->port,   3000, 'right port';
+is $url->path,   '/foo', 'right path';
 is "$url", 'http://xn--bcher-kva.ch:3000/foo', 'right format';
 
 # IDNA (snowman)
 $url = Mojo::URL->new('http://☃.net/');
-is $url->is_abs, 1,             'is absolute';
-is $url->scheme, 'http',        'right scheme';
-is $url->host,   '☃.net',     'right host';
+ok $url->is_abs, 'is absolute';
+is $url->scheme, 'http', 'right scheme';
+is $url->host,   '☃.net', 'right host';
 is $url->ihost,  'xn--n3h.net', 'right internationalized host';
-is $url->path,   '/',           'right path';
+is $url->path,   '/', 'right path';
 is "$url", 'http://xn--n3h.net/', 'right format';
 
 # Already absolute
@@ -315,11 +315,11 @@ is $url->query->param('q'), 'шарифулин', 'right query value';
 $url = Mojo::URL->new(
   'http://☃.net/привет/привет/?привет=шарифулин'
 );
-is $url->is_abs, 1,             'is absolute';
-is $url->scheme, 'http',        'right scheme';
-is $url->host,   '☃.net',     'right host';
+ok $url->is_abs, 'is absolute';
+is $url->scheme, 'http', 'right scheme';
+is $url->host,   '☃.net', 'right host';
 is $url->ihost,  'xn--n3h.net', 'right internationalized host';
-is $url->path, '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
+is $url->path,   '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
   . '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/', 'right host';
 is $url->path->parts->[0], 'привет', 'right path part';
 is $url->path->parts->[1], 'привет', 'right path part';
@@ -334,19 +334,19 @@ is "$url",
 # Empty path elements
 $url = Mojo::URL->new('http://kraih.com/foo//bar/23/');
 $url->base->parse('http://kraih.com/');
-is $url->is_abs, 1, 'is absolute';
+ok $url->is_abs, 'is absolute';
 is $url->to_rel, 'foo//bar/23/', 'right relative version';
 $url = Mojo::URL->new('http://kraih.com//foo//bar/23/');
 $url->base->parse('http://kraih.com/');
-is $url->is_abs, 1, 'is absolute';
+ok $url->is_abs, 'is absolute';
 is $url->to_rel, 'foo//bar/23/', 'right relative version';
 $url = Mojo::URL->new('http://kraih.com/foo///bar/23/');
 $url->base->parse('http://kraih.com/');
-is $url->is_abs, 1,                                'is absolute';
-is $url->to_rel, 'foo///bar/23/',                  'right relative version';
+ok $url->is_abs, 'is absolute';
+is $url->to_rel, 'foo///bar/23/', 'right relative version';
 is $url->to_abs, 'http://kraih.com/foo///bar/23/', 'right absolute version';
-is $url->is_abs, 1,                                'is absolute';
-is $url->to_rel, 'foo///bar/23/',                  'right relative version';
+ok $url->is_abs, 'is absolute';
+is $url->to_rel, 'foo///bar/23/', 'right relative version';
 
 # Merge relative path
 $url = Mojo::URL->new('http://foo.bar/baz?yada');

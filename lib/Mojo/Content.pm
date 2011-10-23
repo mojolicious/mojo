@@ -112,17 +112,12 @@ sub get_header_chunk {
 
 sub has_leftovers {
   my $self = shift;
-  return 1 if length $self->{buffer} || length $self->{pre_buffer};
-  return;
+  return length($self->{buffer}) || length($self->{pre_buffer});
 }
 
 sub header_size { length shift->build_headers }
 
-sub is_chunked {
-  my $self = shift;
-  my $encoding = $self->headers->transfer_encoding || '';
-  return $encoding =~ /chunked/i ? 1 : 0;
-}
+sub is_chunked { (shift->headers->transfer_encoding || '') =~ /chunked/i }
 
 # DEPRECATED in Leaf Fluttering In Wind!
 sub is_done {
@@ -134,21 +129,14 @@ EOF
 
 sub is_dynamic {
   my $self = shift;
-  return 1 if $self->{dynamic} && !defined $self->headers->content_length;
-  return;
+  return $self->{dynamic} && !defined $self->headers->content_length;
 }
 
-sub is_finished {
-  return 1 if (shift->{state} || '') eq 'finished';
-  return;
-}
+sub is_finished { (shift->{state} || '') eq 'finished' }
 
 sub is_multipart {undef}
 
-sub is_parsing_body {
-  return 1 if (shift->{state} || '') eq 'body';
-  return;
-}
+sub is_parsing_body { (shift->{state} || '') eq 'body' }
 
 sub leftovers {
   my $self = shift;

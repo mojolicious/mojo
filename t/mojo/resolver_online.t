@@ -119,7 +119,7 @@ $r->resolve(
   }
 );
 Mojo::IOLoop->start;
-is $r->is_ipv6($result), 1, 'valid IPv6 record';
+ok $r->is_ipv6($result), 'valid IPv6 record';
 ok $ttl, 'got a TTL value';
 
 # Resolve CNAME record
@@ -177,7 +177,7 @@ $r->resolve(
   }
 );
 Mojo::IOLoop->start;
-is $r->is_ipv4($a1), 1, 'valid IPv4 record';
+ok $r->is_ipv4($a1), 'valid IPv4 record';
 is $a1, $a2, 'PTR roundtrip succeeded';
 
 # Resolve PTR record (IPv6)

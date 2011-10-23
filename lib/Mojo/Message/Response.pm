@@ -121,8 +121,7 @@ sub fix_headers {
 sub is_status_class {
   my ($self, $class) = @_;
   return unless my $code = $self->code;
-  return 1 if $code >= $class && $code < ($class + 100);
-  return;
+  return $code >= $class && $code < ($class + 100);
 }
 
 sub _build_start_line {

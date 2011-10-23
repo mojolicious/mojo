@@ -98,17 +98,12 @@ sub fix_headers {
 }
 
 sub is_secure {
-  my $self = shift;
-  my $url  = $self->url;
-  return 1 if ($url->scheme || $url->base->scheme || '') eq 'https';
-  return;
+  my $url = shift->url;
+  return ($url->scheme || $url->base->scheme || '') eq 'https';
 }
 
 sub is_xhr {
-  my $self = shift;
-  return unless my $with = $self->headers->header('X-Requested-With');
-  return 1 if $with =~ /XMLHttpRequest/i;
-  return;
+  (shift->headers->header('X-Requested-With') || '') =~ /XMLHttpRequest/i;
 }
 
 sub param {

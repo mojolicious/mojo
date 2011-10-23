@@ -191,8 +191,8 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $ws,   undef, 'not a websocket';
-is $code, 426,   'right code';
+ok !$ws, 'not a websocket';
+is $code, 426, 'right code';
 ok $body =~ /^(\d+)failed!$/, 'right content';
 ok $1 < 100, 'right timeout';
 
@@ -412,10 +412,10 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $finished,  1,                       'transaction is finished';
-is $websocket, undef,                   'no websocket';
-is $code,      500,                     'right status';
-is $message,   'Internal Server Error', 'right message';
+ok $finished, 'transaction is finished';
+ok !$websocket, 'no websocket';
+is $code, 500, 'right status';
+is $message, 'Internal Server Error', 'right message';
 
 # WebSocket /foo (forbidden)
 ($websocket, $code, $message) = undef;
@@ -429,9 +429,9 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $websocket, undef,          'no websocket';
-is $code,      403,            'right status';
-is $message,   "i'm a teapot", 'right message';
+ok !$websocket, 'no websocket';
+is $code,    403,            'right status';
+is $message, "i'm a teapot", 'right message';
 
 # WebSocket /deadcallback (dies in callback)
 $ua->websocket(

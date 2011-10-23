@@ -99,6 +99,8 @@ Mojo::IOWatcher::EV - EV non-blocking I/O watcher
 
   use Mojo::IOWatcher::EV;
 
+  my $watcher = Mojo::IOWatcher::EV->new;
+
 =head1 DESCRIPTION
 
 L<Mojo::IOWatcher::EV> is a minimalistic non-blocking I/O watcher with

@@ -312,12 +312,12 @@ Request processing callback, defaults to calling the C<dispatch> method.
 Generally you will use a plugin or controller instead of this, consider it
 the sledgehammer in your toolbox.
 
-  my $old = $app->on_process;
+  my $next = $app->on_process;
   $app->on_process(sub {
     my ($self, $c) = @_;
     return $c->render(text => 'Hello world!')
       if $c->req->url->path->contains('/hello');
-    $self->$old($c);
+    $self->$next($c);
   });
 
 =head2 C<plugins>

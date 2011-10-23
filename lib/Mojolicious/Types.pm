@@ -68,6 +68,8 @@ Mojolicious::Types - MIME types
 
   use Mojolicious::Types;
 
+  my $types = Mojolicious::Types->new;
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Types> is a container for MIME types.

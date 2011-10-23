@@ -166,6 +166,8 @@ Mojolicious::Static - Serve static files
 
   use Mojolicious::Static;
 
+  my $static = Mojolicious::Static->new;
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Static> is a dispatcher for static files with C<Range> and

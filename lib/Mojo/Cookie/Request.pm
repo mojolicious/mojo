@@ -78,7 +78,6 @@ Mojo::Cookie::Request - HTTP 1.1 request cookie container
   my $cookie = Mojo::Cookie::Request->new;
   $cookie->name('foo');
   $cookie->value('bar');
-
   say $cookie;
 
 =head1 DESCRIPTION

@@ -357,6 +357,8 @@ Mojo::Transaction::WebSocket - WebSocket transaction container
 
   use Mojo::Transaction::WebSocket;
 
+  my $ws = Mojo::Transaction::WebSocket->new;
+
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions as

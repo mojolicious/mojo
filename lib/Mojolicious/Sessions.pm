@@ -92,6 +92,8 @@ Mojolicious::Sessions - Signed cookie based sessions
 
   use Mojolicious::Sessions;
 
+  my $sessions = Mojolicious::Sessions->new;
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Sessions> is a very simple signed cookie based session

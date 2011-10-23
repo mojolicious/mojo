@@ -243,7 +243,7 @@ Mojo::Content::MultiPart - HTTP 1.1 multipart content container
 
   my $multi = Mojo::Content::MultiPart->new;
   $multi->parse('Content-Type: multipart/mixed; boundary=---foobar');
-  my $part = $multi->parts->[4];
+  my $single = $multi->parts->[4];
 
 =head1 DESCRIPTION
 

@@ -650,8 +650,13 @@ Check if message is at least a specific version.
   $message   = $message->body('Hello!');
   my $cb     = $message->body(sub {...});
 
-Access and replace text content or register C<read> event with content, which
-will be emitted when new content arrives.
+Access and replace text content or register C<read> event with C<content>,
+which will be emitted when new data arrives.
+
+  $message->body(sub {
+    my ($message, $chunk) = @_;
+    say "Streaming: $chunk";
+  });
 
 =head2 C<body_params>
 

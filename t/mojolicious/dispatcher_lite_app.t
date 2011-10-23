@@ -15,13 +15,13 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # Wrap whole application
-my $old = app->on_process;
+my $next = app->on_process;
 app->on_process(
   sub {
     my ($self, $c) = @_;
     return $c->render(text => 'Wrapped!')
       if $c->req->url->path->contains('/wrap');
-    $self->$old($c);
+    $self->$next($c);
   }
 );
 

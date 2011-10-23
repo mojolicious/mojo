@@ -127,6 +127,7 @@ Mojo::CookieJar - Cookie jar for HTTP 1.1 user agents
 =head1 SYNOPSIS
 
   use Mojo::CookieJar;
+
   my $jar = Mojo::CookieJar->new;
 
 =head1 DESCRIPTION

@@ -220,6 +220,7 @@ Mojo::Exception - Exceptions with context
 =head1 SYNOPSIS
 
   use Mojo::Exception;
+
   my $e = Mojo::Exception->new;
 
 =head1 DESCRIPTION

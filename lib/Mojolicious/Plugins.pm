@@ -98,6 +98,9 @@ Mojolicious::Plugins - Plugins
 
   use Mojolicious::Plugins;
 
+  my $plugins = Mojolicious::Plugin->new;
+  $plugins->load_plugin('Config');
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugins> is the plugin manager of L<Mojolicious>.

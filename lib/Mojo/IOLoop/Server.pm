@@ -74,6 +74,7 @@ has iowatcher => sub {
 
 sub DESTROY {
   my $self = shift;
+  if (my $port = $self->{port}) { $ENV{MOJO_REUSE} =~ s/(?:^|\,)$port\:\d+// }
   if (my $cert = $self->{cert}) { unlink $cert if -w $cert }
   if (my $key  = $self->{key})  { unlink $key  if -w $key }
   return unless my $watcher = $self->{iowatcher};
@@ -88,7 +89,7 @@ sub listen {
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # Look for reusable file descriptor
-  my $reuse = my $port = $args->{port} || 3000;
+  my $reuse = my $port = $self->{port} = $args->{port} || 3000;
   $ENV{MOJO_REUSE} ||= '';
   my $fd;
   if ($ENV{MOJO_REUSE} =~ /(?:^|\,)$reuse\:(\d+)/) { $fd = $1 }

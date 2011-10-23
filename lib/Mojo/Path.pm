@@ -193,6 +193,9 @@ Construct a new L<Mojo::Path> object.
 
 Canonicalize path.
 
+  # "/foo/baz"
+  say Mojo::Path->new('/foo/bar/../baz')->canonicalize;
+
 =head2 C<clone>
 
   my $clone = $path->clone;
@@ -205,6 +208,16 @@ Clone path.
 
 Check if path contains given prefix.
 Note that this method is EXPERIMENTAL and might change without warning!
+
+  # True
+  Mojo::Path->new('/foo/bar')->contains('/');
+  Mojo::Path->new('/foo/bar')->contains('/foo');
+  Mojo::Path->new('/foo/bar')->contains('/foo/bar');
+
+  # False
+  Mojo::Path->new('/foo/bar')->contains('/f');
+  Mojo::Path->new('/foo/bar')->contains('/bar');
+  Mojo::Path->new('/foo/bar')->contains('/whatever');
 
 =head2 C<parse>
 

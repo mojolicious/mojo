@@ -294,8 +294,7 @@ sub is_dynamic { shift->content->is_dynamic }
 sub is_finished { (shift->{state} || '') eq 'finished' }
 
 sub is_limit_exceeded {
-  my $self = shift;
-  return unless my $code = ($self->error)[1];
+  return unless my $code = (shift->error)[1];
   return $code ~~ [413, 431];
 }
 

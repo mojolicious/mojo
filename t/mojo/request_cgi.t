@@ -29,8 +29,8 @@ is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
 is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
@@ -60,8 +60,8 @@ is $req->url->base->host, 'mojolicio.us',     'right base host';
 is $req->url->base->port, '',                 'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
 is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
   'http://mojolicio.us/test/index.cgi/foo/bar?lalala=23&bar=baz',
@@ -90,8 +90,8 @@ is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
 is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string,
@@ -123,8 +123,8 @@ is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
 is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string, 'http://Aladdin:open%20sesame@localhost:8080'
@@ -162,8 +162,8 @@ is $req->url->base->host, 'test1',      'right base host';
 is $req->url->base->port, '',           'right base port';
 ok !$req->url->query->to_string, 'no query';
 is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'request=&ajax=true&login=test&password=111&'
   . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right content';
 is $req->param('ajax'),     'true', 'right value';
@@ -196,8 +196,8 @@ is $req->url->base->host, 'test1',      'right base host';
 is $req->url->base->port, '',           'right base port';
 ok !$req->url->query->to_string, 'no query';
 is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'request=&ajax=true&login=test&password=111&'
   . 'edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4', 'right content';
 is $req->param('ajax'),     'true', 'right value';
@@ -243,8 +243,8 @@ is $req->url->base->port, 13028,       'right base port';
 is $req->url->path, '', 'right path';
 is $req->url->base->path, '/diag/upload/', 'right base path';
 is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 ok !$req->is_secure, 'not secure';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
@@ -271,8 +271,8 @@ is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, 'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 ok $req->is_secure, 'is secure';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
@@ -299,8 +299,8 @@ is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, 'foo/bar/', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar/',
@@ -325,8 +325,8 @@ is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, '/foo/bar', 'right path';
 is $req->url->base->path, '', 'right base path';
 is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/foo/bar',
@@ -351,8 +351,8 @@ is $req->url->base->host, 'localhost', 'right base host';
 is $req->url->path, '', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->version, '1.0', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi',
@@ -376,8 +376,8 @@ is $req->url->path, '', 'right path';
 is $req->url->base->path, '/cgi-bin/bootylicious/bootylicious.pl/',
   'right base path';
 is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url->to_abs->to_string,
   'http://getbootylicious.org/cgi-bin/bootylicious/bootylicious.pl',
   'right absolute URL';
@@ -429,8 +429,8 @@ is $req->url->base->host, '127.0.0.1', 'right base host';
 is $req->url->path, '/diag/upload', 'right path';
 is $req->url->base->path, '', 'no base path';
 is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url->to_abs->to_string,
   'http://127.0.0.1:13028/diag/upload',
   'right absolute URL';
@@ -456,8 +456,8 @@ is $req->url->base->host, 'kraih.com', 'right base host';
 is $req->url->path, 'feed/bannana', 'right path';
 is $req->url->base->path, '/sandbox-myapp/monkey.cgi/', 'right base path';
 is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url->to_abs->to_string,
   'http://kraih.com/sandbox-myapp/monkey.cgi/feed/bannana',
   'right absolute URL';
@@ -485,8 +485,8 @@ is $req->url->base->host, 'kraih.com', 'right base host';
 is $req->url->path, '', 'right path';
 is $req->url->base->path, '/sandbox-myapp/monkey.cgi/', 'right base path';
 is $req->version, '1.1', 'right version';
-is $req->at_least_version('1.0'), 1,     'at least version 1.0';
-is $req->at_least_version('1.2'), undef, 'not version 1.2';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url->to_abs->to_string,
   'http://kraih.com/sandbox-myapp/monkey.cgi',
   'right absolute URL';

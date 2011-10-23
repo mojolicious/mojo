@@ -205,7 +205,7 @@ $ua->get(
 );
 Mojo::IOLoop->start;
 is $result, "https://localhost:$port/proxy", 'right content';
-is $kept_alive, 1, 'kept alive';
+ok $kept_alive, 'kept alive';
 
 # WebSocket /test (kept alive proxy websocket)
 $ua->https_proxy("http://localhost:$proxy");
@@ -227,9 +227,9 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $kept_alive, 1,                 'kept alive';
+ok $kept_alive, 'kept alive';
 is $connected,  "localhost:$port", 'connected';
-is $result,     'test1test2',      'right result';
+is $result,     'test1test2', 'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
@@ -246,5 +246,5 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $success, undef, 'no success';
+ok !$success, 'no success';
 is $error, 'Proxy connection failed.', 'right message';

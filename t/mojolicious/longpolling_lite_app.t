@@ -242,8 +242,8 @@ $t->get_ok('/shortpoll')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('this was short.');
-is $t->tx->kept_alive, undef, 'connection was not kept alive';
-is $t->tx->keep_alive, undef, 'connection will not be kept alive';
+ok !$t->tx->kept_alive, 'connection was not kept alive';
+ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $shortpoll, 1, 'finished';
 
 # GET /shortpoll/plain
@@ -251,8 +251,8 @@ $t->get_ok('/shortpoll/plain')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('this was short and plain.');
-is $t->tx->kept_alive, undef, 'connection was not kept alive';
-is $t->tx->keep_alive, 1,     'connection will be kept alive';
+ok !$t->tx->kept_alive, 'connection was not kept alive';
+ok $t->tx->keep_alive, 'connection will be kept alive';
 is $shortpoll_plain, 'finished!', 'finished';
 
 # GET /shortpoll/nolength
@@ -261,8 +261,8 @@ $t->get_ok('/shortpoll/nolength')->status_is(200)
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => undef)->content_type_is('text/plain')
   ->content_is('this was short and had no length.');
-is $t->tx->kept_alive, 1,     'connection was not kept alive';
-is $t->tx->keep_alive, undef, 'connection will be kept alive';
+ok $t->tx->kept_alive, 'connection was kept alive';
+ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $shortpoll_nolength, 'finished!', 'finished';
 
 # GET /longpoll
@@ -270,8 +270,8 @@ $t->get_ok('/longpoll')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('hi there, whats up?');
-is $t->tx->kept_alive, undef, 'connection was kept alive';
-is $t->tx->keep_alive, 1,     'connection will be kept alive';
+ok !$t->tx->kept_alive, 'connection was not kept alive';
+ok $t->tx->keep_alive, 'connection will be kept alive';
 is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll (interrupted)
@@ -314,7 +314,7 @@ $t->get_ok('/longpoll/nolength')->status_is(200)
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => undef)->content_type_is('text/plain')
   ->content_is('hi there, what length?');
-is $t->tx->keep_alive, undef, 'connection will not be kept alive';
+ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $longpoll_nolength, 'finished!', 'finished';
 
 # GET /longpoll/nested

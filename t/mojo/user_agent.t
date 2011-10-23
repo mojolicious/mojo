@@ -48,9 +48,9 @@ $ua->http_proxy(undef);
 $ua->https_proxy(undef);
 is $ua->http_proxy,  undef, 'right proxy';
 is $ua->https_proxy, undef, 'right proxy';
-is $ua->need_proxy('dummy.mojolicio.us'), undef, 'no proxy needed';
-is $ua->need_proxy('icio.us'),            1,     'proxy needed';
-is $ua->need_proxy('localhost'),          1,     'proxy needed';
+ok !$ua->need_proxy('dummy.mojolicio.us'), 'no proxy needed';
+ok $ua->need_proxy('icio.us'),   'proxy needed';
+ok $ua->need_proxy('localhost'), 'proxy needed';
 $ENV{HTTP_PROXY}  = undef;
 $ENV{HTTPS_PROXY} = undef;
 $ENV{NO_PROXY}    = undef;
@@ -60,14 +60,14 @@ $ENV{no_proxy}    = 'localhost,localdomain,foo.com,kraih.com';
 $ua->detect_proxy;
 is $ua->http_proxy,  'proxy.kraih.com',  'right proxy';
 is $ua->https_proxy, 'tunnel.kraih.com', 'right proxy';
-is $ua->need_proxy('dummy.mojolicio.us'),    1,     'proxy needed';
-is $ua->need_proxy('icio.us'),               1,     'proxy needed';
-is $ua->need_proxy('localhost'),             undef, 'proxy needed';
-is $ua->need_proxy('localhost.localdomain'), undef, 'no proxy needed';
-is $ua->need_proxy('foo.com'),               undef, 'no proxy needed';
-is $ua->need_proxy('kraih.com'),             undef, 'no proxy needed';
-is $ua->need_proxy('www.kraih.com'),         undef, 'no proxy needed';
-is $ua->need_proxy('www.kraih.com.com'),     1,     'proxy needed';
+ok $ua->need_proxy('dummy.mojolicio.us'), 'proxy needed';
+ok $ua->need_proxy('icio.us'),            'proxy needed';
+ok !$ua->need_proxy('localhost'),             'proxy needed';
+ok !$ua->need_proxy('localhost.localdomain'), 'no proxy needed';
+ok !$ua->need_proxy('foo.com'),               'no proxy needed';
+ok !$ua->need_proxy('kraih.com'),             'no proxy needed';
+ok !$ua->need_proxy('www.kraih.com'),         'no proxy needed';
+ok $ua->need_proxy('www.kraih.com.com'), 'proxy needed';
 $ENV{HTTP_PROXY}  = $backup;
 $ENV{HTTPS_PROXY} = $backup2;
 $ENV{NO_PROXY}    = $backup3;
@@ -186,23 +186,23 @@ $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 # GET / (missing Content-Lengt header)
 $tx = $ua->get("http://localhost:$port2/");
 ok $tx->success, 'successful';
-ok !$tx->error, 'no error';
-is $tx->kept_alive, undef, 'kept connection not alive';
-is $tx->keep_alive, 1,     'keep connection alive';
+ok !$tx->error,      'no error';
+ok !$tx->kept_alive, 'kept connection not alive';
+ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
 
 # GET / (mock server)
 $tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
-is $tx->kept_alive, undef, 'kept connection not alive';
+ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
 $tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-is $tx->kept_alive, 1, 'kept connection alive';
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
@@ -212,14 +212,14 @@ Mojo::IOLoop->singleton->_drop($last);
 # GET / (mock server closed connection)
 $tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
-is $tx->kept_alive, undef, 'kept connection not alive';
+ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
 $tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-is $tx->kept_alive, 1, 'kept connection alive';
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
@@ -229,14 +229,14 @@ Mojo::IOLoop->singleton->_drop($last);
 # GET / (mock server closed connection)
 $tx = $ua->get("http://localhost:$port/mock");
 ok $tx->success, 'successful';
-is $tx->kept_alive, undef, 'kept connection not alive';
+ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (mock server again)
 $tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-is $tx->kept_alive, 1, 'kept connection alive';
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 

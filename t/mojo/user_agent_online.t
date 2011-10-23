@@ -75,7 +75,7 @@ $ua->get(
   }
 );
 Mojo::IOLoop->singleton->start;
-is $kept_alive, 1, 'connection was kept alive';
+ok $kept_alive, 'connection was kept alive';
 
 # Nested keep alive
 my @kept_alive;
@@ -156,7 +156,7 @@ is $tx->req->headers->content_length, 17, 'right content length';
 is $tx->req->body,   'query=mojolicious', 'right content';
 like $tx->res->body, qr/Mojolicious/,     'right content';
 is $tx->res->code,   200,                 'right status';
-is $tx->keep_alive, 1, 'connection will be kept alive';
+ok $tx->keep_alive, 'connection will be kept alive';
 
 # Simple keep alive form POST
 $tx =
@@ -167,7 +167,7 @@ is $tx->req->headers->content_length, 17, 'right content length';
 is $tx->req->body,   'query=mojolicious', 'right content';
 like $tx->res->body, qr/Mojolicious/,     'right content';
 is $tx->res->code,   200,                 'right status';
-is $tx->kept_alive, 1, 'connection was kept alive';
+ok $tx->kept_alive, 'connection was kept alive';
 
 # Simple request
 $tx = $ua->get('http://www.apache.org');
@@ -185,7 +185,7 @@ $tx = $ua->get('http://www.apache.org');
 is $tx->req->method, 'GET',                   'right method';
 is $tx->req->url,    'http://www.apache.org', 'right url';
 is $tx->res->code,   200,                     'right status';
-is $tx->kept_alive, 1, 'connection was kept alive';
+ok $tx->kept_alive, 'connection was kept alive';
 $tx = $ua->get('http://www.google.de');
 is $tx->req->method, 'GET',                  'right method';
 is $tx->req->url,    'http://www.google.de', 'right url';

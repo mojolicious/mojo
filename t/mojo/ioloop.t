@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 15;
+use Test::More tests => 17;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -141,7 +141,11 @@ my %args = (
   }
 );
 $loop->connect(\%args);
+$ENV{MOJO_REUSE} =~ /(?:^|\,)($port\:\d)/;
+my $reuse = $1;
+ok $reuse, 'file descriptor can be reused';
 $loop->start;
+unlike $ENV{MOJO_REUSE}, qr/$reuse/, 'environment has been cleaned up';
 ok $connected, 'connected';
 ok !$error, 'no error';
 $connected = $error = undef;

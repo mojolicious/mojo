@@ -774,7 +774,7 @@ Get local information about a connection.
 
   my $address = $info->{address};
 
-These values are to be expected in the returned hash reference.
+These values can be expected in the returned hash reference:
 
 =over 2
 
@@ -844,7 +844,7 @@ Get remote information about a connection.
 
   my $address = $info->{address};
 
-These values are to be expected in the returned hash reference.
+These values can be expected in the returned hash reference:
 
 =over 2
 

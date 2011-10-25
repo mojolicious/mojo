@@ -463,7 +463,7 @@ and the application object, as well as a function in C<ep> templates.
 
 Extend L<Mojolicious> by adding hooks to named events.
 
-The following events are available and run in the listed order.
+These events are currently available and run in the listed order:
 
 =over 2
 
@@ -547,8 +547,7 @@ Useful for all kinds of postprocessing tasks.
 
 Load a plugin with L<Mojolicious::Plugins/"register_plugin">.
 
-The following plugins are included in the L<Mojolicious> distribution as
-examples.
+These plugins are included in the L<Mojolicious> distribution as examples:
 
 =over 2
 
@@ -724,7 +723,7 @@ Sebastian Riedel, C<sri@cpan.org>.
 
 =head1 CREDITS
 
-In alphabetical order.
+In alphabetical order:
 
 =over 2
 

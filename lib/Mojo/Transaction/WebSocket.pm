@@ -29,41 +29,6 @@ has handshake => sub { Mojo::Transaction::HTTP->new };
 has 'masked';
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-
-  # Prepare "message" event
-  $self->on(
-    frame => sub {
-      my ($self, $frame) = @_;
-
-      # Ping
-      my $op = $frame->[1] || CONTINUATION;
-      return $self->send_frame(1, PONG, $frame->[2]) if $op == PING;
-
-      # Close
-      return $self->finish if $op == CLOSE;
-
-      # Append chunk and check message size
-      $self->{op} = $op unless exists $self->{op};
-      $self->{message} .= $frame->[2];
-      return $self->finish
-        if length $self->{message} > $self->max_websocket_size;
-
-      # No FIN bit (Continuation)
-      return unless $frame->[0];
-
-      # Message
-      my $message = $self->{message};
-      $self->{message} = '';
-      decode 'UTF-8', $message if $message && delete $self->{op} == TEXT;
-      $self->emit(message => $message);
-    }
-  );
-
-  return $self;
-}
-
 sub build_frame {
   my ($self, $fin, $op, $payload) = @_;
   warn "BUILDING FRAME\n" if DEBUG;
@@ -305,6 +270,28 @@ sub server_read {
   $self->{message} //= '';
   while (my $frame = $self->parse_frame(\$self->{read})) {
     $self->emit(frame => $frame);
+    my $op = $frame->[1] || CONTINUATION;
+
+    # Ping
+    $self->send_frame(1, PONG, $frame->[2]) and next if $op == PING;
+
+    # Close
+    $self->finish and next if $op == CLOSE;
+
+    # Append chunk and check message size
+    $self->{op} = $op unless exists $self->{op};
+    $self->{message} .= $frame->[2];
+    $self->finish and last
+      if length $self->{message} > $self->max_websocket_size;
+
+    # No FIN bit (Continuation)
+    next unless $frame->[0];
+
+    # Message
+    my $message = $self->{message};
+    $self->{message} = '';
+    decode 'UTF-8', $message if $message && delete $self->{op} == TEXT;
+    $self->emit(message => $message);
   }
 
   # Resume
@@ -441,13 +428,6 @@ C<MOJO_MAX_WEBSOCKET_SIZE> or C<262144>.
 
 L<Mojo::Transaction::WebSocket> inherits all methods from
 L<Mojo::Transaction> and implements the following new ones.
-
-=head2 C<new>
-
-  my $ws = Mojo::Transaction::WebSocket->new;
-  my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx);
-
-Construct a new L<Mojo::Transaction::WebSocket> object.
 
 =head2 C<build_frame>
 

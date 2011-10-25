@@ -59,6 +59,7 @@ Mojolicious::Command::eval - Eval command
 =head1 DESCRIPTION
 
 L<Mojolicious::Command::eval> runs code against applications.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES

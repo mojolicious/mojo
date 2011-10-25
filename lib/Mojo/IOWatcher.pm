@@ -177,6 +177,7 @@ Mojo::IOWatcher - Non-blocking I/O watcher
 L<Mojo::IOWatcher> is a minimalistic non-blocking I/O watcher and the
 foundation of L<Mojo::IOLoop>.
 L<Mojo::IOWatcher::EV> is a good example for its extensibility.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
@@ -216,7 +217,6 @@ Cancel timer.
 
 Detect and load the best watcher implementation available, will try the value
 of the C<MOJO_IOWATCHER> environment variable or L<Mojo::IOWatcher::EV>.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_readable>
 

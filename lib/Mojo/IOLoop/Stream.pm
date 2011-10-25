@@ -167,6 +167,7 @@ Mojo::IOLoop::Stream - IOLoop stream
 
 L<Mojo::IOLoop::Stream> is a container for streaming handles used by
 L<Mojo::IOLoop>.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS

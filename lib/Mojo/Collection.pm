@@ -101,6 +101,7 @@ Mojo::Collection - Collection
 =head1 DESCRIPTION
 
 L<Mojo::Collection> is a container for collections.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

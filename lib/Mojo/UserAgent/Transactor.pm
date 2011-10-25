@@ -282,6 +282,7 @@ Mojo::UserAgent::Transactor - User agent transactor
 
 L<Mojo::UserAgent::Transactor> is the transaction building and manipulation
 framework used by L<Mojo::UserAgent>.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
@@ -385,7 +386,6 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 
 Versatile L<Mojo::Transaction::WebSocket> builder for WebSocket handshake
 requests.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

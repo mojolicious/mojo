@@ -105,6 +105,7 @@ Mojo::IOWatcher::EV - EV non-blocking I/O watcher
 
 L<Mojo::IOWatcher::EV> is a minimalistic non-blocking I/O watcher with
 C<libev> support.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

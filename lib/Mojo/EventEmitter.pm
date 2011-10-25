@@ -117,6 +117,7 @@ Mojo::EventEmitter - Event emitter base class
 =head1 DESCRIPTION
 
 L<Mojo::EventEmitter> is a simple base class for event emitting objects.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

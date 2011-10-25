@@ -479,6 +479,7 @@ Mojo::DOM::CSS - CSS3 selector engine
 =head1 DESCRIPTION
 
 L<Mojo::DOM::CSS> is the CSS3 selector engine used by L<Mojo::DOM>.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 SELECTORS

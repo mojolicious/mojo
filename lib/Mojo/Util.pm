@@ -676,6 +676,7 @@ Mojo::Util - Portable utility functions
 =head1 DESCRIPTION
 
 L<Mojo::Util> provides portable utility functions for L<Mojo>.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 FUNCTIONS

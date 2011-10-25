@@ -282,6 +282,7 @@ Mojo::IOLoop::Server - IOLoop socket server
 
 L<Mojo::IOLoop::Server> accepts incoming socket connections for
 L<Mojo::IOLoop>.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS

@@ -46,6 +46,7 @@ L<Mojolicious::Plugin::CallbackCondition> is a routes condition for
 callbacks.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins.
+
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

@@ -11,7 +11,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 87;
+use Test::More tests => 91;
 
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
@@ -56,12 +56,13 @@ websocket '/unicode' => sub {
 # WebSocket /bytes
 websocket '/bytes' => sub {
   my $self = shift;
-  $self->on_message(
-    sub {
-      my ($self, $message) = @_;
-      $self->send_message([$message]);
+  $self->tx->on(
+    frame => sub {
+      my ($ws, $frame) = @_;
+      $ws->send_message([$frame->[1] == 2 ? 'binary' : 'text', $frame->[2]]);
     }
   );
+  $self->rendered(101);
 };
 
 # WebSocket /once
@@ -158,14 +159,26 @@ $t->websocket_ok('/unicode')->send_message_ok('hello again')
   ->message_is('♥: hello again')->send_message_ok('and one ☃ more time')
   ->message_is('♥: and one ☃ more time')->finish_ok;
 
-# WebSocket /bytes
+# WebSocket /bytes (binary frame and frame event)
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
-$t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
-  ->finish_ok;
+$t->websocket_ok('/bytes');
+my $binary;
+my $cb = $t->tx->on(
+  frame => sub {
+    my ($ws, $frame) = @_;
+    $binary++ if $frame->[1] == 2;
+  }
+);
+$t->send_message_ok([binary => $bytes])->message_is($bytes);
+ok $binary, 'received binary frame';
+$binary = undef;
+$t->send_message_ok([text => $bytes])->message_is($bytes)->finish_ok;
+ok !$binary, 'received text frame';
 
 # WebSocket /bytes (multiple times)
-$t->websocket_ok('/bytes')->send_message_ok([$bytes])->message_is($bytes)
-  ->send_message_ok([$bytes])->message_is($bytes)->finish_ok;
+$t->websocket_ok('/bytes')->send_message_ok([binary => $bytes])
+  ->message_is($bytes)->send_message_ok([binary => $bytes])
+  ->message_is($bytes)->finish_ok;
 
 # WebSocket /once
 $t->websocket_ok('/once')->send_message_ok('hello')->message_is('ONE: hello')

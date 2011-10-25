@@ -1,6 +1,11 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.10    2011-10-24 00:00:00
+2.10    2011-10-25 00:00:00
+        - Added EXPERIMENTAL send_frame method to
+          Mojo::Transaction::WebSocket.
+        - Added EXPERIMENTAL frame event to Mojo::Transaction::WebSocket.
+        - Changed syntax for binary messages in Mojo::Transaction::WebSocket.
+            [$bytes] becomes [binary => $bytes]
         - Improved documentation.
         - Improved tests.
 
@@ -1209,9 +1214,9 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999923 2010-03-07 00:00:00
         - Made Mojo::Client sync by default with optional async support, this
           massively improves usability!
-              my $tx = $client->get('http://mojolicious.org');
-              print $client->get('http://search.cpan.org')->res->body;
-              my $tx = $client->post_form('http://kraih.com', {q => 'mojo'});
+            my $tx = $client->get('http://mojolicious.org');
+            print $client->get('http://search.cpan.org')->res->body;
+            my $tx = $client->post_form('http://kraih.com', {q => 'mojo'});
         - Made plugins much more configurable.
         - Improved PSGI support and added "psgi" command.
         - Added automatic environment detection for Plack based servers,
@@ -1295,10 +1300,10 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added UNIX domain socket support to daemons.
         - Added transparent kqueue and epoll support to daemons and client.
         - Added support for listening to multiple locations to the daemons.
-              mojo daemon --listen http://127.0.0.1:3000
-              mojo daemon --listen http://*:3000,http://*:3001,http://*:3002
-              mojo daemon --listen http://[::1]:3000
-              mojo daemon --listen https://*:443:/x/server.crt:/x/server.key
+            mojo daemon --listen http://127.0.0.1:3000
+            mojo daemon --listen http://*:3000,http://*:3001,http://*:3002
+            mojo daemon --listen http://[::1]:3000
+            mojo daemon --listen https://*:443:/x/server.crt:/x/server.key
         - Added routes captures to params in Mojolicious.
         - Added native PSGI support.
         - Added the ability to have multiple Mojolicious::Lite apps at once.
@@ -1307,11 +1312,11 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added simple reverse proxy support with tests.
         - Added simpler way to define default controller and action for a
           route.
-              $r->route('/foo')->to('mycontroller#myaction');
+            $r->route('/foo')->to('mycontroller#myaction');
         - Added simple way to define default controller or action for a
           route. (mvuets)
-              $r->route('/foo/:controller')->to('#myaction');
-              $r->route('/foo/:action')->to('mycontroller#');
+            $r->route('/foo/:controller')->to('#myaction');
+            $r->route('/foo/:action')->to('mycontroller#');
         - Added multipart post support to Test::Mojo. (yuki-kimoto)
         - Added env attribute to Mojo::Message::Request.
         - Added range support to MojoX::Dispatcher::Static. (xantus)
@@ -1472,12 +1477,12 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added more designer friendly .ep templates to Mojolicious.
           The default template format for your application can be controlled
           with the default_handler attribute of the mojolicious renderer.
-              Mojolicious (in the startup method):
-                  $self->renderer->default_handler('epl');
-                  $self->renderer->default_handler('ep');
-	          Mojolicious::Lite:
-	              app->renderer->default_handler('epl');
-	              app->renderer->default_handler('ep');
+          Mojolicious (in the startup method):
+              $self->renderer->default_handler('epl');
+              $self->renderer->default_handler('ep');
+	        Mojolicious::Lite:
+	          app->renderer->default_handler('epl');
+	          app->renderer->default_handler('ep');
         - Added helper support for .ep templates.
         - Added callback tests. (melo)
         - Added support for MOJO_CHUNK_SIZE=1. (melo)
@@ -1537,9 +1542,9 @@ This file documents the revision history for Perl extension Mojolicious.
           "Mojo(licious)::Script" with "Mojo(licious)::Command" manually.
         - Removed unused features from Mojo::Base and simplified API, this
           change is not backwards compatible!
-              __PACKAGE__->attr('foo', default => 'bar');
+            __PACKAGE__->attr('foo', default => 'bar');
           becomes
-              __PACKAGE__->attr(foo => 'bar');
+            __PACKAGE__->attr(foo => 'bar');
         - Merged eplite and epl, this change is not backwards compatible, you
           will have to rename all your eplite templates to epl.
         - Simplified MojoX::Renderer, this change is not backwards
@@ -1547,25 +1552,25 @@ This file documents the revision history for Perl extension Mojolicious.
           Handler can no longer be detected, that means "default_handler" or
           the "handler" argument are required.
           The template argument can no longer contain format or handler.
-              $self->render(template => 'foo.html.epl')
+            $self->render(template => 'foo.html.epl')
           becomes
-              $self->render('foo', format => 'html', handler => 'epl')
+            $self->render('foo', format => 'html', handler => 'epl')
           The following forms are available now.
-              $self->render;
-              $self->render(controller => 'foo', action => 'bar');
-              $self->render({controller => 'foo', action => 'bar'});
-              $self->render(text => 'Hello!');
-              $self->render(template => 'index');
-              $self->render(template => 'foo/index');
-              $self->render(
-                  template => 'index',
-                  format   => 'html',
-                  handler  => 'epl'
-              );
-              $self->render(handler => 'something');
-              $self->render('foo/bar');
-              $self->render('foo/bar', format => 'html');
-              $self->render('foo/bar', {format => 'html'});
+            $self->render;
+            $self->render(controller => 'foo', action => 'bar');
+            $self->render({controller => 'foo', action => 'bar'});
+            $self->render(text => 'Hello!');
+            $self->render(template => 'index');
+            $self->render(template => 'foo/index');
+            $self->render(
+              template => 'index',
+              format   => 'html',
+              handler  => 'epl'
+            );
+            $self->render(handler => 'something');
+            $self->render('foo/bar');
+            $self->render('foo/bar', format => 'html');
+            $self->render('foo/bar', {format => 'html'});
           For renderers the stash will no longer get an updated template,
           instead a new argument will be passed along.
               {template => 'foo/bar', format => 'html', handler => 'epl'}
@@ -1579,15 +1584,15 @@ This file documents the revision history for Perl extension Mojolicious.
           everything is in $self now.
         - Refactored and renamed Mojo::Transaction and Mojo::Pipeline, this
           change is not backwards compatible!
-              Mojo::Transaction -> Mojo::Transaction::Single
-              Mojo::Pipeline -> Mojo::Transaction::Pipeline
+            Mojo::Transaction -> Mojo::Transaction::Single
+            Mojo::Pipeline -> Mojo::Transaction::Pipeline
         - Refactored and renamed Mojo::File and Mojo::File::Memory, this
           change is not backwards compatible!
-              Mojo::File -> Mojo::Asset::File
-              Mojo::File::Memory -> Mojo::Asset::Memory
+            Mojo::File -> Mojo::Asset::File
+            Mojo::File::Memory -> Mojo::Asset::Memory
         - Refactored and renamed Mojo::Content, this change is not backwards
           compatible!
-              Mojo::Content -> Mojo::Content::Single
+            Mojo::Content -> Mojo::Content::Single
         - Added conditions to MojoX::Routes.
         - Added routes script to Mojolicious.
         - Simplified Mojo::Base.
@@ -1638,8 +1643,8 @@ This file documents the revision history for Perl extension Mojolicious.
 0.991242 2009-07-27 00:00:00
         - Cleaned up the whole script system, this change is mostly backwards
           compatible except for a few cases.
-              "daemon $port" now becomes "daemon -p $port"
-              "mojolicious mojo $script" becomes "mojolicious $script"
+            "daemon $port" now becomes "daemon -p $port"
+            "mojolicious mojo $script" becomes "mojolicious $script"
         - Added HTML escape expression marks "<%==" and "%==" to
           Mojo::Template.
         - Added more Mojolicious::Lite examples and reformatted them into a
@@ -1656,8 +1661,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Changed routes syntax again, this change is not entirely backwards
           compatible but will only affect you if you are using the relaxed
           and wildcard variations.
-              "/((foo))" becomes "/(.foo)"
-              "/(((foo)))" becomes "/(*foo)"
+            "/((foo))" becomes "/(.foo)"
+            "/(((foo)))" becomes "/(*foo)"
         - Updated Mojolicious to support ->render(text => 'Hello World!').
         - Updated Mojo::Script::get_data to use "@@ $name" instead of
           "__$name__".

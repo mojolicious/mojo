@@ -944,8 +944,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
   $c = $c->send_message('Hi there!');
   $c = $c->send_message('Hi there!', sub {...});
-  $c = $c->send_message([$bytes]);
-  $c = $c->send_message([$bytes], sub {...});
 
 Send a message non-blocking via WebSocket, the optional drain callback will
 be invoked once all data has been written.

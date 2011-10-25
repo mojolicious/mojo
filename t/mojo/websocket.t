@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 44;
+use Test::More tests => 45;
 
 # "I can't believe it! Reading and writing actually paid off!"
 use IO::Socket::INET;
@@ -483,3 +483,21 @@ $ua->websocket(
 );
 $loop->start;
 is $result, 'hi' x 200000, 'right result';
+
+# WebSocket /echo (ping/pong)
+my $pong;
+$ua->websocket(
+  '/echo' => sub {
+    my $tx = pop;
+    $tx->on(
+      frame => sub {
+        my ($tx, $frame) = @_;
+        $pong = $frame->[2] if $frame->[1] == 10;
+        Mojo::IOLoop->stop;
+      }
+    );
+    $tx->send_frame(1, 9, 'test');
+  }
+);
+Mojo::IOLoop->start;
+is $pong, 'test', 'received pong with payload';

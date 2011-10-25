@@ -272,13 +272,15 @@ sub server_read {
     $self->emit(frame => $frame);
     my $op = $frame->[1] || CONTINUATION;
 
-    # Ping
+    # Ping/Pong
     $self->send_frame(1, PONG, $frame->[2]) and next if $op == PING;
+    next if $op == PONG;
 
     # Close
     $self->finish and next if $op == CLOSE;
 
     # Append chunk and check message size
+    next unless $self->has_subscribers('message');
     $self->{op} = $op unless exists $self->{op};
     $self->{message} .= $frame->[2];
     $self->finish and last

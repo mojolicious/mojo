@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.11    2011-10-25 00:00:00
+        - Improved Mojo::IOLoop::Stream to only emit close events once.
+
 2.10    2011-10-25 00:00:00
         - Added EXPERIMENTAL send_frame method to
           Mojo::Transaction::WebSocket.

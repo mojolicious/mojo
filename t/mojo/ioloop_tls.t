@@ -69,10 +69,8 @@ is $client, 'test321', 'right content';
 $loop   = Mojo::IOLoop->singleton;
 $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
-my $server_close = my $client_close = 0;
-my ($drop, $running);
+my ($drop, $running, $error, $server_close, $client_close);
 Mojo::IOLoop->drop(Mojo::IOLoop->recurring(0 => sub { $drop++ }));
-my $error = '';
 $loop->listen(
   port      => $port,
   tls       => 1,

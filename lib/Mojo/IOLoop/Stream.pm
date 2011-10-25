@@ -20,7 +20,7 @@ sub DESTROY {
   $self->pause if $self->{iowatcher};
   return unless my $handle = $self->{handle};
   close $handle;
-  $self->emit_safe('close');
+  $self->_close;
 }
 
 sub new {
@@ -74,6 +74,11 @@ sub write {
   $self->iowatcher->writing($self->{handle}) if $self->{handle};
 }
 
+sub _close {
+  my $self = shift;
+  $self->emit_safe('close') unless $self->{closed}++;
+}
+
 sub _read {
   my $self = shift;
 
@@ -87,14 +92,14 @@ sub _read {
     return if $! ~~ [EAGAIN, EINTR, EWOULDBLOCK];
 
     # Closed
-    return $self->emit_safe('close') if $! == ECONNRESET;
+    return $self->_close if $! == ECONNRESET;
 
     # Read error
     return $self->emit_safe(error => $!);
   }
 
   # EOF
-  return $self->emit_safe('close') if $read == 0;
+  return $self->_close if $read == 0;
 
   # Handle read
   $self->emit_safe(read => $buffer);
@@ -115,7 +120,7 @@ sub _write {
       return if $! ~~ [EAGAIN, EINTR, EWOULDBLOCK];
 
       # Closed
-      return $self->emit_safe('close') if $! ~~ [ECONNRESET, EPIPE];
+      return $self->_close if $! ~~ [ECONNRESET, EPIPE];
 
       # Write error
       return $self->emit_safe(error => $!);

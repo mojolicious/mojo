@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -162,3 +162,22 @@ $loop->connect(
 $loop->start;
 ok !$connected, 'not connected';
 ok $error, 'has error';
+
+# Dropped connection
+$port = Mojo::IOLoop->generate_port;
+my ($server_close, $client_close);
+Mojo::IOLoop->listen(
+  address  => 'localhost',
+  port     => $port,
+  on_close => sub { $server_close++ }
+);
+Mojo::IOLoop->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_close   => sub { $client_close++ },
+  on_connect => sub { shift->drop(shift) }
+);
+Mojo::IOLoop->timer('0.5' => sub { shift->stop });
+Mojo::IOLoop->start;
+is $server_close, 1, 'server emitted close event once';
+is $client_close, 1, 'client emitted close event once';

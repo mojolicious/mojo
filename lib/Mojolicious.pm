@@ -471,48 +471,51 @@ The following events are available and run in the listed order.
 
 Triggered right after the transaction is built and before the HTTP request
 gets parsed, the callbacks of this hook run in the order they were added.
-One use case would be upload progress bars.
-(Passed the transaction and application instances)
 
   $app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;
   });
 
+One use case would be upload progress bars.
+(Passed the transaction and application instances)
+
 =item before_dispatch
 
 Triggered right before the static and routes dispatchers start their work,
 the callbacks of this hook run in the order they were added.
-Very useful for rewriting incoming requests and other preprocessing tasks.
-(Passed the default controller instance)
 
   $app->hook(before_dispatch => sub {
     my $self = shift;
   });
+
+Very useful for rewriting incoming requests and other preprocessing tasks.
+(Passed the default controller instance)
 
 =item after_static_dispatch
 
 Triggered after the static dispatcher determined if a static file should be
 served and before the routes dispatcher starts its work, the callbacks of
 this hook run in reverse order.
-Mostly used for custom dispatchers and postprocessing static file responses.
-(Passed the default controller instance)
 
   $app->hook(after_static_dispatch => sub {
     my $self = shift;
   });
 
+Mostly used for custom dispatchers and postprocessing static file responses.
+(Passed the default controller instance)
+
 =item before_render
 
 Triggered right before the renderer turns the stash into a response, the
 callbacks of this hook run in the order they were added.
-Very useful for making adjustments to the stash right before rendering.
-(Passed the current controller instance and argument hash)
+Note that this hook is EXPERIMENTAL and might change without warning!
 
   $app->hook(before_render => sub {
     my ($self, $args) = @_;
   });
 
-Note that this hook is EXPERIMENTAL and might change without warning!
+Very useful for making adjustments to the stash right before rendering.
+(Passed the current controller instance and argument hash)
 
 =item after_dispatch
 
@@ -520,12 +523,13 @@ Triggered after a response has been rendered, the callbacks of this hook run
 in reverse order.
 Note that this hook can trigger before C<after_static_dispatch> due to its
 dynamic nature.
-Useful for all kinds of postprocessing tasks.
-(Passed the current controller instance)
 
   $app->hook(after_dispatch => sub {
     my $self = shift;
   });
+
+Useful for all kinds of postprocessing tasks.
+(Passed the current controller instance)
 
 =back
 

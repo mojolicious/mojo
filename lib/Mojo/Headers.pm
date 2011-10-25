@@ -486,8 +486,6 @@ Parse headers from a hash.
   $headers   = $headers->header('Content-Type' => 'text/plain');
 
 Get or replace the current header values.
-Note that this method is context sensitive and will turn all header lines
-into a single one in scalar context.
 
   # Multiple headers with the same name
   for my $header ($headers->header('Set-Cookie')) {

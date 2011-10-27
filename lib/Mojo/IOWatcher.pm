@@ -17,12 +17,8 @@ sub add {
   my $self   = shift;
   my $handle = shift;
   my $args   = {@_, handle => $handle};
-
   $self->{handles}->{fileno $handle} = $args;
-  $args->{on_writable}
-    ? $self->writing($handle)
-    : $self->not_writing($handle);
-
+  $self->watch($handle, 1, $args->{on_writable});
   return $self;
 }
 
@@ -51,14 +47,6 @@ sub is_readable {
   return !!$result;
 }
 
-sub not_writing {
-  my ($self, $handle) = @_;
-  my $poll = $self->_poll;
-  $poll->remove($handle);
-  $poll->mask($handle, POLLIN);
-  return $self;
-}
-
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
 sub recurring { shift->_timer(pop, after => pop, recurring => time) }
 
@@ -81,11 +69,15 @@ sub stop { delete shift->{running} }
 #  The same way you got me, by accident on a golf course."
 sub timer { shift->_timer(pop, after => pop, started => time) }
 
-sub writing {
-  my ($self, $handle) = @_;
+sub watch {
+  my ($self, $handle, $read, $write) = @_;
+
   my $poll = $self->_poll;
   $poll->remove($handle);
-  $poll->mask($handle, POLLIN | POLLOUT);
+  if ($read && $write) { $poll->mask($handle, POLLIN | POLLOUT) }
+  elsif ($read)  { $poll->mask($handle, POLLIN) }
+  elsif ($write) { $poll->mask($handle, POLLOUT) }
+
   return $self;
 }
 
@@ -224,12 +216,6 @@ of the C<MOJO_IOWATCHER> environment variable or L<Mojo::IOWatcher::EV>.
 Quick check if a handle is readable, useful for identifying tainted
 sockets.
 
-=head2 C<not_writing>
-
-  $watcher = $watcher->not_writing($handle);
-
-Only watch handle for readable events.
-
 =head2 C<recurring>
 
   my $id = $watcher->recurring(3 => sub {...});
@@ -261,11 +247,11 @@ Stop watching for I/O and timer events.
 
 Create a new timer, invoking the callback after a given amount of seconds.
 
-=head2 C<writing>
+=head2 C<watch>
 
-  $watcher = $watcher->writing($handle);
+  $watcher = $watcher->watch($handle, $read, $write);
 
-Watch handle for readable and writable events.
+Watch handle for events.
 
 =head1 DEBUGGING
 

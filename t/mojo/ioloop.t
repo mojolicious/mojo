@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 19;
+use Test::More tests => 22;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -106,7 +106,7 @@ $loop->listen(
   port      => $port,
   on_accept => sub {
     my $self = shift;
-    $handle = $self->handle(pop);
+    $handle = $self->stream(pop)->handle;
     $self->stop;
   },
   on_read  => sub { },
@@ -120,6 +120,42 @@ $loop->connect(
 );
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
+
+# Stream
+$port = Mojo::IOLoop->generate_port;
+my $buffer = '';
+Mojo::IOLoop->listen(
+  port      => $port,
+  on_accept => sub { $buffer .= 'accepted' },
+  on_read   => sub {
+    my ($loop, $id, $chunk) = @_;
+    $buffer .= $chunk;
+    return unless $buffer eq 'acceptedhello';
+    $loop->write($id => 'world');
+    $loop->drop($id);
+  }
+);
+my $t = Mojo::IOLoop->trigger;
+Mojo::IOLoop->connect(
+  address    => 'localhost',
+  port       => $port,
+  on_connect => $t->begin,
+  on_close   => sub { $buffer .= 'should not happen' },
+  on_error   => sub { $buffer .= 'should not happen either' },
+);
+$handle = Mojo::IOLoop->stream($t->start)->steal_handle;
+my $stream = Mojo::IOLoop->singleton->stream_class->new($handle);
+$id = Mojo::IOLoop->stream(
+  $stream => {
+    on_close => sub { Mojo::IOLoop->stop },
+    on_read  => sub { $buffer .= pop }
+  }
+);
+$stream->write('hello');
+ok Mojo::IOLoop->stream($id), 'stream exists';
+Mojo::IOLoop->start;
+ok !Mojo::IOLoop->stream($id), 'stream does not exist anymore';
+is $buffer, 'acceptedhelloworld', 'right result';
 
 # Dropped listen socket
 $port  = Mojo::IOLoop->generate_port;

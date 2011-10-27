@@ -17,8 +17,9 @@ has iowatcher => sub {
 #  including my children..."
 sub DESTROY {
   my $self = shift;
-  $self->pause if $self->{iowatcher};
-  return unless my $handle = $self->{handle};
+  return unless my $watcher = $self->{iowatcher};
+  return unless my $handle  = $self->{handle};
+  $watcher->remove($handle);
   close $handle;
   $self->_close;
 }
@@ -32,31 +33,40 @@ sub new {
 
 sub handle { shift->{handle} }
 
-sub is_finished {
+sub is_writing {
   my $self = shift;
-  return !length($self->{buffer}) && !@{$self->subscribers('drain')};
+  return length($self->{buffer}) || $self->has_subscribers('drain');
 }
 
 sub pause {
   my $self = shift;
-  $self->iowatcher->remove($self->{handle}) if $self->{handle};
+  return if $self->{paused}++;
+  $self->iowatcher->watch($self->{handle}, 0, $self->is_writing);
 }
 
 sub resume {
   my $self = shift;
-  weaken $self;
-  $self->iowatcher->add(
-    $self->{handle},
-    on_readable => sub { $self->_read },
-    on_writable => sub { $self->_write }
-  );
+
+  # Start streaming
+  unless ($self->{streaming}++) {
+    weaken $self;
+    return $self->iowatcher->add(
+      $self->{handle},
+      on_readable => sub { $self->_read },
+      on_writable => sub { $self->_write }
+    );
+  }
+
+  # Resume streaming
+  return unless delete $self->{paused};
+  $self->iowatcher->watch($self->{handle}, 1, $self->is_writing);
 }
 
 # "No children have ever meddled with the Republican Party and lived to tell
 #  about it."
 sub steal_handle {
   my $self = shift;
-  $self->pause;
+  $self->iowatcher->remove($self->{handle});
   return delete $self->{handle};
 }
 
@@ -71,7 +81,8 @@ sub write {
   else     { return unless length $self->{buffer} }
 
   # Start writing
-  $self->iowatcher->writing($self->{handle}) if $self->{handle};
+  $self->iowatcher->watch($self->{handle}, !$self->{paused}, 1)
+    if $self->{handle};
 }
 
 sub _close {
@@ -134,8 +145,8 @@ sub _write {
   $self->emit_safe('drain') if !length $self->{buffer};
 
   # Stop writing
-  return if length $self->{buffer} || @{$self->subscribers('drain')};
-  $self->iowatcher->not_writing($handle);
+  return if $self->is_writing;
+  $self->iowatcher->watch($handle, !$self->{paused}, 0);
 }
 
 1;
@@ -239,11 +250,11 @@ Construct a new L<Mojo::IOLoop::Stream> object.
 
 Get handle for stream.
 
-=head2 C<is_finished>
+=head2 C<is_writing>
 
-  my $success = $stream->is_finished;
+  my $success = $stream->is_writing;
 
-Check if stream is in a state where it is safe to close or steal the handle.
+Check if stream is writing.
 
 =head2 C<pause>
 

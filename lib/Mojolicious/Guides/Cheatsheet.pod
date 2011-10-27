@@ -205,6 +205,13 @@ level like C<debug> or C<error>.
   MOJO_LOG_LEVEL=debug
   MOJO_LOG_LEVEL=error
 
+=head2 C<MOJO_MAX_LEFTOVER_SIZE>
+
+Maximum size in bytes of buffer for pipelined HTTP requests, defaults to
+C<262144>.
+
+  MOJO_MAX_LEFTOVER_SIZE=2048
+
 =head2 C<MOJO_MAX_LINE_SIZE>
 
 Maximum line size for HTTP message start lines and headers in bytes, defaults

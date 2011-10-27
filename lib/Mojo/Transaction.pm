@@ -196,13 +196,13 @@ implements the following new ones.
 
 =head2 C<client_close>
 
-  $tx = $tx->client_close;
+  $tx->client_close;
 
 Transaction closed.
 
 =head2 C<client_read>
 
-  $tx = $tx->client_read($chunk);
+  $tx->client_read($chunk);
 
 Read and process client data.
 
@@ -257,13 +257,13 @@ Resume transaction.
 
 =head2 C<server_close>
 
-  $tx = $tx->server_close;
+  $tx->server_close;
 
 Transaction closed.
 
 =head2 C<server_read>
 
-  $tx = $tx->server_read($chunk);
+  $tx->server_read($chunk);
 
 Read and process server data.
 

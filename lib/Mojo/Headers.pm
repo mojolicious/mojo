@@ -180,7 +180,7 @@ sub is_limit_exceeded { shift->{limit} }
 
 sub last_modified { scalar shift->header('Last-Modified' => @_) }
 
-sub leftovers { shift->{buffer} }
+sub leftovers { delete shift->{buffer} }
 
 sub location { scalar shift->header(Location => @_) }
 

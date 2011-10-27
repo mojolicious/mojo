@@ -445,13 +445,13 @@ Check WebSocket handshake challenge.
 
 =head2 C<client_handshake>
 
-  $ws = $ws->client_handshake;
+  $ws->client_handshake;
 
 WebSocket handshake.
 
 =head2 C<client_read>
 
-  $ws = $ws->client_read($data);
+  $ws->client_read($data);
 
 Read raw WebSocket data.
 
@@ -547,13 +547,13 @@ be invoked once all data has been written.
 
 =head2 C<server_handshake>
 
-  $ws = $ws->server_handshake;
+  $ws->server_handshake;
 
 WebSocket handshake.
 
 =head2 C<server_read>
 
-  $ws = $ws->server_read($data);
+  $ws->server_read($data);
 
 Read raw WebSocket data.
 

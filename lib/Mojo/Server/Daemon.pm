@@ -280,7 +280,7 @@ sub _read {
   # Make sure we have a transaction
   my $c = $self->{connections}->{$id};
   my $tx = $c->{transaction} || $c->{websocket};
-  $tx = $c->{transaction} = $self->_build_tx($id, $c) unless $tx;
+  $tx ||= $c->{transaction} = $self->_build_tx($id, $c);
 
   # Parse chunk
   $tx->server_read($chunk);
@@ -312,16 +312,25 @@ sub _write {
 
   # Get chunk
   my $chunk = $tx->server_write;
+  warn "> $chunk\n" if DEBUG;
 
   # Write
+  my $loop = $self->ioloop;
+  $loop->write($id, $chunk);
+
+  # Finish or continue writing
   weaken $self;
   my $cb = sub { $self->_write($id) };
   if ($tx->is_finished) {
-    $self->_finish($id, $tx);
-    $cb = undef unless $c->{transaction} || $c->{websocket};
+    if ($tx->has_subscribers('finish')) {
+      $cb = sub { $self->_finish($id, $tx) }
+    }
+    else {
+      $self->_finish($id, $tx);
+      return unless $c->{transaction} || $c->{websocket};
+    }
   }
-  $self->ioloop->write($id, $chunk, $cb);
-  warn "> $chunk\n" if DEBUG;
+  $loop->write($id, '', $cb);
 }
 
 1;

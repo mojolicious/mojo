@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 113;
+use Test::More tests => 119;
 
 # "I was God once.
 #  Yes, I saw. You were doing well until everyone died."
@@ -214,6 +214,15 @@ get '/longpoll/dynamic/delayed' => sub {
   );
 } => 'dynamic';
 
+# GET /finish
+my $finish;
+get '/finish' => sub {
+  my $self   = shift;
+  my $stream = Mojo::IOLoop->stream($self->tx->connection);
+  $self->on_finish(sub { $finish = $stream->is_writing });
+  $self->render(text => 'Finish!');
+};
+
 # GET /too_long
 my $too_long;
 get '/too_long' => sub {
@@ -378,6 +387,12 @@ $t->get_ok('/longpoll/dynamic/delayed')->status_is(201)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_like('Set-Cookie' => qr/baz=yada/)->content_is('Dynamic!');
 is $longpoll_dynamic_delayed, 'finished!', 'finished';
+
+# GET /finish
+$t->get_ok('/finish')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Finish!');
+ok !$finish, 'finish event timing is right';
 
 # GET /too_long (timeout)
 $tx = $t->ua->keep_alive_timeout(1)->build_tx(GET => '/too_long');

@@ -91,7 +91,7 @@ implements the following new ones.
 
 Maximum asset size in bytes, only attempt upgrading to a L<Mojo::Asset::File>
 object after reaching this limit, defaults to the value of
-C<MOJO_MAX_MEMORY_SIZE> or C<5262144>.
+C<MOJO_MAX_MEMORY_SIZE> or C<262144>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

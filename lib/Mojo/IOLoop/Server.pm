@@ -251,8 +251,8 @@ sub _tls {
 
   # Switch between reading and writing
   my $error = $IO::Socket::SSL::SSL_ERROR;
-  if    ($error == TLS_READ)  { $self->iowatcher->not_writing($handle) }
-  elsif ($error == TLS_WRITE) { $self->iowatcher->writing($handle) }
+  if    ($error == TLS_READ)  { $self->iowatcher->watch($handle, 1, 0) }
+  elsif ($error == TLS_WRITE) { $self->iowatcher->watch($handle, 1, 1) }
 }
 
 1;

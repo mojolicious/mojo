@@ -29,8 +29,8 @@ sub once {
   my $wrapper;
   $wrapper = sub {
     my $self = shift;
-    $self->$cb(@_);
     $self->unsubscribe($name => $wrapper);
+    $self->$cb(@_);
   };
   $self->on($name => $wrapper);
   weaken $wrapper;

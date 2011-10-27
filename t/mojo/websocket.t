@@ -228,7 +228,7 @@ is $early,    1, 'finish event has been emitted at the right time';
 ok $result =~ /^lalala(\d+)$/, 'right result';
 ok $1 > 100, 'right timeout';
 ok $local, 'local port';
-is $loop->handle($tx->connection), $socket, 'right connection id';
+is $loop->stream($tx->connection)->handle, $socket, 'right connection id';
 
 # WebSocket /early_start (server directly sends a message)
 my $flag2;

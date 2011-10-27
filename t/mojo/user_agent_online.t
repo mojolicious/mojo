@@ -36,7 +36,7 @@ $ua->get(
 $loop->start;
 $ua = undef;
 $loop->one_tick(0);
-ok !$loop->handle($id), 'loop not tainted';
+ok !$loop->stream($id), 'loop not tainted';
 is $code, 301, 'right status';
 
 # Fresh user agent

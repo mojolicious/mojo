@@ -8,6 +8,7 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 has [qw/auto_relax relaxed/] => 0;
 has headers => sub { Mojo::Headers->new };
+has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
 sub body_contains {
   croak 'Method "body_contains" not implemented by subclass';
@@ -110,10 +111,7 @@ sub get_header_chunk {
   return substr $self->{header_buffer}, $offset, CHUNK_SIZE;
 }
 
-sub has_leftovers {
-  my $self = shift;
-  return length($self->{buffer}) || length($self->{pre_buffer});
-}
+sub has_leftovers { length(shift->{buffer} || '') }
 
 sub header_size { length shift->build_headers }
 
@@ -138,16 +136,7 @@ sub is_multipart {undef}
 
 sub is_parsing_body { (shift->{state} || '') eq 'body' }
 
-sub leftovers {
-  my $self = shift;
-
-  # Chunked leftovers are in the chunked buffer, and so are those from a
-  # HEAD request
-  return $self->{pre_buffer} if length $self->{pre_buffer};
-
-  # Normal leftovers
-  return $self->{buffer};
-}
+sub leftovers { shift->{buffer} }
 
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_read {
@@ -186,7 +175,9 @@ sub parse {
   # Not chunked, pass through to second buffer
   else {
     $self->{real_size} += length $self->{pre_buffer};
-    $self->{buffer} .= $self->{pre_buffer};
+    $self->{buffer} .= $self->{pre_buffer}
+      unless $self->is_finished
+        && length($self->{buffer}) > $self->max_leftover_size;
     $self->{pre_buffer} = '';
   }
 
@@ -475,6 +466,15 @@ Try to detect broken web servers and turn on relaxed parsing automatically.
   $content    = $content->headers(Mojo::Headers->new);
 
 Content headers, defaults to a L<Mojo::Headers> object.
+
+=head2 C<max_leftover_size>
+
+  my $size = $content->max_leftover_size;
+  $content = $content->max_leftover_size(1024);
+
+Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the
+value of C<MOJO_MAX_LEFTOVER_SIZE> or C<262144>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<relaxed>
 

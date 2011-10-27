@@ -380,7 +380,7 @@ implements the following new ones.
 
 =head2 C<client_read>
 
-  $tx = $tx->client_read($chunk);
+  $tx->client_read($chunk);
 
 Read and process client data.
 
@@ -404,7 +404,7 @@ Leftovers from the server request, used for pipelining.
 
 =head2 C<server_read>
 
-  $tx = $tx->server_read($chunk);
+  $tx->server_read($chunk);
 
 Read and process server data.
 

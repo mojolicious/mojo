@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 863;
+use Test::More tests => 897;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -33,7 +33,7 @@ is $req->cookie('a'), undef, 'no value';
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding line limit
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a");
-$req->parse('Cookie: ' . ('a=b; ' x (128 * 1024)) . "\x0d\x0a");
+$req->parse('Cookie: ' . ('a=b; ' x 131072) . "\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum line size exceeded.', 'right error';
@@ -50,7 +50,7 @@ is $req->body, '', 'no content';
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 4\x0d\x0aCookie: "
-    . ('a=b; ' x (128 * 1024))
+    . ('a=b; ' x 131072)
     . "\x0d\x0aX-Test: 23\x0d\x0a\x0d\x0aabcd");
 ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum line size exceeded.', 'right error';
@@ -65,8 +65,7 @@ is $req->body, '', 'no content';
 # Parse HTTP 1.1 message with content exceeding line limit
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a");
-$req->parse(
-  "Content-Length: 655360\x0d\x0a\x0d\x0a" . ('a=b; ' x (128 * 1024)));
+$req->parse("Content-Length: 655360\x0d\x0a\x0d\x0a" . ('a=b; ' x 131072));
 ok $req->is_finished, 'request is finished';
 is $req->error,       undef, 'no error';
 is $req->method,      'GET', 'right method';
@@ -74,12 +73,12 @@ is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.1'), 'at least version 1.1';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/', 'right URL';
-is $req->body, 'a=b; ' x (128 * 1024), 'right content';
+is $req->body, 'a=b; ' x 131072, 'right content';
 
 # Parse broken HTTP 1.1 message with header exceeding line limit
 $req = Mojo::Message::Request->new;
 $req->parse("GET / HTTP/1.1\x0d\x0a");
-$req->parse("Content-Length: 0\x0d\x0aCookie: " . ('a=b; ' x (128 * 1024)));
+$req->parse("Content-Length: 0\x0d\x0aCookie: " . ('a=b; ' x 131072));
 ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum line size exceeded.', 'right error';
 is $req->method,      'GET', 'right method';
@@ -92,7 +91,7 @@ is $req->body, '', 'no content';
 
 # Parse broken HTTP 1.1 message with start line exceeding line limit
 $req = Mojo::Message::Request->new;
-$req->parse('GET /' . ('abcd' x (128 * 1024)) . ' HTTP/1.1');
+$req->parse('GET /' . ('abcd' x 131072) . ' HTTP/1.1');
 ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum line size exceeded.', 'right error';
 is $req->method,      'GET', 'right method';
@@ -107,7 +106,7 @@ is $req->body, '', 'no content';
 # (alternative)
 $req = Mojo::Message::Request->new;
 $req->parse('GET /');
-$req->parse('abcd' x (128 * 1024));
+$req->parse('abcd' x 131072);
 ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum line size exceeded.', 'right error';
 is $req->method,      'GET', 'right method';
@@ -117,6 +116,71 @@ ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '', 'right URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
+
+# Parse pipelined HTTP 1.1 messages exceeding leftover limit
+$req = Mojo::Message::Request->new;
+$req->parse("GET /one HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'a' x 120000);
+ok $req->is_finished, 'request is finished';
+ok !$req->has_leftovers, 'has no leftovers';
+$req->parse("GET /two HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'b' x 120000);
+ok $req->has_leftovers, 'has leftovers';
+is length($req->leftovers), 120045, 'right size';
+$req->parse("GET /three HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'c' x 120000);
+ok $req->has_leftovers, 'has leftovers';
+is length($req->leftovers), 240092, 'right size';
+$req->parse("GET /four HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'c' x 120000);
+ok $req->has_leftovers, 'has leftovers';
+is length($req->leftovers), 360138, 'right size';
+$req->parse("GET /five HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'c' x 120000);
+ok $req->has_leftovers, 'has leftovers';
+is length($req->leftovers), 360138, 'right size';
+is $req->error,   undef, 'no error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+ok $req->at_least_version('1.1'), 'at least version 1.1';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
+is $req->url, '/one', 'right URL';
+is $req->body, 'a' x 120000, 'right content';
+
+# Parse pipelined HTTP 1.1 messages exceeding leftover limit (chunked)
+$req = Mojo::Message::Request->new;
+$req->parse("GET /one HTTP/1.1\x0d\x0a");
+$req->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
+$req->parse("ea60\x0d\x0a");
+$req->parse('a' x 60000);
+$req->parse("\x0d\x0aea60\x0d\x0a");
+$req->parse('a' x 60000);
+$req->parse("\x0d\x0a0\x0d\x0a\x0d\x0a");
+ok $req->is_finished, 'request is finished';
+ok !$req->has_leftovers, 'has no leftovers';
+$req->parse("GET /two HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'b' x 120000);
+ok $req->has_leftovers, 'has leftovers';
+is length($req->leftovers), 120045, 'right size';
+$req->parse("GET /three HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'c' x 120000);
+ok $req->has_leftovers, 'has leftovers';
+is length($req->leftovers), 240092, 'right size';
+$req->parse("GET /four HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'c' x 120000);
+ok $req->has_leftovers, 'has leftovers';
+is length($req->leftovers), 360138, 'right size';
+$req->parse("GET /five HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'c' x 120000);
+ok $req->has_leftovers, 'has leftovers';
+is length($req->leftovers), 360138, 'right size';
+is $req->error,   undef, 'no error';
+is $req->method,  'GET', 'right method';
+is $req->version, '1.1', 'right version';
+ok $req->at_least_version('1.1'), 'at least version 1.1';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
+is $req->url, '/one', 'right URL';
+is $req->body, 'a' x 120000, 'right content';
 
 # Parse HTTP 1.1 start line, no headers and body
 $req = Mojo::Message::Request->new;

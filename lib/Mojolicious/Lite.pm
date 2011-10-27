@@ -863,14 +863,12 @@ Note that this function is EXPERIMENTAL and might change without warning!
   helper foo => sub {...};
 
 Alias for L<Mojolicious/"helper">.
-Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<hook>
 
   hook after_dispatch => sub {...};
 
 Alias for L<Mojolicious/"hook">.
-Note that this function is EXPERIMENTAL and might change without warning!
 
 =head2 C<plugin>
 

@@ -254,7 +254,6 @@ Get chunk of data starting from a specific position.
   my $true = $file->is_file;
 
 True.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<move_to>
 

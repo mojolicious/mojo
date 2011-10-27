@@ -14,9 +14,9 @@ EOF
 #  but that humblest of all God's creatures... the Tyrannosaurus Rex."
 sub run {
   my $self = shift;
-  my $psgi = Mojo::Server::PSGI->new;
 
   # Preload
+  my $psgi = Mojo::Server::PSGI->new;
   $psgi->app;
 
   # Return app callback

@@ -155,7 +155,6 @@ Let application build a transaction.
   my $app = $server->load_app('./myapp.pl');
 
 Load application from script.
-Note that this method is EXPERIMENTAL and might change without warning!
 
   say Mojo::Server->new->load_app('./myapp.pl')->home;
 

@@ -749,7 +749,6 @@ Value for C<User-Agent> request header, defaults to C<Mojolicious (Perl)>.
   $ua          = $ua->no_proxy(['localhost', 'intranet.mojolicio.us']);
 
 Domains that don't require a proxy server to be used.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<transactor>
 
@@ -863,7 +862,6 @@ You can also append a callback to perform requests non-blocking.
   my $success = $ua->need_proxy('intranet.mojolicio.us');
 
 Check if request for domain would use a proxy server.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<post>
 

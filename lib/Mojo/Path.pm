@@ -107,8 +107,7 @@ sub parse {
 
 sub to_abs_string {
   my $self = shift;
-  return $self->to_string if $self->leading_slash;
-  return '/' . $self->to_string;
+  return $self->leading_slash ? $self->to_string : ('/' . $self->to_string);
 }
 
 sub to_string {
@@ -230,7 +229,6 @@ Parse path.
   my $string = $path->to_abs_string;
 
 Turn path into an absolute string.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<to_string>
 

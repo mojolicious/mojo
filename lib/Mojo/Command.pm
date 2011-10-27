@@ -407,7 +407,6 @@ following new ones.
   my $app = $command->app;
 
 Currently active application, defaults to a L<Mojo::HelloWorld> object.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<chmod_file>
 

@@ -36,7 +36,7 @@ WriteMakefile(
   VERSION_FROM => 'lib/<%= $path %>',
   AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
   EXE_FILES    => ['script/<%= $name %>'],
-  PREREQ_PM    => {'Mojolicious' => '1.90'},
+  PREREQ_PM    => {'Mojolicious' => '2.0'},
   test         => {TESTS => 't/*.t'}
 );
 

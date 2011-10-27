@@ -2,7 +2,6 @@ package Mojolicious::Command::eval;
 use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long 'GetOptions';
-use Mojo::Server;
 
 has description => <<'EOF';
 Run code against application.
@@ -24,10 +23,6 @@ EOF
 sub run {
   my $self = shift;
 
-  # Load application
-  my $server = Mojo::Server->new;
-  my $app    = $server->app;
-
   # Options
   local @ARGV = @_;
   my $verbose;
@@ -35,6 +30,7 @@ sub run {
   my $code = shift @ARGV || '';
 
   # Run code against application
+  my $app = $self->app;
   no warnings;
   my $result = eval "package main; sub app { \$app }; $code";
   say $result if $verbose && defined $result;
@@ -59,7 +55,6 @@ Mojolicious::Command::eval - Eval command
 =head1 DESCRIPTION
 
 L<Mojolicious::Command::eval> runs code against applications.
-Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 

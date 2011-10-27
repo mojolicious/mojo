@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.13    2011-10-28 00:00:00
+        - Removed experimental status from many classes, methods, attributes
+          and functions.
         - Removed before_render hook.
         - Removed Mojolicious::Plugin::CallbackCondition.
         - Improved documentation.

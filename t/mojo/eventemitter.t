@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 46;
+use Test::More tests => 47;
 
 # "Hi, Super Nintendo Chalmers!"
 use_ok 'Mojo::EventEmitter';
@@ -68,16 +68,19 @@ is $once, 1, 'event was not emitted again';
 $e->emit('one_time');
 is $once, 1, 'event was not emitted again';
 $e->once(
-  one_more_time => sub {
-    shift->once(one_more_time => sub { $once++ });
+  one_time => sub {
+    shift->once(one_time => sub { $once++ });
   }
 );
-$e->emit('one_more_time');
+$e->emit('one_time');
 is $once, 1, 'event was emitted once';
-$e->emit('one_more_time');
+$e->emit('one_time');
 is $once, 2, 'event was emitted again';
-$e->emit('one_more_time');
+$e->emit('one_time');
 is $once, 2, 'event was not emitted again';
+$e->once(one_time => sub { $once = shift->has_subscribers('one_time') });
+$e->emit('one_time');
+ok !$once, 'no subscribers';
 
 # Nested one time events
 $once = 0;

@@ -50,7 +50,7 @@ sub resume {
   # Start streaming
   unless ($self->{streaming}++) {
     weaken $self;
-    return $self->iowatcher->add(
+    return $self->iowatcher->io(
       $self->{handle},
       on_readable => sub { $self->_read },
       on_writable => sub { $self->_write }

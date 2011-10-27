@@ -28,7 +28,7 @@ my $listen = IO::Socket::INET->new(
 my $watcher = Mojo::IOWatcher::EV->new;
 isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 my ($readable, $writable);
-$watcher->add(
+$watcher->io(
   $listen,
   on_readable => sub { $readable++ },
   on_writable => sub { $writable++ }
@@ -52,7 +52,7 @@ $watcher = undef;
 $watcher = Mojo::IOWatcher::EV->new;
 isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 ($readable, $writable) = undef;
-$watcher->add(
+$watcher->io(
   $client,
   on_readable => sub { $readable++ },
   on_writable => sub { $writable++ }
@@ -67,7 +67,7 @@ $watcher = undef;
 $watcher = Mojo::IOWatcher::EV->new;
 isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 ($readable, $writable) = undef;
-$watcher->add(
+$watcher->io(
   $server,
   on_readable => sub { $readable++ },
   on_writable => sub { $writable++ }
@@ -93,7 +93,7 @@ $watcher->start;
 is $readable, 3, 'handle is readable';
 is $writable, 1, 'handle is not writable';
 ($readable, $writable) = undef;
-$watcher->add(
+$watcher->io(
   $server,
   on_readable => sub { $readable++ },
   on_writable => sub { $writable++ }

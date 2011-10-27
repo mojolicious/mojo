@@ -121,7 +121,7 @@ sub _connect {
 
   # Start writing right away
   $self->{handle} = $handle;
-  $watcher->add(
+  $watcher->io(
     $handle,
     on_readable => sub { $self->_connecting },
     on_writable => sub { $self->_connecting }

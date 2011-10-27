@@ -143,7 +143,9 @@ Create a new timer, invoking the callback after a given amount of seconds.
 
   $watcher = $watcher->watch($handle, $read, $write);
 
-Watch handle for events.
+Change I/O events to watch handle for.
+
+  $watcher->watch($handle, 0, 0);
 
 =head1 SEE ALSO
 

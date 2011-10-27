@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
           watch method.
         - Replaced is_finished method in Mojo::IOLoop::Stream with is_writing
           method.
+        - Replaced add method in Mojo::IOWatcher with io method.
         - Reduced memory usage of Mojo::Headers significantly.
         - Fixed finish event timing in Mojo::Server::Daemon.
 

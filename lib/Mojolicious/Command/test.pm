@@ -4,19 +4,27 @@ use Mojo::Base 'Mojo::Command';
 use Cwd;
 use FindBin;
 use File::Spec;
-use Test::Harness;
+use Getopt::Long 'GetOptions';
 
 has description => <<'EOF';
 Run unit tests.
 EOF
 has usage => <<"EOF";
-usage: $0 test [TESTS]
+usage: $0 test [OPTIONS] [TESTS]
+
+These options are available:
+  --verbose   Print verbose debug information to STDERR.
 EOF
 
 # "Why, the secret ingredient was...water!
 #  Yes, ordinary water, laced with nothing more than a few spoonfuls of LSD."
 sub run {
-  my ($self, @tests) = @_;
+  my $self = shift;
+
+  # Options
+  local @ARGV = @_;
+  GetOptions(verbose => sub { $ENV{HARNESS_VERBOSE} = 1 });
+  my @tests = @ARGV;
 
   # Search tests
   unless (@tests) {
@@ -54,7 +62,8 @@ sub run {
   }
 
   # Run tests
-  runtests(sort @tests);
+  require Test::Harness;
+  Test::Harness::runtests(sort @tests);
 }
 
 1;

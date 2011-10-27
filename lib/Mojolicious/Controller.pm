@@ -206,19 +206,13 @@ sub redirect_to {
 sub render {
   my $self = shift;
 
-  # Recursion
-  my $stash = $self->stash;
-  if ($stash->{'mojo.rendering'}) {
-    $self->app->log->debug(qq/Can't render in "before_render" hook./);
-    return '';
-  }
-
   # Template may be first argument
   my $template;
   $template = shift if @_ % 2 && !ref $_[0];
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # Template
+  my $stash = $self->stash;
   $args->{template} = $template if $template;
   unless ($stash->{template} || $args->{template}) {
 
@@ -238,12 +232,7 @@ sub render {
   }
 
   # Render
-  my $app = $self->app;
-  {
-    local $stash->{'mojo.rendering'} = 1;
-    $app->plugins->run_hook_reverse(before_render => $self, $args);
-  }
-  my ($output, $type) = $app->renderer->render($self, $args);
+  my ($output, $type) = $self->app->renderer->render($self, $args);
   return unless defined $output;
   return $output if $args->{partial};
 
@@ -819,7 +808,6 @@ It will set a default template to use based on the controller and action name
 or fall back to the route name.
 You can call it with a hash of options which can be preceded by an optional
 template name.
-It will also run the C<before_render> plugin hook.
 
 =head2 C<render_content>
 

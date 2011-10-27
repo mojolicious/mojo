@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 727;
+use Test::More tests => 711;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -66,16 +66,6 @@ get '/unicode/:stuff' => sub {
   $self->render(text => $self->param('stuff') . $self->url_for);
 };
 
-# GET /conditional
-get '/conditional' => (
-  cb => sub {
-    my ($r, $c, $captures) = @_;
-    $captures->{condition} = $c->req->headers->header('X-Condition');
-    return unless $captures->{condition};
-    1;
-  }
-) => {inline => '<%= $condition %>'};
-
 # GET /
 get '/' => 'root';
 
@@ -110,30 +100,6 @@ post '/multipart/form' => sub {
   my $self = shift;
   my @test = $self->param('test');
   $self->render_text(join "\n", @test);
-};
-
-# Reverse "partial" alias
-hook before_render => sub {
-  my ($self, $args) = @_;
-  $args->{partial} = 1 if $args->{laitrap};
-};
-
-# GET /reverse/render
-get '/reverse/render' => sub {
-  my $self = shift;
-  $self->render_data(
-    scalar reverse $self->render_text('lalala', laitrap => 1));
-};
-
-# Force recursion
-hook before_render => sub {
-  my $self = shift;
-  $self->render('foo/bar') if $self->stash('before_render');
-};
-
-# GET /before/render
-get '/before/render' => {before_render => 1} => sub {
-  shift->render('foo/bar');
 };
 
 # GET /auto_name
@@ -616,13 +582,6 @@ $t->get_ok('/unicode/a b')->status_is(200)->content_is('a b/unicode/a%20b');
 # GET /unicode/a\b
 $t->get_ok('/unicode/a\\b')->status_is(200)->content_is('a\\b/unicode/a%5Cb');
 
-# GET /conditional
-$t->get_ok('/conditional' => {'X-Condition' => 'Conditions rock!'})
-  ->status_is(200)->content_is("Conditions rock!\n");
-
-# GET /conditional (missing header)
-$t->get_ok('/conditional')->status_is(404)->content_is("Oops!\n");
-
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -708,17 +667,6 @@ $t->post_form_ok('/multipart/form', {test => [1 .. 5]})->status_is(200)
 $t->post_form_ok('/multipart/form',
   {test => [1 .. 5], file => {content => '123'}})->status_is(200)
   ->content_is(join "\n", 1 .. 5);
-
-# GET /reverse/render
-$t->get_ok('/reverse/render')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('alalal');
-
-# GET /before/render
-$t->get_ok('/before/render')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("controller and action!\n");
 
 # GET /auto_name
 $t->get_ok('/auto_name')->status_is(200)

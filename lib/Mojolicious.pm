@@ -85,7 +85,6 @@ sub new {
     if -w $home->rel_file('log');
 
   # Load default plugins
-  $self->plugin('CallbackCondition');
   $self->plugin('HeaderCondition');
   $self->plugin('DefaultHelpers');
   $self->plugin('TagHelpers');
@@ -504,19 +503,6 @@ this hook run in reverse order.
 Mostly used for custom dispatchers and postprocessing static file responses.
 (Passed the default controller instance)
 
-=item before_render
-
-Triggered right before the renderer turns the stash into a response, the
-callbacks of this hook run in the order they were added.
-Note that this hook is EXPERIMENTAL and might change without warning!
-
-  $app->hook(before_render => sub {
-    my ($self, $args) = @_;
-  });
-
-Very useful for making adjustments to the stash right before rendering.
-(Passed the current controller instance and argument hash)
-
 =item after_dispatch
 
 Triggered after a response has been rendered, the callbacks of this hook run
@@ -550,10 +536,6 @@ Load a plugin with L<Mojolicious::Plugins/"register_plugin">.
 These plugins are included in the L<Mojolicious> distribution as examples:
 
 =over 2
-
-=item L<Mojolicious::Plugin::CallbackCondition>
-
-Very versatile route condition for arbitrary callbacks.
 
 =item L<Mojolicious::Plugin::Charset>
 

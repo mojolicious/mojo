@@ -29,7 +29,7 @@ sub run {
   }
 
   # Handle
-  $self->emit(request => $tx);
+  $self->handler($tx);
 
   # Response start line
   STDOUT->autoflush(1);

@@ -115,11 +115,11 @@ sub _build_tx {
       # WebSocket
       if ($ws) {
         $self->{connections}->{$id}->{websocket} = $ws->server_handshake;
-        $self->emit(request => $ws);
+        $self->handler($ws);
       }
 
       # HTTP
-      $self->emit(request => $tx);
+      $self->handler($tx);
 
       # Resume
       $tx->on(resume => sub { $self->_write($id) });

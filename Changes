@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.12    2011-10-27 00:00:00
         - Added EXPERIMENTAL cleanup_interval attribute to Mojo::IOLoop.
         - Added EXPERIMENTAL max_leftover_size attribute to Mojo::Content.
+        - Added EXPERIMENTAL handler method to Mojo::Server.
         - Replaced handle method in Mojo::IOLoop with stream method.
         - Replaced writing and not_writing methods in Mojo::IOWatcher with
           watch method.

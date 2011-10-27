@@ -230,7 +230,7 @@ sub stream {
   my $stream = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  # Find stream by id
+  # Find stream for id
   unless (blessed $stream) {
     return unless my $c = $self->{connections}->{$stream};
     return $c->{stream};
@@ -917,12 +917,12 @@ and the loop can be restarted by running C<start> again.
 
 =head2 C<stream>
 
-   my $stream = Mojo::IOLoop->stream($id);
-   my $stream = $loop->stream($id);
-   my $id     = $loop->stream($stream, on_read => sub {...});
-   my $id     = $loop->stream($stream, {on_read => sub {...}});
+  my $stream = Mojo::IOLoop->stream($id);
+  my $stream = $loop->stream($id);
+  my $id     = $loop->stream($stream, on_read => sub {...});
+  my $id     = $loop->stream($stream, {on_read => sub {...}});
 
-Turn L<Mojo::IOLoop::Stream> object into connection.
+Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 These options are currently available:

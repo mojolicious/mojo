@@ -200,7 +200,7 @@ sub start {
 
   # Mainloop
   my $id =
-    $self->recurring($self->cleanup_interval => sub { shift->_manage });
+    $self->recurring($self->cleanup_interval => sub { shift->_cleanup });
   $self->iowatcher->start;
   $self->drop($id);
 
@@ -316,6 +316,29 @@ sub write {
   push @{$c->{write}}, [$chunk, $cb];
 }
 
+sub _cleanup {
+  my $self = shift;
+
+  # Manage connections
+  $self->_listening;
+  my $connections = $self->{connections} ||= {};
+  while (my ($id, $c) = each %$connections) {
+
+    # Connection needs to be finished
+    if ($c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing)) {
+      $self->_drop($id);
+      next;
+    }
+
+    # Connection timeout
+    $self->_drop($id)
+      if (time - ($c->{active} || time)) >= ($c->{timeout} || 15);
+  }
+
+  # Graceful shutdown
+  $self->stop if $self->max_connections == 0 && keys %$connections == 0;
+}
+
 sub _drop {
   my ($self, $id) = @_;
 
@@ -365,29 +388,6 @@ sub _listening {
   # Check if multi-accept is desirable and start listening
   $_->accepts($max > 1 ? 10 : 1)->resume for values %$servers;
   $self->{listening} = 1;
-}
-
-sub _manage {
-  my $self = shift;
-
-  # Housekeeping
-  $self->_listening;
-  my $connections = $self->{connections} ||= {};
-  while (my ($id, $c) = each %$connections) {
-
-    # Connection needs to be finished
-    if ($c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing)) {
-      $self->_drop($id);
-      next;
-    }
-
-    # Connection timeout
-    $self->_drop($id)
-      if (time - ($c->{active} || time)) >= ($c->{timeout} || 15);
-  }
-
-  # Graceful shutdown
-  $self->stop if $self->max_connections == 0 && keys %$connections == 0;
 }
 
 sub _not_listening {
@@ -924,6 +924,12 @@ and the loop can be restarted by running C<start> again.
 
 Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 Note that this method is EXPERIMENTAL and might change without warning!
+
+  my $stream = Mojo::IOLoop::Stream->new($handle);
+  Mojo::IOLoop->stream($stream, on_read => sub {
+    my ($loop, $id, $chunk) = @_;
+    $loop->write($id => "echo: $chunk");
+  });
 
 These options are currently available:
 

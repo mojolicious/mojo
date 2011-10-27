@@ -23,8 +23,6 @@ sub new {
 
 sub build_tx { shift->app->build_tx }
 
-sub handler { shift->emit(request => @_) }
-
 sub load_app {
   my ($self, $file) = @_;
 
@@ -88,8 +86,8 @@ Mojo::Server - HTTP server base class
     # Get a transaction
     my $tx = $self->build_tx;
 
-    # Handle request
-    $self->handler($tx);
+    # Emit "request" event
+    $self->emit(request => $tx);
   }
 
 =head1 DESCRIPTION
@@ -151,13 +149,6 @@ Construct a new L<Mojo::Server> object.
   my $tx = $server->build_tx;
 
 Let application build a transaction.
-
-=head2 C<handler>
-
-  $server->handler($tx);
-
-Emit C<request> event.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<load_app>
 

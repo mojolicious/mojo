@@ -31,7 +31,7 @@ sub run {
   }
 
   # Handle
-  $self->handler($tx);
+  $self->emit(request => $tx);
 
   # Response headers
   my $res = $tx->res;

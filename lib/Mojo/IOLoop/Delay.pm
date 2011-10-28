@@ -92,7 +92,7 @@ C<end>.
 
   my $delay = Mojo::IOLoop->delay;
   Mojo::IOLoop->resolver->lookup('mojolicio.us' => $delay->begin);
-  my $address = $delay->start;
+  my $address = $delay->wait;
 
 =head2 C<end>
 

@@ -673,7 +673,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
   my $delay = $loop->delay;
   my $delay = $loop->delay(sub {...});
 
-Get L<Mojo::IOLoop::Delay> object to help synchronizing events.
+Get L<Mojo::IOLoop::Delay> object to synchronize events.
 Note that this method is EXPERIMENTAL and might change without warning!
 
   # Synchronize multiple events

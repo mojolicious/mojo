@@ -3,35 +3,40 @@ use Mojo::Base -base;
 
 use List::Util 'first';
 
-# Regex
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
   \[
-  ((?:$ESCAPE_RE|\w)+)            # Key
+  (?<key>(?:$ESCAPE_RE|\w)+)                            # Key
   (?:
-    (\W)?                         # Operator
+    (?<op>\W)?                                          # Operator
     =
-    (?:"((?:\\"|[^"])+)"|(\S+))   # Value
+    (?:"(?<escaped>(?:\\"|[^"])+)"|(?<unescaped>\S+))   # Value
   )?
   \]
 /x;
 my $CLASS_ID_RE = qr/
   (?:
-    (?:\.((?:\\\.|[^\#\.])+))   # Class
+    (?:\.(?<class>(?:\\\.|[^\#\.])+))   # Class
   |
-    (?:\#((?:\\\#|[^\.\#])+))   # ID
+    (?:\#(?<id>(?:\\\#|[^\.\#])+))      # ID
   )
 /x;
-my $ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
-my $PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
-my $TOKEN_RE        = qr/
-  (\s*,\s*)?                            # Separator
-  ((?:[^\[\\\:\s\,]|$ESCAPE_RE\s?)+)?   # Element
-  ($PSEUDO_CLASS_RE*)?                  # Pseudoclass
-  ((?:$ATTR_RE)*)?                      # Attributes
+my $ELEMENT_RE      = qr/^(?<element>(?:\\\.|\\\#|[^\.\#])+)/;
+my $PSEUDO_CLASS_RE = qr/
+  (?:\:
+  (?<class>[\w\-]+)                     # Class
+  (?:\(
+    (?<args>(?:\([^\)]+\)|[^\)])+)\))?  # Arguments
+  )
+/x;
+my $TOKEN_RE = qr/
+  (?<separator>\s*,\s*)?                          # Separator
+  (?<element>(?:[^\[\\\:\s\,]|$ESCAPE_RE\s?)+)?   # Element
+  (?<pc>$PSEUDO_CLASS_RE*)?                       # Pseudoclass
+  (?<attrs>(?:$ATTR_RE)*)?                        # Attributes
   (?:
-  \s*
-  ([\>\+\~])                            # Combinator
+    \s*
+    (?<combinator>[\>\+\~])                       # Combinator
   )?
 /x;
 
@@ -83,15 +88,11 @@ sub _compile {
   # Tokenize
   my $pattern = [[]];
   while ($css =~ /$TOKEN_RE/g) {
-    my $separator  = $1;
-    my $element    = $2 // '';
-    my $pc         = $3;
-    my $attributes = $6;
-    my $combinator = $11;
+    my ($separator, $element, $pc, $attrs, $combinator) =
+      ($+{separator}, $+{element} // '', $+{pc}, $+{attrs}, $+{combinator});
 
     # Trash
-    next
-      unless $separator || $element || $pc || $attributes || $combinator;
+    next unless $separator || $element || $pc || $attrs || $combinator;
 
     # New selector
     push @$pattern, [] if $separator;
@@ -103,7 +104,7 @@ sub _compile {
 
     # Element
     my $tag = '';
-    $element =~ s/$ELEMENT_RE// and $tag = $self->_unescape($1);
+    $element =~ s/$ELEMENT_RE// and $tag = $self->_unescape($+{element});
 
     # Subject
     $selector->[0] = 'subject' if $tag =~ s/^\$//;
@@ -116,32 +117,32 @@ sub _compile {
     while ($element =~ /$CLASS_ID_RE/g) {
 
       # Class
-      push @$selector, ['attribute', 'class', $self->_regex('~', $1)]
-        if defined $1;
+      push @$selector, ['attribute', 'class', $self->_regex('~', $+{class})]
+        if defined $+{class};
 
       # ID
-      push @$selector, ['attribute', 'id', $self->_regex('', $2)]
-        if defined $2;
+      push @$selector, ['attribute', 'id', $self->_regex('', $+{id})]
+        if defined $+{id};
     }
 
     # Pseudo classes
     while ($pc =~ /$PSEUDO_CLASS_RE/g) {
 
       # "not"
-      if ($1 eq 'not') {
-        my $subpattern = $self->_compile($2)->[-1]->[-1];
+      if ($+{class} eq 'not') {
+        my $subpattern = $self->_compile($+{args})->[-1]->[-1];
         push @$selector, ['pseudoclass', 'not', $subpattern];
       }
 
       # Everything else
-      else { push @$selector, ['pseudoclass', $1, $2] }
+      else { push @$selector, ['pseudoclass', $+{class}, $+{args}] }
     }
 
     # Attributes
-    while ($attributes =~ /$ATTR_RE/g) {
-      my $key   = $self->_unescape($1);
-      my $op    = $2 // '';
-      my $value = $3 // $4;
+    while ($attrs =~ /$ATTR_RE/g) {
+      my $key   = $self->_unescape($+{key});
+      my $op    = $+{op} // '';
+      my $value = $+{escaped} // $+{unescaped};
 
       push @$selector, ['attribute', $key, $self->_regex($op, $value)];
     }

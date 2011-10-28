@@ -7,14 +7,13 @@ use Mojo::Util 'get_line';
 
 has [qw/code message/];
 
-# Start line regex
 my $START_LINE_RE = qr/
   ^\s*
-  HTTP\/(\d\.\d)   # Version
+  HTTP\/(?<version>\d\.\d)   # Version
   \s+
-  (\d\d\d)         # Code
+  (?<code>\d\d\d)            # Code
   \s*
-  ([\w\'\s]+)?     # Message (with "I'm a teapot" support)
+  (?<message>[\w\'\s]+)?     # Message (with "I'm a teapot" support)
   $
 /x;
 
@@ -153,9 +152,9 @@ sub _parse_start_line {
   return unless defined(my $line = get_line $self->{buffer});
   return $self->error('Bad response start line.')
     unless $line =~ $START_LINE_RE;
-  $self->version($1);
-  $self->code($2);
-  $self->message($3);
+  $self->version($+{version});
+  $self->code($+{code});
+  $self->message($+{message});
   $self->content->auto_relax(1);
   $self->{state} = 'content';
 }

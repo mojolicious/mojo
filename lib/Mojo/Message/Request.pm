@@ -10,20 +10,17 @@ has env => sub { {} };
 has method => 'GET';
 has url => sub { Mojo::URL->new };
 
-# Start line regex
 my $START_LINE_RE = qr/
   ^\s*
-  ([a-zA-Z]+)                                                  # Method
+  (?<method>[a-zA-Z]+)                                           # Method
   \s+
-  (
-  [0-9a-zA-Z\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+   # Path
+  (?<path>
+    [0-9a-zA-Z\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+   # Path
   )
-  (?:\s+HTTP\/(\d+\.\d+))?                                     # Version
+  (?:\s+HTTP\/(?<version>\d+\.\d+))?                             # Version
   $
 /x;
-
-# Host regex
-my $HOST_RE = qr/^([^\:]*)\:?(.*)$/;
+my $HOST_RE = qr/^(?<host>[^\:]*)\:?(?<port>.*)$/;
 
 sub clone {
   my $self = shift;
@@ -168,8 +165,8 @@ sub parse {
       # "X-Forwarded-Host"
       if (my $host = $headers->header('X-Forwarded-Host')) {
         if ($host =~ $HOST_RE) {
-          $base->host($1);
-          $base->port($2) if defined $2;
+          $base->host($+{host});
+          $base->port($+{port}) if defined $+{port};
         }
       }
 
@@ -266,10 +263,7 @@ sub _parse_env {
     if ($name eq 'HOST') {
       my $host = $value;
       my $port = undef;
-      if ($host =~ $HOST_RE) {
-        $host = $1;
-        $port = $2;
-      }
+      ($host, $port) = ($+{host}, $+{port}) if $host =~ $HOST_RE;
       $base->host($host);
       $base->port($port);
     }
@@ -344,15 +338,15 @@ sub _parse_start_line {
   # We have a (hopefully) full request line
   return $self->error('Bad request start line.', 400)
     unless $line =~ $START_LINE_RE;
-  $self->method($1);
+  $self->method($+{method});
   my $url = $self->url;
   $1 eq 'CONNECT'
-    ? $url->authority($2)
-    : $url->parse($2);
+    ? $url->authority($+{path})
+    : $url->parse($+{path});
 
   # HTTP 0.9 is identified by the missing version
   $self->{state} = 'content';
-  return $self->version($3) if defined $3;
+  return $self->version($+{version}) if defined $+{version};
   $self->version('0.9');
   $self->{state}  = 'finished';
   $self->{buffer} = '';

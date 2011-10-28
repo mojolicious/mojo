@@ -10,7 +10,6 @@ has 'error';
 our $FALSE = Mojo::JSON::_Bool->new(0);
 our $TRUE  = Mojo::JSON::_Bool->new(1);
 
-# Regex
 my $BOM_RE = qr/
   (?:
   \357\273\277   # UTF-8

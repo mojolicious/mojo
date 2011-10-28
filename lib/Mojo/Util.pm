@@ -426,7 +426,7 @@ sub punycode_decode {
   my @output;
 
   # Delimiter
-  if ($_[0] =~ s/(.*)$DELIMITER//os) { push @output, split //, $1 }
+  if ($_[0] =~ s/(.*)$DELIMITER//s) { push @output, split //, $1 }
 
   # Decode (direct translation of RFC 3492)
   while (length $_[0]) {

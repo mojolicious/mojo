@@ -42,7 +42,7 @@ sub _tokenize {
   while ($string) {
 
     # Name
-    if ($string =~ s/$NAME_RE//o) {
+    if ($string =~ s/$NAME_RE//) {
       my $name = $+{name};
 
       # "expires" is a special case, thank you Netscape...
@@ -50,7 +50,7 @@ sub _tokenize {
 
       # Value
       my $value;
-      if ($string =~ s/$VALUE_RE//o) {
+      if ($string =~ s/$VALUE_RE//) {
         $value = $+{value};
         unquote $value;
       }
@@ -59,8 +59,8 @@ sub _tokenize {
       push @token, [$name, $value];
 
       # Separator
-      $string =~ s/$SEPARATOR_RE//o;
-      if ($string =~ s/$COOKIE_SEPARATOR_RE//o) {
+      $string =~ s/$SEPARATOR_RE//;
+      if ($string =~ s/$COOKIE_SEPARATOR_RE//) {
         push @tree, [@token];
         @token = ();
       }

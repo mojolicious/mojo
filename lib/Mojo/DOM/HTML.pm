@@ -100,7 +100,7 @@ sub parse {
   # Tokenize
   my $tree    = ['root'];
   my $current = $tree;
-  while ($html =~ m/\G$TOKEN_RE/ogcs) {
+  while ($html =~ m/\G$TOKEN_RE/gcs) {
     my ($text, $pi, $comment, $cdata, $doctype, $tag) =
       (@+{qw/text pi comment cdata doctype tag/});
 
@@ -137,7 +137,7 @@ sub parse {
 
       # Attributes
       my $attrs = {};
-      while ($attr =~ /$ATTR_RE/og) {
+      while ($attr =~ /$ATTR_RE/g) {
         my $key = $cs ? $+{key} : lc($+{key});
         my $value = $+{quoted} // $+{quoted_too} // $+{unquoted};
 

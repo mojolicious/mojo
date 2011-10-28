@@ -87,7 +87,7 @@ sub _compile {
 
   # Tokenize
   my $pattern = [[]];
-  while ($css =~ /$TOKEN_RE/og) {
+  while ($css =~ /$TOKEN_RE/g) {
     my ($separator, $element, $pc, $attrs, $combinator) =
       ($+{separator}, $+{element} // '', $+{pc}, $+{attrs}, $+{combinator});
 
@@ -104,7 +104,7 @@ sub _compile {
 
     # Element
     my $tag = '';
-    $element =~ s/$ELEMENT_RE//o and $tag = $self->_unescape($+{element});
+    $element =~ s/$ELEMENT_RE// and $tag = $self->_unescape($+{element});
 
     # Subject
     $selector->[0] = 'subject' if $tag =~ s/^\$//;
@@ -114,7 +114,7 @@ sub _compile {
     push @$selector, ['tag', $tag];
 
     # Class or ID
-    while ($element =~ /$CLASS_ID_RE/og) {
+    while ($element =~ /$CLASS_ID_RE/g) {
 
       # Class
       push @$selector, ['attribute', 'class', $self->_regex('~', $+{class})]
@@ -126,7 +126,7 @@ sub _compile {
     }
 
     # Pseudo classes
-    while ($pc =~ /$PSEUDO_CLASS_RE/og) {
+    while ($pc =~ /$PSEUDO_CLASS_RE/g) {
 
       # "not"
       if ($+{class} eq 'not') {
@@ -139,7 +139,7 @@ sub _compile {
     }
 
     # Attributes
-    while ($attrs =~ /$ATTR_RE/og) {
+    while ($attrs =~ /$ATTR_RE/g) {
       my $key   = $self->_unescape($+{key});
       my $op    = $+{op} // '';
       my $value = $+{escaped} // $+{unescaped};

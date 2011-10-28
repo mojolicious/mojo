@@ -52,8 +52,7 @@ Mojo::IOLoop::Delay - IOLoop delay
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Delay> is an event synchronization helper for
-L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Delay> synchronizes events for L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS

@@ -110,8 +110,6 @@ Construct a new L<Mojo::IOWatcher::EV> object.
 
 Change I/O events to watch handle for.
 
-  $watcher->change($handle, 0, 0);
-
 =head2 C<drop_handle>
 
   $watcher->drop_handle($handle);

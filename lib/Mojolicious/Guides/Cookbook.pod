@@ -441,7 +441,7 @@ synchronize multiple non-blocking requests.
   my $delay = Mojo::IOLoop->delay;
   $ua->get('http://mojolicio.us'         => $delay->begin);
   $ua->get('http://mojolicio.us/perldoc' => $delay->begin);
-  my ($tx, $tx2) = $t->wait;
+  my ($tx, $tx2) = $delay->wait;
 
 Just be aware that the resulting transactions will be in random order.
 

@@ -211,7 +211,7 @@ is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
 my $unicode =
   qq/<html><div id="☃x">Snowman<\/div><div class="x ♥">Heart<\/div><\/html>/;
 encode 'UTF-8', $unicode;
-$dom = Mojo::DOM->new(charset => 'UTF-8');
+$dom = Mojo::DOM->new->charset('UTF-8');
 $dom->parse($unicode);
 is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';
 is $dom->at('#\\2603 x')->text,                       'Snowman', 'right text';
@@ -1639,7 +1639,7 @@ is $dom->find('table > td > tr > thead')->[2], undef, 'no result';
 is $dom->find('table > td > tr > thead')->size, 2, 'right number of elements';
 
 # Ensure XML semantics again
-$dom = Mojo::DOM->new(xml => 1)->parse(<<'EOF');
+$dom = Mojo::DOM->new->xml(1)->parse(<<'EOF');
 <table>
   <td>
     <tr><thead>foo<thead></tr>
@@ -1707,7 +1707,7 @@ $dom->find('b')->each(
 is_deeply \@results, [qw/baz yada/], 'right results';
 
 # Autoload children in XML mode
-$dom = Mojo::DOM->new(<<EOF, xml => 1);
+$dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 <a id="one">
   <B class="two" test>
     foo
@@ -1741,7 +1741,7 @@ is $dom->a->b->c->[2], undef, 'no result';
 is $dom->a->b->c->size, 2, 'right number of elements';
 
 # Direct hash access to attributes in XML mode
-$dom = Mojo::DOM->new(<<EOF, xml => 1);
+$dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 <a id="one">
   <B class="two" test>
     foo

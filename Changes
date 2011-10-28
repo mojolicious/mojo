@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.14    2011-10-28 00:00:00
+        - Deprecated Mojo::DOM->new with arguments.
         - Added EXPERIMENTAL --verbose flag to test command.
 
 2.13    2011-10-28 00:00:00

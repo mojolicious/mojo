@@ -185,7 +185,7 @@ sub dom {
   my $charset;
   ($self->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/
     and $charset = $1;
-  my $dom = $self->dom_class->new(charset => $charset)->parse($self->body);
+  my $dom = $self->dom_class->new->charset($charset)->parse($self->body);
 
   # Find right away
   return $dom->find(@_) if @_;

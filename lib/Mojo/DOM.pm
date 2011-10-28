@@ -32,18 +32,14 @@ sub DESTROY { }
 #  I dunno. Internet?"
 sub new {
   my $class = shift;
-  my $self = bless [], ref $class || $class;
+  my $self = bless [Mojo::DOM::HTML->new], ref $class || $class;
 
-  # Input
+  # DEPRECATED in Leaf Fluttering In Wind!
   my $input;
   $input = shift if @_ % 2;
-
-  # Attributes
+  warn "Mojo::DOM->new with arguments is DEPRECATED!\n" if @_;
   my %attrs = (@_);
-  my $html = $self->[0] = Mojo::DOM::HTML->new;
-  $html->tree($attrs{tree})       if $attrs{tree};
-  $html->charset($attrs{charset}) if exists $attrs{charset};
-  $html->xml($attrs{xml})         if exists $attrs{xml};
+  exists($attrs{$_}) and $self->$_($attrs{$_}) for qw/tree charset xml/;
 
   # Parse right away
   $self->parse($input) if defined $input;
@@ -126,7 +122,7 @@ sub children {
 
     # Add child
     push @children,
-      $self->new(charset => $self->charset, tree => $e, xml => $self->xml);
+      $self->new->charset($self->charset)->tree($e)->xml($self->xml);
   }
 
   return Mojo::Collection->new(@children);
@@ -158,9 +154,9 @@ sub find {
   my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select($selector);
 
   # Upgrade results
-  @$results = map {
-    $self->new(charset => $self->charset, tree => $_, xml => $self->xml)
-  } @$results;
+  @$results =
+    map { $self->new->charset($self->charset)->tree($_)->xml($self->xml) }
+    @$results;
 
   return Mojo::Collection->new(@$results);
 }
@@ -210,11 +206,8 @@ sub parent {
   return if $tree->[0] eq 'root';
 
   # Parent
-  return $self->new(
-    charset => $self->charset,
-    tree    => $tree->[3],
-    xml     => $self->xml
-  );
+  return $self->new->charset($self->charset)->tree($tree->[3])
+    ->xml($self->xml);
 }
 
 sub parse {
@@ -296,11 +289,7 @@ sub root {
     $root = $parent;
   }
 
-  return $self->new(
-    charset => $self->charset,
-    tree    => $root,
-    xml     => $self->xml
-  );
+  return $self->new->charset($self->charset)->tree($root)->xml($self->xml);
 }
 
 sub text {
@@ -508,9 +497,7 @@ following new ones.
 =head2 C<new>
 
   my $dom = Mojo::DOM->new;
-  my $dom = Mojo::DOM->new(xml => 1);
   my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
-  my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>', xml => 1);
 
 Construct a new L<Mojo::DOM> object.
 
@@ -567,7 +554,7 @@ Element attributes.
   my $charset = $dom->charset;
   $dom        = $dom->charset('UTF-8');
 
-Charset used for decoding and encoding HTML5/XML.
+Alias for L<Mojo::DOM::HTML/"charset">.
 
 =head2 C<children>
 
@@ -617,7 +604,7 @@ Parent of element.
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
-Parse HTML5/XML document with L<Mojo::DOM::HTML>.
+Alias for L<Mojo::DOM::HTML/"parse">.
 
 =head2 C<prepend>
 
@@ -682,7 +669,7 @@ Render DOM to XML.
   my $tree = $dom->tree;
   $dom     = $dom->tree(['root', ['text', 'lalala']]);
 
-Document Object Model.
+Alias for L<Mojo::DOM::HTML/"tree">.
 
 =head2 C<type>
 
@@ -696,8 +683,7 @@ Element type.
   my $xml = $dom->xml;
   $dom    = $dom->xml(1);
 
-Disable HTML5 semantics in parser and activate case sensitivity, defaults to
-auto detection based on processing instructions.
+Alias for L<Mojo::DOM::HTML/"xml">.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO

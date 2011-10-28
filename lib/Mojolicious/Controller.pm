@@ -968,7 +968,8 @@ Cookies failing signature verification will be automatically discarded.
   $c        = $c->stash({foo => 'bar'});
   $c        = $c->stash(foo => 'bar');
 
-Non persistent data storage and exchange.
+Non persistent data storage and exchange, application wide default values can
+be set with L<Mojolicious/"defaults">.
 
   $c->stash->{foo} = 'bar';
   my $foo = $c->stash->{foo};
@@ -978,7 +979,8 @@ Non persistent data storage and exchange.
 
   my $ua = $c->ua;
     
-A L<Mojo::UserAgent> prepared for the current environment.
+Alias for C<$c-E<gt>app-E<gt>ua>.
+Usually refers to a L<Mojo::UserAgent> object.
 
   # Blocking
   my $tx = $c->ua->get('http://mojolicio.us');

@@ -41,7 +41,7 @@ sub is_writing {
 sub pause {
   my $self = shift;
   return if $self->{paused}++;
-  $self->iowatcher->watch($self->{handle}, 0, $self->is_writing);
+  $self->iowatcher->change($self->{handle}, 0, $self->is_writing);
 }
 
 sub resume {
@@ -50,7 +50,7 @@ sub resume {
   # Start streaming
   unless ($self->{streaming}++) {
     weaken $self;
-    return $self->iowatcher->io(
+    return $self->iowatcher->watch(
       $self->{handle},
       on_readable => sub { $self->_read },
       on_writable => sub { $self->_write }
@@ -59,7 +59,7 @@ sub resume {
 
   # Resume streaming
   return unless delete $self->{paused};
-  $self->iowatcher->watch($self->{handle}, 1, $self->is_writing);
+  $self->iowatcher->change($self->{handle}, 1, $self->is_writing);
 }
 
 # "No children have ever meddled with the Republican Party and lived to tell
@@ -81,7 +81,7 @@ sub write {
   else     { return unless length $self->{buffer} }
 
   # Start writing
-  $self->iowatcher->watch($self->{handle}, !$self->{paused}, 1)
+  $self->iowatcher->change($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};
 }
 
@@ -146,7 +146,7 @@ sub _write {
 
   # Stop writing
   return if $self->is_writing;
-  $self->iowatcher->watch($handle, !$self->{paused}, 0);
+  $self->iowatcher->change($handle, !$self->{paused}, 0);
 }
 
 1;

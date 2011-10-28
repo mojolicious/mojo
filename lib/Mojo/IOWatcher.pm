@@ -13,6 +13,18 @@ use constant DEBUG => $ENV{MOJO_IOWATCHER_DEBUG} || 0;
 #  I say the Pledge of Allegiance every day.
 #  You pledge allegiance to the flag.
 #  And the flag is made in China."
+sub change {
+  my ($self, $handle, $read, $write) = @_;
+
+  my $poll = $self->_poll;
+  $poll->remove($handle);
+  if ($read && $write) { $poll->mask($handle, POLLIN | POLLOUT) }
+  elsif ($read)  { $poll->mask($handle, POLLIN) }
+  elsif ($write) { $poll->mask($handle, POLLOUT) }
+
+  return $self;
+}
+
 sub detect {
   my $try = $ENV{MOJO_IOWATCHER} || 'Mojo::IOWatcher::EV';
   return $try unless Mojo::Loader->load($try);
@@ -40,15 +52,6 @@ sub is_readable {
   return !!$result;
 }
 
-sub io {
-  my $self   = shift;
-  my $handle = shift;
-  my $args   = {@_, handle => $handle};
-  $self->{handles}->{fileno $handle} = $args;
-  $self->watch($handle, 1, $args->{on_writable});
-  return $self;
-}
-
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
 sub recurring { shift->_timer(pop, after => pop, recurring => time) }
 
@@ -65,14 +68,11 @@ sub stop { delete shift->{running} }
 sub timer { shift->_timer(pop, after => pop, started => time) }
 
 sub watch {
-  my ($self, $handle, $read, $write) = @_;
-
-  my $poll = $self->_poll;
-  $poll->remove($handle);
-  if ($read && $write) { $poll->mask($handle, POLLIN | POLLOUT) }
-  elsif ($read)  { $poll->mask($handle, POLLIN) }
-  elsif ($write) { $poll->mask($handle, POLLOUT) }
-
+  my $self   = shift;
+  my $handle = shift;
+  my $args   = {@_, handle => $handle};
+  $self->{handles}->{fileno $handle} = $args;
+  $self->change($handle, 1, $args->{on_writable});
   return $self;
 }
 
@@ -143,7 +143,7 @@ Mojo::IOWatcher - Non-blocking I/O watcher
 
   # Watch if handle becomes readable
   my $watcher = Mojo::IOWatcher->new;
-  $watcher->io($handle, on_readable => sub {
+  $watcher->watch($handle, on_readable => sub {
     my ($watcher, $handle) = @_;
     ...
   });
@@ -178,6 +178,14 @@ following new ones.
 Detect and load the best watcher implementation available, will try the value
 of the C<MOJO_IOWATCHER> environment variable or L<Mojo::IOWatcher::EV>.
 
+=head2 C<change>
+
+  $watcher = $watcher->change($handle, $read, $write);
+
+Change I/O events to watch handle for.
+
+  $watcher->change($handle, 0, 1);
+
 =head2 C<drop_handle>
 
   $watcher->drop_handle($handle);
@@ -189,26 +197,6 @@ Drop handle.
   my $success = $watcher->drop_timer($id);
 
 Drop timer.
-
-=head2 C<io>
-
-  $watcher = $watcher->io($handle, on_readable => sub {...});
-
-Watch handle for I/O events.
-
-These options are currently available:
-
-=over 2
-
-=item C<on_readable>
-
-Callback to be invoked once the handle becomes readable.
-
-=item C<on_writable>
-
-Callback to be invoked once the handle becomes writable.
-
-=back
 
 =head2 C<is_readable>
 
@@ -244,11 +232,23 @@ Create a new timer, invoking the callback after a given amount of seconds.
 
 =head2 C<watch>
 
-  $watcher = $watcher->watch($handle, $read, $write);
+  $watcher = $watcher->watch($handle, on_readable => sub {...});
 
-Change I/O events to watch handle for.
+Watch handle for I/O events.
 
-  $watcher->watch($handle, 0, 1);
+These options are currently available:
+
+=over 2
+
+=item C<on_readable>
+
+Callback to be invoked once the handle becomes readable.
+
+=item C<on_writable>
+
+Callback to be invoked once the handle becomes writable.
+
+=back
 
 =head1 DEBUGGING
 

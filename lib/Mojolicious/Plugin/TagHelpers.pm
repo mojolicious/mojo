@@ -323,7 +323,7 @@ sub _tag {
   if ($cb || defined $content) {
     $tag .= '>';
     $tag .= $cb ? $cb->() : $content;
-    $tag .= "<\/$name>";
+    $tag .= "</$name>";
   }
 
   # Empty element

@@ -21,8 +21,8 @@ my $ATTR_RE = qr/
   )?
   \s*
 /x;
-my $END_RE   = qr/^\s*\/\s*(?<tag>.+)\s*/;
-my $START_RE = qr/(?<tag>[^\s\/]+)(?<attrs>[\s\S]*)/;
+my $END_RE   = qr#^\s*/\s*(?<tag>.+)\s*#;
+my $START_RE = qr#(?<tag>[^\s/]+)(?<attrs>[\s\S]*)#;
 my $TOKEN_RE = qr/
   (?<text>[^<]*)                                    # Text
   (?:
@@ -154,11 +154,11 @@ sub parse {
 
       # Empty element
       $self->_end($start, \$current)
-        if (!$self->xml && $VOID{$start}) || $attr =~ /\/\s*$/;
+        if (!$self->xml && $VOID{$start}) || $attr =~ m#/\s*$#;
 
       # Relaxed "script" or "style"
       if ($start ~~ [qw/script style/]) {
-        if ($html =~ /\G(.*?)<\s*\/\s*$start\s*>/gcsi) {
+        if ($html =~ m#\G(.*?)<\s*/\s*$start\s*>#gcsi) {
           $self->_raw($1, \$current);
           $self->_end($start, \$current);
         }

@@ -10,16 +10,16 @@ has env => sub { {} };
 has method => 'GET';
 has url => sub { Mojo::URL->new };
 
-my $START_LINE_RE = qr/
+my $START_LINE_RE = qr|
   ^\s*
-  (?<method>[a-zA-Z]+)                                           # Method
+  (?<method>[a-zA-Z]+)                                          # Method
   \s+
   (?<path>
-    [0-9a-zA-Z\-\.\_\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+   # Path
+    [0-9a-zA-Z\-\.\_\~\:/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+   # Path
   )
-  (?:\s+HTTP\/(?<version>\d+\.\d+))?                             # Version
+  (?:\s+HTTP/(?<version>\d+\.\d+))?                             # Version
   $
-/x;
+|x;
 my $HOST_RE = qr/^(?<host>[^\:]*)\:?(?<port>.*)$/;
 
 sub clone {
@@ -206,7 +206,7 @@ sub _build_start_line {
   my $path  = $url->path->to_string;
   my $query = $url->query->to_string;
   $path .= "?$query" if $query;
-  $path = "/$path" unless $path =~ /^\//;
+  $path = "/$path" unless $path =~ m#^/#;
 
   # CONNECT
   my $method = uc $self->method;
@@ -285,7 +285,7 @@ sub _parse_env {
   $self->method($env->{REQUEST_METHOD}) if $env->{REQUEST_METHOD};
 
   # Scheme/Version
-  if (($env->{SERVER_PROTOCOL} || '') =~ /^([^\/]+)\/([^\/]+)$/) {
+  if (($env->{SERVER_PROTOCOL} || '') =~ m#^([^/]+)/([^/]+)$#) {
     $base->scheme($1);
     $self->version($2);
   }
@@ -298,7 +298,7 @@ sub _parse_env {
   if (my $value = $env->{SCRIPT_NAME}) {
 
     # Make sure there is a trailing slash (important for merging)
-    $value .= '/' unless $value =~ /\/$/;
+    $value .= '/' unless $value =~ m#/$#;
     $base_path->parse($value);
   }
 
@@ -313,10 +313,10 @@ sub _parse_env {
   if (defined $buffer && defined $base_buffer && length $base_buffer) {
 
     # Remove SCRIPT_NAME prefix if it's there
-    $base_buffer =~ s/^\///;
-    $base_buffer =~ s/\/$//;
-    $buffer      =~ s/^\/?$base_buffer\/?//;
-    $buffer      =~ s/^\///;
+    $base_buffer =~ s|^/||;
+    $base_buffer =~ s|/$||;
+    $buffer      =~ s|^/?$base_buffer/?||;
+    $buffer      =~ s|^/||;
     $path->parse($buffer);
   }
 

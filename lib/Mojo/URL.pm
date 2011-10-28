@@ -152,7 +152,7 @@ sub path {
     if (!ref $path) {
 
       # Absolute path
-      if ($path =~ /^\//) { $path = Mojo::Path->new($path) }
+      if ($path =~ m#^/#) { $path = Mojo::Path->new($path) }
 
       # Relative path
       else {

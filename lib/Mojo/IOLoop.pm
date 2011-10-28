@@ -3,10 +3,10 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::IOLoop::Client;
+use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Resolver;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
-use Mojo::IOLoop::Trigger;
 use Mojo::IOWatcher;
 use Mojo::Util 'md5_sum';
 use Scalar::Util qw/blessed weaken/;
@@ -91,6 +91,18 @@ sub connection_timeout {
 }
 
 sub defer { shift->timer(0 => @_) }
+
+sub delay {
+  my ($self, $cb) = @_;
+  $self = $self->singleton unless ref $self;
+
+  my $delay = Mojo::IOLoop::Delay->new;
+  $delay->ioloop($self);
+  weaken $delay->{ioloop};
+  $delay->once(finish => $cb) if $cb;
+
+  return $delay;
+}
 
 sub drop {
   my ($self, $id) = @_;
@@ -287,18 +299,6 @@ sub timer {
   return $self->iowatcher->timer($after => sub { $self->$cb(pop) });
 }
 
-sub trigger {
-  my ($self, $cb) = @_;
-  $self = $self->singleton unless ref $self;
-
-  my $t = Mojo::IOLoop::Trigger->new;
-  $t->ioloop($self);
-  weaken $t->{ioloop};
-  $t->once(finish => $cb) if $cb;
-
-  return $t;
-}
-
 sub write {
   my ($self, $id, $chunk, $cb) = @_;
 
@@ -344,7 +344,7 @@ sub _drop {
 
   # Timer
   return $self unless my $watcher = $self->iowatcher;
-  return $self if $watcher->cancel($id);
+  return $self if $watcher->drop_timer($id);
 
   # Listen socket
   if (delete $self->{servers}->{$id}) { delete $self->{listening} }
@@ -667,6 +667,28 @@ dropped, defaults to C<15>.
 Invoke callback on next reactor tick.
 Note that this method is EXPERIMENTAL and might change without warning!
 
+=head2 C<delay>
+
+  my $delay = Mojo::IOLoop->delay;
+  my $delay = $loop->delay;
+  my $delay = $loop->delay(sub {...});
+
+Get L<Mojo::IOLoop::Delay> event synchronization helper.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  # Synchronize multiple events
+  my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
+  for my $i (1 .. 10) {
+    $delay->begin;
+    Mojo::IOLoop->timer($i => sub {
+      say 10 - $i;
+      $delay->end;
+    });
+  }
+
+  # Wait for events
+  $delay->wait;
+
 =head2 C<drop>
 
   $loop = Mojo::IOLoop->drop($id)
@@ -963,28 +985,6 @@ Note that this method is EXPERIMENTAL and might change without warning!
   my $id = $loop->timer(0.25 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of seconds.
-
-=head2 C<trigger>
-
-  my $t = Mojo::IOLoop->trigger;
-  my $t = $loop->trigger;
-  my $t = $loop->trigger(sub {...});
-
-Get L<Mojo::IOLoop::Trigger> remote control for the loop.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-  # Synchronize multiple events
-  my $t = Mojo::IOLoop->trigger(sub { say 'BOOM!' });
-  for my $i (1 .. 10) {
-    $t->begin;
-    Mojo::IOLoop->timer($i => sub {
-      say 10 - $i;
-      $t->end;
-    });
-  }
-
-  # Stop automatically when finished
-  $t->start;
 
 =head2 C<write>
 

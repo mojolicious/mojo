@@ -87,8 +87,8 @@ sub parse {
   $path //= '';
 
   # Leading and trailing slash
-  $path =~ /^\// ? $self->leading_slash(1)  : $self->leading_slash(undef);
-  $path =~ /\/$/ ? $self->trailing_slash(1) : $self->trailing_slash(undef);
+  $path =~ m#^/# ? $self->leading_slash(1)  : $self->leading_slash(undef);
+  $path =~ m#/$# ? $self->trailing_slash(1) : $self->trailing_slash(undef);
 
   # Parse
   url_unescape $path;

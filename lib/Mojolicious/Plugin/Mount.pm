@@ -9,7 +9,7 @@ sub register {
   # Extract host and path
   my $prefix = (keys %$conf)[0];
   my ($host, $path);
-  if ($prefix =~ /^(\*\.)?([^\/]+)(\/.*)?$/) {
+  if ($prefix =~ m#^(\*\.)?([^/]+)(/.*)?$#) {
     $host = quotemeta $2;
     $host = "(?:.*\\.)?$host" if $1;
     $path = defined $3 ? $3 : '/';

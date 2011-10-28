@@ -32,14 +32,14 @@ sub parse {
 
   # Make sure we have a viable pattern
   return $self if !defined $pattern || $pattern eq '/';
-  $pattern = "/$pattern" unless $pattern =~ /^\//;
+  $pattern = "/$pattern" unless $pattern =~ m#^/#;
 
   # Requirements
   my $reqs = ref $_[0] eq 'HASH' ? $_[0] : {@_};
   $self->reqs($reqs);
 
   # Format in pattern
-  if ($pattern =~ s/\.([^\/\)]+)$//) {
+  if ($pattern =~ s|\.([^/\)]+)$||) {
     $reqs->{format}           = quotemeta $1;
     $self->defaults->{format} = $1;
     $self->{strict}           = 1;
@@ -132,7 +132,7 @@ sub _compile {
   if (!exists $reqs->{format} || $reqs->{format}) {
     my $format =
       defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^\/]+)';
-    $self->format(qr/^\/?\.$format$/);
+    $self->format(qr#^/?\.$format$#);
   }
 
   # Compile tree to regular expression

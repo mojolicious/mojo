@@ -51,7 +51,7 @@ sub register {
 
       # Find module
       my $module = $self->param('module');
-      $module =~ s/\//\:\:/g;
+      $module =~ s|/|\:\:|g;
       my $path = Pod::Simple::Search->new->find($module, @PATHS);
 
       # Redirect to CPAN
@@ -68,9 +68,9 @@ sub register {
       $dom->find('a[href]')->each(
         sub {
           my $attrs = shift->attrs;
-          $attrs->{href} =~ s/%3A%3A/\//gi
+          $attrs->{href} =~ s|%3A%3A|/|gi
             if $attrs->{href}
-              =~ s/^http\:\/\/search\.cpan\.org\/perldoc\?/$perldoc/;
+              =~ s|^http\://search\.cpan\.org/perldoc\?|$perldoc|;
         }
       );
 
@@ -86,7 +86,7 @@ sub register {
 
       # Rewrite headers
       my $url = $self->req->url->clone;
-      $url =~ s/%2F/\//gi;
+      $url =~ s|%2F|/|gi;
       my $sections = [];
       $dom->find('h1, h2, h3')->each(
         sub {
@@ -147,8 +147,8 @@ sub _pod_to_html {
   return $@ if $@;
 
   # Filter
-  $output =~ s/<a name='___top' class='dummyTopAnchor'\s*?><\/a>\n//g;
-  $output =~ s/<a class='u'.*?name=".*?"\s*>(.*?)<\/a>/$1/sg;
+  $output =~ s|<a name='___top' class='dummyTopAnchor'\s*?></a>\n||g;
+  $output =~ s|<a class='u'.*?name=".*?"\s*>(.*?)</a>|$1|sg;
 
   return $output;
 }

@@ -54,7 +54,7 @@ sub import {
 sub _request {
 
   # Method
-  my $method = $_[0] =~ /:|\// ? 'get' : lc shift;
+  my $method = $_[0] =~ m#:|/# ? 'get' : lc shift;
 
   # Transaction
   my $tx =

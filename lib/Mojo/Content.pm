@@ -17,10 +17,10 @@ sub body_contains {
 sub body_size { croak 'Method "body_size" not implemented by subclass' }
 
 sub boundary {
-  return
-    unless (shift->headers->content_type || '')
-    =~ /multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+\/]+)/i;
-  return $1;
+  return $1
+    if (shift->headers->content_type || '')
+    =~ m#multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+/]+)#i;
+  return;
 }
 
 # "Operator! Give me the number for 911!"

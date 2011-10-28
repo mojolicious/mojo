@@ -225,7 +225,7 @@ sub tx {
   my $req = $tx->req;
   $req->method(shift);
   my $url = shift;
-  $url = "http://$url" unless $url =~ /^\/|\:\/\//;
+  $url = "http://$url" unless $url =~ m#^/|\://#;
   $req->url->parse($url);
 
   # Callback

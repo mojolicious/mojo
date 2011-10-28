@@ -34,16 +34,16 @@ my $t = Test::Mojo->new;
 
 # Simple POD template
 $t->get_ok('/')->status_is(200)
-  ->content_like(qr/<h1>Test123<\/h1>\s+<p>It <code>works<\/code>!<\/p>/);
+  ->content_like(qr#<h1>Test123</h1>\s+<p>It <code>works</code>!</p>#);
 
 # POD helper
 $t->post_ok('/')->status_is(200)
-  ->content_like(qr/test123\s+<h1>A<\/h1>\s+<h1>B<\/h1>/)
-  ->content_like(qr/\s+<p><code>test<\/code><\/p>/);
+  ->content_like(qr#test123\s+<h1>A</h1>\s+<h1>B</h1>#)
+  ->content_like(qr#\s+<p><code>test</code></p>#);
 
 # POD filter
 $t->post_ok('/block')->status_is(200)
-  ->content_like(qr/test321\s+<h2>lalala<\/h2>\s+<p><code>test<\/code><\/p>/);
+  ->content_like(qr#test321\s+<h2>lalala</h2>\s+<p><code>test</code></p>#);
 
 # Perldoc browser (Welcome)
 $t->get_ok('/perldoc')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')

@@ -135,15 +135,15 @@ Mojo::IOLoop->listen(
     $loop->drop($id);
   }
 );
-my $t = Mojo::IOLoop->trigger;
+my $delay = Mojo::IOLoop->delay;
 Mojo::IOLoop->connect(
   address    => 'localhost',
   port       => $port,
-  on_connect => $t->begin,
+  on_connect => $delay->begin,
   on_close   => sub { $buffer .= 'should not happen' },
   on_error   => sub { $buffer .= 'should not happen either' },
 );
-$handle = Mojo::IOLoop->stream($t->start)->steal_handle;
+$handle = Mojo::IOLoop->stream($delay->wait)->steal_handle;
 my $stream = Mojo::IOLoop->singleton->stream_class->new($handle);
 $id = Mojo::IOLoop->stream(
   $stream => {

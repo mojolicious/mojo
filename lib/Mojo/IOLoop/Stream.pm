@@ -19,7 +19,7 @@ sub DESTROY {
   my $self = shift;
   return unless my $watcher = $self->{iowatcher};
   return unless my $handle  = $self->{handle};
-  $watcher->remove($handle);
+  $watcher->drop_handle($handle);
   close $handle;
   $self->_close;
 }
@@ -66,7 +66,7 @@ sub resume {
 #  about it."
 sub steal_handle {
   my $self = shift;
-  $self->iowatcher->remove($self->{handle});
+  $self->iowatcher->drop_handle($self->{handle});
   return delete $self->{handle};
 }
 

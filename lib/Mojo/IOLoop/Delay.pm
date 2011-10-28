@@ -1,4 +1,4 @@
-package Mojo::IOLoop::Trigger;
+package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::IOLoop;
@@ -18,7 +18,7 @@ sub end {
   $self->emit_safe('finish', @{$self->{args}}) if --$self->{counter} <= 0;
 }
 
-sub start {
+sub wait {
   my $self = shift;
   $self->once(finish => sub { shift->ioloop->stop });
   $self->ioloop->start;
@@ -30,80 +30,81 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Trigger - IOLoop trigger
+Mojo::IOLoop::Delay - IOLoop delay
 
 =head1 SYNOPSIS
 
-  use Mojo::IOLoop::Trigger;
+  use Mojo::IOLoop::Delay;
 
   # Synchronize multiple events
-  my $t = Mojo::IOLoop::Trigger->new;
-  $t->on(finish => sub { say 'BOOM!' });
+  my $delay = Mojo::IOLoop::Delay->new;
+  $delay->on(finish => sub { say 'BOOM!' });
   for my $i (1 .. 10) {
-    $t->begin;
+    $delay->begin;
     Mojo::IOLoop->timer($i => sub {
       say 10 - $i;
-      $t->end;
+      $delay->end;
     });
   }
 
-  # Stop automatically when finished
-  $t->start;
+  # Wait for events
+  $delay->wait;
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Trigger> is a remote control for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Delay> is an event synchronization helper for
+L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::Trigger> can emit the following events.
+L<Mojo::IOLoop::Delay> can emit the following events.
 
 =head2 C<finish>
 
-  $trigger->on(finish => sub {
-    my $trigger = shift;
+  $delay->on(finish => sub {
+    my $delay = shift;
   });
 
 Emitted once the active event counter reaches zero.
 
 =head1 ATTRIBUTES
 
-L<Mojo::IOLoop::Trigger> implements the following attributes.
+L<Mojo::IOLoop::Delay> implements the following attributes.
 
 =head2 C<ioloop>
 
-  my $ioloop = $t->ioloop;
-  $t         = $t->ioloop(Mojo::IOLoop->new);
+  my $ioloop = $delay->ioloop;
+  $delay     = $delay->ioloop(Mojo::IOLoop->new);
 
 Loop object to control, defaults to a L<Mojo::IOLoop> object.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Trigger> inherits all methods from L<Mojo::EventEmitter> and
+L<Mojo::IOLoop::Delay> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
 =head2 C<begin>
 
-  my $cb = $t->begin;
+  my $cb = $delay->begin;
 
 Increment active event counter, the returned callback can be used instead of
 C<end>.
 
-  my $t = Mojo::IOLoop->trigger;
-  Mojo::IOLoop->resolver->lookup('mojolicio.us' => $t->begin);
-  my $address = $t->start;
+  my $delay = Mojo::IOLoop->delay;
+  Mojo::IOLoop->resolver->lookup('mojolicio.us' => $delay->begin);
+  my $address = $delay->start;
 
 =head2 C<end>
 
-  $t->end;
-  $t->end(@args);
+  $delay->end;
+  $delay->end(@args);
 
 Decrement active event counter.
 
-=head2 C<start>
+=head2 C<wait>
 
-  my @args = $t->start;
+  my @args = $delay->wait;
 
 Start C<ioloop> and register C<finish> event that stops it again once the
 active event counter reaches zero.

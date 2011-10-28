@@ -54,8 +54,8 @@ sub _cleanup {
   return unless my $resolver = $self->{resolver};
   return unless my $loop     = $resolver->ioloop;
   return unless my $watcher  = $loop->iowatcher;
-  $watcher->cancel($self->{timer})  if $self->{timer};
-  $watcher->remove($self->{handle}) if $self->{handle};
+  $watcher->drop_timer($self->{timer})   if $self->{timer};
+  $watcher->drop_handle($self->{handle}) if $self->{handle};
 }
 
 sub _connect {

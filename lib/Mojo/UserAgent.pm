@@ -601,15 +601,15 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
     ->res->content->asset->move_to('/Users/sri/mojo.tar.gz');
 
   # Parallel requests
-  my $t = Mojo::IOLoop->trigger;
+  my $delay = Mojo::IOLoop->delay;
   for my $url ('mojolicio.us', 'cpan.org') {
-    $t->begin;
+    $delay->begin;
     $ua->get($url => sub {
       my ($ua, $tx) = @_;
-      $t->end($tx->res->dom->at('title')->text);
+      $delay->end($tx->res->dom->at('title')->text);
     });
   }
-  my @titles = $t->start;
+  my @titles = $delay->wait;
 
   # TLS certificate authentication
   my $tx = $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');

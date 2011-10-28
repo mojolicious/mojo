@@ -13,17 +13,19 @@ use constant DEBUG => $ENV{MOJO_IOWATCHER_DEBUG} || 0;
 #  I say the Pledge of Allegiance every day.
 #  You pledge allegiance to the flag.
 #  And the flag is made in China."
-sub cancel {
-  my ($self, $id) = @_;
-  return 1 if delete $self->{timers}->{$id};
-  return;
-}
-
 sub detect {
   my $try = $ENV{MOJO_IOWATCHER} || 'Mojo::IOWatcher::EV';
   return $try unless Mojo::Loader->load($try);
   return 'Mojo::IOWatcher';
 }
+
+sub drop_handle {
+  my ($self, $handle) = @_;
+  delete $self->{handles}->{fileno $handle};
+  $self->_poll->remove($handle);
+}
+
+sub drop_timer { delete shift->{timers}->{shift()} }
 
 sub is_readable {
   my ($self, $handle) = @_;
@@ -49,13 +51,6 @@ sub io {
 
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
 sub recurring { shift->_timer(pop, after => pop, recurring => time) }
-
-sub remove {
-  my ($self, $handle) = @_;
-  delete $self->{handles}->{fileno $handle};
-  $self->_poll->remove($handle);
-  return $self;
-}
 
 sub start {
   my $self = shift;
@@ -115,7 +110,7 @@ sub _one_tick {
       warn "TIMER $id\n" if DEBUG;
 
       # Normal timer
-      if ($t->{started}) { $self->cancel($id) }
+      if ($t->{started}) { $self->drop_timer($id) }
 
       # Recurring timer
       elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
@@ -146,17 +141,17 @@ Mojo::IOWatcher - Non-blocking I/O watcher
 
   use Mojo::IOWatcher;
 
-  # Watch if I/O handles become readable or writable
+  # Watch if handle becomes readable
   my $watcher = Mojo::IOWatcher->new;
   $watcher->io($handle, on_readable => sub {
     my ($watcher, $handle) = @_;
     ...
   });
 
-  # Use timers
+  # Add a timer
   $watcher->timer(15 => sub {
     my $watcher = shift;
-    $watcher->remove($handle);
+    $watcher->drop_handle($handle);
     say "Timeout!";
   });
 
@@ -176,18 +171,24 @@ Note that this module is EXPERIMENTAL and might change without warning!
 L<Mojo::IOWatcher> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<cancel>
-
-  my $success = $watcher->cancel($id);
-
-Cancel timer.
-
 =head2 C<detect>
 
   my $class = Mojo::IOWatcher->detect;
 
 Detect and load the best watcher implementation available, will try the value
 of the C<MOJO_IOWATCHER> environment variable or L<Mojo::IOWatcher::EV>.
+
+=head2 C<drop_handle>
+
+  $watcher->drop_handle($handle);
+
+Drop handle.
+
+=head2 C<drop_timer>
+
+  my $success = $watcher->drop_timer($id);
+
+Drop timer.
 
 =head2 C<io>
 
@@ -222,12 +223,6 @@ sockets.
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of seconds.
-
-=head2 C<remove>
-
-  $watcher = $watcher->remove($handle);
-
-Remove handle.
 
 =head2 C<start>
 

@@ -113,7 +113,7 @@ sub dispatch {
   # Path
   my $req  = $c->req;
   my $path = $c->stash->{path};
-  if (defined $path) { $path = "/$path" if $path !~ /^\// }
+  if (defined $path) { $path = "/$path" if $path !~ m#^/# }
   else               { $path = $req->url->path->to_abs_string }
 
   # Match
@@ -246,7 +246,7 @@ sub render {
 
   # Format
   if ((my $format = $values->{format}) && !$self->parent) {
-    $path .= ".$format" unless $path =~ /\.[^\/]+$/;
+    $path .= ".$format" unless $path =~ m#\.[^/]+$#;
   }
 
   # Parent

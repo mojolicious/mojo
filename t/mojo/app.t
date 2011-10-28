@@ -47,11 +47,11 @@ Mojo::IOLoop->connect(
     $buffer .= $chunk;
     $self->drop($id) and $self->stop if $buffer =~ /Mojo is working!/;
     $self->write($id, '4321')
-      if $buffer =~ /HTTP\/1.1 100 Continue.*\x0d\x0a\x0d\x0a/gs;
+      if $buffer =~ m#HTTP/1.1 100 Continue.*\x0d\x0a\x0d\x0a#gs;
   }
 );
 Mojo::IOLoop->start;
-like $buffer, qr/HTTP\/1.1 100 Continue/, 'request was continued';
+like $buffer, qr#HTTP/1.1 100 Continue#, 'request was continued';
 
 # Pipelined
 $buffer = '';
@@ -171,11 +171,11 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 
 # Parallel requests
-my $t = Mojo::IOLoop->trigger;
-$ua->get('/13/', $t->begin);
-$ua->post('/14/', {Expect => 'fun'}, 'bar baz foo' x 128, $t->begin);
-$ua->get('/15/', $t->begin);
-($tx, $tx2, my $tx3) = $t->start;
+my $delay = Mojo::IOLoop->delay;
+$ua->get('/13/', $delay->begin);
+$ua->post('/14/', {Expect => 'fun'}, 'bar baz foo' x 128, $delay->begin);
+$ua->get('/15/', $delay->begin);
+($tx, $tx2, my $tx3) = $delay->wait;
 ok $tx->is_finished, 'transaction is finished';
 is $tx->res->body, 'Your Mojo is working!', 'right content';
 ok !$tx->error, 'no error';

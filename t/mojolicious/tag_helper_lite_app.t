@@ -307,7 +307,7 @@ $t->get_ok('/timed')->status_is(200)->content_like(qr/\d+\.\d+\ seconds/);
 
 # GET /rps
 $t->get_ok('/rps')->status_is(200)
-  ->content_like(qr/^lalala\n\d+\.\d+s\ \(\d+\.\d+\/s\)/);
+  ->content_like(qr#^lalala\n\d+\.\d+s\ \(\d+\.\d+/s\)#);
 
 __DATA__
 @@ tags.html.ep

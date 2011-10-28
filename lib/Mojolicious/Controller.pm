@@ -567,7 +567,7 @@ sub url_for {
   my $target = shift || '';
 
   # Absolute URL
-  return Mojo::URL->new($target) if $target =~ /^\w+\:\/\//;
+  return Mojo::URL->new($target) if $target =~ m#^\w+\://#;
 
   # Base
   my $url = Mojo::URL->new;
@@ -578,14 +578,14 @@ sub url_for {
 
   # Relative URL
   my $path = $url->path;
-  if ($target =~ /^\//) {
+  if ($target =~ m#^/#) {
     if (my $e = $self->stash->{path}) {
       my $real = $req->url->path->to_abs_string;
       Mojo::Util::url_unescape($real);
       my $backup = $real;
       Mojo::Util::decode('UTF-8', $real);
       $real //= $backup;
-      $real =~ s/\/?$e$/$target/;
+      $real =~ s|/?$e$|$target|;
       $target = $real;
     }
     $url->parse($target);
@@ -991,15 +991,15 @@ A L<Mojo::UserAgent> prepared for the current environment.
   });
 
   # Parallel non-blocking
-  my $t = Mojo::IOLoop->trigger(sub {
-    my ($t, @titles) = @_;
+  my $delay = Mojo::IOLoop->delay(sub {
+    my ($delay, @titles) = @_;
     $c->render_json(\@titles);
   });
   for my $url ('http://mojolicio.us', 'https://metacpan.org') {
-    $t->begin;
+    $delay->begin;
     $c->ua->get($url => sub {
       my ($ua, $tx) = @_;
-      $t->end($tx->res->dom->html->head->title->text);
+      $delay->end($tx->res->dom->html->head->title->text);
     });
   }
 

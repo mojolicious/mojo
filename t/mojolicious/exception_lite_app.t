@@ -66,11 +66,11 @@ my $t = Test::Mojo->new;
 
 # GET /does_not_exist ("not_found.development.html.ep" route suggestion)
 $t->get_ok('/does_not_exist')->status_is(404)
-  ->content_like(qr/get '\/does_not_exist'/);
+  ->content_like(qr#get '/does_not_exist'#);
 
 # POST /does_not_exist ("not_found.development.html.ep" route suggestion)
 $t->post_ok('/does_not_exist')->status_is(404)
-  ->content_like(qr/any '\/does_not_exist'/);
+  ->content_like(qr#any '/does_not_exist'#);
 
 # GET /dead_template
 $t->get_ok('/dead_template')->status_is(500)->content_like(qr/1\./)

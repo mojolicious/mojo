@@ -177,7 +177,7 @@ sub _decode_string {
   my $pos = pos;
 
   # Extract string with escaped characters
-  m/\G(((?:[^\x00-\x1F\\"]|\\(?:["\\\/bfnrt]|u[A-Fa-f0-9]{4})){0,32766})*)/gc;
+  m#\G(((?:[^\x00-\x1F\\"]|\\(?:["\\/bfnrt]|u[A-Fa-f0-9]{4})){0,32766})*)#gc;
   my $str = $1;
 
   # Missing quote
@@ -189,7 +189,7 @@ sub _decode_string {
 
   # Unescape popular characters
   if (index($str, '\\u') < 0) {
-    $str =~ s/\\(["\\\/bfnrt])/$ESCAPE{$1}/gs;
+    $str =~ s|\\(["\\/bfnrt])|$ESCAPE{$1}|gs;
     return $str;
   }
 
@@ -301,7 +301,7 @@ sub _encode_string {
 
   # Escape string
   $string
-    =~ s/([\x00-\x1F\x7F\x{2028}\x{2029}\\"\/\b\f\n\r\t])/$REVERSE{$1}/gs;
+    =~ s|([\x00-\x1F\x7F\x{2028}\x{2029}\\"/\b\f\n\r\t])|$REVERSE{$1}|gs;
 
   # Stringify
   return "\"$string\"";

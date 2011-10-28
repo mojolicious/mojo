@@ -11,13 +11,9 @@ sub DESTROY { undef $EV }
 # We have to fall back to Mojo::IOWatcher, since EV is unique
 sub new { $EV++ ? Mojo::IOWatcher->new : shift->SUPER::new }
 
-sub recurring { shift->_timer(shift, 1, @_) }
+sub drop_handle { delete shift->{handles}->{fileno shift} }
 
-sub remove {
-  my ($self, $handle) = @_;
-  delete $self->{handles}->{fileno $handle};
-  return $self;
-}
+sub recurring { shift->_timer(shift, 1, @_) }
 
 # "Wow, Barney. You brought a whole beer keg.
 #  Yeah... where do I fill it up?"
@@ -108,18 +104,18 @@ implements the following new ones.
 
 Construct a new L<Mojo::IOWatcher::EV> object.
 
+=head2 C<drop_handle>
+
+  $watcher->drop_handle($handle);
+
+Drop handle.
+
 =head2 C<recurring>
 
   my $id = $watcher->recurring(3 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of seconds.
-
-=head2 C<remove>
-
-  $watcher = $watcher->remove($handle);
-
-Remove handle.
 
 =head2 C<start>
 

@@ -79,7 +79,7 @@ sub DESTROY {
   if (my $key  = $self->{key})  { unlink $key  if -w $key }
   return unless my $watcher = $self->{iowatcher};
   $self->pause if $self->{handle};
-  $watcher->remove($_) for values %{$self->{handles}};
+  $watcher->drop_handle($_) for values %{$self->{handles}};
 }
 
 # "And I gave that man directions, even though I didn't know the way,
@@ -166,7 +166,7 @@ sub generate_port {
 
 sub pause {
   my $self = shift;
-  $self->iowatcher->remove($self->{handle});
+  $self->iowatcher->drop_handle($self->{handle});
 }
 
 sub resume {
@@ -191,7 +191,7 @@ sub _accept {
   weaken $self;
   $tls->{SSL_error_trap} = sub {
     return unless my $handle = delete $self->{handles}->{shift()};
-    $self->iowatcher->remove($handle);
+    $self->iowatcher->drop_handle($handle);
     close $handle;
   };
   $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
@@ -244,7 +244,7 @@ sub _tls {
 
   # Accepted
   if ($handle->accept_SSL) {
-    $self->iowatcher->remove($handle);
+    $self->iowatcher->drop_handle($handle);
     delete $self->{handles}->{$handle};
     return $self->emit_safe(accept => $handle);
   }

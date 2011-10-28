@@ -7,15 +7,15 @@ use Mojo::Util 'get_line';
 
 has [qw/code message/];
 
-my $START_LINE_RE = qr/
+my $START_LINE_RE = qr|
   ^\s*
-  HTTP\/(?<version>\d\.\d)   # Version
+  HTTP/(?<version>\d\.\d)   # Version
   \s+
   (?<code>\d\d\d)            # Code
   \s*
   (?<message>[\w\'\s]+)?     # Message (with "I'm a teapot" support)
   $
-/x;
+|x;
 
 # Umarked codes are from RFC 2616
 my %MESSAGES = (
@@ -142,7 +142,7 @@ sub _parse_start_line {
   my $self = shift;
 
   # Try to detect HTTP 0.9
-  if ($self->{buffer} =~ /^\s*(\S.{4})/ && $1 !~ /^HTTP\//) {
+  if ($self->{buffer} =~ /^\s*(\S.{4})/ && $1 !~ m#^HTTP/#) {
     $self->version('0.9');
     $self->content->relaxed(1);
     return $self->{state} = 'content';

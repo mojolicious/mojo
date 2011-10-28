@@ -276,7 +276,7 @@ sub parse {
 
     # Tokenize
     my @token;
-    for my $token (split /$token_re/, $line) {
+    for my $token (split $token_re, $line) {
 
       # Capture end
       @capture_token = ('cpen', undef)

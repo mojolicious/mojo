@@ -100,7 +100,7 @@ sub parse {
   # Tokenize
   my $tree    = ['root'];
   my $current = $tree;
-  while ($html =~ m/\G$TOKEN_RE/gcs) {
+  while ($html =~ m/\G$TOKEN_RE/ogcs) {
     my ($text, $pi, $comment, $cdata, $doctype, $tag) =
       (@+{qw/text pi comment cdata doctype tag/});
 
@@ -127,17 +127,17 @@ sub parse {
     # End
     next unless $tag;
     my $cs = $self->xml;
-    if ($tag =~ /$END_RE/) {
+    if ($tag =~ $END_RE) {
       $self->_end($cs ? $+{tag} : lc($+{tag}), \$current);
     }
 
     # Start
-    elsif ($tag =~ /$START_RE/) {
+    elsif ($tag =~ $START_RE) {
       my ($start, $attr) = ($cs ? $+{tag} : lc($+{tag}), $+{attrs});
 
       # Attributes
       my $attrs = {};
-      while ($attr =~ /$ATTR_RE/g) {
+      while ($attr =~ /$ATTR_RE/og) {
         my $key = $cs ? $+{key} : lc($+{key});
         my $value = $+{quoted} // $+{quoted_too} // $+{unquoted};
 

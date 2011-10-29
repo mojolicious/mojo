@@ -109,7 +109,7 @@ Mojo::Server::CGI - CGI server
   use Mojo::Server::CGI;
 
   my $cgi = Mojo::Server::CGI->new;
-  $cgi->unsubscribe_all('request')
+  $cgi->unsubscribe('request')
   $cgi->on(request => sub {
     my ($cgi, $tx) = @_;
 

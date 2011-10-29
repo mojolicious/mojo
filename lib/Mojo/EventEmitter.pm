@@ -46,6 +46,13 @@ sub subscribers { shift->{events}->{shift()} || [] }
 sub unsubscribe {
   my ($self, $name, $cb) = @_;
 
+  # All
+  unless ($cb) {
+    delete $self->{events}->{$name};
+    return $self;
+  }
+
+  # One
   my @callbacks;
   for my $subscriber (@{$self->subscribers($name)}) {
     next if $cb eq $subscriber;
@@ -53,12 +60,6 @@ sub unsubscribe {
   }
   $self->{events}->{$name} = \@callbacks;
 
-  return $self;
-}
-
-sub unsubscribe_all {
-  my ($self, $name) = @_;
-  $self->unsubscribe($name => $_) for @{$self->subscribers($name)};
   return $self;
 }
 
@@ -117,7 +118,6 @@ Mojo::EventEmitter - Event emitter base class
 =head1 DESCRIPTION
 
 L<Mojo::EventEmitter> is a simple base class for event emitting objects.
-Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 
@@ -137,6 +137,7 @@ Emit event.
   $e = $e->emit_safe('foo', 123);
 
 Emit event safely and emit C<error> event on failure.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<has_subscribers>
 
@@ -164,15 +165,10 @@ All subscribers for event.
 
 =head2 C<unsubscribe>
 
-  $e->unsubscribe(foo => $cb);
+  $e = $e->unsubscribe('foo');
+  $e = $e->unsubscribe(foo => $cb);
 
 Unsubscribe from event.
-
-=head2 C<unsubscribe_all>
-
-  $e->unsubscribe_all('foo');
-
-Remove all subscribers from event.
 
 =head1 DEBUGGING
 

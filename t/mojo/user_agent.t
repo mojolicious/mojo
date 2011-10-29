@@ -148,7 +148,7 @@ $ua->on(
   }
 );
 $tx = $ua->start($tx);
-$ua->unsubscribe_all('start');
+$ua->unsubscribe('start');
 ok $tx->success, 'successful';
 is $finished, 1, 'finish event has been emitted';
 is $tx->res->code, 200,     'right status';

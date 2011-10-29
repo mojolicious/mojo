@@ -110,7 +110,7 @@ is $once, 1, 'event was not emitted again';
 $e->emit('one_time');
 is $once, 1, 'event was not emitted again';
 
-# Unsubscribe
+# Remove subscribers
 $e = Mojo::EventEmitter->new;
 my $counter = 0;
 $cb = $e->on(foo => sub { $counter++ });
@@ -118,15 +118,13 @@ $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
 $e->unsubscribe(foo => $e->once(foo => sub { $counter++ }));
 is scalar @{$e->subscribers('foo')}, 3, 'three subscribers';
-$e->emit('foo');
+$e->emit('foo')->unsubscribe(foo => $cb);
 is $counter, 3, 'event was emitted three times';
-$e->unsubscribe(foo => $cb);
 is scalar @{$e->subscribers('foo')}, 2, 'two subscribers';
 $e->emit('foo');
 is $counter, 5, 'event was emitted two times';
 ok $e->has_subscribers('foo'), 'has subscribers';
-$e->unsubscribe_all('foo');
-ok !$e->has_subscribers('foo'), 'no subscribers';
+ok !$e->unsubscribe('foo')->has_subscribers('foo'), 'no subscribers';
 is scalar @{$e->subscribers('foo')}, 0, 'no subscribers';
 $e->emit('foo');
 is $counter, 5, 'event was not emitted again';

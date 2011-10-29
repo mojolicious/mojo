@@ -41,8 +41,7 @@ sub is_writing {
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_finish {
   warn <<EOF;
-Mojo::Transaction->on_finish is DEPRECATED in favor of using
-Mojo::Transaction->on!
+Mojo::Transaction->on_finish is DEPRECATED in favor of Mojo::Transaction->on!
 EOF
   shift->on(finish => shift);
 }
@@ -50,8 +49,7 @@ EOF
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_resume {
   warn <<EOF;
-Mojo::Transaction->on_resume is DEPRECATED in favor of using
-Mojo::Transaction->on!
+Mojo::Transaction->on_resume is DEPRECATED in favor of Mojo::Transaction->on!
 EOF
   shift->on(resume => shift);
 }

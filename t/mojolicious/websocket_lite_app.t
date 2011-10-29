@@ -20,8 +20,8 @@ use Test::Mojo;
 # WebSocket /echo
 websocket '/echo' => sub {
   my $self = shift;
-  $self->on_message(
-    sub {
+  $self->on(
+    message => sub {
       my ($self, $message) = @_;
       $self->send_message("echo: $message");
     }
@@ -39,14 +39,14 @@ websocket '/push' => sub {
   my $self = shift;
   my $id =
     Mojo::IOLoop->recurring('0.5' => sub { $self->send_message('push') });
-  $self->on_finish(sub { Mojo::IOLoop->drop($id) });
+  $self->on(finish => sub { Mojo::IOLoop->drop($id) });
 };
 
 # WebSocket /unicode
 websocket '/unicode' => sub {
   my $self = shift;
-  $self->on_message(
-    sub {
+  $self->on(
+    message => sub {
       my ($self, $message) = @_;
       $self->send_message("♥: $message");
     }
@@ -68,8 +68,8 @@ websocket '/bytes' => sub {
 # WebSocket /once
 websocket '/once' => sub {
   my $self = shift;
-  $self->on_message(
-    sub {
+  $self->on(
+    message => sub {
       my ($self, $message) = @_;
       $self->send_message("ONE: $message");
     }
@@ -88,8 +88,8 @@ under '/nested';
 # WebSocket /nested
 websocket sub {
   my $self = shift;
-  $self->on_message(
-    sub {
+  $self->on(
+    message => sub {
       my ($self, $message) = @_;
       $self->send_message("nested echo: $message");
     }

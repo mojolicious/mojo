@@ -72,12 +72,12 @@ sub new {
   $r->namespace(ref $self);
 
   # Hide own controller methods
-  $r->hide(qw/AUTOLOAD DESTROY client cookie delayed finish finished/);
-  $r->hide(qw/flash handler helper on_message param redirect_to render/);
-  $r->hide(qw/render_content render_data render_exception render_json/);
-  $r->hide(qw/render_not_found render_partial render_static render_text/);
-  $r->hide(qw/rendered send_message session signed_cookie url_for/);
-  $r->hide(qw/write write_chunk/);
+  $r->hide(qw/AUTOLOAD DESTROY app cookie finish flash handler on on_finish/);
+  $r->hide(qw/param redirect_to render render_content render_data/);
+  $r->hide(qw/render_exception render_json render_not_found render_partial/);
+  $r->hide(qw/render_static render_text rendered req res respond_to/);
+  $r->hide(qw/send_message session signed_cookie stash tx ua url_for write/);
+  $r->hide('write_chunk');
 
   # Prepare log
   my $mode = $self->mode;

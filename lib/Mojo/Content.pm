@@ -140,9 +140,8 @@ sub leftovers { shift->{buffer} }
 
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_read {
-  warn <<EOF;
-Mojo::Content->on_read is DEPRECATED in favor of using Mojo::Content->on!
-EOF
+  warn
+    "Mojo::Content->on_read is DEPRECATED in favor of Mojo::Content->on!\n";
   shift->on(read => shift);
 }
 

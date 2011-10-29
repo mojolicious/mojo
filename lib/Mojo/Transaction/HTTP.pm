@@ -143,7 +143,7 @@ sub keep_alive {
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_request {
   warn <<EOF;
-Mojo::Transaction::HTTP->on_request is DEPRECATED in favor of using
+Mojo::Transaction::HTTP->on_request is DEPRECATED in favor of
 Mojo::Transaction::HTTP->on!
 EOF
   shift->on(request => shift);

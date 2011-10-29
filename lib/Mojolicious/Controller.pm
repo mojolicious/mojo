@@ -142,20 +142,20 @@ sub flash {
 }
 
 # "My parents may be evil, but at least they're stupid."
-sub on_finish {
-  my ($self, $cb) = @_;
-  return $self->tx->on(finish => sub { shift and $self->$cb(@_) });
+sub on {
+  my ($self, $name, $cb) = @_;
+  my $tx = $self->tx;
+  $self->rendered(101) if $tx->is_websocket;
+  $tx->on($name => sub { shift and $self->$cb(@_) });
 }
 
-# "I like being a women.
-#  Now when I say something stupid, everyone laughs and buys me things."
-sub on_message {
-  my ($self, $cb) = @_;
-  my $tx = $self->tx;
-  Carp::croak('No WebSocket connection to receive messages from')
-    unless $tx->is_websocket;
-  $self->rendered(101);
-  return $tx->on(message => sub { shift and $self->$cb(@_) });
+# DEPRECATED in Leaf Fluttering In Wind!
+sub on_finish {
+  warn <<EOF;
+Mojolicious::Controller->on_finish is DEPRECATED in favor of
+Mojolicious::Controller->on!
+EOF
+  shift->on(finish => @_);
 }
 
 # "Just make a simple cake. And this time, if someone's going to jump out of
@@ -738,27 +738,23 @@ Gracefully end WebSocket connection or long poll stream.
 
 Data storage persistent only for the next request, stored in the session.
 
-=head2 C<on_finish>
+=head2 C<on>
 
-  my $cb = $c->on_finish(sub {...});
+  my $cb = $c->on(finish => sub {...});
 
-Register C<finish> event with transaction, which will be emitted when the
-transaction has been finished.
+Register event with C<tx>, which is usually a L<Mojo::Transaction::HTTP> or
+L<Mojo::Transaction::WebSocket> object.
 
-  $c->on_finish(sub {
+  # Emitted when the transaction has been finished
+  $c->on(finish => sub {
     my $c = shift;
+    say 'We are done!';
   });
 
-=head2 C<on_message>
-
-  my $cb = $c->on_message(sub {...});
-
-Register C<message> event with transaction, which will be emitted when new
-WebSocket messages arrive.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-  $c->on_message(sub {
+  # Emitted when new WebSocket messages arrive
+  $c->on(message => sub {
     my ($c, $message) = @_;
+    say "Message: $message";
   });
 
 =head2 C<param>

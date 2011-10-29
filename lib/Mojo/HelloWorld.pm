@@ -9,7 +9,7 @@ app->log->path(undef);
 
 # "Does whisky count as beer?"
 under '/diag' => sub {
-  shift->on_finish(sub { $ENV{MOJO_HELLO} = 'world' });
+  shift->on(finish => sub { $ENV{MOJO_HELLO} = 'world' });
 };
 
 any '/' => 'diag';
@@ -98,7 +98,7 @@ any '/upload' => sub {
 
 any '/websocket' => sub {
   my $self = shift;
-  $self->on_message(sub { shift->send_message(shift) })
+  $self->on(message => sub { shift->send_message(shift) })
     if $self->tx->is_websocket;
 };
 

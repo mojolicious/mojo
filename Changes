@@ -1,6 +1,12 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.15    2011-10-29 00:00:00
+        - Deprecated Mojolicious::Controller->on_finish in favor of
+          Mojolicious::Controller->on.
+        - Removed Mojolicious::Controller->on_message, you can now use
+          Mojolicious::Controller->on instead.
+            $c->on(message => sub {...})
+        - Added EXPERIMENTAL message event to Mojo::Log.
         - Improved documentation.
 
 2.14    2011-10-29 00:00:00

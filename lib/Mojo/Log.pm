@@ -1,5 +1,5 @@
 package Mojo::Log;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
@@ -27,6 +27,20 @@ has 'path';
 
 # Supported log level
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->on(
+    message => sub {
+      my $self = shift;
+      return unless my $handle = $self->handle;
+      flock $handle, LOCK_EX;
+      $handle->syswrite($self->format(@_));
+      flock $handle, LOCK_UN;
+    }
+  );
+  return $self;
+}
 
 # "Yes, I got the most! I win X-Mas!"
 sub debug { shift->log('debug', @_) }
@@ -59,22 +73,10 @@ sub is_warn { shift->is_level('warn') }
 # "If The Flintstones has taught us anything,
 #  it's that pelicans can be used to mix cement."
 sub log {
-  my ($self, $level, @msgs) = @_;
-
-  # Check log level
-  $level = lc $level;
+  my $self  = shift;
+  my $level = lc shift;
   return $self unless $level && $self->is_level($level);
-
-  # Lock
-  my $handle = $self->handle;
-  flock $handle, LOCK_EX;
-
-  # Format and log messages
-  $handle->syswrite($self->format($level, @msgs));
-
-  # Unlock
-  flock $handle, LOCK_UN;
-
+  $self->emit(message => $level => @_);
   return $self;
 }
 
@@ -110,6 +112,24 @@ Mojo::Log - Simple logger for Mojo
 
 L<Mojo::Log> is a simple logger for L<Mojo> projects.
 
+=head1 EVENTS
+
+L<Mojo::Log> can emit the following events.
+
+=head2 C<message>
+
+  $log->on(message => sub {
+    my ($log, $level, @messages) = @_;
+  });
+
+Emitted when a new message gets logged.
+Note that this event is EXPERIMENTAL and might change without warning!
+
+  $log->on(message => sub {
+    my ($log, $level, @messages) = @_;
+    say "$level: ", join("\n", @messages);
+  });
+
 =head1 ATTRIBUTES
 
 L<Mojo::Log> implements the following attributes.
@@ -137,8 +157,14 @@ Logfile path.
 
 =head1 METHODS
 
-L<Mojo::Log> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Log> inherits all methods from L<Mojo::EventEmitter> and implements
+the following new ones.
+
+=head2 C<new>
+
+  my $log = Mojo::Log->new;
+
+Construct a new L<Mojo::Log> object.
 
 =head2 C<debug>
 

@@ -40,9 +40,9 @@ is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
 my $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
-is $ENV{MOJO_HELLO}, undef, 'on_finish not yet called';
+is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
 $res->[2]->close;
-is delete $ENV{MOJO_HELLO}, 'world', 'on_finish called';
+is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
 $params = Mojo::JSON->new->decode($params);
 is_deeply $params, {bar => 'baz', hello => 'world', lalala => 23},
   'right structure';
@@ -77,9 +77,9 @@ is $headers{'Content-Length'}, 43, 'right "Content-Length" value';
 is $headers{'Content-Type'}, 'application/json', 'right "Content-Type" value';
 $params = '';
 while (defined(my $chunk = $res->[2]->getline)) { $params .= $chunk }
-is $ENV{MOJO_HELLO}, undef, 'on_finish not yet called';
+is $ENV{MOJO_HELLO}, undef, 'finish event has not been emitted';
 $res->[2]->close;
-is delete $ENV{MOJO_HELLO}, 'world', 'on_finish called';
+is delete $ENV{MOJO_HELLO}, 'world', 'finish event has been emitted';
 $params = Mojo::JSON->new->decode($params);
 is_deeply $params, {bar => 'baz', world => 'hello', lalala => 23},
   'right structure';

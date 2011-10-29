@@ -764,7 +764,7 @@ You can restrict access to WebSocket handshakes using the C<websocket> method.
   # Action
   sub echo {
     my $self = shift;
-    $self->on_message(sub {
+    $self->on(message => sub {
       my ($self, $message) = @_;
       $self->send_message("echo: $message");
     });

@@ -85,8 +85,7 @@ sub need_proxy {
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_start {
   warn <<EOF;
-Mojo::UserAgent->on_start is DEPRECATED in favor of using
-Mojo::UserAgent->on!
+Mojo::UserAgent->on_start is DEPRECATED in favor of Mojo::UserAgent->on!
 EOF
   shift->on(start => shift);
 }

@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 54;
+use Test::More tests => 74;
 
 # "This calls for a party, baby.
 #  I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
@@ -17,6 +17,21 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 app->renderer->root(app->home->rel_dir('does_not_exist'));
+
+# Logger
+app->log->handle(undef);
+app->log->level($ENV{MOJO_LOG_LEVEL} = 'debug');
+my $log = '';
+app->log->on(message => sub { shift; $log .= join ':', @_ });
+
+# GET /logger
+get '/logger' => sub {
+  my $self    = shift;
+  my $level   = $self->param('level');
+  my $message = $self->param('message');
+  $self->app->log->log($level => $message);
+  $self->render(text => "$level: $message");
+};
 
 # GET /dead_template
 get '/dead_template';
@@ -64,6 +79,31 @@ get '/trapped/too' => sub {
 
 my $t = Test::Mojo->new;
 
+# GET /logger (debug)
+$t->get_ok('/logger?level=debug&message=one')->status_is(200)
+  ->content_is('debug: one');
+like $log, qr/debug:one/, 'right result';
+
+# GET /logger (info)
+$t->get_ok('/logger?level=info&message=two')->status_is(200)
+  ->content_is('info: two');
+like $log, qr/info:two/, 'right result';
+
+# GET /logger (warn)
+$t->get_ok('/logger?level=warn&message=three')->status_is(200)
+  ->content_is('warn: three');
+like $log, qr/warn:three/, 'right result';
+
+# GET /logger (error)
+$t->get_ok('/logger?level=error&message=four')->status_is(200)
+  ->content_is('error: four');
+like $log, qr/error:four/, 'right result';
+
+# GET /logger (fatal)
+$t->get_ok('/logger?level=fatal&message=five')->status_is(200)
+  ->content_is('fatal: five');
+like $log, qr/fatal:five/, 'right result';
+
 # GET /does_not_exist ("not_found.development.html.ep" route suggestion)
 $t->get_ok('/does_not_exist')->status_is(404)
   ->content_like(qr#get '/does_not_exist'#);
@@ -86,7 +126,8 @@ $t->get_ok('/dead_template_with_layout')->status_is(500)
 
 # GET /dead_action
 $t->get_ok('/dead_action')->status_is(500)
-  ->content_type_is('text/html;charset=UTF-8')->content_like(qr/32\./)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_like(qr|get\ &#39;/dead_action&#39;|)
   ->content_like(qr/dead\ action!/);
 
 # GET /dead_action.xml (different format)
@@ -95,11 +136,13 @@ $t->get_ok('/dead_action.xml')->status_is(500)->content_type_is('text/xml')
 
 # GET /dead_action.json (unsupported format)
 $t->get_ok('/dead_action.json')->status_is(500)
-  ->content_type_is('text/html;charset=UTF-8')->content_like(qr/32\./)
+  ->content_type_is('text/html;charset=UTF-8')
+  ->content_like(qr|get\ &#39;/dead_action&#39;|)
   ->content_like(qr/dead\ action!/);
 
 # GET /double_dead_action
-$t->get_ok('/double_dead_action')->status_is(500)->content_like(qr/36\./)
+$t->get_ok('/double_dead_action')->status_is(500)
+  ->content_like(qr|get\ &#39;/double_dead_action&#39;|)
   ->content_like(qr/double\ dead\ action!/);
 
 # GET /trapped

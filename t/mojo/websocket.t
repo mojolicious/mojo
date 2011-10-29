@@ -37,9 +37,9 @@ get '/link' => sub {
 my $flag;
 websocket '/' => sub {
   my $self = shift;
-  $self->on_finish(sub { $flag += 4 });
-  $self->on_message(
-    sub {
+  $self->on(finish => sub { $flag += 4 });
+  $self->on(
+    message => sub {
       my ($self, $message) = @_;
       my $url = $self->url_for->to_abs;
       $self->send_message("${message}test2$url");
@@ -74,8 +74,8 @@ websocket '/socket' => sub {
 websocket '/early_start' => sub {
   my $self = shift;
   $self->send_message('test1');
-  $self->on_message(
-    sub {
+  $self->on(
+    message => sub {
       my ($self, $message) = @_;
       $self->send_message("${message}test2");
       $self->finish;
@@ -88,7 +88,7 @@ my ($handshake, $denied) = 0;
 websocket '/denied' => sub {
   my $self = shift;
   $self->tx->handshake->on(finish => sub { $handshake += 2 });
-  $self->on_finish(sub { $denied += 1 });
+  $self->on(finish => sub { $denied += 1 });
   $self->render(text => 'denied', status => 403);
 };
 
@@ -111,15 +111,15 @@ websocket '/subreq' => sub {
     }
   );
   $self->send_message('test0');
-  $self->on_finish(sub { $subreq += 3 });
+  $self->on(finish => sub { $subreq += 3 });
 };
 
 # WebSocket /echo
 websocket '/echo' => sub {
   my $self = shift;
   $self->tx->max_websocket_size(500000);
-  $self->on_message(
-    sub {
+  $self->on(
+    message => sub {
       my ($self, $message) = @_;
       $self->send_message($message);
     }
@@ -129,8 +129,8 @@ websocket '/echo' => sub {
 # WebSocket /double_echo
 my $buffer = '';
 websocket '/double_echo' => sub {
-  shift->on_message(
-    sub {
+  shift->on(
+    message => sub {
       my ($self, $message) = @_;
       $self->send_message($message, sub { shift->send_message($message) });
     }
@@ -147,7 +147,7 @@ websocket '/foo' =>
 # WebSocket /deadcallback
 websocket '/deadcallback' => sub {
   my $self = shift;
-  $self->on_message(sub { die 'i see dead callbacks' });
+  $self->on(message => sub { die 'i see dead callbacks' });
 };
 
 # GET /link

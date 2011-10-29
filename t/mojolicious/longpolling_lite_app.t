@@ -20,7 +20,7 @@ my $shortpoll = 0;
 get '/shortpoll' => sub {
   my $self = shift;
   $self->res->headers->connection('close');
-  $self->on_finish(sub { $shortpoll++ });
+  $self->on(finish => sub { $shortpoll++ });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->finish('this was short.');
@@ -30,7 +30,7 @@ get '/shortpoll' => sub {
 my $shortpoll_plain;
 get '/shortpoll/plain' => sub {
   my $self = shift;
-  $self->on_finish(sub { $shortpoll_plain = 'finished!' });
+  $self->on(finish => sub { $shortpoll_plain = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->res->headers->content_length(25);
@@ -41,7 +41,7 @@ get '/shortpoll/plain' => sub {
 my $shortpoll_nolength;
 get '/shortpoll/nolength' => sub {
   my $self = shift;
-  $self->on_finish(sub { $shortpoll_nolength = 'finished!' });
+  $self->on(finish => sub { $shortpoll_nolength = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->write('this was short and had no length.');
@@ -61,8 +61,8 @@ get '/longpoll' => sub {
       shift->timer('0.5' => sub { $self->finish });
     }
   );
-  $self->on_finish(
-    sub {
+  $self->on(
+    finish => sub {
       Mojo::IOLoop->drop($id);
       $longpoll = 'finished!';
     }
@@ -73,7 +73,7 @@ get '/longpoll' => sub {
 my $longpoll_nolength;
 get '/longpoll/nolength' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll_nolength = 'finished!' });
+  $self->on(finish => sub { $longpoll_nolength = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->write('hi ');
@@ -89,7 +89,7 @@ get '/longpoll/nolength' => sub {
 my $longpoll_nested;
 get '/longpoll/nested' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll_nested = 'finished!' });
+  $self->on(finish => sub { $longpoll_nested = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->cookie(foo => 'bar');
@@ -110,7 +110,7 @@ get '/longpoll/plain' => sub {
   $self->write('hi ');
   Mojo::IOLoop->timer(
     '0.5' => sub {
-      $self->on_finish(sub { $longpoll_plain = 'finished!' });
+      $self->on(finish => sub { $longpoll_plain = 'finished!' });
       $self->write('there plain,', sub { shift->write(' whats up?') });
     }
   );
@@ -120,7 +120,7 @@ get '/longpoll/plain' => sub {
 my $longpoll_delayed;
 get '/longpoll/delayed' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll_delayed = 'finished!' });
+  $self->on(finish => sub { $longpoll_delayed = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->write_chunk;
@@ -141,7 +141,7 @@ get '/longpoll/delayed' => sub {
 my $longpoll_plain_delayed;
 get '/longpoll/plain/delayed' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll_plain_delayed = 'finished!' });
+  $self->on(finish => sub { $longpoll_plain_delayed = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->res->headers->content_length(12);
@@ -163,7 +163,7 @@ get '/longpoll/plain/delayed' => sub {
 my $longpoll_nolength_delayed;
 get '/longpoll/nolength/delayed' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll_nolength_delayed = 'finished!' });
+  $self->on(finish => sub { $longpoll_nolength_delayed = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->write;
@@ -184,7 +184,7 @@ get '/longpoll/nolength/delayed' => sub {
 my $longpoll_static_delayed;
 get '/longpoll/static/delayed' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll_static_delayed = 'finished!' });
+  $self->on(finish => sub { $longpoll_static_delayed = 'finished!' });
   Mojo::IOLoop->timer('0.5' => sub { $self->render_static('hello.txt') });
 };
 
@@ -192,7 +192,7 @@ get '/longpoll/static/delayed' => sub {
 my $longpoll_static_delayed_too;
 get '/longpoll/static/delayed_too' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll_static_delayed_too = 'finished!' });
+  $self->on(finish => sub { $longpoll_static_delayed_too = 'finished!' });
   $self->cookie(bar => 'baz');
   $self->session(foo => 'bar');
   $self->render_later;
@@ -203,7 +203,7 @@ get '/longpoll/static/delayed_too' => sub {
 my $longpoll_dynamic_delayed;
 get '/longpoll/dynamic/delayed' => sub {
   my $self = shift;
-  $self->on_finish(sub { $longpoll_dynamic_delayed = 'finished!' });
+  $self->on(finish => sub { $longpoll_dynamic_delayed = 'finished!' });
   Mojo::IOLoop->timer(
     '0.5' => sub {
       $self->res->code(201);
@@ -219,7 +219,7 @@ my $finish;
 get '/finish' => sub {
   my $self   = shift;
   my $stream = Mojo::IOLoop->stream($self->tx->connection);
-  $self->on_finish(sub { $finish = $stream->is_writing });
+  $self->on(finish => sub { $finish = $stream->is_writing });
   $self->render(text => 'Finish!');
 };
 
@@ -227,7 +227,7 @@ get '/finish' => sub {
 my $too_long;
 get '/too_long' => sub {
   my $self = shift;
-  $self->on_finish(sub { $too_long = 'finished!' });
+  $self->on(finish => sub { $too_long = 'finished!' });
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   $self->res->headers->content_length(12);

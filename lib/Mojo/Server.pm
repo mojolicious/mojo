@@ -53,9 +53,8 @@ EOF
 
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_request {
-  warn <<EOF;
-Mojo::Server->on_request is DEPRECATED in favor of using Mojo::Server->on!
-EOF
+  warn
+    "Mojo::Server->on_request is DEPRECATED in favor of Mojo::Server->on!\n";
   shift->on(request => shift);
 }
 

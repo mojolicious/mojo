@@ -312,16 +312,15 @@ sub max_line_size { shift->headers->max_line_size(@_) }
 
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_finish {
-  warn <<EOF;
-Mojo::Message->on_finish is DEPRECATED in favor of using Mojo::Message->on!
-EOF
+  warn
+    "Mojo::Message->on_finish is DEPRECATED in favor of Mojo::Message->on!\n";
   shift->on(finish => shift);
 }
 
 # DEPRECATED in Smiling Face With Sunglasses!
 sub on_progress {
   warn <<EOF;
-Mojo::Message->on_progress is DEPRECATED in favor of using Mojo::Message->on!
+Mojo::Message->on_progress is DEPRECATED in favor of Mojo::Message->on!
 EOF
   shift->on(progress => shift);
 }

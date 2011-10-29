@@ -200,7 +200,7 @@ get '/stream' => sub {
 my $finished;
 get '/finished' => sub {
   my $self = shift;
-  $self->on_finish(sub { $finished += 3 });
+  $self->on(finish => sub { $finished += 3 });
   $finished = 20;
   $self->render(text => 'so far so good!');
 };

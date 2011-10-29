@@ -37,8 +37,8 @@ get '/proxy' => sub {
 websocket '/test' => sub {
   my $self = shift;
   my $flag = 0;
-  $self->on_message(
-    sub {
+  $self->on(
+    message => sub {
       my ($self, $message) = @_;
       $self->send_message("${message}test2");
       $flag = 24;

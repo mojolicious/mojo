@@ -10,12 +10,12 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 
 # DEPRECATED in Smiling Face With Sunglasses!
 my @sunglasses = (
-  qw/add_after add_before append del inner_xml on_finish on_progress on_read/,
+  qw/add_after add_before append del inner_xml on_progress on_read/,
   qw/on_request on_resume on_start render_inner replace_inner/,
 );
 
 # DEPRECATED in Leaf Fluttering In Wind!
-my @leaf = ('is_done');
+my @leaf = (qw/on_finish is_done/);
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.
 #  It's also the food preparation."

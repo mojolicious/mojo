@@ -26,7 +26,7 @@ my $timeout = undef;
 get '/timeout' => sub {
   my $self = shift;
   Mojo::IOLoop->connection_timeout($self->tx->connection => '0.5');
-  $self->on_finish(sub { $timeout = 1 });
+  $self->on(finish => sub { $timeout = 1 });
   $self->render_later;
 };
 
@@ -250,7 +250,7 @@ is $tx->res->body, 'works', 'right content';
 $tx = $ua->get('/timeout');
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close.', 'right error';
-is $timeout, 1, 'on_finish was called';
+is $timeout, 1, 'finish event has been emitted';
 
 # Nested keep alive
 my @kept_alive;

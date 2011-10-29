@@ -701,7 +701,7 @@ WebSocket applications have never been this easy before.
 
   websocket '/echo' => sub {
     my $self = shift;
-    $self->on_message(sub {
+    $self->on(message => sub {
       my ($self, $message) = @_;
       $self->send_message("echo: $message");
     });

@@ -105,6 +105,7 @@ L<Mojo::Server> can emit the following events.
 
 Emitted when a request is ready and needs to be handled.
 
+  $server->unsubscribe_all('request');
   $server->on(request => sub {
     my ($server, $tx) = @_;
     $tx->res->code(200);
@@ -141,7 +142,7 @@ implements the following new ones.
 
   my $server = Mojo::Server->new;
 
-Construct a new L<Mojo::Server> object.
+Construct a new L<Mojo::Server> object and register default C<request> event.
 
 =head2 C<build_tx>
 

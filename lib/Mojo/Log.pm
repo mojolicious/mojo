@@ -140,21 +140,22 @@ L<Mojo::Log> implements the following attributes.
   my $handle = $log->handle;
   $log       = $log->handle(IO::File->new);
 
-Logfile handle.
+Logfile handle used by default C<message> event, defaults to opening C<path>
+or C<STDERR>.
 
 =head2 C<level>
 
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Log level.
+Active log level.
 
 =head2 C<path>
 
   my $path = $log->path
   $log     = $log->path('/var/log/mojo.log');
 
-Logfile path.
+Logfile path used by C<handle>.
 
 =head1 METHODS
 
@@ -238,7 +239,7 @@ Check for warn log level.
 
   $log = $log->log(debug => 'This should work');
 
-Log a message.
+Emit C<message> event.
 
 =head2 C<warn>
 

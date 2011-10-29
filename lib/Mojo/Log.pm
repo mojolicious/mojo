@@ -127,7 +127,7 @@ Note that this event is EXPERIMENTAL and might change without warning!
 
   $log->on(message => sub {
     my ($log, $level, @messages) = @_;
-    say "$level: ", join("\n", @messages);
+    say "$level: ", @messages;
   });
 
 =head1 ATTRIBUTES

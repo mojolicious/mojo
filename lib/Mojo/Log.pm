@@ -102,6 +102,7 @@ Mojo::Log - Simple logger for Mojo
     level => 'warn',
   );
 
+  # Log messages
   $log->debug("Why isn't this working?");
   $log->info("FYI: it happened again");
   $log->warn("This might be a problem");
@@ -140,15 +141,31 @@ L<Mojo::Log> implements the following attributes.
   my $handle = $log->handle;
   $log       = $log->handle(IO::File->new);
 
-Logfile handle used by default C<message> event, defaults to opening C<path>
-or C<STDERR>.
+Logfile handle used by default C<message> event, defaults to opening the
+value of C<path> or C<STDERR>.
 
 =head2 C<level>
 
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Active log level.
+Active log level, defaults to C<debug>.
+
+These levels are currently available:
+
+=over 2
+
+=item C<debug>
+
+=item C<info>
+
+=item C<warn>
+
+=item C<error>
+
+=item C<fatal>
+
+=back
 
 =head2 C<path>
 

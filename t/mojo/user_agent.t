@@ -206,7 +206,7 @@ is $finished, 1, 'finish event has been emitted';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';
 
-# GET /no_length (missing Content-Lengt header)
+# GET /no_length (missing Content-Length header)
 $tx = $ua->get('/no_length');
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';

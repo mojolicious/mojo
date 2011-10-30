@@ -26,7 +26,7 @@
 -ci=2   # Continuation indent is 2 cols
 
 # We use version control, so just rewrite the file
--b 
+-b
 
 # For the up-tight folk :)
 -pt=2    # High parenthesis tightness

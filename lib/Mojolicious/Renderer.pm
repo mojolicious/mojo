@@ -350,7 +350,7 @@ Directory to look for layouts in, defaults to C<layouts>.
 
   my $root  = $renderer->root;
   $renderer = $renderer->root('/foo/bar/templates');
-   
+
 Directory to look for templates in.
 
 =head1 METHODS
@@ -367,7 +367,7 @@ Construct a new renderer.
 =head2 C<add_handler>
 
   $renderer = $renderer->add_handler(epl => sub {...});
-    
+
 Add a new handler to the renderer.
 See L<Mojolicious::Plugin::EPRenderer> for a sample renderer.
 
@@ -407,7 +407,7 @@ See L<Mojolicious::Controller/"render"> for a more user friendly interface.
     format   => 'html',
     handler  => 'epl'
   });
-    
+
 Builds a template name based on an options hash with C<template>, C<format>
 and C<handler>.
 

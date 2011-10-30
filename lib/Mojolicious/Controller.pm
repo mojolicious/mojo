@@ -852,7 +852,7 @@ Disable auto rendering, especially for long polling this can be quite useful.
 
   $c->render_not_found;
   $c->render_not_found($resource);
-    
+
 Render the not found template C<not_found.$mode.$format.*> or
 C<not_found.$format.*> and set the response status code to C<404>.
 
@@ -860,7 +860,7 @@ C<not_found.$format.*> and set the response status code to C<404>.
 
   my $output = $c->render_partial('menubar');
   my $output = $c->render_partial('menubar', format => 'txt');
-    
+
 Same as C<render> but returns the rendered result.
 
 =head2 C<render_static>
@@ -973,7 +973,7 @@ be set with L<Mojolicious/"defaults">.
 =head2 C<ua>
 
   my $ua = $c->ua;
-    
+
 Alias for C<$c-E<gt>app-E<gt>ua>.
 Usually refers to a L<Mojo::UserAgent> object.
 

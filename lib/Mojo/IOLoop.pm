@@ -468,6 +468,8 @@ supported transparently and used if installed.
 
 A TLS certificate and key are also built right in to make writing test
 servers as easy as possible.
+Also note that for convenience the C<PIPE> signal will be set to C<IGNORE>
+when L<Mojo::IOLoop> is loaded.
 
 =head1 ATTRIBUTES
 
@@ -653,7 +655,6 @@ Path to the TLS key file.
 =head2 C<connection_timeout>
 
   my $timeout = Mojo::IOLoop->connection_timeout($id);
-  $loop       = Mojo::IOLoop->connection_timeout($id => 45);
   my $timeout = $loop->connection_timeout($id);
   $loop       = $loop->connection_timeout($id => 45);
 

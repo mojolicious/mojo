@@ -702,7 +702,7 @@ script, so don't forget to use the L<utf8> pragma if necessary.
 
   @@ heart.html.ep
   I ♥ Mojolicious!
-  
+
 
 =head2 Base64 encoded DATA files
 

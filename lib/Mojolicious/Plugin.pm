@@ -30,7 +30,7 @@ the following new ones.
 =head2 C<register>
 
   $plugin->register;
-    
+
 This method will be called by L<Mojolicious::Plugins> at startup time,
 your plugin should use this to hook into the application.
 For instace by adding handlers and helpers to the renderer or using the

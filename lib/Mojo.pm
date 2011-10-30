@@ -95,7 +95,7 @@ which stringifies to the actual path.
 
   my $log = $app->log;
   $app    = $app->log(Mojo::Log->new);
-    
+
 The logging layer of your application, defaults to a L<Mojo::Log> object.
 
   $app->log->debug('It works!');

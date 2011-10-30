@@ -196,8 +196,7 @@ hash to try and find appropriate code to generate a response.
 
 The generated hash of a matching route is actually the center of the whole
 L<Mojolicious> request cycle.
-We call it the stash, and it is basically a global namespace that persists
-until a response has been generated.
+We call it the stash, and it persists until a response has been generated.
 
   # /bye -> {controller => 'foo', action => 'bye', mymessage => 'Bye!'}
   $r->route('/bye')
@@ -217,6 +216,9 @@ Once dispatched the whole stash content can be changed at any time.
     # Change message in stash
     $self->stash(mymessage => 'Welcome!');
   }
+
+A full list of all reserved stash values can also be found in
+L<Mojolicious::Guides::Cheatsheet>.
 
 =head2 Special stash values (C<controller> and C<action>)
 

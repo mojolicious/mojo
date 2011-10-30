@@ -356,7 +356,7 @@ sub _dispatch_callback {
   my ($self, $c, $field, $staging) = @_;
 
   # Routed
-  $c->stash->{'mojo.routed'} = 1;
+  $c->stash->{'mojo.routed'}++;
   $c->app->log->debug(qq/Dispatching callback./);
 
   # Dispatch
@@ -409,7 +409,7 @@ sub _dispatch_controller {
       # Call action
       my $stash = $c->stash;
       if ($app->can($method)) {
-        $stash->{'mojo.routed'} = 1 unless $staging;
+        $stash->{'mojo.routed'}++ unless $staging;
         $continue = $app->$method;
       }
 

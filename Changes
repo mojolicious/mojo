@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.18    2011-10-30 00:00:00
         - Improved documentation.
+        - Fixed small rendering bug.
 
 2.17    2011-10-30 00:00:00
         - Fixed bug in "user_agent.t".

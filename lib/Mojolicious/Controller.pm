@@ -332,7 +332,7 @@ sub render_json {
   return $self->render($args);
 }
 
-sub render_later { shift->stash->{'mojo.rendered'} = 1 }
+sub render_later { shift->stash->{'mojo.rendered'}++ }
 
 # "Excuse me, sir, you're snowboarding off the trail.
 #  Lick my frozen metal ass."
@@ -407,12 +407,11 @@ sub rendered {
 
   # Finish transaction
   my $stash = $self->stash;
-  unless ($stash->{'mojo.finished'}) {
+  unless ($stash->{'mojo.finished'}++) {
     $res->code(200) unless $res->code;
     my $app = $self->app;
     $app->plugins->run_hook_reverse(after_dispatch => $self);
     $app->sessions->store($self);
-    $stash->{'mojo.finished'} = 1;
   }
   $self->tx->resume;
 

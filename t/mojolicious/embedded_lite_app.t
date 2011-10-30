@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'testing';
 }
 
-use Test::More tests => 122;
+use Test::More tests => 125;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -183,6 +183,9 @@ $t->get_ok('/third')->status_is(200)
 
 # GET /just/works (from external embedded app)
 $t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
+
+# GET /just/works/too (from external embedded app)
+$t->get_ok('/just/works/too')->status_is(200)->content_is("It just works!\n");
 
 # GET /x/1/ (full external application)
 $t->get_ok('/x/1/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");

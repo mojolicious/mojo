@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 68;
+use Test::More tests => 71;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -28,6 +28,21 @@ get '/timeout' => sub {
   Mojo::IOLoop->connection_timeout($self->tx->connection => '0.5');
   $self->on(finish => sub { $timeout = 1 });
   $self->render_later;
+};
+
+# GET /no_length
+get '/no_length' => sub {
+  my $self = shift;
+  $self->finish('works too!');
+  $self->rendered(200);
+};
+
+# GET /last
+my $last;
+get '/last' => sub {
+  my $self = shift;
+  $last = $self->tx->connection;
+  $self->render(text => 'works!');
 };
 
 # Proxy detection
@@ -76,64 +91,101 @@ $ENV{https_proxy} = $backup5;
 $ENV{no_proxy}    = $backup6;
 
 # User agent
-$ua = Mojo::UserAgent->new->app(app);
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 
-# Server
-my $port   = Mojo::IOLoop->generate_port;
-my $buffer = {};
-my $last;
-my $id = Mojo::IOLoop->listen(
-  port      => $port,
-  on_accept => sub {
-    my ($loop, $id) = @_;
-    $last = $id;
-    $buffer->{$id} = '';
-  },
-  on_read => sub {
-    my ($loop, $id, $chunk) = @_;
-    $buffer->{$id} .= $chunk;
-    if (index $buffer->{$id}, "\x0d\x0a\x0d\x0a") {
-      delete $buffer->{$id};
-      $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
-          . "Connection: keep-alive\x0d\x0a"
-          . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
-    }
-  },
-  on_error => sub {
-    my ($self, $id) = @_;
-    delete $buffer->{$id};
+# GET / (non-blocking)
+my ($success, $code, $body);
+$ua->get(
+  '/' => sub {
+    my $tx = pop;
+    $success = $tx->success;
+    $code    = $tx->res->code;
+    $body    = $tx->res->body;
+    Mojo::IOLoop->stop;
   }
 );
+Mojo::IOLoop->start;
+ok $success, 'successful';
+is $code,    200, 'right status';
+is $body,    'works', 'right content';
 
-# Wonky server (missing Content-Length header)
-my $port2   = Mojo::IOLoop->generate_port;
-my $buffer2 = {};
-Mojo::IOLoop->listen(
-  port      => $port2,
-  on_accept => sub {
+# GET /last (custom connection)
+($success, $code, $body) = undef;
+Mojo::IOLoop->connect(
+  address    => 'localhost',
+  port       => $ua->test_server->port,
+  on_connect => sub {
     my ($loop, $id) = @_;
-    $buffer2->{$id} = '';
-  },
-  on_read => sub {
-    my ($loop, $id, $chunk) = @_;
-    $buffer2->{$id} .= $chunk;
-    if (index($buffer2->{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
-      delete $buffer2->{$id};
-      $loop->write(
-        $id => "HTTP/1.1 200 OK\x0d\x0a"
-          . "Content-Type: text/plain\x0d\x0a\x0d\x0aworks too!",
-        sub { shift->drop(shift) }
-      );
-    }
-  },
-  on_error => sub {
-    my ($self, $id) = @_;
-    delete $buffer2->{$id};
+    my $tx = $ua->build_tx(GET => 'http://mojolicio.us/last');
+    $tx->connection($id);
+    $ua->start(
+      $tx => sub {
+        my $tx = pop;
+        $success = $tx->success;
+        $code    = $tx->res->code;
+        $body    = $tx->res->body;
+        Mojo::IOLoop->stop;
+      }
+    );
   }
 );
+Mojo::IOLoop->start;
+ok $success, 'successful';
+is $code,    200, 'right status';
+is $body,    'works!', 'right content';
+
+# GET /last (blocking)
+my $tx = $ua->get('/last');
+ok $tx->success, 'successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
+
+# GET /last (again)
+$tx = $ua->get('/last');
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
+
+# Close connection
+Mojo::IOLoop->stream($last)->emit('close');
+Mojo::IOLoop->one_tick while Mojo::IOLoop->stream($last);
+
+# GET /last (closed connection)
+$tx = $ua->get('/last');
+ok $tx->success, 'successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
+
+# GET /last (again)
+$tx = $ua->get('/last');
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
+
+# Close connection
+Mojo::IOLoop->stream($last)->emit('close');
+Mojo::IOLoop->one_tick while Mojo::IOLoop->stream($last);
+
+# GET /last (closed connection)
+$tx = $ua->get('/last');
+ok $tx->success, 'successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
+
+# GET /last (again)
+$tx = $ua->get('/last');
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
 
 # GET /
-my $tx = $ua->get('/');
+$tx = $ua->get('/');
 ok $tx->success, 'successful';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';
@@ -154,91 +206,14 @@ is $finished, 1, 'finish event has been emitted';
 is $tx->res->code, 200,     'right status';
 is $tx->res->body, 'works', 'right content';
 
-# GET / (custom connection)
-my ($success, $code, $body);
-Mojo::IOLoop->connect(
-  address    => 'localhost',
-  port       => $port,
-  on_connect => sub {
-    my ($loop, $id) = @_;
-    my $tx = $ua->build_tx(GET => "http://mojolicio.us:$port/");
-    $tx->connection($id);
-    $ua->start(
-      $tx => sub {
-        my $tx = pop;
-        $loop->drop($id);
-        $success = $tx->success;
-        $code    = $tx->res->code;
-        $body    = $tx->res->body;
-        Mojo::IOLoop->stop;
-      }
-    );
-  }
-);
-Mojo::IOLoop->start;
-ok $success, 'successful';
-is $code,    200, 'right status';
-is $body,    'works!', 'right content';
-
-# Fresh blocking user agent
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
-
-# GET / (missing Content-Lengt header)
-$tx = $ua->get("http://localhost:$port2/");
+# GET /no_length (missing Content-Lengt header)
+$tx = $ua->get('/no_length');
 ok $tx->success, 'successful';
-ok !$tx->error,      'no error';
-ok !$tx->kept_alive, 'kept connection not alive';
-ok $tx->keep_alive, 'keep connection alive';
+ok !$tx->error, 'no error';
+ok $tx->kept_alive, 'kept connection alive';
+ok !$tx->keep_alive, 'keep connection not alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
-
-# GET / (mock server)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-ok !$tx->kept_alive, 'kept connection not alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# GET / (mock server again)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success,    'successful';
-ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# Close connection (bypassing safety net)
-Mojo::IOLoop->singleton->_drop($last);
-
-# GET / (mock server closed connection)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-ok !$tx->kept_alive, 'kept connection not alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# GET / (mock server again)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success,    'successful';
-ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# Close connection (bypassing safety net)
-Mojo::IOLoop->singleton->_drop($last);
-
-# GET / (mock server closed connection)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success, 'successful';
-ok !$tx->kept_alive, 'kept connection not alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# GET / (mock server again)
-$tx = $ua->get("http://localhost:$port/mock");
-ok $tx->success,    'successful';
-ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
 
 # GET / (built-in server)
 $tx = $ua->get('/');
@@ -302,8 +277,8 @@ Mojo::IOLoop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';
 
 # Premature connection close
-$port = Mojo::IOLoop->generate_port;
-$id   = Mojo::IOLoop->listen(
+my $port = Mojo::IOLoop->generate_port;
+my $id   = Mojo::IOLoop->listen(
   port      => $port,
   on_accept => sub { shift->drop(shift) }
 );

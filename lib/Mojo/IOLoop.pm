@@ -183,6 +183,7 @@ sub on_read  { shift->_event(read  => @_) }
 
 sub one_tick {
   my $self = shift;
+  $self = $self->singleton unless ref $self;
   $self->timer(shift // '0.025' => sub { shift->stop });
   $self->start;
 }
@@ -822,6 +823,7 @@ Callback to be invoked if new data arrives on the connection.
 
 =head2 C<one_tick>
 
+  Mojo::IOLoop->one_tick;
   $loop->one_tick;
   $loop->one_tick('0.25');
   $loop->one_tick(0);

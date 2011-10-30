@@ -136,7 +136,7 @@ sub finish_ok {
   my ($self, $desc) = @_;
 
   $self->tx->finish;
-  Mojo::IOLoop->singleton->one_tick while !$self->{finished};
+  Mojo::IOLoop->one_tick while !$self->{finished};
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok 1, $desc || 'finished websocket';
 
@@ -349,8 +349,7 @@ sub _get_content {
 
 sub _message {
   my $self = shift;
-  Mojo::IOLoop->singleton->one_tick
-    while !$self->{finished} && !@{$self->{messages}};
+  Mojo::IOLoop->one_tick while !$self->{finished} && !@{$self->{messages}};
   return shift @{$self->{messages}};
 }
 

@@ -9,8 +9,6 @@ BEGIN {
 
 use Test::More tests => 32;
 
-use IO::Socket::INET;
-
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
 #  besides occasionally wearing the underwear,

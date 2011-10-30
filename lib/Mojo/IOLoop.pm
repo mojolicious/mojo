@@ -872,11 +872,10 @@ The remote port.
 
   my $loop = Mojo::IOLoop->singleton;
 
-The global loop object, used to access a single shared loop instance from
-everywhere inside the process.
-Many methods also allow you to take shortcuts when using the L<Mojo::IOLoop>
-singleton.
+The global L<Mojo::IOLoop> singleton, used to access a single shared loop
+instance from everywhere inside the process.
 
+  # Many methods also allow you to take shortcuts
   Mojo::IOLoop->timer(2 => sub { Mojo::IOLoop->stop });
   Mojo::IOLoop->start;
 

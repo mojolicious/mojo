@@ -380,7 +380,8 @@ L<Mojo::IOLoop::Resolver> implements the following attributes.
   my $ioloop = $resolver->ioloop;
   $resolver  = $resolver->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for I/O operations, defaults to a L<Mojo::IOLoop> object.
+Loop object to use for I/O operations, defaults to the global L<Mojo::IOLoop>
+singleton.
 
 =head2 C<timeout>
 

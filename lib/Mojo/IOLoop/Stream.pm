@@ -230,8 +230,8 @@ L<Mojo::IOLoop::Stream> implements the following attributes.
   my $watcher = $stream->iowatcher;
   $stream     = $stream->iowatcher(Mojo::IOWatcher->new);
 
-Low level event watcher, usually a L<Mojo::IOWatcher> or
-L<Mojo::IOWatcher::EV> object.
+Low level event watcher, defaults to the C<iowatcher> attribute value of the
+global L<Mojo::IOLoop> singleton.
 
 =head1 METHODS
 

@@ -2,6 +2,7 @@ package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use IO::Socket::INET;
+use Mojo::IOLoop::Resolver;
 use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP SO_ERROR TCP_NODELAY/;
 
@@ -17,10 +18,7 @@ use constant TLS => $ENV{MOJO_NO_TLS}
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
-has resolver => sub {
-  require Mojo::IOLoop::Resolver;
-  Mojo::IOLoop::Resolver->new;
-};
+has resolver => sub { Mojo::IOLoop::Resolver->new };
 
 # "It's like my dad always said: eventually, everybody gets shot."
 sub DESTROY {
@@ -211,7 +209,7 @@ L<Mojo::IOLoop::Client> implements the following attributes.
   my $resolver = $client->resolver;
   $client      = $client->resolver(Mojo::IOLoop::Resolver->new);
 
-DNS stub resolver, usually a L<Mojo::IOLoop::Resolver> object.
+DNS stub resolver, defaults to a L<Mojo::IOLoop::Resolver> object.
 
 =head1 METHODS
 

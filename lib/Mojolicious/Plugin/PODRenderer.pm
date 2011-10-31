@@ -115,7 +115,7 @@ sub register {
       # Combine everything to a proper response
       $self->content_for(mojobar => $self->include(inline => $MOJOBAR));
       $self->content_for(perldoc => "$dom");
-      $self->app->plugins->run_hook(before_perldoc => $self);
+      $self->app->plugins->emit_hook(before_perldoc => $self);
       $self->render(
         inline   => $PERLDOC,
         title    => $title,

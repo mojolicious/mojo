@@ -15,7 +15,7 @@ my @sunglasses = (
 );
 
 # DEPRECATED in Leaf Fluttering In Wind!
-my @leaf = (qw/on_finish is_done/);
+my @leaf = (qw/add_hook is_done on_finish run_hook run_hook_reverse/);
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.
 #  It's also the food preparation."

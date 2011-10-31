@@ -1,18 +1,31 @@
 package Mojolicious::Plugins;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::Util 'camelize';
 
-has hooks      => sub { {} };
-has namespaces => sub { ['Mojolicious::Plugin'] };
-
 # "Who would have thought Hell would really exist?
 #  And that it would be in New Jersey?"
+has namespaces => sub { ['Mojolicious::Plugin'] };
+
+# DEPRECATED in Leaf Fluttering In Wind!
 sub add_hook {
-  my ($self, $name, $cb) = @_;
-  return $self unless $name && $cb;
-  $self->hooks->{$name} ||= [];
-  push @{$self->hooks->{$name}}, $cb;
+  warn <<EOF;
+Mojolicious::Plugins->add_hook is DEPRECATED in favor of
+Mojolicious::Plugins->on!
+EOF
+  shift->on(@_);
+}
+
+sub emit_hook {
+  my $self = shift;
+  $_->(@_) for @{$self->subscribers(shift)};
+  return $self;
+}
+
+# "Everybody's a jerk. You, me, this jerk."
+sub emit_hook_reverse {
+  my $self = shift;
+  $_->(@_) for reverse @{$self->subscribers(shift)};
   return $self;
 }
 
@@ -56,21 +69,22 @@ sub register_plugin {
   $self->load_plugin($name)->register($app, ref $_[0] ? $_[0] : {@_});
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
 sub run_hook {
-  my $self = shift;
-  return $self unless my $name  = shift;
-  return $self unless my $hooks = $self->hooks->{$name};
-  for my $hook (@$hooks) { $hook->(@_) }
-  return $self;
+  warn <<EOF;
+Mojolicious::Plugins->run_hook is DEPRECATED in favor of
+Mojolicious::Plugins->emit_hook!
+EOF
+  shift->emit_hook(@_);
 }
 
-# "Everybody's a jerk. You, me, this jerk."
+# DEPRECATED in Leaf Fluttering In Wind!
 sub run_hook_reverse {
-  my $self = shift;
-  return $self unless my $name  = shift;
-  return $self unless my $hooks = $self->hooks->{$name};
-  for my $hook (reverse @$hooks) { $hook->(@_) }
-  return $self;
+  warn <<EOF;
+Mojolicious::Plugins->run_hook_reverse is DEPRECATED in favor of
+Mojolicious::Plugins->emit_hook_reverse!
+EOF
+  shift->emit_hook_reverse(@_);
 }
 
 sub _load {
@@ -104,21 +118,10 @@ Mojolicious::Plugins - Plugins
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugins> is the plugin manager of L<Mojolicious>.
-In your application you will usually use it to load plugins.
-To implement your own plugins see L<Mojolicious::Plugin> and the C<add_hook>
-method below.
 
 =head1 ATTRIBUTES
 
 L<Mojolicious::Plugins> implements the following attributes.
-
-=head2 C<hooks>
-
-  my $hooks = $plugins->hooks;
-  $plugins  = $plugins->hooks({foo => [sub {...}]});
-
-Hash reference containing all hooks that have been registered by loaded
-plugins.
 
 =head2 C<namespaces>
 
@@ -126,20 +129,27 @@ plugins.
   $plugins       = $plugins->namespaces(['Mojolicious::Plugin']);
 
 Namespaces to load plugins from.
-You can add more namespaces to load application specific plugins.
+
+  push @{$plugins->namespaces}, 'MyApp::Plugins';
 
 =head1 METHODS
 
-L<Mojolicious::Plugins> inherits all methods from L<Mojo::Base> and
+L<Mojolicious::Plugins> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 C<add_hook>
+=head2 C<emit_hook>
 
-  $plugins = $plugins->add_hook(event => sub {...});
+  $plugins = $plugins->emit_hook('foo');
+  $plugins = $plugins->emit_hook(foo => 123);
 
-Hook into an event.
-You can also add custom events by calling C<run_hook> and C<run_hook_reverse>
-from your application.
+Emit events as hooks.
+
+=head2 C<emit_hook_reverse>
+
+  $plugins = $plugins->emit_hook_reverse('foo');
+  $plugins = $plugins->emit_hook_reverse(foo => 123);
+
+Emit events as hooks in reverse order.
 
 =head2 C<load_plugin>
 
@@ -162,22 +172,7 @@ Load a plugin from the configured namespaces or by full module name.
   $plugins->register_plugin('MyApp::Plugin::SomeThing', $app, {foo => 23});
 
 Load a plugin from the configured namespaces or by full module name and run
-C<register>.
-Optional arguments are passed to register.
-
-=head2 C<run_hook>
-
-  $plugins = $plugins->run_hook('foo');
-  $plugins = $plugins->run_hook(foo => 123);
-
-Runs a hook.
-
-=head2 C<run_hook_reverse>
-
-  $plugins = $plugins->run_hook_reverse('foo');
-  $plugins = $plugins->run_hook_reverse(foo => 123);
-
-Runs a hook in reverse order.
+C<register>, optional arguments are passed through.
 
 =head1 SEE ALSO
 

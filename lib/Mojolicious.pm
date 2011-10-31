@@ -109,7 +109,7 @@ sub new {
 sub build_tx {
   my $self = shift;
   my $tx   = Mojo::Transaction::HTTP->new;
-  $self->plugins->run_hook(after_build_tx => $tx, $self);
+  $self->plugins->emit_hook(after_build_tx => $tx, $self);
   return $tx;
 }
 
@@ -143,11 +143,11 @@ sub dispatch {
   $c->res->code(undef) if $tx->is_websocket;
   $self->sessions->load($c);
   my $plugins = $self->plugins;
-  $plugins->run_hook(before_dispatch => $c);
+  $plugins->emit_hook(before_dispatch => $c);
 
   # Try to find a static file
   $self->static->dispatch($c);
-  $plugins->run_hook_reverse(after_static_dispatch => $c);
+  $plugins->emit_hook_reverse(after_static_dispatch => $c);
 
   # Routes
   my $res = $tx->res;
@@ -207,7 +207,7 @@ sub helper {
 #  You better not breathe, you better not move.
 #  You're better off dead, I'm tellin' you, dude.
 #  Santa Claus is gunning you down!"
-sub hook { shift->plugins->add_hook(@_) }
+sub hook { shift->plugins->on(@_) }
 
 sub plugin {
   my $self = shift;
@@ -460,9 +460,9 @@ and the application object, as well as a function in C<ep> templates.
 
   $app->hook(after_dispatch => sub {...});
 
-Extend L<Mojolicious> by adding hooks to named events.
+Extend L<Mojolicious> by adding hooks.
 
-These events are currently available and run in the listed order:
+These hooks are currently available and run in the listed order:
 
 =over 2
 

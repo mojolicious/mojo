@@ -277,6 +277,10 @@ pleasant L<Test::Mojo> API to be used.
   use Test::More tests => 4;
   use Test::Mojo;
 
+  # Include application
+  use FindBin;
+  require "$FindBin::Bin/../echo.pl";
+
   # Test echo web service
   my $t = Test::Mojo->new;
   $t->websocket_ok('/echo')->send_message_ok('Hello Mojo!')

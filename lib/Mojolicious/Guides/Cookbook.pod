@@ -292,14 +292,14 @@ block for too long.
     </body>
   </html>
 
-The C<finish> event will always be emitted after a WebSocket connection has
-been closed.
+See also L<Mojo::Transaction::WebSocket/"EVENTS"> for more information about
+the events used in this example.
 
 =head2 Testing WebSockets
 
-While the message flow on WebSocket connections can often be rather dynamic,
-it more often than not is quite predictable, which allows this rather
-pleasant L<Test::Mojo> API to be used.
+While the message flow on WebSocket connections can be rather dynamic, it
+more often than not is quite predictable, which allows this rather pleasant
+L<Test::Mojo> API to be used.
 
   use Test::More tests => 4;
   use Test::Mojo;
@@ -367,8 +367,8 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     </body>
   </html>
 
-The C<finish> event will always be emitted after the transaction has been
-finished.
+See also L<Mojo::Transaction::HTTP/"EVENTS"> and L<Mojo::Log/"EVENTS"> for
+more information about the events used in this example.
 
 =head1 USER AGENT
 

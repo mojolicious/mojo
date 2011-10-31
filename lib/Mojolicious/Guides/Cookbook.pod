@@ -232,11 +232,11 @@ into alien environments like foreign event loops.
 =head1 REAL-TIME WEB
 
 The real-time web is a collection of technologies that include Comet
-(long-polling), HTML5 EventSource and WebSockets, which allow content to be
-pushed to consumers as soon as it is generated, instead of relying on the
-more traditional pull model.
+(long-polling), EventSource and WebSockets, which allow content to be pushed
+to consumers as soon as it is generated, instead of relying on the more
+traditional pull model.
 
-=head2 WebSocket echo service
+=head2 WebSocket
 
 The WebSocket protocol offers full bi-directional low-latency communication
 channels between clients and servers.
@@ -313,7 +313,7 @@ L<Test::Mojo> API to be used.
   $t->websocket_ok('/echo')->send_message_ok('Hello Mojo!')
     ->message_is('echo: Hello Mojo!')->finish_ok;
 
-=head2 Live logging with HTML5 EventSource
+=head2 EventSource
 
 HTML5 EventSource is a special form of long-polling where you can directly
 send DOM events from servers to clients.

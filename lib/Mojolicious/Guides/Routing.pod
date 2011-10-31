@@ -756,7 +756,7 @@ Now just load the plugin and you're done.
 
 You can restrict access to WebSocket handshakes using the C<websocket> method.
 
-  # /ws (WebSocket handshake)
+  # /echo (WebSocket handshake)
   $r->websocket('/echo')->to(controller => 'foo', action => 'echo');
 
   # Controller

@@ -292,8 +292,8 @@ block for too long.
     </body>
   </html>
 
-See also L<Mojo::Transaction::WebSocket/"EVENTS"> for more information about
-the events used in this example.
+The C<finish> event will be emitted right after the WebSocket connection has
+been closed.
 
 =head2 Testing WebSockets
 
@@ -367,8 +367,8 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     </body>
   </html>
 
-See also L<Mojo::Transaction::HTTP/"EVENTS"> and L<Mojo::Log/"EVENTS"> for
-more information about the events used in this example.
+The C<message> event will be emitted for every new log message and the
+C<finish> event right after the transaction has been finished.
 
 =head1 USER AGENT
 
@@ -429,9 +429,9 @@ You can just add username and password to the URL.
 
 =head2 Decorating followup requests
 
-L<Mojo::UserAgent> can automatically follow redirects, the C<on_start>
-callback allows you direct access to each transaction right after they have
-been initialized and before a connection gets associated with them.
+L<Mojo::UserAgent> can automatically follow redirects, the C<start> event
+allows you direct access to each transaction right after they have been
+initialized and before a connection gets associated with them.
 
   # User agent following up to 10 redirects
   my $ua = Mojo::UserAgent->new(max_redirects => 10);
@@ -450,15 +450,18 @@ This even works for proxy C<CONNECT> requests.
 
 =head2 Streaming response
 
-Receiving a streaming response can be really tricky in most HTTP clients,
+Receiving a streaming response can be really tricky in most HTTP clients, but
 L<Mojo::UserAgent> makes it actually easy.
 
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://mojolicio.us');
-  $tx->res->body(sub { say $_[1] });
+  $tx->res->content->on(read => sub {
+    my ($content, $chunk) = @_;
+    say $chunk;
+  });
   $ua->start($tx);
 
-The C<body> callback will be called for every chunk of data that is received,
+The C<read> event will be emitted for every chunk of data that is received,
 even C<chunked> encoding will be handled transparently if necessary.
 
 =head2 Streaming request
@@ -567,10 +570,10 @@ time.
   # Start a bunch of parallel crawlers sharing the same user agent
   $crawl->($_) for 1 .. 3;
 
-  # Start event loop
+  # Start reactor
   Mojo::IOLoop->start;
 
-You can take full control of the L<Mojo::IOLoop> event loop.
+You can take full control of the L<Mojo::IOLoop> reactor.
 
 =head2 Parallel blocking requests
 

@@ -402,7 +402,8 @@ Group for server process.
   my $loop = $daemon->ioloop;
   $daemon  = $daemon->ioloop(Mojo::IOLoop->new);
 
-Event loop for server I/O, defaults to the global L<Mojo::IOLoop> singleton.
+Loop object to use for I/O operations, defaults to the global L<Mojo::IOLoop>
+singleton.
 
 =head2 C<keep_alive_timeout>
 
@@ -473,7 +474,7 @@ implements the following new ones.
 
   $daemon->prepare_ioloop;
 
-Prepare event loop.
+Prepare loop.
 
 =head2 C<run>
 

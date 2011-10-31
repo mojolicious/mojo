@@ -707,6 +707,9 @@ WebSocket applications have never been this easy before.
     });
   };
 
+The C<message> event will be emitted for every new WebSocket message that is
+received.
+
 =head2 External templates
 
 External templates will be searched by the renderer in a C<templates>

@@ -229,6 +229,59 @@ into alien environments like foreign event loops.
   # Call "one_tick" repeatedly from the alien environment
   $daemon->ioloop->one_tick while 1;
 
+=head1 REAL-TIME WEB
+
+The real-time web is a collection of technologies that includes Comet
+(long-polling), HTML5 EventSource and WebSockets, which allow content to be
+pushed to consumers as soon as it is generated, instead of relying on the
+more traditional pull model.
+
+=head2 WebSocket echo service
+
+Receiving WebSocket messages is as easy as subscribing to the C<message>
+event of the current transaction, just be aware that this is all event based,
+so you should not block for too long.
+
+  use Mojolicious::Lite;
+
+  websocket '/echo' => sub {
+    my $self = shift;
+
+    # Connected
+    $self->app->log->debug('WebSocket connected.');
+
+    # Incoming message
+    $self->on(message => sub {
+      my ($self, $message) = @_;
+      $self->send_message("echo: $message");
+    });
+
+    # Disconnected
+    $self->on(finish => sub {
+      my $self = shift;
+      $self->app->log->debug('WebSocket disconnected.');
+    });
+  };
+
+  app->start;
+
+The C<finish> event will always be emitted after a WebSocket connection has
+been closed.
+
+=head2 Testing WebSockets
+
+While the message flow on WebSocket connections can often be rather dynamic,
+it more often than not is quite predictable, which allows this rather
+pleasant L<Test::Mojo> API to be used.
+
+  use Test::More tests => 4;
+  use Test::Mojo;
+
+  # Test echo web service
+  my $t = Test::Mojo->new;
+  $t->websocket_ok('/echo')->send_message_ok('Hello Mojo!')
+    ->message_is('echo: Hello Mojo!')->finish_ok;
+
 =head1 USER AGENT
 
 When we say L<Mojolicious> is a web framework we actually mean it.

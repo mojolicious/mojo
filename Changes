@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.20    2011-10-31 00:00:00
+        - Documentation improvements.
+
 2.19    2011-10-31 00:00:00
         - Deprecated Mojolicious::Plugins->add_hook in favor of
           Mojolicious::Plugins->on.

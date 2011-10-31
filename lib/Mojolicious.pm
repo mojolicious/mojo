@@ -35,7 +35,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.19';
+our $VERSION  = '2.20';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -462,14 +462,14 @@ and the application object, as well as a function in C<ep> templates.
 
 Extend L<Mojolicious> by adding hooks.
 
-These hooks are currently available and run in the listed order:
+These hooks are currently available and are emitted in the listed order:
 
 =over 2
 
 =item after_build_tx
 
-Triggered right after the transaction is built and before the HTTP request
-gets parsed, the callbacks of this hook run in the order they were added.
+Emitted in reverse order right after the transaction is built and before the
+HTTP request gets parsed.
 
   $app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;
@@ -480,8 +480,7 @@ One use case would be upload progress bars.
 
 =item before_dispatch
 
-Triggered right before the static and routes dispatchers start their work,
-the callbacks of this hook run in the order they were added.
+Emitted right before the static and routes dispatchers start their work.
 
   $app->hook(before_dispatch => sub {
     my $self = shift;
@@ -492,9 +491,8 @@ Very useful for rewriting incoming requests and other preprocessing tasks.
 
 =item after_static_dispatch
 
-Triggered after the static dispatcher determined if a static file should be
-served and before the routes dispatcher starts its work, the callbacks of
-this hook run in reverse order.
+Emitted in reverse order after the static dispatcher determined if a static
+file should be served and before the routes dispatcher starts its work.
 
   $app->hook(after_static_dispatch => sub {
     my $self = shift;
@@ -505,8 +503,7 @@ Mostly used for custom dispatchers and postprocessing static file responses.
 
 =item after_dispatch
 
-Triggered after a response has been rendered, the callbacks of this hook run
-in reverse order.
+Emitted in reverse order after a response has been rendered.
 Note that this hook can trigger before C<after_static_dispatch> due to its
 dynamic nature.
 

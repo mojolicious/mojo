@@ -167,10 +167,10 @@ File:
   %= javascript begin
     var ws;
     if ("MozWebSocket" in window) {
-      ws = new MozWebSocket("<%= $url %>");
+      ws = new MozWebSocket('<%= $url %>');
     }
     else if ("WebSocket" in window) {
-      ws = new WebSocket("<%= $url %>");
+      ws = new WebSocket('<%= $url %>');
     }
     if(typeof(ws) !== 'undefined') {
       function wsmessage(event) {

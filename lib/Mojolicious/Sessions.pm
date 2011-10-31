@@ -98,7 +98,7 @@ Mojolicious::Sessions - Signed cookie based sessions
 
 L<Mojolicious::Sessions> is a very simple signed cookie based session
 implementation.
-All data gets serialized with L<Mojo::JSON> and stored on the client side,
+All data gets serialized with L<Mojo::JSON> and stored on the client-side,
 but is protected from unwanted changes with a signature.
 
 =head1 ATTRIBUTES

@@ -342,7 +342,7 @@ is $result2,  'test0test1', 'right result';
 is $finished, 7,            'finished client websocket';
 is $subreq,   9,            'finished server websocket';
 
-# WebSocket /echo (user agent side drain callback)
+# WebSocket /echo (client-side drain callback)
 $flag2  = undef;
 $result = '';
 my $counter = 0;
@@ -370,7 +370,7 @@ $loop->start;
 is $result, 'hi!there!', 'right result';
 is $flag2,  25,          'finish event has been emitted';
 
-# WebSocket /double_echo (server side drain callback)
+# WebSocket /double_echo (server-side drain callback)
 $flag2   = undef;
 $result  = '';
 $counter = 0;
@@ -442,7 +442,7 @@ $ua->websocket(
 );
 $loop->start;
 
-# Server side "finished" callback
+# Server-side "finished" callback
 is $flag, 24, 'finish event has been emitted';
 
 # WebSocket /echo (16bit length)

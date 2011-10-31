@@ -62,7 +62,7 @@ The fundamental idea here is that all resources are uniquely addressable with
 URLs and every resource can have different representations such as HTML, RSS
 or JSON.
 User interface concerns are separated from data storage concerns and all
-session state is kept client side.
+session state is kept client-side.
 
   .---------.                        .------------.
   |         | ->    PUT /foo      -> |            |
@@ -108,7 +108,7 @@ information across several HTTP requests.
   Content-Length: 16
   Hello again sri!
 
-Traditionally all session data was stored on the server side and only session
+Traditionally all session data was stored on the server-side and only session
 ids were exchanged between browser and web server in the form of cookies.
 
   HTTP/1.1 200 OK

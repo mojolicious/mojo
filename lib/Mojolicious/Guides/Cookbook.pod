@@ -231,19 +231,25 @@ into alien environments like foreign event loops.
 
 =head1 REAL-TIME WEB
 
-The real-time web is a collection of technologies that includes Comet
+The real-time web is a collection of technologies that include Comet
 (long-polling), HTML5 EventSource and WebSockets, which allow content to be
 pushed to consumers as soon as it is generated, instead of relying on the
 more traditional pull model.
 
 =head2 WebSocket echo service
 
-Receiving WebSocket messages is as easy as subscribing to the C<message>
-event of the current transaction, just be aware that this is all event based,
-so you should not block for too long.
+The WebSocket protocol offers full bi-directional low-latency communication
+channels between clients and servers.
+Receiving messages is as easy as subscribing to the C<message> event of the
+transaction, just be aware that all of this is event based, so you should not
+block for too long.
 
   use Mojolicious::Lite;
 
+  # Template with browser-side code
+  get '/' => 'index';
+
+  # WebSocket echo service
   websocket '/echo' => sub {
     my $self = shift;
 
@@ -264,6 +270,27 @@ so you should not block for too long.
   };
 
   app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <!doctype html><html>
+    <head><title>Echo</title></head>
+    <body>
+      <script>
+        var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
+
+        // Incoming messages
+        ws.onmessage = function(event) {
+          document.body.innerHTML += event.data + '<br/>';
+        };
+
+        // Outgoing messages
+        window.setInterval(function() {
+          ws.send('Hello Mojo!');
+        }, 1000);
+      </script>
+    </body>
+  </html>
 
 The C<finish> event will always be emitted after a WebSocket connection has
 been closed.
@@ -285,6 +312,63 @@ pleasant L<Test::Mojo> API to be used.
   my $t = Test::Mojo->new;
   $t->websocket_ok('/echo')->send_message_ok('Hello Mojo!')
     ->message_is('echo: Hello Mojo!')->finish_ok;
+
+=head2 Live logging with HTML5 EventSource
+
+HTML5 EventSource is a special form of long-polling where you can directly
+send DOM events from servers to clients.
+It is uni-directional, that means you will have to use Ajax requests for
+sending data from clients to servers, the advantage however is low
+infrastructure requirements, since it reuses the HTTP protocol for transport.
+
+  use Mojolicious::Lite;
+
+  # Template with browser-side code
+  get '/' => 'index';
+
+  # EventSource for log messages
+  get '/events' => sub {
+    my $self = shift;
+
+    # Increase connection timeout a bit
+    Mojo::IOLoop->connection_timeout($self->tx->connection => 300);
+
+    # Change content type
+    $self->res->headers->content_type('text/event-stream');
+
+    # Subscribe to "message" event and forward "log" events to browser
+    my $cb = $self->app->log->on(message => sub {
+      my ($log, $level, $message) = @_;
+      $self->write("event:log\ndata: [$level] $message\n\n");
+    });
+
+    # Unsubscribe from "message" event again once we are done
+    $self->on(finish => sub {
+      my $self = shift;
+      $self->app->log->unsubscribe(message => $cb);
+    });
+  };
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <!doctype html><html>
+    <head><title>LiveLog</title></head>
+    <body>
+      <script>
+        var events = new EventSource('<%= url_for 'events' %>');
+
+        // Subscribe to "log" event
+        events.addEventListener('log', function(event) {
+          document.body.innerHTML += event.data + '<br/>';
+        }, false);
+      </script>
+    </body>
+  </html>
+
+The C<finish> event will always be emitted after the transaction has been
+finished.
 
 =head1 USER AGENT
 

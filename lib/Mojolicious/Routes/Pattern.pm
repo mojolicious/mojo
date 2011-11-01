@@ -2,6 +2,8 @@ package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
 has defaults => sub { {} };
+has format   => sub {qr#\.([^/\)]+)$#};
+has [qw/pattern regex/];
 has quote_end      => ')';
 has quote_start    => '(';
 has relaxed_start  => '.';
@@ -10,7 +12,6 @@ has symbol_start   => ':';
 has symbols        => sub { [] };
 has tree           => sub { [] };
 has wildcard_start => '*';
-has [qw/format pattern regex/];
 
 # "This is the worst kind of discrimination. The kind against me!"
 sub new {
@@ -39,10 +40,8 @@ sub parse {
   $self->reqs($reqs);
 
   # Format in pattern
-  if ($pattern =~ s|\.([^/\)]+)$||) {
-    $reqs->{format}           = quotemeta $1;
-    $self->defaults->{format} = $1;
-    $self->{strict}           = 1;
+  if ($pattern =~ $self->format) {
+    $reqs->{format} = quotemeta($self->{strict} = $1);
   }
 
   # Tokenize
@@ -91,37 +90,33 @@ sub render {
 }
 
 sub shape_match {
-  my ($self, $pathref) = @_;
+  my ($self, $pathref, $detect) = @_;
 
   # Compile on demand
   my $regex;
   $regex = $self->_compile unless $regex = $self->regex;
 
   # Match
-  if (my @captures = $$pathref =~ $regex) {
-    $$pathref =~ s/$regex//;
+  return unless my @captures = $$pathref =~ $regex;
+  $$pathref =~ s/($regex)//;
 
-    # Merge captures
-    my $result = {%{$self->defaults}};
-    for my $symbol (@{$self->symbols}) {
-      last unless @captures;
-
-      # Merge
-      my $capture = shift @captures;
-      $result->{$symbol} = $capture if defined $capture;
-    }
-
-    # Format
-    my $format = $self->format;
-    if ($format && $$pathref =~ s/$format//) { $result->{format} ||= $1 }
-    elsif ($self->reqs->{format}) {
-      return if !$result->{format} || $self->{strict};
-    }
-
-    return $result;
+  # Merge captures
+  my $result = {%{$self->defaults}};
+  for my $symbol (@{$self->symbols}) {
+    last unless @captures;
+    my $capture = shift @captures;
+    $result->{$symbol} = $capture if defined $capture;
   }
 
-  return;
+  # Format
+  $result->{format} ||= $self->{strict} if $detect && exists $self->{strict};
+  my $req = $self->reqs->{format};
+  return $result if defined $req && !$req;
+  my $format = $self->format;
+  if ($detect && $$pathref =~ s|^/?$format||) { $result->{format} ||= $1 }
+  elsif ($req) { return if !$result->{format} }
+
+  return $result;
 }
 
 sub _compile {
@@ -131,8 +126,8 @@ sub _compile {
   my $reqs = $self->reqs;
   if (!exists $reqs->{format} || $reqs->{format}) {
     my $format =
-      defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^\/]+)';
-    $self->format(qr#^/?\.$format$#);
+      defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/\)]+)';
+    $self->format(qr#\.$format$#);
   }
 
   # Compile tree to regular expression
@@ -438,6 +433,7 @@ Render pattern into a path with parameters.
 =head2 C<shape_match>
 
   my $result = $pattern->shape_match(\$path);
+  my $result = $pattern->shape_match(\$path, $detect);
 
 Match pattern against a path and remove matching parts.
 

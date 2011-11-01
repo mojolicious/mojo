@@ -34,7 +34,7 @@ sub match {
   my $dictionary = $self->{dictionary} ||= $r->dictionary;
   my $path       = $self->{path};
   my $pattern    = $r->pattern;
-  my $captures   = $pattern->shape_match(\$path);
+  my $captures   = $pattern->shape_match(\$path, $r->is_endpoint);
   return unless $captures;
   $self->{path} = $path;
   $captures = {%{$self->captures}, %$captures};

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 53;
+use Test::More tests => 50;
 
 use Mojo::ByteStream 'b';
 
@@ -58,15 +58,6 @@ is $pattern->render({controller => 'zzz', action => 'lala'}), '/zzztest/lala',
   'right result';
 $result = $pattern->match('/test/lala');
 is $result, undef, 'no result';
-
-# Format
-$pattern = Mojolicious::Routes::Pattern->new('/(controller)test/(action)');
-is $pattern->defaults->{format}, undef, 'no value';
-$pattern =
-  Mojolicious::Routes::Pattern->new('/(:controller)test/:action.html');
-is $pattern->defaults->{format}, 'html', 'right value';
-$pattern = Mojolicious::Routes::Pattern->new('/index.cgi');
-is $pattern->defaults->{format}, 'cgi', 'right value';
 
 # Relaxed
 $pattern = Mojolicious::Routes::Pattern->new('/test/(.controller)/:action');

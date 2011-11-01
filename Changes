@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
           latest editor's draft.
         - Improved Mojo::ByteStream to generate most Mojo::Util based methods
           automatically.
+        - Fixed route pattern bug.
 
 2.20    2011-11-01 00:00:00
         - Changed semantics of almost all functions in Mojo::Util.

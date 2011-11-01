@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 57;
+use Test::More tests => 51;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -42,12 +42,6 @@ get 'form/:test' => 'form';
 
 # PUT /selection
 put 'selection';
-
-# GET /timed
-get '/timed' => sub { shift->profile('page') };
-
-# GET /rps
-get '/rps';
 
 my $t = Test::Mojo->new;
 
@@ -302,13 +296,6 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d')->status_is(200)
     . '</form>'
     . "\n");
 
-# GET /timed
-$t->get_ok('/timed')->status_is(200)->content_like(qr/\d+\.\d+\ seconds/);
-
-# GET /rps
-$t->get_ok('/rps')->status_is(200)
-  ->content_like(qr#^lalala\n\d+\.\d+s\ \(\d+\.\d+/s\)#);
-
 __DATA__
 @@ tags.html.ep
 <%= tag 'foo' %>
@@ -405,11 +392,3 @@ __DATA__
   %= select_field bar => [['D' => 'd', disabled => 'disabled'], 'baz']
   %= submit_button
 %= end
-
-@@ timed.html.ep
-<%= profile "page" %> seconds
-
-@@ rps.html.ep
-% profile 'foo';
-lalala
-<%= (profile('foo'))[0] %>s (<%= (profile('foo'))[1] %>/s)

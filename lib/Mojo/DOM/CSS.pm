@@ -107,7 +107,7 @@ sub _compile {
     $element =~ s/$ELEMENT_RE// and $tag = $self->_unescape($+{element});
 
     # Subject
-    $selector->[0] = 'subject' if $tag =~ s/^\$//;
+    $selector->[0] = 'subject' if $tag =~ s/^\?//;
 
     # Tag
     $tag = '*' unless $tag;
@@ -209,14 +209,7 @@ sub _element {
       $first-- if $first > 0;
 
       # Next sibling
-      if ($siblings) {
-
-        # Last sibling
-        unless ($current = shift @$siblings) {
-          $siblings = undef;
-          return;
-        }
-      }
+      if ($siblings) { return unless $current = shift @$siblings }
 
       # Next parent
       else {
@@ -682,16 +675,16 @@ An C<E> element whose attributes match all following attribute selectors.
 
   my $links = $css->select('a[foo^="b"][foo$="ar"]');
 
-=head2 C<E $F G>
+=head2 C<E ?F G>
 
 An C<F> element descendant of an C<E> element and ancestor of a C<G> element.
 
-  my $wrappers = $css->select('$div.wrapper > :checked');
+  my $wrappers = $css->select('?div.wrapper > :checked');
 
 By default, the subjects of a selector are the elements represented by the
 last compound selector.
 In CSS4 however the subject can be explicitly identified by prepending a
-dollar sign to one of the compound selectors.
+question mark to one of the compound selectors.
 Note that the CSS4 spec is still a work in progress, so this selector might
 change without warning!
 

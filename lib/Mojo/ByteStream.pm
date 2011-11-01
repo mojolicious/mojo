@@ -14,10 +14,9 @@ my @UTILS = (
 );
 {
   no strict 'refs';
-  my $class = __PACKAGE__;
   for my $name (@UTILS) {
     my $sub = Mojo::Util->can($name);
-    *{"${class}::$name"} = sub {
+    *{__PACKAGE__ . "::$name"} = sub {
       my $self = shift;
       $$self = $sub->($$self, @_);
       return $self;

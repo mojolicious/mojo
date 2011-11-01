@@ -9,13 +9,13 @@ require MIME::QuotedPrint;
 
 # Punycode bootstring parameters
 use constant {
-  PUNYCODE_BASE         => 36,
-  PUNYCODE_TMIN         => 1,
-  PUNYCODE_TMAX         => 26,
-  PUNYCODE_SKEW         => 38,
-  PUNYCODE_DAMP         => 700,
-  PUNYCODE_INITIAL_BIAS => 72,
-  PUNYCODE_INITIAL_N    => 128
+  PC_BASE         => 36,
+  PC_TMIN         => 1,
+  PC_TMAX         => 26,
+  PC_SKEW         => 38,
+  PC_DAMP         => 700,
+  PC_INITIAL_BIAS => 72,
+  PC_INITIAL_N    => 128
 };
 
 # Punycode delimiter
@@ -432,9 +432,9 @@ sub punycode_decode {
   use integer;
 
   # Defaults
-  my $n    = PUNYCODE_INITIAL_N;
+  my $n    = PC_INITIAL_N;
   my $i    = 0;
-  my $bias = PUNYCODE_INITIAL_BIAS;
+  my $bias = PC_INITIAL_BIAS;
   my @output;
 
   # Delimiter
@@ -446,20 +446,17 @@ sub punycode_decode {
     my $w    = 1;
 
     # Base to infinity in steps of base
-    for (my $k = PUNYCODE_BASE; 1; $k += PUNYCODE_BASE) {
+    for (my $k = PC_BASE; 1; $k += PC_BASE) {
 
       # Digit
       my $digit = ord substr $input, 0, 1, '';
       $digit = $digit < 0x40 ? $digit + (26 - 0x30) : ($digit & 0x1f) - 1;
       $i += $digit * $w;
       my $t = $k - $bias;
-      $t =
-          $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
-        : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
-        :                      $t;
+      $t = $t < PC_TMIN ? PC_TMIN : $t > PC_TMAX ? PC_TMAX : $t;
       last if $digit < $t;
 
-      $w *= (PUNYCODE_BASE - $t);
+      $w *= (PC_BASE - $t);
     }
 
     # Bias
@@ -484,7 +481,7 @@ sub punycode_encode {
 
   # Split input
   my @input = map ord, split //, $output;
-  my @chars = sort grep { $_ >= PUNYCODE_INITIAL_N } @input;
+  my @chars = sort grep { $_ >= PC_INITIAL_N } @input;
 
   # Remove non basic characters
   $output =~ s/[^\x00-\x7f]+//gs;
@@ -494,9 +491,9 @@ sub punycode_encode {
   $output .= $DELIMITER if $b > 0;
 
   # Defaults
-  my $n     = PUNYCODE_INITIAL_N;
+  my $n     = PC_INITIAL_N;
   my $delta = 0;
-  my $bias  = PUNYCODE_INITIAL_BIAS;
+  my $bias  = PC_INITIAL_BIAS;
 
   # Encode (direct translation of RFC 3492)
   for my $m (@chars) {
@@ -520,19 +517,16 @@ sub punycode_encode {
         my $q = $delta;
 
         # Base to infinity in steps of base
-        for (my $k = PUNYCODE_BASE; 1; $k += PUNYCODE_BASE) {
+        for (my $k = PC_BASE; 1; $k += PC_BASE) {
           my $t = $k - $bias;
-          $t =
-              $t < PUNYCODE_TMIN ? PUNYCODE_TMIN
-            : $t > PUNYCODE_TMAX ? PUNYCODE_TMAX
-            :                      $t;
+          $t = $t < PC_TMIN ? PC_TMIN : $t > PC_TMAX ? PC_TMAX : $t;
           last if $q < $t;
 
           # Code point for digit "t"
-          my $o = $t + (($q - $t) % (PUNYCODE_BASE - $t));
+          my $o = $t + (($q - $t) % (PC_BASE - $t));
           $output .= chr $o + ($o < 26 ? 0x61 : 0x30 - 26);
 
-          $q = ($q - $t) / (PUNYCODE_BASE - $t);
+          $q = ($q - $t) / (PC_BASE - $t);
         }
 
         # Code point for digit "q"
@@ -631,18 +625,15 @@ sub _adapt {
   my ($delta, $numpoints, $firsttime) = @_;
 
   use integer;
-  $delta = $firsttime ? $delta / PUNYCODE_DAMP : $delta / 2;
+  $delta = $firsttime ? $delta / PC_DAMP : $delta / 2;
   $delta += $delta / $numpoints;
   my $k = 0;
-  while ($delta > ((PUNYCODE_BASE - PUNYCODE_TMIN) * PUNYCODE_TMAX) / 2) {
-    $delta /= PUNYCODE_BASE - PUNYCODE_TMIN;
-    $k += PUNYCODE_BASE;
+  while ($delta > ((PC_BASE - PC_TMIN) * PC_TMAX) / 2) {
+    $delta /= PC_BASE - PC_TMIN;
+    $k += PC_BASE;
   }
 
-  return $k
-    + (
-    ((PUNYCODE_BASE - PUNYCODE_TMIN + 1) * $delta) / ($delta + PUNYCODE_SKEW)
-    );
+  return $k + (((PC_BASE - PC_TMIN + 1) * $delta) / ($delta + PC_SKEW));
 }
 
 sub _hmac {

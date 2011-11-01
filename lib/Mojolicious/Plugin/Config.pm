@@ -44,7 +44,7 @@ sub register {
     $file = $ENV{MOJO_APP};
 
     # Class
-    if ($file && !ref $file) { decamelize $file }
+    if ($file && !ref $file) { $file = decamelize $file }
 
     # File
     else { $file = basename($ENV{MOJO_EXE} || $0) }

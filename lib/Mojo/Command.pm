@@ -52,8 +52,7 @@ sub class_to_file {
   my ($self, $class) = @_;
   $class =~ s/:://g;
   $class =~ s/([A-Z])([A-Z]*)/$1.lc($2)/gex;
-  decamelize $class;
-  return $class;
+  return decamelize $class;
 }
 
 sub class_to_path {
@@ -123,7 +122,7 @@ sub get_all_data {
   my $all = $CACHE->{$class} = {};
   while (@data) {
     my ($name, $content) = splice @data, 0, 2;
-    b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
+    $content = b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
     $all->{$name} = $content;
   }
 
@@ -202,9 +201,7 @@ sub run {
       last if $module = _command("${namespace}::$name");
 
       # DEPRECATED in Smiling Face With Sunglasses!
-      my $class = $name;
-      camelize $class;
-      last if $module = _command("${namespace}::$class");
+      last if $module = _command("${namespace}::" . camelize $name);
     }
 
     # Command missing

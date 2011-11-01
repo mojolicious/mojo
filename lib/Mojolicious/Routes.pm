@@ -461,10 +461,7 @@ sub _generate_class {
   # Class
   my $class = $field->{class};
   my $controller = $field->{controller} || '';
-  unless ($class) {
-    $class = $controller;
-    camelize $class;
-  }
+  $class = camelize $controller unless $class;
 
   # Namespace
   my $namespace = $field->{namespace};

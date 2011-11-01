@@ -343,8 +343,7 @@ sub _get_content {
 
   # Content
   my $content = $tx->res->body;
-  decode $charset, $content if $charset;
-  return $content;
+  return $charset ? decode($charset, $content) : $content;
 }
 
 sub _message {

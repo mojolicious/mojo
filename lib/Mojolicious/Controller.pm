@@ -579,11 +579,8 @@ sub url_for {
   my $path = $url->path;
   if ($target =~ m#^/#) {
     if (my $e = $self->stash->{path}) {
-      my $real = $req->url->path->to_abs_string;
-      Mojo::Util::url_unescape($real);
-      my $backup = $real;
-      Mojo::Util::decode('UTF-8', $real);
-      $real //= $backup;
+      my $real = Mojo::Util::url_unescape($req->url->path->to_abs_string);
+      $real = Mojo::Util::decode('UTF-8', $real) // $real;
       $real =~ s|/?$e$|$target|;
       $target = $real;
     }

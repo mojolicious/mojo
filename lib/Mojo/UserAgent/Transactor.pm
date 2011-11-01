@@ -88,8 +88,8 @@ sub form {
       my $filename;
       if (ref $f eq 'HASH') {
         $filename = delete $f->{filename} || $name;
-        encode $encoding, $filename if $encoding;
-        url_escape $filename, $Mojo::URL::UNRESERVED;
+        $filename = encode $encoding, $filename if $encoding;
+        $filename = url_escape $filename, $Mojo::URL::UNRESERVED;
         $part->asset(delete $f->{file});
         $h->from_hash($f);
         push @parts, $part;
@@ -104,15 +104,15 @@ sub form {
         # Values
         for my $value (ref $f ? @$f : ($f)) {
           $part = Mojo::Content::Single->new(headers => $h);
-          encode $encoding, $value if $encoding;
+          $value = encode $encoding, $value if $encoding;
           $part->asset->add_chunk($value);
           push @parts, $part;
         }
       }
 
       # Content-Disposition
-      encode $encoding, $name if $encoding;
-      url_escape $name, $Mojo::URL::UNRESERVED;
+      $name = encode $encoding, $name if $encoding;
+      $name = url_escape $name, $Mojo::URL::UNRESERVED;
       my $disposition = qq/form-data; name="$name"/;
       $disposition .= qq/; filename="$filename"/ if $filename;
       $h->content_disposition($disposition);

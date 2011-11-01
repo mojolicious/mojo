@@ -30,15 +30,12 @@ sub authority {
 
   # New authority
   if (defined $authority) {
-    my $userinfo = '';
-    my $host     = $authority;
+    my $host = $authority;
 
     # Userinfo
     if ($authority =~ /^([^\@]+)\@(.+)$/) {
-      $userinfo = $1;
-      $host     = $2;
-      url_unescape $userinfo;
-      $self->userinfo($userinfo);
+      $self->userinfo(url_unescape $1);
+      $host = $2;
     }
 
     # Port
@@ -49,23 +46,18 @@ sub authority {
     }
 
     # Host
-    url_unescape $host;
+    $host = url_unescape $host;
     return $host =~ /[^\x00-\x7f]/
       ? $self->ihost($host)
       : $self->host($host);
   }
 
-  # *( unreserved / pct-encoded / sub-delims ), extended with "[" and "]"
-  # to support IPv6
-  my $host = $self->ihost;
-  my $port = $self->port;
-
-  # *( unreserved / pct-encoded / sub-delims / ":" )
-  my $userinfo = $self->userinfo;
-  url_escape $userinfo, "$UNRESERVED$SUBDELIM\:" if $userinfo;
-
   # Format
-  $authority .= "$userinfo\@" if $userinfo;
+  my $host     = $self->ihost;
+  my $port     = $self->port;
+  my $userinfo = $self->userinfo;
+  $authority .= url_escape($userinfo, "$UNRESERVED$SUBDELIM\:") . '@'
+    if $userinfo;
   $authority .= lc($host || '');
   $authority .= ":$port" if $port;
 
@@ -95,10 +87,7 @@ sub ihost {
     # Decode parts
     my @decoded;
     for my $part (split /\./, $_[1]) {
-      if ($part =~ /^xn--(.+)$/) {
-        $part = $1;
-        punycode_decode $part;
-      }
+      $part = punycode_decode $1 if $part =~ /^xn--(.+)$/;
       push @decoded, $part;
     }
     $self->host(join '.', @decoded);
@@ -113,10 +102,7 @@ sub ihost {
   # Encode parts
   my @encoded;
   for my $part (split /\./, $host || '') {
-    if ($part =~ /[^\x00-\x7f]/) {
-      punycode_encode $part;
-      $part = "xn--$part";
-    }
+    $part = 'xn--' . punycode_encode $part if $part =~ /[^\x00-\x7f]/;
     push @encoded, $part;
   }
 
@@ -297,8 +283,7 @@ sub to_string {
 
   # Fragment
   if (my $fragment = $self->fragment) {
-    url_escape $fragment, "$PCHAR\/\?";
-    $url .= "#$fragment";
+    $url .= '#' . url_escape $fragment, "$PCHAR\/\?";
   }
 
   return $url;

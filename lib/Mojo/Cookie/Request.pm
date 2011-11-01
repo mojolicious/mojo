@@ -48,8 +48,7 @@ sub to_string {
   my $cookie = $self->name;
   my $value  = $self->value;
   if (defined $value) {
-    quote $value if $value =~ /[,;"]/;
-    $cookie .= "=$value";
+    $cookie .= '=' . ($value =~ /[,;"]/ ? quote($value) : $value);
   }
   else { $cookie .= '=' }
   if (my $path = $self->path) { $cookie .= "; \$Path=$path" }

@@ -108,9 +108,8 @@ sub client_handshake {
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
   # Generate WebSocket challenge
-  my $key = pack 'N*', int(rand 9999999);
-  b64_encode $key, '';
-  $headers->sec_websocket_key($key) unless $headers->sec_websocket_key;
+  $headers->sec_websocket_key(b64_encode(pack('N*', int(rand 9999999)), ''))
+    unless $headers->sec_websocket_key;
 
   return $self;
 }
@@ -238,8 +237,7 @@ sub send_message {
     if ref $m;
 
   # Text
-  encode 'UTF-8', $m;
-  $self->send_frame(1, TEXT, $m, $cb);
+  $self->send_frame(1, TEXT, encode('UTF-8', $m), $cb);
 }
 
 sub server_handshake {
@@ -292,7 +290,8 @@ sub server_read {
     # Message
     my $message = $self->{message};
     $self->{message} = '';
-    decode 'UTF-8', $message if $message && delete $self->{op} == TEXT;
+    $message = decode 'UTF-8', $message
+      if $message && delete $self->{op} == TEXT;
     $self->emit(message => $message);
   }
 
@@ -322,15 +321,8 @@ sub server_write {
 
 sub _challenge {
   my ($self, $key) = @_;
-
-  # No key or SHA1 support
   return '' unless $key && SHA1;
-
-  # Base64 checksum
-  my $challenge = sha1_bytes($key . GUID);
-  b64_encode $challenge, '';
-
-  return $challenge;
+  return b64_encode(sha1_bytes($key . GUID), '');
 }
 
 sub _xor_mask {

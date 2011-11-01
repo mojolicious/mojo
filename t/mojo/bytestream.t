@@ -21,7 +21,7 @@ is $stream->camelize, 'FooBB', 'right camelized result';
 $stream = b('foo-b_b');
 is $stream->camelize, 'Foo::BB', 'right camelized result';
 $stream = b('FooBar');
-is $stream->camelize, 'FooBar', 'already camlized';
+is $stream->camelize, 'FooBar', 'already camelized';
 $stream = b('Foo::Bar');
 is $stream->camelize, 'Foo::Bar', 'already camelized';
 

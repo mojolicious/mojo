@@ -15,12 +15,8 @@ sub new {
   $self->{method} = lc shift;
 
   # Path
-  my $path = shift;
-  url_unescape $path;
-  my $backup = $path;
-  decode 'UTF-8', $path;
-  $path //= $backup;
-  $self->{path} = $path;
+  my $path = url_unescape shift;
+  $self->{path} = decode('UTF-8', $path) // $path;
 
   # WebSocket
   $self->{websocket} = shift;

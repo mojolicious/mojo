@@ -95,7 +95,7 @@ sub parse {
 
   # Decode
   my $charset = $self->charset;
-  decode $charset, $html if $charset;
+  $html = decode $charset, $html if $charset;
 
   # Tokenize
   my $tree    = ['root'];
@@ -106,7 +106,7 @@ sub parse {
 
     # Text
     if (length $text) {
-      html_unescape $text if (index $text, '&') >= 0;
+      $text = html_unescape $text if (index $text, '&') >= 0;
       $self->_text($text, \$current);
     }
 
@@ -145,7 +145,7 @@ sub parse {
         next if $key eq '/';
 
         # Add unescaped value
-        html_unescape $value if $value && (index $value, '&') >= 0;
+        $value = html_unescape $value if $value && (index $value, '&') >= 0;
         $attrs->{$key} = $value;
       }
 
@@ -174,8 +174,7 @@ sub render {
   my $self    = shift;
   my $content = $self->_render($self->tree);
   my $charset = $self->charset;
-  encode $charset, $content if $charset;
-  return $content;
+  return $charset ? encode($charset, $content) : $content;
 }
 
 # "Woah! God is so in your face!
@@ -277,11 +276,7 @@ sub _render {
 
   # Text (escaped)
   my $e = $tree->[0];
-  if ($e eq 'text') {
-    my $escaped = $tree->[1];
-    xml_escape $escaped;
-    return $escaped;
-  }
+  return xml_escape $tree->[1] if $e eq 'text';
 
   # Raw text
   return $tree->[1] if $e eq 'raw';
@@ -321,8 +316,7 @@ sub _render {
       push @attrs, $key and next unless defined $value;
 
       # Key and value
-      xml_escape $value;
-      push @attrs, qq/$key="$value"/;
+      push @attrs, qq/$key="/ . xml_escape($value) . '"';
     }
     my $attrs = join ' ', @attrs;
     $content .= " $attrs" if $attrs;

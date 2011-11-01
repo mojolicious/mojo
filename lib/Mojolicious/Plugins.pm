@@ -48,8 +48,7 @@ sub load_plugin {
   }
 
   # Try all namspaces
-  my $class = $name;
-  camelize $class if $class =~ /^[a-z]/;
+  my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
   for my $namespace (@{$self->namespaces}) {
     my $module = "${namespace}::$class";
     return $module->new if $self->_load($module);

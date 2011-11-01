@@ -103,8 +103,7 @@ sub register {
       # Content
       unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
         @url = (shift);
-        xml_escape $content;
-        push @_, sub {$content}
+        push @_, sub { xml_escape $content}
       }
 
       # Captures
@@ -306,7 +305,7 @@ sub _tag {
   # Callback
   my $cb = defined $_[-1] && ref($_[-1]) eq 'CODE' ? pop @_ : undef;
   my $content = pop if @_ % 2;
-  xml_escape $content if defined $content;
+  $content = xml_escape $content if defined $content;
 
   # Tag
   my $tag = "<$name";
@@ -314,8 +313,7 @@ sub _tag {
   # Attributes
   my %attrs = @_;
   for my $key (sort keys %attrs) {
-    my $value = $attrs{$key} // '';
-    xml_escape $value;
+    my $value = xml_escape $attrs{$key} // '';
     $tag .= qq/ $key="$value"/;
   }
 

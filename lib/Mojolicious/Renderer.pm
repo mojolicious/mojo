@@ -147,7 +147,8 @@ sub render {
   # Encoding (JSON is already encoded)
   unless ($partial) {
     my $encoding = $options->{encoding};
-    encode $encoding, $output if $encoding && $output && !$json && !$data;
+    $output = encode $encoding, $output
+      if $encoding && $output && !$json && !$data;
   }
 
   return $output, $c->app->types->type($format) || 'text/plain';

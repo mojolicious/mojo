@@ -79,15 +79,13 @@ sub fix_headers {
 
   # Basic authorization
   if ((my $u = $url->userinfo) && !$headers->authorization) {
-    b64_encode $u, '';
-    $headers->authorization("Basic $u");
+    $headers->authorization('Basic ' . b64_encode($u, ''));
   }
 
   # Basic proxy authorization
   if (my $proxy = $self->proxy) {
     if ((my $u = $proxy->userinfo) && !$headers->proxy_authorization) {
-      b64_encode $u, '';
-      $headers->proxy_authorization("Basic $u");
+      $headers->proxy_authorization('Basic ' . b64_encode($u, ''));
     }
   }
 
@@ -236,9 +234,7 @@ sub _build_start_line {
 sub _parse_basic_auth {
   my ($self, $header) = @_;
   return unless $header =~ /Basic (.+)$/;
-  my $auth = $1;
-  b64_decode $auth;
-  return $auth;
+  return b64_decode $1;
 }
 
 sub _parse_env {

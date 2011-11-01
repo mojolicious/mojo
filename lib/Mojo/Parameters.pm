@@ -5,7 +5,7 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-use Mojo::Util qw/encode decode url_escape url_unescape/;
+use Mojo::Util qw/decode encode url_escape url_unescape/;
 use Mojo::URL;
 
 has charset        => 'UTF-8';
@@ -112,16 +112,12 @@ sub parse {
 
     # Unescape
     if (index($name, '%') >= 0) {
-      url_unescape $name;
-      my $backup = $name;
-      decode $charset, $name if $charset;
-      $name //= $backup;
+      $name = url_unescape $name;
+      $name = decode($charset, $name) // $name if $charset;
     }
     if (index($value, '%') >= 0) {
-      url_unescape $value;
-      my $backup = $value;
-      decode $charset, $value if $charset;
-      $value //= $backup;
+      $value = url_unescape $value;
+      $value = decode($charset, $value) // $value if $charset;
     }
 
     push @{$self->params}, $name, $value;
@@ -177,12 +173,8 @@ sub to_string {
   # String
   my $charset = $self->charset;
   if (defined(my $string = $self->{string})) {
-
-    # Escape
-    encode $charset, $string if $charset;
-    url_escape $string, "$Mojo::URL::UNRESERVED\\&\\;\\=\\+\\%";
-
-    return $string;
+    $string = encode $charset, $string if $charset;
+    return url_escape $string, "$Mojo::URL::UNRESERVED\\&\\;\\=\\+\\%";
   }
 
   # Build pairs
@@ -194,11 +186,11 @@ sub to_string {
     my $value = $params->[$i + 1];
 
     # Escape
-    encode $charset, $name if $charset;
-    url_escape $name, $Mojo::URL::UNRESERVED;
+    $name = encode $charset, $name if $charset;
+    $name = url_escape $name, $Mojo::URL::UNRESERVED;
     if ($value) {
-      encode $charset, $value if $charset;
-      url_escape $value, $Mojo::URL::UNRESERVED;
+      $value = encode $charset, $value if $charset;
+      $value = url_escape $value, $Mojo::URL::UNRESERVED;
     }
 
     # Replace whitespace with "+"

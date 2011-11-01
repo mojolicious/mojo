@@ -208,9 +208,8 @@ $dom = Mojo::DOM->new->parse('<div id="sno&quot;wman">☃</div>');
 is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
 
 # Unicode and escaped selectors
-my $unicode =
+my $unicode = encode 'UTF-8',
   qq#<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>#;
-encode 'UTF-8', $unicode;
 $dom = Mojo::DOM->new->charset('UTF-8');
 $dom->parse($unicode);
 is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';

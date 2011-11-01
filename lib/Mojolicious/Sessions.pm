@@ -22,8 +22,7 @@ sub load {
 
   # Deserialize
   $value =~ s/\-/\=/g;
-  b64_decode $value;
-  return unless my $session = $JSON->decode($value);
+  return unless my $session = $JSON->decode(b64_decode $value);
 
   # Expiration
   return unless my $expires = delete $session->{expires};
@@ -66,8 +65,7 @@ sub store {
       ||= time + $self->default_expiration;
 
     # Serialize
-    $value = $JSON->encode($session);
-    b64_encode $value, '';
+    $value = b64_encode $JSON->encode($session), '';
     $value =~ s/\=/\-/g;
   }
 

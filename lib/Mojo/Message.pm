@@ -514,25 +514,18 @@ sub _parse_formdata {
     my $value      = $part;
 
     # Unescape
-    url_unescape $name     if $name;
-    url_unescape $filename if $filename;
+    $name     = url_unescape $name     if $name;
+    $filename = url_unescape $filename if $filename;
     if ($charset) {
-      my $backup = $name;
-      decode $charset, $name if $name;
-      $name //= $backup;
-      $backup = $filename;
-      decode $charset, $filename if $filename;
-      $filename //= $backup;
+      $name     = decode($charset, $name)     // $name     if $name;
+      $filename = decode($charset, $filename) // $filename if $filename;
     }
 
     # Form value
     unless ($filename) {
       $value = $part->asset->slurp;
-      if ($charset && !$part->headers->content_transfer_encoding) {
-        my $backup = $value;
-        decode $charset, $value;
-        $value //= $backup;
-      }
+      $value = decode($charset, $value) // $value
+        if $charset && !$part->headers->content_transfer_encoding;
     }
 
     push @formdata, [$name, $filename, $value];

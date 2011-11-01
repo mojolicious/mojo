@@ -53,10 +53,7 @@ sub build_boundary {
   # Generate and check boundary
   my $size = 1;
   while (1) {
-
-    # Mostly taken from LWP
-    $boundary = join('', map chr(rand(256)), 1 .. $size * 3);
-    b64_encode $boundary;
+    $boundary = b64_encode join('', map chr(rand(256)), 1 .. $size * 3);
     $boundary =~ s/\W/X/g;
 
     # Check parts for boundary

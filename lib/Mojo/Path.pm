@@ -91,7 +91,7 @@ sub parse {
   $path =~ m#/$# ? $self->trailing_slash(1) : $self->trailing_slash(undef);
 
   # Parse
-  url_unescape $path;
+  $path = url_unescape $path;
   utf8::decode $path;
   my @parts;
   for my $part (split '/', $path) {
@@ -118,8 +118,8 @@ sub to_string {
   for my $part (@{$self->parts}) {
     my $escaped = $part;
     utf8::encode $escaped;
-    url_escape $escaped, "$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@";
-    push @path, $escaped;
+    push @path,
+      url_escape($escaped, "$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@");
   }
 
   # Format

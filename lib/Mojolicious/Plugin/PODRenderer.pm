@@ -94,7 +94,7 @@ sub register {
           my $text   = $tag->all_text;
           my $anchor = $text;
           $anchor =~ s/\s+/_/g;
-          url_escape $anchor, 'A-Za-z0-9_';
+          $anchor = url_escape $anchor, 'A-Za-z0-9_';
           $anchor =~ s/\%//g;
           push @$sections, [] if $tag->type eq 'h1' || !@$sections;
           push @{$sections->[-1]}, $text, $url->fragment($anchor)->to_abs;

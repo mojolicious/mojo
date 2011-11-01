@@ -35,7 +35,7 @@ sub b64_encode {
 
 sub camelize {
   my $self = shift;
-  Mojo::Util::camelize $$self;
+  $$self = Mojo::Util::camelize $$self;
   return $self;
 }
 
@@ -46,7 +46,7 @@ sub clone {
 
 sub decamelize {
   my $self = shift;
-  Mojo::Util::decamelize $$self;
+  $$self = Mojo::Util::decamelize $$self;
   return $self;
 }
 
@@ -57,13 +57,13 @@ sub decamelize {
 #  Number 3: 'It was like that when I got here.'"
 sub decode {
   my $self = shift;
-  Mojo::Util::decode shift || 'UTF-8', $$self;
+  $$self = Mojo::Util::decode shift || 'UTF-8', $$self;
   return $self;
 }
 
 sub encode {
   my $self = shift;
-  Mojo::Util::encode shift || 'UTF-8', $$self;
+  $$self = Mojo::Util::encode shift || 'UTF-8', $$self;
   return $self;
 }
 
@@ -81,13 +81,13 @@ sub hmac_sha1_sum {
 
 sub html_escape {
   my $self = shift;
-  Mojo::Util::html_escape $$self;
+  $$self = Mojo::Util::html_escape $$self;
   return $self;
 }
 
 sub html_unescape {
   my $self = shift;
-  Mojo::Util::html_unescape $$self;
+  $$self = Mojo::Util::html_unescape $$self;
   return $self;
 }
 
@@ -105,13 +105,13 @@ sub md5_sum {
 
 sub punycode_decode {
   my $self = shift;
-  Mojo::Util::punycode_decode $$self;
+  $$self = Mojo::Util::punycode_decode $$self;
   return $self;
 }
 
 sub punycode_encode {
   my $self = shift;
-  Mojo::Util::punycode_encode $$self;
+  $$self = Mojo::Util::punycode_encode $$self;
   return $self;
 }
 
@@ -120,19 +120,19 @@ sub punycode_encode {
 #  nutrients they have that might be extracted for our personal use."
 sub qp_decode {
   my $self = shift;
-  Mojo::Util::qp_decode $$self;
+  $$self = Mojo::Util::qp_decode $$self;
   return $self;
 }
 
 sub qp_encode {
   my $self = shift;
-  Mojo::Util::qp_encode $$self;
+  $$self = Mojo::Util::qp_encode $$self;
   return $self;
 }
 
 sub quote {
   my $self = shift;
-  Mojo::Util::quote $$self;
+  $$self = Mojo::Util::quote $$self;
   return $self;
 }
 
@@ -170,31 +170,31 @@ sub to_string { ${shift()} }
 
 sub trim {
   my $self = shift;
-  Mojo::Util::trim $$self, @_;
+  $$self = Mojo::Util::trim $$self;
   return $self;
 }
 
 sub unquote {
   my $self = shift;
-  Mojo::Util::unquote $$self, @_;
+  $$self = Mojo::Util::unquote $$self;
   return $self;
 }
 
 sub url_escape {
   my $self = shift;
-  Mojo::Util::url_escape $$self, @_;
+  $$self = Mojo::Util::url_escape $$self, @_;
   return $self;
 }
 
 sub url_unescape {
   my $self = shift;
-  Mojo::Util::url_unescape $$self;
+  $$self = Mojo::Util::url_unescape $$self;
   return $self;
 }
 
 sub xml_escape {
   my $self = shift;
-  Mojo::Util::xml_escape $$self;
+  $$self = Mojo::Util::xml_escape $$self;
   return $self;
 }
 
@@ -332,13 +332,13 @@ Turn bytestream into MD5 checksum of old content.
 
   $stream = $stream->punycode_decode;
 
-Punycode decode bytestream, as described in RFC 3492.
+Punycode decode bytestream.
 
 =head2 C<punycode_encode>
 
   $stream = $stream->punycode_encode;
 
-Punycode encode bytestream, as described in RFC 3492.
+Punycode encode bytestream.
 
 =head2 C<qp_decode>
 

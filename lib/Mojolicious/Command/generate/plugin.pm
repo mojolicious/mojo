@@ -20,8 +20,7 @@ sub run {
   $name ||= 'MyPlugin';
 
   # Class
-  my $class = $name;
-  camelize $class if $name =~ /^[a-z]/;
+  my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
   $class = "Mojolicious::Plugin::$class";
   my $app = $self->class_to_path($class);
   $self->render_to_rel_file('class', "$name/lib/$app", $class, $name);

@@ -66,7 +66,7 @@ sub run {
   # URL and selector
   my $url = shift @ARGV;
   die $self->usage unless $url;
-  decode 'UTF-8', $url;
+  $url = decode 'UTF-8', $url;
   my $selector = shift @ARGV;
 
   # Fresh user agent

@@ -50,10 +50,7 @@ sub _tokenize {
 
       # Value
       my $value;
-      if ($string =~ s/$VALUE_RE//) {
-        $value = $+{value};
-        unquote $value;
-      }
+      $value = unquote $+{value} if $string =~ s/$VALUE_RE//;
 
       # Token
       push @token, [$name, $value];

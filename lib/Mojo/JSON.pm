@@ -75,7 +75,7 @@ sub decode {
       last;
     }
   }
-  Mojo::Util::decode $encoding, $string;
+  $string = Mojo::Util::decode $encoding, $string;
 
   # Object or array
   my $res = eval {
@@ -114,9 +114,7 @@ sub decode {
 
 sub encode {
   my ($self, $ref) = @_;
-  my $string = _encode_values($ref);
-  Mojo::Util::encode 'UTF-8', $string;
-  return $string;
+  return Mojo::Util::encode 'UTF-8', _encode_values($ref);
 }
 
 sub false {$FALSE}

@@ -53,12 +53,11 @@ sub authority {
   }
 
   # Format
-  my $host     = $self->ihost;
-  my $port     = $self->port;
   my $userinfo = $self->userinfo;
   $authority .= url_escape($userinfo, "$UNRESERVED$SUBDELIM\:") . '@'
     if $userinfo;
-  $authority .= lc($host || '');
+  $authority .= lc($self->ihost || '');
+  my $port = $self->port;
   $authority .= ":$port" if $port;
 
   return $authority;

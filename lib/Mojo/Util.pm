@@ -700,13 +700,13 @@ L<Mojo::Util> implements the following functions.
 
   my $string = b64_decode $b64;
 
-Base64 decode.
+Base64 decode string.
 
 =head2 C<b64_encode>
 
   my $b64 = b64_encode $string;
 
-Base64 encode.
+Base64 encode string.
 
 =head2 C<camelize>
 
@@ -730,13 +730,13 @@ Convert camel case string to snake case and replace C<::> with C<->.
 
   my $chars = decode 'UTF-8', $bytes;
 
-Decode bytes.
+Decode bytes to characters.
 
 =head2 C<encode>
 
   my $bytes = encode 'UTF-8', $chars;
 
-Encode characters.
+Encode characters to bytes.
 
 =head2 C<get_line>
 

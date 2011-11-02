@@ -2,7 +2,7 @@ package Mojolicious::Plugin::EPLRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Template;
-use Mojo::Util 'md5_sum';
+use Mojo::Util qw/encode md5_sum/;
 
 # "Clever things make people feel stupid and unexpected things make them feel
 #  scared."
@@ -18,7 +18,7 @@ sub register {
       my $inline = $options->{inline};
       my $path   = $r->template_path($options);
       if (defined $inline) {
-        utf8::encode $inline;
+        $inline = encode('UTF-8', $inline);
         $path = md5_sum $inline;
       }
       return unless defined $path;

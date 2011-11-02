@@ -5,7 +5,7 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-use Mojo::Util qw/url_escape url_unescape/;
+use Mojo::Util qw/encode url_escape url_unescape/;
 use Mojo::URL;
 
 has [qw/leading_slash trailing_slash/];
@@ -114,13 +114,10 @@ sub to_string {
   my $self = shift;
 
   # Escape
-  my @path;
-  for my $part (@{$self->parts}) {
-    my $escaped = $part;
-    utf8::encode $escaped;
-    push @path,
-      url_escape($escaped, "$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@");
-  }
+  my @path = map {
+    url_escape(encode('UTF-8', $_),
+      "$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@")
+  } @{$self->parts};
 
   # Format
   my $path = join '/', @path;

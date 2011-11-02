@@ -6,7 +6,7 @@ use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
-use Mojo::Util 'decode';
+use Mojo::Util qw/decode encode/;
 
 has description => <<'EOF';
 Perform HTTP 1.1 request.
@@ -139,7 +139,7 @@ sub run {
 
   # Error
   my ($message, $code) = $tx->error;
-  utf8::encode $url;
+  $url = encode 'UTF-8', $url;
   warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
   # Charset
@@ -153,8 +153,7 @@ sub run {
 
 sub _say {
   return unless length(my $value = shift);
-  utf8::encode $value;
-  say $value;
+  say encode('UTF-8', $value);
 }
 
 sub _select {

@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long 'GetOptions';
 use Mojo::Loader;
+use Mojo::Util 'encode';
 
 has description => <<'EOF';
 Inflate embedded files to real files.
@@ -40,11 +41,9 @@ sub run {
   # Generate
   my $all = $self->get_all_data($class);
   for my $file (keys %$all) {
-    my $prefix  = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
-    my $path    = $self->rel_file("$prefix/$file");
-    my $content = $all->{$file};
-    utf8::encode $content;
-    $self->write_file($path, $content);
+    my $prefix = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
+    my $path = $self->rel_file("$prefix/$file");
+    $self->write_file($path, encode('UTF-8', $all->{$file}));
   }
 }
 

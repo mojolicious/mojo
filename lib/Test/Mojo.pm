@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::IOLoop;
 use Mojo::Message::Response;
 use Mojo::UserAgent;
-use Mojo::Util 'decode';
+use Mojo::Util qw/decode encode/;
 use Test::More ();
 
 has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
@@ -231,9 +231,7 @@ sub post_form_ok {
 
   $self->tx($self->ua->post_form($url, @_));
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  my $desc = "post $url";
-  utf8::encode $desc;
-  Test::More::ok $self->tx->is_finished, $desc;
+  Test::More::ok $self->tx->is_finished, encode('UTF-8', "post $url");
 
   return $self;
 }
@@ -313,8 +311,6 @@ sub websocket_ok {
   my $self = shift;
   my $url  = shift;
 
-  my $desc = "websocket $url";
-  utf8::encode $desc;
   $self->{messages} = [];
   $self->{finished} = 0;
   $self->ua->websocket(
@@ -328,7 +324,8 @@ sub websocket_ok {
   );
   Mojo::IOLoop->start;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::ok $self->tx->res->code eq 101, $desc;
+  Test::More::ok $self->tx->res->code eq 101,
+    encode('UTF-8', "websocket $url");
 
   return $self;
 }
@@ -362,10 +359,8 @@ sub _request_ok {
   $self->tx($self->ua->$method($url, %$headers, $body));
   local $Test::Builder::Level = $Test::Builder::Level + 2;
   my ($error, $code) = $self->tx->error;
-  my $desc = "$method $url";
-  utf8::encode $desc;
   Test::More::diag $error if !(my $ok = !$error || $code) && $error;
-  Test::More::ok $ok, $desc;
+  Test::More::ok $ok, encode('UTF-8', "$method $url");
 
   return $self;
 }

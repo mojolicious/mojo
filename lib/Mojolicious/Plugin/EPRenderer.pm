@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Loader;
 use Mojo::Template;
-use Mojo::Util 'md5_sum';
+use Mojo::Util qw/encode md5_sum/;
 
 # "What do you want?
 #  I'm here to kick your ass!
@@ -31,8 +31,7 @@ sub register {
       # Generate name
       my $path = $r->template_path($options) || $options->{inline};
       return unless defined $path;
-      my $id = join ', ', $path, sort keys %{$c->stash};
-      utf8::encode $id;
+      my $id = encode 'UTF-8', join(', ', $path, sort keys %{$c->stash});
       my $key = $options->{cache} = md5_sum $id;
 
       # Cache

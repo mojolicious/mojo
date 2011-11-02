@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin::Config';
 
 use Mojo::JSON;
 use Mojo::Template;
+use Mojo::Util 'encode';
 
 # "And so we say goodbye to our beloved pet, Nibbler, who's gone to a place
 #  where I, too, hope one day to go. The toilet."
@@ -44,12 +45,8 @@ sub render {
   $prepend .= q/use Mojo::Base -strict;/;
 
   # Render
-  my $mt = Mojo::Template->new($conf->{template} || {});
-  $mt->prepend($prepend);
-  $content = $mt->render($content, $app);
-  utf8::encode $content;
-
-  return $content;
+  my $mt = Mojo::Template->new($conf->{template} || {})->prepend($prepend);
+  return encode 'UTF-8', $mt->render($content, $app);
 }
 
 1;

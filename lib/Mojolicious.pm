@@ -35,7 +35,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.21';
+our $VERSION  = '2.22';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -847,6 +847,8 @@ Robert Hicks
 Robin Lee
 
 Roland Lammel
+
+Ruslan Zakirov
 
 Ryan Jendoubi
 

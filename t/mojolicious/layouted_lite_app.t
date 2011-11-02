@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 82;
+use Test::More tests => 87;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -107,6 +107,9 @@ get '/withblocklayout' => sub {
 # GET /content_for
 get '/content_for';
 
+# GET /layout_inheritance
+get '/layout_inheritance';
+
 my $t = Test::Mojo->new;
 
 # GET /works
@@ -163,8 +166,8 @@ $t->get_ok('/layout_without_inheritance')->status_is(200)
 $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-  "<title>Works!</title>\n<br>\nSidebar too!\n\nDefault footer!\n");
+  ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n"
+    . "Hello World!\n\nDefault footer!\n");
 
 # GET /plugin_with_template
 $t->get_ok('/plugin_with_template')->status_is(200)
@@ -212,6 +215,13 @@ $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\n\n");
+
+# GET /layout_inheritance
+$t->get_ok('/layout_inheritance')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is(
+  "Title: Welcome\nBase: Specific: Welcome to Mojolicious!\n\n\n");
 
 __DATA__
 @@ layouts/default.html.ep
@@ -330,3 +340,16 @@ seems
 to
 <%= content_for 'message' %>
 work!
+
+@@ layouts/base.html.ep
+Title: <%= title %>
+Base: <%= content %>
+
+@@ layouts/specific.html.ep
+% layout 'base';
+Specific: <%= content %>
+
+@@ layout_inheritance.html.ep
+% layout 'specific';
+% title 'Welcome';
+Welcome to Mojolicious!

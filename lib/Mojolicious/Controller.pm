@@ -259,10 +259,8 @@ sub render_content {
 
     # Reset with multiple values
     if (@_) {
-      $c->{$name} = '';
-      for my $part (@_, $content) {
-        $c->{$name} .= ref $part eq 'CODE' ? $part->() : $part;
-      }
+      $c->{$name} =
+        join('', map({ref $_ eq 'CODE' ? $_->() : $_} @_, $content));
     }
 
     # First come

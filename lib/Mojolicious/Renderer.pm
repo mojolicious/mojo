@@ -142,6 +142,7 @@ sub render {
     $options->{format}         = $stash->{format} || $self->default_format;
     $options->{template}       = $extends;
     $self->_render_template($c, \$output, $options);
+    $content->{content} = b($output);
   }
 
   # Encoding (JSON is already encoded)

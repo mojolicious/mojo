@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 87;
+use Test::More tests => 97;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -109,6 +109,12 @@ get '/content_for';
 
 # GET /layout_inheritance
 get '/layout_inheritance';
+
+# GET /partial_inheritance
+get '/partial_inheritance';
+
+# GET /unknown_layout
+get '/unknown_layout';
 
 my $t = Test::Mojo->new;
 
@@ -222,6 +228,18 @@ $t->get_ok('/layout_inheritance')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
   "Title: Welcome\nBase: Specific: Welcome to Mojolicious!\n\n\n");
+
+# GET /partial_inheritance
+$t->get_ok('/partial_inheritance')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("HeaderLast template.\n\n");
+
+# GET /unknown_layout
+$t->get_ok('/unknown_layout')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("This layout does not exist.\n");
 
 __DATA__
 @@ layouts/default.html.ep
@@ -353,3 +371,18 @@ Specific: <%= content %>
 % layout 'specific';
 % title 'Welcome';
 Welcome to Mojolicious!
+
+@@ blocks_and_content.html.ep
+<%= content 'header' %><%= content %>
+
+@@ just_blocks.html.ep
+% extends 'blocks_and_content';
+<% content header => begin %>Header<% end %>
+
+@@ partial_inheritance.html.ep
+% extends 'just_blocks';
+Last template.
+
+@@ unknown_layout.html.ep
+% layout 'does_not_exist';
+This layout does not exist.

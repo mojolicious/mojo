@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 71;
+use Test::More tests => 55;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -19,7 +19,7 @@ use_ok 'Mojo::UserAgent';
 app->log->level('fatal');
 
 # GET /
-get '/' => {text => 'works'};
+get '/' => {text => 'works!'};
 
 # GET /timeout
 my $timeout = undef;
@@ -35,14 +35,6 @@ get '/no_length' => sub {
   my $self = shift;
   $self->finish('works too!');
   $self->rendered(200);
-};
-
-# GET /last
-my $last;
-get '/last' => sub {
-  my $self = shift;
-  $last = $self->tx->connection;
-  $self->render(text => 'works!');
 };
 
 # Proxy detection
@@ -107,16 +99,16 @@ $ua->get(
 Mojo::IOLoop->start;
 ok $success, 'successful';
 is $code,    200, 'right status';
-is $body,    'works', 'right content';
+is $body,    'works!', 'right content';
 
-# GET /last (custom connection)
+# GET / (custom connection)
 ($success, $code, $body) = undef;
 Mojo::IOLoop->connect(
   address    => 'localhost',
   port       => $ua->test_server->port,
   on_connect => sub {
     my ($loop, $id) = @_;
-    my $tx = $ua->build_tx(GET => 'http://mojolicio.us/last');
+    my $tx = $ua->build_tx(GET => 'http://mojolicio.us/');
     $tx->connection($id);
     $ua->start(
       $tx => sub {
@@ -134,51 +126,15 @@ ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
-# GET /last (blocking)
-my $tx = $ua->get('/last');
+# GET / (blocking)
+my $tx = $ua->get('/');
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# GET /last (again)
-$tx = $ua->get('/last');
-ok $tx->success,    'successful';
-ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# Close connection
-Mojo::IOLoop->stream($last)->emit('close');
-Mojo::IOLoop->one_tick while Mojo::IOLoop->stream($last);
-
-# GET /last (closed connection)
-$tx = $ua->get('/last');
-ok $tx->success, 'successful';
-ok !$tx->kept_alive, 'kept connection not alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# GET /last (again)
-$tx = $ua->get('/last');
-ok $tx->success,    'successful';
-ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# Close connection
-Mojo::IOLoop->stream($last)->emit('close');
-Mojo::IOLoop->one_tick while Mojo::IOLoop->stream($last);
-
-# GET /last (closed connection)
-$tx = $ua->get('/last');
-ok $tx->success, 'successful';
-ok !$tx->kept_alive, 'kept connection not alive';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-
-# GET /last (again)
-$tx = $ua->get('/last');
+# GET / (again)
+$tx = $ua->get('/');
 ok $tx->success,    'successful';
 ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
@@ -187,8 +143,8 @@ is $tx->res->body, 'works!', 'right content';
 # GET /
 $tx = $ua->get('/');
 ok $tx->success, 'successful';
-is $tx->res->code, 200,     'right status';
-is $tx->res->body, 'works', 'right content';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
 
 # GET / (callbacks)
 my $finished;
@@ -203,8 +159,8 @@ $tx = $ua->start($tx);
 $ua->unsubscribe('start');
 ok $tx->success, 'successful';
 is $finished, 1, 'finish event has been emitted';
-is $tx->res->code, 200,     'right status';
-is $tx->res->body, 'works', 'right content';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
 
 # GET /no_length (missing Content-Length header)
 $tx = $ua->get('/no_length');
@@ -218,8 +174,8 @@ is $tx->res->body, 'works too!', 'right content';
 # GET / (built-in server)
 $tx = $ua->get('/');
 ok $tx->success, 'successful';
-is $tx->res->code, 200,     'right status';
-is $tx->res->body, 'works', 'right content';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
 
 # GET / (built-in server times out)
 $tx = $ua->get('/timeout');

@@ -161,7 +161,7 @@ sub _element {
   my @selectors  = reverse @$selectors;
   my $first      = 2;
   my $parentonly = 0;
-  my ($current, $marker, $snapback, $siblings);
+  my ($current, $marker, $previous, $siblings);
   for (my $i = 0; $i <= $#selectors; $i++) {
     my $selector = $selectors[$i];
 
@@ -177,7 +177,7 @@ sub _element {
         # Can't go back to the first
         unless ($first) {
           $marker   //= $i;
-          $snapback //= $current;
+          $previous //= $current;
         }
       }
 
@@ -242,10 +242,9 @@ sub _element {
         return unless defined $marker;
 
         # Reset
-        $i        = $marker - 2;
-        $current  = $snapback;
-        $snapback = undef;
-        $marker   = undef;
+        $i       = $marker - 2;
+        $current = $previous;
+        ($marker, $previous) = undef;
         last;
       }
     }

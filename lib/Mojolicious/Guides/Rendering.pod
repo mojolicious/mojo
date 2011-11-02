@@ -644,25 +644,18 @@ A common use would be to send the C<head> section of an HTML document to the
 browser in advance and speed up preloading of referenced images and
 stylesheets.
 
-  $self->write_chunk('<html><head><title>Example</title>');
-  $self->write_chunk('<link href="example.css" rel="stylesheet"');
-  $self->write_chunk(' type="text/css"></head>', sub {
+  $self->write_chunk('<html><head><title>Example</title></head>', sub {
     my $self = shift;
-    $self->write_chunk('<body>Example</body></html>');
-    $self->write_chunk('');
+    $self->finish('<body>Example</body></html>');
   });
 
 The optional drain callback ensures that all previous chunks have been
 written before processing continues.
-An empty chunk marks the end of the stream.
+An empty chunk or C<finish> call marks the end of the stream.
 
-  22
-  <html><head><title>Example</title>
   29
-  <link href="example.css" rel="stylesheet"
-  17
-   type="text/css"></head>
-  1C
+  <html><head><title>Example</title></head>
+  1b
   <body>Example</body></html>
   0
 

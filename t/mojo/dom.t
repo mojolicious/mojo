@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 697;
+use Test::More tests => 669;
 
 use ojo;
 use Mojo::Util 'encode';
@@ -1843,48 +1843,6 @@ is "$dom", <<EOF, 'right result';
   </tr>
 </table>
 EOF
-
-# Selector subject
-$dom = Mojo::DOM->new(<<EOF);
-<div id="a" class="wrapper">
-  <div id="b">
-    <a href="http://kraih.com">Kraih</a>
-  </div>
-  <div id="c" class="wrapper">
-    <a href="http://mojolicio.us">Mojolicious</a>
-  </div>
-</div>
-EOF
-is $dom->find('div > ?div > a')->[0]->{id}, 'b', 'right attribute';
-is $dom->find('div > ?div > a')->[1]->{id}, 'c', 'right attribute';
-is $dom->find('div > ?div > a')->[2], undef, 'no result';
-is $dom->find('div > ?div > a')->size, 2, 'right number of elements';
-is $dom->find('div ?div a')->[0]->{id}, 'b', 'right attribute';
-is $dom->find('div ?div a')->[1]->{id}, 'c', 'right attribute';
-is $dom->find('div ?div a')->[2], undef, 'no result';
-is $dom->find('div ?div a')->size, 2, 'right number of elements';
-is $dom->find('.wrapper > ? > [href]')->[0]->{id}, 'b', 'right attribute';
-is $dom->find('.wrapper > ? > [href]')->[1]->{id}, 'c', 'right attribute';
-is $dom->find('.wrapper ? > [href]')->[2], undef, 'no result';
-is $dom->find('.wrapper ? > [href]')->size, 2, 'right number of elements';
-is $dom->find('#a > ? [href]')->[0]->{id}, 'b', 'right attribute';
-is $dom->find('#a > ? [href]')->[1]->{id}, 'c', 'right attribute';
-is $dom->find('#a > ? [href]')->[2], undef, 'no result';
-is $dom->find('#a > ? [href]')->size, 2, 'right number of elements';
-is $dom->find('?div div a')->[0]->{id}, 'a', 'right attribute';
-is $dom->find('?div div a')->[1], undef, 'no result';
-is $dom->find('?div div a')->size, 1, 'right number of elements';
-is $dom->find('div div ?a')->[0]->{href}, 'http://kraih.com',
-  'right attribute';
-is $dom->find('div div ?a')->[0]->text, 'Kraih', 'right text';
-is $dom->find('div div ?a')->[1]->{href}, 'http://mojolicio.us',
-  'right attribute';
-is $dom->find('div div ?a')->[1]->text, 'Mojolicious', 'right text';
-is $dom->find('div div ?a')->[2], undef, 'no result';
-is $dom->find('div div ?a')->size, 2, 'right number of elements';
-is $dom->find('?[class] > div')->[0]->{id}, 'a', 'right attribute';
-is $dom->find('?[class] > div')->[2], undef, 'no result';
-is $dom->find('?[class] > div')->size, 1, 'right number of elements';
 
 # Preformatted text
 $dom = Mojo::DOM->new(<<EOF);

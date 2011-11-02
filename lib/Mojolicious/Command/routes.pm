@@ -1,18 +1,27 @@
 package Mojolicious::Command::routes;
 use Mojo::Base 'Mojo::Command';
 
-use Mojo::Server;
+use re 'regexp_pattern';
+use Getopt::Long 'GetOptions';
 
 has description => <<'EOF';
 Show available routes.
 EOF
 has usage => <<"EOF";
-usage: $0 routes
+usage: $0 routes [OPTIONS]
+
+These options are available:
+  --verbose   Print additional details about routes.
 EOF
 
 # "I'm finally richer than those snooty ATM machines."
 sub run {
   my $self = shift;
+
+  # Options
+  local @ARGV = @_;
+  my $verbose;
+  GetOptions(verbose => sub { $verbose = 1 });
 
   # Check if application has routes
   my $app = $self->app;
@@ -21,58 +30,61 @@ sub run {
   # Walk and draw
   my $routes = [];
   $self->_walk($_, 0, $routes) for @{$app->routes->children};
-  $self->_draw($routes);
+  $self->_draw($routes, $verbose);
 }
 
 sub _draw {
-  my ($self, $routes) = @_;
+  my ($self, $routes, $verbose) = @_;
 
   # Length
-  my $pl = my $nl = my $ml = 0;
+  my @length = (0, 0, 0);
   for my $node (@$routes) {
 
-    # Path
-    my $l = length $node->[0];
-    $pl = $l if $l > $pl;
-
-    # Name
-    my $l2 = length($node->[1]->name);
-    $l2 += 2 if $node->[1]->has_custom_name;
-    $nl = $l2 if $l2 > $nl;
+    # Pattern
+    my $len = length $node->[0];
+    $length[0] = $len if $len > $length[0];
 
     # Methods
-    my $l3 =
-      defined($node->[1]->via)
-      ? length(join ',', @{$node->[1]->via})
-      : length('*');
-    $ml = $l3 if $l3 > $ml;
+    unless (defined $node->[1]->via) { $len = length '*' }
+    else { $len = length(join ',', @{$node->[1]->via}) }
+    $length[1] = $len if $len > $length[1];
+
+    # Name
+    $len = length $node->[1]->name;
+    $len += 2 if $node->[1]->has_custom_name;
+    $length[2] = $len if $len > $length[2];
   }
 
   # Draw
   foreach my $node (@$routes) {
-
-    # Regex
-    $node->[1]->pattern->_compile;
-    my $regex = $node->[1]->pattern->regex;
+    my @parts;
 
     # Pattern
-    my $pattern = $node->[0];
-    my $pp = ' ' x ($pl - length $pattern);
+    push @parts, $node->[0];
+    $parts[-1] .= ' ' x ($length[0] - length $parts[-1]);
+
+    # Methods
+    my $methods;
+    unless (defined $node->[1]->via) { $methods = '*' }
+    else { $methods = uc join ',', @{$node->[1]->via} }
+    push @parts, $methods . ' ' x ($length[1] - length $methods);
 
     # Name
     my $name = $node->[1]->name;
     $name = qq/"$name"/ if $node->[1]->has_custom_name;
-    my $np = ' ' x ($nl - length $name);
+    push @parts, $name . ' ' x ($length[2] - length $name);
 
-    # Methods
-    my $methods =
-      defined $node->[1]->via
-      ? uc join ',', @{$node->[1]->via}
-      : '*';
-    my $mp = ' ' x ($ml - length $methods);
+    # Regex
+    (my $pattern = $node->[1]->pattern)->match('/');
+    my $regex  = (regexp_pattern $pattern->regex)[0];
+    my $format = (regexp_pattern $pattern->format)[0];
+    my $req    = $pattern->reqs->{format};
+    $format = defined $req ? '' : "(?:$format)?" unless $req;
+    push @parts, $node->[1]->is_endpoint ? "$regex$format" : $regex
+      if $verbose;
 
     # Route
-    say "$pattern$pp  $methods$mp  $name$np  $regex";
+    say join('  ', @parts);
   }
 }
 
@@ -80,16 +92,10 @@ sub _draw {
 sub _walk {
   my ($self, $node, $depth, $routes) = @_;
 
-  # Line
-  my $pattern = $node->pattern->pattern || '/';
-  my $line    = '';
-  my $i       = $depth * 2;
-  if ($i) {
-    $line .= ' ' x $i;
-    $line .= '+';
-  }
-  $line .= $pattern;
-  push @$routes, [$line, $node];
+  # Pattern
+  my $prefix = '';
+  if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
+  push @$routes, [$prefix . ($node->pattern->pattern || '/'), $node];
 
   # Walk
   $depth++;

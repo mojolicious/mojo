@@ -2,7 +2,7 @@ package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
 has defaults => sub { {} };
-has format   => sub {qr#\.([^/\)]+)$#};
+has format   => sub {qr#\.([^/]+)$#};
 has [qw/pattern regex/];
 has quote_end      => ')';
 has quote_start    => '(';
@@ -40,7 +40,7 @@ sub parse {
   $self->reqs($reqs);
 
   # Format in pattern
-  if ($pattern =~ $self->format) {
+  if ($pattern =~ m#\.([^/\)]+)$#) {
     $reqs->{format} = quotemeta($self->{strict} = $1);
   }
 
@@ -126,7 +126,7 @@ sub _compile {
   my $reqs = $self->reqs;
   if (!exists $reqs->{format} || $reqs->{format}) {
     my $format =
-      defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/\)]+)';
+      defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/]+)';
     $self->format(qr#\.$format$#);
   }
 

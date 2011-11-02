@@ -569,9 +569,54 @@ You can also add your own shortcuts to make route generation more expressive.
 Shortcuts can lead to anything, routes, bridges or maybe even both.
 And watch out for quicksand!
 
+=head2 Introspection
+
+The C<routes> command can be used from the command line to list all available
+routes together with name and underlying regular expressions.
+
+  $ script/myapp routes -v
+  /foo/:name        GET   fooname        ^/foo/([^/\.]+))(?:\.([^/]+)$)?
+  /baz/*everything  POST  bazeverything  ^/baz/(.+))(?:\.([^/]+)$)?
+  /bar/(.test)      *     bartest        ^/bar/([^/]+))(?:\.([^/]+)$)?
+
 =head1 ADVANCED
 
 Less commonly used and more powerful features.
+
+=head2 IRIs
+
+IRIs are handled transparently, that means paths are guaranteed to be
+unescaped and decoded to Perl characters.
+
+  use utf8;
+
+  # /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
+  $r->route('/☃')->to(controller => 'foo', action => 'snowman');
+
+Just don't forget to use the L<utf8> pragma or you'll make the unicode
+snowman very sad.
+
+=head2 WebSockets
+
+You can restrict access to WebSocket handshakes using the C<websocket> method.
+
+  # /echo (WebSocket handshake)
+  $r->websocket('/echo')->to(controller => 'foo', action => 'echo');
+
+  # Controller
+  package MyApp::Foo;
+  use Mojo::Base 'Mojolicious::Controller';
+
+  # Action
+  sub echo {
+    my $self = shift;
+    $self->on(message => sub {
+      my ($self, $message) = @_;
+      $self->send_message("echo: $message");
+    });
+  }
+
+  1;
 
 =head2 Conditions
 
@@ -751,51 +796,6 @@ Now just load the plugin and you're done.
   }
 
   1;
-
-=head2 WebSockets
-
-You can restrict access to WebSocket handshakes using the C<websocket> method.
-
-  # /echo (WebSocket handshake)
-  $r->websocket('/echo')->to(controller => 'foo', action => 'echo');
-
-  # Controller
-  package MyApp::Foo;
-  use Mojo::Base 'Mojolicious::Controller';
-
-  # Action
-  sub echo {
-    my $self = shift;
-    $self->on(message => sub {
-      my ($self, $message) = @_;
-      $self->send_message("echo: $message");
-    });
-  }
-
-  1;
-
-=head2 IRIs
-
-IRIs are handled transparently, that means paths are guaranteed to be
-unescaped and decoded to Perl characters.
-
-  use utf8;
-
-  # /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
-  $r->route('/☃')->to(controller => 'foo', action => 'snowman');
-
-Just don't forget to use the L<utf8> pragma or you'll make the unicode
-snowman very sad.
-
-=head2 Introspection
-
-The C<routes> command can be used from the command line to list all available
-routes together with name and underlying regular expressions.
-
-  $ script/myapp routes -v
-  /foo/:name        GET   fooname        ^/foo/([^/\.]+))(?:\.([^/]+)$)?
-  /baz/*everything  POST  bazeverything  ^/baz/(.+))(?:\.([^/]+)$)?
-  /bar/(.test)      *     bartest        ^/bar/([^/]+))(?:\.([^/]+)$)?
 
 =head1 MORE
 

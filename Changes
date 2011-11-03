@@ -2,8 +2,10 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.22    2011-11-03 00:00:00
         - Added EXPERIMENTAL --verbose flag to routes command.
+        - Improved documentation.
         - Fixed a few attribute without value selector bugs in
           Mojo::DOM::CSS.
+        - Fixed template inheritance bug in Mojolicious::Renderer.
 
 2.21    2011-11-02 00:00:00
         - Removed profile helper.

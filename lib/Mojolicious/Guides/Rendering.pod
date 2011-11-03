@@ -470,35 +470,26 @@ of the template to the layout.
 
 =head2 Template inheritance
 
-Inheritance takes the layout concept above one step further.
-Unlike C<content_for> the C<content> helper does not allow appending to
-existing values, this makes it possible to overload whole template sections.
-The only difference between C<layout> and C<extends> is that extended
-templates don't get prefixed with C<layouts/>.
+Inheritance takes the layout concept above one step further, it allows you to
+build a skeleton template with named blocks that child templates can override.
 
   @@ first.html.ep
-  %# "<div>First header!First footer!</div>"
+  %# "<div>First header!Hello Mojo!First footer!</div>"
   <div>
-  %= content header => begin
-    First header!
-  % end
-  %= content footer => begin
-    First footer!
-  % end
+    %= content header => begin
+      First header!
+    % end
+    Hello Mojo!
+    %= content footer => begin
+      First footer!
+    % end
   </div>
 
   @@ second.html.ep
-  %# "<div>Second header!First footer!</div>"
+  %# "<div>Second header!Hello Mojo!First footer!</div>"
   % extends 'first';
   % content header => begin
     Second header!
-  % end
-
-  @@ third.html.ep
-  %# "<div>Second header!Third footer!</div>"
-  % extends 'second';
-  % content footer => begin
-    Third footer!
   % end
 
 This chain could go on and on to allow a very high level of template reuse.

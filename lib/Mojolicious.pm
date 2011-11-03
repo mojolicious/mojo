@@ -848,8 +848,6 @@ Robin Lee
 
 Roland Lammel
 
-Ruslan Zakirov
-
 Ryan Jendoubi
 
 Sascha Kiefer

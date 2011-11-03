@@ -22,9 +22,6 @@ use constant {
   PONG         => 10
 };
 
-# Core module since Perl 5.9.3
-use constant SHA1 => eval 'use Digest::SHA (); 1';
-
 has handshake => sub { Mojo::Transaction::HTTP->new };
 has 'masked';
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
@@ -319,11 +316,7 @@ sub server_write {
   return $write;
 }
 
-sub _challenge {
-  my ($self, $key) = @_;
-  return '' unless $key && SHA1;
-  return b64_encode(sha1_bytes($key . GUID), '');
-}
+sub _challenge { b64_encode(sha1_bytes(pop . GUID), '') }
 
 sub _xor_mask {
   my ($input, $mask) = @_;

@@ -434,12 +434,6 @@ like this.
   app->start;
   __DATA__
 
-  @@ layouts/default.html.ep
-  <!doctype html><html>
-    <head><title>Login Manager</title></head>
-    <body><%= content %></body>
-  </html>
-
   @@ index.html.ep
   % layout 'default';
   %= form_for index => begin
@@ -461,6 +455,12 @@ like this.
   % }
   Welcome <%= session 'user' %>.<br>
   %= link_to Logout => 'logout'
+
+  @@ layouts/default.html.ep
+  <!doctype html><html>
+    <head><title>Login Manager</title></head>
+    <body><%= content %></body>
+  </html>
 
 A list of all built-in helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and

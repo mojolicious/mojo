@@ -575,9 +575,8 @@ The C<routes> command can be used from the command line to list all available
 routes together with name and underlying regular expressions.
 
   $ script/myapp routes -v
-  /foo/:name        GET   fooname        ^/foo/([^/\.]+))(?:\.([^/]+)$)?
-  /baz/*everything  POST  bazeverything  ^/baz/(.+))(?:\.([^/]+)$)?
-  /bar/(.test)      *     bartest        ^/bar/([^/]+))(?:\.([^/]+)$)?
+  /foo/:name    GET   fooname  ^/foo/([^/\.]+))(?:\.([^/]+)$)?
+  /bar/(.test)  POST  bartest  ^/bar/([^/]+))(?:\.([^/]+)$)?
 
 =head1 ADVANCED
 

@@ -769,23 +769,6 @@ And you can use all the commands from L<Mojolicious::Commands>.
 
   perl -Mojo -e'a({text => "Hello World!"})->start' get -v /
 
-=head2 jQuery (Content Distribution Network)
-
-These days L<Mojolicious> ships with a bundled version of jQuery, which you
-can easily use as a fallback for applications that might be used offline from
-time to time.
-
-  <%= javascript
-    'http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js' %>
-  %= javascript begin
-    if (typeof jQuery == 'undefined') {
-      var e = document.createElement('script');
-      e.src = '/js/jquery.js';
-      e.type = 'text/javascript';
-      document.getElementsByTagName("head")[0].appendChild(e);
-    }
-  % end
-
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the

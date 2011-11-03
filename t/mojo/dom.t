@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 669;
+use Test::More tests => 675;
 
 use ojo;
 use Mojo::Util 'encode';
@@ -591,8 +591,10 @@ $dom = Mojo::DOM->new->parse(<<EOF);
             <option value="f">f</option>
         </optgroup>
         <option value="g">g</option>
+        <option selected value="h">H</option>
     </select>
     <input type="submit" value="Ok!" />
+    <input type="checkbox" checked name="I">
 </form>
 EOF
 is $dom->find(':root')->[0]->type,     'form', 'right type';
@@ -601,8 +603,14 @@ is $dom->find('form:root')->[0]->type, 'form', 'right type';
 is $dom->find(':root')->[1], undef, 'no result';
 is $dom->find(':checked')->[0]->attrs->{name},        'groovy', 'right name';
 is $dom->find('option:checked')->[0]->attrs->{value}, 'e',      'right value';
-is $dom->find(':checked')->[1]->text,                  'E', 'right text';
-is $dom->find('*:checked')->[1]->text,                 'E', 'right text';
+is $dom->find(':checked')->[1]->text,  'E', 'right text';
+is $dom->find('*:checked')->[1]->text, 'E', 'right text';
+is $dom->find(':checked')->[2]->text,  'H', 'right name';
+is $dom->find(':checked')->[3]->attrs->{name}, 'I', 'right name';
+is $dom->find(':checked')->[4], undef, 'no result';
+is $dom->find('option[selected]')->[0]->attrs->{value}, 'e', 'right value';
+is $dom->find('option[selected]')->[1]->text, 'H', 'right text';
+is $dom->find('option[selected]')->[2], undef, 'no result';
 is $dom->find(':checked[value="e"]')->[0]->text,       'E', 'right text';
 is $dom->find('*:checked[value="e"]')->[0]->text,      'E', 'right text';
 is $dom->find('option:checked[value="e"]')->[0]->text, 'E', 'right text';

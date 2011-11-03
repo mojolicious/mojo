@@ -474,22 +474,20 @@ Inheritance takes the layout concept above one step further, it allows you to
 build a skeleton template with named blocks that child templates can override.
 
   @@ first.html.ep
-  %# "<div>First header!Hello Mojo!First footer!</div>"
   <div>
     %= content header => begin
-      First header!
+      Default header!
     % end
-    Hello Mojo!
+    <b>Hello Mojo!</b>
     %= content footer => begin
-      First footer!
+      Default footer!
     % end
   </div>
 
   @@ second.html.ep
-  %# "<div>Second header!Hello Mojo!First footer!</div>"
   % extends 'first';
   % content header => begin
-    Second header!
+    New header!
   % end
 
 This chain could go on and on to allow a very high level of template reuse.

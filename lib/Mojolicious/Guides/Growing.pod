@@ -97,7 +97,7 @@ information across several HTTP requests.
   HTTP/1.1 200 OK
   Set-Cookie: sessionid=987654321
   Content-Length: 10
-  Hello sri!
+  Hello sri.
 
   GET /protected HTTP/1.1
   Host: mojolicio.us
@@ -106,7 +106,7 @@ information across several HTTP requests.
   HTTP/1.1 200 OK
   Set-Cookie: sessionid=987654321
   Content-Length: 16
-  Hello again sri!
+  Hello again sri.
 
 Traditionally all session data was stored on the server-side and only session
 ids were exchanged between browser and web server in the form of cookies.
@@ -261,11 +261,11 @@ L<Mojolicious> to make our C<model> available to all actions and templates.
     my $pass = $self->param('pass') || '';
 
     # Check password
-    return $self->render(text => "Welcome $user!")
+    return $self->render(text => "Welcome $user.")
       if $self->users->check($user, $pass);
 
     # Failed
-    $self->render(text => 'Wrong username or password!');
+    $self->render(text => 'Wrong username or password.');
   };
 
   app->start;
@@ -329,7 +329,7 @@ you can also add a line like this.
 Quick C<GET> requests can be performed right from the command line.
 
   $ ./myapp.pl get /
-  Wrong username or password!
+  Wrong username or password.
 
   $ ./myapp.pl get -v '/?user=sri&pass=secr3t'
   HTTP/1.1 200 OK
@@ -339,14 +339,14 @@ Quick C<GET> requests can be performed right from the command line.
   Content-Length: 12
   Content-Type: text/plain
 
-  Welcome sri!
+  Welcome sri.
 
 =head2 State keeping
 
 Sessions in L<Mojolicious> pretty much just work out of the box and there is
 no setup required, but we suggest using a more secure C<secret> passphrase.
 
-  app->secret('Mojolicious rocks!');
+  app->secret('Mojolicious rocks');
 
 This passphrase is used by the C<HMAC-MD5> algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.
@@ -368,7 +368,7 @@ past.
 For data that should only be visible on the next request, like a confirmation
 message after a 302 redirect, you can use the C<flash>.
 
-  $self->flash(message => 'Everything is fine!');
+  $self->flash(message => 'Everything is fine.');
   $self->redirect_to('goodbye');
 
 Just remember that everything is stored in C<HMAC-MD5> signed cookies, so
@@ -386,7 +386,7 @@ like this.
   use MyUsers;
 
   # Make signed cookies secure
-  app->secret('Mojolicious rocks!');
+  app->secret('Mojolicious rocks');
 
   my $users = MyUsers->new;
   helper users => sub { return $users };
@@ -406,7 +406,7 @@ like this.
     $self->session(user => $user);
 
     # Store a friendly message for the next page in flash
-    $self->flash(message => 'Thanks for logging in!');
+    $self->flash(message => 'Thanks for logging in.');
 
     # Redirect to protected page with a 302 response
     $self->redirect_to('protected');
@@ -459,7 +459,7 @@ like this.
   % if (my $message = flash 'message') {
     <b><%= $message %></b><br>
   % }
-  Welcome <%= session 'user' %>!<br>
+  Welcome <%= session 'user' %>.<br>
   %= link_to Logout => 'logout'
 
 A list of all built-in helpers can be found in
@@ -503,7 +503,7 @@ actual action code needs to be changed.
   sub startup {
     my $self = shift;
 
-    $self->secret('Mojolicious rocks!');
+    $self->secret('Mojolicious rocks');
     my $users = MyUsers->new;
     $self->helper(users => sub { return $users });
 
@@ -518,7 +518,7 @@ actual action code needs to be changed.
       return $self->render unless $self->users->check($user, $pass);
 
       $self->session(user => $user);
-      $self->flash(message => 'Thanks for logging in!');
+      $self->flash(message => 'Thanks for logging in.');
       $self->redirect_to('protected');
     } => 'index');
 
@@ -580,7 +580,7 @@ Once again the actual action code does not change at all.
     return $self->render unless $self->users->check($user, $pass);
 
     $self->session(user => $user);
-    $self->flash(message => 'Thanks for logging in!');
+    $self->flash(message => 'Thanks for logging in.');
     $self->redirect_to('protected');
   }
 
@@ -613,7 +613,7 @@ information.
   sub startup {
     my $self = shift;
 
-    $self->secret('Mojolicious rocks!');
+    $self->secret('Mojolicious rocks');
     my $users = MyUsers->new;
     $self->helper(users => sub { return $users });
 

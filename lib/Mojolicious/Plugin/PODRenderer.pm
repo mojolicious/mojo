@@ -46,7 +46,7 @@ sub register {
 
   # Perldoc
   $app->routes->any(
-    '/perldoc/(*module)' => {module => 'Mojolicious/Guides'} => sub {
+    '/perldoc/*module' => {module => 'Mojolicious/Guides'} => sub {
       my $self = shift;
 
       # Find module

@@ -455,9 +455,9 @@ of the template to the layout.
   @@ foo/bar.html.ep
   % layout 'mylayout';
   % content_for header => begin
-    <title>MyApp</title>
+    <meta http-equiv="Content-Type" content="text/html">
   % end
-  Hello World!
+  <div>Hello World!</div>
   % content_for header => begin
     <meta http-equiv="Pragma" content="no-cache">
   % end
@@ -475,15 +475,18 @@ build a skeleton template with named C<content> blocks that child templates
 can override.
 
   @@ first.html.ep
-  <div>
-    %= content header => begin
-      Default header
-    % end
-    Hello Mojo
-    %= content footer => begin
-      Default footer
-    % end
-  </div>
+  <!doctype html><html>
+    <head><title>Hello</title></head>
+    <body>
+      %= content header => begin
+        Default header
+      % end
+      <div>Hello World!</div>
+      %= content footer => begin
+        Default footer
+      % end
+    </body>
+  </html>
 
   @@ second.html.ep
   % extends 'first';

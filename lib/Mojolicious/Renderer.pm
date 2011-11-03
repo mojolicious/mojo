@@ -2,7 +2,6 @@ package Mojolicious::Renderer;
 use Mojo::Base -base;
 
 use File::Spec;
-use Mojo::ByteStream 'b';
 use Mojo::Cache;
 use Mojo::Command;
 use Mojo::Home;
@@ -109,14 +108,14 @@ sub render {
   my $content = $stash->{'mojo.content'} ||= {};
   if (defined $text) {
     $self->handlers->{text}->($self, $c, \$output, {text => $text});
-    $content->{content} = b("$output")
+    $content->{content} = $output
       if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Data
   elsif (defined $data) {
     $self->handlers->{data}->($self, $c, \$output, {data => $data});
-    $content->{content} = b("$output")
+    $content->{content} = $output
       if ($c->stash->{extends} || $c->stash->{layout});
   }
 
@@ -124,14 +123,14 @@ sub render {
   elsif (defined $json) {
     $self->handlers->{json}->($self, $c, \$output, {json => $json});
     $format = 'json';
-    $content->{content} = b("$output")
+    $content->{content} = $output
       if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Template or templateless handler
   else {
     return unless $self->_render_template($c, \$output, $options);
-    $content->{content} = b($output)
+    $content->{content} = $output
       if ($c->stash->{extends} || $c->stash->{layout});
   }
 

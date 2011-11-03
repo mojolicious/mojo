@@ -114,15 +114,15 @@ my $t = Test::Mojo->new;
 
 # GET /works
 $t->get_ok('/works')->status_is(200)
-  ->content_is("DefaultJust worksThis template just works!\n\n");
+  ->content_is("DefaultJust worksThis <template> just works!\n\n");
 
 # GET /works (different layout)
 $t->get_ok('/works?green=1')->status_is(200)
-  ->content_is("GreenJust worksThis template just works!\n\n");
+  ->content_is("GreenJust worksThis <template> just works!\n\n");
 
 # GET /works (extended)
 $t->get_ok('/works?blue=1')->status_is(200)
-  ->content_is("BlueJust worksThis template just works!\n\n");
+  ->content_is("BlueJust worksThis <template> just works!\n\n");
 
 # GET /doesnotexist
 $t->get_ok('/doesnotexist')->status_is(404)
@@ -174,7 +174,7 @@ $t->get_ok('/triple_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n"
-    . "New content.\n\nDefault footer!\n");
+    . "New <content>.\n\nDefault footer!\n");
 
 # GET /plugin_with_template
 $t->get_ok('/plugin_with_template')->status_is(200)
@@ -237,7 +237,7 @@ Blue<%= title %><%= content %>
 % title 'Just works';
 % layout 'green' if param 'green';
 % extends 'blue' if param 'blue';
-This template just works!
+This <template> just works!
 
 @@ exception.html.ep
 % title 'Exception happened';
@@ -284,7 +284,7 @@ Sidebar too!
 
 @@ triple_inheritance.html.ep
 % extends 'double_inheritance';
-New content.
+New <content>.
 
 @@ layouts/plugin_with_template.html.ep
 layout_with_template

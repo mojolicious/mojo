@@ -349,10 +349,7 @@ sub _selector {
       # ":checked"
       if ($class eq 'checked') {
         my $attrs = $current->[2];
-        next if exists $attrs->{checked} && !defined $attrs->{checked};
-        next if ($attrs->{checked} || '') eq 'checked';
-        next if exists $attrs->{selected} && !defined $attrs->{selected};
-        next if ($attrs->{selected} || '') eq 'selected';
+        next if exists $attrs->{checked} || exists $attrs->{selected};
       }
 
       # ":empty"
@@ -366,9 +363,7 @@ sub _selector {
       }
 
       # "not"
-      elsif ($class eq 'not') {
-        next unless $self->_selector($args, $current);
-      }
+      elsif ($class eq 'not') { next if !$self->_selector($args, $current) }
 
       # "nth-*"
       elsif ($class =~ /^nth-/) {

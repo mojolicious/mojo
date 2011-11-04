@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.23    2011-11-04 00:00:00
         - Updated jQuery to version 1.7.
         - Improved documentation.
+        - Fixed empty path element bug in Mojo::Path.
 
 2.22    2011-11-03 00:00:00
         - Added EXPERIMENTAL --verbose flag to routes command.

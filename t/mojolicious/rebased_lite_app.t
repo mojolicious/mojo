@@ -45,8 +45,8 @@ $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
 <base href="http://kraih.com/rebased/" />
 <link href="/rebased/b.css" media="test" rel="stylesheet" type="text/css" />
 <img alt="Test" src="/rebased/images/test.png" />
-http://kraih.com/rebased/
-/rebased/
+http://kraih.com/rebased
+/rebased
 http://kraih.com/
 EOF
 

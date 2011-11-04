@@ -11,11 +11,7 @@ use Mojo::URL;
 has [qw/leading_slash trailing_slash/];
 has parts => sub { [] };
 
-sub new {
-  my $self = shift->SUPER::new();
-  $self->parse(@_);
-  return $self;
-}
+sub new { shift->SUPER::new()->parse(@_) }
 
 # DEPRECATED in Smiling Face With Sunglasses!
 sub append {
@@ -32,26 +28,23 @@ sub canonicalize {
   my $self = shift;
 
   # Resolve path
-  my @path;
+  my @parts;
   for my $part (@{$self->parts}) {
 
     # ".."
     if ($part eq '..') {
-
-      # Leading '..' can't be resolved
-      unless (@path && $path[-1] ne '..') { push @path, '..' }
-
-      # Uplevel
-      else { pop @path }
+      unless (@parts && $parts[-1] ne '..') { push @parts, '..' }
+      else                                  { pop @parts }
       next;
     }
 
     # "."
-    next if $part eq '.';
+    next if $part ~~ ['.', ''];
 
-    push @path, $part;
+    # Part
+    push @parts, $part;
   }
-  $self->parts(\@path);
+  $self->parts(\@parts);
 
   return $self;
 }
@@ -86,21 +79,11 @@ sub parse {
   my ($self, $path) = @_;
   $path //= '';
 
-  # Leading and trailing slash
-  $path =~ m#^/# ? $self->leading_slash(1)  : $self->leading_slash(undef);
-  $path =~ m#/$# ? $self->trailing_slash(1) : $self->trailing_slash(undef);
-
-  # Parse
   $path = url_unescape $path;
   utf8::decode $path;
-  my @parts;
-  for my $part (split '/', $path) {
-
-    # Empty parts before the first are garbage
-    next unless length $part or @parts;
-    push @parts, $part;
-  }
-  $self->parts(\@parts);
+  $path =~ s|^/|| ? $self->leading_slash(1)  : $self->leading_slash(undef);
+  $path =~ s|/$|| ? $self->trailing_slash(1) : $self->trailing_slash(undef);
+  $self->parts([split '/', $path, -1]);
 
   return $self;
 }
@@ -114,15 +97,15 @@ sub to_string {
   my $self = shift;
 
   # Escape
-  my @path = map {
+  my @parts = map {
     url_escape(encode('UTF-8', $_),
       "$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@")
   } @{$self->parts};
 
   # Format
-  my $path = join '/', @path;
+  my $path = join '/', @parts;
   $path = "/$path" if $self->leading_slash;
-  $path = "$path/" if @path && $self->trailing_slash;
+  $path = "$path/" if @parts && $self->trailing_slash;
 
   return $path;
 }

@@ -326,8 +326,8 @@ sub _parse_start_line {
   my $self = shift;
 
   # Ignore any leading empty lines
-  my $line = get_line $self->{buffer};
-  $line = get_line $self->{buffer}
+  my $line = get_line \$self->{buffer};
+  $line = get_line \$self->{buffer}
     while ((defined $line) && ($line =~ m/^\s*$/));
   return unless defined $line;
 

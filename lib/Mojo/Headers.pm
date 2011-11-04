@@ -199,7 +199,7 @@ sub parse {
   $self->{buffer} .= $chunk if defined $chunk;
   my $headers = $self->{cache} ||= [];
   my $max = $self->max_line_size;
-  while (defined(my $line = get_line $self->{buffer})) {
+  while (defined(my $line = get_line \$self->{buffer})) {
 
     # Check line size limit
     if (length $line > $max) {

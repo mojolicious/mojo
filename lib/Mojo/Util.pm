@@ -370,12 +370,13 @@ sub encode {
 }
 
 sub get_line {
+  my $string = shift;
 
   # Locate line ending
-  return if (my $pos = index $_[0], "\x0a") == -1;
+  return if (my $pos = index $$string, "\x0a") == -1;
 
   # Extract line and ending
-  my $line = substr $_[0], 0, $pos + 1, '';
+  my $line = substr $$string, 0, $pos + 1, '';
   $line =~ s/\x0d?\x0a$//;
 
   return $line;
@@ -677,7 +678,6 @@ Mojo::Util - Portable utility functions
 =head1 DESCRIPTION
 
 L<Mojo::Util> provides portable utility functions for L<Mojo>.
-Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 FUNCTIONS
 
@@ -727,9 +727,9 @@ Encode characters to bytes.
 
 =head2 C<get_line>
 
-  my $line = get_line $chunk;
+  my $line = get_line \$string;
 
-Extract a whole line from chunk or return undef.
+Extract whole line from string or return C<undef>.
 Lines are expected to end with C<0x0d 0x0a> or C<0x0a>.
 
 =head2 C<hmac_md5_sum>

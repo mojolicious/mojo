@@ -149,7 +149,7 @@ sub _parse_start_line {
   }
 
   # We have a full HTTP 1.0+ response line
-  return unless defined(my $line = get_line $self->{buffer});
+  return unless defined(my $line = get_line \$self->{buffer});
   return $self->error('Bad response start line.')
     unless $line =~ $START_LINE_RE;
   $self->version($+{version});

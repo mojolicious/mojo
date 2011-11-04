@@ -176,7 +176,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Asset::File - File asset
+Mojo::Asset::File - File storage for HTTP 1.1 content
 
 =head1 SYNOPSIS
 
@@ -191,7 +191,7 @@ Mojo::Asset::File - File asset
 
 =head1 DESCRIPTION
 
-L<Mojo::Asset::File> is a container for file assets.
+L<Mojo::Asset::File> is a file storage backend for HTTP 1.1 content.
 
 =head1 ATTRIBUTES
 

@@ -22,7 +22,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Asset - Asset base class
+Mojo::Asset - HTTP 1.1 content storage base class
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ Mojo::Asset - Asset base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Asset> is an abstract base class for assets.
+L<Mojo::Asset> is an abstract base class for HTTP 1.1 content storage.
 
 =head1 ATTRIBUTES
 

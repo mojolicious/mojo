@@ -65,7 +65,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Asset::Memory - In-memory asset
+Mojo::Asset::Memory - In-memory storage for HTTP 1.1 content
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ Mojo::Asset::Memory - In-memory asset
 
 =head1 DESCRIPTION
 
-L<Mojo::Asset::Memory> is a container for in-memory assets.
+L<Mojo::Asset::Memory> is an in-memory storage backend for HTTP 1.1 content.
 
 =head1 ATTRIBUTES
 

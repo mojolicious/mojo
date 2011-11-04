@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.23    2011-11-04 00:00:00
+        - Updated jQuery to version 1.7.
         - Improved documentation.
 
 2.22    2011-11-03 00:00:00

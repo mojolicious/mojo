@@ -653,22 +653,11 @@ L<http://creativecommons.org/licenses/by-sa/3.0>.
 
 =head2 jQuery
 
-  Version 1.6.3
-
-jQuery is a fast and concise JavaScript Library that simplifies HTML document
-traversing, event handling, animating, and Ajax interactions for rapid web
-development. jQuery is designed to change the way that you write JavaScript.
-
   Copyright 2011, John Resig.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
 =head2 prettify.js
-
-  Version 1-Jun-2011
-
-A Javascript module and CSS file that allows syntax highlighting of source
-code snippets in an html page.
 
   Copyright (C) 2006, Google Inc.
 

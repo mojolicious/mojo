@@ -113,9 +113,8 @@ sub parse {
   my ($self, $url) = @_;
   return $self unless $url;
 
-  # Official regex
-  my ($scheme, $authority, $path, $query, $fragment) = $url
-    =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  my ($scheme, $authority, $path, $query, $fragment) =
+    $url =~ m|(?:([^:/?#]+)://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
   $self->scheme($scheme);
   $self->authority($authority);
   $self->path->parse($path);

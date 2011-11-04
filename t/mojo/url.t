@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 340;
+use Test::More tests => 346;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -87,6 +87,17 @@ $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/');
 ok $url->is_abs, 'is absolute';
 is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
+
+# Relative with empty elements
+$url = Mojo::URL->new('//bar/23/');
+ok !$url->is_abs, 'is not absolute';
+is "$url", '//bar/23/', 'right relative version';
+$url = Mojo::URL->new('///bar/23/');
+ok !$url->is_abs, 'is not absolute';
+is "$url", '///bar/23/', 'right relative version';
+$url = Mojo::URL->new('////bar//23/');
+ok !$url->is_abs, 'is not absolute';
+is "$url", '////bar//23/', 'right relative version';
 
 # Relative (base without trailing slash)
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/baz/foo?foo=bar#23');

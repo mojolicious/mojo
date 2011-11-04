@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 897;
+use Test::More tests => 905;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -420,6 +420,22 @@ is $req->version,     '1.0', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 27, 'right "Content-Length" value';
+
+# Parse full HTTP 1.0 request (empty elements in path)
+$req = Mojo::Message::Request->new;
+$req->parse('GET //foo/bar//baz.html?fo');
+$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse('-Type: text/');
+$req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
+$req->parse("o World!\n1234\nlalalala\n");
+ok $req->is_finished, 'request is finished';
+is $req->method,      'GET', 'right method';
+is $req->version,     '1.0', 'right version';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
+is $req->url, '//foo/bar//baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
 

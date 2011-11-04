@@ -14,11 +14,7 @@ has tree           => sub { [] };
 has wildcard_start => '*';
 
 # "This is the worst kind of discrimination. The kind against me!"
-sub new {
-  my $self = shift->SUPER::new();
-  $self->parse(@_);
-  return $self;
-}
+sub new { shift->SUPER::new()->parse(@_) }
 
 sub match {
   my ($self, $path) = @_;

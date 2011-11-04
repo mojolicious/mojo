@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 173;
+use Test::More tests => 175;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -203,15 +203,17 @@ is $path->parts->[4], '23',  'right part';
 is $path->parts->[5], undef, 'no part';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
-$path = Mojo::Path->new('///foo/bar/23///');
-is "$path", '///foo/bar/23///';
+$path = Mojo::Path->new('///foo///bar/23///');
+is "$path", '///foo///bar/23///';
 is $path->parts->[0], '',    'right part';
 is $path->parts->[1], '',    'right part';
 is $path->parts->[2], 'foo', 'right part';
-is $path->parts->[3], 'bar', 'right part';
-is $path->parts->[4], '23',  'right part';
-is $path->parts->[5], '',    'right part';
-is $path->parts->[6], '',    'right part';
-is $path->parts->[7], undef, 'no part';
+is $path->parts->[3], '',    'right part';
+is $path->parts->[4], '',    'right part';
+is $path->parts->[5], 'bar', 'right part';
+is $path->parts->[6], '23',  'right part';
+is $path->parts->[7], '',    'right part';
+is $path->parts->[8], '',    'right part';
+is $path->parts->[9], undef, 'no part';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';

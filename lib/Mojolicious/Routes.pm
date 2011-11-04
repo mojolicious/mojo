@@ -36,11 +36,7 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-sub new {
-  my $self = shift->SUPER::new();
-  $self->parse(@_);
-  return $self;
-}
+sub new { shift->SUPER::new()->parse(@_) }
 
 sub add_child {
   my ($self, $route) = @_;

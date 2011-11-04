@@ -18,11 +18,7 @@ has app_class => 'Mojo::HelloWorld';
 
 # "I'm normally not a praying man, but if you're up there,
 #  please save me Superman."
-sub new {
-  my $self = shift->SUPER::new();
-  $self->parse(@_) if @_;
-  return $self;
-}
+sub new { shift->SUPER::new()->parse(@_) }
 
 sub detect {
   my ($self, $class) = @_;
@@ -109,6 +105,7 @@ sub mojo_lib_dir { File::Spec->catdir(dirname(__FILE__), '..') }
 
 sub parse {
   my ($self, $path) = @_;
+  return $self unless defined $path;
   $self->{parts} = [File::Spec->splitdir($path)];
   return $self;
 }

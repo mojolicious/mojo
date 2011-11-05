@@ -700,7 +700,11 @@ L<Mojo::Cookie::Response> objects.
 Turns content into a L<Mojo::DOM> object and takes an optional selector to
 perform a C<find> on it right away, which returns a collection.
 
-  $message->dom->find('h1, h2, h3')->each(sub { say $_->text });
+  # Perform "find" right away
+  $message->dom('h1, h2, h3')->each(sub { say $_->text });
+
+  # Use everything else Mojo::DOM has to offer
+  say $message->dom->at('title')->text;
 
 =head2 C<error>
 

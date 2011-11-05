@@ -428,6 +428,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
+  say $req->cookies->[1]->value;
+
 =head2 C<fix_headers>
 
   $req = $req->fix_headers;
@@ -458,6 +460,8 @@ Access C<GET> and C<POST> parameters.
 
 All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object.
 
+  say $req->params->param('foo');
+
 =head2 C<parse>
 
   $req = $req->parse('GET /foo/bar HTTP/1.1');
@@ -479,6 +483,8 @@ Proxy URL for message.
   my $params = $req->query_params;
 
 All C<GET> parameters, usually a L<Mojo::Parameters> object.
+
+  say $req->query_params->param('foo');
 
 =head1 SEE ALSO
 

@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.24    2011-11-05 00:00:00
         - Added EXPERIMENTAL canonicalize method to Mojo::URL.
+        - Improved documentation.
         - Fixed small path canonicalization bug in Mojo::URL.
         - Fixed small trailing slash bug in Mojo::Path.
 

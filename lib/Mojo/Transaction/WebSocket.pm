@@ -293,9 +293,7 @@ sub server_read {
   }
 
   # Resume
-  $self->emit('resume');
-
-  return $self;
+  return $self->emit('resume');
 }
 
 sub server_write {
@@ -450,7 +448,7 @@ Raw WebSocket data to write.
 
   my $connection = $ws->connection;
 
-The connection this websocket is using.
+Alias for C<$ws-E<gt>handshake-E<gt>connection>.
 
 =head2 C<finish>
 
@@ -468,13 +466,13 @@ True.
 
   my $local_address = $ws->local_address;
 
-The local address of this WebSocket.
+Alias for C<$ws-E<gt>handshake-E<gt>local_address>.
 
 =head2 C<local_port>
 
   my $local_port = $ws->local_port;
 
-The local port of this WebSocket.
+Alias for C<$ws-E<gt>handshake-E<gt>local_port>.
 
 =head2 C<parse_frame>
 
@@ -486,31 +484,37 @@ Parse WebSocket frame.
 
   my $remote_address = $ws->remote_address;
 
-The remote address of this WebSocket.
+Alias for C<$ws-E<gt>handshake-E<gt>remote_address>.
 
 =head2 C<remote_port>
 
   my $remote_port = $ws->remote_port;
 
-The remote port of this WebSocket.
+Alias for C<$ws-E<gt>handshake-E<gt>remote_port>.
 
 =head2 C<req>
 
   my $req = $ws->req;
 
-The original handshake request.
+Alias for C<$ws-E<gt>handshake-E<gt>req>.
+Usually refers to a L<Mojo::Message::Request> object.
+
+  $ws->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
 
 =head2 C<res>
 
-  my $req = $ws->res;
+  my $res = $ws->res;
 
-The original handshake response.
+Alias for C<$ws-E<gt>handshake-E<gt>res>.
+Usually refers to a L<Mojo::Message::Response> object.
+
+  $ws->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
 
 =head2 C<resume>
 
   $ws = $ws->resume;
 
-Resume transaction.
+Alias for C<$ws-E<gt>handshake-E<gt>resume>.
 
 =head2 C<send_frame>
 

@@ -2,12 +2,15 @@ package Mojo::Transaction;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
+use Mojo::Message::Request;
+use Mojo::Message::Response;
 
 has [qw/connection kept_alive local_address local_port previous remote_port/];
+has req => sub { Mojo::Message::Request->new };
+has res => sub { Mojo::Message::Response->new };
 
 # "Please don't eat me! I have a wife and kids. Eat them!"
 sub client_close { shift->server_close(@_) }
-
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
 
@@ -73,23 +76,14 @@ sub remote_address {
   return $self->{remote_address};
 }
 
-sub req { croak 'Method "req" not implemented by subclass' }
-sub res { croak 'Method "res" not implemented by subclass' }
-
 sub resume {
   my $self = shift;
   if (($self->{state} || '') eq 'paused') { $self->{state} = 'write_body' }
   elsif (!$self->is_writing) { $self->{state} = 'write' }
-  $self->emit('resume');
-  return $self;
+  return $self->emit('resume');
 }
 
-sub server_close {
-  my $self = shift;
-  $self->emit('finish');
-  return $self;
-}
-
+sub server_close { shift->emit('finish') }
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
@@ -173,6 +167,8 @@ Local interface port.
 
 Previous transaction that triggered this followup transaction.
 
+  say $tx->previous->req->url->path;
+
 =head2 C<remote_address>
 
   my $remote_address = $tx->remote_address;
@@ -186,6 +182,20 @@ Remote interface address.
   $tx             = $tx->remote_port($port);
 
 Remote interface port.
+
+=head2 C<req>
+
+  my $req = $tx->req;
+  $tx     = $tx->req(Mojo::Message::Request->new);
+
+HTTP 1.1 request, defaults to a L<Mojo::Message::Request> object.
+
+=head2 C<res>
+
+  my $res = $tx->res;
+  $tx     = $tx->res(Mojo::Message::Response->new);
+
+HTTP 1.1 response, defaults to a L<Mojo::Message::Response> object.
 
 =head1 METHODS
 
@@ -234,18 +244,6 @@ False.
   my $success = $tx->is_writing;
 
 Check if transaction is writing.
-
-=head2 C<req>
-
-  my $req = $tx->req;
-
-Transaction request, usually a L<Mojo::Message::Request> object.
-
-=head2 C<res>
-
-  my $res = $tx->res;
-
-Transaction response, usually a L<Mojo::Message::Response> object.
 
 =head2 C<resume>
 

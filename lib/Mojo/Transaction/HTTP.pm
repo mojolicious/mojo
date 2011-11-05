@@ -1,12 +1,7 @@
 package Mojo::Transaction::HTTP;
 use Mojo::Base 'Mojo::Transaction';
 
-use Mojo::Message::Request;
-use Mojo::Message::Response;
 use Mojo::Transaction::WebSocket;
-
-has req => sub { Mojo::Message::Request->new };
-has res => sub { Mojo::Message::Response->new };
 
 # "What's a wedding?  Webster's dictionary describes it as the act of
 #  removing weeds from one's garden."
@@ -356,22 +351,7 @@ requests.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>
-and implements the following new ones.
-
-=head2 C<req>
-
-  my $req = $tx->req;
-  $tx     = $tx->req(Mojo::Message::Request->new);
-
-HTTP 1.1 request, defaults to a L<Mojo::Message::Request> object.
-
-=head2 C<res>
-
-  my $res = $tx->res;
-  $tx     = $tx->res(Mojo::Message::Response->new);
-
-HTTP 1.1 response, defaults to a L<Mojo::Message::Response> object.
+L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>.
 
 =head1 METHODS
 

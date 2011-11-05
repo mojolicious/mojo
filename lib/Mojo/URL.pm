@@ -297,6 +297,8 @@ sub to_string {
 1;
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::URL - Uniform Resource Locator
@@ -422,6 +424,9 @@ Clone this URL.
 
 Host part of this URL in punycode format.
 
+  # "xn--da5b0n.net"
+  say Mojo::URL->new('http://☃.net')->ihost;
+
 =head2 C<is_abs>
 
   my $success = $url->is_abs;
@@ -459,6 +464,9 @@ defaults to a L<Mojo::Path> object.
   $url      = $url->query(Mojo::Parameters->new);
 
 Query part of this URL, defaults to a L<Mojo::Parameters> object.
+
+  # "2"
+  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query->param('b');
 
   # "http://mojolicio.us?a=2&c=3"
   say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => 2, c => 3);

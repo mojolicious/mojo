@@ -687,6 +687,8 @@ implements the following new ones.
 A reference back to the L<Mojolicious> application that dispatched to this
 controller, defaults to a L<Mojolicious> object.
 
+  $c->app->log->debug('Hello Mojo!');
+
 =head2 C<match>
 
   my $m = $c->match;
@@ -703,6 +705,8 @@ L<Mojolicious::Routes::Match> object.
 The transaction that is currently being processed, usually a
 L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 
+  my $address = $c->tx->remote_address;
+
 =head1 METHODS
 
 L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and
@@ -716,6 +720,8 @@ implements the following new ones.
   my @values = $c->cookie('foo');
 
 Access request cookie values and create new response cookies.
+
+  my $foo = $c->cookie('foo')->value;
 
 =head2 C<finish>
 
@@ -892,12 +898,16 @@ Finalize response and run C<after_dispatch> plugin hook.
 Alias for C<$c-E<gt>tx-E<gt>req>.
 Usually refers to a L<Mojo::Message::Request> object.
 
+  $c->render_json({url => $c->req->url->to_abs->to_string});
+
 =head2 C<res>
 
   my $res = $c->res;
 
 Alias for C<$c-E<gt>tx-E<gt>res>.
 Usually refers to a L<Mojo::Message::Response> object.
+
+  $c->res->headers->content_disposition('attachment; filename=foo.png;');
 
 =head2 C<respond_to>
 

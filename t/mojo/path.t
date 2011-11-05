@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 175;
+use Test::More tests => 179;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -165,6 +165,11 @@ ok !$path->contains('/0.html'),   'does not contain path';
 ok !$path->contains('/♥.html'), 'does not contain path';
 
 # Empty path elements
+$path = Mojo::Path->new('//');
+is "$path", '//';
+is $path->parts->[0], undef, 'no part';
+ok $path->leading_slash,  'has leading slash';
+ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('/foo//bar/23/');
 is "$path", '/foo//bar/23/';
 is $path->parts->[0], 'foo', 'right part';

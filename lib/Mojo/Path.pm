@@ -105,7 +105,7 @@ sub to_string {
   # Format
   my $path = join '/', @parts;
   $path = "/$path" if $self->leading_slash;
-  $path = "$path/" if @parts && $self->trailing_slash;
+  $path = "$path/" if $self->trailing_slash;
 
   return $path;
 }

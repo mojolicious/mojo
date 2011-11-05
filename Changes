@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.24    2011-11-05 00:00:00
+        - Fixed small trailing slash bug in Mojo::Path.
+
 2.23    2011-11-04 00:00:00
         - Changed semantics of get_line function in Mojo::Util.
         - Removed experimental status from Mojo::Util.

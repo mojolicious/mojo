@@ -314,7 +314,7 @@ sub server_write {
   return $write;
 }
 
-sub _challenge { b64_encode(sha1_bytes(pop . GUID), '') }
+sub _challenge { b64_encode(sha1_bytes(pop() . GUID), '') }
 
 sub _xor_mask {
   my ($input, $mask) = @_;

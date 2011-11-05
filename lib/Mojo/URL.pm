@@ -59,6 +59,18 @@ sub authority {
   return $authority;
 }
 
+sub canonicalize {
+  my $self = shift;
+
+  $self->path->canonicalize;
+  return $self unless my $port   = $self->port;
+  return $self unless my $scheme = $self->scheme;
+  $self->port(undef) if $port eq '80'  && $scheme ~~ [qw/http ws/];
+  $self->port(undef) if $port eq '443' && $scheme ~~ [qw/https wss/];
+
+  return $self;
+}
+
 sub clone {
   my $self = shift;
 
@@ -214,7 +226,6 @@ sub to_abs {
   }
 
   # Absolute path
-  $new->canonicalize;
   $new->leading_slash(1);
   $new->trailing_slash($old->trailing_slash);
   $abs->path($new);
@@ -388,6 +399,16 @@ following new ones.
 
 Construct a new L<Mojo::URL> object.
 
+=head2 C<canonicalize>
+
+  $url = $url->canonicalize;
+
+Canonicalize URL.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  # "http://mojolicio.us/foo/baz"
+  say Mojo::URL->new('http://mojolicio.us:80/foo/bar/../baz')->canonicalize;
+
 =head2 C<clone>
 
   my $url2 = $url->clone;
@@ -453,14 +474,14 @@ Query part of this URL, defaults to a L<Mojo::Parameters> object.
   my $abs = $url->to_abs;
   my $abs = $url->to_abs(Mojo::URL->new('http://kraih.com/foo'));
 
-Turn relative URL into an absolute one.
+Clone relative URL and turn it into an absolute one.
 
 =head2 C<to_rel>
 
   my $rel = $url->to_rel;
   my $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/foo'));
 
-Turn absolute URL into a relative one.
+Clone absolute URL and turn it into a relative one.
 
 =head2 C<to_string>
 

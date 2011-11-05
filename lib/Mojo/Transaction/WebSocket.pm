@@ -448,7 +448,7 @@ Raw WebSocket data to write.
 
   my $connection = $ws->connection;
 
-Alias for C<$ws-E<gt>handshake-E<gt>connection>.
+Alias for L<Mojo::Transaction/"connection">.
 
 =head2 C<finish>
 
@@ -466,13 +466,13 @@ True.
 
   my $local_address = $ws->local_address;
 
-Alias for C<$ws-E<gt>handshake-E<gt>local_address>.
+Alias for L<Mojo::Transaction/"local_address">.
 
 =head2 C<local_port>
 
   my $local_port = $ws->local_port;
 
-Alias for C<$ws-E<gt>handshake-E<gt>local_port>.
+Alias for L<Mojo::Transaction/"local_port">.
 
 =head2 C<parse_frame>
 
@@ -484,20 +484,19 @@ Parse WebSocket frame.
 
   my $remote_address = $ws->remote_address;
 
-Alias for C<$ws-E<gt>handshake-E<gt>remote_address>.
+Alias for L<Mojo::Transaction/"remote_address">.
 
 =head2 C<remote_port>
 
   my $remote_port = $ws->remote_port;
 
-Alias for C<$ws-E<gt>handshake-E<gt>remote_port>.
+Alias for L<Mojo::Transaction/"remote_port">.
 
 =head2 C<req>
 
   my $req = $ws->req;
 
-Alias for C<$ws-E<gt>handshake-E<gt>req>.
-Usually refers to a L<Mojo::Message::Request> object.
+Alias for L<Mojo::Transaction/"req">.
 
   $ws->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
 
@@ -505,8 +504,7 @@ Usually refers to a L<Mojo::Message::Request> object.
 
   my $res = $ws->res;
 
-Alias for C<$ws-E<gt>handshake-E<gt>res>.
-Usually refers to a L<Mojo::Message::Response> object.
+Alias for L<Mojo::Transaction/"res">.
 
   $ws->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
 
@@ -514,7 +512,7 @@ Usually refers to a L<Mojo::Message::Response> object.
 
   $ws = $ws->resume;
 
-Alias for C<$ws-E<gt>handshake-E<gt>resume>.
+Alias for L<Mojo::Transaction/"resume">.
 
 =head2 C<send_frame>
 

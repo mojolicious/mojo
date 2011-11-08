@@ -273,7 +273,8 @@ block for too long.
   __DATA__
 
   @@ index.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Echo</title></head>
     <body>
       <script>
@@ -353,7 +354,8 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
   __DATA__
 
   @@ index.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>LiveLog</title></head>
     <body>
       <script>

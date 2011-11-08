@@ -1,5 +1,6 @@
 % my $e = delete $self->stash->{'exception'};
-<!doctype html><html>
+<!DOCTYPE html>
+<html>
   <head>
     <title>Server Error</title>
     <meta http-equiv="Pragma" content="no-cache">

@@ -1350,7 +1350,8 @@ is $dom->find('html > head > script')->[1]->text,
 
 # More real world JavaScript
 $dom = Mojo::DOM->new->parse(<<EOF);
-<!doctype html><html>
+<!DOCTYPE html>
+<html>
   <head>
     <title>Foo</title>
     <script type="text/javascript" src="/js/one.js"></script>
@@ -1372,7 +1373,8 @@ is $dom->at('html > body')->text, 'Bar', 'right text';
 
 # Even more real world JavaScript
 $dom = Mojo::DOM->new->parse(<<EOF);
-<!doctype html><html>
+<!DOCTYPE html>
+<html>
   <head>
     <title>Foo</title>
     <script type="text/javascript" src="/js/one.js"></script>
@@ -1579,7 +1581,7 @@ EOF
 
 # A collection of wonderful screwups
 $dom = Mojo::DOM->new->parse(<<'EOF');
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head><title>Wonderful Screwups</title></head>
   <body id="screw-up">

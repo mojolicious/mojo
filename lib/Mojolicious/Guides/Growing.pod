@@ -457,7 +457,8 @@ like this.
   %= link_to Logout => 'logout'
 
   @@ layouts/default.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Login Manager</title></head>
     <body><%= content %></body>
   </html>

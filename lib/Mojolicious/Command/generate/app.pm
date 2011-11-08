@@ -114,7 +114,8 @@ sub welcome {
 1;
 
 @@ static
-<!doctype html><html>
+<!DOCTYPE html>
+<html>
   <head>
     <title>Welcome to the Mojolicious real-time web framework!</title>
   </head>
@@ -139,7 +140,8 @@ my $t = Test::Mojo->new('<%= $class %>');
 $t->get_ok('/welcome')->status_is(200)->content_like(qr/Mojolicious/i);
 
 @@ layout
-<!doctype html><html>
+<!DOCTYPE html>
+<html>
   <head><title><%%= title %></title></head>
   <body><%%= content %></body>
 </html>

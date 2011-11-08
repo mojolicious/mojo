@@ -42,7 +42,8 @@ app->start;
 Welcome to Mojolicious!
 
 <% %>@@ layouts/default.html.ep
-<!doctype html><html>
+<!DOCTYPE html>
+<html>
   <head><title><%%= title %></title></head>
   <body><%%= content %></body>
 </html>

@@ -252,7 +252,8 @@ Templates can have layouts.
   Hello World!
 
   @@ layouts/green.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title><%= title %></title></head>
     <body><%= content %></body>
   </html>
@@ -272,7 +273,8 @@ delimited by the C<begin> and C<end> keywords.
     % my ($url, $name) = @_;
     Try <%= link_to $url => begin %><%= $name %><% end %>.
   % end
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Sebastians frameworks</title></head>
     <body>
       %= $link->('http://mojolicio.us', 'Mojolicious')
@@ -304,7 +306,8 @@ content.
   % end
 
   @@ layouts/blue.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head>
       <title><%= title %></title>
       %= content_for 'header'
@@ -462,7 +465,8 @@ Formats can be automatically detected by looking at file extensions.
   __DATA__
 
   @@ detected.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Detected</title></head>
     <body>HTML was detected.</body>
   </html>
@@ -665,7 +669,8 @@ C<250KB> will be automatically streamed into a temporary file.
   __DATA__
 
   @@ upload.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Upload</title></head>
     <body>
       % my @attrs = (method => 'POST', enctype => 'multipart/form-data');

@@ -446,7 +446,8 @@ Mojo::Template - Perl-ish templates!
 
   # Simple
   my $output = $mt->render(<<'EOF');
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Simple</title></head>
     <body>Time: <%= localtime(time) %></body>
   </html>

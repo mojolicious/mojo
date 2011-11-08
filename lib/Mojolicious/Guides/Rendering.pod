@@ -37,7 +37,8 @@ or the C<DATA> section of the class C<main>.
 
   __DATA__
   @@ time.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Time</title></head>
     <body><%= localtime time %></body>
   </html>
@@ -333,7 +334,8 @@ trivial.
   Hello World!
 
   @@ layouts/mylayout.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>MyApp</title></head>
     <body><%= content %></body>
   </html>
@@ -347,7 +349,8 @@ You can also pass along normal stash values to the C<layout> helper.
   Hello World!
 
   @@ layouts/mylayout.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title><%= $title %></title></head>
     <body><%= content %></body>
   </html>
@@ -378,7 +381,8 @@ Like most helpers the C<include> helper is just a shortcut to make your life
 a little easier.
 
   @@ foo/bar.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     %= include 'header'
     <body>Bar</body>
   </html>
@@ -390,7 +394,8 @@ Instead of C<include> you could also just call C<render> with the C<partial>
 argument.
 
   @@ foo/bar.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     %= $self->render('header', partial => 1)
     <body>Bar</body>
   </html>
@@ -403,7 +408,8 @@ to C<include>, they will get localized automatically and are only available
 in the partial template.
 
   @@ foo/bar.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     %= include 'header', title => 'Hello'
     <body>Bar</body>
   </html>
@@ -463,7 +469,8 @@ of the template to the layout.
   % end
 
   @@ layouts/mylayout.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><%= content_for 'header' %></head>
     <body><%= content %></body>
   </html>
@@ -475,7 +482,8 @@ build a skeleton template with named C<content> blocks that child templates
 can override.
 
   @@ first.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Hello</title></head>
     <body>
       %= content header => begin
@@ -614,7 +622,8 @@ C<exception.$mode.$format.*> or C<not_found.$mode.$format.*> before falling
 back to the built-in default templates.
 
   @@ not_found.production.html.ep
-  <!doctype html><html>
+  <!DOCTYPE html>
+  <html>
     <head><title>Page Not Found</title></head>
     <body>Page does not seem to exist.</body>
   </html>

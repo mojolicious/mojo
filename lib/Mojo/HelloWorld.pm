@@ -113,7 +113,8 @@ under->any('/*whatever' => {whatever => '', text => 'Your Mojo is working!'});
 __DATA__
 
 @@ layouts/default.html.ep
-<!doctype html><html>
+<!DOCTYPE html>
+<html>
   <head>
     <title><%= title %></title>
     <%= content_for 'head' %>

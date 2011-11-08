@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 397;
+use Test::More tests => 378;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -155,15 +155,11 @@ is $rel->to_abs, 'http://kraih.com/', 'right absolute version';
 is $rel->to_abs->to_rel, '', 'right relative version';
 $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/a/'));
 is $rel, '..', 'right relative version';
-is $rel->to_abs, 'http://kraih.com/a/..', 'right absolute version';
-is $rel->to_abs->canonicalize, 'http://kraih.com/',
-  'right canonicalized version';
+is $rel->to_abs, 'http://kraih.com/', 'right absolute version';
 is $rel->to_abs->to_rel, '..', 'right relative version';
 $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/a/b/'));
 is $rel, '../..', 'right relative version';
-is $rel->to_abs, 'http://kraih.com/a/b/../..', 'right absolute version';
-is $rel->to_abs->canonicalize, 'http://kraih.com/',
-  'right canonicalized version';
+is $rel->to_abs, 'http://kraih.com/', 'right absolute version';
 is $rel->to_abs->to_rel, '../..', 'right relative version';
 $url = Mojo::URL->new('http://kraih.com/index.html');
 $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/'));
@@ -173,17 +169,12 @@ is $rel->to_abs->to_rel, 'index.html', 'right relative version';
 $url = Mojo::URL->new('http://kraih.com/index.html');
 $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/a/'));
 is $rel, '../index.html', 'right relative version';
-is $rel->to_abs, 'http://kraih.com/a/../index.html', 'right absolute version';
-is $rel->to_abs->canonicalize, 'http://kraih.com/index.html',
-  'right canonicalized version';
+is $rel->to_abs, 'http://kraih.com/index.html', 'right absolute version';
 is $rel->to_abs->to_rel, '../index.html', 'right relative version';
 $url = Mojo::URL->new('http://kraih.com/index.html');
 $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/a/b/'));
 is $rel, '../../index.html', 'right relative version';
-is $rel->to_abs, 'http://kraih.com/a/b/../../index.html',
-  'right absolute version';
-is $rel->to_abs->canonicalize, 'http://kraih.com/index.html',
-  'right canonicalized version';
+is $rel->to_abs, 'http://kraih.com/index.html', 'right absolute version';
 is $rel->to_abs->to_rel, '../../index.html', 'right relative version';
 $url = Mojo::URL->new('http://kraih.com/a/b/c/index.html');
 $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/a/b/'));
@@ -215,7 +206,7 @@ $url = Mojo::URL->new('http://kraih.com/foo/bar?foo=bar#23');
 $url->path('../baz');
 is "$url", 'http://kraih.com/foo/../baz?foo=bar#23', 'right path';
 $url->path->canonicalize;
-is "$url", 'http://kraih.com/baz?foo=bar#23', 'right canonicalized path';
+is "$url", 'http://kraih.com/baz?foo=bar#23', 'right absolute path';
 
 # Absolute (base without trailing slash)
 $url = Mojo::URL->new('/foo?foo=bar#23');
@@ -225,31 +216,25 @@ is $url->to_abs, 'http://kraih.com/foo?foo=bar#23', 'right absolute version';
 $url = Mojo::URL->new('../cages/birds.gif');
 $url->base->parse('http://www.aviary.com/products/intro.html');
 ok !$url->is_abs, 'not absolute';
-is $url->to_abs, 'http://www.aviary.com/products/../cages/birds.gif',
+is $url->to_abs, 'http://www.aviary.com/cages/birds.gif',
   'right absolute version';
-is $url->to_abs->canonicalize, 'http://www.aviary.com/cages/birds.gif',
-  'right canonicalized version';
 $url = Mojo::URL->new('.././cages/./birds.gif');
 $url->base->parse('http://www.aviary.com/./products/./intro.html');
 ok !$url->is_abs, 'not absolute';
-is $url->to_abs, 'http://www.aviary.com/./products/./.././cages/./birds.gif',
+is $url->to_abs, 'http://www.aviary.com/cages/birds.gif',
   'right absolute version';
-is $url->to_abs->canonicalize, 'http://www.aviary.com/cages/birds.gif',
-  'right canonicalized version';
 
 # Absolute with path
 $url = Mojo::URL->new('../foo?foo=bar#23');
 $url->base->parse('http://kraih.com/bar/baz/');
 ok !$url->is_abs, 'not absolute';
-is $url->to_abs, 'http://kraih.com/bar/baz/../foo?foo=bar#23',
+is $url->to_abs, 'http://kraih.com/bar/foo?foo=bar#23',
   'right absolute version';
-is $url->to_abs->canonicalize, 'http://kraih.com/bar/foo?foo=bar#23',
-  'right canonicalized version';
 is $url->to_abs->to_rel, '../foo?foo=bar#23', 'right relative version';
-is $url->to_abs->to_rel->to_abs, 'http://kraih.com/bar/baz/../foo?foo=bar#23',
+is $url->to_abs->to_rel->to_abs, 'http://kraih.com/bar/foo?foo=bar#23',
   'right absolute version';
-is $url->to_abs->canonicalize, 'http://kraih.com/bar/foo?foo=bar#23',
-  'right canonicalized version';
+is $url->to_abs, 'http://kraih.com/bar/foo?foo=bar#23',
+  'right absolute version';
 is $url->to_abs->base, 'http://kraih.com/bar/baz/', 'right base';
 
 # Real world tests
@@ -617,86 +602,43 @@ is $url->path->parts->[0], '100%_fun', 'right part';
 is $url->path, '/100%25_fun', 'right path';
 is "$url", 'http://mojolicio.us/100%25_fun', 'right format';
 
-# Canonicalize
-$url = Mojo::URL->new('http://mojolicio.us:80/foo/../bar');
-is "$url", 'http://mojolicio.us:80/foo/../bar', 'right format';
-is $url->canonicalize, 'http://mojolicio.us/bar',
-  'right canonicalized version';
-$url = Mojo::URL->new('https://mojolicio.us:443');
-is "$url", 'https://mojolicio.us:443', 'right format';
-is $url->canonicalize, 'https://mojolicio.us', 'right canonicalized version';
-$url = Mojo::URL->new('http://mojolicio.us:8080/foo/../bar/');
-is "$url", 'http://mojolicio.us:8080/foo/../bar/', 'right format';
-is $url->canonicalize, 'http://mojolicio.us:8080/bar/',
-  'right canonicalized version';
-$url = Mojo::URL->new('ws://mojolicio.us:80/foo/bar/../');
-is "$url", 'ws://mojolicio.us:80/foo/bar/../', 'right format';
-is $url->canonicalize, 'ws://mojolicio.us/foo/',
-  'right canonicalized version';
-$url = Mojo::URL->new('wss://mojolicio.us:443/foo/bar/./');
-is "$url", 'wss://mojolicio.us:443/foo/bar/./', 'right format';
-is $url->canonicalize, 'wss://mojolicio.us/foo/bar/',
-  'right canonicalized version';
-$url = Mojo::URL->new('/foo/bar/..');
-is "$url", '/foo/bar/..', 'right format';
-is $url->canonicalize, '/foo', 'right canonicalized version';
-
 # Resolve RFC 1808 examples
 my $base = Mojo::URL->new('http://a/b/c/d?q#f');
 $url = Mojo::URL->new('g');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/g',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/g', 'right absolute version';
 $url = Mojo::URL->new('./g');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/g',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/g', 'right absolute version';
 $url = Mojo::URL->new('g/');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/g/',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/g/', 'right absolute version';
 $url = Mojo::URL->new('//g');
-is $url->to_abs($base)->canonicalize, 'http://g',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://g', 'right absolute version';
 $url = Mojo::URL->new('?y');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/d?y',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/d?y', 'right absolute version';
 $url = Mojo::URL->new('g?y');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/g?y',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/g?y', 'right absolute version';
 $url = Mojo::URL->new('g?y/./x');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/g?y%2F.%2Fx',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/g?y%2F.%2Fx', 'right absolute version';
 $url = Mojo::URL->new('#s');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/d?q#s',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/d?q#s', 'right absolute version';
 $url = Mojo::URL->new('g#s');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/g#s',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/g#s', 'right absolute version';
 $url = Mojo::URL->new('g#s/./x');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/g#s/./x',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/g#s/./x', 'right absolute version';
 $url = Mojo::URL->new('g?y#s');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/g?y#s',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/g?y#s', 'right absolute version';
 $url = Mojo::URL->new('.');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c', 'right absolute version';
 $url = Mojo::URL->new('./');
-is $url->to_abs($base)->canonicalize, 'http://a/b/c/',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/c/', 'right absolute version';
 $url = Mojo::URL->new('..');
-is $url->to_abs($base)->canonicalize, 'http://a/b',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b', 'right absolute version';
 $url = Mojo::URL->new('../');
-is $url->to_abs($base)->canonicalize, 'http://a/b/',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/', 'right absolute version';
 $url = Mojo::URL->new('../g');
-is $url->to_abs($base)->canonicalize, 'http://a/b/g',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/b/g', 'right absolute version';
 $url = Mojo::URL->new('../..');
-is $url->to_abs($base)->canonicalize, 'http://a/',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/', 'right absolute version';
 $url = Mojo::URL->new('../../');
-is $url->to_abs($base)->canonicalize, 'http://a/',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/', 'right absolute version';
 $url = Mojo::URL->new('../../g');
-is $url->to_abs($base)->canonicalize, 'http://a/g',
-  'right canonicalized version';
+is $url->to_abs($base), 'http://a/g', 'right absolute version';

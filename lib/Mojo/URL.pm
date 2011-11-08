@@ -59,18 +59,6 @@ sub authority {
   return $authority;
 }
 
-sub canonicalize {
-  my $self = shift;
-
-  $self->path->canonicalize;
-  return $self unless my $port   = $self->port;
-  return $self unless my $scheme = $self->scheme;
-  $self->port(undef) if $port eq '80'  && $scheme ~~ [qw/http ws/];
-  $self->port(undef) if $port eq '443' && $scheme ~~ [qw/https wss/];
-
-  return $self;
-}
-
 sub clone {
   my $self = shift;
 
@@ -217,7 +205,8 @@ sub to_abs {
   # Inherit path
   my $base_path = $base->path;
   if (!@{$path->parts}) {
-    $path = $abs->path($base_path->clone)->path->trailing_slash(0);
+    $path =
+      $abs->path($base_path->clone)->path->trailing_slash(0)->canonicalize;
 
     # Query
     return $abs if length($abs->query->to_string);
@@ -233,7 +222,7 @@ sub to_abs {
     pop @{$new->parts} if @{$path->parts} && !$new->trailing_slash;
     push @{$new->parts}, @{$path->parts};
     $new->trailing_slash($path->trailing_slash) if @{$new->parts};
-    $abs->path($new);
+    $abs->path($new->canonicalize);
   }
 
   return $abs;
@@ -400,16 +389,6 @@ following new ones.
   my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
 
 Construct a new L<Mojo::URL> object.
-
-=head2 C<canonicalize>
-
-  $url = $url->canonicalize;
-
-Canonicalize URL.
-Note that this method is EXPERIMENTAL and might change without warning!
-
-  # "http://mojolicio.us/foo/baz"
-  say Mojo::URL->new('http://mojolicio.us:80/foo/bar/../baz')->canonicalize;
 
 =head2 C<clone>
 

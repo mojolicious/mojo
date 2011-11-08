@@ -1364,10 +1364,10 @@ is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '//127.0.0.1:3000', 'right URL';
-is $req->url->host,       '127.0.0.1',              'right host';
-is $req->url->port,       '3000',                   'right port';
-is $req->url->to_abs,     'http://127.0.0.1:3000/', 'right absolute URL';
-is $req->proxy->userinfo, 'Aladdin:open sesame',    'right proxy userinfo';
+is $req->url->host,       '127.0.0.1',             'right host';
+is $req->url->port,       '3000',                  'right port';
+is $req->url->to_abs,     'http://127.0.0.1:3000', 'right absolute URL';
+is $req->proxy->userinfo, 'Aladdin:open sesame',   'right proxy userinfo';
 is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Authorization" value';
 is $req->headers->host, '127.0.0.1:3000', 'right "Host" value';

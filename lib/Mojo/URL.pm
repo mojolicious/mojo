@@ -201,32 +201,40 @@ sub to_abs {
   my $self = shift;
   my $base = shift || $self->base->clone;
 
-  # Absolute URL
+  # Scheme
   my $abs = $self->clone;
   return $abs if $abs->is_abs;
   $abs->scheme($base->scheme);
-  $abs->authority($base->authority) unless $abs->authority;
 
-  # New base
-  $abs->base($base->clone);
-  my $new = $base->path->clone;
+  # Authority
+  return $abs if $abs->authority;
+  $abs->authority($base->authority);
 
-  # Replace path
-  my $old = $self->path;
-  if ($old->leading_slash) { $new->parts([@{$old->parts}]) }
+  # Absolute path
+  my $path = $abs->path;
+  return $abs if $path->leading_slash;
+
+  # Inherit path
+  my $base_path = $base->path;
+  if (!@{$path->parts}) {
+    $path = $abs->path($base_path->clone)->path->trailing_slash(0);
+
+    # Query
+    return $abs if length($abs->query->to_string);
+    $abs->query($base->query->clone);
+  }
 
   # Merge paths
   else {
+    my $new = $base_path->clone;
+    $new->leading_slash(1);
 
     # Characters after the right-most '/' need to go
-    pop @{$new->parts} unless $new->trailing_slash;
-    push @{$new->parts}, @{$old->parts};
+    pop @{$new->parts} if @{$path->parts} && !$new->trailing_slash;
+    push @{$new->parts}, @{$path->parts};
+    $new->trailing_slash($path->trailing_slash) if @{$new->parts};
+    $abs->path($new);
   }
-
-  # Absolute path
-  $new->leading_slash(1);
-  $new->trailing_slash($old->trailing_slash);
-  $abs->path($new);
 
   return $abs;
 }
@@ -235,11 +243,12 @@ sub to_rel {
   my $self = shift;
   my $base = shift || $self->base->clone;
 
-  # Relative URL
+  # Scheme and authority
   my $rel = $self->clone->base($base);
-  $rel->scheme(undef)->userinfo(undef)->host(undef)->port(undef);
+  $rel->scheme(undef);
+  $rel->userinfo(undef)->host(undef)->port(undef) if $base->authority;
 
-  # Build relative path
+  # Path
   my @rel_parts  = @{$rel->path->parts};
   my $base_path  = $base->path;
   my @base_parts = @{$base_path->parts};
@@ -248,8 +257,8 @@ sub to_rel {
     shift @rel_parts;
     shift @base_parts;
   }
-  $rel->path(Mojo::Path->new);
-  my $rel_path = $rel->path;
+  my $rel_path = $rel->path(Mojo::Path->new)->path;
+  $rel_path->leading_slash(1) if $rel->authority;
   $rel_path->parts([('..') x @base_parts, @rel_parts]);
   $rel_path->trailing_slash(1) if $self->path->trailing_slash;
 

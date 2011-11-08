@@ -361,25 +361,24 @@ is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi',
 # Parse Apache 2.2.9 like CGI environment variables (root without PATH_INFO)
 $req = Mojo::Message::Request->new;
 $req->parse(
-  SCRIPT_NAME     => '/cgi-bin/bootylicious/bootylicious.pl',
+  SCRIPT_NAME     => '/cgi-bin/myapp/myapp.pl',
   HTTP_CONNECTION => 'keep-alive',
-  HTTP_HOST       => 'getbootylicious.org',
+  HTTP_HOST       => 'getmyapp.org',
   REQUEST_METHOD  => 'GET',
   QUERY_STRING    => '',
-  REQUEST_URI     => '/cgi-bin/bootylicious/bootylicious.pl',
+  REQUEST_URI     => '/cgi-bin/myapp/myapp.pl',
   SERVER_PROTOCOL => 'HTTP/1.1',
 );
 ok $req->is_finished, 'request is finished';
 is $req->method, 'GET', 'right method';
-is $req->url->base->host, 'getbootylicious.org', 'right base host';
+is $req->url->base->host, 'getmyapp.org', 'right base host';
 is $req->url->path, '', 'right path';
-is $req->url->base->path, '/cgi-bin/bootylicious/bootylicious.pl/',
-  'right base path';
+is $req->url->base->path, '/cgi-bin/myapp/myapp.pl/', 'right base path';
 is $req->version, '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url->to_abs->to_string,
-  'http://getbootylicious.org/cgi-bin/bootylicious/bootylicious.pl',
+  'http://getmyapp.org/cgi-bin/myapp/myapp.pl',
   'right absolute URL';
 
 # Parse Apache mod_fastcgi like CGI environment variables

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 376;
+use Test::More tests => 397;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -125,6 +125,15 @@ is $url->to_rel->to_abs,
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/baz/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/baz');
 is $url->to_rel, 'baz/foo?foo=bar#23', 'right relative version';
+is $url->to_rel->to_abs,
+  'http://sri:foobar@kraih.com:8080/baz/foo?foo=bar#23',
+  'right absolute version';
+
+# Relative (base without authority)
+$url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/baz/foo?foo=bar#23');
+$url->base->parse('http://');
+is $url->to_rel, '//sri:foobar@kraih.com:8080/baz/foo?foo=bar#23',
+  'right relative version';
 is $url->to_rel->to_abs,
   'http://sri:foobar@kraih.com:8080/baz/foo?foo=bar#23',
   'right absolute version';
@@ -403,7 +412,7 @@ is $url->path,     '/baz',    'right path';
 is $url->query,    'yada',    'right query';
 is $url->fragment, undef,     'no fragment';
 is "$url", 'http://foo.bar/baz?yada', 'right absolute URL';
-$url = $url->clone->base($url)->parse('zzz?Zzz')->to_abs;
+$url = Mojo::URL->new('zzz?Zzz')->base($url)->to_abs;
 is $url->base,     'http://foo.bar/baz?yada', 'right base';
 is $url->scheme,   'http',                    'right scheme';
 is $url->userinfo, undef,                     'no userinfo';
@@ -425,8 +434,7 @@ is $url->path,     '/baz/index.html', 'right path';
 is $url->query,    'yada',            'right query';
 is $url->fragment, undef,             'no fragment';
 is "$url", 'http://foo.bar/baz/index.html?yada', 'right absolute URL';
-$url->base(undef);
-$url = $url->clone->base($url)->parse('zzz?Zzz')->to_abs;
+$url = Mojo::URL->new('zzz?Zzz')->base($url)->to_abs;
 is $url->base,     'http://foo.bar/baz/index.html?yada', 'right base';
 is $url->scheme,   'http',                               'right scheme';
 is $url->userinfo, undef,                                'no userinfo';
@@ -448,8 +456,7 @@ is $url->path,     '/baz/index.html', 'right path';
 is $url->query,    'yada',            'right query';
 is $url->fragment, undef,             'no fragment';
 is "$url", 'http://foo.bar/baz/index.html?yada', 'right absolute URL';
-$url->base(undef);
-$url = $url->clone->base($url)->parse('/zzz?Zzz')->to_abs;
+$url = Mojo::URL->new('/zzz?Zzz')->base($url)->to_abs;
 is $url->base,     'http://foo.bar/baz/index.html?yada', 'right base';
 is $url->scheme,   'http',                               'right scheme';
 is $url->userinfo, undef,                                'no userinfo';
@@ -471,8 +478,7 @@ is $url->path,     '/baz/index.html', 'right path';
 is $url->query,    'yada',            'right query';
 is $url->fragment, undef,             'no fragment';
 is "$url", 'http://foo.bar/baz/index.html?yada', 'right absolute URL';
-$url->base(undef);
-$url = $url->clone->base($url)->parse('/zzz')->to_abs;
+$url = Mojo::URL->new('/zzz')->base($url)->to_abs;
 is $url->base,     'http://foo.bar/baz/index.html?yada', 'right base';
 is $url->scheme,   'http',                               'right scheme';
 is $url->userinfo, undef,                                'no userinfo';
@@ -494,8 +500,7 @@ is $url->path,     '/baz/index.html', 'right path';
 is $url->query,    'yada',            'right query';
 is $url->fragment, 'test1',           'right fragment';
 is "$url", 'http://foo.bar/baz/index.html?yada#test1', 'right absolute URL';
-$url->base(undef);
-$url = $url->clone->base($url)->parse('/zzz#test2')->to_abs;
+$url = Mojo::URL->new('/zzz#test2')->base($url)->to_abs;
 is $url->base,     'http://foo.bar/baz/index.html?yada#test1', 'right base';
 is $url->scheme,   'http',                                     'right scheme';
 is $url->userinfo, undef,                                      'no userinfo';
@@ -517,8 +522,7 @@ is $url->path,     '/baz/index.html', 'right path';
 is $url->query,    'yada',            'right query';
 is $url->fragment, 'test1',           'right fragment';
 is "$url", 'http://foo.bar/baz/index.html?yada#test1', 'right absolute URL';
-$url->base(undef);
-$url = $url->clone->base($url)->parse('zzz#test2')->to_abs;
+$url = Mojo::URL->new('zzz#test2')->base($url)->to_abs;
 is $url->base,     'http://foo.bar/baz/index.html?yada#test1', 'right base';
 is $url->scheme,   'http',                                     'right scheme';
 is $url->userinfo, undef,                                      'no userinfo';
@@ -540,8 +544,7 @@ is $url->path,     '/baz/index.html', 'right path';
 is $url->query,    'yada',            'right query';
 is $url->fragment, 'test1',           'right fragment';
 is "$url", 'http://foo.bar/baz/index.html?yada#test1', 'right absolute URL';
-$url->base(undef);
-$url = $url->clone->base($url)->parse('/zzz')->to_abs;
+$url = Mojo::URL->new('/zzz')->base($url)->to_abs;
 is $url->base,     'http://foo.bar/baz/index.html?yada#test1', 'right base';
 is $url->scheme,   'http',                                     'right scheme';
 is $url->userinfo, undef,                                      'no userinfo';
@@ -563,8 +566,7 @@ is $url->path,     '/baz/index.html', 'right path';
 is $url->query,    'yada',            'right query';
 is $url->fragment, 'test1',           'right fragment';
 is "$url", 'http://foo.bar/baz/index.html?yada#test1', 'right absolute URL';
-$url->base(undef);
-$url = $url->clone->base($url)->parse('zzz')->to_abs;
+$url = Mojo::URL->new('zzz')->base($url)->to_abs;
 is $url->base,     'http://foo.bar/baz/index.html?yada#test1', 'right base';
 is $url->scheme,   'http',                                     'right scheme';
 is $url->userinfo, undef,                                      'no userinfo';
@@ -638,3 +640,63 @@ is $url->canonicalize, 'wss://mojolicio.us/foo/bar/',
 $url = Mojo::URL->new('/foo/bar/..');
 is "$url", '/foo/bar/..', 'right format';
 is $url->canonicalize, '/foo', 'right canonicalized version';
+
+# Resolve RFC 1808 examples
+my $base = Mojo::URL->new('http://a/b/c/d?q#f');
+$url = Mojo::URL->new('g');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/g',
+  'right canonicalized version';
+$url = Mojo::URL->new('./g');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/g',
+  'right canonicalized version';
+$url = Mojo::URL->new('g/');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/g/',
+  'right canonicalized version';
+$url = Mojo::URL->new('//g');
+is $url->to_abs($base)->canonicalize, 'http://g',
+  'right canonicalized version';
+$url = Mojo::URL->new('?y');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/d?y',
+  'right canonicalized version';
+$url = Mojo::URL->new('g?y');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/g?y',
+  'right canonicalized version';
+$url = Mojo::URL->new('g?y/./x');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/g?y%2F.%2Fx',
+  'right canonicalized version';
+$url = Mojo::URL->new('#s');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/d?q#s',
+  'right canonicalized version';
+$url = Mojo::URL->new('g#s');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/g#s',
+  'right canonicalized version';
+$url = Mojo::URL->new('g#s/./x');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/g#s/./x',
+  'right canonicalized version';
+$url = Mojo::URL->new('g?y#s');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/g?y#s',
+  'right canonicalized version';
+$url = Mojo::URL->new('.');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c',
+  'right canonicalized version';
+$url = Mojo::URL->new('./');
+is $url->to_abs($base)->canonicalize, 'http://a/b/c/',
+  'right canonicalized version';
+$url = Mojo::URL->new('..');
+is $url->to_abs($base)->canonicalize, 'http://a/b',
+  'right canonicalized version';
+$url = Mojo::URL->new('../');
+is $url->to_abs($base)->canonicalize, 'http://a/b/',
+  'right canonicalized version';
+$url = Mojo::URL->new('../g');
+is $url->to_abs($base)->canonicalize, 'http://a/b/g',
+  'right canonicalized version';
+$url = Mojo::URL->new('../..');
+is $url->to_abs($base)->canonicalize, 'http://a/',
+  'right canonicalized version';
+$url = Mojo::URL->new('../../');
+is $url->to_abs($base)->canonicalize, 'http://a/',
+  'right canonicalized version';
+$url = Mojo::URL->new('../../g');
+is $url->to_abs($base)->canonicalize, 'http://a/g',
+  'right canonicalized version';

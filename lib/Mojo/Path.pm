@@ -44,6 +44,7 @@ sub canonicalize {
     # Part
     push @parts, $part;
   }
+  $self->trailing_slash(undef) unless @parts;
   $self->parts(\@parts);
 
   return $self;

@@ -336,9 +336,7 @@ sub _parse_start_line {
     unless $line =~ $START_LINE_RE;
   $self->method($+{method});
   my $url = $self->url;
-  $1 eq 'CONNECT'
-    ? $url->authority($+{path})
-    : $url->parse($+{path});
+  $+{method} eq 'CONNECT' ? $url->authority($+{path}) : $url->parse($+{path});
 
   # HTTP 0.9 is identified by the missing version
   $self->{state} = 'content';

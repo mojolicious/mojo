@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 366;
+use Test::More tests => 376;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -88,16 +88,32 @@ $url->base->parse('http://sri:foobar@kraih.com:8080/');
 ok $url->is_abs, 'is absolute';
 is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
 
-# Relative with empty elements
-$url = Mojo::URL->new('//bar/23/');
+# Relative without scheme
+$url = Mojo::URL->new('//localhost/23/');
 ok !$url->is_abs, 'is not absolute';
-is "$url", '//bar/23/', 'right relative version';
+is $url->host, 'localhost', 'right host';
+is $url->path, '/23/',      'right path';
+is "$url", '//localhost/23/', 'right relative version';
+is $url->to_abs(Mojo::URL->new('http://')), 'http://localhost/23/',
+  'right absolute version';
+is $url->to_abs(Mojo::URL->new('https://')), 'https://localhost/23/',
+  'right absolute version';
+is $url->to_abs(Mojo::URL->new('http://mojolicio.us')),
+  'http://localhost/23/',
+  'right absolute version';
+is $url->to_abs(Mojo::URL->new('http://mojolicio.us:8080')),
+  'http://localhost/23/',
+  'right absolute version';
 $url = Mojo::URL->new('///bar/23/');
 ok !$url->is_abs, 'is not absolute';
-is "$url", '///bar/23/', 'right relative version';
+is $url->host, '',         'no host';
+is $url->path, '/bar/23/', 'right path';
+is "$url", '/bar/23/', 'right relative version';
 $url = Mojo::URL->new('////bar//23/');
 ok !$url->is_abs, 'is not absolute';
-is "$url", '////bar//23/', 'right relative version';
+is $url->host, '',           'no host';
+is $url->path, '//bar//23/', 'right path';
+is "$url", '//bar//23/', 'right relative version';
 
 # Relative (base without trailing slash)
 $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/baz/foo?foo=bar#23');

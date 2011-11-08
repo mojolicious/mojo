@@ -1,7 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.25    2011-11-06 00:00:00
+2.25    2011-11-08 00:00:00
         - Improved documentation.
+        - Fixed URL without scheme handling in Mojo::URL.
 
 2.24    2011-11-05 00:00:00
         - Added EXPERIMENTAL canonicalize method to Mojo::URL.

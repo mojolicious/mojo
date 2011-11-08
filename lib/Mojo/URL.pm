@@ -116,17 +116,15 @@ sub ihost {
   return join '.', @encoded;
 }
 
-sub is_abs {
-  my $self = shift;
-  return $self->scheme && $self->authority;
-}
+sub is_abs { shift->scheme }
 
 sub parse {
   my ($self, $url) = @_;
   return $self unless $url;
 
-  my ($scheme, $authority, $path, $query, $fragment) =
-    $url =~ m|(?:([^:/?#]+)://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  # Official regex
+  my ($scheme, $authority, $path, $query, $fragment) = $url
+    =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
   $self->scheme($scheme);
   $self->authority($authority);
   $self->path->parse($path);
@@ -207,7 +205,7 @@ sub to_abs {
   my $abs = $self->clone;
   return $abs if $abs->is_abs;
   $abs->scheme($base->scheme);
-  $abs->authority($base->authority);
+  $abs->authority($base->authority) unless $abs->authority;
 
   # New base
   $abs->base($base->clone);
@@ -238,10 +236,8 @@ sub to_rel {
   my $base = shift || $self->base->clone;
 
   # Relative URL
-  my $rel = $self->clone;
-  $rel->base($base);
-  $rel->scheme('');
-  $rel->authority('');
+  my $rel = $self->clone->base($base);
+  $rel->scheme(undef)->userinfo(undef)->host(undef)->port(undef);
 
   # Build relative path
   my @rel_parts  = @{$rel->path->parts};
@@ -266,21 +262,16 @@ sub to_rel {
 sub to_string {
   my $self = shift;
 
-  # Scheme and authority
-  my $url       = '';
-  my $scheme    = $self->scheme;
+  # Scheme
+  my $url = '';
+  if (my $scheme = $self->scheme) { $url .= lc "$scheme://" }
+
+  # Authority
   my $authority = $self->authority;
-  if ($scheme && $authority) {
-    $url .= lc "$scheme://";
-    $url .= "$authority";
-  }
+  $url .= $url ? $authority : $authority ? "//$authority" : '';
 
   # Path
-  my $path  = $self->path;
-  my $slash = $path->leading_slash;
-  $path->leading_slash(0) if !$scheme && @{$self->base->path->parts};
-  $url .= $path;
-  $path->leading_slash($slash);
+  $url .= $self->path;
 
   # Query
   my $query = join '', $self->query;

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 905;
+use Test::More tests => 907;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -423,7 +423,7 @@ is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
 
-# Parse full HTTP 1.0 request (empty elements in path)
+# Parse full HTTP 1.0 request (no scheme and empty elements in path)
 $req = Mojo::Message::Request->new;
 $req->parse('GET //foo/bar//baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
@@ -435,6 +435,8 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
+is $req->url->host, 'foo',            'no host';
+is $req->url->path, '/bar//baz.html', 'right path';
 is $req->url, '//foo/bar//baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
@@ -931,7 +933,7 @@ is $req->method,      'CONNECT', 'right method';
 is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
-is $req->url, '', 'no full URL';
+is $req->url, '//127.0.0.1:3000', 'right URL';
 is $req->url->host,       '127.0.0.1',           'right host';
 is $req->url->port,       '3000',                'right port';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
@@ -1361,12 +1363,11 @@ is $req->method,      'CONNECT', 'right method';
 is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
-is $req->url, '', 'no full URL';
-is $req->url->host, '127.0.0.1', 'right host';
-is $req->url->port, '3000',      'right port';
-is $req->url->to_abs, 'http://Aladdin:open%20sesame@127.0.0.1:3000/',
-  'right absolute URL';
-is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
+is $req->url, '//127.0.0.1:3000', 'right URL';
+is $req->url->host,       '127.0.0.1',              'right host';
+is $req->url->port,       '3000',                   'right port';
+is $req->url->to_abs,     'http://127.0.0.1:3000/', 'right absolute URL';
+is $req->proxy->userinfo, 'Aladdin:open sesame',    'right proxy userinfo';
 is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Authorization" value';
 is $req->headers->host, '127.0.0.1:3000', 'right "Host" value';

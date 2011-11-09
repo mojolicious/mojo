@@ -124,16 +124,7 @@ sub is_multipart {1}
 
 sub parse {
   my $self = shift;
-
-  # Parse headers and chunked body
-  $self->SUPER::parse(@_);
-
-  # Custom body parser
-  return $self if $self->has_subscribers('read');
-
-  # Parse multipart content
-  $self->_parse_multipart;
-
+  $self->SUPER::parse(@_)->_parse_multipart;
   return $self;
 }
 

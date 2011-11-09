@@ -150,12 +150,8 @@ sub move_to {
 
 sub size {
   my $self = shift;
-
-  # File size
-  my $file = $self->path;
-  return -s $file if $file;
-
-  return 0;
+  return 0 unless my $file = $self->path;
+  return -s $file;
 }
 
 sub slurp {
@@ -224,7 +220,8 @@ Actual file path.
   my $tmpdir = $file->tmpdir;
   $file      = $file->tmpdir('/tmp');
 
-Temporary directory.
+Temporary directory, defaults to the value of C<MOJO_TMPDIR> or auto
+detection.
 
 =head1 METHODS
 

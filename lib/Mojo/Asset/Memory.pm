@@ -19,9 +19,10 @@ sub new {
 sub add_chunk {
   my ($self, $chunk) = @_;
   $self->{content} .= $chunk if defined $chunk;
-  return Mojo::Asset::File->new->add_chunk($self->slurp)
-    if $self->size > $self->max_memory_size;
-  return $self;
+  return $self unless $self->size > $self->max_memory_size;
+  my $file = Mojo::Asset::File->new->add_chunk($self->slurp);
+  $self->emit(upgrade => $file);
+  return $file;
 }
 
 sub contains {
@@ -78,6 +79,24 @@ Mojo::Asset::Memory - In-memory storage for HTTP 1.1 content
 =head1 DESCRIPTION
 
 L<Mojo::Asset::Memory> is an in-memory storage backend for HTTP 1.1 content.
+
+=head1 EVENTS
+
+L<Mojo::Asset::Memory> can emit the following events.
+
+=head2 C<upgrade>
+
+  $mem->on(upgrade => sub {
+    my ($mem, $file) = @_;
+  });
+
+Emitted when asset gets upgraded to a L<Mojo::Asset::File> object.
+Note that this event is EXPERIMENTAL and might change without warning!
+
+  $mem->on(upgrade => sub {
+    my ($mem, $file) = @_;
+    $file->tmpdir('/tmp');
+  });
 
 =head1 ATTRIBUTES
 

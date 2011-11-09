@@ -1,5 +1,5 @@
 package Mojo::Asset;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 
@@ -52,8 +52,8 @@ Pretend file starts later.
 
 =head1 METHODS
 
-L<Mojo::Asset> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Asset> inherits all methods from L<Mojo::EventEmitter> and implements
+the following new ones.
 
 =head2 C<add_chunk>
 

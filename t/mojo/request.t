@@ -308,11 +308,12 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 my $backup = $ENV{MOJO_MAX_MEMORY_SIZE} || '';
 $ENV{MOJO_MAX_MEMORY_SIZE} = 12;
 $req = Mojo::Message::Request->new;
-my @upgrade;
+my ($upgrade, $size);
 $req->content->asset->on(
   upgrade => sub {
     my ($mem, $file) = @_;
-    @upgrade = ($file->is_file, $file->size);
+    $upgrade = $file->is_file;
+    $size    = $file->size;
   }
 );
 is $req->content->progress, 0, 'right progress';
@@ -324,10 +325,10 @@ is $req->content->progress, 0, 'right progress';
 $req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
 is $req->content->progress, 4, 'right progress';
 ok !$req->content->asset->is_file, 'stored in memory';
-ok !$upgrade[0], 'upgrade event has not been emitted';
+ok !$upgrade, 'upgrade event has not been emitted';
 $req->parse("o World!\n");
-ok $upgrade[0], 'upgrade event has been emitted';
-ok !$upgrade[1], 'file was empty when upgrade event got emitted';
+ok $upgrade, 'upgrade event has been emitted';
+is $size, 0, 'file was empty when upgrade event got emitted';
 is $req->content->progress, 13, 'right progress';
 ok $req->content->asset->is_file, 'stored in file';
 $req->parse("1234\nlalalala\n");

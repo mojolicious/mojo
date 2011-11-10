@@ -52,7 +52,8 @@ sub body {
   # Callback
   if (ref $new eq 'CODE') {
     weaken $self;
-    return $content->on(read => sub { $self->$new(pop) });
+    return $content->unsubscribe('read')
+      ->on(read => sub { $self->$new(pop) });
   }
 
   # Set text content
@@ -642,8 +643,7 @@ Check if message is at least a specific version.
   $message   = $message->body('Hello!');
   my $cb     = $message->body(sub {...});
 
-Access and replace text content or register C<read> event with C<content>,
-which will be emitted when new data arrives.
+Access C<content> data or replace all C<read> events.
 
   $message->body(sub {
     my ($message, $chunk) = @_;

@@ -457,14 +457,15 @@ L<Mojo::UserAgent> makes it actually easy.
 
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://mojolicio.us');
-  $tx->res->content->unsubscribe('read')->on(read => sub {
-    my ($content, $chunk) = @_;
-    say $chunk;
+  $tx->res->body(sub {
+    my ($res, $chunk) = @_;
+    say "Streaming: $chunk";
   });
   $ua->start($tx);
 
-The C<read> event will be emitted for every chunk of data that is received,
-even C<chunked> encoding will be handled transparently if necessary.
+The C<body> method can be used to replace all C<read> events, which will be
+emitted for every chunk of data that is received, even C<chunked> encoding
+will be handled transparently if necessary.
 
 =head2 Streaming request
 

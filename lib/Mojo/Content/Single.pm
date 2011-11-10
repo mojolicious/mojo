@@ -112,7 +112,8 @@ implements the following new ones.
   my $asset = $single->asset;
   $single   = $single->asset(Mojo::Asset::Memory->new);
 
-The actual content, defaults to a L<Mojo::Asset::Memory> object.
+The actual content, defaults to a L<Mojo::Asset::Memory> object with
+C<auto_upgrade> enabled.
 
 =head2 C<auto_upgrade>
 

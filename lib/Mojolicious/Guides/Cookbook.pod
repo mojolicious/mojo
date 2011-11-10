@@ -457,7 +457,7 @@ L<Mojo::UserAgent> makes it actually easy.
 
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://mojolicio.us');
-  $tx->res->content->on(read => sub {
+  $tx->res->content->unsubscribe('read')->on(read => sub {
     my ($content, $chunk) = @_;
     say $chunk;
   });

@@ -180,33 +180,28 @@ sub parse {
     $self->{pre_buffer} = '';
   }
 
-  # Custom body parser
-  if ($self->has_subscribers('read')) {
+  # Chunked or relaxed content
+  if ($self->is_chunked || $self->relaxed) {
+    $self->{size} += length($self->{buffer} //= '');
+    $self->emit(read => $self->{buffer});
+    $self->{buffer} = '';
+  }
 
-    # Chunked or relaxed content
-    if ($self->is_chunked || $self->relaxed) {
-      $self->emit(read => $self->{buffer} //= '');
-      $self->{buffer} = '';
+  # Normal content
+  else {
+    my $len = $self->headers->content_length || 0;
+    $self->{size} ||= 0;
+    my $need = $len - $self->{size};
+
+    # Slurp
+    if ($need > 0) {
+      my $chunk = substr $self->{buffer}, 0, $need, '';
+      $self->{size} += length $chunk;
+      $self->emit(read => $chunk);
     }
 
-    # Normal content
-    else {
-
-      # Bytes needed
-      my $len = $self->headers->content_length || 0;
-      $self->{size} ||= 0;
-      my $need = $len - $self->{size};
-
-      # Slurp
-      if ($need > 0) {
-        my $chunk = substr $self->{buffer}, 0, $need, '';
-        $self->{size} = $self->{size} + length $chunk;
-        $self->emit(read => $chunk);
-      }
-
-      # Finished
-      $self->{state} = 'finished' if $len <= $self->progress;
-    }
+    # Finished
+    $self->{state} = 'finished' if $len <= $self->progress;
   }
 
   return $self;
@@ -440,9 +435,9 @@ Note that this event is EXPERIMENTAL and might change without warning!
     my ($content, $chunk) = @_;
   });
 
-Emitted when a new chunk of content arrives, also disables normal content
-storage in asset objects.
+Emitted when a new chunk of content arrives.
 
+  $content->unsubscribe('read');
   $content->on(read => sub {
     my ($content, $chunk) = @_;
     say "Streaming: $chunk";

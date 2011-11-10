@@ -7,6 +7,17 @@ use Mojo::Content::MultiPart;
 has asset => sub { Mojo::Asset::Memory->new };
 has auto_upgrade => 1;
 
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->{read} = $self->on(
+    read => sub {
+      my ($self, $chunk) = @_;
+      $self->asset($self->asset->add_chunk($chunk));
+    }
+  );
+  return $self;
+}
+
 sub body_contains {
   return 1 if shift->asset->contains(shift) >= 0;
   return;
@@ -38,38 +49,18 @@ sub get_body_chunk {
 sub parse {
   my $self = shift;
 
-  # Parse headers and chunked body
-  $self->SUPER::parse(@_);
-
-  # Still parsing headers or using a custom body parser
-  return $self
-    if ($self->{state} || '') eq 'headers' || $self->has_subscribers('read');
+  # Parse headers
+  $self->parse_until_body(@_);
 
   # Content needs to be upgraded to multipart
   if ($self->auto_upgrade && defined($self->boundary)) {
+    $self->unsubscribe(read => $self->{read});
     $self->emit(upgrade => my $multi = Mojo::Content::MultiPart->new($self));
     return $multi->parse;
   }
 
-  # Chunked body or relaxed content
-  my $asset = $self->asset;
-  if ($self->is_chunked || $self->relaxed) {
-    $self->asset($asset->add_chunk($self->{buffer}));
-    $self->{buffer} = '';
-  }
-
-  # Normal body
-  else {
-    my $len = $self->headers->content_length || 0;
-    my $need = $len - $asset->size;
-    $self->asset($asset->add_chunk(substr $self->{buffer}, 0, $need, ''))
-      if $need > 0;
-
-    # Finished
-    $self->{state} = 'finished' if $len <= $self->progress;
-  }
-
-  return $self;
+  # Parse body
+  return $self->SUPER::parse;
 }
 
 1;
@@ -136,6 +127,13 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 
 L<Mojo::Content::Single> inherits all methods from L<Mojo::Content> and
 implements the following new ones.
+
+=head2 C<new>
+
+  my $single = Mojo::Content::Single->new;
+
+Construct a new L<Mojo::Content::Single> object and register default C<read>
+event.
 
 =head2 C<body_contains>
 

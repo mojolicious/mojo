@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 910;
+use Test::More tests => 912;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -420,6 +420,8 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = $backup;
 
 # Parse full HTTP 1.0 request
 $req = Mojo::Message::Request->new;
+my $body = '';
+$req->content->on(read => sub { $body .= pop });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
@@ -433,6 +435,8 @@ ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
+is $req->body, "Hello World!\n1234\nlalalala\n", 'right content';
+is $body, "Hello World!\n1234\nlalalala\n", 'right content';
 
 # Parse full HTTP 1.0 request (no scheme and empty elements in path)
 $req = Mojo::Message::Request->new;
@@ -584,7 +588,7 @@ ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_length, 13, 'right "Content-Length" value';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $buffer, '131313abcd1313abcdefghi13', 'right content';
+is $buffer, '131313abcd1313abcdefghi', 'right content';
 
 # Parse HTTP 1.1 "x-application-urlencoded"
 $req = Mojo::Message::Request->new;

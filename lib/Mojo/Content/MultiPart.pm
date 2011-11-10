@@ -5,6 +5,18 @@ use Mojo::Util 'b64_encode';
 
 has parts => sub { [] };
 
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->on(
+    read => sub {
+      my ($self, $chunk) = @_;
+      $self->{multipart} .= $chunk;
+      $self->_parse_multipart;
+    }
+  );
+  return $self;
+}
+
 sub body_contains {
   my ($self, $chunk) = @_;
   for my $part (@{$self->parts}) {
@@ -122,12 +134,6 @@ sub get_body_chunk {
 
 sub is_multipart {1}
 
-sub parse {
-  my $self = shift;
-  $self->SUPER::parse(@_)->_parse_multipart;
-  return $self;
-}
-
 sub _parse_multipart {
   my $self = shift;
 
@@ -157,19 +163,19 @@ sub _parse_multipart_body {
   my ($self, $boundary) = @_;
 
   # Whole part in buffer
-  my $pos = index $self->{buffer}, "\x0d\x0a--$boundary";
+  my $pos = index $self->{multipart}, "\x0d\x0a--$boundary";
   if ($pos < 0) {
-    my $len = length($self->{buffer}) - (length($boundary) + 8);
+    my $len = length($self->{multipart}) - (length($boundary) + 8);
     return unless $len > 0;
 
     # Store chunk
-    my $chunk = substr $self->{buffer}, 0, $len, '';
+    my $chunk = substr $self->{multipart}, 0, $len, '';
     $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
     return;
   }
 
   # Store chunk
-  my $chunk = substr $self->{buffer}, 0, $pos, '';
+  my $chunk = substr $self->{multipart}, 0, $pos, '';
   $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
   $self->{multi_state} = 'multipart_boundary';
   return 1;
@@ -179,8 +185,8 @@ sub _parse_multipart_boundary {
   my ($self, $boundary) = @_;
 
   # Boundary begins
-  if ((index $self->{buffer}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
-    substr $self->{buffer}, 0, length($boundary) + 6, '';
+  if ((index $self->{multipart}, "\x0d\x0a--$boundary\x0d\x0a") == 0) {
+    substr $self->{multipart}, 0, length($boundary) + 6, '';
 
     # New part
     $self->emit(part => my $part = Mojo::Content::Single->new(relaxed => 1));
@@ -191,8 +197,8 @@ sub _parse_multipart_boundary {
 
   # Boundary ends
   my $end = "\x0d\x0a--$boundary--";
-  if ((index $self->{buffer}, $end) == 0) {
-    substr $self->{buffer}, 0, length $end, '';
+  if ((index $self->{multipart}, $end) == 0) {
+    substr $self->{multipart}, 0, length $end, '';
 
     # Finished
     $self->{state} = $self->{multi_state} = 'finished';
@@ -205,9 +211,9 @@ sub _parse_multipart_preamble {
   my ($self, $boundary) = @_;
 
   # Replace preamble with carriage return and line feed
-  my $pos = index $self->{buffer}, "--$boundary";
+  my $pos = index $self->{multipart}, "--$boundary";
   unless ($pos < 0) {
-    substr $self->{buffer}, 0, $pos, "\x0d\x0a";
+    substr $self->{multipart}, 0, $pos, "\x0d\x0a";
 
     # Parse boundary
     $self->{multi_state} = 'multipart_boundary';
@@ -276,6 +282,13 @@ L<Mojo::Content::Single> objects.
 L<Mojo::Content::MultiPart> inherits all methods from L<Mojo::Content> and
 implements the following new ones.
 
+=head2 C<new>
+
+  my $multi = Mojo::Content::MultiPart->new;
+
+Construct a new L<Mojo::Content::MultiPart> object and register default
+C<read> event.
+
 =head2 C<body_contains>
 
   my $success = $multi->body_contains('foobarbaz');
@@ -312,12 +325,6 @@ Get a chunk of content starting from a specfic position.
   my $true = $multi->is_multipart;
 
 True.
-
-=head2 C<parse>
-
-  $multi = $multi->parse('Content-Type: multipart/mixed');
-
-Parse content chunk.
 
 =head1 SEE ALSO
 

@@ -27,7 +27,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 68;
+use Test::More tests => 78;
 
 use Mojolicious;
 use Mojo::Transaction::HTTP;
@@ -84,16 +84,39 @@ $c->app->log->level('fatal');
 my $d = Mojolicious::Routes->new;
 ok $d, 'initialized';
 $d->namespace('Test');
-$d->route('/')->to(controller => 'foo', action => 'home');
+$d->route('/')->over([])->to(controller => 'foo', action => 'home');
 $d->route('/foo/(capture)')->to(controller => 'foo', action => 'bar');
 
-# 404 clean stash
+# Cache
 $c->reset_state;
 my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
+$tx->req->url->parse('/');
+$c->tx($tx);
+ok $d->dispatch($c), 'dispatched';
+is $c->stash->{controller}, 'foo',  'right value';
+is $c->stash->{action},     'home', 'right value';
+ok $c->render_called, 'rendered';
+my $cache = $d->cache->get('GET:/:0');
+ok $cache, 'route has been cached';
+$c->reset_state;
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
+$tx->req->url->parse('/');
+$c->tx($tx);
+ok $d->dispatch($c), 'dispatched';
+is $c->stash->{controller}, 'foo',  'right value';
+is $c->stash->{action},     'home', 'right value';
+ok $c->render_called, 'rendered';
+is_deeply $d->cache->get('GET:/:0'), $cache, 'cached route has been reused';
+
+# 404 clean stash
+$c->reset_state;
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->method('GET');
 $tx->req->url->parse('/not_found');
 $c->tx($tx);
-is $d->dispatch($c), undef, 'not dispatched';
+ok !$d->dispatch($c), 'not dispatched';
 is_deeply $c->stash, {}, 'empty stash';
 ok !$c->render_called, 'nothing rendered';
 
@@ -104,7 +127,7 @@ $tx->req->method('POST');
 $tx->req->url->parse('/foo/hello');
 $c->tx($tx);
 $c->stash(test => 23);
-is $d->dispatch($c), 1, 'dispatched';
+ok $d->dispatch($c), 'dispatched';
 is $c->stash->{controller}, 'foo',   'right value';
 is $c->stash->{action},     'bar',   'right value';
 is $c->stash->{capture},    'hello', 'right value';
@@ -152,7 +175,7 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/hello%20there');
 $c->tx($tx);
-is $d->dispatch($c), 1, 'dispatched';
+ok $d->dispatch($c), 'dispatched';
 is $c->stash->{controller}, 'foo',         'right value';
 is $c->stash->{action},     'bar',         'right value';
 is $c->stash->{capture},    'hello there', 'right value';
@@ -168,7 +191,7 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('/foo/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82');
 $c->tx($tx);
-is $d->dispatch($c), 1, 'dispatched';
+ok $d->dispatch($c), 'dispatched';
 is $c->stash->{controller}, 'foo',          'right value';
 is $c->stash->{action},     'bar',          'right value';
 is $c->stash->{capture},    'привет', 'right value';

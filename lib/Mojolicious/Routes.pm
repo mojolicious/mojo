@@ -199,8 +199,8 @@ sub name {
 
 sub over {
   my $self = shift;
-  return $self unless @_;
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+  return $self unless @$conditions;
 
   # Routes with conditions can't be cached
   push @{$self->conditions}, @$conditions;

@@ -1,8 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.26    2011-11-09 00:00:00
+2.26    2011-11-10 00:00:00
         - Added EXPERIMENTAL upgrade event to Mojo::Asset::Memory.
         - Improved documentation.
+        - Fixed small route caching bug.
 
 2.25    2011-11-08 00:00:00
         - Removed canonicalize method from Mojo::URL.

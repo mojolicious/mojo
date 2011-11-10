@@ -106,22 +106,18 @@ sub _build_tx {
   # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
 
-  # Handle
+  # Events
   weaken $self;
   $tx->on(
-    request => sub {
+    upgrade => sub {
       my ($tx, $ws) = @_;
-
-      # WebSocket
-      if ($ws) {
-        $self->{connections}->{$id}->{websocket} = $ws->server_handshake;
-        $self->emit(request => $ws);
-      }
-
-      # HTTP
-      $self->emit(request => $tx);
-
-      # Resume
+      $self->{connections}->{$id}->{websocket} = $ws->server_handshake;
+    }
+  );
+  $tx->on(
+    request => sub {
+      my $c = $self->{connections}->{$id};
+      $self->emit(request => $c->{websocket} || $c->{transaction});
       $tx->on(resume => sub { $self->_write($id) });
     }
   );

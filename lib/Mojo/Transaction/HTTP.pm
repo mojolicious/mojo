@@ -172,15 +172,10 @@ sub server_read {
 
   # EOF
   elsif ((length $chunk == 0) || ($req->is_finished && !$self->{handled}++)) {
-
-    # WebSocket
-    if (($req->headers->upgrade || '') eq 'websocket') {
-      $self->emit(
-        request => Mojo::Transaction::WebSocket->new(handshake => $self));
-    }
-
-    # HTTP
-    else { $self->emit('request') }
+    $self->emit(
+      upgrade => Mojo::Transaction::WebSocket->new(handshake => $self))
+      if (($req->headers->upgrade || '') eq 'websocket');
+    $self->emit('request');
   }
 
   # Expect 100 Continue
@@ -337,16 +332,29 @@ can emit the following new ones.
 =head2 C<request>
 
   $tx->on(request => sub {
-    my ($tx, $ws) = @_;
+    my $tx = shift;
   });
 
-Emitted when a request is ready and needs to be handled, an optional
-L<Mojo::Transaction::WebSocket> object will be passed for WebSocket handshake
-requests.
+Emitted when a request is ready and needs to be handled.
 
   $tx->on(request => sub {
     my $tx = shift;
     $tx->res->headers->header('X-Bender', 'Bite my shiny metal ass!');
+  });
+
+=head2 C<upgrade>
+
+  $tx->on(upgrade => sub {
+    my ($tx, $ws) = @_;
+  });
+
+Emitted when transaction gets upgraded to a L<Mojo::Transaction::WebSocket>
+object.
+Note that this event is EXPERIMENTAL and might change without warning!.
+
+  $tx->on(upgrade => sub {
+    my ($tx, $ws) = @_;
+    $ws->res->headers->header('X-Bender', 'Bite my shiny metal ass!');
   });
 
 =head1 ATTRIBUTES

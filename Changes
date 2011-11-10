@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.26    2011-11-10 00:00:00
         - Added EXPERIMENTAL upgrade event to Mojo::Asset::Memory.
+        - Added EXPERIMENTAL upgrade event to Mojo::Transaction::HTTP.
         - Improved Mojo::Content::Single and Mojo::Content::MultiPart parsers
           to reuse events.
         - Improved documentation.

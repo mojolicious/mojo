@@ -116,8 +116,8 @@ sub _build_tx {
   );
   $tx->on(
     request => sub {
-      my $c = $self->{connections}->{$id};
-      $self->emit(request => $c->{websocket} || $c->{transaction});
+      my $tx = shift;
+      $self->emit(request => $self->{connections}->{$id}->{websocket} || $tx);
       $tx->on(resume => sub { $self->_write($id) });
     }
   );

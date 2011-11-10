@@ -643,7 +643,7 @@ Check if message is at least a specific version.
   $message   = $message->body('Hello!');
   my $cb     = $message->body(sub {...});
 
-Access C<content> data or replace all C<read> events.
+Access C<content> data or replace all subscribers of the C<read> event.
 
   $message->body(sub {
     my ($message, $chunk) = @_;

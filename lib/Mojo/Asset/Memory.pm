@@ -5,6 +5,7 @@ use Carp 'croak';
 use IO::File;
 use Mojo::Asset::File;
 
+has 'auto_upgrade';
 has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };
 
 # "There's your giraffe, little girl.
@@ -19,7 +20,8 @@ sub new {
 sub add_chunk {
   my ($self, $chunk) = @_;
   $self->{content} .= $chunk if defined $chunk;
-  return $self unless $self->size > $self->max_memory_size;
+  return $self
+    if !$self->auto_upgrade || $self->size <= $self->max_memory_size;
   $self->emit(upgrade => my $file = Mojo::Asset::File->new);
   return $file->add_chunk($self->slurp);
 }
@@ -101,6 +103,15 @@ Note that this event is EXPERIMENTAL and might change without warning!
 
 L<Mojo::Asset::Memory> inherits all attributes from L<Mojo::Asset> and
 implements the following new ones.
+
+=head2 C<auto_upgrade>
+
+  my $upgrade = $mem->auto_upgrade;
+  $mem        = $mem->auto_upgrade(1);
+
+Try to detect if content size exceeds C<max_memory_size> limit and
+automatically upgrade to a L<Mojo::Asset::File> object.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<max_memory_size>
 

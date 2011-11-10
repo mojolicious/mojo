@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 46;
+use Test::More tests => 50;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
@@ -121,3 +121,15 @@ $tmp->add_chunk('x');
 $file->move_to($tmp->path);
 is $file->slurp, 'bcd', 'right content';
 undef $tmp;
+
+# Upgrade
+my $asset = Mojo::Asset::Memory->new(max_memory_size => 5, auto_upgrade => 1);
+$asset = $asset->add_chunk('lala');
+ok !$asset->is_file, 'stored in memory';
+$asset = $asset->add_chunk('lala');
+ok $asset->is_file, 'stored in file';
+$asset = Mojo::Asset::Memory->new(max_memory_size => 5);
+$asset = $asset->add_chunk('lala');
+ok !$asset->is_file, 'stored in memory';
+$asset = $asset->add_chunk('lala');
+ok !$asset->is_file, 'stored in memory';

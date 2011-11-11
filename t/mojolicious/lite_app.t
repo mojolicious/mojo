@@ -1420,18 +1420,18 @@ text!
 <%= time =%>
 <% end =%>
 <%= memorize begin =%>
-    <%= 'a' . int(rand(999)) =%>
+    <%= 'a' . time =%>
 <% end =%><%= memorize begin =%>
-<%= 'b' . int(rand(999)) =%>
+<%= 'b' . time =%>
 <% end =%>
 <%= memorize test => begin =%>
-<%= 'c' . time . int(rand(999)) =%>
+<%= 'c' . time =%>
 <% end =%>
 <%= memorize expiry => {expires => time + 1} => begin %>
-<%= 'd' . time . int(rand(999)) =%>
+<%= 'd' . time =%>
 <% end =%>
 <%= memorize {expires => time + 1} => begin %>
-<%= 'e' . time . int(rand(999)) =%>
+<%= 'e' . time =%>
 <% end =%>
 
 @@ test(test)(\Qtest\E)(.html.ep

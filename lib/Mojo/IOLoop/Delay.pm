@@ -105,8 +105,7 @@ Decrement active event counter.
 
   my @args = $delay->wait;
 
-Start C<ioloop> and register C<finish> event that stops it again once the
-active event counter reaches zero.
+Start C<ioloop> and stop it again once the C<finish> event gets emitted.
 
 =head1 SEE ALSO
 

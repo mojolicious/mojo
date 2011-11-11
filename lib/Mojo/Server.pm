@@ -142,7 +142,8 @@ implements the following new ones.
 
   my $server = Mojo::Server->new;
 
-Construct a new L<Mojo::Server> object and register default C<request> event.
+Construct a new L<Mojo::Server> object and subscribe to C<request> event with
+default request handling.
 
 =head2 C<build_tx>
 

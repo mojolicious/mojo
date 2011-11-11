@@ -183,7 +183,8 @@ the following new ones.
 
   my $log = Mojo::Log->new;
 
-Construct a new L<Mojo::Log> object and register default C<message> event.
+Construct a new L<Mojo::Log> object and subscribe to C<message> event with
+default logger.
 
 =head2 C<debug>
 

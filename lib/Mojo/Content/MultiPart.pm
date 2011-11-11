@@ -286,8 +286,8 @@ implements the following new ones.
 
   my $multi = Mojo::Content::MultiPart->new;
 
-Construct a new L<Mojo::Content::MultiPart> object and register default
-C<read> event.
+Construct a new L<Mojo::Content::MultiPart> object and subscribe to C<read>
+event with default content parser.
 
 =head2 C<body_contains>
 

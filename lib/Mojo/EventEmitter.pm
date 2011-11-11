@@ -151,17 +151,27 @@ Check if event has subscribers.
 
 Subscribe to event.
 
+  $e->on(foo => sub {
+    my ($e, @args) = @_;
+  });
+
 =head2 C<once>
 
   my $cb = $e->once(foo => sub {...});
 
 Subscribe to event and unsubscribe again after it has been emitted once.
 
+  $e->once(foo => sub {
+    my ($e, @args) = @_;
+  });
+
 =head2 C<subscribers>
 
   my $subscribers = $e->subscribers('foo');
 
 All subscribers for event.
+
+  $e->unsubscribe(foo => $e->subscribers('foo')->[-1]);
 
 =head2 C<unsubscribe>
 

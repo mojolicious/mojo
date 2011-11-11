@@ -495,7 +495,7 @@ sub _parse_formdata {
     # Charset
     my $charset = $part->charset || $default;
 
-    # "Content-Disposition"
+    # Content-Disposition header
     my $disposition = $part->headers->content_disposition;
     next unless $disposition;
     my ($name)     = $disposition =~ /\ name="?([^";]+)"?/;

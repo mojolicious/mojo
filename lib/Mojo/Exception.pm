@@ -16,19 +16,12 @@ has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 };
 #  Do they give a Nobel Prize for attempted chemistry?"
 sub new {
   my $self = shift->SUPER::new();
-
-  # Message
-  return $self unless @_;
-
-  # Detect
-  return $self->_detect(@_);
+  return @_ ? $self->_detect(@_) : $self;
 }
 
 sub throw {
   my $self = shift;
-  my $e    = Mojo::Exception->new;
-  $e->trace(2);
-  die $e->_detect(@_);
+  die Mojo::Exception->new->trace(2)->_detect(@_);
 }
 
 sub trace {
@@ -41,11 +34,9 @@ sub trace {
     push @frames, [$p, $f, $l];
 
     # Line
-    if (-r $f) {
-      next unless my $handle = IO::File->new("< $f");
-      my @lines = <$handle>;
-      push @{$frames[-1]}, $lines[$l - 1];
-    }
+    next unless -r $f;
+    next unless my $handle = IO::File->new($f, '<:utf8');
+    push @{$frames[-1]}, (<$handle>)[$l - 1];
   }
   $e->frames(\@frames);
 
@@ -58,8 +49,7 @@ sub _detect {
   # Message
   my $message = shift;
   return $message if blessed $message && $message->isa('Mojo::Exception');
-  $self->message($message);
-  $self->raw_message($message);
+  $self->message($message)->raw_message($message);
 
   # Trace name and line
   my @trace;
@@ -78,23 +68,16 @@ sub _detect {
     my $file = $frame->{file};
     my $line = $frame->{line};
 
-    # Readable
-    if (-r $file) {
-
-      # Slurp
-      my $handle = IO::File->new($file, '<:utf8');
-      my @lines = <$handle>;
-
-      # Line
-      $self->_parse_context($line, [\@lines]);
-      return $self;
-    }
+    # Line
+    next unless -r $file;
+    my $handle = IO::File->new($file, '<:utf8');
+    $self->_parse_context($line, [[<$handle>]]);
+    return $self;
   }
 
   # Parse specific file
   return $self unless my $files = shift;
-  my @lines;
-  for my $lines (@$files) { push @lines, [split /\n/, $lines] }
+  my @lines = map { [split /\n/] } @$files;
 
   # Clean up plain messages
   return $self unless my $name = shift;
@@ -111,18 +94,15 @@ sub _detect {
     $self->message($message);
   }
 
-  # Parse message
+  # Find line
   $name = quotemeta $name;
   my $line;
-  $line = $1 if $self->message =~ /at\s+$name\s+line\s+(\d+)/;
-
-  # Stacktrace
-  unless ($line) {
+  if ($self->message =~ /at\s+$name\s+line\s+(\d+)/) { $line = $1 }
+  else {
     for my $frame (@{$self->frames}) {
-      if ($frame->[1] =~ /^\(eval\ \d+\)$/) {
-        $line = $frame->[2];
-        last;
-      }
+      next unless $frame->[1] =~ /^\(eval\ \d+\)$/;
+      $line = $frame->[2];
+      last;
     }
   }
 
@@ -145,18 +125,14 @@ sub to_string {
   $string .= $self->message if $self->message;
 
   # Before
-  for my $line (@{$self->lines_before}) {
-    $string .= $line->[0] . ': ' . $line->[1] . "\n";
-  }
+  $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
 
   # Line
   $string .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
     if $self->line->[0];
 
   # After
-  for my $line (@{$self->lines_after}) {
-    $string .= $line->[0] . ': ' . $line->[1] . "\n";
-  }
+  $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};
 
   return $string;
 }
@@ -174,10 +150,6 @@ sub _parse_context {
     chomp $code;
     push @{$self->line}, $code;
   }
-
-  # Cleanup
-  $self->lines_before([]);
-  $self->lines_after([]);
 
   # Before
   for my $i (2 .. 6) {
@@ -278,7 +250,8 @@ Raw unprocessed exception message.
   my $verbose = $e->verbose;
   $e          = $e->verbose(1);
 
-Activate verbose rendering.
+Activate verbose rendering, defaults to the value of
+C<MOJO_EXCEPTION_VERBOSE=1> or C<0>.
 
 =head1 METHODS
 

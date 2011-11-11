@@ -742,8 +742,8 @@ Data storage persistent only for the next request, stored in the session.
 
   my $cb = $c->on(finish => sub {...});
 
-Subscribe to C<tx> event, which is usually a L<Mojo::Transaction::HTTP> or
-L<Mojo::Transaction::WebSocket> object.
+Subscribe to events of C<tx>, which is usually a L<Mojo::Transaction::HTTP>
+or L<Mojo::Transaction::WebSocket> object.
 
   # Emitted when the transaction has been finished
   $c->on(finish => sub {

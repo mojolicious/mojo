@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.27    2011-11-11 00:00:00
+        - Added EXPERIMENTAL charset method to Mojo::Content.
         - Improved documentation.
 
 2.26    2011-11-10 00:00:00

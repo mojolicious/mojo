@@ -142,12 +142,8 @@ sub run {
   $url = encode 'UTF-8', $url;
   warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
-  # Charset
-  ($tx->res->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/
-    and $charset = $1
-    unless defined $charset;
-
   # Select
+  $charset //= $tx->res->content->charset;
   $self->_select($buffer, $charset, $selector) if $selector;
 }
 

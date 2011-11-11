@@ -70,6 +70,11 @@ sub build_headers {
   return $headers;
 }
 
+sub charset {
+  (shift->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/i;
+  return $1;
+}
+
 sub clone {
   my $self = shift;
   return if $self->is_dynamic;
@@ -512,6 +517,13 @@ Render whole body.
   my $string = $content->build_headers;
 
 Render all headers.
+
+=head2 C<charset>
+
+  my $charset = $content->charset;
+
+Detect content charset.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<clone>
 

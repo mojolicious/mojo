@@ -332,14 +332,8 @@ sub websocket_ok {
 
 sub _get_content {
   my ($self, $tx) = @_;
-
-  # Charset
-  my $charset;
-  ($tx->res->headers->content_type || '') =~ /charset="?([^"\s]+)"?/
-    and $charset = $1;
-
-  # Content
   my $content = $tx->res->body;
+  my $charset = $tx->res->content->charset;
   return $charset ? decode($charset, $content) : $content;
 }
 

@@ -70,11 +70,10 @@ sub body_params {
 
   # Charset
   my $params = Mojo::Parameters->new;
-  my $type = $self->headers->content_type || '';
-  $params->charset($self->default_charset);
-  $type =~ /charset="?(\S+)"?/ and $params->charset($1);
+  $params->charset($self->content->charset || $self->default_charset);
 
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
+  my $type = $self->headers->content_type || '';
   if ($type =~ m#(?:x-application|application/x-www-form)-urlencoded#i) {
     $params->parse($self->content->asset->slurp);
   }
@@ -180,18 +179,11 @@ sub cookie {
 
 sub dom {
   my $self = shift;
-
-  # Parse
   return if $self->is_multipart;
-  my $charset;
-  ($self->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/
-    and $charset = $1;
-  my $dom = $self->dom_class->new->charset($charset)->parse($self->body);
-
-  # Find right away
-  return $dom->find(@_) if @_;
-
-  return $dom;
+  my $dom =
+    $self->dom_class->new->charset($self->content->charset)
+    ->parse($self->body);
+  return @_ ? $dom->find(@_) : $dom;
 }
 
 sub error {
@@ -487,9 +479,7 @@ sub _parse_formdata {
   my @formdata;
   my $content = $self->content;
   return \@formdata unless $content->is_multipart;
-  my $default = $self->default_charset;
-  ($self->headers->content_type || '') =~ /charset="?(\S+)"?/
-    and $default = $1;
+  my $default = $content->charset || $self->default_charset;
 
   # Walk the tree
   my @parts;
@@ -503,9 +493,7 @@ sub _parse_formdata {
     }
 
     # Charset
-    my $charset = $default;
-    ($part->headers->content_type || '') =~ /charset="?(\S+)"?/
-      and $charset = $1;
+    my $charset = $part->charset || $default;
 
     # "Content-Disposition"
     my $disposition = $part->headers->content_disposition;

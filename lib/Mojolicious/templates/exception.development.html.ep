@@ -67,7 +67,6 @@
       .tap {
         font: 0.5em Verdana, sans-serif;
         text-align: center;
-        text-shadow: #ddd 0 1px 0;
       }
       .value {
         padding-left: 1em;
@@ -97,6 +96,7 @@
         -moz-border-radius-bottomright: 5px;
         border-bottom-right-radius: 5px;
       }
+      #more .tap, #trace .tap { text-shadow: #ddd 0 1px 0 }
       #request {
         -moz-border-radius-topleft: 5px;
         border-top-left-radius: 5px;

@@ -468,8 +468,8 @@ These hooks are currently available and are emitted in the listed order:
 
 =item after_build_tx
 
-Emitted in reverse order right after the transaction is built and before the
-HTTP request gets parsed.
+Emitted right after the transaction is built and before the HTTP request gets
+parsed.
 
   $app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;

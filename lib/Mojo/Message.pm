@@ -263,14 +263,7 @@ sub header_size {
   return $self->content->header_size;
 }
 
-sub headers {
-  my $self = shift;
-  if (@_) {
-    $self->content->headers(@_);
-    return $self;
-  }
-  return $self->content->headers(@_);
-}
+sub headers { shift->content->headers(@_) }
 
 sub is_chunked { shift->content->is_chunked }
 
@@ -614,6 +607,13 @@ to L<Mojo::JSON>.
 Maximum message size in bytes, defaults to the value of
 C<MOJO_MAX_MESSAGE_SIZE> or C<5242880>.
 
+=head2 C<version>
+
+  my $version = $message->version;
+  $message    = $message->version('1.1');
+
+HTTP version of message.
+
 =head1 METHODS
 
 L<Mojo::Message> inherits all methods from L<Mojo::EventEmitter> and
@@ -742,9 +742,8 @@ Size of headers in bytes.
 =head2 C<headers>
 
   my $headers = $message->headers;
-  $message    = $message->headers(Mojo::Headers->new);
 
-Message headers, defaults to a L<Mojo::Headers> object.
+Alias for L<Mojo::Content/"headers">.
 
   say $message->headers->content_type;
 
@@ -850,13 +849,6 @@ Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 
   say $message->uploads->[2]->filename;
-
-=head2 C<version>
-
-  my $version = $message->version;
-  $message    = $message->version('1.1');
-
-HTTP version of message.
 
 =head2 C<write>
 

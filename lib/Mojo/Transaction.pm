@@ -5,7 +5,7 @@ use Carp 'croak';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-has [qw/connection kept_alive local_address local_port previous remote_port/];
+has [qw/kept_alive local_address local_port previous remote_port/];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
@@ -13,6 +13,12 @@ has res => sub { Mojo::Message::Response->new };
 sub client_close { shift->server_close(@_) }
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
+
+sub connection {
+  my ($self, $c) = @_;
+  return $self->emit(connection => $self->{connection} = $c) if $c;
+  return $self->{connection};
+}
 
 sub error {
   my $self = shift;
@@ -112,13 +118,22 @@ L<Mojo::Transaction> is an abstract base class for transactions.
 
 L<Mojo::Transaction> can emit the following events.
 
+=head2 C<connection>
+
+  $tx->on(connection => sub {
+    my ($tx, $connection) = @_;
+  });
+
+Emitted when a connection has been assigned to transaction.
+Note that this event is EXPERIMENTAL and might change without warning!
+
 =head2 C<finish>
 
   $tx->on(finish => sub {
     my $tx = shift;
   });
 
-Emitted when a transaction is finished.
+Emitted when transaction is finished.
 
 =head2 C<resume>
 
@@ -126,18 +141,11 @@ Emitted when a transaction is finished.
     my $tx = shift;
   });
 
-Emitted when a transaction is resumed.
+Emitted when transaction is resumed.
 
 =head1 ATTRIBUTES
 
 L<Mojo::Transaction> implements the following attributes.
-
-=head2 C<connection>
-
-  my $connection = $tx->connection;
-  $tx            = $tx->connection($connection);
-
-Connection identifier or socket.
 
 =head2 C<kept_alive>
 
@@ -219,6 +227,13 @@ Read and process client data.
   my $chunk = $tx->client_write;
 
 Write client data.
+
+=head2 C<connection>
+
+  my $connection = $tx->connection;
+  $tx            = $tx->connection($connection);
+
+Connection identifier or socket.
 
 =head2 C<error>
 

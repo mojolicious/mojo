@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 270;
+use Test::More tests => 269;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -577,10 +577,6 @@ ok $res->at_least_version('1.0'), 'at least version 1.0';
 $res = Mojo::Message::Response->new(version => '0.9');
 ok !$res->at_least_version('1.0'), 'not version 1.0';
 ok $res->at_least_version('0.9'), 'at least version 0.9';
-
-# "headers" chaining
-$res = Mojo::Message::Response->new->headers(Mojo::Headers->new);
-is $res->isa('Mojo::Message::Response'), 1, 'right request';
 
 # Build dom from request with charset
 $res = Mojo::Message::Response->new;

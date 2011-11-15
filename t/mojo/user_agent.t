@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 59;
+use Test::More tests => 67;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -164,6 +164,50 @@ ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close.', 'right error';
 is $timeout, 1, 'finish event has been emitted';
 
+# GET / (introspect)
+my $req = my $res = '';
+my $start = $ua->on(
+  start => sub {
+    my ($ua, $tx) = @_;
+    $tx->on(
+      connection => sub {
+        my ($tx, $connection) = @_;
+        my $stream = Mojo::IOLoop->stream($connection);
+        my $read   = $stream->on(
+          read => sub {
+            my ($stream, $chunk) = @_;
+            $res .= $chunk;
+          }
+        );
+        my $write = $stream->on(
+          write => sub {
+            my ($stream, $chunk) = @_;
+            $req .= $chunk;
+          }
+        );
+        $tx->on(
+          finish => sub {
+            $stream->unsubscribe(read  => $read);
+            $stream->unsubscribe(write => $write);
+          }
+        );
+      }
+    );
+  }
+);
+$tx = $ua->get('/', 'whatever');
+ok $tx->success, 'successful';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
+is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('write')}, 1,
+  'unsubscribed successfully';
+is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')}, 2,
+  'unsubscribed successfully';
+like $req, qr#^GET / .*whatever$#s,      'right request';
+like $res, qr#^HTTP/.*200 OK.*works!$#s, 'right response';
+$ua->unsubscribe(start => $start);
+ok !$ua->has_subscribers('start'), 'unsubscribed successfully';
+
 # GET /echo (stream with drain callback)
 my $stream = 0;
 $tx = $ua->build_tx(GET => '/echo');
@@ -187,8 +231,8 @@ $drain = sub {
 $tx->req->$drain;
 $ua->start($tx);
 ok $tx->success, 'successful';
-ok !$tx->error,      'no error';
-ok !$tx->kept_alive, 'kept connection not alive';
+ok !$tx->error, 'no error';
+ok $tx->kept_alive, 'kept connection alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, '0123456789', 'right content';

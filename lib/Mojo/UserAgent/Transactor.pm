@@ -209,7 +209,7 @@ sub redirect {
     $headers->remove('Cookie');
     $headers->remove('Referer');
   }
-  else { $method = 'GET' unless $method =~ /^GET|HEAD$/i }
+  else { $method = 'GET' unless $method ~~ [qw/GET HEAD/] }
   $new->req->method($method)->url($location);
   $new->previous($old);
 

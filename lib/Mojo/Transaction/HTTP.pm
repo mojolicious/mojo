@@ -14,7 +14,7 @@ sub client_read {
 
   # HEAD response
   my $res = $self->res;
-  if ($self->req->method =~ /^HEAD$/i) {
+  if ($self->req->method eq 'HEAD') {
     $res->parse_until_body($chunk);
     $self->{state} = 'finished' if $res->content->is_parsing_body;
   }
@@ -239,9 +239,7 @@ sub _headers {
   if ($self->{write} <= 0) {
 
     # HEAD request
-    if ($head && $self->req->method =~ /^head$/i) {
-      $self->{state} = 'finished';
-    }
+    if ($head && $self->req->method eq 'HEAD') { $self->{state} = 'finished' }
 
     # Body
     else {

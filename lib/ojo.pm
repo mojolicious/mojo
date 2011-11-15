@@ -41,12 +41,12 @@ sub import {
   *{"${caller}::oO"} = sub { _request(@_) };
   *{"${caller}::a"} =
     sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
-  *{"${caller}::d"} = sub { _request('delete',    @_) };
-  *{"${caller}::f"} = sub { _request('post_form', @_) };
-  *{"${caller}::g"} = sub { _request('get',       @_) };
-  *{"${caller}::h"} = sub { _request('head',      @_) };
-  *{"${caller}::p"} = sub { _request('post',      @_) };
-  *{"${caller}::u"} = sub { _request('put',       @_) };
+  *{"${caller}::d"} = sub { _request('DELETE', @_) };
+  *{"${caller}::f"} = sub { _request('FORM',   @_) };
+  *{"${caller}::g"} = sub { _request('GET',    @_) };
+  *{"${caller}::h"} = sub { _request('HEAD',   @_) };
+  *{"${caller}::p"} = sub { _request('POST',   @_) };
+  *{"${caller}::u"} = sub { _request('PUT',    @_) };
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
 }
 
@@ -54,13 +54,13 @@ sub import {
 sub _request {
 
   # Method
-  my $method = $_[0] =~ m#:|/# ? 'get' : lc shift;
+  my $method = $_[0] =~ m#:|/# ? 'GET' : shift;
 
   # Transaction
   my $tx =
-      $method eq 'post_form'
+      $method eq 'FORM'
     ? $UA->build_form_tx(@_)
-    : $UA->build_tx($method, @_);
+    : $UA->build_tx($method => @_);
 
   # Process
   $tx = $UA->start($tx);

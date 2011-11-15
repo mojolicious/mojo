@@ -4,7 +4,7 @@ use Mojo::Base -base;
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
   \[
-  (?<key>(?:$ESCAPE_RE|\w)+)                            # Key
+  (?<key>(?:$ESCAPE_RE|[\w-])+)                         # Key
   (?:
     (?<op>\W)?                                          # Operator
     =

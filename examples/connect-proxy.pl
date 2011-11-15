@@ -12,50 +12,63 @@ use Mojo::IOLoop;
 my $c = {};
 
 # Minimal connect proxy server to test TLS tunneling
-Mojo::IOLoop->listen(
-  port    => 3000,
-  on_read => sub {
-    my ($loop, $client, $chunk) = @_;
-    if (my $server = $c->{$client}->{connection}) {
-      return $loop->write($server, $chunk);
-    }
-    $c->{$client}->{client} //= '';
-    $c->{$client}->{client} .= $chunk if defined $chunk;
-    if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-      my $buffer = $c->{$client}->{client};
-      $c->{$client}->{client} = '';
-      if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
-        my $address = $1;
-        my $port    = $2 || 80;
-        my $server  = $loop->connect(
-          address    => $address,
-          port       => $port,
-          on_connect => sub {
-            my ($loop, $server) = @_;
-            say "Forwarding to $address:$port.";
-            $c->{$client}->{connection} = $server;
-            $loop->write($client,
-                  "HTTP/1.1 200 OK\x0d\x0a"
-                . "Connection: keep-alive\x0d\x0a\x0d\x0a");
-          },
-          on_read => sub {
-            my ($loop, $server, $chunk) = @_;
-            $loop->write($client, $chunk);
-          },
-          on_error => sub {
-            shift->drop($client);
-            delete $c->{$client};
+Mojo::IOLoop->server(
+  {port => 3000} => sub {
+    my ($loop, $stream, $client) = @_;
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        if (my $server = $c->{$client}->{connection}) {
+          return Mojo::IOLoop->stream($server)->write($chunk);
+        }
+        $c->{$client}->{client} //= '';
+        $c->{$client}->{client} .= $chunk;
+        if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
+          my $buffer = $c->{$client}->{client};
+          $c->{$client}->{client} = '';
+          if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
+            my $address = $1;
+            my $port = $2 || 80;
+            my $server;
+            $server = Mojo::IOLoop->client(
+              {address => $address, port => $port} => sub {
+                my ($loop, $stream, $error) = @_;
+                if ($error) {
+                  say "Connection error for $address:$port: $error";
+                  Mojo::IOLoop->drop($client);
+                  return delete $c->{$client};
+                }
+                say "Forwarding to $address:$port.";
+                $c->{$client}->{connection} = $server;
+                $stream->on(
+                  read => sub {
+                    my ($stream, $chunk) = @_;
+                    Mojo::IOLoop->stream($client)->write($chunk);
+                  }
+                );
+                $stream->on(
+                  close => sub {
+                    Mojo::IOLoop->drop($client);
+                    delete $c->{$client};
+                  }
+                );
+                Mojo::IOLoop->stream($client)
+                  ->write("HTTP/1.1 200 OK\x0d\x0a"
+                    . "Connection: keep-alive\x0d\x0a\x0d\x0a");
+              }
+            );
           }
-        );
+        }
+        else { Mojo::IOLoop->drop($client) }
       }
-      else { $loop->drop($client) }
-    }
-  },
-  on_error => sub {
-    my ($self, $client) = @_;
-    shift->drop($c->{$client}->{connection})
-      if $c->{$client}->{connection};
-    delete $c->{$client};
+    );
+    $stream->on(
+      close => sub {
+        Mojo::IOLoop->drop($c->{$client}->{connection})
+          if $c->{$client}->{connection};
+        delete $c->{$client};
+      }
+    );
   }
 ) or die "Couldn't create listen socket!\n";
 

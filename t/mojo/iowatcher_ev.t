@@ -28,11 +28,7 @@ my $listen = IO::Socket::INET->new(
 my $watcher = Mojo::IOWatcher::EV->new;
 isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 my ($readable, $writable);
-$watcher->watch(
-  $listen,
-  on_readable => sub { $readable++ },
-  on_writable => sub { $writable++ }
-);
+$watcher->watch($listen, sub { $readable++ }, sub { $writable++ });
 $watcher->timer(0 => sub { shift->stop });
 $watcher->start;
 is $readable, undef, 'handle is not readable';
@@ -52,11 +48,7 @@ $watcher = undef;
 $watcher = Mojo::IOWatcher::EV->new;
 isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 ($readable, $writable) = undef;
-$watcher->watch(
-  $client,
-  on_readable => sub { $readable++ },
-  on_writable => sub { $writable++ }
-);
+$watcher->watch($client, sub { $readable++ }, sub { $writable++ });
 $watcher->timer(0 => sub { shift->stop });
 $watcher->start;
 is $readable, undef, 'handle is not readable';
@@ -67,11 +59,7 @@ $watcher = undef;
 $watcher = Mojo::IOWatcher::EV->new;
 isa_ok $watcher, 'Mojo::IOWatcher::EV', 'right object';
 ($readable, $writable) = undef;
-$watcher->watch(
-  $server,
-  on_readable => sub { $readable++ },
-  on_writable => sub { $writable++ }
-);
+$watcher->watch($server, sub { $readable++ }, sub { $writable++ });
 $watcher->change($server, 1, 0);
 $watcher->timer(0 => sub { shift->stop });
 $watcher->start;
@@ -93,11 +81,7 @@ $watcher->start;
 is $readable, 3, 'handle is readable';
 is $writable, 1, 'handle is not writable';
 ($readable, $writable) = undef;
-$watcher->watch(
-  $server,
-  on_readable => sub { $readable++ },
-  on_writable => sub { $writable++ }
-);
+$watcher->watch($server, sub { $readable++ }, sub { $writable++ });
 $watcher->timer(0 => sub { shift->stop });
 $watcher->start;
 is $readable, 1, 'handle is readable';

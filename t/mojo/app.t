@@ -32,22 +32,23 @@ my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app($app);
 # Continue
 my $port   = $ua->test_server->port;
 my $buffer = '';
-Mojo::IOLoop->connect(
-  address    => 'localhost',
-  port       => $port,
-  on_connect => sub {
-    my ($self, $id, $chunk) = @_;
-    $self->write($id,
-          "GET /1/ HTTP/1.1\x0d\x0a"
+my $id;
+$id = Mojo::IOLoop->client(
+  {port => $port} => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        $buffer .= $chunk;
+        Mojo::IOLoop->drop($id) and Mojo::IOLoop->stop
+          if $buffer =~ /Mojo is working!/;
+        $stream->write('4321')
+          if $buffer =~ m#HTTP/1.1 100 Continue.*\x0d\x0a\x0d\x0a#gs;
+      }
+    );
+    $stream->write("GET /1/ HTTP/1.1\x0d\x0a"
         . "Expect: 100-continue\x0d\x0a"
         . "Content-Length: 4\x0d\x0a\x0d\x0a");
-  },
-  on_read => sub {
-    my ($self, $id, $chunk) = @_;
-    $buffer .= $chunk;
-    $self->drop($id) and $self->stop if $buffer =~ /Mojo is working!/;
-    $self->write($id, '4321')
-      if $buffer =~ m#HTTP/1.1 100 Continue.*\x0d\x0a\x0d\x0a#gs;
   }
 );
 Mojo::IOLoop->start;
@@ -55,21 +56,21 @@ like $buffer, qr#HTTP/1.1 100 Continue#, 'request was continued';
 
 # Pipelined
 $buffer = '';
-Mojo::IOLoop->connect(
-  address    => 'localhost',
-  port       => $port,
-  on_connect => sub {
-    my ($self, $id) = @_;
-    $self->write($id,
-          "GET /2/ HTTP/1.1\x0d\x0a"
+$id     = Mojo::IOLoop->client(
+  {port => $port} => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        $buffer .= $chunk;
+        Mojo::IOLoop->drop($id) and Mojo::IOLoop->stop
+          if $buffer =~ /Mojo.*Mojo/gs;
+      }
+    );
+    $stream->write("GET /2/ HTTP/1.1\x0d\x0a"
         . "Content-Length: 0\x0d\x0a\x0d\x0a"
         . "GET /3/ HTTP/1.1\x0d\x0a"
         . "Content-Length: 0\x0d\x0a\x0d\x0a");
-  },
-  on_read => sub {
-    my ($self, $id, $chunk) = @_;
-    $buffer .= $chunk;
-    $self->drop($id) and $self->stop if $buffer =~ /Mojo.*Mojo/gs;
   }
 );
 Mojo::IOLoop->start;

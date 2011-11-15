@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use Mojo::IOLoop;
 
@@ -36,6 +36,14 @@ for my $i (0, 0) {
 @results = $delay->wait;
 is_deeply $finished, [0, 0, 'works!'], 'right results';
 is_deeply \@results, [0, 0], 'right results';
+
+# Context
+$delay = Mojo::IOLoop::Delay->new;
+for my $i (3, 3) {
+  $delay->begin;
+  Mojo::IOLoop->defer(sub { $delay->end($i) });
+}
+is $delay->wait, 3, 'right results';
 
 # Mojo::IOLoop
 $finished = undef;

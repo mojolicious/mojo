@@ -68,11 +68,10 @@ sub stop { delete shift->{running} }
 sub timer { shift->_timer(pop, after => pop, started => time) }
 
 sub watch {
-  my $self   = shift;
-  my $handle = shift;
-  my $args   = {@_, handle => $handle};
-  $self->{handles}->{fileno $handle} = $args;
-  $self->change($handle, 1, $args->{on_writable});
+  my ($self, $handle, $read, $write) = @_;
+  $self->{handles}->{fileno $handle} =
+    {handle => $handle, read => $read, write => $write};
+  $self->change($handle, 1, $write);
   return $self;
 }
 
@@ -93,9 +92,9 @@ sub _one_tick {
   my $poll = $self->_poll;
   $poll->poll('0.025');
   my $handles = $self->{handles};
-  $self->_sandbox('Read', $handles->{fileno $_}->{on_readable}, $_)
+  $self->_sandbox('Read', $handles->{fileno $_}->{read}, $_)
     for $poll->handles(POLLIN | POLLHUP | POLLERR);
-  $self->_sandbox('Write', $handles->{fileno $_}->{on_writable}, $_)
+  $self->_sandbox('Write', $handles->{fileno $_}->{write}, $_)
     for $poll->handles(POLLOUT);
 
   # Wait for timeout
@@ -143,7 +142,7 @@ Mojo::IOWatcher - Non-blocking I/O watcher
 
   # Watch if handle becomes readable
   my $watcher = Mojo::IOWatcher->new;
-  $watcher->watch($handle, on_readable => sub {
+  $watcher->watch($handle => sub {
     my ($watcher, $handle) = @_;
     ...
   });
@@ -232,23 +231,10 @@ Create a new timer, invoking the callback after a given amount of seconds.
 
 =head2 C<watch>
 
-  $watcher = $watcher->watch($handle, on_readable => sub {...});
+  $watcher = $watcher->watch($handle, sub {...});
+  $watcher = $watcher->watch($handle, sub {...}, sub {...});
 
 Watch handle for I/O events.
-
-These options are currently available:
-
-=over 2
-
-=item C<on_readable>
-
-Callback to be invoked once the handle becomes readable.
-
-=item C<on_writable>
-
-Callback to be invoked once the handle becomes writable.
-
-=back
 
 =head1 DEBUGGING
 

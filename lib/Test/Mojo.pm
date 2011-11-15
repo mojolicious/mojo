@@ -17,22 +17,7 @@ $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
 #  How come you guys can go to the moon but can't make my shoes smell good?"
 sub new {
   my $self = shift->SUPER::new;
-
-  # Application
-  if (@_ % 2) { $self->app(shift) }
-
-  # DEPRECATED in Smiling Face With Sunglasses!
-  elsif (@_) {
-    warn <<EOF;
-Test::Mojo->new(app => 'MyApp') is DEPRECATED in favor of
-Test::Mojo->new('MyApp')!
-EOF
-    my $args = {@_};
-    for my $key (qw/app max_redirects tx ua/) {
-      $self->$key($args->{$key}) if $args->{$key};
-    }
-  }
-
+  $self->app(shift) if @_;
   return $self;
 }
 

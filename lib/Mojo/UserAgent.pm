@@ -133,8 +133,7 @@ sub start {
   $self->_start($tx, sub { $tx = $_[1] });
 
   # Start loop
-  my $loop = $self->ioloop;
-  $loop->start;
+  $self->ioloop->start;
 
   return $tx;
 }
@@ -187,8 +186,9 @@ sub _cache {
       my $id = $cached->[1];
 
       # Drop corrupted connection
-      if ($loop->test($id)) { $result = $id }
-      else                  { $loop->drop($id) }
+      my $stream = $loop->stream($id);
+      if ($stream && !$stream->is_readable) { $result = $id }
+      else                                  { $loop->drop($id) }
     }
 
     # Cache again
@@ -223,11 +223,9 @@ sub _connect {
   my ($self, $tx, $cb) = @_;
 
   # Keep alive connection
-  my $loop = $self->_loop;
-  my $id   = $tx->connection;
+  my $id = $tx->connection;
   my ($scheme, $host, $port) = $self->transactor->peer($tx);
   $id ||= $self->_cache("$scheme:$host:$port");
-  weaken $self;
   if ($id && !ref $id) {
     warn "KEEP ALIVE CONNECTION ($scheme:$host:$port)\n" if DEBUG;
     $self->{connections}->{$id} = {cb => $cb, transaction => $tx};
@@ -245,22 +243,27 @@ sub _connect {
 
     # Connect
     warn "NEW CONNECTION ($scheme:$host:$port)\n" if DEBUG;
-    $id = $loop->connect(
+    weaken $self;
+    $id = $self->_loop->client(
       address  => $host,
       port     => $port,
       handle   => $id,
       tls      => $scheme eq 'https' ? 1 : 0,
       tls_cert => $self->cert,
       tls_key  => $self->key,
-      on_connect => sub { $self->_connected($_[1]) }
+      sub {
+        my ($loop, $stream, $error) = @_;
+
+        # Events
+        return $self->_error($id, $error) if $error;
+        $stream->on(close => sub { $self->_handle($id, 1) });
+        $stream->on(error => sub { $self->_error($id, pop) });
+        $stream->on(read => sub { $self->_read($id, pop) });
+        $self->_connected($id);
+      }
     );
     $self->{connections}->{$id} = {cb => $cb, transaction => $tx};
   }
-
-  # Events
-  $loop->on_close($id => sub { $self->_handle(pop, 1) });
-  $loop->on_error($id => sub { $self->_error(@_) });
-  $loop->on_read($id => sub { $self->_read(@_) });
 
   return $id;
 }
@@ -269,18 +272,19 @@ sub _connected {
   my ($self, $id) = @_;
 
   # Store connection information in transaction
-  my $loop = $self->_loop;
-  my $tx   = $self->{connections}->{$id}->{transaction};
+  my $tx = $self->{connections}->{$id}->{transaction};
   $tx->connection($id);
-  my $local = $loop->local_info($id);
-  $tx->local_address($local->{address});
-  $tx->local_port($local->{port});
-  my $remote = $loop->remote_info($id);
-  $tx->remote_address($remote->{address});
-  $tx->remote_port($remote->{port});
-  $loop->connection_timeout($id => $self->keep_alive_timeout);
+  my $loop   = $self->_loop;
+  my $handle = $loop->stream($id)->handle;
+  $tx->local_address($handle->sockhost);
+  $tx->local_port($handle->sockport);
+  $tx->remote_address($handle->peerhost);
+  $tx->remote_port($handle->peerport);
+  $loop->timeout($id => $self->keep_alive_timeout);
 
-  # Write
+  # Start writing
+  weaken $self;
+  $tx->on(resume => sub { $self->_write($id) });
   $self->_write($id);
 }
 
@@ -303,7 +307,7 @@ sub _drop {
 }
 
 sub _error {
-  my ($self, $loop, $id, $error) = @_;
+  my ($self, $id, $error) = @_;
   if (my $tx = $self->{connections}->{$id}->{transaction}) {
     $tx->res->error($error);
   }
@@ -392,12 +396,33 @@ sub _proxy_connect {
       # TLS upgrade
       if ($tx->req->url->scheme eq 'https') {
         return unless my $id = $tx->connection;
-        $self->_loop->start_tls(
-          $id => (tls_cert => $self->cert, tls_key => $self->key));
         $old->req->proxy(undef);
+        my $loop   = $self->_loop;
+        my $handle = $loop->stream($id)->steal_handle;
+        weaken $self;
+        return $loop->client(
+          handle   => $handle,
+          id       => $id,
+          tls      => 1,
+          tls_cert => $self->cert,
+          tls_key  => $self->key,
+          sub {
+            my ($loop, $stream, $error) = @_;
+
+            # Events
+            return $self->_error($id, $error) if $error;
+            $stream->on(close => sub { $self->_handle($id, 1) });
+            $stream->on(error => sub { $self->_error($id, pop) });
+            $stream->on(read => sub { $self->_read($id, pop) });
+
+            # Start real transaction
+            $old->connection($tx->connection);
+            $self->_start($old, $cb);
+          }
+        );
       }
 
-      # Share connection and start real transaction
+      # Start real transaction
       $old->connection($tx->connection);
       $self->_start($old, $cb);
     }
@@ -407,7 +432,7 @@ sub _proxy_connect {
 }
 
 sub _read {
-  my ($self, $loop, $id, $chunk) = @_;
+  my ($self, $id, $chunk) = @_;
   warn "< $chunk\n" if DEBUG;
 
   # Corrupted connection
@@ -428,8 +453,7 @@ sub _redirect {
 
   # Max redirects
   my $redirects = $c->{redirects} || 0;
-  my $max = $self->max_redirects;
-  return unless $redirects < $max;
+  return unless $redirects < $self->max_redirects;
 
   # Start redirected request
   return 1 unless my $id = $self->_start($new, $c->{cb});
@@ -475,9 +499,6 @@ sub _start {
   # Connect
   $self->emit(start => $tx);
   return unless my $id = $self->_connect($tx, $cb);
-  weaken $self;
-  $tx->on(resume => sub { $self->_write($id) });
-  $self->{processing} ||= 0;
   $self->{processing} += 1;
 
   return $id;
@@ -526,7 +547,7 @@ sub _upgrade {
   $res->error('WebSocket challenge failed.') and return
     unless $new->client_challenge;
   $c->{transaction} = $new;
-  $self->_loop->connection_timeout($id, $self->websocket_timeout);
+  $self->_loop->timeout($id, $self->websocket_timeout);
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });
 
@@ -540,7 +561,10 @@ sub _write {
   return unless my $c  = $self->{connections}->{$id};
   return unless my $tx = $c->{transaction};
   return unless $tx->is_writing;
+  return if $self->{writing}++;
   my $chunk = $tx->client_write;
+  delete $self->{writing};
+  warn "> $chunk\n" if DEBUG;
 
   # More data to follow
   my $cb;
@@ -550,8 +574,7 @@ sub _write {
   }
 
   # Write data
-  $self->_loop->write($id, $chunk, $cb);
-  warn "> $chunk\n"   if DEBUG;
+  $self->_loop->stream($id)->write($chunk, $cb);
   $self->_handle($id) if $tx->is_finished;
 }
 

@@ -33,6 +33,11 @@ sub new {
 
 sub handle { shift->{handle} }
 
+sub is_readable {
+  my $self = shift;
+  return $self->iowatcher->is_readable($self->{handle});
+}
+
 sub is_writing {
   my $self = shift;
   return length($self->{buffer}) || $self->has_subscribers('drain');
@@ -52,8 +57,8 @@ sub resume {
     weaken $self;
     return $self->iowatcher->watch(
       $self->{handle},
-      on_readable => sub { $self->_read },
-      on_writable => sub { $self->_write }
+      sub { $self->_read },
+      sub { $self->_write }
     );
   }
 
@@ -138,7 +143,7 @@ sub _write {
     }
 
     # Remove written chunk from buffer
-    substr $self->{buffer}, 0, $written, '';
+    $self->emit_safe(write => substr($self->{buffer}, 0, $written, ''));
   }
 
   # Handle drain
@@ -221,6 +226,14 @@ Emitted if an error happens on the stream.
 
 Emitted if new data arrives on the stream.
 
+=head2 C<write>
+
+  $stream->on(write => sub {
+    my ($stream, $chunk) = @_;
+  });
+
+Emitted if new data has been written to the stream.
+
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop::Stream> implements the following attributes.
@@ -249,6 +262,12 @@ Construct a new L<Mojo::IOLoop::Stream> object.
   my $handle = $stream->handle;
 
 Get handle for stream.
+
+=head2 C<is_readable>
+
+  my $success = $stream->is_readable;
+
+Quick check if stream is readable, useful for identifying tainted sockets.
 
 =head2 C<is_writing>
 

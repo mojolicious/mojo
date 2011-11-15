@@ -24,13 +24,14 @@ my $xml = <<'EOF';
 EOF
 
 # Flash policy server
-Mojo::IOLoop->listen(
-  port    => 843,
-  on_read => sub {
-    my ($loop, $id) = @_;
-
-    # Write XML
-    $loop->write($id, $xml, sub { shift->drop($id) });
+Mojo::IOLoop->server(
+  {port => 843} => sub {
+    my ($loop, $stream, $id) = @_;
+    $stream->on(
+      read => sub {
+        shift->write($xml, sub { Mojo::IOLoop->drop($id) });
+      }
+    );
   }
 ) or die "Couldn't create listen socket!\n";
 

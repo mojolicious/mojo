@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 55;
+use Test::More tests => 59;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -25,7 +25,7 @@ get '/' => {text => 'works!'};
 my $timeout = undef;
 get '/timeout' => sub {
   my $self = shift;
-  Mojo::IOLoop->connection_timeout($self->tx->connection => '0.5');
+  Mojo::IOLoop->timeout($self->tx->connection => '0.5');
   $self->on(finish => sub { $timeout = 1 });
   $self->render_later;
 };
@@ -35,6 +35,12 @@ get '/no_length' => sub {
   my $self = shift;
   $self->finish('works too!');
   $self->rendered(200);
+};
+
+# GET /echo
+get '/echo' => sub {
+  my $self = shift;
+  $self->render_data($self->req->body);
 };
 
 # Proxy detection
@@ -101,31 +107,6 @@ ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
-# GET / (custom connection)
-($success, $code, $body) = undef;
-Mojo::IOLoop->connect(
-  address    => 'localhost',
-  port       => $ua->test_server->port,
-  on_connect => sub {
-    my ($loop, $id) = @_;
-    my $tx = $ua->build_tx(GET => 'http://mojolicio.us/');
-    $tx->connection($id);
-    $ua->start(
-      $tx => sub {
-        my $tx = pop;
-        $success = $tx->success;
-        $code    = $tx->res->code;
-        $body    = $tx->res->body;
-        Mojo::IOLoop->stop;
-      }
-    );
-  }
-);
-Mojo::IOLoop->start;
-ok $success, 'successful';
-is $code,    200, 'right status';
-is $body,    'works!', 'right content';
-
 # GET / (blocking)
 my $tx = $ua->get('/');
 ok $tx->success, 'successful';
@@ -183,6 +164,36 @@ ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close.', 'right error';
 is $timeout, 1, 'finish event has been emitted';
 
+# GET /echo (stream with drain callback)
+my $stream = 0;
+$tx = $ua->build_tx(GET => '/echo');
+my $i = 0;
+my $drain;
+$drain = sub {
+  my $req = shift;
+  return $ua->ioloop->timer(
+    '0.5' => sub {
+      $req->write_chunk('');
+      $tx->resume;
+      $stream
+        += @{Mojo::IOLoop->stream($tx->connection)->subscribers('drain')};
+    }
+  ) if $i >= 10;
+  $req->write_chunk($i++, $drain);
+  $tx->resume;
+  return unless my $id = $tx->connection;
+  $stream += @{Mojo::IOLoop->stream($id)->subscribers('drain')};
+};
+$tx->req->$drain;
+$ua->start($tx);
+ok $tx->success, 'successful';
+ok !$tx->error,      'no error';
+ok !$tx->kept_alive, 'kept connection not alive';
+ok $tx->keep_alive, 'keep connection alive';
+is $tx->res->code, 200,          'right status';
+is $tx->res->body, '0123456789', 'right content';
+is $stream, 1, 'no leaking subscribers';
+
 # Nested keep alive
 my @kept_alive;
 $ua->get(
@@ -234,10 +245,8 @@ is_deeply \@kept_alive, [1, 1], 'connections kept alive';
 
 # Premature connection close
 my $port = Mojo::IOLoop->generate_port;
-my $id   = Mojo::IOLoop->listen(
-  port      => $port,
-  on_accept => sub { shift->drop(shift) }
-);
+my $id =
+  Mojo::IOLoop->server({port => $port} => sub { Mojo::IOLoop->drop(pop) });
 $tx = $ua->get("http://localhost:$port/");
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close.', 'right error';

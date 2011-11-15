@@ -47,19 +47,6 @@ sub new {
   return $self;
 }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub add_after {
-  warn "Mojo::DOM->add_after is DEPRECATED in favor of Mojo::DOM->append!\n";
-  shift->append(@_);
-}
-
-# DEPRECATED in Smiling Face With Sunglasses!
-sub add_before {
-  warn
-    "Mojo::DOM->add_before is DEPRECATED in favor of Mojo::DOM->prepend!\n";
-  shift->prepend(@_);
-}
-
 sub all_text {
   my ($self, $trim) = @_;
   return $self->_text($self->tree, 1, defined $trim ? $trim : 1);
@@ -161,14 +148,6 @@ sub find {
   return Mojo::Collection->new(@$results);
 }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub inner_xml {
-  warn <<EOF;
-Mojo::DOM->inner_xml is DEPRECATED in favor of Mojo::DOM->content_xml!
-EOF
-  shift->content_xml(@_);
-}
-
 sub namespace {
   my $self = shift;
 
@@ -268,15 +247,6 @@ sub replace_content {
   splice @$tree, $start, $#$tree, @new;
 
   return $self;
-}
-
-# DEPRECATED in Smiling Face With Sunglasses!
-sub replace_inner {
-  warn <<EOF;
-Mojo::DOM->replace_inner is DEPRECATED in favor of
-Mojo::DOM->replace_content!
-EOF
-  shift->content_xml(@_);
 }
 
 sub root {

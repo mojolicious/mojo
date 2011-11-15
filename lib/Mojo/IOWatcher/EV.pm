@@ -46,9 +46,8 @@ sub _io {
   my ($self, $fd, $w, $revents) = @_;
   my $handles = $self->{handles};
   my $h       = $handles->{$fd};
-  $self->_sandbox('Read', $h->{on_readable}, $h->{handle})
-    if EV::READ &$revents;
-  $self->_sandbox('Write', $h->{on_writable}, $h->{handle})
+  $self->_sandbox('Read', $h->{read}, $h->{handle}) if EV::READ &$revents;
+  $self->_sandbox('Write', $h->{write}, $h->{handle})
     if EV::WRITE &$revents && $handles->{$fd};
 }
 

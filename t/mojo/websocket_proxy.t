@@ -64,49 +64,61 @@ my $nf =
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
-Mojo::IOLoop->listen(
-  port    => $proxy,
-  on_read => sub {
-    my ($loop, $client, $chunk) = @_;
-    if (my $server = $c->{$client}->{connection}) {
-      return $loop->write($server, $chunk);
-    }
-    $c->{$client}->{client} //= '';
-    $c->{$client}->{client} .= $chunk if defined $chunk;
-    if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-      my $buffer = $c->{$client}->{client};
-      $c->{$client}->{client} = '';
-      if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
-        $connected = "$1:$2";
-        $fail = 1 if $2 == $port + 1;
-        my $server = $loop->connect(
-          address    => $1,
-          port       => $fail ? $port : $2,
-          on_connect => sub {
-            my ($loop, $server) = @_;
-            $c->{$client}->{connection} = $server;
-            $loop->write($client, $fail ? $nf : $ok);
-          },
-          on_error => sub {
-            shift->drop($client);
-            delete $c->{$client};
-          },
-          on_read => sub {
-            my ($loop, $server, $chunk) = @_;
-            $read += length $chunk;
-            $sent += length $chunk;
-            $loop->write($client, $chunk);
+Mojo::IOLoop->server(
+  {port => $proxy} => sub {
+    my ($loop, $stream, $client) = @_;
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        if (my $server = $c->{$client}->{connection}) {
+          return Mojo::IOLoop->stream($server)->write($chunk);
+        }
+        $c->{$client}->{client} //= '';
+        $c->{$client}->{client} .= $chunk;
+        if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
+          my $buffer = $c->{$client}->{client};
+          $c->{$client}->{client} = '';
+          if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
+            $connected = "$1:$2";
+            $fail = 1 if $2 == $port + 1;
+            my $server;
+            $server = Mojo::IOLoop->client(
+              {address => $1, port => $fail ? $port : $2} => sub {
+                my ($loop, $stream, $error) = @_;
+                if ($error) {
+                  Mojo::IOLoop->drop($client);
+                  return delete $c->{$client};
+                }
+                $c->{$client}->{connection} = $server;
+                $stream->on(
+                  read => sub {
+                    my ($stream, $chunk) = @_;
+                    $read += length $chunk;
+                    $sent += length $chunk;
+                    Mojo::IOLoop->stream($client)->write($chunk);
+                  }
+                );
+                $stream->on(
+                  close => sub {
+                    Mojo::IOLoop->drop($client);
+                    delete $c->{$client};
+                  }
+                );
+                Mojo::IOLoop->stream($client)->write($fail ? $nf : $ok);
+              }
+            );
           }
-        );
+        }
+        else { Mojo::IOLoop->drop($client) }
       }
-      else { $loop->drop($client) }
-    }
-  },
-  on_error => sub {
-    my ($self, $client) = @_;
-    shift->drop($c->{$client}->{connection})
-      if $c->{$client}->{connection};
-    delete $c->{$client};
+    );
+    $stream->on(
+      close => sub {
+        Mojo::IOLoop->drop($c->{$client}->{connection})
+          if $c->{$client}->{connection};
+        delete $c->{$client};
+      }
+    );
   }
 );
 

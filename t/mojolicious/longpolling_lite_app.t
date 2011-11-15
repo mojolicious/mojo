@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 119;
+use Test::More tests => 125;
 
 # "I was God once.
 #  Yes, I saw. You were doing well until everyone died."
@@ -214,6 +214,22 @@ get '/longpoll/dynamic/delayed' => sub {
   );
 } => 'dynamic';
 
+# GET /stream
+my $stream = 0;
+get '/stream' => sub {
+  my $self = shift;
+  my $i    = 0;
+  my $drain;
+  $drain = sub {
+    my $self = shift;
+    return $self->finish if $i >= 10;
+    $self->write_chunk($i++, $drain);
+    $stream
+      += @{Mojo::IOLoop->stream($self->tx->connection)->subscribers('drain')};
+  };
+  $self->$drain;
+};
+
 # GET /finish
 my $finish;
 get '/finish' => sub {
@@ -286,17 +302,17 @@ is $longpoll, 'finished!', 'finished';
 # GET /longpoll (interrupted)
 $longpoll = undef;
 my $port = $t->test_server->port;
-Mojo::IOLoop->connect(
-  address    => 'localhost',
-  port       => $port,
-  on_connect => sub {
-    my ($self, $id) = @_;
-    $self->write($id => "GET /longpoll HTTP/1.1\x0d\x0a\x0d\x0a");
-  },
-  on_read => sub {
-    my ($self, $id, $chunk) = @_;
-    $self->drop($id);
-    $self->timer('0.5', sub { Mojo::IOLoop->stop });
+Mojo::IOLoop->client(
+  {port => $port} => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        $stream->emit('close');
+        Mojo::IOLoop->timer('0.5', sub { Mojo::IOLoop->stop });
+      }
+    );
+    $stream->write("GET /longpoll HTTP/1.1\x0d\x0a\x0d\x0a");
   }
 );
 Mojo::IOLoop->start;
@@ -387,6 +403,13 @@ $t->get_ok('/longpoll/dynamic/delayed')->status_is(201)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_like('Set-Cookie' => qr/baz=yada/)->content_is('Dynamic!');
 is $longpoll_dynamic_delayed, 'finished!', 'finished';
+
+# GET /stream
+$t->get_ok('/stream')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('0123456789');
+is $stream, 0, 'no leaking subscribers';
 
 # GET /finish
 $t->get_ok('/finish')->status_is(200)

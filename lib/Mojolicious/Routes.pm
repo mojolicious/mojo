@@ -85,15 +85,6 @@ sub auto_render {
 
 sub bridge { shift->route(@_)->inline(1) }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub del {
-  warn <<EOF;
-Mojolicious::Routes->del is DEPRECATED in favor of
-Mojolicious::Routes->delete!
-EOF
-  shift->delete(@_);
-}
-
 sub delete { shift->_generate_route('delete', @_) }
 
 sub detour {

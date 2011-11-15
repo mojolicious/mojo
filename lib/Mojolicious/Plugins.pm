@@ -34,19 +34,6 @@ sub emit_hook_reverse {
 sub load_plugin {
   my ($self, $name) = @_;
 
-  # DEPRECATED in Smiling Face With Sunglasses!
-  my %special = (
-    ep_render    => 'EPRenderer',
-    epl_renderer => 'EPLRenderer',
-    i18n         => 'I18N',
-    json_config  => 'JSONConfig',
-    pod_renderer => 'PODRenderer'
-  );
-  if (my $new = $special{$name}) {
-    warn qq/Plugin "$name" is DEPRECATED in favor of "$new"!\n/;
-    $name = $new;
-  }
-
   # Try all namspaces
   my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
   for my $namespace (@{$self->namespaces}) {

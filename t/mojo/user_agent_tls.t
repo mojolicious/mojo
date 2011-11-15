@@ -28,22 +28,31 @@ $ua->log->level('fatal');
 # Server
 my $port = $ua->ioloop->generate_port;
 my $error;
-my $id = $ua->ioloop->listen(
+my %args = (
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/server.crt',
   tls_key  => 't/mojo/certs/server.key',
-  tls_ca   => 't/mojo/certs/ca.crt',
-  on_read  => sub {
-    my ($loop, $id) = @_;
-    $loop->write($id => "HTTP/1.1 200 OK\x0d\x0a"
-        . "Connection: keep-alive\x0d\x0a"
-        . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
-    $loop->drop($id);
-  },
-  on_error => sub {
-    shift->drop(shift);
-    $error = shift;
+  tls_ca   => 't/mojo/certs/ca.crt'
+);
+my $id = $ua->ioloop->server(
+  %args => sub {
+    my ($loop, $stream, $id) = @_;
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        $stream->write("HTTP/1.1 200 OK\x0d\x0a"
+            . "Connection: keep-alive\x0d\x0a"
+            . "Content-Length: 6\x0d\x0a\x0d\x0aworks!");
+        $loop->drop($id);
+      }
+    );
+    $stream->on(
+      error => sub {
+        $loop->drop($id);
+        $error = pop;
+      }
+    );
   }
 );
 

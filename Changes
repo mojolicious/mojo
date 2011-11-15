@@ -1,9 +1,19 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.27    2011-11-12 00:00:00
+2.27    2011-11-15 00:00:00
+        - Deprecated Mojo::IOLoop->connect in favor of Mojo::IOLoop->client.
+        - Deprecated Mojo::IOLoop->listen in favor of Mojo::IOLoop->server.
+        - Deprecated Mojo::IOLoop->connection_timeout in favor of
+          Mojo::IOLoop->timeout.
+        - Deprecated Mojo::IOLoop->write in favor of
+          Mojo::IOLoop::Stream->write.
+        - Deprecated on_* methods in Mojo::IOLoop.
+        - Added EXPERIMENTAL is_readable method to Mojo::IOLoop::Stream.
         - Added EXPERIMENTAL charset method to Mojo::Content.
+        - Added EXPERIMENTAL write event to Mojo::IOLoop::Stream.
         - Improved documentation.
         - Improved CSS of some built-in templates.
+        - Fixed multiple drain callback bugs.
 
 2.26    2011-11-10 00:00:00
         - Added EXPERIMENTAL upgrade event to Mojo::Asset::Memory.

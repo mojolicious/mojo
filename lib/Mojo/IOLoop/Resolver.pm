@@ -196,19 +196,19 @@ sub resolve {
     if $ENV{MOJO_NO_RESOLVER} || !$server || !$req;
 
   # Send request
-  warn "RESOLVE $type $name ($server)\n" if DEBUG;
-  $self->_bind($server);
+  warn "RESOLVE $id $type $name ($server)\n" if DEBUG;
   $self->{requests}->{$id} = {
     cb    => $cb,
     timer => $loop->timer(
       $self->timeout => sub {
-        warn "RESOLVE TIMEOUT ($server)\n" if DEBUG;
+        return unless $self->{requests}->{$id};
+        warn "RESOLVE TIMEOUT $id ($server)\n" if DEBUG;
         $CURRENT_SERVER++;
         $self->_cleanup;
       }
     )
   };
-  $loop->write($self->{id} => $req);
+  $self->_start($server, $req);
 }
 
 # "I wonder where Bart is, his dinner's getting all cold... and eaten."
@@ -229,44 +229,15 @@ sub servers {
   return $SERVERS->[$CURRENT_SERVER];
 }
 
-sub _bind {
-  my ($self, $server) = @_;
-
-  # Reuse socket
-  return if $self->{id};
-
-  # New socket
-  weaken $self;
-  $self->{id} = $self->ioloop->connect(
-    address  => $server,
-    port     => 53,
-    on_close => sub { $self->_cleanup },
-    on_error => sub {
-      warn "RESOLVE FAILURE ($server)\n" if DEBUG;
-      $CURRENT_SERVER++;
-      $self->_cleanup;
-    },
-    on_read => sub {
-
-      # Parse response
-      my ($id, $answers) = $self->parse(pop);
-      warn 'ANSWERS ', scalar(@$answers), " ($server)\n" if DEBUG;
-
-      # Finish request
-      return unless my $r = delete $self->{requests}->{$id};
-      shift->drop($r->{timer});
-      $r->{cb}->($self, $answers);
-    },
-    args => {Proto => 'udp', Type => SOCK_DGRAM}
-  );
-}
-
 # "Mrs. Simpson, bathroom is not for customers.
 #  Please use the crack house across the street."
 sub _cleanup {
   my $self = shift;
+
+  delete $self->{started};
   return unless my $loop = $self->ioloop;
   $loop->drop(delete $self->{id}) if $self->{id};
+
   for my $id (keys %{$self->{requests}}) {
     my $r = delete $self->{requests}->{$id};
     $r->{cb}->($self, []);
@@ -339,6 +310,59 @@ sub _parse_name {
   }
 
   return;
+}
+
+sub _start {
+  my ($self, $server, $req) = @_;
+
+  # Reuse socket
+  push @{$self->{buffer}}, $req;
+  return $self->_write if $self->{id};
+  $self->{buffer} = [$req];
+
+  # New socket
+  weaken $self;
+  my %args = (
+    address => $server,
+    port    => 53,
+    args    => {Proto => 'udp', Type => SOCK_DGRAM}
+  );
+  $self->{id} = $self->ioloop->client(
+    %args => sub {
+      my ($loop, $stream, $error) = @_;
+      if ($error) {
+        $CURRENT_SERVER++;
+        return $self->_cleanup;
+      }
+      $stream->on(close => sub { $self->_cleanup });
+      $stream->on(
+        error => sub {
+          warn "RESOLVE FAILURE ($server)\n" if DEBUG;
+          $CURRENT_SERVER++;
+          $self->_cleanup;
+        }
+      );
+      $stream->on(
+        read => sub {
+          my ($id, $answers) = $self->parse(pop);
+          return unless my $r = delete $self->{requests}->{$id};
+          warn "RESOLVED $id ($server)\n" if DEBUG;
+          $self->ioloop->drop($r->{timer});
+          $r->{cb}->($self, $answers);
+        }
+      );
+      $self->{started}++;
+      $self->_write;
+    }
+  );
+}
+
+sub _write {
+  my $self = shift;
+  return unless $self->{started};
+  my $stream = $self->ioloop->stream($self->{id});
+  $stream->write($_) for @{$self->{buffer}};
+  $self->{buffer} = [];
 }
 
 1;

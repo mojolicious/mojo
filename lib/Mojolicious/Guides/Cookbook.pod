@@ -332,7 +332,7 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     my $self = shift;
 
     # Increase connection timeout a bit
-    Mojo::IOLoop->connection_timeout($self->tx->connection => 300);
+    Mojo::IOLoop->timeout($self->tx->connection => 300);
 
     # Change content type
     $self->res->headers->content_type('text/event-stream');
@@ -491,7 +491,7 @@ Sending a streaming request is almost just as easy.
     $drain    = undef unless length $content;
     $req->write($chunk, $drain);
   };
-  $drain->($tx->req);
+  $tx->req->$drain;
 
   # Process transaction
   $ua->start($tx);

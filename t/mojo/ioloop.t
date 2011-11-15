@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 32;
+use Test::More tests => 30;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -107,55 +107,52 @@ ok $count > 3, 'more than three recurring events';
 # Handle
 my $port = Mojo::IOLoop->generate_port;
 my $handle;
-$loop->listen(
-  port      => $port,
-  on_accept => sub {
-    my $self = shift;
-    $handle = $self->stream(pop)->handle;
-    $self->stop;
-  },
-  on_read  => sub { },
-  on_error => sub { }
+$loop->server(
+  port => $port,
+  sub {
+    my ($loop, $stream) = @_;
+    $handle = $stream->handle;
+    $loop->stop;
+  }
 );
-$loop->connect(
-  address  => 'localhost',
-  port     => $port,
-  on_read  => sub { },
-  on_error => sub { }
-);
+$loop->client((address => 'localhost', port => $port) => sub { });
 $loop->start;
 isa_ok $handle, 'IO::Socket', 'right reference';
 
 # Stream
 $port = Mojo::IOLoop->generate_port;
 my $buffer = '';
-Mojo::IOLoop->listen(
-  port      => $port,
-  on_accept => sub { $buffer .= 'accepted' },
-  on_read   => sub {
-    my ($loop, $id, $chunk) = @_;
-    $buffer .= $chunk;
-    return unless $buffer eq 'acceptedhello';
-    $loop->write($id => 'world');
-    $loop->drop($id);
+Mojo::IOLoop->server(
+  port => $port,
+  sub {
+    my ($loop, $stream, $id) = @_;
+    $buffer .= 'accepted';
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        $buffer .= $chunk;
+        return unless $buffer eq 'acceptedhello';
+        $stream->write('world');
+        $stream->emit('close');
+      }
+    );
   }
 );
 my $delay = Mojo::IOLoop->delay;
-Mojo::IOLoop->connect(
-  address    => 'localhost',
-  port       => $port,
-  on_connect => $delay->begin,
-  on_close   => sub { $buffer .= 'should not happen' },
-  on_error   => sub { $buffer .= 'should not happen either' },
-);
-$handle = Mojo::IOLoop->stream($delay->wait)->steal_handle;
-my $stream = Mojo::IOLoop->singleton->stream_class->new($handle);
-$id = Mojo::IOLoop->stream(
-  $stream => {
-    on_close => sub { Mojo::IOLoop->stop },
-    on_read  => sub { $buffer .= pop }
+$delay->begin;
+Mojo::IOLoop->client(
+  {port => $port} => sub {
+    my ($loop, $stream, $error) = @_;
+    $delay->end($stream);
+    $stream->on(close => sub { $buffer .= 'should not happen' });
+    $stream->on(error => sub { $buffer .= 'should not happen either' });
   }
 );
+$handle = $delay->wait->steal_handle;
+my $stream = Mojo::IOLoop->singleton->stream_class->new($handle);
+$id = Mojo::IOLoop->stream($stream);
+$stream->on(close => sub { Mojo::IOLoop->stop });
+$stream->on(read => sub { $buffer .= pop });
 $stream->write('hello');
 ok Mojo::IOLoop->stream($id), 'stream exists';
 Mojo::IOLoop->start;
@@ -163,60 +160,46 @@ ok !Mojo::IOLoop->stream($id), 'stream does not exist anymore';
 is $buffer, 'acceptedhelloworld', 'right result';
 
 # Dropped listen socket
-$port  = Mojo::IOLoop->generate_port;
-$id    = $loop->listen({port => $port});
-$error = undef;
+$port = Mojo::IOLoop->generate_port;
+$id = $loop->server({port => $port} => sub { });
 my $connected;
-my %args = (
-  address    => 'localhost',
-  port       => $port,
-  on_connect => sub {
-    my $loop = shift;
+$loop->client(
+  {port => $port} => sub {
+    my ($loop, $stream) = @_;
     $loop->drop($id);
     $loop->stop;
     $connected = 1;
-  },
-  on_error => sub {
-    shift->stop;
-    $error = pop;
   }
 );
-$loop->connect(\%args);
 like $ENV{MOJO_REUSE}, qr/(?:^|\,)$port\:/, 'file descriptor can be reused';
 $loop->start;
 unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)$port\:/, 'environment is clean';
 ok $connected, 'connected';
-ok !$error, 'no error';
-$connected = $error = undef;
-$loop->connect(
-  address    => 'localhost',
-  port       => $port,
-  on_connect => sub {
-    shift->stop;
-    $connected = 1;
-  },
-  on_error => sub {
+$error = undef;
+$loop->client(
+  (port => $port) => sub {
     shift->stop;
     $error = pop;
   }
 );
 $loop->start;
-ok !$connected, 'not connected';
 ok $error, 'has error';
 
 # Dropped connection
 $port = Mojo::IOLoop->generate_port;
 my ($server_close, $client_close);
-Mojo::IOLoop->listen(
-  address  => 'localhost',
-  port     => $port,
-  on_close => sub { $server_close++ }
+Mojo::IOLoop->server(
+  (port => $port) => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(close => sub { $server_close++ });
+  }
 );
-Mojo::IOLoop->connect(
-  address    => 'localhost',
-  port       => $port,
-  on_close   => sub { $client_close++ },
-  on_connect => sub { shift->drop(shift) }
+$id = Mojo::IOLoop->client(
+  (port => $port) => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(close => sub { $client_close++ });
+    $loop->drop($id);
+  }
 );
 Mojo::IOLoop->timer('0.5' => sub { shift->stop });
 Mojo::IOLoop->start;

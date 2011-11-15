@@ -30,6 +30,7 @@ sub DESTROY {
 sub connect {
   my $self = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
+  $args->{address} ||= 'localhost';
 
   # Lookup
   if (!$args->{handle} && (my $address = $args->{address})) {
@@ -121,8 +122,8 @@ sub _connect {
   $self->{handle} = $handle;
   $watcher->watch(
     $handle,
-    on_readable => sub { $self->_connecting },
-    on_writable => sub { $self->_connecting }
+    sub { $self->_connecting },
+    sub { $self->_connecting }
   );
 }
 
@@ -242,6 +243,10 @@ Use an already prepared handle.
 =item C<port>
 
 Port to connect to.
+
+=item C<timeout>
+
+Maximum time in seconds a connection can take to be connected.
 
 =item C<tls>
 

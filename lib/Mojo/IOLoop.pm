@@ -512,7 +512,7 @@ L<Mojo::IOLoop> implements the following attributes.
   $loop     = $loop->client_class('Mojo::IOLoop::Client');
 
 Class to be used for performing non-blocking socket connections with the
-C<connect> method, defaults to L<Mojo::IOLoop::Client>.
+C<client> method, defaults to L<Mojo::IOLoop::Client>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<connect_timeout>
@@ -601,7 +601,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   my $class = $loop->server_class;
   $loop     = $loop->server_class('Mojo::IOLoop::Server');
 
-Class to be used for accepting incoming connections with the C<listen>
+Class to be used for accepting incoming connections with the C<server>
 method, defaults to L<Mojo::IOLoop::Server>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
@@ -666,7 +666,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<drop>
 
-  $loop = Mojo::IOLoop->drop($id)
+  $loop = Mojo::IOLoop->drop($id);
   $loop = $loop->drop($id);
 
 Drop anything with an id.

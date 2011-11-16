@@ -311,6 +311,7 @@ sub stream {
   weaken $stream->{iowatcher};
 
   # Events
+  weaken $self;
   $stream->on(close => sub { $self->{connections}->{$id}->{finish} = 1 });
   $stream->on(error => sub { $self->{connections}->{$id}->{finish} = 1 });
   $stream->on(read  => sub { $self->{connections}->{$id}->{active} = time });

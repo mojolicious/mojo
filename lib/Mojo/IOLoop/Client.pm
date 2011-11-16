@@ -32,20 +32,17 @@ sub connect {
   my $args = ref $_[0] ? $_[0] : {@_};
   $args->{address} ||= 'localhost';
 
-  # Lookup
-  if (!$args->{handle} && (my $address = $args->{address})) {
-    $self->resolver->lookup(
-      $address => sub {
-        $args->{address} = $_[1] || $args->{address};
-        $self->_connect($args);
-      }
-    );
-  }
-
   # Connect
-  else {
-    $self->resolver->ioloop->defer(sub { $self->_connect($args) });
-  }
+  return $self->resolver->ioloop->timer(0 => sub { $self->_connect($args) })
+    unless !$args->{handle} && (my $address = $args->{address});
+
+  # Lookup
+  $self->resolver->lookup(
+    $address => sub {
+      $args->{address} = $_[1] || $args->{address};
+      $self->_connect($args);
+    }
+  );
 }
 
 sub _cleanup {

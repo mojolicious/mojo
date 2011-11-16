@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 25;
+use Test::More tests => 26;
 
 # "Oh, I'm in no condition to drive. Wait a minute.
 #  I don't have to listen to myself. I'm drunk."
@@ -51,6 +51,8 @@ is $r2->servers->[0], '8.8.4.4', 'right server';
 
 # Lookup "localhost" (pass through)
 my $result;
+is $r->hosts->{localhost}, '127.0.0.1', 'right default';
+$r->hosts->{localhost} = '127.0.0.23';
 $r->lookup(
   'localhost',
   sub {
@@ -60,4 +62,4 @@ $r->lookup(
   }
 );
 Mojo::IOLoop->start;
-is $result, '127.0.0.1', 'got an address';
+is $result, '127.0.0.23', 'got an address';

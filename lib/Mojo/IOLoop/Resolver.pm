@@ -28,6 +28,7 @@ if (-r '/etc/resolv.conf') {
 }
 unshift @$SERVERS, $ENV{MOJO_DNS_SERVER} if $ENV{MOJO_DNS_SERVER};
 
+has hosts => sub { {localhost => '127.0.0.1'} };
 has ioloop => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton;
@@ -66,9 +67,6 @@ my $DNS_TYPES = {
   PTR   => 0x000c,
   TXT   => 0x0010
 };
-
-# "localhost"
-our $LOCALHOST = '127.0.0.1';
 
 sub DESTROY { shift->_cleanup }
 
@@ -112,10 +110,11 @@ sub is_ipv6 { pop =~ $IPV6_RE }
 sub lookup {
   my ($self, $name, $cb) = @_;
 
-  # "localhost"
+  # Known hosts
   weaken $self;
-  return $self->ioloop->defer(sub { $self->$cb($LOCALHOST) })
-    if $name eq 'localhost';
+  my $hosts = $self->hosts;
+  return $self->ioloop->defer(sub { $self->$cb($hosts->{$name}) })
+    if $hosts->{$name};
 
   # Resolve
   $self->resolve(
@@ -211,18 +210,18 @@ sub _cleanup {
   my ($self, $next) = @_;
 
   # Next server
-  push @{$self->servers}, shift @{$self->servers} if $next;
-
-  # Socket
+  if ($next) {
+    push @{$self->servers}, shift @{$self->servers};
+    warn "NEXT SERVER (" . $self->servers->[0] . ")\n" if DEBUG;
+  }
+  delete $self->{server};
   delete $self->{started};
   return unless my $loop = $self->ioloop;
   $loop->drop(delete $self->{id}) if $self->{id};
 
-  # Requests
-  for my $id (keys %{$self->{requests}}) {
-    my $r = delete $self->{requests}->{$id};
-    $r->{cb}->($self, []);
-  }
+  # Finish requests
+  return unless my $requests = delete $self->{requests};
+  $requests->{$_}->{cb}->($self, []) for keys %$requests;
 }
 
 sub _parse_answer {
@@ -311,12 +310,7 @@ sub _start {
       my ($loop, $stream, $error) = @_;
       return $self->_cleanup(1) if $error;
       $stream->on(close => sub { $self->_cleanup });
-      $stream->on(
-        error => sub {
-          warn "RESOLVE FAILURE ($server)\n" if DEBUG;
-          $self->_cleanup(1);
-        }
-      );
+      $stream->on(error => sub { $self->_cleanup(1) });
       $stream->on(
         read => sub {
           my ($id, $answers) = $self->parse(pop);
@@ -326,6 +320,7 @@ sub _start {
           $r->{cb}->($self, $answers);
         }
       );
+      $stream->resume;
       $self->{started}++;
       $self->_write;
     }
@@ -373,6 +368,13 @@ Note that this module is EXPERIMENTAL and might change without warning!
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop::Resolver> implements the following attributes.
+
+=head2 C<hosts>
+
+  my $hosts = $resolver->hosts;
+  $resolver = $resolver->hosts({localhost => '127.0.0.1'});
+
+Known hosts map used by C<lookup>.
 
 =head2 C<ioloop>
 

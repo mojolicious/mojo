@@ -10,12 +10,14 @@ This file documents the revision history for Perl extension Mojolicious.
         - Deprecated on_* methods in Mojo::IOLoop.
         - Replaced servers method in Mojo::IOLoop::Resolver with servers
           attribute.
+        - Added EXPERIMENTAL hosts attribute to Mojo::IOLoop::Resolver.
         - Added EXPERIMENTAL is_readable method to Mojo::IOLoop::Stream.
         - Added EXPERIMENTAL charset method to Mojo::Content.
         - Added EXPERIMENTAL write event to Mojo::IOLoop::Stream.
         - Added EXPERIMENTAL connection event to Mojo::Transaction.
         - Improved documentation.
         - Improved CSS of some built-in templates.
+        - Fixed many small memory leaks.
         - Fixed multiple drain callback bugs.
         - Fixed small attribute selector bug in Mojo::DOM::CSS. (tladesignz)
 

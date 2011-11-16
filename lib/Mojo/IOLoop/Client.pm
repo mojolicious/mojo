@@ -174,8 +174,7 @@ Mojo::IOLoop::Client - Non-blocking TCP client
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Client> opens non-blocking TCP connections for
-L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Client> opens TCP connections for L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS

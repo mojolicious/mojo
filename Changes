@@ -7,8 +7,11 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::IOLoop->timeout.
         - Deprecated Mojo::IOLoop->write in favor of
           Mojo::IOLoop::Stream->write.
+        - Deprecated Mojo::IOLoop->connect_timeout in favor of timeout
+          argument.
         - Deprecated on_* methods in Mojo::IOLoop.
         - Removed Mojo::IOLoop::Resolver.
+        - Added EXPERIMENTAL connect_timeout attribute to Mojo::UserAgent.
         - Added EXPERIMENTAL is_readable method to Mojo::IOLoop::Stream.
         - Added EXPERIMENTAL charset method to Mojo::Content.
         - Added EXPERIMENTAL write event to Mojo::IOLoop::Stream.

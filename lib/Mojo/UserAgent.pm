@@ -14,7 +14,8 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
 # "You can't let a single bad experience scare you away from drugs."
-has cert       => sub { $ENV{MOJO_CERT_FILE} };
+has cert => sub { $ENV{MOJO_CERT_FILE} };
+has connect_timeout => 3;
 has cookie_jar => sub { Mojo::CookieJar->new };
 has [qw/http_proxy https_proxy no_proxy/];
 has ioloop => sub { Mojo::IOLoop->new };
@@ -217,6 +218,7 @@ sub _connect {
     address  => $host,
     port     => $port,
     handle   => $id,
+    timeout  => $self->connect_timeout,
     tls      => $scheme eq 'https' ? 1 : 0,
     tls_cert => $self->cert,
     tls_key  => $self->key,
@@ -651,6 +653,15 @@ L<Mojo::UserAgent> implements the following attributes.
 
 Path to TLS certificate file, defaults to the value of the C<MOJO_CERT_FILE>
 environment variable.
+
+=head2 C<connect_timeout>
+
+  my $timeout = $ua->connect_timeout;
+  $ua         = $ua->connect_timeout(5);
+
+Maximum amount of time in seconds establishing a connection may take,
+defaults to C<3>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<cookie_jar>
 

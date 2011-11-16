@@ -13,9 +13,8 @@ use Time::HiRes 'time';
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
-has client_class    => 'Mojo::IOLoop::Client';
-has connect_timeout => 3;
-has iowatcher       => sub {
+has client_class => 'Mojo::IOLoop::Client';
+has iowatcher    => sub {
   my $class = Mojo::IOWatcher->detect;
   warn "MAINLOOP ($class)\n" if DEBUG;
   $class->new;
@@ -66,8 +65,10 @@ sub client {
     }
   );
 
+  # DEPRECATED in Leaf Fluttering In Wind!
+  $args->{timeout} ||= $self->{connect_timeout};
+
   # Connect
-  $args->{timeout} ||= $self->connect_timeout;
   $client->connect($args);
 
   return $id;
@@ -117,6 +118,19 @@ sub connect {
   );
 
   return $id;
+}
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub connect_timeout {
+  my ($self, $timeout) = @_;
+  warn <<EOF;
+Mojo::IOLoop->connect_timeout is DEPRECATED in favor of the timeout argument!
+EOF
+  if ($timeout) {
+    $self->{connect_timeout} = $timeout;
+    return $self;
+  }
+  return $self->{connect_timeout};
 }
 
 # DEPRECATED in Leaf Fluttering In Wind!
@@ -509,14 +523,6 @@ L<Mojo::IOLoop> implements the following attributes.
 Class to be used for opening TCP connections with the C<client> method,
 defaults to L<Mojo::IOLoop::Client>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
-
-=head2 C<connect_timeout>
-
-  my $timeout = $loop->connect_timeout;
-  $loop       = $loop->connect_timeout(5);
-
-Maximum time in seconds a connection can take to be connected before being
-dropped, defaults to C<3>.
 
 =head2 C<iowatcher>
 

@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 29;
+use Test::More tests => 25;
 
 # "Oh, I'm in no condition to drive. Wait a minute.
 #  I don't have to listen to myself. I'm drunk."
@@ -36,23 +36,18 @@ ok !$r->is_ipv6('1.1.1.1.1.1'),    'not an IPv4 address';
 my $r2 = Mojo::IOLoop::Resolver->new;
 is $r->ioloop, $r2->ioloop, 'same ioloop';
 
-# Shared server pool
-$r->servers('8.8.8.8', '1.2.3.4');
-is_deeply [$r->servers], ['8.8.8.8', '1.2.3.4'], 'right servers';
-is scalar $r->servers, '8.8.8.8', 'right server';
-$r2->servers('8.8.8.8', '1.2.3.4');
-is_deeply [$r2->servers], ['8.8.8.8', '1.2.3.4'], 'right servers';
-is scalar $r2->servers, '8.8.8.8', 'right server';
-$r->servers('1.2.3.4');
-is_deeply [$r->servers], ['1.2.3.4'], 'right servers';
-is scalar $r->servers, '1.2.3.4', 'right server';
-is_deeply [$r2->servers], ['1.2.3.4'], 'right servers';
-is scalar $r2->servers, '1.2.3.4', 'right server';
-$r->servers('1.2.3.4', '4.3.2.1');
-is_deeply [$r->servers], ['1.2.3.4', '4.3.2.1'], 'right servers';
-is scalar $r->servers, '1.2.3.4', 'right server';
-is_deeply [$r2->servers], ['1.2.3.4', '4.3.2.1'], 'right servers';
-is scalar $r2->servers, '1.2.3.4', 'right server';
+# Separate server pools
+$r->servers(['8.8.8.8', '1.2.3.4']);
+is_deeply $r->servers, ['8.8.8.8', '1.2.3.4'], 'right servers';
+is $r->servers->[0], '8.8.8.8', 'right server';
+$r2->servers(['8.8.4.4', '4.3.2.1']);
+is_deeply $r2->servers, ['8.8.4.4', '4.3.2.1'], 'right servers';
+is $r2->servers->[0], '8.8.4.4', 'right server';
+$r->servers(['1.2.3.4']);
+is_deeply $r->servers, ['1.2.3.4'], 'right servers';
+is $r->servers->[0], '1.2.3.4', 'right server';
+is_deeply $r2->servers, ['8.8.4.4', '4.3.2.1'], 'right servers';
+is $r2->servers->[0], '8.8.4.4', 'right server';
 
 # Lookup "localhost" (pass through)
 my $result;

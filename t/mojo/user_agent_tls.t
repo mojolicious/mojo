@@ -28,15 +28,13 @@ $ua->log->level('fatal');
 # Server
 my $port = $ua->ioloop->generate_port;
 my $error;
-my %args = (
+my $id = $ua->ioloop->server(
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/server.crt',
   tls_key  => 't/mojo/certs/server.key',
-  tls_ca   => 't/mojo/certs/ca.crt'
-);
-my $id = $ua->ioloop->server(
-  %args => sub {
+  tls_ca   => 't/mojo/certs/ca.crt',
+  sub {
     my ($loop, $stream, $id) = @_;
     $stream->on(
       read => sub {

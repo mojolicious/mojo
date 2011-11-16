@@ -11,10 +11,28 @@ use constant DEBUG => $ENV{MOJO_RESOLVER_DEBUG} || 0;
 # IPv6 DNS support requires "AF_INET6" and "inet_pton"
 use constant IPV6 => defined &Socket::AF_INET6 && defined &Socket::inet_pton;
 
+# Try to detect DNS servers once
+my $SERVERS = ['8.8.8.8', '8.8.4.4'];
+if (-r '/etc/resolv.conf') {
+  my $file = IO::File->new('< /etc/resolv.conf');
+  my @servers;
+  for my $line (<$file>) {
+
+    # New DNS server
+    if ($line =~ /^nameserver\s+(\S+)$/) {
+      push @servers, $1;
+      warn qq/DETECTED DNS SERVER ($1)\n/ if DEBUG;
+    }
+  }
+  unshift @$SERVERS, @servers;
+}
+unshift @$SERVERS, $ENV{MOJO_DNS_SERVER} if $ENV{MOJO_DNS_SERVER};
+
 has ioloop => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton;
 };
+has servers => sub { [@$SERVERS] };
 has timeout => 3;
 
 # IPv4 (RFC 3986)
@@ -36,30 +54,6 @@ my $IPV6_RE = qr/(?:
   | (?: (?: $H16_RE : ){0,5} $H16_RE )? ::                    $H16_RE
   | (?: (?: $H16_RE : ){0,6} $H16_RE )? ::
 )/x;
-
-# DNS server (default to Google Public DNS)
-my $SERVERS = ['8.8.8.8', '8.8.4.4'];
-
-# Try to detect DNS server
-if (-r '/etc/resolv.conf') {
-  my $file = IO::File->new('< /etc/resolv.conf');
-  my @servers;
-  for my $line (<$file>) {
-
-    # New DNS server
-    if ($line =~ /^nameserver\s+(\S+)$/) {
-      push @servers, $1;
-      warn qq/DETECTED DNS SERVER ($1)\n/ if DEBUG;
-    }
-  }
-  unshift @$SERVERS, @servers;
-}
-
-# User defined DNS server
-unshift @$SERVERS, $ENV{MOJO_DNS_SERVER} if $ENV{MOJO_DNS_SERVER};
-
-# Always start with first DNS server
-my $CURRENT_SERVER = 0;
 
 # DNS record types
 my $DNS_TYPES = {
@@ -145,6 +139,7 @@ sub lookup {
   );
 }
 
+# "I wonder where Bart is, his dinner's getting all cold... and eaten."
 sub parse {
   my ($self, $res) = @_;
 
@@ -189,7 +184,7 @@ sub resolve {
 
   # Build request
   my $loop   = $self->ioloop;
-  my $server = $self->servers;
+  my $server = $self->servers->[0];
   my $req    = $self->build($id, $type, $name);
   weaken $self;
   return $loop->defer(sub { $self->$cb([]) })
@@ -203,41 +198,27 @@ sub resolve {
       $self->timeout => sub {
         return unless $self->{requests}->{$id};
         warn "RESOLVE TIMEOUT $id ($server)\n" if DEBUG;
-        $CURRENT_SERVER++;
-        $self->_cleanup;
+        $self->_cleanup(1);
       }
     )
   };
   $self->_start($server, $req);
 }
 
-# "I wonder where Bart is, his dinner's getting all cold... and eaten."
-sub servers {
-  my $self = shift;
-
-  # New servers
-  if (@_) {
-    @$SERVERS       = @_;
-    $CURRENT_SERVER = 0;
-  }
-
-  # List all
-  return @$SERVERS if wantarray;
-
-  # Current server
-  $CURRENT_SERVER = 0 unless $SERVERS->[$CURRENT_SERVER];
-  return $SERVERS->[$CURRENT_SERVER];
-}
-
 # "Mrs. Simpson, bathroom is not for customers.
 #  Please use the crack house across the street."
 sub _cleanup {
-  my $self = shift;
+  my ($self, $next) = @_;
 
+  # Next server
+  push @{$self->servers}, shift @{$self->servers} if $next;
+
+  # Socket
   delete $self->{started};
   return unless my $loop = $self->ioloop;
   $loop->drop(delete $self->{id}) if $self->{id};
 
+  # Requests
   for my $id (keys %{$self->{requests}}) {
     my $r = delete $self->{requests}->{$id};
     $r->{cb}->($self, []);
@@ -322,24 +303,18 @@ sub _start {
 
   # New socket
   weaken $self;
-  my %args = (
+  $self->{id} = $self->ioloop->client(
     address => $server,
     port    => 53,
-    args    => {Proto => 'udp', Type => SOCK_DGRAM}
-  );
-  $self->{id} = $self->ioloop->client(
-    %args => sub {
+    args    => {Proto => 'udp', Type => SOCK_DGRAM},
+    sub {
       my ($loop, $stream, $error) = @_;
-      if ($error) {
-        $CURRENT_SERVER++;
-        return $self->_cleanup;
-      }
+      return $self->_cleanup(1) if $error;
       $stream->on(close => sub { $self->_cleanup });
       $stream->on(
         error => sub {
           warn "RESOLVE FAILURE ($server)\n" if DEBUG;
-          $CURRENT_SERVER++;
-          $self->_cleanup;
+          $self->_cleanup(1);
         }
       );
       $stream->on(
@@ -407,6 +382,15 @@ L<Mojo::IOLoop::Resolver> implements the following attributes.
 Loop object to use for I/O operations, defaults to the global L<Mojo::IOLoop>
 singleton.
 
+=head2 C<servers>
+
+  my $servers = $resolver->servers;
+  $resolver   = $resolver->servers(['8.8.8.8', '8.8.4.4']);
+
+IP addresses of C<DNS> servers used for lookups, defaults to the value of
+the C<MOJO_DNS_SERVER> environment variable, auto detection, C<8.8.8.8> or
+C<8.8.4.4>.
+
 =head2 C<timeout>
 
   my $timeout = $resolver->timeout;
@@ -464,16 +448,6 @@ Resolve domain into C<A>, C<AAAA>, C<CNAME>, C<MX>, C<NS>, C<PTR> or C<TXT>
 records, C<*> will query for all at once.
 Since this is a "stub resolver" it depends on a recursive name server for DNS
 resolution.
-
-=head2 C<servers>
-
-  my @all     = $resolver->servers;
-  my $current = $resolver->servers;
-  $resolver->servers('8.8.8.8', '8.8.4.4');
-
-IP addresses of C<DNS> servers used for lookups, defaults to the value of
-the C<MOJO_DNS_SERVER> environment variable, auto detection, C<8.8.8.8> or
-C<8.8.4.4>.
 
 =head1 DEBUGGING
 

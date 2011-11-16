@@ -210,14 +210,13 @@ sub _cleanup {
   my ($self, $next) = @_;
 
   # Next server
+  return unless my $loop = $self->ioloop;
   if ($next) {
     push @{$self->servers}, shift @{$self->servers};
     warn "NEXT SERVER (" . $self->servers->[0] . ")\n" if DEBUG;
   }
-  delete $self->{server};
-  delete $self->{started};
-  return unless my $loop = $self->ioloop;
   $loop->drop(delete $self->{id}) if $self->{id};
+  delete $self->{started};
 
   # Finish requests
   return unless my $requests = delete $self->{requests};
@@ -339,7 +338,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Resolver - IOLoop DNS stub resolver
+Mojo::IOLoop::Resolver - Non-blocking DNS stub resolver
 
 =head1 SYNOPSIS
 
@@ -374,6 +373,8 @@ L<Mojo::IOLoop::Resolver> implements the following attributes.
   $resolver = $resolver->hosts({localhost => '127.0.0.1'});
 
 Known hosts map used by C<lookup>.
+
+  $resolver->hosts->{'mojolicio.us'} = '127.0.0.1';
 
 =head2 C<ioloop>
 

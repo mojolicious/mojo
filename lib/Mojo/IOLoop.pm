@@ -512,7 +512,7 @@ L<Mojo::IOLoop> implements the following attributes.
   my $class = $loop->client_class;
   $loop     = $loop->client_class('Mojo::IOLoop::Client');
 
-Class to be used for performing non-blocking socket connections with the
+Class to be used for opening TCP connections to remote hosts with the
 C<client> method, defaults to L<Mojo::IOLoop::Client>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
@@ -602,7 +602,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   my $class = $loop->server_class;
   $loop     = $loop->server_class('Mojo::IOLoop::Server');
 
-Class to be used for accepting incoming connections with the C<server>
+Class to be used for accepting incoming TCP connections with the C<server>
 method, defaults to L<Mojo::IOLoop::Server>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
@@ -611,7 +611,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   my $class = $loop->stream_class;
   $loop     = $loop->stream_class('Mojo::IOLoop::Stream');
 
-Class to be used for streaming handles, defaults to L<Mojo::IOLoop::Stream>.
+Class to be used for I/O streams, defaults to L<Mojo::IOLoop::Stream>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
@@ -721,7 +721,7 @@ responsiveness.
   my $id = $loop->server(port => 3000, sub {...});
   my $id = $loop->server({port => 3000}, sub {...});
 
-Create a new listen socket with C<server_class>, which is usually
+Accept incoming TCP connections with C<server_class>, which is usually
 L<Mojo::IOLoop::Server>, takes the same arguments as
 L<Mojo::IOLoop::Server/"listen">.
 Note that this method is EXPERIMENTAL and might change without warning!

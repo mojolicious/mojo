@@ -260,7 +260,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Server - IOLoop socket server
+Mojo::IOLoop::Server - Non-blocking TCP server
 
 =head1 SYNOPSIS
 
@@ -280,8 +280,7 @@ Mojo::IOLoop::Server - IOLoop socket server
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Server> accepts incoming socket connections for
-L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Server> accepts incoming TCP connections for L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS

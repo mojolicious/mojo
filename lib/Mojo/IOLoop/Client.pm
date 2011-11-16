@@ -154,7 +154,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Client - IOLoop socket client
+Mojo::IOLoop::Client - Non-blocking TCP client
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ Mojo::IOLoop::Client - IOLoop socket client
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Client> performs non-blocking socket connections for
+L<Mojo::IOLoop::Client> opens non-blocking TCP connections for
 L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 

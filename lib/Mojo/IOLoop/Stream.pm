@@ -159,7 +159,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Stream - IOLoop stream
+Mojo::IOLoop::Stream - Non-blocking I/O stream
 
 =head1 SYNOPSIS
 
@@ -186,7 +186,7 @@ Mojo::IOLoop::Stream - IOLoop stream
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Stream> is a container for streaming handles used by
+L<Mojo::IOLoop::Stream> is a container for I/O streams used by
 L<Mojo::IOLoop>.
 Note that this module is EXPERIMENTAL and might change without warning!
 

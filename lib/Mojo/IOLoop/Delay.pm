@@ -30,7 +30,7 @@ __END__
 
 =head1 NAME
 
-Mojo::IOLoop::Delay - IOLoop delay
+Mojo::IOLoop::Delay - Synchronize events
 
 =head1 SYNOPSIS
 

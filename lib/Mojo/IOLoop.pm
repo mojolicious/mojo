@@ -764,7 +764,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
   my $timeout = $loop->timeout($id);
   $loop       = $loop->timeout($id => 45);
 
-Maximum amount of time in seconds a connection can be inactive before being
+Maximum amount of time in seconds a connection can be inactive before getting
 dropped, defaults to C<15>.
 
 =head2 C<timer>

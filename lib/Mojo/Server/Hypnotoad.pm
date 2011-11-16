@@ -614,7 +614,7 @@ Username for worker processes.
   websocket_timeout => 150
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
-before being dropped, defaults to C<300>.
+before getting dropped, defaults to C<300>.
 
 =head2 C<workers>
 

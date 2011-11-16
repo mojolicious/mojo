@@ -507,7 +507,7 @@ This chain could go on and on to allow a very high level of template reuse.
 =head2 Memorizing template blocks
 
 Compiled templates are always cached in memory, but with the C<memorize>
-helper you can go one step further and prevent template blocks from being
+helper you can go one step further and prevent template blocks from getting
 executed more than once.
 
   %= memorize begin

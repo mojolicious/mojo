@@ -398,7 +398,7 @@ singleton.
   my $keep_alive_timeout = $daemon->keep_alive_timeout;
   $daemon                = $daemon->keep_alive_timeout(5);
 
-Maximum amount of time in seconds a connection can be inactive before being
+Maximum amount of time in seconds a connection can be inactive before getting
 dropped, defaults to C<15>.
 
 =head2 C<listen>
@@ -451,7 +451,7 @@ User for the server process.
   $server               = $server->websocket_timeout(300);
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
-before being dropped, defaults to C<300>.
+before getting dropped, defaults to C<300>.
 
 =head1 METHODS
 

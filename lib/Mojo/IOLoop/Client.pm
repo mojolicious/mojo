@@ -234,7 +234,7 @@ Port to connect to.
 
 =item C<timeout>
 
-Maximum time in seconds establishing connection may take.
+Maximum amount of time in seconds establishing connection may take.
 
 =item C<tls>
 

@@ -72,6 +72,9 @@ has iowatcher => sub {
   Mojo::IOLoop->singleton->iowatcher;
 };
 
+# "Your guilty consciences may make you vote Democratic, but secretly you all
+#  yearn for a Republican president to lower taxes, brutalize criminals, and
+#  rule you like a king!"
 sub DESTROY {
   my $self = shift;
   if (my $port = $self->{port}) { $ENV{MOJO_REUSE} =~ s/(?:^|\,)$port\:\d+// }

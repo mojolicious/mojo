@@ -170,12 +170,6 @@ L<Mojolicious::Plugin::JSONConfig>, quite useful for testing.
 
    MOJO_CONFIG=myapp.conf
 
-=head2 C<MOJO_DNS_SERVER>
-
-C<DNS> server to use for non-blocking lookups.
-
-  MOJO_DNS_SERVER=8.8.8.8
-
 =head2 C<MOJO_HOME>
 
 Home directory for the L<Mojolicious> application, should always contain a
@@ -271,13 +265,6 @@ Disable IPv6 support.
 Note that L<IO::Socket::IP> must be installed for IPv6 support.
 
   MOJO_NO_IPV6=1
-
-=head2 C<MOJO_NO_RESOLVER>
-
-Disable non-blocking resolver support and fall back to blocking system
-resolver.
-
-  MOJO_NO_RESOLVER=1
 
 =head2 C<MOJO_NO_TLS>
 

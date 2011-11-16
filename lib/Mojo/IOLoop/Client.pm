@@ -2,7 +2,6 @@ package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use IO::Socket::INET;
-use Mojo::IOLoop::Resolver;
 use Scalar::Util 'weaken';
 use Socket qw/IPPROTO_TCP SO_ERROR TCP_NODELAY/;
 
@@ -18,38 +17,30 @@ use constant TLS => $ENV{MOJO_NO_TLS}
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
-has resolver => sub { Mojo::IOLoop::Resolver->new };
-
 # "It's like my dad always said: eventually, everybody gets shot."
+has iowatcher => sub {
+  require Mojo::IOLoop;
+  Mojo::IOLoop->singleton->iowatcher;
+};
+
 sub DESTROY {
   my $self = shift;
   return if $self->{connected};
   $self->_cleanup;
 }
 
+# "I wonder where Bart is, his dinner's getting all cold... and eaten."
 sub connect {
   my $self = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
   $args->{address} ||= 'localhost';
-
-  # Connect
-  return $self->resolver->ioloop->timer(0 => sub { $self->_connect($args) })
-    unless !$args->{handle} && (my $address = $args->{address});
-
-  # Lookup
-  $self->resolver->lookup(
-    $address => sub {
-      $args->{address} = $_[1] || $args->{address};
-      $self->_connect($args);
-    }
-  );
+  weaken $self;
+  $self->iowatcher->timer(0 => sub { $self->_connect($args) });
 }
 
 sub _cleanup {
   my $self = shift;
-  return unless my $resolver = $self->{resolver};
-  return unless my $loop     = $resolver->ioloop;
-  return unless my $watcher  = $loop->iowatcher;
+  return unless my $watcher = $self->{iowatcher};
   $watcher->drop_timer($self->{timer})   if $self->{timer};
   $watcher->drop_handle($self->{handle}) if $self->{handle};
 }
@@ -59,7 +50,7 @@ sub _connect {
 
   # New socket
   my $handle;
-  my $watcher = $self->resolver->ioloop->iowatcher;
+  my $watcher = $self->iowatcher;
   my $timeout = $args->{timeout} || 3;
   unless ($handle = $args->{handle}) {
     my %options = (
@@ -131,7 +122,7 @@ sub _connecting {
 
   # Switch between reading and writing
   my $handle  = $self->{handle};
-  my $watcher = $self->resolver->ioloop->iowatcher;
+  my $watcher = $self->iowatcher;
   if ($self->{tls} && !$handle->connect_SSL) {
     my $error = $IO::Socket::SSL::SSL_ERROR;
     if    ($error == TLS_READ)  { $watcher->change($handle, 1, 0) }
@@ -201,12 +192,13 @@ Emitted if an error happens on the connection.
 
 L<Mojo::IOLoop::Client> implements the following attributes.
 
-=head2 C<resolver>
+=head2 C<iowatcher>
 
-  my $resolver = $client->resolver;
-  $client      = $client->resolver(Mojo::IOLoop::Resolver->new);
+  my $watcher = $client->iowatcher;
+  $client     = $client->iowatcher(Mojo::IOWatcher->new);
 
-DNS stub resolver, defaults to a L<Mojo::IOLoop::Resolver> object.
+Low level event watcher, defaults to the C<iowatcher> attribute value of the
+global L<Mojo::IOLoop> singleton.
 
 =head1 METHODS
 

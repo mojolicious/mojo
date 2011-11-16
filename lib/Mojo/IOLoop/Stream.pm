@@ -121,6 +121,8 @@ sub _read {
   $self->emit_safe(read => $buffer);
 }
 
+# "Oh, I'm in no condition to drive. Wait a minute.
+#  I don't have to listen to myself. I'm drunk."
 sub _write {
   my $self = shift;
 

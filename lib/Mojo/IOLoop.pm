@@ -4,7 +4,6 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
-use Mojo::IOLoop::Resolver;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::IOWatcher;
@@ -24,11 +23,6 @@ has iowatcher       => sub {
 has [qw/cleanup_interval max_accepts/] => 0;
 has max_connections => 1000;
 has [qw/on_lock on_unlock/];
-has resolver => sub {
-  my $resolver = Mojo::IOLoop::Resolver->new(ioloop => shift);
-  weaken $resolver->{ioloop};
-  return $resolver;
-};
 has server_class => 'Mojo::IOLoop::Server';
 has stream_class => 'Mojo::IOLoop::Stream';
 
@@ -46,8 +40,8 @@ sub client {
   my $id     = $args->{id} || $self->_id;
   my $c      = $self->{connections}->{$id} ||= {};
   $c->{client} = $client;
-  $client->resolver($self->resolver);
-  weaken $client->{resolver};
+  $client->iowatcher($self->iowatcher);
+  weaken $client->{iowatcher};
 
   # Events
   weaken $self;
@@ -588,14 +582,6 @@ Note that exceptions in this callback are not captured.
 
 A callback to free the accept lock, used to sync multiple server processes.
 Note that exceptions in this callback are not captured.
-
-=head2 C<resolver>
-
-  my $resolver = $loop->resolver;
-  $loop        = $loop->resolver(Mojo::IOLoop::Resolver->new);
-
-DNS stub resolver, usually a L<Mojo::IOLoop::Resolver> object.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<server_class>
 

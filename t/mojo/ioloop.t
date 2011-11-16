@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 30;
+use Test::More tests => 28;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -16,7 +16,6 @@ use Test::More tests => 30;
 use_ok 'Mojo::IOLoop';
 use_ok 'Mojo::IOLoop::Client';
 use_ok 'Mojo::IOLoop::Delay';
-use_ok 'Mojo::IOLoop::Resolver';
 use_ok 'Mojo::IOLoop::Server';
 use_ok 'Mojo::IOLoop::Stream';
 
@@ -207,11 +206,9 @@ is $server_close, 1, 'server emitted close event once';
 is $client_close, 1, 'client emitted close event once';
 
 # Defaults
-is Mojo::IOLoop::Client->new->resolver->ioloop, Mojo::IOLoop->singleton,
+is Mojo::IOLoop::Client->new->iowatcher, Mojo::IOLoop->singleton->iowatcher,
   'right default';
 is Mojo::IOLoop::Delay->new->ioloop, Mojo::IOLoop->singleton, 'right default';
-is Mojo::IOLoop::Resolver->new->ioloop, Mojo::IOLoop->singleton,
-  'right default';
 is Mojo::IOLoop::Server->new->iowatcher,
   Mojo::IOLoop->singleton->iowatcher, 'right default';
 is Mojo::IOLoop::Stream->new->iowatcher, Mojo::IOLoop->singleton->iowatcher,

@@ -18,6 +18,8 @@ sub end {
   $self->emit_safe('finish', @{$self->{args}}) if --$self->{counter} <= 0;
 }
 
+# "Mrs. Simpson, bathroom is not for customers.
+#  Please use the crack house across the street."
 sub wait {
   my $self = shift;
   $self->once(finish => sub { shift->ioloop->stop });
@@ -91,8 +93,8 @@ Increment active event counter, the returned callback can be used instead of
 C<end>.
 
   my $delay = Mojo::IOLoop->delay;
-  Mojo::IOLoop->resolver->lookup('mojolicio.us' => $delay->begin);
-  my $address = $delay->wait;
+  Mojo::UserAgent->new->get('mojolicio.us' => $delay->begin);
+  my $tx = $delay->wait;
 
 =head2 C<end>
 

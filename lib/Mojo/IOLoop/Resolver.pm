@@ -320,7 +320,6 @@ sub _start {
           $r->{cb}->($self, $answers);
         }
       );
-      $stream->resume;
       $self->{started}++;
       $self->_write;
     }

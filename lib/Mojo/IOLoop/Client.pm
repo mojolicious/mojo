@@ -33,7 +33,8 @@ sub DESTROY {
 sub connect {
   my $self = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
-  $args->{address} ||= 'localhost';
+  $args->{address} ||= '127.0.0.1';
+  $args->{address} = '127.0.0.1' if $args->{address} eq 'localhost';
   weaken $self;
   $self->iowatcher->timer(0 => sub { $self->_connect($args) });
 }

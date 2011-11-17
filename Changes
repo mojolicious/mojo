@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.28    2011-11-17 00:00:00
+        - Fixed small IPv6 portabilty issue in Mojo::IOLoop::Client.
+
 2.27    2011-11-16 00:00:00
         - Deprecated Mojo::IOLoop->connect in favor of Mojo::IOLoop->client.
         - Deprecated Mojo::IOLoop->listen in favor of Mojo::IOLoop->server.

@@ -220,6 +220,31 @@ Once dispatched the whole stash content can be changed at any time.
 A full list of all reserved stash values can also be found in
 L<Mojolicious::Guides::Cheatsheet>.
 
+=head2 Nested routes
+
+It is also possible to build tree structures from routes to remove repetitive
+code.
+A route with children can't match on it's own though, only the actual
+endpoints of these nested routes can.
+
+  # /foo     -> undef
+  # /foo/bar -> {controller => 'foo', action => 'bar'}
+  my $foo = $r->route('/foo')->to(controller => 'foo');
+  $foo->route('/bar')->to(action => 'bar');
+
+The stash is simply inherited from route to route and newer values override
+old ones.
+
+  # /foo     -> undef
+  # /foo/abc -> undef
+  # /foo/bar -> {controller => 'foo', action => 'bar'}
+  # /foo/baz -> {controller => 'foo', action => 'baz'}
+  # /foo/cde -> {controller => 'foo', action => 'abc'}
+  my $foo = $r->route('/foo')->to(controller => 'foo', action => 'abc');
+  $foo->route('/bar')->to(action => 'bar');
+  $foo->route('/baz')->to(action => 'baz');
+  $foo->route('/cde');
+
 =head2 Special stash values (C<controller> and C<action>)
 
 When the dispatcher sees C<controller> and C<action> values in the stash it
@@ -274,7 +299,8 @@ C<controller> hierarchies.
 
 =head2 Route to class (C<namespace>)
 
-From time to time you might want to dispatch to a whole different C<namespace>.
+You can use the C<namespace> stash value to change the namespace of a whole
+route with all its children.
 
   # /bye -> MyApp::Controller::Foo->bye
   $r->route('/bye')
@@ -285,7 +311,8 @@ The C<controller> is always appended to the C<namespace> if available.
   # /bye -> MyApp::Controller::Foo->bye
   $r->route('/bye')->to('foo#bye', namespace => 'MyApp::Controller');
 
-You can also change the default namespace for all routes in the application.
+You can also change the default namespace for all routes in the application
+with the C<namespace> attribute of the router.
 
   $r->namespace('MyApp::Controller');
 
@@ -301,6 +328,36 @@ callback instead.
 
 This technique is the foundation of L<Mojolicious::Lite>, you can learn more
 about it from the included tutorial.
+
+=head2 Placeholders and destinations
+
+Extracted placeholder values will simply redefine older stash values if they
+already exist.
+
+  # /bye -> {controller => 'foo', action => 'bar', mymessage => 'bye'}
+  # /hey -> {controller => 'foo', action => 'bar', mymessage => 'hey'}
+  $r->route('/:mymessage')
+    ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
+
+One more interesting effect, if a placeholder is at the end of a route and
+there is already a stash value of the same name present, it automatically
+becomes optional.
+
+  # / -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
+  $r->route('/:mymessage')
+    ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
+
+This is also the case if multiple placeholders are right after another and
+not separated by other characters than C</>.
+
+  # /           -> {controller => 'foo',   action => 'bar'}
+  # /users      -> {controller => 'users', action => 'bar'}
+  # /users/list -> {controller => 'users', action => 'list'}
+  $r->route('/:controller/:action')
+    ->to(controller => 'foo', action => 'bar');
+
+Special stash values like C<controller> and C<action> can also be
+placeholders, this allows for extremely flexible routes constructs.
 
 =head2 More restrictive placeholders
 
@@ -368,36 +425,6 @@ Or you can just disable format detection.
   # /foo.html -> undef
   $r->route('/foo', format => 0)->to(controller => 'foo', action => 'bar');
 
-=head2 Placeholders and destinations
-
-Extracted placeholder values will simply redefine older stash values if they
-already exist.
-
-  # /bye -> {controller => 'foo', action => 'bar', mymessage => 'bye'}
-  # /hey -> {controller => 'foo', action => 'bar', mymessage => 'hey'}
-  $r->route('/:mymessage')
-    ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
-
-One more interesting effect, if a placeholder is at the end of a route and
-there is already a stash value of the same name present, it automatically
-becomes optional.
-
-  # / -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
-  $r->route('/:mymessage')
-    ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
-
-This is also the case if multiple placeholders are right after another and
-not separated by other characters than C</>.
-
-  # /           -> {controller => 'foo',   action => 'bar'}
-  # /users      -> {controller => 'users', action => 'bar'}
-  # /users/list -> {controller => 'users', action => 'list'}
-  $r->route('/:controller/:action')
-    ->to(controller => 'foo', action => 'bar');
-
-Special stash values like C<controller> and C<action> can also be
-placeholders, this allows for extremely flexible routes constructs.
-
 =head2 Named routes
 
 Naming your routes will allow backreferencing in many kinds of helpers
@@ -444,31 +471,6 @@ pass.
   # DELETE /bye -> undef
   $r->route('/bye')->via('GET', 'POST')
     ->to(controller => 'foo', action => 'bye');
-
-=head2 Nested routes
-
-It is also possible to build tree structures from routes to remove repetitive
-code.
-A route with children can't match on it's own though, only the actual
-endpoints of these nested routes can.
-
-  # /foo     -> undef
-  # /foo/bar -> {controller => 'foo', action => 'bar'}
-  my $foo = $r->route('/foo')->to(controller => 'foo');
-  $foo->route('/bar')->to(action => 'bar');
-
-The stash will simply move from route to route and newer values override old
-ones.
-
-  # /foo     -> undef
-  # /foo/abc -> undef
-  # /foo/bar -> {controller => 'foo', action => 'bar'}
-  # /foo/baz -> {controller => 'foo', action => 'baz'}
-  # /foo/cde -> {controller => 'foo', action => 'abc'}
-  my $foo = $r->route('/foo')->to(controller => 'foo', action => 'abc');
-  $foo->route('/bar')->to(action => 'bar');
-  $foo->route('/baz')->to(action => 'baz');
-  $foo->route('/cde');
 
 =head2 Waypoints
 

@@ -312,13 +312,13 @@ The C<controller> is always appended to the C<namespace> if available.
   $r->route('/bye')->to('foo#bye', namespace => 'MyApp::Controller');
 
 You can also change the default namespace for all routes in the application
-with the C<namespace> attribute of the router.
+with the C<namespace> attribute of the router object.
 
   $r->namespace('MyApp::Controller');
 
 =head2 Route to callback (C<cb>)
 
-You can use the C<cb> stash value to bypass controllers and execute a
+The C<cb> stash value can be used to bypass controllers and execute a
 callback instead.
 
   $r->route('/bye')->to(cb => sub {

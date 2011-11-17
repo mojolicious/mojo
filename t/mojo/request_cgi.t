@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 202;
+use Test::More tests => 178;
 
 # "Aren't we forgetting the true meaning of Christmas?
 #  You know, the birth of Santa."
@@ -435,61 +435,3 @@ is $req->url->to_abs->to_string,
   'right absolute URL';
 my $file = $req->upload('file');
 is $file->slurp, '11023456789', 'right uploaded content';
-
-# Parse Apache 2.2.9 like CGI environment variables with mod_rewrite
-# (random file and "RewriteRule ^(.*)$ monkey.cgi/$1 [L]")
-$req = Mojo::Message::Request->new;
-$req->parse(
-  HTTP_CONNECTION => 'keep-alive',
-  HTTP_HOST       => 'kraih.com',
-  QUERY_STRING    => '',
-  REQUEST_METHOD  => 'GET',
-  REQUEST_URI     => '/sandbox-myapp/feed/bannana',
-  SCRIPT_NAME     => '/sandbox-myapp/monkey.cgi',
-  PATH_INFO       => '/feed/bannana',
-  SERVER_PROTOCOL => 'HTTP/1.1',
-);
-ok $req->is_finished, 'request is finished';
-is $req->method, 'GET', 'right method';
-is $req->url->base->host, 'kraih.com', 'right base host';
-is $req->url->path, 'feed/bannana', 'right path';
-is $req->url->base->path, '/sandbox-myapp/monkey.cgi/', 'right base path';
-is $req->version, '1.1', 'right version';
-ok $req->at_least_version('1.0'), 'at least version 1.0';
-ok !$req->at_least_version('1.2'), 'not version 1.2';
-is $req->url->to_abs->to_string,
-  'http://kraih.com/sandbox-myapp/monkey.cgi/feed/bannana',
-  'right absolute URL';
-ok $req->url->base->parse('http://kraih.com/sandbox-myapp/'), 'rewritten';
-is $req->url, 'feed/bannana', 'right relative URL';
-is $req->url->to_abs->to_string,
-  'http://kraih.com/sandbox-myapp/feed/bannana',
-  'right absolute URL';
-
-# Parse Apache 2.2.9 like CGI environment variables with mod_rewrite
-# (root and "RewriteRule ^(.*)$ monkey.cgi/$1 [L]")
-$req = Mojo::Message::Request->new;
-$req->parse(
-  HTTP_CONNECTION => 'keep-alive',
-  HTTP_HOST       => 'kraih.com',
-  QUERY_STRING    => '',
-  REQUEST_METHOD  => 'GET',
-  REQUEST_URI     => '/sandbox-myapp/',
-  SCRIPT_NAME     => '/sandbox-myapp/monkey.cgi',
-  SERVER_PROTOCOL => 'HTTP/1.1',
-);
-ok $req->is_finished, 'request is finished';
-is $req->method, 'GET', 'right method';
-is $req->url->base->host, 'kraih.com', 'right base host';
-is $req->url->path, '', 'right path';
-is $req->url->base->path, '/sandbox-myapp/monkey.cgi/', 'right base path';
-is $req->version, '1.1', 'right version';
-ok $req->at_least_version('1.0'), 'at least version 1.0';
-ok !$req->at_least_version('1.2'), 'not version 1.2';
-is $req->url->to_abs->to_string,
-  'http://kraih.com/sandbox-myapp/monkey.cgi',
-  'right absolute URL';
-ok $req->url->base->parse('http://kraih.com/sandbox-myapp/'), 'rewritten';
-is $req->url->base->path, '/sandbox-myapp/', 'right base path';
-is $req->url->to_abs->to_string, 'http://kraih.com/sandbox-myapp',
-  'right absolute URL';

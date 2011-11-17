@@ -258,7 +258,7 @@ sub _parse_env {
     # Host/Port
     if ($name eq 'HOST') {
       my $host = $value;
-      my $port = undef;
+      my $port;
       ($host, $port) = ($+{host}, $+{port}) if $host =~ $HOST_RE;
       $base->host($host);
       $base->port($port);
@@ -270,9 +270,6 @@ sub _parse_env {
 
   # Content-Length is a special case on some servers
   $headers->content_length($env->{CONTENT_LENGTH}) if $env->{CONTENT_LENGTH};
-
-  # Path is a special case on some servers
-  $url->parse($env->{REQUEST_URI}) if $env->{REQUEST_URI};
 
   # Query
   $url->query->parse($env->{QUERY_STRING}) if $env->{QUERY_STRING};
@@ -289,30 +286,23 @@ sub _parse_env {
   # HTTPS
   $base->scheme('https') if $env->{HTTPS};
 
-  # Base path
-  my $base_path = $base->path;
-  if (my $value = $env->{SCRIPT_NAME}) {
-
-    # Make sure there is a trailing slash (important for merging)
-    $value .= '/' unless $value =~ m#/$#;
-    $base_path->parse($value);
-  }
-
   # Path
   my $path = $url->path;
   if   (my $value = $env->{PATH_INFO}) { $path->parse($value) }
   else                                 { $path->parse('') }
 
-  # Fix paths for broken CGI environments
-  my $base_buffer = $base_path->to_string;
-  my $buffer      = $path->to_string;
-  if (defined $buffer && defined $base_buffer && length $base_buffer) {
+  # Base path
+  if (my $value = $env->{SCRIPT_NAME}) {
 
-    # Remove SCRIPT_NAME prefix if it's there
-    $base_buffer =~ s|^/||;
-    $base_buffer =~ s|/$||;
-    $buffer      =~ s|^/?$base_buffer/?||;
-    $buffer      =~ s|^/||;
+    # Make sure there is a trailing slash (important for merging)
+    $base->path->parse($value =~ m#/$# ? $value : "$value/");
+
+    # Remove SCRIPT_NAME prefix if necessary
+    my $buffer = $path->to_string;
+    $value  =~ s|^/||;
+    $value  =~ s|/$||;
+    $buffer =~ s|^/?$value/?||;
+    $buffer =~ s|^/||;
     $path->parse($buffer);
   }
 

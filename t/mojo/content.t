@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 # "No matter how good you are at something,
 #  there's always about a million people better than you."
@@ -32,3 +32,10 @@ ok $content->body_contains('foo'),     'content contains "foo"';
 ok $content->body_contains('bar+'),    'content contains "bar+"';
 ok $content->body_contains('.'),       'content contains "."';
 ok $content->body_contains('.*?foo+'), 'content contains ".*?foo+"';
+
+# Tainted environment
+$content = Mojo::Content::MultiPart->new;
+"a" =~ /(.)/;
+ok !$content->charset, 'no charset';
+"a" =~ /(.)/;
+ok !$content->boundary, 'no boundary';

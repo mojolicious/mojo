@@ -180,9 +180,9 @@ sub cookie {
 sub dom {
   my $self = shift;
   return if $self->is_multipart;
-  my $dom =
-    $self->dom_class->new->charset($self->content->charset)
-    ->parse($self->body);
+  my $dom = $self->dom_class->new;
+  $dom->charset($self->content->charset);
+  $dom->parse($self->body);
   return @_ ? $dom->find(@_) : $dom;
 }
 

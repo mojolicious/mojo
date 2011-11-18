@@ -18,8 +18,9 @@ sub body_size { croak 'Method "body_size" not implemented by subclass' }
 
 sub boundary {
   (shift->headers->content_type || '')
-    =~ m#multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+/]+)#i;
-  return $1;
+    =~ m#multipart.*boundary=\"*([a-zA-Z0-9\'\(\)\,\.\:\?\-\_\+/]+)#i
+    and return $1;
+  return;
 }
 
 # "Operator! Give me the number for 911!"
@@ -70,8 +71,9 @@ sub build_headers {
 }
 
 sub charset {
-  (shift->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/i;
-  return $1;
+  (shift->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/i
+    and return $1;
+  return;
 }
 
 sub clone {

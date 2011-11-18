@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 912;
+use Test::More tests => 916;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -280,7 +280,7 @@ is $req->body, '', 'no content';
 # Parse HTTP 1.0 start line and headers, no body
 $req = Mojo::Message::Request->new;
 $req->parse("GET /foo/bar/baz.html HTTP/1.0\x0d\x0a");
-$req->parse("Content-Type: text/plain\x0d\x0a");
+$req->parse("Content-Type: text/plain;charset=UTF-8\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
@@ -288,8 +288,10 @@ is $req->version,     '1.0', 'right version';
 ok $req->at_least_version('0.9'), 'at least version 0.9';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html', 'right URL';
-is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $req->headers->content_length, 0, 'right "Content-Length" value';
+is $req->headers->content_type, 'text/plain;charset=UTF-8',
+  'right "Content-Type" value';
+is $req->headers->content_length, 0,       'right "Content-Length" value';
+is $req->content->charset,        'UTF-8', 'right charset';
 
 # Parse HTTP 1.0 start line and headers, no body (missing Content-Length)
 $req = Mojo::Message::Request->new;
@@ -425,8 +427,8 @@ $req->content->on(read => sub { $body .= pop });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
 $req->parse('-Type: text/');
-$req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aHell");
-$req->parse("o World!\n1234\nlalalala\n");
+$req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aH");
+$req->parse("ello World!\n1234\nlalalala\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.0', 'right version';
@@ -797,6 +799,7 @@ my $file = File::Spec->catfile(File::Temp::tempdir(CLEANUP => 1),
   ("MOJO_TMP." . time . ".txt"));
 ok $req->upload('upload')->move_to($file), 'moved file';
 ok unlink($file), 'unlinked file';
+is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';
 
 # Parse HTTP 1.1 multipart request (with callbacks and stream)
 $req = Mojo::Message::Request->new;
@@ -1868,3 +1871,10 @@ ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/perldoc?Mojo%3A%3AMessage%3A%3ARequest', 'right URL';
 is $req->url->query->params->[0], 'Mojo::Message::Request', 'right value';
+
+# Tainted environment
+$req = Mojo::Message::Request->new;
+"a" =~ /(.)/;
+ok !$req->content->charset, 'no charset';
+"a" =~ /(.)/;
+ok !$req->content->boundary, 'no boundary';

@@ -17,12 +17,10 @@ sub register {
   }
   else { $path = $prefix }
 
-  # Generate route and "after_build_tx" hook
+  # Generate route
   my $embed = Mojo::Server->new->load_app($conf->{$prefix});
   my $route = $app->routes->route($path)->detour(app => $embed);
   $route->over(host => $host) if $host;
-  $app->hook(after_build_tx =>
-      sub { $embed->plugins->emit_hook(after_build_tx => $_[0], $embed) });
 
   return $route;
 }

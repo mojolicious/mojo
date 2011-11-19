@@ -9,13 +9,6 @@ use Mojolicious::Lite;
 # Load plugin
 plugin 'Config';
 
-# Hook and helper to test inheritance
-hook after_build_tx => sub {
-  my ($tx, $app) = @_;
-  $tx->res->headers->header('X-Build' => $app->app_ref);
-};
-helper app_ref => sub { ref shift->app };
-
 # GET /
 get '/' => 'index';
 

@@ -6,8 +6,6 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL emit_chain method to Mojolicious::Plugins.
           (Akron, sri)
         - Added EXPERIMENTAL around_dispatch hook.
-        - Improved Mojolicious::Plugin::Mount to support after_build_tx
-          hooks.
         - Fixed small bug in boundary and charset methods of Mojo::Content.
 
 2.28    2011-11-18 00:00:00

@@ -480,7 +480,8 @@ parsed.
   });
 
 This is a very powerful hook and should not be used lightly, it makes some
-rather advanced features such as upload progress bars possible.
+rather advanced features such as upload progress bars possible, just note
+that it will not work for embedded applications.
 (Passed the transaction and application instances)
 
 =item before_dispatch

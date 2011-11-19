@@ -86,9 +86,9 @@ ok !$once, 'no subscribers';
 $once = 0;
 $e->once(
   one_time => sub {
-    $e->once(
+    shift->once(
       one_time => sub {
-        $e->once(one_time => sub { $once++ });
+        shift->once(one_time => sub { $once++ });
       }
     );
   }

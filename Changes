@@ -3,7 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.29    2011-11-19 00:00:00
         - Deprecated Mojolicious->on_process in favor of around_dispatch
           hook.
-        - Added EXPERIMENTAL emit_hook_chain method to Mojolicious::Plugins.
+        - Added EXPERIMENTAL emit_chain method to Mojolicious::Plugins.
           (Akron, sri)
         - Added EXPERIMENTAL around_dispatch hook.
         - Fixed small bug in boundary and charset methods of Mojo::Content.

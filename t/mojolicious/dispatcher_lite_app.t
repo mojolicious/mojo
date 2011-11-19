@@ -17,16 +17,16 @@ use Test::Mojo;
 # Wrap whole application
 hook around_dispatch => sub {
   my ($next, $self) = @_;
-  return $self->render(text => 'Wrapped!')
-    if $self->req->url->path->contains('/wrap');
+  return $self->render(text => 'Wrapped again!')
+    if $self->req->url->path->contains('/wrap/again');
   $next->();
 };
 
 # Wrap whole application again
 hook around_dispatch => sub {
   my ($next, $self) = @_;
-  return $self->render(text => 'Wrapped again!')
-    if $self->req->url->path->contains('/wrap/again');
+  return $self->render(text => 'Wrapped!')
+    if $self->req->url->path->contains('/wrap');
   $next->();
 };
 

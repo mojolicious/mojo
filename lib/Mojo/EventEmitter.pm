@@ -26,11 +26,11 @@ sub on {
 sub once {
   my ($self, $name, $cb) = @_;
 
+  weaken $self;
   my $wrapper;
   $wrapper = sub {
-    my $self = shift;
     $self->unsubscribe($name => $wrapper);
-    $self->$cb(@_);
+    $cb->(@_);
   };
   $self->on($name => $wrapper);
   weaken $wrapper;
@@ -53,12 +53,7 @@ sub unsubscribe {
   }
 
   # One
-  my @callbacks;
-  for my $subscriber (@{$self->subscribers($name)}) {
-    next if $cb eq $subscriber;
-    push @callbacks, $subscriber;
-  }
-  $self->{events}->{$name} = \@callbacks;
+  $self->{events}->{$name} = [grep { $cb ne $_ } @{$self->{events}->{$name}}];
 
   return $self;
 }

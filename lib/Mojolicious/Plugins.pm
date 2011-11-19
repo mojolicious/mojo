@@ -22,12 +22,12 @@ sub emit_hook {
   return $self;
 }
 
-sub emit_hook_chain {
+sub emit_chain {
   my ($self, $name, @args) = @_;
   my @subscribers = @{$self->subscribers($name)};
   my $cb;
   $cb = sub {
-    return unless my $next = pop @subscribers;
+    return unless my $next = shift @subscribers;
     $next->($cb, @args);
     undef $cb;
   };
@@ -136,20 +136,20 @@ Namespaces to load plugins from.
 L<Mojolicious::Plugins> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
+=head2 C<emit_chain>
+
+  $plugins = $plugins->emit_chain('foo');
+  $plugins = $plugins->emit_chain(foo => 123);
+
+Emit events as chained hooks.
+Note that this method is EXPERIMENTAL and might change without warning!
+
 =head2 C<emit_hook>
 
   $plugins = $plugins->emit_hook('foo');
   $plugins = $plugins->emit_hook(foo => 123);
 
 Emit events as hooks.
-
-=head2 C<emit_hook_chain>
-
-  $plugins = $plugins->emit_hook_chain('foo');
-  $plugins = $plugins->emit_hook_chain(foo => 123);
-
-Emit events as hooks in a chain.
-Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<emit_hook_reverse>
 

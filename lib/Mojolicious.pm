@@ -93,19 +93,6 @@ sub new {
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';
 
-  # Default dispatcher
-  $self->hook(
-    around_dispatch => sub {
-      my ($next, $c) = @_;
-
-      # DEPRECATED in Leaf Fluttering In Wind!
-      my $cb = $self->on_process;
-      $c->app->$cb($c);
-
-      $next->();
-    }
-  );
-
   # Run mode
   $mode = $mode . '_mode';
   $self->$mode(@_) if $self->can($mode);
@@ -180,14 +167,29 @@ sub handler {
     $tx    = $tx->tx;
   }
 
-  # Build default controller and process
+  # Build default controller
   my $defaults = $self->defaults;
   @{$stash}{keys %$defaults} = values %$defaults;
   my $c =
     $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{app};
   weaken $c->{tx};
-  unless (eval { $self->plugins->emit_hook_chain(around_dispatch => $c) }) {
+
+  # Dispatcher
+  unless ($self->{dispatcher}) {
+    $self->hook(
+      around_dispatch => sub {
+        my ($next, $c) = @_;
+
+        # DEPRECATED in Leaf Fluttering In Wind!
+        $self->on_process->($c->app, $c);
+      }
+    );
+    $self->{dispatcher}++;
+  }
+
+  # Process
+  unless (eval { $self->plugins->emit_chain(around_dispatch => $c) }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);
     $tx->resume;
@@ -221,14 +223,13 @@ sub hook { shift->plugins->on(@_) }
 # DEPRECATED in Leaf Fluttering In Wind!
 sub on_process {
   my ($self, $cb) = @_;
-  if ($cb) {
-    warn <<EOF;
+  return $self->{on_process} ||= sub { shift->dispatch(@_) }
+    unless $cb;
+  warn <<EOF;
 Mojolicious->on_process is DEPRECATED in favor of the around_dispatch hook!
 EOF
-    $self->{on_process} = $cb;
-    return $self;
-  }
-  return $self->{on_process} ||= sub { shift->dispatch(@_) };
+  $self->{on_process} = $cb;
+  return $self;
 }
 
 sub plugin {
@@ -519,9 +520,9 @@ Useful for all kinds of postprocessing tasks.
 
 =item around_dispatch
 
-Emitted in reverse order right before the C<before_dispatch> hook and wraps
-around the whole dispatch process, so you have to manually forward to the
-next hook if you want to continue the chain.
+Emitted right before the C<before_dispatch> hook and wraps around the whole
+dispatch process, so you have to manually forward to the next hook if you
+want to continue the chain.
 Note that this hook is EXPERIMENTAL and might change without warning!
 
   $app->hook(around_dispatch => sub {

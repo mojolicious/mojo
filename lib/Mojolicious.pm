@@ -14,10 +14,7 @@ use Scalar::Util qw/blessed weaken/;
 
 # "Robots don't have any emotions, and sometimes that makes me very sad."
 has controller_class => 'Mojolicious::Controller';
-has mode             => sub { ($ENV{MOJO_MODE} || 'development') };
-has on_process       => sub {
-  sub { shift->dispatch(@_) }
-};
+has mode => sub { ($ENV{MOJO_MODE} || 'development') };
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };
 has routes   => sub { Mojolicious::Routes->new };
@@ -96,6 +93,19 @@ sub new {
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';
 
+  # Default dispatcher
+  $self->hook(
+    around_dispatch => sub {
+      my ($next, $c) = @_;
+
+      # DEPRECATED in Leaf Fluttering In Wind!
+      my $cb = $self->on_process;
+      $c->app->$cb($c);
+
+      $next->();
+    }
+  );
+
   # Run mode
   $mode = $mode . '_mode';
   $self->$mode(@_) if $self->can($mode);
@@ -134,7 +144,6 @@ sub defaults {
   return $self;
 }
 
-# The default dispatchers with exception handling
 sub dispatch {
   my ($self, $c) = @_;
 
@@ -178,7 +187,7 @@ sub handler {
     $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{app};
   weaken $c->{tx};
-  unless (eval { $self->on_process->($self, $c); 1 }) {
+  unless (eval { $self->plugins->emit_hook_chain(around_dispatch => $c) }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);
     $tx->resume;
@@ -209,12 +218,24 @@ sub helper {
 #  Santa Claus is gunning you down!"
 sub hook { shift->plugins->on(@_) }
 
+# DEPRECATED in Leaf Fluttering In Wind!
+sub on_process {
+  my ($self, $cb) = @_;
+  if ($cb) {
+    warn <<EOF;
+Mojolicious->on_process is DEPRECATED in favor of the around_dispatch hook!
+EOF
+    $self->{on_process} = $cb;
+    return $self;
+  }
+  return $self->{on_process} ||= sub { shift->dispatch(@_) };
+}
+
 sub plugin {
   my $self = shift;
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
-# Start command system
 sub start {
   my $class = shift;
 
@@ -228,7 +249,6 @@ sub start {
   Mojolicious::Commands->start(@_);
 }
 
-# This will run once at startup
 sub startup { }
 
 1;
@@ -301,23 +321,6 @@ C<startup>.
 Right before calling C<startup> and mode specific methods, L<Mojolicious>
 will pick up the current mode, name the log file after it and raise the log
 level from C<debug> to C<info> if it has a value other than C<development>.
-
-=head2 C<on_process>
-
-  my $process = $app->on_process;
-  $app        = $app->on_process(sub {...});
-
-Request processing callback, defaults to calling the C<dispatch> method.
-Generally you will use a plugin or controller instead of this, consider it
-the sledgehammer in your toolbox.
-
-  my $next = $app->on_process;
-  $app->on_process(sub {
-    my ($self, $c) = @_;
-    return $c->render(text => 'Hello world!')
-      if $c->req->url->path->contains('/hello');
-    $self->$next($c);
-  });
 
 =head2 C<plugins>
 
@@ -483,7 +486,7 @@ One use case would be upload progress bars.
 Emitted right before the static and routes dispatchers start their work.
 
   $app->hook(before_dispatch => sub {
-    my $self = shift;
+    my $c = shift;
   });
 
 Very useful for rewriting incoming requests and other preprocessing tasks.
@@ -495,7 +498,7 @@ Emitted in reverse order after the static dispatcher determined if a static
 file should be served and before the routes dispatcher starts its work.
 
   $app->hook(after_static_dispatch => sub {
-    my $self = shift;
+    my $c = shift;
   });
 
 Mostly used for custom dispatchers and postprocessing static file responses.
@@ -508,11 +511,26 @@ Note that this hook can trigger before C<after_static_dispatch> due to its
 dynamic nature.
 
   $app->hook(after_dispatch => sub {
-    my $self = shift;
+    my $c = shift;
   });
 
 Useful for all kinds of postprocessing tasks.
 (Passed the current controller instance)
+
+=item around_dispatch
+
+Emitted in reverse order right before the C<before_dispatch> hook and wraps
+around the whole dispatch process, so you have to manually forward to the
+next hook if you want to continue the chain.
+Note that this hook is EXPERIMENTAL and might change without warning!
+
+  $app->hook(around_dispatch => sub {
+    my ($next, $c) = @_;
+    $next->();
+  });
+
+This is a very powerful hook and should not be used lightly, consider it the
+sledgehammer in your toolbox.
 
 =back
 

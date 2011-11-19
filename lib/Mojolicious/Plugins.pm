@@ -22,6 +22,19 @@ sub emit_hook {
   return $self;
 }
 
+sub emit_hook_chain {
+  my ($self, $name, @args) = @_;
+  my @subscribers = @{$self->subscribers($name)};
+  my $cb;
+  $cb = sub {
+    return unless my $next = pop @subscribers;
+    $next->($cb, @args);
+    undef $cb;
+  };
+  $cb->();
+  return $self;
+}
+
 # "Everybody's a jerk. You, me, this jerk."
 sub emit_hook_reverse {
   my $self = shift;
@@ -129,6 +142,14 @@ implements the following new ones.
   $plugins = $plugins->emit_hook(foo => 123);
 
 Emit events as hooks.
+
+=head2 C<emit_hook_chain>
+
+  $plugins = $plugins->emit_hook_chain('foo');
+  $plugins = $plugins->emit_hook_chain(foo => 123);
+
+Emit events as hooks in a chain.
+Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<emit_hook_reverse>
 

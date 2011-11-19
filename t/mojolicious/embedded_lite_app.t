@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'testing';
 }
 
-use Test::More tests => 125;
+use Test::More tests => 167;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -134,167 +134,207 @@ get '/host' => {text => 'main application!'};
 my $t = Test::Mojo->new;
 
 # GET /foo/bar (plugin app)
-$t->get_ok('/foo/bar')->status_is(200)->content_is('plugin works!');
+$t->get_ok('/foo/bar')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('plugin works!');
 
 # GET /hello (from main app)
 $t->get_ok('/hello')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is("Hello from the main app!\n");
 
 # GET /hello/hello (from embedded app)
 $t->get_ok('/hello/hello')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('Hello from the embedded (1) app!');
 
 # GET /hello/hello (from embedded app again)
 $t->get_ok('/hello/hello')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('Hello from the embedded (2) app!');
 
 # GET /hello/hello (from embedded app again)
 $t->get_ok('/hello/hello')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('Hello from the embedded (3) app!');
 
 # GET /bye/bye (from embedded app)
 $t->get_ok('/bye/bye')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('Hello from the embedded (1) app!second embedded! success!');
 
 # GET /bar/bye (from embedded app)
 $t->get_ok('/bar/bye')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('Hello from the embedded (2) app!third embedded! success!');
 
 # GET /baz/bye (from embedded app)
 $t->get_ok('/baz/bye')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('Hello from the embedded (3) app!fourth embedded! success!');
 
 # GET /yada (from embedded app)
-$t->get_ok('/yada')->status_is(200)->content_is('yada fifth embedded works!');
+$t->get_ok('/yada')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
+  ->content_is('yada fifth embedded works!');
 
 # GET /yada/yada (404 from embedded app)
-$t->get_ok('/yada/yada')->status_is(404);
+$t->get_ok('/yada/yada')->header_is('X-Build' => 'Mojolicious::Lite')
+  ->status_is(404);
 
 # GET /yada/yada/yada (from embedded app)
 $t->get_ok('/yada/yada/yada')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('yada sixth embedded works!');
 
 # GET /basic (from embedded app)
-$t->get_ok('/basic')->status_is(200)->content_is('Hello lalala!');
+$t->get_ok('/basic')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('Hello lalala!');
 
 # GET /third/ (from embedded app)
 $t->get_ok('/third')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('Bye from the third embedded app! /third!');
 
 # GET /just/works (from external embedded app)
-$t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
+$t->get_ok('/just/works')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
+  ->content_is("It is working!\n");
 
 # GET /just/works/too (from external embedded app)
-$t->get_ok('/just/works/too')->status_is(200)->content_is("It just works!\n");
+$t->get_ok('/just/works/too')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
+  ->content_is("It just works!\n");
 
 # GET /x/1/ (full external application)
-$t->get_ok('/x/1/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
+$t->get_ok('/x/1/')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
+  ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /x/1/index.html (full external application)
 $t->get_ok('/x/1/index.html')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('External static file!');
 
 # GET /x/1/echo (full external application)
-$t->get_ok('/x/1/echo')->status_is(200)->content_is('echo: nothing!');
+$t->get_ok('/x/1/echo')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('echo: nothing!');
 
 # GET /x/1/stream (full external application)
-$t->get_ok('/x/1/stream')->status_is(200)->content_is('hello!');
+$t->get_ok('/x/1/stream')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('hello!');
 
 # GET /x/1/url/☃ (full external application)
 $t->get_ok('/x/1/url/☃')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('/x/1/url/%E2%98%83 -> /x/1/%E2%98%83/stream!');
 
 # GET /x/♥/ (full external application)
-$t->get_ok('/x/♥/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
+$t->get_ok('/x/♥/')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
+  ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /x/♥/index.html (full external application)
-$t->get_ok('/x/♥/index.html')->status_is(200)
-  ->content_is('External static file!');
+$t->get_ok('/x/♥/index.html')->header_is('X-Build' => 'Mojolicious::Lite')
+  ->status_is(200)->content_is('External static file!');
 
 # GET /x/♥/echo (full external application)
-$t->get_ok('/x/♥/echo')->status_is(200)->content_is('echo: works 2!');
+$t->get_ok('/x/♥/echo')->header_is('X-Build' => 'Mojolicious::Lite')
+  ->status_is(200)->content_is('echo: works 2!');
 
 # GET /x/♥/stream (full external application)
-$t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
+$t->get_ok('/x/♥/stream')->header_is('X-Build' => 'Mojolicious::Lite')
+  ->status_is(200)->content_is('hello!');
 
 # GET /x/♥/url/☃ (full external application)
-$t->get_ok('/x/♥/url/☃')->status_is(200)
+$t->get_ok('/x/♥/url/☃')->header_is('X-Build' => 'Mojolicious::Lite')
+  ->status_is(200)
   ->content_is(
   '/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
 
 # GET /host (main application)
-$t->get_ok('/host')->status_is(200)->content_is('main application!');
+$t->get_ok('/host')->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
+  ->content_is('main application!');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET / (full external application with domain and reverse proxy)
 my $backup = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/' => {'X-Forwarded-Host' => 'mojolicious.org'})->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is("works!\n\ntoo!works!!!\n");
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('mojolicious.org');
 
 # GET /host (full external application with domain and reverse proxy)
 $backup = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/host' => {'X-Forwarded-Host' => 'mojolicious.org'})
-  ->status_is(200)->content_is('mojolicious.org');
+  ->status_is(200)->header_is('X-Build' => 'Mojolicious::Lite')
+  ->content_is('mojolicious.org');
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /host (full external application with domain and no reverse proxy)
 $t->get_ok(
   '/host' => {Host => 'mojolicious.org', 'X-Forwarded-Host' => 'kraih.com'})
-  ->status_is(200)->content_is('mojolicious.org');
+  ->status_is(200)->header_is('X-Build' => 'Mojolicious::Lite')
+  ->content_is('mojolicious.org');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
-  ->content_is('mojolicio.us');
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('mojolicio.us');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'kraih.com'})->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'KRaIH.CoM'})->status_is(200)
-  ->content_is('kraih.com');
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('kraih.com');
 
 # GET /host (full external application with wildcard domain)
 $t->get_ok('/host' => {Host => 'www.kraih.com'})->status_is(200)
-  ->content_is('www.kraih.com');
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('www.kraih.com');
 
 # GET /host (full external application with wildcard domain)
 $t->get_ok('/host' => {Host => 'foo.bar.kraih.com'})->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is('foo.bar.kraih.com');
 
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)
+  ->header_is('X-Build' => 'Mojolicious::Lite')
   ->content_is("works!\n\ntoo!works!!!\n");
 
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/host' => {Host => 'foo-bar.de'})->status_is(200)
-  ->content_is('foo-bar.de');
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('foo-bar.de');
 
 # GET /♥/123/echo (full external application with a bit of everything)
 $t->get_ok('/♥/123/echo' => {Host => 'foo-bar.de'})->status_is(200)
-  ->content_is('echo: works 3!');
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('echo: works 3!');
 
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/host' => {Host => 'www.foo-bar.de'})->status_is(200)
-  ->content_is('www.foo-bar.de');
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('www.foo-bar.de');
 
 # GET /♥/123/echo (full external application with a bit of everything)
 $t->get_ok('/♥/123/echo' => {Host => 'www.foo-bar.de'})->status_is(200)
-  ->content_is('echo: works 3!');
+  ->header_is('X-Build' => 'Mojolicious::Lite')->content_is('echo: works 3!');
 
 __DATA__
 

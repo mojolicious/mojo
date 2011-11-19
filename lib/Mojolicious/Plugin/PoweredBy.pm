@@ -10,11 +10,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app, $args) = @_;
   my $name = $args->{name} || 'Mojolicious (Perl)';
-  $app->hook(
-    after_build_tx => sub {
-      shift->res->headers->header('X-Powered-By' => $name);
-    }
-  );
+  $app->hook(before_dispatch =>
+      sub { shift->res->headers->header('X-Powered-By' => $name) });
 }
 
 1;

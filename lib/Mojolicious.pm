@@ -479,7 +479,9 @@ parsed.
     my ($tx, $app) = @_;
   });
 
-One use case would be upload progress bars.
+This is a very powerful hook and should not be used lightly, one use case
+would be upload progress bars, just note that it will not work in embedded
+applications.
 (Passed the transaction and application instances)
 
 =item before_dispatch

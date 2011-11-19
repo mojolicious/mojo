@@ -9,10 +9,10 @@ sub register {
   $conf ||= {};
 
   # Change default charset on all layers
-  return unless my $charset = $conf->{charset};
-  $app->types->type(html => "text/html;charset=$charset");
-  $app->renderer->encoding($charset);
-  $app->hook(after_build_tx => sub { shift->req->default_charset($charset) });
+  return unless my $s = $conf->{charset};
+  $app->types->type(html => "text/html;charset=$s");
+  $app->renderer->encoding($s);
+  $app->hook(before_dispatch => sub { shift->req->default_charset($s) });
 }
 
 1;

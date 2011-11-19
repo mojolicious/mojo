@@ -532,6 +532,8 @@ Note that this hook is EXPERIMENTAL and might change without warning!
 
 This is a very powerful hook and should not be used lightly, consider it the
 sledgehammer in your toolbox.
+(Passed a closure leading to the next hook andthe current controller
+instance)
 
 =back
 

@@ -479,8 +479,8 @@ parsed.
     my ($tx, $app) = @_;
   });
 
-This is a very powerful hook and should not be used lightly, it can be very
-useful for advanced features like upload progress bars.
+This is a very powerful hook and should not be used lightly, it makes some
+rather advanced features such as upload progress bars possible.
 (Passed the transaction and application instances)
 
 =item before_dispatch
@@ -491,7 +491,7 @@ Emitted right before the static and routes dispatchers start their work.
     my $c = shift;
   });
 
-Useful for rewriting incoming requests and other preprocessing tasks.
+Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller instance)
 
 =item after_static_dispatch

@@ -345,7 +345,7 @@ sub _spawn {
     or croak qq/Can't open lock file "$file": $!/;
 
   # Accept mutex
-  $loop->on_lock(
+  $loop->lock(
     sub {
 
       # Blocking
@@ -369,7 +369,7 @@ sub _spawn {
       return $l;
     }
   );
-  $loop->on_unlock(sub { flock $lock, LOCK_UN });
+  $loop->unlock(sub { flock $lock, LOCK_UN });
 
   # Heartbeat
   weaken $self;

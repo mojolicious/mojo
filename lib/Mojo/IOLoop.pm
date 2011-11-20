@@ -20,10 +20,10 @@ has iowatcher    => sub {
   $class->new;
 };
 has [qw/cleanup_interval max_accepts/] => 0;
+has [qw/lock unlock/];
 has max_connections => 1000;
-has [qw/on_lock on_unlock/];
-has server_class => 'Mojo::IOLoop::Server';
-has stream_class => 'Mojo::IOLoop::Stream';
+has server_class    => 'Mojo::IOLoop::Server';
+has stream_class    => 'Mojo::IOLoop::Stream';
 
 # Ignore PIPE signal
 $SIG{PIPE} = 'IGNORE';
@@ -220,7 +220,24 @@ sub listen {
 # DEPRECATED in Leaf Fluttering In Wind!
 sub on_close { shift->_event(close => @_) }
 sub on_error { shift->_event(error => @_) }
-sub on_read  { shift->_event(read  => @_) }
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub on_lock {
+  warn
+    "Mojo::IOLoop->on_lock is DEPRECATED in favor of Mojo::IOLoop->lock!\n";
+  shift->lock(@_);
+}
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub on_read { shift->_event(read => @_) }
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub on_unlock {
+  warn <<EOF;
+Mojo::IOLoop->on_unlock is DEPRECATED in favor of Mojo::IOLoop->unlock!
+EOF
+  shift->unlock(@_);
+}
 
 sub one_tick {
   my $self = shift;
@@ -426,7 +443,7 @@ sub _listening {
   my $i   = keys %{$self->{connections}};
   my $max = $self->max_connections;
   return unless $i < $max;
-  if (my $cb = $self->on_lock) { return unless $self->$cb(!$i) }
+  if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
 
   # Check if multi-accept is desirable and start listening
   $_->accepts($max > 1 ? 10 : 1)->resume for values %$servers;
@@ -438,7 +455,7 @@ sub _not_listening {
 
   # Check if we are listening
   return unless delete $self->{listening};
-  return unless my $cb = $self->on_unlock;
+  return unless my $cb = $self->unlock;
   $self->$cb();
 
   # Stop listening
@@ -541,6 +558,23 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 Connection cleanup interval in seconds, defaults to C<0>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
+=head2 C<lock>
+
+  my $cb = $loop->lock;
+  $loop  = $loop->lock(sub {...});
+
+A locking callback that decides if this loop is allowed to accept new
+incoming connections, used to sync multiple server processes.
+The callback should return true or false.
+Note that exceptions in this callback are not captured.
+
+  $loop->lock(sub {
+    my ($loop, $blocking) = @_;
+
+    # Got the lock, listen for new connections
+    return 1;
+  });
+
 =head2 C<max_accepts>
 
   my $max = $loop->max_accepts;
@@ -564,31 +598,6 @@ Setting the value to C<0> will make this loop stop accepting new connections
 and allow it to shutdown gracefully without interrupting existing
 connections.
 
-=head2 C<on_lock>
-
-  my $cb = $loop->on_lock;
-  $loop  = $loop->on_lock(sub {...});
-
-A locking callback that decides if this loop is allowed to accept new
-incoming connections, used to sync multiple server processes.
-The callback should return true or false.
-Note that exceptions in this callback are not captured.
-
-  $loop->on_lock(sub {
-    my ($loop, $blocking) = @_;
-
-    # Got the lock, listen for new connections
-    return 1;
-  });
-
-=head2 C<on_unlock>
-
-  my $cb = $loop->on_unlock;
-  $loop  = $loop->on_unlock(sub {...});
-
-A callback to free the accept lock, used to sync multiple server processes.
-Note that exceptions in this callback are not captured.
-
 =head2 C<server_class>
 
   my $class = $loop->server_class;
@@ -606,6 +615,14 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 Class to be used by C<client> and C<server> methods for I/O streams, defaults
 to L<Mojo::IOLoop::Stream>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
+
+=head2 C<unlock>
+
+  my $cb = $loop->unlock;
+  $loop  = $loop->unlock(sub {...});
+
+A callback to free the accept lock, used to sync multiple server processes.
+Note that exceptions in this callback are not captured.
 
 =head1 METHODS
 

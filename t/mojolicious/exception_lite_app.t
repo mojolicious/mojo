@@ -47,7 +47,7 @@ get '/dead_template_with_layout';
 # GET /dead_action
 get '/dead_action' => sub { die 'dead action!' };
 
-# GET /double_dead_action
+# GET /double_dead_action_☃
 get '/double_dead_action_☃' => sub {
   eval { die 'double dead action!' };
   die $@;

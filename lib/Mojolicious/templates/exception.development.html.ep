@@ -44,10 +44,6 @@
         font-family: 'Menlo', 'Monaco', Courier, monospace !important;
         text-shadow: #333 0 1px 0;
       }
-      .file {
-        margin-bottom: 0.5em;
-        margin-top: 1em;
-      }
       .important { background-color: rgba(47, 48, 50, .75) }
       .infobox { color: #333 }
       .infobox tr:nth-child(odd) .value { background-color: #ddeeff }
@@ -55,14 +51,6 @@
       .key {
         text-align: right;
         text-weight: bold;
-      }
-      .preview {
-        background-color: #1a1a1a;
-        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
-        -moz-border-radius: 5px;
-        border-radius: 5px;
-        margin-bottom: 1em;
-        padding: 0.5em;
       }
       .tap {
         font: 0.5em Verdana, sans-serif;
@@ -172,16 +160,16 @@
     </div>
     <div class="box" id="trace">
       % if (@{$e->frames}) {
-        <div id="frames">
-          % for my $frame (@{$e->frames}) {
-            % if (my $line = $frame->[3]) {
-              <div class="file"><%= $frame->[1] %></div>
-              <div class="code preview">
-                %= "$frame->[2]."
-                <code class="prettyprint"><%= $line %></code>
-              </div>
+        <div class="infobox" id="frames">
+          <table>
+            % for my $frame (@{$e->frames}) {
+              <tr>
+                <td class="value">
+                  <pre><%= $frame->[1] . ':' . $frame->[2] %></pre>
+                </td>
+              </tr>
             % }
-          % }
+          </table>
         </div>
         <div class="tap">tap for more</div>
         %= javascript begin

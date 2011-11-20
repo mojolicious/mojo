@@ -19,27 +19,37 @@ sub new {
   return @_ ? $self->_detect(@_) : $self;
 }
 
-sub throw {
+sub throw { shift and die Mojo::Exception->new->trace(2)->_detect(@_) }
+
+sub to_string {
   my $self = shift;
-  die Mojo::Exception->new->trace(2)->_detect(@_);
+
+  # Message only
+  return $self->message unless $self->verbose;
+
+  # Start with message
+  my $string = '';
+  $string .= $self->message if $self->message;
+
+  # Before
+  $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
+
+  # Line
+  $string .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
+    if $self->line->[0];
+
+  # After
+  $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};
+
+  return $string;
 }
 
 sub trace {
   my ($e, $start) = @_;
   $start //= 1;
-
-  # Trace
   my @frames;
-  while (my ($p, $f, $l) = caller($start++)) {
-    push @frames, [$p, $f, $l];
-
-    # Line
-    next unless -r $f;
-    next unless my $handle = IO::File->new($f, '<:utf8');
-    push @{$frames[-1]}, (<$handle>)[$l - 1];
-  }
+  while (my @trace = caller($start++)) { push @frames, \@trace }
   $e->frames(\@frames);
-
   return $e;
 }
 
@@ -65,13 +75,9 @@ sub _detect {
 
   # Frames
   foreach my $frame (reverse @trace) {
-    my $file = $frame->{file};
-    my $line = $frame->{line};
-
-    # Line
-    next unless -r $file;
-    my $handle = IO::File->new($file, '<:utf8');
-    $self->_parse_context($line, [[<$handle>]]);
+    next unless -r $frame->{file};
+    my $handle = IO::File->new($frame->{file}, '<:utf8');
+    $self->_parse_context($frame->{line}, [[<$handle>]]);
     return $self;
   }
 
@@ -114,29 +120,6 @@ sub _detect {
 
 # "You killed zombie Flanders!
 #  He was a zombie?"
-sub to_string {
-  my $self = shift;
-
-  # Message only
-  return $self->message unless $self->verbose;
-
-  # Start with message
-  my $string = '';
-  $string .= $self->message if $self->message;
-
-  # Before
-  $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
-
-  # Line
-  $string .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
-    if $self->line->[0];
-
-  # After
-  $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};
-
-  return $string;
-}
-
 sub _parse_context {
   my ($self, $line, $lines) = @_;
 
@@ -146,20 +129,17 @@ sub _parse_context {
   # Context
   $self->line([$line]);
   for my $l (@$lines) {
-    my $code = $l->[$line - 1];
-    chomp $code;
+    chomp(my $code = $l->[$line - 1]);
     push @{$self->line}, $code;
   }
 
   # Before
   for my $i (2 .. 6) {
-    my $previous = $line - $i;
-    last if $previous < 0;
+    last if ((my $previous = $line - $i) < 0);
     if (defined($lines->[0]->[$previous])) {
       unshift @{$self->lines_before}, [$previous + 1];
       for my $l (@$lines) {
-        my $code = $l->[$previous];
-        chomp $code;
+        chomp(my $code = $l->[$previous]);
         push @{$self->lines_before->[0]}, $code;
       }
     }
@@ -167,8 +147,7 @@ sub _parse_context {
 
   # After
   for my $i (0 .. 4) {
-    my $next = $line + $i;
-    next if $next < 0;
+    next if ((my $next = $line + $i) < 0);
     if (defined($lines->[0]->[$next])) {
       push @{$self->lines_after}, [$next + 1];
       for my $l (@$lines) {
@@ -251,7 +230,7 @@ Raw unprocessed exception message.
   $e          = $e->verbose(1);
 
 Activate verbose rendering, defaults to the value of
-C<MOJO_EXCEPTION_VERBOSE=1> or C<0>.
+C<MOJO_EXCEPTION_VERBOSE> or C<0>.
 
 =head1 METHODS
 
@@ -272,18 +251,19 @@ Construct a new L<Mojo::Exception> object.
 
 Throw exception with stacktrace.
 
-=head2 C<trace>
-
-  $e = $e->trace;
-
-Perform stacktrace.
-
 =head2 C<to_string>
 
   my $string = $e->to_string;
   my $string = "$e";
 
 Render exception with context.
+
+=head2 C<trace>
+
+  $e = $e->trace;
+  $e = $e->trace(2);
+
+Store stacktrace.
 
 =head1 SEE ALSO
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
+use utf8;
+
 # Disable Bonjour, IPv6 and libev
 BEGIN {
   $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
@@ -46,7 +48,7 @@ get '/dead_template_with_layout';
 get '/dead_action' => sub { die 'dead action!' };
 
 # GET /double_dead_action
-get '/double_dead_action' => sub {
+get '/double_dead_action_☃' => sub {
   eval { die 'double dead action!' };
   die $@;
 };
@@ -140,9 +142,9 @@ $t->get_ok('/dead_action.json')->status_is(500)
   ->content_like(qr|get\ &#39;/dead_action&#39;|)
   ->content_like(qr/dead\ action!/);
 
-# GET /double_dead_action
-$t->get_ok('/double_dead_action')->status_is(500)
-  ->content_like(qr|get\ &#39;/double_dead_action&#39;|)
+# GET /double_dead_action_☃
+$t->get_ok('/double_dead_action_☃')->status_is(500)
+  ->content_like(qr|get\ &#39;/double_dead_action_☃&#39;.*dead_action_☃|s)
   ->content_like(qr/double\ dead\ action!/);
 
 # GET /trapped

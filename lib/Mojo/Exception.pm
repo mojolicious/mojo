@@ -24,10 +24,8 @@ sub throw { shift and die Mojo::Exception->new->trace(2)->_detect(@_) }
 sub to_string {
   my $self = shift;
 
-  # Message only
+  # Message
   return $self->message unless $self->verbose;
-
-  # Start with message
   my $string = '';
   $string .= $self->message if $self->message;
 
@@ -45,12 +43,12 @@ sub to_string {
 }
 
 sub trace {
-  my ($e, $start) = @_;
+  my ($self, $start) = @_;
   $start //= 1;
   my @frames;
   while (my @trace = caller($start++)) { push @frames, \@trace }
-  $e->frames(\@frames);
-  return $e;
+  $self->frames(\@frames);
+  return $self;
 }
 
 sub _detect {
@@ -61,31 +59,28 @@ sub _detect {
   return $message if blessed $message && $message->isa('Mojo::Exception');
   $self->message($message)->raw_message($message);
 
-  # Trace name and line
+  # Extract file and line from message
   my @trace;
-  while ($message =~ /at\s+(.+?)\s+line\s+(\d+)/g) {
-    push @trace, {file => $1, line => $2};
-  }
+  while ($message =~ /at\s+(.+?)\s+line\s+(\d+)/g) { push @trace, [$1, $2] }
 
-  # Stacktrace
+  # Extract file and line from stacktrace
   if (my $first = $self->frames->[0]) {
-    unshift @trace, {file => $first->[1], line => $first->[2]}
-      if $first->[1];
+    unshift @trace, [$first->[1], $first->[2]] if $first->[1];
   }
 
-  # Frames
+  # Search for context
   foreach my $frame (reverse @trace) {
-    next unless -r $frame->{file};
-    my $handle = IO::File->new($frame->{file}, '<:utf8');
-    $self->_parse_context($frame->{line}, [[<$handle>]]);
+    next unless -r $frame->[0];
+    my $handle = IO::File->new($frame->[0], '<:utf8');
+    $self->_parse_context($frame->[1], [[<$handle>]]);
     return $self;
   }
 
-  # Parse specific file
+  # More context
   return $self unless my $files = shift;
   my @lines = map { [split /\n/] } @$files;
 
-  # Clean up plain messages
+  # Fix file in message
   return $self unless my $name = shift;
   unless (ref $message) {
     my $filter = sub {
@@ -93,14 +88,13 @@ sub _detect {
       my $new  = "$name line $num";
       my $line = $lines[0]->[$num];
       $new .= qq/, near "$line"/ if defined $line;
-      $new .= '.';
-      return $new;
+      return $new .= '.';
     };
     $message =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;
     $self->message($message);
   }
 
-  # Find line
+  # Search for better context
   $name = quotemeta $name;
   my $line;
   if ($self->message =~ /at\s+$name\s+line\s+(\d+)/) { $line = $1 }
@@ -111,8 +105,6 @@ sub _detect {
       last;
     }
   }
-
-  # Context
   $self->_parse_context($line, \@lines) if $line;
 
   return $self;
@@ -126,7 +118,7 @@ sub _parse_context {
   # Wrong file
   return unless defined $lines->[0]->[$line - 1];
 
-  # Context
+  # Line
   $self->line([$line]);
   for my $l (@$lines) {
     chomp(my $code = $l->[$line - 1]);

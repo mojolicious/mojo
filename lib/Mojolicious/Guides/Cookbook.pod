@@ -651,10 +651,10 @@ Don't you hate waiting for C<make test> to finally finish?
 In newer Perl versions you can set the C<HARNESS_OPTIONS> environment
 variable to take advantage of multiple cpu cores and run tests parallel.
 
-  $ HARNESS_OPTIONS=j5 make test
+  $ HARNESS_OPTIONS=j9 make test
   ...
 
-The C<j5> allows 5 tests to run at the same time, which makes for example the
+The C<j9> allows 9 tests to run at the same time, which makes for example the
 L<Mojolicious> test suite finish 3 times as fast on a dual core laptop!
 
 =head2 Adding commands to Mojolicious

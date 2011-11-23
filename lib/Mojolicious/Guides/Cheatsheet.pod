@@ -1,4 +1,3 @@
-
 =head1 NAZWA
 
 Mojolicious::Guides::Cheatsheet - Przegląd 

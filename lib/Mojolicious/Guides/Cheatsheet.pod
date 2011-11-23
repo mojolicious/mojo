@@ -1,3 +1,4 @@
+=encoding utf8
 =head1 NAZWA
 
 Mojolicious::Guides::Cheatsheet - Przegląd 

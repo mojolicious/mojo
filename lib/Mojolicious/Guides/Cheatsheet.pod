@@ -6,11 +6,11 @@ Mojolicious::Guides::Cheatsheet - Przegląd
 
 =head1 STRESZCZENIE
 
-Dokument zawiera zwięzły, uniwersalny przegląd.
+Dokument zawiera zwięzły, pełny przegląd.
 
-=head1 ZAREZERWOWANE WARTOŚCI UKRYTE
+=head1 WARTOŚCI ZAREZERWOWANE
 
-Oprócz wszystkiego poprzedzonego C<mojo.>, istnieje kilka ukrytych wartości, które są zarezerwowane dla routera i renderera.
+Oprócz wszystkiego poprzedzonego C<mojo.>, istnieje kilka wartości, które są zarezerwowane dla routera i renderera.
 
 =head2 C<action>
 
@@ -22,7 +22,7 @@ Akcja do której przesyłamy.
 
   $r->route('/welcome')->to(app => MyApp->new);
 
-Wbudowana aplikacja do której wysyłamy.
+Osadzona aplikacja do której wysyłamy.
 
 =head2 C<cb>
 
@@ -47,7 +47,7 @@ Kontroler do którego wysyłamy.
 
   $self->render(data => 'raw bytes');
 
-Zmień nieprzetworzone bity w odpowiedź.
+Zmienia nieprzetworzony obszar pamięci w odpowiedź.
 
 =head2 C<extends>
 
@@ -83,7 +83,7 @@ Zmienia strukturę Perla w odpowiedź JSON.
 
   $self->render(layout => 'green');
 
-Układ do renderowania.
+Layout do renderowania.
 
 =head2 C<method>
 
@@ -113,7 +113,7 @@ Podstawowa ścieżka do wysyłania do wbudowanych aplikacji.
 
   $self->render(status => 404);
 
-Status używany dla renderowanej odpowiedzi.
+Status renderowanej odpowiedzi.
 
 =head2 C<template>
 
@@ -125,7 +125,7 @@ Szablon do renderowania.
 
   $self->render(text => 'Hello World!');
 
-Zmienia znaki w odpowiedź.
+Zmienia ciąg znaków w odpowiedź.
 
 =head1 ZMIENNE ŚRODOWISKOWE
 

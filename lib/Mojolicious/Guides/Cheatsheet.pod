@@ -1,4 +1,5 @@
 =encoding utf8
+
 =head1 NAZWA
 
 Mojolicious::Guides::Cheatsheet - Przegląd 
@@ -300,7 +301,7 @@ Katalog na pliki tymczasowe (np. duże uploady). Domyślnie używa losowego, zal
 
   MOJO_TMPDIR=/tmp/mojo
 
-=head1 MORE
+=head1 WIĘCEJ
 
 Zapraszamy do kontynuowania lektury L<Mojolicious::Guides>, lub zajrzenia na Mojolicious wiki L<http://github.com/kraih/mojo/wiki>, które zawiera znacznie więcej ciekawych informacji i przykładów, tworzonych przez wielu autorów.
 

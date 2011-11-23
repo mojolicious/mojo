@@ -1,228 +1,219 @@
 
-=head1 NAME
+=head1 NAZWA
 
-Mojolicious::Guides::Cheatsheet - Reference
+Mojolicious::Guides::Cheatsheet - Przegląd 
 
-=head1 OVERVIEW
+=head1 STRESZCZENIE
 
-This document contains a concise all-purpose reference.
+Dokument zawiera zwięzły, uniwersalny przegląd.
 
-=head1 RESERVED STASH VALUES
+=head1 ZAREZERWOWANE WARTOŚCI UKRYTE
 
-Besides everything prefixed with C<mojo.> there are a few stash values that
-are reserved for routes and the renderer.
+Oprócz wszystkiego poprzedzonego C<mojo.>, istnieje kilka ukrytych wartości, które są zarezerwowane dla routera i renderera.
 
 =head2 C<action>
 
   $r->route('/welcome')->to(action => 'hello');
 
-Action to dispatch to.
+Akcja do której przesyłamy.
 
 =head2 C<app>
 
   $r->route('/welcome')->to(app => MyApp->new);
 
-Embedded application to dispatch to.
+Wbudowana aplikacja do której wysyłamy.
 
 =head2 C<cb>
 
   $r->route('/welcome')->to(cb => sub {...});
 
-Callback to dispatch to.
+Wywołanie zwrotne do którego wysyłamy.
 
 =head2 C<class>
 
   $r->route('/welcome')->to(class => 'Greeting');
 
-Camelized alternative to C<controller>.
+Odpowiednik C<controller> w StyluWielbłądzim.
+
 
 =head2 C<controller>
 
   $r->route('/welcome')->to(controller => 'greetings');
 
-Controller to dispatch to.
+Kontroler do którego wysyłamy.
 
 =head2 C<data>
 
   $self->render(data => 'raw bytes');
 
-Turn raw bytes into a response.
+Zmień nieprzetworzone bity w odpowiedź.
 
 =head2 C<extends>
 
   $self->render(extends => 'template');
 
-Template to extend.
+Szablon do rozszerzenia.
 
 =head2 C<format>
 
   $self->render(format => 'rss');
 
-Format to render.
+Format do renderowania.
 
 =head2 C<handler>
 
   $self->render(handler => 'ep');
 
-Handler to use for rendering.
+Uchwyt, który ma być użyty do renderingu.
 
 =head2 C<inline>
 
   $self->render(inline => '<%= 1 + 1%>');
 
-Inline template to render.
+Szablon inline do renderowania.
 
 =head2 C<json>
 
   $self->render(json => {foo => 23});
 
-Turn Perl structure into JSON response.
+Zmienia strukturę Perla w odpowiedź JSON.
 
 =head2 C<layout>
 
   $self->render(layout => 'green');
 
-Layout to render.
+Układ do renderowania.
 
 =head2 C<method>
 
   $r->route('/welcome')->to(method => 'hello');
 
-Alternative to C<action>.
+Alternatywa dla C<action>.
 
 =head2 C<namespace>
 
   $r->route('/welcome')->to(namespace => 'TestApp', method => 'lulz');
 
-Namespace to dispatch to.
+Przestrzeń nazw do wysłania.
 
 =head2 C<partial>
 
   my $result = $self->render(partial => 1);
 
-Return rendering result instead of turning it into a response.
+Zwraca wynik renderowania, zamiast przesyłania go. 
 
 =head2 C<path>
 
   $r->route('/welcome')->to(path => '/test', app => MyApp->new);
 
-Base path to use for dispatching to embedded applications.
+Podstawowa ścieżka do wysyłania do wbudowanych aplikacji.
 
 =head2 C<status>
 
   $self->render(status => 404);
 
-Status code to use for rendered response.
+Status używany dla renderowanej odpowiedzi.
 
 =head2 C<template>
 
   $self->render(template => 'bye');
 
-Template to render.
+Szablon do renderowania.
 
 =head2 C<text>
 
   $self->render(text => 'Hello World!');
 
-Turn characters into a response.
+Zmienia znaki w odpowiedź.
 
-=head1 ENVIRONMENT VARIABLES
+=head1 ZMIENNE ŚRODOWISKOWE
 
-Many parts of L<Mojolicious> can be tuned with environment variables.
-Debug environment variables are excluded because they are for developer use
-only.
+Wiele elementów L<Mojolicious> może być dostosowywanych przy użyciu zmiennych środowiskowych. Zmienne związane ze środowiskiem debuggera nie zostały opisany, bowiem są przeznaczone do użycia tylko przez developerów. 
+
 
 =head2 C<MOJO_APP>
 
-Decides which L<Mojolicious> or L<Mojo> application will be used, should
-always contain a class name like C<MyApp>, usually defaults to
-L<Mojo::HelloWorld>.
+Wybiera która z aplikacji, L<Mojolicious> czy L<Mojo> zostanie użyta. Zawsze powinna zawierać nazwę klasy, jak C<MyApp>, zwykle domyślnie L<Mojo::HelloWorld>.
 
   MOJO_APP=MyApp
 
 =head2 C<MOJO_CA_FILE>
 
-The path to the TLS CA authority file, should always contain a path like
+Ścieżka do pliku autoryzacji TLS CA, zawsze powinno zawierać ścieżkę, np.
 C</etc/tls/cacerts.pem>.
-Note that L<IO::Socket::SSL> must be installed for TLS support.
+Uwaga: L<IO::Socket::SSL> musi być zainstalowane do obsługi TLS.
 
   MOJO_CA_FILE=/etc/tls/cacerts.pem
 
 =head2 C<MOJO_CERT_FILE>
 
-The path to the TLS certificate, should always contain a path like
+Ścieżka do certyfikatu TLS, zawsze powinno zawierać ścieżkę, np.
 C</etc/tls/client.crt>.
-Note that L<IO::Socket::SSL> must be installed for TLS support.
+Uwaga: L<IO::Socket::SSL> musi być zainstalowane do obsługi TLS.
 
   MOJO_CERT_FILE=/etc/tls/client.crt
 
 =head2 C<MOJO_CHUNK_SIZE>
 
-Chunk size used for I/O operations in bytes, a bigger chunk size speeds up
-I/O operations but will also use more memory, defaults to C<131072>.
+Rozmiar bufora używany dla operacji I/O w bajtach. Większy bufor przyspiesza operacje, ale zużywa pamięć. Domyślnie C<131072>.
 
   MOJO_CHUNK_SIZE=1024
 
 =head2 C<MOJO_CONFIG>
 
-Config file to be used by L<Mojolicious::Plugin::Config> and
-L<Mojolicious::Plugin::JSONConfig>, quite useful for testing.
+Plik konfiguracyjny używany przez L<Mojolicious::Plugin::Config> i
+L<Mojolicious::Plugin::JSONConfig>, bardzo przydatne przy testowaniu.
 
    MOJO_CONFIG=myapp.conf
 
 =head2 C<MOJO_HOME>
 
-Home directory for the L<Mojolicious> application, should always contain a
-path like C</home/sri/myapp>.
+Katalog domowy dla aplikacji L<Mojolicious>. Powinien zawsze zawierać ścieżkę, na przykład C</home/sri/myapp>.
 
   MOJO_HOME=/home/sri/myapp
 
 =head2 C<MOJO_IOWATCHER>
 
-Alternative L<Mojo::IOWatcher> implementation to try.
+Alternatywna implementacja L<Mojo::IOWatcher>.
 
   MOJO_IOWATCHER=Mojo::IOWatcher::EV
 
 =head2 C<MOJO_KEY_FILE>
 
-The path to the TLS key, should always contain a path like
+Ścieżka do klucza TLS, powinna zawsze zawierać ścieżkę, na przykład
 C</etc/tls/client.key>.
-Note that L<IO::Socket::SSL> must be installed for TLS support.
+Uwaga: L<IO::Socket::SSL> musi być zainstalowany do obsługi TLS.
 
   MOJO_KEY_FILE=/etc/tls/client.key
 
 =head2 C<MOJO_LOG_LEVEL>
 
-Log level for the L<Mojolicious> application, should contain a valid log
-level like C<debug> or C<error>.
+Poziom raportowania błędów dla L<Mojolicious>, na przykład C<debug> lub C<error>.
 
   MOJO_LOG_LEVEL=debug
   MOJO_LOG_LEVEL=error
 
 =head2 C<MOJO_MAX_LEFTOVER_SIZE>
 
-Maximum size in bytes of buffer for pipelined HTTP requests, defaults to
-C<262144>.
+Maksymalny rozmiar bufora dla pipelinowych zapytań HTTP, w bajtach, domyślnie C<262144>.
 
   MOJO_MAX_LEFTOVER_SIZE=2048
 
 =head2 C<MOJO_MAX_LINE_SIZE>
 
-Maximum line size for HTTP message start lines and headers in bytes, defaults
-to C<10240>.
+Maksymalna długość linii dla nagłówków HTTP, w bajtach, domyślnie C<10240>.
 
   MOJO_MAX_LINE_SIZE=2048
 
 =head2 C<MOJO_MAX_MEMORY_SIZE>
 
-Maximum size in bytes for HTTP content to keep in memory, bigger content will
-be written to temporary files, defaults to C<262144>.
+Maksymalny rozmiar (w bajtach) treści HTTP trzymanej w pamięci. Większe treści będą zapisywane do plików tymczasowych. Domyślnie C<262144>.
 
   MOJO_MAX_MEMORY_SIZE=2048
 
 =head2 C<MOJO_MAX_MESSAGE_SIZE>
 
-Maximum size for HTTP messages in bytes, defaults to C<5242880>.
+Maksymalny rozmiar wiadomości HTTP, w bajtach, domyślnie C<5242880>.
 
   MOJO_MAX_MESSAGE_SIZE=1024
 
@@ -230,90 +221,88 @@ Maximum size for HTTP messages in bytes, defaults to C<5242880>.
 
   MOJO_MAX_REDIRECTS=3
 
-Maximum number of redirects L<Mojo::UserAgent> will follow, defaults to C<0>.
+Maksymalna liczba przekierowań, które L<Mojo::UserAgent> wykona, domyślnie C<0>.
 
 =head2 C<MOJO_MAX_WEBSOCKET_SIZE>
 
-Maximum size for WebSocket messages in bytes, defaults to C<262144>.
+Maksymalny rozmiar wiadomości WebSocket, w bajtach, domyślnie C<262144>.
 
   MOJO_MAX_WEBSOCKET_SIZE=1024
 
 =head2 C<MOJO_MODE>
 
-Run mode for the L<Mojolicious> application, should contain a valid mode like
-C<development> or C<production>.
+Tryb uruchomienia dla aplikacji L<Mojolicious>, na przykład C<development> or C<production>.
 
   MOJO_MODE=development
   MOJO_MODE=production
 
 =head2 C<MOJO_NO_BONJOUR>
 
-Disable Bonjour support.
-Note that L<Net::Rendezvous::Publish> must be installed for Bonjour support.
+Wyłącza obsługę Bonjour.
+Uwaga: L<Net::Rendezvous::Publish> musi być zainstalowany do obsługi Bonjour.
 
   MOJO_NO_BONJOUR=1
 
 =head2 C<MOJO_NO_DETECT>
 
-Disable L<Mojolicious> deployment environment detection.
+Wyłącza wykrywanie środowiska produkcyjnego L<Mojolicious>.
 
   MOJO_NO_DETECT=1
 
 =head2 C<MOJO_NO_IPV6>
 
-Disable IPv6 support.
-Note that L<IO::Socket::IP> must be installed for IPv6 support.
+Wyłącza obsługę IPv6.
+Uwaga: L<IO::Socket::IP> musi być zainstalowany do obsługi IPv6.
 
   MOJO_NO_IPV6=1
 
 =head2 C<MOJO_NO_TLS>
 
-Disable TLS support, this might result in slightly better performance and
-less memory use.
-Note that L<IO::Socket::SSL> must be installed for TLS support.
+Wyłącza obsługę TLS. Może to spowodować nieco lepszą wydajność i zmniejszyć zużycie pamięci.
+Uwaga: L<IO::Socket::SSL> musi być zainstalowany do obsługi TLS.
+
 
   MOJO_NO_TLS=1
 
 =head2 C<MOJO_PROXY>
 
-Enable automatic HTTP and HTTPS proxy detection in L<Mojo::UserAgent>, for
-security reasons this is disabled by default.
+Włącza automatyczne wykrywanie proxy HTTP i HTTPS w L<Mojo::UserAgent>.
+Ze względów bezpieczeństwa domyślnie jest to wyłączone.
 
   MOJO_PROXY=1
 
 =head2 C<MOJO_REVERSE_PROXY>
 
-Enable reverse proxy support for L<Mojolicious> application.
-This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
-C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
+Włącza obsługę reverse proxy w aplikacji L<Mojolicious>.
+Pozwala to L<Mojolicious> automatycznie pobierać nagłówki C<X-Forwarded-For>, C<X-Forwarded-Host> oraz C<X-Forwarded-HTTPS>.
+
 
   MOJO_REVERSE_PROXY=1
 
 =head2 C<MOJO_STATIC_CLASS>
 
-Class the L<Mojolicious> static file dispatcher should use to find C<DATA>
-templates, defaults to C<main>.
+Klasa, której dispatcher statycznych plików L<Mojolicious> ma używać do znajdowania szablonów C<DATA>.
+Domyślnie C<main>.
 
   MOJO_STATIC_CLASS=MyApp
 
 =head2 C<MOJO_TEMPLATE_CLASS>
 
-Class the L<Mojolicious> renderer should use to find C<DATA> templates,
-defaults to C<main>.
+Klasa, której renderer L<Mojolicious> ma używać do znajdowania szablonów C<DATA>.
+Domyślnie C<main>.
 
   MOJO_TEMPLATE_CLASS=MyApp
 
 =head2 C<MOJO_TMPDIR>
 
-Directory for temporary files like huge uploads, defaults to using a random
-platform specific temporary directory.
+Katalog na pliki tymczasowe (np. duże uploady). Domyślnie używa losowego, zależnego od platformy, katalogu.
+
 
   MOJO_TMPDIR=/tmp/mojo
 
 =head1 MORE
 
-You can continue with L<Mojolicious::Guides> now or take a look at the
-Mojolicious wiki L<http://github.com/kraih/mojo/wiki>, which contains a lot
-more documentation and examples by many different authors.
+Zapraszamy do kontynuowania lektury L<Mojolicious::Guides>, lub zajrzenia na Mojolicious wiki L<http://github.com/kraih/mojo/wiki>, które zawiera znacznie więcej ciekawych informacji i przykładów, tworzonych przez wielu autorów.
+
 
 =cut

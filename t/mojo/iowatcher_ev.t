@@ -9,7 +9,7 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 52;
+plan tests => 53;
 
 use IO::Socket::INET;
 use Mojo::IOLoop;
@@ -156,3 +156,16 @@ $watcher2->timer(0 => sub { shift->stop });
 $watcher2->start;
 is $timer,  2, 'timer was not triggered';
 is $timer2, 2, 'timer was triggered';
+
+# Error
+$watcher = Mojo::IOWatcher::EV->new;
+my $error;
+$watcher->on(
+  error => sub {
+    shift->stop;
+    $error = pop;
+  }
+);
+$watcher->timer(0 => sub { die "works!\n" });
+$watcher->start;
+like $error, qr/works!/, 'right error';

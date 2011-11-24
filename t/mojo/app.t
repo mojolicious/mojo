@@ -41,7 +41,7 @@ $id = Mojo::IOLoop->client(
         my ($stream, $chunk) = @_;
         $buffer .= $chunk;
         Mojo::IOLoop->drop($id) and Mojo::IOLoop->stop
-          if $buffer =~ /Mojo is working!/;
+          if $buffer =~ s/ is working!$//;
         $stream->write('4321')
           if $buffer =~ m#HTTP/1.1 100 Continue.*\x0d\x0a\x0d\x0a#gs;
       }
@@ -52,7 +52,7 @@ $id = Mojo::IOLoop->client(
   }
 );
 Mojo::IOLoop->start;
-like $buffer, qr#HTTP/1.1 100 Continue#, 'request was continued';
+like $buffer, qr#HTTP/1.1 100 Continue.*Mojo$#s, 'request was continued';
 
 # Pipelined
 $buffer = '';
@@ -64,7 +64,7 @@ $id     = Mojo::IOLoop->client(
         my ($stream, $chunk) = @_;
         $buffer .= $chunk;
         Mojo::IOLoop->drop($id) and Mojo::IOLoop->stop
-          if $buffer =~ /Mojo.*Mojo/gs;
+          if $buffer =~ s/ is working!.*is working!$//gs;
       }
     );
     $stream->write("GET /2/ HTTP/1.1\x0d\x0a"
@@ -74,7 +74,7 @@ $id     = Mojo::IOLoop->client(
   }
 );
 Mojo::IOLoop->start;
-like $buffer, qr/Mojo/, 'transactions were pipelined';
+like $buffer, qr/Mojo$/, 'transactions were pipelined';
 
 # Normal request
 my $tx = Mojo::Transaction::HTTP->new;

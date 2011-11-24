@@ -92,6 +92,10 @@ L<Mojo::IOWatcher::EV> is a minimalistic non-blocking I/O watcher with
 C<libev> support.
 Note that this module is EXPERIMENTAL and might change without warning!
 
+=head1 EVENTS
+
+L<Mojo::IOWatcher::EV> inherits all events from L<Mojo::IOWatcher>.
+
 =head1 METHODS
 
 L<Mojo::IOWatcher::EV> inherits all methods from L<Mojo::IOWatcher> and

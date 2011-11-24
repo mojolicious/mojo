@@ -17,10 +17,13 @@ has client_class => 'Mojo::IOLoop::Client';
 has iowatcher    => sub {
   my $class = Mojo::IOWatcher->detect;
   warn "MAINLOOP ($class)\n" if DEBUG;
-  $class->new;
+  my $watcher = $class->new;
+  $watcher->on(error => sub { warn pop });
+  return $watcher;
 };
-has [qw/cleanup_interval max_accepts/] => 0;
+has cleanup_interval => '0.025';
 has [qw/lock unlock/];
+has max_accepts     => 0;
 has max_connections => 1000;
 has server_class    => 'Mojo::IOLoop::Server';
 has stream_class    => 'Mojo::IOLoop::Stream';
@@ -555,7 +558,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   my $interval = $loop->cleanup_interval;
   $loop        = $loop->cleanup_interval(1);
 
-Connection cleanup interval in seconds, defaults to C<0>.
+Connection cleanup interval in seconds, defaults to C<0.025>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<lock>

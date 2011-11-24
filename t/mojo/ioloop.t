@@ -155,6 +155,8 @@ $stream->on(read => sub { $buffer .= pop });
 $stream->write('hello');
 ok Mojo::IOLoop->stream($id), 'stream exists';
 Mojo::IOLoop->start;
+Mojo::IOLoop->timer('0.25' => sub { Mojo::IOLoop->stop });
+Mojo::IOLoop->start;
 ok !Mojo::IOLoop->stream($id), 'stream does not exist anymore';
 is $buffer, 'acceptedhelloworld', 'right result';
 

@@ -1,5 +1,5 @@
 package Mojo::IOWatcher;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
 use Mojo::Loader;
@@ -126,7 +126,8 @@ sub _sandbox {
   my $self = shift;
   my $desc = shift;
   return unless my $cb = shift;
-  warn "$desc failed: $@" unless eval { $self->$cb(@_); 1 };
+  $self->emit_safe(error => "$desc failed: $@")
+    unless eval { $self->$cb(@_); 1 };
 }
 
 1;
@@ -165,10 +166,22 @@ foundation of L<Mojo::IOLoop>.
 L<Mojo::IOWatcher::EV> is a good example for its extensibility.
 Note that this module is EXPERIMENTAL and might change without warning!
 
+=head1 EVENTS
+
+L<Mojo::IOWatcher> can emit the following events.
+
+=head2 C<error>
+
+  $watcher->on(error => sub {
+    my ($watcher, $error) = @_;
+  });
+
+Emitted if an error happens.
+
 =head1 METHODS
 
-L<Mojo::IOWatcher> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::IOWatcher> inherits all methods from L<Mojo::EventEmitter> and
+implements the following new ones.
 
 =head2 C<detect>
 

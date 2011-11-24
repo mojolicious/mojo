@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 52;
+use Test::More tests => 53;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -155,3 +155,16 @@ $watcher2->timer(0 => sub { shift->stop });
 $watcher2->start;
 is $timer,  2, 'timer was not triggered';
 is $timer2, 2, 'timer was triggered';
+
+# Error
+$watcher = Mojo::IOWatcher->new;
+my $error;
+$watcher->on(
+  error => sub {
+    shift->stop;
+    $error = pop;
+  }
+);
+$watcher->timer(0 => sub { die "works!\n" });
+$watcher->start;
+like $error, qr/works!/, 'right error';

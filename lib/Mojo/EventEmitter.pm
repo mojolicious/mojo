@@ -1,7 +1,7 @@
 package Mojo::EventEmitter;
 use Mojo::Base -base;
 
-use Scalar::Util 'weaken';
+use Scalar::Util qw/blessed weaken/;
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 
@@ -61,12 +61,11 @@ sub unsubscribe {
 sub _emit {
   my $self = shift;
   my $safe = shift;
-  return $self unless exists $self->{events}->{my $name = shift};
+  return $self unless my $s = $self->{events}->{my $name = shift};
 
   # Emit event sequentially to all subscribers
-  my @subscribers = @{$self->subscribers($name)};
-  warn "EMIT $name (" . scalar(@subscribers) . ")\n" if DEBUG;
-  for my $cb (@subscribers) {
+  warn 'EMIT ' . blessed($self) . " $name (" . scalar(@$s) . ")\n" if DEBUG;
+  for my $cb (@$s) {
 
     # Unsafe
     if (!$safe) { $self->$cb(@_) }

@@ -202,7 +202,7 @@ L<Mojo::IOLoop::Stream> can emit the following events.
     my $stream = shift;
   });
 
-Emitted if the stream gets closed.
+Emitted safely if the stream gets closed.
 
 =head2 C<drain>
 
@@ -210,7 +210,7 @@ Emitted if the stream gets closed.
     my $stream = shift;
   });
 
-Emitted once all data has been written.
+Emitted safely once all data has been written.
 
 =head2 C<error>
 
@@ -218,7 +218,7 @@ Emitted once all data has been written.
     my ($stream, $error) = @_;
   });
 
-Emitted if an error happens on the stream.
+Emitted safely if an error happens on the stream.
 
 =head2 C<read>
 
@@ -226,7 +226,7 @@ Emitted if an error happens on the stream.
     my ($stream, $chunk) = @_;
   });
 
-Emitted if new data arrives on the stream.
+Emitted safely if new data arrives on the stream.
 
 =head2 C<write>
 
@@ -234,7 +234,7 @@ Emitted if new data arrives on the stream.
     my ($stream, $chunk) = @_;
   });
 
-Emitted if new data has been written to the stream.
+Emitted safely if new data has been written to the stream.
 
 =head1 ATTRIBUTES
 

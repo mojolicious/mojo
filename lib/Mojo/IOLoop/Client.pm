@@ -179,7 +179,7 @@ L<Mojo::IOLoop::Client> can emit the following events.
     my ($client, $handle) = @_;
   });
 
-Emitted once the connection is established.
+Emitted safely once the connection is established.
 
 =head2 C<error>
 
@@ -187,7 +187,7 @@ Emitted once the connection is established.
     my ($client, $error) = @_;
   });
 
-Emitted if an error happens on the connection.
+Emitted safely if an error happens on the connection.
 
 =head1 ATTRIBUTES
 

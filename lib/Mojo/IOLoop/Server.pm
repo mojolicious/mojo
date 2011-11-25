@@ -296,7 +296,7 @@ L<Mojo::IOLoop::Server> can emit the following events.
     my ($server, $handle) = @_;
   });
 
-Emitted for each accepted connection.
+Emitted safely for each accepted connection.
 
 =head1 ATTRIBUTES
 

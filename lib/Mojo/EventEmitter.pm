@@ -14,24 +14,28 @@ use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 #  ...Where are we going?"
 sub emit {
   my ($self, $name) = (shift, shift);
-  warn 'EMIT ' . blessed($self) . " $name\n" if DEBUG;
-  return $self unless my $subscribers = $self->{events}->{$name};
-  for my $cb (@$subscribers) { $self->$cb(@_) }
+  if (my $s = $self->{events}->{$name}) {
+    warn 'EMIT ', blessed($self), " $name (", scalar(@$s), ")\n" if DEBUG;
+    for my $cb (@$s) { $self->$cb(@_) }
+  }
+  elsif (DEBUG) { warn 'EMIT ', blessed($self), " $name (0)\n" }
   return $self;
 }
 
 sub emit_safe {
   my ($self, $name) = (shift, shift);
 
-  warn 'SAFE ' . blessed($self) . " $name\n" if DEBUG;
-  return $self unless my $subscribers = $self->{events}->{$name};
-  for my $cb (@$subscribers) {
-    if (!eval { $self->$cb(@_); 1 } && $name ne 'error') {
-      $self->once(error => sub { warn $_[1] })
-        unless $self->has_subscribers('error');
-      $self->emit_safe('error', qq/Event "$name" failed: $@/);
+  if (my $s = $self->{events}->{$name}) {
+    warn 'SAFE ', blessed($self), " $name (", scalar(@$s), ")\n" if DEBUG;
+    for my $cb (@$s) {
+      if (!eval { $self->$cb(@_); 1 } && $name ne 'error') {
+        $self->once(error => sub { warn $_[1] })
+          unless $self->has_subscribers('error');
+        $self->emit_safe('error', qq/Event "$name" failed: $@/);
+      }
     }
   }
+  elsif (DEBUG) { warn 'SAFE ', blessed($self), " $name (0)\n" }
 
   return $self;
 }

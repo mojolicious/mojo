@@ -74,7 +74,7 @@ sub build_frame {
   }
 
   if (DEBUG) {
-    warn 'HEAD: ' . unpack('B*', $frame) . "\n";
+    warn 'HEAD: ', unpack('B*', $frame), "\n";
     warn "OPCODE: $op\n";
   }
 

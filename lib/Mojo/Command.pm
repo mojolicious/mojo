@@ -157,23 +157,18 @@ sub rel_file {
 
 sub render_data {
   my $self = shift;
-  my $data = shift;
-  $self->renderer->render($self->get_data($data), @_);
+  $self->renderer->render($self->get_data(shift), @_);
 }
 
 sub render_to_file {
-  my $self = shift;
-  my $data = shift;
-  my $path = shift;
+  my ($self, $data, $path) = (shift, shift, shift);
   $self->write_file($path, $self->render_data($data, @_));
   return $self;
 }
 
 sub render_to_rel_file {
   my $self = shift;
-  my $data = shift;
-  my $path = shift;
-  $self->render_to_file($data, $self->rel_dir($path), @_);
+  $self->render_to_file(shift, $self->rel_dir(shift), @_);
 }
 
 # "The only thing I asked you to do for this party was put on clothes,

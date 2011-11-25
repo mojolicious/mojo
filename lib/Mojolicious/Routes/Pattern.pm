@@ -24,8 +24,7 @@ sub match {
 }
 
 sub parse {
-  my $self    = shift;
-  my $pattern = shift;
+  my ($self, $pattern) = (shift, shift);
 
   # Make sure we have a viable pattern
   return $self if !defined $pattern || $pattern eq '/';

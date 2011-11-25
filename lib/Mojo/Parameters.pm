@@ -58,8 +58,7 @@ sub merge {
 }
 
 sub param {
-  my $self = shift;
-  my $name = shift;
+  my ($self, $name) = (shift, shift);
 
   # List names
   return sort keys %{$self->to_hash} unless $name;

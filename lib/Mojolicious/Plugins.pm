@@ -62,10 +62,7 @@ sub load_plugin {
 }
 
 sub register_plugin {
-  my $self = shift;
-  my $name = shift;
-  my $app  = shift;
-  $self->load_plugin($name)->register($app, ref $_[0] ? $_[0] : {@_});
+  shift->load_plugin(shift)->register(shift, ref $_[0] ? $_[0] : {@_});
 }
 
 # DEPRECATED in Leaf Fluttering In Wind!

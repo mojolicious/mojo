@@ -76,9 +76,8 @@ sub watch {
 }
 
 sub _timer {
-  my $self = shift;
-  my $cb   = shift;
-  my $t    = {cb => $cb, @_};
+  my ($self, $cb) = (shift, shift);
+  my $t = {cb => $cb, @_};
   my $id;
   do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}->{$id};
   $self->{timers}->{$id} = $t;
@@ -123,8 +122,7 @@ sub _one_tick {
 sub _poll { shift->{poll} ||= IO::Poll->new }
 
 sub _sandbox {
-  my $self = shift;
-  my $desc = shift;
+  my ($self, $desc) = (shift, shift);
   return unless my $cb = shift;
   $self->emit_safe(error => "$desc failed: $@")
     unless eval { $self->$cb(@_); 1 };

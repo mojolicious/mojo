@@ -275,10 +275,7 @@ sub to {
     else {
 
       # Shortcut and defaults
-      if (ref $_[1] eq 'HASH') {
-        $shortcut = shift;
-        $defaults = shift;
-      }
+      if (ref $_[1] eq 'HASH') { ($shortcut, $defaults) = (shift, shift) }
 
       # Just defaults
       else { $defaults = {@_} }

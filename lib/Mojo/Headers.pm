@@ -87,8 +87,7 @@ sub accept_ranges   { scalar shift->header('Accept-Ranges'   => @_) }
 sub authorization   { scalar shift->header(Authorization     => @_) }
 
 sub add {
-  my $self = shift;
-  my $name = shift;
+  my ($self, $name) = (shift, shift);
 
   # Make sure we have a normal case entry for name
   my $lcname = lc $name;
@@ -130,8 +129,7 @@ sub expect       { scalar shift->header(Expect         => @_) }
 sub expires      { scalar shift->header(Expires        => @_) }
 
 sub from_hash {
-  my $self = shift;
-  my $hash = shift;
+  my ($self, $hash) = (shift, shift);
 
   # Empty hash deletes all headers
   if (keys %{$hash} == 0) {
@@ -149,8 +147,7 @@ sub from_hash {
 
 # "Will you be my mommy? You smell like dead bunnies..."
 sub header {
-  my $self = shift;
-  my $name = shift;
+  my ($self, $name) = (shift, shift);
 
   # Replace
   return $self->remove($name)->add($name, @_) if @_;

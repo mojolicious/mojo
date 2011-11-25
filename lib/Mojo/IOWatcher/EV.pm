@@ -53,10 +53,8 @@ sub _io {
 
 # "It's great! We can do *anything* now that Science has invented Magic."
 sub _timer {
-  my $self      = shift;
-  my $after     = shift || '0.0001';
-  my $recurring = shift;
-  my $cb        = shift;
+  my ($self, $after, $recurring, $cb) = @_;
+  $after ||= '0.0001';
 
   my $id = $self->SUPER::_timer($cb);
   weaken $self;

@@ -27,13 +27,8 @@ sub register {
   );
 
   # Add "file_field" helper
-  $app->helper(
-    file_field => sub {
-      my $c    = shift;
-      my $name = shift;
-      $self->_tag('input', name => $name, type => 'file', @_);
-    }
-  );
+  $app->helper(file_field =>
+      sub { shift; $self->_tag('input', name => shift, type => 'file', @_) });
 
   # Add "form_for" helper
   $app->helper(
@@ -96,9 +91,8 @@ sub register {
   # Add "link_to" helper
   $app->helper(
     link_to => sub {
-      my $c       = shift;
-      my $content = shift;
-      my @url     = ($content);
+      my ($c, $content) = (shift, shift);
+      my @url = ($content);
 
       # Content
       unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
@@ -116,9 +110,8 @@ sub register {
   # Add "password_field" helper
   $app->helper(
     password_field => sub {
-      my $c    = shift;
-      my $name = shift;
-      $self->_tag('input', name => $name, type => 'password', @_);
+      shift;
+      $self->_tag('input', name => shift, type => 'password', @_);
     }
   );
 
@@ -132,10 +125,8 @@ sub register {
   # Add "select_field" helper
   $app->helper(
     select_field => sub {
-      my $c       = shift;
-      my $name    = shift;
-      my $options = shift;
-      my %attrs   = @_;
+      my ($c, $name, $options) = (shift, shift, shift);
+      my %attrs = @_;
 
       # Values
       my %v = map { $_, 1 } $c->param($name);
@@ -240,8 +231,7 @@ sub register {
   # Add "text_area" helper
   $app->helper(
     text_area => sub {
-      my $c    = shift;
-      my $name = shift;
+      my ($c, $name) = (shift, shift);
 
       # Value
       my $cb = ref $_[-1] && ref $_[-1] eq 'CODE' ? pop : sub {''};
@@ -258,9 +248,7 @@ sub register {
 }
 
 sub _input {
-  my $self = shift;
-  my $c    = shift;
-  my $name = shift;
+  my ($self, $c, $name) = (shift, shift, shift);
 
   # Odd
   my %attrs;
@@ -299,8 +287,7 @@ sub _input {
 
 # "We’ve lost power of the forward Gameboy! Mario not responding!"
 sub _tag {
-  my $self = shift;
-  my $name = shift;
+  my ($self, $name) = (shift, shift);
 
   # Callback
   my $cb = defined $_[-1] && ref($_[-1]) eq 'CODE' ? pop @_ : undef;

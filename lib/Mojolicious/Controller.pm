@@ -161,8 +161,7 @@ EOF
 # "Just make a simple cake. And this time, if someone's going to jump out of
 #  it make sure to put them in *after* you cook it."
 sub param {
-  my $self = shift;
-  my $name = shift;
+  my ($self, $name) = (shift, shift);
 
   # List
   my $p = $self->stash->{'mojo.captures'} || {};
@@ -314,8 +313,7 @@ sub render_exception {
 # "If you hate intolerance and being punched in the face by me,
 #  please support Proposition Infinity."
 sub render_json {
-  my $self = shift;
-  my $json = shift;
+  my ($self, $json) = (shift, shift);
   my $args = ref $_[0] ? $_[0] : {@_};
   $args->{json} = $json;
   return $self->render($args);

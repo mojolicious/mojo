@@ -69,8 +69,7 @@ sub languages {
 }
 
 sub localize {
-  my $self = shift;
-  my $key  = shift;
+  my ($self, $key) = (shift, shift);
   return $key unless my $handle = $self->{handle};
   return $handle->maketext($key, @_);
 }

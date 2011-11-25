@@ -203,9 +203,8 @@ sub handler {
 # "This snow is beautiful. I'm glad global warming never happened.
 #  Actually, it did. But thank God nuclear winter canceled it out."
 sub helper {
-  my $self = shift;
-  my $name = shift;
-  my $r    = $self->renderer;
+  my ($self, $name) = (shift, shift);
+  my $r = $self->renderer;
   $self->log->debug(qq/Helper "$name" already exists, replacing./)
     if exists $r->helpers->{$name};
   $r->add_helper($name, @_);

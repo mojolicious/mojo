@@ -336,10 +336,9 @@ sub parse {
 
 sub render {
   my $self = shift;
-  my $tmpl = shift;
 
   # Parse
-  $self->parse($tmpl);
+  $self->parse(shift);
 
   # Build
   $self->build;
@@ -353,8 +352,7 @@ sub render {
 }
 
 sub render_file {
-  my $self = shift;
-  my $path = shift;
+  my ($self, $path) = (shift, shift);
 
   # Slurp file
   $self->name($path) unless defined $self->{name};
@@ -371,28 +369,16 @@ sub render_file {
 }
 
 sub render_file_to_file {
-  my $self  = shift;
-  my $spath = shift;
-  my $tpath = shift;
-
-  # Render
+  my ($self, $spath, $tpath) = (shift, shift, shift);
   my $output = $self->render_file($spath, @_);
   return $output if ref $output;
-
-  # Write to file
   return $self->_write_file($tpath, $output);
 }
 
 sub render_to_file {
-  my $self = shift;
-  my $tmpl = shift;
-  my $path = shift;
-
-  # Render
+  my ($self, $tmpl, $path) = (shift, shift, shift);
   my $output = $self->render($tmpl, @_);
   return $output if ref $output;
-
-  # Write to file
   return $self->_write_file($path, $output);
 }
 

@@ -211,8 +211,7 @@ sub message_unlike {
 sub post_ok { shift->_request_ok('post', @_) }
 
 sub post_form_ok {
-  my $self = shift;
-  my $url  = shift;
+  my ($self, $url) = (shift, shift);
 
   $self->tx($self->ua->post_form($url, @_));
   local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -293,8 +292,7 @@ sub text_unlike {
 }
 
 sub websocket_ok {
-  my $self = shift;
-  my $url  = shift;
+  my ($self, $url) = (shift, shift);
 
   $self->{messages} = [];
   $self->{finished} = 0;

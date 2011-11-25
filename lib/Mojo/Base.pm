@@ -56,9 +56,7 @@ sub new {
 # so we optimize them by compiling our own code, don't be scared, we have
 # tests for every single case
 sub attr {
-  my $class   = shift;
-  my $attrs   = shift;
-  my $default = shift;
+  my ($class, $attrs, $default) = (shift, shift, shift);
 
   # Check arguments
   Carp::croak('Attribute generator called with too many arguments') if @_;

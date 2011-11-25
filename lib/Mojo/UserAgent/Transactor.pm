@@ -12,8 +12,7 @@ use Mojo::URL;
 use Mojo::Util qw/encode url_escape/;
 
 sub form {
-  my $self = shift;
-  my $url  = shift;
+  my ($self, $url) = (shift, shift);
 
   # Callback
   my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';

@@ -32,8 +32,7 @@ sub register {
   # Add "content_for" helper
   $app->helper(
     content_for => sub {
-      my $self = shift;
-      my $name = shift;
+      my ($self, $name) = (shift, shift);
       $self->render_content($name, $self->render_content($name), @_);
     }
   );

@@ -81,7 +81,7 @@ sub render {
   local $stash->{extends} = $partial ? undef : $stash->{extends};
 
   # Merge stash and arguments
-  while (my ($key, $value) = each %$args) { $stash->{$key} = $value }
+  @{$stash}{keys %$args} = values %$args;
 
   # Extract important stash values
   my $template = delete $stash->{template};

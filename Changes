@@ -1,9 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.33    2011-11-26 00:00:00
-        - Added EXPERIMENTAL layout support for inline templates.
         - Improved Mojo::EventEmitter performance slightly.
         - Improved documentation.
+        - Fixed a few small inline template issues.
 
 2.32    2011-11-24 00:00:00
         - Added EXPERIMENTAL error event to Mojo::IOWatcher.

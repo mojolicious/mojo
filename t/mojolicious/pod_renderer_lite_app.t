@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 28;
+use Test::More tests => 31;
 
 # "Amy get your pants back on and get to work.
 #  They think were making out.
@@ -17,6 +17,9 @@ use Test::Mojo;
 
 # POD renderer plugin
 plugin 'PODRenderer';
+
+# Default layout
+app->defaults(layout => 'gray');
 
 # GET /
 get '/' => sub {
@@ -39,11 +42,12 @@ $t->get_ok('/')->status_is(200)
 # POD helper
 $t->post_ok('/')->status_is(200)
   ->content_like(qr#test123\s+<h1>A</h1>\s+<h1>B</h1>#)
-  ->content_like(qr#\s+<p><code>test</code></p>#);
+  ->content_like(qr#\s+<p><code>test</code></p>#)->content_like(qr/Gray/);
 
 # POD filter
 $t->post_ok('/block')->status_is(200)
-  ->content_like(qr#test321\s+<h2>lalala</h2>\s+<p><code>test</code></p>#);
+  ->content_like(qr#test321\s+<h2>lalala</h2>\s+<p><code>test</code></p>#)
+  ->content_like(qr/Gray/);
 
 # Perldoc browser (Welcome)
 $t->get_ok('/perldoc')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
@@ -53,7 +57,8 @@ $t->get_ok('/perldoc')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
 # Perldoc browser (Welcome with slash)
 $t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
   ->text_is('a[id="TUTORIAL"]', 'TUTORIAL')
-  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/galaxy/);
+  ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/galaxy/)
+  ->content_unlike(qr/Gray/);
 
 # Perldoc browser (Mojolicious)
 $t->get_ok('/perldoc/Mojolicious')->status_is(200)
@@ -61,6 +66,9 @@ $t->get_ok('/perldoc/Mojolicious')->status_is(200)
   ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian\ Riedel/);
 
 __DATA__
+
+@@ layouts/gray.html.ep
+Gray <%= content %>
 
 @@ index.html.ep
 test123<%= pod_to_html "=head1 A\n\n=head1 B\n\nC<test>"%>

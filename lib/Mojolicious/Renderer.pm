@@ -132,25 +132,25 @@ sub render {
     return unless $self->_render_template($c, \$output, $options);
     $content->{content} = $output
       if ($c->stash->{extends} || $c->stash->{layout});
-    delete $options->{inline};
   }
 
-  # Extends
-  while ((my $extends = $self->_extends($c)) && !$json && !$data) {
-    $options->{template_class} = $stash->{template_class};
-    $options->{handler}        = $stash->{handler};
-    $options->{format}         = $stash->{format} || $self->default_format;
-    $options->{template}       = $extends;
-    $self->_render_template($c, \$output, $options);
-    $content->{content} = $output
-      if $content->{content} !~ /\S/ && $output =~ /\S/;
-  }
+  # Extendable content
+  if (!$json && !defined $data) {
 
-  # Encoding (JSON is already encoded)
-  unless ($partial) {
-    my $encoding = $options->{encoding};
-    $output = encode $encoding, $output
-      if $encoding && $output && !$json && !$data;
+    # Extends
+    while ((my $extends = $self->_extends($c)) && !defined $inline) {
+      $options->{template_class} = $stash->{template_class};
+      $options->{handler}        = $stash->{handler};
+      $options->{format}         = $stash->{format} || $self->default_format;
+      $options->{template}       = $extends;
+      $self->_render_template($c, \$output, $options);
+      $content->{content} = $output
+        if $content->{content} !~ /\S/ && $output =~ /\S/;
+    }
+
+    # Encoding
+    $output = encode $options->{encoding}, $output
+      if !$partial && $options->{encoding} && $output;
   }
 
   return $output, $c->app->types->type($format) || 'text/plain';

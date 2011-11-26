@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 97;
+use Test::More tests => 102;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -113,8 +113,11 @@ get '/content_for';
 # GET /inline
 get '/inline' => {inline => '<%= "inline!" %>'};
 
-# GET /inline/green
-get '/inline/green' => {inline => '<% layout "green"; %><%= "inline!" %>'};
+# GET /inline/again
+get '/inline/again' => {inline => 0};
+
+# GET /data
+get '/data' => {data => 0};
 
 my $t = Test::Mojo->new;
 
@@ -233,13 +236,16 @@ $t->get_ok('/content_for')->status_is(200)
 $t->get_ok('/inline')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Defaultinline!\n\n");
+  ->content_is("inline!\n");
 
-# GET /inline/green
-$t->get_ok('/inline/green')->status_is(200)
+# GET /inline/again
+$t->get_ok('/inline/again')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Greeninline!\n\n");
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("0\n");
+
+# GET /data
+$t->get_ok('/data')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is(0);
 
 __DATA__
 @@ layouts/default.html.ep

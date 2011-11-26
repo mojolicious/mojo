@@ -132,6 +132,7 @@ sub render {
     return unless $self->_render_template($c, \$output, $options);
     $content->{content} = $output
       if ($c->stash->{extends} || $c->stash->{layout});
+    delete $options->{inline};
   }
 
   # Extends

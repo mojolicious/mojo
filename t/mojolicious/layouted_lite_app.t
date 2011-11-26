@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 87;
+use Test::More tests => 97;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -109,6 +109,12 @@ get '/withblocklayout' => sub {
 
 # GET /content_for
 get '/content_for';
+
+# GET /inline
+get '/inline' => {inline => '<%= "inline!" %>'};
+
+# GET /inline/green
+get '/inline/green' => {inline => '<% layout "green"; %><%= "inline!" %>'};
 
 my $t = Test::Mojo->new;
 
@@ -222,6 +228,18 @@ $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\n\n");
+
+# GET /inline
+$t->get_ok('/inline')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Defaultinline!\n\n");
+
+# GET /inline/green
+$t->get_ok('/inline/green')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Greeninline!\n\n");
 
 __DATA__
 @@ layouts/default.html.ep

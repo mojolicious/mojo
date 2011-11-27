@@ -130,7 +130,7 @@ sub server_read {
   elsif ((length $chunk == 0) || ($req->is_finished && !$self->{handled}++)) {
     $self->emit(
       upgrade => Mojo::Transaction::WebSocket->new(handshake => $self))
-      if (($req->headers->upgrade || '') eq 'websocket');
+      if lc($req->headers->upgrade || '') eq 'websocket';
     $self->emit('request');
   }
 

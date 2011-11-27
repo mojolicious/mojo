@@ -682,7 +682,7 @@ Shortcut for the C<Transfer-Encoding> header.
 =head2 C<upgrade>
 
   my $upgrade = $headers->upgrade;
-  $headers    = $headers->upgrade('WebSocket');
+  $headers    = $headers->upgrade('websocket');
 
 Shortcut for the C<Upgrade> header.
 

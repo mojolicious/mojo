@@ -14,7 +14,7 @@ any '/websocket' => sub {
 };
 
 # "Does whisky count as beer?"
-under->any('/*whatever' => {whatever => '', text => 'Your Mojo is working!'});
+any '/*whatever' => {whatever => '', text => 'Your Mojo is working!'};
 
 1;
 __DATA__

@@ -5,74 +5,25 @@ use Mojo::Util 'get_line';
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 
-# Headers
-my @GENERAL_HEADERS = qw/
-  Connection
-  Cache-Control
-  Date
-  Pragma
-  Trailer
-  Transfer-Encoding
-  Upgrade
-  Via
-  Warning
-  /;
-my @REQUEST_HEADERS = qw/
-  Accept
-  Accept-Charset
-  Accept-Encoding
-  Accept-Language
-  Authorization
-  Expect
-  From
-  Host
-  If-Match
-  If-Modified-Since
-  If-None-Match
-  If-Range
-  If-Unmodified-Since
-  Max-Forwards
-  Proxy-Authorization
-  Range
-  Referer
-  TE
-  User-Agent
-  /;
-my @RESPONSE_HEADERS = qw/
-  Accept-Ranges
-  Age
-  ETag
-  Location
-  Proxy-Authenticate
-  Retry-After
-  Server
-  Vary
-  WWW-Authenticate
-  /;
-my @ENTITY_HEADERS = qw/
-  Allow
-  Content-Encoding
-  Content-Language
-  Content-Length
-  Content-Location
-  Content-MD5
-  Content-Range
-  Content-Type
-  Expires
-  Last-Modified
-  /;
-my @WEBSOCKET_HEADERS = qw/
-  Sec-WebSocket-Accept
-  Sec-WebSocket-Key
-  Sec-WebSocket-Origin
-  Sec-WebSocket-Protocol
-  Sec-WebSocket-Version
-  /;
-my @MISC_HEADERS = qw/DNT/;
-my @HEADERS      = (
-  @GENERAL_HEADERS, @REQUEST_HEADERS,   @RESPONSE_HEADERS,
-  @ENTITY_HEADERS,  @WEBSOCKET_HEADERS, @MISC_HEADERS
+# Common headers
+my @HEADERS = (
+  qw/Accept Accept-Language Accept-Ranges Authorization Connection/,
+  qw/Cache-Control Content-Disposition Content-Length Content-Range/,
+  qw/Content-Transfer-Encoding Content-Type Cookie DNT Date ETag Expect/,
+  qw/Expires Host If-Modified-Since Last-Modified Location/,
+  qw/Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept/,
+  qw/Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol/,
+  qw/Sec-WebSocket-Version Server Set-Cookie Set-Cookie2 Trailer/,
+  qw/Transfer-Encoding Upgrade User-Agent WWW-Authenticate X-Forwarded-For/,
 );
+{
+  no strict 'refs';
+  for my $header (@HEADERS) {
+    my $name = lc $header;
+    $name =~ s/-/_/g;
+    *{__PACKAGE__ . "::$name"} = sub { scalar shift->header($header => @_) };
+  }
+}
 
 # Lower case headers
 my %NORMALCASE_HEADERS;
@@ -80,11 +31,6 @@ for my $name (@HEADERS) {
   my $lowercase = lc $name;
   $NORMALCASE_HEADERS{$lowercase} = $name;
 }
-
-sub accept          { scalar shift->header(Accept            => @_) }
-sub accept_language { scalar shift->header('Accept-Language' => @_) }
-sub accept_ranges   { scalar shift->header('Accept-Ranges'   => @_) }
-sub authorization   { scalar shift->header(Authorization     => @_) }
 
 sub add {
   my ($self, $name) = (shift, shift);
@@ -102,8 +48,6 @@ sub add {
   return $self;
 }
 
-sub cache_control { scalar shift->header('Cache-Control' => @_) }
-
 sub clone {
   my $self  = shift;
   my $clone = $self->new;
@@ -111,22 +55,6 @@ sub clone {
     for keys %{$self->{headers}};
   return $clone;
 }
-
-sub connection          { scalar shift->header(Connection            => @_) }
-sub content_disposition { scalar shift->header('Content-Disposition' => @_) }
-sub content_length      { scalar shift->header('Content-Length'      => @_) }
-sub content_range       { scalar shift->header('Content-Range'       => @_) }
-
-sub content_transfer_encoding {
-  scalar shift->header('Content-Transfer-Encoding' => @_);
-}
-
-sub content_type { scalar shift->header('Content-Type' => @_) }
-sub cookie       { scalar shift->header(Cookie         => @_) }
-sub date         { scalar shift->header(Date           => @_) }
-sub dnt          { scalar shift->header(DNT            => @_) }
-sub expect       { scalar shift->header(Expect         => @_) }
-sub expires      { scalar shift->header(Expires        => @_) }
 
 sub from_hash {
   my ($self, $hash) = (shift, shift);
@@ -160,9 +88,6 @@ sub header {
   return @$headers;
 }
 
-sub host { scalar shift->header(Host => @_) }
-sub if_modified_since { scalar shift->header('If-Modified-Since' => @_) }
-
 # DEPRECATED in Leaf Fluttering In Wind!
 sub is_done {
   warn <<EOF;
@@ -175,11 +100,7 @@ sub is_finished { (shift->{state} || '') eq 'finished' }
 
 sub is_limit_exceeded { shift->{limit} }
 
-sub last_modified { scalar shift->header('Last-Modified' => @_) }
-
 sub leftovers { delete shift->{buffer} }
-
-sub location { scalar shift->header(Location => @_) }
 
 sub names {
   my @headers;
@@ -228,39 +149,13 @@ sub parse {
   return $self;
 }
 
-sub proxy_authenticate  { scalar shift->header('Proxy-Authenticate'  => @_) }
-sub proxy_authorization { scalar shift->header('Proxy-Authorization' => @_) }
-sub range               { scalar shift->header(Range                 => @_) }
-sub referrer            { scalar shift->header(Referer               => @_) }
+sub referrer { scalar shift->header(Referer => @_) }
 
 sub remove {
   my ($self, $name) = @_;
   delete $self->{headers}->{lc $name};
   return $self;
 }
-
-sub sec_websocket_accept {
-  scalar shift->header('Sec-WebSocket-Accept' => @_);
-}
-
-sub sec_websocket_key { scalar shift->header('Sec-WebSocket-Key' => @_) }
-
-sub sec_websocket_origin {
-  scalar shift->header('Sec-WebSocket-Origin' => @_);
-}
-
-sub sec_websocket_protocol {
-  scalar shift->header('Sec-WebSocket-Protocol' => @_);
-}
-
-sub sec_websocket_version {
-  scalar shift->header('Sec-WebSocket-Version' => @_);
-}
-
-sub server      { scalar shift->header(Server        => @_) }
-sub set_cookie  { scalar shift->header('Set-Cookie'  => @_) }
-sub set_cookie2 { scalar shift->header('Set-Cookie2' => @_) }
-sub status      { scalar shift->header(Status        => @_) }
 
 sub to_hash {
   my $self   = shift;
@@ -299,13 +194,6 @@ sub to_string {
   # Format headers
   return join "\x0d\x0a", @headers;
 }
-
-sub trailer           { scalar shift->header(Trailer             => @_) }
-sub transfer_encoding { scalar shift->header('Transfer-Encoding' => @_) }
-sub upgrade           { scalar shift->header(Upgrade             => @_) }
-sub user_agent        { scalar shift->header('User-Agent'        => @_) }
-sub www_authenticate  { scalar shift->header('WWW-Authenticate'  => @_) }
-sub x_forwarded_for   { scalar shift->header('X-Forwarded-For'   => @_) }
 
 1;
 __END__
@@ -454,6 +342,14 @@ Shortcut for the C<Date> header.
   $headers = $headers->dnt(1);
 
 Shortcut for the C<DNT> (Do Not Track) header.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<etag>
+
+  my $etag = $headers->etag;
+  $headers = $headers->etag('abc321');
+
+Shortcut for the C<ETag> header.
 Note that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<expect>

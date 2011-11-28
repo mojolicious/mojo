@@ -2,7 +2,7 @@
 use Mojo::Base -strict;
 
 # "Remember, you can always find East by staring directly at the sun."
-use Test::More tests => 47;
+use Test::More tests => 48;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -36,6 +36,8 @@ $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
 $headers->cache_control('public');
 is $headers->expires, 'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
 is $headers->cache_control, 'public', 'right value';
+$headers->etag('abc321');
+is $headers->etag, 'abc321', 'right value';
 
 # Clone
 $headers = Mojo::Headers->new;

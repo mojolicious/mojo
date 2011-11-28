@@ -4,10 +4,35 @@ use Mojo::Base -strict;
 use Test::More tests => 21;
 
 use Mojo::JSON;
+use Mojolicious::Lite;
 
 # "We need some more secret sauce. Put the mayonnaise in the sun."
 use_ok 'Mojo::Server::PSGI';
 use_ok 'Mojolicious::Command::psgi';
+
+# Silence
+app->log->level('fatal');
+
+# Timing
+under sub {
+  shift->on(finish => sub { $ENV{MOJO_HELLO} = 'world' });
+};
+
+# GET /cookies
+get '/cookies' => sub {
+  my $self   = shift;
+  my $params = $self->req->params->to_hash;
+  for my $key (sort keys %$params) {
+    $self->cookie($key, $params->{$key});
+  }
+  $self->render_text('nomnomnom');
+};
+
+# POST /params
+post '/params' => sub {
+  my $self = shift;
+  $self->render_json($self->req->params->to_hash);
+};
 
 # Binding
 my $psgi    = Mojo::Server::PSGI->new;
@@ -17,7 +42,7 @@ open my $body, '<', \$content;
 my $env = {
   CONTENT_LENGTH      => 11,
   CONTENT_TYPE        => 'application/x-www-form-urlencoded',
-  PATH_INFO           => '/diag/dump_params',
+  PATH_INFO           => '/params',
   QUERY_STRING        => 'lalala=23&bar=baz',
   REQUEST_METHOD      => 'POST',
   SCRIPT_NAME         => '/',
@@ -53,7 +78,7 @@ open $body, '<', \$content;
 $env = {
   CONTENT_LENGTH      => 11,
   CONTENT_TYPE        => 'application/x-www-form-urlencoded',
-  PATH_INFO           => '/diag/dump_params',
+  PATH_INFO           => '/params',
   QUERY_STRING        => 'lalala=23&bar=baz',
   REQUEST_METHOD      => 'POST',
   SCRIPT_NAME         => '/',
@@ -87,7 +112,7 @@ is_deeply $params, {bar => 'baz', world => 'hello', lalala => 23},
 # Cookies
 $env = {
   CONTENT_LENGTH      => 0,
-  PATH_INFO           => '/diag/cookies',
+  PATH_INFO           => '/cookies',
   QUERY_STRING        => 'lalala=23&bar=baz',
   REQUEST_METHOD      => 'GET',
   SCRIPT_NAME         => '/',

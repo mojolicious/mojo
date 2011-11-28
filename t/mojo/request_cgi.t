@@ -211,10 +211,10 @@ is $req->url->to_abs->to_string, 'http://test1/index.pl',
 # Parse Apache 2.2.14 like CGI environment variables and a body (root)
 $req = Mojo::Message::Request->new;
 $req->parse(
-  SCRIPT_NAME       => '/diag/upload',
+  SCRIPT_NAME       => '/upload',
   SERVER_NAME       => '127.0.0.1',
   SERVER_ADMIN      => '[no address given]',
-  PATH_INFO         => '/diag/upload',
+  PATH_INFO         => '/upload',
   HTTP_CONNECTION   => 'Keep-Alive',
   REQUEST_METHOD    => 'POST',
   CONTENT_LENGTH    => '11',
@@ -228,11 +228,11 @@ $req->parse(
   REMOTE_ADDR       => '127.0.0.1',
   CONTENT_TYPE      => 'application/x-www-form-urlencoded; charset=UTF-8',
   SERVER_PROTOCOL   => 'HTTP/1.1',
-  REQUEST_URI       => '/diag/upload',
+  REQUEST_URI       => '/upload',
   GATEWAY_INTERFACE => 'CGI/1.1',
   SERVER_ADDR       => '127.0.0.1',
   DOCUMENT_ROOT     => '/tmp/SnLu1cQ3t2',
-  PATH_TRANSLATED   => '/tmp/test.fcgi/diag/upload',
+  PATH_TRANSLATED   => '/tmp/test.fcgi/upload',
   HTTP_HOST         => '127.0.0.1:13028'
 );
 $req->parse('hello=world');
@@ -241,14 +241,14 @@ is $req->method, 'POST', 'right method';
 is $req->url->base->host, '127.0.0.1', 'right base host';
 is $req->url->base->port, 13028,       'right base port';
 is $req->url->path, '', 'right path';
-is $req->url->base->path, '/diag/upload/', 'right base path';
+is $req->url->base->path, '/upload/', 'right base path';
 is $req->version, '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 ok !$req->is_secure, 'not secure';
 is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right parameters';
-is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/diag/upload',
+is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload',
   'right absolute URL';
 
 # Parse Apache 2.2.11 like CGI environment variables and a body (HTTPS)
@@ -389,7 +389,7 @@ $req->parse(
   SCRIPT_NAME      => '',
   SERVER_NAME      => '127.0.0.1',
   SERVER_ADMIN     => '[no address given]',
-  PATH_INFO        => '/diag/upload',
+  PATH_INFO        => '/upload',
   HTTP_CONNECTION  => 'Keep-Alive',
   REQUEST_METHOD   => 'POST',
   CONTENT_LENGTH   => '135',
@@ -404,11 +404,11 @@ $req->parse(
   CONTENT_TYPE     => 'multipart/form-data; boundary=8jXGX',
   SERVER_PROTOCOL  => 'HTTP/1.1',
   PATH => '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin',
-  REQUEST_URI       => '/diag/upload',
+  REQUEST_URI       => '/upload',
   GATEWAY_INTERFACE => 'CGI/1.1',
   SERVER_ADDR       => '127.0.0.1',
   DOCUMENT_ROOT     => '/tmp/SnLu1cQ3t2',
-  PATH_TRANSLATED   => '/tmp/test.fcgi/diag/upload',
+  PATH_TRANSLATED   => '/tmp/test.fcgi/upload',
   HTTP_HOST         => '127.0.0.1:13028'
 );
 is $req->content->progress, 0, 'right progress';
@@ -425,13 +425,13 @@ is $req->content->progress, 135, 'right progress';
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
 is $req->url->base->host, '127.0.0.1', 'right base host';
-is $req->url->path, '/diag/upload', 'right path';
+is $req->url->path, '/upload', 'right path';
 is $req->url->base->path, '', 'no base path';
 is $req->version, '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url->to_abs->to_string,
-  'http://127.0.0.1:13028/diag/upload',
+  'http://127.0.0.1:13028/upload',
   'right absolute URL';
 my $file = $req->upload('file');
 is $file->slurp, '11023456789', 'right uploaded content';

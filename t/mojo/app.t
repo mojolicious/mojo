@@ -19,15 +19,51 @@ use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
 
 use_ok 'Mojo';
-use_ok 'Mojo::HelloWorld';
+use_ok 'Mojolicious';
 
 # Logger
 my $logger = Mojo::Log->new;
 my $app = Mojo->new({log => $logger});
 is $app->log, $logger, 'right logger';
 
-$app = Mojo::HelloWorld->new;
+# Fresh application
+$app = Mojolicious->new;
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app($app);
+
+# Silence
+$app->log->level('fatal');
+
+# POST /chunked
+$app->routes->post(
+  '/chunked' => sub {
+    my $self = shift;
+
+    my $params = $self->req->params->to_hash;
+    my $chunks = [];
+    for my $key (sort keys %$params) {
+      push @$chunks, $params->{$key};
+    }
+
+    my $cb;
+    $cb = sub {
+      my $self = shift;
+      $cb = undef unless my $chunk = shift @$chunks || '';
+      $self->write_chunk($chunk, $cb);
+    };
+    $self->$cb();
+  }
+);
+
+# POST /upload
+$app->routes->post(
+  '/upload' => sub {
+    my $self = shift;
+    $self->render_data($self->req->upload('file')->slurp);
+  }
+);
+
+# /*
+$app->routes->any('/*whatever' => {text => 'Your Mojo is working!'});
 
 # Continue
 my $port   = $ua->test_server->port;
@@ -160,14 +196,14 @@ for my $i (1 .. 10) { $params->{"test$i"} = $i }
 my $result = '';
 for my $key (sort keys %$params) { $result .= $params->{$key} }
 my ($code, $body);
-$tx = $ua->post_form("http://127.0.0.1:$port/diag/chunked_params" => $params);
+$tx = $ua->post_form("http://127.0.0.1:$port/chunked" => $params);
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 
 # Upload
 ($code, $body) = undef;
 $tx = $ua->post_form(
-  "http://127.0.0.1:$port/diag/upload" => {file => {content => $result}});
+  "http://127.0.0.1:$port/upload" => {file => {content => $result}});
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 

@@ -4,6 +4,7 @@ use Mojo::Base -strict;
 use Test::More tests => 16;
 
 use Mojo::Message::Response;
+use Mojolicious::Lite;
 
 # "My ears are burning.
 #  I wasn't talking about you, Dad.
@@ -11,12 +12,44 @@ use Mojo::Message::Response;
 use_ok 'Mojo::Server::CGI';
 use_ok 'Mojolicious::Command::cgi';
 
+# Silence
+app->log->level('fatal');
+
+# GET /
+get '/' => {text => 'Your Mojo is working!'};
+
+# POST /chunked
+post '/chunked' => sub {
+  my $self = shift;
+
+  my $params = $self->req->params->to_hash;
+  my $chunks = [];
+  for my $key (sort keys %$params) {
+    push @$chunks, $params->{$key};
+  }
+
+  my $cb;
+  $cb = sub {
+    my $self = shift;
+    $cb = undef unless my $chunk = shift @$chunks || '';
+    $self->write_chunk($chunk, $cb);
+  };
+  $self->$cb();
+};
+
+# GET /params
+get '/params' => sub {
+  my $self = shift;
+  $self->render_json($self->req->params->to_hash);
+};
+
 # Simple
 my $message = '';
 {
   local *STDOUT;
   open STDOUT, '>', \$message;
   local %ENV = (
+    MOJO_APP        => $ENV{MOJO_APP},
     PATH_INFO       => '/',
     REQUEST_METHOD  => 'GET',
     SCRIPT_NAME     => '/',
@@ -38,6 +71,7 @@ $message = '';
   local *STDOUT;
   open STDOUT, '>', \$message;
   local %ENV = (
+    MOJO_APP        => $ENV{MOJO_APP},
     PATH_INFO       => '/',
     REQUEST_METHOD  => 'GET',
     SCRIPT_NAME     => '/',
@@ -61,7 +95,8 @@ $message = '';
   local *STDOUT;
   open STDOUT, '>', \$message;
   local %ENV = (
-    PATH_INFO       => '/diag/chunked_params',
+    MOJO_APP        => $ENV{MOJO_APP},
+    PATH_INFO       => '/chunked',
     CONTENT_LENGTH  => length($content),
     CONTENT_TYPE    => 'application/x-www-form-urlencoded',
     REQUEST_METHOD  => 'POST',
@@ -82,7 +117,8 @@ $message = '';
   local *STDOUT;
   open STDOUT, '>', \$message;
   local %ENV = (
-    PATH_INFO       => '/diag/dump_params',
+    MOJO_APP        => $ENV{MOJO_APP},
+    PATH_INFO       => '/params',
     QUERY_STRING    => 'lalala=23&bar=baz',
     REQUEST_METHOD  => 'GET',
     SCRIPT_NAME     => '/',

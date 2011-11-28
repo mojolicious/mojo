@@ -61,6 +61,10 @@ sub extract {
   $self->add(@cookies);
 }
 
+# "Dear Homer, IOU one emergency donut.
+#  Signed Homer.
+#  Bastard!
+#  He's always one step ahead."
 sub find {
   my ($self, $url) = @_;
 

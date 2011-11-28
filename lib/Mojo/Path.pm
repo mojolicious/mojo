@@ -83,6 +83,11 @@ sub to_abs_string {
   return $self->leading_slash ? $self->to_string : ('/' . $self->to_string);
 }
 
+# "How is education supposed to make me feel smarter?
+#  Besides, every time I learn something new,
+#  it pushes some old stuff out of my brain.
+#  Remember when I took that home winemaking course,
+#  and I forgot how to drive?"
 sub to_string {
   my $self = shift;
 

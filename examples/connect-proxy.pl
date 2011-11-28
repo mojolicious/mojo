@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
-use Mojo::Base -strict;
 
 # Use bundled libraries
 use FindBin;
 use lib "$FindBin::Bin/../lib";
+use Mojo::Base -strict;
 
 # "Cheating in a fake fight. That's low."
 use Mojo::IOLoop;

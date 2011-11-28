@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
-use Mojo::Base -strict;
 
 # Use bundled libraries
 use FindBin;
 use lib "$FindBin::Bin/../lib";
+use Mojo::Base -strict;
 
 # "After all this time, somebody else with one eye... who ISN'T a clumsy
 #  carpenter or a kid with a BB gun."

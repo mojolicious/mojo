@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
-use Mojo::Base -strict;
 
 # Use bundled libraries
 use FindBin;
 use lib "$FindBin::Bin/../lib";
+use Mojo::Base -strict;
 
 # "Kif, I'm feeling the Captain's Itch.
 #  I'll get the powder, sir."

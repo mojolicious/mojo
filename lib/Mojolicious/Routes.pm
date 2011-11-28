@@ -532,9 +532,6 @@ sub _generate_route {
   return $route;
 }
 
-# "Stop being such a spineless jellyfish!
-#  You know full well I'm more closely related to the sea cucumber.
-#  Not where it counts."
 sub _walk_stack {
   my ($self, $c) = @_;
 

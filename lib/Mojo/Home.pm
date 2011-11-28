@@ -103,6 +103,9 @@ sub list_files {
 
 sub mojo_lib_dir { File::Spec->catdir(dirname(__FILE__), '..') }
 
+# "Don't worry, son.
+#  I'm sure he's up in heaven right now laughing it up with all the other
+#  celebrities: John Dilinger, Ty Cobb, Joseph Stalin."
 sub parse {
   my ($self, $path) = @_;
   return $self unless defined $path;

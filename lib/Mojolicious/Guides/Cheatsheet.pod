@@ -228,9 +228,9 @@ Maximum size for HTTP messages in bytes, defaults to C<5242880>.
 
 =head2 C<MOJO_MAX_REDIRECTS>
 
-  MOJO_MAX_REDIRECTS=3
-
 Maximum number of redirects L<Mojo::UserAgent> will follow, defaults to C<0>.
+
+  MOJO_MAX_REDIRECTS=3
 
 =head2 C<MOJO_MAX_WEBSOCKET_SIZE>
 

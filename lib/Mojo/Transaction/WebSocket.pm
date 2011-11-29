@@ -182,7 +182,7 @@ sub parse_frame {
 
   # Check if whole packet has arrived
   my $masked = vec($head, 1, 8) & 0b10000000;
-  return if length $clone < ($len + $hlen + $masked ? 4 : 0);
+  return if length $clone < ($len + $hlen + ($masked ? 4 : 0));
   substr $clone, 0, $hlen, '';
 
   # Payload

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 # "Being eaten by crocodile is just like going to sleep...
 #  in a giant blender."
-use Test::More tests => 17;
+use Test::More tests => 25;
 
 use_ok 'Mojo::Transaction::WebSocket';
 
@@ -44,3 +44,21 @@ is $frame->[1], 2,            'binary frame';
 is $frame->[2], 'just works', 'right payload';
 isnt Mojo::Transaction::WebSocket->new->build_frame(1, 2, 'just works'),
   $bytes, 'frames are not equal';
+
+# One-character text frame roundtrip
+$ws    = Mojo::Transaction::WebSocket->new;
+$bytes = $ws->build_frame(1, 1, 'a');
+$frame = $ws->parse_frame(\($dummy = $bytes));
+is $frame->[0], 1,   'fin flag is set';
+is $frame->[1], 1,   'text frame';
+is $frame->[2], 'a', 'right payload';
+is $ws->build_frame(1, 1, 'a'), $bytes, 'frames are equal';
+
+# One-byte binary frame roundtrip
+$ws    = Mojo::Transaction::WebSocket->new;
+$bytes = $ws->build_frame(1, 2, 'a');
+$frame = $ws->parse_frame(\($dummy = $bytes));
+is $frame->[0], 1,   'fin flag is set';
+is $frame->[1], 2,   'binary frame';
+is $frame->[2], 'a', 'right payload';
+is $bytes = $ws->build_frame(1, 2, 'a'), $bytes, 'frames are equal';

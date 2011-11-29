@@ -727,6 +727,9 @@ Gracefully end WebSocket connection or long poll stream.
 
 Data storage persistent only for the next request, stored in the C<session>.
 
+  $c->flash(message => 'User created successfully!');
+  $c->redirect_to('show_user', id => 23);
+
 =head2 C<on>
 
   my $cb = $c->on(finish => sub {...});
@@ -772,7 +775,12 @@ values.
 Prepare a C<302> redirect response, takes the exact same arguments as
 C<url_for>.
 
+  # Conditional redirect
   return $c->redirect_to('login') unless $c->session('user');
+
+  # Moved permanently
+  $c->res->code(301);
+  $c->redirect_to('some_route');
 
 =head2 C<render>
 
@@ -831,7 +839,8 @@ Render a data structure as JSON.
 
   $c->render_later;
 
-Disable auto rendering, especially for long polling this can be quite useful.
+Disable automatic rendering, especially for long polling this can be quite
+useful.
 
   $c->render_later;
   Mojo::IOLoop->timer(2 => sub {
@@ -841,7 +850,7 @@ Disable auto rendering, especially for long polling this can be quite useful.
 =head2 C<render_not_found>
 
   $c->render_not_found;
-  $c->render_not_found($resource);
+  $c->render_not_found('some_resource');
 
 Render the not found template C<not_found.$mode.$format.*> or
 C<not_found.$format.*> and set the response status code to C<404>.
@@ -933,8 +942,7 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $c          = $c->session({foo => 'bar'});
   $c          = $c->session(foo => 'bar');
 
-Persistent data storage, defaults to using C<JSON> serialization and signed
-cookies.
+Persistent data storage, stored C<JSON> serialized in a signed cookie.
 Note that cookies are generally limited to 4096 bytes of data.
 
   $c->session->{foo} = 'bar';
@@ -1050,7 +1058,7 @@ timeout, which usually defaults to C<15> seconds.
   $c->write_chunk(sub {...});
   $c->write_chunk('Hello!', sub {...});
 
-Write dynamic content non-blocking with the C<chunked> transfer encoding, the
+Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.
 
   $c->write_chunk('He', sub {

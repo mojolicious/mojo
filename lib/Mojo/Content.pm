@@ -646,7 +646,7 @@ invoked once all data has been written.
   $content->write_chunk('Hello!');
   $content->write_chunk('Hello!', sub {...});
 
-Write dynamic content non-blocking with the C<chunked> transfer encoding, the
+Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.
 
 =head1 SEE ALSO

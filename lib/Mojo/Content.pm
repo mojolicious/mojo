@@ -156,9 +156,8 @@ sub parse {
 
   # Parse headers
   $self->parse_until_body(@_);
-
-  # Still parsing headers
   return $self if $self->{state} eq 'headers';
+  $self->_body;
 
   # Relaxed parsing for wonky web servers
   if ($self->auto_relax) {
@@ -297,6 +296,11 @@ sub write_chunk {
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
 }
 
+sub _body {
+  my $self = shift;
+  $self->emit('body') unless $self->{body}++;
+}
+
 sub _build_chunk {
   my ($self, $chunk) = @_;
 
@@ -397,7 +401,7 @@ sub _parse_headers {
     $self->{header_size} = $self->{raw_size} - length $leftovers;
     $self->{pre_buffer}  = $leftovers;
     $self->{state}       = 'body';
-    $self->emit('body');
+    $self->_body;
   }
 }
 

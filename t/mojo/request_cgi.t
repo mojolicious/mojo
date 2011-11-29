@@ -1,14 +1,16 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 178;
+use Test::More tests => 181;
 
 # "Aren't we forgetting the true meaning of Christmas?
 #  You know, the birth of Santa."
 use_ok 'Mojo::Message::Request';
 
 # Parse Lighttpd like CGI environment variables and a body
-my $req = Mojo::Message::Request->new;
+my $req  = Mojo::Message::Request->new;
+my $body = 0;
+$req->content->on(body => sub { $body++ });
 $req->parse(
   HTTP_CONTENT_LENGTH => 11,
   HTTP_EXPECT         => '100-continue',
@@ -19,7 +21,11 @@ $req->parse(
   HTTP_HOST           => 'localhost:8080',
   SERVER_PROTOCOL     => 'HTTP/1.0'
 );
-$req->parse('Hello World');
+is $body, 1, 'body event has been emitted once';
+$req->parse('Hello ');
+is $body, 1, 'body event has been emitted once';
+$req->parse('World');
+is $body, 1, 'body event has been emitted once';
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
 is $req->headers->expect, '100-continue', 'right "Expect" value';

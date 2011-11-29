@@ -331,7 +331,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved cookie generation slightly. (cosimo, sri)
         - Improved documentation.
         - Fixed Mojo::IOLoop to not ignore SIGPIPE.
-        - Fixed typos. (akron)
+        - Fixed typos. (Akron)
 
 1.94    2011-08-27 00:00:00
         - Fixed lite_app and plugin generators.
@@ -442,7 +442,7 @@ This file documents the revision history for Perl extension Mojolicious.
           directly.
         - Improved handling of preformatted text in Mojo::DOM.
         - Improved Mojo::DOM to allow smart whitespace trimming to be
-          disabled. (akron)
+          disabled. (Akron)
         - Improved documentation.
         - Fixed small unicode bug in get command.
 
@@ -508,7 +508,7 @@ This file documents the revision history for Perl extension Mojolicious.
 1.67    2011-07-27 00:00:00
         - Improved documentation.
         - Fixed version command.
-        - Fixed small Mojo::DOM bug. (akron)
+        - Fixed small Mojo::DOM bug. (Akron)
 
 1.66    2011-07-27 00:00:00
         - Added EXPERIMENTAL detect method to Mojo::IOWatcher.
@@ -726,7 +726,7 @@ This file documents the revision history for Perl extension Mojolicious.
           sessions to increase efficiency.
         - Reduced memory usage of Hypnotoad workers by at least 1MB (each).
         - Fixed a small Mojo::Loader bug.
-        - Fixed small Windows line ending problem in Mojo::Command. (akron)
+        - Fixed small Windows line ending problem in Mojo::Command. (Akron)
         - Fixed a UTF-8 bug in Mojo::Exception. (jamadam)
         - Fixed "Can't locate object method x via package y" error messages.
         - Fixed woff MIME type.
@@ -764,7 +764,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added FAQ entry to clarify the Perl 5.8.x situation.
         - Improved documentation.
         - Fixed case sensitivity of Mojo::DOM in XML mode.
-        - Fixed pseudo class case handling in Mojo::DOM. (akron)
+        - Fixed pseudo class case handling in Mojo::DOM. (Akron)
 
 1.3     2011-05-05 00:00:00
         - Code name "Tropical Drink", this is a major release.
@@ -842,7 +842,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Improved HTML healing capabilities of Mojo::DOM.
         - Improved Mojo::DOM to ignore useless end tags.
-        - Improved Mojo::DOM inline DTD support. (akron)
+        - Improved Mojo::DOM inline DTD support. (Akron)
         - Improved Mojo::DOM text extraction.
         - Improved Mojolicious::Plugin::I18n default lexicon handling. (yko)
         - Improved a Mojo::IOLoop workaround.
@@ -853,7 +853,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed a Mojo::IOLoop resolver bug. (Charlie Brady)
         - Fixed small Mojo::Asset::File bug. (crab)
         - Fixed small Mojo::DOM selector bug. (tempire)
-        - Fixed small Mojo::DOM namespace detection bug. (akron)
+        - Fixed small Mojo::DOM namespace detection bug. (Akron)
         - Fixed small route pattern escaping bug.
         - Fixed small reload bug.
         - Fixed small perldoc browser bug. (kberov)
@@ -878,7 +878,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Changed lookup method in Mojo::IOLoop to pick records randomly.
         - Fixed small optional tag bugs in Mojo::DOM.
         - Fixed JavaScript/CSS bug in Mojo::DOM.
-        - Fixed Windows home directory detection bug. (akron)
+        - Fixed Windows home directory detection bug. (Akron)
         - Fixed a few warnings.
         - Fixed typos.
 

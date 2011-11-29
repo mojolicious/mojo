@@ -725,7 +725,7 @@ Gracefully end WebSocket connection or long poll stream.
   $c        = $c->flash({foo => 'bar'});
   $c        = $c->flash(foo => 'bar');
 
-Data storage persistent only for the next request, stored in the session.
+Data storage persistent only for the next request, stored in the C<session>.
 
 =head2 C<on>
 
@@ -933,7 +933,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $c          = $c->session({foo => 'bar'});
   $c          = $c->session(foo => 'bar');
 
-Persistent data storage, defaults to using signed cookies.
+Persistent data storage, defaults to using C<JSON> serialization and signed
+cookies.
 Note that cookies are generally limited to 4096 bytes of data.
 
   $c->session->{foo} = 'bar';

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 
 # "Being eaten by crocodile is just like going to sleep...
 #  in a giant blender."
-use Test::More tests => 17;
+use Test::More tests => 25;
 
 use_ok 'Mojo::Transaction::WebSocket';
 
@@ -16,6 +16,15 @@ is $frame->[1], 1,          'text frame';
 is $frame->[2], 'whatever', 'right payload';
 is $ws->build_frame(1, 1, 'whatever'), $bytes, 'frames are equal';
 
+# One-character text frame roundtrip (regression test)
+$ws    = Mojo::Transaction::WebSocket->new;
+$bytes = $ws->build_frame(1, 1, 'a');
+$frame = $ws->parse_frame(\($dummy = $bytes));
+is $frame->[0], 1,          'fin flag is set';
+is $frame->[1], 1,          'text frame';
+is $frame->[2], 'a',        'right payload';
+is $ws->build_frame(1, 1, 'a'), $bytes, 'frames are equal';
+
 # Simple binary frame roundtrip
 $ws    = Mojo::Transaction::WebSocket->new;
 $bytes = $ws->build_frame(1, 2, 'works');
@@ -24,6 +33,15 @@ is $frame->[0], 1,       'fin flag is set';
 is $frame->[1], 2,       'binary frame';
 is $frame->[2], 'works', 'right payload';
 is $bytes = $ws->build_frame(1, 2, 'works'), $bytes, 'frames are equal';
+
+# One-byte binary frame roundtrip (regression test)
+$ws    = Mojo::Transaction::WebSocket->new;
+$bytes = $ws->build_frame(1, 2, 'a');
+$frame = $ws->parse_frame(\($dummy = $bytes));
+is $frame->[0], 1,       'fin flag is set';
+is $frame->[1], 2,       'binary frame';
+is $frame->[2], 'a',     'right payload';
+is $bytes = $ws->build_frame(1, 2, 'a'), $bytes, 'frames are equal';
 
 # Masked text frame roundtrip
 $ws = Mojo::Transaction::WebSocket->new(masked => 1);

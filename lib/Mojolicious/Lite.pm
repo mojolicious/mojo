@@ -220,7 +220,10 @@ Nameless routes get an automatically generated one assigned that is simply
 equal to the route itself without non-word characters.
 
   # /
-  get '/' => 'index';
+  get '/' => sub {
+    my $self = shift;
+    $self->render(name => 'Reload');
+  } => 'index';
 
   # /hello
   get '/hello';
@@ -228,8 +231,8 @@ equal to the route itself without non-word characters.
   __DATA__
 
   @@ index.html.ep
+  <%= link_to $name => 'index' %>.
   <%= link_to Hello => 'hello' %>.
-  <%= link_to Reload => 'index' %>.
 
   @@ hello.html.ep
   Hello World!

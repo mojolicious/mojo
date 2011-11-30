@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed one-byte payload bug in Mojo::Transaction::WebSocket. (tinx)
         - Fixed body event in Mojo::Content to work more reliably in CGI
           environments.
+        - Fixed small portability issue in loader test.
 
 2.34    2011-11-28 00:00:00
         - Added "websocket.pl" to example scripts.

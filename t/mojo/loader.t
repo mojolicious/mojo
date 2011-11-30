@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
-use Test::More tests => 47;
+use Test::More tests => 46;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -16,7 +16,6 @@ use_ok 'Mojo::Loader';
 
 # Single character core module
 my $loader = Mojo::Loader->new;
-ok !UNIVERSAL::can(B => 'svref_2object');
 ok !$loader->load('B');
 ok !!UNIVERSAL::can(B => 'svref_2object');
 

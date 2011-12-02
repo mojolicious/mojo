@@ -362,7 +362,7 @@ sub upload {
 sub uploads {
   my $self = shift;
 
-  # Only multipart messages have uplaods
+  # Only multipart messages have uploads
   my @uploads;
   return \@uploads unless $self->is_multipart;
 

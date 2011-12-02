@@ -146,7 +146,7 @@ sub _config {
   # Hypnotoad settings
   $c->{graceful_timeout}   ||= 30;
   $c->{heartbeat_interval} ||= 5;
-  $c->{heartbeat_timeout}  ||= 15;
+  $c->{heartbeat_timeout}  ||= 5;
   $c->{lock_file}
     ||= File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
     'hypnotoad.lock');
@@ -474,7 +474,7 @@ incoming connections.
   |- Worker [2]
   |- Worker [3]
   |- Worker [4]
-  `- Manager
+  `- Manager (new)
      |- Worker [1]
      |- Worker [2]
      |- Worker [3]
@@ -554,7 +554,7 @@ Heartbeat interval in seconds, defaults to C<5>.
   heartbeat_timeout => 2
 
 Time in seconds before a worker without a heartbeat will be stopped, defaults
-to C<15>.
+to C<5>.
 
 =head2 C<keep_alive_requests>
 

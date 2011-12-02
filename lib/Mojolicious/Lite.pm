@@ -661,6 +661,12 @@ C<250KB> will be automatically streamed into a temporary file.
 
   any '/upload' => sub {
     my $self = shift;
+
+    # Check file size
+    return $self->render(text => 'File is too big.', status => 200)
+      if $self->req->is_limit_exceeded;
+
+    # Process uploaded file
     if (my $example = $self->req->upload('example')) {
       my $size = $example->size;
       my $name = $example->filename;

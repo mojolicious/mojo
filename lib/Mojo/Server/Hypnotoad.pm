@@ -163,7 +163,7 @@ sub _config {
   $daemon->max_clients($c->{clients} || 1000);
   $daemon->group($c->{group}) if $c->{group};
   $daemon->max_requests($c->{keep_alive_requests}      || 25);
-  $daemon->keep_alive_timeout($c->{keep_alive_timeout} || 5);
+  $daemon->keep_alive_timeout($c->{keep_alive_timeout} || 15);
   $daemon->user($c->{user}) if $c->{user};
   $daemon->websocket_timeout($c->{websocket_timeout} || 300);
   $daemon->ioloop->max_accepts($c->{accepts} || 1000);

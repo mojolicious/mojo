@@ -1,7 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.36    2011-12-03 00:00:00
+2.36    2011-12-05 00:00:00
         - Improved documentation.
+        - Fixed default keep alive timeout of Hypnotoad.
 
 2.35    2011-12-01 00:00:00
         - Added EXPERIMENTAL etag method to Mojo::Headers.

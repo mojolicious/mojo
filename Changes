@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.36    2011-12-05 00:00:00
+        - Changed default heartbeat timeout of Hypnotoad from 5 to 10
+          seconds.
         - Improved documentation.
         - Fixed default keep alive timeout of Hypnotoad.
 

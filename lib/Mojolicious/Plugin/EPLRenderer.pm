@@ -17,10 +17,7 @@ sub register {
       # Template
       my $inline = $options->{inline};
       my $path   = $r->template_path($options);
-      if (defined $inline) {
-        $inline = encode('UTF-8', $inline);
-        $path = md5_sum $inline;
-      }
+      $path = md5_sum encode('UTF-8', $inline) if defined $inline;
       return unless defined $path;
 
       # Cache

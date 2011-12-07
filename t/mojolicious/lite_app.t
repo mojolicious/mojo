@@ -228,7 +228,7 @@ get ':number' => [number => qr/0/] => sub {
 };
 
 # DELETE /inline/epl
-del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1%>') };
+del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1 %> ☃') };
 
 # GET /inline/ep
 get '/inline/ep' =>
@@ -925,7 +925,7 @@ $t->get_ok('/0',
 $ENV{MOJO_REVERSE_PROXY} = $backup2;
 
 # DELETE /inline/epl
-$t->delete_ok('/inline/epl')->status_is(200)->content_is("2\n");
+$t->delete_ok('/inline/epl')->status_is(200)->content_is("2 ☃\n");
 
 # GET /inline/ep
 $t->get_ok('/inline/ep?foo=bar')->status_is(200)->content_is("barworks!\n");
@@ -935,7 +935,7 @@ $t->get_ok('/inline/ep/too')->status_is(200)->content_is("0\n");
 
 # GET /inline/ep/partial
 $t->get_ok('/inline/ep/partial')->status_is(200)
-  ->content_is(b("♥just ♥\nworks!\n")->encode);
+  ->content_is("♥just ♥\nworks!\n");
 
 # GET /source
 $t->get_ok('/source')->status_is(200)->content_like(qr#get_ok\('/source#);

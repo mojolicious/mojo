@@ -1,13 +1,15 @@
 #!/usr/bin/env perl
 use Mojo::Base -strict;
 
+use utf8;
+
 # Disable Bonjour, IPv6 and libev
 BEGIN {
   $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 51;
+use Test::More tests => 54;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -42,6 +44,9 @@ get 'form/:test' => 'form';
 
 # PUT /selection
 put 'selection';
+
+# GET /☃
+get '/☃' => 'snowman';
 
 my $t = Test::Mojo->new;
 
@@ -296,6 +301,13 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d')->status_is(200)
     . '</form>'
     . "\n");
 
+# GET /☃
+$t->get_ok('/☃')->status_is(200)->content_is(<<'EOF');
+<form action="/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
+
 __DATA__
 @@ tags.html.ep
 <%= tag 'foo' %>
@@ -391,4 +403,9 @@ __DATA__
   %= select_field foo => [qw/bar baz/], multiple => 'multiple'
   %= select_field bar => [['D' => 'd', disabled => 'disabled'], 'baz']
   %= submit_button
+%= end
+
+@@ snowman.html.ep
+%= form_for snowman => begin
+  %= submit_button '☃'
 %= end

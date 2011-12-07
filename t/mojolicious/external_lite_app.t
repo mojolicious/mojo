@@ -21,7 +21,14 @@ use Test::Mojo;
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
+$t->get_ok('/')->status_is(200)->content_is(<<'EOF');
+works!
+
+too!works!!!
+<form action="/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
 
 # GET /index.html
 $t->get_ok('/index.html')->status_is(200)

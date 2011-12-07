@@ -188,7 +188,14 @@ $t->get_ok('/just/works')->status_is(200)->content_is("It is working!\n");
 $t->get_ok('/just/works/too')->status_is(200)->content_is("It just works!\n");
 
 # GET /x/1/ (full external application)
-$t->get_ok('/x/1/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
+$t->get_ok('/x/1/')->status_is(200)->content_is(<<'EOF');
+works!
+
+too!works!!!
+<form action="/x/1/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
 
 # GET /x/1/index.html (full external application)
 $t->get_ok('/x/1/index.html')->status_is(200)
@@ -205,7 +212,14 @@ $t->get_ok('/x/1/url/☃')->status_is(200)
   ->content_is('/x/1/url/%E2%98%83 -> /x/1/%E2%98%83/stream!');
 
 # GET /x/♥/ (full external application)
-$t->get_ok('/x/♥/')->status_is(200)->content_is("works!\n\ntoo!works!!!\n");
+$t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
+works!
+
+too!works!!!
+<form action="/x/%E2%99%A5/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
 
 # GET /x/♥/index.html (full external application)
 $t->get_ok('/x/♥/index.html')->status_is(200)
@@ -227,13 +241,27 @@ $t->get_ok('/host')->status_is(200)->content_is('main application!');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+  ->content_is(<<'EOF');
+works!
+
+too!works!!!
+<form action="/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
 
 # GET / (full external application with domain and reverse proxy)
 my $backup = $ENV{MOJO_REVERSE_PROXY};
 $ENV{MOJO_REVERSE_PROXY} = 1;
 $t->get_ok('/' => {'X-Forwarded-Host' => 'mojolicious.org'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+  ->content_is(<<'EOF');
+works!
+
+too!works!!!
+<form action="/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
 $ENV{MOJO_REVERSE_PROXY} = $backup;
 
 # GET /host (full external application with domain)
@@ -254,15 +282,28 @@ $t->get_ok(
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+  ->content_is(<<'EOF');
+works!
+
+too!works!!!
+<form action="/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
   ->content_is('mojolicio.us');
 
 # GET / (full external application with domain)
-$t->get_ok('/' => {Host => 'kraih.com'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+$t->get_ok('/' => {Host => 'kraih.com'})->status_is(200)->content_is(<<'EOF');
+works!
+
+too!works!!!
+<form action="/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'KRaIH.CoM'})->status_is(200)
@@ -278,7 +319,14 @@ $t->get_ok('/host' => {Host => 'foo.bar.kraih.com'})->status_is(200)
 
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)
-  ->content_is("works!\n\ntoo!works!!!\n");
+  ->content_is(<<'EOF');
+works!
+
+too!works!!!
+<form action="/%E2%99%A5/123/%E2%98%83">
+  <input type="submit" value="☃" />
+</form>
+EOF
 
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/host' => {Host => 'foo-bar.de'})->status_is(200)

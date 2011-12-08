@@ -88,6 +88,8 @@ sub write {
   # Start writing
   $self->iowatcher->change($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};
+
+  $self->emit_safe(buffer => $chunk);
 }
 
 sub _close {

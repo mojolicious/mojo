@@ -1,8 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.37    2011-12-09 00:00:00
-        - Welcome to the Mojolicious Core Team Marcus Ramberg and Glen
-          Hinkle.
+        - Welcome to the Mojolicious core team Marcus Ramberg, Glen Hinkle
+          and Abhijit Menon-Sen.
         - Improved documentation.
         - Improved unicode tests.
         - Fixed inline template double encoding bug.

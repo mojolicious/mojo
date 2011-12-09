@@ -709,7 +709,7 @@ that have been used in the past.
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri@cpan.org>.
+Sebastian Riedel, C<sri@cpan.org>
 
 =head1 CORE DEVELOPERS
 
@@ -717,9 +717,11 @@ Current members of the core team in alphabetical order:
 
 =over 4
 
-Glen Hinkle, C<tempire@cpan.org>.
+Abhijit Menon-Sen, C<ams@cpan.org>
 
-Marcus Ramberg, C<mramberg@cpan.org>.
+Glen Hinkle, C<tempire@cpan.org>
+
+Marcus Ramberg, C<mramberg@cpan.org>
 
 =back
 
@@ -728,8 +730,6 @@ Marcus Ramberg, C<mramberg@cpan.org>.
 In alphabetical order:
 
 =over 2
-
-Abhijit Menon-Sen
 
 Adam Kennedy
 

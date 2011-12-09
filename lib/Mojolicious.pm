@@ -711,6 +711,12 @@ that have been used in the past.
 
 Sebastian Riedel, C<sri@cpan.org>.
 
+=head1 CORE DEVELOPERS
+
+Glen Hinkle, C<tempire@cpan.org>.
+
+Marcus Ramberg, C<mramberg@cpan.org>.
+
 =head1 CREDITS
 
 In alphabetical order:
@@ -785,8 +791,6 @@ Eugene Toropov
 
 Gisle Aas
 
-Glen Hinkle
-
 Graham Barr
 
 Henry Tang
@@ -818,8 +822,6 @@ Leon Brocard
 Magnus Holm
 
 Maik Fischer
-
-Marcus Ramberg
 
 Mark Stosberg
 

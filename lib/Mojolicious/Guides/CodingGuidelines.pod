@@ -44,6 +44,13 @@ Code should be written with a Perl6 port in mind.
 
 No refactoring unless a very important feature absolutely depends on it.
 
+The addition and modification of features is decided by majority vote or the
+pumpking.
+
+New core developers must be accepted by a 2/3 majority vote.
+
+The pumpking has veto rights and may select his successor.
+
 It's not a feature without a test and documentation.
 
 A feature is only needed when the majority of the userbase benefits from it.

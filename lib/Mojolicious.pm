@@ -713,9 +713,15 @@ Sebastian Riedel, C<sri@cpan.org>.
 
 =head1 CORE DEVELOPERS
 
+Current members of the core team in alphabetical order:
+
+=over 4
+
 Glen Hinkle, C<tempire@cpan.org>.
 
 Marcus Ramberg, C<mramberg@cpan.org>.
+
+=back
 
 =head1 CREDITS
 

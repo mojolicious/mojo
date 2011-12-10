@@ -10,8 +10,6 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL timeout attribute to Mojo::IOLoop::Stream.
         - Changed default keep alive timeout of Mojo::UserAgent from 15 to 20
           seconds.
-        - Changed default WebSocket timeout of Mojo::UserAgent from 300 to
-          305 seconds.
         - Improved documentation.
         - Improved unicode tests.
         - Fixed inline template double encoding bug.

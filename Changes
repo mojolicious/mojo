@@ -1,8 +1,15 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.37    2011-12-09 00:00:00
+2.37    2011-12-10 00:00:00
         - Welcome to the Mojolicious core team Marcus Ramberg, Glen Hinkle
           and Abhijit Menon-Sen.
+        - Removed cleanup_interval attribute from Mojo::IOLoop.
+        - Deprecated Mojo::IOLoop->timeout in favor of
+          Mojo::IOLoop::Stream->timeout.
+        - Added EXPERIMENTAL timeout event to Mojo::IOLoop::Stream.
+        - Added EXPERIMENTAL timeout attribute to Mojo::IOLoop::Stream.
+        - Changed default keep alive timeout of Mojo::UserAgent from 15 to 20
+          seconds.
         - Improved documentation.
         - Improved unicode tests.
         - Fixed inline template double encoding bug.
@@ -864,7 +871,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojolicious::Plugin::I18n default lexicon handling. (yko)
         - Improved a Mojo::IOLoop workaround.
         - Moved all bundled static files to "lib/Mojolicious/public".
-        - Made Test::Mojo a little more user friendly.
+        - Made Test::Mojo a little more user-friendly.
         - Fixed small CGI/FastCGI header generation bug.
         - Fixed readonly handle support in Mojo::IOLoop.
         - Fixed a Mojo::IOLoop resolver bug. (Charlie Brady)
@@ -1455,7 +1462,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Renamed Mojolicious::Book to Mojolicious::Guides.
         - Removed hot deployment support for Windows because of
           incompatibilities between Active Perl and Strawberry Perl.
-        - Made process id and lock file defaults more userfriendly in
+        - Made process id and lock file defaults more user-friendly in
           Mojo::Server::Daemon.
         - Updated for Perl 5.12, not using the bytes pragma anymore.
         - Fixed a bug where WebSocket servers could not directly start

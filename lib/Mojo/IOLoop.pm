@@ -21,7 +21,6 @@ has iowatcher    => sub {
   $watcher->on(error => sub { warn pop });
   return $watcher;
 };
-has cleanup_interval => '0.025';
 has [qw/lock unlock/];
 has max_accepts     => 0;
 has max_connections => 1000;
@@ -137,13 +136,7 @@ EOF
 }
 
 # DEPRECATED in Leaf Fluttering In Wind!
-sub connection_timeout {
-  warn <<EOF;
-Mojo::IOLoop->connection_timeout is DEPRECATED in favor of
-Mojo::IOLoop->timeout!
-EOF
-  shift->timeout(@_);
-}
+*connection_timeout = \&timeout;
 
 sub defer { shift->timer(0 => @_) }
 
@@ -305,8 +298,22 @@ sub start {
   croak 'Mojo::IOLoop already running' if $self->{running}++;
 
   # Mainloop
-  my $id =
-    $self->recurring($self->cleanup_interval => sub { shift->_cleanup });
+  my $id = $self->recurring(
+    '0.025' => sub {
+      my $self = shift;
+
+      # Manage connections
+      $self->_listening;
+      my $connections = $self->{connections} ||= {};
+      while (my ($id, $c) = each %$connections) {
+        $self->_drop($id)
+          if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
+      }
+
+      # Graceful shutdown
+      $self->stop if $self->max_connections == 0 && keys %$connections == 0;
+    }
+  );
   $self->iowatcher->start;
   $self->drop($id);
 
@@ -342,19 +349,22 @@ sub stream {
   weaken $self;
   $stream->on(close => sub { $self->{connections}->{$id}->{finish} = 1 });
   $stream->on(error => sub { $self->{connections}->{$id}->{finish} = 1 });
-  $stream->on(read  => sub { $self->{connections}->{$id}->{active} = time });
-  $stream->on(write => sub { $self->{connections}->{$id}->{active} = time });
   $stream->resume;
 
   return $id;
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
 sub timeout {
+  warn <<EOF;
+Mojo::IOLoop->timeout is DEPRECATED in favor of
+Mojo::IOLoop::Stream->timeout!
+EOF
   my ($self, $id, $timeout) = @_;
   $self = $self->singleton unless ref $self;
-  return unless my $c = $self->{connections}->{$id};
-  return $c->{timeout} unless defined $timeout;
-  $c->{timeout} = $timeout;
+  return unless my $stream = $self->stream($id);
+  return $stream->timeout unless defined $timeout;
+  $stream->timeout($timeout);
   return $self;
 }
 
@@ -375,29 +385,6 @@ EOF
   return $stream->write($chunk) unless $cb;
   weaken $self;
   return $stream->write($chunk, sub { $self->$cb($id) });
-}
-
-sub _cleanup {
-  my $self = shift;
-
-  # Manage connections
-  $self->_listening;
-  my $connections = $self->{connections} ||= {};
-  while (my ($id, $c) = each %$connections) {
-
-    # Connection needs to be finished
-    if ($c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing)) {
-      $self->_drop($id);
-      next;
-    }
-
-    # Connection timeout
-    $self->_drop($id)
-      if (time - ($c->{active} || time)) >= ($c->{timeout} || 15);
-  }
-
-  # Graceful shutdown
-  $self->stop if $self->max_connections == 0 && keys %$connections == 0;
 }
 
 sub _drop {
@@ -551,14 +538,6 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 
 Low level event watcher, usually a L<Mojo::IOWatcher> or
 L<Mojo::IOWatcher::EV> object.
-Note that this attribute is EXPERIMENTAL and might change without warning!
-
-=head2 C<cleanup_interval>
-
-  my $interval = $loop->cleanup_interval;
-  $loop        = $loop->cleanup_interval(1);
-
-Connection cleanup interval in seconds, defaults to C<0.025>.
 Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<lock>
@@ -777,15 +756,6 @@ and the loop can be restarted by running C<start> again.
 
 Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 Note that this method is EXPERIMENTAL and might change without warning!
-
-=head2 C<timeout>
-
-  my $timeout = Mojo::IOLoop->timeout($id);
-  my $timeout = $loop->timeout($id);
-  $loop       = $loop->timeout($id => 45);
-
-Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to C<15>.
 
 =head2 C<timer>
 

@@ -401,7 +401,7 @@ Render output through one of the Mojo renderers.
 This renderer requires some configuration, at the very least you will need to
 have a default C<format> and a default C<handler> as well as a C<template> or
 C<text>/C<json>.
-See L<Mojolicious::Controller/"render"> for a more user friendly interface.
+See L<Mojolicious::Controller/"render"> for a more user-friendly interface.
 
 =head2 C<template_name>
 

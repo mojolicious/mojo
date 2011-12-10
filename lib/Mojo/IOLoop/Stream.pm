@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno qw/EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK/;
 use Scalar::Util 'weaken';
+use Time::HiRes 'time';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
@@ -10,6 +11,7 @@ has iowatcher => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton->iowatcher;
 };
+has timeout => 15;
 
 # "And America has so many enemies.
 #  Iran, Iraq, China, Mordor, the hoochies that laid low Tiger Woods,
@@ -20,6 +22,7 @@ sub DESTROY {
   return unless my $watcher = $self->{iowatcher};
   return unless my $handle  = $self->{handle};
   $watcher->drop_handle($handle);
+  $watcher->drop_timer($self->{timer}) if $self->{timer};
   close $handle;
   $self->_close;
 }
@@ -52,10 +55,21 @@ sub pause {
 sub resume {
   my $self = shift;
 
+  # Timeout
+  my $watcher = $self->iowatcher;
+  weaken $self;
+  $self->{timer} ||= $watcher->recurring(
+    '0.025' => sub {
+      return
+        unless $self && (time - ($self->{active} || time)) >= $self->timeout;
+      $self->emit_safe('timeout') unless $self->{timed}++;
+      $self->_close;
+    }
+  );
+
   # Start streaming
   unless ($self->{streaming}++) {
-    weaken $self;
-    return $self->iowatcher->watch(
+    return $watcher->watch(
       $self->{handle},
       sub { $self->_read },
       sub { $self->_write }
@@ -119,6 +133,7 @@ sub _read {
 
   # Handle read
   $self->emit_safe(read => $buffer);
+  $self->{active} = time;
 }
 
 # "Oh, I'm in no condition to drive. Wait a minute.
@@ -146,6 +161,7 @@ sub _write {
 
     # Remove written chunk from buffer
     $self->emit_safe(write => substr($self->{buffer}, 0, $written, ''));
+    $self->{active} = time;
   }
 
   # Handle drain
@@ -228,6 +244,16 @@ Emitted safely if an error happens on the stream.
 
 Emitted safely if new data arrives on the stream.
 
+=head2 C<timeout>
+
+  $stream->on(timeout => sub {
+    my $stream = shift;
+  });
+
+Emitted safely if the stream has been inactive for too long and will get
+closed automatically.
+Note that this event is EXPERIMENTAL and might change without warning!
+
 =head2 C<write>
 
   $stream->on(write => sub {
@@ -247,6 +273,15 @@ L<Mojo::IOLoop::Stream> implements the following attributes.
 
 Low level event watcher, defaults to the C<iowatcher> attribute value of the
 global L<Mojo::IOLoop> singleton.
+
+=head2 C<timeout>
+
+  my $timeout = $stream->timeout;
+  $stream     = $stream->timeout(45);
+
+Maximum amount of time in seconds stream can be inactive before getting
+closed automatically, defaults to C<15>.
+Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

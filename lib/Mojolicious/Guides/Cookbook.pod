@@ -332,7 +332,7 @@ infrastructure requirements, since it reuses the HTTP protocol for transport.
     my $self = shift;
 
     # Increase connection timeout a bit
-    Mojo::IOLoop->timeout($self->tx->connection => 300);
+    Mojo::IOLoop->stream($self->tx->connection)->timeout(300);
 
     # Change content type
     $self->res->headers->content_type('text/event-stream');

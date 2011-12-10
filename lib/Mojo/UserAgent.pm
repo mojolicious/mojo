@@ -19,7 +19,7 @@ has connect_timeout => 3;
 has cookie_jar => sub { Mojo::CookieJar->new };
 has [qw/http_proxy https_proxy no_proxy/];
 has ioloop => sub { Mojo::IOLoop->new };
-has keep_alive_timeout => 15;
+has keep_alive_timeout => 20;
 has key                => sub { $ENV{MOJO_KEY_FILE} };
 has log                => sub { Mojo::Log->new };
 has max_connections    => 5;
@@ -227,9 +227,7 @@ sub _connect {
 
       # Events
       return $self->_error($id, $error) if $error;
-      $stream->on(close => sub { $self->_handle($id, 1) });
-      $stream->on(error => sub { $self->_error($id, pop) });
-      $stream->on(read => sub { $self->_read($id, pop) });
+      $self->_events($stream, $id);
       $self->_connected($id);
     }
   );
@@ -271,9 +269,7 @@ sub _connect_proxy {
 
             # Events
             return $self->_error($id, $error) if $error;
-            $stream->on(close => sub { $self->_handle($id, 1) });
-            $stream->on(error => sub { $self->_error($id, pop) });
-            $stream->on(read => sub { $self->_read($id, pop) });
+            $self->_events($stream, $id);
 
             # Start real transaction
             $old->connection($tx->connection);
@@ -294,16 +290,18 @@ sub _connect_proxy {
 sub _connected {
   my ($self, $id) = @_;
 
+  # Keep alive timeout
+  my $loop = $self->_loop;
+  $loop->stream($id)->timeout($self->keep_alive_timeout);
+
   # Store connection information in transaction
   my $tx = $self->{connections}->{$id}->{transaction};
   $tx->connection($id);
-  my $loop   = $self->_loop;
   my $handle = $loop->stream($id)->handle;
   $tx->local_address($handle->sockhost);
   $tx->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost);
   $tx->remote_port($handle->peerport);
-  $loop->timeout($id => $self->keep_alive_timeout);
 
   # Start writing
   weaken $self;
@@ -328,12 +326,21 @@ sub _drop {
 }
 
 sub _error {
-  my ($self, $id, $error) = @_;
+  my ($self, $id, $error, $log) = @_;
   if (my $tx = $self->{connections}->{$id}->{transaction}) {
     $tx->res->error($error);
   }
-  $self->log->error($error);
+  $self->log->error($error) if $log;
   $self->_handle($id, $error);
+}
+
+sub _events {
+  my ($self, $stream, $id) = @_;
+  weaken $self;
+  $stream->on(timeout => sub { $self->_error($id, 'Connection timeout.') });
+  $stream->on(close => sub { $self->_handle($id, 1) });
+  $stream->on(error => sub { $self->_error($id, pop, 1) });
+  $stream->on(read => sub { $self->_read($id, pop) });
 }
 
 sub _finish {
@@ -514,7 +521,7 @@ sub _upgrade {
   $res->error('WebSocket challenge failed.') and return
     unless $new->client_challenge;
   $c->{transaction} = $new;
-  $self->_loop->timeout($id, $self->websocket_timeout);
+  $self->_loop->stream($id)->timeout($self->websocket_timeout);
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });
 
@@ -699,7 +706,7 @@ object.
   $ua                    = $ua->keep_alive_timeout(15);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to C<15>.
+dropped, defaults to C<20>.
 
 =head2 C<key>
 

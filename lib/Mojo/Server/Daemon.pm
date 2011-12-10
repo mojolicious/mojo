@@ -165,7 +165,7 @@ sub _finish {
     if ($ws->res->code eq '101') {
 
       # Upgrade connection timeout
-      $self->ioloop->timeout($id, $self->websocket_timeout);
+      $self->ioloop->stream($id)->timeout($self->websocket_timeout);
 
       # Resume
       weaken $self;
@@ -229,9 +229,16 @@ sub _listen {
       $self->{connections}->{$id} = {tls => $tls};
 
       # Keep alive timeout
-      $loop->timeout($id => $self->keep_alive_timeout);
+      $stream->timeout($self->keep_alive_timeout);
 
       # Events
+      $stream->on(
+        timeout => sub {
+          my $c = $self->{connections}->{$id};
+          return unless $c->{transaction} || $c->{websocket};
+          $self->_error($id, 'Connection timeout.');
+        }
+      );
       $stream->on(close => sub { $self->_close($id) });
       $stream->on(error => sub { $self->_error($id, pop) });
       $stream->on(read  => sub { $self->_read($id, pop) });

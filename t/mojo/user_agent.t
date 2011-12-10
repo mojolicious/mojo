@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 67;
+use Test::More tests => 70;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -25,7 +25,8 @@ get '/' => {text => 'works!'};
 my $timeout = undef;
 get '/timeout' => sub {
   my $self = shift;
-  Mojo::IOLoop->timeout($self->tx->connection => '0.5');
+  Mojo::IOLoop->stream($self->tx->connection)
+    ->timeout($self->param('timeout'));
   $self->on(finish => sub { $timeout = 1 });
   $self->render_later;
 };
@@ -158,11 +159,36 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# GET / (built-in server times out)
-$tx = $ua->get('/timeout');
+# GET /timeout (built-in server times out)
+my $log = '';
+my $cb  = app->log->subscribers('message')->[0];
+app->log->unsubscribe(message => $cb);
+app->log->level('error');
+app->log->on(message => sub { $log .= pop });
+$tx = $ua->get('/timeout?timeout=0.5');
+app->log->level('fatal');
+app->log->on(message => $cb);
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close.', 'right error';
 is $timeout, 1, 'finish event has been emitted';
+like $log, qr/Connection\ timeout\./, 'right log message';
+
+# GET /timeout (client times out)
+$cb = $ua->on(
+  start => sub {
+    my ($ua, $tx) = @_;
+    $tx->on(
+      connection => sub {
+        my ($tx, $connection) = @_;
+        Mojo::IOLoop->stream($connection)->timeout('0.5');
+      }
+    );
+  }
+);
+$tx = $ua->get('/timeout?timeout=5');
+$ua->unsubscribe(start => $cb);
+ok !$tx->success, 'not successful';
+is $tx->error, 'Connection timeout.', 'right error';
 
 # GET / (introspect)
 my $req = my $res = '';
@@ -199,9 +225,9 @@ $tx = $ua->get('/', 'whatever');
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
-is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('write')}, 1,
+is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('write')}, 0,
   'unsubscribed successfully';
-is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')}, 2,
+is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')}, 1,
   'unsubscribed successfully';
 like $req, qr#^GET / .*whatever$#s,      'right request';
 like $res, qr#^HTTP/.*200 OK.*works!$#s, 'right response';

@@ -428,5 +428,5 @@ $tx->res->body(
 );
 $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
-ok !$tx->error, 'no error';
+is $tx->error, 'Connection timeout.', 'right error';
 is $buffer, 'how', 'right content';

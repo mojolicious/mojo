@@ -1049,7 +1049,7 @@ For Comet (C<long polling>) you might also want to increase the connection
 timeout, which usually defaults to C<15> seconds.
 
   # Increase timeout for current connection to 300 seconds
-  Mojo::IOLoop->timeout($c->tx->connection => 300);
+  Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
 
 =head2 C<write_chunk>
 

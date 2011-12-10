@@ -87,7 +87,7 @@ C<resources>.
 =head2 Sessions
 
 HTTP was designed as a stateless protocol, web servers don't know anything
-about previous requests, which makes user friendly login systems very tricky.
+about previous requests, which makes user-friendly login systems very tricky.
 Sessions solve this problem by allowing web applications to keep stateful
 information across several HTTP requests.
 

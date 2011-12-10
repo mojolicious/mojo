@@ -27,12 +27,7 @@ sub DESTROY {
   $self->_close;
 }
 
-sub new {
-  my $self = shift->SUPER::new;
-  $self->{handle} = shift;
-  $self->{buffer} = '';
-  return $self;
-}
+sub new { shift->SUPER::new(handle => shift, buffer => '', active => time) }
 
 sub handle { shift->{handle} }
 
@@ -60,21 +55,18 @@ sub resume {
   weaken $self;
   $self->{timer} ||= $watcher->recurring(
     '0.025' => sub {
-      return
-        unless $self && (time - ($self->{active} || time)) >= $self->timeout;
+      return unless $self && (time - ($self->{active})) >= $self->timeout;
       $self->emit_safe('timeout') unless $self->{timed}++;
       $self->_close;
     }
   );
 
   # Start streaming
-  unless ($self->{streaming}++) {
-    return $watcher->watch(
-      $self->{handle},
-      sub { $self->_read },
-      sub { $self->_write }
-    );
-  }
+  return $watcher->watch(
+    $self->{handle},
+    sub { $self->_read },
+    sub { $self->_write }
+  ) unless $self->{streaming}++;
 
   # Resume streaming
   return unless delete $self->{paused};

@@ -100,12 +100,8 @@ sub _build_tx {
 
   # Events
   weaken $self;
-  $tx->on(
-    upgrade => sub {
-      my ($tx, $ws) = @_;
-      $self->{connections}->{$id}->{ws} = $ws->server_handshake;
-    }
-  );
+  $tx->on(upgrade =>
+      sub { $self->{connections}->{$id}->{ws} = pop->server_handshake });
   $tx->on(
     request => sub {
       my $tx = shift;
@@ -114,12 +110,9 @@ sub _build_tx {
     }
   );
 
-  # New request on the connection
-  $c->{requests} ||= 0;
-  $c->{requests}++;
-
   # Kept alive if we have more than one request on the connection
-  $tx->kept_alive(1) if $c->{requests} > 1;
+  $c->{requests} ||= 0;
+  $tx->kept_alive(1) if ++$c->{requests} > 1;
 
   return $tx;
 }

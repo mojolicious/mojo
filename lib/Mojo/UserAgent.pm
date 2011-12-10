@@ -26,7 +26,7 @@ has max_connections    => 5;
 has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
 has name               => 'Mojolicious (Perl)';
 has transactor => sub { Mojo::UserAgent::Transactor->new };
-has websocket_timeout => 300;
+has websocket_timeout => 305;
 
 # Common HTTP methods
 {
@@ -767,7 +767,7 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   $ua                   = $ua->websocket_timeout(300);
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to C<300>.
+before getting dropped, defaults to C<305>.
 
 =head1 METHODS
 

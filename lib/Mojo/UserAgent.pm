@@ -200,7 +200,7 @@ sub _connect {
   $id ||= $self->_cache("$scheme:$host:$port");
   if ($id && !ref $id) {
     warn "KEEP ALIVE CONNECTION ($scheme:$host:$port)\n" if DEBUG;
-    $self->{connections}->{$id} = {cb => $cb, transaction => $tx};
+    $self->{connections}->{$id} = {cb => $cb, tx => $tx};
     $tx->kept_alive(1);
     $self->_connected($id);
     return $id;
@@ -231,7 +231,7 @@ sub _connect {
       $self->_connected($id);
     }
   );
-  $self->{connections}->{$id} = {cb => $cb, transaction => $tx};
+  $self->{connections}->{$id} = {cb => $cb, tx => $tx};
 
   return $id;
 }
@@ -295,7 +295,7 @@ sub _connected {
   $loop->stream($id)->timeout($self->keep_alive_timeout);
 
   # Store connection information in transaction
-  my $tx = $self->{connections}->{$id}->{transaction};
+  my $tx = $self->{connections}->{$id}->{tx};
   $tx->connection($id);
   my $handle = $loop->stream($id)->handle;
   $tx->local_address($handle->sockhost);
@@ -313,7 +313,7 @@ sub _drop {
   my ($self, $id, $close) = @_;
 
   # Close connection
-  my $tx = (delete($self->{connections}->{$id}) || {})->{transaction};
+  my $tx = (delete($self->{connections}->{$id}) || {})->{tx};
   unless (!$close && $tx && $tx->keep_alive && !$tx->error) {
     $self->_cache($id);
     return $self->_loop->drop($id);
@@ -327,9 +327,7 @@ sub _drop {
 
 sub _error {
   my ($self, $id, $error, $log) = @_;
-  if (my $tx = $self->{connections}->{$id}->{transaction}) {
-    $tx->res->error($error);
-  }
+  if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->res->error($error) }
   $self->log->error($error) if $log;
   $self->_handle($id, $error);
 }
@@ -368,7 +366,7 @@ sub _handle {
 
   # Finish WebSocket
   my $c   = $self->{connections}->{$id};
-  my $old = $c->{transaction};
+  my $old = $c->{tx};
   if ($old && $old->is_websocket) {
     $self->{processing} -= 1;
     delete $self->{connections}->{$id};
@@ -411,12 +409,12 @@ sub _read {
 
   # Corrupted connection
   return                   unless my $c  = $self->{connections}->{$id};
-  return $self->_drop($id) unless my $tx = $c->{transaction};
+  return $self->_drop($id) unless my $tx = $c->{tx};
 
   # Process incoming data
   $tx->client_read($chunk);
-  if ($tx->is_finished) { $self->_handle($id) }
-  elsif ($c->{transaction}->is_writing) { $self->_write($id) }
+  if    ($tx->is_finished)     { $self->_handle($id) }
+  elsif ($c->{tx}->is_writing) { $self->_write($id) }
 }
 
 sub _redirect {
@@ -508,7 +506,7 @@ sub _upgrade {
 
   # No upgrade request
   my $c   = $self->{connections}->{$id};
-  my $old = $c->{transaction};
+  my $old = $c->{tx};
   return unless $old->req->headers->upgrade;
 
   # Handshake failed
@@ -520,7 +518,7 @@ sub _upgrade {
   $new->kept_alive($old->kept_alive);
   $res->error('WebSocket challenge failed.') and return
     unless $new->client_challenge;
-  $c->{transaction} = $new;
+  $c->{tx} = $new;
   $self->_loop->stream($id)->timeout($self->websocket_timeout);
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });
@@ -533,7 +531,7 @@ sub _write {
 
   # Prepare outgoing data
   return unless my $c  = $self->{connections}->{$id};
-  return unless my $tx = $c->{transaction};
+  return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
   return if $self->{writing}++;
   my $chunk = $tx->client_write;

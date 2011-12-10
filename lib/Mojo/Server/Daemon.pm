@@ -103,13 +103,13 @@ sub _build_tx {
   $tx->on(
     upgrade => sub {
       my ($tx, $ws) = @_;
-      $self->{connections}->{$id}->{websocket} = $ws->server_handshake;
+      $self->{connections}->{$id}->{ws} = $ws->server_handshake;
     }
   );
   $tx->on(
     request => sub {
       my $tx = shift;
-      $self->emit(request => $self->{connections}->{$id}->{websocket} || $tx);
+      $self->emit(request => $self->{connections}->{$id}->{ws} || $tx);
       $tx->on(resume => sub { $self->_write($id) });
     }
   );
@@ -131,7 +131,7 @@ sub _drop {
 
   # Finish gracefully
   my $c = $self->{connections}->{$id};
-  if (my $tx = $c->{websocket} || $c->{transaction}) { $tx->server_close }
+  if (my $tx = $c->{ws} || $c->{tx}) { $tx->server_close }
 
   # Drop connection
   delete $self->{connections}->{$id};
@@ -154,12 +154,12 @@ sub _finish {
 
   # Finish transaction
   my $c = $self->{connections}->{$id};
-  delete $c->{transaction};
+  delete $c->{tx};
   $tx->server_close;
 
   # WebSocket
   my $s = 0;
-  if (my $ws = $c->{websocket}) {
+  if (my $ws = $c->{ws}) {
 
     # Successful upgrade
     if ($ws->res->code eq '101') {
@@ -174,7 +174,7 @@ sub _finish {
 
     # Failed upgrade
     else {
-      delete $c->{websocket};
+      delete $c->{ws};
       $ws->server_close;
     }
   }
@@ -187,7 +187,7 @@ sub _finish {
 
   # Leftovers
   elsif (defined(my $leftovers = $tx->server_leftovers)) {
-    $tx = $c->{transaction} = $self->_build_tx($id, $c);
+    $tx = $c->{tx} = $self->_build_tx($id, $c);
     $tx->server_read($leftovers);
   }
 }
@@ -234,9 +234,8 @@ sub _listen {
       # Events
       $stream->on(
         timeout => sub {
-          my $c = $self->{connections}->{$id};
-          return unless $c->{transaction} || $c->{websocket};
-          $self->_error($id, 'Connection timeout.');
+          $self->_error($id, 'Connection timeout.')
+            if $self->{connections}->{$id}->{tx};
         }
       );
       $stream->on(close => sub { $self->_close($id) });
@@ -272,8 +271,8 @@ sub _read {
 
   # Make sure we have a transaction
   my $c = $self->{connections}->{$id};
-  my $tx = $c->{transaction} || $c->{websocket};
-  $tx ||= $c->{transaction} = $self->_build_tx($id, $c);
+  my $tx = $c->{tx} || $c->{ws};
+  $tx ||= $c->{tx} = $self->_build_tx($id, $c);
 
   # Parse chunk
   $tx->server_read($chunk);
@@ -300,7 +299,7 @@ sub _write {
 
   # Not writing
   my $c = $self->{connections}->{$id};
-  return unless my $tx = $c->{transaction} || $c->{websocket};
+  return unless my $tx = $c->{tx} || $c->{ws};
   return unless $tx->is_writing;
 
   # Get chunk
@@ -322,7 +321,7 @@ sub _write {
     }
     else {
       $self->_finish($id, $tx);
-      return unless $c->{transaction} || $c->{websocket};
+      return unless $c->{tx} || $c->{ws};
     }
   }
   $stream->write('', $cb);

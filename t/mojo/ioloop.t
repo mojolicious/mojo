@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 28;
+use Test::More tests => 32;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -206,6 +206,50 @@ Mojo::IOLoop->timer('0.5' => sub { shift->stop });
 Mojo::IOLoop->start;
 is $server_close, 1, 'server emitted close event once';
 is $client_close, 1, 'client emitted close event once';
+
+# Stream throttling
+$port = Mojo::IOLoop->generate_port;
+my ($client, $server, $client_after, $server_before, $server_after) = '';
+Mojo::IOLoop->server(
+  {port => $port} => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        Mojo::IOLoop->timer(
+          '0.5' => sub {
+            $server_before = $server;
+            $stream->pause;
+            $stream->write('works!');
+            Mojo::IOLoop->timer(
+              '0.5' => sub {
+                $server_after = $server;
+                $client_after = $client;
+                $stream->resume;
+                Mojo::IOLoop->timer('0.5' => sub { Mojo::IOLoop->stop });
+              }
+            );
+          }
+        ) unless $server;
+        $server .= $chunk;
+      }
+    );
+  }
+);
+Mojo::IOLoop->client(
+  {port => $port} => sub {
+    my ($loop, $stream) = @_;
+    my $drain;
+    $drain = sub { shift->write('1', $drain) };
+    $stream->$drain();
+    $stream->on(read => sub { $client .= pop });
+  }
+);
+Mojo::IOLoop->start;
+is $server_before, $server_after, 'stream has been paused';
+ok length($server) > length($server_after), 'stream has been resumed';
+is $client, $client_after, 'stream was writable while paused';
+is $client, 'works!', 'full message has been written';
 
 # Defaults
 is Mojo::IOLoop::Client->new->iowatcher, Mojo::IOLoop->singleton->iowatcher,

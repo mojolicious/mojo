@@ -40,6 +40,7 @@ plan tests => 21;
 #  To the panic room store!"
 use_ok 'Mojo::IOLoop';
 
+# Built-in certificate
 my $loop = Mojo::IOLoop->new;
 my $port = Mojo::IOLoop->generate_port;
 my ($server, $client) = '';

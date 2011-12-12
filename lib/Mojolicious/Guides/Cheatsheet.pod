@@ -140,14 +140,6 @@ L<Mojo::HelloWorld>.
 
   MOJO_APP=MyApp
 
-=head2 C<MOJO_CA_FILE>
-
-The path to the TLS CA authority file, should always contain a path like
-C</etc/tls/cacerts.pem>.
-Note that L<IO::Socket::SSL> must be installed for TLS support.
-
-  MOJO_CA_FILE=/etc/tls/cacerts.pem
-
 =head2 C<MOJO_CERT_FILE>
 
 The path to the TLS certificate, should always contain a path like

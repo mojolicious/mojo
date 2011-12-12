@@ -781,7 +781,8 @@ implements the following new ones.
   $ua     = $ua->app(MyApp->new);
 
 Application relative URLs will be processed with, defaults to the value of
-the C<MOJO_APP> environment variable.
+the C<MOJO_APP> environment variable. Usually a L<Mojo> or L<Mojolicious
+object.
 
   say $ua->app->secret;
   $ua->app->log->level('fatal');

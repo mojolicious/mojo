@@ -23,13 +23,13 @@ has websocket_timeout  => 300;
 
 my $SOCKET_RE = qr|
   ^
-  (?<scheme>http(?:s)?)\://   # Scheme
-  (?<address>.+)                # Address
-  \:(?<port>\d+)                # Port
+  (http(?:s)?)\://   # Scheme
+  (.+)               # Address
+  \:(\d+)            # Port
   (?:
-    \:(?<cert>.*?)              # Certificate
-    \:(?<key>.*?)               # Key
-    (?:\:(?<ca>.+)?)?           # Certificate Authority
+    \:(.*?)          # Certificate
+    \:(.*?)          # Key
+    (?:\:(.+)?)?     # Certificate Authority
   )?
   $
 |x;
@@ -201,12 +201,12 @@ sub _listen {
   croak qq/Invalid listen value "$listen"/ unless $listen =~ $SOCKET_RE;
   my $options = {};
   my $tls;
-  $tls = $options->{tls} = 1 if $+{scheme} eq 'https';
-  $options->{address}  = $+{address} if $+{address} ne '*';
-  $options->{port}     = $+{port};
-  $options->{tls_cert} = $+{cert} if $+{cert};
-  $options->{tls_key}  = $+{key} if $+{key};
-  $options->{tls_ca}   = $+{ca} if $+{ca};
+  $tls = $options->{tls} = 1 if $1 eq 'https';
+  $options->{address}  = $2 if $2 ne '*';
+  $options->{port}     = $3;
+  $options->{tls_cert} = $4 if $4;
+  $options->{tls_key}  = $5 if $5;
+  $options->{tls_ca}   = $6 if $6;
 
   # Listen backlog size
   my $backlog = $self->backlog;

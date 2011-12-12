@@ -6,40 +6,40 @@ use Scalar::Util 'weaken';
 
 my $ATTR_RE = qr/
   \s*
-  (?<key>[^=\s>]+)              # Key
+  ([^=\s>]+)       # Key
   (?:
     \s*
     =
     \s*
     (?:
-      "(?<quoted>[^"]*?)"       # Quotation marks
+      "([^"]*?)"   # Quotation marks
       |
-      '(?<quoted_too>[^']*?)'   # Apostrophes
+      '([^']*?)'   # Apostrophes
       |
-      (?<unquoted>[^>\s]+)      # Unquoted
+      ([^>\s]+)    # Unquoted
     )
   )?
   \s*
 /x;
-my $END_RE   = qr#^\s*/\s*(?<tag>.+)\s*#;
-my $START_RE = qr#(?<tag>[^\s/]+)(?<attrs>[\s\S]*)#;
+my $END_RE   = qr#^\s*/\s*(.+)\s*#;
+my $START_RE = qr#([^\s/]+)([\s\S]*)#;
 my $TOKEN_RE = qr/
-  (?<text>[^<]*)                                    # Text
+  ([^<]*)                                           # Text
   (?:
-    <\?(?<pi>.*?)\?>                                # Processing Instruction
+    <\?(.*?)\?>                                     # Processing Instruction
     |
-    <\!--(?<comment>.*?)-->                         # Comment
+    <\!--(.*?)-->                                   # Comment
     |
-    <\!\[CDATA\[(?<cdata>.*?)\]\]>                  # CDATA
+    <\!\[CDATA\[(.*?)\]\]>                          # CDATA
     |
-    <!DOCTYPE(?<doctype>
+    <!DOCTYPE(
       \s+\w+
       (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
       (?:\s+\[.+?\])?                               # Int Subset
       \s*
     )>
     |
-    <(?<tag>
+    <(
       \s*
       [^>\s]+                                       # Tag
       (?:$ATTR_RE)*                                 # Attributes
@@ -102,7 +102,7 @@ sub parse {
   my $current = $tree;
   while ($html =~ m/\G$TOKEN_RE/gcs) {
     my ($text, $pi, $comment, $cdata, $doctype, $tag) =
-      (@+{qw/text pi comment cdata doctype tag/});
+      ($1, $2, $3, $4, $5, $6);
 
     # Text
     if (length $text) {
@@ -127,19 +127,17 @@ sub parse {
     # End
     next unless $tag;
     my $cs = $self->xml;
-    if ($tag =~ $END_RE) {
-      $self->_end($cs ? $+{tag} : lc($+{tag}), \$current);
-    }
+    if ($tag =~ $END_RE) { $self->_end($cs ? $1 : lc($1), \$current) }
 
     # Start
     elsif ($tag =~ $START_RE) {
-      my ($start, $attr) = ($cs ? $+{tag} : lc($+{tag}), $+{attrs});
+      my ($start, $attr) = ($cs ? $1 : lc($1), $2);
 
       # Attributes
       my $attrs = {};
       while ($attr =~ /$ATTR_RE/g) {
-        my $key = $cs ? $+{key} : lc($+{key});
-        my $value = $+{quoted} // $+{quoted_too} // $+{unquoted};
+        my $key = $cs ? $1 : lc($1);
+        my $value = $2 // $3 // $4;
 
         # Empty tag
         next if $key eq '/';

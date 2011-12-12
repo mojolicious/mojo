@@ -13,15 +13,15 @@ has [qw/name path value version/];
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
 my $NAME_RE             = qr/
   ^\s*
-  (?<name>[^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace
+  ([^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace
   \s*
-  \=?                   # '=' (optional)
+  \=?            # '=' (optional)
   \s*
 /x;
 my $SEPARATOR_RE = qr/^\s*\;\s*/;
 my $VALUE_RE     = qr/
   ^
-  (?<value>
+  (
     "(?:\\\\|\\"|[^"])+"   # Quoted
   |
     [^\;\,]+               # Unquoted
@@ -43,14 +43,14 @@ sub _tokenize {
 
     # Name
     if ($string =~ s/$NAME_RE//) {
-      my $name = $+{name};
+      my $name = $1;
 
       # "expires" is a special case, thank you Netscape...
       $string =~ s/^([^\;\,]+\,?[^\;\,]+)/"$1"/ if $name =~ /^expires$/i;
 
       # Value
       my $value;
-      $value = unquote $+{value} if $string =~ s/$VALUE_RE//;
+      $value = unquote $1 if $string =~ s/$VALUE_RE//;
 
       # Token
       push @token, [$name, $value];

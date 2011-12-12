@@ -12,15 +12,13 @@ has url => sub { Mojo::URL->new };
 
 my $START_LINE_RE = qr|
   ^\s*
-  (?<method>[a-zA-Z]+)                                          # Method
+  ([a-zA-Z]+)                                                   # Method
   \s+
-  (?<path>
-    [0-9a-zA-Z\-\.\_\~\:/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+   # Path
-  )
-  (?:\s+HTTP/(?<version>\d+\.\d+))?                             # Version
+  ([0-9a-zA-Z\-\.\_\~\:/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+)   # Path
+  (?:\s+HTTP/(\d+\.\d+))?                                       # Version
   $
 |x;
-my $HOST_RE = qr/^(?<host>[^\:]*)\:?(?<port>.*)$/;
+my $HOST_RE = qr/^([^\:]*)\:?(.*)$/;
 
 sub clone {
   my $self = shift;
@@ -163,8 +161,8 @@ sub parse {
       # "X-Forwarded-Host"
       if (my $host = $headers->header('X-Forwarded-Host')) {
         if ($host =~ $HOST_RE) {
-          $base->host($+{host});
-          $base->port($+{port}) if defined $+{port};
+          $base->host($1);
+          $base->port($2) if defined $2;
         }
       }
 
@@ -259,9 +257,8 @@ sub _parse_env {
     if ($name eq 'HOST') {
       my $host = $value;
       my $port;
-      ($host, $port) = ($+{host}, $+{port}) if $host =~ $HOST_RE;
-      $base->host($host);
-      $base->port($port);
+      ($host, $port) = ($1, $2) if $host =~ $HOST_RE;
+      $base->host($host)->port($port);
     }
   }
 
@@ -324,13 +321,13 @@ sub _parse_start_line {
   # We have a (hopefully) full request line
   return $self->error('Bad request start line.', 400)
     unless $line =~ $START_LINE_RE;
-  $self->method($+{method});
+  $self->method($1);
   my $url = $self->url;
-  $+{method} eq 'CONNECT' ? $url->authority($+{path}) : $url->parse($+{path});
+  $1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2);
 
   # HTTP 0.9 is identified by the missing version
   $self->{state} = 'content';
-  return $self->version($+{version}) if defined $+{version};
+  return $self->version($3) if defined $3;
   $self->version('0.9');
   $self->{state}  = 'finished';
   $self->{buffer} = '';

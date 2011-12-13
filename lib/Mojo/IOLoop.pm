@@ -699,13 +699,10 @@ amount of time in seconds.
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of seconds.
-This for example allows you to run multiple reactors next to each other.
 
-  my $loop2 = Mojo::IOLoop->new(timeout => 0);
-  Mojo::IOLoop->recurring(0 => sub { $loop2->one_tick });
-
-Note that the loop timeout can be changed dynamically at any time to adjust
-responsiveness.
+  # Run multiple reactors next to each other
+  my $loop2 = Mojo::IOLoop->new;
+  Mojo::IOLoop->recurring(0 => sub { $loop2->one_tick(0) });
 
 =head2 C<server>
 

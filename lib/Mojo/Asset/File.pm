@@ -194,15 +194,15 @@ Delete file automatically once it's not used anymore.
   my $handle = $file->handle;
   $file      = $file->handle(IO::File->new);
 
-Actual file handle, created on demand.
+File handle, created on demand.
 
 =head2 C<path>
 
   my $path = $file->path;
   $file    = $file->path('/foo/bar/baz.txt');
 
-Actual file path used to create C<handle>, can be automatically generated on
-demand.
+File path used to create C<handle>, can also be automatically generated if
+necessary.
 
 =head2 C<tmpdir>
 

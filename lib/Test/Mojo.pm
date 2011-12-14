@@ -398,6 +398,9 @@ L<Test::Mojo> implements the following attributes.
 
 Current transaction, usually a L<Mojo::Transaction::HTTP> object.
 
+  # More specific tests
+  is $t->tx->res->json->{foo}, 'bar', 'right value';
+
 =head2 C<ua>
 
   my $ua = $t->ua;

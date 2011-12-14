@@ -939,10 +939,10 @@ $req->parse("use strict;\n");
 $req->parse("use warnings;\n\n");
 $req->parse("print \"Hello World :)\\n\"\n");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
-ok $req->is_finished, 'request is finished';
+ok $req->is_finished,  'request is finished';
 ok $req->is_multipart, 'no multipart content';
-is $req->method,  'GET', 'right method';
-is $req->version, '1.1', 'right version';
+is $req->method,       'GET', 'right method';
+is $req->version,      '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo13#23', 'right URL';
@@ -956,11 +956,10 @@ isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
-is $req->body_params->to_hash->{text1}, "hallo welt test123\n",
-  'right value';
+is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
 is $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->body_params->to_hash->{upload}, undef, 'not a body parameter';
-is $req->upload('upload')->filename,  '0', 'right filename';
+is $req->upload('upload')->filename, '0', 'right filename';
 isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
 

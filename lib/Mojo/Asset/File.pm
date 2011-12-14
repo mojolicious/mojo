@@ -13,7 +13,7 @@ has [qw/cleanup path/];
 has handle => sub {
   my $self = shift;
 
-  # Already got a file without handle
+  # Open existing file
   my $handle = IO::File->new;
   my $path   = $self->path;
   if (defined $path && -f $path) {
@@ -21,12 +21,13 @@ has handle => sub {
     return $handle;
   }
 
-  # Open existing or temporary file
+  # Open new or temporary file
   my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
-  my $name = $path || $base;
+  my $name = $path // $base;
   my $fh;
   until (sysopen $fh, $name, O_CREAT | O_EXCL | O_RDWR) {
-    croak qq/Can't open file "$name": $!/ if $path || $! != $!{EEXIST};
+    croak qq/Can't open file "$name": $!/
+      if defined $path || $! != $!{EEXIST};
     $name = "$base." . md5_sum(time . $$ . rand 9999999);
   }
   $self->path($name);
@@ -68,7 +69,7 @@ sub contains {
   my $handle = $self->handle;
   $handle->sysseek($self->start_range, SEEK_SET);
 
-  # Read
+  # Calculate window
   my $end = $self->end_range // $self->size;
   my $window_size = length($pattern) * 2;
   $window_size = $end - $self->start_range
@@ -76,9 +77,9 @@ sub contains {
   my $read         = $handle->sysread(my $window, $window_size);
   my $offset       = $read;
   my $pattern_size = length $pattern;
+  my $range        = $self->end_range;
 
   # Moving window search
-  my $range = $self->end_range;
   while ($offset <= $end) {
     if (defined $range) {
       $pattern_size = $end + 1 - $offset;
@@ -121,7 +122,7 @@ sub get_chunk {
 sub is_file {1}
 
 sub move_to {
-  my ($self, $path) = @_;
+  my ($self, $to) = @_;
 
   # Windows requires that the handle is closed
   close $self->handle;
@@ -129,8 +130,8 @@ sub move_to {
 
   # Move file and prevent clean up
   my $from = $self->path;
-  move($from, $path) or croak qq/Can't move file "$from" to "$path": $!/;
-  $self->path($path)->cleanup(0);
+  move($from, $to) or croak qq/Can't move file "$from" to "$to": $!/;
+  $self->path($to)->cleanup(0);
 
   return $self;
 }
@@ -164,10 +165,12 @@ Mojo::Asset::File - File storage for HTTP 1.1 content
   # Temporary file
   my $file = Mojo::Asset::File->new;
   $file->add_chunk('foo bar baz');
+  say 'File contains "bar"' if $file->contains('bar') >= 0;
   say $file->slurp;
 
   # Existing file
   my $file = Mojo::Asset::File->new(path => '/foo/bar/baz.txt');
+  $file->move_to('/yada.txt');
   say $file->slurp;
 
 =head1 DESCRIPTION
@@ -191,22 +194,23 @@ Delete file automatically once it's not used anymore.
   my $handle = $file->handle;
   $file      = $file->handle(IO::File->new);
 
-Actual file handle.
+Actual file handle, created on demand.
 
 =head2 C<path>
 
   my $path = $file->path;
   $file    = $file->path('/foo/bar/baz.txt');
 
-Actual file path.
+Actual file path used to create C<handle>, can be automatically generated on
+demand.
 
 =head2 C<tmpdir>
 
   my $tmpdir = $file->tmpdir;
   $file      = $file->tmpdir('/tmp');
 
-Temporary directory, defaults to the value of C<MOJO_TMPDIR> or auto
-detection.
+Temporary directory used to generate C<path>, defaults to the value of
+C<MOJO_TMPDIR> or auto detection.
 
 =head1 METHODS
 

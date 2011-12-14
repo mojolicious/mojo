@@ -89,7 +89,7 @@ sub body_params {
       my $value    = $data->[2];
 
       # File
-      next if $filename;
+      next if defined $filename;
 
       # Form value
       $params->append($name, $value);
@@ -374,7 +374,7 @@ sub uploads {
     my $part     = $data->[2];
 
     # Just a form value
-    next unless $filename;
+    next unless defined $filename;
 
     # Uploaded file
     my $upload = Mojo::Upload->new;
@@ -504,7 +504,7 @@ sub _parse_formdata {
     }
 
     # Form value
-    unless ($filename) {
+    unless (defined $filename) {
       $value = $part->asset->slurp;
       $value = decode($charset, $value) // $value
         if $charset && !$part->headers->content_transfer_encoding;

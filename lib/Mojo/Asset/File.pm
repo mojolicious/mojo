@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Asset';
 use Carp 'croak';
 use Errno;
 use Fcntl;
-use File::Copy ();
+use File::Copy 'move';
 use File::Spec;
 use IO::File;
 use Mojo::Util 'md5_sum';
@@ -127,10 +127,9 @@ sub move_to {
   close $self->handle;
   delete $self->{handle};
 
-  # Move and prevent clean up of moved file
-  my $src = $self->path;
-  File::Copy::move($src, $path)
-    or croak qq/Can't move file "$src" to "$path": $!/;
+  # Move file and prevent clean up
+  my $from = $self->path;
+  move($from, $path) or croak qq/Can't move file "$from" to "$path": $!/;
   $self->path($path)->cleanup(0);
 
   return $self;
@@ -138,15 +137,16 @@ sub move_to {
 
 sub size {
   my $self = shift;
-  return 0 unless defined(my $file = $self->path || $self->handle);
+  return 0 unless defined(my $file = $self->path);
   return -s $file;
 }
 
 sub slurp {
-  my $self = shift;
-  $self->handle->sysseek(0, SEEK_SET);
+  my $self   = shift;
+  my $handle = $self->handle;
+  $handle->sysseek(0, SEEK_SET);
   my $content = '';
-  while ($self->handle->sysread(my $buffer, 131072)) { $content .= $buffer }
+  while ($handle->sysread(my $buffer, 131072)) { $content .= $buffer }
   return $content;
 }
 
@@ -161,10 +161,12 @@ Mojo::Asset::File - File storage for HTTP 1.1 content
 
   use Mojo::Asset::File;
 
+  # Temporary file
   my $file = Mojo::Asset::File->new;
   $file->add_chunk('foo bar baz');
   say $file->slurp;
 
+  # Existing file
   my $file = Mojo::Asset::File->new(path => '/foo/bar/baz.txt');
   say $file->slurp;
 

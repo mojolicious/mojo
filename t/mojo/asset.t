@@ -134,14 +134,14 @@ ok !$asset->is_file, 'stored in memory';
 $asset = $asset->add_chunk('lala');
 ok !$asset->is_file, 'stored in memory';
 
-# Handle
+# Temporary file without cleanup
 $file = Mojo::Asset::File->new(cleanup => 0)->add_chunk('test');
-$path = $file->path;
-$file = Mojo::Asset::File->new(handle => $file->handle, cleanup => 1);
 ok $file->is_file, 'stored in file';
 is $file->slurp,   'test', 'right content';
 is $file->size,    4, 'right size';
 is $file->contains('es'), 1, '"es" at position 1';
+$path = $file->path;
+undef $file;
 ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';

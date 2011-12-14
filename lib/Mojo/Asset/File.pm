@@ -15,26 +15,24 @@ has handle => sub {
 
   # Already got a file without handle
   my $handle = IO::File->new;
-  my $file   = $self->path;
-  if ($file && -f $file) {
-    $handle->open("< $file")
-      or croak qq/Can't open file "$file": $!/;
+  my $path   = $self->path;
+  if (defined $path && -f $path) {
+    $handle->open("< $path") or croak qq/Can't open file "$path": $!/;
     return $handle;
   }
 
   # Open existing or temporary file
   my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
-  my $name = $file || $base;
+  my $name = $path || $base;
   my $fh;
   until (sysopen $fh, $name, O_CREAT | O_EXCL | O_RDWR) {
-    croak qq/Can't open file "$name": $!/ if $file || $! != $!{EEXIST};
+    croak qq/Can't open file "$name": $!/ if $path || $! != $!{EEXIST};
     $name = "$base." . md5_sum(time . $$ . rand 9999999);
   }
-  $file = $name;
-  $self->path($file);
+  $self->path($name);
 
   # Enable automatic cleanup
-  $self->cleanup(1);
+  $self->cleanup(1) unless defined $self->cleanup;
 
   # Open for read/write access
   $handle->fdopen(fileno($fh), "+>") or croak qq/Can't open file "$name": $!/;
@@ -49,23 +47,17 @@ has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
 #  claws!"
 sub DESTROY {
   my $self = shift;
-  my $path = $self->path;
-  if ($self->cleanup && -f $path) {
-    close $self->handle;
-    unlink $path;
-  }
+  return unless $self->cleanup && defined(my $path = $self->path);
+  close $self->handle;
+  unlink $path if -w $path;
 }
 
 sub add_chunk {
   my ($self, $chunk) = @_;
-
-  # Seek to end
-  $self->handle->sysseek(0, SEEK_END);
-
-  # Append to file
+  my $handle = $self->handle;
+  $handle->sysseek(0, SEEK_END);
   $chunk //= '';
-  $self->handle->syswrite($chunk, length $chunk);
-
+  $handle->syswrite($chunk, length $chunk);
   return $self;
 }
 
@@ -73,16 +65,17 @@ sub contains {
   my ($self, $pattern) = @_;
 
   # Seek to start
-  $self->handle->sysseek($self->start_range, SEEK_SET);
+  my $handle = $self->handle;
+  $handle->sysseek($self->start_range, SEEK_SET);
+
+  # Read
   my $end = $self->end_range // $self->size;
   my $window_size = length($pattern) * 2;
   $window_size = $end - $self->start_range
     if $window_size > $end - $self->start_range;
-
-  # Read
-  my $read         = $self->handle->sysread(my $window, $window_size);
+  my $read         = $handle->sysread(my $window, $window_size);
   my $offset       = $read;
-  my $pattern_size = length($pattern);
+  my $pattern_size = length $pattern;
 
   # Moving window search
   my $range = $self->end_range;
@@ -91,7 +84,7 @@ sub contains {
       $pattern_size = $end + 1 - $offset;
       return -1 if $pattern_size <= 0;
     }
-    $read = $self->handle->sysread(my $buffer, $pattern_size);
+    $read = $handle->sysread(my $buffer, $pattern_size);
     $offset += $read;
     $window .= $buffer;
     my $pos = index $window, $pattern;
@@ -108,21 +101,19 @@ sub get_chunk {
 
   # Seek to start
   $start += $self->start_range;
-  $self->handle->sysseek($start, SEEK_SET);
-  my $end = $self->end_range;
-  my $buffer;
-
-  # Chunk size
-  my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
+  my $handle = $self->handle;
+  $handle->sysseek($start, SEEK_SET);
 
   # Range support
-  if (defined $end) {
+  my $buffer;
+  my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
+  if (defined(my $end = $self->end_range)) {
     my $chunk = $end + 1 - $start;
     return '' if $chunk <= 0;
     $chunk = $size if $chunk > $size;
-    $self->handle->sysread($buffer, $chunk);
+    $handle->sysread($buffer, $chunk);
   }
-  else { $self->handle->sysread($buffer, $size) }
+  else { $handle->sysread($buffer, $size) }
 
   return $buffer;
 }
@@ -136,34 +127,26 @@ sub move_to {
   close $self->handle;
   delete $self->{handle};
 
-  # Move
+  # Move and prevent clean up of moved file
   my $src = $self->path;
   File::Copy::move($src, $path)
     or croak qq/Can't move file "$src" to "$path": $!/;
-  $self->path($path);
-
-  # Don't clean up a moved file
-  $self->cleanup(0);
+  $self->path($path)->cleanup(0);
 
   return $self;
 }
 
 sub size {
   my $self = shift;
-  return 0 unless my $file = $self->path;
+  return 0 unless defined(my $file = $self->path || $self->handle);
   return -s $file;
 }
 
 sub slurp {
   my $self = shift;
-
-  # Seek to start
   $self->handle->sysseek(0, SEEK_SET);
-
-  # Slurp
   my $content = '';
   while ($self->handle->sysread(my $buffer, 131072)) { $content .= $buffer }
-
   return $content;
 }
 

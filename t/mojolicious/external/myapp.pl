@@ -1,4 +1,4 @@
-use Mojo::Base -strict;
+#!/usr/bin/env perl
 
 use utf8;
 

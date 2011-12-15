@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use Mojo::Base -strict;
 
 # Disable Bonjour and IPv6

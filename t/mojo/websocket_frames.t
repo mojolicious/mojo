@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use Mojo::Base -strict;
 
 # "Being eaten by crocodile is just like going to sleep...

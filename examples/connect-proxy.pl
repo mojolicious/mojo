@@ -1,6 +1,3 @@
-#!/usr/bin/env perl
-
-# Use bundled libraries
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;

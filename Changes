@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.38    2011-12-14 00:00:00
+2.38    2011-12-15 00:00:00
         - Improved documentation. (marcus, sri)
         - Improved tests.
         - Fixed memory leaks caused by named capture groups bug in Perl.

@@ -84,7 +84,6 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 @@ test
 % my $name = shift;
-#!/usr/bin/env perl
 use Mojo::Base -strict;
 
 use Test::More tests => 3;
@@ -104,8 +103,6 @@ $t->get_ok('/')->status_is(200)->content_is('Hello Mojo!');
 
 @@ makefile
 % my ($class, $path) = @_;
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 

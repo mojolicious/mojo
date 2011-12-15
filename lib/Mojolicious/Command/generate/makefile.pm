@@ -24,8 +24,6 @@ __DATA__
 
 @@ makefile
 % my ($class, $path, $name) = @_;
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 

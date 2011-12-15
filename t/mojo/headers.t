@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use Mojo::Base -strict;
 
 # "Remember, you can always find East by staring directly at the sun."

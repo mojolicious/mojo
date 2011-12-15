@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 package Test::Foo;
 use Mojo::Base 'Mojolicious::Controller';
 

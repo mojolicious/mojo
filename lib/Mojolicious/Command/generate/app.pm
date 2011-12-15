@@ -128,7 +128,6 @@ sub welcome {
 
 @@ test
 % my $class = shift;
-#!/usr/bin/env perl
 use Mojo::Base -strict;
 
 use Test::More tests => 4;

@@ -1,4 +1,3 @@
-#!/usr/bin/env perl
 use Mojo::Base -strict;
 
 # "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.

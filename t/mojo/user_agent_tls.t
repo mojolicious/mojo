@@ -26,7 +26,7 @@ $ua->log->level('fatal');
 
 # Server
 my $port = $ua->ioloop->generate_port;
-my $error;
+my $err;
 my $id = $ua->ioloop->server(
   port     => $port,
   tls      => 1,
@@ -47,7 +47,7 @@ my $id = $ua->ioloop->server(
     $stream->on(
       error => sub {
         $loop->drop($id);
-        $error = pop;
+        $err = pop;
       }
     );
   }
@@ -57,12 +57,12 @@ my $id = $ua->ioloop->server(
 my $tx = $ua->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
-ok !$error, 'no error';
-$error = '';
-$tx    = $ua->cert('')->key('')->get("https://localhost:$port");
+ok !$err, 'no error';
+$err = '';
+$tx  = $ua->cert('')->key('')->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
-ok !$error, 'no error';
+ok !$err, 'no error';
 
 # Valid certificate
 $tx =
@@ -92,8 +92,8 @@ $ENV{MOJO_KEY_FILE}  = $backup2;
 $tx =
   $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key')
   ->get("https://localhost:$port");
-ok !$error, 'no error';
+ok !$err, 'no error';
 
 # Empty certificate
 $tx = $ua->cert('no file')->key('no file')->get("https://localhost:$port");
-ok !$error, 'no error';
+ok !$err, 'no error';

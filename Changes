@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.38    2011-12-16 00:00:00
+2.38    2011-12-17 00:00:00
+        - Changed Mojo::IOLoop->client arguments from ($loop, $stream, $err)
+          to ($loop, $err, $stream).
         - Improved documentation. (marcus, sri)
         - Improved tests.
         - Fixed memory leaks caused by named capture groups bug in Perl.

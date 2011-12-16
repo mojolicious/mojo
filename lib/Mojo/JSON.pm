@@ -407,8 +407,8 @@ L<Mojo::JSON> implements the following attributes.
 
 =head2 C<error>
 
-  my $error = $json->error;
-  $json     = $json->error('Oops!');
+  my $err = $json->error;
+  $json   = $json->error('Oops!');
 
 Parser errors.
 

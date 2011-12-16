@@ -16,8 +16,8 @@ sub parse {
   # Parse
   my $json   = Mojo::JSON->new;
   my $config = $json->decode($content);
-  my $error  = $json->error;
-  die qq/Couldn't parse config "$file": $error/ if !$config && $error;
+  my $err    = $json->error;
+  die qq/Couldn't parse config "$file": $err/ if !$config && $err;
   die qq/Invalid config "$file"./ if !$config || ref $config ne 'HASH';
 
   return $config;

@@ -186,7 +186,7 @@ Mojo::IOLoop::Stream - Non-blocking I/O stream
     ...
   });
   $stream->on(error => sub {
-    my ($stream, $error) = @_;
+    my ($stream, $err) = @_;
     ...
   });
 
@@ -223,7 +223,7 @@ Emitted safely once all data has been written.
 =head2 C<error>
 
   $stream->on(error => sub {
-    my ($stream, $error) = @_;
+    my ($stream, $err) = @_;
   });
 
 Emitted safely if an error happens on the stream.

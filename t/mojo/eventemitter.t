@@ -18,8 +18,8 @@ eval { $e->emit('die') };
 is $@, "works!\n", 'right error';
 
 # Error fallback
-my ($echo, $error);
-$e->on(error => sub { $error = pop });
+my ($echo, $err);
+$e->on(error => sub { $err = pop });
 $e->on(test2 => sub { $echo .= 'echo: ' . pop });
 $e->on(
   test2 => sub {
@@ -31,14 +31,14 @@ my $cb = sub { $echo .= 'echo2: ' . pop };
 $e->on(test2 => $cb);
 $e->emit_safe('test2', 'works!');
 is $echo, 'echo: works!echo2: works!', 'right echo';
-is $error, qq/Event "test2" failed: test2: works!\n/, 'right error';
-$echo = $error = undef;
+is $err, qq/Event "test2" failed: test2: works!\n/, 'right error';
+$echo = $err = undef;
 is scalar @{$e->subscribers('test2')}, 3, 'three subscribers';
 $e->unsubscribe(test2 => $cb);
 is scalar @{$e->subscribers('test2')}, 2, 'two subscribers';
 $e->emit_safe('test2', 'works!');
 is $echo, 'echo: works!', 'right echo';
-is $error, qq/Event "test2" failed: test2: works!\n/, 'right error';
+is $err, qq/Event "test2" failed: test2: works!\n/, 'right error';
 
 # Normal event again
 $e->emit('test1');

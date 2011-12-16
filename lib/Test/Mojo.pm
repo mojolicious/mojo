@@ -335,8 +335,8 @@ sub _request_ok {
   # Perform request against application
   $self->tx($self->ua->$method($url, %$headers, $body));
   local $Test::Builder::Level = $Test::Builder::Level + 2;
-  my ($error, $code) = $self->tx->error;
-  Test::More::diag $error if !(my $ok = !$error || $code) && $error;
+  my ($err, $code) = $self->tx->error;
+  Test::More::diag $err if !(my $ok = !$err || $code) && $err;
   Test::More::ok $ok, encode('UTF-8', "$method $url");
 
   return $self;

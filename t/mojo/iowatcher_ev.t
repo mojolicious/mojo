@@ -158,13 +158,13 @@ is $timer2, 2, 'timer was triggered';
 
 # Error
 $watcher = Mojo::IOWatcher::EV->new;
-my $error;
+my $err;
 $watcher->on(
   error => sub {
     shift->stop;
-    $error = pop;
+    $err = pop;
   }
 );
 $watcher->timer(0 => sub { die "works!\n" });
 $watcher->start;
-like $error, qr/works!/, 'right error';
+like $err, qr/works!/, 'right error';

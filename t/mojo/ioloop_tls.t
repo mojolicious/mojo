@@ -52,7 +52,7 @@ $loop->server(
 );
 $loop->client(
   {port => $port, tls => 1} => sub {
-    my ($loop, $stream) = @_;
+    my ($loop, $err, $stream) = @_;
     $stream->write('tset', sub { shift->write('123') });
     $stream->on(read => sub { $client .= pop });
   }
@@ -91,7 +91,7 @@ my $id = $loop->client(
   tls_cert => 't/mojo/certs/client.crt',
   tls_key  => 't/mojo/certs/client.key',
   sub {
-    my ($loop, $stream) = @_;
+    my ($loop, $err, $stream) = @_;
     $stream->write('tset', sub { shift->write('123') });
     $stream->on(close => sub { $client_close++ });
     $stream->on(read => sub { $client .= pop });
@@ -175,7 +175,7 @@ $id = $loop->client(
   tls_cert => 't/mojo/certs/client.crt',
   tls_key  => 't/mojo/certs/client.key',
   sub {
-    my ($loop, $stream) = @_;
+    my ($loop, $err, $stream) = @_;
     $stream->write('tset', sub { shift->write('123') });
     $stream->on(close => sub { $client_close++ });
     $stream->on(read => sub { $client .= pop });

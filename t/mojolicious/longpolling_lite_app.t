@@ -303,7 +303,7 @@ $longpoll = undef;
 my $port = $t->test_server->port;
 Mojo::IOLoop->client(
   {port => $port} => sub {
-    my ($loop, $stream) = @_;
+    my ($loop, $err, $stream) = @_;
     $stream->on(
       read => sub {
         my ($stream, $chunk) = @_;

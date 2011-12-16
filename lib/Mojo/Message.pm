@@ -191,8 +191,8 @@ sub error {
 
   # Get
   unless (@_) {
-    return unless my $error = $self->{error};
-    return wantarray ? @$error : $error->[0];
+    return unless my $err = $self->{error};
+    return wantarray ? @$err : $err->[0];
   }
 
   # Set

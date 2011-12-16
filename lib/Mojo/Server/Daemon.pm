@@ -131,8 +131,8 @@ sub _drop {
 }
 
 sub _error {
-  my ($self, $id, $error) = @_;
-  $self->app->log->error($error);
+  my ($self, $id, $err) = @_;
+  $self->app->log->error($err);
   $self->_drop($id);
 }
 

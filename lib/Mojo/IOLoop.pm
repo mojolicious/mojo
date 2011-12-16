@@ -57,13 +57,13 @@ sub client {
       $self->stream($stream => $id);
 
       # Connected
-      $self->$cb($stream);
+      $self->$cb(undef, $stream);
     }
   );
   $client->on(
     error => sub {
       my $c = delete $self->{connections}->{$id};
-      $self->$cb(undef, pop);
+      $self->$cb(pop);
     }
   );
 
@@ -87,13 +87,13 @@ sub connect {
   my $id;
   $id = $self->client(
     $args => sub {
-      my ($self, $stream, $error) = @_;
+      my ($self, $err, $stream) = @_;
 
       my $c = $self->{connections}->{$id};
       $c->{$_} = delete($args->{"on_$_"}) || $c->{$_}
         for qw/close connect error read/;
-      if ($error) {
-        $c->{error}->($self, $id, $error) if $c->{error};
+      if ($err) {
+        $c->{error}->($self, $id, $err) if $c->{error};
         return;
       }
 
@@ -481,7 +481,7 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
 
   # Connect to port 3000
   my $id = Mojo::IOLoop->client({port => 3000} => sub {
-    my ($loop, $stream) = @_;
+    my ($loop, $err, $stream) = @_;
 
     $stream->on(read => sub {
       my ($stream, $chunk) = @_;
@@ -622,7 +622,7 @@ L<Mojo::IOLoop::Client/"connect">. Note that this method is EXPERIMENTAL and
 might change without warning!
 
   Mojo::IOLoop->client({port => 3000} => sub {
-    my ($loop, $stream, $error) = @_;
+    my ($loop, $err, $stream) = @_;
   });
 
 =head2 C<defer>

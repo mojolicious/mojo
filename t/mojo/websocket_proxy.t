@@ -83,8 +83,8 @@ Mojo::IOLoop->server(
             my $server;
             $server = Mojo::IOLoop->client(
               {address => $1, port => $fail ? $port : $2} => sub {
-                my ($loop, $stream, $error) = @_;
-                if ($error) {
+                my ($loop, $err, $stream) = @_;
+                if ($err) {
                   Mojo::IOLoop->drop($client);
                   return delete $c->{$client};
                 }
@@ -189,15 +189,15 @@ ok $sent > 25, 'sent enough';
 # WebSocket /test (proxy websocket with bad target)
 $ua->http_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
-my ($success, $error);
+my ($success, $err);
 $ua->websocket(
   "ws://localhost:$port2/test" => sub {
     my $tx = pop;
     $success = $tx->success;
-    $error   = $tx->error;
+    $err     = $tx->error;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
 ok !$success, 'no success';
-is $error, 'Proxy connection failed.', 'right message';
+is $err, 'Proxy connection failed.', 'right message';

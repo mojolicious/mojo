@@ -33,16 +33,16 @@ $loop = Mojo::IOLoop->new;
 is ref $loop->iowatcher, 'MyWatcher', 'right class';
 
 # Double start
-my $error;
+my $err;
 Mojo::IOLoop->defer(
   sub {
     eval { Mojo::IOLoop->start };
-    $error = $@;
+    $err = $@;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
-like $error, qr/^Mojo::IOLoop already running/, 'right error';
+like $err, qr/^Mojo::IOLoop already running/, 'right error';
 
 # Ticks
 my $ticks = 0;
@@ -140,7 +140,7 @@ my $delay = Mojo::IOLoop->delay;
 $delay->begin;
 Mojo::IOLoop->client(
   {port => $port} => sub {
-    my ($loop, $stream, $error) = @_;
+    my ($loop, $err, $stream) = @_;
     $delay->end($stream);
     $stream->on(close => sub { $buffer .= 'should not happen' });
     $stream->on(error => sub { $buffer .= 'should not happen either' });
@@ -165,7 +165,7 @@ $id = $loop->server({port => $port} => sub { });
 my $connected;
 $loop->client(
   {port => $port} => sub {
-    my ($loop, $stream) = @_;
+    my ($loop, $err, $stream) = @_;
     $loop->drop($id);
     $loop->stop;
     $connected = 1;
@@ -175,15 +175,15 @@ like $ENV{MOJO_REUSE}, qr/(?:^|\,)$port\:/, 'file descriptor can be reused';
 $loop->start;
 unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)$port\:/, 'environment is clean';
 ok $connected, 'connected';
-$error = undef;
+$err = undef;
 $loop->client(
   (port => $port) => sub {
     shift->stop;
-    $error = pop;
+    $err = pop;
   }
 );
 $loop->start;
-ok $error, 'has error';
+ok $err, 'has error';
 
 # Dropped connection
 $port = Mojo::IOLoop->generate_port;
@@ -196,7 +196,7 @@ Mojo::IOLoop->server(
 );
 $id = Mojo::IOLoop->client(
   (port => $port) => sub {
-    my ($loop, $stream) = @_;
+    my ($loop, $err, $stream) = @_;
     $stream->on(close => sub { $client_close++ });
     $loop->drop($id);
   }
@@ -237,7 +237,7 @@ Mojo::IOLoop->server(
 );
 Mojo::IOLoop->client(
   {port => $port} => sub {
-    my ($loop, $stream) = @_;
+    my ($loop, $err, $stream) = @_;
     my $drain;
     $drain = sub { shift->write('1', $drain) };
     $stream->$drain();

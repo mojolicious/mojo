@@ -223,10 +223,10 @@ sub _connect {
     tls_cert => $self->cert,
     tls_key  => $self->key,
     sub {
-      my ($loop, $stream, $error) = @_;
+      my ($loop, $err, $stream) = @_;
 
       # Events
-      return $self->_error($id, $error) if $error;
+      return $self->_error($id, $err) if $err;
       $self->_events($stream, $id);
       $self->_connected($id);
     }
@@ -265,10 +265,10 @@ sub _connect_proxy {
           tls_cert => $self->cert,
           tls_key  => $self->key,
           sub {
-            my ($loop, $stream, $error) = @_;
+            my ($loop, $err, $stream) = @_;
 
             # Events
-            return $self->_error($id, $error) if $error;
+            return $self->_error($id, $err) if $err;
             $self->_events($stream, $id);
 
             # Start real transaction
@@ -326,10 +326,10 @@ sub _drop {
 }
 
 sub _error {
-  my ($self, $id, $error, $log) = @_;
-  if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->res->error($error) }
-  $self->log->error($error) if $log;
-  $self->_handle($id, $error);
+  my ($self, $id, $err, $log) = @_;
+  if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->res->error($err) }
+  $self->log->error($err) if $log;
+  $self->_handle($id, $err);
 }
 
 sub _events {

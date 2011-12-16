@@ -10,6 +10,14 @@ L<http://twitter.com/kraih> and L<http://github.com/kraih/mojo> or join the
 official IRC channel C<#mojo> on C<irc.perl.org> to get all the latest
 updates.
 
+=head1 LEARNING PERL
+
+If you're new to Perl, see L<learn.perl.org|http://learn.perl.org> for
+help to get started with the language.
+
+There are also some excellent L<Perl books|http://learn.perl.org/books>
+(including some that are freely available online).
+
 =head1 TUTORIAL
 
 =over 2

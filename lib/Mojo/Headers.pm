@@ -13,9 +13,8 @@ my @HEADERS = (
   qw/Expires Host If-Modified-Since Last-Modified Location/,
   qw/Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept/,
   qw/Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol/,
-  qw/Sec-WebSocket-Version Server Set-Cookie Set-Cookie2 Trailer/,
+  qw/Sec-WebSocket-Version Server Set-Cookie Set-Cookie2 Status Trailer/,
   qw/Transfer-Encoding Upgrade User-Agent WWW-Authenticate X-Forwarded-For/,
-  qw/Status/,
 );
 {
   no strict 'refs';

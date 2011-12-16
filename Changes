@@ -1,12 +1,13 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.38    2011-12-15 00:00:00
+2.38    2011-12-16 00:00:00
         - Improved documentation. (marcus, sri)
         - Improved tests.
         - Fixed memory leaks caused by named capture groups bug in Perl.
           (plu, sri)
         - Fixed small cleanup bug in Mojo::Asset::File.
         - Fixed small multipart bug in Mojo::Message. (augensalat)
+        - Fixed missing status method in Mojo::Headers. (crab)
 
 2.37    2011-12-10 00:00:00
         - Welcome to the Mojolicious core team Marcus Ramberg, Glen Hinkle

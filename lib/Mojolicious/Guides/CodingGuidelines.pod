@@ -70,7 +70,7 @@ Only add prereqs if absolutely necessary and make them optional if possible.
 
 Domain specific languages should be avoided in favor of Perl'ish solutions.
 
-No inline POD.
+No inline POD or multiple sentences on the same line.
 
 Documentation belongs to the guides, module POD is just an API reference.
 

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 16;
+use Test::More tests => 20;
 
 use Mojo::Message::Response;
 use Mojolicious::Lite;
@@ -60,6 +60,7 @@ my $message = '';
 my $res =
   Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
 is $res->code, 200, 'rigth status';
+is $res->headers->status, '200 OK', 'right "Status" value';
 is $res->headers->content_type, 'text/html;charset=UTF-8',
   'right "Content-Type" value';
 like $res->body, qr/Mojo/, 'right content';
@@ -81,6 +82,7 @@ $message = '';
 }
 $res = Mojo::Message::Response->new->parse($message);
 is $res->code, 200, 'rigth status';
+is $res->headers->status, undef, 'no "Status" value';
 is $res->headers->content_type, 'text/html;charset=UTF-8',
   'right "Content-Type" value';
 like $res->body, qr/Mojo/, 'right content';
@@ -107,7 +109,8 @@ $message = '';
 }
 like $message, qr/chunked/, 'is chunked';
 $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
-is $res->code, 200,       'rigth status';
+is $res->code, 200, 'rigth status';
+is $res->headers->status, '200 OK', 'right "Status" value';
 is $res->body, '1234567', 'right content';
 
 # Parameters
@@ -128,6 +131,7 @@ $message = '';
 }
 $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
 is $res->code, 200, 'rigth status';
+is $res->headers->status, '200 OK', 'right "Status" value';
 is $res->headers->content_type, 'application/json',
   'right "Content-Type" value';
 is $res->headers->content_length, 27, 'right "Content-Length" value';

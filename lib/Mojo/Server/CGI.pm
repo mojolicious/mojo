@@ -57,7 +57,7 @@ sub run {
   $res->fix_headers;
   my $code    = $res->code    || 404;
   my $message = $res->message || $res->default_message;
-  $res->headers->header(Status => "$code $message") unless $self->nph;
+  $res->headers->status("$code $message") unless $self->nph;
   $offset = 0;
   while (1) {
     my $chunk = $res->get_header_chunk($offset);

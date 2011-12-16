@@ -513,8 +513,8 @@ Opposite of C<element_exists>.
   $t = $t->finish_ok;
   $t = $t->finish_ok('finished successfully');
 
-Finish C<WebSocket> connection.
-Note that this method is EXPERIMENTAL and might change without warning!
+Finish C<WebSocket> connection. Note that this method is EXPERIMENTAL and
+might change without warning!
 
 =head2 C<get_ok>
 
@@ -576,32 +576,32 @@ Alias for the L<Mojo::UserAgent/"max_redirects">.
   $t = $t->message_is('working!');
   $t = $t->message_is('working!', 'right message');
 
-Check WebSocket message for exact match.
-Note that this method is EXPERIMENTAL and might change without warning!
+Check WebSocket message for exact match. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<message_isnt>
 
   $t = $t->message_isnt('working!');
   $t = $t->message_isnt('working!', 'different message');
 
-Opposite of C<message_is>.
-Note that this method is EXPERIMENTAL and might change without warning!
+Opposite of C<message_is>. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<message_like>
 
   $t = $t->message_like(qr/working!/);
   $t = $t->message_like(qr/working!/, 'right message');
 
-Check WebSocket message for similar match.
-Note that this method is EXPERIMENTAL and might change without warning!
+Check WebSocket message for similar match. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<message_unlike>
 
   $t = $t->message_unlike(qr/working!/);
   $t = $t->message_unlike(qr/working!/, 'different message');
 
-Opposite of C<message_like>.
-Note that this method is EXPERIMENTAL and might change without warning!
+Opposite of C<message_like>. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<post_ok>
 
@@ -635,8 +635,8 @@ Reset user agent session.
   $t = $t->send_message_ok('hello');
   $t = $t->send_message_ok('hello', 'sent successfully');
 
-Send C<WebSocket> message.
-Note that this method is EXPERIMENTAL and might change without warning!
+Send C<WebSocket> message. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<status_is>
 
@@ -656,8 +656,8 @@ Opposite of C<status_is>.
   my $url = $t->test_server('http');
   my $url = $t->test_server('https');
 
-Alias for L<Mojo::UserAgent/"test_server">.
-Note that this method is EXPERIMENTAL and might change without warning!
+Alias for L<Mojo::UserAgent/"test_server">. Note that this method is
+EXPERIMENTAL and might change without warning!
 
   $t->get_ok($t->test_server->userinfo('sri:secr3t')->path('/protected'));
 
@@ -696,8 +696,8 @@ Opposite of C<text_like>.
   $t = $t->websocket_ok('/echo');
 
 Open a C<WebSocket> connection with transparent handshake, takes the exact
-same arguments as L<Mojo::UserAgent/"websocket">.
-Note that this method is EXPERIMENTAL and might change without warning!
+same arguments as L<Mojo::UserAgent/"websocket">. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

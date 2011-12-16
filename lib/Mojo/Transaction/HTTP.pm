@@ -315,8 +315,8 @@ Emitted when a request is ready and needs to be handled.
   });
 
 Emitted when transaction gets upgraded to a L<Mojo::Transaction::WebSocket>
-object.
-Note that this event is EXPERIMENTAL and might change without warning!
+object. Note that this event is EXPERIMENTAL and might change without
+warning!
 
   $tx->on(upgrade => sub {
     my ($tx, $ws) = @_;

@@ -757,8 +757,8 @@ Check if message content is chunked.
 
   my $success = $message->is_dynamic;
 
-Check if message content will be dynamic.
-Note that this method is EXPERIMENTAL and might change without warning!
+Check if message content will be dynamic. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<is_finished>
 
@@ -770,8 +770,8 @@ Check if parser is finished.
 
   my $success = $message->is_limit_exceeded;
 
-Check if message has exceeded C<max_line_size> or C<max_message_size>.
-Note that this method is EXPERIMENTAL and might change without warning!
+Check if message has exceeded C<max_line_size> or C<max_message_size>. Note
+that this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<is_multipart>
 
@@ -799,8 +799,8 @@ Remove leftover data from message parser.
 
   $message->max_line_size(1024);
 
-Alias for L<Mojo::Headers/"max_line_size">.
-Note that this method is EXPERIMENTAL and might change without warning!
+Alias for L<Mojo::Headers/"max_line_size">. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<param>
 

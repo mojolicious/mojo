@@ -37,20 +37,18 @@ days, including L<Mojolicious>.
 
 The C<controller> receives a request from a user, passes incoming data to the
 C<model> and retrieves data from it, which then gets turned into an actual
-response by the C<view>.
-But note that this pattern is just a guideline that most of the time results
-in cleaner more maintainable code, not a rule that should be followed at all
-costs.
+response by the C<view>. But note that this pattern is just a guideline that
+most of the time results in cleaner more maintainable code, not a rule that
+should be followed at all costs.
 
 =head2 REpresentational State Transfer
 
 REST is a software architectural style for distributed hypermedia systems
-such as the web.
-While it can be applied to many protocols it is most commonly used with
-C<HTTP> these days.
-In REST terms, when you are opening a URL like C<http://mojolicio.us/foo>
-with your browser, you are basically asking the web server for the HTML
-C<representation> of the C<http://mojolicio.us/foo> C<resource>.
+such as the web. While it can be applied to many protocols it is most
+commonly used with C<HTTP> these days. In REST terms, when you are opening a
+URL like C<http://mojolicio.us/foo> with your browser, you are basically
+asking the web server for the HTML C<representation> of the
+C<http://mojolicio.us/foo> C<resource>.
 
   .--------.                                .--------.
   |        | -> http://mojolicio.us/foo  -> |        |
@@ -60,9 +58,8 @@ C<representation> of the C<http://mojolicio.us/foo> C<resource>.
 
 The fundamental idea here is that all resources are uniquely addressable with
 URLs and every resource can have different representations such as HTML, RSS
-or JSON.
-User interface concerns are separated from data storage concerns and all
-session state is kept client-side.
+or JSON. User interface concerns are separated from data storage concerns and
+all session state is kept client-side.
 
   .---------.                        .------------.
   |         | ->    PUT /foo      -> |            |
@@ -122,11 +119,10 @@ with the REST philosophy and reduces infrastructure requirements.
 
 TDD is a software development process where the developer starts writing
 failing test cases that define the desired functionality and then moves on to
-producing code that passes these tests.
-There are many advantages such as always having good test coverage and code
-being designed for testability, which will in turn often prevent future
-changes from breaking old code.
-Most of L<Mojolicious> was developed using TDD.
+producing code that passes these tests. There are many advantages such as
+always having good test coverage and code being designed for testability,
+which will in turn often prevent future changes from breaking old code. Most
+of L<Mojolicious> was developed using TDD.
 
 =head1 PROTOTYPE
 

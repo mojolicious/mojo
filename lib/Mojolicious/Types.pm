@@ -94,8 +94,8 @@ following ones.
 
   my $extensions = $types->detect('application/json;q=9');
 
-Detect file extensions from C<Accept> header value.
-Note that this method is EXPERIMENTAL and might change without warning!
+Detect file extensions from C<Accept> header value. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<type>
 

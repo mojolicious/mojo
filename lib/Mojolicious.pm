@@ -303,10 +303,9 @@ L<Mojolicious::Controller>.
   $app     = $app->mode('production');
 
 The operating mode for your application, defaults to the value of the
-C<MOJO_MODE> environment variable or C<development>.
-You can also add per mode logic to your application by defining methods named
-C<${mode}_mode> in the application class, which will be called right before
-C<startup>.
+C<MOJO_MODE> environment variable or C<development>. You can also add per
+mode logic to your application by defining methods named C<${mode}_mode> in
+the application class, which will be called right before C<startup>.
 
   sub development_mode {
     my $self = shift;
@@ -327,9 +326,9 @@ level from C<debug> to C<info> if it has a value other than C<development>.
   my $plugins = $app->plugins;
   $app        = $app->plugins(Mojolicious::Plugins->new);
 
-The plugin loader, defaults to a L<Mojolicious::Plugins> object.
-You can usually leave this alone, see L<Mojolicious::Plugin> if you want to
-write a plugin or the C<plugin> method below if you want to load a plugin.
+The plugin loader, defaults to a L<Mojolicious::Plugins> object. You can
+usually leave this alone, see L<Mojolicious::Plugin> if you want to write a
+plugin or the C<plugin> method below if you want to load a plugin.
 
 =head2 C<renderer>
 
@@ -337,18 +336,17 @@ write a plugin or the C<plugin> method below if you want to load a plugin.
   $app         = $app->renderer(Mojolicious::Renderer->new);
 
 Used in your application to render content, defaults to a
-L<Mojolicious::Renderer> object.
-The two main renderer plugins L<Mojolicious::Plugin::EPRenderer> and
-L<Mojolicious::Plugin::EPLRenderer> contain more information.
+L<Mojolicious::Renderer> object. The two main renderer plugins
+L<Mojolicious::Plugin::EPRenderer> and L<Mojolicious::Plugin::EPLRenderer>
+contain more information.
 
 =head2 C<routes>
 
   my $routes = $app->routes;
   $app       = $app->routes(Mojolicious::Routes->new);
 
-The routes dispatcher, defaults to a L<Mojolicious::Routes> object.
-You use this in your startup method to define the url endpoints for your
-application.
+The routes dispatcher, defaults to a L<Mojolicious::Routes> object. You use
+this in your startup method to define the url endpoints for your application.
 
   sub startup {
     my $self = shift;
@@ -373,9 +371,9 @@ the log file reminding you to change your passphrase.
   $app         = $app->sessions(Mojolicious::Sessions->new);
 
 Simple signed cookie based sessions, defaults to a L<Mojolicious::Sessions>
-object.
-You can usually leave this alone, see L<Mojolicious::Controller/"session">
-for more information about working with session data.
+object. You can usually leave this alone, see
+L<Mojolicious::Controller/"session"> for more information about working with
+session data.
 
 =head2 C<static>
 
@@ -404,10 +402,9 @@ new ones.
 
   my $app = Mojolicious->new;
 
-Construct a new L<Mojolicious> application.
-Will automatically detect your home directory and set up logging based on
-your current operating mode.
-Also sets up the renderer, static dispatcher and a default set of plugins.
+Construct a new L<Mojolicious> application. Will automatically detect your
+home directory and set up logging based on your current operating mode. Also
+sets up the renderer, static dispatcher and a default set of plugins.
 
 =head2 C<build_tx>
 
@@ -508,9 +505,8 @@ Mostly used for custom dispatchers and postprocessing static file responses.
 
 =item after_dispatch
 
-Emitted in reverse order after a response has been rendered.
-Note that this hook can trigger before C<after_static_dispatch> due to its
-dynamic nature.
+Emitted in reverse order after a response has been rendered. Note that this
+hook can trigger before C<after_static_dispatch> due to its dynamic nature.
 
   $app->hook(after_dispatch => sub {
     my $c = shift;
@@ -523,8 +519,8 @@ Useful for all kinds of postprocessing tasks.
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you
-want to continue the chain.
-Note that this hook is EXPERIMENTAL and might change without warning!
+want to continue the chain. Note that this hook is EXPERIMENTAL and might
+change without warning!
 
   $app->hook(around_dispatch => sub {
     my ($next, $c) = @_;
@@ -632,12 +628,11 @@ startup.
 =head1 HELPERS
 
 In addition to the attributes and methods above you can also call helpers on
-instances of L<Mojolicious>.
-This includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers>.
-Note that application helpers are always called with a new
-C<controller_class> instance, so they can't depend on or change controller
-state, which includes request, response and stash.
+instances of L<Mojolicious>. This includes all helpers from
+L<Mojolicious::Plugin::DefaultHelpers> and
+L<Mojolicious::Plugin::TagHelpers>. Note that application helpers are always
+called with a new C<controller_class> instance, so they can't depend on or
+change controller state, which includes request, response and stash.
 
   $app->log->debug($app->dumper({foo => 'bar'}));
 

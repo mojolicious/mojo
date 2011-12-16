@@ -14,9 +14,9 @@ different platforms.
 
 =head2 Built-in server
 
-L<Mojolicious> contains a very portable HTTP 1.1 compliant web server.
-It is usually used during development but is solid and fast enough for small
-to mid sized applications.
+L<Mojolicious> contains a very portable HTTP 1.1 compliant web server. It is
+usually used during development but is solid and fast enough for small to mid
+sized applications.
 
   $ ./script/myapp daemon
   Server available at http://127.0.0.1:3000.
@@ -59,18 +59,16 @@ Config files are plain Perl scripts for maximal customizability.
   {listen => ['http://*:80'], workers => 10};
 
 But one of its biggest advantages is the support for effortless zero downtime
-software upgrades.
-That means you can upgrade L<Mojolicious>, Perl or even system libraries at
-runtime without ever stopping the server or losing a single incoming
-connection, just by running the command above again.
+software upgrades. That means you can upgrade L<Mojolicious>, Perl or even
+system libraries at runtime without ever stopping the server or losing a
+single incoming connection, just by running the command above again.
 
   $ hypnotoad script/myapp
   Starting hot deployment for Hypnotoad server 31841.
 
 You might also want to enable proxy support if you're using Hypnotoad behind
-a reverse proxy.
-This allows L<Mojolicious> to automatically pick up the C<X-Forwarded-For>,
-C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
+a reverse proxy. This allows L<Mojolicious> to automatically pick up the
+C<X-Forwarded-For>, C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
 
   # hypnotoad.conf
   {proxy => 1};
@@ -124,25 +122,24 @@ automatically detect that it is executed as a C<CGI> script.
 
 L<PSGI> is an interface between Perl web frameworks and web servers, and
 L<Plack> is a Perl module and toolkit that contains PSGI middleware, helpers
-and adapters to web servers.
-L<PSGI> and L<Plack> are inspired by Python's WSGI and Ruby's Rack.
-L<Mojolicious> applications are ridiculously simple to deploy with L<Plack>.
+and adapters to web servers. L<PSGI> and L<Plack> are inspired by Python's
+WSGI and Ruby's Rack. L<Mojolicious> applications are ridiculously simple to
+deploy with L<Plack>.
 
   $ plackup ./script/myapp
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
 L<Plack> provides many server and protocol adapters for you to choose from
-such as C<FCGI>, C<SCGI> and C<mod_perl>.
-Make sure to run C<plackup> from your applications home directory, otherwise
-libraries might not be found.
+such as C<FCGI>, C<SCGI> and C<mod_perl>. Make sure to run C<plackup> from
+your applications home directory, otherwise libraries might not be found.
 
   $ plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
 Because C<plackup> uses a weird trick to load your script, L<Mojolicious> is
 not always able to detect the applications home directory, if that's the case
-you can simply use the C<MOJO_HOME> environment variable.
-Also note that C<app-E<gt>start> needs to be the last Perl statement in the
-application script for the same reason.
+you can simply use the C<MOJO_HOME> environment variable. Also note that
+C<app-E<gt>start> needs to be the last Perl statement in the application
+script for the same reason.
 
   $ MOJO_HOME=/home/sri/myapp plackup ./script/myapp
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
@@ -184,9 +181,8 @@ But you could even use middleware right in your application.
 
 Sometimes you might have to deploy your application in a blackbox environment
 where you can't just change the server configuration or behind a reverse
-proxy that passes along additional information with C<X-*> headers.
-In such cases you can use a C<before_dispatch> hook to rewrite incoming
-requests.
+proxy that passes along additional information with C<X-*> headers. In such
+cases you can use a C<before_dispatch> hook to rewrite incoming requests.
 
   app->hook(before_dispatch => sub {
     my $self = shift;
@@ -239,10 +235,9 @@ traditional pull model.
 =head2 WebSocket
 
 The WebSocket protocol offers full bi-directional low-latency communication
-channels between clients and servers.
-Receiving messages is as easy as subscribing to the C<message> event of the
-transaction, just be aware that all of this is event based, so you should not
-block for too long.
+channels between clients and servers. Receiving messages is as easy as
+subscribing to the C<message> event of the transaction, just be aware that
+all of this is event based, so you should not block for too long.
 
   use Mojolicious::Lite;
 
@@ -317,10 +312,10 @@ L<Test::Mojo> API to be used.
 =head2 EventSource
 
 HTML5 EventSource is a special form of long-polling where you can directly
-send DOM events from servers to clients.
-It is uni-directional, that means you will have to use Ajax requests for
-sending data from clients to servers, the advantage however is low
-infrastructure requirements, since it reuses the HTTP protocol for transport.
+send DOM events from servers to clients. It is uni-directional, that means
+you will have to use Ajax requests for sending data from clients to servers,
+the advantage however is low infrastructure requirements, since it reuses the
+HTTP protocol for transport.
 
   use Mojolicious::Lite;
 
@@ -378,9 +373,9 @@ When we say L<Mojolicious> is a web framework we actually mean it.
 
 =head2 Web scraping
 
-Scraping information from web sites has never been this much fun before.
-The built-in HTML5/XML parser L<Mojo::DOM> supports all CSS3 selectors that
-make sense for a standalone parser.
+Scraping information from web sites has never been this much fun before. The
+built-in HTML5/XML parser L<Mojo::DOM> supports all CSS3 selectors that make
+sense for a standalone parser.
 
   # Fetch web site
   my $ua = Mojo::UserAgent->new;
@@ -539,10 +534,9 @@ streamed directly from the file.
 =head2 Non-blocking
 
 L<Mojo::UserAgent> has been designed from the ground up to be non-blocking,
-the whole blocking API is just a simple convenience wrapper.
-Especially for high latency tasks like web crawling this can be extremely
-useful, because you can keep many parallel connections active at the same
-time.
+the whole blocking API is just a simple convenience wrapper. Especially for
+high latency tasks like web crawling this can be extremely useful, because
+you can keep many parallel connections active at the same time.
 
   # FIFO queue
   my @urls = ('google.com');
@@ -606,9 +600,8 @@ Just be aware that the resulting transactions will be in random order.
 =head2 Command line
 
 Don't you hate checking huge HTML files from the command line?
-Thanks to the C<mojo get> command that is about to change.
-You can just pick the parts that actually matter with the CSS3 selectors from
-L<Mojo::DOM>.
+Thanks to the C<mojo get> command that is about to change. You can just pick
+the parts that actually matter with the CSS3 selectors from L<Mojo::DOM>.
 
   $ mojo get http://mojolicio.us 'head > title'
 
@@ -768,8 +761,8 @@ write with L<Mojolicious::Lite>.
   app->start;
 
 It works because all routes without a pattern default to C</> and automatic
-rendering kicks in even if no actual code gets executed by the router.
-The renderer just picks up the C<text> value from the stash and generates a
+rendering kicks in even if no actual code gets executed by the router. The
+renderer just picks up the C<text> value from the stash and generates a
 response.
 
 =head2 Hello World oneliner

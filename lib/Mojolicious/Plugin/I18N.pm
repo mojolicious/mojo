@@ -103,11 +103,9 @@ Mojolicious::Plugin::I18N - Internationalization plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::I18N> adds L<Locale::Maketext> support to
-L<Mojolicious>.
-All you have to do besides using this plugin is to add as many lexicon
-classes as you need.
-Languages can usually be detected automatically from the C<Accept-Languages>
-request header.
+L<Mojolicious>. All you have to do besides using this plugin is to add as
+many lexicon classes as you need. Languages can usually be detected
+automatically from the C<Accept-Languages> request header.
 
 This plugin can save a lot of typing, since it will generate the following
 code by default.
@@ -121,8 +119,8 @@ code by default.
   1;
 
 Namespace and default language of generated code are affected by their
-respective options.
-The default lexicon class will only be generated if it doesn't already exist.
+respective options. The default lexicon class will only be generated if it
+doesn't already exist.
 
 =head1 OPTIONS
 

@@ -621,8 +621,8 @@ Mojolicious::Routes - Always find your destination with routes
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Routes> is the core of the L<Mojolicious> web framework.
-See L<Mojolicious::Guides::Routing> for more.
+L<Mojolicious::Routes> is the core of the L<Mojolicious> web framework. See
+L<Mojolicious::Guides::Routing> for more.
 
 =head1 ATTRIBUTES
 
@@ -647,8 +647,8 @@ The children of this routes object, used for nesting routes.
   my $cache = $r->cache;
   $r        = $r->cache(Mojo::Cache->new);
 
-Routing cache, defaults to a L<Mojo::Cache> object.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+Routing cache, defaults to a L<Mojo::Cache> object. Note that this attribute
+is EXPERIMENTAL and might change without warning!
 
 =head2 C<conditions>
 
@@ -756,8 +756,8 @@ Add a new shortcut for this route.
   my $any = $route->any('/:foo' => sub {...});
   my $any = $route->any([qw/get post/] => '/:foo' => sub {...});
 
-Generate route matching any of the listed HTTP request methods or all.
-See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching any of the listed HTTP request methods or all. See
+also the L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<auto_render>
 
@@ -776,8 +776,8 @@ Add a new bridge to this route as a nested child.
 
   my $del = $route->delete('/:foo' => sub {...});
 
-Generate route matching only C<DELETE> requests.
-See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching only C<DELETE> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<detour>
 
@@ -806,29 +806,29 @@ Match routes and dispatch.
 
   my $get = $route->get('/:foo' => sub {...});
 
-Generate route matching only C<GET> requests.
-See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching only C<GET> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<has_conditions>
 
   my $success = $r->has_conditions;
 
-Returns true if this route contains conditions.
-Note that this method is EXPERIMENTAL and might change without warning!
+Returns true if this route contains conditions. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<has_custom_name>
 
   my $success = $r->has_custom_name;
 
-Returns true if this route has a custom user defined name.
-Note that this method is EXPERIMENTAL and might change without warning!
+Returns true if this route has a custom user defined name. Note that this
+method is EXPERIMENTAL and might change without warning!
 
 =head2 C<has_websocket>
 
   my $success = $r->has_websocket;
 
-Returns true if this route has a WebSocket ancestor.
-Note that this method is EXPERIMENTAL and might change without warning!
+Returns true if this route has a WebSocket ancestor. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<hide>
 
@@ -846,8 +846,8 @@ Returns true if this route qualifies as an endpoint.
 
   my $success = $r->is_websocket;
 
-Returns true if this route is a WebSocket.
-Note that this method is EXPERIMENTAL and might change without warning!
+Returns true if this route is a WebSocket. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<name>
 
@@ -855,8 +855,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $r       = $r->name('foo');
 
 The name of this route, defaults to an automatically generated name based on
-the route pattern.
-Note that the name C<current> is reserved for refering to the current route.
+the route pattern. Note that the name C<current> is reserved for refering to
+the current route.
 
 =head2 C<over>
 
@@ -874,15 +874,15 @@ Parse a pattern.
 
   my $post = $route->post('/:foo' => sub {...});
 
-Generate route matching only C<POST> requests.
-See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching only C<POST> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<put>
 
   my $put = $route->put('/:foo' => sub {...});
 
-Generate route matching only C<PUT> requests.
-See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching only C<PUT> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<render>
 
@@ -925,8 +925,8 @@ Stringifies the whole route.
   my $under = $r->under(sub {...});
   my $under = $r->under('/:foo');
 
-Generate bridges.
-See also the L<Mojolicious::Lite> tutorial for more argument variations.
+Generate bridges. See also the L<Mojolicious::Lite> tutorial for more
+argument variations.
 
 =head2 C<via>
 
@@ -948,9 +948,9 @@ Add a waypoint to this route as nested child.
 
   my $websocket = $r->websocket('/:foo' => sub {...});
 
-Generate route matching only C<WebSocket> handshakes.
-See also the L<Mojolicious::Lite> tutorial for more argument variations.
-Note that this method is EXPERIMENTAL and might change without warning!
+Generate route matching only C<WebSocket> handshakes. See also the
+L<Mojolicious::Lite> tutorial for more argument variations. Note that this
+method is EXPERIMENTAL and might change without warning!
 
 =head1 SHORTCUTS
 

@@ -431,9 +431,8 @@ Mojo::DOM - Minimalistic HTML5/XML DOM parser with CSS3 selectors
 =head1 DESCRIPTION
 
 L<Mojo::DOM> is a minimalistic and relaxed HTML5/XML DOM parser with CSS3
-selector support.
-It will even try to interpret broken XML, so you should not use it for
-validation.
+selector support. It will even try to interpret broken XML, so you should not
+use it for validation.
 
 =head1 CASE SENSITIVITY
 
@@ -477,9 +476,8 @@ Construct a new L<Mojo::DOM> object.
   my $untrimmed = $dom->all_text(0);
 
 Extract all text content from DOM structure, smart whitespace trimming is
-activated by default.
-Note that the trim argument of this method is EXPERIMENTAL and might change
-without warning!
+activated by default. Note that the trim argument of this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<append>
 
@@ -503,8 +501,8 @@ Append to element content.
 
   my $result = $dom->at('html title');
 
-Find a single element with CSS3 selectors.
-All selectors from L<Mojo::DOM::CSS> are supported.
+Find a single element with CSS3 selectors. All selectors from
+L<Mojo::DOM::CSS> are supported.
 
 =head2 C<attrs>
 
@@ -624,9 +622,8 @@ Find root node.
   my $untrimmed = $dom->text(0);
 
 Extract text content from element only (not including child elements), smart
-whitespace trimming is activated by default.
-Note that the trim argument of this method is EXPERIMENTAL and might change
-without warning!
+whitespace trimming is activated by default. Note that the trim argument of
+this method is EXPERIMENTAL and might change without warning!
 
 =head2 C<to_xml>
 
@@ -653,8 +650,8 @@ Element type.
   my $xml = $dom->xml;
   $dom    = $dom->xml(1);
 
-Alias for L<Mojo::DOM::HTML/"xml">.
-Note that this method is EXPERIMENTAL and might change without warning!
+Alias for L<Mojo::DOM::HTML/"xml">. Note that this method is EXPERIMENTAL and
+might change without warning!
 
 =head1 SEE ALSO
 

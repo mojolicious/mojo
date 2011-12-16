@@ -158,9 +158,8 @@ after every change.
 =head2 Routes
 
 Routes are basically just fancy paths that can contain different kinds of
-placeholders.
-C<$self> is an instance of L<Mojolicious::Controller> containing both the
-HTTP request and response.
+placeholders. C<$self> is an instance of L<Mojolicious::Controller>
+containing both the HTTP request and response.
 
   # /foo
   get '/foo' => sub {
@@ -215,9 +214,8 @@ to all HTTP features and information.
 
 All routes can have a name associated with them, this allows automatic
 template detection and back referencing with C<url_for>, C<link_to> and
-C<form_for>.
-Nameless routes get an automatically generated one assigned that is simply
-equal to the route itself without non-word characters.
+C<form_for>. Nameless routes get an automatically generated one assigned that
+is simply equal to the route itself without non-word characters.
 
   # /
   get '/' => sub {
@@ -516,9 +514,8 @@ L<Mojolicious/"types">.
 =head2 Under
 
 Authentication and code shared between multiple routes can be realized easily
-with the C<under> statement.
-All following routes are only evaluated if the C<under> callback returned a
-true value.
+with the C<under> statement. All following routes are only evaluated if the
+C<under> callback returned a true value.
 
   use Mojolicious::Lite;
 
@@ -653,9 +650,9 @@ secure.
 =head2 File uploads
 
 All files uploaded via C<multipart/form-data> request are automatically
-available as L<Mojo::Upload> instances.
-And you don't have to worry about memory usage, because all files above
-C<250KB> will be automatically streamed into a temporary file.
+available as L<Mojo::Upload> instances. And you don't have to worry about
+memory usage, because all files above C<250KB> will be automatically streamed
+into a temporary file.
 
   use Mojolicious::Lite;
 
@@ -700,9 +697,8 @@ variable.
 =head2 User agent
 
 With L<Mojo::UserAgent> there's a full featured HTTP 1.1 and WebSocket user
-agent built right in.
-Especially in combination with L<Mojo::JSON> and L<Mojo::DOM> this can be a
-very powerful tool.
+agent built right in. Especially in combination with L<Mojo::JSON> and
+L<Mojo::DOM> this can be a very powerful tool.
 
   get '/test' => sub {
     my $self = shift;
@@ -825,9 +821,9 @@ can be easily mixed to make the transition process very smooth.
 
 There is also a helper command to generate a full L<Mojolicious> example that
 will let you explore the astonishing similarities between
-L<Mojolicious::Lite> and L<Mojolicious> applications.
-Both share about 99% of the same code, so almost everything you learned in
-this tutorial applies there too. :)
+L<Mojolicious::Lite> and L<Mojolicious> applications. Both share about 99% of
+the same code, so almost everything you learned in this tutorial applies
+there too. :)
 
   $ mojo generate app
 
@@ -845,8 +841,8 @@ L<Mojolicious::Lite> implements the following functions.
   my $route = any '/:foo' => sub {...};
   my $route = any ['get', 'post'] => '/:foo' => sub {...};
 
-Generate route matching any of the listed HTTP request methods or all.
-See also the tutorial above for more argument variations.
+Generate route matching any of the listed HTTP request methods or all. See
+also the tutorial above for more argument variations.
 
 =head2 C<app>
 
@@ -858,22 +854,22 @@ The L<Mojolicious::Lite> application.
 
   my $route = del '/:foo' => sub {...};
 
-Generate route matching only C<DELETE> requests.
-See also the tutorial above for more argument variations.
+Generate route matching only C<DELETE> requests. See also the tutorial above
+for more argument variations.
 
 =head2 C<get>
 
   my $route = get '/:foo' => sub {...};
 
-Generate route matching only C<GET> requests.
-See also the tutorial above for more argument variations.
+Generate route matching only C<GET> requests. See also the tutorial above for
+more argument variations.
 
 =head2 C<group>
 
   group {...};
 
-Start a new route group.
-Note that this function is EXPERIMENTAL and might change without warning!
+Start a new route group. Note that this function is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<helper>
 
@@ -897,30 +893,30 @@ Alias for L<Mojolicious/"plugin">.
 
   my $route = post '/:foo' => sub {...};
 
-Generate route matching only C<POST> requests.
-See also the tutorial above for more argument variations.
+Generate route matching only C<POST> requests. See also the tutorial above
+for more argument variations.
 
 =head2 C<put>
 
   my $route = put '/:foo' => sub {...};
 
-Generate route matching only C<PUT> requests.
-See also the tutorial above for more argument variations.
+Generate route matching only C<PUT> requests. See also the tutorial above for
+more argument variations.
 
 =head2 C<under>
 
   my $route = under sub {...};
   my $route = under '/:foo';
 
-Generate bridge to which all following routes are automatically appended.
-See also the tutorial above for more argument variations.
+Generate bridge to which all following routes are automatically appended. See
+also the tutorial above for more argument variations.
 
 =head2 C<websocket>
 
   my $route = websocket '/:foo' => sub {...};
 
-Generate route matching only C<WebSocket> handshakes.
-See also the tutorial above for more argument variations.
+Generate route matching only C<WebSocket> handshakes. See also the tutorial
+above for more argument variations.
 
 =head1 ATTRIBUTES
 

@@ -99,9 +99,8 @@ following new ones.
 
   my $e = $loader->load('Foo::Bar');
 
-Load a class and catch exceptions.
-Note that classes are checked for a C<new> method to see if they are already
-loaded.
+Load a class and catch exceptions. Note that classes are checked for a C<new>
+method to see if they are already loaded.
 
   if (my $e = $loader->load('Foo::Bar')) {
     die "Exception: $e" if ref $e;

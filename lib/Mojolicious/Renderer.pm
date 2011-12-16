@@ -261,8 +261,8 @@ Mojolicious::Renderer - MIME type based renderer
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer.
-See L<Mojolicious::Guides::Rendering> for more.
+L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer. See
+L<Mojolicious::Guides::Rendering> for more.
 
 =head1 ATTRIBUTES
 
@@ -273,17 +273,16 @@ L<Mojolicious::Renderer> implements the following attributes.
   my $cache = $renderer->cache;
   $renderer = $renderer->cache(Mojo::Cache->new);
 
-Renderer cache, defaults to a L<Mojo::Cache> object.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+Renderer cache, defaults to a L<Mojo::Cache> object. Note that this attribute
+is EXPERIMENTAL and might change without warning!
 
 =head2 C<default_format>
 
   my $default = $renderer->default_format;
   $renderer   = $renderer->default_format('html');
 
-The default format to render if C<format> is not set in the stash.
-The renderer will use L<Mojolicious/"types"> to look up the content MIME
-type.
+The default format to render if C<format> is not set in the stash. The
+renderer will use L<Mojolicious/"types"> to look up the content MIME type.
 
 =head2 C<default_handler>
 
@@ -358,8 +357,8 @@ Directory to look for templates in.
 
 =head1 METHODS
 
-L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and implements the
-following ones.
+L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and
+implements the following ones.
 
 =head2 C<new>
 
@@ -371,15 +370,15 @@ Construct a new renderer.
 
   $renderer = $renderer->add_handler(epl => sub {...});
 
-Add a new handler to the renderer.
-See L<Mojolicious::Plugin::EPRenderer> for a sample renderer.
+Add a new handler to the renderer. See L<Mojolicious::Plugin::EPRenderer> for
+a sample renderer.
 
 =head2 C<add_helper>
 
   $renderer = $renderer->add_helper(url_for => sub {...});
 
-Add a new helper to the renderer.
-See L<Mojolicious::Plugin::EPRenderer> for sample helpers.
+Add a new helper to the renderer. See L<Mojolicious::Plugin::EPRenderer> for
+sample helpers.
 
 =head2 C<get_data_template>
 
@@ -397,11 +396,10 @@ Get an DATA template by name, usually used by handlers.
   my ($output, $type) = $renderer->render($c);
   my ($output, $type) = $renderer->render($c, $args);
 
-Render output through one of the Mojo renderers.
-This renderer requires some configuration, at the very least you will need to
-have a default C<format> and a default C<handler> as well as a C<template> or
-C<text>/C<json>.
-See L<Mojolicious::Controller/"render"> for a more user-friendly interface.
+Render output through one of the Mojo renderers. This renderer requires some
+configuration, at the very least you will need to have a default C<format>
+and a default C<handler> as well as a C<template> or C<text>/C<json>. See
+L<Mojolicious::Controller/"render"> for a more user-friendly interface.
 
 =head2 C<template_name>
 

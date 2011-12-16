@@ -21,10 +21,10 @@ requests with code generating the appropriate response.
 
   GET /user/show/1 -> $self->render(text => 'Sebastian');
 
-This black box is usually called a dispatcher.
-There are many implementations using different strategies to establish these
-connections, but pretty much all are based around mapping the requests path
-to some kind of response generator.
+This black box is usually called a dispatcher. There are many implementations
+using different strategies to establish these connections, but pretty much
+all are based around mapping the requests path to some kind of response
+generator.
 
   /user/show/1 -> $self->render(text => 'Sebastian');
   /user/show/2 -> $self->render(text => 'Sara');
@@ -32,9 +32,8 @@ to some kind of response generator.
   /user/show/4 -> $self->render(text => 'Wolfgang');
 
 While it is very well possible to make all these connections static, it is
-also rather inefficient.
-That's why regular expressions are commonly used to make the dispatch process
-more dynamic.
+also rather inefficient. That's why regular expressions are commonly used to
+make the dispatch process more dynamic.
 
   qr|/user/show/(\d+)| -> $self->render(text => $users{$1});
 
@@ -60,8 +59,7 @@ up to represent paths with placeholders.
   /user/show/:id -> $self->render(text => $users{$id});
 
 The only difference between a static path and the route above is the C<:id>
-placeholder.
-One or more placeholders can be anywhere in the route.
+placeholder. One or more placeholders can be anywhere in the route.
 
   /user/:action/:id
 
@@ -71,9 +69,9 @@ placeholder values are turned into a hash.
   /user/show/23 -> /user/:action/:id -> {action => 'show', id => 23}
 
 This hash is basically the center of every L<Mojolicious> application, you
-will learn more about this later on.
-Internally routes get compiled to regular expressions, so you can get the
-best of both worlds with a little bit of experience.
+will learn more about this later on. Internally routes get compiled to
+regular expressions, so you can get the best of both worlds with a little bit
+of experience.
 
   /user/show/:id -> qr/(?-xism:^\/user\/show/([^\/\.]+))/
 
@@ -195,8 +193,8 @@ hash to try and find appropriate code to generate a response.
 =head2 Stash
 
 The generated hash of a matching route is actually the center of the whole
-L<Mojolicious> request cycle.
-We call it the stash, and it persists until a response has been generated.
+L<Mojolicious> request cycle. We call it the stash, and it persists until a
+response has been generated.
 
   # /bye -> {controller => 'foo', action => 'bye', mymessage => 'Bye'}
   $r->route('/bye')
@@ -204,8 +202,8 @@ We call it the stash, and it persists until a response has been generated.
 
 There are a few stash values with special meaning, such as C<controller> and
 C<action>, but you can generally fill it with whatever data you need to
-generate a response.
-Once dispatched the whole stash content can be changed at any time.
+generate a response. Once dispatched the whole stash content can be changed
+at any time.
 
   sub bye {
     my $self = shift;
@@ -223,8 +221,7 @@ L<Mojolicious::Guides::Cheatsheet>.
 =head2 Nested routes
 
 It is also possible to build tree structures from routes to remove repetitive
-code.
-A route with children can't match on it's own though, only the actual
+code. A route with children can't match on it's own though, only the actual
 endpoints of these nested routes can.
 
   # /foo     -> undef
@@ -248,8 +245,8 @@ old ones.
 =head2 Special stash values (C<controller> and C<action>)
 
 When the dispatcher sees C<controller> and C<action> values in the stash it
-will always try to turn them into a class and method to dispatch to.
-The C<controller> value gets camelized and prefixed with a C<namespace>
+will always try to turn them into a class and method to dispatch to. The
+C<controller> value gets camelized and prefixed with a C<namespace>
 (defaulting to the applications class) while the action value is not changed
 at all, because of this both values are case sensitive.
 
@@ -283,9 +280,9 @@ at all, because of this both values are case sensitive.
 
   1;
 
-Controller classes are perfect for organizing code in larger projects.
-There are more dispatch strategies, but because controllers are the most
-commonly used ones they also got a special shortcut in the form of
+Controller classes are perfect for organizing code in larger projects. There
+are more dispatch strategies, but because controllers are the most commonly
+used ones they also got a special shortcut in the form of
 C<controller#action>.
 
   # /bye -> {controller => 'foo', action => 'bye', mymessage => 'Bye'}
@@ -371,10 +368,9 @@ just make a list of possible values.
     ->to(controller => 'foo', action => 'bar');
 
 You can also adjust the regular expressions behind placeholders to better
-suit your needs.
-Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
-placeholders become part of a larger regular expression internally,
-C<(?:...)> is fine though.
+suit your needs. Just make sure not to use C<^> and C<$> or capturing groups
+C<(...)>, because placeholders become part of a larger regular expression
+internally, C<(?:...)> is fine though.
 
   # /23   -> {controller => 'foo', action => 'bar', number => 23}
   # /test -> undef
@@ -400,9 +396,8 @@ automatically detected and stored in the stash value C<format>.
   $r->route('/foo')->to(controller => 'foo', action => 'bar');
 
 This for example allows multiple templates for different formats to share the
-same code.
-You can also mention a format in the route pattern to only match one, just
-make sure the more specific routes go first.
+same code. You can also mention a format in the route pattern to only match
+one, just make sure the more specific routes go first.
 
   # /foo.txt -> {controller => 'foo', action => 'text', format => 'txt'}
   $r->route('/foo.txt')->to(controller => 'foo', action => 'text');
@@ -568,8 +563,8 @@ You can also add your own shortcuts to make route generation more expressive.
   # GET  /user -> {controller => 'user', action => 'show'}
   $r->resource('user');
 
-Shortcuts can lead to anything, routes, bridges or maybe even both.
-And watch out for quicksand!
+Shortcuts can lead to anything, routes, bridges or maybe even both. And watch
+out for quicksand!
 
 =head2 Introspection
 
@@ -622,8 +617,8 @@ You can restrict access to WebSocket handshakes using the C<websocket> method.
 =head2 Conditions
 
 Sometimes you might need a little more power, for example to check the
-C<User-Agent> header in multiple routes.
-This is where conditions come into play, they are basically router plugins.
+C<User-Agent> header in multiple routes. This is where conditions come into
+play, they are basically router plugins.
 
   # Simple "User-Agent" condition
   $r->add_condition(
@@ -704,9 +699,8 @@ applications.
 =head2 Embedding applications
 
 You can easily embed whole applications simply by using them instead of a
-controller.
-This allows for example the use of the L<Mojolicious::Lite> domain specific
-language in normal L<Mojolicious> controllers.
+controller. This allows for example the use of the L<Mojolicious::Lite>
+domain specific language in normal L<Mojolicious> controllers.
 
   # Controller
   package MyApp::Bar;
@@ -782,8 +776,8 @@ package the whole thing as a self contained reusable plugin.
   @@ bar.html.ep
   Hello World!
 
-The C<app> stash value can be used for already instantiated applications.
-Now just load the plugin and you're done.
+The C<app> stash value can be used for already instantiated applications. Now
+just load the plugin and you're done.
 
   # Application
   package MyApp;

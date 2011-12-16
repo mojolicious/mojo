@@ -431,8 +431,8 @@ L<Mojo::Content> can emit the following events.
     my $content = shift;
   });
 
-Emitted once all headers have been parsed and the body starts.
-Note that this event is EXPERIMENTAL and might change without warning!
+Emitted once all headers have been parsed and the body starts. Note that this
+event is EXPERIMENTAL and might change without warning!
 
   $content->on(body => sub {
     my $content = shift;
@@ -477,8 +477,8 @@ Content headers, defaults to a L<Mojo::Headers> object.
   $content = $content->max_leftover_size(1024);
 
 Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the
-value of C<MOJO_MAX_LEFTOVER_SIZE> or C<262144>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+value of C<MOJO_MAX_LEFTOVER_SIZE> or C<262144>. Note that this attribute is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<relaxed>
 
@@ -508,8 +508,8 @@ Content size in bytes.
 
   my $boundary = $content->boundary;
 
-Extract multipart boundary from C<Content-Type> header.
-Note that this method is EXPERIMENTAL and might change without warning!
+Extract multipart boundary from C<Content-Type> header. Note that this method
+is EXPERIMENTAL and might change without warning!
 
 =head2 C<build_body>
 
@@ -527,15 +527,15 @@ Render all headers.
 
   my $charset = $content->charset;
 
-Extract charset from C<Content-Type> header.
-Note that this method is EXPERIMENTAL and might change without warning!
+Extract charset from C<Content-Type> header. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<clone>
 
   my $clone = $content->clone;
 
-Clone content if possible.
-Note that this method is EXPERIMENTAL and might change without warning!
+Clone content if possible. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<generate_body_chunk>
 
@@ -577,8 +577,8 @@ Check if content is chunked.
 
   my $success = $content->is_dynamic;
 
-Check if content will be dynamic.
-Note that this method is EXPERIMENTAL and might change without warning!
+Check if content will be dynamic. Note that this method is EXPERIMENTAL and
+might change without warning!
 
 =head2 C<is_finished>
 
@@ -634,8 +634,8 @@ Parse chunk and stop after headers.
 
   my $size = $content->progress;
 
-Size of content already received from message in bytes.
-Note that this method is EXPERIMENTAL and might change without warning!
+Size of content already received from message in bytes. Note that this method
+is EXPERIMENTAL and might change without warning!
 
 =head2 C<write>
 

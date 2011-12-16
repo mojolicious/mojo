@@ -91,8 +91,8 @@ L<Mojo::Asset::Memory> can emit the following events.
     my ($mem, $file) = @_;
   });
 
-Emitted when asset gets upgraded to a L<Mojo::Asset::File> object.
-Note that this event is EXPERIMENTAL and might change without warning!
+Emitted when asset gets upgraded to a L<Mojo::Asset::File> object. Note that
+this event is EXPERIMENTAL and might change without warning!
 
   $mem->on(upgrade => sub {
     my ($mem, $file) = @_;
@@ -110,8 +110,8 @@ implements the following new ones.
   $mem        = $mem->auto_upgrade(1);
 
 Try to detect if content size exceeds C<max_memory_size> limit and
-automatically upgrade to a L<Mojo::Asset::File> object.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+automatically upgrade to a L<Mojo::Asset::File> object. Note that this
+attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<max_memory_size>
 
@@ -120,8 +120,8 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 
 Maximum asset size in bytes, only attempt upgrading to a L<Mojo::Asset::File>
 object after reaching this limit, defaults to the value of
-C<MOJO_MAX_MEMORY_SIZE> or C<262144>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+C<MOJO_MAX_MEMORY_SIZE> or C<262144>. Note that this attribute is
+EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

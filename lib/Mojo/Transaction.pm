@@ -124,8 +124,8 @@ L<Mojo::Transaction> can emit the following events.
     my ($tx, $connection) = @_;
   });
 
-Emitted when a connection has been assigned to transaction.
-Note that this event is EXPERIMENTAL and might change without warning!
+Emitted when a connection has been assigned to transaction. Note that this
+event is EXPERIMENTAL and might change without warning!
 
 =head2 C<finish>
 
@@ -289,9 +289,8 @@ Write server data.
   my $res = $tx->success;
 
 Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
-successful or C<undef> otherwise.
-Connection and parser errors have only a message in C<error>, 400 and 500
-responses also a code.
+successful or C<undef> otherwise. Connection and parser errors have only a
+message in C<error>, 400 and 500 responses also a code.
 
   if (my $res = $tx->success) {
     say $res->body;

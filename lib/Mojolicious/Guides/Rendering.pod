@@ -23,10 +23,10 @@ utilizing multiple template systems and data encoding modules.
   {text => 'Oops.', status => '410'} -> 410 Gone, text/html, 'Oops.'
 
 Templates can be automatically detected if enough information is provided by
-the developer or routes.
-Template names are expected to follow the C<name.format.handler> scheme, with
-C<name> defaulting to C<controller/action> or the route name, C<format>
-defaulting to C<html> and C<handler> to C<ep>.
+the developer or routes. Template names are expected to follow the
+C<name.format.handler> scheme, with C<name> defaulting to
+C<controller/action> or the route name, C<format> defaulting to C<html> and
+C<handler> to C<ep>.
 
   {controller => 'users', action => 'list'} -> 'users/list.html.ep'
   {name => 'foo', format => 'txt'}          -> 'foo.txt.ep'
@@ -52,9 +52,9 @@ with plugins, but more about that later.
 =head2 Embedded Perl
 
 L<Mojolicious> includes a minimalistic but very powerful template system out
-of the box called Embedded Perl or C<ep> for short.
-It allows the embedding of Perl code right into actual content using a small
-set of special tags and line start characters.
+of the box called Embedded Perl or C<ep> for short. It allows the embedding
+of Perl code right into actual content using a small set of special tags and
+line start characters.
 
   <% Perl code %>
   <%= Perl expression, replaced with XML escaped result %>
@@ -68,8 +68,8 @@ set of special tags and line start characters.
   %% Replaced with "%", useful for generating templates
 
 Tags and lines work pretty much the same, but depending on context one will
-usually look a bit better.
-Semicolons get automatically appended to all expressions.
+usually look a bit better. Semicolons get automatically appended to all
+expressions.
 
   <% my $i = 10; %>
   <ul>
@@ -129,9 +129,8 @@ Most commonly used features every L<Mojolicious> developer should know about.
 The renderer can be manually started by calling the C<render> controller
 method, but that's usually not necessary, because it will get automatically
 called if nothing has been rendered after the routes dispatcher finished its
-work.
-This also means you can have routes pointing only to templates without actual
-actions.
+work. This also means you can have routes pointing only to templates without
+actual actions.
 
   $self->render;
 
@@ -341,8 +340,8 @@ trivial.
   </html>
 
 You just select the right layout template with the C<layout> helper and place
-the result of the current template with the C<content> helper.
-You can also pass along normal stash values to the C<layout> helper.
+the result of the current template with the C<content> helper. You can also
+pass along normal stash values to the C<layout> helper.
 
   @@ foo/bar.html.ep
   % layout 'mylayout', title => 'Hi there';
@@ -616,10 +615,10 @@ to C<CPAN>.
 
 While the built-in C<exception> and C<not_found> templates are very useful
 during development, you most likely want to show your users something more
-related to your application in production.
-That's why L<Mojolicious> will always try to render
-C<exception.$mode.$format.*> or C<not_found.$mode.$format.*> before falling
-back to the built-in default templates.
+related to your application in production. That's why L<Mojolicious> will
+always try to render C<exception.$mode.$format.*> or
+C<not_found.$mode.$format.*> before falling back to the built-in default
+templates.
 
   @@ not_found.production.html.ep
   <!DOCTYPE html>
@@ -646,8 +645,8 @@ stylesheets.
   });
 
 The optional drain callback ensures that all previous chunks have been
-written before processing continues.
-An empty chunk or C<finish> call marks the end of the stream.
+written before processing continues. An empty chunk or C<finish> call marks
+the end of the stream.
 
   29
   <html><head><title>Example</title></head>
@@ -656,9 +655,8 @@ An empty chunk or C<finish> call marks the end of the stream.
   0
 
 Especially in combination with long connection timeouts this can be very
-useful for Comet (C<long polling>).
-Due to limitations in some web servers this might not work perfectly in all
-deployment environments.
+useful for Comet (C<long polling>). Due to limitations in some web servers
+this might not work perfectly in all deployment environments.
 
 =head2 Encoding
 
@@ -705,10 +703,9 @@ C<DATA> section of your application, similar to templates.
 
 Templates stored in files get preferred over files from the C<DATA> section,
 this allows you to include a default set of templates in your application
-that the user can later customize.
-The C<inflate> command will write all templates and static files from the
-C<DATA> section into actual files in the C<templates> and C<public>
-directories.
+that the user can later customize. The C<inflate> command will write all
+templates and static files from the C<DATA> section into actual files in the
+C<templates> and C<public> directories.
 
   $ ./myapp.pl inflate
 

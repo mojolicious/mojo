@@ -402,8 +402,8 @@ implements the following new ones.
 
   my $clone = $req->clone;
 
-Clone request if possible.
-Note that this method is EXPERIMENTAL and might change without warning!
+Clone request if possible. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<cookies>
 

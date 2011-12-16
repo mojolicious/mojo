@@ -138,8 +138,8 @@ implements the following new ones.
   $plugins = $plugins->emit_chain('foo');
   $plugins = $plugins->emit_chain(foo => 123);
 
-Emit events as chained hooks.
-Note that this method is EXPERIMENTAL and might change without warning!
+Emit events as chained hooks. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<emit_hook>
 

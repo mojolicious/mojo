@@ -224,8 +224,8 @@ L<Mojo::Headers> implements the following attributes.
   $headers = $headers->max_line_size(1024);
 
 Maximum line size in bytes, defaults to the value of C<MOJO_MAX_LINE_SIZE> or
-C<10240>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+C<10240>. Note that this attribute is EXPERIMENTAL and might change without
+warning!
 
 =head1 METHODS
 
@@ -277,8 +277,8 @@ Shortcut for the C<Cache-Control> header.
 
   my $clone = $headers->clone;
 
-Clone headers.
-Note that this method is EXPERIMENTAL and might change without warning!
+Clone headers. Note that this method is EXPERIMENTAL and might change without
+warning!
 
 =head2 C<connection>
 
@@ -341,16 +341,16 @@ Shortcut for the C<Date> header.
   my $dnt  = $headers->dnt;
   $headers = $headers->dnt(1);
 
-Shortcut for the C<DNT> (Do Not Track) header.
-Note that this method is EXPERIMENTAL and might change without warning!
+Shortcut for the C<DNT> (Do Not Track) header. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<etag>
 
   my $etag = $headers->etag;
   $headers = $headers->etag('abc321');
 
-Shortcut for the C<ETag> header.
-Note that this method is EXPERIMENTAL and might change without warning!
+Shortcut for the C<ETag> header. Note that this method is EXPERIMENTAL and
+might change without warning!
 
 =head2 C<expect>
 
@@ -414,8 +414,8 @@ Check if header parser is finished.
 
   my $success = $headers->is_limit_exceeded;
 
-Check if a header has exceeded C<max_line_size>.
-Note that this method is EXPERIMENTAL and might change without warning!
+Check if a header has exceeded C<max_line_size>. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<last_modified>
 
@@ -552,8 +552,8 @@ Shortcut for the C<Status> header.
   my $hash = $headers->to_hash;
   my $hash = $headers->to_hash(arrayref => 1);
 
-Format headers as a hash.
-Nested arrayrefs to represent multi line values are optional.
+Format headers as a hash. Nested arrayrefs to represent multi line values are
+optional.
 
 =head2 C<to_string>
 

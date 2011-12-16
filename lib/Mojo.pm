@@ -71,9 +71,9 @@ Mojo - Duct tape for the HTML5 web!
 =head1 DESCRIPTION
 
 Mojo provides a flexible runtime environment for Perl real-time web
-frameworks.
-It provides all the basic tools and helpers needed to write simple web
-applications and higher level web frameworks such as L<Mojolicious>.
+frameworks. It provides all the basic tools and helpers needed to write
+simple web applications and higher level web frameworks such as
+L<Mojolicious>.
 
 See L<Mojolicious> for more!
 
@@ -117,9 +117,9 @@ new ones.
 
   my $app = Mojo->new;
 
-Construct a new L<Mojo> application.
-Will automatically detect your home directory and set up logging to
-C<log/mojo.log> if there's a C<log> directory.
+Construct a new L<Mojo> application. Will automatically detect your home
+directory and set up logging to C<log/mojo.log> if there's a C<log>
+directory.
 
 =head2 C<build_tx>
 

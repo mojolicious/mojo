@@ -513,9 +513,8 @@ The following parameters are currently available:
   accepts => 100
 
 Maximum number of connections a worker is allowed to accept before stopping
-gracefully, defaults to C<1000>.
-Setting the value to C<0> will allow workers to accept new connections
-infinitely.
+gracefully, defaults to C<1000>. Setting the value to C<0> will allow workers
+to accept new connections infinitely.
 
 =head2 C<backlog>
 
@@ -573,8 +572,8 @@ dropped, defaults to C<15>.
 
   listen => ['http://*:80']
 
-List of one or more locations to listen on, defaults to C<http://*:8080>.
-See also L<Mojo::Server::Daemon/"listen"> for more examples.
+List of one or more locations to listen on, defaults to C<http://*:8080>. See
+also L<Mojo::Server::Daemon/"listen"> for more examples.
 
 =head2 C<lock_file>
 
@@ -620,8 +619,8 @@ before getting dropped, defaults to C<300>.
 
   workers => 10
 
-Number of worker processes, defaults to C<4>.
-A good rule of thumb is two worker processes per cpu core.
+Number of worker processes, defaults to C<4>. A good rule of thumb is two
+worker processes per cpu core.
 
 =head1 METHODS
 

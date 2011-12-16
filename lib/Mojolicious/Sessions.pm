@@ -95,9 +95,8 @@ Mojolicious::Sessions - Signed cookie based sessions
 =head1 DESCRIPTION
 
 L<Mojolicious::Sessions> is a very simple signed cookie based session
-implementation.
-All data gets serialized with L<Mojo::JSON> and stored on the client-side,
-but is protected from unwanted changes with a signature.
+implementation. All data gets serialized with L<Mojo::JSON> and stored on the
+client-side, but is protected from unwanted changes with a signature.
 
 =head1 ATTRIBUTES
 
@@ -130,10 +129,10 @@ Path for session cookie, defaults to C</>.
   my $time = $session->default_expiration;
   $session = $session->default_expiration(3600);
 
-Time for the session to expire in seconds from now, defaults to C<3600>.
-The expiration timeout gets refreshed for every request.
-For more control you can also use the C<expires> session value to set the
-expiration date to a specific time in epoch seconds.
+Time for the session to expire in seconds from now, defaults to C<3600>. The
+expiration timeout gets refreshed for every request. For more control you can
+also use the C<expires> session value to set the expiration date to a
+specific time in epoch seconds.
 
   # Expire a week from now
   $c->session(expires => time + 604800);

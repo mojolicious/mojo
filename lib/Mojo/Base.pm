@@ -215,8 +215,8 @@ L<Mojo::Base> implements the following methods.
   my $instance = BaseSubClass->new(name => 'value');
   my $instance = BaseSubClass->new({name => 'value'});
 
-This base class provides a basic object constructor.
-You can pass it either a hash or a hash reference with attribute values.
+This base class provides a basic object constructor. You can pass it either a
+hash or a hash reference with attribute values.
 
 =head2 C<attr>
 
@@ -227,12 +227,10 @@ You can pass it either a hash or a hash reference with attribute values.
   __PACKAGE__->attr([qw/name1 name2 name3/] => 'foo');
   __PACKAGE__->attr([qw/name1 name2 name3/] => sub {...});
 
-Create attributes.
-An arrayref can be used to create more than one attribute.
+Create attributes. An arrayref can be used to create more than one attribute.
 Pass an optional second argument to set a default value, it should be a
-constant or a sub reference.
-The sub reference will be excuted at accessor read time if there's no set
-value.
+constant or a sub reference. The sub reference will be excuted at accessor
+read time if there's no set value.
 
 =head1 DEBUGGING
 

@@ -380,9 +380,9 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON> is a minimalistic and relaxed implementation of RFC 4627.
-While it is possibly the fastest pure-Perl JSON parser available, you should
-not use it for validation.
+L<Mojo::JSON> is a minimalistic and relaxed implementation of RFC 4627. While
+it is possibly the fastest pure-Perl JSON parser available, you should not
+use it for validation.
 
 It supports normal Perl data types like C<Scalar>, C<Array>, C<Hash> and will
 try to stringify blessed references.
@@ -398,9 +398,8 @@ similar native Perl value.
   null  -> undef
 
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
-encoding will only generate UTF-8.
-The two unicode whitespace characters C<u2028> and C<u2029> will always be
-escaped to make JSONP easier.
+encoding will only generate UTF-8. The two unicode whitespace characters
+C<u2028> and C<u2029> will always be escaped to make JSONP easier.
 
 =head1 ATTRIBUTES
 

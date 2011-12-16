@@ -456,9 +456,8 @@ Mojo::Template - Perl-ish templates!
 
 L<Mojo::Template> is a minimalistic and very Perl-ish template engine,
 designed specifically for all those small tasks that come up during big
-projects.
-Like preprocessing a config file, generating text from heredocs and stuff
-like that.
+projects. Like preprocessing a config file, generating text from heredocs and
+stuff like that.
 
   <% Perl code %>
   <%= Perl expression, replaced with result %>
@@ -515,8 +514,8 @@ Perl lines can also be indented freely.
 =head2 Arguments
 
 L<Mojo::Template> templates work just like Perl subs (actually they get
-compiled to a Perl sub internally).
-That means you can access arguments simply via C<@_>.
+compiled to a Perl sub internally). That means you can access arguments
+simply via C<@_>.
 
   % my ($foo, $bar) = @_;
   % my $x = shift;
@@ -544,9 +543,8 @@ And a backslash in front of a newline can be escaped with another backslash.
 =head2 Exceptions
 
 Templates get compiled to Perl code internally, this can make debugging a bit
-tricky.
-But L<Mojo::Template> will return L<Mojo::Exception> objects that stringify
-to error messages with context.
+tricky. But L<Mojo::Template> will return L<Mojo::Exception> objects that
+stringify to error messages with context.
 
   Bareword "xx" not allowed while "strict subs" in use at template line 4.
   2: </head>
@@ -667,8 +665,8 @@ Character indicating the start of a code line, defaults to C<%>.
   my $name = $mt->name;
   $mt      = $mt->name('foo.mt');
 
-Name of template currently being processed, defaults to C<template>.
-Note that this method is attribute and might change without warning!
+Name of template currently being processed, defaults to C<template>. Note
+that this method is attribute and might change without warning!
 
 =head2 C<namespace>
 

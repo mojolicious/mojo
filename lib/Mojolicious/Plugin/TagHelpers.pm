@@ -336,14 +336,12 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
-L<Mojolicious>.
-This is a core plugin, that means it is always enabled and its code a good
-example for learning to build new plugins.
+L<Mojolicious>. This is a core plugin, that means it is always enabled and
+its code a good example for learning to build new plugins.
 
 Most form helpers can automatically pick up previous input values and will
-show them as default.
-You can also use C<param> to set them manually and let necessary attributes
-always be generated automatically.
+show them as default. You can also use C<param> to set them manually and let
+necessary attributes always be generated automatically.
 
   % param country => 'germany' unless param 'country';
   <%= radio_button country => 'germany' %> Germany
@@ -367,8 +365,8 @@ Generate C<base> tag refering to the current base URL.
   %= check_box employed => 1
   %= check_box employed => 1, id => 'foo'
 
-Generate checkbox input element.
-Previous input values will automatically get picked up and shown as default.
+Generate checkbox input element. Previous input values will automatically get
+picked up and shown as default.
 
   <input name="employed" type="checkbox" value="1" />
   <input id="foo" name="employed" type="checkbox" value="1" />
@@ -447,8 +445,8 @@ Generate image tag.
   %= input_tag first_name => 'Default name'
   %= input_tag 'employed', type => 'checkbox'
 
-Generate form input element.
-Previous input values will automatically get picked up and shown as default.
+Generate form input element. Previous input values will automatically get
+picked up and shown as default.
 
   <input name="first_name" />
   <input name="first_name" value="Default name" />
@@ -504,8 +502,8 @@ Generate password input element.
   %= radio_button country => 'germany'
   %= radio_button country => 'germany', id => 'foo'
 
-Generate radio input element.
-Previous input values will automatically get picked up and shown as default.
+Generate radio input element. Previous input values will automatically get
+picked up and shown as default.
 
   <input name="country" type="radio" value="germany" />
   <input id="foo" name="country" type="radio" value="germany" />
@@ -518,8 +516,8 @@ Previous input values will automatically get picked up and shown as default.
   %= select_field country => [{Europe => [[Germany => 'de'], 'en']}]
   %= select_field country => [[Germany => 'de', class => 'europe'], 'en']
 
-Generate select, option and optgroup elements.
-Previous input values will automatically get picked up and shown as default.
+Generate select, option and optgroup elements. Previous input values will
+automatically get picked up and shown as default.
 
   <select name="language">
     <option value="de">de</option>
@@ -572,8 +570,8 @@ Generate submit input element.
 
   %=t div => 'some & content'
 
-Alias for C<tag>.
-Note that this helper is EXPERIMENTAL and might change without warning!
+Alias for C<tag>. Note that this helper is EXPERIMENTAL and might change
+without warning!
 
   <div>some &amp; content</div>
 
@@ -606,8 +604,8 @@ accidental double escaping.
   %= text_field first_name => 'Default name'
   %= text_field first_name => 'Default name', class => 'user'
 
-Generate text input element.
-Previous input values will automatically get picked up and shown as default.
+Generate text input element. Previous input values will automatically get
+picked up and shown as default.
 
   <input name="first_name" />
   <input name="first_name" value="Default name" />
@@ -620,8 +618,8 @@ Previous input values will automatically get picked up and shown as default.
     Default!
   % end
 
-Generate textarea element.
-Previous input values will automatically get picked up and shown as default.
+Generate textarea element. Previous input values will automatically get
+picked up and shown as default.
 
   <textarea name="foo"></textarea>
   <textarea name="foo">

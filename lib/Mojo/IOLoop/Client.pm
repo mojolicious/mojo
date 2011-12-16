@@ -166,8 +166,8 @@ Mojo::IOLoop::Client - Non-blocking TCP client
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Client> opens TCP connections for L<Mojo::IOLoop>.
-Note that this module is EXPERIMENTAL and might change without warning!
+L<Mojo::IOLoop::Client> opens TCP connections for L<Mojo::IOLoop>. Note that
+this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS
 
@@ -213,9 +213,8 @@ implements the following new ones.
     port    => 3000
   );
 
-Open a socket connection to a remote host.
-Note that TLS support depends on L<IO::Socket::SSL> and IPv6 support on
-L<IO::Socket::IP>.
+Open a socket connection to a remote host. Note that TLS support depends on
+L<IO::Socket::SSL> and IPv6 support on L<IO::Socket::IP>.
 
 These options are currently available:
 

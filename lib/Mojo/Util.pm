@@ -729,8 +729,8 @@ Encode characters to bytes.
 
   my $line = get_line \$string;
 
-Extract whole line from string or return C<undef>.
-Lines are expected to end with C<0x0d 0x0a> or C<0x0a>.
+Extract whole line from string or return C<undef>. Lines are expected to end
+with C<0x0d 0x0a> or C<0x0a>.
 
 =head2 C<hmac_md5_sum>
 

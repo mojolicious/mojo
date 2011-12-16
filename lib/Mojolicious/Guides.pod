@@ -24,10 +24,9 @@ excellent introductions to the language.
 =item L<Mojolicious::Lite>
 
 A really fast and fun way to get started developing web applications with
-Mojolicious is the L<Mojolicious::Lite> tutorial.
-Almost everything you learn there can also be applied to normal
-L<Mojolicious> applications and is considered a prerequisite for the guides.
-You should definitely take a look!
+Mojolicious is the L<Mojolicious::Lite> tutorial. Almost everything you learn
+there can also be applied to normal L<Mojolicious> applications and is
+considered a prerequisite for the guides. You should definitely take a look!
 
 =back
 
@@ -62,8 +61,8 @@ Frequently asked questions with the right answers.
 
 =item L<Mojolicious::Guides::CodingGuidelines>
 
-Coding guidelines and mission statement.
-A must read for developers and contributors!
+Coding guidelines and mission statement. A must read for developers and
+contributors!
 
 =back
 

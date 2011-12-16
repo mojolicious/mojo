@@ -659,9 +659,8 @@ Mojolicious::Controller - Controller base class
 =head1 DESCRIPTION
 
 L<Mojolicious::Controller> is the base class for your L<Mojolicious>
-controllers.
-It is also the default controller class for L<Mojolicious> unless you set
-C<controller_class> in your application.
+controllers. It is also the default controller class for L<Mojolicious>
+unless you set C<controller_class> in your application.
 
 =head1 ATTRIBUTES
 
@@ -796,11 +795,9 @@ C<url_for>.
   $c->render('foo/bar', format => 'html');
 
 This is a wrapper around L<Mojolicious::Renderer> exposing pretty much all
-functionality provided by it.
-It will set a default template to use based on the controller and action name
-or fall back to the route name.
-You can call it with a hash of options which can be preceded by an optional
-template name.
+functionality provided by it. It will set a default template to use based on
+the controller and action name or fall back to the route name. You can call
+it with a hash of options which can be preceded by an optional template name.
 
 =head2 C<render_content>
 
@@ -876,8 +873,8 @@ C<public> directory of your application.
   $c->render_text('Hello World', layout => 'green');
 
 Render the given content as Perl characters, which will be encoded to bytes.
-See C<render_data> for an alternative without encoding.
-Note that this does not change the content type of the response, which is
+See C<render_data> for an alternative without encoding. Note that this does
+not change the content type of the response, which is
 C<text/html;charset=UTF-8> by default.
 
   $c->render_text('Hello World!', format => 'txt');
@@ -893,8 +890,8 @@ Finalize response and run C<after_dispatch> plugin hook.
 
   my $req = $c->req;
 
-Alias for C<$c-E<gt>tx-E<gt>req>.
-Usually refers to a L<Mojo::Message::Request> object.
+Alias for C<$c-E<gt>tx-E<gt>req>. Usually refers to a
+L<Mojo::Message::Request> object.
 
   $c->render_json({url => $c->req->url->to_abs->to_string});
 
@@ -902,8 +899,8 @@ Usually refers to a L<Mojo::Message::Request> object.
 
   my $res = $c->res;
 
-Alias for C<$c-E<gt>tx-E<gt>res>.
-Usually refers to a L<Mojo::Message::Response> object.
+Alias for C<$c-E<gt>tx-E<gt>res>. Usually refers to a
+L<Mojo::Message::Response> object.
 
   $c->res->headers->content_disposition('attachment; filename=foo.png;');
 
@@ -917,8 +914,8 @@ Usually refers to a L<Mojo::Message::Response> object.
 
 Automatically select best possible representation for resource from C<Accept>
 request header, C<format> stash value or C<format> GET/POST parameter,
-defaults to rendering an empty C<204> response.
-Note that this method is EXPERIMENTAL and might change without warning!
+defaults to rendering an empty C<204> response. Note that this method is
+EXPERIMENTAL and might change without warning!
 
   $c->respond_to(
     json => sub { $c->render_json({just => 'works'}) },
@@ -932,8 +929,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $c = $c->send_message('Hi there!', sub {...});
 
 Send a message non-blocking via WebSocket, the optional drain callback will
-be invoked once all data has been written.
-Note that this method is EXPERIMENTAL and might change without warning!
+be invoked once all data has been written. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<session>
 
@@ -942,8 +939,8 @@ Note that this method is EXPERIMENTAL and might change without warning!
   $c          = $c->session({foo => 'bar'});
   $c          = $c->session(foo => 'bar');
 
-Persistent data storage, stored C<JSON> serialized in a signed cookie.
-Note that cookies are generally limited to 4096 bytes of data.
+Persistent data storage, stored C<JSON> serialized in a signed cookie. Note
+that cookies are generally limited to 4096 bytes of data.
 
   $c->session->{foo} = 'bar';
   my $foo = $c->session->{foo};
@@ -977,8 +974,8 @@ be set with L<Mojolicious/"defaults">.
 
   my $ua = $c->ua;
 
-Alias for C<$c-E<gt>app-E<gt>ua>.
-Usually refers to a L<Mojo::UserAgent> object.
+Alias for C<$c-E<gt>app-E<gt>ua>. Usually refers to a L<Mojo::UserAgent>
+object.
 
   # Blocking
   my $tx = $c->ua->get('http://mojolicio.us');
@@ -1082,8 +1079,8 @@ You can call C<finish> at any time to end the stream.
 =head1 HELPERS
 
 In addition to the attributes and methods above you can also call helpers on
-instances of L<Mojolicious::Controller>.
-This includes all helpers from L<Mojolicious::Plugin::DefaultHelpers> and
+instances of L<Mojolicious::Controller>. This includes all helpers from
+L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
   $c->layout('green');

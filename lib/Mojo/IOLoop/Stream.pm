@@ -197,8 +197,8 @@ Mojo::IOLoop::Stream - Non-blocking I/O stream
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Stream> is a container for I/O streams used by
-L<Mojo::IOLoop>.
-Note that this module is EXPERIMENTAL and might change without warning!
+L<Mojo::IOLoop>. Note that this module is EXPERIMENTAL and might change
+without warning!
 
 =head1 EVENTS
 
@@ -243,8 +243,8 @@ Emitted safely if new data arrives on the stream.
   });
 
 Emitted safely if the stream has been inactive for too long and will get
-closed automatically.
-Note that this event is EXPERIMENTAL and might change without warning!
+closed automatically. Note that this event is EXPERIMENTAL and might change
+without warning!
 
 =head2 C<write>
 
@@ -272,8 +272,8 @@ global L<Mojo::IOLoop> singleton.
   $stream     = $stream->timeout(45);
 
 Maximum amount of time in seconds stream can be inactive before getting
-closed automatically, defaults to C<15>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+closed automatically, defaults to C<15>. Note that this attribute is
+EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

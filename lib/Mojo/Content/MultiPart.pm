@@ -255,8 +255,8 @@ emit the following new ones.
     my ($multi, $single) = @_;
   });
 
-Emitted when a new L<Mojo::Content::Single> part starts.
-Note that this event is EXPERIMENTAL and might change without warning!
+Emitted when a new L<Mojo::Content::Single> part starts. Note that this event
+is EXPERIMENTAL and might change without warning!
 
   $multi->on(part => sub {
     my ($multi, $single) = @_;
@@ -311,8 +311,8 @@ Generate a suitable boundary for content.
 
   my $clone = $multi->clone;
 
-Clone content if possible.
-Note that this method is EXPERIMENTAL and might change without warning!
+Clone content if possible. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<get_body_chunk>
 

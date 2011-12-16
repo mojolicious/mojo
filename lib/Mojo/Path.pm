@@ -180,8 +180,8 @@ Clone path.
 
   my $success = $path->contains('/foo');
 
-Check if path contains given prefix.
-Note that this method is EXPERIMENTAL and might change without warning!
+Check if path contains given prefix. Note that this method is EXPERIMENTAL
+and might change without warning!
 
   # True
   Mojo::Path->new('/foo/bar')->contains('/');

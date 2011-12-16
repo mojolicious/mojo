@@ -32,9 +32,9 @@ the following new ones.
   $plugin->register;
 
 This method will be called by L<Mojolicious::Plugins> at startup time,
-your plugin should use this to hook into the application.
-For instace by adding handlers and helpers to the renderer or using the
-C<add_hooks> method of L<Mojolicious::Plugins> to hook into the request flow.
+your plugin should use this to hook into the application. For instace by
+adding handlers and helpers to the renderer or using the C<add_hooks> method
+of L<Mojolicious::Plugins> to hook into the request flow.
 
 =head1 SEE ALSO
 

@@ -42,8 +42,8 @@ Mojo::Cache - Naive in-memory cache
 
 =head1 DESCRIPTION
 
-L<Mojo::Cache> is a naive in-memory cache with size limits.
-Note that this module is EXPERIMENTAL and might change without warning!
+L<Mojo::Cache> is a naive in-memory cache with size limits. Note that this
+module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 

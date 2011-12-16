@@ -112,8 +112,8 @@ Turn string into a L<Mojo::ByteStream> object.
 
   my $collection = c(1, 2, 3);
 
-Turn list into a L<Mojo::Collection> object.
-Note that this function is EXPERIMENTAL and might change without warning!
+Turn list into a L<Mojo::Collection> object. Note that this function is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<d>
 
@@ -134,9 +134,9 @@ resulting L<Mojo::Message::Response> object.
   my $res = g('http://mojolicio.us');
 
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
-L<Mojo::Message::Response> object.
-One redirect will be followed by default, you can change this behavior with
-the C<MOJO_MAX_REDIRECTS> environment variable.
+L<Mojo::Message::Response> object. One redirect will be followed by default,
+you can change this behavior with the C<MOJO_MAX_REDIRECTS> environment
+variable.
 
   MOJO_MAX_REDIRECTS=0 perl -Mojo -e 'b(g("mojolicio.us")->code)->say'
 

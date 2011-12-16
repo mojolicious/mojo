@@ -121,8 +121,8 @@ C<auto_upgrade> enabled.
   $single     = $single->auto_upgrade(0);
 
 Try to detect multipart content and automatically upgrade to a
-L<Mojo::Content::MultiPart> object, defaults to C<1>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
+L<Mojo::Content::MultiPart> object, defaults to C<1>. Note that this
+attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 
@@ -152,8 +152,8 @@ Content size in bytes.
 
   my $clone = $single->clone;
 
-Clone content if possible.
-Note that this method is EXPERIMENTAL and might change without warning!
+Clone content if possible. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<get_body_chunk>
 

@@ -12,11 +12,10 @@ updates.
 
 =head1 LEARNING PERL
 
-If you're new to Perl, see L<learn.perl.org|http://learn.perl.org> for
-help to get started with the language.
-
-There are also some excellent L<Perl books|http://learn.perl.org/books>
-(including some that are freely available online).
+If you're new to Perl, take a look at
+L<Learn Perl in 2 hours 30 minutes|http://qntm.org/files/perl/perl.html> and
+the L<Modern Perl|http://onyxneon.com/books/modern_perl/> book, both are
+excellent introductions to the language.
 
 =head1 TUTORIAL
 

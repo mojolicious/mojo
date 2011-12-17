@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small cleanup bug in Mojo::Asset::File.
         - Fixed small multipart bug in Mojo::Message. (augensalat)
         - Fixed missing status method in Mojo::Headers. (crab)
+        - Fixed small Mojo::IOLoop::Stream timeout bug.
 
 2.37    2011-12-10 00:00:00
         - Welcome to the Mojolicious core team Marcus Ramberg, Glen Hinkle

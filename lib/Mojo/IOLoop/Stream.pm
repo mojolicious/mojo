@@ -38,6 +38,7 @@ sub is_readable {
 
 sub is_writing {
   my $self = shift;
+  return if $self->{timed};
   return length($self->{buffer}) || $self->has_subscribers('drain');
 }
 

@@ -105,7 +105,7 @@ sub _close {
 sub _error {
   my $self = shift;
   $self->{error}++;
-  $self->emit_safe(error => $!);
+  $self->emit_safe(error => @_);
 }
 
 sub _read {

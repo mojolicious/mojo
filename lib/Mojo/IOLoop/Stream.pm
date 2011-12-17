@@ -38,7 +38,7 @@ sub is_readable {
 
 sub is_writing {
   my $self = shift;
-  return if $self->{timed};
+  return if $self->{closed} || $self->{error} || $self->{timed_out};
   return length($self->{buffer}) || $self->has_subscribers('drain');
 }
 
@@ -57,7 +57,7 @@ sub resume {
   $self->{timer} ||= $watcher->recurring(
     '0.025' => sub {
       return unless $self && (time - ($self->{active})) >= $self->timeout;
-      $self->emit_safe('timeout') unless $self->{timed}++;
+      $self->emit_safe('timeout') unless $self->{timed_out}++;
       $self->_close;
     }
   );
@@ -102,6 +102,12 @@ sub _close {
   $self->emit_safe('close') unless $self->{closed}++;
 }
 
+sub _error {
+  my $self = shift;
+  $self->{error}++;
+  $self->emit_safe(error => $!);
+}
+
 sub _read {
   my $self = shift;
 
@@ -118,7 +124,7 @@ sub _read {
     return $self->_close if $! == ECONNRESET;
 
     # Read error
-    return $self->emit_safe(error => $!);
+    return $self->_error($!);
   }
 
   # EOF
@@ -149,7 +155,7 @@ sub _write {
       return $self->_close if $! ~~ [ECONNRESET, EPIPE];
 
       # Write error
-      return $self->emit_safe(error => $!);
+      return $self->_error($!);
     }
 
     # Remove written chunk from buffer

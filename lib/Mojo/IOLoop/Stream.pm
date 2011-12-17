@@ -30,7 +30,7 @@ sub is_readable {
 
 sub is_writing {
   my $self = shift;
-  return if $self->{closed};
+  return unless exists $self->{handle};
   return length($self->{buffer}) || $self->has_subscribers('drain');
 }
 
@@ -91,14 +91,11 @@ sub write {
 sub _close {
   my $self = shift;
 
-  # Already closed
-  return if $self->{closed}++;
-
   # Cleanup
+  return unless my $handle  = delete $self->{handle};
   return unless my $watcher = $self->{iowatcher};
-  return unless my $handle  = $self->{handle};
   $watcher->drop_handle($handle);
-  $watcher->drop_timer($self->{timer}) if $self->{timer};
+  $watcher->drop_timer(delete $self->{timer}) if $self->{timer};
 
   # Close
   close $handle;

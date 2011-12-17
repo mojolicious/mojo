@@ -361,9 +361,9 @@ this in your startup method to define the url endpoints for your application.
   $app       = $app->secret('passw0rd');
 
 A secret passphrase used for signed cookies and the like, defaults to the
-application name which is not very secure, so you should change it!!!
-As long as you are using the unsecure default there will be debug messages in
-the log file reminding you to change your passphrase.
+application name which is not very secure, so you should change it!!! As long
+as you are using the unsecure default there will be debug messages in the log
+file reminding you to change your passphrase.
 
 =head2 C<sessions>
 
@@ -462,10 +462,10 @@ and the application object, as well as a function in C<ep> templates.
 
 Extend L<Mojolicious> by adding hooks.
 
-  # Dispatchers will be skipped if there's already a response code defined
+  # Dispatchers will not run if there's already a response code defined
   $app->hook(before_dispatch => sub {
     my $c = shift;
-    $c->render(text => 'Skip both dispatchers!')
+    $c->render(text => 'Skipped dispatchers!')
       if $c->req->url->path->contains('/do_not_dispatch');
   });
 
@@ -484,8 +484,8 @@ parsed.
 
 This is a very powerful hook and should not be used lightly, it makes some
 rather advanced features such as upload progress bars possible, just note
-that it will not work for embedded applications.
-(Passed the transaction and application instances)
+that it will not work for embedded applications. (Passed the transaction and
+application instances)
 
 =item before_dispatch
 
@@ -519,8 +519,8 @@ hook can trigger before C<after_static_dispatch> due to its dynamic nature.
     my $c = shift;
   });
 
-Useful for all kinds of postprocessing tasks.
-(Passed the current controller instance)
+Useful for all kinds of postprocessing tasks. (Passed the current controller
+instance)
 
 =item around_dispatch
 
@@ -535,9 +535,8 @@ change without warning!
   });
 
 This is a very powerful hook and should not be used lightly, consider it the
-sledgehammer in your toolbox.
-(Passed a closure leading to the next hook andthe current controller
-instance)
+sledgehammer in your toolbox. (Passed a closure leading to the next hook and
+the current controller instance)
 
 =back
 

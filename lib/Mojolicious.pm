@@ -473,7 +473,7 @@ These hooks are currently available and are emitted in the listed order:
 
 =over 2
 
-=item after_build_tx
+=item B<after_build_tx>
 
 Emitted right after the transaction is built and before the HTTP request gets
 parsed.
@@ -487,7 +487,7 @@ rather advanced features such as upload progress bars possible, just note
 that it will not work for embedded applications. (Passed the transaction and
 application instances)
 
-=item before_dispatch
+=item B<before_dispatch>
 
 Emitted right before the static and routes dispatchers start their work.
 
@@ -498,7 +498,7 @@ Emitted right before the static and routes dispatchers start their work.
 Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller instance)
 
-=item after_static_dispatch
+=item B<after_static_dispatch>
 
 Emitted in reverse order after the static dispatcher determined if a static
 file should be served and before the routes dispatcher starts its work.
@@ -510,7 +510,7 @@ file should be served and before the routes dispatcher starts its work.
 Mostly used for custom dispatchers and postprocessing static file responses.
 (Passed the default controller instance)
 
-=item after_dispatch
+=item B<after_dispatch>
 
 Emitted in reverse order after a response has been rendered. Note that this
 hook can trigger before C<after_static_dispatch> due to its dynamic nature.
@@ -522,7 +522,7 @@ hook can trigger before C<after_static_dispatch> due to its dynamic nature.
 Useful for all kinds of postprocessing tasks. (Passed the current controller
 instance)
 
-=item around_dispatch
+=item B<around_dispatch>
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you

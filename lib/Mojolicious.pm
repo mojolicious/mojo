@@ -462,6 +462,13 @@ and the application object, as well as a function in C<ep> templates.
 
 Extend L<Mojolicious> by adding hooks.
 
+  # Dispatchers will be skipped if there's already a response code defined
+  $app->hook(before_dispatch => sub {
+    my $c = shift;
+    $c->render(text => 'Skip both dispatchers!')
+      if $c->req->url->path->contains('/do_not_dispatch');
+  });
+
 These hooks are currently available and are emitted in the listed order:
 
 =over 2

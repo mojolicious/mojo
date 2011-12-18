@@ -209,6 +209,7 @@ L<Mojo::IOLoop::Stream> can emit the following events.
 
   $stream->on(close => sub {
     my $stream = shift;
+    ...
   });
 
 Emitted safely if the stream gets closed.
@@ -217,6 +218,7 @@ Emitted safely if the stream gets closed.
 
   $stream->on(drain => sub {
     my $stream = shift;
+    ...
   });
 
 Emitted safely once all data has been written.
@@ -225,6 +227,7 @@ Emitted safely once all data has been written.
 
   $stream->on(error => sub {
     my ($stream, $err) = @_;
+    ...
   });
 
 Emitted safely if an error happens on the stream.
@@ -233,6 +236,7 @@ Emitted safely if an error happens on the stream.
 
   $stream->on(read => sub {
     my ($stream, $chunk) = @_;
+    ...
   });
 
 Emitted safely if new data arrives on the stream.
@@ -241,6 +245,7 @@ Emitted safely if new data arrives on the stream.
 
   $stream->on(timeout => sub {
     my $stream = shift;
+    ...
   });
 
 Emitted safely if the stream has been inactive for too long and will get
@@ -251,6 +256,7 @@ without warning!
 
   $stream->on(write => sub {
     my ($stream, $chunk) = @_;
+    ...
   });
 
 Emitted safely if new data has been written to the stream.

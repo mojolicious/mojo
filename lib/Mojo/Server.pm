@@ -101,6 +101,7 @@ L<Mojo::Server> can emit the following events.
 
   $server->on(request => sub {
     my ($server, $tx) = @_;
+    ...
   });
 
 Emitted when a request is ready and needs to be handled.

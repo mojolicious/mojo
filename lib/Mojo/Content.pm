@@ -429,6 +429,7 @@ L<Mojo::Content> can emit the following events.
 
   $content->on(body => sub {
     my $content = shift;
+    ...
   });
 
 Emitted once all headers have been parsed and the body starts. Note that this
@@ -443,6 +444,7 @@ event is EXPERIMENTAL and might change without warning!
 
   $content->on(read => sub {
     my ($content, $chunk) = @_;
+    ...
   });
 
 Emitted when a new chunk of content arrives.

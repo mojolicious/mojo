@@ -356,6 +356,7 @@ and can emit the following new ones.
 
   $ws->on(frame => sub {
     my ($ws, $frame) = @_;
+    ...
   });
 
 Emitted when a WebSocket frame has been received.
@@ -371,6 +372,7 @@ Emitted when a WebSocket frame has been received.
 
   $ws->on(message => sub {
     my ($ws, $message) = @_;
+    ...
   });
 
 Emitted when a complete WebSocket message has been received.

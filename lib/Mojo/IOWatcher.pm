@@ -172,6 +172,7 @@ L<Mojo::IOWatcher> can emit the following events.
 
   $watcher->on(error => sub {
     my ($watcher, $err) = @_;
+    ...
   });
 
 Emitted safely if an error happens.

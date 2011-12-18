@@ -121,6 +121,7 @@ L<Mojo::Log> can emit the following events.
 
   $log->on(message => sub {
     my ($log, $level, @messages) = @_;
+    ...
   });
 
 Emitted when a new message gets logged. Note that this event is EXPERIMENTAL

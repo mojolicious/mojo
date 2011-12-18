@@ -637,6 +637,7 @@ L<Mojo::UserAgent> can emit the following events.
 
   $ua->on(start => sub {
     my ($ua, $tx) = @_;
+    ...
   });
 
 Emitted whenever a new transaction is about to start, this includes

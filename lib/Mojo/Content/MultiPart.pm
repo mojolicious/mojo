@@ -253,6 +253,7 @@ emit the following new ones.
 
   $multi->on(part => sub {
     my ($multi, $single) = @_;
+    ...
   });
 
 Emitted when a new L<Mojo::Content::Single> part starts. Note that this event

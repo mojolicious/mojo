@@ -149,6 +149,7 @@ Subscribe to event.
 
   $e->on(foo => sub {
     my ($e, @args) = @_;
+    ...
   });
 
 =head2 C<once>
@@ -159,6 +160,7 @@ Subscribe to event and unsubscribe again after it has been emitted once.
 
   $e->once(foo => sub {
     my ($e, @args) = @_;
+    ...
   });
 
 =head2 C<subscribers>

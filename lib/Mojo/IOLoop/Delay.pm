@@ -65,6 +65,7 @@ L<Mojo::IOLoop::Delay> can emit the following events.
 
   $delay->on(finish => sub {
     my $delay = shift;
+    ...
   });
 
 Emitted safely once the active event counter reaches zero.

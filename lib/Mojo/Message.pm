@@ -540,6 +540,7 @@ L<Mojo::Message> can emit the following events.
 
   $message->on(finish => sub {
     my $message = shift;
+    ...
   });
 
 Emitted after message building or parsing is finished.
@@ -554,6 +555,7 @@ Emitted after message building or parsing is finished.
 
   $message->on(progress => sub {
     my $message = shift;
+    ...
   });
 
 Emitted when message building or parsing makes progress.

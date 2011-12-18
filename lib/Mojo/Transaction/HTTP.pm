@@ -299,6 +299,7 @@ can emit the following new ones.
 
   $tx->on(request => sub {
     my $tx = shift;
+    ...
   });
 
 Emitted when a request is ready and needs to be handled.
@@ -312,6 +313,7 @@ Emitted when a request is ready and needs to be handled.
 
   $tx->on(upgrade => sub {
     my ($tx, $ws) = @_;
+    ...
   });
 
 Emitted when transaction gets upgraded to a L<Mojo::Transaction::WebSocket>

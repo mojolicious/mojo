@@ -122,6 +122,7 @@ L<Mojo::Transaction> can emit the following events.
 
   $tx->on(connection => sub {
     my ($tx, $connection) = @_;
+    ...
   });
 
 Emitted when a connection has been assigned to transaction. Note that this
@@ -131,6 +132,7 @@ event is EXPERIMENTAL and might change without warning!
 
   $tx->on(finish => sub {
     my $tx = shift;
+    ...
   });
 
 Emitted when transaction is finished.
@@ -139,6 +141,7 @@ Emitted when transaction is finished.
 
   $tx->on(resume => sub {
     my $tx = shift;
+    ...
   });
 
 Emitted when transaction is resumed.

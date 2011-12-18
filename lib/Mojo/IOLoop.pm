@@ -476,7 +476,6 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
       # Got some data, time to write
       $stream->write('HTTP/1.1 200 OK');
     });
-
   });
 
   # Connect to port 3000
@@ -487,7 +486,7 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
       my ($stream, $chunk) = @_;
 
       # Process input
-      say $chunk;
+      say "Input: $chunk";
     });
 
     # Write request
@@ -623,6 +622,7 @@ might change without warning!
 
   Mojo::IOLoop->client({port => 3000} => sub {
     my ($loop, $err, $stream) = @_;
+    ...
   });
 
 =head2 C<defer>
@@ -714,6 +714,7 @@ might change without warning!
 
   Mojo::IOLoop->server({port => 3000} => sub {
     my ($loop, $stream, $id) = @_;
+    ...
   });
 
 =head2 C<singleton>

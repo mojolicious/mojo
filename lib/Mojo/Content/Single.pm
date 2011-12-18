@@ -91,6 +91,7 @@ emit the following new ones.
 
   $single->on(upgrade => sub {
     my ($single, $multi) = @_;
+    ...
   });
 
 Emitted when content gets upgraded to a L<Mojo::Content::MultiPart> object.

@@ -294,11 +294,11 @@ detection doesn't work, like for C<inline> templates.
 
 =over 2
 
-=item epl
+=item B<epl>
 
 C<Embedded Perl Lite> handled by L<Mojolicious::Plugin::EPLRenderer>.
 
-=item ep
+=item B<ep>
 
 C<Embedded Perl> handled by L<Mojolicious::Plugin::EPRenderer>.
 

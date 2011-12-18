@@ -179,6 +179,7 @@ $err = undef;
 $loop->client(
   (port => $port) => sub {
     shift->stop;
+    pop;
     $err = pop;
   }
 );

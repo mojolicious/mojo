@@ -63,7 +63,7 @@ sub client {
   $client->on(
     error => sub {
       my $c = delete $self->{connections}->{$id};
-      $self->$cb(pop);
+      $self->$cb(pop, undef);
     }
   );
 

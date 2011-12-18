@@ -115,7 +115,7 @@ $id = $loop->client(
   tls      => 1,
   tls_cert => 't/mojo/certs/badcert.key',
   tls_key  => 't/mojo/certs/badcert.crt',
-  sub { $client_error = pop }
+  sub { shift; $client_error = shift }
 );
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
@@ -142,7 +142,7 @@ $id = $loop->client(
   tls      => 1,
   tls_cert => 't/mojo/certs/client.crt',
   tls_key  => 't/mojo/certs/client.key',
-  sub { $client_error = pop }
+  sub { shift; $client_error = shift }
 );
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
@@ -190,7 +190,8 @@ is $client_close, 1,         'client emitted close event once';
 
 # Missing client certificate
 $server_error = $client_error = '';
-$id = $loop->client({port => $port, tls => 1} => sub { $client_error = pop });
+$id = $loop->client(
+  {port => $port, tls => 1} => sub { shift; $client_error = shift });
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
 ok !$server_error, 'no error';
@@ -218,7 +219,7 @@ $id = $loop->client(
   tls      => 1,
   tls_cert => 't/mojo/certs/client.crt',
   tls_key  => 't/mojo/certs/client.key',
-  sub { $client_error = pop }
+  sub { shift; $client_error = shift }
 );
 $loop->timer(1 => sub { shift->stop });
 $loop->start;

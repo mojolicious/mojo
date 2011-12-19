@@ -98,8 +98,7 @@ sub _connect {
       SSL_cert_file   => $args->{tls_cert},
       SSL_key_file    => $args->{tls_key},
       SSL_verify_mode => 0x00,
-      Timeout         => $timeout,
-      %{$args->{tls_args} || {}}
+      Timeout         => $timeout
     );
     $self->{tls} = 1;
     return $self->emit_safe(error => 'TLS upgrade failed.')

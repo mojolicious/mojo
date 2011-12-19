@@ -134,19 +134,18 @@ sub listen {
   croak "IO::Socket::SSL 1.37 required for TLS support" unless TLS;
 
   # Options
-  my %options = (
+  my $options = $self->{tls} = {
     SSL_startHandshake => 0,
     SSL_cert_file      => $args->{tls_cert} || $self->_cert_file,
     SSL_key_file       => $args->{tls_key} || $self->_key_file,
-  );
-  %options = (
+  };
+  %$options = (
     SSL_verify_callback => $args->{tls_verify},
     SSL_ca_file         => -T $args->{tls_ca} ? $args->{tls_ca} : undef,
     SSL_ca_path         => -d $args->{tls_ca} ? $args->{tls_ca} : undef,
     SSL_verify_mode     => $args->{tls_ca} ? 0x03 : undef,
-    %options
+    %$options
   ) if $args->{tls_ca};
-  $self->{tls} = {%options, %{$args->{tls_args} || {}}};
 }
 
 sub generate_port {

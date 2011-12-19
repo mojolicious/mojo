@@ -58,8 +58,7 @@ sub _connect {
       Blocking => 0,
       PeerAddr => $args->{address},
       PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
-      Proto    => 'tcp',
-      %{$args->{args} || {}}
+      Proto    => 'tcp'
     );
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';

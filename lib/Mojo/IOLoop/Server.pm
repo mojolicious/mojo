@@ -117,8 +117,7 @@ sub listen {
       LocalPort => $port,
       Proto     => 'tcp',
       ReuseAddr => 1,
-      Type      => SOCK_STREAM,
-      %{$args->{args} || {}}
+      Type      => SOCK_STREAM
     );
     $options{LocalAddr} =~ s/[\[\]]//g;
     $handle = $class->new(%options)

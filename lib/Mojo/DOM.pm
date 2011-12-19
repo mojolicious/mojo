@@ -644,7 +644,7 @@ Element type.
 Alias for L<Mojo::DOM::HTML/"xml">. Note that this method is EXPERIMENTAL and
 might change without warning!
 
-=head1 CHILD ELEMENTS AND ELEMENT ATTRIBUTES
+=head1 CHILD ELEMENTS
 
 In addition to the methods above, many child elements are also automatically
 available as object methods, which return a L<Mojo::DOM> or
@@ -653,6 +653,8 @@ L<Mojo::Collection> object, depending on number of children.
   say $dom->div->text;
   say $dom->div->[23]->text;
   $dom->div->each(sub { say $_->text });
+
+=head1 ELEMENT ATTRIBUTES
 
 Direct hash access to element attributes is also possible.
 

@@ -646,21 +646,21 @@ change controller state, which includes request, response and stash.
 
 =head2 Web
 
-  http://mojolicio.us
+L<http://mojolicio.us>
 
 =head2 IRC
 
-  #mojo on irc.perl.org
+C<#mojo> on C<irc.perl.org>
 
 =head2 Mailing-List
 
-  http://groups.google.com/group/mojolicious
+L<http://groups.google.com/group/mojolicious>
 
 =head1 DEVELOPMENT
 
 =head2 Repository
 
-  http://github.com/kraih/mojo
+L<http://github.com/kraih/mojo>
 
 =head1 BUNDLED FILES
 

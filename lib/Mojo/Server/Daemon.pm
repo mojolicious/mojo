@@ -36,15 +36,9 @@ my $SOCKET_RE = qr|
 
 sub DESTROY {
   my $self = shift;
-
-  # Clean up connections
   return unless my $loop = $self->ioloop;
-  my $cs = $self->{connections} || {};
-  for my $id (keys %$cs) { $loop->drop($id) }
-
-  # Clean up listen sockets
-  return unless my $listen = $self->{listening};
-  for my $id (@$listen) { $loop->drop($id) }
+  $loop->drop($_) for keys %{$self->{connections} || {}};
+  $loop->drop($_) for @{$self->{listening} || []};
 }
 
 sub prepare_ioloop {

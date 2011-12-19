@@ -62,7 +62,7 @@ sub client {
   );
   $client->on(
     error => sub {
-      my $c = delete $self->{connections}->{$id};
+      delete $self->{connections}->{$id};
       $self->$cb(pop, undef);
     }
   );
@@ -348,7 +348,6 @@ sub stream {
   # Events
   weaken $self;
   $stream->on(close => sub { $self->{connections}->{$id}->{finish} = 1 });
-  $stream->on(error => sub { $self->{connections}->{$id}->{finish} = 1 });
   $stream->resume;
 
   return $id;
@@ -391,19 +390,17 @@ sub _drop {
   my ($self, $id) = @_;
 
   # Timer
-  return $self unless my $watcher = $self->iowatcher;
-  return $self if $watcher->drop_timer($id);
+  return unless my $watcher = $self->iowatcher;
+  return if $watcher->drop_timer($id);
 
   # Listen socket
   if (delete $self->{servers}->{$id}) { delete $self->{listening} }
 
-  # Connection
+  # Connection (stream needs to be deleted first)
   else {
     delete(($self->{connections}->{$id} || {})->{stream});
     delete $self->{connections}->{$id};
   }
-
-  return $self;
 }
 
 # DEPRECATED in Leaf Fluttering In Wind!
@@ -657,8 +654,8 @@ method is EXPERIMENTAL and might change without warning!
 
 =head2 C<drop>
 
-  $loop = Mojo::IOLoop->drop($id);
-  $loop = $loop->drop($id);
+  Mojo::IOLoop->drop($id);
+  $loop->drop($id);
 
 Drop anything with an id. Connections will be dropped gracefully by allowing
 them to finish writing all data in their write buffers.

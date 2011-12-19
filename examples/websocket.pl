@@ -11,6 +11,7 @@ any '/' => sub {
     if $self->tx->is_websocket;
 } => 'websocket';
 
+# Minimal WebSocket application for browser testing
 app->start;
 __DATA__
 

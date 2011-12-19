@@ -110,8 +110,6 @@ sub build_tx {
   return $tx;
 }
 
-# "Amy, technology isn't intrinsically good or evil. It's how it's used.
-#  Like the Death Ray."
 sub defaults {
   my $self = shift;
 
@@ -200,8 +198,6 @@ sub handler {
     unless $stash->{'mojo.rendered'} || $tx->is_writing;
 }
 
-# "This snow is beautiful. I'm glad global warming never happened.
-#  Actually, it did. But thank God nuclear winter canceled it out."
 sub helper {
   my ($self, $name) = (shift, shift);
   my $r = $self->renderer;

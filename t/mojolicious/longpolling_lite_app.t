@@ -307,7 +307,7 @@ Mojo::IOLoop->client(
     $stream->on(
       read => sub {
         my ($stream, $chunk) = @_;
-        $stream->emit('close');
+        $stream->close;
         Mojo::IOLoop->timer('0.5', sub { Mojo::IOLoop->stop });
       }
     );

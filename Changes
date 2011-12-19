@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.39    2011-12-19 00:00:00
+        - Added EXPERIMENTAL close method to Mojo::IOLoop::Stream.
         - Improved documentation. (marcus, vervain, sri)
         - Fixed small argument bug in client method of Mojo::IOLoop.
 

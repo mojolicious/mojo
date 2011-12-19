@@ -17,9 +17,23 @@ has timeout => 15;
 #  Iran, Iraq, China, Mordor, the hoochies that laid low Tiger Woods,
 #  undesirable immigrants - by which I mean everyone that came after me,
 #  including my children..."
-sub DESTROY { shift->_close }
+sub DESTROY { shift->close }
 
 sub new { shift->SUPER::new(handle => shift, buffer => '', active => time) }
+
+sub close {
+  my $self = shift;
+
+  # Cleanup
+  return unless my $handle  = delete $self->{handle};
+  return unless my $watcher = $self->{iowatcher};
+  $watcher->drop_handle($handle);
+  $watcher->drop_timer(delete $self->{timer}) if $self->{timer};
+
+  # Close
+  close $handle;
+  $self->emit_safe('close');
+}
 
 sub handle { shift->{handle} }
 
@@ -48,7 +62,7 @@ sub resume {
   weaken $self;
   $self->{timer} ||= $watcher->recurring(
     '0.025' => sub {
-      $self->emit_safe('timeout')->_close
+      $self->emit_safe('timeout')->close
         if $self && (time - ($self->{active})) >= $self->timeout;
     }
   );
@@ -88,20 +102,6 @@ sub write {
     if $self->{handle};
 }
 
-sub _close {
-  my $self = shift;
-
-  # Cleanup
-  return unless my $handle  = delete $self->{handle};
-  return unless my $watcher = $self->{iowatcher};
-  $watcher->drop_handle($handle);
-  $watcher->drop_timer(delete $self->{timer}) if $self->{timer};
-
-  # Close
-  close $handle;
-  $self->emit_safe('close');
-}
-
 sub _read {
   my $self = shift;
 
@@ -115,14 +115,14 @@ sub _read {
     return if $! ~~ [EAGAIN, EINTR, EWOULDBLOCK];
 
     # Closed
-    return $self->_close if $! == ECONNRESET;
+    return $self->close if $! == ECONNRESET;
 
     # Read error
-    return $self->emit_safe(error => $!)->_close;
+    return $self->emit_safe(error => $!)->close;
   }
 
   # EOF
-  return $self->_close if $read == 0;
+  return $self->close if $read == 0;
 
   # Handle read
   $self->emit_safe(read => $buffer);
@@ -146,10 +146,10 @@ sub _write {
       return if $! ~~ [EAGAIN, EINTR, EWOULDBLOCK];
 
       # Closed
-      return $self->_close if $! ~~ [ECONNRESET, EPIPE];
+      return $self->close if $! ~~ [ECONNRESET, EPIPE];
 
       # Write error
-      return $self->emit_safe(error => $!)->_close;
+      return $self->emit_safe(error => $!)->close;
     }
 
     # Remove written chunk from buffer
@@ -292,6 +292,12 @@ implements the following new ones.
   my $stream = Mojo::IOLoop::Stream->new($handle);
 
 Construct a new L<Mojo::IOLoop::Stream> object.
+
+=head2 C<close>
+
+  $stream->close;
+
+Close stream immediately.
 
 =head2 C<handle>
 

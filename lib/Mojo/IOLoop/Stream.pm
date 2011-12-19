@@ -25,10 +25,10 @@ sub close {
   my $self = shift;
 
   # Cleanup
-  return unless my $handle  = delete $self->{handle};
   return unless my $watcher = $self->{iowatcher};
-  $watcher->drop_handle($handle);
   $watcher->drop_timer(delete $self->{timer}) if $self->{timer};
+  return unless my $handle = delete $self->{handle};
+  $watcher->drop_handle($handle);
 
   # Close
   close $handle;

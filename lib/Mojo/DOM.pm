@@ -412,7 +412,7 @@ Mojo::DOM - Minimalistic HTML5/XML DOM parser with CSS3 selectors
 
   # Walk
   say $dom->div->p->[0]->text;
-  say $dom->div->p->[1]->{id};
+  say $dom->div->children('p')->first->{id};
 
   # Iterate
   $dom->find('p[id]')->each(sub { say shift->{id} });
@@ -513,10 +513,6 @@ L<Mojo::DOM::CSS> are supported.
 
 Element attributes.
 
-  # Direct hash access to attributes is also available
-  say $dom->{foo};
-  say $dom->div->{id};
-
 =head2 C<charset>
 
   my $charset = $dom->charset;
@@ -527,15 +523,10 @@ Alias for L<Mojo::DOM::HTML/"charset">.
 =head2 C<children>
 
   my $collection = $dom->children;
-  my $collection = $dom->children('div')
+  my $collection = $dom->children('div');
 
 Return a L<Mojo::Collection> object containing the children of this element,
 similar to C<find>.
-
-  # Child elements are also automatically available as object methods
-  say $dom->div->text;
-  say $dom->div->[23]->text;
-  $dom->div->each(sub { say $_->text });
 
 =head2 C<content_xml>
 
@@ -652,6 +643,21 @@ Element type.
 
 Alias for L<Mojo::DOM::HTML/"xml">. Note that this method is EXPERIMENTAL and
 might change without warning!
+
+=head1 CHILD ELEMENTS AND ELEMENT ATTRIBUTES
+
+In addition to the methods above, many child elements are also automatically
+available as object methods, which return a L<Mojo::DOM> or
+L<Mojo::Collection> object, depending on number of children.
+
+  say $dom->div->text;
+  say $dom->div->[23]->text;
+  $dom->div->each(sub { say $_->text });
+
+Direct hash access to element attributes is also possible.
+
+  say $dom->{foo};
+  say $dom->div->{id};
 
 =head1 SEE ALSO
 

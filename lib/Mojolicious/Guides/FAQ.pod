@@ -78,6 +78,20 @@ passphrase with the C<secret> attribute of L<Mojolicious>.
 
   app->secret('My very secret passphrase.');
 
+=head2 What does "Connection timeout." mean.
+
+To protect your applications from denial-of-service attacks, all connections
+have an inactivity timeout which limits how long a connection may be inactive
+before being dropped automatically. It defaults to C<20> seconds for the user
+agent and C<15> seconds for all built-in servers, and is commonly referred to
+as C<keep_alive_timeout>.
+
+=head2 What does "Premature connection close." mean?
+
+This error message is often related to the one above, and means that the web
+server closed the connection before the user agent could receive the whole
+response.
+
 =head2 I think i have found a bug, what should i do now?
 
 First make sure you are using the latest version of L<Mojolicious>, it is

@@ -10,6 +10,7 @@ use File::Basename 'dirname';
 use File::Find 'find';
 use File::Spec;
 use FindBin;
+use List::Util 'first';
 use Mojo::Asset::File;
 use Mojo::Command;
 use Mojo::Loader;
@@ -93,7 +94,7 @@ sub list_files {
     wanted => sub {
       my @parts =
         File::Spec->splitdir(File::Spec->abs2rel($File::Find::name, $dir));
-      push @files, join '/', @parts unless $parts[-1] =~ /^\./;
+      push @files, join '/', @parts unless first {/^\./} @parts;
     },
     no_chdir => 1
   }, $dir;

@@ -373,7 +373,7 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 
   # Custom socket
   my $tx = $t->tx(GET => 'http://mojolicio.us');
-  $tx->connection($socket);
+  $tx->connection($sock);
   $ua->start($tx);
 
 =head2 C<websocket>

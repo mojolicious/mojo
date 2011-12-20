@@ -200,10 +200,9 @@ my $port     = $ua->test_server->port;
 my $tx       = $ua->build_websocket_tx('ws://lalala/socket');
 my $finished = 0;
 $tx->on(finish => sub { $finished++ });
-my $socket =
-  IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
-$socket->blocking(0);
-$tx->connection($socket);
+my $sock = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
+$sock->blocking(0);
+$tx->connection($sock);
 $result = '';
 my ($local, $early);
 $ua->start(
@@ -227,7 +226,7 @@ is $early,    1, 'finish event has been emitted at the right time';
 ok $result =~ /^lalala(\d+)$/, 'right result';
 ok $1 > 100, 'right timeout';
 ok $local, 'local port';
-is $loop->stream($tx->connection)->handle, $socket, 'right connection id';
+is $loop->stream($tx->connection)->handle, $sock, 'right connection id';
 
 # WebSocket /early_start (server directly sends a message)
 my $client_flag;

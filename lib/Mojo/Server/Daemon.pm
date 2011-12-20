@@ -21,7 +21,7 @@ has max_clients        => 1000;
 has max_requests       => 25;
 has websocket_timeout  => 300;
 
-my $SOCKET_RE = qr|
+my $LISTEN_RE = qr|
   ^
   (http(?:s)?)\://   # Scheme
   (.+)               # Address
@@ -192,7 +192,7 @@ sub _listen {
   return unless $listen;
 
   # Check listen value
-  croak qq/Invalid listen value "$listen"/ unless $listen =~ $SOCKET_RE;
+  croak qq/Invalid listen value "$listen"/ unless $listen =~ $LISTEN_RE;
   my $options = {};
   my $tls;
   $tls = $options->{tls} = 1 if $1 eq 'https';

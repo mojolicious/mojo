@@ -60,6 +60,7 @@ sub _connect {
       PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
       Proto    => 'tcp'
     );
+    $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
     return $self->emit_safe(error => "Couldn't connect.")
@@ -227,6 +228,11 @@ Address or host name of the peer to connect to.
 =item C<handle>
 
 Use an already prepared handle.
+
+=item C<local_address>
+
+Local address to bind to. Note that this option is EXPERIMENTAL and might
+change without warning!
 
 =item C<port>
 

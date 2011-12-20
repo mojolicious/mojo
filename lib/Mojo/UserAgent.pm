@@ -17,7 +17,7 @@ use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 has cert => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout => 3;
 has cookie_jar => sub { Mojo::CookieJar->new };
-has [qw/http_proxy https_proxy no_proxy/];
+has [qw/http_proxy https_proxy local_address no_proxy/];
 has ioloop => sub { Mojo::IOLoop->new };
 has keep_alive_timeout => 20;
 has key                => sub { $ENV{MOJO_KEY_FILE} };
@@ -215,13 +215,14 @@ sub _connect {
   warn "NEW CONNECTION ($scheme:$host:$port)\n" if DEBUG;
   weaken $self;
   $id = $self->_loop->client(
-    address  => $host,
-    port     => $port,
-    handle   => $id,
-    timeout  => $self->connect_timeout,
-    tls      => $scheme eq 'https' ? 1 : 0,
-    tls_cert => $self->cert,
-    tls_key  => $self->key,
+    address       => $host,
+    port          => $port,
+    handle        => $id,
+    local_address => $self->local_address,
+    timeout       => $self->connect_timeout,
+    tls           => $scheme eq 'https' ? 1 : 0,
+    tls_cert      => $self->cert,
+    tls_key       => $self->key,
     sub {
       my ($loop, $err, $stream) = @_;
 
@@ -714,6 +715,14 @@ dropped, defaults to C<20>.
 
 Path to TLS key file, defaults to the value of the C<MOJO_KEY_FILE>
 environment variable.
+
+=head2 C<local_address>
+
+  my $address = $ua->local_address;
+  $ua         = $ua->local_address('127.0.0.1');
+
+Local address to bind to. Note that this attribute is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<log>
 

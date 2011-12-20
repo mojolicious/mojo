@@ -10,15 +10,23 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 101;
+plan tests => 104;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
+use IO::Socket::INET;
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
+use Mojolicious::Lite;
 use ojo;
 
 use_ok 'Mojo::UserAgent';
+
+# GET /remote_address
+get '/remote_address' => sub {
+  my $self = shift;
+  $self->render(text => $self->tx->remote_address);
+};
 
 # Make sure user agents dont taint the ioloop
 my $loop = Mojo::IOLoop->singleton;
@@ -37,6 +45,23 @@ $ua = undef;
 $loop->one_tick(0);
 ok !$loop->stream($id), 'loop not tainted';
 is $code, 301, 'right status';
+
+# Fresh user agent
+$ua = Mojo::UserAgent->new;
+
+# Local address
+$ua->app(app);
+my $sock = IO::Socket::INET->new(
+  PeerAddr => 'mojolicio.us',
+  PeerPort => 80,
+  Proto    => 'tcp'
+);
+my $address = $sock->sockhost;
+isnt $address, '127.0.0.1', 'different address';
+$ua->local_address('127.0.0.1')->max_connections(0);
+is $ua->get('/remote_address')->res->body, '127.0.0.1', 'right address';
+$ua->local_address($address);
+is $ua->get('/remote_address')->res->body, $address, 'right address';
 
 # Fresh user agent
 $ua = Mojo::UserAgent->new;

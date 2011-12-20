@@ -97,7 +97,7 @@ sub register {
       # Content
       unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
         @url = (shift);
-        push @_, sub { xml_escape $content}
+        push @_, $content;
       }
 
       # Captures
@@ -289,7 +289,7 @@ sub _input {
 sub _tag {
   my ($self, $name) = (shift, shift);
 
-  # Callback
+  # Content
   my $cb = defined $_[-1] && ref($_[-1]) eq 'CODE' ? pop @_ : undef;
   my $content = pop if @_ % 2;
   $content = xml_escape $content if defined $content;

@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.39    2011-12-20 00:00:00
+        - Deprecated all keep_alive_timeout attributes and parameters in
+          favor of inactivity_timeout.
         - Added EXPERIMENTAL local_address attribute to Mojo::UserAgent.
         - Added EXPERIMENTAL local_address option to
           Mojo::IOLoop::Client->connect.

@@ -18,8 +18,8 @@ has cert => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout => 3;
 has cookie_jar => sub { Mojo::CookieJar->new };
 has [qw/http_proxy https_proxy local_address no_proxy/];
-has ioloop => sub { Mojo::IOLoop->new };
-has keep_alive_timeout => 20;
+has inactivity_timeout => 20;
+has ioloop             => sub { Mojo::IOLoop->new };
 has key                => sub { $ENV{MOJO_KEY_FILE} };
 has log                => sub { Mojo::Log->new };
 has max_connections    => 5;
@@ -70,6 +70,15 @@ sub detect_proxy {
   }
 
   return $self;
+}
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub keep_alive_timeout {
+  warn <<EOF;
+Mojo::UserAgent->keep_alive_timeout is DEPRECATED in favor of
+Mojo::UserAgent->inactivity_timeout!
+EOF
+  shift->inactivity_timeout(@_);
 }
 
 sub need_proxy {
@@ -291,9 +300,9 @@ sub _connect_proxy {
 sub _connected {
   my ($self, $id) = @_;
 
-  # Keep alive timeout
+  # Inactivity timeout
   my $loop = $self->_loop;
-  $loop->stream($id)->timeout($self->keep_alive_timeout);
+  $loop->stream($id)->timeout($self->inactivity_timeout);
 
   # Store connection information in transaction
   my $tx = $self->{connections}->{$id}->{tx};
@@ -692,6 +701,14 @@ Proxy server to use for HTTP and WebSocket requests.
 
 Proxy server to use for HTTPS and WebSocket requests.
 
+=head2 C<inactivity_timeout>
+
+  my $timeout = $ua->inactivity_timeout;
+  $ua         = $ua->inactivity_timeout(15);
+
+Maximum amount of time in seconds a connection can be inactive before getting
+dropped, defaults to C<20>.
+
 =head2 C<ioloop>
 
   my $loop = $ua->ioloop;
@@ -699,14 +716,6 @@ Proxy server to use for HTTPS and WebSocket requests.
 
 Loop object to use for blocking I/O operations, defaults to a L<Mojo::IOLoop>
 object.
-
-=head2 C<keep_alive_timeout>
-
-  my $keep_alive_timeout = $ua->keep_alive_timeout;
-  $ua                    = $ua->keep_alive_timeout(15);
-
-Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to C<20>.
 
 =head2 C<key>
 
@@ -773,8 +782,8 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<websocket_timeout>
 
-  my $websocket_timeout = $ua->websocket_timeout;
-  $ua                   = $ua->websocket_timeout(300);
+  my $timeout = $ua->websocket_timeout;
+  $ua         = $ua->websocket_timeout(300);
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
 before getting dropped, defaults to C<300>.

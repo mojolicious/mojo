@@ -163,13 +163,17 @@ sub _config {
   $daemon->max_clients($c->{clients} || 1000);
   $daemon->group($c->{group}) if $c->{group};
   $daemon->max_requests($c->{keep_alive_requests}      || 25);
-  $daemon->keep_alive_timeout($c->{keep_alive_timeout} || 15);
+  $daemon->inactivity_timeout($c->{inactivity_timeout} || 15);
   $daemon->user($c->{user}) if $c->{user};
   $daemon->websocket_timeout($c->{websocket_timeout} || 300);
   $daemon->ioloop->max_accepts($c->{accepts} || 1000);
   my $listen = $c->{listen} || ['http://*:8080'];
   $listen = [$listen] unless ref $listen;
   $daemon->listen($listen);
+
+  # DEPRECATED in Leaf Fluttering In Wind!
+  $daemon->inactivity_timeout($c->{keep_alive_timeout})
+    if $c->{keep_alive_timeout};
 }
 
 sub _exit { say shift and exit 0 }
@@ -555,18 +559,18 @@ Heartbeat interval in seconds, defaults to C<5>.
 Time in seconds before a worker without a heartbeat will be stopped, defaults
 to C<10>.
 
+=head2 C<inactivity_timeout>
+
+  inactivity_timeout => 10
+
+Maximum amount of time in seconds a connection can be inactive before being
+dropped, defaults to C<15>.
+
 =head2 C<keep_alive_requests>
 
   keep_alive_requests => 50
 
 Number of keep alive requests per connection, defaults to C<25>.
-
-=head2 C<keep_alive_timeout>
-
-  keep_alive_timeout => 10
-
-Maximum amount of time in seconds a connection can be inactive before being
-dropped, defaults to C<15>.
 
 =head2 C<listen>
 

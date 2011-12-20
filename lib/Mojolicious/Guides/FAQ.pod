@@ -84,7 +84,7 @@ To protect your applications from denial-of-service attacks, all connections
 have an inactivity timeout which limits how long a connection may be inactive
 before being dropped automatically. It defaults to C<20> seconds for the user
 agent and C<15> seconds for all built-in servers, and is commonly referred to
-as C<keep_alive_timeout>.
+as C<inactivity_timeout>.
 
 =head2 What does "Premature connection close." mean?
 

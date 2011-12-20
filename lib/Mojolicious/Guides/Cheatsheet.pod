@@ -280,20 +280,6 @@ C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
 
   MOJO_REVERSE_PROXY=1
 
-=head2 C<MOJO_STATIC_CLASS>
-
-Class the L<Mojolicious> static file dispatcher should use to find C<DATA>
-templates, defaults to C<main>.
-
-  MOJO_STATIC_CLASS=MyApp
-
-=head2 C<MOJO_TEMPLATE_CLASS>
-
-Class the L<Mojolicious> renderer should use to find C<DATA> templates,
-defaults to C<main>.
-
-  MOJO_TEMPLATE_CLASS=MyApp
-
 =head2 C<MOJO_TMPDIR>
 
 Directory for temporary files like huge uploads, defaults to using a random

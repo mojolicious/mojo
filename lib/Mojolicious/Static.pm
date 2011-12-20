@@ -9,7 +9,7 @@ use Mojo::Content::Single;
 use Mojo::Home;
 use Mojo::Path;
 
-has default_static_class => sub { $ENV{MOJO_STATIC_CLASS} || 'main' };
+has default_static_class => 'main';
 has 'root';
 
 # "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
@@ -181,8 +181,7 @@ L<Mojolicious::Static> implements the following attributes.
   my $class = $static->default_static_class;
   $static   = $static->default_static_class('main');
 
-Class to use for finding files in C<DATA> section, defaults to the value of
-C<MOJO_STATIC_CLASS> or C<main>.
+Class to use for finding files in C<DATA> section, defaults to C<main>.
 
 =head2 C<root>
 

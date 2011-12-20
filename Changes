@@ -6,6 +6,8 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::IOLoop::Client->connect.
         - Added EXPERIMENTAL close method to Mojo::IOLoop::Stream.
         - Added "hello.pl" and "fast.pl" to example scripts.
+        - Removed MOJO_STATIC_CLASS and MOJO_TEMPLATE_CLASS environment
+          variables.
         - Improved documentation. (marcus, vervain, sri)
         - Improved tests for many environment variables.
         - Fixed small argument bug in client method of Mojo::IOLoop.

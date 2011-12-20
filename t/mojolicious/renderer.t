@@ -1,12 +1,25 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 # "Actually, she wasn't really my girlfriend,
 #  she just lived nextdoor and never closed her curtains."
 use Mojolicious;
 use Mojolicious::Controller;
 use Mojolicious::Renderer;
+use Mojolicious::Static;
+
+# Template class
+my $backup = $ENV{MOJO_TEMPLATE_CLASS} || '';
+$ENV{MOJO_TEMPLATE_CLASS} = 'Foo';
+is(Mojolicious::Renderer->new->default_template_class, 'Foo', 'right value');
+$ENV{MOJO_TEMPLATE_CLASS} = $backup;
+
+# Static class
+$backup = $ENV{MOJO_STATIC_CLASS} || '';
+$ENV{MOJO_STATIC_CLASS} = 'Bar';
+is(Mojolicious::Static->new->default_static_class, 'Bar', 'right value');
+$ENV{MOJO_STATIC_CLASS} = $backup;
 
 # Fresh controller
 my $c = Mojolicious::Controller->new;

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 56;
+use Test::More tests => 57;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
@@ -132,6 +132,12 @@ $asset = $asset->add_chunk('lala');
 ok !$asset->is_file, 'stored in memory';
 $asset = $asset->add_chunk('lala');
 ok !$asset->is_file, 'stored in memory';
+
+# Temporary directory
+$backup = $ENV{MOJO_TMPDIR} || '';
+$ENV{MOJO_TMPDIR} = '/does/not/exist';
+is(Mojo::Asset::File->new->tmpdir, '/does/not/exist', 'right value');
+$ENV{MOJO_TMPDIR} = $backup;
 
 # Temporary file without cleanup
 $file = Mojo::Asset::File->new(cleanup => 0)->add_chunk('test');

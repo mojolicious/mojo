@@ -9,7 +9,8 @@ use Mojo::Content::Single;
 use Mojo::Home;
 use Mojo::Path;
 
-has [qw/default_static_class root/];
+has default_static_class => sub { $ENV{MOJO_STATIC_CLASS} || 'main' };
+has 'root';
 
 # "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {
@@ -134,11 +135,7 @@ sub _get_data_file {
   return if $rel =~ /\.\w+\.\w+$/;
 
   # Detect DATA class
-  my $class =
-       $c->stash->{static_class}
-    || $ENV{MOJO_STATIC_CLASS}
-    || $self->default_static_class
-    || 'main';
+  my $class = $c->stash->{static_class} || $self->default_static_class;
 
   # Find DATA file
   my $data = $self->{data_files}->{$class}
@@ -184,7 +181,8 @@ L<Mojolicious::Static> implements the following attributes.
   my $class = $static->default_static_class;
   $static   = $static->default_static_class('main');
 
-The dispatcher will use this class to look for files in the C<DATA> section.
+Class to use for finding files in C<DATA> section, defaults to the value of
+C<MOJO_STATIC_CLASS> or C<main>.
 
 =head2 C<root>
 

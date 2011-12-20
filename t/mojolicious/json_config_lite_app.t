@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 
 # "Oh, I always feared he might run off like this.
 #  Why, why, why didn't I break his legs?"
@@ -38,13 +38,17 @@ $t->get_ok('/')->status_is(200)->content_is("barbarbar\n");
 
 # No config file, default only
 $config =
-  plugin JSONConfig => {file => 'nonexisted', default => {foo => 'qux'}};
+  plugin JSONConfig => {file => 'nonexistent', default => {foo => 'qux'}};
 is $config->{foo}, 'qux', 'right value';
 is app->config->{foo}, 'qux', 'right value';
 is app->config('foo'), 'qux', 'right value';
 
 # No config file, no default
-ok !(eval { plugin JSONConfig => {file => 'nonexisted'} }), 'no config file';
+ok !(eval { plugin JSONConfig => {file => 'nonexistent'} }), 'no config file';
+my $backup = $ENV{MOJO_CONFIG} || '';
+$ENV{MOJO_CONFIG} = 'nonexistent';
+ok !(eval { plugin 'JSONConfig' }), 'no config file';
+$ENV{MOJO_CONFIG} = $backup;
 
 __DATA__
 @@ index.html.ep

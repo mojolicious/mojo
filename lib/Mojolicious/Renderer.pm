@@ -9,14 +9,15 @@ use Mojo::JSON;
 use Mojo::Util 'encode';
 
 has cache => sub { Mojo::Cache->new };
-has default_format   => 'html';
-has detect_templates => 1;
-has encoding         => 'UTF-8';
-has handlers         => sub { {} };
-has helpers          => sub { {} };
-has layout_prefix    => 'layouts';
-has root             => '/';
-has [qw/default_handler default_template_class/];
+has default_format => 'html';
+has 'default_handler';
+has default_template_class => sub { $ENV{MOJO_TEMPLATE_CLASS} || 'main' };
+has detect_templates       => 1;
+has encoding               => 'UTF-8';
+has handlers => sub { {} };
+has helpers  => sub { {} };
+has layout_prefix => 'layouts';
+has root          => '/';
 
 # "This is not how Xmas is supposed to be.
 #  In my day Xmas was about bringing people together,
@@ -206,10 +207,7 @@ sub _detect_handler {
 #  Please line up in order of how much beryllium it takes to kill you."
 sub _detect_template_class {
   my ($self, $options) = @_;
-       $options->{template_class}
-    || $ENV{MOJO_TEMPLATE_CLASS}
-    || $self->default_template_class
-    || 'main';
+  return $options->{template_class} || $self->default_template_class;
 }
 
 sub _extends {
@@ -309,8 +307,8 @@ C<Embedded Perl> handled by L<Mojolicious::Plugin::EPRenderer>.
   my $default = $renderer->default_template_class;
   $renderer   = $renderer->default_template_class('main');
 
-The renderer will use this class to look for templates in the C<DATA>
-section.
+Class to use for finding templates in C<DATA> section, defaults to the value
+of C<MOJO_TEMPLATE_CLASS> or C<main>.
 
 =head2 C<detect_templates>
 

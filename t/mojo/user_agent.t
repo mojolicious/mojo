@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 70;
+use Test::More tests => 71;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -87,6 +87,12 @@ $ENV{NO_PROXY}    = $backup3;
 $ENV{http_proxy}  = $backup4;
 $ENV{https_proxy} = $backup5;
 $ENV{no_proxy}    = $backup6;
+
+# Max redirects
+$backup = $ENV{MOJO_MAX_REDIRECTS} || '';
+$ENV{MOJO_MAX_REDIRECTS} = 25;
+is(Mojo::UserAgent->new->max_redirects, 25, 'right value');
+$ENV{MOJO_MAX_REDIRECTS} = $backup;
 
 # User agent
 $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);

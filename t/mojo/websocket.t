@@ -6,13 +6,21 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 46;
+use Test::More tests => 47;
 
 # "I can't believe it! Reading and writing actually paid off!"
 use IO::Socket::INET;
 use Mojo::IOLoop;
+use Mojo::Transaction::WebSocket;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
+
+# Max WebSocket size
+my $backup = $ENV{MOJO_MAX_WEBSOCKET_SIZE} || '';
+$ENV{MOJO_MAX_WEBSOCKET_SIZE} = 1024;
+is(Mojo::Transaction::WebSocket->new->max_websocket_size, 1024,
+  'right value');
+$ENV{MOJO_MAX_WEBSOCKET_SIZE} = $backup;
 
 # User agent
 my $ua = app->ua;

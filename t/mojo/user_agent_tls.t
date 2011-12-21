@@ -20,11 +20,8 @@ plan tests => 14;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
 
-# User agent
-my $ua = Mojo::UserAgent->new;
-$ua->log->level('fatal');
-
 # Server
+my $ua   = Mojo::UserAgent->new;
 my $port = $ua->ioloop->generate_port;
 my $err;
 my $id = $ua->ioloop->server(
@@ -74,7 +71,6 @@ is $tx->res->body, 'works!', 'right content';
 
 # Fresh user agent
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
-$ua->log->level('fatal');
 
 # Valid certificate (env)
 my $backup = $ENV{MOJO_CERT_FILE} || '';

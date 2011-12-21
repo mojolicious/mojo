@@ -71,7 +71,6 @@ sub run {
 
   # Fresh user agent
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-  $ua->log->level('fatal');
   $ua->max_redirects(5) if $redirect;
 
   # Absolute URL

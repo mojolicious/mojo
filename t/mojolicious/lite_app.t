@@ -26,9 +26,6 @@ use Mojo::UserAgent;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# User agent
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
-
 # Missing plugin
 eval { plugin 'does_not_exist' };
 is $@, "Plugin \"does_not_exist\" missing, maybe you need to install it?\n",
@@ -541,6 +538,7 @@ my $t = Test::Mojo->new;
 is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
 
 # User agent timer
+my $ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop)->app(app);
 my $timer;
 $tua->ioloop->timer(

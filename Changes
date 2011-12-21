@@ -1,13 +1,15 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.39    2011-12-21 00:00:00
+2.39    2011-12-22 00:00:00
         - Deprecated all keep_alive_timeout attributes and parameters in
           favor of inactivity_timeout.
+        - Added EXPERIMENTAL error event to Mojo::UserAgent.
         - Added EXPERIMENTAL local_address attribute to Mojo::UserAgent.
         - Added EXPERIMENTAL local_address option to
           Mojo::IOLoop::Client->connect.
         - Added EXPERIMENTAL close method to Mojo::IOLoop::Stream.
         - Added "hello.pl" and "fast.pl" to example scripts.
+        - Removed log attribute from Mojo::UserAgent.
         - Removed MOJO_STATIC_CLASS and MOJO_TEMPLATE_CLASS environment
           variables.
         - Improved documentation. (marcus, vervain, sri)
@@ -15,6 +17,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Morbo to ignore hidden directories.
         - Fixed small argument bug in client method of Mojo::IOLoop.
         - Fixed small memory leak in Mojo::IOLoop::Stream.
+        - Fixed multiple small error reporting bugs in Mojo::UserAgent.
         - Fixed online tests to not be affected by geographical location.
           (marcus)
 

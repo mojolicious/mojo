@@ -22,12 +22,6 @@ is(Mojo::Transaction::WebSocket->new->max_websocket_size, 1024,
   'right value');
 $ENV{MOJO_MAX_WEBSOCKET_SIZE} = $backup;
 
-# User agent
-my $ua = app->ua;
-
-# Loop
-my $loop = Mojo::IOLoop->singleton;
-
 # Silence
 app->log->level('fatal');
 
@@ -158,6 +152,7 @@ websocket '/deadcallback' => sub {
 };
 
 # GET /link
+my $ua  = app->ua;
 my $res = $ua->get('/link')->success;
 is $res->code, 200, 'right status';
 like $res->body, qr#ws\://localhost\:\d+/#, 'right content';
@@ -168,6 +163,7 @@ is $res->code,   404,           'right status';
 like $res->body, qr/Not Found/, 'right content';
 
 # WebSocket /
+my $loop = Mojo::IOLoop->singleton;
 my $result;
 $ua->websocket(
   '/' => sub {

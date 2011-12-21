@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Mojo::CookieJar;
 use Mojo::IOLoop;
-use Mojo::Log;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
@@ -21,7 +20,6 @@ has [qw/http_proxy https_proxy local_address no_proxy/];
 has inactivity_timeout => 20;
 has ioloop             => sub { Mojo::IOLoop->new };
 has key                => sub { $ENV{MOJO_KEY_FILE} };
-has log                => sub { Mojo::Log->new };
 has max_connections    => 5;
 has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
 has name               => 'Mojolicious (Perl)';
@@ -140,7 +138,6 @@ sub test_server {
   my $server = $self->_test_server(@_);
   delete $server->{app};
   $server->app($self->app);
-  $self->log($server->app->log);
 
   # Build absolute URL for test server
   return Mojo::URL->new->scheme($self->{scheme})->host('localhost')
@@ -336,9 +333,9 @@ sub _drop {
 }
 
 sub _error {
-  my ($self, $id, $err, $log) = @_;
+  my ($self, $id, $err, $emit) = @_;
   if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->res->error($err) }
-  $self->log->error($err) if $log;
+  $self->emit(error => $err) if $emit;
   $self->_handle($id, $err);
 }
 
@@ -643,6 +640,16 @@ supported transparently and used if installed.
 
 L<Mojo::UserAgent> can emit the following events.
 
+=head2 C<error>
+
+  $ua->on(error => sub {
+    my ($ua, $err) = @_;
+    ...
+  });
+
+Emitted if an error happens that can't be associated with a transaction. Note
+that this event is EXPERIMENTAL and might change without warning!
+
 =head2 C<start>
 
   $ua->on(start => sub {
@@ -732,14 +739,6 @@ environment variable.
 
 Local address to bind to. Note that this attribute is EXPERIMENTAL and might
 change without warning!
-
-=head2 C<log>
-
-  my $log = $ua->log;
-  $ua     = $ua->log(Mojo::Log->new);
-
-A L<Mojo::Log> object used for logging, defaults to the application log or a
-L<Mojo::Log> object.
 
 =head2 C<max_connections>
 

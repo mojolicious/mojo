@@ -35,7 +35,6 @@ sub run {
   # Upload
   my $ua = Mojo::UserAgent->new;
   $ua->detect_proxy;
-  $ua->log->level('fatal');
   my $tx = $ua->post_form(
     "https://$user:$password\@pause.perl.org/pause/authenquery" => {
       HIDDENNAME                        => $user,

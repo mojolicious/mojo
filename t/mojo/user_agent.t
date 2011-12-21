@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 71;
+use Test::More tests => 75;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -94,10 +94,8 @@ $ENV{MOJO_MAX_REDIRECTS} = 25;
 is(Mojo::UserAgent->new->max_redirects, 25, 'right value');
 $ENV{MOJO_MAX_REDIRECTS} = $backup;
 
-# User agent
-$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-
 # GET / (non-blocking)
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my ($success, $code, $body);
 $ua->get(
   '/' => sub {
@@ -112,6 +110,22 @@ Mojo::IOLoop->start;
 ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'works!', 'right content';
+
+# Error in callback
+ok !$ua->has_subscribers('error'), 'no subscribers';
+my $err;
+my $cb = $ua->on(
+  error => sub {
+    $err = pop;
+    Mojo::IOLoop->stop;
+  }
+);
+ok $ua->has_subscribers('error'), 'has subscribers';
+$ua->get('/' => sub { die 'error event works' });
+Mojo::IOLoop->start;
+like $err, qr/error event works/, 'right error';
+$ua->unsubscribe(error => $cb);
+ok !$ua->has_subscribers('error'), 'no subscribers';
 
 # GET / (blocking)
 my $tx = $ua->get('/');
@@ -166,7 +180,7 @@ is $tx->res->body, 'works!', 'right content';
 
 # GET /timeout (built-in server times out)
 my $log = '';
-my $cb  = app->log->subscribers('message')->[0];
+$cb = app->log->subscribers('message')->[0];
 app->log->unsubscribe(message => $cb);
 app->log->level('error');
 app->log->on(message => sub { $log .= pop });

@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 104;
+plan tests => 105;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -67,10 +67,10 @@ is $ua->get('/remote_address')->res->body, $address, 'right address';
 $ua = Mojo::UserAgent->new;
 
 # Connection refused
-$ua->log->level('fatal');
 my $tx = $ua->build_tx(GET => 'http://localhost:99999');
 $ua->start($tx);
 ok !$tx->is_finished, 'transaction is not finished';
+is $tx->error, "Couldn't connect.", 'right error';
 
 # Connection refused
 $tx = $ua->build_tx(GET => 'http://127.0.0.1:99999');
@@ -194,21 +194,21 @@ is $tx->res->code,   200,                 'right status';
 ok $tx->kept_alive, 'connection was kept alive';
 
 # Simple request
-$tx = $ua->get('http://www.apache.org');
-is $tx->req->method, 'GET',                   'right method';
-is $tx->req->url,    'http://www.apache.org', 'right url';
-is $tx->req->body,   '',                      'no content';
-is $tx->res->code,   200,                     'right status';
+$tx = $ua->get('http://www.wikipedia.org');
+is $tx->req->method, 'GET',                      'right method';
+is $tx->req->url,    'http://www.wikipedia.org', 'right url';
+is $tx->req->body,   '',                         'no content';
+is $tx->res->code,   200,                        'right status';
 
 # Simple keep alive requests
 $tx = $ua->get('http://google.com');
 is $tx->req->method, 'GET',               'right method';
 is $tx->req->url,    'http://google.com', 'right url';
 is $tx->res->code,   301,                 'right status';
-$tx = $ua->get('http://www.apache.org');
-is $tx->req->method, 'GET',                   'right method';
-is $tx->req->url,    'http://www.apache.org', 'right url';
-is $tx->res->code,   200,                     'right status';
+$tx = $ua->get('http://www.wikipedia.org');
+is $tx->req->method, 'GET',                      'right method';
+is $tx->req->url,    'http://www.wikipedia.org', 'right url';
+is $tx->res->code,   200,                        'right status';
 ok $tx->kept_alive, 'connection was kept alive';
 $tx = $ua->get('http://www.wikipedia.org');
 is $tx->req->method, 'GET',                      'right method';
@@ -272,13 +272,13 @@ ok $tx->local_port > 0, 'has local port';
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('http://www.apache.org');
+$tx->req->url->parse('http://www.wikipedia.org');
 my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
-$tx2->req->url->parse('http://www.apache.org');
+$tx2->req->url->parse('http://www.wikipedia.org');
 my $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
-$tx3->req->url->parse('http://www.apache.org');
+$tx3->req->url->parse('http://www.wikipedia.org');
 $ua->start($tx);
 $ua->start($tx2);
 $ua->start($tx3);
@@ -288,36 +288,36 @@ ok $tx3->is_finished, 'transaction is finished';
 is $tx->res->code,  200, 'right status';
 is $tx2->res->code, 200, 'right status';
 is $tx3->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Apache/, 'right content';
+like $tx2->res->content->asset->slurp, qr/Wikipedia/i, 'right content';
 
 # Mixed HEAD and GET requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('HEAD');
-$tx->req->url->parse('http://www.apache.org');
+$tx->req->url->parse('http://www.wikipedia.org');
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
-$tx2->req->url->parse('http://www.apache.org');
+$tx2->req->url->parse('http://www.wikipedia.org');
 $ua->start($tx);
 $ua->start($tx2);
 ok $tx->is_finished,  'transaction is finished';
 ok $tx2->is_finished, 'transaction is finished';
 is $tx->res->code,  200, 'right status';
 is $tx2->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Apache/, 'right content';
+like $tx2->res->content->asset->slurp, qr/Wikipedia/i, 'right content';
 
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('http://www.apache.org');
+$tx->req->url->parse('http://www.perl.org');
 $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
-$tx2->req->url->parse('http://www.apache.org');
+$tx2->req->url->parse('http://www.perl.org');
 $tx3 = Mojo::Transaction::HTTP->new;
 $tx3->req->method('GET');
-$tx3->req->url->parse('http://www.apache.org');
+$tx3->req->url->parse('http://www.perl.org');
 my $tx4 = Mojo::Transaction::HTTP->new;
 $tx4->req->method('GET');
-$tx4->req->url->parse('http://www.apache.org');
+$tx4->req->url->parse('http://www.perl.org');
 $ua->start($tx);
 $ua->start($tx2);
 $ua->start($tx3);
@@ -330,4 +330,4 @@ is $tx->res->code,  200, 'right status';
 is $tx2->res->code, 200, 'right status';
 is $tx3->res->code, 200, 'right status';
 is $tx4->res->code, 200, 'right status';
-like $tx2->res->content->asset->slurp, qr/Apache/, 'right content';
+like $tx2->res->content->asset->slurp, qr/Perl/i, 'right content';

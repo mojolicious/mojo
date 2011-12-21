@@ -210,32 +210,32 @@ is $tx->req->method, 'GET',                   'right method';
 is $tx->req->url,    'http://www.apache.org', 'right url';
 is $tx->res->code,   200,                     'right status';
 ok $tx->kept_alive, 'connection was kept alive';
-$tx = $ua->get('http://www.google.de');
+$tx = $ua->get('http://www.wikipedia.org');
 is $tx->req->method, 'GET',                  'right method';
-is $tx->req->url,    'http://www.google.de', 'right url';
+is $tx->req->url,    'http://www.wikipedia.org', 'right url';
 is $tx->res->code,   200,                    'right status';
 
 # Simple requests with redirect
 $ua->max_redirects(3);
-$tx = $ua->get('http://www.google.com');
+$tx = $ua->get('http://wikipedia.org/wiki/Perl');
 $ua->max_redirects(0);
 is $tx->req->method, 'GET',                   'right method';
-is $tx->req->url,    'http://www.google.de/', 'right url';
+is $tx->req->url,    'http://en.wikipedia.org/wiki/Perl', 'right url';
 is $tx->res->code,   200,                     'right status';
 is $tx->previous->req->method, 'GET',                   'right method';
-is $tx->previous->req->url,    'http://www.google.com', 'right url';
-is $tx->previous->res->code,   302,                     'right status';
+is $tx->previous->req->url,    'http://www.wikipedia.org/wiki/Perl', 'right url';
+is $tx->previous->res->code,   301,                     'right status';
 
 # Simple requests with redirect and no callback
 $ua->max_redirects(3);
-$tx = $ua->get('http://www.google.com');
+$tx = $ua->get('http://wikipedia.org/wiki/Perl');
 $ua->max_redirects(0);
 is $tx->req->method, 'GET',                   'right method';
-is $tx->req->url,    'http://www.google.de/', 'right url';
+is $tx->req->url,    'http://en.wikipedia.org/wiki/Perl', 'right url';
 is $tx->res->code,   200,                     'right status';
 is $tx->previous->req->method, 'GET',                   'right method';
-is $tx->previous->req->url,    'http://www.google.com', 'right url';
-is $tx->previous->res->code,   302,                     'right status';
+is $tx->previous->req->url,    'http://www.wikipedia.org/wiki/Perl', 'right url';
+is $tx->previous->res->code,   301,                     'right status';
 
 # Custom chunked request without callback
 $tx = Mojo::Transaction::HTTP->new;

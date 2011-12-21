@@ -15,6 +15,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Morbo to ignore hidden directories.
         - Fixed small argument bug in client method of Mojo::IOLoop.
         - Fixed small memory leak in Mojo::IOLoop::Stream.
+        - Fixed online tests to not be affected by geographical location.
+          (marcus)
 
 2.38    2011-12-17 00:00:00
         - Changed Mojo::IOLoop->client arguments from ($loop, $stream, $err)

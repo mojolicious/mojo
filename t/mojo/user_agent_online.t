@@ -210,32 +210,32 @@ is $tx->req->method, 'GET',                   'right method';
 is $tx->req->url,    'http://www.apache.org', 'right url';
 is $tx->res->code,   200,                     'right status';
 ok $tx->kept_alive, 'connection was kept alive';
-$tx = $ua->get('http://www.google.de');
-is $tx->req->method, 'GET',                  'right method';
-is $tx->req->url,    'http://www.google.de', 'right url';
-is $tx->res->code,   200,                    'right status';
+$tx = $ua->get('http://www.wikipedia.org');
+is $tx->req->method, 'GET',                      'right method';
+is $tx->req->url,    'http://www.wikipedia.org', 'right url';
+is $tx->res->code,   200,                        'right status';
 
 # Simple requests with redirect
 $ua->max_redirects(3);
-$tx = $ua->get('http://www.google.com');
+$tx = $ua->get('http://wikipedia.org/wiki/Perl');
 $ua->max_redirects(0);
-is $tx->req->method, 'GET',                   'right method';
-is $tx->req->url,    'http://www.google.de/', 'right url';
-is $tx->res->code,   200,                     'right status';
-is $tx->previous->req->method, 'GET',                   'right method';
-is $tx->previous->req->url,    'http://www.google.com', 'right url';
-is $tx->previous->res->code,   302,                     'right status';
+is $tx->req->method, 'GET',                               'right method';
+is $tx->req->url,    'http://en.wikipedia.org/wiki/Perl', 'right url';
+is $tx->res->code,   200,                                 'right status';
+is $tx->previous->req->method, 'GET', 'right method';
+is $tx->previous->req->url, 'http://www.wikipedia.org/wiki/Perl', 'right url';
+is $tx->previous->res->code, 301, 'right status';
 
 # Simple requests with redirect and no callback
 $ua->max_redirects(3);
-$tx = $ua->get('http://www.google.com');
+$tx = $ua->get('http://wikipedia.org/wiki/Perl');
 $ua->max_redirects(0);
-is $tx->req->method, 'GET',                   'right method';
-is $tx->req->url,    'http://www.google.de/', 'right url';
-is $tx->res->code,   200,                     'right status';
-is $tx->previous->req->method, 'GET',                   'right method';
-is $tx->previous->req->url,    'http://www.google.com', 'right url';
-is $tx->previous->res->code,   302,                     'right status';
+is $tx->req->method, 'GET',                               'right method';
+is $tx->req->url,    'http://en.wikipedia.org/wiki/Perl', 'right url';
+is $tx->res->code,   200,                                 'right status';
+is $tx->previous->req->method, 'GET', 'right method';
+is $tx->previous->req->url, 'http://www.wikipedia.org/wiki/Perl', 'right url';
+is $tx->previous->res->code, 301, 'right status';
 
 # Custom chunked request without callback
 $tx = Mojo::Transaction::HTTP->new;
@@ -254,14 +254,14 @@ is_deeply [$tx->res->error], ['Bad Request', 400], 'right error';
 # Custom requests with keep alive
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('http://www.apache.org');
+$tx->req->url->parse('http://www.wikipedia.org');
 ok !$tx->kept_alive, 'connection was not kept alive';
 $ua->start($tx);
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->kept_alive,  'connection was kept alive';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('http://www.apache.org');
+$tx->req->url->parse('http://www.wikipedia.org');
 ok !$tx->kept_alive, 'connection was not kept alive';
 $ua->start($tx);
 ok $tx->is_finished,   'transaction is finished';

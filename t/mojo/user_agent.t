@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 75;
+use Test::More tests => 73;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -112,20 +112,20 @@ is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
 # Error in callback
-ok !$ua->has_subscribers('error'), 'no subscribers';
+my $cb = app->log->subscribers('message')->[0];
+app->log->unsubscribe(message => $cb);
+app->log->level('error');
+my $cb2 = app->ua->on(error => sub { Mojo::IOLoop->stop });
+ok app->ua->has_subscribers('error'), 'has subscribers';
 my $err;
-my $cb = $ua->on(
-  error => sub {
-    $err = pop;
-    Mojo::IOLoop->stop;
-  }
-);
-ok $ua->has_subscribers('error'), 'has subscribers';
-$ua->get('/' => sub { die 'error event works' });
+my $cb3 = app->log->on(message => sub { $err .= pop });
+app->ua->get('/' => sub { die 'error event works' });
 Mojo::IOLoop->start;
+app->log->level('fatal');
+app->log->on(message => $cb);
 like $err, qr/error event works/, 'right error';
-$ua->unsubscribe(error => $cb);
-ok !$ua->has_subscribers('error'), 'no subscribers';
+app->ua->unsubscribe(error => $cb2);
+app->log->unsubscribe(message => $cb3);
 
 # GET / (blocking)
 my $tx = $ua->get('/');

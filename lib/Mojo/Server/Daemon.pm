@@ -393,8 +393,7 @@ Group for server process.
   $daemon     = $daemon->inactivity_timeout(5);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to C<15>. Setting the value to C<0> will allow connections
-to be inactive indefinitely.
+dropped, defaults to C<15>.
 
 =head2 C<ioloop>
 
@@ -454,8 +453,7 @@ User for the server process.
   $server     = $server->websocket_timeout(300);
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to C<300>. Setting the value to C<0> will
-allow WebSocket connections to be inactive indefinitely.
+before getting dropped, defaults to C<300>.
 
 =head1 METHODS
 

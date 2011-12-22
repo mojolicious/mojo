@@ -714,7 +714,8 @@ Proxy server to use for HTTPS and WebSocket requests.
   $ua         = $ua->inactivity_timeout(15);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to C<20>.
+dropped, defaults to C<20>. Setting the value to C<0> will allow connections
+to be inactive indefinitely.
 
 =head2 C<ioloop>
 
@@ -785,7 +786,8 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   $ua         = $ua->websocket_timeout(300);
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to C<300>.
+before getting dropped, defaults to C<300>. Setting the value to C<0> will
+allow WebSocket connections to be inactive indefinitely.
 
 =head1 METHODS
 

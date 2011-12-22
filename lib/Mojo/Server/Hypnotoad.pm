@@ -564,7 +564,8 @@ to C<10>.
   inactivity_timeout => 10
 
 Maximum amount of time in seconds a connection can be inactive before being
-dropped, defaults to C<15>.
+dropped, defaults to C<15>. Setting the value to C<0> will allow connections
+to be inactive indefinitely.
 
 =head2 C<keep_alive_requests>
 
@@ -617,7 +618,8 @@ Username for worker processes.
   websocket_timeout => 150
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to C<300>.
+before getting dropped, defaults to C<300>. Setting the value to C<0> will
+allow WebSocket connections to be inactive indefinitely.
 
 =head2 C<workers>
 

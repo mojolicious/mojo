@@ -212,7 +212,7 @@ my ($client, $server, $client_after, $server_before, $server_after) = '';
 Mojo::IOLoop->server(
   {port => $port} => sub {
     my ($loop, $stream) = @_;
-    $stream->on(
+    $stream->timeout(0)->on(
       read => sub {
         my ($stream, $chunk) = @_;
         Mojo::IOLoop->timer(

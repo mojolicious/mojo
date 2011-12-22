@@ -62,8 +62,8 @@ sub resume {
   weaken $self;
   $self->{timer} ||= $watcher->recurring(
     '0.025' => sub {
-      $self->emit_safe('timeout')->close
-        if $self && (time - ($self->{active})) >= $self->timeout;
+      return unless $self && (my $t = $self->timeout);
+      $self->emit_safe('timeout')->close if (time - ($self->{active})) >= $t;
     }
   );
 
@@ -279,7 +279,8 @@ global L<Mojo::IOLoop> singleton.
   $stream     = $stream->timeout(45);
 
 Maximum amount of time in seconds stream can be inactive before getting
-closed automatically, defaults to C<15>. Note that this attribute is
+closed automatically, defaults to C<15>. Setting the value to C<0> will allow
+this stream to be inactive indefinitely. Note that this attribute is
 EXPERIMENTAL and might change without warning!
 
 =head1 METHODS

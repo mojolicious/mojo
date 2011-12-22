@@ -23,16 +23,16 @@ __DATA__
 
 @@ gitignore
 .*
+*~
 !.gitignore
 !.perltidyrc
-*~
 blib
+pm_to_blib
 Makefile*
 !Makefile.PL
-*META.*
 MANIFEST*
 !MANIFEST.SKIP
-pm_to_blib
+*META.*
 
 __END__
 =head1 NAME

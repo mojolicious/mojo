@@ -162,7 +162,7 @@ $t->websocket_ok('/unicode')->send_message_ok('hello again')
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
 $t->websocket_ok('/bytes');
 my $binary;
-my $cb = $t->tx->on(
+$t->tx->on(
   frame => sub {
     my ($ws, $frame) = @_;
     $binary++ if $frame->[1] == 2;

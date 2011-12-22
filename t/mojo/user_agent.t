@@ -111,20 +111,19 @@ ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
-# Error in callback
-my $cb = app->log->subscribers('message')->[0];
-app->log->unsubscribe(message => $cb);
+# Error in callback is logged
+my $message = app->log->subscribers('message')->[0];
+app->log->unsubscribe(message => $message);
 app->log->level('error');
 app->ua->once(error => sub { Mojo::IOLoop->stop });
 ok app->ua->has_subscribers('error'), 'has subscribers';
 my $err;
-my $cb2 = app->log->on(message => sub { $err .= pop });
+app->log->once(message => sub { $err .= pop });
 app->ua->get('/' => sub { die 'error event works' });
 Mojo::IOLoop->start;
 app->log->level('fatal');
-app->log->on(message => $cb);
+app->log->on(message => $message);
 like $err, qr/error event works/, 'right error';
-app->log->unsubscribe(message => $cb2);
 
 # GET / (blocking)
 my $tx = $ua->get('/');
@@ -178,20 +177,20 @@ is $tx->res->body, 'works!', 'right content';
 
 # GET /timeout (built-in server times out)
 my $log = '';
-$cb = app->log->subscribers('message')->[0];
-app->log->unsubscribe(message => $cb);
+$message = app->log->subscribers('message')->[0];
+app->log->unsubscribe(message => $message);
 app->log->level('error');
 app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.5');
 app->log->level('fatal');
-app->log->on(message => $cb);
+app->log->on(message => $message);
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close.', 'right error';
 is $timeout, 1, 'finish event has been emitted';
 like $log, qr/Connection\ timeout\./, 'right log message';
 
 # GET /timeout (client times out)
-$cb = $ua->once(
+$ua->once(
   start => sub {
     my ($ua, $tx) = @_;
     $tx->on(

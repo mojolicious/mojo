@@ -624,7 +624,7 @@ You can also extract all text from nested child elements.
 
 The request can be customized as well.
 
-  $ mojo get --method post --content 'Hello!' http://mojolicio.us
+  $ mojo get --method POST --content 'Hello!' http://mojolicio.us
   $ mojo get --header 'X-Bender: Bite my shiny metal ass!' http://google.com
 
 You can follow redirects and view the headers for all messages.

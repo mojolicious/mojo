@@ -390,24 +390,18 @@ Test::Mojo - Testing Mojo!
 
 =head1 SYNOPSIS
 
-  use Test::More tests => 10;
+  use Test::More tests => 12;
   use Test::Mojo;
 
   my $t = Test::Mojo->new('MyApp');
 
-  $t->get_ok('/welcome')
-    ->status_is(200)
-    ->content_like(qr/Hello!/, 'welcome message');
+  $t->get_ok('/welcome')->status_is(200)->text_is('div#message' => 'Hello!');
 
-  $t->post_form_ok('/search', {title => 'Perl', author => 'taro'})
-    ->status_is(200)
-    ->content_like(qr/Perl.+taro/);
-
-  $t->delete_ok('/something')
+  $t->post_form_ok('/search.json' => {q => 'Perl'})
     ->status_is(200)
     ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
     ->header_isnt('X-Bender' => 'Bite my shiny metal ass!');
-    ->content_is('Hello world!');
+    ->json_is('/results/4/title' => 'Perl rocks!');
 
   $t->websocket_ok('/echo')
     ->send_message_ok('hello')

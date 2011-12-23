@@ -147,7 +147,7 @@ sub run {
   # JSON
   return unless $selector;
   return $self->_json($buffer, $selector)
-    if $tx->res->headers->content_type =~ /JSON/i;
+    if ($tx->res->headers->content_type || '') =~ /JSON/i;
 
   # Selector
   $self->_select($buffer, $charset // $tx->res->content->charset, $selector);
@@ -155,10 +155,11 @@ sub run {
 
 sub _json {
   my ($self, $buffer, $pointer) = @_;
-  my $j = Mojo::JSON->new;
-  return unless my $data = $j->decode($buffer);
+  my $json = Mojo::JSON->new;
+  return unless my $data = $json->decode($buffer);
   return unless $data = Mojo::JSON::Pointer->get($data, $pointer);
-  say ref $data eq 'HASH' || ref $data eq 'ARRAY' ? $j->encode($data) : $data;
+  ref $data eq 'HASH'
+    || ref $data eq 'ARRAY' ? say($json->encode($data)) : _say($data);
 }
 
 sub _say {

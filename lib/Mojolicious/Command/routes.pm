@@ -23,13 +23,9 @@ sub run {
   my $verbose;
   GetOptions(verbose => sub { $verbose = 1 });
 
-  # Check if application has routes
-  my $app = $self->app;
-  die "Application has no routes.\n" unless $app->can('routes');
-
   # Walk and draw
   my $routes = [];
-  $self->_walk($_, 0, $routes) for @{$app->routes->children};
+  $self->_walk($_, 0, $routes) for @{$self->app->routes->children};
   $self->_draw($routes, $verbose);
 }
 

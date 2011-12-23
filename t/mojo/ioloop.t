@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -100,7 +100,8 @@ $loop->recurring(0.5 => sub { $count++ });
 $loop->timer(3 => sub { shift->stop });
 $loop->start;
 $loop->one_tick;
-ok $count > 3, 'more than three recurring events';
+ok $count > 1, 'more than one recurring event';
+ok $count < 10, 'less than ten recurring events';
 
 # Handle
 my $port = Mojo::IOLoop->generate_port;

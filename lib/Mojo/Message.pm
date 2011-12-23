@@ -6,6 +6,7 @@ use Mojo::Asset::Memory;
 use Mojo::Content::Single;
 use Mojo::DOM;
 use Mojo::JSON;
+use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
 use Mojo::Util qw/decode url_unescape/;
@@ -287,9 +288,10 @@ sub is_limit_exceeded {
 sub is_multipart { shift->content->is_multipart }
 
 sub json {
-  my $self = shift;
+  my ($self, $pointer) = @_;
   return if $self->is_multipart;
-  return $self->json_class->new->decode($self->body);
+  my $data = $self->json_class->new->decode($self->body);
+  return $pointer ? Mojo::JSON::Pointer->get($data, $pointer) : $data;
 }
 
 sub leftovers { shift->content->leftovers }
@@ -785,11 +787,15 @@ Check if message content is a L<Mojo::Content::MultiPart> object.
 
   my $object = $message->json;
   my $array  = $message->json;
+  my $value  = $message->json('/foo/bar');
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
-C<undef> otherwise.
+C<undef> otherwise. An optional JSON Pointer can be used to extract a
+specific value. Note that the JSON Pointer argument of this method is
+EXPERIMENTAL and might change without warning!
 
   say $message->json->{foo}->{bar}->[23];
+  say $message->json('/foo/bar/23');
 
 =head2 C<leftovers>
 

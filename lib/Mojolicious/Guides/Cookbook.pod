@@ -601,7 +601,8 @@ Just be aware that the resulting transactions will be in random order.
 
 Don't you hate checking huge HTML files from the command line?
 Thanks to the C<mojo get> command that is about to change. You can just pick
-the parts that actually matter with the CSS3 selectors from L<Mojo::DOM>.
+the parts that actually matter with the CSS3 selectors from L<Mojo::DOM> and
+JSON Pointers from L<Mojo::JSON::Pointer>.
 
   $ mojo get http://mojolicio.us 'head > title'
 
@@ -629,6 +630,10 @@ The request can be customized as well.
 You can follow redirects and view the headers for all messages.
 
   $ mojo get --redirect --verbose http://reddit.com 'head > title'
+
+Extract just the information you really need from JSON data structures.
+
+  $ mojo get http://search.twitter.com/search.json /error
 
 This can be an invaluable tool for testing your applications.
 

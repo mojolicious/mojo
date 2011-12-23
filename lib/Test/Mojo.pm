@@ -164,10 +164,38 @@ sub header_unlike {
 }
 
 sub json_content_is {
-  my ($self, $struct, $desc) = @_;
+  my ($self, $data, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  Test::More::is_deeply $self->tx->res->json, $struct,
+  Test::More::is_deeply $self->tx->res->json, $data,
     $desc || 'exact match for JSON structure';
+  return $self;
+}
+
+sub json_is {
+  my ($self, $p, $data, $desc) = @_;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  Test::More::is_deeply $self->tx->res->json($p),
+    $data, $desc || qq/exact match for JSON Pointer "$p"/;
+  return $self;
+}
+
+sub json_has {
+  my ($self, $p, $desc) = @_;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  Test::More::ok(
+    Mojo::JSON::Pointer->contains($self->tx->res->json, $p),
+    $desc || qq/has value for JSON Pointer "$p"/
+  );
+  return $self;
+}
+
+sub json_hasnt {
+  my ($self, $p, $desc) = @_;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  Test::More::ok(
+    !Mojo::JSON::Pointer->contains($self->tx->res->json, $p),
+    $desc || qq/has no value for JSON Pointer "$p"/
+  );
   return $self;
 }
 
@@ -559,10 +587,36 @@ Opposite of C<header_like>.
 =head2 C<json_content_is>
 
   $t = $t->json_content_is([1, 2, 3]);
-  $t = $t->json_content_is([1, 2, 3], 'right content!');
-  $t = $t->json_content_is({foo => 'bar', baz => 23}, 'right content!');
+  $t = $t->json_content_is([1, 2, 3], 'right content');
+  $t = $t->json_content_is({foo => 'bar', baz => 23}, 'right content');
 
 Check response content for JSON data.
+
+=head2 C<json_is>
+
+  $t = $t->json_is('/foo' => {bar => [1, 2, 3]});
+  $t = $t->json_is('/foo/bar' => [1, 2, 3]);
+  $t = $t->json_is('/foo/bar/1' => 2, 'right value');
+
+Check the value extracted from JSON response using the given JSON Pointer.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+=head2 C<json_has>
+
+  $t = $t->json_has('/foo');
+  $t = $t->json_has('/minibar', 'has a minibar');
+
+Check if JSON response contains a value that can be identified with the given
+JSON Pointer. Note that this method is EXPERIMENTAL and might change without
+warning!
+
+=head2 C<json_hasnt>
+
+  $t = $t->json_hasnt('/foo');
+  $t = $t->json_hasnt('/minibar', 'no minibar');
+
+Opposite of C<json_has>. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 C<max_redirects>
 

@@ -144,7 +144,7 @@ sub run {
   $url = encode 'UTF-8', $url;
   warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
 
-  # JSON
+  # JSON Pointer
   return unless $selector;
   return $self->_json($buffer, $selector)
     if ($tx->res->headers->content_type || '') =~ /JSON/i;

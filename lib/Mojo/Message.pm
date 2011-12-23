@@ -791,8 +791,8 @@ Check if message content is a L<Mojo::Content::MultiPart> object.
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise. An optional JSON Pointer can be used to extract a
-specific value. Note that the JSON Pointer argument of this method is
-EXPERIMENTAL and might change without warning!
+specific value with L<Mojo::JSON::Pointer>. Note that the JSON Pointer
+argument of this method is EXPERIMENTAL and might change without warning!
 
   say $message->json->{foo}->{bar}->[23];
   say $message->json('/foo/bar/23');

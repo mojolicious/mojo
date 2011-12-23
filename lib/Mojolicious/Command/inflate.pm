@@ -2,7 +2,6 @@ package Mojolicious::Command::inflate;
 use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long 'GetOptions';
-use Mojo::Loader;
 use Mojo::Util 'encode';
 
 has description => <<'EOF';
@@ -12,7 +11,6 @@ has usage => <<"EOF";
 usage: $0 inflate [OPTIONS]
 
 These options are available:
-  --class <class>      Class to inflate.
   --public <path>      Path prefix for generated static files, defaults to
                        "public".
   --templates <path>   Path prefix for generated template files, defaults to
@@ -25,21 +23,15 @@ sub run {
 
   # Options
   local @ARGV = @_;
-  my $class     = 'main';
   my $public    = 'public';
   my $templates = 'templates';
   GetOptions(
-    'class=s'     => sub { $class     = $_[1] },
     'public=s'    => sub { $public    = $_[1] },
     'templates=s' => sub { $templates = $_[1] },
   );
 
-  # Load class
-  my $e = Mojo::Loader->load($class);
-  die $e if ref $e;
-
   # Generate
-  my $all = $self->get_all_data($class);
+  my $all = $self->get_all_data($self->app->renderer->default_template_class);
   for my $file (keys %$all) {
     my $prefix = $file =~ /\.\w+\.\w+$/ ? $templates : $public;
     my $path = $self->rel_file("$prefix/$file");

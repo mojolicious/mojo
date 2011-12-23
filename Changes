@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.40    2011-12-24 00:00:00
         - Added EXPERIMENTAL JSON Pointer support. (crab)
         - Improved inactivity timeouts by allowing them to be disabled.
+        - Improved class detection of inflate command.
         - Improved documentation.
         - Fixed repository to not favor specific editors.
 

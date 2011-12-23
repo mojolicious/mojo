@@ -1,7 +1,6 @@
 package Mojolicious::Plugin::EPRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Mojo::Loader;
 use Mojo::Template;
 use Mojo::Util qw/encode md5_sum/;
 

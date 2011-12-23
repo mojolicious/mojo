@@ -735,7 +735,7 @@ $t->get_ok('/without-format')->content_is("/without-format\n");
 $t->get_ok('/without-format.html')->content_is("/without-format\n");
 
 # GET /json_too
-$t->get_ok('/json_too')->status_is(200)->json_is('/' => {hello => 'world'});
+$t->get_ok('/json_too')->status_is(200)->json_content_is({hello => 'world'});
 
 # GET /static.txt (static inline file)
 $t->get_ok('/static.txt')->status_is(200)
@@ -1169,7 +1169,7 @@ is $tx->res->body, '%E1', 'right content';
 $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('application/json')
-  ->json_is('/' => {foo => [1, -2, 3, 'b☃r']})
+  ->json_content_is({foo => [1, -2, 3, 'b☃r']})
   ->json_is('/foo', [1, -2, 3, 'b☃r'])->json_is('/foo/3', 'b☃r')
   ->json_has('/foo')->json_hasnt('/bar');
 

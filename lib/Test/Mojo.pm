@@ -163,11 +163,7 @@ sub header_unlike {
   return $self;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
 sub json_content_is {
-  warn <<EOF;
-Test::Mojo->json_content_is is DEPRECATED in favor of Test::Mojo->json_is!
-EOF
   my ($self, $data, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::is_deeply $self->tx->res->json, $data,
@@ -582,6 +578,14 @@ Check response header for similar match.
 
 Opposite of C<header_like>.
 
+=head2 C<json_content_is>
+
+  $t = $t->json_content_is([1, 2, 3]);
+  $t = $t->json_content_is([1, 2, 3], 'right content');
+  $t = $t->json_content_is({foo => 'bar', baz => 23}, 'right content');
+
+Check response content for JSON data.
+
 =head2 C<json_is>
 
   $t = $t->json_is('/foo' => {bar => [1, 2, 3]});
@@ -591,8 +595,6 @@ Opposite of C<header_like>.
 Check the value extracted from JSON response using the given JSON Pointer
 with L<Mojo::JSON::Pointer>. Note that this method is EXPERIMENTAL and might
 change without warning!
-
-  $t->json_is('/' => [1, 2, 3]);
 
 =head2 C<json_has>
 

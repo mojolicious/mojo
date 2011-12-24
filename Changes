@@ -5,6 +5,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved inactivity timeouts by allowing them to be disabled.
         - Improved class detection of inflate command.
         - Improved documentation.
+        - Fixed small bug in Mojo::IOLoop::Server that prevented TLS tests
+          from running parallel. (nwatkiss)
         - Fixed repository to not favor specific editors.
 
 2.39    2011-12-22 00:00:00

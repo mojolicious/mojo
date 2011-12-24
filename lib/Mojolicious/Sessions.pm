@@ -9,6 +9,7 @@ has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 has secure             => 0;
+has httponly           => 0;
 
 # JSON serializer
 my $JSON = Mojo::JSON->new;
@@ -74,6 +75,7 @@ sub store {
   my $domain = $self->cookie_domain;
   $options->{domain} = $domain if $domain;
   $options->{secure} = 1       if $self->secure;
+  $options->{httponly} = 1     if $self->httponly;
 
   # Session cookie
   $c->signed_cookie($self->cookie_name, $value, $options);
@@ -147,6 +149,16 @@ specific time in epoch seconds.
 
 Set the secure flag on all session cookies, so that browsers send them only
 over HTTPS connections.
+
+=head2 C<httponly>
+
+  my $httponly = $session->httponly;
+  $session     = $session->httponly(1);
+
+Set the httponly flag on all session cookies, so that browsers make them
+available only to HTTP (or HTTPS) transport. In particular, this prevents
+JavaScript access to the cookies, making applications more resilient to some
+forms of Cross-Site Scripting attacks.
 
 =head1 METHODS
 

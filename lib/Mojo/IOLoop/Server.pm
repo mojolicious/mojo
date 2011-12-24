@@ -213,7 +213,7 @@ sub _cert_file {
 
   # Create temporary TLS cert file
   $cert = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    'mojocert.pem');
+    "mojocert-$$.pem");
   croak qq/Can't create temporary TLS cert file "$cert"/
     unless my $file = IO::File->new("> $cert");
   print $file CERT;
@@ -230,7 +230,7 @@ sub _key_file {
 
   # Create temporary TLS key file
   $key = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    'mojokey.pem');
+    "mojokey-$$.pem");
   croak qq/Can't create temporary TLS key file "$key"/
     unless my $file = IO::File->new("> $key");
   print $file KEY;

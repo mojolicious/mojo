@@ -220,12 +220,13 @@ hash or a hash reference with attribute values.
 
 =head2 C<attr>
 
-  __PACKAGE__->attr('name');
-  __PACKAGE__->attr([qw/name1 name2 name3/]);
-  __PACKAGE__->attr(name => 'foo');
-  __PACKAGE__->attr(name => sub {...});
-  __PACKAGE__->attr([qw/name1 name2 name3/] => 'foo');
-  __PACKAGE__->attr([qw/name1 name2 name3/] => sub {...});
+  $instance->attr('name');
+  BaseSubClass->attr('name');
+  BaseSubClass->attr([qw/name1 name2 name3/]);
+  BaseSubClass->attr(name => 'foo');
+  BaseSubClass->attr(name => sub {...});
+  BaseSubClass->attr([qw/name1 name2 name3/] => 'foo');
+  BaseSubClass->attr([qw/name1 name2 name3/] => sub {...});
 
 Create attributes. An arrayref can be used to create more than one attribute.
 Pass an optional second argument to set a default value, it should be a

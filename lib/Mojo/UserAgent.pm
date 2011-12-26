@@ -650,6 +650,11 @@ L<Mojo::UserAgent> can emit the following events.
 Emitted if an error happens that can't be associated with a transaction. Note
 that this event is EXPERIMENTAL and might change without warning!
 
+  $ua->on(error => sub {
+    my ($ua, $err) = @_;
+    say "This looks bad: $err";
+  });
+
 =head2 C<start>
 
   $ua->on(start => sub {

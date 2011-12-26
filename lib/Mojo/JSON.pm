@@ -146,7 +146,7 @@ sub _decode_object {
 
     # Quote
     m/\G$WHITESPACE_RE"/xgc
-      or _exception("Expected string while parsing object");
+      or _exception('Expected string while parsing object');
 
     # Key
     my $key = _decode_string();
@@ -165,7 +165,7 @@ sub _decode_object {
     last if m/\G$WHITESPACE_RE\}/xgc;
 
     # Invalid character
-    _exception(q/Expected comma or right curly bracket while parsing object/);
+    _exception('Expected comma or right curly bracket while parsing object');
   }
 
   return \%hash;

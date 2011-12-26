@@ -32,7 +32,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.40';
+our $VERSION  = '2.41';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -665,7 +665,7 @@ directory.
 
 =head2 Mojolicious Artwork
 
-  Copyright (C) 2010-2011, Sebastian Riedel.
+  Copyright (C) 2010-2012, Sebastian Riedel.
 
 Licensed under the CC-SA License, Version 3.0
 L<http://creativecommons.org/licenses/by-sa/3.0>.
@@ -922,7 +922,7 @@ Zak B. Elep
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2011, Sebastian Riedel.
+Copyright (C) 2008-2012, Sebastian Riedel.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

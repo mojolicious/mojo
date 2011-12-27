@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 260;
+use Test::More tests => 261;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -26,6 +26,7 @@ my $t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
+is $t->app->sessions->httponly, 0, 'HttpOnly attribute defaults to false';
 
 # Foo::fun
 my $url = $t->test_server;

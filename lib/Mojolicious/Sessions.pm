@@ -9,6 +9,7 @@ has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 has secure             => 0;
+has httponly           => 0;
 
 # JSON serializer
 my $JSON = Mojo::JSON->new;
@@ -25,8 +26,9 @@ sub load {
   return unless my $session = $JSON->decode(b64_decode $value);
 
   # Expiration
-  return unless my $expires = delete $session->{expires};
-  return unless $expires > time;
+  my $need_expiration = $self->default_expiration;
+  return if $need_expiration and not my $expires = delete $session->{expires};
+  return if defined $expires and $expires <= time;
 
   # Content
   my $stash = $c->stash;
@@ -53,8 +55,9 @@ sub store {
   delete $session->{new_flash} unless keys %{$session->{new_flash}};
 
   # Default to expiring session
-  my $expires = 1;
-  my $value   = '';
+  my $expiration = $self->default_expiration;
+  my $expires    = 1;
+  my $value      = '';
 
   # Actual session data
   my $default = delete $session->{expires};
@@ -62,7 +65,7 @@ sub store {
 
     # Expiration
     $expires = $session->{expires} = $default
-      ||= time + $self->default_expiration;
+      ||= time + $expiration;
 
     # Serialize
     $value = b64_encode $JSON->encode($session), '';
@@ -75,9 +78,20 @@ sub store {
   my $domain = $self->cookie_domain;
   $options->{domain} = $domain if $domain;
   $options->{secure} = 1       if $self->secure;
+  $options->{httponly} = 1     if $self->httponly;
+
+  # Non-expiration
+  if (not $expiration) {
+    delete $options->{expires};
+    delete $session->{expires};
+  }
 
   # Session cookie
-  $c->signed_cookie($self->cookie_name, $value, $options);
+  my $name = $self->cookie_name;
+  my $previous = $c->cookie($name);
+  if (not $previous or $value ne $previous) {
+    $c->signed_cookie($name, $value, $options);
+  }
 }
 
 1;
@@ -141,6 +155,9 @@ specific time in epoch seconds.
   # Expire a long long time ago
   $c->session(expires => 1);
 
+For non-expiring sessions, set the default expiration to C<0>. Non-expiring
+session cookies expire when the browser is closed.
+
 =head2 C<secure>
 
   my $secure = $session->secure;
@@ -148,6 +165,16 @@ specific time in epoch seconds.
 
 Set the secure flag on all session cookies, so that browsers send them only
 over HTTPS connections.
+
+=head2 C<httponly>
+
+  my $httponly = $session->httponly;
+  $session     = $session->httponly(1);
+
+Set the httponly flag on all session cookies, so that browsers make them
+available only to HTTP (or HTTPS) transport. In particular, this prevents
+JavaScript access to the cookies, making applications more resilient to some
+forms of Cross-Site Scripting attacks.
 
 =head1 METHODS
 

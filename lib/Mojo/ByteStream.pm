@@ -280,8 +280,7 @@ Size of bytestream.
 
   my $collection = $stream->split(',');
 
-Turn bytestream into L<Mojo::Collection>. Note that this method is
-EXPERIMENTAL and might change without warning!
+Turn bytestream into L<Mojo::Collection>.
 
   $stream->split(',')->map(sub { $_->quote })->join("\n")->say;
 

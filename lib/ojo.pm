@@ -112,8 +112,7 @@ Turn string into a L<Mojo::ByteStream> object.
 
   my $collection = c(1, 2, 3);
 
-Turn list into a L<Mojo::Collection> object. Note that this function is
-EXPERIMENTAL and might change without warning!
+Turn list into a L<Mojo::Collection> object.
 
 =head2 C<d>
 

@@ -70,7 +70,8 @@ sub store {
   }
 
   # Options
-  my $options = {expires => $expires, path => $self->cookie_path};
+  my $options =
+    {expires => $expires, httponly => 1, path => $self->cookie_path};
   my $domain = $self->cookie_domain;
   $options->{domain} = $domain if $domain;
   $options->{secure} = 1       if $self->secure;

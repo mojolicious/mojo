@@ -868,8 +868,7 @@ more argument variations.
 
   group {...};
 
-Start a new route group. Note that this function is EXPERIMENTAL and might
-change without warning!
+Start a new route group.
 
 =head2 C<helper>
 

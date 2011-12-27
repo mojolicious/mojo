@@ -1,10 +1,14 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.41    2011-12-28 00:00:00
+        - Removed experimental status from group feature of
+          Mojolicious::Lite.
         - Removed experimental status from Mojo::Collection.
         - Removed experimental status from Mojolicious::Plugin::Mount.
         - Removed experimental status from dnt and etag methods in
           Mojo::Headers.
+        - Improved session cookies to always enable the HttpOnly flag.
+          (nwatkiss, sri)
         - Improved documentation.
 
 2.40    2011-12-24 00:00:00

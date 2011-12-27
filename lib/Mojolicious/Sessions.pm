@@ -86,7 +86,11 @@ sub store {
   }
 
   # Session cookie
-  $c->signed_cookie($self->cookie_name, $value, $options);
+  my $name = $self->cookie_name;
+  my $previous = $c->cookie($name);
+  if (not $previous or $value ne $previous) {
+    $c->signed_cookie($name, $value, $options);
+  }
 }
 
 1;

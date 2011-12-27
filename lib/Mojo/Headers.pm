@@ -341,16 +341,14 @@ Shortcut for the C<Date> header.
   my $dnt  = $headers->dnt;
   $headers = $headers->dnt(1);
 
-Shortcut for the C<DNT> (Do Not Track) header. Note that this method is
-EXPERIMENTAL and might change without warning!
+Shortcut for the C<DNT> (Do Not Track) header.
 
 =head2 C<etag>
 
   my $etag = $headers->etag;
   $headers = $headers->etag('abc321');
 
-Shortcut for the C<ETag> header. Note that this method is EXPERIMENTAL and
-might change without warning!
+Shortcut for the C<ETag> header.
 
 =head2 C<expect>
 

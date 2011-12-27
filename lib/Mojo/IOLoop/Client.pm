@@ -231,8 +231,7 @@ Use an already prepared handle.
 
 =item C<local_address>
 
-Local address to bind to. Note that this option is EXPERIMENTAL and might
-change without warning!
+Local address to bind to.
 
 =item C<port>
 

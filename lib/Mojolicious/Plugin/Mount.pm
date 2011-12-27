@@ -56,8 +56,7 @@ Mojolicious::Plugin::Mount - Application mount plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Mount> is a plugin that allows you to mount whole
-L<Mojolicious> applications. Note that this module is EXPERIMENTAL and might
-change without warning!
+L<Mojolicious> applications.
 
 =head1 METHODS
 

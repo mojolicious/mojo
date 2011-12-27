@@ -249,8 +249,7 @@ Emitted safely if new data arrives on the stream.
   });
 
 Emitted safely if the stream has been inactive for too long and will get
-closed automatically. Note that this event is EXPERIMENTAL and might change
-without warning!
+closed automatically.
 
 =head2 C<write>
 
@@ -280,8 +279,7 @@ global L<Mojo::IOLoop> singleton.
 
 Maximum amount of time in seconds stream can be inactive before getting
 closed automatically, defaults to C<15>. Setting the value to C<0> will allow
-this stream to be inactive indefinitely. Note that this attribute is
-EXPERIMENTAL and might change without warning!
+this stream to be inactive indefinitely.
 
 =head1 METHODS
 

@@ -130,10 +130,6 @@ sub flash {
   $flash = {} unless $flash && ref $flash eq 'HASH';
   $session->{new_flash} = $flash;
 
-  # DEPRECATED in Smiling Face With Sunglasses!
-  warn "Direct hash access to the flash is DEPRECATED!\n" and return $flash
-    unless @_;
-
   # Set
   my $values = @_ > 1 ? {@_} : $_[0];
   $session->{new_flash} = {%$flash, %$values};

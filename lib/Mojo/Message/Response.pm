@@ -82,11 +82,11 @@ sub cookies {
   my $self = shift;
 
   # Add cookies
+  my $headers = $self->headers;
   if (@_) {
     for my $cookie (@_) {
-      $cookie = Mojo::Cookie::Response->new($cookie)
-        if ref $cookie eq 'HASH';
-      $self->headers->add('Set-Cookie', "$cookie");
+      $cookie = Mojo::Cookie::Response->new($cookie) if ref $cookie eq 'HASH';
+      $headers->add('Set-Cookie', "$cookie");
     }
     return $self;
   }
@@ -94,8 +94,7 @@ sub cookies {
   # Parse cookies
   my @cookies;
   push @cookies, @{Mojo::Cookie::Response->parse($_)}
-    for $self->headers->set_cookie;
-
+    for $headers->set_cookie;
   return \@cookies;
 }
 

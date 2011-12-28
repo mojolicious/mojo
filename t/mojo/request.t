@@ -1598,7 +1598,7 @@ ok !$req2->at_least_version('1.2'), 'not version 1.2';
 is $req2->headers->expect, '100-continue', 'right "Expect" value';
 is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req2->headers->content_length, 13, 'right "Content-Length" value';
-is $req2->headers->cookie, 'foo=bar; bar=baz', 'right "Cookie" value';
+is $req2->headers->cookie, 'foo=bar, bar=baz', 'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is defined $req2->cookie('foo'), 1,  'right value';

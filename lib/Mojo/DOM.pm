@@ -632,9 +632,11 @@ Alias for L<Mojo::DOM::HTML/"tree">.
 =head2 C<type>
 
   my $type = $dom->type;
-  $dom     = $dom->type('html');
+  $dom     = $dom->type('div');
 
 Element type.
+
+  say $dom->children->first->type;
 
 =head2 C<xml>
 

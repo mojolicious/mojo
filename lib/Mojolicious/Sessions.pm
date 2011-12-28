@@ -25,8 +25,9 @@ sub load {
   return unless my $session = $JSON->decode(b64_decode $value);
 
   # Expiration
-  return unless my $expires = delete $session->{expires};
-  return unless $expires > time;
+  my $expiration = $self->default_expiration;
+  return if $expiration && !(my $expires = delete $session->{expires});
+  return if defined $expires && $expires <= time;
 
   # Content
   my $stash = $c->stash;
@@ -57,24 +58,25 @@ sub store {
   my $value   = '';
 
   # Actual session data
-  my $default = delete $session->{expires};
+  my $expiration = $self->default_expiration;
+  my $default    = delete $session->{expires};
   if (keys %$session) {
 
     # Expiration
-    $expires = $session->{expires} = $default
-      ||= time + $self->default_expiration;
+    $expires = $session->{expires} = $default || time + $expiration;
 
     # Serialize
     $value = b64_encode $JSON->encode($session), '';
     $value =~ s/\=/\-/g;
   }
+  delete $session->{expires} unless $expiration || $default;
 
   # Options
-  my $options =
-    {expires => $expires, httponly => 1, path => $self->cookie_path};
+  my $options = {httponly => 1, path => $self->cookie_path};
   my $domain = $self->cookie_domain;
-  $options->{domain} = $domain if $domain;
-  $options->{secure} = 1       if $self->secure;
+  $options->{domain}  = $domain  if $domain;
+  $options->{expires} = $expires if $session->{expires};
+  $options->{secure}  = 1        if $self->secure;
 
   # Session cookie
   $c->signed_cookie($self->cookie_name, $value, $options);
@@ -131,9 +133,11 @@ Path for session cookie, defaults to C</>.
   $session = $session->default_expiration(3600);
 
 Time for the session to expire in seconds from now, defaults to C<3600>. The
-expiration timeout gets refreshed for every request. For more control you can
-also use the C<expires> session value to set the expiration date to a
-specific time in epoch seconds.
+expiration timeout gets refreshed for every request. Setting the value to
+C<0> will allow sessions to persist until the browser window is closed, this
+can have security implications though. For more control you can also use the
+C<expires> session value to set the expiration date to a specific time in
+epoch seconds.
 
   # Expire a week from now
   $c->session(expires => time + 604800);

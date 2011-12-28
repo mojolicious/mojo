@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 153;
+use Test::More tests => 154;
 
 # "Let's see how crazy I am now, Nixon. The correct answer is very."
 use Mojo::ByteStream 'b';
@@ -231,7 +231,7 @@ $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
   "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
-is $t->tx->res->cookie('mojolicious')->httponly, 1,
+ok $t->tx->res->cookie('mojolicious')->httponly,
   'session cookie has HttpOnly flag';
 
 # GET /bridge2stash (broken session cookie)
@@ -264,6 +264,8 @@ $t->get_ok('/bridge2stash')->status_is(200)
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
   "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
+ok $t->tx->res->cookie('mojolicious')->expires->epoch < time,
+  'session cookie expires';
 
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)

@@ -12,9 +12,9 @@ my @sunglasses = (qw/on_progress on_read on_request on_resume on_start/);
 
 # DEPRECATED in Leaf Fluttering In Wind!
 my @leaf = (
-  qw/add_hook connect connection_timeout is_done keep_alive_timeout listen/,
-  qw/on_close on_error on_finish on_lock on_process on_read on_unlock/,
-  qw/run_hook run_hook_reverse timeout write/
+  qw/add_hook comment connect connection_timeout is_done keep_alive_timeout/,
+  qw/listen on_close on_error on_finish on_lock on_process on_read/,
+  qw/on_unlock port run_hook run_hook_reverse timeout version write/
 );
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.

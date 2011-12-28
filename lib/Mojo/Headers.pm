@@ -13,7 +13,7 @@ my @HEADERS = (
   qw/Expires Host If-Modified-Since Last-Modified Location/,
   qw/Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept/,
   qw/Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol/,
-  qw/Sec-WebSocket-Version Server Set-Cookie Set-Cookie2 Status Trailer/,
+  qw/Sec-WebSocket-Version Server Set-Cookie Status Trailer/,
   qw/Transfer-Encoding Upgrade User-Agent WWW-Authenticate X-Forwarded-For/,
 );
 {
@@ -530,13 +530,6 @@ Shortcut for the C<Server> header.
   $headers       = $headers->set_cookie('f=b; Version=1; Path=/');
 
 Shortcut for the C<Set-Cookie> header.
-
-=head2 C<set_cookie2>
-
-  my $set_cookie2 = $headers->set_cookie2;
-  $headers        = $headers->set_cookie2('f=b; Version=1; Path=/');
-
-Shortcut for the C<Set-Cookie2> header.
 
 =head2 C<status>
 

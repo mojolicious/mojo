@@ -4,10 +4,12 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util 'quote';
 
-has [qw/comment domain httponly max_age port secure/];
+has [qw/domain httponly max_age secure/];
 
-my $FIELD_RE =
-  qr/(Comment|Domain|expires|HttpOnly|Max-Age|Path|Port|Secure|Version)/msi;
+my $FIELD_RE = qr/(Domain|expires|HttpOnly|Max-Age|Path|Secure)/msi;
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub comment { warn "Mojo::Cookie::Response->comment is DEPRECATED!\n" }
 
 sub expires {
   my ($self, $expires) = @_;
@@ -19,9 +21,8 @@ sub expires {
   }
 
   # Upgrade
-  return unless defined $self->{expires};
   $self->{expires} = Mojo::Date->new($self->{expires})
-    unless ref $self->{expires};
+    if defined $self->{expires} && !ref $self->{expires};
 
   return $self->{expires};
 }
@@ -61,10 +62,13 @@ sub parse {
   return \@cookies;
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
+sub port { warn "Mojo::Cookie::Response->port is DEPRECATED!\n" }
+
 sub to_string {
   my $self = shift;
 
-  # Version
+  # Name and value
   return '' unless $self->name;
   my $cookie = $self->name;
   my $value  = $self->value;
@@ -72,7 +76,6 @@ sub to_string {
     $cookie .= '=' . ($value =~ /[,;"]/ ? quote($value) : $value);
   }
   else { $cookie .= '=' }
-  $cookie .= sprintf "; Version=%d", ($self->version || 1);
 
   # Domain
   if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
@@ -86,17 +89,11 @@ sub to_string {
   # Expires
   if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
 
-  # Port
-  if (my $port = $self->port) { $cookie .= qq/; Port="$port"/ }
-
   # Secure
   if (my $secure = $self->secure) { $cookie .= "; Secure" }
 
   # HttpOnly
   if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
-
-  # Comment
-  if (my $comment = $self->comment) { $cookie .= "; Comment=$comment" }
 
   return $cookie;
 }
@@ -126,13 +123,6 @@ L<Mojo::Cookie::Response> is a container for HTTP 1.1 response cookies.
 L<Mojo::Cookie::Response> inherits all attributes from L<Mojo::Cookie> and
 implements the followign new ones.
 
-=head2 C<comment>
-
-  my $comment = $cookie->comment;
-  $cookie     = $cookie->comment('test 123');
-
-Cookie comment.
-
 =head2 C<domain>
 
   my $domain = $cookie->domain;
@@ -145,7 +135,8 @@ Cookie domain.
   my $httponly = $cookie->httponly;
   $cookie      = $cookie->httponly(1);
 
-HTTP only flag.
+HttpOnly flag, which can prevent client side scripts from accessing this
+cookie.
 
 =head2 C<max_age>
 
@@ -154,19 +145,13 @@ HTTP only flag.
 
 Max age for cookie in seconds.
 
-=head2 C<port>
-
-  my $port = $cookie->port;
-  $cookie  = $cookie->port('80 8080');
-
-Cookie port.
-
 =head2 C<secure>
 
   my $secure = $cookie->secure;
   $cookie    = $cookie->secure(1);
 
-Secure flag.
+Secure flag, which instructs browsers to only send this cookie over HTTPS
+connections.
 
 =head1 METHODS
 
@@ -182,7 +167,7 @@ Expiration for cookie in seconds.
 
 =head2 C<parse>
 
-  my $cookies = $cookie->parse('f=b; Version=1; Path=/');
+  my $cookies = $cookie->parse('f=b; Path=/');
 
 Parse cookies.
 

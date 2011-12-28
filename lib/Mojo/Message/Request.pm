@@ -44,7 +44,7 @@ sub cookies {
     my $cookies = shift;
     $cookies = Mojo::Cookie::Request->new($cookies)
       if ref $cookies eq 'HASH';
-    $cookies = $cookies->to_string_with_prefix;
+    $cookies = $cookies->to_string;
     for my $cookie (@_) {
       $cookie = Mojo::Cookie::Request->new($cookie)
         if ref $cookie eq 'HASH';

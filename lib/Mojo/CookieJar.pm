@@ -87,17 +87,14 @@ sub find {
       push @new, $cookie;
 
       # Taste cookie
-      my $port = $url->port || 80;
-      next if $cookie->port && $port != $cookie->port;
       next if $cookie->secure && $url->scheme ne 'https';
       my $cpath = $cookie->path;
       push @found,
         Mojo::Cookie::Request->new(
-        name    => $cookie->name,
-        value   => $cookie->value,
-        path    => $cookie->path,
-        version => $cookie->version,
-        secure  => $cookie->secure
+        name   => $cookie->name,
+        value  => $cookie->value,
+        path   => $cookie->path,
+        secure => $cookie->secure
         ) if $path =~ /^$cpath/;
     }
 

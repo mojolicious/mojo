@@ -91,15 +91,10 @@ sub cookies {
     return $self;
   }
 
-  # Set-Cookie2
+  # Parse cookies
   my @cookies;
-  my $headers = $self->headers;
   push @cookies, @{Mojo::Cookie::Response->parse($_)}
-    for $headers->set_cookie2;
-
-  # Set-Cookie
-  push @cookies, @{Mojo::Cookie::Response->parse($_)}
-    for $headers->set_cookie;
+    for $self->headers->set_cookie;
 
   return \@cookies;
 }

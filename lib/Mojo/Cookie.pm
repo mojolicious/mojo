@@ -8,7 +8,7 @@ use overload
 use Carp 'croak';
 use Mojo::Util 'unquote';
 
-has [qw/name path value version/];
+has [qw/name path value/];
 
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
 my $NAME_RE             = qr/
@@ -33,6 +33,9 @@ my $VALUE_RE     = qr/
 #  He may be a liar, a pig, an idiot, a communist,
 #  but he is not a porn star."
 sub to_string { croak 'Method "to_string" not implemented by subclass' }
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub version { warn "Mojo::Cookie->version is DEPRECATED!\n" }
 
 sub _tokenize {
   my ($self, $string) = @_;
@@ -113,13 +116,6 @@ Cookie path.
   $cookie   = $cookie->value('/test');
 
 Cookie value.
-
-=head2 C<version>
-
-  my $version = $cookie->version;
-  $cookie     = $cookie->version(1);
-
-Cookie version.
 
 =head1 METHODS
 

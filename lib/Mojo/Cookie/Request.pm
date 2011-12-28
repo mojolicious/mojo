@@ -11,7 +11,6 @@ sub parse {
 
   # Walk tree
   my @cookies;
-  my $version = 0;
   for my $knot ($self->_tokenize($string)) {
     for my $token (@{$knot}) {
       my ($name, $value) = @{$token};
@@ -19,26 +18,19 @@ sub parse {
       # Path
       if ($name =~ /^\$Path$/i) { $cookies[-1]->path($value) }
 
-      # Version
-      elsif ($name =~ /^\$Version$/i) { $version = $value }
+      # Garbage
+      elsif ($name =~ /^\$/) {next}
 
       # Name and value
       else {
         push @cookies, Mojo::Cookie::Request->new;
         $cookies[-1]->name($name);
         $cookies[-1]->value($value //= '');
-        $cookies[-1]->version($version);
       }
     }
   }
 
   return \@cookies;
-}
-
-sub prefix {
-  my $self = shift;
-  my $version = $self->version || 1;
-  return "\$Version=$version";
 }
 
 sub to_string {
@@ -54,13 +46,6 @@ sub to_string {
   if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
   return $cookie;
-}
-
-sub to_string_with_prefix {
-  my $self   = shift;
-  my $prefix = $self->prefix;
-  my $cookie = $self->to_string;
-  return "$prefix; $cookie";
 }
 
 1;
@@ -94,27 +79,15 @@ implements the following new ones.
 
 =head2 C<parse>
 
-  my $cookies = $cookie->parse('$Version=1; f=b; $Path=/');
+  my $cookies = $cookie->parse('f=b; $Path=/');
 
 Parse cookies.
-
-=head2 C<prefix>
-
-  my $prefix = $cookie->prefix;
-
-Prefix for cookies.
 
 =head2 C<to_string>
 
   my $string = $cookie->to_string;
 
 Render cookie.
-
-=head2 C<to_string_with_prefix>
-
-  my $string = $cookie->to_string_with_prefix;
-
-Render cookie with prefix.
 
 =head1 SEE ALSO
 

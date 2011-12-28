@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 269;
+use Test::More tests => 268;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -8,7 +8,6 @@ use Test::More tests => 269;
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
-use Mojo::Cookie::Response;
 use Mojo::Headers;
 
 use_ok 'Mojo::Message::Response';
@@ -393,10 +392,9 @@ is $res->headers->content_length, 27, 'right "Content-Length" value';
 is $res->headers->set_cookie, 'foo=bar; Version=1; Path=/test',
   'right "Set-Cookie" value';
 my $cookies = $res->cookies;
-is $cookies->[0]->name,    'foo',   'right name';
-is $cookies->[0]->value,   'bar',   'right value';
-is $cookies->[0]->version, 1,       'right version';
-is $cookies->[0]->path,    '/test', 'right path';
+is $cookies->[0]->name,  'foo',   'right name';
+is $cookies->[0]->value, 'bar',   'right value';
+is $cookies->[0]->path,  '/test', 'right path';
 is $res->cookie('foo')->value, 'bar',   'right value';
 is $res->cookie('foo')->path,  '/test', 'right path';
 
@@ -451,15 +449,9 @@ $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res->cookies(
-  {name => 'foo', value => 'bar', path => '/foobar'},
-  {name => 'bar', value => 'baz', path => '/test/23'}
-);
-$res->headers->set_cookie2(
-  Mojo::Cookie::Response->new(
-    name  => 'baz',
-    value => 'yada',
-    path  => '/foobar'
-  )
+  {name => 'foo', value => 'bar',  path => '/foobar'},
+  {name => 'bar', value => 'baz',  path => '/test/23'},
+  {name => 'baz', value => 'yada', path => '/foobar'}
 );
 ok !!$res->to_string, 'message built';
 my $res2 = Mojo::Message::Response->new;

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 87;
+use Test::More tests => 83;
 
 # "Hello, my name is Mr. Burns. I believe you have a letter for me.
 #  Okay Mr. Burns, what’s your first name.
@@ -280,24 +280,6 @@ $jar->add(
 @cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
 is $cookies[0]->name,  'foo',  'right name';
 is $cookies[0]->value, 'bar2', 'right value';
-is $cookies[1], undef, 'no second cookie';
-
-# Non-standard port
-$jar = Mojo::CookieJar->new;
-$jar->add(
-  Mojo::Cookie::Response->new(
-    domain => 'kraih.com',
-    path   => '/foo',
-    name   => 'foo',
-    value  => 'bar',
-    port   => 88
-  )
-);
-@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
-is $cookies[0], undef, 'no cookie for port 80';
-@cookies = $jar->find(Mojo::URL->new('http://kraih.com:88/foo'));
-is $cookies[0]->name,  'foo', 'right name';
-is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
 # Switch between secure and normal cookies

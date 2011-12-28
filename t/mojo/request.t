@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 934;
+use Test::More tests => 932;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -1598,8 +1598,7 @@ ok !$req2->at_least_version('1.2'), 'not version 1.2';
 is $req2->headers->expect, '100-continue', 'right "Expect" value';
 is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req2->headers->content_length, 13, 'right "Content-Length" value';
-is $req2->headers->cookie,
-  '$Version=1; foo=bar; $Path=/foobar; bar=baz; $Path=/test/23',
+is $req2->headers->cookie, 'foo=bar; $Path=/foobar; bar=baz; $Path=/test/23',
   'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
@@ -1660,14 +1659,12 @@ is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
 my $cookies = $req->cookies;
-is $cookies->[0]->name,    'foo',      'right name';
-is $cookies->[0]->value,   'bar',      'right value';
-is $cookies->[0]->version, 1,          'right version';
-is $cookies->[0]->path,    '/foobar',  'right path';
-is $cookies->[1]->name,    'bar',      'right name';
-is $cookies->[1]->value,   'baz',      'right value';
-is $cookies->[1]->version, 1,          'right version';
-is $cookies->[1]->path,    '/test/23', 'right path';
+is $cookies->[0]->name,  'foo',      'right name';
+is $cookies->[0]->value, 'bar',      'right value';
+is $cookies->[0]->path,  '/foobar',  'right path';
+is $cookies->[1]->name,  'bar',      'right name';
+is $cookies->[1]->value, 'baz',      'right value';
+is $cookies->[1]->path,  '/test/23', 'right path';
 
 # WebKit multipart/form-data request
 $req = Mojo::Message::Request->new;

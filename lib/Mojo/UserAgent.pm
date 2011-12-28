@@ -487,10 +487,7 @@ sub _test_server {
   my ($self, $scheme) = @_;
 
   # Fresh start
-  if ($scheme) {
-    delete $self->{port};
-    delete $self->{server};
-  }
+  delete $self->{port} if $scheme;
 
   # Start test server
   unless ($self->{port}) {

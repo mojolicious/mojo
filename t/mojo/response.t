@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 268;
+use Test::More tests => 269;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -462,15 +462,16 @@ is $res2->version,     '1.1', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res2->headers->content_length, 0, 'right "Content-Length" value';
-is defined $res2->cookie('foo'), 1, 'right value';
-is defined $res2->cookie('baz'), 1, 'right value';
-is defined $res2->cookie('bar'), 1, 'right value';
+ok defined $res2->cookie('foo'),   'cookie "foo" exists';
+ok defined $res2->cookie('bar'),   'cookie "bar" exists';
+ok defined $res2->cookie('baz'),   'cookie "baz" exists';
+ok !defined $res2->cookie('yada'), 'cookie "yada" does not exist';
 is $res2->cookie('foo')->path,  '/foobar',  'right path';
 is $res2->cookie('foo')->value, 'bar',      'right value';
-is $res2->cookie('baz')->path,  '/foobar',  'right path';
-is $res2->cookie('baz')->value, 'yada',     'right value';
 is $res2->cookie('bar')->path,  '/test/23', 'right path';
 is $res2->cookie('bar')->value, 'baz',      'right value';
+is $res2->cookie('baz')->path,  '/foobar',  'right path';
+is $res2->cookie('baz')->value, 'yada',     'right value';
 
 # Build response with callback (make sure it's called)
 $res = Mojo::Message::Response->new;

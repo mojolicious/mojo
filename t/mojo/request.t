@@ -1591,10 +1591,10 @@ is $req2->headers->cookie, 'foo=bar; bar=baz; baz=yada',
   'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is defined $req2->cookie('foo'),  1,  'right value';
-is defined $req2->cookie('bar'),  1,  'right value';
-is defined $req2->cookie('baz'),  1,  'right value';
-is defined $req2->cookie('yada'), '', 'no value';
+ok defined $req2->cookie('foo'),   'cookie "foo" exists';
+ok defined $req2->cookie('bar'),   'cookie "bar" exists';
+ok defined $req2->cookie('baz'),   'cookie "baz" exists';
+ok !defined $req2->cookie('yada'), 'cookie "yada" does not exist';
 is $req2->cookie('foo')->value, 'bar',  'right value';
 is $req2->cookie('bar')->value, 'baz',  'right value';
 is $req2->cookie('baz')->value, 'yada', 'right value';

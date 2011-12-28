@@ -15,7 +15,7 @@ sub parse {
     for my $token (@{$knot}) {
       my ($name, $value) = @{$token};
 
-      # Garbage
+      # Garbage (RFC 2965)
       next if $name =~ /^\$/;
 
       # Name and value
@@ -30,15 +30,10 @@ sub parse {
 
 sub to_string {
   my $self = shift;
-
-  return '' unless $self->name;
-  my $cookie = $self->name;
-  my $value  = $self->value;
-  if (defined $value) {
-    $cookie .= '=' . ($value =~ /[,;"]/ ? quote($value) : $value);
-  }
-  else { $cookie .= '=' }
-
+  return '' unless my $cookie = $self->name;
+  $cookie .= '=';
+  my $value = $self->value;
+  $cookie .= $value =~ /[,;"]/ ? quote($value) : $value if defined $value;
   return $cookie;
 }
 

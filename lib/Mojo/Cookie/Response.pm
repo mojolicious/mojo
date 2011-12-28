@@ -6,7 +6,7 @@ use Mojo::Util 'quote';
 
 has [qw/domain httponly max_age path secure/];
 
-my $FIELD_RE = qr/(Domain|expires|HttpOnly|Max-Age|Path|Secure)/msi;
+my $ATTR_RE = qr/(Domain|expires|HttpOnly|Max-Age|Path|Secure)/msi;
 
 # DEPRECATED in Leaf Fluttering In Wind!
 sub comment { warn "Mojo::Cookie::Response->comment is DEPRECATED!\n" }
@@ -40,21 +40,16 @@ sub parse {
       my ($name, $value) = @{$knot->[$i]};
 
       # This will only run once
-      if (not $i) {
+      if (!$i) {
         push @cookies, Mojo::Cookie::Response->new;
         $cookies[-1]->name($name);
         $cookies[-1]->value($value //= '');
-        next;
       }
 
-      # Field
-      if (my @match = $name =~ $FIELD_RE) {
-
-        # Underscore
-        (my $id = lc $match[0]) =~ tr/-/_/;
-
-        # Flag
-        $cookies[-1]->$id($id =~ /(?:Secure|HttpOnly)/i ? 1 : $value);
+      # Attributes
+      elsif (my @match = $name =~ $ATTR_RE) {
+        (my $attr = lc $match[0]) =~ tr/-/_/;
+        $cookies[-1]->$attr($attr =~ /(?:Secure|HttpOnly)/i ? 1 : $value);
       }
     }
   }
@@ -69,13 +64,10 @@ sub to_string {
   my $self = shift;
 
   # Name and value
-  return '' unless $self->name;
-  my $cookie = $self->name;
-  my $value  = $self->value;
-  if (defined $value) {
-    $cookie .= '=' . ($value =~ /[,;"]/ ? quote($value) : $value);
-  }
-  else { $cookie .= '=' }
+  return '' unless my $cookie = $self->name;
+  $cookie .= '=';
+  my $value = $self->value;
+  $cookie .= $value =~ /[,;"]/ ? quote($value) : $value if defined $value;
 
   # Domain
   if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
@@ -169,6 +161,7 @@ implements the following new ones.
 
   my $expires = $cookie->expires;
   $cookie     = $cookie->expires(time + 60);
+  $cookie     = $cookie->expires(Mojo::Date->new(time + 60));
 
 Expiration for cookie in seconds.
 

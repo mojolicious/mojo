@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.42    2011-12-29 00:00:00
+        - Improved RFC 6265 compliance of generated request headers.
         - Improved documentation.
 
 2.41    2011-12-28 00:00:00

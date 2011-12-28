@@ -42,10 +42,12 @@ sub cookies {
   # Add cookies
   my $headers = $self->headers;
   if (@_) {
+    my @cookies = $headers->cookie || ();
     for my $cookie (@_) {
       $cookie = Mojo::Cookie::Request->new($cookie) if ref $cookie eq 'HASH';
-      $self->headers->add('Cookie', "$cookie");
+      push @cookies, $cookie;
     }
+    $headers->cookie(join('; ', @cookies));
     return $self;
   }
 

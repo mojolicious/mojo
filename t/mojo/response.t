@@ -449,10 +449,10 @@ $res = Mojo::Message::Response->new;
 $res->code(404);
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res->cookies(
-  {name => 'foo', value => 'bar',  path => '/foobar'},
-  {name => 'bar', value => 'baz',  path => '/test/23'},
-  {name => 'baz', value => 'yada', path => '/foobar'}
+  {name => 'foo', value => 'bar', path => '/foobar'},
+  {name => 'bar', value => 'baz', path => '/test/23'}
 );
+$res->cookies({name => 'baz', value => 'yada', path => '/foobar'});
 ok !!$res->to_string, 'message built';
 my $res2 = Mojo::Message::Response->new;
 $res2->parse($res->to_string);

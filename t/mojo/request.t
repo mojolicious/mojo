@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 928;
+use Test::More tests => 930;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -1572,20 +1572,9 @@ $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1/foo/bar');
 $req->headers->expect('100-continue');
-$req->cookies(
-  Mojo::Cookie::Request->new(
-    name  => 'foo',
-    value => 'bar',
-    path  => '/foobar'
-
-  ),
-  Mojo::Cookie::Request->new(
-    name  => 'bar',
-    value => 'baz',
-    path  => '/test/23'
-
-  )
-);
+$req->cookies({name => 'foo', value => 'bar'},
+  {name => 'bar', value => 'baz'});
+$req->cookies(Mojo::Cookie::Request->new(name => 'baz', value => 'yada'));
 $req->body("Hello World!\n");
 ok !!$req->to_string, 'message built';
 $req2 = Mojo::Message::Request->new;
@@ -1598,14 +1587,17 @@ ok !$req2->at_least_version('1.2'), 'not version 1.2';
 is $req2->headers->expect, '100-continue', 'right "Expect" value';
 is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req2->headers->content_length, 13, 'right "Content-Length" value';
-is $req2->headers->cookie, 'foo=bar, bar=baz', 'right "Cookie" value';
+is $req2->headers->cookie, 'foo=bar; bar=baz; baz=yada',
+  'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is defined $req2->cookie('foo'), 1,  'right value';
-is defined $req2->cookie('baz'), '', 'no value';
-is defined $req2->cookie('bar'), 1,  'right value';
-is $req2->cookie('foo')->value, 'bar', 'right value';
-is $req2->cookie('bar')->value, 'baz', 'right value';
+is defined $req2->cookie('foo'),  1,  'right value';
+is defined $req2->cookie('bar'),  1,  'right value';
+is defined $req2->cookie('baz'),  1,  'right value';
+is defined $req2->cookie('yada'), '', 'no value';
+is $req2->cookie('foo')->value, 'bar',  'right value';
+is $req2->cookie('bar')->value, 'baz',  'right value';
+is $req2->cookie('baz')->value, 'yada', 'right value';
 is $req2->body, "Hello World!\n", 'right content';
 
 # Parse full HTTP 1.0 request with cookies and progress callback

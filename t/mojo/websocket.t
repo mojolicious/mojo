@@ -16,11 +16,11 @@ use Mojo::UserAgent;
 use Mojolicious::Lite;
 
 # Max WebSocket size
-my $backup = $ENV{MOJO_MAX_WEBSOCKET_SIZE} || '';
-$ENV{MOJO_MAX_WEBSOCKET_SIZE} = 1024;
-is(Mojo::Transaction::WebSocket->new->max_websocket_size, 1024,
-  'right value');
-$ENV{MOJO_MAX_WEBSOCKET_SIZE} = $backup;
+{
+  local $ENV{MOJO_MAX_WEBSOCKET_SIZE} = 1024;
+  is(Mojo::Transaction::WebSocket->new->max_websocket_size,
+    1024, 'right value');
+}
 
 # Silence
 app->log->level('fatal');

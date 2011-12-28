@@ -11,18 +11,18 @@ use List::Util 'first';
 use_ok 'Mojo::Home';
 
 # ENV detection
-my $backup = $ENV{MOJO_HOME} || '';
-$ENV{MOJO_HOME} = '.';
-my $home = Mojo::Home->new->detect;
-is_deeply [split /\\|\//, File::Spec->canonpath($home->to_string)],
-  [split /\\|\//, File::Spec->canonpath(realpath cwd())],
-  'right path detected';
-$ENV{MOJO_HOME} = $backup;
+{
+  local $ENV{MOJO_HOME} = '.';
+  my $home = Mojo::Home->new->detect;
+  is_deeply [split /\\|\//, File::Spec->canonpath($home->to_string)],
+    [split /\\|\//, File::Spec->canonpath(realpath cwd())],
+    'right path detected';
+}
 
 # Class detection
 my $original =
   File::Spec->catdir(File::Spec->splitdir($FindBin::Bin), '..', '..');
-$home = Mojo::Home->new->detect;
+my $home   = Mojo::Home->new->detect;
 my $target = realpath $original;
 is_deeply [split /\\|\//, $target], [split /\\|\//, $home],
   'right path detected';

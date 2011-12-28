@@ -250,10 +250,10 @@ too!works!!!
 EOF
 
 # GET / (full external application with domain and reverse proxy)
-my $backup = $ENV{MOJO_REVERSE_PROXY};
-$ENV{MOJO_REVERSE_PROXY} = 1;
-$t->get_ok('/' => {'X-Forwarded-Host' => 'mojolicious.org'})->status_is(200)
-  ->content_is(<<'EOF');
+{
+  local $ENV{MOJO_REVERSE_PROXY} = 1;
+  $t->get_ok('/' => {'X-Forwarded-Host' => 'mojolicious.org'})->status_is(200)
+    ->content_is(<<'EOF');
 works!
 
 too!works!!!
@@ -261,18 +261,18 @@ too!works!!!
   <input type="submit" value="☃" />
 </form>
 EOF
-$ENV{MOJO_REVERSE_PROXY} = $backup;
+}
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is('mojolicious.org');
 
 # GET /host (full external application with domain and reverse proxy)
-$backup = $ENV{MOJO_REVERSE_PROXY};
-$ENV{MOJO_REVERSE_PROXY} = 1;
-$t->get_ok('/host' => {'X-Forwarded-Host' => 'mojolicious.org'})
-  ->status_is(200)->content_is('mojolicious.org');
-$ENV{MOJO_REVERSE_PROXY} = $backup;
+{
+  local $ENV{MOJO_REVERSE_PROXY} = 1;
+  $t->get_ok('/host' => {'X-Forwarded-Host' => 'mojolicious.org'})
+    ->status_is(200)->content_is('mojolicious.org');
+}
 
 # GET /host (full external application with domain and no reverse proxy)
 $t->get_ok(

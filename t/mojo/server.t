@@ -21,11 +21,11 @@ my $app = $server->new(app_class => 'Mojo::TestServerViaApp')->app;
 isa_ok $app, 'Mojo::TestServerViaApp', 'right object';
 
 # Test setting the class name through the environment
-my $backup = $ENV{MOJO_APP} || '';
-$ENV{MOJO_APP} = 'Mojo::TestServerViaEnv';
-$app = $server->new->app;
-isa_ok $app, 'Mojo::TestServerViaEnv', 'right object';
-$ENV{MOJO_APP} = $backup;
+{
+  local $ENV{MOJO_APP} = 'Mojo::TestServerViaEnv';
+  $app = $server->new->app;
+  isa_ok $app, 'Mojo::TestServerViaEnv', 'right object';
+}
 
 # Test the default
 $app = $server->new->app;

@@ -44,11 +44,12 @@ is app->config->{foo}, 'qux', 'right value';
 is app->config('foo'), 'qux', 'right value';
 
 # No config file, no default
-ok !(eval { plugin JSONConfig => {file => 'nonexistent'} }), 'no config file';
-my $backup = $ENV{MOJO_CONFIG} || '';
-$ENV{MOJO_CONFIG} = 'nonexistent';
-ok !(eval { plugin 'JSONConfig' }), 'no config file';
-$ENV{MOJO_CONFIG} = $backup;
+{
+  ok !(eval { plugin JSONConfig => {file => 'nonexistent'} }),
+    'no config file';
+  local $ENV{MOJO_CONFIG} = 'nonexistent';
+  ok !(eval { plugin 'JSONConfig' }), 'no config file';
+}
 
 __DATA__
 @@ index.html.ep

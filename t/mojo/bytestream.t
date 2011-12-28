@@ -376,10 +376,10 @@ is $stream->split('/')->map(sub { shift->quote })->join(', '),
 my $buffer = '';
 open my $handle, '>', \$buffer;
 b('te', 'st')->say($handle);
-my $backup = *STDOUT;
+my $stdout = *STDOUT;
 *STDOUT = $handle;
 b(1, 2, 3)->say;
-*STDOUT = $backup;
+*STDOUT = $stdout;
 is $buffer, "test\n123\n", 'right output';
 
 # Nested bytestreams

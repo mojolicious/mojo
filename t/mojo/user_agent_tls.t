@@ -73,16 +73,14 @@ is $tx->res->body, 'works!', 'right content';
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
 
 # Valid certificate (env)
-my $backup = $ENV{MOJO_CERT_FILE} || '';
-$ENV{MOJO_CERT_FILE} = 't/mojo/certs/client.crt';
-my $backup2 = $ENV{MOJO_KEY_FILE} || '';
-$ENV{MOJO_KEY_FILE} = 't/mojo/certs/client.key';
-$tx = $ua->get("https://localhost:$port");
-ok $tx->success, 'successful';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
-$ENV{MOJO_CERT_FILE} = $backup;
-$ENV{MOJO_KEY_FILE}  = $backup2;
+{
+  local $ENV{MOJO_CERT_FILE} = 't/mojo/certs/client.crt';
+  local $ENV{MOJO_KEY_FILE}  = 't/mojo/certs/client.key';
+  $tx = $ua->get("https://localhost:$port");
+  ok $tx->success, 'successful';
+  is $tx->res->code, 200,      'right status';
+  is $tx->res->body, 'works!', 'right content';
+}
 
 # Invalid certificate
 $tx =

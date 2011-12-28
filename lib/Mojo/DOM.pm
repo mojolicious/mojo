@@ -636,7 +636,7 @@ Alias for L<Mojo::DOM::HTML/"tree">.
 
 Element type.
 
-  say $dom->children->first->type;
+  $dom->children->each(sub { say $_->type });
 
 =head2 C<xml>
 

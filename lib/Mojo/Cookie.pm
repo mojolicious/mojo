@@ -8,7 +8,7 @@ use overload
 use Carp 'croak';
 use Mojo::Util 'unquote';
 
-has [qw/name path value/];
+has [qw/name value/];
 
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
 my $NAME_RE             = qr/
@@ -102,13 +102,6 @@ L<Mojo::Cookie> implements the following attributes.
   $cookie  = $cookie->name('foo');
 
 Cookie name.
-
-=head2 C<path>
-
-  my $path = $cookie->path;
-  $cookie  = $cookie->path('/test');
-
-Cookie path.
 
 =head2 C<value>
 

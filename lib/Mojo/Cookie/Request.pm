@@ -15,18 +15,13 @@ sub parse {
     for my $token (@{$knot}) {
       my ($name, $value) = @{$token};
 
-      # Path
-      if ($name =~ /^\$Path$/i) { $cookies[-1]->path($value) }
-
       # Garbage
-      elsif ($name =~ /^\$/) {next}
+      next if $name =~ /^\$/;
 
       # Name and value
-      else {
-        push @cookies, Mojo::Cookie::Request->new;
-        $cookies[-1]->name($name);
-        $cookies[-1]->value($value //= '');
-      }
+      push @cookies, Mojo::Cookie::Request->new;
+      $cookies[-1]->name($name);
+      $cookies[-1]->value($value //= '');
     }
   }
 
@@ -43,7 +38,6 @@ sub to_string {
     $cookie .= '=' . ($value =~ /[,;"]/ ? quote($value) : $value);
   }
   else { $cookie .= '=' }
-  if (my $path = $self->path) { $cookie .= "; \$Path=$path" }
 
   return $cookie;
 }
@@ -79,7 +73,7 @@ implements the following new ones.
 
 =head2 C<parse>
 
-  my $cookies = $cookie->parse('f=b; $Path=/');
+  my $cookies = $cookie->parse('f=b; g=a');
 
 Parse cookies.
 

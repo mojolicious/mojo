@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 932;
+use Test::More tests => 928;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -1598,17 +1598,14 @@ ok !$req2->at_least_version('1.2'), 'not version 1.2';
 is $req2->headers->expect, '100-continue', 'right "Expect" value';
 is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req2->headers->content_length, 13, 'right "Content-Length" value';
-is $req2->headers->cookie, 'foo=bar; $Path=/foobar; bar=baz; $Path=/test/23',
-  'right "Cookie" value';
+is $req2->headers->cookie, 'foo=bar; bar=baz', 'right "Cookie" value';
 is $req2->url, '/foo/bar', 'right URL';
 is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is defined $req2->cookie('foo'), 1,  'right value';
 is defined $req2->cookie('baz'), '', 'no value';
 is defined $req2->cookie('bar'), 1,  'right value';
-is $req2->cookie('foo')->path,  '/foobar',  'right path';
-is $req2->cookie('foo')->value, 'bar',      'right value';
-is $req2->cookie('bar')->path,  '/test/23', 'right path';
-is $req2->cookie('bar')->value, 'baz',      'right value';
+is $req2->cookie('foo')->value, 'bar', 'right value';
+is $req2->cookie('bar')->value, 'baz', 'right value';
 is $req2->body, "Hello World!\n", 'right content';
 
 # Parse full HTTP 1.0 request with cookies and progress callback
@@ -1659,12 +1656,10 @@ is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27, 'right "Content-Length" value';
 my $cookies = $req->cookies;
-is $cookies->[0]->name,  'foo',      'right name';
-is $cookies->[0]->value, 'bar',      'right value';
-is $cookies->[0]->path,  '/foobar',  'right path';
-is $cookies->[1]->name,  'bar',      'right name';
-is $cookies->[1]->value, 'baz',      'right value';
-is $cookies->[1]->path,  '/test/23', 'right path';
+is $cookies->[0]->name,  'foo', 'right name';
+is $cookies->[0]->value, 'bar', 'right value';
+is $cookies->[1]->name,  'bar', 'right name';
+is $cookies->[1]->value, 'baz', 'right value';
 
 # WebKit multipart/form-data request
 $req = Mojo::Message::Request->new;

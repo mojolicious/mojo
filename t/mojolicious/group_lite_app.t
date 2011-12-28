@@ -225,12 +225,12 @@ $t->get_ok('/param_auth/too?name=Bender')->status_is(200)
 
 # GET /bridge2stash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!!\n");
+  ->content_is("stash too!!!!!!!\n");
 
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!\n");
 ok $t->tx->res->cookie('mojolicious')->httponly,
   'session cookie has HttpOnly flag';
 
@@ -240,12 +240,12 @@ my $session = b("☃☃☃☃☃")->encode->b64_encode('');
 my $hmac    = $session->clone->hmac_md5_sum($t->app->secret);
 my $broken  = "\$Version=1; mojolicious=$session--$hmac; \$Path=/";
 $t->get_ok('/bridge2stash' => {Cookie => $broken})->status_is(200)
-  ->content_is("stash too!!!!!!!/!\n");
+  ->content_is("stash too!!!!!!!\n");
 
 # GET /bridge2stash (fresh start)
 $t->reset_session;
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!!\n");
+  ->content_is("stash too!!!!!!!\n");
 
 # GET /mojolicious-white.png
 # GET /mojolicious-black.png
@@ -258,18 +258,18 @@ $t->get_ok('/mojolicious-black.png')->status_is(200);
 # GET /bridge2stash (with cookies, session and flash again)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!\n");
 
 # GET /bridge2stash (with cookies and session but no flash)
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!\n");
 ok $t->tx->res->cookie('mojolicious')->expires->epoch < time,
   'session cookie expires';
 
 # GET /bridge2stash (with cookies and session cleared)
 $t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!!\n");
+  ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!\n");
 
 # GET /late/session (late session does not affect rendering)
 $t->get_ok('/late/session')->status_is(200)->content_is('not yet!');
@@ -289,17 +289,17 @@ $t->get_ok('/with/under/count', {'X-Bender' => 'Rodriguez'})->status_is(200)
 # GET /bridge2stash (again)
 $t->get_ok('/bridge2stash', {'X-Flash' => 1})->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!\n");
 
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!/!\n");
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!\n");
 
 # GET /bridge2stash (with cookies and session but no flash)
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!/!\n");
+  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!\n");
 
 # GET /possible
 $t->get_ok('/possible')->status_is(200)
@@ -382,7 +382,7 @@ Not Bender!
 <%= stash('_name') %> too!<%= $self->cookie('foo') %>!\
 <%= $self->signed_cookie('bar')%>!<%= $self->signed_cookie('bad')%>!\
 <%= $self->cookie('bad') %>!<%= session 'foo' %>!\
-<%= flash 'foo' %>!<%= $cookie->path if $cookie %>!
+<%= flash 'foo' %>!
 % $self->session(foo => 'session');
 % my $headers = $self->req->headers;
 % $self->flash(foo => 'flash') if $headers->header('X-Flash');

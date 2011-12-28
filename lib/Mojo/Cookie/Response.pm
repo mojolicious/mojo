@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util 'quote';
 
-has [qw/domain httponly max_age secure/];
+has [qw/domain httponly max_age path secure/];
 
 my $FIELD_RE = qr/(Domain|expires|HttpOnly|Max-Age|Path|Secure)/msi;
 
@@ -144,6 +144,13 @@ cookie.
   $cookie     = $cookie->max_age(60);
 
 Max age for cookie in seconds.
+
+=head2 C<path>
+
+  my $path = $cookie->path;
+  $cookie  = $cookie->path('/test');
+
+Cookie path.
 
 =head2 C<secure>
 

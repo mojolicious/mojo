@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 260;
+use Test::More tests => 261;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -26,6 +26,7 @@ my $t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
+is $t->app->sessions->cookie_path,   '/bar',         'right path';
 
 # Foo::fun
 my $url = $t->test_server;
@@ -334,8 +335,8 @@ $t->get_ok('/shortcut/act')->status_is(200)
 
 # Session with domain
 $t->get_ok('/foo/session')->status_is(200)
-  ->header_unlike('Set-Cookie', qr/foo/)
   ->header_like('Set-Cookie' => qr/; Domain=\.example\.com/)
+  ->header_like('Set-Cookie' => qr|; Path=/bar|)
   ->content_is('Bender rockzzz!');
 
 # Mixed formats

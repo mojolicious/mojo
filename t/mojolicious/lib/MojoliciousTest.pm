@@ -37,8 +37,9 @@ sub startup {
     }
   );
 
-  # Session domain
+  # Session
   $self->sessions->cookie_domain('.example.com');
+  $self->sessions->cookie_path('/bar');
 
   # Routes
   my $r = $self->routes;

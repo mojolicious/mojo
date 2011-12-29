@@ -26,7 +26,7 @@ sub load {
 
   # Expiration
   my $expiration = $self->default_expiration;
-  return if $expiration && !(my $expires = delete $session->{expires});
+  return if !(my $expires = delete $session->{expires}) && $expiration;
   return if defined $expires && $expires <= time;
 
   # Content
@@ -53,32 +53,24 @@ sub store {
     if $stash->{'mojo.static'};
   delete $session->{new_flash} unless keys %{$session->{new_flash}};
 
-  # Default to expiring session
-  my $expires = 1;
-  my $value   = '';
-
-  # Actual session data
+  # Expiration
   my $expiration = $self->default_expiration;
   my $default    = delete $session->{expires};
-  if (keys %$session) {
+  $session->{expires} = $default || time + $expiration
+    if $expiration || $default;
 
-    # Expiration
-    $expires = $session->{expires} = $default || time + $expiration;
-
-    # Serialize
-    $value = b64_encode $JSON->encode($session), '';
-    $value =~ s/\=/\-/g;
-  }
-  delete $session->{expires} unless $expiration || $default;
-
-  # Options
-  my $options = {httponly => 1, path => $self->cookie_path};
-  my $domain = $self->cookie_domain;
-  $options->{domain}  = $domain  if $domain;
-  $options->{expires} = $expires if $session->{expires};
-  $options->{secure}  = 1        if $self->secure;
+  # Serialize
+  my $value = b64_encode $JSON->encode($session), '';
+  $value =~ s/\=/\-/g;
 
   # Session cookie
+  my $options = {
+    domain   => $self->cookie_domain,
+    expires  => $session->{expires},
+    httponly => 1,
+    path     => $self->cookie_path,
+    secure   => $self->secure
+  };
   $c->signed_cookie($self->cookie_name, $value, $options);
 }
 

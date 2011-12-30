@@ -762,6 +762,9 @@ to do is add a new C<handler>.
 
       # Pass the rendered result back to the renderer
       $$output = 'The rendered result';
+
+      # Return true if rendering succeeded and false if it didn't
+      return 1;
     }
   );
 

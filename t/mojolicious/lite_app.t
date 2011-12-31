@@ -833,9 +833,9 @@ $t->get_ok('/regex/in/template')->status_is(200)
   ->content_is("test(test)(\\Qtest\\E)(\n");
 
 # GET /stream (with basic auth)
-$t->get_ok($t->ua->test_server->userinfo('sri:foo')->path('/stream')
-    ->query(foo => 'bar'))->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
+$t->get_ok(
+  $t->ua->app_url->userinfo('sri:foo')->path('/stream')->query(foo => 'bar'))
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr#^foobarsri\:foohttp://localhost\:\d+/stream$#);
 

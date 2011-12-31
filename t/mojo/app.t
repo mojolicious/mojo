@@ -65,7 +65,7 @@ $app->routes->post(
 $app->routes->any('/*whatever' => {text => 'Your Mojo is working!'});
 
 # Continue
-my $port   = $ua->test_server->port;
+my $port   = $ua->app_url->port;
 my $buffer = '';
 my $id;
 $id = Mojo::IOLoop->client(

@@ -29,7 +29,7 @@ is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
 
 # Foo::fun
-my $url = $t->ua->test_server;
+my $url = $t->ua->app_url;
 $url->path('/fun/time');
 $t->get_ok($url, {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
   ->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
@@ -98,7 +98,7 @@ $t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
   ->content_is('Have fun!');
 
 # Foo::fun
-$url = $t->ua->test_server;
+$url = $t->ua->app_url;
 $url->path('/fun/time');
 $t->get_ok($url, {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')

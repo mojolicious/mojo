@@ -52,6 +52,18 @@ sub app {
   return $self->{app};
 }
 
+sub app_url {
+  my $self = shift;
+
+  # Prepare application for testing
+  my $server = $self->_server(@_);
+  delete $server->{app};
+  $server->app($self->app);
+
+  # Build absolute URL for test server
+  return Mojo::URL->new("$self->{scheme}://localhost:$self->{port}/");
+}
+
 sub build_form_tx      { shift->transactor->form(@_) }
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
@@ -128,18 +140,6 @@ sub start {
   $self->ioloop->start;
 
   return $tx;
-}
-
-sub test_server {
-  my $self = shift;
-
-  # Prepare application for testing
-  my $server = $self->_server(@_);
-  delete $server->{app};
-  $server->app($self->app);
-
-  # Build absolute URL for test server
-  return Mojo::URL->new("$self->{scheme}://localhost:$self->{port}/");
 }
 
 sub websocket {
@@ -466,7 +466,7 @@ sub _start {
   if ($self->app) {
     my $req = $tx->req;
     my $url = $req->url->to_abs;
-    $req->url($url->base($self->test_server)->to_abs) unless $url->host;
+    $req->url($url->base($self->app_url)->to_abs) unless $url->host;
   }
 
   # Proxy
@@ -807,6 +807,17 @@ L<Mojolicious> object.
   $ua->app->log->level('fatal');
   $ua->app->defaults(testing => 'oh yea!');
 
+=head2 C<app_url>
+
+  my $url = $ua->app_url;
+  my $url = $ua->app_url('http');
+  my $url = $ua->app_url('https');
+
+Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
+Note that this method is EXPERIMENTAL and might change without warning!
+
+  say $ua->app_url->port;
+
 =head2 C<build_form_tx>
 
   my $tx = $ua->build_form_tx('http://kraih.com/foo' => {test => 123});
@@ -947,16 +958,6 @@ transactions non-blocking.
     Mojo::IOLoop->stop;
   });
   Mojo::IOLoop->start;
-
-=head2 C<test_server>
-
-  my $url = $ua->test_server;
-  my $url = $ua->test_server('http');
-  my $url = $ua->test_server('https');
-
-Starts a test server for C<app> if necessary and returns absolute
-L<Mojo::URL> object for it. Note that this method is EXPERIMENTAL and might
-change without warning!
 
 =head2 C<websocket>
 

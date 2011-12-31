@@ -200,7 +200,7 @@ ok $body =~ /^(\d+)failed!$/, 'right content';
 ok $1 < 100, 'right timeout';
 
 # WebSocket /socket (using an already prepared socket)
-my $port     = $ua->test_server->port;
+my $port     = $ua->app_url->port;
 my $tx       = $ua->build_websocket_tx('ws://lalala/socket');
 my $finished = 0;
 $tx->on(finish => sub { $finished++ });

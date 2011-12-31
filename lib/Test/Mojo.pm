@@ -430,7 +430,7 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
 
 User agent used for testing, defaults to a L<Mojo::UserAgent> object.
 
-  $t->get_ok($t->ua->test_server->userinfo('sri:secr3t')->path('/secrets'));
+  $t->get_ok($t->ua->app_url->userinfo('sri:secr3t')->path('/secrets'));
 
 =head1 METHODS
 

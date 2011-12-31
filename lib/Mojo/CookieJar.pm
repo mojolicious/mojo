@@ -112,9 +112,11 @@ sub inject {
 
   # Take delicious cookies from the jar
   return unless keys %{$self->{jar}};
-  my $req = $tx->req;
-  my $url = $req->url->clone;
-  if (my $host = $req->headers->host) { $url->host($host) }
+  my $req     = $tx->req;
+  my $url     = $req->url->clone;
+  my $headers = $req->headers;
+  $url->scheme('https') if $headers->header('X-Forwarded-HTTPS');
+  if (my $host = $headers->host) { $url->host($host) }
   $req->cookies($self->find($url));
 }
 
@@ -180,7 +182,8 @@ Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 
   $jar = $jar->inject($tx);
 
-Inject request cookies into transaction.
+Inject request cookies into transaction, the C<X-Forwarded-HTTPS> header can
+be used to emulate a secure connection.
 
 =head1 SEE ALSO
 

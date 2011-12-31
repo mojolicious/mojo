@@ -286,8 +286,6 @@ sub status_isnt {
   return $self;
 }
 
-sub test_server { shift->ua->test_server(@_) }
-
 sub text_is {
   my ($self, $selector, $value, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -429,6 +427,8 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
   $t     = $t->ua(Mojo::UserAgent->new);
 
 User agent used for testing, defaults to a L<Mojo::UserAgent> object.
+
+  $t->get_ok($t->ua->test_server->userinfo('sri:secr3t')->path('/secrets'));
 
 =head1 METHODS
 
@@ -698,17 +698,6 @@ Check response status for exact match.
   $t = $t->status_isnt(200);
 
 Opposite of C<status_is>.
-
-=head2 C<test_server>
-
-  my $url = $t->test_server;
-  my $url = $t->test_server('http');
-  my $url = $t->test_server('https');
-
-Alias for L<Mojo::UserAgent/"test_server">. Note that this method is
-EXPERIMENTAL and might change without warning!
-
-  $t->get_ok($t->test_server->userinfo('sri:secr3t')->path('/protected'));
 
 =head2 C<text_is>
 

@@ -300,7 +300,7 @@ is $longpoll, 'finished!', 'finished';
 
 # GET /longpoll (interrupted)
 $longpoll = undef;
-my $port = $t->test_server->port;
+my $port = $t->ua->test_server->port;
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;

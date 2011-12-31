@@ -134,12 +134,12 @@ sub test_server {
   my $self = shift;
 
   # Prepare application for testing
-  my $server = $self->_server;
+  my $server = $self->_server(@_);
   delete $server->{app};
   $server->app($self->app);
 
   # Build absolute URL for test server
-  return Mojo::URL->new("http://localhost:$self->{port}/");
+  return Mojo::URL->new("$self->{scheme}://localhost:$self->{port}/");
 }
 
 sub websocket {
@@ -439,18 +439,22 @@ sub _redirect {
 }
 
 sub _server {
-  my $self = shift;
+  my ($self, $scheme) = @_;
+
+  # Restart with different scheme
+  delete $self->{port}   if $scheme;
+  return $self->{server} if $self->{port};
 
   # Start test server
-  return $self->{server} if $self->{port};
   my $loop   = $self->_loop;
   my $server = $self->{server} =
     Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
   my $port = $self->{port} = $loop->generate_port;
   die "Couldn't find a free TCP port for testing.\n" unless $port;
-  $server->listen(["http://*:$port"]);
+  $self->{scheme} = $scheme ||= 'http';
+  $server->listen(["$scheme://*:$port"]);
   $server->prepare_ioloop;
-  warn "TEST SERVER STARTED (http://*:$port)\n" if DEBUG;
+  warn "TEST SERVER STARTED ($scheme://*:$port)\n" if DEBUG;
 
   return $server;
 }
@@ -947,6 +951,8 @@ transactions non-blocking.
 =head2 C<test_server>
 
   my $url = $ua->test_server;
+  my $url = $ua->test_server('http');
+  my $url = $ua->test_server('https');
 
 Starts a test server for C<app> if necessary and returns absolute
 L<Mojo::URL> object for it. Note that this method is EXPERIMENTAL and might

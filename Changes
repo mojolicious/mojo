@@ -1,10 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.42    2011-12-31 00:00:00
+        - Deprecated Test::Mojo->max_redirects.
         - Removed exprimental status from respond_to method in
           Mojolicious::Controller.
         - Removed test_server method from Test::Mojo.
-        - Removed scheme argument from test_server method in Mojo::UserAgent.
         - Improved RFC 6265 compliance of generated request headers.
         - Improved documentation.
         - Fixed bug that prevented sessions without expiration.

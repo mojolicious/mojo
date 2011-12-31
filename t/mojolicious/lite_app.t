@@ -1270,7 +1270,7 @@ $t->get_ok('/static_render')->status_is(200)
   ->content_is('Hello Mojo from a static file!');
 
 # GET /redirect_named (with redirecting enabled in user agent)
-$t->max_redirects(3);
+$t->ua->max_redirects(3);
 $t->get_ok('/redirect_named')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -1278,7 +1278,7 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->element_exists_not('#bar')->text_isnt('div' => 'Redirect')
   ->text_is('div' => 'Redirect works!')->text_unlike('[id="foo"]' => qr/Foo/)
   ->text_like('[id="foo"]' => qr/^Redirect/);
-$t->max_redirects(0);
+$t->ua->max_redirects(0);
 Test::Mojo->new->tx($t->tx->previous)->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')

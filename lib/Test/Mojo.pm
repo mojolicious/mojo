@@ -199,7 +199,9 @@ sub json_hasnt {
   return $self;
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
 sub max_redirects {
+  warn "Test::Mojo->max_redirects is DEPRECATED!\n";
   my $self = shift;
   return $self->ua->max_redirects unless @_;
   $self->ua->max_redirects(@_);
@@ -612,13 +614,6 @@ EXPERIMENTAL and might change without warning!
 
 Opposite of C<json_has>. Note that this method is EXPERIMENTAL and might
 change without warning!
-
-=head2 C<max_redirects>
-
-  my $max_redirects = $t->max_redirects;
-  $t                = $t->max_redirects(3);
-
-Alias for the L<Mojo::UserAgent/"max_redirects">.
 
 =head2 C<message_is>
 

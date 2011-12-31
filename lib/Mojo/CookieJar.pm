@@ -182,8 +182,7 @@ Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 
   $jar = $jar->inject($tx);
 
-Inject request cookies into transaction, the C<X-Forwarded-HTTPS> header can
-be used to emulate a secure connection.
+Inject request cookies into transaction.
 
 =head1 SEE ALSO
 

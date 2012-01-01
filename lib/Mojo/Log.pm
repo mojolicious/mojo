@@ -124,8 +124,7 @@ L<Mojo::Log> can emit the following events.
     ...
   });
 
-Emitted when a new message gets logged. Note that this event is EXPERIMENTAL
-and might change without warning!
+Emitted when a new message gets logged.
 
   $log->unsubscribe('message');
   $log->on(message => sub {

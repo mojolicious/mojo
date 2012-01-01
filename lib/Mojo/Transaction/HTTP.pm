@@ -91,15 +91,6 @@ sub keep_alive {
   return 1;
 }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_request {
-  warn <<EOF;
-Mojo::Transaction::HTTP->on_request is DEPRECATED in favor of
-Mojo::Transaction::HTTP->on!
-EOF
-  shift->on(request => shift);
-}
-
 sub server_leftovers {
   my $self = shift;
 

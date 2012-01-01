@@ -95,7 +95,6 @@ emit the following new ones.
   });
 
 Emitted when content gets upgraded to a L<Mojo::Content::MultiPart> object.
-Note that this event is EXPERIMENTAL and might change without warning!
 
   $single->on(upgrade => sub {
     my ($single, $multi) = @_;
@@ -122,8 +121,7 @@ C<auto_upgrade> enabled.
   $single     = $single->auto_upgrade(0);
 
 Try to detect multipart content and automatically upgrade to a
-L<Mojo::Content::MultiPart> object, defaults to C<1>. Note that this
-attribute is EXPERIMENTAL and might change without warning!
+L<Mojo::Content::MultiPart> object, defaults to C<1>.
 
 =head1 METHODS
 

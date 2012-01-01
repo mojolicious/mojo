@@ -97,14 +97,6 @@ sub need_proxy {
   return 1;
 }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_start {
-  warn <<EOF;
-Mojo::UserAgent->on_start is DEPRECATED in favor of Mojo::UserAgent->on!
-EOF
-  shift->on(start => shift);
-}
-
 sub post_form {
   my $self = shift;
   $self->start($self->build_form_tx(@_));
@@ -641,8 +633,7 @@ L<Mojo::UserAgent> can emit the following events.
     ...
   });
 
-Emitted if an error happens that can't be associated with a transaction. Note
-that this event is EXPERIMENTAL and might change without warning!
+Emitted if an error happens that can't be associated with a transaction.
 
   $ua->on(error => sub {
     my ($ua, $err) = @_;
@@ -682,8 +673,7 @@ environment variable.
   $ua         = $ua->connect_timeout(5);
 
 Maximum amount of time in seconds establishing a connection may take,
-defaults to C<3>. Note that this attribute is EXPERIMENTAL and might change
-without warning!
+defaults to C<3>.
 
 =head2 C<cookie_jar>
 

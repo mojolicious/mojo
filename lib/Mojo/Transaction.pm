@@ -47,22 +47,6 @@ sub is_writing {
   return $state ~~ [qw/write write_start_line write_headers write_body/];
 }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_finish {
-  warn <<EOF;
-Mojo::Transaction->on_finish is DEPRECATED in favor of Mojo::Transaction->on!
-EOF
-  shift->on(finish => shift);
-}
-
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_resume {
-  warn <<EOF;
-Mojo::Transaction->on_resume is DEPRECATED in favor of Mojo::Transaction->on!
-EOF
-  shift->on(resume => shift);
-}
-
 sub remote_address {
   my ($self, $address) = @_;
 
@@ -125,8 +109,7 @@ L<Mojo::Transaction> can emit the following events.
     ...
   });
 
-Emitted when a connection has been assigned to transaction. Note that this
-event is EXPERIMENTAL and might change without warning!
+Emitted when a connection has been assigned to transaction.
 
 =head2 C<finish>
 

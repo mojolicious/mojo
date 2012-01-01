@@ -256,8 +256,7 @@ emit the following new ones.
     ...
   });
 
-Emitted when a new L<Mojo::Content::Single> part starts. Note that this event
-is EXPERIMENTAL and might change without warning!
+Emitted when a new L<Mojo::Content::Single> part starts.
 
   $multi->on(part => sub {
     my ($multi, $single) = @_;

@@ -201,8 +201,7 @@ List all files in directory and subdirectories recursively.
 
   my $path = $home->mojo_lib_dir;
 
-Path to C<lib> directory in which L<Mojolicious> is installed. Note that this
-method is EXPERIMENTAL and might change without warning!
+Path to C<lib> directory in which L<Mojolicious> is installed.
 
 =head2 C<parse>
 
@@ -226,8 +225,7 @@ Generate absolute path for relative file.
 
   my $string = $home->slurp_rel_file('foo/bar.html');
 
-Read all file data at once. Note that this method is EXPERIMENTAL and might
-change without warning!
+Read all file data at once.
 
 =head2 C<to_string>
 

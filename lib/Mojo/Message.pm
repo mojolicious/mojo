@@ -298,21 +298,6 @@ sub leftovers { shift->content->leftovers }
 
 sub max_line_size { shift->headers->max_line_size(@_) }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_finish {
-  warn
-    "Mojo::Message->on_finish is DEPRECATED in favor of Mojo::Message->on!\n";
-  shift->on(finish => shift);
-}
-
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_progress {
-  warn <<EOF;
-Mojo::Message->on_progress is DEPRECATED in favor of Mojo::Message->on!
-EOF
-  shift->on(progress => shift);
-}
-
 sub param {
   my $self = shift;
   $self->{body_params} ||= $self->body_params;

@@ -51,13 +51,6 @@ EOF
   return $app;
 }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_request {
-  warn
-    "Mojo::Server->on_request is DEPRECATED in favor of Mojo::Server->on!\n";
-  shift->on(request => shift);
-}
-
 # "Are you saying you're never going to eat any animal again? What about
 #  bacon?
 #  No.

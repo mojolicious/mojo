@@ -144,13 +144,6 @@ sub is_parsing_body { (shift->{state} || '') eq 'body' }
 
 sub leftovers { shift->{buffer} }
 
-# DEPRECATED in Smiling Face With Sunglasses!
-sub on_read {
-  warn
-    "Mojo::Content->on_read is DEPRECATED in favor of Mojo::Content->on!\n";
-  shift->on(read => shift);
-}
-
 sub parse {
   my $self = shift;
 
@@ -432,8 +425,7 @@ L<Mojo::Content> can emit the following events.
     ...
   });
 
-Emitted once all headers have been parsed and the body starts. Note that this
-event is EXPERIMENTAL and might change without warning!
+Emitted once all headers have been parsed and the body starts.
 
   $content->on(body => sub {
     my $content = shift;

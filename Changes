@@ -4,6 +4,26 @@ This file documents the revision history for Perl extension Mojolicious.
         - Deprecated Test::Mojo->max_redirects.
         - Removed exprimental status from respond_to method in
           Mojolicious::Controller.
+        - Removed experimental status from error event in Mojo::UserAgent.
+        - Removed experimental status from connect_timeout attribute in
+          Mojo::UserAgent.
+        - Removed experimental status from connection event in
+          Mojo::Transaction.
+        - Removed experimental status from upgrade event in
+          Mojo::Asset::Memory.
+        - Removed experimental status from auto_upgrade and max_memory_size
+          attributes in Mojo::Asset::Memory.
+        - Removed experimental status from part event in
+          Mojo::Content::MultiPart.
+        - Removed experimental status from upgrade event in
+          Mojo::Content::Single.
+        - Removed experimental status from auto_upgrade attribute in
+          Mojo::Content::Single.
+        - Removed experimental status from body event in Mojo::Content.
+        - Removed experimental status from mojo_lib_dir and slurp_rel_file
+          methods in Mojo::Home.
+        - Removed experimental status from message event in Mojo::Log.
+        - Removed experimental status from contains method in Mojo::Path.
         - Removed test_server method from Test::Mojo.
         - Renamed test_server method in Mojo::UserAgent to app_url.
         - Improved RFC 6265 compliance of generated request headers.

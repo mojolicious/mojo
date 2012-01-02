@@ -479,7 +479,8 @@ EXPERIMENTAL and might change without warning!
   my $relaxed = $content->relaxed;
   $content    = $content->relaxed(1);
 
-Activate relaxed parsing for HTTP 0.9 and broken web servers.
+Activate relaxed parsing for HTTP 0.9 and responses that are terminated with
+a connection close.
 
 =head1 METHODS
 
@@ -528,8 +529,8 @@ EXPERIMENTAL and might change without warning!
 
   my $clone = $content->clone;
 
-Clone content if possible. Note that this method is EXPERIMENTAL and might
-change without warning!
+Clone content if possible, otherwise return C<undef>. Note that this method
+is EXPERIMENTAL and might change without warning!
 
 =head2 C<generate_body_chunk>
 
@@ -597,7 +598,7 @@ Check if body parsing started yet.
 
   my $bytes = $content->leftovers;
 
-Remove leftover data from content parser.
+Get leftover data from content parser.
 
 =head2 C<parse>
 

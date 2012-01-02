@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.42    2012-01-01 00:00:00
+2.42    2012-01-02 00:00:00
         - Deprecated Test::Mojo->max_redirects.
         - Removed exprimental status from respond_to method in
           Mojolicious::Controller.

@@ -571,8 +571,9 @@ Check if content is chunked.
 
   my $success = $content->is_dynamic;
 
-Check if content will be dynamic. Note that this method is EXPERIMENTAL and
-might change without warning!
+Check if content will be dynamically generated, which prevents C<clone> from
+working. Note that this method is EXPERIMENTAL and might change without
+warning!
 
 =head2 C<is_finished>
 

@@ -639,7 +639,7 @@ C<POST> parameters, usually a L<Mojo::Parameters> object.
 
   my $size = $message->body_size;
 
-Size of the body in bytes.
+Alias for L<Mojo::Content/"body_size">.
 
 =head2 C<build_body>
 
@@ -720,7 +720,7 @@ Get a chunk of start line data starting from a specific position.
 
   my $success = $message->has_leftovers;
 
-Check if message parser has leftover data.
+Alias for L<Mojo::Content/"has_leftovers">.
 
 =head2 C<header_size>
 
@@ -740,13 +740,13 @@ Alias for L<Mojo::Content/"headers">.
 
   my $success = $message->is_chunked;
 
-Check if message content is chunked.
+Alias for L<Mojo::Content/"is_chunked">.
 
 =head2 C<is_dynamic>
 
   my $success = $message->is_dynamic;
 
-Check if message content will be dynamic. Note that this method is
+Alias for L<Mojo::Content/"is_dynamic">. Note that this method is
 EXPERIMENTAL and might change without warning!
 
 =head2 C<is_finished>
@@ -766,7 +766,7 @@ that this method is EXPERIMENTAL and might change without warning!
 
   my $success = $message->is_multipart;
 
-Check if message content is a L<Mojo::Content::MultiPart> object.
+Alias for L<Mojo::Content/"is_multipart">.
 
 =head2 C<json>
 
@@ -786,7 +786,7 @@ argument of this method is EXPERIMENTAL and might change without warning!
 
   my $bytes = $message->leftovers;
 
-Remove leftover data from message parser.
+Alias for L<Mojo::Content/"leftovers">.
 
 =head2 C<max_line_size>
 
@@ -848,16 +848,14 @@ All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
   $message->write('Hello!');
   $message->write('Hello!', sub {...});
 
-Write dynamic content non-blocking, the optional drain callback will be
-invoked once all data has been written.
+Alias for L<Mojo::Content/"write">.
 
 =head2 C<write_chunk>
 
   $message->write_chunk('Hello!');
   $message->write_chunk('Hello!', sub {...});
 
-Write dynamic content non-blocking with C<chunked> transfer encoding, the
-optional drain callback will be invoked once all data has been written.
+Alias for L<Mojo::Content/"write_headers">.
 
 =head1 SEE ALSO
 

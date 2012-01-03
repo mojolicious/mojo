@@ -293,7 +293,8 @@ on L<Mojo::DOM>.
   my $t = Test::Mojo->new->max_redirects(1);
 
   # Test if the HTML login form exists
-  $t->get_ok('/')->status_is(200)
+  $t->get_ok('/')
+    ->status_is(200)
     ->element_exists('form input[name="user"]')
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');
@@ -681,7 +682,8 @@ help with home directory detection, so C<t/login.t> can be simplified.
   # Load application class
   my $t = Test::Mojo->new('MyApp')->max_redirects(1);
 
-  $t->get_ok('/')->status_is(200)
+  $t->get_ok('/')
+    ->status_is(200)
     ->element_exists('form input[name="user"]')
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');

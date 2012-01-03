@@ -306,8 +306,10 @@ L<Test::Mojo> API to be used.
 
   # Test echo web service
   my $t = Test::Mojo->new;
-  $t->websocket_ok('/echo')->send_message_ok('Hello Mojo!')
-    ->message_is('echo: Hello Mojo!')->finish_ok;
+  $t->websocket_ok('/echo')
+    ->send_message_ok('Hello Mojo!')
+    ->message_is('echo: Hello Mojo!')
+    ->finish_ok;
 
 =head2 EventSource
 

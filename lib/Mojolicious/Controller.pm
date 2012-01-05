@@ -1010,11 +1010,11 @@ object.
 
 Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 
-  # "/perldoc" if application is deployed under "/"
-  say $c->url_for('/perldoc');
+  # "/perldoc?foo=bar" if application is deployed under "/"
+  say $c->url_for('/perldoc')->query(foo => 'bar');
 
-  # "/myapp/perldoc" if application is deployed under "/myapp"
-  say $c->url_for('/perldoc');
+  # "/myapp/perldoc?foo=bar" if application is deployed under "/myapp"
+  say $c->url_for('/perldoc')->query(foo => 'bar');
 
 =head2 C<write>
 

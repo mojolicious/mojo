@@ -475,7 +475,7 @@ Generate script tag for C<Javascript> asset.
   <%= link_to index => begin %>Home<% end %>
   <%= link_to '/path/to/file' => begin %>File<% end %>
   <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
-  <%= link_to url_for->query(foo => $foo) => begin %>Retry<% end %>
+  <%= link_to url_for->query(foo => 'bar')->to_abs => begin %>Retry<% end %>
 
 Generate link to route, path or URL, defaults to using the capitalized link
 target as content.
@@ -485,7 +485,7 @@ target as content.
   <a href="/path/to/index">Home</a>
   <a href="/path/to/file">File</a>
   <a href="http://mojolicio.us">Mojolicious</a>
-  <a href="/current/path?foo=something">Retry</a>
+  <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
 
 =head2 C<password_field>
 

@@ -59,6 +59,8 @@ sub run {
     verbose     => sub { $verbose  = 1 }
   );
 
+  $verbose = 1 if ($method eq 'HEAD');
+
   # Headers
   my $headers = {};
   for my $header (@headers) {

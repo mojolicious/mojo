@@ -19,7 +19,7 @@ sub new {
   return @_ ? $self->_detect(@_) : $self;
 }
 
-sub throw { shift and die Mojo::Exception->new->trace(2)->_detect(@_) }
+sub throw { die shift->new->trace(2)->_detect(@_) }
 
 sub to_string {
   my $self = shift;

@@ -58,6 +58,8 @@ sub run {
   );
   $verbose = 1 if $method eq 'HEAD';
 
+  $verbose = 1 if ($method eq 'HEAD');
+
   # Headers
   my $headers = {};
   for my $header (@headers) {

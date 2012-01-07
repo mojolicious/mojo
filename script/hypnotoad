@@ -37,6 +37,7 @@ usage: $0 [OPTIONS] [APPLICATION]
 
   hypnotoad script/myapp
   hypnotoad myapp.pl
+  hypnotoad -f myapp.pl
 
 These options are available:
   -c, --config <path>   Configuration file, defaults to "hypnotoad.conf" in

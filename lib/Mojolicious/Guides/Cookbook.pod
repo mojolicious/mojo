@@ -29,7 +29,7 @@ Perl works on.
 
 Another huge advantage is that it supports TLS and WebSockets out of the box.
 
-  $ ./script/myapp daemon --listen https://*:3000
+  $ ./script/myapp daemon -l https://*:3000
   Server available at https://127.0.0.1:3000.
 
 A development certificate for testing purposes is built right in, so it just
@@ -626,12 +626,12 @@ You can also extract all text from nested child elements.
 
 The request can be customized as well.
 
-  $ mojo get --method POST --content 'Hello!' http://mojolicio.us
-  $ mojo get --header 'X-Bender: Bite my shiny metal ass!' http://google.com
+  $ mojo get -M POST -c 'Hello!' http://mojolicio.us
+  $ mojo get -H 'X-Bender: Bite my shiny metal ass!' http://google.com
 
 You can follow redirects and view the headers for all messages.
 
-  $ mojo get --redirect --verbose http://reddit.com 'head > title'
+  $ mojo get -r -v http://reddit.com 'head > title'
 
 Extract just the information you really need from JSON data structures.
 

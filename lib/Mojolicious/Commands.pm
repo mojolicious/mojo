@@ -1,18 +1,19 @@
 package Mojolicious::Commands;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long qw/GetOptions :config pass_through/;
+use Getopt::Long
+  qw/GetOptions :config pass_through no_ignore_case no_auto_abbrev/;
 
 # "One day a man has everything, the next day he blows up a $400 billion
 #  space station, and the next day he has nothing. It makes you think."
 has hint => <<"EOF";
 
 These options are available for all commands:
-    --help          Get more information on a specific command.
-    --home <path>   Path to your applications home directory, defaults to
-                    the value of MOJO_HOME or auto detection.
-    --mode <name>   Run mode of your application, defaults to the value of
-                    MOJO_MODE or "development".
+    -h, --help          Get more information on a specific command.
+        --home <path>   Path to your applications home directory, defaults to
+                        the value of MOJO_HOME or auto detection.
+    -m, --mode <name>   Run mode of your application, defaults to the value
+                        of MOJO_MODE or "development".
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
@@ -21,9 +22,9 @@ has namespaces => sub { [qw/Mojolicious::Command Mojo::Command/] };
 # Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
 BEGIN {
   GetOptions(
-    'help|h' => sub { $ENV{MOJO_HELP} = 1 },
-    'home=s' => sub { $ENV{MOJO_HOME} = $_[1] },
-    'mode=s' => sub { $ENV{MOJO_MODE} = $_[1] }
+    'h|help'   => sub { $ENV{MOJO_HELP} = 1 },
+    'home=s'   => sub { $ENV{MOJO_HOME} = $_[1] },
+    'm|mode=s' => sub { $ENV{MOJO_MODE} = $_[1] }
   ) unless Mojo::Command->detect;
 }
 

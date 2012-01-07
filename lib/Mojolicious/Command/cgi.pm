@@ -1,7 +1,7 @@
 package Mojolicious::Command::cgi;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long 'GetOptions';
+use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
 use Mojo::Server::CGI;
 
 has description => <<'EOF';

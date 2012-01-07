@@ -46,7 +46,7 @@ EOF
 # Start
 my $port   = Mojo::IOLoop->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
-my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '--listen',
+my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
   "http://*:$port", $script;
 sleep 1
   while !IO::Socket::INET->new(

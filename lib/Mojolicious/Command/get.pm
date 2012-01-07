@@ -1,7 +1,7 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long 'GetOptions';
+use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON;
@@ -29,13 +29,13 @@ usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
   mojo get http://search.twitter.com/search.json /error
 
 These options are available:
-  --charset <charset>     Charset of HTML5/XML content, defaults to auto
-                          detection or "UTF-8".
-  --content <content>     Content to send with request.
-  --header <name:value>   Additional HTTP header.
-  --method <method>       HTTP method to use, defaults to "GET".
-  --redirect              Follow up to 5 redirects.
-  --verbose               Print verbose debug information to STDERR.
+  -C, --charset <charset>     Charset of HTML5/XML content, defaults to auto
+                              detection or "UTF-8".
+  -c, --content <content>     Content to send with request.
+  -H, --header <name:value>   Additional HTTP header.
+  -M, --method <method>       HTTP method to use, defaults to "GET".
+  -r, --redirect              Follow up to 5 redirects.
+  -v, --verbose               Print request and response headers to STDERR.
 EOF
 
 # "Objection.
@@ -46,18 +46,17 @@ sub run {
 
   # Options
   local @ARGV = @_;
-  my $method = 'GET';
-  my @headers;
-  my $content = '';
+  my ($method, $content, @headers) = ('GET', '');
   my ($charset, $redirect, $verbose) = 0;
   GetOptions(
-    'charset=s' => sub { $charset  = $_[1] },
-    'content=s' => sub { $content  = $_[1] },
-    'header=s'  => \@headers,
-    'method=s'  => sub { $method   = $_[1] },
-    redirect    => sub { $redirect = 1 },
-    verbose     => sub { $verbose  = 1 }
+    'C|charset=s' => sub { $charset  = $_[1] },
+    'c|content=s' => sub { $content  = $_[1] },
+    'H|header=s'  => \@headers,
+    'M|method=s'  => sub { $method   = $_[1] },
+    'r|redirect'  => sub { $redirect = 1 },
+    'v|verbose'   => sub { $verbose  = 1 }
   );
+  $verbose = 1 if $method eq 'HEAD';
 
   # Headers
   my $headers = {};

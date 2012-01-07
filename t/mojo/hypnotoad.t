@@ -163,7 +163,7 @@ is $tx->res->code, 200,            'right status';
 is $tx->res->body, 'Hello World!', 'right content';
 
 # Stop
-open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '--stop';
+open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '-s';
 sleep 1
   while IO::Socket::INET->new(
   Proto    => 'tcp',

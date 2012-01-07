@@ -16,7 +16,7 @@ Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
 
-use Getopt::Long 'GetOptions';
+use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
 
 # "Welcome to 'Entertainment And Earth Invasion Tonite'.
 #  Across the galaxy my people are completing the mighty space fleet that
@@ -25,10 +25,10 @@ use Getopt::Long 'GetOptions';
 my $morbo = Mojo::Server::Morbo->new;
 my ($help, @listen, @watch);
 GetOptions(
-  help => sub { $help = 1 },
-  'listen=s' => \@listen,
-  verbose    => sub { $ENV{MORBO_VERBOSE} = 1 },
-  'watch=s'  => \@watch
+  'h|help' => sub { $help = 1 },
+  'l|listen=s' => \@listen,
+  'v|verbose'  => sub { $ENV{MORBO_VERBOSE} = 1 },
+  'w|watch=s'  => \@watch
 );
 $help = 1 unless my $app = shift;
 
@@ -38,17 +38,19 @@ usage: $0 [OPTIONS] [APPLICATION]
 
   morbo script/myapp
   morbo myapp.pl
+  morbo -w /usr/local/lib -w public myapp.pl
 
 These options are available:
-  --help                     Show this message.
-  --listen <location>        Set one or more locations you want to listen on,
-                             defaults to "http://*:3000".
-  --verbose                  Print details about what files changed to
-                             STDOUT.
-  --watch <directory/file>   Set one or more directories and files to watch
-                             for changes, defaults to the application script
-                             as well as the "lib" and "templates" directories
-                             in the current working directory.
+  -h, --help                     Show this message.
+  -l, --listen <location>        Set one or more locations you want to listen
+                                 on, defaults to "http://*:3000".
+  -v, --verbose                  Print details about what files changed to
+                                 STDOUT.
+  -w, --watch <directory/file>   Set one or more directories and files to
+                                 watch for changes, defaults to the
+                                 application script as well as the "lib" and
+                                 "templates" directories in the current
+                                 working directory.
 EOF
 
 # "With Halley's Comet out of ice, Earth is experiencing a sudden case of

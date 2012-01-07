@@ -1,7 +1,7 @@
 package Mojolicious::Command::daemon;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long 'GetOptions';
+use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
 use Mojo::Server::Daemon;
 
 has description => <<'EOF';
@@ -11,19 +11,20 @@ has usage => <<"EOF";
 usage: $0 daemon [OPTIONS]
 
 These options are available:
-  --backlog <size>         Set listen backlog size, defaults to SOMAXCONN.
-  --clients <number>       Set maximum number of concurrent clients, defaults
-                           to 1000.
-  --group <name>           Set group name for process.
-  --inactivity <seconds>   Set inactivity timeout, defaults to 15.
-  --listen <location>      Set one or more locations you want to listen on,
-                           defaults to "http://*:3000".
-  --proxy                  Activate reverse proxy support, defaults to the
-                           value of MOJO_REVERSE_PROXY.
-  --requests <number>      Set maximum number of requests per keep-alive
-                           connection, defaults to 25.
-  --user <name>            Set username for process.
-  --websocket <seconds>    Set WebSocket timeout, defaults to 300.
+  -b, --backlog <size>         Set listen backlog size, defaults to
+                               SOMAXCONN.
+  -c, --clients <number>       Set maximum number of concurrent clients,
+                               defaults to 1000.
+  -g, --group <name>           Set group name for process.
+  -i, --inactivity <seconds>   Set inactivity timeout, defaults to 15.
+  -l, --listen <location>      Set one or more locations you want to listen
+                               on, defaults to "http://*:3000".
+  -p, --proxy                  Activate reverse proxy support, defaults to
+                               the value of MOJO_REVERSE_PROXY.
+  -r, --requests <number>      Set maximum number of requests per keep-alive
+                               connection, defaults to 25.
+  -u, --user <name>            Set username for process.
+  -w, --websocket <seconds>    Set WebSocket timeout, defaults to 300.
 EOF
 
 # "It's an albino humping worm!
@@ -37,15 +38,15 @@ sub run {
   local @ARGV = @_;
   my @listen;
   GetOptions(
-    'backlog=i'    => sub { $daemon->backlog($_[1]) },
-    'clients=i'    => sub { $daemon->max_clients($_[1]) },
-    'group=s'      => sub { $daemon->group($_[1]) },
-    'inactivity=i' => sub { $daemon->inactivity_timeout($_[1]) },
-    'listen=s'     => \@listen,
-    'proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
-    'requests=i'  => sub { $daemon->max_requests($_[1]) },
-    'user=s'      => sub { $daemon->user($_[1]) },
-    'websocket=i' => sub { $daemon->websocket_timeout($_[1]) }
+    'b|backlog=i'    => sub { $daemon->backlog($_[1]) },
+    'c|clients=i'    => sub { $daemon->max_clients($_[1]) },
+    'g|group=s'      => sub { $daemon->group($_[1]) },
+    'i|inactivity=i' => sub { $daemon->inactivity_timeout($_[1]) },
+    'l|listen=s'     => \@listen,
+    'p|proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
+    'r|requests=i'  => sub { $daemon->max_requests($_[1]) },
+    'u|user=s'      => sub { $daemon->user($_[1]) },
+    'w|websocket=i' => sub { $daemon->websocket_timeout($_[1]) }
   );
 
   # Start

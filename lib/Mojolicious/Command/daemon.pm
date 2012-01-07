@@ -1,13 +1,11 @@
 package Mojolicious::Command::daemon;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 use Mojo::Server::Daemon;
 
-has description => <<'EOF';
-Start application with HTTP 1.1 and WebSocket server.
-EOF
-has usage => <<"EOF";
+has description => "Start application with HTTP 1.1 and WebSocket server.\n";
+has usage       => <<"EOF";
 usage: $0 daemon [OPTIONS]
 
 These options are available:

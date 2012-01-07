@@ -1,12 +1,8 @@
 package Mojolicious::Command::generate::makefile;
 use Mojo::Base 'Mojo::Command';
 
-has description => <<'EOF';
-Generate "Makefile.PL".
-EOF
-has usage => <<"EOF";
-usage: $0 generate makefile
-EOF
+has description => qq/Generate "Makefile.PL".\n/;
+has usage       => "usage: $0 generate makefile\n";
 
 # "If we don't go back there and make that event happen,
 #  the entire universe will be destroyed...

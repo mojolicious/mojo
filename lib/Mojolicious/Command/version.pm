@@ -6,13 +6,8 @@ use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious;
 
-has description => <<'EOF';
-Show versions of installed modules.
-EOF
-has usage => <<"EOF";
-usage: $0 version
-
-EOF
+has description => "Show versions of installed modules.\n";
+has usage       => "usage: $0 version\n";
 
 # "It's so cold, my processor is running at peak efficiency!"
 sub run {

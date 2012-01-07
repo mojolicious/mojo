@@ -3,12 +3,8 @@ use Mojo::Base 'Mojo::Command';
 
 use Mojo::Server::PSGI;
 
-has description => <<'EOF';
-Start application with PSGI.
-EOF
-has usage => <<"EOF";
-usage: $0 psgi
-EOF
+has description => "Start application with PSGI.\n";
+has usage       => "usage: $0 psgi\n";
 
 # "In the end it was not guns or bombs that defeated the aliens,
 #  but that humblest of all God's creatures... the Tyrannosaurus Rex."

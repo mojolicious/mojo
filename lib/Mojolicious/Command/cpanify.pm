@@ -2,13 +2,11 @@ package Mojolicious::Command::cpanify;
 use Mojo::Base 'Mojo::Command';
 
 use File::Basename 'basename';
-use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 use Mojo::UserAgent;
 
-has description => <<'EOF';
-Upload distribution to CPAN.
-EOF
-has usage => <<"EOF";
+has description => "Upload distribution to CPAN.\n";
+has usage       => <<"EOF";
 usage: $0 cpanify [OPTIONS] [FILE]
 
   mojo cpanify -u sri -p secr3t Mojolicious-Plugin-MyPlugin-0.01.tar.gz

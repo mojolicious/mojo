@@ -1,12 +1,8 @@
 package Mojolicious::Command::generate::hypnotoad;
 use Mojo::Base 'Mojo::Command';
 
-has description => <<'EOF';
-Generate "hypnotoad.conf".
-EOF
-has usage => <<"EOF";
-usage: $0 generate hypnotoad
-EOF
+has description => qq/Generate "hypnotoad.conf".\n/;
+has usage       => "usage: $0 generate hypnotoad\n";
 
 # "Oh no! Can we switch back using four or more bodies?
 #  I'm not sure. I'm afraid we need to use... MATH."

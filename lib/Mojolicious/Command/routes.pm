@@ -2,12 +2,10 @@ package Mojolicious::Command::routes;
 use Mojo::Base 'Mojo::Command';
 
 use re 'regexp_pattern';
-use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 
-has description => <<'EOF';
-Show available routes.
-EOF
-has usage => <<"EOF";
+has description => "Show available routes.\n";
+has usage       => <<"EOF";
 usage: $0 routes [OPTIONS]
 
 These options are available:

@@ -310,16 +310,14 @@ Mojo::Command - Command base class
   use Getopt::Long 'GetOptions';
 
   # Short description
-  has description => <<'EOF';
-  My first Mojo command.
-  EOF
+  has description => "My first Mojo command.\n";
 
   # Short usage message
   has usage => <<"EOF";
   usage: $0 mycommand [OPTIONS]
 
   These options are available:
-    --something   Does something.
+    -s, --something   Does something.
   EOF
 
   # <suitable Futurama quote here>
@@ -328,7 +326,7 @@ Mojo::Command - Command base class
 
     # Handle options
     local @ARGV = @_;
-    GetOptions('something' => sub { $something = 1 });
+    GetOptions('s|something' => sub { $something = 1 });
 
     # Magic here! :)
   }

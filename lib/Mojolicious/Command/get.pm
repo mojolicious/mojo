@@ -1,7 +1,7 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON;
@@ -10,10 +10,8 @@ use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
 use Mojo::Util qw/decode encode/;
 
-has description => <<'EOF';
-Perform HTTP 1.1 request.
-EOF
-has usage => <<"EOF";
+has description => "Perform HTTP 1.1 request.\n";
+has usage       => <<"EOF";
 usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
 
   mojo get /

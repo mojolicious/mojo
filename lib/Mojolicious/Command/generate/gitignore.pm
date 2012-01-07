@@ -1,12 +1,8 @@
 package Mojolicious::Command::generate::gitignore;
 use Mojo::Base 'Mojo::Command';
 
-has description => <<'EOF';
-Generate ".gitignore".
-EOF
-has usage => <<"EOF";
-usage: $0 generate gitignore
-EOF
+has description => qq/Generate ".gitignore".\n/;
+has usage       => "usage: $0 generate gitignore\n";
 
 # "I want to see the edge of the universe.
 #  Ooh, that sounds cool.

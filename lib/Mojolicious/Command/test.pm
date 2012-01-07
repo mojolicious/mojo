@@ -4,12 +4,10 @@ use Mojo::Base 'Mojo::Command';
 use Cwd;
 use FindBin;
 use File::Spec;
-use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 
-has description => <<'EOF';
-Run unit tests.
-EOF
-has usage => <<"EOF";
+has description => "Run unit tests.\n";
+has usage       => <<"EOF";
 usage: $0 test [OPTIONS] [TESTS]
 
 These options are available:

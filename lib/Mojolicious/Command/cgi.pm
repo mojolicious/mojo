@@ -1,13 +1,11 @@
 package Mojolicious::Command::cgi;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 use Mojo::Server::CGI;
 
-has description => <<'EOF';
-Start application with CGI.
-EOF
-has usage => <<"EOF";
+has description => "Start application with CGI.\n";
+has usage       => <<"EOF";
 usage: $0 cgi [OPTIONS]
 
 These options are available:

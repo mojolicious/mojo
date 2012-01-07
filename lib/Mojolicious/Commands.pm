@@ -2,7 +2,7 @@ package Mojolicious::Commands;
 use Mojo::Base 'Mojo::Command';
 
 use Getopt::Long
-  qw/GetOptions :config pass_through no_ignore_case no_auto_abbrev/;
+  qw/GetOptions :config no_auto_abbrev no_ignore_case pass_through/;
 
 # "One day a man has everything, the next day he blows up a $400 billion
 #  space station, and the next day he has nothing. It makes you think."

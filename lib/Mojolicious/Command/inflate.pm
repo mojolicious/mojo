@@ -3,12 +3,8 @@ use Mojo::Base 'Mojo::Command';
 
 use Mojo::Util 'encode';
 
-has description => <<'EOF';
-Inflate embedded files to real files.
-EOF
-has usage => <<"EOF";
-usage: $0 inflate
-EOF
+has description => "Inflate embedded files to real files.\n";
+has usage       => "usage: $0 inflate\n";
 
 # "Come on stem cells! Work your astounding scientific nonsense!"
 sub run {

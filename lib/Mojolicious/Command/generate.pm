@@ -2,10 +2,8 @@ package Mojolicious::Command::generate;
 use Mojo::Base 'Mojolicious::Commands';
 
 # "Ah, nothing like a warm fire and a SuperSoaker of fine cognac."
-has description => <<'EOF';
-Generate files and directories from templates.
-EOF
-has hint => <<"EOF";
+has description => "Generate files and directories from templates.\n";
+has hint        => <<"EOF";
 
 See '$0 generate help GENERATOR' for more information on a specific generator.
 EOF
@@ -16,9 +14,7 @@ These generators are currently available:
 EOF
 has namespaces =>
   sub { [qw/Mojolicious::Command::generate Mojo::Command::generate/] };
-has usage => <<"EOF";
-usage: $0 generate GENERATOR [OPTIONS]
-EOF
+has usage => "usage: $0 generate GENERATOR [OPTIONS]\n";
 
 1;
 __END__

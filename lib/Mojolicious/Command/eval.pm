@@ -1,12 +1,10 @@
 package Mojolicious::Command::eval;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long qw/GetOptions :config no_ignore_case no_auto_abbrev/;
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 
-has description => <<'EOF';
-Run code against application.
-EOF
-has usage => <<"EOF";
+has description => "Run code against application.\n";
+has usage       => <<"EOF";
 usage: $0 eval [OPTIONS] CODE
 
   mojo eval 'say app->ua->get("/")->res->body'

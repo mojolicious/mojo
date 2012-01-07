@@ -4,12 +4,8 @@ use Mojo::Base 'Mojo::Command';
 use Mojo::Util 'camelize';
 
 # "You know Santa may have killed Scruffy, but he makes a good point."
-has description => <<'EOF';
-Generate Mojolicious plugin directory structure.
-EOF
-has usage => <<"EOF";
-usage: $0 generate plugin [NAME]
-EOF
+has description => "Generate Mojolicious plugin directory structure.\n";
+has usage       => "usage: $0 generate plugin [NAME]\n";
 
 # "There we were in the park when suddenly some old lady says I stole her
 #  purse.

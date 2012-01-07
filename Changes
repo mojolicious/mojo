@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.43    2012-01-07 00:00:00
+2.43    2012-01-08 00:00:00
         - Improved most commands with shortcut options.
         - Improved get command to automatically enable verbose mode for HEAD
           requests. (simotrone)

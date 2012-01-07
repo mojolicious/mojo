@@ -53,6 +53,13 @@ as you are not using anything marked experimental, untested or undocumented,
 you can always count on backwards compatibility, everything else would be
 considered a bug.
 
+=head2 Why not split up Mojolicious into many smaller distributions?
+
+Because there are no advantages, it drastically increases maintenance costs
+and installation times without giving us anything in return. It would only
+make sense if we wanted to pass ownership of a module to a new maintainer,
+which we already have done in the past.
+
 =head2 What does the error "Maximum message size exceeded." mean?
 
 To protect your applications from excessively large requests and responses,

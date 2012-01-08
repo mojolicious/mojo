@@ -2,6 +2,8 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.44    2012-01-09 00:00:00
         - Improved documentation.
+        - Fixed Mojo::ByteStream, Mojo::Collection and Mojo::DOM to not be
+          subclasses of Mojo::Base.
 
 2.43    2012-01-08 00:00:00
         - Improved most commands with shortcut options.

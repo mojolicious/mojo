@@ -1,5 +1,5 @@
 package Mojo::Collection;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 use overload
   'bool'   => sub {1},
   '""'     => sub { shift->join("\n") },
@@ -104,8 +104,7 @@ L<Mojo::Collection> is a container for collections.
 
 =head1 METHODS
 
-L<Mojo::Collection> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojo::Collection> implements the following methods.
 
 =head2 C<new>
 

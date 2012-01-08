@@ -1,5 +1,5 @@
 package Mojo::DOM;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 use overload
   '%{}'    => sub { shift->attrs },
   'bool'   => sub {1},
@@ -460,8 +460,7 @@ XML detection can be also deactivated with the C<xml> method.
 
 =head1 METHODS
 
-L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::DOM> implements the following methods.
 
 =head2 C<new>
 

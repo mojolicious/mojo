@@ -667,7 +667,7 @@ that they will be picked up automatically by the command line interface?
   use Mojo::Base 'Mojo::Command';
 
   has description => "Spy on application.\n";
-  has usage       => "usage: $0 spy [COMMAND]\n";
+  has usage       => "usage: $0 spy [TARGET]\n";
 
   sub run {
     my ($self, $whatever) = @_;

@@ -666,6 +666,8 @@ that they will be picked up automatically by the command line interface?
   package Mojolicious::Command::spy;
   use Mojo::Base 'Mojo::Command';
 
+  has description => "Spy on application.\n";
+
   sub run {
     my ($self, $whatever) = @_;
 

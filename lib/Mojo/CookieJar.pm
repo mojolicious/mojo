@@ -16,9 +16,8 @@ sub add {
 
   # Add cookies
   for my $cookie (@cookies) {
-    my $domain = $cookie->domain;
-    my $path   = $cookie->path;
-    my $name   = $cookie->name;
+    my ($name, $value, $domain, $path) =
+      ($cookie->name, $cookie->value, $cookie->domain, $cookie->path);
 
     # Convert max age to expires
     $cookie->expires($cookie->max_age + time) if $cookie->max_age;
@@ -27,20 +26,14 @@ sub add {
     $cookie->max_age(0) unless $cookie->expires || $cookie->max_age;
 
     # Check cookie size
-    my $value = $cookie->value;
     next if length($value //= '') > $self->max_cookie_size;
 
-    # Check if we already have a similar cookie
+    # Replace cookie
     $domain =~ s/^\.//;
-    $self->{jar}->{$domain} ||= [];
-    my @new;
-    for my $old (@{$self->{jar}->{$domain}}) {
-      push @new, $old unless $old->path eq $path && $old->name eq $name;
-    }
-
-    # Yummy!
-    push @new, $cookie;
-    $self->{jar}->{$domain} = \@new;
+    my @new =
+      grep { $_->path ne $path || $_->name ne $name }
+      @{$self->{jar}->{$domain} || []};
+    $self->{jar}->{$domain} = [@new, $cookie];
   }
 
   return $self;
@@ -50,15 +43,12 @@ sub empty { shift->{jar} = {} }
 
 sub extract {
   my ($self, $tx) = @_;
-
-  # Repair cookies and put them in the jar
-  my $url     = $tx->req->url;
-  my @cookies = @{$tx->res->cookies};
-  for my $cookie (@cookies) {
+  my $url = $tx->req->url;
+  for my $cookie (@{$tx->res->cookies}) {
     $cookie->domain($url->host) unless $cookie->domain;
     $cookie->path($url->path)   unless $cookie->path;
+    $self->add($cookie);
   }
-  $self->add(@cookies);
 }
 
 # "Dear Homer, IOU one emergency donut.
@@ -81,9 +71,8 @@ sub find {
 
       # Check if cookie has expired
       my $session = defined $cookie->max_age && $cookie->max_age > 0 ? 1 : 0;
-      if ((my $expires = $cookie->expires) && !$session) {
-        next if time > ($expires->epoch || 0);
-      }
+      my $expires = $cookie->expires;
+      next if $expires && !$session && time > ($expires->epoch || 0);
       push @new, $cookie;
 
       # Taste cookie
@@ -91,10 +80,8 @@ sub find {
       my $cpath = $cookie->path;
       push @found,
         Mojo::Cookie::Request->new(
-        name   => $cookie->name,
-        value  => $cookie->value,
-        path   => $cookie->path,
-        secure => $cookie->secure
+        name  => $cookie->name,
+        value => $cookie->value
         ) if $path =~ /^$cpath/;
     }
 
@@ -109,13 +96,9 @@ sub find {
 
 sub inject {
   my ($self, $tx) = @_;
-
-  # Take delicious cookies from the jar
   return unless keys %{$self->{jar}};
   my $req = $tx->req;
-  my $url = $req->url->clone;
-  if (my $host = $req->headers->host) { $url->host($host) }
-  $req->cookies($self->find($url));
+  $req->cookies($self->find($req->url));
 }
 
 1;

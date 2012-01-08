@@ -18,9 +18,7 @@ $jar->add(
     path   => '/foo',
     name   => 'foo',
     value  => 'bar'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain => '.kraih.com',
     path   => '/',
@@ -86,9 +84,7 @@ $jar->add(
     path   => '/foo',
     name   => 'foo',
     value  => 'bar'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain => 'foo.localhost',
     path   => '/foo',
@@ -125,9 +121,7 @@ $jar->add(
     path   => '/foo',
     name   => 'foo',
     value  => 'bar'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
     path   => '/foo',

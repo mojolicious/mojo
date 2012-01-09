@@ -682,6 +682,7 @@ perform a C<find> on it right away, which returns a collection.
 
   # Use everything else Mojo::DOM has to offer
   say $message->dom->at('title')->text;
+  $message->dom->html->body->children->each(sub { say $_->type });
 
 =head2 C<error>
 

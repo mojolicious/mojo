@@ -67,8 +67,7 @@ sub attrs {
   my $self = shift;
 
   # Not a tag
-  my $tree = $self->tree;
-  return {} if $tree->[0] eq 'root';
+  return {} if (my $tree = $self->tree)->[0] eq 'root';
 
   # Hash
   my $attrs = $tree->[2];
@@ -79,9 +78,7 @@ sub attrs {
 
   # Set
   my $values = ref $_[0] ? $_[0] : {@_};
-  for my $key (keys %$values) {
-    $attrs->{$key} = $values->{$key};
-  }
+  $attrs->{$_} = $values->{$_} for keys %$values;
 
   return $self;
 }
@@ -152,8 +149,7 @@ sub namespace {
   my $self = shift;
 
   # Prefix
-  my $current = $self->tree;
-  return if $current->[0] eq 'root';
+  return if (my $current = $self->tree)->[0] eq 'root';
   my $prefix = '';
   if ($current->[1] =~ /^(.*?)\:/) { $prefix = $1 }
 
@@ -181,8 +177,7 @@ sub parent {
   my $self = shift;
 
   # Not a tag
-  my $tree = $self->tree;
-  return if $tree->[0] eq 'root';
+  return if (my $tree = $self->tree)->[0] eq 'root';
 
   # Parent
   return $self->new->charset($self->charset)->tree($tree->[3])
@@ -280,8 +275,7 @@ sub type {
   my ($self, $type) = @_;
 
   # Not a tag
-  my $tree = $self->tree;
-  return if $tree->[0] eq 'root';
+  return if (my $tree = $self->tree)->[0] eq 'root';
 
   # Get
   return $tree->[1] unless $type;
@@ -307,8 +301,7 @@ sub _add {
   $new = $self->_parse("$new");
 
   # Not a tag
-  my $tree = $self->tree;
-  return $self if $tree->[0] eq 'root';
+  return $self if (my $tree = $self->tree)->[0] eq 'root';
 
   # Find
   my $parent = $tree->[3];
@@ -478,6 +471,12 @@ Extract all text content from DOM structure, smart whitespace trimming is
 activated by default. Note that the trim argument of this method is
 EXPERIMENTAL and might change without warning!
 
+  # "test 123"
+  $dom->parse("<div>test\n<p>123</p></div>")->div->all_text;
+
+  # "test\n123"
+  $dom->parse("<div>test\n<p>123</p></div>")->div->all_text(0);
+
 =head2 C<append>
 
   $dom = $dom->append('<p>Hi!</p>');
@@ -614,6 +613,12 @@ Find root node.
 Extract text content from element only (not including child elements), smart
 whitespace trimming is activated by default. Note that the trim argument of
 this method is EXPERIMENTAL and might change without warning!
+
+  # "test"
+  $dom->parse("<div>test\n<p>123</p></div>")->div->text;
+
+  # "test\n"
+  $dom->parse("<div>test\n<p>123</p></div>")->div->text(0);
 
 =head2 C<to_xml>
 

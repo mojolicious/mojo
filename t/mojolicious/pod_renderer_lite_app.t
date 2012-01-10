@@ -62,7 +62,7 @@ $t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
 # Perldoc browser (Mojolicious)
 $t->get_ok('/perldoc/Mojolicious')->status_is(200)
   ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
-  ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian\ Riedel/);
+  ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
 
 __DATA__
 

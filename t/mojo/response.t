@@ -277,7 +277,7 @@ ok !$res->at_least_version('1.2'), 'not version 1.2';
 ok $res->headers->content_type =~ m#multipart/form-data#,
   'right "Content-Type" value';
 isa_ok $res->content, 'Mojo::Content::Single', 'right content';
-like $res->content->asset->slurp, qr/hallo\ welt/, 'right content';
+like $res->content->asset->slurp, qr/hallo welt/, 'right content';
 
 # Build HTTP 1.1 response start line with minimal headers
 $res = Mojo::Message::Response->new;

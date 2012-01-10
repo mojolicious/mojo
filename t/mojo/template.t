@@ -1043,15 +1043,14 @@ $file = File::Spec->catfile(File::Spec->splitdir($FindBin::Bin),
   qw/lib exception.mt/);
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message, qr/exception\.mt\ line\ 2/,
-  'message contains file name';
+like $output->message, qr/exception\.mt line 2/, 'message contains file name';
 is $output->lines_before->[0]->[0], 1,      'right number';
 is $output->lines_before->[0]->[1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
 is $output->line->[1], '% die;', 'right line';
 is $output->lines_after->[0]->[0], 3,     'right number';
 is $output->lines_after->[0]->[1], '123', 'right line';
-like "$output", qr/exception\.mt\ line\ 2/, 'right result';
+like "$output", qr/exception\.mt line 2/, 'right result';
 
 # Exception in file (different name)
 $mt   = Mojo::Template->new;
@@ -1059,14 +1058,14 @@ $file = File::Spec->catfile(File::Spec->splitdir($FindBin::Bin),
   qw/lib exception.mt/);
 $output = $mt->name('foo.mt')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message, qr/foo\.mt\ line\ 2/, 'message contains file name';
+like $output->message, qr/foo\.mt line 2/, 'message contains file name';
 is $output->lines_before->[0]->[0], 1,      'right number';
 is $output->lines_before->[0]->[1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
 is $output->line->[1], '% die;', 'right line';
 is $output->lines_after->[0]->[0], 3,     'right number';
 is $output->lines_after->[0]->[1], '123', 'right line';
-like "$output", qr/foo\.mt\ line\ 2/, 'right result';
+like "$output", qr/foo\.mt line 2/, 'right result';
 
 # File to file with utf8 data
 $mt = Mojo::Template->new;

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 411;
+use Test::More tests => 413;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -77,5 +77,12 @@ is $monkey->evil,    1,     'monkey is evil';
 is $monkey->bananas, undef, 'monkey has no bananas';
 $monkey->bananas(3);
 is $monkey->bananas, 3, 'monkey has 3 bananas';
+
+# Exceptions
+eval { BaseTest->attr(foo => []) };
+like $@, qr/Default has to be a code reference or constant value/,
+  'right error';
+eval { BaseTest->attr(23) };
+like $@, qr/Attribute "23" invalid/, 'right error';
 
 1;

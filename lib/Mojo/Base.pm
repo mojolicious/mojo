@@ -56,12 +56,8 @@ sub new {
 # so we optimize them by compiling our own code, don't be scared, we have
 # tests for every single case
 sub attr {
-  my ($class, $attrs, $default) = (shift, shift, shift);
-
-  # Check arguments
-  Carp::croak('Attribute generator called with too many arguments') if @_;
-  return unless $class && $attrs;
-  $class = ref $class || $class;
+  my ($class, $attrs, $default) = @_;
+  return unless ($class = ref $class || $class) && $attrs;
 
   # Check default
   Carp::croak('Default has to be a code reference or constant value')
@@ -69,46 +65,32 @@ sub attr {
 
   # Create attributes
   $attrs = [$attrs] unless ref $attrs eq 'ARRAY';
-  my $ws = '  ';
   for my $attr (@$attrs) {
-
     Carp::croak(qq/Attribute "$attr" invalid/)
       unless $attr =~ /^[a-zA-Z_]\w*$/;
 
-    # Header
-    my $code = "sub {\n";
+    # Header (check arguments)
+    my $code = "sub {\n  if (\@_ == 1) {\n";
 
-    # No value
-    $code .= "${ws}if (\@_ == 1) {\n";
-    unless (defined $default) {
+    # No default value (return value)
+    unless (defined $default) { $code .= "    return \$_[0]->{'$attr'};" }
 
-      # Return value
-      $code .= "$ws${ws}return \$_[0]->{'$attr'};\n";
-    }
+    # Default value
     else {
 
       # Return value
-      $code .= "$ws${ws}return \$_[0]->{'$attr'} ";
-      $code .= "if exists \$_[0]->{'$attr'};\n";
+      $code .= "    return \$_[0]->{'$attr'} if exists \$_[0]->{'$attr'};\n";
 
       # Return default value
-      $code .= "$ws${ws}return \$_[0]->{'$attr'} = ";
-      $code .=
-        ref $default eq 'CODE'
-        ? '$default->($_[0])'
-        : '$default';
-      $code .= ";\n";
+      $code .= "    return \$_[0]->{'$attr'} = ";
+      $code .= ref $default eq 'CODE' ? '$default->($_[0]);' : '$default;';
     }
-    $code .= "$ws}\n";
 
     # Store value
-    $code .= "$ws\$_[0]->{'$attr'} = \$_[1];\n";
+    $code .= "\n  }\n  \$_[0]->{'$attr'} = \$_[1];\n";
 
-    # Return invocant
-    $code .= "${ws}\$_[0];\n";
-
-    # Footer
-    $code .= '};';
+    # Footer (return invocant)
+    $code .= "  \$_[0];\n};";
 
     # We compile custom attribute code for speed
     no strict 'refs';
@@ -119,10 +101,7 @@ sub attr {
     Carp::croak("Mojo::Base compiler error: \n$code\n$@\n") if $@;
 
     # Debug mode
-    if ($ENV{MOJO_BASE_DEBUG}) {
-      warn "\nATTRIBUTE: $class->$attr\n";
-      warn "$code\n\n";
-    }
+    warn "\nATTRIBUTE: $class->$attr\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
   }
 }
 

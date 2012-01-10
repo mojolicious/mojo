@@ -36,6 +36,7 @@ All templates should be in the C<templates> directory of the application
 or the C<DATA> section of the class C<main>.
 
   __DATA__
+
   @@ time.html.ep
   <!DOCTYPE html>
   <html>
@@ -421,6 +422,7 @@ in the partial template.
 It's never fun to repeat yourself, that's why you can build reusable template
 blocks in C<ep> that work very similar normal Perl functions.
 
+  @@ welcome.html.ep
   <% my $block = begin %>
     <% my $name = shift; %>
     Hello <%= $name %>.
@@ -430,6 +432,7 @@ blocks in C<ep> that work very similar normal Perl functions.
 
 Blocks are always delimited by the C<begin> and C<end> keywords.
 
+  @@ welcome.html.ep
   % my $block = begin
     % my $name = shift;
     Hello <%= $name %>.
@@ -438,8 +441,9 @@ Blocks are always delimited by the C<begin> and C<end> keywords.
     %= $block->('Sebastian')
   % }
 
-A naive translation to equivalent Perl code could look like this.
+A naive translation to Perl pseudocode could look like this.
 
+  @@ welcome.html.pl
   my $output = '';
   my $block  = sub {
     my $name   = shift;
@@ -450,7 +454,7 @@ A naive translation to equivalent Perl code could look like this.
   for (1 .. 10) {
     $output .= $block->('Sebastian');
   }
-  print $output;
+  return $output;
 
 =head2 Content blocks
 
@@ -509,6 +513,7 @@ Compiled templates are always cached in memory, but with the C<memorize>
 helper you can go one step further and prevent template blocks from getting
 executed more than once.
 
+  @@ cached.html.ep
   %= memorize begin
     This template was compiled at <%= localtime time %>.
   % end

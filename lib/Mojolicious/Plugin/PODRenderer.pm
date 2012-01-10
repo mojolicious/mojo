@@ -77,7 +77,8 @@ sub register {
       # Rewrite code sections for syntax highlighting
       $dom->find('pre')->each(
         sub {
-          my $attrs = shift->attrs;
+          return if (my $e = shift)->all_text =~ /^\s*\$\s+/m;
+          my $attrs = $e->attrs;
           my $class = $attrs->{class};
           $attrs->{class} =
             defined $class ? "$class prettyprint" : 'prettyprint';
@@ -90,15 +91,14 @@ sub register {
       my $sections = [];
       $dom->find('h1, h2, h3')->each(
         sub {
-          my $tag    = shift;
-          my $text   = $tag->all_text;
-          my $anchor = $text;
+          my $e = shift;
+          my $anchor = my $text = $e->all_text;
           $anchor =~ s/\s+/_/g;
           $anchor = url_escape $anchor, 'A-Za-z0-9_';
           $anchor =~ s/\%//g;
-          push @$sections, [] if $tag->type eq 'h1' || !@$sections;
+          push @$sections, [] if $e->type eq 'h1' || !@$sections;
           push @{$sections->[-1]}, $text, $url->fragment($anchor)->to_abs;
-          $tag->replace_content(
+          $e->replace_content(
             $self->link_to(
               $text => $url->fragment('toc')->to_abs,
               class => 'mojoscroll',

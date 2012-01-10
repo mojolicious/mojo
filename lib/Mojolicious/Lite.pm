@@ -775,7 +775,7 @@ change the application log level directly in your test files.
 To disable debug messages later in a production setup you can change the
 L<Mojolicious> mode, default will be C<development>.
 
-  $ ./myapp.pl --mode production
+  $ ./myapp.pl -m production
 
 =head2 Logging
 

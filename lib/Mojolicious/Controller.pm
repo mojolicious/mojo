@@ -925,12 +925,17 @@ defaults to rendering an empty C<204> response.
 
 =head2 C<send_message>
 
+  $c = $c->send_message([binary => $bytes]);
+  $c = $c->send_message([text   => $bytes]);
   $c = $c->send_message('Hi there!');
   $c = $c->send_message('Hi there!', sub {...});
 
 Send a message non-blocking via WebSocket, the optional drain callback will
 be invoked once all data has been written. Note that this method is
 EXPERIMENTAL and might change without warning!
+
+  # Send JSON object as text frame
+  $c->send_message([text => Mojo::JSON->new->encode({hello => 'world'})]);
 
 =head2 C<session>
 

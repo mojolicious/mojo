@@ -306,7 +306,25 @@ or they would just keep getting emitted.
 
   app->start;
 
-And remember that all events are processed cooperatively, so your callbacks
+Timers are not tied to a specific request or connection, and can even be
+created at startup time.
+
+  use Mojolicious::Lite;
+  use Mojo::IOLoop;
+
+  # Count seconds since startup
+  my $i = 0;
+  Mojo::IOLoop->recurring(1 => sub { $i++ });
+
+  # Show counter
+  get '/' => sub {
+    my $self = shift;
+    $self->render(text => "About $i seconds running!");
+  };
+
+  app->start;
+
+Just remember that all events are processed cooperatively, so your callbacks
 shouldn't block for too long.
 
 =head2 WebSocket web service
@@ -451,7 +469,6 @@ Internally the L<Mojo::IOLoop> reactor can use multiple event loop backends,
 L<EV> for example will be automatically used if installed. Which in turn
 allows L<AnyEvent> to just work.
 
-  #!/usr/bin/env perl
   use Mojolicious::Lite;
   use EV;
   use AnyEvent;

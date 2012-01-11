@@ -230,47 +230,9 @@ into alien environments like foreign event loops.
 The real-time web is a collection of technologies that include Comet
 (long-polling), EventSource and WebSockets, which allow content to be pushed
 to consumers as soon as it is generated, instead of relying on the more
-traditional pull model.
-
-=head2 Timers
-
-All built-in web servers use non-blocking I/O and are based on the
-L<Mojo::IOLoop> reactor, which provides many very powerful features that
-allow real-time web applications to scale extremely well. Timers for example
-can be used to delay rendering of a response without blocking any other
-requests that might be processed in parallel, like C<sleep> would.
-
-  use Mojolicious::Lite;
-
-  # Wait for 3 seconds before rendering a response
-  get '/' => sub {
-    my $self = shift;
-    Mojo::IOLoop->timer(3 => sub {
-      $self->render(text => 'Delayed by 3 seconds!');
-    });
-  };
-
-  app->start;
-
-Recurring timers are slightly more powerful, but need to be dropped manually
-again, or they would just keep running as long as the server process stays
-up.
-
-  use Mojolicious::Lite;
-
-  # Count to 5 in 1 second steps
-  get '/' => sub {
-    my $self = shift;
-    my $i = 1;
-    my $id = Mojo::IOLoop->recurring(1 => sub {
-      $self->write_chunk($i);
-      $self->finish if $i == 5;
-      $i++;
-    });
-    $self->on(finish => sub { Mojo::IOLoop->drop($id) });
-  };
-
-  app->start;
+traditional pull model. All built-in web servers use non-blocking I/O and are
+based on the L<Mojo::IOLoop> reactor, which provides many very powerful
+features that allow real-time web applications to scale extremely well.
 
 =head2 Backend web services
 
@@ -302,6 +264,51 @@ latency backend web services.
       % }
     </body>
   </html>
+
+=head2 Timers
+
+Another primary feature of the L<Mojo::IOLoop> reactor are timers, which can
+for example be used to delay rendering of a response, and unlike C<sleep>,
+won't block any other requests that might be processed in parallel.
+
+  use Mojolicious::Lite;
+
+  # Wait for 3 seconds before rendering a response
+  get '/' => sub {
+    my $self = shift;
+    Mojo::IOLoop->timer(3 => sub {
+      $self->render(text => 'Delayed by 3 seconds!');
+    });
+  };
+
+  app->start;
+
+Recurring timers are slightly more powerful, but need to be dropped manually,
+or they would just keep getting emitted as long as the server process stays
+up.
+
+  use Mojolicious::Lite;
+
+  # Count to 5 in 1 second steps
+  get '/' => sub {
+    my $self = shift;
+
+    # Start recurring timer
+    my $i = 1;
+    my $id = Mojo::IOLoop->recurring(1 => sub {
+      $self->write_chunk($i);
+      $self->finish if $i == 5;
+      $i++;
+    });
+
+    # Drop recurring timer
+    $self->on(finish => sub { Mojo::IOLoop->drop($id) });
+  };
+
+  app->start;
+
+And remember that all events are processed cooperatively, so your callbacks
+shouldn't block for too long.
 
 =head2 WebSocket web service
 

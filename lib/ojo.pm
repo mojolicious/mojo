@@ -81,7 +81,7 @@ ojo - Fun Oneliners with Mojo!
 
 =head1 SYNOPSIS
 
-  perl -Mojo -e 'b(g("mojolicio.us")->dom->at("title")->text)->say'
+  $ perl -Mojo -e 'b(g("mojolicio.us")->dom->at("title")->text)->say'
 
 =head1 DESCRIPTION
 
@@ -98,7 +98,7 @@ L<ojo> implements the following functions.
 Create a route with L<Mojolicious::Lite/"any"> and return the current
 L<Mojolicious::Lite> object.
 
-  perl -Mojo -e 'a("/" => {text => "Hello Mojo!"})->start' daemon
+  $ perl -Mojo -e 'a("/" => {text => "Hello Mojo!"})->start' daemon
 
 =head2 C<b>
 
@@ -106,7 +106,7 @@ L<Mojolicious::Lite> object.
 
 Turn string into a L<Mojo::ByteStream> object.
 
-  perl -Mojo -e 'b(g("mojolicio.us")->body)->html_unescape->say'
+  $ perl -Mojo -e 'b(g("mojolicio.us")->body)->html_unescape->say'
 
 =head2 C<c>
 
@@ -137,7 +137,7 @@ L<Mojo::Message::Response> object. One redirect will be followed by default,
 you can change this behavior with the C<MOJO_MAX_REDIRECTS> environment
 variable.
 
-  MOJO_MAX_REDIRECTS=0 perl -Mojo -e 'b(g("mojolicio.us")->code)->say'
+  $ MOJO_MAX_REDIRECTS=0 perl -Mojo -e 'b(g("mojolicio.us")->code)->say'
 
 =head2 C<h>
 

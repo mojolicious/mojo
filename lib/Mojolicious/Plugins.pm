@@ -10,8 +10,7 @@ has namespaces => sub { ['Mojolicious::Plugin'] };
 # DEPRECATED in Leaf Fluttering In Wind!
 sub add_hook {
   warn <<EOF;
-Mojolicious::Plugins->add_hook is DEPRECATED in favor of
-Mojolicious::Plugins->on!
+Mojolicious::Plugins->add_hook is DEPRECATED in favor of Mojolicious->hook!
 EOF
   shift->on(@_);
 }

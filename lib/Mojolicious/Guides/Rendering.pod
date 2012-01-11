@@ -231,9 +231,9 @@ These mappings can be easily extended or changed with L<Mojolicious/"types">.
 Data can be passed to templates through the C<stash> in any of the native
 Perl data types.
 
-  $self->stash(author => 'Sebastian');
+  $self->stash(author     => 'Sebastian');
   $self->stash(frameworks => ['Catalyst', 'Mojolicious']);
-  $self->stash(examples => {tweetylicious => 'a microblogging app'});
+  $self->stash(examples   => {tweetylicious => 'a microblogging app'});
 
   %= $author
   %= $frameworks->[1]

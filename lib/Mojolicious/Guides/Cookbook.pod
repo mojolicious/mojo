@@ -780,11 +780,11 @@ response.
 The C<Hello World> example above can get even a little bit shorter in an
 L<ojo> oneliner.
 
-  perl -Mojo -e'a({text => "Hello World!"})->start' daemon
+  $ perl -Mojo -e'a({text => "Hello World!"})->start' daemon
 
 And you can use all the commands from L<Mojolicious::Commands>.
 
-  perl -Mojo -e'a({text => "Hello World!"})->start' get -v /
+  $ perl -Mojo -e'a({text => "Hello World!"})->start' get -v /
 
 =head1 MORE
 

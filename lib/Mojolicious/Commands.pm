@@ -47,7 +47,7 @@ Mojolicious::Commands - Commands
 
 L<Mojolicious::Commands> is the interactive command line interface to the
 L<Mojolicious> framework. It will automatically detect available commands in
-the L<Mojolicious::Command> namespace.
+the C<Mojolicious::Command> namespace.
 
 =head1 COMMANDS
 
@@ -180,7 +180,7 @@ Short hint shown after listing available commands.
   $commands      = $commands->namespaces(['Mojolicious::Commands']);
 
 Namespaces to search for available commands, defaults to
-L<Mojolicious::Command> and L<Mojo::Command>.
+C<Mojolicious::Command> and C<Mojo::Command>.
 
 =head1 METHODS
 

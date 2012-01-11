@@ -232,7 +232,78 @@ The real-time web is a collection of technologies that include Comet
 to consumers as soon as it is generated, instead of relying on the more
 traditional pull model.
 
-=head2 WebSocket
+=head2 Timers
+
+All built-in web servers use non-blocking I/O and are based on the
+L<Mojo::IOLoop> reactor, which provides many very powerful features that
+allow real-time web applications to scale extremely well. Timers for example
+can be used to delay rendering of a response without blocking any other
+requests that might be processed in parallel, like C<sleep> would.
+
+  use Mojolicious::Lite;
+
+  # Wait for 3 seconds before rendering a response
+  get '/' => sub {
+    my $self = shift;
+    Mojo::IOLoop->timer(3 => sub {
+      $self->render(text => 'Delayed by 3 seconds!');
+    });
+  };
+
+  app->start;
+
+Recurring timers are slightly more powerful, but need to be dropped manually
+again, or they would just keep running as long as the server process stays
+up.
+
+  use Mojolicious::Lite;
+
+  # Count to 5 in 1 second steps
+  get '/' => sub {
+    my $self = shift;
+    my $i = 1;
+    my $id = Mojo::IOLoop->recurring(1 => sub {
+      $self->write_chunk($i);
+      $self->finish if $i == 5;
+      $i++;
+    });
+    $self->on(finish => sub { Mojo::IOLoop->drop($id) });
+  };
+
+  app->start;
+
+=head2 Backend web services
+
+Since L<Mojo::UserAgent> is also based on the L<Mojo::IOLoop> reactor, it
+won't block the built-in web servers when used non-blocking, even for high
+latency backend web services.
+
+  use Mojolicious::Lite;
+
+  # Search Twitter for "perl"
+  get '/' => sub {
+    my $self = shift;
+    $self->ua->get('http://search.twitter.com/search.json?q=perl' => sub {
+      my ($ua, $tx) = @_;
+      $self->render('twitter', results => $tx->res->json->{results});
+    });
+  };
+
+  app->start;
+  __DATA__
+
+  @@ twitter.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head><title>Twitter results for "perl"</title></head>
+    <body>
+      % for my $result (@$results) {
+        <p><%= $result->{text} %></p>
+      % }
+    </body>
+  </html>
+
+=head2 WebSocket web service
 
 The WebSocket protocol offers full bi-directional low-latency communication
 channels between clients and servers. Receiving messages is as easy as
@@ -291,7 +362,7 @@ all of this is event based, so you should not block for too long.
 The C<finish> event will be emitted right after the WebSocket connection has
 been closed.
 
-=head2 Testing WebSockets
+=head2 Testing WebSocket web services
 
 While the message flow on WebSocket connections can be rather dynamic, it
 more often than not is quite predictable, which allows this rather pleasant
@@ -311,7 +382,7 @@ L<Test::Mojo> API to be used.
     ->message_is('echo: Hello Mojo!')
     ->finish_ok;
 
-=head2 EventSource
+=head2 EventSource web service
 
 HTML5 EventSource is a special form of long-polling where you can directly
 send DOM events from servers to clients. It is uni-directional, that means

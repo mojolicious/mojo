@@ -229,10 +229,11 @@ into alien environments like foreign event loops.
 
 The real-time web is a collection of technologies that include Comet
 (long-polling), EventSource and WebSockets, which allow content to be pushed
-to consumers as soon as it is generated, instead of relying on the more
-traditional pull model. All built-in web servers use non-blocking I/O and are
-based on the L<Mojo::IOLoop> reactor, which provides many very powerful
-features that allow real-time web applications to scale extremely well.
+to consumers as soon as it is generated with long-lived connections, instead
+of relying on the more traditional pull model. All built-in web servers use
+non-blocking I/O and are based on the L<Mojo::IOLoop> reactor, which provides
+many very powerful features that allow real-time web applications to scale up
+to thousands of clients.
 
 =head2 Backend web services
 
@@ -284,8 +285,7 @@ won't block any other requests that might be processed in parallel.
   app->start;
 
 Recurring timers are slightly more powerful, but need to be dropped manually,
-or they would just keep getting emitted as long as the server process stays
-up.
+or they would just keep getting emitted.
 
   use Mojolicious::Lite;
 
@@ -297,11 +297,10 @@ up.
     my $i = 1;
     my $id = Mojo::IOLoop->recurring(1 => sub {
       $self->write_chunk($i);
-      $self->finish if $i == 5;
-      $i++;
+      $self->finish if $i++ == 5;
     });
 
-    # Drop recurring timer
+    # Stop recurring timer
     $self->on(finish => sub { Mojo::IOLoop->drop($id) });
   };
 
@@ -314,8 +313,7 @@ shouldn't block for too long.
 
 The WebSocket protocol offers full bi-directional low-latency communication
 channels between clients and servers. Receiving messages is as easy as
-subscribing to the C<message> event of the transaction, just be aware that
-all of this is event based, so you should not block for too long.
+subscribing to the C<message> event of the transaction.
 
   use Mojolicious::Lite;
 

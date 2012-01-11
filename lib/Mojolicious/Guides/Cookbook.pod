@@ -229,7 +229,7 @@ into alien environments like foreign event loops.
 
 The real-time web is a collection of technologies that include Comet
 (long-polling), EventSource and WebSockets, which allow content to be pushed
-to consumers as soon as it is generated with long-lived connections, instead
+to consumers with long-lived connections as soon as it is generated, instead
 of relying on the more traditional pull model. All built-in web servers use
 non-blocking I/O and are based on the L<Mojo::IOLoop> reactor, which provides
 many very powerful features that allow real-time web applications to scale up
@@ -274,7 +274,7 @@ won't block any other requests that might be processed in parallel.
 
   use Mojolicious::Lite;
 
-  # Wait for 3 seconds before rendering a response
+  # Wait 3 seconds before rendering a response
   get '/' => sub {
     my $self = shift;
     Mojo::IOLoop->timer(3 => sub {
@@ -444,6 +444,29 @@ HTTP protocol for transport.
 
 The C<message> event will be emitted for every new log message and the
 C<finish> event right after the transaction has been finished.
+
+=head2 Event loops
+
+Internally the L<Mojo::IOLoop> reactor can use multiple event loop backends,
+L<EV> for example will be automatically used if installed. Which in turn
+allows L<AnyEvent> to just work.
+
+  #!/usr/bin/env perl
+  use Mojolicious::Lite;
+  use EV;
+  use AnyEvent;
+
+  # Wait 3 seconds before rendering a response
+  get '/' => sub {
+    my $self = shift;
+    my $w;
+    $w = AE::timer 3, 0, sub {
+      $self->render(text => 'Delayed by 3 seconds!');
+      undef $w;
+    };
+  };
+
+  app->start;
 
 =head1 USER AGENT
 

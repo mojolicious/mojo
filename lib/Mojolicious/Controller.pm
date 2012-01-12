@@ -592,8 +592,7 @@ sub url_for {
 
 sub url_with {
   my $self = shift;
-  my $url  = $self->req->url->clone;
-  return @_ ? $self->url_for(@_)->query($url->query) : $url;
+  return $self->url_for(@_)->query($self->req->url->query->clone);
 }
 
 sub write {

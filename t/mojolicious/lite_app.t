@@ -533,10 +533,10 @@ get '/redirect/condition/1' => (redirect => 1) =>
 # GET /url_with
 get '/url_with';
 
-# GET /url_with/abs
-get '/url_with/abs' => sub {
+# GET /url_with/*
+get '/url_with/:foo' => sub {
   my $self = shift;
-  $self->render(text => $self->url_with->to_abs);
+  $self->render(text => $self->url_with(foo => 'bar')->to_abs);
 };
 
 # Oh Fry, I love you more than the moon, and the stars,
@@ -1401,9 +1401,9 @@ http://mojolicio.us/test?foo=23&bar=24&baz=25
 /bar/23?bar=24&baz=25&foo=yada
 EOF
 
-# GET /url_with/abs
-$t->get_ok('/url_with/abs?foo=bar')->status_is(200)
-  ->content_like(qr|http\://localhost\:\d+/url_with/abs\?foo\=bar|);
+# GET /url_with/foo
+$t->get_ok('/url_with/foo?foo=bar')->status_is(200)
+  ->content_like(qr|http\://localhost\:\d+/url_with/bar\?foo\=bar|);
 
 # User agent timer
 $tua->ioloop->one_tick('0.1');

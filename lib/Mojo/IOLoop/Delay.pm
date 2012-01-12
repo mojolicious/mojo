@@ -49,8 +49,8 @@ Mojo::IOLoop::Delay - Synchronize events
     });
   }
 
-  # Wait for events
-  $delay->wait;
+  # Wait for events unless reactor is already running
+  $delay->wait unless Mojo::IOLoop->is_running;
 
 =head1 DESCRIPTION
 

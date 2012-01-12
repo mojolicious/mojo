@@ -788,6 +788,8 @@ Danijel Tasov
 
 David Davis
 
+Diego Kuperman
+
 Dmitriy Shalashov
 
 Dmitry Konstantinov

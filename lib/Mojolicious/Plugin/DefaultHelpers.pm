@@ -9,7 +9,7 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  for my $name (qw/app flash param stash session url_for/) {
+  for my $name (qw/app flash param stash session url_for url_with/) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -234,6 +234,13 @@ Page title.
   %= url_for 'named', controller => 'bar', action => 'baz'
 
 Alias for L<Mojolicious::Controller/"url_for">.
+
+=head2 C<url_with>
+
+  %= url_with 'named', controller => 'bar', action => 'baz'
+
+Alias for L<Mojolicious::Controller/"url_with">. Note that this helper is
+EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

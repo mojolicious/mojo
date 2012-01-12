@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 378;
+use Test::More tests => 381;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -57,6 +57,13 @@ $url->query('foo');
 is "$url", 'http://sri:foobar@kraih.com:8080?foo#23', 'right format';
 $url->query('foo=bar');
 is "$url", 'http://sri:foobar@kraih.com:8080?foo=bar#23', 'right format';
+$url->query([foo => undef]);
+is "$url", 'http://sri:foobar@kraih.com:8080#23', 'right format';
+$url->query([foo => 23, bar => 24, baz => 25]);
+is "$url", 'http://sri:foobar@kraih.com:8080?foo=23&bar=24&baz=25#23',
+  'right format';
+$url->query([foo => 26, bar => undef, baz => undef]);
+is "$url", 'http://sri:foobar@kraih.com:8080?foo=26#23', 'right format';
 
 # Query string
 $url = Mojo::URL->new(

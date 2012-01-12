@@ -590,6 +590,12 @@ sub url_for {
   return $url;
 }
 
+sub url_with {
+  my $self = shift;
+  my $url  = $self->req->url->clone;
+  return @_ ? $self->url_for(@_)->query($url->query) : $url;
+}
+
 sub write {
   my ($self, $chunk, $cb) = @_;
 
@@ -1020,6 +1026,21 @@ Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 
   # "/myapp/perldoc?foo=bar" if application is deployed under "/myapp"
   say $c->url_for('/perldoc')->query(foo => 'bar');
+
+=head2 C<url_with>
+
+  my $url = $c->url_with;
+  my $url = $c->url_with(name => 'sebastian');
+  my $url = $c->url_with('test', name => 'sebastian');
+  my $url = $c->url_with('/perldoc');
+  my $url = $c->url_with('http://mojolicio.us/perldoc');
+
+Does the same as C<url_for>, but inherits query parameters from the current
+request. Note that this method is EXPERIMENTAL and might change without
+warning!
+
+  # Replace one query parameter
+  say $c->url_with->query([page => 2]);
 
 =head2 C<write>
 

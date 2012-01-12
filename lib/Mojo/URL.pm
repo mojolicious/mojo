@@ -164,16 +164,15 @@ sub query {
     # Merge with array
     elsif (ref $_[0] && ref $_[0] eq 'ARRAY') {
       my $q = $self->{query} ||= Mojo::Parameters->new;
-      my $merge = Mojo::Parameters->new(@{$_[0]});
-      for my $name ($merge->param) {
-        $q->param($name => $merge->param($name));
+      while (my $name = shift @{$_[0]}) {
+        my $value = shift @{$_[0]};
+        defined $value ? $q->param($name => $value) : $q->remove($name);
       }
     }
 
     # Append hash
     elsif (ref $_[0] && ref $_[0] eq 'HASH') {
-      my $q = $self->{query} ||= Mojo::Parameters->new;
-      $q->append(%{$_[0]});
+      ($self->{query} ||= Mojo::Parameters->new)->append(%{$_[0]});
     }
 
     # Replace with string
@@ -452,6 +451,9 @@ Query part of this URL, defaults to a L<Mojo::Parameters> object.
 
   # "http://mojolicio.us?a=2&b=2&c=3"
   say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => 2, c => 3]);
+
+  # "http://mojolicio.us?b=2"
+  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => undef]);
 
   # "http://mojolicio.us?a=1&b=2&a=2&c=3"
   say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query({a => 2, c => 3});

@@ -649,7 +649,7 @@ method is EXPERIMENTAL and might change without warning!
     });
   }
 
-  # Wait for events unless reactor is already running
+  # Wait for events if necessary
   $delay->wait unless Mojo::IOLoop->is_running;
 
 =head2 C<drop>

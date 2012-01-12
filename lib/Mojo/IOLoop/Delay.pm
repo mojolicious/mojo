@@ -49,7 +49,7 @@ Mojo::IOLoop::Delay - Synchronize events
     });
   }
 
-  # Wait for events unless reactor is already running
+  # Wait for events if necessary
   $delay->wait unless Mojo::IOLoop->is_running;
 
 =head1 DESCRIPTION
@@ -108,7 +108,15 @@ Decrement active event counter.
 
   my @args = $delay->wait;
 
-Start C<ioloop> and stop it again once the C<finish> event gets emitted.
+Start C<ioloop> and stop it again once the C<finish> event gets emitted, only
+works when C<ioloop> is not running already.
+
+  # Use the "finish" event to synchronize portably
+  $delay->on(finish => sub {
+    my ($delay, @args) = @_;
+    ...
+  });
+  $delay->wait unless $delay->ioloop->is_running;
 
 =head1 SEE ALSO
 

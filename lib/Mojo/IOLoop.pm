@@ -138,8 +138,6 @@ EOF
 # DEPRECATED in Leaf Fluttering In Wind!
 *connection_timeout = \&timeout;
 
-sub defer { shift->timer(0 => @_) }
-
 sub delay {
   my ($self, $cb) = @_;
   $self = $self->singleton unless ref $self;
@@ -622,22 +620,14 @@ might change without warning!
     ...
   });
 
-=head2 C<defer>
-
-  Mojo::IOLoop->defer(sub {...});
-  $loop->defer(sub {...});
-
-Invoke callback on next reactor tick. Note that this method is EXPERIMENTAL
-and might change without warning!
-
 =head2 C<delay>
 
   my $delay = Mojo::IOLoop->delay;
   my $delay = $loop->delay;
   my $delay = $loop->delay(sub {...});
 
-Get L<Mojo::IOLoop::Delay> object to synchronize events. Note that this
-method is EXPERIMENTAL and might change without warning!
+Get L<Mojo::IOLoop::Delay> object to synchronize events and subscribe to
+C<finish> event if optional callback is provided.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });

@@ -19,7 +19,7 @@ my $delay = Mojo::IOLoop::Delay->new;
 my @results;
 for my $i (0, 0) {
   $delay->begin;
-  Mojo::IOLoop->defer(sub { push @results, $i; $delay->end });
+  Mojo::IOLoop->timer(0 => sub { push @results, $i; $delay->end });
 }
 $delay->wait;
 is_deeply \@results, [0, 0], 'right results';
@@ -30,7 +30,7 @@ my $finished;
 $delay->on(finish => sub { shift; $finished = [@_, 'works!'] });
 for my $i (0, 0) {
   $delay->begin;
-  Mojo::IOLoop->defer(sub { $delay->end($i) });
+  Mojo::IOLoop->timer(0 => sub { $delay->end($i) });
 }
 @results = $delay->wait;
 is_deeply $finished, [0, 0, 'works!'], 'right results';
@@ -40,7 +40,7 @@ is_deeply \@results, [0, 0], 'right results';
 $delay = Mojo::IOLoop::Delay->new;
 for my $i (3, 3) {
   $delay->begin;
-  Mojo::IOLoop->defer(sub { $delay->end($i) });
+  Mojo::IOLoop->timer(0 => sub { $delay->end($i) });
 }
 is $delay->wait, 3, 'right results';
 
@@ -49,7 +49,7 @@ $finished = undef;
 $delay = Mojo::IOLoop->delay(sub { shift; $finished = [@_, 'too!'] });
 for my $i (1, 1) {
   my $cb = $delay->begin;
-  Mojo::IOLoop->defer(sub { $delay->$cb($i) });
+  Mojo::IOLoop->timer(0 => sub { $delay->$cb($i) });
 }
 @results = $delay->wait;
 is_deeply $finished, [1, 1, 'too!'], 'right results';

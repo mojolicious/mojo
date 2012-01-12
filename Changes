@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.44    2012-01-12 00:00:00
+        - Removed experimental status from Mojo::IOLoop::Delay.
+        - Removed defer method from Mojo::IOLoop.
         - Improved syntax highlighting in perldoc browser slightly.
         - Improved Mojo::Base tests.
         - Improved documentation.

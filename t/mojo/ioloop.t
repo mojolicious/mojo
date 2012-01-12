@@ -34,8 +34,8 @@ is ref $loop->iowatcher, 'MyWatcher', 'right class';
 
 # Double start
 my $err;
-Mojo::IOLoop->defer(
-  sub {
+Mojo::IOLoop->timer(
+  0 => sub {
     eval { Mojo::IOLoop->start };
     $err = $@;
     Mojo::IOLoop->stop;

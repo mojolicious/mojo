@@ -54,8 +54,7 @@ Mojo::IOLoop::Delay - Synchronize events
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Delay> synchronizes events for L<Mojo::IOLoop>. Note that
-this module is EXPERIMENTAL and might change without warning!
+L<Mojo::IOLoop::Delay> synchronizes events for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 

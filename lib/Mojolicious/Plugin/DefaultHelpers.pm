@@ -9,7 +9,7 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  for my $name (qw/app flash param stash session url_for url_with/) {
+  for my $name (qw/app flash param stash session url_for/) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -96,6 +96,14 @@ sub register {
       # Memorize
       $memorize->{$name}->{expires} = $expires;
       $memorize->{$name}->{content} = $cb->();
+    }
+  );
+
+  # Add "url_with" helper
+  $app->helper(
+    url_with => sub {
+      my $self = shift;
+      return $self->url_for(@_)->query($self->req->url->query->clone);
     }
   );
 }
@@ -239,8 +247,11 @@ Alias for L<Mojolicious::Controller/"url_for">.
 
   %= url_with 'named', controller => 'bar', action => 'baz'
 
-Alias for L<Mojolicious::Controller/"url_with">. Note that this helper is
-EXPERIMENTAL and might change without warning!
+Does the same as C<url_for>, but inherits query parameters from the current
+request. Note that this helper is EXPERIMENTAL and might change without
+warning!
+
+  %= url_with->query([page => 2])
 
 =head1 METHODS
 

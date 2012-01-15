@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.44    2012-01-13 00:00:00
+2.44    2012-01-16 00:00:00
         - Added EXPERIMENTAL url_with helper to
           Mojolicious::Plugin::DefaultHelpers. (diegok, marcus, judofyr, sri)
         - Added EXPERIMENTAL support for removing query parmaters while
@@ -10,6 +10,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved syntax highlighting in perldoc browser slightly.
         - Improved Mojo::Base tests.
         - Improved documentation.
+        - Fixed Mojo::Command->app to be an attribute and not a method.
         - Fixed Mojo::ByteStream, Mojo::Collection and Mojo::DOM to not be
           subclasses of Mojo::Base.
 

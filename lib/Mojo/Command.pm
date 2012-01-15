@@ -12,6 +12,7 @@ use Mojo::Template;
 use Mojo::Loader;
 use Mojo::Util qw/b64_decode decamelize/;
 
+has app => sub { Mojo::Server->new->app };
 has hint => <<"EOF";
 
 See '$0 help COMMAND' for more information on a specific command.
@@ -32,8 +33,6 @@ has usage      => "usage: $0\n";
 
 # Cache
 my $CACHE = {};
-
-sub app { Mojo::Server->new->app }
 
 sub chmod_file {
   my ($self, $path, $mod) = @_;
@@ -342,6 +341,13 @@ default.
 
 L<Mojo::Command> implements the following attributes.
 
+=head2 C<app>
+
+  my $app  = $command->app;
+  $command = $command->app(Mojolicious->new);
+
+Currently active application, defaults to a L<Mojo::HelloWorld> object.
+
 =head2 C<description>
 
   my $description = $command->description;
@@ -388,12 +394,6 @@ Usage information for command, used for the help screen.
 
 L<Mojo::Command> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
-
-=head2 C<app>
-
-  my $app = $command->app;
-
-Currently active application, defaults to a L<Mojo::HelloWorld> object.
 
 =head2 C<chmod_file>
 

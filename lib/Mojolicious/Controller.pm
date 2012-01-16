@@ -22,10 +22,11 @@ has match => sub {
 has tx => sub { Mojo::Transaction::HTTP->new };
 
 # Bundled files
-my $H = Mojo::Home->new;
+our $H = Mojo::Home->new;
 $H->parse($H->parse($H->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 our $EXCEPTION     = $H->slurp_rel_file('exception.html.ep');
 our $DEV_EXCEPTION = $H->slurp_rel_file('exception.development.html.ep');
+our $MOJOBAR       = $H->slurp_rel_file('mojobar.html.ep');
 our $NOT_FOUND     = $H->slurp_rel_file('not_found.html.ep');
 our $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
 

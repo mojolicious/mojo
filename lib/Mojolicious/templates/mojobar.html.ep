@@ -1,6 +1,6 @@
-% content_for header => begin
-  %= javascript '/js/jquery.js'
-  %= stylesheet begin
+%= javascript '/js/jquery.js'
+<div id="mojobar">
+  %= stylesheet scoped => 'scoped', begin
     #mojobar {
       background-color: #1a1a1a;
       background: -webkit-gradient(
@@ -54,8 +54,6 @@
     }
     #mojobar-links a:hover { color: #fff }
   % end
-% end
-<div id="mojobar">
   <div id="mojobar-logo">
     %= link_to 'http://mojolicio.us' => begin
       %= image '/mojolicious-white.png', alt => 'Mojolicious logo'

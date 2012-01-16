@@ -4,7 +4,6 @@
     <title><%= $title %></title>
     %= stylesheet '/css/prettify-mojo.css'
     %= javascript '/js/prettify.js'
-    %= content_for 'header'
     %= stylesheet begin
       a { color: inherit }
       a:hover { color: #2a2a2a }
@@ -62,7 +61,7 @@
     % end
   </head>
   <body onload="prettyPrint()">
-    %= content_for 'mojobar'
+    %= include inline => $Mojolicious::Controller::MOJOBAR
     % my $link = begin
       %= link_to shift, shift, class => "mojoscroll"
     % end

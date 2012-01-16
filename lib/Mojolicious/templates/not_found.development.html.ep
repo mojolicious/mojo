@@ -5,101 +5,68 @@
     %= stylesheet '/css/prettify-mojo.css'
     %= javascript '/js/prettify.js'
     %= stylesheet begin
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
+      a { color: inherit }
+      a:hover { color: #2a2a2a }
       a img { border: 0 }
       body {
         background-color: #f5f6f8;
-        color: #333;
+        color: #445555;
+        font: 0.9em 'Helvetica Neue', 'Helvetica', sans-serif;
+        font-weight: normal;
+        line-height: 1.5;
         margin: 0;
-        text-align: center;
       }
-      h1 {
-        font: 1.5em 'Helvetica Neue', 'Helvetica', sans-serif;
-        font-weight: 300;
-        margin-bottom: 1em;
-        margin-top: 1em;
+      h1, h2, h3 {
+        color: #2a2a2a;
+        font-size: 1.5em;
+        margin: 0;
       }
-      #footer {
-        background-color: #caecf6;
-        padding-top: 20em;
-        width: 100%;
-      }
-      #footer a img { margin-top: 20em }
-      #documentation {
-        background-color: #ecf1da;
-        padding-bottom: 20em;
-        padding-top: 20em;
-      }
-      #documentation h1 { margin-bottom: 3em }
-      #header {
-        margin-bottom: 20em;
-        margin-top: 15em;
-        width: 100%;
-      }
-      #perldoc {
+      h1 a, h2 a, h3 a { text-decoration: none }
+      pre {
         background-color: #eee;
-        border: 2px dashed #1a1a1a;
-        color: #000;
-        display: inline-block;
-        margin-left: 0.1em;
-        padding: 0.5em;
-        white-space: nowrap;
-      }
-      #preview {
-        background-color: #1a1a1a;
         background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
         -moz-border-radius: 5px;
         border-radius: 5px;
-        font: 1.5em 'Menlo', 'Monaco', Courier, monospace;
-        margin: 0;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 0.5em;
-        padding-left: 1em;
+        color: #eee;
+        font: 0.8em 'Menlo', 'Monaco', Courier, monospace;
         text-align: left;
         text-shadow: #333 0 1px 0;
-        width: 500px;
+        padding-bottom: 1.5em;
+        padding-top: 1.5em;
+        white-space: pre-wrap;
       }
-      #suggestion {
-        background-color: #2f3032;
-        color: #eee;
-        padding-bottom: 20em;
-        padding-top: 20em;
+      #footer {
+        padding-top: 1em;
+        text-align: center;
+      }
+      #introduction {
+        background-color: #fff;
+        -moz-border-radius-bottomleft: 5px;
+        border-bottom-left-radius: 5px;
+        -moz-border-radius-bottomright: 5px;
+        border-bottom-right-radius: 5px;
+        -moz-box-shadow: 0px 0px 2px #ccc;
+        -webkit-box-shadow: 0px 0px 2px #ccc;
+        box-shadow: 0px 0px 2px #ccc;
+        margin-left: 5em;
+        margin-right: 5em;
+        padding: 3em;
+        padding-top: 7em;
+      }
+      #wrapperlicious {
+        max-width: 1000px;
+        margin: 0 auto;
       }
     % end
   </head>
   <body onload="prettyPrint()">
-    <div id="header">
-      %= image '/mojolicious-box.png', alt => 'Mojolicious banner'
-      <h1>This page is brand new and has not been unboxed yet!</h1>
-    </div>
-    <div id="suggestion">
-      %= image '/mojolicious-arrow.png', alt => 'Arrow'
-      <h1>Perhaps you would like to add a route for it?</h1>
-      <div id="preview">
-	    % my $m = lc $self->req->method eq 'get' ? 'get' : 'any';
-        <pre class="prettyprint">
-<%= $m %> '<%= $self->req->url->path->to_abs_string %>' => sub {
-    my $self = shift;
-    $self->render_text('Hello world!');
-};</pre>
+    %= include inline => $Mojolicious::Controller::MOJOBAR
+    <div id="wrapperlicious">
+      <div id="introduction">
+        <p>INTRODUCTION GOES HERE!</p>
       </div>
     </div>
-    <div id="documentation">
-      <h1>
-        You might also enjoy our excellent documentation in
-        <div id="perldoc">
-          %= link_to 'perldoc Mojolicious::Guides', $guide
-        </div>
-      </h1>
-      %= image '/amelia.png', alt => 'Amelia'
-    </div>
     <div id="footer">
-      <h1>And don't forget to have fun!</h1>
-      <p><%= image '/mojolicious-clouds.png', alt => 'Clouds' %></p>
       %= link_to 'http://mojolicio.us' => begin
         %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
       % end

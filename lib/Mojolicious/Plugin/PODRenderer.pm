@@ -5,9 +5,7 @@ use IO::File;
 use Mojo::Asset::File;
 use Mojo::ByteStream 'b';
 use Mojo::DOM;
-use Mojo::Home;
 use Mojo::Util 'url_escape';
-
 use Pod::Simple::HTML;
 use Pod::Simple::Search;
 
@@ -15,10 +13,7 @@ use Pod::Simple::Search;
 our @PATHS = map { $_, "$_/pods" } @INC;
 
 # Bundled files
-my $H = Mojo::Home->new;
-$H->parse($H->parse($H->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
-our $MOJOBAR = $H->slurp_rel_file('mojobar.html.ep');
-our $PERLDOC = $H->slurp_rel_file('perldoc.html.ep');
+our $PERLDOC = $Mojolicious::Controller::H->slurp_rel_file('perldoc.html.ep');
 
 # "This is my first visit to the Galaxy of Terror and I'd like it to be a
 #  pleasant one."
@@ -113,7 +108,6 @@ sub register {
       $dom->find('h1 + p')->first(sub { $title = shift->text });
 
       # Combine everything to a proper response
-      $self->content_for(mojobar => $self->include(inline => $MOJOBAR));
       $self->content_for(perldoc => "$dom");
       $self->app->plugins->emit_hook(before_perldoc => $self);
       $self->render(

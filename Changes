@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.44    2012-01-16 00:00:00
+        - Added new not_found page for development mode.
         - Added EXPERIMENTAL url_with helper to
           Mojolicious::Plugin::DefaultHelpers. (diegok, marcus, judofyr, sri)
         - Added EXPERIMENTAL support for removing query parmaters while

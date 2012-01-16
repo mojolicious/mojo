@@ -327,19 +327,12 @@ sub render_not_found {
   return if $stash->{'mojo.exception'};
   return if $stash->{'mojo.not_found'};
 
-  # Check for POD plugin
-  my $guide =
-      $self->app->renderer->helpers->{pod_to_html}
-    ? $self->url_for('/perldoc')
-    : 'http://mojolicio.us/perldoc';
-
   # Render with fallbacks
   my $mode    = $self->app->mode;
   my $options = {
     template         => "not_found.$mode",
     format           => $stash->{format} || 'html',
     status           => 404,
-    guide            => $guide,
     'mojo.not_found' => 1
   };
   my $inline = $mode eq 'development' ? $DEV_NOT_FOUND : $NOT_FOUND;

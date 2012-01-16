@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head><title>Page Not Found</title></head>
+  <head><title>Page not found</title></head>
    %= stylesheet begin
       a img { border: 0 }
       body { background-color: #caecf6 }

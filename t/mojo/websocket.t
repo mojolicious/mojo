@@ -159,8 +159,8 @@ like $res->body, qr#ws\://localhost\:\d+/#, 'right content';
 
 # GET /socket (plain HTTP request)
 $res = $ua->get('/socket')->res;
-is $res->code,   404,           'right status';
-like $res->body, qr/Not Found/, 'right content';
+is $res->code, 404, 'right status';
+like $res->body, qr/Page not found/, 'right content';
 
 # WebSocket /
 my $loop = Mojo::IOLoop->singleton;

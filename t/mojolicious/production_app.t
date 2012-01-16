@@ -71,11 +71,11 @@ $t->get_ok('/hello.txt')->status_is(200)
 $t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
+  ->content_like(qr/Page not found/);
 
 # Try to access a file which is not under the web root via path
 # traversal in production mode
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
+  ->content_like(qr/Page not found/);

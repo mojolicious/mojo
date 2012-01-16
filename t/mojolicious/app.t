@@ -41,7 +41,7 @@ $t->get_ok($url, {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
 $t->get_ok('/foo/baz')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_unlike(qr/Something/)->content_like(qr/Not Found/);
+  ->content_unlike(qr/Something/)->content_like(qr/Page not found/);
 
 # Foo::yada (action-less template)
 $t->get_ok('/foo/yada')->status_is(200)
@@ -121,7 +121,7 @@ $t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)
 $t->get_ok('/auth/authenticated')->status_is(404)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
+  ->content_like(qr/Page not found/);
 
 # Foo::test
 $t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)
@@ -203,7 +203,7 @@ $t->get_ok('/test6', {'X-Test' => 'Hi there!'})->status_is(200)
 $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
+  ->content_like(qr/Page not found/);
 
 # Check Last-Modified header for static files
 my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
@@ -223,7 +223,7 @@ $t->get_ok('/hello.txt')->status_is(200)
 $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Not Found/);
+  ->content_like(qr/Page not found/);
 
 # Check If-Modified-Since
 $t->get_ok('/hello.txt', {'If-Modified-Since' => $mtime})->status_is(304)

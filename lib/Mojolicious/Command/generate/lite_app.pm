@@ -24,7 +24,7 @@ use Mojolicious::Lite;
 # Documentation browser under "/perldoc"
 plugin 'PODRenderer';
 
-get '/welcome' => sub {
+get '/' => sub {
   my $self = shift;
   $self->render('index');
 };

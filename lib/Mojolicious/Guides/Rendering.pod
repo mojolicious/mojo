@@ -628,7 +628,7 @@ templates.
   @@ not_found.production.html.ep
   <!DOCTYPE html>
   <html>
-    <head><title>Page Not Found</title></head>
+    <head><title>Page not found</title></head>
     <body>Page does not seem to exist.</body>
   </html>
 

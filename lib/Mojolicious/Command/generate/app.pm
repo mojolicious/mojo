@@ -88,7 +88,7 @@ sub startup {
   my $r = $self->routes;
 
   # Normal route to controller
-  $r->route('/welcome')->to('example#welcome');
+  $r->route('/')->to('example#welcome');
 }
 
 1;
@@ -118,7 +118,7 @@ sub welcome {
   <body>
     <h2>Welcome to the Mojolicious real-time web framework!</h2>
     This is the static document "public/index.html",
-    <a href="/welcome">click here</a> to get back to the start.
+    <a href="/">click here</a> to get back to the start.
   </body>
 </html>
 
@@ -132,7 +132,7 @@ use Test::Mojo;
 use_ok '<%= $class %>';
 
 my $t = Test::Mojo->new('<%= $class %>');
-$t->get_ok('/welcome')->status_is(200)->content_like(qr/Mojolicious/i);
+$t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
 
 @@ layout
 <!DOCTYPE html>

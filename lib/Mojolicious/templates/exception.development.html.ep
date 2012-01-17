@@ -19,6 +19,7 @@
         margin: 0;
       }
       pre {
+        font: 0.8em 'Menlo', 'Monaco', Courier, monospace;
         margin: 0;
         white-space: pre-wrap;
       }
@@ -41,17 +42,13 @@
         background-color: #1a1a1a;
         background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
         color: #eee;
-        font-family: 'Menlo', 'Monaco', Courier, monospace !important;
         text-shadow: #333 0 1px 0;
       }
       .important { background-color: rgba(47, 48, 50, .75) }
       .infobox { color: #333 }
       .infobox tr:nth-child(odd) .value { background-color: #ddeeff }
       .infobox tr:nth-child(even) .value { background-color: #eef9ff }
-      .key {
-        text-align: right;
-        text-weight: bold;
-      }
+      .key { text-align: right }
       .striped { border-top: solid #cce4ff 1px }
       .tap {
         font: 0.5em Verdana, sans-serif;

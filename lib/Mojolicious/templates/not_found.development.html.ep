@@ -17,11 +17,6 @@
         background-color: #eef9ff;
         padding: 0.5em;
       }
-      h1 {
-        color: #2a2a2a;
-        font-size: 1.5em;
-        margin: 0;
-      }
       pre {
         margin: 0;
         white-space: pre-wrap;
@@ -63,10 +58,10 @@
     %= include inline => $Mojolicious::Controller::MOJOBAR
     <div id="wrapperlicious">
       <div id="routes">
-        <h1>Page not found</h1>
         <p>
-          None of these routes matched, maybe you need to add one for
-          <code><%= $self->req->url->path %></code>?
+          None of these routes matched your request for
+          <code><%= $self->req->url->path %></code>, maybe you need to add
+          one?
         </p>
         % my $walk;
         % $walk = begin

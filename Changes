@@ -4,7 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added new not_found page for development mode.
         - Added EXPERIMENTAL url_with helper to
           Mojolicious::Plugin::DefaultHelpers. (diegok, marcus, judofyr, sri)
-        - Added EXPERIMENTAL support for removing query parmaters while
+        - Added EXPERIMENTAL support for removing query parameters while
           merging to query method of Mojo::URL. (marcus, judofyr, sri)
         - Removed experimental status from Mojo::IOLoop::Delay.
         - Removed defer method from Mojo::IOLoop.

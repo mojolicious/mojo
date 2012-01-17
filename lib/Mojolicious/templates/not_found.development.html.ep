@@ -22,6 +22,11 @@
         font: 0.8em 'Menlo', 'Monaco', Courier, monospace;
         padding: 0.4em;
       }
+      h1 {
+        color: #2a2a2a;
+        font-size: 1.5em;
+        margin: 0;
+      }
       pre {
         font: 0.8em 'Menlo', 'Monaco', Courier, monospace;
         margin: 0;
@@ -38,8 +43,12 @@
         border-top: solid #cce4ff 1px;
         padding: 0.5em;
       }
-      tr:nth-child(odd) td { background-color: #ddeeff }
-      tr:nth-child(even) td { background-color: #eef9ff }
+      th {
+        padding: 0.5em;
+        text-align: left;
+      }
+      tr:nth-child(even) td { background-color: #ddeeff }
+      tr:nth-child(odd) td { background-color: #eef9ff }
       #footer {
         padding-top: 1em;
         text-align: center;
@@ -68,8 +77,10 @@
     %= include inline => $Mojolicious::Controller::MOJOBAR
     <div id="wrapperlicious">
       <div id="routes">
+        <h1>Page not found.</h1>
         <p>
-          None of these routes matched your request for
+          None of these routes matched your
+          <code><%= $self->req->method %></code> request for
           <code><%= $self->req->url->path %></code>, maybe you need to add a
           new one?
         </p>
@@ -83,17 +94,20 @@
               <pre><%= '  ' x $depth %><%= $pattern %></pre>
             </td>
             <td>
-              %= uc(join ',', @{$node->via || []}) || '*'
+              <pre><%= uc(join ',', @{$node->via || []}) || '*' %></pre>
             </td>
-            <td>
-              %= $node->name
-            </td>
+            <td><pre><%= $node->name %></pre></td>
           </tr>
           % $depth++;
           %= $walk->($_, $depth) for @{$node->children};
           % $depth--;
         % end
         <table>
+          <tr>
+            <th>Pattern</th>
+            <th>Methods</th>
+            <th>Name</th>
+          </tr>
           %= $walk->($_, 0) for @{app->routes->children};
         </table>
       </div>

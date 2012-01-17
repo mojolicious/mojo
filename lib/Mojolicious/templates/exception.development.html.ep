@@ -52,6 +52,7 @@
         text-align: right;
         text-weight: bold;
       }
+      .striped { border-top: solid #cce4ff 1px }
       .tap {
         font: 0.5em Verdana, sans-serif;
         text-align: center;
@@ -111,18 +112,14 @@
         % my ($key, $value, $i) = @_;
         %= tag 'tr', $i ? (class => 'important') : undef, begin
           <td class="key"><%= $key %>.</td>
-          <td class="value">
-            <pre class="prettyprint"><%= $value %></pre>
-          </td>
+          <td class="value"><pre class="prettyprint"><%= $value %></pre></td>
         % end
       % end
       % my $kv = begin
         % my ($key, $value) = @_;
         <tr>
           <td class="key"><%= $key %>:</td>
-          <td class="value">
-            <pre><%= $value %></pre>
-          </td>
+          <td class="striped value"><pre><%= $value %></pre></td>
         </tr>
       % end
       <div id="showcase" class="code box">
@@ -176,7 +173,7 @@
             <table>
               % for my $frame (@{$e->frames}) {
                 <tr>
-                  <td class="value">
+                  <td class="striped value">
                     <pre><%= $frame->[1] . ':' . $frame->[2] %></pre>
                   </td>
                 </tr>

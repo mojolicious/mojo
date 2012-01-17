@@ -15,7 +15,8 @@
       }
       code {
         background-color: #eef9ff;
-        padding: 0.5em;
+        border: solid #cce4ff 1px;
+        padding: 0.4em;
       }
       pre {
         margin: 0;
@@ -27,7 +28,10 @@
         margin-bottom: 1em;
         width: 100%;
       }
-      td { padding: 0.5em }
+      td {
+        border-top: solid #cce4ff 1px;
+        padding: 0.5em;
+      }
       tr:nth-child(odd) td { background-color: #ddeeff }
       tr:nth-child(even) td { background-color: #eef9ff }
       #footer {

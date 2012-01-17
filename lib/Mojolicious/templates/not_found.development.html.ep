@@ -70,8 +70,8 @@
       <div id="routes">
         <p>
           None of these routes matched your request for
-          <code><%= $self->req->url->path %></code>, maybe you need to add
-          one?
+          <code><%= $self->req->url->path %></code>, maybe you need to add a
+          new one?
         </p>
         % my $walk;
         % $walk = begin

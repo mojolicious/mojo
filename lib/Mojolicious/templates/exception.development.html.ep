@@ -28,7 +28,7 @@
         margin-bottom: 1em;
         width: 100%;
       }
-      td { padding: 0.3em }
+      td { padding: 0.5em }
       .box {
         background-color: #fff;
         -moz-box-shadow: 0px 0px 2px #ccc;

@@ -168,7 +168,7 @@ Construct a new L<Mojo::Path> object.
 Canonicalize path.
 
   # "/foo/baz"
-  say Mojo::Path->new('/foo/bar/../baz')->canonicalize;
+  Mojo::Path->new('/foo/bar/../baz')->canonicalize;
 
 =head2 C<clone>
 

@@ -403,7 +403,7 @@ Clone this URL.
 Host part of this URL in punycode format.
 
   # "xn--da5b0n.net"
-  say Mojo::URL->new('http://☃.net')->ihost;
+  Mojo::URL->new('http://☃.net')->ihost;
 
 =head2 C<is_abs>
 
@@ -428,10 +428,10 @@ Path part of this URL, relative paths will be appended to the existing path,
 defaults to a L<Mojo::Path> object.
 
   # "http://mojolicio.us/Mojo/DOM"
-  say Mojo::URL->new('http://mojolicio.us/perldoc')->path('/Mojo/DOM');
+  Mojo::URL->new('http://mojolicio.us/perldoc')->path('/Mojo/DOM');
 
   # "http://mojolicio.us/perldoc/Mojo/DOM"
-  say Mojo::URL->new('http://mojolicio.us/perldoc')->path('Mojo/DOM');
+  Mojo::URL->new('http://mojolicio.us/perldoc')->path('Mojo/DOM');
 
 =head2 C<query>
 
@@ -444,19 +444,19 @@ defaults to a L<Mojo::Path> object.
 Query part of this URL, defaults to a L<Mojo::Parameters> object.
 
   # "2"
-  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query->param('b');
+  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query->param('b');
 
   # "http://mojolicio.us?a=2&c=3"
-  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => 2, c => 3);
+  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => 2, c => 3);
 
   # "http://mojolicio.us?a=2&b=2&c=3"
-  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => 2, c => 3]);
+  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => 2, c => 3]);
 
   # "http://mojolicio.us?b=2"
-  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => undef]);
+  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => undef]);
 
   # "http://mojolicio.us?a=1&b=2&a=2&c=3"
-  say Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query({a => 2, c => 3});
+  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query({a => 2, c => 3});
 
 =head2 C<to_abs>
 

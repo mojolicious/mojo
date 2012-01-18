@@ -63,11 +63,28 @@ this module is EXPERIMENTAL and might change without warning!
 Check if data structure contains a value that can be identified with the
 given JSON Pointer.
 
+  # True
+  $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/foo');
+  $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
+
+  # False
+  $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/bar');
+  $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/9');
+
 =head2 C<get>
 
   my $value = $p->get($data, '/foo/bar');
 
 Extract value identified by the given JSON Pointer.
+
+  # "bar"
+  $p->get({foo => 'bar', baz => [4, 5, 6]}, '/foo');
+
+  # "4"
+  $p->get({foo => 'bar', baz => [4, 5, 6]}, '/baz/0');
+
+  # "6"
+  $p->get({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
 
 =head1 SEE ALSO
 

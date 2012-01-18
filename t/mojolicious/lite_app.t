@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 721;
+use Test::More tests => 727;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -537,6 +537,13 @@ get '/url_with';
 get '/url_with/:foo' => sub {
   my $self = shift;
   $self->render(text => $self->url_with(foo => 'bar')->to_abs);
+};
+
+# GET /dynamic/inline
+my $dynamic_inline = 1;
+get '/dynamic/inline' => sub {
+  my $self = shift;
+  $self->render(inline => 'dynamic inline ' . $dynamic_inline++);
 };
 
 # Oh Fry, I love you more than the moon, and the stars,
@@ -1404,6 +1411,14 @@ EOF
 # GET /url_with/foo
 $t->get_ok('/url_with/foo?foo=bar')->status_is(200)
   ->content_like(qr|http\://localhost\:\d+/url_with/bar\?foo\=bar|);
+
+# GET /dynamic/inline
+$t->get_ok('/dynamic/inline')->status_is(200)
+  ->content_is("dynamic inline 1\n");
+
+# GET /dynamic/inline (again)
+$t->get_ok('/dynamic/inline')->status_is(200)
+  ->content_is("dynamic inline 2\n");
 
 # User agent timer
 $tua->ioloop->one_tick('0.1');

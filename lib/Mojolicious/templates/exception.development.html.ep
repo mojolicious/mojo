@@ -191,8 +191,8 @@
           % my $req = $self->req;
           %= $kv->(Method => $req->method)
           % my $url = $req->url;
-          %= $kv->(Path => $url->to_string)
-          %= $kv->(Base => $url->base->to_string)
+          %= $kv->(URL => $url->to_string)
+          %= $kv->('Base URL' => $url->base->to_string)
           %= $kv->(Parameters => dumper $req->params->to_hash)
           %= $kv->(Stash => dumper $snapshot)
           %= $kv->(Session => dumper session)

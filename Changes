@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.45    2012-01-18 00:00:00
+        - Removed T-Shirt link.
         - Fixed small caching bug in Mojolicious::Plugin::EPRenderer.
         - Fixed typo in exception template.
 

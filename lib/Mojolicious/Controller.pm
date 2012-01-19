@@ -228,7 +228,7 @@ sub render {
   # Render
   my ($output, $type) = $self->app->renderer->render($self, $args);
   return unless defined $output;
-  return $output if $args->{partial};
+  return Mojo::ByteStream->new($output) if $args->{partial};
 
   # Prepare response
   my $res = $self->res;
@@ -346,12 +346,9 @@ sub render_not_found {
 sub render_partial {
   my $self     = shift;
   my $template = @_ % 2 ? shift : undef;
-  my $args     = {@_};
-
+  my $args     = {@_, partial => 1};
   $args->{template} = $template if defined $template;
-  $args->{partial} = 1;
-
-  return Mojo::ByteStream->new($self->render($args));
+  return $self->render($args);
 }
 
 sub render_static {

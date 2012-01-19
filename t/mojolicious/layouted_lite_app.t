@@ -333,7 +333,7 @@ localized2 <%= content %>
 
 @@ outerlayout.html.ep
 Hello
-<%= include 'outermenu' %>
+<%= $self->render('outermenu', partial => 1) %>
 
 @@ outermenu.html.ep
 % stash test => 'there';

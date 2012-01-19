@@ -9,11 +9,11 @@ has [qw/code message/];
 
 my $START_LINE_RE = qr|
   ^\s*
-  HTTP/(\d\.\d)   # Version
+  HTTP/(\d\.\d)      # Version
   \s+
-  (\d\d\d)        # Code
+  (\d\d\d)           # Code
   \s*
-  ([\w\'\s]+)?    # Message (with "I'm a teapot" support)
+  ([^\x0d\x0a]+)?    # Message (with "I'm a teapot" support)
   $
 |x;
 

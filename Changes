@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.46    2012-01-20 00:00:00
         - Added EXPERIMENTAL request_timeout attribute to Mojo::UserAgent.
         - Improved documentation.
+        - Improved tests.
         - Fixed small parser bug in Mojo::Message::Response.
         - Fixed small partial rendering bug.
 

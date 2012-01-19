@@ -31,7 +31,7 @@ EOF
 
 # GET /index.html
 $t->get_ok('/index.html')->status_is(200)
-  ->content_is('External static file!');
+  ->content_is("External static file!\n");
 
 # GET /echo
 $t->get_ok('/echo')->status_is(200)->content_is('echo: nothing!');

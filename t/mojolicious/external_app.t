@@ -25,7 +25,7 @@ $t->get_ok('/')->status_is(200)->content_is('too!');
 
 # GET /index.html
 $t->get_ok('/index.html')->status_is(200)
-  ->content_is('External static file!');
+  ->content_is("External static file!\n");
 
 # GET /test
 $t->get_ok('/test')->status_is(200)->content_is('works!');

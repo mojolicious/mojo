@@ -383,7 +383,7 @@ $t->get_ok('/longpoll/static/delayed')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')
-  ->content_is('Hello Mojo from a static file!');
+  ->content_is("Hello Mojo from a static file!\n");
 is $longpoll_static_delayed, 'finished!', 'finished';
 
 # GET /longpoll/static/delayed_too
@@ -393,7 +393,7 @@ $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
   ->header_like('Set-Cookie' => qr/bar=baz/)
   ->header_like('Set-Cookie' => qr/mojolicious=/)
   ->content_type_is('text/plain')
-  ->content_is('Hello Mojo from a static file!');
+  ->content_is("Hello Mojo from a static file!\n");
 is $longpoll_static_delayed_too, 'finished!', 'finished';
 
 # GET /longpoll/dynamic/delayed

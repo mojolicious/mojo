@@ -37,7 +37,7 @@ $t->get_ok('/x/1')->status_is(200)->content_is('too!');
 
 # GET /x/1/index.html (external app)
 $t->get_ok('/x/1/index.html')->status_is(200)
-  ->content_is('External static file!');
+  ->content_is("External static file!\n");
 
 # GET /x/1/test (external app)
 $t->get_ok('/x/1/test')->status_is(200)->content_is('works!');
@@ -47,7 +47,7 @@ $t->get_ok('/x/♥')->status_is(200)->content_is('too!');
 
 # GET /x/♥/index.html (external app)
 $t->get_ok('/x/♥/index.html')->status_is(200)
-  ->content_is('External static file!');
+  ->content_is("External static file!\n");
 
 # GET /x/♥/test (external app)
 $t->get_ok('/x/♥/test')->status_is(200)->content_is('works!');
@@ -58,7 +58,7 @@ $t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
 
 # GET /index.html (external app with domain)
 $t->get_ok('/index.html' => {Host => 'mojolicio.us'})->status_is(200)
-  ->content_is('External static file!');
+  ->content_is("External static file!\n");
 
 # GET /test (external app with domain)
 $t->get_ok('/test' => {Host => 'mojolicio.us'})->status_is(200)
@@ -70,7 +70,7 @@ $t->get_ok('/♥/123/' => {Host => 'test.foo-bar.de'})->status_is(200)
 
 # GET /♥/123/index.html (external app with a bit of everything)
 $t->get_ok('/♥/123/index.html' => {Host => 'test.foo-bar.de'})
-  ->status_is(200)->content_is('External static file!');
+  ->status_is(200)->content_is("External static file!\n");
 
 # GET /♥/123/test (external app with a bit of everything)
 $t->get_ok('/♥/123/test' => {Host => 'test.foo-bar.de'})->status_is(200)

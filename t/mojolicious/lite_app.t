@@ -1282,8 +1282,8 @@ $t->get_ok('/redirect_callback')->status_is(301)
 $t->get_ok('/static_render')->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 30)
-  ->content_is('Hello Mojo from a static file!');
+  ->header_is('Content-Length' => 31)
+  ->content_is("Hello Mojo from a static file!\n");
 
 # GET /redirect_named (with redirecting enabled in user agent)
 $t->ua->max_redirects(3);
@@ -1314,8 +1314,8 @@ $t->get_ok('/koi8-r')->status_is(200)
 $t->get_ok('/hello.txt')->status_is(200)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 30)
-  ->content_is('Hello Mojo from a static file!');
+  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
+  ->content_is("Hello Mojo from a static file!\n");
 
 # GET /hello.txt (partial static file)
 $t->get_ok('/hello.txt', {'Range' => 'bytes=2-8'})->status_is(206)

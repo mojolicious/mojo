@@ -198,7 +198,7 @@ EOF
 
 # GET /x/1/index.html (full external application)
 $t->get_ok('/x/1/index.html')->status_is(200)
-  ->content_is('External static file!');
+  ->content_is("External static file!\n");
 
 # GET /x/1/echo (full external application)
 $t->get_ok('/x/1/echo')->status_is(200)->content_is('echo: nothing!');
@@ -222,7 +222,7 @@ EOF
 
 # GET /x/♥/index.html (full external application)
 $t->get_ok('/x/♥/index.html')->status_is(200)
-  ->content_is('External static file!');
+  ->content_is("External static file!\n");
 
 # GET /x/♥/echo (full external application)
 $t->get_ok('/x/♥/echo')->status_is(200)->content_is('echo: works 2!');

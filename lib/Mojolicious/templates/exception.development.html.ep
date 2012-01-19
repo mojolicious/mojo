@@ -206,7 +206,7 @@
       <div class="box infobox" id="more">
         <div id="infos">
           <table>
-            %= $kv->(Perl => "$] ($^O)")
+            %= $kv->(Perl => "$^V ($^O)")
             % my $version  = $Mojolicious::VERSION;
             % my $codename = $Mojolicious::CODENAME;
             %= $kv->(Mojolicious => "$version ($codename)")

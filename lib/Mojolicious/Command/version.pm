@@ -48,7 +48,7 @@ sub run {
 
   print <<"EOF";
 CORE
-  Perl        ($], $^O)
+  Perl        ($^V, $^O)
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL

@@ -258,6 +258,9 @@ Construct a new L<Mojo::Parameters> object.
 
 Append parameters.
 
+  # "foo=bar&foo=baz"
+  Mojo::Parameters->new('foo=bar')->append(foo => 'baz');
+
 =head2 C<clone>
 
   my $params2 = $params->clone;
@@ -277,7 +280,7 @@ Merge parameters.
   my @foo   = $params->param('foo');
   my $foo   = $params->param(foo => 'ba;r');
 
-Check parameter values.
+Check and replace parameter values.
 
 =head2 C<params>
 
@@ -296,13 +299,19 @@ Parse parameters.
 
   $params = $params->remove('foo');
 
-Remove a parameter.
+Remove parameters.
+
+  # "bar=yada"
+  Mojo::Parameters->new('foo=bar&foo=baz&bar=yada')->remove('foo');
 
 =head2 C<to_hash>
 
   my $hash = $params->to_hash;
 
 Turn parameters into a hashref.
+
+  # "baz"
+  Mojo::Parameters->new('foo=bar&foo=baz')->to_hash->{foo}->[1];
 
 =head2 C<to_string>
 

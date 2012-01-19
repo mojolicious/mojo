@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 283;
+use Test::More tests => 277;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -34,16 +34,6 @@ $res->parse("HTTP/1.1 200 OK\x0d\x0a\x0d\x0a");
 ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
-is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
-
-# Parse HTTP 1.1 response start line, no headers and body (strange message)
-$res = Mojo::Message::Response->new;
-$res->parse("HTTP/1.1 200 Looks-0k!\@  #\$\%^ &*()\x0d\x0a\x0d\x0a");
-ok $res->is_finished, 'response is finished';
-is $res->code,        200, 'right status';
-is $res->message,     'Looks-0k!@  #$%^ &*()', 'right message';
 is $res->version,     '1.1', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
@@ -306,12 +296,12 @@ is $res->headers->content_length, 0, 'right "Content-Length" value';
 # Build HTTP 1.1 response start line with minimal headers (strange message)
 $res = Mojo::Message::Response->new;
 $res->code(404);
-$res->message('Looks-0k!@  #$%^ &*()');
+$res->message('Looks-0k!@ ;\':" #$%^<>,.\\o/ &*()');
 $res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 $res = Mojo::Message::Response->new->parse($res->to_string);
 ok $res->is_finished, 'response is finished';
 is $res->code,        '404', 'right status';
-is $res->message,     'Looks-0k!@  #$%^ &*()', 'right message';
+is $res->message,     'Looks-0k!@ ;\':" #$%^<>,.\\o/ &*()', 'right message';
 is $res->version,     '1.1', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';

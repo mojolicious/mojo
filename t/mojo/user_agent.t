@@ -175,7 +175,7 @@ app->log->on(message => $message);
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close.', 'right error';
 is $timeout, 1, 'finish event has been emitted';
-like $log, qr/Connection timeout\./, 'right log message';
+like $log, qr/Inactivity timeout\./, 'right log message';
 
 # GET /timeout (client times out)
 $ua->once(
@@ -191,7 +191,7 @@ $ua->once(
 );
 $tx = $ua->get('/timeout?timeout=5');
 ok !$tx->success, 'not successful';
-is $tx->error, 'Connection timeout.', 'right error';
+is $tx->error, 'Inactivity timeout.', 'right error';
 
 # GET / (introspect)
 my $req = my $res = '';

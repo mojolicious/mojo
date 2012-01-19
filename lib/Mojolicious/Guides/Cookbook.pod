@@ -422,7 +422,7 @@ HTTP protocol for transport.
   get '/events' => sub {
     my $self = shift;
 
-    # Increase connection timeout a bit
+    # Increase inactivity timeout for connection a bit
     Mojo::IOLoop->stream($self->tx->connection)->timeout(300);
 
     # Change content type

@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 125;
+use Test::More tests => 128;
 
 # "I was God once.
 #  Yes, I saw. You were doing well until everyone died."
@@ -416,8 +416,8 @@ $t->get_ok('/finish')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Finish!');
 ok !$finish, 'finish event timing is right';
 
-# GET /too_long (timeout)
-$tx = $t->ua->inactivity_timeout(1)->build_tx(GET => '/too_long');
+# GET /too_long (request timeout)
+$tx = $t->ua->request_timeout('0.5')->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->body(
   sub {
@@ -427,5 +427,20 @@ $tx->res->body(
 );
 $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
-is $tx->error, 'Connection timeout.', 'right error';
+is $tx->error, 'Request timeout.', 'right error';
+is $buffer, 'how', 'right content';
+$t->ua->request_timeout(0);
+
+# GET /too_long (inactivity timeout)
+$tx = $t->ua->inactivity_timeout('0.5')->build_tx(GET => '/too_long');
+$buffer = '';
+$tx->res->body(
+  sub {
+    my ($self, $chunk) = @_;
+    $buffer .= $chunk;
+  }
+);
+$t->ua->start($tx);
+is $tx->res->code, 200, 'right status';
+is $tx->error, 'Inactivity timeout.', 'right error';
 is $buffer, 'how', 'right content';

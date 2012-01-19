@@ -160,7 +160,7 @@ sub _finish {
     # Successful upgrade
     if ($ws->res->code eq '101') {
 
-      # Upgrade connection timeout
+      # Upgrade inactivity timeout
       $self->ioloop->stream($id)->timeout($self->websocket_timeout);
 
       # Resume
@@ -230,7 +230,7 @@ sub _listen {
       # Events
       $stream->on(
         timeout => sub {
-          $self->_error($id, 'Connection timeout.')
+          $self->_error($id, 'Inactivity timeout.')
             if $self->{connections}->{$id}->{tx};
         }
       );

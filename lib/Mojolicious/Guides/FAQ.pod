@@ -85,7 +85,7 @@ passphrase with the C<secret> attribute of L<Mojolicious>.
 
   app->secret('My very secret passphrase.');
 
-=head2 What does "Connection timeout." mean.
+=head2 What does "Inactivity timeout." mean.
 
 To protect your applications from denial-of-service attacks, all connections
 have an inactivity timeout which limits how long a connection may be inactive

@@ -659,7 +659,7 @@ the end of the stream.
   <body>Example</body></html>
   0
 
-Especially in combination with long connection timeouts this can be very
+Especially in combination with long inactivity timeouts this can be very
 useful for Comet (C<long polling>). Due to limitations in some web servers
 this might not work perfectly in all deployment environments.
 

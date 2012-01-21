@@ -23,7 +23,6 @@ has key                => sub { $ENV{MOJO_KEY_FILE} };
 has max_connections    => 5;
 has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
 has name               => 'Mojolicious (Perl)';
-has request_timeout    => 0;
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 has websocket_timeout => 300;
 
@@ -292,16 +291,8 @@ sub _connected {
   my $loop = $self->_loop;
   $loop->stream($id)->timeout($self->inactivity_timeout);
 
-  # Request timeout
-  my $c       = $self->{connections}->{$id};
-  my $timeout = $self->request_timeout;
-  weaken $self;
-  $c->{timeout} =
-    $loop->timer($timeout => sub { $self->_error($id, 'Request timeout.') })
-    if $timeout;
-
   # Store connection information in transaction
-  my $tx = $c->{tx};
+  my $tx = $self->{connections}->{$id}->{tx};
   $tx->connection($id);
   my $handle = $loop->stream($id)->handle;
   $tx->local_address($handle->sockhost);
@@ -310,6 +301,7 @@ sub _connected {
   $tx->remote_port($handle->peerport);
 
   # Start writing
+  weaken $self;
   $tx->on(resume => sub { $self->_write($id) });
   $self->_write($id);
 }
@@ -369,11 +361,8 @@ sub _finish {
 sub _handle {
   my ($self, $id, $close) = @_;
 
-  # Request timeout
-  my $c = $self->{connections}->{$id};
-  $self->_loop->drop($c->{timeout}) if $c->{timeout};
-
   # Finish WebSocket
+  my $c   = $self->{connections}->{$id};
   my $old = $c->{tx};
   if ($old && $old->is_websocket) {
     $self->{processing} -= 1;
@@ -771,20 +760,6 @@ Value for C<User-Agent> request header, defaults to C<Mojolicious (Perl)>.
   $ua          = $ua->no_proxy(['localhost', 'intranet.mojolicio.us']);
 
 Domains that don't require a proxy server to be used.
-
-=head2 C<request_timeout>
-
-  my $timeout = $ua->request_timeout;
-  $ua         = $ua->request_timeout(5);
-
-Maximum amount of time in seconds sending the request and receiving the whole
-response may take before getting canceled, defaults to C<0>. Setting the
-value to C<0> will allow the user agent to wait indefinitely. The timeout
-will reset for every followed redirect. Note that this attribute is
-EXPERIMENTAL and might change without warning!
-
-  # Total limit of 8 seconds
-  $ua->max_redirects(0)->connect_timeout(3)->request_timeout(5);
 
 =head2 C<transactor>
 

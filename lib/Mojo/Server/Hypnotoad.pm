@@ -537,8 +537,8 @@ C<1000>.
 
   graceful_timeout => 15
 
-Time in seconds a graceful worker stop may take before being forced, defaults
-to C<30>.
+Maximum amount of time in seconds a graceful worker stop may take before
+being forced, defaults to C<30>.
 
 =head2 C<group>
 
@@ -556,14 +556,14 @@ Heartbeat interval in seconds, defaults to C<5>.
 
   heartbeat_timeout => 2
 
-Time in seconds before a worker without a heartbeat will be stopped, defaults
-to C<10>.
+Maximum amount of time in seconds before a worker without a heartbeat will be
+stopped, defaults to C<10>.
 
 =head2 C<inactivity_timeout>
 
   inactivity_timeout => 10
 
-Maximum amount of time in seconds a connection can be inactive before being
+Maximum amount of time in seconds a connection can be inactive before getting
 dropped, defaults to C<15>. Setting the value to C<0> will allow connections
 to be inactive indefinitely.
 
@@ -604,8 +604,8 @@ the C<MOJO_REVERSE_PROXY> environment variable.
 
   upgrade_timeout => 30
 
-Time in seconds a zero downtime software upgrade may take before being
-aborted, defaults to C<60>.
+Maximum amount of time in seconds a zero downtime software upgrade may take
+before getting canceled, defaults to C<60>.
 
 =head2 C<user>
 

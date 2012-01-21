@@ -683,8 +683,8 @@ environment variable.
   my $timeout = $ua->connect_timeout;
   $ua         = $ua->connect_timeout(5);
 
-Maximum amount of time in seconds establishing a connection may take,
-defaults to C<3>.
+Maximum amount of time in seconds establishing a connection may take before
+getting canceled, defaults to C<3>.
 
 =head2 C<cookie_jar>
 
@@ -775,13 +775,16 @@ Domains that don't require a proxy server to be used.
 =head2 C<request_timeout>
 
   my $timeout = $ua->request_timeout;
-  $ua         = $ua->request_timeout(25);
+  $ua         = $ua->request_timeout(5);
 
-Maximum amount of time in seconds receiving a whole response may take from
-when a connection has been established, defaults to C<0>. Setting the value
-to C<0> will allow the user agent to wait indefinitely. The timeout will
-reset for every followed redirect. Note that this attribute is EXPERIMENTAL
-and might change without warning!
+Maximum amount of time in seconds sending the request and receiving the whole
+response may take before getting canceled, defaults to C<0>. Setting the
+value to C<0> will allow the user agent to wait indefinitely. The timeout
+will reset for every followed redirect. Note that this attribute is
+EXPERIMENTAL and might change without warning!
+
+  # Total limit of 8 seconds
+  $ua->max_redirects(0)->connect_timeout(3)->request_timeout(5);
 
 =head2 C<transactor>
 

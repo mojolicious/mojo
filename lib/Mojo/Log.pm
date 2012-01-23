@@ -35,7 +35,7 @@ sub new {
       my $self = shift;
       return unless my $handle = $self->handle;
       flock $handle, LOCK_EX;
-      croak qq/Can't write to log: $!/
+      croak "Can't write to log: $!"
         unless defined $handle->syswrite($self->format(@_));
       flock $handle, LOCK_UN;
     }

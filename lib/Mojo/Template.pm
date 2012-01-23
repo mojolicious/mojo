@@ -356,7 +356,7 @@ sub render_file {
 
   # Slurp file
   $self->name($path) unless defined $self->{name};
-  croak "Can't open template '$path': $!"
+  croak qq/Can't open template "$path": $!/
     unless my $file = IO::File->new("< $path");
   my $tmpl = '';
   while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) {
@@ -410,7 +410,7 @@ sub _write_file {
   my ($self, $path, $output) = @_;
 
   # Encode and write to file
-  croak "Can't open file '$path': $!"
+  croak qq/Can't open file "$path": $!/
     unless my $file = IO::File->new("> $path");
   $output = encode $self->encoding, $output if $self->encoding;
   croak qq/Can't write to file "$path": $!/

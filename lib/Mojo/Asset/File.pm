@@ -58,7 +58,7 @@ sub add_chunk {
   my $handle = $self->handle;
   $handle->sysseek(0, SEEK_END);
   $chunk //= '';
-  croak qq/Can't write to file asset: $!/
+  croak "Can't write to asset: $!"
     unless defined $handle->syswrite($chunk, length $chunk);
   return $self;
 }

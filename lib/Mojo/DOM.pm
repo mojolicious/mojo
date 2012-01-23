@@ -471,11 +471,11 @@ Extract all text content from DOM structure, smart whitespace trimming is
 activated by default. Note that the trim argument of this method is
 EXPERIMENTAL and might change without warning!
 
-  # "test 123"
-  $dom->parse("<div>test\n<p>123</p></div>")->div->all_text;
+  # "foo bar baz"
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->all_text;
 
-  # "test\n123"
-  $dom->parse("<div>test\n<p>123</p></div>")->div->all_text(0);
+  # "foo\nbarbaz\n"
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->all_text(0);
 
 =head2 C<append>
 
@@ -614,11 +614,11 @@ Extract text content from element only (not including child elements), smart
 whitespace trimming is activated by default. Note that the trim argument of
 this method is EXPERIMENTAL and might change without warning!
 
-  # "test"
-  $dom->parse("<div>test\n<p>123</p></div>")->div->text;
+  # "foo baz"
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->text;
 
-  # "test\n"
-  $dom->parse("<div>test\n<p>123</p></div>")->div->text(0);
+  # "foo\nbaz\n"
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->text(0);
 
 =head2 C<to_xml>
 

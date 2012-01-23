@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved tests.
         - Fixed small parser bug in Mojo::Message::Response.
         - Fixed small partial rendering bug.
+        - Fixed small HTML5 parser bug in Mojo::DOM::HTML. (dougwilson)
 
 2.45    2012-01-18 00:00:00
         - Removed T-Shirt link.

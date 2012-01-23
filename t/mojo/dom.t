@@ -1988,11 +1988,11 @@ is $dom->tree->[0], 'root', 'right element';
 is $dom->tree->[1]->[0], 'tag', 'right element';
 is $dom->tree->[1]->[1], 'foo', 'right tag';
 is_deeply $dom->tree->[1]->[2], {bar => ''}, 'right attributes';
-is $dom->tree->[1]->[4]->[0], 'text', 'right element';
+is $dom->tree->[1]->[4]->[0], 'text',       'right element';
 is $dom->tree->[1]->[4]->[1], "\n  test\n", 'right text';
 is $dom->tree->[3]->[0], 'tag', 'right element';
 is $dom->tree->[3]->[1], 'bar', 'right tag';
-is $dom->tree->[3]->[4]->[0], 'text', 'right element';
+is $dom->tree->[3]->[4]->[0], 'text',  'right element';
 is $dom->tree->[3]->[4]->[1], 'after', 'right text';
 is "$dom", <<EOF, 'stringified right';
 <foo bar="">

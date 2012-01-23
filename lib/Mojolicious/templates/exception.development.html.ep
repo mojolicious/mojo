@@ -1,4 +1,3 @@
-% my $e = delete $self->stash->{'exception'};
 <!DOCTYPE html>
 <html>
   <head>
@@ -120,6 +119,7 @@
         </tr>
       % end
       <div id="showcase" class="code box">
+        % my $e = $self->stash->{exception};
         <pre><%= $e->message %></pre>
         <div id="context">
           <table>

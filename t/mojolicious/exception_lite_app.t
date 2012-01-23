@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 74;
+use Test::More tests => 80;
 
 # "This calls for a party, baby.
 #  I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
@@ -77,6 +77,17 @@ get '/trapped/too' => sub {
   eval { die MyException->new(error => 'works') };
   $self->render_text("$@" || 'failed');
 };
+
+# Reuse exception
+my $exception;
+hook after_dispatch => sub {
+  my $self = shift;
+  return unless $self->req->url->path->contains('/reuse/exception');
+  $exception = $self->stash('exception');
+};
+
+# GET /reuse/exception
+get '/reuse/exception' => sub { die "Reusable exception.\n" };
 
 my $t = Test::Mojo->new;
 
@@ -165,6 +176,13 @@ $t->get_ok('/missing_template.xml')->status_is(404)
 $t->get_ok('/missing_template.json')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_like(qr/Page not found/);
+
+# GET /reuse/exception
+ok !$exception, 'no exception';
+$t->get_ok('/reuse/exception')->status_is(500)
+  ->content_like(qr/Reusable exception/);
+isa_ok $exception, 'Mojo::Exception',      'right exception class';
+like $exception,   qr/Reusable exception/, 'right exception';
 
 __DATA__
 @@ layouts/green.html.ep

@@ -49,7 +49,8 @@ sub new {
 
 sub all_text {
   my ($self, $trim) = @_;
-  return $self->_text($self->tree, 1, defined $trim ? $trim : 1);
+  my $tree = $self->tree;
+  return _text(_elements($tree), 1, _trim($tree, $trim));
 }
 
 sub append { shift->_add(1, @_) }
@@ -259,7 +260,39 @@ sub root {
 
 sub text {
   my ($self, $trim) = @_;
-  return $self->_text($self->tree, 0, defined $trim ? $trim : 1);
+  my $tree = $self->tree;
+  return _text(_elements($tree), 0, _trim($tree, $trim));
+}
+
+sub text_after {
+  my ($self, $trim) = @_;
+
+  # Find text elements after
+  return '' if (my $tree = $self->tree)->[0] eq 'root';
+  my (@elements, $started);
+  for my $e (@{_elements($tree->[3])}) {
+    ++$started and next if $e eq $tree;
+    next unless $started;
+    last if $e->[0] eq 'tag';
+    push @elements, $e;
+  }
+
+  return _text(\@elements, 0, _trim($tree, $trim));
+}
+
+sub text_before {
+  my ($self, $trim) = @_;
+
+  # Find text elements before
+  return '' if (my $tree = $self->tree)->[0] eq 'root';
+  my @elements;
+  for my $e (@{_elements($tree->[3])}) {
+    last if $e eq $tree;
+    push @elements, $e;
+    @elements = () if $e->[0] eq 'tag';
+  }
+
+  return _text(\@elements, 0, _trim($tree, $trim));
 }
 
 sub to_xml { shift->[0]->render }
@@ -317,6 +350,11 @@ sub _add {
   return $self;
 }
 
+sub _elements {
+  my $e = shift;
+  return [@$e[($e->[0] eq 'root' ? 1 : 4) .. $#$e]];
+}
+
 sub _parent {
   my ($children, $parent) = @_;
   my @new;
@@ -337,27 +375,18 @@ sub _parse {
 }
 
 sub _text {
-  my ($self, $tree, $recurse, $trim) = @_;
-
-  # Don't trim preformatted text
-  my $start = 4;
-  if ($tree->[0] eq 'root') { $start = 1 }
-  elsif ($trim) {
-    my $parent = $tree;
-    while ($parent->[0] eq 'tag') {
-      $trim = 0 if $parent->[1] eq 'pre';
-      last unless $parent = $parent->[3];
-    }
-  }
+  my ($elements, $recurse, $trim) = @_;
 
   # Walk tree
   my $text = '';
-  for my $e (@$tree[$start .. $#$tree]) {
+  for my $e (@$elements) {
     my $type = $e->[0];
 
     # Nested tag
     my $content = '';
-    if ($type eq 'tag' && $recurse) { $content = $self->_text($e, 1, $trim) }
+    if ($type eq 'tag' && $recurse) {
+      $content = _text(_elements($e), 1, _trim($e, $trim));
+    }
 
     # Text
     elsif ($type eq 'text') {
@@ -383,6 +412,21 @@ sub _text {
   }
 
   return $text;
+}
+
+sub _trim {
+  my ($e, $trim) = @_;
+
+  # Deactivated
+  return 0 unless $trim = defined $trim ? $trim : 1;
+
+  # Detect "pre" tag
+  while ($e->[0] eq 'tag') {
+    return 0 if $e->[1] eq 'pre';
+    last unless $e = $e->[3];
+  }
+
+  return 1;
 }
 
 1;
@@ -619,6 +663,36 @@ this method is EXPERIMENTAL and might change without warning!
 
   # "foo\nbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->text(0);
+
+=head2 C<text_after>
+
+  my $trimmed   = $dom->text_after;
+  my $untrimmed = $dom->text_after(0);
+
+Extract text content immediately after element, smart whitespace trimming is
+activated by default. Note that this method is EXPERIMENTAL and might change
+without warning!
+
+  # "baz"
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_after;
+
+  # "baz\n"
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_after(0);
+
+=head2 C<text_before>
+
+  my $trimmed   = $dom->text_before;
+  my $untrimmed = $dom->text_before(0);
+
+Extract text content immediately before element, smart whitespace trimming is
+activated by default. Note that this method is EXPERIMENTAL and might change
+without warning!
+
+  # "foo"
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_before;
+
+  # "foo\n"
+  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_before(0);
 
 =head2 C<to_xml>
 

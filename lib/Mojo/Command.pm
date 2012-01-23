@@ -267,7 +267,8 @@ sub write_file {
   # Write unbuffered
   croak qq/Can't open file "$path": $!/
     unless my $file = IO::File->new("> $path");
-  $file->syswrite($data);
+  croak qq/Can't write to file "$path": $!/
+    unless defined $file->syswrite($data);
   say "  [write] $path" unless $self->quiet;
 
   return $self;

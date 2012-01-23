@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 694;
+use Test::More tests => 718;
 
 use ojo;
 use Mojo::Util 'encode';
@@ -1882,6 +1882,44 @@ is $dom->div->pre->code->text, "like\n  it\n    really", 'right text';
 is $dom->div->pre->code->text(0), "like\n  it\n    really", 'right text';
 is $dom->div->pre->code->all_text, "like\n  it\n    really", 'right text';
 is $dom->div->pre->code->all_text(0), "like\n  it\n    really", 'right text';
+
+# Text siblings
+$dom = Mojo::DOM->new(<<EOF);
+ok
+<div>
+  looks<p>like</p>
+  thi<![CDATA[s]]>
+  <p>might</p><p>really</p>
+  <p>
+    just
+  </p>work
+</div>
+wow
+EOF
+is $dom->text_before, '', 'right text';
+is $dom->text_before(0), '', 'right text';
+is $dom->div->text_before, 'ok', 'right text';
+is $dom->div->text_before(0), "ok\n", 'right text';
+is $dom->div->p->[0]->text_before, 'looks', 'right text';
+is $dom->div->p->[0]->text_before(0), "\n  looks", 'right text';
+is $dom->div->p->[1]->text_before, 'thi s', 'right text';
+is $dom->div->p->[1]->text_before(0), "\n  thi s\n  ", 'right text';
+is $dom->div->p->[2]->text_before, '', 'right text';
+is $dom->div->p->[2]->text_before(0), '', 'right text';
+is $dom->div->p->[3]->text_before, '', 'right text';
+is $dom->div->p->[3]->text_before(0), "\n  ", 'right text';
+is $dom->text_after, '', 'right text';
+is $dom->text_after(0), '', 'right text';
+is $dom->div->text_after, 'wow', 'right text';
+is $dom->div->text_after(0), "\nwow\n", 'right text';
+is $dom->div->p->[0]->text_after, 'thi s', 'right text';
+is $dom->div->p->[0]->text_after(0), "\n  thi s\n  ", 'right text';
+is $dom->div->p->[1]->text_after, '', 'right text';
+is $dom->div->p->[1]->text_after(0), '', 'right text';
+is $dom->div->p->[2]->text_after, '', 'right text';
+is $dom->div->p->[2]->text_after(0), "\n  ", 'right text';
+is $dom->div->p->[3]->text_after, 'work', 'right text';
+is $dom->div->p->[3]->text_after(0), "work\n", 'right text';
 
 # PoCo example with whitespace sensitive text
 $dom = Mojo::DOM->new(<<EOF);

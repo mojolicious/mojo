@@ -54,7 +54,8 @@ sub move_to {
   my ($self, $path) = @_;
   croak qq/Can't open file "$path": $!/
     unless my $file = IO::File->new("> $path");
-  $file->syswrite($self->{content});
+  croak qq/Can't write to file "$path": $!/
+    unless defined $file->syswrite($self->{content});
   return $self;
 }
 

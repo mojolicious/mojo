@@ -413,7 +413,8 @@ sub _write_file {
   croak "Can't open file '$path': $!"
     unless my $file = IO::File->new("> $path");
   $output = encode $self->encoding, $output if $self->encoding;
-  $file->syswrite($output) or croak "Can't write to file '$path': $!";
+  croak qq/Can't write to file "$path": $!/
+    unless defined $file->syswrite($output);
 
   return;
 }

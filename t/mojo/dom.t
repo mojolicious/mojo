@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 683;
+use Test::More tests => 694;
 
 use ojo;
 use Mojo::Util 'encode';
@@ -1976,3 +1976,27 @@ is $dom->find('a[accesskey~="1"]')->[0]->text, 'One', 'right text';
 is $dom->find('a[accesskey~="1]')->[1], undef, 'no result';
 is $dom->find('a[accesskey*="1"]')->[0]->text, 'One', 'right text';
 is $dom->find('a[accesskey*="1]')->[1], undef, 'no result';
+
+# Empty attribute value
+$dom = Mojo::DOM->new->parse(<<EOF);
+<foo bar=>
+  test
+</foo>
+<bar>after</bar>
+EOF
+is $dom->tree->[0], 'root', 'right element';
+is $dom->tree->[1]->[0], 'tag', 'right element';
+is $dom->tree->[1]->[1], 'foo', 'right tag';
+is_deeply $dom->tree->[1]->[2], {bar => ''}, 'right attributes';
+is $dom->tree->[1]->[4]->[0], 'text', 'right element';
+is $dom->tree->[1]->[4]->[1], "\n  test\n", 'right text';
+is $dom->tree->[3]->[0], 'tag', 'right element';
+is $dom->tree->[3]->[1], 'bar', 'right tag';
+is $dom->tree->[3]->[4]->[0], 'text', 'right element';
+is $dom->tree->[3]->[4]->[1], 'after', 'right text';
+is "$dom", <<EOF, 'stringified right';
+<foo bar="">
+  test
+</foo>
+<bar>after</bar>
+EOF

@@ -1,4 +1,4 @@
-% my $e = delete $self->stash->{'exception'};
+% my $e = $self->stash->{'exception'};
 <!DOCTYPE html>
 <html>
   <head>

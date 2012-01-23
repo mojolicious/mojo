@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 57;
+use Test::More tests => 59;
+use File::Temp;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
@@ -150,3 +151,18 @@ undef $file;
 ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';
+
+# Failed syswrite
+{
+    no strict 'refs';
+    # Fake ENOSPC : No space left on device
+    *{"IO::File::syswrite"} = sub { $! = 28; return undef };
+}
+my $dir = File::Temp::tempdir(CLEANUP => 1);
+my $mem_fail = Mojo::Asset::Memory->new;
+$mem_fail->add_chunk('scooby doo');
+eval {
+    $mem_fail->move_to("$dir/tempfile");
+};
+ok $@, 'move_to failed because syswrite failed';
+ok $@ =~ /move memory asset/, 'error message contains "move memory asset"';

@@ -267,7 +267,7 @@ sub text {
 sub text_after {
   my ($self, $trim) = @_;
 
-  # Find text elements after
+  # Find following text elements
   return '' if (my $tree = $self->tree)->[0] eq 'root';
   my (@elements, $started);
   for my $e (@{_elements($tree->[3])}) {
@@ -277,13 +277,13 @@ sub text_after {
     push @elements, $e;
   }
 
-  return _text(\@elements, 0, _trim($tree, $trim));
+  return _text(\@elements, 0, _trim($tree->[3], $trim));
 }
 
 sub text_before {
   my ($self, $trim) = @_;
 
-  # Find text elements before
+  # Find preceding text elements
   return '' if (my $tree = $self->tree)->[0] eq 'root';
   my @elements;
   for my $e (@{_elements($tree->[3])}) {
@@ -292,7 +292,7 @@ sub text_before {
     @elements = () if $e->[0] eq 'tag';
   }
 
-  return _text(\@elements, 0, _trim($tree, $trim));
+  return _text(\@elements, 0, _trim($tree->[3], $trim));
 }
 
 sub to_xml { shift->[0]->render }

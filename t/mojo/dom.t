@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 718;
+use Test::More tests => 720;
 
 use ojo;
 use Mojo::Util 'encode';
@@ -1882,6 +1882,8 @@ is $dom->div->pre->code->text, "like\n  it\n    really", 'right text';
 is $dom->div->pre->code->text(0), "like\n  it\n    really", 'right text';
 is $dom->div->pre->code->all_text, "like\n  it\n    really", 'right text';
 is $dom->div->pre->code->all_text(0), "like\n  it\n    really", 'right text';
+is $dom->div->pre->text_before, 'looks', 'right text';
+is $dom->div->pre->text_after,  'works', 'right text';
 
 # Text siblings
 $dom = Mojo::DOM->new(<<EOF);

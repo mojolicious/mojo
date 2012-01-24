@@ -669,9 +669,9 @@ this method is EXPERIMENTAL and might change without warning!
   my $trimmed   = $dom->text_after;
   my $untrimmed = $dom->text_after(0);
 
-Extract text content immediately after element, smart whitespace trimming is
-activated by default. Note that this method is EXPERIMENTAL and might change
-without warning!
+Extract text content immediately following element, smart whitespace trimming
+is activated by default. Note that this method is EXPERIMENTAL and might
+change without warning!
 
   # "baz"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_after;
@@ -684,9 +684,9 @@ without warning!
   my $trimmed   = $dom->text_before;
   my $untrimmed = $dom->text_before(0);
 
-Extract text content immediately before element, smart whitespace trimming is
-activated by default. Note that this method is EXPERIMENTAL and might change
-without warning!
+Extract text content immediately preceding element, smart whitespace trimming
+is activated by default. Note that this method is EXPERIMENTAL and might
+change without warning!
 
   # "foo"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_before;

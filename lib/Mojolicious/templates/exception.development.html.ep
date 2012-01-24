@@ -119,29 +119,28 @@
         </tr>
       % end
       <div id="showcase" class="code box">
-        % my $e = $self->stash->{exception};
-        <pre><%= $e->message %></pre>
+        <pre><%= $exception->message %></pre>
         <div id="context">
           <table>
-            % for my $line (@{$e->lines_before}) {
+            % for my $line (@{$exception->lines_before}) {
               %= $cv->($line->[0], $line->[1])
             % }
-            % if (defined $e->line->[1]) {
-              %= $cv->($e->line->[0], $e->line->[1], 1)
+            % if (defined $exception->line->[1]) {
+              %= $cv->($exception->line->[0], $exception->line->[1], 1)
             % }
-            % for my $line (@{$e->lines_after}) {
+            % for my $line (@{$exception->lines_after}) {
               %= $cv->($line->[0], $line->[1])
             % }
           </table>
         </div>
-        % if (defined $e->line->[2]) {
+        % if (defined $exception->line->[2]) {
           <div id="insight">
             <table>
-              % for my $line (@{$e->lines_before}) {
+              % for my $line (@{$exception->lines_before}) {
                 %= $cv->($line->[0], $line->[2])
               % }
-              %= $cv->($e->line->[0], $e->line->[2], 1)
-              % for my $line (@{$e->lines_after}) {
+              %= $cv->($exception->line->[0], $exception->line->[2], 1)
+              % for my $line (@{$exception->lines_after}) {
                 %= $cv->($line->[0], $line->[2])
               % }
             </table>
@@ -165,10 +164,10 @@
         % }
       </div>
       <div class="box" id="trace">
-        % if (@{$e->frames}) {
+        % if (@{$exception->frames}) {
           <div class="infobox" id="frames">
             <table>
-              % for my $frame (@{$e->frames}) {
+              % for my $frame (@{$exception->frames}) {
                 <tr>
                   <td class="striped value">
                     <pre><%= $frame->[1] . ':' . $frame->[2] %></pre>

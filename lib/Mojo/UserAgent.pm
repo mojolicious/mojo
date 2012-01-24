@@ -292,21 +292,14 @@ sub _connected {
   my $loop = $self->_loop;
   $loop->stream($id)->timeout($self->inactivity_timeout);
 
-  # Request timeout
-  my $c       = $self->{connections}->{$id};
-  my $timeout = $self->request_timeout;
-  weaken $self;
-  $c->{timeout} =
-    $loop->timer($timeout => sub { $self->_error($id, 'Request timeout.') })
-    if $timeout;
-
   # Store connection information in transaction
-  (my $tx = $c->{tx})->connection($id);
+  (my $tx = $self->{connections}->{$id}->{tx})->connection($id);
   my $handle = $loop->stream($id)->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
 
   # Start writing
+  weaken $self;
   $tx->on(resume => sub { $self->_write($id) });
   $self->_write($id);
 }
@@ -498,6 +491,14 @@ sub _start {
   $self->emit(start => $tx);
   return unless my $id = $self->_connect($tx, $cb);
   $self->{processing} += 1;
+
+  # Request timeout
+  if (my $t = $self->request_timeout) {
+    weaken $self;
+    my $loop = $self->_loop;
+    $self->{connections}->{$id}->{timeout} =
+      $loop->timer($t => sub { $self->_error($id, 'Request timeout.') });
+  }
 
   return $id;
 }
@@ -774,13 +775,13 @@ Domains that don't require a proxy server to be used.
   my $timeout = $ua->request_timeout;
   $ua         = $ua->request_timeout(5);
 
-Maximum amount of time in seconds sending the request and receiving the whole
-response may take before getting canceled, defaults to C<0>. Setting the
-value to C<0> will allow the user agent to wait indefinitely. The timeout
-will reset for every followed redirect. Note that this attribute is
-EXPERIMENTAL and might change without warning!
+Maximum amount of time in seconds establishing a connection, sending the
+request and receiving a whole response may take before getting canceled,
+defaults to C<0>. Setting the value to C<0> will allow the user agent to wait
+indefinitely. The timeout will reset for every followed redirect. Note that
+this attribute is EXPERIMENTAL and might change without warning!
 
-  # Total limit of 8 seconds
+  # Total limit of 5 seconds, of which 3 seconds may be spent connecting
   $ua->max_redirects(0)->connect_timeout(3)->request_timeout(5);
 
 =head2 C<transactor>

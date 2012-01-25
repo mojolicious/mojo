@@ -476,6 +476,7 @@ parsed.
 
   $app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;
+    ...
   });
 
 This is a very powerful hook and should not be used lightly, it makes some
@@ -489,6 +490,7 @@ Emitted right before the static and routes dispatchers start their work.
 
   $app->hook(before_dispatch => sub {
     my $c = shift;
+    ...
   });
 
 Very useful for rewriting incoming requests and other preprocessing tasks.
@@ -501,6 +503,7 @@ file should be served and before the routes dispatcher starts its work.
 
   $app->hook(after_static_dispatch => sub {
     my $c = shift;
+    ...
   });
 
 Mostly used for custom dispatchers and postprocessing static file responses.
@@ -513,6 +516,7 @@ hook can trigger before C<after_static_dispatch> due to its dynamic nature.
 
   $app->hook(after_dispatch => sub {
     my $c = shift;
+    ...
   });
 
 Useful for all kinds of postprocessing tasks. (Passed the current controller
@@ -527,7 +531,9 @@ change without warning!
 
   $app->hook(around_dispatch => sub {
     my ($next, $c) = @_;
+    ...
     $next->();
+    ...
   });
 
 This is a very powerful hook and should not be used lightly, consider it the

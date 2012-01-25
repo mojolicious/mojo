@@ -10,7 +10,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 105;
+plan tests => 109;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -331,3 +331,14 @@ is $tx2->res->code, 200, 'right status';
 is $tx3->res->code, 200, 'right status';
 is $tx4->res->code, 200, 'right status';
 like $tx2->res->content->asset->slurp, qr/Perl/i, 'right content';
+
+# Connect timeout (non-routable IP)
+$tx = $ua->connect_timeout('0.5')->get('10.255.255.1');
+ok !$tx->is_finished, 'transaction is not finished';
+is $tx->error, 'Connect timeout.', 'right error';
+$ua->connect_timeout(3);
+
+# Request timeout (non-routable IP)
+$tx = $ua->request_timeout('0.5')->get('10.255.255.1');
+ok !$tx->is_finished, 'transaction is not finished';
+is $tx->error, 'Request timeout.', 'right error';

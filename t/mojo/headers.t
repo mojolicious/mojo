@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 # "Remember, you can always find East by staring directly at the sun."
-use Test::More tests => 51;
+use Test::More tests => 89;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -41,6 +41,58 @@ is $headers->header('ETag'), $headers->etag, 'values are equal';
 $headers->status('200 OK');
 is $headers->status, '200 OK', 'right value';
 is $headers->header('Status'), $headers->status, 'values are equal';
+
+# Common headers
+$headers = Mojo::Headers->new;
+is $headers->accept('foo')->accept,                   'foo', 'right value';
+is $headers->accept_language('foo')->accept_language, 'foo', 'right value';
+is $headers->accept_ranges('foo')->accept_ranges,     'foo', 'right value';
+is $headers->authorization('foo')->authorization,     'foo', 'right value';
+is $headers->connection('foo')->connection,           'foo', 'right value';
+is $headers->cache_control('foo')->cache_control,     'foo', 'right value';
+is $headers->content_disposition('foo')->content_disposition, 'foo',
+  'right value';
+is $headers->content_length('foo')->content_length, 'foo', 'right value';
+is $headers->content_range('foo')->content_range,   'foo', 'right value';
+is $headers->content_transfer_encoding('foo')->content_transfer_encoding,
+  'foo', 'right value';
+is $headers->content_type('foo')->content_type, 'foo', 'right value';
+is $headers->cookie('foo')->cookie,             'foo', 'right value';
+is $headers->dnt('foo')->dnt,                   'foo', 'right value';
+is $headers->date('foo')->date,                 'foo', 'right value';
+is $headers->etag('foo')->etag,                 'foo', 'right value';
+is $headers->expect('foo')->expect,             'foo', 'right value';
+is $headers->expires('foo')->expires,           'foo', 'right value';
+is $headers->host('foo')->host,                 'foo', 'right value';
+is $headers->if_modified_since('foo')->if_modified_since, 'foo',
+  'right value';
+is $headers->last_modified('foo')->last_modified, 'foo', 'right value';
+is $headers->location('foo')->location,           'foo', 'right value';
+is $headers->proxy_authenticate('foo')->proxy_authenticate, 'foo',
+  'right value';
+is $headers->proxy_authorization('foo')->proxy_authorization, 'foo',
+  'right value';
+is $headers->range('foo')->range, 'foo', 'right value';
+is $headers->sec_websocket_protocol('foo')->sec_websocket_protocol, 'foo',
+  'right value';
+is $headers->sec_websocket_key('foo')->sec_websocket_key, 'foo',
+  'right value';
+is $headers->sec_websocket_origin('foo')->sec_websocket_origin, 'foo',
+  'right value';
+is $headers->sec_websocket_protocol('foo')->sec_websocket_protocol, 'foo',
+  'right value';
+is $headers->sec_websocket_version('foo')->sec_websocket_version, 'foo',
+  'right value';
+is $headers->server('foo')->server,         'foo', 'right value';
+is $headers->set_cookie('foo')->set_cookie, 'foo', 'right value';
+is $headers->status('foo')->status,         'foo', 'right value';
+is $headers->trailer('foo')->trailer,       'foo', 'right value';
+is $headers->transfer_encoding('foo')->transfer_encoding, 'foo',
+  'right value';
+is $headers->upgrade('foo')->upgrade,                   'foo', 'right value';
+is $headers->user_agent('foo')->user_agent,             'foo', 'right value';
+is $headers->www_authenticate('foo')->www_authenticate, 'foo', 'right value';
+is $headers->x_forwarded_for('foo')->x_forwarded_for,   'foo', 'right value';
 
 # Clone
 $headers = Mojo::Headers->new;

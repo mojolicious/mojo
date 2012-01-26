@@ -19,6 +19,7 @@ has types => sub {
     json => 'application/json',
     mp3  => 'audio/mpeg',
     png  => 'image/png',
+    pdf  => 'application/pdf',
     rss  => 'application/rss+xml',
     svg  => 'image/svg+xml',
     tar  => 'application/x-tar',

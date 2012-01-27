@@ -39,7 +39,7 @@ sub handle { shift->{handle} }
 
 sub is_readable {
   my $self = shift;
-  return $self->iowatcher->is_readable($self->{handle});
+  return $self->{handle} && $self->iowatcher->is_readable($self->{handle});
 }
 
 sub is_writing {

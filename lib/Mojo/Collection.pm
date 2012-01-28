@@ -22,12 +22,6 @@ sub new {
   bless [@_], ref $class || $class;
 }
 
-sub concat {
-  my $self = shift;
-  push @$self, map {@$_} @_;
-  return $self;
-}
-
 sub each {
   my ($self, $cb) = @_;
   return @$self unless $cb;
@@ -95,6 +89,7 @@ Mojo::Collection - Collection
   # Manipulate collections
   use Mojo::Collection;
   my $collection = Mojo::Collection->new(qw/just works/);
+  unshift @$collection, 'it';
   $collection->map(sub { ucfirst })->each(sub {
     my ($word, $count) = @_;
     say "$count: $word";
@@ -117,16 +112,6 @@ L<Mojo::Collection> implements the following methods.
   my $collection = Mojo::Collection->new(1, 2, 3);
 
 Construct a new L<Mojo::Collection> object.
-
-=head2 C<concat>
-
-  $collection = $collection->concat(@collections);
-
-Concatenate one or more collections. Note that this method is EXPERIMENTAL
-and might change without warning!
-
-  # "9"
-  c(1, 2, 3)->concat(c(4, 5, 6), c(7, 8, 9))->size;
 
 =head2 C<each>
 

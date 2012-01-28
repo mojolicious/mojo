@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 48;
+use Test::More tests => 49;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 use_ok 'Mojo::Collection', 'c';
@@ -104,3 +104,9 @@ is_deeply [$collection->slice(-3, -5)->each], [10, 6], 'right result';
 is_deeply [$collection->slice(1, 2, 3)->each], [2, 3, 4], 'right result';
 is_deeply [$collection->slice(6, 1, 4)->each], [7, 2, 5], 'right result';
 is_deeply [$collection->slice(6 .. 9)->each], [7, 10, 9, 8], 'right result';
+
+# Merge
+my $coll_a = c(1, 2, 3, 4, 5);
+my $coll_b = c(6, 7, 8, 9, 10);
+$collection = c();
+is_deeply [$collection->merge($coll_a, $coll_b)->each], [1..10], 'right result';

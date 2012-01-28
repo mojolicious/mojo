@@ -108,5 +108,4 @@ is_deeply [$collection->slice(6 .. 9)->each], [7, 10, 9, 8], 'right result';
 # Merge
 my $coll_a = c(1, 2, 3, 4, 5);
 my $coll_b = c(6, 7, 8, 9, 10);
-$collection = c();
-is_deeply [$collection->merge($coll_a, $coll_b)->each], [1..10], 'right result';
+is_deeply [$coll_a->union($coll_b)->each], [1..10], 'right result';

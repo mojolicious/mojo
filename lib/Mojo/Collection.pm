@@ -77,9 +77,9 @@ sub sort {
   return $self->new(sort { $a->$cb($b) } @$self);
 }
 
-sub merge {
-  my ($self, @mcos) = @_;
-  return $self->new(map { @{$_} } @mcos);
+sub union {
+  my ($self, @others) = @_;
+  return $self->new(map { @{$_} } $self, @others);
 }
 
 1;

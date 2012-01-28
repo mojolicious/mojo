@@ -22,6 +22,12 @@ sub new {
   bless [@_], ref $class || $class;
 }
 
+sub concat {
+  my $self = shift;
+  push @$self, map {@$_} @_;
+  return $self;
+}
+
 sub each {
   my ($self, $cb) = @_;
   return @$self unless $cb;
@@ -77,11 +83,6 @@ sub sort {
   return $self->new(sort { $a->$cb($b) } @$self);
 }
 
-sub union {
-  my ($self, @others) = @_;
-  return $self->new(map { @{$_} } $self, @others);
-}
-
 1;
 __END__
 
@@ -116,6 +117,16 @@ L<Mojo::Collection> implements the following methods.
   my $collection = Mojo::Collection->new(1, 2, 3);
 
 Construct a new L<Mojo::Collection> object.
+
+=head2 C<concat>
+
+  $collection = $collection->concat(@collections);
+
+Concatenate one or more collections. Note that this method is EXPERIMENTAL
+and might change without warning!
+
+  # "9"
+  c(1, 2, 3)->concat(c(4, 5, 6), c(7, 8, 9))->size;
 
 =head2 C<each>
 
@@ -198,12 +209,6 @@ Sort elements based on return value of closure and create a new collection
 from the results.
 
   my $insensitive = $collection->sort(sub { uc(shift) cmp uc(shift) });
-
-=head2 C<union>
-
-  my $new = $collection->union($collection_b, ...);
-
-Return the union of two or more collections.
 
 =head1 SEE ALSO
 

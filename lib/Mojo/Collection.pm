@@ -199,11 +199,11 @@ from the results.
 
   my $insensitive = $collection->sort(sub { uc(shift) cmp uc(shift) });
 
-=head2 C<merge>
+=head2 C<union>
 
-  my $new = $collection->merge($collection_a, $collection_b, ...);
+  my $new = $collection->union($collection_b, ...);
 
-Merges two or more collection objects into a new one.
+Return the union of two or more collections.
 
 =head1 SEE ALSO
 

@@ -77,6 +77,11 @@ sub sort {
   return $self->new(sort { $a->$cb($b) } @$self);
 }
 
+sub merge {
+  my ($self, @mcos) = @_;
+  return $self->new(map { @{$_} } @mcos);
+}
+
 1;
 __END__
 
@@ -193,6 +198,12 @@ Sort elements based on return value of closure and create a new collection
 from the results.
 
   my $insensitive = $collection->sort(sub { uc(shift) cmp uc(shift) });
+
+=head2 C<merge>
+
+  my $new = $collection->merge($collection_a, $collection_b, ...);
+
+Merges two or more collection objects into a new one.
 
 =head1 SEE ALSO
 

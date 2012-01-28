@@ -1,11 +1,12 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.47    2012-01-27 00:00:00
+2.47    2012-01-28 00:00:00
         - Added pdf MIME type. (bfaist)
         - Improved documentation.
         - Improved tests.
         - Fixed small bug in Mojo::IOLoop::Stream that caused close events to
           fail sometimes.
+        - Added Mojo::Collection::union method. (ifimbres)
 
 2.46    2012-01-25 00:00:00
         - Added EXPERIMENTAL request_timeout attribute to Mojo::UserAgent.

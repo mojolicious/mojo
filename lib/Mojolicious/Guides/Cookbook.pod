@@ -14,9 +14,10 @@ different platforms.
 
 =head2 Built-in server
 
-L<Mojolicious> contains a very portable HTTP 1.1 compliant web server. It is
-usually used during development but is solid and fast enough for small to mid
-sized applications.
+L<Mojolicious> contains a very portable non-blocking I/O HTTP 1.1 and
+WebSocket server with L<Mojo::Server::Daemon>. It is usually used during
+development and in the construction of more advanced web servers, but is
+solid and fast enough for small to mid sized applications.
 
   $ ./script/myapp daemon
   Server available at http://127.0.0.1:3000.
@@ -35,6 +36,21 @@ Another huge advantage is that it supports TLS and WebSockets out of the box.
 A development certificate for testing purposes is built right in, so it just
 works.
 
+=head2 Morbo
+
+After reading the L<Mojolicious::Lite> tutorial, you should already be
+familiar with L<Mojo::Server::Morbo>.
+
+  Mojo::Server::Morbo
+  `- Mojo::Server::Daemon
+
+It is basically a restarter that forks a new L<Mojo::Server::Daemon> web
+server whenever a file in your project changes, and should therefore only be
+used during development.
+
+  $ morbo script/myapp
+  Server available at http://127.0.0.1:3000.
+
 =head2 Hypnotoad
 
 For bigger applications L<Mojolicious> contains the UNIX optimized preforking
@@ -47,8 +63,8 @@ of multiple cpu cores and copy-on-write.
   |- Mojo::Server::Daemon [3]
   `- Mojo::Server::Daemon [4]
 
-It is based on the normal built-in web server but optimized specifically for
-production environments out of the box.
+It is also based on the L<Mojo::Server::Daemon> web server, but optimized
+specifically for production environments out of the box.
 
   $ hypnotoad script/myapp
   Server available at http://127.0.0.1:8080.

@@ -86,10 +86,8 @@ sub generate_body_chunk {
   my ($self, $offset) = @_;
 
   # Drain
-  if (!delete $self->{delay} && !length $self->{body_buffer}) {
-    my $cb = delete $self->{drain};
-    $self->$cb($offset) if $cb;
-  }
+  $self->emit(drain => $offset)
+    if !delete $self->{delay} && !length $self->{body_buffer};
 
   # Get chunk
   my $chunk = $self->{body_buffer} // '';
@@ -269,7 +267,7 @@ sub write {
   else { $self->{delay} = 1 }
 
   # Drain
-  $self->{drain} = $cb if $cb;
+  $self->once(drain => $cb) if $cb;
 
   # Finish
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
@@ -417,6 +415,21 @@ in RFC 2616.
 =head1 EVENTS
 
 L<Mojo::Content> can emit the following events.
+
+=head2 C<drain>
+
+  $content->on(drain => sub {
+    my ($content, $offset) = @_;
+    ...
+  });
+
+Emitted once all data has been written. Note that this event is EXPERIMENTAL
+and might change without warning!
+
+  $content->on(drain => sub {
+    my $content = shift;
+    $content->write_chunk(time);
+  });
 
 =head2 C<body>
 

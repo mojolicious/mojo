@@ -216,7 +216,7 @@ sub send_frame {
   my ($self, $fin, $type, $payload, $cb) = @_;
 
   # Prepare frame
-  $self->{drain} = $cb if $cb;
+  $self->once(drain => $cb) if $cb;
   $self->{write} //= '';
   $self->{write} .= $self->build_frame($fin, $type, $payload);
   $self->{state} = 'write';
@@ -303,8 +303,7 @@ sub server_write {
   $self->{write} //= '';
   unless (length $self->{write}) {
     $self->{state} = $self->{finished} ? 'finished' : 'read';
-    my $cb = delete $self->{drain};
-    $self->$cb if $cb;
+    $self->emit('drain');
   }
 
   # Empty buffer
@@ -351,6 +350,20 @@ without warning!
 
 L<Mojo::Transaction::WebSocket> inherits all events from L<Mojo::Transaction>
 and can emit the following new ones.
+
+=head2 C<drain>
+
+  $ws->on(drain => sub {
+    my $ws = shift;
+    ...
+  });
+
+Emitted once all data has been sent.
+
+  $ws->on(drain => sub {
+    my $ws = shift;
+    $ws->send_message(time);
+  });
 
 =head2 C<frame>
 

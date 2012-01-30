@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'production';
 }
 
-use Test::More tests => 57;
+use Test::More tests => 63;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -20,6 +20,12 @@ use_ok 'MojoliciousTest';
 my $t = Test::Mojo->new('MojoliciousTest');
 
 # Plugin::Test::SomePlugin2::register (security violation)
+$t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
+  ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Page not found/);
+
+# Plugin::Test::SomePlugin2::register (security violation again)
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
   ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')

@@ -15,7 +15,7 @@ my @HEADERS = (
   qw/Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol/,
   qw/Sec-WebSocket-Version Server Set-Cookie Status Trailer/,
   qw/Transfer-Encoding Upgrade User-Agent WWW-Authenticate X-Forwarded-For/,
-  qw/X-Forwarded-Host X-Forwarded-HTTPS/
+  qw/X-Forwarded-Host X-Forwarded-HTTPS X-Requested-With/
 );
 {
   no strict 'refs';
@@ -608,6 +608,13 @@ Shortcut for the C<X-Forwarded-Host> header.
   $headers              = $headers->x_forwarded_https(1);
 
 Shortcut for the C<X-Forwarded-HTTPS> header.
+
+=head2 C<x_requested_with>
+
+  my $x_requested_with = $headers->x_requested_with;
+  $headers             = $headers->x_requested_with('XMLHttpRequest');
+
+Shortcut for the C<X-Requested-With> header.
 
 =head1 SEE ALSO
 

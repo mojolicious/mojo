@@ -91,9 +91,7 @@ sub is_secure {
   return ($url->scheme || $url->base->scheme || '') eq 'https';
 }
 
-sub is_xhr {
-  (shift->headers->header('X-Requested-With') || '') =~ /XMLHttpRequest/i;
-}
+sub is_xhr { (shift->headers->x_requested_with || '') =~ /XMLHttpRequest/i }
 
 sub param {
   my $self = shift;

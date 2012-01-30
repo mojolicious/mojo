@@ -5,8 +5,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL drain event to Mojo::Transaction::WebSocket.
         - Added EXPERIMENTAL support for RSV1-3 flags to
           Mojo::Transaction::WebSocket.
-        - Added x_forwarded_host and x_forwarded_https methods to
-          Mojo::Headers.
+        - Added x_forwarded_host, x_forwarded_https and x_requested_with
+          methods to Mojo::Headers.
         - Removed experimental status from JSON Pointer support.
         - Added pdf MIME type. (bfaist)
         - Improved documentation.

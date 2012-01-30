@@ -502,11 +502,11 @@ $ua->websocket(
     $tx->on(
       frame => sub {
         my ($tx, $frame) = @_;
-        $pong = $frame->[2] if $frame->[1] == 10;
+        $pong = $frame->[5] if $frame->[4] == 10;
         Mojo::IOLoop->stop;
       }
     );
-    $tx->send_frame(1, 9, 'test');
+    $tx->send_frame(1, 0, 0, 0, 9, 'test');
   }
 );
 Mojo::IOLoop->start;

@@ -27,12 +27,15 @@ has 'masked';
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
 sub build_frame {
-  my ($self, $fin, $op, $payload) = @_;
+  my ($self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload) = @_;
   warn "BUILDING FRAME\n" if DEBUG;
 
   # Head
-  my $frame = 0;
+  my $frame = 0b00000000;
   vec($frame, 0, 8) = $op | 0b10000000 if $fin;
+  vec($frame, 0, 8) |= 0b01000000 if $rsv1;
+  vec($frame, 0, 8) |= 0b00100000 if $rsv2;
+  vec($frame, 0, 8) |= 0b00010000 if $rsv3;
 
   # Mask payload
   warn "PAYLOAD: $payload\n" if DEBUG;
@@ -117,7 +120,7 @@ sub connection   { shift->handshake->connection(@_) }
 
 sub finish {
   my $self = shift;
-  $self->send_frame(1, CLOSE, '');
+  $self->send_frame(1, 0, 0, 0, CLOSE, '');
   $self->{finished} = 1;
   return $self;
 }
@@ -140,6 +143,14 @@ sub parse_frame {
   # FIN
   my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
   warn "FIN: $fin\n" if DEBUG;
+
+  # RSV1-3
+  my $rsv1 = (vec($head, 0, 8) & 0b01000000) == 0b01000000 ? 1 : 0;
+  warn "RSV1: $rsv1\n" if DEBUG;
+  my $rsv2 = (vec($head, 0, 8) & 0b00100000) == 0b00100000 ? 1 : 0;
+  warn "RSV2: $rsv2\n" if DEBUG;
+  my $rsv3 = (vec($head, 0, 8) & 0b00010000) == 0b00010000 ? 1 : 0;
+  warn "RSV3: $rsv3\n" if DEBUG;
 
   # Opcode
   my $op = vec($head, 0, 8) & 0b00001111;
@@ -198,7 +209,7 @@ sub parse_frame {
   warn "PAYLOAD: $payload\n" if DEBUG;
   $$buffer = $clone;
 
-  return [$fin, $op, $payload];
+  return [$fin, $rsv1, $rsv2, $rsv3, $op, $payload];
 }
 
 sub remote_address { shift->handshake->remote_address }
@@ -213,12 +224,13 @@ sub resume {
 }
 
 sub send_frame {
-  my ($self, $fin, $type, $payload, $cb) = @_;
+  my ($self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload, $cb) = @_;
 
   # Prepare frame
   $self->once(drain => $cb) if $cb;
   $self->{write} //= '';
-  $self->{write} .= $self->build_frame($fin, $type, $payload);
+  $self->{write}
+    .= $self->build_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload);
   $self->{state} = 'write';
 
   # Resume
@@ -230,11 +242,14 @@ sub send_message {
   $m //= '';
 
   # Binary or raw text
-  return $self->send_frame(1, $m->[0] eq 'text' ? TEXT : BINARY, $m->[1], $cb)
-    if ref $m;
+  if (ref $m) {
+    return $self->send_frame(1, 0, 0, 0, TEXT, $m->[1], $cb)
+      if $m->[0] eq 'text';
+    return $self->send_frame(1, 0, 0, 0, BINARY, $m->[1], $cb);
+  }
 
   # Text
-  $self->send_frame(1, TEXT, encode('UTF-8', $m), $cb);
+  $self->send_frame(1, 0, 0, 0, TEXT, encode('UTF-8', $m), $cb);
 }
 
 sub server_handshake {
@@ -265,10 +280,10 @@ sub server_read {
   $self->{message} //= '';
   while (my $frame = $self->parse_frame(\$self->{read})) {
     $self->emit(frame => $frame);
-    my $op = $frame->[1] || CONTINUATION;
+    my $op = $frame->[4] || CONTINUATION;
 
     # Ping/Pong
-    $self->send_frame(1, PONG, $frame->[2]) and next if $op == PING;
+    $self->send_frame(1, 0, 0, 0, PONG, $frame->[5]) and next if $op == PING;
     next if $op == PONG;
 
     # Close
@@ -277,7 +292,7 @@ sub server_read {
     # Append chunk and check message size
     next unless $self->has_subscribers('message');
     $self->{op} = $op unless exists $self->{op};
-    $self->{message} .= $frame->[2];
+    $self->{message} .= $frame->[5];
     $self->finish and last
       if length $self->{message} > $self->max_websocket_size;
 
@@ -376,9 +391,12 @@ Emitted when a WebSocket frame has been received.
 
   $ws->on(frame => sub {
     my ($ws, $frame) = @_;
-    say 'Fin: ',     $frame->[0];
-    say 'Type: ',    $frame->[1];
-    say 'Payload: ', $frame->[2];
+    say "Fin: $frame->[0]";
+    say "Rsv1: $frame->[1]";
+    say "Rsv2: $frame->[2]";
+    say "Rsv3: $frame->[3]";
+    say "Op: $frame->[4]";
+    say "Payload: $frame->[5]";
   });
 
 =head2 C<message>
@@ -430,7 +448,7 @@ L<Mojo::Transaction> and implements the following new ones.
 
 =head2 C<build_frame>
 
-  my $bytes = $ws->build_frame($fin, $op, $payload);
+  my $bytes = $ws->build_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload);
 
 Build WebSocket frame.
 
@@ -530,8 +548,8 @@ Alias for L<Mojo::Transaction/"resume">.
 
 =head2 C<send_frame>
 
-  $ws->send_frame($fin, $op, $payload);
-  $ws->send_frame($fin, $op, $payload, sub {...});
+  $ws->send_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload);
+  $ws->send_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload, sub {...});
 
 Send a single frame non-blocking via WebSocket, the optional drain callback
 will be invoked once all data has been written.

@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojolicious.
 2.47    2012-01-30 00:00:00
         - Added EXPERIMENTAL drain event to Mojo::Content.
         - Added EXPERIMENTAL drain event to Mojo::Transaction::WebSocket.
+        - Added EXPERIMENTAL support for RSV1-3 flags to
+          Mojo::Transaction::WebSocket.
         - Added pdf MIME type. (bfaist)
         - Improved documentation.
         - Improved tests.

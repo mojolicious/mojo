@@ -51,8 +51,7 @@ Mojo::JSON::Pointer - JSON Pointers
 =head1 DESCRIPTION
 
 L<Mojo::JSON::Pointer> implements JSON Pointers as described in
-L<http://tools.ietf.org/html/draft-pbryan-zyp-json-pointer-02>. Note that
-this module is EXPERIMENTAL and might change without warning!
+L<http://tools.ietf.org/html/draft-pbryan-zyp-json-pointer-02>.
 
 =head1 METHODS
 

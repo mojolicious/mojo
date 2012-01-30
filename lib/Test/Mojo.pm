@@ -537,8 +537,7 @@ Opposite of C<element_exists>.
   $t = $t->finish_ok;
   $t = $t->finish_ok('finished successfully');
 
-Finish C<WebSocket> connection. Note that this method is EXPERIMENTAL and
-might change without warning!
+Finish C<WebSocket> connection.
 
 =head2 C<get_ok>
 
@@ -595,8 +594,7 @@ Check response content for JSON data.
   $t = $t->json_is('/foo/bar/1' => 2, 'right value');
 
 Check the value extracted from JSON response using the given JSON Pointer
-with L<Mojo::JSON::Pointer>. Note that this method is EXPERIMENTAL and might
-change without warning!
+with L<Mojo::JSON::Pointer>.
 
 =head2 C<json_has>
 
@@ -604,48 +602,42 @@ change without warning!
   $t = $t->json_has('/minibar', 'has a minibar');
 
 Check if JSON response contains a value that can be identified using the
-given JSON Pointer with L<Mojo::JSON::Pointer>. Note that this method is
-EXPERIMENTAL and might change without warning!
+given JSON Pointer with L<Mojo::JSON::Pointer>.
 
 =head2 C<json_hasnt>
 
   $t = $t->json_hasnt('/foo');
   $t = $t->json_hasnt('/minibar', 'no minibar');
 
-Opposite of C<json_has>. Note that this method is EXPERIMENTAL and might
-change without warning!
+Opposite of C<json_has>.
 
 =head2 C<message_is>
 
   $t = $t->message_is('working!');
   $t = $t->message_is('working!', 'right message');
 
-Check WebSocket message for exact match. Note that this method is
-EXPERIMENTAL and might change without warning!
+Check WebSocket message for exact match.
 
 =head2 C<message_isnt>
 
   $t = $t->message_isnt('working!');
   $t = $t->message_isnt('working!', 'different message');
 
-Opposite of C<message_is>. Note that this method is EXPERIMENTAL and might
-change without warning!
+Opposite of C<message_is>.
 
 =head2 C<message_like>
 
   $t = $t->message_like(qr/working!/);
   $t = $t->message_like(qr/working!/, 'right message');
 
-Check WebSocket message for similar match. Note that this method is
-EXPERIMENTAL and might change without warning!
+Check WebSocket message for similar match.
 
 =head2 C<message_unlike>
 
   $t = $t->message_unlike(qr/working!/);
   $t = $t->message_unlike(qr/working!/, 'different message');
 
-Opposite of C<message_like>. Note that this method is EXPERIMENTAL and might
-change without warning!
+Opposite of C<message_like>.
 
 =head2 C<post_ok>
 
@@ -679,8 +671,7 @@ Reset user agent session.
   $t = $t->send_message_ok('hello');
   $t = $t->send_message_ok('hello', 'sent successfully');
 
-Send C<WebSocket> message. Note that this method is EXPERIMENTAL and might
-change without warning!
+Send C<WebSocket> message.
 
 =head2 C<status_is>
 
@@ -729,8 +720,7 @@ Opposite of C<text_like>.
   $t = $t->websocket_ok('/echo');
 
 Open a C<WebSocket> connection with transparent handshake, takes the exact
-same arguments as L<Mojo::UserAgent/"websocket">. Note that this method is
-EXPERIMENTAL and might change without warning!
+same arguments as L<Mojo::UserAgent/"websocket">.
 
 =head1 SEE ALSO
 

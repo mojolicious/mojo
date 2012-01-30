@@ -595,8 +595,7 @@ Check response content for JSON data.
   $t = $t->json_is('/foo/bar/1' => 2, 'right value');
 
 Check the value extracted from JSON response using the given JSON Pointer
-with L<Mojo::JSON::Pointer>. Note that this method is EXPERIMENTAL and might
-change without warning!
+with L<Mojo::JSON::Pointer>.
 
 =head2 C<json_has>
 
@@ -604,16 +603,14 @@ change without warning!
   $t = $t->json_has('/minibar', 'has a minibar');
 
 Check if JSON response contains a value that can be identified using the
-given JSON Pointer with L<Mojo::JSON::Pointer>. Note that this method is
-EXPERIMENTAL and might change without warning!
+given JSON Pointer with L<Mojo::JSON::Pointer>.
 
 =head2 C<json_hasnt>
 
   $t = $t->json_hasnt('/foo');
   $t = $t->json_hasnt('/minibar', 'no minibar');
 
-Opposite of C<json_has>. Note that this method is EXPERIMENTAL and might
-change without warning!
+Opposite of C<json_has>.
 
 =head2 C<message_is>
 

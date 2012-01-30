@@ -949,7 +949,8 @@ Add a waypoint to this route as nested child.
   my $websocket = $r->websocket('/:foo' => sub {...});
 
 Generate route matching only C<WebSocket> handshakes. See also the
-L<Mojolicious::Lite> tutorial for more argument variations.
+L<Mojolicious::Lite> tutorial for more argument variations. Note that this
+method is EXPERIMENTAL and might change without warning!
 
 =head1 SHORTCUTS
 

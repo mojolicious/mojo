@@ -423,7 +423,8 @@ L<Mojo::Content> can emit the following events.
     ...
   });
 
-Emitted once all data has been written.
+Emitted once all data has been written. Note that this event is EXPERIMENTAL
+and might change without warning!
 
   $content->on(drain => sub {
     my $content = shift;

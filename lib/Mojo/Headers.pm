@@ -15,6 +15,7 @@ my @HEADERS = (
   qw/Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol/,
   qw/Sec-WebSocket-Version Server Set-Cookie Status Trailer/,
   qw/Transfer-Encoding Upgrade User-Agent WWW-Authenticate X-Forwarded-For/,
+  qw/X-Forwarded-Host X-Forwarded-HTTPS/
 );
 {
   no strict 'refs';
@@ -593,6 +594,20 @@ Shortcut for the C<WWW-Authenticate> header.
   $headers            = $headers->x_forwarded_for('127.0.0.1');
 
 Shortcut for the C<X-Forwarded-For> header.
+
+=head2 C<x_forwarded_host>
+
+  my $x_forwarded_host = $headers->x_forwarded_host;
+  $headers             = $headers->x_forwarded_host('mojolicio.us');
+
+Shortcut for the C<X-Forwarded-Host> header.
+
+=head2 C<x_forwarded_https>
+
+  my $x_forwarded_https = $headers->x_forwarded_https;
+  $headers              = $headers->x_forwarded_https(1);
+
+Shortcut for the C<X-Forwarded-HTTPS> header.
 
 =head1 SEE ALSO
 

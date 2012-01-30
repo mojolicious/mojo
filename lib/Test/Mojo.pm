@@ -514,8 +514,8 @@ Opposite of C<content_type_like>.
 
   $t = $t->delete_ok('/foo');
 
-Perform a C<DELETE> request and check for success, takes the exact same
-arguments as L<Mojo::UserAgent/"delete">.
+Perform a C<DELETE> request and check for transport errors, takes the exact
+same arguments as L<Mojo::UserAgent/"delete">.
 
 =head2 C<element_exists>
 
@@ -544,15 +544,15 @@ might change without warning!
 
   $t = $t->get_ok('/foo');
 
-Perform a C<GET> request and check for success, takes the exact same
+Perform a C<GET> request and check for transport errors, takes the exact same
 arguments as L<Mojo::UserAgent/"get">.
 
 =head2 C<head_ok>
 
   $t = $t->head_ok('/foo');
 
-Perform a C<HEAD> request and check for success, takes the exact same
-arguments as L<Mojo::UserAgent/"head">.
+Perform a C<HEAD> request and check for transport errors, takes the exact
+same arguments as L<Mojo::UserAgent/"head">.
 
 =head2 C<header_is>
 
@@ -651,21 +651,21 @@ change without warning!
 
   $t = $t->post_ok('/foo');
 
-Perform a C<POST> request and check for success, takes the exact same
-arguments as L<Mojo::UserAgent/"post">.
+Perform a C<POST> request and check for transport errors, takes the exact
+same arguments as L<Mojo::UserAgent/"post">.
 
 =head2 C<post_form_ok>
 
   $t = $t->post_form_ok('/foo' => {test => 123});
 
-Submit a C<POST> form and check for success, takes the exact same arguments
-as L<Mojo::UserAgent/"post_form">.
+Submit a C<POST> form and check for transport errors, takes the exact same
+arguments as L<Mojo::UserAgent/"post_form">.
 
 =head2 C<put_ok>
 
   $t = $t->put_ok('/foo');
 
-Perform a C<PUT> request and check for success, takes the exact same
+Perform a C<PUT> request and check for transport errors, takes the exact same
 arguments as L<Mojo::UserAgent/"put">.
 
 =head2 C<reset_session>

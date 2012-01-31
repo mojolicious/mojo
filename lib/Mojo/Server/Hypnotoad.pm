@@ -47,8 +47,7 @@ sub run {
   my ($self, $app, $config) = @_;
 
   # No windows support
-  _exit('Hypnotoad not available for Windows.')
-    if $^O eq 'MSWin32' || $^O =~ /cygwin/;
+  _exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
 
   # Application
   $ENV{HYPNOTOAD_APP} ||= abs_path $app;

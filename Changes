@@ -8,6 +8,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added x_forwarded_host, x_forwarded_https and x_requested_with
           methods to Mojo::Headers.
         - Removed experimental status from JSON Pointer support.
+        - Removed Cygwin exception from Hypnotoad.
         - Added pdf MIME type. (bfaist)
         - Improved documentation.
         - Improved tests.

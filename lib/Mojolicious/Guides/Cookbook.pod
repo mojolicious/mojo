@@ -532,7 +532,7 @@ which can be combined to solve some of hardest problems in web development.
   # Upload form
   get '/' => 'index';
 
-  # Streaming upload (will be invoked twice, due to early "request" event)
+  # Streaming multipart upload (invoked twice, due to early "request" event)
   post '/upload' => sub {
     my $self = shift;
 
@@ -540,7 +540,7 @@ which can be combined to solve some of hardest problems in web development.
     return $self->req->content->on(part => sub {
       my ($multi, $single) = @_;
 
-      # Subscribe to "body" event or part to make sure we have all headers
+      # Subscribe to "body" event of part to make sure we have all headers
       $single->on(body => sub {
         my $single = shift;
 
@@ -565,7 +565,7 @@ which can be combined to solve some of hardest problems in web development.
   @@ index.html.ep
   <!DOCTYPE html>
   <html>
-    <head><title>Streaming upload</title></head>
+    <head><title>Streaming multipart upload</title></head>
     <body>
       % my @attrs = (method => 'POST', enctype => 'multipart/form-data');
       %= form_for upload => @attrs => begin

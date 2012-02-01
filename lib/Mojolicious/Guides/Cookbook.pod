@@ -10,7 +10,9 @@ This document cotains many fun recipes for cooking with L<Mojolicious>.
 =head1 DEPLOYMENT
 
 Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on
-different platforms.
+different platforms. Note that many real-time web features are based on the
+L<Mojo::IOLoop> reactor, and therefore require one of the built-in web
+servers to be able to use them to their full potential.
 
 =head2 Built-in server
 

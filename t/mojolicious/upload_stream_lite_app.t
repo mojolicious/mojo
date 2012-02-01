@@ -15,7 +15,7 @@ use Mojolicious::Lite;
 use Scalar::Util 'weaken';
 use Test::Mojo;
 
-# Trigger early "request" event for multipart requests under "/upload"
+# Emit "request" event early for multipart requests under "/upload"
 hook after_build_tx => sub {
   my $tx = shift;
   weaken $tx;

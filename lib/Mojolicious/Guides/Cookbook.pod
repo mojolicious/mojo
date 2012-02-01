@@ -532,7 +532,7 @@ which can be combined to solve some of hardest problems in web development.
   # Upload form
   get '/' => 'index';
 
-  # Streaming upload
+  # Streaming upload (will be invoked twice, due to early "request" event)
   post '/upload' => sub {
     my $self = shift;
 

@@ -15,25 +15,23 @@ use Mojolicious::Lite;
 use Scalar::Util 'weaken';
 use Test::Mojo;
 
-# Trigger early request for multipart requests under "/upload"
-app->hook(
-  after_build_tx => sub {
-    my $tx = shift;
-    weaken $tx;
-    $tx->req->content->on(
-      upgrade => sub {
-        $tx->emit('request') if $tx->req->url->path->contains('/upload');
-      }
-    );
-  }
-);
+# Trigger early "request" event for multipart requests under "/upload"
+hook after_build_tx => sub {
+  my $tx = shift;
+  weaken $tx;
+  $tx->req->content->on(
+    upgrade => sub {
+      $tx->emit('request') if $tx->req->url->path->contains('/upload');
+    }
+  );
+};
 
 # POST /upload/*
 my $cache = {};
 post '/upload/:id' => sub {
   my $self = shift;
 
-  # First invocation, locate part and prepare streaming
+  # First invocation, prepare streaming
   my $id = $self->param('id');
   $self->req->content->on(
     part => sub {

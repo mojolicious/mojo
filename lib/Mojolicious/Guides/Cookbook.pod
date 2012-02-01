@@ -513,6 +513,68 @@ HTTP protocol for transport.
 The C<message> event will be emitted for every new log message and the
 C<finish> event right after the transaction has been finished.
 
+=head2 Streaming multipart uploads
+
+L<Mojolicious> contains a very sophisticated event system based on
+L<Mojo::EventEmitter>, with ready-to-use events on almost all layers, and
+which can be combined to solve some of hardest problems in web development.
+
+  use Mojolicious::Lite;
+  use Scalar::Util 'weaken';
+
+  # Emit "request" event early for requests that get upgraded to multipart
+  hook after_build_tx => sub {
+    my $tx = shift;
+    weaken $tx;
+    $tx->req->content->on(upgrade => sub { $tx->emit('request') });
+  };
+
+  # Upload form
+  get '/' => 'index';
+
+  # Streaming upload
+  post '/upload' => sub {
+    my $self = shift;
+
+    # First invocation, subscribe to "part" event to find the right one
+    return $self->req->content->on(part => sub {
+      my ($multi, $single) = @_;
+
+      # Subscribe to "body" event or part to make sure we have all headers
+      $single->on(body => sub {
+        my $single = shift;
+
+        # Make sure we have the right part and replace "read" event
+        return unless $single->headers->content_disposition =~ /example/;
+        $single->unsubscribe('read')->on(read => sub {
+          my ($single, $chunk) = @_;
+
+          # Log size of every chunk we receive
+          $self->app->log->debug(length($chunk) . ' bytes uploaded.');
+        });
+      });
+    }) unless $self->req->is_finished;
+
+    # Second invocation, render response
+    $self->render(text => 'Upload was successful.');
+  };
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head><title>Streaming upload</title></head>
+    <body>
+      % my @attrs = (method => 'POST', enctype => 'multipart/form-data');
+      %= form_for upload => @attrs => begin
+        %= file_field 'example'
+        %= submit_button 'Upload'
+      % end
+    </body>
+  </html>
+
 =head2 Event loops
 
 Internally the L<Mojo::IOLoop> reactor can use multiple event loop backends,

@@ -12,6 +12,7 @@ use List::Util 'shuffle';
 use Mojo::Server::Daemon;
 use POSIX qw/setsid WNOHANG/;
 use Scalar::Util 'weaken';
+use Time::HiRes 'ualarm';
 
 # Preload
 use Mojo::UserAgent;
@@ -150,6 +151,7 @@ sub _config {
     ||= File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
     'hypnotoad.lock');
   $c->{lock_file} .= ".$$";
+  $c->{lock_timeout} ||= '0.5';
   $c->{pid_file}
     ||= File::Spec->catfile(dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid');
   $c->{upgrade_timeout} ||= 60;
@@ -356,9 +358,9 @@ sub _spawn {
       if ($_[1]) {
         eval {
           local $SIG{ALRM} = sub { die "alarm\n" };
-          my $old = alarm 1;
+          my $old = ualarm $c->{lock_timeout} * 1000000;
           $l = flock $lock, LOCK_EX;
-          alarm $old;
+          ualarm $old;
         };
         if ($@) {
           die $@ unless $@ eq "alarm\n";
@@ -584,6 +586,13 @@ also L<Mojo::Server::Daemon/"listen"> for more examples.
   lock_file => '/tmp/hypnotoad.lock'
 
 Full path to accept mutex lock file, defaults to a random temporary file.
+
+=head2 C<lock_timeout>
+
+  lock_timeout => 1
+
+Maximum amount of time in seconds a worker may block when waiting for the
+accept mutex, defaults to C<0.5>.
 
 =head2 C<pid_file>
 

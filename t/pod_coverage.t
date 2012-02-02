@@ -12,7 +12,7 @@ my @leaf = (
   qw/add_hook comment connect connection_timeout is_done keep_alive_timeout/,
   qw/listen max_redirects on_close on_error on_finish on_lock on_process/,
   qw/on_read on_unlock port prepare_ioloop run_hook run_hook_reverse/,
-  qw/timeout version write/
+  qw/timeout version write x_forwarded_for/
 );
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.

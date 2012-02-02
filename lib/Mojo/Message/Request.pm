@@ -91,7 +91,9 @@ sub is_secure {
   return ($url->scheme || $url->base->scheme || '') eq 'https';
 }
 
-sub is_xhr { (shift->headers->x_requested_with || '') =~ /XMLHttpRequest/i }
+sub is_xhr {
+  (shift->headers->header('X-Requested-With') || '') =~ /XMLHttpRequest/i;
+}
 
 sub param {
   my $self = shift;
@@ -153,7 +155,7 @@ sub parse {
     if ($ENV{MOJO_REVERSE_PROXY}) {
 
       # "X-Forwarded-Host"
-      if (my $host = $headers->x_forwarded_host) {
+      if (my $host = $headers->header('X-Forwarded-Host')) {
         if ($host =~ $HOST_RE) {
           $base->host($1);
           $base->port($2) if defined $2;
@@ -161,7 +163,7 @@ sub parse {
       }
 
       # "X-Forwarded-HTTPS"
-      if ($headers->x_forwarded_https) { $base->scheme('https') }
+      $base->scheme('https') if $headers->header('X-Forwarded-HTTPS');
     }
   }
 

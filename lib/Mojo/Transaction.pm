@@ -59,8 +59,8 @@ sub remote_address {
   # Reverse proxy
   if ($ENV{MOJO_REVERSE_PROXY}) {
     return $self->{forwarded_for} if $self->{forwarded_for};
-    return $self->{forwarded_for} = $1
-      if ($self->req->headers->x_forwarded_for || '') =~ /([^,\s]+)$/;
+    ($self->req->headers->header('X-Forwarded-For') || '') =~ /([^,\s]+)$/
+      and return $self->{forwarded_for} = $1;
   }
 
   return $self->{remote_address};

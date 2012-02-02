@@ -1,15 +1,14 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.47    2012-02-02 00:00:00
+2.47    2012-02-03 00:00:00
         - Deprecated Mojo::Server::Daemon->prepare_ioloop in favor of
           Mojo::Server::Daemon->start.
+        - Deprecated Mojo::Headers->x_forwarded_for.
         - Added EXPERIMENTAL drain event to Mojo::Content.
         - Added EXPERIMENTAL drain event to Mojo::Transaction::WebSocket.
         - Added EXPERIMENTAL support for RSV1-3 flags to
           Mojo::Transaction::WebSocket.
         - Added lock_timeout parameter to Hypnotoad.
-        - Added x_forwarded_host, x_forwarded_https and x_requested_with
-          methods to Mojo::Headers.
         - Removed experimental status from JSON Pointer support.
         - Removed Cygwin exception from Hypnotoad.
         - Renamed resume and pause methods in Mojo::IOLoop::Server to start

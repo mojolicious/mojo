@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 # "Remember, you can always find East by staring directly at the sun."
-use Test::More tests => 92;
+use Test::More tests => 88;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -92,11 +92,6 @@ is $headers->transfer_encoding('foo')->transfer_encoding, 'foo',
 is $headers->upgrade('foo')->upgrade,                   'foo', 'right value';
 is $headers->user_agent('foo')->user_agent,             'foo', 'right value';
 is $headers->www_authenticate('foo')->www_authenticate, 'foo', 'right value';
-is $headers->x_forwarded_for('foo')->x_forwarded_for,   'foo', 'right value';
-is $headers->x_forwarded_host('foo')->x_forwarded_host, 'foo', 'right value';
-is $headers->x_forwarded_https('foo')->x_forwarded_https, 'foo',
-  'right value';
-is $headers->x_requested_with('foo')->x_requested_with, 'foo', 'right value';
 
 # Clone
 $headers = Mojo::Headers->new;

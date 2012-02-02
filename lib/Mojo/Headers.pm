@@ -14,8 +14,7 @@ my @HEADERS = (
   qw/Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept/,
   qw/Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol/,
   qw/Sec-WebSocket-Version Server Set-Cookie Status Trailer/,
-  qw/Transfer-Encoding Upgrade User-Agent WWW-Authenticate X-Forwarded-For/,
-  qw/X-Forwarded-Host X-Forwarded-HTTPS X-Requested-With/
+  qw/Transfer-Encoding Upgrade User-Agent WWW-Authenticate/
 );
 {
   no strict 'refs';
@@ -194,6 +193,12 @@ sub to_string {
 
   # Format headers
   return join "\x0d\x0a", @headers;
+}
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub x_forwarded_for {
+  warn "Mojo::Headers->x_forwarded_for is DEPRECATED!\n";
+  shift->header('X-Forwarded-For' => @_);
 }
 
 1;
@@ -587,34 +592,6 @@ Shortcut for the C<User-Agent> header.
   $headers         = $headers->www_authenticate('Basic realm="realm"');
 
 Shortcut for the C<WWW-Authenticate> header.
-
-=head2 C<x_forwarded_for>
-
-  my $x_forwarded_for = $headers->x_forwarded_for;
-  $headers            = $headers->x_forwarded_for('127.0.0.1');
-
-Shortcut for the C<X-Forwarded-For> header.
-
-=head2 C<x_forwarded_host>
-
-  my $x_forwarded_host = $headers->x_forwarded_host;
-  $headers             = $headers->x_forwarded_host('mojolicio.us');
-
-Shortcut for the C<X-Forwarded-Host> header.
-
-=head2 C<x_forwarded_https>
-
-  my $x_forwarded_https = $headers->x_forwarded_https;
-  $headers              = $headers->x_forwarded_https(1);
-
-Shortcut for the C<X-Forwarded-HTTPS> header.
-
-=head2 C<x_requested_with>
-
-  my $x_requested_with = $headers->x_requested_with;
-  $headers             = $headers->x_requested_with('XMLHttpRequest');
-
-Shortcut for the C<X-Requested-With> header.
 
 =head1 SEE ALSO
 

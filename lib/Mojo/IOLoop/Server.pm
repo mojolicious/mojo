@@ -81,7 +81,7 @@ sub DESTROY {
   if (my $cert = $self->{cert}) { unlink $cert if -w $cert }
   if (my $key  = $self->{key})  { unlink $key  if -w $key }
   return unless my $watcher = $self->{iowatcher};
-  $self->pause if $self->{handle};
+  $self->stop if $self->{handle};
   $watcher->drop_handle($_) for values %{$self->{handles}};
 }
 
@@ -165,16 +165,16 @@ sub generate_port {
   return;
 }
 
-sub pause {
-  my $self = shift;
-  $self->iowatcher->drop_handle($self->{handle});
-}
-
-sub resume {
+sub start {
   my $self = shift;
   weaken $self;
   $self->iowatcher->watch($self->{handle},
     sub { $self->_accept for 1 .. $self->accepts });
+}
+
+sub stop {
+  my $self = shift;
+  $self->iowatcher->drop_handle($self->{handle});
 }
 
 sub _accept {
@@ -276,8 +276,8 @@ Mojo::IOLoop::Server - Non-blocking TCP server
   $server->listen(port => 3000);
 
   # Start and stop accepting connections
-  $server->resume;
-  $server->pause;
+  $server->start;
+  $server->stop;
 
 =head1 DESCRIPTION
 
@@ -368,17 +368,17 @@ Path to TLS certificate authority file or directory.
 
 Find a free TCP port.
 
-=head2 C<pause>
+=head2 C<start>
 
-  $server->pause;
-
-Stop accepting connections.
-
-=head2 C<resume>
-
-  $server->resume;
+  $server->start;
 
 Start accepting connections.
+
+=head2 C<stop>
+
+  $server->stop;
+
+Stop accepting connections.
 
 =head1 SEE ALSO
 

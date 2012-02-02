@@ -48,13 +48,7 @@ sub is_writing {
   return length($self->{buffer}) || $self->has_subscribers('drain');
 }
 
-sub pause {
-  my $self = shift;
-  return if $self->{paused}++;
-  $self->iowatcher->change($self->{handle}, 0, $self->is_writing);
-}
-
-sub resume {
+sub start {
   my $self = shift;
 
   # Timeout
@@ -77,6 +71,12 @@ sub resume {
   # Resume streaming
   return unless delete $self->{paused};
   $self->iowatcher->change($self->{handle}, 1, $self->is_writing);
+}
+
+sub stop {
+  my $self = shift;
+  return if $self->{paused}++;
+  $self->iowatcher->change($self->{handle}, 0, $self->is_writing);
 }
 
 # "No children have ever meddled with the Republican Party and lived to tell
@@ -192,8 +192,8 @@ Mojo::IOLoop::Stream - Non-blocking I/O stream
   });
 
   # Start and stop watching for new data
-  $stream->resume;
-  $stream->pause;
+  $stream->start;
+  $stream->stop;
 
 =head1 DESCRIPTION
 
@@ -316,17 +316,17 @@ Quick check if stream is readable, useful for identifying tainted sockets.
 
 Check if stream is writing.
 
-=head2 C<pause>
+=head2 C<start>
 
-  $stream->pause;
-
-Stop watching for new data on the stream.
-
-=head2 C<resume>
-
-  $stream->resume;
+  $stream->start;
 
 Start watching for new data on the stream.
+
+=head2 C<stop>
+
+  $stream->stop;
+
+Stop watching for new data on the stream.
 
 =head2 C<steal_handle>
 

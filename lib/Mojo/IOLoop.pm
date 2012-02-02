@@ -346,7 +346,7 @@ sub stream {
   # Events
   weaken $self;
   $stream->on(close => sub { $self->{connections}->{$id}->{finish} = 1 });
-  $stream->resume;
+  $stream->start;
 
   return $id;
 }
@@ -431,7 +431,7 @@ sub _listening {
   if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
 
   # Check if multi-accept is desirable and start listening
-  $_->accepts($max > 1 ? 10 : 1)->resume for values %$servers;
+  $_->accepts($max > 1 ? 10 : 1)->start for values %$servers;
   $self->{listening} = 1;
 }
 
@@ -444,7 +444,7 @@ sub _not_listening {
   $self->$cb();
 
   # Stop listening
-  $_->pause for values %{$self->{servers} || {}};
+  $_->stop for values %{$self->{servers} || {}};
 }
 
 1;

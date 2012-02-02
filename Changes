@@ -12,6 +12,10 @@ This file documents the revision history for Perl extension Mojolicious.
           methods to Mojo::Headers.
         - Removed experimental status from JSON Pointer support.
         - Removed Cygwin exception from Hypnotoad.
+        - Renamed resume and pause methods in Mojo::IOLoop::Server to start
+          and stop.
+        - Renamed resume and pause methods in Mojo::IOLoop::Stream to start
+          and stop.
         - Added pdf MIME type. (bfaist)
         - Improved documentation.
         - Improved tests.

@@ -219,13 +219,13 @@ Mojo::IOLoop->server(
         Mojo::IOLoop->timer(
           '0.5' => sub {
             $server_before = $server;
-            $stream->pause;
+            $stream->stop;
             $stream->write('works!');
             Mojo::IOLoop->timer(
               '0.5' => sub {
                 $server_after = $server;
                 $client_after = $client;
-                $stream->resume;
+                $stream->start;
                 Mojo::IOLoop->timer('0.5' => sub { Mojo::IOLoop->stop });
               }
             );

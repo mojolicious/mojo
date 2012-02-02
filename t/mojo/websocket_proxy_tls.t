@@ -66,8 +66,7 @@ my $daemon =
 my $port   = Mojo::IOLoop->new->generate_port;
 my $listen = "https://*:$port"
   . ':t/mojo/certs/server.crt:t/mojo/certs/server.key:t/mojo/certs/ca.crt';
-$daemon->listen([$listen]);
-$daemon->prepare_ioloop;
+$daemon->listen([$listen])->start;
 
 # Connect proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;

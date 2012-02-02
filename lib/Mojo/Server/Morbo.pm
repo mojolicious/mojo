@@ -115,7 +115,7 @@ sub _spawn {
   $daemon->load_app($self->watch->[0]);
   $daemon->silent(1) if $ENV{MORBO_REV} > 1;
   $daemon->listen($self->listen) if @{$self->listen};
-  $daemon->prepare_ioloop;
+  $daemon->start;
   my $loop = $daemon->ioloop;
   $loop->recurring(
     1 => sub { shift->stop if !kill(0, $manager) || $self->{finished} });
@@ -189,7 +189,7 @@ Check if file has been modified since last check.
 
   $morbo->run('script/myapp');
 
-Start server.
+Run server.
 
 =head1 DEBUGGING
 

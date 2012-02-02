@@ -127,7 +127,7 @@ implements the following new ones.
 
   my $res = $psgi->run($env);
 
-Start PSGI.
+Run PSGI.
 
 =head1 SEE ALSO
 

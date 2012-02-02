@@ -83,8 +83,8 @@ sub run {
   # Initiate hot deployment
   $self->_hot_deploy unless $ENV{HYPNOTOAD_PID};
 
-  # Prepare loop
-  $daemon->prepare_ioloop;
+  # Start accepting connections
+  $daemon->start;
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer})
@@ -645,7 +645,7 @@ implements the following new ones.
 
   $toad->run('script/myapp', 'hypnotoad.conf');
 
-Start server.
+Run server.
 
 =head1 DEBUGGING
 

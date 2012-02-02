@@ -157,7 +157,7 @@ Load application from script.
 
   $server->run;
 
-Start server.
+Run server.
 
 =head1 SEE ALSO
 

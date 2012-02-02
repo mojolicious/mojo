@@ -158,7 +158,7 @@ implements the following new ones.
 
   $cgi->run;
 
-Process CGI.
+Run CGI.
 
 =head1 SEE ALSO
 

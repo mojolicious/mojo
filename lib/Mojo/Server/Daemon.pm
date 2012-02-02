@@ -50,10 +50,13 @@ EOF
   shift->inactivity_timeout(@_);
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
 sub prepare_ioloop {
-  my $self = shift;
-  $self->_listen($_) for @{$self->listen || ['http://*:3000']};
-  $self->ioloop->max_connections($self->max_clients);
+  warn <<EOF;
+Mojo::Server::Daemon->prepare_ioloop is DEPRECATED in favor of
+Mojo::Server::Daemon->start!
+EOF
+  shift->start(@_);
 }
 
 # "40 dollars!? This better be the best damn beer ever..
@@ -61,8 +64,8 @@ sub prepare_ioloop {
 sub run {
   my $self = shift;
 
-  # Prepare ioloop
-  $self->prepare_ioloop;
+  # Start accepting connections
+  $self->start;
 
   # User and group
   $self->setuidgid;
@@ -79,6 +82,12 @@ sub setuidgid {
   $self->_group;
   $self->_user;
   return $self;
+}
+
+sub start {
+  my $self = shift;
+  $self->_listen($_) for @{$self->listen || ['http://*:3000']};
+  $self->ioloop->max_connections($self->max_clients);
 }
 
 sub _build_tx {
@@ -462,23 +471,23 @@ allow WebSocket connections to be inactive indefinitely.
 L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and
 implements the following new ones.
 
-=head2 C<prepare_ioloop>
-
-  $daemon->prepare_ioloop;
-
-Prepare loop.
-
 =head2 C<run>
 
   $daemon->run;
 
-Start server.
+Run server.
 
 =head2 C<setuidgid>
 
   $daemon->setuidgid;
 
 Set user and group for process.
+
+=head2 C<start>
+
+  $daemon->start;
+
+Start accepting connections.
 
 =head1 DEBUGGING
 

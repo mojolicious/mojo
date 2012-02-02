@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.47    2012-02-01 00:00:00
+2.47    2012-02-02 00:00:00
+        - Deprecated Mojo::Server::Daemon->prepare_ioloop in favor of
+          Mojo::Server::Daemon->start.
         - Added EXPERIMENTAL drain event to Mojo::Content.
         - Added EXPERIMENTAL drain event to Mojo::Transaction::WebSocket.
         - Added EXPERIMENTAL support for RSV1-3 flags to

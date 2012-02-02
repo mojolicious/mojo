@@ -50,8 +50,7 @@ my $ua = Mojo::UserAgent->new;
 my $daemon =
   Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
 my $port = Mojo::IOLoop->new->generate_port;
-$daemon->listen(["http://*:$port"]);
-$daemon->prepare_ioloop;
+$daemon->listen(["http://*:$port"])->start;
 
 # Connect proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;

@@ -11,7 +11,8 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 my @leaf = (
   qw/add_hook comment connect connection_timeout is_done keep_alive_timeout/,
   qw/listen max_redirects on_close on_error on_finish on_lock on_process/,
-  qw/on_read on_unlock port run_hook run_hook_reverse timeout version write/
+  qw/on_read on_unlock port prepare_ioloop run_hook run_hook_reverse/,
+  qw/timeout version write/
 );
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.

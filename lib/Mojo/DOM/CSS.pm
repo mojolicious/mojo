@@ -467,7 +467,7 @@ All CSS3 selectors that make sense for a standalone parser are supported.
 
 Any element.
 
-  my $first = $css->select('*');
+  my $all = $css->select('*');
 
 =head2 C<E>
 

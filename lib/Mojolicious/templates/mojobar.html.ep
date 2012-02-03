@@ -41,7 +41,7 @@
     }
     #mojobar-links a {
       color: #ccc;
-      font: 1em 'Helvetica Neue', 'Helvetica', sans-serif;
+      font: 1em 'Helvetica Neue', Helvetica, sans-serif;
       font-weight: 300;
       margin-left: 0.5em;
       padding-bottom: 1em;

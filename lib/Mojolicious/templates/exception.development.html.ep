@@ -12,13 +12,13 @@
       body {
         background-color: #f5f6f8;
         color: #445555;
-        font: 0.9em 'Helvetica Neue', 'Helvetica', sans-serif;
+        font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
         font-weight: normal;
         line-height: 1.5;
         margin: 0;
       }
       pre {
-        font: 0.8em 'Consolas', 'Menlo', 'Monaco', Courier, monospace;
+        font: 0.8em Consolas, Menlo, Monaco, Courier, monospace;
         margin: 0;
         white-space: pre-wrap;
       }
@@ -71,7 +71,7 @@
         margin-right: 5em;
       }
       #showcase > pre {
-        font: 1.5em 'Helvetica Neue', 'Helvetica', sans-serif;
+        font: 1.5em 'Helvetica Neue', Helvetica, sans-serif;
         font-weight: 300;
         margin: 0;
         text-shadow: #333 0 1px 0;

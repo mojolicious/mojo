@@ -18,6 +18,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added pdf MIME type. (bfaist)
         - Improved documentation.
         - Improved tests.
+        - Improved CSS of some built-in templates.
         - Fixed small bug in Mojo::IOLoop::Stream that caused close events to
           fail sometimes.
         - Fixed small relative URL detection bug in get command.

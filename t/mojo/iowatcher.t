@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 53;
+use Test::More tests => 55;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -31,6 +31,7 @@ $watcher->timer(0 => sub { shift->stop });
 $watcher->start;
 is $readable, undef, 'handle is not readable';
 is $writable, undef, 'handle is not writable';
+ok !$watcher->is_readable($listen), 'handle is not readable';
 
 # Connect
 my $client =
@@ -39,6 +40,7 @@ $watcher->timer(1 => sub { shift->stop });
 $watcher->start;
 ok $readable, 'handle is readable';
 ok !$writable, 'handle is not writable';
+ok $watcher->is_readable($listen), 'handle is readable';
 
 # Accept
 my $server = $listen->accept;

@@ -8,7 +8,7 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 53;
+plan tests => 55;
 
 use IO::Socket::INET;
 use Mojo::IOLoop;
@@ -32,6 +32,7 @@ $watcher->timer(0 => sub { shift->stop });
 $watcher->start;
 is $readable, undef, 'handle is not readable';
 is $writable, undef, 'handle is not writable';
+ok !$watcher->is_readable($listen), 'handle is not readable';
 
 # Connect
 my $client =
@@ -40,6 +41,7 @@ $watcher->timer(1 => sub { shift->stop });
 $watcher->start;
 ok $readable, 'handle is readable';
 ok !$writable, 'handle is not writable';
+ok $watcher->is_readable($listen), 'handle is readable';
 
 # Accept
 my $server = $listen->accept;

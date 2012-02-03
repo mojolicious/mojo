@@ -14,7 +14,7 @@ different platforms. Note that many real-time web features are based on the
 L<Mojo::IOLoop> reactor, and therefore require one of the built-in web
 servers to be able to use them to their full potential.
 
-=head2 Built-in server
+=head2 Built-in web server
 
 L<Mojolicious> contains a very portable non-blocking I/O HTTP 1.1 and
 WebSocket server with L<Mojo::Server::Daemon>. It is usually used during
@@ -208,7 +208,7 @@ cases you can use a C<before_dispatch> hook to rewrite incoming requests.
       if $self->req->headers->header('X-Forwarded-Protocol') eq 'https';
   });
 
-=head2 Embedding
+=head2 Application embedding
 
 From time to time you might want to reuse parts of L<Mojolicious>
 applications like configuration files, database connection or helpers for
@@ -222,6 +222,8 @@ other scripts, with this little mock server you can just embed them.
 
   # Access fully initialized application
   say $app->static->root;
+
+=head2 Web server embedding
 
 You can also use the built-in web server to embed L<Mojolicious> applications
 into alien environments like foreign event loops.

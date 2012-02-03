@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.47    2012-02-03 00:00:00
+2.47    2012-02-04 00:00:00
         - Deprecated Mojo::Server::Daemon->prepare_ioloop in favor of
           Mojo::Server::Daemon->start.
         - Deprecated Mojo::Headers->x_forwarded_for.
@@ -458,8 +458,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added EXPERIMENTAL binary support to Mojo::Transaction::WebSocket.
         - Updated WebSocket implementation to ietf-16.
         - Changed default upgrade timeout of Hypnotoad from 30 to 60 seconds.
-        - Improved accept performance of all built-in servers by up to 1000%
-          with the EV backend.
+        - Improved accept performance of all built-in web servers by up to
+          1000% with the EV backend.
         - Improved connection_timeout method in Mojo::IOLoop by allowing it
           to be called as a class method.
         - Improved documentation.

@@ -157,13 +157,13 @@ ok !$tx->keep_alive, 'keep connection not alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
 
-# GET / (built-in server)
+# GET / (built-in web server)
 $tx = $ua->get('/');
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# GET /timeout (built-in server times out)
+# GET /timeout (built-in web server times out)
 my $log = '';
 $message = app->log->subscribers('message')->[0];
 app->log->unsubscribe(message => $message);

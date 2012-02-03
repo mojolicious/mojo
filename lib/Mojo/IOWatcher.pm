@@ -42,7 +42,6 @@ sub drop_timer { delete shift->{timers}->{shift()} }
 sub is_readable {
   my ($self, $handle) = @_;
 
-  # Make sure we watch for readable and writable events
   my $test = $self->{test} ||= IO::Poll->new;
   $test->mask($handle, POLLIN);
   $test->poll(0);

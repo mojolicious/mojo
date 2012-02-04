@@ -190,13 +190,13 @@ of the C<MOJO_IOWATCHER> environment variable or L<Mojo::IOWatcher::EV>.
   my $success = $watcher->drop($handle);
   my $success = $watcher->drop($id);
 
-Drop I/O watcher or timer.
+Drop handle or timer.
 
 =head2 C<io>
 
   $watcher = $watcher->io($handle => sub {...});
 
-Create a new I/O watcher, invoking the callback whenever handle becomes
+Watch handle for I/O events, invoking the callback whenever handle becomes
 readable or writable.
 
 =head2 C<is_readable>

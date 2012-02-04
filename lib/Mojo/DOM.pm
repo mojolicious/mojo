@@ -33,17 +33,7 @@ sub DESTROY { }
 sub new {
   my $class = shift;
   my $self = bless [Mojo::DOM::HTML->new], ref $class || $class;
-
-  # DEPRECATED in Leaf Fluttering In Wind!
-  my $input;
-  $input = shift if @_ % 2;
-  warn "Mojo::DOM->new with arguments is DEPRECATED!\n" if @_;
-  my %attrs = (@_);
-  exists($attrs{$_}) and $self->$_($attrs{$_}) for qw/tree charset xml/;
-
-  # Parse right away
-  $self->parse($input) if defined $input;
-
+  $self->parse(@_) if @_;
   return $self;
 }
 

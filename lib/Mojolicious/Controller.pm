@@ -144,15 +144,6 @@ sub on {
   $tx->on($name => sub { shift and $self->$cb(@_) });
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub on_finish {
-  warn <<EOF;
-Mojolicious::Controller->on_finish is DEPRECATED in favor of
-Mojolicious::Controller->on!
-EOF
-  shift->on(finish => @_);
-}
-
 # "Just make a simple cake. And this time, if someone's going to jump out of
 #  it make sure to put them in *after* you cook it."
 sub param {

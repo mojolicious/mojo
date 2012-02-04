@@ -11,7 +11,17 @@ sub DESTROY { undef $EV }
 # We have to fall back to Mojo::IOWatcher, since EV is unique
 sub new { $EV++ ? Mojo::IOWatcher->new : shift->SUPER::new }
 
-sub change {
+sub recurring { shift->_timer(shift, 1, @_) }
+
+# "Wow, Barney. You brought a whole beer keg.
+#  Yeah... where do I fill it up?"
+sub start {EV::run}
+
+sub stop { EV::break(EV::BREAK_ONE) }
+
+sub timer { shift->_timer(shift, 0, @_) }
+
+sub watch {
   my ($self, $handle, $read, $write) = @_;
 
   my $fd = fileno $handle;
@@ -30,24 +40,12 @@ sub change {
   return $self;
 }
 
-sub drop_handle { delete shift->{handles}->{fileno shift} }
-
-sub recurring { shift->_timer(shift, 1, @_) }
-
-# "Wow, Barney. You brought a whole beer keg.
-#  Yeah... where do I fill it up?"
-sub start {EV::run}
-
-sub stop { EV::break(EV::BREAK_ONE) }
-
-sub timer { shift->_timer(shift, 0, @_) }
-
 sub _io {
   my ($self, $fd, $w, $revents) = @_;
   my $handles = $self->{handles};
   my $h       = $handles->{$fd};
-  $self->_sandbox('Read', $h->{read}, $h->{handle}) if EV::READ &$revents;
-  $self->_sandbox('Write', $h->{write}, $h->{handle})
+  $self->_sandbox('Read', $h->{cb}, $h->{handle}, 0) if EV::READ &$revents;
+  $self->_sandbox('Write', $h->{cb}, $h->{handle}, 1)
     if EV::WRITE &$revents && $handles->{$fd};
 }
 
@@ -105,18 +103,6 @@ implements the following new ones.
 
 Construct a new L<Mojo::IOWatcher::EV> object.
 
-=head2 C<change>
-
-  $watcher = $watcher->change($handle, $read, $write);
-
-Change I/O events to watch handle for.
-
-=head2 C<drop_handle>
-
-  $watcher->drop_handle($handle);
-
-Drop handle.
-
 =head2 C<recurring>
 
   my $id = $watcher->recurring(3 => sub {...});
@@ -141,6 +127,12 @@ Stop watching for I/O and timer events.
   my $id = $watcher->timer(3 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of seconds.
+
+=head2 C<watch>
+
+  $watcher = $watcher->watch($handle, $read, $write);
+
+Change I/O events to watch handle for.
 
 =head1 SEE ALSO
 

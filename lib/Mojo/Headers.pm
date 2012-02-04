@@ -88,14 +88,6 @@ sub header {
   return @$headers;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub is_done {
-  warn <<EOF;
-Mojo::Headers->is_done is DEPRECATED in favor of Mojo::Headers->is_finished!
-EOF
-  shift->is_finished;
-}
-
 sub is_finished { (shift->{state} || '') eq 'finished' }
 
 sub is_limit_exceeded { shift->{limit} }

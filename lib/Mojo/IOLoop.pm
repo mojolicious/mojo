@@ -389,7 +389,7 @@ sub _drop {
 
   # Timer
   return unless my $watcher = $self->iowatcher;
-  return if $watcher->drop_timer($id);
+  return if $watcher->drop($id);
 
   # Listen socket
   if (delete $self->{servers}->{$id}) { delete $self->{listening} }

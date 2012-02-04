@@ -7,14 +7,6 @@ use Mojo::Util 'camelize';
 #  And that it would be in New Jersey?"
 has namespaces => sub { ['Mojolicious::Plugin'] };
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub add_hook {
-  warn <<EOF;
-Mojolicious::Plugins->add_hook is DEPRECATED in favor of Mojolicious->hook!
-EOF
-  shift->on(@_);
-}
-
 sub emit_hook {
   my $self = shift;
   $_->(@_) for @{$self->subscribers(shift)};
@@ -62,24 +54,6 @@ sub load_plugin {
 
 sub register_plugin {
   shift->load_plugin(shift)->register(shift, ref $_[0] ? $_[0] : {@_});
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub run_hook {
-  warn <<EOF;
-Mojolicious::Plugins->run_hook is DEPRECATED in favor of
-Mojolicious::Plugins->emit_hook!
-EOF
-  shift->emit_hook(@_);
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub run_hook_reverse {
-  warn <<EOF;
-Mojolicious::Plugins->run_hook_reverse is DEPRECATED in favor of
-Mojolicious::Plugins->emit_hook_reverse!
-EOF
-  shift->emit_hook_reverse(@_);
 }
 
 sub _load {

@@ -29,15 +29,6 @@ sub error {
   return;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub is_done {
-  warn <<EOF;
-Mojo::Transaction->is_done is DEPRECATED in favor of
-Mojo::Transaction->is_finished!
-EOF
-  shift->is_finished;
-}
-
 sub is_finished { (shift->{state} || '') eq 'finished' }
 
 sub is_websocket {undef}

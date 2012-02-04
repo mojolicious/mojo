@@ -121,14 +121,6 @@ sub header_size { length shift->build_headers }
 
 sub is_chunked { (shift->headers->transfer_encoding || '') =~ /chunked/i }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub is_done {
-  warn <<EOF;
-Mojo::Content->is_done is DEPRECATED in favor of Mojo::Content->is_finished!
-EOF
-  shift->is_finished;
-}
-
 sub is_dynamic {
   my $self = shift;
   return $self->{dynamic} && !defined $self->headers->content_length;

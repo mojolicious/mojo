@@ -42,8 +42,8 @@ sub connect {
 sub _cleanup {
   my $self = shift;
   return unless my $watcher = $self->{iowatcher};
-  $watcher->drop_timer($self->{timer})   if $self->{timer};
-  $watcher->drop_handle($self->{handle}) if $self->{handle};
+  $watcher->drop($self->{timer})  if $self->{timer};
+  $watcher->drop($self->{handle}) if $self->{handle};
 }
 
 sub _connect {
@@ -108,11 +108,7 @@ sub _connect {
 
   # Start writing right away
   $self->{handle} = $handle;
-  $watcher->watch(
-    $handle,
-    sub { $self->_connecting },
-    sub { $self->_connecting }
-  );
+  $watcher->io($handle => sub { $self->_connecting });
 }
 
 # "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
@@ -125,8 +121,8 @@ sub _connecting {
   my $watcher = $self->iowatcher;
   if ($self->{tls} && !$handle->connect_SSL) {
     my $err = $IO::Socket::SSL::SSL_ERROR;
-    if    ($err == TLS_READ)  { $watcher->change($handle, 1, 0) }
-    elsif ($err == TLS_WRITE) { $watcher->change($handle, 1, 1) }
+    if    ($err == TLS_READ)  { $watcher->watch($handle, 1, 0) }
+    elsif ($err == TLS_WRITE) { $watcher->watch($handle, 1, 1) }
     return;
   }
 

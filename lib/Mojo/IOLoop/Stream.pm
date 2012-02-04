@@ -26,9 +26,9 @@ sub close {
 
   # Cleanup
   return unless my $watcher = $self->{iowatcher};
-  $watcher->drop_timer(delete $self->{timer}) if $self->{timer};
+  $watcher->drop(delete $self->{timer}) if $self->{timer};
   return unless my $handle = delete $self->{handle};
-  $watcher->drop_handle($handle);
+  $watcher->drop($handle);
 
   # Close
   close $handle;
@@ -62,28 +62,26 @@ sub start {
   );
 
   # Start streaming
-  return $watcher->watch(
-    $self->{handle},
-    sub { $self->_read },
-    sub { $self->_write }
-  ) unless $self->{streaming}++;
+  my $handle = $self->{handle};
+  return $watcher->io($handle => sub { pop() ? $self->_write : $self->_read })
+    unless $self->{streaming}++;
 
   # Resume streaming
   return unless delete $self->{paused};
-  $self->iowatcher->change($self->{handle}, 1, $self->is_writing);
+  $watcher->watch($handle, 1, $self->is_writing);
 }
 
 sub stop {
   my $self = shift;
   return if $self->{paused}++;
-  $self->iowatcher->change($self->{handle}, 0, $self->is_writing);
+  $self->iowatcher->watch($self->{handle}, 0, $self->is_writing);
 }
 
 # "No children have ever meddled with the Republican Party and lived to tell
 #  about it."
 sub steal_handle {
   my $self = shift;
-  $self->iowatcher->drop_handle($self->{handle});
+  $self->iowatcher->drop($self->{handle});
   return delete $self->{handle};
 }
 
@@ -98,7 +96,7 @@ sub write {
   else     { return unless length $self->{buffer} }
 
   # Start writing
-  $self->iowatcher->change($self->{handle}, !$self->{paused}, 1)
+  $self->iowatcher->watch($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};
 }
 
@@ -162,7 +160,7 @@ sub _write {
 
   # Stop writing
   return if $self->is_writing;
-  $self->iowatcher->change($handle, !$self->{paused}, 0);
+  $self->iowatcher->watch($handle, !$self->{paused}, 0);
 }
 
 1;

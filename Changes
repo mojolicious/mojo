@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.47    2012-02-04 00:00:00
+2.47    2012-02-05 00:00:00
         - Deprecated Mojo::Server::Daemon->prepare_ioloop in favor of
           Mojo::Server::Daemon->start.
         - Deprecated Mojo::Headers->x_forwarded_for.
@@ -11,6 +11,10 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added lock_timeout parameter to Hypnotoad.
         - Removed experimental status from JSON Pointer support.
         - Removed Cygwin exception from Hypnotoad.
+        - Replaced drop_handle and drop_timer methods in Mojo::IOWatcher with
+          drop method.
+        - Renamed change and watch methods in Mojo::IOWatcher to watch and
+          io.
         - Renamed resume and pause methods in Mojo::IOLoop::Server to start
           and stop.
         - Renamed resume and pause methods in Mojo::IOLoop::Stream to start

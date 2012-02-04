@@ -268,14 +268,6 @@ sub headers { shift->content->headers(@_) }
 
 sub is_chunked { shift->content->is_chunked }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub is_done {
-  warn <<EOF;
-Mojo::Message->is_done is DEPRECATED in favor of Mojo::Message->is_finished!
-EOF
-  shift->is_finished;
-}
-
 sub is_dynamic { shift->content->is_dynamic }
 
 sub is_finished { (shift->{state} || '') eq 'finished' }

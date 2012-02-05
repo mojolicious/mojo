@@ -32,7 +32,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 21;
+plan tests => 16;
 
 # "To the panic room!
 #  We don't have a panic room.
@@ -121,73 +121,6 @@ $loop->timer(1 => sub { shift->stop });
 $loop->start;
 ok $client_error, 'has error';
 
-# Valid client certificate but rejected by callback
-$loop         = Mojo::IOLoop->new;
-$port         = Mojo::IOLoop->generate_port;
-$client_error = '';
-$loop->server(
-  port       => $port,
-  tls        => 1,
-  tls_cert   => 't/mojo/certs/server.crt',
-  tls_key    => 't/mojo/certs/server.key',
-  tls_ca     => 't/mojo/certs/ca.crt',
-  tls_verify => sub {0},
-  sub {
-    my ($loop, $stream) = @_;
-    $stream->timeout('0.5');
-  }
-);
-$id = $loop->client(
-  port     => $port,
-  tls      => 1,
-  tls_cert => 't/mojo/certs/client.crt',
-  tls_key  => 't/mojo/certs/client.key',
-  sub { shift; $client_error = shift }
-);
-$loop->timer(1 => sub { shift->stop });
-$loop->start;
-ok $client_error, 'has error';
-
-# Valid client certificate accepted by callback
-$loop         = Mojo::IOLoop->new;
-$port         = Mojo::IOLoop->generate_port;
-$server       = $client = '';
-$server_close = $client_close = 0;
-$loop->server(
-  port       => $port,
-  tls        => 1,
-  tls_cert   => 't/mojo/certs/server.crt',
-  tls_key    => 't/mojo/certs/server.key',
-  tls_ca     => 't/mojo/certs/ca.crt',
-  tls_verify => sub {1},
-  sub {
-    my ($loop, $stream) = @_;
-    $stream->write('test', sub { shift->write('321') });
-    $stream->on(close => sub { $server_close++ });
-    $stream->on(error => sub { $server_error = pop });
-    $stream->on(read  => sub { $server .= pop });
-    $stream->timeout('0.5');
-  }
-);
-$id = $loop->client(
-  port     => $port,
-  tls      => 1,
-  tls_cert => 't/mojo/certs/client.crt',
-  tls_key  => 't/mojo/certs/client.key',
-  sub {
-    my ($loop, $err, $stream) = @_;
-    $stream->write('tset', sub { shift->write('123') });
-    $stream->on(close => sub { $client_close++ });
-    $stream->on(read => sub { $client .= pop });
-  }
-);
-$loop->timer(1 => sub { shift->stop });
-$loop->start;
-is $server,       'tset123', 'right content';
-is $client,       'test321', 'right content';
-is $server_close, 1,         'server emitted close event once';
-is $client_close, 1,         'client emitted close event once';
-
 # Missing client certificate
 $server_error = $client_error = '';
 $id = $loop->client(
@@ -207,12 +140,7 @@ $loop->server(
   tls_cert => 't/mojo/certs/server.crt',
   tls_key  => 't/mojo/certs/server.key',
   tls_ca   => 'no cert',
-  sub {
-    my ($loop, $stream) = @_;
-    $stream->write('test', sub { shift->write('321') });
-    $stream->on(error => sub { $server_error = pop });
-    $stream->timeout('0.5');
-  }
+  sub { $server_error = 'connected!' }
 );
 $id = $loop->client(
   port     => $port,

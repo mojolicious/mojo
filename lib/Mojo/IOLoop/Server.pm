@@ -140,11 +140,9 @@ sub listen {
     SSL_key_file       => $args->{tls_key} || $self->_key_file,
   };
   %$options = (
-    SSL_verify_callback => $args->{tls_verify},
-    SSL_ca_file         => -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_ca_path         => -d $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_verify_mode     => $args->{tls_ca} ? 0x03 : undef,
-    %$options
+    %$options,
+    SSL_ca_file => -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+    SSL_verify_mode => 0x03
   ) if $args->{tls_ca};
 }
 

@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 55;
+use Test::More tests => 57;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -170,3 +170,16 @@ $watcher->on(
 $watcher->timer(0 => sub { die "works!\n" });
 $watcher->start;
 like $err, qr/works!/, 'right error';
+
+# Detection
+is(Mojo::IOWatcher->detect, 'Mojo::IOWatcher', 'right class');
+
+# Dummy watcher
+package Mojo::IOWatcher::Test;
+use Mojo::Base 'Mojo::IOWatcher';
+$ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher::Test';
+
+package main;
+
+# Detection (env)
+is(Mojo::IOWatcher->detect, 'Mojo::IOWatcher::Test', 'right class');

@@ -352,7 +352,7 @@ Path to the TLS key file, defaulting to a built-in test key.
 
 =item C<tls_ca>
 
-Path to TLS certificate authority file or directory.
+Path to TLS certificate authority file.
 
 =back
 

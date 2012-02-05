@@ -8,7 +8,7 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 55;
+plan tests => 57;
 
 use IO::Socket::INET;
 use Mojo::IOLoop;
@@ -171,3 +171,16 @@ $watcher->on(
 $watcher->timer(0 => sub { die "works!\n" });
 $watcher->start;
 like $err, qr/works!/, 'right error';
+
+# Detection
+is(Mojo::IOWatcher->detect, 'Mojo::IOWatcher::EV', 'right class');
+
+# Dummy watcher
+package Mojo::IOWatcher::Test;
+use Mojo::Base 'Mojo::IOWatcher';
+$ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher::Test';
+
+package main;
+
+# Detection (env)
+is(Mojo::IOWatcher->detect, 'Mojo::IOWatcher::Test', 'right class');

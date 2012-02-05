@@ -679,6 +679,10 @@ Path to TLS certificate authority file, defaults to the value of the
 C<MOJO_CA_FILE> environment variable. Note that this attribute is
 EXPERIMENTAL and might change without warning!
 
+  # Show certificate authorities for debugging
+  IO::Socket::SSL::set_ctx_defaults(
+    SSL_verify_callback => sub { say "Authority: $_[2]" and return $_[0] });
+
 =head2 C<cert>
 
   my $cert = $ua->cert;

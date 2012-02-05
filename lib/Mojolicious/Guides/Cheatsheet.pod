@@ -139,9 +139,17 @@ L<Mojo::HelloWorld>.
 
   MOJO_APP=MyApp
 
+=head2 C<MOJO_CA_FILE>
+
+The path to the TLS certificate authority file, should always contain a path
+like C</etc/tls/ca.crt>. Note that L<IO::Socket::SSL> must be installed for
+TLS support.
+
+  MOJO_CA_FILE=/etc/tls/ca.crt
+
 =head2 C<MOJO_CERT_FILE>
 
-The path to the TLS certificate, should always contain a path like
+The path to the TLS certificate file, should always contain a path like
 C</etc/tls/client.crt>. Note that L<IO::Socket::SSL> must be installed for
 TLS support.
 
@@ -176,7 +184,7 @@ Alternative L<Mojo::IOWatcher> implementation to try.
 
 =head2 C<MOJO_KEY_FILE>
 
-The path to the TLS key, should always contain a path like
+The path to the TLS key file, should always contain a path like
 C</etc/tls/client.key>. Note that L<IO::Socket::SSL> must be installed for
 TLS support.
 

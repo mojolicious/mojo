@@ -13,6 +13,7 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
 # "You can't let a single bad experience scare you away from drugs."
+has ca   => sub { $ENV{MOJO_CA_FILE} };
 has cert => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout => 3;
 has cookie_jar => sub { Mojo::CookieJar->new };
@@ -218,6 +219,7 @@ sub _connect {
     local_address => $self->local_address,
     timeout       => $self->connect_timeout,
     tls           => $scheme eq 'https' ? 1 : 0,
+    tls_ca        => $self->ca,
     tls_cert      => $self->cert,
     tls_key       => $self->key,
     sub {
@@ -260,6 +262,7 @@ sub _connect_proxy {
           handle   => $handle,
           id       => $id,
           tls      => 1,
+          tls_ca   => $self->ca,
           tls_cert => $self->cert,
           tls_key  => $self->key,
           sub {
@@ -666,6 +669,15 @@ automatically prepared proxy C<CONNECT> requests and followed redirects.
 =head1 ATTRIBUTES
 
 L<Mojo::UserAgent> implements the following attributes.
+
+=head2 C<ca>
+
+  my $ca = $ua->ca;
+  $ua    = $ua->ca('ca.crt');
+
+Path to TLS certificate authority file, defaults to the value of the
+C<MOJO_CA_FILE> environment variable. Note that this attribute is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<cert>
 

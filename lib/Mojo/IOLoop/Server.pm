@@ -193,7 +193,7 @@ sub _accept {
     $self->iowatcher->drop($handle);
     close $handle;
   };
-  $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
+  return unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
   $self->iowatcher->io($handle => sub { $self->_tls($handle) });
   $self->{handles}->{$handle} = $handle;
 }
@@ -342,6 +342,10 @@ Port to listen on.
 
 Enable TLS.
 
+=item C<tls_ca>
+
+Path to TLS certificate authority file.
+
 =item C<tls_cert>
 
 Path to the TLS cert file, defaulting to a built-in test certificate.
@@ -349,10 +353,6 @@ Path to the TLS cert file, defaulting to a built-in test certificate.
 =item C<tls_key>
 
 Path to the TLS key file, defaulting to a built-in test key.
-
-=item C<tls_ca>
-
-Path to TLS certificate authority file.
 
 =back
 

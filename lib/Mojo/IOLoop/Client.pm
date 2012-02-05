@@ -94,9 +94,11 @@ sub _connect {
         close delete $self->{handle};
         $self->emit_safe(error => $_[1]);
       },
-      SSL_cert_file   => $args->{tls_cert},
-      SSL_key_file    => $args->{tls_key},
-      SSL_verify_mode => 0x00
+      SSL_cert_file => $args->{tls_cert},
+      SSL_key_file  => $args->{tls_key},
+      SSL_ca_file   => $args->{tls_ca}
+        && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+      SSL_verify_mode => $args->{tls_ca} ? 0x01 : 0x00
     );
     $self->{tls} = 1;
     return $self->emit_safe(error => 'TLS upgrade failed.')
@@ -238,6 +240,10 @@ getting canceled.
 =item C<tls>
 
 Enable TLS.
+
+=item C<tls_ca>
+
+Path to TLS certificate authority file.
 
 =item C<tls_cert>
 

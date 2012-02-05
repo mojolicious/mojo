@@ -701,8 +701,14 @@ Base64 encode string.
 
 Convert snake case string to camel case and replace C<-> with C<::>.
 
-  foo_bar     -> FooBar
-  foo_bar-baz -> FooBar::Baz
+  # "FooBar"
+  camelize 'foo_bar';
+
+  # "FooBar::Baz"
+  camelize 'foo_bar-baz';
+
+  # "FooBar::Baz"
+  camelize 'FooBar::Baz';
 
 =head2 C<decamelize>
 
@@ -710,8 +716,14 @@ Convert snake case string to camel case and replace C<-> with C<::>.
 
 Convert camel case string to snake case and replace C<::> with C<->.
 
-  FooBar      -> foo_bar
-  FooBar::Baz -> foo_bar-baz
+  # "foo_bar"
+  decamelize 'FooBar';
+
+  # "foo_bar-baz"
+  decamelize 'FooBar::Baz';
+
+  # "foo_bar-baz"
+  decamelize 'foo_bar-baz';
 
 =head2 C<decode>
 

@@ -52,7 +52,6 @@ sub _connect {
   # New socket
   my $handle;
   my $watcher = $self->iowatcher;
-  my $timeout = $args->{timeout} || 3;
   unless ($handle = $args->{handle}) {
     my %options = (
       Blocking => 0,
@@ -67,8 +66,7 @@ sub _connect {
       unless $handle = $class->new(%options);
 
     # Timer
-    $self->{timer} =
-      $watcher->timer($timeout,
+    $self->{timer} = $watcher->timer($args->{timeout} || 3,
       sub { $self->emit_safe(error => 'Connect timeout.') });
 
     # IPv6 needs an early start

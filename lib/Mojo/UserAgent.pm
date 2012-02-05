@@ -673,7 +673,7 @@ L<Mojo::UserAgent> implements the following attributes.
 =head2 C<ca>
 
   my $ca = $ua->ca;
-  $ua    = $ua->ca('ca.crt');
+  $ua    = $ua->ca('/etc/tls/ca.crt');
 
 Path to TLS certificate authority file, defaults to the value of the
 C<MOJO_CA_FILE> environment variable. Note that this attribute is
@@ -682,7 +682,7 @@ EXPERIMENTAL and might change without warning!
 =head2 C<cert>
 
   my $cert = $ua->cert;
-  $ua      = $ua->cert('tls.crt');
+  $ua      = $ua->cert('/etc/tls/client.crt');
 
 Path to TLS certificate file, defaults to the value of the C<MOJO_CERT_FILE>
 environment variable.
@@ -737,7 +737,7 @@ object.
 =head2 C<key>
 
   my $key = $ua->key;
-  $ua     = $ua->key('tls.crt');
+  $ua     = $ua->key('/etc/tls/client.crt');
 
 Path to TLS key file, defaults to the value of the C<MOJO_KEY_FILE>
 environment variable.

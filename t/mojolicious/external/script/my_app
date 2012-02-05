@@ -12,8 +12,7 @@ use File::Spec;
 #  That way you can't accidentally change history or do something disgusting
 #  like sleep with your own grandmother.
 #  I wouldn't want to do that again."
-use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
-use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
+push @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib');
 
 # Check if Mojolicious is installed
 die <<EOF unless eval 'use Mojolicious::Commands; 1';

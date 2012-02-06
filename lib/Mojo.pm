@@ -38,25 +38,27 @@ sub new {
 
 sub build_tx { Mojo::Transaction::HTTP->new }
 
-sub config {
-  my $self = shift;
-
-  # Hash
-  $self->{config} ||= {};
-  return $self->{config} unless @_;
-
-  # Get
-  return $self->{config}->{$_[0]} unless @_ > 1 || ref $_[0];
-
-  # Set
-  my $values = ref $_[0] ? $_[0] : {@_};
-  $self->{config} = {%{$self->{config}}, %$values};
-
-  return $self;
-}
+sub config { shift->_dict(config => @_) }
 
 # "D’oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
+
+sub _dict {
+  my ($self, $name) = (shift, shift);
+
+  # Hash
+  $self->{$name} ||= {};
+  return $self->{$name} unless @_;
+
+  # Get
+  return $self->{$name}->{$_[0]} unless @_ > 1 || ref $_[0];
+
+  # Set
+  my $values = ref $_[0] ? $_[0] : {@_};
+  $self->{$name} = {%{$self->{$name}}, %$values};
+
+  return $self;
+}
 
 1;
 __END__

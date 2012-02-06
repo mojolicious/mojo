@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 44;
+use Test::More tests => 50;
 
 # "I was so bored I cut the pony tail off the guy in front of us.
 #  Look at me, I'm a grad student.
@@ -24,6 +24,17 @@ use_ok 'Mojolicious';
 my $logger = Mojo::Log->new;
 my $app = Mojo->new({log => $logger});
 is $app->log, $logger, 'right logger';
+
+# Config
+is $app->config('foo'), undef, 'no value';
+is_deeply $app->config(foo => 'bar')->config, {foo => 'bar'}, 'right value';
+is $app->config('foo'), 'bar', 'right value';
+delete $app->config->{foo};
+is $app->config('foo'), undef, 'no value';
+$app->config(foo => 'bar', baz => 'yada');
+is_deeply $app->config, {foo => 'bar', baz => 'yada'}, 'right value';
+$app->config({test => 23});
+is $app->config->{test}, 23, 'right value';
 
 # Fresh application
 $app = Mojolicious->new;

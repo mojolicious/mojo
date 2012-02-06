@@ -110,22 +110,7 @@ sub build_tx {
   return $tx;
 }
 
-sub defaults {
-  my $self = shift;
-
-  # Hash
-  $self->{defaults} ||= {};
-  return $self->{defaults} unless @_;
-
-  # Get
-  return $self->{defaults}->{$_[0]} unless @_ > 1 || ref $_[0];
-
-  # Set
-  my $values = ref $_[0] ? $_[0] : {@_};
-  $self->{defaults} = {%{$self->{defaults}}, %$values};
-
-  return $self;
-}
+sub defaults { shift->_dict(defaults => @_) }
 
 sub dispatch {
   my ($self, $c) = @_;

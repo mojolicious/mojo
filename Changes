@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Deprecated Mojo::Server::Daemon->prepare_ioloop in favor of
           Mojo::Server::Daemon->start.
         - Deprecated Mojo::Headers->x_forwarded_for.
+        - Added EXPERIMENTAL config method to Mojo.
         - Added EXPERIMENTAL ca attribute to Mojo::UserAgent.
         - Added EXPERIMENTAL drain event to Mojo::Content.
         - Added EXPERIMENTAL drain event to Mojo::Transaction::WebSocket.

@@ -38,6 +38,23 @@ sub new {
 
 sub build_tx { Mojo::Transaction::HTTP->new }
 
+sub config {
+  my $self = shift;
+
+  # Hash
+  $self->{config} ||= {};
+  return $self->{config} unless @_;
+
+  # Get
+  return $self->{config}->{$_[0]} unless @_ > 1 || ref $_[0];
+
+  # Set
+  my $values = ref $_[0] ? $_[0] : {@_};
+  $self->{config} = {%{$self->{config}}, %$values};
+
+  return $self;
+}
+
 # "D’oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
@@ -129,6 +146,20 @@ directory.
 
 Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
 object.
+
+=head2 C<config>
+
+  my $config = $app->config;
+  my $foo    = $app->config('foo');
+  $app       = $app->config({foo => 'bar'});
+  $app       = $app->config(foo => 'bar');
+
+Application configuration. Note that this method is EXPERIMENTAL and might
+change without warning!
+
+  $app->config->{foo} = 'bar';
+  my $foo = $app->config->{foo};
+  delete $app->config->{foo};
 
 =head2 C<handler>
 

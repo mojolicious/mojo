@@ -126,8 +126,8 @@ sub run {
 sub _config {
   my ($self, $app) = @_;
 
-  # Load configuration from application
-  my $c = eval { $app->config('hypnotoad') } || {};
+  # load configuration from application
+  my $c = $app->config('hypnotoad') || {};
 
   # DEPRECATED in Leaf Fluttering In Wind!
   my $file = $ENV{HYPNOTOAD_CONFIG};
@@ -506,8 +506,8 @@ Stop worker gracefully.
 
 =head1 CONFIGURATION
 
-Since the normal L<Mojolicious> configuration system is reused, you just add
-a new section to your L<Mojolicious::Plugin::Config> or
+Since the normal application configuration system is reused, you usually just
+add a new section to your L<Mojolicious::Plugin::Config> or
 L<Mojolicious::Config::JSONConfig> configuration files.
 
   # myapp.conf

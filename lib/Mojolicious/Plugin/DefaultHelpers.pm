@@ -26,6 +26,9 @@ sub register {
     );
   }
 
+  # Add "config" helper
+  $app->helper(config => sub { shift->app->config(@_) });
+
   # Add "content" helper
   $app->helper(content => sub { shift->render_content(@_) });
 
@@ -138,6 +141,12 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
   %= app->secret
 
 Alias for L<Mojolicious::Controller/"app">.
+
+=head2 C<config>
+
+  %= config 'something'
+
+Alias for L<Mojo/"config">.
 
 =head2 C<content>
 

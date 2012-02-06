@@ -84,14 +84,11 @@ sub register {
   $config = {%$config, %{$self->load($mode, $conf, $app)}}
     if defined $mode && -e $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
+  my $current = $app->config;
+  %$current = (%$current, %$config);
+  $app->defaults(config => $current);
 
-  # Add "config" helper
-  $app->helper(config => sub { @_ > 1 ? $config->{$_[1]} : $config });
-
-  # Add default stash value
-  $app->defaults(($conf->{stash_key} || 'config') => $config);
-
-  return $config;
+  return $current;
 }
 
 1;
@@ -115,14 +112,11 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
   # Mojolicious::Lite
   my $config = plugin 'Config';
 
-  # Reads myapp.conf by default and puts the parsed version into the stash
-  my $config = $self->stash('config');
+  # Reads "myapp.conf" by default
+  my $config = app->config;
 
   # Everything can be customized with options
-  my $config = plugin Config => {
-    file      => '/etc/myapp.stuff',
-    stash_key => 'conf'
-  };
+  my $config = plugin Config => {file => '/etc/myapp.stuff'};
 
 =head1 DESCRIPTION
 
@@ -157,24 +151,6 @@ File extension of configuration file, defaults to C<conf>.
 
 Configuration file, defaults to the value of the C<MOJO_CONFIG> environment
 variable or C<myapp.conf> in the application home directory.
-
-=head2 C<stash_key>
-
-  # Mojolicious::Lite
-  plugin Config => {stash_key => 'conf'};
-
-Configuration stash key.
-
-=head1 HELPERS
-
-L<Mojolicious::Plugin::Config> implements the following helpers.
-
-=head2 C<config>
-
-  %= config 'something'
-  %= config->{something}
-
-Access config values.
 
 =head1 METHODS
 

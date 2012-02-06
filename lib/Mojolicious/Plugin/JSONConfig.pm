@@ -70,14 +70,11 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
   # Mojolicious::Lite
   my $config = plugin 'JSONConfig';
 
-  # Reads myapp.json by default and puts the parsed version into the stash
-  my $config = $self->stash('config');
+  # Reads "myapp.json" by default
+  my $config = app->config;
 
   # Everything can be customized with options
-  my $config = plugin JSONConfig => {
-    file      => '/etc/myapp.conf',
-    stash_key => 'conf'
-  };
+  my $config = plugin JSONConfig => {file => '/etc/myapp.conf'};
 
 =head1 DESCRIPTION
 
@@ -97,11 +94,6 @@ L<Mojolicious::Plugin::Config> and supports the following new ones.
   plugin JSONConfig => {template => {line_start => '.'}};
 
 Template options.
-
-=head1 HELPERS
-
-L<Mojolicious::Plugin::JSONConfig> inherits all helpers from
-L<Mojolicious::Plugin::Config>.
 
 =head1 METHODS
 

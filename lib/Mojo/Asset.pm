@@ -13,6 +13,8 @@ sub get_chunk { croak 'Method "get_chunk" not implemented by subclass' }
 
 sub is_file {undef}
 
+# "Oh no! Can we switch back using four or more bodies?
+#  I'm not sure. I'm afraid we need to use... MATH."
 sub move_to { croak 'Method "move_to" not implemented by subclass' }
 sub size    { croak 'Method "size" not implemented by subclass' }
 sub slurp   { croak 'Method "slurp" not implemented by subclass' }

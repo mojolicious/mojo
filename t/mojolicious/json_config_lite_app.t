@@ -8,12 +8,16 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 17;
+use Test::More tests => 20;
 
 # "Oh, I always feared he might run off like this.
 #  Why, why, why didn't I break his legs?"
 use Mojolicious::Lite;
 use Test::Mojo;
+
+# Default
+app->config(it => 'works');
+is_deeply app->config, {it => 'works'}, 'right value';
 
 # Load plugin
 my $config =
@@ -27,6 +31,7 @@ is app->config->{utf},   'утф', 'right value';
 is app->config('foo'),   'bar',    'right value';
 is app->config('hello'), 'there',  'right value';
 is app->config('utf'),   'утф', 'right value';
+is app->config('it'),    'works',  'right value';
 
 # GET /
 get '/' => 'index';
@@ -41,7 +46,8 @@ $config =
   plugin JSONConfig => {file => 'nonexistent', default => {foo => 'qux'}};
 is $config->{foo}, 'qux', 'right value';
 is app->config->{foo}, 'qux', 'right value';
-is app->config('foo'), 'qux', 'right value';
+is app->config('foo'), 'qux',   'right value';
+is app->config('it'),  'works', 'right value';
 
 # No config file, no default
 {

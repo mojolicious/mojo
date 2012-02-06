@@ -30,21 +30,23 @@ my $dir = File::Temp::tempdir(CLEANUP => 1);
 chdir $dir;
 my $command = Mojo::Command->new;
 my $script  = $command->rel_file('myapp.pl');
+my $port1   = Mojo::IOLoop->generate_port;
+my $port2   = Mojo::IOLoop->generate_port;
 $command->write_rel_file('myapp.pl', <<EOF);
 use Mojolicious::Lite;
+
+plugin Config => {
+  default => {
+    hypnotoad =>
+      {listen => ['http://*:$port1', 'http://*:$port2'], workers => 1}
+  }
+};
 
 app->log->level('fatal');
 
 get '/hello' => {text => 'Hello Hypnotoad!'};
 
 app->start;
-EOF
-
-# Prepare config
-my $port1 = Mojo::IOLoop->generate_port;
-my $port2 = Mojo::IOLoop->generate_port;
-$command->write_rel_file('hypnotoad.conf', <<EOF);
-{listen => ['http://*:$port1', 'http://*:$port2'], workers => 1};
 EOF
 
 # Start
@@ -95,6 +97,13 @@ is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 # Update script
 $command->write_rel_file('myapp.pl', <<EOF);
 use Mojolicious::Lite;
+
+plugin Config => {
+  default => {
+    hypnotoad =>
+      {listen => ['http://*:$port1', 'http://*:$port2'], workers => 1}
+  }
+};
 
 app->log->level('fatal');
 

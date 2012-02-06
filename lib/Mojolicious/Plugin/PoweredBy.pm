@@ -42,7 +42,7 @@ new plugins.
 
 L<Mojolicious::Plugin::PoweredBy> supports the following options.
 
-=head2 C<powered_by>
+=head2 C<name>
 
   plugin PoweredBy => (name => 'MyApp 1.0');
 

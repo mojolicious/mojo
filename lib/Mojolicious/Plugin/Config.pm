@@ -75,32 +75,20 @@ sub register {
   if (-e $file) { $config = $self->load($file, $conf, $app) }
 
   # Check for default
-  else {
-
-    # All missing
-    die qq/Config file "$file" missing, maybe you need to create it?\n/
-      unless $conf->{default};
+  elsif ($conf->{default}) {
     $app->log->debug(qq/Config file "$file" missing, using default config./);
   }
+  else { die qq/Config file "$file" missing, maybe you need to create it?\n/ }
 
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}}
     if defined $mode && -e $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
+  my $current = $app->config;
+  %$current = (%$current, %$config);
+  $app->defaults(config => $current);
 
-  # Add "config" helper
-  $app->helper(
-    config => sub {
-      my $self = shift;
-      return $config unless @_;
-      $config->{$_[0]};
-    }
-  );
-
-  # Add default stash value
-  $app->defaults(($conf->{stash_key} || 'config') => $config);
-
-  return $config;
+  return $current;
 }
 
 1;
@@ -124,20 +112,17 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
   # Mojolicious::Lite
   my $config = plugin 'Config';
 
-  # Reads myapp.conf by default and puts the parsed version into the stash
-  my $config = $self->stash('config');
+  # Reads "myapp.conf" by default
+  my $config = app->config;
 
   # Everything can be customized with options
-  my $config = plugin Config => {
-    file      => '/etc/myapp.stuff',
-    stash_key => 'conf'
-  };
+  my $config = plugin Config => {file => '/etc/myapp.stuff'};
 
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Config> is a Perl-ish configuration plugin. The
 application object can be accessed via the C<app> helper. You can extend the
-normal config file C<myapp.conf> with C<mode> specific ones like
+normal configuration file C<myapp.conf> with C<mode> specific ones like
 C<myapp.$mode.conf>.
 
 =head1 OPTIONS
@@ -156,7 +141,7 @@ Default configuration.
   # Mojolicious::Lite
   plugin Config => {ext => 'stuff'};
 
-File extension of config file, defaults to C<conf>.
+File extension of configuration file, defaults to C<conf>.
 
 =head2 C<file>
 
@@ -167,24 +152,6 @@ File extension of config file, defaults to C<conf>.
 Configuration file, defaults to the value of the C<MOJO_CONFIG> environment
 variable or C<myapp.conf> in the application home directory.
 
-=head2 C<stash_key>
-
-  # Mojolicious::Lite
-  plugin Config => {stash_key => 'conf'};
-
-Configuration stash key.
-
-=head1 HELPERS
-
-L<Mojolicious::Plugin::Config> implements the following helpers.
-
-=head2 C<config>
-
-  %= config 'something'
-  %= config->{something}
-
-Access config values.
-
 =head1 METHODS
 
 L<Mojolicious::Plugin::Config> inherits all methods from
@@ -194,7 +161,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
   $plugin->load($file, $conf, $app);
 
-Loads config file and passes the content to C<parse>.
+Loads configuration file and passes the content to C<parse>.
 
   sub load {
     my ($self, $file, $conf, $app) = @_;
@@ -206,7 +173,7 @@ Loads config file and passes the content to C<parse>.
 
   $plugin->parse($content, $file, $conf, $app);
 
-Parse config file.
+Parse configuration file.
 
   sub parse {
     my ($self, $content, $file, $conf, $app) = @_;

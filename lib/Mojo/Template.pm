@@ -457,8 +457,8 @@ Mojo::Template - Perl-ish templates!
 
 L<Mojo::Template> is a minimalistic and very Perl-ish template engine,
 designed specifically for all those small tasks that come up during big
-projects. Like preprocessing a config file, generating text from heredocs and
-stuff like that.
+projects. Like preprocessing a configuration file, generating text from
+heredocs and stuff like that.
 
   <% Perl code %>
   <%= Perl expression, replaced with result %>

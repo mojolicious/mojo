@@ -24,7 +24,10 @@ my $toad   = Mojo::Server::Hypnotoad->new;
 my $config = 'hypnotoad.conf';
 my $help;
 GetOptions(
-  'c|config=s'   => sub { $config                    = $_[1] },
+
+  # DEPRECATED in Leaf Fluttering In Wind!
+  'c|config=s' => sub { $config = $_[1] },
+
   'f|foreground' => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
   'h|help'       => sub { $help                      = 1 },
   's|stop'       => sub { $ENV{HYPNOTOAD_STOP}       = 1 },
@@ -41,8 +44,6 @@ usage: $0 [OPTIONS] [APPLICATION]
   hypnotoad -f myapp.pl
 
 These options are available:
-  -c, --config <path>   Configuration file, defaults to "hypnotoad.conf" in
-                        the same directory as the application script.
   -f, --foreground      Keep manager process in foreground.
   -h, --help            Show this message.
   -s, --stop            Stop server gracefully.

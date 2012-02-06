@@ -38,8 +38,27 @@ sub new {
 
 sub build_tx { Mojo::Transaction::HTTP->new }
 
+sub config { shift->_dict(config => @_) }
+
 # "D’oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
+
+sub _dict {
+  my ($self, $name) = (shift, shift);
+
+  # Hash
+  $self->{$name} ||= {};
+  return $self->{$name} unless @_;
+
+  # Get
+  return $self->{$name}->{$_[0]} unless @_ > 1 || ref $_[0];
+
+  # Set
+  my $values = ref $_[0] ? $_[0] : {@_};
+  $self->{$name} = {%{$self->{$name}}, %$values};
+
+  return $self;
+}
 
 1;
 __END__
@@ -129,6 +148,20 @@ directory.
 
 Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
 object.
+
+=head2 C<config>
+
+  my $config = $app->config;
+  my $foo    = $app->config('foo');
+  $app       = $app->config({foo => 'bar'});
+  $app       = $app->config(foo => 'bar');
+
+Application configuration. Note that this method is EXPERIMENTAL and might
+change without warning!
+
+  $app->config->{foo} = 'bar';
+  my $foo = $app->config->{foo};
+  delete $app->config->{foo};
 
 =head2 C<handler>
 

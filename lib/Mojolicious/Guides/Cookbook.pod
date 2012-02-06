@@ -81,7 +81,7 @@ You can tweak many configuration settings right from within your application.
 
   app->start;
 
-Or add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config> or
+Or just add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config> or
 L<Mojolicious::Config::JSONConfig> configuration file.
 
   # myapp.conf

@@ -505,9 +505,9 @@ Stop worker gracefully.
 
 =back
 
-=head1 CONFIGURATION
+=head1 SETTINGS
 
-L<Mojo::Server::Hypnotoad> can be configured with the following setting.
+L<Mojo::Server::Hypnotoad> can be configured with the following settings.
 
   # myapp.conf
   {hypnotoad => {listen => ['http://*:3000'], workers => 10}};

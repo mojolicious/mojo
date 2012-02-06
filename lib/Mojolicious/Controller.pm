@@ -436,22 +436,17 @@ sub send_message {
 sub session {
   my $self = shift;
 
-  # Get
-  my $stash   = $self->stash;
-  my $session = $stash->{'mojo.session'};
-  if ($_[0] && !defined $_[1] && !ref $_[0]) {
-    return unless $session && ref $session eq 'HASH';
-    return $session->{$_[0]};
-  }
-
   # Hash
-  $session = {} unless $session && ref $session eq 'HASH';
-  $stash->{'mojo.session'} = $session;
-  return $session unless @_;
+  my $stash = $self->stash;
+  $stash->{'mojo.session'} ||= {};
+  return $stash->{'mojo.session'} unless @_;
+
+  # Get
+  return $stash->{'mojo.session'}->{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
-  my $values = @_ > 1 ? {@_} : $_[0];
-  $stash->{'mojo.session'} = {%$session, %$values};
+  my $values = ref $_[0] ? $_[0] : {@_};
+  $stash->{'mojo.session'} = {%{$stash->{'mojo.session'}}, %$values};
 
   return $self;
 }

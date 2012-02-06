@@ -8,7 +8,7 @@ use File::Spec;
 
 push @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib');
 unshift @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib')
-  if $ENV{TEST_MORBO};
+  if $ENV{TEST_HYPNOTOAD};
 
 # Check if Mojolicious is installed
 die <<EOF unless eval 'use Mojo::Server::Hypnotoad; 1';

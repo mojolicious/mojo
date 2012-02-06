@@ -122,9 +122,7 @@ sub defaults {
 
   # Set
   my $values = ref $_[0] ? $_[0] : {@_};
-  for my $key (keys %$values) {
-    $self->{defaults}->{$key} = $values->{$key};
-  }
+  $self->{defaults} = {%{$self->{defaults}}, %$values};
 
   return $self;
 }

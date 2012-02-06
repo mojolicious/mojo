@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.47    2012-02-05 00:00:00
+2.47    2012-02-06 00:00:00
+        - Deprecated Hypnotoad configuration files in favor of more powerful
+          application configuration files.
         - Deprecated Mojo::Server::Daemon->prepare_ioloop in favor of
           Mojo::Server::Daemon->start.
         - Deprecated Mojo::Headers->x_forwarded_for.
@@ -1358,7 +1360,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added support for selector groups to Mojo::DOM.
         - Added more attribute selectors, pseudo classes and combinators to
           Mojo::DOM.
-        - Added support for mode specific config files to
+        - Added support for mode specific configuration files to
           Mojolicious::Plugin::JsonConfig. (marcus)
         - Added reserved route name current.
         - Simplified transaction pausing by replacing it with an automatism.

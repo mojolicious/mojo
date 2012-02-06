@@ -109,12 +109,6 @@ L<Mojolicious> application.
 
 Generate C<.gitignore> file.
 
-=head2 C<generate hypnotoad>
-
-  $ mojo generate hypnotoad
-
-Generate C<hypnotoad.conf> file.
-
 =head2 C<generate lite_app>
 
   $ mojo generate lite_app

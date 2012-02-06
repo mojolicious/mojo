@@ -71,10 +71,12 @@ specifically for production environments out of the box.
   $ hypnotoad script/myapp
   Server available at http://127.0.0.1:8080.
 
-Config files are plain Perl scripts for maximal customizability.
+Since the normal L<Mojolicious> configuration system is reused, you just add
+a new section to your L<Mojolicious::Plugin::Config> or
+L<Mojolicious::Config::JSONConfig> configuration files.
 
-  # hypnotoad.conf
-  {listen => ['http://*:80'], workers => 10};
+  # myapp.conf
+  {hypnotoad => {listen => ['http://*:80'], workers => 10}};
 
 But one of its biggest advantages is the support for effortless zero downtime
 software upgrades. That means you can upgrade L<Mojolicious>, Perl or even
@@ -88,8 +90,8 @@ You might also want to enable proxy support if you're using Hypnotoad behind
 a reverse proxy. This allows L<Mojolicious> to automatically pick up the
 C<X-Forwarded-For>, C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
 
-  # hypnotoad.conf
-  {proxy => 1};
+  # myapp.conf
+  {hypnotoad => {proxy => 1}};
 
 =head2 Nginx
 

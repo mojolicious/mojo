@@ -53,7 +53,7 @@ sub run {
   # Application
   $ENV{HYPNOTOAD_APP} ||= abs_path $app;
 
-  # Config
+  # DEPRECATED in Leaf Fluttering In Wind!
   $ENV{HYPNOTOAD_CONFIG} ||= abs_path $config;
 
   # This is a production server
@@ -66,13 +66,10 @@ sub run {
   # Clean start
   exec $ENV{HYPNOTOAD_EXE} unless $ENV{HYPNOTOAD_REV}++;
 
-  # Preload application
+  # Preload application and configure server
   my $daemon = $self->{daemon} = Mojo::Server::Daemon->new;
   warn "APPLICATION $ENV{HYPNOTOAD_APP}\n" if DEBUG;
-  $daemon->load_app($ENV{HYPNOTOAD_APP});
-
-  # Load configuration
-  $self->_config;
+  $self->_config($daemon->load_app($ENV{HYPNOTOAD_APP}));
 
   # Testing
   _exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
@@ -127,13 +124,16 @@ sub run {
 }
 
 sub _config {
-  my $self = shift;
+  my ($self, $app) = @_;
 
-  # Load config file
+  # Load configuration from application
+  my $c = eval { $app->config('hypnotoad') } || {};
+
+  # DEPRECATED in Leaf Fluttering In Wind!
   my $file = $ENV{HYPNOTOAD_CONFIG};
   warn "CONFIG $file\n" if DEBUG;
-  my $c = {};
   if (-r $file) {
+    warn "Hypnotoad config files are DEPRECATED!\n";
     unless ($c = do $file) {
       die qq/Can't load config file "$file": $@/ if $@;
       die qq/Can't load config file "$file": $!/ unless defined $c;
@@ -141,9 +141,9 @@ sub _config {
         unless ref $c eq 'HASH';
     }
   }
-  $self->{config} = $c;
 
   # Hypnotoad settings
+  $self->{config} = $c;
   $c->{graceful_timeout}   ||= 30;
   $c->{heartbeat_interval} ||= 5;
   $c->{heartbeat_timeout}  ||= 10;
@@ -417,7 +417,7 @@ Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
   use Mojo::Server::Hypnotoad;
 
   my $toad = Mojo::Server::Hypnotoad->new;
-  $toad->run('./myapp.pl', './hypnotoad.conf');
+  $toad->run('./myapp.pl');
 
 =head1 DESCRIPTION
 
@@ -506,10 +506,12 @@ Stop worker gracefully.
 
 =head1 CONFIGURATION
 
-C<Hypnotoad> configuration files are normal Perl scripts returning a hash.
+Since the normal L<Mojolicious> configuration system is reused, you just add
+a new section to your L<Mojolicious::Plugin::Config> or
+L<Mojolicious::Config::JSONConfig> configuration files.
 
-  # hypnotoad.conf
-  {listen => ['http://*:3000', 'http://*:4000'], workers => 10};
+  # myapp.conf
+  {hypnotoad => {listen => ['http://*:3000'], workers => 10}};
 
 The following parameters are currently available:
 
@@ -643,7 +645,7 @@ implements the following new ones.
 
 =head2 C<run>
 
-  $toad->run('script/myapp', 'hypnotoad.conf');
+  $toad->run('script/myapp');
 
 Run server.
 

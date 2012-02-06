@@ -6,8 +6,6 @@ use warnings;
 use File::Basename 'dirname';
 use File::Spec;
 
-push @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib');
-
 # Check if Mojolicious is installed
 die <<EOF unless eval 'use Mojolicious::Commands; 1';
 It looks like you don't have the Mojolicious framework installed.

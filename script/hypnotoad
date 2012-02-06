@@ -6,7 +6,9 @@ use warnings;
 use File::Basename 'dirname';
 use File::Spec;
 
-push @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib');
+# Testing
+unshift @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib')
+  if $ENV{TEST_MORBO};
 
 # Check if Mojolicious is installed
 die <<EOF unless eval 'use Mojo::Server::Hypnotoad; 1';

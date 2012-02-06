@@ -447,7 +447,8 @@ See L<Mojolicious::Guides::Cookbook> for deployment recipes.
 
 =head1 SIGNALS
 
-You can control C<hypnotoad> at runtime with signals.
+L<Mojo::Server::Hypnotoad> can be controlled at runtime with the following
+signals.
 
 =head2 Manager
 
@@ -513,7 +514,7 @@ L<Mojolicious::Config::JSONConfig> configuration files.
   # myapp.conf
   {hypnotoad => {listen => ['http://*:3000'], workers => 10}};
 
-The following parameters are currently available:
+L<Mojo::Server::Hypnotoad> can be configured with the following setting.
 
 =head2 C<accepts>
 

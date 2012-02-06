@@ -508,7 +508,7 @@ Stop worker gracefully.
 =head1 SETTINGS
 
 L<Mojo::Server::Hypnotoad> can be configured with the following settings, see
-L<Mojolicios::Guides::Cookbook/"Hypnotoad"> for examples.
+L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
 =head2 C<accepts>
 

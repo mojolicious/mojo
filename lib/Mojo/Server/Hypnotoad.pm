@@ -507,14 +507,10 @@ Stop worker gracefully.
 
 =head1 CONFIGURATION
 
-Since the normal application configuration system is reused, you usually just
-add a new section to your L<Mojolicious::Plugin::Config> or
-L<Mojolicious::Config::JSONConfig> configuration files.
+L<Mojo::Server::Hypnotoad> can be configured with the following setting.
 
   # myapp.conf
   {hypnotoad => {listen => ['http://*:3000'], workers => 10}};
-
-L<Mojo::Server::Hypnotoad> can be configured with the following setting.
 
 =head2 C<accepts>
 

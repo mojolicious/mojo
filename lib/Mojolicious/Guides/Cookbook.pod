@@ -71,14 +71,7 @@ specifically for production environments out of the box.
   $ hypnotoad script/myapp
   Server available at http://127.0.0.1:8080.
 
-Since the normal application configuration system is reused, you usually just
-add a new section to your L<Mojolicious::Plugin::Config> or
-L<Mojolicious::Config::JSONConfig> configuration files.
-
-  # myapp.conf
-  {hypnotoad => {listen => ['http://*:80'], workers => 10}};
-
-Or change the application configuration directly.
+You can tweak many configuration settings right from within your application.
 
   use Mojolicious::Lite;
 
@@ -87,6 +80,14 @@ Or change the application configuration directly.
   get '/' => {text => 'ALL GLORY TO THE HYPNOTOAD!'};
 
   app->start;
+
+Or add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config> or
+L<Mojolicious::Config::JSONConfig> configuration file.
+
+  # myapp.conf
+  {hypnotoad => {listen => ['http://*:80'], workers => 10}};
+
+Or change the application configuration directly.
 
 But one of its biggest advantages is the support for effortless zero downtime
 software upgrades. That means you can upgrade L<Mojolicious>, Perl or even

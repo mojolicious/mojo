@@ -507,10 +507,8 @@ Stop worker gracefully.
 
 =head1 SETTINGS
 
-L<Mojo::Server::Hypnotoad> can be configured with the following settings.
-
-  # myapp.conf
-  {hypnotoad => {listen => ['http://*:3000'], workers => 10}};
+L<Mojo::Server::Hypnotoad> can be configured with the following settings, see
+L<Mojolicios::Guides::Cookbook/"Hypnotoad"> for examples.
 
 =head2 C<accepts>
 

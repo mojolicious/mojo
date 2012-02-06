@@ -126,7 +126,7 @@ sub run {
 sub _config {
   my ($self, $app) = @_;
 
-  # load configuration from application
+  # Load configuration from application
   my $c = $app->config('hypnotoad') || {};
 
   # DEPRECATED in Leaf Fluttering In Wind!

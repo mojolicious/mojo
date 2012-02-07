@@ -225,6 +225,8 @@ sub _list_data_templates {
   return [keys %$all];
 }
 
+# "Oh no! Can we switch back using four or more bodies?
+#  I'm not sure. I'm afraid we need to use... MATH."
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 

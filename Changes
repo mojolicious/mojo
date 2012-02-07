@@ -1,8 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.48    2012-02-07 00:00:00
+2.48    2012-02-08 00:00:00
         - Improved documentation.
         - Improved tests.
+        - Fixed small MIME::Base64 and MIME::QuotedPrint related bugs in
+          Mojo::Util.
 
 2.47    2012-02-06 00:00:00
         - Deprecated Hypnotoad configuration files in favor of more powerful

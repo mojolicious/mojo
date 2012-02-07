@@ -295,9 +295,9 @@ push @EXPORT_OK, qw/punycode_encode qp_decode qp_encode quote/;
 push @EXPORT_OK, qw/secure_compare sha1_bytes sha1_sum trim unquote/;
 push @EXPORT_OK, qw/url_escape url_unescape xml_escape/;
 
-sub b64_decode { MIME::Base64::decode_base64(@_) }
+sub b64_decode { MIME::Base64::decode_base64(shift) }
 
-sub b64_encode { MIME::Base64::encode_base64(@_) }
+sub b64_encode { MIME::Base64::encode_base64(shift, shift) }
 
 sub camelize {
   my $string = shift;
@@ -545,9 +545,9 @@ sub punycode_encode {
   return $output;
 }
 
-sub qp_decode { MIME::QuotedPrint::decode_qp(@_) }
+sub qp_decode { MIME::QuotedPrint::decode_qp(shift) }
 
-sub qp_encode { MIME::QuotedPrint::encode_qp(@_) }
+sub qp_encode { MIME::QuotedPrint::encode_qp(shift) }
 
 sub quote {
   my $string = shift;

@@ -7,6 +7,10 @@ use utf8;
 #  Yes. *lie dectector blows up*"
 use Test::More tests => 141;
 
+# Need to be loaded first to trigger edge case
+use MIME::Base64;
+use MIME::QuotedPrint;
+
 use_ok 'Mojo::Util',       'md5_bytes';
 use_ok 'Mojo::ByteStream', 'b';
 

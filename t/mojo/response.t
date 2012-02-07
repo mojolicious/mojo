@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 277;
+use Test::More tests => 334;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -12,8 +12,79 @@ use Mojo::Headers;
 
 use_ok 'Mojo::Message::Response';
 
-# Status code and message
+# Common status codes
 my $res = Mojo::Message::Response->new;
+is $res->code(100)->default_message, 'Continue',            'right message';
+is $res->code(101)->default_message, 'Switching Protocols', 'right message';
+is $res->code(102)->default_message, 'Processing',          'right message';
+is $res->code(200)->default_message, 'OK',                  'right message';
+is $res->code(201)->default_message, 'Created',             'right message';
+is $res->code(202)->default_message, 'Accepted',            'right message';
+is $res->code(203)->default_message,
+  'Non-Authoritative Information', 'right message';
+is $res->code(204)->default_message, 'No Content',         'right message';
+is $res->code(205)->default_message, 'Reset Content',      'right message';
+is $res->code(206)->default_message, 'Partial Content',    'right message';
+is $res->code(207)->default_message, 'Multi-Status',       'right message';
+is $res->code(300)->default_message, 'Multiple Choices',   'right message';
+is $res->code(301)->default_message, 'Moved Permanently',  'right message';
+is $res->code(302)->default_message, 'Found',              'right message';
+is $res->code(303)->default_message, 'See Other',          'right message';
+is $res->code(304)->default_message, 'Not Modified',       'right message';
+is $res->code(305)->default_message, 'Use Proxy',          'right message';
+is $res->code(307)->default_message, 'Temporary Redirect', 'right message';
+is $res->code(400)->default_message, 'Bad Request',        'right message';
+is $res->code(401)->default_message, 'Unauthorized',       'right message';
+is $res->code(402)->default_message, 'Payment Required',   'right message';
+is $res->code(403)->default_message, 'Forbidden',          'right message';
+is $res->code(404)->default_message, 'Not Found',          'right message';
+is $res->code(405)->default_message, 'Method Not Allowed', 'right message';
+is $res->code(406)->default_message, 'Not Acceptable',     'right message';
+is $res->code(407)->default_message,
+  'Proxy Authentication Required', 'right message';
+is $res->code(408)->default_message, 'Request Timeout',     'right message';
+is $res->code(409)->default_message, 'Conflict',            'right message';
+is $res->code(410)->default_message, 'Gone',                'right message';
+is $res->code(411)->default_message, 'Length Required',     'right message';
+is $res->code(412)->default_message, 'Precondition Failed', 'right message';
+is $res->code(413)->default_message,
+  'Request Entity Too Large', 'right message';
+is $res->code(414)->default_message, 'Request-URI Too Large', 'right message';
+is $res->code(415)->default_message,
+  'Unsupported Media Type',
+  'right message';
+is $res->code(416)->default_message,
+  'Request Range Not Satisfiable', 'right message';
+is $res->code(417)->default_message, 'Expectation Failed',    'right message';
+is $res->code(418)->default_message, "I'm a teapot",          'right message';
+is $res->code(422)->default_message, 'Unprocessable Entity',  'right message';
+is $res->code(423)->default_message, 'Locked',                'right message';
+is $res->code(424)->default_message, 'Failed Dependency',     'right message';
+is $res->code(425)->default_message, 'Unordered Colection',   'right message';
+is $res->code(426)->default_message, 'Upgrade Required',      'right message';
+is $res->code(428)->default_message, 'Precondition Required', 'right message';
+is $res->code(429)->default_message, 'Too Many Requests',     'right message';
+is $res->code(431)->default_message,
+  'Request Header Fields Too Large', 'right message';
+is $res->code(449)->default_message, 'Retry With',            'right message';
+is $res->code(500)->default_message, 'Internal Server Error', 'right message';
+is $res->code(501)->default_message, 'Not Implemented',       'right message';
+is $res->code(502)->default_message, 'Bad Gateway',           'right message';
+is $res->code(503)->default_message, 'Service Unavailable',   'right message';
+is $res->code(504)->default_message, 'Gateway Timeout',       'right message';
+is $res->code(505)->default_message,
+  'HTTP Version Not Supported', 'right message';
+is $res->code(506)->default_message,
+  'Variant Also Negotiates', 'right message';
+is $res->code(507)->default_message, 'Insufficient Storage', 'right message';
+is $res->code(509)->default_message,
+  'Bandwidth Limit Exceeded', 'right message';
+is $res->code(510)->default_message, 'Not Extended', 'right message';
+is $res->code(511)->default_message,
+  'Network Authentication Required', 'right message';
+
+# Status code and message
+$res = Mojo::Message::Response->new;
 is $res->code,            undef,       'no status';
 is $res->default_message, 'Not Found', 'right default message';
 is $res->message,         undef,       'no message';

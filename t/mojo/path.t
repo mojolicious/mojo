@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 179;
+use Test::More tests => 184;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -165,12 +165,12 @@ ok !$path->contains('/♥.html'), 'does not contain path';
 
 # Empty path elements
 $path = Mojo::Path->new('//');
-is "$path", '//';
+is "$path", '//', 'rigth result';
 is $path->parts->[0], undef, 'no part';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('/foo//bar/23/');
-is "$path", '/foo//bar/23/';
+is "$path", '/foo//bar/23/', 'rigth result';
 is $path->parts->[0], 'foo', 'right part';
 is $path->parts->[1], '',    'right part';
 is $path->parts->[2], 'bar', 'right part';
@@ -179,7 +179,7 @@ is $path->parts->[4], undef, 'no part';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('//foo/bar/23/');
-is "$path", '//foo/bar/23/';
+is "$path", '//foo/bar/23/', 'rigth result';
 is $path->parts->[0], '',    'right part';
 is $path->parts->[1], 'foo', 'right part';
 is $path->parts->[2], 'bar', 'right part';
@@ -188,7 +188,7 @@ is $path->parts->[4], undef, 'no part';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('/foo///bar/23/');
-is "$path", '/foo///bar/23/';
+is "$path", '/foo///bar/23/', 'rigth result';
 is $path->parts->[0], 'foo', 'right part';
 is $path->parts->[1], '',    'right part';
 is $path->parts->[2], '',    'right part';
@@ -198,7 +198,7 @@ is $path->parts->[5], undef, 'no part';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('///foo/bar/23/');
-is "$path", '///foo/bar/23/';
+is "$path", '///foo/bar/23/', 'rigth result';
 is $path->parts->[0], '',    'right part';
 is $path->parts->[1], '',    'right part';
 is $path->parts->[2], 'foo', 'right part';
@@ -208,7 +208,7 @@ is $path->parts->[5], undef, 'no part';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new('///foo///bar/23///');
-is "$path", '///foo///bar/23///';
+is "$path", '///foo///bar/23///', 'rigth result';
 is $path->parts->[0], '',    'right part';
 is $path->parts->[1], '',    'right part';
 is $path->parts->[2], 'foo', 'right part';
@@ -221,3 +221,11 @@ is $path->parts->[8], '',    'right part';
 is $path->parts->[9], undef, 'no part';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
+
+# Escaped slash
+$path = Mojo::Path->new->parts(['foo/bar']);
+is $path->parts->[0], 'foo/bar', 'right part';
+is $path->parts->[1], undef,     'no part';
+is "$path", 'foo%2Fbar', 'rigth result';
+is $path->to_string,     'foo%2Fbar',  'rigth result';
+is $path->to_abs_string, '/foo%2Fbar', 'rigth result';

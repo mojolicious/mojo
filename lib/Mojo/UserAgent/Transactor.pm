@@ -225,7 +225,7 @@ sub tx {
   $req->method(shift);
   my $url = shift;
   $url = "http://$url" unless $url =~ m#^/|\://#;
-  $req->url->parse($url);
+  ref $url ? $req->url($url) : $req->url->parse($url);
 
   # Callback
   my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';

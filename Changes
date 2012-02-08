@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.48    2012-02-08 00:00:00
         - Improved documentation.
         - Improved tests.
+        - Fixed small URL escaping bug in Mojo::UserAgent::Transactor.
         - Fixed small MIME::Base64 and MIME::QuotedPrint related bugs in
           Mojo::Util. (sestegra, sri)
 

@@ -1,9 +1,10 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 175;
+use Test::More tests => 179;
 
 use File::Spec;
 use FindBin;
+use Mojo::URL;
 
 # "Once the government approves something, it's no longer immoral!"
 use_ok 'Mojo::UserAgent::Transactor';
@@ -12,6 +13,15 @@ use_ok 'Mojo::UserAgent::Transactor';
 my $t = Mojo::UserAgent::Transactor->new;
 my $tx = $t->tx(GET => 'mojolicio.us/foo.html?bar=baz');
 is $tx->req->url->to_abs, 'http://mojolicio.us/foo.html?bar=baz', 'right URL';
+is $tx->req->method, 'GET', 'right method';
+
+# GET with escaped slash
+my $url = Mojo::URL->new('http://mojolicio.us');
+$url->path->parts(['foo/bar']);
+$tx = $t->tx(GET => $url);
+is $tx->req->url->to_string, $url->to_string, 'URLs are equal';
+is $tx->req->url->path->to_string, $url->path->to_string, 'paths are equal';
+is $tx->req->url->path->to_string, 'foo%2Fbar', 'right path';
 is $tx->req->method, 'GET', 'right method';
 
 # POST with header

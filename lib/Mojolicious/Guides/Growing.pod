@@ -680,7 +680,8 @@ C<t/login.t> can be simplified.
   use Test::Mojo;
 
   # Load application class
-  my $t = Test::Mojo->new('MyApp')->max_redirects(1);
+  my $t = Test::Mojo->new('MyApp');
+  $t->ua->max_redirects(1);
 
   $t->get_ok('/')
     ->status_is(200)

@@ -16,7 +16,7 @@ The short answer is "it doesn't", because we interpret the words
 "web framework" much more literally than others. With the emergence of the
 C<Real-time Web> and new technologies such as C<WebSockets>, we are facing
 new challenges that go way beyond what commonly used modules like L<LWP> were
-designed for. Because of this L<Mojolicious> contains a whole new C<HTTP>
+designed for. Because of this, L<Mojolicious> contains a whole new C<HTTP>
 client/server stack called L<Mojo>, which was heavily inspired by the
 original C<LWPng> effort and carefully designed with these new requirements
 in mind. So while some of the higher abstraction layers might look similar to
@@ -25,7 +25,7 @@ be the foundation for more advanced ones in the future.
 
 =head2 Why doesn't Mojolicious have any dependencies?
 
-We are optimizing L<Mojolicious> for user-friendliness and development speed
+We are optimizing L<Mojolicious> for user-friendliness and development speed,
 without compromises. While there are no rules in
 L<Mojolicious::Guides::CodingGuidelines> that forbid dependencies, we do
 currently discourage adding non-optional ones in favor of a faster and more
@@ -37,10 +37,10 @@ they are installed.
 =head2 Why reinvent wheels?
 
 Because we can make them rounder. Components specifically designed for
-user-friendliness and development speed are not easy to come by. While we are
+user-friendliness and development speed are not easy to come by. We are
 strong believers of the Perl mantra "There is more than one way to do it.",
-we also believe that well designed defaults result in a much more pleasant
-user experience. We want the best of both worlds.
+and our quest is to develop the best possible solutions with these two
+criteria in mind.
 
 =head2 What about backwards compatibility?
 

@@ -623,6 +623,8 @@ Scraping information from web sites has never been this much fun before. The
 built-in HTML5/XML parser L<Mojo::DOM> supports all CSS3 selectors that make
 sense for a standalone parser.
 
+  use Mojo::UserAgent;
+
   # Fetch web site
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->get('mojolicio.us/perldoc');
@@ -644,6 +646,9 @@ Most web services these days are based on the JSON data-interchange format.
 That's why L<Mojolicious> comes with the possibly fastest pure-Perl
 implementation L<Mojo::JSON> built right in.
 
+  use Mojo::UserAgent;
+  use Mojo::Util 'encode';
+
   # Fresh user agent
   my $ua = Mojo::UserAgent->new;
 
@@ -658,14 +663,14 @@ implementation L<Mojo::JSON> built right in.
     my $user = $tweet->{from_user};
 
     # Show both
-    my $result = "$text --$user";
-    utf8::encode $result;
-    say $result;
+    say encode('UTF-8', "$text --$user");
   }
 
 =head2 Basic authentication
 
 You can just add username and password to the URL.
+
+  use Mojo::UserAgent;
 
   my $ua = Mojo::UserAgent->new;
   say $ua->get('https://sri:secret@mojolicio.us/hideout')->res->body;
@@ -675,6 +680,8 @@ You can just add username and password to the URL.
 L<Mojo::UserAgent> can automatically follow redirects, the C<start> event
 allows you direct access to each transaction right after they have been
 initialized and before a connection gets associated with them.
+
+  use Mojo::UserAgent;
 
   # User agent following up to 10 redirects
   my $ua = Mojo::UserAgent->new(max_redirects => 10);
@@ -696,6 +703,8 @@ This even works for proxy C<CONNECT> requests.
 Receiving a streaming response can be really tricky in most HTTP clients, but
 L<Mojo::UserAgent> makes it actually easy.
 
+  use Mojo::UserAgent;
+
   # Build a normal transaction
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://mojolicio.us');
@@ -715,6 +724,8 @@ even C<chunked> encoding will be handled transparently if necessary.
 =head2 Streaming request
 
 Sending a streaming request is almost just as easy.
+
+  use Mojo::UserAgent;
 
   # Build a normal transaction
   my $ua = Mojo::UserAgent->new;
@@ -746,6 +757,8 @@ When downloading large files with L<Mojo::UserAgent> you don't have to worry
 about memory usage at all, because it will automatically stream everything
 above C<250KB> into a temporary file.
 
+  use Mojo::UserAgent;
+
   # Lets fetch the latest Mojolicious tarball
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
   my $tx = $ua->get('latest.mojolicio.us');
@@ -762,6 +775,8 @@ variable.
 
 Uploading a large file is even easier.
 
+  use Mojo::UserAgent;
+
   # Upload file via POST and "multipart/form-data"
   my $ua = Mojo::UserAgent->new;
   $ua->post_form('mojolicio.us/upload',
@@ -769,6 +784,8 @@ Uploading a large file is even easier.
 
 And once again you don't have to worry about memory usage, all data will be
 streamed directly from the file.
+
+  use Mojo::UserAgent;
 
   # Upload file via PUT
   my $ua     = Mojo::UserAgent->new;
@@ -783,6 +800,10 @@ L<Mojo::UserAgent> has been designed from the ground up to be non-blocking,
 the whole blocking API is just a simple convenience wrapper. Especially for
 high latency tasks like web crawling this can be extremely useful, because
 you can keep many parallel connections active at the same time.
+
+  use Mojo::UserAgent;
+  use Mojo::IOLoop;
+  use Mojo::URL;
 
   # FIFO queue
   my @urls = ('google.com');
@@ -835,6 +856,9 @@ You can emulate blocking behavior by using a L<Mojo::IOLoop> delay to
 synchronize multiple non-blocking requests. Just be aware that the resulting
 transactions will be in random order.
 
+  use Mojo::UserAgent;
+  use Mojo::IOLoop;
+
   # Synchronize non-blocking requests and capture result
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay;
@@ -844,6 +868,9 @@ transactions will be in random order.
 
 The C<finish> event of L<Mojo::IOLoop::Delay> can be used in code that needs
 to be able to work standalone as well as inside L<Mojolicious> applications.
+
+  use Mojo::UserAgent;
+  use Mojo::IOLoop;
 
   # Synchronize non-blocking requests portably
   my $ua    = Mojo::UserAgent->new;

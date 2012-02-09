@@ -1,7 +1,7 @@
 package Mojo::JSON::Pointer;
 use Mojo::Base -base;
 
-use Mojo::Util 'url_unescape';
+use Mojo::Util qw/decode url_unescape/;
 use Scalar::Util 'looks_like_number';
 
 sub contains { shift->_pointer(1, @_) }
@@ -15,8 +15,7 @@ sub _pointer {
   # Parse pointer and walk data structure
   return unless $pointer =~ s|^/||;
   for my $p (split '/', $pointer) {
-    $p = url_unescape $p;
-    utf8::decode $p;
+    $p = decode('UTF-8', url_unescape $p);
 
     # Hash
     if (ref $data eq 'HASH' && exists $data->{$p}) { $data = $data->{$p} }

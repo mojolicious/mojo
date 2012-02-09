@@ -673,8 +673,8 @@ environments.
 
 =head2 Simplified tests
 
-Normal L<Mojolicious> applications are a little easier to test and don't need
-help with home directory detection, so C<t/login.t> can be simplified.
+Normal L<Mojolicious> applications are a little easier to test, so
+C<t/login.t> can be simplified.
 
   use Test::More tests => 16;
   use Test::Mojo;

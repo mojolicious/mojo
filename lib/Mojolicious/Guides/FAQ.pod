@@ -14,9 +14,9 @@ L<Mojolicious> together with the right answers.
 
 The short answer is "it doesn't", because we interpret the words
 "web framework" much more literally than others. With the emergence of the
-C<Real-time Web> and new technologies such as C<WebSockets>, we are facing
+C<real-time web> and new technologies such as C<WebSockets>, we are facing
 new challenges that go way beyond what commonly used modules like L<LWP> were
-designed for. Because of this, L<Mojolicious> contains a whole new C<HTTP>
+designed for. Because of this, L<Mojolicious> contains a whole new HTTP
 client/server stack called L<Mojo>, which was heavily inspired by the
 original C<LWPng> effort and carefully designed with these new requirements
 in mind. So while some of the higher abstraction layers might look similar to
@@ -39,8 +39,8 @@ they are installed.
 Because we can make them rounder. Components specifically designed for
 user-friendliness and development speed are not easy to come by. We are
 strong believers of the Perl mantra "There is more than one way to do it.",
-and our quest is to develop the best possible solutions with these two
-criteria in mind.
+and our quest is to develop the best possible solutions for these two
+criteria.
 
 =head2 What about backwards compatibility?
 
@@ -104,7 +104,7 @@ response.
 =head2 I think i have found a bug, what should i do now?
 
 First make sure you are using the latest version of L<Mojolicious>, it is
-quite likely that the bug has already been fixed. If that doesn't help
+quite likely that the bug has already been fixed. If that doesn't help,
 prepare a test case demonstrating the bug, you are not expected to fix it
 yourself, but you'll have to make sure the developers can replicate your
 problem. Sending in your whole application generally does more harm than
@@ -122,7 +122,7 @@ L<Mojolicious::Guides::CodingGuidelines>.
 
 =head2 Which namespace should i use for Mojolicious plugins?
 
-For all new plugins that you might want to release to CPAN we suggest using
+For all new plugins that you might want to release to CPAN, we suggest using
 the "Mojolicious::Plugin" namespace. While "MojoX" has been used a lot in the
 past, it is now deprecated.
 

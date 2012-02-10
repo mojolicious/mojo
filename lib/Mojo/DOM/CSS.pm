@@ -71,12 +71,48 @@ sub select {
       # Parts
       for my $part (@$pattern) {
         push(@results, $current) and last
-          if $self->_element($current, $part, $tree);
+          if $self->_combinator([reverse @$part], $current, $tree);
       }
     }
   }
 
   return \@results;
+}
+
+sub _ancestor {
+  my ($self, $selectors, $current, $tree) = @_;
+  while ($current = $current->[3]) {
+    return if $current->[0] eq 'root' || $current eq $tree;
+    return 1 if $self->_combinator($selectors, $current, $tree);
+  }
+  return;
+}
+
+sub _combinator {
+  my ($self, $selectors, $current, $tree) = @_;
+
+  # Selector
+  my @s = @$selectors;
+  return unless my $combinator = shift @s;
+  if ($combinator->[0] ne 'combinator') {
+    return unless $self->_selector($combinator, $current);
+    return 1 unless $combinator = shift @s;
+  }
+
+  # Ancestor " "
+  my $c = $combinator->[1];
+  if ($c eq ' ') { return unless $self->_ancestor(\@s, $current, $tree) }
+
+  # Parent only ">"
+  elsif ($c eq '>') { return unless $self->_parent(\@s, $current, $tree) }
+
+  # Preceding siblings "~"
+  elsif ($c eq '~') { return unless $self->_sibling(\@s, $current, $tree) }
+
+  # Immediately preceding siblings "+"
+  elsif ($c eq '+') { return unless $self->_previous(\@s, $current, $tree) }
+
+  return 1;
 }
 
 sub _compile {
@@ -93,9 +129,13 @@ sub _compile {
 
     # New selector
     push @$pattern, [] if $separator;
+    my $part = $pattern->[-1];
+
+    # Empty combinator
+    push @$part, [combinator => ' ']
+      if $part->[-1] && $part->[-1]->[0] ne 'combinator';
 
     # Selector
-    my $part = $pattern->[-1];
     push @$part, ['element'];
     my $selector = $part->[-1];
 
@@ -138,106 +178,10 @@ sub _compile {
     }
 
     # Combinator
-    push @$part, ['combinator', $combinator] if $combinator;
+    push @$part, [combinator => $combinator] if $combinator;
   }
 
   return $pattern;
-}
-
-sub _element {
-  my ($self, $candidate, $selectors, $tree) = @_;
-
-  # Match
-  my @selectors  = reverse @$selectors;
-  my $first      = 2;
-  my $parentonly = 0;
-  my ($current, $marker, $previous, $siblings);
-  for (my $i = 0; $i <= $#selectors; $i++) {
-    my $selector = $selectors[$i];
-
-    # Combinator
-    $parentonly-- if $parentonly > 0;
-    if ($selector->[0] eq 'combinator') {
-      my $c = $selector->[1];
-
-      # Parent only ">"
-      if ($c eq '>') {
-        $parentonly += 2;
-
-        # Can't go back to the first
-        unless ($first) {
-          $marker   //= $i;
-          $previous //= $current;
-        }
-      }
-
-      # Preceding siblings "~" and "+"
-      elsif ($c eq '~' || $c eq '+') {
-        my $parent = $current->[3];
-        my $start = $parent->[0] eq 'root' ? 1 : 4;
-        $siblings = [];
-
-        # Siblings
-        for my $i ($start .. $#$parent) {
-          my $sibling = $parent->[$i];
-          next unless $sibling->[0] eq 'tag';
-
-          # Reached current
-          if ($sibling eq $current) {
-            @$siblings = ($siblings->[-1]) if $c eq '+';
-            last;
-          }
-          push @$siblings, $sibling;
-        }
-      }
-
-      next;
-    }
-
-    # Walk backwards
-    while (1) {
-      $first-- if $first > 0;
-
-      # Next sibling
-      if ($siblings) { return unless $current = shift @$siblings }
-
-      # Next parent
-      else {
-        return
-          unless $current = $current ? $current->[3] : $candidate;
-
-        # Don't search beyond the current tree
-        return if $current eq $tree;
-      }
-
-      # Not a tag
-      return if $current->[0] ne 'tag';
-
-      # Compare part to element
-      if ($self->_selector($selector, $current)) {
-        $siblings = undef;
-        last;
-      }
-
-      # First selector needs to match
-      return if $first;
-
-      # Parent only
-      if ($parentonly) {
-
-        # First parent needs to match
-        return unless defined $marker;
-
-        # Reset
-        $i       = $marker - 2;
-        $current = $previous;
-        ($marker, $previous) = undef;
-        last;
-      }
-    }
-  }
-
-  return 1;
 }
 
 # "Rock stars... is there anything they don't know?"
@@ -261,6 +205,44 @@ sub _equation {
   }
 
   return $num;
+}
+
+sub _parent {
+  my ($self, $selectors, $current, $tree) = @_;
+  return unless my $parent = $current->[3];
+  return if $parent->[0] eq 'root';
+  return $self->_combinator($selectors, $parent, $tree) ? 1 : undef;
+}
+
+sub _previous {
+  my ($self, $selectors, $current, $tree) = @_;
+
+  # Find immediately preceding element
+  my $parent = $current->[3];
+  my $found;
+  my $start = $parent->[0] eq 'root' ? 1 : 4;
+  for my $e (@$parent[$start .. $#$parent]) {
+    return $found if $e eq $current;
+    next unless $e->[0] eq 'tag';
+    $found = $self->_combinator($selectors, $e, $tree);
+  }
+
+  return;
+}
+
+sub _sibling {
+  my ($self, $selectors, $current, $tree) = @_;
+
+  # Find preceding elements
+  my $parent = $current->[3];
+  my $start = $parent->[0] eq 'root' ? 1 : 4;
+  for my $e (@$parent[$start .. $#$parent]) {
+    last if $e eq $current;
+    next unless $e->[0] eq 'tag';
+    return 1 if $self->_combinator($selectors, $e, $tree);
+  }
+
+  return;
 }
 
 sub _regex {

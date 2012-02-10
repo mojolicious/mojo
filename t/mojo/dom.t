@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 720;
+use Test::More tests => 727;
 
 use ojo;
 use Mojo::Util 'encode';
@@ -2040,3 +2040,25 @@ is "$dom", <<EOF, 'stringified right';
 </foo>
 <bar>after</bar>
 EOF
+
+# Nested lists
+$dom = Mojo::DOM->new(<<EOF);
+<div>
+  <ul>
+    <li>
+      A
+      <ul>
+        <li>B</li>
+        C
+      </ul>
+    </li>
+  </ul>
+</div>
+EOF
+is $dom->find('div > ul > li')->[0]->text, 'A', 'right text';
+is $dom->find('div > ul > li')->[1], undef, 'no result';
+is $dom->find('div > ul li')->[0]->text, 'A', 'right text';
+is $dom->find('div > ul li')->[1]->text, 'B', 'right text';
+is $dom->find('div > ul li')->[2], undef, 'no result';
+is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
+is $dom->find('div > ul ul')->[1], undef, 'no result';

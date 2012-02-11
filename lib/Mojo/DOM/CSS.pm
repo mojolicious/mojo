@@ -100,10 +100,10 @@ sub _combinator {
   elsif ($c eq '>') { return unless $self->_parent(\@s, $current, $tree) }
 
   # "~" (preceding siblings)
-  elsif ($c eq '~') { return unless $self->_sibling(\@s, $current, $tree) }
+  elsif ($c eq '~') { return unless $self->_sibling(\@s, $current, $tree, 0) }
 
   # "+" (immediately preceding siblings)
-  elsif ($c eq '+') { return unless $self->_previous(\@s, $current, $tree) }
+  elsif ($c eq '+') { return unless $self->_sibling(\@s, $current, $tree, 1) }
 
   return 1;
 }
@@ -207,32 +207,22 @@ sub _parent {
   return $self->_combinator($selectors, $parent, $tree) ? 1 : undef;
 }
 
-sub _previous {
-  my ($self, $selectors, $current, $tree) = @_;
+sub _sibling {
+  my ($self, $selectors, $current, $tree, $immediate) = @_;
 
-  # Find immediately preceding element
+  # Find preceding elements
   my $parent = $current->[3];
   my $found;
   my $start = $parent->[0] eq 'root' ? 1 : 4;
   for my $e (@$parent[$start .. $#$parent]) {
     return $found if $e eq $current;
     next unless $e->[0] eq 'tag';
-    $found = $self->_combinator($selectors, $e, $tree);
-  }
 
-  return;
-}
+    # "+" (immediately preceding sibling)
+    if ($immediate) { $found = $self->_combinator($selectors, $e, $tree) }
 
-sub _sibling {
-  my ($self, $selectors, $current, $tree) = @_;
-
-  # Find preceding elements
-  my $parent = $current->[3];
-  my $start = $parent->[0] eq 'root' ? 1 : 4;
-  for my $e (@$parent[$start .. $#$parent]) {
-    last if $e eq $current;
-    next unless $e->[0] eq 'tag';
-    return 1 if $self->_combinator($selectors, $e, $tree);
+    # "~" (preceding sibling)
+    else { $found //= $self->_combinator($selectors, $e, $tree) }
   }
 
   return;

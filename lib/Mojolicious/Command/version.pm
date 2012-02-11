@@ -13,22 +13,6 @@ has usage       => "usage: $0 version\n";
 sub run {
   my $self = shift;
 
-  # Latest version
-  my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
-  my $latest = $current;
-  eval {
-    Mojo::UserAgent->new->max_redirects(3)
-      ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
-      ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
-  };
-
-  # Message
-  my $message = 'This version is up to date, have fun!';
-  $message = 'Thanks for testing a development release, you are awesome!'
-    if $latest < $current;
-  $message = "You might want to update your Mojolicious to $latest."
-    if $latest > $current;
-
   # EV
   my $ev = eval 'use Mojo::IOWatcher::EV; 1' ? $EV::VERSION : 'not installed';
 
@@ -57,8 +41,24 @@ OPTIONAL
   IO::Socket::SSL          ($tls)
   Net::Rendezvous::Publish ($bonjour)
 
-$message
 EOF
+
+  # Latest version
+  my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
+  my $latest = $current;
+  eval {
+    Mojo::UserAgent->new->max_redirects(3)
+      ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
+      ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
+  };
+
+  # Message
+  my $message = 'This version is up to date, have fun!';
+  $message = 'Thanks for testing a development release, you are awesome!'
+    if $latest < $current;
+  $message = "You might want to update your Mojolicious to $latest."
+    if $latest > $current;
+  say $message;
 }
 
 1;

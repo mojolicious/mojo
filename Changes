@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.49    2012-02-11 00:00:00
+        - Improved version command to be more responsive. (crab)
         - Improved documentation.
         - Fixed parent combinator bug in Mojo::DOM::CSS. (sharifulin, sri)
 

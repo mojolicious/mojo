@@ -44,7 +44,7 @@ has 'tree';
 sub select {
   my $self = shift;
 
-  # Compile selector
+  # Compile selectors
   my $pattern = $self->_compile(shift);
 
   # Walk tree
@@ -55,20 +55,13 @@ sub select {
     my $type = $current->[0];
 
     # Root
-    if ($type eq 'root') {
-
-      # Fill queue
-      unshift @queue, @$current[1 .. $#$current];
-      next;
-    }
+    if ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
 
     # Tag
     elsif ($type eq 'tag') {
-
-      # Fill queue
       unshift @queue, @$current[4 .. $#$current];
 
-      # Parts
+      # Try all selectors with element
       for my $part (@$pattern) {
         push(@results, $current) and last
           if $self->_combinator([reverse @$part], $current, $tree);
@@ -99,17 +92,17 @@ sub _combinator {
     return 1 unless $combinator = shift @s;
   }
 
-  # Ancestor " "
+  # " " (ancestor)
   my $c = $combinator->[1];
   if ($c eq ' ') { return unless $self->_ancestor(\@s, $current, $tree) }
 
-  # Parent only ">"
+  # ">" (parent only)
   elsif ($c eq '>') { return unless $self->_parent(\@s, $current, $tree) }
 
-  # Preceding siblings "~"
+  # "~" (preceding siblings)
   elsif ($c eq '~') { return unless $self->_sibling(\@s, $current, $tree) }
 
-  # Immediately preceding siblings "+"
+  # "+" (immediately preceding siblings)
   elsif ($c eq '+') { return unless $self->_previous(\@s, $current, $tree) }
 
   return 1;

@@ -222,7 +222,7 @@ sub _sibling {
     if ($immediate) { $found = $self->_combinator($selectors, $e, $tree) }
 
     # "~" (preceding sibling)
-    else { $found //= $self->_combinator($selectors, $e, $tree) }
+    else { return 1 if $self->_combinator($selectors, $e, $tree) }
   }
 
   return;

@@ -100,7 +100,7 @@ sub _connect {
       unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
   }
 
-  # Start writing right away
+  # Wait for handle to become writable
   $self->{handle} = $handle;
   $watcher->io($handle => sub { $self->_connecting })->watch($handle, 0, 1);
 }

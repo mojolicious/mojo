@@ -10,7 +10,7 @@ use Mojo::Home;
 use Mojo::Path;
 
 has default_static_class => 'main';
-has 'root';
+has paths => sub { [] };
 
 # "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {
@@ -39,61 +39,68 @@ sub dispatch {
   return 1;
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
+sub root {
+  warn <<EOF;
+Mojolicious::Static->root is DEPRECATED in favor of
+Mojolicious::Static->paths!
+EOF
+  my $self = shift;
+  return $self->paths->[0] unless @_;
+  $self->paths->[0] = shift;
+  return $self;
+}
+
 sub serve {
   my ($self, $c, $rel) = @_;
 
-  # Path and extension
-  my $path = File::Spec->catfile($self->root, split('/', $rel));
-  $path =~ /\.(\w+)$/;
-  my $ext = $1;
-
-  # Root for bundled files
-  $self->{bundled} ||= Mojo::Home->new(Mojo::Home->mojo_lib_dir)
-    ->rel_dir('Mojolicious/public');
-
-  # Normal file
+  # Search all paths
   my $asset;
-  my $modified = $self->{modified} ||= time;
   my $size     = 0;
+  my $modified = $self->{modified} ||= time;
   my $res      = $c->res;
-  if (my $file = $self->_get_file($path)) {
-    if (@$file) { ($asset, $size, $modified) = @$file }
+  for my $path (@{$self->paths}) {
+    my $file = File::Spec->catfile($path, split('/', $rel));
+    next unless my $data = $self->_get_file($file);
 
-    # Exists but is forbidden
-    else {
+    # Forbidded
+    unless (@$data) {
       $c->app->log->debug(qq/File "$rel" is forbidden./);
       $res->code(403) and return;
     }
+
+    # Exists
+    ($asset, $size, $modified) = @$data;
   }
 
-  # DATA file
-  elsif (!$asset && defined(my $data = $self->_get_data_file($c, $rel))) {
+  # Search DATA
+  if (!$asset && defined(my $data = $self->_get_data_file($c, $rel))) {
     $size  = length $data;
     $asset = Mojo::Asset::Memory->new->add_chunk($data);
   }
 
-  # Bundled file
-  else {
-    $path = File::Spec->catfile($self->{bundled}, split('/', $rel));
-    if (my $bundled = $self->_get_file($path)) {
-      ($asset, $size, $modified) = @$bundled if @$bundled;
-    }
+  # Search bundled files
+  elsif (!$asset) {
+    my $b = $self->{bundled} ||= Mojo::Home->new(Mojo::Home->mojo_lib_dir)
+      ->rel_dir('Mojolicious/public');
+    my $data = $self->_get_file(File::Spec->catfile($b, split('/', $rel)));
+    ($asset, $size, $modified) = @$data if $data && @$data;
   }
 
   # Not a static file
   return unless $asset;
 
   # If modified since
-  my $rqh = $c->req->headers;
-  my $rsh = $res->headers;
-  if (my $date = $rqh->if_modified_since) {
+  my $req_headers = $c->req->headers;
+  my $res_headers = $res->headers;
+  if (my $date = $req_headers->if_modified_since) {
 
     # Not modified
     my $since = Mojo::Date->new($date)->epoch;
     if (defined $since && $since == $modified) {
-      $rsh->remove('Content-Type');
-      $rsh->remove('Content-Length');
-      $rsh->remove('Content-Disposition');
+      $res_headers->remove('Content-Type');
+      $res_headers->remove('Content-Length');
+      $res_headers->remove('Content-Disposition');
       $res->code(304) and return 1;
     }
   }
@@ -101,13 +108,13 @@ sub serve {
   # Range
   my $start = 0;
   my $end = $size - 1 >= 0 ? $size - 1 : 0;
-  if (my $range = $rqh->range) {
+  if (my $range = $req_headers->range) {
     if ($range =~ m/^bytes=(\d+)\-(\d+)?/ && $1 <= $end) {
       $start = $1;
       $end = $2 if defined $2 && $2 <= $end;
       $res->code(206);
-      $rsh->content_length($end - $start + 1);
-      $rsh->content_range("bytes $start-$end/$size");
+      $res_headers->content_length($end - $start + 1);
+      $res_headers->content_range("bytes $start-$end/$size");
     }
 
     # Not satisfiable
@@ -119,9 +126,10 @@ sub serve {
   # Serve file
   $res->code(200) unless $res->code;
   $res->content->asset($asset);
-  $rsh->content_type($c->app->types->type($ext) || 'text/plain');
-  $rsh->accept_ranges('bytes');
-  $rsh->last_modified(Mojo::Date->new($modified));
+  $rel =~ /\.(\w+)$/;
+  $res_headers->content_type($c->app->types->type($1) || 'text/plain');
+  $res_headers->accept_ranges('bytes');
+  $res_headers->last_modified(Mojo::Date->new($modified));
 
   return 1;
 }
@@ -183,12 +191,12 @@ L<Mojolicious::Static> implements the following attributes.
 
 Class to use for finding files in C<DATA> section, defaults to C<main>.
 
-=head2 C<root>
+=head2 C<paths>
 
-  my $root = $static->root;
-  $static  = $static->root('/foo/bar/files');
+  my $paths = $static->paths;
+  $static   = $static->paths(['/foo/bar/public']);
 
-Directory to serve static files from.
+Directories to serve static files from.
 
 =head1 METHODS
 

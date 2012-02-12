@@ -26,7 +26,7 @@ use Mojolicious::Lite;
 app->log->level('fatal');
 
 # Avoid exception template
-app->renderer->root(app->home->rel_dir('public'));
+app->renderer->paths->[0] = app->home->rel_dir('public');
 
 # GET /link
 get '/link' => sub {

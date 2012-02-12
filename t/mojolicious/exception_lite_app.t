@@ -17,7 +17,7 @@ use Test::More tests => 80;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-app->renderer->root(app->home->rel_dir('does_not_exist'));
+app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
 
 # Logger
 app->log->handle(undef);

@@ -17,7 +17,7 @@ has encoding               => 'UTF-8';
 has handlers               => sub { {} };
 has helpers                => sub { {} };
 has layout_prefix          => 'layouts';
-has root                   => '/';
+has paths                  => sub { [] };
 
 # "This is not how Xmas is supposed to be.
 #  In my day Xmas was about bringing people together,
@@ -157,6 +157,18 @@ sub render {
   return $output, $c->app->types->type($format) || 'text/plain';
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
+sub root {
+  warn <<EOF;
+Mojolicious::Renderer->root is DEPRECATED in favor of
+Mojolicious::Renderer->paths!
+EOF
+  my $self = shift;
+  return $self->paths->[0] unless @_;
+  $self->paths->[0] = shift;
+  return $self;
+}
+
 sub template_name {
   my ($self, $options) = @_;
 
@@ -171,8 +183,18 @@ sub template_name {
 
 sub template_path {
   my $self = shift;
+
+  # Nameless
   return unless my $name = $self->template_name(shift);
-  return File::Spec->catfile($self->root, split '/', $name);
+
+  # Search all paths
+  foreach my $path (@{$self->paths}) {
+    my $file = File::Spec->catfile($path, split '/', $name);
+    return $file if -r $file;
+  }
+
+  # Fall back to first path
+  return File::Spec->catfile($self->paths->[0], split '/', $name);
 }
 
 sub _detect_handler {
@@ -185,7 +207,7 @@ sub _detect_handler {
   my $templates = $self->{templates};
   unless ($templates) {
     $templates = $self->{templates} =
-      Mojo::Home->new->parse($self->root)->list_files;
+      [map { @{Mojo::Home->new($_)->list_files} } @{$self->paths}];
   }
 
   # DATA templates
@@ -203,8 +225,6 @@ sub _detect_handler {
   return;
 }
 
-# "You are hereby conquered.
-#  Please line up in order of how much beryllium it takes to kill you."
 sub _detect_template_class {
   my ($self, $options) = @_;
   return $options->{template_class} || $self->default_template_class;
@@ -219,8 +239,6 @@ sub _extends {
   return delete $stash->{extends};
 }
 
-# "Oh no! Can we switch back using four or more bodies?
-#  I'm not sure. I'm afraid we need to use... MATH."
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
@@ -341,12 +359,12 @@ Registered helpers.
 
 Directory to look for layouts in, defaults to C<layouts>.
 
-=head2 C<root>
+=head2 C<paths>
 
-  my $root  = $renderer->root;
-  $renderer = $renderer->root('/foo/bar/templates');
+  my $paths = $renderer->paths;
+  $renderer = $renderer->paths(['/foo/bar/templates']);
 
-Directory to look for templates in.
+Directories to look for templates in.
 
 =head1 METHODS
 
@@ -382,7 +400,7 @@ sample helpers.
     template_class => 'main'
   }, 'foo.html.ep');
 
-Get an DATA template by name, usually used by handlers.
+Get a DATA template by name, usually used by handlers.
 
 =head2 C<render>
 

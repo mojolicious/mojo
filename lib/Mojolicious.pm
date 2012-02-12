@@ -59,10 +59,10 @@ sub DESTROY { }
 sub new {
   my $self = shift->SUPER::new(@_);
 
-  # Root directories
+  # Paths
   my $home = $self->home;
-  $self->renderer->root($home->rel_dir('templates'));
-  $self->static->root($home->rel_dir('public'));
+  push @{$self->renderer->paths}, $home->rel_dir('templates');
+  push @{$self->static->paths},   $home->rel_dir('public');
 
   # Default to application namespace
   my $r = $self->routes;

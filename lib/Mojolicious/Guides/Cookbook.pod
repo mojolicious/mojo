@@ -1017,10 +1017,10 @@ get automatically installed with the modules.
       File::Spec->catdir(dirname(__FILE__), 'MyMojoliciousApp'));
 
     # Switch to installable "public" directory
-    $self->static->root($self->home->rel_dir('public'));
+    $self->static->paths->[0] = $self->home->rel_dir('public');
 
     # Switch to installable "templates" directory
-    $self->renderer->root($self->home->rel_dir('templates'));
+    $self->renderer->paths->[0] = $self->home->rel_dir('templates');
 
     $self->plugin('PODRenderer');
 

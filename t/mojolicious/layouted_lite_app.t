@@ -19,7 +19,7 @@ use Test::Mojo;
 # Plugin with a template
 plugin 'PluginWithTemplate';
 
-app->renderer->root(app->home->rel_dir('does_not_exist'));
+app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
 
 # Default layout for whole application
 app->defaults(layout => 'default');

@@ -23,11 +23,7 @@ has iowatcher => sub {
   Mojo::IOLoop->singleton->iowatcher;
 };
 
-sub DESTROY {
-  my $self = shift;
-  return if $self->{connected};
-  $self->_cleanup;
-}
+sub DESTROY { shift->_cleanup }
 
 # "I wonder where Bart is, his dinner's getting all cold... and eaten."
 sub connect {
@@ -42,8 +38,8 @@ sub connect {
 sub _cleanup {
   my $self = shift;
   return unless my $watcher = $self->{iowatcher};
-  $watcher->drop($self->{timer})  if $self->{timer};
-  $watcher->drop($self->{handle}) if $self->{handle};
+  $watcher->drop(delete $self->{timer})  if $self->{timer};
+  $watcher->drop(delete $self->{handle}) if $self->{handle};
 }
 
 sub _connect {
@@ -91,7 +87,6 @@ sub _connect {
       SSL_startHandshake => 0,
       SSL_error_trap     => sub {
         $self->_cleanup;
-        close delete $self->{handle};
         $self->emit_safe(error => $_[1]);
       },
       SSL_cert_file => $args->{tls_cert},
@@ -107,7 +102,7 @@ sub _connect {
 
   # Start writing right away
   $self->{handle} = $handle;
-  $watcher->io($handle => sub { $self->_connecting });
+  $watcher->io($handle => sub { $self->_connecting })->watch($handle, 0, 1);
 }
 
 # "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
@@ -130,7 +125,6 @@ sub _connecting {
     unless $handle->connected;
 
   # Connected
-  $self->{connected} = 1;
   $self->_cleanup;
   $self->emit_safe(connect => $handle);
 }

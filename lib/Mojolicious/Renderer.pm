@@ -191,7 +191,7 @@ sub _detect_handler {
   # DATA templates
   my $class  = $self->_detect_template_class($options);
   my $inline = $self->{data_templates}->{$class}
-    ||= $self->_list_data_templates($class);
+    ||= [keys %{Mojo::Command->new->get_all_data($class) || {}}];
 
   # Detect
   return unless my $file = $self->template_name($options);
@@ -217,12 +217,6 @@ sub _extends {
     $stash->{extends} ||= $self->layout_prefix . '/' . $layout;
   }
   return delete $stash->{extends};
-}
-
-sub _list_data_templates {
-  my ($self, $class) = @_;
-  my $all = Mojo::Command->new->get_all_data($class);
-  return [keys %$all];
 }
 
 # "Oh no! Can we switch back using four or more bodies?

@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved version command to be more responsive. (crab)
         - Improved resilience of Mojo::IOLoop::Client.
         - Improved documentation.
+        - Improved tests.
         - Fixed parent combinator bug in Mojo::DOM::CSS. (sharifulin, sri)
 
 2.48    2012-02-09 00:00:00

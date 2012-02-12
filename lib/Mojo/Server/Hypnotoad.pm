@@ -111,10 +111,7 @@ sub run {
   };
   $SIG{QUIT} = sub { $self->{finished} = $self->{graceful} = 1 };
   $SIG{USR2} = sub { $self->{upgrade} ||= time };
-  $SIG{TTIN} = sub {
-    $c->{workers}++
-      if (!defined $c->{max_workers} || $c->{workers} < $c->{max_workers});
-  };
+  $SIG{TTIN} = sub { $c->{workers}++ };
   $SIG{TTOU} = sub {
     return unless $c->{workers};
     $c->{workers}--;
@@ -593,13 +590,6 @@ Full path to accept mutex lock file, defaults to a random temporary file.
 
 Maximum amount of time in seconds a worker may block when waiting for the
 accept mutex, defaults to C<0.5>.
-
-=head2 C<max_workers>
-
-  max_workers => 100
-
-Maximum size of worker pool, defaults to unlimited. Setting the value to
-C<undef> removes the limitation.
 
 =head2 C<pid_file>
 

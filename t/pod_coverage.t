@@ -9,9 +9,8 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 
 # DEPRECATED in Leaf Fluttering In Wind!
 my @leaf = (
-  qw/comment connect connection_timeout keep_alive_timeout listen/,
-  qw/max_redirects on_close on_error on_lock on_process on_read on_unlock/,
-  qw/port prepare_ioloop root timeout version write x_forwarded_for/
+  qw/comment keep_alive_timeout max_redirects on_process port/,
+  qw/prepare_ioloop root version x_forwarded_for/
 );
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.

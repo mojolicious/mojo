@@ -67,76 +67,11 @@ sub client {
     }
   );
 
-  # DEPRECATED in Leaf Fluttering In Wind!
-  $args->{timeout} ||= $self->{connect_timeout};
-
   # Connect
   $client->connect($args);
 
   return $id;
 }
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub connect {
-  my $self = shift;
-  $self = $self->singleton unless ref $self;
-  my $args = ref $_[0] ? $_[0] : {@_};
-  warn
-    "Mojo::IOLoop->connect is DEPRECATED in favor of Mojo::IOLoop->client!\n";
-
-  my $id;
-  $id = $self->client(
-    $args => sub {
-      my ($self, $err, $stream) = @_;
-
-      my $c = $self->{connections}->{$id};
-      $c->{$_} = delete($args->{"on_$_"}) || $c->{$_}
-        for qw/close connect error read/;
-      if ($err) {
-        $c->{error}->($self, $id, $err) if $c->{error};
-        return;
-      }
-
-      $stream->on(
-        close => sub {
-          my $c = $self->{connections}->{$id};
-          $c->{close}->($self, $id) if $c->{close};
-        }
-      );
-      $stream->on(
-        error => sub {
-          my $c = $self->{connections}->{$id};
-          $c->{error}->($self, $id, pop) if $c->{error};
-        }
-      );
-      $stream->on(
-        read => sub {
-          my $c = $self->{connections}->{$id};
-          $c->{read}->($self, $id, pop) if $c->{read};
-        }
-      );
-      $c->{connect}->($self, $id) if $c->{connect};
-    }
-  );
-
-  return $id;
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub connect_timeout {
-  my ($self, $timeout) = @_;
-  warn <<EOF;
-Mojo::IOLoop->connect_timeout is DEPRECATED in favor of the timeout argument!
-EOF
-  if ($timeout) {
-    $self->{connect_timeout} = $timeout;
-    return $self;
-  }
-  return $self->{connect_timeout};
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-*connection_timeout = \&timeout;
 
 sub delay {
   my ($self, $cb) = @_;
@@ -163,74 +98,6 @@ sub is_running {
   my $self = shift;
   $self = $self->singleton unless ref $self;
   return $self->{running};
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub listen {
-  my $self = shift;
-  $self = $self->singleton unless ref $self;
-  my $args = ref $_[0] ? $_[0] : {@_};
-  warn
-    "Mojo::IOLoop->listen is DEPRECATED in favor of Mojo::IOLoop->server!\n";
-
-  my $accept = delete $args->{on_accept};
-  my $close  = delete $args->{on_close};
-  my $error  = delete $args->{on_error};
-  my $read   = delete $args->{on_read};
-  my $id;
-  $id = $self->server(
-    $args => sub {
-      my ($self, $stream, $id) = @_;
-
-      my $c = $self->{connections}->{$id};
-      $c->{close} = $close if $close;
-      $c->{error} = $error if $error;
-      $c->{read}  = $read  if $read;
-      $stream->on(
-        close => sub {
-          my $c = $self->{connections}->{$id};
-          $c->{close}->($self, $id) if $c->{close};
-        }
-      );
-      $stream->on(
-        error => sub {
-          my $c = $self->{connections}->{$id};
-          $c->{error}->($self, $id, pop) if $c->{error};
-        }
-      );
-      $stream->on(
-        read => sub {
-          my $c = $self->{connections}->{$id};
-          $c->{read}->($self, $id, pop) if $c->{read};
-        }
-      );
-      $self->$accept($id) if $accept;
-    }
-  );
-
-  return $id;
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub on_close { shift->_event(close => @_) }
-sub on_error { shift->_event(error => @_) }
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub on_lock {
-  warn
-    "Mojo::IOLoop->on_lock is DEPRECATED in favor of Mojo::IOLoop->lock!\n";
-  shift->lock(@_);
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub on_read { shift->_event(read => @_) }
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub on_unlock {
-  warn <<EOF;
-Mojo::IOLoop->on_unlock is DEPRECATED in favor of Mojo::IOLoop->unlock!
-EOF
-  shift->unlock(@_);
 }
 
 sub one_tick {
@@ -351,37 +218,11 @@ sub stream {
   return $id;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub timeout {
-  warn <<EOF;
-Mojo::IOLoop->timeout is DEPRECATED in favor of
-Mojo::IOLoop::Stream->timeout!
-EOF
-  my ($self, $id, $timeout) = @_;
-  $self = $self->singleton unless ref $self;
-  return unless my $stream = $self->stream($id);
-  return $stream->timeout unless defined $timeout;
-  $stream->timeout($timeout);
-  return $self;
-}
-
 sub timer {
   my ($self, $after, $cb) = @_;
   $self = $self->singleton unless ref $self;
   weaken $self;
   return $self->iowatcher->timer($after => sub { $self->$cb(pop) });
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub write {
-  my ($self, $id, $chunk, $cb) = @_;
-  warn <<EOF;
-Mojo::IOLoop->write is DEPRECATED in favor of Mojo::IOLoop::Stream->write!
-EOF
-  return unless my $stream = $self->stream($id);
-  return $stream->write($chunk) unless $cb;
-  weaken $self;
-  return $stream->write($chunk, sub { $self->$cb($id) });
 }
 
 sub _drop {
@@ -399,15 +240,6 @@ sub _drop {
     delete(($self->{connections}->{$id} || {})->{stream});
     delete $self->{connections}->{$id};
   }
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub _event {
-  my ($self, $event, $id, $cb) = @_;
-  warn "Mojo::IOLoop->on_* methods are DEPRECATED!\n";
-  return unless my $c = $self->{connections}->{$id};
-  $c->{$event} = $cb if $cb;
-  return $self;
 }
 
 sub _id {

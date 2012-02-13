@@ -642,9 +642,9 @@ C<register> is called.
     my ($self, $app) = @_;
 
     # Append "templates" and "public" directories
-    my $home = catdir(dirname(__FILE__), 'AlertAssets');
-    push @{$app->renderer->paths}, catdir($home, 'templates');
-    push @{$app->static->paths}, catdir($home, 'public');
+    my $base = catdir(dirname(__FILE__), 'AlertAssets');
+    push @{$app->renderer->paths}, catdir($base, 'templates');
+    push @{$app->static->paths},   catdir($base, 'public');
   }
 
   1;

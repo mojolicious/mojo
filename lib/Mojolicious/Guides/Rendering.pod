@@ -619,19 +619,18 @@ to C<CPAN>.
 =head2 Bundling assets with plugins
 
 Assets such as templates and static files can be easily bundled with your
-plugins.
+plugins, even if you plan to release them to C<CPAN>.
 
   $ mojo generate plugin AlertAssets
-  $ cd AlertAssets
-  $ mkdir lib/Mojolicious/Plugin/AlertAssets
-  $ cd lib/Mojolicious/Plugin/AlertAssets
+  $ mkdir AlertAssets/lib/Mojolicious/Plugin/AlertAssets
+  $ cd AlertAssets/lib/Mojolicious/Plugin/AlertAssets
   $ mkdir public
   $ echo 'alert("Hello World!");' > public/alertassets.js
   $ mkdir templates
   $ echo '%= javascript "/alertassets.js"' > templates/alertassets.html.ep
 
 Just append their respective directories to the list of search paths when
-your plugin gets loaded.
+C<register> is called.
 
   package Mojolicious::Plugin::AlertAssets;
   use Mojo::Base 'Mojolicious::Plugin';
@@ -643,7 +642,7 @@ your plugin gets loaded.
   sub register {
     my ($self, $app) = @_;
 
-    # Append "templates" and "public" directories to search paths
+    # Append "templates" and "public" directories
     my $home = Mojo::Home->new(File::Spec->catdir(dirname(__FILE__)));
     push @{$app->renderer->paths}, $home->rel_dir('AlertAssets/templates');
     push @{$app->static->paths}, $home->rel_dir('AlertAssets/public');
@@ -668,7 +667,7 @@ you've installed and loaded the plugin, with slightly lower precedence.
   <html>
     <head>
       <title>Alert me!</title>
-      %= include 'alertasset'
+      %= include 'alertassets'
     </head>
     <body>You've been alerted.</body>
   </html>

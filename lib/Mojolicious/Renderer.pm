@@ -366,6 +366,9 @@ Directory to look for layouts in, defaults to C<layouts>.
 
 Directories to look for templates in.
 
+  # Add another "templates" directory
+  push @{$renderer->paths}, '/foo/bar/templates';
+
 =head1 METHODS
 
 L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and

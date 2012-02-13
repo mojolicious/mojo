@@ -316,6 +316,9 @@ L<Mojolicious::Renderer> object. The two main renderer plugins
 L<Mojolicious::Plugin::EPRenderer> and L<Mojolicious::Plugin::EPLRenderer>
 contain more information.
 
+  # Add another "templates" directory
+  push @{$app->renderer->paths}, '/foo/bar/templates';
+
 =head2 C<routes>
 
   my $routes = $app->routes;
@@ -358,6 +361,9 @@ session data.
 
 For serving static assets from your C<public> directory, defaults to a
 L<Mojolicious::Static> object.
+
+  # Add another "public" directory
+  push @{$app->static->paths}, '/foo/bar/public';
 
 =head2 C<types>
 

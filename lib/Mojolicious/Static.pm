@@ -198,6 +198,9 @@ Class to use for finding files in C<DATA> section, defaults to C<main>.
 
 Directories to serve static files from.
 
+  # Add another "public" directory
+  push @{$static->paths}, '/foo/bar/public';
+
 =head1 METHODS
 
 L<Mojolicious::Static> inherits all methods from L<Mojo::Base>

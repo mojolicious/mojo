@@ -1004,7 +1004,7 @@ get automatically installed with the modules.
   use Mojo::Base 'Mojolicious';
 
   use File::Basename 'dirname';
-  use File::Spec;
+  use File::Spec::Functions 'catdir';
 
   # Every CPAN module needs a version
   our $VERSION = '1.0';
@@ -1013,8 +1013,7 @@ get automatically installed with the modules.
     my $self = shift;
 
     # Switch to installable home directory
-    $self->home->parse(
-      File::Spec->catdir(dirname(__FILE__), 'MyMojoliciousApp'));
+    $self->home->parse(catdir(dirname(__FILE__), 'MyMojoliciousApp'));
 
     # Switch to installable "public" directory
     $self->static->paths->[0] = $self->home->rel_dir('public');

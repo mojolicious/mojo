@@ -1,7 +1,7 @@
 package Mojolicious::Renderer;
 use Mojo::Base -base;
 
-use File::Spec;
+use File::Spec::Functions 'catfile';
 use Mojo::Cache;
 use Mojo::Command;
 use Mojo::Home;
@@ -189,12 +189,12 @@ sub template_path {
 
   # Search all paths
   foreach my $path (@{$self->paths}) {
-    my $file = File::Spec->catfile($path, split '/', $name);
+    my $file = catfile($path, split '/', $name);
     return $file if -r $file;
   }
 
   # Fall back to first path
-  return File::Spec->catfile($self->paths->[0], split '/', $name);
+  return catfile($self->paths->[0], split '/', $name);
 }
 
 sub _detect_handler {

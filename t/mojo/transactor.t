@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More tests => 179;
 
-use File::Spec;
+use File::Spec::Functions 'catdir';
 use FindBin;
 use Mojo::URL;
 
@@ -73,7 +73,7 @@ is $tx->req->body, 'test=123', 'right content';
 # Multipart form with real file
 $tx =
   $t->form('http://kraih.com/foo',
-  {mytext => {file => File::Spec->catdir($FindBin::Bin, 'transactor.t')}});
+  {mytext => {file => catdir($FindBin::Bin, 'transactor.t')}});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',

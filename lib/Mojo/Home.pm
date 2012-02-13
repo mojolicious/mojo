@@ -8,7 +8,7 @@ use overload
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Find 'find';
-use File::Spec;
+use File::Spec::Functions qw/abs2rel catdir catfile splitdir/;
 use FindBin;
 use List::Util 'first';
 use Mojo::Asset::File;
@@ -30,8 +30,7 @@ sub detect {
 
   # Environment variable
   if ($ENV{MOJO_HOME}) {
-    my @parts = File::Spec->splitdir(abs_path $ENV{MOJO_HOME});
-    $self->{parts} = \@parts;
+    $self->{parts} = [splitdir(abs_path $ENV{MOJO_HOME})];
     return $self;
   }
 
@@ -49,7 +48,7 @@ sub detect {
 
       # Directory
       $path =~ s/$file$//;
-      my @home = File::Spec->splitdir($path);
+      my @home = splitdir $path;
 
       # Remove "lib" and "blib"
       while (@home) {
@@ -58,8 +57,7 @@ sub detect {
       }
 
       # Turn into absolute path
-      $self->{parts} =
-        [File::Spec->splitdir(abs_path(File::Spec->catdir(@home) || '.'))];
+      $self->{parts} = [splitdir(abs_path(catdir(@home) || '.'))];
     }
   }
 
@@ -74,7 +72,7 @@ sub lib_dir {
 
   # Directory found
   my $parts = $self->{parts} || [];
-  my $path = File::Spec->catdir(@$parts, 'lib');
+  my $path = catdir @$parts, 'lib';
   return $path if -d $path;
 
   # No lib directory
@@ -86,14 +84,13 @@ sub list_files {
 
   # Files relative to directory
   my $parts = $self->{parts} || [];
-  my $root = File::Spec->catdir(@$parts);
-  $dir = File::Spec->catdir($root, split '/', ($dir || ''));
+  my $root = catdir @$parts;
+  $dir = catdir $root, split '/', ($dir || '');
   return [] unless -d $dir;
   my @files;
   find {
     wanted => sub {
-      my @parts =
-        File::Spec->splitdir(File::Spec->abs2rel($File::Find::name, $dir));
+      my @parts = splitdir(abs2rel($File::Find::name, $dir));
       push @files, join '/', @parts unless first {/^\./} @parts;
     },
     no_chdir => 1
@@ -102,7 +99,7 @@ sub list_files {
   return [sort @files];
 }
 
-sub mojo_lib_dir { File::Spec->catdir(dirname(__FILE__), '..') }
+sub mojo_lib_dir { catdir(dirname(__FILE__), '..') }
 
 # "Don't worry, son.
 #  I'm sure he's up in heaven right now laughing it up with all the other
@@ -110,31 +107,19 @@ sub mojo_lib_dir { File::Spec->catdir(dirname(__FILE__), '..') }
 sub parse {
   my ($self, $path) = @_;
   return $self unless defined $path;
-  $self->{parts} = [File::Spec->splitdir($path)];
+  $self->{parts} = [splitdir $path];
   return $self;
 }
 
-sub rel_dir {
-  my $self = shift;
-  my $parts = $self->{parts} || [];
-  File::Spec->catdir(@$parts, split '/', shift);
-}
+sub rel_dir { catdir(@{shift->{parts} || []}, split '/', shift) }
 
-sub rel_file {
-  my $self = shift;
-  my $parts = $self->{parts} || [];
-  File::Spec->catfile(@$parts, split '/', shift);
-}
+sub rel_file { catfile(@{shift->{parts} || []}, split '/', shift) }
 
 sub slurp_rel_file {
   Mojo::Asset::File->new(path => shift->rel_file(@_))->slurp;
 }
 
-sub to_string {
-  my $self = shift;
-  my $parts = $self->{parts} || [];
-  File::Spec->catdir(@$parts);
-}
+sub to_string { catdir(@{shift->{parts} || []}) }
 
 1;
 __END__

@@ -1,10 +1,11 @@
 package Mojolicious::Command::test;
 use Mojo::Base 'Mojo::Command';
 
-use Cwd;
+use Cwd 'realpath';
 use FindBin;
-use File::Spec;
+use File::Spec::Functions qw/abs2rel catdir splitdir/;
 use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
+use Mojo::Home;
 
 has description => "Run unit tests.\n";
 has usage       => <<"EOF";
@@ -26,36 +27,21 @@ sub run {
 
   # Search tests
   unless (@tests) {
-    my @base = File::Spec->splitdir(File::Spec->abs2rel($FindBin::Bin));
+    my @base = splitdir(abs2rel $FindBin::Bin);
 
     # Test directory in the same directory as "mojo" (t)
-    my $path = File::Spec->catdir(@base, 't');
+    my $path = catdir @base, 't';
 
     # Test dirctory in the directory above "mojo" (../t)
-    $path = File::Spec->catdir(@base, '..', 't') unless -d $path;
-    unless (-d $path) {
-      say "Can't find test directory.";
-      return;
-    }
+    $path = catdir @base, '..', 't' unless -d $path;
+    return say "Can't find test directory." unless -d $path;
 
     # List test files
-    my @dirs = ($path);
-    while (my $dir = shift @dirs) {
-      opendir(my $fh, $dir);
-      for my $file (readdir($fh)) {
-        next if $file eq '.';
-        next if $file eq '..';
-        my $fpath = File::Spec->catfile($dir, $file);
-        push @dirs, File::Spec->catdir($dir, $file) if -d $fpath;
-        push @tests,
-          File::Spec->abs2rel(
-          Cwd::realpath(File::Spec->catfile(File::Spec->splitdir($fpath))))
-          if (-f $fpath) && ($fpath =~ /\.t$/);
-      }
-      closedir $fh;
-    }
+    my $home = Mojo::Home->new($path);
+    $_ =~ /\.t$/ and push(@tests, $home->rel_file($_))
+      for @{$home->list_files};
 
-    $path = Cwd::realpath($path);
+    $path = realpath $path;
     say "Running tests from '$path'.";
   }
 

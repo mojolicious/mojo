@@ -1,7 +1,7 @@
 package Mojolicious::Static;
 use Mojo::Base -base;
 
-use File::Spec;
+use File::Spec::Functions 'catfile';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Command;
@@ -60,7 +60,7 @@ sub serve {
   my $modified = $self->{modified} ||= time;
   my $res      = $c->res;
   for my $path (@{$self->paths}) {
-    my $file = File::Spec->catfile($path, split('/', $rel));
+    my $file = catfile($path, split('/', $rel));
     next unless my $data = $self->_get_file($file);
 
     # Forbidded
@@ -83,7 +83,7 @@ sub serve {
   elsif (!$asset) {
     my $b = $self->{bundled} ||= Mojo::Home->new(Mojo::Home->mojo_lib_dir)
       ->rel_dir('Mojolicious/public');
-    my $data = $self->_get_file(File::Spec->catfile($b, split('/', $rel)));
+    my $data = $self->_get_file(catfile($b, split('/', $rel)));
     ($asset, $size, $modified) = @$data if $data && @$data;
   }
 

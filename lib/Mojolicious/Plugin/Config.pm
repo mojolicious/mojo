@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Config;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use File::Basename 'basename';
-use File::Spec;
+use File::Spec::Functions 'file_name_is_absolute';
 use Mojo::Util 'decamelize';
 
 use constant DEBUG => $ENV{MOJO_CONFIG_DEBUG} || 0;
@@ -66,9 +66,9 @@ sub register {
 
   # Absolute path
   $file = $app->home->rel_file($file)
-    unless File::Spec->file_name_is_absolute($file);
+    unless file_name_is_absolute $file;
   $mode = $app->home->rel_file($mode)
-    if defined $mode && !File::Spec->file_name_is_absolute($mode);
+    if defined $mode && !file_name_is_absolute $mode;
 
   # Read config file
   my $config = {};

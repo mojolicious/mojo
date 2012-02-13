@@ -7,7 +7,7 @@ use Test::More tests => 930;
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
 #  they're on TV!"
-use File::Spec;
+use File::Spec::Functions 'catfile';
 use File::Temp;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
@@ -794,8 +794,8 @@ is_deeply $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename,  'hello.pl',            'right filename';
 isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
-my $file = File::Spec->catfile(File::Temp::tempdir(CLEANUP => 1),
-  ("MOJO_TMP." . time . ".txt"));
+my $file =
+  catfile(File::Temp::tempdir(CLEANUP => 1), ("MOJO_TMP." . time . ".txt"));
 ok $req->upload('upload')->move_to($file), 'moved file';
 ok unlink($file), 'unlinked file';
 is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';

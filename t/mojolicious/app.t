@@ -12,7 +12,7 @@ use Test::More tests => 280;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use File::Spec;
+use File::Spec::Functions 'catdir';
 use Mojo::Date;
 use Mojo::Transaction::HTTP;
 use Mojolicious;
@@ -218,7 +218,7 @@ $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
   ->content_like(qr/Page not found/);
 
 # Check Last-Modified header for static files
-my $path  = File::Spec->catdir($FindBin::Bin, 'public_dev', 'hello.txt');
+my $path  = catdir($FindBin::Bin, 'public_dev', 'hello.txt');
 my $size  = (stat $path)[7];
 my $mtime = Mojo::Date->new((stat $path)[9])->to_string;
 

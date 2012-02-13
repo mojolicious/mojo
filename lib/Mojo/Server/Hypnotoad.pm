@@ -5,7 +5,7 @@ use Carp 'croak';
 use Cwd 'abs_path';
 use Fcntl ':flock';
 use File::Basename 'dirname';
-use File::Spec;
+use File::Spec::Functions qw/catfile tmpdir/;
 use IO::File;
 use IO::Poll 'POLLIN';
 use List::Util 'shuffle';
@@ -147,13 +147,10 @@ sub _config {
   $c->{graceful_timeout}   ||= 30;
   $c->{heartbeat_interval} ||= 5;
   $c->{heartbeat_timeout}  ||= 10;
-  $c->{lock_file}
-    ||= File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    'hypnotoad.lock');
+  $c->{lock_file} ||= catfile($ENV{MOJO_TMPDIR} || tmpdir, 'hypnotoad.lock');
   $c->{lock_file} .= ".$$";
   $c->{lock_timeout} ||= '0.5';
-  $c->{pid_file}
-    ||= File::Spec->catfile(dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid');
+  $c->{pid_file} ||= catfile(dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid');
   $c->{upgrade_timeout} ||= 60;
   $c->{workers}         ||= 4;
 

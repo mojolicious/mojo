@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use Test::More tests => 32;
 
 use Cwd 'cwd';
-use File::Spec;
+use File::Spec::Functions 'catdir';
 use File::Temp;
 
 # "My cat's breath smells like cat food."
@@ -92,7 +92,7 @@ my $cwd = cwd;
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 chdir $dir;
 $command->create_rel_dir('foo/bar');
-ok -d File::Spec->catdir($dir, qw/foo bar/), 'directory exists';
+ok -d catdir($dir, qw/foo bar/), 'directory exists';
 my $template = "@@ foo_bar\njust <%= 'works' %>!\n";
 open $data, '<', \$template;
 no strict 'refs';

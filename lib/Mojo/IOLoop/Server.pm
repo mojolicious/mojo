@@ -2,7 +2,7 @@ package Mojo::IOLoop::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use File::Spec;
+use File::Spec::Functions qw/catfile tmpdir/;
 use IO::File;
 use IO::Socket::INET;
 use Scalar::Util 'weaken';
@@ -206,8 +206,7 @@ sub _cert_file {
   return $cert if $cert && -r $cert;
 
   # Create temporary TLS cert file
-  $cert = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    "mojocert-$$.pem");
+  $cert = catfile $ENV{MOJO_TMPDIR} || tmpdir, "mojocert-$$.pem";
   croak qq/Can't create temporary TLS cert file "$cert"/
     unless my $file = IO::File->new("> $cert");
   print $file CERT;
@@ -223,8 +222,7 @@ sub _key_file {
   return $key if $key && -r $key;
 
   # Create temporary TLS key file
-  $key = File::Spec->catfile($ENV{MOJO_TMPDIR} || File::Spec->tmpdir,
-    "mojokey-$$.pem");
+  $key = catfile $ENV{MOJO_TMPDIR} || tmpdir, "mojokey-$$.pem";
   croak qq/Can't create temporary TLS key file "$key"/
     unless my $file = IO::File->new("> $key");
   print $file KEY;

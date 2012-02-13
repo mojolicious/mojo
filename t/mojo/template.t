@@ -19,7 +19,7 @@ use utf8;
 
 use Test::More tests => 199;
 
-use File::Spec;
+use File::Spec::Functions qw/catfile splitdir/;
 use File::Temp;
 use FindBin;
 
@@ -1032,15 +1032,13 @@ EOF
 
 # File
 $mt = Mojo::Template->new;
-my $file =
-  File::Spec->catfile(File::Spec->splitdir($FindBin::Bin), qw/lib test.mt/);
+my $file = catfile(splitdir($FindBin::Bin), qw/lib test.mt/);
 $output = $mt->render_file($file, 3);
 like $output, qr/23\nHello World!/, 'file';
 
 # Exception in file
-$mt   = Mojo::Template->new;
-$file = File::Spec->catfile(File::Spec->splitdir($FindBin::Bin),
-  qw/lib exception.mt/);
+$mt     = Mojo::Template->new;
+$file   = catfile(splitdir($FindBin::Bin), qw/lib exception.mt/);
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/exception\.mt line 2/, 'message contains file name';
@@ -1053,9 +1051,8 @@ is $output->lines_after->[0]->[1], '123', 'right line';
 like "$output", qr/exception\.mt line 2/, 'right result';
 
 # Exception in file (different name)
-$mt   = Mojo::Template->new;
-$file = File::Spec->catfile(File::Spec->splitdir($FindBin::Bin),
-  qw/lib exception.mt/);
+$mt     = Mojo::Template->new;
+$file   = catfile(splitdir($FindBin::Bin), qw/lib exception.mt/);
 $output = $mt->name('foo.mt')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/foo\.mt line 2/, 'message contains file name';
@@ -1072,23 +1069,22 @@ $mt = Mojo::Template->new;
 $mt->tag_start('[$-');
 $mt->tag_end('-$]');
 my $dir = File::Temp::tempdir(CLEANUP => 1);
-$file = File::Spec->catfile($dir, 'test.mt');
+$file = catfile $dir, 'test.mt';
 is $mt->render_to_file(<<"EOF", $file), undef, 'file rendered';
 <% my \$i = 23; %> foo bar
 \x{df}\x{0100}bar\x{263a} <%= \$i %>
 test
 EOF
 $mt = Mojo::Template->new;
-my $file2 = File::Spec->catfile($dir, 'test2.mt');
+my $file2 = catfile $dir, 'test2.mt';
 is $mt->render_file_to_file($file, $file2), undef, 'file rendered to file';
 $mt     = Mojo::Template->new;
 $output = $mt->render_file($file2);
 is $output, " foo bar\n\x{df}\x{0100}bar\x{263a} 23\ntest\n", 'right result';
 
 # Exception with utf8 context
-$mt   = Mojo::Template->new;
-$file = File::Spec->catfile(File::Spec->splitdir($FindBin::Bin),
-  qw/lib utf8_exception.mt/);
+$mt     = Mojo::Template->new;
+$file   = catfile(splitdir($FindBin::Bin), qw/lib utf8_exception.mt/);
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->lines_before->[0]->[1], '☃', 'right line';

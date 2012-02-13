@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use File::Basename 'dirname';
-use File::Spec;
+use File::Spec::Functions 'splitdir';
 
 # "Behold, a time traveling machine.
 #  Time? I can't go back there!
@@ -12,7 +12,7 @@ use File::Spec;
 #  That way you can't accidentally change history or do something disgusting
 #  like sleep with your own grandmother.
 #  I wouldn't want to do that again."
-push @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib');
+push @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib');
 
 # Check if Mojolicious is installed
 die <<EOF unless eval 'use Mojolicious::Commands; 1';

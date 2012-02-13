@@ -1,12 +1,11 @@
 package Mojo::Command;
 use Mojo::Base -base;
 
-require Cwd;
-require File::Path;
-require File::Spec;
-require IO::File;
-
 use Carp 'croak';
+use Cwd 'getcwd';
+use File::Path 'mkpath';
+use File::Spec::Functions qw/catdir catfile splitdir/;
+use IO::File;
 use Mojo::Server;
 use Mojo::Template;
 use Mojo::Loader;
@@ -70,7 +69,7 @@ sub create_dir {
   }
 
   # Create
-  File::Path::mkpath($path) or croak qq/Can't make directory "$path": $!/;
+  mkpath $path or croak qq/Can't make directory "$path": $!/;
   say "  [mkdir] $path" unless $self->quiet;
   return $self;
 }
@@ -142,17 +141,9 @@ sub help {
   exit 0;
 }
 
-sub rel_dir {
-  my ($self, $path) = @_;
-  my @parts = split /\//, $path;
-  return File::Spec->catdir(Cwd::getcwd(), @parts);
-}
+sub rel_dir { catdir(getcwd(), split /\//, pop) }
 
-sub rel_file {
-  my ($self, $path) = @_;
-  my @parts = split /\//, $path;
-  return File::Spec->catfile(Cwd::getcwd(), @parts);
-}
+sub rel_file { catfile(getcwd(), split /\//, pop) }
 
 sub render_data {
   my $self = shift;
@@ -259,9 +250,9 @@ sub write_file {
   my ($self, $path, $data) = @_;
 
   # Directory
-  my @parts = File::Spec->splitdir($path);
+  my @parts = splitdir $path;
   pop @parts;
-  my $dir = File::Spec->catdir(@parts);
+  my $dir = catdir @parts;
   $self->create_dir($dir);
 
   # Write unbuffered

@@ -636,16 +636,15 @@ C<register> is called.
   use Mojo::Base 'Mojolicious::Plugin';
 
   use File::Basename 'dirname';
-  use File::Spec;
-  use Mojo::Home;
+  use File::Spec::Functions 'catdir';
 
   sub register {
     my ($self, $app) = @_;
 
     # Append "templates" and "public" directories
-    my $home = Mojo::Home->new(File::Spec->catdir(dirname(__FILE__)));
-    push @{$app->renderer->paths}, $home->rel_dir('AlertAssets/templates');
-    push @{$app->static->paths}, $home->rel_dir('AlertAssets/public');
+    my $home = catdir(dirname(__FILE__), 'AlertAssets');
+    push @{$app->renderer->paths}, catdir($home, 'templates');
+    push @{$app->static->paths}, catdir($home, 'public');
   }
 
   1;

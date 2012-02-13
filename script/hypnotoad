@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use File::Basename 'dirname';
-use File::Spec;
+use File::Spec::Functions 'splitdir';
 
-push @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib');
-unshift @INC, join('/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib')
+push @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib');
+unshift @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib')
   if $ENV{TEST_HYPNOTOAD};
 
 # Check if Mojolicious is installed

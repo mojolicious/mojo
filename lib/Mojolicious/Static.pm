@@ -216,7 +216,7 @@ Dispatch a L<Mojolicious::Controller> object.
 
   my $success = $static->serve($c, 'foo/bar.html');
 
-Serve a specific file.
+Serve a specific file, relative to C<paths>.
 
 =head1 SEE ALSO
 

@@ -837,8 +837,8 @@ Same as C<render> but returns the rendered result.
   my $success = $c->render_static('images/logo.png');
   my $success = $c->render_static('../lib/MyApp.pm');
 
-Render a static file using L<Mojolicious::Static> relative to the
-C<public> directory of your application.
+Render a static file using L<Mojolicious::Static>, relative to the
+C<public> directories of your application.
 
 =head2 C<render_text>
 

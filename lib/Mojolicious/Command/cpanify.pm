@@ -52,7 +52,7 @@ sub run {
     elsif ($code eq '409') { $message = 'File already exists on CPAN.' }
     die qq/Problem uploading file "$file". ($message)\n/;
   }
-  say 'Upload sucessful!';
+  say 'Upload successful!';
 }
 
 1;

@@ -32,7 +32,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.49';
+our $VERSION  = '2.50';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -359,7 +359,7 @@ session data.
   my $static = $app->static;
   $app       = $app->static(Mojolicious::Static->new);
 
-For serving static assets from your C<public> directory, defaults to a
+For serving static files from your C<public> directories, defaults to a
 L<Mojolicious::Static> object.
 
   # Add another "public" directory

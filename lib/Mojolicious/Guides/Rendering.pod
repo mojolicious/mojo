@@ -32,8 +32,8 @@ C<handler> to C<ep>.
   {name => 'foo', format => 'txt'}          -> 'foo.txt.ep'
   {name => 'foo', handler => 'epl'}         -> 'foo.html.epl'
 
-All templates should be in the C<templates> directory of the application
-or the C<DATA> section of the class C<main>.
+All templates should be in the C<templates> directories of the application or
+the C<DATA> section of the class C<main>.
 
   __DATA__
 

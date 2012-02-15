@@ -5,6 +5,7 @@ use warnings;
 
 use File::Basename 'dirname';
 use File::Spec::Functions 'splitdir';
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 
 push @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib');
 unshift @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib')
@@ -17,10 +18,7 @@ Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
 
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
-
 # "Hey sexy mama, wanna kill all humans?"
-my $toad   = Mojo::Server::Hypnotoad->new;
 my $config = 'hypnotoad.conf';
 my $help;
 GetOptions(
@@ -52,7 +50,7 @@ EOF
 
 # "This is it.
 #  The moment we should've trained for."
-$toad->run($app, $config);
+Mojo::Server::Hypnotoad->new->run($app, $config);
 
 __END__
 

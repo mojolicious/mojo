@@ -5,6 +5,7 @@ use warnings;
 
 use File::Basename 'dirname';
 use File::Spec::Functions 'splitdir';
+use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 
 push @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib');
 unshift @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib')
@@ -17,13 +18,10 @@ Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
 
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
-
 # "Welcome to 'Entertainment And Earth Invasion Tonite'.
 #  Across the galaxy my people are completing the mighty space fleet that
 #  will exterminate the human race!
 #  But first, this news from Tinseltown."
-my $morbo = Mojo::Server::Morbo->new;
 my ($help, @listen, @watch);
 GetOptions(
   'h|help' => sub { $help = 1 },
@@ -57,6 +55,7 @@ EOF
 # "With Halley's Comet out of ice, Earth is experiencing a sudden case of
 #  global warming.
 #  Morbo is pleased but sticky."
+my $morbo = Mojo::Server::Morbo->new;
 $morbo->listen(\@listen) if @listen;
 $morbo->watch(\@watch)   if @watch;
 $morbo->run($app);

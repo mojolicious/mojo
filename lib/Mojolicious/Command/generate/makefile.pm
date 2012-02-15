@@ -9,9 +9,10 @@ has usage       => "usage: $0 generate makefile\n";
 #  And as an environmentalist, I'm against that."
 sub run {
   my $self  = shift;
-  my $class = $ENV{MOJO_APP} || 'MyApp';
-  my $path  = $self->class_to_path($class);
-  my $name  = $self->class_to_file($class);
+  my $class = $ENV{MOJO_APP};
+  $class = 'MyApp' if !$class || ref $class;
+  my $path = $self->class_to_path($class);
+  my $name = $self->class_to_file($class);
   $self->render_to_rel_file('makefile', 'Makefile.PL', $class, $path, $name);
 }
 

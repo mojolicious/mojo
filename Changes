@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.50    2012-02-15 00:00:00
         - Improved documentation.
+        - Fixed small bug in makefile command.
 
 2.49    2012-02-13 00:00:00
         - Deprecated Mojolicious::Renderer->root in favor of

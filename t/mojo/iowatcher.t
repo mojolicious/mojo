@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 57;
+use Test::More tests => 60;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -183,3 +183,27 @@ package main;
 
 # Detection (env)
 is(Mojo::IOWatcher->detect, 'Mojo::IOWatcher::Test', 'right class');
+
+# Watcher in control
+undef $ENV{MOJO_IOWATCHER};
+isa_ok(Mojo::IOLoop->singleton->iowatcher, 'Mojo::IOWatcher', 'right object');
+$port = Mojo::IOLoop->generate_port;
+($server, $client) = '';
+Mojo::IOLoop->server(
+  {port => $port} => sub {
+    my ($loop, $stream) = @_;
+    $stream->write('test', sub { shift->write('321') });
+    $stream->on(read => sub { $server .= pop });
+  }
+);
+Mojo::IOLoop->client(
+  {port => $port} => sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->write('tset', sub { shift->write('123') });
+    $stream->on(read => sub { $client .= pop });
+  }
+);
+Mojo::IOLoop->timer(1 => sub { Mojo::IOLoop->singleton->iowatcher->stop });
+Mojo::IOLoop->singleton->iowatcher->start;
+is $server, 'tset123', 'right content';
+is $client, 'test321', 'right content';

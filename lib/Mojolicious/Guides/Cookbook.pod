@@ -613,6 +613,21 @@ allows L<AnyEvent> to just work.
 
   app->start;
 
+Who actually controls the event loop backend is not important.
+
+  use Mojo::UserAgent;
+  use EV;
+  use AnyEvent;
+
+  # Let AnyEvent take control
+  my $cv = AE::cv;
+  my $ua = Mojo::UserAgent->new;
+  $ua->get('http://search.twitter.com/search.json?q=perl' => sub {
+    my ($ua, $tx) = @_;
+    $cv->send($tx->res->json->{results}->[0]->{text});
+  });
+  say $cv->recv;
+
 =head1 USER AGENT
 
 When we say L<Mojolicious> is a web framework we actually mean it.

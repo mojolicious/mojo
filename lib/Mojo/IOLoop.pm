@@ -36,6 +36,9 @@ sub client {
   my $cb = pop;
   my $args = ref $_[0] ? $_[0] : {@_};
 
+  # Make sure garbage gets collected
+  $self->_cleaner;
+
   # New client
   my $client = $self->client_class->new;
   my $id     = $args->{id} || $self->_id;
@@ -121,6 +124,9 @@ sub server {
   $self = $self->singleton unless ref $self;
   my $cb = pop;
 
+  # Make sure garbage gets collected
+  $self->_cleaner;
+
   # New server
   my $server = $self->server_class->new;
   my $id     = $self->_id;
@@ -158,43 +164,23 @@ sub singleton { state $loop ||= shift->SUPER::new }
 sub start {
   my $self = shift;
   $self = $self->singleton unless ref $self;
-
-  # Check if we are already running
   croak 'Mojo::IOLoop already running' if $self->{running}++;
-
-  # Mainloop
-  my $id = $self->recurring(
-    '0.025' => sub {
-      my $self = shift;
-
-      # Manage connections
-      $self->_listening;
-      my $connections = $self->{connections} ||= {};
-      while (my ($id, $c) = each %$connections) {
-        $self->_drop($id)
-          if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
-      }
-
-      # Graceful shutdown
-      $self->stop if $self->max_connections == 0 && keys %$connections == 0;
-    }
-  );
   $self->iowatcher->start;
-  $self->drop($id);
-
   return $self;
 }
 
 sub stop {
   my $self = shift;
   $self = $self->singleton unless ref $self;
-  delete $self->{running};
-  $self->iowatcher->stop;
+  $self->iowatcher->stop if delete $self->{running};
 }
 
 sub stream {
   my $self = shift;
   $self = $self->singleton unless ref $self;
+
+  # Make sure garbage gets collected
+  $self->_cleaner;
 
   # Find stream for id
   my $stream = shift;
@@ -223,6 +209,26 @@ sub timer {
   $self = $self->singleton unless ref $self;
   weaken $self;
   return $self->iowatcher->timer($after => sub { $self->$cb(pop) });
+}
+
+sub _cleaner {
+  my $self = shift;
+  $self->{cleaner} ||= $self->recurring(
+    '0.025' => sub {
+      my $self = shift;
+
+      # Manage connections
+      $self->_listening;
+      my $connections = $self->{connections} ||= {};
+      while (my ($id, $c) = each %$connections) {
+        $self->_drop($id)
+          if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
+      }
+
+      # Graceful shutdown
+      $self->stop if $self->max_connections == 0 && keys %$connections == 0;
+    }
+  );
 }
 
 sub _drop {

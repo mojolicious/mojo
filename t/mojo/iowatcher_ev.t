@@ -8,7 +8,7 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 57;
+plan tests => 60;
 
 use IO::Socket::INET;
 use Mojo::IOLoop;
@@ -184,3 +184,28 @@ package main;
 
 # Detection (env)
 is(Mojo::IOWatcher->detect, 'Mojo::IOWatcher::Test', 'right class');
+
+# EV in control
+undef $ENV{MOJO_IOWATCHER};
+isa_ok(Mojo::IOLoop->singleton->iowatcher,
+  'Mojo::IOWatcher::EV', 'right object');
+$port = Mojo::IOLoop->generate_port;
+($server, $client) = '';
+Mojo::IOLoop->server(
+  {port => $port} => sub {
+    my ($loop, $stream) = @_;
+    $stream->write('test', sub { shift->write('321') });
+    $stream->on(read => sub { $server .= pop });
+  }
+);
+Mojo::IOLoop->client(
+  {port => $port} => sub {
+    my ($loop, $err, $stream) = @_;
+    $stream->write('tset', sub { shift->write('123') });
+    $stream->on(read => sub { $client .= pop });
+  }
+);
+Mojo::IOLoop->timer(1 => sub { EV::break(EV::BREAK_ONE()) });
+EV::run();
+is $server, 'tset123', 'right content';
+is $client, 'test321', 'right content';

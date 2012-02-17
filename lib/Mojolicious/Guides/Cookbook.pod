@@ -251,7 +251,7 @@ into alien environments like foreign event loops.
     $self->render(text => 'Hello World!');
   };
 
-  # Connect application with custom daemon and start accepting connections
+  # Connect application with web server and start accepting connections
   my $daemon =
     Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
   $daemon->start;
@@ -619,7 +619,7 @@ Who actually controls the event loop backend is not important.
   use EV;
   use AnyEvent;
 
-  # Let AnyEvent take control
+  # Search Twitter for "perl"
   my $cv = AE::cv;
   my $ua = Mojo::UserAgent->new;
   $ua->get('http://search.twitter.com/search.json?q=perl' => sub {
@@ -627,6 +627,22 @@ Who actually controls the event loop backend is not important.
     $cv->send($tx->res->json->{results}->[0]->{text});
   });
   say $cv->recv;
+
+You could for example just embed the built-in web server into an L<AnyEvent>
+application.
+
+  use Mojolicious::Lite;
+  use Mojo::Server::Daemon;
+  use EV;
+  use AnyEvent;
+
+  get '/' => {text => 'Hello World!'};
+
+  # Start web server and let AnyEvent take control
+  my $daemon =
+    Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
+  $daemon->start;
+  AE::cv->recv;
 
 =head1 USER AGENT
 

@@ -99,8 +99,7 @@ sub generate_port { Mojo::IOLoop::Server->generate_port }
 
 sub is_running {
   my $self = shift;
-  $self = $self->singleton unless ref $self;
-  return $self->{running};
+  return (ref $self ? $self : $self->singleton)->iowatcher->is_running;
 }
 
 sub one_tick {

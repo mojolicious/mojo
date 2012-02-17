@@ -11,6 +11,8 @@ sub DESTROY { undef $EV }
 # We have to fall back to Mojo::IOWatcher, since EV is unique
 sub new { $EV++ ? Mojo::IOWatcher->new : shift->SUPER::new }
 
+sub is_running {EV::depth}
+
 sub recurring { shift->_timer(shift, 1, @_) }
 
 # "Wow, Barney. You brought a whole beer keg.
@@ -102,6 +104,12 @@ implements the following new ones.
   my $watcher = Mojo::IOWatcher::EV->new;
 
 Construct a new L<Mojo::IOWatcher::EV> object.
+
+=head2 C<is_running>
+
+  my $success = $watcher->is_running;
+
+Check if watcher is running.
 
 =head2 C<recurring>
 

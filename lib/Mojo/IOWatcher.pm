@@ -45,6 +45,8 @@ sub is_readable {
   return !!$result;
 }
 
+sub is_running { shift->{running} }
+
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
 sub recurring { shift->_timer(pop, after => pop, recurring => time) }
 
@@ -205,6 +207,12 @@ readable or writable.
 
 Quick check if a handle is readable, useful for identifying tainted
 sockets.
+
+=head2 C<is_running>
+
+  my $success = $watcher->is_running;
+
+Check if watcher is running.
 
 =head2 C<recurring>
 

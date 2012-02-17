@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 33;
+use Test::More tests => 35;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -250,6 +250,20 @@ is $server_before, $server_after, 'stream has been paused';
 ok length($server) > length($server_after), 'stream has been resumed';
 is $client, $client_after, 'stream was writable while paused';
 is $client, 'works!', 'full message has been written';
+
+# Graceful shutdown
+$err = '';
+$loop = Mojo::IOLoop->new(max_connections => 0);
+$loop->drop($loop->client({port => $loop->generate_port}));
+$loop->timer(
+  1 => sub {
+    shift->stop;
+    $err = 'failed!';
+  }
+);
+$loop->start;
+ok !$err, 'no error';
+is $loop->max_connections, 0, 'right value';
 
 # Defaults
 is Mojo::IOLoop::Client->new->iowatcher, Mojo::IOLoop->singleton->iowatcher,

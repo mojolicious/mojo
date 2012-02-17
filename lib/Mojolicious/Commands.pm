@@ -103,23 +103,11 @@ List available options for generator command with short descriptions.
 Generate application directory structure for a fully functional
 L<Mojolicious> application.
 
-=head2 C<generate gitignore>
-
-  $ mojo generate gitignore
-
-Generate C<.gitignore> file.
-
 =head2 C<generate lite_app>
 
   $ mojo generate lite_app
 
 Generate a fully functional L<Mojolicious::Lite> application.
-
-=head2 C<generate makefile>
-
-  $ mojo generate makefile
-
-Generate C<Makefile.PL> file for application.
 
 =head2 C<get>
 

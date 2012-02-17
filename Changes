@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::IOWatcher::EV.
         - Added file upload support to param method in
           Mojolicious::Controller.
+        - Removed gitignore and makefile commands.
         - Improved Mojo::IOLoop to be controllable from foreign event loops.
         - Improved protection from excessively large form values in
           Mojo::Message.

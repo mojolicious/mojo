@@ -11,6 +11,8 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::Message.
         - Improved resilience of Mojo::IOLoop::Client.
         - Improved documentation.
+        - Fixed inconsistency between expressions and escaped expressions in
+          Mojo::Template.
         - Fixed small bugs in makefile command. (tempire, marcus, sri)
 
 2.49    2012-02-13 00:00:00

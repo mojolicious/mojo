@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 199;
+use Test::More tests => 200;
 
 use File::Spec::Functions qw/catfile splitdir/;
 use File::Temp;
@@ -27,9 +27,14 @@ use FindBin;
 #  like God must feel when he's holding a gun."
 use_ok 'Mojo::Template';
 
-# Trim tag
+# Consistent scalar context
 my $mt     = Mojo::Template->new;
-my $output = $mt->render(" ♥    <%= 'test♥' =%> \n");
+my $output = $mt->render('<%= @{[qw/a b c/]} %>:<%== @{[qw/a b c/]} %>');
+is $output, "3:3\n", 'same context';
+
+# Trim tag
+$mt     = Mojo::Template->new;
+$output = $mt->render(" ♥    <%= 'test♥' =%> \n");
 is $output, ' ♥test♥', 'tag trimmed';
 
 # Trim expression

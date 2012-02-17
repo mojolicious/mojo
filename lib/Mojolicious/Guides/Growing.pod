@@ -267,7 +267,8 @@ L<Mojolicious> to make our C<model> available to all actions and templates.
   app->start;
 
 The C<param> method of our L<Mojolicious::Controller> instance is used to
-access query parameters, POST parameters and route placeholders, all at once.
+access query parameters, POST parameters, file uploads and route
+placeholders, all at once.
 
 =head2 Testing
 

@@ -3,7 +3,11 @@ This file documents the revision history for Perl extension Mojolicious.
 2.50    2012-02-17 00:00:00
         - Added EXPERIMENTAL is_running method to Mojo::IOWatcher and
           Mojo::IOWatcher::EV.
+        - Added file upload support to param method in
+          Mojolicious::Controller.
         - Improved Mojo::IOLoop to be controllable from foreign event loops.
+        - Improved protection from excessively large form values in
+          Mojo::Message.
         - Improved resilience of Mojo::IOLoop::Client.
         - Improved documentation.
         - Fixed small bug in makefile command.

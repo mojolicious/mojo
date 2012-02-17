@@ -151,9 +151,11 @@ sub param {
 
   # List
   my $p = $self->stash->{'mojo.captures'} || {};
+  my $req = $self->req;
   unless (defined $name) {
     my %seen;
-    my @keys = grep { !$seen{$_}++ } $self->req->param;
+    my @keys = grep { !$seen{$_}++ } $req->param;
+    push @keys, grep { !$seen{$_}++ } map { $_->name } @{$req->uploads};
     push @keys, grep { !$RESERVED{$_} && !$seen{$_}++ } keys %$p;
     return sort @keys;
   }
@@ -167,8 +169,12 @@ sub param {
   # Captured unreserved value
   return $p->{$name} if !$RESERVED{$name} && exists $p->{$name};
 
+  # Upload
+  my $upload = $req->upload($name);
+  return $upload if $upload;
+
   # Param value
-  return $self->req->param($name);
+  return $req->param($name);
 }
 
 # "Is there an app for kissing my shiny metal ass?
@@ -728,14 +734,17 @@ or L<Mojo::Transaction::WebSocket> object.
   my @foo   = $c->param('foo');
   $c        = $c->param(foo => 'ba;r');
 
-Access GET/POST parameters and route captures that are not reserved stash
-values.
+Access GET/POST parameters, file uploads and route captures that are not
+reserved stash values.
 
   # Only GET parameters
   my $foo = $c->req->url->query->param('foo');
 
   # Only GET and POST parameters
   my $foo = $c->req->param('foo');
+
+  # Only file uploads
+  my $foo = $c->req->upload('foo');
 
 =head2 C<redirect_to>
 

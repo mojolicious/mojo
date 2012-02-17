@@ -1976,16 +1976,16 @@ $dom = Mojo::DOM->new(<<EOF);
   <head><meta http-equiv="content-type" content="text/html"></head>
 </html>
 EOF
-is $dom->find('[http-equiv]')->[0]->{content}, 'text/html', 'rigth attribute';
+is $dom->find('[http-equiv]')->[0]->{content}, 'text/html', 'right attribute';
 is $dom->find('[http-equiv]')->[1], undef, 'no result';
 is $dom->find('[http-equiv="content-type"]')->[0]->{content}, 'text/html',
-  'rigth attribute';
+  'right attribute';
 is $dom->find('[http-equiv="content-type"]')->[1], undef, 'no result';
 is $dom->find('[http-equiv^="content-"]')->[0]->{content}, 'text/html',
-  'rigth attribute';
+  'right attribute';
 is $dom->find('[http-equiv^="content-"]')->[1], undef, 'no result';
 is $dom->find('head > [http-equiv$="-type"]')->[0]->{content}, 'text/html',
-  'rigth attribute';
+  'right attribute';
 is $dom->find('head > [http-equiv$="-type"]')->[1], undef, 'no result';
 
 # Find "0" attribute value

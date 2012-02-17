@@ -76,7 +76,8 @@ sub body_params {
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
   my $type = $self->headers->content_type || '';
   if ($type =~ m#(?:x-application|application/x-www-form)-urlencoded#i) {
-    $params->parse($self->content->asset->slurp);
+    return $params if (my $asset = $self->content->asset)->is_file;
+    $params->parse($asset->slurp);
   }
 
   # "multipart/formdata"
@@ -258,11 +259,7 @@ sub get_start_line_chunk {
 
 sub has_leftovers { shift->content->has_leftovers }
 
-sub header_size {
-  my $self = shift;
-  $self->fix_headers;
-  return $self->content->header_size;
-}
+sub header_size { shift->fix_headers->content->header_size }
 
 sub headers { shift->content->headers(@_) }
 
@@ -292,8 +289,7 @@ sub max_line_size { shift->headers->max_line_size(@_) }
 
 sub param {
   my $self = shift;
-  $self->{body_params} ||= $self->body_params;
-  return $self->{body_params}->param(@_);
+  return ($self->{body_params} ||= $self->body_params)->param(@_);
 }
 
 sub parse            { shift->_parse(0, @_) }
@@ -484,7 +480,8 @@ sub _parse_formdata {
 
     # Form value
     unless (defined $filename) {
-      $value = $part->asset->slurp;
+      next if (my $asset = $part->asset)->is_file;
+      $value = $asset->slurp;
       $value = decode($charset, $value) // $value
         if $charset && !$part->headers->content_transfer_encoding;
     }

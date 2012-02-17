@@ -97,8 +97,7 @@ sub is_xhr {
 
 sub param {
   my $self = shift;
-  $self->{params} = $self->params unless $self->{params};
-  return $self->{params}->param(@_);
+  return ($self->{params} ||= $self->params)->param(@_);
 }
 
 sub params {

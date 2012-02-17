@@ -17,20 +17,21 @@ use Test::Mojo;
 # POST /upload
 post '/upload' => sub {
   my $self = shift;
-  my $file = $self->req->upload('file');
+  my $file = $self->param('file');
   my $h    = $file->headers;
   $self->render_text($file->filename
       . $file->asset->slurp
       . $self->param('test')
       . $h->content_type
-      . ($h->header('X-X') || ''));
+      . ($h->header('X-X') || '')
+      . join(',', $self->param));
 };
 
 # POST /multi_reverse
 post '/multi_reverse' => sub {
   my $self  = shift;
-  my $file2 = $self->req->upload('file2');
-  my $file1 = $self->req->upload('file1');
+  my $file2 = $self->param('file2');
+  my $file1 = $self->param('file1');
   $self->render_text($file1->filename
       . $file1->asset->slurp
       . $file2->filename
@@ -40,8 +41,8 @@ post '/multi_reverse' => sub {
 # POST /multi
 post '/multi' => sub {
   my $self  = shift;
-  my $file1 = $self->req->upload('file1');
-  my $file2 = $self->req->upload('file2');
+  my $file1 = $self->param('file1');
+  my $file2 = $self->param('file2');
   $self->render_text($file1->filename
       . $file1->asset->slurp
       . $file2->filename
@@ -54,20 +55,22 @@ my $t = Test::Mojo->new;
 my $file = Mojo::Asset::File->new->add_chunk('lalala');
 $t->post_form_ok('/upload',
   {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
-  ->content_is('xlalalatsetapplication/octet-stream');
+  ->content_is('xlalalatsetapplication/octet-streamfile,test');
 
 # POST /upload (path)
 $t->post_form_ok('/upload', {file => {file => $file->path}, test => 'foo'})
-  ->status_is(200)->content_like(qr#lalalafooapplication/octet-stream$#);
+  ->status_is(200)
+  ->content_like(qr#lalalafooapplication/octet-streamfile,test$#);
 
 # POST /upload (memory)
 $t->post_form_ok('/upload', {file => {content => 'alalal'}, test => 'tset'})
-  ->status_is(200)->content_is('filealalaltsetapplication/octet-stream');
+  ->status_is(200)
+  ->content_is('filealalaltsetapplication/octet-streamfile,test');
 
 # POST /upload (memory with headers)
 my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
 $t->post_form_ok('/upload', {file => $hash, test => 'tset'})->status_is(200)
-  ->content_is('filealalaltsetfoo/barY');
+  ->content_is('filealalaltsetfoo/barYfile,test');
 
 # POST /multi_reverse
 $t->post_form_ok('/multi_reverse',

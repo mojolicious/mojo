@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 930;
+use Test::More tests => 962;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -609,8 +609,30 @@ is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
 is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->body_params->to_hash->{foo}, [qw/bar bar/], 'right values';
-is_deeply $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
+is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
 is_deeply $req->params->to_hash->{foo}, [qw/bar bar 13/], 'right values';
+
+# Parse HTTP 1.1 "x-application-urlencoded" (too big for memory)
+$req = Mojo::Message::Request->new;
+$req->content->asset->max_memory_size(10);
+$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 26\x0d\x0a");
+$req->parse("Content-Type: x-application-urlencoded\x0d\x0a\x0d\x0a");
+$req->parse('foo=bar& tset=23+;&foo=bar');
+ok $req->is_finished, 'request is finished';
+is $req->method,      'POST', 'right method';
+is $req->version,     '1.1', 'right version';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
+is $req->headers->content_type,
+  'x-application-urlencoded', 'right "Content-Type" value';
+is $req->content->asset->size, 26, 'right size';
+is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
+is $req->body_params, '', 'no parameters';
+is $req->body_params->to_hash->{foo}, undef, 'no values';
+is $req->body_params->to_hash->{' tset'}, undef, 'no value';
+is $req->params->to_hash->{foo}, 13, 'right values';
 
 # Parse HTTP 1.1 "application/x-www-form-urlencoded"
 $req = Mojo::Message::Request->new;
@@ -631,15 +653,15 @@ is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar&+tset=23+;&foo=bar', 'right content';
 is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->body_params->to_hash->{foo}, [qw/bar bar/], 'right values';
-is_deeply $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
+is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
 is_deeply $req->params->to_hash->{foo}, [qw/bar bar 13/], 'right values';
 is_deeply [$req->param('foo')], [qw/bar bar 13/], 'right values';
-is_deeply $req->param(' tset'), '23 ', 'right value';
+is $req->param(' tset'), '23 ', 'right value';
 $req->param('set', 'single');
-is_deeply $req->param('set'), 'single', 'setting single param works';
+is $req->param('set'), 'single', 'setting single param works';
 $req->param('multi', 1, 2, 3);
-is_deeply [$req->param('multi')],
-  [qw/1 2 3/], 'setting multiple value param works';
+is_deeply [$req->param('multi')], [qw/1 2 3/],
+  'setting multiple value param works';
 is $req->param('test23'), undef, 'no value';
 
 # Parse HTTP 1.1 chunked request with trailing headers
@@ -788,9 +810,8 @@ isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
-is_deeply $req->body_params->to_hash->{text1}, "hallo welt test123\n",
-  'right value';
-is_deeply $req->body_params->to_hash->{text2}, '', 'right value';
+is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
+is $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename,  'hello.pl',            'right filename';
 isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
@@ -799,6 +820,65 @@ my $file =
 ok $req->upload('upload')->move_to($file), 'moved file';
 ok unlink($file), 'unlinked file';
 is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';
+
+# Parse HTTP 1.1 multipart request (too big for memory)
+$req = Mojo::Message::Request->new;
+$req->content->on(
+  body => sub {
+    my $single = shift;
+    $single->on(
+      upgrade => sub {
+        my ($single, $multi) = @_;
+        $multi->on(
+          part => sub {
+            my ($multi, $part) = @_;
+            $part->asset->max_memory_size(5);
+          }
+        );
+      }
+    );
+  }
+);
+$req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
+$req->parse("Content-Length: 418\x0d\x0a");
+$req->parse('Content-Type: multipart/form-data; bo');
+$req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
+$req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$req->parse("Content-Disposition: form-data; name=\"text1\"\x0d\x0a");
+$req->parse("\x0d\x0ahallo welt test123\n");
+$req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$req->parse("Content-Disposition: form-data; name=\"text2\"\x0d\x0a");
+$req->parse("\x0d\x0a\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$req->parse('Content-Disposition: form-data; name="upload"; file');
+$req->parse("name=\"hello.pl\"\x0d\x0a");
+$req->parse("Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+$req->parse("#!/usr/bin/perl\n\n");
+$req->parse("use strict;\n");
+$req->parse("use warnings;\n\n");
+$req->parse("print \"Hello World :)\\n\"\n");
+$req->parse("\x0d\x0a------------0xKhTmLbOuNdArY--");
+ok $req->is_finished,  'request is finished';
+ok $req->is_multipart, 'multipart content';
+is $req->method,       'GET', 'right method';
+is $req->version,      '1.1', 'right version';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
+is $req->url, '/foo/bar/baz.html?foo13#23', 'right URL';
+is $req->query_params, 'foo13', 'right parameters';
+is $req->headers->content_type,
+  'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
+  'right "Content-Type" value';
+is $req->headers->content_length, 418, 'right "Content-Type" value';
+isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
+isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
+isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
+is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
+  'right content';
+is $req->body_params->to_hash->{text1}, undef, 'no value';
+is $req->body_params->to_hash->{text2}, '',    'right value';
+is $req->upload('upload')->filename,  'hello.pl',          'right filename';
+isa_ok $req->upload('upload')->asset, 'Mojo::Asset::File', 'right file';
+is $req->upload('upload')->asset->size, 69, 'right size';
 
 # Parse HTTP 1.1 multipart request (with callbacks and stream)
 $req = Mojo::Message::Request->new;
@@ -871,9 +951,8 @@ isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
-is_deeply $req->body_params->to_hash->{text1}, "hallo welt test123\n",
-  'right value';
-is_deeply $req->body_params->to_hash->{text2}, '', 'right value';
+is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
+is $req->body_params->to_hash->{text2}, '', 'right value';
 is $stream,
     "#!/usr/bin/perl\n\n"
   . "use strict;\n"
@@ -1670,7 +1749,7 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
     . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
     . "\x0d\x0a");
 ok $req->is_finished, 'request is finished';
-is_deeply $req->param('Vorname'), 'T', 'right value';
+is $req->param('Vorname'), 'T', 'right value';
 
 # Google Chrome multipart/form-data request
 $req = Mojo::Message::Request->new;

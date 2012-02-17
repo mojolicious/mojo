@@ -246,10 +246,7 @@ into alien environments like foreign event loops.
   use Mojo::Server::Daemon;
 
   # Normal action
-  get '/' => sub {
-    my $self = shift;
-    $self->render(text => 'Hello World!');
-  };
+  get '/' => {text => 'Hello World!'};
 
   # Connect application with web server and start accepting connections
   my $daemon =
@@ -636,12 +633,15 @@ application.
   use EV;
   use AnyEvent;
 
+  # Normal action
   get '/' => {text => 'Hello World!'};
 
-  # Start web server and let AnyEvent take control
+  # Connect application with web server and start accepting connections
   my $daemon =
     Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
   $daemon->start;
+
+  # Let AnyEvent take control
   AE::cv->recv;
 
 =head1 USER AGENT

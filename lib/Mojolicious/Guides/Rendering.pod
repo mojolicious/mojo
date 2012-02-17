@@ -38,10 +38,12 @@ the C<DATA> section of the class C<main>.
   __DATA__
 
   @@ time.html.ep
+  % use Time::Piece;
+  % my $now = localtime;
   <!DOCTYPE html>
   <html>
     <head><title>Time</title></head>
-    <body><%= localtime time %></body>
+    <body>The time is <%= $now->hms %>.</body>
   </html>
 
   @@ hello.txt.ep
@@ -514,8 +516,9 @@ helper you can go one step further and prevent template blocks from getting
 executed more than once.
 
   @@ cached.html.ep
+  % use Time::Piece;
   %= memorize begin
-    This template was compiled at <%= localtime time %>.
+    This template was compiled at <%= localtime->hms %>.
   % end
 
 =head2 Adding helpers

@@ -1063,6 +1063,7 @@ get automatically installed with the modules.
 That's really everything, now you can package your application like any other
 CPAN module.
 
+  $ ./script/my_mojolicious_app generate makefile
   $ perl Makefile.PL
   $ make test
   $ make manifest

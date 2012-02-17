@@ -109,6 +109,12 @@ L<Mojolicious> application.
 
 Generate a fully functional L<Mojolicious::Lite> application.
 
+=head2 C<generate makefile>
+
+  $ mojo generate makefile
+
+Generate C<Makefile.PL> file for application.
+
 =head2 C<get>
 
   $ mojo get http://mojolicio.us

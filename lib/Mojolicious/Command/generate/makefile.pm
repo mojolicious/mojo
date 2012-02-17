@@ -7,32 +7,21 @@ has usage       => "usage: $0 generate makefile\n";
 # "If we don't go back there and make that event happen,
 #  the entire universe will be destroyed...
 #  And as an environmentalist, I'm against that."
-sub run {
-  my $self  = shift;
-  my $class = $ENV{MOJO_APP};
-  $class = 'MyApp' if !$class || ref $class;
-  my $path = $self->class_to_path($class);
-  my $name = $self->class_to_file($class);
-  $self->render_to_rel_file('makefile', 'Makefile.PL', $class, $path, $name);
-}
+sub run { shift->render_to_rel_file('makefile', 'Makefile.PL') }
 
 1;
 __DATA__
 
 @@ makefile
-% my ($class, $path, $name) = @_;
 use strict;
 use warnings;
 
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-  NAME         => '<%= $class %>',
-  VERSION_FROM => 'lib/<%= $path %>',
-  AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-  EXE_FILES    => ['script/<%= $name %>'],
-  PREREQ_PM    => {'Mojolicious' => '2.0'},
-  test         => {TESTS => 't/*.t'}
+  VERSION   => '0.01',
+  PREREQ_PM => {'Mojolicious' => '2.50'},
+  test      => {TESTS => 't/*.t'}
 );
 
 __END__

@@ -108,7 +108,7 @@ WriteMakefile(
   NAME         => '<%= $class %>',
   VERSION_FROM => 'lib/<%= $path %>',
   AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-  PREREQ_PM    => {'Mojolicious' => '2.0'},
+  PREREQ_PM    => {'Mojolicious' => '2.50'},
   test         => {TESTS => 't/*.t'}
 );
 

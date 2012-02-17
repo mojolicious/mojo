@@ -32,12 +32,14 @@ sub connect {
   $args->{address} ||= '127.0.0.1';
   $args->{address} = '127.0.0.1' if $args->{address} eq 'localhost';
   weaken $self;
-  $self->iowatcher->timer(0 => sub { $self->_connect($args) });
+  $self->{delay} =
+    $self->iowatcher->timer(0 => sub { $self->_connect($args) });
 }
 
 sub _cleanup {
   my $self = shift;
   return unless my $watcher = $self->{iowatcher};
+  $watcher->drop(delete $self->{delay})  if $self->{delay};
   $watcher->drop(delete $self->{timer})  if $self->{timer};
   $watcher->drop(delete $self->{handle}) if $self->{handle};
 }

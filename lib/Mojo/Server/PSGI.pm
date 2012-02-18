@@ -110,7 +110,7 @@ Mojo::Server::PSGI - PSGI server
     # Resume transaction
     $tx->resume;
   });
-  $psgi->to_psgi;
+  my $app = $psgi->to_psgi;
 
 =head1 DESCRIPTION
 

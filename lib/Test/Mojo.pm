@@ -455,7 +455,7 @@ Alias for L<Mojo::UserAgent/"app">.
   # Change log level
   $t->app->log->level('fatal');
 
-  # Increase inactivity timeout for all connections
+  # Disable inactivity timeout for all connections
   $t->app->hook(after_build_tx => sub {
     my ($tx, $app) = @_;
     $tx->on(connection => sub {

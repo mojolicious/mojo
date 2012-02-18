@@ -460,7 +460,8 @@ Alias for L<Mojo::UserAgent/"app">.
     my ($tx, $app) = @_;
     $tx->on(connection => sub {
       my ($tx, $id) = @_;
-      Mojo::IOLoop->stream($id)->timeout(0) });
+      Mojo::IOLoop->stream($id)->timeout(0);
+    });
   });
 
 =head2 C<content_is>

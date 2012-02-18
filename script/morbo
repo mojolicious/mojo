@@ -9,9 +9,8 @@ use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
 
 # Source directory has precedence
 my @base = (splitdir(dirname(__FILE__)), '..');
--e catdir(@base, 't')
-  ? unshift(@INC, join('/', @base, 'lib'))
-  : push(@INC, join('/', @base, 'lib'));
+my $lib = join('/', @base, 'lib');
+-e catdir(@base, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
 
 # Check if Mojolicious is installed
 die <<EOF unless eval 'use Mojo::Server::Morbo; 1';

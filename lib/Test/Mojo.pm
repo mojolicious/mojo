@@ -452,9 +452,16 @@ Construct a new L<Test::Mojo> object.
 
 Alias for L<Mojo::UserAgent/"app">.
 
-  my $secret = $t->app->secret;
+  # Change log level
   $t->app->log->level('fatal');
-  $t->app->defaults(testing => 'oh yea!');
+
+  # Increase inactivity timeout for all connections
+  $t->app->hook(after_build_tx => sub {
+    my ($tx, $app) = @_;
+    $tx->on(connection => sub {
+      my ($tx, $id) = @_;
+      Mojo::IOLoop->stream($id)->timeout(0) });
+  });
 
 =head2 C<content_is>
 

@@ -655,9 +655,13 @@ environments.
   use warnings;
 
   use File::Basename 'dirname';
-  use File::Spec::Functions 'splitdir';
+  use File::Spec::Functions qw/catfile splitdir/;
 
-  push @INC, join('/', splitdir(dirname(__FILE__)), '..', 'lib');
+  # Source directory has precedence
+  my @base = splitdir(dirname(__FILE__));
+  -e catfile(@base, '..', 'Makefile.PL')
+    ? unshift(@INC, join('/', @base, '..', 'lib'))
+    : push(@INC, join('/', @base, '..', 'lib'));
 
   # Check if Mojolicious is installed
   die <<EOF unless eval 'use Mojolicious::Commands; 1';

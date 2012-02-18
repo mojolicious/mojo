@@ -94,11 +94,11 @@ sub build {
           my $a = $self->auto_escape;
           if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
             $lines[-1] .= "\$_M .= escape";
-            $lines[-1] .= " +$value" if length $value;
+            $lines[-1] .= " scalar $value" if length $value;
           }
 
           # Raw
-          else { $lines[-1] .= "\$_M .= $value" }
+          else { $lines[-1] .= "\$_M .= scalar $value" }
         }
 
         # Multiline

@@ -28,11 +28,9 @@ use FindBin;
 use_ok 'Mojo::Template';
 
 # Consistent scalar context
-my $mt = Mojo::Template->new;
-my $output =
-  $mt->render('<%= localtime 784111777 %>:<%== localtime 784111777 %>');
-is $output, "Sun Nov  6 09:49:37 1994:Sun Nov  6 09:49:37 1994\n",
-  'same context';
+my $mt     = Mojo::Template->new;
+my $output = $mt->render('<%= split /,/, "a,b" %>:<%== split /,/, "a,b" %>');
+is $output, "2:2\n", 'same context';
 
 # Trim tag
 $mt     = Mojo::Template->new;

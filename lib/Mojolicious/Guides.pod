@@ -102,7 +102,7 @@ WebSocket server with support for zero downtime software upgrades
 
 =item L<Mojo::Server::CGI>, L<Mojo::Server::PSGI>
 
-Transparent CGI and PSGI support out of the box.
+Transparent CGI and L<PSGI> support out of the box.
 
 =item L<Mojo::Template>
 

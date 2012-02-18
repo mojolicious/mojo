@@ -153,10 +153,10 @@ automatically detect that it is executed as a C<CGI> script.
 =head2 PSGI/Plack
 
 L<PSGI> is an interface between Perl web frameworks and web servers, and
-L<Plack> is a Perl module and toolkit that contains PSGI middleware, helpers
-and adapters to web servers. L<PSGI> and L<Plack> are inspired by Python's
-WSGI and Ruby's Rack. L<Mojolicious> applications are ridiculously simple to
-deploy with L<Plack>.
+L<Plack> is a Perl module and toolkit that contains L<PSGI> middleware,
+helpers and adapters to web servers. L<PSGI> and L<Plack> are inspired by
+Python's WSGI and Ruby's Rack. L<Mojolicious> applications are ridiculously
+simple to deploy with L<Plack>.
 
   $ plackup ./script/myapp
   HTTP::Server::PSGI: Accepting connections at http://0:5000/

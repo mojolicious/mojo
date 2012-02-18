@@ -49,6 +49,11 @@ sub run {
     \@headers, Mojo::Server::PSGI::_IO->new(tx => $tx)];
 }
 
+sub to_psgi {
+  (my $self = shift)->app;
+  return sub { $self->run(@_) }
+}
+
 # "Wow! Homer must have got one of those robot cars!
 #  *Car crashes in background*
 #  Yeah, one of those AMERICAN robot cars."
@@ -105,7 +110,7 @@ Mojo::Server::PSGI - PSGI server
     # Resume transaction
     $tx->resume;
   });
-  my $app = sub { $psgi->run(@_) };
+  $psgi->to_psgi;
 
 =head1 DESCRIPTION
 
@@ -127,7 +132,14 @@ implements the following new ones.
 
   my $res = $psgi->run($env);
 
-Run PSGI.
+Run L<PSGI>.
+
+=head2 C<to_psgi>
+
+  my $app = $psgi->to_psgi;
+
+Turn L<Mojo> application into L<PSGI> application. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head1 SEE ALSO
 

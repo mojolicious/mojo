@@ -154,16 +154,14 @@ sub handler {
   weaken $c->{tx};
 
   # Dispatcher
-  unless ($self->{dispatcher}) {
+  unless ($self->{dispatch}) {
     $self->hook(
       around_dispatch => sub {
         my ($next, $c) = @_;
-
-        # DEPRECATED in Leaf Fluttering In Wind!
-        $self->on_process->($c->app, $c);
+        $c->app->dispatch($c);
       }
     );
-    $self->{dispatcher}++;
+    $self->{dispatch}++;
   }
 
   # Process
@@ -194,18 +192,6 @@ sub helper {
 #  You're better off dead, I'm tellin' you, dude.
 #  Santa Claus is gunning you down!"
 sub hook { shift->plugins->on(@_) }
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub on_process {
-  my ($self, $cb) = @_;
-  return $self->{on_process} ||= sub { shift->dispatch(@_) }
-    unless $cb;
-  warn <<EOF;
-Mojolicious->on_process is DEPRECATED in favor of the around_dispatch hook!
-EOF
-  $self->{on_process} = $cb;
-  return $self;
-}
 
 sub plugin {
   my $self = shift;
@@ -512,8 +498,7 @@ instance)
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you
-want to continue the chain. Note that this hook is EXPERIMENTAL and might
-change without warning!
+want to continue the chain.
 
   $app->hook(around_dispatch => sub {
     my ($next, $c) = @_;

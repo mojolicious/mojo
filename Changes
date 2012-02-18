@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.51    2012-02-18 00:00:00
+        - Removed experimental status from around_dispatch hook.
+        - Removed experimental status from emit_chain method in
+          Mojolicious::Plugins.
         - Improved portability of scripts.
         - Improved documentation.
 

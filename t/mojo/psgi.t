@@ -34,8 +34,7 @@ post '/params' => sub {
 };
 
 # Binding
-my $psgi    = Mojo::Server::PSGI->new;
-my $app     = sub { $psgi->run(@_) };
+my $app     = Mojo::Server::PSGI->new->to_psgi;
 my $content = 'hello=world';
 open my $body, '<', \$content;
 my $env = {

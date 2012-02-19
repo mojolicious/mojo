@@ -11,9 +11,18 @@ use Test::More tests => 64;
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 use IO::Socket::INET;
-use Mojo::IOLoop;
 
 use_ok 'Mojo::IOWatcher';
+
+# Instantiation
+my $watcher = Mojo::IOWatcher->new;
+is ref $watcher, 'Mojo::IOWatcher', 'right object';
+is ref Mojo::IOWatcher->new, 'Mojo::IOWatcher', 'right object';
+undef $watcher;
+is ref Mojo::IOWatcher->new, 'Mojo::IOWatcher', 'right object';
+require Mojo::IOLoop;
+$watcher = Mojo::IOLoop->singleton->iowatcher;
+is ref $watcher, 'Mojo::IOWatcher', 'right object';
 
 # Listen
 my $port   = Mojo::IOLoop->generate_port;
@@ -23,8 +32,6 @@ my $listen = IO::Socket::INET->new(
   LocalPort => $port,
   Proto     => 'tcp'
 );
-my $watcher = Mojo::IOWatcher->new;
-isa_ok $watcher, 'Mojo::IOWatcher', 'right object';
 my ($readable, $writable);
 $watcher->io($listen => sub { pop() ? $writable++ : $readable++ })
   ->watch($listen, 0, 0)->watch($listen, 1, 1);
@@ -45,9 +52,7 @@ ok $watcher->is_readable($listen), 'handle is readable';
 
 # Accept
 my $server = $listen->accept;
-$watcher = undef;
-$watcher = Mojo::IOWatcher->new;
-isa_ok $watcher, 'Mojo::IOWatcher', 'right object';
+$watcher->drop($listen);
 ($readable, $writable) = undef;
 $watcher->io($client => sub { pop() ? $writable++ : $readable++ });
 $watcher->timer(0 => sub { shift->stop });
@@ -56,9 +61,7 @@ is $readable, undef, 'handle is not readable';
 is $writable, 1,     'handle is writable';
 print $client "hello!\n";
 sleep 1;
-$watcher = undef;
-$watcher = Mojo::IOWatcher->new;
-isa_ok $watcher, 'Mojo::IOWatcher', 'right object';
+$watcher->drop($client);
 ($readable, $writable) = undef;
 $watcher->io($server => sub { pop() ? $writable++ : $readable++ });
 $watcher->watch($server, 1, 0);
@@ -126,15 +129,14 @@ is $timer,     1, 'timer was not triggered';
 is $recurring, 4, 'recurring was not triggered again';
 
 # Reset
-$watcher = undef;
-$watcher = Mojo::IOWatcher->new;
-isa_ok $watcher, 'Mojo::IOWatcher', 'right object';
+$watcher->drop($id);
+$watcher->drop($server);
 $watcher->timer(0 => sub { shift->stop });
 $watcher->start;
 is $readable, 6, 'io event was not triggered again';
 is $writable, 6, 'io event was not triggered again';
 my $watcher2 = Mojo::IOWatcher->new;
-isa_ok $watcher2, 'Mojo::IOWatcher', 'right object';
+is ref $watcher2, 'Mojo::IOWatcher', 'right object';
 
 # Parallel loops
 $timer = 0;
@@ -159,9 +161,8 @@ is $timer,  2, 'timer was not triggered';
 is $timer2, 2, 'timer was triggered';
 
 # Error
-$watcher = Mojo::IOWatcher->new;
 my $err;
-$watcher->on(
+$watcher->unsubscribe('error')->on(
   error => sub {
     shift->stop;
     $err = pop;

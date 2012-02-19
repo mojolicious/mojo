@@ -30,6 +30,9 @@ has stream_class    => 'Mojo::IOLoop::Stream';
 # Ignore PIPE signal
 $SIG{PIPE} = 'IGNORE';
 
+# Initialize singleton watcher early
+__PACKAGE__->singleton->iowatcher;
+
 sub client {
   my $self = shift;
   $self = $self->singleton unless ref $self;

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.52    2012-02-19 00:00:00
+        - Renamed to_psgi method in Mojo::Server::PSGI to to_psgi_app.
         - Improved documentation.
 
 2.51    2012-02-19 00:00:00

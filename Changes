@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Removed experimental status from around_dispatch hook.
         - Removed experimental status from emit_chain method in
           Mojolicious::Plugins.
+        - Removed experimental status from drain event in Mojo::Content.
         - Improved portability of scripts.
         - Improved documentation.
         - Fixed bug that can prevent foreign event loops from being able to

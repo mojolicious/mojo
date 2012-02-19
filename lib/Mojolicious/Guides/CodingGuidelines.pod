@@ -47,7 +47,8 @@ No refactoring unless a very important feature absolutely depends on it.
 The addition and modification of features is decided by majority vote or the
 pumpking.
 
-New core developers must be accepted by a 2/3 majority vote.
+Any core developer may nominate a new one, who must then be accepted by a 2/3
+majority vote.
 
 The pumpking has veto rights and may select his successor.
 

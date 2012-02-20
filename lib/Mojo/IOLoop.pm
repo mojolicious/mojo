@@ -173,8 +173,7 @@ sub start {
 
 sub stop {
   my $self = shift;
-  $self = $self->singleton unless ref $self;
-  $self->iowatcher->stop;
+  (ref $self ? $self : $self->singleton)->iowatcher->stop;
 }
 
 sub stream {

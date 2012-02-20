@@ -156,8 +156,7 @@ object.
   $app       = $app->config({foo => 'bar'});
   $app       = $app->config(foo => 'bar');
 
-Application configuration. Note that this method is EXPERIMENTAL and might
-change without warning!
+Application configuration.
 
   $app->config->{foo} = 'bar';
   my $foo = $app->config->{foo};

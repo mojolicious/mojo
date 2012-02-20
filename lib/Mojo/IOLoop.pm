@@ -166,7 +166,7 @@ sub singleton { state $loop ||= shift->SUPER::new }
 sub start {
   my $self = shift;
   $self = $self->singleton unless ref $self;
-  croak 'Mojo::IOLoop already running' if $self->{running}++;
+  croak 'Mojo::IOLoop already running' if $self->is_running;
   $self->iowatcher->start;
   return $self;
 }
@@ -174,7 +174,7 @@ sub start {
 sub stop {
   my $self = shift;
   $self = $self->singleton unless ref $self;
-  $self->iowatcher->stop if delete $self->{running};
+  $self->iowatcher->stop;
 }
 
 sub stream {

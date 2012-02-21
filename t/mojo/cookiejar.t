@@ -307,3 +307,18 @@ is $cookies[0]->value, 'bar', 'right value';
 is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
+
+
+# Leading dot
+$jar = Mojo::CookieJar->new;
+$jar->add(
+  Mojo::Cookie::Response->new(
+    domain => '.kraih.com',
+    path   => '/foo(bar',
+    name   => 'foo',
+    value  => 'bar'
+  )
+);
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo%28bar'));
+is $cookies[0]->name,  'foo', 'right name';
+

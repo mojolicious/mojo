@@ -82,7 +82,7 @@ sub find {
         Mojo::Cookie::Request->new(
         name  => $cookie->name,
         value => $cookie->value
-        ) if $path =~ /^$cpath/;
+        ) if $path =~ /^\Q$cpath/;
     }
 
     $self->{jar}->{$domain} = \@new;

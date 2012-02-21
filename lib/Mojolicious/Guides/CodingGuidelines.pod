@@ -92,7 +92,8 @@ No spaghetti code.
 
 Code should be organized in blocks and those blocks should be commented.
 
-Comments should be funny if possible.
+Comments should be correctly capitalized, and funny if possible, punctuation
+is optional if it doesn't increase readability.
 
 Every file should contain at least one quote from C<The Simpsons> or
 C<Futurama>.

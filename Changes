@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved documentation.
         - Fixed bug that prevented Mojo::IOLoop from dying when started
           twice.
+        - Fixed a cookie jar path parsing bug. (marcus)
 
 2.51    2012-02-19 00:00:00
         - Added EXPERIMENTAL to_psgi method to Mojo::Server::PSGI.

@@ -308,7 +308,7 @@ is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
-# Leading dot
+# ( in path.
 $jar = Mojo::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(

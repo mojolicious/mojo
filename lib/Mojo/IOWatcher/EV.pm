@@ -122,7 +122,8 @@ amount of seconds.
 
   $watcher->start;
 
-Start watching for I/O and timer events.
+Start watching for I/O and timer events, this will block until C<stop> is
+called.
 
 =head2 C<stop>
 

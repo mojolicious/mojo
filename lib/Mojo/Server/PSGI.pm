@@ -49,7 +49,7 @@ sub run {
     \@headers, Mojo::Server::PSGI::_IO->new(tx => $tx)];
 }
 
-sub to_psgi {
+sub to_psgi_app {
   (my $self = shift)->app;
   return sub { $self->run(@_) }
 }
@@ -110,7 +110,7 @@ Mojo::Server::PSGI - PSGI server
     # Resume transaction
     $tx->resume;
   });
-  my $app = $psgi->to_psgi;
+  my $app = $psgi->to_psgi_app;
 
 =head1 DESCRIPTION
 
@@ -134,9 +134,9 @@ implements the following new ones.
 
 Run L<PSGI>.
 
-=head2 C<to_psgi>
+=head2 C<to_psgi_app>
 
-  my $app = $psgi->to_psgi;
+  my $app = $psgi->to_psgi_app;
 
 Turn L<Mojo> application into L<PSGI> application. Note that this method is
 EXPERIMENTAL and might change without warning!

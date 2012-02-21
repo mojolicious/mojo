@@ -1,6 +1,12 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.52    2012-00-00 00:00:00
+
+2.52    2012-02-20 00:00:00
+        - Removed experimental status from config method in Mojo.
+        - Renamed to_psgi method in Mojo::Server::PSGI to to_psgi_app.
+        - Improved documentation.
+        - Fixed bug that prevented Mojo::IOLoop from dying when started
+          twice.
         - Fixed a cookie jar path parsing bug.
 
 2.51    2012-02-19 00:00:00

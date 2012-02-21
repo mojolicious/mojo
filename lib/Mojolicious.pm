@@ -32,7 +32,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.51';
+our $VERSION  = '2.52';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -681,7 +681,7 @@ that have been used in the past.
 
 0.999920, C<Snowman> (u2603)
 
-=head1 AUTHOR
+=head1 PROJECT FOUNDER
 
 Sebastian Riedel, C<sri@cpan.org>
 

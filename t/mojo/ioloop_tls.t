@@ -66,7 +66,7 @@ is $client, 'test321', 'right content';
 $loop   = Mojo::IOLoop->singleton;
 $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
-my ($drop, $running, $timeout, $server_error, $server_close, $client_close);
+my ($drop, $running, $timeout, $server_err, $server_close, $client_close);
 Mojo::IOLoop->drop(Mojo::IOLoop->recurring(0 => sub { $drop++ }));
 $loop->server(
   port     => $port,
@@ -80,7 +80,7 @@ $loop->server(
     $running = Mojo::IOLoop->is_running;
     $stream->on(timeout => sub { $timeout++ });
     $stream->on(close   => sub { $server_close++ });
-    $stream->on(error   => sub { $server_error = pop });
+    $stream->on(error   => sub { $server_err = pop });
     $stream->on(read    => sub { $server .= pop });
     $stream->timeout('0.5');
   }
@@ -105,60 +105,60 @@ is $timeout,      1,         'server emitted timeout event once';
 is $server_close, 1,         'server emitted close event once';
 is $client_close, 1,         'client emitted close event once';
 ok $running,      'loop was running';
-ok !$drop,         'event dropped successfully';
-ok !$server_error, 'no error';
+ok !$drop,       'event dropped successfully';
+ok !$server_err, 'no error';
 
 # Invalid client certificate
-my $client_error;
+my $client_err;
 $loop->client(
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',
   tls_key  => 't/mojo/certs/badclient.key',
-  sub { shift; $client_error = shift }
+  sub { shift; $client_err = shift }
 );
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok $client_error, 'has error';
+ok $client_err, 'has error';
 
 # Missing client certificate
-$server_error = $client_error = '';
-$loop->client(
-  {port => $port, tls => 1} => sub { shift; $client_error = shift });
+$server_err = $client_err = '';
+$loop->client({port => $port, tls => 1} => sub { shift; $client_err = shift }
+);
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok !$server_error, 'no error';
-ok $client_error, 'has error';
+ok !$server_err, 'no error';
+ok $client_err, 'has error';
 
 # Invalid certificate authority (server)
-$loop         = Mojo::IOLoop->new;
-$port         = Mojo::IOLoop->generate_port;
-$server_error = $client_error = '';
+$loop       = Mojo::IOLoop->new;
+$port       = Mojo::IOLoop->generate_port;
+$server_err = $client_err = '';
 $loop->server(
   port     => $port,
   tls      => 1,
   tls_ca   => 'no cert',
   tls_cert => 't/mojo/certs/server.crt',
   tls_key  => 't/mojo/certs/server.key',
-  sub { $server_error = 'connected!' }
+  sub { $server_err = 'connected!' }
 );
 $loop->client(
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/client.crt',
   tls_key  => 't/mojo/certs/client.key',
-  sub { shift; $client_error = shift }
+  sub { shift; $client_err = shift }
 );
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok !$server_error, 'no error';
-ok $client_error, 'has error';
+ok !$server_err, 'no error';
+ok $client_err, 'has error';
 
 # Valid client and server certificates
 $loop   = Mojo::IOLoop->singleton;
 $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
-($running, $timeout, $server_error, $server_close, $client_close) = undef;
+($running, $timeout, $server_err, $server_close, $client_close) = undef;
 $loop->server(
   port     => $port,
   tls      => 1,
@@ -171,7 +171,7 @@ $loop->server(
     $running = Mojo::IOLoop->is_running;
     $stream->on(timeout => sub { $timeout++ });
     $stream->on(close   => sub { $server_close++ });
-    $stream->on(error   => sub { $server_error = pop });
+    $stream->on(error   => sub { $server_err = pop });
     $stream->on(read    => sub { $server .= pop });
     $stream->timeout('0.5');
   }
@@ -197,48 +197,48 @@ is $timeout,      1,         'server emitted timeout event once';
 is $server_close, 1,         'server emitted close event once';
 is $client_close, 1,         'client emitted close event once';
 ok $running,      'loop was running';
-ok !$server_error, 'no error';
+ok !$server_err, 'no error';
 
 # Invalid server certificate
-$loop         = Mojo::IOLoop->new;
-$port         = Mojo::IOLoop->generate_port;
-$server_error = $client_error = '';
+$loop       = Mojo::IOLoop->new;
+$port       = Mojo::IOLoop->generate_port;
+$server_err = $client_err = '';
 $loop->server(
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',
   tls_key  => 't/mojo/certs/badclient.key',
-  sub { $server_error = 'connected!' }
+  sub { $server_err = 'connected!' }
 );
 $loop->client(
   port   => $port,
   tls    => 1,
   tls_ca => 't/mojo/certs/ca.crt',
-  sub { shift; $client_error = shift }
+  sub { shift; $client_err = shift }
 );
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok !$server_error, 'no error';
-ok $client_error, 'has error';
+ok !$server_err, 'no error';
+ok $client_err, 'has error';
 
 # Invalid certificate authority (client)
-$loop         = Mojo::IOLoop->new;
-$port         = Mojo::IOLoop->generate_port;
-$server_error = $client_error = '';
+$loop       = Mojo::IOLoop->new;
+$port       = Mojo::IOLoop->generate_port;
+$server_err = $client_err = '';
 $loop->server(
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',
   tls_key  => 't/mojo/certs/badclient.key',
-  sub { $server_error = 'connected!' }
+  sub { $server_err = 'connected!' }
 );
 $loop->client(
   port   => $port,
   tls    => 1,
   tls_ca => 'no cert',
-  sub { shift; $client_error = shift }
+  sub { shift; $client_err = shift }
 );
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
-ok !$server_error, 'no error';
-ok $client_error, 'has error';
+ok !$server_err, 'no error';
+ok $client_err, 'has error';

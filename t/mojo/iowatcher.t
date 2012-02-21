@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 64;
+use Test::More tests => 66;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -190,7 +190,7 @@ $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 is ref Mojo::IOLoop->singleton->iowatcher, 'Mojo::IOWatcher', 'right object';
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 $port = Mojo::IOLoop->generate_port;
-my ($server_running, $client_running);
+my ($server_err, $server_running, $client_err, $client_running);
 ($server, $client) = '';
 Mojo::IOLoop->server(
   {port => $port} => sub {
@@ -198,6 +198,8 @@ Mojo::IOLoop->server(
     $stream->write('test', sub { shift->write('321') });
     $stream->on(read => sub { $server .= pop });
     $server_running = Mojo::IOLoop->is_running;
+    eval { Mojo::IOLoop->start };
+    $server_err = $@;
   }
 );
 Mojo::IOLoop->client(
@@ -206,11 +208,15 @@ Mojo::IOLoop->client(
     $stream->write('tset', sub { shift->write('123') });
     $stream->on(read => sub { $client .= pop });
     $client_running = Mojo::IOLoop->is_running;
+    eval { Mojo::IOLoop->start };
+    $client_err = $@;
   }
 );
 Mojo::IOLoop->timer(1 => sub { Mojo::IOLoop->singleton->iowatcher->stop });
 Mojo::IOLoop->singleton->iowatcher->start;
 ok !Mojo::IOLoop->is_running, 'loop is not running';
+like $server_err, qr/^Mojo::IOLoop already running/, 'right error';
+like $client_err, qr/^Mojo::IOLoop already running/, 'right error';
 ok $server_running, 'loop is running';
 ok $client_running, 'loop is running';
 is $server,         'tset123', 'right content';

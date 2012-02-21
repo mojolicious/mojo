@@ -382,29 +382,30 @@ C</> and C<.>.
 
 Routes can be restricted to specific request methods.
 
-  # GET /bye
-  get '/bye' => sub {
+  # GET /hello
+  get '/hello' => sub {
     my $self = shift;
-    $self->render(text => 'Bye.');
+    $self->render(text => 'Hello World!');
   };
 
-  # POST /bye
-  post '/bye' => sub {
+  # PUT /hello
+  put '/hello' => sub {
     my $self = shift;
-    $self->render(text => 'Bye.');
+    my $size = length $self->req->body;
+    $self->render(text => "You uploaded $size bytes to /hello.");
   };
 
   # GET|POST|DELETE /bye
   any ['get', 'post', 'delete'] => '/bye' => sub {
     my $self = shift;
-    $self->render(text => 'Bye.');
+    $self->render(text => 'Bye World!');
   };
 
-  # * /baz
-  any '/baz' => sub {
+  # * /whatever
+  any '/whatever' => sub {
     my $self   = shift;
     my $method = $self->req->method;
-    $self->render(text => "You called /baz with $method");
+    $self->render(text => "You called /whatever with $method.");
   };
 
 =head2 Optional placeholders

@@ -404,7 +404,8 @@ object.
 
 =head2 C<handler>
 
-  $tx = $app->handler($tx);
+  $app->handler($tx);
+  $app->handler($c);
 
 Sets up the default controller and calls process for every request.
 

@@ -164,7 +164,7 @@ Application configuration.
 
 =head2 C<handler>
 
-  $tx = $app->handler($tx);
+  $app->handler($tx);
 
 The handler is the main entry point to your application or framework and
 will be called for each new transaction, which will usually be a

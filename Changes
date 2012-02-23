@@ -3,6 +3,8 @@ This file documents the revision history for Perl extension Mojolicious.
 2.52    2012-02-23 00:00:00
         - Removed experimental status from config method in Mojo.
         - Renamed to_psgi method in Mojo::Server::PSGI to to_psgi_app.
+        - Improved emit_chain method in Mojolicious::Plugins to allow
+          reforwarding. (jamadam)
         - Improved documentation.
         - Fixed bug that prevented Mojo::IOLoop from dying when started
           twice.

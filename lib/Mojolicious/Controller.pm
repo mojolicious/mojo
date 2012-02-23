@@ -167,8 +167,8 @@ sub param {
   }
 
   # Captured unreserved values
-  if (!$RESERVED{$name} && defined(my $values = $p->{$name})) {
-    return ref $values ? wantarray ? @$values : $$values[0] : $values;
+  if (!$RESERVED{$name} && defined(my $v = $p->{$name})) {
+    return ref $v && ref $v eq 'ARRAY' ? wantarray ? @$v : $$v[0] : $v;
   }
 
   # Upload

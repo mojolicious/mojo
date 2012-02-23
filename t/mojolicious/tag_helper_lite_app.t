@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 54;
+use Test::More tests => 57;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -300,6 +300,30 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d')->status_is(200)
     . '</form>'
     . "\n");
 
+# PUT /selection (multiple values preselected)
+$t->put_ok('/selection?preselect=1')->status_is(200)
+  ->content_is("<form action=\"/selection\">\n  "
+    . '<select name="a">'
+    . '<option selected="selected" value="b">b</option>'
+    . '<optgroup label="c">'
+    . '<option value="d">d</option>'
+    . '<option value="e">E</option>'
+    . '<option value="f">f</option>'
+    . '</optgroup>'
+    . '<option selected="selected" value="g">g</option>'
+    . '</select>' . "\n  "
+    . '<select multiple="multiple" name="foo">'
+    . '<option value="bar">bar</option>'
+    . '<option value="baz">baz</option>'
+    . '</select>' . "\n  "
+    . '<select name="bar">'
+    . '<option disabled="disabled" value="d">D</option>'
+    . '<option value="baz">baz</option>'
+    . '</select>' . "\n  "
+    . '<input type="submit" value="Ok" />' . "\n"
+    . '</form>'
+    . "\n");
+
 # GET /☃
 $t->get_ok('/☃')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83">
@@ -397,6 +421,7 @@ __DATA__
 <%= input_tag 'a', value => 'c' %>
 
 @@ selection.html.ep
+% param a => qw/b g/ if param 'preselect';
 %= form_for selection => begin
   %= select_field a => ['b', {c => ['d', [ E => 'e'], 'f']}, 'g']
   %= select_field foo => [qw/bar baz/], multiple => 'multiple'

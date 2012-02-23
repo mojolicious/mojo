@@ -149,8 +149,8 @@ sub on {
 sub param {
   my ($self, $name) = (shift, shift);
 
-  # List
-  my $p = $self->stash->{'mojo.captures'} || {};
+  # List names
+  my $p = $self->stash->{'mojo.captures'} ||= {};
   my $req = $self->req;
   unless (defined $name) {
     my %seen;
@@ -160,20 +160,22 @@ sub param {
     return sort @keys;
   }
 
-  # Override value
+  # Override values
   if (@_) {
-    $p->{$name} = $_[0];
+    $p->{$name} = @_ > 1 ? [@_] : $_[0];
     return $self;
   }
 
-  # Captured unreserved value
-  return $p->{$name} if !$RESERVED{$name} && exists $p->{$name};
+  # Captured unreserved values
+  if (!$RESERVED{$name} && defined(my $values = $p->{$name})) {
+    return ref $values ? wantarray ? @$values : $$values[0] : $values;
+  }
 
   # Upload
   my $upload = $req->upload($name);
   return $upload if $upload;
 
-  # Param value
+  # Param values
   return $req->param($name);
 }
 
@@ -733,6 +735,7 @@ or L<Mojo::Transaction::WebSocket> object.
   my $foo   = $c->param('foo');
   my @foo   = $c->param('foo');
   $c        = $c->param(foo => 'ba;r');
+  $c        = $c->param(foo => qw/ba;r ba;z/);
 
 Access GET/POST parameters, file uploads and route captures that are not
 reserved stash values.

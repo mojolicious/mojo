@@ -25,7 +25,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 78;
+use Test::More tests => 84;
 
 use Mojolicious;
 use Mojo::Transaction::HTTP;
@@ -74,6 +74,14 @@ is_deeply $c->stash, {}, 'elements can be deleted';
 $c->stash({a => 1, b => 2});
 $stash = $c->stash;
 is_deeply $stash, {a => 1, b => 2}, 'set via hashref';
+
+# Override captures
+is $c->param('foo'), undef, 'no value';
+is $c->param(foo => 'works')->param('foo'), 'works', 'right value';
+is $c->param(foo => 'too')->param('foo'),   'too',   'right value';
+is $c->param(foo => qw/just works/)->param('foo'), 'just', 'right value';
+is_deeply [$c->param('foo')], [qw/just works/], 'right values';
+is $c->param(foo => undef)->param('foo'), undef, 'no value';
 
 # Controller with application and routes
 $c = Test::Controller->new(app => Mojolicious->new);

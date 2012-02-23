@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 74;
+use Test::More tests => 76;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use_ok 'Mojo::Parameters';
@@ -37,6 +37,10 @@ is $params2->to_string, 'x=1&y=2', 'right format';
 # Param
 is_deeply $params->param('foo'), 'b;ar', 'right structure';
 is_deeply [$params->param('a')], [4, 5], 'right structure';
+$params->param(foo => 'bar');
+is_deeply [$params->param('foo')], ['bar'], 'right structure';
+$params->param(foo => qw/baz yada/);
+is_deeply [$params->param('foo')], [qw/baz yada/], 'right structure';
 
 # Parse with ";" separator
 $params->parse('q=1;w=2;e=3;e=4;r=6;t=7');

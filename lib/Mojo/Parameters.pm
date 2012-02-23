@@ -279,6 +279,7 @@ Merge parameters.
   my $foo   = $params->param('foo');
   my @foo   = $params->param('foo');
   my $foo   = $params->param(foo => 'ba;r');
+  my @foo   = $params->param(foo => qw/ba;r ba;z/);
 
 Check and replace parameter values.
 

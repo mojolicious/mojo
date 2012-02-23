@@ -53,11 +53,7 @@ sub class_to_file {
   return decamelize $class;
 }
 
-sub class_to_path {
-  my ($self, $class) = @_;
-  my $path = join '/', split /::|'/, $class;
-  return "$path.pm";
-}
+sub class_to_path { join '.', join('/', split /::|'/, pop), 'pm' }
 
 sub create_dir {
   my ($self, $path) = @_;
@@ -129,8 +125,7 @@ sub get_all_data {
 
 sub get_data {
   my ($self, $data, $class) = @_;
-  my $all = $self->get_all_data($class);
-  return $all->{$data};
+  ($self->get_all_data($class) || {})->{$data};
 }
 
 # "You don’t like your job, you don’t strike.

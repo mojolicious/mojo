@@ -43,7 +43,7 @@ websocket '/' => sub {
     message => sub {
       my ($self, $message) = @_;
       my $url = $self->url_for->to_abs;
-      $self->send_message("${message}test2$url");
+      $self->send("${message}test2$url");
       $server_flag = 20;
     }
   );
@@ -60,12 +60,11 @@ get '/something/else' => sub {
 # WebSocket /socket
 websocket '/socket' => sub {
   my $self = shift;
-  $self->send_message(
+  $self->send(
     $self->req->headers->host,
     sub {
       my $self = shift;
-      $self->send_message(
-        Mojo::IOLoop->stream($self->tx->connection)->timeout);
+      $self->send(Mojo::IOLoop->stream($self->tx->connection)->timeout);
       $self->finish;
     }
   );
@@ -74,11 +73,11 @@ websocket '/socket' => sub {
 # WebSocket /early_start
 websocket '/early_start' => sub {
   my $self = shift;
-  $self->send_message('test1');
+  $self->send('test1');
   $self->on(
     message => sub {
       my ($self, $message) = @_;
-      $self->send_message("${message}test2");
+      $self->send("${message}test2");
       $self->finish;
     }
   );
@@ -103,15 +102,15 @@ websocket '/subreq' => sub {
       $tx->on(
         message => sub {
           my ($tx, $message) = @_;
-          $self->send_message($message);
+          $self->send($message);
           $tx->finish;
           $self->finish;
         }
       );
-      $tx->send_message('test1');
+      $tx->send('test1');
     }
   );
-  $self->send_message('test0');
+  $self->send('test0');
   $self->on(finish => sub { $subreq += 3 });
 };
 
@@ -122,7 +121,7 @@ websocket '/echo' => sub {
   $self->on(
     message => sub {
       my ($self, $message) = @_;
-      $self->send_message($message);
+      $self->send($message);
     }
   );
 };
@@ -133,7 +132,7 @@ websocket '/double_echo' => sub {
   shift->on(
     message => sub {
       my ($self, $message) = @_;
-      $self->send_message($message, sub { shift->send_message($message) });
+      $self->send($message, sub { shift->send($message) });
     }
   );
 };
@@ -176,7 +175,7 @@ $ua->websocket(
         $tx->finish;
       }
     );
-    $tx->send_message('test1');
+    $tx->send('test1');
   }
 );
 $loop->start;
@@ -248,7 +247,7 @@ $ua->websocket(
       message => sub {
         my ($tx, $message) = @_;
         $result = $message;
-        $tx->send_message('test3');
+        $tx->send('test3');
         $client_flag = 18;
       }
     );
@@ -365,10 +364,10 @@ $ua->websocket(
       }
     );
     $client_flag = 20;
-    $tx->send_message(
+    $tx->send(
       'hi!',
       sub {
-        shift->send_message('there!');
+        shift->send('there!');
         $drain
           += @{Mojo::IOLoop->stream($tx->connection)->subscribers('drain')};
       }
@@ -401,7 +400,7 @@ $ua->websocket(
       }
     );
     $client_flag = 19;
-    $tx->send_message('hi!');
+    $tx->send('hi!');
   }
 );
 $loop->start;
@@ -446,7 +445,7 @@ is $message, "i'm a teapot", 'right message';
 # WebSocket /deadcallback (dies in callback)
 $ua->websocket(
   '/deadcallback' => sub {
-    pop->send_message('test1');
+    pop->send('test1');
     $loop->stop;
   }
 );
@@ -468,7 +467,7 @@ $ua->websocket(
         $tx->finish;
       }
     );
-    $tx->send_message('hi!' x 100);
+    $tx->send('hi!' x 100);
   }
 );
 $loop->start;
@@ -488,7 +487,7 @@ $ua->websocket(
         $tx->finish;
       }
     );
-    $tx->send_message('hi' x 200000);
+    $tx->send('hi' x 200000);
   }
 );
 $loop->start;
@@ -506,7 +505,7 @@ $ua->websocket(
         Mojo::IOLoop->stop;
       }
     );
-    $tx->send_frame(1, 0, 0, 0, 9, 'test');
+    $tx->send([1, 0, 0, 0, 9, 'test']);
   }
 );
 Mojo::IOLoop->start;

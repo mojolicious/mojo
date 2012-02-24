@@ -120,7 +120,7 @@ sub connection   { shift->handshake->connection(@_) }
 
 sub finish {
   my $self = shift;
-  $self->send_frame(1, 0, 0, 0, CLOSE, '');
+  $self->send([1, 0, 0, 0, CLOSE, '']);
   $self->{finished} = 1;
   return $self;
 }
@@ -223,33 +223,28 @@ sub resume {
   return $self;
 }
 
-sub send_frame {
-  my ($self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload, $cb) = @_;
+sub send {
+  my ($self, $frame, $cb) = @_;
+
+  # Binary or raw text
+  if (ref $frame && ref $frame eq 'HASH') {
+    $frame =
+      exists $frame->{text}
+      ? [1, 0, 0, 0, TEXT, $frame->{text}]
+      : [1, 0, 0, 0, BINARY, $frame->{binary}];
+  }
+
+  # Text
+  elsif (!ref $frame) { $frame = [1, 0, 0, 0, TEXT, encode('UTF-8', $frame)] }
 
   # Prepare frame
   $self->once(drain => $cb) if $cb;
   $self->{write} //= '';
-  $self->{write}
-    .= $self->build_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload);
+  $self->{write} .= $self->build_frame(@$frame);
   $self->{state} = 'write';
 
   # Resume
   $self->emit('resume');
-}
-
-sub send_message {
-  my ($self, $m, $cb) = @_;
-  $m //= '';
-
-  # Binary or raw text
-  if (ref $m) {
-    return $self->send_frame(1, 0, 0, 0, TEXT, $m->[1], $cb)
-      if $m->[0] eq 'text';
-    return $self->send_frame(1, 0, 0, 0, BINARY, $m->[1], $cb);
-  }
-
-  # Text
-  $self->send_frame(1, 0, 0, 0, TEXT, encode('UTF-8', $m), $cb);
 }
 
 sub server_handshake {
@@ -283,7 +278,7 @@ sub server_read {
     my $op = $frame->[4] || CONTINUATION;
 
     # Ping/Pong
-    $self->send_frame(1, 0, 0, 0, PONG, $frame->[5]) and next if $op == PING;
+    $self->send([1, 0, 0, 0, PONG, $frame->[5]]) and next if $op == PING;
     next if $op == PONG;
 
     # Close
@@ -377,7 +372,7 @@ Emitted once all data has been sent.
 
   $ws->on(drain => sub {
     my $ws = shift;
-    $ws->send_message(time);
+    $ws->send(time);
   });
 
 =head2 C<frame>
@@ -546,23 +541,16 @@ Alias for L<Mojo::Transaction/"res">.
 
 Alias for L<Mojo::Transaction/"resume">.
 
-=head2 C<send_frame>
+=head2 C<send>
 
-  $ws->send_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload);
-  $ws->send_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload, sub {...});
+  $ws->send({binary => $bytes});
+  $ws->send({text   => $bytes});
+  $ws->send([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
+  $ws->send('Hi there!');
+  $ws->send('Hi there!' => sub {...});
 
-Send a single frame non-blocking via WebSocket, the optional drain callback
-will be invoked once all data has been written.
-
-=head2 C<send_message>
-
-  $ws->send_message([binary => $bytes]);
-  $ws->send_message([text   => $bytes]);
-  $ws->send_message('Hi there!');
-  $ws->send_message('Hi there!', sub {...});
-
-Send a message non-blocking via WebSocket, the optional drain callback will
-be invoked once all data has been written.
+Send a message or single frame non-blocking via WebSocket, the optional drain
+callback will be invoked once all data has been written.
 
 =head2 C<server_handshake>
 

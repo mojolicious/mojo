@@ -7,8 +7,7 @@ use Mojolicious::Lite;
 #  Not where it counts."
 any '/' => sub {
   my $self = shift;
-  $self->on(message => sub { shift->send_message(shift) })
-    if $self->tx->is_websocket;
+  $self->on(message => sub { shift->send(shift) }) if $self->tx->is_websocket;
 } => 'websocket';
 
 # Minimal WebSocket application for browser testing

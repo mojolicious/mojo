@@ -260,10 +260,10 @@ sub reset_session {
   return $self;
 }
 
-sub send_message_ok {
+sub send_ok {
   my ($self, $message, $desc) = @_;
 
-  $self->tx->send_message($message, sub { Mojo::IOLoop->stop });
+  $self->tx->send($message, sub { Mojo::IOLoop->stop });
   Mojo::IOLoop->start;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok 1, $desc || 'send message';
@@ -400,7 +400,7 @@ Test::Mojo - Testing Mojo!
     ->json_is('/results/4/title' => 'Perl rocks!');
 
   $t->websocket_ok('/echo')
-    ->send_message_ok('hello')
+    ->send_ok('hello')
     ->message_is('echo: hello')
     ->finish_ok;
 
@@ -679,13 +679,16 @@ arguments as L<Mojo::UserAgent/"put">.
 
 Reset user agent session.
 
-=head2 C<send_message_ok>
+=head2 C<send_ok>
 
-  $t = $t->send_message_ok('hello');
-  $t = $t->send_message_ok('hello', 'sent successfully');
+  $t = $t->send_ok({binary => $bytes});
+  $t = $t->send_ok({text   => $bytes});
+  $t = $t->send_ok([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
+  $t = $t->send_ok('hello');
+  $t = $t->send_ok('hello', 'sent successfully');
 
-Send C<WebSocket> message. Note that this method is EXPERIMENTAL and might
-change without warning!
+Send C<WebSocket> message or single frame. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<status_is>
 

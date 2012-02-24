@@ -428,13 +428,13 @@ sub respond_to {
   ref $target eq 'CODE' ? $target->($self) : $self->render($target);
 }
 
-sub send_message {
+sub send {
   my ($self, $message, $cb) = @_;
 
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to send message to')
     unless $tx->is_websocket;
-  $tx->send_message($message, sub { shift and $self->$cb(@_) if $cb });
+  $tx->send($message, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered(101);
 
   return $self;
@@ -912,19 +912,20 @@ defaults to rendering an empty C<204> response.
     any  => {data => '', status => 204}
   );
 
-=head2 C<send_message>
+=head2 C<send>
 
-  $c = $c->send_message([binary => $bytes]);
-  $c = $c->send_message([text   => $bytes]);
-  $c = $c->send_message('Hi there!');
-  $c = $c->send_message('Hi there!', sub {...});
+  $c = $c->send({binary => $bytes});
+  $c = $c->send({text   => $bytes});
+  $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
+  $c = $c->send('Hi there!');
+  $c = $c->send('Hi there!', sub {...});
 
-Send a message non-blocking via WebSocket, the optional drain callback will
-be invoked once all data has been written. Note that this method is
-EXPERIMENTAL and might change without warning!
+Send a message or single frame non-blocking via WebSocket, the optional drain
+callback will be invoked once all data has been written. Note that this
+method is EXPERIMENTAL and might change without warning!
 
   # Send JSON object as text frame
-  $c->send_message([text => Mojo::JSON->new->encode({hello => 'world'})]);
+  $c->send({text => Mojo::JSON->new->encode({hello => 'world'})});
 
 =head2 C<session>
 

@@ -713,7 +713,7 @@ WebSocket applications have never been this easy before.
     my $self = shift;
     $self->on(message => sub {
       my ($self, $message) = @_;
-      $self->send_message("echo: $message");
+      $self->send("echo: $message");
     });
   };
 

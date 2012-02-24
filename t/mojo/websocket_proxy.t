@@ -39,7 +39,7 @@ websocket '/test' => sub {
   $self->on(
     message => sub {
       my ($self, $message) = @_;
-      $self->send_message("${message}test2");
+      $self->send("${message}test2");
       $flag = 24;
     }
   );
@@ -144,7 +144,7 @@ $ua->websocket(
         $tx->finish;
       }
     );
-    $tx->send_message('test1');
+    $tx->send('test1');
   }
 );
 Mojo::IOLoop->start;
@@ -176,7 +176,7 @@ $ua->websocket(
         $tx->finish;
       }
     );
-    $tx->send_message('test1');
+    $tx->send('test1');
   }
 );
 Mojo::IOLoop->start;

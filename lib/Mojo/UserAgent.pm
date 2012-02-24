@@ -621,7 +621,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
       say $message;
       $tx->finish;
     });
-    $tx->send_message('hi there!');
+    $tx->send('hi there!');
   });
   Mojo::IOLoop->start;
 
@@ -1002,7 +1002,7 @@ that this method is EXPERIMENTAL and might change without warning!
       my ($tx, $message) = @_;
       say "$message\n";
     });
-    $tx->send_message('Hi!');
+    $tx->send('Hi!');
   });
   Mojo::IOLoop->start;
 

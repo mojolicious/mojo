@@ -920,12 +920,15 @@ defaults to rendering an empty C<204> response.
   $c = $c->send('Hi there!');
   $c = $c->send('Hi there!', sub {...});
 
-Send a message or single frame non-blocking via WebSocket, the optional drain
-callback will be invoked once all data has been written. Note that this
-method is EXPERIMENTAL and might change without warning!
+Send message or frame non-blocking via WebSocket, the optional drain callback
+will be invoked once all data has been written. Note that this method is
+EXPERIMENTAL and might change without warning!
 
   # Send JSON object as text frame
   $c->send({text => Mojo::JSON->new->encode({hello => 'world'})});
+
+  # Send "Ping" frame
+  $c->send([1, 0, 0, 0, 9, 'Hello World!']);
 
 =head2 C<session>
 

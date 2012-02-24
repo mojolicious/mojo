@@ -549,8 +549,11 @@ Alias for L<Mojo::Transaction/"resume">.
   $ws->send('Hi there!');
   $ws->send('Hi there!' => sub {...});
 
-Send a message or single frame non-blocking via WebSocket, the optional drain
-callback will be invoked once all data has been written.
+Send message or frame non-blocking via WebSocket, the optional drain callback
+will be invoked once all data has been written.
+
+  # Send "Ping" frame
+  $ws->send([1, 0, 0, 0, 9, 'Hello World!']);
 
 =head2 C<server_handshake>
 

@@ -687,8 +687,8 @@ Reset user agent session.
   $t = $t->send_ok('hello');
   $t = $t->send_ok('hello', 'sent successfully');
 
-Send C<WebSocket> message or single frame. Note that this method is
-EXPERIMENTAL and might change without warning!
+Send message or frame via WebSocket. Note that this method is EXPERIMENTAL
+and might change without warning!
 
 =head2 C<status_is>
 

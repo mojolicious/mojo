@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.53    2012-02-24 00:00:00
+        - Improved documentation.
+
 2.52    2012-02-24 00:00:00
         - Removed experimental status from config method in Mojo.
         - Renamed send_message method in Mojolicious::Controller to send.

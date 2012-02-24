@@ -593,7 +593,8 @@ accept mutex, defaults to C<0.5>.
   pid_file => '/var/run/hypnotoad.pid'
 
 Full path to PID file, defaults to C<hypnotoad.pid> in the same directory as
-the application.
+the application. Note that this value can only be changed when the server has
+been stopped.
 
 =head2 C<proxy>
 

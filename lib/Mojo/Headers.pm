@@ -386,6 +386,15 @@ Get or replace the current header values.
     }
   }
 
+In list context, this method returns an array with one entry for each
+occurrence of the specified header. The array may contain one string,
+or a number of arrayrefs, each containing a list of one or more
+comma-separated values that occurred in that header line.
+
+(Thus, if the X-Foo header occurs twice and contains "foo, bar" on one
+line and "baz" on the next, C<header('X-Foo')> would return two
+arrayrefs, namely C<[qw/foo bar/]> and C<[qw/baz/]>).
+
 =head2 C<host>
 
   my $host = $headers->host;

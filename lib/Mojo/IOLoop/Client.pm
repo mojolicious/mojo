@@ -64,7 +64,7 @@ sub _connect {
       unless $handle = $class->new(%options);
 
     # Timer
-    $self->{timer} = $watcher->timer($args->{timeout} || 3,
+    $self->{timer} = $watcher->timer($args->{timeout} || 10,
       sub { $self->emit_safe(error => 'Connect timeout.') });
 
     # IPv6 needs an early start
@@ -231,7 +231,7 @@ Port to connect to.
 =item C<timeout>
 
 Maximum amount of time in seconds establishing connection may take before
-getting canceled.
+getting canceled, defaults to C<10>.
 
 =item C<tls>
 

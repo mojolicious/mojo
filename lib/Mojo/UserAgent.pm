@@ -15,7 +15,7 @@ use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 # "You can't let a single bad experience scare you away from drugs."
 has ca   => sub { $ENV{MOJO_CA_FILE} };
 has cert => sub { $ENV{MOJO_CERT_FILE} };
-has connect_timeout => 3;
+has connect_timeout => 10;
 has cookie_jar => sub { Mojo::CookieJar->new };
 has [qw/http_proxy https_proxy local_address no_proxy/];
 has inactivity_timeout => 20;
@@ -261,6 +261,7 @@ sub _connect_proxy {
         return $loop->client(
           handle   => $handle,
           id       => $id,
+          timeout  => $self->connect_timeout,
           tls      => 1,
           tls_ca   => $self->ca,
           tls_cert => $self->cert,
@@ -697,7 +698,7 @@ environment variable.
   $ua         = $ua->connect_timeout(5);
 
 Maximum amount of time in seconds establishing a connection may take before
-getting canceled, defaults to C<3>.
+getting canceled, defaults to C<10>.
 
 =head2 C<cookie_jar>
 

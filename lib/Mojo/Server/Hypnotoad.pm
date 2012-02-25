@@ -287,7 +287,7 @@ sub _pid_file {
   return if -e (my $file = $self->{config}->{pid_file});
 
   # Create PID file
-  $self->{log}->info(qq/Storing PID $$ in "$file"./);
+  $self->{log}->info(qq/Creating PID file "$file"./);
   croak qq/Can't create PID file "$file": $!/
     unless my $pid = IO::File->new($file, '>', 0644);
   print $pid $$;
@@ -310,7 +310,7 @@ sub _reap {
   else {
     my $w = delete $self->{workers}->{$pid};
     $self->{log}->info("Worker $pid died unexpectedly, restarting.")
-      unless $w->{graceful} || $w->{force};
+      unless $w->{graceful} || $w->{force} || $self->{finished};
   }
 }
 

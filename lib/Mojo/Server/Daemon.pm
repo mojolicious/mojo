@@ -265,7 +265,7 @@ sub _listen {
 
   # Friendly message
   return if $self->silent;
-  $self->app->log->info("Server listening ($listen)");
+  $self->app->log->info(qq/Listening at "$listen"./);
   $listen =~ s|^(https?\://)\*|${1}127.0.0.1|i;
   say "Server available at $listen.";
 }

@@ -578,8 +578,8 @@ accept mutex, defaults to C<0.5>.
   pid_file => '/var/run/hypnotoad.pid'
 
 Full path to PID file, defaults to C<hypnotoad.pid> in the same directory as
-the application. Note that this value can only be changed when the server has
-been stopped.
+the application. Note that this value can only be changed after the server
+has been stopped.
 
 =head2 C<proxy>
 
@@ -625,7 +625,7 @@ implements the following new ones.
 
   $toad->run('script/myapp');
 
-Run server.
+Run server for application.
 
 =head1 SEE ALSO
 

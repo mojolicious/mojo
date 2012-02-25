@@ -189,7 +189,7 @@ Check if file has been modified since last check.
 
   $morbo->run('script/myapp');
 
-Run server.
+Run server for application.
 
 =head1 DEBUGGING
 

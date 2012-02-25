@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 86;
+use Test::More tests => 85;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -88,9 +88,7 @@ get '/echo' => sub {
 {
   is(Mojo::UserAgent->new->connect_timeout, 10, 'right value');
   local $ENV{MOJO_CONNECT_TIMEOUT} = 25;
-  is(Mojo::UserAgent->new->connect_timeout, 25, 'right value');
-  $ENV{MOJO_CONNECT_TIMEOUT} = 0;
-  is(Mojo::UserAgent->new->connect_timeout,    0,  'right value');
+  is(Mojo::UserAgent->new->connect_timeout,    25, 'right value');
   is(Mojo::UserAgent->new->inactivity_timeout, 20, 'right value');
   local $ENV{MOJO_INACTIVITY_TIMEOUT} = 25;
   is(Mojo::UserAgent->new->inactivity_timeout, 25, 'right value');

@@ -15,7 +15,7 @@ use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 # "You can't let a single bad experience scare you away from drugs."
 has ca              => sub { $ENV{MOJO_CA_FILE} };
 has cert            => sub { $ENV{MOJO_CERT_FILE} };
-has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} // 10 };
+has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
 has cookie_jar      => sub { Mojo::CookieJar->new };
 has [qw/http_proxy https_proxy local_address no_proxy/];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };

@@ -46,6 +46,7 @@ sub run {
   }
 
   # Run tests
+  $ENV{HARNESS_OPTIONS} //= 'c';
   require Test::Harness;
   Test::Harness::runtests(sort @tests);
 }

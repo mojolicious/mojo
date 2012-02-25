@@ -14,7 +14,8 @@ These options are available:
   -c, --clients <number>       Set maximum number of concurrent clients,
                                defaults to 1000.
   -g, --group <name>           Set group name for process.
-  -i, --inactivity <seconds>   Set inactivity timeout, defaults to 15.
+  -i, --inactivity <seconds>   Set inactivity timeout, defaults to the value
+                               of MOJO_INACTIVITY_TIMEOUT or 15.
   -l, --listen <location>      Set one or more locations you want to listen
                                on, defaults to "http://*:3000".
   -p, --proxy                  Activate reverse proxy support, defaults to
@@ -22,7 +23,8 @@ These options are available:
   -r, --requests <number>      Set maximum number of requests per keep-alive
                                connection, defaults to 25.
   -u, --user <name>            Set username for process.
-  -w, --websocket <seconds>    Set WebSocket timeout, defaults to 300.
+  -w, --websocket <seconds>    Set WebSocket timeout, defaults to the value
+                               of MOJO_WEBSOCKET_TIMEOUT or 300.
 EOF
 
 # "It's an albino humping worm!

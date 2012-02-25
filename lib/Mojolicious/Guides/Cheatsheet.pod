@@ -169,12 +169,28 @@ L<Mojolicious::Plugin::JSONConfig>, quite useful for testing.
 
    MOJO_CONFIG=myapp.conf
 
+=head2 C<MOJO_CONNECT_TIMEOUT>
+
+Maximum amount of time in seconds establishing a connection may take before
+getting canceled, defaults to C<10>.
+
+  MOJO_CONNECT_TIMEOUT=30
+
 =head2 C<MOJO_HOME>
 
 Home directory for the L<Mojolicious> application, should always contain a
 path like C</home/sri/myapp>.
 
   MOJO_HOME=/home/sri/myapp
+
+=head2 C<MOJO_INACTIVITY_TIMEOUT>
+
+Maximum amount of time in seconds a connection can be inactive before getting
+dropped, defaults to C<20> for L<Mojo::UserAgent> and C<15> for
+L<Mojo::Server::Daemon>. Setting the value to C<0> will allow connections to
+be inactive indefinitely.
+
+  MOJO_INACTIVITY_TIMEOUT=0
 
 =head2 C<MOJO_IOWATCHER>
 
@@ -280,6 +296,15 @@ security reasons this is disabled by default.
 
   MOJO_PROXY=1
 
+=head2 C<MOJO_REQUEST_TIMEOUT>
+
+Maximum amount of time in seconds establishing a connection, sending the
+request and receiving a whole response may take before getting canceled,
+defaults to C<0>. Setting the value to C<0> will allow the user agent to wait
+indefinitely. The timeout will reset for every followed redirect.
+
+  MOJO_REQUEST_TIMEOUT=30
+
 =head2 C<MOJO_REVERSE_PROXY>
 
 Enable reverse proxy support for L<Mojolicious> application. This allows
@@ -294,6 +319,14 @@ Directory for temporary files like huge uploads, defaults to using a random
 platform specific temporary directory.
 
   MOJO_TMPDIR=/tmp/mojo
+
+=head2 C<MOJO_WEBSOCKET_TIMEOUT>
+
+Maximum amount of time in seconds a WebSocket connection can be inactive
+before getting dropped, defaults to C<300>. Setting the value to C<0> will
+allow connections to be inactive indefinitely.
+
+  MOJO_WEBSOCKET_TIMEOUT=0
 
 =head1 MORE
 

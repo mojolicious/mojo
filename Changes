@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.54    2012-02-25 00:00:00
+        - Added support for MOJO_CONNECT_TIMEOUT, MOJO_INACTIVITY_TIMEOUT,
+          MOJO_REQUEST_TIMEOUT and MOJO_WEBSOCKET_TIMEOUT environment
+          variables.
         - Increased default connect timeout from 3 to 10 seconds in
           Mojo::UserAgent and Mojo::IOLoop::Client.
         - Improved test command to colorize by default.

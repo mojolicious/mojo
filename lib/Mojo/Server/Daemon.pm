@@ -15,11 +15,11 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
 has [qw/backlog group listen silent user/];
-has inactivity_timeout => 15;
+has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
 has max_clients        => 1000;
 has max_requests       => 25;
-has websocket_timeout  => 300;
+has websocket_timeout  => sub { $ENV{MOJO_WEBSOCKET_TIMEOUT}  // 300 };
 
 my $LISTEN_RE = qr|
   ^
@@ -402,8 +402,9 @@ Group for server process.
   $daemon     = $daemon->inactivity_timeout(5);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to C<15>. Setting the value to C<0> will allow connections
-to be inactive indefinitely.
+dropped, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
+variable or C<15>. Setting the value to C<0> will allow connections to be
+inactive indefinitely.
 
 =head2 C<ioloop>
 
@@ -463,8 +464,9 @@ User for the server process.
   $server     = $server->websocket_timeout(300);
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to C<300>. Setting the value to C<0> will
-allow WebSocket connections to be inactive indefinitely.
+before getting dropped, defaults to the value of the
+C<MOJO_WEBSOCKET_TIMEOUT> environment variable or C<300>. Setting the value
+to C<0> will allow WebSocket connections to be inactive indefinitely.
 
 =head1 METHODS
 

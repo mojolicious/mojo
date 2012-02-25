@@ -13,20 +13,20 @@ use Scalar::Util 'weaken';
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
 # "You can't let a single bad experience scare you away from drugs."
-has ca   => sub { $ENV{MOJO_CA_FILE} };
-has cert => sub { $ENV{MOJO_CERT_FILE} };
-has connect_timeout => 10;
-has cookie_jar => sub { Mojo::CookieJar->new };
+has ca              => sub { $ENV{MOJO_CA_FILE} };
+has cert            => sub { $ENV{MOJO_CERT_FILE} };
+has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} // 10 };
+has cookie_jar      => sub { Mojo::CookieJar->new };
 has [qw/http_proxy https_proxy local_address no_proxy/];
-has inactivity_timeout => 20;
+has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };
 has ioloop             => sub { Mojo::IOLoop->new };
 has key                => sub { $ENV{MOJO_KEY_FILE} };
 has max_connections    => 5;
-has max_redirects      => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
-has name               => 'Mojolicious (Perl)';
-has request_timeout    => 0;
-has transactor => sub { Mojo::UserAgent::Transactor->new };
-has websocket_timeout => 300;
+has max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
+has name => 'Mojolicious (Perl)';
+has request_timeout   => sub { $ENV{MOJO_REQUEST_TIMEOUT}   // 0 };
+has transactor        => sub { Mojo::UserAgent::Transactor->new };
+has websocket_timeout => sub { $ENV{MOJO_WEBSOCKET_TIMEOUT} // 300 };
 
 # Common HTTP methods
 {
@@ -698,7 +698,8 @@ environment variable.
   $ua         = $ua->connect_timeout(5);
 
 Maximum amount of time in seconds establishing a connection may take before
-getting canceled, defaults to C<10>.
+getting canceled, defaults to the value of the C<MOJO_CONNECT_TIMEOUT>
+environment variable or C<10>.
 
 =head2 C<cookie_jar>
 
@@ -728,8 +729,9 @@ Proxy server to use for HTTPS and WebSocket requests.
   $ua         = $ua->inactivity_timeout(15);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to C<20>. Setting the value to C<0> will allow connections
-to be inactive indefinitely.
+dropped, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
+variable or C<20>. Setting the value to C<0> will allow connections to be
+inactive indefinitely.
 
 =head2 C<ioloop>
 
@@ -793,7 +795,8 @@ Domains that don't require a proxy server to be used.
 
 Maximum amount of time in seconds establishing a connection, sending the
 request and receiving a whole response may take before getting canceled,
-defaults to C<0>. Setting the value to C<0> will allow the user agent to wait
+defaults to the value of the C<MOJO_REQUEST_TIMEOUT> environment variable or
+C<0>. Setting the value to C<0> will allow the user agent to wait
 indefinitely. The timeout will reset for every followed redirect. Note that
 this attribute is EXPERIMENTAL and might change without warning!
 
@@ -814,8 +817,9 @@ Note that this attribute is EXPERIMENTAL and might change without warning!
   $ua         = $ua->websocket_timeout(300);
 
 Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to C<300>. Setting the value to C<0> will
-allow WebSocket connections to be inactive indefinitely.
+before getting dropped, defaults to the value of the
+C<MOJO_WEBSOCKET_TIMEOUT> environment variable or C<300>. Setting the value
+to C<0> will allow WebSocket connections to be inactive indefinitely.
 
 =head1 METHODS
 

@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.54    2012-02-25 00:00:00
         - Improved documentation.
+        - Fixed small rendering bug in Mojolicious::Plugin::PODRenderer.
 
 2.53    2012-02-25 00:00:00
         - Improved Hypnotoad with many info level log messages.

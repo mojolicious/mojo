@@ -81,8 +81,7 @@ sub register {
       );
 
       # Rewrite headers
-      my $url = $self->req->url->clone;
-      $url =~ s|%2F|/|gi;
+      my $url      = $self->req->url->clone;
       my $sections = [];
       $dom->find('h1, h2, h3')->each(
         sub {

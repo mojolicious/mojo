@@ -308,9 +308,8 @@ sub _reap {
 
   # Clean up worker
   else {
-    my $w = delete $self->{workers}->{$pid};
-    $self->{log}->info("Worker $pid died unexpectedly, restarting.")
-      unless $w->{graceful} || $w->{force} || $self->{finished};
+    $self->{log}->debug("Worker $pid stopped.");
+    delete $self->{workers}->{$pid};
   }
 }
 

@@ -67,8 +67,6 @@ sub run {
   # Preload application and configure server
   my $daemon = $self->{daemon} = Mojo::Server::Daemon->new;
   $self->_config(my $app = $daemon->load_app($ENV{HYPNOTOAD_APP}));
-  $self->{log} = $app->log;
-  $self->{log}->info(qq/Loaded application "$ENV{HYPNOTOAD_APP}"./);
 
   # Testing
   _exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
@@ -79,8 +77,8 @@ sub run {
   # Initiate hot deployment
   $self->_hot_deploy unless $ENV{HYPNOTOAD_PID};
 
-  # Daemonize as early as possible
-  unless ($ENV{HYPNOTOAD_FOREGROUND}) {
+  # Daemonize as early as possible (but not for restarts)
+  if (!$ENV{HYPNOTOAD_FOREGROUND} && $ENV{HYPNOTOAD_REV} < 3) {
 
     # Fork and kill parent
     die "Can't fork: $!" unless defined(my $pid = fork);
@@ -94,6 +92,8 @@ sub run {
   }
 
   # Start accepting connections
+  ($self->{log} = $app->log)
+    ->info(qq/Hypnotoad server $$ started for "$ENV{HYPNOTOAD_APP}"./);
   $daemon->start;
 
   # Pipe for worker communication
@@ -118,7 +118,6 @@ sub run {
   };
 
   # Mainloop
-  $self->{log}->info("Manager $$ started.");
   $self->_manage while 1;
 }
 
@@ -220,7 +219,7 @@ sub _manage {
 
   # Upgraded
   if ($ENV{HYPNOTOAD_PID} && $ENV{HYPNOTOAD_PID} ne $$) {
-    $self->{log}->info("Stopping manager $ENV{HYPNOTOAD_PID}.");
+    $self->{log}->info("Upgrade successful, stopping $ENV{HYPNOTOAD_PID}.");
     kill 'QUIT', $ENV{HYPNOTOAD_PID};
   }
   $ENV{HYPNOTOAD_PID} = $$;
@@ -235,8 +234,7 @@ sub _manage {
     unless ($self->{new}) {
       $self->{log}->info('Starting zero downtime software upgrade.');
       croak "Can't fork: $!" unless defined(my $pid = fork);
-      $self->{new} = $pid if $pid;
-      exec $ENV{HYPNOTOAD_EXE} unless $pid;
+      $self->{new} = $pid ? $pid : exec($ENV{HYPNOTOAD_EXE});
     }
 
     # Timeout
@@ -251,21 +249,21 @@ sub _manage {
     my $interval = $c->{heartbeat_interval};
     my $timeout  = $c->{heartbeat_timeout};
     if ($w->{time} + $interval + $timeout <= time) {
-      $self->{log}->info("Worker $pid has no heartbeat.");
+      $self->{log}->info("Worker $pid has no heartbeat, restarting.");
       $w->{graceful} ||= time;
     }
 
     # Graceful stop with timeout
     $w->{graceful} ||= time if $self->{graceful};
     if ($w->{graceful}) {
-      $self->{log}->info("Trying to stop worker $pid gracefully.");
+      $self->{log}->debug("Trying to stop worker $pid gracefully.");
       kill 'QUIT', $pid;
       $w->{force} = 1 if $w->{graceful} + $c->{graceful_timeout} <= time;
     }
 
     # Normal stop
     if (($self->{finished} && !$self->{graceful}) || $w->{force}) {
-      $self->{log}->info("Stopping worker $pid.");
+      $self->{log}->debug("Stopping worker $pid.");
       kill 'KILL', $pid;
     }
   }
@@ -289,7 +287,7 @@ sub _pid_file {
   return if -e (my $file = $self->{config}->{pid_file});
 
   # Create PID file
-  $self->{log}->info(qq/Creating PID file "$file" for manager $$./);
+  $self->{log}->info(qq/Storing PID $$ in "$file"./);
   croak qq/Can't create PID file "$file": $!/
     unless my $pid = IO::File->new($file, '>', 0644);
   print $pid $$;
@@ -310,8 +308,9 @@ sub _reap {
 
   # Clean up worker
   else {
-    $self->{log}->info("Worker $pid stopped.");
-    delete $self->{workers}->{$pid};
+    my $w = delete $self->{workers}->{$pid};
+    $self->{log}->info("Worker $pid died unexpectedly, restarting.")
+      unless $w->{graceful} || $w->{force};
   }
 }
 
@@ -378,7 +377,7 @@ sub _spawn {
   $daemon->setuidgid;
 
   # Start
-  $self->{log}->info("Worker $$ started.");
+  $self->{log}->debug("Worker $$ started.");
   $loop->start;
   exit 0;
 }

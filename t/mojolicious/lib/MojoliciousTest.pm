@@ -89,19 +89,19 @@ sub startup {
 
   # /test3 (no class, just a namespace)
   $r->route('/test3')
-    ->to(namespace => 'MojoliciousTestController', method => 'index');
+    ->to(namespace => 'MojoliciousTestController', action => 'index');
 
   # /test2 (different namespace test)
   $r->route('/test2')->to(
-    namespace => 'MojoliciousTest2',
-    class     => 'Foo',
-    method    => 'test'
+    namespace  => 'MojoliciousTest2',
+    controller => 'Foo',
+    action     => 'test'
   );
 
   # /test5 (only namespace test)
   $r->route('/test5')->to(
     namespace => 'MojoliciousTest2::Foo',
-    method    => 'test'
+    action    => 'test'
   );
 
   # /test6 (no namespace test)

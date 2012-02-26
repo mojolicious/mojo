@@ -367,10 +367,8 @@ sub _dispatch_controller {
     if (my $e = Mojo::Loader->load($app)) {
 
       # Doesn't exist
-      unless (ref $e) {
-        $c->app->log->debug("$app does not exist, maybe a typo?");
-        return;
-      }
+      $c->app->log->debug("$app does not exist, maybe a typo?") and return
+        unless ref $e;
 
       # Error
       return $e;
@@ -442,7 +440,9 @@ sub _dispatch_controller {
 sub _generate_class {
   my ($self, $field, $c) = @_;
 
-  # Class
+  # DEPRECATED in Leaf Fluttering In Wind!
+  warn "The class stash value is DEPRECATED in favor of controller!\n"
+    if $field->{class};
   my $class = camelize $field->{class} || $field->{controller} || '';
 
   # Namespace
@@ -462,23 +462,20 @@ sub _generate_method {
   my ($self, $field, $c) = @_;
 
   # Prepare hidden
-  unless ($self->{hiding}) {
-    $self->{hiding} = {};
-    $self->{hiding}->{$_}++ for @{$self->hidden};
-  }
+  unless ($self->{hiding}) { $self->{hiding}->{$_}++ for @{$self->hidden} }
+
+  # DEPRECATED in Leaf Fluttering In Wind!
+  warn "The method stash value is DEPRECATED in favor of action!\n"
+    if $field->{method};
+  return unless my $method = $field->{method} || $field->{action};
 
   # Hidden
-  return unless my $method = $field->{method} || $field->{action};
-  if ($self->{hiding}->{$method} || index($method, '_') == 0) {
-    $c->app->log->debug(qq/Action "$method" is not allowed./);
-    return;
-  }
+  $c->app->log->debug(qq/Action "$method" is not allowed./) and return
+    if $self->{hiding}->{$method} || index($method, '_') == 0;
 
   # Invalid
-  unless ($method =~ /^[a-zA-Z0-9_:]+$/) {
-    $c->app->log->debug(qq/Action "$method" is invalid./);
-    return;
-  }
+  $c->app->log->debug(qq/Action "$method" is invalid./) and return
+    unless $method =~ /^[a-zA-Z0-9_:]+$/;
 
   return $method;
 }
@@ -495,9 +492,7 @@ sub _generate_route {
     if (!ref $arg && !$pattern) { $pattern = $arg }
 
     # Scalar
-    elsif (!ref $arg && @args) {
-      push @$conditions, $arg, shift @args;
-    }
+    elsif (!ref $arg && @args) { push @$conditions, $arg, shift @args }
 
     # Last scalar is the route name
     elsif (!ref $arg) { $name = $arg }

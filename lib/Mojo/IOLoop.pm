@@ -344,7 +344,9 @@ absolute minimal feature set required to build solid and scalable
 non-blocking TCP clients and servers.
 
 Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
-supported transparently and used if installed.
+supported transparently and used if installed. Individual features can also
+be disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment
+variables.
 
 A TLS certificate and key are also built right in to make writing test
 servers as easy as possible. Also note that for convenience the C<PIPE>

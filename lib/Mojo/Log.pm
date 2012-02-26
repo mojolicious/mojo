@@ -150,7 +150,8 @@ value of C<path> or C<STDERR>.
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Active log level, defaults to C<debug>.
+Active log level, defaults to the value of the C<MOJO_LOG_LEVEL> environment
+variable or C<debug>.
 
 These levels are currently available:
 

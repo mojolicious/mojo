@@ -53,10 +53,6 @@ Generating content with the L<Mojolicious> renderer.
 
 Cooking with L<Mojolicious>, recipes for every taste.
 
-=item L<Mojolicious::Guides::Cheatsheet>
-
-A concise all-purpose reference.
-
 =item L<Mojolicious::Guides::FAQ>
 
 Frequently asked questions with the right answers.

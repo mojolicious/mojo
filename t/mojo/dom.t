@@ -1724,7 +1724,7 @@ $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
   </B>
 </a>
 EOF
-is $dom->xml, 1, 'xml mode activated';
+is $dom->xml, 1, 'xml mode enabled';
 is $dom->a->B->text, 'foo', 'right text';
 is $dom->a->B->c->[0]->text, 'bar', 'right text';
 is $dom->a->B->c->[1]->text, 'baz', 'right text';
@@ -1741,7 +1741,7 @@ $dom = Mojo::DOM->new(<<EOF);
   </B>
 </a>
 EOF
-is $dom->xml, undef, 'xml mode not activated';
+is $dom->xml, undef, 'xml mode disabled';
 is $dom->a->b->text, 'foo', 'right text';
 is $dom->a->b->c->[0]->text, 'bar', 'right text';
 is $dom->a->b->c->[1]->text, 'baz', 'right text';
@@ -1758,7 +1758,7 @@ $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
   </B>
 </a>
 EOF
-is $dom->xml, 1, 'xml mode activated';
+is $dom->xml, 1, 'xml mode enabled';
 is $dom->a->{id}, 'one', 'right attribute';
 is_deeply [sort keys %{$dom->a}], ['id'], 'right attributes';
 is $dom->a->B->text, 'foo', 'right text';
@@ -1794,7 +1794,7 @@ $dom = Mojo::DOM->new(<<EOF);
   </B>
 </a>
 EOF
-is $dom->xml, undef, 'xml mode not activated';
+is $dom->xml, undef, 'xml mode disabled';
 is $dom->a->{id}, 'one', 'right attribute';
 is_deeply [sort keys %{$dom->a}], ['id'], 'right attributes';
 is $dom->a->b->text, 'foo', 'right text';

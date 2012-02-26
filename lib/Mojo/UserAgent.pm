@@ -632,7 +632,8 @@ L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP 1.1 and WebSocket
 user agent with C<IPv6>, C<TLS> and C<libev> support.
 
 Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
-supported transparently and used if installed.
+supported transparently and used if installed. Individual features can be
+disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
 =head1 EVENTS
 
@@ -890,7 +891,8 @@ append a callback to perform requests non-blocking.
   $ua = $ua->detect_proxy;
 
 Check environment variables C<HTTP_PROXY>, C<http_proxy>, C<HTTPS_PROXY>,
-C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information.
+C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information. Automatic
+proxy detection can be enabled with the C<MOJO_PROXY> environment variable.
 
 =head2 C<get>
 

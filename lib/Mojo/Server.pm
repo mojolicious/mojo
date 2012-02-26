@@ -124,8 +124,8 @@ Application this server handles, defaults to a L<Mojo::HelloWorld> object.
   my $app_class = $server->app_class;
   $server       = $server->app_class('MojoSubclass');
 
-Class of the application this server handles, defaults to
-L<Mojo::HelloWorld>.
+Class of the application this server handles, defaults to the value of the
+C<MOJO_APP> environment variable or L<Mojo::HelloWorld>.
 
 =head1 METHODS
 

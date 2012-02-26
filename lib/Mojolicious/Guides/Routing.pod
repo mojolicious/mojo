@@ -215,8 +215,10 @@ at any time.
     $self->stash(mymessage => 'Welcome');
   }
 
-A full list of all reserved stash values can also be found in
-L<Mojolicious::Guides::Cheatsheet>.
+The full list of all reserved stash values is currently C<action>, C<app>,
+C<cb>, C<class>, C<controller>, C<data>, C<extends>, C<format>, C<handler>,
+C<json>, C<layout>, C<method>, C<namespace>, C<partial>, C<path>, C<status>,
+C<template> and C<text>.
 
 =head2 Nested routes
 
@@ -701,7 +703,7 @@ applications.
 
   1;
 
-=head2 Embedding applications
+=head2 Embedding applications (C<app> and C<path>)
 
 You can easily embed whole applications simply by using them instead of a
 controller. This allows for example the use of the L<Mojolicious::Lite>
@@ -722,7 +724,7 @@ domain specific language in normal L<Mojolicious> controllers.
 
 With the C<detour> method which is very similar to C<to>, you can allow the
 route to partially match and use only the remaining path in the embedded
-application.
+application, the base path will be passed along in the C<path> stash value.
 
   # /foo/*
   $r->route('/foo')->detour('bar#', name => 'Mojo');

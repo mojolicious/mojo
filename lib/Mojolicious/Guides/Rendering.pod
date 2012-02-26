@@ -142,7 +142,7 @@ make sure that templates use the current controller instance and not the
 default controller specified in the C<controller_class> attribute of the
 application class.
 
-=head2 Rendering templates (C<template>)
+=head2 Rendering templates (C<template>, C<format> and C<handler>)
 
 The renderer will always try to detect the right template but you can also
 use the C<template> stash value to render a specific one.
@@ -325,7 +325,7 @@ A list of all built-in helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
-=head2 Layouts
+=head2 Layouts (C<layout>)
 
 Most of the time when using C<ep> templates you will want to wrap your
 generated content in a HTML skeleton, thanks to layouts that's absolutely
@@ -480,7 +480,7 @@ of the template to the layout.
     <body><%= content %></body>
   </html>
 
-=head2 Template inheritance
+=head2 Template inheritance (C<extends>)
 
 Inheritance takes the layout concept above one step further, it allows you to
 build a skeleton template with named C<content> blocks that child templates

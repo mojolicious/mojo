@@ -167,7 +167,8 @@ Construct a new L<Mojo::Home> object.
   $home = $home->detect;
   $home = $home->detect('My::App');
 
-Detect home directory from application class.
+Detect home directory from value of C<MOJO_HOME> environment variable or
+application class.
 
 =head2 C<lib_dir>
 

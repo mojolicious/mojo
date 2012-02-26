@@ -32,8 +32,8 @@ our $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
 
 # Reserved stash values
 my @RESERVED = (
-  qw/action app cb class controller data exception extends format handler/,
-  qw/json layout method namespace partial path status template text/
+  qw/action app cb class controller data extends format handler json layout/,
+  qw/method namespace partial path status template text/
 );
 my %RESERVED;
 $RESERVED{$_}++ for @RESERVED;

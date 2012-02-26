@@ -488,7 +488,8 @@ relative file.
   $commands->run;
   $commands->run(@ARGV);
 
-Load and run commands.
+Load and run commands. Automatic deployment environment detection can be
+disabled with the C<MOJO_NO_DETECT> environment variable.
 
 =head2 C<start>
 

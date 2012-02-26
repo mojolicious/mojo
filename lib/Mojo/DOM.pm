@@ -407,7 +407,7 @@ sub _text {
 sub _trim {
   my ($e, $trim) = @_;
 
-  # Deactivated
+  # Disabled
   return 0 unless $trim = defined $trim ? $trim : 1;
 
   # Detect "pre" tag
@@ -477,7 +477,7 @@ switch into XML mode and everything becomes case sensitive.
   say $dom->at('P')->text;
   say $dom->P->{ID};
 
-XML detection can be also deactivated with the C<xml> method.
+XML detection can be also disabled with the C<xml> method.
 
   # XML sematics
   $dom->xml(1);
@@ -502,7 +502,7 @@ Construct a new L<Mojo::DOM> object.
   my $untrimmed = $dom->all_text(0);
 
 Extract all text content from DOM structure, smart whitespace trimming is
-activated by default. Note that the trim argument of this method is
+disabled by default. Note that the trim argument of this method is
 EXPERIMENTAL and might change without warning!
 
   # "foo bar baz"
@@ -645,7 +645,7 @@ Find root node.
   my $untrimmed = $dom->text(0);
 
 Extract text content from element only (not including child elements), smart
-whitespace trimming is activated by default. Note that the trim argument of
+whitespace trimming is disabled by default. Note that the trim argument of
 this method is EXPERIMENTAL and might change without warning!
 
   # "foo baz"
@@ -660,7 +660,7 @@ this method is EXPERIMENTAL and might change without warning!
   my $untrimmed = $dom->text_after(0);
 
 Extract text content immediately following element, smart whitespace trimming
-is activated by default. Note that this method is EXPERIMENTAL and might
+is disabled by default. Note that this method is EXPERIMENTAL and might
 change without warning!
 
   # "baz"
@@ -675,7 +675,7 @@ change without warning!
   my $untrimmed = $dom->text_before(0);
 
 Extract text content immediately preceding element, smart whitespace trimming
-is activated by default. Note that this method is EXPERIMENTAL and might
+is disabled by default. Note that this method is EXPERIMENTAL and might
 change without warning!
 
   # "foo"

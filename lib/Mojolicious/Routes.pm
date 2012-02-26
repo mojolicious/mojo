@@ -443,9 +443,7 @@ sub _generate_class {
   my ($self, $field, $c) = @_;
 
   # Class
-  my $class = $field->{class};
-  my $controller = $field->{controller} || '';
-  $class = camelize $controller unless $class;
+  my $class = camelize $field->{class} || $field->{controller} || '';
 
   # Namespace
   my $namespace = $field->{namespace};

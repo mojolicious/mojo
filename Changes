@@ -1,6 +1,11 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.54    2012-02-26 00:00:00
+        - Added EXPERIMENTAL patch function to Mojolicious::Lite.
+        - Added EXPERIMENTAL patch method to Mojolicious::Routes.
+        - Added EXPERIMENTAL patch method to Mojo::UserAgent.
+        - Added EXPERIMENTAL patch_ok method to Test::Mojo.
+        - Added EXPERIMENTAL t function to ojo.
         - Added support for MOJO_CONNECT_TIMEOUT, MOJO_INACTIVITY_TIMEOUT,
           MOJO_REQUEST_TIMEOUT and MOJO_WEBSOCKET_TIMEOUT environment
           variables.

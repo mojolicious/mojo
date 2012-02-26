@@ -49,6 +49,7 @@ sub import {
   *{"${caller}::hook"}   = sub { $app->hook(@_) };
   *{"${caller}::under"}  = *{"${caller}::ladder"} =
     sub { $routes = $root->under(@_) };
+  *{"${caller}::patch"}     = sub { $routes->patch(@_) };
   *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
   *{"${caller}::post"}      = sub { $routes->post(@_) };
   *{"${caller}::put"}       = sub { $routes->put(@_) };
@@ -881,6 +882,14 @@ Alias for L<Mojolicious/"helper">.
   hook after_dispatch => sub {...};
 
 Alias for L<Mojolicious/"hook">.
+
+=head2 C<patch>
+
+  my $route = patch '/:foo' => sub {...};
+
+Generate route matching only C<PATCH> requests. See also the tutorial above
+for more argument variations. Note that this function is EXPERIMENTAL and
+might change without warning!
 
 =head2 C<plugin>
 

@@ -31,7 +31,7 @@ has websocket_timeout => sub { $ENV{MOJO_WEBSOCKET_TIMEOUT} // 300 };
 # Common HTTP methods
 {
   no strict 'refs';
-  for my $name (qw/DELETE GET HEAD POST PUT/) {
+  for my $name (qw/DELETE GET HEAD PATCH POST PUT/) {
     *{__PACKAGE__ . '::' . lc($name)} = sub {
       my $self = shift;
       $self->start($self->build_tx($name, @_));
@@ -932,6 +932,23 @@ append a callback to perform requests non-blocking.
   my $success = $ua->need_proxy('intranet.mojolicio.us');
 
 Check if request for domain would use a proxy server.
+
+=head2 C<patch>
+
+  my $tx = $ua->patch('http://kraih.com');
+
+Perform blocking HTTP C<PATCH> request and return resulting
+L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
+append a callback to perform requests non-blocking. Note that this method is
+EXPERIMENTAL and might change without warning!
+
+  $ua->patch('http://kraih.com' => sub {
+    my ($ua, $tx) = @_;
+    say $tx->res->body;
+    Mojo::IOLoop->stop;
+  });
+  Mojo::IOLoop->start;
 
 =head2 C<post>
 

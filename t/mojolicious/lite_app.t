@@ -363,8 +363,8 @@ post '/bar/:test' => {test => 'default'} => sub {
   $self->render_text($self->stash('test'));
 };
 
-# GET /firefox/*
-get '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
+# PATCH /firefox/*
+patch '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
   my $self = shift;
   $self->render_text($self->url_for('foxy', stuff => 'foo'));
 } => 'foxy';
@@ -1130,14 +1130,14 @@ $t->get_ok('/layout')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("LayoutYea baby! with layout\n");
 
-# GET /firefox
-$t->get_ok('/firefox/bar', {'User-Agent' => 'Firefox'})->status_is(200)
+# PATCH /firefox
+$t->patch_ok('/firefox/bar', {'User-Agent' => 'Firefox'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/firefox/foo');
 
-# GET /firefox
-$t->get_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
+# PATCH /firefox
+$t->patch_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Oops!/);

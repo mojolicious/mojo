@@ -99,7 +99,7 @@ sub content_type_unlike {
 # "A job's a job. I mean, take me.
 #  If my plant pollutes the water and poisons the town,
 #  by your logic, that would make me a criminal."
-sub delete_ok { shift->_request_ok('delete', @_) }
+sub delete_ok { shift->_request_ok(delete => @_) }
 
 sub element_exists {
   my ($self, $selector, $desc) = @_;
@@ -128,8 +128,8 @@ sub finish_ok {
   return $self;
 }
 
-sub get_ok  { shift->_request_ok('get',  @_) }
-sub head_ok { shift->_request_ok('head', @_) }
+sub get_ok  { shift->_request_ok(get  => @_) }
+sub head_ok { shift->_request_ok(head => @_) }
 
 sub header_is {
   my ($self, $name, $value) = @_;
@@ -238,7 +238,8 @@ sub message_unlike {
 }
 
 # "God bless those pagans."
-sub post_ok { shift->_request_ok('post', @_) }
+sub patch_ok { shift->_request_ok(patch => @_) }
+sub post_ok  { shift->_request_ok(post  => @_) }
 
 sub post_form_ok {
   my ($self, $url) = (shift, shift);
@@ -251,7 +252,7 @@ sub post_form_ok {
 }
 
 # "WHO IS FONZY!?! Don't they teach you anything at school?"
-sub put_ok { shift->_request_ok('put', @_) }
+sub put_ok { shift->_request_ok(put => @_) }
 
 sub reset_session {
   my $self = shift;
@@ -651,6 +652,14 @@ EXPERIMENTAL and might change without warning!
 
 Opposite of C<message_like>. Note that this method is EXPERIMENTAL and might
 change without warning!
+
+=head2 C<patch_ok>
+
+  $t = $t->patch_ok('/foo');
+
+Perform a C<PATCH> request and check for transport errors, takes the exact
+same arguments as L<Mojo::UserAgent/"patch">. Note that this method is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<post_ok>
 

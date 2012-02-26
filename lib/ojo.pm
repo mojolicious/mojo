@@ -41,12 +41,13 @@ sub import {
   *{"${caller}::oO"} = sub { _request(@_) };
   *{"${caller}::a"} =
     sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
-  *{"${caller}::d"} = sub { _request('DELETE', @_) };
-  *{"${caller}::f"} = sub { _request('FORM',   @_) };
-  *{"${caller}::g"} = sub { _request('GET',    @_) };
-  *{"${caller}::h"} = sub { _request('HEAD',   @_) };
-  *{"${caller}::p"} = sub { _request('POST',   @_) };
-  *{"${caller}::u"} = sub { _request('PUT',    @_) };
+  *{"${caller}::d"} = sub { _request(DELETE => @_) };
+  *{"${caller}::f"} = sub { _request(FORM   => @_) };
+  *{"${caller}::g"} = sub { _request(GET    => @_) };
+  *{"${caller}::h"} = sub { _request(HEAD   => @_) };
+  *{"${caller}::p"} = sub { _request(POST   => @_) };
+  *{"${caller}::t"} = sub { _request(PATCH  => @_) };
+  *{"${caller}::u"} = sub { _request(PUT    => @_) };
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
 }
 
@@ -58,9 +59,7 @@ sub _request {
 
   # Transaction
   my $tx =
-      $method eq 'FORM'
-    ? $UA->build_form_tx(@_)
-    : $UA->build_tx($method => @_);
+    $method eq 'FORM' ? $UA->build_form_tx(@_) : $UA->build_tx($method => @_);
 
   # Process
   $tx = $UA->start($tx);
@@ -152,6 +151,14 @@ L<Mojo::Message::Response> object.
 
 Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.
+
+=head2 C<t>
+
+  my $res = t('http://mojolicio.us');
+
+Perform C<PATCH> request with L<Mojo::UserAgent/"patch"> and return resulting
+L<Mojo::Message::Response> object. Note that this function is EXPERIMENTAL
+and might change without warning!
 
 =head2 C<u>
 

@@ -44,8 +44,8 @@ get 'form/:test' => 'form';
 # PUT /selection
 put 'selection';
 
-# GET /☃
-get '/☃' => 'snowman';
+# PATCH /☃
+patch '/☃' => 'snowman';
 
 my $t = Test::Mojo->new;
 
@@ -324,8 +324,8 @@ $t->put_ok('/selection?preselect=1')->status_is(200)
     . '</form>'
     . "\n");
 
-# GET /☃
-$t->get_ok('/☃')->status_is(200)->content_is(<<'EOF');
+# PATCH /☃
+$t->patch_ok('/☃')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83">
   <input type="submit" value="☃" />
 </form>

@@ -215,10 +215,8 @@ at any time.
     $self->stash(mymessage => 'Welcome');
   }
 
-The full list of all reserved stash values is currently C<action>, C<app>,
-C<cb>, C<class>, C<controller>, C<data>, C<extends>, C<format>, C<handler>,
-C<json>, C<layout>, C<method>, C<namespace>, C<partial>, C<path>, C<status>,
-C<template> and C<text>.
+For a full list of reserved stash values see
+L<Mojolicious::Controller/"stash">.
 
 =head2 Nested routes
 

@@ -962,7 +962,11 @@ Cookies failing signature verification will be automatically discarded.
   $c        = $c->stash(foo => 'bar');
 
 Non persistent data storage and exchange, application wide default values can
-be set with L<Mojolicious/"defaults">.
+be set with L<Mojolicious/"defaults">. Many stash value have a special
+meaning and are reserved, the full list is currently C<action>, C<app>,
+C<cb>, C<class>, C<controller>, C<data>, C<extends>, C<format>, C<handler>,
+C<json>, C<layout>, C<method>, C<namespace>, C<partial>, C<path>, C<status>,
+C<template> and C<text>.
 
   $c->stash->{foo} = 'bar';
   my $foo = $c->stash->{foo};

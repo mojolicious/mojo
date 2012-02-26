@@ -142,7 +142,7 @@ make sure that templates use the current controller instance and not the
 default controller specified in the C<controller_class> attribute of the
 application class.
 
-=head2 Rendering templates (C<template>, C<format> and C<handler>)
+=head2 Rendering templates
 
 The renderer will always try to detect the right template but you can also
 use the C<template> stash value to render a specific one.
@@ -161,7 +161,7 @@ shortcut.
 All values passed to the C<render> call are only temporarily assigned to the
 stash and get reset again once rendering is finished.
 
-=head2 Rendering inline templates (C<inline>)
+=head2 Rendering inline templates
 
 Some renderers such as C<ep> allow templates to be passed inline.
 
@@ -172,41 +172,41 @@ too.
 
   $self->render(inline => "<%= shift->param('foo') %>", handler => 'epl');
 
-=head2 Rendering text (C<text>)
+=head2 Rendering text
 
 Perl characters can be rendered with the C<text> stash value, the given
 content will be automatically encoded to bytes.
 
   $self->render(text => 'Hello Wörld!');
 
-=head2 Rendering data (C<data>)
+=head2 Rendering data
 
 Raw bytes can be rendered with the C<data> stash value, no encoding will be
 performed.
 
   $self->render(data => $octets);
 
-=head2 Rendering JSON (C<json>)
+=head2 Rendering JSON
 
 The C<json> stash value allows you to pass Perl structures to the renderer
 which get directly encoded to JSON.
 
   $self->render(json => {foo => [1, 'test', 3]});
 
-=head2 Partial rendering (C<partial>)
+=head2 Partial rendering
 
 Sometimes you might want to access the rendered result, for example to
 generate emails, this can be done using the C<partial> stash value.
 
   my $html = $self->render('mail', partial => 1);
 
-=head2 Status code (C<status>)
+=head2 Status code
 
 Response status codes can be changed with the C<status> stash value.
 
   $self->render(text => 'Oops.', status => 500);
 
-=head2 Content type (C<format>)
+=head2 Content type
 
 The C<Content-Type> header of the response is actually based on the MIME type
 mapping of the C<format> stash value.
@@ -325,7 +325,7 @@ A list of all built-in helpers can be found in
 L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
-=head2 Layouts (C<layout>)
+=head2 Layouts
 
 Most of the time when using C<ep> templates you will want to wrap your
 generated content in a HTML skeleton, thanks to layouts that's absolutely
@@ -480,7 +480,7 @@ of the template to the layout.
     <body><%= content %></body>
   </html>
 
-=head2 Template inheritance (C<extends>)
+=head2 Template inheritance
 
 Inheritance takes the layout concept above one step further, it allows you to
 build a skeleton template with named C<content> blocks that child templates

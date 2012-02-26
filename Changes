@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.54    2012-02-26 00:00:00
+2.54    2012-02-27 00:00:00
         - Deprecated class and method stash values in favor of controller and
           action.
         - Added EXPERIMENTAL patch function to Mojolicious::Lite.

@@ -582,8 +582,8 @@ to L<Mojo::JSON>.
   my $size = $message->max_message_size;
   $message = $message->max_message_size(1024);
 
-Maximum message size in bytes, defaults to the value of
-C<MOJO_MAX_MESSAGE_SIZE> or C<5242880>.
+Maximum message size in bytes, defaults to the value of the
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<5242880>.
 
 =head2 C<version>
 

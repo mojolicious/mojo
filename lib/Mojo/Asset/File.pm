@@ -210,8 +210,8 @@ necessary.
   my $tmpdir = $file->tmpdir;
   $file      = $file->tmpdir('/tmp');
 
-Temporary directory used to generate C<path>, defaults to the value of
-C<MOJO_TMPDIR> or auto detection.
+Temporary directory used to generate C<path>, defaults to the value of the
+C<MOJO_TMPDIR> environment variable or auto detection.
 
 =head1 METHODS
 

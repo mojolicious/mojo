@@ -118,8 +118,8 @@ automatically upgrade to a L<Mojo::Asset::File> object.
   $mem     = $mem->max_memory_size(1024);
 
 Maximum asset size in bytes, only attempt upgrading to a L<Mojo::Asset::File>
-object after reaching this limit, defaults to the value of
-C<MOJO_MAX_MEMORY_SIZE> or C<262144>.
+object after reaching this limit, defaults to the value of the
+C<MOJO_MAX_MEMORY_SIZE> environment variable or C<262144>.
 
 =head1 METHODS
 

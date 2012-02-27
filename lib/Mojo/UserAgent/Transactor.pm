@@ -133,8 +133,7 @@ sub form {
     $req->body($params->to_string);
   }
 
-  return $tx unless wantarray;
-  return $tx, $cb;
+  return wantarray ? ($tx, $cb) : $tx;
 }
 
 # "This kid's a wonder!
@@ -237,8 +236,7 @@ sub tx {
   # Headers
   $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
-  return $tx unless wantarray;
-  return $tx, $cb;
+  return wantarray ? ($tx, $cb) : $tx;
 }
 
 # "She found my one weakness... that I'm weak!"
@@ -248,19 +246,16 @@ sub websocket {
   # New WebSocket
   my ($tx, $cb) = $self->tx(GET => @_);
   my $req = $tx->req;
-  my $url = $req->url;
-  my $abs = $url->to_abs;
+  my $abs = $req->url->to_abs;
   if (my $scheme = $abs->scheme) {
-    $scheme = $scheme eq 'wss' ? 'https' : 'http';
-    $req->url($abs->scheme($scheme));
+    $req->url($abs->scheme($scheme eq 'wss' ? 'https' : 'http'));
   }
 
   # Handshake
   Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1)
     ->client_handshake;
 
-  return $tx unless wantarray;
-  return $tx, $cb;
+  return wantarray ? ($tx, $cb) : $tx;
 }
 
 1;

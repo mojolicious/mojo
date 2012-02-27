@@ -167,21 +167,21 @@ Construct a new L<Mojo::Home> object.
   $home = $home->detect;
   $home = $home->detect('My::App');
 
-Detect home directory from value of C<MOJO_HOME> environment variable or
-application class.
+Detect home directory from the value of the C<MOJO_HOME> environment variable
+or application class.
 
 =head2 C<lib_dir>
 
   my $path = $home->lib_dir;
 
-Path to C<lib> directory.
+Path to C<lib> directory of application.
 
 =head2 C<list_files>
 
   my $files = $home->list_files;
   my $files = $home->list_files('foo/bar');
 
-List all files in directory and subdirectories recursively.
+Portably list all files in directory and subdirectories recursively.
 
 =head2 C<mojo_lib_dir>
 
@@ -193,25 +193,25 @@ Path to C<lib> directory in which L<Mojolicious> is installed.
 
   $home = $home->parse('/foo/bar');
 
-Parse path.
+Parse home directory.
 
 =head2 C<rel_dir>
 
   my $path = $home->rel_dir('foo/bar');
 
-Generate absolute path for relative directory.
+Portably generate an absolute path from a relative UNIX style path.
 
 =head2 C<rel_file>
 
   my $path = $home->rel_file('foo/bar.html');
 
-Generate absolute path for relative file.
+Portably generate an absolute path from a relative UNIX style path.
 
 =head2 C<slurp_rel_file>
 
   my $string = $home->slurp_rel_file('foo/bar.html');
 
-Read all file data at once.
+Portably read all file data at once.
 
 =head2 C<to_string>
 

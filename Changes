@@ -15,6 +15,7 @@ This file documents the revision history for Perl extension Mojolicious.
           documentation.
         - Increased default connect timeout from 3 to 10 seconds in
           Mojo::UserAgent and Mojo::IOLoop::Client.
+        - Improved resilience of Mojo::IOLoop::Stream.
         - Improved test command to colorize by default.
         - Improved documentation.
         - Fixed small rendering bug in Mojolicious::Plugin::PODRenderer.

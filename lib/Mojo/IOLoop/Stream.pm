@@ -39,6 +39,7 @@ sub handle { shift->{handle} }
 
 sub is_readable {
   my $self = shift;
+  $self->{active} = time;
   return $self->{handle} && $self->iowatcher->is_readable($self->{handle});
 }
 

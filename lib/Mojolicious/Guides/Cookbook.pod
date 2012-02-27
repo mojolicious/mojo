@@ -408,6 +408,9 @@ subscribing to the C<message> event of the transaction.
     # Connected
     $self->app->log->debug('WebSocket connected.');
 
+    # Increase inactivity timeout for connection a bit
+    Mojo::IOLoop->stream($self->tx->connection)->timeout(300);
+
     # Incoming message
     $self->on(message => sub {
       my ($self, $message) = @_;

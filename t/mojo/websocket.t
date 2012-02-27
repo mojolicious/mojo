@@ -196,7 +196,7 @@ $loop->start;
 ok !$ws, 'not a websocket';
 is $code, 426, 'right code';
 ok $body =~ /^(\d+)failed!$/, 'right content';
-ok $1 < 100, 'right timeout';
+is $1, 15, 'right timeout';
 
 # WebSocket /socket (using an already prepared socket)
 my $port     = $ua->app_url->port;
@@ -227,7 +227,7 @@ $loop->start;
 is $finished, 1, 'finish event has been emitted';
 is $early,    1, 'finish event has been emitted at the right time';
 ok $result =~ /^lalala(\d+)$/, 'right result';
-ok $1 > 100, 'right timeout';
+is $1, 15, 'right timeout';
 ok $local, 'local port';
 is $loop->stream($tx->connection)->handle, $sock, 'right connection id';
 

@@ -24,9 +24,8 @@ has key                => sub { $ENV{MOJO_KEY_FILE} };
 has max_connections    => 5;
 has max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
 has name => 'Mojolicious (Perl)';
-has request_timeout   => sub { $ENV{MOJO_REQUEST_TIMEOUT}   // 0 };
-has transactor        => sub { Mojo::UserAgent::Transactor->new };
-has websocket_timeout => sub { $ENV{MOJO_WEBSOCKET_TIMEOUT} // 300 };
+has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
+has transactor => sub { Mojo::UserAgent::Transactor->new };
 
 # Common HTTP methods
 {
@@ -524,7 +523,6 @@ sub _upgrade {
   $res->error('WebSocket challenge failed.') and return
     unless $new->client_challenge;
   $c->{tx} = $new;
-  $self->_loop->stream($id)->timeout($self->websocket_timeout);
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });
 
@@ -812,16 +810,6 @@ this attribute is EXPERIMENTAL and might change without warning!
 
 Transaction builder, defaults to a L<Mojo::UserAgent::Transactor> object.
 Note that this attribute is EXPERIMENTAL and might change without warning!
-
-=head2 C<websocket_timeout>
-
-  my $timeout = $ua->websocket_timeout;
-  $ua         = $ua->websocket_timeout(300);
-
-Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to the value of the
-C<MOJO_WEBSOCKET_TIMEOUT> environment variable or C<300>. Setting the value
-to C<0> will allow WebSocket connections to be inactive indefinitely.
 
 =head1 METHODS
 

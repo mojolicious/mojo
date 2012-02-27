@@ -23,8 +23,6 @@ These options are available:
   -r, --requests <number>      Set maximum number of requests per keep-alive
                                connection, defaults to 25.
   -u, --user <name>            Set username for process.
-  -w, --websocket <seconds>    Set WebSocket timeout, defaults to the value
-                               of MOJO_WEBSOCKET_TIMEOUT or 300.
 EOF
 
 # "It's an albino humping worm!
@@ -44,9 +42,8 @@ sub run {
     'i|inactivity=i' => sub { $daemon->inactivity_timeout($_[1]) },
     'l|listen=s'     => \@listen,
     'p|proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
-    'r|requests=i'  => sub { $daemon->max_requests($_[1]) },
-    'u|user=s'      => sub { $daemon->user($_[1]) },
-    'w|websocket=i' => sub { $daemon->websocket_timeout($_[1]) }
+    'r|requests=i' => sub { $daemon->max_requests($_[1]) },
+    'u|user=s'     => sub { $daemon->user($_[1]) }
   );
 
   # Start

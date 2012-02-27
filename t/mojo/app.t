@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 56;
+use Test::More tests => 53;
 
 # "I was so bored I cut the pony tail off the guy in front of us.
 #  Look at me, I'm a grad student.
@@ -21,18 +21,13 @@ use Mojo::UserAgent;
 use_ok 'Mojo';
 use_ok 'Mojolicious';
 
-# Timeouts
+# Timeout
 {
   is(Mojo::Server::Daemon->new->inactivity_timeout, 15, 'right value');
   local $ENV{MOJO_INACTIVITY_TIMEOUT} = 25;
   is(Mojo::Server::Daemon->new->inactivity_timeout, 25, 'right value');
   $ENV{MOJO_INACTIVITY_TIMEOUT} = 0;
-  is(Mojo::Server::Daemon->new->inactivity_timeout, 0,   'right value');
-  is(Mojo::Server::Daemon->new->websocket_timeout,  300, 'right value');
-  local $ENV{MOJO_WEBSOCKET_TIMEOUT} = 25;
-  is(Mojo::Server::Daemon->new->websocket_timeout, 25, 'right value');
-  $ENV{MOJO_WEBSOCKET_TIMEOUT} = 0;
-  is(Mojo::Server::Daemon->new->websocket_timeout, 0, 'right value');
+  is(Mojo::Server::Daemon->new->inactivity_timeout, 0, 'right value');
 }
 
 # Logger

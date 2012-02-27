@@ -19,7 +19,6 @@ has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
 has max_clients        => 1000;
 has max_requests       => 25;
-has websocket_timeout  => sub { $ENV{MOJO_WEBSOCKET_TIMEOUT}  // 300 };
 
 my $LISTEN_RE = qr|
   ^
@@ -168,11 +167,6 @@ sub _finish {
 
     # Successful upgrade
     if ($ws->res->code eq '101') {
-
-      # Upgrade inactivity timeout
-      $self->ioloop->stream($id)->timeout($self->websocket_timeout);
-
-      # Resume
       weaken $self;
       $ws->on(resume => sub { $self->_write($id) });
     }
@@ -458,16 +452,6 @@ Disable console messages.
   $daemon  = $daemon->user('web');
 
 User for the server process.
-
-=head2 C<websocket_timeout>
-
-  my $timeout = $server->websocket_timeout;
-  $server     = $server->websocket_timeout(300);
-
-Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to the value of the
-C<MOJO_WEBSOCKET_TIMEOUT> environment variable or C<300>. Setting the value
-to C<0> will allow WebSocket connections to be inactive indefinitely.
 
 =head1 METHODS
 

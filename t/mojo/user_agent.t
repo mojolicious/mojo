@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 85;
+use Test::More tests => 82;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -98,12 +98,7 @@ get '/echo' => sub {
   local $ENV{MOJO_REQUEST_TIMEOUT} = 25;
   is(Mojo::UserAgent->new->request_timeout, 25, 'right value');
   $ENV{MOJO_REQUEST_TIMEOUT} = 0;
-  is(Mojo::UserAgent->new->request_timeout,   0,   'right value');
-  is(Mojo::UserAgent->new->websocket_timeout, 300, 'right value');
-  local $ENV{MOJO_WEBSOCKET_TIMEOUT} = 25;
-  is(Mojo::UserAgent->new->websocket_timeout, 25, 'right value');
-  $ENV{MOJO_WEBSOCKET_TIMEOUT} = 0;
-  is(Mojo::UserAgent->new->websocket_timeout, 0, 'right value');
+  is(Mojo::UserAgent->new->request_timeout, 0, 'right value');
 }
 
 # GET / (non-blocking)

@@ -159,7 +159,6 @@ sub _config {
   $daemon->max_requests($c->{keep_alive_requests}      || 25);
   $daemon->inactivity_timeout($c->{inactivity_timeout} || 15);
   $daemon->user($c->{user}) if $c->{user};
-  $daemon->websocket_timeout($c->{websocket_timeout} || 300);
   $daemon->ioloop->max_accepts($c->{accepts} || 1000);
   my $listen = $c->{listen} || ['http://*:8080'];
   $listen = [$listen] unless ref $listen;
@@ -601,14 +600,6 @@ before getting canceled, defaults to C<60>.
   user => 'sri'
 
 Username for worker processes.
-
-=head2 C<websocket_timeout>
-
-  websocket_timeout => 150
-
-Maximum amount of time in seconds a WebSocket connection can be inactive
-before getting dropped, defaults to C<300>. Setting the value to C<0> will
-allow WebSocket connections to be inactive indefinitely.
 
 =head2 C<workers>
 

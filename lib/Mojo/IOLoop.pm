@@ -580,9 +580,6 @@ and the loop can be restarted by running C<start> again.
 Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 Note that this method is EXPERIMENTAL and might change without warning!
 
-  # Increase timeout for the connection of a transaction to 300 seconds
-  Mojo::IOLoop->stream($tx->connection)->timeout(300);
-
 =head2 C<timer>
 
   my $id = Mojo::IOLoop->timer(5 => sub {...});

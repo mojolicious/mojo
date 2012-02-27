@@ -857,7 +857,8 @@ Alias for L<Mojo::UserAgent::Transactor/"tx">.
 
   my $tx = $ua->build_websocket_tx('ws://localhost:3000');
 
-Alias for L<Mojo::UserAgent::Transactor/"websocket">.
+Alias for L<Mojo::UserAgent::Transactor/"websocket">. Note that this method
+is EXPERIMENTAL and might change without warning!
 
 =head2 C<delete>
 

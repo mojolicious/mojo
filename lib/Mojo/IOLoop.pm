@@ -523,7 +523,7 @@ amount of time in seconds.
   my $id = $loop->recurring(3 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given
-amount of seconds.
+amount of time in seconds.
 
   # Run multiple reactors next to each other
   my $loop2 = Mojo::IOLoop->new;
@@ -580,13 +580,17 @@ and the loop can be restarted by running C<start> again.
 Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 Note that this method is EXPERIMENTAL and might change without warning!
 
+  # Increase inactivity timeout for connection to 300 seconds
+  Mojo::IOLoop->stream($id)->timeout(300);
+
 =head2 C<timer>
 
   my $id = Mojo::IOLoop->timer(5 => sub {...});
   my $id = $loop->timer(5 => sub {...});
   my $id = $loop->timer(0.25 => sub {...});
 
-Create a new timer, invoking the callback after a given amount of seconds.
+Create a new timer, invoking the callback after a given amount of time in
+seconds.
 
 =head1 DEBUGGING
 

@@ -243,6 +243,7 @@ You can also use the built-in web server to embed L<Mojolicious> applications
 into alien environments like foreign event loops.
 
   use Mojolicious::Lite;
+  use Mojo::IOLoop;
   use Mojo::Server::Daemon;
 
   # Normal action
@@ -301,6 +302,7 @@ Multiple events such as parallel requests can be easily synchronized with a
 L<Mojo::IOLoop> delay.
 
   use Mojolicious::Lite;
+  use Mojo::IOLoop;
 
   # Search Twitter for "perl" and "python"
   get '/' => sub {
@@ -336,6 +338,7 @@ for example be used to delay rendering of a response, and unlike C<sleep>,
 won't block any other requests that might be processed in parallel.
 
   use Mojolicious::Lite;
+  use Mojo::IOLoop;
 
   # Wait 3 seconds before rendering a response
   get '/' => sub {
@@ -351,6 +354,7 @@ Recurring timers are slightly more powerful, but need to be dropped manually,
 or they would just keep getting emitted.
 
   use Mojolicious::Lite;
+  use Mojo::IOLoop;
 
   # Count to 5 in 1 second steps
   get '/' => sub {
@@ -397,6 +401,7 @@ channels between clients and servers. Receiving messages is as easy as
 subscribing to the C<message> event of the transaction.
 
   use Mojolicious::Lite;
+  use Mojo::IOLoop;
 
   # Template with browser-side code
   get '/' => 'index';
@@ -480,6 +485,7 @@ the advantage however is low infrastructure requirements, since it reuses the
 HTTP protocol for transport.
 
   use Mojolicious::Lite;
+  use Mojo::IOLoop;
 
   # Template with browser-side code
   get '/' => 'index';

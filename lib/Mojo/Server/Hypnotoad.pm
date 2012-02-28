@@ -389,6 +389,8 @@ sub _stop {
 1;
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
@@ -458,15 +460,15 @@ Attempt zero downtime software upgrade (hot deployment) without losing any
 incoming connections.
 
   Manager (old)
-  |- Worker [1]
-  |- Worker [2]
-  |- Worker [3]
-  |- Worker [4]
-  `- Manager (new)
-     |- Worker [1]
-     |- Worker [2]
-     |- Worker [3]
-     `- Worker [4]
+  ├─ Worker [1]
+  ├─ Worker [2]
+  ├─ Worker [3]
+  ├─ Worker [4]
+  └─ Manager (new)
+     ├─ Worker [1]
+     ├─ Worker [2]
+     ├─ Worker [3]
+     └─ Worker [4]
 
 The new manager will automatically send a C<QUIT> signal to the old manager
 and take over serving requests after starting up successfully.

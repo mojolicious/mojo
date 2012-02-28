@@ -77,7 +77,7 @@
     %= include inline => $Mojolicious::Controller::MOJOBAR
     <div id="wrapperlicious">
       <div id="routes">
-        <h1>Page not found&hellip; yet!</h1>
+        <h1>Page not found... yet!</h1>
         <p>
           None of these routes matched your
           <code><%= $self->req->method %></code> request for

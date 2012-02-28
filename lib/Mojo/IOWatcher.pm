@@ -113,7 +113,7 @@ sub _one_tick {
       elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
 
       # Handle timer
-      if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb, $id) }
+      if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb) }
     }
   }
 }

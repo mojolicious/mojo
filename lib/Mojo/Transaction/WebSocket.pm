@@ -447,6 +447,9 @@ L<Mojo::Transaction> and implements the following new ones.
 
 Build WebSocket frame.
 
+  # Build single "Binary" frame
+  say $ws->build_frame(1, 0, 0, 0, 2, 'Hello World!');
+
 =head2 C<client_challenge>
 
   my $success = $ws->client_challenge;

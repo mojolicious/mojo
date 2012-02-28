@@ -116,7 +116,7 @@ sub recurring {
   my ($self, $after, $cb) = @_;
   $self = $self->singleton unless ref $self;
   weaken $self;
-  return $self->iowatcher->recurring($after => sub { $self->$cb(pop) });
+  return $self->iowatcher->recurring($after => sub { $self->$cb });
 }
 
 # "Fat Tony is a cancer on this fair city!
@@ -209,7 +209,7 @@ sub timer {
   my ($self, $after, $cb) = @_;
   $self = $self->singleton unless ref $self;
   weaken $self;
-  return $self->iowatcher->timer($after => sub { $self->$cb(pop) });
+  return $self->iowatcher->timer($after => sub { $self->$cb });
 }
 
 sub _cleaner {

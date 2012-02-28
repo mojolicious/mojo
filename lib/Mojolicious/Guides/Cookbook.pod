@@ -1,6 +1,4 @@
 
-=encoding utf8
-
 =head1 NAME
 
 Mojolicious::Guides::Cookbook - Cookbook
@@ -46,7 +44,7 @@ After reading the L<Mojolicious::Lite> tutorial, you should already be
 familiar with L<Mojo::Server::Morbo>.
 
   Mojo::Server::Morbo
-  └─ Mojo::Server::Daemon
+  `- Mojo::Server::Daemon
 
 It is basically a restarter that forks a new L<Mojo::Server::Daemon> web
 server whenever a file in your project changes, and should therefore only be
@@ -62,10 +60,10 @@ web server L<Mojo::Server::Hypnotoad> that will allow you to take advantage
 of multiple cpu cores and copy-on-write.
 
   Mojo::Server::Hypnotoad
-  ├─ Mojo::Server::Daemon [1]
-  ├─ Mojo::Server::Daemon [2]
-  ├─ Mojo::Server::Daemon [3]
-  └─ Mojo::Server::Daemon [4]
+  |- Mojo::Server::Daemon [1]
+  |- Mojo::Server::Daemon [2]
+  |- Mojo::Server::Daemon [3]
+  `- Mojo::Server::Daemon [4]
 
 It is also based on the L<Mojo::Server::Daemon> web server, but optimized
 specifically for production environments out of the box.

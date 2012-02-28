@@ -1,6 +1,4 @@
 
-=encoding utf8
-
 =head1 NAME
 
 Mojolicious::Guides::Growing - Growing
@@ -21,21 +19,21 @@ MVC is a software architectural pattern for graphical user interface
 programming originating in Smalltalk-80, that separates application logic,
 presentation and input.
 
-           ┌────────────┐    ┌───────┐    ┌──────┐
-  Input -> │ Controller │ -> │ Model │ -> │ View │ -> Output
-           └────────────┘    └───────┘    └──────┘
+           .------------.    .-------.    .------.
+  Input -> | Controller | -> | Model | -> | View | -> Output
+           '------------'    '-------'    '------'
 
 A slightly modified version of the pattern moving some application logic into
 the C<controller> is the foundation of pretty much every web framework these
 days, including L<Mojolicious>.
 
-              ┌────────────────┐     ┌───────┐
-  Request  -> │                │ <-> │ Model │
-              │                │     └───────┘
-              │   Controller   │
-              │                │     ┌───────┐
-  Response <- │                │ <-> │ View  │
-              └────────────────┘     └───────┘
+              .----------------.     .-------.
+  Request  -> |                | <-> | Model |
+              |                |     '-------'
+              |   Controller   |
+              |                |     .-------.
+  Response <- |                | <-> | View  |
+              '----------------'     '-------'
 
 The C<controller> receives a request from a user, passes incoming data to the
 C<model> and retrieves data from it, which then gets turned into an actual
@@ -52,32 +50,32 @@ like C<http://mojolicio.us/foo> with your browser, you are basically asking
 the web server for the HTML C<representation> of the
 C<http://mojolicio.us/foo> C<resource>.
 
-  ┌────────┐                                ┌────────┐
-  │        │ -> http://mojolicio.us/foo  -> │        │
-  │ Client │                                │ Server │
-  │        │ <- <html>Mojo rocks!</html> <- │        │
-  └────────┘                                └────────┘
+  .--------.                                .--------.
+  |        | -> http://mojolicio.us/foo  -> |        |
+  | Client |                                | Server |
+  |        | <- <html>Mojo rocks!</html> <- |        |
+  '--------'                                '--------'
 
 The fundamental idea here is that all resources are uniquely addressable with
 URLs and every resource can have different representations such as HTML, RSS
 or JSON. User interface concerns are separated from data storage concerns and
 all session state is kept client-side.
 
-  ┌─────────┐                        ┌────────────┐
-  │         │ ->    PUT /foo      -> │            │
-  │         │ ->    Hello world!  -> │            │
-  │         │                        │            │
-  │         │ <-    201 CREATED   <- │            │
-  │         │                        │            │
-  │         │ ->    GET /foo      -> │            │
-  │ Browser │                        │ Web Server │
-  │         │ <-    200 OK        <- │            │
-  │         │ <-    Hello world!  <- │            │
-  │         │                        │            │
-  │         │ ->    DELETE /foo   -> │            │
-  │         │                        │            │
-  │         │ <-    200 OK        <- │            │
-  └─────────┘                        └────────────┘
+  .---------.                        .------------.
+  |         | ->    PUT /foo      -> |            |
+  |         | ->    Hello world!  -> |            |
+  |         |                        |            |
+  |         | <-    201 CREATED   <- |            |
+  |         |                        |            |
+  |         | ->    GET /foo      -> |            |
+  | Browser |                        | Web Server |
+  |         | <-    200 OK        <- |            |
+  |         | <-    Hello world!  <- |            |
+  |         |                        |            |
+  |         | ->    DELETE /foo   -> |            |
+  |         |                        |            |
+  |         | <-    200 OK        <- |            |
+  '---------'                        '------------'
 
 While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part
 of REST they go very well with it and are commonly used to manipulate
@@ -144,23 +142,23 @@ Full L<Mojolicious> applications on the other hand are much closer to a well
 organized CPAN distribution to maximize maintainability.
 
   myapp                      # Application directory
-  ├─ script                  # Script directory
-  │  └─ myapp                # Application script
-  ├─ lib                     # Library directory
-  │  ├─ MyApp.pm             # Application class
-  │  └─ MyApp                # Application namespace
-  │     └─ Example.pm        # Controller class
-  ├─ t                       # Test directory
-  │  └─ basic.t              # Random test
-  ├─ log                     # Log directory
-  │  └─ development.log      # Development mode log file
-  ├─ public                  # Static file directory (served automatically)
-  │  └─ index.html           # Static HTML file
-  └─ templates               # Template directory
-     ├─ layouts              # Template directory for layouts
-     │  └─ default.html.ep   # Layout template
-     └─ example              # Template directory for "Example" controller
-        └─ welcome.html.ep   # Template for "welcome" action
+  |- script                  # Script directory
+  |  `- myapp                # Application script
+  |- lib                     # Library directory
+  |  |- MyApp.pm             # Application class
+  |  `- MyApp                # Application namespace
+  |     `- Example.pm        # Controller class
+  |- t                       # Test directory
+  |  `- basic.t              # Random test
+  |- log                     # Log directory
+  |  `- development.log      # Development mode log file
+  |- public                  # Static file directory (served automatically)
+  |  `- index.html           # Static HTML file
+  `- templates               # Template directory
+     |- layouts              # Template directory for layouts
+     |  `- default.html.ep   # Layout template
+     `- example              # Template directory for "Example" controller
+        `- welcome.html.ep   # Template for "welcome" action
 
 Both application skeletons can be automatically generated.
 

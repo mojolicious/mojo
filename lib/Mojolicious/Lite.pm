@@ -35,10 +35,11 @@ sub import {
   # Export
   no warnings 'redefine';
   my $root = $routes;
+  for my $name (qw/any get patch post put websocket/) {
+    *{"${caller}::$name"} = sub { $routes->$name(@_) };
+  }
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
-  *{"${caller}::any"} = sub { $routes->any(@_) };
   *{"${caller}::del"} = sub { $routes->delete(@_) };
-  *{"${caller}::get"} = sub { $routes->get(@_) };
   *{"${caller}::group"} = sub (&) {
     my $old = $root;
     $_[0]->($root = $routes);
@@ -47,13 +48,9 @@ sub import {
   };
   *{"${caller}::helper"} = sub { $app->helper(@_) };
   *{"${caller}::hook"}   = sub { $app->hook(@_) };
+  *{"${caller}::plugin"} = sub { $app->plugin(@_) };
   *{"${caller}::under"}  = *{"${caller}::ladder"} =
     sub { $routes = $root->under(@_) };
-  *{"${caller}::patch"}     = sub { $routes->patch(@_) };
-  *{"${caller}::plugin"}    = sub { $app->plugin(@_) };
-  *{"${caller}::post"}      = sub { $routes->post(@_) };
-  *{"${caller}::put"}       = sub { $routes->put(@_) };
-  *{"${caller}::websocket"} = sub { $routes->websocket(@_) };
 
   # We are most likely the app in a lite environment
   $ENV{MOJO_APP} ||= $app;
@@ -888,8 +885,7 @@ Alias for L<Mojolicious/"hook">.
   my $route = patch '/:foo' => sub {...};
 
 Generate route matching only C<PATCH> requests. See also the tutorial above
-for more argument variations. Note that this function is EXPERIMENTAL and
-might change without warning!
+for more argument variations.
 
 =head2 C<plugin>
 
@@ -924,7 +920,8 @@ also the tutorial above for more argument variations.
   my $route = websocket '/:foo' => sub {...};
 
 Generate route matching only C<WebSocket> handshakes. See also the tutorial
-above for more argument variations.
+above for more argument variations. Note that this function is EXPERIMENTAL
+and might change without warning!
 
 =head1 ATTRIBUTES
 

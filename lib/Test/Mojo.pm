@@ -658,8 +658,7 @@ change without warning!
   $t = $t->patch_ok('/foo');
 
 Perform a C<PATCH> request and check for transport errors, takes the exact
-same arguments as L<Mojo::UserAgent/"patch">. Note that this method is
-EXPERIMENTAL and might change without warning!
+same arguments as L<Mojo::UserAgent/"patch">.
 
 =head2 C<post_ok>
 

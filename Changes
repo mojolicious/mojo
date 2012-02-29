@@ -1,10 +1,17 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.56    2012-02-29 00:00:00
+        - Removed experimental status from patch function in
+          Mojolicious::Lite.
+        - Removed experimental status from patch method in
+          Mojolicious::Routes.
+        - Removed experimental status from patch method in Mojo::UserAgent.
+        - Removed experimental status from patch_ok method in Test::Mojo.
+        - Removed experimental status from t function in ojo.
         - Improved documentation.
         - Fixed small inconsistency between Mojo::IOWatcher and
-          Mojo::IOWatcher::EV where Mojo::IOWatcher would not stop
-          automatically without watchers.
+          Mojo::IOWatcher::EV where Mojo::IOWatcher wouldn't stop
+          automatically when not watching for events anymore.
         - Fixed Mojo::IOLoop to clean up after itself.
 
 2.55    2012-02-28 00:00:00

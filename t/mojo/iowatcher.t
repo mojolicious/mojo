@@ -24,7 +24,7 @@ require Mojo::IOLoop;
 $watcher = Mojo::IOLoop->singleton->iowatcher;
 is ref $watcher, 'Mojo::IOWatcher', 'right object';
 
-# Make sure it stops automatically when no events are being watched
+# Make sure it stops automatically when not watching for events
 Mojo::IOLoop->start;
 
 # Listen

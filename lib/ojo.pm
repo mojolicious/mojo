@@ -157,8 +157,7 @@ L<Mojo::Message::Response> object.
   my $res = t('http://mojolicio.us');
 
 Perform C<PATCH> request with L<Mojo::UserAgent/"patch"> and return resulting
-L<Mojo::Message::Response> object. Note that this function is EXPERIMENTAL
-and might change without warning!
+L<Mojo::Message::Response> object.
 
 =head2 C<u>
 

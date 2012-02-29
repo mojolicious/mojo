@@ -868,8 +868,7 @@ Parse a pattern.
   my $route = $route->patch('/:foo' => sub {...});
 
 Generate route matching only C<PATCH> requests. See also the
-L<Mojolicious::Lite> tutorial for more argument variations. Note that this
-method is EXPERIMENTAL and might change without warning!
+L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<post>
 

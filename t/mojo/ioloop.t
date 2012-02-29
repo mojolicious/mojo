@@ -122,7 +122,7 @@ $loop->drop($id);
 $loop->drop($id2);
 isa_ok $handle, 'IO::Socket', 'right reference';
 
-# Make sure it stops automatically when no events are being watched
+# Make sure it stops automatically when not watching for events
 $loop->start;
 
 # Stream

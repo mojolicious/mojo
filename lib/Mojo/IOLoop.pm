@@ -561,7 +561,8 @@ instance from everywhere inside the process.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the loop, this will block until C<stop> is called.
+Start the loop, this will block until C<stop> is called or no events are
+being watched anymore.
 
 =head2 C<stop>
 

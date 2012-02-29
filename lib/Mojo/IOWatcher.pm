@@ -229,7 +229,7 @@ amount of time in seconds.
   $watcher->start;
 
 Start watching for I/O and timer events, this will block until C<stop> is
-called.
+called or no events are being watched anymore.
 
 =head2 C<stop>
 

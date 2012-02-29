@@ -150,7 +150,7 @@ routes structures.
   sub startup {
     my $self = shift;
 
-    # Routes
+    # Router
     my $r = $self->routes;
 
     # Route
@@ -258,11 +258,8 @@ sensitive.
   sub startup {
     my $self = shift;
 
-    # Routes
-    my $r = $self->routes;
-
     # /bye -> {controller => 'foo', action => 'bye'} -> MyApp::Foo->bye
-    $r->route('/bye')->to(controller => 'foo', action => 'bye');
+    $self->routes->route('/bye')->to(controller => 'foo', action => 'bye');
   }
 
   1;
@@ -534,10 +531,8 @@ which makes them a very powerful tool especially for plugins.
         if $self->req->url->path->contains('/test');
     });
 
-    # Routes
-    my $r = $self->routes;
-
     # These will not be reached if the hook above renders a response
+    my $r = $self->routes;
     $r->route('/welcome')->to('foo#welcome');
     $r->route('/bye')->to('foo#bye');
   }
@@ -724,11 +719,8 @@ applications.
     # Plugin
     $self->plugin('WerewolfCondition');
 
-    # Routes
-    my $r = $self->routes;
-
     # /hideout (keep them out for 4 days after full moon)
-    $r->route('/hideout')->over(werewolf => 4)
+    $self->routes->route('/hideout')->over(werewolf => 4)
       ->to(controller => 'foo', action => 'bar');
   }
 

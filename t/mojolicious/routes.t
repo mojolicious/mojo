@@ -6,10 +6,8 @@ use Test::More tests => 351;
 use_ok 'Mojolicious::Routes';
 use_ok 'Mojolicious::Routes::Match';
 
-# Routes
-my $r = Mojolicious::Routes->new;
-
 # /clean
+my $r = Mojolicious::Routes->new;
 $r->route('/clean')->to(clean => 1);
 
 # /clean/too

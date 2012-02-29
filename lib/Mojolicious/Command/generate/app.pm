@@ -86,7 +86,7 @@ sub startup {
   # Documentation browser under "/perldoc"
   $self->plugin('PODRenderer');
 
-  # Routes
+  # Router
   my $r = $self->routes;
 
   # Normal route to controller

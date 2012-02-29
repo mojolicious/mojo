@@ -41,11 +41,9 @@ sub startup {
   $self->sessions->cookie_domain('.example.com');
   $self->sessions->cookie_path('/bar');
 
-  # Routes
-  my $r = $self->routes;
-
   # /plugin/upper_case
   # /plugin/camel_case (plugins loaded correctly)
+  my $r = $self->routes;
   $r->route('/plugin/upper_case')->to('foo#plugin_upper_case');
   $r->route('/plugin/camel_case')->to('foo#plugin_camel_case');
 

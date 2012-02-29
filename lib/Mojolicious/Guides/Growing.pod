@@ -507,7 +507,6 @@ actual action code needs to be changed.
     my $users = MyUsers->new;
     $self->helper(users => sub { return $users });
 
-    # Routes
     my $r = $self->routes;
 
     $r->any('/' => sub {

@@ -86,27 +86,29 @@ ok $ticks > 2, 'more than two ticks';
 # Run again without first tick event handler
 my $before = $ticks;
 my $after  = 0;
-$loop->recurring(0 => sub { $after++ });
+my $id2    = $loop->recurring(0 => sub { $after++ });
 $loop->drop($id);
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
 $loop->one_tick;
+$loop->drop($id2);
 ok $after > 1, 'more than one tick';
 is $ticks, $before, 'no additional ticks';
 
 # Recurring timer
 my $count = 0;
-$loop->recurring(0.5 => sub { $count++ });
+$id = $loop->recurring(0.5 => sub { $count++ });
 $loop->timer(3 => sub { shift->stop });
 $loop->start;
 $loop->one_tick;
+$loop->drop($id);
 ok $count > 1, 'more than one recurring event';
 ok $count < 10, 'less than ten recurring events';
 
 # Handle
 my $port = Mojo::IOLoop->generate_port;
 my $handle;
-$loop->server(
+$id = $loop->server(
   port => $port,
   sub {
     my ($loop, $stream) = @_;
@@ -114,9 +116,14 @@ $loop->server(
     $loop->stop;
   }
 );
-$loop->client((address => 'localhost', port => $port) => sub { });
+$id2 = $loop->client((address => 'localhost', port => $port) => sub { });
 $loop->start;
+$loop->drop($id);
+$loop->drop($id2);
 isa_ok $handle, 'IO::Socket', 'right reference';
+
+# Make sure it stops automatically when no events are being watched
+$loop->start;
 
 # Stream
 $port = Mojo::IOLoop->generate_port;

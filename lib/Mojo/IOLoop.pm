@@ -227,6 +227,8 @@ sub _cleaner {
       }
 
       # Graceful shutdown
+      $self->_drop(delete $self->{cleaner})
+        unless keys(%$connections) || keys(%{$self->{servers}});
       $self->stop if $self->max_connections == 0 && keys %$connections == 0;
     }
   );

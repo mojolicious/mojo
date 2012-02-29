@@ -257,9 +257,7 @@ sensitive.
 
   sub startup {
     my $self = shift;
-
-    # Router
-    my $r = $self->routes;
+    my $r    = $self->routes;
 
     # /bye -> {controller => 'foo', action => 'bye'} -> MyApp::Foo->bye
     $r->route('/bye')->to(controller => 'foo', action => 'bye');
@@ -474,7 +472,8 @@ pass.
 
 =head2 Bridges
 
-Bridges unlike nested routes always match and result in additional dispatch
+Bridges can be used to share code with multiple nested routes, because unlike
+normal nested routes, they always match and result in additional dispatch
 cycles.
 
   # /foo     -> undef
@@ -512,6 +511,36 @@ have children.
   $foo->route('/bar')->to(action => 'bar');
 
 All children will be ignored if a waypoint matches.
+
+=head2 Hooks
+
+Hooks operate outside the routing system and allow you to extend
+L<Mojolicious> itself by sharing code with all requests indiscriminately,
+which makes them a very powerful tool especially for plugins.
+
+  # Application
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
+
+  sub startup {
+    my $self = shift;
+    my $r    = $self->routes;
+
+    # Check all requests for a "/test" prefix
+    $self->hook(before_dispatch => sub {
+      my $self = shift;
+      $self->render(text => 'This request did not reach the router.')
+        if $self->req->url->path->contains('/test');
+    });
+
+    # Routes that will not be reached if the hook above renders a response
+    $r->route('/welcome')->to('foo#welcome');
+    $r->route('/bye')->to('foo#bye');
+  }
+
+  1;
+
+For a full list of available hooks see L<Mojolicious/"hook">.
 
 =head2 Mojolicious::Lite routes
 
@@ -687,12 +716,10 @@ applications.
 
   sub startup {
     my $self = shift;
+    my $r    = $self->routes;
 
     # Plugin
     $self->plugin('WerewolfCondition');
-
-    # Routes
-    my $r = $self->routes;
 
     # /hideout (keep them out for 4 days after full moon)
     $r->route('/hideout')->over(werewolf => 4)

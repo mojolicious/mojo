@@ -791,40 +791,6 @@ For more control the L<Mojolicious> instance can be accessed directly.
     $self->render(text => 'Hello Mojo!');
   });
 
-=head2 Growing
-
-In case a lite app needs to grow, lite and real L<Mojolicious> applications
-can be easily mixed to make the transition process very smooth.
-
-  package MyApp::Foo;
-  use Mojo::Base 'Mojolicious::Controller';
-
-  sub index {
-    my $self = shift;
-    $self->render(text => 'It works.');
-  }
-
-  package main;
-  use Mojolicious::Lite;
-
-  get '/bar' => sub {
-    my $self = shift;
-    $self->render(text => 'This too.');
-  };
-
-  app->routes->namespace('MyApp');
-  app->routes->route('/foo/:action')->via('GET')->to('foo#index');
-
-  app->start;
-
-There is also a helper command to generate a full L<Mojolicious> example that
-will let you explore the astonishing similarities between
-L<Mojolicious::Lite> and L<Mojolicious> applications. Both share about 99% of
-the same code, so almost everything you learned in this tutorial applies
-there too. :)
-
-  $ mojo generate app
-
 =head2 More
 
 You can continue with L<Mojolicious::Guides> now, and don't forget to have

@@ -502,11 +502,13 @@ actual action code needs to be changed.
 
   sub startup {
     my $self = shift;
-    my $r    = $self->routes;
 
     $self->secret('Mojolicious rocks');
     my $users = MyUsers->new;
     $self->helper(users => sub { return $users });
+
+    # Routes
+    my $r = $self->routes;
 
     $r->any('/' => sub {
       my $self = shift;
@@ -610,12 +612,12 @@ information.
 
   sub startup {
     my $self = shift;
-    my $r    = $self->routes;
 
     $self->secret('Mojolicious rocks');
     my $users = MyUsers->new;
     $self->helper(users => sub { return $users });
 
+    my $r = $self->routes;
     $r->any('/')->to('login#index')->name('index');
     $r->get('/protected')->to('login#protected')->name('protected');
     $r->get('/logout')->to('login#logout')->name('logout');

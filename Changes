@@ -2,6 +2,9 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.56    2012-02-29 00:00:00
         - Improved documentation.
+        - Fixed small inconsistency between Mojo::IOWatcher and
+          Mojo::IOWatcher::EV where Mojo::IOWatcher would not stop
+          automatically without watchers.
 
 2.55    2012-02-28 00:00:00
         - Combined WebSocket timeout with normal inactivity timeout.

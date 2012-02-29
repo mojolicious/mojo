@@ -24,6 +24,9 @@ require Mojo::IOLoop;
 $watcher = Mojo::IOLoop->singleton->iowatcher;
 is ref $watcher, 'Mojo::IOWatcher', 'right object';
 
+# Make sure it stops automatically without watchers
+Mojo::IOLoop->start;
+
 # Listen
 my $port   = Mojo::IOLoop->generate_port;
 my $listen = IO::Socket::INET->new(

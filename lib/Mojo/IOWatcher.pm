@@ -116,6 +116,9 @@ sub _one_tick {
       if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb) }
     }
   }
+
+  # Stop automatically
+  $self->stop unless keys(%{$self->{timers}}) || keys(%{$self->{handles}});
 }
 
 sub _poll { shift->{poll} ||= IO::Poll->new }

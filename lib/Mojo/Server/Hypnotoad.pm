@@ -66,7 +66,8 @@ sub run {
 
   # Preload application and configure server
   my $daemon = $self->{daemon} = Mojo::Server::Daemon->new;
-  $self->_config(my $app = $daemon->load_app($ENV{HYPNOTOAD_APP}));
+  my $app = $daemon->load_app($ENV{HYPNOTOAD_APP});
+  $self->_config($app);
 
   # Testing
   _exit('Everything looks good!') if $ENV{HYPNOTOAD_TEST};
@@ -92,8 +93,8 @@ sub run {
   }
 
   # Start accepting connections
-  ($self->{log} = $app->log)
-    ->info(qq/Hypnotoad server $$ started for "$ENV{HYPNOTOAD_APP}"./);
+  my $log = $self->{log} = $app->log;
+  $log->info(qq/Hypnotoad server $$ started for "$ENV{HYPNOTOAD_APP}"./);
   $daemon->start;
 
   # Pipe for worker communication

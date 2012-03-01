@@ -119,7 +119,8 @@ sub run {
       # Stream content
       $tx->res->body(
         sub {
-          $cb->(my $res = shift);
+          my $res = shift;
+          $cb->($res);
 
           # Ignore intermediate content
           return if $redirect && $res->is_status_class(300);

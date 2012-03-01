@@ -76,7 +76,8 @@ sub body_params {
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
   my $type = $self->headers->content_type || '';
   if ($type =~ m#(?:x-application|application/x-www-form)-urlencoded#i) {
-    return $params if (my $asset = $self->content->asset)->is_file;
+    my $asset = $self->content->asset;
+    return $params if $asset->is_file;
     $params->parse($asset->slurp);
   }
 
@@ -480,7 +481,8 @@ sub _parse_formdata {
 
     # Form value
     unless (defined $filename) {
-      next if (my $asset = $part->asset)->is_file;
+      my $asset = $part->asset;
+      next if $asset->is_file;
       $value = $asset->slurp;
       $value = decode($charset, $value) // $value
         if $charset && !$part->headers->content_transfer_encoding;

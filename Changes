@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.56    2012-02-29 00:00:00
+2.56    2012-03-01 00:00:00
         - Removed experimental status from patch function in
           Mojolicious::Lite.
         - Removed experimental status from patch method in

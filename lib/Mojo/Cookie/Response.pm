@@ -48,7 +48,8 @@ sub parse {
 
       # Attributes
       elsif (my @match = $name =~ $ATTR_RE) {
-        (my $attr = lc $match[0]) =~ tr/-/_/;
+        my $attr = lc $match[0];
+        $attr =~ tr/-/_/;
         $cookies[-1]->$attr($attr =~ /(?:Secure|HttpOnly)/i ? 1 : $value);
       }
     }

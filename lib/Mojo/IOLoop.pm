@@ -143,7 +143,8 @@ sub server {
       my $handle = pop;
 
       # Accept
-      my $id = $self->stream(my $stream = $self->stream_class->new($handle));
+      my $stream = $self->stream_class->new($handle);
+      my $id     = $self->stream($stream);
       $self->$cb($stream, $id);
 
       # Enforce limit

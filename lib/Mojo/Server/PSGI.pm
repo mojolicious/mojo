@@ -50,7 +50,10 @@ sub run {
 }
 
 sub to_psgi_app {
-  (my $self = shift)->app;
+  my $self = shift;
+
+  # Preload application and wrap it
+  $self->app;
   return sub { $self->run(@_) }
 }
 

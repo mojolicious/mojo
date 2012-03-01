@@ -72,7 +72,8 @@ sub register {
       # Rewrite code sections for syntax highlighting
       $dom->find('pre')->each(
         sub {
-          return if (my $e = shift)->all_text =~ /^\s*\$\s+/m;
+          my $e = shift;
+          return if $e->all_text =~ /^\s*\$\s+/m;
           my $attrs = $e->attrs;
           my $class = $attrs->{class};
           $attrs->{class} =

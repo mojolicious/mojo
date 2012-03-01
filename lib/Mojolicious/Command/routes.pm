@@ -69,7 +69,8 @@ sub _draw {
     push @parts, $name . ' ' x ($length[2] - length $name);
 
     # Regex
-    (my $pattern = $node->[1]->pattern)->match('/');
+    my $pattern = $node->[1]->pattern;
+    $pattern->match('/');
     my $regex  = (regexp_pattern $pattern->regex)[0];
     my $format = (regexp_pattern $pattern->format)[0];
     my $req    = $pattern->reqs->{format};

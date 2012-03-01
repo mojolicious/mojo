@@ -346,11 +346,11 @@ Path to TLS certificate authority file.
 
 =item C<tls_cert>
 
-Path to the TLS cert file, defaulting to a built-in test certificate.
+Path to the TLS cert file, defaults to a built-in test certificate.
 
 =item C<tls_key>
 
-Path to the TLS key file, defaulting to a built-in test key.
+Path to the TLS key file, defaults to a built-in test key.
 
 =back
 

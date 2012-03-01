@@ -429,6 +429,24 @@ List of one or more locations to listen on, defaults to C<http://*:3000>.
   $daemon->listen(
     ['https://*:3000?cert=/x/server.crt&key=/y/server.key&ca=/z/ca.crt']);
 
+These parameters are currently available:
+
+=over 4
+
+=item C<ca>
+
+Path to TLS certificate authority file.
+
+=item C<cert>
+
+Path to the TLS cert file, defaults to a built-in test certificate.
+
+=item C<key>
+
+Path to the TLS key file, defaults to a built-in test key.
+
+=back
+
 =head2 C<max_clients>
 
   my $max_clients = $daemon->max_clients;

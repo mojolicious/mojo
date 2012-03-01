@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::Server';
 
 use Carp 'croak';
 use Mojo::IOLoop;
+use Mojo::URL;
 use POSIX;
 use Scalar::Util 'weaken';
 use Sys::Hostname;
@@ -19,19 +20,6 @@ has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
 has max_clients        => 1000;
 has max_requests       => 25;
-
-my $LISTEN_RE = qr|
-  ^
-  (http(?:s)?)\://   # Scheme
-  (.+)               # Address
-  \:(\d+)            # Port
-  (?:
-    \:(.*?)          # Certificate
-    \:(.*?)          # Key
-    (?:\:(.+)?)?     # Certificate Authority
-  )?
-  $
-|x;
 
 sub DESTROY {
   my $self = shift;
@@ -204,17 +192,32 @@ sub _listen {
   return unless $listen;
 
   # Check listen value
-  croak qq/Invalid listen value "$listen"/ unless $listen =~ $LISTEN_RE;
-  my $options = {};
-  my $tls;
-  $tls = $options->{tls} = 1 if $1 eq 'https';
-  $options->{address}  = $2 if $2 ne '*';
-  $options->{port}     = $3;
-  $options->{tls_cert} = $4 if $4;
-  $options->{tls_key}  = $5 if $5;
-  $options->{tls_ca}   = $6 if $6;
+  my $url   = Mojo::URL->new($listen);
+  my $query = $url->query;
 
-  # Listen backlog size
+  # DEPRECATED in Leaf Fluttering In Wind!
+  my ($address, $port, $cert, $key, $ca);
+  if ($listen =~ qr|//(.+)\:(\d+)\:(.*?)\:(.*?)(?:\:(.+)?)?$|) {
+    warn "Custom listen values are DEPRECATED in favor of URLs!\n";
+    ($address, $port, $cert, $key, $ca) = ($1, $2, $3, $4, $5);
+  }
+
+  else {
+    $address = $url->host;
+    $port    = $url->port;
+    $cert    = $query->param('cert');
+    $key     = $query->param('key');
+    $ca      = $query->param('ca');
+  }
+
+  # Options
+  my $options = {port => $port};
+  my $tls;
+  $tls = $options->{tls} = 1 if $url->scheme eq 'https';
+  $options->{address}  = $address if $address ne '*';
+  $options->{tls_cert} = $cert    if $cert;
+  $options->{tls_key}  = $key     if $key;
+  $options->{tls_ca}   = $ca      if $ca;
   my $backlog = $self->backlog;
   $options->{backlog} = $backlog if $backlog;
 
@@ -420,10 +423,11 @@ List of one or more locations to listen on, defaults to C<http://*:3000>.
   $daemon->listen(['http://*:3000', 'https://*:4000']);
 
   # Use a custom certificate and key
-  $daemon->listen(['https://*:3000:/x/server.crt:/y/server.key']);
+  $daemon->listen(['https://*:3000?cert=/x/server.crt&key=/y/server.key']);
 
   # Or even a custom certificate authority
-  $daemon->listen(['https://*:3000:/x/server.crt:/y/server.key:/z/ca.crt']);
+  $daemon->listen(
+    ['https://*:3000?cert=/x/server.crt&key=/y/server.key&ca=/z/ca.crt']);
 
 =head2 C<max_clients>
 

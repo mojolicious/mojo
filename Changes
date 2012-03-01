@@ -1,6 +1,11 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.56    2012-03-01 00:00:00
+        - Deprecated custom listen values in Mojo::Server::Daemon->listen in
+          favor of URLs, this change also affects Morbo and Hypnotoad.
+            https://*:3000:/x/server.crt:/y/server.key:/z/ca.crt
+          becomes
+            https://*:3000?cert=/x/server.crt&key=/y/server.key&ca=/z/ca.crt
         - Removed experimental status from patch function in
           Mojolicious::Lite.
         - Removed experimental status from patch method in

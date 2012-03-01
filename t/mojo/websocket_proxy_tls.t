@@ -62,9 +62,12 @@ websocket '/test' => sub {
 # Web server with valid certificates
 my $daemon =
   Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
-my $port   = Mojo::IOLoop->new->generate_port;
-my $listen = "https://*:$port"
-  . ':t/mojo/certs/server.crt:t/mojo/certs/server.key:t/mojo/certs/ca.crt';
+my $port = Mojo::IOLoop->new->generate_port;
+my $listen =
+    "https://*:$port"
+  . '?cert=t/mojo/certs/server.crt'
+  . '&key=t/mojo/certs/server.key'
+  . '&ca=t/mojo/certs/ca.crt';
 $daemon->listen([$listen])->start;
 
 # Connect proxy server for testing

@@ -958,9 +958,8 @@ This file documents the revision history for Perl extension Mojolicious.
 1.44    2011-06-18 00:00:00
         - Added EXPERIMENTAL self-restarting Morbo development web server and
           removed old "--reload" support since there have been too many
-          negative side effects.
-          This also improves overall performance by about 5-10% and reduces
-          memory usage by about 10%.
+          negative side effects. This also improves overall performance by
+          about 5-10% and reduces memory usage by about 10%.
         - Added EXPERIMENTAL application mount plugin.
         - Added EXPERIMENTAL --help support for all commands.
         - Updated prettify.js to version 1-Jun-2011.
@@ -1048,9 +1047,9 @@ This file documents the revision history for Perl extension Mojolicious.
 1.32    2011-05-11 00:00:00
         - Added EXPERIMENTAL name support for template exceptions.
         - Updated IO::Socket::SSL requirement to 1.43 due to bugs in older
-          versions.
-          Note that the version requirement will keep getting updated until
-          we encounter a version that is not broken most of the time.
+          versions. Note that the version requirement will keep getting
+          updated until we encounter a version that is not broken most of the
+          time.
         - Improved reloading slightly by allowing it to clean up the main
           namespace.
         - Improved documentation.
@@ -1433,9 +1432,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Code name "Hot Beverage", this is a major release.
         - Removed Mojo::Server::Daemon::Prefork due to unfixable design flaws
           regarding WebSocket support, please use a PSGI server instead for
-          HTTP production setups.
-          For scalable WebSocket deployment we will introduce a whole new
-          server in one of the next releases!
+          HTTP production setups. For scalable WebSocket deployment we will
+          introduce a whole new server in one of the next releases!
         - Deprecated old Mojo::Template block syntax and added a very pretty
           replacement. (See documentation for more)
         - Deprecated helper method in Mojolicious::Controller.
@@ -1605,8 +1603,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed small renderer bug.
 
 0.999925 2010-06-07 00:00:00
-        - Updated WebSocket implementation to draft 76,
-          NOTE THAT THIS CHANGE IS NOT BACKWARD COMPATIBLE!!!
+        - Updated WebSocket implementation to draft 76, NOTE THAT THIS CHANGE
+          IS NOT BACKWARDS COMPATIBLE!!!
           (sadly we have no choice when the spec changes)
         - Increased Perl version requirement to 5.8.7 due to unicode bugs in
           earlier releases.
@@ -1699,9 +1697,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved PSGI support and added "psgi" command.
         - Added automatic environment detection for Plack based servers,
           there is no technical way to detect all PSGI compliant servers yet
-          though.
-          That means "plackup myapp.pl" and "plackup script/myapp" should
-          just work.
+          though. That means "plackup myapp.pl" and "plackup script/myapp"
+          should just work.
         - Added session and flash helpers.
         - Added finished callback to WebSocket client and server.
         - Added referrer method to Mojo::Headers. (esskar)
@@ -1726,9 +1723,8 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added I18N support. (vti, memowe)
         - Added template detection again, you can now just mix multiple
           template engines and the renderer will automatically pick the right
-          template.
-          So you don't have to use the "handler" argument anymore, even
-          though it's still available and overrides auto detection.
+          template. So you don't have to use the "handler" argument anymore,
+          even though it's still available and overrides auto detection.
         - Added Flash Policy Server example. (xantus)
         - Added more reference docs.
         - Added .gitignore generator command. (marcus)
@@ -1947,14 +1943,14 @@ This file documents the revision history for Perl extension Mojolicious.
 
 0.999901 2009-09-01 00:00:00
         - Added new Mojo::Client, because the old one had bugs that prevented
-          proper scaling and could not be fixed otherwise.
-          Note that this change is not backward compatible, the decision to
-          make it so close to the 1.0 release was not easy but the bugs were
-          simply too serious.
+          proper scaling and could not be fixed otherwise. Note that this
+          change is not backwards compatible, the decision to make it so
+          close to the 1.0 release was not easy but the bugs were simply too
+          serious.
         - Added native JSON support.
-        - Added more designer friendly .ep templates to Mojolicious.
-          The default template format for your application can be controlled
-          with the default_handler attribute of the mojolicious renderer.
+        - Added more designer friendly .ep templates to Mojolicious. The
+          default template format for your application can be controlled with
+          the default_handler attribute of the mojolicious renderer.
           Mojolicious (in the startup method):
               $self->renderer->default_handler('epl');
               $self->renderer->default_handler('ep');
@@ -2006,29 +2002,28 @@ This file documents the revision history for Perl extension Mojolicious.
 
 0.991250 2009-08-18 00:00:00
         - This release contains many substantial changes that are not
-          backward compatible, but good news is that it's also the last major
-          feature breaking release before 1.0. ;)
-          Older releases of Mojo did contain additional Mojo::Script::* and
+          backwards compatible, but good news is that it's also the last
+          major feature breaking release before 1.0. ;) Older releases of
+          Mojo did contain additional Mojo::Script::* and
           Mojolicious::Script::* modules that are obsolete now and might
           break this version if they are still present on your system.
-          Because of this we highly suggest that you
-          DELETE ALL MODULES IN THE "Mojo", "MojoX" AND "Mojolicious"
-          NAMESPACES MANUALLY!!!
+          Because of this we highly suggest that you DELETE ALL MODULES IN
+          THE "Mojo", "MojoX" AND "Mojolicious" NAMESPACES MANUALLY!!!
         - Mojo::Script has been renamed to Mojo::Command, this change is not
-          backward compatible!
-          You will have to regenerate application scripts or replace
-          "Mojo(licious)::Script" with "Mojo(licious)::Command" manually.
+          backwards compatible! You will have to regenerate application
+          scripts or replace "Mojo(licious)::Script" with
+          "Mojo(licious)::Command" manually.
         - Removed unused features from Mojo::Base and simplified API, this
-          change is not backward compatible!
+          change is not backwards compatible!
             __PACKAGE__->attr('foo', default => 'bar');
           becomes
             __PACKAGE__->attr(foo => 'bar');
-        - Merged eplite and epl, this change is not backward compatible, you
+        - Merged eplite and epl, this change is not backwards compatible, you
           will have to rename all your eplite templates to epl.
-        - Simplified MojoX::Renderer, this change is not backward compatible!
-          Handler can no longer be detected, that means "default_handler" or
-          the "handler" argument are required.
-          The template argument can no longer contain format or handler.
+        - Simplified MojoX::Renderer, this change is not backwards
+          compatible! Handler can no longer be detected, that means
+          "default_handler" or the "handler" argument are required. The
+          template argument can no longer contain format or handler.
             $self->render(template => 'foo.html.epl')
           becomes
             $self->render('foo', format => 'html', handler => 'epl')
@@ -2052,22 +2047,20 @@ This file documents the revision history for Perl extension Mojolicious.
           instead a new argument will be passed along.
               {template => 'foo/bar', format => 'html', handler => 'epl'}
         - Simplified context and controller in Mojolicious, this change is
-          not backward compatible!
-          If you've been using a custom context object you'll now have to use
-          a custom controller base class.
-          The new controller_class attribute can now be used to set the
-          default controller in Mojolicious.
-          There is also no $c argument anymore actions get called with, since
-          everything is in $self now.
+          not backwards compatible! If you've been using a custom context
+          object you'll now have to use a custom controller base class. The
+          new controller_class attribute can now be used to set the default
+          controller in Mojolicious. There is also no $c argument anymore
+          actions get called with, since everything is in $self now.
         - Refactored and renamed Mojo::Transaction and Mojo::Pipeline, this
-          change is not backward compatible!
+          change is not backwards compatible!
             Mojo::Transaction -> Mojo::Transaction::Single
             Mojo::Pipeline -> Mojo::Transaction::Pipeline
         - Refactored and renamed Mojo::File and Mojo::File::Memory, this
-          change is not backward compatible!
+          change is not backwards compatible!
             Mojo::File -> Mojo::Asset::File
             Mojo::File::Memory -> Mojo::Asset::Memory
-        - Refactored and renamed Mojo::Content, this change is not backward
+        - Refactored and renamed Mojo::Content, this change is not backwards
           compatible!
             Mojo::Content -> Mojo::Content::Single
         - Added conditions to MojoX::Routes.
@@ -2118,7 +2111,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Perl 5.8.1 prereqs. (alias)
 
 0.991242 2009-07-27 00:00:00
-        - Cleaned up the whole script system, this change is mostly backward
+        - Cleaned up the whole script system, this change is mostly backwards
           compatible except for a few cases.
             "daemon $port" now becomes "daemon -p $port"
             "mojolicious mojo $script" becomes "mojolicious $script"
@@ -2132,10 +2125,10 @@ This file documents the revision history for Perl extension Mojolicious.
         - Mojolicious::Lite has been introduced as a new entry level web
           framework example.
         - Mojo::Message::Response will now default to response code 200,
-          this change is not backward compatible.
-          In Mojolicious you should use ->render(text => 'Hello!') instead of
-          ->res->body('Hello!') now.
-        - Changed routes syntax again, this change is not entirely backward
+          this change is not backwards compatible. In Mojolicious you should
+          use ->render(text => 'Hello!') instead of ->res->body('Hello!')
+          now.
+        - Changed routes syntax again, this change is not entirely backwards
           compatible but will only affect you if you are using the relaxed
           and wildcard variations.
             "/((foo))" becomes "/(.foo)"
@@ -2182,7 +2175,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 0.991237 2009-07-15 00:00:00
         - Renamed process_local to process_app in Mojo::Client, this change
-          is not backward compatible and you might have to change some of
+          is not backwards compatible and you might have to change some of
           your tests.
         - Simplified MojoX::Renderer.
         - Simplified Mojo::Loader.
@@ -2232,13 +2225,13 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed tarball.
 
 0.991231 2009-06-29 00:00:00
-        - Rewrote MojoX::Renderer, it is not backward compatible and
+        - Rewrote MojoX::Renderer, it is not backwards compatible and
           templates need to be renamed in the following 3 part format
           "index.html.tt"!
         - Added exception support to MojoX::Dispatcher::Routes, this change
-          is not backward compatible and "dispatch" calls now return
+          is not backwards compatible and "dispatch" calls now return
           exception objects for errors and false otherwise.
-        - Changed routes syntax, this change is not backward compatible and
+        - Changed routes syntax, this change is not backwards compatible and
           you need to change all your existing routes.
             "/:foo" becomes "/(foo)"
             "/^foo" becomes "/((foo))"

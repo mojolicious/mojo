@@ -126,6 +126,7 @@ sub dispatch {
   # Walk the stack
   return if $self->_walk_stack($c);
   $self->auto_render($c);
+  return 1;
 }
 
 sub get { shift->_generate_route(get => @_) }

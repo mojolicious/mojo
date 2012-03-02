@@ -49,7 +49,7 @@ $HELPERS =~ s/\n//g;
 sub build {
   my $self = shift;
 
-  # Compile
+  # Lines
   my (@lines, $cpst);
   my $multi = 0;
   for my $line (@{$self->tree}) {
@@ -73,7 +73,7 @@ sub build {
       }
 
       # Text
-      if ($type eq 'text') {
+      elsif ($type eq 'text') {
 
         # Quote and fix line ending
         $value = quotemeta($value);
@@ -82,10 +82,10 @@ sub build {
       }
 
       # Code or multiline expression
-      if ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
+      elsif ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
 
       # Expression
-      if ($type ~~ [qw/expr escp/]) {
+      elsif ($type ~~ [qw/expr escp/]) {
 
         # Start
         unless ($multi) {
@@ -109,32 +109,22 @@ sub build {
         $lines[-1] .= ';' if !$multi && !$cpst;
       }
 
-      # Capture started
+      # Capture start
       if ($cpst) {
         $lines[-1] .= $cpst;
         $cpst = undef;
       }
-
-      # Capture start
-      if ($type eq 'cpst') { $cpst = " sub { my \$_M = ''; " }
+      $cpst = " sub { my \$_M = ''; " if $type eq 'cpst';
     }
   }
 
-  # Wrap
-  my $prepend   = $self->prepend;
-  my $append    = $self->append;
-  my $namespace = $self->namespace;
-  $lines[0] ||= '';
-  $lines[0] =
-    "package $namespace; $HELPERS sub { my \$_M = ''; $prepend; do {"
-    . $lines[0];
-  $lines[-1] .= "$append; \$_M; } };";
+  # Closure
+  my $first = $lines[0] ||= '';
+  $lines[0] = 'package ' . $self->namespace . "; $HELPERS ";
+  $lines[0]  .= "sub { my \$_M = ''; " . $self->prepend . "; do { $first";
+  $lines[-1] .= $self->append . "; \$_M; } };";
 
-  # Final code
-  $self->code(join "\n", @lines);
-  $self->tree([]);
-
-  return $self;
+  return $self->code(join "\n", @lines)->tree([]);
 }
 
 sub compile {
@@ -156,14 +146,6 @@ sub compile {
 sub interpret {
   my $self = shift;
 
-  # Compile
-  unless ($self->compiled) {
-    my $e = $self->compile;
-    return $e if ref $e;
-  }
-  my $compiled = $self->compiled;
-  return unless $compiled;
-
   # Stacktrace
   local $SIG{__DIE__} = sub {
     CORE::die($_[0]) if ref $_[0];
@@ -172,6 +154,7 @@ sub interpret {
   };
 
   # Interpret
+  return unless my $compiled = $self->compiled;
   my $output = eval { $compiled->(@_) };
   $output =
     Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
@@ -209,31 +192,31 @@ sub parse {
   # Token regex
   my $token_re = qr/
     (
-    $tag_start$replace             # Replace
+      $tag_start$replace             # Replace
     |
-    $tag_start$expr$escp\s*$cpen   # Escaped expression (end)
+      $tag_start$expr$escp\s*$cpen   # Escaped expression (end)
     |
-    $tag_start$expr$escp           # Escaped expression
+      $tag_start$expr$escp           # Escaped expression
     |
-    $tag_start$expr\s*$cpen        # Expression (end)
+      $tag_start$expr\s*$cpen        # Expression (end)
     |
-    $tag_start$expr                # Expression
+      $tag_start$expr                # Expression
     |
-    $tag_start$cmnt\s*$cpen        # Comment (end)
+      $tag_start$cmnt\s*$cpen        # Comment (end)
     |
-    $tag_start$cmnt                # Comment
+      $tag_start$cmnt                # Comment
     |
-    $tag_start\s*$cpen             # Code (end)
+      $tag_start\s*$cpen             # Code (end)
     |
-    $tag_start                     # Code
+      $tag_start                     # Code
     |
-    $cpst\s*$trim$tag_end          # Trim end (start)
+      $cpst\s*$trim$tag_end          # Trim end (start)
     |
-    $trim$tag_end                  # Trim end
+      $trim$tag_end                  # Trim end
     |
-    $cpst\s*$tag_end               # End (start)
+      $cpst\s*$tag_end               # End (start)
     |
-    $tag_end                       # End
+      $tag_end                       # End
     )
   /x;
 
@@ -332,19 +315,8 @@ sub parse {
 
 sub render {
   my $self = shift;
-
-  # Parse
-  $self->parse(shift);
-
-  # Build
-  $self->build;
-
-  # Compile
-  my $e = $self->compile;
-  return $e if $e;
-
-  # Interpret
-  return $self->interpret(@_);
+  my $e    = $self->parse(shift)->build->compile;
+  return $e ? $e : $self->interpret(@_);
 }
 
 sub render_file {
@@ -355,9 +327,7 @@ sub render_file {
   croak qq/Can't open template "$path": $!/
     unless my $file = IO::File->new("< $path");
   my $tmpl = '';
-  while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) {
-    $tmpl .= $buffer;
-  }
+  while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) { $tmpl .= $buffer }
 
   # Decode and render
   $tmpl = decode $self->encoding, $tmpl if $self->encoding;

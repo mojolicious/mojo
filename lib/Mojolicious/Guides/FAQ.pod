@@ -42,7 +42,7 @@ strong believers of the Perl mantra "There is more than one way to do it.",
 and our quest is to develop the best possible solutions for these two
 criteria.
 
-=head2 What about backwards compatibility?
+=head2 What about backward compatibility?
 
 In conformance with L<Mojolicious::Guides::CodingGuidelines>, we will always
 deprecate a feature for at least one major release before removing or
@@ -50,7 +50,7 @@ changing it in incompatible ways. New features can however be marked as
 experimental to explicitly exclude them from these rules. This gives us the
 necessary freedom to ensure a healthy future for L<Mojolicious>. So, as long
 as you are not using anything marked experimental, untested or undocumented,
-you can always count on backwards compatibility, everything else would be
+you can always count on backward compatibility, everything else would be
 considered a bug.
 
 =head2 Why not split up Mojolicious into many smaller distributions?

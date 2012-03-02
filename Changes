@@ -1606,7 +1606,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 0.999925 2010-06-07 00:00:00
         - Updated WebSocket implementation to draft 76,
-          NOTE THAT THIS CHANGE IS NOT BACKWARDS COMPATIBLE!!!
+          NOTE THAT THIS CHANGE IS NOT BACKWARD COMPATIBLE!!!
           (sadly we have no choice when the spec changes)
         - Increased Perl version requirement to 5.8.7 due to unicode bugs in
           earlier releases.
@@ -1948,7 +1948,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.999901 2009-09-01 00:00:00
         - Added new Mojo::Client, because the old one had bugs that prevented
           proper scaling and could not be fixed otherwise.
-          Note that this change is not backwards compatible, the decision to
+          Note that this change is not backward compatible, the decision to
           make it so close to the 1.0 release was not easy but the bugs were
           simply too serious.
         - Added native JSON support.
@@ -2006,8 +2006,8 @@ This file documents the revision history for Perl extension Mojolicious.
 
 0.991250 2009-08-18 00:00:00
         - This release contains many substantial changes that are not
-          backwards compatible, but good news is that it's also the last
-          major feature breaking release before 1.0. ;)
+          backward compatible, but good news is that it's also the last major
+          feature breaking release before 1.0. ;)
           Older releases of Mojo did contain additional Mojo::Script::* and
           Mojolicious::Script::* modules that are obsolete now and might
           break this version if they are still present on your system.
@@ -2015,18 +2015,17 @@ This file documents the revision history for Perl extension Mojolicious.
           DELETE ALL MODULES IN THE "Mojo", "MojoX" AND "Mojolicious"
           NAMESPACES MANUALLY!!!
         - Mojo::Script has been renamed to Mojo::Command, this change is not
-          backwards compatible!
+          backward compatible!
           You will have to regenerate application scripts or replace
           "Mojo(licious)::Script" with "Mojo(licious)::Command" manually.
         - Removed unused features from Mojo::Base and simplified API, this
-          change is not backwards compatible!
+          change is not backward compatible!
             __PACKAGE__->attr('foo', default => 'bar');
           becomes
             __PACKAGE__->attr(foo => 'bar');
-        - Merged eplite and epl, this change is not backwards compatible, you
+        - Merged eplite and epl, this change is not backward compatible, you
           will have to rename all your eplite templates to epl.
-        - Simplified MojoX::Renderer, this change is not backwards
-          compatible!
+        - Simplified MojoX::Renderer, this change is not backward compatible!
           Handler can no longer be detected, that means "default_handler" or
           the "handler" argument are required.
           The template argument can no longer contain format or handler.
@@ -2053,7 +2052,7 @@ This file documents the revision history for Perl extension Mojolicious.
           instead a new argument will be passed along.
               {template => 'foo/bar', format => 'html', handler => 'epl'}
         - Simplified context and controller in Mojolicious, this change is
-          not backwards compatible!
+          not backward compatible!
           If you've been using a custom context object you'll now have to use
           a custom controller base class.
           The new controller_class attribute can now be used to set the
@@ -2061,14 +2060,14 @@ This file documents the revision history for Perl extension Mojolicious.
           There is also no $c argument anymore actions get called with, since
           everything is in $self now.
         - Refactored and renamed Mojo::Transaction and Mojo::Pipeline, this
-          change is not backwards compatible!
+          change is not backward compatible!
             Mojo::Transaction -> Mojo::Transaction::Single
             Mojo::Pipeline -> Mojo::Transaction::Pipeline
         - Refactored and renamed Mojo::File and Mojo::File::Memory, this
-          change is not backwards compatible!
+          change is not backward compatible!
             Mojo::File -> Mojo::Asset::File
             Mojo::File::Memory -> Mojo::Asset::Memory
-        - Refactored and renamed Mojo::Content, this change is not backwards
+        - Refactored and renamed Mojo::Content, this change is not backward
           compatible!
             Mojo::Content -> Mojo::Content::Single
         - Added conditions to MojoX::Routes.
@@ -2119,7 +2118,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Fixed Perl 5.8.1 prereqs. (alias)
 
 0.991242 2009-07-27 00:00:00
-        - Cleaned up the whole script system, this change is mostly backwards
+        - Cleaned up the whole script system, this change is mostly backward
           compatible except for a few cases.
             "daemon $port" now becomes "daemon -p $port"
             "mojolicious mojo $script" becomes "mojolicious $script"
@@ -2133,10 +2132,10 @@ This file documents the revision history for Perl extension Mojolicious.
         - Mojolicious::Lite has been introduced as a new entry level web
           framework example.
         - Mojo::Message::Response will now default to response code 200,
-          this change is not backwards compatible.
+          this change is not backward compatible.
           In Mojolicious you should use ->render(text => 'Hello!') instead of
           ->res->body('Hello!') now.
-        - Changed routes syntax again, this change is not entirely backwards
+        - Changed routes syntax again, this change is not entirely backward
           compatible but will only affect you if you are using the relaxed
           and wildcard variations.
             "/((foo))" becomes "/(.foo)"

@@ -14,7 +14,7 @@ has tree           => sub { [] };
 has wildcard_start => '*';
 
 # "This is the worst kind of discrimination. The kind against me!"
-sub new { shift->SUPER::new()->parse(@_) }
+sub new { shift->SUPER::new->parse(@_) }
 
 sub match {
   my ($self, $path) = @_;
@@ -39,10 +39,7 @@ sub parse {
     if $pattern =~ m#\.([^/\)]+)$#;
 
   # Tokenize
-  $self->pattern($pattern);
-  $self->_tokenize;
-
-  return $self;
+  return $self->pattern($pattern)->_tokenize;
 }
 
 sub render {
@@ -277,9 +274,8 @@ sub _tokenize {
       $tree->[-1]->[-1] .= $char;
     }
   }
-  $self->tree($tree);
 
-  return $self;
+  return $self->tree($tree);
 }
 
 1;

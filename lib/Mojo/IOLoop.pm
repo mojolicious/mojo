@@ -47,8 +47,7 @@ sub client {
   my $id     = $args->{id} || $self->_id;
   my $c      = $self->{connections}->{$id} ||= {};
   $c->{client} = $client;
-  $client->iowatcher($self->iowatcher);
-  weaken $client->{iowatcher};
+  weaken $client->iowatcher($self->iowatcher)->{iowatcher};
 
   # Events
   weaken $self;
@@ -84,8 +83,7 @@ sub delay {
   $self = $self->singleton unless ref $self;
 
   my $delay = Mojo::IOLoop::Delay->new;
-  $delay->ioloop($self);
-  weaken $delay->{ioloop};
+  weaken $delay->ioloop($self)->{ioloop};
   $delay->once(finish => $cb) if $cb;
 
   return $delay;
@@ -133,8 +131,7 @@ sub server {
   my $server = $self->server_class->new;
   my $id     = $self->_id;
   $self->{servers}->{$id} = $server;
-  $server->iowatcher($self->iowatcher);
-  weaken $server->{iowatcher};
+  weaken $server->iowatcher($self->iowatcher)->{iowatcher};
 
   # Events
   weaken $self;
@@ -195,8 +192,7 @@ sub stream {
   my $id = shift || $self->_id;
   my $c = $self->{connections}->{$id} ||= {};
   $c->{stream} = $stream;
-  $stream->iowatcher($self->iowatcher);
-  weaken $stream->{iowatcher};
+  weaken $stream->iowatcher($self->iowatcher)->{iowatcher};
 
   # Events
   weaken $self;

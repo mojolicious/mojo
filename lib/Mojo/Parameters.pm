@@ -17,7 +17,7 @@ has pair_separator => '&';
 #  HOMER!
 #  I gotta go Moe my damn weiner kids are listening."
 sub new {
-  my $self = shift->SUPER::new();
+  my $self = shift->SUPER::new;
 
   # Hash/Array
   if (@_ > 1) { $self->append(@_) }

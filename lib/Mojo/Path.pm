@@ -11,7 +11,7 @@ use Mojo::URL;
 has [qw/leading_slash trailing_slash/];
 has parts => sub { [] };
 
-sub new { shift->SUPER::new()->parse(@_) }
+sub new { shift->SUPER::new->parse(@_) }
 
 sub canonicalize {
   my $self = shift;

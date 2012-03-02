@@ -36,16 +36,13 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-sub new { shift->SUPER::new()->parse(@_) }
+sub new { shift->SUPER::new->parse(@_) }
 
 sub add_child {
   my ($self, $route) = @_;
-
-  $route->parent($self);
-  weaken $route->{parent};
+  weaken $route->parent($self)->{parent};
   $route->shortcuts($self->shortcuts);
   push @{$self->children}, $route;
-
   return $self;
 }
 
@@ -61,55 +58,44 @@ sub add_shortcut {
   return $self;
 }
 
-sub any {
-  shift->_generate_route((ref $_[0] || '') eq 'ARRAY' ? shift : [], @_);
-}
+sub any { shift->_generate_route(ref $_[0] eq 'ARRAY' ? shift : [], @_) }
 
 # "Hey. What kind of party is this? There's no booze and only one hooker."
 sub auto_render {
   my ($self, $c) = @_;
 
+  # Try rendering template or not_found if the route never reached an action
   eval {
     my $stash = $c->stash;
-    unless ($stash->{'mojo.rendered'} || $c->tx->is_websocket) {
-
-      # Render template or not_found if the route never reached an action
-      $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
-    }
-
+    $c->render
+      or ($stash->{'mojo.routed'} or $c->render_not_found)
+      unless $stash->{'mojo.rendered'} || $c->tx->is_websocket;
     1;
   } or $c->render_exception($@);
-
-  return 1;
 }
 
 sub bridge { shift->route(@_)->inline(1) }
 
 sub delete { shift->_generate_route(delete => @_) }
 
-sub detour {
-  my $self = shift;
-  $self->partial(1);
-  $self->to(@_);
-  return $self;
-}
+sub detour { shift->partial(1)->to(@_) }
 
 sub dispatch {
   my ($self, $c) = @_;
 
-  # Path
+  # Prepare path
   my $req  = $c->req;
   my $path = $c->stash->{path};
   if (defined $path) { $path = "/$path" if $path !~ m#^/# }
   else               { $path = $req->url->path->to_abs_string }
 
-  # Match
+  # Prepare match
   my $method = $req->method;
   my $websocket = $c->tx->is_websocket ? 1 : 0;
   my $m = Mojolicious::Routes::Match->new($method => $path, $websocket);
   $c->match($m);
 
-  # Cached
+  # Check cache
   my $cache = $self->cache;
   if ($cache && (my $cached = $cache->get("$method:$path:$websocket"))) {
     $m->root($self);
@@ -118,14 +104,12 @@ sub dispatch {
     $m->endpoint($cached->{endpoint});
   }
 
-  # Lookup
+  # Check routes
   else {
     $m->match($self, $c);
 
-    # Endpoint found
+    # Cache routes without conditions
     if ($cache && (my $endpoint = $m->endpoint)) {
-
-      # Cache routes without conditions
       $cache->set(
         "$method:$path:$websocket" => {
           endpoint => $endpoint,
@@ -176,7 +160,7 @@ sub is_websocket { shift->{websocket} }
 sub name {
   my $self = shift;
 
-  # Custom names get precedence
+  # Custom names have precedence
   if (@_) {
     if (defined(my $name = shift)) {
       $self->{name}   = $name;
@@ -204,16 +188,9 @@ sub over {
 
 sub parse {
   my $self = shift;
-
-  # Pattern does the real work
-  $self->pattern->parse(@_);
-
-  # Default name
-  my $name = $self->pattern->pattern // '';
+  my $name = $self->pattern->parse(@_)->pattern // '';
   $name =~ s/\W+//g;
-  $self->{name}   = $name;
-  $self->{custom} = 0;
-
+  $self->{name} = $name;
   return $self;
 }
 
@@ -358,9 +335,9 @@ sub _dispatch_controller {
   return 1
     unless my $app = $field->{app} || $self->_generate_class($field, $c);
   my $method = $self->_generate_method($field, $c);
-  my $dispatch = ref $app || $app;
-  $dispatch .= "->$method" if $method;
-  $c->app->log->debug(qq/Dispatching "$dispatch"./);
+  my $target = ref $app || $app;
+  $target .= "->$method" if $method;
+  $c->app->log->debug(qq/Dispatching "$target"./);
 
   # Load class
   if (!ref $app && !$self->{loaded}->{$app}) {
@@ -398,8 +375,7 @@ sub _dispatch_controller {
       # Render
       else {
         $c->app->log->debug(
-          qq/Action "$dispatch" not found, assuming template without action./
-        );
+          qq/Action "$target" not found, assuming template without action./);
         $self->auto_render($app) unless $staging;
       }
 
@@ -408,18 +384,12 @@ sub _dispatch_controller {
       @{$stash}{keys %$new} = values %$new;
     }
 
-    # Handler
+    # Application
     else {
-
-      # Connect routes
       if ($app->can('routes')) {
         my $r = $app->routes;
-        unless ($r->parent) {
-          $r->parent($c->match->endpoint);
-          weaken $r->{parent};
-        }
+        weaken $r->parent($c->match->endpoint)->{parent} unless $r->parent;
       }
-
       $app->handler($c);
     }
 
@@ -518,11 +488,8 @@ sub _generate_route {
     if !ref $methods && $methods eq 'under';
 
   # Create route
-  my $route =
-    $self->route($pattern, {@$constraints})->over($conditions)->via($methods)
-    ->to($defaults)->name($name);
-
-  return $route;
+  return $self->route($pattern, {@$constraints})->over($conditions)
+    ->via($methods)->to($defaults)->name($name);
 }
 
 sub _walk_stack {

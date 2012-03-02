@@ -19,7 +19,7 @@ our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
 
 # "Homer, it's easy to criticize.
 #  Fun, too."
-sub new { shift->SUPER::new()->parse(@_) }
+sub new { shift->SUPER::new->parse(@_) }
 
 sub authority {
   my ($self, $authority) = @_;

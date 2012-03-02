@@ -19,7 +19,7 @@ has app_class => 'Mojo::HelloWorld';
 
 # "I'm normally not a praying man, but if you're up there,
 #  please save me Superman."
-sub new { shift->SUPER::new()->parse(@_) }
+sub new { shift->SUPER::new->parse(@_) }
 
 sub detect {
   my ($self, $class) = @_;

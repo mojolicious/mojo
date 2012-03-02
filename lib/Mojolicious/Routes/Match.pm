@@ -9,7 +9,7 @@ has [qw/endpoint root/];
 
 # "I'm Bender, baby, please insert liquor!"
 sub new {
-  my $self = shift->SUPER::new();
+  my $self = shift->SUPER::new;
 
   # Method
   $self->{method} = lc shift;

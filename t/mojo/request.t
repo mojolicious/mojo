@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 962;
+use Test::More tests => 966;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -605,6 +605,7 @@ ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type,
   'x-application-urlencoded', 'right "Content-Type" value';
+ok !$req->content->asset->is_file, 'stored in memory';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
 is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
@@ -627,12 +628,13 @@ ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type,
   'x-application-urlencoded', 'right "Content-Type" value';
+ok $req->content->asset->is_file, 'stored in file';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
-is $req->body_params, '', 'no parameters';
-is $req->body_params->to_hash->{foo}, undef, 'no values';
-is $req->body_params->to_hash->{' tset'}, undef, 'no value';
-is $req->params->to_hash->{foo}, 13, 'right values';
+is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
+is_deeply $req->body_params->to_hash->{foo}, [qw/bar bar/], 'right values';
+is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
+is_deeply $req->params->to_hash->{foo}, [qw/bar bar 13/], 'right values';
 
 # Parse HTTP 1.1 "application/x-www-form-urlencoded"
 $req = Mojo::Message::Request->new;
@@ -808,6 +810,7 @@ is $req->headers->content_length, 418, 'right "Content-Type" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
+ok !$req->content->parts->[0]->asset->is_file, 'stored in memory';
 is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
@@ -872,10 +875,11 @@ is $req->headers->content_length, 418, 'right "Content-Type" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
-is $req->content->parts->[0]->asset->slurp, "hallo welt test123\n",
+ok $req->content->parts->[0]->asset->is_file, 'stored in file';
+is $req->content->parts->[0]->asset->slurp,   "hallo welt test123\n",
   'right content';
-is $req->body_params->to_hash->{text1}, undef, 'no value';
-is $req->body_params->to_hash->{text2}, '',    'right value';
+is $req->body_params->to_hash->{text1}, "hallo welt test123\n", 'right value';
+is $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename,  'hello.pl',          'right filename';
 isa_ok $req->upload('upload')->asset, 'Mojo::Asset::File', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';

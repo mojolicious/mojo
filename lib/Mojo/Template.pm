@@ -73,7 +73,7 @@ sub build {
       }
 
       # Text
-      elsif ($type eq 'text') {
+      if ($type eq 'text') {
 
         # Quote and fix line ending
         $value = quotemeta($value);
@@ -82,10 +82,10 @@ sub build {
       }
 
       # Code or multiline expression
-      elsif ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
+      if ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
 
       # Expression
-      elsif ($type ~~ [qw/expr escp/]) {
+      if ($type ~~ [qw/expr escp/]) {
 
         # Start
         unless ($multi) {

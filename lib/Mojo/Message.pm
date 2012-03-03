@@ -623,10 +623,9 @@ Access C<content> data or replace all subscribers of the C<read> event.
   my $params = $message->body_params;
 
 C<POST> parameters extracted from C<x-application-urlencoded>,
-C<application/x-www-form-urlencoded> or C<multipart/form-data> message
-content, usually a L<Mojo::Parameters> object. For security reasons only
-content that does not exceed L<Mojo::Asset::Memory/"max_memory_size"> will be
-parsed.
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
+usually a L<Mojo::Parameters> object. For security reasons only data that
+does not exceed L<Mojo::Asset::Memory/"max_memory_size"> will be parsed.
 
   say $message->body_params->param('foo');
 
@@ -669,8 +668,8 @@ L<Mojo::Cookie::Response> objects.
   my $dom        = $message->dom;
   my $collection = $message->dom('a[href]');
 
-Turns content into a L<Mojo::DOM> object and takes an optional selector to
-perform a C<find> on it right away, which returns a collection.
+Turns message body into a L<Mojo::DOM> object and takes an optional selector
+to perform a C<find> on it right away, which returns a collection.
 
   # Perform "find" right away
   $message->dom('h1, h2, h3')->each(sub { say $_->text });

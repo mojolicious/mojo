@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 197;
+use Test::More tests => 198;
 
 use File::Spec::Functions qw/catfile splitdir/;
 use File::Temp;
@@ -955,6 +955,16 @@ $output = $mt->render(<<'EOF');
 %>\
 EOF
 is $output, 'hello world', 'multiline expression';
+
+# Escaped multiline expression
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<%==
+'hello '
+.'world'
+%>
+EOF
+is $output, "hello world\n", 'escaped multiline expression';
 
 # Scoped scalar
 $mt     = Mojo::Template->new;

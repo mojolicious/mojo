@@ -622,7 +622,11 @@ Access C<content> data or replace all subscribers of the C<read> event.
 
   my $params = $message->body_params;
 
-C<POST> parameters, usually a L<Mojo::Parameters> object.
+C<POST> parameters extracted from C<x-application-urlencoded>,
+C<application/x-www-form-urlencoded> or C<multipart/form-data> message
+content, usually a L<Mojo::Parameters> object. For security reasons only
+content that does not exceed L<Mojo::Asset::Memory/"max_memory_size"> will be
+parsed.
 
   say $message->body_params->param('foo');
 

@@ -581,10 +581,10 @@ to L<Mojo::JSON>.
   $message = $message->max_message_size(1024);
 
 Maximum message size in bytes, defaults to the value of the
-C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<5242880>. Increasing this
-value can also drastically increase memory usage, should you for example
-attempt to parse an excessively large message body with C<body_params>,
-C<dom> or C<json>.
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<5242880>. Note that
+increasing this value can also drastically increase memory usage, should you
+for example attempt to parse an excessively large message body with the
+C<body_params>, C<dom> or C<json> methods.
 
 =head2 C<version>
 

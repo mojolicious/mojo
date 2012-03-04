@@ -60,7 +60,7 @@ Fresh code based upon years of experience developing L<Catalyst>.
 
 All you need is a oneliner, it takes less than a minute.
 
-  $ sudo sh -c "curl -L cpanmin.us | perl - Mojolicious"
+  $ sudo sh -c "curl -L cpanmin.us | perl - -n Mojolicious"
 
 =head2 Getting Started
 

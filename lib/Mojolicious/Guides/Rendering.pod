@@ -214,6 +214,9 @@ generate emails, this can be done using the C<partial> stash value.
 
   my $html = $self->render('mail', partial => 1);
 
+  # Synonymous with calling Mojolicious::Controller->render_partial()
+  my $html = $self->render_partial('mail');
+
 =head2 Status code
 
 Response status codes can be changed with the C<status> stash value.

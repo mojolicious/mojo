@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.58    2012-03-06 00:00:00
         - Improved documentation.
+        - Fixed small caching bug in Morbo file watcher.
 
 2.57    2012-03-03 00:00:00
         - Replaced protection from excessively large form values in

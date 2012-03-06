@@ -31,9 +31,8 @@ has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
-our $AUTHORITY = 'cpan:SRI';
-our $CODENAME  = 'Leaf Fluttering In Wind';
-our $VERSION   = '2.58';
+our $CODENAME = 'Leaf Fluttering In Wind';
+our $VERSION  = '2.58';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."

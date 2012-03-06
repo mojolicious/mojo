@@ -15,11 +15,12 @@ use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
-has [qw/backlog group listen silent user/];
+has [qw/backlog group silent user/];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
-has ioloop             => sub { Mojo::IOLoop->singleton };
-has max_clients        => 1000;
-has max_requests       => 25;
+has ioloop => sub { Mojo::IOLoop->singleton };
+has listen => sub { [split /,/, $ENV{MOJO_LISTEN} || 'http://*:3000'] };
+has max_clients  => 1000;
+has max_requests => 25;
 
 sub DESTROY {
   my $self = shift;
@@ -73,7 +74,7 @@ sub setuidgid {
 
 sub start {
   my $self = shift;
-  $self->_listen($_) for @{$self->listen || ['http://*:3000']};
+  $self->_listen($_) for @{$self->listen};
   $self->ioloop->max_connections($self->max_clients);
 }
 
@@ -417,7 +418,8 @@ singleton.
   my $listen = $daemon->listen;
   $daemon    = $daemon->listen(['https://localhost:3000']);
 
-List of one or more locations to listen on, defaults to C<http://*:3000>.
+List of one or more locations to listen on, defaults to the value of the
+C<MOJO_LISTEN> environment variable or C<http://*:3000>.
 
   # Listen on two ports with HTTP and HTTPS at the same time
   $daemon->listen(['http://*:3000', 'https://*:4000']);

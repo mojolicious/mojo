@@ -17,7 +17,8 @@ These options are available:
   -i, --inactivity <seconds>   Set inactivity timeout, defaults to the value
                                of MOJO_INACTIVITY_TIMEOUT or 15.
   -l, --listen <location>      Set one or more locations you want to listen
-                               on, defaults to "http://*:3000".
+                               on, defaults to the value of MOJO_LISTEN or
+                               "http://*:3000".
   -p, --proxy                  Activate reverse proxy support, defaults to
                                the value of MOJO_REVERSE_PROXY.
   -r, --requests <number>      Set maximum number of requests per keep-alive

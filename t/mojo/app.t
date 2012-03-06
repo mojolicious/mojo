@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 53;
+use Test::More tests => 56;
 
 # "I was so bored I cut the pony tail off the guy in front of us.
 #  Look at me, I'm a grad student.
@@ -28,6 +28,21 @@ use_ok 'Mojolicious';
   is(Mojo::Server::Daemon->new->inactivity_timeout, 25, 'right value');
   $ENV{MOJO_INACTIVITY_TIMEOUT} = 0;
   is(Mojo::Server::Daemon->new->inactivity_timeout, 0, 'right value');
+}
+
+# Listen
+{
+  is_deeply(Mojo::Server::Daemon->new->listen,
+    ['http://*:3000'], 'right value');
+  local $ENV{MOJO_LISTEN} = 'http://localhost:8080';
+  is_deeply(Mojo::Server::Daemon->new->listen,
+    ['http://localhost:8080'], 'right value');
+  $ENV{MOJO_LISTEN} = 'http://*:80,https://*:443';
+  is_deeply(
+    Mojo::Server::Daemon->new->listen,
+    ['http://*:80', 'https://*:443'],
+    'right value'
+  );
 }
 
 # Logger

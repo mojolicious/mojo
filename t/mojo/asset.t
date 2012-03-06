@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 57;
+use Test::More tests => 65;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
@@ -108,18 +108,30 @@ $mem = Mojo::Asset::Memory->new;
 $mem->add_chunk('abc');
 my $tmp = Mojo::Asset::File->new;
 $tmp->add_chunk('x');
-$mem->move_to($tmp->path);
-is $mem->slurp, 'abc', 'right content';
+$path = $tmp->path;
+ok -e $path, 'file exists';
 undef $tmp;
+ok !-e $path, 'file has been cleaned up';
+$mem->move_to($path);
+is $mem->slurp, 'abc', 'right content';
+ok -e $path, 'file exists';
+unlink $path;
+ok !-e $path, 'file has been cleaned up';
 
 # Move file asset to file
 $file = Mojo::Asset::File->new;
 $file->add_chunk('bcd');
 $tmp = Mojo::Asset::File->new;
 $tmp->add_chunk('x');
-$file->move_to($tmp->path);
-is $file->slurp, 'bcd', 'right content';
+$path = $tmp->path;
+ok -e $path, 'file exists';
 undef $tmp;
+ok !-e $path, 'file has been cleaned up';
+$file->move_to($path);
+is $file->slurp, 'bcd', 'right content';
+ok -e $path, 'file exists';
+unlink $path;
+ok !-e $path, 'file has been cleaned up';
 
 # Upgrade
 my $asset = Mojo::Asset::Memory->new(max_memory_size => 5, auto_upgrade => 1);

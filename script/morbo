@@ -43,7 +43,8 @@ usage: $0 [OPTIONS] [APPLICATION]
 These options are available:
   -h, --help                     Show this message.
   -l, --listen <location>        Set one or more locations you want to listen
-                                 on, defaults to "http://*:3000".
+                                 on, defaults to the value of MOJO_LISTEN or
+                                 "http://*:3000".
   -v, --verbose                  Print details about what files changed to
                                  STDOUT.
   -w, --watch <directory/file>   Set one or more directories and files to
@@ -56,9 +57,9 @@ EOF
 # "With Halley's Comet out of ice, Earth is experiencing a sudden case of
 #  global warming.
 #  Morbo is pleased but sticky."
+$ENV{MOJO_LISTEN} = join(',', @listen) if @listen;
 my $morbo = Mojo::Server::Morbo->new;
-$morbo->listen(\@listen) if @listen;
-$morbo->watch(\@watch)   if @watch;
+$morbo->watch(\@watch) if @watch;
 $morbo->run($app);
 
 __END__

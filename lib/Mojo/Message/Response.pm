@@ -206,7 +206,7 @@ implements the following new ones.
 
   my $cookies = $res->cookies;
   $res        = $res->cookies(Mojo::Cookie::Response->new);
-  $req        = $req->cookies({name => 'foo', value => 'bar'});
+  $res        = $res->cookies({name => 'foo', value => 'bar'});
 
 Access response cookies, usually L<Mojo::Cookie::Response> objects.
 

@@ -152,7 +152,7 @@ sub _config {
   $c->{workers}         ||= 4;
 
   # Daemon settings
-  $ENV{MOJO_REVERSE_PROXY} = 1 if $c->{proxy};
+  $ENV{MOJO_REVERSE_PROXY} = $c->{proxy};
   my $daemon = $self->{daemon};
   $daemon->backlog($c->{backlog}) if defined $c->{backlog};
   $daemon->max_clients($c->{clients} || 1000);
@@ -586,8 +586,7 @@ has been stopped.
 
   proxy => 1
 
-Activate reverse proxy support, defaults to the value of
-the C<MOJO_REVERSE_PROXY> environment variable.
+Activate reverse proxy support.
 
 =head2 C<upgrade_timeout>
 

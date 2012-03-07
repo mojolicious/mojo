@@ -1,9 +1,11 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.58    2012-03-06 00:00:00
+2.58    2012-03-07 00:00:00
         - Added support for MOJO_LISTEN environment variable.
         - Removed listen attribute from Mojo::Server::Morbo.
         - Improved documentation.
+        - Fixed bug in Hypnotoad that prevented disabling of reverse proxy
+          support between zero downtime software upgrades.
         - Fixed small caching bug in Morbo file watcher.
         - Fixed Windows bug in "asset.t".
 

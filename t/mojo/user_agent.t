@@ -6,13 +6,12 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 82;
+use Test::More tests => 81;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
+use Mojo::UserAgent;
 use Mojolicious::Lite;
-
-use_ok 'Mojo::UserAgent';
 
 # Silence
 app->log->level('fatal');

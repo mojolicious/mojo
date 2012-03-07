@@ -2,11 +2,11 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 184;
+use Test::More tests => 183;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
-use_ok 'Mojo::Path';
+use Mojo::Path;
 
 # Basics
 my $path = Mojo::Path->new;

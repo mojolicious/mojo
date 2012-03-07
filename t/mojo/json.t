@@ -2,12 +2,11 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 118;
-
-use Mojo::ByteStream 'b';
+use Test::More tests => 117;
 
 # "We should be safe up here. I'm pretty sure fires can't climb trees."
-use_ok 'Mojo::JSON';
+use Mojo::ByteStream 'b';
+use Mojo::JSON;
 
 # Decode array
 my $json  = Mojo::JSON->new;

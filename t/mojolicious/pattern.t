@@ -1,11 +1,10 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 50;
-
-use Mojo::ByteStream 'b';
+use Test::More tests => 49;
 
 # "People said I was dumb, but I proved them."
-use_ok 'Mojolicious::Routes::Pattern';
+use Mojo::ByteStream 'b';
+use Mojolicious::Routes::Pattern;
 
 # Normal pattern with text, symbols and a default value
 my $pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action');

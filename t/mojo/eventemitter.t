@@ -1,9 +1,9 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 47;
+use Test::More tests => 46;
 
 # "Hi, Super Nintendo Chalmers!"
-use_ok 'Mojo::EventEmitter';
+use Mojo::EventEmitter;
 
 # Normal event
 my $e      = Mojo::EventEmitter->new;

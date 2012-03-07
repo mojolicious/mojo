@@ -6,13 +6,12 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 7;
-
-use Mojo::IOLoop;
+use Test::More tests => 6;
 
 # "And now to create an unstoppable army of between one million and two
 #  million zombies!"
-use_ok 'Mojo::IOLoop::Delay';
+use Mojo::IOLoop;
+use Mojo::IOLoop::Delay;
 
 # Minimal
 my $delay = Mojo::IOLoop::Delay->new;

@@ -5,14 +5,13 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 141;
+use Test::More tests => 139;
 
 # Need to be loaded first to trigger edge case
 use MIME::Base64;
 use MIME::QuotedPrint;
-
-use_ok 'Mojo::Util',       'md5_bytes';
-use_ok 'Mojo::ByteStream', 'b';
+use Mojo::Util 'md5_bytes';
+use Mojo::ByteStream 'b';
 
 # camelize
 my $stream = b('foo_bar_baz');

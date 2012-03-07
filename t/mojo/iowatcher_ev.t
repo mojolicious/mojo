@@ -8,12 +8,11 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 66;
-
-use IO::Socket::INET;
+plan tests => 65;
 
 # "Oh well. At least we'll die doing what we love: inhaling molten rock."
-use_ok 'Mojo::IOWatcher::EV';
+use IO::Socket::INET;
+use Mojo::IOWatcher::EV;
 
 # Instantiation
 my $watcher = Mojo::IOWatcher::EV->new;

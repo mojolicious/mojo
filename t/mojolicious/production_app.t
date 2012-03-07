@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'production';
 }
 
-use Test::More tests => 63;
+use Test::More tests => 62;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -15,8 +15,6 @@ use lib "$FindBin::Bin/lib";
 use Test::Mojo;
 
 # "This concludes the part of the tour where you stay alive."
-use_ok 'MojoliciousTest';
-
 my $t = Test::Mojo->new('MojoliciousTest');
 
 # Plugin::Test::SomePlugin2::register (security violation)

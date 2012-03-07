@@ -2,9 +2,9 @@ use Mojo::Base -strict;
 
 # "Being eaten by crocodile is just like going to sleep...
 #  in a giant blender."
-use Test::More tests => 71;
+use Test::More tests => 70;
 
-use_ok 'Mojo::Transaction::WebSocket';
+use Mojo::Transaction::WebSocket;
 
 # Simple text frame roundtrip
 my $ws    = Mojo::Transaction::WebSocket->new;
@@ -89,9 +89,11 @@ is $frame->[2], 0,            'rsv2 flag is not set';
 is $frame->[3], 0,            'rsv3 flag is not set';
 is $frame->[4], 1,            'text frame';
 is $frame->[5], 'also works', 'right payload';
-isnt Mojo::Transaction::WebSocket->new->build_frame(1, 0, 0, 0, 2,
-  'also works'),
-  $bytes, 'frames are not equal';
+isnt(
+  Mojo::Transaction::WebSocket->new->build_frame(1, 0, 0, 0, 2, 'also works'),
+  $bytes,
+  'frames are not equal'
+);
 
 # Masked binary frame roundtrip
 $ws = Mojo::Transaction::WebSocket->new(masked => 1);
@@ -103,9 +105,11 @@ is $frame->[2], 0,            'rsv2 flag is not set';
 is $frame->[3], 0,            'rsv3 flag is not set';
 is $frame->[4], 2,            'binary frame';
 is $frame->[5], 'just works', 'right payload';
-isnt Mojo::Transaction::WebSocket->new->build_frame(1, 0, 0, 0, 2,
-  'just works'),
-  $bytes, 'frames are not equal';
+isnt(
+  Mojo::Transaction::WebSocket->new->build_frame(1, 0, 0, 0, 2, 'just works'),
+  $bytes,
+  'frames are not equal'
+);
 
 # One-character text frame roundtrip
 $ws    = Mojo::Transaction::WebSocket->new;

@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 280;
+use Test::More tests => 279;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -20,8 +20,6 @@ use Test::Mojo;
 
 # "Congratulations Fry, you've snagged the perfect girlfriend.
 #  Amy's rich, she's probably got other characteristics..."
-use_ok 'MojoliciousTest';
-
 my $t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available

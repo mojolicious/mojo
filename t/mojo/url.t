@@ -2,11 +2,11 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 381;
+use Test::More tests => 380;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
-use_ok 'Mojo::URL';
+use Mojo::URL;
 
 # Simple
 my $url = Mojo::URL->new('HtTp://Kraih.Com');

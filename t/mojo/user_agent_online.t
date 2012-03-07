@@ -10,17 +10,16 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 109;
+plan tests => 108;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
 use IO::Socket::INET;
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;
+use Mojo::UserAgent;
 use Mojolicious::Lite;
 use ojo;
-
-use_ok 'Mojo::UserAgent';
 
 # GET /remote_address
 get '/remote_address' => sub {

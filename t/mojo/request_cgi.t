@@ -1,10 +1,10 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 181;
+use Test::More tests => 180;
 
 # "Aren't we forgetting the true meaning of Christmas?
 #  You know, the birth of Santa."
-use_ok 'Mojo::Message::Request';
+use Mojo::Message::Request;
 
 # Parse Lighttpd like CGI environment variables and a body
 my $req  = Mojo::Message::Request->new;

@@ -1,9 +1,9 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 29;
+use Test::More tests => 28;
 
 # "Your mistletoe is no match for my *tow* missile."
-use_ok 'Mojolicious::Types';
+use Mojolicious::Types;
 
 # Basics
 my $t = Mojolicious::Types->new;

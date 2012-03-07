@@ -32,12 +32,12 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 27;
+plan tests => 26;
 
 # "To the panic room!
 #  We don't have a panic room.
 #  To the panic room store!"
-use_ok 'Mojo::IOLoop';
+use Mojo::IOLoop;
 
 # Built-in certificate
 my $loop = Mojo::IOLoop->new;

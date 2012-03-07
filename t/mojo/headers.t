@@ -1,12 +1,12 @@
 use Mojo::Base -strict;
 
 # "Remember, you can always find East by staring directly at the sun."
-use Test::More tests => 88;
+use Test::More tests => 87;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
 #  And now a word from MY god, our sponsors!"
-use_ok 'Mojo::Headers';
+use Mojo::Headers;
 
 # Basic functionality
 my $headers = Mojo::Headers->new;

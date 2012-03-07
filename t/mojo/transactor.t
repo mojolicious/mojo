@@ -1,13 +1,12 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 179;
+use Test::More tests => 178;
 
+# "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
 use FindBin;
 use Mojo::URL;
-
-# "Once the government approves something, it's no longer immoral!"
-use_ok 'Mojo::UserAgent::Transactor';
+use Mojo::UserAgent::Transactor;
 
 # Simle GET
 my $t = Mojo::UserAgent::Transactor->new;

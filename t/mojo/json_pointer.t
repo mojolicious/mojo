@@ -2,11 +2,11 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 19;
+use Test::More tests => 18;
 
 # "I've had it with this school, Skinner.
 #  Low test scores, class after class of ugly, ugly children..."
-use_ok 'Mojo::JSON::Pointer';
+use Mojo::JSON::Pointer;
 
 # "contains" (hash)
 my $p = Mojo::JSON::Pointer->new;

@@ -1,13 +1,12 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 32;
+use Test::More tests => 31;
 
+# "My cat's breath smells like cat food."
 use Cwd 'cwd';
 use File::Spec::Functions 'catdir';
 use File::Temp;
-
-# "My cat's breath smells like cat food."
-use_ok 'Mojo::Command';
+use Mojo::Command;
 
 my $command = Mojo::Command->new;
 

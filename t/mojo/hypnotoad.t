@@ -19,10 +19,10 @@ use Mojo::UserAgent;
 
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
-plan tests => 51;
+plan tests => 50;
 
 # "I ate the blue ones... they taste like burning."
-use_ok 'Mojo::Server::Hypnotoad';
+use Mojo::Server::Hypnotoad;
 
 # Prepare script
 my $cwd = cwd;

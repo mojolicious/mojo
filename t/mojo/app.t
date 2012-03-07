@@ -6,20 +6,19 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 56;
+use Test::More tests => 54;
 
 # "I was so bored I cut the pony tail off the guy in front of us.
 #  Look at me, I'm a grad student.
 #  I'm 30 years old and I made $600 last year.
 #  Bart, don't make fun of grad students.
 #  They've just made a terrible life choice."
+use Mojo;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
-
-use_ok 'Mojo';
-use_ok 'Mojolicious';
+use Mojolicious;
 
 # Timeout
 {

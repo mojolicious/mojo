@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 334;
+use Test::More tests => 333;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -9,8 +9,7 @@ use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Headers;
-
-use_ok 'Mojo::Message::Response';
+use Mojo::Message::Response;
 
 # Common status codes
 my $res = Mojo::Message::Response->new;

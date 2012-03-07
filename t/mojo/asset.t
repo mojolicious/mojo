@@ -1,13 +1,13 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 65;
+use Test::More tests => 63;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
 #  I will be nice to a sick kid.
 #  For legal purposes, sick kids may include hookers with a cold."
-use_ok 'Mojo::Asset::File';
-use_ok 'Mojo::Asset::Memory';
+use Mojo::Asset::File;
+use Mojo::Asset::Memory;
 
 # File asset
 my $file = Mojo::Asset::File->new;

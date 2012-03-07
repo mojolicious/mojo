@@ -1,10 +1,10 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 184;
+use Test::More tests => 182;
 
 # "What good is money if it can't inspire terror in your fellow man?"
-use_ok 'Mojo::Cookie::Request';
-use_ok 'Mojo::Cookie::Response';
+use Mojo::Cookie::Request;
+use Mojo::Cookie::Response;
 
 # Request cookie as string
 my $cookie = Mojo::Cookie::Request->new;

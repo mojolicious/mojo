@@ -17,15 +17,14 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 198;
-
-use File::Spec::Functions qw/catfile splitdir/;
-use File::Temp;
-use FindBin;
+use Test::More tests => 197;
 
 # "When I held that gun in my hand, I felt a surge of power...
 #  like God must feel when he's holding a gun."
-use_ok 'Mojo::Template';
+use File::Spec::Functions qw/catfile splitdir/;
+use File::Temp;
+use FindBin;
+use Mojo::Template;
 
 # Consistent scalar context
 my $mt     = Mojo::Template->new;

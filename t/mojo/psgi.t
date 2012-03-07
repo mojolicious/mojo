@@ -1,13 +1,12 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 21;
-
-use Mojo::JSON;
-use Mojolicious::Lite;
+use Test::More tests => 19;
 
 # "We need some more secret sauce. Put the mayonnaise in the sun."
-use_ok 'Mojo::Server::PSGI';
-use_ok 'Mojolicious::Command::psgi';
+use Mojo::JSON;
+use Mojo::Server::PSGI;
+use Mojolicious::Lite;
+use Mojolicious::Command::psgi;
 
 # Silence
 app->log->level('fatal');

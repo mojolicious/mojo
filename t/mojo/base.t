@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 413;
+use Test::More tests => 409;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -19,10 +19,10 @@ __PACKAGE__->attr('name');
 
 package main;
 
-use_ok 'Mojo::Base';
-use_ok 'BaseTest::Base1';
-use_ok 'BaseTest::Base2';
-use_ok 'BaseTest::Base3';
+use Mojo::Base;
+use BaseTest::Base1;
+use BaseTest::Base2;
+use BaseTest::Base3;
 
 # Basic functionality
 my $monkeys = [];

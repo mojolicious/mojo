@@ -6,17 +6,17 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 35;
+use Test::More tests => 30;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
 #  besides occasionally wearing the underwear,
 #  which as we discussed, is strictly a comfort thing."
-use_ok 'Mojo::IOLoop';
-use_ok 'Mojo::IOLoop::Client';
-use_ok 'Mojo::IOLoop::Delay';
-use_ok 'Mojo::IOLoop::Server';
-use_ok 'Mojo::IOLoop::Stream';
+use Mojo::IOLoop;
+use Mojo::IOLoop::Client;
+use Mojo::IOLoop::Delay;
+use Mojo::IOLoop::Server;
+use Mojo::IOLoop::Stream;
 
 # Custom watcher
 package MyWatcher;
@@ -159,7 +159,7 @@ $id = Mojo::IOLoop->stream($stream);
 $stream->on(close => sub { Mojo::IOLoop->stop });
 $stream->on(read => sub { $buffer .= pop });
 $stream->write('hello');
-ok Mojo::IOLoop->stream($id), 'stream exists';
+ok(Mojo::IOLoop->stream($id), 'stream exists');
 Mojo::IOLoop->start;
 Mojo::IOLoop->timer('0.25' => sub { Mojo::IOLoop->stop });
 Mojo::IOLoop->start;
@@ -273,10 +273,20 @@ ok !$err, 'no error';
 is $loop->max_connections, 0, 'right value';
 
 # Defaults
-is Mojo::IOLoop::Client->new->iowatcher, Mojo::IOLoop->singleton->iowatcher,
-  'right default';
-is Mojo::IOLoop::Delay->new->ioloop, Mojo::IOLoop->singleton, 'right default';
-is Mojo::IOLoop::Server->new->iowatcher,
-  Mojo::IOLoop->singleton->iowatcher, 'right default';
-is Mojo::IOLoop::Stream->new->iowatcher, Mojo::IOLoop->singleton->iowatcher,
-  'right default';
+is(
+  Mojo::IOLoop::Client->new->iowatcher,
+  Mojo::IOLoop->singleton->iowatcher,
+  'right default'
+);
+is(Mojo::IOLoop::Delay->new->ioloop, Mojo::IOLoop->singleton,
+  'right default');
+is(
+  Mojo::IOLoop::Server->new->iowatcher,
+  Mojo::IOLoop->singleton->iowatcher,
+  'right default'
+);
+is(
+  Mojo::IOLoop::Stream->new->iowatcher,
+  Mojo::IOLoop->singleton->iowatcher,
+  'right default'
+);

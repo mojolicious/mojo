@@ -1,9 +1,9 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 51;
+use Test::More tests => 50;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
-use_ok 'Mojo::Collection', 'c';
+use Mojo::Collection 'c';
 
 # Array
 is c(1, 2, 3)->[1], 2, 'right result';

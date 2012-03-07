@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 # "Would you kindly shut your noise-hole?"
-use Test::More tests => 5;
+use Test::More tests => 4;
 
 package Mojo::TestServerViaEnv;
 use Mojo::Base 'Mojo';
@@ -11,7 +11,7 @@ use Mojo::Base 'Mojo';
 
 package main;
 
-use_ok 'Mojo::Server';
+use Mojo::Server;
 
 my $server = Mojo::Server->new;
 isa_ok $server, 'Mojo::Server', 'right object';

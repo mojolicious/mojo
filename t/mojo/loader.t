@@ -1,13 +1,13 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 46;
+use Test::More tests => 45;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
 # "Bad bees. Get away from my sugar.
 #  Ow. OW. Oh, they're defending themselves somehow."
-use_ok 'Mojo::Loader';
+use Mojo::Loader;
 
 # Single character core module
 my $loader = Mojo::Loader->new;

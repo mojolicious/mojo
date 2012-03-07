@@ -1,10 +1,10 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 21;
+use Test::More tests => 20;
 
 # "You know, most people pray silently.
 #  Marge He's way the hell up there."
-use_ok 'Mojo::Cache';
+use Mojo::Cache;
 
 my $cache = Mojo::Cache->new(max_keys => 2);
 $cache->set(foo => 'bar');

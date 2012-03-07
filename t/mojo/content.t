@@ -1,11 +1,11 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 19;
+use Test::More tests => 17;
 
 # "No matter how good you are at something,
 #  there's always about a million people better than you."
-use_ok 'Mojo::Content::MultiPart';
-use_ok 'Mojo::Content::Single';
+use Mojo::Content::MultiPart;
+use Mojo::Content::Single;
 
 # Single
 my $content = Mojo::Content::Single->new;

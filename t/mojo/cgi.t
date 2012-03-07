@@ -1,15 +1,14 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 20;
-
-use Mojo::Message::Response;
-use Mojolicious::Lite;
+use Test::More tests => 18;
 
 # "My ears are burning.
 #  I wasn't talking about you, Dad.
 #  No, my ears are really burning. I wanted to see inside, so I lit a Q-tip."
-use_ok 'Mojo::Server::CGI';
-use_ok 'Mojolicious::Command::cgi';
+use Mojo::Message::Response;
+use Mojo::Server::CGI;
+use Mojolicious::Command::cgi;
+use Mojolicious::Lite;
 
 # Silence
 app->log->level('fatal');

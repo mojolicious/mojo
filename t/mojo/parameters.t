@@ -2,10 +2,10 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 76;
+use Test::More tests => 75;
 
 # "Now that's a wave of destruction that's easy on the eyes."
-use_ok 'Mojo::Parameters';
+use Mojo::Parameters;
 
 # Basics with custom pair separator
 my $params = Mojo::Parameters->new('foo=b%3Bar&baz=23');

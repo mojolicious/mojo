@@ -1,10 +1,10 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 351;
+use Test::More tests => 349;
 
 # "They're not very heavy, but you don't hear me not complaining."
-use_ok 'Mojolicious::Routes';
-use_ok 'Mojolicious::Routes::Match';
+use Mojolicious::Routes;
+use Mojolicious::Routes::Match;
 
 # /clean
 my $r = Mojolicious::Routes->new;

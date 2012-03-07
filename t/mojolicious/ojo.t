@@ -9,10 +9,10 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 11;
+use Test::More tests => 10;
 
 # "What do you mean 'we', flesh-tube?"
-use_ok 'ojo';
+use ojo;
 
 # * /
 a('/' => sub {

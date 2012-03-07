@@ -6,13 +6,12 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 66;
+use Test::More tests => 65;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 use IO::Socket::INET;
-
-use_ok 'Mojo::IOWatcher';
+use Mojo::IOWatcher;
 
 # Instantiation
 my $watcher = Mojo::IOWatcher->new;

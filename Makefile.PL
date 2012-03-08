@@ -24,10 +24,6 @@ WriteMakefile(
     },
     no_index => {directory => [qw/t/]}
   },
-  META_ADD => {
-    build_requires     => {},
-    configure_requires => {}
-  },
   EXE_FILES => ['script/hypnotoad', 'script/mojo', 'script/morbo'],
   test => {TESTS => 't/*.t t/*/*.t'}
 );

@@ -789,10 +789,11 @@ EXPERIMENTAL and might change without warning!
 
 =head2 C<param>
 
-  my $param  = $message->param('foo');
-  my @params = $message->param('foo');
+  my @names = $message->param;
+  my $foo   = $message->param('foo');
+  my @foo   = $message->param('foo');
 
-Access C<GET> and C<POST> parameters.
+Access C<POST> parameters.
 
 =head2 C<parse>
 

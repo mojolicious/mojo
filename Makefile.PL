@@ -22,7 +22,7 @@ WriteMakefile(
       repository  => 'http://github.com/kraih/mojo',
       bugtracker  => 'http://github.com/kraih/mojo/issues'
     },
-    no_index => {directory => [qw/t/]}
+    no_index => {directory => ['t']}
   },
   EXE_FILES => ['script/hypnotoad', 'script/mojo', 'script/morbo'],
   test => {TESTS => 't/*.t t/*/*.t'}

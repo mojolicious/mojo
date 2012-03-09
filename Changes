@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.58    2012-03-09 00:00:00
         - Added support for MOJO_LISTEN environment variable.
         - Removed listen attribute from Mojo::Server::Morbo.
+        - Improved event loop compatibility of Mojo::Server::PSGI.
         - Improved documentation.
         - Improved tests.
         - Fixed Mojo::URL object handling bug in url_for.

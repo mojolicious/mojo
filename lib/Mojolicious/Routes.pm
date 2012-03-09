@@ -923,7 +923,7 @@ method is EXPERIMENTAL and might change without warning!
 =head1 SHORTCUTS
 
 In addition to the attributes and methods above you can also call shortcuts
-on instances of L<Mojolicious::Routes>.
+on L<Mojolicious::Routes> objects.
 
   $r->add_shortcut(firefox => sub {
     my ($r, $path) = @_;

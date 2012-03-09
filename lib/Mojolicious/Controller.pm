@@ -528,9 +528,10 @@ sub ua { shift->app->ua }
 
 sub url_for {
   my $self = shift;
-  my $target = shift || '';
+  my $target = shift // '';
 
   # Absolute URL
+  return $target if (Scalar::Util::blessed($target) || '') eq 'Mojo::URL';
   return Mojo::URL->new($target) if $target =~ m#^\w+\://#;
 
   # Base
@@ -1092,7 +1093,7 @@ You can call C<finish> at any time to end the stream.
 =head1 HELPERS
 
 In addition to the attributes and methods above you can also call helpers on
-instances of L<Mojolicious::Controller>. This includes all helpers from
+L<Mojolicious::Controller> objects. This includes all helpers from
 L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 

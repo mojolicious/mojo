@@ -242,10 +242,10 @@ L<Mojolicious> to make our C<model> available to all actions and templates.
   use lib 'lib';
   use MyUsers;
 
-  # Model instance
+  # Model object
   my $users = MyUsers->new;
 
-  # Helper function returning our model instance
+  # Helper function returning our model object
   helper users => sub { return $users };
 
   # /?user=sri&pass=secr3t
@@ -266,7 +266,7 @@ L<Mojolicious> to make our C<model> available to all actions and templates.
 
   app->start;
 
-The C<param> method of our L<Mojolicious::Controller> instance is used to
+The C<param> method of our L<Mojolicious::Controller> object is used to
 access query parameters, POST parameters, file uploads and route
 placeholders, all at once.
 

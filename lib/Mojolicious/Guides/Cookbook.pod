@@ -1017,7 +1017,7 @@ you can use or overload.
 
 Ever thought about running a quick oneliner against your L<Mojolicious>
 application to test something?
-Thanks to the C<eval> command you can do just that, the application instance
+Thanks to the C<eval> command you can do just that, the application object
 itself can be accessed via C<app>.
 
   $ mojo generate lite_app

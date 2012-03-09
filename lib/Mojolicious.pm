@@ -456,7 +456,7 @@ parsed.
 This is a very powerful hook and should not be used lightly, it makes some
 rather advanced features such as upload progress bars possible, just note
 that it will not work for embedded applications. (Passed the transaction and
-application instances)
+application object)
 
 =item B<before_dispatch>
 
@@ -468,7 +468,7 @@ Emitted right before the static and routes dispatchers start their work.
   });
 
 Very useful for rewriting incoming requests and other preprocessing tasks.
-(Passed the default controller instance)
+(Passed the default controller object)
 
 =item B<after_static_dispatch>
 
@@ -481,7 +481,7 @@ file should be served and before the routes dispatcher starts its work.
   });
 
 Mostly used for custom dispatchers and postprocessing static file responses.
-(Passed the default controller instance)
+(Passed the default controller object)
 
 =item B<after_dispatch>
 
@@ -494,7 +494,7 @@ hook can trigger before C<after_static_dispatch> due to its dynamic nature.
   });
 
 Useful for all kinds of postprocessing tasks. (Passed the current controller
-instance)
+object)
 
 =item B<around_dispatch>
 
@@ -511,7 +511,7 @@ want to continue the chain.
 
 This is a very powerful hook and should not be used lightly, consider it the
 sledgehammer in your toolbox. (Passed a closure leading to the next hook and
-the current controller instance)
+the current controller object)
 
 =back
 
@@ -610,10 +610,10 @@ startup.
 =head1 HELPERS
 
 In addition to the attributes and methods above you can also call helpers on
-instances of L<Mojolicious>. This includes all helpers from
+L<Mojolicious> objects. This includes all helpers from
 L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>. Note that application helpers are always
-called with a new C<controller_class> instance, so they can't depend on or
+called with a new C<controller_class> object, so they can't depend on or
 change controller state, which includes request, response and stash.
 
   $app->log->debug($app->dumper({foo => 'bar'}));

@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 6;
+use Test::More tests => 9;
 
 # "For example, if you killed your grandfather, you'd cease to exist!
 #  But existing is basically all I do!"
@@ -26,6 +26,12 @@ get '/' => 'root';
 
 # GET /foo
 get '/foo';
+
+# GET /bar
+get '/bar' => sub {
+  my $self = shift;
+  $self->redirect_to($self->url_for('foo'));
+};
 
 my $t = Test::Mojo->new;
 
@@ -48,6 +54,10 @@ http://kraih.com/rebased
 /rebased
 http://kraih.com/
 EOF
+
+# GET /bar
+$t->get_ok('/bar')->status_is(302)
+  ->header_is(Location => 'http://kraih.com/rebased/foo');
 
 __DATA__
 @@ root.html.ep

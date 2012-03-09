@@ -549,7 +549,7 @@ might change without warning!
   my $loop = Mojo::IOLoop->singleton;
 
 The global L<Mojo::IOLoop> singleton, used to access a single shared loop
-instance from everywhere inside the process.
+object from everywhere inside the process.
 
   # Many methods also allow you to take shortcuts
   Mojo::IOLoop->timer(2 => sub { Mojo::IOLoop->stop });

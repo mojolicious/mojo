@@ -127,7 +127,7 @@ without ruining the result.
 
 Stash values that don't have invalid characters in their name get
 automatically initialized as normal variables in the template, and the
-controller instance as C<$self>.
+controller object as C<$self>.
 
   $self->stash(name => 'tester');
 
@@ -152,7 +152,7 @@ actual actions.
   $self->render;
 
 There is one big difference though, by calling C<render> manually you can
-make sure that templates use the current controller instance and not the
+make sure that templates use the current controller object and not the
 default controller specified in the C<controller_class> attribute of the
 application class.
 

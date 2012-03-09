@@ -155,8 +155,8 @@ after every change.
 =head2 Routes
 
 Routes are basically just fancy paths that can contain different kinds of
-placeholders. C<$self> is an instance of L<Mojolicious::Controller>
-containing both the HTTP request and response.
+placeholders. C<$self> is a L<Mojolicious::Controller> object containing
+both, the HTTP request and response.
 
   # /foo
   get '/foo' => sub {
@@ -648,7 +648,7 @@ secure.
 =head2 File uploads
 
 All files uploaded via C<multipart/form-data> request are automatically
-available as L<Mojo::Upload> instances. And you don't have to worry about
+available as L<Mojo::Upload> objects. And you don't have to worry about
 memory usage, because all files above C<250KB> will be automatically streamed
 into a temporary file.
 
@@ -782,7 +782,7 @@ C<log/$mode.log> file if a C<log> directory exists.
 
   $ mkdir log
 
-For more control the L<Mojolicious> instance can be accessed directly.
+For more control the L<Mojolicious> object can be accessed directly.
 
   app->log->level('error');
   app->routes->route('/foo/:bar')->via('GET')->to(cb => sub {

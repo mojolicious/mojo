@@ -234,7 +234,7 @@ $t->put_ok('/selection')->status_is(200)
     . '<select name="a">'
     . '<option value="b">b</option>'
     . '<optgroup label="c">'
-    . '<option value="d">d</option>'
+    . '<option value="&lt;d">&lt;d</option>'
     . '<option value="e">E</option>'
     . '<option value="f">f</option>'
     . '</optgroup>'
@@ -258,7 +258,7 @@ $t->put_ok('/selection?a=e&foo=bar&bar=baz')->status_is(200)
     . '<select name="a">'
     . '<option value="b">b</option>'
     . '<optgroup label="c">'
-    . '<option value="d">d</option>'
+    . '<option value="&lt;d">&lt;d</option>'
     . '<option selected="selected" value="e">E</option>'
     . '<option value="f">f</option>'
     . '</optgroup>'
@@ -282,7 +282,7 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d')->status_is(200)
     . '<select name="a">'
     . '<option value="b">b</option>'
     . '<optgroup label="c">'
-    . '<option value="d">d</option>'
+    . '<option value="&lt;d">&lt;d</option>'
     . '<option selected="selected" value="e">E</option>'
     . '<option value="f">f</option>'
     . '</optgroup>'
@@ -306,7 +306,7 @@ $t->put_ok('/selection?preselect=1')->status_is(200)
     . '<select name="a">'
     . '<option selected="selected" value="b">b</option>'
     . '<optgroup label="c">'
-    . '<option value="d">d</option>'
+    . '<option value="&lt;d">&lt;d</option>'
     . '<option value="e">E</option>'
     . '<option value="f">f</option>'
     . '</optgroup>'
@@ -440,7 +440,7 @@ __DATA__
 @@ selection.html.ep
 % param a => qw/b g/ if param 'preselect';
 %= form_for selection => begin
-  %= select_field a => ['b', {c => ['d', [ E => 'e'], 'f']}, 'g']
+  %= select_field a => ['b', {c => ['<d', [ E => 'e'], 'f']}, 'g']
   %= select_field foo => [qw/bar baz/], multiple => 'multiple'
   %= select_field bar => [['D' => 'd', disabled => 'disabled'], 'baz']
   %= submit_button

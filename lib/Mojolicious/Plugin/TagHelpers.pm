@@ -144,7 +144,7 @@ sub register {
         %attrs = (%attrs, @$pair[2 .. $#$pair]);
 
         # Option tag
-        $self->_tag('option', %attrs, sub { $pair->[0] });
+        $self->_tag('option', %attrs, sub { xml_escape $pair->[0] });
       };
 
       return $self->_tag(

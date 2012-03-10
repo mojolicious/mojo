@@ -242,7 +242,7 @@ sub register {
       }
 
       # Make sure value is wrapped
-      if (defined($value = $c->param($name) || $value)) {
+      if (defined($value = $c->param($name) // $value)) {
         $cb = sub { xml_escape $value}
       }
 

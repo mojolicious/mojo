@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 60;
+use Test::More tests => 63;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -332,10 +332,18 @@ $t->patch_ok('/☃')->status_is(200)->content_is(<<'EOF');
 </form>
 EOF
 
-# PATCH /☃
+# PATCH /☃ (form value)
 $t->patch_ok('/☃?foo=ba<z')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83">
   <textarea cols="40" name="foo">ba&lt;z</textarea>
+  <input type="submit" value="☃" />
+</form>
+EOF
+
+# PATCH /☃ (empty form value)
+$t->patch_ok('/☃?foo=')->status_is(200)->content_is(<<'EOF');
+<form action="/%E2%98%83">
+  <textarea cols="40" name="foo"></textarea>
   <input type="submit" value="☃" />
 </form>
 EOF

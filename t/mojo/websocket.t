@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 47;
+use Test::More tests => 49;
 
 # "I can't believe it! Reading and writing actually paid off!"
 use IO::Socket::INET;
@@ -148,6 +148,14 @@ websocket '/foo' =>
 websocket '/deadcallback' => sub {
   my $self = shift;
   $self->on(message => sub { die 'i see dead callbacks' });
+};
+
+# WebSocket /timeout
+my $timeout;
+websocket '/timeout' => sub {
+  my $self = shift;
+  Mojo::IOLoop->stream($self->tx->connection)->timeout('0.5');
+  $self->on(finish => sub { $timeout = 'works!' });
 };
 
 # GET /link
@@ -492,6 +500,23 @@ $ua->websocket(
 );
 $loop->start;
 is $result, 'hi' x 200000, 'right result';
+
+# WebSocket /timeout
+my $log = '';
+$message = app->log->subscribers('message')->[0];
+app->log->unsubscribe(message => $message);
+app->log->level('error');
+app->log->on(message => sub { $log .= pop });
+$ua->websocket(
+  '/timeout' => sub {
+    pop->on(finish => sub { Mojo::IOLoop->stop });
+  }
+);
+Mojo::IOLoop->start;
+app->log->level('fatal');
+app->log->on(message => $message);
+is $timeout, 'works!', 'finish event has been emitted';
+like $log, qr/Inactivity timeout\./, 'right log message';
 
 # WebSocket /echo (ping/pong)
 my $pong;

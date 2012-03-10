@@ -151,7 +151,6 @@ sub _finish {
   $tx->server_close;
 
   # WebSocket
-  my $s = 0;
   if (my $ws = $c->{ws}) {
 
     # Successful upgrade
@@ -237,8 +236,8 @@ sub _listen {
       # Events
       $stream->on(
         timeout => sub {
-          $self->_error($id, 'Inactivity timeout.')
-            if $self->{connections}->{$id}->{tx};
+          my $c = $self->{connections}->{$id};
+          $self->_error($id, 'Inactivity timeout.') if $c->{tx} || $c->{ws};
         }
       );
       $stream->on(close => sub { $self->_close($id) });

@@ -129,6 +129,7 @@ undef $tmp;
 ok !-e $path, 'file has been cleaned up';
 $file->move_to($path);
 is $file->slurp, 'bcd', 'right content';
+undef $file;
 ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';

@@ -17,12 +17,10 @@ use Mojo::Command;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
 
+# "I ate the blue ones... they taste like burning."
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
 plan tests => 50;
-
-# "I ate the blue ones... they taste like burning."
-use Mojo::Server::Hypnotoad;
 
 # Prepare script
 my $cwd = cwd;

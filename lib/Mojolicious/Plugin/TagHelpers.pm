@@ -234,9 +234,16 @@ sub register {
       my ($c, $name) = (shift, shift);
 
       # Value
-      my $cb = ref $_[-1] && ref $_[-1] eq 'CODE' ? pop : sub {''};
-      if (defined(my $value = $c->param($name))) {
-        $cb = sub {$value}
+      my $cb = sub {''};
+      my $value;
+      if (@_ % 2) {
+        if   (ref $_[-1] && ref $_[-1] eq 'CODE') { $cb    = pop }
+        else                                      { $value = shift }
+      }
+
+      # Make sure value is wrapped
+      if (defined($value = $c->param($name) || $value)) {
+        $cb = sub { xml_escape $value}
       }
 
       return $self->_tag('textarea', name => $name, @_, $cb);
@@ -614,6 +621,7 @@ picked up and shown as default.
 =head2 C<text_area>
 
   %= text_area 'foo'
+  %= text_area foo => 'Default!', cols => 40
   %= text_area foo => begin
     Default!
   % end
@@ -622,6 +630,7 @@ Generate textarea element. Previous input values will automatically get
 picked up and shown as default.
 
   <textarea name="foo"></textarea>
+  <textarea cols="40" name="foo">Default!</textarea>
   <textarea name="foo">
     Default!
   </textarea>

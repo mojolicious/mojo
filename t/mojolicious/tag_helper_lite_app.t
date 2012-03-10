@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 57;
+use Test::More tests => 60;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -201,7 +201,7 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 EOF
 
 # GET /form (alternative)
-$t->get_ok('/form/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
+$t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
 <form action="/links" method="post">
   <input name="foo" />
 </form>
@@ -214,7 +214,7 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=5')->status_is(200)->content_is(<<EOF);
   <input name="c" type="hidden" value="foo" />
   <input name="d" type="file" />
   <textarea cols="40" name="e" rows="50">4</textarea>
-  <textarea name="f">5</textarea>
+  <textarea name="f">&lt;5</textarea>
   <input name="g" type="password" />
   <input id="foo" name="h" type="password" />
   <input type="submit" value="Ok!" />
@@ -327,6 +327,15 @@ $t->put_ok('/selection?preselect=1')->status_is(200)
 # PATCH /☃
 $t->patch_ok('/☃')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83">
+  <textarea cols="40" name="foo">b&lt;a&gt;r</textarea>
+  <input type="submit" value="☃" />
+</form>
+EOF
+
+# PATCH /☃
+$t->patch_ok('/☃?foo=ba<z')->status_is(200)->content_is(<<'EOF');
+<form action="/%E2%98%83">
+  <textarea cols="40" name="foo">ba&lt;z</textarea>
   <input type="submit" value="☃" />
 </form>
 EOF
@@ -431,5 +440,6 @@ __DATA__
 
 @@ snowman.html.ep
 %= form_for snowman => begin
+  %= text_area foo => 'b<a>r', cols => 40
   %= submit_button '☃'
 %= end

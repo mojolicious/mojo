@@ -123,8 +123,7 @@ sub _drop {
   my ($self, $id) = @_;
 
   # Finish gracefully
-  my $c = $self->{connections}->{$id};
-  if (my $tx = $c->{ws} || $c->{tx}) { $tx->server_close }
+  if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->server_close }
 
   # Drop connection
   delete $self->{connections}->{$id};
@@ -139,19 +138,18 @@ sub _error {
 sub _finish {
   my ($self, $id, $tx) = @_;
 
-  # WebSocket
+  # Always drop connection for WebSockets
   if ($tx->is_websocket) {
     $self->_drop($id);
     return $self->ioloop->drop($id);
   }
 
   # Finish transaction
-  my $c = $self->{connections}->{$id};
-  delete $c->{tx};
   $tx->server_close;
 
-  # WebSocket
-  if (my $ws = $c->{ws}) {
+  # Upgrade connection to WebSocket
+  my $c = $self->{connections}->{$id};
+  if (my $ws = $c->{tx} = delete $c->{ws}) {
 
     # Successful upgrade
     if ($ws->res->code eq '101') {
@@ -161,18 +159,18 @@ sub _finish {
 
     # Failed upgrade
     else {
-      delete $c->{ws};
+      delete $c->{tx};
       $ws->server_close;
     }
   }
 
-  # Close connection
+  # Close connection if necessary
   if ($tx->req->error || !$tx->keep_alive) {
     $self->_drop($id);
     $self->ioloop->drop($id);
   }
 
-  # Leftovers
+  # Build new transaction for leftovers
   elsif (defined(my $leftovers = $tx->server_leftovers)) {
     $tx = $c->{tx} = $self->_build_tx($id, $c);
     $tx->server_read($leftovers);
@@ -236,8 +234,8 @@ sub _listen {
       # Events
       $stream->on(
         timeout => sub {
-          my $c = $self->{connections}->{$id};
-          $self->_error($id, 'Inactivity timeout.') if $c->{tx} || $c->{ws};
+          $self->_error($id, 'Inactivity timeout.')
+            if $self->{connections}->{$id}->{tx};
         }
       );
       $stream->on(close => sub { $self->_close($id) });
@@ -273,8 +271,7 @@ sub _read {
 
   # Make sure we have a transaction
   my $c = $self->{connections}->{$id};
-  my $tx = $c->{tx} || $c->{ws};
-  $tx ||= $c->{tx} = $self->_build_tx($id, $c);
+  my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
 
   # Parse chunk
   $tx->server_read($chunk);
@@ -301,7 +298,7 @@ sub _write {
 
   # Not writing
   my $c = $self->{connections}->{$id};
-  return unless my $tx = $c->{tx} || $c->{ws};
+  return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
 
   # Get chunk
@@ -323,7 +320,7 @@ sub _write {
     }
     else {
       $self->_finish($id, $tx);
-      return unless $c->{tx} || $c->{ws};
+      return unless $c->{tx};
     }
   }
   $stream->write('', $cb);

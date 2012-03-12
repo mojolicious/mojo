@@ -181,7 +181,7 @@ class, but the router can be accessed from everywhere (even at runtime).
 
 =head2 Routing destination
 
-After you start a new route with the method L<Mojolicious::Routes/"route">
+After you start a new route with the method L<Mojolicious::Routes/"route">,
 you can also give it a destination in the form of a hash using the chained
 method L<Mojolicious::Routes/"to">.
 
@@ -312,7 +312,7 @@ The C<controller> is always appended to the C<namespace> if available.
   $r->route('/bye')->to('foo#bye', namespace => 'MyApp::Controller');
 
 You can also change the default namespace for all routes in the application
-with the attribute L<Mojolicious::Routes/"namespace">.
+with the router attribute L<Mojolicious::Routes/"namespace">.
 
   $r->namespace('MyApp::Controller');
 
@@ -677,7 +677,7 @@ play, they are basically router plugins.
     ->to(controller => 'foo', action => 'bar');
 
 The method L<Mojolicious::Routes/"add_condition"> registers the new condition
-in the router while L<Mojolicious::Routes/"over"> actually applies it to the
+in the router, while L<Mojolicious::Routes/"over"> actually applies it to the
 route.
 
 =head2 Condition plugins

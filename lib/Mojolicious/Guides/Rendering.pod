@@ -152,7 +152,7 @@ pointing only to templates without actual actions.
   $self->render;
 
 There is one big difference though, by calling it manually you can make sure
-that templates use the current controller object and not the default
+that templates use the current controller object, and not the default
 controller specified in the attribute L<Mojolicious/"controller_class">.
 
 =head2 Rendering templates
@@ -394,8 +394,8 @@ L<Mojolicious/"defaults">.
 
 =head2 Including partial templates
 
-Like most helpers the helper L<Mojolicious::Plugin::DefaultHelpers/"include">
-is just a shortcut to make your life a little easier.
+Like most helpers L<Mojolicious::Plugin::DefaultHelpers/"include"> is just a
+shortcut to make your life a little easier.
 
   @@ foo/bar.html.ep
   <!DOCTYPE html>

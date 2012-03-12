@@ -146,8 +146,8 @@ Most commonly used features every L<Mojolicious> developer should know about.
 The renderer can be manually started by calling the method
 L<Mojolicious::Controller/"render">, but that's usually not necessary,
 because it will get automatically called if nothing has been rendered after
-the routes dispatcher finished its work. This also means you can have routes
-pointing only to templates without actual actions.
+the router finished its work. This also means you can have routes pointing
+only to templates without actual actions.
 
   $self->render;
 

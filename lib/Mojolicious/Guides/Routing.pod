@@ -425,8 +425,9 @@ Or you can just disable format detection.
 
 =head2 Named routes
 
-Naming your routes will allow backreferencing in many kinds of helpers
-throughout the whole framework.
+Naming your routes will allow backreferencing in many methods and helpers
+throughout the whole framework, most of them internally rely on
+L<Mojolicious::Controller/"url_for"> for this.
 
   # /foo/abc -> {controller => 'foo', action => 'bar', name => 'abc'}
   $r->route('/foo/:name')->name('test')
@@ -453,6 +454,12 @@ name at all.
   # Generate URL for current route
   $self->url_for('current');
   $self->url_for;
+
+To check or get the actual name of the currently active route you can also
+use the helper L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
+
+  # Get name for current route
+  my $name = $self->current_route;
 
 =head2 HTTP methods
 

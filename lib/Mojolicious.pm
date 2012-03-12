@@ -310,8 +310,8 @@ contain more information.
   my $routes = $app->routes;
   $app       = $app->routes(Mojolicious::Routes->new);
 
-The routes dispatcher, defaults to a L<Mojolicious::Routes> object. You use
-this in your startup method to define the url endpoints for your application.
+The router, defaults to a L<Mojolicious::Routes> object. You use this in your
+startup method to define the url endpoints for your application.
 
   sub startup {
     my $self = shift;
@@ -460,7 +460,7 @@ application object)
 
 =item B<before_dispatch>
 
-Emitted right before the static and routes dispatchers start their work.
+Emitted right before the static dispatcher and router start their work.
 
   $app->hook(before_dispatch => sub {
     my $c = shift;
@@ -473,7 +473,7 @@ Very useful for rewriting incoming requests and other preprocessing tasks.
 =item B<after_static_dispatch>
 
 Emitted in reverse order after the static dispatcher determined if a static
-file should be served and before the routes dispatcher starts its work.
+file should be served and before the router starts its work.
 
   $app->hook(after_static_dispatch => sub {
     my $c = shift;

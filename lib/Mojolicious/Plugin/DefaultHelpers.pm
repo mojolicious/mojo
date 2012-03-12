@@ -40,6 +40,16 @@ sub register {
     }
   );
 
+  # Add "current_route" helper
+  $app->helper(
+    current_route => sub {
+      my $self = shift;
+      return '' unless my $endpoint = $self->match->endpoint;
+      return $endpoint->name unless @_;
+      return $endpoint->name eq shift;
+    }
+  );
+
   # Add "dumper" helper
   $app->helper(
     dumper => sub {
@@ -170,6 +180,16 @@ Append content to named buffer and retrieve it.
     world!
   % end
   %= content_for 'message'
+
+=head2 C<current_route>
+
+  % if (current_route 'hello') {
+    Hello World!
+  % }
+  %= current_route
+
+Check or return name of current route. Note that this helper is EXPERIMENTAL
+and might change without warning!
 
 =head2 C<dumper>
 

@@ -661,7 +661,7 @@ controller, defaults to a L<Mojolicious> object.
   my $m = $c->match;
   $c    = $c->match(Mojolicious::Routes::Match->new);
 
-Routes dispatcher results for the current request, defaults to a
+Router results for the current request, defaults to a
 L<Mojolicious::Routes::Match> object.
 
   my $name = $c->match->endpoint->name;

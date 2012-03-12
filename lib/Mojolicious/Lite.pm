@@ -198,8 +198,8 @@ L<Mojolicious::Guides::Rendering/"Embedded Perl">.
 
 =head2 HTTP
 
-L<Mojo::Message::Request> and L<Mojo::Message::Response> give you full access
-to all HTTP features and information.
+L<Mojolicious::Controller/"req"> and L<Mojolicious::Controller/"res"> give
+you full access to all HTTP features and information.
 
   # /agent
   get '/agent' => sub {

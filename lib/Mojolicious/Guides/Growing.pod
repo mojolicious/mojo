@@ -343,8 +343,9 @@ Quick C<GET> requests can be performed right from the command line.
 
 =head2 State keeping
 
-Sessions in L<Mojolicious> pretty much just work out of the box and there is
-no setup required, but we suggest setting a more secure passphrase with
+Sessions in L<Mojolicious> pretty much just work out of the box once you
+start using the method L<Mojolicious::Controller/"session">, there is no
+setup required, but we suggest setting a more secure passphrase with
 L<Mojolicious/"secret">.
 
   app->secret('Mojolicious rocks');
@@ -368,8 +369,7 @@ past.
 
 For data that should only be visible on the next request, like a confirmation
 message after a 302 redirect, you can use the flash, accessible through the
-method L<Mojolicious::Controller/"flash"> and helper
-L<Mojolicious::Plugin::DefaultHelpers/"flash">.
+method L<Mojolicious::Controller/"flash">.
 
   $self->flash(message => 'Everything is fine.');
   $self->redirect_to('goodbye');

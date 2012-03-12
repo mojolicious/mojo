@@ -160,9 +160,13 @@ Alias for L<Mojo/"config">.
 
 =head2 C<content>
 
+  %= content foo => begin
+    test
+  % end
+  %= content 'foo'
   %= content
 
-Insert content into a layout template.
+Store content and retrieve it.
 
 =head2 C<content_for>
 
@@ -193,15 +197,16 @@ EXPERIMENTAL and might change without warning!
 
 =head2 C<dumper>
 
-  %= dumper $foo
+  %= dumper {some => 'data'}
 
 Dump a Perl data structure using L<Data::Dumper>.
 
 =head2 C<extends>
 
-  % extends 'foo';
+  % extends 'blue';
+  % extends 'blue', title => 'Blue!';
 
-Extend a template.
+Extend a template, all arguments get merged into the stash.
 
 =head2 C<flash>
 
@@ -220,8 +225,9 @@ only available in the partial template.
 =head2 C<layout>
 
   % layout 'green';
+  % layout 'green', title => 'Green!';
 
-Render this template with a layout.
+Render this template with a layout, all arguments get merged into the stash.
 
 =head2 C<memorize>
 
@@ -262,9 +268,10 @@ Alias for L<Mojolicious::Controller/"stash">.
 =head2 C<title>
 
   % title 'Welcome!';
+  % title 'Welcome!', foo => 'bar';
   %= title
 
-Page title.
+Page title, all arguments get merged into the stash.
 
 =head2 C<url_for>
 

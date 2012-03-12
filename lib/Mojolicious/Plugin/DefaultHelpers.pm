@@ -188,8 +188,8 @@ Append content to named buffer and retrieve it.
   % }
   %= current_route
 
-Check or return name of current route. Note that this helper is EXPERIMENTAL
-and might change without warning!
+Check or get name of currently active route. Note that this helper is
+EXPERIMENTAL and might change without warning!
 
 =head2 C<dumper>
 

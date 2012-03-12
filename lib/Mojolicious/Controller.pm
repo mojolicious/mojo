@@ -683,10 +683,10 @@ implements the following new ones.
 
 =head2 C<cookie>
 
-  $c         = $c->cookie(foo => 'bar');
-  $c         = $c->cookie(foo => 'bar', {path => '/'});
   my $value  = $c->cookie('foo');
   my @values = $c->cookie('foo');
+  $c         = $c->cookie(foo => 'bar');
+  $c         = $c->cookie(foo => 'bar', {path => '/'});
 
 Access request cookie values and create new response cookies.
 
@@ -952,10 +952,10 @@ that cookies are generally limited to 4096 bytes of data.
 
 =head2 C<signed_cookie>
 
-  $c         = $c->signed_cookie(foo => 'bar');
-  $c         = $c->signed_cookie(foo => 'bar', {path => '/'});
   my $value  = $c->signed_cookie('foo');
   my @values = $c->signed_cookie('foo');
+  $c         = $c->signed_cookie(foo => 'bar');
+  $c         = $c->signed_cookie(foo => 'bar', {path => '/'});
 
 Access signed request cookie values and create new signed response cookies.
 Cookies failing signature verification will be automatically discarded.

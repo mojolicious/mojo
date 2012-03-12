@@ -181,8 +181,9 @@ class, but the router can be accessed from everywhere (even at runtime).
 
 =head2 Routing destination
 
-After you start a new route with the C<route> method you can also give it a
-destination in the form of a hash using the chained C<to> method.
+After you start a new route with the method L<Mojolicious::Routes/"route">
+you can also give it a destination in the form of a hash using the chained
+method L<Mojolicious::Routes/"to">.
 
   # /welcome -> {controller => 'foo', action => 'welcome'}
   $r->route('/welcome')->to(controller => 'foo', action => 'welcome');
@@ -311,7 +312,7 @@ The C<controller> is always appended to the C<namespace> if available.
   $r->route('/bye')->to('foo#bye', namespace => 'MyApp::Controller');
 
 You can also change the default namespace for all routes in the application
-with the C<namespace> attribute of the router object.
+with the attribute L<Mojolicious::Routes/"namespace">.
 
   $r->namespace('MyApp::Controller');
 
@@ -455,7 +456,7 @@ name at all.
 
 =head2 HTTP methods
 
-The C<via> method of the route object allows only specific HTTP methods to
+The method L<Mojolicious::Routes/"via"> allows only specific HTTP methods to
 pass.
 
   # GET /bye    -> {controller => 'foo', action => 'bye'}
@@ -627,7 +628,8 @@ snowman very sad.
 
 =head2 WebSockets
 
-You can restrict access to WebSocket handshakes using the C<websocket> method.
+You can restrict access to WebSocket handshakes using the method
+L<Mojolicious::Routes/"websocket">.
 
   # /echo (WebSocket handshake)
   $r->websocket('/echo')->to(controller => 'foo', action => 'echo');
@@ -674,8 +676,9 @@ play, they are basically router plugins.
   $r->route('/firefox_only')->over(agent => qr/Firefox/)
     ->to(controller => 'foo', action => 'bar');
 
-The method C<add_condition> registers the new condition in the router while
-C<over> actually applies it to the route.
+The method L<Mojolicious::Routes/"add_condition"> registers the new condition
+in the router while L<Mojolicious::Routes/"over"> actually applies it to the
+route.
 
 =head2 Condition plugins
 
@@ -745,9 +748,10 @@ domain specific language in normal L<Mojolicious> controllers.
 
   1;
 
-With the C<detour> method which is very similar to C<to>, you can allow the
-route to partially match and use only the remaining path in the embedded
-application, the base path will be passed along in the C<path> stash value.
+With the method L<Mojolicious::Routes/"detour"> which is very similar to
+L<Mojolicious::Routes/"to">, you can allow the route to partially match and
+use only the remaining path in the embedded application, the base path will
+be passed along in the C<path> stash value.
 
   # /foo/*
   $r->route('/foo')->detour('bar#', name => 'Mojo');

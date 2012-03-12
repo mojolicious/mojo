@@ -166,7 +166,8 @@ both, the HTTP request and response.
 
 =head2 GET/POST parameters
 
-All C<GET> and C<POST> parameters are accessible via C<param>.
+All C<GET> and C<POST> parameters are accessible via
+L<Mojolicious::Controller/"param">.
 
   # /foo?user=sri
   get '/foo' => sub {
@@ -177,8 +178,8 @@ All C<GET> and C<POST> parameters are accessible via C<param>.
 
 =head2 Stash and templates
 
-The C<stash> is used to pass data to templates, which can be inlined in the
-C<DATA> section.
+The L<Mojolicious::Controller/"stash"> is used to pass data to templates,
+which can be inlined in the C<DATA> section.
 
   # /bar
   get '/bar' => sub {
@@ -210,9 +211,12 @@ to all HTTP features and information.
 =head2 Route names
 
 All routes can have a name associated with them, this allows automatic
-template detection and back referencing with C<url_for>, C<link_to> and
-C<form_for>. Nameless routes get an automatically generated one assigned that
-is simply equal to the route itself without non-word characters.
+template detection and back referencing with
+L<Mojolicious::Controller/"url_for">,
+L<Mojolicious::Plugin::TagHelpers/"link_to"> and
+L<Mojolicious::Plugin::TagHelpers/"form_for">. Nameless routes get an
+automatically generated one assigned that is simply equal to the route itself
+without non-word characters.
 
   # /
   get '/' => sub {
@@ -282,8 +286,8 @@ delimited by the C<begin> and C<end> keywords.
 
 =head2 Captured content
 
-The C<content_for> helper can be used to pass around blocks of captured
-content.
+The helper L<Mojolicious::Plugin::TagHelpers/"content_for"> can be used to
+pass around blocks of captured content.
 
   # /captured
   get '/captured' => sub {
@@ -342,8 +346,8 @@ L<Mojolicious::Plugin::TagHelpers>.
 =head2 Placeholders
 
 Route placeholders allow capturing parts of a request path until a C</> or
-C<.> separator occurs, results will be stored by name in the C<stash> and
-C<param>.
+C<.> separator occurs, results are accessible via
+L<Mojolicious::Controller/"stash"> and L<Mojolicious::Controller/"param">.
 
   # /foo/test
   # /foo/test123
@@ -487,7 +491,8 @@ Restrictive placeholders can also be used for format detection.
 =head2 Content negotiation
 
 For resources with different representations and that require truly
-C<RESTful> content negotiation you can also use C<respond_to>.
+C<RESTful> content negotiation you can also use
+L<Mojolicious::Controller/"respond_to">.
 
   # /hello (Accept: application/json)
   # /hello (Accept: text/xml)
@@ -640,8 +645,8 @@ using them.
 
 =head2 Secret
 
-Note that you should use a custom C<secret> to make signed cookies really
-secure.
+Note that you should use a custom L<Mojolicious/"secret"> to make signed
+cookies really secure.
 
   app->secret('My secret passphrase here');
 
@@ -715,8 +720,9 @@ WebSocket applications have never been this easy before.
     });
   };
 
-The C<message> event will be emitted for every new WebSocket message that is
-received.
+The event L<Mojo::Transaction::WebSocket/"message">, which you can subscribe
+to with L<Mojolicious::Controller/"on">, will be emitted for every new
+WebSocket message that is received.
 
 =head2 External templates
 

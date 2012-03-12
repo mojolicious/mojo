@@ -398,7 +398,8 @@ shouldn't block for too long.
 
 The WebSocket protocol offers full bi-directional low-latency communication
 channels between clients and servers. Receiving messages is as easy as
-subscribing to the C<message> event of the transaction.
+subscribing to the event L<Mojo::Transaction::WebSocket/"message"> with the
+method L<Mojolicious::Controller/"on">.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -453,8 +454,8 @@ subscribing to the C<message> event of the transaction.
     </body>
   </html>
 
-The C<finish> event will be emitted right after the WebSocket connection has
-been closed.
+The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right
+after the WebSocket connection has been closed.
 
 =head2 Testing WebSocket web services
 
@@ -532,8 +533,9 @@ HTTP protocol for transport.
     </body>
   </html>
 
-The C<message> event will be emitted for every new log message and the
-C<finish> event right after the transaction has been finished.
+The event L<Mojo::Log/"message"> will be emitted for every new log message
+and the event L<Mojo::Transaction/"finish"> right after the transaction has
+been finished.
 
 =head2 Streaming multipart uploads
 
@@ -717,9 +719,10 @@ You can just add username and password to the URL.
 
 =head2 Decorating followup requests
 
-L<Mojo::UserAgent> can automatically follow redirects, the C<start> event
-allows you direct access to each transaction right after they have been
-initialized and before a connection gets associated with them.
+L<Mojo::UserAgent> can automatically follow redirects, the event
+L<Mojo::UserAgent/"start"> allows you direct access to each transaction right
+after they have been initialized and before a connection gets associated with
+them.
 
   use Mojo::UserAgent;
 
@@ -758,8 +761,9 @@ L<Mojo::UserAgent> makes it actually easy.
   # Process transaction
   $ua->start($tx);
 
-The C<read> event will be emitted for every chunk of data that is received,
-even C<chunked> encoding will be handled transparently if necessary.
+The event L<Mojo::Content/"read"> will be emitted for every chunk of data
+that is received, even C<chunked> encoding will be handled transparently if
+necessary.
 
 =head2 Streaming request
 
@@ -788,8 +792,8 @@ Sending a streaming request is almost just as easy.
   # Process transaction
   $ua->start($tx);
 
-The drain callback passed to C<write> will be invoked whenever the entire
-previous chunk has actually been written.
+The drain callback passed to L<Mojo::Message/"write"> will be invoked
+whenever the entire previous chunk has actually been written.
 
 =head2 Large file downloads
 
@@ -906,8 +910,8 @@ transactions will be in random order.
   $ua->get('http://mojolicio.us/perldoc' => $delay->begin);
   my ($tx, $tx2) = $delay->wait;
 
-The C<finish> event of L<Mojo::IOLoop::Delay> can be used in code that needs
-to be able to work standalone as well as inside L<Mojolicious> applications.
+The event L<Mojo::IOLoop::Delay/"finish"> can be used for code that needs to
+be able to work standalone as well as inside L<Mojolicious> applications.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;

@@ -143,18 +143,17 @@ Most commonly used features every L<Mojolicious> developer should know about.
 
 =head2 Automatic rendering
 
-The renderer can be manually started by calling the C<render> controller
-method, but that's usually not necessary, because it will get automatically
-called if nothing has been rendered after the routes dispatcher finished its
-work. This also means you can have routes pointing only to templates without
-actual actions.
+The renderer can be manually started by calling the method
+L<Mojolicious::Controller/"render">, but that's usually not necessary,
+because it will get automatically called if nothing has been rendered after
+the routes dispatcher finished its work. This also means you can have routes
+pointing only to templates without actual actions.
 
   $self->render;
 
-There is one big difference though, by calling C<render> manually you can
-make sure that templates use the current controller object and not the
-default controller specified in the C<controller_class> attribute of the
-application class.
+There is one big difference though, by calling it manually you can make sure
+that templates use the current controller object and not the default
+controller specified in the attribute L<Mojolicious/"controller_class">.
 
 =head2 Rendering templates
 
@@ -171,9 +170,6 @@ Because rendering a specific template is the most common task it also has a
 shortcut.
 
   $self->render('foo/bar');
-
-All values passed to the C<render> call are only temporarily assigned to the
-stash and get reset again once rendering is finished.
 
 =head2 Rendering inline templates
 
@@ -244,8 +240,8 @@ These mappings can be easily extended or changed with L<Mojolicious/"types">.
 
 =head2 Stash data
 
-Data can be passed to templates through the C<stash> in any of the native
-Perl data types.
+Any of the native Perl data types can be passed to templates through the
+L<Mojolicious::Controller/"stash">.
 
   $self->stash(author     => 'Sebastian');
   $self->stash(frameworks => ['Catalyst', 'Mojolicious']);
@@ -268,8 +264,9 @@ Since everything is just Perl normal control structures just work.
 =head2 Content negotiation
 
 For resources with different representations and that require truly
-C<RESTful> content negotiation you can also use C<respond_to> instead of
-C<render>.
+C<RESTful> content negotiation you can also use
+L<Mojolicious::Controller/"respond_to"> instead of
+L<Mojolicious::Controller/"render">.
 
   # /hello (Accept: application/json) -> "json"
   # /hello (Accept: text/xml)         -> "xml"
@@ -295,7 +292,7 @@ parameter.
   );
 
 Callbacks can be used for representations that are too complex to fit into a
-single C<render> call.
+single render call.
 
   # /hello (Accept: application/json) -> "json"
   # /hello (Accept: text/html)        -> "html"
@@ -323,11 +320,11 @@ Helpers are little functions you can use in templates and controller code.
 
   my $serialized = $self->dumper([1, 2, 3]);
 
-The C<dumper> helper for example will use L<Data::Dumper> to serialize
-whatever data structure you pass it, this can be very useful for debugging.
-We differentiate between C<default helpers> which are more general purpose
-like C<dumper> and C<tag helpers>, which are template specific and mostly
-used to generate C<HTML> tags.
+The helper L<Mojolicious::Plugin::DefaultHelpers/"dumper"> for example will
+use L<Data::Dumper> to serialize whatever data structure you pass it, this
+can be very useful for debugging. We differentiate between C<default helpers>
+which are more general purpose like C<dumper> and C<tag helpers>, which are
+template specific and mostly used to generate C<HTML> tags.
 
   %= javascript '/script.js'
 
@@ -356,9 +353,11 @@ trivial.
     <body><%= content %></body>
   </html>
 
-You just select the right layout template with the C<layout> helper and place
-the result of the current template with the C<content> helper. You can also
-pass along normal stash values to the C<layout> helper.
+You just select the right layout template with the helper
+L<Mojolicious::Plugin::DefaultHelpers/"layout"> and place the result of the
+current template with the helper
+L<Mojolicious::Plugin::DefaultHelpers/"content">. You can also pass along
+normal stash values to the C<layout> helper.
 
   @@ foo/bar.html.ep
   % layout 'mylayout', title => 'Hi there';
@@ -372,11 +371,13 @@ pass along normal stash values to the C<layout> helper.
   </html>
 
 Instead of the C<layout> helper you could also just use the C<layout> stash
-value, or call C<render> with the C<layout> argument.
+value, or call L<Mojolicious::Controller/"render"> with the C<layout>
+argument.
 
   $self->render(template => 'mytemplate', layout => 'mylayout');
 
-To set a C<layout> stash value application wide you can use C<defaults>.
+To set a C<layout> stash value application wide you can use
+L<Mojolicious/"defaults">.
 
   # Application
   package MyApp;
@@ -393,8 +394,8 @@ To set a C<layout> stash value application wide you can use C<defaults>.
 
 =head2 Including partial templates
 
-Like most helpers the C<include> helper is just a shortcut to make your life
-a little easier.
+Like most helpers the helper L<Mojolicious::Plugin::DefaultHelpers/"include">
+is just a shortcut to make your life a little easier.
 
   @@ foo/bar.html.ep
   <!DOCTYPE html>
@@ -406,8 +407,8 @@ a little easier.
   @@ header.html.ep
   <head><title>Howdy</title></head>
 
-Instead of C<include> you could also just call C<render> with the C<partial>
-argument.
+Instead of C<include> you could also just call
+L<Mojolicious::Controller/"render"> with the C<partial> argument.
 
   @@ foo/bar.html.ep
   <!DOCTYPE html>
@@ -476,8 +477,8 @@ A naive translation to Perl code could look like this.
 
 =head2 Content blocks
 
-Blocks and the C<content_for> helper can also be used to pass whole sections
-of the template to the layout.
+Blocks and the helper L<Mojolicious::Plugin::DefaultHelpers/"content_for">
+can also be used to pass whole sections of the template to the layout.
 
   @@ foo/bar.html.ep
   % layout 'mylayout';
@@ -498,9 +499,10 @@ of the template to the layout.
 
 =head2 Template inheritance
 
-Inheritance takes the layout concept above one step further, it allows you to
-build a skeleton template with named C<content> blocks that child templates
-can override.
+Inheritance takes the layout concept above one step further, the helpers
+L<Mojolicious::Plugin::DefaultHelpers/"content"> and
+L<Mojolicious::Plugin::DefaultHelpers/"extends">allow you to build a skeleton
+template with named blocks that child templates can override.
 
   @@ first.html.ep
   <!DOCTYPE html>
@@ -527,9 +529,9 @@ This chain could go on and on to allow a very high level of template reuse.
 
 =head2 Memorizing template blocks
 
-Compiled templates are always cached in memory, but with the C<memorize>
-helper you can go one step further and prevent template blocks from getting
-executed more than once.
+Compiled templates are always cached in memory, but with the helper
+L<Mojolicious::Plugin::DefaultHelpers/"memorize"> you can go one step further
+and prevent template blocks from getting executed more than once.
 
   @@ cached.html.ep
   % use Time::Piece;
@@ -724,8 +726,8 @@ stylesheets.
   });
 
 The optional drain callback ensures that all previous chunks have been
-written before processing continues. An empty chunk or C<finish> call marks
-the end of the stream.
+written before processing continues. An empty chunk or call to
+L<Mojolicious::Controller/"finish"> marks the end of the stream.
 
   29
   <html><head><title>Example</title></head>

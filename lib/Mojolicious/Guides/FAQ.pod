@@ -81,7 +81,7 @@ C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
 L<Mojolicious> uses a secret passphrase for security features such as signed
 cookies. It defaults to the name of your application, which is not very
 secure, so we added this log message as a reminder. You can change the
-passphrase with the C<secret> attribute of L<Mojolicious>.
+passphrase with the attribute L<Mojolicious/"secret">.
 
   app->secret('My very secret passphrase.');
 

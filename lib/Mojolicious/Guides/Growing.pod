@@ -233,8 +233,9 @@ all logic related to matching usernames and passwords.
 
   1;
 
-A simple C<helper> function can be registered with the C<helper> method of
-L<Mojolicious> to make our C<model> available to all actions and templates.
+A simple helper function can be registered with the method
+L<Mojolicious/"helper"> to make our C<model> available to all actions and
+templates.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
@@ -266,9 +267,9 @@ L<Mojolicious> to make our C<model> available to all actions and templates.
 
   app->start;
 
-The C<param> method of our L<Mojolicious::Controller> object is used to
-access query parameters, POST parameters, file uploads and route
-placeholders, all at once.
+The method L<Mojolicious::Controller/"param"> is used to access query
+parameters, POST parameters, file uploads and route placeholders, all at
+once.
 
 =head2 Testing
 
@@ -343,7 +344,8 @@ Quick C<GET> requests can be performed right from the command line.
 =head2 State keeping
 
 Sessions in L<Mojolicious> pretty much just work out of the box and there is
-no setup required, but we suggest using a more secure C<secret> passphrase.
+no setup required, but we suggest setting a more secure passphrase with
+L<Mojolicious/"secret">.
 
   app->secret('Mojolicious rocks');
 
@@ -365,7 +367,9 @@ past.
   $self->session(expires => 1);
 
 For data that should only be visible on the next request, like a confirmation
-message after a 302 redirect, you can use the C<flash>.
+message after a 302 redirect, you can use the flash, accessible through the
+method L<Mojolicious::Controller/"flash"> and helper
+L<Mojolicious::Plugin::DefaultHelpers/"flash">.
 
   $self->flash(message => 'Everything is fine.');
   $self->redirect_to('goodbye');
@@ -535,8 +539,8 @@ actual action code needs to be changed.
 
   1;
 
-The C<startup> method of L<Mojolicious> gets called right after instantiation
-and is the place where the whole application gets set up.
+The C<startup> method gets called right after instantiation and is the place
+where the whole application gets set up.
 
 =head2 Simplified application script
 

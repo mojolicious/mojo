@@ -187,13 +187,13 @@ Append content to named buffer and retrieve it.
 
 =head2 C<current_route>
 
-  % if (current_route 'hello') {
-    Hello World!
+  % if (current_route 'login') {
+    Welcome to Mojolicious!
   % }
   %= current_route
 
-Check or get name of currently active route. Note that this helper is
-EXPERIMENTAL and might change without warning!
+Check or get name of current route. Note that this helper is EXPERIMENTAL and
+might change without warning!
 
 =head2 C<dumper>
 

@@ -434,10 +434,10 @@ L<Mojolicious::Controller/"url_for"> for this.
     ->to(controller => 'foo', action => 'bar');
 
   # Generate URL "/foo/abc" for route "test"
-  $self->url_for('test');
+  my $url = $self->url_for('test');
 
   # Generate URL "/foo/sebastian" for route "test"
-  $self->url_for('test', name => 'sebastian');
+  my $url = $self->url_for('test', name => 'sebastian');
 
 Nameless routes get an automatically generated one assigned that is simply
 equal to the route itself without non-word characters.
@@ -446,20 +446,23 @@ equal to the route itself without non-word characters.
   $r->route('/foo/bar')->to('test#stuff');
 
   # Generate URL "/foo/bar"
-  $self->url_for('foobar');
+  my $url = $self->url_for('foobar');
 
 To refer to the current route you can use the reserved name C<current> or no
 name at all.
 
   # Generate URL for current route
-  $self->url_for('current');
-  $self->url_for;
+  my $url = $self->url_for('current');
+  my $url = $self->url_for;
 
-To check or get the actual name of the currently active route you can also
-use the helper L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
+To check or get the name of the current route you can use the helper
+L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
 
-  # Get name for current route
+  # Name for current route
   my $name = $self->current_route;
+
+  # Check route name in code shared by multiple routes
+  $self->stash(button => 'green') if $self->current_route('login');
 
 =head2 HTTP methods
 

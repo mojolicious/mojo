@@ -153,7 +153,7 @@ only to templates without actual actions.
 
 There is one big difference though, by calling it manually you can make sure
 that templates use the current controller object, and not the default
-controller specified in the attribute L<Mojolicious/"controller_class">.
+controller specified with the attribute L<Mojolicious/"controller_class">.
 
 =head2 Rendering templates
 

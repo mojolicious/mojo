@@ -212,9 +212,8 @@ to all HTTP features and information.
 
 All routes can have a name associated with them, this allows automatic
 template detection and back referencing with
-L<Mojolicious::Controller/"url_for">,
-L<Mojolicious::Plugin::TagHelpers/"link_to"> and
-L<Mojolicious::Plugin::TagHelpers/"form_for">. Nameless routes get an
+L<Mojolicious::Controller/"url_for"> as well as many helpers like
+L<Mojolicious::Plugin::TagHelpers/"link_to">. Nameless routes get an
 automatically generated one assigned that is simply equal to the route itself
 without non-word characters.
 
@@ -238,7 +237,10 @@ without non-word characters.
 
 =head2 Layouts
 
-Templates can have layouts.
+Templates can have layouts too, you just select one with the helper
+L<Mojolicious::Plugin::DefaultHelpers/"layout"> and place the result of the
+current template with the helper
+L<Mojolicious::Plugin::DefaultHelpers/"content">.
 
   # /with_layout
   get '/with_layout' => sub {
@@ -628,7 +630,8 @@ constructs.
 =head2 Sessions
 
 Signed cookie based sessions just work out of the box as soon as you start
-using them.
+using them through the helper
+L<Mojolicious::Plugin::DefaultHelpers/"session">.
 
   use Mojolicious::Lite;
 
@@ -699,9 +702,9 @@ variable.
 
 =head2 User agent
 
-With L<Mojo::UserAgent> there's a full featured HTTP 1.1 and WebSocket user
-agent built right in. Especially in combination with L<Mojo::JSON> and
-L<Mojo::DOM> this can be a very powerful tool.
+With L<Mojolicious::Controller/"ua"> there's a full featured HTTP 1.1 and
+WebSocket user agent built right in. Especially in combination with
+L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
 
   get '/test' => sub {
     my $self = shift;

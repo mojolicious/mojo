@@ -27,8 +27,9 @@ use FindBin;
 use Mojo::Template;
 
 # Consistent scalar context
-my $mt     = Mojo::Template->new;
-my $output = $mt->render('<%= split /,/, "a,b" %>:<%== split /,/, "a,b" %>');
+my $mt = Mojo::Template->new;
+$mt->prepend('my @foo = (3, 4);');
+my $output = $mt->render('<%= @foo %>:<%== @foo %>');
 is $output, "2:2\n", 'same context';
 
 # Trim tag

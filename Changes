@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Made text_area helper a little smarter. (sshaw, sri)
         - Improved inactivity timeout logging for WebSockets.
         - Improved documentation.
+        - Improved tests.
         - Fixed escaping bug in select_field and text_area helpers.
         - Fixed Windows bug in "asset.t".
 

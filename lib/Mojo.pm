@@ -163,6 +163,7 @@ object.
 
 Application configuration.
 
+  # Manipulate configuration
   $app->config->{foo} = 'bar';
   my $foo = $app->config->{foo};
   delete $app->config->{foo};

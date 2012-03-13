@@ -654,6 +654,7 @@ implements the following new ones.
 A reference back to the L<Mojolicious> application that dispatched to this
 controller, defaults to a L<Mojolicious> object.
 
+  # Use application logger
   $c->app->log->debug('Hello Mojo!');
 
 =head2 C<match>
@@ -664,6 +665,7 @@ controller, defaults to a L<Mojolicious> object.
 Router results for the current request, defaults to a
 L<Mojolicious::Routes::Match> object.
 
+  # Introspect router results
   my $name = $c->match->endpoint->name;
 
 =head2 C<tx>
@@ -674,6 +676,7 @@ L<Mojolicious::Routes::Match> object.
 The transaction that is currently being processed, usually a
 L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 
+  # Check peer information
   my $address = $c->tx->remote_address;
 
 =head1 METHODS
@@ -690,6 +693,7 @@ implements the following new ones.
 
 Access request cookie values and create new response cookies.
 
+  # Extract value from request cookie
   my $foo = $c->cookie('foo')->value;
 
 =head2 C<finish>
@@ -707,6 +711,7 @@ Gracefully end WebSocket connection or long poll stream.
 
 Data storage persistent only for the next request, stored in the C<session>.
 
+  # Show message after redirect
   $c->flash(message => 'User created successfully!');
   $c->redirect_to('show_user', id => 23);
 
@@ -824,6 +829,7 @@ Render a data structure as JSON.
 Disable automatic rendering, especially for long polling this can be quite
 useful.
 
+  # Delayed rendering
   $c->render_later;
   Mojo::IOLoop->timer(2 => sub {
     $c->render(text => 'Delayed by 2 seconds!');
@@ -862,6 +868,7 @@ See C<render_data> for an alternative without encoding. Note that this does
 not change the content type of the response, which is
 C<text/html;charset=UTF-8> by default.
 
+  # Render "text/plain" response
   $c->render_text('Hello World!', format => 'txt');
 
 =head2 C<rendered>
@@ -883,6 +890,7 @@ Finalize response and run C<after_dispatch> plugin hook.
 Alias for C<$c-E<gt>tx-E<gt>req>. Usually refers to a
 L<Mojo::Message::Request> object.
 
+  # Extract request information
   $c->render_json({url => $c->req->url->to_abs->to_string});
 
 =head2 C<res>
@@ -892,6 +900,7 @@ L<Mojo::Message::Request> object.
 Alias for C<$c-E<gt>tx-E<gt>res>. Usually refers to a
 L<Mojo::Message::Response> object.
 
+  # Force file download by setting a custom response header
   $c->res->headers->content_disposition('attachment; filename=foo.png;');
 
 =head2 C<respond_to>
@@ -906,6 +915,7 @@ Automatically select best possible representation for resource from C<Accept>
 request header, C<format> stash value or C<format> GET/POST parameter,
 defaults to rendering an empty C<204> response.
 
+  # Negotiate content
   $c->respond_to(
     json => sub { $c->render_json({just => 'works'}) },
     xml  => {text => '<just>works</just>'},
@@ -946,6 +956,7 @@ timeout, which usually defaults to C<15> seconds.
 Persistent data storage, stored C<JSON> serialized in a signed cookie. Note
 that cookies are generally limited to 4096 bytes of data.
 
+  # Manipulate session
   $c->session->{foo} = 'bar';
   my $foo = $c->session->{foo};
   delete $c->session->{foo};
@@ -974,6 +985,7 @@ C<cb>, C<controller>, C<data>, C<extends>, C<format>, C<handler>, C<json>,
 C<layout>, C<namespace>, C<partial>, C<path>, C<status>, C<template> and
 C<text>.
 
+  # Manipulate stash
   $c->stash->{foo} = 'bar';
   my $foo = $c->stash->{foo};
   delete $c->stash->{foo};
@@ -1024,8 +1036,8 @@ Generate a portable L<Mojo::URL> object with base for a route, path or URL.
   # "/myapp/perldoc?foo=bar" if application is deployed under "/myapp"
   $c->url_for('/perldoc')->query(foo => 'bar');
 
-You can also use L<Mojolicious::Plugin::DefaultHelpers/"url_with"> to inherit
-query parameters from the current request.
+You can also use the helper L<Mojolicious::Plugin::DefaultHelpers/"url_with">
+to inherit query parameters from the current request.
 
   # "/list?q=mojo&page=2" if current request was for "/list?q=mojo&page=1"
   $c->url_with->query([page => 2]);
@@ -1072,6 +1084,7 @@ timeout, which usually defaults to C<15> seconds.
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.
 
+  # Make sure previous chunk has been written before continuing
   $c->write_chunk('He', sub {
     my $c = shift;
     $c->write_chunk('ll', sub {

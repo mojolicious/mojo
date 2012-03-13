@@ -32,7 +32,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.60';
+our $VERSION  = '2.61';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -391,6 +391,7 @@ object.
 Default values for L<Mojolicious::Controller/"stash">, assigned for every new
 request.
 
+  # Manipulate defaults
   $app->defaults->{foo} = 'bar';
   my $foo = $app->defaults->{foo};
   delete $app->defaults->{foo};

@@ -3,7 +3,6 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::Cache;
-use Mojo::Exception;
 use Mojo::Loader;
 use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
@@ -63,15 +62,10 @@ sub any { shift->_generate_route(ref $_[0] eq 'ARRAY' ? shift : [], @_) }
 # "Hey. What kind of party is this? There's no booze and only one hooker."
 sub auto_render {
   my ($self, $c) = @_;
-
-  # Try rendering template or not_found if the route never reached an action
-  eval {
-    my $stash = $c->stash;
-    $c->render
-      or ($stash->{'mojo.routed'} or $c->render_not_found)
-      unless $stash->{'mojo.rendered'} || $c->tx->is_websocket;
-    1;
-  } or $c->render_exception($@);
+  my $stash = $c->stash;
+  $c->render
+    or ($stash->{'mojo.routed'} or $c->render_not_found)
+    unless $stash->{'mojo.rendered'} || $c->tx->is_websocket;
 }
 
 sub bridge { shift->route(@_)->inline(1) }
@@ -123,7 +117,7 @@ sub dispatch {
   # No match
   return unless $m && @{$m->stack};
 
-  # Walk the stack
+  # Dispatch
   return if $self->_walk_stack($c);
   $self->auto_render($c);
   return 1;
@@ -316,17 +310,10 @@ sub websocket {
 
 sub _dispatch_callback {
   my ($self, $c, $field, $staging) = @_;
-
-  # Routed
   $c->stash->{'mojo.routed'}++;
   $c->app->log->debug(qq/Dispatching callback./);
-
-  # Dispatch
-  my $continue;
-  return Mojo::Exception->new($@)
-    unless eval { $continue = $field->{cb}->($c); 1 };
-  return 1 if !$staging || $continue;
-  return;
+  my $continue = $field->{cb}->($c);
+  return !$staging || $continue ? 1 : undef;
 }
 
 sub _dispatch_controller {
@@ -340,72 +327,38 @@ sub _dispatch_controller {
   $target .= "->$method" if $method;
   $c->app->log->debug(qq/Dispatching "$target"./);
 
-  # Load class
-  if (!ref $app && !$self->{loaded}->{$app}) {
-    if (my $e = Mojo::Loader->load($app)) {
+  # Controller or application
+  return unless $self->_load_class($c, $app);
+  $app = $app->new($c) unless ref $app;
 
-      # Doesn't exist
-      $c->app->log->debug("$app does not exist, maybe a typo?") and return
-        unless ref $e;
-
-      # Error
-      return $e;
-    }
-
-    # Check for controller and application
-    return
-      unless $app->isa($self->controller_base_class) || $app->isa('Mojo');
-    $self->{loaded}->{$app}++;
-  }
-
-  # Dispatch
+  # Action
   my $continue;
-  my $success = eval {
-    $app = $app->new($c) unless ref $app;
+  if ($method) {
 
-    # Action
-    if ($method) {
-
-      # Call action
-      my $stash = $c->stash;
-      if ($app->can($method)) {
-        $stash->{'mojo.routed'}++ unless $staging;
-        $continue = $app->$method;
-      }
-
-      # Render
-      else {
-        $c->app->log->debug(
-          qq/Action "$target" not found, assuming template without action./);
-        $self->auto_render($app) unless $staging;
-      }
-
-      # Merge stash
-      my $new = $app->stash;
-      @{$stash}{keys %$new} = values %$new;
+    # Call action
+    my $stash = $c->stash;
+    if (my $code = $app->can($method)) {
+      $stash->{'mojo.routed'}++ unless $staging;
+      $continue = $app->$code;
     }
 
-    # Application
+    # Render
     else {
-      if ($app->can('routes')) {
-        my $r = $app->routes;
-        weaken $r->parent($c->match->endpoint)->{parent} unless $r->parent;
-      }
-      $app->handler($c);
+      $c->app->log->debug(
+        qq/Action "$target" not found, assuming template without action./);
     }
-
-    1;
-  };
-
-  # Controller error
-  unless ($success) {
-    my $e = Mojo::Exception->new($@);
-    $app->render_exception($e) if $app->can('render_exception');
-    return $e;
   }
 
-  return 1 if !$staging || $continue;
-  return;
+  # Application
+  else {
+    if (my $code = $app->can('routes')) {
+      my $r = $app->$code;
+      weaken $r->parent($c->match->endpoint)->{parent} unless $r->parent;
+    }
+    $app->handler($c);
+  }
+
+  return !$staging || $continue ? 1 : undef;
 }
 
 sub _generate_class {
@@ -493,12 +446,28 @@ sub _generate_route {
     ->via($methods)->to($defaults)->name($name);
 }
 
+sub _load_class {
+  my ($self, $c, $app) = @_;
+
+  # Load unless already loaded or application
+  return 1 if $self->{loaded}->{$app} || ref $app;
+  if (my $e = Mojo::Loader->load($app)) {
+
+    # Doesn't exist
+    $c->app->log->debug("$app does not exist, maybe a typo?") and return
+      unless ref $e;
+
+    # Error
+    die $e;
+  }
+
+  # Check for controller and application
+  return unless $app->isa($self->controller_base_class) || $app->isa('Mojo');
+  return ++$self->{loaded}->{$app};
+}
+
 sub _walk_stack {
   my ($self, $c) = @_;
-
-  # Stacktrace
-  local $SIG{__DIE__} =
-    sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
 
   # Walk the stack
   my $stack   = $c->match->stack;
@@ -513,19 +482,13 @@ sub _walk_stack {
     @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
 
     # Dispatch
-    my $e =
+    my $continue =
         $field->{cb}
       ? $self->_dispatch_callback($c, $field, $staging)
       : $self->_dispatch_controller($c, $field, $staging);
 
-    # Exception
-    if (ref $e) {
-      $c->render_exception($e);
-      return 1;
-    }
-
     # Break the chain
-    return 1 if $staging && !$e;
+    return 1 if $staging && !$continue;
   }
 
   return;

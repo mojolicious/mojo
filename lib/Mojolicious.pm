@@ -2,6 +2,7 @@ package Mojolicious;
 use Mojo::Base 'Mojo';
 
 use Carp 'croak';
+use Mojo::Exception;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -96,6 +97,16 @@ sub new {
   # Run mode
   $mode = $mode . '_mode';
   $self->$mode(@_) if $self->can($mode);
+
+  # Exception handling
+  $self->hook(
+    around_dispatch => sub {
+      my ($next, $c) = @_;
+      local $SIG{__DIE__} =
+        sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
+      $c->render_exception($@) unless eval { $next->(); 1 };
+    }
+  );
 
   # Startup
   $self->startup(@_);

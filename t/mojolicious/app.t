@@ -74,32 +74,30 @@ $t->get_ok('/foo/syntaxerror')->status_is(500)
 # Exceptional::this_one_dies (action dies)
 $t->get_ok('/exceptional/this_one_dies')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Action died: doh!\n");
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("doh!\n\n");
 
 # Exceptional::this_one_might_die (bridge dies)
 $t->get_ok('/exceptional_too/this_one_dies')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Action died: double doh!\n");
+  ->content_is("double doh!\n\n");
 
 # Exceptional::this_one_dies (action behind bridge dies)
 $t->get_ok('/exceptional_too/this_one_dies', {'X-DoNotDie' => 1})
   ->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Action died: doh!\n");
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("doh!\n\n");
 
 # Exceptional::this_one_does_not_exist (action does not exist)
-$t->get_ok('/exceptional/this_one_does_not_exist')->status_is(200)
+$t->get_ok('/exceptional/this_one_does_not_exist')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->json_content_is({error => 'not found!'});
+  ->content_like(qr/Page not found/);
 
 # Exceptional::this_one_does_not_exist (action behind bridge does not exist)
 $t->get_ok('/exceptional_too/this_one_does_not_exist', {'X-DoNotDie' => 1})
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->json_content_is({error => 'not found!'});
+  ->content_like(qr/Page not found/);
 
 # Foo::fun
 $t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)

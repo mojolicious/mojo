@@ -211,7 +211,7 @@ sub _cert_file {
     unless my $file = IO::File->new("> $cert");
   print $file CERT;
 
-  $self->{cert} = $cert;
+  return $self->{cert} = $cert;
 }
 
 sub _key_file {
@@ -227,7 +227,7 @@ sub _key_file {
     unless my $file = IO::File->new("> $key");
   print $file KEY;
 
-  $self->{key} = $key;
+  return $self->{key} = $key;
 }
 
 # "Where on my badge does it say anything about protecting people?

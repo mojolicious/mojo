@@ -14,9 +14,6 @@ use POSIX qw/setsid WNOHANG/;
 use Scalar::Util 'weaken';
 use Time::HiRes 'ualarm';
 
-# Preload
-require Mojo::UserAgent;
-
 sub DESTROY {
   my $self = shift;
 
@@ -287,8 +284,8 @@ sub _pid_file {
   return if -e (my $file = $self->{config}->{pid_file});
 
   # Create PID file
-  $self->{log}->info(qq/Creating PID file "$file"./);
-  croak qq/Can't create PID file "$file": $!/
+  $self->{log}->info(qq/Creating process id file "$file"./);
+  croak qq/Can't create process id file "$file": $!/
     unless my $pid = IO::File->new($file, '>', 0644);
   print $pid $$;
 }
@@ -565,7 +562,8 @@ also L<Mojo::Server::Daemon/"listen"> for more examples.
 
   lock_file => '/tmp/hypnotoad.lock'
 
-Full path to accept mutex lock file, defaults to a random temporary file.
+Full path of accept mutex lock file prefix, to which the process id will be
+appended, defaults to a random temporary path.
 
 =head2 C<lock_timeout>
 
@@ -578,9 +576,9 @@ accept mutex, defaults to C<0.5>.
 
   pid_file => '/var/run/hypnotoad.pid'
 
-Full path to PID file, defaults to C<hypnotoad.pid> in the same directory as
-the application. Note that this value can only be changed after the server
-has been stopped.
+Full path to process id file, defaults to C<hypnotoad.pid> in the same
+directory as the application. Note that this value can only be changed after
+the server has been stopped.
 
 =head2 C<proxy>
 

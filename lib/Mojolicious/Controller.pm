@@ -665,9 +665,6 @@ controller, defaults to a L<Mojolicious> object.
 Router results for the current request, defaults to a
 L<Mojolicious::Routes::Match> object.
 
-  # Introspect router results
-  my $name = $c->match->endpoint->name;
-
 =head2 C<tx>
 
   my $tx = $c->tx;

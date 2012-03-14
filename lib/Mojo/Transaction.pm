@@ -152,6 +152,7 @@ Local interface port.
 
 Previous transaction that triggered this followup transaction.
 
+  # Path of previous request
   say $tx->previous->req->url->path;
 
 =head2 C<remote_address>
@@ -269,6 +270,7 @@ Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
 successful or C<undef> otherwise. Connection and parser errors have only a
 message in C<error>, 400 and 500 responses also a code.
 
+  # Sensible exception handling
   if (my $res = $tx->success) {
     say $res->body;
   }

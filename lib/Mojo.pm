@@ -3,7 +3,6 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::Home;
-use Mojo::IOLoop;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;

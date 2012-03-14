@@ -1,7 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.62    2012-03-14 00:00:00
-        - Improved logging of low level exceptions in Mojolicious.
         - Improved documentation.
 
 2.61    2012-03-14 00:00:00

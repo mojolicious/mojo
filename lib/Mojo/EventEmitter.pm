@@ -42,33 +42,10 @@ sub emit_safe {
 
 sub has_subscribers { scalar @{shift->subscribers(shift)} }
 
-sub on {
-  my ($self, $name, $cb) = @_;
-  push @{$self->{events}->{$name} ||= []}, $cb;
-  return $cb;
-}
-
-sub once {
-  my ($self, $name, $cb) = @_;
-
-  weaken $self;
-  my $wrapper;
-  $wrapper = sub {
-    $self->unsubscribe($name => $wrapper);
-    $cb->(@_);
-  };
-  $self->on($name => $wrapper);
-  weaken $wrapper;
-
-  return $wrapper;
-}
-
-sub subscribers { shift->{events}->{shift()} || [] }
-
 # "Back you robots!
 #  Nobody ruins my family vacation but me!
 #  And maybe the boy."
-sub unsubscribe {
+sub off {
   my ($self, $name, $cb) = @_;
 
   # All
@@ -81,6 +58,38 @@ sub unsubscribe {
   $self->{events}->{$name} = [grep { $cb ne $_ } @{$self->{events}->{$name}}];
 
   return $self;
+}
+
+sub on {
+  my ($self, $name, $cb) = @_;
+  push @{$self->{events}->{$name} ||= []}, $cb;
+  return $cb;
+}
+
+sub once {
+  my ($self, $name, $cb) = @_;
+
+  weaken $self;
+  my $wrapper;
+  $wrapper = sub {
+    $self->off($name => $wrapper);
+    $cb->(@_);
+  };
+  $self->on($name => $wrapper);
+  weaken $wrapper;
+
+  return $wrapper;
+}
+
+sub subscribers { shift->{events}->{shift()} || [] }
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub unsubscribe {
+  warn <<EOF;
+Mojo::EventEmitter->unsubscribe is DEPRECATED in favor of
+Mojo::EventEmitter->off!
+EOF
+  shift->off(@_);
 }
 
 1;
@@ -141,6 +150,13 @@ is EXPERIMENTAL and might change without warning!
 
 Check if event has subscribers.
 
+=head2 C<off>
+
+  $e = $e->off('foo');
+  $e = $e->off(foo => $cb);
+
+Unsubscribe from event.
+
 =head2 C<on>
 
   my $cb = $e->on(foo => sub {...});
@@ -169,14 +185,8 @@ Subscribe to event and unsubscribe again after it has been emitted once.
 
 All subscribers for event.
 
-  $e->unsubscribe(foo => $e->subscribers('foo')->[-1]);
-
-=head2 C<unsubscribe>
-
-  $e = $e->unsubscribe('foo');
-  $e = $e->unsubscribe(foo => $cb);
-
-Unsubscribe from event.
+  # Unsubscribe last subscriber
+  $e->off(foo => $e->subscribers('foo')->[-1]);
 
 =head1 DEBUGGING
 

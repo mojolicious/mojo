@@ -92,7 +92,7 @@ Mojo::Server::PSGI - PSGI server
   use Mojo::Server::PSGI;
 
   my $psgi = Mojo::Server::PSGI->new;
-  $psgi->unsubscribe('request');
+  $psgi->off('request');
   $psgi->on(request => sub {
     my ($psgi, $tx) = @_;
 

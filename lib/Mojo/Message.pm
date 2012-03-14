@@ -53,8 +53,7 @@ sub body {
   # Callback
   if (ref $new eq 'CODE') {
     weaken $self;
-    return $content->unsubscribe('read')
-      ->on(read => sub { $self->$new(pop) });
+    return $content->off('read')->on(read => sub { $self->$new(pop) });
   }
 
   # Set text content

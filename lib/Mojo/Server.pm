@@ -99,7 +99,7 @@ L<Mojo::Server> can emit the following events.
 
 Emitted when a request is ready and needs to be handled.
 
-  $server->unsubscribe('request');
+  $server->off('request');
   $server->on(request => sub {
     my ($server, $tx) = @_;
     $tx->res->code(200);

@@ -127,7 +127,7 @@ L<Mojo::Log> can emit the following events.
 
 Emitted when a new message gets logged.
 
-  $log->unsubscribe('message');
+  $log->off('message');
   $log->on(message => sub {
     my ($log, $level, @messages) = @_;
     say "$level: ", @messages;

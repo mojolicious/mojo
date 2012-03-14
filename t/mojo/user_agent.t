@@ -119,7 +119,7 @@ is $body,    'works!', 'right content';
 
 # Error in callback is logged
 my $message = app->log->subscribers('message')->[0];
-app->log->unsubscribe(message => $message);
+app->log->off(message => $message);
 app->log->level('error');
 app->ua->once(error => sub { Mojo::IOLoop->stop });
 ok app->ua->has_subscribers('error'), 'has subscribers';
@@ -184,7 +184,7 @@ is $tx->res->body, 'works!', 'right content';
 # GET /timeout (built-in web server times out)
 my $log = '';
 $message = app->log->subscribers('message')->[0];
-app->log->unsubscribe(message => $message);
+app->log->off(message => $message);
 app->log->level('error');
 app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.5');
@@ -234,8 +234,8 @@ my $start = $ua->on(
         );
         $tx->on(
           finish => sub {
-            $stream->unsubscribe(read  => $read);
-            $stream->unsubscribe(write => $write);
+            $stream->off(read  => $read);
+            $stream->off(write => $write);
           }
         );
       }
@@ -252,7 +252,7 @@ is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')}, 1,
   'unsubscribed successfully';
 like $req, qr#^GET / .*whatever$#s,      'right request';
 like $res, qr#^HTTP/.*200 OK.*works!$#s, 'right response';
-$ua->unsubscribe(start => $start);
+$ua->off(start => $start);
 ok !$ua->has_subscribers('start'), 'unsubscribed successfully';
 
 # GET /echo (stream with drain callback)

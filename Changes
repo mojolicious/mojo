@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.62    2012-03-15 00:00:00
+        - Deprecated Mojo::EventEmitter->unsubscribe in favor of
+          Mojo::EventEmitter->off.
         - Improved Mojo::IOWatcher exception handling a little.
         - Improved documentation.
         - Improved tests.

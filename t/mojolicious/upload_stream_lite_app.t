@@ -40,7 +40,7 @@ post '/upload/:id' => sub {
         body => sub {
           my $single = shift;
           return unless $single->headers->content_disposition =~ /my_file/;
-          $single->unsubscribe('read');
+          $single->off('read');
           $single->on(read => sub { $cache->{$id} .= pop });
         }
       );

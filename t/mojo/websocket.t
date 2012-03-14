@@ -504,7 +504,7 @@ is $result, 'hi' x 200000, 'right result';
 # WebSocket /timeout
 my $log = '';
 $message = app->log->subscribers('message')->[0];
-app->log->unsubscribe(message => $message);
+app->log->off(message => $message);
 app->log->level('error');
 app->log->on(message => sub { $log .= pop });
 $ua->websocket(

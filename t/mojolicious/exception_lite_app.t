@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 80;
+use Test::More tests => 83;
 
 # "This calls for a party, baby.
 #  I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
@@ -86,8 +86,20 @@ hook after_dispatch => sub {
   $exception = $self->stash('exception');
 };
 
+# Custom exception handling
+hook around_dispatch => sub {
+  my ($next, $self) = @_;
+  unless (eval { $next->(); 1 }) {
+    die $@ unless $@ eq "CUSTOM\n";
+    $self->render(text => 'Custom handling works!');
+  }
+};
+
 # GET /reuse/exception
 get '/reuse/exception' => sub { die "Reusable exception.\n" };
+
+# GET /custom
+get '/custom' => sub { die "CUSTOM\n" };
 
 my $t = Test::Mojo->new;
 
@@ -162,6 +174,9 @@ $t->get_ok('/trapped')->status_is(200)->content_is('bar');
 
 # GET /trapped/too
 $t->get_ok('/trapped/too')->status_is(200)->content_is('works');
+
+# GET /custom
+$t->get_ok('/custom')->status_is(200)->content_is('Custom handling works!');
 
 # GET /missing_template
 $t->get_ok('/missing_template')->status_is(404)

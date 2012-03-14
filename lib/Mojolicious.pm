@@ -91,13 +91,6 @@ sub new {
   $self->plugin('RequestTimer');
   $self->plugin('PoweredBy');
 
-  # Reduced log output outside of development mode
-  $self->log->level('info') unless $mode eq 'development';
-
-  # Run mode
-  $mode = $mode . '_mode';
-  $self->$mode(@_) if $self->can($mode);
-
   # Exception handling
   $self->hook(
     around_dispatch => sub {
@@ -107,6 +100,13 @@ sub new {
       $c->render_exception($@) unless eval { $next->(); 1 };
     }
   );
+
+  # Reduced log output outside of development mode
+  $self->log->level('info') unless $mode eq 'development';
+
+  # Run mode
+  $mode = $mode . '_mode';
+  $self->$mode(@_) if $self->can($mode);
 
   # Startup
   $self->startup(@_);
@@ -521,7 +521,8 @@ want to continue the chain.
     ...
   });
 
-This is a very powerful hook and should not be used lightly, consider it the
+This is a very powerful hook and should not be used lightly, it allows you to
+customize application wide exception handling for example, consider it the
 sledgehammer in your toolbox. (Passed a closure leading to the next hook and
 the current controller object)
 

@@ -528,15 +528,11 @@ Alias for L<Mojo::Transaction/"remote_port">.
 
 Alias for L<Mojo::Transaction/"req">.
 
-  $ws->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-
 =head2 C<res>
 
   my $res = $ws->res;
 
 Alias for L<Mojo::Transaction/"res">.
-
-  $ws->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
 
 =head2 C<resume>
 

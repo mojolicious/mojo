@@ -246,7 +246,7 @@ True.
 
   $file = $file->move_to('/foo/bar/baz.txt');
 
-Move asset data into a specific file.
+Move asset data into a specific file and disable C<cleanup>.
 
 =head2 C<size>
 

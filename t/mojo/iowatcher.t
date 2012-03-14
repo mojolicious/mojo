@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 65;
+use Test::More tests => 66;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -19,7 +19,7 @@ is ref $watcher, 'Mojo::IOWatcher', 'right object';
 is ref Mojo::IOWatcher->new, 'Mojo::IOWatcher', 'right object';
 undef $watcher;
 is ref Mojo::IOWatcher->new, 'Mojo::IOWatcher', 'right object';
-require Mojo::IOLoop;
+use_ok 'Mojo::IOLoop';
 $watcher = Mojo::IOLoop->singleton->iowatcher;
 is ref $watcher, 'Mojo::IOWatcher', 'right object';
 

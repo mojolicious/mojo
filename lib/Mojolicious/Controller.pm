@@ -1,6 +1,7 @@
 package Mojolicious::Controller;
 use Mojo::Base -base;
 
+use Carp ();
 use Mojo::ByteStream;
 use Mojo::Cookie::Response;
 use Mojo::Exception;
@@ -10,9 +11,7 @@ use Mojo::URL;
 use Mojo::Util;
 use Mojolicious;
 use Mojolicious::Routes::Match;
-
-require Carp;
-require Scalar::Util;
+use Scalar::Util ();
 
 # "Scalpel... blood bucket... priest."
 has app => sub { Mojolicious->new };

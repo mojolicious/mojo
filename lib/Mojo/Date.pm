@@ -5,7 +5,7 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-require Time::Local;
+use Time::Local 'timegm';
 
 has 'epoch';
 
@@ -49,7 +49,7 @@ sub parse {
 
   # Prevent crash
   my $epoch;
-  $epoch = eval { Time::Local::timegm($s, $m, $h, $day, $month, $year) };
+  $epoch = eval { timegm($s, $m, $h, $day, $month, $year) };
   $self->epoch($epoch) if !$@ && $epoch >= 0;
 
   return $self;

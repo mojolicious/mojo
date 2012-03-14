@@ -17,9 +17,7 @@ has client_class => 'Mojo::IOLoop::Client';
 has iowatcher    => sub {
   my $class = Mojo::IOWatcher->detect;
   warn "MAINLOOP ($class)\n" if DEBUG;
-  my $watcher = $class->new;
-  $watcher->on(error => sub { warn pop });
-  return $watcher;
+  return $class->new;
 };
 has [qw/lock unlock/];
 has max_accepts     => 0;

@@ -164,7 +164,7 @@ is $timer2, 2, 'timer was triggered';
 
 # Error
 my $err;
-$watcher->unsubscribe('error')->on(
+$watcher->on(
   error => sub {
     shift->stop;
     $err = pop;

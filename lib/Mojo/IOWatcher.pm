@@ -125,8 +125,10 @@ sub _poll { shift->{poll} ||= IO::Poll->new }
 
 sub _sandbox {
   my ($self, $desc, $cb) = (shift, shift, shift);
-  $self->emit_safe(error => "$desc failed: $@")
-    unless eval { $self->$cb(@_); 1 };
+  return if eval { $self->$cb(@_); 1 };
+  $self->once(error => sub { warn $_[1] })
+    unless $self->has_subscribers('error');
+  $self->emit_safe(error => "$desc failed: $@");
 }
 
 1;

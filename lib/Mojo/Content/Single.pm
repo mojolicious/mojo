@@ -54,7 +54,7 @@ sub parse {
 
   # Content needs to be upgraded to multipart
   if ($self->auto_upgrade && defined($self->boundary)) {
-    $self->off(read => $self->{read});
+    $self->unsubscribe(read => $self->{read});
     $self->emit(upgrade => my $multi = Mojo::Content::MultiPart->new($self));
     return $multi->parse;
   }

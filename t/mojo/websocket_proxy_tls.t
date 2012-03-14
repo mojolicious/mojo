@@ -178,7 +178,7 @@ Mojo::IOLoop->start;
 is $result, "Hello World! / https://localhost:$port/", 'right content';
 is $works,  'it does!',                                'right header';
 is $start,  2,                                         'redirected once';
-$ua->off('start');
+$ua->unsubscribe('start');
 
 # WebSocket /test (normal websocket)
 $result = undef;

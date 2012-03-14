@@ -445,7 +445,7 @@ Emitted once all headers have been parsed and the body starts.
 
 Emitted when a new chunk of content arrives.
 
-  $content->off('read');
+  $content->unsubscribe('read');
   $content->on(read => sub {
     my ($content, $chunk) = @_;
     say "Streaming: $chunk";

@@ -510,7 +510,7 @@ HTTP protocol for transport.
     # Unsubscribe from "message" event again once we are done
     $self->on(finish => sub {
       my $self = shift;
-      $self->app->log->off(message => $cb);
+      $self->app->log->unsubscribe(message => $cb);
     });
   };
 
@@ -570,7 +570,7 @@ which can be combined to solve some of hardest problems in web development.
 
         # Make sure we have the right part and replace "read" event
         return unless $single->headers->content_disposition =~ /example/;
-        $single->off('read')->on(read => sub {
+        $single->unsubscribe('read')->on(read => sub {
           my ($single, $chunk) = @_;
 
           # Log size of every chunk we receive
@@ -753,7 +753,7 @@ L<Mojo::UserAgent> makes it actually easy.
   my $tx = $ua->build_tx(GET => 'http://mojolicio.us');
 
   # Replace "read" events to disable default content parser
-  $tx->res->content->off('read')->on(read => sub {
+  $tx->res->content->unsubscribe('read')->on(read => sub {
     my ($content, $chunk) = @_;
     say "Streaming: $chunk";
   });

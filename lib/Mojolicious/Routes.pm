@@ -310,7 +310,7 @@ sub websocket {
 sub _dispatch_callback {
   my ($self, $c, $field, $staging) = @_;
   $c->stash->{'mojo.routed'}++;
-  $c->app->log->debug(qq/Dispatching callback./);
+  $c->app->log->debug(qq/Routing to a callback./);
   my $continue = $field->{cb}->($c);
   return !$staging || $continue ? 1 : undef;
 }
@@ -322,9 +322,8 @@ sub _dispatch_controller {
   return 1
     unless my $app = $field->{app} || $self->_generate_class($field, $c);
   my $method = $self->_generate_method($field, $c);
-  my $target = ref $app || $app;
-  $target .= "->$method" if $method;
-  $c->app->log->debug(qq/Dispatching "$target"./);
+  my $target = (ref $app || $app) . ($method ? "->$method" : '');
+  $c->app->log->debug(qq/Routing to "$target"./);
 
   # Controller or application
   return unless $self->_load_class($c, $app);

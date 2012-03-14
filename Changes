@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.62    2012-03-15 00:00:00
         - Improved Mojo::IOWatcher exception handling a little.
+        - Improved Mojolicious::Routes logging.
         - Improved documentation.
         - Improved tests.
 

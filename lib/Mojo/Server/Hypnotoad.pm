@@ -14,9 +14,6 @@ use POSIX qw/setsid WNOHANG/;
 use Scalar::Util 'weaken';
 use Time::HiRes 'ualarm';
 
-# Preload
-use Mojo::UserAgent;
-
 sub DESTROY {
   my $self = shift;
 

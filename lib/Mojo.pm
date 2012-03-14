@@ -3,8 +3,10 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojo::Home;
+use Mojo::IOLoop;
 use Mojo::Log;
 use Mojo::Transaction::HTTP;
+use Mojo::UserAgent;
 use Scalar::Util 'weaken';
 
 has home => sub { Mojo::Home->new };
@@ -13,7 +15,6 @@ has ua   => sub {
   my $self = shift;
 
   # Fresh user agent
-  require Mojo::UserAgent;
   my $ua = Mojo::UserAgent->new->app($self);
   weaken $self;
   $ua->on(error => sub { $self->log->error(pop) });
@@ -32,6 +33,10 @@ sub new {
   # Log directory
   $self->log->path($self->home->rel_file('log/mojo.log'))
     if -w $self->home->rel_file('log');
+
+  # Low level exception handling
+  Mojo::IOLoop->singleton->iowatcher->on(
+    error => sub { $self->log->error(pop) });
 
   return $self;
 }

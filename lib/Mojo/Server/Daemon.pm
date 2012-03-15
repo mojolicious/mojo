@@ -248,20 +248,18 @@ sub _listen {
 
   # Bonjour
   if (BONJOUR && (my $p = Net::Rendezvous::Publish->new)) {
-    my $port = $options->{port};
     my $name = $options->{address} || Sys::Hostname::hostname();
     $p->publish(
-      name   => "Mojolicious ($name:$port)",
-      type   => '_http._tcp',
-      domain => 'local',
-      port   => $port
-    ) if $port && !$tls;
+      name => "Mojolicious ($name:$options->{port})",
+      type => '_http._tcp',
+      port => $options->{port}
+    ) if $options->{port} && !$tls;
   }
 
   # Friendly message
   return if $self->silent;
   $self->app->log->info(qq/Listening at "$listen"./);
-  $listen =~ s|^(https?\://)\*|${1}127.0.0.1|i;
+  $listen =~ s|//\*|//127.0.0.1|i;
   say "Server available at $listen.";
 }
 

@@ -396,7 +396,7 @@ captured.
 The maximum number of connections this loop is allowed to accept before
 shutting down gracefully without interrupting existing connections, defaults
 to C<0>. Setting the value to C<0> will allow this loop to accept new
-connections infinitely. Note that this attribute is EXPERIMENTAL and might
+connections indefinitely. Note that this attribute is EXPERIMENTAL and might
 change without warning!
 
 =head2 C<max_connections>

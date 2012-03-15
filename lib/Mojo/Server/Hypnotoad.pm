@@ -496,7 +496,7 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
 Maximum number of connections a worker is allowed to accept before stopping
 gracefully, defaults to C<1000>. Setting the value to C<0> will allow workers
-to accept new connections infinitely.
+to accept new connections indefinitely.
 
 =head2 C<backlog>
 

@@ -391,6 +391,16 @@ created at startup time.
 
   app->start;
 
+Since timers and other low level event watchers are also independent from
+applications, errors can't get logged automatically, you can change that by
+subscribing to the event L<Mojo::IOWatcher/"error">.
+
+  # Forward error messages to the application log
+  Mojo::IOLoop->singleton->iowatcher->on(error => sub {
+    my ($watcher, $err) = @_;
+    app->log->error($err);
+  });
+
 Just remember that all events are processed cooperatively, so your callbacks
 shouldn't block for too long.
 

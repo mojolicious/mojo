@@ -233,9 +233,7 @@ sub render {
   $res->body($output) unless $res->body;
   my $headers = $res->headers;
   $headers->content_type($type) unless $headers->content_type;
-  $self->rendered($stash->{status});
-
-  return 1;
+  return $self->rendered($stash->{status});
 }
 
 # "She's built like a steakhouse, but she handles like a bistro!"
@@ -351,15 +349,11 @@ sub render_partial {
 
 sub render_static {
   my ($self, $file) = @_;
-
   my $app = $self->app;
-  $app->log->debug(
-    qq/Static file "$file" not found, public directory missing?/)
+  $app->log->debug(qq/File "$file" not found, public directory missing?/)
     and return
     unless $app->static->serve($self, $file);
-  $self->rendered;
-
-  return 1;
+  return $self->rendered;
 }
 
 sub render_text { shift->render(text => shift, @_) }
@@ -769,16 +763,15 @@ C<url_for>.
 
 =head2 C<render>
 
-  $c->render;
-  $c->render(controller => 'foo', action => 'bar');
-  $c->render({controller => 'foo', action => 'bar'});
-  $c->render(text => 'Hello!');
-  $c->render(template => 'index');
-  $c->render(template => 'foo/index');
-  $c->render(template => 'index', format => 'html', handler => 'epl');
-  $c->render(handler => 'something');
-  $c->render('foo/bar');
-  $c->render('foo/bar', format => 'html');
+  my $success = $c->render;
+  my $success = $c->render(controller => 'foo', action => 'bar');
+  my $success = $c->render({controller => 'foo', action => 'bar'});
+  my $success = $c->render(text => 'Hello!');
+  my $success = $c->render(template => 'foo/index');
+  my $success = $c->render(template => 'index', format => 'html');
+  my $success = $c->render(handler => 'something');
+  my $success = $c->render('foo/bar');
+  my $output  = $c->render('foo/bar', partial => 1);
 
 This is a wrapper around L<Mojolicious::Renderer> exposing pretty much all
 functionality provided by it. It will set a default template to use based on
@@ -851,8 +844,8 @@ Same as C<render> but returns the rendered result.
   my $success = $c->render_static('images/logo.png');
   my $success = $c->render_static('../lib/MyApp.pm');
 
-Render a static file using L<Mojolicious::Static>, relative to the
-C<public> directories of your application.
+Render a static file using L<Mojolicious::Static>, relative to the C<public>
+directories of your application.
 
 =head2 C<render_text>
 

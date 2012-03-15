@@ -247,7 +247,8 @@ get '/inline/ep/partial' => sub {
 get '/source' => sub {
   my $self = shift;
   my $file = $self->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
-  $self->render_static($file)
+  $self->render('this_does_not_ever_exist')
+    or $self->render_static($file)
     or $self->render_text('does not exist!', status => 404);
 };
 

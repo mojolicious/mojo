@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved Mojolicious::Routes logging.
         - Improved documentation.
         - Improved tests.
+        - Fixed IPv6 listen value bug in Mojo::Server::Daemon.
 
 2.61    2012-03-14 00:00:00
         - Merged Mojolicious exception handling into the around_dispatch

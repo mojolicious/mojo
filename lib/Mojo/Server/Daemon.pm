@@ -195,7 +195,7 @@ sub _listen {
 
   # DEPRECATED in Leaf Fluttering In Wind!
   my ($address, $port, $cert, $key, $ca);
-  if ($listen =~ qr|//(.+)\:(\d+)\:(.*?)\:(.*?)(?:\:(.+)?)?$|) {
+  if ($listen =~ qr|//([^\[\]]]+)\:(\d+)\:(.*?)\:(.*?)(?:\:(.+)?)?$|) {
     warn "Custom HTTPS listen values are DEPRECATED in favor of URLs!\n";
     ($address, $port, $cert, $key, $ca) = ($1, $2, $3, $4, $5);
   }

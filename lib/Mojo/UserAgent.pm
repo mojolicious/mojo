@@ -796,8 +796,7 @@ Maximum amount of time in seconds establishing a connection, sending the
 request and receiving a whole response may take before getting canceled,
 defaults to the value of the C<MOJO_REQUEST_TIMEOUT> environment variable or
 C<0>. Setting the value to C<0> will allow the user agent to wait
-indefinitely. The timeout will reset for every followed redirect. Note that
-this attribute is EXPERIMENTAL and might change without warning!
+indefinitely. The timeout will reset for every followed redirect.
 
   # Total limit of 5 seconds, of which 3 seconds may be spent connecting
   $ua->max_redirects(0)->connect_timeout(3)->request_timeout(5);
@@ -835,7 +834,6 @@ L<Mojolicious> object.
   my $url = $ua->app_url('https');
 
 Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
-Note that this method is EXPERIMENTAL and might change without warning!
 
   say $ua->app_url->port;
 

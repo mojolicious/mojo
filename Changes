@@ -7,18 +7,21 @@ This file documents the revision history for Perl extension Mojolicious.
         - Removed experimental status from Mojo::Server::Morbo.
         - Removed experimental status from Mojo::Transaction::WebSocket.
         - Removed experimental status from Mojo::UserAgent::Transactor.
+        - Removed experimental status from Mojolicious::Command::cpanify.
+        - Removed experimental status from upgrade event in
+          Mojo::Transaction::HTTP.
         - Removed experimental status from t helper in
           Mojolicious::Plugin::TagHelpers.
-        - Removed experimental status from url_with helper in
-          Mojolicious::Plugin::DefaultHelpers.
+        - Removed experimental status from current_route and url_with helpers
+          in Mojolicious::Plugin::DefaultHelpers.
         - Removed experimental status from websocket function in
           Mojolicious::Lite.
         - Removed experimental status from cache attribute in
           Mojolicious::Renderer.
         - Removed experimental status from format attribute in
           Mojolicious::Routes::Pattern.
-        - Removed experimental status from ca and local_address and
-          transactor attributes in Mojo::UserAgent.
+        - Removed experimental status from ca and local_address,
+          request_timeout and transactor attributes in Mojo::UserAgent.
         - Removed experimental status from cache attribute in
           Mojolicious::Routes.
         - Removed experimental status from send method in
@@ -28,8 +31,8 @@ This file documents the revision history for Perl extension Mojolicious.
           websocket_ok methods in Test::Mojo.
         - Removed experimental status from detect method in
           Mojolicious::Types.
-        - Removed experimental status from build_websocket_tx and websocket
-          methods in Mojo::UserAgent.
+        - Removed experimental status from app_url, build_websocket_tx and
+          websocket methods in Mojo::UserAgent.
         - Removed experimental status from emit_safe method in
           Mojo::EventEmitter.
         - Removed experimental status from to_psgi_app method in

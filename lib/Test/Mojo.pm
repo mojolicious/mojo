@@ -456,15 +456,6 @@ Alias for L<Mojo::UserAgent/"app">.
   # Change log level
   $t->app->log->level('fatal');
 
-  # Disable inactivity timeout for all connections
-  $t->app->hook(after_build_tx => sub {
-    my ($tx, $app) = @_;
-    $tx->on(connection => sub {
-      my ($tx, $id) = @_;
-      Mojo::IOLoop->stream($id)->timeout(0);
-    });
-  });
-
 =head2 C<content_is>
 
   $t = $t->content_is('working!');

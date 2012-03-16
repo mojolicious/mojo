@@ -391,16 +391,6 @@ created at startup time.
 
   app->start;
 
-Since timers and other low level event watchers are also independent from
-applications, errors can't get logged automatically, you can change that by
-subscribing to the event L<Mojo::IOWatcher/"error">.
-
-  # Forward error messages to the application log
-  Mojo::IOLoop->singleton->iowatcher->on(error => sub {
-    my ($watcher, $err) = @_;
-    app->log->error($err);
-  });
-
 Just remember that all events are processed cooperatively, so your callbacks
 shouldn't block for too long.
 
@@ -423,9 +413,6 @@ method L<Mojolicious::Controller/"on">.
 
     # Connected
     $self->app->log->debug('WebSocket connected.');
-
-    # Increase inactivity timeout for connection a bit
-    Mojo::IOLoop->stream($self->tx->connection)->timeout(300);
 
     # Incoming message
     $self->on(message => sub {
@@ -504,9 +491,6 @@ HTTP protocol for transport.
   # EventSource for log messages
   get '/events' => sub {
     my $self = shift;
-
-    # Increase inactivity timeout for connection a bit
-    Mojo::IOLoop->stream($self->tx->connection)->timeout(300);
 
     # Change content type
     $self->res->headers->content_type('text/event-stream');

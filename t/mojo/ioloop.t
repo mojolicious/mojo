@@ -109,7 +109,8 @@ ok $count < 10, 'less than ten recurring events';
 my $port = Mojo::IOLoop->generate_port;
 my $handle;
 $id = $loop->server(
-  port => $port,
+  address => '127.0.0.1',
+  port    => $port,
   sub {
     my ($loop, $stream) = @_;
     $handle = $stream->handle;
@@ -129,7 +130,8 @@ $loop->start;
 $port = Mojo::IOLoop->generate_port;
 my $buffer = '';
 Mojo::IOLoop->server(
-  port => $port,
+  address => '127.0.0.1',
+  port    => $port,
   sub {
     my ($loop, $stream, $id) = @_;
     $buffer .= 'accepted';
@@ -168,7 +170,7 @@ is $buffer, 'acceptedhelloworld', 'right result';
 
 # Dropped listen socket
 $port = Mojo::IOLoop->generate_port;
-$id = $loop->server({port => $port} => sub { });
+$id = $loop->server({address => '127.0.0.1', port => $port} => sub { });
 my $connected;
 $loop->client(
   {port => $port} => sub {
@@ -197,7 +199,7 @@ ok $err, 'has error';
 $port = Mojo::IOLoop->generate_port;
 my ($server_close, $client_close);
 Mojo::IOLoop->server(
-  (port => $port) => sub {
+  (address => '127.0.0.1', port => $port) => sub {
     my ($loop, $stream) = @_;
     $stream->on(close => sub { $server_close++ });
   }
@@ -218,7 +220,7 @@ is $client_close, 1, 'client emitted close event once';
 $port = Mojo::IOLoop->generate_port;
 my ($client, $server, $client_after, $server_before, $server_after) = '';
 Mojo::IOLoop->server(
-  {port => $port} => sub {
+  {address => '127.0.0.1', port => $port} => sub {
     my ($loop, $stream) = @_;
     $stream->timeout(0)->on(
       read => sub {

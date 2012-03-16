@@ -50,7 +50,7 @@ my $ua = Mojo::UserAgent->new;
 my $daemon =
   Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
 my $port = Mojo::IOLoop->new->generate_port;
-$daemon->listen(["http://*:$port"])->start;
+$daemon->listen(["http://127.0.0.1:$port"])->start;
 
 # Connect proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;
@@ -63,7 +63,7 @@ my $nf =
   . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";
 Mojo::IOLoop->server(
-  {port => $proxy} => sub {
+  {address => '127.0.0.1', port => $proxy} => sub {
     my ($loop, $stream, $client) = @_;
     $stream->on(
       read => sub {

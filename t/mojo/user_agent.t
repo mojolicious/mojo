@@ -336,8 +336,8 @@ is_deeply \@kept_alive, [1, 1], 'connections kept alive';
 
 # Premature connection close
 my $port = Mojo::IOLoop->generate_port;
-my $id =
-  Mojo::IOLoop->server({port => $port} => sub { Mojo::IOLoop->drop(pop) });
+my $id   = Mojo::IOLoop->server(
+  {address => '127.0.0.1', port => $port} => sub { Mojo::IOLoop->drop(pop) });
 $tx = $ua->get("http://localhost:$port/");
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close.', 'right error';

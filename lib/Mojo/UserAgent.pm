@@ -449,8 +449,8 @@ sub _server {
   my $port = $self->{port} = $loop->generate_port;
   die "Couldn't find a free TCP port for testing.\n" unless $port;
   $self->{scheme} = $scheme ||= 'http';
-  $server->listen(["$scheme://*:$port"])->start;
-  warn "TEST SERVER STARTED ($scheme://*:$port)\n" if DEBUG;
+  $server->listen(["$scheme://127.0.0.1:$port"])->start;
+  warn "TEST SERVER STARTED ($scheme://127.0.0.1:$port)\n" if DEBUG;
 
   return $server;
 }

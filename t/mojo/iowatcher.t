@@ -195,7 +195,7 @@ $port = Mojo::IOLoop->generate_port;
 my ($server_err, $server_running, $client_err, $client_running);
 ($server, $client) = '';
 Mojo::IOLoop->server(
-  {port => $port} => sub {
+  {address => '127.0.0.1', port => $port} => sub {
     my ($loop, $stream) = @_;
     $stream->write('test', sub { shift->write('321') });
     $stream->on(read => sub { $server .= pop });

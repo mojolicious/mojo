@@ -44,7 +44,7 @@ my $loop = Mojo::IOLoop->new;
 my $port = Mojo::IOLoop->generate_port;
 my ($server, $client) = '';
 $loop->server(
-  {port => $port, tls => 1} => sub {
+  {address => '127.0.0.1', port => $port, tls => 1} => sub {
     my ($loop, $stream) = @_;
     $stream->write('test', sub { shift->write('321') });
     $stream->on(read => sub { $server .= pop });
@@ -69,6 +69,7 @@ $server = $client = '';
 my ($drop, $running, $timeout, $server_err, $server_close, $client_close);
 Mojo::IOLoop->drop(Mojo::IOLoop->recurring(0 => sub { $drop++ }));
 $loop->server(
+  address  => '127.0.0.1',
   port     => $port,
   tls      => 1,
   tls_ca   => 't/mojo/certs/ca.crt',
@@ -135,6 +136,7 @@ $loop       = Mojo::IOLoop->new;
 $port       = Mojo::IOLoop->generate_port;
 $server_err = $client_err = '';
 $loop->server(
+  address  => '127.0.0.1',
   port     => $port,
   tls      => 1,
   tls_ca   => 'no cert',
@@ -160,6 +162,7 @@ $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
 ($running, $timeout, $server_err, $server_close, $client_close) = undef;
 $loop->server(
+  address  => '127.0.0.1',
   port     => $port,
   tls      => 1,
   tls_ca   => 't/mojo/certs/ca.crt',
@@ -204,6 +207,7 @@ $loop       = Mojo::IOLoop->new;
 $port       = Mojo::IOLoop->generate_port;
 $server_err = $client_err = '';
 $loop->server(
+  address  => '127.0.0.1',
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',
@@ -226,6 +230,7 @@ $loop       = Mojo::IOLoop->new;
 $port       = Mojo::IOLoop->generate_port;
 $server_err = $client_err = '';
 $loop->server(
+  address  => '127.0.0.1',
   port     => $port,
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',

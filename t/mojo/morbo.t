@@ -46,11 +46,12 @@ EOF
 my $port   = Mojo::IOLoop->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
-  "http://*:$port", $script;
+  "http://127.0.0.1:$port", $script;
+sleep 3;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',
-  PeerAddr => 'localhost',
+  PeerAddr => '127.0.0.1',
   PeerPort => $port
   );
 
@@ -86,7 +87,7 @@ sleep 3;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',
-  PeerAddr => 'localhost',
+  PeerAddr => '127.0.0.1',
   PeerPort => $port
   );
 
@@ -122,7 +123,7 @@ sleep 3;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',
-  PeerAddr => 'localhost',
+  PeerAddr => '127.0.0.1',
   PeerPort => $port
   );
 
@@ -143,7 +144,7 @@ kill 'INT', $pid;
 sleep 1
   while IO::Socket::INET->new(
   Proto    => 'tcp',
-  PeerAddr => 'localhost',
+  PeerAddr => '127.0.0.1',
   PeerPort => $port
   );
 

@@ -14,8 +14,8 @@ use Test::More tests => 63;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# GET /tags
-get 'tags';
+# OPTIONS /tags
+options 'tags';
 
 # GET /more_tags
 get 'more_tags';
@@ -49,8 +49,8 @@ patch '/☃' => 'snowman';
 
 my $t = Test::Mojo->new;
 
-# GET /tags
-$t->get_ok('/tags')->status_is(200)->content_is(<<EOF);
+# OPTIONS /tags
+$t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="t&lt;wo" three="four">Hello</foo>

@@ -1,6 +1,11 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.62    2012-03-16 00:00:00
+        - Added options function to Mojolicious::Lite.
+        - Added options method to Mojolicious::Routes.
+        - Added options method to Mojo::UserAgent.
+        - Added options_ok method to Test::Mojo.
+        - Added o function to ojo.
         - Removed experimental status from Mojo::Cache.
         - Removed experimental status from Mojo::DOM::CSS.
         - Removed experimental status from Mojo::DOM::HTML.

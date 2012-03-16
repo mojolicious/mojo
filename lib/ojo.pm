@@ -41,13 +41,14 @@ sub import {
   *{"${caller}::oO"} = sub { _request(@_) };
   *{"${caller}::a"} =
     sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
-  *{"${caller}::d"} = sub { _request(DELETE => @_) };
-  *{"${caller}::f"} = sub { _request(FORM   => @_) };
-  *{"${caller}::g"} = sub { _request(GET    => @_) };
-  *{"${caller}::h"} = sub { _request(HEAD   => @_) };
-  *{"${caller}::p"} = sub { _request(POST   => @_) };
-  *{"${caller}::t"} = sub { _request(PATCH  => @_) };
-  *{"${caller}::u"} = sub { _request(PUT    => @_) };
+  *{"${caller}::d"} = sub { _request(DELETE  => @_) };
+  *{"${caller}::f"} = sub { _request(FORM    => @_) };
+  *{"${caller}::g"} = sub { _request(GET     => @_) };
+  *{"${caller}::h"} = sub { _request(HEAD    => @_) };
+  *{"${caller}::o"} = sub { _request(OPTIONS => @_) };
+  *{"${caller}::p"} = sub { _request(POST    => @_) };
+  *{"${caller}::t"} = sub { _request(PATCH   => @_) };
+  *{"${caller}::u"} = sub { _request(PUT     => @_) };
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
 }
 
@@ -144,6 +145,13 @@ variable.
 
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
+
+=head2 C<o>
+
+  my $res = o('http://mojolicio.us');
+
+Perform C<OPTIONS> request with L<Mojo::UserAgent/"options"> and return
+resulting L<Mojo::Message::Response> object.
 
 =head2 C<p>
 

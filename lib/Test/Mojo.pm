@@ -238,8 +238,9 @@ sub message_unlike {
 }
 
 # "God bless those pagans."
-sub patch_ok { shift->_request_ok(patch => @_) }
-sub post_ok  { shift->_request_ok(post  => @_) }
+sub options_ok { shift->_request_ok(options => @_) }
+sub patch_ok   { shift->_request_ok(patch   => @_) }
+sub post_ok    { shift->_request_ok(post    => @_) }
 
 sub post_form_ok {
   my ($self, $url) = (shift, shift);
@@ -638,6 +639,13 @@ Check WebSocket message for similar match.
   $t = $t->message_unlike(qr/working!/, 'different message');
 
 Opposite of C<message_like>.
+
+=head2 C<options_ok>
+
+  $t = $t->options_ok('/foo');
+
+Perform a C<OPTIONS> request and check for transport errors, takes the exact
+same arguments as L<Mojo::UserAgent/"options">.
 
 =head2 C<patch_ok>
 

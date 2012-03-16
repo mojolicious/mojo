@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 # "What do you mean 'we', flesh-tube?"
 use ojo;
@@ -26,6 +26,9 @@ is g('/')->body, 'GET', 'right content';
 
 # HEAD /
 is h('/')->body, '', 'no content';
+
+# OPTIONS /
+is o('/')->body, 'OPTIONS', 'right content';
 
 # PATCH /
 is t('/')->body, 'PATCH', 'right content';

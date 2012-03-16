@@ -35,7 +35,7 @@ sub import {
   # Export
   no warnings 'redefine';
   my $root = $routes;
-  for my $name (qw/any get patch post put websocket/) {
+  for my $name (qw/any get options patch post put websocket/) {
     *{"${caller}::$name"} = sub { $routes->$name(@_) };
   }
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
@@ -854,6 +854,13 @@ Alias for L<Mojolicious/"helper">.
   hook after_dispatch => sub {...};
 
 Alias for L<Mojolicious/"hook">.
+
+=head2 C<options>
+
+  my $route = options '/:foo' => sub {...};
+
+Generate route matching only C<OPTIONS> requests. See also the tutorial above
+for more argument variations.
 
 =head2 C<patch>
 

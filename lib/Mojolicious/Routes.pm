@@ -166,6 +166,8 @@ sub name {
   return $self->{name};
 }
 
+sub options { shift->_generate_route(options => @_) }
+
 sub over {
   my $self = shift;
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
@@ -774,6 +776,13 @@ Check if this route is a WebSocket.
 The name of this route, defaults to an automatically generated name based on
 the route pattern. Note that the name C<current> is reserved for refering to
 the current route.
+
+=head2 C<options>
+
+  my $route = $route->options('/:foo' => sub {...});
+
+Generate route matching only C<OPTIONS> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<over>
 

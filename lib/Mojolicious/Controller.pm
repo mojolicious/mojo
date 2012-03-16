@@ -964,8 +964,8 @@ Non persistent data storage and exchange, application wide default values can
 be set with L<Mojolicious/"defaults">. Many stash value have a special
 meaning and are reserved, the full list is currently C<action>, C<app>,
 C<cb>, C<controller>, C<data>, C<extends>, C<format>, C<handler>, C<json>,
-C<layout>, C<namespace>, C<partial>, C<path>, C<status>, C<template> and
-C<text>.
+C<layout>, C<namespace>, C<partial>, C<path>, C<static_class>, C<status>,
+C<template>, C<template_class> and C<text>.
 
   # Manipulate stash
   $c->stash->{foo} = 'bar';

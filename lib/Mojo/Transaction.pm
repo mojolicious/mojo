@@ -25,8 +25,7 @@ sub error {
   my $req  = $self->req;
   return $req->error if $req->error;
   my $res = $self->res;
-  return $res->error if $res->error;
-  return;
+  return $res->error ? $res->error : undef;
 }
 
 sub is_finished { (shift->{state} || '') eq 'finished' }
@@ -70,8 +69,7 @@ sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
 sub success {
   my $self = shift;
-  return $self->res unless $self->error;
-  return;
+  return $self->error ? undef : $self->res;
 }
 
 1;

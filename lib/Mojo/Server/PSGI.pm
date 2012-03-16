@@ -136,8 +136,7 @@ Run L<PSGI>.
 
   my $app = $psgi->to_psgi_app;
 
-Turn L<Mojo> application into L<PSGI> application. Note that this method is
-EXPERIMENTAL and might change without warning!
+Turn L<Mojo> application into L<PSGI> application.
 
 =head1 SEE ALSO
 

@@ -476,7 +476,6 @@ Content headers, defaults to a L<Mojo::Headers> object.
 
 Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the
 value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head2 C<relaxed>
 
@@ -507,8 +506,7 @@ Content size in bytes.
 
   my $boundary = $content->boundary;
 
-Extract multipart boundary from C<Content-Type> header. Note that this method
-is EXPERIMENTAL and might change without warning!
+Extract multipart boundary from C<Content-Type> header.
 
 =head2 C<build_body>
 
@@ -526,15 +524,13 @@ Render all headers.
 
   my $charset = $content->charset;
 
-Extract charset from C<Content-Type> header. Note that this method is
-EXPERIMENTAL and might change without warning!
+Extract charset from C<Content-Type> header.
 
 =head2 C<clone>
 
   my $clone = $content->clone;
 
-Clone content if possible, otherwise return C<undef>. Note that this method
-is EXPERIMENTAL and might change without warning!
+Clone content if possible, otherwise return C<undef>.
 
 =head2 C<generate_body_chunk>
 
@@ -577,8 +573,7 @@ Check if content is chunked.
   my $success = $content->is_dynamic;
 
 Check if content will be dynamically generated, which prevents C<clone> from
-working. Note that this method is EXPERIMENTAL and might change without
-warning!
+working.
 
 =head2 C<is_finished>
 
@@ -634,8 +629,7 @@ Parse chunk and stop after headers.
 
   my $size = $content->progress;
 
-Size of content already received from message in bytes. Note that this method
-is EXPERIMENTAL and might change without warning!
+Size of content already received from message in bytes.
 
 =head2 C<write>
 

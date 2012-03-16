@@ -85,8 +85,7 @@ sub build_boundary {
 sub clone {
   my $self = shift;
   return unless my $clone = $self->SUPER::clone();
-  $clone->parts($self->parts);
-  return $clone;
+  return $clone->parts($self->parts);
 }
 
 sub get_body_chunk {
@@ -177,8 +176,7 @@ sub _parse_multipart_body {
   # Store chunk
   my $chunk = substr $self->{multipart}, 0, $pos, '';
   $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
-  $self->{multi_state} = 'multipart_boundary';
-  return 1;
+  return $self->{multi_state} = 'multipart_boundary';
 }
 
 sub _parse_multipart_boundary {
@@ -191,8 +189,7 @@ sub _parse_multipart_boundary {
     # New part
     $self->emit(part => my $part = Mojo::Content::Single->new(relaxed => 1));
     push @{$self->parts}, $part;
-    $self->{multi_state} = 'multipart_body';
-    return 1;
+    return $self->{multi_state} = 'multipart_body';
   }
 
   # Boundary ends
@@ -216,8 +213,7 @@ sub _parse_multipart_preamble {
     substr $self->{multipart}, 0, $pos, "\x0d\x0a";
 
     # Parse boundary
-    $self->{multi_state} = 'multipart_boundary';
-    return 1;
+    return $self->{multi_state} = 'multipart_boundary';
   }
 
   # No boundary yet
@@ -311,8 +307,7 @@ Generate a suitable boundary for content.
 
   my $clone = $multi->clone;
 
-Clone content if possible. Note that this method is EXPERIMENTAL and might
-change without warning!
+Clone content if possible, otherwise return C<undef>.
 
 =head2 C<get_body_chunk>
 

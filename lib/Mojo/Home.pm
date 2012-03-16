@@ -69,14 +69,8 @@ sub detect {
 
 sub lib_dir {
   my $self = shift;
-
-  # Directory found
-  my $parts = $self->{parts} || [];
-  my $path = catdir @$parts, 'lib';
-  return $path if -d $path;
-
-  # No lib directory
-  return;
+  my $path = catdir @{$self->{parts} || []}, 'lib';
+  return -d $path ? $path : undef;
 }
 
 sub list_files {

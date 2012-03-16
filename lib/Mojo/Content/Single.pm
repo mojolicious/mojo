@@ -18,10 +18,7 @@ sub new {
   return $self;
 }
 
-sub body_contains {
-  return 1 if shift->asset->contains(shift) >= 0;
-  return;
-}
+sub body_contains { shift->asset->contains(shift) >= 0 }
 
 sub body_size {
   my $self = shift;
@@ -32,8 +29,7 @@ sub body_size {
 sub clone {
   my $self = shift;
   return unless my $clone = $self->SUPER::clone();
-  $clone->asset($self->asset);
-  return $clone;
+  return $clone->asset($self->asset);
 }
 
 sub get_body_chunk {
@@ -151,8 +147,7 @@ Content size in bytes.
 
   my $clone = $single->clone;
 
-Clone content if possible. Note that this method is EXPERIMENTAL and might
-change without warning!
+Clone content if possible, otherwise return C<undef>.
 
 =head2 C<get_body_chunk>
 

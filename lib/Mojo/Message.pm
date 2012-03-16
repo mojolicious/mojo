@@ -268,10 +268,7 @@ sub is_dynamic { shift->content->is_dynamic }
 
 sub is_finished { (shift->{state} || '') eq 'finished' }
 
-sub is_limit_exceeded {
-  return unless my $code = (shift->error)[1];
-  return $code ~~ [413, 431];
-}
+sub is_limit_exceeded { ((shift->error)[1] || '') ~~ [413, 431] }
 
 sub is_multipart { shift->content->is_multipart }
 
@@ -739,8 +736,7 @@ Alias for L<Mojo::Content/"is_chunked">.
 
   my $success = $message->is_dynamic;
 
-Alias for L<Mojo::Content/"is_dynamic">. Note that this method is
-EXPERIMENTAL and might change without warning!
+Alias for L<Mojo::Content/"is_dynamic">.
 
 =head2 C<is_finished>
 
@@ -752,8 +748,7 @@ Check if parser is finished.
 
   my $success = $message->is_limit_exceeded;
 
-Check if message has exceeded C<max_line_size> or C<max_message_size>. Note
-that this method is EXPERIMENTAL and might change without warning!
+Check if message has exceeded C<max_line_size> or C<max_message_size>.
 
 =head2 C<is_multipart>
 
@@ -784,8 +779,7 @@ Alias for L<Mojo::Content/"leftovers">.
 
   $message->max_line_size(1024);
 
-Alias for L<Mojo::Headers/"max_line_size">. Note that this method is
-EXPERIMENTAL and might change without warning!
+Alias for L<Mojo::Headers/"max_line_size">.
 
 =head2 C<param>
 

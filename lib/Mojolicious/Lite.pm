@@ -895,8 +895,7 @@ also the tutorial above for more argument variations.
   my $route = websocket '/:foo' => sub {...};
 
 Generate route matching only C<WebSocket> handshakes. See also the tutorial
-above for more argument variations. Note that this function is EXPERIMENTAL
-and might change without warning!
+above for more argument variations.
 
 =head1 ATTRIBUTES
 

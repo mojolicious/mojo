@@ -284,8 +284,7 @@ Alias for L<Mojolicious::Controller/"url_for">.
   %= url_with 'named', controller => 'bar', action => 'baz'
 
 Does the same as C<url_for>, but inherits query parameters from the current
-request. Note that this helper is EXPERIMENTAL and might change without
-warning!
+request.
 
   %= url_with->query([page => 2])
 

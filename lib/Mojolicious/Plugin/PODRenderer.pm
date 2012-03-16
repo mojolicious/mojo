@@ -191,8 +191,7 @@ Handler name.
   # Mojolicious::Lite
   plugin PODRenderer => {no_perldoc => 1};
 
-Disable perldoc browser. Note that this option is EXPERIMENTAL and might
-change without warning!
+Disable perldoc browser.
 
 =head2 C<preprocess>
 

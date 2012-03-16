@@ -569,8 +569,7 @@ The children of this routes object, used for nesting routes.
   my $cache = $r->cache;
   $r        = $r->cache(Mojo::Cache->new);
 
-Routing cache, defaults to a L<Mojo::Cache> object. Note that this attribute
-is EXPERIMENTAL and might change without warning!
+Routing cache, defaults to a L<Mojo::Cache> object.
 
 =head2 C<conditions>
 
@@ -735,22 +734,19 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   my $success = $r->has_conditions;
 
-Returns true if this route contains conditions. Note that this method is
-EXPERIMENTAL and might change without warning!
+Check if this route contains conditions.
 
 =head2 C<has_custom_name>
 
   my $success = $r->has_custom_name;
 
-Returns true if this route has a custom user defined name. Note that this
-method is EXPERIMENTAL and might change without warning!
+Check if this route has a custom user defined name.
 
 =head2 C<has_websocket>
 
   my $success = $r->has_websocket;
 
-Returns true if this route has a WebSocket ancestor. Note that this method is
-EXPERIMENTAL and might change without warning!
+Check if this route has a WebSocket ancestor.
 
 =head2 C<hide>
 
@@ -762,14 +758,13 @@ Hide controller method or attribute from routes.
 
   my $success = $r->is_endpoint;
 
-Returns true if this route qualifies as an endpoint.
+Check if this route qualifies as an endpoint.
 
 =head2 C<is_websocket>
 
   my $success = $r->is_websocket;
 
-Returns true if this route is a WebSocket. Note that this method is
-EXPERIMENTAL and might change without warning!
+Check if this route is a WebSocket.
 
 =head2 C<name>
 
@@ -878,8 +873,7 @@ Add a waypoint to this route as nested child.
   my $websocket = $r->websocket('/:foo' => sub {...});
 
 Generate route matching only C<WebSocket> handshakes. See also the
-L<Mojolicious::Lite> tutorial for more argument variations. Note that this
-method is EXPERIMENTAL and might change without warning!
+L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head1 SHORTCUTS
 

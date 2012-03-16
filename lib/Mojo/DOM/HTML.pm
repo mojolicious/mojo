@@ -426,8 +426,7 @@ Mojo::DOM::HTML - HTML5/XML engine
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::HTML> is the HTML5/XML engine used by L<Mojo::DOM>. Note that
-this module is EXPERIMENTAL and might change without warning!
+L<Mojo::DOM::HTML> is the HTML5/XML engine used by L<Mojo::DOM>.
 
 =head1 ATTRIBUTES
 

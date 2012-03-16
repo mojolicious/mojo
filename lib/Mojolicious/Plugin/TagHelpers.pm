@@ -577,8 +577,7 @@ Generate submit input element.
 
   %=t div => 'some & content'
 
-Alias for C<tag>. Note that this helper is EXPERIMENTAL and might change
-without warning!
+Alias for C<tag>.
 
   <div>some &amp; content</div>
 

@@ -1,6 +1,57 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.62    2012-03-15 00:00:00
+2.62    2012-03-16 00:00:00
+        - Removed experimental status from Mojo::Cache.
+        - Removed experimental status from Mojo::DOM::CSS.
+        - Removed experimental status from Mojo::DOM::HTML.
+        - Removed experimental status from Mojo::Server::Morbo.
+        - Removed experimental status from Mojo::Transaction::WebSocket.
+        - Removed experimental status from Mojo::UserAgent::Transactor.
+        - Removed experimental status from t helper in
+          Mojolicious::Plugin::TagHelpers.
+        - Removed experimental status from url_with helper in
+          Mojolicious::Plugin::DefaultHelpers.
+        - Removed experimental status from websocket function in
+          Mojolicious::Lite.
+        - Removed experimental status from cache attribute in
+          Mojolicious::Renderer.
+        - Removed experimental status from format attribute in
+          Mojolicious::Routes::Pattern.
+        - Removed experimental status from ca and local_address and
+          transactor attributes in Mojo::UserAgent.
+        - Removed experimental status from cache attribute in
+          Mojolicious::Routes.
+        - Removed experimental status from send method in
+          Mojolicious::Controller.
+        - Removed experimental status from finish_ok, message_is,
+          message_isnt, message_like, message_unlike, send_ok and
+          websocket_ok methods in Test::Mojo.
+        - Removed experimental status from detect method in
+          Mojolicious::Types.
+        - Removed experimental status from build_websocket_tx and websocket
+          methods in Mojo::UserAgent.
+        - Removed experimental status from emit_safe method in
+          Mojo::EventEmitter.
+        - Removed experimental status from to_psgi_app method in
+          Mojo::Server::PSGI.
+        - Removed experimental status from clone method in
+          Mojo::Message::Request.
+        - Removed experimental status from has_conditions, has_custom_name,
+          has_websocket, is_websocket and websocket methods in
+          Mojolicious::Routes.
+        - Removed experimental status from clone, is_limit_exceeded and
+          max_line_size methods in Mojo::Headers.
+        - Removed experimental status from text_after, text_before and xml
+          methods, as well as trim arguments in Mojo::DOM.
+        - Removed experimental status from boundary, charset, clone,
+          is_dynamic, progress and max_leftover_size methods in
+          Mojo::Content.
+        - Removed experimental status from clone method in
+          Mojo::Content::MultiPart.
+        - Removed experimental status from clone method in
+          Mojo::Content::Single.
+        - Removed experimental status from is_dynamic, is_limit_exceeded and
+          max_line_size methods in Mojo::Message.
         - Improved Mojo::IOWatcher exception handling a little.
         - Improved Mojolicious::Routes logging.
         - Improved documentation.

@@ -316,8 +316,7 @@ Default parameters.
   my $regex = $pattern->format;
   $pattern  = $pattern->format($regex);
 
-Compiled regex for format matching, defaults to C<\.([^/]+)$>. Note that this
-attribute is EXPERIMENTAL and might change without warning!
+Compiled regex for format matching, defaults to C<\.([^/]+)$>.
 
 =head2 C<pattern>
 

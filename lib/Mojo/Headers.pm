@@ -222,8 +222,7 @@ L<Mojo::Headers> implements the following attributes.
   $headers = $headers->max_line_size(1024);
 
 Maximum line size in bytes, defaults to the value of the
-C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>. Note that this
-attribute is EXPERIMENTAL and might change without warning!
+C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
 
 =head1 METHODS
 
@@ -275,8 +274,7 @@ Shortcut for the C<Cache-Control> header.
 
   my $clone = $headers->clone;
 
-Clone headers. Note that this method is EXPERIMENTAL and might change without
-warning!
+Clone headers.
 
 =head2 C<connection>
 
@@ -410,8 +408,7 @@ Check if header parser is finished.
 
   my $success = $headers->is_limit_exceeded;
 
-Check if a header has exceeded C<max_line_size>. Note that this method is
-EXPERIMENTAL and might change without warning!
+Check if a header has exceeded C<max_line_size>.
 
 =head2 C<last_modified>
 

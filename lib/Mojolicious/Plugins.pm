@@ -66,8 +66,7 @@ sub _load {
   }
 
   # Module is a plugin
-  return unless $module->isa('Mojolicious::Plugin');
-  return 1;
+  return $module->isa('Mojolicious::Plugin') ? 1 : undef;
 }
 
 1;

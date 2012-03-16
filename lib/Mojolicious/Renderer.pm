@@ -289,8 +289,7 @@ L<Mojolicious::Renderer> implements the following attributes.
   my $cache = $renderer->cache;
   $renderer = $renderer->cache(Mojo::Cache->new);
 
-Renderer cache, defaults to a L<Mojo::Cache> object. Note that this attribute
-is EXPERIMENTAL and might change without warning!
+Renderer cache, defaults to a L<Mojo::Cache> object.
 
 =head2 C<default_format>
 

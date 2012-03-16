@@ -397,8 +397,7 @@ implements the following new ones.
 
   my $clone = $req->clone;
 
-Clone request if possible, otherwise return C<undef>. Note that this method
-is EXPERIMENTAL and might change without warning!
+Clone request if possible, otherwise return C<undef>.
 
 =head2 C<cookies>
 

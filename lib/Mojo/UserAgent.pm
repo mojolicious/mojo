@@ -678,8 +678,7 @@ L<Mojo::UserAgent> implements the following attributes.
   $ua    = $ua->ca('/etc/tls/ca.crt');
 
 Path to TLS certificate authority file, defaults to the value of the
-C<MOJO_CA_FILE> environment variable. Note that this attribute is
-EXPERIMENTAL and might change without warning!
+C<MOJO_CA_FILE> environment variable.
 
   # Show certificate authorities for debugging
   IO::Socket::SSL::set_ctx_defaults(
@@ -755,8 +754,7 @@ environment variable.
   my $address = $ua->local_address;
   $ua         = $ua->local_address('127.0.0.1');
 
-Local address to bind to. Note that this attribute is EXPERIMENTAL and might
-change without warning!
+Local address to bind to.
 
 =head2 C<max_connections>
 
@@ -810,7 +808,6 @@ this attribute is EXPERIMENTAL and might change without warning!
   $ua   = $ua->transactor(Mojo::UserAgent::Transactor->new);
 
 Transaction builder, defaults to a L<Mojo::UserAgent::Transactor> object.
-Note that this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 
@@ -858,8 +855,7 @@ Alias for L<Mojo::UserAgent::Transactor/"tx">.
 
   my $tx = $ua->build_websocket_tx('ws://localhost:3000');
 
-Alias for L<Mojo::UserAgent::Transactor/"websocket">. Note that this method
-is EXPERIMENTAL and might change without warning!
+Alias for L<Mojo::UserAgent::Transactor/"websocket">.
 
 =head2 C<delete>
 
@@ -1006,8 +1002,7 @@ transactions non-blocking.
   $ua->websocket('ws://localhost:3000' => sub {...});
 
 Open a non-blocking WebSocket connection with transparent handshake, takes
-the exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">. Note
-that this method is EXPERIMENTAL and might change without warning!
+the exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($ua, $tx) = @_;

@@ -79,11 +79,9 @@ sub client {
 sub delay {
   my ($self, $cb) = @_;
   $self = $self->singleton unless ref $self;
-
   my $delay = Mojo::IOLoop::Delay->new;
   weaken $delay->ioloop($self)->{ioloop};
   $delay->once(finish => $cb) if $cb;
-
   return $delay;
 }
 

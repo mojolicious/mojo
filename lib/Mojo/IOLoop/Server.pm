@@ -147,7 +147,7 @@ sub listen {
 sub generate_port {
 
   # Try private ports
-  for my $port ((49152 + int(rand 10000)) .. 655535) {
+  for my $port ((49152 + int(rand 15000)) .. 65535) {
     IO::Socket::INET->new(
       Listen    => 5,
       LocalAddr => '127.0.0.1',

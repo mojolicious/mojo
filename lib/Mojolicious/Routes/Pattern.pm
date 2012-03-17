@@ -204,61 +204,52 @@ sub _tokenize {
   my $pattern = $self->pattern;
   my $tree    = [];
   my $state   = 'text';
-  my $quoted  = 0;
+  my $quoted;
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
     # Inside a symbol
-    my $symbol = $state ~~ [qw/relaxed symbol wildcard/] ? 1 : 0;
+    my $symbol = $state ~~ [qw/relaxed symbol wildcard/];
 
     # Quote start
     if ($char eq $quote_start) {
       $quoted = 1;
       $state  = 'symbol';
       push @$tree, ['symbol', ''];
-      next;
     }
 
     # Symbol start
-    if ($char eq $symbol_start) {
+    elsif ($char eq $symbol_start) {
       push @$tree, ['symbol', ''] if $state ne 'symbol';
       $state = 'symbol';
-      next;
     }
 
     # Relaxed start (needs to be quoted)
-    if ($quoted && $char eq $relaxed_start && $state eq 'symbol') {
+    elsif ($quoted && $char eq $relaxed_start && $state eq 'symbol') {
       $state = 'relaxed';
       $tree->[-1]->[0] = 'relaxed';
-      next;
     }
 
     # Wildcard start (upgrade when quoted)
-    if ($char eq $wildcard_start) {
+    elsif ($char eq $wildcard_start) {
       push @$tree, ['symbol', ''] unless $quoted;
       $state = 'wildcard';
       $tree->[-1]->[0] = 'wildcard';
-      next;
     }
 
     # Quote end
-    if ($char eq $quote_end) {
+    elsif ($char eq $quote_end) {
       $quoted = 0;
       $state  = 'text';
-      next;
     }
 
     # Slash
-    if ($char eq '/') {
+    elsif ($char eq '/') {
       push @$tree, ['slash'];
       $state = 'text';
-      next;
     }
 
     # Relaxed, symbol or wildcard
-    elsif ($symbol && $char =~ /\w/) {
-      $tree->[-1]->[-1] .= $char;
-      next;
-    }
+    elsif ($symbol && $char =~ /\w/) { $tree->[-1]->[-1] .= $char }
 
     # Text
     else {

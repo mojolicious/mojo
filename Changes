@@ -1,6 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.62    2012-03-17 00:00:00
+        - Deprecated Mojolicious::Renderer->default_template_class in favor
+          of Mojolicious::Renderer->classes.
+        - Deprecated Mojolicious::Static->default_static_class in favor of
+          Mojolicious::Static->classes.
         - Added options function to Mojolicious::Lite.
         - Added options method to Mojolicious::Routes.
         - Added options method to Mojo::UserAgent.
@@ -60,11 +64,11 @@ This file documents the revision history for Perl extension Mojolicious.
           Mojo::Content::Single.
         - Removed experimental status from is_dynamic, is_limit_exceeded and
           max_line_size methods in Mojo::Message.
-        - Improved port range and address used for testing.
         - Improved Mojo::IOWatcher exception handling a little.
         - Improved Mojolicious::Routes logging.
         - Improved documentation.
         - Improved tests.
+        - Fixed port generation bug. (xaka)
         - Fixed IPv6 listen value bug in Mojo::Server::Daemon.
 
 2.61    2012-03-14 00:00:00

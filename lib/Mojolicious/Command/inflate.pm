@@ -10,8 +10,14 @@ has usage       => "usage: $0 inflate\n";
 sub run {
   my $self = shift;
 
-  # Find and turn all embedded files into real files
-  my $all = $self->get_all_data($self->app->renderer->default_template_class);
+  # Find all embedded files
+  my $all = {};
+  my $app = $self->app;
+  for my $class (@{$app->renderer->classes}, @{$app->static->classes}) {
+    $all = {%$all, %{$self->get_all_data($class)}};
+  }
+
+  # Turn them into real files
   for my $file (keys %$all) {
     my $prefix = $file =~ /\.\w+\.\w+$/ ? 'templates' : 'public';
     my $path = $self->rel_file("$prefix/$file");

@@ -4,16 +4,14 @@ use Mojo::Base 'Mojolicious::Plugin';
 # "Good news, everyone! I've taught the toaster to feel love!"
 sub register {
   my ($self, $app) = @_;
-  $app->routes->route('/plugin_with_template')->to(
-    cb => sub {
-      shift->render('template', template_class => __PACKAGE__);
-    }
-  );
+  push @{$app->renderer->classes}, __PACKAGE__;
+  $app->routes->route('/plugin_with_template')
+    ->to(cb => sub { shift->render('plugin_with_template') });
 }
 
 1;
 __DATA__
 
-@@ template.html.ep
-% layout plugin_with_template => (template_class => 'main');
+@@ plugin_with_template.html.ep
+% layout 'plugin_with_template';
 with template

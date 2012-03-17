@@ -9,8 +9,20 @@ use Mojo::Content::Single;
 use Mojo::Home;
 use Mojo::Path;
 
-has default_static_class => 'main';
-has paths => sub { [] };
+has classes => sub { ['main'] };
+has paths   => sub { [] };
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub default_static_class {
+  warn <<EOF;
+Mojolicious::Static->default_static_class is DEPRECATED in favor of
+Mojolicious::Static->classes!
+EOF
+  my $self = shift;
+  return $self->classes->[0] unless @_;
+  $self->classes->[0] = shift;
+  return $self;
+}
 
 # "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {
@@ -142,17 +154,17 @@ sub _get_data_file {
   # Protect templates
   return if $rel =~ /\.\w+\.\w+$/;
 
-  # Detect DATA class
-  my $class = $c->stash->{static_class} || $self->default_static_class;
-
-  # Find DATA file
-  my $data = $self->{data_files}->{$class}
-    ||= [keys %{Mojo::Command->new->get_all_data($class) || {}}];
-  for my $path (@$data) {
-    return Mojo::Command->new->get_data($path, $class) if $path eq $rel;
+  # Index DATA files
+  unless ($self->{data_files}) {
+    $self->{data_files} = {};
+    for my $class (@{$self->classes}) {
+      $self->{data_files}->{$_} = $class
+        for keys %{Mojo::Command->new->get_all_data($class) || {}};
+    }
   }
 
-  return;
+  # Find file
+  return Mojo::Command->new->get_data($rel, $self->{data_files}->{$rel});
 }
 
 sub _get_file {
@@ -184,12 +196,12 @@ C<If-Modified-Since> support.
 
 L<Mojolicious::Static> implements the following attributes.
 
-=head2 C<default_static_class>
+=head2 C<classes>
 
-  my $class = $static->default_static_class;
-  $static   = $static->default_static_class('main');
+  my $classes = $static->classes;
+  $static     = $static->classes(['main']);
 
-Class to use for finding files in C<DATA> section, defaults to C<main>.
+Classes to use for finding files in C<DATA> section, defaults to C<main>.
 
 =head2 C<paths>
 

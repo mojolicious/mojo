@@ -13,6 +13,10 @@ sub startup {
   # Plugin
   $self->plugin('MojoliciousTest::Plugin::Test::SomePlugin2');
 
+  # DATA classes
+  push @{$self->renderer->classes}, 'SingleFileTestApp::Foo';
+  push @{$self->static->classes},   'SingleFileTestApp::Foo';
+
   # Helper route
   $self->routes->route('/helper')->to(
     cb => sub {
@@ -34,22 +38,11 @@ sub bar {
   $self->render_text($self->url_for);
 }
 
-sub data_template {
-  shift->render('index', template_class => 'SingleFileTestApp::Foo');
-}
+sub data_template { shift->render('index') }
 
-sub data_template2 {
-  shift->stash(
-    template       => 'too',
-    template_class => 'SingleFileTestApp::Foo'
-  );
-}
+sub data_template2 { shift->stash(template => 'too') }
 
-sub data_static {
-  my $self = shift;
-  $self->stash(static_class => __PACKAGE__);
-  $self->render_static('singlefiletestapp/foo.txt');
-}
+sub data_static { shift->render_static('singlefiletestapp/foo.txt') }
 
 sub index { shift->stash(template => 'withlayout', msg => 'works great!') }
 

@@ -203,6 +203,9 @@ L<Mojolicious::Static> implements the following attributes.
 
 Classes to use for finding files in C<DATA> section, defaults to C<main>.
 
+  # Add another class with static files in DATA section
+  push @{$static->classes}, 'Mojolicious::Plugin::Fun';
+
 =head2 C<paths>
 
   my $paths = $static->paths;

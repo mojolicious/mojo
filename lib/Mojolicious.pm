@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.62';
+our $VERSION  = '2.63';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -316,6 +316,9 @@ contain more information.
   # Add another "templates" directory
   push @{$app->renderer->paths}, '/foo/bar/templates';
 
+  # Add another class with templates in DATA section
+  push @{$app->renderer->classes}, 'Mojolicious::Plugin::Fun';
+
 =head2 C<routes>
 
   my $routes = $app->routes;
@@ -361,6 +364,9 @@ L<Mojolicious::Static> object.
 
   # Add another "public" directory
   push @{$app->static->paths}, '/foo/bar/public';
+
+  # Add another class with static files in DATA section
+  push @{$app->static->classes}, 'Mojolicious::Plugin::Fun';
 
 =head2 C<types>
 

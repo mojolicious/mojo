@@ -302,6 +302,9 @@ Renderer cache, defaults to a L<Mojo::Cache> object.
 
 Classes to use for finding templates in C<DATA> section, defaults to C<main>.
 
+  # Add another class with templates in DATA section
+  push @{$renderer->classes}, 'Mojolicious::Plugin::Fun';
+
 =head2 C<default_format>
 
   my $default = $renderer->default_format;

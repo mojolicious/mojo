@@ -13,9 +13,8 @@ has classes => sub { ['main'] };
 has default_format => 'html';
 has 'default_handler';
 has encoding => 'UTF-8';
-has handlers => sub { {} };
-has helpers  => sub { {} };
-has paths    => sub { [] };
+has [qw/handlers helpers/] => sub { {} };
+has paths => sub { [] };
 
 # "This is not how Xmas is supposed to be.
 #  In my day Xmas was about bringing people together,
@@ -223,22 +222,17 @@ sub _detect_handler {
   # Templates
   return unless my $file = $self->template_name($options);
   unless ($self->{templates}) {
-    my $list = [map { @{Mojo::Home->new($_)->list_files} } @{$self->paths}];
-    for my $file (sort @$list) {
-      next unless $file =~ s/\.(\w+)$//;
-      $self->{templates}->{$file} ||= $1;
-    }
+    $_ =~ s/\.(\w+)$// and $self->{templates}->{$_} ||= $1
+      for sort map { @{Mojo::Home->new($_)->list_files} } @{$self->paths};
   }
-  return $self->{templates}->{$file} if defined $self->{templates}->{$file};
+  return $self->{templates}->{$file} if exists $self->{templates}->{$file};
 
   # DATA templates
   unless ($self->{data}) {
-    for my $file (sort keys %{$self->_data_templates}) {
-      next unless $file =~ s/\.(\w+)$//;
-      $self->{data}->{$file} ||= $1;
-    }
+    $_ =~ s/\.(\w+)$// and $self->{data}->{$_} ||= $1
+      for sort keys %{$self->_data_templates};
   }
-  return $self->{data}->{$file} if defined $self->{data}->{$file};
+  return $self->{data}->{$file} if exists $self->{data}->{$file};
 
   return;
 }
@@ -259,7 +253,7 @@ sub _extends {
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
-  # Render
+  # Find handler and render
   my $handler =
        $options->{handler}
     || $self->_detect_handler($options)
@@ -271,7 +265,6 @@ sub _render_template {
 
   # No handler
   else { $c->app->log->error(qq/No handler for "$handler" available./) }
-
   return;
 }
 
@@ -325,22 +318,10 @@ renderer will use L<Mojolicious/"types"> to look up the content MIME type.
 =head2 C<default_handler>
 
   my $default = $renderer->default_handler;
-  $renderer   = $renderer->default_handler('epl');
+  $renderer   = $renderer->default_handler('ep');
 
 The default template handler to use for rendering in cases where auto
 detection doesn't work, like for C<inline> templates.
-
-=over 2
-
-=item B<epl>
-
-C<Embedded Perl Lite> handled by L<Mojolicious::Plugin::EPLRenderer>.
-
-=item B<ep>
-
-C<Embedded Perl> handled by L<Mojolicious::Plugin::EPRenderer>.
-
-=back
 
 =head2 C<encoding>
 
@@ -382,21 +363,20 @@ implements the following ones.
 
   my $renderer = Mojolicious::Renderer->new;
 
-Construct a new renderer.
+Construct a new renderer and register C<data>, C<json> as well as C<text>
+handlers.
 
 =head2 C<add_handler>
 
   $renderer = $renderer->add_handler(epl => sub {...});
 
-Add a new handler to the renderer. See L<Mojolicious::Plugin::EPRenderer> for
-a sample renderer.
+Register a new handler.
 
 =head2 C<add_helper>
 
   $renderer = $renderer->add_helper(url_for => sub {...});
 
-Add a new helper to the renderer. See L<Mojolicious::Plugin::EPRenderer> for
-sample helpers.
+Register a new helper.
 
 =head2 C<get_data_template>
 
@@ -427,7 +407,7 @@ L<Mojolicious::Controller/"render"> for a more user-friendly interface.
   });
 
 Builds a template name based on an options hash with C<template>, C<format>
-and C<handler>.
+and C<handler>, usually used by handlers.
 
 =head2 C<template_path>
 
@@ -438,7 +418,7 @@ and C<handler>.
   });
 
 Builds a full template path based on an options hash with C<template>,
-C<format> and C<handler>.
+C<format> and C<handler>, usually used by handlers.
 
 =head1 SEE ALSO
 

@@ -1,11 +1,12 @@
 package Mojolicious::Routes::Match;
 use Mojo::Base -base;
 
+use List::Util 'first';
 use Mojo::Util qw/decode url_unescape/;
 
 has captures => sub { {} };
-has stack    => sub { [] };
 has [qw/endpoint root/];
+has stack => sub { [] };
 
 # "I'm Bender, baby, please insert liquor!"
 sub new {
@@ -31,11 +32,9 @@ sub match {
 
   # Match
   $self->root($r) unless $self->root;
-  my $dictionary = $self->{dictionary} ||= $r->dictionary;
-  my $path       = $self->{path};
-  my $pattern    = $r->pattern;
-  my $captures   = $pattern->shape_match(\$path, $r->is_endpoint);
-  return unless $captures;
+  my $path    = $self->{path};
+  my $pattern = $r->pattern;
+  return unless my $captures = $pattern->shape_match(\$path, $r->is_endpoint);
   $self->{path} = $path;
   $captures = {%{$self->captures}, %$captures};
 
@@ -43,30 +42,22 @@ sub match {
   if (my $methods = $r->via) {
     my $method = lc $self->{method};
     $method = 'get' if $method eq 'head';
-    my $found = 0;
-    for my $m (@$methods) { ++$found and last if $method eq $m }
-    return unless $found;
+    return unless first { $method eq $_ } @$methods;
   }
 
   # Conditions
   my $conditions = $r->conditions;
+  my $dictionary = $self->{dictionary} ||= $r->dictionary;
   for (my $i = 0; $i < @$conditions; $i += 2) {
-    my $name      = $conditions->[$i];
-    my $value     = $conditions->[$i + 1];
-    my $condition = $dictionary->{$name};
-
-    # No condition
-    return unless $condition;
-
-    # Match
-    return if !$condition->($r, $c, $captures, $value);
+    return unless my $condition = $dictionary->{$conditions->[$i]};
+    return if !$condition->($r, $c, $captures, $conditions->[$i + 1]);
   }
 
   # WebSocket
   return if $r->is_websocket && !$self->{websocket};
 
   # Partial
-  my $empty = !length $path || $path eq '/' ? 1 : 0;
+  my $empty = !length $path || $path eq '/';
   if ($r->partial) {
     $captures->{path} = $path;
     $self->endpoint($r);
@@ -82,11 +73,8 @@ sub match {
     delete $captures->{app};
   }
 
-  # Waypoint match
-  if ($r->block && $empty) {
-    $self->endpoint($r);
-    return $self;
-  }
+  # Waypoint
+  return $self->endpoint($r) if $r->block && $empty;
 
   # Endpoint
   return $self->endpoint($r) if $endpoint && $empty;
@@ -99,15 +87,10 @@ sub match {
     # Endpoint found
     return $self if $self->endpoint;
 
-    # Reset path
+    # Reset
     $self->{path} = $path;
-
-    # Reset stack
-    if ($r->parent) { $self->stack([@$snapshot]) }
-    else {
-      $self->captures({});
-      $self->stack([]);
-    }
+    if   ($r->parent) { $self->stack([@$snapshot]) }
+    else              { $self->captures({})->stack([]) }
   }
 
   return $self;
@@ -117,11 +100,11 @@ sub match {
 #  I don't like having discs crammed into me, unless they're Oreos.
 #  And then, only in the mouth."
 sub path_for {
-  my $self   = shift;
-  my $values = {};
-  my $name   = undef;
+  my $self = shift;
 
   # Single argument
+  my $values = {};
+  my $name   = undef;
   if (@_ == 1) {
 
     # Hash
@@ -153,7 +136,6 @@ sub path_for {
   }
 
   # Current route
-  my $captures = $self->captures;
   my $endpoint;
   if ($name && $name eq 'current' || !$name) {
     return unless $endpoint = $self->endpoint;
@@ -171,7 +153,7 @@ sub path_for {
         last if $child->has_custom_name;
       }
 
-      # Search too
+      # Search children too
       push @children, @{$child->children};
     }
     $endpoint = $candidate;
@@ -181,6 +163,7 @@ sub path_for {
   }
 
   # Merge values
+  my $captures = $self->captures;
   $values = {%$captures, format => undef, %$values};
   my $pattern = $endpoint->pattern;
   $values->{format} =

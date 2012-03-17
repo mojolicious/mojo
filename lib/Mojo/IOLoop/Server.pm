@@ -145,18 +145,14 @@ sub listen {
 }
 
 sub generate_port {
-
-  # Try private ports
-  for my $port ((49152 + int(rand 16000)) .. 65535) {
-    IO::Socket::INET->new(
-      Listen    => 5,
-      LocalAddr => '127.0.0.1',
-      LocalPort => $port,
-      Proto     => 'tcp'
-    ) and return $port;
-  }
-
-  return;
+  
+  # Allow OS assign a port for us
+  return IO::Socket::INET->new(
+    Listen    => 5,
+    LocalAddr => '127.0.0.1',
+    LocalPort => 0,
+    Proto     => 'tcp'
+  )->sockport;
 }
 
 sub start {

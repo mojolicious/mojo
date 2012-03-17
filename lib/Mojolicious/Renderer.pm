@@ -222,13 +222,23 @@ sub _detect_handler {
 
   # Templates
   return unless my $file = $self->template_name($options);
-  $file = quotemeta $file;
-  my $templates = $self->{templates}
-    ||= [map { @{Mojo::Home->new($_)->list_files} } @{$self->paths}];
-  /^$file\.(\w+)$/ and return $1 for @$templates;
+  unless ($self->{templates}) {
+    my $list = [map { @{Mojo::Home->new($_)->list_files} } @{$self->paths}];
+    for my $file (sort @$list) {
+      next unless $file =~ s/\.(\w+)$//;
+      $self->{templates}->{$file} ||= $1;
+    }
+  }
+  return $self->{templates}->{$file} if defined $self->{templates}->{$file};
 
   # DATA templates
-  /^$file\.(\w+)$/ and return $1 for keys %{$self->_data_templates};
+  unless ($self->{data}) {
+    for my $file (sort keys %{$self->_data_templates}) {
+      next unless $file =~ s/\.(\w+)$//;
+      $self->{data}->{$file} ||= $1;
+    }
+  }
+  return $self->{data}->{$file} if defined $self->{data}->{$file};
 
   return;
 }

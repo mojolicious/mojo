@@ -1,16 +1,14 @@
 package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
-has defaults => sub { {} };
-has format   => sub {qr#\.([^/]+)$#};
+has [qw/defaults reqs/] => sub { {} };
+has format => sub {qr#\.([^/]+)$#};
 has [qw/pattern regex/];
-has quote_end      => ')';
-has quote_start    => '(';
-has relaxed_start  => '.';
-has reqs           => sub { {} };
-has symbol_start   => ':';
-has symbols        => sub { [] };
-has tree           => sub { [] };
+has quote_end     => ')';
+has quote_start   => '(';
+has relaxed_start => '.';
+has symbol_start  => ':';
+has [qw/symbols tree/] => sub { [] };
 has wildcard_start => '*';
 
 # "This is the worst kind of discrimination. The kind against me!"

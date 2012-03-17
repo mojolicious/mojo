@@ -151,8 +151,8 @@ sub handler {
 
   # Embedded application
   my $stash = {};
-  if ($tx->can('stash')) {
-    $stash = $tx->stash;
+  if (my $sub = $tx->can('stash')) {
+    $stash = $tx->$sub;
     $tx    = $tx->tx;
   }
 
@@ -166,12 +166,7 @@ sub handler {
 
   # Dispatcher
   unless ($self->{dispatch}) {
-    $self->hook(
-      around_dispatch => sub {
-        my ($next, $c) = @_;
-        $c->app->dispatch($c);
-      }
-    );
+    $self->hook(around_dispatch => sub { shift; $c->app->dispatch(@_) });
     $self->{dispatch}++;
   }
 

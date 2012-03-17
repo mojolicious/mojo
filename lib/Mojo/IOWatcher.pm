@@ -180,6 +180,11 @@ L<Mojo::IOWatcher> can emit the following events.
 
 Emitted safely if an error happens.
 
+  $watcher->on(error => sub {
+    my ($watcher, $err) = @_;
+    say "Something very bad happened: $err";
+  });
+
 =head1 METHODS
 
 L<Mojo::IOWatcher> inherits all methods from L<Mojo::EventEmitter> and

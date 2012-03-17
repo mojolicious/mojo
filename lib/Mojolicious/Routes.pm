@@ -337,9 +337,9 @@ sub _dispatch_controller {
 
     # Call action
     my $stash = $c->stash;
-    if (my $code = $app->can($method)) {
+    if (my $sub = $app->can($method)) {
       $stash->{'mojo.routed'}++ unless $staging;
-      $continue = $app->$code;
+      $continue = $app->$sub;
     }
 
     # Render
@@ -351,8 +351,8 @@ sub _dispatch_controller {
 
   # Application
   else {
-    if (my $code = $app->can('routes')) {
-      my $r = $app->$code;
+    if (my $sub = $app->can('routes')) {
+      my $r = $app->$sub;
       weaken $r->parent($c->match->endpoint)->{parent} unless $r->parent;
     }
     $app->handler($c);

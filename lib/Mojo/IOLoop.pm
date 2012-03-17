@@ -491,7 +491,8 @@ them to finish writing all data in their write buffers.
   my $port = Mojo::IOLoop->generate_port;
   my $port = $loop->generate_port;
 
-Find a free TCP port, this is a utility function primarily used for tests.
+Find a free private TCP port in the range from C<49152> to C<65535>, this is
+a utility function primarily used for tests.
 
 =head2 C<is_running>
 

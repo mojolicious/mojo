@@ -147,7 +147,7 @@ sub listen {
 sub generate_port {
 
   # Try private ports
-  for my $port ((49152 + int(rand 15000)) .. 65535) {
+  for my $port ((49152 + int(rand 16000)) .. 65535) {
     IO::Socket::INET->new(
       Listen    => 5,
       LocalAddr => '127.0.0.1',
@@ -338,7 +338,8 @@ Path to the TLS key file, defaults to a built-in test key.
 
   my $port = $server->generate_port;
 
-Find a free TCP port, this is a utility function primarily used for tests.
+Find a free private TCP port in the range from C<49152> to C<65535>, this is
+a utility function primarily used for tests.
 
 =head2 C<start>
 

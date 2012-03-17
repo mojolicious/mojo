@@ -36,7 +36,8 @@ use Mojolicious::Lite;
 plugin Config => {
   default => {
     hypnotoad => {
-      listen  => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],
+      inactivity_timeout => 3,
+      listen => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],
       workers => 1
     }
   }
@@ -102,7 +103,8 @@ use Mojolicious::Lite;
 plugin Config => {
   default => {
     hypnotoad => {
-      listen  => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],
+      inactivity_timeout => 3,
+      listen => ['http://127.0.0.1:$port1', 'http://127.0.0.1:$port2'],
       workers => 1
     }
   }
@@ -176,7 +178,6 @@ is $tx->res->body, 'Hello World!', 'right content';
 
 # Stop
 open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '-s';
-sleep 3;
 sleep 1
   while IO::Socket::INET->new(
   Proto    => 'tcp',

@@ -166,7 +166,12 @@ sub handler {
 
   # Dispatcher
   unless ($self->{dispatch}) {
-    $self->hook(around_dispatch => sub { shift; $c->app->dispatch(@_) });
+    $self->hook(
+      around_dispatch => sub {
+        my ($next, $c) = @_;
+        $c->app->dispatch($c);
+      }
+    );
     $self->{dispatch}++;
   }
 

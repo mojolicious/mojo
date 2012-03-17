@@ -214,7 +214,6 @@ sub _data_templates {
     $self->{data_templates}->{$_} = $class
       for keys %{Mojo::Command->new->get_all_data($class) || {}};
   }
-
   return $self->{data_templates} ||= {};
 }
 
@@ -224,8 +223,8 @@ sub _detect_handler {
   # Templates
   return unless my $file = $self->template_name($options);
   $file = quotemeta $file;
-  my $templates = $self->{templates} =
-    [map { @{Mojo::Home->new($_)->list_files} } @{$self->paths}];
+  my $templates = $self->{templates}
+    ||= [map { @{Mojo::Home->new($_)->list_files} } @{$self->paths}];
   /^$file\.(\w+)$/ and return $1 for @$templates;
 
   # DATA templates

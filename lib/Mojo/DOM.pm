@@ -596,6 +596,9 @@ Parent of element.
 
 Alias for L<Mojo::DOM::HTML/"parse">.
 
+  # Parse UTF-8 encoded XML
+  my $dom = Mojo::DOM->new->charset('UTF-8')->xml(1)->parse($xml);
+
 =head2 C<prepend>
 
   $dom = $dom->prepend('<p>Hi!</p>');

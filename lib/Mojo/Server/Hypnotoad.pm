@@ -509,7 +509,9 @@ Listen backlog size, defaults to C<SOMAXCONN>.
   clients => 100
 
 Maximum number of parallel client connections per worker process, defaults to
-C<1000>.
+C<1000>. Note that depending on how much your application may block, you
+might want to decrease this value and increase C<workers> instead for better
+performance.
 
 =head2 C<graceful_timeout>
 

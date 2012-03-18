@@ -57,10 +57,12 @@ These commands are available by default.
 
   $ mojo
   $ mojo help
+  $ script/myapp help
 
 List available commands with short descriptions.
 
   $ mojo help <command>
+  $ script/myapp help <command>
 
 List available options for the command with short descriptions.
 
@@ -73,7 +75,8 @@ Start application with CGI backend.
 
 =head2 C<cpanify>
 
-  $ mojo cpanify -u sri -p secr3t Mojolicious-2.0.tar.gz
+  $ mojo cpanify -u sri -p secr3t Mojolicious-Plugin-Fun-0.1.tar.gz
+  $ script/myapp cpanify -u sri -p secr3t Mojolicious-Plugin-Fun-0.1.tar.gz
 
 Upload files to CPAN.
 
@@ -95,10 +98,12 @@ Run code against application.
 
   $ mojo generate
   $ mojo generate help
+  $ script/myapp generate help
 
 List available generator commands with short descriptions.
 
   $ mojo generate help <generator>
+  $ script/myapp generate help <generator>
 
 List available options for generator command with short descriptions.
 
@@ -118,6 +123,7 @@ Generate a fully functional L<Mojolicious::Lite> application.
 =head2 C<generate makefile>
 
   $ mojo generate makefile
+  $ script/myapp generate makefile
 
 Generate C<Makefile.PL> file for application.
 
@@ -136,7 +142,7 @@ Perform requests to remote host or local application.
 
 =head2 C<inflate>
 
-  $ myapp.pl inflate
+  $ script/myapp inflate
 
 Turn templates and static files embedded in the C<DATA> sections of your
 application into real files.
@@ -166,6 +172,7 @@ Runs application tests from the C<t> directory.
 =head2 C<version>
 
   $ mojo version
+  $ script/myapp version
 
 Show version information for installed core and optional modules, very useful
 for debugging.

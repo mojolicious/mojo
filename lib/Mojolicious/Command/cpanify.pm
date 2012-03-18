@@ -35,8 +35,8 @@ sub run {
       HIDDENNAME                        => $user,
       CAN_MULTIPART                     => 1,
       pause99_add_uri_upload            => basename($file),
-      SUBMIT_pause99_add_uri_httpupload => " Upload this file from my disk ",
-      pause99_add_uri_uri               => "",
+      SUBMIT_pause99_add_uri_httpupload => ' Upload this file from my disk ',
+      pause99_add_uri_uri               => '',
       pause99_add_uri_httpupload        => {file => $file},
     }
   );

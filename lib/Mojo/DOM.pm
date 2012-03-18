@@ -502,7 +502,7 @@ Construct a new L<Mojo::DOM> object.
   my $untrimmed = $dom->all_text(0);
 
 Extract all text content from DOM structure, smart whitespace trimming is
-disabled by default.
+enabled by default.
 
   # "foo bar baz"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->all_text;
@@ -647,7 +647,7 @@ Find root node.
   my $untrimmed = $dom->text(0);
 
 Extract text content from element only (not including child elements), smart
-whitespace trimming is disabled by default.
+whitespace trimming is enabled by default.
 
   # "foo baz"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->text;
@@ -661,7 +661,7 @@ whitespace trimming is disabled by default.
   my $untrimmed = $dom->text_after(0);
 
 Extract text content immediately following element, smart whitespace trimming
-is disabled by default.
+is enabled by default.
 
   # "baz"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_after;
@@ -675,7 +675,7 @@ is disabled by default.
   my $untrimmed = $dom->text_before(0);
 
 Extract text content immediately preceding element, smart whitespace trimming
-is disabled by default.
+is enabled by default.
 
   # "foo"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_before;

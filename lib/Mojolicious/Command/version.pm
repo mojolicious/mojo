@@ -77,7 +77,8 @@ Mojolicious::Command::version - Version command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::version> shows versions of installed modules.
+L<Mojolicious::Command::version> shows version information for installed core
+and optional modules.
 
 =head1 ATTRIBUTES
 

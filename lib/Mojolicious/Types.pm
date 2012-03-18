@@ -88,8 +88,8 @@ List of MIME types.
 
 =head1 METHODS
 
-L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements the
-following ones.
+L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements
+the following ones.
 
 =head2 C<detect>
 

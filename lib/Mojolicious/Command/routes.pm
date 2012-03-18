@@ -114,7 +114,7 @@ Mojolicious::Command::routes - Routes command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::routes> prints all your application routes.
+L<Mojolicious::Command::routes> lists all your application routes.
 
 =head1 ATTRIBUTES
 

@@ -68,8 +68,8 @@ Mojolicious::Command::daemon - Daemon command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::daemon> is a command interface to
-L<Mojo::Server::Daemon>.
+L<Mojolicious::Command::daemon> starts applications with
+L<Mojo::Server::Daemon> backend.
 
 =head1 ATTRIBUTES
 

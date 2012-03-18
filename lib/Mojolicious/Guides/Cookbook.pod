@@ -27,7 +27,7 @@ solid and fast enough for small to mid sized applications.
 It has many configuration options and is known to work on every platform
 Perl works on.
 
-  $ ./script/myapp help daemon
+  $ ./script/myapp daemon -h
   ...List of available options...
 
 Another huge advantage is that it supports TLS and WebSockets out of the box.

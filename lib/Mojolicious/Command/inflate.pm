@@ -41,8 +41,8 @@ Mojolicious::Command::inflate - Inflate command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::inflate> turns all your embedded templates into real
-ones.
+L<Mojolicious::Command::inflate> turns templates and static files embedded in
+the C<DATA> sections of your application into real files.
 
 =head1 ATTRIBUTES
 

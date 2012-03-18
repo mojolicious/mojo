@@ -71,6 +71,12 @@ List available options for the command with short descriptions.
 
 Start application with CGI backend.
 
+=head2 C<cpanify>
+
+  $ mojo cpanify -u sri -p secr3t Mojolicious-2.0.tar.gz
+
+Upload files to CPAN.
+
 =head2 C<daemon>
 
   $ mojo daemon
@@ -115,18 +121,32 @@ Generate a fully functional L<Mojolicious::Lite> application.
 
 Generate C<Makefile.PL> file for application.
 
+=head2 C<generate plugin>
+
+  $ mojo generate plugin <PluginName>
+
+Generate directory structure for a fully functional L<Mojolicious> plugin.
+
 =head2 C<get>
 
   $ mojo get http://mojolicio.us
   $ script/myapp get /foo
 
-Perform GET request to remote host or local application.
+Perform requests to remote host or local application.
 
 =head2 C<inflate>
 
   $ myapp.pl inflate
 
-Turn embedded files from the C<DATA> section into real files.
+Turn templates and static files embedded in the C<DATA> sections of your
+application into real files.
+
+=head2 C<psgi>
+
+  $ mojo psgi
+  $ script/myapp psgi
+
+Start application with PSGI backend.
 
 =head2 C<routes>
 
@@ -147,7 +167,7 @@ Runs application tests from the C<t> directory.
 
   $ mojo version
 
-List version information for installed core and optional modules, very useful
+Show version information for installed core and optional modules, very useful
 for debugging.
 
 =head1 ATTRIBUTES

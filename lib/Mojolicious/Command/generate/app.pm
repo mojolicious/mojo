@@ -167,7 +167,8 @@ Mojolicious::Command::generate::app - App generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::app> is an application generator.
+L<Mojolicious::Command::generate::app> generates application directory
+structures for fully functional L<Mojolicious> applications.
 
 =head1 ATTRIBUTES
 

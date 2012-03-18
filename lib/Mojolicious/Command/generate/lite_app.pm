@@ -58,7 +58,8 @@ Mojolicious::Command::generate::lite_app - Lite app generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::lite_app> is a application generator.
+L<Mojolicious::Command::generate::lite_app> generate fully functional
+L<Mojolicious::Lite> applications.
 
 =head1 ATTRIBUTES
 

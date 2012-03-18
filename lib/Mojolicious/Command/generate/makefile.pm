@@ -38,7 +38,8 @@ Mojolicious::Command::generate::makefile - Makefile generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::makefile> is a makefile generator.
+L<Mojolicious::Command::generate::makefile> generates C<Makefile.PL> files
+for applications.
 
 =head1 ATTRIBUTES
 

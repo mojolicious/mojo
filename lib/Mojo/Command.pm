@@ -171,23 +171,20 @@ sub run {
   if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
 
     # Help
-    my $help = $name eq 'help' ? 1 : 0;
+    my $help = $name eq 'help';
     $name = shift @args if $help;
     $help = 1           if $ENV{MOJO_HELP};
 
     # Try all namespaces
     my $module;
-    for my $namespace (@{$self->namespaces}) {
-      last if $module = _command("${namespace}::$name");
-    }
+    $module = _command("${_}::$name") and last for @{$self->namespaces};
 
     # Command missing
     die qq/Command "$name" missing, maybe you need to install it?\n/
       unless $module;
 
     # Run
-    my $command = $module->new;
-    return $help ? $command->help : $command->run(@args);
+    return $help ? $module->new->help : $module->new->run(@args);
   }
 
   # Test
@@ -199,10 +196,8 @@ sub run {
   for my $namespace (@{$self->namespaces}) {
     for my $module (@{Mojo::Loader->search($namespace)}) {
       next unless my $command = _command($module);
-      $command =~ s/^$namespace\:://;
-      push @$commands, [$command => $module]
-        unless $seen->{$command};
-      $seen->{$command} = 1;
+      $command =~ s/^$namespace\:\://;
+      push @$commands, [$command => $module] unless $seen->{$command}++;
     }
   }
 
@@ -211,20 +206,17 @@ sub run {
 
   # Make list
   my $list = [];
-  my $len  = 0;
+  my $max  = 0;
   foreach my $command (@$commands) {
-    my $name = $command->[0];
-    my $l    = length $name;
-    $len = $l if $l > $len;
-    push @$list, [$name, $command->[1]->new->description];
+    my $len = length $command->[0];
+    $max = $len if $len > $max;
+    push @$list, [$command->[0], $command->[1]->new->description];
   }
 
   # Print list
   foreach my $command (@$list) {
-    my $name        = $command->[0];
-    my $description = $command->[1];
-    my $padding     = ' ' x ($len - length $name);
-    print "  $name$padding   $description";
+    my ($name, $description) = @$command;
+    print "  $name" . (' ' x ($max - length $name)) . "   $description";
   }
   print $self->hint;
   return 1;
@@ -267,14 +259,11 @@ sub write_rel_file {
 
 sub _command {
   my $module = shift;
-
   if (my $e = Mojo::Loader->load($module)) {
     return unless ref $e;
     die $e;
   }
-  return unless $module->isa('Mojo::Command');
-
-  return $module;
+  return $module->isa('Mojo::Command') ? $module : undef;
 }
 
 1;

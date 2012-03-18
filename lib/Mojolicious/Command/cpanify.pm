@@ -71,7 +71,7 @@ Mojolicious::Command::cpanify - Cpanify command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::cpanify> is a CPAN uploader.
+L<Mojolicious::Command::cpanify> uploads files to CPAN.
 
 =head1 ATTRIBUTES
 

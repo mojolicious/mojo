@@ -126,7 +126,8 @@ Mojolicious::Command::generate::plugin - Plugin generator command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::generate::plugin> is a plugin generator.
+L<Mojolicious::Command::generate::plugin> generates directory structures for
+fully functional L<Mojolicious> plugins.
 
 =head1 ATTRIBUTES
 

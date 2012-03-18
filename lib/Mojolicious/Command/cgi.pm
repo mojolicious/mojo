@@ -37,7 +37,8 @@ Mojolicious::Command::cgi - CGI command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::cgi> is a command interface to L<Mojo::Server::CGI>.
+L<Mojolicious::Command::cgi> starts applications with L<Mojo::Server::CGI>
+backend.
 
 =head1 ATTRIBUTES
 

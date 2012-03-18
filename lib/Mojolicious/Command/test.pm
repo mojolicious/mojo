@@ -67,7 +67,7 @@ Mojolicious::Command::test - Test command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::test> is a test script.
+L<Mojolicious::Command::test> runs application tests from the C<t> directory.
 
 =head1 ATTRIBUTES
 

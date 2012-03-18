@@ -223,8 +223,8 @@ L<Mojolicious::Command::get> is a command interface to L<Mojo::UserAgent>.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::get> inherits all attributes from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::get> performs requests to remote hosts or local
+applications.
 
 =head2 C<description>
 

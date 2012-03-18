@@ -26,8 +26,8 @@ Mojolicious::Command::psgi - PSGI command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::psgi> is a command interface to
-L<Mojo::Server::PSGI>.
+L<Mojolicious::Command::psgi> starts applications with L<Mojo::Server::PSGI>
+backend.
 
 =head1 ATTRIBUTES
 

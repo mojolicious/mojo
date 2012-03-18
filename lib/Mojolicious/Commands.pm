@@ -57,40 +57,36 @@ These commands are available by default.
 
   $ mojo
   $ mojo help
-  $ script/myapp help
+  $ ./myapp.pl help
 
 List available commands with short descriptions.
 
   $ mojo help <command>
-  $ script/myapp help <command>
+  $ ./myapp.pl help <command>
 
 List available options for the command with short descriptions.
 
 =head2 C<cgi>
 
-  $ mojo cgi
-  $ script/myapp cgi
+  $ ./myapp.pl cgi
 
 Start application with CGI backend.
 
 =head2 C<cpanify>
 
   $ mojo cpanify -u sri -p secr3t Mojolicious-Plugin-Fun-0.1.tar.gz
-  $ script/myapp cpanify -u sri -p secr3t Mojolicious-Plugin-Fun-0.1.tar.gz
 
 Upload files to CPAN.
 
 =head2 C<daemon>
 
-  $ mojo daemon
-  $ script/myapp daemon
+  $ ./myapp.pl daemon
 
 Start application with standalone HTTP 1.1 server backend.
 
 =head2 C<eval>
 
-  $ mojo eval 'say app->home'
-  $ script/myapp eval 'say app->home'
+  $ ./myapp.pl eval 'say app->home'
 
 Run code against application.
 
@@ -98,12 +94,12 @@ Run code against application.
 
   $ mojo generate
   $ mojo generate help
-  $ script/myapp generate help
+  $ ./myapp.pl generate help
 
 List available generator commands with short descriptions.
 
   $ mojo generate help <generator>
-  $ script/myapp generate help <generator>
+  $ ./myapp.pl generate help <generator>
 
 List available options for generator command with short descriptions.
 
@@ -123,7 +119,7 @@ Generate a fully functional L<Mojolicious::Lite> application.
 =head2 C<generate makefile>
 
   $ mojo generate makefile
-  $ script/myapp generate makefile
+  $ ./myapp.pl generate makefile
 
 Generate C<Makefile.PL> file for application.
 
@@ -136,43 +132,41 @@ Generate directory structure for a fully functional L<Mojolicious> plugin.
 =head2 C<get>
 
   $ mojo get http://mojolicio.us
-  $ script/myapp get /foo
+  $ ./myapp.pl get /foo
 
 Perform requests to remote host or local application.
 
 =head2 C<inflate>
 
-  $ script/myapp inflate
+  $ ./myapp.pl inflate
 
 Turn templates and static files embedded in the C<DATA> sections of your
 application into real files.
 
 =head2 C<psgi>
 
-  $ mojo psgi
-  $ script/myapp psgi
+  $ ./myapp.pl psgi
 
 Start application with PSGI backend.
 
 =head2 C<routes>
 
-  $ myapp.pl routes
-  $ script/myapp routes
+  $ ./myapp.pl routes
 
 List application routes.
 
 =head2 C<test>
 
   $ mojo test
-  $ script/myapp test
-  $ script/myapp test t/foo.t
+  $ ./myapp.pl test
+  $ ./myapp.pl test t/fun.t
 
 Runs application tests from the C<t> directory.
 
 =head2 C<version>
 
   $ mojo version
-  $ script/myapp version
+  $ ./myapp.pl version
 
 Show version information for installed core and optional modules, very useful
 for debugging.

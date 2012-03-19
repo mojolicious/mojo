@@ -175,7 +175,7 @@ sub _compile {
   $regex = "$block$regex" if $block;
 
   # Compile
-  $regex = qr/^$regex/;
+  $regex = qr/^$regex/s;
   $self->regex($regex);
 
   return $regex;

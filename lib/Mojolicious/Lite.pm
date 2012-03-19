@@ -399,8 +399,8 @@ Routes can be restricted to specific request methods.
     $self->render(text => "You uploaded $size bytes to /hello.");
   };
 
-  # GET|POST|DELETE /bye
-  any ['get', 'post', 'delete'] => '/bye' => sub {
+  # GET|POST|PATCH /bye
+  any ['GET', 'POST', 'PATCH'] => '/bye' => sub {
     my $self = shift;
     $self->render(text => 'Bye World!');
   };
@@ -812,7 +812,7 @@ L<Mojolicious::Lite> implements the following functions.
 =head2 C<any>
 
   my $route = any '/:foo' => sub {...};
-  my $route = any ['get', 'post'] => '/:foo' => sub {...};
+  my $route = any ['GET', 'POST'] => '/:foo' => sub {...};
 
 Generate route matching any of the listed HTTP request methods or all. See
 also the tutorial above for more argument variations.

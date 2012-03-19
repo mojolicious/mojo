@@ -69,7 +69,7 @@ sub auto_render {
 
 sub bridge { shift->route(@_)->inline(1) }
 
-sub delete { shift->_generate_route(delete => @_) }
+sub delete { shift->_generate_route(DELETE => @_) }
 
 sub detour { shift->partial(1)->to(@_) }
 
@@ -122,7 +122,7 @@ sub dispatch {
   return 1;
 }
 
-sub get { shift->_generate_route(get => @_) }
+sub get { shift->_generate_route(GET => @_) }
 
 sub has_conditions {
   my $self = shift;
@@ -164,7 +164,7 @@ sub name {
   return $self;
 }
 
-sub options { shift->_generate_route(options => @_) }
+sub options { shift->_generate_route(OPTIONS => @_) }
 
 sub over {
   my $self = shift;
@@ -188,9 +188,9 @@ sub parse {
   return $self;
 }
 
-sub patch { shift->_generate_route(patch => @_) }
-sub post  { shift->_generate_route(post  => @_) }
-sub put   { shift->_generate_route(put   => @_) }
+sub patch { shift->_generate_route(PATCH => @_) }
+sub post  { shift->_generate_route(POST  => @_) }
+sub put   { shift->_generate_route(PUT   => @_) }
 
 sub render {
   my ($self, $path, $values) = @_;
@@ -288,7 +288,7 @@ sub under { shift->_generate_route(under => @_) }
 sub via {
   my $self = shift;
   return $self->{via} unless @_;
-  my $methods = [map { lc $_ } @{ref $_[0] ? $_[0] : [@_]}];
+  my $methods = [map { uc $_ } @{ref $_[0] ? $_[0] : [@_]}];
   $self->{via} = $methods if @$methods;
   return $self;
 }
@@ -670,7 +670,7 @@ Add a new shortcut for this route.
 =head2 C<any>
 
   my $route = $route->any('/:foo' => sub {...});
-  my $route = $route->any([qw/get post/] => '/:foo' => sub {...});
+  my $route = $route->any(['GET', 'POST'] => '/:foo' => sub {...});
 
 Generate route matching any of the listed HTTP request methods or all. See
 also the L<Mojolicious::Lite> tutorial for more argument variations.

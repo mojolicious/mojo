@@ -13,7 +13,7 @@ sub new {
   my $self = shift->SUPER::new;
 
   # Method
-  $self->{method} = lc shift;
+  $self->{method} = uc shift;
 
   # Path
   my $path = url_unescape shift;
@@ -40,8 +40,7 @@ sub match {
 
   # Method
   if (my $methods = $r->via) {
-    my $method = lc $self->{method};
-    $method = 'get' if $method eq 'head';
+    my $method = $self->{method} eq 'HEAD' ? 'GET' : $self->{method};
     return unless first { $method eq $_ } @$methods;
   }
 

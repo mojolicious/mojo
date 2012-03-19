@@ -169,6 +169,7 @@ sub _get_data_file {
 
 sub _get_file {
   my ($self, $path, $rel) = @_;
+  no warnings 'newline';
   return unless -f $path;
   return [] unless -r $path;
   return [Mojo::Asset::File->new(path => $path), (stat $path)[7, 9]];

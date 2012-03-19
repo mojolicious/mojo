@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 727;
+use Test::More tests => 730;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -977,6 +977,9 @@ $t->get_ok('/foo_relaxed/')->status_is(404);
 
 # GET /foo_wildcard/123
 $t->get_ok('/foo_wildcard/123')->status_is(200)->content_is('123');
+
+# GET /foo_wildcard/IQ==%0A
+$t->get_ok('/foo_wildcard/IQ==%0A')->status_is(200)->content_is("IQ==\x0a");
 
 # GET /foo_wildcard
 $t->get_ok('/foo_wildcard/')->status_is(404);

@@ -662,8 +662,10 @@ into a temporary file.
 
   use Mojolicious::Lite;
 
+  # Upload form in DATA section
   get '/' => 'form';
 
+  # Multipart upload handler
   post '/upload' => sub {
     my $self = shift;
 

@@ -547,7 +547,7 @@ which can be combined to solve some of hardest problems in web development.
     $tx->req->content->on(upgrade => sub { $tx->emit('request') });
   };
 
-  # Upload form
+  # Upload form in DATA section
   get '/' => 'index';
 
   # Streaming multipart upload (invoked twice, due to early "request" event)

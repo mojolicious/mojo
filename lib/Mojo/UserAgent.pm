@@ -45,12 +45,9 @@ sub app {
 
   # Try to detect application
   $self->{app} ||= $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
-  if ($app) {
-    $self->{app} = ref $app ? $app : $self->_server->app_class($app)->app;
-    return $self;
-  }
-
-  return $self->{app};
+  return $self->{app} unless $app;
+  $self->{app} = ref $app ? $app : $self->_server->app_class($app)->app;
+  return $self;
 }
 
 sub app_url {
@@ -80,15 +77,6 @@ sub detect_proxy {
   }
 
   return $self;
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub keep_alive_timeout {
-  warn <<EOF;
-Mojo::UserAgent->keep_alive_timeout is DEPRECATED in favor of
-Mojo::UserAgent->inactivity_timeout!
-EOF
-  shift->inactivity_timeout(@_);
 }
 
 sub need_proxy {
@@ -431,8 +419,7 @@ sub _redirect {
 
   # Follow redirect
   return 1 unless my $id = $self->_start($new, delete $c->{cb});
-  $self->{connections}->{$id}->{redirects} = $redirects + 1;
-  return 1;
+  return $self->{connections}->{$id}->{redirects} = $redirects + 1;
 }
 
 sub _server {

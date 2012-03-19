@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.63    2012-03-18 00:00:00
+2.63    2012-03-19 00:00:00
         - Improved Mojolicious::Renderer performance.
         - Improved documentation.
         - Fixed bug that slowed down Mojolicious::Renderer.

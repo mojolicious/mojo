@@ -32,10 +32,8 @@ my $VALUE_RE     = qr/
 # "My Homer is not a communist.
 #  He may be a liar, a pig, an idiot, a communist,
 #  but he is not a porn star."
+sub parse     { croak 'Method "parse" not implemented by subclass' }
 sub to_string { croak 'Method "to_string" not implemented by subclass' }
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub version { warn "Mojo::Cookie->version is DEPRECATED!\n" }
 
 sub _tokenize {
   my ($self, $string) = @_;
@@ -114,6 +112,12 @@ Cookie value.
 
 L<Mojo::Cookie> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<parse>
+
+  my $cookies = $cookie->parse($string);
+
+Parse cookies.
 
 =head2 C<to_string>
 

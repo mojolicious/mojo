@@ -39,22 +39,20 @@ sub clone {
 sub cookies {
   my $self = shift;
 
-  # Add cookies
+  # Parse cookies
   my $headers = $self->headers;
-  if (@_) {
-    my @cookies = $headers->cookie || ();
-    for my $cookie (@_) {
-      $cookie = Mojo::Cookie::Request->new($cookie) if ref $cookie eq 'HASH';
-      push @cookies, $cookie;
-    }
-    $headers->cookie(join('; ', @cookies));
-    return $self;
-  }
+  return [map { @{Mojo::Cookie::Request->parse($_)} } $headers->cookie]
+    unless @_;
 
-  # Cookie
-  my @cookies;
-  push @cookies, @{Mojo::Cookie::Request->parse($_)} for $headers->cookie;
-  return \@cookies;
+  # Add cookies
+  my @cookies = $headers->cookie || ();
+  for my $cookie (@_) {
+    $cookie = Mojo::Cookie::Request->new($cookie) if ref $cookie eq 'HASH';
+    push @cookies, $cookie;
+  }
+  $headers->cookie(join('; ', @cookies));
+
+  return $self;
 }
 
 sub fix_headers {

@@ -8,9 +8,6 @@ has [qw/domain httponly max_age path secure/];
 
 my $ATTR_RE = qr/(Domain|expires|HttpOnly|Max-Age|Path|Secure)/msi;
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub comment { warn "Mojo::Cookie::Response->comment is DEPRECATED!\n" }
-
 sub expires {
   my ($self, $expires) = @_;
 
@@ -57,9 +54,6 @@ sub parse {
 
   return \@cookies;
 }
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub port { warn "Mojo::Cookie::Response->port is DEPRECATED!\n" }
 
 sub to_string {
   my $self = shift;

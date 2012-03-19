@@ -153,35 +153,32 @@ sub path {
 sub query {
   my $self = shift;
 
-  # Merge or replace parameters
-  if (@_) {
+  # Get parameters
+  return $self->{query} ||= Mojo::Parameters->new unless @_;
 
-    # Replace with list
-    if (@_ > 1) {
-      $self->{query} = Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_);
-    }
-
-    # Merge with array
-    elsif (ref $_[0] && ref $_[0] eq 'ARRAY') {
-      my $q = $self->{query} ||= Mojo::Parameters->new;
-      while (my $name = shift @{$_[0]}) {
-        my $value = shift @{$_[0]};
-        defined $value ? $q->param($name => $value) : $q->remove($name);
-      }
-    }
-
-    # Append hash
-    elsif (ref $_[0] && ref $_[0] eq 'HASH') {
-      ($self->{query} ||= Mojo::Parameters->new)->append(%{$_[0]});
-    }
-
-    # Replace with string
-    else { $self->{query} = Mojo::Parameters->new($_[0]) }
-
-    return $self;
+  # Replace with list
+  if (@_ > 1) {
+    $self->{query} = Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_);
   }
 
-  return $self->{query} ||= Mojo::Parameters->new;
+  # Merge with array
+  elsif (ref $_[0] && ref $_[0] eq 'ARRAY') {
+    my $q = $self->{query} ||= Mojo::Parameters->new;
+    while (my $name = shift @{$_[0]}) {
+      my $value = shift @{$_[0]};
+      defined $value ? $q->param($name => $value) : $q->remove($name);
+    }
+  }
+
+  # Append hash
+  elsif (ref $_[0] && ref $_[0] eq 'HASH') {
+    ($self->{query} ||= Mojo::Parameters->new)->append(%{$_[0]});
+  }
+
+  # Replace with string
+  else { $self->{query} = Mojo::Parameters->new($_[0]) }
+
+  return $self;
 }
 
 sub to_abs {

@@ -30,6 +30,8 @@ my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 
 sub new {
   my $self = shift->SUPER::new(@_);
+
+  # Default logger
   $self->on(
     message => sub {
       my $self = shift;
@@ -40,6 +42,7 @@ sub new {
       flock $handle, LOCK_UN;
     }
   );
+
   return $self;
 }
 

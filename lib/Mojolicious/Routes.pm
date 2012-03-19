@@ -155,15 +155,13 @@ sub name {
   my $self = shift;
 
   # Custom names have precedence
-  if (@_) {
-    if (defined(my $name = shift)) {
-      $self->{name}   = $name;
-      $self->{custom} = 1;
-    }
-    return $self;
+  return $self->{name} unless @_;
+  if (defined(my $name = shift)) {
+    $self->{name}   = $name;
+    $self->{custom} = 1;
   }
 
-  return $self->{name};
+  return $self;
 }
 
 sub options { shift->_generate_route(options => @_) }
@@ -289,15 +287,10 @@ sub under { shift->_generate_route(under => @_) }
 
 sub via {
   my $self = shift;
-
-  # Restrict methods
-  if (@_) {
-    my $methods = [map { lc $_ } @{ref $_[0] ? $_[0] : [@_]}];
-    $self->{via} = $methods if @$methods;
-    return $self;
-  }
-
-  return $self->{via};
+  return $self->{via} unless @_;
+  my $methods = [map { lc $_ } @{ref $_[0] ? $_[0] : [@_]}];
+  $self->{via} = $methods if @$methods;
+  return $self;
 }
 
 sub waypoint { shift->route(@_)->block(1) }

@@ -30,15 +30,6 @@ sub DESTROY {
 }
 
 # DEPRECATED in Leaf Fluttering In Wind!
-sub keep_alive_timeout {
-  warn <<EOF;
-Mojo::Server::Daemon->keep_alive_timeout is DEPRECATED in favor of
-Mojo::Server::Daemon->inactivity_timeout!
-EOF
-  shift->inactivity_timeout(@_);
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
 sub prepare_ioloop {
   warn <<EOF;
 Mojo::Server::Daemon->prepare_ioloop is DEPRECATED in favor of

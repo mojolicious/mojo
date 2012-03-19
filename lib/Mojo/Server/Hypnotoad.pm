@@ -161,10 +161,6 @@ sub _config {
   my $listen = $c->{listen} || ['http://*:8080'];
   $listen = [$listen] unless ref $listen;
   $daemon->listen($listen);
-
-  # DEPRECATED in Leaf Fluttering In Wind!
-  $daemon->inactivity_timeout($c->{keep_alive_timeout})
-    if $c->{keep_alive_timeout};
 }
 
 sub _exit { say shift and exit 0 }

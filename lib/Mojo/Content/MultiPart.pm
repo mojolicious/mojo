@@ -7,6 +7,8 @@ has parts => sub { [] };
 
 sub new {
   my $self = shift->SUPER::new(@_);
+
+  # Default content parser
   $self->on(
     read => sub {
       my ($self, $chunk) = @_;
@@ -14,6 +16,7 @@ sub new {
       $self->_parse_multipart;
     }
   );
+
   return $self;
 }
 

@@ -683,8 +683,8 @@ implements the following new ones.
 
 Access request cookie values and create new response cookies.
 
-  # Extract value from request cookie
-  my $foo = $c->cookie('foo')->value;
+  # Create response cookie with domain
+  $c->cookie(name => 'sebastian', {domain => 'mojolicio.us'});
 
 =head2 C<finish>
 
@@ -942,6 +942,9 @@ that cookies are generally limited to 4096 bytes of data.
   $c->session->{foo} = 'bar';
   my $foo = $c->session->{foo};
   delete $c->session->{foo};
+
+  # Delete whole session
+  $c->session(expires => 1);
 
 =head2 C<signed_cookie>
 

@@ -662,7 +662,9 @@ into a temporary file.
 
   use Mojolicious::Lite;
 
-  any '/upload' => sub {
+  get '/' => 'form';
+
+  post '/upload' => sub {
     my $self = shift;
 
     # Check file size
@@ -680,13 +682,12 @@ into a temporary file.
   app->start;
   __DATA__
 
-  @@ upload.html.ep
+  @@ form.html.ep
   <!DOCTYPE html>
   <html>
     <head><title>Upload</title></head>
     <body>
-      % my @attrs = (method => 'POST', enctype => 'multipart/form-data');
-      %= form_for upload => @attrs => begin
+      %= form_for upload => (enctype => 'multipart/form-data') => begin
         %= file_field 'example'
         %= submit_button 'Upload'
       % end

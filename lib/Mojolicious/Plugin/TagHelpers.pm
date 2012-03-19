@@ -36,10 +36,21 @@ sub register {
       my $c   = shift;
       my @url = (shift);
 
+      # POST detection
+      my @post;
+      if (my $r = $c->app->routes->find(@url)) {
+        my %methods = (GET => 1, POST => 1);
+        do {
+          my @via = @{$r->via || []};
+          %methods = map { $_ => 1 } grep { $methods{$_} } @via if @via;
+        } while $r = $r->parent;
+        @post = (method => 'POST') if $methods{POST} && !$methods{GET};
+      }
+
       # Captures
       push @url, shift if ref $_[0] eq 'HASH';
 
-      return $self->_tag('form', action => $c->url_for(@url), @_);
+      return $self->_tag('form', action => $c->url_for(@url), @post, @_);
     }
   );
 
@@ -407,7 +418,8 @@ Generate file input element.
     %= submit_button
   % end
 
-Generate form for route, path or URL.
+Generate form for route, path or URL. For routes that allow the C<POST>
+method but not C<GET>, a C<method> attribute will be automatically added.
 
   <form action="/path/to/login" method="post">
     <input name="first_name" />

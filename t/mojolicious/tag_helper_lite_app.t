@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
 }
 
-use Test::More tests => 63;
+use Test::More tests => 72;
 
 # "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
@@ -17,14 +17,14 @@ use Test::Mojo;
 # OPTIONS /tags
 options 'tags';
 
-# GET /more_tags
-get 'more_tags';
+# PATCH /more_tags
+patch 'more_tags';
 
 # GET /small_tags
 get 'small_tags';
 
-# GET /links
-get 'links';
+# GET|POST /links
+any [qw/GET POST/] => 'links';
 
 # GET /script
 get 'script';
@@ -44,8 +44,11 @@ get 'form/:test' => 'form';
 # PUT /selection
 put 'selection';
 
-# PATCH /☃
-patch '/☃' => 'snowman';
+# PATCH|POST /☃
+any [qw/PATCH POST/] => '/☃' => 'snowman';
+
+# POST /no_snowman
+post '/no_snowman';
 
 my $t = Test::Mojo->new;
 
@@ -56,8 +59,8 @@ $t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo one="t&lt;wo" three="four">Hello</foo>
 EOF
 
-# GET /more_tags
-$t->get_ok('/more_tags')->status_is(200)->content_is(<<EOF);
+# PATCH /more_tags
+$t->patch_ok('/more_tags')->status_is(200)->content_is(<<EOF);
 <bar>b&lt;a&gt;z</bar>
 <bar>0</bar>
 <bar class="test">0</bar>
@@ -76,6 +79,15 @@ EOF
 
 # GET /links
 $t->get_ok('/links')->status_is(200)->content_is(<<EOF);
+<a href="/path">Pa&lt;th</a>
+<a href="http://example.com/" title="Foo">Foo</a>
+<a href="http://example.com/"><foo>Example</foo></a>
+<a href="/links">Home</a>
+<a href="/form/23" title="Foo">Foo</a>
+EOF
+
+# POST /links
+$t->post_ok('/links')->status_is(200)->content_is(<<EOF);
 <a href="/path">Pa&lt;th</a>
 <a href="http://example.com/" title="Foo">Foo</a>
 <a href="http://example.com/"><foo>Example</foo></a>
@@ -325,16 +337,16 @@ $t->put_ok('/selection?preselect=1')->status_is(200)
     . "\n");
 
 # PATCH /☃
-$t->patch_ok('/☃')->status_is(200)->content_is(<<'EOF');
-<form action="/%E2%98%83">
+$t->post_ok('/☃')->status_is(200)->content_is(<<'EOF');
+<form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo">b&lt;a&gt;r</textarea>
   <input type="submit" value="☃" />
 </form>
 EOF
 
-# PATCH /☃ (form value)
-$t->patch_ok('/☃?foo=ba<z')->status_is(200)->content_is(<<'EOF');
-<form action="/%E2%98%83">
+# POST /☃ (form value)
+$t->post_ok('/☃?foo=ba<z')->status_is(200)->content_is(<<'EOF');
+<form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo">ba&lt;z</textarea>
   <input type="submit" value="☃" />
 </form>
@@ -342,9 +354,23 @@ EOF
 
 # PATCH /☃ (empty form value)
 $t->patch_ok('/☃?foo=')->status_is(200)->content_is(<<'EOF');
-<form action="/%E2%98%83">
+<form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo"></textarea>
   <input type="submit" value="☃" />
+</form>
+EOF
+
+# POST /no_snowman (POST form)
+$t->post_ok('/no_snowman')->status_is(200)->content_is(<<'EOF');
+<form action="/%E2%98%83" method="POST">
+  <input type="submit" value="whatever" />
+</form>
+EOF
+
+# POST /no_snowman (PATCH form)
+$t->post_ok('/no_snowman?foo=1')->status_is(200)->content_is(<<'EOF');
+<form action="/%E2%98%83" method="PATCH">
+  <input type="submit" value="whatever" />
 </form>
 EOF
 
@@ -450,4 +476,10 @@ __DATA__
 %= form_for snowman => begin
   %= text_area foo => 'b<a>r', cols => 40
   %= submit_button '☃'
+%= end
+
+@@ no_snowman.html.ep
+% my @attrs = param('foo') ? (method => 'PATCH') : ();
+%= form_for 'snowman', @attrs => begin
+  %= submit_button 'whatever'
 %= end

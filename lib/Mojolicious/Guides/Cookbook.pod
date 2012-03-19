@@ -585,8 +585,7 @@ which can be combined to solve some of hardest problems in web development.
   <html>
     <head><title>Streaming multipart upload</title></head>
     <body>
-      % my @attrs = (method => 'POST', enctype => 'multipart/form-data');
-      %= form_for upload => @attrs => begin
+      %= form_for upload => (enctype => 'multipart/form-data') => begin
         %= file_field 'example'
         %= submit_button 'Upload'
       % end

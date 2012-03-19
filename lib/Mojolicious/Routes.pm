@@ -200,17 +200,15 @@ sub render {
   $path = $prefix . $path unless $prefix eq '/';
 
   # Make sure there is always a root
-  $path = '/' if !$path && !$self->parent;
+  my $parent = $self->parent;
+  $path = '/' if !$path && !$parent;
 
   # Format
-  if ((my $format = $values->{format}) && !$self->parent) {
+  if ((my $format = $values->{format}) && !$parent) {
     $path .= ".$format" unless $path =~ m#\.[^/]+$#;
   }
 
-  # Parent
-  $path = $self->parent->render($path, $values) if $self->parent;
-
-  return $path;
+  return $parent ? $parent->render($path, $values) : $path;
 }
 
 sub route {
@@ -669,8 +667,8 @@ Add a new shortcut for this route.
 
 =head2 C<any>
 
-  my $route = $route->any('/:foo' => sub {...});
-  my $route = $route->any(['GET', 'POST'] => '/:foo' => sub {...});
+  my $route = $r->any('/:foo' => sub {...});
+  my $route = $r->any(['GET', 'POST'] => '/:foo' => sub {...});
 
 Generate route matching any of the listed HTTP request methods or all. See
 also the L<Mojolicious::Lite> tutorial for more argument variations.
@@ -690,7 +688,7 @@ Add a new bridge to this route as a nested child.
 
 =head2 C<delete>
 
-  my $route = $route->delete('/:foo' => sub {...});
+  my $route = $r->delete('/:foo' => sub {...});
 
 Generate route matching only C<DELETE> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -720,7 +718,7 @@ Match routes and dispatch.
 
 =head2 C<get>
 
-  my $route = $route->get('/:foo' => sub {...});
+  my $route = $r->get('/:foo' => sub {...});
 
 Generate route matching only C<GET> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -772,7 +770,7 @@ the current route.
 
 =head2 C<options>
 
-  my $route = $route->options('/:foo' => sub {...});
+  my $route = $r->options('/:foo' => sub {...});
 
 Generate route matching only C<OPTIONS> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -791,21 +789,21 @@ Parse a pattern.
 
 =head2 C<patch>
 
-  my $route = $route->patch('/:foo' => sub {...});
+  my $route = $r->patch('/:foo' => sub {...});
 
 Generate route matching only C<PATCH> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<post>
 
-  my $route = $route->post('/:foo' => sub {...});
+  my $route = $r->post('/:foo' => sub {...});
 
 Generate route matching only C<POST> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<put>
 
-  my $route = $route->put('/:foo' => sub {...});
+  my $route = $r->put('/:foo' => sub {...});
 
 Generate route matching only C<PUT> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.

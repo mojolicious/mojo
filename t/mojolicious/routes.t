@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 349;
+use Test::More tests => 353;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -8,7 +8,7 @@ use Mojolicious::Routes::Match;
 
 # /clean
 my $r = Mojolicious::Routes->new;
-$r->route('/clean')->to(clean => 1);
+$r->route('/clean')->to(clean => 1)->name('very_clean');
 
 # /clean/too
 $r->route('/clean/too')->to(something => 1);
@@ -200,6 +200,14 @@ is $m->stack->[0]->{clean},     undef, 'no value';
 is $m->stack->[0]->{something}, 1,     'right value';
 is $m->path_for, '/clean/too', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
+
+# Introspect
+is $r->find('very_clean')->to_string, '/clean', 'right pattern';
+is $r->find('0')->to_string,          '/0',     'right pattern';
+is $r->find('test_edit')->to_string, '/:controller/test/edit',
+  'right pattern';
+is $r->find('articles_delete')->to_string, '/articles/:id/delete',
+  'right pattern';
 
 # Null route
 $m = Mojolicious::Routes::Match->new(GET => '/0')->match($r);

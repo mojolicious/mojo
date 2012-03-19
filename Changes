@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added find method to Mojolicious::Routes.
         - Improved Mojolicious::Renderer performance.
         - Improved documentation.
+        - Improved tests.
         - Fixed bug that slowed down Mojolicious::Renderer.
         - Fixed small newline capture bug in Mojolicious::Routes::Match.
 

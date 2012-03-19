@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 279;
+use Test::More tests => 280;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -23,6 +23,8 @@ use Test::Mojo;
 my $t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available
+is $t->app->routes->find('something')->to_string, '/test4/:something',
+  'right pattern';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
 

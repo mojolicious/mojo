@@ -739,7 +739,7 @@ Match routes and dispatch.
 
 =head2 C<find>
 
-  my $foo = $r->find('foo');
+  my $route = $r->find('foo');
 
 Find child route by name, custom names have precedence over automatically
 generated ones.
@@ -838,8 +838,8 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<render>
 
-  my $path = $r->render($path);
-  my $path = $r->render($path, {foo => 'bar'});
+  my $path = $r->render($suffix);
+  my $path = $r->render($suffix, {foo => 'bar'});
 
 Render route with parameters into a path.
 

@@ -138,7 +138,7 @@ sub path_for {
   }
 
   # Find endpoint
-  else { return $name unless $endpoint = $self->route_for($name) }
+  else { return $name unless $endpoint = $self->root->find($name) }
 
   # Merge values
   my $captures = $self->captures;
@@ -154,28 +154,6 @@ sub path_for {
   my $path = $endpoint->render('', $values);
   utf8::downgrade $path, 1;
   return wantarray ? ($path, $endpoint->has_websocket) : $path;
-}
-
-sub route_for {
-  my ($self, $name) = @_;
-
-  # Check all children
-  return unless my $root = $self->root;
-  my @children = (@{$root->children});
-  my $candidate;
-  while (my $child = shift @children) {
-
-    # Match
-    if ($child->name eq $name) {
-      $candidate = $child;
-      return $candidate if $child->has_custom_name;
-    }
-
-    # Search children too
-    push @children, @{$child->children};
-  }
-
-  return $candidate;
 }
 
 1;
@@ -271,13 +249,6 @@ Match against a routes tree.
   my ($path, $ws) = $m->path_for('named', {foo => 'bar'});
 
 Render matching route with parameters into path.
-
-=head2 C<route_for>
-
-  my $foo = $m->route_for('foo');
-
-Find route by name, custom names have precedence over automatically generated
-ones.
 
 =head1 SEE ALSO
 

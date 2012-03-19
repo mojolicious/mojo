@@ -122,6 +122,27 @@ sub dispatch {
   return 1;
 }
 
+sub find {
+  my ($self, $name) = @_;
+
+  # Check all children
+  my @children = (@{$self->children});
+  my $candidate;
+  while (my $child = shift @children) {
+
+    # Match
+    if ($child->name eq $name) {
+      $candidate = $child;
+      return $candidate if $child->has_custom_name;
+    }
+
+    # Search children too
+    push @children, @{$child->children};
+  }
+
+  return $candidate;
+}
+
 sub get { shift->_generate_route(GET => @_) }
 
 sub has_conditions {
@@ -716,6 +737,13 @@ application embedding.
 
 Match routes and dispatch.
 
+=head2 C<find>
+
+  my $foo = $r->find('foo');
+
+Find child route by name, custom names have precedence over automatically
+generated ones.
+
 =head2 C<get>
 
   my $route = $r->get('/:foo' => sub {...});
@@ -733,7 +761,7 @@ Check if this route contains conditions.
 
   my $success = $r->has_custom_name;
 
-Check if this route has a custom user defined name.
+Check if this route has a custom name.
 
 =head2 C<has_websocket>
 

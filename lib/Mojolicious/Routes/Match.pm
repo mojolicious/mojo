@@ -160,7 +160,8 @@ sub route_for {
   my ($self, $name) = @_;
 
   # Check all children
-  my @children = (@{$self->root->children});
+  return unless my $root = $self->root;
+  my @children = (@{$root->children});
   my $candidate;
   while (my $child = shift @children) {
 
@@ -243,8 +244,8 @@ implements the following ones.
 
 =head2 C<new>
 
-  my $m = Mojolicious::Routes::Match->new(get => '/foo');
-  my $m = Mojolicious::Routes::Match->new(get => '/foo', $ws);
+  my $m = Mojolicious::Routes::Match->new(GET => '/foo');
+  my $m = Mojolicious::Routes::Match->new(GET => '/foo', $ws);
 
 Construct a new match object.
 

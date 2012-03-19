@@ -16,7 +16,7 @@ use Scalar::Util ();
 # "Scalpel... blood bucket... priest."
 has app => sub { Mojolicious->new };
 has match => sub {
-  Mojolicious::Routes::Match->new(get => '/')->root(shift->app->routes);
+  Mojolicious::Routes::Match->new(GET => '/')->root(shift->app->routes);
 };
 has tx => sub { Mojo::Transaction::HTTP->new };
 

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 349;
+use Test::More tests => 352;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -188,6 +188,13 @@ $r->route('/regex/alternatives/:alternatives',
 # /versioned/2.0/test.xml
 $r->route('/versioned')->route('/2.0')->to(controller => 'foo')
   ->route('/test')->to(action => 'bar');
+
+# Empty match
+ok !Mojolicious::Routes::Match->new(GET => '/')->path_for, 'no result';
+is(Mojolicious::Routes::Match->new(GET => '/')->path_for('foo'),
+  'foo', 'right result');
+ok !Mojolicious::Routes::Match->new(GET => '/')->route_for('foo'),
+  'no result';
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(get => '/clean')->match($r);

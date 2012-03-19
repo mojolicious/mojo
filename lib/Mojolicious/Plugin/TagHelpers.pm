@@ -18,11 +18,7 @@ sub register {
   # Add "checkbox" helper
   $app->helper(
     check_box => sub {
-      $self->_input(
-        shift, shift,
-        value => shift,
-        @_, type => 'checkbox'
-      );
+      $self->_input(shift, shift, value => shift, @_, type => 'checkbox');
     }
   );
 
@@ -33,12 +29,12 @@ sub register {
   # Add "form_for" helper
   $app->helper(
     form_for => sub {
-      my $c   = shift;
-      my @url = (shift);
+      my ($c, @url) = (shift, shift);
+      push @url, shift if ref $_[0] eq 'HASH';
 
       # POST detection
       my @post;
-      if (my $r = $c->app->routes->find(@url)) {
+      if (my $r = $c->app->routes->find($url[0])) {
         my %methods = (GET => 1, POST => 1);
         do {
           my @via = @{$r->via || []};
@@ -46,9 +42,6 @@ sub register {
         } while $r = $r->parent;
         @post = (method => 'POST') if $methods{POST} && !$methods{GET};
       }
-
-      # Captures
-      push @url, shift if ref $_[0] eq 'HASH';
 
       return $self->_tag('form', action => $c->url_for(@url), @post, @_);
     }
@@ -88,8 +81,7 @@ sub register {
       }
 
       # Path
-      my $src;
-      $src = shift if @_ % 2;
+      my $src = @_ % 2 ? shift : undef;
 
       # Attributes
       my %attrs = @_;
@@ -272,8 +264,7 @@ sub _input {
   my %attrs;
   if (@_ % 2) {
     my $value = shift;
-    %attrs = @_;
-    $attrs{value} = $value;
+    %attrs = (@_, value => $value);
   }
 
   # Even
@@ -324,9 +315,7 @@ sub _tag {
 
   # Block
   if ($cb || defined $content) {
-    $tag .= '>';
-    $tag .= $cb ? $cb->() : $content;
-    $tag .= "</$name>";
+    $tag .= '>' . ($cb ? $cb->() : $content) . "</$name>";
   }
 
   # Empty element

@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'production';
 }
 
-use Test::More tests => 65;
+use Test::More tests => 67;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -20,6 +20,12 @@ my $t = Test::Mojo->new('MojoliciousTest');
 # Application is already available
 is $t->app->routes->find('something')->to_string, '/test4/:something',
   'right pattern';
+is $t->app->routes->find('test3')->pattern->defaults->{namespace},
+  'MojoliciousTestController',
+  'right namespace';
+is $t->app->routes->find('authenticated')->pattern->defaults->{controller},
+  'foo',
+  'right controller';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
 

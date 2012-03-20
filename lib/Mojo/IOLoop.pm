@@ -328,9 +328,8 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
     $loop->drop($id);
   });
 
-  # Start and stop loop
-  Mojo::IOLoop->start;
-  Mojo::IOLoop->stop;
+  # Start loop if necessary
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head1 DESCRIPTION
 

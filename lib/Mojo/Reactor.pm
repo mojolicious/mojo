@@ -152,16 +152,15 @@ Mojo::Reactor - Minimalistic low level event reactor
     say 'Timeout!';
   });
 
-  # Start and stop reactor
-  $reactor->start;
-  $reactor->stop;
+  # Start reactor if necessary
+  $reactor->start unless $reactor->is_running;
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor> is a minimalistic low level event reactor and the foundation
-of L<Mojo::IOLoop>. L<Mojo::Reactor::EV> is a good example for its
-extensibility. Note that this module is EXPERIMENTAL and might change without
-warning!
+L<Mojo::Reactor> is a minimalistic low level event reactor based on
+L<IO::Poll> and the foundation of L<Mojo::IOLoop>. L<Mojo::Reactor::EV> is a
+good example for its extensibility. Note that this module is EXPERIMENTAL and
+might change without warning!
 
 =head1 EVENTS
 
@@ -206,6 +205,12 @@ Drop handle or timer.
 
 Watch handle for I/O events, invoking the callback whenever handle becomes
 readable or writable.
+
+  # Callback will be invoked twice if handle becomes readable and writable
+  $reactor->io($handle => sub {
+    my ($reactor, $handle, $writable) = @_;
+    say $writable ? 'Handle is writable' : 'Handle is readable';
+  });
 
 =head2 C<is_readable>
 

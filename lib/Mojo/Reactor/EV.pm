@@ -76,7 +76,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Reactor::EV - Minimalistic low level event reactor with EV support
+Mojo::Reactor::EV - Minimalistic low level event reactor with libev support
 
 =head1 SYNOPSIS
 

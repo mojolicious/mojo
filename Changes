@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.64    2012-03-21 00:00:00
+        - Improved documentation.
+
 2.63    2012-03-20 00:00:00
         - Renamed Mojo::IOWatcher to Mojo::Reactor.
         - Added Mojolicious::Routes::Route.

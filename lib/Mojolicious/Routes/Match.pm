@@ -28,7 +28,6 @@ sub new {
 # "Life can be hilariously cruel."
 sub match {
   my ($self, $r, $c) = @_;
-  return unless $r;
 
   # Match
   $self->root($r) unless $self->root;
@@ -46,7 +45,7 @@ sub match {
 
   # Conditions
   my $conditions = $r->conditions;
-  my $dictionary = $self->{dictionary} ||= $r->dictionary;
+  my $dictionary = $r->dictionary;
   for (my $i = 0; $i < @$conditions; $i += 2) {
     return unless my $condition = $dictionary->{$conditions->[$i]};
     return if !$condition->($r, $c, $captures, $conditions->[$i + 1]);

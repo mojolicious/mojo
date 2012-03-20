@@ -6,8 +6,6 @@ use Mojo::Loader;
 use Mojo::Util 'md5_sum';
 use Time::HiRes qw/time usleep/;
 
-use constant DEBUG => $ENV{MOJO_REACTOR_DEBUG} || 0;
-
 # "I don't know.
 #  Can I really betray my country?
 #  I say the Pledge of Allegiance every day.
@@ -104,7 +102,6 @@ sub _one_tick {
     my $t = $timers->{$id};
     my $after = $t->{after} || 0;
     if ($after <= time - ($t->{started} || $t->{recurring} || 0)) {
-      warn "TIMER $id\n" if DEBUG;
 
       # Normal timer
       if ($t->{started}) { $self->drop($id) }
@@ -268,13 +265,6 @@ Change I/O events to watch handle for.
 
   # Pause watching for events
   $reactor->watch($handle, 0, 0);
-
-=head1 DEBUGGING
-
-You can set the C<MOJO_REACTOR_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
-
-  MOJO_REACTOR_DEBUG=1
 
 =head1 SEE ALSO
 

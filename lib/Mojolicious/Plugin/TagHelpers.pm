@@ -344,10 +344,11 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 
 L<Mojolicious::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
 L<Mojolicious>. This is a core plugin, that means it is always enabled and
-its code a good example for learning to build new plugins.
+its code a good example for learning how to build new plugins.
 
 Most form helpers can automatically pick up previous input values and will
-show them as default. You can also use C<param> to set them manually and let
+show them as default. You can also use
+L<Mojolicious::Plugin::DefaultHelpers/"param"> to set them manually and let
 necessary attributes always be generated automatically.
 
   % param country => 'germany' unless param 'country';
@@ -390,19 +391,19 @@ Generate file input element.
 
 =head2 C<form_for>
 
-  %= form_for login => (method => 'post') => begin
+  %= form_for login => (method => 'POST') => begin
     %= text_field 'first_name'
     %= submit_button
   % end
-  %= form_for login => {foo => 'bar'} => (method => 'post') => begin
+  %= form_for login => {foo => 'bar'} => (method => 'POST') => begin
     %= text_field 'first_name'
     %= submit_button
   % end
-  %= form_for '/login' => (method => 'post') => begin
+  %= form_for '/login' => (method => 'POST') => begin
     %= text_field 'first_name'
     %= submit_button
   % end
-  %= form_for 'http://kraih.com/login' => (method => 'post') => begin
+  %= form_for 'http://kraih.com/login' => (method => 'POST') => begin
     %= text_field 'first_name'
     %= submit_button
   % end
@@ -410,19 +411,19 @@ Generate file input element.
 Generate form for route, path or URL. For routes that allow C<POST> but not
 C<GET>, a C<method> attribute will be automatically added.
 
-  <form action="/path/to/login" method="post">
+  <form action="/path/to/login" method="POST">
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
-  <form action="/path/to/login/bar" method="post">
+  <form action="/path/to/login/bar" method="POST">
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
-  <form action="/login" method="post">
+  <form action="/login" method="POST">
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
-  <form action="http://kraih.com/login" method="post">
+  <form action="http://kraih.com/login" method="POST">
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>

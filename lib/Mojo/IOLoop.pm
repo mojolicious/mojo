@@ -463,7 +463,7 @@ might change without warning!
   my $delay = $loop->delay(sub {...});
 
 Get L<Mojo::IOLoop::Delay> object to synchronize events and subscribe to
-C<finish> event if optional callback is provided.
+event L<Mojo::IOLoop::Delay/"finish"> if optional callback is provided.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });

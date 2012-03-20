@@ -27,8 +27,7 @@ sub drop {
 sub io {
   my ($self, $handle, $cb) = @_;
   $self->{handles}->{fileno $handle} = {handle => $handle, cb => $cb};
-  $self->watch($handle, 1, 1);
-  return $self;
+  return $self->watch($handle, 1, 1);
 }
 
 sub is_readable {

@@ -2,8 +2,8 @@ use Mojo::Base -strict;
 
 # Disable libev and TLS
 BEGIN {
-  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
-  $ENV{MOJO_NO_TLS}    = 1;
+  $ENV{MOJO_NO_TLS}  = 1;
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor';
 }
 
 use Test::More;

@@ -18,9 +18,9 @@ use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 # "It's like my dad always said: eventually, everybody gets shot."
-has iowatcher => sub {
+has reactor => sub {
   require Mojo::IOLoop;
-  Mojo::IOLoop->singleton->iowatcher;
+  Mojo::IOLoop->singleton->reactor;
 };
 
 sub DESTROY { shift->_cleanup }
@@ -32,16 +32,15 @@ sub connect {
   $args->{address} ||= '127.0.0.1';
   $args->{address} = '127.0.0.1' if $args->{address} eq 'localhost';
   weaken $self;
-  $self->{delay} =
-    $self->iowatcher->timer(0 => sub { $self->_connect($args) });
+  $self->{delay} = $self->reactor->timer(0 => sub { $self->_connect($args) });
 }
 
 sub _cleanup {
   my $self = shift;
-  return unless my $watcher = $self->{iowatcher};
-  $watcher->drop(delete $self->{delay})  if $self->{delay};
-  $watcher->drop(delete $self->{timer})  if $self->{timer};
-  $watcher->drop(delete $self->{handle}) if $self->{handle};
+  return unless my $reactor = $self->{reactor};
+  $reactor->drop(delete $self->{delay})  if $self->{delay};
+  $reactor->drop(delete $self->{timer})  if $self->{timer};
+  $reactor->drop(delete $self->{handle}) if $self->{handle};
 }
 
 sub _connect {
@@ -49,7 +48,7 @@ sub _connect {
 
   # New socket
   my $handle;
-  my $watcher = $self->iowatcher;
+  my $reactor = $self->reactor;
   unless ($handle = $args->{handle}) {
     my %options = (
       Blocking => 0,
@@ -64,7 +63,7 @@ sub _connect {
       unless $handle = $class->new(%options);
 
     # Timer
-    $self->{timer} = $watcher->timer($args->{timeout} || 10,
+    $self->{timer} = $reactor->timer($args->{timeout} || 10,
       sub { $self->emit_safe(error => 'Connect timeout.') });
 
     # IPv6 needs an early start
@@ -104,7 +103,7 @@ sub _connect {
 
   # Wait for handle to become writable
   $self->{handle} = $handle;
-  $watcher->io($handle => sub { $self->_connecting })->watch($handle, 0, 1);
+  $reactor->io($handle => sub { $self->_connecting })->watch($handle, 0, 1);
 }
 
 # "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
@@ -114,11 +113,11 @@ sub _connecting {
 
   # Switch between reading and writing
   my $handle  = $self->{handle};
-  my $watcher = $self->iowatcher;
+  my $reactor = $self->reactor;
   if ($self->{tls} && !$handle->connect_SSL) {
     my $err = $IO::Socket::SSL::SSL_ERROR;
-    if    ($err == TLS_READ)  { $watcher->watch($handle, 1, 0) }
-    elsif ($err == TLS_WRITE) { $watcher->watch($handle, 1, 1) }
+    if    ($err == TLS_READ)  { $reactor->watch($handle, 1, 0) }
+    elsif ($err == TLS_WRITE) { $reactor->watch($handle, 1, 1) }
     return;
   }
 
@@ -185,12 +184,12 @@ Emitted safely if an error happens on the connection.
 
 L<Mojo::IOLoop::Client> implements the following attributes.
 
-=head2 C<iowatcher>
+=head2 C<reactor>
 
-  my $watcher = $client->iowatcher;
-  $client     = $client->iowatcher(Mojo::IOWatcher->new);
+  my $reactor = $client->reactor;
+  $client     = $client->reactor(Mojo::Reactor->new);
 
-Low level event watcher, defaults to the C<iowatcher> attribute value of the
+Low level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.
 
 =head1 METHODS

@@ -65,10 +65,10 @@ AnqxHi90n/p912ynLg2SjBq+03GaECeGzC/QqKK2gtA=
 -----END RSA PRIVATE KEY-----
 EOF
 
-has accepts   => 10;
-has iowatcher => sub {
+has accepts => 10;
+has reactor => sub {
   require Mojo::IOLoop;
-  Mojo::IOLoop->singleton->iowatcher;
+  Mojo::IOLoop->singleton->reactor;
 };
 
 # "Your guilty consciences may make you vote Democratic, but secretly you all
@@ -78,9 +78,9 @@ sub DESTROY {
   my $self = shift;
   if (my $port = $self->{port}) { $ENV{MOJO_REUSE} =~ s/(?:^|\,)$port\:\d+// }
   defined $_ and -w $_ and unlink $_ for $self->{cert}, $self->{key};
-  return unless my $watcher = $self->{iowatcher};
+  return unless my $reactor = $self->{reactor};
   $self->stop if $self->{handle};
-  $watcher->drop($_) for values %{$self->{handles}};
+  $reactor->drop($_) for values %{$self->{handles}};
 }
 
 # "And I gave that man directions, even though I didn't know the way,
@@ -155,13 +155,13 @@ sub generate_port {
 sub start {
   my $self = shift;
   weaken $self;
-  $self->iowatcher->io(
+  $self->reactor->io(
     $self->{handle} => sub { $self->_accept for 1 .. $self->accepts });
 }
 
 sub stop {
   my $self = shift;
-  $self->iowatcher->drop($self->{handle});
+  $self->reactor->drop($self->{handle});
 }
 
 sub _accept {
@@ -179,11 +179,11 @@ sub _accept {
   weaken $self;
   $tls->{SSL_error_trap} = sub {
     return unless my $handle = delete $self->{handles}->{shift()};
-    $self->iowatcher->drop($handle);
+    $self->reactor->drop($handle);
     close $handle;
   };
   return unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
-  $self->iowatcher->io($handle => sub { $self->_tls($handle) });
+  $self->reactor->io($handle => sub { $self->_tls($handle) });
   $self->{handles}->{$handle} = $handle;
 }
 
@@ -210,15 +210,15 @@ sub _tls {
 
   # Accepted
   if ($handle->accept_SSL) {
-    $self->iowatcher->drop($handle);
+    $self->reactor->drop($handle);
     delete $self->{handles}->{$handle};
     return $self->emit_safe(accept => $handle);
   }
 
   # Switch between reading and writing
   my $err = $IO::Socket::SSL::SSL_ERROR;
-  if    ($err == TLS_READ)  { $self->iowatcher->watch($handle, 1, 0) }
-  elsif ($err == TLS_WRITE) { $self->iowatcher->watch($handle, 1, 1) }
+  if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
+  elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
 }
 
 1;
@@ -273,12 +273,12 @@ L<Mojo::IOLoop::Server> implements the following attributes.
 
 Number of connections to accept at once, defaults to C<10>.
 
-=head2 C<iowatcher>
+=head2 C<reactor>
 
-  my $watcher = $server->iowatcher;
-  $server     = $server->iowatcher(Mojo::IOWatcher->new);
+  my $reactor = $server->reactor;
+  $server     = $server->reactor(Mojo::Reactor->new);
 
-Low level event watcher, defaults to the C<iowatcher> attribute value of the
+Low level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.
 
 =head1 METHODS

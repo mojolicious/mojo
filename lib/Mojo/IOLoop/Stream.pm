@@ -7,9 +7,9 @@ use Time::HiRes 'time';
 
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
-has iowatcher => sub {
+has reactor => sub {
   require Mojo::IOLoop;
-  Mojo::IOLoop->singleton->iowatcher;
+  Mojo::IOLoop->singleton->reactor;
 };
 has timeout => 15;
 
@@ -25,10 +25,10 @@ sub close {
   my $self = shift;
 
   # Cleanup
-  return unless my $watcher = $self->{iowatcher};
-  $watcher->drop(delete $self->{timer}) if $self->{timer};
+  return unless my $reactor = $self->{reactor};
+  $reactor->drop(delete $self->{timer}) if $self->{timer};
   return unless my $handle = delete $self->{handle};
-  $watcher->drop($handle);
+  $reactor->drop($handle);
 
   # Close
   close $handle;
@@ -40,7 +40,7 @@ sub handle { shift->{handle} }
 sub is_readable {
   my $self = shift;
   $self->{active} = time;
-  return $self->{handle} && $self->iowatcher->is_readable($self->{handle});
+  return $self->{handle} && $self->reactor->is_readable($self->{handle});
 }
 
 sub is_writing {
@@ -53,9 +53,9 @@ sub start {
   my $self = shift;
 
   # Timeout
-  my $watcher = $self->iowatcher;
+  my $reactor = $self->reactor;
   weaken $self;
-  $self->{timer} ||= $watcher->recurring(
+  $self->{timer} ||= $reactor->recurring(
     '0.025' => sub {
       return unless $self && (my $t = $self->timeout);
       $self->emit_safe('timeout')->close if (time - ($self->{active})) >= $t;
@@ -64,25 +64,25 @@ sub start {
 
   # Start streaming
   my $handle = $self->{handle};
-  return $watcher->io($handle => sub { pop() ? $self->_write : $self->_read })
+  return $reactor->io($handle => sub { pop() ? $self->_write : $self->_read })
     unless $self->{streaming}++;
 
   # Resume streaming
   return unless delete $self->{paused};
-  $watcher->watch($handle, 1, $self->is_writing);
+  $reactor->watch($handle, 1, $self->is_writing);
 }
 
 sub stop {
   my $self = shift;
   return if $self->{paused}++;
-  $self->iowatcher->watch($self->{handle}, 0, $self->is_writing);
+  $self->reactor->watch($self->{handle}, 0, $self->is_writing);
 }
 
 # "No children have ever meddled with the Republican Party and lived to tell
 #  about it."
 sub steal_handle {
   my $self = shift;
-  $self->iowatcher->drop($self->{handle});
+  $self->reactor->drop($self->{handle});
   return delete $self->{handle};
 }
 
@@ -97,7 +97,7 @@ sub write {
   else     { return unless length $self->{buffer} }
 
   # Start writing
-  $self->iowatcher->watch($self->{handle}, !$self->{paused}, 1)
+  $self->reactor->watch($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};
 }
 
@@ -161,7 +161,7 @@ sub _write {
 
   # Stop writing
   return if $self->is_writing;
-  $self->iowatcher->watch($handle, !$self->{paused}, 0);
+  $self->reactor->watch($handle, !$self->{paused}, 0);
 }
 
 1;
@@ -263,12 +263,12 @@ Emitted safely if new data has been written to the stream.
 
 L<Mojo::IOLoop::Stream> implements the following attributes.
 
-=head2 C<iowatcher>
+=head2 C<reactor>
 
-  my $watcher = $stream->iowatcher;
-  $stream     = $stream->iowatcher(Mojo::IOWatcher->new);
+  my $reactor = $stream->reactor;
+  $stream     = $stream->reactor(Mojo::Reactor->new);
 
-Low level event watcher, defaults to the C<iowatcher> attribute value of the
+Low level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.
 
 =head2 C<timeout>

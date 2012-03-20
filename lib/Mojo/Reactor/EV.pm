@@ -1,5 +1,5 @@
-package Mojo::IOWatcher::EV;
-use Mojo::Base 'Mojo::IOWatcher';
+package Mojo::Reactor::EV;
+use Mojo::Base 'Mojo::Reactor';
 
 use EV 4.0;
 use Scalar::Util 'weaken';
@@ -8,8 +8,8 @@ my $EV;
 
 sub DESTROY { undef $EV }
 
-# We have to fall back to Mojo::IOWatcher, since EV is unique
-sub new { $EV++ ? Mojo::IOWatcher->new : shift->SUPER::new }
+# We have to fall back to Mojo::Reactor, since EV is unique
+sub new { $EV++ ? Mojo::Reactor->new : shift->SUPER::new }
 
 sub is_running {EV::depth}
 
@@ -76,71 +76,70 @@ __END__
 
 =head1 NAME
 
-Mojo::IOWatcher::EV - EV non-blocking I/O watcher
+Mojo::Reactor::EV - EV non-blocking I/O reactor
 
 =head1 SYNOPSIS
 
-  use Mojo::IOWatcher::EV;
+  use Mojo::Reactor::EV;
 
-  my $watcher = Mojo::IOWatcher::EV->new;
+  my $reactor = Mojo::Reactor::EV->new;
 
 =head1 DESCRIPTION
 
-L<Mojo::IOWatcher::EV> is a minimalistic non-blocking I/O watcher with
-C<libev> support. Note that this module is EXPERIMENTAL and might change
-without warning!
+L<Mojo::Reactor::EV> is a minimalistic non-blocking I/O reactor with C<libev>
+support. Note that this module is EXPERIMENTAL and might change without warning!
 
 =head1 EVENTS
 
-L<Mojo::IOWatcher::EV> inherits all events from L<Mojo::IOWatcher>.
+L<Mojo::Reactor::EV> inherits all events from L<Mojo::Reactor>.
 
 =head1 METHODS
 
-L<Mojo::IOWatcher::EV> inherits all methods from L<Mojo::IOWatcher> and
+L<Mojo::Reactor::EV> inherits all methods from L<Mojo::Reactor> and
 implements the following new ones.
 
 =head2 C<new>
 
-  my $watcher = Mojo::IOWatcher::EV->new;
+  my $reactor = Mojo::Reactor::EV->new;
 
-Construct a new L<Mojo::IOWatcher::EV> object.
+Construct a new L<Mojo::Reactor::EV> object.
 
 =head2 C<is_running>
 
-  my $success = $watcher->is_running;
+  my $success = $reactor->is_running;
 
-Check if watcher is running.
+Check if reactor is running.
 
 =head2 C<recurring>
 
-  my $id = $watcher->recurring(3 => sub {...});
+  my $id = $reactor->recurring(3 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
 
 =head2 C<start>
 
-  $watcher->start;
+  $reactor->start;
 
 Start watching for I/O and timer events, this will block until C<stop> is
 called or no events are being watched anymore.
 
 =head2 C<stop>
 
-  $watcher->stop;
+  $reactor->stop;
 
 Stop watching for I/O and timer events.
 
 =head2 C<timer>
 
-  my $id = $watcher->timer(3 => sub {...});
+  my $id = $reactor->timer(3 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds.
 
 =head2 C<watch>
 
-  $watcher = $watcher->watch($handle, $read, $write);
+  $reactor = $reactor->watch($handle, $read, $write);
 
 Change I/O events to watch handle for.
 

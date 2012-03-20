@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable Bonjour, IPv6 and libev
 BEGIN {
   $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
-  $ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher';
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor';
 }
 
 use Test::More tests => 30;
@@ -18,19 +18,19 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 
-# Custom watcher
-package MyWatcher;
-use Mojo::Base 'Mojo::IOWatcher';
+# Custom reactor
+package MyReactor;
+use Mojo::Base 'Mojo::Reactor';
 
 package main;
 
-# Watcher detection
-$ENV{MOJO_IOWATCHER} = 'MyWatcherDoesNotExist';
+# Reactor detection
+$ENV{MOJO_REACTOR} = 'MyReactorDoesNotExist';
 my $loop = Mojo::IOLoop->new;
-is ref $loop->iowatcher, 'Mojo::IOWatcher', 'right class';
-$ENV{MOJO_IOWATCHER} = 'MyWatcher';
+is ref $loop->reactor, 'Mojo::Reactor', 'right class';
+$ENV{MOJO_REACTOR} = 'MyReactor';
 $loop = Mojo::IOLoop->new;
-is ref $loop->iowatcher, 'MyWatcher', 'right class';
+is ref $loop->reactor, 'MyReactor', 'right class';
 
 # Double start
 my $err;
@@ -276,19 +276,19 @@ is $loop->max_connections, 0, 'right value';
 
 # Defaults
 is(
-  Mojo::IOLoop::Client->new->iowatcher,
-  Mojo::IOLoop->singleton->iowatcher,
+  Mojo::IOLoop::Client->new->reactor,
+  Mojo::IOLoop->singleton->reactor,
   'right default'
 );
 is(Mojo::IOLoop::Delay->new->ioloop, Mojo::IOLoop->singleton,
   'right default');
 is(
-  Mojo::IOLoop::Server->new->iowatcher,
-  Mojo::IOLoop->singleton->iowatcher,
+  Mojo::IOLoop::Server->new->reactor,
+  Mojo::IOLoop->singleton->reactor,
   'right default'
 );
 is(
-  Mojo::IOLoop::Stream->new->iowatcher,
-  Mojo::IOLoop->singleton->iowatcher,
+  Mojo::IOLoop::Stream->new->reactor,
+  Mojo::IOLoop->singleton->reactor,
   'right default'
 );

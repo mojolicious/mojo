@@ -1,28 +1,27 @@
 use Mojo::Base -strict;
 
-# Disable Bonjour and IPv6
-BEGIN { $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1 }
+# Disable Bonjour, IPv6 and libev
+BEGIN {
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor';
+}
 
-use Test::More;
+use Test::More tests => 66;
 
-plan skip_all => 'set TEST_EV to enable this test (developer only!)'
-  unless $ENV{TEST_EV};
-plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 67;
-
-# "Oh well. At least we'll die doing what we love: inhaling molten rock."
+# "I don't mind being called a liar when I'm lying, or about to lie,
+#  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 use IO::Socket::INET;
+use Mojo::Reactor;
 
 # Instantiation
-use_ok 'Mojo::IOWatcher::EV';
-my $watcher = Mojo::IOWatcher::EV->new;
-is ref $watcher, 'Mojo::IOWatcher::EV', 'right object';
-is ref Mojo::IOWatcher::EV->new, 'Mojo::IOWatcher', 'right object';
-undef $watcher;
-is ref Mojo::IOWatcher::EV->new, 'Mojo::IOWatcher::EV', 'right object';
+my $reactor = Mojo::Reactor->new;
+is ref $reactor, 'Mojo::Reactor', 'right object';
+is ref Mojo::Reactor->new, 'Mojo::Reactor', 'right object';
+undef $reactor;
+is ref Mojo::Reactor->new, 'Mojo::Reactor', 'right object';
 use_ok 'Mojo::IOLoop';
-$watcher = Mojo::IOLoop->singleton->iowatcher;
-is ref $watcher, 'Mojo::IOWatcher::EV', 'right object';
+$reactor = Mojo::IOLoop->singleton->reactor;
+is ref $reactor, 'Mojo::Reactor', 'right object';
 
 # Make sure it stops automatically when not watching for events
 Mojo::IOLoop->start;
@@ -36,162 +35,161 @@ my $listen = IO::Socket::INET->new(
   Proto     => 'tcp'
 );
 my ($readable, $writable);
-$watcher->io($listen => sub { pop() ? $writable++ : $readable++ })
+$reactor->io($listen => sub { pop() ? $writable++ : $readable++ })
   ->watch($listen, 0, 0)->watch($listen, 1, 1);
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable, undef, 'handle is not readable';
 is $writable, undef, 'handle is not writable';
-ok !$watcher->is_readable($listen), 'handle is not readable';
+ok !$reactor->is_readable($listen), 'handle is not readable';
 
 # Connect
 my $client =
   IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
-$watcher->timer(1 => sub { shift->stop });
-$watcher->start;
+$reactor->timer(1 => sub { shift->stop });
+$reactor->start;
 ok $readable, 'handle is readable';
 ok !$writable, 'handle is not writable';
-ok $watcher->is_readable($listen), 'handle is readable';
+ok $reactor->is_readable($listen), 'handle is readable';
 
 # Accept
 my $server = $listen->accept;
-$watcher->drop($listen);
+$reactor->drop($listen);
 ($readable, $writable) = undef;
-$watcher->io($client => sub { pop() ? $writable++ : $readable++ });
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->io($client => sub { pop() ? $writable++ : $readable++ });
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable, undef, 'handle is not readable';
 is $writable, 1,     'handle is writable';
 print $client "hello!\n";
 sleep 1;
-$watcher->drop($client);
+$reactor->drop($client);
 ($readable, $writable) = undef;
-$watcher->io($server => sub { pop() ? $writable++ : $readable++ });
-$watcher->watch($server, 1, 0);
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->io($server => sub { pop() ? $writable++ : $readable++ });
+$reactor->watch($server, 1, 0);
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable, 1,     'handle is readable';
 is $writable, undef, 'handle is not writable';
-$watcher->watch($server, 1, 1);
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->watch($server, 1, 1);
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable, 2, 'handle is readable';
 is $writable, 1, 'handle is writable';
-$watcher->watch($server, 0, 0);
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->watch($server, 0, 0);
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable, 2, 'handle is not readable';
 is $writable, 1, 'handle is not writable';
-$watcher->watch($server, 1, 0);
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->watch($server, 1, 0);
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable, 3, 'handle is readable';
 is $writable, 1, 'handle is not writable';
 ($readable, $writable) = undef;
-$watcher->io($server => sub { pop() ? $writable++ : $readable++ });
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->io($server => sub { pop() ? $writable++ : $readable++ });
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable, 1, 'handle is readable';
 is $writable, 1, 'handle is writable';
 
 # Timers
 my ($timer, $recurring);
-$watcher->timer(0 => sub { $timer++ });
-$watcher->drop($watcher->timer(0 => sub { $timer++ }));
-my $id = $watcher->recurring(0 => sub { $recurring++ });
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->timer(0 => sub { $timer++ });
+$reactor->drop($reactor->timer(0 => sub { $timer++ }));
+my $id = $reactor->recurring(0 => sub { $recurring++ });
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable,  2, 'handle is readable again';
 is $writable,  2, 'handle is writable again';
 is $timer,     1, 'timer was triggered';
 is $recurring, 1, 'recurring was triggered';
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable,  3, 'handle is readable again';
 is $writable,  3, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
 is $recurring, 2, 'recurring was triggered again';
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable,  4, 'handle is readable again';
 is $writable,  4, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
 is $recurring, 3, 'recurring was not triggered';
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable,  5, 'handle is readable again';
 is $writable,  5, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
 is $recurring, 4, 'recurring was triggered again';
-$watcher->drop($id);
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->drop($id);
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable,  6, 'handle is readable again';
 is $writable,  6, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
 is $recurring, 4, 'recurring was not triggered again';
 
 # Reset
-$watcher->drop($id);
-$watcher->drop($server);
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->drop($id);
+$reactor->drop($server);
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $readable, 6, 'io event was not triggered again';
 is $writable, 6, 'io event was not triggered again';
-my $watcher2 = Mojo::IOWatcher::EV->new;
-is ref $watcher2, 'Mojo::IOWatcher', 'right object';
+my $reactor2 = Mojo::Reactor->new;
+is ref $reactor2, 'Mojo::Reactor', 'right object';
 
 # Parallel loops
 $timer = 0;
-$watcher->recurring(0 => sub { $timer++ });
+$reactor->recurring(0 => sub { $timer++ });
 my $timer2 = 0;
-$watcher2->recurring(0 => sub { $timer2++ });
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor2->recurring(0 => sub { $timer2++ });
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $timer,  1, 'timer was triggered';
 is $timer2, 0, 'timer was not triggered';
-$watcher2->timer(0 => sub { shift->stop });
-$watcher2->start;
+$reactor2->timer(0 => sub { shift->stop });
+$reactor2->start;
 is $timer,  1, 'timer was not triggered';
 is $timer2, 1, 'timer was triggered';
-$watcher->timer(0 => sub { shift->stop });
-$watcher->start;
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
 is $timer,  2, 'timer was triggered';
 is $timer2, 1, 'timer was not triggered';
-$watcher2->timer(0 => sub { shift->stop });
-$watcher2->start;
+$reactor2->timer(0 => sub { shift->stop });
+$reactor2->start;
 is $timer,  2, 'timer was not triggered';
 is $timer2, 2, 'timer was triggered';
 
 # Error
 my $err;
-$watcher->on(
+$reactor->on(
   error => sub {
     shift->stop;
     $err = pop;
   }
 );
-$watcher->timer(0 => sub { die "works!\n" });
-$watcher->start;
+$reactor->timer(0 => sub { die "works!\n" });
+$reactor->start;
 like $err, qr/works!/, 'right error';
 
 # Detection
-is(Mojo::IOWatcher->detect, 'Mojo::IOWatcher::EV', 'right class');
+is(Mojo::Reactor->detect, 'Mojo::Reactor', 'right class');
 
-# Dummy watcher
-package Mojo::IOWatcher::Test;
-use Mojo::Base 'Mojo::IOWatcher';
-$ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher::Test';
+# Dummy reactor
+package Mojo::Reactor::Test;
+use Mojo::Base 'Mojo::Reactor';
+$ENV{MOJO_REACTOR} = 'Mojo::Reactor::Test';
 
 package main;
 
 # Detection (env)
-is(Mojo::IOWatcher->detect, 'Mojo::IOWatcher::Test', 'right class');
+is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
 
-# EV in control
-$ENV{MOJO_IOWATCHER} = 'Mojo::IOWatcher::EV';
-is ref Mojo::IOLoop->singleton->iowatcher, 'Mojo::IOWatcher::EV',
-  'right object';
+# Reactor in control
+$ENV{MOJO_REACTOR} = 'Mojo::Reactor';
+is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor', 'right object';
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 $port = Mojo::IOLoop->generate_port;
 my ($server_err, $server_running, $client_err, $client_running);
@@ -216,8 +214,8 @@ Mojo::IOLoop->client(
     $client_err = $@;
   }
 );
-Mojo::IOLoop->timer(1 => sub { EV::break(EV::BREAK_ONE()) });
-EV::run();
+Mojo::IOLoop->timer(1 => sub { Mojo::IOLoop->singleton->reactor->stop });
+Mojo::IOLoop->singleton->reactor->start;
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 like $server_err, qr/^Mojo::IOLoop already running/, 'right error';
 like $client_err, qr/^Mojo::IOLoop already running/, 'right error';

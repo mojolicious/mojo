@@ -1,4 +1,4 @@
-package Mojo::IOWatcher;
+package Mojo::Reactor;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
@@ -6,7 +6,7 @@ use Mojo::Loader;
 use Mojo::Util 'md5_sum';
 use Time::HiRes qw/time usleep/;
 
-use constant DEBUG => $ENV{MOJO_IOWATCHER_DEBUG} || 0;
+use constant DEBUG => $ENV{MOJO_REACTOR_DEBUG} || 0;
 
 # "I don't know.
 #  Can I really betray my country?
@@ -14,9 +14,9 @@ use constant DEBUG => $ENV{MOJO_IOWATCHER_DEBUG} || 0;
 #  You pledge allegiance to the flag.
 #  And the flag is made in China."
 sub detect {
-  my $try = $ENV{MOJO_IOWATCHER} || 'Mojo::IOWatcher::EV';
+  my $try = $ENV{MOJO_REACTOR} || 'Mojo::Reactor::EV';
   return $try unless Mojo::Loader->load($try);
-  return 'Mojo::IOWatcher';
+  return 'Mojo::Reactor';
 }
 
 sub drop {
@@ -136,145 +136,145 @@ __END__
 
 =head1 NAME
 
-Mojo::IOWatcher - Non-blocking I/O watcher
+Mojo::Reactor - Non-blocking I/O reactor
 
 =head1 SYNOPSIS
 
-  use Mojo::IOWatcher;
+  use Mojo::Reactor;
 
   # Watch if handle becomes readable or writabe
-  my $watcher = Mojo::IOWatcher->new;
-  $watcher->io($handle => sub {
-    my ($watcher, $handle, $writable) = @_;
+  my $reactor = Mojo::Reactor->new;
+  $reactor->io($handle => sub {
+    my ($reactor, $handle, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
 
   # Add a timer
-  $watcher->timer(15 => sub {
-    my $watcher = shift;
-    $watcher->drop($handle);
+  $reactor->timer(15 => sub {
+    my $reactor = shift;
+    $reactor->drop($handle);
     say 'Timeout!';
   });
 
-  # Start and stop watcher
-  $watcher->start;
-  $watcher->stop;
+  # Start and stop reactor
+  $reactor->start;
+  $reactor->stop;
 
 =head1 DESCRIPTION
 
-L<Mojo::IOWatcher> is a minimalistic non-blocking I/O watcher and the
-foundation of L<Mojo::IOLoop>. L<Mojo::IOWatcher::EV> is a good example for
-its extensibility. Note that this module is EXPERIMENTAL and might change
-without warning!
+L<Mojo::Reactor> is a minimalistic non-blocking I/O reactor and the
+foundation of L<Mojo::IOLoop>. L<Mojo::Reactor::EV> is a good example for its
+extensibility. Note that this module is EXPERIMENTAL and might change without
+warning!
 
 =head1 EVENTS
 
-L<Mojo::IOWatcher> can emit the following events.
+L<Mojo::Reactor> can emit the following events.
 
 =head2 C<error>
 
-  $watcher->on(error => sub {
-    my ($watcher, $err) = @_;
+  $reactor->on(error => sub {
+    my ($reactor, $err) = @_;
     ...
   });
 
 Emitted safely if an error happens.
 
-  $watcher->on(error => sub {
-    my ($watcher, $err) = @_;
+  $reactor->on(error => sub {
+    my ($reactor, $err) = @_;
     say "Something very bad happened: $err";
   });
 
 =head1 METHODS
 
-L<Mojo::IOWatcher> inherits all methods from L<Mojo::EventEmitter> and
+L<Mojo::Reactor> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
 =head2 C<detect>
 
-  my $class = Mojo::IOWatcher->detect;
+  my $class = Mojo::Reactor->detect;
 
-Detect and load the best watcher implementation available, will try the value
-of the C<MOJO_IOWATCHER> environment variable or L<Mojo::IOWatcher::EV>.
+Detect and load the best reactor implementation available, will try the value
+of the C<MOJO_REACTOR> environment variable or L<Mojo::Reactor::EV>.
 
 =head2 C<drop>
 
-  my $success = $watcher->drop($handle);
-  my $success = $watcher->drop($id);
+  my $success = $reactor->drop($handle);
+  my $success = $reactor->drop($id);
 
 Drop handle or timer.
 
 =head2 C<io>
 
-  $watcher = $watcher->io($handle => sub {...});
+  $reactor = $reactor->io($handle => sub {...});
 
 Watch handle for I/O events, invoking the callback whenever handle becomes
 readable or writable.
 
 =head2 C<is_readable>
 
-  my $success = $watcher->is_readable($handle);
+  my $success = $reactor->is_readable($handle);
 
 Quick check if a handle is readable, useful for identifying tainted
 sockets.
 
 =head2 C<is_running>
 
-  my $success = $watcher->is_running;
+  my $success = $reactor->is_running;
 
-Check if watcher is running.
+Check if reactor is running.
 
 =head2 C<recurring>
 
-  my $id = $watcher->recurring(3 => sub {...});
+  my $id = $reactor->recurring(3 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
 
 =head2 C<start>
 
-  $watcher->start;
+  $reactor->start;
 
 Start watching for I/O and timer events, this will block until C<stop> is
 called or no events are being watched anymore.
 
 =head2 C<stop>
 
-  $watcher->stop;
+  $reactor->stop;
 
 Stop watching for I/O and timer events.
 
 =head2 C<timer>
 
-  my $id = $watcher->timer(3 => sub {...});
+  my $id = $reactor->timer(3 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds.
 
 =head2 C<watch>
 
-  $watcher = $watcher->watch($handle, $read, $write);
+  $reactor = $reactor->watch($handle, $read, $write);
 
 Change I/O events to watch handle for.
 
   # Watch only for readable events
-  $watcher->watch($handle, 1, 0);
+  $reactor->watch($handle, 1, 0);
 
   # Watch only for writable events
-  $watcher->watch($handle, 0, 1);
+  $reactor->watch($handle, 0, 1);
 
   # Watch for readable and writable events
-  $watcher->watch($handle, 1, 1);
+  $reactor->watch($handle, 1, 1);
 
   # Pause watching for events
-  $watcher->watch($handle, 0, 0);
+  $reactor->watch($handle, 0, 0);
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_IOWATCHER_DEBUG> environment variable to get some
+You can set the C<MOJO_REACTOR_DEBUG> environment variable to get some
 advanced diagnostics information printed to C<STDERR>.
 
-  MOJO_IOWATCHER_DEBUG=1
+  MOJO_REACTOR_DEBUG=1
 
 =head1 SEE ALSO
 

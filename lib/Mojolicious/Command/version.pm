@@ -14,7 +14,7 @@ sub run {
   my $self = shift;
 
   # EV
-  my $ev = eval 'use Mojo::IOWatcher::EV; 1' ? $EV::VERSION : 'not installed';
+  my $ev = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'not installed';
 
   # IPv6
   my $ipv6 =

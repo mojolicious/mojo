@@ -9,8 +9,8 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 
 # DEPRECATED in Leaf Fluttering In Wind!
 my @leaf = (
-  qw/default_static_class default_template_class dictionary max_redirects/,
-  qw/prepare_ioloop root unsubscribe x_forwarded_for/
+  qw/controller_base_class default_static_class default_template_class/,
+  qw/dictionary max_redirects prepare_ioloop root unsubscribe x_forwarded_for/
 );
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.

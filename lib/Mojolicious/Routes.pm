@@ -1,6 +1,7 @@
 package Mojolicious::Routes;
 use Mojo::Base 'Mojolicious::Routes::Route';
 
+use List::Util 'first';
 use Mojo::Cache;
 use Mojo::Loader;
 use Mojo::Util 'camelize';
@@ -8,9 +9,9 @@ use Mojolicious::Routes::Match;
 use Scalar::Util 'weaken';
 
 has 'namespace';
-has cache => sub { Mojo::Cache->new };
+has base_classes => sub { [qw/Mojolicious::Controller Mojo/] };
+has cache        => sub { Mojo::Cache->new };
 has [qw/conditions shortcuts/] => sub { {} };
-has controller_base_class => 'Mojolicious::Controller';
 has hidden => sub { [qw/new attr has/] };
 
 sub add_condition {
@@ -31,6 +32,18 @@ sub auto_render {
   my $stash = $c->stash;
   return if $stash->{'mojo.rendered'} || $c->tx->is_websocket;
   $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
+}
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub controller_base_class {
+  warn <<EOF;
+Mojolicious::Routes->controller_base_class is DEPRECATED in favor of
+Mojolicious::Routes->base_classes!
+EOF
+  my $self = shift;
+  return $self->base_classes->[0] unless @_;
+  $self->base_classes->[0] = shift;
+  return $self;
 }
 
 sub dispatch {
@@ -201,8 +214,8 @@ sub _load_class {
     die $e;
   }
 
-  # Check for controller and application
-  return unless $app->isa($self->controller_base_class) || $app->isa('Mojo');
+  # Check base classes
+  return unless first { $app->isa($_) } @{$self->base_classes};
   return ++$self->{loaded}->{$app};
 }
 
@@ -293,6 +306,14 @@ L<Mojolicious::Guides::Routing> for more.
 L<Mojolicious::Routes> inherits all attributes from
 L<Mojolicious::Routes::Route> and implements the following new ones.
 
+=head2 C<base_classes>
+
+  my $classes = $r->base_classes;
+  $r          = $r->base_classes(['Mojolicious::Controller']);
+
+Base classes used to identify controllers, defaults to
+L<Mojolicious::Controller> and L<Mojo>.
+
 =head2 C<cache>
 
   my $cache = $r->cache;
@@ -306,14 +327,6 @@ Routing cache, defaults to a L<Mojo::Cache> object.
   $r             = $r->conditions({foo => sub {...}});
 
 Contains all available conditions.
-
-=head2 C<controller_base_class>
-
-  my $base = $r->controller_base_class;
-  $r       = $r->controller_base_class('Mojolicious::Controller');
-
-Base class used to identify controllers, defaults to
-L<Mojolicious::Controller>.
 
 =head2 C<hidden>
 

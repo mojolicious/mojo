@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.64    2012-03-21 00:00:00
+        - Deprecated Mojolicious::Routes->controller_base_class in favor of
+          Mojolicious::Routes->base_classes.
         - Improved documentation.
 
 2.63    2012-03-20 00:00:00

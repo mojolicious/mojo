@@ -8,11 +8,11 @@ use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
 use Scalar::Util 'weaken';
 
-has 'namespace';
 has base_classes => sub { [qw/Mojolicious::Controller Mojo/] };
 has cache        => sub { Mojo::Cache->new };
 has [qw/conditions shortcuts/] => sub { {} };
 has hidden => sub { [qw/new attr has/] };
+has 'namespace';
 
 sub add_condition {
   my ($self, $name, $cb) = @_;
@@ -309,7 +309,7 @@ L<Mojolicious::Routes::Route> and implements the following new ones.
 =head2 C<base_classes>
 
   my $classes = $r->base_classes;
-  $r          = $r->base_classes(['Mojolicious::Controller']);
+  $r          = $r->base_classes(['MyApp::Controller']);
 
 Base classes used to identify controllers, defaults to
 L<Mojolicious::Controller> and L<Mojo>.

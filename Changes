@@ -11,7 +11,6 @@ This file documents the revision history for Perl extension Mojolicious.
         - Improved tests.
         - Fixed bug that slowed down Mojolicious::Renderer.
         - Fixed small newline capture bug in Mojolicious::Routes::Match.
-        - Fixed small condition bug.
 
 2.62    2012-03-17 00:00:00
         - Deprecated Mojolicious::Renderer->default_template_class in favor

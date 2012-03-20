@@ -9,8 +9,21 @@ use Scalar::Util 'weaken';
 
 has 'namespace';
 has cache => sub { Mojo::Cache->new };
+has [qw/conditions shortcuts/] => sub { {} };
 has controller_base_class => 'Mojolicious::Controller';
 has hidden => sub { [qw/new attr has/] };
+
+sub add_condition {
+  my ($self, $name, $cb) = @_;
+  $self->conditions->{$name} = $cb;
+  return $self;
+}
+
+sub add_shortcut {
+  my ($self, $name, $cb) = @_;
+  $self->shortcuts->{$name} = $cb;
+  return $self;
+}
 
 # "Hey. What kind of party is this? There's no booze and only one hooker."
 sub auto_render {
@@ -287,6 +300,13 @@ L<Mojolicious::Routes::Route> and implements the following new ones.
 
 Routing cache, defaults to a L<Mojo::Cache> object.
 
+=head2 C<conditions>
+
+  my $conditions = $r->conditions;
+  $r             = $r->conditions({foo => sub {...}});
+
+Contains all available conditions.
+
 =head2 C<controller_base_class>
 
   my $base = $r->controller_base_class;
@@ -300,7 +320,8 @@ L<Mojolicious::Controller>.
   my $hidden = $r->hidden;
   $r         = $r->hidden([qw/new attr tx render req res stash/]);
 
-Controller methods and attributes that are hidden from routes.
+Controller methods and attributes that are hidden from routes, defaults to
+C<new>, C<attr> and C<has>.
 
 =head2 C<namespace>
 
@@ -309,10 +330,29 @@ Controller methods and attributes that are hidden from routes.
 
 Namespace used by C<dispatch> to search for controllers.
 
+=head2 C<shortcuts>
+
+  my $shortcuts = $r->shortcuts;
+  $r            = $r->shortcuts({foo => sub {...}});
+
+Contains all available shortcuts.
+
 =head1 METHODS
 
 L<Mojolicious::Routes> inherits all methods from
 L<Mojolicious::Routes::Route> and implements the following ones.
+
+=head2 C<add_condition>
+
+  $r = $r->add_condition(foo => sub {...});
+
+Add a new condition.
+
+=head2 C<add_shortcut>
+
+  $r = $r->add_shortcut(foo => sub {...});
+
+Add a new shortcut.
 
 =head2 C<auto_render>
 
@@ -324,7 +364,7 @@ Automatic rendering.
 
   my $success = $r->dispatch(Mojolicious::Controller->new);
 
-Match routes and dispatch.
+Match routes with L<Mojolicious::Routes::Match> and dispatch.
 
 =head2 C<hide>
 
@@ -336,7 +376,7 @@ Hide controller method or attribute from routes.
 
   my $route = $r->route('/:c/:a', a => qr/\w+/);
 
-Add a new nested L<Mojolicious::Routes::Route> child to this route.
+Add a new nested L<Mojolicious::Routes::Route> child.
 
 =head1 SEE ALSO
 

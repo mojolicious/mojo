@@ -33,7 +33,8 @@ is $t->app->routes->find('authenticated')->pattern->defaults->{controller},
   'right controller';
 is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route',
   'right class';
-is ref $t->app->routes, 'Mojolicious::Routes', 'right class';
+is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',
+  'right class';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
 

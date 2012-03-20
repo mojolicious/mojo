@@ -7,8 +7,7 @@ use Scalar::Util qw/blessed weaken/;
 
 has [qw/block inline parent partial/];
 has 'children' => sub { [] };
-has [qw/conditions shortcuts/] => sub { {} };
-has pattern => sub { Mojolicious::Routes::Pattern->new };
+has pattern    => sub { Mojolicious::Routes::Pattern->new };
 
 # "Yet thanks to my trusty safety sphere,
 #  I sublibed with only tribial brain dablage."
@@ -22,7 +21,7 @@ sub AUTOLOAD {
 
   # Call shortcut
   croak qq/Can't locate object method "$method" via package "$package"/
-    unless my $shortcut = $self->shortcuts->{$method};
+    unless my $shortcut = $self->root->shortcuts->{$method};
   return $self->$shortcut(@_);
 }
 
@@ -33,20 +32,7 @@ sub new { shift->SUPER::new->parse(@_) }
 sub add_child {
   my ($self, $route) = @_;
   weaken $route->parent($self)->{parent};
-  $route->conditions($self->conditions)->shortcuts($self->shortcuts);
   push @{$self->children}, $route;
-  return $self;
-}
-
-sub add_condition {
-  my ($self, $name, $cb) = @_;
-  $self->conditions->{$name} = $cb;
-  return $self;
-}
-
-sub add_shortcut {
-  my ($self, $name, $cb) = @_;
-  $self->shortcuts->{$name} = $cb;
   return $self;
 }
 
@@ -129,9 +115,7 @@ sub over {
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   return $self unless @$conditions;
   $self->{over} = $conditions;
-  my $root = my $parent = $self;
-  while ($parent = $parent->parent) { $root = $parent }
-  $root->cache(0);
+  $self->root->cache(0);
 
   return $self;
 }
@@ -165,6 +149,12 @@ sub render {
   }
 
   return $parent ? $parent->render($path, $values) : $path;
+}
+
+sub root {
+  my $root = my $parent = shift;
+  while ($parent = $parent->parent) { $root = $parent }
+  return $root;
 }
 
 sub route {
@@ -334,13 +324,6 @@ Allow this route to match even if it's not an endpoint, used for waypoints.
 
 The children of this routes object, used for nesting routes.
 
-=head2 C<conditions>
-
-  my $conditions = $r->conditions;
-  $r             = $r->conditions({foo => sub {...}});
-
-Contains all available conditions for this route.
-
 =head2 C<inline>
 
   my $inline = $r->inline;
@@ -369,13 +352,6 @@ Route has no specific end, remaining characters will be captured in C<path>.
 
 Pattern for this route, defaults to a L<Mojolicious::Routes::Pattern> object.
 
-=head2 C<shortcuts>
-
-  my $shortcuts = $r->shortcuts;
-  $r            = $r->shortcuts({foo => sub {...}});
-
-Contains all additional route shortcuts available for this route.
-
 =head1 METHODS
 
 L<Mojolicious::Routes::Route> inherits all methods from L<Mojo::Base> and
@@ -386,25 +362,13 @@ implements the following ones.
   my $r = Mojolicious::Routes::Route->new;
   my $r = Mojolicious::Routes::Route->new('/:controller/:action');
 
-Construct a new route object.
+Construct a new L<Mojolicious::Routes::Route> object.
 
 =head2 C<add_child>
 
   $r = $r->add_child(Mojolicious::Route->new);
 
 Add a new child to this route.
-
-=head2 C<add_condition>
-
-  $r = $r->add_condition(foo => sub {...});
-
-Add a new condition for this route.
-
-=head2 C<add_shortcut>
-
-  $r = $r->add_shortcut(foo => sub {...});
-
-Add a new shortcut for this route.
 
 =head2 C<any>
 
@@ -463,7 +427,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   my $success = $r->has_conditions;
 
-Check if this route contains conditions.
+Check if this route has active conditions.
 
 =head2 C<has_custom_name>
 
@@ -507,10 +471,10 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<over>
 
-  my $conditions = $r->over;
-  $r             = $r->over(foo => qr/\w+/);
+  my $over = $r->over;
+  $r       = $r->over(foo => qr/\w+/);
 
-Apply condition parameters to this route and disable routing cache.
+Activate conditions for this route and disable routing cache.
 
 =head2 C<parse>
 
@@ -546,6 +510,12 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
 Render route with parameters into a path.
 
+=head2 C<root>
+
+  my $root = $r->root;
+
+The L<Mojolicious::Routes> object this route is an ancestor of.
+
 =head2 C<route>
 
   my $route = $r->route('/:c/:a', a => qr/\w+/);
@@ -573,7 +543,7 @@ Set default parameters for this route.
 
   my $string = $r->to_string;
 
-Stringifies the whole route.
+Stringify the whole route.
 
 =head2 C<under>
 

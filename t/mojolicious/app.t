@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_MODE}       = 'development';
 }
 
-use Test::More tests => 282;
+use Test::More tests => 284;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -31,6 +31,10 @@ is $t->app->routes->find('test3')->pattern->defaults->{namespace},
 is $t->app->routes->find('authenticated')->pattern->defaults->{controller},
   'foo',
   'right controller';
+is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route',
+  'right class';
+is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',
+  'right class';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
 

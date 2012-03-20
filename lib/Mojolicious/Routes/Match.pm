@@ -44,11 +44,11 @@ sub match {
   }
 
   # Conditions
+  my $over = $r->over || [];
   my $conditions = $r->conditions;
-  my $dictionary = $r->dictionary;
-  for (my $i = 0; $i < @$conditions; $i += 2) {
-    return unless my $condition = $dictionary->{$conditions->[$i]};
-    return if !$condition->($r, $c, $captures, $conditions->[$i + 1]);
+  for (my $i = 0; $i < @$over; $i += 2) {
+    return unless my $condition = $conditions->{$over->[$i]};
+    return if !$condition->($r, $c, $captures, $over->[$i + 1]);
   }
 
   # WebSocket

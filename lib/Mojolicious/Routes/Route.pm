@@ -6,8 +6,8 @@ use Mojolicious::Routes::Pattern;
 use Scalar::Util qw/blessed weaken/;
 
 has [qw/block inline parent partial/];
-has [qw/children conditions/] => sub { [] };
-has [qw/dictionary shortcuts/] => sub { {} };
+has 'children' => sub { [] };
+has [qw/conditions shortcuts/] => sub { {} };
 has pattern => sub { Mojolicious::Routes::Pattern->new };
 
 # "Yet thanks to my trusty safety sphere,
@@ -33,14 +33,14 @@ sub new { shift->SUPER::new->parse(@_) }
 sub add_child {
   my ($self, $route) = @_;
   weaken $route->parent($self)->{parent};
-  $route->dictionary($self->dictionary)->shortcuts($self->shortcuts);
+  $route->conditions($self->conditions)->shortcuts($self->shortcuts);
   push @{$self->children}, $route;
   return $self;
 }
 
 sub add_condition {
   my ($self, $name, $cb) = @_;
-  $self->dictionary->{$name} = $cb;
+  $self->conditions->{$name} = $cb;
   return $self;
 }
 
@@ -57,6 +57,15 @@ sub bridge { shift->route(@_)->inline(1) }
 sub delete { shift->_generate_route(DELETE => @_) }
 
 sub detour { shift->partial(1)->to(@_) }
+
+# DEPRECATED in Leaf Fluttering In Wind!
+sub dictionary {
+  warn <<EOF;
+Mojolicious::Routes::Route->dictionary is DEPRECATED in favor of
+Mojolicious::Routes::Route->conditions!
+EOF
+  return shift->conditions(@_);
+}
 
 sub find {
   my ($self, $name) = @_;
@@ -83,7 +92,7 @@ sub get { shift->_generate_route(GET => @_) }
 
 sub has_conditions {
   my $self = shift;
-  return 1 if @{$self->conditions};
+  return 1 if @{$self->over || []};
   return unless my $parent = $self->parent;
   return $parent->has_conditions;
 }
@@ -123,14 +132,13 @@ sub options { shift->_generate_route(OPTIONS => @_) }
 
 sub over {
   my $self = shift;
-  my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
-  return $self unless @$conditions;
 
   # Routes with conditions can't be cached
-  push @{$self->conditions}, @$conditions;
-  my $root = my $parent = $self;
-  while ($parent = $parent->parent) { $root = $parent }
-  $root->cache(0);
+  return $self->{over} unless @_;
+  my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
+  return $self unless @$conditions;
+  $self->{over} = $conditions;
+  $self->root->cache(0);
 
   return $self;
 }
@@ -164,6 +172,12 @@ sub render {
   }
 
   return $parent ? $parent->render($path, $values) : $path;
+}
+
+sub root {
+  my $root = my $parent = shift;
+  while ($parent = $parent->parent) { $root = $parent }
+  return $root;
 }
 
 sub route {
@@ -335,15 +349,8 @@ The children of this routes object, used for nesting routes.
 
 =head2 C<conditions>
 
-  my $conditions  = $r->conditions;
-  $r              = $r->conditions([foo => qr/\w+/]);
-
-Contains condition parameters for this route, used for C<over>.
-
-=head2 C<dictionary>
-
-  my $dictionary = $r->dictionary;
-  $r             = $r->dictionary({foo => sub {...}});
+  my $conditions = $r->conditions;
+  $r             = $r->conditions({foo => sub {...}});
 
 Contains all available conditions for this route.
 
@@ -513,7 +520,8 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 C<over>
 
-  $r = $r->over(foo => qr/\w+/);
+  my $conditions = $r->over;
+  $r             = $r->over(foo => qr/\w+/);
 
 Apply condition parameters to this route and disable routing cache.
 
@@ -550,6 +558,12 @@ L<Mojolicious::Lite> tutorial for more argument variations.
   my $path = $r->render($suffix, {foo => 'bar'});
 
 Render route with parameters into a path.
+
+=head2 C<root>
+
+  my $root = $r->root;
+
+The root of the routes tree.
 
 =head2 C<route>
 

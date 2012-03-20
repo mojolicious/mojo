@@ -58,15 +58,6 @@ sub delete { shift->_generate_route(DELETE => @_) }
 
 sub detour { shift->partial(1)->to(@_) }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub dictionary {
-  warn <<EOF;
-Mojolicious::Routes::Route->dictionary is DEPRECATED in favor of
-Mojolicious::Routes::Route->conditions!
-EOF
-  return shift->conditions(@_);
-}
-
 sub find {
   my ($self, $name) = @_;
 
@@ -138,7 +129,9 @@ sub over {
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   return $self unless @$conditions;
   $self->{over} = $conditions;
-  $self->root->cache(0);
+  my $root = my $parent = $self;
+  while ($parent = $parent->parent) { $root = $parent }
+  $root->cache(0);
 
   return $self;
 }
@@ -172,12 +165,6 @@ sub render {
   }
 
   return $parent ? $parent->render($path, $values) : $path;
-}
-
-sub root {
-  my $root = my $parent = shift;
-  while ($parent = $parent->parent) { $root = $parent }
-  return $root;
 }
 
 sub route {
@@ -558,12 +545,6 @@ L<Mojolicious::Lite> tutorial for more argument variations.
   my $path = $r->render($suffix, {foo => 'bar'});
 
 Render route with parameters into a path.
-
-=head2 C<root>
-
-  my $root = $r->root;
-
-The root of the routes tree.
 
 =head2 C<route>
 

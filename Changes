@@ -1,10 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.63    2012-03-20 00:00:00
-        - Deprecated Mojolicious::Routes::Route->dictionary in favor of
-          Mojolicious::Routes::Route->conditions.
         - Added Mojolicious::Routes::Route.
-        - Added find and root methods to Mojolicious::Routes::Route.
+        - Added find method to Mojolicious::Routes::Route.
         - Improved form_for helper to automatically add method="POST"
           attributes when necessary.
         - Improved Mojolicious::Renderer performance.

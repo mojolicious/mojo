@@ -136,7 +136,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Reactor - Non-blocking I/O reactor
+Mojo::Reactor - Minimalistic low level event reactor
 
 =head1 SYNOPSIS
 
@@ -162,8 +162,8 @@ Mojo::Reactor - Non-blocking I/O reactor
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor> is a minimalistic non-blocking I/O reactor and the
-foundation of L<Mojo::IOLoop>. L<Mojo::Reactor::EV> is a good example for its
+L<Mojo::Reactor> is a minimalistic low level event reactor and the foundation
+of L<Mojo::IOLoop>. L<Mojo::Reactor::EV> is a good example for its
 extensibility. Note that this module is EXPERIMENTAL and might change without
 warning!
 

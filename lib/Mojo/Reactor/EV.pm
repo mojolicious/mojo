@@ -76,7 +76,7 @@ __END__
 
 =head1 NAME
 
-Mojo::Reactor::EV - EV non-blocking I/O reactor
+Mojo::Reactor::EV - Minimalistic low level event reactor with EV support
 
 =head1 SYNOPSIS
 
@@ -86,8 +86,9 @@ Mojo::Reactor::EV - EV non-blocking I/O reactor
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::EV> is a minimalistic non-blocking I/O reactor with C<libev>
-support. Note that this module is EXPERIMENTAL and might change without warning!
+L<Mojo::Reactor::EV> is a minimalistic low level event reactor with C<libev>
+support. Note that this module is EXPERIMENTAL and might change without
+warning!
 
 =head1 EVENTS
 

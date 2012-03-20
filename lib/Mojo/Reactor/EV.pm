@@ -140,9 +140,9 @@ seconds.
 
 =head2 C<watch>
 
-  $reactor = $reactor->watch($handle, $read, $write);
+  $reactor = $reactor->watch($handle, $readable, $writable);
 
-Change I/O events to watch handle for.
+Change I/O events to watch handle for with C<true> and C<false> values.
 
 =head1 SEE ALSO
 

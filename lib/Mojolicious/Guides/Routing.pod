@@ -183,7 +183,7 @@ class, but the router can be accessed from everywhere (even at runtime).
 
 After you start a new route with the method L<Mojolicious::Routes/"route">,
 you can also give it a destination in the form of a hash using the chained
-method L<Mojolicious::Routes/"to">.
+method L<Mojolicious::Routes::Route/"to">.
 
   # /welcome -> {controller => 'foo', action => 'welcome'}
   $r->route('/welcome')->to(controller => 'foo', action => 'welcome');
@@ -466,8 +466,8 @@ L<Mojolicious::Plugin::DefaultHelpers/"current_route">.
 
 =head2 HTTP methods
 
-The method L<Mojolicious::Routes/"via"> allows only specific HTTP methods to
-pass.
+The method L<Mojolicious::Routes::Route/"via"> allows only specific HTTP
+methods to pass.
 
   # GET /bye    -> {controller => 'foo', action => 'bye'}
   # POST /bye   -> undef
@@ -639,7 +639,7 @@ snowman very sad.
 =head2 WebSockets
 
 You can restrict access to WebSocket handshakes using the method
-L<Mojolicious::Routes/"websocket">.
+L<Mojolicious::Routes::Route/"websocket">.
 
   # /echo (WebSocket handshake)
   $r->websocket('/echo')->to(controller => 'foo', action => 'echo');
@@ -686,9 +686,9 @@ play, they are basically router plugins.
   $r->route('/firefox_only')->over(agent => qr/Firefox/)
     ->to(controller => 'foo', action => 'bar');
 
-The method L<Mojolicious::Routes/"add_condition"> registers the new condition
-in the router, while L<Mojolicious::Routes/"over"> actually applies it to the
-route.
+The method L<Mojolicious::Routes::Route/"add_condition"> registers the new
+condition in the router, while L<Mojolicious::Routes/"over"> actually applies
+it to the route.
 
 =head2 Condition plugins
 
@@ -758,10 +758,10 @@ domain specific language in normal L<Mojolicious> controllers.
 
   1;
 
-With the method L<Mojolicious::Routes/"detour"> which is very similar to
-L<Mojolicious::Routes/"to">, you can allow the route to partially match and
-use only the remaining path in the embedded application, the base path will
-be passed along in the C<path> stash value.
+With the method L<Mojolicious::Routes::Route/"detour"> which is very similar
+to L<Mojolicious::Routes::Route/"to">, you can allow the route to partially
+match and use only the remaining path in the embedded application, the base
+path will be passed along in the C<path> stash value.
 
   # /foo/*
   $r->route('/foo')->detour('bar#', name => 'Mojo');

@@ -1398,7 +1398,7 @@ $t->get_ok('/dynamic/inline')->status_is(200)
   ->content_is("dynamic inline 2\n");
 
 # User agent timer
-$tua->ioloop->one_tick('0.1');
+$tua->ioloop->one_tick;
 is $timer,
   "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
   'right content';

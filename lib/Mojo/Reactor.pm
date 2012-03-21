@@ -45,43 +45,11 @@ sub is_readable {
 sub is_running { shift->{running} }
 
 # "This was such a pleasant St. Patrick's Day until Irish people showed up."
-sub recurring { shift->_timer(pop, after => pop, recurring => time) }
-
-sub start {
+sub one_tick {
   my $self = shift;
-  return if $self->{running}++;
-  $self->_one_tick while $self->{running};
-}
 
-sub stop { delete shift->{running} }
-
-# "Bart, how did you get a cellphone?
-#  The same way you got me, by accident on a golf course."
-sub timer { shift->_timer(pop, after => pop, started => time) }
-
-sub watch {
-  my ($self, $handle, $read, $write) = @_;
-
-  my $poll = $self->_poll;
-  $poll->remove($handle);
-  if ($read && $write) { $poll->mask($handle, POLLIN | POLLOUT) }
-  elsif ($read)  { $poll->mask($handle, POLLIN) }
-  elsif ($write) { $poll->mask($handle, POLLOUT) }
-
-  return $self;
-}
-
-sub _timer {
-  my ($self, $cb) = (shift, shift);
-  my $t = {cb => $cb, @_};
-  my $id;
-  do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}->{$id};
-  $self->{timers}->{$id} = $t;
-  return $id;
-}
-
-sub _one_tick {
-  my $self = shift;
+  # Remember state
+  (my $state, $self->{running}) = ($self->{running}, 1);
 
   # I/O
   my $poll = $self->_poll;
@@ -110,8 +78,46 @@ sub _one_tick {
     }
   }
 
-  # Stop automatically
-  $self->stop unless keys(%{$self->{timers}}) || keys(%{$self->{io}});
+  # Restore state if necessary
+  $self->{running} = $state if $self->{running};
+}
+
+sub recurring { shift->_timer(pop, after => pop, recurring => time) }
+
+sub start {
+  my $self = shift;
+  return if $self->{running}++;
+  while ($self->{running}) {
+    $self->one_tick;
+    $self->stop unless keys(%{$self->{timers}}) || keys(%{$self->{io}});
+  }
+}
+
+sub stop { delete shift->{running} }
+
+# "Bart, how did you get a cellphone?
+#  The same way you got me, by accident on a golf course."
+sub timer { shift->_timer(pop, after => pop, started => time) }
+
+sub watch {
+  my ($self, $handle, $read, $write) = @_;
+
+  my $poll = $self->_poll;
+  $poll->remove($handle);
+  if ($read && $write) { $poll->mask($handle, POLLIN | POLLOUT) }
+  elsif ($read)  { $poll->mask($handle, POLLIN) }
+  elsif ($write) { $poll->mask($handle, POLLOUT) }
+
+  return $self;
+}
+
+sub _timer {
+  my ($self, $cb) = (shift, shift);
+  my $t = {cb => $cb, @_};
+  my $id;
+  do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}->{$id};
+  $self->{timers}->{$id} = $t;
+  return $id;
 }
 
 sub _poll { shift->{poll} ||= IO::Poll->new }
@@ -221,6 +227,12 @@ sockets.
   my $success = $reactor->is_running;
 
 Check if reactor is running.
+
+=head2 C<one_tick>
+
+  $reactor->one_tick;
+
+Run reactor for roughly one tick.
 
 =head2 C<recurring>
 

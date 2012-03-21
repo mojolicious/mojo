@@ -102,8 +102,7 @@ sub is_running {
 sub one_tick {
   my $self = shift;
   $self = $self->singleton unless ref $self;
-  $self->timer(shift // 0.025 => sub { shift->stop });
-  $self->start;
+  $self->reactor->one_tick;
 }
 
 sub recurring {
@@ -162,7 +161,6 @@ sub start {
   $self = $self->singleton unless ref $self;
   croak 'Mojo::IOLoop already running' if $self->is_running;
   $self->reactor->start;
-  return $self;
 }
 
 sub stop {
@@ -505,11 +503,8 @@ Check if loop is running.
 
   Mojo::IOLoop->one_tick;
   $loop->one_tick;
-  $loop->one_tick(0.25);
-  $loop->one_tick(0);
 
-Run reactor for roughly one tick and try not to block longer than the given
-amount of time in seconds.
+Run reactor for roughly one tick.
 
 =head2 C<recurring>
 
@@ -521,7 +516,7 @@ amount of time in seconds.
 
   # Run multiple reactors next to each other
   my $loop2 = Mojo::IOLoop->new;
-  Mojo::IOLoop->recurring(0 => sub { $loop2->one_tick(0) });
+  Mojo::IOLoop->recurring(0 => sub { $loop2->one_tick });
 
 =head2 C<server>
 

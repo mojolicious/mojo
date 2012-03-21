@@ -13,6 +13,8 @@ sub new { $EV++ ? Mojo::Reactor->new : shift->SUPER::new }
 
 sub is_running {EV::depth}
 
+sub one_tick { EV::run(EV::RUN_NOWAIT) }
+
 sub recurring { shift->_timer(shift, 1, @_) }
 
 # "Wow, Barney. You brought a whole beer keg.
@@ -109,6 +111,12 @@ Construct a new L<Mojo::Reactor::EV> object.
   my $success = $reactor->is_running;
 
 Check if reactor is running.
+
+=head2 C<one_tick>
+
+  $reactor->one_tick;
+
+Run reactor for roughly one tick.
 
 =head2 C<recurring>
 

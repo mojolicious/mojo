@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.65    2012-03-22 00:00:00
+        - Added one_tick method to Mojo::Reactor and Mojo::Reactor::EV.
         - Improved documentation.
         - Improved tests.
 

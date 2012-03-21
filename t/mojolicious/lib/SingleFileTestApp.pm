@@ -32,12 +32,6 @@ sub startup {
 package SingleFileTestApp::Foo;
 use Mojo::Base 'Mojolicious::Controller';
 
-sub bar {
-  my $self = shift;
-  $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-  $self->render_text($self->url_for);
-}
-
 sub data_template { shift->render('index') }
 
 sub data_template2 { shift->stash(template => 'too') }
@@ -45,6 +39,12 @@ sub data_template2 { shift->stash(template => 'too') }
 sub data_static { shift->render_static('singlefiletestapp/foo.txt') }
 
 sub index { shift->stash(template => 'withlayout', msg => 'works great!') }
+
+sub routes {
+  my $self = shift;
+  $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
+  $self->render_text($self->url_for);
+}
 
 1;
 __DATA__

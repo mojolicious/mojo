@@ -312,11 +312,12 @@ $t->get_ok('/foo/data_static')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("And this one... ALL GLORY TO THE HYPNOTOAD!\n");
 
-# SingleFileTestApp::Foo::bar
-$t->get_ok('/foo/bar')->status_is(200)
+# SingleFileTestApp::Foo::routes
+$t->get_ok('/foo/routes')->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/foo/bar');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('/foo/routes');
 
 $t = Test::Mojo->new('MojoliciousTest');
 

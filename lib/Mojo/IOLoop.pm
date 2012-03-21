@@ -110,7 +110,7 @@ sub recurring {
   my ($self, $after, $cb) = @_;
   $self = $self->singleton unless ref $self;
   weaken $self;
-  return $self->reactor->recurring($after => sub { $self->$cb });
+  return $self->reactor->recurring($after => sub { shift; $self->$cb(@_) });
 }
 
 # "Fat Tony is a cancer on this fair city!

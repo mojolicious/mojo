@@ -86,13 +86,18 @@ ok $ticks > 2, 'more than two ticks';
 # Run again without first tick event handler
 my $before = $ticks;
 my $after  = 0;
-my $id2    = $loop->recurring(0 => sub { $after++ });
+$loop->recurring(
+  0 => sub {
+    my ($loop, $id) = @_;
+    $after++;
+    $loop->drop($id) if $after == 2;
+  }
+);
 $loop->drop($id);
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
 $loop->one_tick;
-$loop->drop($id2);
-ok $after > 1, 'more than one tick';
+is $after, 2, 'exactly two tick';
 is $ticks, $before, 'no additional ticks';
 
 # Recurring timer
@@ -117,7 +122,7 @@ $id = $loop->server(
     $loop->stop;
   }
 );
-$id2 = $loop->client((address => 'localhost', port => $port) => sub { });
+my $id2 = $loop->client((address => 'localhost', port => $port) => sub { });
 $loop->start;
 $loop->drop($id);
 $loop->drop($id2);

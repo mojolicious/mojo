@@ -8,7 +8,7 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 67;
+plan tests => 71;
 
 # "Oh well. At least we'll die doing what we love: inhaling molten rock."
 use IO::Socket::INET;
@@ -145,7 +145,13 @@ is ref $reactor2, 'Mojo::Reactor', 'right object';
 $timer = 0;
 $reactor->recurring(0 => sub { $timer++ });
 my $timer2 = 0;
-$reactor2->recurring(0 => sub { $timer2++ });
+$reactor2->recurring(
+  0 => sub {
+    my ($reactor2, $id) = @_;
+    $timer2++;
+    $reactor2->drop($id) if $timer2 == 2;
+  }
+);
 $reactor->timer(0 => sub { shift->stop });
 $reactor->start;
 is $timer,  1, 'timer was triggered';
@@ -162,6 +168,14 @@ $reactor2->timer(0 => sub { shift->stop });
 $reactor2->start;
 is $timer,  2, 'timer was not triggered';
 is $timer2, 2, 'timer was triggered';
+$reactor2->timer(0 => sub { shift->stop });
+$reactor2->start;
+is $timer,  2, 'timer was not triggered';
+is $timer2, 2, 'timer was triggered';
+$reactor->timer(0 => sub { shift->stop });
+$reactor->start;
+is $timer,  3, 'timer was triggered';
+is $timer2, 2, 'timer was not triggered';
 
 # Error
 my $err;

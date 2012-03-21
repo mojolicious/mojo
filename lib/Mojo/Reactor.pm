@@ -109,7 +109,7 @@ sub _one_tick {
       elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
 
       # Handle timer
-      if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb) }
+      if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb, $id) }
     }
   }
 
@@ -231,6 +231,14 @@ Check if reactor is running.
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
+
+  # Invoke callback 3 times
+  my $i = 1;
+  $reactor->recurring(0.5 => sub {
+    my ($reactor, $id) = @_;
+    say $i++;
+    $reactor->drop($id) if $i == 3;
+  });
 
 =head2 C<start>
 

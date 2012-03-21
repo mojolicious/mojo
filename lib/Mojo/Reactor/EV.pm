@@ -63,7 +63,7 @@ sub _timer {
     $recurring ? $after : 0,
     sub {
       my $w = shift;
-      $self->_sandbox("Timer $id", $self->{timers}->{$id}->{cb});
+      $self->_sandbox("Timer $id", $self->{timers}->{$id}->{cb}, $id);
       delete $self->{timers}->{$id} unless $recurring;
     }
   );

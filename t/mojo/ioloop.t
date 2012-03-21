@@ -163,7 +163,7 @@ $stream->on(read => sub { $buffer .= pop });
 $stream->write('hello');
 ok(Mojo::IOLoop->stream($id), 'stream exists');
 Mojo::IOLoop->start;
-Mojo::IOLoop->timer('0.25' => sub { Mojo::IOLoop->stop });
+Mojo::IOLoop->timer(0.25 => sub { Mojo::IOLoop->stop });
 Mojo::IOLoop->start;
 ok !Mojo::IOLoop->stream($id), 'stream does not exist anymore';
 is $buffer, 'acceptedhelloworld', 'right result';
@@ -211,7 +211,7 @@ $id = Mojo::IOLoop->client(
     $loop->drop($id);
   }
 );
-Mojo::IOLoop->timer('0.5' => sub { shift->stop });
+Mojo::IOLoop->timer(0.5 => sub { shift->stop });
 Mojo::IOLoop->start;
 is $server_close, 1, 'server emitted close event once';
 is $client_close, 1, 'client emitted close event once';
@@ -226,16 +226,16 @@ Mojo::IOLoop->server(
       read => sub {
         my ($stream, $chunk) = @_;
         Mojo::IOLoop->timer(
-          '0.5' => sub {
+          0.5 => sub {
             $server_before = $server;
             $stream->stop;
             $stream->write('works!');
             Mojo::IOLoop->timer(
-              '0.5' => sub {
+              0.5 => sub {
                 $server_after = $server;
                 $client_after = $client;
                 $stream->start;
-                Mojo::IOLoop->timer('0.5' => sub { Mojo::IOLoop->stop });
+                Mojo::IOLoop->timer(0.5 => sub { Mojo::IOLoop->stop });
               }
             );
           }

@@ -102,7 +102,7 @@ sub is_running {
 sub one_tick {
   my $self = shift;
   $self = $self->singleton unless ref $self;
-  $self->timer(shift // '0.025' => sub { shift->stop });
+  $self->timer(shift // 0.025 => sub { shift->stop });
   $self->start;
 }
 
@@ -208,7 +208,7 @@ sub timer {
 sub _cleaner {
   my $self = shift;
   $self->{cleaner} ||= $self->recurring(
-    '0.025' => sub {
+    0.025 => sub {
       my $self = shift;
 
       # Manage connections
@@ -505,7 +505,7 @@ Check if loop is running.
 
   Mojo::IOLoop->one_tick;
   $loop->one_tick;
-  $loop->one_tick('0.25');
+  $loop->one_tick(0.25);
   $loop->one_tick(0);
 
 Run reactor for roughly one tick and try not to block longer than the given

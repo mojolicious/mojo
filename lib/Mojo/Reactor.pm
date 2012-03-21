@@ -85,7 +85,7 @@ sub _one_tick {
 
   # I/O
   my $poll = $self->_poll;
-  $poll->poll('0.025');
+  $poll->poll(0.025);
   $self->_sandbox('Read', $self->{io}->{fileno $_}->{cb}, 0)
     for $poll->handles(POLLIN | POLLHUP | POLLERR);
   $self->_sandbox('Write', $self->{io}->{fileno $_}->{cb}, 1)
@@ -224,7 +224,7 @@ Check if reactor is running.
 
 =head2 C<recurring>
 
-  my $id = $reactor->recurring(3 => sub {...});
+  my $id = $reactor->recurring(0.25 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
@@ -244,7 +244,7 @@ Stop watching for I/O and timer events.
 
 =head2 C<timer>
 
-  my $id = $reactor->timer(3 => sub {...});
+  my $id = $reactor->timer(0.5 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds.

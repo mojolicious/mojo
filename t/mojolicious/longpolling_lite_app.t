@@ -55,9 +55,9 @@ get '/longpoll' => sub {
   $self->res->headers->content_type('text/plain');
   $self->write_chunk('hi ');
   my $id = Mojo::IOLoop->timer(
-    '0.5' => sub {
+    0.5 => sub {
       $self->write_chunk('there,', sub { shift->write_chunk(' whats up?') });
-      shift->timer('0.5' => sub { $self->finish });
+      shift->timer(0.5 => sub { $self->finish });
     }
   );
   $self->on(
@@ -77,9 +77,9 @@ get '/longpoll/nolength' => sub {
   $self->res->headers->content_type('text/plain');
   $self->write('hi ');
   Mojo::IOLoop->timer(
-    '0.5' => sub {
+    0.5 => sub {
       $self->write('there,', sub { shift->write(' what length?') });
-      shift->timer('0.5' => sub { $self->finish });
+      shift->timer(0.5 => sub { $self->finish });
     }
   );
 };
@@ -108,7 +108,7 @@ get '/longpoll/plain' => sub {
   $self->res->headers->content_length(25);
   $self->write('hi ');
   Mojo::IOLoop->timer(
-    '0.5' => sub {
+    0.5 => sub {
       $self->on(finish => sub { $longpoll_plain = 'finished!' });
       $self->write('there plain,', sub { shift->write(' whats up?') });
     }
@@ -124,7 +124,7 @@ get '/longpoll/delayed' => sub {
   $self->res->headers->content_type('text/plain');
   $self->write_chunk;
   Mojo::IOLoop->timer(
-    '0.5' => sub {
+    0.5 => sub {
       $self->write_chunk(
         sub {
           my $self = shift;
@@ -146,7 +146,7 @@ get '/longpoll/plain/delayed' => sub {
   $self->res->headers->content_length(12);
   $self->write;
   Mojo::IOLoop->timer(
-    '0.5' => sub {
+    0.5 => sub {
       $self->write(
         sub {
           my $self = shift;
@@ -167,7 +167,7 @@ get '/longpoll/nolength/delayed' => sub {
   $self->res->headers->content_type('text/plain');
   $self->write;
   Mojo::IOLoop->timer(
-    '0.5' => sub {
+    0.5 => sub {
       $self->write(
         sub {
           my $self = shift;
@@ -184,7 +184,7 @@ my $longpoll_static_delayed;
 get '/longpoll/static/delayed' => sub {
   my $self = shift;
   $self->on(finish => sub { $longpoll_static_delayed = 'finished!' });
-  Mojo::IOLoop->timer('0.5' => sub { $self->render_static('hello.txt') });
+  Mojo::IOLoop->timer(0.5 => sub { $self->render_static('hello.txt') });
 };
 
 # GET /longpoll/static/delayed_too
@@ -195,7 +195,7 @@ get '/longpoll/static/delayed_too' => sub {
   $self->cookie(bar => 'baz');
   $self->session(foo => 'bar');
   $self->render_later;
-  Mojo::IOLoop->timer('0.5' => sub { $self->render_static('hello.txt') });
+  Mojo::IOLoop->timer(0.5 => sub { $self->render_static('hello.txt') });
 } => 'delayed_too';
 
 # GET /longpoll/dynamic/delayed
@@ -204,7 +204,7 @@ get '/longpoll/dynamic/delayed' => sub {
   my $self = shift;
   $self->on(finish => sub { $longpoll_dynamic_delayed = 'finished!' });
   Mojo::IOLoop->timer(
-    '0.5' => sub {
+    0.5 => sub {
       $self->res->code(201);
       $self->cookie(baz => 'yada');
       $self->res->body('Dynamic!');
@@ -308,7 +308,7 @@ Mojo::IOLoop->client(
       read => sub {
         my ($stream, $chunk) = @_;
         $stream->close;
-        Mojo::IOLoop->timer('0.5', sub { Mojo::IOLoop->stop });
+        Mojo::IOLoop->timer(0.5, sub { Mojo::IOLoop->stop });
       }
     );
     $stream->write("GET /longpoll HTTP/1.1\x0d\x0a\x0d\x0a");
@@ -417,7 +417,7 @@ $t->get_ok('/finish')->status_is(200)
 ok !$finish, 'finish event timing is right';
 
 # GET /too_long (request timeout)
-$tx = $t->ua->request_timeout('0.5')->build_tx(GET => '/too_long');
+$tx = $t->ua->request_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->body(
   sub {
@@ -432,7 +432,7 @@ is $buffer, 'how', 'right content';
 $t->ua->request_timeout(0);
 
 # GET /too_long (inactivity timeout)
-$tx = $t->ua->inactivity_timeout('0.5')->build_tx(GET => '/too_long');
+$tx = $t->ua->inactivity_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->body(
   sub {

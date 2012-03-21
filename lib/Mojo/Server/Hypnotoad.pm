@@ -143,7 +143,7 @@ sub _config {
   $c->{heartbeat_timeout}  ||= 10;
   $c->{lock_file}          ||= catfile tmpdir, 'hypnotoad.lock';
   $c->{lock_file} .= ".$$";
-  $c->{lock_timeout} ||= '0.5';
+  $c->{lock_timeout} ||= 0.5;
   $c->{pid_file} ||= catfile dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid';
   $c->{upgrade_timeout} ||= 60;
   $c->{workers}         ||= 4;

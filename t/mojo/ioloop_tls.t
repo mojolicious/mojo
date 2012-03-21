@@ -83,7 +83,7 @@ $loop->server(
     $stream->on(close   => sub { $server_close++ });
     $stream->on(error   => sub { $server_err = pop });
     $stream->on(read    => sub { $server .= pop });
-    $stream->timeout('0.5');
+    $stream->timeout(0.5);
   }
 );
 $loop->client(
@@ -176,7 +176,7 @@ $loop->server(
     $stream->on(close   => sub { $server_close++ });
     $stream->on(error   => sub { $server_err = pop });
     $stream->on(read    => sub { $server .= pop });
-    $stream->timeout('0.5');
+    $stream->timeout(0.5);
   }
 );
 $loop->client(

@@ -12,7 +12,7 @@ use Mojo::UserAgent;
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 
 # User agent
-my $UA = Mojo::UserAgent->new;
+my $UA = Mojo::UserAgent->new->detect_proxy;
 
 # "I'm sorry, guys. I never meant to hurt you.
 #  Just to destroy everything you ever believed in."

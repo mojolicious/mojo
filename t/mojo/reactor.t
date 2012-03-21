@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor';
 }
 
-use Test::More tests => 70;
+use Test::More tests => 66;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -144,13 +144,7 @@ is ref $reactor2, 'Mojo::Reactor', 'right object';
 $timer = 0;
 $reactor->recurring(0 => sub { $timer++ });
 my $timer2 = 0;
-$reactor2->recurring(
-  0 => sub {
-    my ($reactor2, $id) = @_;
-    $timer2++;
-    $reactor2->drop($id) if $timer2 == 2;
-  }
-);
+$reactor2->recurring(0 => sub { $timer2++ });
 $reactor->timer(0 => sub { shift->stop });
 $reactor->start;
 is $timer,  1, 'timer was triggered';
@@ -167,14 +161,6 @@ $reactor2->timer(0 => sub { shift->stop });
 $reactor2->start;
 is $timer,  2, 'timer was not triggered';
 is $timer2, 2, 'timer was triggered';
-$reactor2->timer(0 => sub { shift->stop });
-$reactor2->start;
-is $timer,  2, 'timer was not triggered';
-is $timer2, 2, 'timer was triggered';
-$reactor->timer(0 => sub { shift->stop });
-$reactor->start;
-is $timer,  3, 'timer was triggered';
-is $timer2, 2, 'timer was not triggered';
 
 # Error
 my $err;

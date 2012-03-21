@@ -116,7 +116,8 @@ Check if reactor is running.
 
   $reactor->one_tick;
 
-Run reactor for roughly one tick.
+Run reactor for roughly one tick. Note that this method can recurse back into
+the reactor, so you need to be careful.
 
 =head2 C<recurring>
 

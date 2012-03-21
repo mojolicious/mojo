@@ -27,16 +27,16 @@ sub watch {
   my ($self, $handle, $read, $write) = @_;
 
   my $fd = fileno $handle;
-  my $h  = $self->{handles}->{$fd};
+  my $io = $self->{io}->{$fd};
   my $mode;
   if ($read && $write) { $mode = EV::READ | EV::WRITE }
   elsif ($read)  { $mode = EV::READ }
   elsif ($write) { $mode = EV::WRITE }
-  else           { delete $h->{watcher} }
-  if (my $w = $h->{watcher}) { $w->set($fd, $mode) }
+  else           { delete $io->{watcher} }
+  if (my $w = $io->{watcher}) { $w->set($fd, $mode) }
   elsif ($mode) {
     weaken $self;
-    $h->{watcher} = EV::io($fd, $mode, sub { $self->_io($fd, @_) });
+    $io->{watcher} = EV::io($fd, $mode, sub { $self->_io($fd, @_) });
   }
 
   return $self;
@@ -44,11 +44,10 @@ sub watch {
 
 sub _io {
   my ($self, $fd, $w, $revents) = @_;
-  my $handles = $self->{handles};
-  my $h       = $handles->{$fd};
-  $self->_sandbox('Read', $h->{cb}, $h->{handle}, 0) if EV::READ &$revents;
-  $self->_sandbox('Write', $h->{cb}, $h->{handle}, 1)
-    if EV::WRITE &$revents && $handles->{$fd};
+  my $io = $self->{io}->{$fd};
+  $self->_sandbox('Read', $io->{cb}, 0) if EV::READ &$revents;
+  $self->_sandbox('Write', $io->{cb}, 1)
+    if EV::WRITE &$revents && $self->{io}->{$fd};
 }
 
 # "It's great! We can do *anything* now that Science has invented Magic."

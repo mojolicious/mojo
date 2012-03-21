@@ -21,12 +21,12 @@ sub drop {
   my ($self, $drop) = @_;
   return delete shift->{timers}->{shift()} unless ref $drop;
   $self->_poll->remove($drop);
-  return delete $self->{handles}->{fileno $drop};
+  return delete $self->{io}->{fileno $drop};
 }
 
 sub io {
   my ($self, $handle, $cb) = @_;
-  $self->{handles}->{fileno $handle} = {handle => $handle, cb => $cb};
+  $self->{io}->{fileno $handle} = {cb => $cb};
   return $self->watch($handle, 1, 1);
 }
 
@@ -86,19 +86,16 @@ sub _one_tick {
   # I/O
   my $poll = $self->_poll;
   $poll->poll('0.025');
-  my $handles = $self->{handles};
-  $self->_sandbox('Read', $handles->{fileno $_}->{cb}, $_, 0)
+  $self->_sandbox('Read', $self->{io}->{fileno $_}->{cb}, 0)
     for $poll->handles(POLLIN | POLLHUP | POLLERR);
-  $self->_sandbox('Write', $handles->{fileno $_}->{cb}, $_, 1)
+  $self->_sandbox('Write', $self->{io}->{fileno $_}->{cb}, 1)
     for $poll->handles(POLLOUT);
 
   # Wait for timeout
-  usleep 25000 unless keys %{$self->{handles}};
+  usleep 25000 unless keys %{$self->{io}};
 
   # Timers
-  my $timers = $self->{timers} || {};
-  for my $id (keys %$timers) {
-    my $t = $timers->{$id};
+  while (my ($id, $t) = each %{$self->{timers} || {}}) {
     my $after = $t->{after} || 0;
     if ($after <= time - ($t->{started} || $t->{recurring} || 0)) {
 
@@ -114,7 +111,7 @@ sub _one_tick {
   }
 
   # Stop automatically
-  $self->stop unless keys(%{$self->{timers}}) || keys(%{$self->{handles}});
+  $self->stop unless keys(%{$self->{timers}}) || keys(%{$self->{io}});
 }
 
 sub _poll { shift->{poll} ||= IO::Poll->new }
@@ -141,7 +138,7 @@ Mojo::Reactor - Minimalistic low level event reactor
   # Watch if handle becomes readable or writabe
   my $reactor = Mojo::Reactor->new;
   $reactor->io($handle => sub {
-    my ($reactor, $handle, $writable) = @_;
+    my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
 
@@ -208,7 +205,7 @@ readable or writable.
 
   # Callback will be invoked twice if handle becomes readable and writable
   $reactor->io($handle => sub {
-    my ($reactor, $handle, $writable) = @_;
+    my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
 

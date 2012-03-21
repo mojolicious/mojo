@@ -15,7 +15,7 @@ sub form {
   my ($self, $url) = (shift, shift);
 
   # Callback
-  my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
+  my $cb = pop @_ if (ref $_[-1] || '') eq 'CODE';
 
   # Form
   my $encoding = shift;
@@ -227,7 +227,7 @@ sub tx {
   ref $url ? $req->url($url) : $req->url->parse($url);
 
   # Callback
-  my $cb = pop @_ if ref $_[-1] && ref $_[-1] eq 'CODE';
+  my $cb = pop @_ if (ref $_[-1] || '') eq 'CODE';
 
   # Body
   $req->body(pop @_)

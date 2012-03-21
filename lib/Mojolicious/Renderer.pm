@@ -246,10 +246,6 @@ sub _extends {
   return delete $stash->{extends};
 }
 
-# "I want to see the edge of the universe.
-#  Ooh, that sounds cool.
-#  It's funny, you live in the universe, but you never get to do this things
-#  until someone comes to visit."
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 

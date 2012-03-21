@@ -84,14 +84,11 @@ sub register {
     memorize => sub {
       shift;
       my $cb = pop;
-      return '' unless ref $cb && ref $cb eq 'CODE';
+      return '' unless (ref $cb || '') eq 'CODE';
       my $name = shift;
       my $args;
-      if (ref $name && ref $name eq 'HASH') {
-        $args = $name;
-        $name = undef;
-      }
-      else { $args = shift || {} }
+      if ((ref $name || '') eq 'HASH') { ($args, $name) = ($name, undef) }
+      else                             { $args = shift || {} }
 
       # Default name
       $name ||= join '', map { $_ || '' } (caller(1))[0 .. 3];

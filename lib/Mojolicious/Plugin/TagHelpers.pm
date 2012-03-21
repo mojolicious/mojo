@@ -75,7 +75,7 @@ sub register {
 
       # CDATA
       my $cb = sub {''};
-      if (ref $_[-1] && ref $_[-1] eq 'CODE') {
+      if ((ref $_[-1] || '') eq 'CODE') {
         my $old = pop;
         $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
       }
@@ -189,7 +189,7 @@ sub register {
 
       # CDATA
       my $cb;
-      if (ref $_[-1] && ref $_[-1] eq 'CODE') {
+      if ((ref $_[-1] || '') eq 'CODE') {
         my $old = pop;
         $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
       }
@@ -240,8 +240,8 @@ sub register {
       my $cb = sub {''};
       my $value;
       if (@_ % 2) {
-        if   (ref $_[-1] && ref $_[-1] eq 'CODE') { $cb    = pop }
-        else                                      { $value = shift }
+        if   ((ref $_[-1] || '') eq 'CODE') { $cb    = pop }
+        else                                { $value = shift }
       }
 
       # Make sure value is wrapped

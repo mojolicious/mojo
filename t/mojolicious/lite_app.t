@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor';
 }
 
-use Test::More tests => 730;
+use Test::More tests => 709;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -336,9 +336,6 @@ get '/layout' => sub {
 
 # POST /template
 post '/template' => 'index';
-
-# GET /memorized
-get '/memorized' => 'memorized';
 
 # * /something
 any '/something' => sub {
@@ -1050,30 +1047,6 @@ $t->post_ok('/template')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
 
-# GET /memorized
-$t->get_ok('/memorized')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/\d+a\d+b\d+c\d+\nd\d+\ne\d+/);
-my $memorized = $t->tx->res->body;
-
-# GET /memorized
-$t->get_ok('/memorized')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($memorized);
-
-# GET /memorized
-$t->get_ok('/memorized')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($memorized);
-
-# GET /memorized (expired)
-sleep 2;
-$t->get_ok('/memorized')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/\d+a\d+b\d+c\d+\nd\d+\ne\d+/)->content_isnt($memorized);
-
 # GET /something
 $t->get_ok('/something')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1454,25 +1427,6 @@ text!
 
 @@ template.txt.epl
 <div id="foo">Redirect works!</div>
-
-@@ memorized.html.ep
-<%= memorize begin =%>
-<%= time =%>
-<% end =%>
-<%= memorize begin =%>
-    <%= 'a' . time =%>
-<% end =%><%= memorize begin =%>
-<%= 'b' . time =%>
-<% end =%>
-<%= memorize test => begin =%>
-<%= 'c' . time =%>
-<% end =%>
-<%= memorize expiry => {expires => time + 1} => begin %>
-<%= 'd' . time =%>
-<% end =%>
-<%= memorize {expires => time + 1} => begin %>
-<%= 'e' . time =%>
-<% end =%>
 
 @@ test(test)(\Qtest\E)(.html.ep
 <%= $self->match->endpoint->name %>

@@ -38,7 +38,7 @@ sub capture;
 *capture = sub { shift->(@_) };
 sub escape;
 *escape = sub {
-  return $_[0] if ref $_[0] && ref $_[0] eq 'Mojo::ByteStream';
+  return $_[0] if (ref $_[0] || '') eq 'Mojo::ByteStream';
   no warnings 'uninitialized';
   Mojo::Util::xml_escape "$_[0]";
 };

@@ -162,7 +162,7 @@ sub query {
   }
 
   # Merge with array
-  elsif (ref $_[0] && ref $_[0] eq 'ARRAY') {
+  elsif ((ref $_[0] || '') eq 'ARRAY') {
     my $q = $self->{query} ||= Mojo::Parameters->new;
     while (my $name = shift @{$_[0]}) {
       my $value = shift @{$_[0]};
@@ -171,7 +171,7 @@ sub query {
   }
 
   # Append hash
-  elsif (ref $_[0] && ref $_[0] eq 'HASH') {
+  elsif ((ref $_[0] || '') eq 'HASH') {
     ($self->{query} ||= Mojo::Parameters->new)->append(%{$_[0]});
   }
 

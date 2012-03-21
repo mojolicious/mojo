@@ -227,7 +227,7 @@ sub send {
   my ($self, $frame, $cb) = @_;
 
   # Binary or raw text
-  if (ref $frame && ref $frame eq 'HASH') {
+  if ((ref $frame || '') eq 'HASH') {
     $frame =
       exists $frame->{text}
       ? [1, 0, 0, 0, TEXT, $frame->{text}]

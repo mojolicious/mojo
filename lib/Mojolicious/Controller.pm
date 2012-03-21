@@ -167,7 +167,7 @@ sub param {
 
   # Captured unreserved values
   if (!$RESERVED{$name} && defined(my $v = $p->{$name})) {
-    return ref $v && ref $v eq 'ARRAY' ? wantarray ? @$v : $$v[0] : $v;
+    return (ref $v || '') eq 'ARRAY' ? wantarray ? @$v : $$v[0] : $v;
   }
 
   # Upload
@@ -570,27 +570,17 @@ sub url_for {
 
 sub write {
   my ($self, $chunk, $cb) = @_;
-
-  if (ref $chunk && ref $chunk eq 'CODE') {
-    $cb    = $chunk;
-    $chunk = undef;
-  }
+  ($cb, $chunk) = ($chunk, undef) if (ref $chunk || '') eq 'CODE';
   $self->res->write($chunk, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered;
-
   return $self;
 }
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
-
-  if (ref $chunk && ref $chunk eq 'CODE') {
-    $cb    = $chunk;
-    $chunk = undef;
-  }
+  ($cb, $chunk) = ($chunk, undef) if (ref $chunk || '') eq 'CODE';
   $self->res->write_chunk($chunk, sub { shift and $self->$cb(@_) if $cb });
   $self->rendered;
-
   return $self;
 }
 

@@ -49,7 +49,8 @@ sub one_tick {
   my $self = shift;
 
   # Remember state
-  (my $state, $self->{running}) = ($self->{running}, 1);
+  my $running = $self->{running};
+  $self->{running} = 1;
 
   # I/O
   my $poll = $self->_poll;
@@ -79,7 +80,7 @@ sub one_tick {
   }
 
   # Restore state if necessary
-  $self->{running} = $state if $self->{running};
+  $self->{running} = $running if $self->{running};
 }
 
 sub recurring { shift->_timer(pop, after => pop, recurring => time) }
@@ -243,6 +244,9 @@ the reactor, so you need to be careful.
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
+
+  # Invoke as soon as possible
+  $reactor->recurring(0 => sub { say 'Reactor tick.' });
 
 =head2 C<start>
 

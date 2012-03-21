@@ -21,7 +21,7 @@ sub recurring { shift->_timer(shift, 1, @_) }
 #  Yeah... where do I fill it up?"
 sub start {EV::run}
 
-sub stop { EV::break(EV::BREAK_ONE) }
+sub stop { EV::break(EV::BREAK_ALL) }
 
 sub timer { shift->_timer(shift, 0, @_) }
 

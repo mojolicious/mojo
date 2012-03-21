@@ -113,10 +113,12 @@ sub watch {
 
 sub _timer {
   my ($self, $cb) = (shift, shift);
+
   my $t = {cb => $cb, @_};
   my $id;
   do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}->{$id};
   $self->{timers}->{$id} = $t;
+
   return $id;
 }
 

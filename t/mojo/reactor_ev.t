@@ -215,7 +215,7 @@ Mojo::IOLoop->client(
     $client_err = $@;
   }
 );
-Mojo::IOLoop->timer(1 => sub { EV::break(EV::BREAK_ONE()) });
+Mojo::IOLoop->timer(1 => sub { EV::break(EV::BREAK_ALL()) });
 EV::run();
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 like $server_err, qr/^Mojo::IOLoop already running/, 'right error';

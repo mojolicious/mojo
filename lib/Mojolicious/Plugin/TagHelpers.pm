@@ -364,7 +364,7 @@ L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
 
   %= base_tag
 
-Generate C<base> tag refering to the current base URL.
+Generate portable C<base> tag refering to the current base URL.
 
   <base href="http://localhost/cgi-bin/myapp.pl" />
 
@@ -408,8 +408,8 @@ Generate file input element.
     %= submit_button
   % end
 
-Generate form for route, path or URL. For routes that allow C<POST> but not
-C<GET>, a C<method> attribute will be automatically added.
+Generate portable form for route, path or URL. For routes that allow C<POST>
+but not C<GET>, a C<method> attribute will be automatically added.
 
   <form action="/path/to/login" method="POST">
     <input name="first_name" />
@@ -468,7 +468,7 @@ picked up and shown as default.
     var a = 'b';
   % end
 
-Generate script tag for C<Javascript> asset.
+Generate portable script tag for C<Javascript> asset.
 
   <script src="/script.js" type="text/javascript" />
   <script type="text/javascript"><![CDATA[
@@ -486,8 +486,8 @@ Generate script tag for C<Javascript> asset.
   <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => 'bar')->to_abs => begin %>Retry<% end %>
 
-Generate link to route, path or URL, defaults to using the capitalized link
-target as content.
+Generate portable link to route, path or URL, defaults to using the
+capitalized link target as content.
 
   <a href="/path/to/index">Home</a>
   <a class="links" href="/path/to/index/bar">Home</a>
@@ -558,7 +558,7 @@ automatically get picked up and shown as default.
     body {color: #000}
   % end
 
-Generate style or link tag for C<CSS> asset.
+Generate portable style or link tag for C<CSS> asset.
 
   <link href="/foo.css" media="screen" rel="stylesheet" type="text/css" />
   <style type="text/css"><![CDATA[

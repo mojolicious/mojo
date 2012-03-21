@@ -11,7 +11,7 @@ use Scalar::Util 'weaken';
 has base_classes => sub { [qw/Mojolicious::Controller Mojo/] };
 has cache        => sub { Mojo::Cache->new };
 has [qw/conditions shortcuts/] => sub { {} };
-has hidden => sub { [qw/new attr has/] };
+has hidden => sub { [qw/attr has new/] };
 has 'namespace';
 
 sub add_condition {
@@ -181,7 +181,7 @@ sub _generate_method {
   my ($self, $field, $c) = @_;
 
   # Prepare hidden
-  unless ($self->{hiding}) { $self->{hiding}->{$_}++ for @{$self->hidden} }
+  $self->{hiding} = {map { $_ => 1 } @{$self->hidden}} unless $self->{hiding};
 
   # DEPRECATED in Leaf Fluttering In Wind!
   warn "The method stash value is DEPRECATED in favor of action!\n"
@@ -331,10 +331,10 @@ Contains all available conditions.
 =head2 C<hidden>
 
   my $hidden = $r->hidden;
-  $r         = $r->hidden([qw/new attr tx render req res stash/]);
+  $r         = $r->hidden([qw/attr has new/]);
 
 Controller methods and attributes that are hidden from routes, defaults to
-C<new>, C<attr> and C<has>.
+C<attr>, C<has> and C<new>.
 
 =head2 C<namespace>
 

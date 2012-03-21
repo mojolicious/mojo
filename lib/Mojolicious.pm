@@ -69,13 +69,12 @@ sub new {
   my $r = $self->routes;
   $r->namespace(ref $self);
 
-  # Hide controller attributes/methods, "handler" and "routes"
+  # Hide controller attributes/methods and "handler"
   $r->hide(qw/AUTOLOAD DESTROY app cookie finish flash handler on on_finish/);
   $r->hide(qw/param redirect_to render render_content render_data/);
   $r->hide(qw/render_exception render_json render_not_found render_partial/);
-  $r->hide(qw/render_static render_text rendered req res respond_to/);
-  $r->hide(qw/send session signed_cookie stash tx ua url_for write/);
-  $r->hide('write_chunk');
+  $r->hide(qw/render_static render_text rendered req res respond_to send/);
+  $r->hide(qw/session signed_cookie stash tx ua url_for write write_chunk/);
 
   # Prepare log
   my $mode = $self->mode;

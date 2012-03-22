@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor';
 }
 
-use Test::More tests => 30;
+use Test::More tests => 32;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -188,8 +188,7 @@ $err = undef;
 $loop->client(
   (port => $port) => sub {
     shift->stop;
-    pop;
-    $err = pop;
+    $err = shift;
   }
 );
 $loop->start;
@@ -260,19 +259,26 @@ ok length($server) > length($server_after), 'stream has been resumed';
 is $client, $client_after, 'stream was writable while paused';
 is $client, 'works!', 'full message has been written';
 
-# Graceful shutdown
+# Graceful shutdown (max_connections)
 $err = '';
 $loop = Mojo::IOLoop->new(max_connections => 0);
 $loop->drop($loop->client({port => $loop->generate_port}));
-$loop->timer(
-  1 => sub {
-    shift->stop;
-    $err = 'failed!';
-  }
-);
+$loop->timer(1 => sub { shift->stop; $err = 'failed!' });
 $loop->start;
 ok !$err, 'no error';
 is $loop->max_connections, 0, 'right value';
+
+# Graceful shutdown (max_accepts)
+$err  = '';
+$loop = Mojo::IOLoop->new(max_accepts => 1);
+$port = $loop->generate_port;
+$loop->server(
+  {address => '127.0.0.1', port => $port} => sub { shift; shift->close });
+$loop->client({port => $port} => sub { });
+$loop->timer(1 => sub { shift->stop; $err = 'failed!' });
+$loop->start;
+ok !$err, 'no error';
+is $loop->max_accepts, 1, 'right value';
 
 # Defaults
 is(

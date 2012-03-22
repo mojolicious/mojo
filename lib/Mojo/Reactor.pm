@@ -167,7 +167,7 @@ L<Mojo::Reactor> is a minimalistic low level event reactor based on
 L<IO::Poll> and the foundation of L<Mojo::IOLoop>. Note that this module is
 EXPERIMENTAL and might change without warning!
 
-  # A new reactor backend could look like this
+  # A new reactor implementation could look like this
   package Mojo::Reactor::MyLoop;
   use Mojo::Base 'Mojo::Reactor';
 

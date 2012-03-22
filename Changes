@@ -2,6 +2,8 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.65    2012-03-22 00:00:00
         - Added one_tick method to Mojo::Reactor and Mojo::Reactor::EV.
+        - Removed experimental status from max_accepts attribute in
+          Mojo::IOLoop.
         - Updated jQuery to version 1.7.2.
         - Improved documentation.
         - Improved tests.

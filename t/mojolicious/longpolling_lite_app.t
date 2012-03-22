@@ -62,7 +62,7 @@ get '/longpoll' => sub {
   );
   $self->on(
     finish => sub {
-      Mojo::IOLoop->drop($id);
+      Mojo::IOLoop->remove($id);
       $longpoll = 'finished!';
     }
   );

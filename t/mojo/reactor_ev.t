@@ -55,7 +55,7 @@ ok $reactor->is_readable($listen), 'handle is readable';
 
 # Accept
 my $server = $listen->accept;
-$reactor->drop($listen);
+$reactor->remove($listen);
 ($readable, $writable) = undef;
 $reactor->io($client => sub { pop() ? $writable++ : $readable++ });
 $reactor->timer(0 => sub { shift->stop });
@@ -64,7 +64,7 @@ is $readable, undef, 'handle is not readable';
 is $writable, 1,     'handle is writable';
 print $client "hello!\n";
 sleep 1;
-$reactor->drop($client);
+$reactor->remove($client);
 ($readable, $writable) = undef;
 $reactor->io($server => sub { pop() ? $writable++ : $readable++ });
 $reactor->watch($server, 1, 0);
@@ -97,7 +97,7 @@ is $writable, 1, 'handle is writable';
 # Timers
 my ($timer, $recurring);
 $reactor->timer(0 => sub { $timer++ });
-$reactor->drop($reactor->timer(0 => sub { $timer++ }));
+$reactor->remove($reactor->timer(0 => sub { $timer++ }));
 my $id = $reactor->recurring(0 => sub { $recurring++ });
 $reactor->one_tick;
 is $readable,  2, 'handle is readable again';
@@ -123,7 +123,7 @@ is $readable,  5, 'handle is readable again';
 is $writable,  5, 'handle is writable again';
 is $timer,     1, 'timer was not triggered';
 is $recurring, 4, 'recurring was triggered again';
-$reactor->drop($id);
+$reactor->remove($id);
 $reactor->timer(0 => sub { shift->stop });
 $reactor->start;
 is $readable,  6, 'handle is readable again';
@@ -132,8 +132,8 @@ is $timer,     1, 'timer was not triggered';
 is $recurring, 4, 'recurring was not triggered again';
 
 # Reset
-$reactor->drop($id);
-$reactor->drop($server);
+$reactor->remove($id);
+$reactor->remove($server);
 $reactor->timer(0 => sub { shift->stop });
 $reactor->start;
 is $readable, 6, 'io event was not triggered again';

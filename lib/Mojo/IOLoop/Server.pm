@@ -80,7 +80,7 @@ sub DESTROY {
   defined $_ and -w $_ and unlink $_ for $self->{cert}, $self->{key};
   return unless my $reactor = $self->{reactor};
   $self->stop if $self->{handle};
-  $reactor->drop($_) for values %{$self->{handles}};
+  $reactor->remove($_) for values %{$self->{handles}};
 }
 
 # "And I gave that man directions, even though I didn't know the way,
@@ -161,7 +161,7 @@ sub start {
 
 sub stop {
   my $self = shift;
-  $self->reactor->drop($self->{handle});
+  $self->reactor->remove($self->{handle});
 }
 
 sub _accept {
@@ -179,7 +179,7 @@ sub _accept {
   weaken $self;
   $tls->{SSL_error_trap} = sub {
     return unless my $handle = delete $self->{handles}->{shift()};
-    $self->reactor->drop($handle);
+    $self->reactor->remove($handle);
     close $handle;
   };
   return unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
@@ -210,7 +210,7 @@ sub _tls {
 
   # Accepted
   if ($handle->accept_SSL) {
-    $self->reactor->drop($handle);
+    $self->reactor->remove($handle);
     delete $self->{handles}->{$handle};
     return $self->emit_safe(accept => $handle);
   }

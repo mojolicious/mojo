@@ -134,7 +134,7 @@ ok $tx->kept_alive,  'connection was kept alive';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
-# Drop keep alive connections
+# Remove keep alive connections
 $ua = Mojo::UserAgent->new;
 
 # Wait for hot deployment to finish

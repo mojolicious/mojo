@@ -66,8 +66,8 @@ is $client, 'test321', 'right content';
 $loop   = Mojo::IOLoop->singleton;
 $port   = Mojo::IOLoop->generate_port;
 $server = $client = '';
-my ($drop, $running, $timeout, $server_err, $server_close, $client_close);
-Mojo::IOLoop->drop(Mojo::IOLoop->recurring(0 => sub { $drop++ }));
+my ($remove, $running, $timeout, $server_err, $server_close, $client_close);
+Mojo::IOLoop->remove(Mojo::IOLoop->recurring(0 => sub { $remove++ }));
 $loop->server(
   address  => '127.0.0.1',
   port     => $port,
@@ -106,7 +106,7 @@ is $timeout,      1,         'server emitted timeout event once';
 is $server_close, 1,         'server emitted close event once';
 is $client_close, 1,         'client emitted close event once';
 ok $running,      'loop was running';
-ok !$drop,       'event dropped successfully';
+ok !$remove,     'event removed successfully';
 ok !$server_err, 'no error';
 
 # Invalid client certificate

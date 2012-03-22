@@ -135,7 +135,7 @@ sub _cache {
   my $cache = $self->{cache} ||= [];
   if ($id) {
     my $max = $self->max_connections;
-    $self->_drop(shift(@$cache)->[1]) while @$cache > $max;
+    $self->_remove(shift(@$cache)->[1]) while @$cache > $max;
     push @$cache, [$name, $id] if $max;
     return;
   }
@@ -145,11 +145,11 @@ sub _cache {
   my ($result, @cache);
   for my $cached (@$cache) {
 
-    # Search for id/name and drop corrupted connections
+    # Search for id/name and remove corrupted connections
     if (!$result && ($cached->[1] eq $name || $cached->[0] eq $name)) {
       my $stream = $loop->stream($cached->[1]);
       if ($stream && !$stream->is_readable) { $result = $cached->[1] }
-      else                                  { $loop->drop($cached->[1]) }
+      else                                  { $loop->remove($cached->[1]) }
     }
 
     # Requeue
@@ -169,11 +169,11 @@ sub _cleanup {
   delete $self->{server};
 
   # Clean up active connections
-  warn "DROPPING ALL CONNECTIONS\n" if DEBUG;
-  $loop->drop($_) for keys %{$self->{connections} || {}};
+  warn "REMOVING ALL CONNECTIONS\n" if DEBUG;
+  $loop->remove($_) for keys %{$self->{connections} || {}};
 
   # Clean up keep alive connections
-  $loop->drop($_->[1]) for @{$self->{cache} || []};
+  $loop->remove($_->[1]) for @{$self->{cache} || []};
 }
 
 sub _connect {
@@ -296,22 +296,6 @@ sub _connected {
   $self->_write($id);
 }
 
-sub _drop {
-  my ($self, $id, $close) = @_;
-
-  # Close connection
-  my $tx = (delete($self->{connections}->{$id}) || {})->{tx};
-  unless (!$close && $tx && $tx->keep_alive && !$tx->error) {
-    $self->_cache($id);
-    return $self->_loop->drop($id);
-  }
-
-  # Keep connection alive
-  $self->_cache(join(':', $self->transactor->peer($tx)), $id)
-    unless (($tx->req->method || '') eq 'CONNECT'
-    && ($tx->res->code || '') eq '200');
-}
-
 sub _error {
   my ($self, $id, $err, $emit) = @_;
   if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->res->error($err) }
@@ -353,14 +337,14 @@ sub _handle {
 
   # Request timeout
   my $c = $self->{connections}->{$id};
-  $self->_loop->drop($c->{timeout}) if $c->{timeout};
+  $self->_loop->remove($c->{timeout}) if $c->{timeout};
 
   # Finish WebSocket
   my $old = $c->{tx};
   if ($old && $old->is_websocket) {
     $self->{processing} -= 1;
     delete $self->{connections}->{$id};
-    $self->_drop($id, $close);
+    $self->_remove($id, $close);
     $old->client_close;
   }
 
@@ -373,7 +357,7 @@ sub _handle {
 
   # Finish normal connection
   else {
-    $self->_drop($id, $close);
+    $self->_remove($id, $close);
     return unless $old;
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
     $self->{processing} -= 1;
@@ -398,13 +382,29 @@ sub _read {
   warn "< $chunk\n" if DEBUG;
 
   # Corrupted connection
-  return                   unless my $c  = $self->{connections}->{$id};
-  return $self->_drop($id) unless my $tx = $c->{tx};
+  return                     unless my $c  = $self->{connections}->{$id};
+  return $self->_remove($id) unless my $tx = $c->{tx};
 
   # Process incoming data
   $tx->client_read($chunk);
   if    ($tx->is_finished)     { $self->_handle($id) }
   elsif ($c->{tx}->is_writing) { $self->_write($id) }
+}
+
+sub _remove {
+  my ($self, $id, $close) = @_;
+
+  # Close connection
+  my $tx = (delete($self->{connections}->{$id}) || {})->{tx};
+  unless (!$close && $tx && $tx->keep_alive && !$tx->error) {
+    $self->_cache($id);
+    return $self->_loop->remove($id);
+  }
+
+  # Keep connection alive
+  $self->_cache(join(':', $self->transactor->peer($tx)), $id)
+    unless (($tx->req->method || '') eq 'CONNECT'
+    && ($tx->res->code || '') eq '200');
 }
 
 sub _redirect {
@@ -716,7 +716,7 @@ Proxy server to use for HTTPS and WebSocket requests.
   $ua         = $ua->inactivity_timeout(15);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
+closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
 variable or C<20>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
 

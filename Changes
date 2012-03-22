@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.65    2012-03-22 00:00:00
+        - Deprecated Mojo::IOLoop->drop in favor of Mojo::IOLoop->remove.
+        - Renamed Mojo::Reactor->drop to Mojo::Reactor->remove.
         - Added one_tick method to Mojo::Reactor and Mojo::Reactor::EV.
         - Removed experimental status from Mojo::Reactor.
         - Removed experimental status from Mojo::Reactor::EV.

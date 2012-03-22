@@ -85,11 +85,10 @@ sub delay {
   return $delay;
 }
 
+# DEPRECATED in Leaf Fluttering In Wind!
 sub drop {
-  my ($self, $id) = @_;
-  $self = $self->singleton unless ref $self;
-  if (my $c = $self->{connections}->{$id}) { return $c->{finish} = 1 }
-  $self->_drop($id);
+  warn "Mojo::IOLoop->drop is DEPRECATED in favor of Mojo::IOLoop->remove!\n";
+  shift->remove(@_);
 }
 
 sub generate_port { Mojo::IOLoop::Server->generate_port }
@@ -110,6 +109,13 @@ sub recurring {
   $self = $self->singleton unless ref $self;
   weaken $self;
   return $self->reactor->recurring($after => sub { $self->$cb });
+}
+
+sub remove {
+  my ($self, $id) = @_;
+  $self = $self->singleton unless ref $self;
+  if (my $c = $self->{connections}->{$id}) { return $c->{finish} = 1 }
+  $self->_remove($id);
 }
 
 # "Fat Tony is a cancer on this fair city!
@@ -213,33 +219,16 @@ sub _cleaner {
       $self->_listening;
       my $connections = $self->{connections} ||= {};
       while (my ($id, $c) = each %$connections) {
-        $self->_drop($id)
+        $self->_remove($id)
           if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
       }
 
       # Graceful shutdown
-      $self->_drop(delete $self->{cleaner})
+      $self->_remove(delete $self->{cleaner})
         unless keys(%$connections) || keys(%{$self->{servers}});
       $self->stop if $self->max_connections == 0 && keys %$connections == 0;
     }
   );
-}
-
-sub _drop {
-  my ($self, $id) = @_;
-
-  # Timer
-  return unless my $reactor = $self->reactor;
-  return if $reactor->drop($id);
-
-  # Listen socket
-  if (delete $self->{servers}->{$id}) { delete $self->{listening} }
-
-  # Connection (stream needs to be deleted first)
-  else {
-    delete(($self->{connections}->{$id} || {})->{stream});
-    delete $self->{connections}->{$id};
-  }
 }
 
 sub _id {
@@ -277,6 +266,23 @@ sub _not_listening {
 
   # Stop listening
   $_->stop for values %{$self->{servers} || {}};
+}
+
+sub _remove {
+  my ($self, $id) = @_;
+
+  # Timer
+  return unless my $reactor = $self->reactor;
+  return if $reactor->remove($id);
+
+  # Listen socket
+  if (delete $self->{servers}->{$id}) { delete $self->{listening} }
+
+  # Connection (stream needs to be deleted first)
+  else {
+    delete(($self->{connections}->{$id} || {})->{stream});
+    delete $self->{connections}->{$id};
+  }
 }
 
 1;
@@ -323,7 +329,7 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
   # Add a timer
   Mojo::IOLoop->timer(5 => sub {
     my $loop = shift;
-    $loop->drop($id);
+    $loop->remove($id);
   });
 
   # Start loop if necessary
@@ -473,14 +479,6 @@ event L<Mojo::IOLoop::Delay/"finish"> if optional callback is provided.
   # Wait for events if necessary
   $delay->wait unless Mojo::IOLoop->is_running;
 
-=head2 C<drop>
-
-  Mojo::IOLoop->drop($id);
-  $loop->drop($id);
-
-Drop anything with an id. Connections will be dropped gracefully by allowing
-them to finish writing all data in their write buffers.
-
 =head2 C<generate_port>
 
   my $port = Mojo::IOLoop->generate_port;
@@ -516,6 +514,14 @@ amount of time in seconds.
   # Run multiple reactors next to each other
   my $loop2 = Mojo::IOLoop->new;
   Mojo::IOLoop->recurring(0 => sub { $loop2->one_tick });
+
+=head2 C<remove>
+
+  Mojo::IOLoop->remove($id);
+  $loop->remove($id);
+
+Remove anything with an id. Connections will be dropped gracefully by
+allowing them to finish writing all data in their write buffers.
 
 =head2 C<server>
 

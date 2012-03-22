@@ -17,13 +17,6 @@ sub detect {
   return 'Mojo::Reactor';
 }
 
-sub drop {
-  my ($self, $drop) = @_;
-  return delete shift->{timers}->{shift()} unless ref $drop;
-  $self->_poll->remove($drop);
-  return delete $self->{io}->{fileno $drop};
-}
-
 sub io {
   my ($self, $handle, $cb) = @_;
   $self->{io}->{fileno $handle} = {cb => $cb};
@@ -69,7 +62,7 @@ sub one_tick {
     if ($after <= time - ($t->{started} || $t->{recurring} || 0)) {
 
       # Normal timer
-      if ($t->{started}) { $self->drop($id) }
+      if ($t->{started}) { $self->remove($id) }
 
       # Recurring timer
       elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
@@ -84,6 +77,13 @@ sub one_tick {
 }
 
 sub recurring { shift->_timer(pop, after => pop, recurring => time) }
+
+sub remove {
+  my ($self, $remove) = @_;
+  return delete shift->{timers}->{shift()} unless ref $remove;
+  $self->_poll->remove($remove);
+  return delete $self->{io}->{fileno $remove};
+}
 
 sub start {
   my $self = shift;
@@ -154,7 +154,7 @@ Mojo::Reactor - Minimalistic low level event reactor
   # Add a timer
   $reactor->timer(15 => sub {
     my $reactor = shift;
-    $reactor->drop($handle);
+    $reactor->remove($handle);
     say 'Timeout!';
   });
 
@@ -172,11 +172,11 @@ L<IO::Poll> and the foundation of L<Mojo::IOLoop>.
 
   $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::MyLoop';
 
-  sub drop       {...}
   sub io         {...}
   sub is_running {...}
   sub one_tick   {...}
   sub recurring  {...}
+  sub remove     {...}
   sub start      {...}
   sub stop       {...}
   sub timer      {...}
@@ -216,13 +216,6 @@ implements the following new ones.
 
 Detect and load the best reactor implementation available, will try the value
 of the C<MOJO_REACTOR> environment variable or L<Mojo::Reactor::EV>.
-
-=head2 C<drop>
-
-  my $success = $reactor->drop($handle);
-  my $success = $reactor->drop($id);
-
-Drop handle or timer.
 
 =head2 C<io>
 
@@ -266,6 +259,13 @@ amount of time in seconds.
 
   # Invoke as soon as possible
   $reactor->recurring(0 => sub { say 'Reactor tick.' });
+
+=head2 C<remove>
+
+  my $success = $reactor->remove($handle);
+  my $success = $reactor->remove($id);
+
+Remove handle or timer.
 
 =head2 C<start>
 

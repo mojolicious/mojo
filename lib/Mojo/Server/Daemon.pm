@@ -25,8 +25,8 @@ has max_requests => 25;
 sub DESTROY {
   my $self = shift;
   return unless my $loop = $self->ioloop;
-  $loop->drop($_) for keys %{$self->{connections} || {}};
-  $loop->drop($_) for @{$self->{listening} || []};
+  $loop->remove($_) for keys %{$self->{connections} || {}};
+  $loop->remove($_) for @{$self->{listening} || []};
 }
 
 # DEPRECATED in Leaf Fluttering In Wind!
@@ -108,31 +108,21 @@ sub _build_tx {
   return $tx;
 }
 
-sub _close { shift->_drop(pop) }
-
-sub _drop {
-  my ($self, $id) = @_;
-
-  # Finish gracefully
-  if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->server_close }
-
-  # Drop connection
-  delete $self->{connections}->{$id};
-}
+sub _close { shift->_remove(pop) }
 
 sub _error {
   my ($self, $id, $err) = @_;
   $self->app->log->error($err);
-  $self->_drop($id);
+  $self->_remove($id);
 }
 
 sub _finish {
   my ($self, $id, $tx) = @_;
 
-  # Always drop connection for WebSockets
+  # Always remove connection for WebSockets
   if ($tx->is_websocket) {
-    $self->_drop($id);
-    return $self->ioloop->drop($id);
+    $self->_remove($id);
+    return $self->ioloop->remove($id);
   }
 
   # Finish transaction
@@ -157,8 +147,8 @@ sub _finish {
 
   # Close connection if necessary
   if ($tx->req->error || !$tx->keep_alive) {
-    $self->_drop($id);
-    $self->ioloop->drop($id);
+    $self->_remove($id);
+    $self->ioloop->remove($id);
   }
 
   # Build new transaction for leftovers
@@ -274,6 +264,16 @@ sub _read {
   elsif ($tx->is_writing) { $self->_write($id) }
 }
 
+sub _remove {
+  my ($self, $id) = @_;
+
+  # Finish gracefully
+  if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->server_close }
+
+  # Remove connection
+  delete $self->{connections}->{$id};
+}
+
 sub _user {
   my $self = shift;
   return unless my $user = $self->user;
@@ -386,7 +386,7 @@ Group for server process.
   $daemon     = $daemon->inactivity_timeout(5);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
+closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
 variable or C<15>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
 

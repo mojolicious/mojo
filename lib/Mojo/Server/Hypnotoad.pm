@@ -540,7 +540,7 @@ stopped, defaults to C<10>.
   inactivity_timeout => 10
 
 Maximum amount of time in seconds a connection can be inactive before getting
-dropped, defaults to C<15>. Setting the value to C<0> will allow connections
+closed, defaults to C<15>. Setting the value to C<0> will allow connections
 to be inactive indefinitely.
 
 =head2 C<keep_alive_requests>

@@ -37,7 +37,7 @@ get '/plain' => {text => 'Nothing to see here!'};
 websocket '/push' => sub {
   my $self = shift;
   my $id = Mojo::IOLoop->recurring(0.5 => sub { $self->send('push') });
-  $self->on(finish => sub { Mojo::IOLoop->drop($id) });
+  $self->on(finish => sub { Mojo::IOLoop->remove($id) });
 };
 
 # WebSocket /unicode

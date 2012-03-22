@@ -64,7 +64,7 @@ which we already have done in the past.
 
 To protect your applications from excessively large requests and responses,
 our HTTP parser has a cap after which it will automatically stop accepting
-new data, and in most cases force the connection to be dropped. This limit is
+new data, and in most cases force the connection to be closed. This limit is
 around C<5MB> by default, you can use the C<MOJO_MAX_MESSAGE_SIZE>
 environment variable to change this value.
 
@@ -89,7 +89,7 @@ passphrase with the attribute L<Mojolicious/"secret">.
 
 To protect your applications from denial-of-service attacks, all connections
 have an inactivity timeout which limits how long a connection may be inactive
-before being dropped automatically. It defaults to C<20> seconds for the user
+before being closed automatically. It defaults to C<20> seconds for the user
 agent and C<15> seconds for all built-in web servers, and is commonly
 referred to as C<inactivity_timeout>. This timeout always applies, so you
 might have to tweak it for applications that take a long time to process a

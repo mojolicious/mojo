@@ -110,7 +110,7 @@ $id = Mojo::IOLoop->client(
       read => sub {
         my ($stream, $chunk) = @_;
         $buffer .= $chunk;
-        Mojo::IOLoop->drop($id) and Mojo::IOLoop->stop
+        Mojo::IOLoop->remove($id) and Mojo::IOLoop->stop
           if $buffer =~ s/ is working!$//;
         $stream->write('4321')
           if $buffer =~ m#HTTP/1.1 100 Continue.*\x0d\x0a\x0d\x0a#gs;
@@ -133,7 +133,7 @@ $id     = Mojo::IOLoop->client(
       read => sub {
         my ($stream, $chunk) = @_;
         $buffer .= $chunk;
-        Mojo::IOLoop->drop($id) and Mojo::IOLoop->stop
+        Mojo::IOLoop->remove($id) and Mojo::IOLoop->stop
           if $buffer =~ s/ is working!.*is working!$//gs;
       }
     );

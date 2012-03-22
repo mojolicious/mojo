@@ -32,7 +32,7 @@ Mojo::IOLoop->server(
                 my ($loop, $err, $stream) = @_;
                 if ($err) {
                   say "Connection error for $address:$port: $err";
-                  Mojo::IOLoop->drop($client);
+                  Mojo::IOLoop->remove($client);
                   return delete $c->{$client};
                 }
                 say "Forwarding to $address:$port.";
@@ -45,7 +45,7 @@ Mojo::IOLoop->server(
                 );
                 $stream->on(
                   close => sub {
-                    Mojo::IOLoop->drop($client);
+                    Mojo::IOLoop->remove($client);
                     delete $c->{$client};
                   }
                 );
@@ -56,12 +56,12 @@ Mojo::IOLoop->server(
             );
           }
         }
-        else { Mojo::IOLoop->drop($client) }
+        else { Mojo::IOLoop->remove($client) }
       }
     );
     $stream->on(
       close => sub {
-        Mojo::IOLoop->drop($c->{$client}->{connection})
+        Mojo::IOLoop->remove($c->{$client}->{connection})
           if $c->{$client}->{connection};
         delete $c->{$client};
       }

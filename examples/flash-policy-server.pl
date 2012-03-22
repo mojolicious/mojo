@@ -26,7 +26,7 @@ Mojo::IOLoop->server(
     my ($loop, $stream, $id) = @_;
     $stream->on(
       read => sub {
-        shift->write($xml, sub { Mojo::IOLoop->drop($id) });
+        shift->write($xml, sub { Mojo::IOLoop->remove($id) });
       }
     );
   }

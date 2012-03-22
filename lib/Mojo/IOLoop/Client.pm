@@ -38,9 +38,9 @@ sub connect {
 sub _cleanup {
   my $self = shift;
   return unless my $reactor = $self->{reactor};
-  $reactor->drop(delete $self->{delay})  if $self->{delay};
-  $reactor->drop(delete $self->{timer})  if $self->{timer};
-  $reactor->drop(delete $self->{handle}) if $self->{handle};
+  $reactor->remove(delete $self->{delay})  if $self->{delay};
+  $reactor->remove(delete $self->{timer})  if $self->{timer};
+  $reactor->remove(delete $self->{handle}) if $self->{handle};
 }
 
 sub _connect {

@@ -350,7 +350,7 @@ won't block any other requests that might be processed in parallel.
 
   app->start;
 
-Recurring timers are slightly more powerful, but need to be dropped manually,
+Recurring timers are slightly more powerful, but need to be stopped manually,
 or they would just keep getting emitted.
 
   use Mojolicious::Lite;
@@ -368,7 +368,7 @@ or they would just keep getting emitted.
     });
 
     # Stop recurring timer
-    $self->on(finish => sub { Mojo::IOLoop->drop($id) });
+    $self->on(finish => sub { Mojo::IOLoop->remove($id) });
   };
 
   app->start;

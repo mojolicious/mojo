@@ -26,9 +26,9 @@ sub close {
 
   # Cleanup
   return unless my $reactor = $self->{reactor};
-  $reactor->drop(delete $self->{timer}) if $self->{timer};
+  $reactor->remove(delete $self->{timer}) if $self->{timer};
   return unless my $handle = delete $self->{handle};
-  $reactor->drop($handle);
+  $reactor->remove($handle);
 
   # Close
   close $handle;
@@ -82,7 +82,7 @@ sub stop {
 #  about it."
 sub steal_handle {
   my $self = shift;
-  $self->reactor->drop($self->{handle});
+  $self->reactor->remove($self->{handle});
   return delete $self->{handle};
 }
 

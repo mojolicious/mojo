@@ -180,6 +180,7 @@ EXPERIMENTAL and might change without warning!
   sub recurring  {...}
   sub start      {...}
   sub stop       {...}
+  sub timer      {...}
   sub watch      {...}
 
   1;

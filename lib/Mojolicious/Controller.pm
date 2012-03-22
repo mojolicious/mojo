@@ -917,6 +917,12 @@ will be invoked once all data has been written.
   # Send "Ping" frame
   $c->send([1, 0, 0, 0, 9, 'Hello World!']);
 
+For mostly idle WebSockets you might also want to increase the inactivity
+timeout, which usually defaults to C<15> seconds.
+
+  # Increase inactivity timeout for connection to 300 seconds
+  Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
+
 =head2 C<session>
 
   my $session = $c->session;
@@ -1041,6 +1047,12 @@ invoked once all data has been written.
       $c->finish;
     });
   });
+
+For Comet (C<long polling>) you might also want to increase the inactivity
+timeout, which usually defaults to C<15> seconds.
+
+  # Increase inactivity timeout for connection to 300 seconds
+  Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
 
 =head2 C<write_chunk>
 

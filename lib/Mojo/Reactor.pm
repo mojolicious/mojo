@@ -144,7 +144,7 @@ Mojo::Reactor - Minimalistic low level event reactor
 
   use Mojo::Reactor;
 
-  # Watch if handle becomes readable or writabe
+  # Watch if handle becomes readable or writable
   my $reactor = Mojo::Reactor->new;
   $reactor->io($handle => sub {
     my ($reactor, $writable) = @_;
@@ -185,7 +185,7 @@ EXPERIMENTAL and might change without warning!
 
   1;
 
-Exceptions in callbacks should be catched and emitted as C<error> events with
+Exceptions in callbacks should be caught and emitted as C<error> events with
 L<Mojo::EventEmitter/"emit">.
 
 =head1 EVENTS

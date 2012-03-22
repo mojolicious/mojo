@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable Bonjour, IPv6 and libev
 BEGIN {
   $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
-  $ENV{MOJO_REACTOR} = 'Mojo::Reactor';
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
 use Test::More tests => 32;
@@ -20,14 +20,14 @@ use Mojo::IOLoop::Stream;
 
 # Custom reactor
 package MyReactor;
-use Mojo::Base 'Mojo::Reactor';
+use Mojo::Base 'Mojo::Reactor::Poll';
 
 package main;
 
 # Reactor detection
 $ENV{MOJO_REACTOR} = 'MyReactorDoesNotExist';
 my $loop = Mojo::IOLoop->new;
-is ref $loop->reactor, 'Mojo::Reactor', 'right class';
+is ref $loop->reactor, 'Mojo::Reactor::Poll', 'right class';
 $ENV{MOJO_REACTOR} = 'MyReactor';
 $loop = Mojo::IOLoop->new;
 is ref $loop->reactor, 'MyReactor', 'right class';

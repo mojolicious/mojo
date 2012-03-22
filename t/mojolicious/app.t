@@ -4,7 +4,7 @@ use Mojo::Base -strict;
 BEGIN {
   $ENV{MOJO_MODE}       = 'development';
   $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
-  $ENV{MOJO_REACTOR}    = 'Mojo::Reactor';
+  $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
 use Test::More tests => 284;

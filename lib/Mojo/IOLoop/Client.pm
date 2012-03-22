@@ -187,7 +187,7 @@ L<Mojo::IOLoop::Client> implements the following attributes.
 =head2 C<reactor>
 
   my $reactor = $client->reactor;
-  $client     = $client->reactor(Mojo::Reactor->new);
+  $client     = $client->reactor(Mojo::Reactor::Poll->new);
 
 Low level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.

@@ -17,7 +17,7 @@ use IO::Socket::INET;
 use_ok 'Mojo::Reactor::EV';
 my $reactor = Mojo::Reactor::EV->new;
 is ref $reactor, 'Mojo::Reactor::EV', 'right object';
-is ref Mojo::Reactor::EV->new, 'Mojo::Reactor', 'right object';
+is ref Mojo::Reactor::EV->new, 'Mojo::Reactor::Poll', 'right object';
 undef $reactor;
 is ref Mojo::Reactor::EV->new, 'Mojo::Reactor::EV', 'right object';
 use_ok 'Mojo::IOLoop';
@@ -139,7 +139,7 @@ $reactor->start;
 is $readable, 6, 'io event was not triggered again';
 is $writable, 6, 'io event was not triggered again';
 my $reactor2 = Mojo::Reactor::EV->new;
-is ref $reactor2, 'Mojo::Reactor', 'right object';
+is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
 
 # Parallel loops
 $timer = 0;
@@ -180,7 +180,7 @@ is(Mojo::Reactor->detect, 'Mojo::Reactor::EV', 'right class');
 
 # Dummy reactor
 package Mojo::Reactor::Test;
-use Mojo::Base 'Mojo::Reactor';
+use Mojo::Base 'Mojo::Reactor::Poll';
 $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Test';
 
 package main;

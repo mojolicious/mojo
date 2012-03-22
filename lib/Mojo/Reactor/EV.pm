@@ -1,5 +1,5 @@
 package Mojo::Reactor::EV;
-use Mojo::Base 'Mojo::Reactor';
+use Mojo::Base 'Mojo::Reactor::Poll';
 
 use EV 4.0;
 use Scalar::Util 'weaken';
@@ -8,8 +8,8 @@ my $EV;
 
 sub DESTROY { undef $EV }
 
-# We have to fall back to Mojo::Reactor, since EV is unique
-sub new { $EV++ ? Mojo::Reactor->new : shift->SUPER::new }
+# We have to fall back to Mojo::Reactor::Poll, since EV is unique
+sub new { $EV++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
 
 sub is_running {EV::depth}
 
@@ -77,26 +77,40 @@ __END__
 
 =head1 NAME
 
-Mojo::Reactor::EV - Minimalistic low level event reactor with libev support
+Mojo::Reactor::EV - Low level event reactor with libev support
 
 =head1 SYNOPSIS
 
   use Mojo::Reactor::EV;
 
+  # Watch if handle becomes readable or writable
   my $reactor = Mojo::Reactor::EV->new;
+  $reactor->io($handle => sub {
+    my ($reactor, $writable) = @_;
+    say $writable ? 'Handle is writable' : 'Handle is readable';
+  });
+
+  # Add a timer
+  $reactor->timer(15 => sub {
+    my $reactor = shift;
+    $reactor->remove($handle);
+    say 'Timeout!';
+  });
+
+  # Start reactor if necessary
+  $reactor->start unless $reactor->is_running;
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::EV> is a minimalistic low level event reactor with C<libev>
-support.
+L<Mojo::Reactor::EV> is a low level event reactor based on C<libev>.
 
 =head1 EVENTS
 
-L<Mojo::Reactor::EV> inherits all events from L<Mojo::Reactor>.
+L<Mojo::Reactor::EV> inherits all events from L<Mojo::Reactor::Poll>.
 
 =head1 METHODS
 
-L<Mojo::Reactor::EV> inherits all methods from L<Mojo::Reactor> and
+L<Mojo::Reactor::EV> inherits all methods from L<Mojo::Reactor::Poll> and
 implements the following new ones.
 
 =head2 C<new>
@@ -125,6 +139,9 @@ the reactor, so you need to be careful.
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
 
+  # Invoke as soon as possible
+  $reactor->recurring(0 => sub { say 'Reactor tick.' });
+
 =head2 C<start>
 
   $reactor->start;
@@ -150,6 +167,18 @@ seconds.
   $reactor = $reactor->watch($handle, $readable, $writable);
 
 Change I/O events to watch handle for with C<true> and C<false> values.
+
+  # Watch only for readable events
+  $reactor->watch($handle, 1, 0);
+
+  # Watch only for writable events
+  $reactor->watch($handle, 0, 1);
+
+  # Watch for readable and writable events
+  $reactor->watch($handle, 1, 1);
+
+  # Pause watching for events
+  $reactor->watch($handle, 0, 0);
 
 =head1 SEE ALSO
 

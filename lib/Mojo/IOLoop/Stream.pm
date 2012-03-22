@@ -266,7 +266,7 @@ L<Mojo::IOLoop::Stream> implements the following attributes.
 =head2 C<reactor>
 
   my $reactor = $stream->reactor;
-  $stream     = $stream->reactor(Mojo::Reactor->new);
+  $stream     = $stream->reactor(Mojo::Reactor::Poll->new);
 
 Low level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.

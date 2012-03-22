@@ -6,7 +6,7 @@ use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
-use Mojo::Reactor;
+use Mojo::Reactor::Poll;
 use Mojo::Util 'md5_sum';
 use Scalar::Util qw/blessed weaken/;
 use Time::HiRes 'time';
@@ -18,7 +18,7 @@ has [qw/lock unlock/];
 has max_accepts     => 0;
 has max_connections => 1000;
 has reactor         => sub {
-  my $class = Mojo::Reactor->detect;
+  my $class = Mojo::Reactor::Poll->detect;
   warn "MAINLOOP ($class)\n" if DEBUG;
   return $class->new;
 };
@@ -406,8 +406,8 @@ connections.
   my $reactor = $loop->reactor;
   $loop       = $loop->reactor(Mojo::Reactor->new);
 
-Low level event reactor, usually a L<Mojo::Reactor> or L<Mojo::Reactor::EV>
-object.
+Low level event reactor, usually a L<Mojo::Reactor::Poll> or
+L<Mojo::Reactor::EV> object.
 
 =head2 C<server_class>
 

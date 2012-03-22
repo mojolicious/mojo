@@ -88,8 +88,7 @@ Mojo::Reactor::EV - Minimalistic low level event reactor with libev support
 =head1 DESCRIPTION
 
 L<Mojo::Reactor::EV> is a minimalistic low level event reactor with C<libev>
-support. Note that this module is EXPERIMENTAL and might change without
-warning!
+support.
 
 =head1 EVENTS
 

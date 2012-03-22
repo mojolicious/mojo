@@ -307,7 +307,8 @@ Get handle for stream.
 
   my $success = $stream->is_readable;
 
-Quick check if stream is readable, useful for identifying tainted sockets.
+Quick non-blocking check if stream is readable, useful for identifying
+tainted sockets.
 
 =head2 C<is_writing>
 

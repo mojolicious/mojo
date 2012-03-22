@@ -401,8 +401,7 @@ connections.
   $loop       = $loop->reactor(Mojo::Reactor->new);
 
 Low level event reactor, usually a L<Mojo::Reactor> or L<Mojo::Reactor::EV>
-object. Note that this attribute is EXPERIMENTAL and might change without
-warning!
+object.
 
 =head2 C<server_class>
 

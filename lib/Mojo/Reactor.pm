@@ -164,8 +164,7 @@ Mojo::Reactor - Minimalistic low level event reactor
 =head1 DESCRIPTION
 
 L<Mojo::Reactor> is a minimalistic low level event reactor based on
-L<IO::Poll> and the foundation of L<Mojo::IOLoop>. Note that this module is
-EXPERIMENTAL and might change without warning!
+L<IO::Poll> and the foundation of L<Mojo::IOLoop>.
 
   # A new reactor implementation could look like this
   package Mojo::Reactor::MyLoop;
@@ -185,8 +184,8 @@ EXPERIMENTAL and might change without warning!
 
   1;
 
-Exceptions in callbacks should be caught and emitted as C<error> events with
-L<Mojo::EventEmitter/"emit">.
+Exceptions in callbacks should be caught and emitted safely as C<error>
+events with L<Mojo::EventEmitter/"emit_safe">.
 
 =head1 EVENTS
 
@@ -242,8 +241,8 @@ readable or writable.
 
   my $success = $reactor->is_readable($handle);
 
-Quick check if a handle is readable, useful for identifying tainted
-sockets.
+Quick non-blocking check if a handle is readable, useful for identifying
+tainted sockets.
 
 =head2 C<is_running>
 

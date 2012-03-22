@@ -161,12 +161,6 @@ implements the following new ones.
 Watch handle for I/O events, invoking the callback whenever handle becomes
 readable or writable.
 
-  # Callback will be invoked twice if handle becomes readable and writable
-  $reactor->io($handle => sub {
-    my ($reactor, $writable) = @_;
-    say $writable ? 'Handle is writable' : 'Handle is readable';
-  });
-
 =head2 C<is_running>
 
   my $success = $reactor->is_running;
@@ -186,9 +180,6 @@ the reactor, so you need to be careful.
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
-
-  # Invoke as soon as possible
-  $reactor->recurring(0 => sub { say 'Reactor tick.' });
 
 =head2 C<remove>
 
@@ -222,18 +213,6 @@ seconds.
   $reactor = $reactor->watch($handle, $readable, $writable);
 
 Change I/O events to watch handle for with C<true> and C<false> values.
-
-  # Watch only for readable events
-  $reactor->watch($handle, 1, 0);
-
-  # Watch only for writable events
-  $reactor->watch($handle, 0, 1);
-
-  # Watch for readable and writable events
-  $reactor->watch($handle, 1, 1);
-
-  # Pause watching for events
-  $reactor->watch($handle, 0, 0);
 
 =head1 SEE ALSO
 

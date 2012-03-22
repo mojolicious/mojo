@@ -2,7 +2,7 @@ package Mojo::Reactor;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
+use IO::Poll qw/POLLERR POLLHUP POLLIN/;
 use Mojo::Loader;
 
 sub detect {
@@ -76,7 +76,7 @@ L<Mojo::Reactor> can emit the following events.
     ...
   });
 
-Emitted safely if an error happens.
+Emitted safely for exceptions caught in callbacks.
 
   $reactor->on(error => sub {
     my ($reactor, $err) = @_;

@@ -674,11 +674,11 @@ into a temporary file.
       if $self->req->is_limit_exceeded;
 
     # Process uploaded file
-    if (my $example = $self->param('example')) {
-      my $size = $example->size;
-      my $name = $example->filename;
-      $self->render(text => "Thanks for uploading $size byte file $name.");
-    }
+    return $self->redirect_to('form')
+      unless my $example = $self->param('example');
+    my $size = $example->size;
+    my $name = $example->filename;
+    $self->render(text => "Thanks for uploading $size byte file $name.");
   };
 
   app->start;

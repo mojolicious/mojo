@@ -112,6 +112,16 @@ sub watch {
   return $self;
 }
 
+sub _poll { shift->{poll} ||= IO::Poll->new }
+
+sub _sandbox {
+  my ($self, $desc, $cb) = (shift, shift, shift);
+  return if eval { $self->$cb(@_); 1 };
+  $self->once(error => sub { warn $_[1] })
+    unless $self->has_subscribers('error');
+  $self->emit_safe(error => "$desc failed: $@");
+}
+
 sub _timer {
   my ($self, $cb) = (shift, shift);
 
@@ -121,16 +131,6 @@ sub _timer {
   $self->{timers}->{$id} = $t;
 
   return $id;
-}
-
-sub _poll { shift->{poll} ||= IO::Poll->new }
-
-sub _sandbox {
-  my ($self, $desc, $cb) = (shift, shift, shift);
-  return if eval { $self->$cb(@_); 1 };
-  $self->once(error => sub { warn $_[1] })
-    unless $self->has_subscribers('error');
-  $self->emit_safe(error => "$desc failed: $@");
 }
 
 1;
@@ -164,9 +164,28 @@ Mojo::Reactor - Minimalistic low level event reactor
 =head1 DESCRIPTION
 
 L<Mojo::Reactor> is a minimalistic low level event reactor based on
-L<IO::Poll> and the foundation of L<Mojo::IOLoop>. L<Mojo::Reactor::EV> is a
-good example for its extensibility. Note that this module is EXPERIMENTAL and
-might change without warning!
+L<IO::Poll> and the foundation of L<Mojo::IOLoop>. Note that this module is
+EXPERIMENTAL and might change without warning!
+
+  # A new reactor backend could look like this
+  package Mojo::Reactor::MyLoop;
+  use Mojo::Base 'Mojo::Reactor';
+
+  $ENV{MOJO_REACTOR} ||= 'Mojo::Reactor::MyLoop';
+
+  sub drop       {...}
+  sub io         {...}
+  sub is_running {...}
+  sub one_tick   {...}
+  sub recurring  {...}
+  sub start      {...}
+  sub stop       {...}
+  sub watch      {...}
+
+  1;
+
+Exceptions in callbacks should be catched and emitted as C<error> events with
+L<Mojo::EventEmitter/"emit">.
 
 =head1 EVENTS
 

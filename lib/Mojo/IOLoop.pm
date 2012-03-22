@@ -360,8 +360,7 @@ L<Mojo::IOLoop> implements the following attributes.
   $loop     = $loop->client_class('Mojo::IOLoop::Client');
 
 Class to be used for opening TCP connections with the C<client> method,
-defaults to L<Mojo::IOLoop::Client>. Note that this attribute is EXPERIMENTAL
-and might change without warning!
+defaults to L<Mojo::IOLoop::Client>.
 
 =head2 C<lock>
 
@@ -415,8 +414,7 @@ L<Mojo::Reactor::EV> object.
   $loop     = $loop->server_class('Mojo::IOLoop::Server');
 
 Class to be used for accepting TCP connections with the C<server> method,
-defaults to L<Mojo::IOLoop::Server>. Note that this attribute is EXPERIMENTAL
-and might change without warning!
+defaults to L<Mojo::IOLoop::Server>.
 
 =head2 C<stream_class>
 
@@ -424,8 +422,7 @@ and might change without warning!
   $loop     = $loop->stream_class('Mojo::IOLoop::Stream');
 
 Class to be used by C<client> and C<server> methods for I/O streams, defaults
-to L<Mojo::IOLoop::Stream>. Note that this attribute is EXPERIMENTAL and
-might change without warning!
+to L<Mojo::IOLoop::Stream>.
 
 =head2 C<unlock>
 
@@ -449,8 +446,7 @@ following new ones.
 
 Open TCP connection with C<client_class>, which is usually
 L<Mojo::IOLoop::Client>, takes the same arguments as
-L<Mojo::IOLoop::Client/"connect">. Note that this method is EXPERIMENTAL and
-might change without warning!
+L<Mojo::IOLoop::Client/"connect">.
 
   Mojo::IOLoop->client({port => 3000} => sub {
     my ($loop, $err, $stream) = @_;
@@ -531,8 +527,7 @@ allowing them to finish writing all data in their write buffers.
 
 Accept TCP connections with C<server_class>, which is usually
 L<Mojo::IOLoop::Server>, takes the same arguments as
-L<Mojo::IOLoop::Server/"listen">. Note that this method is EXPERIMENTAL and
-might change without warning!
+L<Mojo::IOLoop::Server/"listen">.
 
   Mojo::IOLoop->server({port => 3000} => sub {
     my ($loop, $stream, $id) = @_;
@@ -573,7 +568,6 @@ and the loop can be restarted by running C<start> again.
   my $id     = $loop->stream($stream);
 
 Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
-Note that this method is EXPERIMENTAL and might change without warning!
 
   # Increase inactivity timeout for connection to 300 seconds
   Mojo::IOLoop->stream($id)->timeout(300);

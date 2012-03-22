@@ -7,7 +7,12 @@ This file documents the revision history for Perl extension Mojolicious.
         - Added one_tick method to Mojo::Reactor and Mojo::Reactor::EV.
         - Removed experimental status from Mojo::Reactor.
         - Removed experimental status from Mojo::Reactor::EV.
-        - Removed experimental status from max_accepts and reactor attributes
+        - Removed experimental status from Mojo::IOLoop::Stream.
+        - Removed experimental status from Mojo::IOLoop::Client.
+        - Removed experimental status from Mojo::IOLoop::Server.
+        - Removed experimental status from client_class, max_accepts,
+          server_class, stream_class and reactor attributes in Mojo::IOLoop.
+        - Removed experimental status from client server and stream methods
           in Mojo::IOLoop.
         - Updated jQuery to version 1.7.2.
         - Improved documentation.

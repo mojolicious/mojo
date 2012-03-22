@@ -197,8 +197,7 @@ Mojo::IOLoop::Stream - Non-blocking I/O stream
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Stream> is a container for I/O streams used by
-L<Mojo::IOLoop>. Note that this module is EXPERIMENTAL and might change
-without warning!
+L<Mojo::IOLoop>.
 
 =head1 EVENTS
 

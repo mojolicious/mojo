@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.65';
+our $VERSION  = '2.66';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."

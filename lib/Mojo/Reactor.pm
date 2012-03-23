@@ -169,6 +169,9 @@ Stop watching for I/O and timer events.
 Create a new timer, invoking the callback after a given amount of time in
 seconds.
 
+  # Invoke as soon as possible
+  $reactor->timer(0 => sub { say 'First tick.' });
+
 =head2 C<watch>
 
   $reactor = $reactor->watch($handle, $readable, $writable);

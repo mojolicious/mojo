@@ -8,7 +8,7 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 67;
+plan tests => 68;
 
 # "Oh well. At least we'll die doing what we love: inhaling molten rock."
 use IO::Socket::INET;
@@ -25,6 +25,11 @@ $reactor = Mojo::IOLoop->singleton->reactor;
 is ref $reactor, 'Mojo::Reactor::EV', 'right object';
 
 # Make sure it stops automatically when not watching for events
+Mojo::IOLoop->one_tick;
+my $triggered;
+Mojo::IOLoop->timer(0.25 => sub { $triggered++ });
+Mojo::IOLoop->one_tick;
+ok $triggered, 'reactor waited for one event';
 Mojo::IOLoop->start;
 
 # Listen

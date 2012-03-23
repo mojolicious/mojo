@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 66;
+use Test::More tests => 67;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -24,6 +24,11 @@ $reactor = Mojo::IOLoop->singleton->reactor;
 is ref $reactor, 'Mojo::Reactor::Poll', 'right object';
 
 # Make sure it stops automatically when not watching for events
+Mojo::IOLoop->one_tick;
+my $triggered;
+Mojo::IOLoop->timer(0.25 => sub { $triggered++ });
+Mojo::IOLoop->one_tick;
+ok $triggered, 'reactor waited for one event';
 Mojo::IOLoop->start;
 
 # Listen

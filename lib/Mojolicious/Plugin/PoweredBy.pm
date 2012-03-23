@@ -8,8 +8,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 #  and the octopus ate all his acorns.
 #  And also he got a racecar. Is any of this getting through to you?"
 sub register {
-  my ($self, $app, $args) = @_;
-  my $name = $args->{name} || 'Mojolicious (Perl)';
+  my ($self, $app, $conf) = @_;
+  my $name = $conf->{name} || 'Mojolicious (Perl)';
   $app->hook(before_dispatch =>
       sub { shift->res->headers->header('X-Powered-By' => $name) });
 }

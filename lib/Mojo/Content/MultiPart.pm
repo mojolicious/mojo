@@ -142,7 +142,7 @@ sub _parse_multipart {
   # Parse
   $self->{multi_state} ||= 'multipart_preamble';
   my $boundary = $self->boundary;
-  while (!$self->is_finished) {
+  until ($self->is_finished) {
 
     # Preamble
     if (($self->{multi_state} || '') eq 'multipart_preamble') {

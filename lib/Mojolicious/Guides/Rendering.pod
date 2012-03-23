@@ -714,7 +714,7 @@ Less commonly used and more powerful features.
 
 =head2 Internationalization
 
-Thanks to L<Locale::Maketext>, all you need for basic internationalization
+Thanks to L<Locale::Maketext> all you need for basic internationalization
 support in your application is the plugin L<Mojolicious::Plugin::I18N> and a
 few lexicon classes.
 
@@ -740,7 +740,7 @@ Preferred languages will be automatically detected from the
 C<Accept-Language> header or can be manually changed with the helper
 L<Mojolicious::Plugin::I18N/"languages">.
 
-  $ ./myapp.pl get / -H 'Accept-Language: de'
+  $ ./myapp.pl get -H 'Accept-Language: de' /
 
 =head2 Chunked transfer encoding
 

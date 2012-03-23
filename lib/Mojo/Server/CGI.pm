@@ -22,7 +22,7 @@ sub run {
 
   # Request body
   binmode STDIN;
-  while (!$req->is_finished) {
+  until ($req->is_finished) {
     my $read = STDIN->read(my $buffer, CHUNK_SIZE, 0);
     last unless $read;
     $req->parse($buffer);

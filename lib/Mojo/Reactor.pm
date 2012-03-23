@@ -170,7 +170,7 @@ Create a new timer, invoking the callback after a given amount of time in
 seconds.
 
   # Invoke as soon as possible
-  $reactor->timer(0 => sub { say 'First tick.' });
+  $reactor->timer(0 => sub { say 'Next tick.' });
 
 =head2 C<watch>
 

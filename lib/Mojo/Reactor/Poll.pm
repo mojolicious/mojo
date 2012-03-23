@@ -27,8 +27,9 @@ sub one_tick {
   $self->{running} = 1;
 
   # Wait for one event
-  my $i = 0;
-  while (!$i) {
+  my $i    = 0;
+  my $poll = $self->_poll;
+  until ($i) {
 
     # Stop automatically if there is nothing to watch
     return $self->stop unless keys %{$self->{timers}} || keys %{$self->{io}};
@@ -40,7 +41,6 @@ sub one_tick {
 
     # I/O
     if (keys %{$self->{io}}) {
-      my $poll = $self->_poll;
       $poll->poll($timeout);
       ++$i and $self->_sandbox('Read', $self->{io}->{fileno $_}->{cb}, 0)
         for $poll->handles(POLLIN | POLLHUP | POLLERR);
@@ -48,7 +48,7 @@ sub one_tick {
         for $poll->handles(POLLOUT);
     }
 
-    # Wait for timeout
+    # Wait for timeout if poll can't be used
     elsif ($timeout) { usleep $timeout * 1000000 }
 
     # Timers

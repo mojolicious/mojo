@@ -2,6 +2,7 @@ package Mojo::Reactor::Poll;
 use Mojo::Base 'Mojo::Reactor';
 
 use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
+use List::Util 'min';
 use Mojo::Util 'md5_sum';
 use Time::HiRes qw/time usleep/;
 
@@ -25,30 +26,43 @@ sub one_tick {
   my $running = $self->{running};
   $self->{running} = 1;
 
-  # I/O
-  my $poll = $self->_poll;
-  $poll->poll(0.025);
-  $self->_sandbox('Read', $self->{io}->{fileno $_}->{cb}, 0)
-    for $poll->handles(POLLIN | POLLHUP | POLLERR);
-  $self->_sandbox('Write', $self->{io}->{fileno $_}->{cb}, 1)
-    for $poll->handles(POLLOUT);
+  # Wait for one event
+  my $i = 0;
+  while (!$i) {
 
-  # Wait for timeout
-  usleep 25000 unless keys %{$self->{io}};
+    # Stop automatically if there is nothing to watch
+    return $self->stop unless keys %{$self->{timers}} || keys %{$self->{io}};
 
-  # Timers
-  while (my ($id, $t) = each %{$self->{timers} || {}}) {
-    my $after = $t->{after} || 0;
-    if ($after <= time - ($t->{started} || $t->{recurring} || 0)) {
+    # Calculate ideal timeout based on timers
+    my $min = min map { $_->{time} } values %{$self->{timers}};
+    my $timeout = defined $min ? ($min - time) : 0.025;
+    $timeout = 0 if $timeout < 0;
 
-      # Normal timer
-      if ($t->{started}) { $self->remove($id) }
+    # I/O
+    if (keys %{$self->{io}}) {
+      my $poll = $self->_poll;
+      $poll->poll($timeout);
+      ++$i and $self->_sandbox('Read', $self->{io}->{fileno $_}->{cb}, 0)
+        for $poll->handles(POLLIN | POLLHUP | POLLERR);
+      ++$i and $self->_sandbox('Write', $self->{io}->{fileno $_}->{cb}, 1)
+        for $poll->handles(POLLOUT);
+    }
+
+    # Wait for timeout
+    elsif ($timeout) { usleep $timeout * 1000000 }
+
+    # Timers
+    while (my ($id, $t) = each %{$self->{timers} || {}}) {
+      next unless $t->{time} <= time;
 
       # Recurring timer
-      elsif ($after && $t->{recurring}) { $t->{recurring} += $after }
+      if (exists $t->{recurring}) { $t->{time} = time + $t->{recurring} }
+
+      # Normal timer
+      else { $self->remove($id) }
 
       # Handle timer
-      if (my $cb = $t->{cb}) { $self->_sandbox("Timer $id", $cb) }
+      ++$i and $self->_sandbox("Timer $id", $t->{cb}) if $t->{cb};
     }
   }
 
@@ -56,7 +70,7 @@ sub one_tick {
   $self->{running} = $running if $self->{running};
 }
 
-sub recurring { shift->_timer(pop, after => pop, recurring => time) }
+sub recurring { shift->_timer(1, @_) }
 
 sub remove {
   my ($self, $remove) = @_;
@@ -68,17 +82,14 @@ sub remove {
 sub start {
   my $self = shift;
   return if $self->{running}++;
-  while ($self->{running}) {
-    $self->one_tick;
-    $self->stop unless keys(%{$self->{timers}}) || keys(%{$self->{io}});
-  }
+  $self->one_tick while $self->{running};
 }
 
 sub stop { delete shift->{running} }
 
 # "Bart, how did you get a cellphone?
 #  The same way you got me, by accident on a golf course."
-sub timer { shift->_timer(pop, after => pop, started => time) }
+sub timer { shift->_timer(0, @_) }
 
 sub watch {
   my ($self, $handle, $read, $write) = @_;
@@ -103,13 +114,11 @@ sub _sandbox {
 }
 
 sub _timer {
-  my ($self, $cb) = (shift, shift);
-
-  my $t = {cb => $cb, @_};
+  my ($self, $recurring, $after, $cb) = @_;
   my $id;
   do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}->{$id};
-  $self->{timers}->{$id} = $t;
-
+  my $t = $self->{timers}->{$id} = {cb => $cb, time => time + $after};
+  $t->{recurring} = $after if $recurring;
   return $id;
 }
 
@@ -171,8 +180,9 @@ Check if reactor is running.
 
   $reactor->one_tick;
 
-Run reactor for roughly one tick. Note that this method can recurse back into
-the reactor, so you need to be careful.
+Run reactor until at least one event has been handled or no events are being
+watched anymore. Note that this method can recurse back into the reactor, so
+you need to be careful.
 
 =head2 C<recurring>
 

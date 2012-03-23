@@ -95,6 +95,9 @@ Detect and load the best reactor implementation available, will try the value
 of the C<MOJO_REACTOR> environment variable, L<Mojo::Reactor::EV> or
 L<Mojo::Reactor::Poll>.
 
+  # Instantiate best reactor implementation available
+  my $reactor = Mojo::Reactor->detect->new;
+
 =head2 C<io>
 
   $reactor = $reactor->io($handle => sub {...});
@@ -125,8 +128,9 @@ Check if reactor is running.
 
   $reactor->one_tick;
 
-Run reactor for roughly one tick. Note that this method can recurse back into
-the reactor, so you need to be careful.
+Run reactor until at least one event has been handled or no events are being
+watched anymore. Note that this method can recurse back into the reactor, so
+you need to be careful.
 
 =head2 C<recurring>
 

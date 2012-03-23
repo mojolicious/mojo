@@ -13,9 +13,9 @@ sub new { $EV++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
 
 sub is_running {EV::depth}
 
-sub one_tick { EV::run(EV::RUN_NOWAIT) }
+sub one_tick { EV::run(EV::RUN_ONCE) }
 
-sub recurring { shift->_timer(shift, 1, @_) }
+sub recurring { shift->_timer(1, @_) }
 
 # "Wow, Barney. You brought a whole beer keg.
 #  Yeah... where do I fill it up?"
@@ -23,7 +23,7 @@ sub start {EV::run}
 
 sub stop { EV::break(EV::BREAK_ALL) }
 
-sub timer { shift->_timer(shift, 0, @_) }
+sub timer { shift->_timer(0, @_) }
 
 sub watch {
   my ($self, $handle, $read, $write) = @_;
@@ -54,10 +54,10 @@ sub _io {
 
 # "It's great! We can do *anything* now that Science has invented Magic."
 sub _timer {
-  my ($self, $after, $recurring, $cb) = @_;
+  my ($self, $recurring, $after, $cb) = @_;
   $after ||= '0.0001';
 
-  my $id = $self->SUPER::_timer($cb);
+  my $id = $self->SUPER::_timer(0, 0, $cb);
   weaken $self;
   $self->{timers}->{$id}->{watcher} = EV::timer(
     $after,
@@ -129,8 +129,9 @@ Check if reactor is running.
 
   $reactor->one_tick;
 
-Run reactor for roughly one tick. Note that this method can recurse back into
-the reactor, so you need to be careful.
+Run reactor until at least one event has been handled or no events are being
+watched anymore. Note that this method can recurse back into the reactor, so
+you need to be careful.
 
 =head2 C<recurring>
 

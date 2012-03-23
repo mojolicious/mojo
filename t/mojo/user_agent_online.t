@@ -41,7 +41,8 @@ $ua->get(
 );
 $loop->start;
 $ua = undef;
-$loop->one_tick;
+$loop->timer(0.25 => sub { shift->stop });
+$loop->start;
 ok !$loop->stream($id), 'loop not tainted';
 is $code, 301, 'right status';
 

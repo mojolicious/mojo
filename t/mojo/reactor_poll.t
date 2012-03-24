@@ -27,7 +27,7 @@ is ref $reactor, 'Mojo::Reactor::Poll', 'right object';
 Mojo::IOLoop->one_tick;
 my $triggered;
 Mojo::IOLoop->timer(0.25 => sub { $triggered++ });
-Mojo::IOLoop->one_tick;
+Mojo::IOLoop->start;
 ok $triggered, 'reactor waited for one event';
 Mojo::IOLoop->start;
 

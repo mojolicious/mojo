@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.68';
+our $VERSION  = '2.69';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -617,8 +617,8 @@ application.
 
   $app->startup;
 
-This is your main hook into the application, it will be called at application
-startup.
+This is your main hook into the application and meant to be overloaded in a
+subclass, it will be called at application startup.
 
   sub startup {
     my $self = shift;

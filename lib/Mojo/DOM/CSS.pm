@@ -81,6 +81,20 @@ sub _ancestor {
   return;
 }
 
+sub _attr {
+  my ($self, $key, $regex, $current) = @_;
+
+  # Ignore namespace prefix
+  my $attrs = $current->[2];
+  for my $name (keys %$attrs) {
+    next unless $name =~ /\:?$key$/;
+    return 1 unless defined $attrs->{$name} && defined $regex;
+    return 1 if $attrs->{$name} =~ $regex;
+  }
+
+  return;
+}
+
 sub _combinator {
   my ($self, $selectors, $current, $tree) = @_;
 
@@ -143,12 +157,11 @@ sub _compile {
     while ($element =~ /$CLASS_ID_RE/g) {
 
       # Class
-      push @$selector, ['attribute', 'class', $self->_regex('~', $1)]
+      push @$selector, ['attr', 'class', $self->_regex('~', $1)]
         if defined $1;
 
       # ID
-      push @$selector, ['attribute', 'id', $self->_regex('', $2)]
-        if defined $2;
+      push @$selector, ['attr', 'id', $self->_regex('', $2)] if defined $2;
     }
 
     # Pseudo classes
@@ -157,17 +170,17 @@ sub _compile {
       # "not"
       if ($1 eq 'not') {
         my $subpattern = $self->_compile($2)->[-1]->[-1];
-        push @$selector, ['pseudoclass', 'not', $subpattern];
+        push @$selector, ['pc', 'not', $subpattern];
       }
 
       # Everything else
-      else { push @$selector, ['pseudoclass', $1, $2] }
+      else { push @$selector, ['pc', $1, $2] }
     }
 
     # Attributes
     while ($attrs =~ /$ATTR_RE/g) {
       my ($key, $op, $value) = ($self->_unescape($1), $2 // '', $3 // $4);
-      push @$selector, ['attribute', $key, $self->_regex($op, $value)];
+      push @$selector, ['attr', $key, $self->_regex($op, $value)];
     }
 
     # Combinator
@@ -318,22 +331,19 @@ sub _regex {
   $value = quotemeta $self->_unescape($value);
 
   # "~=" (word)
-  my $regex;
-  if ($op eq '~') { $regex = qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
+  if ($op eq '~') { return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
 
   # "*=" (contains)
-  elsif ($op eq '*') { $regex = qr/$value/ }
+  elsif ($op eq '*') { return qr/$value/ }
 
   # "^=" (begins with)
-  elsif ($op eq '^') { $regex = qr/^$value/ }
+  elsif ($op eq '^') { return qr/^$value/ }
 
   # "$=" (ends with)
-  elsif ($op eq '$') { $regex = qr/$value$/ }
+  elsif ($op eq '$') { return qr/$value$/ }
 
   # Everything else
-  else { $regex = qr/^$value$/ }
-
-  return $regex;
+  return qr/^$value$/;
 }
 
 # "All right, brain.
@@ -346,41 +356,21 @@ sub _selector {
   for my $c (@$selector[1 .. $#$selector]) {
     my $type = $c->[0];
 
-    # Tag
+    # Tag (ignore namespace prefix)
     if ($type eq 'tag') {
-      my $type = $c->[1];
-
-      # Wildcard
-      next if $type eq '*';
-
-      # Type (ignore namespace prefix)
-      next if $current->[1] =~ /(?:^|\:)$type$/;
+      my $tag = $c->[1];
+      return unless $tag eq '*' || $current->[1] =~ /(?:^|\:)$tag$/;
     }
 
     # Attribute
-    elsif ($type eq 'attribute') {
-      my $key   = $c->[1];
-      my $regex = $c->[2];
-      my $attrs = $current->[2];
-
-      # Find attributes (ignore namespace prefix)
-      my $found = 0;
-      for my $name (keys %$attrs) {
-        if ($name =~ /\:?$key$/) {
-          next unless exists $attrs->{$name};
-          ++$found and last unless defined $attrs->{$name};
-          ++$found and last if !$regex || $attrs->{$name} =~ $regex;
-        }
-      }
-      next if $found;
+    elsif ($type eq 'attr') {
+      return unless $self->_attr($c->[1], $c->[2], $current);
     }
 
     # Pseudo class
-    elsif ($type eq 'pseudoclass') {
-      next if $self->_pc(lc $c->[1], $c->[2], $current);
+    elsif ($type eq 'pc') {
+      return unless $self->_pc(lc $c->[1], $c->[2], $current);
     }
-
-    return;
   }
 
   return 1;

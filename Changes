@@ -4,6 +4,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Added start_app method to Mojo::Command.
   - Improved documentation.
   - Improved tests.
+  - Fixed small bugs in Mojo::Command and Mojolicious::Commands.
 
 2.66  2012-03-23
   - Reformatted "Changes".

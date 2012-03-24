@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 31;
+use Test::More tests => 28;
 
 # "My cat's breath smells like cat food."
 use Cwd 'cwd';
@@ -8,9 +8,8 @@ use File::Spec::Functions 'catdir';
 use File::Temp;
 use Mojo::Command;
 
-my $command = Mojo::Command->new;
-
 # Application
+my $command = Mojo::Command->new;
 isa_ok $command->app, 'Mojo', 'right application';
 
 # UNIX DATA templates
@@ -71,20 +70,6 @@ is $command->class_to_path("Foo'Bar::Baz"),  'Foo/Bar/Baz.pm', 'right path';
 is $command->class_to_path("Foo::Bar'Baz"),  'Foo/Bar/Baz.pm', 'right path';
 is $command->class_to_path("Foo::Bar::Baz"), 'Foo/Bar/Baz.pm', 'right path';
 is $command->class_to_path("Foo'Bar'Baz"),   'Foo/Bar/Baz.pm', 'right path';
-
-# Environment detection
-{
-  local $ENV{PLACK_ENV} = 'production';
-  is $command->detect, 'psgi', 'right environment';
-}
-{
-  local $ENV{PATH_INFO} = '/test';
-  is $command->detect, 'cgi', 'right environment';
-}
-{
-  local $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-  is $command->detect, 'cgi', 'right environment';
-}
 
 # Generating files
 my $cwd = cwd;

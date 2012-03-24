@@ -173,8 +173,9 @@ Application configuration.
   $app->handler($tx);
 
 The handler is the main entry point to your application or framework and
-will be called for each new transaction, which will usually be a
-L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
+meant to be overloaded in a subclass. It will be called for each new
+transaction, which will usually be a L<Mojo::Transaction::HTTP> or
+L<Mojo::Transaction::WebSocket> object.
 
   sub handler {
     my ($self, $tx) = @_;

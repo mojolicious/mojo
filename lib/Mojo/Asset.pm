@@ -59,19 +59,21 @@ the following new ones.
 
   $asset = $asset->add_chunk('foo bar baz');
 
-Add chunk of data to asset.
+Add chunk of data to asset, meant to be overloaded in a subclass.
 
 =head2 C<contains>
 
   my $position = $asset->contains('bar');
 
-Check if asset contains a specific string.
+Check if asset contains a specific string, meant to be overloaded in a
+subclass.
 
 =head2 C<get_chunk>
 
   my $chunk = $asset->get_chunk($offset);
 
-Get chunk of data starting from a specific position.
+Get chunk of data starting from a specific position, meant to be overloaded
+in a subclass.
 
 =head2 C<is_file>
 
@@ -83,19 +85,19 @@ False.
 
   $asset = $asset->move_to('/foo/bar/baz.txt');
 
-Move asset data into a specific file.
+Move asset data into a specific file, meant to be overloaded in a subclass.
 
 =head2 C<size>
 
   my $size = $asset->size;
 
-Size of asset data in bytes.
+Size of asset data in bytes, meant to be overloaded in a subclass.
 
 =head2 C<slurp>
 
   my $string = $asset->slurp;
 
-Read all asset data at once.
+Read all asset data at once, meant to be overloaded in a subclass.
 
 =head1 SEE ALSO
 

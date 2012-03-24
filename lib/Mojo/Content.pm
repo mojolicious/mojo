@@ -494,13 +494,14 @@ implements the following new ones.
 
   my $success = $content->body_contains('foo bar baz');
 
-Check if content contains a specific string.
+Check if content contains a specific string, meant to be overloaded in a
+subclass.
 
 =head2 C<body_size>
 
   my $size = $content->body_size;
 
-Content size in bytes.
+Content size in bytes, meant to be overloaded in a subclass.
 
 =head2 C<boundary>
 
@@ -542,7 +543,8 @@ Generate dynamic content.
 
   my $chunk = $content->get_body_chunk(0);
 
-Get a chunk of content starting from a specfic position.
+Get a chunk of content starting from a specfic position, meant to be
+overloaded in a subclass.
 
 =head2 C<get_header_chunk>
 

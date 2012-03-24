@@ -102,8 +102,7 @@ sub get_data {
 # "You don’t like your job, you don’t strike.
 #  You go in every day and do it really half-assed. That’s the American way."
 sub help {
-  my $self = shift;
-  print $self->usage;
+  print shift->usage;
   exit 0;
 }
 
@@ -208,6 +207,9 @@ L<Mojo::Command> implements the following attributes.
   $command = $command->app(Mojolicious->new);
 
 Currently active application, defaults to a L<Mojo::HelloWorld> object.
+
+  # Introspect
+  say "Template path: $_" for @{$command->app->renderer->paths};
 
 =head2 C<description>
 
@@ -334,7 +336,7 @@ relative file.
   $command->run;
   $command->run(@ARGV);
 
-Run command.
+Run command, meant to be overloaded in a subclass.
 
 =head2 C<write_file>
 

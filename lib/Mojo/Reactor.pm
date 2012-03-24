@@ -103,7 +103,7 @@ L<Mojo::Reactor::Poll>.
   $reactor = $reactor->io($handle => sub {...});
 
 Watch handle for I/O events, invoking the callback whenever handle becomes
-readable or writable.
+readable or writable, meant to be overloaded in a subclass.
 
   # Callback will be invoked twice if handle becomes readable and writable
   $reactor->io($handle => sub {
@@ -122,22 +122,22 @@ tainted sockets.
 
   my $success = $reactor->is_running;
 
-Check if reactor is running.
+Check if reactor is running, meant to be overloaded in a subclass.
 
 =head2 C<one_tick>
 
   $reactor->one_tick;
 
 Run reactor until at least one event has been handled or no events are being
-watched anymore. Note that this method can recurse back into the reactor, so
-you need to be careful.
+watched anymore, meant to be overloaded in a subclass. Note that this method
+can recurse back into the reactor, so you need to be careful.
 
 =head2 C<recurring>
 
   my $id = $reactor->recurring(0.25 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given
-amount of time in seconds.
+amount of time in seconds, meant to be overloaded in a subclass.
 
   # Invoke as soon as possible
   $reactor->recurring(0 => sub { say 'Reactor tick.' });
@@ -147,27 +147,28 @@ amount of time in seconds.
   my $success = $reactor->remove($handle);
   my $success = $reactor->remove($id);
 
-Remove handle or timer.
+Remove handle or timer, meant to be overloaded in a subclass.
 
 =head2 C<start>
 
   $reactor->start;
 
 Start watching for I/O and timer events, this will block until C<stop> is
-called or no events are being watched anymore.
+called or no events are being watched anymore, meant to be overloaded in a
+subclass.
 
 =head2 C<stop>
 
   $reactor->stop;
 
-Stop watching for I/O and timer events.
+Stop watching for I/O and timer events, meant to be overloaded in a subclass.
 
 =head2 C<timer>
 
   my $id = $reactor->timer(0.5 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of time in
-seconds.
+seconds, meant to be overloaded in a subclass.
 
   # Invoke as soon as possible
   $reactor->timer(0 => sub { say 'Next tick.' });
@@ -176,7 +177,8 @@ seconds.
 
   $reactor = $reactor->watch($handle, $readable, $writable);
 
-Change I/O events to watch handle for with C<true> and C<false> values.
+Change I/O events to watch handle for with C<true> and C<false> values, meant
+to be overloaded in a subclass.
 
   # Watch only for readable events
   $reactor->watch($handle, 1, 0);

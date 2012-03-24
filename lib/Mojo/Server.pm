@@ -157,7 +157,7 @@ Load application from script.
 
   $server->run;
 
-Run server.
+Run server, meant to be overloaded in a subclass.
 
 =head1 SEE ALSO
 

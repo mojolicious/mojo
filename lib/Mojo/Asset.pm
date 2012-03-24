@@ -97,7 +97,7 @@ Size of asset data in bytes, meant to be overloaded in a subclass.
 
   my $string = $asset->slurp;
 
-Read all asset data at once, meant to be overloaded in a subclass.
+Read all asset data at once. Meant to be overloaded in a subclass.
 
 =head1 SEE ALSO
 

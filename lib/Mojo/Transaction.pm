@@ -196,13 +196,13 @@ Transaction closed.
 
   $tx->client_read($chunk);
 
-Read and process client data, meant to be overloaded in a subclass.
+Read and process client data. Meant to be overloaded in a subclass.
 
 =head2 C<client_write>
 
   my $chunk = $tx->client_write;
 
-Write client data, meant to be overloaded in a subclass.
+Write client data. Meant to be overloaded in a subclass.
 
 =head2 C<connection>
 
@@ -252,13 +252,13 @@ Transaction closed.
 
   $tx->server_read($chunk);
 
-Read and process server data, meant to be overloaded in a subclass.
+Read and process server data. Meant to be overloaded in a subclass.
 
 =head2 C<server_write>
 
   my $chunk = $tx->server_write;
 
-Write server data, meant to be overloaded in a subclass.
+Write server data. Meant to be overloaded in a subclass.
 
 =head2 C<success>
 

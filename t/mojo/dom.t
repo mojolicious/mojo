@@ -483,7 +483,7 @@ is "$dom", $yadis, 'successful roundtrip';
 # Result and iterator order
 $dom = Mojo::DOM->new->parse('<a><b>1</b></a><b>2</b><b>3</b>');
 my @numbers;
-$dom->find("b")->each(sub { push @numbers, pop, shift->text });
+$dom->find('b')->each(sub { push @numbers, pop, shift->text });
 is_deeply \@numbers, [1, 1, 2, 2, 3, 3], 'right order';
 
 # Attributes on multiple lines

@@ -117,13 +117,13 @@ following new ones.
 
   my $cookies = $cookie->parse($string);
 
-Parse cookies, meant to be overloaded in a subclass.
+Parse cookies. Meant to be overloaded in a subclass.
 
 =head2 C<to_string>
 
   my $string = $cookie->to_string;
 
-Render cookie, meant to be overloaded in a subclass.
+Render cookie. Meant to be overloaded in a subclass.
 
 =head1 SEE ALSO
 

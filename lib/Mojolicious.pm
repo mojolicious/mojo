@@ -617,8 +617,8 @@ application.
 
   $app->startup;
 
-This is your main hook into the application and meant to be overloaded in a
-subclass, it will be called at application startup.
+This is your main hook into the application, it will be called at application
+startup. Meant to be overloaded in a subclass.
 
   sub startup {
     my $self = shift;

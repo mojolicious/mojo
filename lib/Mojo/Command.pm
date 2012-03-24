@@ -336,7 +336,7 @@ relative file.
   $command->run;
   $command->run(@ARGV);
 
-Run command, meant to be overloaded in a subclass.
+Run command. Meant to be overloaded in a subclass.
 
 =head2 C<write_file>
 

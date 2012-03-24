@@ -20,7 +20,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   VERSION   => '0.01',
-  PREREQ_PM => {'Mojolicious' => '2.67'},
+  PREREQ_PM => {'Mojolicious' => '2.68'},
   test      => {TESTS => 't/*.t'}
 );
 

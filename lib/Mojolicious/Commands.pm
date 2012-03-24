@@ -1,9 +1,10 @@
 package Mojolicious::Commands;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojo::Base';
 
 use Getopt::Long
   qw/GetOptions :config no_auto_abbrev no_ignore_case pass_through/;
 use Mojo::Loader;
+use Mojo::Server;
 
 # "One day a man has everything, the next day he blows up a $400 billion
 #  space station, and the next day he has nothing. It makes you think."
@@ -55,7 +56,7 @@ sub run {
   my ($self, $name, @args) = @_;
 
   # Application loader
-  return $self->app if defined $ENV{MOJO_APP_LOADER};
+  return Mojo::Server->new->app if defined $ENV{MOJO_APP_LOADER};
 
   # Try to detect environment
   $name = $self->detect($name) unless $ENV{MOJO_NO_DETECT};
@@ -286,8 +287,7 @@ for debugging.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Commands> inherits all attributes from L<Mojo::Command> and
-implements the following new ones.
+L<Mojolicious::Commands> implements the following attributes.
 
 =head2 C<hint>
 
@@ -313,7 +313,7 @@ C<Mojolicious::Command> and C<Mojo::Command>.
 
 =head1 METHODS
 
-L<Mojolicious::Commands> inherits all methods from L<Mojo::Command> and
+L<Mojolicious::Commands> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
 =head2 C<detect>
@@ -333,15 +333,15 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
 
 =head2 C<start>
 
-  Mojo::Command->start;
-  Mojo::Command->start(@ARGV);
+  Mojolicious::Commands->start;
+  Mojolicious::Commands->start(@ARGV);
 
 Start the command line interface.
 
 =head2 C<start_app>
 
-  Mojo::Command->start_app('MyApp');
-  Mojo::Command->start_app(MyApp => @ARGV);
+  Mojolicious::Commands->start_app('MyApp');
+  Mojolicious::Commands->start_app(MyApp => @ARGV);
 
 Start the command line interface for application.
 

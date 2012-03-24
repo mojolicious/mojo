@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.69  2012-03-25
+  - Improved Mojo::DOM::CSS performance.
   - Improved documentation.
   - Improved Mojo::Reactor tests to be less strict.
 

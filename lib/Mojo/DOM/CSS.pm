@@ -207,6 +207,90 @@ sub _parent {
   return $self->_combinator($selectors, $parent, $tree) ? 1 : undef;
 }
 
+sub _pc {
+  my ($self, $class, $args, $current) = @_;
+
+  # "first-*"
+  if ($class =~ /^first\-(?:(child)|of-type)$/) {
+    $class = defined $1 ? 'nth-child' : 'nth-of-type';
+    $args = 1;
+  }
+
+  # "last-*"
+  elsif ($class =~ /^last\-(?:(child)|of-type)$/) {
+    $class = defined $1 ? 'nth-last-child' : 'nth-last-of-type';
+    $args = '-n+1';
+  }
+
+  # ":checked"
+  if ($class eq 'checked') {
+    my $attrs = $current->[2];
+    return 1 if exists $attrs->{checked} || exists $attrs->{selected};
+  }
+
+  # ":empty"
+  elsif ($class eq 'empty') { return 1 unless defined $current->[4] }
+
+  # ":root"
+  elsif ($class eq 'root') {
+    if (my $parent = $current->[3]) { return 1 if $parent->[0] eq 'root' }
+  }
+
+  # "not"
+  elsif ($class eq 'not') { return 1 if !$self->_selector($args, $current) }
+
+  # "nth-*"
+  elsif ($class =~ /^nth-/) {
+
+    # Numbers
+    $args = $self->_equation($args) unless ref $args;
+
+    # Siblings
+    my $parent = $current->[3];
+    my $start = $parent->[0] eq 'root' ? 1 : 4;
+    my @siblings;
+    my $type = $class =~ /of-type$/ ? $current->[1] : undef;
+    for my $j ($start .. $#$parent) {
+      my $sibling = $parent->[$j];
+      next unless $sibling->[0] eq 'tag';
+      next if defined $type && $type ne $sibling->[1];
+      push @siblings, $sibling;
+    }
+
+    # Reverse
+    @siblings = reverse @siblings if $class =~ /^nth-last/;
+
+    # Find
+    for my $i (0 .. $#siblings) {
+      my $result = $args->[0] * $i + $args->[1];
+      next if $result < 1;
+      last unless my $sibling = $siblings[$result - 1];
+      return 1 if $sibling eq $current;
+    }
+  }
+
+  # "only-*"
+  elsif ($class =~ /^only-(?:child|(of-type))$/) {
+    my $type = $1 ? $current->[1] : undef;
+
+    # Siblings
+    my $parent = $current->[3];
+    my $start = $parent->[0] eq 'root' ? 1 : 4;
+    for my $j ($start .. $#$parent) {
+      my $sibling = $parent->[$j];
+      next unless $sibling->[0] eq 'tag';
+      next if $sibling eq $current;
+      next if defined $type && $sibling->[1] ne $type;
+      return if $sibling ne $current;
+    }
+
+    # No siblings
+    return 1;
+  }
+
+  return;
+}
+
 sub _sibling {
   my ($self, $selectors, $current, $tree, $immediate) = @_;
 
@@ -293,94 +377,7 @@ sub _selector {
 
     # Pseudo class
     elsif ($type eq 'pseudoclass') {
-      my $class = lc $c->[1];
-      my $args  = $c->[2];
-
-      # "first-*"
-      if ($class =~ /^first\-(?:(child)|of-type)$/) {
-        $class = defined $1 ? 'nth-child' : 'nth-of-type';
-        $args = 1;
-      }
-
-      # "last-*"
-      elsif ($class =~ /^last\-(?:(child)|of-type)$/) {
-        $class = defined $1 ? 'nth-last-child' : 'nth-last-of-type';
-        $args = '-n+1';
-      }
-
-      # ":checked"
-      if ($class eq 'checked') {
-        my $attrs = $current->[2];
-        next if exists $attrs->{checked} || exists $attrs->{selected};
-      }
-
-      # ":empty"
-      elsif ($class eq 'empty') { next unless defined $current->[4] }
-
-      # ":root"
-      elsif ($class eq 'root') {
-        if (my $parent = $current->[3]) {
-          next if $parent->[0] eq 'root';
-        }
-      }
-
-      # "not"
-      elsif ($class eq 'not') { next if !$self->_selector($args, $current) }
-
-      # "nth-*"
-      elsif ($class =~ /^nth-/) {
-
-        # Numbers
-        $args = $c->[2] = $self->_equation($args)
-          unless ref $args;
-
-        # Siblings
-        my $parent = $current->[3];
-        my $start = $parent->[0] eq 'root' ? 1 : 4;
-        my @siblings;
-        my $type = $class =~ /of-type$/ ? $current->[1] : undef;
-        for my $j ($start .. $#$parent) {
-          my $sibling = $parent->[$j];
-          next unless $sibling->[0] eq 'tag';
-          next if defined $type && $type ne $sibling->[1];
-          push @siblings, $sibling;
-        }
-
-        # Reverse
-        @siblings = reverse @siblings if $class =~ /^nth-last/;
-
-        # Find
-        my $found = 0;
-        for my $i (0 .. $#siblings) {
-          my $result = $args->[0] * $i + $args->[1];
-          next if $result < 1;
-          last unless my $sibling = $siblings[$result - 1];
-          if ($sibling eq $current) {
-            $found = 1;
-            last;
-          }
-        }
-        next if $found;
-      }
-
-      # "only-*"
-      elsif ($class =~ /^only-(?:child|(of-type))$/) {
-        my $type = $1 ? $current->[1] : undef;
-
-        # Siblings
-        my $parent = $current->[3];
-        my $start = $parent->[0] eq 'root' ? 1 : 4;
-        for my $j ($start .. $#$parent) {
-          my $sibling = $parent->[$j];
-          next unless $sibling->[0] eq 'tag';
-          next if $sibling eq $current;
-          next if defined $type && $sibling->[1] ne $type;
-          return if $sibling ne $current;
-        }
-
-        # No siblings
-        next;
-      }
+      next if $self->_pc(lc $c->[1], $c->[2], $current);
     }
 
     return;

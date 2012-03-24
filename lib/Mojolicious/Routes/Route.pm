@@ -474,7 +474,8 @@ L<Mojolicious::Lite> tutorial for more argument variations.
   my $over = $r->over;
   $r       = $r->over(foo => qr/\w+/);
 
-Activate conditions for this route and disable routing cache.
+Activate conditions for this route. Note that this automatically disables the
+routing cache, since conditions are too complex for caching.
 
 =head2 C<parse>
 

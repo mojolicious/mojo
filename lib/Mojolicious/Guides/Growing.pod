@@ -555,11 +555,8 @@ allow running unit tests again.
   use lib 'lib';
   use Mojolicious::Commands;
 
-  # Application
-  $ENV{MOJO_APP} = 'MyApp';
-
-  # Start commands
-  Mojolicious::Commands->start;
+  # Start commands for application
+  Mojolicious::Commands->start_app('MyApp');
 
 =head2 Controller class
 
@@ -672,11 +669,8 @@ environments.
 
   EOF
 
-  # Application
-  $ENV{MOJO_APP} ||= 'MyApp';
-
-  # Start commands
-  Mojolicious::Commands->start;
+  # Start commands for application
+  Mojolicious::Commands->start_app('MyApp');
 
 =head2 Simplified tests
 

@@ -233,6 +233,12 @@ sub start {
   ref $self ? $self->run(@args) : $self->new->run(@args);
 }
 
+sub start_app {
+  my $self = shift;
+  $ENV{MOJO_APP} = shift;
+  $self->start(@_);
+}
+
 sub write_file {
   my ($self, $path, $data) = @_;
 
@@ -486,6 +492,13 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
   Mojo::Command->start(@ARGV);
 
 Start the command line interface.
+
+=head2 C<start_app>
+
+  Mojo::Command->start_app('MyApp');
+  Mojo::Command->start_app(MyApp => @ARGV);
+
+Start the command line interface for application.
 
 =head2 C<write_file>
 

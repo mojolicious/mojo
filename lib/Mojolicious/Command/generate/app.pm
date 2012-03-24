@@ -68,11 +68,8 @@ Please visit http://mojolicio.us for detailed installation instructions.
 
 EOF
 
-# Application
-$ENV{MOJO_APP} ||= '<%= $class %>';
-
-# Start commands
-Mojolicious::Commands->start;
+# Start commands for application
+Mojolicious::Commands->start_app('<%= $class %>');
 
 @@ appclass
 % my $class = shift;

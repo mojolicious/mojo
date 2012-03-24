@@ -898,8 +898,8 @@ you can keep many parallel connections active at the same time.
   # Start a bunch of parallel crawlers sharing the same user agent
   $crawl->($_) for 1 .. 3;
 
-  # Start reactor
-  Mojo::IOLoop->start;
+  # Start reactor if necessary
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 You can take full control of the L<Mojo::IOLoop> reactor.
 

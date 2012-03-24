@@ -550,6 +550,9 @@ object from everywhere inside the process.
 Start the loop, this will block until C<stop> is called or no events are
 being watched anymore.
 
+  # Start loop only if it is not running already
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
 =head2 C<stop>
 
   Mojo::IOLoop->stop;

@@ -602,15 +602,15 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   # WebSocket request
   $ua->websocket('ws://websockets.org:8787' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish  => sub { Mojo::IOLoop->stop });
+    $tx->on(finish  => sub { say 'WebSocket closed.' });
     $tx->on(message => sub {
       my ($tx, $message) = @_;
-      say $message;
+      say "WebSocket message: $message";
       $tx->finish;
     });
     $tx->send('hi there!');
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head1 DESCRIPTION
 
@@ -854,9 +854,8 @@ append a callback to perform requests non-blocking.
   $ua->delete('http://kraih.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<detect_proxy>
 
@@ -878,9 +877,8 @@ append a callback to perform requests non-blocking.
   $ua->get('http://kraih.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<head>
 
@@ -894,9 +892,8 @@ append a callback to perform requests non-blocking.
   $ua->head('http://kraih.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<need_proxy>
 
@@ -916,9 +913,8 @@ append a callback to perform requests non-blocking.
   $ua->options('http://kraih.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<patch>
 
@@ -932,9 +928,8 @@ append a callback to perform requests non-blocking.
   $ua->patch('http://kraih.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<post>
 
@@ -948,9 +943,8 @@ append a callback to perform requests non-blocking.
   $ua->post('http://kraih.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<post_form>
 
@@ -964,9 +958,8 @@ perform requests non-blocking.
   $ua->post_form('http://kraih.com' => {q => 'test'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<put>
 
@@ -980,9 +973,8 @@ append a callback to perform requests non-blocking.
   $ua->put('http://kraih.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<start>
 
@@ -994,9 +986,8 @@ transactions non-blocking.
   $ua->start($tx => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
-    Mojo::IOLoop->stop;
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<websocket>
 
@@ -1007,14 +998,13 @@ the exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($ua, $tx) = @_;
-    $tx->on(finish  => sub { Mojo::IOLoop->stop });
     $tx->on(message => sub {
       my ($tx, $message) = @_;
-      say "$message\n";
+      say $message;
     });
     $tx->send('Hi!');
   });
-  Mojo::IOLoop->start;
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head1 DEBUGGING
 

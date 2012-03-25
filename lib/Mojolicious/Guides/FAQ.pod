@@ -60,6 +60,14 @@ and installation times without giving us anything in return. It would only
 make sense if we wanted to pass ownership of a module to a new maintainer,
 which we already have done in the past.
 
+=head2 Can you add feature XY to the core distribution?
+
+Probably not. While the L<Mojolicious> distribtion covers a wide range of
+features, we are rather conservative when it comes to adding new ones. The
+most important criteria are outlined in
+L<Mojolicious::Guides::CodingGuidelines>. But don't let this discourage you,
+asking doesn't hurt, just be prepared that it might not pass the vote.
+
 =head2 What does the error "Maximum message size exceeded." mean?
 
 To protect your applications from excessively large requests and responses,

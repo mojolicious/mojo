@@ -118,7 +118,7 @@ Turn list into a L<Mojo::Collection> object.
 =head2 C<d>
 
   my $res = d('http://mojolicio.us');
-  my $res = d('http://mojolicio.us' => {Accept => '*/*'} => 'Hi!');
+  my $res = d('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return
 resulting L<Mojo::Message::Response> object.
@@ -126,7 +126,7 @@ resulting L<Mojo::Message::Response> object.
 =head2 C<f>
 
   my $res = f('kraih.com' => {a => 'b'});
-  my $res = f('kraih.com' => 'UTF-8' => {a => 'b'} => {Accept => '*/*'});
+  my $res = f('kraih.com' => 'UTF-8' => {a => 'b'} => {DNT => 1});
 
 Perform C<POST> form request with L<Mojo::UserAgent/"post_form"> and return
 resulting L<Mojo::Message::Response> object.
@@ -134,7 +134,7 @@ resulting L<Mojo::Message::Response> object.
 =head2 C<g>
 
   my $res = g('http://mojolicio.us');
-  my $res = g('http://mojolicio.us' => {Accept => '*/*'} => 'Hi!');
+  my $res = g('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
 L<Mojo::Message::Response> object. One redirect will be followed by default,
@@ -146,7 +146,7 @@ variable.
 =head2 C<h>
 
   my $res = h('http://mojolicio.us');
-  my $res = h('http://mojolicio.us' => {Accept => '*/*'} => 'Hi!');
+  my $res = h('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
@@ -154,7 +154,7 @@ L<Mojo::Message::Response> object.
 =head2 C<o>
 
   my $res = o('http://mojolicio.us');
-  my $res = o('http://mojolicio.us' => {Accept => '*/*'} => 'Hi!');
+  my $res = o('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<OPTIONS> request with L<Mojo::UserAgent/"options"> and return
 resulting L<Mojo::Message::Response> object.
@@ -162,7 +162,7 @@ resulting L<Mojo::Message::Response> object.
 =head2 C<p>
 
   my $res = p('http://mojolicio.us');
-  my $res = p('http://mojolicio.us' => {Accept => '*/*'} => 'Hi!');
+  my $res = p('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.
@@ -170,7 +170,7 @@ L<Mojo::Message::Response> object.
 =head2 C<t>
 
   my $res = t('http://mojolicio.us');
-  my $res = t('http://mojolicio.us' => {Accept => '*/*'} => 'Hi!');
+  my $res = t('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<PATCH> request with L<Mojo::UserAgent/"patch"> and return resulting
 L<Mojo::Message::Response> object.
@@ -178,7 +178,7 @@ L<Mojo::Message::Response> object.
 =head2 C<u>
 
   my $res = u('http://mojolicio.us');
-  my $res = u('http://mojolicio.us' => {Accept => '*/*'} => 'Hi!');
+  my $res = u('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<PUT> request with L<Mojo::UserAgent/"put"> and return resulting
 L<Mojo::Message::Response> object.

@@ -285,14 +285,6 @@ implements the following new ones.
 =head2 C<form>
 
   my $tx = $t->form('http://kraih.com' => {a => 'b'});
-  my $tx = $t->form('http://kraih.com' => 'UTF-8' => {a => 'b'});
-  my $tx = $t->form('http://kraih.com' => {a => 'b'} => {Accept => '*/*'});
-  my $tx = $t->form(
-    'http://kraih.com',
-    'UTF-8',
-    {a => 'b'},
-    {Accept => '*/*'}
-  );
   my $tx = $t->form('http://kraih.com' => {mytext => {file => '/foo.txt'}});
   my $tx = $t->form('http://kraih.com' => {mytext => {content => 'lalala'}});
   my $tx = $t->form('http://kraih.com' => {
@@ -301,6 +293,9 @@ implements the following new ones.
       filename => 'foo.zip'
     }
   });
+  my $tx = $t->form('http://kraih.com' => 'UTF-8' => {a => 'b'});
+  my $tx = $t->form('http://kraih.com' => {a => 'b'} => {DNT => 1});
+  my $tx = $t->form('http://kraih.com', 'UTF-8', {a => 'b'}, {DNT => 1});
 
 Versatile L<Mojo::Transaction::HTTP> builder for form requests.
 
@@ -342,9 +337,9 @@ or C<307> redirect response if possible.
 
   my $tx = $t->tx(GET  => 'kraih.com');
   my $tx = $t->tx(POST => 'http://kraih.com');
-  my $tx = $t->tx(GET  => 'http://kraih.com' => {Accept => '*/*'});
+  my $tx = $t->tx(GET  => 'http://kraih.com' => {DNT => 1});
   my $tx = $t->tx(PUT  => 'http://kraih.com' => 'Hi!');
-  my $tx = $t->tx(POST => 'http://kraih.com' => {Accept => '*/*'} => 'Hi!');
+  my $tx = $t->tx(POST => 'http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 
@@ -361,7 +356,7 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
 =head2 C<websocket>
 
   my $tx = $t->websocket('ws://localhost:3000');
-  my $tx = $t->websocket('ws://localhost:3000' => 'Accept' => '*/*');
+  my $tx = $t->websocket('ws://localhost:3000' => {DNT => 1});
 
 Versatile L<Mojo::Transaction::WebSocket> builder for WebSocket handshake
 requests.

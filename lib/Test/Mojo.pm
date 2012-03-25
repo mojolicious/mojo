@@ -505,7 +505,7 @@ Opposite of C<content_type_like>.
 =head2 C<delete_ok>
 
   $t = $t->delete_ok('/foo');
-  $t = $t->delete_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->delete_ok('/foo' => {DNT => 1} => 'Hi!');
 
 Perform a C<DELETE> request and check for transport errors, takes the exact
 same arguments as L<Mojo::UserAgent/"delete">.
@@ -535,7 +535,7 @@ Finish C<WebSocket> connection.
 =head2 C<get_ok>
 
   $t = $t->get_ok('/foo');
-  $t = $t->get_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->get_ok('/foo' => {DNT => 1} => 'Hi!');
 
 Perform a C<GET> request and check for transport errors, takes the exact same
 arguments as L<Mojo::UserAgent/"get">.
@@ -543,7 +543,7 @@ arguments as L<Mojo::UserAgent/"get">.
 =head2 C<head_ok>
 
   $t = $t->head_ok('/foo');
-  $t = $t->head_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->head_ok('/foo' => {DNT => 1} => 'Hi!');
 
 Perform a C<HEAD> request and check for transport errors, takes the exact
 same arguments as L<Mojo::UserAgent/"head">.
@@ -637,7 +637,7 @@ Opposite of C<message_like>.
 =head2 C<options_ok>
 
   $t = $t->options_ok('/foo');
-  $t = $t->options_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->options_ok('/foo' => {DNT => 1} => 'Hi!');
 
 Perform a C<OPTIONS> request and check for transport errors, takes the exact
 same arguments as L<Mojo::UserAgent/"options">.
@@ -645,7 +645,7 @@ same arguments as L<Mojo::UserAgent/"options">.
 =head2 C<patch_ok>
 
   $t = $t->patch_ok('/foo');
-  $t = $t->patch_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->patch_ok('/foo' => {DNT => 1} => 'Hi!');
 
 Perform a C<PATCH> request and check for transport errors, takes the exact
 same arguments as L<Mojo::UserAgent/"patch">.
@@ -653,7 +653,7 @@ same arguments as L<Mojo::UserAgent/"patch">.
 =head2 C<post_ok>
 
   $t = $t->post_ok('/foo');
-  $t = $t->post_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->post_ok('/foo' => {DNT => 1} => 'Hi!');
 
 Perform a C<POST> request and check for transport errors, takes the exact
 same arguments as L<Mojo::UserAgent/"post">.
@@ -661,7 +661,7 @@ same arguments as L<Mojo::UserAgent/"post">.
 =head2 C<post_form_ok>
 
   $t = $t->post_form_ok('/foo' => {a => 'b'});
-  $t = $t->post_form_ok('/foo' => 'UTF-8' => {a => 'b'} => {Accept => '*/*'});
+  $t = $t->post_form_ok('/foo' => 'UTF-8' => {a => 'b'} => {DNT => 1});
 
 Submit a C<POST> form and check for transport errors, takes the exact same
 arguments as L<Mojo::UserAgent/"post_form">.
@@ -669,7 +669,7 @@ arguments as L<Mojo::UserAgent/"post_form">.
 =head2 C<put_ok>
 
   $t = $t->put_ok('/foo');
-  $t = $t->put_ok('/foo' => {Accept => '*/*'} => 'Hi!');
+  $t = $t->put_ok('/foo' => {DNT => 1} => 'Hi!');
 
 Perform a C<PUT> request and check for transport errors, takes the exact same
 arguments as L<Mojo::UserAgent/"put">.
@@ -735,7 +735,7 @@ Opposite of C<text_like>.
 =head2 C<websocket_ok>
 
   $t = $t->websocket_ok('/echo');
-  $t = $t->websocket_ok('/echo' => 'Accept' => '*/*');
+  $t = $t->websocket_ok('/echo' => {DNT => 1});
 
 Open a C<WebSocket> connection with transparent handshake, takes the exact
 same arguments as L<Mojo::UserAgent/"websocket">.

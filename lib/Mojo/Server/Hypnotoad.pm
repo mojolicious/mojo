@@ -580,7 +580,8 @@ the server has been stopped.
 
   proxy => 1
 
-Activate reverse proxy support.
+Activate reverse proxy support, defaults to the value of the
+C<MOJO_REVERSE_PROXY> environment variable.
 
 =head2 C<upgrade_timeout>
 

@@ -840,25 +840,34 @@ Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
 
 =head2 C<build_form_tx>
 
-  my $tx = $ua->build_form_tx('http://kraih.com/foo' => {test => 123});
+  my $tx = $ua->build_form_tx('http://kraih.com' => {a => 'b'});
+  my $tx = $ua->build_form_tx(
+    'http://kraih.com',
+    'UTF-8',
+    {a => 'b'},
+    {Accept => '*/*'}
+  );
 
 Alias for L<Mojo::UserAgent::Transactor/"form">.
 
 =head2 C<build_tx>
 
-  my $tx = $ua->build_tx(GET => 'mojolicio.us');
+  my $tx = $ua->build_tx(GET => 'kraih.com');
+  my $tx = $ua->build_tx(PUT => 'kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Alias for L<Mojo::UserAgent::Transactor/"tx">.
 
 =head2 C<build_websocket_tx>
 
-  my $tx = $ua->build_websocket_tx('ws://localhost:3000');
+  my $tx = $ua->build_websocket_tx('ws://localhost');
+  my $tx = $ua->build_websocket_tx('ws://localhost' => {Accept => '*/*'});
 
 Alias for L<Mojo::UserAgent::Transactor/"websocket">.
 
 =head2 C<delete>
 
   my $tx = $ua->delete('http://kraih.com');
+  my $tx = $ua->delete('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<DELETE> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
@@ -882,6 +891,7 @@ proxy detection can be enabled with the C<MOJO_PROXY> environment variable.
 =head2 C<get>
 
   my $tx = $ua->get('http://kraih.com');
+  my $tx = $ua->get('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<GET> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
@@ -897,6 +907,7 @@ append a callback to perform requests non-blocking.
 =head2 C<head>
 
   my $tx = $ua->head('http://kraih.com');
+  my $tx = $ua->head('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<HEAD> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
@@ -918,6 +929,7 @@ Check if request for domain would use a proxy server.
 =head2 C<options>
 
   my $tx = $ua->options('http://kraih.com');
+  my $tx = $ua->options('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<OPTIONS> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
@@ -933,6 +945,7 @@ append a callback to perform requests non-blocking.
 =head2 C<patch>
 
   my $tx = $ua->patch('http://kraih.com');
+  my $tx = $ua->patch('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<PATCH> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
@@ -948,6 +961,7 @@ append a callback to perform requests non-blocking.
 =head2 C<post>
 
   my $tx = $ua->post('http://kraih.com');
+  my $tx = $ua->post('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<POST> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
@@ -962,7 +976,13 @@ append a callback to perform requests non-blocking.
 
 =head2 C<post_form>
 
-  my $tx = $ua->post_form('http://kraih.com/foo' => {test => 123});
+  my $tx = $ua->post_form('http://kraih.com' => {a => 'b'});
+  my $tx = $ua->post_form(
+    'http://kraih.com',
+    'UTF-8',
+    {a => 'b'},
+    {Accept => '*/*'}
+  );
 
 Perform blocking HTTP C<POST> request with form data and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
@@ -978,6 +998,7 @@ perform requests non-blocking.
 =head2 C<put>
 
   my $tx = $ua->put('http://kraih.com');
+  my $tx = $ua->put('http://kraih.com' => {Accept => '*/*'} => 'Hi!');
 
 Perform blocking HTTP C<PUT> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
@@ -1005,7 +1026,8 @@ transactions non-blocking.
 
 =head2 C<websocket>
 
-  $ua->websocket('ws://localhost:3000' => sub {...});
+  $ua->websocket('ws://localhost' => sub {...});
+  $ua->websocket('ws://localhost' => {'Accept' => '*/*'} => sub {...});
 
 Open a non-blocking WebSocket connection with transparent handshake, takes
 the exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.

@@ -284,6 +284,7 @@ implements the following new ones.
 
 =head2 C<form>
 
+  my $tx = $t->form('kraih.com' => {a => 'b'});
   my $tx = $t->form('http://kraih.com' => {a => 'b'});
   my $tx = $t->form('http://kraih.com' => {mytext => {file => '/foo.txt'}});
   my $tx = $t->form('http://kraih.com' => {mytext => {content => 'lalala'}});

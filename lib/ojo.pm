@@ -30,7 +30,7 @@ sub import {
   eval "package $caller; use Mojolicious::Lite;";
 
   # Allow redirects
-  $UA->max_redirects(1) unless defined $ENV{MOJO_MAX_REDIRECTS};
+  $UA->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
 
   # Application
   $UA->app(*{"${caller}::app"}->());
@@ -137,7 +137,7 @@ resulting L<Mojo::Message::Response> object.
   my $res = g('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
-L<Mojo::Message::Response> object. One redirect will be followed by default,
+L<Mojo::Message::Response> object. Ten redirects will be followed by default,
 you can change this behavior with the C<MOJO_MAX_REDIRECTS> environment
 variable.
 

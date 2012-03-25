@@ -32,7 +32,7 @@ These options are available:
   -c, --content <content>     Content to send with request.
   -H, --header <name:value>   Additional HTTP header.
   -M, --method <method>       HTTP method to use, defaults to "GET".
-  -r, --redirect              Follow up to 5 redirects.
+  -r, --redirect              Follow up to 10 redirects.
   -v, --verbose               Print request and response headers to STDERR.
 EOF
 
@@ -71,7 +71,7 @@ sub run {
 
   # Fresh user agent
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-  $ua->max_redirects(5) if $redirect;
+  $ua->max_redirects(10) if $redirect;
 
   # Absolute URL
   if ($url !~ m#/#) { $ua->detect_proxy }

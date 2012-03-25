@@ -47,7 +47,7 @@ EOF
   my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
   my $latest = $current;
   eval {
-    Mojo::UserAgent->new->max_redirects(3)
+    Mojo::UserAgent->new->max_redirects(10)
       ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
       ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
   };

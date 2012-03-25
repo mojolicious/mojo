@@ -85,7 +85,16 @@ ojo - Fun Oneliners with Mojo!
 
 =head1 DESCRIPTION
 
-A collection of automatically exported functions for fun Perl oneliners.
+A collection of automatically exported functions for fun Perl oneliners. Ten
+redirects will be followed by default, you can change this behavior with the
+C<MOJO_MAX_REDIRECTS> environment variable.
+
+  $ MOJO_MAX_REDIRECTS=0 perl -Mojo -E 'say g("mojolicio.us")->code'
+
+Proxy detection is disabled by default, but you can enable it with the
+C<MOJO_PROXY> environment variable.
+
+  $ MOJO_PROXY=1 perl -Mojo -E 'say g("mojolicio.us")->body'
 
 =head1 FUNCTIONS
 
@@ -137,11 +146,7 @@ resulting L<Mojo::Message::Response> object.
   my $res = g('http://mojolicio.us' => {DNT => 1} => 'Hi!');
 
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
-L<Mojo::Message::Response> object. Ten redirects will be followed by default,
-you can change this behavior with the C<MOJO_MAX_REDIRECTS> environment
-variable.
-
-  $ MOJO_MAX_REDIRECTS=0 perl -Mojo -E 'say g("mojolicio.us")->code'
+L<Mojo::Message::Response> object.
 
 =head2 C<h>
 

@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.69  2012-03-25
+2.69  2012-03-26
   - Changed number of redirects ojo and the get command will follow to 10.
   - Improved Mojo::DOM::CSS performance.
   - Improved documentation.

@@ -585,7 +585,10 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   $ua->max_redirects(5)->get('latest.mojolicio.us')
     ->res->content->asset->move_to('/Users/sri/mojo.tar.gz');
 
-  # Parallel requests
+  # TLS certificate authentication
+  my $tx = $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
+
+  # Blocking parallel requests (does not work inside a running event loop)
   my $delay = Mojo::IOLoop->delay;
   for my $url ('mojolicio.us', 'cpan.org') {
     $delay->begin;
@@ -596,10 +599,21 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   }
   my @titles = $delay->wait;
 
-  # TLS certificate authentication
-  my $tx = $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
+  # Non-blocking parallel requests (does work inside a running event loop)
+  my $delay = Mojo::IOLoop->delay(sub {
+    my ($delay, @titles) = @_;
+    ...
+  });
+  for my $url ('mojolicio.us', 'cpan.org') {
+    $delay->begin;
+    $ua->get($url => sub {
+      my ($ua, $tx) = @_;
+      $delay->end($tx->res->dom->at('title')->text);
+    });
+  }
+  $delay->wait unless Mojo::IOLoop->is_running;
 
-  # WebSocket request
+  # Non-blocking WebSocket connection
   $ua->websocket('ws://websockets.org:8787' => sub {
     my ($ua, $tx) = @_;
     $tx->on(finish  => sub { say 'WebSocket closed.' });

@@ -928,7 +928,7 @@ be able to work standalone as well as inside L<Mojolicious> applications.
   # Synchronize non-blocking requests portably
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay(sub {
-    my ($ua, $tx, $tx2) = @_;
+    my ($delay, $tx, $tx2) = @_;
     ...
   });
   $ua->get('http://mojolicio.us'         => $delay->begin);

@@ -149,18 +149,16 @@ sub _config {
   $c->{workers}         ||= 4;
 
   # Daemon settings
-  $ENV{MOJO_REVERSE_PROXY} = $c->{proxy};
+  $ENV{MOJO_REVERSE_PROXY} = $c->{proxy} if defined $c->{proxy};
   my $daemon = $self->{daemon};
   $daemon->backlog($c->{backlog}) if defined $c->{backlog};
   $daemon->max_clients($c->{clients} || 1000);
-  $daemon->group($c->{group}) if $c->{group};
+  $daemon->group($c->{group}) if defined $c->{group};
   $daemon->max_requests($c->{keep_alive_requests}      || 25);
   $daemon->inactivity_timeout($c->{inactivity_timeout} || 15);
-  $daemon->user($c->{user}) if $c->{user};
+  $daemon->user($c->{user}) if defined $c->{user};
   $daemon->ioloop->max_accepts($c->{accepts} || 1000);
-  my $listen = $c->{listen} || ['http://*:8080'];
-  $listen = [$listen] unless ref $listen;
-  $daemon->listen($listen);
+  $daemon->listen($c->{listen} || ['http://*:8080']);
 }
 
 sub _exit { say shift and exit 0 }

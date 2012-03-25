@@ -199,15 +199,6 @@ sub json_hasnt {
   return $self;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub max_redirects {
-  warn "Test::Mojo->max_redirects is DEPRECATED!\n";
-  my $self = shift;
-  return $self->ua->max_redirects unless @_;
-  $self->ua->max_redirects(@_);
-  return $self;
-}
-
 sub message_is {
   my ($self, $value, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;

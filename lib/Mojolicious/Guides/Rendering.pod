@@ -692,6 +692,29 @@ you've installed and loaded the plugin, with slightly lower precedence.
     <body>You've been alerted.</body>
   </html>
 
+And it works just the same for assets bundled in the C<DATA> section of your
+plugin.
+
+  package Mojolicious::Plugin::AlertAssets;
+  use Mojo::Base 'Mojolicious::Plugin';
+
+  sub register {
+    my ($self, $app) = @_;
+
+    # Append class
+    push @{$app->renderer->classes}, __PACKAGE__;
+    push @{$app->static->classes},   __PACKAGE__;
+  }
+
+  1;
+  __DATA__
+
+  @@ alertassets.js
+  alert("Hello World!");
+
+  @@ alertassets.html.ep
+  %= javascript "/alertassets.js"
+
 =head2 Custom C<exception> and C<not_found> templates
 
 While the built-in C<exception> and C<not_found> templates are very useful

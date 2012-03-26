@@ -32,6 +32,9 @@ sub import {
   # Allow redirects
   $UA->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
 
+  # Detect proxy
+  $UA->detect_proxy unless defined $ENV{MOJO_PROXY};
+
   # Application
   $UA->app(*{"${caller}::app"}->());
 
@@ -91,10 +94,10 @@ C<MOJO_MAX_REDIRECTS> environment variable.
 
   $ MOJO_MAX_REDIRECTS=0 perl -Mojo -E 'say g("mojolicio.us")->code'
 
-Proxy detection is disabled by default, but you can enable it with the
+Proxy detection is enabled by default, but you can disable it with the
 C<MOJO_PROXY> environment variable.
 
-  $ MOJO_PROXY=1 perl -Mojo -E 'say g("mojolicio.us")->body'
+  $ MOJO_PROXY=0 perl -Mojo -E 'say g("mojolicio.us")->body'
 
 =head1 FUNCTIONS
 

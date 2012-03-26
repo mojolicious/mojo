@@ -2,16 +2,12 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 726;
+use Test::More tests => 725;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
-use ojo;
 use Mojo::DOM;
 use Mojo::Util 'encode';
-
-# ojo
-is x('<div>Hello ♥!</div>')->at('div')->text, 'Hello ♥!', 'right text';
 
 # Simple (basics)
 my $dom = Mojo::DOM->new->parse(

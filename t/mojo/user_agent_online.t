@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 # Disable libev and TLS
 BEGIN {
   $ENV{MOJO_NO_TLS}  = 1;
+  $ENV{MOJO_PROXY}   = 0;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 

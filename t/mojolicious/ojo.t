@@ -6,6 +6,7 @@ use utf8;
 BEGIN {
   $ENV{MOJO_MODE}       = 'development';
   $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_PROXY}      = 0;
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 

@@ -69,7 +69,7 @@ sub _detect {
   }
 
   # Search for context
-  foreach my $frame (reverse @trace) {
+  for my $frame (reverse @trace) {
     next unless -r $frame->[0];
     my $handle = IO::File->new($frame->[0], '<:utf8');
     $self->_parse_context($frame->[1], [[<$handle>]]);

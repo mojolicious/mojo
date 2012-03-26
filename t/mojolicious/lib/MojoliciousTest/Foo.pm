@@ -81,3 +81,10 @@ sub withblock { shift->render(template => 'withblock') }
 sub withlayout { shift->stash(template => 'withlayout') }
 
 1;
+__DATA__
+
+@@ just/some/template.html.ep
+Development template with high precedence.
+
+@@ some/static/file.txt
+Development static file with high precedence.

@@ -41,7 +41,7 @@ sub search {
   # Scan
   my $modules = [];
   my %found;
-  foreach my $directory (exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC) {
+  for my $directory (exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC) {
     my $path = catdir $directory, (split /::/, $namespace);
     next unless (-e $path && -d $path);
 

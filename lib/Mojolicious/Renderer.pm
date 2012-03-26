@@ -195,7 +195,7 @@ sub template_path {
   return unless my $name = $self->template_name(shift);
 
   # Search all paths
-  foreach my $path (@{$self->paths}) {
+  for my $path (@{$self->paths}) {
     my $file = catfile($path, split '/', $name);
     return $file if -r $file;
   }
@@ -209,7 +209,7 @@ sub _data_templates {
 
   # Index DATA templates
   return $self->{data_templates} if $self->{data_templates};
-  for my $class (@{$self->classes}) {
+  for my $class (reverse @{$self->classes}) {
     $self->{data_templates}->{$_} = $class
       for keys %{Mojo::Command->new->get_all_data($class) || {}};
   }
@@ -298,7 +298,8 @@ Renderer cache, defaults to a L<Mojo::Cache> object.
   my $classes = $renderer->classes;
   $renderer   = $renderer->classes(['main']);
 
-Classes to use for finding templates in C<DATA> section, defaults to C<main>.
+Classes to use for finding templates in C<DATA> section, first one has the
+highest precedence, defaults to C<main>.
 
   # Add another class with templates in DATA section
   push @{$renderer->classes}, 'Mojolicious::Plugin::Fun';
@@ -345,7 +346,7 @@ Registered helpers.
   my $paths = $renderer->paths;
   $renderer = $renderer->paths(['/foo/bar/templates']);
 
-Directories to look for templates in.
+Directories to look for templates in, first one has the highest precedence.
 
   # Add another "templates" directory
   push @{$renderer->paths}, '/foo/bar/templates';

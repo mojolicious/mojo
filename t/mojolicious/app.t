@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 284;
+use Test::More tests => 294;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -249,6 +249,18 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
 $t->get_ok('/hello.txt', {'If-Modified-Since' => $mtime})->status_is(304)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
+
+# Embedded development static file
+$t->get_ok('/some/static/file.txt')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Development static file with high precedence.\n");
+
+# Embedded development template
+$t->get_ok('/just/some/template')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Development template with high precedence.\n");
 
 # Check develpment mode log level
 my $app = Mojolicious->new;

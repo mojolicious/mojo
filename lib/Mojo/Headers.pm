@@ -155,7 +155,7 @@ sub to_hash {
 
   # Build
   my $hash = {};
-  foreach my $header (@{$self->names}) {
+  for my $header (@{$self->names}) {
     my @headers = $self->header($header);
 
     # Nested arrayrefs
@@ -165,7 +165,7 @@ sub to_hash {
     else {
 
       # Turn single value arrayrefs into strings
-      foreach my $h (@headers) { $h = $h->[0] if @$h == 1 }
+      for my $h (@headers) { $h = $h->[0] if @$h == 1 }
       $hash->{$header} = @headers > 1 ? [@headers] : $headers[0];
     }
   }

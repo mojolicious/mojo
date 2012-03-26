@@ -1,16 +1,26 @@
 package MojoliciousTest;
 use Mojo::Base 'Mojolicious';
 
+use MojoliciousTest::Foo;
+
 sub development_mode {
   my $self = shift;
 
+  # Template and static file class with higher precedence for development
+  unshift @{$self->static->classes},   'MojoliciousTest::Foo';
+  unshift @{$self->renderer->classes}, 'MojoliciousTest::Foo';
+
   # Static root for development
-  $self->static->paths->[0] = $self->home->rel_dir('public_dev');
+  unshift @{$self->static->paths}, $self->home->rel_dir('public_dev');
 }
 
 # "Let's face it, comedy's a dead art form. Tragedy, now that's funny."
 sub startup {
   my $self = shift;
+
+  # Template and static file class with lower precedence for production
+  push @{$self->static->classes},   'MojoliciousTest';
+  push @{$self->renderer->classes}, 'MojoliciousTest';
 
   # Plugins in custom namespace
   unshift @{$self->plugins->namespaces},
@@ -134,6 +144,16 @@ sub startup {
 
   # /*/* (the default route)
   $r->route('/(controller)/(action)')->to(action => 'index');
+
+  # /just/some/template (embedded template)
+  $r->route('/just/some/template')->to(template => 'just/some/template');
 }
 
 1;
+__DATA__
+
+@@ some/static/file.txt
+Production static file with low precedence.
+
+@@ just/some/template.html.ep
+Production template with low precedence.

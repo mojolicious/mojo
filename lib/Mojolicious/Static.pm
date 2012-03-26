@@ -72,17 +72,14 @@ sub serve {
   my $modified = $self->{modified} ||= time;
   my $res      = $c->res;
   for my $path (@{$self->paths}) {
-    my $file = catfile($path, split('/', $rel));
-    next unless my $data = $self->_get_file($file);
-
-    # Forbidded
-    unless (@$data) {
-      $c->app->log->debug(qq/File "$rel" is forbidden./);
-      $res->code(403) and return;
-    }
+    next unless my $data = $self->_get_file(catfile $path, split('/', $rel));
 
     # Exists
-    ($asset, $size, $modified) = @$data;
+    last if ($asset, $size, $modified) = @$data;
+
+    # Forbidded
+    $c->app->log->debug(qq/File "$rel" is forbidden./);
+    $res->code(403) and return;
   }
 
   # Search DATA
@@ -157,7 +154,7 @@ sub _get_data_file {
   # Index DATA files
   unless ($self->{data_files}) {
     $self->{data_files} = {};
-    for my $class (@{$self->classes}) {
+    for my $class (reverse @{$self->classes}) {
       $self->{data_files}->{$_} = $class
         for keys %{Mojo::Command->new->get_all_data($class) || {}};
     }
@@ -202,7 +199,8 @@ L<Mojolicious::Static> implements the following attributes.
   my $classes = $static->classes;
   $static     = $static->classes(['main']);
 
-Classes to use for finding files in C<DATA> section, defaults to C<main>.
+Classes to use for finding files in C<DATA> section, first one has the
+highest precedence, defaults to C<main>.
 
   # Add another class with static files in DATA section
   push @{$static->classes}, 'Mojolicious::Plugin::Fun';
@@ -212,7 +210,7 @@ Classes to use for finding files in C<DATA> section, defaults to C<main>.
   my $paths = $static->paths;
   $static   = $static->paths(['/foo/bar/public']);
 
-Directories to serve static files from.
+Directories to serve static files from, first one has the highest precedence.
 
   # Add another "public" directory
   push @{$static->paths}, '/foo/bar/public';

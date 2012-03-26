@@ -6,6 +6,8 @@ This file documents the revision history for Perl extension Mojolicious.
   - Improved Mojo::DOM::CSS performance.
   - Improved documentation.
   - Improved Mojo::Reactor tests to be less strict.
+  - Fixed a bug where paths and classes in Mojolicious::Static and
+    Mojolicious::Renderer would have the wrong precedence.
   - Fixed small bug where Hypnotoad would ignore the MOJO_REVERSE_PROXY
     environment variable.
 

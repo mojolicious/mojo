@@ -50,7 +50,7 @@ sub _draw {
   }
 
   # Draw
-  foreach my $node (@$routes) {
+  for my $node (@$routes) {
     my @parts;
 
     # Pattern

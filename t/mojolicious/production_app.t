@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 69;
+use Test::More tests => 79;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -105,3 +105,15 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);
+
+# Embedded production static file
+$t->get_ok('/some/static/file.txt')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Production static file with low precedence.\n\n");
+
+# Embedded production template
+$t->get_ok('/just/some/template')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("Production template with low precedence.\n");

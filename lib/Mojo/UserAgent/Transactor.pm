@@ -78,7 +78,7 @@ sub form {
 
     # Parts
     my @parts;
-    foreach my $name (sort keys %$form) {
+    for my $name (sort keys %$form) {
       my $part = Mojo::Content::Single->new;
       my $h    = $part->headers;
       my $f    = $form->{$name};

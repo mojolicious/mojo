@@ -46,9 +46,7 @@ sub dispatch {
   # Serve static file
   return unless $self->serve($c, join('/', @parts));
   $stash->{'mojo.static'}++;
-  $c->rendered;
-
-  return 1;
+  return $c->rendered;
 }
 
 # DEPRECATED in Leaf Fluttering In Wind!
@@ -107,10 +105,9 @@ sub serve {
     # Not modified
     my $since = Mojo::Date->new($date)->epoch;
     if (defined $since && $since == $modified) {
-      $res_headers->remove('Content-Type');
-      $res_headers->remove('Content-Length');
-      $res_headers->remove('Content-Disposition');
-      $res->code(304) and return 1;
+      $res_headers->remove('Content-Type')->remove('Content-Length')
+        ->remove('Content-Disposition');
+      return $res->code(304);
     }
   }
 
@@ -127,20 +124,16 @@ sub serve {
     }
 
     # Not satisfiable
-    else { $res->code(416) and return 1 }
+    else { return $res->code(416) }
   }
-  $asset->start_range($start);
-  $asset->end_range($end);
+  $asset->start_range($start)->end_range($end);
 
   # Serve file
   $res->code(200) unless $res->code;
   $res->content->asset($asset);
   $rel =~ /\.(\w+)$/;
-  $res_headers->content_type($c->app->types->type($1) || 'text/plain');
-  $res_headers->accept_ranges('bytes');
-  $res_headers->last_modified(Mojo::Date->new($modified));
-
-  return 1;
+  return $res_headers->content_type($c->app->types->type($1) || 'text/plain')
+    ->accept_ranges('bytes')->last_modified(Mojo::Date->new($modified));
 }
 
 # "I like being a women.

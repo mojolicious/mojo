@@ -111,8 +111,7 @@ sub run {
     my ($name, $description) = @$command;
     print "  $name" . (' ' x ($max - length $name)) . "   $description";
   }
-  print $self->hint;
-  return 1;
+  return print $self->hint;
 }
 
 sub start {

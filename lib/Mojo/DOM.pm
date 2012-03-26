@@ -76,7 +76,7 @@ sub attrs {
 
 sub charset {
   my $self = shift;
-  return $self->[0]->charset if @_ == 0;
+  return $self->[0]->charset unless @_;
   $self->[0]->charset(shift);
   return $self;
 }
@@ -289,7 +289,7 @@ sub to_xml { shift->[0]->render }
 
 sub tree {
   my $self = shift;
-  return $self->[0]->tree if @_ == 0;
+  return $self->[0]->tree unless @_;
   $self->[0]->tree(shift);
   return $self;
 }
@@ -312,7 +312,7 @@ sub type {
 # "I want to set the record straight, I thought the cop was a prostitute."
 sub xml {
   my $self = shift;
-  return $self->[0]->xml if @_ == 0;
+  return $self->[0]->xml unless @_;
   $self->[0]->xml(shift);
   return $self;
 }

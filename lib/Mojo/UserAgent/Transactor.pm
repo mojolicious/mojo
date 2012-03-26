@@ -120,8 +120,7 @@ sub form {
     # Multipart content
     my $content = Mojo::Content::MultiPart->new;
     $headers->content_type('multipart/form-data');
-    $content->headers($headers);
-    $content->parts(\@parts);
+    $content->headers($headers)->parts(\@parts);
 
     # Add content to transaction
     $req->content($content);
@@ -202,16 +201,11 @@ sub redirect {
   if ($code ~~ [301, 307]) {
     return unless $req = $req->clone;
     $new->req($req);
-    my $headers = $req->headers;
-    $headers->remove('Host');
-    $headers->remove('Cookie');
-    $headers->remove('Referer');
+    $req->headers->remove('Host')->remove('Cookie')->remove('Referer');
   }
   else { $method = 'GET' unless $method ~~ [qw/GET HEAD/] }
   $new->req->method($method)->url($location);
-  $new->previous($old);
-
-  return $new;
+  return $new->previous($old);
 }
 
 # "If he is so smart, how come he is dead?"

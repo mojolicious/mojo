@@ -85,9 +85,7 @@ sub body_params {
 
     # Formdata
     for my $data (@$formdata) {
-      my $name     = $data->[0];
-      my $filename = $data->[1];
-      my $value    = $data->[2];
+      my ($name, $filename, $value) = @$data;
 
       # File
       next if defined $filename;
@@ -340,19 +338,18 @@ sub uploads {
   # Extract formdata
   my $formdata = $self->_parse_formdata;
   for my $data (@$formdata) {
-    my $name     = $data->[0];
-    my $filename = $data->[1];
-    my $part     = $data->[2];
+    my ($name, $filename, $part) = @$data;
 
     # Just a form value
     next unless defined $filename;
 
     # Uploaded file
-    my $upload = Mojo::Upload->new;
-    $upload->name($name);
-    $upload->asset($part->asset);
-    $upload->filename($filename);
-    $upload->headers($part->headers);
+    my $upload = Mojo::Upload->new(
+      name     => $name,
+      asset    => $part->asset,
+      filename => $filename,
+      headers  => $part->headers
+    );
     push @uploads, $upload;
   }
 

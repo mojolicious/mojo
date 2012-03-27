@@ -44,12 +44,11 @@ OPTIONAL
 EOF
 
   # Latest version
-  my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
-  my $latest = $current;
+  my $latest = my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
   eval {
-    Mojo::UserAgent->new->max_redirects(10)
-      ->get('search.cpan.org/dist/Mojolicious')->res->dom('.version')
-      ->each(sub { $latest = $_->text if $_->text =~ /^[\d\.]+$/ });
+    $latest =
+      Mojo::UserAgent->new(max_redirects => 10)
+      ->get('api.metacpan.org/v0/release/Mojolicious')->res->json->{version};
   };
 
   # Message

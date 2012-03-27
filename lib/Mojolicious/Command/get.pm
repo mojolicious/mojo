@@ -156,8 +156,7 @@ sub _json {
   my $json = Mojo::JSON->new;
   return unless my $data = $json->decode($buffer);
   return unless $data = Mojo::JSON::Pointer->get($data, $pointer);
-  ref $data eq 'HASH'
-    || ref $data eq 'ARRAY' ? say($json->encode($data)) : _say($data);
+  ref $data ~~ ['HASH', 'ARRAY'] ? say($json->encode($data)) : _say($data);
 }
 
 sub _say {

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.70  2012-03-27
+  - Improved speed of version command by switching to the MetaCPAN API.
   - Improved documentation.
   - Fixed small bug in inflate command. (memowe)
 
@@ -1907,7 +1908,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Added header_condition plugin to Mojolicious. (xantus)
   - Added finish method to Mojolicious::Controller.
   - Added WebSocket support to Mojolicious and Mojolicious::Lite.
-  - Added message body support to Mojo::Client api. (tempire)
+  - Added message body support to Mojo::Client API. (tempire)
   - Added stash helper.
   - Added POD renderer plugin to Mojolicious. (vti)
   - Added inflate command to Mojolicious. (vti, korshak)
@@ -1926,7 +1927,7 @@ This file documents the revision history for Perl extension Mojolicious.
     through for debugging.
   - Made Mojo::IOLoop very hard to kill.
   - Reduced Mojolicious log output outside of development mode.
-  - Polished Mojo::Client api.
+  - Polished Mojo::Client API.
   - Fixed connect error handling in Mojo::Client.
   - Fixed double encoding of JSON data with charset plugin. (yuki-kimoto)
   - Fixed prefork daemon signal handling.
@@ -2374,7 +2375,7 @@ This file documents the revision history for Perl extension Mojolicious.
 0.9  2008-12-01
   - Added modes to Mojolicious.
   - Added Mojo::Log and log support for Mojo/Mojolicious.
-  - Changed MojoX::Renderer and Mojo::Template api to make catching errors
+  - Changed MojoX::Renderer and Mojo::Template API to make catching errors
     easier, we now use a scalar ref for results like most template engines.
   - Added MojoX::Context.
   - Added multi level controller class support to Mojolicious.
@@ -2436,22 +2437,22 @@ This file documents the revision history for Perl extension Mojolicious.
   - Fixed lower case appclasses.
 
 0.8007  2008-11-07
-  - Cleaned up the api some more.
+  - Cleaned up the API some more.
   - Added param to Mojo::Message.
   - Added "server.t". (Mark Stosberg)
   - Added documentation. (Mark Stosberg)
-  - Cleaned up Mojo::File api.
+  - Cleaned up Mojo::File API.
   - Fixed infinite loop in Mojo::File. (Leon Brocard)
 
 0.8006  2008-11-06
-  - Simplified api by removing aliases, this will help with subclassing
+  - Simplified API by removing aliases, this will help with subclassing
     annoyances but might break some existing code if you are using long
     versions of formerly aliased attributes.
   - Fixed application/x-www-form-urlencoded.
   - Fixed support for query strings.
   - Fixed multi query parameter support.
   - Added a context class to the Mojolicious generator.
-  - Cleaned up Mojo::Server api. (Mark Stosberg)
+  - Cleaned up Mojo::Server API. (Mark Stosberg)
   - Increased Mojo::Template performance. (Pedro Melo)
   - Added documentation. (Mark Stosberg)
   - Fixed typos. (Marcus Ramberg)

@@ -14,7 +14,7 @@ sub run {
   my $all = {};
   my $app = $self->app;
   for my $class (@{$app->renderer->classes}, @{$app->static->classes}) {
-    $all = {%{$self->get_all_data($class)}, %$all};
+    $all = {%{$self->get_all_data($class) // {}}, %$all};
   }
 
   # Turn them into real files

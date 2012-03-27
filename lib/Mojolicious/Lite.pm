@@ -817,8 +817,9 @@ L<Mojolicious::Lite> implements the following functions.
   my $route = any '/:foo' => sub {...};
   my $route = any ['GET', 'POST'] => '/:foo' => sub {...};
 
-Generate route matching any of the listed HTTP request methods or all. See
-also the tutorial above for more argument variations.
+Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the
+listed HTTP request methods or all. See also the tutorial above for more
+argument variations.
 
 =head2 C<app>
 
@@ -830,15 +831,15 @@ The L<Mojolicious::Lite> application.
 
   my $route = del '/:foo' => sub {...};
 
-Generate route matching only C<DELETE> requests. See also the tutorial above
-for more argument variations.
+Generate route with L<Mojolicious::Routes::Route/"delete">, matching only
+C<DELETE> requests. See also the tutorial above for more argument variations.
 
 =head2 C<get>
 
   my $route = get '/:foo' => sub {...};
 
-Generate route matching only C<GET> requests. See also the tutorial above for
-more argument variations.
+Generate route with L<Mojolicious::Routes::Route/"get">, matching only C<GET>
+requests. See also the tutorial above for more argument variations.
 
 =head2 C<group>
 
@@ -862,15 +863,16 @@ Alias for L<Mojolicious/"hook">.
 
   my $route = options '/:foo' => sub {...};
 
-Generate route matching only C<OPTIONS> requests. See also the tutorial above
-for more argument variations.
+Generate route with L<Mojolicious::Routes::Route/"options">, matching only
+C<OPTIONS> requests. See also the tutorial above for more argument
+variations.
 
 =head2 C<patch>
 
   my $route = patch '/:foo' => sub {...};
 
-Generate route matching only C<PATCH> requests. See also the tutorial above
-for more argument variations.
+Generate route with L<Mojolicious::Routes::Route/"patch">, matching only
+C<PATCH> requests. See also the tutorial above for more argument variations.
 
 =head2 C<plugin>
 
@@ -882,30 +884,32 @@ Alias for L<Mojolicious/"plugin">.
 
   my $route = post '/:foo' => sub {...};
 
-Generate route matching only C<POST> requests. See also the tutorial above
-for more argument variations.
+Generate route with L<Mojolicious::Routes::Route/"post">, matching only
+C<POST> requests. See also the tutorial above for more argument variations.
 
 =head2 C<put>
 
   my $route = put '/:foo' => sub {...};
 
-Generate route matching only C<PUT> requests. See also the tutorial above for
-more argument variations.
+Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT>
+requests. See also the tutorial above for more argument variations.
 
 =head2 C<under>
 
   my $route = under sub {...};
   my $route = under '/:foo';
 
-Generate bridge to which all following routes are automatically appended. See
-also the tutorial above for more argument variations.
+Generate bridge with L<Mojolicious::Routes::Route/"under">, to which all
+following routes are automatically appended. See also the tutorial above for
+more argument variations.
 
 =head2 C<websocket>
 
   my $route = websocket '/:foo' => sub {...};
 
-Generate route matching only C<WebSocket> handshakes. See also the tutorial
-above for more argument variations.
+Generate route with L<Mojolicious::Routes::Route/"websocket">, matching only
+C<WebSocket> handshakes. See also the tutorial above for more argument
+variations.
 
 =head1 ATTRIBUTES
 

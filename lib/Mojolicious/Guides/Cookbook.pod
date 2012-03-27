@@ -100,7 +100,7 @@ single incoming connection, just by running the command above again.
 
 You might also want to enable proxy support if you're using Hypnotoad behind
 a reverse proxy. This allows L<Mojolicious> to automatically pick up the
-C<X-Forwarded-For>, C<X-Forwarded-Host> and C<X-Forwarded-HTTPS> headers.
+C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
 
   # myapp.conf
   {hypnotoad => {proxy => 1}};

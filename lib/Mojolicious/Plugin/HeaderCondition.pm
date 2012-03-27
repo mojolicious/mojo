@@ -68,7 +68,6 @@ Mojolicious::Plugin::HeaderCondition - Header condition plugin
   get '/' => (agent => qr/Firefox/) => sub {...};
 
   # The "host" condition is a shortcut for the detected host
-  # (usually the "Host" or "X-Forwarded-Host" header)
   get '/' => (host => qr/mojolicio\.us/) => sub {...};
 
 =head1 DESCRIPTION

@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.69  2012-03-26
+  - Removed X-Forwarded-Host support since it is redundant for well
+    configured reverse proxies.
   - Changed number of redirects ojo and the get command will follow to 10.
   - Improved ojo to detect proxy servers automatically.
   - Improved Mojo::DOM::CSS performance.

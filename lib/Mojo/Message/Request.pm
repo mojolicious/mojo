@@ -148,20 +148,9 @@ sub parse {
       }
     }
 
-    # Reverse proxy
-    if ($ENV{MOJO_REVERSE_PROXY}) {
-
-      # "X-Forwarded-Host"
-      if (my $host = $headers->header('X-Forwarded-Host')) {
-        if ($host =~ $HOST_RE) {
-          $base->host($1);
-          $base->port($2) if defined $2;
-        }
-      }
-
-      # "X-Forwarded-HTTPS"
-      $base->scheme('https') if $headers->header('X-Forwarded-HTTPS');
-    }
+    # "X-Forwarded-HTTPS"
+    $base->scheme('https')
+      if $ENV{MOJO_REVERSE_PROXY} && $headers->header('X-Forwarded-HTTPS');
   }
 
   return $self;

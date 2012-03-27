@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 125;
+use Test::More tests => 116;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -249,35 +249,9 @@ too!works!!!
 </form>
 EOF
 
-# GET / (full external application with domain and reverse proxy)
-{
-  local $ENV{MOJO_REVERSE_PROXY} = 1;
-  $t->get_ok('/' => {'X-Forwarded-Host' => 'mojolicious.org'})->status_is(200)
-    ->content_is(<<'EOF');
-works!
-
-too!works!!!
-<form action="/%E2%98%83">
-  <input type="submit" value="☃" />
-</form>
-EOF
-}
-
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is('mojolicious.org');
-
-# GET /host (full external application with domain and reverse proxy)
-{
-  local $ENV{MOJO_REVERSE_PROXY} = 1;
-  $t->get_ok('/host' => {'X-Forwarded-Host' => 'mojolicious.org'})
-    ->status_is(200)->content_is('mojolicious.org');
-}
-
-# GET /host (full external application with domain and no reverse proxy)
-$t->get_ok(
-  '/host' => {Host => 'mojolicious.org', 'X-Forwarded-Host' => 'kraih.com'})
-  ->status_is(200)->content_is('mojolicious.org');
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)

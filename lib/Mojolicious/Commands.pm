@@ -337,12 +337,16 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
 
 Start the command line interface.
 
+  Mojolicious::Commands->start('daemon', '-l', 'http://*:8080');
+
 =head2 C<start_app>
 
   Mojolicious::Commands->start_app('MyApp');
   Mojolicious::Commands->start_app(MyApp => @ARGV);
 
-Start the command line interface for application.
+Load application and start the command line interface for it.
+
+  Mojolicious::Commands->start_app('MyApp', 'daemon', '-l', 'http://*:8080');
 
 =head1 SEE ALSO
 

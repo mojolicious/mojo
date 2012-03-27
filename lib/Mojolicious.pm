@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.69';
+our $VERSION  = '2.70';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -607,11 +607,13 @@ Template specific helper collection.
 
 =head2 C<start>
 
-  Mojolicious->start;
-  Mojolicious->start('daemon');
+  $app->start;
+  $app->start('daemon');
 
-Start the L<Mojolicious::Commands> command line interface for your
-application.
+Start the command line interface for your application with
+L<Mojolicious::Commands/"start">.
+
+  $app->start('daemon', '-l', 'http://*:8080');
 
 =head2 C<startup>
 

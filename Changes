@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.70  2012-03-27
+  - Improved documentation.
+
 2.69  2012-03-26
   - Removed X-Forwarded-Host support since it is redundant for well
     configured reverse proxies.

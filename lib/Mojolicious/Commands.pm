@@ -337,6 +337,7 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
 
 Start the command line interface.
 
+  # Always start daemon and ignore @ARGV
   Mojolicious::Commands->start('daemon', '-l', 'http://*:8080');
 
 =head2 C<start_app>
@@ -346,6 +347,7 @@ Start the command line interface.
 
 Load application and start the command line interface for it.
 
+  # Always start daemon for application and ignore @ARGV
   Mojolicious::Commands->start_app('MyApp', 'daemon', '-l', 'http://*:8080');
 
 =head1 SEE ALSO

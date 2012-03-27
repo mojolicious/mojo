@@ -608,11 +608,12 @@ Template specific helper collection.
 =head2 C<start>
 
   $app->start;
-  $app->start('daemon');
+  $app->start(@ARGV);
 
 Start the command line interface for your application with
 L<Mojolicious::Commands/"start">.
 
+  # Always start daemon and ignore @ARGV
   $app->start('daemon', '-l', 'http://*:8080');
 
 =head2 C<startup>

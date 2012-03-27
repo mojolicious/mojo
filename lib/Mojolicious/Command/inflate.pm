@@ -13,9 +13,8 @@ sub run {
   # Find all embedded files
   my $all = {};
   my $app = $self->app;
-  for my $class (@{$app->renderer->classes}, @{$app->static->classes}) {
-    $all = {%{$self->get_all_data($class) // {}}, %$all};
-  }
+  $all = {%{$self->get_all_data($_) || {}}, %$all}
+    for @{$app->renderer->classes}, @{$app->static->classes};
 
   # Turn them into real files
   for my $file (keys %$all) {

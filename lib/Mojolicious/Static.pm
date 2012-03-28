@@ -149,7 +149,7 @@ sub _get_data_file {
     $self->{data_files} = {};
     for my $class (reverse @{$self->classes}) {
       $self->{data_files}->{$_} = $class
-        for keys %{Mojo::Command->new->get_all_data($class)};
+        for keys %{Mojo::Command->get_all_data($class)};
     }
   }
 

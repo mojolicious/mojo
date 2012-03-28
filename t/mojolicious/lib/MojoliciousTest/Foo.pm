@@ -83,7 +83,7 @@ sub withlayout { shift->stash(template => 'withlayout') }
 1;
 __DATA__
 
-@@ just/some/template.html.ep
+@@ just/some/template.html.epl
 Development template with high precedence.
 
 @@ some/static/file.txt

@@ -75,8 +75,15 @@ EOF
 
 sub get_data_template {
   my ($self, $options, $template) = @_;
-  return Mojo::Command->new->get_data($template,
-    $self->_data_templates->{$template});
+
+  # Index and find DATA templates
+  unless ($self->{index}) {
+    my $index = $self->{index} = {};
+    for my $class (reverse @{$self->classes}) {
+      $index->{$_} = $class for keys %{Mojo::Command->get_all_data($class)};
+    }
+  }
+  return Mojo::Command->new->get_data($template, $self->{index}->{$template});
 }
 
 # "Bodies are for hookers and fat people."
@@ -204,18 +211,6 @@ sub template_path {
   return catfile($self->paths->[0], split '/', $name);
 }
 
-sub _data_templates {
-  my $self = shift;
-
-  # Index DATA templates
-  return $self->{data_templates} if $self->{data_templates};
-  for my $class (reverse @{$self->classes}) {
-    $self->{data_templates}->{$_} = $class
-      for keys %{Mojo::Command->new->get_all_data($class)};
-  }
-  return $self->{data_templates} ||= {};
-}
-
 sub _detect_handler {
   my ($self, $options) = @_;
 
@@ -223,17 +218,19 @@ sub _detect_handler {
   return unless my $file = $self->template_name($options);
   unless ($self->{templates}) {
     $_ =~ s/\.(\w+)$// and $self->{templates}->{$_} ||= $1
-      for sort map { @{Mojo::Home->new($_)->list_files} } @{$self->paths};
+      for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
   }
   return $self->{templates}->{$file} if exists $self->{templates}->{$file};
 
   # DATA templates
   unless ($self->{data}) {
     $_ =~ s/\.(\w+)$// and $self->{data}->{$_} ||= $1
-      for sort keys %{$self->_data_templates};
+      for map { sort keys %{Mojo::Command->get_all_data($_)} }
+      @{$self->classes};
   }
   return $self->{data}->{$file} if exists $self->{data}->{$file};
 
+  # Nothing
   return;
 }
 

@@ -81,18 +81,21 @@ sub _build_tx {
 
   # Store connection information
   my $handle = $self->ioloop->stream($id)->handle;
-  $tx->local_address($handle->sockhost);
-  $tx->local_port($handle->sockport);
-  $tx->remote_address($handle->peerhost);
-  $tx->remote_port($handle->peerport);
+  $tx->local_address($handle->sockhost)->local_port($handle->sockport);
+  $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
 
   # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
 
   # Events
   weaken $self;
-  $tx->on(upgrade =>
-      sub { ($self->{connections}->{$id}->{ws} = pop)->server_handshake });
+  $tx->on(
+    upgrade => sub {
+      my ($tx, $ws) = @_;
+      $ws->server_handshake;
+      $self->{connections}->{$id}->{ws} = $ws;
+    }
+  );
   $tx->on(
     request => sub {
       my $tx = shift;

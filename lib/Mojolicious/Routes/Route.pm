@@ -208,7 +208,7 @@ sub to {
     }
   }
 
-  # Defaults
+  # Merge defaults
   my $pattern = $self->pattern;
   $pattern->defaults({%{$pattern->defaults}, %$defaults}) if $defaults;
 
@@ -382,6 +382,10 @@ also the L<Mojolicious::Lite> tutorial for more argument variations.
 
 Add a new bridge to this route as a nested child.
 
+  my $auth = $r->bridge('/user')->to('user#auth');
+  $auth->route('/show')->to('#show');
+  $auth->route('/create')->to('#create');
+
 =head2 C<delete>
 
   my $route = $r->delete('/:foo' => sub {...});
@@ -414,6 +418,8 @@ application embedding.
 
 Find child route by name, custom names have precedence over automatically
 generated ones.
+
+  $r->find('show_user')->to(foo => 'bar');
 
 =head2 C<get>
 

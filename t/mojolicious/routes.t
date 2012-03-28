@@ -89,8 +89,8 @@ $r->route('/wildcards/4/*wildcard/foo')
 
 # /format
 # /format.html
-$r->route('/format')
-  ->to(controller => 'hello', action => 'you', format => 'html');
+$r->route('/format')->to(controller => 'hello')
+  ->to(action => 'you', format => 'html');
 
 # /format2.html
 $r->route('/format2.html')->to(controller => 'you', action => 'hello');

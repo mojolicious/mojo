@@ -166,7 +166,6 @@ sub route {
 
 sub to {
   my $self = shift;
-  return $self unless @_;
 
   # Single argument
   my ($shortcut, $defaults);
@@ -181,10 +180,7 @@ sub to {
   else {
 
     # Odd
-    if (@_ % 2) {
-      $shortcut = shift;
-      $defaults = {@_};
-    }
+    if (@_ % 2) { ($shortcut, $defaults) = (shift, {@_}) }
 
     # Even
     else {
@@ -214,8 +210,7 @@ sub to {
 
   # Defaults
   my $pattern = $self->pattern;
-  my $old     = $pattern->defaults;
-  $pattern->defaults({%$old, %$defaults}) if $defaults;
+  $pattern->defaults({%{$pattern->defaults}, %$defaults}) if $defaults;
 
   return $self;
 }
@@ -487,6 +482,8 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 Activate conditions for this route. Note that this automatically disables the
 routing cache, since conditions are too complex for caching.
 
+  $r->route('/foo')->over(host => qr/mojolicio\.us/)->to('foo#bar');
+
 =head2 C<parse>
 
   $r = $r->parse('/:controller/:action');
@@ -533,6 +530,8 @@ Render route with parameters into a path.
 
 The L<Mojolicious::Routes> object this route is an ancestor of.
 
+  #r->root->caching(0);
+
 =head2 C<route>
 
   my $route = $r->route('/:c/:a', a => qr/\w+/);
@@ -541,7 +540,6 @@ Add a new nested child to this route.
 
 =head2 C<to>
 
-  my $to  = $r->to;
   $r = $r->to(action => 'foo');
   $r = $r->to({action => 'foo'});
   $r = $r->to('controller#action');
@@ -583,6 +581,8 @@ variations.
 
 Restrict HTTP methods this route is allowed to handle, defaults to no
 restrictions.
+
+  $r->route('/foo')->via(qw/GET POST/)->to('foo#bar');
 
 =head2 C<waypoint>
 

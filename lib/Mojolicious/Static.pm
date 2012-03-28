@@ -145,16 +145,15 @@ sub _get_data_file {
   return if $rel =~ /\.\w+\.\w+$/;
 
   # Index DATA files
-  unless ($self->{data_files}) {
-    $self->{data_files} = {};
+  unless ($self->{index}) {
+    my $index = $self->{index} = {};
     for my $class (reverse @{$self->classes}) {
-      $self->{data_files}->{$_} = $class
-        for keys %{Mojo::Command->get_all_data($class)};
+      $index->{$_} = $class for keys %{Mojo::Command->get_all_data($class)};
     }
   }
 
   # Find file
-  return Mojo::Command->new->get_data($rel, $self->{data_files}->{$rel});
+  return Mojo::Command->get_data($rel, $self->{index}->{$rel});
 }
 
 sub _get_file {

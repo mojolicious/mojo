@@ -38,8 +38,7 @@ sub run {
 
     # List test files
     my $home = Mojo::Home->new($path);
-    $_ =~ /\.t$/ and push(@tests, $home->rel_file($_))
-      for @{$home->list_files};
+    /\.t$/ and push(@tests, $home->rel_file($_)) for @{$home->list_files};
 
     $path = realpath $path;
     say "Running tests from '$path'.";

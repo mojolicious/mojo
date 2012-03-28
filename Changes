@@ -1,8 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.70  2012-03-27
+2.70  2012-03-28
   - Improved speed of version command by switching to the MetaCPAN API.
   - Improved documentation.
+  - Fixed small bug in Mojo::Command->get_all_data.
   - Fixed small bug in inflate command. (memowe)
 
 2.69  2012-03-26

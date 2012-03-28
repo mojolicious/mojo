@@ -211,7 +211,7 @@ sub _data_templates {
   return $self->{data_templates} if $self->{data_templates};
   for my $class (reverse @{$self->classes}) {
     $self->{data_templates}->{$_} = $class
-      for keys %{Mojo::Command->new->get_all_data($class) || {}};
+      for keys %{Mojo::Command->new->get_all_data($class)};
   }
   return $self->{data_templates} ||= {};
 }

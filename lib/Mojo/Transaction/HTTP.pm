@@ -33,8 +33,6 @@ sub client_read {
 
   # Check for errors
   $self->{state} = 'finished' if $self->error;
-
-  return $self;
 }
 
 sub client_write {
@@ -133,8 +131,6 @@ sub server_read {
       $self->{continued} = 0;
     }
   }
-
-  return $self;
 }
 
 sub server_write {

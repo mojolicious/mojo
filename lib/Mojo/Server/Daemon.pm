@@ -92,7 +92,7 @@ sub _build_tx {
   # Events
   weaken $self;
   $tx->on(upgrade =>
-      sub { $self->{connections}->{$id}->{ws} = pop->server_handshake });
+      sub { ($self->{connections}->{$id}->{ws} = pop)->server_handshake });
   $tx->on(
     request => sub {
       my $tx = shift;

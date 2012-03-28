@@ -81,19 +81,13 @@ sub build_frame {
     warn "OPCODE: $op\n";
   }
 
-  # Payload
-  $frame .= $payload;
-
-  return $frame;
+  return $frame . $payload;
 }
 
 sub client_challenge {
   my $self = shift;
-
-  # Solve WebSocket challenge
-  my $solution = $self->_challenge($self->req->headers->sec_websocket_key);
-  return unless $solution eq $self->res->headers->sec_websocket_accept;
-  return 1;
+  return $self->_challenge($self->req->headers->sec_websocket_key) eq
+    $self->res->headers->sec_websocket_accept ? 1 : undef;
 }
 
 sub client_handshake {
@@ -110,8 +104,6 @@ sub client_handshake {
   # Generate WebSocket challenge
   $headers->sec_websocket_key(b64_encode(pack('N*', int(rand 9999999)), ''))
     unless $headers->sec_websocket_key;
-
-  return $self;
 }
 
 sub client_read  { shift->server_read(@_) }
@@ -262,8 +254,6 @@ sub server_handshake {
   $res_headers->sec_websocket_protocol($1) if $1;
   $res_headers->sec_websocket_accept(
     $self->_challenge($req_headers->sec_websocket_key));
-
-  return $self;
 }
 
 sub server_read {
@@ -303,7 +293,7 @@ sub server_read {
   }
 
   # Resume
-  return $self->emit('resume');
+  $self->emit('resume');
 }
 
 sub server_write {
@@ -332,9 +322,7 @@ sub _xor_mask {
   $mask = $mask x 128;
   my $output = '';
   $output .= $_ ^ $mask while length($_ = substr($input, 0, 512, '')) == 512;
-  $output .= $_ ^ substr($mask, 0, length, '');
-
-  return $output;
+  return $output .= $_ ^ substr($mask, 0, length, '');
 }
 
 1;
@@ -508,6 +496,15 @@ Alias for L<Mojo::Transaction/"local_port">.
   my $frame = $ws->parse_frame(\$bytes);
 
 Parse WebSocket frame.
+
+  # Parse single frame and remove it from buffer
+  my $frame = $ws->parse_frame(\$buffer);
+  say "Fin: $frame->[0]";
+  say "Rsv1: $frame->[1]";
+  say "Rsv2: $frame->[2]";
+  say "Rsv3: $frame->[3]";
+  say "Op: $frame->[4]";
+  say "Payload: $frame->[5]";
 
 =head2 C<remote_address>
 

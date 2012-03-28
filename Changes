@@ -5,6 +5,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Improved documentation.
   - Fixed handler detection precedence bug in Mojolicious::Renderer.
   - Fixed ability to disable inactivity timeout in Hypnotoad.
+  - Fixed ability to disable accepts limit in Hypnotoad.
   - Fixed small bug in Mojo::Command->get_all_data.
   - Fixed small bug in inflate command. (memowe)
 

@@ -15,7 +15,7 @@ has base => sub { Mojo::URL->new };
 # Characters (RFC 3986)
 our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
 our $SUBDELIM   = '!\$\&\'\(\)\*\+\,\;\=';
-our $PCHAR      = "$UNRESERVED$SUBDELIM\%\:\@";
+my $PCHAR = "$UNRESERVED$SUBDELIM\%\:\@";
 
 # "Homer, it's easy to criticize.
 #  Fun, too."
@@ -43,9 +43,7 @@ sub authority {
 
     # Host
     $host = url_unescape $host;
-    return $host =~ /[^\x00-\x7f]/
-      ? $self->ihost($host)
-      : $self->host($host);
+    return $host =~ /[^\x00-\x7f]/ ? $self->ihost($host) : $self->host($host);
   }
 
   # Format

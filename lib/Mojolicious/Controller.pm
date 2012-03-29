@@ -23,19 +23,18 @@ has tx => sub { Mojo::Transaction::HTTP->new };
 # Bundled files
 our $H = Mojo::Home->new;
 $H->parse($H->parse($H->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
-our $EXCEPTION     = $H->slurp_rel_file('exception.html.ep');
-our $DEV_EXCEPTION = $H->slurp_rel_file('exception.development.html.ep');
-our $MOJOBAR       = $H->slurp_rel_file('mojobar.html.ep');
-our $NOT_FOUND     = $H->slurp_rel_file('not_found.html.ep');
-our $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
+our $MOJOBAR = $H->slurp_rel_file('mojobar.html.ep');
+my $EXCEPTION     = $H->slurp_rel_file('exception.html.ep');
+my $DEV_EXCEPTION = $H->slurp_rel_file('exception.development.html.ep');
+my $NOT_FOUND     = $H->slurp_rel_file('not_found.html.ep');
+my $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
 
 # Reserved stash values
 my @RESERVED = (
   qw/action app cb controller data extends format handler json layout/,
   qw/namespace partial path status template text/
 );
-my %RESERVED;
-$RESERVED{$_}++ for @RESERVED;
+my %RESERVED = map { $_ => 1 } @RESERVED;
 
 # "Is all the work done by the children?
 #  No, not the whipping."
@@ -60,7 +59,6 @@ sub DESTROY { }
 #  She also liked to shut up!"
 sub cookie {
   my ($self, $name, $value, $options) = @_;
-  return unless $name;
 
   # Response cookie
   if (defined $value) {
@@ -188,9 +186,7 @@ sub redirect_to {
   my $res     = $self->res;
   my $headers = $res->headers;
   $headers->location($self->url_for(@_)->to_abs);
-  $self->rendered($res->is_status_class(300) ? undef : 302);
-
-  return $self;
+  return $self->rendered($res->is_status_class(300) ? undef : 302);
 }
 
 # "Mamma Mia! The cruel meatball of war has rolled onto our laps and ruined
@@ -422,14 +418,11 @@ sub respond_to {
 
 sub send {
   my ($self, $message, $cb) = @_;
-
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to send message to')
     unless $tx->is_websocket;
   $tx->send($message, sub { shift and $self->$cb(@_) if $cb });
-  $self->rendered(101);
-
-  return $self;
+  return $self->rendered(101);
 }
 
 # "Why am I sticky and naked? Did I miss something fun?"
@@ -453,7 +446,6 @@ sub session {
 
 sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
-  return unless $name;
 
   # Response cookie
   my $secret = $self->app->secret;
@@ -461,17 +453,14 @@ sub signed_cookie {
 
     # Sign value
     my $sig = Mojo::Util::hmac_md5_sum $value, $secret;
-    $value = $value .= "--$sig";
 
     # Create cookie
-    my $cookie = $self->cookie($name, $value, $options);
-    return $cookie;
+    return $self->cookie($name, "$value--$sig", $options);
   }
 
   # Request cookies
-  my @values = $self->cookie($name);
   my @results;
-  for my $value (@values) {
+  for my $value ($self->cookie($name)) {
 
     # Check signature
     if ($value =~ s/\-\-([^\-]+)$//) {
@@ -572,16 +561,14 @@ sub write {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if (ref $chunk || '') eq 'CODE';
   $self->res->write($chunk, sub { shift and $self->$cb(@_) if $cb });
-  $self->rendered;
-  return $self;
+  return $self->rendered;
 }
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if (ref $chunk || '') eq 'CODE';
   $self->res->write_chunk($chunk, sub { shift and $self->$cb(@_) if $cb });
-  $self->rendered;
-  return $self;
+  return $self->rendered;
 }
 
 sub _render_fallbacks {

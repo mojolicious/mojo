@@ -26,19 +26,14 @@ my @HEADERS = (
 }
 
 # Lower case headers
-my %NORMALCASE_HEADERS;
-for my $name (@HEADERS) {
-  my $lowercase = lc $name;
-  $NORMALCASE_HEADERS{$lowercase} = $name;
-}
+my %NORMALCASE = map { lc($_) => $_ } @HEADERS;
 
 sub add {
   my ($self, $name) = (shift, shift);
 
   # Make sure we have a normal case entry for name
   my $lcname = lc $name;
-  $NORMALCASE_HEADERS{$lcname} = $name
-    unless exists $NORMALCASE_HEADERS{$lcname};
+  $NORMALCASE{$lcname} = $name unless exists $NORMALCASE{$lcname};
   $name = $lcname;
 
   # Add lines
@@ -96,7 +91,7 @@ sub leftovers { delete shift->{buffer} }
 
 sub names {
   my @headers;
-  push @headers, $NORMALCASE_HEADERS{$_} || $_ for keys %{shift->{headers}};
+  push @headers, $NORMALCASE{$_} || $_ for keys %{shift->{headers}};
   return \@headers;
 }
 

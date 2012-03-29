@@ -43,14 +43,11 @@ sub canonicalize {
 #  They said if you don't show up tomorrow don't bother showing up on Monday.
 #  Woo-hoo. Four-day weekend."
 sub clone {
-  my $self = shift;
-
+  my $self  = shift;
   my $clone = Mojo::Path->new;
   $clone->parts([@{$self->parts}]);
   $clone->leading_slash($self->leading_slash);
-  $clone->trailing_slash($self->trailing_slash);
-
-  return $clone;
+  return $clone->trailing_slash($self->trailing_slash);
 }
 
 sub contains {

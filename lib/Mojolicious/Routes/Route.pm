@@ -596,6 +596,9 @@ restrictions.
 
 Add a waypoint to this route as nested child.
 
+  my $foo = $r->waypoint('/foo')->to('example#foo');
+  $foo->route('/bar')->to('#bar');
+
 =head2 C<websocket>
 
   my $websocket = $r->websocket('/:foo' => sub {...});

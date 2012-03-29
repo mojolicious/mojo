@@ -4,18 +4,19 @@ use Mojo::Base -base;
 use Mojo::Util qw/decode encode html_unescape xml_escape/;
 use Scalar::Util 'weaken';
 
+has [qw/charset xml/];
+has tree => sub { ['root'] };
+
 my $ATTR_RE = qr/
   \s*
   ([^=\s>]+)       # Key
   (?:
-    \s*
-    =
-    \s*
+    \s*=\s*
     (?:
       "([^"]*?)"   # Quotation marks
-      |
+    |
       '([^']*?)'   # Apostrophes
-      |
+    |
       ([^>\s]*)    # Unquoted
     )
   )?
@@ -27,18 +28,18 @@ my $TOKEN_RE = qr/
   ([^<]*)                                           # Text
   (?:
     <\?(.*?)\?>                                     # Processing Instruction
-    |
+  |
     <\!--(.*?)-->                                   # Comment
-    |
+  |
     <\!\[CDATA\[(.*?)\]\]>                          # CDATA
-    |
+  |
     <!DOCTYPE(
       \s+\w+
       (?:(?:\s+\w+)?(?:\s+(?:"[^"]*"|'[^']*'))+)?   # External ID
       (?:\s+\[.+?\])?                               # Int Subset
       \s*
     )>
-    |
+  |
     <(
       \s*
       [^>\s]+                                       # Tag
@@ -83,9 +84,6 @@ my @HTML5_INLINE = (
 );
 my %INLINE;
 $INLINE{$_}++ for @HTML4_INLINE, @HTML5_INLINE;
-
-has [qw/charset xml/];
-has tree => sub { ['root'] };
 
 # "No one believes me.
 #  I believe you, dad.

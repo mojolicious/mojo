@@ -11,23 +11,9 @@ use Mojo::Util 'unquote';
 has [qw/name value/];
 
 my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
-my $NAME_RE             = qr/
-  ^\s*
-  ([^\=\;\,]+)   # Relaxed Netscape token, allowing whitespace
-  \s*
-  \=?            # '=' (optional)
-  \s*
-/x;
-my $SEPARATOR_RE = qr/^\s*\;\s*/;
-my $VALUE_RE     = qr/
-  ^
-  (
-    "(?:\\\\|\\"|[^"])+"   # Quoted
-  |
-    [^\;\,]+               # Unquoted
-  )
-  \s*
-/x;
+my $NAME_RE             = qr/^\s*([^\=\;\,]+)\s*\=?\s*/x;
+my $SEPARATOR_RE        = qr/^\s*\;\s*/;
+my $VALUE_RE            = qr/^("(?:\\\\|\\"|[^"])+"|[^\;\,]+)\s*/x;
 
 # "My Homer is not a communist.
 #  He may be a liar, a pig, an idiot, a communist,

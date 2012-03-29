@@ -410,11 +410,11 @@ sub html_unescape {
       (
         (?:
           \d{1,7}             # Number
-          |
+        |
           x[0-9A-Fa-f]{1,6}   # Hex
         )
       )
-      |
+    |
       ([A-Za-z]{1,8})         # Name
     )
     ;

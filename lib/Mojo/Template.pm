@@ -11,22 +11,18 @@ use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 
 # "If for any reason you're not completely satisfied, I hate you."
 has [qw/auto_escape compiled/];
-has [qw/append code prepend/] => '';
-has capture_end     => 'end';
-has capture_start   => 'begin';
-has comment_mark    => '#';
-has encoding        => 'UTF-8';
-has escape_mark     => '=';
-has expression_mark => '=';
-has line_start      => '%';
-has name            => 'template';
-has namespace       => 'Mojo::Template::SandBox';
-has replace_mark    => '%';
-has tag_start       => '<%';
-has tag_end         => '%>';
-has template        => '';
-has tree            => sub { [] };
-has trim_mark       => '=';
+has [qw/append code prepend template/] => '';
+has capture_end   => 'end';
+has capture_start => 'begin';
+has comment_mark  => '#';
+has encoding      => 'UTF-8';
+has [qw/escape_mark expression_mark trim_mark/] => '=';
+has [qw/line_start replace_mark/] => '%';
+has name      => 'template';
+has namespace => 'Mojo::Template::SandBox';
+has tag_start => '<%';
+has tag_end   => '%>';
+has tree      => sub { [] };
 
 # Helpers
 my $HELPERS = <<'EOF';

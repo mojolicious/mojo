@@ -13,8 +13,7 @@ sub run {
 
   # Environment
   my $tx  = $self->build_tx;
-  my $req = $tx->req;
-  $req->parse(\%ENV);
+  my $req = $tx->req->parse(\%ENV);
 
   # Store connection information
   $tx->remote_address($ENV{REMOTE_ADDR});

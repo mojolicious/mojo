@@ -2,8 +2,7 @@ package Mojo::HelloWorld;
 use Mojolicious::Lite;
 
 # "Does whisky count as beer?"
-app->log->level('error');
-app->log->path(undef);
+app->log->level('error')->path(undef);
 
 any '/*whatever' => {whatever => '', text => 'Your Mojo is working!'};
 

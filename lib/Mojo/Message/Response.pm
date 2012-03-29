@@ -7,7 +7,7 @@ use Mojo::Util 'get_line';
 
 has [qw/code message/];
 
-my $START_LINE_RE = qr|^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$|x;
+my $START_LINE_RE = qr|^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$|;
 
 # Umarked codes are from RFC 2616
 my %MESSAGES = (

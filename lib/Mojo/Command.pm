@@ -34,7 +34,7 @@ sub chmod_rel_file {
 sub class_to_file {
   my ($self, $class) = @_;
   $class =~ s/:://g;
-  $class =~ s/([A-Z])([A-Z]*)/$1.lc($2)/gex;
+  $class =~ s/([A-Z])([A-Z]*)/$1.lc($2)/ge;
   return decamelize $class;
 }
 

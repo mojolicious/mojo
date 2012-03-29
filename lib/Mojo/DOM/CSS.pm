@@ -1,6 +1,8 @@
 package Mojo::DOM::CSS;
 use Mojo::Base -base;
 
+has 'tree';
+
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
   \[
@@ -20,14 +22,8 @@ my $CLASS_ID_RE = qr/
   )
 /x;
 my $ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
-my $PSEUDO_CLASS_RE = qr/
-  (?:\:
-  ([\w\-]+)                       # Class
-  (?:\(
-    ((?:\([^\)]+\)|[^\)])+)\))?   # Arguments
-  )
-/x;
-my $TOKEN_RE = qr/
+my $PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
+my $TOKEN_RE        = qr/
   (\s*,\s*)?                            # Separator
   ((?:[^\[\\\:\s\,]|$ESCAPE_RE\s?)+)?   # Element
   ($PSEUDO_CLASS_RE*)?                  # Pseudoclass
@@ -37,8 +33,6 @@ my $TOKEN_RE = qr/
     ([\>\+\~])                          # Combinator
   )?
 /x;
-
-has 'tree';
 
 # "Why can't she just drink herself happy like a normal person?"
 sub select {
@@ -383,7 +377,7 @@ sub _unescape {
   $value =~ s/\\\n//g;
 
   # Unescape unicode characters
-  $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack('U', hex $1)/gex;
+  $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack('U', hex $1)/ge;
 
   # Remove backslash
   $value =~ s/\\//g;

@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-# To regenerate all required certificates run these commands
+# To regenerate all required certificates run these commands (29.03.2012)
 # openssl genrsa -out ca.key 1024
 # openssl req -new -key ca.key -out ca.csr -subj "/C=US/CN=ca"
 # openssl req -x509 -days 7300 -key ca.key -in ca.csr -out ca.crt

@@ -359,7 +359,10 @@ implements the following new ones.
   my $env = $req->env;
   $req    = $req->env({});
 
-Direct access to the environment hash if available.
+Direct access to the C<CGI> or C<PSGI> environment hash if available.
+
+  # Check PSGI version
+  my $version = $req->env->{'psgi.version'};
 
 =head2 C<method>
 

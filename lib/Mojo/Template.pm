@@ -167,18 +167,18 @@ sub parse {
   delete $self->template($tmpl)->{tree};
 
   # Token
-  my $cmnt    = $self->comment_mark;
-  my $cpen    = $self->capture_end;
-  my $cpst    = $self->capture_start;
-  my $end     = $self->tag_end;
-  my $escp    = $self->escape_mark;
-  my $expr    = $self->expression_mark;
-  my $replace = $self->replace_mark;
-  my $start   = $self->line_start;
   my $tag     = $self->tag_start;
+  my $replace = $self->replace_mark;
+  my $expr    = $self->expression_mark;
+  my $escp    = $self->escape_mark;
+  my $cpen    = $self->capture_end;
+  my $cmnt    = $self->comment_mark;
+  my $cpst    = $self->capture_start;
   my $trim    = $self->trim_mark;
+  my $end     = $self->tag_end;
+  my $start   = $self->line_start;
 
-  # Precompile regular expressions
+  # Precompile
   my $token_re = qr/
     (
       \Q$tag$replace\E                 # Replace

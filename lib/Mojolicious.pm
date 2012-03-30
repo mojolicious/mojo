@@ -66,8 +66,7 @@ sub new {
   push @{$self->static->paths},   $home->rel_dir('public');
 
   # Default to application namespace
-  my $r = $self->routes;
-  $r->namespace(ref $self);
+  my $r = $self->routes->namespace(ref $self);
 
   # Hide controller attributes/methods and "handler"
   $r->hide(qw/AUTOLOAD DESTROY app cookie finish flash handler on on_finish/);

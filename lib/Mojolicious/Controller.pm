@@ -675,9 +675,9 @@ Gracefully end WebSocket connection or long poll stream.
 
 =head2 C<flash>
 
-  my $foo   = $c->flash('foo');
-  $c        = $c->flash({foo => 'bar'});
-  $c        = $c->flash(foo => 'bar');
+  my $foo = $c->flash('foo');
+  $c      = $c->flash({foo => 'bar'});
+  $c      = $c->flash(foo => 'bar');
 
 Data storage persistent only for the next request, stored in the C<session>.
 
@@ -753,10 +753,11 @@ C<url_for>.
   my $success = $c->render('foo/bar');
   my $output  = $c->render('foo/bar', partial => 1);
 
-This is a wrapper around L<Mojolicious::Renderer> exposing pretty much all
-functionality provided by it. It will set a default template to use based on
-the controller and action name or fall back to the route name. You can call
-it with a hash of options which can be preceded by an optional template name.
+This is a wrapper around L<Mojolicious::Renderer/"render"> exposing pretty
+much all functionality provided by it. It will set a default template to use
+based on the controller and action name or fall back to the route name. You
+can call it with a hash of options which can be preceded by an optional
+template name.
 
 =head2 C<render_content>
 

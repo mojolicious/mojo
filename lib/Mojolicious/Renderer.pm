@@ -389,8 +389,7 @@ Get a DATA template by name, usually used by handlers.
   my ($output, $type) = $renderer->render(Mojolicious::Controller->new);
   my ($output, $type) = $renderer->render(Mojolicious::Controller->new, {
     template => 'foo/bar',
-    format   => 'html',
-    handler  => 'epl'
+    foo      => 'bar'
   });
 
 Render output through one of the Mojo renderers. This renderer requires some

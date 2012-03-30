@@ -95,9 +95,8 @@ sub _detect {
   }
 
   # Search for better context
-  $name = quotemeta $name;
   my $line;
-  if ($self->message =~ /at\s+$name\s+line\s+(\d+)/) { $line = $1 }
+  if ($self->message =~ /at\s+\Q$name\E\s+line\s+(\d+)/) { $line = $1 }
   else {
     for my $frame (@{$self->frames}) {
       next unless $frame->[1] =~ /^\(eval\ \d+\)$/;

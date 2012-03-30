@@ -164,57 +164,52 @@ sub parse {
   my ($self, $tmpl) = @_;
 
   # Clean start
-  $self->template($tmpl);
-  delete $self->{tree};
+  delete $self->template($tmpl)->{tree};
 
   # Token
-  my $raw_start     = $self->line_start;
-  my $raw_tag_start = $self->tag_start;
-  my $raw_tag_end   = $self->tag_end;
-  my $raw_expr      = $self->expression_mark;
-  my $raw_trim      = $self->trim_mark;
-  my $raw_replace   = $self->replace_mark;
-  my $start         = quotemeta $raw_start;
-  my $tag_start     = quotemeta $raw_tag_start;
-  my $tag_end       = quotemeta $raw_tag_end;
-  my $cmnt          = quotemeta $self->comment_mark;
-  my $escp          = quotemeta $self->escape_mark;
-  my $expr          = quotemeta $raw_expr;
-  my $trim          = quotemeta $raw_trim;
-  my $cpst          = quotemeta $self->capture_start;
-  my $cpen          = quotemeta $self->capture_end;
-  my $replace       = quotemeta $raw_replace;
+  my $cmnt    = $self->comment_mark;
+  my $cpen    = $self->capture_end;
+  my $cpst    = $self->capture_start;
+  my $end     = $self->tag_end;
+  my $escp    = $self->escape_mark;
+  my $expr    = $self->expression_mark;
+  my $replace = $self->replace_mark;
+  my $start   = $self->line_start;
+  my $tag     = $self->tag_start;
+  my $trim    = $self->trim_mark;
 
-  # Token regex
+  # Precompile regular expressions
   my $token_re = qr/
     (
-      $tag_start$replace             # Replace
+      \Q$tag$replace\E                 # Replace
     |
-      $tag_start$expr$escp\s*$cpen   # Escaped expression (end)
+      \Q$tag$expr$escp\E\s*\Q$cpen\E   # Escaped expression (end)
     |
-      $tag_start$expr$escp           # Escaped expression
+      \Q$tag$expr$escp\E               # Escaped expression
     |
-      $tag_start$expr\s*$cpen        # Expression (end)
+      \Q$tag$expr\E\s*\Q$cpen\E        # Expression (end)
     |
-      $tag_start$expr                # Expression
+      \Q$tag$expr\E                    # Expression
     |
-      $tag_start$cmnt\s*$cpen        # Comment (end)
+      \Q$tag$cmnt\E\s*\Q$cpen\E        # Comment (end)
     |
-      $tag_start$cmnt                # Comment
+      \Q$tag$cmnt\E                    # Comment
     |
-      $tag_start\s*$cpen             # Code (end)
+      \Q$tag\E\s*\Q$cpen\E             # Code (end)
     |
-      $tag_start                     # Code
+      \Q$tag\E                         # Code
     |
-      $cpst\s*$trim$tag_end          # Trim end (start)
+      \Q$cpst\E\s*\Q$trim$end\E        # Trim end (start)
     |
-      $trim$tag_end                  # Trim end
+      \Q$trim$end\E                    # Trim end
     |
-      $cpst\s*$tag_end               # End (start)
+      \Q$cpst\E\s*\Q$end\E             # End (start)
     |
-      $tag_end                       # End
+      \Q$end\E                         # End
     )
   /x;
+  my $cpen_re = qr/^(\Q$tag\E)(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E/;
+  my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
 
   # Split lines
   my $state = 'text';
@@ -224,11 +219,9 @@ sub parse {
     $trimming = 0 if $state eq 'text';
 
     # Perl line
-    if ($state eq 'text' && $line !~ s/^(\s*)$start$replace/$1$raw_start/) {
-      $line =~ s/^(\s*)$start($expr)?// and $line =
-        $2
-        ? "$1$raw_tag_start$2$line $raw_tag_end"
-        : "$raw_tag_start$line $raw_trim$raw_tag_end";
+    if ($state eq 'text' && $line !~ s/^(\s*)\Q$start$replace\E/$1$start/) {
+      $line =~ s/^(\s*)\Q$start\E(\Q$expr\E)?//
+        and $line = $2 ? "$1$tag$2$line $end" : "$tag$line $trim$end";
     }
 
     # Escaped line ending
@@ -239,10 +232,7 @@ sub parse {
       if ($len == 1) { $line =~ s/\\$// }
 
       # Backslash
-      if ($len >= 2) {
-        $line =~ s/\\\\$/\\/;
-        $line .= "\n";
-      }
+      elsif ($len > 1) { $line =~ s/\\\\$/\\\n/ }
     }
 
     # Normal line ending
@@ -253,11 +243,10 @@ sub parse {
     for my $token (split $token_re, $line) {
 
       # Capture end
-      @capture_token = ('cpen', undef)
-        if $token =~ s/^($tag_start)(?:$expr)?(?:$escp)?\s*$cpen/$1/;
+      @capture_token = ('cpen', undef) if $token =~ s/$cpen_re/$1/;
 
       # End
-      if ($state ne 'text' && $token =~ /^(?:($cpst)\s*)?($trim)?$tag_end$/) {
+      if ($state ne 'text' && $token =~ $end_re) {
         $state = 'text';
 
         # Capture start
@@ -274,22 +263,22 @@ sub parse {
       }
 
       # Code
-      elsif ($token =~ /^$tag_start$/) { $state = 'code' }
+      elsif ($token =~ /^\Q$tag\E$/) { $state = 'code' }
 
       # Expression
-      elsif ($token =~ /^$tag_start$expr$/) { $state = 'expr' }
+      elsif ($token =~ /^\Q$tag$expr\E$/) { $state = 'expr' }
 
       # Expression that needs to be escaped
-      elsif ($token =~ /^$tag_start$expr$escp$/) { $state = 'escp' }
+      elsif ($token =~ /^\Q$tag$expr$escp\E$/) { $state = 'escp' }
 
       # Comment
-      elsif ($token =~ /^$tag_start$cmnt$/) { $state = 'cmnt' }
+      elsif ($token =~ /^\Q$tag$cmnt\E$/) { $state = 'cmnt' }
 
       # Value
       else {
 
         # Replace
-        $token = $raw_tag_start if $token eq "$raw_tag_start$raw_replace";
+        $token = $tag if $token eq "$tag$replace";
 
         # Convert whitespace text to line noise
         if ($trimming && $token =~ s/^(\s+)//) {

@@ -214,15 +214,15 @@ and implements the following ones.
 
 =head2 C<dispatch>
 
-  my $success = $static->dispatch($c);
+  my $success = $static->dispatch(Mojolicious::Controller->new);
 
 Dispatch a L<Mojolicious::Controller> object.
 
 =head2 C<serve>
 
-  my $success = $static->serve($c, 'foo/bar.html');
+  my $success = $static->serve(Mojolicious::Controller->new, 'foo/bar.html');
 
-Serve a specific file, relative to C<paths>.
+Serve a specific file, relative to C<paths> or from C<classes>.
 
 =head1 SEE ALSO
 

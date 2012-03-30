@@ -386,8 +386,12 @@ Get a DATA template by name, usually used by handlers.
 
 =head2 C<render>
 
-  my ($output, $type) = $renderer->render($c);
-  my ($output, $type) = $renderer->render($c, $args);
+  my ($output, $type) = $renderer->render(Mojolicious::Controller->new);
+  my ($output, $type) = $renderer->render(Mojolicious::Controller->new, {
+    template => 'foo/bar',
+    format   => 'html',
+    handler  => 'epl'
+  });
 
 Render output through one of the Mojo renderers. This renderer requires some
 configuration, at the very least you will need to have a default C<format>

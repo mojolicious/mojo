@@ -621,8 +621,8 @@ implements the following new ones.
   my $app = $c->app;
   $c      = $c->app(Mojolicious->new);
 
-A reference back to the L<Mojolicious> application that dispatched to this
-controller, defaults to a L<Mojolicious> object.
+A reference back to the application that dispatched to this controller,
+defaults to a L<Mojolicious> object.
 
   # Use application logger
   $c->app->log->debug('Hello Mojo!');
@@ -824,8 +824,8 @@ Same as C<render> but returns the rendered result.
   my $success = $c->render_static('images/logo.png');
   my $success = $c->render_static('../lib/MyApp.pm');
 
-Render a static file using L<Mojolicious::Static>, relative to the C<public>
-directories of your application.
+Render a static file using L<Mojolicious::Static/"serve">, usually from the
+C<public> directory or C<DATA> section of your application.
 
 =head2 C<render_text>
 

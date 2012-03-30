@@ -151,13 +151,13 @@ implements the following ones.
 
 =head2 C<load>
 
-  $session->load($c);
+  $session->load(Mojolicious::Controller->new);
 
 Load session data from signed cookie.
 
 =head2 C<store>
 
-  $session->store($c);
+  $session->store(Mojolicious::Controller->new);
 
 Store session data in signed cookie.
 

@@ -5,6 +5,16 @@ use Carp 'croak';
 use Fcntl ':flock';
 use IO::File;
 
+sub open_log_file {
+  my ($path) = @_;
+  
+  croak qq/Can't open log file "$path": $!/
+    unless my $file = IO::File->new(">> $path");
+  binmode $file, ':utf8';
+
+  return $file;
+}
+
 has handle => sub {
   my $self = shift;
 
@@ -15,12 +25,7 @@ has handle => sub {
   }
 
   # Append to file
-  my $path = $self->path;
-  croak qq/Can't open log file "$path": $!/
-    unless my $file = IO::File->new(">> $path");
-  binmode $file, ':utf8';
-
-  return $file;
+  return open_log_file($self->path);
 };
 has level => 'debug';
 has 'path';
@@ -36,6 +41,11 @@ sub new {
     message => sub {
       my $self = shift;
       return unless my $handle = $self->handle;
+      
+      if ($self->path && !(-e $self->path)) {
+        $self->handle($handle = open_log_file($self->path));
+      }
+      
       flock $handle, LOCK_EX;
       croak "Can't write to log: $!"
         unless defined $handle->syswrite($self->format(@_));

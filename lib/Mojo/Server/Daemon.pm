@@ -171,7 +171,6 @@ sub _group {
 
 sub _listen {
   my ($self, $listen) = @_;
-  return unless $listen;
 
   # Check listen value
   my $url   = Mojo::URL->new($listen);

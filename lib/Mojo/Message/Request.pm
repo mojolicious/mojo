@@ -101,8 +101,7 @@ sub param {
 sub params {
   my $self   = shift;
   my $params = Mojo::Parameters->new;
-  $params->merge($self->body_params, $self->query_params);
-  return $params;
+  return $params->merge($self->body_params, $self->query_params);
 }
 
 sub parse {
@@ -159,19 +158,16 @@ sub parse {
 sub proxy {
   my ($self, $url) = @_;
 
+  # Get
+  return $self->{proxy} unless $url;
+
   # Mojo::URL object
-  if (ref $url) {
-    $self->{proxy} = $url;
-    return $self;
-  }
+  if (ref $url) { $self->{proxy} = $url }
 
   # String
-  elsif ($url) {
-    $self->{proxy} = Mojo::URL->new($url);
-    return $self;
-  }
+  elsif ($url) { $self->{proxy} = Mojo::URL->new($url) }
 
-  return $self->{proxy};
+  return $self;
 }
 
 sub query_params { shift->url->query }

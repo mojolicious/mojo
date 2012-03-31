@@ -33,8 +33,8 @@ $log->level('debug')->log(info => 'Whatever.');
 is_deeply $messages, [qw/info Whatever./], 'right messages';
 $log->level('error')->log(info => 'Again.');
 is_deeply $messages, [qw/info Whatever./], 'right messages';
-$log->log(fatal => 'Test', 123);
-is_deeply $messages, [qw/info Whatever. fatal Test 123/], 'right messages';
+$log->log(fatal => 'Test', 1, 2, 3);
+is_deeply $messages, [qw/info Whatever. fatal Test 1 2 3/], 'right messages';
 
 # "debug"
 is $log->level('debug')->level, 'debug', 'right level';

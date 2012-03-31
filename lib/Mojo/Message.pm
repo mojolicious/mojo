@@ -146,7 +146,6 @@ sub build_start_line {
 
 sub cookie {
   my ($self, $name) = @_;
-  return unless $name;
 
   # Map
   unless ($self->{cookies}) {
@@ -298,7 +297,6 @@ sub to_string {
 
 sub upload {
   my ($self, $name) = @_;
-  return unless $name;
 
   # Map
   unless ($self->{uploads}) {

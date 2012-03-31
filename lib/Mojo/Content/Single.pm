@@ -51,16 +51,15 @@ sub parse {
   # Parse headers
   $self->parse_until_body(@_);
 
-  # Content needs to be upgraded to multipart
-  if ($self->auto_upgrade && defined($self->boundary)) {
-    $self->unsubscribe(read => $self->{read});
-    my $multi = Mojo::Content::MultiPart->new($self);
-    $self->emit(upgrade => $multi);
-    return $multi->parse;
-  }
-
   # Parse body
-  return $self->SUPER::parse;
+  return $self->SUPER::parse
+    unless $self->auto_upgrade && defined($self->boundary);
+
+  # Content needs to be upgraded to multipart
+  $self->unsubscribe(read => $self->{read});
+  my $multi = Mojo::Content::MultiPart->new($self);
+  $self->emit(upgrade => $multi);
+  return $multi->parse;
 }
 
 1;

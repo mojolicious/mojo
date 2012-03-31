@@ -415,6 +415,7 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
 
   # More specific tests
   is $t->tx->res->json->{foo}, 'bar', 'right value';
+  ok $t->tx->res->is_multipart, 'multipart content';
 
 =head2 C<ua>
 
@@ -454,6 +455,7 @@ Alias for L<Mojo::UserAgent/"app">.
 
   # Test application directly
   is $t->app->defaults->{foo}, 'bar', 'right value';
+  ok $t->app->routes->find('echo')->is_websocket, 'WebSocket route';
 
 =head2 C<content_is>
 

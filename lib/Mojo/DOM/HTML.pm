@@ -85,8 +85,7 @@ sub parse {
   my ($self, $html) = @_;
 
   # Decode
-  my $charset = $self->charset;
-  $html = decode $charset, $html if $charset;
+  if (my $charset = $self->charset) { $html = decode $charset, $html }
 
   # Tokenize
   my $tree    = ['root'];
@@ -105,9 +104,7 @@ sub parse {
     if ($doctype) { $self->_doctype($doctype, \$current) }
 
     # Comment
-    elsif ($comment) {
-      $self->_comment($comment, \$current);
-    }
+    elsif ($comment) { $self->_comment($comment, \$current) }
 
     # CDATA
     elsif ($cdata) { $self->_cdata($cdata, \$current) }

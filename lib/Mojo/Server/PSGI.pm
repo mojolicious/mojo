@@ -15,32 +15,27 @@ sub run {
   my $req = $tx->req->parse($env);
 
   # Store connection information
-  $tx->remote_address($env->{REMOTE_ADDR});
   $tx->local_port($env->{SERVER_PORT});
+  $tx->remote_address($env->{REMOTE_ADDR});
 
   # Request body
   my $len = $env->{CONTENT_LENGTH};
   until ($req->is_finished) {
     my $chunk = ($len && $len < CHUNK_SIZE) ? $len : CHUNK_SIZE;
-    my $read = $env->{'psgi.input'}->read(my $buffer, $chunk, 0);
-    last unless $read;
+    last unless my $read = $env->{'psgi.input'}->read(my $buffer, $chunk, 0);
     $req->parse($buffer);
-    $len -= $read;
-    last if $len <= 0;
+    last if ($len -= $read) <= 0;
   }
 
   # Handle
   $self->emit(request => $tx);
 
   # Response headers
-  my $res = $tx->res;
-  $res->fix_headers;
+  my $res     = $tx->res->fix_headers;
   my $headers = $res->content->headers;
   my @headers;
   for my $name (@{$headers->names}) {
-    for my $values ($headers->header($name)) {
-      push @headers, $name => $_ for @$values;
-    }
+    push @headers, $name => $_ for map {@$_} $headers->header($name);
   }
 
   # PSGI response

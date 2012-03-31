@@ -1,14 +1,28 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 44;
+use Test::More tests => 45;
 
 # "Don't let Krusty's death get you down, boy.
 #  People die all the time, just like that.
 #  Why, you could wake up dead tomorrow! Well, good night."
+use File::Spec::Functions 'catdir';
+use File::Temp;
+use Mojo::Asset::File;
 use Mojo::Log;
 
+# Logging to file
+my $dir = File::Temp::tempdir(CLEANUP => 1);
+my $path = catdir $dir, 'test.log';
+my $log = Mojo::Log->new(level => 'debug', path => $path);
+$log->debug('Just works.');
+$log = Mojo::Log->new;
+like(
+  Mojo::Asset::File->new(path => $path)->slurp,
+  qr/^\[.*\] \[debug\] Just works\.\n$/,
+  'right content'
+);
+
 # Formatting
-my $log = Mojo::Log->new;
 like $log->format(debug => 'Test 123.'), qr/^\[.*\] \[debug\] Test 123\.\n$/,
   'right format';
 like $log->format(qw/debug Test 123./), qr/^\[.*\] \[debug\] Test\n123\.\n$/,

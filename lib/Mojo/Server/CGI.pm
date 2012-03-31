@@ -16,14 +16,13 @@ sub run {
   my $req = $tx->req->parse(\%ENV);
 
   # Store connection information
-  $tx->remote_address($ENV{REMOTE_ADDR});
   $tx->local_port($ENV{SERVER_PORT});
+  $tx->remote_address($ENV{REMOTE_ADDR});
 
   # Request body
   binmode STDIN;
   until ($req->is_finished) {
-    my $read = STDIN->read(my $buffer, CHUNK_SIZE, 0);
-    last unless $read;
+    last unless my $read = STDIN->read(my $buffer, CHUNK_SIZE, 0);
     $req->parse($buffer);
   }
 
@@ -35,21 +34,19 @@ sub run {
   binmode STDOUT;
   my $res    = $tx->res;
   my $offset = 0;
-  if ($self->nph) {
-    while (1) {
-      my $chunk = $res->get_start_line_chunk($offset);
+  while ($self->nph) {
+    my $chunk = $res->get_start_line_chunk($offset);
 
-      # No start line yet, try again
-      sleep 1 and next unless defined $chunk;
+    # No start line yet, try again
+    sleep 1 and next unless defined $chunk;
 
-      # End of start line
-      last unless length $chunk;
+    # End of start line
+    last unless length $chunk;
 
-      # Start line
-      return unless STDOUT->opened;
-      print STDOUT $chunk;
-      $offset += length $chunk;
-    }
+    # Start line
+    return unless STDOUT->opened;
+    print STDOUT $chunk;
+    $offset += length $chunk;
   }
 
   # Response headers

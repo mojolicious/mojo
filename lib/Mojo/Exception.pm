@@ -148,8 +148,6 @@ sub _parse_context {
       }
     }
   }
-
-  return $self;
 }
 
 1;

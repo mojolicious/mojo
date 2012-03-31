@@ -69,12 +69,12 @@ sub fix_headers {
     $headers->host($host) unless $headers->host;
   }
 
-  # Basic authorization
+  # Basic authentication
   if ((my $u = $url->userinfo) && !$headers->authorization) {
     $headers->authorization('Basic ' . b64_encode($u, ''));
   }
 
-  # Basic proxy authorization
+  # Basic proxy authentication
   if (my $proxy = $self->proxy) {
     if ((my $u = $proxy->userinfo) && !$headers->proxy_authorization) {
       $headers->proxy_authorization('Basic ' . b64_encode($u, ''));
@@ -133,14 +133,14 @@ sub parse {
       $base->authority($host);
     }
 
-    # Basic authorization
+    # Basic authentication
     if (my $auth = $headers->authorization) {
       if (my $userinfo = $self->_parse_basic_auth($auth)) {
         $base->userinfo($userinfo);
       }
     }
 
-    # Basic proxy authorization
+    # Basic proxy authentication
     if (my $auth = $headers->proxy_authorization) {
       if (my $userinfo = $self->_parse_basic_auth($auth)) {
         $self->proxy(Mojo::URL->new->userinfo($userinfo));

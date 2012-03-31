@@ -1044,7 +1044,7 @@ is $req->upload('upload')->filename, '0', 'right filename';
 isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
 
-# Parse full HTTP 1.1 proxy request with basic authorization
+# Parse full HTTP 1.1 proxy request with basic authentication
 $req = Mojo::Message::Request->new;
 $req->parse("GET http://127.0.0.1/foo/bar HTTP/1.1\x0d\x0a");
 $req->parse("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
@@ -1064,7 +1064,7 @@ is $req->url->base->userinfo, 'Aladdin:open sesame', 'right base userinfo';
 is $req->url, 'http://127.0.0.1/foo/bar', 'right URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 
-# Parse full HTTP 1.1 proxy connect request with basic authorization
+# Parse full HTTP 1.1 proxy connect request with basic authentication
 $req = Mojo::Message::Request->new;
 $req->parse("CONNECT 127.0.0.1:3000 HTTP/1.1\x0d\x0a");
 $req->parse("Host: 127.0.0.1\x0d\x0a");
@@ -1427,7 +1427,7 @@ is $req->headers->host,   '127.0.0.1',                'right "Host" value';
 is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
-# Build full HTTP 1.1 proxy request with basic authorization
+# Build full HTTP 1.1 proxy request with basic authentication
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://Aladdin:open%20sesame@127.0.0.1/foo/bar');
@@ -1452,7 +1452,7 @@ is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
 is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 
-# Build full HTTP 1.1 proxy request with basic authorization (and clone)
+# Build full HTTP 1.1 proxy request with basic authentication (and clone)
 $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://Aladdin:open%20sesame@127.0.0.1/foo/bar');
@@ -1495,7 +1495,7 @@ is $clone->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
 is $clone->headers->content_length, '13', 'right "Content-Length" value';
 is $clone->body, "Hello World!\n", 'right content';
 
-# Build full HTTP 1.1 proxy connect request with basic authorization
+# Build full HTTP 1.1 proxy connect request with basic authentication
 $req = Mojo::Message::Request->new;
 $req->method('CONNECT');
 $req->url->parse('http://Aladdin:open%20sesame@127.0.0.1:3000/foo/bar');

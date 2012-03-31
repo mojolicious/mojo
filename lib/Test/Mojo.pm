@@ -423,6 +423,10 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
 
 User agent used for testing, defaults to a L<Mojo::UserAgent> object.
 
+  # Allow redirects
+  $t->ua->max_redirects(10);
+
+  # Request with Basic authentication
   $t->get_ok($t->ua->app_url->userinfo('sri:secr3t')->path('/secrets'));
 
 =head1 METHODS
@@ -447,6 +451,9 @@ Alias for L<Mojo::UserAgent/"app">.
 
   # Change log level
   $t->app->log->level('fatal');
+
+  # Test application directly
+  is $t->app->defaults->{foo}, 'bar', 'right value';
 
 =head2 C<content_is>
 

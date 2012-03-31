@@ -103,7 +103,7 @@ is $req->url->to_abs->to_string,
   'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
   'right absolute URL';
 
-# Parse Apache like CGI environment variables with basic authorization
+# Parse Apache like CGI environment variables with basic authentication
 $req = Mojo::Message::Request->new;
 $req->parse(
   CONTENT_LENGTH           => 11,

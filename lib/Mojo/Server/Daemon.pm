@@ -46,14 +46,11 @@ sub run {
   # Start accepting connections
   $self->start;
 
-  # User and group
-  $self->setuidgid;
-
   # Signals
   $SIG{INT} = $SIG{TERM} = sub { exit 0 };
 
-  # Start loop
-  $self->ioloop->start;
+  # Change user/group and start loop
+  $self->setuidgid->ioloop->start;
 }
 
 sub setuidgid {
@@ -477,7 +474,7 @@ Run server.
 
 =head2 C<setuidgid>
 
-  $daemon->setuidgid;
+  $daemon = $daemon->setuidgid;
 
 Set user and group for process.
 

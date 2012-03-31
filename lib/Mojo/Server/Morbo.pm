@@ -1,7 +1,6 @@
 package Mojo::Server::Morbo;
 use Mojo::Base -base;
 
-use Carp 'croak';
 use Mojo::Home;
 use Mojo::Server::Daemon;
 use POSIX 'WNOHANG';
@@ -24,9 +23,7 @@ sub check_file {
   my $cache = $self->{cache} ||= {};
   my $stats = $cache->{$file} ||= [$^T, $size];
   return if $mtime <= $stats->[0] && $size == $stats->[1];
-  $cache->{$file} = [$mtime, $size];
-
-  return 1;
+  return $cache->{$file} = [$mtime, $size];
 }
 
 sub run {
@@ -99,7 +96,7 @@ sub _spawn {
   # Fork
   my $manager = $$;
   $ENV{MORBO_REV}++;
-  croak "Can't fork: $!" unless defined(my $pid = fork);
+  die "Can't fork: $!" unless defined(my $pid = fork);
 
   # Manager
   return $self->{running} = $pid if $pid;

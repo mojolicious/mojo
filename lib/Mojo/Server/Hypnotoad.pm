@@ -1,7 +1,6 @@
 package Mojo::Server::Hypnotoad;
 use Mojo::Base -base;
 
-use Carp 'croak';
 use Cwd 'abs_path';
 use Fcntl ':flock';
 use File::Basename 'dirname';
@@ -59,8 +58,7 @@ sub run {
   $0 = $ENV{HYPNOTOAD_APP};
 
   # Clean start
-  croak "Can't exec: $!"
-    if !$ENV{HYPNOTOAD_REV}++ && !exec $ENV{HYPNOTOAD_EXE};
+  die "Can't exec: $!" if !$ENV{HYPNOTOAD_REV}++ && !exec $ENV{HYPNOTOAD_EXE};
 
   # Preload application and configure server
   my $daemon = $self->{daemon} = Mojo::Server::Daemon->new;
@@ -96,8 +94,7 @@ sub run {
   $daemon->start;
 
   # Pipe for worker communication
-  pipe($self->{reader}, $self->{writer})
-    or croak "Can't create pipe: $!";
+  pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
   $self->{poll} = IO::Poll->new;
   $self->{poll}->mask($self->{reader}, POLLIN);
 
@@ -111,8 +108,7 @@ sub run {
   $SIG{USR2} = sub { $self->{upgrade} ||= time };
   $SIG{TTIN} = sub { $c->{workers}++ };
   $SIG{TTOU} = sub {
-    return unless $c->{workers};
-    $c->{workers}--;
+    return unless $c->{workers} && $c->{workers}--;
     $self->{workers}->{shuffle keys %{$self->{workers}}}->{graceful} ||= time;
   };
 
@@ -174,10 +170,8 @@ sub _heartbeat {
   return unless $self->{reader}->sysread(my $chunk, 4194304);
 
   # Update heartbeats
-  while ($chunk =~ /(\d+)\n/g) {
-    my $pid = $1;
-    $self->{workers}->{$pid}->{time} = time if $self->{workers}->{$pid};
-  }
+  $self->{workers}->{$1} and $self->{workers}->{$1}->{time} = time
+    while $chunk =~ /(\d+)\n/g;
 }
 
 sub _hot_deploy {
@@ -225,8 +219,8 @@ sub _manage {
     # Fresh start
     unless ($self->{new}) {
       $self->{log}->info('Starting zero downtime software upgrade.');
-      croak "Can't fork: $!" unless defined(my $pid = $self->{new} = fork);
-      exec($ENV{HYPNOTOAD_EXE}) or croak("Can't exec: $!") unless $pid;
+      die "Can't fork: $!" unless defined(my $pid = $self->{new} = fork);
+      exec($ENV{HYPNOTOAD_EXE}) or die("Can't exec: $!") unless $pid;
     }
 
     # Timeout
@@ -262,8 +256,7 @@ sub _manage {
 }
 
 sub _pid {
-  my $self = shift;
-  return unless my $file = IO::File->new($self->{config}->{pid_file}, '<');
+  return unless my $file = IO::File->new(shift->{config}->{pid_file}, '<');
   my $pid = <$file>;
   chomp $pid;
   return $pid;
@@ -280,7 +273,7 @@ sub _pid_file {
 
   # Create PID file
   $self->{log}->info(qq/Creating process id file "$file"./);
-  croak qq/Can't create process id file "$file": $!/
+  die qq/Can't create process id file "$file": $!/
     unless my $pid = IO::File->new($file, '>', 0644);
   print $pid $$;
 }
@@ -310,18 +303,17 @@ sub _spawn {
   my $self = shift;
 
   # Manager
-  croak "Can't fork: $!" unless defined(my $pid = fork);
+  die "Can't fork: $!" unless defined(my $pid = fork);
   return $self->{workers}->{$pid} = {time => time} if $pid;
 
-  # Worker
-  my $daemon = $self->{daemon};
-  my $loop   = $daemon->ioloop;
-  my $c      = $self->{config};
-
   # Prepare lock file
+  my $c    = $self->{config};
   my $file = $c->{lock_file};
   my $lock = IO::File->new("> $file")
-    or croak qq/Can't open lock file "$file": $!/;
+    or die qq/Can't open lock file "$file": $!/;
+
+  # Change user/group
+  my $loop = $self->{daemon}->setuidgid->ioloop;
 
   # Accept mutex
   $loop->lock(
@@ -336,10 +328,7 @@ sub _spawn {
           $l = flock $lock, LOCK_EX;
           ualarm $old;
         };
-        if ($@) {
-          die $@ unless $@ eq "alarm\n";
-          $l = 0;
-        }
+        if ($@) { $l = $@ eq "alarm\n" ? 0 : die($@) }
       }
 
       # Non blocking
@@ -365,7 +354,6 @@ sub _spawn {
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete $self->{reader};
   delete $self->{poll};
-  $daemon->setuidgid;
 
   # Start
   $self->{log}->debug("Worker $$ started.");

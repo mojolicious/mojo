@@ -130,12 +130,6 @@ on C<irc.perl.org>).
 If you decide to fix the bug yourself make sure to also take a look at
 L<Mojolicious::Guides::CodingGuidelines>.
 
-=head2 Which namespace should i use for Mojolicious plugins?
-
-For all new plugins that you might want to release to CPAN, we suggest using
-the "Mojolicious::Plugin" namespace. While "MojoX" has been used a lot in the
-past, it is now deprecated.
-
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the

@@ -59,7 +59,8 @@ sub run {
   $0 = $ENV{HYPNOTOAD_APP};
 
   # Clean start
-  exec $ENV{HYPNOTOAD_EXE} unless $ENV{HYPNOTOAD_REV}++;
+  croak "Can't exec: $!"
+    if !$ENV{HYPNOTOAD_REV}++ && !exec $ENV{HYPNOTOAD_EXE};
 
   # Preload application and configure server
   my $daemon = $self->{daemon} = Mojo::Server::Daemon->new;
@@ -224,8 +225,8 @@ sub _manage {
     # Fresh start
     unless ($self->{new}) {
       $self->{log}->info('Starting zero downtime software upgrade.');
-      croak "Can't fork: $!" unless defined(my $pid = fork);
-      $self->{new} = $pid ? $pid : exec($ENV{HYPNOTOAD_EXE});
+      croak "Can't fork: $!" unless defined(my $pid = $self->{new} = fork);
+      exec($ENV{HYPNOTOAD_EXE}) or croak("Can't exec: $!") unless $pid;
     }
 
     # Timeout

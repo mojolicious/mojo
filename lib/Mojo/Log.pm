@@ -53,8 +53,7 @@ sub fatal { shift->log('fatal', @_) }
 
 sub format {
   my ($self, $level, @msgs) = @_;
-  my $msgs = join "\n", @msgs;
-  return '[' . localtime(time) . "] [$level] $msgs\n";
+  return '[' . localtime(time) . "] [$level] " . join("\n", @msgs) . "\n";
 }
 
 sub info { shift->log('info', @_) }

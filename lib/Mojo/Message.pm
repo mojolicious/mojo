@@ -149,7 +149,7 @@ sub cookie {
 
   # Map
   unless ($self->{cookies}) {
-    my $cookies = {};
+    my $cookies = $self->{cookies} = {};
     for my $cookie (@{$self->cookies}) {
       my $cookie_name = $cookie->name;
 
@@ -163,8 +163,6 @@ sub cookie {
       # Cookie
       else { $cookies->{$cookie_name} = $cookie }
     }
-
-    $self->{cookies} = $cookies;
   }
 
   # Multiple
@@ -300,7 +298,7 @@ sub upload {
 
   # Map
   unless ($self->{uploads}) {
-    my $uploads = {};
+    my $uploads = $self->{uploads} = {};
     for my $upload (@{$self->uploads}) {
       my $uname = $upload->name;
 
@@ -314,8 +312,6 @@ sub upload {
       # Upload
       else { $uploads->{$uname} = $upload }
     }
-
-    $self->{uploads} = $uploads;
   }
 
   # Multiple

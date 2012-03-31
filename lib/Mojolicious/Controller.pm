@@ -861,7 +861,7 @@ Alias for C<$c-E<gt>tx-E<gt>req>. Usually refers to a
 L<Mojo::Message::Request> object.
 
   # Extract request information
-  $c->render_json({url => $c->req->url->to_abs->to_string});
+  my $userinfo = $c->req->url->userinfo;
 
 =head2 C<res>
 

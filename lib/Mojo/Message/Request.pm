@@ -357,6 +357,9 @@ implements the following new ones.
 
 Direct access to the C<CGI> or C<PSGI> environment hash if available.
 
+  # Check CGI version
+  my $version = $req->env->{GATEWAY_INTERFACE};
+
   # Check PSGI version
   my $version = $req->env->{'psgi.version'};
 
@@ -373,6 +376,8 @@ HTTP request method.
   $req    = $req->url(Mojo::URL->new);
 
 HTTP request URL, defaults to a L<Mojo::URL> object.
+
+  my $foo = $req->url->query->to_hash->{foo};
 
 =head1 METHODS
 
@@ -451,7 +456,7 @@ Proxy URL for message.
 
 All C<GET> parameters, usually a L<Mojo::Parameters> object.
 
-  say $req->query_params->param('foo');
+  say $req->query_params->to_hash->{'foo'};
 
 =head1 SEE ALSO
 

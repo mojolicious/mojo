@@ -105,6 +105,10 @@ sub run {
     while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }
   };
   $SIG{QUIT} = sub { $self->{finished} = $self->{graceful} = 1 };
+  $SIG{USR1} = sub {
+    $log->info('Reopening log file.')->close;
+    kill 'USR1', $_ for keys %{$self->{workers}};
+  };
   $SIG{USR2} = sub { $self->{upgrade} ||= time };
   $SIG{TTIN} = sub { $c->{workers}++ };
   $SIG{TTOU} = sub {
@@ -351,6 +355,7 @@ sub _spawn {
   # Clean worker environment
   $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = $SIG{USR2} = $SIG{TTIN} = $SIG{TTOU} =
     'DEFAULT';
+  $SIG{USR1} = sub { $self->{daemon}->app->log->close };
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete $self->{reader};
   delete $self->{poll};
@@ -433,6 +438,10 @@ Increase worker pool by one.
 
 Decrease worker pool by one.
 
+=item C<USR1>
+
+Reopen log file, useful for log rotation.
+
 =item C<USR2>
 
 Attempt zero downtime software upgrade (hot deployment) without losing any
@@ -465,6 +474,10 @@ Stop worker immediately.
 =item C<QUIT>
 
 Stop worker gracefully.
+
+=item C<USR1>
+
+Reopen log file, useful for log rotation.
 
 =back
 

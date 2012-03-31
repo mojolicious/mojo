@@ -44,6 +44,8 @@ sub new {
   return $self;
 }
 
+sub close { delete shift->{handle} }
+
 # "Yes, I got the most! I win X-Mas!"
 sub debug { shift->log(debug => @_) }
 sub error { shift->log(error => @_) }
@@ -139,7 +141,7 @@ L<Mojo::Log> implements the following attributes.
   my $handle = $log->handle;
   $log       = $log->handle(IO::File->new);
 
-Logfile handle used by default C<message> event, defaults to opening the
+Log file handle used by default C<message> event, defaults to opening the
 value of C<path> or C<STDERR>.
 
 =head2 C<level>
@@ -171,7 +173,7 @@ These levels are currently available:
   my $path = $log->path
   $log     = $log->path('/var/log/mojo.log');
 
-Logfile path used by C<handle>.
+Log file path used by C<handle>.
 
 =head1 METHODS
 
@@ -184,6 +186,12 @@ the following new ones.
 
 Construct a new L<Mojo::Log> object and subscribe to C<message> event with
 default logger.
+
+=head2 C<close>
+
+  $log->close;
+
+Close C<handle>, useful for log rotation.
 
 =head2 C<debug>
 

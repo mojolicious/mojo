@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 45;
+use Test::More tests => 48;
 
 # "Don't let Krusty's death get you down, boy.
 #  People die all the time, just like that.
@@ -14,6 +14,10 @@ use Mojo::Log;
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 my $path = catdir $dir, 'test.log';
 my $log = Mojo::Log->new(level => 'debug', path => $path);
+ok $log->handle, 'file has been opened';
+ok !$log->handle(undef)->handle, 'handle has been replaced';
+$log->close;
+ok $log->handle, 'file has been reopened';
 $log->debug('Just works.');
 $log = Mojo::Log->new;
 like(

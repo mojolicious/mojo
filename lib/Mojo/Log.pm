@@ -8,19 +8,17 @@ use IO::File;
 has handle => sub {
   my $self = shift;
 
-  # Need a log file
-  unless ($self->path) {
-    binmode STDERR, ':utf8';
-    return \*STDERR;
+  # File
+  if (my $path = $self->path) {
+    croak qq/Can't open log file "$path": $!/
+      unless my $file = IO::File->new(">> $path");
+    binmode $file, ':utf8';
+    return $file;
   }
 
-  # Append to file
-  my $path = $self->path;
-  croak qq/Can't open log file "$path": $!/
-    unless my $file = IO::File->new(">> $path");
-  binmode $file, ':utf8';
-
-  return $file;
+  # STDERR
+  binmode STDERR, ':utf8';
+  return \*STDERR;
 };
 has level => 'debug';
 has 'path';
@@ -47,16 +45,16 @@ sub new {
 }
 
 # "Yes, I got the most! I win X-Mas!"
-sub debug { shift->log('debug', @_) }
-sub error { shift->log('error', @_) }
-sub fatal { shift->log('fatal', @_) }
+sub debug { shift->log(debug => @_) }
+sub error { shift->log(error => @_) }
+sub fatal { shift->log(fatal => @_) }
 
 sub format {
   my ($self, $level, @msgs) = @_;
   return '[' . localtime(time) . "] [$level] " . join("\n", @msgs) . "\n";
 }
 
-sub info { shift->log('info', @_) }
+sub info { shift->log(info => @_) }
 
 sub is_debug { shift->is_level('debug') }
 sub is_error { shift->is_level('error') }
@@ -64,11 +62,9 @@ sub is_fatal { shift->is_level('fatal') }
 sub is_info  { shift->is_level('info') }
 
 sub is_level {
-  my ($self, $level) = @_;
-  return unless $level;
-  $level = lc $level;
-  my $current = $ENV{MOJO_LOG_LEVEL} || $self->level;
-  return $LEVEL->{$level} >= $LEVEL->{$current};
+  my $self  = shift;
+  my $level = lc shift;
+  return $LEVEL->{$level} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || $self->level};
 }
 
 sub is_warn { shift->is_level('warn') }
@@ -78,12 +74,11 @@ sub is_warn { shift->is_level('warn') }
 sub log {
   my $self  = shift;
   my $level = lc shift;
-  return $self unless $level && $self->is_level($level);
-  $self->emit(message => $level => @_);
-  return $self;
+  return $self unless $self->is_level($level);
+  return $self->emit(message => $level => @_);
 }
 
-sub warn { shift->log('warn', @_) }
+sub warn { shift->log(warn => @_) }
 
 1;
 __END__

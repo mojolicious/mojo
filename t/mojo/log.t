@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 45;
+use Test::More tests => 48;
 
 # "Don't let Krusty's death get you down, boy.
 #  People die all the time, just like that.
@@ -19,6 +19,19 @@ $log = Mojo::Log->new;
 like(
   Mojo::Asset::File->new(path => $path)->slurp,
   qr/^\[.*\] \[debug\] Just works\.\n$/,
+  'right content'
+);
+
+# Reopen log file
+$path = catdir $dir, 'test2.log';
+$log = Mojo::Log->new->level('debug')->path($path);
+ok $log->handle, 'handle has been opened';
+ok $log->reopen, 'handle has been reopened';
+$log->info('Works again.');
+$log = Mojo::Log->new;
+like(
+  Mojo::Asset::File->new(path => $path)->slurp,
+  qr/^\[.*\] \[info\] Works again\.\n$/,
   'right content'
 );
 

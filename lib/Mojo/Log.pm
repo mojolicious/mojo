@@ -265,7 +265,7 @@ Emit C<message> event.
 
 =head2 C<reopen>
 
-  $log->reopen;
+  my $success = $log->reopen;
 
 Reopen C<handle> if C<path> is available, useful for log rotation.
 

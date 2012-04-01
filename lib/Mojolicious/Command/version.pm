@@ -44,19 +44,20 @@ OPTIONAL
 EOF
 
   # Latest version
-  my $latest = my ($current) = $Mojolicious::VERSION =~ /^([^_]+)/;
+  my $latest;
   eval {
+    my $ua = Mojo::UserAgent->new(max_redirects => 10)->detect_proxy;
     $latest =
-      Mojo::UserAgent->new(max_redirects => 10)
-      ->get('api.metacpan.org/v0/release/Mojolicious')->res->json->{version};
-  };
+      $ua->get('api.metacpan.org/v0/release/Mojolicious')
+      ->res->json->{version};
+  } or return;
 
   # Message
   my $message = 'This version is up to date, have fun!';
   $message = 'Thanks for testing a development release, you are awesome!'
-    if $latest < $current;
+    if $latest < $Mojolicious::VERSION;
   $message = "You might want to update your Mojolicious to $latest."
-    if $latest > $current;
+    if $latest > $Mojolicious::VERSION;
   say $message;
 }
 

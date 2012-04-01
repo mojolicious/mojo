@@ -15,7 +15,7 @@ my $dir = File::Temp::tempdir(CLEANUP => 1);
 my $path = catdir $dir, 'test.log';
 my $log = Mojo::Log->new(level => 'debug', path => $path);
 $log->debug('Just works.');
-$log = Mojo::Log->new;
+undef $log;
 like(
   Mojo::Asset::File->new(path => $path)->slurp,
   qr/^\[.*\] \[debug\] Just works\.\n$/,
@@ -28,7 +28,7 @@ $log = Mojo::Log->new->level('debug')->path($path);
 ok $log->handle, 'handle has been opened';
 ok $log->reopen, 'handle has been reopened';
 $log->info('Works again.');
-$log = Mojo::Log->new;
+undef $log;
 like(
   Mojo::Asset::File->new(path => $path)->slurp,
   qr/^\[.*\] \[info\] Works again\.\n$/,
@@ -36,9 +36,11 @@ like(
 );
 
 # Formatting
+$log = Mojo::Log->new;
 like $log->format(debug => 'Test 123.'), qr/^\[.*\] \[debug\] Test 123\.\n$/,
   'right format';
-like $log->format(qw/debug Test 123./), qr/^\[.*\] \[debug\] Test\n123\.\n$/,
+like $log->format(qw/debug Test 1 2 3/),
+  qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/,
   'right format';
 
 # Events

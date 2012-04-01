@@ -67,7 +67,9 @@ most important criteria are outlined in
 L<Mojolicious::Guides::CodingGuidelines>. But don't let this discourage you,
 it doesn't hurt to open a
 L<GitHub issue|https://github.com/kraih/mojo/issues> and ask, just be
-prepared that it might not pass the vote.
+prepared that it might not pass the vote. To increase the chances you can
+also discuss and refine ideas on the
+L<mailing-list|http://groups.google.com/group/mojolicious>.
 
 =head2 What does the error "Maximum message size exceeded." mean?
 

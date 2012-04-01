@@ -144,8 +144,8 @@ L<Mojo::Log> implements the following attributes.
   my $handle = $log->handle;
   $log       = $log->handle(IO::File->new);
 
-Log file handle used by default C<message> event, defaults to opening the
-value of C<path> or C<STDERR>.
+Log file handle used by default C<message> event, defaults to opening C<path>
+or C<STDERR>.
 
 =head2 C<level>
 

@@ -10,21 +10,6 @@ has 'error';
 my $FALSE = Mojo::JSON::_Bool->new(0);
 my $TRUE  = Mojo::JSON::_Bool->new(1);
 
-my $BOM_RE = qr/
-  (?:
-    \357\273\277   # UTF-8
-  |
-    \377\376\0\0   # UTF-32LE
-  |
-    \0\0\376\377   # UTF-32BE
-  |
-    \376\377       # UTF-16BE
-  |
-    \377\376       # UTF-16LE
-  )
-/x;
-my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
-
 # Escaped special character map (with u2028 and u2029)
 my %ESCAPE = (
   '"'     => '"',
@@ -38,17 +23,18 @@ my %ESCAPE = (
   'u2028' => "\x{2028}",
   'u2029' => "\x{2029}"
 );
-my %REVERSE;
-for (0x00 .. 0x1F, 0x7F) { $REVERSE{pack 'C', $_} = sprintf '\u%.4X', $_ }
-for my $key (keys %ESCAPE) { $REVERSE{$ESCAPE{$key}} = "\\$key" }
+my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
+for (0x00 .. 0x1F, 0x7F) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
 # Unicode encoding detection
 my $UTF_PATTERNS = {
-  "\0\0\0[^\0]"    => 'UTF-32BE',
-  "\0[^\0]\0[^\0]" => 'UTF-16BE',
-  "[^\0]\0\0\0"    => 'UTF-32LE',
-  "[^\0]\0[^\0]\0" => 'UTF-16LE'
+  'UTF-32BE' => qr/^\0\0\0[^\0]/,
+  'UTF-16BE' => qr/^\0[^\0]\0[^\0]/,
+  'UTF-32LE' => qr/^[^\0]\0\0\0/,
+  'UTF-16LE' => qr/^[^\0]\0[^\0]\0/
 };
+
+my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 
 # "Hey...That's not the wallet inspector..."
 sub decode {
@@ -61,7 +47,8 @@ sub decode {
   $self->error('Missing or empty input.') and return unless $string;
 
   # Remove BOM
-  $string =~ s/^$BOM_RE//g;
+  $string
+    =~ s/^(?:\357\273\277|\377\376\0\0|\0\0\376\377|\376\377|\377\376)//g;
 
   # Wide characters
   $self->error('Wide character in input.') and return
@@ -69,11 +56,9 @@ sub decode {
 
   # Detect and decode unicode
   my $encoding = 'UTF-8';
-  for my $pattern (keys %$UTF_PATTERNS) {
-    if ($string =~ /^$pattern/) {
-      $encoding = $UTF_PATTERNS->{$pattern};
-      last;
-    }
+  for my $name (keys %$UTF_PATTERNS) {
+    next unless $string =~ $UTF_PATTERNS->{$name};
+    $encoding = $name;
   }
   $string = Mojo::Util::decode $encoding, $string;
 
@@ -265,33 +250,19 @@ sub _decode_value {
 }
 
 sub _encode_array {
-  my $array = shift;
-
-  # Values
-  my @array;
-  for my $value (@$array) {
-    push @array, _encode_values($value);
-  }
-
-  # Stringify
-  my $string = join ',', @array;
-  return "[$string]";
+  return '[' . join(',', map { _encode_values($_) } @{shift()}) . ']';
 }
 
 sub _encode_object {
   my $object = shift;
 
-  # Values
-  my @values;
-  for my $key (keys %$object) {
-    my $name  = _encode_string($key);
-    my $value = _encode_values($object->{$key});
-    push @values, "$name:$value";
-  }
+  # Pairs
+  my @values =
+    map { _encode_string($_) . ':' . _encode_values($object->{$_}) }
+    keys %$object;
 
   # Stringify
-  my $string = join ',', @values;
-  return "{$string}";
+  return '{' . join(',', @values) . '}';
 }
 
 sub _encode_string {

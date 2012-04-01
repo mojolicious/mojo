@@ -121,12 +121,10 @@ good, the C<t> directory of this distribution has many good examples for how
 to do it right. Writing a test is usually the hardest part of fixing a bug,
 so the better your test case the faster it can be fixed. ;)
 
-Once that's done you can contact the developers via via
-L<GitHub|https://github.com/kraih/mojo/issues>,
-L<mailing list|http://groups.google.com/group/mojolicious> or IRC (C<#mojo>
-on C<irc.perl.org>).
+Once that's done you can contact the developers via
+L<GitHub issue|https://github.com/kraih/mojo/issues>.
 
-If you decide to fix the bug yourself make sure to also take a look at
+If you decide to fix the bug yourself, make sure to also take a look at
 L<Mojolicious::Guides::CodingGuidelines>.
 
 =head1 MORE

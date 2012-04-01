@@ -52,8 +52,7 @@ sub search {
       next if -d catfile splitdir($path), $file;
 
       # Module found
-      my $name = fileparse $file, qr/\.pm/;
-      my $class = "$namespace\::$name";
+      my $class = "$namespace\::" . fileparse $file, qr/\.pm/;
       push @$modules, $class unless $found{$class};
       $found{$class} ||= 1;
     }

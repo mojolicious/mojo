@@ -256,13 +256,13 @@ sub _encode_array {
 sub _encode_object {
   my $object = shift;
 
-  # Pairs
-  my @values =
+  # Encode pairs
+  my @pairs =
     map { _encode_string($_) . ':' . _encode_values($object->{$_}) }
     keys %$object;
 
   # Stringify
-  return '{' . join(',', @values) . '}';
+  return '{' . join(',', @pairs) . '}';
 }
 
 sub _encode_string {
@@ -304,7 +304,7 @@ sub _encode_values {
     if $flags & (B::SVp_IOK | B::SVp_NOK) && !($flags & B::SVp_POK);
 
   # String
-  _encode_string($value);
+  return _encode_string($value);
 }
 
 sub _exception {

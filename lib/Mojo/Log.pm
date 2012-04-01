@@ -7,7 +7,16 @@ use IO::File;
 
 has handle => sub {
   my $self = shift;
-  return $self->{handle} if $self->reopen;
+
+  # File
+  if (my $path = $self->path) {
+    croak qq/Can't open log file "$path": $!/
+      unless my $file = IO::File->new(">> $path");
+    binmode $file, ':utf8';
+    return $file;
+  }
+
+  # STDERR
   binmode STDERR, ':utf8';
   return \*STDERR;
 };
@@ -67,20 +76,6 @@ sub log {
   my $level = lc shift;
   return $self unless $self->is_level($level);
   return $self->emit(message => $level => @_);
-}
-
-sub reopen {
-  my $self = shift;
-
-  # No log file
-  return unless my $path = $self->path;
-
-  # Reopen log file
-  delete $self->{handle};
-  croak qq/Can't open log file "$path": $!/
-    unless my $file = IO::File->new(">> $path");
-  binmode $file, ':utf8';
-  return $self->{handle} = $file;
 }
 
 sub warn { shift->log(warn => @_) }
@@ -262,12 +257,6 @@ Check for warn log level.
   $log = $log->log(debug => 'This should work');
 
 Emit C<message> event.
-
-=head2 C<reopen>
-
-  my $success = $log->reopen;
-
-Reopen C<handle> if C<path> is available, useful for log rotation.
 
 =head2 C<warn>
 

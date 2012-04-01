@@ -440,7 +440,7 @@ Decrease worker pool by one.
 
 =item C<USR1>
 
-Reopen log file.
+Reopen log file server-wide.
 
 =item C<USR2>
 
@@ -477,7 +477,7 @@ Stop worker gracefully.
 
 =item C<USR1>
 
-Reopen log file.
+Reopen worker log file.
 
 =back
 

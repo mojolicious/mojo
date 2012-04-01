@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 48;
+use Test::More tests => 50;
 
 # "Don't let Krusty's death get you down, boy.
 #  People die all the time, just like that.
@@ -26,7 +26,9 @@ like(
 $path = catdir $dir, 'test2.log';
 $log = Mojo::Log->new->level('debug')->path($path);
 ok $log->handle, 'handle has been opened';
+ok !$log->handle(undef)->handle, 'handle has been replaced';
 ok $log->reopen, 'handle has been reopened';
+ok $log->handle, 'handle is open';
 $log->info('Works again.');
 undef $log;
 like(

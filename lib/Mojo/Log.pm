@@ -44,8 +44,6 @@ sub new {
   return $self;
 }
 
-sub close { delete shift->{handle} }
-
 # "Yes, I got the most! I win X-Mas!"
 sub debug { shift->log(debug => @_) }
 sub error { shift->log(error => @_) }
@@ -186,12 +184,6 @@ the following new ones.
 
 Construct a new L<Mojo::Log> object and subscribe to C<message> event with
 default logger.
-
-=head2 C<close>
-
-  $log->close;
-
-Close C<handle>, useful for log rotation.
 
 =head2 C<debug>
 

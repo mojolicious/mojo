@@ -106,7 +106,7 @@ sub run {
   };
   $SIG{QUIT} = sub { $self->{finished} = $self->{graceful} = 1 };
   $SIG{USR1} = sub {
-    $log->info('Reopening log file.')->close;
+    delete $log->info('Reopening log file.')->{handle};
     kill 'USR1', $_ for keys %{$self->{workers}};
   };
   $SIG{USR2} = sub { $self->{upgrade} ||= time };
@@ -355,7 +355,7 @@ sub _spawn {
   # Clean worker environment
   $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = $SIG{USR2} = $SIG{TTIN} = $SIG{TTOU} =
     'DEFAULT';
-  $SIG{USR1} = sub { $self->{daemon}->app->log->close };
+  $SIG{USR1} = sub { delete $self->{daemon}->app->log->{handle} };
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete $self->{reader};
   delete $self->{poll};

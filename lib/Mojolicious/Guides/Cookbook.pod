@@ -977,12 +977,12 @@ This can be an invaluable tool for testing your applications.
 
   $ ./myapp.pl get /welcome 'head > title'
 
-=head2 Oneliner
+=head2 Oneliners
 
 For quick hacks and especially testing, L<ojo> oneliners are also a great
 choice.
 
-  $ perl -Mojo -E'say g("mojolicio.us")->dom->html->head->title->text'
+  $ perl -Mojo -E 'say g("mojolicio.us")->dom->html->head->title->text'
 
 =head1 HACKS
 
@@ -1117,16 +1117,16 @@ rendering kicks in even if no actual code gets executed by the router. The
 renderer just picks up the C<text> value from the stash and generates a
 response.
 
-=head2 Hello World oneliner
+=head2 Hello World oneliners
 
 The C<Hello World> example above can get even a little bit shorter in an
 L<ojo> oneliner.
 
-  $ perl -Mojo -E'a({text => "Hello World!"})->start' daemon
+  $ perl -Mojo -E 'a({text => "Hello World!"})->start' daemon
 
 And you can use all the commands from L<Mojolicious::Commands>.
 
-  $ perl -Mojo -E'a({text => "Hello World!"})->start' get -v /
+  $ perl -Mojo -E 'a({text => "Hello World!"})->start' get -v /
 
 =head1 MORE
 

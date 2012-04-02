@@ -33,8 +33,7 @@ sub DESTROY { }
 sub new {
   my $class = shift;
   my $self = bless [Mojo::DOM::HTML->new], ref $class || $class;
-  $self->parse(@_) if @_;
-  return $self;
+  return @_ ? $self->parse(@_) : $self;
 }
 
 sub all_text {

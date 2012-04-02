@@ -17,8 +17,7 @@ $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
 #  How come you guys can go to the moon but can't make my shoes smell good?"
 sub new {
   my $self = shift->SUPER::new;
-  $self->app(shift) if @_;
-  return $self;
+  return @_ ? $self->app(shift) : $self;
 }
 
 sub app {

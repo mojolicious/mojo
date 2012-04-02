@@ -977,6 +977,13 @@ This can be an invaluable tool for testing your applications.
 
   $ ./myapp.pl get /welcome 'head > title'
 
+=head2 Oneliner
+
+For quick hacks and especially testing, L<ojo> oneliners are also a great
+choice.
+
+  $ perl -Mojo -E'say g("mojolicio.us")->dom->html->head->title->text'
+
 =head1 HACKS
 
 Fun hacks you might not use very often but that might come in handy some day.
@@ -1115,11 +1122,11 @@ response.
 The C<Hello World> example above can get even a little bit shorter in an
 L<ojo> oneliner.
 
-  $ perl -Mojo -e'a({text => "Hello World!"})->start' daemon
+  $ perl -Mojo -E'a({text => "Hello World!"})->start' daemon
 
 And you can use all the commands from L<Mojolicious::Commands>.
 
-  $ perl -Mojo -e'a({text => "Hello World!"})->start' get -v /
+  $ perl -Mojo -E'a({text => "Hello World!"})->start' get -v /
 
 =head1 MORE
 

@@ -17,6 +17,9 @@ use base 'BaseTest::Base2';
 __PACKAGE__->attr(heads => 1);
 __PACKAGE__->attr('name');
 
+package BaseTestTest;
+use Mojo::Base '+BaseTest';
+
 package main;
 
 use Mojo::Base;
@@ -32,7 +35,7 @@ for my $i (1 .. 50) {
   is $monkeys->[$i]->bananas, $i, 'right attribute value';
 }
 for my $i (51 .. 100) {
-  $monkeys->[$i] = BaseTest->new(bananas => $i);
+  $monkeys->[$i] = BaseTestTest->new(bananas => $i);
   is $monkeys->[$i]->bananas, $i, 'right attribute value';
 }
 

@@ -742,7 +742,7 @@ support in your application is the plugin L<Mojolicious::Plugin::I18N> and a
 few lexicon classes.
 
   package MyApp::I18N::de;
-  use base 'MyApp::I18N';
+  use Mojo::Base '+MyApp::I18N';
 
   our %Lexicon = ('Hello World' => 'Hallo Welt');
 

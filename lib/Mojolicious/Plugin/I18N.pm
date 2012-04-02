@@ -13,10 +13,10 @@ sub register {
   # Initialize
   my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
   my $default   = $conf->{default}   || 'en';
-  eval "package $namespace; use Mojo::Base 'Locale::Maketext'; 1;";
+  eval "package $namespace; use base 'Locale::Maketext'; 1;";
   eval "require ${namespace}::${default};";
   unless (eval "\%${namespace}::${default}::Lexicon") {
-    eval "package ${namespace}::$default; use Mojo::Base '+$namespace';"
+    eval "package ${namespace}::$default; use base '$namespace';"
       . 'our %Lexicon = (_AUTO => 1); 1;';
     die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
   }
@@ -112,9 +112,9 @@ code by default.
 
   # $self->plugin('I18N');
   package MyApp::I18N;
-  use Mojo::Base 'Locale::Maketext';
+  use base 'Locale::Maketext';
   package MyApp::I18N::en;
-  use Mojo::Base '+MyApp::I18N';
+  use base 'MyApp::I18N';
   our %Lexicon = (_AUTO => 1);
   1;
 

@@ -18,7 +18,7 @@ __PACKAGE__->attr(heads => 1);
 __PACKAGE__->attr('name');
 
 package BaseTestTest;
-use Mojo::Base '+BaseTest';
+use Mojo::Base 'BaseTest';
 
 package main;
 

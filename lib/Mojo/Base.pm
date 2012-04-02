@@ -29,7 +29,7 @@ sub import {
   else {
     my $file = $flag;
     $file =~ s/::|'/\//g;
-    require "$file.pm" unless $flag =~ s/^\+//;
+    require "$file.pm" unless $flag->can('new');
   }
 
   # ISA
@@ -145,7 +145,7 @@ L<Mojo::Base> is a simple base class for L<Mojo> projects.
   use Mojo::Base '+SomeBaseClass';
   use Mojo::Base 'SomeBaseClass';
 
-All four forms save a lot of typing.
+All three forms save a lot of typing.
 
   # use Mojo::Base -strict;
   use strict;
@@ -158,14 +158,6 @@ All four forms save a lot of typing.
   use feature ':5.10';
   use Mojo::Base;
   push @ISA, 'Mojo::Base';
-  sub has { Mojo::Base::attr(__PACKAGE__, @_) }
-
-  # use Mojo::Base '+SomeBaseClass';
-  use strict;
-  use warnings;
-  use feature ':5.10';
-  push @ISA, 'SomeBaseClass';
-  use Mojo::Base;
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
   # use Mojo::Base 'SomeBaseClass';

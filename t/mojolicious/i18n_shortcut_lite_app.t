@@ -9,12 +9,14 @@ BEGIN {
 use Test::More tests => 24;
 
 package MyTestApp::I18N::en;
-use Mojo::Base '+MyTestApp::I18N';
+use Mojo::Base -strict;
+use base 'MyTestApp::I18N';
 
 our %Lexicon = (hello => 'Hello World');
 
 package MyTestApp::I18N::de;
-use Mojo::Base '+MyTestApp::I18N';
+use Mojo::Base -strict;
+use base 'MyTestApp::I18N';
 
 our %Lexicon = (hello => 'Hallo Welt');
 

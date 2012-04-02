@@ -1,7 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.71  2012-04-02
-  - Added base class without require support to Mojo::Base.
   - Improved Hypnotoad error handling.
   - Improved version command to detect proxy servers automatically.
   - Improved documentation.

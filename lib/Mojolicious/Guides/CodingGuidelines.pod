@@ -42,8 +42,6 @@ than a minute on most common hardware is a good rule of thumb)
 
 Code should be written with a Perl6 port in mind.
 
-No refactoring unless a very important feature absolutely depends on it.
-
 The addition and modification of features is decided by majority vote or the
 pumpking.
 
@@ -56,16 +54,17 @@ It's not a feature without a test and documentation.
 
 A feature is only needed when the majority of the userbase benefits from it.
 
-Features may not be changed without being deprecated for at least one major
-release or 3 months.
+Features may only be changed in a major release or after being deprecated for
+at least 3 months.
 
-Deprecating a feature should be avoided at all costs.
-
-A major release can be version number independent and is signaled by a new
-unique code name based on a unicode character.
+Refactoring and deprecations should be avoided if no important feature
+depends on it.
 
 New features can be marked as experimental to be excluded from deprecation
 policies.
+
+A major release can be version number independent and is signaled by a new
+unique code name based on a unicode character.
 
 Only add prereqs if absolutely necessary and make them optional if possible.
 

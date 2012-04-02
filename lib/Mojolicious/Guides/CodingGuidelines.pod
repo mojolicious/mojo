@@ -63,8 +63,8 @@ depends on it.
 New features can be marked as experimental to be excluded from deprecation
 policies.
 
-A major release can be version number independent and is signaled by a new
-unique code name based on a unicode character.
+A major release is signaled by a new major version number and a unique code
+name based on a unicode character.
 
 Only add prereqs if absolutely necessary and make them optional if possible.
 
@@ -97,7 +97,7 @@ is optional if it doesn't increase readability.
 Every file should contain at least one quote from C<The Simpsons> or
 C<Futurama>.
 
-No names outside of the CREDITS section of Mojo.pm.
+No names outside of C<Mojolicious.pm>.
 
 No Elitism.
 

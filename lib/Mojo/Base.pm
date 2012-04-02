@@ -142,7 +142,6 @@ L<Mojo::Base> is a simple base class for L<Mojo> projects.
   # Automatically enables "strict", "warnings" and Perl 5.10 features
   use Mojo::Base -strict;
   use Mojo::Base -base;
-  use Mojo::Base '+SomeBaseClass';
   use Mojo::Base 'SomeBaseClass';
 
 All three forms save a lot of typing.

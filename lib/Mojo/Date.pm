@@ -23,10 +23,12 @@ sub new { shift->SUPER::new->parse(@_) }
 #  at you?"
 sub parse {
   my ($self, $date) = @_;
+
+  # Invalid
   return $self unless defined $date;
 
   # epoch (784111777)
-  $self->epoch($date) and return $self if $date =~ /^\d+$/;
+  return $self->epoch($date) if $date =~ /^\d+$/;
 
   # RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
   my ($day, $month, $year, $h, $m, $s);

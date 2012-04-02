@@ -25,7 +25,7 @@ my $hash = $headers->to_hash;
 is $hash->{Connection}, 'close',        'right value';
 is $hash->{Expect},     'continue-100', 'right value';
 is $hash->{'Content-Type'}, 'text/html', 'right value';
-$hash = $headers->to_hash(arrayref => 1);
+$hash = $headers->to_hash(1);
 is_deeply $hash->{Connection},     [['close']],        'right structure';
 is_deeply $hash->{Expect},         [['continue-100']], 'right structure';
 is_deeply $hash->{'Content-Type'}, [['text/html']],    'right structure';
@@ -119,7 +119,7 @@ is $headers->to_string,
   . "X-Test: 25\x0d\x0a 26", 'right format';
 my @array = $headers->header('X-Test');
 is_deeply \@array, [[23, 24], ['single line'], [25, 26]], 'right structure';
-is_deeply $headers->to_hash(arrayref => 1),
+is_deeply $headers->to_hash(1),
   {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
 is_deeply $headers->to_hash,
   {'X-Test' => [[23, 24], 'single line', [25, 26]]}, 'right structure';
@@ -158,7 +158,7 @@ $hash = $headers->to_hash;
 is_deeply $hash->{'X-Test'}, [[23, 24], 'single line', [25, 26]],
   'right structure';
 is_deeply $hash->{'X-Test2'}, 'foo', 'right structure';
-$hash = $headers->to_hash(arrayref => 1);
+$hash = $headers->to_hash(1);
 is_deeply $hash->{'X-Test'}, [[23, 24], ['single line'], [25, 26]],
   'right structure';
 is_deeply $hash->{'X-Test2'}, [['foo']], 'right structure';

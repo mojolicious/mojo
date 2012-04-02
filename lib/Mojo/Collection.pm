@@ -19,7 +19,7 @@ sub import {
 
 sub new {
   my $class = shift;
-  bless [@_], ref $class || $class;
+  return bless [@_], ref $class || $class;
 }
 
 sub each {
@@ -41,34 +41,34 @@ sub first {
 #  I can get by with one."
 sub grep {
   my ($self, $cb) = @_;
-  $self->new(grep { $_->$cb } @$self);
+  return $self->new(grep { $_->$cb } @$self);
 }
 
 sub join {
   my ($self, $expression) = @_;
-  Mojo::ByteStream->new(join $expression, map({"$_"} @$self));
+  return Mojo::ByteStream->new(join $expression, map({"$_"} @$self));
 }
 
 sub map {
   my ($self, $cb) = @_;
-  $self->new(map { $_->$cb } @$self);
+  return $self->new(map { $_->$cb } @$self);
 }
 
 sub reverse {
   my $self = shift;
-  $self->new(reverse @$self);
+  return $self->new(reverse @$self);
 }
 
 sub shuffle {
   my $self = shift;
-  $self->new(List::Util::shuffle @$self);
+  return $self->new(List::Util::shuffle @$self);
 }
 
 sub size { scalar @{$_[0]} }
 
 sub slice {
   my $self = shift;
-  $self->new(@$self[@_]);
+  return $self->new(@$self[@_]);
 }
 
 sub sort {

@@ -33,12 +33,11 @@ sub add {
 
   # Make sure we have a normal case entry for name
   my $lcname = lc $name;
-  $NORMALCASE{$lcname} = $name unless exists $NORMALCASE{$lcname};
-  $name = $lcname;
+  $NORMALCASE{$lcname} //= $name;
 
   # Add lines
-  push @{$self->{headers}->{$name}}, (ref $_ || '') eq 'ARRAY' ? $_ : [$_]
-    for @_;
+  push @{$self->{headers}->{$lcname}},
+    map { (ref $_ || '') eq 'ARRAY' ? $_ : [$_] } @_;
 
   return $self;
 }
@@ -90,9 +89,7 @@ sub is_limit_exceeded { shift->{limit} }
 sub leftovers { delete shift->{buffer} }
 
 sub names {
-  my @headers;
-  push @headers, $NORMALCASE{$_} || $_ for keys %{shift->{headers}};
-  return \@headers;
+  [map { $NORMALCASE{$_} || $_ } keys %{shift->{headers}}];
 }
 
 sub parse {
@@ -108,8 +105,7 @@ sub parse {
 
     # Check line size limit
     if (length $line > $max) {
-      $self->{state} = 'finished';
-      $self->{limit} = 1;
+      $self->{limit} = $self->{state} = 'finished';
       return $self;
     }
 
@@ -128,10 +124,8 @@ sub parse {
   }
 
   # Check line size limit
-  if (length $self->{buffer} > $max) {
-    $self->{state} = 'finished';
-    $self->{limit} = 1;
-  }
+  $self->{limit} = $self->{state} = 'finished'
+    if length $self->{buffer} > $max;
 
   return $self;
 }
@@ -145,22 +139,21 @@ sub remove {
 }
 
 sub to_hash {
-  my $self   = shift;
-  my %params = @_;
+  my ($self, $multi) = @_;
 
   # Build
   my $hash = {};
   for my $header (@{$self->names}) {
     my @headers = $self->header($header);
 
-    # Nested arrayrefs
-    if ($params{arrayref}) { $hash->{$header} = [@headers] }
+    # Multi line
+    if ($multi) { $hash->{$header} = [@headers] }
 
-    # Flat arrayref
+    # Flat
     else {
 
-      # Turn single value arrayrefs into strings
-      for my $h (@headers) { $h = $h->[0] if @$h == 1 }
+      # Turn single value arrays into strings
+      @$_ == 1 and $_ = $_->[0] for @headers;
       $hash->{$header} = @headers > 1 ? [@headers] : $headers[0];
     }
   }
@@ -531,10 +524,10 @@ Shortcut for the C<Status> header.
 =head2 C<to_hash>
 
   my $hash = $headers->to_hash;
-  my $hash = $headers->to_hash(arrayref => 1);
+  my $hash = $headers->to_hash(1);
 
-Format headers as a hash. Nested arrayrefs to represent multi line values are
-optional.
+Format headers as a hash, nested arrays to represent multi line values are
+disabled by default.
 
 =head2 C<to_string>
 

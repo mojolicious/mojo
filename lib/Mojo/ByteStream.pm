@@ -37,7 +37,7 @@ sub import {
 #  Well, I think the veal died of loneliness."
 sub new {
   my $class = shift;
-  bless \(my $dummy = join '', @_), ref $class || $class;
+  return bless \(my $dummy = join '', @_), ref $class || $class;
 }
 
 sub clone {
@@ -80,7 +80,7 @@ sub size { length ${shift()} }
 
 sub split {
   my ($self, $pattern) = @_;
-  Mojo::Collection->new(map { $self->new($_) } split $pattern, $$self);
+  return Mojo::Collection->new(map { $self->new($_) } split $pattern, $$self);
 }
 
 sub to_string { ${shift()} }

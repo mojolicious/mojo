@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 409;
+use Test::More tests => 413;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -19,6 +19,9 @@ __PACKAGE__->attr('name');
 
 package BaseTestTest;
 use Mojo::Base 'BaseTest';
+
+package BaseTestTestTest;
+use Mojo::Base 'BaseTestTest';
 
 package main;
 
@@ -40,10 +43,14 @@ for my $i (51 .. 100) {
 }
 
 # Instance method
-my $monkey = BaseTest->new;
+my $monkey = BaseTestTestTest->new;
 $monkey->attr('mojo');
 $monkey->mojo(23);
 is $monkey->mojo, 23, 'monkey has mojo';
+ok !BaseTestTest->can('mojo'), 'base class does not have mojo';
+ok(BaseTestTest->can('heads'), 'base class has heads');
+ok !BaseTest->can('mojo'), 'base class does not have mojo';
+ok(BaseTest->can('heads'), 'base class has heads');
 
 # "default" defined but false
 my $m = $monkeys->[1];

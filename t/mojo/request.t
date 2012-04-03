@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 965;
+use Test::More tests => 976;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -1191,6 +1191,29 @@ is $req->headers->content_length, '13', 'right "Content-Length" value';
 is $req->body, "Hello World!\n", 'right content';
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
+
+# Build HTTP 1.1 request parts with progress
+$req = Mojo::Message::Request->new;
+($finished, $progress) = undef;
+$req->on(finish => sub { $finished = shift->is_finished });
+$req->on(progress => sub { $progress++ });
+$req->method('get');
+$req->url->parse('http://127.0.0.1/foo/bar');
+$req->headers->expect('100-continue');
+$req->body("Hello World!\n");
+ok !$progress, 'no progress';
+ok !$finished, 'not finished';
+ok $req->build_start_line, 'built start line';
+ok $progress, 'made progress';
+$progress = undef;
+ok !$finished, 'not finished';
+ok $req->build_headers, 'built headers';
+ok $progress, 'made progress';
+$progress = undef;
+ok !$finished, 'not finished';
+ok $req->build_body, 'built body';
+ok $progress, 'made progress';
+ok $finished, 'finished';
 
 # Build full HTTP 1.1 request (with clone)
 $req      = Mojo::Message::Request->new;

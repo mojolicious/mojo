@@ -1,7 +1,6 @@
 package Mojo::Message;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::Content::Single;
 use Mojo::DOM;
@@ -104,45 +103,9 @@ sub body_size { shift->content->body_size }
 #  It cost 80 million dollars to make.
 #  How do you sleep at night?
 #  On top of a pile of money, with many beautiful women."
-sub build_body {
-  my $self = shift;
-  my $body = $self->content->build_body(@_);
-  $self->{state} = 'finished';
-  $self->emit('finish');
-  return $body;
-}
-
-sub build_headers {
-  my $self = shift;
-
-  # HTTP 0.9 has no headers
-  return '' if $self->version eq '0.9';
-
-  $self->fix_headers;
-  return $self->content->build_headers;
-}
-
-sub build_start_line {
-  my $self = shift;
-
-  my $startline = '';
-  my $offset    = 0;
-  while (1) {
-    my $chunk = $self->get_start_line_chunk($offset);
-
-    # No start line yet, try again
-    next unless defined $chunk;
-
-    # End of start line
-    last unless length $chunk;
-
-    # Start line
-    $offset += length $chunk;
-    $startline .= $chunk;
-  }
-
-  return $startline;
-}
+sub build_body       { shift->_build('body') }
+sub build_headers    { shift->_build('header') }
+sub build_start_line { shift->_build('start_line') }
 
 sub cookie {
   my ($self, $name) = @_;
@@ -200,17 +163,16 @@ sub error {
 
 sub fix_headers {
   my $self = shift;
+  return $self
+    if $self->{fix}++ || !$self->at_least_version('1.0') || $self->is_chunked;
 
   # Content-Length header or connection close is required in HTTP 1.0
   # unless the chunked transfer encoding is used
-  if ($self->at_least_version('1.0') && !$self->is_chunked) {
-    my $headers = $self->headers;
-    unless ($headers->content_length) {
-      $self->is_dynamic
-        ? $headers->connection('close')
-        : $headers->content_length($self->body_size);
-    }
-  }
+  my $headers = $self->headers;
+  $self->is_dynamic
+    ? $headers->connection('close')
+    : $headers->content_length($self->body_size)
+    unless $headers->content_length;
 
   return $self;
 }
@@ -241,7 +203,7 @@ sub get_header_chunk {
   # HTTP 0.9 has no headers
   return '' if $self->version eq '0.9';
 
-  return $self->content->get_header_chunk(@_);
+  return $self->fix_headers->content->get_header_chunk(@_);
 }
 
 sub get_start_line_chunk {
@@ -349,9 +311,31 @@ sub uploads {
 sub write       { shift->content->write(@_) }
 sub write_chunk { shift->content->write_chunk(@_) }
 
-sub _build_start_line {
-  croak 'Method "_build_start_line" not implemented by subclass';
+sub _build {
+  my ($self, $part) = @_;
+
+  # Build part from chunks
+  my $method = "get_${part}_chunk";
+  my $buffer = '';
+  my $offset = 0;
+  while (1) {
+    my $chunk = $self->$method($offset);
+
+    # No chunk yet, try again
+    next unless defined $chunk;
+
+    # End of part
+    last unless length $chunk;
+
+    # Part
+    $offset += length $chunk;
+    $buffer .= $chunk;
+  }
+
+  return $buffer;
 }
+
+sub _build_start_line {''}
 
 sub _parse {
   my ($self, $until_body, $chunk) = @_;
@@ -419,9 +403,7 @@ sub _parse {
   return $self;
 }
 
-sub _parse_start_line {
-  croak 'Method "_parse_start_line" not implemented by subclass';
-}
+sub _parse_start_line { }
 
 sub _parse_formdata {
   my $self = shift;

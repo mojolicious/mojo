@@ -91,7 +91,7 @@ sub default_message { $MESSAGES{$_[1] || $_[0]->code || 404} || '' }
 
 sub fix_headers {
   my $self = shift;
-  $self->SUPER::fix_headers(@_);
+  $self->{fix} ? return $self : $self->SUPER::fix_headers(@_);
 
   # Date header is required in responses
   my $headers = $self->headers;

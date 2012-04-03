@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 333;
+use Test::More tests => 344;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -411,6 +411,29 @@ is $res->headers->connection, 'keep-alive', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, '13', 'right "Content-Length" value';
 is $res->body, "Hello World!\n", 'right content';
+
+# Build HTTP 1.1 response parts with progress
+$res = Mojo::Message::Response->new;
+my ($finished, $progress);
+$res->on(finish => sub { $finished = shift->is_finished });
+$res->on(progress => sub { $progress++ });
+$res->code(200);
+$res->headers->connection('keep-alive');
+$res->headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
+$res->body("Hello World!\n");
+ok !$progress, 'no progress';
+ok !$finished, 'not finished';
+ok $res->build_start_line, 'built start line';
+ok $progress, 'made progress';
+$progress = undef;
+ok !$finished, 'not finished';
+ok $res->build_headers, 'built headers';
+ok $progress, 'made progress';
+$progress = undef;
+ok !$finished, 'not finished';
+ok $res->build_body, 'built body';
+ok $progress, 'made progress';
+ok $finished, 'finished';
 
 # Build HTTP 0.9 response
 $res = Mojo::Message::Response->new;

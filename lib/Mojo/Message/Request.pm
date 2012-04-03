@@ -57,7 +57,7 @@ sub cookies {
 
 sub fix_headers {
   my $self = shift;
-  $self->SUPER::fix_headers(@_);
+  $self->{fix} ? return $self : $self->SUPER::fix_headers(@_);
 
   # Host header is required in HTTP 1.1 requests
   my $url     = $self->url;

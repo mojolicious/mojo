@@ -252,14 +252,10 @@ sub get_start_line_chunk {
 }
 
 sub has_leftovers { shift->content->has_leftovers }
-
-sub header_size { shift->fix_headers->content->header_size }
-
-sub headers { shift->content->headers(@_) }
-
-sub is_chunked { shift->content->is_chunked }
-
-sub is_dynamic { shift->content->is_dynamic }
+sub header_size   { shift->fix_headers->content->header_size }
+sub headers       { shift->content->headers(@_) }
+sub is_chunked    { shift->content->is_chunked }
+sub is_dynamic    { shift->content->is_dynamic }
 
 sub is_finished { (shift->{state} || '') eq 'finished' }
 

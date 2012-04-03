@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 54;
+use Test::More tests => 55;
 
 # "I was so bored I cut the pony tail off the guy in front of us.
 #  Look at me, I'm a grad student.
@@ -59,6 +59,9 @@ $app->config(foo => 'bar', baz => 'yada');
 is_deeply $app->config, {foo => 'bar', baz => 'yada'}, 'right value';
 $app->config({test => 23});
 is $app->config->{test}, 23, 'right value';
+
+# Transaction
+isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';
 
 # Fresh application
 $app = Mojolicious->new;

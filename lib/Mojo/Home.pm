@@ -177,6 +177,8 @@ Path to C<lib> directory of application.
 
 Portably list all files in directory and subdirectories recursively.
 
+  $home->rel_file($home->list_files('templates/layouts')->[1]);
+
 =head2 C<mojo_lib_dir>
 
   my $path = $home->mojo_lib_dir;
@@ -206,6 +208,8 @@ Portably generate an absolute path from a relative UNIX style path.
   my $string = $home->slurp_rel_file('foo/bar.html');
 
 Portably read all file data at once.
+
+  my $content = $home->slurp_rel_file($home->list_files('public')->[1]);
 
 =head2 C<to_string>
 

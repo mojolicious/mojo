@@ -85,20 +85,17 @@ __END__
 
 =head1 NAME
 
-Mojo::Log - Simple logger for Mojo
+Mojo::Log - Simple logger
 
 =head1 SYNOPSIS
 
   use Mojo::Log;
 
-  # Create a logging object that will log to STDERR by default
+  # Log to STDERR
   my $log = Mojo::Log->new;
 
-  # Customize the log location and minimum log level
-  my $log = Mojo::Log->new(
-    path  => '/var/log/mojo.log',
-    level => 'warn',
-  );
+  # Customize log file location and minimum log level
+  my $log = Mojo::Log->new(path => '/var/log/mojo.log', level => 'warn');
 
   # Log messages
   $log->debug("Why isn't this working?");

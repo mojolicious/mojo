@@ -16,8 +16,7 @@ sub run {
   my $req = $tx->req->parse(\%ENV);
 
   # Store connection information
-  $tx->local_port($ENV{SERVER_PORT});
-  $tx->remote_address($ENV{REMOTE_ADDR});
+  $tx->local_port($ENV{SERVER_PORT})->remote_address($ENV{REMOTE_ADDR});
 
   # Request body
   binmode STDIN;

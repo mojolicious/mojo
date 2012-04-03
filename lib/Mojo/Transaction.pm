@@ -38,11 +38,11 @@ sub is_writing {
 }
 
 sub remote_address {
-  my ($self, $address) = @_;
+  my $self = shift;
 
   # New address
-  if ($address) {
-    $self->{remote_address} = $address;
+  if (@_) {
+    $self->{remote_address} = shift;
     return $self;
   }
 

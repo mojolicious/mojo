@@ -15,8 +15,7 @@ sub run {
   my $req = $tx->req->parse($env);
 
   # Store connection information
-  $tx->local_port($env->{SERVER_PORT});
-  $tx->remote_address($env->{REMOTE_ADDR});
+  $tx->local_port($env->{SERVER_PORT})->remote_address($env->{REMOTE_ADDR});
 
   # Request body
   my $len = $env->{CONTENT_LENGTH};

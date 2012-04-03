@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.71';
+our $VERSION  = '2.72';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -560,19 +560,20 @@ Perl-ish configuration files.
 
 =item L<Mojolicious::Plugin::DefaultHelpers>
 
-General purpose helper collection.
+General purpose helper collection, loaded automatically.
 
 =item L<Mojolicious::Plugin::EPLRenderer>
 
-Renderer for plain embedded Perl templates.
+Renderer for plain embedded Perl templates, loaded automatically.
 
 =item L<Mojolicious::Plugin::EPRenderer>
 
-Renderer for more sophisiticated embedded Perl templates.
+Renderer for more sophisiticated embedded Perl templates, loaded
+automatically.
 
 =item L<Mojolicious::Plugin::HeaderCondition>
 
-Route condition for all kinds of headers.
+Route condition for all kinds of headers, loaded automatically.
 
 =item L<Mojolicious::Plugin::I18N>
 
@@ -592,15 +593,15 @@ Renderer for POD files and documentation browser.
 
 =item L<Mojolicious::Plugin::PoweredBy>
 
-Add an C<X-Powered-By> header to outgoing responses.
+Add an C<X-Powered-By> header to outgoing responses, loaded automatically.
 
 =item L<Mojolicious::Plugin::RequestTimer>
 
-Log timing information.
+Log timing information, loaded automatically.
 
 =item L<Mojolicious::Plugin::TagHelpers>
 
-Template specific helper collection.
+Template specific helper collection, loaded automatically.
 
 =back
 

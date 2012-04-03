@@ -498,6 +498,13 @@ Emitted after message building or parsing is finished.
 
 Emitted when message building or parsing makes progress.
 
+  # Building
+  $message->on(progress => sub {
+    my ($message, $state, $offset) = @_;
+    say qq/Building "$state" at offset $offset/;
+  });
+
+  # Parsing
   $message->on(progress => sub {
     my $message = shift;
     return unless my $len = $message->headers->content_length;

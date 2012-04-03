@@ -265,12 +265,14 @@ implements the following new ones.
 
   my $tx = $t->form('kraih.com' => {a => 'b'});
   my $tx = $t->form('http://kraih.com' => {a => 'b'});
+  my $tx = $t->form('http://kraih.com' => {a => ['b', 'c', 'd']});
   my $tx = $t->form('http://kraih.com' => {mytext => {file => '/foo.txt'}});
   my $tx = $t->form('http://kraih.com' => {mytext => {content => 'lalala'}});
   my $tx = $t->form('http://kraih.com' => {
     myzip => {
       file     => Mojo::Asset::Memory->new->add_chunk('lalala'),
-      filename => 'foo.zip'
+      filename => 'foo.zip',
+      DNT      => 1
     }
   });
   my $tx = $t->form('http://kraih.com' => 'UTF-8' => {a => 'b'});

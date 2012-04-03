@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 197;
+use Test::More tests => 201;
 
 # "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
@@ -50,6 +50,14 @@ is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $tx->req->body, 'test=123', 'right content';
+
+# Simple form with multiple values
+$tx = $t->form('http://kraih.com/foo' => {test => [1, 2, 3]});
+is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
+  'right "Content-Type" value';
+is $tx->req->body, 'test=1&test=2&test=3', 'right content';
 
 # UTF-8 form
 $tx = $t->form('http://kraih.com/foo', 'UTF-8', {test => 123});

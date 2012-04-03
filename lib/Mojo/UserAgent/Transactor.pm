@@ -281,6 +281,10 @@ implements the following new ones.
 
 Versatile L<Mojo::Transaction::HTTP> builder for form requests.
 
+  # Inspect request
+  say $t->form('mojolicio.us' => {a => [1, 2, 3]})->req->to_string;
+
+  # Submit form and stream response
   my $tx = $t->form('http://kraih.com/foo' => {a => 'b'});
   $tx->res->body(sub { say $_[1] });
   $ua->start($tx);
@@ -289,6 +293,7 @@ While the "multipart/form-data" content type will be automatically used
 instead of "application/x-www-form-urlencoded" when necessary, you can also
 enforce it by setting the header manually.
 
+  # Force multipart
   my $tx = $t->form(
     'http://kraih.com/foo',
     {a => 'b'},

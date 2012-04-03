@@ -496,20 +496,15 @@ sub _start {
 sub _upgrade {
   my ($self, $id) = @_;
 
-  # No upgrade request
+  # Check if connection needs to be upgraded
   my $c   = $self->{connections}->{$id};
   my $old = $c->{tx};
   return unless $old->req->headers->upgrade;
+  return unless ($old->res->code || '') eq '101';
 
-  # Handshake failed
-  my $res = $old->res;
-  return unless ($res->code || '') eq '101';
-
-  # Upgrade to WebSocket transaction
+  # Check challenge and upgrade to WebSocket transaction
   my $new = Mojo::Transaction::WebSocket->new(handshake => $old, masked => 1);
-  $new->kept_alive($old->kept_alive);
-  $res->error('WebSocket challenge failed.') and return
-    unless $new->client_challenge;
+  return unless $new->client_challenge;
   $c->{tx} = $new;
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });

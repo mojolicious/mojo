@@ -119,6 +119,7 @@ sub finish {
 
 sub is_websocket {1}
 
+sub kept_alive    { shift->handshake->kept_alive }
 sub local_address { shift->handshake->local_address }
 sub local_port    { shift->handshake->local_port }
 
@@ -478,6 +479,12 @@ Finish the WebSocket connection gracefully.
   my $true = $ws->is_websocket;
 
 True.
+
+=head2 C<kept_alive>
+
+  my $kept_alive = $ws->kept_alive;
+
+Alias for L<Mojo::Transaction/"kept_alive">.
 
 =head2 C<local_address>
 

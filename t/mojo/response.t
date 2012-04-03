@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 348;
+use Test::More tests => 350;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -445,6 +445,8 @@ ok $res->build_body, 'built body';
 is $state, 'body', 'made progress on headers';
 ok $progress, 'made progress';
 ok $finished, 'finished';
+is $res->build_headers, $res->content->build_headers, 'headers are equal';
+is $res->build_body,    $res->content->build_body,    'body is equal';
 
 # Build HTTP 0.9 response
 $res = Mojo::Message::Response->new;

@@ -1,6 +1,7 @@
 package Mojo::UserAgent::Transactor;
 use Mojo::Base -base;
 
+use File::Spec::Functions 'splitpath';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
@@ -27,103 +28,47 @@ sub form {
   $params->charset($encoding) if defined $encoding;
   my $multipart;
   for my $name (sort keys %$form) {
+    my $value = $form->{$name};
 
     # Array
-    if (ref $form->{$name} eq 'ARRAY') {
-      $params->append($name, $_) for @{$form->{$name}};
-    }
+    if (ref $value eq 'ARRAY') { $params->append($name, $_) for @$value }
 
     # Hash
-    elsif (ref $form->{$name} eq 'HASH') {
-      my $hash = $form->{$name};
+    elsif (ref $value eq 'HASH') {
 
       # Enforce "multipart/form-data"
       $multipart = 1;
 
       # File
-      if (my $file = $hash->{file}) {
-
-        # Upgrade
-        $file = $hash->{file} = Mojo::Asset::File->new(path => $file)
-          unless ref $file;
-
-        # Filename
-        $hash->{filename} ||= $file->path if $file->can('path');
+      if (my $file = $value->{file}) {
+        $value->{file} = Mojo::Asset::File->new(path => $file) if !ref $file;
+        $value->{filename} ||= (splitpath($value->{file}->path))[2]
+          if $value->{file}->isa('Mojo::Asset::File');
       }
 
       # Memory
-      elsif (defined(my $content = delete $hash->{content})) {
-        $hash->{file} = Mojo::Asset::Memory->new->add_chunk($content);
+      elsif (defined(my $content = delete $value->{content})) {
+        $value->{file} = Mojo::Asset::Memory->new->add_chunk($content);
       }
 
-      $hash->{'Content-Type'} ||= 'application/octet-stream';
-      push @{$params->params}, $name, $hash;
+      push @{$params->params}, $name, $value;
     }
 
     # Single value
-    else { $params->append($name, $form->{$name}) }
+    else { $params->append($name, $value) }
   }
 
   # New transaction
   my $tx      = $self->tx(POST => $url);
   my $req     = $tx->req;
-  my $headers = $req->headers;
-  $headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
+  my $headers = $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
   # Multipart
   $headers->content_type('multipart/form-data') if $multipart;
-  my $type = $headers->content_type || '';
-  if ($type eq 'multipart/form-data') {
-    my $form = $params->to_hash;
-
-    # Parts
-    my @parts;
-    for my $name (sort keys %$form) {
-      my $part = Mojo::Content::Single->new;
-      my $h    = $part->headers;
-      my $f    = $form->{$name};
-
-      # File
-      my $filename;
-      if (ref $f eq 'HASH') {
-        $filename = delete $f->{filename} || $name;
-        $filename = encode $encoding, $filename if $encoding;
-        $filename = url_escape $filename, $Mojo::URL::UNRESERVED;
-        $part->asset(delete $f->{file});
-        $h->from_hash($f);
-        push @parts, $part;
-      }
-
-      # Fields
-      else {
-        my $type = 'text/plain';
-        $type .= qq/;charset=$encoding/ if $encoding;
-        $h->content_type($type);
-
-        # Values
-        for my $value (ref $f ? @$f : ($f)) {
-          $part = Mojo::Content::Single->new(headers => $h);
-          $value = encode $encoding, $value if $encoding;
-          $part->asset->add_chunk($value);
-          push @parts, $part;
-        }
-      }
-
-      # Content-Disposition
-      $name = encode $encoding, $name if $encoding;
-      $name = url_escape $name, $Mojo::URL::UNRESERVED;
-      my $disposition = qq/form-data; name="$name"/;
-      $disposition .= qq/; filename="$filename"/ if $filename;
-      $h->content_disposition($disposition);
-    }
-
-    # Multipart content
-    my $content = Mojo::Content::MultiPart->new;
-    $headers->content_type('multipart/form-data');
-    $content->headers($headers)->parts(\@parts);
-
-    # Add content to transaction
-    $req->content($content);
+  if (($headers->content_type || '') eq 'multipart/form-data') {
+    my $parts = $self->_multipart($params->to_hash, $encoding);
+    $req->content(
+      Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
   }
 
   # Urlencoded
@@ -250,6 +195,46 @@ sub websocket {
     ->client_handshake;
 
   return wantarray ? ($tx, $cb) : $tx;
+}
+
+sub _multipart {
+  my ($self, $form, $encoding) = @_;
+
+  # Parts
+  my @parts;
+  for my $name (sort keys %$form) {
+    my $values = $form->{$name};
+    my $part   = Mojo::Content::Single->new;
+
+    # File
+    my $filename;
+    my $headers = $part->headers;
+    if (ref $values eq 'HASH') {
+      $filename = delete $values->{filename} || $name;
+      $filename = encode $encoding, $filename if $encoding;
+      $filename = url_escape $filename, $Mojo::URL::UNRESERVED;
+      push @parts, $part->asset(delete $values->{file});
+      $headers->from_hash($values);
+    }
+
+    # Fields
+    else {
+      for my $value (ref $values ? @$values : ($values)) {
+        push @parts, $part = Mojo::Content::Single->new(headers => $headers);
+        $value = encode $encoding, $value if $encoding;
+        $part->asset->add_chunk($value);
+      }
+    }
+
+    # Content-Disposition
+    $name = encode $encoding, $name if $encoding;
+    $name = url_escape $name, $Mojo::URL::UNRESERVED;
+    my $disposition = qq/form-data; name="$name"/;
+    $disposition .= qq/; filename="$filename"/ if $filename;
+    $headers->content_disposition($disposition);
+  }
+
+  return \@parts;
 }
 
 1;

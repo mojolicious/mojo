@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 178;
+use Test::More tests => 197;
 
 # "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
@@ -69,17 +69,60 @@ is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
 is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'test=123', 'right content';
 
-# Multipart form with real file
+# Multipart form
 $tx =
-  $t->form('http://kraih.com/foo',
-  {mytext => {file => catdir($FindBin::Bin, 'transactor.t')}});
+  $t->form('http://kraih.com/foo' => {test => 123} =>
+    {'Content-Type' => 'multipart/form-data'});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition, qr/mytext/,
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/"test"/,
+  'right "Content-Disposition" value';
+is $tx->req->content->parts->[0]->asset->slurp, 123, 'right part';
+is $tx->req->content->parts->[1], undef, 'no more parts';
+
+# Multipart form with multiple values
+$tx =
+  $t->form('http://kraih.com/foo' => {test => [1, 2, 3]} =>
+    {'Content-Type' => 'multipart/form-data'});
+is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, 'multipart/form-data',
+  'right "Content-Type" value';
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/"test"/,
+  'right "Content-Disposition" value';
+is $tx->req->content->parts->[0]->asset->slurp, 1, 'right part';
+like $tx->req->content->parts->[1]->headers->content_disposition,
+  qr/"test"/,
+  'right "Content-Disposition" value';
+is $tx->req->content->parts->[1]->asset->slurp, 2, 'right part';
+like $tx->req->content->parts->[2]->headers->content_disposition,
+  qr/"test"/,
+  'right "Content-Disposition" value';
+is $tx->req->content->parts->[2]->asset->slurp, 3, 'right part';
+is $tx->req->content->parts->[3], undef, 'no more parts';
+
+# Multipart form with real file and custom header
+$tx =
+  $t->form('http://kraih.com/foo',
+  {mytext => {file => catdir($FindBin::Bin, 'transactor.t'), DNT => 1}});
+is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, 'multipart/form-data',
+  'right "Content-Type" value';
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/"mytext"/,
+  'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/"transactor.t"/,
   'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
+ok !$tx->req->content->parts->[0]->headers->header('file'),
+  'no "file" header';
+is $tx->req->content->parts->[0]->headers->dnt, 1, 'right "DNT" header';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
 # Multipart form with in-memory content

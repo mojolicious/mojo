@@ -723,7 +723,7 @@ L<Mojo::Collection> object, depending on number of children.
 
 =head1 ELEMENT ATTRIBUTES
 
-Direct hash access to element attributes is also possible.
+Direct hash reference access to element attributes is also possible.
 
   say $dom->{foo};
   say $dom->div->{id};

@@ -128,7 +128,7 @@ sub _config {
     unless ($c = do $file) {
       die qq/Can't load config file "$file": $@/ if $@;
       die qq/Can't load config file "$file": $!/ unless defined $c;
-      die qq/Config file "$file" did not return a hashref.\n/
+      die qq/Config file "$file" did not return a hash reference.\n/
         unless ref $c eq 'HASH';
     }
   }

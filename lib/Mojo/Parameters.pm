@@ -309,7 +309,7 @@ Remove parameters.
 
   my $hash = $params->to_hash;
 
-Turn parameters into a hashref.
+Turn parameters into a hash reference.
 
   # "baz"
   Mojo::Parameters->new('foo=bar&foo=baz')->to_hash->{foo}->[1];

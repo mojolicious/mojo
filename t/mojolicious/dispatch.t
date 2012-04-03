@@ -43,7 +43,7 @@ is $c->stash('foo'), 'bar', 'set and return a stash value';
 
 # Ref value
 my $stash = $c->stash;
-is_deeply $stash, {foo => 'bar'}, 'return a hashref';
+is_deeply $stash, {foo => 'bar'}, 'return a hash reference';
 
 # Replace
 $c->stash(foo => 'baz');
@@ -74,7 +74,7 @@ is_deeply $c->stash, {}, 'elements can be deleted';
 # Set via hash
 $c->stash({a => 1, b => 2});
 $stash = $c->stash;
-is_deeply $stash, {a => 1, b => 2}, 'set via hashref';
+is_deeply $stash, {a => 1, b => 2}, 'set via hash reference';
 
 # Override captures
 is $c->param('foo'), undef, 'no value';

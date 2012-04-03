@@ -119,7 +119,7 @@ sub path_for {
     # Even
     else {
 
-      # Name and hashref
+      # Name and hash
       if (ref $_[1] eq 'HASH') { ($name, $values) = (shift, shift) }
 
       # Just values

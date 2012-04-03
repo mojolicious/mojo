@@ -756,8 +756,8 @@ C<url_for>.
 This is a wrapper around L<Mojolicious::Renderer/"render"> exposing pretty
 much all functionality provided by it. It will set a default template to use
 based on the controller and action name or fall back to the route name. You
-can call it with a hash of options which can be preceded by an optional
-template name.
+can call it with a hash or hash reference of options which can be preceded by
+an optional template name.
 
 =head2 C<render_content>
 

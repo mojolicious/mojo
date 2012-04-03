@@ -207,10 +207,10 @@ hash or a hash reference with attribute values.
   BaseSubClass->attr([qw/name1 name2 name3/] => 'foo');
   BaseSubClass->attr([qw/name1 name2 name3/] => sub {...});
 
-Create attributes. An array can be used to create more than one attribute.
-Pass an optional second argument to set a default value, it should be a
-constant or a sub reference. The sub reference will be excuted at accessor
-read time if there's no set value.
+Create attributes. An array reference can be used to create more than one
+attribute. Pass an optional second argument to set a default value, it should
+be a constant or a sub reference. The sub reference will be excuted at
+accessor read time if there's no set value.
 
 =head1 DEBUGGING
 

@@ -352,7 +352,7 @@ Shortcut for the C<Expires> header.
 
   $headers = $headers->from_hash({'Content-Type' => 'text/html'});
 
-Parse headers from a hash.
+Parse headers from a hash reference.
 
 =head2 C<header>
 
@@ -526,14 +526,14 @@ Shortcut for the C<Status> header.
   my $hash = $headers->to_hash;
   my $hash = $headers->to_hash(1);
 
-Format headers as a hash, nested arrays to represent multi line values are
-disabled by default.
+Turn headers into hash reference, nested array references to represent multi
+line values are disabled by default.
 
 =head2 C<to_string>
 
   my $string = $headers->to_string;
 
-Format headers suitable for HTTP 1.1 messages.
+Turn headers into a string, suitable for HTTP 1.1 messages.
 
 =head2 C<trailer>
 

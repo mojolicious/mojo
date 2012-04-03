@@ -2380,7 +2380,8 @@ This file documents the revision history for Perl extension Mojolicious.
   - Added proper home detection to Mojo itself. (charsbar)
   - Fixed a bug where errors got cached in the router. (charsbar)
   - Updated error handling in MojoX::Dispatcher::Static.
-  - Fixed Mojo::Message::Request::cookies() to always return a arrayref.
+  - Fixed Mojo::Message::Request::cookies() to always return an array
+    reference.
   - Fixed url_for to support references. (vti)
   - Fixed unescaping of captures. (vti)
   - Fixed typos. (uwe)

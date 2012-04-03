@@ -405,8 +405,8 @@ L<Mojolicious::Controller/"render"> for a more user-friendly interface.
     handler  => 'epl'
   });
 
-Builds a template name based on an options hash with C<template>, C<format>
-and C<handler>, usually used by handlers.
+Builds a template name based on an options hash reference with C<template>,
+C<format> and C<handler>, usually used by handlers.
 
 =head2 C<template_path>
 
@@ -416,8 +416,8 @@ and C<handler>, usually used by handlers.
     handler  => 'epl'
   });
 
-Builds a full template path based on an options hash with C<template>,
-C<format> and C<handler>, usually used by handlers.
+Builds a full template path based on an options hash reference with
+C<template>, C<format> and C<handler>, usually used by handlers.
 
 =head1 SEE ALSO
 

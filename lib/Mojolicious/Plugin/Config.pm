@@ -28,7 +28,7 @@ sub parse {
   no warnings;
   die qq/Couldn't parse config file "$file": $@/
     unless my $config = eval "sub app { \$app }; $content";
-  die qq/Config file "$file" did not return a hashref.\n/
+  die qq/Config file "$file" did not return a hash reference.\n/
     unless (ref $config || '') eq 'HASH';
 
   return $config;

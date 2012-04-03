@@ -284,6 +284,9 @@ my %REVERSE_ENTITIES = reverse %ENTITIES;
 # "apos"
 $ENTITIES{apos} = 39;
 
+# Entities regex for html_unescape
+my $ENTITIES_RE = qr/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}))|([A-Za-z]{1,8}));/;
+
 # Encode cache
 my %ENCODE;
 
@@ -403,22 +406,7 @@ sub html_escape {
 #  Just relax and it'll come, son."
 sub html_unescape {
   my $string = shift;
-  $string =~ s/
-    &
-    (?:
-      \#
-      (
-        (?:
-          \d{1,7}             # Number
-        |
-          x[0-9A-Fa-f]{1,6}   # Hex
-        )
-      )
-    |
-      ([A-Za-z]{1,8})         # Name
-    )
-    ;
-  /_unescape($1, $2)/gex;
+  $string =~ s/$ENTITIES_RE/_unescape($1, $2)/ge;
   return $string;
 }
 

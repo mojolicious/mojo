@@ -66,7 +66,7 @@ sub form {
   # Multipart
   $headers->content_type('multipart/form-data') if $multipart;
   if (($headers->content_type || '') eq 'multipart/form-data') {
-    my $parts = $self->_multipart($params->to_hash, $encoding);
+    my $parts = $self->_multipart($encoding, $params->to_hash);
     $req->content(
       Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
   }
@@ -198,7 +198,7 @@ sub websocket {
 }
 
 sub _multipart {
-  my ($self, $form, $encoding) = @_;
+  my ($self, $encoding, $form) = @_;
 
   # Parts
   my @parts;

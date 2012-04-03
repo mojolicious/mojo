@@ -21,7 +21,6 @@ my $CLASS_ID_RE = qr/
     (?:\#((?:\\\#|[^\.\#])+))   # ID
   )
 /x;
-my $ELEMENT_RE      = qr/^((?:\\\.|\\\#|[^\.\#])+)/;
 my $PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
 my $TOKEN_RE        = qr/
   (\s*,\s*)?                            # Separator
@@ -142,7 +141,7 @@ sub _compile {
 
     # Element
     my $tag = '*';
-    $element =~ s/$ELEMENT_RE// and $tag = $self->_unescape($1);
+    $element =~ s/^((?:\\\.|\\\#|[^\.\#])+)// and $tag = $self->_unescape($1);
 
     # Tag
     push @$selector, ['tag', $tag];

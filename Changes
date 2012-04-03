@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.73  2012-04-04
+2.73  2012-04-03
   - Improved documentation.
   - Improved tests.
   - Fixed multiple progress event bugs in Mojo::Message.

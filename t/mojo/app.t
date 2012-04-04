@@ -77,9 +77,7 @@ $app->routes->post(
 
     my $params = $self->req->params->to_hash;
     my $chunks = [];
-    for my $key (sort keys %$params) {
-      push @$chunks, $params->{$key};
-    }
+    for my $key (sort keys %$params) { push @$chunks, $params->{$key} }
 
     my $cb;
     $cb = sub {

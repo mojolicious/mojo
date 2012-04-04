@@ -20,9 +20,7 @@ under sub {
 get '/cookies' => sub {
   my $self   = shift;
   my $params = $self->req->params->to_hash;
-  for my $key (sort keys %$params) {
-    $self->cookie($key, $params->{$key});
-  }
+  for my $key (sort keys %$params) { $self->cookie($key, $params->{$key}) }
   $self->render_text('nomnomnom');
 };
 

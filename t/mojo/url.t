@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 380;
+use Test::More tests => 387;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -326,6 +326,15 @@ is $url->ihost,  'xn--bcher-kva.ch', 'right internationalized host';
 is $url->port,   3000, 'right port';
 is $url->path,   '/foo', 'right path';
 is "$url", 'http://xn--bcher-kva.ch:3000/foo', 'right format';
+$url = Mojo::URL->new('http://bücher.bücher.ch:3000/foo');
+ok $url->is_abs, 'is absolute';
+is $url->scheme, 'http', 'right scheme';
+is $url->host,   'bücher.bücher.ch', 'right host';
+is $url->ihost,  'xn--bcher-kva.xn--bcher-kva.ch',
+  'right internationalized host';
+is $url->port, 3000,   'right port';
+is $url->path, '/foo', 'right path';
+is "$url", 'http://xn--bcher-kva.xn--bcher-kva.ch:3000/foo', 'right format';
 
 # IDNA (snowman)
 $url = Mojo::URL->new('http://☃.net/');

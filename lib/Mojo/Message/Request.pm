@@ -98,9 +98,9 @@ sub param {
 }
 
 sub params {
-  my $self   = shift;
-  my $params = Mojo::Parameters->new;
-  return $params->merge($self->body_params, $self->query_params);
+  my $self = shift;
+  my $p    = Mojo::Parameters->new;
+  return $p->merge($self->body_params, $self->query_params);
 }
 
 sub parse {
@@ -427,7 +427,7 @@ Access C<GET> and C<POST> parameters.
 
 =head2 C<params>
 
-  my $params = $req->params;
+  my $p = $req->params;
 
 All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object.
 
@@ -451,7 +451,7 @@ Proxy URL for message.
 
 =head2 C<query_params>
 
-  my $params = $req->query_params;
+  my $p = $req->query_params;
 
 All C<GET> parameters, usually a L<Mojo::Parameters> object.
 

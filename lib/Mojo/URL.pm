@@ -72,34 +72,21 @@ sub clone {
 }
 
 sub ihost {
-  my ($self, $host) = @_;
+  my $self = shift;
 
-  # Generate host
-  if (defined $host) {
+  # Decode
+  return $self->host(join '.',
+    map { /^xn--(.+)$/ ? punycode_decode($_) : $_ } split /\./, shift)
+    if @_;
 
-    # Decode parts
-    my @decoded;
-    for my $part (split /\./, $_[1]) {
-      $part = punycode_decode $1 if $part =~ /^xn--(.+)$/;
-      push @decoded, $part;
-    }
-    $self->host(join '.', @decoded);
-
-    return $self;
-  }
-
-  # Host
-  return unless $host = $self->host;
+  # Check if host needs to be encoded
+  return unless my $host = $self->host;
   return $host unless $host =~ /[^\x00-\x7f]/;
 
-  # Encode parts
-  my @encoded;
-  for my $part (split /\./, $host || '') {
-    $part = 'xn--' . punycode_encode $part if $part =~ /[^\x00-\x7f]/;
-    push @encoded, $part;
-  }
-
-  return join '.', @encoded;
+  # Encode
+  return join '.',
+    map { /[^\x00-\x7f]/ ? ('xn--' . punycode_encode $_) : $_ } split /\./,
+    $host;
 }
 
 sub is_abs { shift->scheme }
@@ -109,13 +96,12 @@ sub parse {
   return $self unless $url;
 
   # Official regex
-  my ($scheme, $authority, $path, $query, $fragment) = $url
-    =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
-  $self->scheme($scheme);
-  $self->authority($authority);
-  $self->path->parse($path);
-  $self->query($query);
-  $self->fragment($fragment);
+  $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  $self->scheme($1);
+  $self->authority($2);
+  $self->path->parse($3);
+  $self->query($4);
+  $self->fragment($5);
 
   return $self;
 }
@@ -150,13 +136,11 @@ sub path {
 sub query {
   my $self = shift;
 
-  # Get parameters
+  # Old parameters
   return $self->{query} ||= Mojo::Parameters->new unless @_;
 
   # Replace with list
-  if (@_ > 1) {
-    $self->{query} = Mojo::Parameters->new(ref $_[0] ? @{$_[0]} : @_);
-  }
+  if (@_ > 1) { $self->{query} = Mojo::Parameters->new(@_) }
 
   # Merge with array
   elsif ((ref $_[0] || '') eq 'ARRAY') {

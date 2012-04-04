@@ -79,7 +79,7 @@ sub param {
 
 sub params {
   my ($self, $params) = @_;
-  if ($params) { $self->{params} = $params }
+  if ($params) { $self->{params} = $params and return $self }
   elsif (defined $self->{string}) { $self->parse }
   return $self->{params} ||= [];
 }
@@ -137,9 +137,8 @@ sub remove {
     if ($params->[$i] eq $name) { splice @$params, $i, 2 }
     else                        { $i += 2 }
   }
-  $self->params($params);
 
-  return $self;
+  return $self->params($params);
 }
 
 sub to_hash {
@@ -215,7 +214,7 @@ Mojo::Parameters - Parameter container
 
   use Mojo::Parameters;
 
-  my $params = Mojo::Parameters->new(foo => 'bar', baz => 23);
+  my $p = Mojo::Parameters->new(foo => 'bar', baz => 23);
 
 =head1 DESCRIPTION
 
@@ -227,15 +226,15 @@ L<Mojo::Parameters> implements the following attributes.
 
 =head2 C<charset>
 
-  my $charset = $params->charset;
-  $params     = $params->charset('UTF-8');
+  my $charset = $p->charset;
+  $p          = $p->charset('UTF-8');
 
 Charset used for decoding parameters, defaults to C<UTF-8>.
 
 =head2 C<pair_separator>
 
-  my $separator = $params->pair_separator;
-  $params       = $params->pair_separator(';');
+  my $separator = $p->pair_separator;
+  $p            = $p->pair_separator(';');
 
 Separator for parameter pairs, defaults to C<&>.
 
@@ -246,15 +245,15 @@ the following new ones.
 
 =head2 C<new>
 
-  my $params = Mojo::Parameters->new;
-  my $params = Mojo::Parameters->new('foo=b%3Bar&baz=23');
-  my $params = Mojo::Parameters->new(foo => 'b;ar', baz => 23);
+  my $p = Mojo::Parameters->new;
+  my $p = Mojo::Parameters->new('foo=b%3Bar&baz=23');
+  my $p = Mojo::Parameters->new(foo => 'b;ar', baz => 23);
 
 Construct a new L<Mojo::Parameters> object.
 
 =head2 C<append>
 
-  $params = $params->append(foo => 'ba;r');
+  $p = $p->append(foo => 'ba;r');
 
 Append parameters.
 
@@ -263,42 +262,42 @@ Append parameters.
 
 =head2 C<clone>
 
-  my $params2 = $params->clone;
+  my $p2 = $p->clone;
 
 Clone parameters.
 
 =head2 C<merge>
 
-  $params = $params->merge($params2, $params3);
+  $p = $p->merge($p2, $p3);
 
 Merge parameters.
 
 =head2 C<param>
 
-  my @names = $params->param;
-  my $foo   = $params->param('foo');
-  my @foo   = $params->param('foo');
-  my $foo   = $params->param(foo => 'ba;r');
-  my @foo   = $params->param(foo => qw/ba;r ba;z/);
+  my @names = $p->param;
+  my $foo   = $p->param('foo');
+  my @foo   = $p->param('foo');
+  my $foo   = $p->param(foo => 'ba;r');
+  my @foo   = $p->param(foo => qw/ba;r ba;z/);
 
 Check and replace parameter values.
 
 =head2 C<params>
 
-  my $parameters = $params->params;
-  $params        = $params->params([foo => 'b;ar', baz => 23]);
+  my $params = $p->params;
+  $p         = $p->params([foo => 'b;ar', baz => 23]);
 
 Parsed parameters.
 
 =head2 C<parse>
 
-  $params = $params->parse('foo=b%3Bar&baz=23');
+  $p = $p->parse('foo=b%3Bar&baz=23');
 
 Parse parameters.
 
 =head2 C<remove>
 
-  $params = $params->remove('foo');
+  $p = $p->remove('foo');
 
 Remove parameters.
 
@@ -307,7 +306,7 @@ Remove parameters.
 
 =head2 C<to_hash>
 
-  my $hash = $params->to_hash;
+  my $hash = $p->to_hash;
 
 Turn parameters into a hash reference.
 
@@ -316,7 +315,7 @@ Turn parameters into a hash reference.
 
 =head2 C<to_string>
 
-  my $string = $params->to_string;
+  my $string = $p->to_string;
 
 Turn parameters into a string.
 

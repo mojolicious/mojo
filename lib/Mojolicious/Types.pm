@@ -33,20 +33,23 @@ has types => sub {
 
 # "Magic. Got it."
 sub detect {
-  my ($self, $accept) = @_;
+  my ($self, $accept, $all) = @_;
+  $accept ||= '';
+
+  # First MIME type only
+  return [] unless $all || $accept =~ /^[^,]+?(?:\;[^,]*)*$/;
 
   # Detect extensions from MIME type
-  return [] unless (($accept || '') =~ /^([^,]+?)(?:\;[^,]*)*$/);
-  my $pattern = $1;
-  my @exts;
-  my $types = $self->types;
-  for my $ext (sort keys %$types) {
-    my $type = quotemeta $types->{$ext};
-    $type =~ s/\\\;.*$//;
-    push @exts, $ext if $pattern =~ /^$type$/i;
+  my %results;
+  my $reverse = $self->_reverse;
+  for my $type (split /,/, $accept) {
+    next unless $type =~ /^\s*([^;]+?)\s*(?:\;.*)*?$/;
+    next unless my $exts = $reverse->{lc $1};
+    my $quality = $type =~ /\;\s*q=(\d+(?:\.\d+)?)/ ? $1 : 1;
+    $results{$_} = $quality for @$exts;
   }
 
-  return \@exts;
+  return [sort { $results{$b} <=> $results{$a} } sort keys %results];
 }
 
 sub type {
@@ -54,6 +57,22 @@ sub type {
   return $self->types->{$ext || ''} unless $type;
   $self->types->{$ext} = $type;
   return $self;
+}
+
+sub _reverse {
+  my $self = shift;
+
+  # Index types
+  unless ($self->{reverse}) {
+    my $types = $self->types;
+    for my $ext (keys %$types) {
+      my $type = lc $types->{$ext};
+      $type =~ s/\;.*$//;
+      push @{$self->{reverse}->{$type}}, $ext;
+    }
+  }
+
+  return $self->{reverse};
 }
 
 1;
@@ -91,9 +110,11 @@ the following ones.
 
 =head2 C<detect>
 
-  my $extensions = $types->detect('application/json;q=9');
+  my $first = $types->detect('application/json;q=9');
+  my $all   = $types->detect('application/json;q=9', 1);
 
-Detect file extensions from C<Accept> header value.
+Detect file extensions from C<Accept> header value, detection of more than
+one MIME type is disabled by default.
 
 =head2 C<type>
 

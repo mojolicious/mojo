@@ -386,24 +386,21 @@ sub respond_to {
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # Detect formats
-  my @formats;
   my $app = $self->app;
-  push @formats, @{$app->types->detect($self->req->headers->accept)};
+  my @formats =
+    @{$app->types->detect($self->req->headers->accept, $self->req->is_xhr)};
   my $stash = $self->stash;
   unless (@formats) {
-    if (my $format = $stash->{format} || $self->req->param('format')) {
-      push @formats, $format;
-    }
-    else { push @formats, $app->renderer->default_format }
+    my $format = $stash->{format} || $self->req->param('format');
+    push @formats, $format ? $format : $app->renderer->default_format;
   }
 
   # Find target
   my $target;
   for my $format (@formats) {
-    if ($target = $args->{$format}) {
-      $stash->{format} = $format;
-      last;
-    }
+    next unless $target = $args->{$format};
+    $stash->{format} = $format;
+    last;
   }
 
   # Fallback
@@ -883,7 +880,9 @@ L<Mojo::Message::Response> object.
 
 Automatically select best possible representation for resource from C<Accept>
 request header, C<format> stash value or C<format> GET/POST parameter,
-defaults to rendering an empty C<204> response.
+defaults to rendering an empty C<204> response. Multiple MIME types are only
+allowed for Ajax requests, which are determined by the presence of a
+C<X-Requested-With> request header with the value C<XMLHttpRequest>.
 
   $c->respond_to(
     json => sub { $c->render_json({just => 'works'}) },

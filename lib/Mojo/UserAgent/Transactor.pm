@@ -279,9 +279,10 @@ implements the following new ones.
   my $tx = $t->form('http://kraih.com' => {a => 'b'} => {DNT => 1});
   my $tx = $t->form('http://kraih.com', 'UTF-8', {a => 'b'}, {DNT => 1});
 
-Versatile L<Mojo::Transaction::HTTP> builder for form requests.
+Versatile L<Mojo::Transaction::HTTP> builder for C<POST> requests with form
+data.
 
-  # Inspect request
+  # Inspect generated request
   say $t->form('mojolicio.us' => {a => [1, 2, 3]})->req->to_string;
 
   # Submit form and stream response
@@ -329,6 +330,9 @@ or C<307> redirect response if possible.
   my $tx = $t->tx(POST => 'http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
+
+  # Inspect generated request
+  say $t->tx(GET => 'mojolicio.us' => {DNT => 1} => 'Bye!')->req->to_string;
 
   # Streaming response
   my $tx = $t->tx(GET => 'http://mojolicio.us');

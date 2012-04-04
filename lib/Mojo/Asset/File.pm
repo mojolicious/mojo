@@ -55,11 +55,13 @@ sub DESTROY {
 
 sub add_chunk {
   my ($self, $chunk) = @_;
+
   my $handle = $self->handle;
   $handle->sysseek(0, SEEK_END);
   $chunk //= '';
   croak "Can't write to asset: $!"
     unless defined $handle->syswrite($chunk, length $chunk);
+
   return $self;
 }
 
@@ -82,10 +84,7 @@ sub contains {
 
   # Moving window search
   while ($offset <= $end) {
-    if (defined $range) {
-      $pattern_size = $end + 1 - $offset;
-      return -1 if $pattern_size <= 0;
-    }
+    return -1 if defined $range && ($pattern_size = $end + 1 - $offset) <= 0;
     $read = $handle->sysread(my $buffer, $pattern_size);
     $offset += $read;
     $window .= $buffer;
@@ -138,14 +137,12 @@ sub move_to {
 }
 
 sub size {
-  my $self = shift;
-  return 0 unless defined(my $file = $self->path);
+  return 0 unless defined(my $file = shift->path);
   return -s $file;
 }
 
 sub slurp {
-  my $self   = shift;
-  my $handle = $self->handle;
+  my $handle = shift->handle;
   $handle->sysseek(0, SEEK_SET);
   my $content = '';
   while ($handle->sysread(my $buffer, 131072)) { $content .= $buffer }

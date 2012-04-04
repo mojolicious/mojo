@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 32;
+use Test::More tests => 34;
 
 # "Your mistletoe is no match for my *tow* missile."
 use Mojolicious::Types;
@@ -43,6 +43,11 @@ is_deeply $t->detect('text/html;q=0.8,*/*;q=0.9'), [], 'no formats';
 
 # Multiple MIME types
 is_deeply $t->detect('text/html;q=0.9,text/plain', 1), ['txt', 'htm', 'html'],
+  'right formats';
+is_deeply $t->detect('Text/Html;q=0.9,Text/Plain', 1), ['txt', 'htm', 'html'],
+  'right formats';
+is_deeply $t->detect('TEXT/HTML;v=9;q=0.9,TEXT/PLAIN', 1),
+  ['txt', 'htm', 'html'],
   'right formats';
 is_deeply $t->detect('application/json, text/javascript, */*; q=0.01', 1),
   ['json'], 'right formats';

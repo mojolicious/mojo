@@ -111,7 +111,7 @@ the following ones.
 =head2 C<detect>
 
   my $first = $types->detect('application/json;q=9');
-  my $all   = $types->detect('application/json;q=9', 1);
+  my $all   = $types->detect('application/json;q=9,text/plain', 1);
 
 Detect file extensions from C<Accept> header value, detection of more than
 one MIME type is disabled by default.

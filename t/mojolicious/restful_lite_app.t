@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 345;
+use Test::More tests => 333;
 
 # "Woohoo, time to go clubbin'! Baby seals here I come!"
 use Mojolicious::Lite;
@@ -426,20 +426,3 @@ $t->get_ok('/rest.html' => {Accept => $chrome})->status_is(200)
 $t->get_ok('/rest?format=html' => {Accept => $chrome})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');
-
-# GET /rest (not Ajax)
-my $ajax = 'text/html,text/xml;q=1.1';
-$t->get_ok('/rest' => {Accept => $ajax})->status_is(200)
-  ->content_type_is('text/html;charset=UTF-8')
-  ->content_is('<html><body>works');
-
-# GET /rest (Ajax)
-$t->get_ok(
-  '/rest' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})
-  ->status_is(200)->content_type_is('text/xml')
-  ->content_is('<just>works</just>');
-
-# GET /rest (Ajax with html format and query)
-$t->get_ok('/rest.html?format=html' =>
-    {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})->status_is(200)
-  ->content_type_is('text/xml')->content_is('<just>works</just>');

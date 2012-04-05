@@ -167,9 +167,9 @@ your applications home directory, otherwise libraries might not be found.
 
   $ plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
-Because C<plackup> uses a weird trick to load your script, L<Mojolicious> is
-not always able to detect the applications home directory, if that's the case
-you can simply use the C<MOJO_HOME> environment variable. Also note that
+Because of the way C<plackup> loads your script, L<Mojolicious> is not always
+able to detect the applications home directory, if that's the case you can
+simply use the C<MOJO_HOME> environment variable. Also note that
 C<app-E<gt>start> needs to be the last Perl statement in the application
 script for the same reason.
 
@@ -612,7 +612,27 @@ which can be combined to solve some of hardest problems in web development.
 
 Internally the L<Mojo::IOLoop> reactor can use multiple event loop backends,
 L<EV> for example will be automatically used if installed. Which in turn
-allows L<AnyEvent> to just work.
+allows event loops like L<IO::Async> to just work.
+
+  use Mojolicious::Lite;
+  use EV;
+  use IO::Async::Loop::EV;
+  use IO::Async::Timer::Absolute;
+
+  my $loop = IO::Async::Loop::EV->new;
+
+  # Wait 3 seconds before rendering a response
+  get '/' => sub {
+    my $self = shift;
+    $loop->add(IO::Async::Timer::Absolute->new(
+      time      => time + 3,
+      on_expire => sub { $self->render(text => 'Delayed by 3 seconds!') }
+    ));
+  };
+
+  app->start;
+
+Same for L<AnyEvent>.
 
   use Mojolicious::Lite;
   use EV;

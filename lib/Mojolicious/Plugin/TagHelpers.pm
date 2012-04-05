@@ -210,7 +210,7 @@ sub register {
       my ($c, $name) = (shift, shift);
 
       # Content
-      my $cb = ref $_[-1] eq 'CODE' ? pop @_ : sub {''};
+      my $cb = ref $_[-1] eq 'CODE' ? pop : sub {''};
       my $content = @_ % 2 ? shift : undef;
 
       # Make sure content is wrapped
@@ -261,7 +261,7 @@ sub _tag {
   my ($self, $name) = (shift, shift);
 
   # Content
-  my $cb = ref $_[-1] eq 'CODE' ? pop @_ : undef;
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   my $content = @_ % 2 ? pop : undef;
 
   # Start tag

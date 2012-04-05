@@ -163,7 +163,7 @@ sub tx {
   ref $url ? $req->url($url) : $req->url->parse($url);
 
   # Body
-  $req->body(pop @_)
+  $req->body(pop)
     if @_ & 1 == 1 && ref $_[0] ne 'HASH' || ref $_[-2] eq 'HASH';
 
   # Headers

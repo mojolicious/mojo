@@ -35,14 +35,13 @@ sub client {
   my $self = shift;
   $self = $self->singleton unless ref $self;
   my $cb = pop;
-  my $args = ref $_[0] ? $_[0] : {@_};
 
   # Make sure garbage gets collected
   $self->_cleaner;
 
   # New client
   my $client = $self->client_class->new;
-  my $id     = $args->{id} || $self->_id;
+  my $id     = $self->_id;
   my $c      = $self->{connections}->{$id} ||= {};
   $c->{client} = $client;
   weaken $client->reactor($self->reactor)->{reactor};
@@ -57,7 +56,7 @@ sub client {
       my $c = $self->{connections}->{$id};
       delete $c->{client};
       my $stream = $c->{stream} = $self->stream_class->new($handle);
-      $self->stream($stream => $id);
+      $self->_stream($stream => $id);
 
       # Connected
       $self->$cb(undef, $stream);
@@ -71,7 +70,7 @@ sub client {
   );
 
   # Connect
-  $client->connect($args);
+  $client->connect(@_);
 
   return $id;
 }
@@ -181,25 +180,13 @@ sub stream {
   # Make sure garbage gets collected
   $self->_cleaner;
 
-  # Find stream for id
-  my $stream = shift;
-  unless (blessed $stream) {
-    return unless my $c = $self->{connections}->{$stream};
-    return $c->{stream};
-  }
-
   # Connect stream with reactor
-  my $id = shift || $self->_id;
-  my $c = $self->{connections}->{$id} ||= {};
-  $c->{stream} = $stream;
-  weaken $stream->reactor($self->reactor)->{reactor};
+  my $stream = shift;
+  return $self->_stream($stream, $self->_id) if blessed $stream;
 
-  # Events
-  weaken $self;
-  $stream->on(close => sub { $self->{connections}->{$id}->{finish} = 1 });
-  $stream->start;
-
-  return $id;
+  # Find stream for id
+  return unless my $c = $self->{connections}->{$stream};
+  return $c->{stream};
 }
 
 sub timer {
@@ -283,6 +270,21 @@ sub _remove {
     delete(($self->{connections}->{$id} || {})->{stream});
     delete $self->{connections}->{$id};
   }
+}
+
+sub _stream {
+  my ($self, $stream, $id) = @_;
+
+  # Connect stream with reactor
+  $self->{connections}->{$id}->{stream} = $stream;
+  weaken $stream->reactor($self->reactor)->{reactor};
+
+  # Events
+  weaken $self;
+  $stream->on(close => sub { $self->{connections}->{$id}->{finish} = 1 });
+  $stream->start;
+
+  return $id;
 }
 
 1;

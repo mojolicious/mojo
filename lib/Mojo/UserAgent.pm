@@ -247,10 +247,11 @@ sub _connect_proxy {
         $old->req->proxy(undef);
         my $loop   = $self->_loop;
         my $handle = $loop->stream($id)->steal_handle;
+        my $c      = delete $self->{connections}->{$id};
+        $loop->remove($id);
         weaken $self;
-        return $loop->client(
+        $id = $loop->client(
           handle   => $handle,
-          id       => $id,
           timeout  => $self->connect_timeout,
           tls      => 1,
           tls_ca   => $self->ca,
@@ -264,10 +265,11 @@ sub _connect_proxy {
             $self->_events($stream, $id);
 
             # Start real transaction
-            $old->connection($tx->connection);
+            $old->connection($id);
             $self->_start($old, $cb);
           }
         );
+        return $self->{connections}->{$id} = $c;
       }
 
       # Start real transaction

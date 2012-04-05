@@ -37,7 +37,7 @@ sub add {
 
   # Add lines
   push @{$self->{headers}->{$lcname}},
-    map { (ref $_ || '') eq 'ARRAY' ? $_ : [$_] } @_;
+    map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
 
   return $self;
 }

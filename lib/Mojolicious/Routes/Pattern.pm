@@ -184,7 +184,7 @@ sub _compile {
 # "Interesting... Oh no wait, the other thing, tedious."
 sub _compile_req {
   my $req = shift;
-  return "($req)" if !ref $req || ref $req ne 'ARRAY';
+  return "($req)" if ref $req ne 'ARRAY';
   return '(' . join('|', map {quotemeta} reverse sort @$req) . ')';
 }
 

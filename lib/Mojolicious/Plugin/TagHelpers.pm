@@ -70,7 +70,7 @@ sub register {
 
       # CDATA
       my $cb = sub {''};
-      if ((ref $_[-1] || '') eq 'CODE') {
+      if (ref $_[-1] eq 'CODE') {
         my $old = pop;
         $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
       }
@@ -173,7 +173,7 @@ sub register {
 
       # CDATA
       my $cb;
-      if ((ref $_[-1] || '') eq 'CODE') {
+      if (ref $_[-1] eq 'CODE') {
         my $old = pop;
         $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
       }
@@ -210,7 +210,7 @@ sub register {
       my ($c, $name) = (shift, shift);
 
       # Content
-      my $cb = defined $_[-1] && ref($_[-1]) eq 'CODE' ? pop @_ : sub {''};
+      my $cb = ref $_[-1] eq 'CODE' ? pop @_ : sub {''};
       my $content = @_ % 2 ? shift : undef;
 
       # Make sure content is wrapped
@@ -261,7 +261,7 @@ sub _tag {
   my ($self, $name) = (shift, shift);
 
   # Content
-  my $cb = defined $_[-1] && ref($_[-1]) eq 'CODE' ? pop @_ : undef;
+  my $cb = ref $_[-1] eq 'CODE' ? pop @_ : undef;
   my $content = @_ % 2 ? pop : undef;
 
   # Start tag

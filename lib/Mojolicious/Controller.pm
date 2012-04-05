@@ -147,25 +147,25 @@ sub param {
   my ($self, $name) = (shift, shift);
 
   # List names
-  my $p = $self->stash->{'mojo.captures'} ||= {};
+  my $captures = $self->stash->{'mojo.captures'} ||= {};
   my $req = $self->req;
   unless (defined $name) {
     my %seen;
     my @keys = grep { !$seen{$_}++ } $req->param;
     push @keys, grep { !$seen{$_}++ } map { $_->name } @{$req->uploads};
-    push @keys, grep { !$RESERVED{$_} && !$seen{$_}++ } keys %$p;
+    push @keys, grep { !$RESERVED{$_} && !$seen{$_}++ } keys %$captures;
     return sort @keys;
   }
 
   # Override values
   if (@_) {
-    $p->{$name} = @_ > 1 ? [@_] : $_[0];
+    $captures->{$name} = @_ > 1 ? [@_] : $_[0];
     return $self;
   }
 
   # Captured unreserved values
-  if (!$RESERVED{$name} && defined(my $v = $p->{$name})) {
-    return (ref $v || '') eq 'ARRAY' ? wantarray ? @$v : $$v[0] : $v;
+  if (!$RESERVED{$name} && defined(my $value = $captures->{$name})) {
+    return ref $value eq 'ARRAY' ? wantarray ? @$value : $$value[0] : $value;
   }
 
   # Upload
@@ -555,14 +555,14 @@ sub url_for {
 
 sub write {
   my ($self, $chunk, $cb) = @_;
-  ($cb, $chunk) = ($chunk, undef) if (ref $chunk || '') eq 'CODE';
+  ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
   $self->res->write($chunk, sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered;
 }
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
-  ($cb, $chunk) = ($chunk, undef) if (ref $chunk || '') eq 'CODE';
+  ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
   $self->res->write_chunk($chunk, sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered;
 }

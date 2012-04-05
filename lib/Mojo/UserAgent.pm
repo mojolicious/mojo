@@ -33,7 +33,7 @@ has transactor => sub { Mojo::UserAgent::Transactor->new };
   for my $name (qw/DELETE GET HEAD OPTIONS PATCH POST PUT/) {
     *{__PACKAGE__ . '::' . lc($name)} = sub {
       my $self = shift;
-      my $cb = (ref $_[-1] eq 'CODE') ? pop : undef;
+      my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
       $self->start($self->build_tx($name, @_), $cb);
     };
   }
@@ -89,7 +89,7 @@ sub need_proxy {
 
 sub post_form {
   my $self = shift;
-  my $cb = (ref $_[-1] eq 'CODE') ? pop : undef;
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   $self->start($self->build_form_tx(@_), $cb);
 }
 
@@ -127,7 +127,7 @@ sub start {
 
 sub websocket {
   my $self = shift;
-  my $cb = (ref $_[-1] eq 'CODE') ? pop : undef;
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   $self->start($self->build_websocket_tx(@_), $cb);
 }
 

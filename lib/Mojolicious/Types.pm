@@ -93,7 +93,8 @@ the following ones.
 
   my $ext = $types->detect('application/json;q=9');
 
-Detect file extensions from C<Accept> header value.
+Detect file extensions from C<Accept> header value. Unspecific values that
+contain more than one MIME type are ignored.
 
 =head2 C<type>
 

@@ -15,9 +15,6 @@ use Mojo::Util qw/encode url_escape/;
 sub form {
   my ($self, $url) = (shift, shift);
 
-  # Callback
-  my $cb = pop @_ if (ref $_[-1] || '') eq 'CODE';
-
   # Form
   my $encoding = shift;
   my $form = ref $encoding ? $encoding : shift;
@@ -77,7 +74,7 @@ sub form {
     $req->body($p->to_string);
   }
 
-  return wantarray ? ($tx, $cb) : $tx;
+  return $tx;
 }
 
 # "This kid's a wonder!
@@ -165,9 +162,6 @@ sub tx {
   $url = "http://$url" unless $url =~ m#^/|\://#;
   ref $url ? $req->url($url) : $req->url->parse($url);
 
-  # Callback
-  my $cb = pop @_ if (ref $_[-1] || '') eq 'CODE';
-
   # Body
   $req->body(pop @_)
     if @_ & 1 == 1 && ref $_[0] ne 'HASH' || ref $_[-2] eq 'HASH';
@@ -175,7 +169,7 @@ sub tx {
   # Headers
   $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
 
-  return wantarray ? ($tx, $cb) : $tx;
+  return $tx;
 }
 
 # "She found my one weakness... that I'm weak!"
@@ -183,7 +177,7 @@ sub websocket {
   my $self = shift;
 
   # New WebSocket
-  my ($tx, $cb) = $self->tx(GET => @_);
+  my $tx  = $self->tx(GET => @_);
   my $req = $tx->req;
   my $abs = $req->url->to_abs;
   if (my $scheme = $abs->scheme) {
@@ -194,7 +188,7 @@ sub websocket {
   Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1)
     ->client_handshake;
 
-  return wantarray ? ($tx, $cb) : $tx;
+  return $tx;
 }
 
 sub _multipart {

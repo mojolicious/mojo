@@ -138,7 +138,7 @@ looks very similar to the Nginx one above.
     </Proxy>
     ProxyRequests Off
     ProxyPreserveHost On
-    ProxyPass / http://localhost:8080 keepalive=On
+    ProxyPass / http://localhost:8080/ keepalive=On
     ProxyPassReverse / http://localhost:8080/
     RequestHeader set X-Forwarded-HTTPS "0"
   </VirtualHost>

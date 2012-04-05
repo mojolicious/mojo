@@ -365,9 +365,9 @@ Direct access to the C<CGI> or C<PSGI> environment hash if available.
 =head2 C<method>
 
   my $method = $req->method;
-  $req       = $req->method('GET');
+  $req       = $req->method('POST');
 
-HTTP request method.
+HTTP request method, defaults to C<GET>.
 
 =head2 C<url>
 

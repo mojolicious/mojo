@@ -195,9 +195,7 @@ sub _connect {
   }
 
   # CONNECT request to proxy required
-  return
-    if ($tx->req->method || '') ne 'CONNECT'
-    && $self->_connect_proxy($tx, $cb);
+  return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
 
   # Connect
   warn "NEW CONNECTION ($scheme:$host:$port)\n" if DEBUG;
@@ -406,8 +404,7 @@ sub _remove {
 
   # Keep connection alive
   $self->_cache(join(':', $self->transactor->peer($tx)), $id)
-    unless (($tx->req->method || '') eq 'CONNECT'
-    && ($tx->res->code || '') eq '200');
+    unless $tx->req->method eq 'CONNECT' && ($tx->res->code || '') eq '200';
 }
 
 sub _redirect {

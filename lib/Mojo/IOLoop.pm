@@ -177,6 +177,9 @@ sub stream {
   my $self = shift;
   $self = $self->singleton unless ref $self;
 
+  # Make sure garbage gets collected
+  $self->_cleaner;
+
   # Connect stream with reactor
   my $stream = shift;
   return $self->_stream($stream, $self->_id) if blessed $stream;
@@ -271,9 +274,6 @@ sub _remove {
 
 sub _stream {
   my ($self, $stream, $id) = @_;
-
-  # Make sure garbage gets collected
-  $self->_cleaner;
 
   # Connect stream with reactor
   $self->{connections}->{$id}->{stream} = $stream;

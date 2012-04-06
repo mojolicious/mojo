@@ -24,8 +24,7 @@ has handle => sub {
   # Open new or temporary file
   my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
   my $name = $path // $base;
-  my $fh;
-  until (sysopen $fh, $name, O_CREAT | O_EXCL | O_RDWR) {
+  until ($handle->open($name, O_CREAT | O_EXCL | O_RDWR)) {
     croak qq/Can't open file "$name": $!/
       if defined $path || $! != $!{EEXIST};
     $name = "$base." . md5_sum(time . $$ . rand 9999999);
@@ -34,9 +33,6 @@ has handle => sub {
 
   # Enable automatic cleanup
   $self->cleanup(1) unless defined $self->cleanup;
-
-  # Open for read/write access
-  $handle->fdopen(fileno($fh), "+>") or croak qq/Can't open file "$name": $!/;
 
   return $handle;
 };

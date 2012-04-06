@@ -2,7 +2,7 @@ package Mojo::Asset::Memory;
 use Mojo::Base 'Mojo::Asset';
 
 use Carp 'croak';
-use IO::File;
+use IO::Handle;
 use Mojo::Asset::File;
 
 has 'auto_upgrade';
@@ -48,8 +48,7 @@ sub get_chunk {
 
 sub move_to {
   my ($self, $path) = @_;
-  croak qq/Can't open file "$path": $!/
-    unless my $file = IO::File->new("> $path");
+  croak qq/Can't open file "$path": $!/ unless open my $file, '>', $path;
   croak qq/Can't write to file "$path": $!/
     unless defined $file->syswrite($self->{content});
   return $self;

@@ -1,7 +1,6 @@
 package Mojolicious::Plugin::PODRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use IO::File;
 use Mojo::Asset::File;
 use Mojo::ByteStream 'b';
 use Mojo::DOM;
@@ -54,7 +53,7 @@ sub register {
         unless $path && -r $path;
 
       # Turn POD into HTML
-      my $file = IO::File->new("< $path");
+      open my $file, '<', $path;
       my $html = _pod_to_html(join '', <$file>);
 
       # Rewrite links

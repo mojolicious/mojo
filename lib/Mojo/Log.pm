@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
-use IO::File;
+use IO::Handle;
 
 has handle => sub {
   my $self = shift;
@@ -11,8 +11,7 @@ has handle => sub {
   # File
   if (my $path = $self->path) {
     croak qq/Can't open log file "$path": $!/
-      unless my $file = IO::File->new(">> $path");
-    binmode $file, ':utf8';
+      unless open my $file, '>>:utf8', $path;
     return $file;
   }
 
@@ -134,7 +133,7 @@ L<Mojo::Log> implements the following attributes.
 =head2 C<handle>
 
   my $handle = $log->handle;
-  $log       = $log->handle(IO::File->new);
+  $log       = $log->handle(IO::Handle->new);
 
 Log file handle used by default C<message> event, defaults to opening C<path>
 or C<STDERR>.

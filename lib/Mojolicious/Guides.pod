@@ -15,9 +15,10 @@ latest updates.
 If you are new to Perl, we recommend
 L<Learn Perl in 2 hours 30 minutes|http://qntm.org/files/perl/perl.html> for
 a quick introduction, or the
-L<Modern Perl book|http://modernperlbooks.com/books/modern_perl/>, freely available
-in many formats. Both are excellent introductions to the language. For more
-books and documentation, check out L<learn.perl.org|http://learn.perl.org/>.
+L<Modern Perl book|http://modernperlbooks.com/books/modern_perl/>, freely
+available in many formats. Both are excellent introductions to the language.
+For more books and documentation, check out
+L<learn.perl.org|http://learn.perl.org/>.
 
 =head1 TUTORIAL
 

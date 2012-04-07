@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.77  2012-04-07
+2.77  2012-04-08
   - Improved documentation. (tempire, sri)
   - Fixed small bug that prevented non-string secrets in Mojolicious.
 

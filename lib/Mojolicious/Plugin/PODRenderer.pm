@@ -18,9 +18,9 @@ my $PERLDOC = $Mojolicious::Controller::H->slurp_rel_file('perldoc.html.ep');
 #  pleasant one."
 sub register {
   my ($self, $app, $conf) = @_;
+  $conf ||= {};
 
   # Config
-  $conf ||= {};
   my $name       = $conf->{name}       || 'pod';
   my $preprocess = $conf->{preprocess} || 'ep';
 
@@ -197,7 +197,7 @@ Disable perldoc browser.
   # Mojolicious::Lite
   plugin PODRenderer => {preprocess => 'epl'};
 
-Handler name of preprocessor.
+Name of handler used to preprocess POD.
 
 =head1 HELPERS
 

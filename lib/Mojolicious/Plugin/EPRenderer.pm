@@ -124,7 +124,7 @@ Handler name.
   # Mojolicious::Lite
   plugin EPRenderer => {template => {line_start => '.'}};
 
-Template options.
+Attribute values passed to L<Mojo::Template> object used to render templates.
 
 =head1 METHODS
 

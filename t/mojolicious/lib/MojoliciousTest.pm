@@ -1,6 +1,8 @@
 package MojoliciousTest;
 use Mojo::Base 'Mojolicious';
 
+use utf8;
+
 use MojoliciousTest::Foo;
 
 sub development_mode {
@@ -147,6 +149,42 @@ sub startup {
 
   # /just/some/template (embedded template)
   $r->route('/just/some/template')->to(template => 'just/some/template');
+
+  # OPTIONS /tags
+  $r->options('/tags')->to(template => 'tags');
+
+  # PATCH /more_tags
+  $r->patch('more_tags');
+
+  # GET /small_tags
+  $r->get('small_tags');
+
+  # GET|POST /links
+  $r->route('links')->via('GET','POST');
+
+  # GET /script
+  $r->get('script');
+
+  # GET /style
+  $r->get('style');
+
+  # GET /basicform
+  $r->get('/basicform');
+
+  # GET /multibox
+  $r->get('/multibox');
+
+  # GET /form
+  $r->get('form/:test')->to('form');
+
+  # PUT /selection
+  $r->put('selection');
+
+  # PATCH|POST /☃
+  $r->route('/☃')->via(qw/PATCH POST/)->to(template => 'snowman');
+
+  # POST /no_snowman
+  $r->post('/no_snowman');
 }
 
 1;
@@ -157,3 +195,112 @@ Production static file with low precedence.
 
 @@ just/some/template.html.ep
 Production template with low precedence.
+
+@@ tags/index.html.ep
+<%= tag 'foo' %>
+<%= tag 'foo', bar => 'baz' %>
+<%= tag 'foo', one => 't<wo', three => 'four' => begin %>Hello<% end %>
+
+@@ more_tags/index.html.ep
+%= tag bar => 'b<a>z'
+%= tag bar => 0
+%= tag 'bar', class => 'test', 0
+%= tag 'bar', class => 'test', ''
+
+@@ small_tags/index.html.ep
+%=t div => 'some & content'
+%=t div => begin
+  %=t p => (id => 0) => 'just'
+  %=t p => 0
+%= end
+%=t div => 'works'
+
+@@ links/index.html.ep
+<%= link_to 'Pa<th' => '/path' %>
+<%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
+<%= link_to 'http://example.com/' => begin %><foo>Example</foo><% end %>
+<%= link_to Home => 'links' %>
+<%= link_to Foo => 'form', {test => 23}, title => 'Foo' %>
+
+@@ script/index.html.ep
+<%= javascript '/script.js' %>
+<%= javascript begin %>
+  var a = 'b';
+<% end %>
+<%= javascript type => 'foo' => begin %>
+  var a = 'b';
+<% end %>
+
+@@ style/index.html.ep
+<%= stylesheet '/foo.css' %>
+<%= stylesheet begin %>
+  body {color: #000}
+<% end %>
+<%= stylesheet type => 'foo' => begin %>
+  body {color: #000}
+<% end %>
+
+@@ basicform/index.html.ep
+%= form_for links => begin
+  %= text_field foo => 'bar'
+  %= text_field bar => 'baz', class => 'test'
+  %= text_field yada => undef
+  %= input_tag baz => 'yada', class => 'tset'
+  %= submit_button
+%= end
+
+@@ multibox/index.html.ep
+%= form_for multibox => begin
+  %= check_box foo => 'one'
+  %= check_box foo => 'two'
+  %= submit_button
+%= end
+
+@@ form/lala.html.ep
+<%= form_for 'links', method => 'post' => begin %>
+  <%= input_tag 'foo' %>
+<% end %>
+%= form_for 'form', {test => 24}, method => 'post' => begin
+  %= text_field 'foo'
+  %= check_box foo => 1
+  %= check_box a => 2
+  %= radio_button b => '1'
+  %= radio_button b => '0'
+  %= hidden_field c => 'foo'
+  %= file_field 'd'
+  %= text_area e => (cols => 40, rows => 50) => begin
+    default!
+  %= end
+  %= text_area 'f'
+  %= password_field 'g'
+  %= password_field 'h', id => 'foo'
+  %= submit_button 'Ok!'
+  %= submit_button 'Ok too!', id => 'bar'
+%= end
+<%= form_for '/' => begin %>
+  <%= input_tag 'foo' %>
+<% end %>
+<%= input_tag 'escaped' %>
+<%= input_tag 'a' %>
+<%= input_tag 'a', value => 'c' %>
+
+@@ selection/index.html.ep
+% param a => qw/b g/ if param 'preselect';
+%= form_for selection => begin
+  %= select_field a => ['b', {c => ['<d', [ E => 'e'], 'f']}, 'g']
+  %= select_field foo => [qw/bar baz/], multiple => 'multiple'
+  %= select_field bar => [['D' => 'd', disabled => 'disabled'], 'baz']
+  %= submit_button
+%= end
+
+@@ snowman/index.html.ep
+%= form_for snowman => begin
+  %= text_area foo => 'b<a>r', cols => 40
+  %= submit_button '☃'
+%= end
+
+@@ no_snowman/index.html.ep
+% my @attrs = param('foo') ? (method => 'PATCH') : ();
+%= form_for 'snowman', @attrs => begin
+  %= submit_button 'whatever'
+%= end

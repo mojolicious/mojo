@@ -188,7 +188,7 @@ $t->get_ok('/just/works/too')->status_is(200)->content_is("It just works!\n");
 
 # GET /x/1/ (full external application)
 $t->get_ok('/x/1/')->status_is(200)->content_is(<<'EOF');
-works!
+works!Insecure!Insecure!
 
 too!works!!!
 <form action="/x/1/%E2%98%83">
@@ -212,7 +212,7 @@ $t->get_ok('/x/1/url/☃')->status_is(200)
 
 # GET /x/♥/ (full external application)
 $t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
-works!
+works!Insecure!Insecure!
 
 too!works!!!
 <form action="/x/%E2%99%A5/%E2%98%83">
@@ -241,7 +241,7 @@ $t->get_ok('/host')->status_is(200)->content_is('main application!');
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is(<<'EOF');
-works!
+works!Insecure!Insecure!
 
 too!works!!!
 <form action="/%E2%98%83">
@@ -256,7 +256,7 @@ $t->get_ok('/host' => {Host => 'mojolicious.org'})->status_is(200)
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
   ->content_is(<<'EOF');
-works!
+works!Insecure!Insecure!
 
 too!works!!!
 <form action="/%E2%98%83">
@@ -270,7 +270,7 @@ $t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
 
 # GET / (full external application with domain)
 $t->get_ok('/' => {Host => 'kraih.com'})->status_is(200)->content_is(<<'EOF');
-works!
+works!Insecure!Insecure!
 
 too!works!!!
 <form action="/%E2%98%83">
@@ -293,7 +293,7 @@ $t->get_ok('/host' => {Host => 'foo.bar.kraih.com'})->status_is(200)
 # GET /♥/123/host (full external application with a bit of everything)
 $t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)
   ->content_is(<<'EOF');
-works!
+works!Insecure!Insecure!
 
 too!works!!!
 <form action="/%E2%99%A5/123/%E2%98%83">

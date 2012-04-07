@@ -5,6 +5,9 @@ use utf8;
 # "Boy, who knew a cooler could also make a handy wang coffin?"
 use Mojolicious::Lite;
 
+# Secret for config file tests
+app->secret('Insecure!');
+
 # Load plugin
 plugin 'Config';
 
@@ -45,4 +48,4 @@ app->start;
 __DATA__
 
 @@ menubar.html.ep
-<%= $config->{just} %>
+<%= $config->{just} %><%= $config->{one} %><%= $config->{two} %>

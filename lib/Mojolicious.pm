@@ -385,9 +385,10 @@ new ones.
 
   my $app = Mojolicious->new;
 
-Construct a new L<Mojolicious> application. Will automatically detect your
-home directory and set up logging based on your current operating mode. Also
-sets up the renderer, static dispatcher and a default set of plugins.
+Construct a new L<Mojolicious> application, calling C<${mode}_mode> and
+C<startup> in the process. Will automatically detect your home directory and
+set up logging based on your current operating mode. Also sets up the
+renderer, static dispatcher and a default set of plugins.
 
 =head2 C<build_tx>
 
@@ -516,7 +517,9 @@ object)
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you
-want to continue the chain.
+want to continue the chain. Default exception handling with
+L<Mojolicious::Controller/"render_exception"> is the first hook in the chain
+and a call to C<dispatch> the last, yours will be in between.
 
   $app->hook(around_dispatch => sub {
     my ($next, $c) = @_;

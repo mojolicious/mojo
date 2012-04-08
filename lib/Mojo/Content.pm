@@ -24,51 +24,8 @@ sub boundary {
 }
 
 # "Operator! Give me the number for 911!"
-sub build_body {
-  my $self = shift;
-
-  # Concatenate all chunks in memory
-  my $body   = '';
-  my $offset = 0;
-  while (1) {
-    my $chunk = $self->get_body_chunk($offset);
-
-    # No content yet, try again
-    next unless defined $chunk;
-
-    # End of content
-    last unless length $chunk;
-
-    # Content
-    $offset += length $chunk;
-    $body .= $chunk;
-  }
-
-  return $body;
-}
-
-sub build_headers {
-  my $self = shift;
-
-  # Concatenate all chunks in memory
-  my $headers = '';
-  my $offset  = 0;
-  while (1) {
-    my $chunk = $self->get_header_chunk($offset);
-
-    # No headers yet, try again
-    next unless defined $chunk;
-
-    # End of headers
-    last unless length $chunk;
-
-    # Headers
-    $offset += length $chunk;
-    $headers .= $chunk;
-  }
-
-  return $headers;
-}
+sub build_body    { shift->_build('body') }
+sub build_headers { shift->_build('header') }
 
 sub charset {
   (shift->headers->content_type || '') =~ /charset="?([^"\s;]+)"?/i
@@ -198,7 +155,7 @@ sub parse {
 sub parse_body {
   my $self = shift;
   $self->{state} = 'body';
-  $self->parse(@_);
+  return $self->parse(@_);
 }
 
 sub parse_body_once {
@@ -282,6 +239,30 @@ sub write_chunk {
 sub _body {
   my $self = shift;
   $self->emit('body') unless $self->{body}++;
+}
+
+sub _build {
+  my ($self, $part) = @_;
+
+  # Build part from chunks
+  my $method = "get_${part}_chunk";
+  my $buffer = '';
+  my $offset = 0;
+  while (1) {
+    my $chunk = $self->$method($offset);
+
+    # No chunk yet, try again
+    next unless defined $chunk;
+
+    # End of part
+    last unless length $chunk;
+
+    # Part
+    $offset += length $chunk;
+    $buffer .= $chunk;
+  }
+
+  return $buffer;
 }
 
 sub _build_chunk {

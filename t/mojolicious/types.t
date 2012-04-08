@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 28;
+use Test::More tests => 30;
 
 # "Your mistletoe is no match for my *tow* missile."
 use Mojolicious::Types;
@@ -35,6 +35,8 @@ is_deeply $t->detect('text/xml'), ['xml', 'xsl'], 'right formats';
 is_deeply $t->detect('application/zip'), ['zip'], 'right format';
 
 # Detect special cases
+is_deeply $t->detect('Text/Xml'),        ['xml', 'xsl'],  'right formats';
+is_deeply $t->detect('TEXT/XML'),        ['xml', 'xsl'],  'right formats';
 is_deeply $t->detect('text/html;q=0.9'), ['htm', 'html'], 'right formats';
 is_deeply $t->detect('text/html,*/*'),             [], 'no formats';
 is_deeply $t->detect('text/html;q=0.9,*/*'),       [], 'no formats';

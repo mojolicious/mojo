@@ -10,11 +10,6 @@ use Mojo::Util 'unquote';
 
 has [qw/name value/];
 
-my $COOKIE_SEPARATOR_RE = qr/^\s*\,\s*/;
-my $NAME_RE             = qr/^\s*([^\=\;\,]+)\s*\=?\s*/;
-my $SEPARATOR_RE        = qr/^\s*\;\s*/;
-my $VALUE_RE            = qr/^("(?:\\\\|\\"|[^"])+"|[^\;\,]+)\s*/;
-
 # "My Homer is not a communist.
 #  He may be a liar, a pig, an idiot, a communist,
 #  but he is not a porn star."
@@ -29,7 +24,7 @@ sub _tokenize {
   while ($string) {
 
     # Name
-    if ($string =~ s/$NAME_RE//) {
+    if ($string =~ s/^\s*([^\=\;\,]+)\s*\=?\s*//) {
       my $name = $1;
 
       # "expires" is a special case, thank you Netscape...
@@ -37,14 +32,15 @@ sub _tokenize {
 
       # Value
       my $value;
-      $value = unquote $1 if $string =~ s/$VALUE_RE//;
+      $value = unquote $1
+        if $string =~ s/^("(?:\\\\|\\"|[^"])+"|[^\;\,]+)\s*//;
 
       # Token
       push @token, [$name, $value];
 
       # Separator
-      $string =~ s/$SEPARATOR_RE//;
-      if ($string =~ s/$COOKIE_SEPARATOR_RE//) {
+      $string =~ s/^\s*\;\s*//;
+      if ($string =~ s/^\s*\,\s*//) {
         push @tree, [@token];
         @token = ();
       }

@@ -37,13 +37,13 @@ sub detect {
 
   # Detect extensions from MIME type
   return [] unless (($accept || '') =~ /^([^,]+?)(?:\;[^,]*)*$/);
-  my $pattern = $1;
+  my $type = lc $1;
   my @exts;
   my $types = $self->types;
   for my $ext (sort keys %$types) {
-    my $type = quotemeta $types->{$ext};
-    $type =~ s/\\\;.*$//;
-    push @exts, $ext if $pattern =~ /^$type$/i;
+    my $try = lc $types->{$ext};
+    $try =~ s/\;.*$//;
+    push @exts, $ext if $type eq $try;
   }
 
   return \@exts;
@@ -91,9 +91,10 @@ the following ones.
 
 =head2 C<detect>
 
-  my $extensions = $types->detect('application/json;q=9');
+  my $ext = $types->detect('application/json;q=9');
 
-Detect file extensions from C<Accept> header value.
+Detect file extensions from C<Accept> header value. Unspecific values that
+contain more than one MIME type are ignored.
 
 =head2 C<type>
 

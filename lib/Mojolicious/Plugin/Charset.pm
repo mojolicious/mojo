@@ -6,13 +6,12 @@ use Mojo::Base 'Mojolicious::Plugin';
 #  It also opened my calendar to Friday and ordered me some french fries."
 sub register {
   my ($self, $app, $conf) = @_;
-  $conf ||= {};
 
   # Change default charset on all layers
-  return unless my $s = $conf->{charset};
-  $app->types->type(html => "text/html;charset=$s");
-  $app->renderer->encoding($s);
-  $app->hook(before_dispatch => sub { shift->req->default_charset($s) });
+  return unless my $c = ($conf || {})->{charset};
+  $app->types->type(html => "text/html;charset=$c");
+  $app->renderer->encoding($c);
+  $app->hook(before_dispatch => sub { shift->req->default_charset($c) });
 }
 
 1;
@@ -33,7 +32,8 @@ Mojolicious::Plugin::Charset - Charset plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Charset> is a plugin to easily set the default charset
-and encoding on all layers of L<Mojolicious>.
+and encoding on all layers of L<Mojolicious>. The code of this plugin is a
+good example for learning to build new plugins.
 
 =head1 OPTIONS
 

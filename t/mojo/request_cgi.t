@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 180;
+use Test::More tests => 188;
 
 # "Aren't we forgetting the true meaning of Christmas?
 #  You know, the birth of Santa."
@@ -143,6 +143,12 @@ is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 
 # Parse Apache 2.2 (win32) like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
+my $finished;
+my $progress = 0;
+$req->on(finish => sub { $finished = shift->is_finished });
+$req->on(progress => sub { $progress++ });
+ok !$finished, 'not finished';
+ok !$progress, 'no progress';
 is $req->content->progress, 0, 'right progress';
 $req->parse(
   CONTENT_LENGTH  => 87,
@@ -154,10 +160,18 @@ $req->parse(
   HTTP_HOST       => 'test1',
   SERVER_PROTOCOL => 'HTTP/1.1'
 );
+ok !$finished, 'not finished';
+ok $progress, 'made progress';
+$progress = 0;
 is $req->content->progress, 0, 'right progress';
 $req->parse('request=&ajax=true&login=test&password=111&');
+ok !$finished, 'not finished';
+ok $progress, 'made progress';
+$progress = 0;
 is $req->content->progress, 43, 'right progress';
 $req->parse('edition=db6d8b30-16df-4ecd-be2f-c8194f94e1f4');
+ok $finished, 'finished';
+ok $progress, 'made progress';
 is $req->content->progress, 87, 'right progress';
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';

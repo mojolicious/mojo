@@ -33,7 +33,8 @@ has transactor => sub { Mojo::UserAgent::Transactor->new };
   for my $name (qw/DELETE GET HEAD OPTIONS PATCH POST PUT/) {
     *{__PACKAGE__ . '::' . lc($name)} = sub {
       my $self = shift;
-      $self->start($self->build_tx($name, @_));
+      my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+      $self->start($self->build_tx($name, @_), $cb);
     };
   }
 }
@@ -88,7 +89,8 @@ sub need_proxy {
 
 sub post_form {
   my $self = shift;
-  $self->start($self->build_form_tx(@_));
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  $self->start($self->build_form_tx(@_), $cb);
 }
 
 sub start {
@@ -125,7 +127,8 @@ sub start {
 
 sub websocket {
   my $self = shift;
-  $self->start($self->build_websocket_tx(@_));
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  $self->start($self->build_websocket_tx(@_), $cb);
 }
 
 sub _cache {
@@ -192,9 +195,7 @@ sub _connect {
   }
 
   # CONNECT request to proxy required
-  return
-    if ($tx->req->method || '') ne 'CONNECT'
-    && $self->_connect_proxy($tx, $cb);
+  return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
 
   # Connect
   warn "NEW CONNECTION ($scheme:$host:$port)\n" if DEBUG;
@@ -228,7 +229,7 @@ sub _connect_proxy {
 
   # Start CONNECT request
   return unless my $new = $self->transactor->proxy_connect($old);
-  $self->_start(
+  return $self->_start(
     $new => sub {
       my ($self, $tx) = @_;
 
@@ -244,10 +245,11 @@ sub _connect_proxy {
         $old->req->proxy(undef);
         my $loop   = $self->_loop;
         my $handle = $loop->stream($id)->steal_handle;
+        my $c      = delete $self->{connections}->{$id};
+        $loop->remove($id);
         weaken $self;
-        return $loop->client(
+        $id = $loop->client(
           handle   => $handle,
-          id       => $id,
           timeout  => $self->connect_timeout,
           tls      => 1,
           tls_ca   => $self->ca,
@@ -261,10 +263,11 @@ sub _connect_proxy {
             $self->_events($stream, $id);
 
             # Start real transaction
-            $old->connection($tx->connection);
+            $old->connection($id);
             $self->_start($old, $cb);
           }
         );
+        return $self->{connections}->{$id} = $c;
       }
 
       # Start real transaction
@@ -272,8 +275,6 @@ sub _connect_proxy {
       $self->_start($old, $cb);
     }
   );
-
-  return 1;
 }
 
 sub _connected {
@@ -403,8 +404,7 @@ sub _remove {
 
   # Keep connection alive
   $self->_cache(join(':', $self->transactor->peer($tx)), $id)
-    unless (($tx->req->method || '') eq 'CONNECT'
-    && ($tx->res->code || '') eq '200');
+    unless $tx->req->method eq 'CONNECT' && ($tx->res->code || '') eq '200';
 }
 
 sub _redirect {

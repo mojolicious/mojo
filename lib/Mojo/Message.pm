@@ -30,13 +30,11 @@ sub at_least_version {
   my ($search_major,  $search_minor)  = split /\./, $version;
   my ($current_major, $current_minor) = split /\./, $self->version;
 
-  # Version is equal or newer
+  # Major version is newer
   return 1 if $search_major < $current_major;
-  return 1
-    if $search_major == $current_major && $search_minor <= $current_minor;
 
-  # Version is older
-  return;
+  # Minor version is newer or equal
+  return $search_major == $current_major && $search_minor <= $current_minor;
 }
 
 sub body {
@@ -69,13 +67,13 @@ sub body_params {
   return $self->{body_params} if $self->{body_params};
 
   # Charset
-  my $params = Mojo::Parameters->new;
-  $params->charset($self->content->charset || $self->default_charset);
+  my $p = Mojo::Parameters->new;
+  $p->charset($self->content->charset || $self->default_charset);
 
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
   my $type = $self->headers->content_type || '';
   if ($type =~ m#(?:x-application|application/x-www-form)-urlencoded#i) {
-    $params->parse($self->content->asset->slurp);
+    $p->parse($self->content->asset->slurp);
   }
 
   # "multipart/formdata"
@@ -90,11 +88,11 @@ sub body_params {
       next if defined $filename;
 
       # Form value
-      $params->append($name, $value);
+      $p->append($name, $value);
     }
   }
 
-  return $self->{body_params} = $params;
+  return $self->{body_params} = $p;
 }
 
 sub body_size { shift->content->body_size }
@@ -163,11 +161,11 @@ sub error {
 
 sub fix_headers {
   my $self = shift;
-  return $self
-    if $self->{fix}++ || !$self->at_least_version('1.0') || $self->is_chunked;
 
   # Content-Length header or connection close is required in HTTP 1.0
   # unless the chunked transfer encoding is used
+  return $self
+    if $self->{fix}++ || !$self->at_least_version('1.0') || $self->is_chunked;
   my $headers = $self->headers;
   $self->is_dynamic
     ? $headers->connection('close')
@@ -178,13 +176,13 @@ sub fix_headers {
 }
 
 sub get_body_chunk {
-  my $self = shift;
+  my ($self, $offset) = @_;
 
   # Progress
-  $self->emit(progress => 'body', @_);
+  $self->emit(progress => 'body', $offset);
 
   # Chunk
-  my $chunk = $self->content->get_body_chunk(@_);
+  my $chunk = $self->content->get_body_chunk($offset);
   return $chunk if !defined $chunk || length $chunk;
 
   # Finish
@@ -195,20 +193,20 @@ sub get_body_chunk {
 }
 
 sub get_header_chunk {
-  my $self = shift;
+  my ($self, $offset) = @_;
 
   # Progress
-  $self->emit(progress => 'headers', @_);
+  $self->emit(progress => 'headers', $offset);
 
   # HTTP 0.9 has no headers
   return '' if $self->version eq '0.9';
 
-  return $self->fix_headers->content->get_header_chunk(@_);
+  return $self->fix_headers->content->get_header_chunk($offset);
 }
 
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
-  $self->emit(progress => 'start_line', @_);
+  $self->emit(progress => 'start_line', $offset);
   return substr $self->{start_line_buffer} //= $self->_build_start_line,
     $offset, CHUNK_SIZE;
 }
@@ -248,7 +246,7 @@ sub start_line_size { length shift->build_start_line }
 
 sub to_string {
   my $self = shift;
-  $self->build_start_line . $self->build_headers . $self->build_body;
+  return $self->build_start_line . $self->build_headers . $self->build_body;
 }
 
 sub upload {
@@ -403,8 +401,6 @@ sub _parse {
   return $self;
 }
 
-sub _parse_start_line { }
-
 sub _parse_formdata {
   my $self = shift;
 
@@ -456,6 +452,8 @@ sub _parse_formdata {
   return \@formdata;
 }
 
+sub _parse_start_line { }
+
 1;
 __END__
 
@@ -500,6 +498,13 @@ Emitted after message building or parsing is finished.
 
 Emitted when message building or parsing makes progress.
 
+  # Building
+  $message->on(progress => sub {
+    my ($message, $state, $offset) = @_;
+    say qq/Building "$state" at offset $offset/;
+  });
+
+  # Parsing
   $message->on(progress => sub {
     my $message = shift;
     return unless my $len = $message->headers->content_length;
@@ -585,7 +590,7 @@ Access C<content> data or replace all subscribers of the C<read> event.
 
 =head2 C<body_params>
 
-  my $params = $message->body_params;
+  my $p = $message->body_params;
 
 C<POST> parameters extracted from C<x-application-urlencoded>,
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,

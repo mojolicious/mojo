@@ -37,7 +37,7 @@ sub add {
 
   # Add lines
   push @{$self->{headers}->{$lcname}},
-    map { (ref $_ || '') eq 'ARRAY' ? $_ : [$_] } @_;
+    map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
 
   return $self;
 }
@@ -523,8 +523,8 @@ Shortcut for the C<Status> header.
 
 =head2 C<to_hash>
 
-  my $hash = $headers->to_hash;
-  my $hash = $headers->to_hash(1);
+  my $single = $headers->to_hash;
+  my $multi  = $headers->to_hash(1);
 
 Turn headers into hash reference, nested array references to represent multi
 line values are disabled by default.

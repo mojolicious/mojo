@@ -111,7 +111,7 @@ sub shape_match {
 sub _compile {
   my $self = shift;
 
-  # Compile format regular expression
+  # Compile format regex
   my $reqs = $self->reqs;
   if (!exists $reqs->{format} || $reqs->{format}) {
     my $format =
@@ -119,7 +119,7 @@ sub _compile {
     $self->format(qr#\.$format$#);
   }
 
-  # Compile tree to regular expression
+  # Compile tree to regex
   my $block    = '';
   my $regex    = '';
   my $optional = 1;
@@ -184,7 +184,7 @@ sub _compile {
 # "Interesting... Oh no wait, the other thing, tedious."
 sub _compile_req {
   my $req = shift;
-  return "($req)" if !ref $req || ref $req ne 'ARRAY';
+  return "($req)" if ref $req ne 'ARRAY';
   return '(' . join('|', map {quotemeta} reverse sort @$req) . ')';
 }
 

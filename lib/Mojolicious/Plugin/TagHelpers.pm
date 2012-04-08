@@ -51,13 +51,8 @@ sub register {
   $app->helper(
     hidden_field => sub {
       shift;
-      $self->_tag(
-        'input',
-        name  => shift,
-        value => shift,
-        type  => 'hidden',
-        @_
-      );
+      my %attrs = (type => 'hidden', name => shift, value => shift, @_);
+      return $self->_tag('input', %attrs);
     }
   );
 
@@ -75,17 +70,16 @@ sub register {
 
       # CDATA
       my $cb = sub {''};
-      if ((ref $_[-1] || '') eq 'CODE') {
+      if (ref $_[-1] eq 'CODE') {
         my $old = pop;
         $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
       }
 
-      # Path
-      my $src = @_ % 2 ? shift : undef;
+      # URL
+      my $src = @_ % 2 ? $c->url_for(shift) : undef;
 
       # Attributes
-      my %attrs = @_;
-      $attrs{src} = $c->url_for($src) if $src;
+      my %attrs = (@_, $src ? (src => $src) : ());
 
       return $self->_tag('script', type => 'text/javascript', %attrs, $cb);
     }
@@ -128,57 +122,47 @@ sub register {
   # Add "select_field" helper
   $app->helper(
     select_field => sub {
-      my ($c, $name, $options) = (shift, shift, shift);
-      my %attrs = @_;
+      my ($c, $name, $options, %attrs) = (shift, shift, shift, @_);
 
-      # Values
-      my %v = map { $_, 1 } $c->param($name);
-
-      # Callback
-      my $cb = sub {
+      # "option" callback
+      my %values = map { $_ => 1 } $c->param($name);
+      my $option = sub {
 
         # Pair
         my $pair = shift;
-        $pair = [$pair, $pair] unless ref $pair eq 'ARRAY';
+        $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
 
         # Attributes
         my %attrs = (value => $pair->[1]);
-        $attrs{selected} = 'selected' if exists $v{$pair->[1]};
+        $attrs{selected} = 'selected' if exists $values{$pair->[1]};
         %attrs = (%attrs, @$pair[2 .. $#$pair]);
 
-        # Option tag
-        $self->_tag('option', %attrs, sub { xml_escape $pair->[0] });
+        return $self->_tag('option', %attrs, sub { xml_escape $pair->[0] });
       };
 
-      return $self->_tag(
-        'select',
-        name => $name,
-        %attrs,
-        sub {
+      # "optgroup" callback
+      my $optgroup = sub {
 
-          # Parts
-          my $parts = '';
-          for my $o (@$options) {
+        # Parts
+        my $parts = '';
+        for my $group (@$options) {
 
-            # OptGroup
-            if (ref $o eq 'HASH') {
-              my ($label, $values) = each %$o;
-              $parts .= $self->_tag(
-                'optgroup',
-                label => $label,
-                sub {
-                  join '', map { $cb->($_) } @$values;
-                }
-              );
-            }
-
-            # Option
-            else { $parts .= $cb->($o) }
+          # "optgroup" tag
+          if (ref $group eq 'HASH') {
+            my ($label, $values) = each %$group;
+            my $content = join '', map { $option->($_) } @$values;
+            $parts
+              .= $self->_tag('optgroup', label => $label, sub {$content});
           }
 
-          return $parts;
+          # "option" tag
+          else { $parts .= $option->($group) }
         }
-      );
+
+        return $parts;
+      };
+
+      return $self->_tag('select', name => $name, %attrs, $optgroup);
     }
   );
 
@@ -189,39 +173,28 @@ sub register {
 
       # CDATA
       my $cb;
-      if ((ref $_[-1] || '') eq 'CODE') {
+      if (ref $_[-1] eq 'CODE') {
         my $old = pop;
         $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
       }
 
-      # Path
-      my $href;
-      $href = shift if @_ % 2;
+      # URL
+      my $href = @_ % 2 ? $c->url_for(shift) : undef;
 
-      # Attributes
-      my %attrs = @_;
+      # "style" tag
+      return $self->_tag('style', type => 'text/css', @_, $cb) unless $href;
 
-      # Link
-      return $self->_tag(
-        'link',
-        href  => $c->url_for($href),
-        media => 'screen',
-        rel   => 'stylesheet',
-        type  => 'text/css',
-        %attrs
-      ) if $href;
-
-      # Style
-      return $self->_tag('style', type => 'text/css', %attrs, $cb);
+      # "link" tag
+      my %attrs = (href => $href, type => 'text/css', media => 'screen', @_);
+      return $self->_tag('link', rel => 'stylesheet', %attrs);
     }
   );
 
   # Add "submit_button" helper
   $app->helper(
     submit_button => sub {
-      my $c = shift;
-      my $value = shift // 'Ok';
-      return $self->_tag('input', value => $value, type => 'submit', @_);
+      shift;
+      $self->_tag('input', value => shift // 'Ok', type => 'submit', @_);
     }
   );
 
@@ -236,17 +209,13 @@ sub register {
     text_area => sub {
       my ($c, $name) = (shift, shift);
 
-      # Value
-      my $cb = sub {''};
-      my $value;
-      if (@_ % 2) {
-        if   ((ref $_[-1] || '') eq 'CODE') { $cb    = pop }
-        else                                { $value = shift }
-      }
+      # Content
+      my $cb = ref $_[-1] eq 'CODE' ? pop : sub {''};
+      my $content = @_ % 2 ? shift : undef;
 
-      # Make sure value is wrapped
-      if (defined($value = $c->param($name) // $value)) {
-        $cb = sub { xml_escape $value}
+      # Make sure content is wrapped
+      if (defined($content = $c->param($name) // $content)) {
+        $cb = sub { xml_escape $content }
       }
 
       return $self->_tag('textarea', name => $name, @_, $cb);
@@ -260,32 +229,25 @@ sub register {
 sub _input {
   my ($self, $c, $name) = (shift, shift, shift);
 
-  # Odd
-  my %attrs;
-  if (@_ % 2) {
-    my $value = shift;
-    %attrs = (@_, value => $value);
-  }
+  # Attributes
+  my %attrs = @_ % 2 ? (value => shift, @_) : @_;
 
-  # Even
-  else { %attrs = @_ }
-
-  # Value
-  my @p = $c->param($name);
+  # Values
+  my @values = $c->param($name);
 
   # Special selection value
-  my $t = $attrs{type} || '';
-  if (@p && $t ne 'submit') {
+  my $type = $attrs{type} || '';
+  if (@values && $type ne 'submit') {
 
     # Checkbox or radiobutton
     my $value = $attrs{value} // '';
-    if ($t eq 'checkbox' || $t eq 'radio') {
+    if ($type eq 'checkbox' || $type eq 'radio') {
       $attrs{value} = $value;
-      $attrs{checked} = 'checked' if defined first { $value eq $_ } @p;
+      $attrs{checked} = 'checked' if defined first { $value eq $_ } @values;
     }
 
-    # Other
-    else { $attrs{value} = $p[0] }
+    # Others
+    else { $attrs{value} = $values[0] }
 
     return $self->_tag('input', name => $name, %attrs);
   }
@@ -299,23 +261,21 @@ sub _tag {
   my ($self, $name) = (shift, shift);
 
   # Content
-  my $cb = defined $_[-1] && ref($_[-1]) eq 'CODE' ? pop @_ : undef;
-  my $content = pop if @_ % 2;
-  $content = xml_escape $content if defined $content;
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $content = @_ % 2 ? pop : undef;
 
-  # Tag
+  # Start tag
   my $tag = "<$name";
 
   # Attributes
   my %attrs = @_;
   for my $key (sort keys %attrs) {
-    my $value = xml_escape $attrs{$key} // '';
-    $tag .= qq/ $key="$value"/;
+    $tag .= qq/ $key="/ . xml_escape($attrs{$key} // '') . '"';
   }
 
-  # Block
+  # End tag
   if ($cb || defined $content) {
-    $tag .= '>' . ($cb ? $cb->() : $content) . "</$name>";
+    $tag .= '>' . ($cb ? $cb->() : xml_escape($content)) . "</$name>";
   }
 
   # Empty element

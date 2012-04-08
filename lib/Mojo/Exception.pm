@@ -5,7 +5,6 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-use IO::File;
 use Scalar::Util 'blessed';
 
 has [qw/frames line lines_before lines_after/] => sub { [] };
@@ -71,7 +70,7 @@ sub _detect {
   # Search for context
   for my $frame (reverse @trace) {
     next unless -r $frame->[0];
-    my $handle = IO::File->new($frame->[0], '<:utf8');
+    open my $handle, '<:utf8', $frame->[0];
     $self->_parse_context($frame->[1], [[<$handle>]]);
     return $self;
   }

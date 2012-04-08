@@ -2,7 +2,7 @@ package Mojo::Template;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use IO::File;
+use IO::Handle;
 use Mojo::ByteStream;
 use Mojo::Exception;
 use Mojo::Util qw/decode encode/;
@@ -34,7 +34,7 @@ sub capture;
 *capture = sub { shift->(@_) };
 sub escape;
 *escape = sub {
-  return $_[0] if (ref $_[0] || '') eq 'Mojo::ByteStream';
+  return $_[0] if ref $_[0] eq 'Mojo::ByteStream';
   no warnings 'uninitialized';
   Mojo::Util::xml_escape "$_[0]";
 };
@@ -309,8 +309,7 @@ sub render_file {
 
   # Slurp file
   $self->name($path) unless defined $self->{name};
-  croak qq/Can't open template "$path": $!/
-    unless my $file = IO::File->new("< $path");
+  croak qq/Can't open template "$path": $!/ unless open my $file, '<', $path;
   my $tmpl = '';
   while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) { $tmpl .= $buffer }
 
@@ -361,8 +360,7 @@ sub _write_file {
   my ($self, $path, $output) = @_;
 
   # Encode and write to file
-  croak qq/Can't open file "$path": $!/
-    unless my $file = IO::File->new("> $path");
+  croak qq/Can't open file "$path": $!/ unless open my $file, '>', $path;
   $output = encode $self->encoding, $output if $self->encoding;
   croak qq/Can't write to file "$path": $!/
     unless defined $file->syswrite($output);

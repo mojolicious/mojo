@@ -23,7 +23,6 @@ my $ATTR_RE = qr/
   \s*
 /x;
 my $END_RE   = qr#^\s*/\s*(.+)\s*#;
-my $START_RE = qr#([^\s/]+)([\s\S]*)#;
 my $TOKEN_RE = qr/
   ([^<]*)                                           # Text
   (?:
@@ -118,7 +117,7 @@ sub parse {
     if ($tag =~ $END_RE) { $self->_end($cs ? $1 : lc($1), \$current) }
 
     # Start
-    elsif ($tag =~ $START_RE) {
+    elsif ($tag =~ qr#([^\s/]+)([\s\S]*)#) {
       my ($start, $attr) = ($cs ? $1 : lc($1), $2);
 
       # Attributes

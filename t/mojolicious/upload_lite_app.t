@@ -16,14 +16,14 @@ use Test::Mojo;
 
 # POST /upload
 post '/upload' => sub {
-  my $self = shift;
-  my $file = $self->param('file');
-  my $h    = $file->headers;
+  my $self    = shift;
+  my $file    = $self->param('file');
+  my $headers = $file->headers;
   $self->render_text($file->filename
       . $file->asset->slurp
       . $self->param('test')
-      . $h->content_type
-      . ($h->header('X-X') || '')
+      . ($headers->content_type  || '')
+      . ($headers->header('X-X') || '')
       . join(',', $self->param));
 };
 
@@ -55,17 +55,15 @@ my $t = Test::Mojo->new;
 my $file = Mojo::Asset::File->new->add_chunk('lalala');
 $t->post_form_ok('/upload',
   {file => {file => $file, filename => 'x'}, test => 'tset'})->status_is(200)
-  ->content_is('xlalalatsetapplication/octet-streamfile,test');
+  ->content_is('xlalalatsetfile,test');
 
 # POST /upload (path)
 $t->post_form_ok('/upload', {file => {file => $file->path}, test => 'foo'})
-  ->status_is(200)
-  ->content_like(qr#lalalafooapplication/octet-streamfile,test$#);
+  ->status_is(200)->content_like(qr#lalalafoofile,test$#);
 
 # POST /upload (memory)
 $t->post_form_ok('/upload', {file => {content => 'alalal'}, test => 'tset'})
-  ->status_is(200)
-  ->content_is('filealalaltsetapplication/octet-streamfile,test');
+  ->status_is(200)->content_is('filealalaltsetfile,test');
 
 # POST /upload (memory with headers)
 my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};

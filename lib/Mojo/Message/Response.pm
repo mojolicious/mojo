@@ -7,8 +7,6 @@ use Mojo::Util 'get_line';
 
 has [qw/code message/];
 
-my $START_LINE_RE = qr|^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$|;
-
 # Umarked codes are from RFC 2616
 my %MESSAGES = (
   100 => 'Continue',
@@ -134,7 +132,7 @@ sub _parse_start_line {
   # We have a full HTTP 1.0+ response line
   return unless defined(my $line = get_line \$self->{buffer});
   return $self->error('Bad response start line.')
-    unless $line =~ $START_LINE_RE;
+    unless $line =~ qr|^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$|;
   $self->version($1)->code($2)->message($3);
   $self->content->auto_relax(1);
   $self->{state} = 'content';

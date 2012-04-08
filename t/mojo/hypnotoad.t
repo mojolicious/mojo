@@ -11,7 +11,6 @@ use Test::More;
 use Cwd 'cwd';
 use File::Temp;
 use FindBin;
-use IO::File;
 use IO::Socket::INET;
 use Mojo::Command;
 use Mojo::IOLoop;
@@ -189,8 +188,7 @@ sleep 1
 chdir $cwd;
 
 sub _pid {
-  return
-    unless my $file = IO::File->new($command->rel_file('hypnotoad.pid'), '<');
+  return unless open my $file, '<', $command->rel_file('hypnotoad.pid');
   my $pid = <$file>;
   chomp $pid;
   return $pid;

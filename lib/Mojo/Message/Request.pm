@@ -18,7 +18,6 @@ my $START_LINE_RE = qr|
   (?:\s+HTTP/(\d+\.\d+))?                                       # Version
   $
 |x;
-my $HOST_RE = qr/^([^\:]*)\:?(.*)$/;
 
 sub clone {
   my $self = shift;
@@ -99,9 +98,9 @@ sub param {
 }
 
 sub params {
-  my $self   = shift;
-  my $params = Mojo::Parameters->new;
-  return $params->merge($self->body_params, $self->query_params);
+  my $self = shift;
+  my $p    = Mojo::Parameters->new;
+  return $p->merge($self->body_params, $self->query_params);
 }
 
 sub parse {
@@ -235,7 +234,7 @@ sub _parse_env {
     if ($name eq 'HOST') {
       my $host = $value;
       my $port;
-      ($host, $port) = ($1, $2) if $host =~ $HOST_RE;
+      ($host, $port) = ($1, $2) if $host =~ /^([^\:]*)\:?(.*)$/;
       $base->host($host)->port($port);
     }
   }
@@ -366,9 +365,9 @@ Direct access to the C<CGI> or C<PSGI> environment hash if available.
 =head2 C<method>
 
   my $method = $req->method;
-  $req       = $req->method('GET');
+  $req       = $req->method('POST');
 
-HTTP request method.
+HTTP request method, defaults to C<GET>.
 
 =head2 C<url>
 
@@ -428,7 +427,7 @@ Access C<GET> and C<POST> parameters.
 
 =head2 C<params>
 
-  my $params = $req->params;
+  my $p = $req->params;
 
 All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object.
 
@@ -452,7 +451,7 @@ Proxy URL for message.
 
 =head2 C<query_params>
 
-  my $params = $req->query_params;
+  my $p = $req->query_params;
 
 All C<GET> parameters, usually a L<Mojo::Parameters> object.
 

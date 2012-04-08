@@ -5,7 +5,6 @@ use Cwd 'abs_path';
 use Fcntl ':flock';
 use File::Basename 'dirname';
 use File::Spec::Functions qw/catfile tmpdir/;
-use IO::File;
 use IO::Poll 'POLLIN';
 use List::Util 'shuffle';
 use Mojo::Server::Daemon;
@@ -256,7 +255,7 @@ sub _manage {
 }
 
 sub _pid {
-  return unless my $file = IO::File->new(shift->{config}->{pid_file}, '<');
+  return unless open my $file, '<', shift->{config}->{pid_file};
   my $pid = <$file>;
   chomp $pid;
   return $pid;
@@ -274,7 +273,8 @@ sub _pid_file {
   # Create PID file
   $self->{log}->info(qq/Creating process id file "$file"./);
   die qq/Can't create process id file "$file": $!/
-    unless my $pid = IO::File->new($file, '>', 0644);
+    unless open my $pid, '>', $file;
+  chmod 0644, $pid;
   print $pid $$;
 }
 
@@ -309,8 +309,7 @@ sub _spawn {
   # Prepare lock file
   my $c    = $self->{config};
   my $file = $c->{lock_file};
-  my $lock = IO::File->new("> $file")
-    or die qq/Can't open lock file "$file": $!/;
+  die qq/Can't open lock file "$file": $!/ unless open my $lock, '>', $file;
 
   # Change user/group
   my $loop = $self->{daemon}->setuidgid->ioloop;
@@ -443,11 +442,11 @@ incoming connections.
   |- Worker [2]
   |- Worker [3]
   |- Worker [4]
-  `- Manager (new)
+  +- Manager (new)
      |- Worker [1]
      |- Worker [2]
      |- Worker [3]
-     `- Worker [4]
+     +- Worker [4]
 
 The new manager will automatically send a C<QUIT> signal to the old manager
 and take over serving requests after starting up successfully.

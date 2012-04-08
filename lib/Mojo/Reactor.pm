@@ -132,6 +132,11 @@ Run reactor until at least one event has been handled or no events are being
 watched anymore. Note that this method can recurse back into the reactor, so
 you need to be careful. Meant to be overloaded in a subclass.
 
+  # Don't block longer than 0.5 seconds
+  my $id = $reactor->timer(0.5 => sub {});
+  $reactor->one_tick;
+  $reactor->remove($id);
+
 =head2 C<recurring>
 
   my $id = $reactor->recurring(0.25 => sub {...});

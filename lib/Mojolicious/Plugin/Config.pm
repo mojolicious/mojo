@@ -29,7 +29,7 @@ sub parse {
   die qq/Couldn't parse config file "$file": $@/
     unless my $config = eval "sub app { \$app }; $content";
   die qq/Config file "$file" did not return a hash reference.\n/
-    unless (ref $config || '') eq 'HASH';
+    unless ref $config eq 'HASH';
 
   return $config;
 }
@@ -121,9 +121,10 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Config> is a Perl-ish configuration plugin. The
-application object can be accessed via the C<app> helper. You can extend the
-normal configuration file C<myapp.conf> with C<mode> specific ones like
-C<myapp.$mode.conf>.
+application object can be accessed via C<$app> or the C<app> function. You
+can extend the normal configuration file C<myapp.conf> with C<mode> specific
+ones like C<myapp.$mode.conf>. The code of this plugin is a good example for
+learning to build new plugins.
 
 =head1 OPTIONS
 
@@ -134,14 +135,14 @@ L<Mojolicious::Plugin::Config> supports the following options.
   # Mojolicious::Lite
   plugin Config => {default => {foo => 'bar'}};
 
-Default configuration.
+Default configuration, making configuration files optional.
 
 =head2 C<ext>
 
   # Mojolicious::Lite
   plugin Config => {ext => 'stuff'};
 
-File extension of configuration file, defaults to C<conf>.
+File extension for generated configuration file names, defaults to C<conf>.
 
 =head2 C<file>
 
@@ -149,8 +150,8 @@ File extension of configuration file, defaults to C<conf>.
   plugin Config => {file => 'myapp.conf'};
   plugin Config => {file => '/etc/foo.stuff'};
 
-Configuration file, defaults to the value of the C<MOJO_CONFIG> environment
-variable or C<myapp.conf> in the application home directory.
+Full path to configuration file, defaults to the value of the C<MOJO_CONFIG>
+environment variable or C<myapp.conf> in the application home directory.
 
 =head1 METHODS
 

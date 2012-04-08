@@ -64,9 +64,8 @@ sub run {
   if ($name && $name =~ /^\w+$/ && ($name ne 'help' || $args[0])) {
 
     # Help
-    my $help = $name eq 'help';
-    $name = shift @args if $help;
-    $help = 1           if $ENV{MOJO_HELP};
+    $name = shift @args if my $help = $name eq 'help';
+    $help = $ENV{MOJO_HELP} = $ENV{MOJO_HELP} ? 1 : $help;
 
     # Try all namespaces
     my $module;

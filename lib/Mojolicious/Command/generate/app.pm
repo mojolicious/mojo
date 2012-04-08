@@ -2,7 +2,7 @@ package Mojolicious::Command::generate::app;
 use Mojo::Base 'Mojo::Command';
 
 has description => "Generate Mojolicious application directory structure.\n";
-has usage       => "usage: $0 generate app [CLASS]\n";
+has usage       => "usage: $0 generate app [NAME]\n";
 
 # "I say, you've damaged our servants quarters... and our servants."
 sub run {

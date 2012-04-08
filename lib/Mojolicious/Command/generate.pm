@@ -16,6 +16,8 @@ has namespaces =>
   sub { [qw/Mojolicious::Command::generate Mojo::Command::generate/] };
 has usage => "usage: $0 generate GENERATOR [OPTIONS]\n";
 
+sub help { shift->run(@_) }
+
 1;
 __END__
 
@@ -71,7 +73,13 @@ L<Mojolicious::Command::generate> and L<Mojo::Command::generate>.
 =head1 METHODS
 
 L<Mojolicious::Command::generate> inherits all methods from
-L<Mojolicious::Commands>.
+L<Mojolicious::Commands> and implements the following new ones.
+
+=head2 C<help>
+
+  $generator->help('app');
+
+Print usage information for generator command.
 
 =head1 SEE ALSO
 

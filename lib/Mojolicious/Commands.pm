@@ -77,7 +77,7 @@ sub run {
       unless $module;
 
     # Run
-    return $help ? $module->new->help : $module->new->run(@args);
+    return $help ? $module->new->help(@args) : $module->new->run(@args);
   }
 
   # Test

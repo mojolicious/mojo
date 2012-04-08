@@ -1,6 +1,8 @@
 package MojoliciousTest;
 use Mojo::Base 'Mojolicious';
 
+use utf8;
+
 use MojoliciousTest::Foo;
 
 sub development_mode {

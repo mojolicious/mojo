@@ -438,7 +438,8 @@ L<Mojo::Transaction> and implements the following new ones.
   my $multi = Mojo::Content::MultiPart->new;
 
 Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
-C<frame> event with default message parser.
+C<frame> event with default message parser, which also handles C<PING> and
+C<CLOSE> frames automatically.
 
 =head2 C<build_frame>
 

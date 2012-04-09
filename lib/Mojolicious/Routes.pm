@@ -372,9 +372,9 @@ Match routes with L<Mojolicious::Routes::Match> and dispatch.
 
 =head2 C<hide>
 
-  $r = $r->hide('new');
+  $r = $r->hide(qw/foo bar/);
 
-Hide controller method or attribute from routes.
+Hide controller methods and attributes from routes.
 
 =head2 C<route>
 

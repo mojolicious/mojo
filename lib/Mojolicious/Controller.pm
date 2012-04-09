@@ -691,13 +691,13 @@ or L<Mojo::Transaction::WebSocket> object.
   # Emitted when the transaction has been finished
   $c->on(finish => sub {
     my $c = shift;
-    say 'We are done!';
+    $c->app->log->debug('We are done!');
   });
 
   # Emitted when new WebSocket messages arrive
   $c->on(message => sub {
     my ($c, $message) = @_;
-    say "Message: $message";
+    $c->app->log->debug("Message: $message");
   });
 
 =head2 C<param>

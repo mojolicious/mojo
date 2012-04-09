@@ -78,19 +78,19 @@ following new ones.
 
   $upload->move_to('/foo/bar/baz.txt');
 
-Move uploaded data to a specific file.
+Alias for L<Mojo::Asset::File/"move_to">.
 
 =head2 C<size>
 
   my $size = $upload->size;
 
-Size of upload in bytes.
+Alias for L<Mojo::Asset::File/"size">.
 
 =head2 C<slurp>
 
   my $string = $upload->slurp;
 
-Read all upload data at once.
+Alias for L<Mojo::Asset::File/"slurp">.
 
 =head1 SEE ALSO
 

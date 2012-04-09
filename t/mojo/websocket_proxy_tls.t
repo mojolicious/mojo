@@ -89,7 +89,6 @@ Mojo::IOLoop->server(
         if (my $server = $c->{$client}->{connection}) {
           return Mojo::IOLoop->stream($server)->write($chunk);
         }
-        $c->{$client}->{client} //= '';
         $c->{$client}->{client} .= $chunk;
         if ($c->{$client}->{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
           my $buffer = $c->{$client}->{client};

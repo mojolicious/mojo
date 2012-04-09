@@ -207,10 +207,7 @@ sub write {
   $self->{dynamic} = 1;
 
   # Add chunk
-  if (defined $chunk) {
-    $self->{body_buffer} //= '';
-    $self->{body_buffer} .= $chunk;
-  }
+  if (defined $chunk) { $self->{body_buffer} .= $chunk }
 
   # Delay
   else { $self->{delay} = 1 }

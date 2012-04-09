@@ -15,9 +15,9 @@ sub set {
   my ($self, $key, $value) = @_;
 
   # Cache with size limit
-  my $keys  = $self->max_keys;
   my $cache = $self->{cache} ||= {};
   my $stack = $self->{stack} ||= [];
+  my $keys  = $self->max_keys;
   delete $cache->{shift @$stack} while @$stack >= $keys;
   push @$stack, $key;
   $cache->{$key} = $value;

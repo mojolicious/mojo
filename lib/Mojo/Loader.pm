@@ -36,29 +36,23 @@ sub search {
   my ($self, $namespace) = @_;
 
   # Scan
-  my $modules = [];
-  my %found;
+  my (@modules, %found);
   for my $directory (exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC) {
-    my $path = catdir $directory, (split /::/, $namespace);
-    next unless (-e $path && -d $path);
-
-    # Get files
-    opendir(my $dir, $path);
-    my @files = grep /\.pm$/, readdir($dir);
-    closedir($dir);
+    next unless -d (my $path = catdir $directory, (split /::/, $namespace));
 
     # Check files
-    for my $file (@files) {
+    opendir(my $dir, $path);
+    for my $file (grep /\.pm$/, readdir($dir)) {
       next if -d catfile splitdir($path), $file;
 
       # Module found
       my $class = "$namespace\::" . fileparse $file, qr/\.pm/;
-      push @$modules, $class unless $found{$class};
-      $found{$class} ||= 1;
+      push @modules, $class unless $found{$class}++;
     }
+    closedir $dir;
   }
 
-  return $modules;
+  return \@modules;
 }
 
 1;

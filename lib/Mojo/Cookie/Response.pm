@@ -32,15 +32,14 @@ sub parse {
 
   # Walk tree
   my @cookies;
-  for my $knot ($self->_tokenize($string)) {
-    for my $i (0 .. $#{$knot}) {
-      my ($name, $value) = @{$knot->[$i]};
+  for my $token ($self->_tokenize($string)) {
+    for my $i (0 .. $#$token) {
+      my ($name, $value) = @{$token->[$i]};
 
       # This will only run once
       if (!$i) {
-        push @cookies, Mojo::Cookie::Response->new;
-        $cookies[-1]->name($name);
-        $cookies[-1]->value($value //= '');
+        push @cookies,
+          Mojo::Cookie::Response->new(name => $name, value => $value // '');
       }
 
       # Attributes
@@ -59,10 +58,10 @@ sub to_string {
   my $self = shift;
 
   # Name and value
-  return '' unless my $cookie = $self->name;
-  $cookie .= '=';
-  my $value = $self->value;
-  $cookie .= $value =~ /[,;"]/ ? quote($value) : $value if defined $value;
+  return '' unless my $name = $self->name;
+  my $value = $self->value // '';
+  $value = $value =~ /[,;"]/ ? quote($value) : $value;
+  my $cookie = "$name=$value";
 
   # Domain
   if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }

@@ -11,18 +11,11 @@ sub parse {
 
   # Walk tree
   my @cookies;
-  for my $knot ($self->_tokenize($string)) {
-    for my $token (@{$knot}) {
-      my ($name, $value) = @{$token};
-
-      # Garbage (RFC 2965)
-      next if $name =~ /^\$/;
-
-      # Name and value
-      push @cookies, Mojo::Cookie::Request->new;
-      $cookies[-1]->name($name);
-      $cookies[-1]->value($value //= '');
-    }
+  for my $token (map {@$_} $self->_tokenize($string)) {
+    my ($name, $value) = @$token;
+    next if $name =~ /^\$/;
+    push @cookies,
+      Mojo::Cookie::Request->new(name => $name, value => $value // '');
   }
 
   return \@cookies;
@@ -30,11 +23,10 @@ sub parse {
 
 sub to_string {
   my $self = shift;
-  return '' unless my $cookie = $self->name;
-  $cookie .= '=';
-  my $value = $self->value;
-  $cookie .= $value =~ /[,;"]/ ? quote($value) : $value if defined $value;
-  return $cookie;
+  return '' unless my $name = $self->name;
+  my $value = $self->value // '';
+  $value = $value =~ /[,;"]/ ? quote($value) : $value;
+  return "$name=$value";
 }
 
 1;

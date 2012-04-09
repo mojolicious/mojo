@@ -51,7 +51,7 @@ sub detect {
 
 sub type {
   my ($self, $ext, $type) = @_;
-  return $self->types->{$ext || ''} unless $type;
+  return $self->types->{$ext} unless $type;
   $self->types->{$ext} = $type;
   return $self;
 }

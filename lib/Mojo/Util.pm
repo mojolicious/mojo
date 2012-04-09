@@ -307,17 +307,10 @@ sub camelize {
   my $string = shift;
   return $string if $string =~ /^[A-Z]/;
 
-  # Module parts
-  my @parts;
-  for my $part (split /-/, $string) {
-    next unless $part;
-
-    # Camel case words
-    my @words = split /_/, $part;
-    @words = map { ucfirst lc } @words;
-    push @parts, join '', @words;
-  }
-  return join '::', @parts;
+  # Camel case words
+  return join '::', map {
+    join '', map { ucfirst lc } split /_/, $_
+  } split /-/, $string;
 }
 
 sub decamelize {
@@ -328,12 +321,12 @@ sub decamelize {
   my @parts;
   for my $part (split /\:\:/, $string) {
 
-    # Camel case words
+    # Snake case words
     my @words;
-    push @words, $1 while ($part =~ s/([A-Z]{1}[^A-Z]*)//);
-    @words = map {lc} @words;
+    push @words, lc $1 while $part =~ s/([A-Z]{1}[^A-Z]*)//;
     push @parts, join '_', @words;
   }
+
   return join '-', @parts;
 }
 
@@ -388,17 +381,18 @@ sub hmac_md5_sum  { _hmac(0, @_) }
 sub hmac_sha1_sum { _hmac(1, @_) }
 
 sub html_escape {
-  my $string  = shift;
+  my $string = shift;
+
   my $escaped = '';
-  for (1 .. length $string) {
+  for my $i (0 .. (length($string) - 1)) {
 
     # Escape entities
-    my $char = substr $string, 0, 1, '';
+    my $char = substr $string, $i, 1;
     my $num = unpack 'U', $char;
-    my $named = $REVERSE_ENTITIES{$num};
-    $char = "&$named;" if $named;
+    if (my $named = $REVERSE_ENTITIES{$num}) { $char = "&$named;" }
     $escaped .= $char;
   }
+
   return $escaped;
 }
 

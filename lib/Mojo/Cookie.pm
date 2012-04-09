@@ -24,37 +24,30 @@ sub _tokenize {
   while ($string) {
 
     # Name
-    if ($string =~ s/^\s*([^\=\;\,]+)\s*\=?\s*//) {
-      my $name = $1;
+    last unless $string =~ s/^\s*([^\=\;\,]+)\s*\=?\s*//;
+    my $name = $1;
 
-      # "expires" is a special case, thank you Netscape...
-      $string =~ s/^([^\;\,]+\,?[^\;\,]+)/"$1"/ if $name =~ /^expires$/i;
+    # "expires" is a special case, thank you Netscape...
+    $string =~ s/^([^\;\,]+\,?[^\;\,]+)/"$1"/ if $name =~ /^expires$/i;
 
-      # Value
-      my $value;
-      $value = unquote $1
-        if $string =~ s/^("(?:\\\\|\\"|[^"])+"|[^\;\,]+)\s*//;
+    # Value
+    my $value;
+    $value = unquote $1
+      if $string =~ s/^("(?:\\\\|\\"|[^"])+"|[^\;\,]+)\s*//;
 
-      # Token
-      push @token, [$name, $value];
+    # Token
+    push @token, [$name, $value];
 
-      # Separator
-      $string =~ s/^\s*\;\s*//;
-      if ($string =~ s/^\s*\,\s*//) {
-        push @tree, [@token];
-        @token = ();
-      }
+    # Separator
+    $string =~ s/^\s*\;\s*//;
+    if ($string =~ s/^\s*\,\s*//) {
+      push @tree, [@token];
+      @token = ();
     }
-
-    # Bad format
-    else {last}
-
   }
 
-  # No separator
-  push @tree, [@token] if @token;
-
-  return @tree;
+  # Take care of final token
+  return @token ? (@tree, \@token) : @tree;
 }
 
 1;

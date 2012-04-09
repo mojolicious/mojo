@@ -137,7 +137,8 @@ sub _dispatch_controller {
 
   # Action
   elsif (my $method = $self->_generate_method($field, $c)) {
-    $c->app->log->debug(qq/Routing to action "$class->$method"./);
+    my $log = $c->app->log;
+    $log->debug(qq/Routing to action "$class->$method"./);
 
     # Try to call action
     my $stash = $c->stash;
@@ -147,7 +148,7 @@ sub _dispatch_controller {
     }
 
     # Action not found
-    else { $c->app->log->debug('Assuming template without action.') }
+    else { $log->debug('Action not found, routing to template.') }
   }
 
   return !$staging || $continue ? 1 : undef;
@@ -156,13 +157,9 @@ sub _dispatch_controller {
 sub _generate_class {
   my ($self, $field, $c) = @_;
 
-  # DEPRECATED in Leaf Fluttering In Wind!
-  warn "The class stash value is DEPRECATED in favor of controller!\n"
-    if $field->{class};
-  my $class = camelize $field->{class} || $field->{controller} || '';
-
-  # Namespace
+  # Namespace and class
   my $namespace = $field->{namespace};
+  my $class = camelize $field->{controller} || '';
   return unless $class || $namespace;
   $namespace //= $self->namespace;
   $class = length $class ? "${namespace}::$class" : $namespace
@@ -177,15 +174,9 @@ sub _generate_class {
 sub _generate_method {
   my ($self, $field, $c) = @_;
 
-  # Prepare hidden
-  $self->{hiding} = {map { $_ => 1 } @{$self->hidden}} unless $self->{hiding};
-
-  # DEPRECATED in Leaf Fluttering In Wind!
-  warn "The method stash value is DEPRECATED in favor of action!\n"
-    if $field->{method};
-  return unless my $method = $field->{method} || $field->{action};
-
   # Hidden
+  $self->{hiding} = {map { $_ => 1 } @{$self->hidden}} unless $self->{hiding};
+  return unless my $method = $field->{action};
   $c->app->log->debug(qq/Action "$method" is not allowed./) and return
     if $self->{hiding}->{$method} || index($method, '_') == 0;
 

@@ -378,11 +378,11 @@ Emitted when a WebSocket frame has been received.
   $ws->unsubscribe('frame');
   $ws->on(frame => sub {
     my ($ws, $frame) = @_;
-    say "Fin: $frame->[0]";
-    say "Rsv1: $frame->[1]";
-    say "Rsv2: $frame->[2]";
-    say "Rsv3: $frame->[3]";
-    say "Op: $frame->[4]";
+    say "FIN: $frame->[0]";
+    say "RSV1: $frame->[1]";
+    say "RSV2: $frame->[2]";
+    say "RSV3: $frame->[3]";
+    say "Opcode: $frame->[4]";
     say "Payload: $frame->[5]";
   });
 
@@ -447,8 +447,23 @@ C<CLOSE> frames automatically.
 
 Build WebSocket frame.
 
-  # Build single "Binary" frame
+  # Continuation frame with FIN bit and payload
+  say $ws->build_frame(1, 0, 0, 0, 0, 'World!');
+
+  # Text frame with payload
+  say $ws->build_frame(0, 0, 0, 0, 1, 'Hello');
+
+  # Binary frame with FIN bit and payload
   say $ws->build_frame(1, 0, 0, 0, 2, 'Hello World!');
+
+  # Close frame with FIN bit and without payload
+  say $ws->build_frame(1, 0, 0, 0, 8, '');
+
+  # Ping frame with FIN bit and payload
+  say $ws->build_frame(1, 0, 0, 0, 9, 'Test 123');
+
+  # Pong frame with FIN bit and payload
+  say $ws->build_frame(1, 0, 0, 0, 10, 'Test 123');
 
 =head2 C<client_challenge>
 
@@ -518,11 +533,11 @@ Parse WebSocket frame.
 
   # Parse single frame and remove it from buffer
   my $frame = $ws->parse_frame(\$buffer);
-  say "Fin: $frame->[0]";
-  say "Rsv1: $frame->[1]";
-  say "Rsv2: $frame->[2]";
-  say "Rsv3: $frame->[3]";
-  say "Op: $frame->[4]";
+  say "FIN: $frame->[0]";
+  say "RSV1: $frame->[1]";
+  say "RSV2: $frame->[2]";
+  say "RSV3: $frame->[3]";
+  say "Opcode: $frame->[4]";
   say "Payload: $frame->[5]";
 
 =head2 C<remote_address>

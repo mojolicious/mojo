@@ -115,42 +115,39 @@ sub _dispatch_callback {
 sub _dispatch_controller {
   my ($self, $c, $field, $staging) = @_;
 
-  # Class and method
+  # Load and instantiate controller/application
   return 1
     unless my $app = $field->{app} || $self->_generate_class($field, $c);
-  my $method = $self->_generate_method($field, $c);
-  my $target = (ref $app || $app) . ($method ? "->$method" : '');
-  $c->app->log->debug(qq/Routing to "$target"./);
-
-  # Controller or application
   return unless $self->_load_class($c, $app);
   $app = $app->new($c) unless ref $app;
 
-  # Action
+  # Application
   my $continue;
-  if ($method) {
+  my $class = ref $app;
+  if (my $sub = $app->can('handler')) {
+    $c->app->log->debug(qq/Routing to application "$class"./);
 
-    # Call action
+    # Try to connect routes
+    if (my $sub = $app->can('routes')) {
+      my $r = $app->$sub;
+      weaken $r->parent($c->match->endpoint)->{parent} unless $r->parent;
+    }
+    $app->$sub($c);
+  }
+
+  # Action
+  elsif (my $method = $self->_generate_method($field, $c)) {
+    $c->app->log->debug(qq/Routing to action "$class->$method"./);
+
+    # Try to call action
     my $stash = $c->stash;
     if (my $sub = $app->can($method)) {
       $stash->{'mojo.routed'}++ unless $staging;
       $continue = $app->$sub;
     }
 
-    # Render
-    else {
-      $c->app->log->debug(
-        qq/Action "$target" not found, assuming template without action./);
-    }
-  }
-
-  # Application
-  else {
-    if (my $sub = $app->can('routes')) {
-      my $r = $app->$sub;
-      weaken $r->parent($c->match->endpoint)->{parent} unless $r->parent;
-    }
-    $app->handler($c);
+    # Action not found
+    else { $c->app->log->debug('Assuming template without action.') }
   }
 
   return !$staging || $continue ? 1 : undef;

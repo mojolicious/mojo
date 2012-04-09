@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 294;
+use Test::More tests => 314;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -330,6 +330,28 @@ $t->get_ok('/foo/routes')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/foo/routes');
+
+# SingleFileTestApp::Redispatch::handler
+$t->get_ok('/redispatch')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Redispatch!');
+
+# SingleFileTestApp::Redispatch::render
+$t->get_ok('/redispatch/render')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Render!');
+
+# SingleFileTestApp::Redispatch::handler (targeting an existing method)
+$t->get_ok('/redispatch/secret')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Redispatch!');
+
+# SingleFileTestApp::Redispatch::secret
+$t->get_ok('/redispatch/secret?rly=1')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Secret!');
 
 $t = Test::Mojo->new('MojoliciousTest');
 

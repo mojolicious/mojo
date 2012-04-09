@@ -17,6 +17,9 @@ sub startup {
   push @{$self->renderer->classes}, 'SingleFileTestApp::Foo';
   push @{$self->static->classes},   'SingleFileTestApp::Foo';
 
+  # Allow redispatching controller
+  push @{$self->routes->base_classes}, 'Mojo::Base';
+
   # Helper route
   $self->routes->route('/helper')->to(
     cb => sub {
@@ -27,6 +30,26 @@ sub startup {
 
   # /*/* - the default route
   $self->routes->route('/:controller/:action')->to(action => 'index');
+}
+
+package SingleFileTestApp::Redispatch;
+use Mojo::Base -base;
+
+sub handler {
+  my ($self, $c) = @_;
+  return secret($c) if $c->param('rly');
+  return render($c) if $c->stash('action') eq 'render';
+  $c->render(text => 'Redispatch!');
+}
+
+sub render {
+  my $c = shift;
+  $c->render(text => 'Render!');
+}
+
+sub secret {
+  my $c = shift;
+  $c->render(text => 'Secret!');
 }
 
 package SingleFileTestApp::Foo;

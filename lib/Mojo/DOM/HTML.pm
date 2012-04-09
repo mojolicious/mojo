@@ -52,21 +52,19 @@ my %OPTIONAL = map { $_ => 1 }
   qw/body colgroup dd head li optgroup option p rt rp tbody td tfoot th/;
 
 # Elements that break HTML paragraphs
-my @PARAGRAPH = (
+my %PARAGRAPH = map { $_ => 1 } (
   qw/address article aside blockquote dir div dl fieldset footer form h1 h2/,
   qw/h3 h4 h5 h6 header hgroup hr menu nav ol p pre section table or ul/
 );
-my %PARAGRAPH = map { $_ => 1 } @PARAGRAPH;
 
 # HTML table elements
 my %TABLE = map { $_ => 1 } qw/col colgroup tbody td th thead tr/;
 
 # HTML5 void elements
-my @VOID = (
+my %VOID = map { $_ => 1 } (
   qw/area base br col command embed hr img input keygen link meta param/,
   qw/source track wbr/
 );
-my %VOID = map { $_ => 1 } @VOID;
 
 # HTML4/5 inline elements
 my @HTML4_INLINE = qw/applet basefont big del font iframe ins s strike u/;
@@ -150,9 +148,8 @@ sub parse {
       }
     }
   }
-  $self->tree($tree);
 
-  return $self;
+  return $self->tree($tree);
 }
 
 sub render {

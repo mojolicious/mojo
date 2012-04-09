@@ -2,6 +2,7 @@ package Mojolicious::Command::generate::plugin;
 use Mojo::Base 'Mojo::Command';
 
 use Mojo::Util 'camelize';
+use Mojolicious;
 
 # "You know Santa may have killed Scruffy, but he makes a good point."
 has description => "Generate Mojolicious plugin directory structure.\n";
@@ -108,7 +109,7 @@ WriteMakefile(
   NAME         => '<%= $class %>',
   VERSION_FROM => 'lib/<%= $path %>',
   AUTHOR       => 'A Good Programmer <nospam@cpan.org>',
-  PREREQ_PM    => {'Mojolicious' => '2.77'},
+  PREREQ_PM    => {'Mojolicious' => '<%= $Mojolicious::VERSION %>'},
   test         => {TESTS => 't/*.t'}
 );
 

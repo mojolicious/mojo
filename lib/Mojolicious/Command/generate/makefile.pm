@@ -1,6 +1,8 @@
 package Mojolicious::Command::generate::makefile;
 use Mojo::Base 'Mojo::Command';
 
+use Mojolicious;
+
 has description => qq/Generate "Makefile.PL".\n/;
 has usage       => "usage: $0 generate makefile\n";
 
@@ -20,7 +22,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   VERSION   => '0.01',
-  PREREQ_PM => {'Mojolicious' => '2.77'},
+  PREREQ_PM => {'Mojolicious' => '<%= $Mojolicious::VERSION %>'},
   test      => {TESTS => 't/*.t'}
 );
 

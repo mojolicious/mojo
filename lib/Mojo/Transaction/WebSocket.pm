@@ -34,7 +34,7 @@ sub new {
 
 sub build_frame {
   my ($self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload) = @_;
-  warn "BUILDING FRAME\n" if DEBUG;
+  warn "*** BUILDING FRAME\n" if DEBUG;
 
   # Head
   my $frame = 0b00000000;
@@ -44,10 +44,10 @@ sub build_frame {
   vec($frame, 0, 8) |= 0b00010000 if $rsv3;
 
   # Mask payload
-  warn "PAYLOAD: $payload\n" if DEBUG;
+  warn "=== PAYLOAD\n$payload\n" if DEBUG;
   my $masked = $self->masked;
   if ($masked) {
-    warn "MASKING PAYLOAD\n" if DEBUG;
+    warn "=== MASKING PAYLOAD\n" if DEBUG;
     my $mask = pack 'N', int(rand 9999999);
     $payload = $mask . _xor_mask($payload, $mask);
   }
@@ -83,8 +83,8 @@ sub build_frame {
   }
 
   if (DEBUG) {
-    warn 'HEAD: ', unpack('B*', $frame), "\n";
-    warn "OPCODE: $op\n";
+    warn '=== HEAD (', unpack('B*', $frame), ")\n";
+    warn "=== OPCODE ($op)\n";
   }
 
   return $frame . $payload;
@@ -131,40 +131,40 @@ sub local_port    { shift->handshake->local_port }
 
 sub parse_frame {
   my ($self, $buffer) = @_;
-  warn "PARSING FRAME\n" if DEBUG;
+  warn "*** PARSING FRAME\n" if DEBUG;
 
   # Head
   my $clone = $$buffer;
   return unless length $clone > 2;
   my $head = substr $clone, 0, 2;
-  warn 'HEAD: ' . unpack('B*', $head) . "\n" if DEBUG;
+  warn '=== HEAD (' . unpack('B*', $head) . ")\n" if DEBUG;
 
   # FIN
   my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;
-  warn "FIN: $fin\n" if DEBUG;
+  warn "=== FIN ($fin)\n" if DEBUG;
 
   # RSV1-3
   my $rsv1 = (vec($head, 0, 8) & 0b01000000) == 0b01000000 ? 1 : 0;
-  warn "RSV1: $rsv1\n" if DEBUG;
+  warn "=== RSV1 ($rsv1)\n" if DEBUG;
   my $rsv2 = (vec($head, 0, 8) & 0b00100000) == 0b00100000 ? 1 : 0;
-  warn "RSV2: $rsv2\n" if DEBUG;
+  warn "=== RSV2 ($rsv2)\n" if DEBUG;
   my $rsv3 = (vec($head, 0, 8) & 0b00010000) == 0b00010000 ? 1 : 0;
-  warn "RSV3: $rsv3\n" if DEBUG;
+  warn "=== RSV3 ($rsv3)\n" if DEBUG;
 
   # Opcode
   my $op = vec($head, 0, 8) & 0b00001111;
-  warn "OPCODE: $op\n" if DEBUG;
+  warn "=== OPCODE ($op)\n" if DEBUG;
 
   # Length
   my $len = vec($head, 1, 8) & 0b01111111;
-  warn "LENGTH: $len\n" if DEBUG;
+  warn "=== LENGTH ($len)\n" if DEBUG;
 
   # No payload
   my $hlen = 2;
-  if ($len == 0) { warn "NOTHING\n" if DEBUG }
+  if ($len == 0) { warn "=== NOTHING\n" if DEBUG }
 
   # Small payload
-  elsif ($len < 126) { warn "SMALL\n" if DEBUG }
+  elsif ($len < 126) { warn "=== SMALL\n" if DEBUG }
 
   # Extended payload (16bit)
   elsif ($len == 126) {
@@ -172,7 +172,7 @@ sub parse_frame {
     $hlen = 4;
     my $ext = substr $clone, 2, 2;
     $len = unpack 'n', $ext;
-    warn "EXTENDED (16bit): $len\n" if DEBUG;
+    warn "=== EXTENDED 16BIT ($len)\n" if DEBUG;
   }
 
   # Extended payload (64bit)
@@ -184,7 +184,7 @@ sub parse_frame {
       $Config{ivsize} > 4
       ? unpack('Q>', $ext)
       : unpack('N', substr($ext, 4, 4));
-    warn "EXTENDED (64bit): $len\n" if DEBUG;
+    warn "=== EXTENDED 64BIT ($len)\n" if DEBUG;
   }
 
   # Check message size
@@ -202,10 +202,10 @@ sub parse_frame {
 
   # Unmask payload
   if ($masked) {
-    warn "UNMASKING PAYLOAD\n" if DEBUG;
+    warn "=== UNMASKING PAYLOAD\n" if DEBUG;
     $payload = _xor_mask($payload, substr($payload, 0, 4, ''));
   }
-  warn "PAYLOAD: $payload\n" if DEBUG;
+  warn "=== PAYLOAD\n$payload\n" if DEBUG;
   $$buffer = $clone;
 
   return [$fin, $rsv1, $rsv2, $rsv3, $op, $payload];

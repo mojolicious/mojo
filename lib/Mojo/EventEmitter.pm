@@ -15,10 +15,10 @@ use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 sub emit {
   my ($self, $name) = (shift, shift);
   if (my $s = $self->{events}->{$name}) {
-    warn 'EMIT ', blessed($self), " $name (", scalar(@$s), ")\n" if DEBUG;
+    warn '=== EMIT ', blessed($self), " $name (", scalar(@$s), ")\n" if DEBUG;
     for my $cb (@$s) { $self->$cb(@_) }
   }
-  elsif (DEBUG) { warn 'EMIT ', blessed($self), " $name (0)\n" }
+  elsif (DEBUG) { warn '=== EMIT ', blessed($self), " $name (0)\n" }
   return $self;
 }
 
@@ -26,7 +26,7 @@ sub emit_safe {
   my ($self, $name) = (shift, shift);
 
   if (my $s = $self->{events}->{$name}) {
-    warn 'SAFE ', blessed($self), " $name (", scalar(@$s), ")\n" if DEBUG;
+    warn '=== SAFE ', blessed($self), " $name (", scalar(@$s), ")\n" if DEBUG;
     for my $cb (@$s) {
       if (!eval { $self->$cb(@_); 1 } && $name ne 'error') {
         $self->once(error => sub { warn $_[1] })
@@ -35,7 +35,7 @@ sub emit_safe {
       }
     }
   }
-  elsif (DEBUG) { warn 'SAFE ', blessed($self), " $name (0)\n" }
+  elsif (DEBUG) { warn '=== SAFE ', blessed($self), " $name (0)\n" }
 
   return $self;
 }

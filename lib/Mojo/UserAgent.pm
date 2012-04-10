@@ -182,14 +182,14 @@ sub _cleanup {
 sub _connect {
   my ($self, $tx, $cb) = @_;
 
-  # Keep alive connection
+  # Cached connection
   my $id = $tx->connection;
-  my ($scheme, $host, $port) = $self->transactor->peer($tx);
+  my ($scheme, $host, $port) = $self->transactor->endpoint($tx);
   $id ||= $self->_cache("$scheme:$host:$port");
   if ($id && !ref $id) {
-    warn "KEEP ALIVE CONNECTION ($scheme:$host:$port)\n" if DEBUG;
+    warn "CACHED CONNECTION ($scheme:$host:$port)\n" if DEBUG;
     $self->{connections}->{$id} = {cb => $cb, tx => $tx};
-    $tx->kept_alive(1);
+    $tx->kept_alive(1) unless $tx->connection;
     $self->_connected($id);
     return $id;
   }
@@ -197,7 +197,8 @@ sub _connect {
   # CONNECT request to proxy required
   return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
 
-  # Connect
+  # New connection
+  ($scheme, $host, $port) = $self->transactor->peer($tx);
   warn "NEW CONNECTION ($scheme:$host:$port)\n" if DEBUG;
   weaken $self;
   $id = $self->_loop->client(
@@ -403,7 +404,7 @@ sub _remove {
   }
 
   # Keep connection alive
-  $self->_cache(join(':', $self->transactor->peer($tx)), $id)
+  $self->_cache(join(':', $self->transactor->endpoint($tx)), $id)
     unless $tx->req->method eq 'CONNECT' && ($tx->res->code || '') eq '200';
 }
 

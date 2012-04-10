@@ -13,7 +13,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 16;
+plan tests => 17;
 
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
@@ -199,23 +199,24 @@ is $result, 'test1test2', 'right result';
 
 # GET /proxy (proxy request)
 $ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
-my $auth;
 $result = undef;
+my ($auth, $kept_alive);
 $ua->get(
   "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
-    $auth   = $tx->req->headers->proxy_authorization;
-    $result = $tx->success->body;
+    $result     = $tx->success->body;
+    $auth       = $tx->req->headers->proxy_authorization;
+    $kept_alive = $tx->kept_alive;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
-ok !$auth, 'no "Proxy-Authorization" header';
 is $result, "https://localhost:$port/proxy", 'right content';
+ok !$auth,       'no "Proxy-Authorization" header';
+ok !$kept_alive, 'not kept alive';
 
 # GET /proxy (kept alive proxy request)
-$result = undef;
-my $kept_alive;
+($result, $kept_alive) = undef;
 $ua->get(
   "https://localhost:$port/proxy" => sub {
     my $tx = pop;
@@ -230,8 +231,7 @@ ok $kept_alive, 'kept alive';
 
 # WebSocket /test (kept alive proxy websocket)
 $ua->https_proxy("http://localhost:$proxy");
-$result     = undef;
-$kept_alive = undef;
+($result, $kept_alive) = undef;
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
     my $tx = pop;

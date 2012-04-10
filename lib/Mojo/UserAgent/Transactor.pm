@@ -12,6 +12,17 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util qw/encode url_escape/;
 
+sub endpoint {
+  my ($self, $tx) = @_;
+
+  my $url    = $tx->req->url;
+  my $scheme = $url->scheme || 'http';
+  my $host   = $url->ihost;
+  my $port   = $url->port || ($scheme eq 'https' ? 443 : 80);
+
+  return $scheme, $host, $port;
+}
+
 sub form {
   my ($self, $url) = (shift, shift);
 
@@ -82,18 +93,15 @@ sub form {
 sub peer {
   my ($self, $tx) = @_;
 
-  # Peer for transaction
-  my $req    = $tx->req;
-  my $url    = $req->url;
-  my $scheme = $url->scheme || 'http';
-  my $host   = $url->ihost;
-  my $port   = $url->port;
-  if (my $proxy = $req->proxy) {
+  # Start with endpoint
+  my ($scheme, $host, $port) = $self->endpoint($tx);
+
+  # Proxy
+  if (my $proxy = $tx->req->proxy) {
     $scheme = $proxy->scheme;
     $host   = $proxy->ihost;
-    $port   = $proxy->port;
+    $port   = $proxy->port || ($scheme eq 'https' ? 443 : 80);
   }
-  $port ||= $scheme eq 'https' ? 443 : 80;
 
   return $scheme, $host, $port;
 }
@@ -254,6 +262,12 @@ framework used by L<Mojo::UserAgent>.
 
 L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
+
+=head2 C<endpoint>
+
+  my ($scheme, $host, $port) = $t->endpoint($tx);
+
+Actual endpoint for transaction.
 
 =head2 C<form>
 

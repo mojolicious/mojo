@@ -28,7 +28,7 @@ sub check_file {
 
 sub run {
   my ($self, $app) = @_;
-  warn "=== Manager started ($$)\n" if DEBUG;
+  warn "-- Manager started ($$)\n" if DEBUG;
 
   # Watch files and manage worker
   $SIG{CHLD} = sub { $self->_reap };
@@ -51,7 +51,7 @@ sub _manage {
   my $self = shift;
 
   # Discover files
-  warn "=== Discovering new files\n" if DEBUG;
+  warn "-- Discovering new files\n" if DEBUG;
   my @files;
   for my $watch (@{$self->watch}) {
     if (-d $watch) {
@@ -63,9 +63,9 @@ sub _manage {
 
   # Check files
   for my $file (@files) {
-    warn "=== Checking ($file)\n" if DEBUG;
+    warn "-- Checking ($file)\n" if DEBUG;
     next unless $self->check_file($file);
-    warn "=== Modified ($file)\n" if DEBUG;
+    warn "-- Modified ($file)\n" if DEBUG;
     say qq/File "$file" changed, restarting./ if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{running} if $self->{running};
     $self->{modified} = 1;
@@ -81,7 +81,7 @@ sub _manage {
 sub _reap {
   my $self = shift;
   while ((my $pid = waitpid -1, WNOHANG) > 0) {
-    warn "=== Worker stopped ($pid)\n" if DEBUG;
+    warn "-- Worker stopped ($pid)\n" if DEBUG;
     delete $self->{running};
   }
 }
@@ -102,7 +102,7 @@ sub _spawn {
   return $self->{running} = $pid if $pid;
 
   # Worker
-  warn "=== Worker started ($$)\n" if DEBUG;
+  warn "-- Worker started ($$)\n" if DEBUG;
   $SIG{CHLD} = 'DEFAULT';
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{finished} = 1 };
   my $daemon = Mojo::Server::Daemon->new;

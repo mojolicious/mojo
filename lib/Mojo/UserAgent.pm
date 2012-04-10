@@ -100,10 +100,10 @@ sub start {
   if ($cb) {
 
     # Start non-blocking
-    warn "*** New non-blocking request\n" if DEBUG;
+    warn "-- New non-blocking request\n" if DEBUG;
     unless ($self->{nb}) {
       croak 'Blocking request in progress' if keys %{$self->{connections}};
-      warn "=== Switching to non-blocking mode\n" if DEBUG;
+      warn "-- Switching to non-blocking mode\n" if DEBUG;
       $self->_cleanup;
       $self->{nb} = 1;
     }
@@ -111,10 +111,10 @@ sub start {
   }
 
   # Start blocking
-  warn "*** New blocking request\n" if DEBUG;
+  warn "-- New blocking request\n" if DEBUG;
   if (delete $self->{nb}) {
     croak 'Non-blocking requests in progress' if keys %{$self->{connections}};
-    warn "=== Switching to blocking mode\n"   if DEBUG;
+    warn "-- Switching to blocking mode\n" if DEBUG;
     $self->_cleanup;
   }
   $self->_start($tx, sub { $tx = $_[1] });
@@ -186,7 +186,7 @@ sub _connect {
   my ($scheme, $host, $port) = $self->transactor->endpoint($tx);
   $id ||= $self->_cache("$scheme:$host:$port");
   if ($id && !ref $id) {
-    warn "=== Cached connection ($scheme:$host:$port)\n" if DEBUG;
+    warn "-- Cached connection ($scheme:$host:$port)\n" if DEBUG;
     $self->{connections}->{$id} = {cb => $cb, tx => $tx};
     $tx->kept_alive(1) unless $tx->connection;
     $self->_connected($id);
@@ -197,7 +197,7 @@ sub _connect {
   return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
 
   # New connection
-  warn "=== New connection ($scheme:$host:$port)\n" if DEBUG;
+  warn "-- New connection ($scheme:$host:$port)\n" if DEBUG;
   ($scheme, $host, $port) = $self->transactor->peer($tx);
   weaken $self;
   $id = $self->_loop->client(
@@ -380,7 +380,7 @@ sub _loop {
 
 sub _read {
   my ($self, $id, $chunk) = @_;
-  warn "=== Client <<< Server\n$chunk\n" if DEBUG;
+  warn "-- Client <<< Server\n$chunk\n" if DEBUG;
 
   # Corrupted connection
   return                     unless my $c  = $self->{connections}->{$id};
@@ -436,7 +436,7 @@ sub _server {
   die "Couldn't find a free TCP port for testing.\n" unless $port;
   $self->{scheme} = $scheme ||= 'http';
   $server->listen(["$scheme://127.0.0.1:$port"])->start;
-  warn "=== Test server started ($scheme://127.0.0.1:$port)\n" if DEBUG;
+  warn "-- Test server started ($scheme://127.0.0.1:$port)\n" if DEBUG;
 
   return $server;
 }
@@ -520,7 +520,7 @@ sub _write {
   return if $self->{writing}++;
   my $chunk = $tx->client_write;
   delete $self->{writing};
-  warn "=== Client >>> Server\n$chunk\n" if DEBUG;
+  warn "-- Client >>> Server\n$chunk\n" if DEBUG;
 
   # More data to follow
   my $cb;

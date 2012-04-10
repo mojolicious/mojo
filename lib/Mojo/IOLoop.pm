@@ -19,7 +19,7 @@ has max_accepts     => 0;
 has max_connections => 1000;
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
-  warn "=== Mainloop ($class)\n" if DEBUG;
+  warn "-- Mainloop ($class)\n" if DEBUG;
   return $class->new;
 };
 has server_class => 'Mojo::IOLoop::Server';

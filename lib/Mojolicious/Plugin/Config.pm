@@ -55,13 +55,13 @@ sub register {
     # Default extension
     $file .= '.' . ($conf->{ext} || 'conf');
   }
-  warn "=== Config file ($file)\n" if DEBUG;
+  warn "-- Config file ($file)\n" if DEBUG;
 
   # Mode specific config file
   my $mode;
   if ($file =~ /^(.*)\.([^\.]+)$/) {
     $mode = join '.', $1, $app->mode, $2;
-    warn "=== Mode specific config file ($mode)\n" if DEBUG;
+    warn "-- Mode specific config file ($mode)\n" if DEBUG;
   }
 
   # Absolute path

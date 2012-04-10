@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 211;
+use Test::More tests => 238;
 
 # "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
@@ -158,11 +158,65 @@ like $tx->req->content->parts->[0]->headers->content_disposition,
 is $tx->req->content->parts->[0]->asset->slurp, 'whatever', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
+# Simple endpoint
+$tx = $t->tx(GET => 'mojolicio.us');
+is(($t->endpoint($tx))[0], 'http',         'right scheme');
+is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
+is(($t->endpoint($tx))[2], 80,             'right port');
+
+# Simple endpoint with proxy
+$tx = $t->tx(GET => 'http://mojolicio.us');
+$tx->req->proxy('http://127.0.0.1:3000');
+is(($t->endpoint($tx))[0], 'http',      'right scheme');
+is(($t->endpoint($tx))[1], '127.0.0.1', 'right host');
+is(($t->endpoint($tx))[2], 3000,        'right port');
+
+# Simple WebSocket endpoint with proxy
+$tx = $t->websocket('ws://mojolicio.us');
+$tx->req->proxy('http://127.0.0.1:3000');
+is(($t->endpoint($tx))[0], 'http',         'right scheme');
+is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
+is(($t->endpoint($tx))[2], 80,             'right port');
+
+# HTTPS endpoint
+$tx = $t->tx(GET => 'https://mojolicio.us');
+is(($t->endpoint($tx))[0], 'https',        'right scheme');
+is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
+is(($t->endpoint($tx))[2], 443,            'right port');
+
+# HTTPS endpoint with proxy
+$tx = $t->tx(GET => 'https://mojolicio.us');
+$tx->req->proxy('http://127.0.0.1:3000');
+is(($t->endpoint($tx))[0], 'https',        'right scheme');
+is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
+is(($t->endpoint($tx))[2], 443,            'right port');
+
+# TLS WebSocket endpoint with proxy
+$tx = $t->websocket('wss://mojolicio.us');
+$tx->req->proxy('http://127.0.0.1:3000');
+is(($t->endpoint($tx))[0], 'https',        'right scheme');
+is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
+is(($t->endpoint($tx))[2], 443,            'right port');
+
 # Simple peer
 $tx = $t->tx(GET => 'mojolicio.us');
 is(($t->peer($tx))[0], 'http',         'right scheme');
 is(($t->peer($tx))[1], 'mojolicio.us', 'right host');
 is(($t->peer($tx))[2], 80,             'right port');
+
+# Simple peer with proxy
+$tx = $t->tx(GET => 'http://mojolicio.us');
+$tx->req->proxy('http://127.0.0.1:3000');
+is(($t->peer($tx))[0], 'http',      'right scheme');
+is(($t->peer($tx))[1], '127.0.0.1', 'right host');
+is(($t->peer($tx))[2], 3000,        'right port');
+
+# Simple WebSocket peer with proxy
+$tx = $t->websocket('ws://mojolicio.us');
+$tx->req->proxy('http://127.0.0.1:3000');
+is(($t->peer($tx))[0], 'http',      'right scheme');
+is(($t->peer($tx))[1], '127.0.0.1', 'right host');
+is(($t->peer($tx))[2], 3000,        'right port');
 
 # HTTPS peer
 $tx = $t->tx(GET => 'https://mojolicio.us');
@@ -170,8 +224,15 @@ is(($t->peer($tx))[0], 'https',        'right scheme');
 is(($t->peer($tx))[1], 'mojolicio.us', 'right host');
 is(($t->peer($tx))[2], 443,            'right port');
 
-# Proxy peer
+# HTTPS peer with proxy
 $tx = $t->tx(GET => 'https://mojolicio.us');
+$tx->req->proxy('http://127.0.0.1:3000');
+is(($t->peer($tx))[0], 'http',      'right scheme');
+is(($t->peer($tx))[1], '127.0.0.1', 'right host');
+is(($t->peer($tx))[2], 3000,        'right port');
+
+# TLS WebSocket peer with proxy
+$tx = $t->websocket('wss://mojolicio.us');
 $tx->req->proxy('http://127.0.0.1:3000');
 is(($t->peer($tx))[0], 'http',      'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');

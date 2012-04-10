@@ -15,12 +15,17 @@ use Mojo::Util qw/encode url_escape/;
 sub endpoint {
   my ($self, $tx) = @_;
 
-  my $url    = $tx->req->url;
+  # Basic endpoint
+  my $req    = $tx->req;
+  my $url    = $req->url;
   my $scheme = $url->scheme || 'http';
   my $host   = $url->ihost;
   my $port   = $url->port || ($scheme eq 'https' ? 443 : 80);
 
-  return $scheme, $host, $port;
+  # Proxy for normal HTTP requests
+  return $scheme eq 'http' && lc($req->headers->upgrade || '') ne 'websocket'
+    ? $self->_proxy($tx, $scheme, $host, $port)
+    : ($scheme, $host, $port);
 }
 
 sub form {
@@ -92,18 +97,7 @@ sub form {
 #  He organized all the law suits against me into one class action suit."
 sub peer {
   my ($self, $tx) = @_;
-
-  # Start with endpoint
-  my ($scheme, $host, $port) = $self->endpoint($tx);
-
-  # Proxy
-  if (my $proxy = $tx->req->proxy) {
-    $scheme = $proxy->scheme;
-    $host   = $proxy->ihost;
-    $port   = $proxy->port || ($scheme eq 'https' ? 443 : 80);
-  }
-
-  return $scheme, $host, $port;
+  return $self->_proxy($tx, $self->endpoint($tx));
 }
 
 # "America's health care system is second only to Japan...
@@ -237,6 +231,19 @@ sub _multipart {
   }
 
   return \@parts;
+}
+
+sub _proxy {
+  my ($self, $tx, $scheme, $host, $port) = @_;
+
+  # Update with proxy information
+  if (my $proxy = $tx->req->proxy) {
+    $scheme = $proxy->scheme;
+    $host   = $proxy->ihost;
+    $port   = $proxy->port || ($scheme eq 'https' ? 443 : 80);
+  }
+
+  return $scheme, $host, $port;
 }
 
 1;

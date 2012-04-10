@@ -213,7 +213,7 @@ $ua->get(
 Mojo::IOLoop->start;
 is $result, "https://localhost:$port/proxy", 'right content';
 ok !$auth,       'no "Proxy-Authorization" header';
-ok !$kept_alive, 'not kept alive';
+ok !$kept_alive, 'connection was not kept alive';
 
 # GET /proxy (kept alive proxy request)
 ($result, $kept_alive) = undef;
@@ -227,7 +227,7 @@ $ua->get(
 );
 Mojo::IOLoop->start;
 is $result, "https://localhost:$port/proxy", 'right content';
-ok $kept_alive, 'kept alive';
+ok $kept_alive, 'connection was kept alive';
 
 # WebSocket /test (kept alive proxy websocket)
 $ua->https_proxy("http://localhost:$proxy");
@@ -248,7 +248,7 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-ok $kept_alive, 'kept alive';
+ok $kept_alive, 'connection was kept alive';
 is $connected,  "localhost:$port", 'connected';
 is $result,     'test1test2', 'right result';
 ok $read > 25, 'read enough';

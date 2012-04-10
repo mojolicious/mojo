@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 203;
+use Test::More tests => 207;
 
 # "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
@@ -203,14 +203,20 @@ ok $tx->req->headers->sec_websocket_version,
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
 
 # Proxy CONNECT
-$tx = $t->tx(GET => 'https://mojolicio.us');
-$tx->req->proxy('http://127.0.0.1:3000');
+$tx = $t->tx(GET => 'https://sri:secr3t@mojolicio.us');
+$tx->req->proxy('http://sri:secr3t@127.0.0.1:3000');
 $tx = $t->proxy_connect($tx);
 is $tx->req->method, 'CONNECT', 'right method';
-is $tx->req->url->to_abs,   'https://mojolicio.us',  'right URL';
-is $tx->req->proxy->to_abs, 'http://127.0.0.1:3000', 'right proxy URL';
-ok !$tx->req->headers->host, 'no "Host" header';
+is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
+is $tx->req->proxy->to_abs, 'http://sri:secr3t@127.0.0.1:3000',
+  'right proxy URL';
+ok !$tx->req->headers->authorization,       'no "Authorization" header';
+ok !$tx->req->headers->proxy_authorization, 'no "Proxy-Authorization" header';
+ok !$tx->req->headers->host,                'no "Host" header';
 $tx->req->fix_headers;
+ok !$tx->req->headers->authorization, 'no "Authorization" header';
+is $tx->req->headers->proxy_authorization, 'Basic c3JpOnNlY3IzdA==',
+  'right "Proxy-Authorization" header';
 is $tx->req->headers->host, '127.0.0.1:3000', 'right "Host" header';
 
 # Simple 302 redirect

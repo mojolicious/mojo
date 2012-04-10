@@ -158,8 +158,7 @@ sub parse {
 sub proxy {
   my $self = shift;
   return $self->{proxy} unless @_;
-  my $url = shift;
-  $self->{proxy} = !$url || ref $url ? $url : Mojo::URL->new($url);
+  $self->{proxy} = !$_[0] || ref $_[0] ? shift : Mojo::URL->new(shift);
   return $self;
 }
 

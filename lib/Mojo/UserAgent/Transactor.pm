@@ -115,7 +115,7 @@ sub proxy_connect {
   return unless $upgrade eq 'websocket' || $scheme eq 'https';
 
   # CONNECT request
-  my $new = $self->tx(CONNECT => $url->clone);
+  my $new = $self->tx(CONNECT => $url->clone->userinfo(undef));
   $new->req->proxy($proxy);
 
   return $new;

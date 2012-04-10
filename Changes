@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.81  2012-04-11
+  - Improved debug messages of Mojo::UserAgent and Mojo::Server::Daemon.
   - Improved documentation.
   - Improved tests.
 

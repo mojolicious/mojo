@@ -172,7 +172,6 @@ sub _cleanup {
   delete $self->{server};
 
   # Clean up active connections
-  warn "REMOVING ALL CONNECTIONS\n" if DEBUG;
   $loop->remove($_) for keys %{$self->{connections} || {}};
 
   # Clean up keep alive connections
@@ -198,8 +197,8 @@ sub _connect {
   return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
 
   # New connection
-  ($scheme, $host, $port) = $self->transactor->peer($tx);
   warn "NEW CONNECTION ($scheme:$host:$port)\n" if DEBUG;
+  ($scheme, $host, $port) = $self->transactor->peer($tx);
   weaken $self;
   $id = $self->_loop->client(
     address       => $host,
@@ -381,7 +380,7 @@ sub _loop {
 
 sub _read {
   my ($self, $id, $chunk) = @_;
-  warn "< $chunk\n" if DEBUG;
+  warn "-> $chunk\n" if DEBUG;
 
   # Corrupted connection
   return                     unless my $c  = $self->{connections}->{$id};
@@ -404,8 +403,7 @@ sub _remove {
   }
 
   # Keep connection alive
-  $self->_cache(join(':', $self->transactor->endpoint($tx)), $id)
-    unless $tx->req->method eq 'CONNECT' && ($tx->res->code || '') eq '200';
+  $self->_cache(join(':', $self->transactor->endpoint($tx)), $id);
 }
 
 sub _redirect {
@@ -522,7 +520,7 @@ sub _write {
   return if $self->{writing}++;
   my $chunk = $tx->client_write;
   delete $self->{writing};
-  warn "> $chunk\n" if DEBUG;
+  warn "<- $chunk\n" if DEBUG;
 
   # More data to follow
   my $cb;

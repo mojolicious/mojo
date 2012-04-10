@@ -131,11 +131,11 @@ sub local_port    { shift->handshake->local_port }
 
 sub parse_frame {
   my ($self, $buffer) = @_;
-  warn "*** PARSING FRAME\n" if DEBUG;
 
   # Head
   my $clone = $$buffer;
   return unless length $clone > 2;
+  warn "*** PARSING FRAME\n" if DEBUG;
   my $head = substr $clone, 0, 2;
   warn '=== HEAD (' . unpack('B*', $head) . ")\n" if DEBUG;
 

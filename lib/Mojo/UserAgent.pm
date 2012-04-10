@@ -380,7 +380,7 @@ sub _loop {
 
 sub _read {
   my ($self, $id, $chunk) = @_;
-  warn "SERVER -> CLIENT\n$chunk\n" if DEBUG;
+  warn "CLIENT <- SERVER\n$chunk\n" if DEBUG;
 
   # Corrupted connection
   return                     unless my $c  = $self->{connections}->{$id};
@@ -520,7 +520,7 @@ sub _write {
   return if $self->{writing}++;
   my $chunk = $tx->client_write;
   delete $self->{writing};
-  warn "SERVER <- CLIENT\n$chunk\n" if DEBUG;
+  warn "CLIENT -> SERVER\n$chunk\n" if DEBUG;
 
   # More data to follow
   my $cb;

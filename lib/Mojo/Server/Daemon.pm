@@ -245,7 +245,7 @@ sub _listen {
 
 sub _read {
   my ($self, $id, $chunk) = @_;
-  warn "=== SERVER <<< CLIENT\n$chunk\n" if DEBUG;
+  warn "=== Server <<< Client\n$chunk\n" if DEBUG;
 
   # Make sure we have a transaction
   my $c = $self->{connections}->{$id};
@@ -293,7 +293,7 @@ sub _write {
   return if $c->{writing}++;
   my $chunk = $tx->server_write;
   delete $c->{writing};
-  warn "=== SERVER >>> CLIENT\n$chunk\n" if DEBUG;
+  warn "=== Server >>> Client\n$chunk\n" if DEBUG;
 
   # Write
   my $stream = $self->ioloop->stream($id);

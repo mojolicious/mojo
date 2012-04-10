@@ -102,7 +102,7 @@ sub start {
     # Start non-blocking
     warn "NEW NON-BLOCKING REQUEST\n" if DEBUG;
     unless ($self->{nb}) {
-      croak 'Blocking request in progress' if $self->{processing};
+      croak 'Blocking request in progress' if keys %{$self->{connections}};
       warn "SWITCHING TO NON-BLOCKING MODE\n" if DEBUG;
       $self->_cleanup;
       $self->{nb} = 1;
@@ -113,7 +113,7 @@ sub start {
   # Start blocking
   warn "NEW BLOCKING REQUEST\n" if DEBUG;
   if (delete $self->{nb}) {
-    croak 'Non-blocking requests in progress' if $self->{processing};
+    croak 'Non-blocking requests in progress' if keys %{$self->{connections}};
     warn "SWITCHING TO BLOCKING MODE\n" if DEBUG;
     $self->_cleanup;
   }
@@ -343,7 +343,6 @@ sub _handle {
   # Finish WebSocket
   my $old = $c->{tx};
   if ($old && $old->is_websocket) {
-    $self->{processing} -= 1;
     delete $self->{connections}->{$id};
     $self->_remove($id, $close);
     $old->client_close;
@@ -361,7 +360,6 @@ sub _handle {
     $self->_remove($id, $close);
     return unless $old;
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
-    $self->{processing} -= 1;
     $old->client_close;
 
     # Handle redirects
@@ -370,7 +368,7 @@ sub _handle {
   }
 
   # Stop loop
-  $self->ioloop->stop if !$self->{nb} && !$self->{processing};
+  $self->ioloop->stop if !$self->{nb} && !keys %{$self->{connections}};
 }
 
 sub _loop {
@@ -480,7 +478,6 @@ sub _start {
   # Connect
   $self->emit(start => $tx);
   return unless my $id = $self->_connect($tx, $cb);
-  $self->{processing} += 1;
 
   # Request timeout
   if (my $t = $self->request_timeout) {

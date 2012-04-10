@@ -54,10 +54,7 @@ sub from_hash {
   my ($self, $hash) = (shift, shift);
 
   # Empty hash deletes all headers
-  if (keys %{$hash} == 0) {
-    $self->{headers} = {};
-    return $self;
-  }
+  delete $self->{headers} if keys %{$hash} == 0;
 
   # Merge
   while (my ($header, $value) = each %$hash) {
@@ -142,23 +139,23 @@ sub to_hash {
   my ($self, $multi) = @_;
 
   # Build
-  my $hash = {};
+  my %hash;
   for my $header (@{$self->names}) {
     my @headers = $self->header($header);
 
     # Multi line
-    if ($multi) { $hash->{$header} = [@headers] }
+    if ($multi) { $hash{$header} = [@headers] }
 
     # Flat
     else {
 
       # Turn single value arrays into strings
       @$_ == 1 and $_ = $_->[0] for @headers;
-      $hash->{$header} = @headers > 1 ? [@headers] : $headers[0];
+      $hash{$header} = @headers > 1 ? [@headers] : $headers[0];
     }
   }
 
-  return $hash;
+  return \%hash;
 }
 
 sub to_string {

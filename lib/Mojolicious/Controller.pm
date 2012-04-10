@@ -272,12 +272,12 @@ sub render_exception {
   return if $self->stash->{'mojo.exception'};
 
   # Filtered stash snapshot
-  my $snapshot = {};
-  my $stash    = $self->stash;
+  my %snapshot;
+  my $stash = $self->stash;
   for my $key (keys %$stash) {
     next if $key =~ /^mojo\./;
     next unless defined(my $value = $stash->{$key});
-    $snapshot->{$key} = $value;
+    $snapshot{$key} = $value;
   }
 
   # Render with fallbacks
@@ -287,7 +287,7 @@ sub render_exception {
     format           => $stash->{format} || 'html',
     handler          => undef,
     status           => 500,
-    snapshot         => $snapshot,
+    snapshot         => \%snapshot,
     exception        => $e,
     'mojo.exception' => 1
   };

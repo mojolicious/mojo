@@ -81,8 +81,8 @@ sub register {
       );
 
       # Rewrite headers
-      my $url      = $self->req->url->clone;
-      my $sections = [];
+      my $url = $self->req->url->clone;
+      my @sections;
       $dom->find('h1, h2, h3')->each(
         sub {
           my $e = shift;
@@ -90,8 +90,8 @@ sub register {
           $anchor =~ s/\s+/_/g;
           $anchor = url_escape $anchor, 'A-Za-z0-9_';
           $anchor =~ s/\%//g;
-          push @$sections, [] if $e->type eq 'h1' || !@$sections;
-          push @{$sections->[-1]}, $text, $url->fragment($anchor)->to_abs;
+          push @sections, [] if $e->type eq 'h1' || !@sections;
+          push @{$sections[-1]}, $text, $url->fragment($anchor)->to_abs;
           $e->replace_content(
             $self->link_to(
               $text => $url->fragment('toc')->to_abs,
@@ -111,7 +111,7 @@ sub register {
       $self->render(
         inline   => $PERLDOC,
         title    => $title,
-        sections => $sections
+        sections => \@sections
       );
       $self->res->headers->content_type('text/html;charset="UTF-8"');
     }

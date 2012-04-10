@@ -76,13 +76,13 @@ $app->routes->post(
     my $self = shift;
 
     my $params = $self->req->params->to_hash;
-    my $chunks = [];
-    for my $key (sort keys %$params) { push @$chunks, $params->{$key} }
+    my @chunks;
+    for my $key (sort keys %$params) { push @chunks, $params->{$key} }
 
     my $cb;
     $cb = sub {
       my $self = shift;
-      $cb = undef unless my $chunk = shift @$chunks || '';
+      $cb = undef unless my $chunk = shift @chunks || '';
       $self->write_chunk($chunk, $cb);
     };
     $self->$cb();
@@ -226,12 +226,12 @@ ok $tx->is_finished,  'transaction is finished';
 ok $tx2->is_finished, 'transaction is finished';
 
 # Form with chunked response
-my $params = {};
-for my $i (1 .. 10) { $params->{"test$i"} = $i }
+my %params;
+for my $i (1 .. 10) { $params{"test$i"} = $i }
 my $result = '';
-for my $key (sort keys %$params) { $result .= $params->{$key} }
+for my $key (sort keys %params) { $result .= $params{$key} }
 my ($code, $body);
-$tx = $ua->post_form("http://127.0.0.1:$port/chunked" => $params);
+$tx = $ua->post_form("http://127.0.0.1:$port/chunked" => \%params);
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 

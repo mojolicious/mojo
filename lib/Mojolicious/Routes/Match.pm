@@ -99,12 +99,11 @@ sub path_for {
   my $self = shift;
 
   # Single argument
-  my $values = {};
-  my $name;
+  my (%values, $name);
   if (@_ == 1) {
 
     # Hash
-    $values = shift if ref $_[0] eq 'HASH';
+    %values = %{shift()} if ref $_[0] eq 'HASH';
 
     # Name
     $name = $_[0] if $_[0];
@@ -114,16 +113,16 @@ sub path_for {
   elsif (@_ > 1) {
 
     # Odd
-    if (@_ % 2) { ($name, $values) = (shift, {@_}) }
+    if (@_ % 2) { ($name, %values) = (shift, @_) }
 
     # Even
     else {
 
       # Name and hash
-      if (ref $_[1] eq 'HASH') { ($name, $values) = (shift, shift) }
+      if (ref $_[1] eq 'HASH') { ($name, %values) = (shift, %{shift()}) }
 
       # Just values
-      else { $values = {@_} }
+      else { %values = @_ }
 
     }
   }
@@ -139,16 +138,16 @@ sub path_for {
 
   # Merge values
   my $captures = $self->captures;
-  $values = {%$captures, format => undef, %$values};
+  %values = (%$captures, format => undef, %values);
   my $pattern = $endpoint->pattern;
-  $values->{format} =
+  $values{format} =
     defined $captures->{format}
     ? $captures->{format}
     : $pattern->defaults->{format}
     if $pattern->reqs->{format};
 
   # Render
-  my $path = $endpoint->render('', $values);
+  my $path = $endpoint->render('', \%values);
   utf8::downgrade $path, 1;
   return wantarray ? ($path, $endpoint->has_websocket) : $path;
 }

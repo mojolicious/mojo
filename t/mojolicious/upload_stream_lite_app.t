@@ -27,7 +27,7 @@ hook after_build_tx => sub {
 };
 
 # POST /upload/*
-my $cache = {};
+my %cache;
 post '/upload/:id' => sub {
   my $self = shift;
 
@@ -41,7 +41,7 @@ post '/upload/:id' => sub {
           my $single = shift;
           return unless $single->headers->content_disposition =~ /my_file/;
           $single->unsubscribe('read');
-          $single->on(read => sub { $cache->{$id} .= pop });
+          $single->on(read => sub { $cache{$id} .= pop });
         }
       );
     }
@@ -49,13 +49,13 @@ post '/upload/:id' => sub {
   return unless $self->req->is_finished;
 
   # Second invocation, render response
-  $self->render(data => $cache->{$id});
+  $self->render(data => $cache{$id});
 };
 
 # GET /download/*
 get '/download/:id' => sub {
   my $self = shift;
-  $self->render(data => $cache->{$self->param('id')});
+  $self->render(data => $cache{$self->param('id')});
 };
 
 my $t = Test::Mojo->new;

@@ -119,7 +119,7 @@ sub parse {
       my ($start, $attr) = ($cs ? $1 : lc($1), $2);
 
       # Attributes
-      my $attrs = {};
+      my %attrs;
       while ($attr =~ /$ATTR_RE/g) {
         my $key = $cs ? $1 : lc($1);
         my $value = $2 // $3 // $4;
@@ -129,11 +129,11 @@ sub parse {
 
         # Add unescaped value
         $value = html_unescape $value if $value && (index $value, '&') >= 0;
-        $attrs->{$key} = $value;
+        $attrs{$key} = $value;
       }
 
       # Start
-      $self->_start($start, $attrs, \$current);
+      $self->_start($start, \%attrs, \$current);
 
       # Empty element
       $self->_end($start, \$current)

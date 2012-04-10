@@ -7,25 +7,25 @@ use Mojo::Base -strict;
 use Mojo::IOLoop;
 
 # Buffer for incoming data
-my $buffer = {};
+my %buffer;
 
 # Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)
 Mojo::IOLoop->server(
   {port => 3000} => sub {
     my ($loop, $stream, $id) = @_;
-    $buffer->{$id} = '';
+    $buffer{$id} = '';
     $stream->on(
       read => sub {
         my ($stream, $chunk) = @_;
 
         # Append chunk to buffer
-        $buffer->{$id} .= $chunk;
+        $buffer{$id} .= $chunk;
 
         # Check if we got start line and headers (no body support)
-        if (index($buffer->{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
+        if (index($buffer{$id}, "\x0d\x0a\x0d\x0a") >= 0) {
 
           # Clean buffer
-          delete $buffer->{$id};
+          delete $buffer{$id};
 
           # Write a minimal HTTP response
           # (the "Hello World!" message has been optimized away!)
@@ -34,7 +34,7 @@ Mojo::IOLoop->server(
         }
       }
     );
-    $stream->on(close => sub { delete $buffer->{$id} });
+    $stream->on(close => sub { delete $buffer{$id} });
   }
 ) or die "Couldn't create listen socket!\n";
 

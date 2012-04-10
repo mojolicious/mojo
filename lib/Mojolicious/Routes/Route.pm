@@ -245,15 +245,14 @@ sub _generate_route {
   my ($self, $methods, @args) = @_;
 
   # Route information
-  my ($cb, $constraints, $defaults, $name, $pattern);
-  my $conditions = [];
+  my ($cb, @conditions, @constraints, %defaults, $name, $pattern);
   while (defined(my $arg = shift @args)) {
 
     # First scalar is the pattern
     if (!ref $arg && !$pattern) { $pattern = $arg }
 
     # Scalar
-    elsif (!ref $arg && @args) { push @$conditions, $arg, shift @args }
+    elsif (!ref $arg && @args) { push @conditions, $arg, shift @args }
 
     # Last scalar is the route name
     elsif (!ref $arg) { $name = $arg }
@@ -262,25 +261,23 @@ sub _generate_route {
     elsif (ref $arg eq 'CODE') { $cb = $arg }
 
     # Constraints
-    elsif (ref $arg eq 'ARRAY') { $constraints = $arg }
+    elsif (ref $arg eq 'ARRAY') { @constraints = @$arg }
 
     # Defaults
-    elsif (ref $arg eq 'HASH') { $defaults = $arg }
+    elsif (ref $arg eq 'HASH') { %defaults = %$arg }
   }
 
-  # Defaults
-  $constraints ||= [];
-  $defaults    ||= {};
-  $defaults->{cb} = $cb if $cb;
+  # Callback
+  $defaults{cb} = $cb if $cb;
 
   # Create bridge
-  return $self->bridge($pattern, {@$constraints})->over($conditions)
-    ->to($defaults)->name($name)
+  return $self->bridge($pattern, {@constraints})->over(\@conditions)
+    ->to(\%defaults)->name($name)
     if !ref $methods && $methods eq 'under';
 
   # Create route
-  return $self->route($pattern, {@$constraints})->over($conditions)
-    ->via($methods)->to($defaults)->name($name);
+  return $self->route($pattern, {@constraints})->over(\@conditions)
+    ->via($methods)->to(\%defaults)->name($name);
 }
 
 1;

@@ -149,10 +149,7 @@ sub handler {
 
   # Embedded application
   my $stash = {};
-  if (my $sub = $tx->can('stash')) {
-    $stash = $tx->$sub;
-    $tx    = $tx->tx;
-  }
+  if (my $sub = $tx->can('stash')) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
 
   # Build default controller
   my $defaults = $self->defaults;

@@ -57,10 +57,10 @@ sub run {
   $verbose = 1 if $method eq 'HEAD';
 
   # Headers
-  my $headers = {};
+  my %headers;
   for my $header (@headers) {
     next unless $header =~ /^\s*([^\:]+)\s*:\s*([^\:]+)\s*$/;
-    $headers->{$1} = $2;
+    $headers{$1} = $2;
   }
 
   # URL and selector
@@ -133,7 +133,7 @@ sub run {
   );
 
   # Get
-  my $tx = $ua->build_tx($method, $url, $headers, $content);
+  my $tx = $ua->build_tx($method, $url, \%headers, $content);
   STDOUT->autoflush(1);
   $tx = $ua->start($tx);
 

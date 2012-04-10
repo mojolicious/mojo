@@ -83,13 +83,12 @@ sub run {
   return 1 if $ENV{HARNESS_ACTIVE};
 
   # Try all namespaces
-  my $commands = [];
-  my $seen     = {};
+  my (@commands, %seen);
   for my $namespace (@{$self->namespaces}) {
     for my $module (@{Mojo::Loader->search($namespace)}) {
       next unless my $command = _command($module);
       $command =~ s/^$namespace\:\://;
-      push @$commands, [$command => $module] unless $seen->{$command}++;
+      push @commands, [$command => $module] unless $seen{$command}++;
     }
   }
 
@@ -97,16 +96,16 @@ sub run {
   print $self->message;
 
   # Make list
-  my $list = [];
-  my $max  = 0;
-  for my $command (@$commands) {
+  my @list;
+  my $max = 0;
+  for my $command (@commands) {
     my $len = length $command->[0];
     $max = $len if $len > $max;
-    push @$list, [$command->[0], $command->[1]->new->description];
+    push @list, [$command->[0], $command->[1]->new->description];
   }
 
   # Print list
-  for my $command (@$list) {
+  for my $command (@list) {
     my ($name, $description) = @$command;
     print "  $name" . (' ' x ($max - length $name)) . "   $description";
   }

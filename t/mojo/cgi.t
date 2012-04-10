@@ -21,15 +21,13 @@ post '/chunked' => sub {
   my $self = shift;
 
   my $params = $self->req->params->to_hash;
-  my $chunks = [];
-  for my $key (sort keys %$params) {
-    push @$chunks, $params->{$key};
-  }
+  my @chunks;
+  for my $key (sort keys %$params) { push @chunks, $params->{$key} }
 
   my $cb;
   $cb = sub {
     my $self = shift;
-    $cb = undef unless my $chunk = shift @$chunks || '';
+    $cb = undef unless my $chunk = shift @chunks || '';
     $self->write_chunk($chunk, $cb);
   };
   $self->$cb();

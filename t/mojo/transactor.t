@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 201;
+use Test::More tests => 203;
 
 # "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
@@ -209,6 +209,9 @@ $tx = $t->proxy_connect($tx);
 is $tx->req->method, 'CONNECT', 'right method';
 is $tx->req->url->to_abs,   'https://mojolicio.us',  'right URL';
 is $tx->req->proxy->to_abs, 'http://127.0.0.1:3000', 'right proxy URL';
+ok !$tx->req->headers->host, 'no "Host" header';
+$tx->req->fix_headers;
+is $tx->req->headers->host, '127.0.0.1:3000', 'right "Host" header';
 
 # Simple 302 redirect
 $tx =

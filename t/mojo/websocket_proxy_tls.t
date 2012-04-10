@@ -13,7 +13,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 15;
+plan tests => 16;
 
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
@@ -198,15 +198,19 @@ Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
 # GET /proxy (proxy request)
-$ua->https_proxy("http://localhost:$proxy");
+$ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
+my $auth;
 $result = undef;
 $ua->get(
   "https://localhost:$port/proxy" => sub {
-    $result = pop->success->body;
+    my ($ua, $tx) = @_;
+    $auth   = $tx->req->headers->proxy_authorization;
+    $result = $tx->success->body;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
+ok !$auth, 'no "Proxy-Authorization" header';
 is $result, "https://localhost:$port/proxy", 'right content';
 
 # GET /proxy (kept alive proxy request)

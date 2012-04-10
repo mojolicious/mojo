@@ -1550,7 +1550,7 @@ is $req->url->to_abs,     'http://127.0.0.1:3000', 'right absolute URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame',   'right proxy userinfo';
 is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Authorization" value';
-is $req->headers->host, '127.0.0.1:3000', 'right "Host" value';
+is $req->headers->host, '127.0.0.2:8080', 'right "Host" value';
 is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Proxy-Authorization" value';
 

@@ -91,7 +91,7 @@ sub fix_headers {
   my $self = shift;
   $self->{fix} ? return $self : $self->SUPER::fix_headers(@_);
 
-  # Date header is required in responses
+  # Date
   my $headers = $self->headers;
   $headers->date(Mojo::Date->new->to_string) unless $headers->date;
 

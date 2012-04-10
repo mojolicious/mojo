@@ -58,27 +58,28 @@ sub fix_headers {
   my $self = shift;
   $self->{fix} ? return $self : $self->SUPER::fix_headers(@_);
 
-  # Host header is required in HTTP 1.1 requests
+  # Basic authentication
   my $url     = $self->url;
   my $headers = $self->headers;
-  if ($self->at_least_version('1.1')) {
-    my $host = $url->ihost;
-    my $port = $url->port;
-    $host .= ":$port" if $port;
-    $headers->host($host) unless $headers->host;
+  if ((my $userinfo = $url->userinfo) && !$headers->authorization) {
+    $headers->authorization('Basic ' . b64_encode($userinfo, ''));
   }
 
-  # Basic authentication
-  if ((my $u = $url->userinfo) && !$headers->authorization) {
-    $headers->authorization('Basic ' . b64_encode($u, ''));
-  }
-
-  # Basic proxy authentication
+  # Proxy
   if (my $proxy = $self->proxy) {
-    if ((my $u = $proxy->userinfo) && !$headers->proxy_authorization) {
-      $headers->proxy_authorization('Basic ' . b64_encode($u, ''));
-    }
+    $url = $proxy if $self->method eq 'CONNECT';
+
+    # Basic proxy authentication
+    my $userinfo = $proxy->userinfo;
+    $headers->proxy_authorization('Basic ' . b64_encode($userinfo, ''))
+      if $userinfo && !$headers->proxy_authorization;
   }
+
+  # Host
+  my $host = $url->ihost;
+  my $port = $url->port;
+  $host .= ":$port" if $port;
+  $headers->host($host) unless $headers->host;
 
   return $self;
 }
@@ -155,17 +156,10 @@ sub parse {
 }
 
 sub proxy {
-  my ($self, $url) = @_;
-
-  # Get
-  return $self->{proxy} unless $url;
-
-  # Mojo::URL object
-  if (ref $url) { $self->{proxy} = $url }
-
-  # String
-  elsif ($url) { $self->{proxy} = Mojo::URL->new($url) }
-
+  my $self = shift;
+  return $self->{proxy} unless @_;
+  my $url = shift;
+  $self->{proxy} = !$url || ref $url ? $url : Mojo::URL->new($url);
   return $self;
 }
 
@@ -448,6 +442,9 @@ Parse HTTP request chunks or environment hash.
   $req      = $req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 
 Proxy URL for message.
+
+  # Disable proxy
+  $req->proxy(0);
 
 =head2 C<query_params>
 

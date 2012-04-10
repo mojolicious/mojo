@@ -239,10 +239,12 @@ sub _connect_proxy {
         return $self->_finish($old, $cb);
       }
 
+      # Prevent proxy reassignment
+      $old->req->proxy(0);
+
       # TLS upgrade
       if ($tx->req->url->scheme eq 'https') {
         return unless my $id = $tx->connection;
-        $old->req->proxy(undef);
         my $loop   = $self->_loop;
         my $handle = $loop->stream($id)->steal_handle;
         my $c      = delete $self->{connections}->{$id};
@@ -459,12 +461,12 @@ sub _start {
 
     # HTTP proxy
     if (my $proxy = $self->http_proxy) {
-      $req->proxy($proxy) if !$req->proxy && $scheme eq 'http';
+      $req->proxy($proxy) if !defined($req->proxy) && $scheme eq 'http';
     }
 
     # HTTPS proxy
     if (my $proxy = $self->https_proxy) {
-      $req->proxy($proxy) if !$req->proxy && $scheme eq 'https';
+      $req->proxy($proxy) if !defined($req->proxy) && $scheme eq 'https';
     }
   }
 

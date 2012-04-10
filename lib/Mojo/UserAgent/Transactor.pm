@@ -109,10 +109,10 @@ sub proxy_connect {
   return unless my $proxy = $req->proxy;
 
   # WebSocket and/or HTTPS
-  my $url = $req->url;
-  return
-    unless lc($req->headers->upgrade || '') eq 'websocket'
-      || ($url->scheme || '') eq 'https';
+  my $url     = $req->url;
+  my $upgrade = lc($req->headers->upgrade || '');
+  my $scheme  = $url->scheme;
+  return unless $upgrade eq 'websocket' || $scheme eq 'https';
 
   # CONNECT request
   my $new = $self->tx(CONNECT => $url->clone);

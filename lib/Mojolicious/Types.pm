@@ -42,8 +42,7 @@ sub detect {
   my $types = $self->types;
   for my $ext (sort keys %$types) {
     my @types = ref $types->{$ext} ? @{$types->{$ext}} : ($types->{$ext});
-    $type eq $_ and push @exts, $ext
-      for map { s/\;.*$//; $_ } map {lc} @types;
+    $type eq $_ and push @exts, $ext for map { s/\;.*$//; lc $_ } @types;
   }
 
   return \@exts;

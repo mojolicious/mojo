@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 38;
+use Test::More tests => 41;
 
 # "Your mistletoe is no match for my *tow* missile."
 use Mojolicious::Types;
@@ -47,6 +47,9 @@ is_deeply $t->detect('text/html;q=0.8,*/*;q=0.9'), [], 'no formats';
 $t->type(json => ['application/json', 'text/x-json']);
 is $t->types->{json}->[0], 'application/json', 'right type';
 is $t->types->{json}->[1], 'text/x-json',      'right type';
+ok !$t->types->{json}->[2], 'no type';
+is $t->types->{htm}, 'text/html', 'right type';
+is $t->types->{html}, 'text/html;charset=UTF-8', 'right type';
 is_deeply $t->detect('application/json'), ['json'], 'right formats';
 is_deeply $t->detect('text/x-json'),      ['json'], 'right formats';
 is_deeply $t->detect('text/html'), ['htm', 'html'], 'right formats';

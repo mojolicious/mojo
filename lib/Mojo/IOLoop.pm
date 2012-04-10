@@ -410,6 +410,12 @@ connections.
 Low level event reactor, usually a L<Mojo::Reactor::Poll> or
 L<Mojo::Reactor::EV> object.
 
+  # Watch handle for I/O events
+  $loop->reactor->io($handle => sub {
+    my ($reactor, $writable) = @_;
+    say $writable ? 'Handle is writable' : 'Handle is readable';
+  });
+
 =head2 C<server_class>
 
   my $class = $loop->server_class;

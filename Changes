@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.81  2012-04-11
+  - Improved documentation.
+  - Improved tests.
+
 2.80  2012-04-10
   - Added support for alternative MIME types to Mojolicious::Types.
   - Added endpoint method to Mojo::UserAgent::Transactor.

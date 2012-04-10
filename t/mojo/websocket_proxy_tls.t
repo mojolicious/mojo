@@ -166,7 +166,7 @@ $result = undef;
 my $works;
 $ua->max_redirects(3)->get(
   "https://localhost:$port/broken_redirect" => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $result = $tx->success->body;
     $works  = $tx->res->headers->header('X-Works');
     Mojo::IOLoop->stop;
@@ -211,17 +211,17 @@ $ua->get(
   }
 );
 Mojo::IOLoop->start;
-is $result, "https://localhost:$port/proxy", 'right content';
 ok !$auth,       'no "Proxy-Authorization" header';
 ok !$kept_alive, 'connection was not kept alive';
+is $result, "https://localhost:$port/proxy", 'right content';
 
 # GET /proxy (kept alive proxy request)
-($result, $kept_alive) = undef;
+($kept_alive, $result) = undef;
 $ua->get(
   "https://localhost:$port/proxy" => sub {
-    my $tx = pop;
-    $result     = $tx->success->body;
+    my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
+    $result     = $tx->success->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -231,10 +231,10 @@ ok $kept_alive, 'connection was kept alive';
 
 # WebSocket /test (kept alive proxy websocket)
 $ua->https_proxy("http://localhost:$proxy");
-($result, $kept_alive) = undef;
+($kept_alive, $result) = undef;
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
@@ -260,7 +260,7 @@ my $port2 = $port + 1;
 my ($success, $err);
 $ua->websocket(
   "wss://localhost:$port2/test" => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $success = $tx->success;
     $err     = $tx->error;
     Mojo::IOLoop->stop;

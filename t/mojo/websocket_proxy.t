@@ -150,25 +150,25 @@ is $result, 'test1test2', 'right result';
 
 # GET http://kraih.com/proxy (proxy request)
 $ua->http_proxy("http://localhost:$port");
-$result = undef;
 my $kept_alive;
+$result = undef;
 $ua->get(
   "http://kraih.com/proxy" => sub {
     my ($ua, $tx) = @_;
-    $result     = $tx->success->body;
     $kept_alive = $tx->kept_alive;
+    $result     = $tx->success->body;
     Mojo::IOLoop->stop;
   }
 );
 Mojo::IOLoop->start;
-is $result, 'http://kraih.com/proxy', 'right content';
 ok !$kept_alive, 'connection was not kept alive';
+is $result, 'http://kraih.com/proxy', 'right content';
 
 # WebSocket /test (kept alive proxy websocket)
-($result, $kept_alive) = undef;
+($kept_alive, $result) = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
@@ -182,15 +182,15 @@ $ua->websocket(
   }
 );
 Mojo::IOLoop->start;
-is $result, 'test1test2', 'right result';
 ok $kept_alive, 'connection was kept alive';
+is $result, 'test1test2', 'right result';
 
 # WebSocket /test (proxy websocket)
 $ua = Mojo::UserAgent->new(http_proxy => "http://localhost:$proxy");
 $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
       message => sub {
@@ -214,7 +214,7 @@ my $port2 = $port + 1;
 my ($success, $err);
 $ua->websocket(
   "ws://localhost:$port2/test" => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $success = $tx->success;
     $err     = $tx->error;
     Mojo::IOLoop->stop;

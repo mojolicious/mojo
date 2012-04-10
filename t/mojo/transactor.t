@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 207;
+use Test::More tests => 211;
 
 # "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
@@ -205,6 +205,13 @@ is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
 # Proxy CONNECT
 $tx = $t->tx(GET => 'https://sri:secr3t@mojolicio.us');
 $tx->req->proxy('http://sri:secr3t@127.0.0.1:3000');
+ok !$tx->req->headers->authorization,       'no "Authorization" header';
+ok !$tx->req->headers->proxy_authorization, 'no "Proxy-Authorization" header';
+$tx->req->fix_headers;
+is $tx->req->headers->authorization, 'Basic c3JpOnNlY3IzdA==',
+  'right "Authorization" header';
+is $tx->req->headers->proxy_authorization, 'Basic c3JpOnNlY3IzdA==',
+  'right "Proxy-Authorization" header';
 $tx = $t->proxy_connect($tx);
 is $tx->req->method, 'CONNECT', 'right method';
 is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';

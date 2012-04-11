@@ -403,7 +403,8 @@ sub _remove {
   }
 
   # Keep connection alive
-  $self->_cache(join(':', $self->transactor->endpoint($tx)), $id);
+  $self->_cache(join(':', $self->transactor->endpoint($tx)), $id)
+    unless $tx->req->method eq 'CONNECT' && ($tx->res->code || '') eq '200';
 }
 
 sub _redirect {

@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -670,7 +669,7 @@ C<register> is called.
 
   1;
 
-Both will work just like normal C<templates> and C<public> direcotries once
+Both will work just like normal C<templates> and C<public> directories once
 you've installed and loaded the plugin, with slightly lower precedence.
 
   use Mojolicious::Lite;

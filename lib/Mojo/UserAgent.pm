@@ -181,12 +181,12 @@ sub _cleanup {
 sub _connect {
   my ($self, $tx, $cb) = @_;
 
-  # Cached connection
+  # Reuse connection
   my $id = $tx->connection;
   my ($scheme, $host, $port) = $self->transactor->endpoint($tx);
   $id ||= $self->_cache("$scheme:$host:$port");
   if ($id && !ref $id) {
-    warn "-- Cached connection ($scheme:$host:$port)\n" if DEBUG;
+    warn "-- Reusing connection ($scheme:$host:$port)\n" if DEBUG;
     $self->{connections}->{$id} = {cb => $cb, tx => $tx};
     $tx->kept_alive(1) unless $tx->connection;
     $self->_connected($id);
@@ -196,8 +196,8 @@ sub _connect {
   # CONNECT request to proxy required
   return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
 
-  # New connection
-  warn "-- New connection ($scheme:$host:$port)\n" if DEBUG;
+  # Connect
+  warn "-- Connect ($scheme:$host:$port)\n" if DEBUG;
   ($scheme, $host, $port) = $self->transactor->peer($tx);
   weaken $self;
   $id = $self->_loop->client(

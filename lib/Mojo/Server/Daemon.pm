@@ -80,7 +80,6 @@ sub _build_tx {
   my $handle = $self->ioloop->stream($id)->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
-  warn "-- Accept connection (@{[$tx->remote_address]})\n" if DEBUG;
 
   # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
@@ -207,6 +206,7 @@ sub _listen {
 
       # Add new connection
       $self->{connections}->{$id} = {tls => $tls};
+      warn "-- Accept (@{[$stream->handle->peerhost]})\n" if DEBUG;
 
       # Inactivity timeout
       $stream->timeout($self->inactivity_timeout);

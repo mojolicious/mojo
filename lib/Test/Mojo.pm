@@ -426,6 +426,12 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
   # Allow redirects
   $t->ua->max_redirects(10);
 
+  # Customize all transactions (including followed redirects)
+  $t->ua->on(start => sub {
+    my ($ua, $tx) = @_;
+    $tx->req->headers->accept_language('en-US');
+  });
+
   # Request with Basic authentication
   $t->get_ok($t->ua->app_url->userinfo('sri:secr3t')->path('/secrets'));
 

@@ -34,7 +34,7 @@ sub new {
 
 sub build_frame {
   my ($self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload) = @_;
-  warn "-- Building frame\n" if DEBUG;
+  warn "-- Building frame ($fin, $rsv1, $rsv2, $rsv3, $op)\n" if DEBUG;
 
   # Head
   my $frame = 0b00000000;
@@ -81,11 +81,7 @@ sub build_frame {
       ? pack('Q>', $len)
       : pack('NN', $len >> 32, $len & 0xFFFFFFFF);
   }
-
-  if (DEBUG) {
-    warn '-- Head (', unpack('B*', $frame), ")\n";
-    warn "-- Opcode ($op)\n";
-  }
+  warn "-- Head (@{[unpack('B*', $frame)]})\n" if DEBUG;
 
   return $frame . $payload;
 }
@@ -137,7 +133,7 @@ sub parse_frame {
   return unless length $clone > 2;
   warn "-- Parsing frame\n" if DEBUG;
   my $head = substr $clone, 0, 2;
-  warn '-- Head (' . unpack('B*', $head) . ")\n" if DEBUG;
+  warn "-- Head (@{[unpack('B*', $head)]})\n" if DEBUG;
 
   # FIN
   my $fin = (vec($head, 0, 8) & 0b10000000) == 0b10000000 ? 1 : 0;

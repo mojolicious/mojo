@@ -80,6 +80,7 @@ sub _build_tx {
   my $handle = $self->ioloop->stream($id)->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
+  warn "-- Accept connection (@{[$tx->remote_address]})\n" if DEBUG;
 
   # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
@@ -102,7 +103,6 @@ sub _build_tx {
   );
 
   # Kept alive if we have more than one request on the connection
-  $c->{requests} ||= 0;
   $tx->kept_alive(1) if ++$c->{requests} > 1;
 
   return $tx;

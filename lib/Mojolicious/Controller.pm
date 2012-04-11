@@ -740,12 +740,14 @@ C<url_for>.
   my $success = $c->render;
   my $success = $c->render(controller => 'foo', action => 'bar');
   my $success = $c->render({controller => 'foo', action => 'bar'});
-  my $success = $c->render(text => 'Hello!');
   my $success = $c->render(template => 'foo/index');
   my $success = $c->render(template => 'index', format => 'html');
+  my $success = $c->render(data => $bytes);
+  my $success = $c->render(text => 'Hello!');
+  my $success = $c->render(json => {foo => 'bar'});
   my $success = $c->render(handler => 'something');
-  my $success = $c->render('foo/bar');
-  my $output  = $c->render('foo/bar', partial => 1);
+  my $success = $c->render('foo/index');
+  my $output  = $c->render('foo/index', partial => 1);
 
 This is a wrapper around L<Mojolicious::Renderer/"render"> exposing pretty
 much all functionality provided by it. It will set a default template to use

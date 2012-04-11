@@ -142,7 +142,7 @@ sub redirect {
   # Clone request if necessary
   my $new    = Mojo::Transaction::HTTP->new;
   my $method = $req->method;
-  if ($code ~~ [301, 307]) {
+  if ($code ~~ [301, 302, 307]) {
     return unless $req = $req->clone;
     $new->req($req);
     $req->headers->remove('Host')->remove('Cookie')->remove('Referer');

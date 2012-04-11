@@ -100,7 +100,7 @@ sub start {
   if ($cb) {
 
     # Start non-blocking
-    warn "-- New non-blocking request\n" if DEBUG;
+    warn "-- Non-blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
     unless ($self->{nb}) {
       croak 'Blocking request in progress' if keys %{$self->{connections}};
       warn "-- Switching to non-blocking mode\n" if DEBUG;
@@ -111,7 +111,7 @@ sub start {
   }
 
   # Start blocking
-  warn "-- New blocking request\n" if DEBUG;
+  warn "-- Blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
   if (delete $self->{nb}) {
     croak 'Non-blocking requests in progress' if keys %{$self->{connections}};
     warn "-- Switching to blocking mode\n" if DEBUG;
@@ -380,13 +380,13 @@ sub _loop {
 
 sub _read {
   my ($self, $id, $chunk) = @_;
-  warn "-- Client <<< Server\n$chunk\n" if DEBUG;
 
   # Corrupted connection
   return                     unless my $c  = $self->{connections}->{$id};
   return $self->_remove($id) unless my $tx = $c->{tx};
 
   # Process incoming data
+  warn "-- Client <<< Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
   $tx->client_read($chunk);
   if    ($tx->is_finished)     { $self->_handle($id) }
   elsif ($c->{tx}->is_writing) { $self->_write($id) }
@@ -521,7 +521,7 @@ sub _write {
   return if $self->{writing}++;
   my $chunk = $tx->client_write;
   delete $self->{writing};
-  warn "-- Client >>> Server\n$chunk\n" if DEBUG;
+  warn "-- Client >>> Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
 
   # More data to follow
   my $cb;

@@ -245,13 +245,13 @@ sub _listen {
 
 sub _read {
   my ($self, $id, $chunk) = @_;
-  warn "-- Server <<< Client\n$chunk\n" if DEBUG;
 
   # Make sure we have a transaction
   my $c = $self->{connections}->{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
 
   # Parse chunk
+  warn "-- Server <<< Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
 
   # Last keep alive request
@@ -293,7 +293,7 @@ sub _write {
   return if $c->{writing}++;
   my $chunk = $tx->server_write;
   delete $c->{writing};
-  warn "-- Server >>> Client\n$chunk\n" if DEBUG;
+  warn "-- Server >>> Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
 
   # Write
   my $stream = $self->ioloop->stream($id);

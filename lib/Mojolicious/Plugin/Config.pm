@@ -5,8 +5,6 @@ use File::Basename 'basename';
 use File::Spec::Functions 'file_name_is_absolute';
 use Mojo::Util 'decamelize';
 
-use constant DEBUG => $ENV{MOJO_CONFIG_DEBUG} || 0;
-
 # "Who are you, my warranty?!"
 sub load {
   my ($self, $file, $conf, $app) = @_;
@@ -55,18 +53,13 @@ sub register {
     # Default extension
     $file .= '.' . ($conf->{ext} || 'conf');
   }
-  warn "-- Config file ($file)\n" if DEBUG;
 
   # Mode specific config file
   my $mode;
-  if ($file =~ /^(.*)\.([^\.]+)$/) {
-    $mode = join '.', $1, $app->mode, $2;
-    warn "-- Mode specific config file ($mode)\n" if DEBUG;
-  }
+  if ($file =~ /^(.*)\.([^\.]+)$/) { $mode = join '.', $1, $app->mode, $2 }
 
   # Absolute path
-  $file = $app->home->rel_file($file)
-    unless file_name_is_absolute $file;
+  $file = $app->home->rel_file($file) unless file_name_is_absolute $file;
   $mode = $app->home->rel_file($mode)
     if defined $mode && !file_name_is_absolute $mode;
 
@@ -187,13 +180,6 @@ Parse configuration file.
   $plugin->register;
 
 Register plugin in L<Mojolicious> application.
-
-=head1 DEBUGGING
-
-You can set the C<MOJO_CONFIG_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
-
-  MOJO_CONFIG_DEBUG=1
 
 =head1 SEE ALSO
 

@@ -5,8 +5,6 @@ use Mojo::Home;
 use Mojo::Server::Daemon;
 use POSIX 'WNOHANG';
 
-use constant DEBUG => $ENV{MORBO_DEBUG} || 0;
-
 has watch => sub { [qw/lib templates/] };
 
 # "All in all, this is one day Mittens the kitten won’t soon forget.
@@ -28,7 +26,6 @@ sub check_file {
 
 sub run {
   my ($self, $app) = @_;
-  warn "-- Manager started ($$)\n" if DEBUG;
 
   # Watch files and manage worker
   $SIG{CHLD} = sub { $self->_reap };
@@ -51,7 +48,6 @@ sub _manage {
   my $self = shift;
 
   # Discover files
-  warn "-- Discovering new files\n" if DEBUG;
   my @files;
   for my $watch (@{$self->watch}) {
     if (-d $watch) {
@@ -63,9 +59,7 @@ sub _manage {
 
   # Check files
   for my $file (@files) {
-    warn "-- Checking ($file)\n" if DEBUG;
     next unless $self->check_file($file);
-    warn "-- Modified ($file)\n" if DEBUG;
     say qq/File "$file" changed, restarting./ if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{running} if $self->{running};
     $self->{modified} = 1;
@@ -80,10 +74,7 @@ sub _manage {
 
 sub _reap {
   my $self = shift;
-  while ((my $pid = waitpid -1, WNOHANG) > 0) {
-    warn "-- Worker stopped ($pid)\n" if DEBUG;
-    delete $self->{running};
-  }
+  while ((my $pid = waitpid -1, WNOHANG) > 0) { delete $self->{running} }
 }
 
 # "Morbo cannot read his teleprompter.
@@ -102,7 +93,6 @@ sub _spawn {
   return $self->{running} = $pid if $pid;
 
   # Worker
-  warn "-- Worker started ($$)\n" if DEBUG;
   $SIG{CHLD} = 'DEFAULT';
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub { $self->{finished} = 1 };
   my $daemon = Mojo::Server::Daemon->new;
@@ -176,13 +166,6 @@ Check if file has been modified since last check.
   $morbo->run('script/myapp');
 
 Run server for application.
-
-=head1 DEBUGGING
-
-You can set the C<MORBO_DEBUG> environment variable to get some advanced
-diagnostics information printed to C<STDERR>.
-
-  MORBO_DEBUG=1
 
 =head1 SEE ALSO
 

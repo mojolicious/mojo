@@ -195,7 +195,7 @@ sub _load_class {
   if (my $e = Mojo::Loader->load($app)) {
 
     # Doesn't exist
-    $c->app->log->debug("$app does not exist, maybe a typo?") and return
+    $c->app->log->debug(qq/"$app" does not exist, maybe a typo?/) and return
       unless ref $e;
 
     # Error
@@ -203,7 +203,8 @@ sub _load_class {
   }
 
   # Check base classes
-  return unless first { $app->isa($_) } @{$self->base_classes};
+  $c->app->log->debug(qq/"$app" is not a controller./) and return
+    unless first { $app->isa($_) } @{$self->base_classes};
   return ++$self->{loaded}->{$app};
 }
 

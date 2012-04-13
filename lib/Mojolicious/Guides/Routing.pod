@@ -528,11 +528,11 @@ From the tutorial you should already know L<Mojolicious::Lite> routes, which
 are in fact just a small convenience layer around everything described above
 and also part of the normal router.
 
-  # GET /foo -> {controller => 'foo', action => 'abc'}
-  $r->get('/foo')->to(controller => 'foo', action => 'abc');
+  # POST /foo -> {controller => 'foo', action => 'abc'}
+  $r->post('/foo')->to(controller => 'foo', action => 'abc');
 
-  # POST /bar -> {controller => 'foo', action => 'bar'}
-  $r->post('/bar')->to('foo#bar');
+  # PATCH /bar -> {controller => 'foo', action => 'bar', test => 23}
+  $r->patch('/bar')->to('foo#bar', test => 23);
 
   # GET /baz -> {template => 'foo/bar'}
   $r->get('/baz')->to(template => 'foo/bar');

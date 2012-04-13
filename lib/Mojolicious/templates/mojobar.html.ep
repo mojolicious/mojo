@@ -72,8 +72,12 @@
 </div>
 %= javascript begin
   $(window).load(function () {
+    if (window.location.hash) {
+      var tweak = $(window.location.hash).offset().top - 70;
+      $('html, body').animate({scrollTop:tweak}, 1);
+    }
     var mojobar = $('#mojobar');
-    var start   = mojobar.offset().top;
+    var start = mojobar.offset().top;
     var fixed;
     $(window).scroll(function () {
       if (!fixed && (mojobar.offset().top - $(window).scrollTop() < 0)) {

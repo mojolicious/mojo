@@ -166,11 +166,11 @@ Mojolicious::Routes::Match - Routes visitor
 
   # Routes
   my $r = Mojolicious::Routes->new;
-  $r->route('/foo')->to(action => 'foo');
-  $r->route('/bar')->to(action => 'bar');
+  $r->get('/foo')->to(action => 'foo');
+  $r->put('/bar')->to(action => 'bar');
 
   # Match
-  my $m = Mojolicious::Routes::Match->new(GET => '/bar');
+  my $m = Mojolicious::Routes::Match->new(PUT => '/bar');
   $m->match($r);
   say $m->captures->{action};
 

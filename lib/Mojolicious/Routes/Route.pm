@@ -380,8 +380,8 @@ also the L<Mojolicious::Lite> tutorial for more argument variations.
 Add a new bridge to this route as a nested child.
 
   my $auth = $r->bridge('/user')->to('user#auth');
-  $auth->route('/show')->to('#show');
-  $auth->route('/create')->to('#create');
+  $auth->get('/show')->to('#show');
+  $auth->post('/create')->to('#create');
 
 =head2 C<delete>
 
@@ -485,7 +485,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 Activate conditions for this route. Note that this automatically disables the
 routing cache, since conditions are too complex for caching.
 
-  $r->route('/foo')->over(host => qr/mojolicio\.us/)->to('foo#bar');
+  $r->get('/foo')->over(host => qr/mojolicio\.us/)->to('foo#bar');
 
 =head2 C<parse>
 
@@ -594,7 +594,7 @@ restrictions.
 Add a waypoint to this route as nested child.
 
   my $foo = $r->waypoint('/foo')->to('example#foo');
-  $foo->route('/bar')->to('#bar');
+  $foo->get('/bar')->to('#bar');
 
 =head2 C<websocket>
 

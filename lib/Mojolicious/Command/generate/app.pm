@@ -87,7 +87,7 @@ sub startup {
   my $r = $self->routes;
 
   # Normal route to controller
-  $r->route('/')->to('example#welcome');
+  $r->get('/')->to('example#welcome');
 }
 
 1;

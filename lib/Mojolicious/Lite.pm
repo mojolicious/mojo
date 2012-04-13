@@ -797,7 +797,7 @@ C<log/$mode.log> file if a C<log> directory exists.
 For more control the L<Mojolicious> object can be accessed directly.
 
   app->log->level('error');
-  app->routes->route('/foo/:bar')->via('GET')->to(cb => sub {
+  app->routes->get('/foo/:bar' => sub {
     my $self = shift;
     $self->app->log->debug('Got a request for "Hello Mojo!".');
     $self->render(text => 'Hello Mojo!');

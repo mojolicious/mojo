@@ -326,7 +326,7 @@ startup method to define the url endpoints for your application.
     my $self = shift;
 
     my $r = $self->routes;
-    $r->route('/:controller/:action')->to('test#welcome');
+    $r->get('/:controller/:action')->to('test#welcome');
   }
 
 =head2 C<secret>

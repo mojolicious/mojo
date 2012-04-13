@@ -531,6 +531,16 @@ and also part of the normal router.
   # GET /foo -> {controller => 'foo', action => 'abc'}
   $r->get('/foo')->to(controller => 'foo', action => 'abc');
 
+  # POST /bar -> {controller => 'foo', action => 'bar'}
+  $r->post('/bar')->to('foo#bar');
+
+  # GET /baz -> {template => 'foo/bar'}
+  $r->get('/baz')->to(template => 'foo/bar');
+
+  # * /yada.txt  -> {controller => 'foo', action => 'yada', format => 'txt'}
+  # * /yada.json -> {controller => 'foo', action => 'yada', format => 'json'}
+  $r->any('/yada' => [format => ['txt', 'json']])->to('foo#yada');
+
 This makes the process of growing your L<Mojolicious::Lite> prototypes into
 full L<Mojolicious> applications very straightforward.
 

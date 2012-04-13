@@ -417,7 +417,7 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
   ok $t->tx->res->is_multipart, 'multipart content';
 
   # Test custom transaction
-  my $tx = $t->ua->build_form_tx('/users' => {name => 'sri', id => 99});
+  my $tx = $t->ua->build_form_tx('/user/99' => {name => 'sri'});
   $tx->req->method('PUT');
   $t->tx($t->ua->start($tx))
     ->status_is(200)
@@ -468,6 +468,13 @@ Alias for L<Mojo::UserAgent/"app">.
   # Test application directly
   is $t->app->defaults->{foo}, 'bar', 'right value';
   ok $t->app->routes->find('echo')->is_websocket, 'WebSocket route';
+
+  # Change application behavior
+  $t->app->hook(before_dispatch => sub {
+    my $self = shift;
+    $self->render(text => 'This request did not reach the router.')
+      if $self->req->url->path->contains('/user');
+  });
 
 =head2 C<content_is>
 

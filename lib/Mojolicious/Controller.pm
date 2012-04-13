@@ -309,8 +309,7 @@ sub render_later { shift->stash->{'mojo.rendered'}++ }
 # "Excuse me, sir, you're snowboarding off the trail.
 #  Lick my frozen metal ass."
 sub render_not_found {
-  my ($self, $resource) = @_;
-  $self->app->log->debug(qq/Resource "$resource" not found./) if $resource;
+  my $self = shift;
 
   # Recursion
   my $stash = $self->stash;
@@ -804,7 +803,6 @@ useful.
 =head2 C<render_not_found>
 
   $c->render_not_found;
-  $c->render_not_found('some_resource');
 
 Render the not found template C<not_found.$mode.$format.*> or
 C<not_found.$format.*> and set the response status code to C<404>.

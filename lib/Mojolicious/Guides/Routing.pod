@@ -522,40 +522,11 @@ have children.
 
 All children will be ignored if a waypoint matches.
 
-=head2 Hooks
+=head2 More convenient routes
 
-Hooks operate outside the routing system and allow you to extend
-L<Mojolicious> itself by sharing code with all requests indiscriminately,
-which makes them a very powerful tool especially for plugins.
-
-  # Application
-  package MyApp;
-  use Mojo::Base 'Mojolicious';
-
-  sub startup {
-    my $self = shift;
-
-    # Check all requests for a "/test" prefix
-    $self->hook(before_dispatch => sub {
-      my $self = shift;
-      $self->render(text => 'This request did not reach the router.')
-        if $self->req->url->path->contains('/test');
-    });
-
-    # These will not be reached if the hook above renders a response
-    my $r = $self->routes;
-    $r->route('/welcome')->to('foo#welcome');
-    $r->route('/bye')->to('foo#bye');
-  }
-
-  1;
-
-For a full list of available hooks see L<Mojolicious/"hook">.
-
-=head2 Mojolicious::Lite routes
-
-L<Mojolicious::Lite> routes are in fact just a small convenience layer around
-everything described above and also part of the normal router.
+From the tutorial you should already know L<Mojolicious::Lite> routes, which
+are in fact just a small convenience layer around everything described above
+and also part of the normal router.
 
   # GET /foo -> {controller => 'foo', action => 'abc'}
   $r->get('/foo')->to(controller => 'foo', action => 'abc');
@@ -582,6 +553,36 @@ Even the more abstract concepts are available.
     my $self = shift;
     $self->render(text => 'Go away.');
   });
+
+=head2 Hooks
+
+Hooks operate outside the routing system and allow you to extend
+L<Mojolicious> itself by sharing code with all requests indiscriminately,
+which makes them a very powerful tool especially for plugins.
+
+  # Application
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
+
+  sub startup {
+    my $self = shift;
+
+    # Check all requests for a "/test" prefix
+    $self->hook(before_dispatch => sub {
+      my $self = shift;
+      $self->render(text => 'This request did not reach the router.')
+        if $self->req->url->path->contains('/test');
+    });
+
+    # These will not be reached if the hook above renders a response
+    my $r = $self->routes;
+    $r->get('/welcome')->to('foo#welcome');
+    $r->post('/bye')->to('foo#bye');
+  }
+
+  1;
+
+For a full list of available hooks see L<Mojolicious/"hook">.
 
 =head2 Shortcuts
 
@@ -630,8 +631,8 @@ unescaped and decoded to Perl characters.
 
   use utf8;
 
-  # /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
-  $r->route('/☃')->to(controller => 'foo', action => 'snowman');
+  # GET /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
+  $r->get('/☃')->to(controller => 'foo', action => 'snowman');
 
 Just don't forget to use the L<utf8> pragma or you'll make the unicode
 snowman very sad.
@@ -683,8 +684,7 @@ play, they are basically router plugins.
   );
 
   # /firefox_only (Firefox) -> {controller => 'foo', action => 'bar'}
-  $r->route('/firefox_only')->over(agent => qr/Firefox/)
-    ->to(controller => 'foo', action => 'bar');
+  $r->get('/firefox_only')->over(agent => qr/Firefox/)->to('foo#bar');
 
 The method L<Mojolicious::Routes::Route/"add_condition"> registers the new
 condition in the router, while L<Mojolicious::Routes/"over"> actually applies
@@ -733,7 +733,7 @@ applications.
     $self->plugin('WerewolfCondition');
 
     # /hideout (keep them out for 4 days after full moon)
-    $self->routes->route('/hideout')->over(werewolf => 4)
+    $self->routes->get('/hideout')->over(werewolf => 4)
       ->to(controller => 'foo', action => 'bar');
   }
 
@@ -764,7 +764,7 @@ match and use only the remaining path in the embedded application, the base
 path will be passed along in the C<path> stash value.
 
   # /foo/*
-  $r->route('/foo')->detour('bar#', name => 'Mojo');
+  $r->any('/foo')->detour('bar#', name => 'Mojo');
 
 A minimal embeddable application is nothing more than a subclass of L<Mojo>,
 containing a C<handler> method accepting L<Mojolicious::Controller> objects.
@@ -807,7 +807,7 @@ package the whole thing as a self contained reusable plugin.
     my ($self, $app) = @_;
 
     # Automatically add route
-    $app->routes->route('/foo')->detour(app => EmbeddedApp::app());
+    $app->routes->any('/foo')->detour(app => EmbeddedApp::app());
   }
 
   package EmbeddedApp;

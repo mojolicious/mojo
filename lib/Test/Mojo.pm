@@ -416,6 +416,13 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
   is $t->tx->res->json->{foo}, 'bar', 'right value';
   ok $t->tx->res->is_multipart, 'multipart content';
 
+  # Test custom transaction
+  my $tx = $t->ua->build_form_tx('/users' => {name => 'sri', id => 99});
+  $tx->req->method('PUT');
+  $t->tx($t->ua->start($tx))
+    ->status_is(200)
+    ->text_is('div#message' => 'User has been replaced.');
+
 =head2 C<ua>
 
   my $ua = $t->ua;

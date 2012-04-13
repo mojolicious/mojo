@@ -58,6 +58,7 @@ sub DESTROY { }
 #  She also liked to shut up!"
 sub cookie {
   my ($self, $name, $value, $options) = @_;
+  $options ||= {};
 
   # Response cookie
   if (defined $value) {
@@ -67,24 +68,17 @@ sub cookie {
       if length $value > 4096;
 
     # Create new cookie
-    my $cookie = Mojo::Cookie::Response->new(
-      name  => $name,
-      value => $value,
-      %{$options || {}}
-    );
-    $self->res->cookies($cookie);
+    $self->res->cookies(
+      Mojo::Cookie::Response->new(name => $name, value => $value, %$options));
     return $self;
   }
 
-  # Request cookie
-  unless (wantarray) {
-    return unless my $cookie = $self->req->cookie($name);
-    return $cookie->value;
-  }
-
   # Request cookies
-  my @cookies = $self->req->cookie($name);
-  return map { $_->value } @cookies;
+  return map { $_->value } $self->req->cookie($name) if wantarray;
+
+  # Request cookie
+  return unless my $cookie = $self->req->cookie($name);
+  return $cookie->value;
 }
 
 # "Something's wrong, she's not responding to my poking stick."
@@ -113,21 +107,14 @@ sub flash {
   # Get
   my $session = $self->stash->{'mojo.session'};
   if ($_[0] && !defined $_[1] && !ref $_[0]) {
-    return unless $session && ref $session eq 'HASH';
+    return unless ref $session eq 'HASH';
     return unless my $flash = $session->{flash};
-    return unless ref $flash eq 'HASH';
     return $flash->{$_[0]};
   }
 
-  # Initialize
-  $session = $self->session;
-  my $flash = $session->{new_flash};
-  $flash = {} unless $flash && ref $flash eq 'HASH';
-  $session->{new_flash} = $flash;
-
   # Set
-  my $values = @_ > 1 ? {@_} : $_[0];
-  $session->{new_flash} = {%$flash, %$values};
+  my $flash = $session->{new_flash} ||= {};
+  %$flash = (%$flash, %{@_ > 1 ? {@_} : $_[0]});
 
   return $self;
 }
@@ -182,9 +169,8 @@ sub redirect_to {
   my $self = shift;
 
   # Don't override 3xx status
-  my $res     = $self->res;
-  my $headers = $res->headers;
-  $headers->location($self->url_for(@_)->to_abs);
+  my $res = $self->res;
+  $res->headers->location($self->url_for(@_)->to_abs);
   return $self->rendered($res->is_status_class(300) ? undef : 302);
 }
 
@@ -194,27 +180,24 @@ sub render {
   my $self = shift;
 
   # Template may be first argument
-  my $template;
-  $template = shift if @_ % 2 && !ref $_[0];
+  my $template = @_ % 2 && !ref $_[0] ? shift : undef;
   my $args = ref $_[0] ? $_[0] : {@_};
+  $args->{template} = $template if $template;
 
   # Template
   my $stash = $self->stash;
-  $args->{template} = $template if $template;
-  unless ($stash->{template} || $args->{template}) {
-
-    # Default template
-    my $controller = $args->{controller} || $stash->{controller};
-    my $action     = $args->{action}     || $stash->{action};
+  unless ($args->{template} || $stash->{template}) {
 
     # Normal default template
+    my $controller = $args->{controller} || $stash->{controller};
+    my $action     = $args->{action}     || $stash->{action};
     if ($controller && $action) {
-      $self->stash->{template} = join('/', split(/-/, $controller), $action);
+      $stash->{template} = join '/', split(/-/, $controller), $action;
     }
 
     # Try the route name if we don't have controller and action
-    elsif ($self->match->endpoint) {
-      $self->stash->{template} = $self->match->endpoint->name;
+    elsif (my $endpoint = $self->match->endpoint) {
+      $stash->{template} = $endpoint->name;
     }
   }
 
@@ -264,19 +247,17 @@ sub render_data { shift->render(data => @_) }
 sub render_exception {
   my ($self, $e) = @_;
   $e = Mojo::Exception->new($e);
-  my $app = $self->app;
-  $app->log->error($e);
 
   # Recursion
-  return if $self->stash->{'mojo.exception'};
+  my $app = $self->app;
+  $app->log->error($e);
+  my $stash = $self->stash;
+  return if $stash->{'mojo.exception'};
 
   # Filtered stash snapshot
-  my %snapshot;
-  my $stash = $self->stash;
-  for my $key (keys %$stash) {
-    next if $key =~ /^mojo\./;
-    $snapshot{$key} = $stash->{$key} if defined $stash->{$key};
-  }
+  my %snapshot =
+    map { $_ => $stash->{$_} }
+    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
 
   # Render with fallbacks
   my $mode    = $app->mode;
@@ -308,8 +289,7 @@ sub render_not_found {
 
   # Recursion
   my $stash = $self->stash;
-  return if $stash->{'mojo.exception'};
-  return if $stash->{'mojo.not_found'};
+  return if $stash->{'mojo.exception'} || $stash->{'mojo.not_found'};
 
   # Render with fallbacks
   my $mode    = $self->app->mode;
@@ -337,10 +317,9 @@ sub render_partial {
 sub render_static {
   my ($self, $file) = @_;
   my $app = $self->app;
-  $app->log->debug(qq/File "$file" not found, public directory missing?/)
-    and return
-    unless $app->static->serve($self, $file);
-  return $self->rendered;
+  return $self->rendered if $app->static->serve($self, $file);
+  $app->log->debug(qq/File "$file" not found, public directory missing?/);
+  return;
 }
 
 sub render_text { shift->render(text => @_) }
@@ -356,8 +335,7 @@ sub rendered {
   $res->code($status) if $status;
 
   # Finish transaction
-  my $stash = $self->stash;
-  unless ($stash->{'mojo.finished'}++) {
+  unless ($self->stash->{'mojo.finished'}++) {
     $res->code(200) unless $res->code;
     my $app = $self->app;
     $app->plugins->emit_hook_reverse(after_dispatch => $self);
@@ -418,15 +396,14 @@ sub session {
 
   # Hash
   my $stash = $self->stash;
-  $stash->{'mojo.session'} ||= {};
-  return $stash->{'mojo.session'} unless @_;
+  my $session = $stash->{'mojo.session'} ||= {};
+  return $session unless @_;
 
   # Get
-  return $stash->{'mojo.session'}->{$_[0]} unless @_ > 1 || ref $_[0];
+  return $session->{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
-  my $values = ref $_[0] ? $_[0] : {@_};
-  $stash->{'mojo.session'} = {%{$stash->{'mojo.session'}}, %$values};
+  %$session = (%$session, %{ref $_[0] ? $_[0] : {@_}});
 
   return $self;
 }
@@ -436,14 +413,9 @@ sub signed_cookie {
 
   # Response cookie
   my $secret = $self->app->secret;
-  if (defined $value) {
-
-    # Sign value
-    my $sig = Mojo::Util::hmac_md5_sum $value, $secret;
-
-    # Create cookie
-    return $self->cookie($name, "$value--$sig", $options);
-  }
+  return $self->cookie($name,
+    "$value--" . Mojo::Util::hmac_md5_sum($value, $secret), $options)
+    if defined $value;
 
   # Request cookies
   my @results;
@@ -452,9 +424,9 @@ sub signed_cookie {
     # Check signature
     if ($value =~ s/\-\-([^\-]+)$//) {
       my $sig = $1;
-      my $check = Mojo::Util::hmac_md5_sum $value, $secret;
 
       # Verified
+      my $check = Mojo::Util::hmac_md5_sum $value, $secret;
       if (Mojo::Util::secure_compare $sig, $check) { push @results, $value }
 
       # Bad cookie
@@ -476,18 +448,18 @@ sub stash {
   my $self = shift;
 
   # Hash
-  $self->{stash} ||= {};
-  return $self->{stash} unless @_;
+  my $stash = $self->{stash} ||= {};
+  return $stash unless @_;
 
   # Get
-  return $self->{stash}->{$_[0]} unless @_ > 1 || ref $_[0];
+  return $stash->{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
   my $values = ref $_[0] ? $_[0] : {@_};
   for my $key (keys %$values) {
     $self->app->log->debug(qq/Careful, "$key" is a reserved stash value./)
       if $RESERVED{$key};
-    $self->{stash}->{$key} = $values->{$key};
+    $stash->{$key} = $values->{$key};
   }
 
   return $self;
@@ -504,19 +476,17 @@ sub url_for {
   return Mojo::URL->new($target) if $target =~ m#^\w+\://#;
 
   # Base
-  my $url = Mojo::URL->new;
-  my $req = $self->req;
-  $url->base($req->url->base->clone);
-  my $base = $url->base;
-  $base->userinfo(undef);
+  my $url  = Mojo::URL->new;
+  my $req  = $self->req;
+  my $base = $url->base($req->url->base->clone)->base->userinfo(undef);
 
   # Relative URL
   my $path = $url->path;
   if ($target =~ m#^/#) {
-    if (my $e = $self->stash->{path}) {
+    if (my $prefix = $self->stash->{path}) {
       my $real = Mojo::Util::url_unescape($req->url->path->to_abs_string);
       $real = Mojo::Util::decode('UTF-8', $real) // $real;
-      $real =~ s|/?$e$|$target|;
+      $real =~ s|/?$prefix$|$target|;
       $target = $real;
     }
     $url->parse($target);
@@ -524,8 +494,8 @@ sub url_for {
 
   # Route
   else {
-    my ($p, $ws) = $self->match->path_for($target, @_);
-    $path->parse($p) if $p;
+    my ($generated, $ws) = $self->match->path_for($target, @_);
+    $path->parse($generated) if $generated;
 
     # Fix trailing slash
     $path->trailing_slash(1)
@@ -574,9 +544,7 @@ sub _render_fallbacks {
       delete $stash->{layout};
       delete $stash->{extends};
       delete $options->{template};
-      $options->{inline}  = $inline;
-      $options->{handler} = 'ep';
-      return $self->render($options);
+      return $self->render(%$options, inline => $inline, handler => 'ep');
     }
   }
 }

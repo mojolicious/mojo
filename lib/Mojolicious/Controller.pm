@@ -257,7 +257,7 @@ sub render_content {
   return Mojo::ByteStream->new("$content");
 }
 
-sub render_data { shift->render(data => shift, @_) }
+sub render_data { shift->render(data => @_) }
 
 # "The path to robot hell is paved with human flesh.
 #  Neat."
@@ -297,12 +297,7 @@ sub render_exception {
 
 # "If you hate intolerance and being punched in the face by me,
 #  please support Proposition Infinity."
-sub render_json {
-  my ($self, $json) = (shift, shift);
-  my $args = ref $_[0] ? $_[0] : {@_};
-  $args->{json} = $json;
-  return $self->render($args);
-}
+sub render_json { shift->render(json => @_) }
 
 sub render_later { shift->stash->{'mojo.rendered'}++ }
 
@@ -333,11 +328,10 @@ sub render_not_found {
 # "You called my thesis a fat sack of barf, and then you stole it?
 #  Welcome to academia."
 sub render_partial {
-  my $self     = shift;
+  my $self = shift;
   my $template = @_ % 2 ? shift : undef;
-  my $args     = {@_, partial => 1};
-  $args->{template} = $template if defined $template;
-  return $self->render($args);
+  return $self->render(
+    {@_, partial => 1, defined $template ? (template => $template) : ()});
 }
 
 sub render_static {
@@ -349,7 +343,7 @@ sub render_static {
   return $self->rendered;
 }
 
-sub render_text { shift->render(text => shift, @_) }
+sub render_text { shift->render(text => @_) }
 
 sub rendered {
   my ($self, $status) = @_;
@@ -811,6 +805,7 @@ C<not_found.$format.*> and set the response status code to C<404>.
 
   my $output = $c->render_partial('menubar');
   my $output = $c->render_partial('menubar', format => 'txt');
+  my $output = $c->render_partial(template => 'menubar');
 
 Same as C<render> but returns the rendered result.
 

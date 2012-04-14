@@ -1764,10 +1764,10 @@ is $dom->at('a')->B->{class}, 'two', 'right attribute';
 is $dom->find('a')->[0]->B->{class}, 'two', 'right attribute';
 is_deeply [sort keys %{$dom->a->B}], [qw/class test/], 'right attributes';
 is $dom->a->B->c->[0]->text, 'bar', 'right text';
-is $dom->a->B->c->[0]->{id}, 'three', 'right attribute';
+is $dom->a->B->c->[0]{id}, 'three', 'right attribute';
 is_deeply [sort keys %{$dom->a->B->c->[0]}], ['id'], 'right attributes';
 is $dom->a->B->c->[1]->text, 'baz', 'right text';
-is $dom->a->B->c->[1]->{ID}, 'four', 'right attribute';
+is $dom->a->B->c->[1]{ID}, 'four', 'right attribute';
 is_deeply [sort keys %{$dom->a->B->c->[1]}], ['ID'], 'right attributes';
 is $dom->a->B->c->[2], undef, 'no result';
 is $dom->a->B->c->size, 2, 'right number of elements';
@@ -1800,10 +1800,10 @@ is $dom->at('a')->b->{class}, 'two', 'right attribute';
 is $dom->find('a')->[0]->b->{class}, 'two', 'right attribute';
 is_deeply [sort keys %{$dom->a->b}], [qw/class test/], 'right attributes';
 is $dom->a->b->c->[0]->text, 'bar', 'right text';
-is $dom->a->b->c->[0]->{id}, 'three', 'right attribute';
+is $dom->a->b->c->[0]{id}, 'three', 'right attribute';
 is_deeply [sort keys %{$dom->a->b->c->[0]}], ['id'], 'right attributes';
 is $dom->a->b->c->[1]->text, 'baz', 'right text';
-is $dom->a->b->c->[1]->{id}, 'four', 'right attribute';
+is $dom->a->b->c->[1]{id}, 'four', 'right attribute';
 is_deeply [sort keys %{$dom->a->b->c->[1]}], ['id'], 'right attributes';
 is $dom->a->b->c->[2], undef, 'no result';
 is $dom->a->b->c->size, 2, 'right number of elements';
@@ -1971,15 +1971,15 @@ $dom = Mojo::DOM->new(<<EOF);
   <head><meta http-equiv="content-type" content="text/html"></head>
 </html>
 EOF
-is $dom->find('[http-equiv]')->[0]->{content}, 'text/html', 'right attribute';
+is $dom->find('[http-equiv]')->[0]{content}, 'text/html', 'right attribute';
 is $dom->find('[http-equiv]')->[1], undef, 'no result';
-is $dom->find('[http-equiv="content-type"]')->[0]->{content}, 'text/html',
+is $dom->find('[http-equiv="content-type"]')->[0]{content}, 'text/html',
   'right attribute';
 is $dom->find('[http-equiv="content-type"]')->[1], undef, 'no result';
-is $dom->find('[http-equiv^="content-"]')->[0]->{content}, 'text/html',
+is $dom->find('[http-equiv^="content-"]')->[0]{content}, 'text/html',
   'right attribute';
 is $dom->find('[http-equiv^="content-"]')->[1], undef, 'no result';
-is $dom->find('head > [http-equiv$="-type"]')->[0]->{content}, 'text/html',
+is $dom->find('head > [http-equiv$="-type"]')->[0]{content}, 'text/html',
   'right attribute';
 is $dom->find('head > [http-equiv$="-type"]')->[1], undef, 'no result';
 

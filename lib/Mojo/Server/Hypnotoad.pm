@@ -19,8 +19,8 @@ sub DESTROY {
   return unless $self->{finished};
 
   # Manager
-  if (my $file = $self->{config}->{pid_file})  { unlink $file if -w $file }
-  if (my $file = $self->{config}->{lock_file}) { unlink $file if -w $file }
+  if (my $file = $self->{config}{pid_file})  { unlink $file if -w $file }
+  if (my $file = $self->{config}{lock_file}) { unlink $file if -w $file }
 }
 
 # "Marge? Since I'm not talking to Lisa,
@@ -108,7 +108,7 @@ sub run {
   $SIG{TTIN} = sub { $c->{workers}++ };
   $SIG{TTOU} = sub {
     return unless $c->{workers} && $c->{workers}--;
-    $self->{workers}->{shuffle keys %{$self->{workers}}}->{graceful} ||= time;
+    $self->{workers}{shuffle keys %{$self->{workers}}}{graceful} ||= time;
   };
 
   # Mainloop
@@ -169,7 +169,7 @@ sub _heartbeat {
   return unless $self->{reader}->sysread(my $chunk, 4194304);
 
   # Update heartbeats
-  $self->{workers}->{$1} and $self->{workers}->{$1}->{time} = time
+  $self->{workers}{$1} and $self->{workers}{$1}{time} = time
     while $chunk =~ /(\d+)\n/g;
 }
 
@@ -255,7 +255,7 @@ sub _manage {
 }
 
 sub _pid {
-  return unless open my $file, '<', shift->{config}->{pid_file};
+  return unless open my $file, '<', shift->{config}{pid_file};
   my $pid = <$file>;
   chomp $pid;
   return $pid;
@@ -268,7 +268,7 @@ sub _pid_file {
   return if $self->{finished};
 
   # Check if PID file already exists
-  return if -e (my $file = $self->{config}->{pid_file});
+  return if -e (my $file = $self->{config}{pid_file});
 
   # Create PID file
   $self->{log}->info(qq/Creating process id file "$file"./);
@@ -294,7 +294,7 @@ sub _reap {
   # Clean up worker
   else {
     $self->{log}->debug("Worker $pid stopped.");
-    delete $self->{workers}->{$pid};
+    delete $self->{workers}{$pid};
   }
 }
 
@@ -304,7 +304,7 @@ sub _spawn {
 
   # Manager
   die "Can't fork: $!" unless defined(my $pid = fork);
-  return $self->{workers}->{$pid} = {time => time} if $pid;
+  return $self->{workers}{$pid} = {time => time} if $pid;
 
   # Prepare lock file
   my $c    = $self->{config};

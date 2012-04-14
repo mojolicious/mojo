@@ -85,7 +85,7 @@ sub get_data_template {
   }
 
   # Find template
-  return Mojo::Command->get_data($template, $self->{index}->{$template});
+  return Mojo::Command->get_data($template, $self->{index}{$template});
 }
 
 # "Bodies are for hookers and fat people."
@@ -219,18 +219,18 @@ sub _detect_handler {
   # Templates
   return unless my $file = $self->template_name($options);
   unless ($self->{templates}) {
-    s/\.(\w+)$// and $self->{templates}->{$_} ||= $1
+    s/\.(\w+)$// and $self->{templates}{$_} ||= $1
       for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
   }
-  return $self->{templates}->{$file} if exists $self->{templates}->{$file};
+  return $self->{templates}{$file} if exists $self->{templates}{$file};
 
   # DATA templates
   unless ($self->{data}) {
     my @templates =
       map { sort keys %{Mojo::Command->get_all_data($_)} } @{$self->classes};
-    s/\.(\w+)$// and $self->{data}->{$_} ||= $1 for @templates;
+    s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
   }
-  return $self->{data}->{$file} if exists $self->{data}->{$file};
+  return $self->{data}{$file} if exists $self->{data}{$file};
 
   # Nothing
   return;

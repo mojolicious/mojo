@@ -572,7 +572,7 @@ Find elements with CSS3 selectors and return a L<Mojo::Collection> object.
 All selectors from L<Mojo::DOM::CSS> are supported.
 
   # Find a specific element and extract information
-  my $id = $dom->find('div')->[23]->{id};
+  my $id = $dom->find('div')->[23]{id};
 
   # Extract information from multiple elements
   my @headers = $dom->find('h1, h2, h3')->map(sub { shift->text })->each;

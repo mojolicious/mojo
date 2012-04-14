@@ -73,21 +73,21 @@ sub attr {
     my $code = "sub {\n  if (\@_ == 1) {\n";
 
     # No default value (return value)
-    unless (defined $default) { $code .= "    return \$_[0]->{'$attr'};" }
+    unless (defined $default) { $code .= "    return \$_[0]{'$attr'};" }
 
     # Default value
     else {
 
       # Return value
-      $code .= "    return \$_[0]->{'$attr'} if exists \$_[0]->{'$attr'};\n";
+      $code .= "    return \$_[0]{'$attr'} if exists \$_[0]{'$attr'};\n";
 
       # Return default value
-      $code .= "    return \$_[0]->{'$attr'} = ";
+      $code .= "    return \$_[0]{'$attr'} = ";
       $code .= ref $default eq 'CODE' ? '$default->($_[0]);' : '$default;';
     }
 
     # Store value
-    $code .= "\n  }\n  \$_[0]->{'$attr'} = \$_[1];\n";
+    $code .= "\n  }\n  \$_[0]{'$attr'} = \$_[1];\n";
 
     # Footer (return invocant)
     $code .= "  \$_[0];\n};";

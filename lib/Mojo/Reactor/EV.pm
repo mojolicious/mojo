@@ -29,7 +29,7 @@ sub watch {
   my ($self, $handle, $read, $write) = @_;
 
   my $fd = fileno $handle;
-  my $io = $self->{io}->{$fd};
+  my $io = $self->{io}{$fd};
   my $mode;
   if ($read && $write) { $mode = EV::READ | EV::WRITE }
   elsif ($read)  { $mode = EV::READ }
@@ -46,10 +46,10 @@ sub watch {
 
 sub _io {
   my ($self, $fd, $w, $revents) = @_;
-  my $io = $self->{io}->{$fd};
+  my $io = $self->{io}{$fd};
   $self->_sandbox('Read', $io->{cb}, 0) if EV::READ &$revents;
   $self->_sandbox('Write', $io->{cb}, 1)
-    if EV::WRITE &$revents && $self->{io}->{$fd};
+    if EV::WRITE &$revents && $self->{io}{$fd};
 }
 
 # "It's great! We can do *anything* now that Science has invented Magic."
@@ -59,10 +59,10 @@ sub _timer {
 
   my $id = $self->SUPER::_timer(0, 0, $cb);
   weaken $self;
-  $self->{timers}->{$id}->{watcher} = EV::timer(
+  $self->{timers}{$id}{watcher} = EV::timer(
     $after => ($recurring ? $after : 0) => sub {
-      $self->_sandbox("Timer $id", $self->{timers}->{$id}->{cb});
-      delete $self->{timers}->{$id} unless $recurring;
+      $self->_sandbox("Timer $id", $self->{timers}{$id}{cb});
+      delete $self->{timers}{$id} unless $recurring;
     }
   );
 

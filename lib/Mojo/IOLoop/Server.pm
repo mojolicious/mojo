@@ -178,13 +178,13 @@ sub _accept {
   return $self->emit_safe(accept => $handle) unless my $tls = $self->{tls};
   weaken $self;
   $tls->{SSL_error_trap} = sub {
-    return unless my $handle = delete $self->{handles}->{shift()};
+    return unless my $handle = delete $self->{handles}{shift()};
     $self->reactor->remove($handle);
     close $handle;
   };
   return unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
   $self->reactor->io($handle => sub { $self->_tls($handle) });
-  $self->{handles}->{$handle} = $handle;
+  $self->{handles}{$handle} = $handle;
 }
 
 sub _cert_file {
@@ -211,7 +211,7 @@ sub _tls {
   # Accepted
   if ($handle->accept_SSL) {
     $self->reactor->remove($handle);
-    delete $self->{handles}->{$handle};
+    delete $self->{handles}{$handle};
     return $self->emit_safe(accept => $handle);
   }
 

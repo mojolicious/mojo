@@ -24,7 +24,7 @@ sub wait {
   my $self = shift;
   $self->once(finish => sub { shift->ioloop->stop });
   $self->ioloop->start;
-  return wantarray ? @{$self->{args}} : $self->{args}->[0];
+  return wantarray ? @{$self->{args}} : $self->{args}[0];
 }
 
 1;

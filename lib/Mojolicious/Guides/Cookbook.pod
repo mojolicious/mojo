@@ -320,14 +320,14 @@ L<Mojo::IOLoop> delay.
     $delay->begin;
     $self->ua->get('http://search.twitter.com/search.json?q=perl' => sub {
       my ($ua, $tx) = @_;
-      $delay->end($tx->res->json->{results}->[0]->{text});
+      $delay->end($tx->res->json->{results}[0]{text});
     });
 
     # Second request
     $delay->begin;
     $self->ua->get('http://search.twitter.com/search.json?q=python' => sub {
       my ($ua, $tx) = @_;
-      $delay->end($tx->res->json->{results}->[0]->{text});
+      $delay->end($tx->res->json->{results}[0]{text});
     });
   };
 
@@ -663,7 +663,7 @@ Who actually controls the event loop backend is not important.
   my $ua = Mojo::UserAgent->new;
   $ua->get('http://search.twitter.com/search.json?q=perl' => sub {
     my ($ua, $tx) = @_;
-    $cv->send($tx->res->json->{results}->[0]->{text});
+    $cv->send($tx->res->json->{results}[0]{text});
   });
   say $cv->recv;
 

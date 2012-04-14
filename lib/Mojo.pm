@@ -51,7 +51,7 @@ sub _dict {
   return $self->{$name} unless @_;
 
   # Get
-  return $self->{$name}->{$_[0]} unless @_ > 1 || ref $_[0];
+  return $self->{$name}{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
   my $values = ref $_[0] ? $_[0] : {@_};

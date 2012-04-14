@@ -42,7 +42,7 @@ sub client {
   # New client
   my $client = $self->client_class->new;
   my $id     = $self->_id;
-  my $c      = $self->{connections}->{$id} ||= {};
+  my $c      = $self->{connections}{$id} ||= {};
   $c->{client} = $client;
   weaken $client->reactor($self->reactor)->{reactor};
 
@@ -53,7 +53,7 @@ sub client {
       my $handle = pop;
 
       # New stream
-      my $c = $self->{connections}->{$id};
+      my $c = $self->{connections}{$id};
       delete $c->{client};
       my $stream = $c->{stream} = $self->stream_class->new($handle);
       $self->_stream($stream => $id);
@@ -64,7 +64,7 @@ sub client {
   );
   $client->on(
     error => sub {
-      delete $self->{connections}->{$id};
+      delete $self->{connections}{$id};
       $self->$cb(pop, undef);
     }
   );
@@ -113,7 +113,7 @@ sub recurring {
 sub remove {
   my ($self, $id) = @_;
   $self = $self->singleton unless ref $self;
-  if (my $c = $self->{connections}->{$id}) { return $c->{finish} = 1 }
+  if (my $c = $self->{connections}{$id}) { return $c->{finish} = 1 }
   $self->_remove($id);
 }
 
@@ -130,7 +130,7 @@ sub server {
   # New server
   my $server = $self->server_class->new;
   my $id     = $self->_id;
-  $self->{servers}->{$id} = $server;
+  $self->{servers}{$id} = $server;
   weaken $server->reactor($self->reactor)->{reactor};
 
   # Events
@@ -182,7 +182,7 @@ sub stream {
   return $self->_stream($stream, $self->_id) if blessed $stream;
 
   # Find stream for id
-  return unless my $c = $self->{connections}->{$stream};
+  return unless my $c = $self->{connections}{$stream};
   return $c->{stream};
 }
 
@@ -219,7 +219,7 @@ sub _id {
   my $self = shift;
   my $id;
   do { $id = md5_sum('c' . time . rand 999) }
-    while $self->{connections}->{$id} || $self->{servers}->{$id};
+    while $self->{connections}{$id} || $self->{servers}{$id};
   return $id;
 }
 
@@ -260,12 +260,12 @@ sub _remove {
   return if $reactor->remove($id);
 
   # Listen socket
-  if (delete $self->{servers}->{$id}) { delete $self->{listening} }
+  if (delete $self->{servers}{$id}) { delete $self->{listening} }
 
   # Connection (stream needs to be deleted first)
   else {
-    delete(($self->{connections}->{$id} || {})->{stream});
-    delete $self->{connections}->{$id};
+    delete(($self->{connections}{$id} || {})->{stream});
+    delete $self->{connections}{$id};
   }
 }
 
@@ -276,12 +276,12 @@ sub _stream {
   $self->_cleaner;
 
   # Connect stream with reactor
-  $self->{connections}->{$id}->{stream} = $stream;
+  $self->{connections}{$id}{stream} = $stream;
   weaken $stream->reactor($self->reactor)->{reactor};
 
   # Events
   weaken $self;
-  $stream->on(close => sub { $self->{connections}->{$id}->{finish} = 1 });
+  $stream->on(close => sub { $self->{connections}{$id}{finish} = 1 });
   $stream->start;
 
   return $id;

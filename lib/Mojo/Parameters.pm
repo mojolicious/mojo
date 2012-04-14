@@ -311,7 +311,7 @@ Remove parameters.
 Turn parameters into a hash reference.
 
   # "baz"
-  Mojo::Parameters->new('foo=bar&foo=baz')->to_hash->{foo}->[1];
+  Mojo::Parameters->new('foo=bar&foo=baz')->to_hash->{foo}[1];
 
 =head2 C<to_string>
 

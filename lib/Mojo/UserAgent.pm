@@ -187,7 +187,7 @@ sub _connect {
   $id ||= $self->_cache("$scheme:$host:$port");
   if ($id && !ref $id) {
     warn "-- Reusing connection ($scheme:$host:$port)\n" if DEBUG;
-    $self->{connections}->{$id} = {cb => $cb, tx => $tx};
+    $self->{connections}{$id} = {cb => $cb, tx => $tx};
     $tx->kept_alive(1) unless $tx->connection;
     $self->_connected($id);
     return $id;
@@ -219,7 +219,7 @@ sub _connect {
       $self->_connected($id);
     }
   );
-  $self->{connections}->{$id} = {cb => $cb, tx => $tx};
+  $self->{connections}{$id} = {cb => $cb, tx => $tx};
 
   return $id;
 }
@@ -247,7 +247,7 @@ sub _connect_proxy {
         return unless my $id = $tx->connection;
         my $loop   = $self->_loop;
         my $handle = $loop->stream($id)->steal_handle;
-        my $c      = delete $self->{connections}->{$id};
+        my $c      = delete $self->{connections}{$id};
         $loop->remove($id);
         weaken $self;
         $id = $loop->client(
@@ -269,7 +269,7 @@ sub _connect_proxy {
             $self->_start($old, $cb);
           }
         );
-        return $self->{connections}->{$id} = $c;
+        return $self->{connections}{$id} = $c;
       }
 
       # Start real transaction
@@ -287,7 +287,7 @@ sub _connected {
   $loop->stream($id)->timeout($self->inactivity_timeout);
 
   # Store connection information in transaction
-  my $tx = $self->{connections}->{$id}->{tx};
+  my $tx = $self->{connections}{$id}{tx};
   $tx->connection($id);
   my $handle = $loop->stream($id)->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
@@ -301,7 +301,7 @@ sub _connected {
 
 sub _error {
   my ($self, $id, $err, $emit) = @_;
-  if (my $tx = $self->{connections}->{$id}->{tx}) { $tx->res->error($err) }
+  if (my $tx = $self->{connections}{$id}{tx}) { $tx->res->error($err) }
   $self->emit(error => $err) if $emit;
   $self->_handle($id, $err);
 }
@@ -339,13 +339,13 @@ sub _handle {
   my ($self, $id, $close) = @_;
 
   # Request timeout
-  my $c = $self->{connections}->{$id};
+  my $c = $self->{connections}{$id};
   $self->_loop->remove($c->{timeout}) if $c->{timeout};
 
   # Finish WebSocket
   my $old = $c->{tx};
   if ($old && $old->is_websocket) {
-    delete $self->{connections}->{$id};
+    delete $self->{connections}{$id};
     $self->_remove($id, $close);
     $old->client_close;
   }
@@ -382,7 +382,7 @@ sub _read {
   my ($self, $id, $chunk) = @_;
 
   # Corrupted connection
-  return                     unless my $c  = $self->{connections}->{$id};
+  return                     unless my $c  = $self->{connections}{$id};
   return $self->_remove($id) unless my $tx = $c->{tx};
 
   # Process incoming data
@@ -396,7 +396,7 @@ sub _remove {
   my ($self, $id, $close) = @_;
 
   # Close connection
-  my $tx = (delete($self->{connections}->{$id}) || {})->{tx};
+  my $tx = (delete($self->{connections}{$id}) || {})->{tx};
   unless (!$close && $tx && $tx->keep_alive && !$tx->error) {
     $self->_cache($id);
     return $self->_loop->remove($id);
@@ -419,7 +419,7 @@ sub _redirect {
 
   # Follow redirect
   return 1 unless my $id = $self->_start($new, delete $c->{cb});
-  return $self->{connections}->{$id}->{redirects} = $redirects + 1;
+  return $self->{connections}{$id}{redirects} = $redirects + 1;
 }
 
 sub _server {
@@ -485,7 +485,7 @@ sub _start {
   if (my $t = $self->request_timeout) {
     weaken $self;
     my $loop = $self->_loop;
-    $self->{connections}->{$id}->{timeout} =
+    $self->{connections}{$id}{timeout} =
       $loop->timer($t => sub { $self->_error($id, 'Request timeout.') });
   }
 
@@ -496,7 +496,7 @@ sub _upgrade {
   my ($self, $id) = @_;
 
   # Check if connection needs to be upgraded
-  my $c   = $self->{connections}->{$id};
+  my $c   = $self->{connections}{$id};
   my $old = $c->{tx};
   return unless $old->req->headers->upgrade;
   return unless ($old->res->code || '') eq '101';
@@ -515,7 +515,7 @@ sub _write {
   my ($self, $id) = @_;
 
   # Prepare outgoing data
-  return unless my $c  = $self->{connections}->{$id};
+  return unless my $c  = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
   return if $self->{writing}++;

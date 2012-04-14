@@ -98,14 +98,14 @@ sub register {
       delete $memorize{$name}
         if exists $memorize{$name}
           && $expires > 0
-          && $memorize{$name}->{expires} < time;
+          && $memorize{$name}{expires} < time;
 
       # Memorized
-      return $memorize{$name}->{content} if exists $memorize{$name};
+      return $memorize{$name}{content} if exists $memorize{$name};
 
       # Memorize
-      $memorize{$name}->{expires} = $expires;
-      $memorize{$name}->{content} = $cb->();
+      $memorize{$name}{expires} = $expires;
+      $memorize{$name}{content} = $cb->();
     }
   );
 

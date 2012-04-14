@@ -14,7 +14,7 @@ use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 #  ...Where are we going?"
 sub emit {
   my ($self, $name) = (shift, shift);
-  if (my $s = $self->{events}->{$name}) {
+  if (my $s = $self->{events}{$name}) {
     warn "-- Emit @{[blessed($self)]} $name (@{[scalar(@$s)]})\n" if DEBUG;
     for my $cb (@$s) { $self->$cb(@_) }
   }
@@ -25,7 +25,7 @@ sub emit {
 sub emit_safe {
   my ($self, $name) = (shift, shift);
 
-  if (my $s = $self->{events}->{$name}) {
+  if (my $s = $self->{events}{$name}) {
     warn "-- Safe @{[blessed($self)]} $name (@{[scalar(@$s)]})\n" if DEBUG;
     for my $cb (@$s) {
       if (!eval { $self->$cb(@_); 1 } && $name ne 'error') {
@@ -44,7 +44,7 @@ sub has_subscribers { scalar @{shift->subscribers(shift)} }
 
 sub on {
   my ($self, $name, $cb) = @_;
-  push @{$self->{events}->{$name} ||= []}, $cb;
+  push @{$self->{events}{$name} ||= []}, $cb;
   return $cb;
 }
 
@@ -63,7 +63,7 @@ sub once {
   return $wrapper;
 }
 
-sub subscribers { shift->{events}->{shift()} || [] }
+sub subscribers { shift->{events}{shift()} || [] }
 
 # "Back you robots!
 #  Nobody ruins my family vacation but me!
@@ -73,12 +73,12 @@ sub unsubscribe {
 
   # All
   unless ($cb) {
-    delete $self->{events}->{$name};
+    delete $self->{events}{$name};
     return $self;
   }
 
   # One
-  $self->{events}->{$name} = [grep { $cb ne $_ } @{$self->{events}->{$name}}];
+  $self->{events}{$name} = [grep { $cb ne $_ } @{$self->{events}{$name}}];
 
   return $self;
 }

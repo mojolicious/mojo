@@ -13,7 +13,7 @@ use Time::HiRes qw/time usleep/;
 #  And the flag is made in China."
 sub io {
   my ($self, $handle, $cb) = @_;
-  $self->{io}->{fileno $handle} = {cb => $cb};
+  $self->{io}{fileno $handle} = {cb => $cb};
   return $self->watch($handle, 1, 1);
 }
 
@@ -42,9 +42,9 @@ sub one_tick {
     # I/O
     if (keys %{$self->{io}}) {
       $poll->poll($timeout);
-      ++$i and $self->_sandbox('Read', $self->{io}->{fileno $_}->{cb}, 0)
+      ++$i and $self->_sandbox('Read', $self->{io}{fileno $_}{cb}, 0)
         for $poll->handles(POLLIN | POLLHUP | POLLERR);
-      ++$i and $self->_sandbox('Write', $self->{io}->{fileno $_}->{cb}, 1)
+      ++$i and $self->_sandbox('Write', $self->{io}{fileno $_}{cb}, 1)
         for $poll->handles(POLLOUT);
     }
 
@@ -74,9 +74,9 @@ sub recurring { shift->_timer(1, @_) }
 
 sub remove {
   my ($self, $remove) = @_;
-  return delete shift->{timers}->{shift()} unless ref $remove;
+  return delete shift->{timers}{shift()} unless ref $remove;
   $self->_poll->remove($remove);
-  return delete $self->{io}->{fileno $remove};
+  return delete $self->{io}{fileno $remove};
 }
 
 sub start {
@@ -116,8 +116,8 @@ sub _sandbox {
 sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
   my $id;
-  do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}->{$id};
-  my $t = $self->{timers}->{$id} = {cb => $cb, time => time + $after};
+  do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}{$id};
+  my $t = $self->{timers}{$id} = {cb => $cb, time => time + $after};
   $t->{recurring} = $after if $recurring;
   return $id;
 }

@@ -51,7 +51,7 @@ sub detect {
 sub type {
   my ($self, $ext) = (shift, shift);
   my $types = $self->types;
-  return ref $types->{$ext} ? $types->{$ext}->[0] : $types->{$ext} unless @_;
+  return ref $types->{$ext} ? $types->{$ext}[0] : $types->{$ext} unless @_;
   $types->{$ext} = shift;
   return $self;
 }

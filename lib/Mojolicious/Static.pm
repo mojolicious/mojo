@@ -153,7 +153,7 @@ sub _get_data_file {
   }
 
   # Find file
-  return Mojo::Command->get_data($rel, $self->{index}->{$rel});
+  return Mojo::Command->get_data($rel, $self->{index}{$rel});
 }
 
 sub _get_file {

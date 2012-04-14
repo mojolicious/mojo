@@ -32,7 +32,7 @@ sub add {
 
     # Replace cookie
     $domain =~ s/^\.//;
-    my $jar = $self->{jar}->{$domain} ||= [];
+    my $jar = $self->{jar}{$domain} ||= [];
     @$jar = (grep({$_->path ne $path || $_->name ne $name} @$jar), $cookie);
   }
 
@@ -63,7 +63,7 @@ sub find {
   my $path = $url->path->to_string || '/';
   my @found;
   while ($domain =~ /[^\.]+\.[^\.]+|localhost$/) {
-    next unless my $jar = $self->{jar}->{$domain};
+    next unless my $jar = $self->{jar}{$domain};
 
     # Grab cookies
     my @new;
@@ -86,7 +86,7 @@ sub find {
       push @found, $result;
     }
 
-    $self->{jar}->{$domain} = \@new;
+    $self->{jar}{$domain} = \@new;
   }
 
   # Remove another part

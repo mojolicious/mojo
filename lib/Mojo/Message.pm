@@ -127,7 +127,7 @@ sub cookie {
   }
 
   # Multiple
-  my $cookies = $self->{cookies}->{$name};
+  my $cookies = $self->{cookies}{$name};
   my @cookies;
   @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies) if $cookies;
 
@@ -271,7 +271,7 @@ sub upload {
   }
 
   # Multiple
-  my $uploads = $self->{uploads}->{$name};
+  my $uploads = $self->{uploads}{$name};
   my @uploads;
   @uploads = ref $uploads eq 'ARRAY' ? @$uploads : ($uploads) if $uploads;
 
@@ -740,7 +740,7 @@ Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise. An optional JSON Pointer can be used to extract a
 specific value with L<Mojo::JSON::Pointer>.
 
-  say $message->json->{foo}->{bar}->[23];
+  say $message->json->{foo}{bar}[23];
   say $message->json('/foo/bar/23');
 
 =head2 C<leftovers>

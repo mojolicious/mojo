@@ -36,8 +36,7 @@ sub add {
   $NORMALCASE{$lcname} //= $name;
 
   # Add lines
-  push @{$self->{headers}->{$lcname}},
-    map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
+  push @{$self->{headers}{$lcname}}, map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
 
   return $self;
 }
@@ -45,7 +44,7 @@ sub add {
 sub clone {
   my $self  = shift;
   my $clone = $self->new;
-  $clone->{headers}->{$_} = [@{$self->{headers}->{$_}}]
+  $clone->{headers}{$_} = [@{$self->{headers}{$_}}]
     for keys %{$self->{headers}};
   return $clone;
 }
@@ -72,7 +71,7 @@ sub header {
   return $self->remove($name)->add($name, @_) if @_;
 
   # String
-  return unless my $headers = $self->{headers}->{lc $name};
+  return unless my $headers = $self->{headers}{lc $name};
   return join ', ', map { join ', ', @$_ } @$headers unless wantarray;
 
   # Array
@@ -131,7 +130,7 @@ sub referrer { scalar shift->header(Referer => @_) }
 
 sub remove {
   my ($self, $name) = @_;
-  delete $self->{headers}->{lc $name};
+  delete $self->{headers}{lc $name};
   return $self;
 }
 

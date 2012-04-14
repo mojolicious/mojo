@@ -169,7 +169,7 @@ sub _load {
   my ($self, $c, $app) = @_;
 
   # Load unless already loaded or application
-  return 1 if $self->{loaded}->{$app} || ref $app;
+  return 1 if $self->{loaded}{$app} || ref $app;
   if (my $e = Mojo::Loader->load($app)) {
 
     # Doesn't exist
@@ -183,7 +183,7 @@ sub _load {
   # Check base classes
   $c->app->log->debug(qq/Class "$app" is not a controller./) and return
     unless first { $app->isa($_) } @{$self->base_classes};
-  return ++$self->{loaded}->{$app};
+  return ++$self->{loaded}{$app};
 }
 
 sub _method {
@@ -193,7 +193,7 @@ sub _method {
   $self->{hiding} = {map { $_ => 1 } @{$self->hidden}} unless $self->{hiding};
   return unless my $method = $field->{action};
   $c->app->log->debug(qq/Action "$method" is not allowed./) and return
-    if $self->{hiding}->{$method} || index($method, '_') == 0;
+    if $self->{hiding}{$method} || index($method, '_') == 0;
 
   # Invalid
   $c->app->log->debug(qq/Action "$method" is invalid./) and return

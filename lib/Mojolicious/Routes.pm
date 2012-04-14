@@ -64,10 +64,8 @@ sub dispatch {
   # Check cache
   my $cache = $self->cache;
   if ($cache && (my $cached = $cache->get("$method:$path:$websocket"))) {
-    $m->root($self);
-    $m->stack($cached->{stack});
-    $m->captures($cached->{captures});
-    $m->endpoint($cached->{endpoint});
+    $m->root($self)->endpoint($cached->{endpoint});
+    $m->stack($cached->{stack})->captures($cached->{captures});
   }
 
   # Check routes
@@ -90,7 +88,7 @@ sub dispatch {
   return unless $m && @{$m->stack};
 
   # Dispatch
-  return if $self->_walk_stack($c);
+  return if $self->_walk($c);
   $self->auto_render($c);
   return 1;
 }
@@ -104,7 +102,7 @@ sub route {
   return $route;
 }
 
-sub _dispatch_callback {
+sub _callback {
   my ($self, $c, $field, $staging) = @_;
   $c->stash->{'mojo.routed'}++;
   $c->app->log->debug(qq/Routing to a callback./);
@@ -112,13 +110,26 @@ sub _dispatch_callback {
   return !$staging || $continue ? 1 : undef;
 }
 
-sub _dispatch_controller {
+sub _class {
+  my ($self, $field, $c) = @_;
+
+  # Namespace and class
+  my $namespace = $field->{namespace};
+  my $class = camelize $field->{controller} || '';
+  return unless $class || $namespace;
+  $class = length $class ? "${namespace}::$class" : $namespace
+    if length($namespace //= $self->namespace);
+
+  # Check if it looks like a class
+  return $class =~ /^[a-zA-Z0-9_:]+$/ ? $class : undef;
+}
+
+sub _controller {
   my ($self, $c, $field, $staging) = @_;
 
   # Load and instantiate controller/application
-  return 1
-    unless my $app = $field->{app} || $self->_generate_class($field, $c);
-  return unless $self->_load_class($c, $app);
+  return 1 unless my $app = $field->{app} || $self->_class($field, $c);
+  return unless $self->_load($c, $app);
   $app = $app->new($c) unless ref $app;
 
   # Application
@@ -136,9 +147,9 @@ sub _dispatch_controller {
   }
 
   # Action
-  elsif (my $method = $self->_generate_method($field, $c)) {
+  elsif (my $method = $self->_method($field, $c)) {
     my $log = $c->app->log;
-    $log->debug(qq/Routing to action "$class->$method"./);
+    $log->debug(qq/Routing to controller "$class" and action "$method"./);
 
     # Try to call action
     my $stash = $c->stash;
@@ -148,30 +159,34 @@ sub _dispatch_controller {
     }
 
     # Action not found
-    else { $log->debug('Action not found, routing to template.') }
+    else { $log->debug('Action not found in controller.') }
   }
 
   return !$staging || $continue ? 1 : undef;
 }
 
-sub _generate_class {
-  my ($self, $field, $c) = @_;
+sub _load {
+  my ($self, $c, $app) = @_;
 
-  # Namespace and class
-  my $namespace = $field->{namespace};
-  my $class = camelize $field->{controller} || '';
-  return unless $class || $namespace;
-  $namespace //= $self->namespace;
-  $class = length $class ? "${namespace}::$class" : $namespace
-    if length $namespace;
+  # Load unless already loaded or application
+  return 1 if $self->{loaded}->{$app} || ref $app;
+  if (my $e = Mojo::Loader->load($app)) {
 
-  # Invalid
-  return unless $class =~ /^[a-zA-Z0-9_:]+$/;
+    # Doesn't exist
+    $c->app->log->debug(qq/Controller "$app" does not exist./) and return
+      unless ref $e;
 
-  return $class;
+    # Error
+    die $e;
+  }
+
+  # Check base classes
+  $c->app->log->debug(qq/Class "$app" is not a controller./) and return
+    unless first { $app->isa($_) } @{$self->base_classes};
+  return ++$self->{loaded}->{$app};
 }
 
-sub _generate_method {
+sub _method {
   my ($self, $field, $c) = @_;
 
   # Hidden
@@ -187,28 +202,7 @@ sub _generate_method {
   return $method;
 }
 
-sub _load_class {
-  my ($self, $c, $app) = @_;
-
-  # Load unless already loaded or application
-  return 1 if $self->{loaded}->{$app} || ref $app;
-  if (my $e = Mojo::Loader->load($app)) {
-
-    # Doesn't exist
-    $c->app->log->debug(qq/"$app" does not exist, maybe a typo?/) and return
-      unless ref $e;
-
-    # Error
-    die $e;
-  }
-
-  # Check base classes
-  $c->app->log->debug(qq/"$app" is not a controller./) and return
-    unless first { $app->isa($_) } @{$self->base_classes};
-  return ++$self->{loaded}->{$app};
-}
-
-sub _walk_stack {
+sub _walk {
   my ($self, $c) = @_;
 
   # Walk the stack
@@ -226,8 +220,8 @@ sub _walk_stack {
     # Dispatch
     my $continue =
         $field->{cb}
-      ? $self->_dispatch_callback($c, $field, $staging)
-      : $self->_dispatch_controller($c, $field, $staging);
+      ? $self->_callback($c, $field, $staging)
+      : $self->_controller($c, $field, $staging);
 
     # Break the chain
     return 1 if $staging && !$continue;

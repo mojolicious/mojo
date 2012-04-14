@@ -236,6 +236,8 @@ other scripts, with this little mock server you can just embed them.
 
   # Access fully initialized application
   say $app->static->root;
+  say $app->config->{secret_identity};
+  say $app->home;
 
 =head2 Web server embedding
 

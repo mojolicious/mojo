@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 353;
+use Test::More tests => 365;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -184,10 +184,15 @@ $r->route('/regex/alternatives/:alternatives',
   alternatives => qr/foo|bar|baz/)
   ->to(controller => 'regex', action => 'alternatives');
 
-# /versioned/2.0/test
-# /versioned/2.0/test.xml
-$r->route('/versioned')->route('/2.0')->to(controller => 'foo')
-  ->route('/test')->to(action => 'bar');
+# /versioned/1.0/test
+# /versioned/1.0/test.xml
+# /versioned/2.4/test
+# /versioned/2.4/test.xml
+my $versioned = $r->route('/versioned');
+$versioned->route('/1.0')->to(controller => 'bar')->route('/test')
+  ->to(action => 'baz');
+$versioned->route('/2.4')->to(controller => 'foo')->route('/test')
+  ->to(action => 'bar');
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(GET => '/clean')->match($r);
@@ -710,19 +715,37 @@ $m =
 is $m->stack->[0], undef, 'no value';
 
 # Route with version
-$m = Mojolicious::Routes::Match->new(GET => '/versioned/2.0/test')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/versioned/1.0/test')->match($r);
+is $m->stack->[0]->{controller}, 'bar', 'right value';
+is $m->stack->[0]->{action},     'baz', 'right value';
+is $m->stack->[0]->{format},     undef, 'no value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/versioned/1.0/test', 'right path';
+$m =
+  Mojolicious::Routes::Match->new(GET => '/versioned/1.0/test.xml')
+  ->match($r);
+is $m->stack->[0]->{controller}, 'bar', 'right value';
+is $m->stack->[0]->{action},     'baz', 'right value';
+is $m->stack->[0]->{format},     'xml', 'right value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/versioned/1.0/test', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/versioned/2.4/test')->match($r);
 is $m->stack->[0]->{controller}, 'foo', 'right value';
 is $m->stack->[0]->{action},     'bar', 'right value';
 is $m->stack->[0]->{format},     undef, 'no value';
 is $m->stack->[1], undef, 'no value';
-is $m->path_for, '/versioned/2.0/test', 'right path';
+is $m->path_for, '/versioned/2.4/test', 'right path';
 $m =
-  Mojolicious::Routes::Match->new(GET => '/versioned/2.0/test.xml')
+  Mojolicious::Routes::Match->new(GET => '/versioned/2.4/test.xml')
   ->match($r);
 is $m->stack->[0]->{controller}, 'foo', 'right value';
 is $m->stack->[0]->{action},     'bar', 'right value';
 is $m->stack->[0]->{format},     'xml', 'right value';
 is $m->stack->[1], undef, 'no value';
-is $m->path_for, '/versioned/2.0/test', 'right path';
+is $m->path_for, '/versioned/2.4/test', 'right path';
 $m = Mojolicious::Routes::Match->new(GET => '/versioned/3.0/test')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/versioned/3.4/test')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/versioned/0.3/test')->match($r);
 is $m->stack->[0], undef, 'no value';

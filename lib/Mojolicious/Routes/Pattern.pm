@@ -100,9 +100,9 @@ sub shape_match {
   # Format
   $result->{format} ||= $self->{strict} if $detect && exists $self->{strict};
   my $req = $self->reqs->{format};
-  return $result if defined $req && !$req;
+  return $result if !$detect || defined $req && !$req;
   my $format = $self->format;
-  if ($detect && $$pathref =~ s|^/?$format||) { $result->{format} ||= $1 }
+  if ($$pathref =~ s|^/?$format||) { $result->{format} ||= $1 }
   elsif ($req) { return if !$result->{format} }
 
   return $result;

@@ -25,8 +25,7 @@ sub to_string {
 
   # Message
   return $self->message unless $self->verbose;
-  my $string = '';
-  $string .= $self->message if $self->message;
+  my $string = $self->message ? $self->message : '';
 
   # Before
   $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
@@ -50,67 +49,9 @@ sub trace {
   return $self;
 }
 
-sub _detect {
-  my $self = shift;
-
-  # Message
-  my $message = shift;
-  return $message if blessed $message && $message->isa('Mojo::Exception');
-  $self->message($message)->raw_message($message);
-
-  # Extract file and line from message
-  my @trace;
-  while ($message =~ /at\s+(.+?)\s+line\s+(\d+)/g) { push @trace, [$1, $2] }
-
-  # Extract file and line from stacktrace
-  if (my $first = $self->frames->[0]) {
-    unshift @trace, [$first->[1], $first->[2]] if $first->[1];
-  }
-
-  # Search for context
-  for my $frame (reverse @trace) {
-    next unless -r $frame->[0];
-    open my $handle, '<:utf8', $frame->[0];
-    $self->_parse_context($frame->[1], [[<$handle>]]);
-    return $self;
-  }
-
-  # More context
-  return $self unless my $files = shift;
-  my @lines = map { [split /\n/] } @$files;
-
-  # Fix file in message
-  return $self unless my $name = shift;
-  unless (ref $message) {
-    my $filter = sub {
-      my $num  = shift;
-      my $new  = "$name line $num";
-      my $line = $lines[0]->[$num];
-      $new .= qq/, near "$line"/ if defined $line;
-      return $new .= '.';
-    };
-    $message =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;
-    $self->message($message);
-  }
-
-  # Search for better context
-  my $line;
-  if ($self->message =~ /at\s+\Q$name\E\s+line\s+(\d+)/) { $line = $1 }
-  else {
-    for my $frame (@{$self->frames}) {
-      next unless $frame->[1] =~ /^\(eval\ \d+\)$/;
-      $line = $frame->[2];
-      last;
-    }
-  }
-  $self->_parse_context($line, \@lines) if $line;
-
-  return $self;
-}
-
 # "You killed zombie Flanders!
 #  He was a zombie?"
-sub _parse_context {
+sub _context {
   my ($self, $line, $lines) = @_;
 
   # Wrong file
@@ -147,6 +88,63 @@ sub _parse_context {
       }
     }
   }
+}
+
+sub _detect {
+  my $self = shift;
+
+  # Message
+  my $message = shift;
+  return $message if blessed $message && $message->isa('Mojo::Exception');
+  $self->message($message)->raw_message($message);
+
+  # Extract file and line from message
+  my @trace;
+  while ($message =~ /at\s+(.+?)\s+line\s+(\d+)/g) { push @trace, [$1, $2] }
+
+  # Extract file and line from stacktrace
+  if (my $first = $self->frames->[0]) {
+    unshift @trace, [$first->[1], $first->[2]] if $first->[1];
+  }
+
+  # Search for context
+  for my $frame (reverse @trace) {
+    next unless -r $frame->[0];
+    open my $handle, '<:utf8', $frame->[0];
+    $self->_context($frame->[1], [[<$handle>]]);
+    return $self;
+  }
+
+  # More context
+  return $self unless my $files = shift;
+  my @lines = map { [split /\n/] } @$files;
+
+  # Fix file in message
+  return $self unless my $name = shift;
+  unless (ref $message) {
+    my $filter = sub {
+      my $num  = shift;
+      my $new  = "$name line $num";
+      my $line = $lines[0]->[$num];
+      $new .= qq/, near "$line"/ if defined $line;
+      return $new .= '.';
+    };
+    $message =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;
+    $self->message($message);
+  }
+
+  # Search for better context
+  my $line;
+  if ($self->message =~ /at\s+\Q$name\E\s+line\s+(\d+)/) { $line = $1 }
+  else {
+    for my $frame (@{$self->frames}) {
+      $line = $frame->[1] =~ /^\(eval\ \d+\)$/ ? $frame->[2] : next;
+      last;
+    }
+  }
+  $self->_context($line, \@lines) if $line;
+
+  return $self;
 }
 
 1;

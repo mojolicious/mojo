@@ -64,8 +64,7 @@ sub attr {
     if ref $default && ref $default ne 'CODE';
 
   # Create attributes
-  $attrs = [$attrs] unless ref $attrs eq 'ARRAY';
-  for my $attr (@$attrs) {
+  for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
     Carp::croak(qq/Attribute "$attr" invalid/)
       unless $attr =~ /^[a-zA-Z_]\w*$/;
 
@@ -95,12 +94,7 @@ sub attr {
     # We compile custom attribute code for speed
     no strict 'refs';
     no warnings 'redefine';
-    *{"${class}::$attr"} = eval $code;
-
-    # This should never happen (hopefully)
-    Carp::croak("Mojo::Base compiler error: \n$code\n$@\n") if $@;
-
-    # Debug mode
+    *{"${class}::$attr"} = eval $code or Carp::croak("Mojo::Base error: $@");
     warn "\nATTRIBUTE: $class->$attr\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
   }
 }

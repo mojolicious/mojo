@@ -29,15 +29,6 @@ sub DESTROY {
   $loop->remove($_) for @{$self->{listening} || []};
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub prepare_ioloop {
-  warn <<EOF;
-Mojo::Server::Daemon->prepare_ioloop is DEPRECATED in favor of
-Mojo::Server::Daemon->start!
-EOF
-  shift->start(@_);
-}
-
 # "40 dollars!? This better be the best damn beer ever..
 #  *drinks beer* You got lucky."
 sub run {

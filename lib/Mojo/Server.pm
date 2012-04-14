@@ -28,8 +28,7 @@ sub load_app {
 
   # Clean up environment
   local $ENV{MOJO_APP_LOADER} = 1;
-  local $ENV{MOJO_APP};
-  local $ENV{MOJO_EXE};
+  local ($ENV{MOJO_APP}, $ENV{MOJO_EXE});
 
   # Try to load application from script into sandbox
   my $class = 'Mojo::Server::SandBox::' . md5_sum($file . $$);

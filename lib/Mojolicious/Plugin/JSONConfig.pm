@@ -45,8 +45,9 @@ sub render {
   $prepend .= q/use Mojo::Base -strict;/;
 
   # Render
-  my $mt = Mojo::Template->new($conf->{template} || {})->prepend($prepend);
-  return encode 'UTF-8', $mt->render($content, $app);
+  my $mt = Mojo::Template->new($conf->{template} || {});
+  my $json = $mt->prepend($prepend)->render($content, $app);
+  return ref $json ? die($json) : encode('UTF-8', $json);
 }
 
 1;

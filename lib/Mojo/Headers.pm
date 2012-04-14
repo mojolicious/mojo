@@ -171,12 +171,6 @@ sub to_string {
   return join "\x0d\x0a", @headers;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub x_forwarded_for {
-  warn "Mojo::Headers->x_forwarded_for is DEPRECATED!\n";
-  shift->header('X-Forwarded-For' => @_);
-}
-
 1;
 __END__
 

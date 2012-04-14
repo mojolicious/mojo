@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 365;
+use Test::More tests => 386;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -193,6 +193,16 @@ $versioned->route('/1.0')->to(controller => 'bar')->route('/test')
   ->to(action => 'baz');
 $versioned->route('/2.4')->to(controller => 'foo')->route('/test')
   ->to(action => 'bar');
+
+# /versioned/too/1.0
+my $too = $r->route('/versioned/too')->to('too#');
+$too->route('/1.0')->to('#foo');
+$too->route('/2.0', format => 0)->to('#bar');
+
+# /multi/foo.bar
+my $multi = $r->route('/multi');
+$multi->route('/foo.bar')->to('just#works');
+$multi->route('/bar.baz')->to('works#too', format => 'xml');
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(GET => '/clean')->match($r);
@@ -749,3 +759,33 @@ $m = Mojolicious::Routes::Match->new(GET => '/versioned/3.4/test')->match($r);
 is $m->stack->[0], undef, 'no value';
 $m = Mojolicious::Routes::Match->new(GET => '/versioned/0.3/test')->match($r);
 is $m->stack->[0], undef, 'no value';
+
+# Route with version at the end
+$m = Mojolicious::Routes::Match->new(GET => '/versioned/too/1.0')->match($r);
+is $m->stack->[0]->{controller}, 'too', 'right value';
+is $m->stack->[0]->{action},     'foo', 'right value';
+is $m->stack->[0]->{format},     '0',   'right value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/versioned/too/1.0', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/versioned/too/2.0')->match($r);
+is $m->stack->[0]->{controller}, 'too', 'right value';
+is $m->stack->[0]->{action},     'bar', 'right value';
+is $m->stack->[0]->{format},     undef, 'no value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/versioned/too/2.0', 'right path';
+
+# Multiple extensions
+$m = Mojolicious::Routes::Match->new(GET => '/multi/foo.bar')->match($r);
+is $m->stack->[0]->{controller}, 'just',  'right value';
+is $m->stack->[0]->{action},     'works', 'right value';
+is $m->stack->[0]->{format},     'bar',   'right value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/multi/foo.bar', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/multi/foo.bar.baz')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/multi/bar.baz')->match($r);
+is $m->stack->[0]->{controller}, 'works', 'right value';
+is $m->stack->[0]->{action},     'too',   'right value';
+is $m->stack->[0]->{format},     'xml',   'right value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/multi/bar.baz', 'right path';

@@ -2,8 +2,7 @@ package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
 has [qw/defaults reqs/] => sub { {} };
-has format => sub {qr#\.([^/]+)$#};
-has [qw/pattern regex/];
+has [qw/format pattern regex/];
 has quote_end     => ')';
 has quote_start   => '(';
 has relaxed_start => '.';
@@ -15,10 +14,9 @@ has wildcard_start => '*';
 sub new { shift->SUPER::new->parse(@_) }
 
 sub match {
-  my ($self, $path) = @_;
-  my $result = $self->shape_match(\$path);
-  return $result if !$path || $path eq '/';
-  return;
+  my ($self, $path, $detect) = @_;
+  my $result = $self->shape_match(\$path, $detect);
+  return !$path || $path eq '/' ? $result : undef;
 }
 
 sub parse {
@@ -33,8 +31,7 @@ sub parse {
   $self->reqs($reqs);
 
   # Format in pattern
-  $reqs->{format} = quotemeta($self->{strict} = $1)
-    if $pattern =~ m#\.([^/\)]+)$#;
+  $self->{strict} = $1 if $pattern =~ m#\.([^/\)]+)$#;
 
   # Tokenize
   return $self->pattern($pattern)->_tokenize;
@@ -82,8 +79,8 @@ sub shape_match {
   my ($self, $pathref, $detect) = @_;
 
   # Compile on demand
-  my $regex;
-  $regex = $self->_compile unless $regex = $self->regex;
+  my $regex = $self->regex || $self->_compile;
+  my $format = $detect ? ($self->format || $self->_compile_format) : undef;
 
   # Match
   return unless my @captures = $$pathref =~ $regex;
@@ -98,11 +95,13 @@ sub shape_match {
   }
 
   # Format
-  $result->{format} ||= $self->{strict} if $detect && exists $self->{strict};
   my $req = $self->reqs->{format};
   return $result if !$detect || defined $req && !$req;
-  my $format = $self->format;
-  if ($$pathref =~ s|^/?$format||) { $result->{format} ||= $1 }
+  if (exists $self->{strict}) {
+    $result->{format} //= $self->{strict};
+    return $result;
+  }
+  if ($$pathref =~ s|^/?$format||) { $result->{format} = $1 }
   elsif ($req) { return if !$result->{format} }
 
   return $result;
@@ -111,15 +110,8 @@ sub shape_match {
 sub _compile {
   my $self = shift;
 
-  # Compile format regex
-  my $reqs = $self->reqs;
-  if (!exists $reqs->{format} || $reqs->{format}) {
-    my $format =
-      defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/]+)';
-    $self->format(qr#\.$format$#);
-  }
-
   # Compile tree to regex
+  my $reqs     = $self->reqs;
   my $block    = '';
   my $regex    = '';
   my $optional = 1;
@@ -179,6 +171,23 @@ sub _compile {
   $self->regex($regex);
 
   return $regex;
+}
+
+sub _compile_format {
+  my $self = shift;
+
+  # Format in pattern
+  return if $self->{strict};
+
+  # Default regex
+  my $reqs = $self->reqs;
+  return $self->format(qr#\.([^/]+)$#)->format
+    if !exists $reqs->{format} && $reqs->{format};
+
+  # Compile custom regex
+  my $regex =
+    defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/]+)';
+  return $self->format(qr#\.$regex$#)->format;
 }
 
 # "Interesting... Oh no wait, the other thing, tedious."
@@ -304,7 +313,7 @@ Default parameters.
   my $regex = $pattern->format;
   $pattern  = $pattern->format($regex);
 
-Compiled regex for format matching, defaults to C<\.([^/]+)$>.
+Compiled regex for format matching.
 
 =head2 C<pattern>
 
@@ -392,6 +401,7 @@ Construct a new pattern object.
 =head2 C<match>
 
   my $result = $pattern->match('/foo/bar');
+  my $result = $pattern->match('/foo/bar', $detect);
 
 Match pattern against a path.
 

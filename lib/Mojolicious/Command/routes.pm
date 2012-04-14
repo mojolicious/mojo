@@ -70,13 +70,10 @@ sub _draw {
 
     # Regex
     my $pattern = $node->[1]->pattern;
-    $pattern->match('/');
-    my $regex  = (regexp_pattern $pattern->regex)[0];
-    my $format = (regexp_pattern $pattern->format)[0];
-    my $req    = $pattern->reqs->{format};
-    $format = defined $req ? '' : "(?:$format)?" unless $req;
-    push @parts, $node->[1]->is_endpoint ? "$regex$format" : $regex
-      if $verbose;
+    $pattern->match('/', $node->[1]->is_endpoint);
+    my $regex = (regexp_pattern $pattern->regex)[0];
+    my $format = (regexp_pattern $pattern->format || '')[0];
+    push @parts, $format ? "$regex(?:$format)" : $regex if $verbose;
 
     # Route
     say join('  ', @parts);

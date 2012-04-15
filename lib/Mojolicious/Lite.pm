@@ -580,17 +580,16 @@ Restrictive placeholders can also be used for format detection.
 Or you can just disable format detection.
 
   # /hello
-  get '/hello' => [format => 0] => {text => 'No format.'};
+  get '/hello' => [format => 0] => {text => 'No format detection.'};
 
-  # Disable format detection for the following routes
+  # Disable format detection for the following routes and allow re-enabling
   under [format => 0];
 
   # /foo
-  get '/foo' => {text => 'No format again.'};
+  get '/foo' => {text => 'No format detection again.'};
 
   # /bar.txt
-  # /bar.html
-  get '/bar' => [format => ['txt', 'html']] => {text => 'Two formats.'};
+  get '/bar' => [format => 'txt'] => {text => ' Just one format.'};
 
 =head2 Content negotiation
 

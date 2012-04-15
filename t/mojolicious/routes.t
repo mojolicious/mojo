@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 404;
+use Test::More tests => 416;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -207,9 +207,13 @@ $multi->route('/bar.baz')->to('works#too', format => 'xml');
 # /nodetect
 # /nodetect2.txt
 # /nodetect2.html
-my $no_detect = $r->route(format => 0);
-$no_detect->route('/nodetect')->to('foo#none');
-$no_detect->route('/nodetect2', format => ['txt', 'html'])->to('bar#hyper');
+# /nodetect3.xml
+# /nodetect3/rly
+my $inactive = $r->route(format => 0);
+$inactive->route('/nodetect')->to('foo#none');
+$inactive->route('/nodetect2', format => ['txt', 'html'])->to('bar#hyper');
+my $some = $inactive->waypoint('/nodetect3', format => 'xml')->to('baz#some');
+$some->route('/rly')->to('#rly');
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(GET => '/clean')->match($r);
@@ -230,6 +234,7 @@ is $r->find('test_edit')->to_string, '/:controller/test/edit',
   'right pattern';
 is $r->find('articles_delete')->to_string, '/articles/:id/delete',
   'right pattern';
+is $r->find('rly')->pattern->reqs->{format}, 0, 'right value';
 
 # Null route
 $m = Mojolicious::Routes::Match->new(GET => '/0')->match($r);
@@ -821,4 +826,23 @@ is $m->path_for, '/nodetect2.html', 'right path';
 $m = Mojolicious::Routes::Match->new(GET => '/nodetect2')->match($r);
 is $m->stack->[0], undef, 'no value';
 $m = Mojolicious::Routes::Match->new(GET => '/nodetect2.xml')->match($r);
+is $m->stack->[0], undef, 'no value';
+
+# Disabled format detection inheritance with waypoint
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect3.xml')->match($r);
+is $m->stack->[0]{controller}, 'baz',  'right value';
+is $m->stack->[0]{action},     'some', 'right value';
+is $m->stack->[0]{format},     'xml',  'right value';
+is $m->stack->[1], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect3')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect3.txt')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect3.xml/rly')->match($r);
+is $m->stack->[0]{controller}, 'baz', 'right value';
+is $m->stack->[0]{action},     'rly', 'right value';
+is $m->stack->[0]{format},     'xml', 'no value';
+is $m->stack->[1], undef, 'no value';
+$m =
+  Mojolicious::Routes::Match->new(GET => '/nodetect3.xml/rly.txt')->match($r);
 is $m->stack->[0], undef, 'no value';

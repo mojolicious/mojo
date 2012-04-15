@@ -140,18 +140,12 @@ sub put   { shift->_generate_route(PUT   => @_) }
 sub render {
   my ($self, $path, $values) = @_;
 
-  # Path prefix
-  my $prefix = $self->pattern->render($values);
+  # Render pattern
+  my $prefix = $self->pattern->render($values, !$path);
   $path = "$prefix$path" unless $prefix eq '/';
+  $path ||= '/' unless my $parent = $self->parent;
 
-  # Make sure there is always a root
-  my $parent = $self->parent;
-  $path = '/' if !$path && !$parent;
-
-  # Format
-  $path .= ".$values->{format}"
-    if $values->{format} && !$parent && $path !~ m#\.[^/]+$#;
-
+  # Let parent render
   return $parent ? $parent->render($path, $values) : $path;
 }
 

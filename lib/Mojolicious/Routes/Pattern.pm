@@ -34,7 +34,7 @@ sub parse {
 }
 
 sub render {
-  my ($self, $values) = @_;
+  my ($self, $values, $format) = @_;
   $values ||= {};
 
   # Merge values with defaults
@@ -68,7 +68,9 @@ sub render {
     $string = "$rendered$string";
   }
 
-  return $string || '/';
+  # Format is optional
+  $string ||= '/';
+  return $format && $values->{format} ? "$string.$values->{format}" : $string;
 }
 
 sub shape_match {
@@ -391,7 +393,7 @@ Construct a new pattern object.
 =head2 C<match>
 
   my $result = $pattern->match('/foo/bar');
-  my $result = $pattern->match('/foo/bar', $detect);
+  my $result = $pattern->match('/foo/bar', 1);
 
 Match pattern against entire path, format detection is disabled by default.
 
@@ -406,13 +408,15 @@ Parse a raw pattern.
 =head2 C<render>
 
   my $path = $pattern->render({action => 'foo'});
+  my $path = $pattern->render({action => 'foo'}, 1);
 
-Render pattern into a path with parameters.
+Render pattern into a path with parameters, format rendering is disabled by
+default.
 
 =head2 C<shape_match>
 
   my $result = $pattern->shape_match(\$path);
-  my $result = $pattern->shape_match(\$path, $detect);
+  my $result = $pattern->shape_match(\$path, 1);
 
 Match pattern against path and remove matching parts, format detection is
 disabled by default.

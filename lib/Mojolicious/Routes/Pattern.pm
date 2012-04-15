@@ -34,10 +34,10 @@ sub parse {
 }
 
 sub render {
-  my ($self, $values, $format) = @_;
-  $values ||= {};
+  my ($self, $values, $render) = @_;
 
   # Merge values with defaults
+  my $format = ($values ||= {})->{format};
   $values = {%{$self->defaults}, %$values};
 
   # Turn pattern into path
@@ -70,7 +70,7 @@ sub render {
 
   # Format is optional
   $string ||= '/';
-  return $format && $values->{format} ? "$string.$values->{format}" : $string;
+  return $render && $format ? "$string.$format" : $string;
 }
 
 sub shape_match {

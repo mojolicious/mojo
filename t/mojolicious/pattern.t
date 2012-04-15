@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 89;
+use Test::More tests => 90;
 
 # "People said I was dumb, but I proved them."
 use Mojo::ByteStream 'b';
@@ -142,7 +142,7 @@ $result = $pattern->match('/test.json');
 ok $pattern->regex, 'regex has been compiled on demand';
 ok !$pattern->format, 'no format regex';
 is $result->{action}, 'index', 'right value';
-ok !$result->{format}, 'no value';
+is $result->{format}, undef,   'no value';
 $result = $pattern->match('/test.json', 1);
 is $result->{action}, 'index', 'right value';
 is $result->{format}, undef,   'no value';
@@ -168,7 +168,7 @@ $pattern = Mojolicious::Routes::Pattern->new('/test', format => 0);
 $pattern->defaults({action => 'index'});
 $result = $pattern->match('/test', 1);
 is $result->{action}, 'index', 'right value';
-ok !$result->{format}, 'no value';
+is $result->{format}, undef,   'no value';
 $result = $pattern->match('/test.xml', 1);
 is $result, undef, 'no result';
 
@@ -178,19 +178,21 @@ is $pattern->reqs->{format}, 0, 'right value';
 $pattern->defaults({action => 'index'});
 $result = $pattern->match('/', 1);
 is $result->{action}, 'index', 'right value';
-ok !$result->{format}, 'no value';
+is $result->{format}, undef,   'no value';
 $result = $pattern->match('/.xml', 1);
 is $result, undef, 'no result';
 
 # Versioned pattern
 $pattern = Mojolicious::Routes::Pattern->new('/:test/v1.0');
-$pattern->defaults({action => 'index'});
+$pattern->defaults({action => 'index', format => 'html'});
 $result = $pattern->match('/foo/v1.0', 1);
 is $result->{test},   'foo',   'right value';
 is $result->{action}, 'index', 'right value';
-ok !$result->{format}, 'no value';
+is $result->{format}, 'html',  'right value';
 is $pattern->render($result), '/foo/v1.0', 'right result';
-is $pattern->render($result, 1), '/foo/v1.0', 'right result';
+is $pattern->render($result, 1), '/foo/v1.0.html', 'right result';
+is $pattern->render({%$result, format => undef}, 1), '/foo/v1.0',
+  'right result';
 $result = $pattern->match('/foo/v1.0.txt', 1);
 is $result->{test},   'foo',   'right value';
 is $result->{action}, 'index', 'right value';

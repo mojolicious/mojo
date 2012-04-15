@@ -582,7 +582,7 @@ Or you can just disable format detection.
   # /hello
   get '/hello' => [format => 0] => {text => 'No format detection.'};
 
-  # Disable detection for the following routes and allow selective re-enabling
+  # Disable detection and allow the following routes selective re-enabling
   under [format => 0];
 
   # /foo

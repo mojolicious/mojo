@@ -398,41 +398,37 @@ automatically detected and stored in the stash value C<format>.
   # /foo.txt  -> {controller => 'foo', action => 'bar', format => 'txt'}
   $r->route('/foo')->to(controller => 'foo', action => 'bar');
 
-This for example allows multiple templates for different formats to share the
-same code. You can also mention a format in the route pattern to only match
-one, just make sure the more specific routes go first.
+This for example allows multiple templates in different formats to share the
+same code.
 
-  # /foo.txt -> {controller => 'foo', action => 'text', format => 'txt'}
-  $r->route('/foo.txt')->to(controller => 'foo', action => 'text');
-
-  # /foo      -> {controller => 'foo', action => 'hyper'}
-  # /foo.html -> {controller => 'foo', action => 'hyper', format => 'html'}
-  $r->route('/foo')->to(controller => 'foo', action => 'hyper');
+  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo.html -> {controller => 'foo', action => 'bar', format => 'html'}
+  $r->route('/foo')->to(controller => 'foo', action => 'bar');
 
 Restrictive placeholders can also be used.
 
-  # /foo.rss -> {controller => 'foo', action => 'feed', format => 'rss'}
-  # /foo.xml -> {controller => 'foo', action => 'feed', format => 'xml'}
+  # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
+  # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
   # /foo.txt -> undef
   $r->route('/foo', format => ['rss', 'xml'])
-    ->to(controller => 'foo', action => 'feed');
+    ->to(controller => 'foo', action => 'bar');
 
 Or you can just disable format detection, which gets inherited by nested
-routes and allows re-enabling detection selectively.
+routes and allows selective re-enabling.
 
-  # /foo      -> {controller => 'foo', action => 'none'}
+  # /foo      -> {controller => 'foo', action => 'bar'}
   # /foo.html -> undef
-  $r->route('/foo', format => 0)->to('foo#none');
+  $r->route('/foo', format => 0)->to('foo#bar');
 
-  # /foo      -> {controller => 'foo', action => 'none'}
+  # /foo      -> {controller => 'foo', action => 'bar'}
   # /foo.html -> undef
-  # /bar      -> undef
-  # /bar.txt  -> {controller => 'bar', action => 'hyper', format => 'txt'}
-  # /bar.html -> {controller => 'bar', action => 'hyper', format => 'html'}
-  # /bar.xml  -> undef
+  # /baz      -> undef
+  # /baz.txt  -> {controller => 'bar', action => 'baz', format => 'txt'}
+  # /baz.html -> {controller => 'bar', action => 'baz', format => 'html'}
+  # /baz.xml  -> undef
   my $inactive = $r->route(format => 0);
   $inactive->route('/foo')->to('foo#none');
-  $inactive->route('/bar', format => ['txt', 'html'])->to('bar#hyper');
+  $inactive->route('/baz', format => ['txt', 'html'])->to('bar#baz');
 
 =head2 Named routes
 

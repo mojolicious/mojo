@@ -409,7 +409,7 @@ one, just make sure the more specific routes go first.
   # /foo.html -> {controller => 'foo', action => 'hyper', format => 'html'}
   $r->route('/foo')->to(controller => 'foo', action => 'hyper');
 
-Restrictive placeholders can also be used for format detection.
+Restrictive placeholders can also be used.
 
   # /foo.rss -> {controller => 'foo', action => 'feed', format => 'rss'}
   # /foo.xml -> {controller => 'foo', action => 'feed', format => 'xml'}

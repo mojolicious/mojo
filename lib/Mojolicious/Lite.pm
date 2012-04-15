@@ -566,7 +566,7 @@ Formats can be automatically detected by looking at file extensions.
   @@ detected.txt.ep
   TXT was detected.
 
-Restrictive placeholders can also be used for format detection.
+Restrictive placeholders can also be used.
 
   # /hello.json
   # /hello.txt
@@ -582,7 +582,7 @@ Or you can just disable format detection.
   # /hello
   get '/hello' => [format => 0] => {text => 'No format detection.'};
 
-  # Disable format detection for the following routes and allow re-enabling
+  # Disable detection for the following routes and allow selective re-enabling
   under [format => 0];
 
   # /foo

@@ -4,6 +4,8 @@ This file documents the revision history for Perl extension Mojolicious.
   - Improved router to allow disabled format detection to be inheritable by
     nested routes.
   - Improved error handling in Mojolicious::Plugin::JSONConfig.
+  - Improved match method in Mojolicious::Routes::Pattern to support format
+    detection.
   - Improved router log messages.
   - Improved all debug messages.
   - Improved documentation.
@@ -45,12 +47,12 @@ This file documents the revision history for Perl extension Mojolicious.
 2.75  2012-04-05
   - Improved documentation.
   - Improved tests.
-  - Fixed small bug in Mojo::Parameters->params.
+  - Fixed small bug in params method of Mojo::Parameters.
 
 2.74  2012-04-04
   - Improved documentation.
   - Improved tests.
-  - Fixed multiple small bugs in Mojo::UserAgent::Transactor->form.
+  - Fixed multiple small bugs in form method of Mojo::UserAgent::Transactor.
 
 2.73  2012-04-03
   - Improved documentation.
@@ -66,7 +68,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Improved version command to detect proxy servers automatically.
   - Improved documentation.
   - Improved tests.
-  - Fixed small argument bug in Mojo::Headers->to_hash.
+  - Fixed small argument bug in to_hash method of Mojo::Headers.
 
 2.70  2012-03-30
   - Improved speed of version command by switching to the MetaCPAN API.
@@ -76,7 +78,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Fixed handler detection precedence bug in Mojolicious::Renderer.
   - Fixed ability to disable inactivity timeout in Hypnotoad.
   - Fixed ability to disable accepts limit in Hypnotoad.
-  - Fixed small bug in Mojo::Command->get_all_data.
+  - Fixed small bug in get_all_data method of Mojo::Command.
   - Fixed small bug in inflate command. (memowe)
 
 2.69  2012-03-26

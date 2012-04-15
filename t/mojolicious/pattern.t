@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 78;
+use Test::More tests => 87;
 
 # "People said I was dumb, but I proved them."
 use Mojo::ByteStream 'b';
@@ -180,4 +180,21 @@ $result = $pattern->match('/', 1);
 is $result->{action}, 'index', 'right value';
 ok !$result->{format}, 'no value';
 $result = $pattern->match('/.xml', 1);
+is $result, undef, 'no result';
+
+# Versioned pattern
+$pattern = Mojolicious::Routes::Pattern->new('/:test/v1.0');
+$pattern->defaults({action => 'index'});
+$result = $pattern->match('/foo/v1.0', 1);
+is $result->{test},   'foo',   'right value';
+is $result->{action}, 'index', 'right value';
+ok !$result->{format}, 'no value';
+is $pattern->render({test => '23'}), '/23/v1.0', 'right result';
+$result = $pattern->match('/foo/v1.0.txt', 1);
+is $result->{test},   'foo',   'right value';
+is $result->{action}, 'index', 'right value';
+is $result->{format}, 'txt',   'right value';
+is $pattern->render({test => '23', format => 'txt'}), '/23/v1.0',
+  'right result';
+$result = $pattern->match('/foo/v2.0', 1);
 is $result, undef, 'no result';

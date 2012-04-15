@@ -92,17 +92,17 @@ $r->route('/wildcards/4/*wildcard/foo')
 $r->route('/format')->to(controller => 'hello')
   ->to(action => 'you', format => 'html');
 
-# /format2.html
-$r->route('/format2.html')->to(controller => 'you', action => 'hello');
+# /format2.html/hello
+$r->route('/format2.html')->route('/hello')->to('you#hello');
 
-# /format2.json
-$r->route('/format2.json')->to(controller => 'you', action => 'hello_json');
+# /format2.json/hello
+$r->route('/format2.json')->route('/hello')->to('you#hello_json');
 
-# /format3/*.html
-$r->route('/format3/:foo.html')->to(controller => 'me', action => 'bye');
+# /format3/*.html/bye
+$r->route('/format3/:foo.html')->route('/bye')->to('me#bye');
 
-# /format3/*.json
-$r->route('/format3/:foo.json')->to(controller => 'me', action => 'bye_json');
+# /format3/*.json/bye
+$r->route('/format3/:foo.json')->route('/bye')->to('me#bye_json');
 
 # /format4.txt
 $r->route('/format4', format => qr/txt/)
@@ -532,34 +532,36 @@ is $m->path_for(format => 'html'), '/format.html', 'right path';
 is $m->path_for(format => 'txt'),  '/format.txt',  'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
-# Hardcoded format
-$m = Mojolicious::Routes::Match->new(GET => '/format2.html')->match($r);
+# Hardcoded format in nested route
+$m = Mojolicious::Routes::Match->new(GET => '/format2.html/hello')->match($r);
 is $m->stack->[0]{controller}, 'you',   'right value';
 is $m->stack->[0]{action},     'hello', 'right value';
 is $m->stack->[0]{format},     undef,   'no value';
-is $m->path_for, '/format2.html', 'right path';
+is $m->path_for, '/format2.html/hello', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format2.json')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format2.json/hello')->match($r);
 is $m->stack->[0]{controller}, 'you',        'right value';
 is $m->stack->[0]{action},     'hello_json', 'right value';
 is $m->stack->[0]{format},     undef,        'no value';
-is $m->path_for, '/format2.json', 'right path';
+is $m->path_for, '/format2.json/hello', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
-# Hardcoded format after placeholder
-$m = Mojolicious::Routes::Match->new(GET => '/format3/baz.html')->match($r);
+# Hardcoded format after placeholder in nested route
+$m =
+  Mojolicious::Routes::Match->new(GET => '/format3/baz.html/bye')->match($r);
 is $m->stack->[0]{controller}, 'me',  'right value';
 is $m->stack->[0]{action},     'bye', 'right value';
 is $m->stack->[0]{format},     undef, 'no value';
 is $m->stack->[0]{foo},        'baz', 'right value';
-is $m->path_for, '/format3/baz.html', 'right path';
+is $m->path_for, '/format3/baz.html/bye', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format3/baz.json')->match($r);
+$m =
+  Mojolicious::Routes::Match->new(GET => '/format3/baz.json/bye')->match($r);
 is $m->stack->[0]{controller}, 'me',       'right value';
 is $m->stack->[0]{action},     'bye_json', 'right value';
 is $m->stack->[0]{format},     undef,      'no value';
 is $m->stack->[0]{foo},        'baz',      'right value';
-is $m->path_for, '/format3/baz.json', 'right path';
+is $m->path_for, '/format3/baz.json/bye', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Format with regex constraint

@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 154;
+use Test::More tests => 169;
 
 # "Let's see how crazy I am now, Nixon. The correct answer is very."
 use Mojo::ByteStream 'b';
@@ -176,6 +176,17 @@ group {
 
 # GET /noauthgroup
 get '/noauthgroup' => {inline => 'Whatever <%= $foo %>.'};
+
+# Disable format detection
+under [format => 0];
+
+# GET /no_format
+get '/no_format' => {text => 'No format detection.'};
+
+# GET /some_formats.txt
+# GET /some_formats.html
+get '/some_formats' => [format => [qw/txt html/]] =>
+  {text => 'Some format detection.'};
 
 my $t = Test::Mojo->new;
 
@@ -366,6 +377,26 @@ $t->get_ok('/authgroup')->status_is(200)->content_is("You're not ok.");
 
 # GET /noauthgroup
 $t->get_ok('/noauthgroup')->status_is(200)->content_is("Whatever one.\n");
+
+# GET /no_format
+$t->get_ok('/no_format')->status_is(200)->content_is('No format detection.');
+
+# GET /no_format.txt
+$t->get_ok('/no_format.txt')->status_is(404);
+
+# GET /some_formats
+$t->get_ok('/some_formats')->status_is(404);
+
+# GET /some_formats.txt
+$t->get_ok('/some_formats.txt')->status_is(200)
+  ->content_is('Some format detection.');
+
+# GET /some_formats.html
+$t->get_ok('/some_formats.html')->status_is(200)
+  ->content_is('Some format detection.');
+
+# GET /some_formats.xml
+$t->get_ok('/some_formats.xml')->status_is(404);
 
 __DATA__
 @@ not_found.html.epl

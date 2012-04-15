@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 416;
+use Test::More tests => 435;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -209,11 +209,19 @@ $multi->route('/bar.baz')->to('works#too', format => 'xml');
 # /nodetect2.html
 # /nodetect3.xml
 # /nodetect3/rly
+# /nodetect4
+# /nodetect4.txt
+# /nodetect4/ya
+# /nodetect4.txt/ya
 my $inactive = $r->route(format => 0);
 $inactive->route('/nodetect')->to('foo#none');
 $inactive->route('/nodetect2', format => ['txt', 'html'])->to('bar#hyper');
 my $some = $inactive->waypoint('/nodetect3', format => 'xml')->to('baz#some');
 $some->route('/rly')->to('#rly');
+my $more =
+  $inactive->waypoint('/nodetect4', format => 'txt')
+  ->to('baz#more', format => 'json');
+$more->route('/ya')->to('#ya');
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(GET => '/clean')->match($r);
@@ -845,4 +853,31 @@ is $m->stack->[0]{format},     'xml', 'no value';
 is $m->stack->[1], undef, 'no value';
 $m =
   Mojolicious::Routes::Match->new(GET => '/nodetect3.xml/rly.txt')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect4')->match($r);
+is $m->stack->[0]{controller}, 'baz',  'right value';
+is $m->stack->[0]{action},     'more', 'right value';
+is $m->stack->[0]{format},     'json', 'right value';
+is $m->stack->[1], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect4.txt')->match($r);
+is $m->stack->[0]{controller}, 'baz',  'right value';
+is $m->stack->[0]{action},     'more', 'right value';
+is $m->stack->[0]{format},     'txt',  'right value';
+is $m->stack->[1], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect4.xml')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect4/ya')->match($r);
+is $m->stack->[0]{controller}, 'baz',  'right value';
+is $m->stack->[0]{action},     'ya',   'right value';
+is $m->stack->[0]{format},     'json', 'right value';
+is $m->stack->[1], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect4.txt/ya')->match($r);
+is $m->stack->[0]{controller}, 'baz', 'right value';
+is $m->stack->[0]{action},     'ya',  'right value';
+is $m->stack->[0]{format},     'txt', 'right value';
+is $m->stack->[1], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect4/ya.xml')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m =
+  Mojolicious::Routes::Match->new(GET => '/nodetect4.txt/ya.xml')->match($r);
 is $m->stack->[0], undef, 'no value';

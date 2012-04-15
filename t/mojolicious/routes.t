@@ -201,7 +201,7 @@ $too->route('/2.0', format => 0)->to('#bar');
 
 # /multi/foo.bar
 my $multi = $r->route('/multi');
-$multi->route('/foo.bar')->to('just#works');
+$multi->route('/foo.bar', format => 0)->to('just#works');
 $multi->route('/bar.baz')->to('works#too', format => 'xml');
 
 # /nodetect
@@ -536,28 +536,28 @@ is @{$m->stack}, 1, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(GET => '/format2.html')->match($r);
 is $m->stack->[0]{controller}, 'you',   'right value';
 is $m->stack->[0]{action},     'hello', 'right value';
-is $m->stack->[0]{format},     'html',  'right value';
+is $m->stack->[0]{format},     undef,   'no value';
 is $m->path_for, '/format2.html', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(GET => '/format2.json')->match($r);
 is $m->stack->[0]{controller}, 'you',        'right value';
 is $m->stack->[0]{action},     'hello_json', 'right value';
-is $m->stack->[0]{format},     'json',       'right value';
+is $m->stack->[0]{format},     undef,        'no value';
 is $m->path_for, '/format2.json', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
 # Hardcoded format after placeholder
 $m = Mojolicious::Routes::Match->new(GET => '/format3/baz.html')->match($r);
-is $m->stack->[0]{controller}, 'me',   'right value';
-is $m->stack->[0]{action},     'bye',  'right value';
-is $m->stack->[0]{format},     'html', 'right value';
-is $m->stack->[0]{foo},        'baz',  'right value';
+is $m->stack->[0]{controller}, 'me',  'right value';
+is $m->stack->[0]{action},     'bye', 'right value';
+is $m->stack->[0]{format},     undef, 'no value';
+is $m->stack->[0]{foo},        'baz', 'right value';
 is $m->path_for, '/format3/baz.html', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(GET => '/format3/baz.json')->match($r);
 is $m->stack->[0]{controller}, 'me',       'right value';
 is $m->stack->[0]{action},     'bye_json', 'right value';
-is $m->stack->[0]{format},     'json',     'right value';
+is $m->stack->[0]{format},     undef,      'no value';
 is $m->stack->[0]{foo},        'baz',      'right value';
 is $m->path_for, '/format3/baz.json', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
@@ -784,7 +784,7 @@ is $m->stack->[0], undef, 'no value';
 $m = Mojolicious::Routes::Match->new(GET => '/versioned/too/1.0')->match($r);
 is $m->stack->[0]{controller}, 'too', 'right value';
 is $m->stack->[0]{action},     'foo', 'right value';
-is $m->stack->[0]{format},     '0',   'right value';
+is $m->stack->[0]{format},     undef, 'no value';
 is $m->stack->[1], undef, 'no value';
 is $m->path_for, '/versioned/too/1.0', 'right path';
 $m = Mojolicious::Routes::Match->new(GET => '/versioned/too/2.0')->match($r);
@@ -798,7 +798,7 @@ is $m->path_for, '/versioned/too/2.0', 'right path';
 $m = Mojolicious::Routes::Match->new(GET => '/multi/foo.bar')->match($r);
 is $m->stack->[0]{controller}, 'just',  'right value';
 is $m->stack->[0]{action},     'works', 'right value';
-is $m->stack->[0]{format},     'bar',   'right value';
+is $m->stack->[0]{format},     undef,   'no value';
 is $m->stack->[1], undef, 'no value';
 is $m->path_for, '/multi/foo.bar', 'right path';
 $m = Mojolicious::Routes::Match->new(GET => '/multi/foo.bar.baz')->match($r);

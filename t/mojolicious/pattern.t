@@ -145,7 +145,7 @@ is $result->{action}, 'index', 'right value';
 ok !$result->{format}, 'no value';
 $result = $pattern->match('/test.json', 1);
 is $result->{action}, 'index', 'right value';
-is $result->{format}, 'json',  'right value';
+is $result->{format}, undef,   'no value';
 $result = $pattern->match('/test.xml');
 is $result, undef, 'no result';
 $result = $pattern->match('/test');

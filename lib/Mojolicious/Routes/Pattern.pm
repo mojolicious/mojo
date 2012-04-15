@@ -29,9 +29,6 @@ sub parse {
   # Requirements
   $self->reqs({@_});
 
-  # Format in pattern
-  $self->{strict} = $1 if $pattern =~ m#\.([^/\)]+)$#;
-
   # Tokenize
   return $pattern eq '/' ? $self : $self->pattern($pattern)->_tokenize;
 }
@@ -96,10 +93,6 @@ sub shape_match {
   # Format
   my $req = $self->reqs->{format};
   return $result if !$detect || defined $req && !$req;
-  if (exists $self->{strict}) {
-    $result->{format} //= $self->{strict};
-    return $result;
-  }
   if ($$pathref =~ s|^/?$format||) { $result->{format} = $1 }
   elsif ($req) { return if !$result->{format} }
 
@@ -174,9 +167,6 @@ sub _compile {
 
 sub _compile_format {
   my $self = shift;
-
-  # Format in pattern
-  return if $self->{strict};
 
   # Default regex
   my $reqs = $self->reqs;

@@ -212,7 +212,7 @@ get '/root.html' => 'root_path';
 get '/root' => sub { shift->render_text('root fallback!') };
 
 # GET /template.txt
-get '/template.txt' => 'template';
+get '/template.txt' => {template => 'template', format => 'txt'};
 
 # GET /0
 get ':number' => [number => qr/0/] => sub {

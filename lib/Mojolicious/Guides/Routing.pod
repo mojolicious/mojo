@@ -417,11 +417,22 @@ Restrictive placeholders can also be used for format detection.
   $r->route('/foo', format => ['rss', 'xml'])
     ->to(controller => 'foo', action => 'feed');
 
-Or you can just disable format detection.
+Or you can just disable format detection, it gets inherited by nested routes
+and can be re-enabled selectively.
 
-  # /foo      -> {controller => 'foo', action => 'bar'}
+  # /foo      -> {controller => 'foo', action => 'none'}
   # /foo.html -> undef
-  $r->route('/foo', format => 0)->to(controller => 'foo', action => 'bar');
+  $r->route('/foo', format => 0)->to('foo#none');
+
+  # /foo      -> {controller => 'foo', action => 'none'}
+  # /foo.html -> undef
+  # /bar      -> undef
+  # /bar.txt  -> {controller => 'bar', action => 'hyper', format => 'txt'}
+  # /bar.html -> {controller => 'bar', action => 'hyper', format => 'html'}
+  # /bar.xml  -> undef
+  my $no_detect = $r->route(format => 0);
+  $no_detect->route('/foo')->to('foo#none');
+  $no_detect->route('/bar', format => ['txt', 'html'])->to('bar#hyper');
 
 =head2 Named routes
 

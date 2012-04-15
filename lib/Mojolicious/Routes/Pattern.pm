@@ -20,21 +20,20 @@ sub match {
 }
 
 sub parse {
-  my ($self, $pattern) = (shift, shift);
+  my $self = shift;
 
   # Make sure we have a viable pattern
-  return $self if !defined $pattern || $pattern eq '/';
+  my $pattern = @_ % 2 ? (shift || '/') : '/';
   $pattern = "/$pattern" unless $pattern =~ m#^/#;
 
   # Requirements
-  my $reqs = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-  $self->reqs($reqs);
+  $self->reqs({@_});
 
   # Format in pattern
   $self->{strict} = $1 if $pattern =~ m#\.([^/\)]+)$#;
 
   # Tokenize
-  return $self->pattern($pattern)->_tokenize;
+  return $pattern eq '/' ? $self : $self->pattern($pattern)->_tokenize;
 }
 
 sub render {
@@ -392,9 +391,10 @@ implements the following ones.
 
 =head2 C<new>
 
-  my $pattern = Mojolicious::Routes::Pattern->new('/:controller/:action',
-    action => qr/\w+/
-  );
+  my $pattern = Mojolicious::Routes::Pattern->new('/:action');
+  my $pattern =
+    Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
+  my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
 
 Construct a new pattern object.
 
@@ -407,7 +407,9 @@ Match pattern against a path.
 
 =head2 C<parse>
 
-  $pattern = $pattern->parse('/:controller/:action', action => qr/\w+/);
+  $pattern = $pattern->parse('/:action');
+  $pattern = $pattern->parse('/:action', action => qr/\w+/);
+  $pattern = $pattern->parse(format => 0);
 
 Parse a raw pattern.
 

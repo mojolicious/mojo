@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 74;
+use Test::More tests => 78;
 
 # "People said I was dumb, but I proved them."
 use Mojo::ByteStream 'b';
@@ -164,11 +164,20 @@ $result = $pattern->match('/test');
 is $result->{action}, 'index', 'right value';
 
 # Format detection disabled
-$pattern = Mojolicious::Routes::Pattern->new('/test');
-$pattern->reqs({format => 0});
+$pattern = Mojolicious::Routes::Pattern->new('/test', format => 0);
 $pattern->defaults({action => 'index'});
 $result = $pattern->match('/test', 1);
 is $result->{action}, 'index', 'right value';
 ok !$result->{format}, 'no value';
 $result = $pattern->match('/test.xml', 1);
+is $result, undef, 'no result';
+
+# Special pattern for disabling format detection
+$pattern = Mojolicious::Routes::Pattern->new(format => 0);
+is $pattern->reqs->{format}, 0, 'right value';
+$pattern->defaults({action => 'index'});
+$result = $pattern->match('/', 1);
+is $result->{action}, 'index', 'right value';
+ok !$result->{format}, 'no value';
+$result = $pattern->match('/.xml', 1);
 is $result, undef, 'no result';

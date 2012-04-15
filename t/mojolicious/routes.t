@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 386;
+use Test::More tests => 404;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -203,6 +203,13 @@ $too->route('/2.0', format => 0)->to('#bar');
 my $multi = $r->route('/multi');
 $multi->route('/foo.bar')->to('just#works');
 $multi->route('/bar.baz')->to('works#too', format => 'xml');
+
+# /nodetect
+# /nodetect2.txt
+# /nodetect2.html
+my $no_detect = $r->route(format => 0);
+$no_detect->route('/nodetect')->to('foo#none');
+$no_detect->route('/nodetect2', format => ['txt', 'html'])->to('bar#hyper');
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(GET => '/clean')->match($r);
@@ -789,3 +796,29 @@ is $m->stack->[0]{action},     'too',   'right value';
 is $m->stack->[0]{format},     'xml',   'right value';
 is $m->stack->[1], undef, 'no value';
 is $m->path_for, '/multi/bar.baz', 'right path';
+
+# Disabled format detection inheritance
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect')->match($r);
+is $m->stack->[0]{controller}, 'foo',  'right value';
+is $m->stack->[0]{action},     'none', 'right value';
+is $m->stack->[0]{format},     undef,  'no value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/nodetect', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect.txt')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect2.txt')->match($r);
+is $m->stack->[0]{controller}, 'bar',   'right value';
+is $m->stack->[0]{action},     'hyper', 'right value';
+is $m->stack->[0]{format},     'txt',   'right value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/nodetect2.txt', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect2.html')->match($r);
+is $m->stack->[0]{controller}, 'bar',   'right value';
+is $m->stack->[0]{action},     'hyper', 'right value';
+is $m->stack->[0]{format},     'html',  'right value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/nodetect2.html', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect2')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/nodetect2.xml')->match($r);
+is $m->stack->[0], undef, 'no value';

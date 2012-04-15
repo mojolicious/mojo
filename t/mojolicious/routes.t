@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 447;
+use Test::More tests => 413;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -92,42 +92,30 @@ $r->route('/wildcards/4/*wildcard/foo')
 $r->route('/format')->to(controller => 'hello')
   ->to(action => 'you', format => 'html');
 
-# /format2.html/hello
-$r->route('/format2.html')->route('/hello')->to('you#hello');
-
-# /format2.json/hello
-$r->route('/format2.json')->route('/hello')->to('you#hello_json');
-
-# /format3/*.html/bye
-$r->route('/format3/:foo.html')->route('/bye')->to('me#bye');
-
-# /format3/*.json/bye
-$r->route('/format3/:foo.json')->route('/bye')->to('me#bye_json');
-
-# /format4.txt
-$r->route('/format4', format => qr/txt/)
+# /format2.txt
+$r->route('/format2', format => qr/txt/)
   ->to(controller => 'we', action => 'howdy');
 
-# /format5.txt
-# /format5.text
-$r->route('/format5', format => [qw/txt text/])
+# /format3.txt
+# /format3.text
+$r->route('/format3', format => [qw/txt text/])
   ->to(controller => 'we', action => 'cheers');
 
-# /format6
-# /format6.html
-$r->route('/format6', format => ['html'])
+# /format4
+# /format4.html
+$r->route('/format4', format => ['html'])
   ->to(controller => 'us', action => 'yay', format => 'html');
 
-# /format7
-$r->route('/format7', format => 0)->to(controller => 'us', action => 'wow');
+# /format5
+$r->route('/format5', format => 0)->to(controller => 'us', action => 'wow');
 
-# /format8
-$r->route('/format8', format => 0)
+# /format6
+$r->route('/format6', format => 0)
   ->to(controller => 'us', action => 'doh', format => 'xml');
 
-# /format9.foo
-# /fomrat9.foobar
-$r->route('/format9', format => [qw/foo foobar/])->to('perl#rocks');
+# /format7.foo
+# /format7.foobar
+$r->route('/format7', format => [qw/foo foobar/])->to('perl#rocks');
 
 # /articles
 # /articles.html
@@ -532,144 +520,92 @@ is $m->path_for(format => 'html'), '/format.html', 'right path';
 is $m->path_for(format => 'txt'),  '/format.txt',  'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
-# Hardcoded format in nested route
-$m = Mojolicious::Routes::Match->new(GET => '/format2.html/hello')->match($r);
-is $m->stack->[0]{controller}, 'you',   'right value';
-is $m->stack->[0]{action},     'hello', 'right value';
-is $m->stack->[0]{format},     undef,   'no value';
-is $m->path_for, '/format2.html/hello', 'right path';
-is @{$m->stack}, 1, 'right number of elements';
-$m =
-  Mojolicious::Routes::Match->new(GET => '/format2.html/hello.txt')
-  ->match($r);
-is $m->stack->[0]{controller}, 'you',   'right value';
-is $m->stack->[0]{action},     'hello', 'right value';
-is $m->stack->[0]{format},     'txt',   'no value';
-is $m->path_for, '/format2.html/hello', 'right path';
-is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format2.json/hello')->match($r);
-is $m->stack->[0]{controller}, 'you',        'right value';
-is $m->stack->[0]{action},     'hello_json', 'right value';
-is $m->stack->[0]{format},     undef,        'no value';
-is $m->path_for, '/format2.json/hello', 'right path';
-is @{$m->stack}, 1, 'right number of elements';
-$m =
-  Mojolicious::Routes::Match->new(GET => '/format2.html.ep/hello')->match($r);
-is $m->stack->[0], undef, 'no value';
-
-# Hardcoded format after placeholder in nested route
-$m =
-  Mojolicious::Routes::Match->new(GET => '/format3/baz.html/bye')->match($r);
-is $m->stack->[0]{controller}, 'me',  'right value';
-is $m->stack->[0]{action},     'bye', 'right value';
-is $m->stack->[0]{format},     undef, 'no value';
-is $m->stack->[0]{foo},        'baz', 'right value';
-is $m->path_for, '/format3/baz.html/bye', 'right path';
-is @{$m->stack}, 1, 'right number of elements';
-$m =
-  Mojolicious::Routes::Match->new(GET => '/format3/baz.html/bye.txt')
-  ->match($r);
-is $m->stack->[0]{controller}, 'me',  'right value';
-is $m->stack->[0]{action},     'bye', 'right value';
-is $m->stack->[0]{format},     'txt', 'no value';
-is $m->stack->[0]{foo},        'baz', 'right value';
-is $m->path_for, '/format3/baz.html/bye', 'right path';
-is @{$m->stack}, 1, 'right number of elements';
-$m =
-  Mojolicious::Routes::Match->new(GET => '/format3/baz.json/bye')->match($r);
-is $m->stack->[0]{controller}, 'me',       'right value';
-is $m->stack->[0]{action},     'bye_json', 'right value';
-is $m->stack->[0]{format},     undef,      'no value';
-is $m->stack->[0]{foo},        'baz',      'right value';
-is $m->path_for, '/format3/baz.json/bye', 'right path';
-is @{$m->stack}, 1, 'right number of elements';
-
 # Format with regex constraint
-$m = Mojolicious::Routes::Match->new(GET => '/format4')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format2')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format4.txt')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format2.txt')->match($r);
 is $m->stack->[0]{controller}, 'we',    'right value';
 is $m->stack->[0]{action},     'howdy', 'right value';
 is $m->stack->[0]{format},     'txt',   'right value';
-is $m->path_for, '/format4.txt', 'right path';
+is $m->path_for, '/format2.txt', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format4.html')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format2.html')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format4.txt.txt')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format2.txt.txt')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
 
 # Format with constraint alternatives
-$m = Mojolicious::Routes::Match->new(GET => '/format5')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format3')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format5.txt')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format3.txt')->match($r);
 is $m->stack->[0]{controller}, 'we',     'right value';
 is $m->stack->[0]{action},     'cheers', 'right value';
 is $m->stack->[0]{format},     'txt',    'right value';
-is $m->path_for, '/format5.txt', 'right path';
+is $m->path_for, '/format3.txt', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format5.text')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format3.text')->match($r);
 is $m->stack->[0]{controller}, 'we',     'right value';
 is $m->stack->[0]{action},     'cheers', 'right value';
 is $m->stack->[0]{format},     'text',   'right value';
-is $m->path_for, '/format5.text', 'right path';
+is $m->path_for, '/format3.text', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format5.html')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format3.html')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format5.txt.txt')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format3.txt.txt')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
 
 # Format with constraint and default
-$m = Mojolicious::Routes::Match->new(GET => '/format6')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format4')->match($r);
 is $m->stack->[0]{controller}, 'us',   'right value';
 is $m->stack->[0]{action},     'yay',  'right value';
 is $m->stack->[0]{format},     'html', 'right value';
-is $m->path_for, '/format6.html', 'right path';
+is $m->path_for, '/format4.html', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format6.html')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format4.html')->match($r);
 is $m->stack->[0]{controller}, 'us',   'right value';
 is $m->stack->[0]{action},     'yay',  'right value';
 is $m->stack->[0]{format},     'html', 'right value';
-is $m->path_for, '/format6.html', 'right path';
+is $m->path_for, '/format4.html', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format6.txt')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format4.txt')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format6.txt.html')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format4.txt.html')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
 
 # Forbidden format
-$m = Mojolicious::Routes::Match->new(GET => '/format7')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format5')->match($r);
 is $m->stack->[0]{controller}, 'us',  'right value';
 is $m->stack->[0]{action},     'wow', 'right value';
 is $m->stack->[0]{format},     undef, 'no value';
-is $m->path_for, '/format7', 'right path';
+is $m->path_for, '/format5', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format7.html')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format5.html')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
 
 # Forbidden format and default
-$m = Mojolicious::Routes::Match->new(GET => '/format8')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format6')->match($r);
 is $m->stack->[0]{controller}, 'us',  'right value';
 is $m->stack->[0]{action},     'doh', 'right value';
 is $m->stack->[0]{format},     'xml', 'right value';
-is $m->path_for, '/format8', 'right path';
+is $m->path_for, '/format6', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format8.xml')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format6.xml')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
 
 # Formats with similar start
-$m = Mojolicious::Routes::Match->new(GET => '/format9.foo')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format7.foo')->match($r);
 is $m->stack->[0]{controller}, 'perl',  'right value';
 is $m->stack->[0]{action},     'rocks', 'right value';
 is $m->stack->[0]{format},     'foo',   'right value';
-is $m->path_for, '/format9.foo', 'right path';
+is $m->path_for, '/format7.foo', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format9.foobar')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format7.foobar')->match($r);
 is $m->stack->[0]{controller}, 'perl',   'right value';
 is $m->stack->[0]{action},     'rocks',  'right value';
 is $m->stack->[0]{format},     'foobar', 'right value';
-is $m->path_for, '/format9.foobar', 'right path';
+is $m->path_for, '/format7.foobar', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
-$m = Mojolicious::Routes::Match->new(GET => '/format9.foobarbaz')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/format7.foobarbaz')->match($r);
 is @{$m->stack}, 0, 'right number of elements';
 
 # Request methods

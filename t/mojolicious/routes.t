@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 435;
+use Test::More tests => 447;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -539,12 +539,23 @@ is $m->stack->[0]{action},     'hello', 'right value';
 is $m->stack->[0]{format},     undef,   'no value';
 is $m->path_for, '/format2.html/hello', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
+$m =
+  Mojolicious::Routes::Match->new(GET => '/format2.html/hello.txt')
+  ->match($r);
+is $m->stack->[0]{controller}, 'you',   'right value';
+is $m->stack->[0]{action},     'hello', 'right value';
+is $m->stack->[0]{format},     'txt',   'no value';
+is $m->path_for, '/format2.html/hello', 'right path';
+is @{$m->stack}, 1, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(GET => '/format2.json/hello')->match($r);
 is $m->stack->[0]{controller}, 'you',        'right value';
 is $m->stack->[0]{action},     'hello_json', 'right value';
 is $m->stack->[0]{format},     undef,        'no value';
 is $m->path_for, '/format2.json/hello', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
+$m =
+  Mojolicious::Routes::Match->new(GET => '/format2.html.ep/hello')->match($r);
+is $m->stack->[0], undef, 'no value';
 
 # Hardcoded format after placeholder in nested route
 $m =
@@ -552,6 +563,15 @@ $m =
 is $m->stack->[0]{controller}, 'me',  'right value';
 is $m->stack->[0]{action},     'bye', 'right value';
 is $m->stack->[0]{format},     undef, 'no value';
+is $m->stack->[0]{foo},        'baz', 'right value';
+is $m->path_for, '/format3/baz.html/bye', 'right path';
+is @{$m->stack}, 1, 'right number of elements';
+$m =
+  Mojolicious::Routes::Match->new(GET => '/format3/baz.html/bye.txt')
+  ->match($r);
+is $m->stack->[0]{controller}, 'me',  'right value';
+is $m->stack->[0]{action},     'bye', 'right value';
+is $m->stack->[0]{format},     'txt', 'no value';
 is $m->stack->[0]{foo},        'baz', 'right value';
 is $m->path_for, '/format3/baz.html/bye', 'right path';
 is @{$m->stack}, 1, 'right number of elements';

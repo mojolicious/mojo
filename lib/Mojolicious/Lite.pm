@@ -456,66 +456,6 @@ Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
 placeholders become part of a larger regular expression internally,
 C<(?:...)> is fine though.
 
-=head2 Formats
-
-Formats can be automatically detected by looking at file extensions.
-
-  # /detection.html
-  # /detection.txt
-  get '/detection' => sub {
-    my $self = shift;
-    $self->render('detected');
-  };
-
-  __DATA__
-
-  @@ detected.html.ep
-  <!DOCTYPE html>
-  <html>
-    <head><title>Detected</title></head>
-    <body>HTML was detected.</body>
-  </html>
-
-  @@ detected.txt.ep
-  TXT was detected.
-
-Restrictive placeholders can also be used for format detection.
-
-  # /hello.json
-  # /hello.txt
-  get '/hello' => [format => ['json', 'txt']] => sub {
-    my $self = shift;
-    return $self->render_json({hello => 'world'})
-      if $self->stash('format') eq 'json';
-    $self->render_text('hello world');
-  };
-
-=head2 Content negotiation
-
-For resources with different representations and that require truly
-C<RESTful> content negotiation you can also use
-L<Mojolicious::Controller/"respond_to">.
-
-  # /hello (Accept: application/json)
-  # /hello (Accept: text/xml)
-  # /hello.json
-  # /hello.xml
-  # /hello?format=json
-  # /hello?format=xml
-  get '/hello' => sub {
-    my $self = shift;
-    $self->respond_to(
-      json => {json => {hello => 'world'}},
-      xml  => {text => '<hello>world</hello>'},
-      any  => {data => '', status => 204}
-    );
-  };
-
-MIME type mappings can be extended or changed easily with
-L<Mojolicious/"types">.
-
-  app->types->type(rdf => 'application/rdf+xml');
-
 =head2 Under
 
 Authentication and code shared between multiple routes can be realized easily
@@ -602,6 +542,81 @@ C<under> statements.
   get '/welcome' => {text => 'Hi Bender.'};
 
   app->start;
+
+=head2 Formats
+
+Formats can be automatically detected by looking at file extensions.
+
+  # /detection.html
+  # /detection.txt
+  get '/detection' => sub {
+    my $self = shift;
+    $self->render('detected');
+  };
+
+  __DATA__
+
+  @@ detected.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head><title>Detected</title></head>
+    <body>HTML was detected.</body>
+  </html>
+
+  @@ detected.txt.ep
+  TXT was detected.
+
+Restrictive placeholders can also be used for format detection.
+
+  # /hello.json
+  # /hello.txt
+  get '/hello' => [format => ['json', 'txt']] => sub {
+    my $self = shift;
+    return $self->render_json({hello => 'world'})
+      if $self->stash('format') eq 'json';
+    $self->render_text('hello world');
+  };
+
+Or you can just disable format detection.
+
+  # /hello
+  get '/hello' => [format => 0] => {text => 'No format.'};
+
+  # Disable format detection for the following routes
+  under [format => 0];
+
+  # /foo
+  get '/foo' => {text => 'No format again.'};
+
+  # /bar.txt
+  # /bar.html
+  get '/bar' => [format => ['txt', 'html']] => {text => 'Two formats.'};
+
+=head2 Content negotiation
+
+For resources with different representations and that require truly
+C<RESTful> content negotiation you can also use
+L<Mojolicious::Controller/"respond_to">.
+
+  # /hello (Accept: application/json)
+  # /hello (Accept: text/xml)
+  # /hello.json
+  # /hello.xml
+  # /hello?format=json
+  # /hello?format=xml
+  get '/hello' => sub {
+    my $self = shift;
+    $self->respond_to(
+      json => {json => {hello => 'world'}},
+      xml  => {text => '<hello>world</hello>'},
+      any  => {data => '', status => 204}
+    );
+  };
+
+MIME type mappings can be extended or changed easily with
+L<Mojolicious/"types">.
+
+  app->types->type(rdf => 'application/rdf+xml');
 
 =head2 Conditions
 

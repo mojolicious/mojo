@@ -55,10 +55,8 @@ sub find {
   while (my $child = shift @children) {
 
     # Match
-    if ($child->name eq $name) {
-      $candidate = $child;
-      return $candidate if $child->has_custom_name;
-    }
+    $candidate = $child->has_custom_name ? return $child : $child
+      if $child->name eq $name;
 
     # Search children too
     push @children, @{$child->children};
@@ -87,9 +85,8 @@ sub has_websocket {
 
 sub is_endpoint {
   my $self = shift;
-  return   if $self->inline;
-  return 1 if $self->block;
-  return !@{$self->children};
+  return if $self->inline;
+  return $self->block ? 1 : !@{$self->children};
 }
 
 sub is_websocket { shift->{websocket} }
@@ -124,9 +121,8 @@ sub over {
 
 sub parse {
   my $self = shift;
-  my $name = $self->pattern->parse(@_)->pattern // '';
-  $name =~ s/\W+//g;
-  $self->{name} = $name;
+  $self->{name} = $self->pattern->parse(@_)->pattern // '';
+  $self->{name} =~ s/\W+//g;
   return $self;
 }
 
@@ -139,16 +135,15 @@ sub render {
 
   # Path prefix
   my $prefix = $self->pattern->render($values);
-  $path = $prefix . $path unless $prefix eq '/';
+  $path = "$prefix$path" unless $prefix eq '/';
 
   # Make sure there is always a root
   my $parent = $self->parent;
   $path = '/' if !$path && !$parent;
 
   # Format
-  if ((my $format = $values->{format}) && !$parent) {
-    $path .= ".$format" unless $path =~ m#\.[^/]+$#;
-  }
+  $path .= ".$values->{format}"
+    if $values->{format} && !$parent && $path !~ m#\.[^/]+$#;
 
   return $parent ? $parent->render($path, $values) : $path;
 }
@@ -160,10 +155,8 @@ sub root {
 }
 
 sub route {
-  my $self  = shift;
-  my $route = $self->new(@_);
-  $self->add_child($route);
-  return $route;
+  my $self = shift;
+  return $self->add_child($self->new(@_))->children->[-1];
 }
 
 sub to {

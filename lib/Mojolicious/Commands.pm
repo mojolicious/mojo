@@ -131,10 +131,7 @@ sub start_app {
 
 sub _command {
   my $module = shift;
-  if (my $e = Mojo::Loader->load($module)) {
-    return unless ref $e;
-    die $e;
-  }
+  if (my $e = Mojo::Loader->load($module)) { return ref $e ? die $e : undef }
   return $module->isa('Mojo::Command') ? $module : undef;
 }
 

@@ -393,7 +393,7 @@ Construct a new pattern object.
   my $result = $pattern->match('/foo/bar');
   my $result = $pattern->match('/foo/bar', $detect);
 
-Match pattern against a path.
+Match pattern against entire path, format detection is disabled by default.
 
 =head2 C<parse>
 
@@ -414,7 +414,8 @@ Render pattern into a path with parameters.
   my $result = $pattern->shape_match(\$path);
   my $result = $pattern->shape_match(\$path, $detect);
 
-Match pattern against a path and remove matching parts.
+Match pattern against path and remove matching parts, format detection is
+disabled by default.
 
 =head1 SEE ALSO
 

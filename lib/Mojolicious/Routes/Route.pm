@@ -230,7 +230,7 @@ sub via {
 
 # DEPRECATED in Leaf Fluttering In Wind!
 sub waypoint {
-  warn "Mojolicious::Static->waypoint is DEPRECATED!\n";
+  warn "Mojolicious::Routes::Route->waypoint is DEPRECATED!\n";
   shift->route(@_)->block(1);
 }
 

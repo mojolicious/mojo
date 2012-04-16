@@ -188,11 +188,11 @@ sub _tokenize {
   my $self = shift;
 
   # Token
-  my $quote_end      = $self->quote_end;
-  my $quote_start    = $self->quote_start;
-  my $relaxed_start  = $self->relaxed_start;
-  my $symbol_start   = $self->symbol_start;
-  my $wildcard_start = $self->wildcard_start;
+  my $quote_end   = $self->quote_end;
+  my $quote_start = $self->quote_start;
+  my $relaxed     = $self->relaxed_start;
+  my $symbol      = $self->symbol_start;
+  my $wildcard    = $self->wildcard_start;
 
   # Parse the pattern character wise
   my $pattern = $self->pattern;
@@ -200,13 +200,13 @@ sub _tokenize {
   my (@tree, $quoted);
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
-    # Inside a symbol
-    my $symbol = $state ~~ [qw/relaxed symbol wildcard/];
+    # Inside a placeholder
+    my $placeholder = $state ~~ [qw/relaxed symbol wildcard/];
 
     # DEPRECATED in Leaf Fluttering In Wind!
     if ($quoted && $char eq '.' && $state eq 'symbol') {
       warn "Relaxed placeholders /(.foo) are DEPRECATED in favor of /#foo!\n";
-      $char = $relaxed_start;
+      $char = $relaxed;
     }
 
     # Quote start
@@ -217,16 +217,15 @@ sub _tokenize {
     }
 
     # Symbol start
-    elsif ($char eq $symbol_start) {
+    elsif ($char eq $symbol) {
       push @tree, ['symbol', ''] if $state ne 'symbol';
       $state = 'symbol';
     }
 
     # Relaxed or wildcard start (upgrade when quoted)
-    elsif ($char eq $relaxed_start || $char eq $wildcard_start) {
+    elsif ($char ~~ [$relaxed, $wildcard]) {
       push @tree, ['symbol', ''] unless $quoted;
-      $tree[-1]->[0] = $state =
-        $char eq $wildcard_start ? 'wildcard' : 'relaxed';
+      $tree[-1]->[0] = $state = $char eq $relaxed ? 'relaxed' : 'wildcard';
     }
 
     # Quote end
@@ -242,17 +241,14 @@ sub _tokenize {
     }
 
     # Relaxed, symbol or wildcard
-    elsif ($symbol && $char =~ /\w/) { $tree[-1]->[-1] .= $char }
+    elsif ($placeholder && $char =~ /\w/) { $tree[-1]->[-1] .= $char }
 
     # Text
     else {
       $state = 'text';
 
       # New text element
-      unless ($tree[-1]->[0] eq 'text') {
-        push @tree, ['text', $char];
-        next;
-      }
+      push @tree, ['text', $char] and next unless $tree[-1]->[0] eq 'text';
 
       # More text
       $tree[-1]->[-1] .= $char;

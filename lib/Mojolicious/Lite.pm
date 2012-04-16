@@ -361,6 +361,20 @@ L<Mojolicious::Controller/"stash"> and L<Mojolicious::Controller/"param">.
     $self->render(text => "Our :bar placeholder matched $bar");
   };
 
+=head2 Relaxed Placeholders
+
+Relaxed placeholders allow matching of everything until a C</> occurs.
+
+  # /test/hello
+  # /test123/hello
+  # /test.123/hello
+  get '/#you/hello' => 'groovy';
+
+  __DATA__
+
+  @@ groovy.html.ep
+  Your name is <%= $you %>.
+
 =head2 Wildcard placeholders
 
 Wildcard placeholders allow matching absolutely everything, including

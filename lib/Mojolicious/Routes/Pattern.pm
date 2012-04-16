@@ -5,7 +5,7 @@ has [qw/defaults reqs/] => sub { {} };
 has [qw/format pattern regex/];
 has quote_end     => ')';
 has quote_start   => '(';
-has relaxed_start => '.';
+has relaxed_start => '#';
 has symbol_start  => ':';
 has [qw/symbols tree/] => sub { [] };
 has wildcard_start => '*';
@@ -203,6 +203,12 @@ sub _tokenize {
     # Inside a placeholder
     my $placeholder = $state ~~ [qw/relaxed symbol wildcard/];
 
+    # DEPRECATED in Leaf Fluttering In Wind!
+    if ($quoted && $char eq '.' && $state eq 'symbol') {
+      warn "Relaxed placeholders /(.foo) are DEPRECATED in favor of /#foo!\n";
+      $char = $relaxed;
+    }
+
     # Quote start
     if ($char eq $quote_start) {
       $quoted = 1;
@@ -216,15 +222,10 @@ sub _tokenize {
       $state = 'symbol';
     }
 
-    # Relaxed start (needs to be quoted)
-    elsif ($quoted && $char eq $relaxed && $state eq 'symbol') {
-      $tree[-1]->[0] = $state = 'relaxed';
-    }
-
-    # Wildcard start (upgrade when quoted)
-    elsif ($char eq $wildcard) {
+    # Relaxed or wildcard start (upgrade when quoted)
+    elsif ($char ~~ [$relaxed, $wildcard]) {
       push @tree, ['symbol', ''] unless $quoted;
-      $tree[-1]->[0] = $state = 'wildcard';
+      $tree[-1]->[0] = $state = $char eq $relaxed ? 'relaxed' : 'wildcard';
     }
 
     # Quote end
@@ -330,7 +331,7 @@ Pattern in compiled regex form.
   my $relaxed = $pattern->relaxed_start;
   $pattern    = $pattern->relaxed_start('*');
 
-Character indicating a relaxed placeholder, defaults to C<.>.
+Character indicating a relaxed placeholder, defaults to C<#>.
 
 =head2 C<reqs>
 

@@ -68,7 +68,7 @@ sub register {
         }
       );
 
-      # Rewrite code sections for syntax highlighting
+      # Rewrite code blocks for syntax highlighting
       $dom->find('pre')->each(
         sub {
           my $e = shift;
@@ -82,7 +82,7 @@ sub register {
 
       # Rewrite headers
       my $url = $self->req->url->clone;
-      my @sections;
+      my @parts;
       $dom->find('h1, h2, h3')->each(
         sub {
           my $e = shift;
@@ -90,8 +90,8 @@ sub register {
           $anchor =~ s/\s+/_/g;
           $anchor = url_escape $anchor, 'A-Za-z0-9_';
           $anchor =~ s/\%//g;
-          push @sections, [] if $e->type eq 'h1' || !@sections;
-          push @{$sections[-1]}, $text, $url->fragment($anchor)->to_abs;
+          push @parts, [] if $e->type eq 'h1' || !@parts;
+          push @{$parts[-1]}, $text, $url->fragment($anchor)->to_abs;
           $e->replace_content(
             $self->link_to(
               $text => $url->fragment('toc')->to_abs,
@@ -108,11 +108,7 @@ sub register {
 
       # Combine everything to a proper response
       $self->content_for(perldoc => "$dom");
-      $self->render(
-        inline   => $PERLDOC,
-        title    => $title,
-        sections => \@sections
-      );
+      $self->render(inline => $PERLDOC, title => $title, parts => \@parts);
       $self->res->headers->content_type('text/html;charset="UTF-8"');
     }
   ) unless $conf->{no_perldoc};

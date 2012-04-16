@@ -60,10 +60,7 @@ sub _load {
   my ($self, $module) = @_;
 
   # Load
-  if (my $e = Mojo::Loader->load($module)) {
-    die $e if ref $e;
-    return;
-  }
+  if (my $e = Mojo::Loader->load($module)) { ref $e ? die $e : return }
 
   # Module is a plugin
   return $module->isa('Mojolicious::Plugin') ? 1 : undef;

@@ -69,15 +69,13 @@
       <div id="perldoc">
         <h1><a id="toc">TABLE OF CONTENTS</a></h1>
         <ul>
-          % for my $section (@$sections) {
+          % for my $part (@$parts) {
             <li>
-              %= $link->(splice @$section, 0, 2)
-              % if (@$section) {
+              %= $link->(splice @$part, 0, 2)
+              % if (@$part) {
                 <ul>
-                  % while (@$section) {
-                    <li>
-                      %= $link->(splice @$section, 0, 2)
-                    </li>
+                  % while (@$part) {
+                    <li><%= $link->(splice @$part, 0, 2) %></li>
                   % }
                 </ul>
               % }

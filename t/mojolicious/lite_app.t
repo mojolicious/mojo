@@ -248,7 +248,7 @@ get '/source' => sub {
 };
 
 # GET /foo_relaxed/*
-get '/foo_relaxed/#test' => sub {
+get '/foo_relaxed/(.test)' => sub {
   my $self = shift;
   $self->render_text(
     $self->stash('test') . ($self->req->headers->dnt ? 1 : 0));

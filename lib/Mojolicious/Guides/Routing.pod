@@ -110,21 +110,9 @@ the surrounding text.
   /sebastian23hello  -> /(:name)hello -> {name => 'sebastian23'}
   /sebastian 23hello -> /(:name)hello -> {name => 'sebastian 23'}
 
-=head2 Relaxed placeholders
-
-Relaxed placeholders are just like generic placeholders, but match all
-characters except C</>.
-
-  /hello              -> /#name/hello -> undef
-  /sebastian/23/hello -> /#name/hello -> undef
-  /sebastian.23/hello -> /#name/hello -> {name => 'sebastian.23'}
-  /sebastian/hello    -> /#name/hello -> {name => 'sebastian'}
-  /sebastian23/hello  -> /#name/hello -> {name => 'sebastian23'}
-  /sebastian 23/hello -> /#name/hello -> {name => 'sebastian 23'}
-
 =head2 Wildcard placeholders
 
-Wildcard placeholders are just like the two placeholders above, but match
+Wildcard placeholders are just like generic placeholders, but match
 absolutely everything, including C</> and C<.>.
 
   /hello              -> /*name/hello -> undef
@@ -133,6 +121,18 @@ absolutely everything, including C</> and C<.>.
   /sebastian/hello    -> /*name/hello -> {name => 'sebastian'}
   /sebastian23/hello  -> /*name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /*name/hello -> {name => 'sebastian 23'}
+
+=head2 Relaxed placeholders
+
+Relaxed placeholders are similar to the two placeholders above, but always
+require parentheses and match all characters except C</>.
+
+  /hello              -> /(.name)/hello -> undef
+  /sebastian/23/hello -> /(.name)/hello -> undef
+  /sebastian.23/hello -> /(.name)/hello -> {name => 'sebastian.23'}
+  /sebastian/hello    -> /(.name)/hello -> {name => 'sebastian'}
+  /sebastian23/hello  -> /(.name)/hello -> {name => 'sebastian23'}
+  /sebastian 23/hello -> /(.name)/hello -> {name => 'sebastian 23'}
 
 =head1 BASICS
 

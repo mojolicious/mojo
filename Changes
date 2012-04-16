@@ -1,7 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.82  2012-04-16
-  - Deprecated relaxed placeholders "/(.foo)" in favor of "/#foo".
   - Deprecated Mojolicious::Routes::Route->waypoint.
   - Deprecated Mojolicious::Routes::Route->block.
   - Improved Mojolicious::Routes::Pattern to render formats.

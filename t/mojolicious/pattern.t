@@ -58,13 +58,13 @@ $result = $pattern->match('/test/lala');
 is $result, undef, 'no result';
 
 # Relaxed
-$pattern = Mojolicious::Routes::Pattern->new('/test/#controller/:action');
+$pattern = Mojolicious::Routes::Pattern->new('/test/(.controller)/:action');
 $result  = $pattern->match('/test/foo.bar/baz');
 is $result->{controller}, 'foo.bar', 'right value';
 is $result->{action},     'baz',     'right value';
 is $pattern->render({controller => 'foo.bar', action => 'baz'}),
   '/test/foo.bar/baz', 'right result';
-$pattern = Mojolicious::Routes::Pattern->new('/test/(#groovy)');
+$pattern = Mojolicious::Routes::Pattern->new('/test/(.groovy)');
 $result  = $pattern->match('/test/foo.bar');
 is $pattern->defaults->{format}, undef, 'no value';
 is $result->{groovy}, 'foo.bar', 'right value';

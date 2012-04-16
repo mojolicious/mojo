@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.82  2012-04-16
+  - Deprecated Mojolicious::Routes::Route->waypoint.
+  - Deprecated Mojolicious::Routes::Route->block.
   - Improved Mojolicious::Routes::Pattern to render formats.
   - Improved regex formatting in routes command.
   - Improved documentation.

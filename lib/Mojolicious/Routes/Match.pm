@@ -72,7 +72,7 @@ sub match {
     delete $captures->{app};
   }
 
-  # Waypoint
+  # DEPRECATED in Leaf Fluttering In Wind!
   return $self->endpoint($r) if $r->block && $empty;
 
   # Endpoint

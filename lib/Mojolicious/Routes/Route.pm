@@ -2,7 +2,6 @@ package Mojolicious::Routes::Route;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use List::Util 'first';
 use Mojolicious::Routes::Pattern;
 use Scalar::Util qw/blessed weaken/;
 
@@ -32,16 +31,10 @@ sub new { shift->SUPER::new->parse(@_) }
 
 sub add_child {
   my ($self, $route) = @_;
-
-  # Connect child
   weaken $route->parent($self)->{parent};
   push @{$self->children}, $route;
-
-  # Inherit format detection from parents
-  $route->pattern->reqs->{format} //= 0
-    if defined first { defined $_ && !$_ }
-    map { $_->pattern->reqs->{format} } @{$self->_stack};
-
+  my $format = $self->pattern->reqs->{format};
+  $route->pattern->reqs->{format} //= 0 if defined $format && !$format;
   return $self;
 }
 
@@ -92,8 +85,15 @@ sub has_websocket {
 
 sub is_endpoint {
   my $self = shift;
+
+  # Bridge
   return if $self->inline;
-  return $self->block ? 1 : !@{$self->children};
+
+  # DEPRECATED in Leaf Fluttering In Wind!
+  return 1 if $self->block;
+
+  # Check number of children
+  return !@{$self->children};
 }
 
 sub is_websocket { shift->{websocket} }
@@ -149,7 +149,11 @@ sub render {
   return $parent ? $parent->render($path, $values) : $path;
 }
 
-sub root { shift->_stack->[-1] }
+sub root {
+  my $root = my $parent = shift;
+  while ($parent = $parent->parent) { $root = $parent }
+  return $root;
+}
 
 sub route {
   my $self = shift;
@@ -224,7 +228,11 @@ sub via {
   return $self;
 }
 
-sub waypoint { shift->route(@_)->block(1) }
+# DEPRECATED in Leaf Fluttering In Wind!
+sub waypoint {
+  warn "Mojolicious::Static->waypoint is DEPRECATED!\n";
+  shift->route(@_)->block(1);
+}
 
 sub websocket {
   my $self  = shift;
@@ -272,12 +280,6 @@ sub _generate_route {
     ->via($methods)->to(\%defaults)->name($name);
 }
 
-sub _stack {
-  my @parents = (shift);
-  while (my $parent = $parents[-1]->parent) { push @parents, $parent }
-  return \@parents;
-}
-
 1;
 __END__
 
@@ -299,13 +301,6 @@ L<Mojolicious::Routes>.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Routes::Route> implements the following attributes.
-
-=head2 C<block>
-
-  my $block = $r->block;
-  $r        = $r->block(1);
-
-Allow this route to match even if it's not an endpoint, used for waypoints.
 
 =head2 C<children>
 
@@ -591,18 +586,6 @@ Restrict HTTP methods this route is allowed to handle, defaults to no
 restrictions.
 
   $r->route('/foo')->via(qw/GET POST/)->to('foo#bar');
-
-=head2 C<waypoint>
-
-  my $waypoint = $r->waypoint;
-  my $waypoint = $r->waypoint('/:action');
-  my $waypoint = $r->waypoint('/:action', action => qr/\w+/);
-  my $waypoint = $r->waypoint(format => 0);
-
-Add a waypoint to this route as nested child.
-
-  my $foo = $r->waypoint('/foo')->to('example#foo');
-  $foo->get('/bar')->to('#bar');
 
 =head2 C<websocket>
 

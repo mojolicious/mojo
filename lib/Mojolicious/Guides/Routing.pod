@@ -517,18 +517,6 @@ will be broken, this makes bridges a very powerful tool for authentication.
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 
-=head2 Waypoints
-
-Waypoints are very similar to normal nested routes but can match even if they
-have children.
-
-  # /foo     -> {controller => 'foo', action => 'baz'}
-  # /foo/bar -> {controller => 'foo', action => 'bar'}
-  my $foo = $r->waypoint('/foo')->to(controller => 'foo', action => 'baz');
-  $foo->route('/bar')->to(action => 'bar');
-
-All children will be ignored if a waypoint matches.
-
 =head2 More convenient routes
 
 From the tutorial you should already know L<Mojolicious::Lite> routes, which

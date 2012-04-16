@@ -212,7 +212,7 @@ is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor::Poll',
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 $port = Mojo::IOLoop->generate_port;
 my ($server_err, $server_running, $client_err, $client_running);
-($server, $client) = '';
+$server = $client = '';
 Mojo::IOLoop->server(
   {address => '127.0.0.1', port => $port} => sub {
     my ($loop, $stream) = @_;

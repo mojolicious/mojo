@@ -22,7 +22,7 @@ sub run {
 
   # Options
   local @ARGV = @_;
-  my ($password, $user) = '';
+  my $password = my $user = '';
   GetOptions(
     'p|password=s' => sub { $password = $_[1] },
     'u|user=s'     => sub { $user     = $_[1] }

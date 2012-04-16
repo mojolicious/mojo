@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.83  2012-04-17
+  - Fixed small bug in cpanify command.
+
 2.82  2012-04-16
   - Deprecated relaxed placeholders "/(.foo)" in favor of "/#foo".
   - Deprecated Mojolicious::Routes::Route->waypoint.

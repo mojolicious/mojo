@@ -42,7 +42,7 @@ use Mojo::IOLoop;
 # Built-in certificate
 my $loop = Mojo::IOLoop->new;
 my $port = Mojo::IOLoop->generate_port;
-my ($server, $client) = '';
+my ($server, $client);
 $loop->server(
   {address => '127.0.0.1', port => $port, tls => 1} => sub {
     my ($loop, $stream) = @_;

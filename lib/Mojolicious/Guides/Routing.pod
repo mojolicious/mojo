@@ -125,7 +125,7 @@ characters except C</>.
 =head2 Wildcard placeholders
 
 Wildcard placeholders are just like the two placeholders above, but match
-absolutely everything.
+absolutely everything, including C</> and C<.>.
 
   /hello              -> /*name/hello -> undef
   /sebastian/23/hello -> /*name/hello -> {name => 'sebastian/23'}

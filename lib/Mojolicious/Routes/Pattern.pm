@@ -168,13 +168,13 @@ sub _compile_format {
 
   # Default regex
   my $reqs = $self->reqs;
-  return $self->format(qr#\.([^/]+)#)->format
+  return $self->format(qr#\.([^/]+)$#)->format
     if !exists $reqs->{format} && $reqs->{format};
 
   # Compile custom regex
   my $regex =
     defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/]+)';
-  return $self->format(qr#\.$regex#)->format;
+  return $self->format(qr#\.$regex$#)->format;
 }
 
 # "Interesting... Oh no wait, the other thing, tedious."

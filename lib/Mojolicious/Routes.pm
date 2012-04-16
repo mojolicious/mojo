@@ -96,10 +96,7 @@ sub dispatch {
 sub hide { push @{shift->hidden}, @_ }
 
 sub route {
-  my $self  = shift;
-  my $route = Mojolicious::Routes::Route->new(@_);
-  $self->add_child($route);
-  return $route;
+  shift->add_child(Mojolicious::Routes::Route->new(@_))->children->[-1];
 }
 
 sub _callback {

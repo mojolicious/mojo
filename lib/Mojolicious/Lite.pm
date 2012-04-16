@@ -25,8 +25,7 @@ sub import {
   my $app = $class->new;
 
   # Initialize routes
-  my $routes = $app->routes;
-  $routes->namespace('');
+  my $routes = $app->routes->namespace('');
 
   # Default static and template class
   $app->static->classes->[0]   = $caller;
@@ -43,20 +42,15 @@ sub import {
   *{"${caller}::group"} = sub (&) {
     my $old = $root;
     $_[0]->($root = $routes);
-    $routes = $root;
-    $root   = $old;
+    ($routes, $root) = ($root, $old);
   };
   *{"${caller}::helper"} = sub { $app->helper(@_) };
   *{"${caller}::hook"}   = sub { $app->hook(@_) };
   *{"${caller}::plugin"} = sub { $app->plugin(@_) };
-  *{"${caller}::under"}  = *{"${caller}::ladder"} =
-    sub { $routes = $root->under(@_) };
+  *{"${caller}::under"}  = sub { $routes = $root->under(@_) };
 
   # We are most likely the app in a lite environment
   $ENV{MOJO_APP} ||= $app;
-
-  # Shagadelic!
-  *{"${caller}::shagadelic"} = sub { $app->start(@_) };
 
   # Lite apps are strict!
   Mojo::Base->import(-strict);

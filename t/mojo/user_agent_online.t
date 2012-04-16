@@ -11,7 +11,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan tests => 108;
+plan tests => 106;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -148,8 +148,6 @@ is h('mojolicio.us')->code,          200, 'right status';
 is p('mojolicio.us/lalalala')->code, 404, 'right status';
 is g('http://mojolicio.us')->code,   200, 'right status';
 is p('http://mojolicio.us')->code,   404, 'right status';
-is oO('http://mojolicio.us')->code,  200, 'right status';
-is oO(POST => 'http://mojolicio.us')->code, 404, 'right status';
 my $res = f('search.cpan.org/search' => {query => 'mojolicious'});
 like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';

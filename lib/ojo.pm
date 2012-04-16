@@ -39,9 +39,8 @@ sub import {
   $UA->app(*{"${caller}::app"}->());
 
   # Functions
-  *{"${caller}::Oo"} = *{"${caller}::b"} = \&b;
+  *{"${caller}::b"} = \&b;
   *{"${caller}::c"} = \&c;
-  *{"${caller}::oO"} = sub { _request(@_) };
   *{"${caller}::a"} =
     sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
   *{"${caller}::d"} = sub { _request(DELETE  => @_) };

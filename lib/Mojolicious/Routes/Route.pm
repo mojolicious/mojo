@@ -40,7 +40,7 @@ sub add_child {
   # Inherit format detection from parents
   $route->pattern->reqs->{format} //= 0
     if defined first { defined $_ && !$_ }
-    map { $_->pattern->reqs->{format} } @{$self->_parents};
+    map { $_->pattern->reqs->{format} } @{$self->_stack};
 
   return $self;
 }
@@ -149,7 +149,7 @@ sub render {
   return $parent ? $parent->render($path, $values) : $path;
 }
 
-sub root { shift->_parents->[-1] }
+sub root { shift->_stack->[-1] }
 
 sub route {
   my $self = shift;
@@ -272,7 +272,7 @@ sub _generate_route {
     ->via($methods)->to(\%defaults)->name($name);
 }
 
-sub _parents {
+sub _stack {
   my @parents = (shift);
   while (my $parent = $parents[-1]->parent) { push @parents, $parent }
   return \@parents;

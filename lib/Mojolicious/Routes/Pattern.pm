@@ -96,7 +96,7 @@ sub shape_match {
   my $req = $self->reqs->{format};
   return $result if !$detect || defined $req && !$req;
   if ($$pathref =~ s|^/?$format||) { $result->{format} = $1 }
-  elsif ($req) { return if !$result->{format} }
+  elsif ($req) { return unless $result->{format} }
 
   return $result;
 }
@@ -105,9 +105,8 @@ sub _compile {
   my $self = shift;
 
   # Compile tree to regex
-  my $reqs     = $self->reqs;
-  my $block    = '';
-  my $regex    = '';
+  my $block = my $regex = '';
+  my $reqs = $self->reqs;
   my $optional = 1;
   my $defaults = $self->defaults;
   for my $token (reverse @{$self->tree}) {
@@ -161,10 +160,7 @@ sub _compile {
   $regex = "$block$regex" if $block;
 
   # Compile
-  $regex = qr/^$regex/s;
-  $self->regex($regex);
-
-  return $regex;
+  return $self->regex(qr/^$regex/s)->regex;
 }
 
 sub _compile_format {
@@ -222,15 +218,13 @@ sub _tokenize {
 
     # Relaxed start (needs to be quoted)
     elsif ($quoted && $char eq $relaxed_start && $state eq 'symbol') {
-      $state = 'relaxed';
-      $tree[-1]->[0] = 'relaxed';
+      $tree[-1]->[0] = $state = 'relaxed';
     }
 
     # Wildcard start (upgrade when quoted)
     elsif ($char eq $wildcard_start) {
       push @tree, ['symbol', ''] unless $quoted;
-      $state = 'wildcard';
-      $tree[-1]->[0] = 'wildcard';
+      $tree[-1]->[0] = $state = 'wildcard';
     }
 
     # Quote end

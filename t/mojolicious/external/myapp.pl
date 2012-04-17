@@ -11,6 +11,15 @@ app->secret('Insecure!');
 # Load plugin
 plugin 'Config';
 
+# Message condition
+app->routes->add_condition(
+  message => sub {
+    my ($r, $c, $captures, $message) = @_;
+    $c->res->headers->header('X-Message' => $message);
+    return 1;
+  }
+);
+
 # GET /
 get '/' => 'index';
 
@@ -39,7 +48,7 @@ get '/url/☃' => sub {
 };
 
 # GET /host
-get '/host' => sub {
+get '/host' => (message => 'it works!') => sub {
   my $self = shift;
   $self->render(text => $self->url_for->base->host);
 };

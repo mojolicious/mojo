@@ -45,7 +45,7 @@ sub match {
 
   # Conditions
   if (my $over = $r->over) {
-    my $conditions = $self->{conditions} ||= $r->root->conditions;
+    my $conditions = $self->{conditions} ||= $self->root->conditions;
     for (my $i = 0; $i < @$over; $i += 2) {
       return unless my $condition = $conditions->{$over->[$i]};
       return if !$condition->($r, $c, $captures, $over->[$i + 1]);

@@ -530,7 +530,7 @@ Render route with parameters into a path.
 
 The L<Mojolicious::Routes> object this route is an ancestor of.
 
-  #r->root->caching(0);
+  $r->root->cache(0);
 
 =head2 C<route>
 

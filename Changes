@@ -1,6 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.83  2012-04-18
+  - Added hostname verification support to Mojo::IOLoop::Client and
+    Mojo::UserAgent.
   - Added SNI support to Mojo::IOLoop::Client and Mojo::UserAgent.
   - Improved documentation.
   - Fixed bug that prevented conditions to work in embedded applications.

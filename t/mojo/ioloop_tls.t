@@ -6,18 +6,18 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-# To regenerate all required certificates run these commands (29.03.2012)
+# To regenerate all required certificates run these commands (18.04.2012)
 # openssl genrsa -out ca.key 1024
 # openssl req -new -key ca.key -out ca.csr -subj "/C=US/CN=ca"
 # openssl req -x509 -days 7300 -key ca.key -in ca.csr -out ca.crt
 #
 # openssl genrsa -out server.key 1024
-# openssl req -new -key server.key -out server.csr -subj "/C=US/CN=server"
+# openssl req -new -key server.key -out server.csr -subj "/C=US/CN=localhost"
 # openssl x509 -req -days 7300 -in server.csr -out server.crt -CA ca.crt \
 #   -CAkey ca.key -CAcreateserial
 #
 # openssl genrsa -out client.key 1024
-# openssl req -new -key client.key -out client.csr -subj "/C=US/CN=client"
+# openssl req -new -key client.key -out client.csr -subj "/C=US/CN=localhost"
 # openssl x509 -req -days 7300 -in client.csr -out client.crt -CA ca.crt \
 #   -CAkey ca.key -CAcreateserial
 #
@@ -32,7 +32,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 26;
+plan tests => 28;
 
 # "To the panic room!
 #  We don't have a panic room.
@@ -202,7 +202,7 @@ is $client_close, 1,         'client emitted close event once';
 ok $running,      'loop was running';
 ok !$server_err, 'no error';
 
-# Invalid server certificate
+# Invalid server certificate (unsigned)
 $loop       = Mojo::IOLoop->new;
 $port       = Mojo::IOLoop->generate_port;
 $server_err = $client_err = '';
@@ -218,6 +218,30 @@ $loop->client(
   port   => $port,
   tls    => 1,
   tls_ca => 't/mojo/certs/ca.crt',
+  sub { shift; $client_err = shift }
+);
+$loop->timer(1 => sub { shift->stop });
+$loop->start;
+ok !$server_err, 'no error';
+ok $client_err, 'has error';
+
+# Invalid server certificate (hostname)
+$loop       = Mojo::IOLoop->new;
+$port       = Mojo::IOLoop->generate_port;
+$server_err = $client_err = '';
+$loop->server(
+  address  => '127.0.0.1',
+  port     => $port,
+  tls      => 1,
+  tls_cert => 't/mojo/certs/server.crt',
+  tls_key  => 't/mojo/certs/server.key',
+  sub { $server_err = 'connected!' }
+);
+$loop->client(
+  address => '127.0.0.1',
+  port    => $port,
+  tls     => 1,
+  tls_ca  => 't/mojo/certs/ca.crt',
   sub { shift; $client_err = shift }
 );
 $loop->timer(1 => sub { shift->stop });

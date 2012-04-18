@@ -214,7 +214,7 @@ These options are currently available:
 
 =item C<address>
 
-Address or host name of the peer to connect to.
+Address or host name of the peer to connect to, defaults to C<localhost>.
 
 =item C<handle>
 
@@ -239,7 +239,7 @@ Enable TLS.
 
 =item C<tls_ca>
 
-Path to TLS certificate authority file.
+Path to TLS certificate authority file. Also activates hostname verification.
 
 =item C<tls_cert>
 

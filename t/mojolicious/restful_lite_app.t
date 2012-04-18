@@ -402,8 +402,8 @@ $t->post_ok('/rest.png?format=json')->status_is(201)
 $t->get_ok('/nothing', {Accept => 'image/png'})->status_is(404);
 
 # GET /rest.html (Internet Explorer 8)
-my $ie =
-  'image/jpeg, application/x-ms-application, image/gif, application/xaml+xml'
+my $ie
+  = 'image/jpeg, application/x-ms-application, image/gif, application/xaml+xml'
   . ', image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash'
   . ', application/msword, */*';
 $t->get_ok('/rest.html' => {Accept => $ie})->status_is(200)

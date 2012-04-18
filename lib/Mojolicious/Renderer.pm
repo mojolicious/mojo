@@ -226,8 +226,9 @@ sub _detect_handler {
 
   # DATA templates
   unless ($self->{data}) {
-    my @templates =
-      map { sort keys %{Mojo::Command->get_all_data($_)} } @{$self->classes};
+    my @templates
+      = map { sort keys %{Mojo::Command->get_all_data($_)} }
+      @{$self->classes};
     s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
   }
   return $self->{data}{$file} if exists $self->{data}{$file};
@@ -249,8 +250,8 @@ sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
   # Find handler and render
-  my $handler =
-       $options->{handler}
+  my $handler 
+    = $options->{handler}
     || $self->_detect_handler($options)
     || $self->default_handler;
   $options->{handler} = $handler;

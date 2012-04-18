@@ -121,8 +121,8 @@ sub _compile {
   # Tokenize
   my $pattern = [[]];
   while ($css =~ /$TOKEN_RE/g) {
-    my ($separator, $element, $pc, $attrs, $combinator) =
-      ($1, $2 // '', $3, $6, $11);
+    my ($separator, $element, $pc, $attrs, $combinator)
+      = ($1, $2 // '', $3, $6, $11);
 
     # Trash
     next unless $separator || $element || $pc || $attrs || $combinator;

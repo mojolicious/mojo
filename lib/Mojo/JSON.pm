@@ -257,8 +257,8 @@ sub _encode_object {
   my $object = shift;
 
   # Encode pairs
-  my @pairs =
-    map { _encode_string($_) . ':' . _encode_values($object->{$_}) }
+  my @pairs
+    = map { _encode_string($_) . ':' . _encode_values($object->{$_}) }
     keys %$object;
 
   # Stringify

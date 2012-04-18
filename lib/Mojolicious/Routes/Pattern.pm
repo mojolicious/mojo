@@ -172,8 +172,8 @@ sub _compile_format {
     if !exists $reqs->{format} && $reqs->{format};
 
   # Compile custom regex
-  my $regex =
-    defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/]+)';
+  my $regex
+    = defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/]+)';
   return $self->format(qr#\.$regex$#)->format;
 }
 
@@ -376,8 +376,8 @@ implements the following ones.
 =head2 C<new>
 
   my $pattern = Mojolicious::Routes::Pattern->new('/:action');
-  my $pattern =
-    Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
+  my $pattern
+    = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
   my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
 
 Construct a new pattern object.

@@ -33,7 +33,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.84';
+our $VERSION  = '2.85';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -93,8 +93,8 @@ sub new {
   $self->hook(
     around_dispatch => sub {
       my ($next, $c) = @_;
-      local $SIG{__DIE__} =
-        sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
+      local $SIG{__DIE__}
+        = sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
       $c->render_exception($@) unless eval { $next->(); 1 };
     }
   );
@@ -154,8 +154,8 @@ sub handler {
   # Build default controller
   my $defaults = $self->defaults;
   @{$stash}{keys %$defaults} = values %$defaults;
-  my $c =
-    $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
+  my $c
+    = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{app};
   weaken $c->{tx};
 

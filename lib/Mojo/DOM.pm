@@ -128,8 +128,8 @@ sub find {
   my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select($selector);
 
   # Upgrade results
-  @$results =
-    map { $self->new->charset($self->charset)->tree($_)->xml($self->xml) }
+  @$results
+    = map { $self->new->charset($self->charset)->tree($_)->xml($self->xml) }
     @$results;
 
   return Mojo::Collection->new(@$results);

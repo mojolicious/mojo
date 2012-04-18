@@ -75,8 +75,8 @@ sub register {
           return if $e->all_text =~ /^\s*\$\s+/m;
           my $attrs = $e->attrs;
           my $class = $attrs->{class};
-          $attrs->{class} =
-            defined $class ? "$class prettyprint" : 'prettyprint';
+          $attrs->{class}
+            = defined $class ? "$class prettyprint" : 'prettyprint';
         }
       );
 

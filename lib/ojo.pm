@@ -41,8 +41,8 @@ sub import {
   # Functions
   *{"${caller}::b"} = \&b;
   *{"${caller}::c"} = \&c;
-  *{"${caller}::a"} =
-    sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
+  *{"${caller}::a"}
+    = sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
   *{"${caller}::d"} = sub { _request(DELETE  => @_) };
   *{"${caller}::f"} = sub { _request(FORM    => @_) };
   *{"${caller}::g"} = sub { _request(GET     => @_) };
@@ -61,8 +61,10 @@ sub _request {
   my $method = $_[0] =~ m#:|/# ? 'GET' : shift;
 
   # Transaction
-  my $tx =
-    $method eq 'FORM' ? $UA->build_form_tx(@_) : $UA->build_tx($method => @_);
+  my $tx
+    = $method eq 'FORM'
+    ? $UA->build_form_tx(@_)
+    : $UA->build_tx($method => @_);
 
   # Process
   $tx = $UA->start($tx);

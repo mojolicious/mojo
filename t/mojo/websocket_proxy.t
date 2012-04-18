@@ -47,8 +47,8 @@ websocket '/test' => sub {
 
 # HTTP server for testing
 my $ua = Mojo::UserAgent->new;
-my $daemon =
-  Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+my $daemon
+  = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
 my $port = Mojo::IOLoop->new->generate_port;
 $daemon->listen(["http://127.0.0.1:$port"])->start;
 
@@ -56,8 +56,8 @@ $daemon->listen(["http://127.0.0.1:$port"])->start;
 my $proxy = Mojo::IOLoop->generate_port;
 my (%buffer, $connected);
 my ($read, $sent, $fail) = 0;
-my $nf =
-    "HTTP/1.1 404 NOT FOUND\x0d\x0a"
+my $nf
+  = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.1 200 OK\x0d\x0aConnection: keep-alive\x0d\x0a\x0d\x0a";

@@ -20,8 +20,8 @@ app->config(it => 'works');
 is_deeply app->config, {it => 'works'}, 'right value';
 
 # Load plugin
-my $config =
-  plugin j_s_o_n_config => {default => {foo => 'baz', hello => 'there'}};
+my $config
+  = plugin j_s_o_n_config => {default => {foo => 'baz', hello => 'there'}};
 is $config->{foo},   'bar',    'right value';
 is $config->{hello}, 'there',  'right value';
 is $config->{utf},   'утф', 'right value';
@@ -42,8 +42,8 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->content_is("barbarbar\n");
 
 # No config file, default only
-$config =
-  plugin JSONConfig => {file => 'nonexistent', default => {foo => 'qux'}};
+$config
+  = plugin JSONConfig => {file => 'nonexistent', default => {foo => 'qux'}};
 is $config->{foo}, 'qux', 'right value';
 is app->config->{foo}, 'qux', 'right value';
 is app->config('foo'), 'qux',   'right value';

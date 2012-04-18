@@ -2,6 +2,7 @@ package Mojo::UserAgent;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
+use List::Util 'first';
 use Mojo::CookieJar;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
@@ -73,18 +74,14 @@ sub detect_proxy {
   # Upper case gets priority
   $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
   $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
-  if (my $no = $ENV{NO_PROXY} || $ENV{no_proxy}) {
-    $self->no_proxy([split /,/, $no]);
-  }
+  $self->no_proxy([split /,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
 
   return $self;
 }
 
 sub need_proxy {
   my ($self, $host) = @_;
-  return 1 unless my $no = $self->no_proxy;
-  $host =~ /\Q$_\E$/ and return for @$no;
-  return 1;
+  return !first { $host =~ /\Q$_\E$/ } @{$self->no_proxy || []};
 }
 
 sub post_form {
@@ -421,8 +418,8 @@ sub _server {
 
   # Start test server
   my $loop   = $self->_loop;
-  my $server = $self->{server} =
-    Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
+  my $server = $self->{server}
+    = Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
   my $port = $self->{port} = $loop->generate_port;
   die "Couldn't find a free TCP port for testing.\n" unless $port;
   $self->{scheme} = $scheme ||= 'http';
@@ -474,8 +471,8 @@ sub _start {
   if (my $t = $self->request_timeout) {
     weaken $self;
     my $loop = $self->_loop;
-    $self->{connections}{$id}{timeout} =
-      $loop->timer($t => sub { $self->_error($id => 'Request timeout.') });
+    $self->{connections}{$id}{timeout}
+      = $loop->timer($t => sub { $self->_error($id => 'Request timeout.') });
   }
 
   return $id;

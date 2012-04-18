@@ -218,13 +218,13 @@ is "$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;',
   'right html escaped result';
 
 # utf8 html_unescape
-$stream =
-  b('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;')->decode('UTF-8')->html_unescape;
+$stream = b('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;')->decode('UTF-8')
+  ->html_unescape;
 is "$stream", "foo<baz>&\"\x{152}&Foo;", 'right html unescaped result';
 
 # html_escape (path)
-$stream =
-  b('/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm')->html_escape;
+$stream = b('/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm')
+  ->html_escape;
 is "$stream", '/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm',
   'right html escaped result';
 

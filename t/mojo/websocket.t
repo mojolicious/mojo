@@ -52,8 +52,8 @@ websocket '/' => sub {
 # GET /something/else
 get '/something/else' => sub {
   my $self = shift;
-  my $timeout =
-    Mojo::IOLoop->singleton->stream($self->tx->connection)->timeout;
+  my $timeout
+    = Mojo::IOLoop->singleton->stream($self->tx->connection)->timeout;
   $self->render(text => "${timeout}failed!");
 };
 

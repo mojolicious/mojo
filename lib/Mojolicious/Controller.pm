@@ -224,8 +224,8 @@ sub render_content {
 
     # Reset with multiple values
     if (@_) {
-      $c->{$name} =
-        join('', map({ref $_ eq 'CODE' ? $_->() : $_} @_, $content));
+      $c->{$name}
+        = join('', map({ref $_ eq 'CODE' ? $_->() : $_} @_, $content));
     }
 
     # First come
@@ -252,8 +252,8 @@ sub render_exception {
   return if $stash->{'mojo.exception'};
 
   # Filtered stash snapshot
-  my %snapshot =
-    map { $_ => $stash->{$_} }
+  my %snapshot
+    = map { $_ => $stash->{$_} }
     grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
 
   # Render with fallbacks

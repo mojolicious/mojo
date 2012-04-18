@@ -17,16 +17,20 @@ sub run {
   my $ev = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'not installed';
 
   # IPv6
-  my $ipv6 =
-    Mojo::IOLoop::Server::IPV6() ? $IO::Socket::IP::VERSION : 'not installed';
+  my $ipv6
+    = Mojo::IOLoop::Server::IPV6()
+    ? $IO::Socket::IP::VERSION
+    : 'not installed';
 
   # TLS
-  my $tls =
-    Mojo::IOLoop::Server::TLS() ? $IO::Socket::SSL::VERSION : 'not installed';
+  my $tls
+    = Mojo::IOLoop::Server::TLS()
+    ? $IO::Socket::SSL::VERSION
+    : 'not installed';
 
   # Bonjour
-  my $bonjour =
-    eval 'Mojo::Server::Daemon::BONJOUR()'
+  my $bonjour
+    = Mojo::Server::Daemon::BONJOUR()
     ? $Net::Rendezvous::Publish::VERSION
     : 'not installed';
 

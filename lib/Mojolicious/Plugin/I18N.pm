@@ -34,8 +34,8 @@ sub register {
       );
 
       # Handler
-      $self->stash->{i18n} =
-        Mojolicious::Plugin::I18N::_Handler->new(namespace => $namespace);
+      $self->stash->{i18n}
+        = Mojolicious::Plugin::I18N::_Handler->new(namespace => $namespace);
 
       # Languages
       $self->stash->{i18n}->languages(@languages, $default);

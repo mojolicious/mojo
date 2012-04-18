@@ -60,11 +60,11 @@ websocket '/test' => sub {
 };
 
 # Web server with valid certificates
-my $daemon =
-  Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+my $daemon
+  = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
 my $port = Mojo::IOLoop->new->generate_port;
-my $listen =
-    "https://127.0.0.1:$port"
+my $listen
+  = "https://127.0.0.1:$port"
   . '?cert=t/mojo/certs/server.crt'
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt';
@@ -74,8 +74,8 @@ $daemon->listen([$listen])->start;
 my $proxy = Mojo::IOLoop->generate_port;
 my (%buffer, $connected);
 my ($read, $sent, $fail) = 0;
-my $nf =
-    "HTTP/1.1 404 NOT FOUND\x0d\x0a"
+my $nf
+  = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
 my $ok = "HTTP/1.0 200 OK\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";

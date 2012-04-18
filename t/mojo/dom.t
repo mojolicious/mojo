@@ -176,8 +176,8 @@ EOF
 is $dom->at('script')->text, "alert('lalala');", 'right script content';
 
 # HTML5 (unquoted values)
-$dom =
-  Mojo::DOM->new->parse(qq#<div id = test foo ="bar" class=tset>works</div>#);
+$dom = Mojo::DOM->new->parse(
+  qq#<div id = test foo ="bar" class=tset>works</div>#);
 is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
@@ -506,8 +506,8 @@ is $dom->at('div')->text,        'content', 'right text';
 is $dom->at('div')->content_xml, 'content', 'right text';
 
 # Class with hyphen
-$dom =
-  Mojo::DOM->new->parse(qq#<div class="a">A</div><div class="a-1">A1</div>#);
+$dom = Mojo::DOM->new->parse(
+  qq#<div class="a">A</div><div class="a-1">A1</div>#);
 @div = ();
 $dom->find('.a')->each(sub { push @div, shift->text });
 is_deeply \@div, ['A'], 'found first element only';

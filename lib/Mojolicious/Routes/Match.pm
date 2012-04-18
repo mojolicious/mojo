@@ -140,8 +140,8 @@ sub path_for {
   my $captures = $self->captures;
   %values = (%$captures, format => undef, %values);
   my $pattern = $endpoint->pattern;
-  $values{format} =
-    defined $captures->{format}
+  $values{format}
+    = defined $captures->{format}
     ? $captures->{format}
     : $pattern->defaults->{format}
     if $pattern->reqs->{format};

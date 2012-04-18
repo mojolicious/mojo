@@ -16,7 +16,8 @@ use Test::More tests => 11;
 use ojo;
 
 # * /
-a('/' => sub {
+a(
+  '/' => sub {
     my $self = shift;
     $self->render(text => $self->req->method . ($self->param('foo') || ''));
   }

@@ -152,8 +152,8 @@ sub interpret {
   # Interpret
   return unless my $compiled = $self->compiled;
   my $output = eval { $compiled->(@_) };
-  $output =
-    Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
+  $output
+    = Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
     if $@;
 
   return $output;

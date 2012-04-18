@@ -252,8 +252,8 @@ into alien environments like foreign event loops.
   get '/' => {text => 'Hello World!'};
 
   # Connect application with web server and start accepting connections
-  my $daemon =
-    Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
+  my $daemon
+    = Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
   $daemon->start;
 
   # Call "one_tick" repeatedly from the alien environment
@@ -679,8 +679,8 @@ application.
   get '/' => {text => 'Hello World!'};
 
   # Connect application with web server and start accepting connections
-  my $daemon =
-    Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
+  my $daemon
+    = Mojo::Server::Daemon->new(app => app, listen => ['http://*:8080']);
   $daemon->start;
 
   # Let AnyEvent take control

@@ -366,8 +366,8 @@ my $url2 = $url->to_rel;
 is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
 
 # IRI
-$url =
-  Mojo::URL->new('http://sharifulin.ru/привет/?q=шарифулин');
+$url
+  = Mojo::URL->new('http://sharifulin.ru/привет/?q=шарифулин');
 is $url->path->parts->[0], 'привет', 'right path part';
 is $url->path, '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/', 'right path';
 is $url->query, 'q=%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD',
@@ -375,9 +375,10 @@ is $url->query, 'q=%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD',
 is $url->query->param('q'), 'шарифулин', 'right query value';
 
 # IRI/IDNA
-$url = Mojo::URL->new(
+$url
+  = Mojo::URL->new(
   'http://☃.net/привет/привет/?привет=шарифулин'
-);
+  );
 ok $url->is_abs, 'is absolute';
 is $url->scheme, 'http', 'right scheme';
 is $url->host,   '☃.net', 'right host';

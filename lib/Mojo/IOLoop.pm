@@ -447,8 +447,8 @@ following new ones.
 
 =head2 C<client>
 
-  my $id =
-    Mojo::IOLoop->client(address => '127.0.0.1', port => 3000, sub {...});
+  my $id
+    = Mojo::IOLoop->client(address => '127.0.0.1', port => 3000, sub {...});
   my $id = $loop->client(address => '127.0.0.1', port => 3000, sub {...});
   my $id = $loop->client({address => '127.0.0.1', port => 3000}, sub {...});
 

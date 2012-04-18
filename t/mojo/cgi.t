@@ -54,8 +54,8 @@ my $message = '';
   );
   Mojolicious::Command::cgi->new->run;
 }
-my $res =
-  Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
+my $res
+  = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
 is $res->code, 200, 'right status';
 is $res->headers->status, '200 OK', 'right "Status" value';
 is $res->headers->content_type, 'text/html;charset=UTF-8',

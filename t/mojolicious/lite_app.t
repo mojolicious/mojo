@@ -173,8 +173,8 @@ get '/maybe/ajax' => sub {
 # GET /stream
 get '/stream' => sub {
   my $self = shift;
-  my $chunks =
-    [qw/foo bar/, $self->req->url->to_abs->userinfo, $self->url_for->to_abs];
+  my $chunks = [qw/foo bar/, $self->req->url->to_abs->userinfo,
+    $self->url_for->to_abs];
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   my $cb;
@@ -1238,8 +1238,8 @@ Test::Mojo->new->tx($t->tx->previous)->status_is(302)
   ->header_like(Location => qr#/template.txt$#)->content_is('Redirecting!');
 
 # GET /koi8-r
-my $koi8 =
-    'Этот человек наполняет меня надеждой.'
+my $koi8
+  = 'Этот человек наполняет меня надеждой.'
   . ' Ну, и некоторыми другими глубокими и приводящими в'
   . ' замешательство эмоциями.';
 $t->get_ok('/koi8-r')->status_is(200)

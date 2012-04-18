@@ -215,8 +215,8 @@ sub _walk {
     @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
 
     # Dispatch
-    my $continue =
-        $field->{cb}
+    my $continue
+      = $field->{cb}
       ? $self->_callback($c, $field, $staging)
       : $self->_controller($c, $field, $staging);
 

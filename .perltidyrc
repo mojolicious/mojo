@@ -1,34 +1,12 @@
-# Perl Best Practices (plus errata) .perltidyrc file
--l=98    # Max line width is 98 cols
--i=4     # Indent level is 4 cols
--ci=4    # Continuation indent is 4 cols
-#-st     # Output to STDOUT
--se      # Errors to STDERR
--vt=2    # Maximal vertical tightness
--cti=0   # No extra indentation for closing brackets
--pt=1    # Medium parenthesis tightness
--bt=1    # Medium brace tightness
--sbt=1   # Medium square bracket tightness
--bbt=1   # Medium block brace tightness
--nsfs    # No space before semicolons
--nolq    # Don't outdent long quoted strings
--wbb="% + - * / x != == >= <= =~ < > | & **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="
-         # Break before all operators
-
-# Extras/overrides/deviations from Perl Best Practices
---maximum-line-length=78              # Be less generous
---warning-output                      # Show warnings
---maximum-consecutive-blank-lines=2   # Default is 1
---nohanging-side-comments             # Troublesome for commented out code
-
--isbc   # Block comments may only be indented if they have some space characters before the #
--i=2    # Indent level is 2 cols
--ci=2   # Continuation indent is 2 cols
-
-# We use version control, so just rewrite the file
--b
-
-# For the up-tight folk :)
+-pbp     # Start with Perl Best Practices
+-l=78    # 78 character per line
+-w       # Show all warnings
+-mbl=2   # No more than 2 blank lines
+-isbc    # Don't indent comments without whitespace before the #
+-i=2     # Indent level is 2
+-ci=2    # Continuation indent is 2
+-vt=0    # Less vertical tightness
+-b       # Just rewrite the file
 -pt=2    # High parenthesis tightness
 -bt=2    # High brace tightness
 -sbt=2   # High square bracket tightness

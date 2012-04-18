@@ -50,9 +50,9 @@ is $cookies->[0]->value, 'WILE_E_COYOTE', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse multiple request cookies (Netscape)
-$cookie = Mojo::Cookie::Request->new;
-$cookies =
-  $cookie->parse('CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001');
+$cookie  = Mojo::Cookie::Request->new;
+$cookies = $cookie->parse(
+  'CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001');
 is $cookies->[0]->name,  'CUSTOMER',             'right name';
 is $cookies->[0]->value, 'WILE_E_COYOTE',        'right value';
 is $cookies->[1]->name,  'PART_NUMBER',          'right name';
@@ -60,9 +60,9 @@ is $cookies->[1]->value, 'ROCKET_LAUNCHER_0001', 'right value';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse multiple request cookies from multiple header values (Netscape)
-$cookie = Mojo::Cookie::Request->new;
-$cookies =
-  $cookie->parse('CUSTOMER=WILE_E_COYOTE, PART_NUMBER=ROCKET_LAUNCHER_0001');
+$cookie  = Mojo::Cookie::Request->new;
+$cookies = $cookie->parse(
+  'CUSTOMER=WILE_E_COYOTE, PART_NUMBER=ROCKET_LAUNCHER_0001');
 is $cookies->[0]->name,  'CUSTOMER',             'right name';
 is $cookies->[0]->value, 'WILE_E_COYOTE',        'right value';
 is $cookies->[1]->name,  'PART_NUMBER',          'right name';
@@ -90,8 +90,8 @@ is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted request cookie roundtrip (RFC 2965)
 $cookie = Mojo::Cookie::Request->new;
-$cookies =
-  $cookie->parse('$Version=1; foo="b ,a\";= r\"\\\\"; $Path="/test"');
+$cookies
+  = $cookie->parse('$Version=1; foo="b ,a\";= r\"\\\\"; $Path="/test"');
 is $cookies->[0]->name,  'foo',          'right name';
 is $cookies->[0]->value, 'b ,a";= r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
@@ -176,7 +176,8 @@ is $cookie->to_string,
   'right format';
 
 # Parse response cookie (RFC 6265)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo=ba r; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure;');
 is $cookies->[0]->name,    'foo',       'right name';
@@ -190,7 +191,8 @@ is $cookies->[0]->secure, '1', 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie (RFC 6265)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo="b a\" r\"\\\\"; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure');
 is $cookies->[0]->name,    'foo',       'right name';
@@ -204,7 +206,8 @@ is $cookies->[0]->secure, '1', 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie (RFC 6265, alternative)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo="b a\" ;r\"\\\\"; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure');
 is $cookies->[0]->name,    'foo',        'right name';
@@ -218,7 +221,8 @@ is $cookies->[0]->secure, '1', 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie roundtrip (RFC 6265)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo="b ,a\";= r\"\\\\"; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure');
 is $cookies->[0]->name,    'foo',          'right name';
@@ -242,7 +246,8 @@ is $cookies->[0]->secure, '1', 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie roundtrip (RFC 6265, alternative)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo="b ,a\" r\"\\\\"; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure');
 is $cookies->[0]->name,    'foo',        'right name';
@@ -266,7 +271,8 @@ is $cookies->[0]->secure, '1', 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie roundtrip (RFC 6265, another alternative)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo="b ;a\" r\"\\\\"; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT;  Secure');
 is $cookies->[0]->name,    'foo',        'right name';
@@ -290,7 +296,8 @@ is $cookies->[0]->secure, '1', 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie roundtrip (RFC 6265, yet another alternative)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo="\"b a\" r\""; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure');
 is $cookies->[0]->name,    'foo',       'right name';
@@ -314,7 +321,8 @@ is $cookies->[0]->secure, '1', 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie without value (RFC 2965)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo=""; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure');
 is $cookies->[0]->name,    'foo',       'right name';
@@ -329,7 +337,8 @@ is $cookies->[0]->to_string,
   'foo=; Domain=kraih.com; Path=/test; Max-Age=60;'
   . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure', 'right result';
 is $cookies->[1], undef, 'no more cookies';
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo=; Version=1; Domain=kraih.com; Path=/test; Max-Age=60;'
     . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure');
 is $cookies->[0]->name,    'foo',       'right name';
@@ -357,7 +366,8 @@ is $cookie->to_string,
   'right format';
 
 # Parse response cookie with Max-Age 0 and expires 0 (RFC 6265)
-$cookies = Mojo::Cookie::Response->parse(
+$cookies
+  = Mojo::Cookie::Response->parse(
       'foo=bar; Domain=kraih.com; Path=/; Max-Age=0;'
     . ' expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure');
 is $cookies->[0]->name,    'foo',       'right name';

@@ -88,8 +88,8 @@ sub parse {
   my $tree    = ['root'];
   my $current = $tree;
   while ($html =~ m/\G$TOKEN_RE/gcs) {
-    my ($text, $pi, $comment, $cdata, $doctype, $tag) =
-      ($1, $2, $3, $4, $5, $6);
+    my ($text, $pi, $comment, $cdata, $doctype, $tag)
+      = ($1, $2, $3, $4, $5, $6);
 
     # Text
     if (length $text) {

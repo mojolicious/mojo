@@ -26,8 +26,8 @@ is_deeply [sort keys %{$command->get_all_data('Example::Package::UNIX')}],
 close $data;
 
 # Windows DATA templates
-my $windows =
-  "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
+my $windows
+  = "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
 open $data, '<', \$windows;
 no strict 'refs';
 *{"Example::Package::Windows::DATA"} = $data;

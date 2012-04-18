@@ -199,23 +199,23 @@ $array = $json->decode(b("\x{feff}[true]")->encode('UTF-32BE'));
 is_deeply $array, [$json->true], 'decode \x{feff}[true]';
 
 # Decode UTF-16LE without BOM
-$array =
-  $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16LE')->to_string);
+$array
+  = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16LE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Decode UTF-16BE without BOM
-$array =
-  $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16BE')->to_string);
+$array
+  = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-16BE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Decode UTF-32LE without BOM
-$array =
-  $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32LE')->to_string);
+$array
+  = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32LE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Decode UTF-32BE without BOM
-$array =
-  $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32BE')->to_string);
+$array
+  = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32BE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Complicated roudtrips

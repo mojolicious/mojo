@@ -65,8 +65,8 @@ sub get_header_chunk {
 
   unless (defined $self->{header_buffer}) {
     my $headers = $self->headers->to_string;
-    $self->{header_buffer} =
-      $headers ? "$headers\x0d\x0a\x0d\x0a" : "\x0d\x0a";
+    $self->{header_buffer}
+      = $headers ? "$headers\x0d\x0a\x0d\x0a" : "\x0d\x0a";
   }
 
   return substr $self->{header_buffer}, $offset, CHUNK_SIZE;

@@ -205,13 +205,13 @@ sub _listen {
       # Events
       $stream->on(
         timeout => sub {
-          $self->_error($id, 'Inactivity timeout.')
+          $self->_error($id => 'Inactivity timeout.')
             if $self->{connections}{$id}{tx};
         }
       );
       $stream->on(close => sub { $self->_close($id) });
-      $stream->on(error => sub { $self->_error($id, pop) });
-      $stream->on(read  => sub { $self->_read($id, pop) });
+      $stream->on(error => sub { $self->_error($id => pop) });
+      $stream->on(read  => sub { $self->_read($id => pop) });
     }
   );
   $self->{listening} ||= [];

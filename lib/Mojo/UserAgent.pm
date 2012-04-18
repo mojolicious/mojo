@@ -178,6 +178,41 @@ sub _cleanup {
   $loop->remove($_->[1]) for @{$self->{cache} || []};
 }
 
+sub _client {
+  my ($self, $scheme, $host, $port, $handle, $cb) = @_;
+
+  # Open connection
+  weaken $self;
+  my $id;
+  return $id = $self->_loop->client(
+    address       => $host,
+    handle        => $handle,
+    local_address => $self->local_address,
+    port          => $port,
+    timeout       => $self->connect_timeout,
+    tls           => $scheme eq 'https' ? 1 : 0,
+    tls_ca        => $self->ca,
+    tls_cert      => $self->cert,
+    tls_key       => $self->key,
+    sub {
+      my ($loop, $err, $stream) = @_;
+
+      # Connection error
+      return $self->_error($id, $err) if $err;
+
+      # Events
+      $stream->on(
+        timeout => sub { $self->_error($id => 'Inactivity timeout.') });
+      $stream->on(close => sub { $self->_handle($id => 1) });
+      $stream->on(error => sub { $self->_error($id, pop, 1) });
+      $stream->on(read => sub { $self->_read($id => pop) });
+
+      # Connection established
+      $cb->(@_);
+    }
+  );
+}
+
 sub _connect {
   my ($self, $tx, $cb) = @_;
 
@@ -200,25 +235,8 @@ sub _connect {
   warn "-- Connect ($scheme:$host:$port)\n" if DEBUG;
   ($scheme, $host, $port) = $self->transactor->peer($tx);
   weaken $self;
-  $id = $self->_loop->client(
-    address       => $host,
-    handle        => $id,
-    local_address => $self->local_address,
-    port          => $port,
-    timeout       => $self->connect_timeout,
-    tls           => $scheme eq 'https' ? 1 : 0,
-    tls_ca        => $self->ca,
-    tls_cert      => $self->cert,
-    tls_key       => $self->key,
-    sub {
-      my ($loop, $err, $stream) = @_;
-
-      # Events
-      return $self->_error($id, $err) if $err;
-      $self->_events($stream, $id);
-      $self->_connected($id);
-    }
-  );
+  $id = $self->_client(
+    ($scheme, $host, $port, $id) => sub { $self->_connected($id) });
   $self->{connections}{$id} = {cb => $cb, tx => $tx};
 
   return $id;
@@ -242,40 +260,20 @@ sub _connect_proxy {
       # Prevent proxy reassignment
       $old->req->proxy(0);
 
-      # TLS upgrade
-      if ($tx->req->url->scheme eq 'https') {
-        return unless my $id = $tx->connection;
-        my $loop   = $self->_loop;
-        my $handle = $loop->stream($id)->steal_handle;
-        my $c      = delete $self->{connections}{$id};
-        $loop->remove($id);
-        weaken $self;
-        $id = $loop->client(
-          address  => ($self->transactor->peer($old))[1],
-          handle   => $handle,
-          timeout  => $self->connect_timeout,
-          tls      => 1,
-          tls_ca   => $self->ca,
-          tls_cert => $self->cert,
-          tls_key  => $self->key,
-          sub {
-            my ($loop, $err, $stream) = @_;
-
-            # Events
-            return $self->_error($id, $err) if $err;
-            $self->_events($stream, $id);
-
-            # Start real transaction
-            $old->connection($id);
-            $self->_start($old, $cb);
-          }
-        );
-        return $self->{connections}{$id} = $c;
-      }
-
       # Start real transaction
-      $old->connection($tx->connection);
-      $self->_start($old, $cb);
+      return $self->_start($old->connection($tx->connection), $cb)
+        unless $tx->req->url->scheme eq 'https';
+
+      # TLS upgrade
+      return unless my $id = $tx->connection;
+      my $loop   = $self->_loop;
+      my $handle = $loop->stream($id)->steal_handle;
+      my $c      = delete $self->{connections}{$id};
+      $loop->remove($id);
+      weaken $self;
+      $id = $self->_client($self->transactor->endpoint($old),
+        $handle, sub { $self->_start($old->connection($id), $cb) });
+      return $self->{connections}{$id} = $c;
     }
   );
 }
@@ -304,16 +302,7 @@ sub _error {
   my ($self, $id, $err, $emit) = @_;
   if (my $tx = $self->{connections}{$id}{tx}) { $tx->res->error($err) }
   $self->emit(error => $err) if $emit;
-  $self->_handle($id, $err);
-}
-
-sub _events {
-  my ($self, $stream, $id) = @_;
-  weaken $self;
-  $stream->on(timeout => sub { $self->_error($id, 'Inactivity timeout.') });
-  $stream->on(close => sub { $self->_handle($id, 1) });
-  $stream->on(error => sub { $self->_error($id, pop, 1) });
-  $stream->on(read => sub { $self->_read($id, pop) });
+  $self->_handle($id => $err);
 }
 
 sub _finish {
@@ -487,7 +476,7 @@ sub _start {
     weaken $self;
     my $loop = $self->_loop;
     $self->{connections}{$id}{timeout} =
-      $loop->timer($t => sub { $self->_error($id, 'Request timeout.') });
+      $loop->timer($t => sub { $self->_error($id => 'Request timeout.') });
   }
 
   return $id;

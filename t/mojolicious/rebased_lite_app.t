@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 22;
+use Test::More tests => 24;
 
 # "For example, if you killed your grandfather, you'd cease to exist!
 #  But existing is basically all I do!"
@@ -73,8 +73,11 @@ foo
 EOF
 
 # GET /bar
+ok !$t->ua->cookie_jar->find($t->ua->app_url->path('/foo')),
+  'no session cookie';
 $t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')
   ->header_is(Location => 'http://kraih.com/rebased/foo');
+ok $t->ua->cookie_jar->find($t->ua->app_url->path('/foo')), 'session cookie';
 
 # GET /foo (with flash message)
 $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);

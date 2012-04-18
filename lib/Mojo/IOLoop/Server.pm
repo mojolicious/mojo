@@ -133,9 +133,9 @@ sub listen {
 
   # Options
   my $options = $self->{tls} = {
-    SSL_startHandshake => 0,
-    SSL_cert_file      => $args->{tls_cert} || $self->_cert_file,
-    SSL_key_file       => $args->{tls_key} || $self->_key_file,
+    SSL_cert_file => $args->{tls_cert} || $self->_cert_file,
+    SSL_key_file  => $args->{tls_key}  || $self->_key_file,
+    SSL_startHandshake => 0
   };
   %$options = (
     %$options,

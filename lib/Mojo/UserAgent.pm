@@ -202,9 +202,9 @@ sub _connect {
   weaken $self;
   $id = $self->_loop->client(
     address       => $host,
-    port          => $port,
     handle        => $id,
     local_address => $self->local_address,
+    port          => $port,
     timeout       => $self->connect_timeout,
     tls           => $scheme eq 'https' ? 1 : 0,
     tls_ca        => $self->ca,
@@ -251,6 +251,7 @@ sub _connect_proxy {
         $loop->remove($id);
         weaken $self;
         $id = $loop->client(
+          address  => ($self->transactor->peer($old))[1],
           handle   => $handle,
           timeout  => $self->connect_timeout,
           tls      => 1,

@@ -222,8 +222,8 @@ sub _listen {
     my $name = $options->{address} || Sys::Hostname::hostname();
     $p->publish(
       name => "Mojolicious ($name:$options->{port})",
-      type => '_http._tcp',
-      port => $options->{port}
+      port => $options->{port},
+      type => '_http._tcp'
     ) if $options->{port} && !$tls;
   }
 

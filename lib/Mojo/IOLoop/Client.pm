@@ -85,17 +85,17 @@ sub _connect {
 
     # Upgrade
     my %options = (
-      SSL_startHandshake => 0,
-      SSL_error_trap     => sub {
+      SSL_ca_file => $args->{tls_ca}
+        && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+      SSL_cert_file  => $args->{tls_cert},
+      SSL_error_trap => sub {
         $self->_cleanup;
         $self->emit_safe(error => $_[1]);
       },
-      SSL_hostname  => $args->{address},
-      SSL_cert_file => $args->{tls_cert},
-      SSL_key_file  => $args->{tls_key},
-      SSL_ca_file   => $args->{tls_ca}
-        && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-      SSL_verify_mode => $args->{tls_ca} ? 0x01 : 0x00
+      SSL_hostname       => $args->{address},
+      SSL_key_file       => $args->{tls_key},
+      SSL_startHandshake => 0,
+      SSL_verify_mode    => $args->{tls_ca} ? 0x01 : 0x00
     );
     $self->{tls} = 1;
     return $self->emit_safe(error => 'TLS upgrade failed.')

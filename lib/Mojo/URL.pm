@@ -124,8 +124,7 @@ sub path {
       $path = $self->{path} || Mojo::Path->new;
       pop @{$path->parts} unless $path->trailing_slash;
       push @{$path->parts}, @{$new->parts};
-      $path->leading_slash(1);
-      $path->trailing_slash($new->trailing_slash);
+      $path->leading_slash(1)->trailing_slash($new->trailing_slash);
     }
   }
   $self->{path} = $path;
@@ -186,14 +185,13 @@ sub to_abs {
       $abs->path($base_path->clone)->path->trailing_slash(0)->canonicalize;
 
     # Query
-    return $abs if length($abs->query->to_string);
+    return $abs if length $abs->query->to_string;
     $abs->query($base->query->clone);
   }
 
   # Merge paths
   else {
-    my $new = $base_path->clone;
-    $new->leading_slash(1);
+    my $new = $base_path->clone->leading_slash(1);
 
     # Characters after the right-most '/' need to go
     pop @{$new->parts} if @{$path->parts} && !$new->trailing_slash;
@@ -210,23 +208,22 @@ sub to_rel {
   my $base = shift || $self->base->clone;
 
   # Scheme and authority
-  my $rel = $self->clone->base($base);
-  $rel->scheme(undef);
+  my $rel = $self->clone->base($base)->scheme(undef);
   $rel->userinfo(undef)->host(undef)->port(undef) if $base->authority;
 
   # Path
-  my @rel_parts  = @{$rel->path->parts};
+  my @parts      = @{$rel->path->parts};
   my $base_path  = $base->path;
   my @base_parts = @{$base_path->parts};
   pop @base_parts unless $base_path->trailing_slash;
-  while (@rel_parts && @base_parts && $rel_parts[0] eq $base_parts[0]) {
-    shift @rel_parts;
+  while (@parts && @base_parts && $parts[0] eq $base_parts[0]) {
+    shift @parts;
     shift @base_parts;
   }
-  my $rel_path = $rel->path(Mojo::Path->new)->path;
-  $rel_path->leading_slash(1) if $rel->authority;
-  $rel_path->parts([('..') x @base_parts, @rel_parts]);
-  $rel_path->trailing_slash(1) if $self->path->trailing_slash;
+  my $path = $rel->path(Mojo::Path->new)->path;
+  $path->leading_slash(1) if $rel->authority;
+  $path->parts([('..') x @base_parts, @parts]);
+  $path->trailing_slash(1) if $self->path->trailing_slash;
 
   return $rel;
 }

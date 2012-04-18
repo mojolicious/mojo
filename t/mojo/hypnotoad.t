@@ -6,7 +6,11 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
+# "I ate the blue ones... they taste like burning."
 use Test::More;
+plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
+  unless $ENV{TEST_HYPNOTOAD};
+plan tests => 50;
 
 use Cwd 'cwd';
 use File::Temp;
@@ -15,11 +19,6 @@ use IO::Socket::INET;
 use Mojo::Command;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
-
-# "I ate the blue ones... they taste like burning."
-plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
-  unless $ENV{TEST_HYPNOTOAD};
-plan tests => 50;
 
 # Prepare script
 my $cwd = cwd;

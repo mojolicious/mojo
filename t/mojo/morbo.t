@@ -7,7 +7,6 @@ BEGIN {
 }
 
 use Test::More;
-
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
 plan tests => 26;

@@ -90,6 +90,7 @@ sub _connect {
         $self->_cleanup;
         $self->emit_safe(error => $_[1]);
       },
+      SSL_hostname  => $args->{address},
       SSL_cert_file => $args->{tls_cert},
       SSL_key_file  => $args->{tls_key},
       SSL_ca_file   => $args->{tls_ca}

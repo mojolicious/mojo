@@ -1,12 +1,12 @@
 use Mojo::Base -strict;
 
-# Disable Bonjour, IPv6 and libev
+# Disable Bonjour, IPv6, TLS and libev
 BEGIN {
-  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_NO_TLS} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 81;
+use Test::More tests => 82;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -131,8 +131,12 @@ app->log->level('fatal');
 app->log->on(message => $message);
 like $err, qr/error event works/, 'right error';
 
+# GET / (HTTPS request without TLS support)
+my $tx = $ua->get($ua->app_url->scheme('https'));
+like $tx->error, qr/IO::Socket::SSL/, 'right error';
+
 # GET / (blocking)
-my $tx = $ua->get('/');
+$tx = $ua->get('/');
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';

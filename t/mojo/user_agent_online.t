@@ -1,16 +1,17 @@
 use Mojo::Base -strict;
 
-# Disable libev and TLS
+# Disable libev and proxy detection
 BEGIN {
-  $ENV{MOJO_NO_TLS}  = 1;
   $ENV{MOJO_PROXY}   = 0;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
 use Test::More;
-
+use Mojo::IOLoop::Server;
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
+plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
+  unless Mojo::IOLoop::Server::TLS;
 plan tests => 106;
 
 # "So then I said to the cop, "No, you're driving under the influence...
@@ -158,9 +159,9 @@ is $tx->req->method, 'GET',             'right method';
 is $tx->req->url,    'http://cpan.org', 'right url';
 is $tx->res->code,   301,               'right status';
 
-# HTTPS request without TLS support
-$tx = $ua->get('https://www.google.com');
-ok !!$tx->error, 'request failed';
+# HTTPS request that requires SNI
+$tx = $ua->get('https://sni.velox.ch/');
+like $tx->res->body, qr/Great!/, 'right response';
 
 # Simple request with body
 $tx = $ua->get('http://mojolicio.us' => 'Hi there!');

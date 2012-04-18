@@ -88,7 +88,7 @@ sub match {
 
     # Reset
     $self->{path} = $path;
-    if   ($r->parent) { $self->stack([@$snapshot]) }
+    if   ($r->parent) { $self->captures($captures)->stack([@$snapshot]) }
     else              { $self->captures({})->stack([]) }
   }
 

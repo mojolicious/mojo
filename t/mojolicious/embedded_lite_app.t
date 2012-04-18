@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 123;
+use Test::More tests => 129;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -316,6 +316,14 @@ $t->get_ok('/♥/123/host' => {Host => 'www.foo-bar.de'})->status_is(200)
 # GET /♥/123/echo (full external application with a bit of everything)
 $t->get_ok('/♥/123/echo' => {Host => 'www.foo-bar.de'})->status_is(200)
   ->content_is('echo: works 3!');
+
+# GET /♥/123/hello (full external application with a bit of everything)
+$t->get_ok('/♥/123/hello' => {Host => 'www.foo-bar.de'})->status_is(200)
+  ->content_is("Oneone\n");
+
+# GET /♥/123/hello/world (full external application with a bit of everything)
+$t->get_ok('/♥/123/hello/world' => {Host => 'www.foo-bar.de'})
+  ->status_is(200)->content_is("Two\n");
 
 __DATA__
 

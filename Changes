@@ -1,8 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.83  2012-04-17
+2.83  2012-04-18
   - Improved documentation.
   - Fixed bug that prevented conditions to work in embedded applications.
+  - Fixed bug that changed default values in embedded applications.
   - Fixed small bug in cpanify command.
 
 2.82  2012-04-16

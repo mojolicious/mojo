@@ -178,7 +178,7 @@ sub _cleanup {
   $loop->remove($_->[1]) for @{$self->{cache} || []};
 }
 
-sub _client {
+sub _connect {
   my ($self, $scheme, $host, $port, $handle, $cb) = @_;
 
   # Open connection
@@ -208,38 +208,9 @@ sub _client {
       $stream->on(read => sub { $self->_read($id => pop) });
 
       # Connection established
-      $cb->(@_);
+      $cb->();
     }
   );
-}
-
-sub _connect {
-  my ($self, $tx, $cb) = @_;
-
-  # Reuse connection
-  my $id = $tx->connection;
-  my ($scheme, $host, $port) = $self->transactor->endpoint($tx);
-  $id ||= $self->_cache("$scheme:$host:$port");
-  if ($id && !ref $id) {
-    warn "-- Reusing connection ($scheme:$host:$port)\n" if DEBUG;
-    $self->{connections}{$id} = {cb => $cb, tx => $tx};
-    $tx->kept_alive(1) unless $tx->connection;
-    $self->_connected($id);
-    return $id;
-  }
-
-  # CONNECT request to proxy required
-  return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
-
-  # Connect
-  warn "-- Connect ($scheme:$host:$port)\n" if DEBUG;
-  ($scheme, $host, $port) = $self->transactor->peer($tx);
-  weaken $self;
-  $id = $self->_client(
-    ($scheme, $host, $port, $id) => sub { $self->_connected($id) });
-  $self->{connections}{$id} = {cb => $cb, tx => $tx};
-
-  return $id;
 }
 
 sub _connect_proxy {
@@ -271,9 +242,9 @@ sub _connect_proxy {
       my $c      = delete $self->{connections}{$id};
       $loop->remove($id);
       weaken $self;
-      $id = $self->_client($self->transactor->endpoint($old),
+      $id = $self->_connect($self->transactor->endpoint($old),
         $handle, sub { $self->_start($old->connection($id), $cb) });
-      return $self->{connections}{$id} = $c;
+      $self->{connections}{$id} = $c;
     }
   );
 }
@@ -296,6 +267,35 @@ sub _connected {
   weaken $self;
   $tx->on(resume => sub { $self->_write($id) });
   $self->_write($id);
+}
+
+sub _connection {
+  my ($self, $tx, $cb) = @_;
+
+  # Reuse connection
+  my $id = $tx->connection;
+  my ($scheme, $host, $port) = $self->transactor->endpoint($tx);
+  $id ||= $self->_cache("$scheme:$host:$port");
+  if ($id && !ref $id) {
+    warn "-- Reusing connection ($scheme:$host:$port)\n" if DEBUG;
+    $self->{connections}{$id} = {cb => $cb, tx => $tx};
+    $tx->kept_alive(1) unless $tx->connection;
+    $self->_connected($id);
+    return $id;
+  }
+
+  # CONNECT request to proxy required
+  return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
+
+  # Connect
+  warn "-- Connect ($scheme:$host:$port)\n" if DEBUG;
+  ($scheme, $host, $port) = $self->transactor->peer($tx);
+  weaken $self;
+  $id = $self->_connect(
+    ($scheme, $host, $port, $id) => sub { $self->_connected($id) });
+  $self->{connections}{$id} = {cb => $cb, tx => $tx};
+
+  return $id;
 }
 
 sub _error {
@@ -467,9 +467,8 @@ sub _start {
   # Inject cookies
   if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
-  # Connect
-  $self->emit(start => $tx);
-  return unless my $id = $self->_connect($tx, $cb);
+  # Connection
+  return unless my $id = $self->emit(start => $tx)->_connection($tx, $cb);
 
   # Request timeout
   if (my $t = $self->request_timeout) {

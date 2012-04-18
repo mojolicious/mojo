@@ -128,8 +128,7 @@ sub parse {
   # Chunked or relaxed content
   if ($self->is_chunked || $self->relaxed) {
     $self->{size} += length($self->{buffer} //= '');
-    $self->emit(read => $self->{buffer});
-    $self->{buffer} = '';
+    $self->emit(read => $self->{buffer})->{buffer} = '';
   }
 
   # Normal content

@@ -53,11 +53,11 @@ get '/host' => (message => 'it works!') => sub {
   $self->render(text => $self->url_for->base->host);
 };
 
-# GET /hello
-get '/hello' => {inline => 'One<%= param "test" || "" %>', test => 'one'};
+# GET /one
+get '/one' => sub { shift->render_text('One') };
 
-# GET /hello/world
-get '/hello/world' => {inline => 'Two<%= param "test" || "" %>'};
+# GET /one/two
+get '/one/two' => {text => 'Two'};
 
 app->start;
 __DATA__

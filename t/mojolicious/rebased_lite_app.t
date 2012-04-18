@@ -38,7 +38,7 @@ get '/foo';
 # GET /bar
 get '/bar' => sub {
   my $self = shift;
-  $self->flash(just => 'works!');
+  $self->flash(just => 'works!')->flash({works => 'too!'});
   $self->redirect_to($self->url_for('foo'));
 };
 
@@ -78,7 +78,7 @@ $t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')
 
 # GET /foo (with flash message)
 $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
-<base href="http://kraih.com/rebased/" />works!
+<base href="http://kraih.com/rebased/" />works!too!
 <link href="/rebased/b.css" media="test" rel="stylesheet" type="text/css" />
 <img alt="Test" src="/rebased/images/test.png" />
 http://kraih.com/rebased
@@ -116,7 +116,7 @@ __DATA__
 % }
 
 @@ foo.html.ep
-<%= base_tag %><%= flash 'just' || '' %>
+<%= base_tag %><%= flash 'just' || '' %><%= flash 'works' || '' %>
 %= stylesheet '/b.css', media => 'test'
 %= image '/images/test.png', alt => 'Test'
 %= url_for('root')->to_abs

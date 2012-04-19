@@ -266,8 +266,8 @@ Emitted when a new L<Mojo::Content::Single> part starts.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Content::MultiPart> inherits all attributes from L<Mojo::Content>
-and implements the following new ones.
+L<Mojo::Content::MultiPart> inherits all attributes from L<Mojo::Content> and
+implements the following new ones.
 
 =head2 C<parts>
 

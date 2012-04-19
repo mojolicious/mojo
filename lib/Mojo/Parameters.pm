@@ -239,8 +239,8 @@ Separator for parameter pairs, defaults to C<&>.
 
 =head1 METHODS
 
-L<Mojo::Parameters> inherits all methods from L<Mojo::Base> and implements
-the following new ones.
+L<Mojo::Parameters> inherits all methods from L<Mojo::Base> and implements the
+following new ones.
 
 =head2 C<new>
 

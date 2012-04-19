@@ -226,8 +226,8 @@ sub _detect_handler {
 
   # DATA templates
   unless ($self->{data}) {
-    my @templates = map { sort keys %{Mojo::Command->get_all_data($_)} }
-      @{$self->classes};
+    my @templates
+      = map { sort keys %{Mojo::Command->get_all_data($_)} } @{$self->classes};
     s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
   }
   return $self->{data}{$file} if exists $self->{data}{$file};
@@ -393,8 +393,8 @@ Get a DATA template by name, usually used by handlers.
   });
 
 Render output through one of the Mojo renderers. This renderer requires some
-configuration, at the very least you will need to have a default C<format>
-and a default C<handler> as well as a C<template> or C<text>/C<json>. See
+configuration, at the very least you will need to have a default C<format> and
+a default C<handler> as well as a C<template> or C<text>/C<json>. See
 L<Mojolicious::Controller/"render"> for a more user-friendly interface.
 
 =head2 C<template_name>

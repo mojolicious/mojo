@@ -143,11 +143,8 @@ sub listen {
 }
 
 sub generate_port {
-  IO::Socket::INET->new(
-    Listen    => 5,
-    LocalAddr => '127.0.0.1',
-    Proto     => 'tcp'
-  )->sockport;
+  IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1', Proto => 'tcp')
+    ->sockport;
 }
 
 sub start {

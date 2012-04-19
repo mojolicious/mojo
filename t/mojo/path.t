@@ -22,8 +22,7 @@ ok !$path->leading_slash, 'no leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 
 # Unicode
-is $path->parse('/foo/♥/bar')->to_string, '/foo/%E2%99%A5/bar',
-  'right path';
+is $path->parse('/foo/♥/bar')->to_string, '/foo/%E2%99%A5/bar', 'right path';
 is $path->parts->[0], 'foo', 'right part';
 is $path->parts->[1], '♥', 'right part';
 is $path->parts->[2], 'bar', 'right part';

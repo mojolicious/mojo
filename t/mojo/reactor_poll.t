@@ -49,8 +49,7 @@ ok !$writable, 'handle is not writable';
 ok !$reactor->is_readable($listen), 'handle is not readable';
 
 # Connect
-my $client
-  = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
+my $client = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $reactor->timer(1 => sub { shift->stop });
 $reactor->start;
 ok $readable, 'handle is readable';
@@ -207,8 +206,7 @@ is(Mojo::Reactor->detect, 'Mojo::Reactor::Test', 'right class');
 
 # Reactor in control
 $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
-is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor::Poll',
-  'right object';
+is ref Mojo::IOLoop->singleton->reactor, 'Mojo::Reactor::Poll', 'right object';
 ok !Mojo::IOLoop->is_running, 'loop is not running';
 $port = Mojo::IOLoop->generate_port;
 my ($server_err, $server_running, $client_err, $client_running);

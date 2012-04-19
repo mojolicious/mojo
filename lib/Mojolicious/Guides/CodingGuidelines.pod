@@ -5,8 +5,8 @@ Mojolicious::Guides::CodingGuidelines - Coding guidelines
 
 =head1 OVERVIEW
 
-This document describes the coding guidelines that are the foundations
-of L<Mojo> and L<Mojolicious> development.
+This document describes the coding guidelines that are the foundations of
+L<Mojo> and L<Mojolicious> development.
 
 Please do not send patches unless you agree with them.
 
@@ -19,9 +19,9 @@ applications and higher level web frameworks such as L<Mojolicious>.
 All components should be reusable in other projects and in a UNIXish way
 only loosely coupled.
 
-Especially for people new to Perl it should be as easy as possible to
-install Mojolicious and get started. Writing web applications can be one of
-the most fun ways to learn a language!
+Especially for people new to Perl it should be as easy as possible to install
+Mojolicious and get started. Writing web applications can be one of the most
+fun ways to learn a language!
 
 For developers of other web frameworks it should be possible to reuse all the
 infrastructure and just consider the higher levels of the L<Mojolicious>
@@ -57,8 +57,8 @@ A feature is only needed when the majority of the userbase benefits from it.
 Features may only be changed in a major release or after being deprecated for
 at least 3 months.
 
-Refactoring and deprecations should be avoided if no important feature
-depends on it.
+Refactoring and deprecations should be avoided if no important feature depends
+on it.
 
 New features can be marked as experimental to be excluded from deprecation
 policies.
@@ -79,10 +79,10 @@ of text. (An example for every one or two sentences is a good rule of thumb)
 
 Everything should be ordered alphabetically if possible.
 
-The master source code repository should always be kept in a stable state,
-use feature branches for actual development.
+The master source code repository should always be kept in a stable state, use
+feature branches for actual development.
 
-Lines should not be longer than 78 characters and we indent with 2
+Lines should not be longer than 79 characters and we indent with 2
 whitespaces.
 
 Code should be run through L<Perl::Tidy> with the included C<.perltidyrc>.

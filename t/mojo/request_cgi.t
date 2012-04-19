@@ -190,8 +190,7 @@ is $req->param('login'),    'test', 'right value';
 is $req->param('password'), '111',  'right value';
 is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
   'right value';
-is $req->url->to_abs->to_string, 'http://test1/index.pl',
-  'right absolute URL';
+is $req->url->to_abs->to_string, 'http://test1/index.pl', 'right absolute URL';
 
 # Parse Apache 2.2 (win32) like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
@@ -224,8 +223,7 @@ is $req->param('login'),    'test', 'right value';
 is $req->param('password'), '111',  'right value';
 is $req->param('edition'), 'db6d8b30-16df-4ecd-be2f-c8194f94e1f4',
   'right value';
-is $req->url->to_abs->to_string, 'http://test1/index.pl',
-  'right absolute URL';
+is $req->url->to_abs->to_string, 'http://test1/index.pl', 'right absolute URL';
 
 # Parse Apache 2.2.14 like CGI environment variables and a body (root)
 $req = Mojo::Message::Request->new;

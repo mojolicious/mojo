@@ -146,8 +146,8 @@ Activate non parsed header mode.
 
 =head1 METHODS
 
-L<Mojo::Server::CGI> inherits all methods from L<Mojo::Server> and
-implements the following new ones.
+L<Mojo::Server::CGI> inherits all methods from L<Mojo::Server> and implements
+the following new ones.
 
 =head2 C<run>
 

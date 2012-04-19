@@ -143,8 +143,7 @@ $auth->bridge->to('album#allow')->route('/album/create/')->to('album#create');
 $auth->route('/gift/')->to('gift#index')->name('gift');
 
 # /regex/alternatives/*
-$r->route('/regex/alternatives/:alternatives',
-  alternatives => qr/foo|bar|baz/)
+$r->route('/regex/alternatives/:alternatives', alternatives => qr/foo|bar|baz/)
   ->to(controller => 'regex', action => 'alternatives');
 
 # /versioned/1.0/test
@@ -189,8 +188,7 @@ is @{$m->stack}, 1, 'right number of elements';
 # Introspect
 is $r->find('very_clean')->to_string, '/clean', 'right pattern';
 is $r->find('0')->to_string,          '/0',     'right pattern';
-is $r->find('test_edit')->to_string, '/:controller/test/edit',
-  'right pattern';
+is $r->find('test_edit')->to_string, '/:controller/test/edit', 'right pattern';
 is $r->find('articles_delete')->to_string, '/articles/:id/delete',
   'right pattern';
 is $r->find('nodetect')->pattern->reqs->{format}, 0, 'right value';
@@ -255,8 +253,8 @@ $m = Mojolicious::Routes::Match->new(GET => '/alternatives3/foo')->match($r);
 is $m->stack->[0]{foo}, 'foo', 'right value';
 is @{$m->stack}, 1, 'right number of elements';
 is $m->path_for, '/alternatives3/foo', 'right path';
-$m = Mojolicious::Routes::Match->new(GET => '/alternatives3/foobar')
-  ->match($r);
+$m
+  = Mojolicious::Routes::Match->new(GET => '/alternatives3/foobar')->match($r);
 is $m->stack->[0]{foo}, 'foobar', 'right value';
 is @{$m->stack}, 1, 'right number of elements';
 is $m->path_for, '/alternatives3/foobar', 'right path';

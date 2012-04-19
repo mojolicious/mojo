@@ -144,8 +144,7 @@ new ones.
   my $app = Mojo->new;
 
 Construct a new L<Mojo> application. Will automatically detect your home
-directory and set up logging to C<log/mojo.log> if there's a C<log>
-directory.
+directory and set up logging to C<log/mojo.log> if there's a C<log> directory.
 
 =head2 C<build_tx>
 
@@ -174,8 +173,8 @@ Application configuration.
 
 The handler is the main entry point to your application or framework and will
 be called for each new transaction, which will usually be a
-L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Meant
-to be overloaded in a subclass.
+L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Meant to
+be overloaded in a subclass.
 
   sub handler {
     my ($self, $tx) = @_;

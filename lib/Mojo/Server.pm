@@ -128,8 +128,8 @@ C<MOJO_APP> environment variable or L<Mojo::HelloWorld>.
 
 =head1 METHODS
 
-L<Mojo::Server> inherits all methods from L<Mojo::EventEmitter> and
-implements the following new ones.
+L<Mojo::Server> inherits all methods from L<Mojo::EventEmitter> and implements
+the following new ones.
 
 =head2 C<new>
 

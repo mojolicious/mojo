@@ -113,14 +113,14 @@ automatically upgrade to a L<Mojo::Asset::File> object.
   my $size = $mem->max_memory_size;
   $mem     = $mem->max_memory_size(1024);
 
-Maximum size in bytes of data to keep in memory before automatically
-upgrading to a L<Mojo::Asset::File> object, defaults to the value of the
+Maximum size in bytes of data to keep in memory before automatically upgrading
+to a L<Mojo::Asset::File> object, defaults to the value of the
 C<MOJO_MAX_MEMORY_SIZE> environment variable or C<262144>.
 
 =head1 METHODS
 
-L<Mojo::Asset::Memory> inherits all methods from L<Mojo::Asset> and
-implements the following new ones.
+L<Mojo::Asset::Memory> inherits all methods from L<Mojo::Asset> and implements
+the following new ones.
 
 =head2 C<new>
 

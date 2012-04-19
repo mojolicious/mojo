@@ -458,8 +458,8 @@ value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>.
   my $relaxed = $content->relaxed;
   $content    = $content->relaxed(1);
 
-Activate relaxed parsing for HTTP 0.9 and responses that are terminated with
-a connection close.
+Activate relaxed parsing for HTTP 0.9 and responses that are terminated with a
+connection close.
 
 =head1 METHODS
 

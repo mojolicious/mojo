@@ -261,19 +261,16 @@ is $json->error, 'Malformed JSON: Missing low-surrogate at line 1, offset 8.',
   'right error';
 is $json->decode(b("\x{feff}[\"\\udf46\"]")->encode('UTF-16LE')), undef,
   'missing low surrogate';
-is $json->error,
-  'Malformed JSON: Missing high-surrogate at line 1, offset 8.',
+is $json->error, 'Malformed JSON: Missing high-surrogate at line 1, offset 8.',
   'right error';
 is $json->decode('[[]'), undef, 'missing right square bracket';
-is $json->error,
-  'Malformed JSON: Expected comma or right square bracket while'
+is $json->error, 'Malformed JSON: Expected comma or right square bracket while'
   . ' parsing array at line 1, offset 3.', 'right error';
 is $json->decode('{{}'), undef, 'missing right curly bracket';
 is $json->error, 'Malformed JSON: Expected string while'
   . ' parsing object at line 1, offset 1.', 'right error';
 is $json->decode('[[]...'), undef, 'syntax error';
-is $json->error,
-  'Malformed JSON: Expected comma or right square bracket while'
+is $json->error, 'Malformed JSON: Expected comma or right square bracket while'
   . ' parsing array at line 1, offset 3.', 'right error';
 is $json->decode('{{}...'), undef, 'syntax error';
 is $json->error, 'Malformed JSON: Expected string while'

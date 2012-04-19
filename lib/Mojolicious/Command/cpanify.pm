@@ -72,8 +72,8 @@ L<Mojolicious::Command::cpanify> uploads files to CPAN.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::cpanify> inherits all attributes from
-L<Mojo::Command> and implements the following new ones.
+L<Mojolicious::Command::cpanify> inherits all attributes from L<Mojo::Command>
+and implements the following new ones.
 
 =head2 C<description>
 

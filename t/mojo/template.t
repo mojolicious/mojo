@@ -95,8 +95,7 @@ is $output, "<%= 1 + 1 %>\n", 'expression tag has been replaced';
 # Replace expression tag (alternative)
 $mt     = Mojo::Template->new;
 $output = $mt->render(' lalala <%%= 1 + 1 %> 1234 ');
-is $output, " lalala <%= 1 + 1 %> 1234 \n",
-  'expression tag has been replaced';
+is $output, " lalala <%= 1 + 1 %> 1234 \n", 'expression tag has been replaced';
 
 # Replace expression tag (another alternative)
 $mt     = Mojo::Template->new;
@@ -858,8 +857,7 @@ $output = $mt->render(<<'EOF', 23);
 EOF
 is $output, "23\nsomething\nelse\n23\n", 'prepending code';
 $mt = Mojo::Template->new;
-$mt->prepend(
-  q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);
+$mt->prepend(q/{no warnings 'redefine'; no strict 'refs'; *foo = sub { 23 }}/);
 $output = $mt->render('<%= foo() %>');
 is $output, "23\n", 'right result';
 $output = $mt->render('%= foo()');

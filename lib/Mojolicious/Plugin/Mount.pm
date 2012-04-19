@@ -61,8 +61,8 @@ learning to build new plugins.
 
 =head1 METHODS
 
-L<Mojolicious::Plugin::Mount> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+L<Mojolicious::Plugin::Mount> inherits all methods from L<Mojolicious::Plugin>
+and implements the following new ones.
 
 =head2 C<register>
 

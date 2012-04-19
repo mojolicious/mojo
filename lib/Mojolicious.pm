@@ -468,8 +468,8 @@ parsed.
   });
 
 This is a very powerful hook and should not be used lightly, it makes some
-rather advanced features such as upload progress bars possible, just note
-that it will not work for embedded applications. (Passed the transaction and
+rather advanced features such as upload progress bars possible, just note that
+it will not work for embedded applications. (Passed the transaction and
 application object)
 
 =item B<before_dispatch>
@@ -513,8 +513,8 @@ object)
 =item B<around_dispatch>
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
-dispatch process, so you have to manually forward to the next hook if you
-want to continue the chain. Default exception handling with
+dispatch process, so you have to manually forward to the next hook if you want
+to continue the chain. Default exception handling with
 L<Mojolicious::Controller/"render_exception"> is the first hook in the chain
 and a call to C<dispatch> the last, yours will be in between.
 
@@ -632,10 +632,10 @@ startup. Meant to be overloaded in a subclass.
 
 In addition to the attributes and methods above you can also call helpers on
 L<Mojolicious> objects. This includes all helpers from
-L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers>. Note that application helpers are always
-called with a new C<controller_class> object, so they can't depend on or
-change controller state, which includes request, response and stash.
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
+Note that application helpers are always called with a new C<controller_class>
+object, so they can't depend on or change controller state, which includes
+request, response and stash.
 
   $app->log->debug($app->dumper({foo => 'bar'}));
 
@@ -686,8 +686,8 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 
 =head1 CODE NAMES
 
-Every major release of L<Mojolicious> has a code name, these are the ones
-that have been used in the past.
+Every major release of L<Mojolicious> has a code name, these are the ones that
+have been used in the past.
 
 2.0, C<Leaf Fluttering In Wind> (u1F343)
 

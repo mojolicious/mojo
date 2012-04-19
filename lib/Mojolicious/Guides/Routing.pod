@@ -22,9 +22,8 @@ requests with code generating the appropriate response.
   GET /user/show/1 -> $self->render(text => 'Sebastian');
 
 This black box is usually called a dispatcher. There are many implementations
-using different strategies to establish these connections, but pretty much
-all are based around mapping the requests path to some kind of response
-generator.
+using different strategies to establish these connections, but pretty much all
+are based around mapping the requests path to some kind of response generator.
 
   /user/show/1 -> $self->render(text => 'Sebastian');
   /user/show/2 -> $self->render(text => 'Sara');
@@ -69,9 +68,9 @@ placeholder values are turned into a hash.
   /user/show/23 -> /user/:action/:id -> {action => 'show', id => 23}
 
 This hash is basically the center of every L<Mojolicious> application, you
-will learn more about this later on. Internally routes get compiled to
-regular expressions, so you can get the best of both worlds with a little bit
-of experience.
+will learn more about this later on. Internally routes get compiled to regular
+expressions, so you can get the best of both worlds with a little bit of
+experience.
 
   /user/show/:id -> qr/(?-xism:^\/user\/show/([^\/\.]+))/
 
@@ -90,8 +89,8 @@ any time.
 
 =head2 Generic placeholders
 
-Generic placeholders are the simplest form of placeholders and match
-all characters except C</> and C<.>.
+Generic placeholders are the simplest form of placeholders and match all
+characters except C</> and C<.>.
 
   /hello              -> /:name/hello -> undef
   /sebastian/23/hello -> /:name/hello -> undef
@@ -100,8 +99,8 @@ all characters except C</> and C<.>.
   /sebastian23/hello  -> /:name/hello -> {name => 'sebastian23'}
   /sebastian 23/hello -> /:name/hello -> {name => 'sebastian 23'}
 
-A generic placeholder can be surrounded by parentheses to separate it from
-the surrounding text.
+A generic placeholder can be surrounded by parentheses to separate it from the
+surrounding text.
 
   /hello             -> /(:name)hello -> undef
   /sebastian/23hello -> /(:name)hello -> undef
@@ -203,8 +202,8 @@ response has been generated.
 
 There are a few stash values with special meaning, such as C<controller> and
 C<action>, but you can generally fill it with whatever data you need to
-generate a response. Once dispatched the whole stash content can be changed
-at any time.
+generate a response. Once dispatched the whole stash content can be changed at
+any time.
 
   sub bye {
     my $self = shift;
@@ -248,8 +247,8 @@ old ones.
 When the dispatcher sees C<controller> and C<action> values in the stash it
 will always try to turn them into a class and method to dispatch to. The
 C<controller> value gets camelized using L<Mojo::Util/"camelize"> and
-prefixed with a C<namespace> (defaulting to the applications class). While
-the action value is not changed at all, because of this both values are case
+prefixed with a C<namespace> (defaulting to the applications class). While the
+action value is not changed at all, because of this both values are case
 sensitive.
 
   # Application
@@ -347,8 +346,8 @@ becomes optional.
   $r->route('/:mymessage')
     ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
 
-This is also the case if multiple placeholders are right after another and
-not separated by other characters than C</>.
+This is also the case if multiple placeholders are right after another and not
+separated by other characters than C</>.
 
   # /           -> {controller => 'foo',   action => 'bar'}
   # /users      -> {controller => 'users', action => 'bar'}
@@ -370,8 +369,8 @@ just make a list of possible values.
   $r->route('/:name', name => ['bender', 'leela'])
     ->to(controller => 'foo', action => 'bar');
 
-You can also adjust the regular expressions behind placeholders to better
-suit your needs. Just make sure not to use C<^> and C<$> or capturing groups
+You can also adjust the regular expressions behind placeholders to better suit
+your needs. Just make sure not to use C<^> and C<$> or capturing groups
 C<(...)>, because placeholders become part of a larger regular expression
 internally, C<(?:...)> is fine though.
 
@@ -499,8 +498,8 @@ cycles.
   my $foo = $r->bridge('/foo')->to(controller => 'foo', action => 'baz');
   $foo->route('/bar')->to(action => 'bar');
 
-The actual bridge code needs to return a true value or the dispatch chain
-will be broken, this makes bridges a very powerful tool for authentication.
+The actual bridge code needs to return a true value or the dispatch chain will
+be broken, this makes bridges a very powerful tool for authentication.
 
   # /foo     -> undef
   # /foo/bar -> {cb => sub {...}}
@@ -753,8 +752,8 @@ applications.
 =head2 Embedding applications
 
 You can easily embed whole applications simply by using them instead of a
-controller. This allows for example the use of the L<Mojolicious::Lite>
-domain specific language in normal L<Mojolicious> controllers.
+controller. This allows for example the use of the L<Mojolicious::Lite> domain
+specific language in normal L<Mojolicious> controllers.
 
   # Controller
   package MyApp::Bar;

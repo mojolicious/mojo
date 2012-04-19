@@ -611,10 +611,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP 1.1 and WebSocket
 user agent with C<IPv6>, C<TLS> and C<libev> support.
 
-Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
-supported transparently and used if installed. Individual features can also
-be disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment
-variables.
+Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are supported
+transparently and used if installed. Individual features can also be disabled
+with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
 =head1 EVENTS
 
@@ -800,9 +799,9 @@ implements the following new ones.
   $ua     = $ua->app('MyApp');
   $ua     = $ua->app(MyApp->new);
 
-Application relative URLs will be processed with, defaults to the value of
-the C<MOJO_APP> environment variable, which is usually a L<Mojo> or
-L<Mojolicious> object.
+Application relative URLs will be processed with, defaults to the value of the
+C<MOJO_APP> environment variable, which is usually a L<Mojo> or L<Mojolicious>
+object.
 
   say $ua->app->secret;
   $ua->app->log->level('fatal');
@@ -999,8 +998,8 @@ transactions non-blocking.
   $ua->websocket('ws://localhost:3000' => sub {...});
   $ua->websocket('ws://localhost:3000' => {DNT => 1} => sub {...});
 
-Open a non-blocking WebSocket connection with transparent handshake, takes
-the exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
+Open a non-blocking WebSocket connection with transparent handshake, takes the
+exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($ua, $tx) = @_;

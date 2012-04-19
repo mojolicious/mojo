@@ -213,8 +213,8 @@ List available options for generator command with short descriptions.
 
   $ mojo generate app <AppName>
 
-Generate application directory structure for a fully functional
-L<Mojolicious> application.
+Generate application directory structure for a fully functional L<Mojolicious>
+application.
 
 =head2 C<generate lite_app>
 

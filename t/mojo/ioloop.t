@@ -286,8 +286,7 @@ is(
   Mojo::IOLoop->singleton->reactor,
   'right default'
 );
-is(Mojo::IOLoop::Delay->new->ioloop, Mojo::IOLoop->singleton,
-  'right default');
+is(Mojo::IOLoop::Delay->new->ioloop, Mojo::IOLoop->singleton, 'right default');
 is(
   Mojo::IOLoop::Server->new->reactor,
   Mojo::IOLoop->singleton->reactor,

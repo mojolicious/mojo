@@ -14,14 +14,14 @@ L<Mojolicious> together with the right answers.
 
 The short answer is "it doesn't", because we interpret the words
 "web framework" much more literally than others. With the emergence of the
-C<real-time web> and new technologies such as C<WebSockets>, we are facing
-new challenges that go way beyond what commonly used modules like L<LWP> were
+C<real-time web> and new technologies such as C<WebSockets>, we are facing new
+challenges that go way beyond what commonly used modules like L<LWP> were
 designed for. Because of this, L<Mojolicious> contains a whole new HTTP
-client/server stack called L<Mojo>, which was heavily inspired by the
-original C<LWPng> effort and carefully designed with these new requirements
-in mind. So while some of the higher abstraction layers might look similar to
-other web frameworks, it actually defines a whole new category and could even
-be the foundation for more advanced ones in the future.
+client/server stack called L<Mojo>, which was heavily inspired by the original
+C<LWPng> effort and carefully designed with these new requirements in mind. So
+while some of the higher abstraction layers might look similar to other web
+frameworks, it actually defines a whole new category and could even be the
+foundation for more advanced ones in the future.
 
 =head2 Why doesn't Mojolicious have any dependencies?
 
@@ -37,10 +37,9 @@ they are installed.
 =head2 Why reinvent wheels?
 
 Because we can make them rounder. Components specifically designed for
-user-friendliness and development speed are not easy to come by. We are
-strong believers of the Perl mantra "There is more than one way to do it.",
-and our quest is to develop the best possible solutions for these two
-criteria.
+user-friendliness and development speed are not easy to come by. We are strong
+believers of the Perl mantra "There is more than one way to do it.", and our
+quest is to develop the best possible solutions for these two criteria.
 
 =head2 What about backwards compatibility?
 
@@ -66,18 +65,18 @@ features, we are rather conservative when it comes to adding new ones. The
 most important criteria are outlined in
 L<Mojolicious::Guides::CodingGuidelines>. But don't let this discourage you,
 it doesn't hurt to open a
-L<GitHub issue|https://github.com/kraih/mojo/issues> and ask, just be
-prepared that it might not pass the vote. To increase the chances you can
-also discuss and refine ideas on the
+L<GitHub issue|https://github.com/kraih/mojo/issues> and ask, just be prepared
+that it might not pass the vote. To increase the chances you can also discuss
+and refine ideas on the
 L<mailing-list|http://groups.google.com/group/mojolicious>.
 
 =head2 What does the error "Maximum message size exceeded." mean?
 
 To protect your applications from excessively large requests and responses,
-our HTTP parser has a cap after which it will automatically stop accepting
-new data, and in most cases force the connection to be closed. This limit is
-around C<5MB> by default, you can use the C<MOJO_MAX_MESSAGE_SIZE>
-environment variable to change this value.
+our HTTP parser has a cap after which it will automatically stop accepting new
+data, and in most cases force the connection to be closed. This limit is
+around C<5MB> by default, you can use the C<MOJO_MAX_MESSAGE_SIZE> environment
+variable to change this value.
 
 =head2 What does the error "Maximum line size exceeded." mean?
 
@@ -101,10 +100,9 @@ passphrase with the attribute L<Mojolicious/"secret">.
 To protect your applications from denial-of-service attacks, all connections
 have an inactivity timeout which limits how long a connection may be inactive
 before being closed automatically. It defaults to C<20> seconds for the user
-agent and C<15> seconds for all built-in web servers, and is commonly
-referred to as C<inactivity_timeout>. This timeout always applies, so you
-might have to tweak it for applications that take a long time to process a
-request.
+agent and C<15> seconds for all built-in web servers, and is commonly referred
+to as C<inactivity_timeout>. This timeout always applies, so you might have to
+tweak it for applications that take a long time to process a request.
 
 =head2 What does "Premature connection close." mean?
 
@@ -118,10 +116,10 @@ First make sure you are using the latest version of L<Mojolicious>, it is
 quite likely that the bug has already been fixed. If that doesn't help,
 prepare a test case demonstrating the bug, you are not expected to fix it
 yourself, but you'll have to make sure the developers can replicate your
-problem. Sending in your whole application generally does more harm than
-good, the C<t> directory of this distribution has many good examples for how
-to do it right. Writing a test is usually the hardest part of fixing a bug,
-so the better your test case the faster it can be fixed. ;)
+problem. Sending in your whole application generally does more harm than good,
+the C<t> directory of this distribution has many good examples for how to do
+it right. Writing a test is usually the hardest part of fixing a bug, so the
+better your test case the faster it can be fixed. ;)
 
 Once that's done you can contact the developers via
 L<GitHub issue|https://github.com/kraih/mojo/issues>.

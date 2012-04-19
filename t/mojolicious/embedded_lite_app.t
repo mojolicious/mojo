@@ -136,8 +136,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/foo/bar')->status_is(200)->content_is('plugin works!');
 
 # GET /hello (from main app)
-$t->get_ok('/hello')->status_is(200)
-  ->content_is("Hello from the main app!\n");
+$t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");
 
 # GET /hello/hello (from embedded app)
 $t->get_ok('/hello/hello')->status_is(200)
@@ -232,8 +231,7 @@ $t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
 
 # GET /x/♥/url/☃ (full external application)
 $t->get_ok('/x/♥/url/☃')->status_is(200)
-  ->content_is(
-  '/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
+  ->content_is('/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
 
 # GET /host (main application)
 $t->get_ok('/host')->status_is(200)->content_is('main application!');

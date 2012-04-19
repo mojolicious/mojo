@@ -43,12 +43,12 @@ should be followed at all costs.
 
 =head2 REpresentational State Transfer
 
-REST is a software architectural style for distributed hypermedia systems
-such as the web. While it can be applied to many protocols it is most
-commonly used with HTTP these days. In REST terms, when you are opening a URL
-like C<http://mojolicio.us/foo> with your browser, you are basically asking
-the web server for the HTML C<representation> of the
-C<http://mojolicio.us/foo> C<resource>.
+REST is a software architectural style for distributed hypermedia systems such
+as the web. While it can be applied to many protocols it is most commonly used
+with HTTP these days. In REST terms, when you are opening a URL like
+C<http://mojolicio.us/foo> with your browser, you are basically asking the web
+server for the HTML C<representation> of the C<http://mojolicio.us/foo>
+C<resource>.
 
   +--------+                                +--------+
   |        | -> http://mojolicio.us/foo  -> |        |
@@ -126,9 +126,9 @@ of L<Mojolicious> was developed using TDD.
 
 =head1 PROTOTYPE
 
-One of the main differences between L<Mojolicious> and other web frameworks
-is that it also includes L<Mojolicious::Lite>, a micro web framework
-optimized for rapid prototyping.
+One of the main differences between L<Mojolicious> and other web frameworks is
+that it also includes L<Mojolicious::Lite>, a micro web framework optimized
+for rapid prototyping.
 
 =head2 Differences
 
@@ -186,8 +186,8 @@ This will be the foundation for our login manager example application.
 
   app->start;
 
-The built-in development web server makes working on your application a lot
-of fun thanks to automatic reloading.
+The built-in development web server makes working on your application a lot of
+fun thanks to automatic reloading.
 
   $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
@@ -198,15 +198,15 @@ you refresh your browser.
 =head2 Model
 
 In L<Mojolicious> we consider web applications simple frontends for existing
-business logic, that means L<Mojolicious> is by design entirely L<model>
-layer agnostic and you just use whatever Perl modules you like most.
+business logic, that means L<Mojolicious> is by design entirely L<model> layer
+agnostic and you just use whatever Perl modules you like most.
 
   $ mkdir lib
   $ touch lib/MyUsers.pm
   $ chmod 644 lib/MyUsers.pm
 
-Our login manager will simply use a plain old Perl module abstracting away
-all logic related to matching usernames and passwords.
+Our login manager will simply use a plain old Perl module abstracting away all
+logic related to matching usernames and passwords.
 
   package MyUsers;
 
@@ -268,8 +268,7 @@ templates.
   app->start;
 
 The method L<Mojolicious::Controller/"param"> is used to access query
-parameters, POST parameters, file uploads and route placeholders, all at
-once.
+parameters, POST parameters, file uploads and route placeholders, all at once.
 
 =head2 Testing
 
@@ -343,9 +342,9 @@ Quick C<GET> requests can be performed right from the command line.
 
 =head2 State keeping
 
-Sessions in L<Mojolicious> pretty much just work out of the box once you
-start using the method L<Mojolicious::Controller/"session">, there is no
-setup required, but we suggest setting a more secure passphrase with
+Sessions in L<Mojolicious> pretty much just work out of the box once you start
+using the method L<Mojolicious::Controller/"session">, there is no setup
+required, but we suggest setting a more secure passphrase with
 L<Mojolicious/"secret">.
 
   app->secret('Mojolicious rocks');
@@ -357,8 +356,8 @@ secure and can be changed at any time to invalidate all existing sessions.
   my $user = $self->session('user');
 
 By default all sessions expire after one hour, for more control you can also
-use the C<expires> session value to set the expiration date to a specific
-time in epoch seconds.
+use the C<expires> session value to set the expiration date to a specific time
+in epoch seconds.
 
   $self->session(expires => time + 3600);
 
@@ -467,8 +466,7 @@ like this.
   </html>
 
 A list of all built-in helpers can be found in
-L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers>.
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
 =head1 WELL STRUCTURED APPLICATION
 
@@ -484,8 +482,8 @@ directories.
 
   $ ./myapp.pl inflate
 
-Those directories always get priority, so inflating can also be a great way
-to allow your users to customize their applications.
+Those directories always get priority, so inflating can also be a great way to
+allow your users to customize their applications.
 
 =head2 Simplified application class
 
@@ -560,8 +558,8 @@ allow running unit tests again.
 
 =head2 Controller class
 
-Hybrid routes are a nice intermediate step, but to maximize maintainability
-it makes sense to split our action code from its routing information.
+Hybrid routes are a nice intermediate step, but to maximize maintainability it
+makes sense to split our action code from its routing information.
 
   $ mkdir lib/MyApp
   $ touch lib/MyApp/Login.pm
@@ -700,8 +698,8 @@ C<t/login.t> can be simplified.
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');
 
-Test driven development takes a little getting used to, but is very well
-worth it!
+Test driven development takes a little getting used to, but is very well worth
+it!
 
 =head1 MORE
 

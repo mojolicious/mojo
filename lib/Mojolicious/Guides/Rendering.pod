@@ -24,9 +24,8 @@ utilizing multiple template systems and data encoding modules.
 
 Templates can be automatically detected if enough information is provided by
 the developer or routes. Template names are expected to follow the
-C<name.format.handler> scheme, with C<name> defaulting to
-C<controller/action> or the route name, C<format> defaulting to C<html> and
-C<handler> to C<ep>.
+C<name.format.handler> scheme, with C<name> defaulting to C<controller/action>
+or the route name, C<format> defaulting to C<html> and C<handler> to C<ep>.
 
   {controller => 'users', action => 'list'} -> 'users/list.html.ep'
   {name => 'foo', format => 'txt'}          -> 'foo.txt.ep'
@@ -55,9 +54,9 @@ with plugins, but more about that later.
 =head2 Embedded Perl
 
 L<Mojolicious> includes a minimalistic but very powerful template system out
-of the box called Embedded Perl or C<ep> for short. It allows the embedding
-of Perl code right into actual content using a small set of special tags and
-line start characters.
+of the box called Embedded Perl or C<ep> for short. It allows the embedding of
+Perl code right into actual content using a small set of special tags and line
+start characters.
 
   <% Perl code %>
   <%= Perl expression, replaced with XML escaped result %>
@@ -321,8 +320,8 @@ Helpers are little functions you can use in templates and controller code.
   my $serialized = $self->dumper([1, 2, 3]);
 
 The helper L<Mojolicious::Plugin::DefaultHelpers/"dumper"> for example will
-use L<Data::Dumper> to serialize whatever data structure you pass it, this
-can be very useful for debugging. We differentiate between C<default helpers>
+use L<Data::Dumper> to serialize whatever data structure you pass it, this can
+be very useful for debugging. We differentiate between C<default helpers>
 which are more general purpose like C<dumper> and C<tag helpers>, which are
 template specific and mostly used to generate C<HTML> tags.
 
@@ -333,8 +332,7 @@ template specific and mostly used to generate C<HTML> tags.
   % end
 
 A list of all built-in helpers can be found in
-L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers>.
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
 =head2 Layouts
 
@@ -420,9 +418,9 @@ L<Mojolicious::Controller/"render"> with the C<partial> argument.
   @@ header.html.ep
   <head><title>Howdy</title></head>
 
-But there is one small difference between the two, if you pass stash values
-to C<include>, they will get localized automatically and are only available
-in the partial template.
+But there is one small difference between the two, if you pass stash values to
+C<include>, they will get localized automatically and are only available in
+the partial template.
 
   @@ foo/bar.html.ep
   <!DOCTYPE html>
@@ -501,7 +499,7 @@ can also be used to pass whole sections of the template to the layout.
 
 Inheritance takes the layout concept above one step further, the helpers
 L<Mojolicious::Plugin::DefaultHelpers/"content"> and
-L<Mojolicious::Plugin::DefaultHelpers/"extends">allow you to build a skeleton
+L<Mojolicious::Plugin::DefaultHelpers/"extends"> allow you to build a skeleton
 template with named blocks that child templates can override.
 
   @@ first.html.ep
@@ -541,8 +539,8 @@ and prevent template blocks from getting executed more than once.
 
 =head2 Adding helpers
 
-Adding and redefining helpers is very easy, you can use them to do pretty
-much everything.
+Adding and redefining helpers is very easy, you can use them to do pretty much
+everything.
 
   use Mojolicious::Lite;
 
@@ -760,17 +758,17 @@ few lexicon classes.
   @@ hello.html.ep
   <%=l 'Hello World' %>!
 
-Preferred languages will be automatically detected from the
-C<Accept-Language> header or can be manually changed with the helper
+Preferred languages will be automatically detected from the C<Accept-Language>
+header or can be manually changed with the helper
 L<Mojolicious::Plugin::I18N/"languages">.
 
   $ ./myapp.pl get -H 'Accept-Language: de' /
 
 =head2 Chunked transfer encoding
 
-For very dynamic content you might not know the response C<Content-Length>
-in advance, that's where the C<chunked> C<Transfer-Encoding> comes in handy.
-A common use would be to send the C<head> section of an HTML document to the
+For very dynamic content you might not know the response C<Content-Length> in
+advance, that's where the C<chunked> C<Transfer-Encoding> comes in handy. A
+common use would be to send the C<head> section of an HTML document to the
 browser in advance and speed up preloading of referenced images and
 stylesheets.
 
@@ -795,8 +793,8 @@ this might not work perfectly in all deployment environments.
 
 =head2 Encoding
 
-Templates stored in files are expected to be C<UTF-8> by default, but that
-can be easily changed.
+Templates stored in files are expected to be C<UTF-8> by default, but that can
+be easily changed.
 
   # Application
   package MyApp;
@@ -828,8 +826,8 @@ script, so don't forget to use the L<utf8> pragma if necessary.
 
 =head2 Base64 encoded DATA files
 
-Base64 encoded static files such as images can be easily stored in the
-C<DATA> section of your application, similar to templates.
+Base64 encoded static files such as images can be easily stored in the C<DATA>
+section of your application, similar to templates.
 
   @@ favicon.ico (base64)
   ...base64 encoded image...
@@ -837,9 +835,9 @@ C<DATA> section of your application, similar to templates.
 =head2 Inflating DATA templates
 
 Templates stored in files get preferred over files from the C<DATA> section,
-this allows you to include a default set of templates in your application
-that the user can later customize. The C<inflate> command will write all
-templates and static files from the C<DATA> section into actual files in the
+this allows you to include a default set of templates in your application that
+the user can later customize. The C<inflate> command will write all templates
+and static files from the C<DATA> section into actual files in the
 C<templates> and C<public> directories.
 
   $ ./myapp.pl inflate
@@ -871,8 +869,8 @@ L<Mojo::Template> contains the whole list of available options.
 
 =head2 Adding your favorite template system
 
-Maybe you would prefer a different template system than C<ep>, all you have
-to do is add a new C<handler>.
+Maybe you would prefer a different template system than C<ep>, all you have to
+do is add a new C<handler>.
 
   use Mojolicious::Lite;
 
@@ -911,8 +909,8 @@ to do is add a new C<handler>.
   @@ index.html.mine
   ...
 
-Since most template systems don't support templates in the C<DATA> section
-the renderer provides methods to help you with that.
+Since most template systems don't support templates in the C<DATA> section the
+renderer provides methods to help you with that.
 
 =head1 MORE
 

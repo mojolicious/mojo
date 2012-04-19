@@ -495,8 +495,7 @@ sub url_for {
 
     # Fix trailing slash
     $path->trailing_slash(1)
-      if (!$target || $target eq 'current')
-      && $req->url->path->trailing_slash;
+      if (!$target || $target eq 'current') && $req->url->path->trailing_slash;
 
     # Fix scheme for WebSockets
     $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws') if $ws;
@@ -640,8 +639,8 @@ Data storage persistent only for the next request, stored in the C<session>.
 
   my $cb = $c->on(finish => sub {...});
 
-Subscribe to events of C<tx>, which is usually a L<Mojo::Transaction::HTTP>
-or L<Mojo::Transaction::WebSocket> object.
+Subscribe to events of C<tx>, which is usually a L<Mojo::Transaction::HTTP> or
+L<Mojo::Transaction::WebSocket> object.
 
   # Emitted when the transaction has been finished
   $c->on(finish => sub {
@@ -727,8 +726,8 @@ C<extends> features.
   $c->render_data($bytes);
   $c->render_data($bytes, format => 'png');
 
-Render the given content as raw bytes, similar to C<render_text> but data
-will not be encoded.
+Render the given content as raw bytes, similar to C<render_text> but data will
+not be encoded.
 
 =head2 C<render_exception>
 
@@ -904,11 +903,10 @@ Cookies failing signature verification will be automatically discarded.
   $c        = $c->stash(foo => 'bar');
 
 Non persistent data storage and exchange, application wide default values can
-be set with L<Mojolicious/"defaults">. Many stash value have a special
-meaning and are reserved, the full list is currently C<action>, C<app>,
-C<cb>, C<controller>, C<data>, C<extends>, C<format>, C<handler>, C<json>,
-C<layout>, C<namespace>, C<partial>, C<path>, C<status>, C<template> and
-C<text>.
+be set with L<Mojolicious/"defaults">. Many stash value have a special meaning
+and are reserved, the full list is currently C<action>, C<app>, C<cb>,
+C<controller>, C<data>, C<extends>, C<format>, C<handler>, C<json>, C<layout>,
+C<namespace>, C<partial>, C<path>, C<status>, C<template> and C<text>.
 
   # Manipulate stash
   $c->stash->{foo} = 'bar';
@@ -1032,8 +1030,7 @@ You can call C<finish> at any time to end the stream.
 
 In addition to the attributes and methods above you can also call helpers on
 L<Mojolicious::Controller> objects. This includes all helpers from
-L<Mojolicious::Plugin::DefaultHelpers> and
-L<Mojolicious::Plugin::TagHelpers>.
+L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 
   $c->layout('green');
   $c->title('Welcome!');

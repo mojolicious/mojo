@@ -50,7 +50,7 @@ Mojo::JSON::Pointer - JSON Pointers
 =head1 DESCRIPTION
 
 L<Mojo::JSON::Pointer> implements JSON Pointers as described in
-L<http://tools.ietf.org/html/draft-pbryan-zyp-json-pointer-02>.
+L<http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer>.
 
 =head1 METHODS
 
@@ -58,8 +58,8 @@ L<http://tools.ietf.org/html/draft-pbryan-zyp-json-pointer-02>.
 
   my $success = $p->contains($data, '/foo/1');
 
-Check if data structure contains a value that can be identified with the
-given JSON Pointer.
+Check if data structure contains a value that can be identified with the given
+JSON Pointer.
 
   # True
   $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/foo');

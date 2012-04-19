@@ -150,8 +150,7 @@ sub _compile {
     while ($element =~ /$CLASS_ID_RE/g) {
 
       # Class
-      push @$selector, ['attr', 'class', $self->_regex('~', $1)]
-        if defined $1;
+      push @$selector, ['attr', 'class', $self->_regex('~', $1)] if defined $1;
 
       # ID
       push @$selector, ['attr', 'id', $self->_regex('', $2)] if defined $2;
@@ -466,8 +465,8 @@ An C<E> element, root of the document.
 
 =head2 C<E:checked>
 
-A user interface element C<E> which is checked (for instance a radio-button
-or checkbox).
+A user interface element C<E> which is checked (for instance a radio-button or
+checkbox).
 
   my $input = $css->select(':checked');
 

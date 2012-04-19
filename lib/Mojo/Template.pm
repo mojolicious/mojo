@@ -145,8 +145,7 @@ sub interpret {
   # Stacktrace
   local $SIG{__DIE__} = sub {
     CORE::die($_[0]) if ref $_[0];
-    Mojo::Exception->throw(shift, [$self->template, $self->code],
-      $self->name);
+    Mojo::Exception->throw(shift, [$self->template, $self->code], $self->name);
   };
 
   # Interpret
@@ -464,8 +463,8 @@ Perl lines can also be indented freely.
 =head2 Arguments
 
 L<Mojo::Template> templates work just like Perl subs (actually they get
-compiled to a Perl sub internally). That means you can access arguments
-simply via C<@_>.
+compiled to a Perl sub internally). That means you can access arguments simply
+via C<@_>.
 
   % my ($foo, $bar) = @_;
   % my $x = shift;
@@ -505,8 +504,8 @@ stringify to error messages with context.
 
 =head2 Caching
 
-L<Mojo::Template> does not support caching by itself, but you can easily
-build a wrapper around it.
+L<Mojo::Template> does not support caching by itself, but you can easily build
+a wrapper around it.
 
   # Compile and store code somewhere
   my $mt = Mojo::Template->new;
@@ -615,8 +614,8 @@ Character indicating the start of a code line, defaults to C<%>.
   my $name = $mt->name;
   $mt      = $mt->name('foo.mt');
 
-Name of template currently being processed, defaults to C<template>. Note
-that this method is attribute and might change without warning!
+Name of template currently being processed, defaults to C<template>. Note that
+this method is attribute and might change without warning!
 
 =head2 C<namespace>
 

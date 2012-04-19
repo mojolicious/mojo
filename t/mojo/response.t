@@ -48,9 +48,8 @@ is $res->code(411)->default_message, 'Length Required',     'right message';
 is $res->code(412)->default_message, 'Precondition Failed', 'right message';
 is $res->code(413)->default_message, 'Request Entity Too Large',
   'right message';
-is $res->code(414)->default_message, 'Request-URI Too Large', 'right message';
-is $res->code(415)->default_message, 'Unsupported Media Type',
-  'right message';
+is $res->code(414)->default_message, 'Request-URI Too Large',  'right message';
+is $res->code(415)->default_message, 'Unsupported Media Type', 'right message';
 is $res->code(416)->default_message, 'Request Range Not Satisfiable',
   'right message';
 is $res->code(417)->default_message, 'Expectation Failed',    'right message';
@@ -184,8 +183,8 @@ is $res->message,     'Damn it', 'right message';
 is $res->version,     '1.0', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
-is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $res->headers->content_length, 0, 'right "Content-Length" value';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, 0,            'right "Content-Length" value';
 
 # Parse full HTTP 1.0 response
 $res = Mojo::Message::Response->new;
@@ -199,8 +198,8 @@ is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.0', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
-is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $res->headers->content_length, 27, 'right "Content-Length" value';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, 27,           'right "Content-Length" value';
 
 # Parse full HTTP 1.0 response (missing Content-Length)
 $res = Mojo::Message::Response->new;
@@ -280,9 +279,9 @@ is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.1', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
-is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $res->headers->content_length, 13, 'right "Content-Length" value';
-is $res->content->body_size,      13, 'right size';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, 13,           'right "Content-Length" value';
+is $res->content->body_size,      13,           'right size';
 
 # Parse HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;
@@ -507,8 +506,8 @@ is $res->message,     'OK', 'right message';
 is $res->version,     '1.0', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
-is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $res->headers->content_length, 27, 'right "Content-Length" value';
+is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, 27,           'right "Content-Length" value';
 is $res->headers->set_cookie, 'foo=bar; Version=1; Path=/test',
   'right "Set-Cookie" value';
 my $cookies = $res->cookies;

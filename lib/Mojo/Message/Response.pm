@@ -11,7 +11,7 @@ has [qw/code message/];
 my %MESSAGES = (
   100 => 'Continue',
   101 => 'Switching Protocols',
-  102 => 'Processing',                      # RFC 2518 (WebDAV)
+  102 => 'Processing',                       # RFC 2518 (WebDAV)
   200 => 'OK',
   201 => 'Created',
   202 => 'Accepted',
@@ -19,7 +19,7 @@ my %MESSAGES = (
   204 => 'No Content',
   205 => 'Reset Content',
   206 => 'Partial Content',
-  207 => 'Multi-Status',                    # RFC 2518 (WebDAV)
+  207 => 'Multi-Status',                     # RFC 2518 (WebDAV)
   300 => 'Multiple Choices',
   301 => 'Moved Permanently',
   302 => 'Found',
@@ -45,27 +45,27 @@ my %MESSAGES = (
   415 => 'Unsupported Media Type',
   416 => 'Request Range Not Satisfiable',
   417 => 'Expectation Failed',
-  418 => "I'm a teapot",                    # :)
-  422 => 'Unprocessable Entity',            # RFC 2518 (WebDAV)
-  423 => 'Locked',                          # RFC 2518 (WebDAV)
-  424 => 'Failed Dependency',               # RFC 2518 (WebDAV)
-  425 => 'Unordered Colection',             # RFC 3648 (WebDav)
-  426 => 'Upgrade Required',                # RFC 2817
-  428 => 'Precondition Required',           # draft-nottingham-http-new-status
-  429 => 'Too Many Requests',               # draft-nottingham-http-new-status
-  431 => 'Request Header Fields Too Large', # draft-nottingham-http-new-status
-  449 => 'Retry With',                      # unofficial Microsoft
+  418 => "I'm a teapot",                     # :)
+  422 => 'Unprocessable Entity',             # RFC 2518 (WebDAV)
+  423 => 'Locked',                           # RFC 2518 (WebDAV)
+  424 => 'Failed Dependency',                # RFC 2518 (WebDAV)
+  425 => 'Unordered Colection',              # RFC 3648 (WebDav)
+  426 => 'Upgrade Required',                 # RFC 2817
+  428 => 'Precondition Required',            # draft-nottingham-http-new-status
+  429 => 'Too Many Requests',                # draft-nottingham-http-new-status
+  431 => 'Request Header Fields Too Large',  # draft-nottingham-http-new-status
+  449 => 'Retry With',                       # unofficial Microsoft
   500 => 'Internal Server Error',
   501 => 'Not Implemented',
   502 => 'Bad Gateway',
   503 => 'Service Unavailable',
   504 => 'Gateway Timeout',
   505 => 'HTTP Version Not Supported',
-  506 => 'Variant Also Negotiates',         # RFC 2295
-  507 => 'Insufficient Storage',            # RFC 2518 (WebDAV)
-  509 => 'Bandwidth Limit Exceeded',        # unofficial
-  510 => 'Not Extended',                    # RFC 2774
-  511 => 'Network Authentication Required', # draft-nottingham-http-new-status
+  506 => 'Variant Also Negotiates',          # RFC 2295
+  507 => 'Insufficient Storage',             # RFC 2518 (WebDAV)
+  509 => 'Bandwidth Limit Exceeded',         # unofficial
+  510 => 'Not Extended',                     # RFC 2774
+  511 => 'Network Authentication Required',  # draft-nottingham-http-new-status
 );
 
 sub cookies {
@@ -175,8 +175,8 @@ L<Mojo::Message::Response> inherits all events from L<Mojo::Message>.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Message::Response> inherits all attributes from L<Mojo::Message>
-and implements the following new ones.
+L<Mojo::Message::Response> inherits all attributes from L<Mojo::Message> and
+implements the following new ones.
 
 =head2 C<code>
 

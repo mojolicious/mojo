@@ -163,8 +163,7 @@ sub to_string {
   # Format multiline values
   my @headers;
   for my $name (@{$self->names}) {
-    push @headers, "$name: " . join("\x0d\x0a ", @$_)
-      for $self->header($name);
+    push @headers, "$name: " . join("\x0d\x0a ", @$_) for $self->header($name);
   }
 
   # Format headers

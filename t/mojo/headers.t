@@ -56,18 +56,17 @@ is $headers->content_length('foo')->content_length, 'foo', 'right value';
 is $headers->content_range('foo')->content_range,   'foo', 'right value';
 is $headers->content_transfer_encoding('foo')->content_transfer_encoding,
   'foo', 'right value';
-is $headers->content_type('foo')->content_type, 'foo', 'right value';
-is $headers->cookie('foo')->cookie,             'foo', 'right value';
-is $headers->dnt('foo')->dnt,                   'foo', 'right value';
-is $headers->date('foo')->date,                 'foo', 'right value';
-is $headers->etag('foo')->etag,                 'foo', 'right value';
-is $headers->expect('foo')->expect,             'foo', 'right value';
-is $headers->expires('foo')->expires,           'foo', 'right value';
-is $headers->host('foo')->host,                 'foo', 'right value';
-is $headers->if_modified_since('foo')->if_modified_since, 'foo',
-  'right value';
-is $headers->last_modified('foo')->last_modified, 'foo', 'right value';
-is $headers->location('foo')->location,           'foo', 'right value';
+is $headers->content_type('foo')->content_type,           'foo', 'right value';
+is $headers->cookie('foo')->cookie,                       'foo', 'right value';
+is $headers->dnt('foo')->dnt,                             'foo', 'right value';
+is $headers->date('foo')->date,                           'foo', 'right value';
+is $headers->etag('foo')->etag,                           'foo', 'right value';
+is $headers->expect('foo')->expect,                       'foo', 'right value';
+is $headers->expires('foo')->expires,                     'foo', 'right value';
+is $headers->host('foo')->host,                           'foo', 'right value';
+is $headers->if_modified_since('foo')->if_modified_since, 'foo', 'right value';
+is $headers->last_modified('foo')->last_modified,         'foo', 'right value';
+is $headers->location('foo')->location,                   'foo', 'right value';
 is $headers->proxy_authenticate('foo')->proxy_authenticate, 'foo',
   'right value';
 is $headers->proxy_authorization('foo')->proxy_authorization, 'foo',
@@ -75,23 +74,21 @@ is $headers->proxy_authorization('foo')->proxy_authorization, 'foo',
 is $headers->range('foo')->range, 'foo', 'right value';
 is $headers->sec_websocket_protocol('foo')->sec_websocket_protocol, 'foo',
   'right value';
-is $headers->sec_websocket_key('foo')->sec_websocket_key, 'foo',
-  'right value';
+is $headers->sec_websocket_key('foo')->sec_websocket_key, 'foo', 'right value';
 is $headers->sec_websocket_origin('foo')->sec_websocket_origin, 'foo',
   'right value';
 is $headers->sec_websocket_protocol('foo')->sec_websocket_protocol, 'foo',
   'right value';
 is $headers->sec_websocket_version('foo')->sec_websocket_version, 'foo',
   'right value';
-is $headers->server('foo')->server,         'foo', 'right value';
-is $headers->set_cookie('foo')->set_cookie, 'foo', 'right value';
-is $headers->status('foo')->status,         'foo', 'right value';
-is $headers->trailer('foo')->trailer,       'foo', 'right value';
-is $headers->transfer_encoding('foo')->transfer_encoding, 'foo',
-  'right value';
-is $headers->upgrade('foo')->upgrade,                   'foo', 'right value';
-is $headers->user_agent('foo')->user_agent,             'foo', 'right value';
-is $headers->www_authenticate('foo')->www_authenticate, 'foo', 'right value';
+is $headers->server('foo')->server,                       'foo', 'right value';
+is $headers->set_cookie('foo')->set_cookie,               'foo', 'right value';
+is $headers->status('foo')->status,                       'foo', 'right value';
+is $headers->trailer('foo')->trailer,                     'foo', 'right value';
+is $headers->transfer_encoding('foo')->transfer_encoding, 'foo', 'right value';
+is $headers->upgrade('foo')->upgrade,                     'foo', 'right value';
+is $headers->user_agent('foo')->user_agent,               'foo', 'right value';
+is $headers->www_authenticate('foo')->www_authenticate,   'foo', 'right value';
 
 # Clone
 $headers = Mojo::Headers->new;
@@ -121,8 +118,8 @@ my @array = $headers->header('X-Test');
 is_deeply \@array, [[23, 24], ['single line'], [25, 26]], 'right structure';
 is_deeply $headers->to_hash(1),
   {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
-is_deeply $headers->to_hash,
-  {'X-Test' => [[23, 24], 'single line', [25, 26]]}, 'right structure';
+is_deeply $headers->to_hash, {'X-Test' => [[23, 24], 'single line', [25, 26]]},
+  'right structure';
 my $string = $headers->header('X-Test');
 is $string, "23, 24, single line, 25, 26", 'right format';
 

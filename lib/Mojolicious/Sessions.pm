@@ -124,9 +124,9 @@ Path for session cookie, defaults to C</>.
   $session = $session->default_expiration(3600);
 
 Time for the session to expire in seconds from now, defaults to C<3600>. The
-expiration timeout gets refreshed for every request. Setting the value to
-C<0> will allow sessions to persist until the browser window is closed, this
-can have security implications though. For more control you can also use the
+expiration timeout gets refreshed for every request. Setting the value to C<0>
+will allow sessions to persist until the browser window is closed, this can
+have security implications though. For more control you can also use the
 C<expires> session value to set the expiration date to a specific time in
 epoch seconds.
 

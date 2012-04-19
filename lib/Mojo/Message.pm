@@ -50,8 +50,7 @@ sub body {
   # Callback
   if (ref $new eq 'CODE') {
     weaken $self;
-    return $content->unsubscribe('read')
-      ->on(read => sub { $self->$new(pop) });
+    return $content->unsubscribe('read')->on(read => sub { $self->$new(pop) });
   }
 
   # Set text content
@@ -543,8 +542,8 @@ L<Mojo::DOM>.
   my $class = $message->json_class;
   $message  = $message->json_class('Mojo::JSON');
 
-Class to be used for JSON deserialization with the C<json> method, defaults
-to L<Mojo::JSON>.
+Class to be used for JSON deserialization with the C<json> method, defaults to
+L<Mojo::JSON>.
 
 =head2 C<max_message_size>
 
@@ -737,8 +736,8 @@ Alias for L<Mojo::Content/"is_multipart">.
   my $value  = $message->json('/foo/bar');
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
-C<undef> otherwise. An optional JSON Pointer can be used to extract a
-specific value with L<Mojo::JSON::Pointer>.
+C<undef> otherwise. An optional JSON Pointer can be used to extract a specific
+value with L<Mojo::JSON::Pointer>.
 
   say $message->json->{foo}{bar}[23];
   say $message->json('/foo/bar/23');

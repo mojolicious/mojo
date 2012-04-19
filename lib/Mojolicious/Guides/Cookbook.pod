@@ -11,21 +11,21 @@ This document cotains many fun recipes for cooking with L<Mojolicious>.
 
 Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on
 different platforms. Note that many real-time web features are based on the
-L<Mojo::IOLoop> reactor, and therefore require one of the built-in web
-servers to be able to use them to their full potential.
+L<Mojo::IOLoop> reactor, and therefore require one of the built-in web servers
+to be able to use them to their full potential.
 
 =head2 Built-in web server
 
 L<Mojolicious> contains a very portable non-blocking I/O HTTP 1.1 and
 WebSocket server with L<Mojo::Server::Daemon>. It is usually used during
-development and in the construction of more advanced web servers, but is
-solid and fast enough for small to mid sized applications.
+development and in the construction of more advanced web servers, but is solid
+and fast enough for small to mid sized applications.
 
   $ ./script/myapp daemon
   Server available at http://127.0.0.1:3000.
 
-It has many configuration options and is known to work on every platform
-Perl works on.
+It has many configuration options and is known to work on every platform Perl
+works on.
 
   $ ./script/myapp daemon -h
   ...List of available options...
@@ -56,8 +56,8 @@ used during development.
 =head2 Hypnotoad
 
 For bigger applications L<Mojolicious> contains the UNIX optimized preforking
-web server L<Mojo::Server::Hypnotoad> that will allow you to take advantage
-of multiple cpu cores and copy-on-write.
+web server L<Mojo::Server::Hypnotoad> that will allow you to take advantage of
+multiple cpu cores and copy-on-write.
 
   Mojo::Server::Hypnotoad
   |- Mojo::Server::Daemon [1]
@@ -98,8 +98,8 @@ single incoming connection, just by running the command above again.
   $ hypnotoad script/myapp
   Starting hot deployment for Hypnotoad server 31841.
 
-You might also want to enable proxy support if you're using Hypnotoad behind
-a reverse proxy. This allows L<Mojolicious> to automatically pick up the
+You might also want to enable proxy support if you're using Hypnotoad behind a
+reverse proxy. This allows L<Mojolicious> to automatically pick up the
 C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
 
   # myapp.conf
@@ -176,10 +176,9 @@ script for the same reason.
   $ MOJO_HOME=/home/sri/myapp plackup ./script/myapp
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
-Some server adapters might ask for a C<.psgi> file, if that's the case you
-can just point them at your application script because it will automatically
-act like one if it detects the presence of a C<PLACK_ENV> environment
-variable.
+Some server adapters might ask for a C<.psgi> file, if that's the case you can
+just point them at your application script because it will automatically act
+like one if it detects the presence of a C<PLACK_ENV> environment variable.
 
 =head2 Plack middleware
 
@@ -212,9 +211,9 @@ But you could even use middleware right in your application.
 =head2 Rewriting
 
 Sometimes you might have to deploy your application in a blackbox environment
-where you can't just change the server configuration or behind a reverse
-proxy that passes along additional information with C<X-*> headers. In such
-cases you can use a C<before_dispatch> hook to rewrite incoming requests.
+where you can't just change the server configuration or behind a reverse proxy
+that passes along additional information with C<X-*> headers. In such cases
+you can use a C<before_dispatch> hook to rewrite incoming requests.
 
   app->hook(before_dispatch => sub {
     my $self = shift;
@@ -224,9 +223,9 @@ cases you can use a C<before_dispatch> hook to rewrite incoming requests.
 
 =head2 Application embedding
 
-From time to time you might want to reuse parts of L<Mojolicious>
-applications like configuration files, database connection or helpers for
-other scripts, with this little mock server you can just embed them.
+From time to time you might want to reuse parts of L<Mojolicious> applications
+like configuration files, database connection or helpers for other scripts,
+with this little mock server you can just embed them.
 
   use Mojo::Server;
 
@@ -466,8 +465,8 @@ method L<Mojolicious::Controller/"on">.
     </body>
   </html>
 
-The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right
-after the WebSocket connection has been closed.
+The event L<Mojo::Transaction::WebSocket/"finish"> will be emitted right after
+the WebSocket connection has been closed.
 
 =head2 Testing WebSocket web services
 
@@ -492,10 +491,10 @@ L<Test::Mojo> API to be used.
 =head2 EventSource web service
 
 HTML5 EventSource is a special form of long-polling where you can directly
-send DOM events from servers to clients. It is uni-directional, that means
-you will have to use Ajax requests for sending data from clients to servers,
-the advantage however is low infrastructure requirements, since it reuses the
-HTTP protocol for transport.
+send DOM events from servers to clients. It is uni-directional, that means you
+will have to use Ajax requests for sending data from clients to servers, the
+advantage however is low infrastructure requirements, since it reuses the HTTP
+protocol for transport.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -545,9 +544,9 @@ HTTP protocol for transport.
     </body>
   </html>
 
-The event L<Mojo::Log/"message"> will be emitted for every new log message
-and the event L<Mojo::Transaction/"finish"> right after the transaction has
-been finished.
+The event L<Mojo::Log/"message"> will be emitted for every new log message and
+the event L<Mojo::Transaction/"finish"> right after the transaction has been
+finished.
 
 =head2 Streaming multipart uploads
 
@@ -792,8 +791,8 @@ L<Mojo::UserAgent> makes it actually easy.
   # Process transaction
   $ua->start($tx);
 
-The event L<Mojo::Content/"read"> will be emitted for every chunk of data
-that is received, even C<chunked> encoding will be handled transparently if
+The event L<Mojo::Content/"read"> will be emitted for every chunk of data that
+is received, even C<chunked> encoding will be handled transparently if
 necessary.
 
 =head2 Streaming request
@@ -823,8 +822,8 @@ Sending a streaming request is almost just as easy.
   # Process transaction
   $ua->start($tx);
 
-The drain callback passed to L<Mojo::Message/"write"> will be invoked
-whenever the entire previous chunk has actually been written.
+The drain callback passed to L<Mojo::Message/"write"> will be invoked whenever
+the entire previous chunk has actually been written.
 
 =head2 Large file downloads
 
@@ -839,8 +838,8 @@ above C<250KB> into a temporary file.
   my $tx = $ua->get('latest.mojolicio.us');
   $tx->res->content->asset->move_to('mojo.tar.gz');
 
-To protect you from excessively large files there is also a limit of C<5MB>
-by default, which you can tweak with the C<MOJO_MAX_MESSAGE_SIZE> environment
+To protect you from excessively large files there is also a limit of C<5MB> by
+default, which you can tweak with the C<MOJO_MAX_MESSAGE_SIZE> environment
 variable.
 
   # Increase limit to 1GB
@@ -873,8 +872,8 @@ streamed directly from the file.
 
 L<Mojo::UserAgent> has been designed from the ground up to be non-blocking,
 the whole blocking API is just a simple convenience wrapper. Especially for
-high latency tasks like web crawling this can be extremely useful, because
-you can keep many parallel connections active at the same time.
+high latency tasks like web crawling this can be extremely useful, because you
+can keep many parallel connections active at the same time.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
@@ -959,10 +958,10 @@ be able to work standalone as well as inside L<Mojolicious> applications.
 
 =head2 Command line
 
-Don't you hate checking huge HTML files from the command line?
-Thanks to the C<mojo get> command that is about to change. You can just pick
-the parts that actually matter with the CSS3 selectors from L<Mojo::DOM> and
-JSON Pointers from L<Mojo::JSON::Pointer>.
+Don't you hate checking huge HTML files from the command line? Thanks to the
+C<mojo get> command that is about to change. You can just pick the parts that
+actually matter with the CSS3 selectors from L<Mojo::DOM> and JSON Pointers
+from L<Mojo::JSON::Pointer>.
 
   $ mojo get http://mojolicio.us 'head > title'
 
@@ -1012,9 +1011,9 @@ Fun hacks you might not use very often but that might come in handy some day.
 
 =head2 Faster tests
 
-Don't you hate waiting for C<make test> to finally finish?
-In newer Perl versions you can set the C<HARNESS_OPTIONS> environment
-variable to take advantage of multiple cpu cores and run tests parallel.
+Don't you hate waiting for C<make test> to finally finish? In newer Perl
+versions you can set the C<HARNESS_OPTIONS> environment variable to take
+advantage of multiple cpu cores and run tests parallel.
 
   $ HARNESS_OPTIONS=j9 make test
   ...
@@ -1046,8 +1045,8 @@ that they will be picked up automatically by the command line interface?
 
   1;
 
-There are many more useful methods and attributes in L<Mojo::Command> that
-you can use or overload.
+There are many more useful methods and attributes in L<Mojo::Command> that you
+can use or overload.
 
   $ mojo spy secret
   The secret of this application is "Mojolicious::Lite".
@@ -1058,9 +1057,8 @@ you can use or overload.
 =head2 Running code against your application
 
 Ever thought about running a quick oneliner against your L<Mojolicious>
-application to test something?
-Thanks to the C<eval> command you can do just that, the application object
-itself can be accessed via C<app>.
+application to test something? Thanks to the C<eval> command you can do just
+that, the application object itself can be accessed via C<app>.
 
   $ mojo generate lite_app
   $ ./myapp.pl eval 'say app->static->root'
@@ -1071,8 +1069,8 @@ The C<verbose> option will automatically print the return value to C<STDOUT>.
 
 =head2 Making your application installable
 
-Ever thought about releasing your L<Mojolicious> application to CPAN?
-It's actually much easier than you might think.
+Ever thought about releasing your L<Mojolicious> application to CPAN? It's
+actually much easier than you might think.
 
   $ mojo generate app
   $ cd my_mojolicious_app

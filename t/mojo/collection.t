@@ -40,8 +40,7 @@ is_deeply [$collection->grep(sub { $_ > 5 })->each], [6, 7, 8, 9],
   'right elements';
 is_deeply [$collection->grep(sub { $_ < 5 })->each], [1, 2, 3, 4],
   'right elements';
-is_deeply [$collection->grep(sub { shift == 5 })->each], [5],
-  'right elements';
+is_deeply [$collection->grep(sub { shift == 5 })->each], [5], 'right elements';
 is_deeply [$collection->grep(sub { $_ < 1 })->each], [], 'no elements';
 is_deeply [$collection->grep(sub { $_ > 9 })->each], [], 'no elements';
 

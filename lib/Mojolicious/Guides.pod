@@ -13,8 +13,8 @@ latest updates.
 =head1 LEARNING PERL
 
 If you are new to Perl, we recommend
-L<Learn Perl in 2 hours 30 minutes|http://qntm.org/files/perl/perl.html> for
-a quick introduction, or the
+L<Learn Perl in 2 hours 30 minutes|http://qntm.org/files/perl/perl.html> for a
+quick introduction, or the
 L<Modern Perl book|http://modernperlbooks.com/books/modern_perl/>, freely
 available in many formats. Both are excellent introductions to the language.
 For more books and documentation, check out
@@ -94,8 +94,8 @@ and testing.
 =item L<Mojo::Server::Hypnotoad>
 
 Full featured UNIX optimized preforking non-blocking I/O HTTP 1.1 and
-WebSocket server with support for zero downtime software upgrades
-(hot deployment).
+WebSocket server with support for zero downtime software upgrades (hot
+deployment).
 
 =item L<Mojo::Server::CGI>, L<Mojo::Server::PSGI>
 

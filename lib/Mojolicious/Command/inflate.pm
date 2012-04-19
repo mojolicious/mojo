@@ -45,8 +45,8 @@ the C<DATA> sections of your application into real files.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::inflate> inherits all attributes from
-L<Mojo::Command> and implements the following new ones.
+L<Mojolicious::Command::inflate> inherits all attributes from L<Mojo::Command>
+and implements the following new ones.
 
 =head2 C<description>
 

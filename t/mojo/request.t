@@ -433,8 +433,8 @@ is $req->version,     '1.0', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $req->headers->content_length, 27, 'right "Content-Length" value';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 27,           'right "Content-Length" value';
 is $req->body, "Hello World!\n1234\nlalalala\n", 'right content';
 is $body, "Hello World!\n1234\nlalalala\n", 'right content';
 
@@ -453,8 +453,8 @@ ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url->host, 'foo',            'no host';
 is $req->url->path, '/bar//baz.html', 'right path';
 is $req->url, '//foo/bar//baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $req->headers->content_length, 27, 'right "Content-Length" value';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 27,           'right "Content-Length" value';
 
 # Parse full HTTP 1.0 request (behind reverse proxy)
 $req = Mojo::Message::Request->new;
@@ -473,8 +473,8 @@ ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->url->to_abs, 'http://mojolicio.us/foo/bar/baz.html?foo=13#23',
   'right absolute URL';
-is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $req->headers->content_length, 27, 'right "Content-Length" value';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 27,           'right "Content-Length" value';
 
 # Parse full HTTP 1.0 request with zero chunk
 $req = Mojo::Message::Request->new;
@@ -494,8 +494,8 @@ is $req->version,     '1.0', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $req->headers->content_length, 27, 'right "Content-Length" value';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 27,           'right "Content-Length" value';
 
 # Parse full HTTP 1.0 request with utf8 form input
 $req = Mojo::Message::Request->new;
@@ -550,8 +550,8 @@ is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_length, 13, 'right "Content-Length" value';
-is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 13,           'right "Content-Length" value';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->content->asset->size, 13, 'right size';
 is $req->content->asset->slurp, 'abcdabcdefghi', 'right content';
 
@@ -586,8 +586,8 @@ is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_length, 13, 'right "Content-Length" value';
-is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 13,           'right "Content-Length" value';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $buffer, '131313abcd1313abcdefghi', 'right content';
 
 # Parse HTTP 1.1 "x-application-urlencoded"
@@ -1047,8 +1047,7 @@ $req = Mojo::Message::Request->new;
 $req->parse("GET http://127.0.0.1/foo/bar HTTP/1.1\x0d\x0a");
 $req->parse("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Host: 127.0.0.1\x0d\x0a");
-$req->parse(
-  "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
+$req->parse("Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Content-Length: 13\x0d\x0a\x0d\x0a");
 $req->parse("Hello World!\n");
 ok $req->is_finished, 'request is finished';
@@ -1056,8 +1055,7 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
-is $req->url->base, 'http://Aladdin:open%20sesame@127.0.0.1',
-  'right base URL';
+is $req->url->base, 'http://Aladdin:open%20sesame@127.0.0.1', 'right base URL';
 is $req->url->base->userinfo, 'Aladdin:open sesame', 'right base userinfo';
 is $req->url, 'http://127.0.0.1/foo/bar', 'right URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
@@ -1066,8 +1064,7 @@ is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 $req = Mojo::Message::Request->new;
 $req->parse("CONNECT 127.0.0.1:3000 HTTP/1.1\x0d\x0a");
 $req->parse("Host: 127.0.0.1\x0d\x0a");
-$req->parse(
-  "Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
+$req->parse("Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'CONNECT', 'right method';
@@ -1132,9 +1129,9 @@ is $clone->version,     '1.1', 'right version';
 ok $clone->at_least_version('1.0'), 'at least version 1.0';
 ok !$clone->at_least_version('1.2'), 'not version 1.2';
 is $clone->url, '/foo/bar', 'right URL';
-is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $clone->headers->expect, '100-continue', 'right "Expect" value';
-is $clone->headers->host,   '127.0.0.1',    'right "Host" value';
+is $clone->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->headers->expect, '100-continue',             'right "Expect" value';
+is $clone->headers->host,   '127.0.0.1',                'right "Host" value';
 
 # Build HTTP 1.1 start line and header (with clone and changes)
 $req = Mojo::Message::Request->new;
@@ -1258,9 +1255,9 @@ is $clone->version,     '1.1', 'right version';
 ok $clone->at_least_version('1.0'), 'at least version 1.0';
 ok !$clone->at_least_version('1.2'), 'not version 1.2';
 is $clone->url, '/foo/bar', 'right URL';
-is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $clone->headers->expect, '100-continue', 'right "Expect" value';
-is $clone->headers->host,   '127.0.0.1',    'right "Host" value';
+is $clone->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->headers->expect, '100-continue',             'right "Expect" value';
+is $clone->headers->host,   '127.0.0.1',                'right "Host" value';
 is $clone->headers->content_length, '13', 'right "Content-Length" value';
 is $clone->body, "Hello World!\n", 'right content';
 ok !$finished, 'finish event has been emitted';
@@ -1519,8 +1516,8 @@ is $clone->version,     '1.1', 'right version';
 ok $clone->at_least_version('1.0'), 'at least version 1.0';
 ok !$clone->at_least_version('1.2'), 'not version 1.2';
 is $clone->url, 'http://127.0.0.1/foo/bar', 'right URL';
-is $clone->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
-is $clone->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
+is $clone->url->to_abs,     'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $clone->proxy->userinfo, 'Aladdin:open sesame',      'right proxy userinfo';
 is $clone->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Authorization" value';
 is $clone->headers->expect, '100-continue', 'right "Expect" value';
@@ -1762,8 +1759,8 @@ is $req->version,     '1.0', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
-is $req->headers->content_length, 27, 'right "Content-Length" value';
+is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, 27,           'right "Content-Length" value';
 my $cookies = $req->cookies;
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';

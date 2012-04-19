@@ -99,11 +99,7 @@ get '/outerinnerlayout' => sub {
 # GET /withblocklayout
 get '/withblocklayout' => sub {
   my $self = shift;
-  $self->render(
-    template => 'index',
-    layout   => 'with_block',
-    handler  => 'epl'
-  );
+  $self->render(template => 'index', layout => 'with_block', handler => 'epl');
 };
 
 # GET /content_for
@@ -216,8 +212,7 @@ $t->get_ok('/outerlayouttwo')->status_is(200)
 $t->get_ok('/outerinnerlayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-  "layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
+  ->content_is("layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 
 # GET /withblocklayout
 $t->get_ok('/withblocklayout')->status_is(200)
@@ -234,8 +229,7 @@ $t->get_ok('/content_for')->status_is(200)
 # GET /inline
 $t->get_ok('/inline')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("inline!\n");
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("inline!\n");
 
 # GET /inline/again
 $t->get_ok('/inline/again')->status_is(200)

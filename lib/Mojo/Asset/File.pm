@@ -25,8 +25,7 @@ has handle => sub {
   my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
   my $name = $path // $base;
   until ($handle->open($name, O_CREAT | O_EXCL | O_RDWR)) {
-    croak qq/Can't open file "$name": $!/
-      if defined $path || $! != $!{EEXIST};
+    croak qq/Can't open file "$name": $!/ if defined $path || $! != $!{EEXIST};
     $name = "$base." . md5_sum(time . $$ . rand 9999999);
   }
   $self->path($name);

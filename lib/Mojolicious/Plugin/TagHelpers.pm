@@ -151,8 +151,7 @@ sub register {
           if (ref $group eq 'HASH') {
             my ($label, $values) = each %$group;
             my $content = join '', map { $option->($_) } @$values;
-            $parts
-              .= $self->_tag('optgroup', label => $label, sub {$content});
+            $parts .= $self->_tag('optgroup', label => $label, sub {$content});
           }
 
           # "option" tag
@@ -303,8 +302,8 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
-L<Mojolicious>. This is a core plugin, that means it is always enabled and
-its code a good example for learning how to build new plugins.
+L<Mojolicious>. This is a core plugin, that means it is always enabled and its
+code a good example for learning how to build new plugins.
 
 Most form helpers can automatically pick up previous input values and will
 show them as default. You can also use
@@ -587,8 +586,8 @@ picked up and shown as default.
     Default!
   % end
 
-Generate textarea element. Previous input values will automatically get
-picked up and shown as default.
+Generate textarea element. Previous input values will automatically get picked
+up and shown as default.
 
   <textarea name="foo"></textarea>
   <textarea cols="40" name="foo">Default!</textarea>

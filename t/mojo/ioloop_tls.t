@@ -124,8 +124,7 @@ ok $client_err, 'has error';
 
 # Missing client certificate
 $server_err = $client_err = '';
-$loop->client({port => $port, tls => 1} => sub { shift; $client_err = shift }
-);
+$loop->client({port => $port, tls => 1} => sub { shift; $client_err = shift });
 $loop->timer(1 => sub { shift->stop });
 $loop->start;
 ok !$server_err, 'no error';

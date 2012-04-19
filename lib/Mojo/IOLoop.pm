@@ -343,14 +343,13 @@ L<Mojo::IOLoop> is a very minimalistic reactor based on L<Mojo::Reactor>, it
 has been reduced to the absolute minimal feature set required to build solid
 and scalable non-blocking TCP clients and servers.
 
-Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are
-supported transparently and used if installed. Individual features can also
-be disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment
-variables.
+Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are supported
+transparently and used if installed. Individual features can also be disabled
+with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
-A TLS certificate and key are also built right in to make writing test
-servers as easy as possible. Also note that for convenience the C<PIPE>
-signal will be set to C<IGNORE> when L<Mojo::IOLoop> is loaded.
+A TLS certificate and key are also built right in to make writing test servers
+as easy as possible. Also note that for convenience the C<PIPE> signal will be
+set to C<IGNORE> when L<Mojo::IOLoop> is loaded.
 
 =head1 ATTRIBUTES
 
@@ -369,10 +368,9 @@ defaults to L<Mojo::IOLoop::Client>.
   my $cb = $loop->lock;
   $loop  = $loop->lock(sub {...});
 
-A locking callback that decides if this loop is allowed to accept new
-incoming connections, used to sync multiple server processes. The callback
-should return true or false. Note that exceptions in this callback are not
-captured.
+A locking callback that decides if this loop is allowed to accept new incoming
+connections, used to sync multiple server processes. The callback should
+return true or false. Note that exceptions in this callback are not captured.
 
   $loop->lock(sub {
     my ($loop, $blocking) = @_;
@@ -399,8 +397,7 @@ connections indefinitely.
 The maximum number of parallel connections this loop is allowed to handle
 before stopping to accept new incoming connections, defaults to C<1000>.
 Setting the value to C<0> will make this loop stop accepting new connections
-and allow it to shutdown gracefully without interrupting existing
-connections.
+and allow it to shutdown gracefully without interrupting existing connections.
 
 =head2 C<reactor>
 
@@ -467,8 +464,8 @@ L<Mojo::IOLoop::Client/"connect">.
   my $delay = $loop->delay;
   my $delay = $loop->delay(sub {...});
 
-Get L<Mojo::IOLoop::Delay> object to synchronize events and subscribe to
-event L<Mojo::IOLoop::Delay/"finish"> if optional callback is provided.
+Get L<Mojo::IOLoop::Delay> object to synchronize events and subscribe to event
+L<Mojo::IOLoop::Delay/"finish"> if optional callback is provided.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
@@ -555,8 +552,8 @@ object from everywhere inside the process.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the loop, this will block until C<stop> is called or no events are
-being watched anymore.
+Start the loop, this will block until C<stop> is called or no events are being
+watched anymore.
 
   # Start loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
@@ -591,8 +588,8 @@ seconds.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_IOLOOP_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
+You can set the C<MOJO_IOLOOP_DEBUG> environment variable to get some advanced
+diagnostics information printed to C<STDERR>.
 
   MOJO_IOLOOP_DEBUG=1
 

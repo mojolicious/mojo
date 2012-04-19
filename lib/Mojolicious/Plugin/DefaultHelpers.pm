@@ -135,9 +135,9 @@ Mojolicious::Plugin::DefaultHelpers - Default helpers plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::DefaultHelpers> is a collection of renderer helpers
-for L<Mojolicious>. This is a core plugin, that means it is always enabled
-and its code a good example for learning to build new plugins.
+L<Mojolicious::Plugin::DefaultHelpers> is a collection of renderer helpers for
+L<Mojolicious>. This is a core plugin, that means it is always enabled and its
+code a good example for learning to build new plugins.
 
 =head1 HELPERS
 

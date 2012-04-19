@@ -92,8 +92,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::daemon> inherits all methods from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::daemon> inherits all methods from L<Mojo::Command> and
+implements the following new ones.
 
 =head2 C<run>
 

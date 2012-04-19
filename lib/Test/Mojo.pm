@@ -573,8 +573,8 @@ arguments as L<Mojo::UserAgent/"get">.
   $t = $t->head_ok('/foo');
   $t = $t->head_ok('/foo' => {DNT => 1} => 'Hi!');
 
-Perform a C<HEAD> request and check for transport errors, takes the exact
-same arguments as L<Mojo::UserAgent/"head">.
+Perform a C<HEAD> request and check for transport errors, takes the exact same
+arguments as L<Mojo::UserAgent/"head">.
 
 =head2 C<header_is>
 
@@ -616,16 +616,16 @@ Check response content for JSON data.
   $t = $t->json_is('/foo/bar' => [1, 2, 3]);
   $t = $t->json_is('/foo/bar/1' => 2, 'right value');
 
-Check the value extracted from JSON response using the given JSON Pointer
-with L<Mojo::JSON::Pointer>.
+Check the value extracted from JSON response using the given JSON Pointer with
+L<Mojo::JSON::Pointer>.
 
 =head2 C<json_has>
 
   $t = $t->json_has('/foo');
   $t = $t->json_has('/minibar', 'has a minibar');
 
-Check if JSON response contains a value that can be identified using the
-given JSON Pointer with L<Mojo::JSON::Pointer>.
+Check if JSON response contains a value that can be identified using the given
+JSON Pointer with L<Mojo::JSON::Pointer>.
 
 =head2 C<json_hasnt>
 
@@ -683,8 +683,8 @@ same arguments as L<Mojo::UserAgent/"patch">.
   $t = $t->post_ok('/foo');
   $t = $t->post_ok('/foo' => {DNT => 1} => 'Hi!');
 
-Perform a C<POST> request and check for transport errors, takes the exact
-same arguments as L<Mojo::UserAgent/"post">.
+Perform a C<POST> request and check for transport errors, takes the exact same
+arguments as L<Mojo::UserAgent/"post">.
 
 =head2 C<post_form_ok>
 

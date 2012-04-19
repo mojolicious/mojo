@@ -341,8 +341,8 @@ sub decode {
 
     # Everything else
     else {
-      $bytes = ($ENCODE{$encoding} ||= find_encoding($encoding))
-        ->decode($bytes, 1);
+      $bytes
+        = ($ENCODE{$encoding} ||= find_encoding($encoding))->decode($bytes, 1);
     }
 
     1;

@@ -29,8 +29,7 @@ get '/hello' => 'works';
 my $t = Test::Mojo->new;
 
 # GET /hello
-$t->get_ok('/hello')->status_is(200)
-  ->content_is("Hello from the main app!\n");
+$t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");
 
 # GET /x/1 (external app)
 $t->get_ok('/x/1')->status_is(200)->content_is('too!');

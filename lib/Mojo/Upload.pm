@@ -45,8 +45,7 @@ L<Mojo::Upload> implements the following attributes.
   my $asset = $upload->asset;
   $upload   = $upload->asset(Mojo::Asset::File->new);
 
-Asset containing the uploaded data, defaults to a L<Mojo::Asset::File>
-object.
+Asset containing the uploaded data, defaults to a L<Mojo::Asset::File> object.
 
 =head2 C<filename>
 

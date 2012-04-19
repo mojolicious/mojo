@@ -29,8 +29,8 @@ the following new ones.
 
   $plugin->register;
 
-This method will be called by L<Mojolicious::Plugins> at startup time,
-your plugin should use this to hook into the application.
+This method will be called by L<Mojolicious::Plugins> at startup time, your
+plugin should use this to hook into the application.
 
 =head1 SEE ALSO
 

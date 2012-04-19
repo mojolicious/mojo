@@ -173,8 +173,8 @@ get '/maybe/ajax' => sub {
 # GET /stream
 get '/stream' => sub {
   my $self = shift;
-  my $chunks = [qw/foo bar/, $self->req->url->to_abs->userinfo,
-    $self->url_for->to_abs];
+  my $chunks
+    = [qw/foo bar/, $self->req->url->to_abs->userinfo, $self->url_for->to_abs];
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   my $cb;
@@ -591,8 +591,7 @@ $t->get_ok('/unicode/a\\b')->status_is(200)->content_is('a\\b/unicode/a%5Cb');
 # GET /
 $t->get_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+  ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # HEAD /
 $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -601,8 +600,7 @@ $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 
 # GET / (with body)
 $t->get_ok('/', '1234' x 1024)->status_is(200)
-  ->content_is(
-  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+  ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # DELETE /
 $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -775,8 +773,7 @@ $t->get_ok('/static2.txt', {'Range' => 'bytes=2-5'})->status_is(206)
 # GET /template.txt.epl (protected DATA template)
 $t->get_ok('/template.txt.epl')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Oops!/);
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
 
 # GET /null/0
 $t->get_ok('/null/0')->status_is(200)
@@ -865,11 +862,9 @@ $t->get_ok('/root.txt')->status_is(200)
   ->content_is('root fallback!');
 
 # GET /.html
-$t->get_ok('/.html')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
+$t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(
-  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
+  ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /0 ("X-Forwarded-For")
 my $source = $t->tx->local_address;
@@ -926,8 +921,7 @@ $t->get_ok('/source?fail=1')->status_is(404)->content_is('does not exist!');
 $t->get_ok('/foo_relaxed/123')->status_is(200)->content_is('1230');
 
 # GET /foo_relaxed/123 (Do Not Track)
-$t->get_ok('/foo_relaxed/123', {DNT => 1})->status_is(200)
-  ->content_is('1231');
+$t->get_ok('/foo_relaxed/123', {DNT => 1})->status_is(200)->content_is('1231');
 
 # GET /foo_relaxed
 $t->get_ok('/foo_relaxed/')->status_is(404);
@@ -998,8 +992,7 @@ $t->get_ok('/session_cookie/2')->status_is(200)
 
 # GET /foo
 $t->get_ok('/foo')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('Yea baby!');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Yea baby!');
 
 # POST /template
 $t->post_ok('/template')->status_is(200)
@@ -1038,8 +1031,7 @@ $t->post_ok('/something/else')->status_is(200)
 # DELETE /something/else
 $t->delete_ok('/something/else')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Oops!/);
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
 
 # GET /regex/23
 $t->get_ok('/regex/23')->status_is(200)
@@ -1049,8 +1041,7 @@ $t->get_ok('/regex/23')->status_is(200)
 # GET /regex/foo
 $t->get_ok('/regex/foo')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Oops!/);
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
 
 # POST /bar
 $t->post_ok('/bar')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
@@ -1076,8 +1067,7 @@ $t->patch_ok('/firefox/bar', {'User-Agent' => 'Firefox'})->status_is(200)
 # PATCH /firefox
 $t->patch_ok('/firefox/bar', {'User-Agent' => 'Explorer'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Oops!/);
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
 
 # GET /url_for_foxy
 $t->get_ok('/url_for_foxy')->status_is(200)

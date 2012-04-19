@@ -275,9 +275,9 @@ global L<Mojo::IOLoop> singleton.
   my $timeout = $stream->timeout;
   $stream     = $stream->timeout(45);
 
-Maximum amount of time in seconds stream can be inactive before getting
-closed automatically, defaults to C<15>. Setting the value to C<0> will allow
-this stream to be inactive indefinitely.
+Maximum amount of time in seconds stream can be inactive before getting closed
+automatically, defaults to C<15>. Setting the value to C<0> will allow this
+stream to be inactive indefinitely.
 
 =head1 METHODS
 
@@ -306,8 +306,8 @@ Get handle for stream.
 
   my $success = $stream->is_readable;
 
-Quick non-blocking check if stream is readable, useful for identifying
-tainted sockets.
+Quick non-blocking check if stream is readable, useful for identifying tainted
+sockets.
 
 =head2 C<is_writing>
 

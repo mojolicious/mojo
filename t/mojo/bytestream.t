@@ -63,13 +63,11 @@ is "$stream", "Zm9vw5/EgGJhciUyM+KYug==\n", 'right base64 encoded result';
 
 # utf8 b64_decode
 $stream = b("Zm9vw5/EgGJhciUyM+KYug==\n")->b64_decode->decode('UTF-8');
-is "$stream", "foo\x{df}\x{0100}bar%23\x{263a}",
-  'right base64 decoded result';
+is "$stream", "foo\x{df}\x{0100}bar%23\x{263a}", 'right base64 decoded result';
 
 # utf8 b64_decode
 $stream = b("Zm9vw5/EgGJhciUyM+KYug==\n")->b64_decode->decode;
-is "$stream", "foo\x{df}\x{0100}bar%23\x{263a}",
-  'right base64 decoded result';
+is "$stream", "foo\x{df}\x{0100}bar%23\x{263a}", 'right base64 decoded result';
 
 # b64_encode (custom line ending)
 $stream = b('foobar$%^&3217');
@@ -165,8 +163,8 @@ is b(
   'Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data')
   ->hmac_md5_sum(chr(0xaa) x 80), '6f630fad67cda0ee1fb1f562db3aa53e',
   'right hmac md5 checksum';
-is b('Hi there')->hmac_md5_sum(1234567890),
-  'e3b5fab1b3f5b9d1fe391d09fce7b2ae', 'right hmac md5 checksum';
+is b('Hi there')->hmac_md5_sum(1234567890), 'e3b5fab1b3f5b9d1fe391d09fce7b2ae',
+  'right hmac md5 checksum';
 
 # hmac_sha1_sum (RFC 2202)
 is b('Hi There')->hmac_sha1_sum(chr(0x0b) x 20),
@@ -193,8 +191,7 @@ is b('Hi there')->hmac_sha1_sum(1234567890),
 
 # html_escape
 $stream = b("foobar'<baz>");
-is $stream->html_escape, 'foobar&#39;&lt;baz&gt;',
-  'right html escaped result';
+is $stream->html_escape, 'foobar&#39;&lt;baz&gt;', 'right html escaped result';
 
 # html_escape (nothing to escape)
 $stream = b('foobar');
@@ -218,13 +215,13 @@ is "$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;',
   'right html escaped result';
 
 # utf8 html_unescape
-$stream = b('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;')->decode('UTF-8')
-  ->html_unescape;
+$stream
+  = b('foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;')->decode('UTF-8')->html_unescape;
 is "$stream", "foo<baz>&\"\x{152}&Foo;", 'right html unescaped result';
 
 # html_escape (path)
-$stream = b('/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm')
-  ->html_escape;
+$stream
+  = b('/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm')->html_escape;
 is "$stream", '/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm',
   'right html escaped result';
 
@@ -376,8 +373,8 @@ is_deeply [b('')->split(qr/,/)->each], [], 'no elements';
 $stream = b('1/2/3');
 is $stream->split('/')->map(sub { $_->quote })->join(', '), '"1", "2", "3"',
   'right result';
-is $stream->split('/')->map(sub { shift->quote })->join(', '),
-  '"1", "2", "3"', 'right result';
+is $stream->split('/')->map(sub { shift->quote })->join(', '), '"1", "2", "3"',
+  'right result';
 
 # say and autojoin
 my $buffer = '';

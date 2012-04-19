@@ -200,21 +200,20 @@ my $t = Test::Mojo->new;
 $t->get_ok('/with_under', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
+  ->header_is('X-Under'      => '23, 24')->header_like('X-Under' => qr/23, 24/)
   ->content_is('Unders are cool!');
 
 # GET /with_under_too
 $t->get_ok('/with_under_too', {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
+  ->header_is('X-Under'      => '23, 24')->header_like('X-Under' => qr/23, 24/)
   ->content_is('Unders are cool too!');
 
 # GET /with_under_too
 $t->get_ok('/with_under_too')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/Oops!/);
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
 
 # GET /param_auth
 $t->get_ok('/param_auth')->status_is(200)
@@ -225,8 +224,7 @@ $t->get_ok('/param_auth')->status_is(200)
 # GET /param_auth?name=Bender
 $t->get_ok('/param_auth?name=Bender')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Bender!\n");
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Bender!\n");
 
 # GET /param_auth/too
 $t->get_ok('/param_auth/too')->status_is(200)

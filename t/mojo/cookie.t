@@ -50,9 +50,9 @@ is $cookies->[0]->value, 'WILE_E_COYOTE', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse multiple request cookies (Netscape)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse(
-  'CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001');
+$cookie = Mojo::Cookie::Request->new;
+$cookies
+  = $cookie->parse('CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001');
 is $cookies->[0]->name,  'CUSTOMER',             'right name';
 is $cookies->[0]->value, 'WILE_E_COYOTE',        'right value';
 is $cookies->[1]->name,  'PART_NUMBER',          'right name';
@@ -60,9 +60,9 @@ is $cookies->[1]->value, 'ROCKET_LAUNCHER_0001', 'right value';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse multiple request cookies from multiple header values (Netscape)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse(
-  'CUSTOMER=WILE_E_COYOTE, PART_NUMBER=ROCKET_LAUNCHER_0001');
+$cookie = Mojo::Cookie::Request->new;
+$cookies
+  = $cookie->parse('CUSTOMER=WILE_E_COYOTE, PART_NUMBER=ROCKET_LAUNCHER_0001');
 is $cookies->[0]->name,  'CUSTOMER',             'right name';
 is $cookies->[0]->value, 'WILE_E_COYOTE',        'right value';
 is $cookies->[1]->name,  'PART_NUMBER',          'right name';
@@ -89,9 +89,8 @@ is $cookies->[0]->value, 'b ,a" r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted request cookie roundtrip (RFC 2965)
-$cookie = Mojo::Cookie::Request->new;
-$cookies
-  = $cookie->parse('$Version=1; foo="b ,a\";= r\"\\\\"; $Path="/test"');
+$cookie  = Mojo::Cookie::Request->new;
+$cookies = $cookie->parse('$Version=1; foo="b ,a\";= r\"\\\\"; $Path="/test"');
 is $cookies->[0]->name,  'foo',          'right name';
 is $cookies->[0]->value, 'b ,a";= r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
@@ -170,10 +169,8 @@ $cookie->max_age(60);
 $cookie->expires(1218092879);
 $cookie->secure(1);
 $cookie->httponly(1);
-is $cookie->to_string,
-  'foo=ba r; Domain=kraih.com; Path=/test; Max-Age=60;'
-  . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure; HttpOnly',
-  'right format';
+is $cookie->to_string, 'foo=ba r; Domain=kraih.com; Path=/test; Max-Age=60;'
+  . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure; HttpOnly', 'right format';
 
 # Parse response cookie (RFC 6265)
 $cookies

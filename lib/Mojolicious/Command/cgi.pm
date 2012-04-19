@@ -42,8 +42,8 @@ backend.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::cgi> inherits all attributes from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::cgi> inherits all attributes from L<Mojo::Command> and
+implements the following new ones.
 
 =head2 C<description>
 

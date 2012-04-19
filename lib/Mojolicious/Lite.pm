@@ -140,8 +140,8 @@ customized to override normal C<@ARGV> use.
 =head2 Reloading
 
 Your application will automatically reload itself if you start it with the
-C<morbo> development web server, so you don't have to restart the server
-after every change.
+C<morbo> development web server, so you don't have to restart the server after
+every change.
 
   $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
@@ -149,8 +149,8 @@ after every change.
 =head2 Routes
 
 Routes are basically just fancy paths that can contain different kinds of
-placeholders. C<$self> is a L<Mojolicious::Controller> object containing
-both, the HTTP request and response.
+placeholders. C<$self> is a L<Mojolicious::Controller> object containing both,
+the HTTP request and response.
 
   # /foo
   get '/foo' => sub {
@@ -192,8 +192,8 @@ L<Mojolicious::Guides::Rendering/"Embedded Perl">.
 
 =head2 HTTP
 
-L<Mojolicious::Controller/"req"> and L<Mojolicious::Controller/"res"> give
-you full access to all HTTP features and information.
+L<Mojolicious::Controller/"req"> and L<Mojolicious::Controller/"res"> give you
+full access to all HTTP features and information.
 
   # /agent
   get '/agent' => sub {
@@ -377,8 +377,8 @@ Relaxed placeholders allow matching of everything until a C</> occurs.
 
 =head2 Wildcard placeholders
 
-Wildcard placeholders allow matching absolutely everything, including
-C</> and C<.>.
+Wildcard placeholders allow matching absolutely everything, including C</> and
+C<.>.
 
   # /hello/test
   # /hello/test123
@@ -461,8 +461,8 @@ easily customized.
   };
 
 Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
-placeholders become part of a larger regular expression internally,
-C<(?:...)> is fine though.
+placeholders become part of a larger regular expression internally, C<(?:...)>
+is fine though.
 
 =head2 Under
 
@@ -601,9 +601,8 @@ Or you can just disable format detection.
 
 =head2 Content negotiation
 
-For resources with different representations and that require truly
-C<RESTful> content negotiation you can also use
-L<Mojolicious::Controller/"respond_to">.
+For resources with different representations and that require truly C<RESTful>
+content negotiation you can also use L<Mojolicious::Controller/"respond_to">.
 
   # /hello (Accept: application/json)
   # /hello (Accept: text/xml)
@@ -678,9 +677,9 @@ cookies really secure.
 =head2 File uploads
 
 All files uploaded via C<multipart/form-data> request are automatically
-available as L<Mojo::Upload> objects. And you don't have to worry about
-memory usage, because all files above C<250KB> will be automatically streamed
-into a temporary file.
+available as L<Mojo::Upload> objects. And you don't have to worry about memory
+usage, because all files above C<250KB> will be automatically streamed into a
+temporary file.
 
   use Mojolicious::Lite;
 
@@ -718,8 +717,8 @@ into a temporary file.
     </body>
   </html>
 
-To protect you from excessively large files there is also a limit of C<5MB>
-by default, which you can tweak with the C<MOJO_MAX_MESSAGE_SIZE> environment
+To protect you from excessively large files there is also a limit of C<5MB> by
+default, which you can tweak with the C<MOJO_MAX_MESSAGE_SIZE> environment
 variable.
 
   # Increase limit to 1GB
@@ -767,8 +766,8 @@ directory.
 
 =head2 Static files
 
-Static files will be automatically served from the C<DATA> section
-(even Base64 encoded) or a C<public> directory if it exists.
+Static files will be automatically served from the C<DATA> section (even
+Base64 encoded) or a C<public> directory if it exists.
 
   @@ something.js
   alert('hello!');

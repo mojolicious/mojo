@@ -213,8 +213,8 @@ Connection identifier or socket.
 
 =head2 C<error>
 
-  my $message          = $message->error;
-  my ($message, $code) = $message->error;
+  my $message          = $tx->error;
+  my ($message, $code) = $tx->error;
 
 Parser errors and codes.
 

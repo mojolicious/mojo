@@ -824,11 +824,6 @@ Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
 
 Alias for L<Mojo::UserAgent::Transactor/"form">.
 
-  # Streaming multipart file upload
-  my $tx
-    = $ua->build_form_tx('mojolicio.us' => {fun => {file => '/etc/passwd'}});
-  $ua->start($tx);
-
 =head2 C<build_tx>
 
   my $tx = $ua->build_tx(GET => 'kraih.com');

@@ -803,8 +803,13 @@ Application relative URLs will be processed with, defaults to the value of the
 C<MOJO_APP> environment variable, which is usually a L<Mojo> or L<Mojolicious>
 object.
 
+  # Introspect
   say $ua->app->secret;
+
+  # Change log level
   $ua->app->log->level('fatal');
+
+  # Change application behavior
   $ua->app->defaults(testing => 'oh yea!');
 
 =head2 C<app_url>
@@ -815,6 +820,7 @@ object.
 
 Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
 
+  # Port currently used for processing relative URLs
   say $ua->app_url->port;
 
 =head2 C<build_form_tx>

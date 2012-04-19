@@ -41,5 +41,5 @@ is ref Mojolicious::Commands->run('psgi'), 'CODE', 'right reference';
 }
 
 # Start application with command
-is ref Mojolicious::Commands->start_app(MojoliciousTest => 'psgi'),
-  'CODE', 'right reference';
+is ref Mojolicious::Commands->start_app(MojoliciousTest => 'psgi'), 'CODE',
+  'right reference';

@@ -64,8 +64,8 @@ my $y = 1;
 for my $i (101 .. 150) {
   $y = !$y;
   $monkeys[$i] = BaseTest->new;
-  isa_ok $monkeys[$i]->name('foobarbaz'),
-    'BaseTest', 'attribute value has right class';
+  isa_ok $monkeys[$i]->name('foobarbaz'), 'BaseTest',
+    'attribute value has right class';
   $monkeys[$i]->heads('3') if $y;
   $y
     ? is($monkeys[$i]->heads, 3, 'right attribute value')

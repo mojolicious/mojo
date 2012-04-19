@@ -27,8 +27,7 @@ $log = Mojo::Log->new;
 like $log->format(debug => 'Test 123.'), qr/^\[.*\] \[debug\] Test 123\.\n$/,
   'right format';
 like $log->format(qw/debug Test 1 2 3/),
-  qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/,
-  'right format';
+  qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
 
 # Events
 my $messages = [];

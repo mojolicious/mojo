@@ -73,8 +73,8 @@ is "$stream", "foo\x{df}\x{0100}bar%23\x{263a}",
 
 # b64_encode (custom line ending)
 $stream = b('foobar$%^&3217');
-is $stream->b64_encode(''),
-  "Zm9vYmFyJCVeJjMyMTc=", 'right base64 encoded result';
+is $stream->b64_encode(''), "Zm9vYmFyJCVeJjMyMTc=",
+  'right base64 encoded result';
 
 # url_escape
 $stream = b('business;23');
@@ -186,8 +186,8 @@ is b('Test Using Larger Than Block-Size Key - Hash Key First')
   'right hmac sha1 checksum';
 is b(
   'Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data')
-  ->hmac_sha1_sum(chr(0xaa) x 80),
-  'e8e99d0f45237d786d6bbaa7965c7808bbff1a91', 'right hmac sha1 checksum';
+  ->hmac_sha1_sum(chr(0xaa) x 80), 'e8e99d0f45237d786d6bbaa7965c7808bbff1a91',
+  'right hmac sha1 checksum';
 is b('Hi there')->hmac_sha1_sum(1234567890),
   '4fd7160f392dc54308608cae6587e137c62c2e39', 'right hmac sha1 checksum';
 
@@ -374,8 +374,8 @@ is_deeply [b('')->split('')->each],    [], 'no elements';
 is_deeply [b('')->split(',')->each],   [], 'no elements';
 is_deeply [b('')->split(qr/,/)->each], [], 'no elements';
 $stream = b('1/2/3');
-is $stream->split('/')->map(sub { $_->quote })->join(', '),
-  '"1", "2", "3"', 'right result';
+is $stream->split('/')->map(sub { $_->quote })->join(', '), '"1", "2", "3"',
+  'right result';
 is $stream->split('/')->map(sub { shift->quote })->join(', '),
   '"1", "2", "3"', 'right result';
 

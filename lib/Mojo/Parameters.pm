@@ -153,8 +153,7 @@ sub to_hash {
 
     # Array
     if (exists $params{$name}) {
-      $params{$name} = [$params{$name}]
-        unless ref $params{$name} eq 'ARRAY';
+      $params{$name} = [$params{$name}] unless ref $params{$name} eq 'ARRAY';
       push @{$params{$name}}, $value;
     }
 

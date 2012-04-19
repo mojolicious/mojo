@@ -333,8 +333,7 @@ is $cookies->[0]->max_age, 60,          'right max age value';
 is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
   'right expires value';
 is $cookies->[0]->secure, '1', 'right secure flag';
-is $cookies->[0]->to_string,
-  'foo=; Domain=kraih.com; Path=/test; Max-Age=60;'
+is $cookies->[0]->to_string, 'foo=; Domain=kraih.com; Path=/test; Max-Age=60;'
   . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure', 'right result';
 is $cookies->[1], undef, 'no more cookies';
 $cookies
@@ -349,8 +348,7 @@ is $cookies->[0]->max_age, 60,          'right max age value';
 is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
   'right expires value';
 is $cookies->[0]->secure, '1', 'right secure flag';
-is $cookies->[0]->to_string,
-  'foo=; Domain=kraih.com; Path=/test; Max-Age=60;'
+is $cookies->[0]->to_string, 'foo=; Domain=kraih.com; Path=/test; Max-Age=60;'
   . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure', 'right result';
 is $cookies->[1], undef, 'no more cookies';
 

@@ -35,8 +35,7 @@ sub detect {
   return 'psgi' if defined $ENV{PLACK_ENV};
 
   # CGI
-  return 'cgi'
-    if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
+  return 'cgi' if defined $ENV{PATH_INFO} || defined $ENV{GATEWAY_INTERFACE};
 
   # Nothing
   return $guess;

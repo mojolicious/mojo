@@ -84,8 +84,7 @@ is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/"test"/,
+like $tx->req->content->parts->[0]->headers->content_disposition, qr/"test"/,
   'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 123, 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
@@ -97,16 +96,13 @@ is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/"test"/,
+like $tx->req->content->parts->[0]->headers->content_disposition, qr/"test"/,
   'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 1, 'right part';
-like $tx->req->content->parts->[1]->headers->content_disposition,
-  qr/"test"/,
+like $tx->req->content->parts->[1]->headers->content_disposition, qr/"test"/,
   'right "Content-Disposition" value';
 is $tx->req->content->parts->[1]->asset->slurp, 2, 'right part';
-like $tx->req->content->parts->[2]->headers->content_disposition,
-  qr/"test"/,
+like $tx->req->content->parts->[2]->headers->content_disposition, qr/"test"/,
   'right "Content-Disposition" value';
 is $tx->req->content->parts->[2]->asset->slurp, 3, 'right part';
 is $tx->req->content->parts->[3], undef, 'no more parts';
@@ -119,11 +115,9 @@ is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/"mytext"/,
-  'right "Content-Disposition" value';
+  qr/"mytext"/, 'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/"transactor.t"/,
-  'right "Content-Disposition" value';
+  qr/"transactor.t"/, 'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
 ok !$tx->req->content->parts->[0]->headers->header('file'),
   'no "file" header';
@@ -149,8 +143,7 @@ is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
-  qr/foo\.zip/,
-  'right "Content-Disposition" value';
+  qr/foo\.zip/, 'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 'whatever', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 

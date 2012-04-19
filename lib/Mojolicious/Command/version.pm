@@ -18,19 +18,15 @@ sub run {
 
   # IPv6
   my $ipv6
-    = Mojo::IOLoop::Server::IPV6()
-    ? $IO::Socket::IP::VERSION
-    : 'not installed';
+    = Mojo::IOLoop::Server::IPV6 ? $IO::Socket::IP::VERSION : 'not installed';
 
   # TLS
   my $tls
-    = Mojo::IOLoop::Server::TLS()
-    ? $IO::Socket::SSL::VERSION
-    : 'not installed';
+    = Mojo::IOLoop::Server::TLS ? $IO::Socket::SSL::VERSION : 'not installed';
 
   # Bonjour
   my $bonjour
-    = Mojo::Server::Daemon::BONJOUR()
+    = Mojo::Server::Daemon::BONJOUR
     ? $Net::Rendezvous::Publish::VERSION
     : 'not installed';
 

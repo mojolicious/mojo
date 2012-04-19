@@ -107,10 +107,8 @@ sub startup {
   );
 
   # /test5 (only namespace test)
-  $r->route('/test5')->to(
-    namespace => 'MojoliciousTest2::Foo',
-    action    => 'test'
-  );
+  $r->route('/test5')
+    ->to(namespace => 'MojoliciousTest2::Foo', action => 'test');
 
   # /test6 (no namespace test)
   $r->route('/test6')->to(

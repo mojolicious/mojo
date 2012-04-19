@@ -1947,21 +1947,17 @@ is $dom->find('entry')->[0]->id->text,          '1286823',       'right text';
 is $dom->find('entry')->[0]->addresses->children('type')->[0]->text, 'home',
   'right text';
 is $dom->find('entry')->[0]->addresses->formatted->text,
-  "742 Evergreen Terrace\nSpringfield, VT 12345 USA",
-  'right text';
+  "742 Evergreen Terrace\nSpringfield, VT 12345 USA", 'right text';
 is $dom->find('entry')->[0]->addresses->formatted->text(0),
-  "742 Evergreen Terrace\nSpringfield, VT 12345 USA",
-  'right text';
+  "742 Evergreen Terrace\nSpringfield, VT 12345 USA", 'right text';
 is $dom->find('entry')->[1]->displayName->text, 'Marge Simpson', 'right text';
 is $dom->find('entry')->[1]->id->text,          '1286822',       'right text';
 is $dom->find('entry')->[1]->addresses->children('type')->[0]->text, 'home',
   'right text';
 is $dom->find('entry')->[1]->addresses->formatted->text,
-  '742 Evergreen Terrace Springfield, VT 12345 USA',
-  'right text';
+  '742 Evergreen Terrace Springfield, VT 12345 USA', 'right text';
 is $dom->find('entry')->[1]->addresses->formatted->text(0),
-  "742 Evergreen Terrace\nSpringfield, VT 12345 USA",
-  'right text';
+  "742 Evergreen Terrace\nSpringfield, VT 12345 USA", 'right text';
 is $dom->find('entry')->[2], undef, 'no result';
 is $dom->find('entry')->size, 2, 'right number of elements';
 

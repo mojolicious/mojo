@@ -113,17 +113,12 @@ $r->route('/format7', format => [qw/foo foobar/])->to('perl#rocks');
 
 # /articles/1/edit
 # /articles/1/delete
-my $bridge = $r->bridge('/articles/:id')->to(
-  controller => 'articles',
-  action     => 'load',
-  format     => 'html'
-);
+my $bridge = $r->bridge('/articles/:id')
+  ->to(controller => 'articles', action => 'load', format => 'html');
 $bridge->route('/edit')->to(controller => 'articles', action => 'edit');
-$bridge->route('/delete')->to(
-  controller => 'articles',
-  action     => 'delete',
-  format     => undef
-)->name('articles_delete');
+$bridge->route('/delete')
+  ->to(controller => 'articles', action => 'delete', format => undef)
+  ->name('articles_delete');
 
 # GET /method/get
 $r->route('/method/get')->via('GET')

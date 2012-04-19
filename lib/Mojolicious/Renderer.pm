@@ -226,8 +226,7 @@ sub _detect_handler {
 
   # DATA templates
   unless ($self->{data}) {
-    my @templates
-      = map { sort keys %{Mojo::Command->get_all_data($_)} }
+    my @templates = map { sort keys %{Mojo::Command->get_all_data($_)} }
       @{$self->classes};
     s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
   }

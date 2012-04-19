@@ -105,11 +105,9 @@ is $url->to_abs(Mojo::URL->new('http://')), 'http://localhost/23/',
 is $url->to_abs(Mojo::URL->new('https://')), 'https://localhost/23/',
   'right absolute version';
 is $url->to_abs(Mojo::URL->new('http://mojolicio.us')),
-  'http://localhost/23/',
-  'right absolute version';
+  'http://localhost/23/', 'right absolute version';
 is $url->to_abs(Mojo::URL->new('http://mojolicio.us:8080')),
-  'http://localhost/23/',
-  'right absolute version';
+  'http://localhost/23/', 'right absolute version';
 $url = Mojo::URL->new('///bar/23/');
 ok !$url->is_abs, 'is not absolute';
 is $url->host, '',         'no host';

@@ -1330,8 +1330,8 @@ $t->get_ok('/captures/♥/☃')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/captures/%E2%99%A5/%E2%98%83');
-is b($t->tx->res->body)->url_unescape->decode('UTF-8'),
-  '/captures/♥/☃', 'right result';
+is b($t->tx->res->body)->url_unescape->decode('UTF-8'), '/captures/♥/☃',
+  'right result';
 
 # GET /favicon.ico (bundled file in DATA section)
 $t->get_ok('/favicon.ico')->status_is(200)->content_is("Not a favicon!\n\n");

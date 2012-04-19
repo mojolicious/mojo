@@ -66,8 +66,8 @@ sub build_frame {
     warn "-- Extended 64bit payload ($len)\n$payload\n" if DEBUG;
     vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
     $frame .= $prefix;
-    $frame .=
-      $Config{ivsize} > 4
+    $frame
+      .= $Config{ivsize} > 4
       ? pack('Q>', $len)
       : pack('NN', $len >> 32, $len & 0xFFFFFFFF);
   }

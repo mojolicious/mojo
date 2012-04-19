@@ -105,8 +105,7 @@ sub parse {
     my $connection = $headers->connection || '';
     my $len        = $headers->content_length // '';
     $self->relaxed(1)
-      if !length $len
-        && ($connection =~ /close/i || $headers->content_type);
+      if !length $len && ($connection =~ /close/i || $headers->content_type);
   }
 
   # Parse chunked content

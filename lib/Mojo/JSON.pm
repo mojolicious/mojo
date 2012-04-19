@@ -193,13 +193,11 @@ sub _decode_string {
 
         # High surrogate
         ($ord & 0xFC00) == 0xD800
-          or pos($_) = $pos + pos($str),
-          _exception('Missing high-surrogate');
+          or pos($_) = $pos + pos($str), _exception('Missing high-surrogate');
 
         # Low surrogate
         $str =~ m/\G\\u([Dd][C-Fc-f]..)/gc
-          or pos($_) = $pos + pos($str),
-          _exception('Missing low-surrogate');
+          or pos($_) = $pos + pos($str), _exception('Missing low-surrogate');
 
         # Pair
         $ord = 0x10000 + ($ord - 0xD800) * 0x400 + (hex($1) - 0xDC00);
@@ -257,8 +255,7 @@ sub _encode_object {
   my $object = shift;
 
   # Encode pairs
-  my @pairs
-    = map { _encode_string($_) . ':' . _encode_values($object->{$_}) }
+  my @pairs = map { _encode_string($_) . ':' . _encode_values($object->{$_}) }
     keys %$object;
 
   # Stringify

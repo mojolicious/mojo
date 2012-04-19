@@ -602,8 +602,8 @@ is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type,
-  'x-application-urlencoded', 'right "Content-Type" value';
+is $req->headers->content_type, 'x-application-urlencoded',
+  'right "Content-Type" value';
 ok !$req->content->asset->is_file, 'stored in memory';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
@@ -625,8 +625,8 @@ is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type,
-  'x-application-urlencoded', 'right "Content-Type" value';
+is $req->headers->content_type, 'x-application-urlencoded',
+  'right "Content-Type" value';
 ok $req->content->asset->is_file, 'stored in file';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
@@ -647,8 +647,7 @@ is $req->version,     '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type,
-  'application/x-www-form-urlencoded',
+is $req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar&+tset=23+;&foo=bar', 'right content';
@@ -960,8 +959,7 @@ is $stream,
     "#!/usr/bin/perl\n\n"
   . "use strict;\n"
   . "use warnings;\n\n"
-  . "print \"Hello World :)\\n\"\n",
-  'right content';
+  . "print \"Hello World :)\\n\"\n", 'right content';
 
 # Parse HTTP 1.1 multipart request (without upgrade)
 $req = Mojo::Message::Request->new;

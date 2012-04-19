@@ -396,8 +396,7 @@ is $req->url->base->path, '/cgi-bin/myapp/myapp.pl/', 'right base path';
 is $req->version, '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
-is $req->url->to_abs->to_string,
-  'http://getmyapp.org/cgi-bin/myapp/myapp.pl',
+is $req->url->to_abs->to_string, 'http://getmyapp.org/cgi-bin/myapp/myapp.pl',
   'right absolute URL';
 
 # Parse Apache mod_fastcgi like CGI environment variables
@@ -449,8 +448,7 @@ is $req->url->base->path, '', 'no base path';
 is $req->version, '1.1', 'right version';
 ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
-is $req->url->to_abs->to_string,
-  'http://127.0.0.1:13028/upload',
+is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload',
   'right absolute URL';
 my $file = $req->upload('file');
 is $file->slurp, '11023456789', 'right uploaded content';

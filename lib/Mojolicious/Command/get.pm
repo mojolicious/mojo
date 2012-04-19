@@ -106,8 +106,8 @@ sub run {
         my $version = $res->version;
         my $code    = $res->code;
         my $message = $res->message;
-        warn "HTTP/$version $code $message\n",
-          $res->headers->to_string, "\n\n";
+        warn "HTTP/$version $code $message\n", $res->headers->to_string,
+          "\n\n";
 
         # Finished
         $v = 0;

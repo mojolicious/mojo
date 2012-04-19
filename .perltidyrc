@@ -2,12 +2,12 @@
 -b       # Just rewrite the file
 -w       # Show all warnings
 -iob     # Ignore old breakpoints
--l=79    # 79 character per line
+-l=79    # 79 characters per line
 -mbl=2   # No more than 2 blank lines
--i=2     # Indent level is 2
--ci=2    # Continuation indent is 2
+-i=2     # Indentation is 2 columns
+-ci=2    # Continuation indentation is 2 columns
 -vt=0    # Less vertical tightness
 -pt=2    # High parenthesis tightness
 -bt=2    # High brace tightness
 -sbt=2   # High square bracket tightness
--isbc    # Don't indent comments without whitespace before the #
+-isbc    # Don't indent comments without leading space

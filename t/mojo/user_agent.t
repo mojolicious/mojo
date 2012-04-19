@@ -133,7 +133,7 @@ like $err, qr/error event works/, 'right error';
 
 # GET / (HTTPS request without TLS support)
 my $tx = $ua->get($ua->app_url->scheme('https'));
-like $tx->error, qr/IO::Socket::SSL/, 'right error';
+ok $tx->error, 'has error';
 
 # GET / (blocking)
 $tx = $ua->get('/');

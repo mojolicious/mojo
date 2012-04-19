@@ -1,8 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.85  2012-04-19
-  - Modernized .perltidyrc.
+  - Modernized ".perltidyrc".
   - Improved documentation. (diegok, sri)
+  - Fixed bug in "user_agent.t".
 
 2.84  2012-04-19
   - Improved documentation.
@@ -1930,7 +1931,7 @@ This file documents the revision history for Perl extension Mojolicious.
     still available and overrides auto detection.
   - Added Flash Policy Server example. (xantus)
   - Added more reference docs.
-  - Added .gitignore generator command. (marcus)
+  - Added ".gitignore" generator command. (marcus)
   - Added automatic CGI/FastCGI environment detection to Mojo::Commands.
   - Renamed Mojolicious::Book to Mojolicious::Guides.
   - Removed hot deployment support for Windows because of incompatibilities
@@ -2497,7 +2498,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Fixed / routes matching too much.
   - New Windows workaround in Mojo::Client and Mojo::Server::Daemon.
   - Cleaned up Mojo::Transaction. (Ask Bjoern Hansen)
-  - Added .perltidyrc. (Ask Bjoern Hansen)
+  - Added ".perltidyrc". (Ask Bjoern Hansen)
   - Allow chains to be broken with return values in
     MojoX::Dispatcher::Routes.
   - The stack in MojoX::Routes resets now.

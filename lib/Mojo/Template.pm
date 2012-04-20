@@ -151,11 +151,9 @@ sub interpret {
   # Interpret
   return unless my $compiled = $self->compiled;
   my $output = eval { $compiled->(@_) };
-  $output
-    = Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
-    if $@;
-
-  return $output;
+  return $@
+    ? Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
+    : $output;
 }
 
 # "I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T..."
@@ -313,22 +311,23 @@ sub render_file {
   while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) { $tmpl .= $buffer }
 
   # Decode and render
-  $tmpl = decode $self->encoding, $tmpl if $self->encoding;
+  if (my $encoding = $self->encoding) {
+    croak qq/Template "$path" has invalid encoding./
+      unless defined($tmpl = decode $encoding, $tmpl);
+  }
   return $self->render($tmpl, @_);
 }
 
 sub render_file_to_file {
   my ($self, $spath, $tpath) = (shift, shift, shift);
   my $output = $self->render_file($spath, @_);
-  return $output if ref $output;
-  return $self->_write_file($tpath, $output);
+  return ref $output ? $output : $self->_write_file($tpath, $output);
 }
 
 sub render_to_file {
   my ($self, $tmpl, $path) = (shift, shift, shift);
   my $output = $self->render($tmpl, @_);
-  return $output if ref $output;
-  return $self->_write_file($path, $output);
+  return ref $output ? $output : $self->_write_file($path, $output);
 }
 
 sub _trim {

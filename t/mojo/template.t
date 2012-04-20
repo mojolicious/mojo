@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 197;
+use Test::More tests => 199;
 
 # "When I held that gun in my hand, I felt a surge of power...
 #  like God must feel when he's holding a gun."
@@ -1064,3 +1064,11 @@ is $output->lines_after->[0]->[1], '☃', 'right line';
 is utf8::is_utf8($output->lines_before->[0]->[1]), 1, 'context has utf8 flag';
 is utf8::is_utf8($output->line->[1]), 1, 'context has utf8 flag';
 is utf8::is_utf8($output->lines_after->[0]->[1]), 1, 'context has utf8 flag';
+
+# Different encodings
+$mt = Mojo::Template->new(encoding => 'ISO-8859-1');
+$file = catfile $dir, 'test3.mt';
+is $mt->render_to_file('ü', $file), undef, 'file rendered';
+$mt = Mojo::Template->new(encoding => 'UTF-8');
+eval { $mt->render_file($file) };
+like $@, qr/invalid encoding/, 'right error';

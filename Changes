@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.86  2012-04-20
+  - Improved Mojo::Template exception handling.
   - Improved documentation.
 
 2.85  2012-04-19

@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 199;
+use Test::More tests => 200;
 
 # "When I held that gun in my hand, I felt a surge of power...
 #  like God must feel when he's holding a gun."
@@ -1070,5 +1070,5 @@ $mt = Mojo::Template->new(encoding => 'ISO-8859-1');
 $file = catfile $dir, 'test3.mt';
 is $mt->render_to_file('ü', $file), undef, 'file rendered';
 $mt = Mojo::Template->new(encoding => 'UTF-8');
-eval { $mt->render_file($file) };
+ok !eval { $mt->render_file($file) }, 'file not rendered';
 like $@, qr/invalid encoding/, 'right error';

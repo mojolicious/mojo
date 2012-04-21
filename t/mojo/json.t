@@ -1,8 +1,16 @@
+package JSONTest;
+use Mojo::Base -base;
+
+has 'something' => sub { {} };
+
+sub TO_JSON { shift->something }
+
+package main;
 use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 117;
+use Test::More tests => 119;
 
 # "We should be safe up here. I'm pretty sure fires can't climb trees."
 use Mojo::ByteStream 'b';
@@ -251,6 +259,13 @@ is_deeply $json->decode($string), ["\x{2028}test\x{2029}123"],
 # Blessed reference
 $string = $json->encode([b('test')]);
 is_deeply $json->decode($string), ['test'], 'right roundtrip';
+
+# Blessed reference with TO_JSON method
+$string = $json->encode(JSONTest->new);
+is_deeply $json->decode($string), {}, 'right roundtrip';
+$string = $json->encode(
+  JSONTest->new(something => {just => 'works'}, else => {not => 'working'}));
+is_deeply $json->decode($string), {just => 'works'}, 'right roundtrip';
 
 # Errors
 is $json->decode('["♥"]'), undef, 'wide character in input';

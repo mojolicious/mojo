@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use B;
 use Mojo::Util;
+use Scalar::Util 'blessed';
 
 has 'error';
 
@@ -56,10 +57,7 @@ sub decode {
 
   # Detect and decode unicode
   my $encoding = 'UTF-8';
-  for my $name (keys %$UTF_PATTERNS) {
-    next unless $string =~ $UTF_PATTERNS->{$name};
-    $encoding = $name;
-  }
+  $string =~ $UTF_PATTERNS->{$_} and $encoding = $_ for keys %$UTF_PATTERNS;
   $string = Mojo::Util::decode $encoding, $string;
 
   # Object or array
@@ -209,9 +207,7 @@ sub _decode_string {
   }
 
   # The rest
-  $buffer .= substr $str, pos($str), length($str);
-
-  return $buffer;
+  return $buffer . substr $str, pos($str), length($str);
 }
 
 # "Eternity with nerds.
@@ -278,21 +274,22 @@ sub _encode_values {
   # Reference
   if (my $ref = ref $value) {
 
+    # Blessed reference with TO_JSON method
+    return _encode_values($value->TO_JSON)
+      if blessed $value && $value->can('TO_JSON');
+
     # Array
     return _encode_array($value) if $ref eq 'ARRAY';
 
     # Object
     return _encode_object($value) if $ref eq 'HASH';
+
+    # True or false
+    return $value ? 'true' : 'false' if $ref eq 'Mojo::JSON::_Bool';
   }
 
-  # "null"
+  # Null
   return 'null' unless defined $value;
-
-  # "false"
-  return 'false' if ref $value eq 'Mojo::JSON::_Bool' && !$value;
-
-  # "true"
-  return 'true' if ref $value eq 'Mojo::JSON::_Bool' && $value;
 
   # Number
   my $flags = B::svref_2object(\$value)->FLAGS;
@@ -352,7 +349,8 @@ it is possibly the fastest pure-Perl JSON parser available, you should not use
 it for validation.
 
 It supports normal Perl data types like C<Scalar>, C<Array> reference, C<Hash>
-reference and will try to stringify blessed references.
+reference and will try to call the C<TO_JSON> method on blessed references, or
+stringify them if it doesn't exist.
 
   [1, -2, 3]     -> [1, -2, 3]
   {"foo": "bar"} -> {foo => 'bar'}

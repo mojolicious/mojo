@@ -9,9 +9,6 @@ has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 
-# JSON serializer
-my $JSON = Mojo::JSON->new;
-
 # "Bender, quit destroying the universe!"
 sub load {
   my ($self, $c) = @_;
@@ -21,7 +18,7 @@ sub load {
 
   # Deserialize
   $value =~ s/\-/\=/g;
-  return unless my $session = $JSON->decode(b64_decode $value);
+  return unless my $session = Mojo::JSON->new->decode(b64_decode $value);
 
   # Expiration
   my $expiration = $self->default_expiration;
@@ -59,7 +56,7 @@ sub store {
     if $expiration || $default;
 
   # Serialize
-  my $value = b64_encode $JSON->encode($session), '';
+  my $value = b64_encode(Mojo::JSON->new->encode($session), '');
   $value =~ s/\=/\-/g;
 
   # Session cookie

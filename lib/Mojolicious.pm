@@ -81,13 +81,8 @@ sub new {
     if -w $home->rel_file('log');
 
   # Load default plugins
-  $self->plugin('HeaderCondition');
-  $self->plugin('DefaultHelpers');
-  $self->plugin('TagHelpers');
-  $self->plugin('EPLRenderer');
-  $self->plugin('EPRenderer');
-  $self->plugin('RequestTimer');
-  $self->plugin('PoweredBy');
+  $self->plugin($_) for qw/HeaderCondition DefaultHelpers TagHelpers/;
+  $self->plugin($_) for qw/EPLRenderer EPRenderer RequestTimer PoweredBy/;
 
   # Exception handling
   $self->hook(
@@ -103,8 +98,7 @@ sub new {
   $self->log->level('info') unless $mode eq 'development';
 
   # Run mode
-  $mode = $mode . '_mode';
-  $self->$mode(@_) if $self->can($mode);
+  if (my $sub = $self->can("${mode}_mode")) { $self->$sub(@_) }
 
   # Startup
   $self->startup(@_);
@@ -128,8 +122,7 @@ sub dispatch {
   my $tx = $c->tx;
   $c->res->code(undef) if $tx->is_websocket;
   $self->sessions->load($c);
-  my $plugins = $self->plugins;
-  $plugins->emit_hook(before_dispatch => $c);
+  my $plugins = $self->plugins->emit_hook(before_dispatch => $c);
 
   # Try to find a static file
   $self->static->dispatch($c);

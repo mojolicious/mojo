@@ -27,11 +27,11 @@ sub new {
   my $self = shift->SUPER::new(@_);
 
   # Detect home directory
-  $self->home->detect(ref $self);
+  my $home = $self->home->detect(ref $self);
 
   # Log directory
-  $self->log->path($self->home->rel_file('log/mojo.log'))
-    if -w $self->home->rel_file('log');
+  $self->log->path($home->rel_file('log/mojo.log'))
+    if -w $home->rel_file('log');
 
   return $self;
 }
@@ -47,15 +47,14 @@ sub _dict {
   my ($self, $name) = (shift, shift);
 
   # Hash
-  $self->{$name} ||= {};
-  return $self->{$name} unless @_;
+  my $dict = $self->{$name} ||= {};
+  return $dict unless @_;
 
   # Get
-  return $self->{$name}{$_[0]} unless @_ > 1 || ref $_[0];
+  return $dict->{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
-  my $values = ref $_[0] ? $_[0] : {@_};
-  $self->{$name} = {%{$self->{$name}}, %$values};
+  %$dict = (%$dict, %{ref $_[0] ? $_[0] : {@_}});
 
   return $self;
 }

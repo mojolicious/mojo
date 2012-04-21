@@ -103,23 +103,17 @@ sub render {
   @{$stash}{keys %$args} = values %$args;
 
   # Extract important stash values
-  my $template = delete $stash->{template};
-  my $format   = $stash->{format} || $self->default_format;
-  my $data     = delete $stash->{data};
-  my $json     = delete $stash->{json};
-  my $text     = delete $stash->{text};
-  my $inline   = delete $stash->{inline};
-
-  # Pick handler
-  my $handler = $stash->{handler};
-  $handler = $self->default_handler if defined $inline && !defined $handler;
   my $options = {
-    template => $template,
-    format   => $format,
-    handler  => $handler,
     encoding => $self->encoding,
-    inline   => $inline
+    handler  => $stash->{handler},
+    template => delete $stash->{template}
   };
+  my $data   = $options->{data}   = delete $stash->{data};
+  my $format = $options->{format} = $stash->{format} || $self->default_format;
+  my $inline = $options->{inline} = delete $stash->{inline};
+  my $json   = $options->{json}   = delete $stash->{json};
+  my $text   = $options->{test}   = delete $stash->{text};
+  $options->{handler} //= $self->default_handler if defined $inline;
 
   # Text
   my $output;
@@ -187,14 +181,10 @@ EOF
 
 sub template_name {
   my ($self, $options) = @_;
-
   return unless my $template = $options->{template} || '';
   return unless my $format = $options->{format};
   my $handler = $options->{handler};
-  my $file    = "$template.$format";
-  $file = "$file.$handler" if defined $handler;
-
-  return $file;
+  return defined $handler ? "$template.$format.$handler" : "$template.$format";
 }
 
 sub template_path {

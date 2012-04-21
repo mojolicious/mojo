@@ -8,8 +8,8 @@ use Scalar::Util 'blessed';
 has 'error';
 
 # Literal names
-my $FALSE = Mojo::JSON::_Bool->new(0);
-my $TRUE  = Mojo::JSON::_Bool->new(1);
+my $FALSE = bless \(my $false = 0), 'Mojo::JSON::_Bool';
+my $TRUE  = bless \(my $true  = 1), 'Mojo::JSON::_Bool';
 
 # Escaped special character map (with u2028 and u2029)
 my %ESCAPE = (
@@ -274,10 +274,6 @@ sub _encode_values {
   # Reference
   if (my $ref = ref $value) {
 
-    # Blessed reference with TO_JSON method
-    return _encode_values($value->TO_JSON)
-      if blessed $value && $value->can('TO_JSON');
-
     # Array
     return _encode_array($value) if $ref eq 'ARRAY';
 
@@ -286,6 +282,11 @@ sub _encode_values {
 
     # True or false
     return $value ? 'true' : 'false' if $ref eq 'Mojo::JSON::_Bool';
+
+    # Blessed reference with TO_JSON method
+    if (blessed $value && (my $sub = $value->can('TO_JSON'))) {
+      return _encode_values($value->$sub);
+    }
   }
 
   # Null
@@ -319,13 +320,7 @@ sub _exception {
 
 # Emulate boolean type
 package Mojo::JSON::_Bool;
-use Mojo::Base -base;
-use overload
-  '0+'     => sub { $_[0]{value} },
-  '""'     => sub { $_[0]{value} },
-  fallback => 1;
-
-sub new { shift->SUPER::new(value => shift) }
+use overload '0+' => sub { ${$_[0]} }, '""' => sub { ${$_[0]} }, fallback => 1;
 
 1;
 __END__

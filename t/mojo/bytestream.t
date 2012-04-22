@@ -191,7 +191,7 @@ is b('Hi there')->hmac_sha1_sum(1234567890),
 
 # html_escape
 $stream = b("foobar'<baz>");
-is $stream->html_escape, 'foobar&#39;&lt;baz&gt;', 'right html escaped result';
+is $stream->html_escape, 'foobar&#39;&LT;baz&GT;', 'right html escaped result';
 
 # html_escape (nothing to escape)
 $stream = b('foobar');
@@ -211,7 +211,7 @@ is $stream->html_unescape, 'foobar', 'right html unescaped result';
 
 # utf8 html_escape
 $stream = b("foobar<baz>&\"\x{152}")->html_escape;
-is "$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;',
+is "$stream", 'foobar&LT;baz&GT;&AMP;&QUOT;&OElig;',
   'right html escaped result';
 
 # utf8 html_unescape
@@ -220,9 +220,9 @@ $stream
 is "$stream", "foo<baz>&\"\x{152}&Foo;", 'right html unescaped result';
 
 # html_escape (path)
-$stream
-  = b('/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm')->html_escape;
-is "$stream", '/usr/local/lib/perl5/site_perl/5.10.0/Mojo/ByteStream.pm',
+$stream = b('/site_perl/5.10.0/Mojo.pm')->html_escape;
+is "$stream",
+  '&sol;site&UnderBar;perl&sol;5&period;10&period;0&sol;Mojo&period;pm',
   'right html escaped result';
 
 # xml_escape

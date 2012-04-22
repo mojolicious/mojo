@@ -43,36 +43,23 @@ sub import {
   *{"${caller}::c"} = \&c;
   *{"${caller}::a"}
     = sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
-  *{"${caller}::d"} = sub { _request(DELETE  => @_) };
-  *{"${caller}::f"} = sub { _request(FORM    => @_) };
-  *{"${caller}::g"} = sub { _request(GET     => @_) };
-  *{"${caller}::h"} = sub { _request(HEAD    => @_) };
-  *{"${caller}::o"} = sub { _request(OPTIONS => @_) };
-  *{"${caller}::p"} = sub { _request(POST    => @_) };
-  *{"${caller}::t"} = sub { _request(PATCH   => @_) };
-  *{"${caller}::u"} = sub { _request(PUT     => @_) };
+  *{"${caller}::d"} = sub { _request($UA->build_tx(DELETE => @_)) };
+  *{"${caller}::f"} = sub { _request($UA->build_form_tx(@_)) };
+  *{"${caller}::g"} = sub { _request($UA->build_tx(GET => @_)) };
+  *{"${caller}::h"} = sub { _request($UA->build_tx(HEAD => @_)) };
+  *{"${caller}::o"} = sub { _request($UA->build_tx(OPTIONS => @_)) };
+  *{"${caller}::p"} = sub { _request($UA->build_tx(POST => @_)) };
+  *{"${caller}::t"} = sub { _request($UA->build_tx(PATCH => @_)) };
+  *{"${caller}::u"} = sub { _request($UA->build_tx(PUT => @_)) };
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
 }
 
 # "I wonder what the shroud of Turin tastes like."
 sub _request {
-
-  # Method
-  my $method = $_[0] =~ m#:|/# ? 'GET' : shift;
-
-  # Transaction
-  my $tx
-    = $method eq 'FORM'
-    ? $UA->build_form_tx(@_)
-    : $UA->build_tx($method => @_);
-
-  # Process
-  $tx = $UA->start($tx);
-
-  # Error
+  my $tx = $UA->start(@_);
   my ($message, $code) = $tx->error;
-  warn qq/Problem loading URL "$_[0]". ($message)\n/ if $message && !$code;
-
+  warn qq/Problem loading URL "@{[$tx->req->url->to_abs]}". ($message)\n/
+    if $message && !$code;
   return $tx->res;
 }
 

@@ -1,12 +1,13 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.86  2012-04-22
+2.86  2012-04-23
   - Added support for TO_JSON method to Mojo::JSON.
   - Updated HTML5 entities in Mojo::Util.
   - Improved Mojo::Template exception handling.
   - Improved ojo exception handling.
   - Improved documentation.
   - Improved tests.
+  - Fixed a few HTML5 unescaping bugs.
 
 2.85  2012-04-19
   - Modernized ".perltidyrc".

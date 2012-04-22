@@ -5,7 +5,7 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 141;
+use Test::More tests => 142;
 
 # Need to be loaded first to trigger edge case
 use MIME::Base64;
@@ -190,8 +190,9 @@ is b('Hi there')->hmac_sha1_sum(1234567890),
   '4fd7160f392dc54308608cae6587e137c62c2e39', 'right hmac sha1 checksum';
 
 # html_escape
-$stream = b("foobar'<baz>");
-is $stream->html_escape, 'foobar&#39;&LT;baz&GT;', 'right html escaped result';
+$stream = b("foo bar'<baz>");
+is $stream->html_escape, 'foo bar&#39;&lt;baz&gt;',
+  'right html escaped result';
 
 # html_escape (nothing to escape)
 $stream = b('foobar');
@@ -209,9 +210,13 @@ is $stream->html_unescape, "foobar'<baz>&\"", 'right html unescaped result';
 $stream = b('foobar');
 is $stream->html_unescape, 'foobar', 'right html unescaped result';
 
+# html_unescape (relaxed)
+$stream = b('f&0oo&nbspba;&ampr');
+is $stream->html_unescape, "f&0oo\x{00a0}ba;&r", 'right html unescaped result';
+
 # utf8 html_escape
 $stream = b("foobar<baz>&\"\x{152}")->html_escape;
-is "$stream", 'foobar&LT;baz&GT;&AMP;&QUOT;&OElig;',
+is "$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;',
   'right html escaped result';
 
 # utf8 html_unescape
@@ -222,7 +227,7 @@ is "$stream", "foo<baz>&\"\x{152}&Foo;", 'right html unescaped result';
 # html_escape (path)
 $stream = b('/site_perl/5.10.0/Mojo.pm')->html_escape;
 is "$stream",
-  '&sol;site&UnderBar;perl&sol;5&period;10&period;0&sol;Mojo&period;pm',
+  '&sol;site&lowbar;perl&sol;5&period;10&period;0&sol;Mojo&period;pm',
   'right html escaped result';
 
 # xml_escape

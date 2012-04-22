@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 129;
+use Test::More tests => 133;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -322,6 +322,12 @@ $t->get_ok('/♥/123/one' => {Host => 'www.foo-bar.de'})->status_is(200)
 # GET /♥/123/one/two (full external application with a bit of everything)
 $t->get_ok('/♥/123/one/two' => {Host => 'www.foo-bar.de'})->status_is(200)
   ->content_is('Two');
+
+# GET /host (full external application with bad domain)
+$t->get_ok('/' => {Host => 'mojoliciousxorg'})->status_is(404);
+
+# GET /host (full external application with bad wildcard domain)
+$t->get_ok('/' => {Host => 'www.kraihxcom'})->status_is(404);
 
 __DATA__
 

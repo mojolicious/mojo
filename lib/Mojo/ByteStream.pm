@@ -186,6 +186,8 @@ Alias for L<Mojo::Util/"hmac_md5_sum">.
 
 Alias for L<Mojo::Util/"hmac_sha1_sum">.
 
+  b('foo bar baz')->hmac_sha1_sum('secr3t')->quote->say;
+
 =head2 C<html_escape>
 
   $stream = $stream->html_escape;
@@ -200,6 +202,8 @@ Alias for L<Mojo::Util/"html_escape">.
   $stream = $stream->html_unescape;
 
 Alias for L<Mojo::Util/"html_unescape">.
+
+  b('&lt;html&gt;')->html_unescape->url_escape->say;
 
 =head2 C<md5_bytes>
 
@@ -316,6 +320,8 @@ Alias for L<Mojo::Util/"url_escape">.
   $stream = $stream->url_unescape;
 
 Alias for L<Mojo::Util/"url_unescape">.
+
+  b('%3Chtml%3E')->url_unescape->html_escape->say;
 
 =head2 C<xml_escape>
 

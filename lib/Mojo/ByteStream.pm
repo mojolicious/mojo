@@ -127,23 +127,20 @@ Construct a new L<Mojo::ByteStream> object.
 
   $stream = $stream->b64_decode;
 
-Base64 decode bytestream.
+Alias for L<Mojo::Util/"b64_decode">.
 
 =head2 C<b64_encode>
 
   $stream = $stream->b64_encode;
   $stream = $stream->b64_encode('');
 
-Base64 encode bytestream.
+Alias for L<Mojo::Util/"b64_encode">.
 
 =head2 C<camelize>
 
   $stream = $stream->camelize;
 
-Convert snake case bytestream to camel case and replace C<-> with C<::>.
-
-  foo_bar     -> FooBar
-  foo_bar-baz -> FooBar::Baz
+Alias for L<Mojo::Util/"camelize">.
 
 =head2 C<clone>
 
@@ -155,17 +152,14 @@ Clone bytestream.
 
   $stream = $stream->decamelize;
 
-Convert camel case bytestream to snake case and replace C<::> with C<->.
-
-  FooBar      -> foo_bar
-  FooBar::Baz -> foo_bar-baz
+Alias for L<Mojo::Util/"b64_decamelize">.
 
 =head2 C<decode>
 
   $stream = $stream->decode;
   $stream = $stream->decode($encoding);
 
-Decode bytestream, defaults to C<UTF-8>.
+Alias for L<Mojo::Util/"decode">, defaults to C<UTF-8>.
 
   $stream->decode('UTF-8')->to_string;
 
@@ -174,7 +168,7 @@ Decode bytestream, defaults to C<UTF-8>.
   $stream = $stream->encode;
   $stream = $stream->encode($encoding);
 
-Encode bytestream, defaults to C<UTF-8>.
+Alias for L<Mojo::Util/"encode">, defaults to C<UTF-8>.
 
   $stream->encode('UTF-8')->to_string;
 
@@ -182,67 +176,67 @@ Encode bytestream, defaults to C<UTF-8>.
 
   $stream = $stream->hmac_md5_sum($secret);
 
-Turn bytestream into HMAC-MD5 checksum of old content.
+Alias for L<Mojo::Util/"hmac_md5_sum">.
 
 =head2 C<hmac_sha1_sum>
 
   $stream = $stream->hmac_sha1_sum($secret);
 
-Turn bytestream into HMAC-SHA1 checksum of old content.
+Alias for L<Mojo::Util/"hmac_sha1_sum">.
 
 =head2 C<html_escape>
 
   $stream = $stream->html_escape;
 
-Escape all HTML5 named character entities in bytestream.
+Alias for L<Mojo::Util/"html_escape">.
 
 =head2 C<html_unescape>
 
   $stream = $stream->html_unescape;
 
-Unescape all HTML5 entities in bytestream.
+Alias for L<Mojo::Util/"html_unescape">.
 
 =head2 C<md5_bytes>
 
   $stream = $stream->md5_bytes;
 
-Turn bytestream into binary MD5 checksum of old content.
+Alias for L<Mojo::Util/"md5_bytes">.
 
 =head2 C<md5_sum>
 
   $stream = $stream->md5_sum;
 
-Turn bytestream into MD5 checksum of old content.
+Alias for L<Mojo::Util/"md5_sum">.
 
 =head2 C<punycode_decode>
 
   $stream = $stream->punycode_decode;
 
-Punycode decode bytestream.
+Alias for L<Mojo::Util/"punycode_decode">.
 
 =head2 C<punycode_encode>
 
   $stream = $stream->punycode_encode;
 
-Punycode encode bytestream.
+Alias for L<Mojo::Util/"punycode_encode">.
 
 =head2 C<qp_decode>
 
   $stream = $stream->qp_decode;
 
-Quoted Printable decode bytestream.
+Alias for L<Mojo::Util/"qp_decode">.
 
 =head2 C<qp_encode>
 
   $stream = $stream->qp_encode;
 
-Quoted Printable encode bytestream.
+Alias for L<Mojo::Util/"qp_encode">.
 
 =head2 C<quote>
 
   $stream = $stream->quote;
 
-Quote bytestream.
+Alias for L<Mojo::Util/"quote">.
 
 =head2 C<say>
 
@@ -255,19 +249,19 @@ Print bytestream to handle or STDOUT and append a newline.
 
   my $success = $stream->secure_compare($string);
 
-Constant time comparison algorithm to prevent timing attacks.
+Alias for L<Mojo::Util/"secure_compare">.
 
 =head2 C<sha1_bytes>
 
   $stream = $stream->sha1_bytes;
 
-Turn bytestream into binary SHA1 checksum of old content.
+Alias for L<Mojo::Util/"sha1_bytes">.
 
 =head2 C<sha1_sum>
 
   $stream = $stream->sha1_sum;
 
-Turn bytestream into SHA1 checksum of old content.
+Alias for L<Mojo::Util/"sha1_sum">.
 
 =head2 C<size>
 
@@ -293,33 +287,32 @@ Stringify bytestream.
 
   $stream = $stream->trim;
 
-Trim whitespace characters from both ends of bytestream.
+Alias for L<Mojo::Util/"trim">.
 
 =head2 C<unquote>
 
   $stream = $stream->unquote;
 
-Unquote bytestream.
+Alias for L<Mojo::Util/"unquote">.
 
 =head2 C<url_escape>
 
   $stream = $stream->url_escape;
   $stream = $stream->url_escape('A-Za-z0-9\-\.\_\~');
 
-URL escape bytestream.
+Alias for L<Mojo::Util/"url_escape">.
 
 =head2 C<url_unescape>
 
   $stream = $stream->url_unescape;
 
-URL unescape bytestream.
+Alias for L<Mojo::Util/"url_unescape">.
 
 =head2 C<xml_escape>
 
   $stream = $stream->xml_escape;
 
-Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in
-bytestream, this is a much faster version of C<html_escape>.
+Alias for L<Mojo::Util/"xml_escape">.
 
 =head1 SEE ALSO
 

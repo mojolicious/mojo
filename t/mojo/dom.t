@@ -1977,13 +1977,13 @@ is $dom->find('head > [http-equiv$="-type"]')->[0]{content}, 'text/html',
   'right attribute';
 is $dom->find('head > [http-equiv$="-type"]')->[1], undef, 'no result';
 
-# Find "0" attribute value
+# Find "0" attribute value and unescape relaxed entity
 $dom = Mojo::DOM->new(<<EOF);
 <a accesskey="0">Zero</a>
-<a accesskey="1">One</a>
+<a accesskey="1">O&aMpn&ampe</a>
 EOF
-is $dom->find('a[accesskey]')->[0]->text, 'Zero', 'right text';
-is $dom->find('a[accesskey]')->[1]->text, 'One',  'right text';
+is $dom->find('a[accesskey]')->[0]->text, 'Zero',     'right text';
+is $dom->find('a[accesskey]')->[1]->text, 'O&aMpn&e', 'right text';
 is $dom->find('a[accesskey]')->[2], undef, 'no result';
 is $dom->find('a[accesskey="0"]')->[0]->text, 'Zero', 'right text';
 is $dom->find('a[accesskey="0"]')->[1], undef, 'no result';
@@ -1995,15 +1995,15 @@ is $dom->find('a[accesskey~="0"]')->[0]->text, 'Zero', 'right text';
 is $dom->find('a[accesskey~="0]')->[1], undef, 'no result';
 is $dom->find('a[accesskey*="0"]')->[0]->text, 'Zero', 'right text';
 is $dom->find('a[accesskey*="0]')->[1], undef, 'no result';
-is $dom->find('a[accesskey="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey="1"]')->[0]->text, 'O&aMpn&e', 'right text';
 is $dom->find('a[accesskey="1"]')->[1], undef, 'no result';
-is $dom->find('a[accesskey^="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey^="1"]')->[0]->text, 'O&aMpn&e', 'right text';
 is $dom->find('a[accesskey^="1"]')->[1], undef, 'no result';
-is $dom->find('a[accesskey$="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey$="1"]')->[0]->text, 'O&aMpn&e', 'right text';
 is $dom->find('a[accesskey$="1]')->[1], undef, 'no result';
-is $dom->find('a[accesskey~="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey~="1"]')->[0]->text, 'O&aMpn&e', 'right text';
 is $dom->find('a[accesskey~="1]')->[1], undef, 'no result';
-is $dom->find('a[accesskey*="1"]')->[0]->text, 'One', 'right text';
+is $dom->find('a[accesskey*="1"]')->[0]->text, 'O&aMpn&e', 'right text';
 is $dom->find('a[accesskey*="1]')->[1], undef, 'no result';
 
 # Empty attribute value

@@ -132,7 +132,7 @@ Alias for L<Mojo::Util/"b64_decode">.
 =head2 C<b64_encode>
 
   $stream = $stream->b64_encode;
-  $stream = $stream->b64_encode('');
+  $stream = $stream->b64_encode("\n");
 
 Alias for L<Mojo::Util/"b64_encode">.
 

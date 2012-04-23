@@ -2376,8 +2376,7 @@ $REVERSE_ENTITIES{$ENTITIES{$_}} //= $_ for reverse sort keys %ENTITIES;
 $ENTITIES{'apos;'} = "\x{0027}";
 
 # Entities regex for html_unescape
-my $ENTITIES_RE
-  = qr/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}));|([A-Za-z]{1,8};?))/;
+my $ENTITIES_RE = qr/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}));|([\w\.]+;?))/;
 
 # Encode cache
 my %ENCODE;

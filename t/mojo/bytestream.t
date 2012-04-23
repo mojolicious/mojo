@@ -5,7 +5,7 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 142;
+use Test::More tests => 143;
 
 # Need to be loaded first to trigger edge case
 use MIME::Base64;
@@ -201,6 +201,11 @@ is $stream->html_escape, 'foobar', 'right html escaped result';
 # html_unescape
 $stream = b('foobar&lt;baz&gt;&#x26;&#34;');
 is $stream->html_unescape, "foobar<baz>&\"", 'right html unescaped result';
+
+# html_unescape (special entities)
+$stream = b('foo &CounterClockwiseContourIntegral; bar &b.Sigma; &sup1baz');
+is $stream->html_unescape, "foo \x{2233} bar \x{1d6ba} \x{00b9}baz",
+  'right html unescaped result';
 
 # html_unescape (apos)
 $stream = b('foobar&apos;&lt;baz&gt;&#x26;&#34;');

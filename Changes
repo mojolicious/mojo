@@ -3,6 +3,7 @@ This file documents the revision history for Perl extension Mojolicious.
 2.87  2012-04-23
   - Improved html_escape performance and added pattern support.
   - Improved documentation.
+  - Improved tests.
   - Fixed small escaping bug.
 
 2.86  2012-04-23

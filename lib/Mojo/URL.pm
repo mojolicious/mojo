@@ -48,7 +48,7 @@ sub authority {
 
   # Format
   my $userinfo = $self->userinfo;
-  $authority .= url_escape($userinfo, "$UNRESERVED$SUBDELIM\:") . '@'
+  $authority .= url_escape($userinfo, "^$UNRESERVED$SUBDELIM\:") . '@'
     if $userinfo;
   $authority .= lc($self->ihost || '');
   my $port = $self->port;
@@ -251,7 +251,7 @@ sub to_string {
 
   # Fragment
   if (my $fragment = $self->fragment) {
-    $url .= '#' . url_escape $fragment, "$PCHAR\/\?";
+    $url .= '#' . url_escape $fragment, "^$PCHAR\/\?";
   }
 
   return $url;

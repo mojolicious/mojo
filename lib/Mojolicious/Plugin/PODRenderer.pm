@@ -88,7 +88,7 @@ sub register {
           my $e = shift;
           my $anchor = my $text = $e->all_text;
           $anchor =~ s/\s+/_/g;
-          $anchor = url_escape $anchor, 'A-Za-z0-9_';
+          $anchor = url_escape $anchor, '^A-Za-z0-9_';
           $anchor =~ s/\%//g;
           push @parts, [] if $e->type eq 'h1' || !@parts;
           push @{$parts[-1]}, $text, $url->fragment($anchor)->to_abs;

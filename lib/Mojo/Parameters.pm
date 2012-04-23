@@ -171,7 +171,7 @@ sub to_string {
   my $charset = $self->charset;
   if (defined(my $string = $self->{string})) {
     $string = encode $charset, $string if $charset;
-    return url_escape $string, "$Mojo::URL::UNRESERVED\\&\\;\\=\\+\\%";
+    return url_escape $string, "^$Mojo::URL::UNRESERVED\\&\\;\\=\\+\\%";
   }
 
   # Build pairs
@@ -184,10 +184,10 @@ sub to_string {
 
     # Escape
     $name = encode $charset, $name if $charset;
-    $name = url_escape $name, $Mojo::URL::UNRESERVED;
+    $name = url_escape $name, "^$Mojo::URL::UNRESERVED";
     if ($value) {
       $value = encode $charset, $value if $charset;
-      $value = url_escape $value, $Mojo::URL::UNRESERVED;
+      $value = url_escape $value, "^$Mojo::URL::UNRESERVED";
     }
 
     # Replace whitespace with "+"

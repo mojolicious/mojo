@@ -87,7 +87,7 @@ sub to_string {
   my $self = shift;
 
   # Escape
-  my $chars = "$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@";
+  my $chars = "^$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM\:\@";
   my @parts = map { url_escape(encode('UTF-8', $_), $chars) } @{$self->parts};
 
   # Format

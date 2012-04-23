@@ -2745,11 +2745,12 @@ Mojo::Util - Portable utility functions
 
 =head1 SYNOPSIS
 
-  use Mojo::Util qw/url_escape url_unescape/;
+  use Mojo::Util qw/b64_encode url_escape url_unescape/;
 
   my $string = 'test=23';
   my $escaped = url_escape $string;
   say url_unescape $escaped;
+  say b64_encode $escaped, '';
 
 =head1 DESCRIPTION
 

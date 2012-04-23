@@ -101,7 +101,7 @@ Mojo::ByteStream - ByteStream
 
   # Chain methods
   my $stream = Mojo::ByteStream->new('foo bar baz')->quote;
-  $stream = $stream->unquote->encode('UTF-8')->b64_encode;
+  $stream = $stream->unquote->encode('UTF-8')->b64_encode('');
   say $stream;
 
   # Use the alternative constructor

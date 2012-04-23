@@ -2925,13 +2925,14 @@ Unquote string.
   my $escaped = url_escape $string;
   my $escaped = url_escape $string, '^A-Za-z0-9\-\.\_\~';
 
-URL escape string, the pattern used defaults to C<^A-Za-z0-9\-\.\_\~>.
+Percent-encode unsafe characters in string, the pattern used defaults to
+C<^A-Za-z0-9\-\.\_\~>.
 
 =head2 C<url_unescape>
 
   my $string = url_unescape $escaped;
 
-URL unescape string.
+Decode percent-encoded characters in string.
 
 =head2 C<xml_escape>
 

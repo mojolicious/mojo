@@ -2768,8 +2768,9 @@ Base64 decode string.
 =head2 C<b64_encode>
 
   my $b64 = b64_encode $string;
+  my $b64 = b64_encode $string, '';
 
-Base64 encode string.
+Base64 encode string, the line ending defaults to a newline.
 
 =head2 C<camelize>
 

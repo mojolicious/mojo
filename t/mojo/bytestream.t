@@ -71,7 +71,7 @@ is "$stream", "foo\x{df}\x{0100}bar%23\x{263a}", 'right base64 decoded result';
 
 # b64_encode (custom line ending)
 $stream = b('foobar$%^&3217');
-is $stream->b64_encode(''), "Zm9vYmFyJCVeJjMyMTc=",
+is $stream->b64_encode(''), 'Zm9vYmFyJCVeJjMyMTc=',
   'right base64 encoded result';
 
 # url_escape
@@ -225,8 +225,8 @@ is $stream->html_unescape, "&Ltf&&0oo\x{00a0}ba;<r",
   'right html unescaped result';
 
 # utf8 html_escape
-$stream = b("foobar<baz>&\"\x{152}")->html_escape;
-is "$stream", 'foobar&lt;baz&gt;&amp;&quot;&OElig;',
+$stream = b("fo\nobar<baz>&\"\x{152}")->html_escape;
+is "$stream", "fo\nobar&lt;baz&gt;&amp;&quot;&OElig;",
   'right html escaped result';
 
 # utf8 html_unescape

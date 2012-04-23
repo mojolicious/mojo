@@ -194,13 +194,13 @@ Turn bytestream into HMAC-SHA1 checksum of old content.
 
   $stream = $stream->html_escape;
 
-HTML escape bytestream.
+Escape all HTML5 named character entities in bytestream.
 
 =head2 C<html_unescape>
 
   $stream = $stream->html_unescape;
 
-HTML unescape bytestream.
+Unescape all HTML5 entities in bytestream.
 
 =head2 C<md5_bytes>
 
@@ -318,8 +318,8 @@ URL unescape bytestream.
 
   $stream = $stream->xml_escape;
 
-XML escape bytestream, this is a much faster version of C<html_escape>
-escaping only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'>.
+Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in
+bytestream, this is a much faster version of C<html_escape>.
 
 =head1 SEE ALSO
 

@@ -2837,13 +2837,13 @@ Generate HMAC-SHA1 checksum for string.
 
   my $escaped = html_escape $string;
 
-HTML escape string.
+Escape all HTML5 named character entities in string.
 
 =head2 C<html_unescape>
 
   my $string = html_unescape $escaped;
 
-HTML unescape string.
+Unescape all HTML5 entities in string.
 
 =head2 C<md5_bytes>
 
@@ -2934,8 +2934,8 @@ URL unescape string.
 
   my $escaped = xml_escape $string;
 
-XML escape string, this is a much faster version of C<html_escape> escaping
-only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'>.
+Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string,
+this is a much faster version of C<html_escape>.
 
 =head1 SEE ALSO
 

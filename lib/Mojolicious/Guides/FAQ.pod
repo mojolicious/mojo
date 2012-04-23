@@ -116,7 +116,7 @@ Hypnotoad worker processes send heartbeat messages to the manager process in
 regular intervals to signal that they are still responsive. A long blocking
 operation in your application can prevent this, and will force the affected
 worker to be restarted after a timeout. This C<heartbeat_timeout> defaults to
-C<10> seconds and can be extended if your application requires it.
+C<20> seconds and can be extended if your application requires it.
 
 =head2 I think i have found a bug, what should i do now?
 

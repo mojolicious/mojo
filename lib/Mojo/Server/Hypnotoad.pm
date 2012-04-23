@@ -136,7 +136,7 @@ sub _config {
   $self->{config} = $c;
   $c->{graceful_timeout}   ||= 30;
   $c->{heartbeat_interval} ||= 5;
-  $c->{heartbeat_timeout}  ||= 10;
+  $c->{heartbeat_timeout}  ||= 20;
   $c->{lock_file}          ||= catfile tmpdir, 'hypnotoad.lock';
   $c->{lock_file} .= ".$$";
   $c->{lock_timeout} ||= 0.5;
@@ -519,7 +519,7 @@ Heartbeat interval in seconds, defaults to C<5>.
   heartbeat_timeout => 2
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped, defaults to C<10>.
+stopped, defaults to C<20>.
 
 =head2 C<inactivity_timeout>
 

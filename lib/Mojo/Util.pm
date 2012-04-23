@@ -2472,15 +2472,11 @@ sub hmac_md5_sum  { _hmac(0, @_) }
 sub hmac_sha1_sum { _hmac(1, @_) }
 
 sub html_escape {
-  my $string = shift;
-
-  my $escaped = '';
-  for my $i (0 .. (length($string) - 1)) {
-    my $char = substr $string, $i, 1;
-    $escaped .= exists $REVERSE{$char} ? "&$REVERSE{$char}" : $char;
-  }
-
-  return $escaped;
+  my ($string, $pattern) = @_;
+  $pattern ||= '^\n\r\t !\#\$%\(-;=?-~';
+  return $string unless $string =~ /[^$pattern]/;
+  $string =~ s/([$pattern])/_escape($1)/ge;
+  return $string;
 }
 
 # "Daddy, I'm scared. Too scared to even wet my pants.
@@ -2660,9 +2656,9 @@ sub unquote {
 
 sub url_escape {
   my ($string, $pattern) = @_;
-  $pattern ||= 'A-Za-z0-9\-\.\_\~';
-  return $string unless $string =~ /[^$pattern]/;
-  $string =~ s/([^$pattern])/sprintf('%%%02X',ord($1))/ge;
+  $pattern ||= '^A-Za-z0-9\-\.\_\~';
+  return $string unless $string =~ /[$pattern]/;
+  $string =~ s/([$pattern])/sprintf('%%%02X',ord($1))/ge;
   return $string;
 }
 
@@ -2700,6 +2696,12 @@ sub _adapt {
   }
 
   return $k + (((PC_BASE - PC_TMIN + 1) * $delta) / ($delta + PC_SKEW));
+}
+
+# Helper for html_escape
+sub _escape {
+  return "&$REVERSE{$_[0]}" if exists $REVERSE{$_[0]};
+  return '&#' . ord($_[0]) . ';';
 }
 
 sub _hmac {
@@ -2833,8 +2835,10 @@ Generate HMAC-SHA1 checksum for string.
 =head2 C<html_escape>
 
   my $escaped = html_escape $string;
+  my $escaped = html_escape $string, '^\n\r\t !\#\$%\(-;=?-~';
 
-Escape all HTML5 named character entities in string.
+Escape unsafe characters in string with HTML5 entities, the pattern used
+defaults to C<^\n\r\t !\#\$%\(-;=?-~>.
 
 =head2 C<html_unescape>
 
@@ -2917,9 +2921,9 @@ Unquote string.
 =head2 C<url_escape>
 
   my $escaped = url_escape $string;
-  my $escaped = url_escape $string, 'A-Za-z0-9\-\.\_\~';
+  my $escaped = url_escape $string, '^A-Za-z0-9\-\.\_\~';
 
-URL escape string.
+URL escape string, the pattern used defaults to C<^A-Za-z0-9\-\.\_\~>.
 
 =head2 C<url_unescape>
 

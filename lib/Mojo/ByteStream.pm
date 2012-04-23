@@ -187,6 +187,7 @@ Alias for L<Mojo::Util/"hmac_sha1_sum">.
 =head2 C<html_escape>
 
   $stream = $stream->html_escape;
+  $stream = $stream->html_escape('^\n\r\t !\#\$%\(-;=?-~');
 
 Alias for L<Mojo::Util/"html_escape">.
 
@@ -298,7 +299,7 @@ Alias for L<Mojo::Util/"unquote">.
 =head2 C<url_escape>
 
   $stream = $stream->url_escape;
-  $stream = $stream->url_escape('A-Za-z0-9\-\.\_\~');
+  $stream = $stream->url_escape('^A-Za-z0-9\-\.\_\~');
 
 Alias for L<Mojo::Util/"url_escape">.
 

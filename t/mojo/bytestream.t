@@ -5,7 +5,7 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 143;
+use Test::More tests => 145;
 
 # Need to be loaded first to trigger edge case
 use MIME::Base64;
@@ -77,6 +77,10 @@ is $stream->b64_encode(''), "Zm9vYmFyJCVeJjMyMTc=",
 # url_escape
 $stream = b('business;23');
 is $stream->url_escape, 'business%3B23', 'right url escaped result';
+
+# url_escape (custom pattern)
+$stream = b('&business;23')->url_escape('s&');
+is "$stream", '%26bu%73ine%73%73;23', 'right url escaped result';
 
 # url_unescape
 $stream = b('business%3B23');
@@ -231,10 +235,13 @@ $stream
 is "$stream", "foo<baz>&\"\x{152}&Foo;", 'right html unescaped result';
 
 # html_escape (path)
-$stream = b('/site_perl/5.10.0/Mojo.pm')->html_escape;
-is "$stream",
-  '&sol;site&lowbar;perl&sol;5&period;10&period;0&sol;Mojo&period;pm',
+$stream = b('/home/sri/perl/site_perl/5.10.0/Mojo.pm')->html_escape;
+is "$stream", '/home/sri/perl/site_perl/5.10.0/Mojo.pm',
   'right html escaped result';
+
+# html_escape (custom pattern)
+$stream = b("fo\no b<a>r")->html_escape('o<');
+is "$stream", "f&#111;\n&#111; b&lt;a>r", 'right html escaped result';
 
 # xml_escape
 $stream = b(qq/la<f>\nbar"baz"'yada\n'&lt;la/)->xml_escape;

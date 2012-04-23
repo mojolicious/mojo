@@ -136,6 +136,8 @@ Alias for L<Mojo::Util/"b64_decode">.
 
 Alias for L<Mojo::Util/"b64_encode">.
 
+  b('foo bar baz')->b64_encode('')->say;
+
 =head2 C<camelize>
 
   $stream = $stream->camelize;
@@ -157,30 +159,30 @@ Alias for L<Mojo::Util/"b64_decamelize">.
 =head2 C<decode>
 
   $stream = $stream->decode;
-  $stream = $stream->decode($encoding);
+  $stream = $stream->decode('iso-8859-1');
 
 Alias for L<Mojo::Util/"decode">, defaults to C<UTF-8>.
 
-  $stream->decode('UTF-8')->to_string;
+  $stream->decode('UTF-16LE')->unquote->trim->say;
 
 =head2 C<encode>
 
   $stream = $stream->encode;
-  $stream = $stream->encode($encoding);
+  $stream = $stream->encode('iso-8859-1');
 
 Alias for L<Mojo::Util/"encode">, defaults to C<UTF-8>.
 
-  $stream->encode('UTF-8')->to_string;
+  $stream->trim->quote->encode->say;
 
 =head2 C<hmac_md5_sum>
 
-  $stream = $stream->hmac_md5_sum($secret);
+  $stream = $stream->hmac_md5_sum('passw0rd');
 
 Alias for L<Mojo::Util/"hmac_md5_sum">.
 
 =head2 C<hmac_sha1_sum>
 
-  $stream = $stream->hmac_sha1_sum($secret);
+  $stream = $stream->hmac_sha1_sum('passw0rd');
 
 Alias for L<Mojo::Util/"hmac_sha1_sum">.
 
@@ -190,6 +192,8 @@ Alias for L<Mojo::Util/"hmac_sha1_sum">.
   $stream = $stream->html_escape('^\n\r\t !\#\$%\(-;=?-~');
 
 Alias for L<Mojo::Util/"html_escape">.
+
+  b('<html>')->html_escape->say;
 
 =head2 C<html_unescape>
 
@@ -252,6 +256,8 @@ Print bytestream to handle or STDOUT and append a newline.
 
 Alias for L<Mojo::Util/"secure_compare">.
 
+  say 'Match!' if b('foo')->secure_compare('foo');
+
 =head2 C<sha1_bytes>
 
   $stream = $stream->sha1_bytes;
@@ -276,7 +282,7 @@ Size of bytestream.
 
 Turn bytestream into L<Mojo::Collection>.
 
-  $stream->split(',')->map(sub { $_->quote })->join("\n")->say;
+  b('a,b,c')->split(',')->map(sub { $_->quote })->join("\n")->say;
 
 =head2 C<to_string>
 
@@ -302,6 +308,8 @@ Alias for L<Mojo::Util/"unquote">.
   $stream = $stream->url_escape('^A-Za-z0-9\-\.\_\~');
 
 Alias for L<Mojo::Util/"url_escape">.
+
+  b('foo bar baz')->url_escape->say;
 
 =head2 C<url_unescape>
 

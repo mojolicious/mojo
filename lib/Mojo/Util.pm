@@ -2369,8 +2369,8 @@ my %ENTITIES = (
 );
 
 # Reverse entities for html_escape
-my %REVERSE_ENTITIES;
-$REVERSE_ENTITIES{$ENTITIES{$_}} //= $_ for reverse sort keys %ENTITIES;
+my %REVERSE;
+$REVERSE{$ENTITIES{$_}} //= $_ for reverse sort keys %ENTITIES;
 
 # "apos"
 $ENTITIES{'apos;'} = "\x{0027}";
@@ -2476,11 +2476,8 @@ sub html_escape {
 
   my $escaped = '';
   for my $i (0 .. (length($string) - 1)) {
-
-    # Escape entities
     my $char = substr $string, $i, 1;
-    if (my $named = $REVERSE_ENTITIES{$char}) { $char = "&$named" }
-    $escaped .= $char;
+    $escaped .= exists $REVERSE{$char} ? "&$REVERSE{$char}" : $char;
   }
 
   return $escaped;

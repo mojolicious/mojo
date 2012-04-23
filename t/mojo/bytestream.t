@@ -211,8 +211,9 @@ $stream = b('foobar');
 is $stream->html_unescape, 'foobar', 'right html unescaped result';
 
 # html_unescape (relaxed)
-$stream = b('f&0oo&nbspba;&ampr');
-is $stream->html_unescape, "f&0oo\x{00a0}ba;&r", 'right html unescaped result';
+$stream = b('&Ltf&amp&0oo&nbspba;&ltr');
+is $stream->html_unescape, "&Ltf&&0oo\x{00a0}ba;<r",
+  'right html unescaped result';
 
 # utf8 html_escape
 $stream = b("foobar<baz>&\"\x{152}")->html_escape;

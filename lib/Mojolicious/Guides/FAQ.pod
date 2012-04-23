@@ -110,13 +110,14 @@ This error message is often related to the one above, and means that the web
 server closed the connection before the user agent could receive the whole
 response.
 
-=head2 What does "Worker 1234 has no heartbeat, restarting." mean?
+=head2 What does "Worker 31842 has no heartbeat, restarting." mean?
 
 Hypnotoad worker processes send heartbeat messages to the manager process in
-regular intervals to signal that they are still responsive. A long blocking
-operation in your application can prevent this, and will force the affected
-worker to be restarted after a timeout. This C<heartbeat_timeout> defaults to
-C<20> seconds and can be extended if your application requires it.
+regular intervals to signal that they are still responsive. A blocking
+operation such as an infinite loop in your application, can prevent this, and
+will force the affected worker to be restarted after a timeout. This
+C<heartbeat_timeout> defaults to C<20> seconds and can be extended if your
+application requires it.
 
 =head2 I think i have found a bug, what should i do now?
 

@@ -2375,9 +2375,6 @@ $REVERSE{$ENTITIES{$_}} //= $_ for reverse sort keys %ENTITIES;
 # "apos"
 $ENTITIES{'apos;'} = "\x{0027}";
 
-# Entities regex for html_unescape
-my $ENTITIES_RE = qr/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}));|([\w\.]+;?))/;
-
 # Encode cache
 my %ENCODE;
 
@@ -2475,7 +2472,7 @@ sub html_escape {
   my ($string, $pattern) = @_;
   $pattern ||= '^\n\r\t !\#\$%\(-;=?-~';
   return $string unless $string =~ /[^$pattern]/;
-  $string =~ s/([$pattern])/_escape($1)/ge;
+  $string =~ s/([$pattern])/_encode($1)/ge;
   return $string;
 }
 
@@ -2483,7 +2480,8 @@ sub html_escape {
 #  Just relax and it'll come, son."
 sub html_unescape {
   my $string = shift;
-  $string =~ s/$ENTITIES_RE/_unescape($1, $2)/ge;
+  $string
+    =~ s/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}));|([\w\.]+;?))/_decode($1,$2)/ge;
   return $string;
 }
 
@@ -2698,10 +2696,25 @@ sub _adapt {
   return $k + (((PC_BASE - PC_TMIN + 1) * $delta) / ($delta + PC_SKEW));
 }
 
+# Helper for html_unescape
+sub _decode {
+
+  # Numeric
+  return substr($_[0], 0, 1) eq 'x' ? chr(hex $_[0]) : chr($_[0]) unless $_[1];
+
+  # Find entity name
+  my $rest   = '';
+  my $entity = $_[1];
+  while (length $entity) {
+    return "$ENTITIES{$entity}$rest" if exists $ENTITIES{$entity};
+    $rest = chop($entity) . $rest;
+  }
+  return "&$_[1]";
+}
+
 # Helper for html_escape
-sub _escape {
-  return "&$REVERSE{$_[0]}" if exists $REVERSE{$_[0]};
-  return '&#' . ord($_[0]) . ';';
+sub _encode {
+  return exists $REVERSE{$_[0]} ? "&$REVERSE{$_[0]}" : "&#@{[ord($_[0])]};";
 }
 
 sub _hmac {
@@ -2718,22 +2731,6 @@ sub _hmac {
   my $ipad = $secret ^ (chr(0x36) x 64);
   my $opad = $secret ^ (chr(0x5c) x 64);
   return unpack 'H*', $hash->($opad . $hash->($ipad . $string));
-}
-
-# Helper for html_unescape
-sub _unescape {
-
-  # Numeric
-  return substr($_[0], 0, 1) eq 'x' ? chr(hex $_[0]) : chr($_[0]) unless $_[1];
-
-  # Find entity name
-  my $rest   = '';
-  my $entity = $_[1];
-  while (length $entity) {
-    return "$ENTITIES{$entity}$rest" if exists $ENTITIES{$entity};
-    $rest = chop($entity) . $rest;
-  }
-  return "&$_[1]";
 }
 
 1;

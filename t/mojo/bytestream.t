@@ -203,8 +203,8 @@ $stream = b('foobar');
 is $stream->html_escape, 'foobar', 'right html escaped result';
 
 # html_unescape
-$stream = b('foobar&lt;baz&gt;&#x26;&#34;');
-is $stream->html_unescape, "foobar<baz>&\"", 'right html unescaped result';
+$stream = b('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x26;&#34;');
+is $stream->html_unescape, "<foo>bar<baz>&\"", 'right html unescaped result';
 
 # html_unescape (special entities)
 $stream = b('foo &CounterClockwiseContourIntegral; bar &b.Sigma; &sup1baz');

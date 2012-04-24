@@ -269,10 +269,11 @@ Exception happened!
 Not found happened!
 
 @@ template_inheritance.html.ep
+% use Mojo::ByteStream 'b';
 % layout 'template_inheritance';
 % title 'Works!';
 <% content header => begin =%>
-<%= Mojo::ByteStream->new('<br>') %>
+<%= b('<br>') %>
 <% end =%>
 <% content sidebar => begin =%>
 Sidebar!

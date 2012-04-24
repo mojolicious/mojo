@@ -423,7 +423,7 @@ the default in L<Mojolicious> C<.ep> templates for example.
 
 L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 
-  <%= Mojo::ByteStream->new('<div>excluded!</div>') %>
+  <%= b('<div>excluded!</div>') %>
 
 =head2 Trimming
 

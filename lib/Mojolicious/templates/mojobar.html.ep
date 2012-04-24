@@ -73,7 +73,7 @@
 %= javascript begin
   $(window).load(function () {
     if (window.location.hash) {
-      var tweak = $(window.location.hash).offset().top - 70;
+      var tweak = $(window.location.hash).offset().top - 50;
       $('html, body').animate({scrollTop:tweak}, 1);
     }
     var mojobar = $('#mojobar');
@@ -98,7 +98,7 @@
       var parts  = this.href.split("#");
       var hash   = "#" + parts[1];
       var target = $(hash);
-      var top    = target.offset().top - 70;
+      var top    = target.offset().top - 50;
       var old    = target.attr('id');
       target.attr('id', '');
       location.hash = hash;

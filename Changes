@@ -1,5 +1,8 @@
 This file documents the revision history for Perl extension Mojolicious.
 
+2.90  2012-04-25
+  - Fixed small JavaScript bug in Mojolicious::Plugin::PODRenderer.
+
 2.89  2012-04-24
   - Made logo on built-in templates smaller.
   - Improved CSS of built-in templates.

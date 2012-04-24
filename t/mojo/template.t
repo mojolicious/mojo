@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 200;
+use Test::More tests => 201;
 
 # "When I held that gun in my hand, I felt a surge of power...
 #  like God must feel when he's holding a gun."
@@ -266,6 +266,16 @@ $output = $mt->render(<<'EOF');
 <%== $block->() %>
 EOF
 is $output, "<html>\n\n", 'escaped expression block';
+
+# Capture and filter block
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+% use Mojo::Util 'trim';
+<%= trim capture begin %>
+  <p>Just some HTML</p>
+<% end %>
+EOF
+is $output, "<p>Just some HTML</p>\n", 'captured lines';
 
 # Capture lines (passed through with extra whitespace)
 $mt     = Mojo::Template->new;

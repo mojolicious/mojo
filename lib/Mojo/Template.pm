@@ -28,16 +28,13 @@ has tree      => sub { [] };
 my $HELPERS = <<'EOF';
 use Mojo::ByteStream 'b';
 use Mojo::Util;
-no strict 'refs';
 no warnings 'redefine';
-sub capture;
-*capture = sub { shift->(@_) };
-sub escape;
-*escape = sub {
+sub capture { shift->(@_) }
+sub escape {
   return $_[0] if ref $_[0] eq 'Mojo::ByteStream';
   no warnings 'uninitialized';
   Mojo::Util::xml_escape "$_[0]";
-};
+}
 use Mojo::Base -strict;
 EOF
 $HELPERS =~ s/\n//g;
@@ -447,6 +444,13 @@ C<end> keywords.
   <% end %>
   <%= $block->('Baerbel') %>
   <%= $block->('Wolfgang') %>
+
+Or use the C<capture> function to get the result right away.
+
+  % use Mojo::Util 'trim';
+  <%= trim capture begin %>
+    <p>Just some HTML</p>
+  <% end %>
 
 =head2 Indentation
 

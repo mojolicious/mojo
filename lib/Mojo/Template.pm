@@ -26,10 +26,8 @@ has tree      => sub { [] };
 
 # Helpers
 my $HELPERS = <<'EOF';
-use Mojo::ByteStream 'b';
 use Mojo::Util;
 no warnings 'redefine';
-sub capture { shift->(@_) }
 sub escape {
   return $_[0] if ref $_[0] eq 'Mojo::ByteStream';
   no warnings 'uninitialized';
@@ -58,7 +56,7 @@ sub build {
       if ($type eq 'cpen') {
 
         # End block
-        $lines[-1] .= 'return b($_M) }';
+        $lines[-1] .= 'return Mojo::ByteStream->new($_M) }';
 
         # No following code
         my $next = $line->[$j + 3];
@@ -444,13 +442,6 @@ C<end> keywords.
   <% end %>
   <%= $block->('Baerbel') %>
   <%= $block->('Wolfgang') %>
-
-Or use the C<capture> function to get the result right away.
-
-  % use Mojo::Util 'trim';
-  <%= trim capture begin %>
-    <p>Just some HTML</p>
-  <% end %>
 
 =head2 Indentation
 

@@ -272,7 +272,7 @@ Not found happened!
 % layout 'template_inheritance';
 % title 'Works!';
 <% content header => begin =%>
-<%= b('<br>') %>
+<%= Mojo::ByteStream->new('<br>') %>
 <% end =%>
 <% content sidebar => begin =%>
 Sidebar!

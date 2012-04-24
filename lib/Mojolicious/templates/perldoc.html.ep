@@ -51,7 +51,7 @@
         margin-left: 5em;
         margin-right: 5em;
         padding: 3em;
-        padding-top: 7em;
+        padding-top: 70px;
       }
       #perldoc > ul:first-of-type a { text-decoration: none }
       #wrapperlicious {

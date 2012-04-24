@@ -65,7 +65,7 @@
         margin-left: 5em;
         margin-right: 5em;
         padding: 1em;
-        padding-top: 7em;
+        padding-top: 70px;
       }
       #wrapperlicious {
         max-width: 1000px;

@@ -16,10 +16,10 @@
         #000 100%
       );
       background: linear-gradient(top, #2a2a2a 0%, #000 100%);
-      -moz-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
-      -webkit-box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
-      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.6);
-      height: 60px;
+      -moz-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.6);
+      -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.6);
+      box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.6);
+      height: 46px;
       overflow: hidden;
       position: absolute;
       text-align: right;
@@ -30,14 +30,14 @@
     #mojobar-logo {
       float: left;
       margin-left: 5em;
-      padding-top: 2px;
+      padding-top: 3px;
     }
     #mojobar-links {
       display:table-cell;
       float: right;
       height: 60px;
       margin-right: 5em;
-      margin-top: 1.5em;
+      margin-top: 1em;
     }
     #mojobar-links a {
       color: #ccc;

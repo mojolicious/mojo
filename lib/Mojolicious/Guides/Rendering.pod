@@ -114,7 +114,7 @@ which is the default to prevent XSS attacks against your application.
 
 Only L<Mojo::ByteStream> objects are excluded from automatic escaping.
 
-  <%= b('<p>test</p>') %>
+  <%= Mojo::ByteStream->new('<p>test</p>') %>
 
 You can also add an additional equal sign to the end of a tag to have it
 automatically remove all surrounding whitespace, this allows free indenting

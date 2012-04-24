@@ -558,8 +558,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   }
 
   # PUT request with content
-  my $tx = $ua->put(
-    'mojolicio.us' => {'Content-Type' => 'text/plain'} => 'Hello World!');
+  my $tx
+    = $ua->put('kraih.com' => {'Content-Type' => 'text/plain'} => 'Hello!');
 
   # Grab the latest Mojolicious release :)
   $ua->max_redirects(5)->get('latest.mojolicio.us')

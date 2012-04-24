@@ -271,9 +271,8 @@ Mojo::URL - Uniform Resource Locator
   use Mojo::URL;
 
   # Parse
-  my $url = Mojo::URL->new(
-    'http://sri:foobar@kraih.com:3000/foo/bar?foo=bar#23'
-  );
+  my $url
+    = Mojo::URL->new('http://sri:foobar@kraih.com:3000/foo/bar?foo=bar#23');
   say $url->scheme;
   say $url->userinfo;
   say $url->host;

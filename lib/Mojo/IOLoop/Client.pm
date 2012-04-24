@@ -200,10 +200,7 @@ implements the following new ones.
 
 =head2 C<connect>
 
-  $client->connect(
-    address => '127.0.0.1',
-    port    => 3000
-  );
+  $client->connect(address => '127.0.0.1', port => 3000);
 
 Open a socket connection to a remote host. Note that TLS support depends on
 L<IO::Socket::SSL> and IPv6 support on L<IO::Socket::IP>.

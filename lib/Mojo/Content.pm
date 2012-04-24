@@ -597,9 +597,8 @@ Parse body chunk once.
 
 =head2 C<parse_until_body>
 
-  $content = $content->parse_until_body(
-    "Content-Length: 12\r\n\r\nHello World!"
-  );
+  $content
+    = $content->parse_until_body("Content-Length: 12\r\n\r\nHello World!");
 
 Parse chunk and stop after headers.
 

@@ -728,9 +728,8 @@ Render template file.
 =head2 C<render_file_to_file>
 
   my $exception = $mt->render_file_to_file($template_file, $output_file);
-  my $exception = $mt->render_file_to_file(
-    $template_file, $output_file, @args
-  );
+  my $exception
+    = $mt->render_file_to_file($template_file, $output_file, @args);
 
 Render template file to a specific file.
 

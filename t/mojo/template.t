@@ -273,38 +273,38 @@ is $output, "<html>\n\n", 'escaped expression block';
 # Capture lines (passed through with extra whitespace)
 $mt = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
-<% my $result = escape capture begin                  %>
+<% my $result = capture begin                  %>
 <html>
 <%                        end %>
-%= $result
+%== $result
 EOF
 is $output, "\n\n<html>\n\n", 'captured lines';
 
 # Capture tags (passed through)
 $mt = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
-<% my $result = escape capture begin %><html><% end %><%= $result %>
+<% my $result = capture begin %><html><% end %><%== $result %>
 EOF
 is $output, "<html>\n", 'capture tags';
 
 # Capture tags (passed through alternative)
 $mt = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
-<% my $result = escape capture begin %><html><% end %><%= $result %>
+<% my $result = capture begin %><html><% end %><%== $result %>
 EOF
 is $output, "<html>\n", 'capture tags';
 
 # Capture tags with appended code (passed through)
 $mt = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
-<% my $result = escape( capture begin %><html><% end ); %><%= $result %>
+<% my $result = +(capture begin %><html><% end); %><%== $result %>
 EOF
 is $output, "<html>\n", 'capture tags with appended code';
 
 # Capture tags with appended code (passed through alternative)
 $mt = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
-<% my $result = escape( capture begin %><html><% end ); %><%= $result %>
+<% my $result = +( capture begin %><html><% end ); %><%= $result %>
 EOF
 is $output, "<html>\n", 'capture tags with appended code';
 
@@ -312,8 +312,8 @@ is $output, "<html>\n", 'capture tags with appended code';
 $mt = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = capture
-  begin %><%= escape capture begin %><html><% end
-  %><% end %><%= $result %>
+  begin %><%= capture begin %><html><% end
+  %><% end %><%== $result %>
 EOF
 is $output, "<html>\n", 'nested capture tags';
 
@@ -321,7 +321,7 @@ is $output, "<html>\n", 'nested capture tags';
 $mt = Mojo::Template->new(prepend => $capture);
 $output = $mt->render(<<'EOF');
 <% my $result = capture begin =%>
-    <%= escape capture begin =%>
+    <%== capture begin =%>
         <html>
     <% end =%>
 <% end =%>

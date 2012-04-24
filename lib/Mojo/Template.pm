@@ -28,7 +28,7 @@ has tree      => sub { [] };
 my $HELPERS = <<'EOF';
 use Mojo::Util;
 no warnings 'redefine';
-sub escape {
+sub _escape {
   return $_[0] if ref $_[0] eq 'Mojo::ByteStream';
   no warnings 'uninitialized';
   Mojo::Util::xml_escape "$_[0]";
@@ -84,7 +84,7 @@ sub build {
           # Escaped
           my $a = $self->auto_escape;
           if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
-            $lines[-1] .= "\$_M .= escape";
+            $lines[-1] .= "\$_M .= _escape";
             $lines[-1] .= " scalar $value" if length $value;
           }
 

@@ -134,7 +134,7 @@ sub cookie {
   return wantarray ? @cookies : $cookies[0];
 }
 
-sub cookies { croak 'Method "add_chunk" not implemented by subclass' }
+sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
 sub dom {
   my $self = shift;

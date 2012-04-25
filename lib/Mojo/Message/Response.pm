@@ -217,7 +217,7 @@ Generate default response message for code.
 
   $res = $res->fix_headers;
 
-Make sure message has all required headers for the current HTTP version.
+Make sure response has all required headers for the current HTTP version.
 
 =head2 C<is_status_class>
 

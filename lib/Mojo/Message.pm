@@ -1,6 +1,7 @@
 package Mojo::Message;
 use Mojo::Base 'Mojo::EventEmitter';
 
+use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::Content::Single;
 use Mojo::DOM;
@@ -132,6 +133,8 @@ sub cookie {
 
   return wantarray ? @cookies : $cookies[0];
 }
+
+sub cookies { croak 'Method "add_chunk" not implemented by subclass' }
 
 sub dom {
   my $self = shift;
@@ -593,7 +596,8 @@ Access C<content> data or replace all subscribers of the C<read> event.
 
 C<POST> parameters extracted from C<x-application-urlencoded>,
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
-usually a L<Mojo::Parameters> object.
+usually a L<Mojo::Parameters> object. Note that this method caches all data,
+so it should not be called before the entire message body has been received.
 
   say $message->body_params->param('foo');
 
@@ -627,9 +631,16 @@ Render start line.
   my @cookies = $message->cookie('foo');
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
-L<Mojo::Cookie::Response> objects.
+L<Mojo::Cookie::Response> objects. Note that this method caches all data, so
+it should not be called before all headers have been received.
 
   say $message->cookie('foo')->value;
+
+=head2 C<cookies>
+
+  my $cookies = $message->cookies;
+
+Access message cookies, meant to be overloaded in a subclass.
 
 =head2 C<dom>
 
@@ -760,7 +771,8 @@ Alias for L<Mojo::Headers/"max_line_size">.
   my $foo   = $message->param('foo');
   my @foo   = $message->param('foo');
 
-Access C<POST> parameters.
+Access C<POST> parameters. Note that this method caches all data, so it should
+not be called before the entire message body has been received.
 
 =head2 C<parse>
 
@@ -792,6 +804,8 @@ Render whole message.
   my @uploads = $message->upload('foo');
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
+Note that this method caches all data, so it should not be called before the
+entire message body has been received.
 
   say $message->upload('foo')->asset->slurp;
 

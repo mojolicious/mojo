@@ -396,7 +396,7 @@ Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
   $req = $req->fix_headers;
 
-Make sure message has all required headers for the current HTTP version.
+Make sure request has all required headers for the current HTTP version.
 
 =head2 C<is_secure>
 
@@ -416,7 +416,8 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
   my $foo   = $req->param('foo');
   my @foo   = $req->param('foo');
 
-Access C<GET> and C<POST> parameters.
+Access C<GET> and C<POST> parameters. Note that this method caches all data,
+so it should not be called before the entire request body has been received.
 
 =head2 C<params>
 
@@ -440,7 +441,7 @@ Parse HTTP request chunks or environment hash.
   $req      = $req->proxy('http://foo:bar@127.0.0.1:3000');
   $req      = $req->proxy(Mojo::URL->new('http://127.0.0.1:3000'));
 
-Proxy URL for message.
+Proxy URL for request.
 
   # Disable proxy
   $req->proxy(0);

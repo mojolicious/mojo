@@ -211,7 +211,6 @@ sub render {
   return $self->rendered($stash->{status});
 }
 
-# "She's built like a steakhouse, but she handles like a bistro!"
 sub render_content {
   my $self    = shift;
   my $name    = shift || 'content';

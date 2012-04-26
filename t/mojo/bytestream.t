@@ -195,8 +195,7 @@ is b('Hi there')->hmac_sha1_sum(1234567890),
 
 # html_escape
 $stream = b("foo bar'<baz>");
-is $stream->html_escape, 'foo bar&#39;&lt;baz&gt;',
-  'right html escaped result';
+is $stream->html_escape, 'foo bar&#39;&LTbaz&GT', 'right html escaped result';
 
 # html_escape (nothing to escape)
 $stream = b('foobar');
@@ -207,8 +206,8 @@ $stream = b('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x26;&#34;');
 is $stream->html_unescape, "<foo>bar<baz>&\"", 'right html unescaped result';
 
 # html_unescape (special entities)
-$stream = b('foo &CounterClockwiseContourIntegral; bar &b.Sigma; &sup1baz');
-is $stream->html_unescape, "foo \x{2233} bar \x{1d6ba} \x{00b9}baz",
+$stream = b('foo &CounterClockwiseContourIntegral; bar &sup1baz');
+is $stream->html_unescape, "foo \x{2233} bar \x{00b9}baz",
   'right html unescaped result';
 
 # html_unescape (apos)
@@ -226,8 +225,7 @@ is $stream->html_unescape, "&Ltf&&0oo\x{00a0}ba;<r",
 
 # utf8 html_escape
 $stream = b("fo\nobar<baz>&\"\x{152}")->html_escape;
-is "$stream", "fo\nobar&lt;baz&gt;&amp;&quot;&OElig;",
-  'right html escaped result';
+is "$stream", "fo\nobar&LTbaz&GT&AMP&QUOT&OElig;", 'right html escaped result';
 
 # utf8 html_unescape
 $stream
@@ -241,7 +239,7 @@ is "$stream", '/home/sri/perl/site_perl/5.10.0/Mojo.pm',
 
 # html_escape (custom pattern)
 $stream = b("fo\no b<a>r")->html_escape('o<');
-is "$stream", "f&#111;\n&#111; b&lt;a>r", 'right html escaped result';
+is "$stream", "f&#111;\n&#111; b&LTa>r", 'right html escaped result';
 
 # xml_escape
 $stream = b(qq/la<f>\nbar"baz"'yada\n'&lt;la/)->xml_escape;

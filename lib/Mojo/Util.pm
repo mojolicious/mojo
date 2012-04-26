@@ -23,16 +23,16 @@ use constant {
 # Punycode delimiter
 my $DELIMITER = chr 0x2D;
 
-# To update named character references run this command
-# perl examples/ncr.pl > lib/Mojo/ncr.txt
+# To update HTML5 entities run this command
+# perl examples/entities.pl > lib/Mojo/entities.txt
 my %ENTITIES;
 {
-  open my $ncr, '<', catfile(dirname(__FILE__), 'ncr.txt');
-  $_ =~ /^(\S+)\s+U\+(\S+)/ and $ENTITIES{$1} = chr hex($2) for <$ncr>;
+  open my $entities, '<', catfile(dirname(__FILE__), 'entities.txt');
+  $_ =~ /^(\S+)\s+U\+(\S+)/ and $ENTITIES{$1} = chr hex($2) for <$entities>;
 }
 
 # Reverse entities for html_escape (without "apos")
-$ENTITIES{'#39;'} = $ENTITIES{'apos;'};
+$ENTITIES{'#39;'} = "\x{0027}";
 my %REVERSE;
 $REVERSE{$ENTITIES{$_}} //= $_ for sort keys %ENTITIES;
 

@@ -141,7 +141,7 @@ sub html_escape {
 sub html_unescape {
   my $string = shift;
   $string
-    =~ s/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}));|([\w\.]+;?))/_decode($1,$2)/ge;
+    =~ s/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
   return $string;
 }
 

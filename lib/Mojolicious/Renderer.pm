@@ -287,7 +287,7 @@ Renderer cache, defaults to a L<Mojo::Cache> object.
   my $classes = $renderer->classes;
   $renderer   = $renderer->classes(['main']);
 
-Classes to use for finding templates in C<DATA> section, first one has the
+Classes to use for finding templates in C<DATA> sections, first one has the
 highest precedence, defaults to C<main>.
 
   # Add another class with templates in DATA section

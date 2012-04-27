@@ -583,6 +583,12 @@ selectors from L<Mojo::DOM::CSS> are supported.
 
 Find element namespace.
 
+   # Find namespace for an element with namespace prefix
+   my $namespace = $dom->at('svg\:circle')->namespace;
+
+   # Find namespace for an element that may or may not have a namespace prefix
+   my $namespace = $dom->at('circle')->namespace;
+
 =head2 C<parent>
 
   my $parent = $dom->parent;

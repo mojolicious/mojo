@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.92  2012-04-27
+2.92  2012-04-28
   - Improved documentation.
   - Improved tests.
   - Fixed attribute namespace selector bugs in Mojo::DOM::CSS.

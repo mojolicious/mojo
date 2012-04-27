@@ -215,13 +215,13 @@ sub _parent {
 sub _pc {
   my ($self, $class, $args, $current) = @_;
 
-  # "first-*"
+  # ":first-*"
   if ($class =~ /^first\-(?:(child)|of-type)$/) {
     $class = defined $1 ? 'nth-child' : 'nth-of-type';
     $args = 1;
   }
 
-  # "last-*"
+  # ":last-*"
   elsif ($class =~ /^last\-(?:(child)|of-type)$/) {
     $class = defined $1 ? 'nth-last-child' : 'nth-last-of-type';
     $args = '-n+1';
@@ -241,10 +241,10 @@ sub _pc {
     if (my $parent = $current->[3]) { return 1 if $parent->[0] eq 'root' }
   }
 
-  # "not"
+  # ":not"
   elsif ($class eq 'not') { return 1 if !$self->_selector($args, $current) }
 
-  # "nth-*"
+  # ":nth-*"
   elsif ($class =~ /^nth-/) {
 
     # Numbers
@@ -255,8 +255,8 @@ sub _pc {
     my $start = $parent->[0] eq 'root' ? 1 : 4;
     my @siblings;
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
-    for my $j ($start .. $#$parent) {
-      my $sibling = $parent->[$j];
+    for my $i ($start .. $#$parent) {
+      my $sibling = $parent->[$i];
       next unless $sibling->[0] eq 'tag';
       next if defined $type && $type ne $sibling->[1];
       push @siblings, $sibling;
@@ -274,19 +274,17 @@ sub _pc {
     }
   }
 
-  # "only-*"
+  # ":only-*"
   elsif ($class =~ /^only-(?:child|(of-type))$/) {
     my $type = $1 ? $current->[1] : undef;
 
     # Siblings
     my $parent = $current->[3];
     my $start = $parent->[0] eq 'root' ? 1 : 4;
-    for my $j ($start .. $#$parent) {
-      my $sibling = $parent->[$j];
-      next unless $sibling->[0] eq 'tag';
-      next if $sibling eq $current;
-      next if defined $type && $sibling->[1] ne $type;
-      return if $sibling ne $current;
+    for my $i ($start .. $#$parent) {
+      my $sibling = $parent->[$i];
+      next if $sibling->[0] ne 'tag' || $sibling eq $current;
+      return unless defined $type && $sibling->[1] ne $type;
     }
 
     # No siblings
@@ -323,16 +321,16 @@ sub _regex {
   $value = quotemeta $self->_unescape($value);
 
   # "~=" (word)
-  if ($op eq '~') { return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ }
+  return qr/(?:^|.*\s+)$value(?:\s+.*|$)/ if $op eq '~';
 
   # "*=" (contains)
-  elsif ($op eq '*') { return qr/$value/ }
+  return qr/$value/ if $op eq '*';
 
   # "^=" (begins with)
-  elsif ($op eq '^') { return qr/^$value/ }
+  return qr/^$value/ if $op eq '^';
 
   # "$=" (ends with)
-  elsif ($op eq '$') { return qr/$value$/ }
+  return qr/$value$/ if $op eq '$';
 
   # Everything else
   return qr/^$value$/;
@@ -345,23 +343,21 @@ sub _selector {
   my ($self, $selector, $current) = @_;
 
   # Selectors
-  for my $c (@$selector[1 .. $#$selector]) {
-    my $type = $c->[0];
+  for my $s (@$selector[1 .. $#$selector]) {
+    my $type = $s->[0];
 
     # Tag (ignore namespace prefix)
     if ($type eq 'tag') {
-      my $tag = $c->[1];
+      my $tag = $s->[1];
       return unless $tag eq '*' || $current->[1] =~ /(?:^|\:)$tag$/;
     }
 
     # Attribute
-    elsif ($type eq 'attr') {
-      return unless $self->_attr($c->[1], $c->[2], $current);
-    }
+    elsif ($type eq 'attr') { return unless $self->_attr(@$s[1, 2], $current) }
 
     # Pseudo class
     elsif ($type eq 'pc') {
-      return unless $self->_pc(lc $c->[1], $c->[2], $current);
+      return unless $self->_pc(lc $s->[1], $s->[2], $current);
     }
   }
 

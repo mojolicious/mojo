@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 725;
+use Test::More tests => 735;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -432,7 +432,7 @@ is $s->[0]->at('Type')->text, 'http://o.r.g/sso/2.0', 'right text';
 is $s->[0]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
 is $s->[1]->at('Type')->text, 'http://o.r.g/sso/1.0', 'right text';
 is $s->[1]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
-is $s->[2], undef, 'no text';
+is $s->[2], undef, 'no result';
 is $s->size, 2, 'right number of elements';
 
 # Yadis (roundtrip with namespace)
@@ -470,10 +470,25 @@ is $s->[2]->at('Type')->text, 'http://o.r.g/sso/2.0', 'right text';
 is $s->[2]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
 is $s->[3]->at('Type')->text, 'http://o.r.g/sso/1.0', 'right text';
 is $s->[3]->namespace, 'xri://$xrd*($v*2.0)', 'right namespace';
-is $s->[4], undef, 'no text';
+is $s->[4], undef, 'no result';
 is $s->size, 4, 'right number of elements';
 is $dom->at('[Test="23"]')->text, 'http://o.r.g/sso/1.0', 'right text';
 is $dom->at('[test="23"]')->text, 'http://o.r.g/sso/2.0', 'right text';
+is $dom->find('xrds\:Service > Type')->[0]->text, 'http://o.r.g/sso/4.0',
+  'right text';
+is $dom->find('xrds\:Service > Type')->[1], undef, 'no result';
+is $dom->find('xrds\3AService > Type')->[0]->text, 'http://o.r.g/sso/4.0',
+  'right text';
+is $dom->find('xrds\3AService > Type')->[1], undef, 'no result';
+is $dom->find('xrds\3A Service > Type')->[0]->text, 'http://o.r.g/sso/4.0',
+  'right text';
+is $dom->find('xrds\3A Service > Type')->[1], undef, 'no result';
+is $dom->find('xrds\00003AService > Type')->[0]->text, 'http://o.r.g/sso/4.0',
+  'right text';
+is $dom->find('xrds\00003AService > Type')->[1], undef, 'no result';
+is $dom->find('xrds\00003A Service > Type')->[0]->text, 'http://o.r.g/sso/4.0',
+  'right text';
+is $dom->find('xrds\00003A Service > Type')->[1], undef, 'no result';
 is "$dom", $yadis, 'successful roundtrip';
 
 # Result and iterator order

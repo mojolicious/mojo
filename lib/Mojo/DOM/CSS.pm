@@ -80,7 +80,7 @@ sub _attr {
   # Ignore namespace prefix
   my $attrs = $current->[2];
   for my $name (keys %$attrs) {
-    next unless $name =~ /\:?$key$/;
+    next unless $name =~ /(?:^|\:)$key$/;
     return 1 unless defined $attrs->{$name} && defined $regex;
     return 1 if $attrs->{$name} =~ $regex;
   }

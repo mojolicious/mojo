@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 741;
+use Test::More tests => 755;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -415,6 +415,21 @@ is $dom->at('book nons section')->namespace, undef,         'no namespace';
 is $dom->at('book nons section')->text,      'Nothing',     'right text';
 is $dom->at('book meta number')->namespace,  'uri:isbn-ns', 'right namespace';
 is $dom->at('book meta number')->text, '978-0596000271', 'right text';
+is $dom->children('bk:book')->first->{xmlns}, 'uri:default-ns',
+  'right attribute';
+is $dom->children('k:book')->first, undef, 'no result';
+is $dom->children('book')->first,   undef, 'no result';
+is $dom->children('ook')->first,    undef, 'no result';
+is $dom->at('k\:book'), undef, 'no result';
+is $dom->at('ook'),     undef, 'no result';
+is $dom->at('[xmlns\:bk]')->{'xmlns:bk'}, 'uri:book-ns', 'right attribute';
+is $dom->at('[bk]')->{'xmlns:bk'},        'uri:book-ns', 'right attribute';
+is $dom->at('[bk]')->attrs('xmlns:bk'), 'uri:book-ns', 'right attribute';
+is $dom->at('[bk]')->attrs('s:bk'),     undef,         'no attribute';
+is $dom->at('[bk]')->attrs('bk'),       undef,         'no attribute';
+is $dom->at('[bk]')->attrs('k'),        undef,         'no attribute';
+is $dom->at('[s\:bk]'), undef, 'no result';
+is $dom->at('[k]'),     undef, 'no result';
 
 # Yadis
 $dom = Mojo::DOM->new->parse(<<'EOF');

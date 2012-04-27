@@ -28,7 +28,7 @@ my $DELIMITER = chr 0x2D;
 my %ENTITIES;
 {
   open my $entities, '<', catfile(dirname(__FILE__), 'entities.txt');
-  $_ =~ /^(\S+)\s+U\+(\S+)/ and $ENTITIES{$1} = chr hex($2) for <$entities>;
+  /^(\S+)\s+U\+(\S+)/ and $ENTITIES{$1} = chr hex($2) for <$entities>;
 }
 
 # Reverse entities for html_escape (without "apos")

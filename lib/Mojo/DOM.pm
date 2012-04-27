@@ -67,8 +67,7 @@ sub attrs {
   return $attrs->{$_[0]} unless @_ > 1 || ref $_[0];
 
   # Set
-  my $values = ref $_[0] ? $_[0] : {@_};
-  $attrs->{$_} = $values->{$_} for keys %$values;
+  %$attrs = (%$attrs, %{ref $_[0] ? $_[0] : {@_}});
 
   return $self;
 }
@@ -584,10 +583,10 @@ selectors from L<Mojo::DOM::CSS> are supported.
 Find element namespace.
 
    # Find namespace for an element with namespace prefix
-   my $namespace = $dom->at('svg\:circle')->namespace;
+   my $namespace = $dom->at('svg > svg\:circle')->namespace;
 
    # Find namespace for an element that may or may not have a namespace prefix
-   my $namespace = $dom->at('circle')->namespace;
+   my $namespace = $dom->at('svg > circle')->namespace;
 
 =head2 C<parent>
 

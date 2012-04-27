@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 735;
+use Test::More tests => 741;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -198,8 +198,14 @@ is $dom->at('[foo=ba]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
 # Already decoded unicode snowman and quotes in selector
-$dom = Mojo::DOM->new->parse('<div id="sno&quot;wman">☃</div>');
-is $dom->at('[id="sno\"wman"]')->text, '☃', 'right text';
+$dom = Mojo::DOM->new->parse('<div id="snowm&quot;an">☃</div>');
+is $dom->at('[id="snowm\"an"]')->text,      '☃', 'right text';
+is $dom->at('[id="snowm\22 an"]')->text,    '☃', 'right text';
+is $dom->at('[id="snowm\000022an"]')->text, '☃', 'right text';
+is $dom->at('[id="snowm\22an"]'),      undef, 'no result';
+is $dom->at('[id="snowm\21 an"]'),     undef, 'no result';
+is $dom->at('[id="snowm\000021an"]'),  undef, 'no result';
+is $dom->at('[id="snowm\000021 an"]'), undef, 'no result';
 
 # Unicode and escaped selectors
 my $unicode = encode 'UTF-8',

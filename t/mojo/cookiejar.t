@@ -145,17 +145,13 @@ $jar->add(
     path   => '/foo',
     name   => 'foo',
     value  => 'bar'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain => 'www.kraih.com',
     path   => '/',
     name   => 'just',
     value  => 'works'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
     path   => '/foo',
@@ -168,7 +164,7 @@ is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
-# Expired cookie
+# Expired cookies
 $jar = Mojo::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
@@ -176,6 +172,13 @@ $jar->add(
     path   => '/foo',
     name   => 'foo',
     value  => 'bar'
+  ),
+  Mojo::Cookie::Response->new(
+    domain  => 'labs.kraih.com',
+    path    => '/',
+    name    => 'baz',
+    value   => '24',
+    max_age => -1
   )
 );
 my $expired = Mojo::Cookie::Response->new(
@@ -184,8 +187,7 @@ my $expired = Mojo::Cookie::Response->new(
   name   => 'baz',
   value  => '23'
 );
-$expired->expires(time - 1);
-$jar->add($expired);
+$jar->add($expired->expires(time - 1));
 @cookies = $jar->find(Mojo::URL->new('http://labs.kraih.com/foo'));
 is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
@@ -199,9 +201,7 @@ $jar->add(
     path   => '/foo',
     name   => 'foo',
     value  => 'bar'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain  => 'labs.kraih.com',
     path    => '/',
@@ -225,17 +225,13 @@ $jar->add(
     path   => '/',
     name   => 'foo',
     value  => 'bar'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain => '.labs.kraih.com',
     path   => '/',
     name   => 'baz',
     value  => 'yada'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain => '.kraih.com',
     path   => '/',
@@ -260,9 +256,7 @@ $jar->add(
     path   => '/foo',
     name   => 'foo',
     value  => 'bar1'
-  )
-);
-$jar->add(
+  ),
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
     path   => '/foo',

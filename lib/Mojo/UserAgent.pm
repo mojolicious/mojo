@@ -132,32 +132,32 @@ sub _cache {
   my ($self, $name, $id) = @_;
 
   # Enqueue
-  my $cache = $self->{cache} ||= [];
+  my $old = $self->{cache} ||= [];
   if ($id) {
     my $max = $self->max_connections;
-    $self->_remove(shift(@$cache)->[1]) while @$cache > $max;
-    push @$cache, [$name, $id] if $max;
+    $self->_remove(shift(@$old)->[1]) while @$old > $max;
+    push @$old, [$name, $id] if $max;
     return;
   }
 
   # Dequeue
+  my $found;
   my $loop = $self->_loop;
-  my ($result, @cache);
-  for my $cached (@$cache) {
+  my $new = $self->{cache} = [];
+  for my $cached (@$old) {
 
     # Search for id/name and remove corrupted connections
-    if (!$result && ($cached->[1] eq $name || $cached->[0] eq $name)) {
+    if (!$found && ($cached->[1] eq $name || $cached->[0] eq $name)) {
       my $stream = $loop->stream($cached->[1]);
-      if ($stream && !$stream->is_readable) { $result = $cached->[1] }
+      if ($stream && !$stream->is_readable) { $found = $cached->[1] }
       else                                  { $loop->remove($cached->[1]) }
     }
 
     # Requeue
-    else { push @cache, $cached }
+    else { push @$new, $cached }
   }
-  $self->{cache} = \@cache;
 
-  return $result;
+  return $found;
 }
 
 sub _cleanup {
@@ -687,6 +687,9 @@ environment variable or C<10>.
 
 Cookie jar to use for this user agents requests, defaults to a
 L<Mojo::CookieJar> object.
+
+  # Disable cookie jar
+  $ua->cookie_jar(0);
 
 =head2 C<http_proxy>
 

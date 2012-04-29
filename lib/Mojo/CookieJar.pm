@@ -15,24 +15,21 @@ sub add {
   my ($self, @cookies) = @_;
 
   # Add cookies
+  my $size = $self->max_cookie_size;
   for my $cookie (@cookies) {
-    my $name   = $cookie->name;
-    my $value  = $cookie->value;
-    my $domain = $cookie->domain;
-    my $path   = $cookie->path;
 
     # Convert max age to expires
-    $cookie->expires($cookie->max_age + time) if $cookie->max_age;
-
-    # Default to session cookie
-    $cookie->max_age(0) unless $cookie->expires || $cookie->max_age;
+    if (my $age = $cookie->max_age) { $cookie->expires($age + time) }
 
     # Check cookie size
-    next if length($value //= '') > $self->max_cookie_size;
+    next if length($cookie->value // '') > $size;
 
     # Replace cookie
+    my $domain = $cookie->domain;
     $domain =~ s/^\.//;
-    my $jar = $self->{jar}{$domain} ||= [];
+    my $path = $cookie->path;
+    my $name = $cookie->name;
+    my $jar  = $self->{jar}{$domain} ||= [];
     @$jar = (grep({$_->path ne $path || $_->name ne $name} @$jar), $cookie);
   }
 
@@ -63,30 +60,24 @@ sub find {
   my $path = $url->path->to_string || '/';
   my @found;
   while ($domain =~ /[^\.]+\.[^\.]+|localhost$/) {
-    next unless my $jar = $self->{jar}{$domain};
+    next unless my $old = $self->{jar}{$domain};
 
     # Grab cookies
-    my @new;
-    for my $cookie (@$jar) {
+    my $new = $self->{jar}{$domain} = [];
+    for my $cookie (@$old) {
 
       # Check if cookie has expired
       my $expires = $cookie->expires;
-      my $session = defined $cookie->max_age && $cookie->max_age > 0 ? 1 : 0;
-      next if $expires && !$session && time > ($expires->epoch || 0);
-      push @new, $cookie;
+      next if $expires && time > ($expires->epoch || 0);
+      push @$new, $cookie;
 
       # Taste cookie
       next if $cookie->secure && $url->scheme ne 'https';
-      my $cpath = $cookie->path;
-      next unless $path =~ /^\Q$cpath/;
-      my $result = Mojo::Cookie::Request->new(
-        name  => $cookie->name,
-        value => $cookie->value
-      );
-      push @found, $result;
+      next unless $path =~ /^\Q@{[$cookie->path]}/;
+      my $name  = $cookie->name;
+      my $value = $cookie->value;
+      push @found, Mojo::Cookie::Request->new(name => $name, value => $value);
     }
-
-    $self->{jar}{$domain} = \@new;
   }
 
   # Remove another part
@@ -128,7 +119,7 @@ L<Mojo::CookieJar> implements the following attributes.
   my $max_cookie_size = $jar->max_cookie_size;
   $jar                = $jar->max_cookie_size(4096);
 
-Maximum size of cookies in bytes.
+Maximum cookie size in bytes, defaults to C<4096>.
 
 =head1 METHODS
 

@@ -9,19 +9,19 @@ has [qw/domain httponly max_age path secure/];
 my $ATTR_RE = qr/(Domain|expires|HttpOnly|Max-Age|Path|Secure)/msi;
 
 sub expires {
-  my ($self, $expires) = @_;
-
-  # New expires value
-  if (defined $expires) {
-    $self->{expires} = $expires;
-    return $self;
-  }
+  my $self = shift;
 
   # Upgrade
-  $self->{expires} = Mojo::Date->new($self->{expires})
-    if defined $self->{expires} && !ref $self->{expires};
+  return $self->{expires}
+    = defined $self->{expires} && !ref $self->{expires}
+    ? Mojo::Date->new($self->{expires})
+    : $self->{expires}
+    unless @_;
 
-  return $self->{expires};
+  # New expires value
+  $self->{expires} = shift;
+
+  return $self;
 }
 
 # "Remember the time he ate my goldfish?

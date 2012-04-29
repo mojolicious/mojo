@@ -701,8 +701,8 @@ is enabled by default.
 
 Render DOM to XML.
 
-  # "<b>test</b>"
-  $dom->parse('<div><b>test</b></div>')->div->b->to_xml;
+  # "<div><b>test</b></div>"
+  $dom->parse('<div><b>test</b></div>')->div->to_xml;
 
 =head2 C<tree>
 

@@ -474,12 +474,12 @@ into XML mode and everything becomes case sensitive.
   say $dom->at('P')->text;
   say $dom->P->{ID};
 
-XML detection can be also disabled with the C<xml> method.
+XML detection can also be disabled with the C<xml> method.
 
-  # XML sematics
+  # Force XML semantics
   $dom->xml(1);
 
-  # HTML5 semantics
+  # Force HTML5 semantics
   $dom->xml(0);
 
 =head1 METHODS
@@ -699,7 +699,7 @@ is enabled by default.
 
   my $xml = $dom->to_xml;
 
-Render DOM to XML.
+Render this element and its content to XML.
 
   # "<div><b>test</b></div>"
   $dom->parse('<div><b>test</b></div>')->div->to_xml;
@@ -734,7 +734,7 @@ In addition to the methods above, many child elements are also automatically
 available as object methods, which return a L<Mojo::DOM> or
 L<Mojo::Collection> object, depending on number of children.
 
-  say $dom->div->text;
+  say $dom->p->text;
   say $dom->div->[23]->text;
   $dom->div->each(sub { say $_->text });
 

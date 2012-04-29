@@ -174,7 +174,8 @@ Path to C<lib> directory of application.
   my $files = $home->list_files;
   my $files = $home->list_files('foo/bar');
 
-Portably list all files in directory and subdirectories recursively.
+Portably list all files recursively in directory relative to the home
+diectory.
 
   $home->rel_file($home->list_files('templates/layouts')->[1]);
 
@@ -194,19 +195,20 @@ Parse home directory.
 
   my $path = $home->rel_dir('foo/bar');
 
-Portably generate an absolute path from a relative UNIX style path.
+Portably generate an absolute path for a directory relative to the home
+directory.
 
 =head2 C<rel_file>
 
   my $path = $home->rel_file('foo/bar.html');
 
-Portably generate an absolute path from a relative UNIX style path.
+Portably generate an absolute path for a file relative to the home directory.
 
 =head2 C<slurp_rel_file>
 
   my $string = $home->slurp_rel_file('foo/bar.html');
 
-Portably read all file data at once.
+Portably read all data at once from file relative to the home directory.
 
   my $content = $home->slurp_rel_file($home->list_files('public')->[1]);
 

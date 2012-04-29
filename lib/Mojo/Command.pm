@@ -237,7 +237,7 @@ following new ones.
 
 =head2 C<chmod_file>
 
-  $command = $command->chmod_file('/foo/bar.txt', 0644);
+  $command = $command->chmod_file('/home/sri/bar.txt', 0644);
 
 Portably change mode of a file.
 
@@ -245,7 +245,7 @@ Portably change mode of a file.
 
   $command = $command->chmod_rel_file('foo/bar.txt', 0644);
 
-Portably change mode of a relative file.
+Portably change mode of a file relative to the current working directory.
 
 =head2 C<class_to_file>
 
@@ -268,7 +268,7 @@ Convert class name to path.
 
 =head2 C<create_dir>
 
-  $command = $command->create_dir('/foo/bar/baz');
+  $command = $command->create_dir('/home/sri/foo/bar');
 
 Portably create a directory.
 
@@ -276,7 +276,7 @@ Portably create a directory.
 
   $command = $command->create_rel_dir('foo/bar/baz');
 
-Portably create a relative directory.
+Portably create a directory relative to the current working directory.
 
 =head2 C<get_all_data>
 
@@ -302,13 +302,15 @@ Print usage information for command.
 
   my $path = $command->rel_dir('foo/bar');
 
-Portably generate an absolute path from a relative UNIX style path.
+Portably generate an absolute path for a directory relative to the current
+working directory.
 
 =head2 C<rel_file>
 
   my $path = $command->rel_file('foo/bar.txt');
 
-Portably generate an absolute path from a relative UNIX style path.
+Portably generate an absolute path for a file relative to the current working
+directory.
 
 =head2 C<render_data>
 
@@ -318,7 +320,7 @@ Render a template from the C<DATA> section of the command class.
 
 =head2 C<render_to_file>
 
-  $command = $command->render_to_file('foo_bar', '/foo/bar.txt');
+  $command = $command->render_to_file('foo_bar', '/home/sri/bar.txt');
 
 Render a template from the C<DATA> section of the command class to a file.
 
@@ -327,7 +329,7 @@ Render a template from the C<DATA> section of the command class to a file.
   $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
 
 Portably render a template from the C<DATA> section of the command class to a
-relative file.
+file relative to the current working directory.
 
 =head2 C<run>
 
@@ -338,7 +340,7 @@ Run command. Meant to be overloaded in a subclass.
 
 =head2 C<write_file>
 
-  $command = $command->write_file('/foo/bar.txt', 'Hello World!');
+  $command = $command->write_file('/home/sri/bar.txt', 'Hello World!');
 
 Portably write text to a file.
 
@@ -346,7 +348,7 @@ Portably write text to a file.
 
   $command = $command->write_rel_file('foo/bar.txt', 'Hello World!');
 
-Portably write text to a relative file.
+Portably write text to a file relative to the current working directory.
 
 =head1 SEE ALSO
 

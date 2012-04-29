@@ -22,6 +22,9 @@ sub startup {
   push @{$self->static->classes},   'MojoliciousTest';
   push @{$self->renderer->classes}, 'MojoliciousTest';
 
+  # Application specific commands
+  push @{$self->commands->namespaces}, 'MojoliciousTest::Command';
+
   # Plugins in custom namespace
   unshift @{$self->plugins->namespaces}, $self->routes->namespace . '::Plugin';
   $self->plugin('test-some_plugin2');

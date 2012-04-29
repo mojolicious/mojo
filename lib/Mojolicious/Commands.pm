@@ -125,7 +125,7 @@ sub start {
 sub start_app {
   my $self = shift;
   $ENV{MOJO_APP} = shift;
-  $self->start(@_);
+  $self->new->app->start(@_);
 }
 
 sub _command {
@@ -138,7 +138,7 @@ sub _command {
 
 =head1 NAME
 
-Mojolicious::Commands - Commands
+Mojolicious::Commands - Command line interface
 
 =head1 SYNOPSIS
 
@@ -302,6 +302,9 @@ Short usage message shown before listing available commands.
 
 Namespaces to search for available commands, defaults to
 C<Mojolicious::Command> and C<Mojo::Command>.
+
+  # Add another namespace to search for commands
+  push @{$commands->namespaces}, 'MyApp::Command';
 
 =head1 METHODS
 

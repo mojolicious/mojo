@@ -14,6 +14,7 @@ use Mojolicious::Types;
 use Scalar::Util qw/blessed weaken/;
 
 # "Robots don't have any emotions, and sometimes that makes me very sad."
+has commands => sub { Mojolicious::Commands->new };
 has controller_class => 'Mojolicious::Controller';
 has mode => sub { ($ENV{MOJO_MODE} || 'development') };
 has plugins  => sub { Mojolicious::Plugins->new };
@@ -204,10 +205,10 @@ sub start {
   $ENV{MOJO_EXE} ||= (caller)[1];
 
   # We are the application
-  $ENV{MOJO_APP} = ref $class ? $class : $class->new;
+  my $self = $ENV{MOJO_APP} = ref $class ? $class : $class->new;
 
   # Start!
-  Mojolicious::Commands->start(@_);
+  $self->commands->start(@_);
 }
 
 sub startup { }
@@ -248,6 +249,17 @@ Take a look at our excellent documentation in L<Mojolicious::Guides>!
 
 L<Mojolicious> inherits all attributes from L<Mojo> and implements the
 following new ones.
+
+=head2 C<commands>
+
+  my $commands = $app->commands;
+  $app         = $app->commands(Mojolicious::Commands->new);
+
+Command line interface for your application, defaults to a
+L<Mojolicious::Commands> object.
+
+  # Add another namespace to search for commands
+  push @{$app->commands->namespaces}, 'MyApp::Command';
 
 =head2 C<controller_class>
 

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 7;
+use Test::More tests => 11;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -31,15 +31,43 @@ is ref Mojolicious::Commands->run('psgi'), 'CODE', 'right reference';
 # Start application
 {
   local $ENV{MOJO_APP_LOADER} = 1;
-  local $ENV{MOJO_APP}        = 'MojoliciousTest';
-  is ref Mojolicious::Commands->start, 'MojoliciousTest', 'right class';
-}
-{
-  local $ENV{MOJO_APP_LOADER} = 1;
+  local $ENV{MOJO_APP};
   is ref Mojolicious::Commands->start_app('MojoliciousTest'),
     'MojoliciousTest', 'right class';
 }
+{
+  local $ENV{MOJO_APP_LOADER} = 1;
+  local $ENV{MOJO_APP}        = 'MojoliciousTest';
+  is ref Mojolicious::Commands->start, 'MojoliciousTest', 'right class';
+}
 
 # Start application with command
-is ref Mojolicious::Commands->start_app(MojoliciousTest => 'psgi'), 'CODE',
-  'right reference';
+{
+  local $ENV{MOJO_APP};
+  is ref Mojolicious::Commands->start_app(MojoliciousTest => 'psgi'), 'CODE',
+    'right reference';
+}
+{
+  local $ENV{MOJO_APP} = 'MojoliciousTest';
+  is ref Mojolicious::Commands->start('psgi'), 'CODE', 'right reference';
+}
+
+# Start application with application specific command
+my $app;
+{
+  local $ENV{MOJO_APP_LOADER} = 1;
+  $app = Mojolicious::Commands->start_app('MojoliciousTest');
+}
+is $app->start('test_command'), 'works!', 'right result';
+$app = undef;
+{
+  local $ENV{MOJO_APP_LOADER} = 1;
+  local $ENV{MOJO_APP}        = 'MojoliciousTest';
+  $app = Mojolicious::Commands->start;
+}
+is $app->start('test_command'), 'works!', 'right result';
+{
+  local $ENV{MOJO_APP};
+  is(Mojolicious::Commands->start_app(MojoliciousTest => 'test_command'),
+    'works!', 'right result');
+}

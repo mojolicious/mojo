@@ -3,8 +3,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::Util 'camelize';
 
-# "Who would have thought Hell would really exist?
-#  And that it would be in New Jersey?"
 has namespaces => sub { ['Mojolicious::Plugin'] };
 
 sub emit_hook {

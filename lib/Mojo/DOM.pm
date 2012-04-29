@@ -533,6 +533,9 @@ Append to element content.
 Find a single element with CSS3 selectors. All selectors from
 L<Mojo::DOM::CSS> are supported.
 
+  # Find first element with "svg" namespace definition
+  my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
+
 =head2 C<attrs>
 
   my $attrs = $dom->attrs;

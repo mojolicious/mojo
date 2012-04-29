@@ -20,17 +20,16 @@ has paths => sub { [] };
 #  In my day Xmas was about bringing people together,
 #  not blowing them apart."
 sub new {
-  my $self = shift->SUPER::new(@_);
 
-  # Data
-  $self->add_handler(
+  # Add "data" handler
+  my $self = shift->SUPER::new(@_)->add_handler(
     data => sub {
       my ($r, $c, $output, $options) = @_;
       $$output = $options->{data};
     }
   );
 
-  # JSON
+  # Add "json" handler
   $self->add_handler(
     json => sub {
       my ($r, $c, $output, $options) = @_;
@@ -38,15 +37,13 @@ sub new {
     }
   );
 
-  # Text
-  $self->add_handler(
+  # Add "text" handler
+  return $self->add_handler(
     text => sub {
       my ($r, $c, $output, $options) = @_;
       $$output = $options->{text};
     }
   );
-
-  return $self;
 }
 
 sub add_handler {

@@ -7,7 +7,6 @@ app->log->level('error')->path(undef);
 any '/*whatever' => {whatever => '', text => 'Your Mojo is working!'};
 
 1;
-__END__
 
 =head1 NAME
 

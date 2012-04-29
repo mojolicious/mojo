@@ -62,8 +62,6 @@ my $morbo = Mojo::Server::Morbo->new;
 $morbo->watch(\@watch) if @watch;
 $morbo->run($app);
 
-__END__
-
 =head1 NAME
 
 morbo - Morbo HTTP 1.1 and WebSocket development server

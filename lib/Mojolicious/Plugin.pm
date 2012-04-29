@@ -6,7 +6,6 @@ use Mojo::Base -base;
 sub register { }
 
 1;
-__END__
 
 =head1 NAME
 

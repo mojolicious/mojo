@@ -225,7 +225,6 @@ sub _parse_multipart_preamble {
 }
 
 1;
-__END__
 
 =head1 NAME
 

@@ -59,7 +59,6 @@ sub size { length shift->{content} }
 sub slurp { shift->{content} }
 
 1;
-__END__
 
 =head1 NAME
 

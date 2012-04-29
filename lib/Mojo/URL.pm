@@ -258,7 +258,6 @@ sub to_string {
 }
 
 1;
-__END__
 
 =encoding utf8
 

@@ -80,7 +80,6 @@ sub log {
 sub warn { shift->log(warn => @_) }
 
 1;
-__END__
 
 =head1 NAME
 

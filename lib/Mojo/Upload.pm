@@ -18,7 +18,6 @@ sub size    { shift->asset->size }
 sub slurp   { shift->asset->slurp }
 
 1;
-__END__
 
 =head1 NAME
 

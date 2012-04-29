@@ -18,7 +18,6 @@ sub size    { croak 'Method "size" not implemented by subclass' }
 sub slurp   { croak 'Method "slurp" not implemented by subclass' }
 
 1;
-__END__
 
 =head1 NAME
 

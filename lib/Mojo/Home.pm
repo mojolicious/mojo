@@ -116,7 +116,6 @@ sub slurp_rel_file {
 sub to_string { catdir(@{shift->{parts} || []}) }
 
 1;
-__END__
 
 =head1 NAME
 

@@ -323,7 +323,6 @@ package Mojo::JSON::_Bool;
 use overload '0+' => sub { ${$_[0]} }, '""' => sub { ${$_[0]} }, fallback => 1;
 
 1;
-__END__
 
 =head1 NAME
 

@@ -19,7 +19,6 @@ has usage => "usage: $0 generate GENERATOR [OPTIONS]\n";
 sub help { shift->run(@_) }
 
 1;
-__END__
 
 =head1 NAME
 

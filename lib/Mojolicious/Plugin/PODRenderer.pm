@@ -143,8 +143,6 @@ sub _pod_to_html {
 
 1;
 
-__END__
-
 =head1 NAME
 
 Mojolicious::Plugin::PODRenderer - POD renderer plugin

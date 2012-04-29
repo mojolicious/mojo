@@ -123,7 +123,6 @@ sub _timer {
 }
 
 1;
-__END__
 
 =head1 NAME
 

@@ -418,7 +418,6 @@ sub _trim {
 }
 
 1;
-__END__
 
 =head1 NAME
 
@@ -560,11 +559,17 @@ Alias for L<Mojo::DOM::HTML/"charset">.
 Return a L<Mojo::Collection> object containing the children of this element,
 similar to C<find>.
 
+  # Show type of random child element
+  say $dom->children->shuffle->first->type;
+
 =head2 C<content_xml>
 
   my $xml = $dom->content_xml;
 
 Render content of this element to XML.
+
+  # "<b>test</b>"
+  $dom->parse('<div><b>test</b></div>')->div->content_xml;
 
 =head2 C<find>
 
@@ -696,6 +701,9 @@ is enabled by default.
 
 Render DOM to XML.
 
+  # "<b>test</b>"
+  $dom->parse('<div><b>test</b></div>')->div->b->to_xml;
+
 =head2 C<tree>
 
   my $tree = $dom->tree;
@@ -710,6 +718,7 @@ Alias for L<Mojo::DOM::HTML/"tree">.
 
 Element type.
 
+  # List types of child elements
   $dom->children->each(sub { say $_->type });
 
 =head2 C<xml>

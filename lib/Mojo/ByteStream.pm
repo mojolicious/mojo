@@ -86,7 +86,6 @@ sub split {
 sub to_string { ${shift()} }
 
 1;
-__END__
 
 =head1 NAME
 

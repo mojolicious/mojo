@@ -281,7 +281,6 @@ sub _generate_route {
 }
 
 1;
-__END__
 
 =head1 NAME
 

@@ -135,7 +135,6 @@ sub _command {
 }
 
 1;
-__END__
 
 =head1 NAME
 

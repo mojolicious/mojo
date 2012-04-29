@@ -35,7 +35,6 @@ sub timer      { croak 'Method "timer" not implemented by subclass' }
 sub watch      { croak 'Method "watch" not implemented by subclass' }
 
 1;
-__END__
 
 =head1 NAME
 

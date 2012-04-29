@@ -60,7 +60,6 @@ EOF
 sub run { croak 'Method "run" not implemented by subclass' }
 
 1;
-__END__
 
 =head1 NAME
 

@@ -544,7 +544,6 @@ sub _render_fallbacks {
 }
 
 1;
-__END__
 
 =head1 NAME
 

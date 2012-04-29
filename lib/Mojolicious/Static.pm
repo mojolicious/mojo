@@ -165,7 +165,6 @@ sub _get_file {
 }
 
 1;
-__END__
 
 =head1 NAME
 

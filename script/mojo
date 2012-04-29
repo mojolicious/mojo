@@ -21,8 +21,6 @@ EOF
 # "My eyes! The goggles do nothing!"
 Mojolicious::Commands->start;
 
-__END__
-
 =head1 NAME
 
 mojo - The Mojolicious command system

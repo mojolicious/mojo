@@ -11,7 +11,6 @@ has usage       => "usage: $0 psgi\n";
 sub run { Mojo::Server::PSGI->new->to_psgi_app }
 
 1;
-__END__
 
 =head1 NAME
 

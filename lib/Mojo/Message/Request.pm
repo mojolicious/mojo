@@ -304,7 +304,6 @@ sub _parse_start_line {
 }
 
 1;
-__END__
 
 =head1 NAME
 

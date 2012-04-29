@@ -251,7 +251,6 @@ sub _render_template {
 }
 
 1;
-__END__
 
 =head1 NAME
 

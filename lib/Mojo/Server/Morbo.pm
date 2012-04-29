@@ -107,7 +107,6 @@ sub _spawn {
 }
 
 1;
-__END__
 
 =head1 NAME
 

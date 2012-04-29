@@ -228,7 +228,6 @@ sub _walk {
 }
 
 1;
-__END__
 
 =head1 NAME
 

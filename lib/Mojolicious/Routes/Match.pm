@@ -153,7 +153,6 @@ sub path_for {
 }
 
 1;
-__END__
 
 =head1 NAME
 

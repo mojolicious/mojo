@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 314;
+use Test::More tests => 315;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -35,6 +35,8 @@ is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',
   'right class';
 is $t->app->sessions->cookie_domain, '.example.com', 'right domain';
 is $t->app->sessions->cookie_path,   '/bar',         'right path';
+is $t->app->commands->get_data('some/static/file.txt', 'MojoliciousTest'),
+  "Production static file with low precedence.\n\n", 'right result';
 
 # Plugin::Test::SomePlugin2::register (security violation)
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)

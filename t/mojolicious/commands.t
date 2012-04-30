@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 11;
+use Test::More tests => 10;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -57,13 +57,6 @@ my $app;
 {
   local $ENV{MOJO_APP_LOADER} = 1;
   $app = Mojolicious::Commands->start_app('MojoliciousTest');
-}
-is $app->start('test_command'), 'works!', 'right result';
-$app = undef;
-{
-  local $ENV{MOJO_APP_LOADER} = 1;
-  local $ENV{MOJO_APP}        = 'MojoliciousTest';
-  $app = Mojolicious::Commands->start;
 }
 is $app->start('test_command'), 'works!', 'right result';
 {

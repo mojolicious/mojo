@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Leaf Fluttering In Wind';
-our $VERSION  = '2.92';
+our $VERSION  = '2.93';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -298,9 +298,8 @@ level from C<debug> to C<info> if it has a value other than C<development>.
   my $plugins = $app->plugins;
   $app        = $app->plugins(Mojolicious::Plugins->new);
 
-The plugin loader, defaults to a L<Mojolicious::Plugins> object. You can
-usually leave this alone, see L<Mojolicious::Plugin> if you want to write a
-plugin or the C<plugin> method below if you want to load a plugin.
+The plugin manager, defaults to a L<Mojolicious::Plugins> object. See the
+C<plugin> method below if you want to load a plugin.
 
   # Add another namespace to load plugins from
   push @{$app->plugins->namespaces}, 'MyApp::Plugin';

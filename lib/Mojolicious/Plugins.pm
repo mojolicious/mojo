@@ -68,7 +68,7 @@ sub _load {
 
 =head1 NAME
 
-Mojolicious::Plugins - Plugins
+Mojolicious::Plugins - Plugin manager
 
 =head1 SYNOPSIS
 

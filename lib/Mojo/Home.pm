@@ -151,7 +151,7 @@ following new ones.
 =head2 C<new>
 
   my $home = Mojo::Home->new;
-  my $home = Mojo::Home->new('/foo/bar');
+  my $home = Mojo::Home->new('/home/sri/myapp');
 
 Construct a new L<Mojo::Home> object.
 
@@ -187,7 +187,7 @@ Path to C<lib> directory in which L<Mojolicious> is installed.
 
 =head2 C<parse>
 
-  $home = $home->parse('/foo/bar');
+  $home = $home->parse('/home/sri/myapp');
 
 Parse home directory.
 

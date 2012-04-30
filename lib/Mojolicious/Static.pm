@@ -199,12 +199,12 @@ highest precedence, defaults to C<main>.
 =head2 C<paths>
 
   my $paths = $static->paths;
-  $static   = $static->paths(['/foo/bar/public']);
+  $static   = $static->paths(['/home/sri/public']);
 
 Directories to serve static files from, first one has the highest precedence.
 
   # Add another "public" directory
-  push @{$static->paths}, '/foo/bar/public';
+  push @{$static->paths}, '/home/sri/public';
 
 =head1 METHODS
 

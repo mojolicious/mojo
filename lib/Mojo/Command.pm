@@ -237,13 +237,13 @@ following new ones.
 
 =head2 C<chmod_file>
 
-  $command = $command->chmod_file('/home/sri/bar.txt', 0644);
+  $command = $command->chmod_file('/home/sri/foo.txt', 0644);
 
 Portably change mode of a file.
 
 =head2 C<chmod_rel_file>
 
-  $command = $command->chmod_rel_file('foo/bar.txt', 0644);
+  $command = $command->chmod_rel_file('foo/foo.txt', 0644);
 
 Portably change mode of a file relative to the current working directory.
 
@@ -320,7 +320,7 @@ Render a template from the C<DATA> section of the command class.
 
 =head2 C<render_to_file>
 
-  $command = $command->render_to_file('foo_bar', '/home/sri/bar.txt');
+  $command = $command->render_to_file('foo_bar', '/home/sri/foo.txt');
 
 Render a template from the C<DATA> section of the command class to a file.
 
@@ -340,7 +340,7 @@ Run command. Meant to be overloaded in a subclass.
 
 =head2 C<write_file>
 
-  $command = $command->write_file('/home/sri/bar.txt', 'Hello World!');
+  $command = $command->write_file('/home/sri/foo.txt', 'Hello World!');
 
 Portably write text to a file.
 

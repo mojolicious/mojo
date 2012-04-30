@@ -29,7 +29,7 @@ Mojo::Upload - Upload container
 
   my $upload = Mojo::Upload->new;
   say $upload->filename;
-  $upload->move_to('/foo/bar/baz.txt');
+  $upload->move_to('/home/sri/foo.txt');
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ following new ones.
 
 =head2 C<move_to>
 
-  $upload->move_to('/foo/bar/baz.txt');
+  $upload->move_to('/home/sri/foo.txt');
 
 Alias for L<Mojo::Asset::File/"move_to">.
 

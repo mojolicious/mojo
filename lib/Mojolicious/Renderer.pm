@@ -329,12 +329,12 @@ Registered helpers.
 =head2 C<paths>
 
   my $paths = $renderer->paths;
-  $renderer = $renderer->paths(['/foo/bar/templates']);
+  $renderer = $renderer->paths(['/home/sri/templates']);
 
 Directories to look for templates in, first one has the highest precedence.
 
   # Add another "templates" directory
-  push @{$renderer->paths}, '/foo/bar/templates';
+  push @{$renderer->paths}, '/home/sri/templates';
 
 =head1 METHODS
 

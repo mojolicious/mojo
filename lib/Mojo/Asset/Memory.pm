@@ -148,7 +148,7 @@ Get chunk of data starting from a specific position.
 
 =head2 C<move_to>
 
-  $mem = $mem->move_to('/foo/bar/baz.txt');
+  $mem = $mem->move_to('/home/sri/foo.txt');
 
 Move asset data into a specific file.
 

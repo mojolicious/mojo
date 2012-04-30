@@ -316,7 +316,7 @@ L<Mojolicious::Plugin::EPRenderer> and L<Mojolicious::Plugin::EPLRenderer>
 contain more information.
 
   # Add another "templates" directory
-  push @{$app->renderer->paths}, '/foo/bar/templates';
+  push @{$app->renderer->paths}, '/home/sri/templates';
 
   # Add another class with templates in DATA section
   push @{$app->renderer->classes}, 'Mojolicious::Plugin::Fun';
@@ -365,7 +365,7 @@ For serving static files from your C<public> directories, defaults to a
 L<Mojolicious::Static> object.
 
   # Add another "public" directory
-  push @{$app->static->paths}, '/foo/bar/public';
+  push @{$app->static->paths}, '/home/sri/public';
 
   # Add another class with static files in DATA section
   push @{$app->static->classes}, 'Mojolicious::Plugin::Fun';

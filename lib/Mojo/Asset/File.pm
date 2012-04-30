@@ -161,7 +161,7 @@ Mojo::Asset::File - File storage for HTTP 1.1 content
   say $file->slurp;
 
   # Existing file
-  my $file = Mojo::Asset::File->new(path => '/foo/bar/baz.txt');
+  my $file = Mojo::Asset::File->new(path => '/home/sri/foo.txt');
   $file->move_to('/yada.txt');
   say $file->slurp;
 
@@ -191,7 +191,7 @@ File handle, created on demand.
 =head2 C<path>
 
   my $path = $file->path;
-  $file    = $file->path('/foo/bar/baz.txt');
+  $file    = $file->path('/home/sri/foo.txt');
 
 File path used to create C<handle>, can also be automatically generated if
 necessary.
@@ -235,7 +235,7 @@ True.
 
 =head2 C<move_to>
 
-  $file = $file->move_to('/foo/bar/baz.txt');
+  $file = $file->move_to('/home/sri/bar.txt');
 
 Move asset data into a specific file and disable C<cleanup>.
 

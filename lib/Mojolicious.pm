@@ -258,7 +258,7 @@ following new ones.
 Command line interface for your application, defaults to a
 L<Mojolicious::Commands> object.
 
-  # Add another namespace to search for commands
+  # Add another namespace to load commands from
   push @{$app->commands->namespaces}, 'MyApp::Command';
 
 =head2 C<controller_class>
@@ -301,6 +301,9 @@ level from C<debug> to C<info> if it has a value other than C<development>.
 The plugin loader, defaults to a L<Mojolicious::Plugins> object. You can
 usually leave this alone, see L<Mojolicious::Plugin> if you want to write a
 plugin or the C<plugin> method below if you want to load a plugin.
+
+  # Add another namespace to load plugins from
+  push @{$app->plugins->namespaces}, 'MyApp::Plugin';
 
 =head2 C<renderer>
 

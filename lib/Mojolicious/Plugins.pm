@@ -90,9 +90,10 @@ L<Mojolicious::Plugins> implements the following attributes.
   my $namespaces = $plugins->namespaces;
   $plugins       = $plugins->namespaces(['Mojolicious::Plugin']);
 
-Namespaces to load plugins from.
+Namespaces to load plugins from, defaults to L<Mojolicious::Plugin>.
 
-  push @{$plugins->namespaces}, 'MyApp::Plugins';
+  # Add another namespace to load plugins from
+  push @{$plugins->namespaces}, 'MyApp::Plugin';
 
 =head1 METHODS
 

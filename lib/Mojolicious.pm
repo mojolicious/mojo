@@ -667,8 +667,8 @@ L<http://github.com/kraih/mojo>
 
 =head1 BUNDLED FILES
 
-L<Mojolicious> ships with a few popular static files bundled in the C<public>
-directory.
+The L<Mojolicious> distribution includes a few files with different licenses
+that have been bundled for internal use.
 
 =head2 Mojolicious Artwork
 
@@ -679,7 +679,7 @@ L<http://creativecommons.org/licenses/by-sa/3.0>.
 
 =head2 jQuery
 
-  Copyright 2011, John Resig.
+  Copyright (C) 2011, John Resig.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 

@@ -69,7 +69,7 @@ sub build_frame {
     $frame
       .= $Config{ivsize} > 4
       ? pack('Q>', $len)
-      : pack('NN', $len >> 32, $len & 0xFFFFFFFF);
+      : pack('NN', $len / 0xFFFFFFFF, ($len % 0xFFFFFFFF) - ($len / 0xFFFFFFFF) + 1);
   }
 
   # Mask payload

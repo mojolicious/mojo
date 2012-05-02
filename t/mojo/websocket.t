@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 49;
+use Test::More tests => 48;
 
 # "I can't believe it! Reading and writing actually paid off!"
 use IO::Socket::INET;
@@ -480,26 +480,6 @@ $ua->websocket(
 );
 $loop->start;
 is $result, 'hi!' x 100, 'right result';
-
-# WebSocket /echo (64bit length)
-$result = undef;
-$ua->websocket(
-  '/echo' => sub {
-    my $tx = pop;
-    $tx->max_websocket_size(500000);
-    $tx->on(finish => sub { $loop->stop });
-    $tx->on(
-      message => sub {
-        my ($tx, $message) = @_;
-        $result = $message;
-        $tx->finish;
-      }
-    );
-    $tx->send('hi' x 200000);
-  }
-);
-$loop->start;
-is $result, 'hi' x 200000, 'right result';
 
 # WebSocket /timeout
 my $log = '';

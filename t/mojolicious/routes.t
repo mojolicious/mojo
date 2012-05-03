@@ -173,22 +173,22 @@ my $inactive = $r->route(format => 0);
 $inactive->route('/nodetect')->to('foo#none');
 $inactive->route('/nodetect2', format => ['txt', 'html'])->to('bar#hyper');
 
-# /detached/first
-# /detached/second
-# /detached/second.xml
-# /attached/third
-# /attached/third.xml
-my $attached = $r->route('/attached')->to('attached#');
-my $first = $attached->route(format => 0)->route('/first')->to('#first');
-$attached->route('/second')->to('#second');
-my $third    = $attached->route('/third')->to('#third');
-my $detached = $r->detach->route('/detached')->to('detached#');
-my $second   = $r->find('second');
-is $second->render('', {}), '/attached/second', 'right result';
-$second->detach;
+# /target/first
+# /target/second
+# /target/second.xml
+# /source/third
+# /source/third.xml
+my $source = $r->route('/source')->to('source#');
+my $first = $source->route(format => 0)->route('/first')->to('#first');
+$source->route('/second')->to('#second');
+my $third  = $source->route('/third')->to('#third');
+my $target = $r->remove->route('/target')->to('target#');
+my $second = $r->find('second');
+is $second->render('', {}), '/source/second', 'right result';
+$second->remove;
 is $second->render('', {}), '/second', 'right result';
-$detached->add_child($first)->add_child($second);
-is $second->render('', {}), '/detached/second', 'right result';
+$target->add_child($first)->add_child($second);
+is $second->render('', {}), '/target/second', 'right result';
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(GET => '/clean')->match($r);
@@ -730,42 +730,42 @@ is $m->stack->[0], undef, 'no value';
 $m = Mojolicious::Routes::Match->new(GET => '/nodetect2.xml')->match($r);
 is $m->stack->[0], undef, 'no value';
 
-# Detached routes
-$m = Mojolicious::Routes::Match->new(GET => '/detached/first')->match($r);
-is $m->stack->[0]{controller}, 'detached', 'right value';
-is $m->stack->[0]{action},     'first',    'right value';
-is $m->stack->[0]{format},     undef,      'no value';
+# Removed routes
+$m = Mojolicious::Routes::Match->new(GET => '/target/first')->match($r);
+is $m->stack->[0]{controller}, 'target', 'right value';
+is $m->stack->[0]{action},     'first',  'right value';
+is $m->stack->[0]{format},     undef,    'no value';
 is $m->stack->[1], undef, 'no value';
-is $m->path_for, '/detached/first', 'right path';
-$m = Mojolicious::Routes::Match->new(GET => '/detached/first.xml')->match($r);
+is $m->path_for, '/target/first', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/target/first.xml')->match($r);
 is $m->stack->[0], undef, 'no value';
-$m = Mojolicious::Routes::Match->new(GET => '/attached/first')->match($r);
+$m = Mojolicious::Routes::Match->new(GET => '/source/first')->match($r);
 is $m->stack->[0], undef, 'no value';
-$m = Mojolicious::Routes::Match->new(GET => '/detached/second')->match($r);
-is $m->stack->[0]{controller}, 'detached', 'right value';
-is $m->stack->[0]{action},     'second',   'right value';
-is $m->stack->[0]{format},     undef,      'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/target/second')->match($r);
+is $m->stack->[0]{controller}, 'target', 'right value';
+is $m->stack->[0]{action},     'second', 'right value';
+is $m->stack->[0]{format},     undef,    'no value';
 is $m->stack->[1], undef, 'no value';
-is $m->path_for, '/detached/second', 'right path';
-$m = Mojolicious::Routes::Match->new(GET => '/detached/second.xml')->match($r);
-is $m->stack->[0]{controller}, 'detached', 'right value';
-is $m->stack->[0]{action},     'second',   'right value';
-is $m->stack->[0]{format},     'xml',      'right value';
+is $m->path_for, '/target/second', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/target/second.xml')->match($r);
+is $m->stack->[0]{controller}, 'target', 'right value';
+is $m->stack->[0]{action},     'second', 'right value';
+is $m->stack->[0]{format},     'xml',    'right value';
 is $m->stack->[1], undef, 'no value';
-is $m->path_for, '/detached/second', 'right path';
-$m = Mojolicious::Routes::Match->new(GET => '/attached/second')->match($r);
+is $m->path_for, '/target/second', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/source/second')->match($r);
 is $m->stack->[0], undef, 'no value';
-$m = Mojolicious::Routes::Match->new(GET => '/attached/third')->match($r);
-is $m->stack->[0]{controller}, 'attached', 'right value';
-is $m->stack->[0]{action},     'third',    'right value';
-is $m->stack->[0]{format},     undef,      'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/source/third')->match($r);
+is $m->stack->[0]{controller}, 'source', 'right value';
+is $m->stack->[0]{action},     'third',  'right value';
+is $m->stack->[0]{format},     undef,    'no value';
 is $m->stack->[1], undef, 'no value';
-is $m->path_for, '/attached/third', 'right path';
-$m = Mojolicious::Routes::Match->new(GET => '/attached/third.xml')->match($r);
-is $m->stack->[0]{controller}, 'attached', 'right value';
-is $m->stack->[0]{action},     'third',    'right value';
-is $m->stack->[0]{format},     'xml',      'right value';
+is $m->path_for, '/source/third', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/source/third.xml')->match($r);
+is $m->stack->[0]{controller}, 'source', 'right value';
+is $m->stack->[0]{action},     'third',  'right value';
+is $m->stack->[0]{format},     'xml',    'right value';
 is $m->stack->[1], undef, 'no value';
-is $m->path_for, '/attached/third', 'right path';
-$m = Mojolicious::Routes::Match->new(GET => '/detached/third')->match($r);
+is $m->path_for, '/source/third', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/target/third')->match($r);
 is $m->stack->[0], undef, 'no value';

@@ -31,10 +31,8 @@ sub new { shift->SUPER::new->parse(@_) }
 
 sub add_child {
   my ($self, $route) = @_;
-  weaken $route->parent($self)->{parent};
+  weaken $route->remove->parent($self)->{parent};
   push @{$self->children}, $route;
-  my $format = $self->pattern->reqs->{format};
-  $route->pattern->reqs->{format} //= 0 if defined $format && !$format;
   return $self;
 }
 
@@ -137,6 +135,13 @@ sub patch { shift->_generate_route(PATCH => @_) }
 sub post  { shift->_generate_route(POST  => @_) }
 sub put   { shift->_generate_route(PUT   => @_) }
 
+sub remove {
+  my $self = shift;
+  return $self unless my $parent = $self->parent;
+  @{$parent->children} = grep { $_ ne $self } @{$parent->children};
+  return $self->parent(undef);
+}
+
 sub render {
   my ($self, $path, $values) = @_;
 
@@ -156,8 +161,11 @@ sub root {
 }
 
 sub route {
-  my $self = shift;
-  return $self->add_child($self->new(@_))->children->[-1];
+  my $self   = shift;
+  my $route  = $self->add_child($self->new(@_))->children->[-1];
+  my $format = $self->pattern->reqs->{format};
+  $route->pattern->reqs->{format} //= 0 if defined $format && !$format;
+  return $route;
 }
 
 sub to {
@@ -223,7 +231,7 @@ sub under { shift->_generate_route(under => @_) }
 sub via {
   my $self = shift;
   return $self->{via} unless @_;
-  my $methods = [map { uc $_ } @{ref $_[0] ? $_[0] : [@_]}];
+  my $methods = [map uc($_), @{ref $_[0] ? $_[0] : [@_]}];
   $self->{via} = $methods if @$methods;
   return $self;
 }
@@ -353,6 +361,9 @@ Construct a new L<Mojolicious::Routes::Route> object.
   $r = $r->add_child(Mojolicious::Route->new);
 
 Add a new child to this route.
+
+  # Make this route the new parent of route "perldoc"
+  $r->add_child($r->find('perldoc'));
 
 =head2 C<any>
 
@@ -515,6 +526,15 @@ Generate route matching only C<PUT> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->put('/user')->to('user#replace');
+
+=head2 C<remove>
+
+  $r = $r->remove;
+
+Remove route from C<parent>.
+
+  # Remove route "perldoc"
+  $r->find('perldoc')->remove;
 
 =head2 C<render>
 

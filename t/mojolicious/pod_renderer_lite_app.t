@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 31;
+use Test::More tests => 32;
 
 # "Amy get your pants back on and get to work.
 #  They think were making out.
@@ -16,6 +16,7 @@ use Test::Mojo;
 
 # POD renderer plugin
 plugin 'PODRenderer';
+ok app->routes->find('perldoc'), 'route found';
 
 # Default layout
 app->defaults(layout => 'gray');

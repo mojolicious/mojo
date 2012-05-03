@@ -1,8 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
 2.93  2012-05-03
+  - Added remove method to Mojolicious::Routes::Route.
   - Improved 32bit Perl support of Mojo::Transaction::WebSocket.
     (mikemagowan, sri)
+  - Improved documentation browser to have a route name.
   - Improved documentation.
   - Improved tests.
   - Fixed bug that prevented helper names from starting with "end". (Akron)
@@ -485,7 +487,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Removed experimental status from Mojo::IOLoop::Delay.
   - Removed defer method from Mojo::IOLoop.
   - Improved exception page for development mode.
-  - Improved syntax highlighting in perldoc browser slightly.
+  - Improved syntax highlighting in documentation browser slightly.
   - Improved Mojo::Base tests.
   - Improved documentation.
   - Fixed Mojo::Command->app to be an attribute and not a method.
@@ -1432,7 +1434,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Fixed small Mojo::DOM namespace detection bug. (Akron)
   - Fixed small route pattern escaping bug.
   - Fixed small reload bug.
-  - Fixed small perldoc browser bug. (kberov)
+  - Fixed small documentation browser bug. (kberov)
   - Fixed cookbook recipe. (moritz)
 
 1.16  2011-04-15
@@ -1573,7 +1575,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Deprecated session method in Mojolicious.
   - Deprecated handler and helper attributes in Mojolicious::Renderer.
   - Added new exception and not_found templates.
-  - Added POD browser to Mojolicious::Plugin::PodRenderer.
+  - Added documentation browser to Mojolicious::Plugin::PodRenderer.
   - Added EXPERIMENTAL content_for helper.
   - Disabled debug log messages for static files.
   - Improved Hypnotoad web server to restart workers regularly.

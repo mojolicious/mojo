@@ -49,18 +49,6 @@ sub dispatch {
   return $c->rendered;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub root {
-  warn <<EOF;
-Mojolicious::Static->root is DEPRECATED in favor of
-Mojolicious::Static->paths!
-EOF
-  my $self = shift;
-  return $self->paths->[0] unless @_;
-  $self->paths->[0] = shift;
-  return $self;
-}
-
 sub serve {
   my ($self, $c, $rel) = @_;
 

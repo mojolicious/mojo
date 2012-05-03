@@ -9,7 +9,7 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 # DEPRECATED in Leaf Fluttering In Wind!
 my @leaf = (
   qw/block controller_base_class default_static_class default_template_class/,
-  qw/drop dictionary max_redirects root waypoint/
+  qw/drop waypoint/
 );
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.

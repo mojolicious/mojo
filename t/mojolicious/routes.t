@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 360;
+use Test::More tests => 392;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -172,6 +172,23 @@ $multi->route('/bar.baz')->to('works#too', format => 'xml');
 my $inactive = $r->route(format => 0);
 $inactive->route('/nodetect')->to('foo#none');
 $inactive->route('/nodetect2', format => ['txt', 'html'])->to('bar#hyper');
+
+# /removed/first
+# /removed/second
+# /removed/second.xml
+# /source/third
+# /source/third.xml
+my $source = $r->route('/source')->to('source#');
+my $first = $source->route(format => 0)->route('/first')->to('#first');
+$source->route('/second')->to('#second');
+my $third   = $source->route('/third')->to('#third');
+my $removed = $r->remove->route('/removed')->to('removed#');
+my $second  = $r->find('second');
+is $second->render('', {}), '/source/second', 'right result';
+$second->remove;
+is $second->render('', {}), '/second', 'right result';
+$removed->add_child($first)->add_child($second);
+is $second->render('', {}), '/removed/second', 'right result';
 
 # Make sure stash stays clean
 my $m = Mojolicious::Routes::Match->new(GET => '/clean')->match($r);
@@ -711,4 +728,44 @@ is $m->path_for, '/nodetect2.html', 'right path';
 $m = Mojolicious::Routes::Match->new(GET => '/nodetect2')->match($r);
 is $m->stack->[0], undef, 'no value';
 $m = Mojolicious::Routes::Match->new(GET => '/nodetect2.xml')->match($r);
+is $m->stack->[0], undef, 'no value';
+
+# Removed routes
+$m = Mojolicious::Routes::Match->new(GET => '/removed/first')->match($r);
+is $m->stack->[0]{controller}, 'removed', 'right value';
+is $m->stack->[0]{action},     'first',   'right value';
+is $m->stack->[0]{format},     undef,     'no value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/removed/first', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/removed/first.xml')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/source/first')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/removed/second')->match($r);
+is $m->stack->[0]{controller}, 'removed', 'right value';
+is $m->stack->[0]{action},     'second',  'right value';
+is $m->stack->[0]{format},     undef,     'no value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/removed/second', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/removed/second.xml')->match($r);
+is $m->stack->[0]{controller}, 'removed', 'right value';
+is $m->stack->[0]{action},     'second',  'right value';
+is $m->stack->[0]{format},     'xml',     'right value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/removed/second', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/source/second')->match($r);
+is $m->stack->[0], undef, 'no value';
+$m = Mojolicious::Routes::Match->new(GET => '/source/third')->match($r);
+is $m->stack->[0]{controller}, 'source', 'right value';
+is $m->stack->[0]{action},     'third',  'right value';
+is $m->stack->[0]{format},     undef,    'no value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/source/third', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/source/third.xml')->match($r);
+is $m->stack->[0]{controller}, 'source', 'right value';
+is $m->stack->[0]{action},     'third',  'right value';
+is $m->stack->[0]{format},     'xml',    'right value';
+is $m->stack->[1], undef, 'no value';
+is $m->path_for, '/source/third', 'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/removed/third')->match($r);
 is $m->stack->[0], undef, 'no value';

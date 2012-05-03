@@ -164,18 +164,6 @@ sub render {
   return $output, $c->app->types->type($format) || 'text/plain';
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub root {
-  warn <<EOF;
-Mojolicious::Renderer->root is DEPRECATED in favor of
-Mojolicious::Renderer->paths!
-EOF
-  my $self = shift;
-  return $self->paths->[0] unless @_;
-  $self->paths->[0] = shift;
-  return $self;
-}
-
 sub template_name {
   my ($self, $options) = @_;
   return unless my $template = $options->{template} || '';

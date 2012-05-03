@@ -20,13 +20,8 @@ Please visit http://mojolicio.us for detailed installation instructions.
 EOF
 
 # "Hey sexy mama, wanna kill all humans?"
-my $config = 'hypnotoad.conf';
 my $help;
 GetOptions(
-
-  # DEPRECATED in Leaf Fluttering In Wind!
-  'c|config=s' => sub { $config = $_[1] },
-
   'f|foreground' => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
   'h|help'       => sub { $help                      = 1 },
   's|stop'       => sub { $ENV{HYPNOTOAD_STOP}       = 1 },
@@ -46,12 +41,12 @@ These options are available:
   -f, --foreground      Keep manager process in foreground.
   -h, --help            Show this message.
   -s, --stop            Stop server gracefully.
-  -t, --test            Test application/configuration and exit.
+  -t, --test            Test application and exit.
 EOF
 
 # "This is it.
 #  The moment we should've trained for."
-Mojo::Server::Hypnotoad->new->run($app, $config);
+Mojo::Server::Hypnotoad->new->run($app);
 
 =head1 NAME
 

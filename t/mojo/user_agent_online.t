@@ -34,7 +34,7 @@ my $loop = Mojo::IOLoop->singleton;
 my $ua   = Mojo::UserAgent->new;
 my ($id, $code);
 $ua->get(
-  'http://cpan.org' => sub {
+  'http://metacpan.org' => sub {
     my $tx = pop;
     $id   = $tx->connection;
     $code = $tx->res->code;
@@ -136,7 +136,7 @@ $ua = Mojo::UserAgent->new;
 # Custom non keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('http://cpan.org');
+$tx->req->url->parse('http://metacpan.org');
 $tx->req->headers->connection('close');
 $ua->start($tx);
 ok $tx->is_finished, 'transaction is finished';
@@ -154,10 +154,10 @@ like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';
 
 # Simple request
-$tx = $ua->get('cpan.org');
-is $tx->req->method, 'GET',             'right method';
-is $tx->req->url,    'http://cpan.org', 'right url';
-is $tx->res->code,   301,               'right status';
+$tx = $ua->get('metacpan.org');
+is $tx->req->method, 'GET',                 'right method';
+is $tx->req->url,    'http://metacpan.org', 'right url';
+is $tx->res->code,   301,                   'right status';
 
 # HTTPS request that requires SNI
 $tx = $ua->get('https://sni.velox.ch/');

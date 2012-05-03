@@ -117,7 +117,6 @@ websocket '/subreq' => sub {
 # WebSocket /echo
 websocket '/echo' => sub {
   my $self = shift;
-  $self->tx->max_websocket_size(500000);
   $self->on(
     message => sub {
       my ($self, $message) = @_;

@@ -125,7 +125,7 @@ sub parse_frame {
 
   # Head
   my $clone = $$buffer;
-  return unless length $clone > 2;
+  return unless length $clone >= 2;
   my $head = substr $clone, 0, 2;
 
   # FIN

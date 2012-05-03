@@ -38,7 +38,7 @@ app->defaults(default => 23);
 helper test_helper  => sub { shift->param(@_) };
 helper test_helper2 => sub { shift->app->controller_class };
 helper dead         => sub { die $_[1] || 'works!' };
-helper endpoint     => sub { 'works!' };
+helper endpoint     => sub {'works!'};
 is app->test_helper('foo'), undef, 'no value yet';
 is app->test_helper2, 'Mojolicious::Controller', 'right value';
 
@@ -393,7 +393,7 @@ get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
 app->helper(agent => sub { shift->req->headers->user_agent });
 
 # GET /helper/endpoint
-get '/helper/endpoint' => sub { shift->render('endpoint')};
+get '/helper/endpoint' => 'endpoint';
 
 # GET /eperror
 get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
@@ -1147,7 +1147,7 @@ $t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)
 $t->get_ok('/helper/endpoint')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("works!");
+  ->content_is("works!\nworks!\nworks!works!");
 
 # GET /eperror
 $t->get_ok('/eperror')->status_is(500)
@@ -1446,7 +1446,10 @@ app layout <%= content %><%= app->mode %>
 (<%= agent %>)\
 
 @@ endpoint.html.ep
-<%= endpoint %>\
+% endpoint;
+%= endpoint
+%== endpoint
+<% endpoint; %><%= endpoint %><%== endpoint %>\
 
 @@ eperror.html.ep
 %= $c->foo('bar');

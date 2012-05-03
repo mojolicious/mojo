@@ -173,31 +173,29 @@ sub parse {
   # Precompile
   my $token_re = qr/
     (
-      \Q$tag$replace\E                     # Replace
+      \Q$tag$replace\E                       # Replace
     |
-      \Q$tag$expr$escp\E\s*\Q$cpen\E(?!\w) # Escaped expression (end)
+      \Q$tag$expr$escp\E\s*\Q$cpen\E(?!\w)   # Escaped expression (end)
     |
-      \Q$tag$expr$escp\E                   # Escaped expression
+      \Q$tag$expr$escp\E                     # Escaped expression
     |
-      \Q$tag$expr\E\s*\Q$cpen\E(?!\w)      # Expression (end)
+      \Q$tag$expr\E\s*\Q$cpen\E(?!\w)        # Expression (end)
     |
-      \Q$tag$expr\E                        # Expression
+      \Q$tag$expr\E                          # Expression
     |
-      \Q$tag$cmnt\E\s*\Q$cpen\E(?!\w)      # Comment (end)
+      \Q$tag$cmnt\E                          # Comment
     |
-      \Q$tag$cmnt\E                        # Comment
+      \Q$tag\E\s*\Q$cpen\E(?!\w)             # Code (end)
     |
-      \Q$tag\E\s*\Q$cpen\E(?!\w)           # Code (end)
+      \Q$tag\E                               # Code
     |
-      \Q$tag\E                             # Code
+      \Q$cpst\E\s*\Q$trim$end\E              # Trim end (start)
     |
-      \Q$cpst\E\s*\Q$trim$end\E            # Trim end (start)
+      \Q$trim$end\E                          # Trim end
     |
-      \Q$trim$end\E                        # Trim end
+      \Q$cpst\E\s*\Q$end\E                   # End (start)
     |
-      \Q$cpst\E\s*\Q$end\E                 # End (start)
-    |
-      \Q$end\E                             # End
+      \Q$end\E                               # End
     )
   /x;
   my $cpen_re = qr/^(\Q$tag\E)(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E(?!\w)/;

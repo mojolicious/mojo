@@ -362,7 +362,7 @@ Construct a new L<Mojolicious::Routes::Route> object.
 
 Add a new child to this route.
 
-  # Move route around
+  # Reattach route
   $r->add_child($r->find('foo'));
 
 =head2 C<any>
@@ -401,11 +401,13 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r = $r->detach;
 
-Detach route from parent. Detached routes can be reattached to a new parent
-with C<add_child>.
+Detach route from parent.
 
   # Remove route
   $r->find('foo')->detach;
+
+  # Reattach route to new parent
+  $r->find('foo')->add_child($r->find('bar')->detach);
 
 =head2 C<detour>
 

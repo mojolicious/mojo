@@ -6,6 +6,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Improved documentation.
   - Improved tests.
   - Fixed bug that prevented helper names from starting with "end". (Akron)
+  - Fixed bug that prevented helper names from ending with "begin".
   - Fixed empty frame handling in Mojo::Transaction::WebSocket.
 
 2.92  2012-04-30

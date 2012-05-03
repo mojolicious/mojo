@@ -189,17 +189,17 @@ sub parse {
     |
       \Q$tag\E                               # Code
     |
-      \Q$cpst\E\s*\Q$trim$end\E              # Trim end (start)
+      (?<!\w)\Q$cpst\E\s*\Q$trim$end\E       # Trim end (start)
     |
       \Q$trim$end\E                          # Trim end
     |
-      \Q$cpst\E\s*\Q$end\E                   # End (start)
+      (?<!\w)\Q$cpst\E\s*\Q$end\E            # End (start)
     |
       \Q$end\E                               # End
     )
   /x;
   my $cpen_re = qr/^(\Q$tag\E)(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E(?!\w)/;
-  my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
+  my $end_re  = qr/^(?:(?<!\w)(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
 
   # Split lines
   my $state = 'text';

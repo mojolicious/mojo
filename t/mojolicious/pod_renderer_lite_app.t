@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 32;
+use Test::More tests => 35;
 
 # "Amy get your pants back on and get to work.
 #  They think were making out.
@@ -33,6 +33,9 @@ post '/' => 'index';
 # GET /block
 post '/block' => 'block';
 
+# GET /empty
+get '/empty' => {inline => '', handler => 'pod'};
+
 my $t = Test::Mojo->new;
 
 # Simple POD template
@@ -48,6 +51,9 @@ $t->post_ok('/')->status_is(200)
 $t->post_ok('/block')->status_is(200)
   ->content_like(qr#test321\s+<h2>lalala</h2>\s+<p><code>test</code></p>#)
   ->content_like(qr/Gray/);
+
+# Empty
+$t->get_ok('/empty')->status_is(200)->content_is('');
 
 # Perldoc browser (Welcome)
 $t->get_ok('/perldoc')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')

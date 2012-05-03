@@ -9,6 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Fixed bug that prevented helper names from starting with "end". (Akron)
   - Fixed bug that prevented helper names from ending with "begin".
   - Fixed empty frame handling in Mojo::Transaction::WebSocket.
+  - Fixed small rendering bug in Mojolicious::Plugin::PODRenderer.
 
 2.92  2012-04-30
   - Added commands attribute to Mojolicious.
@@ -1768,7 +1769,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Fixed a small Test::Mojo bug.
   - Fixed multiple route condition bugs. (esskar)
   - Fixed a small relative path bug in Mojo::URL.
-  - Fixed pod renderer bug. (vti)
+  - Fixed POD renderer bug. (vti)
   - Fixed a multipart parser bug affecting mostly file uploads.
   - Fixed input tag helper escaping. (vti)
   - Fixed url_for WebSocket support.

@@ -30,8 +30,9 @@ sub register {
       my ($r, $c, $output, $options) = @_;
 
       # Preprocess with ep and then render
-      $$output = _pod_to_html($$output)
-        if $r->handlers->{$preprocess}->($r, $c, $output, $options);
+      return unless $r->handlers->{$preprocess}->($r, $c, $output, $options);
+      $$output = _pod_to_html($$output);
+      return 1;
     }
   );
 
@@ -115,8 +116,7 @@ sub register {
 }
 
 sub _pod_to_html {
-  my $pod = shift;
-  return unless defined $pod;
+  return unless defined(my $pod = shift);
 
   # Block
   $pod = $pod->() if ref $pod eq 'CODE';
@@ -129,10 +129,8 @@ sub _pod_to_html {
   $parser->html_footer('');
 
   # Parse
-  my $output;
-  $parser->output_string(\$output);
-  eval { $parser->parse_string_document("$pod") };
-  return $@ if $@;
+  $parser->output_string(\(my $output));
+  return $@ unless eval { $parser->parse_string_document("$pod"); 1 };
 
   # Filter
   $output =~ s|<a name='___top' class='dummyTopAnchor'\s*?></a>\n||g;

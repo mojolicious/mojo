@@ -39,8 +39,7 @@ sub register {
   $app->helper(pod_to_html => sub { shift; b(_pod_to_html(@_)) });
 
   # Perldoc
-  return if $conf->{no_perldoc};
-  $app->routes->any(
+  return $app->routes->any(
     '/perldoc/*module' => {module => 'Mojolicious/Guides'} => sub {
       my $self = shift;
 
@@ -112,7 +111,7 @@ sub register {
       $self->render(inline => $PERLDOC, title => $title, parts => \@parts);
       $self->res->headers->content_type('text/html;charset="UTF-8"');
     }
-  )->name('perldoc');
+  ) unless $conf->{no_perldoc};
 }
 
 sub _pod_to_html {
@@ -212,7 +211,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-  $plugin->register;
+  my $route = $plugin->register;
 
 Register renderer in L<Mojolicious> application.
 

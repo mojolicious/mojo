@@ -64,7 +64,7 @@ and implements the following new ones.
 
 =head2 C<register>
 
-  $plugin->register;
+  my $route = $plugin->register;
 
 Mount L<Mojolicious> application.
 

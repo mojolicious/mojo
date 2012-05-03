@@ -15,7 +15,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # POD renderer plugin
-plugin 'PODRenderer';
+plugin('PODRenderer')->name('perldoc');
 ok app->routes->find('perldoc'), 'route found';
 
 # Default layout

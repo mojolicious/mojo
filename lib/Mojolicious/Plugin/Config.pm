@@ -176,7 +176,7 @@ Parse configuration file.
 
 =head2 C<register>
 
-  $plugin->register;
+  my $config = $plugin->register;
 
 Register plugin in L<Mojolicious> application.
 

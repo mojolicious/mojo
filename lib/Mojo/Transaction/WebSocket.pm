@@ -61,7 +61,7 @@ sub build_frame {
     $frame .= pack 'n', $len;
   }
 
-  # Extended payload (64bit)
+  # Extended payload (64bit with 32bit fallback)
   else {
     warn "-- Extended 64bit payload ($len)\n$payload\n" if DEBUG;
     vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
@@ -69,7 +69,7 @@ sub build_frame {
     $frame
       .= $Config{ivsize} > 4
       ? pack('Q>', $len)
-      : pack('NN', $len >> 32, $len & 0xFFFFFFFF);
+      : pack('NN', 0, $len & 0xFFFFFFFF);
   }
 
   # Mask payload
@@ -154,7 +154,7 @@ sub parse_frame {
     warn "-- Extended 16bit payload ($len)\n" if DEBUG;
   }
 
-  # Extended payload (64bit)
+  # Extended payload (64bit with 32bit fallback)
   elsif ($len == 127) {
     return unless length $clone > 10;
     $hlen = 10;

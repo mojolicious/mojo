@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 # "Being eaten by crocodile is just like going to sleep...
 #  in a giant blender."
-use Test::More tests => 98;
+use Test::More tests => 105;
 
 use Mojo::Transaction::WebSocket;
 
@@ -182,3 +182,16 @@ is $frame->[3], 0,  'rsv3 flag is not set';
 is $frame->[4], 8,  'close frame';
 is $frame->[5], '', 'no payload';
 is $ws->build_frame(1, 0, 0, 0, 8, ''), $bytes, 'frames are equal';
+
+# Masked empty binary frame roundtrip
+$ws = Mojo::Transaction::WebSocket->new(masked => 1);
+$bytes = $ws->build_frame(1, 0, 0, 0, 2, '');
+$frame = $ws->parse_frame(\($dummy = $bytes));
+is $frame->[0], 1,  'fin flag is set';
+is $frame->[1], 0,  'rsv1 flag is not set';
+is $frame->[2], 0,  'rsv2 flag is not set';
+is $frame->[3], 0,  'rsv3 flag is not set';
+is $frame->[4], 2,  'binary frame';
+is $frame->[5], '', 'no payload';
+isnt(Mojo::Transaction::WebSocket->new->build_frame(1, 0, 0, 0, 2, ''),
+  $bytes, 'frames are not equal');

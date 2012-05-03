@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 685;
+use Test::More tests => 690;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -38,6 +38,7 @@ app->defaults(default => 23);
 helper test_helper  => sub { shift->param(@_) };
 helper test_helper2 => sub { shift->app->controller_class };
 helper dead         => sub { die $_[1] || 'works!' };
+helper endpoint     => sub { 'works!' };
 is app->test_helper('foo'), undef, 'no value yet';
 is app->test_helper2, 'Mojolicious::Controller', 'right value';
 
@@ -390,6 +391,9 @@ get '/app' => {layout => 'app'};
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
 app->helper(agent => sub { shift->req->headers->user_agent });
+
+# GET /helper/endpoint
+get '/helper/endpoint' => sub { shift->render('endpoint')};
 
 # GET /eperror
 get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
@@ -1139,6 +1143,12 @@ $t->get_ok('/helper', {'User-Agent' => 'Explorer'})->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("23\n<br>\n&lt;...\n/template\n(Explorer)");
 
+# GET /helper/endpoint
+$t->get_ok('/helper/endpoint')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is("works!");
+
 # GET /eperror
 $t->get_ok('/eperror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1434,6 +1444,9 @@ app layout <%= content %><%= app->mode %>
 %= '<...'
 %= url_for 'index'
 (<%= agent %>)\
+
+@@ endpoint.html.ep
+<%= endpoint %>\
 
 @@ eperror.html.ep
 %= $c->foo('bar');

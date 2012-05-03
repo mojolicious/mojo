@@ -9,6 +9,9 @@ use Mojo::Util qw/b64_encode decode encode sha1_bytes/;
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 
+# 64bit Perl
+use constant MODERN => $Config{ivsize} > 4;
+
 # Unique value from the spec
 use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
@@ -66,10 +69,7 @@ sub build_frame {
     warn "-- Extended 64bit payload ($len)\n$payload\n" if DEBUG;
     vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
     $frame .= $prefix;
-    $frame
-      .= $Config{ivsize} > 4
-      ? pack('Q>', $len)
-      : pack('NN', 0, $len & 0xFFFFFFFF);
+    $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xFFFFFFFF);
   }
 
   # Mask payload
@@ -159,10 +159,7 @@ sub parse_frame {
     return unless length $clone > 10;
     $hlen = 10;
     my $ext = substr $clone, 2, 8;
-    $len
-      = $Config{ivsize} > 4
-      ? unpack('Q>', $ext)
-      : unpack('N', substr($ext, 4, 4));
+    $len = MODERN ? unpack('Q>', $ext) : unpack('N', substr($ext, 4, 4));
     warn "-- Extended 64bit payload ($len)\n" if DEBUG;
   }
 

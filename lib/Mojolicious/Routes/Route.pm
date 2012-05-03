@@ -31,7 +31,7 @@ sub new { shift->SUPER::new->parse(@_) }
 
 sub add_child {
   my ($self, $route) = @_;
-  weaken $route->remove->parent($self)->{parent};
+  weaken $route->detach->parent($self)->{parent};
   push @{$self->children}, $route;
   return $self;
 }
@@ -41,6 +41,13 @@ sub any { shift->_generate_route(ref $_[0] eq 'ARRAY' ? shift : [], @_) }
 sub bridge { shift->route(@_)->inline(1) }
 
 sub delete { shift->_generate_route(DELETE => @_) }
+
+sub detach {
+  my $self = shift;
+  return $self unless my $parent = $self->parent;
+  @{$parent->children} = grep { $_ ne $self } @{$parent->children};
+  return $self->parent(undef);
+}
 
 sub detour { shift->partial(1)->to(@_) }
 
@@ -134,13 +141,6 @@ sub parse {
 sub patch { shift->_generate_route(PATCH => @_) }
 sub post  { shift->_generate_route(POST  => @_) }
 sub put   { shift->_generate_route(PUT   => @_) }
-
-sub remove {
-  my $self = shift;
-  return $self unless my $parent = $self->parent;
-  @{$parent->children} = grep { $_ ne $self } @{$parent->children};
-  return $self->parent(undef);
-}
 
 sub render {
   my ($self, $path, $values) = @_;
@@ -397,6 +397,15 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->delete('/user')->to('user#remove');
 
+=head2 C<detach>
+
+  $r = $r->detach;
+
+Detach route from C<parent>.
+
+  # Remove route "perldoc"
+  $r->find('perldoc')->detach;
+
 =head2 C<detour>
 
   $r = $r->detour(action => 'foo');
@@ -526,15 +535,6 @@ Generate route matching only C<PUT> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->put('/user')->to('user#replace');
-
-=head2 C<remove>
-
-  $r = $r->remove;
-
-Remove route from C<parent>.
-
-  # Remove route "perldoc"
-  $r->find('perldoc')->remove;
 
 =head2 C<render>
 

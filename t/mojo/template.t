@@ -145,24 +145,22 @@ is $output, "% my \$number = 23;\nThe number is <%= \$number %>.\n",
   'mixed lines have been replaced';
 
 # Helper starting with "end"
-$mt = Mojo::Template->new(
-  prepend => 'no warnings "redefine"; sub endpoint { "works!" }');
+$mt = Mojo::Template->new(prepend => 'sub endpoint { "works!" }');
 $output = $mt->render(<<'EOF');
 % endpoint;
 %= endpoint
 %== endpoint
-<% endpoint; %><%= endpoint %><%== endpoint %>\
+<% endpoint; %><%= endpoint %><%== endpoint =%>
 EOF
 is $output, "works!\nworks!\nworks!works!", 'helper worked';
 
 # Helper ending with "begin"
-$mt = Mojo::Template->new(
-  prepend => 'no warnings "redefine"; sub funbegin { "works too!" }');
+$mt = Mojo::Template->new(prepend => 'sub funbegin { "works too!" }');
 $output = $mt->render(<<'EOF');
 % funbegin;
 %= funbegin
 %== funbegin
-<% funbegin; %><%= funbegin %><%== funbegin %>\
+<% funbegin; %><%= funbegin %><%== funbegin =%>\
 EOF
 is $output, "works too!\nworks too!\nworks too!works too!", 'helper worked';
 

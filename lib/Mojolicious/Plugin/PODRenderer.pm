@@ -150,16 +150,16 @@ Mojolicious::Plugin::PODRenderer - POD renderer plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin('PODRenderer');
-  $self->plugin(PODRenderer => {name => 'foo'});
-  $self->plugin(PODRenderer => {preprocess => 'epl'});
+  my $route = $self->plugin('PODRenderer');
+  my $route = $self->plugin(PODRenderer => {name => 'foo'});
+  my $route = $self->plugin(PODRenderer => {preprocess => 'epl'});
   $self->render('some_template', handler => 'pod');
   %= pod_to_html "=head1 TEST\n\nC<123>"
 
   # Mojolicious::Lite
-  plugin 'PODRenderer';
-  plugin PODRenderer => {name => 'foo'};
-  plugin PODRenderer => {preprocess => 'epl'};
+  my $route = plugin 'PODRenderer';
+  my $route = plugin PODRenderer => {name => 'foo'};
+  my $route = plugin PODRenderer => {preprocess => 'epl'};
   $self->render('some_template', handler => 'pod');
   %= pod_to_html "=head1 TEST\n\nC<123>"
 

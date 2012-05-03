@@ -33,10 +33,10 @@ Mojolicious::Plugin::Mount - Application mount plugin
 =head1 SYNOPSIS
 
   # Mojolicious
-  $self->plugin(Mount => {'/prefix' => '/home/sri/myapp.pl'});
+  my $route = $self->plugin(Mount => {'/prefix' => '/home/sri/myapp.pl'});
 
   # Mojolicious::Lite
-  plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
+  my $route = plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
 
   # Adjust the generated route
   my $example = plugin Mount => {'/example' => '/home/sri/example.pl'};

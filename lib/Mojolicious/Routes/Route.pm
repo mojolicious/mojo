@@ -403,11 +403,11 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
 Detach route from parent.
 
-  # Remove route
+  # Remove route completely
   $r->find('foo')->detach;
 
   # Reattach route to new parent
-  $r->find('foo')->add_child($r->find('bar')->detach);
+  $r->route('/foo')->add_child($r->find('bar')->detach);
 
 =head2 C<detour>
 

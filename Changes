@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.93  2012-05-04
+2.93  2012-05-05
   - Added remove method to Mojolicious::Routes::Route.
   - Improved 32bit Perl support of Mojo::Transaction::WebSocket.
     (mikemagowan, sri)

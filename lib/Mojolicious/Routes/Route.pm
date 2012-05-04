@@ -382,7 +382,7 @@ also the L<Mojolicious::Lite> tutorial for more argument variations.
   my $bridge = $r->bridge('/:action', action => qr/\w+/);
   my $bridge = $r->bridge(format => 0);
 
-Add a new bridge to this route as a nested child.
+Generate bridge.
 
   my $auth = $r->bridge('/user')->to('user#auth');
   $auth->get('/show')->to('#show');
@@ -561,7 +561,7 @@ The L<Mojolicious::Routes> object this route is an ancestor of.
   my $route = $r->route('/:action', action => qr/\w+/);
   my $route = $r->route(format => 0);
 
-Add a new nested child to this route.
+Generate route matching all HTTP request methods.
 
 =head2 C<to>
 

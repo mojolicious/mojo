@@ -364,9 +364,12 @@ Hide controller methods and attributes from routes.
 
 =head2 C<route>
 
-  my $route = $r->route('/:c/:a', a => qr/\w+/);
+  my $route = $r->route;
+  my $route = $r->route('/:action');
+  my $route = $r->route('/:action', action => qr/\w+/);
+  my $route = $r->route(format => 0);
 
-Add a new nested L<Mojolicious::Routes::Route> child.
+Generate route matching all HTTP request methods.
 
 =head1 SEE ALSO
 

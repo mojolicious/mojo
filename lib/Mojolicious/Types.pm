@@ -4,7 +4,7 @@ use Mojo::Base -base;
 # "Once again, the conservative, sandwich-heavy portfolio pays off for the
 #  hungry investor."
 has types => sub {
-  return {
+  {
     atom => 'application/atom+xml',
     bin  => 'application/octet-stream',
     css  => 'text/css',

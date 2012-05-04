@@ -8,7 +8,6 @@ use I18N::LangTags::Detect;
 #  No, the cat shelter’s onto me."
 sub register {
   my ($self, $app, $conf) = @_;
-  $conf ||= {};
 
   # Initialize
   my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
@@ -165,7 +164,7 @@ and implements the following new ones.
 
 =head2 C<register>
 
-  $plugin->register;
+  $plugin->register($app, $conf);
 
 Register plugin hooks and helpers in L<Mojolicious> application.
 

@@ -18,7 +18,6 @@ my $PERLDOC = $Mojolicious::Controller::H->slurp_rel_file('perldoc.html.ep');
 #  pleasant one."
 sub register {
   my ($self, $app, $conf) = @_;
-  $conf ||= {};
 
   # Add "pod" handler
   my $preprocess = $conf->{preprocess} || 'ep';
@@ -206,7 +205,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-  my $route = $plugin->register;
+  my $route = $plugin->register($app, $conf);
 
 Register renderer in L<Mojolicious> application.
 

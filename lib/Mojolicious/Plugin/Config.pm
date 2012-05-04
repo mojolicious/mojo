@@ -34,7 +34,6 @@ sub parse {
 
 sub register {
   my ($self, $app, $conf) = @_;
-  $conf ||= {};
 
   # Config file
   my $file = $conf->{file} || $ENV{MOJO_CONFIG};
@@ -176,7 +175,7 @@ Parse configuration file.
 
 =head2 C<register>
 
-  my $config = $plugin->register;
+  my $config = $plugin->register($app, $conf);
 
 Register plugin in L<Mojolicious> application.
 

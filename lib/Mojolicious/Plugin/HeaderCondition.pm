@@ -82,7 +82,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-  $plugin->register;
+  $plugin->register($app);
 
 Register condition in L<Mojolicious> application.
 

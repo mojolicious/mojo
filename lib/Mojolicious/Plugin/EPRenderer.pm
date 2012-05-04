@@ -9,7 +9,6 @@ use Mojo::Util qw/encode md5_sum/;
 #  Wishful thinking. We have long since evolved beyond the need for asses."
 sub register {
   my ($self, $app, $conf) = @_;
-  $conf ||= {};
 
   # Custom sandbox
   my $template = $conf->{template} || {};
@@ -129,7 +128,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-  $plugin->register;
+  $plugin->register($app, $conf);
 
 Register renderer in L<Mojolicious> application.
 

@@ -69,7 +69,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 <% %>=head2 C<register>
 
-  $plugin->register;
+  $plugin->register($app);
 
 Register plugin in L<Mojolicious> application.
 

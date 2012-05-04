@@ -23,26 +23,14 @@ sub parse {
   return $config;
 }
 
-sub register {
-  my ($self, $app, $conf) = @_;
-  $conf->{ext} = 'json' unless exists $conf->{ext};
-  $self->SUPER::register($app, $conf);
-}
+sub register { shift->SUPER::register(shift, {ext => 'json', %{shift()}}) }
 
 sub render {
   my ($self, $content, $file, $conf, $app) = @_;
 
-  # Instance
-  my $prepend = 'my $app = shift;';
-
-  # Be less strict
-  $prepend .= q/no strict 'refs'; no warnings 'redefine';/;
-
-  # Helper
-  $prepend .= "sub app; *app = sub { \$app };";
-
-  # Be strict again
-  $prepend .= q/use Mojo::Base -strict;/;
+  # Application instance and helper
+  my $prepend = q/my $app = shift; no strict 'refs'; no warnings 'redefine';/;
+  $prepend .= q/sub app; *app = sub { $app }; use Mojo::Base -strict;/;
 
   # Render
   my $mt = Mojo::Template->new($conf->{template} || {});
@@ -118,7 +106,7 @@ Process content with C<render> and parse it with L<Mojo::JSON>.
 
 =head2 C<register>
 
-  my $config = $plugin->register;
+  my $config = $plugin->register($app, $conf);
 
 Register plugin in L<Mojolicious> application.
 

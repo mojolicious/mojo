@@ -40,8 +40,6 @@ Keep it simple, no magic unless absolutely necessary.
 The installation process should be as fast and painless as possible. (Less
 than a minute on most common hardware is a good rule of thumb)
 
-Code should be written with a Perl6 port in mind.
-
 The addition and modification of features is decided by majority vote or the
 pumpking.
 

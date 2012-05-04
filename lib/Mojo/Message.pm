@@ -12,8 +12,6 @@ use Mojo::Upload;
 use Mojo::Util qw/decode url_unescape/;
 use Scalar::Util 'weaken';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
-
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
 has dom_class        => 'Mojo::DOM';
@@ -210,7 +208,7 @@ sub get_start_line_chunk {
   my ($self, $offset) = @_;
   $self->emit(progress => 'start_line', $offset);
   return substr $self->{start_line_buffer} //= $self->_build_start_line,
-    $offset, CHUNK_SIZE;
+    $offset, $ENV{MOJO_CHUNK_SIZE} || 131072;
 }
 
 sub has_leftovers { shift->content->has_leftovers }

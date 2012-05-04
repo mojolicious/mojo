@@ -1,8 +1,6 @@
 package Mojo::Server::PSGI;
 use Mojo::Base 'Mojo::Server';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
-
 # "Things aren't as happy as they used to be down here at the unemployment
 #  office.
 #  Joblessness is no longer just for philosophy majors.
@@ -20,7 +18,8 @@ sub run {
   # Request body
   my $len = $env->{CONTENT_LENGTH};
   until ($req->is_finished) {
-    my $chunk = ($len && $len < CHUNK_SIZE) ? $len : CHUNK_SIZE;
+    my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
+    my $chunk = ($len && $len < $size) ? $len : $size;
     last unless my $read = $env->{'psgi.input'}->read(my $buffer, $chunk, 0);
     $req->parse($buffer);
     last if ($len -= $read) <= 0;

@@ -1,8 +1,6 @@
 package Mojo::Server::CGI;
 use Mojo::Base 'Mojo::Server';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
-
 has 'nph';
 
 # "Lisa, you're a Buddhist, so you believe in reincarnation.
@@ -21,7 +19,8 @@ sub run {
   # Request body
   binmode STDIN;
   until ($req->is_finished) {
-    last unless my $read = STDIN->read(my $buffer, CHUNK_SIZE, 0);
+    my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
+    last unless my $read = STDIN->read(my $buffer, $size, 0);
     $req->parse($buffer);
   }
 

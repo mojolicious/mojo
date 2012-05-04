@@ -4,8 +4,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Mojo::Headers;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
-
 has [qw/auto_relax relaxed/] => 0;
 has headers => sub { Mojo::Headers->new };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
@@ -69,7 +67,8 @@ sub get_header_chunk {
       = $headers ? "$headers\x0d\x0a\x0d\x0a" : "\x0d\x0a";
   }
 
-  return substr $self->{header_buffer}, $offset, CHUNK_SIZE;
+  return substr $self->{header_buffer}, $offset,
+    $ENV{MOJO_CHUNK_SIZE} || 131072;
 }
 
 sub has_leftovers { length(shift->{buffer} || '') }

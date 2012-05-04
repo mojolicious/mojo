@@ -5,8 +5,6 @@ use Errno qw/EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK/;
 use Scalar::Util 'weaken';
 use Time::HiRes 'time';
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
-
 has reactor => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton->reactor;
@@ -105,7 +103,8 @@ sub _read {
   my $self = shift;
 
   # Read
-  my $read = $self->{handle}->sysread(my $buffer, CHUNK_SIZE, 0);
+  my $read
+    = $self->{handle}->sysread(my $buffer, $ENV{MOJO_CHUNK_SIZE} || 131072, 0);
 
   # Error
   unless (defined $read) {

@@ -7,8 +7,6 @@ use Mojo::ByteStream;
 use Mojo::Exception;
 use Mojo::Util qw/decode encode/;
 
-use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
-
 # "If for any reason you're not completely satisfied, I hate you."
 has [qw/auto_escape compiled/];
 has [qw/append code prepend template/] => '';
@@ -301,7 +299,7 @@ sub render_file {
   $self->name($path) unless defined $self->{name};
   croak qq/Can't open template "$path": $!/ unless open my $file, '<', $path;
   my $tmpl = '';
-  while ($file->sysread(my $buffer, CHUNK_SIZE, 0)) { $tmpl .= $buffer }
+  while ($file->sysread(my $buffer, 131072, 0)) { $tmpl .= $buffer }
 
   # Decode and render
   if (my $encoding = $self->encoding) {

@@ -11,11 +11,8 @@ sub register {
   my ($self, $app, $conf) = @_;
   $conf ||= {};
 
-  # Config
-  my $name     = $conf->{name}     || 'ep';
-  my $template = $conf->{template} || {};
-
   # Custom sandbox
+  my $template = $conf->{template} || {};
   $template->{namespace} //= 'Mojo::Template::SandBox::'
     . md5_sum(($ENV{MOJO_EXE} || ref $app) . $$);
 
@@ -24,7 +21,7 @@ sub register {
 
   # Add "ep" handler
   $app->renderer->add_handler(
-    $name => sub {
+    $conf->{name} || 'ep' => sub {
       my ($r, $c, $output, $options) = @_;
 
       # Generate name

@@ -700,7 +700,7 @@ $t->get_ok('/inline/exception')->status_is(500)
 $t->get_ok('/data/exception')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(qq/Died at template from DATA section "dies.html.ep" line 2/
+  ->content_is(qq/Died at template "dies.html.ep" from DATA section line 2/
     . qq/, near "123".\n\n/);
 
 # GET /template/exception

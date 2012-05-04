@@ -27,7 +27,10 @@ sub register {
 
       # Cached
       $mt ||= Mojo::Template->new;
-      if ($mt->compiled) { $$output = $mt->interpret($c) }
+      if ($mt->compiled) {
+        $c->app->log->debug("Rendering cached @{[$mt->name]}.");
+        $$output = $mt->interpret($c);
+      }
 
       # Not cached
       else {
@@ -55,7 +58,7 @@ sub register {
           elsif (my $d = $r->get_data_template($options, $t)) {
             $c->app->log->debug(
               qq/Rendering template "$t" from DATA section./);
-            $mt->name(qq/template from DATA section "$t"/);
+            $mt->name(qq/template "$t" from DATA section/);
             $$output = $mt->render($d, $c);
           }
 

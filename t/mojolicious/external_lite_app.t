@@ -21,7 +21,7 @@ my $t = Test::Mojo->new;
 
 # GET /
 $t->get_ok('/')->status_is(200)->content_is(<<'EOF');
-works!Insecure!Insecure!
+works ♥!Insecure!Insecure!
 
 too!works!!!
 <form action="/%E2%98%83">

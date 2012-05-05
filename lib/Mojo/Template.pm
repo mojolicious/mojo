@@ -128,8 +128,7 @@ sub compile {
     ->trace->verbose(1)
     if $@;
 
-  $self->compiled($compiled);
-  return;
+  $self->compiled($compiled) and return;
 }
 
 sub interpret {

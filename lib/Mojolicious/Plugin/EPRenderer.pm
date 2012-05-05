@@ -10,12 +10,8 @@ use Mojo::Util qw/encode md5_sum/;
 sub register {
   my ($self, $app, $conf) = @_;
 
-  # Custom sandbox
-  my $template = $conf->{template} || {};
-  $template->{namespace} //= 'Mojo::Template::SandBox::'
-    . md5_sum(($ENV{MOJO_EXE} || ref $app) . $$);
-
   # Auto escape by default to prevent XSS attacks
+  my $template = $conf->{template} || {};
   $template->{auto_escape} //= 1;
 
   # Add "ep" handler

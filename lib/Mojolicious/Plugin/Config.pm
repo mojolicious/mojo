@@ -23,9 +23,9 @@ sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Run Perl code
-  no warnings;
-  die qq/Couldn't parse config file "$file": $@/
-    unless my $config = eval "sub app { \$app }; $content";
+  my $config = eval 'package Mojolicious::Plugin::Config::Sandbox;'
+    . "{ no warnings; sub app { \$app }; use Mojo::Base -strict; $content }";
+  die qq/Couldn't load configuration from file "$file": $@/ if !$config && $@;
   die qq/Config file "$file" did not return a hash reference.\n/
     unless ref $config eq 'HASH';
 

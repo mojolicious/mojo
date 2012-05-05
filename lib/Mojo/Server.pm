@@ -31,20 +31,16 @@ sub load_app {
   local ($ENV{MOJO_APP}, $ENV{MOJO_EXE});
 
   # Try to load application from script into sandbox
-  my $class = 'Mojo::Server::SandBox::' . md5_sum($file . $$);
-  my $app;
-  die $@ unless eval <<EOF;
-package $class;
+  my $app = eval <<EOF;
+package Mojo::Server::SandBox::@{[md5_sum($file . $$)]};
 {
-  unless (\$app = do \$file) {
-    die qq/Can't load application "\$file": \$@/ if \$@;
-    die qq/Can't load application "\$file": \$!/ unless defined \$app;
-    die qq/Can't load application' "\$file".\n/ unless \$app;
-  }
+  my \$app = do \$file;
+  if (!\$app && (my \$e = \$@ || \$!)) { die \$e }
+  return \$app;
 }
-1;
 EOF
-  die qq/"$file" is not a valid application.\n/
+  die qq/Couldn't load application from file "$file": $@/ if !$app && $@;
+  die qq/File "$file" did not return an application object.\n/
     unless blessed $app && $app->isa('Mojo');
   return $self->app($app)->app;
 }

@@ -11,16 +11,16 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Initialize
-  my $name    = $conf->{namespace} || ((ref $app) . "::I18N");
-  my $default = $conf->{default}   || 'en';
-  die qq/Couldn't initialize I18N class "$name": $@/
-    unless eval "package $name; { use base 'Locale::Maketext'; 1 }";
-  my $dc = "${name}::$default";
+  my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
+  my $default   = $conf->{default}   || 'en';
+  die qq/Couldn't initialize I18N class "$namespace": $@/
+    unless eval "package $namespace; use base 'Locale::Maketext'; 1";
+  my $dc = "${namespace}::$default";
   if (my $e = Mojo::Loader->load($dc)) {
     die qq/Couldn't load default lexicon class "$dc": $e/ if ref $e;
     die qq/Couldn't initialize default lexicon class "$dc": $@/
       unless eval
-        "package $dc; { use base '$name'; our \%Lexicon = (_AUTO => 1); }";
+        "package $dc; use base '$namespace'; our \%Lexicon = (_AUTO => 1);";
   }
 
   # Add hook
@@ -37,7 +37,7 @@ sub register {
 
       # Handler
       $self->stash->{i18n}
-        = Mojolicious::Plugin::I18N::_Handler->new(namespace => $name);
+        = Mojolicious::Plugin::I18N::_Handler->new(namespace => $namespace);
 
       # Languages
       $self->stash->{i18n}->languages(@languages, $default);

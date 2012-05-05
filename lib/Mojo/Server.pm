@@ -33,11 +33,9 @@ sub load_app {
   # Try to load application from script into sandbox
   my $app = eval <<EOF;
 package Mojo::Server::SandBox::@{[md5_sum($file . $$)]};
-{
-  my \$app = do \$file;
-  if (!\$app && (my \$e = \$@ || \$!)) { die \$e }
-  return \$app;
-}
+my \$app = do \$file;
+if (!\$app && (my \$e = \$@ || \$!)) { die \$e }
+\$app;
 EOF
   die qq/Couldn't load application from file "$file": $@/ if !$app && $@;
   die qq/File "$file" did not return an application object.\n/

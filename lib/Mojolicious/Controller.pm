@@ -826,8 +826,8 @@ L<Mojo::Message::Response> object.
 =head2 C<respond_to>
 
   $c->respond_to(
-    json => sub {...},
-    xml  => {text => 'hello!'},
+    json => {json => {message => 'Welcome!'}},
+    html => {template => 'welcome'},
     any  => sub {...}
   );
 

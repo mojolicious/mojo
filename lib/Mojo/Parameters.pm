@@ -171,7 +171,7 @@ sub to_string {
   my $charset = $self->charset;
   if (defined(my $string = $self->{string})) {
     $string = encode $charset, $string if $charset;
-    return url_escape $string, "^$Mojo::URL::UNRESERVED\\&\\;\\=\\+\\%";
+    return url_escape $string, "^$Mojo::URL::UNRESERVED\&\;\=\+\%";
   }
 
   # Build pairs

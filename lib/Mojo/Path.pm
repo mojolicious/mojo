@@ -63,9 +63,8 @@ sub contains {
 
 sub parse {
   my ($self, $path) = @_;
-  $path //= '';
 
-  $path = url_unescape $path;
+  $path = url_unescape $path // '';
   utf8::decode $path;
   $path =~ s|^/|| ? $self->leading_slash(1)  : $self->leading_slash(undef);
   $path =~ s|/$|| ? $self->trailing_slash(1) : $self->trailing_slash(undef);

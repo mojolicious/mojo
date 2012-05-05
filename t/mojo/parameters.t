@@ -152,10 +152,10 @@ is_deeply $p->to_hash,
 
 # Unicode
 $p = Mojo::Parameters->new;
-$p->parse('input=say%20%22%C2%AB%22;');
-is $p->params->[1], 'say "«"', 'right value';
-is $p->param('input'), 'say "«"', 'right value';
-is "$p", 'input=say+%22%C2%AB%22', 'right result';
+$p->parse('input=say%20%22%C2%AB~%22;');
+is $p->params->[1], 'say "«~"', 'right value';
+is $p->param('input'), 'say "«~"', 'right value';
+is "$p", 'input=say+%22%C2%AB~%22', 'right result';
 
 # Reparse
 $p = Mojo::Parameters->new('foo=bar&baz=23');

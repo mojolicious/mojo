@@ -14,6 +14,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Fixed empty frame handling in Mojo::Transaction::WebSocket.
   - Fixed small rendering bug in Mojolicious::Plugin::PODRenderer.
   - Fixed small code generation bug in Mojolicious::Plugin::I18N.
+  - Fixed small escaping bug in Mojo::URL.
 
 2.92  2012-04-30
   - Added commands attribute to Mojolicious.

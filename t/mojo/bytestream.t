@@ -5,7 +5,7 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 145;
+use Test::More tests => 146;
 
 # Need to be loaded first to trigger edge case
 use MIME::Base64;
@@ -81,6 +81,10 @@ is $stream->url_escape, 'business%3B23', 'right url escaped result';
 # url_escape (custom pattern)
 $stream = b('&business;23')->url_escape('s&');
 is "$stream", '%26bu%73ine%73%73;23', 'right url escaped result';
+
+# url_escape (nothing to escape)
+$stream = b('foobar123-._~')->url_escape;
+is "$stream", 'foobar123-._~', 'right url escaped result';
 
 # url_unescape
 $stream = b('business%3B23');
@@ -198,8 +202,9 @@ $stream = b("foo bar'<baz>");
 is $stream->html_escape, 'foo bar&#39;&LTbaz&GT', 'right html escaped result';
 
 # html_escape (nothing to escape)
-$stream = b('foobar');
-is $stream->html_escape, 'foobar', 'right html escaped result';
+$stream = b("foobar123\n\r\t !#\$\%()*+,-./:;=?[\\]^-{|}@~");
+is $stream->html_escape, "foobar123\n\r\t !#\$\%()*+,-./:;=?[\\]^-{|}@~",
+  'right html escaped result';
 
 # html_unescape
 $stream = b('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x26;&#34;');

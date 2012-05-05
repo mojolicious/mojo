@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 982;
+use Test::More tests => 988;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -2012,3 +2012,14 @@ ok $req->at_least_version('1.0'), 'at least version 1.0';
 ok !$req->at_least_version('1.2'), 'not version 1.2';
 is $req->url, '/perldoc?Mojo%3A%3AMessage%3A%3ARequest', 'right URL';
 is $req->url->query->params->[0], 'Mojo::Message::Request', 'right value';
+
+# Parse lots of special characters in URL
+$req = Mojo::Message::Request->new;
+$req->parse('GET /#09azAZ-._~:/?[]@!$&\'()*+,;=% ');
+$req->parse("HTTP/1.1\x0d\x0a\x0d\x0a");
+ok $req->is_finished, 'request is finished';
+is $req->method,      'GET', 'right method';
+is $req->version,     '1.1', 'right version';
+ok $req->at_least_version('1.0'), 'at least version 1.0';
+ok !$req->at_least_version('1.2'), 'not version 1.2';
+is $req->url, '/#09azAZ-._~:/?%5B%5D@!$&\'()*+,;=%', 'right URL';

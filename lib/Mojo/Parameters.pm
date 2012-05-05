@@ -94,14 +94,14 @@ sub parse {
 
   # Detect pair separator for reconstruction
   return $self unless defined $string && length $string;
-  $self->pair_separator(';') if $string =~ /\;/ && $string !~ /\&/;
+  $self->pair_separator(';') if $string =~ /;/ && $string !~ /\&/;
 
   # W3C suggests to also accept ";" as a separator
   my $charset = $self->charset;
   for my $pair (split /[\&\;]+/, $string) {
 
     # Parse
-    $pair =~ /^([^\=]*)(?:=(.*))?$/;
+    $pair =~ /^([^=]*)(?:=(.*))?$/;
     my $name  = $1 // '';
     my $value = $2 // '';
 
@@ -171,7 +171,7 @@ sub to_string {
   my $charset = $self->charset;
   if (defined(my $string = $self->{string})) {
     $string = encode $charset, $string if $charset;
-    return url_escape $string, "^$Mojo::URL::UNRESERVED\&\;\=\+\%";
+    return url_escape $string, "^$Mojo::URL::UNRESERVED&;=+%";
   }
 
   # Build pairs

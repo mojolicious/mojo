@@ -42,7 +42,7 @@ sub AUTOLOAD {
   my $self = shift;
 
   # Method
-  my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
   croak qq/Undefined subroutine &${package}::$method called/
     unless blessed $self && $self->isa(__PACKAGE__);
 

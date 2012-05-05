@@ -24,22 +24,22 @@ sub _tokenize {
   while ($string) {
 
     # Name
-    last unless $string =~ s/^\s*([^\=\;\,]+)\s*\=?\s*//;
+    last unless $string =~ s/^\s*([^=;,]+)\s*=?\s*//;
     my $name = $1;
 
     # "expires" is a special case, thank you Netscape...
-    $string =~ s/^([^\;\,]+\,?[^\;\,]+)/"$1"/ if $name =~ /^expires$/i;
+    $string =~ s/^([^;,]+,?[^;,]+)/"$1"/ if $name =~ /^expires$/i;
 
     # Value
     my $value;
-    $value = unquote $1 if $string =~ s/^("(?:\\\\|\\"|[^"])+"|[^\;\,]+)\s*//;
+    $value = unquote $1 if $string =~ s/^("(?:\\\\|\\"|[^"])+"|[^;,]+)\s*//;
 
     # Token
     push @token, [$name, $value];
 
     # Separator
-    $string =~ s/^\s*\;\s*//;
-    if ($string =~ s/^\s*\,\s*//) {
+    $string =~ s/^\s*;\s*//;
+    if ($string =~ s/^\s*,\s*//) {
       push @tree, [@token];
       @token = ();
     }

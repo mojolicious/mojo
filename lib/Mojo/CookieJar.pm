@@ -59,7 +59,7 @@ sub find {
   return unless my $domain = $url->host;
   my $path = $url->path->to_string || '/';
   my @found;
-  while ($domain =~ /[^\.]+\.[^\.]+|localhost$/) {
+  while ($domain =~ /[^.]+\.[^.]+|localhost$/) {
     next unless my $old = $self->{jar}{$domain};
 
     # Grab cookies
@@ -81,7 +81,7 @@ sub find {
   }
 
   # Remove another part
-  continue { $domain =~ s/^[^\.]+\.?// }
+  continue { $domain =~ s/^[^.]+\.?// }
 
   return @found;
 }

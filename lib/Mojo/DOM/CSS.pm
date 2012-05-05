@@ -6,7 +6,7 @@ has 'tree';
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
   \[
-  ((?:$ESCAPE_RE|[\w-])+)         # Key
+  ((?:$ESCAPE_RE|[\w\-])+)        # Key
   (?:
     (\W)?                         # Operator
     =
@@ -16,20 +16,20 @@ my $ATTR_RE   = qr/
 /x;
 my $CLASS_ID_RE = qr/
   (?:
-    (?:\.((?:\\\.|[^\#\.])+))   # Class
+    (?:\.((?:\\\.|[^\#.])+))   # Class
   |
-    (?:\#((?:\\\#|[^\.\#])+))   # ID
+    (?:\#((?:\\\#|[^.\#])+))   # ID
   )
 /x;
-my $PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^\)]+\)|[^\)])+)\))?)/;
+my $PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?)/;
 my $TOKEN_RE        = qr/
-  (\s*,\s*)?                            # Separator
-  ((?:[^\[\\\:\s\,]|$ESCAPE_RE\s?)+)?   # Element
-  ($PSEUDO_CLASS_RE*)?                  # Pseudoclass
-  ((?:$ATTR_RE)*)?                      # Attributes
+  (\s*,\s*)?                         # Separator
+  ((?:[^[\\:\s,]|$ESCAPE_RE\s?)+)?   # Element
+  ($PSEUDO_CLASS_RE*)?               # Pseudoclass
+  ((?:$ATTR_RE)*)?                   # Attributes
   (?:
     \s*
-    ([\>\+\~])                          # Combinator
+    ([>+~])                          # Combinator
   )?
 /x;
 
@@ -141,7 +141,7 @@ sub _compile {
 
     # Element
     my $tag = '*';
-    $element =~ s/^((?:\\\.|\\\#|[^\.\#])+)// and $tag = $self->_unescape($1);
+    $element =~ s/^((?:\\\.|\\\#|[^.#])+)// and $tag = $self->_unescape($1);
 
     # Tag
     push @$selector, ['tag', $tag];
@@ -194,7 +194,7 @@ sub _equation {
   elsif ($equation =~ /^odd$/i) { $num = [2, 1] }
 
   # Equation
-  elsif ($equation =~ /(?:(\-?(?:\d+)?)?(n))?\s*\+?\s*(\-?\s*\d+)?\s*$/i) {
+  elsif ($equation =~ /(?:(-?(?:\d+)?)?(n))?\s*\+?\s*(-?\s*\d+)?\s*$/i) {
     $num->[0] = $1;
     $num->[0] = $2 ? 1 : 0 unless defined($num->[0]) && length($num->[0]);
     $num->[0] = -1 if $num->[0] eq '-';
@@ -216,13 +216,13 @@ sub _pc {
   my ($self, $class, $args, $current) = @_;
 
   # ":first-*"
-  if ($class =~ /^first\-(?:(child)|of-type)$/) {
+  if ($class =~ /^first-(?:(child)|of-type)$/) {
     $class = defined $1 ? 'nth-child' : 'nth-of-type';
     $args = 1;
   }
 
   # ":last-*"
-  elsif ($class =~ /^last\-(?:(child)|of-type)$/) {
+  elsif ($class =~ /^last-(?:(child)|of-type)$/) {
     $class = defined $1 ? 'nth-last-child' : 'nth-last-of-type';
     $args = '-n+1';
   }

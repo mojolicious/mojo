@@ -59,7 +59,7 @@ sub run {
   # Headers
   my %headers;
   for my $header (@headers) {
-    next unless $header =~ /^\s*([^\:]+)\s*:\s*([^\:]+)\s*$/;
+    next unless $header =~ /^\s*([^:]+)\s*:\s*([^:]+)\s*$/;
     $headers{$1} = $2;
   }
 

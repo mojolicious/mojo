@@ -17,7 +17,7 @@ sub load {
   return unless my $value = $c->signed_cookie($self->cookie_name);
 
   # Deserialize
-  $value =~ s/\-/\=/g;
+  $value =~ s/-/=/g;
   return unless my $session = Mojo::JSON->new->decode(b64_decode $value);
 
   # Expiration
@@ -57,7 +57,7 @@ sub store {
 
   # Serialize
   my $value = b64_encode(Mojo::JSON->new->encode($session), '');
-  $value =~ s/\=/\-/g;
+  $value =~ s/=/-/g;
 
   # Session cookie
   my $options = {

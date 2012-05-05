@@ -15,7 +15,7 @@ sub AUTOLOAD {
   my $self = shift;
 
   # Method
-  my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
   croak qq/Undefined subroutine &${package}::$method called/
     unless blessed $self && $self->isa(__PACKAGE__);
 
@@ -201,7 +201,7 @@ sub to {
   if ($shortcut) {
 
     # App
-    if (ref $shortcut || $shortcut =~ /^[\w\:]+$/) {
+    if (ref $shortcut || $shortcut =~ /^[\w:]+$/) {
       $defaults->{app} = $shortcut;
     }
 

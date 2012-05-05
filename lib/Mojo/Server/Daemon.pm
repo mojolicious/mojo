@@ -159,33 +159,20 @@ sub _group {
 sub _listen {
   my ($self, $listen) = @_;
 
-  # Check listen value
-  my $url   = Mojo::URL->new($listen);
-  my $query = $url->query;
-
-  # DEPRECATED in Leaf Fluttering In Wind!
-  my ($address, $port, $cert, $key, $ca);
-  if ($listen =~ qr|//([^\[\]]]+)\:(\d+)\:(.*?)\:(.*?)(?:\:(.+)?)?$|) {
-    warn "Custom HTTPS listen values are DEPRECATED in favor of URLs!\n";
-    ($address, $port, $cert, $key, $ca) = ($1, $2, $3, $4, $5);
-  }
-
-  else {
-    $address = $url->host;
-    $port    = $url->port;
-    $cert    = $query->param('cert');
-    $key     = $query->param('key');
-    $ca      = $query->param('ca');
-  }
-
   # Options
-  my $options = {port => $port};
+  my $url = Mojo::URL->new($listen);
+  my $options = {port => $url->port};
   my $tls;
   $tls = $options->{tls} = 1 if $url->scheme eq 'https';
-  $options->{address}  = $address if $address ne '*';
-  $options->{tls_cert} = $cert    if $cert;
-  $options->{tls_key}  = $key     if $key;
-  $options->{tls_ca}   = $ca      if $ca;
+  my $address = $url->host;
+  $options->{address} = $address if $address ne '*';
+  my $query = $url->query;
+  my $cert  = $query->param('cert');
+  $options->{tls_cert} = $cert if $cert;
+  my $key = $query->param('key');
+  $options->{tls_key} = $key if $key;
+  my $ca = $query->param('ca');
+  $options->{tls_ca} = $ca if $ca;
   my $backlog = $self->backlog;
   $options->{backlog} = $backlog if $backlog;
 

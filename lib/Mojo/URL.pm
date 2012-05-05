@@ -13,8 +13,8 @@ has [qw/fragment host port scheme userinfo/];
 has base => sub { Mojo::URL->new };
 
 # Characters (RFC 3986)
-our $UNRESERVED = 'A-Za-z0-9\-\.\_\~';
-our $SUBDELIM   = '\!\$\&\'\(\)\*\+\,\;\=';
+our $UNRESERVED = 'A-Za-z0-9\-._~';
+our $SUBDELIM   = '!$&\'()*+,;=';
 
 # "Homer, it's easy to criticize.
 #  Fun, too."
@@ -250,7 +250,7 @@ sub to_string {
 
   # Fragment
   if (my $fragment = $self->fragment) {
-    $url .= '#' . url_escape $fragment, "^$UNRESERVED$SUBDELIM\%\:\@\/\?";
+    $url .= '#' . url_escape $fragment, "^$UNRESERVED$SUBDELIM%:@/?";
   }
 
   return $url;

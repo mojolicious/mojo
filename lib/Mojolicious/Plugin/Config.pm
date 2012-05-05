@@ -55,7 +55,7 @@ sub register {
 
   # Mode specific config file
   my $mode;
-  if ($file =~ /^(.*)\.([^\.]+)$/) { $mode = join '.', $1, $app->mode, $2 }
+  if ($file =~ /^(.*)\.([^.]+)$/) { $mode = join '.', $1, $app->mode, $2 }
 
   # Absolute path
   $file = $app->home->rel_file($file) unless file_name_is_absolute $file;

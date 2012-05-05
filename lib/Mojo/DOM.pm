@@ -16,7 +16,7 @@ sub AUTOLOAD {
   my $self = shift;
 
   # Method
-  my ($package, $method) = our $AUTOLOAD =~ /^([\w\:]+)\:\:(\w+)$/;
+  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
   croak qq/Undefined subroutine &${package}::$method called/
     unless blessed $self && $self->isa(__PACKAGE__);
 
@@ -392,8 +392,7 @@ sub _text {
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
 
     # Add leading whitespace if punctuation allows it
-    $content = " $content"
-      if $text =~ /\S\z/ && $content =~ /^[^\.\!\?\,\;\:\s]+/;
+    $content = " $content" if $text =~ /\S\z/ && $content =~ /^[^.!?,;:\s]+/;
 
     # Trim whitespace blocks
     $text .= $content if $content =~ /\S+/ || !$trim;

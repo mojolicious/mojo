@@ -12,10 +12,10 @@ has url => sub { Mojo::URL->new };
 
 my $START_LINE_RE = qr|
   ^\s*
-  ([a-zA-Z]+)                                                   # Method
+  ([a-zA-Z]+)                                  # Method
   \s+
-  ([0-9a-zA-Z\-\.\_\~\:/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=\%]+)   # Path
-  (?:\s+HTTP/(\d+\.\d+))?                                       # Version
+  ([0-9a-zA-Z\-._~:/?#[\]\@!\$&'()*+,;=\%]+)   # Path
+  (?:\s+HTTP/(\d+\.\d+))?                      # Version
   $
 |x;
 

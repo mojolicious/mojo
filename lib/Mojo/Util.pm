@@ -130,7 +130,7 @@ sub hmac_sha1_sum { _hmac(1, @_) }
 
 sub html_escape {
   my ($string, $pattern) = @_;
-  $pattern ||= '^\n\r\t !\#\$%\(-;=?-~';
+  $pattern ||= '^\n\r\t !#$%(-;=?-~';
   return $string unless $string =~ /[^$pattern]/;
   $string =~ s/([$pattern])/_encode($1)/ge;
   return $string;
@@ -314,7 +314,7 @@ sub unquote {
 
 sub url_escape {
   my ($string, $pattern) = @_;
-  $pattern ||= '^A-Za-z0-9\-\.\_\~';
+  $pattern ||= '^A-Za-z0-9\-._~';
   return $string unless $string =~ /[$pattern]/;
   $string =~ s/([$pattern])/sprintf('%%%02X',ord($1))/ge;
   return $string;
@@ -493,10 +493,10 @@ Generate HMAC-SHA1 checksum for string.
 =head2 C<html_escape>
 
   my $escaped = html_escape $string;
-  my $escaped = html_escape $string, '^\n\r\t !\#\$%\(-;=?-~';
+  my $escaped = html_escape $string, '^\n\r\t !#$%(-;=?-~';
 
 Escape unsafe characters in string with HTML5 entities, the pattern used
-defaults to C<^\n\r\t !\#\$%\(-;=?-~>.
+defaults to C<^\n\r\t !#$%(-;=?-~>.
 
 =head2 C<html_unescape>
 
@@ -579,10 +579,10 @@ Unquote string.
 =head2 C<url_escape>
 
   my $escaped = url_escape $string;
-  my $escaped = url_escape $string, '^A-Za-z0-9\-\.\_\~';
+  my $escaped = url_escape $string, '^A-Za-z0-9\-._~';
 
 Percent-encode unsafe characters in string, the pattern used defaults to
-C<^A-Za-z0-9\-\.\_\~>.
+C<^A-Za-z0-9\-._~>.
 
 =head2 C<url_unescape>
 

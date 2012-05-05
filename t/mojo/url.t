@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 394;
+use Test::More tests => 398;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -32,6 +32,13 @@ $url->path('/index.xml');
 is "$url",
   'http://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#/!%?@3',
   'right format';
+
+# Advanced fragment roundtrip
+$url = Mojo::URL->new('http://localhost#AZaz09-._~!$&\'()*+,;=%:@/?');
+is $url->scheme,   'http',                        'right scheme';
+is $url->host,     'localhost',                   'right host';
+is $url->fragment, 'AZaz09-._~!$&\'()*+,;=%:@/?', 'right fragment';
+is "$url", 'http://localhost#AZaz09-._~!$&\'()*+,;=%:@/?', 'right format';
 
 # Parameters
 $url = Mojo::URL->new(

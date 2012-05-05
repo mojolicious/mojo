@@ -10,15 +10,15 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Initialize
-  my $namespace = $conf->{namespace} || ((ref $app) . "::I18N");
-  my $default   = $conf->{default}   || 'en';
-  eval "package $namespace; use base 'Locale::Maketext'; 1;";
-  eval "require ${namespace}::${default};";
-  unless (eval "\%${namespace}::${default}::Lexicon") {
-    eval "package ${namespace}::$default; use base '$namespace';"
-      . 'our %Lexicon = (_AUTO => 1); 1;';
-    die qq/Couldn't initialize I18N class "$namespace": $@/ if $@;
-  }
+  my $ns      = $conf->{namespace} || ((ref $app) . "::I18N");
+  my $default = $conf->{default}   || 'en';
+  die qq/Couldn't initialize I18N class "$ns": $@/
+    unless eval "package $ns; { use base 'Locale::Maketext'; 1 }";
+  my $dc = "${ns}::$default";
+  eval "require $dc;";
+  die qq/Couldn't initialize default lexicon class "$dc": $@/
+    unless eval "\%${dc}::Lexicon"
+      || eval "package $dc; { use base '$ns'; our \%Lexicon = (_AUTO => 1); }";
 
   # Add hook
   $app->hook(
@@ -34,7 +34,7 @@ sub register {
 
       # Handler
       $self->stash->{i18n}
-        = Mojolicious::Plugin::I18N::_Handler->new(namespace => $namespace);
+        = Mojolicious::Plugin::I18N::_Handler->new(namespace => $ns);
 
       # Languages
       $self->stash->{i18n}->languages(@languages, $default);

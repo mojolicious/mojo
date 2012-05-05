@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use I18N::LangTags;
 use I18N::LangTags::Detect;
+use Mojo::Loader;
 
 # "Can we have Bender burgers again?
 #  No, the cat shelter’s onto me."
@@ -10,15 +11,17 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Initialize
-  my $ns      = $conf->{namespace} || ((ref $app) . "::I18N");
+  my $name    = $conf->{namespace} || ((ref $app) . "::I18N");
   my $default = $conf->{default}   || 'en';
-  die qq/Couldn't initialize I18N class "$ns": $@/
-    unless eval "package $ns; { use base 'Locale::Maketext'; 1 }";
-  my $dc = "${ns}::$default";
-  eval "require $dc;";
-  die qq/Couldn't initialize default lexicon class "$dc": $@/
-    unless eval "\%${dc}::Lexicon"
-      || eval "package $dc; { use base '$ns'; our \%Lexicon = (_AUTO => 1); }";
+  die qq/Couldn't initialize I18N class "$name": $@/
+    unless eval "package $name; { use base 'Locale::Maketext'; 1 }";
+  my $dc = "${name}::$default";
+  if (my $e = Mojo::Loader->load($dc)) {
+    die qq/Couldn't load default lexicon class "$dc": $e/ if ref $e;
+    die qq/Couldn't initialize default lexicon class "$dc": $@/
+      unless eval
+        "package $dc; { use base '$name'; our \%Lexicon = (_AUTO => 1); }";
+  }
 
   # Add hook
   $app->hook(
@@ -34,7 +37,7 @@ sub register {
 
       # Handler
       $self->stash->{i18n}
-        = Mojolicious::Plugin::I18N::_Handler->new(namespace => $ns);
+        = Mojolicious::Plugin::I18N::_Handler->new(namespace => $name);
 
       # Languages
       $self->stash->{i18n}->languages(@languages, $default);

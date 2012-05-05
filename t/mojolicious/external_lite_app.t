@@ -23,7 +23,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
 
-too!works!!!
+too!works!!!Mojolicious::Plugin::Config::Sandbox
 <form action="/%E2%98%83">
   <input type="submit" value="☃" />
 </form>

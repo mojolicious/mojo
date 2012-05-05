@@ -1,5 +1,5 @@
 %= include 'menubar'
-<%= $config->{works} . stash('also') %>
+<%= $config->{works} . stash('also') . stash('in') %>
 %= form_for '/☃' => begin
   %= submit_button '☃'
 %= end

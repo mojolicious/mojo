@@ -192,7 +192,7 @@ $t->get_ok('/just/works/too')->status_is(200)->content_is("It just works!\n");
 $t->get_ok('/x/1/')->status_is(200)->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
 
-too!works!!!
+too!works!!!Mojolicious::Plugin::Config::Sandbox
 <form action="/x/1/%E2%98%83">
   <input type="submit" value="☃" />
 </form>
@@ -216,7 +216,7 @@ $t->get_ok('/x/1/url/☃')->status_is(200)
 $t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
 
-too!works!!!
+too!works!!!Mojolicious::Plugin::Config::Sandbox
 <form action="/x/%E2%99%A5/%E2%98%83">
   <input type="submit" value="☃" />
 </form>
@@ -250,7 +250,7 @@ $t->get_ok('/' => {Host => 'mojolicious.org'})->status_is(200)
   ->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
 
-too!works!!!
+too!works!!!Mojolicious::Plugin::Config::Sandbox
 <form action="/%E2%98%83">
   <input type="submit" value="☃" />
 </form>
@@ -265,7 +265,7 @@ $t->get_ok('/' => {Host => 'mojolicio.us'})->status_is(200)
   ->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
 
-too!works!!!
+too!works!!!Mojolicious::Plugin::Config::Sandbox
 <form action="/%E2%98%83">
   <input type="submit" value="☃" />
 </form>
@@ -279,7 +279,7 @@ $t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
 $t->get_ok('/' => {Host => 'kraih.com'})->status_is(200)->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
 
-too!works!!!
+too!works!!!Mojolicious::Plugin::Config::Sandbox
 <form action="/%E2%98%83">
   <input type="submit" value="☃" />
 </form>
@@ -302,7 +302,7 @@ $t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)
   ->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
 
-too!works!!!
+too!works!!!Mojolicious::Plugin::Config::Sandbox
 <form action="/%E2%99%A5/123/%E2%98%83">
   <input type="submit" value="☃" />
 </form>

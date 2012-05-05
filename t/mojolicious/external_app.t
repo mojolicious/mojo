@@ -21,11 +21,11 @@ use Test::Mojo;
 my $t = Test::Mojo->new('MyApp');
 
 # GET /
-$t->get_ok('/')->status_is(200)->content_is('too!');
+$t->get_ok('/')->status_is(200)->content_is('too%21');
 
 # GET /index.html
 $t->get_ok('/index.html')->status_is(200)
   ->content_is("External static file!\n");
 
 # GET /test
-$t->get_ok('/test')->status_is(200)->content_is('works!');
+$t->get_ok('/test')->status_is(200)->content_is('works%21');

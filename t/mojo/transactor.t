@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 238;
+use Test::More tests => 257;
 
 # "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
@@ -463,9 +463,46 @@ is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
-# 308 redirect (unsupported)
+# Simple 308 redirect
 $tx = $t->tx(POST => 'http://mojolico.us/foo', {Accept => 'application/json'});
 $tx->res->code(308);
+$tx->res->headers->location('http://kraih.com/bar');
+is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
+is $tx->req->body, '', 'no content';
+$tx = $t->redirect($tx);
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
+is $tx->req->headers->accept,   'application/json',     'right "Accept" value';
+is $tx->req->headers->location, undef,                  'no "Location" value';
+is $tx->req->body, '',    'no content';
+is $tx->res->code, undef, 'no status';
+is $tx->res->headers->location, undef, 'no "Location" value';
+
+# 308 redirect with content
+$tx = $t->tx(POST => 'http://mojolico.us/foo', {Accept => '*/*'}, 'whatever');
+$tx->res->code(308);
+$tx->res->headers->location('http://kraih.com/bar');
+is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->body, 'whatever', 'right content';
+$tx = $t->redirect($tx);
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
+is $tx->req->headers->accept,   '*/*',                  'right "Accept" value';
+is $tx->req->headers->location, undef,                  'no "Location" value';
+is $tx->req->body, 'whatever', 'right content';
+is $tx->res->code, undef,      'no status';
+is $tx->res->headers->location, undef, 'no "Location" value';
+
+# 308 redirect (dynamic)
+$tx = $t->tx(POST => 'http://mojolico.us/foo');
+$tx->res->code(308);
+$tx->res->headers->location('http://kraih.com/bar');
+$tx->req->write_chunk('whatever', sub { shift->finish });
+is $t->redirect($tx), undef, 'unsupported redirect';
+
+# 309 redirect (unsupported)
+$tx = $t->tx(POST => 'http://mojolico.us/foo', {Accept => 'application/json'});
+$tx->res->code(309);
 $tx->res->headers->location('http://kraih.com/bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';

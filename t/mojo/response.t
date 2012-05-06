@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 350;
+use Test::More tests => 354;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -25,6 +25,8 @@ is $res->code(204)->default_message, 'No Content',         'right message';
 is $res->code(205)->default_message, 'Reset Content',      'right message';
 is $res->code(206)->default_message, 'Partial Content',    'right message';
 is $res->code(207)->default_message, 'Multi-Status',       'right message';
+is $res->code(208)->default_message, 'Already Reported',   'right message';
+is $res->code(226)->default_message, 'IM Used',            'right message';
 is $res->code(300)->default_message, 'Multiple Choices',   'right message';
 is $res->code(301)->default_message, 'Moved Permanently',  'right message';
 is $res->code(302)->default_message, 'Found',              'right message';
@@ -32,6 +34,7 @@ is $res->code(303)->default_message, 'See Other',          'right message';
 is $res->code(304)->default_message, 'Not Modified',       'right message';
 is $res->code(305)->default_message, 'Use Proxy',          'right message';
 is $res->code(307)->default_message, 'Temporary Redirect', 'right message';
+is $res->code(308)->default_message, 'Permanent Redirect', 'right message';
 is $res->code(400)->default_message, 'Bad Request',        'right message';
 is $res->code(401)->default_message, 'Unauthorized',       'right message';
 is $res->code(402)->default_message, 'Payment Required',   'right message';
@@ -48,7 +51,7 @@ is $res->code(411)->default_message, 'Length Required',     'right message';
 is $res->code(412)->default_message, 'Precondition Failed', 'right message';
 is $res->code(413)->default_message, 'Request Entity Too Large',
   'right message';
-is $res->code(414)->default_message, 'Request-URI Too Large',  'right message';
+is $res->code(414)->default_message, 'Request-URI Too Long',   'right message';
 is $res->code(415)->default_message, 'Unsupported Media Type', 'right message';
 is $res->code(416)->default_message, 'Request Range Not Satisfiable',
   'right message';
@@ -74,6 +77,7 @@ is $res->code(505)->default_message, 'HTTP Version Not Supported',
 is $res->code(506)->default_message, 'Variant Also Negotiates',
   'right message';
 is $res->code(507)->default_message, 'Insufficient Storage', 'right message';
+is $res->code(508)->default_message, 'Loop Detected',        'right message';
 is $res->code(509)->default_message, 'Bandwidth Limit Exceeded',
   'right message';
 is $res->code(510)->default_message, 'Not Extended', 'right message';

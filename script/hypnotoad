@@ -12,13 +12,6 @@ my @base = (splitdir(dirname(__FILE__)), '..');
 my $lib = join('/', @base, 'lib');
 -e catdir(@base, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
 
-# Check if Mojolicious is installed
-die <<EOF unless eval 'use Mojo::Server::Hypnotoad; 1';
-It looks like you don't have the Mojolicious framework installed.
-Please visit http://mojolicio.us for detailed installation instructions.
-
-EOF
-
 # "Hey sexy mama, wanna kill all humans?"
 my $help;
 GetOptions(
@@ -46,6 +39,7 @@ EOF
 
 # "This is it.
 #  The moment we should've trained for."
+require Mojo::Server::Hypnotoad;
 Mojo::Server::Hypnotoad->new->run($app);
 
 =head1 NAME

@@ -61,14 +61,8 @@ my @base = (splitdir(dirname(__FILE__)), '..');
 my $lib = join('/', @base, 'lib');
 -e catdir(@base, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
 
-# Check if Mojolicious is installed;
-die <<EOF unless eval 'use Mojolicious::Commands; 1';
-It looks like you don't have the Mojolicious framework installed.
-Please visit http://mojolicio.us for detailed installation instructions.
-
-EOF
-
 # Start commands for application
+require Mojolicious::Commands;
 Mojolicious::Commands->start_app('<%= $class %>');
 
 @@ appclass

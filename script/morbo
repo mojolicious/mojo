@@ -12,13 +12,6 @@ my @base = (splitdir(dirname(__FILE__)), '..');
 my $lib = join('/', @base, 'lib');
 -e catdir(@base, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
 
-# Check if Mojolicious is installed
-die <<EOF unless eval 'use Mojo::Server::Morbo; 1';
-It looks like you don't have the Mojolicious framework installed.
-Please visit http://mojolicio.us for detailed installation instructions.
-
-EOF
-
 # "Welcome to 'Entertainment And Earth Invasion Tonite'.
 #  Across the galaxy my people are completing the mighty space fleet that
 #  will exterminate the human race!
@@ -58,6 +51,7 @@ EOF
 #  global warming.
 #  Morbo is pleased but sticky."
 $ENV{MOJO_LISTEN} = join(',', @listen) if @listen;
+require Mojo::Server::Morbo;
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->watch(\@watch) if @watch;
 $morbo->run($app);

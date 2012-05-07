@@ -61,8 +61,7 @@ sub _build_tx {
   my ($self, $id, $c) = @_;
 
   # Build transaction
-  my $tx = $self->build_tx;
-  $tx->connection($id);
+  my $tx = $self->build_tx->connection($id);
 
   # Identify
   $tx->res->headers->server('Mojolicious (Perl)');
@@ -96,14 +95,6 @@ sub _build_tx {
   $tx->kept_alive(1) if ++$c->{requests} > 1;
 
   return $tx;
-}
-
-sub _close { shift->_remove(pop) }
-
-sub _error {
-  my ($self, $id, $err) = @_;
-  $self->app->log->error($err);
-  $self->_remove($id);
 }
 
 sub _finish {
@@ -187,19 +178,19 @@ sub _listen {
       $stream->timeout($self->inactivity_timeout);
 
       # Events
+      $stream->on(close => sub { $self->_remove($id) });
       $stream->on(
-        timeout => sub {
-          $self->_error($id => 'Inactivity timeout.')
-            if $self->{connections}{$id}{tx};
+        error => sub {
+          $self->app->log->error(pop);
+          $self->_remove($id);
         }
       );
-      $stream->on(close => sub { $self->_close($id) });
-      $stream->on(error => sub { $self->_error($id => pop) });
-      $stream->on(read  => sub { $self->_read($id => pop) });
+      $stream->on(read => sub { $self->_read($id => pop) });
+      $stream->on(
+        timeout => sub { $self->app->log->debug('Inactivity timeout.') });
     }
   );
-  $self->{listening} ||= [];
-  push @{$self->{listening}}, $id;
+  push @{$self->{listening} ||= []}, $id;
 
   # Bonjour
   if (BONJOUR && (my $p = Net::Rendezvous::Publish->new)) {

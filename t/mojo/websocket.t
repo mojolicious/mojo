@@ -484,7 +484,7 @@ is $result, 'hi!' x 100, 'right result';
 my $log = '';
 $message = app->log->subscribers('message')->[0];
 app->log->unsubscribe(message => $message);
-app->log->level('error');
+app->log->level('debug');
 app->log->on(message => sub { $log .= pop });
 $ua->websocket(
   '/timeout' => sub {

@@ -254,8 +254,7 @@ sub _connected {
   $loop->stream($id)->timeout($self->inactivity_timeout);
 
   # Store connection information in transaction
-  my $tx = $self->{connections}{$id}{tx};
-  $tx->connection($id);
+  my $tx     = $self->{connections}{$id}{tx}->connection($id);
   my $handle = $loop->stream($id)->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);

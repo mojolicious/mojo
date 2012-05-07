@@ -189,7 +189,7 @@ is $tx->res->body, 'works!', 'right content';
 my $log = '';
 $message = app->log->subscribers('message')->[0];
 app->log->unsubscribe(message => $message);
-app->log->level('error');
+app->log->level('debug');
 app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.5');
 app->log->level('fatal');

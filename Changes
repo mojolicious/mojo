@@ -1,8 +1,10 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.94  2012-05-06
+2.94  2012-05-07
   - Added support for 308 redirects to Mojo::UserAgent.
   - Added support for new HTTP status codes.
+  - Improved built-in web servers to log inactivity timeouts as debug messages
+    instead of errors.
   - Improved documentation.
   - Fixed typo in 414 status message.
   - Fixed small backlog bug in Mojo::Server::Daemon.

@@ -11,6 +11,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Fixed small cookie formatting bug.
   - Fixed small bug in cookie parser.
   - Fixed small backlog bug in Mojo::Server::Daemon.
+  - Fixed a small Mojo::Util::html_escape misfeature (OlegG).
 
 2.93  2012-05-05
   - Added remove method to Mojolicious::Routes::Route.

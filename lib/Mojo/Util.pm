@@ -33,7 +33,7 @@ my %ENTITIES;
 
 # Reverse entities for html_escape (without "apos")
 my %REVERSE = ("\x{0027}" => '#39;');
-$REVERSE{$ENTITIES{$_}} //= $_ for sort keys %ENTITIES;
+$REVERSE{$ENTITIES{$_}} //= $_ for sort grep /;$/, keys %ENTITIES;
 
 # Encode cache
 my %ENCODE;

@@ -169,8 +169,9 @@ $cookie->max_age(60);
 $cookie->expires(1218092879);
 $cookie->secure(1);
 $cookie->httponly(1);
-is $cookie->to_string, 'foo=ba r; domain=kraih.com; path=/test; Max-Age=60;'
-  . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; secure; HttpOnly', 'right format';
+is $cookie->to_string,
+  'foo=ba r; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=kraih.com;'
+  . ' path=/test; secure; HttpOnly; Max-Age=60', 'right format';
 
 # Parse response cookie (RFC 6265)
 $cookies
@@ -330,8 +331,9 @@ is $cookies->[0]->max_age, 60,          'right max age value';
 is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
   'right expires value';
 is $cookies->[0]->secure, '1', 'right secure flag';
-is $cookies->[0]->to_string, 'foo=; domain=kraih.com; path=/test; Max-Age=60;'
-  . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; secure', 'right result';
+is $cookies->[0]->to_string,
+  'foo=; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=kraih.com;'
+  . ' path=/test; secure; Max-Age=60', 'right result';
 is $cookies->[1], undef, 'no more cookies';
 $cookies
   = Mojo::Cookie::Response->parse(
@@ -345,8 +347,9 @@ is $cookies->[0]->max_age, 60,          'right max age value';
 is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
   'right expires value';
 is $cookies->[0]->secure, '1', 'right secure flag';
-is $cookies->[0]->to_string, 'foo=; domain=kraih.com; path=/test; Max-Age=60;'
-  . ' expires=Thu, 07 Aug 2008 07:07:59 GMT; secure', 'right result';
+is $cookies->[0]->to_string,
+  'foo=; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=kraih.com;'
+  . ' path=/test; secure; Max-Age=60', 'right result';
 is $cookies->[1], undef, 'no more cookies';
 
 # Response cookie with Max-Age 0 and Expires 0
@@ -357,7 +360,7 @@ $cookie->path('/');
 $cookie->max_age(0);
 $cookie->expires(0);
 is $cookie->to_string,
-  'foo=bar; path=/; Max-Age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT',
+  'foo=bar; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; Max-Age=0',
   'right format';
 
 # Parse response cookie with Max-Age 0 and Expires 0 (RFC 6265)

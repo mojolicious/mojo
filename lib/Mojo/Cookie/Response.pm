@@ -6,7 +6,7 @@ use Mojo::Util 'quote';
 
 has [qw/domain httponly max_age path secure/];
 
-my $ATTR_RE = qr/(domain|expires|HttpOnly|Max-Age|path|secure)/msi;
+my $ATTR_RE = qr/(expires|domain|path|secure|HttpOnly|Max-Age)/msi;
 
 sub expires {
   my $self = shift;
@@ -57,29 +57,29 @@ sub parse {
 sub to_string {
   my $self = shift;
 
-  # Name and value
+  # Name and value (Netscape)
   return '' unless my $name = $self->name;
   my $value = $self->value // '';
   $value = $value =~ /[,;"]/ ? quote($value) : $value;
   my $cookie = "$name=$value";
 
-  # "domain"
-  if (my $domain = $self->domain) { $cookie .= "; domain=$domain" }
-
-  # "path"
-  if (my $path = $self->path) { $cookie .= "; path=$path" }
-
-  # "Max-Age"
-  if (defined(my $m = $self->max_age)) { $cookie .= "; Max-Age=$m" }
-
-  # "expires"
+  # "expires" (Netscape)
   if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
 
-  # "secure"
+  # "domain" (Netscape)
+  if (my $domain = $self->domain) { $cookie .= "; domain=$domain" }
+
+  # "path" (Netscape)
+  if (my $path = $self->path) { $cookie .= "; path=$path" }
+
+  # "secure" (Netscape)
   if (my $secure = $self->secure) { $cookie .= "; secure" }
 
-  # "HttpOnly"
+  # "HttpOnly" (RFC 6265)
   if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
+
+  # "Max-Age" (RFC 6265)
+  if (defined(my $m = $self->max_age)) { $cookie .= "; Max-Age=$m" }
 
   return $cookie;
 }

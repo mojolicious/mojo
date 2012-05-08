@@ -9,6 +9,7 @@ This file documents the revision history for Perl extension Mojolicious.
   - Improved documentation.
   - Fixed typo in 414 status message.
   - Fixed small cookie formatting bug.
+  - Fixed small bug in cookie parser.
   - Fixed small backlog bug in Mojo::Server::Daemon.
 
 2.93  2012-05-05

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 182;
+use Test::More tests => 190;
 
 # "What good is money if it can't inspire terror in your fellow man?"
 use Mojo::Cookie::Request;
@@ -171,7 +171,7 @@ $cookie->secure(1);
 $cookie->httponly(1);
 is $cookie->to_string,
   'foo=ba r; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=kraih.com;'
-  . ' path=/test; secure; HttpOnly; Max-Age=60', 'right format';
+  . ' path=/test; secure; Max-Age=60; HttpOnly', 'right format';
 
 # Parse response cookie (RFC 6265)
 $cookies
@@ -186,6 +186,21 @@ is $cookies->[0]->max_age, 60,          'right max age value';
 is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
   'right expires value';
 is $cookies->[0]->secure, '1', 'right secure flag';
+is $cookies->[1], undef, 'no more cookies';
+
+# Parse response cookie with invalid flag (RFC 6265)
+$cookies
+  = Mojo::Cookie::Response->parse(
+      'foo=ba r; Domain=kraih.com; Path=/test; Max-Age=60;'
+    . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; InSecure;');
+is $cookies->[0]->name,    'foo',       'right name';
+is $cookies->[0]->value,   'ba r',      'right value';
+is $cookies->[0]->domain,  'kraih.com', 'right domain';
+is $cookies->[0]->path,    '/test',     'right path';
+is $cookies->[0]->max_age, 60,          'right max age value';
+is $cookies->[0]->expires, 'Thu, 07 Aug 2008 07:07:59 GMT',
+  'right expires value';
+is $cookies->[0]->secure, undef, 'no secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted response cookie (RFC 6265)

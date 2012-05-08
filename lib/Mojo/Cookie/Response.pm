@@ -6,8 +6,6 @@ use Mojo::Util 'quote';
 
 has [qw/domain httponly max_age path secure/];
 
-my $ATTR_RE = qr/(expires|domain|path|secure|HttpOnly|Max-Age)/msi;
-
 sub expires {
   my $self = shift;
 
@@ -37,17 +35,18 @@ sub parse {
       my ($name, $value) = @{$token->[$i]};
 
       # This will only run once
-      if (!$i) {
-        push @cookies,
-          Mojo::Cookie::Response->new(name => $name, value => $value // '');
-      }
+      push(@cookies,
+        Mojo::Cookie::Response->new(name => $name, value => $value // ''))
+        and next
+        unless $i;
 
-      # Attributes
-      elsif (my @match = $name =~ $ATTR_RE) {
-        my $attr = lc $match[0];
-        $attr =~ tr/-/_/;
-        $cookies[-1]->$attr($attr =~ /(?:secure|HttpOnly)/i ? 1 : $value);
-      }
+      # Attributes (Netscape and RFC 6265)
+      next
+        unless my @match
+          = $name =~ /^(expires|domain|path|secure|Max-Age|HttpOnly)$/msi;
+      my $attr = lc $match[0];
+      $attr =~ tr/-/_/;
+      $cookies[-1]->$attr($attr =~ /(?:secure|HttpOnly)/i ? 1 : $value);
     }
   }
 
@@ -75,11 +74,11 @@ sub to_string {
   # "secure" (Netscape)
   if (my $secure = $self->secure) { $cookie .= "; secure" }
 
-  # "HttpOnly" (RFC 6265)
-  if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
-
   # "Max-Age" (RFC 6265)
   if (defined(my $m = $self->max_age)) { $cookie .= "; Max-Age=$m" }
+
+  # "HttpOnly" (RFC 6265)
+  if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
 
   return $cookie;
 }

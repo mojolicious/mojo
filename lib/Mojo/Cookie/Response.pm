@@ -6,7 +6,7 @@ use Mojo::Util 'quote';
 
 has [qw/domain httponly max_age path secure/];
 
-my $ATTR_RE = qr/(Domain|Expires|HttpOnly|Max-Age|Path|Secure)/msi;
+my $ATTR_RE = qr/(domain|expires|HttpOnly|Max-Age|path|secure)/msi;
 
 sub expires {
   my $self = shift;
@@ -46,7 +46,7 @@ sub parse {
       elsif (my @match = $name =~ $ATTR_RE) {
         my $attr = lc $match[0];
         $attr =~ tr/-/_/;
-        $cookies[-1]->$attr($attr =~ /(?:Secure|HttpOnly)/i ? 1 : $value);
+        $cookies[-1]->$attr($attr =~ /(?:secure|HttpOnly)/i ? 1 : $value);
       }
     }
   }
@@ -63,22 +63,22 @@ sub to_string {
   $value = $value =~ /[,;"]/ ? quote($value) : $value;
   my $cookie = "$name=$value";
 
-  # Domain
-  if (my $domain = $self->domain) { $cookie .= "; Domain=$domain" }
+  # "domain"
+  if (my $domain = $self->domain) { $cookie .= "; domain=$domain" }
 
-  # Path
-  if (my $path = $self->path) { $cookie .= "; Path=$path" }
+  # "path"
+  if (my $path = $self->path) { $cookie .= "; path=$path" }
 
-  # Max-Age
+  # "Max-Age"
   if (defined(my $m = $self->max_age)) { $cookie .= "; Max-Age=$m" }
 
-  # Expires
-  if (defined(my $e = $self->expires)) { $cookie .= "; Expires=$e" }
+  # "expires"
+  if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
 
-  # Secure
-  if (my $secure = $self->secure) { $cookie .= "; Secure" }
+  # "secure"
+  if (my $secure = $self->secure) { $cookie .= "; secure" }
 
-  # HttpOnly
+  # "HttpOnly"
   if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
 
   return $cookie;
@@ -160,7 +160,7 @@ Expiration for cookie in seconds.
 
 =head2 C<parse>
 
-  my $cookies = $cookie->parse('f=b; Path=/');
+  my $cookies = $cookie->parse('f=b; path=/');
 
 Parse cookies.
 

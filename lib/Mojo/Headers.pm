@@ -297,7 +297,7 @@ Shortcut for the C<Content-Type> header.
 =head2 C<cookie>
 
   my $cookie = $headers->cookie;
-  $headers   = $headers->cookie('$Version=1; f=b; $Path=/');
+  $headers   = $headers->cookie('f=b');
 
 Shortcut for the C<Cookie> header.
 
@@ -498,7 +498,7 @@ Shortcut for the C<Server> header.
 =head2 C<set_cookie>
 
   my $set_cookie = $headers->set_cookie;
-  $headers       = $headers->set_cookie('f=b; Version=1; Path=/');
+  $headers       = $headers->set_cookie('f=b; path=/');
 
 Shortcut for the C<Set-Cookie> header.
 

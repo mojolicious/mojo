@@ -254,9 +254,8 @@ ok $t->tx->res->cookie('mojolicious')->httponly,
 $t->reset_session;
 my $session = b("☃☃☃☃☃")->encode->b64_encode('');
 my $hmac    = $session->clone->hmac_md5_sum($t->app->secret);
-my $broken  = "\$Version=1; mojolicious=$session--$hmac; \$Path=/";
-$t->get_ok('/bridge2stash' => {Cookie => $broken})->status_is(200)
-  ->content_is("stash too!!!!!!!\n");
+$t->get_ok('/bridge2stash' => {Cookie => "mojolicious=$session--$hmac"})
+  ->status_is(200)->content_is("stash too!!!!!!!\n");
 
 # GET /bridge2stash (without cookie jar)
 $t->ua->cookie_jar(0);

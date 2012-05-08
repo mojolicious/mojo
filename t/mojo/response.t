@@ -502,7 +502,7 @@ $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 200 OK\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: 27\x0d\x0a");
-$res->parse("Set-Cookie: foo=bar; Version=1; Path=/test\x0d\x0a\x0d\x0a");
+$res->parse("Set-Cookie: foo=bar; path=/test\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
 ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
@@ -512,7 +512,7 @@ ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27,           'right "Content-Length" value';
-is $res->headers->set_cookie, 'foo=bar; Version=1; Path=/test',
+is $res->headers->set_cookie, 'foo=bar; path=/test',
   'right "Set-Cookie" value';
 my $cookies = $res->cookies;
 is $cookies->[0]->name,  'foo',   'right name';

@@ -392,8 +392,8 @@ $t->get_ok('/shortcut/act')->status_is(200)
 
 # Session with domain
 $t->get_ok('/foo/session')->status_is(200)
-  ->header_like('Set-Cookie' => qr/; Domain=\.example\.com/)
-  ->header_like('Set-Cookie' => qr|; Path=/bar|)
+  ->header_like('Set-Cookie' => qr/; domain=\.example\.com/)
+  ->header_like('Set-Cookie' => qr|; path=/bar|)
   ->content_is('Bender rockzzz!');
 
 # Mixed formats

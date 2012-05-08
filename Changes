@@ -7,11 +7,11 @@ This file documents the revision history for Perl extension Mojolicious.
   - Improved built-in web servers to log inactivity timeouts as debug messages
     instead of errors.
   - Improved documentation.
+  - Fixed html_escape to always use entities with semicolon. (OlegG, crab)
   - Fixed typo in 414 status message.
   - Fixed small cookie formatting bug.
   - Fixed small bug in cookie parser.
   - Fixed small backlog bug in Mojo::Server::Daemon.
-  - Fixed a small Mojo::Util::html_escape misfeature (OlegG).
 
 2.93  2012-05-05
   - Added remove method to Mojolicious::Routes::Route.

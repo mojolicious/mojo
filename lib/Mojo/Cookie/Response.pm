@@ -6,7 +6,7 @@ use Mojo::Util 'quote';
 
 has [qw/domain httponly max_age path secure/];
 
-my $ATTR_RE = qr/(Domain|expires|HttpOnly|Max-Age|Path|Secure)/msi;
+my $ATTR_RE = qr/(Domain|Expires|HttpOnly|Max-Age|Path|Secure)/msi;
 
 sub expires {
   my $self = shift;
@@ -73,7 +73,7 @@ sub to_string {
   if (defined(my $m = $self->max_age)) { $cookie .= "; Max-Age=$m" }
 
   # Expires
-  if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
+  if (defined(my $e = $self->expires)) { $cookie .= "; Expires=$e" }
 
   # Secure
   if (my $secure = $self->secure) { $cookie .= "; Secure" }

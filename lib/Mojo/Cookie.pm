@@ -27,8 +27,8 @@ sub _tokenize {
     last unless $string =~ s/^\s*([^=;,]+)\s*=?\s*//;
     my $name = $1;
 
-    # "expires" is a special case, thank you Netscape...
-    $string =~ s/^([^;,]+,?[^;,]+)/"$1"/ if $name =~ /^expires$/i;
+    # "Expires" is a special case, thank you Netscape...
+    $string =~ s/^([^;,]+,?[^;,]+)/"$1"/ if $name =~ /^Expires$/i;
 
     # Value
     my $value;

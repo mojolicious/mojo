@@ -127,9 +127,9 @@ Check if reactor is running. Meant to be overloaded in a subclass.
 
   $reactor->one_tick;
 
-Run reactor until at least one event has been handled or no events are being
-watched anymore. Note that this method can recurse back into the reactor, so
-you need to be careful. Meant to be overloaded in a subclass.
+Run reactor until an event occurs or no events are being watched anymore. Note
+that this method can recurse back into the reactor, so you need to be careful.
+Meant to be overloaded in a subclass.
 
   # Don't block longer than 0.5 seconds
   my $id = $reactor->timer(0.5 => sub {});

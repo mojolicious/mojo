@@ -125,9 +125,8 @@ Check if reactor is running.
 
   $reactor->one_tick;
 
-Run reactor until at least one event has been handled or no events are being
-watched anymore. Note that this method can recurse back into the reactor, so
-you need to be careful.
+Run reactor until an event occurs or no events are being watched anymore. Note
+that this method can recurse back into the reactor, so you need to be careful.
 
 =head2 C<recurring>
 

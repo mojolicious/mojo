@@ -414,20 +414,21 @@ the default in L<Mojolicious> C<.ep> templates for example.
 
   <%= Perl expression, replaced with XML escaped result %>
   <%== Perl expression, replaced with result %>
+
 L<Mojo::ByteStream> objects are always excluded from automatic escaping.
+
   <%= Mojo::ByteStream->new('<div>excluded!</div>') %>
-You can use escaped tags and lines to generate templates.
-  %% my $number = <%= 20 + 3 %>;
-  The number is <%%= $number %>
-A newline can be escaped with a backslash.
-  This is <%= 23 * 3 %> a\
+
+Newlines can be escaped with a backslash.
+
+  This is <%= 1 + 1 %> a\
   single line
+
 And a backslash in front of a newline can be escaped with another backslash.
 
-  % use Data::Dumper;
-  This will\\
-  result <%=  Dumper {foo => 'bar'} %>\\
-  in multiple lines
+  This will <%= 1 + 1 %> result\\
+  in multiple\\
+  lines
 
 =head2 Trimming
 
@@ -480,23 +481,6 @@ stringify to error messages with context.
   4: % my $i = 2; xx
   5: %= $i * 2
   6: </body>
-
-=head2 Caching
-
-L<Mojo::Template> does not support caching by itself, but you can easily build
-a wrapper around it.
-
-  # Compile and store code somewhere
-  my $mt = Mojo::Template->new;
-  $mt->parse($template);
-  $mt->build;
-  my $code = $mt->code;
-
-  # Load code and template (template for debug trace only)
-  $mt->template($template);
-  $mt->code($code);
-  $mt->compile;
-  my $output = $mt->interpret(@args);
 
 =head1 ATTRIBUTES
 

@@ -116,6 +116,17 @@ Only L<Mojo::ByteStream> objects are excluded from automatic escaping.
 
   <%= Mojo::ByteStream->new('<p>test</p>') %>
 
+Newlines can be escaped with a backslash.
+
+  This is <%= 1 + 1 %> a\
+  single line
+
+And a backslash in front of a newline can be escaped with another backslash.
+
+  This will <%= 1 + 1 %> result\\
+  in multiple\\
+  lines
+
 You can also add an additional equal sign to the end of a tag to have it
 automatically remove all surrounding whitespace, this allows free indenting
 without ruining the result.

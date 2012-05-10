@@ -360,7 +360,8 @@ Construct a new L<Mojolicious::Routes::Route> object.
 
   $r = $r->add_child(Mojolicious::Route->new);
 
-Add a new child to this route.
+Add a new child to this route, it will be automatically removed from its
+current parent if necessary.
 
   # Reattach route
   $r->add_child($r->find('foo'));
@@ -623,7 +624,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 In addition to the attributes and methods above you can also call shortcuts
 on L<Mojolicious::Routes::Route> objects.
 
-  $r->add_shortcut(firefox => sub {
+  $r->root->add_shortcut(firefox => sub {
     my ($r, $path) = @_;
     $r->get($path, agent => qr/Firefox/);
   });

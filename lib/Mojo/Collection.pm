@@ -102,6 +102,16 @@ Mojo::Collection - Collection
 
 L<Mojo::Collection> is a container for collections.
 
+=head1 FUNCTIONS
+
+L<Mojo::Collection> implements the following functions.
+
+=head2 C<c>
+
+  my $collection = c(1, 2, 3);
+
+Construct a new L<Mojo::Collection> object.
+
 =head1 METHODS
 
 L<Mojo::Collection> implements the following methods.

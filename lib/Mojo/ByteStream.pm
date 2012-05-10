@@ -112,6 +112,16 @@ Mojo::ByteStream - ByteStream
 L<Mojo::ByteStream> provides a more friendly API for the bytestream
 manipulation functions in L<Mojo::Util>.
 
+=head1 FUNCTIONS
+
+L<Mojo::ByteStream> implements the following functions.
+
+=head2 C<b>
+
+  my $stream = b('test123');
+
+Construct a new L<Mojo::ByteStream> object.
+
 =head1 METHODS
 
 L<Mojo::ByteStream> implements the following methods.

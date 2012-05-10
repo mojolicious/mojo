@@ -407,17 +407,27 @@ heredocs and stuff like that.
   %# Comment line, treated as "<%# line =%>"
   %% Replaced with "%", useful for generating templates
 
-=head2 Automatic escaping
+=head2 Escaping
 
 Escaping behavior can be reversed with the C<auto_escape> attribute, this is
 the default in L<Mojolicious> C<.ep> templates for example.
 
   <%= Perl expression, replaced with XML escaped result %>
   <%== Perl expression, replaced with result %>
-
 L<Mojo::ByteStream> objects are always excluded from automatic escaping.
-
   <%= Mojo::ByteStream->new('<div>excluded!</div>') %>
+You can use escaped tags and lines to generate templates.
+  %% my $number = <%= 20 + 3 %>;
+  The number is <%%= $number %>
+A newline can be escaped with a backslash.
+  This is <%= 23 * 3 %> a\
+  single line
+And a backslash in front of a newline can be escaped with another backslash.
+
+  % use Data::Dumper;
+  This will\\
+  result <%=  Dumper {foo => 'bar'} %>\\
+  in multiple lines
 
 =head2 Trimming
 
@@ -457,25 +467,6 @@ via C<@_>.
   % my ($foo, $bar) = @_;
   % my $x = shift;
   test 123 <%= $foo %>
-
-=head2 More escaping
-
-You can use escaped tags and lines to generate templates.
-
-  %% my $number = <%= 20 + 3 %>;
-  The number is <%%= $number %>
-
-A newline can be escaped with a backslash.
-
-  This is <%= 23 * 3 %> a\
-  single line
-
-And a backslash in front of a newline can be escaped with another backslash.
-
-  % use Data::Dumper;
-  This will\\
-  result <%=  Dumper {foo => 'bar'} %>\\
-  in multiple lines
 
 =head2 Exceptions
 

@@ -2,6 +2,7 @@ This file documents the revision history for Perl extension Mojolicious.
 
 2.95  2012-05-10
   - Improved documentation.
+  - Fixed bug that caused inactivity timeouts to be logged too often.
 
 2.94  2012-05-09
   - Added support for 308 redirects to Mojo::UserAgent.

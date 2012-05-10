@@ -171,7 +171,7 @@ sub _listen {
       my ($loop, $stream, $id) = @_;
 
       # Add new connection
-      $self->{connections}{$id} = {tls => $tls};
+      my $c = $self->{connections}{$id} = {tls => $tls};
       warn "-- Accept (@{[$stream->handle->peerhost]})\n" if DEBUG;
 
       # Inactivity timeout
@@ -186,8 +186,8 @@ sub _listen {
         }
       );
       $stream->on(read => sub { $self->_read($id => pop) });
-      $stream->on(
-        timeout => sub { $self->app->log->debug('Inactivity timeout.') });
+      $stream->on(timeout =>
+          sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
     }
   );
   push @{$self->{listening} ||= []}, $id;

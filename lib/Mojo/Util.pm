@@ -1,13 +1,13 @@
 package Mojo::Util;
 use Mojo::Base 'Exporter';
 
-use Digest::MD5 qw/md5 md5_hex/;
-use Digest::SHA qw/sha1 sha1_hex/;
+use Digest::MD5 qw(md5 md5_hex);
+use Digest::SHA qw(sha1 sha1_hex);
 use Encode 'find_encoding';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
-use MIME::Base64 qw/decode_base64 encode_base64/;
-use MIME::QuotedPrint qw/decode_qp encode_qp/;
+use MIME::Base64 qw(decode_base64 encode_base64);
+use MIME::QuotedPrint qw(decode_qp encode_qp);
 
 # Punycode bootstring parameters
 use constant {
@@ -40,11 +40,11 @@ my %ENCODE;
 
 # "Bart, stop pestering Satan!"
 our @EXPORT_OK = (
-  qw/b64_decode b64_encode camelize decamelize decode encode get_line/,
-  qw/hmac_md5_sum hmac_sha1_sum html_escape html_unescape md5_bytes md5_sum/,
-  qw/punycode_decode punycode_encode qp_decode qp_encode quote/,
-  qw/secure_compare sha1_bytes sha1_sum trim unquote url_escape/,
-  qw/url_unescape xml_escape/
+  qw(b64_decode b64_encode camelize decamelize decode encode get_line),
+  qw(hmac_md5_sum hmac_sha1_sum html_escape html_unescape md5_bytes md5_sum),
+  qw(punycode_decode punycode_encode qp_decode qp_encode quote),
+  qw(secure_compare sha1_bytes sha1_sum trim unquote url_escape),
+  qw(url_unescape xml_escape)
 );
 
 sub b64_decode { decode_base64(shift) }
@@ -274,7 +274,7 @@ sub qp_encode { encode_qp(shift) }
 sub quote {
   my $string = shift;
   $string =~ s/(["\\])/\\$1/g;
-  return qq/"$string"/;
+  return qq{"$string"};
 }
 
 sub secure_compare {
@@ -401,7 +401,7 @@ Mojo::Util - Portable utility functions
 
 =head1 SYNOPSIS
 
-  use Mojo::Util qw/b64_encode url_escape url_unescape/;
+  use Mojo::Util qw(b64_encode url_escape url_unescape);
 
   my $string = 'test=23';
   my $escaped = url_escape $string;

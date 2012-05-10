@@ -269,7 +269,7 @@ sub _tag {
   # Attributes
   my %attrs = @_;
   for my $key (sort keys %attrs) {
-    $tag .= qq/ $key="/ . xml_escape($attrs{$key} // '') . '"';
+    $tag .= qq{ $key="} . xml_escape($attrs{$key} // '') . '"';
   }
 
   # End tag
@@ -477,8 +477,8 @@ picked up and shown as default.
 
 =head2 C<select_field>
 
-  %= select_field language => [qw/de en/]
-  %= select_field language => [qw/de en/], id => 'lang'
+  %= select_field language => [qw(de en)]
+  %= select_field language => [qw(de en)], id => 'lang'
   %= select_field country => [[Germany => 'de'], 'en']
   %= select_field country => [{Europe => [[Germany => 'de'], 'en']}]
   %= select_field country => [[Germany => 'de', class => 'europe'], 'en']

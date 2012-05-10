@@ -3,9 +3,9 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Mojolicious::Routes::Pattern;
-use Scalar::Util qw/blessed weaken/;
+use Scalar::Util qw(blessed weaken);
 
-has [qw/block inline parent partial/];
+has [qw(block inline parent partial)];
 has 'children' => sub { [] };
 has pattern    => sub { Mojolicious::Routes::Pattern->new };
 
@@ -16,11 +16,11 @@ sub AUTOLOAD {
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
-  croak qq/Undefined subroutine &${package}::$method called/
+  croak qq[Undefined subroutine &${package}::$method called]
     unless blessed $self && $self->isa(__PACKAGE__);
 
   # Call shortcut
-  croak qq/Can't locate object method "$method" via package "$package"/
+  croak qq{Can't locate object method "$method" via package "$package"}
     unless my $shortcut = $self->root->shortcuts->{$method};
   return $self->$shortcut(@_);
 }
@@ -602,13 +602,13 @@ variations.
 
   my $methods = $r->via;
   $r          = $r->via('GET');
-  $r          = $r->via(qw/GET POST/);
-  $r          = $r->via([qw/GET POST/]);
+  $r          = $r->via(qw(GET POST));
+  $r          = $r->via([qw(GET POST)]);
 
 Restrict HTTP methods this route is allowed to handle, defaults to no
 restrictions.
 
-  $r->route('/foo')->via(qw/GET POST/)->to('foo#bar');
+  $r->route('/foo')->via(qw(GET POST))->to('foo#bar');
 
 =head2 C<websocket>
 

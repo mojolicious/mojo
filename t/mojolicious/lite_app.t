@@ -67,7 +67,7 @@ get '/' => 'root';
 
 # GET /alternatives/☃
 # GET /alternatives/♥
-get '/alternatives/:char' => [char => [qw/☃ ♥/]] => sub {
+get '/alternatives/:char' => [char => [qw(☃ ♥)]] => sub {
   my $self = shift;
   $self->render_text($self->url_for);
 };
@@ -174,7 +174,7 @@ get '/maybe/ajax' => sub {
 get '/stream' => sub {
   my $self = shift;
   my $chunks
-    = [qw/foo bar/, $self->req->url->to_abs->userinfo, $self->url_for->to_abs];
+    = [qw(foo bar), $self->req->url->to_abs->userinfo, $self->url_for->to_abs];
   $self->res->code(200);
   $self->res->headers->content_type('text/plain');
   my $cb;
@@ -339,7 +339,7 @@ any '/something' => sub {
 };
 
 # GET|POST /something/else
-any [qw/get post/] => '/something/else' => sub {
+any [qw(get post)] => '/something/else' => sub {
   my $self = shift;
   $self->render_text('Yay!');
 };
@@ -700,15 +700,15 @@ $t->get_ok('/inline/exception')->status_is(500)
 $t->get_ok('/data/exception')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is(qq/Died at template "dies.html.ep" from DATA section line 2/
-    . qq/, near "123".\n\n/);
+  ->content_is(qq{Died at template "dies.html.ep" from DATA section line 2}
+    . qq{, near "123".\n\n});
 
 # GET /template/exception
 $t->get_ok('/template/exception')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
-  qq/Died at template "dies_too.html.ep" line 2, near "321".\n\n/);
+  qq{Died at template "dies_too.html.ep" line 2, near "321".\n\n});
 
 # GET /with-format
 $t->get_ok('/with-format')->content_is("/without-format\n");

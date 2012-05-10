@@ -8,11 +8,11 @@ use Mojo::Util 'decamelize';
 # "Who are you, my warranty?!"
 sub load {
   my ($self, $file, $conf, $app) = @_;
-  $app->log->debug(qq/Reading config file "$file"./);
+  $app->log->debug(qq{Reading config file "$file".});
 
   # Slurp UTF-8 file
   open my $handle, "<:encoding(UTF-8)", $file
-    or die qq/Couldn't open config file "$file": $!/;
+    or die qq{Couldn't open config file "$file": $!};
   my $content = do { local $/; <$handle> };
 
   # Process
@@ -25,8 +25,8 @@ sub parse {
   # Run Perl code
   my $config = eval 'package Mojolicious::Plugin::Config::Sandbox;'
     . "no warnings; sub app { \$app }; use Mojo::Base -strict; $content";
-  die qq/Couldn't load configuration from file "$file": $@/ if !$config && $@;
-  die qq/Config file "$file" did not return a hash reference.\n/
+  die qq{Couldn't load configuration from file "$file": $@} if !$config && $@;
+  die qq{Config file "$file" did not return a hash reference.\n}
     unless ref $config eq 'HASH';
 
   return $config;
@@ -68,9 +68,9 @@ sub register {
 
   # Check for default
   elsif ($conf->{default}) {
-    $app->log->debug(qq/Config file "$file" missing, using default config./);
+    $app->log->debug(qq{Config file "$file" missing, using default config.});
   }
-  else { die qq/Config file "$file" missing, maybe you need to create it?\n/ }
+  else { die qq{Config file "$file" missing, maybe you need to create it?\n} }
 
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}}

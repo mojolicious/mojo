@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
 use Mojo::Parameters;
-use Mojo::Util qw/b64_encode b64_decode get_line/;
+use Mojo::Util qw(b64_encode b64_decode get_line);
 use Mojo::URL;
 
 has env => sub { {} };

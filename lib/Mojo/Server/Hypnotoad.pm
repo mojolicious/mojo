@@ -4,11 +4,11 @@ use Mojo::Base -base;
 use Cwd 'abs_path';
 use Fcntl ':flock';
 use File::Basename 'dirname';
-use File::Spec::Functions qw/catfile tmpdir/;
+use File::Spec::Functions qw(catfile tmpdir);
 use IO::Poll 'POLLIN';
 use List::Util 'shuffle';
 use Mojo::Server::Daemon;
-use POSIX qw/setsid WNOHANG/;
+use POSIX qw(setsid WNOHANG);
 use Scalar::Util 'weaken';
 use Time::HiRes 'ualarm';
 
@@ -86,7 +86,7 @@ sub run {
 
   # Start accepting connections
   my $log = $self->{log} = $app->log;
-  $log->info(qq/Hypnotoad server $$ started for "$ENV{HYPNOTOAD_APP}"./);
+  $log->info(qq[Hypnotoad server $$ started for "$ENV{HYPNOTOAD_APP}".]);
   $daemon->start;
 
   # Pipe for worker communication
@@ -254,8 +254,8 @@ sub _pid_file {
   return if -e (my $file = $self->{config}{pid_file});
 
   # Create PID file
-  $self->{log}->info(qq/Creating process id file "$file"./);
-  die qq/Can't create process id file "$file": $!/
+  $self->{log}->info(qq{Creating process id file "$file".});
+  die qq{Can't create process id file "$file": $!}
     unless open my $pid, '>', $file;
   chmod 0644, $pid;
   print $pid $$;
@@ -292,7 +292,7 @@ sub _spawn {
   # Prepare lock file
   my $c    = $self->{config};
   my $file = $c->{lock_file};
-  die qq/Can't open lock file "$file": $!/ unless open my $lock, '>', $file;
+  die qq{Can't open lock file "$file": $!} unless open my $lock, '>', $file;
 
   # Change user/group
   my $loop = $self->{daemon}->setuidgid->ioloop;

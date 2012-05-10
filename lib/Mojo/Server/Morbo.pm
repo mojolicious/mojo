@@ -5,7 +5,7 @@ use Mojo::Home;
 use Mojo::Server::Daemon;
 use POSIX 'WNOHANG';
 
-has watch => sub { [qw/lib templates/] };
+has watch => sub { [qw(lib templates)] };
 
 # "All in all, this is one day Mittens the kitten won’t soon forget.
 #  Kittens give Morbo gas.
@@ -60,7 +60,7 @@ sub _manage {
   # Check files
   for my $file (@files) {
     next unless $self->check_file($file);
-    say qq/File "$file" changed, restarting./ if $ENV{MORBO_VERBOSE};
+    say qq{File "$file" changed, restarting.} if $ENV{MORBO_VERBOSE};
     kill 'TERM', $self->{running} if $self->{running};
     $self->{modified} = 1;
   }

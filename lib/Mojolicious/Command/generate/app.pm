@@ -54,7 +54,7 @@ __DATA__
 use Mojo::Base -strict;
 
 use File::Basename 'dirname';
-use File::Spec::Functions qw/catdir splitdir/;
+use File::Spec::Functions qw(catdir splitdir);
 
 # Source directory has precedence
 my @base = (splitdir(dirname(__FILE__)), '..');

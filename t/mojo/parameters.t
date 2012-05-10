@@ -38,8 +38,8 @@ is_deeply $p->param('foo'), 'b;ar', 'right structure';
 is_deeply [$p->param('a')], [4, 5], 'right structure';
 $p->param(foo => 'bar');
 is_deeply [$p->param('foo')], ['bar'], 'right structure';
-$p->param(foo => qw/baz yada/);
-is_deeply [$p->param('foo')], [qw/baz yada/], 'right structure';
+$p->param(foo => qw(baz yada));
+is_deeply [$p->param('foo')], [qw(baz yada)], 'right structure';
 
 # Parse with ";" separator
 $p->parse('q=1;w=2;e=3;e=4;r=6;t=7');
@@ -54,7 +54,7 @@ is $p->to_string, 'q=1;w=2;t=7', 'right format';
 is_deeply $p->to_hash, {q => 1, w => 2, t => 7}, 'right structure';
 
 # List names
-is_deeply [$p->param], [qw/q t w/], 'right structure';
+is_deeply [$p->param], [qw(q t w)], 'right structure';
 
 # Append
 $p->append('a', 4, 'a', 5, 'b', 6, 'b', 7);
@@ -143,10 +143,10 @@ is "$p", 'a=works+too', 'right format';
 
 # Array values
 $p = Mojo::Parameters->new;
-$p->append(foo => [qw/bar baz/], a => 'b', bar => [qw/bas test/]);
-is_deeply [$p->param('foo')], [qw/bar baz/], 'right values';
+$p->append(foo => [qw(bar baz)], a => 'b', bar => [qw(bas test)]);
+is_deeply [$p->param('foo')], [qw(bar baz)], 'right values';
 is $p->param('a'), 'b', 'right value';
-is_deeply [$p->param('bar')], [qw/bas test/], 'right values';
+is_deeply [$p->param('bar')], [qw(bas test)], 'right values';
 is_deeply $p->to_hash,
   {foo => ['bar', 'baz'], a => 'b', bar => ['bas', 'test']}, 'right structure';
 

@@ -92,9 +92,9 @@ $collection = c(2, 5, 4, 1);
 is_deeply [$collection->sort->each], [1, 2, 4, 5], 'right order';
 is_deeply [$collection->sort(sub { $_[1] cmp $_[0] })->each], [5, 4, 2, 1],
   'right order';
-$collection = c(qw/Test perl Mojo/);
+$collection = c(qw(Test perl Mojo));
 is_deeply [$collection->sort(sub { uc(shift) cmp uc(shift) })->each],
-  [qw/Mojo perl Test/], 'right order';
+  [qw(Mojo perl Test)], 'right order';
 $collection = c();
 is_deeply [$collection->sort->each], [], 'no elements';
 is_deeply [$collection->sort(sub { $_[1] cmp $_[0] })->each], [],

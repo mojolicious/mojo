@@ -9,12 +9,12 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  for my $name (qw/app flash param stash session url_for/) {
+  for my $name (qw(app flash param stash session url_for)) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
   # Stash key shortcuts
-  for my $name (qw/extends layout title/) {
+  for my $name (qw(extends layout title)) {
     $app->helper(
       $name => sub {
         my $self  = shift;

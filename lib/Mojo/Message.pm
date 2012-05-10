@@ -9,7 +9,7 @@ use Mojo::JSON;
 use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
-use Mojo::Util qw/decode url_unescape/;
+use Mojo::Util qw(decode url_unescape);
 use Scalar::Util 'weaken';
 
 has content => sub { Mojo::Content::Single->new };
@@ -364,7 +364,7 @@ sub _parse {
   }
 
   # Content
-  if (($self->{state} || '') ~~ [qw/body content finished/]) {
+  if (($self->{state} || '') ~~ [qw(body content finished)]) {
 
     # Until body
     my $content = $self->content;
@@ -500,7 +500,7 @@ Emitted when message building or parsing makes progress.
   # Building
   $message->on(progress => sub {
     my ($message, $state, $offset) = @_;
-    say qq/Building "$state" at offset $offset/;
+    say qq{Building "$state" at offset $offset};
   });
 
   # Parsing

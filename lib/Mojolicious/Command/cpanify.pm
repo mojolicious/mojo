@@ -2,7 +2,7 @@ package Mojolicious::Command::cpanify;
 use Mojo::Base 'Mojo::Command';
 
 use File::Basename 'basename';
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::UserAgent;
 
 has description => "Upload distribution to CPAN.\n";
@@ -47,7 +47,7 @@ sub run {
     my $message = $tx->error;
     if    ($code eq '401') { $message = 'Wrong username or password.' }
     elsif ($code eq '409') { $message = 'File already exists on CPAN.' }
-    die qq/Problem uploading file "$file". ($message)\n/;
+    die qq{Problem uploading file "$file". ($message)\n};
   }
   say 'Upload successful!';
 }

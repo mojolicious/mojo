@@ -8,7 +8,7 @@ use overload
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Find 'find';
-use File::Spec::Functions qw/abs2rel catdir catfile splitdir/;
+use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
 use List::Util 'first';
 use Mojo::Asset::File;

@@ -2,7 +2,7 @@ package Mojo::Reactor;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use IO::Poll qw/POLLERR POLLHUP POLLIN/;
+use IO::Poll qw(POLLERR POLLHUP POLLIN);
 use Mojo::Loader;
 
 sub detect {

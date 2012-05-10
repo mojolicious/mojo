@@ -22,7 +22,7 @@ is $command->get_data('template1', 'Example::Package::UNIX'),
 is $command->get_data('template2', 'Example::Package::UNIX'),
   "Second Template\n", 'right template';
 is_deeply [sort keys %{$command->get_all_data('Example::Package::UNIX')}],
-  [qw/template1 template2/], 'right DATA files';
+  [qw(template1 template2)], 'right DATA files';
 close $data;
 
 # Windows DATA templates
@@ -36,7 +36,7 @@ is $command->get_data('template3', 'Example::Package::Windows'),
 is $command->get_data('template4', 'Example::Package::Windows'),
   "Fourth Template\r\n", 'right template';
 is_deeply [sort keys %{$command->get_all_data('Example::Package::Windows')}],
-  [qw/template3 template4/], 'right DATA files';
+  [qw(template3 template4)], 'right DATA files';
 close $data;
 
 # Mixed whitespace
@@ -51,7 +51,7 @@ is $command->get_data('template6', 'Example::Package::Mixed'), "6\n",
 is $command->get_data('template7', 'Example::Package::Mixed'), '7',
   'right template';
 is_deeply [sort keys %{$command->get_all_data('Example::Package::Mixed')}],
-  [qw/template5 template6 template7/], 'right DATA files';
+  [qw(template5 template6 template7)], 'right DATA files';
 close $data;
 
 # Class to file
@@ -76,7 +76,7 @@ my $cwd = cwd;
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 chdir $dir;
 $command->create_rel_dir('foo/bar');
-ok -d catdir($dir, qw/foo bar/), 'directory exists';
+ok -d catdir($dir, qw(foo bar)), 'directory exists';
 my $template = "@@ foo_bar\njust <%= 'works' %>!\n";
 open $data, '<', \$template;
 no strict 'refs';

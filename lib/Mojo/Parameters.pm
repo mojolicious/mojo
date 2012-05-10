@@ -5,7 +5,7 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-use Mojo::Util qw/decode encode url_escape url_unescape/;
+use Mojo::Util qw(decode encode url_escape url_unescape);
 use Mojo::URL;
 
 has charset        => 'UTF-8';
@@ -276,7 +276,7 @@ Merge parameters.
   my $foo   = $p->param('foo');
   my @foo   = $p->param('foo');
   my $foo   = $p->param(foo => 'ba;r');
-  my @foo   = $p->param(foo => qw/ba;r ba;z/);
+  my @foo   = $p->param(foo => qw(ba;r ba;z));
 
 Check and replace parameter values.
 

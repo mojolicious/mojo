@@ -10,7 +10,7 @@ use warnings;
 #  like sleep with your own grandmother.
 #  I wouldn't want to do that again."
 use File::Basename 'dirname';
-use File::Spec::Functions qw/catdir splitdir/;
+use File::Spec::Functions qw(catdir splitdir);
 
 # Source directory has precedence
 my @base = (splitdir(dirname(__FILE__)), '..');

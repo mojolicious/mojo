@@ -1,7 +1,7 @@
 package Mojo::EventEmitter;
 use Mojo::Base -base;
 
-use Scalar::Util qw/blessed weaken/;
+use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 
@@ -31,7 +31,7 @@ sub emit_safe {
       if (!eval { $self->$cb(@_); 1 } && $name ne 'error') {
         $self->once(error => sub { warn $_[1] })
           unless $self->has_subscribers('error');
-        $self->emit_safe('error', qq/Event "$name" failed: $@/);
+        $self->emit_safe('error', qq{Event "$name" failed: $@});
       }
     }
   }

@@ -87,7 +87,7 @@ Mojo::Collection - Collection
 
   # Manipulate collections
   use Mojo::Collection;
-  my $collection = Mojo::Collection->new(qw/just works/);
+  my $collection = Mojo::Collection->new(qw(just works));
   unshift @$collection, 'it';
   $collection->map(sub { ucfirst })->each(sub {
     my ($word, $count) = @_;
@@ -96,7 +96,7 @@ Mojo::Collection - Collection
 
   # Use the alternative constructor
   use Mojo::Collection 'c';
-  c(qw/a b c/)->join('/')->url_escape->say;
+  c(qw(a b c))->join('/')->url_escape->say;
 
 =head1 DESCRIPTION
 

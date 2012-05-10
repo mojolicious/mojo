@@ -4,11 +4,11 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Cwd 'getcwd';
 use File::Path 'mkpath';
-use File::Spec::Functions qw/catdir catfile splitdir/;
+use File::Spec::Functions qw(catdir catfile splitdir);
 use IO::Handle;
 use Mojo::Server;
 use Mojo::Template;
-use Mojo::Util qw/b64_decode decamelize/;
+use Mojo::Util qw(b64_decode decamelize);
 
 has app => sub { Mojo::Server->new->app };
 has description => 'No description.';
@@ -20,7 +20,7 @@ my %CACHE;
 
 sub chmod_file {
   my ($self, $path, $mod) = @_;
-  chmod $mod, $path or croak qq/Can't chmod path "$path": $!/;
+  chmod $mod, $path or croak qq{Can't chmod path "$path": $!};
   $mod = sprintf '%lo', $mod;
   say "  [chmod] $path $mod" unless $self->quiet;
   return $self;
@@ -50,7 +50,7 @@ sub create_dir {
   }
 
   # Create
-  mkpath $path or croak qq/Can't make directory "$path": $!/;
+  mkpath $path or croak qq{Can't make directory "$path": $!};
   say "  [mkdir] $path" unless $self->quiet;
   return $self;
 }
@@ -136,8 +136,8 @@ sub write_file {
   $self->create_dir($dir);
 
   # Write unbuffered
-  croak qq/Can't open file "$path": $!/ unless open my $file, '>', $path;
-  croak qq/Can't write to file "$path": $!/
+  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
+  croak qq{Can't write to file "$path": $!}
     unless defined $file->syswrite($data);
   say "  [write] $path" unless $self->quiet;
 

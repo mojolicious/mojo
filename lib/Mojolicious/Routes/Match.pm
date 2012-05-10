@@ -2,10 +2,10 @@ package Mojolicious::Routes::Match;
 use Mojo::Base -base;
 
 use List::Util 'first';
-use Mojo::Util qw/decode url_unescape/;
+use Mojo::Util qw(decode url_unescape);
 
 has captures => sub { {} };
-has [qw/endpoint root/];
+has [qw(endpoint root)];
 has stack => sub { [] };
 
 # "I'm Bender, baby, please insert liquor!"

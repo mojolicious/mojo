@@ -20,20 +20,20 @@ $r->route('/0')->to(null => 1);
 # /alternatives/0
 # /alternatives/test
 # /alternatives/23
-$r->route('/alternatives/:foo', foo => [qw/0 test 23/])->to(foo => 11);
+$r->route('/alternatives/:foo', foo => [qw(0 test 23)])->to(foo => 11);
 
 # /alternatives2/0
 # /alternatives2/test
 # /alternatives2/23
-$r->route('/alternatives2/:foo', foo => [qw/0 test 23/]);
+$r->route('/alternatives2/:foo', foo => [qw(0 test 23)]);
 
 # /alternatives3/foo
 # /alternatives3/foobar
-$r->route('/alternatives3/:foo', foo => [qw/foo foobar/]);
+$r->route('/alternatives3/:foo', foo => [qw(foo foobar)]);
 
 # /alternatives4/foo
 # /alternatives4/foo.bar
-$r->route('/alternatives4/:foo', foo => [qw/foo foo.bar/]);
+$r->route('/alternatives4/:foo', foo => [qw(foo foo.bar)]);
 
 # /*/test
 my $test = $r->route('/:controller/test')->to(action => 'test');
@@ -92,7 +92,7 @@ $r->route('/format2', format => qr/txt/)
 
 # /format3.txt
 # /format3.text
-$r->route('/format3', format => [qw/txt text/])
+$r->route('/format3', format => [qw(txt text)])
   ->to(controller => 'we', action => 'cheers');
 
 # /format4
@@ -109,7 +109,7 @@ $r->route('/format6', format => 0)
 
 # /format7.foo
 # /format7.foobar
-$r->route('/format7', format => [qw/foo foobar/])->to('perl#rocks');
+$r->route('/format7', format => [qw(foo foobar)])->to('perl#rocks');
 
 # /articles/1/edit
 # /articles/1/delete
@@ -129,7 +129,7 @@ $r->route('/method/post')->via('post')
   ->to(controller => 'method', action => 'post');
 
 # POST|GET /method/post_get
-$r->route('/method/post_get')->via(qw/POST get/)
+$r->route('/method/post_get')->via(qw(POST get))
   ->to(controller => 'method', action => 'post_get');
 
 # /simple/form

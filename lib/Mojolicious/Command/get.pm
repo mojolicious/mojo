@@ -1,14 +1,14 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::JSON::Pointer;
 use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
-use Mojo::Util qw/decode encode/;
+use Mojo::Util qw(decode encode);
 
 has description => "Perform HTTP 1.1 request.\n";
 has usage       => <<"EOF";
@@ -140,7 +140,7 @@ sub run {
   # Error
   my ($message, $code) = $tx->error;
   $url = encode 'UTF-8', $url;
-  warn qq/Problem loading URL "$url". ($message)\n/ if $message && !$code;
+  warn qq{Problem loading URL "$url". ($message)\n} if $message && !$code;
 
   # JSON Pointer
   return unless $selector;
@@ -194,7 +194,7 @@ sub _select {
     }
 
     # Unknown
-    else { die qq/Unknown command "$command".\n/ }
+    else { die qq{Unknown command "$command".\n} }
     $finished++;
   }
 

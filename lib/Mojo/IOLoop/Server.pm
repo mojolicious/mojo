@@ -5,7 +5,7 @@ use Carp 'croak';
 use File::Temp;
 use IO::Socket::INET;
 use Scalar::Util 'weaken';
-use Socket qw/IPPROTO_TCP TCP_NODELAY/;
+use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}

@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojo::IOLoop;
 use Mojo::Message::Response;
 use Mojo::UserAgent;
-use Mojo::Util qw/decode encode/;
+use Mojo::Util qw(decode encode);
 use Test::More ();
 
 has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
@@ -104,7 +104,7 @@ sub element_exists {
   my ($self, $selector, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok $self->tx->res->dom->at($selector),
-    $desc || qq/"$selector" exists/;
+    $desc || qq{"$selector" exists};
   return $self;
 }
 
@@ -112,7 +112,7 @@ sub element_exists_not {
   my ($self, $selector, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok !$self->tx->res->dom->at($selector),
-    $desc || qq/"$selector" exists not/;
+    $desc || qq{"$selector" exists not};
   return $self;
 }
 
@@ -174,7 +174,7 @@ sub json_is {
   my ($self, $p, $data, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::is_deeply $self->tx->res->json($p), $data,
-    $desc || qq/exact match for JSON Pointer "$p"/;
+    $desc || qq{exact match for JSON Pointer "$p"};
   return $self;
 }
 
@@ -183,7 +183,7 @@ sub json_has {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok(
     Mojo::JSON::Pointer->contains($self->tx->res->json, $p),
-    $desc || qq/has value for JSON Pointer "$p"/
+    $desc || qq{has value for JSON Pointer "$p"}
   );
   return $self;
 }
@@ -193,7 +193,7 @@ sub json_hasnt {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   Test::More::ok(
     !Mojo::JSON::Pointer->contains($self->tx->res->json, $p),
-    $desc || qq/has no value for JSON Pointer "$p"/
+    $desc || qq{has no value for JSON Pointer "$p"}
   );
   return $self;
 }

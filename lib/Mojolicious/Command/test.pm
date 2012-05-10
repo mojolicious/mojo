@@ -3,8 +3,8 @@ use Mojo::Base 'Mojo::Command';
 
 use Cwd 'realpath';
 use FindBin;
-use File::Spec::Functions qw/abs2rel catdir splitdir/;
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
+use File::Spec::Functions qw(abs2rel catdir splitdir);
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Home;
 
 has description => "Run unit tests.\n";

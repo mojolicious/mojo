@@ -2,9 +2,9 @@ package Mojolicious::Sessions;
 use Mojo::Base -base;
 
 use Mojo::JSON;
-use Mojo::Util qw/b64_decode b64_encode/;
+use Mojo::Util qw(b64_decode b64_encode);
 
-has [qw/cookie_domain secure/];
+has [qw(cookie_domain secure)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;

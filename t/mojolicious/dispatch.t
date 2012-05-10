@@ -80,8 +80,8 @@ is_deeply $stash, {a => 1, b => 2}, 'set via hash reference';
 is $c->param('foo'), undef, 'no value';
 is $c->param(foo => 'works')->param('foo'), 'works', 'right value';
 is $c->param(foo => 'too')->param('foo'),   'too',   'right value';
-is $c->param(foo => qw/just works/)->param('foo'), 'just', 'right value';
-is_deeply [$c->param('foo')], [qw/just works/], 'right values';
+is $c->param(foo => qw(just works))->param('foo'), 'just', 'right value';
+is_deeply [$c->param('foo')], [qw(just works)], 'right values';
 is $c->param(foo => undef)->param('foo'), undef, 'no value';
 is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name,
   'bar', 'right value';
@@ -161,21 +161,21 @@ is $c->param('controller'), undef, 'no value';
 is $c->param('action'),     undef, 'no value';
 is $c->param('capture'),    undef, 'no value';
 is $c->param('foo'),        'bar', 'right value';
-is_deeply [$c->param], [qw/capture foo/], 'right names';
+is_deeply [$c->param], [qw(capture foo)], 'right names';
 $c->req->param(bar => 'baz');
 is $c->param('controller'), undef, 'no value';
 is $c->param('action'),     undef, 'no value';
 is $c->param('capture'),    undef, 'no value';
 is $c->param('foo'),        'bar', 'right value';
 is $c->param('bar'),        'baz', 'right value';
-is_deeply [$c->param], [qw/bar capture foo/], 'right names';
+is_deeply [$c->param], [qw(bar capture foo)], 'right names';
 $c->req->param(action => 'baz');
 is $c->param('controller'), undef, 'no value';
 is $c->param('action'),     'baz', 'no value';
 is $c->param('capture'),    undef, 'no value';
 is $c->param('foo'),        'bar', 'right value';
 is $c->param('bar'),        'baz', 'right value';
-is_deeply [$c->param], [qw/action bar capture foo/], 'right names';
+is_deeply [$c->param], [qw(action bar capture foo)], 'right names';
 ok $c->render_called, 'rendered';
 
 # Escaping

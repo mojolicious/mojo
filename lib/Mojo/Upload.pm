@@ -6,7 +6,7 @@ use Mojo::Asset::File;
 use Mojo::Headers;
 
 has asset => sub { Mojo::Asset::File->new };
-has [qw/filename name/];
+has [qw(filename name)];
 has headers => sub { Mojo::Headers->new };
 
 # "B-6

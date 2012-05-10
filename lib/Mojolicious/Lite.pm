@@ -34,7 +34,7 @@ sub import {
   # Export
   no warnings 'redefine';
   my $root = $routes;
-  for my $name (qw/any get options patch post put websocket/) {
+  for my $name (qw(any get options patch post put websocket)) {
     *{"${caller}::$name"} = sub { $routes->$name(@_) };
   }
   *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};

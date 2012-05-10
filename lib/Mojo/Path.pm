@@ -5,10 +5,10 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-use Mojo::Util qw/encode url_escape url_unescape/;
+use Mojo::Util qw(encode url_escape url_unescape);
 use Mojo::URL;
 
-has [qw/leading_slash trailing_slash/];
+has [qw(leading_slash trailing_slash)];
 has parts => sub { [] };
 
 sub new { shift->SUPER::new->parse(@_) }
@@ -129,7 +129,7 @@ Path has a leading slash.
 =head2 C<parts>
 
   my $parts = $path->parts;
-  $path     = $path->parts([qw/foo bar baz/]);
+  $path     = $path->parts([qw(foo bar baz)]);
 
 The path parts.
 

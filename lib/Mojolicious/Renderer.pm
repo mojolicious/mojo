@@ -13,7 +13,7 @@ has classes => sub { ['main'] };
 has default_format => 'html';
 has 'default_handler';
 has encoding => 'UTF-8';
-has [qw/handlers helpers/] => sub { {} };
+has [qw(handlers helpers)] => sub { {} };
 has paths => sub { [] };
 
 # "This is not how Xmas is supposed to be.
@@ -234,7 +234,7 @@ sub _render_template {
   }
 
   # No handler
-  else { $c->app->log->error(qq/No handler for "$handler" available./) }
+  else { $c->app->log->error(qq{No handler for "$handler" available.}) }
   return;
 }
 

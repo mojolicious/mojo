@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Mojo::Headers;
 
-has [qw/auto_relax relaxed/] => 0;
+has [qw(auto_relax relaxed)] => 0;
 has headers => sub { Mojo::Headers->new };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
@@ -193,7 +193,7 @@ sub parse_until_body {
 
 sub progress {
   my $self = shift;
-  return 0 unless ($self->{state} || '') ~~ [qw/body finished/];
+  return 0 unless ($self->{state} || '') ~~ [qw(body finished)];
   return $self->{raw_size} - ($self->{header_size} || 0);
 }
 

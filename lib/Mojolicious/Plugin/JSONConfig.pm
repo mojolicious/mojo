@@ -17,8 +17,8 @@ sub parse {
   my $json   = Mojo::JSON->new;
   my $config = $json->decode($content);
   my $err    = $json->error;
-  die qq/Couldn't parse config "$file": $err/ if !$config && $err;
-  die qq/Invalid config "$file"./ if !$config || ref $config ne 'HASH';
+  die qq{Couldn't parse config "$file": $err} if !$config && $err;
+  die qq{Invalid config "$file".} if !$config || ref $config ne 'HASH';
 
   return $config;
 }
@@ -29,8 +29,8 @@ sub render {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Application instance and helper
-  my $prepend = q/my $app = shift; no strict 'refs'; no warnings 'redefine';/;
-  $prepend .= q/sub app; *app = sub { $app }; use Mojo::Base -strict;/;
+  my $prepend = q[my $app = shift; no strict 'refs'; no warnings 'redefine';];
+  $prepend .= q[sub app; *app = sub { $app }; use Mojo::Base -strict;];
 
   # Render
   my $mt = Mojo::Template->new($conf->{template} || {});

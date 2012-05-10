@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 use File::Basename 'dirname';
-use File::Spec::Functions qw/catdir splitdir/;
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
+use File::Spec::Functions qw(catdir splitdir);
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 
 # Source directory has precedence
 my @base = (splitdir(dirname(__FILE__)), '..');

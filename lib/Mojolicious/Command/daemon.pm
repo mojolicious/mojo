@@ -1,7 +1,7 @@
 package Mojolicious::Command::daemon;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Daemon;
 
 has description => "Start application with HTTP 1.1 and WebSocket server.\n";

@@ -10,7 +10,7 @@ use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util qw/encode url_escape/;
+use Mojo::Util qw(encode url_escape);
 
 sub endpoint {
   my ($self, $tx) = @_;
@@ -147,7 +147,7 @@ sub redirect {
     $new->req($req);
     $req->headers->remove('Host')->remove('Cookie')->remove('Referer');
   }
-  else { $method = 'GET' unless $method ~~ [qw/GET HEAD/] }
+  else { $method = 'GET' unless $method ~~ [qw(GET HEAD)] }
   $new->req->method($method)->url($location);
   return $new->previous($old);
 }
@@ -225,8 +225,8 @@ sub _multipart {
     # Content-Disposition
     $name = encode $encoding, $name if $encoding;
     $name = url_escape $name, "^$Mojo::URL::UNRESERVED";
-    my $disposition = qq/form-data; name="$name"/;
-    $disposition .= qq/; filename="$filename"/ if $filename;
+    my $disposition = qq{form-data; name="$name"};
+    $disposition .= qq{; filename="$filename"} if $filename;
     $headers->content_disposition($disposition);
   }
 

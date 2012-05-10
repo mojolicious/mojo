@@ -1,10 +1,10 @@
 package Mojo::Reactor::Poll;
 use Mojo::Base 'Mojo::Reactor';
 
-use IO::Poll qw/POLLERR POLLHUP POLLIN POLLOUT/;
+use IO::Poll qw(POLLERR POLLHUP POLLIN POLLOUT);
 use List::Util 'min';
 use Mojo::Util 'md5_sum';
-use Time::HiRes qw/time usleep/;
+use Time::HiRes qw(time usleep);
 
 # "I don't know.
 #  Can I really betray my country?

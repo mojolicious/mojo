@@ -47,7 +47,7 @@ sub load_plugin {
   return $name->new if $self->_load($name);
 
   # Not found
-  die qq/Plugin "$name" missing, maybe you need to install it?\n/;
+  die qq{Plugin "$name" missing, maybe you need to install it?\n};
 }
 
 sub register_plugin {

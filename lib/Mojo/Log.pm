@@ -10,7 +10,7 @@ has handle => sub {
 
   # File
   if (my $path = $self->path) {
-    croak qq/Can't open log file "$path": $!/
+    croak qq{Can't open log file "$path": $!}
       unless open my $file, '>>:utf8', $path;
     return $file;
   }

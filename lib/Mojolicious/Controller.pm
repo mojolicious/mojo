@@ -31,8 +31,8 @@ my $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
-  qw/action app cb controller data extends format handler json layout/,
-  qw/namespace partial path status template text/
+  qw(action app cb controller data extends format handler json layout),
+  qw(namespace partial path status template text)
 );
 
 # "Is all the work done by the children?
@@ -42,11 +42,11 @@ sub AUTOLOAD {
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
-  Carp::croak(qq/Undefined subroutine &${package}::$method called/)
+  Carp::croak(qq[Undefined subroutine &${package}::$method called])
     unless Scalar::Util::blessed($self) && $self->isa(__PACKAGE__);
 
   # Call helper
-  Carp::croak(qq/Can't locate object method "$method" via package "$package"/)
+  Carp::croak(qq{Can't locate object method "$method" via package "$package"})
     unless my $helper = $self->app->renderer->helpers->{$method};
   return $self->$helper(@_);
 }
@@ -64,7 +64,7 @@ sub cookie {
   if (defined $value) {
 
     # Cookie too big
-    $self->app->log->error(qq/Cookie "$name" is bigger than 4096 bytes./)
+    $self->app->log->error(qq{Cookie "$name" is bigger than 4096 bytes.})
       if length $value > 4096;
 
     # Create new cookie
@@ -313,7 +313,7 @@ sub render_static {
   my ($self, $file) = @_;
   my $app = $self->app;
   return $self->rendered if $app->static->serve($self, $file);
-  $app->log->debug(qq/File "$file" not found, public directory missing?/);
+  $app->log->debug(qq{File "$file" not found, public directory missing?});
   return;
 }
 
@@ -427,12 +427,12 @@ sub signed_cookie {
       # Bad cookie
       else {
         $self->app->log->debug(
-          qq/Bad signed cookie "$name", possible hacking attempt./);
+          qq{Bad signed cookie "$name", possible hacking attempt.});
       }
     }
 
     # Not signed
-    else { $self->app->log->debug(qq/Cookie "$name" not signed./) }
+    else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
   }
 
   return wantarray ? @results : $results[0];
@@ -452,7 +452,7 @@ sub stash {
   # Set
   my $values = ref $_[0] ? $_[0] : {@_};
   for my $key (keys %$values) {
-    $self->app->log->debug(qq/Careful, "$key" is a reserved stash value./)
+    $self->app->log->debug(qq{Careful, "$key" is a reserved stash value.})
       if $RESERVED{$key};
     $stash->{$key} = $values->{$key};
   }
@@ -658,7 +658,7 @@ L<Mojo::Transaction::WebSocket> object.
   my $foo   = $c->param('foo');
   my @foo   = $c->param('foo');
   $c        = $c->param(foo => 'ba;r');
-  $c        = $c->param(foo => qw/ba;r ba;z/);
+  $c        = $c->param(foo => qw(ba;r ba;z));
 
 Access GET/POST parameters, file uploads and route captures that are not
 reserved stash values.

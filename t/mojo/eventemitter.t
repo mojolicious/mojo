@@ -31,14 +31,14 @@ my $cb = sub { $echo .= 'echo2: ' . pop };
 $e->on(test2 => $cb);
 $e->emit_safe('test2', 'works!');
 is $echo, 'echo: works!echo2: works!', 'right echo';
-is $err, qq/Event "test2" failed: test2: works!\n/, 'right error';
+is $err, qq{Event "test2" failed: test2: works!\n}, 'right error';
 $echo = $err = undef;
 is scalar @{$e->subscribers('test2')}, 3, 'three subscribers';
 $e->unsubscribe(test2 => $cb);
 is scalar @{$e->subscribers('test2')}, 2, 'two subscribers';
 $e->emit_safe('test2', 'works!');
 is $echo, 'echo: works!', 'right echo';
-is $err, qq/Event "test2" failed: test2: works!\n/, 'right error';
+is $err, qq{Event "test2" failed: test2: works!\n}, 'right error';
 
 # Normal event again
 $e->emit('test1');

@@ -64,7 +64,7 @@ sub serve {
     last if ($asset, $size, $modified) = @$data;
 
     # Forbidded
-    $c->app->log->debug(qq/File "$rel" is forbidden./);
+    $c->app->log->debug(qq{File "$rel" is forbidden.});
     $res->code(403) and return;
   }
 

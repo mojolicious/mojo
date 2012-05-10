@@ -37,8 +37,8 @@ my \$app = do \$file;
 if (!\$app && (my \$e = \$@ || \$!)) { die \$e }
 \$app;
 EOF
-  die qq/Couldn't load application from file "$file": $@/ if !$app && $@;
-  die qq/File "$file" did not return an application object.\n/
+  die qq{Couldn't load application from file "$file": $@} if !$app && $@;
+  die qq{File "$file" did not return an application object.\n}
     unless blessed $app && $app->isa('Mojo');
   return $self->app($app)->app;
 }

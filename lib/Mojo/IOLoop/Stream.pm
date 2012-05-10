@@ -1,7 +1,7 @@
 package Mojo::IOLoop::Stream;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Errno qw/EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK/;
+use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK);
 use Scalar::Util 'weaken';
 use Time::HiRes 'time';
 

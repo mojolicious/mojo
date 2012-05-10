@@ -2,8 +2,8 @@ use Mojo::Base -strict;
 
 use Test::More tests => 15;
 
-use Cwd qw/cwd realpath/;
-use File::Spec::Functions qw/canonpath catdir splitdir/;
+use Cwd qw(cwd realpath);
+use File::Spec::Functions qw(canonpath catdir splitdir);
 use FindBin;
 use List::Util 'first';
 

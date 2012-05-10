@@ -8,7 +8,7 @@ use overload
 use Carp 'croak';
 use Mojo::Util 'unquote';
 
-has [qw/name value/];
+has [qw(name value)];
 
 # "My Homer is not a communist.
 #  He may be a liar, a pig, an idiot, a communist,

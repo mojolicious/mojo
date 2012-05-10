@@ -10,20 +10,20 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Scalar::Util qw/blessed weaken/;
+use Scalar::Util qw(blessed weaken);
 
 sub AUTOLOAD {
   my $self = shift;
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
-  croak qq/Undefined subroutine &${package}::$method called/
+  croak qq[Undefined subroutine &${package}::$method called]
     unless blessed $self && $self->isa(__PACKAGE__);
 
   # Search children
   my $children = $self->children($method);
   return @$children > 1 ? $children : $children->[0] if @$children;
-  croak qq/Can't locate object method "$method" via package "$package"/;
+  croak qq{Can't locate object method "$method" via package "$package"};
 }
 
 sub DESTROY { }

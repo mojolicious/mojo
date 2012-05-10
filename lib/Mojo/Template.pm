@@ -5,17 +5,17 @@ use Carp 'croak';
 use IO::Handle;
 use Mojo::ByteStream;
 use Mojo::Exception;
-use Mojo::Util qw/decode encode/;
+use Mojo::Util qw(decode encode);
 
 # "If for any reason you're not completely satisfied, I hate you."
-has [qw/auto_escape compiled/];
-has [qw/append code prepend template/] => '';
+has [qw(auto_escape compiled)];
+has [qw(append code prepend template)] => '';
 has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
 has encoding      => 'UTF-8';
-has [qw/escape_mark expression_mark trim_mark/] => '=';
-has [qw/line_start replace_mark/] => '%';
+has [qw(escape_mark expression_mark trim_mark)] => '=';
+has [qw(line_start replace_mark)] => '%';
 has name      => 'template';
 has namespace => 'Mojo::Template::SandBox';
 has tag_start => '<%';
@@ -74,7 +74,7 @@ sub build {
       if ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
 
       # Expression
-      if ($type ~~ [qw/expr escp/]) {
+      if ($type ~~ [qw(expr escp)]) {
 
         # Start
         unless ($multi) {
@@ -296,13 +296,13 @@ sub render_file {
 
   # Slurp file
   $self->name($path) unless defined $self->{name};
-  croak qq/Can't open template "$path": $!/ unless open my $file, '<', $path;
+  croak qq{Can't open template "$path": $!} unless open my $file, '<', $path;
   my $tmpl = '';
   while ($file->sysread(my $buffer, 131072, 0)) { $tmpl .= $buffer }
 
   # Decode and render
   if (my $encoding = $self->encoding) {
-    croak qq/Template "$path" has invalid encoding./
+    croak qq{Template "$path" has invalid encoding.}
       unless defined($tmpl = decode $encoding, $tmpl);
   }
   return $self->render($tmpl, @_);
@@ -348,9 +348,9 @@ sub _write_file {
   my ($self, $path, $output) = @_;
 
   # Encode and write to file
-  croak qq/Can't open file "$path": $!/ unless open my $file, '>', $path;
+  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
   $output = encode $self->encoding, $output if $self->encoding;
-  croak qq/Can't write to file "$path": $!/
+  croak qq{Can't write to file "$path": $!}
     unless defined $file->syswrite($output);
 
   return;

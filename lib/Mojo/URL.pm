@@ -7,9 +7,9 @@ use overload
 
 use Mojo::Parameters;
 use Mojo::Path;
-use Mojo::Util qw/punycode_decode punycode_encode url_escape url_unescape/;
+use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
 
-has [qw/fragment host port scheme userinfo/];
+has [qw(fragment host port scheme userinfo)];
 has base => sub { Mojo::URL->new };
 
 # Characters (RFC 3986)

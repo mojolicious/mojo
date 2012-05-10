@@ -2,7 +2,7 @@ package Mojolicious::Plugin::EPRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Template;
-use Mojo::Util qw/encode md5_sum/;
+use Mojo::Util qw(encode md5_sum);
 
 # "What do you want?
 #  I'm here to kick your ass!
@@ -31,8 +31,8 @@ sub register {
         my $mt = Mojo::Template->new($template);
 
         # Be a bit more relaxed for helpers
-        my $prepend = q/my $self = shift; use Scalar::Util 'weaken';/
-          . q/weaken $self; no strict 'refs'; no warnings 'redefine';/;
+        my $prepend = q[my $self = shift; use Scalar::Util 'weaken';]
+          . q[weaken $self; no strict 'refs'; no warnings 'redefine';];
 
         # Helpers
         $prepend .= 'my $_H = $self->app->renderer->helpers;';

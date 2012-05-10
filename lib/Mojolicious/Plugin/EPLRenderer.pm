@@ -2,7 +2,7 @@ package Mojolicious::Plugin::EPLRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Template;
-use Mojo::Util qw/encode md5_sum/;
+use Mojo::Util qw(encode md5_sum);
 
 # "Clever things make people feel stupid and unexpected things make them feel
 #  scared."
@@ -49,21 +49,21 @@ sub register {
 
           # Try template
           if (-r $path) {
-            $c->app->log->debug(qq/Rendering template "$t"./);
-            $mt->name(qq/template "$t"/);
+            $c->app->log->debug(qq{Rendering template "$t".});
+            $mt->name(qq{template "$t"});
             $$output = $mt->render_file($path, $c);
           }
 
           # Try DATA section
           elsif (my $d = $r->get_data_template($options, $t)) {
             $c->app->log->debug(
-              qq/Rendering template "$t" from DATA section./);
-            $mt->name(qq/template "$t" from DATA section/);
+              qq{Rendering template "$t" from DATA section.});
+            $mt->name(qq{template "$t" from DATA section});
             $$output = $mt->render($d, $c);
           }
 
           # No template
-          else { $c->app->log->debug(qq/Template "$t" not found./) and return }
+          else { $c->app->log->debug(qq{Template "$t" not found.}) and return }
         }
 
         # Cache

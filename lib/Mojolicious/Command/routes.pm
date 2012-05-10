@@ -2,7 +2,7 @@ package Mojolicious::Command::routes;
 use Mojo::Base 'Mojo::Command';
 
 use re 'regexp_pattern';
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 
 has description => "Show available routes.\n";
 has usage       => <<"EOF";
@@ -65,7 +65,7 @@ sub _draw {
 
     # Name
     my $name = $node->[1]->name;
-    $name = qq/"$name"/ if $node->[1]->has_custom_name;
+    $name = qq{"$name"} if $node->[1]->has_custom_name;
     push @parts, $name . ' ' x ($length[2] - length $name);
 
     # Regex

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use IO::Socket::INET;
 use Scalar::Util 'weaken';
-use Socket qw/IPPROTO_TCP SO_ERROR TCP_NODELAY/;
+use Socket qw(IPPROTO_TCP SO_ERROR TCP_NODELAY);
 
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}

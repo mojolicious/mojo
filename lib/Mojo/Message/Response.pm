@@ -5,7 +5,7 @@ use Mojo::Cookie::Response;
 use Mojo::Date;
 use Mojo::Util 'get_line';
 
-has [qw/code message/];
+has [qw(code message)];
 
 # Umarked codes are from RFC 2616
 my %MESSAGES = (

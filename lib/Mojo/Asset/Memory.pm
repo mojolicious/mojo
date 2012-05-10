@@ -48,8 +48,8 @@ sub get_chunk {
 
 sub move_to {
   my ($self, $path) = @_;
-  croak qq/Can't open file "$path": $!/ unless open my $file, '>', $path;
-  croak qq/Can't write to file "$path": $!/
+  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
+  croak qq{Can't write to file "$path": $!}
     unless defined $file->syswrite($self->{content});
   return $self;
 }

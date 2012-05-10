@@ -5,7 +5,7 @@ use Mojo::Base 'Mojo::Transaction';
 #  I can't think of a way to finish that sentence."
 use Config;
 use Mojo::Transaction::HTTP;
-use Mojo::Util qw/b64_encode decode encode sha1_bytes/;
+use Mojo::Util qw(b64_encode decode encode sha1_bytes);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 

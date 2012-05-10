@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::Command';
 
 use Mojolicious;
 
-has description => qq/Generate "Makefile.PL".\n/;
+has description => qq{Generate "Makefile.PL".\n};
 has usage       => "usage: $0 generate makefile\n";
 
 # "If we don't go back there and make that event happen,

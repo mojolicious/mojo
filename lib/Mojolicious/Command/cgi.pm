@@ -1,7 +1,7 @@
 package Mojolicious::Command::cgi;
 use Mojo::Base 'Mojo::Command';
 
-use Getopt::Long qw/GetOptions :config no_auto_abbrev no_ignore_case/;
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::CGI;
 
 has description => "Start application with CGI.\n";

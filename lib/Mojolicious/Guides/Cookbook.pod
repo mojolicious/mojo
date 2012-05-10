@@ -1039,7 +1039,7 @@ that they will be picked up automatically by the command line interface?
     # Leak secret passphrase
     if ($whatever eq 'secret') {
       my $secret = $self->app->secret;
-      say qq/The secret of this application is "$secret"./;
+      say qq{The secret of this application is "$secret".};
     }
   }
 

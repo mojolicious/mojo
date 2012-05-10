@@ -24,7 +24,7 @@ patch 'more_tags';
 get 'small_tags';
 
 # GET|POST /links
-any [qw/GET POST/] => 'links';
+any [qw(GET POST)] => 'links';
 
 # GET /script
 get 'script';
@@ -45,7 +45,7 @@ get 'form/:test' => 'form';
 put 'selection';
 
 # PATCH|POST /☃
-any [qw/PATCH POST/] => '/☃' => 'snowman';
+any [qw(PATCH POST)] => '/☃' => 'snowman';
 
 # POST /no_snowman
 post '/no_snowman';
@@ -464,10 +464,10 @@ __DATA__
 <%= input_tag 'a', value => 'c' %>
 
 @@ selection.html.ep
-% param a => qw/b g/ if param 'preselect';
+% param a => qw(b g) if param 'preselect';
 %= form_for selection => begin
   %= select_field a => ['b', {c => ['<d', [ E => 'e'], 'f']}, 'g']
-  %= select_field foo => [qw/bar baz/], multiple => 'multiple'
+  %= select_field foo => [qw(bar baz)], multiple => 'multiple'
   %= select_field bar => [['D' => 'd', disabled => 'disabled'], 'baz']
   %= submit_button
 %= end

@@ -7,14 +7,14 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 
 # Common headers
 my @HEADERS = (
-  qw/Accept Accept-Language Accept-Ranges Authorization Connection/,
-  qw/Cache-Control Content-Disposition Content-Length Content-Range/,
-  qw/Content-Transfer-Encoding Content-Type Cookie DNT Date ETag Expect/,
-  qw/Expires Host If-Modified-Since Last-Modified Location/,
-  qw/Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept/,
-  qw/Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol/,
-  qw/Sec-WebSocket-Version Server Set-Cookie Status Trailer/,
-  qw/Transfer-Encoding Upgrade User-Agent WWW-Authenticate/
+  qw(Accept Accept-Language Accept-Ranges Authorization Connection),
+  qw(Cache-Control Content-Disposition Content-Length Content-Range),
+  qw(Content-Transfer-Encoding Content-Type Cookie DNT Date ETag Expect),
+  qw(Expires Host If-Modified-Since Last-Modified Location),
+  qw(Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept),
+  qw(Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol),
+  qw(Sec-WebSocket-Version Server Set-Cookie Status Trailer),
+  qw(Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
 );
 {
   no strict 'refs';

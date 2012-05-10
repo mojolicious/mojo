@@ -8,13 +8,13 @@ use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
 use Mojo::Util 'md5_sum';
-use Scalar::Util qw/blessed weaken/;
+use Scalar::Util qw(blessed weaken);
 use Time::HiRes 'time';
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
 has client_class => 'Mojo::IOLoop::Client';
-has [qw/lock unlock/];
+has [qw(lock unlock)];
 has max_accepts     => 0;
 has max_connections => 1000;
 has reactor         => sub {

@@ -56,7 +56,7 @@ my $modules = $loader->search('LoaderTest');
 my @modules = sort @$modules;
 
 # Search
-is_deeply \@modules, [qw/LoaderTest::A LoaderTest::B LoaderTest::C/],
+is_deeply \@modules, [qw(LoaderTest::A LoaderTest::B LoaderTest::C)],
   'found the right modules';
 
 # Load

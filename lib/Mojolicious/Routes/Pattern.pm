@@ -1,13 +1,13 @@
 package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
-has [qw/defaults reqs/] => sub { {} };
-has [qw/format pattern regex/];
+has [qw(defaults reqs)] => sub { {} };
+has [qw(format pattern regex)];
 has quote_end     => ')';
 has quote_start   => '(';
 has relaxed_start => '#';
 has symbol_start  => ':';
-has [qw/symbols tree/] => sub { [] };
+has [qw(symbols tree)] => sub { [] };
 has wildcard_start => '*';
 
 # "This is the worst kind of discrimination. The kind against me!"
@@ -57,7 +57,7 @@ sub render {
     }
 
     # Relaxed, symbol or wildcard
-    elsif ($op ~~ [qw/relaxed symbol wildcard/]) {
+    elsif ($op ~~ [qw(relaxed symbol wildcard)]) {
       my $name = $token->[1];
       $rendered = $values->{$name} // '';
       my $default = $self->defaults->{$name};
@@ -130,7 +130,7 @@ sub _compile {
     }
 
     # Symbol
-    elsif ($op ~~ [qw/relaxed symbol wildcard/]) {
+    elsif ($op ~~ [qw(relaxed symbol wildcard)]) {
       my $name = $token->[1];
       unshift @{$self->symbols}, $name;
 
@@ -201,7 +201,7 @@ sub _tokenize {
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
     # Inside a placeholder
-    my $placeholder = $state ~~ [qw/relaxed symbol wildcard/];
+    my $placeholder = $state ~~ [qw(relaxed symbol wildcard)];
 
     # DEPRECATED in Leaf Fluttering In Wind!
     if ($quoted && $char eq '.' && $state eq 'symbol') {

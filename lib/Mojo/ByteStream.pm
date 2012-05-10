@@ -7,10 +7,10 @@ use Mojo::Util;
 
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
-  qw/b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum/,
-  qw/html_escape html_unescape md5_bytes md5_sum punycode_decode/,
-  qw/punycode_encode qp_decode qp_encode quote sha1_bytes sha1_sum trim/,
-  qw/unquote url_escape url_unescape xml_escape/
+  qw(b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum),
+  qw(html_escape html_unescape md5_bytes md5_sum punycode_decode),
+  qw(punycode_encode qp_decode qp_encode quote sha1_bytes sha1_sum trim),
+  qw(unquote url_escape url_unescape xml_escape)
 );
 {
   no strict 'refs';

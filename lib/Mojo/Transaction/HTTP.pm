@@ -83,8 +83,8 @@ sub keep_alive {
   return 1 if $req_conn eq 'keep-alive' || $res_conn eq 'keep-alive';
 
   # No keep alive for 0.9 and 1.0
-  return if $req->version ~~ [qw/0.9 1.0/];
-  return if $res->version ~~ [qw/0.9 1.0/];
+  return if $req->version ~~ [qw(0.9 1.0)];
+  return if $res->version ~~ [qw(0.9 1.0)];
 
   return 1;
 }

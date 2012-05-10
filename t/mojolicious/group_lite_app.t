@@ -186,7 +186,7 @@ get '/no_format' => {text => 'No format detection.'};
 
 # GET /some_formats.txt
 # GET /some_formats.html
-get '/some_formats' => [format => [qw/txt json/]] =>
+get '/some_formats' => [format => [qw(txt json)]] =>
   {text => 'Some format detection.'};
 
 # GET /no_real_format.xml

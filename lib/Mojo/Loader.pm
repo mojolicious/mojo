@@ -2,7 +2,7 @@ package Mojo::Loader;
 use Mojo::Base -base;
 
 use File::Basename 'fileparse';
-use File::Spec::Functions qw/catdir catfile splitdir/;
+use File::Spec::Functions qw(catdir catfile splitdir);
 use Mojo::Command;
 use Mojo::Exception;
 
@@ -71,7 +71,7 @@ Mojo::Loader - Loader
 
     # And load them safely
     my $e = $loader->load($module);
-    warn qq/Loading "$module" failed: $e/ if ref $e;
+    warn qq{Loading "$module" failed: $e} if ref $e;
   }
 
 =head1 DESCRIPTION

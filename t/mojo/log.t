@@ -26,7 +26,7 @@ like(
 $log = Mojo::Log->new;
 like $log->format(debug => 'Test 123.'), qr/^\[.*\] \[debug\] Test 123\.\n$/,
   'right format';
-like $log->format(qw/debug Test 1 2 3/),
+like $log->format(qw(debug Test 1 2 3)),
   qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
 
 # Events
@@ -38,18 +38,18 @@ $log->unsubscribe('message')->on(
   }
 );
 $log->info('Whatever.');
-is_deeply $messages, [qw/info Whatever./], 'right messages';
+is_deeply $messages, [qw(info Whatever.)], 'right messages';
 $log->level('error')->info('Again.');
-is_deeply $messages, [qw/info Whatever./], 'right messages';
+is_deeply $messages, [qw(info Whatever.)], 'right messages';
 $log->fatal('Test', 123);
-is_deeply $messages, [qw/info Whatever. fatal Test 123/], 'right messages';
+is_deeply $messages, [qw(info Whatever. fatal Test 123)], 'right messages';
 $messages = [];
 $log->level('debug')->log(info => 'Whatever.');
-is_deeply $messages, [qw/info Whatever./], 'right messages';
+is_deeply $messages, [qw(info Whatever.)], 'right messages';
 $log->level('error')->log(info => 'Again.');
-is_deeply $messages, [qw/info Whatever./], 'right messages';
+is_deeply $messages, [qw(info Whatever.)], 'right messages';
 $log->log(fatal => 'Test', 1, 2, 3);
-is_deeply $messages, [qw/info Whatever. fatal Test 1 2 3/], 'right messages';
+is_deeply $messages, [qw(info Whatever. fatal Test 1 2 3)], 'right messages';
 
 # "debug"
 is $log->level('debug')->level, 'debug', 'right level';

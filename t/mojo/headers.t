@@ -29,7 +29,7 @@ $hash = $headers->to_hash(1);
 is_deeply $hash->{Connection},     [['close']],        'right structure';
 is_deeply $hash->{Expect},         [['continue-100']], 'right structure';
 is_deeply $hash->{'Content-Type'}, [['text/html']],    'right structure';
-is_deeply [sort @{$headers->names}], [qw/Connection Content-Type Expect/],
+is_deeply [sort @{$headers->names}], [qw(Connection Content-Type Expect)],
   'right structure';
 $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
 $headers->cache_control('public');

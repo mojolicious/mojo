@@ -7,8 +7,8 @@ use overload
 
 use Scalar::Util 'blessed';
 
-has [qw/frames line lines_before lines_after/] => sub { [] };
-has [qw/message raw_message/] => 'Exception!';
+has [qw(frames line lines_before lines_after)] => sub { [] };
+has [qw(message raw_message)] => 'Exception!';
 has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 };
 
 # "Attempted murder? Now honestly, what is that?
@@ -126,7 +126,7 @@ sub _detect {
       my $num  = shift;
       my $new  = "$name line $num";
       my $line = $lines[0]->[$num];
-      $new .= qq/, near "$line"/ if defined $line;
+      $new .= qq{, near "$line"} if defined $line;
       return $new .= '.';
     };
     $message =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;

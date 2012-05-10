@@ -5,7 +5,7 @@ use Carp 'croak';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-has [qw/kept_alive local_address local_port previous remote_port/];
+has [qw(kept_alive local_address local_port previous remote_port)];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
@@ -34,7 +34,7 @@ sub is_websocket {undef}
 
 sub is_writing {
   return 1 unless my $state = shift->{state};
-  return $state ~~ [qw/write write_start_line write_headers write_body/];
+  return $state ~~ [qw(write write_start_line write_headers write_body)];
 }
 
 sub remote_address {

@@ -249,7 +249,7 @@ $stream = b("fo\no b<a>r")->html_escape('o<');
 is "$stream", "f&#111;\n&#111; b&LT;a>r", 'right html escaped result';
 
 # xml_escape
-$stream = b(qq/la<f>\nbar"baz"'yada\n'&lt;la/)->xml_escape;
+$stream = b(qq{la<f>\nbar"baz"'yada\n'&lt;la})->xml_escape;
 is "$stream", "la&lt;f&gt;\nbar&quot;baz&quot;&#39;yada\n&#39;&amp;lt;la",
   'right xml escaped result';
 

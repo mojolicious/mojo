@@ -83,7 +83,7 @@ is_deeply $hash, {}, 'decode {}';
 $hash = $json->decode('{"foo": "bar"}');
 is_deeply $hash, {foo => 'bar'}, 'decode {"foo": "bar"}';
 $hash = $json->decode('{"foo": [23, "bar"]}');
-is_deeply $hash, {foo => [qw/23 bar/]}, 'decode {"foo": [23, "bar"]}';
+is_deeply $hash, {foo => [qw(23 bar)]}, 'decode {"foo": [23, "bar"]}';
 
 # Decode full spec example
 $hash = $json->decode(<<EOF);

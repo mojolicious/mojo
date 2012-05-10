@@ -8,10 +8,10 @@ use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
 use Scalar::Util 'weaken';
 
-has base_classes => sub { [qw/Mojolicious::Controller Mojo/] };
+has base_classes => sub { [qw(Mojolicious::Controller Mojo)] };
 has cache        => sub { Mojo::Cache->new };
-has [qw/conditions shortcuts/] => sub { {} };
-has hidden => sub { [qw/attr has new/] };
+has [qw(conditions shortcuts)] => sub { {} };
+has hidden => sub { [qw(attr has new)] };
 has 'namespace';
 
 sub add_condition {
@@ -102,7 +102,7 @@ sub route {
 sub _callback {
   my ($self, $c, $field, $staging) = @_;
   $c->stash->{'mojo.routed'}++;
-  $c->app->log->debug(qq/Routing to a callback./);
+  $c->app->log->debug('Routing to a callback.');
   my $continue = $field->{cb}->($c);
   return !$staging || $continue ? 1 : undef;
 }
@@ -133,7 +133,7 @@ sub _controller {
   my $continue;
   my $class = ref $app;
   if (my $sub = $app->can('handler')) {
-    $c->app->log->debug(qq/Routing to application "$class"./);
+    $c->app->log->debug(qq{Routing to application "$class".});
 
     # Try to connect routes
     if (my $sub = $app->can('routes')) {
@@ -146,7 +146,7 @@ sub _controller {
   # Action
   elsif (my $method = $self->_method($field, $c)) {
     my $log = $c->app->log;
-    $log->debug(qq/Routing to controller "$class" and action "$method"./);
+    $log->debug(qq{Routing to controller "$class" and action "$method".});
 
     # Try to call action
     my $stash = $c->stash;
@@ -170,7 +170,7 @@ sub _load {
   if (my $e = Mojo::Loader->load($app)) {
 
     # Doesn't exist
-    $c->app->log->debug(qq/Controller "$app" does not exist./) and return
+    $c->app->log->debug(qq{Controller "$app" does not exist.}) and return
       unless ref $e;
 
     # Error
@@ -178,7 +178,7 @@ sub _load {
   }
 
   # Check base classes
-  $c->app->log->debug(qq/Class "$app" is not a controller./) and return
+  $c->app->log->debug(qq{Class "$app" is not a controller.}) and return
     unless first { $app->isa($_) } @{$self->base_classes};
   return ++$self->{loaded}{$app};
 }
@@ -189,11 +189,11 @@ sub _method {
   # Hidden
   $self->{hiding} = {map { $_ => 1 } @{$self->hidden}} unless $self->{hiding};
   return unless my $method = $field->{action};
-  $c->app->log->debug(qq/Action "$method" is not allowed./) and return
+  $c->app->log->debug(qq{Action "$method" is not allowed.}) and return
     if $self->{hiding}{$method} || index($method, '_') == 0;
 
   # Invalid
-  $c->app->log->debug(qq/Action "$method" is invalid./) and return
+  $c->app->log->debug(qq{Action "$method" is invalid.}) and return
     unless $method =~ /^[a-zA-Z0-9_:]+$/;
 
   return $method;
@@ -308,7 +308,7 @@ Contains all available conditions.
 =head2 C<hidden>
 
   my $hidden = $r->hidden;
-  $r         = $r->hidden([qw/attr has new/]);
+  $r         = $r->hidden([qw(attr has new)]);
 
 Controller methods and attributes that are hidden from routes, defaults to
 C<attr>, C<has> and C<new>.
@@ -358,7 +358,7 @@ Match routes with L<Mojolicious::Routes::Match> and dispatch.
 
 =head2 C<hide>
 
-  $r = $r->hide(qw/foo bar/);
+  $r = $r->hide(qw(foo bar));
 
 Hide controller methods and attributes from routes.
 

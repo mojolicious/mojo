@@ -13,7 +13,7 @@ usage: $0 generate GENERATOR [OPTIONS]
 These generators are currently available:
 EOF
 has namespaces =>
-  sub { [qw/Mojolicious::Command::generate Mojo::Command::generate/] };
+  sub { [qw(Mojolicious::Command::generate Mojo::Command::generate)] };
 has usage => "usage: $0 generate GENERATOR [OPTIONS]\n";
 
 sub help { shift->run(@_) }

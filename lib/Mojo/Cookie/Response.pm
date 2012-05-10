@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util 'quote';
 
-has [qw/domain httponly max_age path secure/];
+has [qw(domain httponly max_age path secure)];
 
 sub expires {
   my $self = shift;

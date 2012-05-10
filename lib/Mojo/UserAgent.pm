@@ -764,7 +764,7 @@ Value for C<User-Agent> request header, defaults to C<Mojolicious (Perl)>.
 =head2 C<no_proxy>
 
   my $no_proxy = $ua->no_proxy;
-  $ua          = $ua->no_proxy(['localhost', 'intranet.mojolicio.us']);
+  $ua          = $ua->no_proxy([qw(localhost intranet.mojolicio.us)]);
 
 Domains that don't require a proxy server to be used.
 

@@ -369,7 +369,7 @@ current parent if necessary.
 =head2 C<any>
 
   my $route = $r->any('/:foo' => sub {...});
-  my $route = $r->any(['GET', 'POST'] => '/:foo' => sub {...});
+  my $route = $r->any([qw(GET POST)] => '/:foo' => sub {...});
 
 Generate route matching any of the listed HTTP request methods or all. See
 also the L<Mojolicious::Lite> tutorial for more argument variations.

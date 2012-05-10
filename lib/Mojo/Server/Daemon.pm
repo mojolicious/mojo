@@ -371,7 +371,7 @@ List of one or more locations to listen on, defaults to the value of the
 C<MOJO_LISTEN> environment variable or C<http://*:3000>.
 
   # Listen on two ports with HTTP and HTTPS at the same time
-  $daemon->listen(['http://*:3000', 'https://*:4000']);
+  $daemon->listen([qw(http://*:3000 https://*:4000)]);
 
   # Use a custom certificate and key
   $daemon->listen(['https://*:3000?cert=/x/server.crt&key=/y/server.key']);

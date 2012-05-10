@@ -425,7 +425,7 @@ Charset used for decoding and encoding HTML5/XML.
 =head2 C<tree>
 
   my $tree = $html->tree;
-  $html    = $html->tree(['root', ['text', 'lalala']]);
+  $html    = $html->tree(['root', [qw(text lalala)]]);
 
 Document Object Model.
 

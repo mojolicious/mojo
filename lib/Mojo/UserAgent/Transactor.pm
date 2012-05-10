@@ -279,7 +279,7 @@ Actual endpoint for transaction.
 
   my $tx = $t->form('kraih.com' => {a => 'b'});
   my $tx = $t->form('http://kraih.com' => {a => 'b'});
-  my $tx = $t->form('http://kraih.com' => {a => ['b', 'c', 'd']});
+  my $tx = $t->form('http://kraih.com' => {a => [qw(b c d)]});
   my $tx = $t->form('http://kraih.com' => {mytext => {file => '/foo.txt'}});
   my $tx = $t->form('http://kraih.com' => {mytext => {content => 'lalala'}});
   my $tx = $t->form('http://kraih.com' => {

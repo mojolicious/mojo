@@ -407,7 +407,7 @@ Routes can be restricted to specific request methods.
   };
 
   # GET|POST|PATCH /bye
-  any ['GET', 'POST', 'PATCH'] => '/bye' => sub {
+  any [qw(GET POST PATCH)] => '/bye' => sub {
     my $self = shift;
     $self->render(text => 'Bye World!');
   };
@@ -442,7 +442,7 @@ just make a list of possible values.
 
   # /test
   # /123
-  any '/:foo' => [foo => ['test', 123]] => sub {
+  any '/:foo' => [foo => [qw(test 123)]] => sub {
     my $self = shift;
     my $foo  = $self->param('foo');
     $self->render(text => "Our :foo placeholder matched $foo");
@@ -577,7 +577,7 @@ Restrictive placeholders can also be used.
 
   # /hello.json
   # /hello.txt
-  get '/hello' => [format => ['json', 'txt']] => sub {
+  get '/hello' => [format => [qw(json txt)]] => sub {
     my $self = shift;
     return $self->render_json({hello => 'world'})
       if $self->stash('format') eq 'json';
@@ -835,7 +835,7 @@ L<Mojolicious::Lite> implements the following functions.
 =head2 C<any>
 
   my $route = any '/:foo' => sub {...};
-  my $route = any ['GET', 'POST'] => '/:foo' => sub {...};
+  my $route = any [qw(GET POST)] => '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the
 listed HTTP request methods or all. See also the tutorial above for more

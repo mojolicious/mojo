@@ -706,7 +706,7 @@ Render this element and its content to XML.
 =head2 C<tree>
 
   my $tree = $dom->tree;
-  $dom     = $dom->tree(['root', ['text', 'lalala']]);
+  $dom     = $dom->tree(['root', [qw(text lalala)]]);
 
 Alias for L<Mojo::DOM::HTML/"tree">.
 

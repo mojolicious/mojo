@@ -100,7 +100,7 @@ don't really know what they actually want.
 
   my $type = $types->type('png');
   $types   = $types->type(png => 'image/png');
-  $types   = $types->type(json => ['application/json', 'text/x-json']);
+  $types   = $types->type(json => [qw(application/json text/x-json)]);
 
 Get or set MIME types for file extension, alternatives are only used for
 detection.

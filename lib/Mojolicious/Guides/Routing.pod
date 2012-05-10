@@ -366,7 +366,7 @@ just make a list of possible values.
   # /bender -> {controller => 'foo', action => 'bar', name => 'bender'}
   # /leela  -> {controller => 'foo', action => 'bar', name => 'leela'}
   # /fry    -> undef
-  $r->route('/:name', name => ['bender', 'leela'])
+  $r->route('/:name', name => [qw(bender leela)])
     ->to(controller => 'foo', action => 'bar');
 
 You can also adjust the regular expressions behind placeholders to better suit
@@ -409,7 +409,7 @@ Restrictive placeholders can also be used.
   # /foo.rss -> {controller => 'foo', action => 'bar', format => 'rss'}
   # /foo.xml -> {controller => 'foo', action => 'bar', format => 'xml'}
   # /foo.txt -> undef
-  $r->route('/foo', format => ['rss', 'xml'])
+  $r->route('/foo', format => [qw(rss xml)])
     ->to(controller => 'foo', action => 'bar');
 
 Or you can just disable format detection, which gets inherited by nested
@@ -427,7 +427,7 @@ routes and allows selective re-enabling.
   # /baz.xml  -> undef
   my $inactive = $r->route(format => 0);
   $inactive->route('/foo')->to('foo#none');
-  $inactive->route('/baz', format => ['txt', 'html'])->to('bar#baz');
+  $inactive->route('/baz', format => [qw(txt html)])->to('bar#baz');
 
 =head2 Named routes
 
@@ -533,7 +533,7 @@ and also part of the normal router.
 
   # * /yada.txt  -> {controller => 'foo', action => 'yada', format => 'txt'}
   # * /yada.json -> {controller => 'foo', action => 'yada', format => 'json'}
-  $r->any('/yada' => [format => ['txt', 'json']])->to('foo#yada');
+  $r->any('/yada' => [format => [qw(txt json)]])->to('foo#yada');
 
   # GET /foo/bar  -> {controller => 'foo', action => 'bar'}
   # PUT /foo/baz  -> {controller => 'foo', action => 'baz'}

@@ -254,7 +254,7 @@ Any of the native Perl data types can be passed to templates through the
 L<Mojolicious::Controller/"stash">.
 
   $self->stash(author     => 'Sebastian');
-  $self->stash(frameworks => ['Catalyst', 'Mojolicious']);
+  $self->stash(frameworks => [qw(Catalyst Mojolicious)]);
   $self->stash(examples   => {tweetylicious => 'a microblogging app'});
 
   %= $author

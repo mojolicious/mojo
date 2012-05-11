@@ -42,7 +42,7 @@ sub AUTOLOAD {
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
-  Carp::croak(qq[Undefined subroutine &${package}::$method called])
+  Carp::croak("Undefined subroutine &${package}::$method called")
     unless Scalar::Util::blessed($self) && $self->isa(__PACKAGE__);
 
   # Call helper

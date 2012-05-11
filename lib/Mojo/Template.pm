@@ -65,7 +65,7 @@ sub build {
       if ($type eq 'text') {
 
         # Quote and fix line ending
-        $value = quotemeta($value);
+        $value = quotemeta $value;
         $value .= '\n' if $newline;
         $lines[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
       }
@@ -368,23 +368,31 @@ Mojo::Template - Perl-ish templates!
 
   # Simple
   my $output = $mt->render(<<'EOF');
+  % use Time::Piece;
   <!DOCTYPE html>
   <html>
     <head><title>Simple</title></head>
-    <body>Time: <%= localtime(time) %></body>
+    % my $now = localtime;
+    <body>Time: <%= $now->hms %></body>
   </html>
   EOF
   say $output;
 
   # More complicated
   my $output = $mt->render(<<'EOF', 23, 'foo bar');
-  %= 5 * 5
   % my ($number, $text) = @_;
-  test 123
-  foo <% my $i = $number + 2; %>
-  % for (1 .. 23) {
-  * some text <%= $i++ %>
-  % }
+  %= 5 * 5
+  <!DOCTYPE html>
+  <html>
+    <head><title>Simple</title></head>
+    <body>
+      test 123
+      foo <% my $i = $number + 2; %>
+      % for (1 .. 23) {
+      * some text <%= $i++ %>
+      % }
+    </body>
+  </html>
   EOF
   say $output;
 

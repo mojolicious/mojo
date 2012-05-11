@@ -378,13 +378,13 @@ Mojo::Template - Perl-ish templates!
   EOF
   say $output;
 
-  # More complicated
+  # More advanced
   my $output = $mt->render(<<'EOF', 23, 'foo bar');
   % my ($number, $text) = @_;
   %= 5 * 5
   <!DOCTYPE html>
   <html>
-    <head><title>Simple</title></head>
+    <head><title>More advanced</title></head>
     <body>
       test 123
       foo <% my $i = $number + 2; %>

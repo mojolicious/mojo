@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 204;
+use Test::More tests => 214;
 
 # "When I held that gun in my hand, I felt a surge of power...
 #  like God must feel when he's holding a gun."
@@ -1050,7 +1050,6 @@ like "$output", qr/exception\.mt line 2/, 'right result';
 
 # Exception in file (different name)
 $mt     = Mojo::Template->new;
-$file   = catfile(splitdir($FindBin::Bin), qw(lib exception.mt));
 $output = $mt->name('foo.mt')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/foo\.mt line 2/, 'message contains file name';
@@ -1062,11 +1061,26 @@ is $output->lines_after->[0]->[0], 3,     'right number';
 is $output->lines_after->[0]->[1], '123', 'right line';
 like "$output", qr/foo\.mt line 2/, 'right result';
 
+# Exception in file (rendering to file)
+$mt = Mojo::Template->new;
+my $dir = File::Temp::tempdir(CLEANUP => 1);
+my $file2 = catfile $dir, 'test1.mt';
+$output = $mt->render_file_to_file($file, $file2);
+ok !-e $file2, 'file has not been rendered';
+isa_ok $output, 'Mojo::Exception', 'right exception';
+like $output->message, qr/exception\.mt line 2/, 'message contains file name';
+is $output->lines_before->[0]->[0], 1,      'right number';
+is $output->lines_before->[0]->[1], 'test', 'right line';
+is $output->line->[0], 2,        'right number';
+is $output->line->[1], '% die;', 'right line';
+is $output->lines_after->[0]->[0], 3,     'right number';
+is $output->lines_after->[0]->[1], '123', 'right line';
+like "$output", qr/exception\.mt line 2/, 'right result';
+
 # File to file with utf8 data
 $mt = Mojo::Template->new;
 $mt->tag_start('[$-');
 $mt->tag_end('-$]');
-my $dir = File::Temp::tempdir(CLEANUP => 1);
 $file = catfile $dir, 'test.mt';
 is $mt->render_to_file(<<"EOF", $file), undef, 'file rendered';
 <% my \$i = 23; %> foo bar
@@ -1074,7 +1088,7 @@ is $mt->render_to_file(<<"EOF", $file), undef, 'file rendered';
 test
 EOF
 $mt = Mojo::Template->new;
-my $file2 = catfile $dir, 'test2.mt';
+$file2 = catfile $dir, 'test2.mt';
 is $mt->render_file_to_file($file, $file2), undef, 'file rendered to file';
 $mt     = Mojo::Template->new;
 $output = $mt->render_file($file2);

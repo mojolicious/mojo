@@ -674,9 +674,9 @@ Compile template.
 Interpret template.
 
   # Reuse template
-  say $mt->render('Result <%= $_[0] + $_[1] %>', 1, 1);
-  say $mt->interpret(2, 2);
-  say $mt->interpret(3, 3);
+  say $mt->render('Hello <%= $_[0] %>!', 'Bender');
+  say $mt->interpret('Fry');
+  say $mt->interpret('Leela');
 
 =head2 C<parse>
 
@@ -691,27 +691,29 @@ Parse template.
 
 Render template.
 
+  say $mt->render('Hello <%= $_[0] %>!', 'Bender');
+
 =head2 C<render_file>
 
-  my $output = $mt->render_file($template_file);
-  my $output = $mt->render_file($template_file, @args);
+  my $output = $mt->render_file('/tmp/foo.mt');
+  my $output = $mt->render_file('/tmp/foo.mt', @args);
 
 Render template file.
 
 =head2 C<render_file_to_file>
 
-  my $exception = $mt->render_file_to_file($template_file, $output_file);
+  my $exception = $mt->render_file_to_file('/tmp/foo.mt', '/tmp/foo.txt');
   my $exception
-    = $mt->render_file_to_file($template_file, $output_file, @args);
+    = $mt->render_file_to_file('/tmp/foo.mt', '/tmp/foo.txt', @args);
 
-Render template file to a specific file.
+Render template file to another file.
 
 =head2 C<render_to_file>
 
-  my $exception = $mt->render_to_file($template, $output_file);
-  my $exception = $mt->render_to_file($template, $output_file, @args);
+  my $exception = $mt->render_to_file($template, '/tmp/foo.txt');
+  my $exception = $mt->render_to_file($template, '/tmp/foo.txt', @args);
 
-Render template to a specific file.
+Render template to a file.
 
 =head1 SEE ALSO
 

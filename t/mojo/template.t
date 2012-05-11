@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 202;
+use Test::More tests => 204;
 
 # "When I held that gun in my hand, I felt a surge of power...
 #  like God must feel when he's holding a gun."
@@ -789,6 +789,10 @@ $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
 </html>
 EOF
 is $output, "<html>\ntest bar\n</html>\n", 'arguments';
+is $mt->interpret('tset', {foo => 'baz'}), "<html>\ntset baz\n</html>\n",
+  'arguments again';
+is $mt->interpret('tset', {foo => 'yada'}), "<html>\ntset yada\n</html>\n",
+  'arguments again';
 
 # Ugly multiline loop
 $mt     = Mojo::Template->new;

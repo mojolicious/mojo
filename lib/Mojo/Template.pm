@@ -286,9 +286,8 @@ sub parse {
 }
 
 sub render {
-  my $self = shift;
-  my $e    = $self->parse(shift)->build->compile;
-  return $e ? $e : $self->interpret(@_);
+  my $self = shift->parse(shift)->build;
+  return $self->compile || $self->interpret(@_);
 }
 
 sub render_file {
@@ -673,6 +672,11 @@ Compile template.
   my $output = $mt->interpret(@args);
 
 Interpret template.
+
+  # Reuse template
+  say $mt->render('Result <%= $_[0] + $_[1] %>', 1, 1);
+  say $mt->interpret(2, 2);
+  say $mt->interpret(3, 3);
 
 =head2 C<parse>
 

@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 203;
+use Test::More tests => 206;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -196,6 +196,11 @@ $path->merge('/bar/baz/');
 is "$path", '/bar/baz/', 'right path';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
+$path = Mojo::Path->new('/foo/bar');
+$path->merge(Mojo::Path->new('baz/yada'));
+is "$path", '/foo/baz/yada', 'right path';
+ok $path->leading_slash, 'has leading slash';
+ok !$path->trailing_slash, 'no trailing slash';
 
 # Empty path elements
 $path = Mojo::Path->new('//');

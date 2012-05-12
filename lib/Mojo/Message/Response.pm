@@ -136,7 +136,7 @@ sub _parse_start_line {
   # We have a full HTTP 1.0+ response line
   return unless defined(my $line = get_line \$self->{buffer});
   return $self->error('Bad response start line.')
-    unless $line =~ qr|^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$|;
+    unless $line =~ m|^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$|;
   $self->version($1)->code($2)->message($3);
   $self->content->auto_relax(1);
   $self->{state} = 'content';

@@ -65,7 +65,7 @@ sub merge {
   my ($self, $path) = @_;
 
   # Replace
-  return $self->parse($path) if $path =~ qr|^/|;
+  return $self->parse($path) if $path =~ m|^/|;
 
   # Merge
   pop @{$self->parts} unless $self->trailing_slash;

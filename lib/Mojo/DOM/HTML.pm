@@ -115,7 +115,7 @@ sub parse {
     if ($tag =~ $END_RE) { $self->_end($cs ? $1 : lc($1), \$current) }
 
     # Start
-    elsif ($tag =~ qr#([^\s/]+)([\s\S]*)#) {
+    elsif ($tag =~ m#([^\s/]+)([\s\S]*)#) {
       my ($start, $attr) = ($cs ? $1 : lc($1), $2);
 
       # Attributes

@@ -1,10 +1,9 @@
 This file documents the revision history for Perl extension Mojolicious.
 
-2.96  2012-05-12
+2.96  2012-05-13
   - Added merge method to Mojo::Path.
   - Improved documentation.
   - Improved tests.
-  - Fixed small stringification bugs in Mojo::Path.
 
 2.95  2012-05-10
   - Improved documentation.

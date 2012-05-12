@@ -220,8 +220,13 @@ sub to_string {
   my $authority = $self->authority;
   $url .= $url ? $authority : $authority ? "//$authority" : '';
 
-  # Path
-  $url .= $url ? $self->path->to_abs_string : $self->path->to_string;
+  # Relative path
+  my $path = $self->path;
+  if (!$url) { $url .= "$path" }
+
+  # Absolute path
+  elsif ($path->leading_slash) { $url .= "$path" }
+  else                         { $url .= @{$path->parts} ? "/$path" : '' }
 
   # Query
   my $query = join '', $self->query;

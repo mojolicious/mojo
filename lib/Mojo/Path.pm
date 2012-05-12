@@ -86,9 +86,8 @@ sub parse {
 }
 
 sub to_abs_string {
-  my $self   = shift;
-  my $string = $self->to_string;
-  return $self->leading_slash ? $string : length($string) ? "/$string" : '';
+  my $self = shift;
+  return $self->leading_slash ? "$self" : "/$self";
 }
 
 # "How is education supposed to make me feel smarter?

@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 210;
+use Test::More tests => 212;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -20,6 +20,9 @@ is $path->parts->[0], 'path', 'right part';
 is $path->parts->[1], undef,  'no part';
 ok !$path->leading_slash, 'no leading slash';
 ok $path->trailing_slash, 'has trailing slash';
+$path = Mojo::Path->new;
+is $path->to_string,     '',  'right result';
+is $path->to_abs_string, '/', 'right result';
 
 # Advanced
 $path = Mojo::Path->new('/AZaz09-._~!$&\'()*+,;=:@');

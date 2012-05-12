@@ -203,6 +203,7 @@ Check if path contains given prefix.
 
   $path = $path->merge('/foo/bar');
   $path = $path->merge('foo/bar');
+  $path = $path->merge(Mojo::Path->new('foo/bar'));
 
 Merge paths.
 

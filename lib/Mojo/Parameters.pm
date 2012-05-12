@@ -266,7 +266,7 @@ Clone parameters.
 
 =head2 C<merge>
 
-  $p = $p->merge($p2, $p3);
+  $p = $p->merge(Mojo::Parameters->new(foo => 'b;ar', baz => 23));
 
 Merge parameters.
 

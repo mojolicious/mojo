@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 188;
+use Test::More tests => 203;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -169,6 +169,33 @@ ok !$path->contains('/0/♥'),    'does not contain path';
 ok !$path->contains('/0/0.html'), 'does not contain path';
 ok !$path->contains('/0.html'),   'does not contain path';
 ok !$path->contains('/♥.html'), 'does not contain path';
+
+# Merge
+$path = Mojo::Path->new('/foo');
+$path->merge('bar/baz');
+is "$path", '/bar/baz', 'right path';
+ok $path->leading_slash, 'has leading slash';
+ok !$path->trailing_slash, 'no trailing slash';
+$path = Mojo::Path->new('/foo/');
+$path->merge('bar/baz');
+is "$path", '/foo/bar/baz', 'right path';
+ok $path->leading_slash, 'has leading slash';
+ok !$path->trailing_slash, 'no trailing slash';
+$path = Mojo::Path->new('/foo/');
+$path->merge('bar/baz/');
+is "$path", '/foo/bar/baz/', 'right path';
+ok $path->leading_slash,  'has leading slash';
+ok $path->trailing_slash, 'has trailing slash';
+$path = Mojo::Path->new('/foo/');
+$path->merge('/bar/baz');
+is "$path", '/bar/baz', 'right path';
+ok $path->leading_slash, 'has leading slash';
+ok !$path->trailing_slash, 'no trailing slash';
+$path = Mojo::Path->new('/foo/bar');
+$path->merge('/bar/baz/');
+is "$path", '/bar/baz/', 'right path';
+ok $path->leading_slash,  'has leading slash';
+ok $path->trailing_slash, 'has trailing slash';
 
 # Empty path elements
 $path = Mojo::Path->new('//');

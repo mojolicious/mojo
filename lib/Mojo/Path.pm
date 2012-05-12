@@ -61,6 +61,19 @@ sub contains {
   return @$parts ? undef : 1;
 }
 
+sub merge {
+  my ($self, $path) = @_;
+
+  # Replace
+  return $self->parse($path) if $path =~ qr|^/|;
+
+  # Merge
+  pop @{$self->parts} unless $self->trailing_slash;
+  $path = $self->new($path);
+  push @{$self->parts}, @{$path->parts};
+  return $self->leading_slash(1)->trailing_slash($path->trailing_slash);
+}
+
 sub parse {
   my ($self, $path) = @_;
 
@@ -185,6 +198,22 @@ Check if path contains given prefix.
   Mojo::Path->new('/foo/bar')->contains('/f');
   Mojo::Path->new('/foo/bar')->contains('/bar');
   Mojo::Path->new('/foo/bar')->contains('/whatever');
+
+=head2 C<merge>
+
+  $path = $path->merge('/foo/bar');
+  $path = $path->merge('foo/bar');
+
+Merge paths.
+
+  # "/baz/yada"
+  Mojo::Path->new('/foo/bar')->merge('/baz/yada');
+
+  # "/foo/baz/yada"
+  Mojo::Path->new('/foo/bar')->merge('baz/yada');
+
+  # "/foo/bar/baz/yada"
+  Mojo::Path->new('/foo/bar/')->merge('baz/yada');
 
 =head2 C<parse>
 

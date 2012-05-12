@@ -109,24 +109,11 @@ sub path {
   my ($self, $path) = @_;
 
   # Old path
-  return $self->{path} ||= Mojo::Path->new unless $path;
+  $self->{path} ||= Mojo::Path->new;
+  return $self->{path} unless $path;
 
   # New path
-  if (!ref $path) {
-
-    # Absolute path
-    if ($path =~ m#^/#) { $path = Mojo::Path->new($path) }
-
-    # Relative path
-    else {
-      my $new = Mojo::Path->new($path);
-      $path = $self->{path} || Mojo::Path->new;
-      pop @{$path->parts} unless $path->trailing_slash;
-      push @{$path->parts}, @{$new->parts};
-      $path->leading_slash(1)->trailing_slash($new->trailing_slash);
-    }
-  }
-  $self->{path} = $path;
+  $self->{path} = ref $path ? $path : $self->{path}->merge($path);
 
   return $self;
 }
@@ -189,15 +176,7 @@ sub to_abs {
   }
 
   # Merge paths
-  else {
-    my $new = $base_path->clone->leading_slash(1);
-
-    # Characters after the right-most '/' need to go
-    pop @{$new->parts} if @{$path->parts} && !$new->trailing_slash;
-    push @{$new->parts}, @{$path->parts};
-    $new->trailing_slash($path->trailing_slash) if @{$new->parts};
-    $abs->path($new->canonicalize);
-  }
+  else { $abs->path($base_path->clone->merge($path)->canonicalize) }
 
   return $abs;
 }

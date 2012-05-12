@@ -399,11 +399,14 @@ Parse URL.
 Path part of this URL, relative paths will be appended to the existing path,
 defaults to a L<Mojo::Path> object.
 
-  # "http://mojolicio.us/Mojo/DOM"
-  Mojo::URL->new('http://mojolicio.us/perldoc')->path('/Mojo/DOM');
+  # "http://mojolicio.us/DOM/HTML"
+  Mojo::URL->new('http://mojolicio.us/perldoc/Mojo')->path('/DOM/HTML');
 
-  # "http://mojolicio.us/perldoc/Mojo/DOM"
-  Mojo::URL->new('http://mojolicio.us/perldoc')->path('Mojo/DOM');
+  # "http://mojolicio.us/perldoc/DOM/HTML"
+  Mojo::URL->new('http://mojolicio.us/perldoc/Mojo')->path('DOM/HTML');
+
+  # "http://mojolicio.us/perldoc/Mojo/DOM/HTML"
+  Mojo::URL->new('http://mojolicio.us/perldoc/Mojo/')->path('DOM/HTML');
 
 =head2 C<query>
 

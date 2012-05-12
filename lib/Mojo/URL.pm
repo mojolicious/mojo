@@ -221,7 +221,7 @@ sub to_string {
   $url .= $url ? $authority : $authority ? "//$authority" : '';
 
   # Path
-  $url .= $self->path;
+  $url .= $url ? $self->path->to_abs_string : $self->path->to_string;
 
   # Query
   my $query = join '', $self->query;

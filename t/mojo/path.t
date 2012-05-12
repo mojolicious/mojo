@@ -196,10 +196,10 @@ $path->merge('/bar/baz/');
 is "$path", '/bar/baz/', 'right path';
 ok $path->leading_slash,  'has leading slash';
 ok $path->trailing_slash, 'has trailing slash';
-$path = Mojo::Path->new('/foo/bar');
-$path->merge(Mojo::Path->new('baz/yada'));
-is "$path", '/foo/baz/yada', 'right path';
-ok $path->leading_slash, 'has leading slash';
+$path = Mojo::Path->new('foo/bar');
+$path->merge('baz/yada');
+is "$path", 'foo/baz/yada', 'right path';
+ok !$path->leading_slash,  'no leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 
 # Empty path elements

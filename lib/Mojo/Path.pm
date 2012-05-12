@@ -71,7 +71,7 @@ sub merge {
   pop @{$self->parts} unless $self->trailing_slash;
   $path = $self->new($path);
   push @{$self->parts}, @{$path->parts};
-  return $self->leading_slash(1)->trailing_slash($path->trailing_slash);
+  return $self->trailing_slash($path->trailing_slash);
 }
 
 sub parse {
@@ -86,8 +86,9 @@ sub parse {
 }
 
 sub to_abs_string {
-  my $self = shift;
-  return $self->leading_slash ? $self->to_string : ('/' . $self->to_string);
+  my $self   = shift;
+  my $string = $self->to_string;
+  return $self->leading_slash ? $string : $string ? "/$string" : '';
 }
 
 # "How is education supposed to make me feel smarter?

@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 206;
+use Test::More tests => 210;
 
 # "This is the greatest case of false advertising I’ve seen since I sued the
 #  movie 'The Never Ending Story.'"
@@ -53,6 +53,11 @@ is $path->parts->[1], '0',    'right part';
 is $path->parts->[2], undef,  'no part';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
+$path = Mojo::Path->new('0');
+is $path->parts->[0], '0',   'right part';
+is $path->parts->[1], undef, 'no part';
+is $path->to_string,     '0',  'right result';
+is $path->to_abs_string, '/0', 'right result';
 
 # Canonicalizing
 $path = Mojo::Path->new(

@@ -145,19 +145,19 @@ $t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr#/bar/test#);
+  ->content_like(qr!/bar/test!);
 
 # Foo::index
 $t->get_ok('/foo', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr#<body>\s+23\nHello Mojo from the template /foo! He#);
+  ->content_like(qr|<body>\s+23\nHello Mojo from the template /foo! He|);
 
 # Foo::Bar::index
 $t->get_ok('/foo-bar', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr#Hello Mojo from the other template /foo-bar!#);
+  ->content_like(qr|Hello Mojo from the other template /foo-bar!|);
 
 # Foo::something
 $t->get_ok('/somethingtest', {'X-Test' => 'Hi there!'})->status_is(200)
@@ -194,7 +194,7 @@ $t->get_ok('/test2', {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr#/test2#);
+  ->content_like(qr!/test2!);
 
 # MojoliciousTestController::index
 $t->get_ok('/test3', {'X-Test' => 'Hi there!'})->status_is(200)
@@ -273,7 +273,7 @@ $tx->req->method('GET');
 $tx->req->url->parse('/foo');
 $app->handler($tx);
 is $tx->res->code, 200, 'right status';
-like $tx->res->body, qr#Hello Mojo from the template /foo! Hello World!#,
+like $tx->res->body, qr|Hello Mojo from the template /foo! Hello World!|,
   'right content';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
@@ -286,7 +286,7 @@ $tx->req->method('GET');
 $tx->req->url->parse('/foo');
 $app->handler($tx);
 is $tx->res->code, 200, 'right status';
-like $tx->res->body, qr#Hello Mojo from the template /foo! Hello World!#,
+like $tx->res->body, qr|Hello Mojo from the template /foo! Hello World!|,
   'right content';
 
 $t = Test::Mojo->new('SingleFileTestApp');
@@ -393,9 +393,9 @@ $t->get_ok('/shortcut/act')->status_is(200)
 # Session with domain
 $t->get_ok('/foo/session')->status_is(200)
   ->header_like('Set-Cookie' => qr/; domain=\.example\.com/)
-  ->header_like('Set-Cookie' => qr|; path=/bar|)
+  ->header_like('Set-Cookie' => qr!; path=/bar!)
   ->content_is('Bender rockzzz!');
 
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
-  ->content_like(qr#<\?xml version="1.0" encoding="UTF-8"\?><rss />#);
+  ->content_like(qr!<\?xml version="1.0" encoding="UTF-8"\?><rss />!);

@@ -313,7 +313,7 @@ is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
-ok $res->headers->content_type =~ m#multipart/form-data#,
+ok $res->headers->content_type =~ m!multipart/form-data!,
   'right "Content-Type" value';
 isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
@@ -346,7 +346,7 @@ is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
 ok $res->at_least_version('1.0'), 'at least version 1.0';
 ok !$res->at_least_version('1.2'), 'not version 1.2';
-ok $res->headers->content_type =~ m#multipart/form-data#,
+ok $res->headers->content_type =~ m!multipart/form-data!,
   'right "Content-Type" value';
 isa_ok $res->content, 'Mojo::Content::Single', 'right content';
 like $res->content->asset->slurp, qr/hallo welt/, 'right content';

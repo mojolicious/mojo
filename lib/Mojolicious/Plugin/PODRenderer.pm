@@ -42,7 +42,7 @@ sub register {
 
       # Find module
       my $module = $self->param('module');
-      $module =~ s|/|\:\:|g;
+      $module =~ s!/!\:\:!g;
       my $path = Pod::Simple::Search->new->find($module, @PATHS);
 
       # Redirect to CPAN
@@ -59,9 +59,9 @@ sub register {
       $dom->find('a[href]')->each(
         sub {
           my $attrs = shift->attrs;
-          $attrs->{href} =~ s|%3A%3A|/|gi
+          $attrs->{href} =~ s!%3A%3A!/!gi
             if $attrs->{href}
-              =~ s|^http\://search\.cpan\.org/perldoc\?|$perldoc|;
+              =~ s!^http\://search\.cpan\.org/perldoc\?!$perldoc!;
         }
       );
 
@@ -129,8 +129,8 @@ sub _pod_to_html {
   return $@ unless eval { $parser->parse_string_document("$pod"); 1 };
 
   # Filter
-  $output =~ s|<a name='___top' class='dummyTopAnchor'\s*?></a>\n||g;
-  $output =~ s|<a class='u'.*?name=".*?"\s*>(.*?)</a>|$1|sg;
+  $output =~ s!<a name='___top' class='dummyTopAnchor'\s*?></a>\n!!g;
+  $output =~ s!<a class='u'.*?name=".*?"\s*>(.*?)</a>!$1!sg;
 
   return $output;
 }

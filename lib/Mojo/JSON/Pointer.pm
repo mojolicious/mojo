@@ -13,7 +13,7 @@ sub _pointer {
   my ($self, $contains, $data, $pointer) = @_;
 
   # Parse pointer and walk data structure
-  return unless $pointer =~ s|^/||;
+  return unless $pointer =~ s!^/!!;
   for my $p (split '/', $pointer) {
     $p = decode('UTF-8', url_unescape $p);
 

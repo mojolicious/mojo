@@ -114,7 +114,7 @@ $id = Mojo::IOLoop->client(
         Mojo::IOLoop->remove($id) and Mojo::IOLoop->stop
           if $buffer =~ s/ is working!$//;
         $stream->write('4321')
-          if $buffer =~ m#HTTP/1.1 100 Continue.*\x0d\x0a\x0d\x0a#gs;
+          if $buffer =~ m!HTTP/1.1 100 Continue.*\x0d\x0a\x0d\x0a!gs;
       }
     );
     $stream->write("GET /1/ HTTP/1.1\x0d\x0a"
@@ -123,7 +123,7 @@ $id = Mojo::IOLoop->client(
   }
 );
 Mojo::IOLoop->start;
-like $buffer, qr#HTTP/1.1 100 Continue.*Mojo$#s, 'request was continued';
+like $buffer, qr!HTTP/1.1 100 Continue.*Mojo$!s, 'request was continued';
 
 # Pipelined
 $buffer = '';

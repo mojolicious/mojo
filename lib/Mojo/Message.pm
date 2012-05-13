@@ -70,12 +70,12 @@ sub body_params {
 
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
   my $type = $self->headers->content_type || '';
-  if ($type =~ m#(?:x-application|application/x-www-form)-urlencoded#i) {
+  if ($type =~ m!(?:x-application|application/x-www-form)-urlencoded!i) {
     $p->parse($self->content->asset->slurp);
   }
 
   # "multipart/formdata"
-  elsif ($type =~ m#multipart/form-data#i) {
+  elsif ($type =~ m!multipart/form-data!i) {
     my $formdata = $self->_parse_formdata;
 
     # Formdata

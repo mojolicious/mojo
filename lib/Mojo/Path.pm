@@ -65,7 +65,7 @@ sub merge {
   my ($self, $path) = @_;
 
   # Replace
-  return $self->parse($path) if $path =~ m|^/|;
+  return $self->parse($path) if $path =~ m!^/!;
 
   # Merge
   pop @{$self->parts} unless $self->trailing_slash;
@@ -79,8 +79,8 @@ sub parse {
 
   $path = url_unescape $path // '';
   utf8::decode $path;
-  $path =~ s|^/|| ? $self->leading_slash(1)  : $self->leading_slash(undef);
-  $path =~ s|/$|| ? $self->trailing_slash(1) : $self->trailing_slash(undef);
+  $path =~ s!^/!! ? $self->leading_slash(1)  : $self->leading_slash(undef);
+  $path =~ s!/$!! ? $self->trailing_slash(1) : $self->trailing_slash(undef);
 
   return $self->parts([split '/', $path, -1]);
 }

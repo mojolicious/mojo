@@ -161,7 +161,7 @@ sub tx {
   my $req = $tx->req;
   $req->method(shift);
   my $url = shift;
-  $url = "http://$url" unless $url =~ m#^/|\://#;
+  $url = "http://$url" unless $url =~ m!^/|\://!;
   ref $url ? $req->url($url) : $req->url->parse($url);
 
   # Body

@@ -172,7 +172,7 @@ sub _build_start_line {
   my $path  = $url->path->to_string;
   my $query = $url->query->to_string;
   $path .= "?$query" if $query;
-  $path = "/$path" unless $path =~ m#^/#;
+  $path = "/$path" unless $path =~ m!^/!;
 
   # CONNECT
   my $method = uc $self->method;
@@ -245,7 +245,7 @@ sub _parse_env {
   $self->method($env->{REQUEST_METHOD}) if $env->{REQUEST_METHOD};
 
   # Scheme/Version
-  if (($env->{SERVER_PROTOCOL} || '') =~ m#^([^/]+)/([^/]+)$#) {
+  if (($env->{SERVER_PROTOCOL} || '') =~ m!^([^/]+)/([^/]+)$!) {
     $base->scheme($1);
     $self->version($2);
   }
@@ -262,14 +262,14 @@ sub _parse_env {
   if (my $value = $env->{SCRIPT_NAME}) {
 
     # Make sure there is a trailing slash (important for merging)
-    $base->path->parse($value =~ m#/$# ? $value : "$value/");
+    $base->path->parse($value =~ m!/$! ? $value : "$value/");
 
     # Remove SCRIPT_NAME prefix if necessary
     my $buffer = $path->to_string;
-    $value  =~ s|^/||;
-    $value  =~ s|/$||;
-    $buffer =~ s|^/?$value/?||;
-    $buffer =~ s|^/||;
+    $value  =~ s!^/!!;
+    $value  =~ s!/$!!;
+    $buffer =~ s!^/?$value/?!!;
+    $buffer =~ s!^/!!;
     $path->parse($buffer);
   }
 

@@ -130,11 +130,11 @@ like $log, qr/fatal:five/, 'right result';
 
 # GET /does_not_exist ("not_found.development.html.ep" route suggestion)
 $t->get_ok('/does_not_exist')->status_is(404)
-  ->content_like(qr#/does_not_exist#);
+  ->content_like(qr!/does_not_exist!);
 
 # POST /does_not_exist ("not_found.development.html.ep" route suggestion)
 $t->post_ok('/does_not_exist')->status_is(404)
-  ->content_like(qr#/does_not_exist#);
+  ->content_like(qr!/does_not_exist!);
 
 # GET /dead_template
 $t->get_ok('/dead_template')->status_is(500)->content_like(qr/1\./)
@@ -151,7 +151,7 @@ $t->get_ok('/dead_template_with_layout')->status_is(500)->content_like(qr/2\./)
 # GET /dead_action
 $t->get_ok('/dead_action')->status_is(500)
   ->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr|get &#39;/dead_action&#39;|)
+  ->content_like(qr!get &#39;/dead_action&#39;!)
   ->content_like(qr/dead action!/);
 
 # GET /dead_action.xml (different format)
@@ -161,12 +161,12 @@ $t->get_ok('/dead_action.xml')->status_is(500)->content_type_is('text/xml')
 # GET /dead_action.json (unsupported format)
 $t->get_ok('/dead_action.json')->status_is(500)
   ->content_type_is('text/html;charset=UTF-8')
-  ->content_like(qr|get &#39;/dead_action&#39;|)
+  ->content_like(qr!get &#39;/dead_action&#39;!)
   ->content_like(qr/dead action!/);
 
 # GET /double_dead_action_☃
 $t->get_ok('/double_dead_action_☃')->status_is(500)
-  ->content_like(qr|get &#39;/double_dead_action_☃&#39;.*lite_app\.t\:\d|s)
+  ->content_like(qr!get &#39;/double_dead_action_☃&#39;.*lite_app\.t\:\d!s)
   ->content_like(qr/double dead action!/);
 
 # GET /trapped

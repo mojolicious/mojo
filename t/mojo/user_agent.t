@@ -254,8 +254,8 @@ is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('write')}, 0,
   'unsubscribed successfully';
 is scalar @{Mojo::IOLoop->stream($tx->connection)->subscribers('read')}, 1,
   'unsubscribed successfully';
-like $req, qr#^GET / .*whatever$#s,      'right request';
-like $res, qr#^HTTP/.*200 OK.*works!$#s, 'right response';
+like $req, qr!^GET / .*whatever$!s,      'right request';
+like $res, qr|^HTTP/.*200 OK.*works!$|s, 'right response';
 $ua->unsubscribe(start => $start);
 ok !$ua->has_subscribers('start'), 'unsubscribed successfully';
 

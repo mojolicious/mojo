@@ -95,7 +95,7 @@ sub parse {
   return $self unless $url;
 
   # Official regex
-  $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  $url =~ m!(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
   $self->scheme($1);
   $self->authority($2);
   $self->path->parse($3);

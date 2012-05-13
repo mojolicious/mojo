@@ -12,7 +12,7 @@ sub register {
 
   # Extract host
   my $host;
-  if ($path =~ m#^(\*\.)?([^/]+)(/.*)?$#) {
+  if ($path =~ m!^(\*\.)?([^/]+)(/.*)?$!) {
     $host = $1 ? qr/^(?:.*\.)?\Q$2\E$/i : qr/^\Q$2\E$/i;
     $path = $3;
   }

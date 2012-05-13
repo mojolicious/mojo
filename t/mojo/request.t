@@ -1839,7 +1839,7 @@ is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
   'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBp6FjksAAAAABwA'
   . 'AAGV4cGlyZXM=--1641adddfe885276cda0deb7475f153a', 'right value';
-like $req->headers->content_type, qr#multipart/form-data#,
+like $req->headers->content_type, qr!multipart/form-data!,
   'right "Content-Type" value';
 is $req->param('fname'), 'Иван',       'right value';
 is $req->param('sname'), 'Иванов',   'right value';
@@ -1911,7 +1911,7 @@ is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
   'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBiWFjksAAAAABwA'
   . 'AAGV4cGlyZXM=--cd933a37999e0fa8d7804205e89193a7', 'right value';
-like $req->headers->content_type, qr#multipart/form-data#,
+like $req->headers->content_type, qr!multipart/form-data!,
   'right "Content-Type" value';
 is $req->param('fname'), 'Иван',       'right value';
 is $req->param('sname'), 'Иванов',   'right value';
@@ -1978,7 +1978,7 @@ is $req->url, '/', 'right URL';
 is $req->cookie('mojolicious')->value,
   'BAcIMTIzNDU2NzgECAgIAwIAAAAXDGFsZXgudm9yb25vdgQAAAB1c2VyBhaIjksAAAAABwA'
   . 'AAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f2672', 'right value';
-like $req->headers->content_type, qr#multipart/form-data#,
+like $req->headers->content_type, qr!multipart/form-data!,
   'right "Content-Type" value';
 is $req->param('fname'), 'Иван',       'right value';
 is $req->param('sname'), 'Иванов',   'right value';

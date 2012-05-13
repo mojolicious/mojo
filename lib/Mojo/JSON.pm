@@ -170,7 +170,7 @@ sub _decode_string {
 
   # Unescape popular characters
   if (index($str, '\\u') < 0) {
-    $str =~ s|\\(["\\/bfnrt])|$ESCAPE{$1}|gs;
+    $str =~ s!\\(["\\/bfnrt])!$ESCAPE{$1}!gs;
     return $str;
   }
 
@@ -262,7 +262,7 @@ sub _encode_string {
   my $string = shift;
 
   # Escape string
-  $string =~ s|([\x00-\x1F\x7F\x{2028}\x{2029}\\"/\b\f\n\r\t])|$REVERSE{$1}|gs;
+  $string =~ s!([\x00-\x1F\x7F\x{2028}\x{2029}\\"/\b\f\n\r\t])!$REVERSE{$1}!gs;
 
   # Stringify
   return "\"$string\"";

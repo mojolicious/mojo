@@ -161,7 +161,7 @@ websocket '/timeout' => sub {
 my $ua  = app->ua;
 my $res = $ua->get('/link')->success;
 is $res->code, 200, 'right status';
-like $res->body, qr#ws\://localhost\:\d+/#, 'right content';
+like $res->body, qr!ws\://localhost\:\d+/!, 'right content';
 
 # GET /socket (plain HTTP request)
 $res = $ua->get('/socket')->res;
@@ -186,7 +186,7 @@ $ua->websocket(
   }
 );
 $loop->start;
-like $result, qr#test1test2ws\://localhost\:\d+/#, 'right result';
+like $result, qr!test1test2ws\://localhost\:\d+/!, 'right result';
 
 # WebSocket /something/else (failed websocket connection)
 my ($code, $body, $ws);

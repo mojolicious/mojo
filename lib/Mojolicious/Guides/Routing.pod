@@ -34,7 +34,7 @@ While it is very well possible to make all these connections static, it is
 also rather inefficient. That's why regular expressions are commonly used to
 make the dispatch process more dynamic.
 
-  qr|/user/show/(\d+)| -> $self->render(text => $users{$1});
+  qr!/user/show/(\d+)! -> $self->render(text => $users{$1});
 
 Modern dispatchers have pretty much everything HTTP has to offer at their
 disposal and can use many more variables than just the request path, such as
@@ -50,7 +50,7 @@ request method and headers like C<Host>, C<User-Agent> and C<Accept>.
 While regular expressions are quite powerful they also tend to be unpleasant
 to look at and are generally overkill for ordinary path matching.
 
-  qr|/user/show/(\d+)| -> $self->render(text => $users{$1});
+  qr!/user/show/(\d+)! -> $self->render(text => $users{$1});
 
 This is where routes come into play, they have been designed from the ground
 up to represent paths with placeholders.

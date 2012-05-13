@@ -468,7 +468,7 @@ sub url_for {
 
   # Absolute URL
   return $target if (Scalar::Util::blessed($target) || '') eq 'Mojo::URL';
-  return Mojo::URL->new($target) if $target =~ m#^\w+\://#;
+  return Mojo::URL->new($target) if $target =~ m!^\w+\://!;
 
   # Base
   my $url  = Mojo::URL->new;
@@ -477,11 +477,11 @@ sub url_for {
 
   # Relative URL
   my $path = $url->path;
-  if ($target =~ m#^/#) {
+  if ($target =~ m!^/!) {
     if (my $prefix = $self->stash->{path}) {
       my $real = Mojo::Util::url_unescape($req->url->path->to_abs_string);
       $real = Mojo::Util::decode('UTF-8', $real) // $real;
-      $real =~ s|/?$prefix$|$target|;
+      $real =~ s!/?$prefix$!$target!;
       $target = $real;
     }
     $url->parse($target);

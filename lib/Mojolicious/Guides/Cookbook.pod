@@ -215,6 +215,7 @@ where you can't just change the server configuration or behind a reverse proxy
 that passes along additional information with C<X-*> headers. In such cases
 you can use a C<before_dispatch> hook to rewrite incoming requests.
 
+  # Change scheme if "X-Forwarded-Protocol" header is set to "https"
   app->hook(before_dispatch => sub {
     my $self = shift;
     $self->req->url->base->scheme('https')
@@ -225,6 +226,7 @@ Since reverse proxies generally don't pass along information about path
 prefixes your application might be deployed under, rewriting the base path of
 incoming requests is also quite common.
 
+  # Move first part from path to base path in production mode
   app->hook(before_dispatch => sub {
     my $self = shift;
     push @{$self->req->url->base->path->parts},

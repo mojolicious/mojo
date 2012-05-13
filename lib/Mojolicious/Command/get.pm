@@ -74,7 +74,7 @@ sub run {
   $ua->max_redirects(10) if $redirect;
 
   # Absolute URL
-  if ($url !~ m#/#) { $ua->detect_proxy }
+  if ($url !~ m!/!) { $ua->detect_proxy }
 
   # Application
   else { $ua->app($ENV{MOJO_APP} || 'Mojo::HelloWorld') }

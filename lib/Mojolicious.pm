@@ -500,7 +500,7 @@ file should be served and before the router starts its work.
     ...
   });
 
-Mostly used for custom dispatchers and postprocessing static file responses.
+Mostly used for custom dispatchers and post-processing static file responses.
 (Passed the default controller object)
 
 =item B<after_dispatch>
@@ -513,8 +513,8 @@ hook can trigger before C<after_static_dispatch> due to its dynamic nature.
     ...
   });
 
-Useful for all kinds of postprocessing tasks. (Passed the current controller
-object)
+Useful for rewriting outgoing responses and other post-processing tasks.
+(Passed the current controller object)
 
 =item B<around_dispatch>
 

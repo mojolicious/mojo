@@ -151,7 +151,9 @@ Mojo::Reactor::Poll - Low level event reactor with poll support
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::Poll> is a low level event reactor based on L<IO::Poll>.
+L<Mojo::Reactor::Poll> is a low level event reactor based on L<IO::Poll>. Note
+that this reactor was designed for maximum portability, and therefore does not
+use a monotonic clock to handle time jumps.
 
 =head1 EVENTS
 

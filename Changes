@@ -1,6 +1,5 @@
-This file documents the revision history for Mojolicious.
 
-2.96  2012-05-14
+2.96  2012-05-15
   - Added merge method to Mojo::Path.
   - Improved documentation.
   - Improved tests.

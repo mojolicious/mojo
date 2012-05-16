@@ -219,7 +219,7 @@ sub is_dynamic    { shift->content->is_dynamic }
 
 sub is_finished { (shift->{state} || '') eq 'finished' }
 
-sub is_limit_exceeded { ((shift->error)[1] || '') ~~ [413, 431] }
+sub is_limit_exceeded { ((shift->error)[1] || 0) ~~ [413, 431] }
 
 sub is_multipart { shift->content->is_multipart }
 

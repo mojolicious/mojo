@@ -12,7 +12,7 @@ plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 106;
+plan tests => 105;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -153,15 +153,11 @@ my $res = f('search.cpan.org/search' => {query => 'mojolicious'});
 like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';
 
-# Simple request
-$tx = $ua->get('metacpan.org');
-is $tx->req->method, 'GET',                 'right method';
-is $tx->req->url,    'http://metacpan.org', 'right url';
-is $tx->res->code,   301,                   'right status';
-
-# HTTPS request that requires SNI
-$tx = $ua->get('https://sni.velox.ch/');
-like $tx->res->body, qr/Great!/, 'right response';
+# Simple HTTPS request
+$tx = $ua->get('https://www.metacpan.org');
+is $tx->req->method, 'GET',                      'right method';
+is $tx->req->url,    'https://www.metacpan.org', 'right url';
+is $tx->res->code,   200,                        'right status';
 
 # Simple request with body
 $tx = $ua->get('http://mojolicio.us' => 'Hi there!');

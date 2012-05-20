@@ -1,8 +1,9 @@
 
-2.96  2012-05-18
+2.96  2012-05-20
   - Added merge method to Mojo::Path.
   - Improved documentation.
   - Improved tests.
+  - Fixed small Mojo::URL and Mojo::Path stringification bugs.
 
 2.95  2012-05-10
   - Improved documentation.

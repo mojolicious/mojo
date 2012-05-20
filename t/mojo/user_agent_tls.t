@@ -12,7 +12,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 22;
+plan tests => 24;
 
 # "That does not compute.
 #  Really?
@@ -77,8 +77,10 @@ $tx = $ua->build_tx(GET => 'https://lalala/');
 $tx->connection($sock);
 $ua->start($tx);
 ok $tx->success, 'successful';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
+is $tx->req->method, 'GET',             'right method';
+is $tx->req->url,    'https://lalala/', 'right url';
+is $tx->res->code,   200,               'right status';
+is $tx->res->body,   'works!',          'right content';
 
 # Valid certificates (env)
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);

@@ -3,6 +3,8 @@
   - Added merge method to Mojo::Path.
   - Improved documentation.
   - Improved tests.
+  - Fixed small bug that prevented already prepared IO::Socket::SSL handles to
+    be used by Mojo::UserAgent.
   - Fixed small Mojo::URL and Mojo::Path stringification bugs.
 
 2.95  2012-05-10

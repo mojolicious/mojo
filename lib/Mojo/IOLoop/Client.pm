@@ -2,7 +2,7 @@ package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use IO::Socket::INET;
-use Scalar::Util 'weaken';
+use Scalar::Util qw/blessed weaken/;
 use Socket qw(IPPROTO_TCP SO_ERROR TCP_NODELAY);
 
 # IPv6 support requires IO::Socket::IP
@@ -75,7 +75,7 @@ sub _connect {
 
   # TLS
   weaken $self;
-  if ($args->{tls}) {
+  if ($args->{tls} && !$handle->isa('IO::Socket::SSL')) {
 
     # No TLS support
     return $self->emit_safe(

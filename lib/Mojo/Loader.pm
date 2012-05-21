@@ -35,21 +35,20 @@ sub load {
 sub search {
   my ($self, $namespace) = @_;
 
-  # Scan
+  # Check all directories
   my (@modules, %found);
-  for my $directory (exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC) {
+  for my $directory (@INC) {
     next unless -d (my $path = catdir $directory, (split /::/, $namespace));
 
-    # Check files
+    # List "*.pm" files in directory
     opendir(my $dir, $path);
-    for my $file (grep /\.pm$/, readdir($dir)) {
+    for my $file (grep /\.pm$/, readdir $dir) {
       next if -d catfile splitdir($path), $file;
 
       # Module found
       my $class = "$namespace\::" . fileparse $file, qr/\.pm/;
       push @modules, $class unless $found{$class}++;
     }
-    closedir $dir;
   }
 
   return \@modules;
@@ -92,6 +91,7 @@ method to see if they are already loaded.
 
   if (my $e = $loader->load('Foo::Bar')) {
     die "Exception: $e" if ref $e;
+    say 'Already loaded!';
   }
 
 =head2 C<search>

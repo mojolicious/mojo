@@ -355,9 +355,7 @@ Get or replace the current header values.
     say 'Set-Cookie:';
 
     # Each header contains an array of lines
-    for my $line (@$header) {
-      say $line;
-    }
+    say for @$header;
   }
 
 =head2 C<host>

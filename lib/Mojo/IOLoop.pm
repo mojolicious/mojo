@@ -511,6 +511,9 @@ that this method can recurse back into the reactor, so you need to be careful.
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
 
+  # Invoke as soon as possible
+  Mojo::IOLoop->recurring(0 => sub { say 'Reactor tick.' });
+
 =head2 C<remove>
 
   Mojo::IOLoop->remove($id);
@@ -583,6 +586,9 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds.
+
+  # Invoke as soon as possible
+  Mojo::IOLoop->timer(0 => sub { say 'Next tick.' });
 
 =head1 DEBUGGING
 

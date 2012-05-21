@@ -519,8 +519,8 @@ amount of time in seconds.
   Mojo::IOLoop->remove($id);
   $loop->remove($id);
 
-Remove anything with an id. Connections will be dropped gracefully by
-allowing them to finish writing all data in their write buffers.
+Remove anything with an id, connections will be dropped gracefully by allowing
+them to finish writing all data in their write buffers.
 
 =head2 C<server>
 
@@ -564,8 +564,8 @@ watched anymore.
   Mojo::IOLoop->stop;
   $loop->stop;
 
-Stop the loop immediately, this will not interrupt any existing connections
-and the loop can be restarted by running C<start> again.
+Stop the loop, this will not interrupt any existing connections and the loop
+can be restarted by running C<start> again.
 
 =head2 C<stream>
 

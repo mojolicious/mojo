@@ -1,4 +1,7 @@
 
+2.97  2012-05-21
+  - Improved documentation.
+
 2.96  2012-05-21
   - Added merge method to Mojo::Path.
   - Improved documentation.

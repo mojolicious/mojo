@@ -354,7 +354,7 @@ Get or replace the current header values.
   for my $header ($headers->header('Set-Cookie')) {
     say 'Set-Cookie:';
 
-    # Each header contains an array of lines
+    # Multiple lines per header
     say for @$header;
   }
 

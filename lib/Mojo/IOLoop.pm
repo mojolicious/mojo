@@ -452,6 +452,7 @@ Open TCP connection with C<client_class>, which is usually
 L<Mojo::IOLoop::Client>, takes the same arguments as
 L<Mojo::IOLoop::Client/"connect">.
 
+  # Connect to localhost on port 3000
   Mojo::IOLoop->client({port => 3000} => sub {
     my ($loop, $err, $stream) = @_;
     ...
@@ -532,6 +533,7 @@ Accept TCP connections with C<server_class>, which is usually
 L<Mojo::IOLoop::Server>, takes the same arguments as
 L<Mojo::IOLoop::Server/"listen">.
 
+  # Listen on port 3000
   Mojo::IOLoop->server({port => 3000} => sub {
     my ($loop, $stream, $id) = @_;
     ...

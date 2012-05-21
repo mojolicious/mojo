@@ -35,7 +35,7 @@ sub search {
   # Check all directories
   my (@modules, %found);
   for my $directory (@INC) {
-    next unless -d (my $path = catdir $directory, (split /::/, $namespace));
+    next unless -d (my $path = catdir $directory, split(/::/, $namespace));
 
     # List "*.pm" files in directory
     opendir(my $dir, $path);

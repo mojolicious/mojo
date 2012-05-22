@@ -107,7 +107,7 @@ L<Mojolicious::Plugin::I18N> adds L<Locale::Maketext> support to
 L<Mojolicious>. All you have to do besides using this plugin is to add as many
 lexicon classes as you need. Languages can usually be detected automatically
 from the C<Accept-Languages> request header. The code of this plugin is a good
-example for learning to build new plugins.
+example for learning to build new plugins, you're welcome to fork it.
 
 This plugin can save a lot of typing, since it will generate the following
 code by default.

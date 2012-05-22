@@ -302,7 +302,8 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 
 L<Mojolicious::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
 L<Mojolicious>. This is a core plugin, that means it is always enabled and its
-code a good example for learning how to build new plugins.
+code a good example for learning how to build new plugins, you're welcome to
+fork it.
 
 Most form helpers can automatically pick up previous input values and will
 show them as default. You can also use

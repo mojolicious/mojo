@@ -739,9 +739,9 @@ Alias for L<Mojo::Content/"is_multipart">.
 
 =head2 C<json>
 
-  my $object = $message->json;
-  my $array  = $message->json;
-  my $value  = $message->json('/foo/bar');
+  my $hash  = $message->json;
+  my $array = $message->json;
+  my $value = $message->json('/foo/bar');
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise. An optional JSON Pointer can be used to extract a specific

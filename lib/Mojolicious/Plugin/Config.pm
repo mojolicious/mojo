@@ -43,7 +43,7 @@ sub register {
     $file
       = $ENV{MOJO_EXE} ? basename($ENV{MOJO_EXE}) : decamelize($ENV{MOJO_APP});
 
-    # Replace ".pl" and ".t" with default extention
+    # Replace ".pl" and ".t" with default extension
     $file =~ s/\.(?:pl|t)$//i;
     $file .= '.' . ($conf->{ext} || 'conf');
   }

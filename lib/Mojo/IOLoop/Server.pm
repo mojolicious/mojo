@@ -2,7 +2,8 @@ package Mojo::IOLoop::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use File::Temp;
+use File::Basename 'dirname';
+use File::Spec::Functions 'catfile';
 use IO::Socket::INET;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
@@ -19,51 +20,10 @@ use constant TLS => $ENV{MOJO_NO_TLS}
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
-# Default TLS cert (18.04.2012)
-# (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)
-use constant CERT => <<EOF;
------BEGIN CERTIFICATE-----
-MIIDaTCCAtKgAwIBAgIJAI+AzotR68CTMA0GCSqGSIb3DQEBBQUAMIGAMQswCQYD
-VQQGEwJERTEWMBQGA1UECBMNTmllZGVyc2FjaHNlbjESMBAGA1UEBxMJSGFtYmVy
-Z2VuMRQwEgYDVQQKEwtNb2pvbGljaW91czESMBAGA1UEAxMJbG9jYWxob3N0MRsw
-GQYJKoZIhvcNAQkBFgxzcmlAY3Bhbi5vcmcwHhcNMTIwNDE4MTczOTU5WhcNMzIw
-NDEzMTczOTU5WjCBgDELMAkGA1UEBhMCREUxFjAUBgNVBAgTDU5pZWRlcnNhY2hz
-ZW4xEjAQBgNVBAcTCUhhbWJlcmdlbjEUMBIGA1UEChMLTW9qb2xpY2lvdXMxEjAQ
-BgNVBAMTCWxvY2FsaG9zdDEbMBkGCSqGSIb3DQEJARYMc3JpQGNwYW4ub3JnMIGf
-MA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCohcU0qG+hHn6JK8XdygAJo7EuRqG2
-5GSHaRRMyYgd89tEluInMH86tVcktJ1s/0VVvr5anAp8L7Pgu01Wr13OfgIzBxCz
-51ZIFxq4DtimBftXs9Z9M0sui2NuIPDrMEjkYUhUsxMEZcDSp2KJjDosZjSYUiiF
-G2ACvVGXSrS16QIDAQABo4HoMIHlMB0GA1UdDgQWBBSrZ+hIlPTgV7xx2O9wzdIO
-/d4osDCBtQYDVR0jBIGtMIGqgBSrZ+hIlPTgV7xx2O9wzdIO/d4osKGBhqSBgzCB
-gDELMAkGA1UEBhMCREUxFjAUBgNVBAgTDU5pZWRlcnNhY2hzZW4xEjAQBgNVBAcT
-CUhhbWJlcmdlbjEUMBIGA1UEChMLTW9qb2xpY2lvdXMxEjAQBgNVBAMTCWxvY2Fs
-aG9zdDEbMBkGCSqGSIb3DQEJARYMc3JpQGNwYW4ub3JnggkAj4DOi1HrwJMwDAYD
-VR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQAq6MXA7ZeO7B7vAcWxQKeLPKSy
-Jzkb1bC/agaISDbOwuZ1AoQSj6OQHKhNIdY5v/oLQJ0B8wB0dIigqn1WVacDtPgu
-PKSrxpqieDCh2bJ7+dyQIzQHgtZqPHi5k1PyNNXQxC94kPWdFp6PpF0M/y97aCxC
-ZQjKgDfncFWY3FHqUw==
------END CERTIFICATE-----
-EOF
-
-# Default TLS key (18.04.2012)
-# (openssl req -new -x509 -keyout cakey.pem -out cacert.pem -nodes -days 7300)
-use constant KEY => <<EOF;
------BEGIN RSA PRIVATE KEY-----
-MIICXAIBAAKBgQCohcU0qG+hHn6JK8XdygAJo7EuRqG25GSHaRRMyYgd89tEluIn
-MH86tVcktJ1s/0VVvr5anAp8L7Pgu01Wr13OfgIzBxCz51ZIFxq4DtimBftXs9Z9
-M0sui2NuIPDrMEjkYUhUsxMEZcDSp2KJjDosZjSYUiiFG2ACvVGXSrS16QIDAQAB
-AoGALSdqp6lZ/7nD/c0Uv1CYofySROv3+KFJrl6hadG1/xCP99jVz9pWvMxKBTO/
-2qyrT0ZEitK0nIHLmLOXDVr/rxzbxP/kHmkOLKj45jW31BSap89tUpFjFQXFfjwT
-YnOgOB4+eqQuGwigCqabcQPtFC4fU7Qzk7pdz/kO4FjR0GECQQDdXthCKgS7E5Zy
-qqzjepxYvKgkWPD3G9H6I8LOtiVBdcehflF8Y61OGsEST3pbOhrijhY281VnD1AG
-pNL1rOhDAkEAwuKKTN+2GF3m1mPtGW9jpkP8gU2zcO945U0jxpn2srjQ9oIoB45Y
-gqtE6yybRY4BBd+hMdgeH5dXSwsZW+FMYwJASrFy5LhKylisndoq5cJ8OJDHZyQ/
-ghF4Ax/H3nmlDnZQOpRlqEP1uPHcDXKVxWxQn/rzUe0+9rw681Lv/4ctAwJAfyLO
-2muvHaJUr1QtH0S9m4AKwEfyYiC3m8+BIVTbzagoGki62IMSVtxob4uAGBYVsME9
-JYk5zZ4rgndRKdGGxQJBAIpbdLBKArvnpbYIqNJGG83mUZ/VZaQl0G+S3zGkgre9
-KjIuz10nNMNAKmGRrTbClLtvAQ9MVa3Xjnp+XmxPFho=
------END RSA PRIVATE KEY-----
-EOF
+# To regenerate the certificate run this command (18.04.2012)
+# openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
+my $CERT = catfile(dirname(__FILE__), 'server.crt');
+my $KEY  = catfile(dirname(__FILE__), 'server.key');
 
 has accepts => 10;
 has reactor => sub {
@@ -77,7 +37,6 @@ has reactor => sub {
 sub DESTROY {
   my $self = shift;
   if (my $port = $self->{port}) { $ENV{MOJO_REUSE} =~ s/(?:^|\,)$port\:\d+// }
-  defined $_ and -w $_ and unlink $_ for $self->{cert}, $self->{key};
   return unless my $reactor = $self->{reactor};
   $self->stop if $self->{handle};
   $reactor->remove($_) for values %{$self->{handles}};
@@ -131,8 +90,8 @@ sub listen {
 
   # Options
   my $options = $self->{tls} = {
-    SSL_cert_file => $args->{tls_cert} || $self->_cert_file,
-    SSL_key_file  => $args->{tls_key}  || $self->_key_file,
+    SSL_cert_file => $args->{tls_cert} || $CERT,
+    SSL_key_file  => $args->{tls_key}  || $KEY,
     SSL_startHandshake => 0
   };
   %$options = (
@@ -180,22 +139,6 @@ sub _accept {
   return unless $handle = IO::Socket::SSL->start_SSL($handle, %$tls);
   $self->reactor->io($handle => sub { $self->_tls($handle) });
   $self->{handles}{$handle} = $handle;
-}
-
-sub _cert_file {
-  my $self = shift;
-  return $self->{cert} if $self->{cert};
-  my $cert = File::Temp->new(UNLINK => 0, SUFFIX => ".$$.pem");
-  print $cert CERT;
-  return $self->{cert} = $cert->filename;
-}
-
-sub _key_file {
-  my $self = shift;
-  return $self->{key} if $self->{key};
-  my $key = File::Temp->new(UNLINK => 0, SUFFIX => ".$$.pem");
-  print $key KEY;
-  return $self->{key} = $key->filename;
 }
 
 # "Where on my badge does it say anything about protecting people?

@@ -136,6 +136,8 @@ L<Net::Rendezvous::Publish> are supported transparently and used if installed.
 Individual features can also be disabled with the C<MOJO_NO_BONJOUR>,
 C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
+See L<Mojolicious::Guides::Cookbook> for deployment recipes.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Server::Morbo> implements the following attributes.

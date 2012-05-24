@@ -350,6 +350,8 @@ A TLS certificate and key are also built right in to make writing test servers
 as easy as possible. Also note that for convenience the C<PIPE> signal will be
 set to C<IGNORE> when L<Mojo::IOLoop> is loaded.
 
+See L<Mojolicious::Guides::Cookbook> for recipes.
+
 =head1 ATTRIBUTES
 
 L<Mojo::IOLoop> implements the following attributes.

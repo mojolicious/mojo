@@ -23,8 +23,7 @@ sub new {
 sub app {
   my ($self, $app) = @_;
   return $self->ua->app unless $app;
-  $ENV{MOJO_APP} = $app;
-  $self->ua->app($app);
+  $self->ua->app($ENV{MOJO_APP} = $app);
   return $self;
 }
 

@@ -200,14 +200,7 @@ sub plugin {
 
 sub start {
   my $class = shift;
-
-  # Executable
-  $ENV{MOJO_EXE} ||= (caller)[1];
-
-  # We are the application
   my $self = $ENV{MOJO_APP} = ref $class ? $class : $class->new;
-
-  # Start!
   $self->commands->start(@_);
 }
 

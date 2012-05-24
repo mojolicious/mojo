@@ -38,18 +38,13 @@ sub register {
   # Config file
   my $file = $conf->{file} || $ENV{MOJO_CONFIG};
   unless ($file) {
-    $file = $ENV{MOJO_APP};
 
-    # Class
-    if ($file && !ref $file) { $file = decamelize $file }
+    # File or class
+    $file
+      = $ENV{MOJO_EXE} ? basename($ENV{MOJO_EXE}) : decamelize($ENV{MOJO_APP});
 
-    # File
-    else { $file = basename($ENV{MOJO_EXE} || $0) }
-
-    # Remove .pl and .t extentions
+    # Replace ".pl" and ".t" with default extention
     $file =~ s/\.(?:pl|t)$//i;
-
-    # Default extension
     $file .= '.' . ($conf->{ext} || 'conf');
   }
 

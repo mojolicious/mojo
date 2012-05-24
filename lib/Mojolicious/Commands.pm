@@ -113,11 +113,6 @@ sub run {
 
 sub start {
   my $self = shift;
-
-  # Executable
-  $ENV{MOJO_EXE} ||= (caller)[1] if $ENV{MOJO_APP};
-
-  # Run
   my @args = @_ ? @_ : @ARGV;
   ref $self ? $self->run(@args) : $self->new->run(@args);
 }

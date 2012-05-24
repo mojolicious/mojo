@@ -114,7 +114,7 @@ sub run {
 sub start {
   my $self = shift;
   my @args = @_ ? @_ : @ARGV;
-  ref $self ? $self->run(@args) : $self->new->run(@args);
+  return ref $self ? $self->run(@args) : $self->new->run(@args);
 }
 
 sub start_app {

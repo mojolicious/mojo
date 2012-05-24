@@ -216,7 +216,7 @@ sub write {
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
 }
 
-# "Here's to alcohol, the cause of—and solution to—all life's problems."
+# "Here's to alcohol, the cause of-and solution to-all life's problems."
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
 

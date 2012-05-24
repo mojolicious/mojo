@@ -41,8 +41,8 @@ get '/nothing' => 'nothing';
 # GET /unknown
 get '/unknown' => 'unknown';
 
-# Hey, I don’t see you planning for your old age.
-# I got plans. I’m gonna turn my on/off switch to off.
+# "Hey, I don't see you planning for your old age.
+#  I got plans. I'm gonna turn my on/off switch to off."
 my $t = Test::Mojo->new;
 
 # German (detected)

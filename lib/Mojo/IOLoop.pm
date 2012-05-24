@@ -118,7 +118,7 @@ sub remove {
 }
 
 # "Fat Tony is a cancer on this fair city!
-#  He is the cancer and I am the… uh… what cures cancer?"
+#  He is the cancer and I am the... uh... what cures cancer?"
 sub server {
   my $self = shift;
   $self = $self->singleton unless ref $self;

@@ -40,7 +40,7 @@ sub build_tx { Mojo::Transaction::HTTP->new }
 
 sub config { shift->_dict(config => @_) }
 
-# "D’oh."
+# "D'oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
 sub _dict {

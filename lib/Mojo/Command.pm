@@ -100,8 +100,8 @@ sub get_data {
   $self->get_all_data($class)->{$data};
 }
 
-# "You don’t like your job, you don’t strike.
-#  You go in every day and do it really half-assed. That’s the American way."
+# "You don't like your job, you don't strike.
+#  You go in every day and do it really half-assed. That's the American way."
 sub help {
   print shift->usage;
   exit 0;

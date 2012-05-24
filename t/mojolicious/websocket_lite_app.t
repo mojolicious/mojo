@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
-# "Oh, dear. She’s stuck in an infinite loop and he’s an idiot.
-#  Well, that’s love for you."
+# "Oh, dear. She's stuck in an infinite loop and he's an idiot.
+#  Well, that's love for you."
 use utf8;
 
 # Disable Bonjour, IPv6 and libev

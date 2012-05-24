@@ -255,7 +255,7 @@ sub _input {
   return $self->_tag('input', name => $name, %attrs);
 }
 
-# "We’ve lost power of the forward Gameboy! Mario not responding!"
+# "We've lost power of the forward Gameboy! Mario not responding!"
 sub _tag {
   my ($self, $name) = (shift, shift);
 

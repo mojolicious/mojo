@@ -7,7 +7,7 @@ use POSIX 'WNOHANG';
 
 has watch => sub { [qw(lib templates)] };
 
-# "All in all, this is one day Mittens the kitten won’t soon forget.
+# "All in all, this is one day Mittens the kitten won't soon forget.
 #  Kittens give Morbo gas.
 #  In lighter news, the city of New New York is doomed.
 #  Blame rests with known human Professor Hubert Farnsworth and his tiny,
@@ -39,7 +39,7 @@ sub run {
   exit 0;
 }
 
-# "And so with two weeks left in the campaign, the question on everyone’s
+# "And so with two weeks left in the campaign, the question on everyone's
 #  mind is, who will be the president of Earth?
 #  Jack Johnson or bitter rival John Jackson.
 #  Two terrific candidates, Morbo?

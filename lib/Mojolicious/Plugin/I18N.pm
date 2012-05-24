@@ -6,7 +6,7 @@ use I18N::LangTags::Detect;
 use Mojo::Loader;
 
 # "Can we have Bender burgers again?
-#  No, the cat shelter’s onto me."
+#  No, the cat shelter's onto me."
 sub register {
   my ($self, $app, $conf) = @_;
 

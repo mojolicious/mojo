@@ -301,9 +301,7 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
-L<Mojolicious>. This is a core plugin, that means it is always enabled and its
-code a good example for learning how to build new plugins, you're welcome to
-fork it.
+L<Mojolicious>.
 
 Most form helpers can automatically pick up previous input values and will
 show them as default. You can also use
@@ -314,6 +312,9 @@ necessary attributes always be generated automatically.
   <%= radio_button country => 'germany' %> Germany
   <%= radio_button country => 'france'  %> France
   <%= radio_button country => 'uk'      %> UK
+
+This is a core plugin, that means it is always enabled and its code a good
+example for learning how to build new plugins, you're welcome to fork it.
 
 =head1 HELPERS
 

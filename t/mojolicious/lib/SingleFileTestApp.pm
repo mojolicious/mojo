@@ -10,8 +10,9 @@ sub startup {
   $self->log->path(undef);
   $self->log->level('fatal');
 
-  # Plugin
+  # Plugins
   $self->plugin('MojoliciousTest::Plugin::Test::SomePlugin2');
+  $self->plugin('Config');
 
   # DATA classes
   push @{$self->renderer->classes}, 'SingleFileTestApp::Foo';
@@ -54,6 +55,11 @@ sub secret {
 
 package SingleFileTestApp::Foo;
 use Mojo::Base 'Mojolicious::Controller';
+
+sub conf {
+  my $self = shift;
+  $self->render(text => $self->config->{single_file});
+}
 
 sub data_template { shift->render('index') }
 

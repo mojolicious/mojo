@@ -1,6 +1,8 @@
 
-2.97  2012-05-22
+2.97  2012-05-24
   - Improved documentation.
+  - Fixed bug that prevented Test::Mojo from working with normal Mojolicious
+    applications that use Mojolicious::Plugin::Config.
 
 2.96  2012-05-21
   - Added merge method to Mojo::Path.

@@ -11,6 +11,7 @@ sub startup {
   $self->log->level('fatal');
 
   # Plugins
+  $self->plugin('PluginWithEmbeddedApp');
   $self->plugin('MojoliciousTest::Plugin::Test::SomePlugin2');
   $self->plugin('Config');
 

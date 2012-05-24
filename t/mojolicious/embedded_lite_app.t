@@ -135,8 +135,8 @@ get '/host' => {text => 'main application!'};
 
 my $t = Test::Mojo->new;
 
-# GET /foo/bar (plugin app)
-$t->get_ok('/foo/bar')->status_is(200)->content_is('plugin works!');
+# GET /plugin/foo (plugin app)
+$t->get_ok('/plugin/foo')->status_is(200)->content_is('plugin works!');
 
 # GET /hello (from main app)
 $t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");

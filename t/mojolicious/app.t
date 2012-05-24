@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 320;
+use Test::More tests => 325;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -302,7 +302,13 @@ $t->get_ok('/helper')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Welcome aboard!');
 
-# SingleFileTestApp::Foo::conf
+# PluginWithEmbeddedApp (lite app in plugin)
+$t->get_ok('/plugin/foo')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('plugin works!');
+
+# SingleFileTestApp::Foo::conf (config file)
 $t->get_ok('/foo/conf')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('works!');

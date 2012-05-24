@@ -414,8 +414,6 @@ heredocs and stuff like that.
   %# Comment line, treated as "<%# line =%>"
   %% Replaced with "%", useful for generating templates
 
-=head2 Escaping
-
 Escaping behavior can be reversed with the C<auto_escape> attribute, this is
 the default in L<Mojolicious> C<.ep> templates for example.
 
@@ -437,13 +435,9 @@ And a backslash in front of a newline can be escaped with another backslash.
   in multiple\\
   lines
 
-=head2 Trimming
-
 Whitespace characters around tags can be trimmed with a special tag ending.
 
   <%= All whitespace characters around this expression will be trimmed =%>
-
-=head2 Blocks
 
 You can capture whole template blocks for reuse later with the C<begin> and
 C<end> keywords.
@@ -455,8 +449,6 @@ C<end> keywords.
   <%= $block->('Baerbel') %>
   <%= $block->('Wolfgang') %>
 
-=head2 Indentation
-
 Perl lines can also be indented freely.
 
   % my $block = begin
@@ -466,8 +458,6 @@ Perl lines can also be indented freely.
   %= $block->('Baerbel')
   %= $block->('Wolfgang')
 
-=head2 Arguments
-
 L<Mojo::Template> templates work just like Perl subs (actually they get
 compiled to a Perl sub internally). That means you can access arguments simply
 via C<@_>.
@@ -475,8 +465,6 @@ via C<@_>.
   % my ($foo, $bar) = @_;
   % my $x = shift;
   test 123 <%= $foo %>
-
-=head2 Exceptions
 
 Templates get compiled to Perl code internally, this can make debugging a bit
 tricky. But L<Mojo::Template> will return L<Mojo::Exception> objects that
@@ -488,6 +476,8 @@ stringify to error messages with context.
   4: % my $i = 2; xx
   5: %= $i * 2
   6: </body>
+
+See L<Mojolicious::Guides::Rendering> for more.
 
 =head1 ATTRIBUTES
 

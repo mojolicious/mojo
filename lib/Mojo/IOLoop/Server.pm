@@ -22,8 +22,8 @@ use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 # To regenerate the certificate run this command (18.04.2012)
 # openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
-my $CERT = catfile(dirname(__FILE__), 'server.crt');
-my $KEY  = catfile(dirname(__FILE__), 'server.key');
+my $CERT = catfile dirname(__FILE__), 'server.crt';
+my $KEY  = catfile dirname(__FILE__), 'server.key';
 
 has accepts => 10;
 has reactor => sub {

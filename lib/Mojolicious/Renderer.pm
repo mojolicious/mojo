@@ -252,8 +252,9 @@ Mojolicious::Renderer - MIME type based renderer
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer. See
-L<Mojolicious::Guides::Rendering> for more.
+L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer.
+
+See L<Mojolicious::Guides::Rendering> for more.
 
 =head1 ATTRIBUTES
 

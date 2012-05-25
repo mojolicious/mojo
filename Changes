@@ -1,5 +1,5 @@
 
-2.97  2012-05-24
+2.97  2012-05-25
   - Improved documentation.
   - Improved tests.
   - Fixed bug that prevented Test::Mojo from working with normal Mojolicious

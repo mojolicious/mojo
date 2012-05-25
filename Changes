@@ -266,7 +266,7 @@
   - Fixed small newline capture bug in Mojolicious::Routes::Match.
 
 2.62  2012-03-17
-  - Deprecated Mojolicious::Renderer->default_template_class in favor of 
+  - Deprecated Mojolicious::Renderer->default_template_class in favor of
     Mojolicious::Renderer->classes.
   - Deprecated Mojolicious::Static->default_static_class in favor of
     Mojolicious::Static->classes.

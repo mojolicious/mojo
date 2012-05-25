@@ -224,11 +224,8 @@ sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
   # Find handler and render
-  my $handler 
-    = $options->{handler}
-    || $self->_detect_handler($options)
-    || $self->default_handler;
-  $options->{handler} = $handler;
+  my $handler = $options->{handler} || $self->_detect_handler($options);
+  $options->{handler} = $handler ||= $self->default_handler;
   if (my $renderer = $self->handlers->{$handler}) {
     return 1 if $renderer->($self, $c, $output, $options);
   }

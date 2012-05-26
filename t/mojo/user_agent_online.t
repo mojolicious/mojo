@@ -10,9 +10,11 @@ use Test::More;
 use Mojo::IOLoop::Server;
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
+plan skip_all => 'IO::Socket::IP 0.06 required for this test!'
+  unless Mojo::IOLoop::Server::IPV6;
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 109;
+plan tests => 117;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -153,11 +155,42 @@ my $res = f('search.cpan.org/search' => {query => 'mojolicious'});
 like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';
 
-# Simple request
+# Simple requests
 $tx = $ua->get('metacpan.org');
 is $tx->req->method, 'GET',                 'right method';
 is $tx->req->url,    'http://metacpan.org', 'right url';
 is $tx->res->code,   301,                   'right status';
+$tx = $ua->get('http://google.com');
+is $tx->req->method, 'GET',               'right method';
+is $tx->req->url,    'http://google.com', 'right url';
+is $tx->res->code,   301,                 'right status';
+
+# Simple keep alive requests
+$tx = $ua->get('http://www.wikipedia.org');
+is $tx->req->method, 'GET',                      'right method';
+is $tx->req->url,    'http://www.wikipedia.org', 'right url';
+is $tx->req->body,   '',                         'no content';
+is $tx->res->code,   200,                        'right status';
+ok $tx->keep_alive, 'connection will be kept alive';
+ok !$tx->kept_alive, 'connection was not kept alive';
+$tx = $ua->get('http://www.wikipedia.org');
+is $tx->req->method, 'GET',                      'right method';
+is $tx->req->url,    'http://www.wikipedia.org', 'right url';
+is $tx->res->code,   200,                        'right status';
+ok $tx->keep_alive, 'connection will be kept alive';
+ok $tx->kept_alive, 'connection was kept alive';
+$tx = $ua->get('http://www.wikipedia.org');
+is $tx->req->method, 'GET',                      'right method';
+is $tx->req->url,    'http://www.wikipedia.org', 'right url';
+is $tx->res->code,   200,                        'right status';
+ok $tx->keep_alive, 'connection will be kept alive';
+ok $tx->kept_alive, 'connection was kept alive';
+
+# Request that requires IPv6
+$tx = $ua->get('http://ipv6.google.com');
+is $tx->req->method, 'GET',                    'right method';
+is $tx->req->url,    'http://ipv6.google.com', 'right url';
+is $tx->res->code,   200,                      'right status';
 
 # Simple HTTPS request
 $tx = $ua->get('https://www.metacpan.org');
@@ -199,28 +232,6 @@ is $tx->req->body,   'query=mojolicious', 'right content';
 like $tx->res->body, qr/Mojolicious/,     'right content';
 is $tx->res->code,   200,                 'right status';
 ok $tx->kept_alive, 'connection was kept alive';
-
-# Simple request
-$tx = $ua->get('http://www.wikipedia.org');
-is $tx->req->method, 'GET',                      'right method';
-is $tx->req->url,    'http://www.wikipedia.org', 'right url';
-is $tx->req->body,   '',                         'no content';
-is $tx->res->code,   200,                        'right status';
-
-# Simple keep alive requests
-$tx = $ua->get('http://google.com');
-is $tx->req->method, 'GET',               'right method';
-is $tx->req->url,    'http://google.com', 'right url';
-is $tx->res->code,   301,                 'right status';
-$tx = $ua->get('http://www.wikipedia.org');
-is $tx->req->method, 'GET',                      'right method';
-is $tx->req->url,    'http://www.wikipedia.org', 'right url';
-is $tx->res->code,   200,                        'right status';
-ok $tx->kept_alive, 'connection was kept alive';
-$tx = $ua->get('http://www.wikipedia.org');
-is $tx->req->method, 'GET',                      'right method';
-is $tx->req->url,    'http://www.wikipedia.org', 'right url';
-is $tx->res->code,   200,                        'right status';
 
 # Simple requests with redirect
 $ua->max_redirects(3);

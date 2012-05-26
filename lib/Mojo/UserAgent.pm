@@ -555,9 +555,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
     say "Error: $message";
   }
 
-  # PUT request with content
+  # IPv6 PUT request with content
   my $tx
-    = $ua->put('kraih.com' => {'Content-Type' => 'text/plain'} => 'Hello!');
+    = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hello!');
 
   # Grab the latest Mojolicious release :)
   $ua->max_redirects(5)->get('latest.mojolicio.us')

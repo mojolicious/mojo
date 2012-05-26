@@ -370,6 +370,9 @@ singleton.
 List of one or more locations to listen on, defaults to the value of the
 C<MOJO_LISTEN> environment variable or C<http://*:3000>.
 
+  # Listen on IPv6 interface
+  $daemon->listen(['http://[::1]:4000']);
+
   # Listen on two ports with HTTP and HTTPS at the same time
   $daemon->listen([qw(http://*:3000 https://*:4000)]);
 

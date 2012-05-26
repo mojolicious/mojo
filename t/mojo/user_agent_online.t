@@ -150,7 +150,7 @@ like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
 # Oneliner
 is g('mojolicio.us')->code,          200, 'right status';
 is h('mojolicio.us')->code,          200, 'right status';
-is h('mojolicio.us')->body,          '',  'no body';
+is h('mojolicio.us')->body,          '',  'no content';
 is p('mojolicio.us/lalalala')->code, 404, 'right status';
 is g('http://mojolicio.us')->code,   200, 'right status';
 is p('http://mojolicio.us')->code,   404, 'right status';

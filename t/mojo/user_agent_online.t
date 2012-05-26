@@ -14,7 +14,7 @@ plan skip_all => 'IO::Socket::IP 0.06 required for this test!'
   unless Mojo::IOLoop::Server::IPV6;
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 86;
+plan tests => 84;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -201,18 +201,19 @@ is $tx->req->method, 'GET',                      'right method';
 is $tx->req->url,    'https://www.metacpan.org', 'right url';
 is $tx->res->code,   200,                        'right status';
 
+# HTTPS request that requires IPv6
+$tx = $ua->get('https://ipv6.google.com');
+is $tx->req->method, 'GET',                     'right method';
+is $tx->req->url,    'https://ipv6.google.com', 'right url';
+is $tx->res->code,   200,                       'right status';
+
 # HTTPS request that requires SNI
 $tx = $ua->get('https://google.de');
 like $ua->ioloop->stream($tx->connection)
   ->handle->peer_certificate('commonName'), qr/google\.de/, 'right name';
 
-# Simple request with body
-$tx = $ua->get('http://mojolicio.us' => 'Hi there!');
-is $tx->req->method, 'GET', 'right method';
-is $tx->req->url, 'http://mojolicio.us', 'right url';
-is $tx->req->headers->content_length, 9, 'right content length';
-is $tx->req->body, 'Hi there!', 'right content';
-is $tx->res->code, 200,         'right status';
+# Fresh user agent again
+$ua = Mojo::UserAgent->new;
 
 # Simple keep alive form POST
 $tx = $ua->post_form(

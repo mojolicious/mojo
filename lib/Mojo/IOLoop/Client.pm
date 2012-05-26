@@ -17,6 +17,9 @@ use constant TLS => $ENV{MOJO_NO_TLS}
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
+# Fix IO::Socket::SSL to work with IO::Socket::IP
+$IO::Socket::SSL::ISA[0] = 'IO::Socket::IP' if IPV6;
+
 # "It's like my dad always said: eventually, everybody gets shot."
 has reactor => sub {
   require Mojo::IOLoop;

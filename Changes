@@ -1,5 +1,6 @@
 
 2.97  2012-05-26
+  - Added workaround to make IO::Socket::SSL work with IO::Socket::IP.
   - Improved documentation.
   - Improved tests.
   - Fixed bug that prevented Test::Mojo from working with normal Mojolicious

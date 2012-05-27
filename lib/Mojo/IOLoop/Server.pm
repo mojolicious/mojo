@@ -21,7 +21,7 @@ use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
 # Fix IO::Socket::SSL to work with IO::Socket::IP
-$IO::Socket::SSL::ISA[0] = 'IO::Socket::IP' if IPV6;
+$IO::Socket::SSL::ISA[0] = 'IO::Socket::IP' if IPV6 && TLS;
 
 # To regenerate the certificate run this command (18.04.2012)
 # openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300

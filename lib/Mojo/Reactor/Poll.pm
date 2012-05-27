@@ -53,10 +53,10 @@ sub one_tick {
 
     # Timers
     while (my ($id, $t) = each %{$self->{timers} || {}}) {
-      next unless $t->{time} <= time;
+      next unless $t->{time} <= (my $time = time);
 
       # Recurring timer
-      if (exists $t->{recurring}) { $t->{time} = time + $t->{recurring} }
+      if (exists $t->{recurring}) { $t->{time} = $time + $t->{recurring} }
 
       # Normal timer
       else { $self->remove($id) }

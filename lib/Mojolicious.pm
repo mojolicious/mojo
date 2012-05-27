@@ -198,7 +198,7 @@ sub plugin {
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
-sub start { shift->commands->start(@_) }
+sub start { ($ENV{MOJO_APP} = shift)->commands->start(@_) }
 
 sub startup { }
 

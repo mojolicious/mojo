@@ -1,5 +1,5 @@
 package Mojo::Collection;
-use Mojo::Base -strict;
+use Mojo::Base 'Exporter';
 use overload
   'bool'   => sub {1},
   '""'     => sub { shift->join("\n") },
@@ -8,19 +8,14 @@ use overload
 use List::Util;
 use Mojo::ByteStream;
 
-sub import {
-  my $class = shift;
-  return unless @_ > 0;
-  no strict 'refs';
-  no warnings 'redefine';
-  my $caller = caller;
-  *{"${caller}::c"} = sub { $class->new(@_) };
-}
+our @EXPORT_OK = ('c');
 
 sub new {
   my $class = shift;
   return bless [@_], ref $class || $class;
 }
+
+sub c { __PACKAGE__->new(@_) }
 
 sub each {
   my ($self, $cb) = @_;

@@ -1,9 +1,11 @@
 package Mojo::ByteStream;
-use Mojo::Base -strict;
+use Mojo::Base 'Exporter';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Collection;
 use Mojo::Util;
+
+our @EXPORT_OK = ('b');
 
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
@@ -24,21 +26,14 @@ my @UTILS = (
   }
 }
 
-sub import {
-  my $class = shift;
-  return unless @_ > 0;
-  no strict 'refs';
-  no warnings 'redefine';
-  my $caller = caller;
-  *{"${caller}::b"} = sub { $class->new(@_) };
-}
-
 # "Do we have any food that wasn't brutally slaughtered?
 #  Well, I think the veal died of loneliness."
 sub new {
   my $class = shift;
   return bless \(my $dummy = join '', @_), ref $class || $class;
 }
+
+sub b { __PACKAGE__->new(@_) }
 
 sub clone {
   my $self = shift;

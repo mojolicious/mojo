@@ -3,9 +3,9 @@
 
 Back in the early days of the web, many people learned Perl because of a
 wonderful Perl library called L<CGI>. It was simple enough to get started
-without knowing much about the language and powerful enough to keep you
-going, learning by doing was much fun. While most of the techniques used are
-outdated now, the idea behind it is not. L<Mojolicious> is a new attempt at
+without knowing much about the language and powerful enough to keep you going,
+learning by doing was much fun. While most of the techniques used are outdated
+now, the idea behind it is not. L<Mojolicious> is a new attempt at
 implementing this idea using state of the art technology.
 
 =head2 Features
@@ -34,8 +34,8 @@ they are installed).
 
 =item *
 
-Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6,
-TLS, Bonjour, IDNA, Comet (long polling), chunking and multipart support.
+Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6, TLS,
+IDNA, Comet (long polling), chunking and multipart support.
 
 =item *
 
@@ -72,8 +72,8 @@ These three lines are a whole web application.
 
   app->start;
 
-To run this example with the built-in development web server just put the
-code into a file and start it with C<morbo>.
+To run this example with the built-in development web server just put the code
+into a file and start it with C<morbo>.
 
   $ morbo hello.pl
   Server available at http://127.0.0.1:3000.

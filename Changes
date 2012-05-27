@@ -1,6 +1,7 @@
 
 2.97  2012-05-27
   - Added workaround to make IO::Socket::SSL work with IO::Socket::IP.
+  - Removed Bonjour support.
   - Improved documentation.
   - Improved tests.
   - Fixed bug that prevented Test::Mojo from working with normal Mojolicious

@@ -1,8 +1,8 @@
 use Mojo::Base -strict;
 
-# Disable Bonjour, IPv6, TLS and libev
+# Disable IPv6, TLS and libev
 BEGIN {
-  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = $ENV{MOJO_NO_TLS} = 1;
+  $ENV{MOJO_NO_IPV6} = $ENV{MOJO_NO_TLS} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 

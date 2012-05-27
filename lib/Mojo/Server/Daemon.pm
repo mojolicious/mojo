@@ -6,12 +6,6 @@ use Mojo::IOLoop;
 use Mojo::URL;
 use POSIX;
 use Scalar::Util 'weaken';
-use Sys::Hostname;
-
-# Bonjour
-use constant BONJOUR => $ENV{MOJO_NO_BONJOUR}
-  ? 0
-  : eval 'use Net::Rendezvous::Publish 0.04 (); 1';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
@@ -192,16 +186,6 @@ sub _listen {
   );
   push @{$self->{listening} ||= []}, $id;
 
-  # Bonjour
-  if (BONJOUR && (my $p = Net::Rendezvous::Publish->new)) {
-    my $name = $options->{address} || Sys::Hostname::hostname();
-    $p->publish(
-      name => "Mojolicious ($name:$options->{port})",
-      port => $options->{port},
-      type => '_http._tcp'
-    ) if $options->{port} && !$tls;
-  }
-
   # Friendly message
   return if $self->silent;
   $self->app->log->info(qq{Listening at "$listen".});
@@ -312,12 +296,12 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP 1.1 and WebSocket server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured non-blocking I/O HTTP 1.1 and
-WebSocket server with C<IPv6>, C<TLS>, C<Bonjour> and C<libev> support.
+WebSocket server with C<IPv6>, C<TLS> and C<libev> support.
 
 Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and
 L<Net::Rendezvous::Publish> are supported transparently and used if installed.
-Individual features can also be disabled with the C<MOJO_NO_BONJOUR>,
-C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+Individual features can also be disabled with the C<MOJO_NO_IPV6> and
+C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for deployment recipes.
 

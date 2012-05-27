@@ -1,10 +1,7 @@
 use Mojo::Base -strict;
 
-# Disable Bonjour and libev
-BEGIN {
-  $ENV{MOJO_NO_BONJOUR} = 1;
-  $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
-}
+# Disable libev
+BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
 use Mojo::IOLoop::Server;

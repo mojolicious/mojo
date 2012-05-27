@@ -2,11 +2,11 @@ use Mojo::Base -strict;
 
 use utf8;
 
-# Disable Bonjour, IPv6 and libev
+# Disable IPv6 and libev
 BEGIN {
-  $ENV{MOJO_MODE}       = 'development';
-  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
-  $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
+  $ENV{MOJO_MODE}    = 'development';
+  $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
 use Test::More tests => 83;

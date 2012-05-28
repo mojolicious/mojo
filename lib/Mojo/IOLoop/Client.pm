@@ -64,12 +64,13 @@ sub _connect {
     return $self->emit_safe(error => "Couldn't connect.")
       unless $handle = $class->new(%options);
 
+    # IPv6 needs an early start
+    return $self->emit_safe(error => "Couldn't connect.")
+      if IPV6 && !defined($handle->connect);
+
     # Timer
     $self->{timer} = $reactor->timer($args->{timeout} || 10,
       sub { $self->emit_safe(error => 'Connect timeout.') });
-
-    # IPv6 needs an early start
-    $handle->connect if IPV6;
   }
   $handle->blocking(0);
 

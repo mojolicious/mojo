@@ -1,5 +1,6 @@
 
 2.98  2012-05-29
+  - Improved IPv6 exception handling in Mojo::IOLoop::Client.
   - Improved tests.
 
 2.97  2012-05-28

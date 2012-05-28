@@ -36,8 +36,8 @@ sub client {
   $self = $self->singleton unless ref $self;
   my $cb = pop;
 
-  # Make sure garbage gets collected
-  $self->_cleaner;
+  # Manage connections
+  $self->_manage;
 
   # New client
   my $client = $self->client_class->new;
@@ -124,8 +124,8 @@ sub server {
   $self = $self->singleton unless ref $self;
   my $cb = pop;
 
-  # Make sure garbage gets collected
-  $self->_cleaner;
+  # Manage connections
+  $self->_manage;
 
   # New server
   my $server = $self->server_class->new;
@@ -193,28 +193,6 @@ sub timer {
   return $self->reactor->timer($after => sub { $self->$cb });
 }
 
-sub _cleaner {
-  my $self = shift;
-  $self->{cleaner} ||= $self->recurring(
-    0.025 => sub {
-      my $self = shift;
-
-      # Manage connections
-      $self->_listening;
-      my $connections = $self->{connections} ||= {};
-      while (my ($id, $c) = each %$connections) {
-        $self->_remove($id)
-          if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
-      }
-
-      # Graceful shutdown
-      $self->_remove(delete $self->{cleaner})
-        unless keys %$connections || keys %{$self->{servers}};
-      $self->stop if $self->max_connections == 0 && keys %$connections == 0;
-    }
-  );
-}
-
 sub _id {
   my $self = shift;
   my $id;
@@ -238,6 +216,30 @@ sub _listening {
   # Check if multi-accept is desirable and start listening
   $_->accepts($max > 1 ? 10 : 1)->start for values %$servers;
   $self->{listening} = 1;
+}
+
+sub _manage {
+  my $self = shift;
+  $self->{manager} ||= $self->recurring(
+    0.025 => sub {
+      my $self = shift;
+
+      # Acquire accept mutex
+      $self->_listening;
+
+      # Close connections gracefully
+      my $connections = $self->{connections} ||= {};
+      while (my ($id, $c) = each %$connections) {
+        $self->_remove($id)
+          if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
+      }
+
+      # Graceful shutdown
+      $self->_remove(delete $self->{manager})
+        unless keys %$connections || keys %{$self->{servers}};
+      $self->stop if $self->max_connections == 0 && keys %$connections == 0;
+    }
+  );
 }
 
 sub _not_listening {
@@ -272,8 +274,8 @@ sub _remove {
 sub _stream {
   my ($self, $stream, $id) = @_;
 
-  # Make sure garbage gets collected
-  $self->_cleaner;
+  # Manage connections
+  $self->_manage;
 
   # Connect stream with reactor
   $self->{connections}{$id}{stream} = $stream;
@@ -350,7 +352,7 @@ A TLS certificate and key are also built right in to make writing test servers
 as easy as possible. Also note that for convenience the C<PIPE> signal will be
 set to C<IGNORE> when L<Mojo::IOLoop> is loaded.
 
-See L<Mojolicious::Guides::Cookbook> for recipes.
+See L<Mojolicious::Guides::Cookbook> for more.
 
 =head1 ATTRIBUTES
 

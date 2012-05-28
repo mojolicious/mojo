@@ -613,7 +613,7 @@ Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are supported
 transparently and used if installed. Individual features can also be disabled
 with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
-See L<Mojolicious::Guides::Cookbook> for recipes.
+See L<Mojolicious::Guides::Cookbook> for more.
 
 =head1 EVENTS
 

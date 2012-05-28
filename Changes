@@ -1,5 +1,5 @@
 
-2.97  2012-05-27
+2.97  2012-05-28
   - Added workaround to make IO::Socket::SSL work with IO::Socket::IP.
   - Removed Bonjour support.
   - Improved documentation.

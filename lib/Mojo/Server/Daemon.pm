@@ -68,7 +68,7 @@ sub _build_tx {
   # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
 
-  # Events
+  # Handle upgrades and requests
   weaken $self;
   $tx->on(
     upgrade => sub {

@@ -19,7 +19,7 @@ has max_accepts     => 0;
 has max_connections => 1000;
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
-  warn "-- Mainloop ($class)\n" if DEBUG;
+  warn "-- Reactor ($class)\n" if DEBUG;
   return $class->new;
 };
 has server_class => 'Mojo::IOLoop::Server';
@@ -46,7 +46,7 @@ sub client {
   $c->{client} = $client;
   weaken $client->reactor($self->reactor)->{reactor};
 
-  # Events
+  # Connect
   weaken $self;
   $client->on(
     connect => sub {
@@ -68,8 +68,6 @@ sub client {
       delete $self->{connections}{$id};
     }
   );
-
-  # Connect
   $client->connect(@_);
 
   return $id;
@@ -133,7 +131,7 @@ sub server {
   $self->{servers}{$id} = $server;
   weaken $server->reactor($self->reactor)->{reactor};
 
-  # Events
+  # Listen
   weaken $self;
   $server->on(
     accept => sub {
@@ -144,16 +142,18 @@ sub server {
       my $id     = $self->stream($stream);
       $self->$cb($stream, $id);
 
-      # Enforce limit
+      # Enforce connection limit
       $self->max_connections(0)
         if defined $self->{accepts} && --$self->{accepts} == 0;
+
+      # Stop listening
       $self->_not_listening;
     }
   );
-
-  # Listen
   $server->listen(@_);
   $self->{accepts} = $self->max_accepts if $self->max_accepts;
+
+  # Stop listening
   $self->_not_listening;
 
   return $id;
@@ -204,13 +204,14 @@ sub _id {
 sub _listening {
   my $self = shift;
 
-  # Check if we should be listening
+  # Check connection limit
   return if $self->{listening};
-  my $servers = $self->{servers} ||= {};
-  return unless keys %$servers;
+  return unless keys(my $servers = $self->{servers} ||= {});
   my $i   = keys %{$self->{connections}};
   my $max = $self->max_connections;
   return unless $i < $max;
+
+  # Acquire accept mutex
   if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
 
   # Check if multi-accept is desirable and start listening
@@ -224,7 +225,7 @@ sub _manage {
     0.025 => sub {
       my $self = shift;
 
-      # Acquire accept mutex
+      # Start listening if possible
       $self->_listening;
 
       # Close connections gracefully
@@ -245,7 +246,7 @@ sub _manage {
 sub _not_listening {
   my $self = shift;
 
-  # Check if we are listening
+  # Release accept mutex
   return unless delete $self->{listening};
   return unless my $cb = $self->unlock;
   $self->$cb();
@@ -281,7 +282,7 @@ sub _stream {
   $self->{connections}{$id}{stream} = $stream;
   weaken $stream->reactor($self->reactor)->{reactor};
 
-  # Events
+  # Stream
   weaken $self;
   $stream->on(close => sub { $self->{connections}{$id}{finish} = 1 });
   $stream->start;

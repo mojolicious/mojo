@@ -206,7 +206,8 @@ sub _listening {
 
   # Check connection limit
   return if $self->{listening};
-  return unless keys(my $servers = $self->{servers} ||= {});
+  my $servers = $self->{servers} ||= {};
+  return unless keys %$servers;
   my $i   = keys %{$self->{connections}};
   my $max = $self->max_connections;
   return unless $i < $max;

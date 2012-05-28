@@ -373,14 +373,14 @@ defaults to L<Mojo::IOLoop::Client>.
   my $cb = $loop->lock;
   $loop  = $loop->lock(sub {...});
 
-A locking callback that decides if this loop is allowed to accept new incoming
-connections, used to sync multiple server processes. The callback should
-return true or false. Note that exceptions in this callback are not captured.
+A callback for acquiring the accept mutex, used to sync multiple server
+processes. The callback should return true or false. Note that exceptions in
+this callback are not captured.
 
   $loop->lock(sub {
     my ($loop, $blocking) = @_;
 
-    # Got the lock, listen for new connections
+    # Got the accept mutex, start listening
     return 1;
   });
 
@@ -402,7 +402,8 @@ connections indefinitely.
 The maximum number of parallel connections this loop is allowed to handle
 before stopping to accept new incoming connections, defaults to C<1000>.
 Setting the value to C<0> will make this loop stop accepting new connections
-and allow it to shutdown gracefully without interrupting existing connections.
+and allow it to shut down gracefully without interrupting existing
+connections.
 
 =head2 C<reactor>
 
@@ -439,8 +440,8 @@ to L<Mojo::IOLoop::Stream>.
   my $cb = $loop->unlock;
   $loop  = $loop->unlock(sub {...});
 
-A callback to free the accept lock, used to sync multiple server processes.
-Note that exceptions in this callback are not captured.
+A callback for releasing the accept mutex, used to sync multiple server
+processes. Note that exceptions in this callback are not captured.
 
 =head1 METHODS
 

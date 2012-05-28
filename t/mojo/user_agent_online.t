@@ -14,7 +14,7 @@ plan skip_all => 'IO::Socket::IP 0.06 required for this test!'
   unless Mojo::IOLoop::Server::IPV6;
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 84;
+plan tests => 86;
 
 # "So then I said to the cop, "No, you're driving under the influence...
 #  of being a jerk"."
@@ -77,8 +77,14 @@ $ua->start($tx);
 ok !$tx->is_finished, 'transaction is not finished';
 ok $tx->error, 'has error';
 
-# Connection refused
+# Connection refused (IPv4)
 $tx = $ua->build_tx(GET => "http://127.0.0.1:$port");
+$ua->start($tx);
+ok !$tx->is_finished, 'transaction is not finished';
+ok $tx->error, 'has error';
+
+# Connection refused (IPv6)
+$tx = $ua->build_tx(GET => "http://[::1]:$port");
 $ua->start($tx);
 ok !$tx->is_finished, 'transaction is not finished';
 ok $tx->error, 'has error';

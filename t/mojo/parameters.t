@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 80;
+use Test::More tests => 84;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use Mojo::Parameters;
@@ -151,11 +151,15 @@ is_deeply $p->to_hash,
   {foo => ['bar', 'baz'], a => 'b', bar => ['bas', 'test']}, 'right structure';
 $p = Mojo::Parameters->new(foo => ['ba;r', 'b;az']);
 is_deeply $p->to_hash, {foo => ['ba;r', 'b;az']}, 'right structure';
-$p->append(foo => ['bar'], foo => ['baz']);
-is_deeply $p->to_hash, {foo => ['ba;r', 'b;az', 'bar', 'baz']},
+$p->append(foo => ['bar'], foo => ['baz', 'yada']);
+is_deeply $p->to_hash, {foo => ['ba;r', 'b;az', 'bar', 'baz', 'yada']},
   'right structure';
+is $p->param('foo'), 'ba;r', 'right value';
+is_deeply [$p->param('foo')], [qw(ba;r b;az bar baz yada)], 'right values';
 $p = Mojo::Parameters->new(foo => ['ba;r', 'b;az'], bar => 23);
 is_deeply $p->to_hash, {foo => ['ba;r', 'b;az'], bar => 23}, 'right structure';
+is $p->param('foo'), 'ba;r', 'right value';
+is_deeply [$p->param('foo')], [qw(ba;r b;az)], 'right values';
 
 # Unicode
 $p = Mojo::Parameters->new;

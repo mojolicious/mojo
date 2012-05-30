@@ -37,7 +37,7 @@ sub append {
     my $value = $pairs[$i + 1] // '';
 
     # Single value
-    unless (ref $value eq 'ARRAY') { push @$params, $key => $value }
+    if (ref $value ne 'ARRAY') { push @$params, $key => $value }
 
     # Multiple values
     else { push @$params, $key => (defined $_ ? "$_" : '') for @$value }

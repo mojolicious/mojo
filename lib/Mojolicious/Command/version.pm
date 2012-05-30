@@ -32,9 +32,9 @@ CORE
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL
-  EV                       ($ev)
-  IO::Socket::INET6        ($ipv6)
-  IO::Socket::SSL          ($tls)
+  EV                ($ev)
+  IO::Socket::INET6 ($ipv6)
+  IO::Socket::SSL   ($tls)
 
 EOF
 

@@ -408,6 +408,9 @@ Query part of this URL, defaults to a L<Mojo::Parameters> object.
   # "http://mojolicio.us?a=2&c=3"
   Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => 2, c => 3);
 
+  # "http://mojolicio.us?a=2&a=3"
+  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => [2, 3]);
+
   # "http://mojolicio.us?a=2&b=2&c=3"
   Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => 2, c => 3]);
 

@@ -1,5 +1,6 @@
 
 2.98  2012-05-30
+  - Switched from IO::Socket::IP to IO::Socket::INET6 for IPv6 support.
   - Improved IPv6 exception handling in Mojo::IOLoop::Client.
   - Improved documentation.
   - Improved tests.

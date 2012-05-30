@@ -5,20 +5,17 @@ use IO::Socket::INET;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP SO_ERROR TCP_NODELAY);
 
-# IPv6 support requires IO::Socket::IP
+# IPv6 support requires IO::Socket::INET6
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval 'use IO::Socket::IP 0.06 (); 1';
+  : eval 'use IO::Socket::INET6 2.69 (); 1';
 
 # TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS}
-  ? 0
-  : eval 'use IO::Socket::SSL 1.37 "inet4"; 1';
+use constant TLS => $ENV{MOJO_NO_TLS} ? 0
+  : eval(IPV6 ? 'use IO::Socket::SSL 1.37 (); 1'
+  : 'use IO::Socket::SSL 1.37 "inet4"; 1');
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
-
-# Fix IO::Socket::SSL to work with IO::Socket::IP
-$IO::Socket::SSL::ISA[0] = 'IO::Socket::IP' if IPV6 && TLS;
 
 # "It's like my dad always said: eventually, everybody gets shot."
 has reactor => sub {
@@ -60,13 +57,9 @@ sub _connect {
     );
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
-    my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
+    my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
     return $self->emit_safe(error => "Couldn't connect.")
       unless $handle = $class->new(%options);
-
-    # IPv6 needs an early start
-    return $self->emit_safe(error => "Couldn't connect.")
-      if IPV6 && !defined($handle->connect);
 
     # Timer
     $self->{timer} = $reactor->timer($args->{timeout} || 10,
@@ -206,7 +199,7 @@ implements the following new ones.
   $client->connect(address => '127.0.0.1', port => 3000);
 
 Open a socket connection to a remote host. Note that TLS support depends on
-L<IO::Socket::SSL> and IPv6 support on L<IO::Socket::IP>.
+L<IO::Socket::SSL> and IPv6 support on L<IO::Socket::INET6>.
 
 These options are currently available:
 

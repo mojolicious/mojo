@@ -8,20 +8,17 @@ use IO::Socket::INET;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
 
-# IPv6 support requires IO::Socket::IP
+# IPv6 support requires IO::Socket::INET6
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval 'use IO::Socket::IP 0.06 (); 1';
+  : eval 'use IO::Socket::INET6 2.69 (); 1';
 
 # TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS}
-  ? 0
-  : eval 'use IO::Socket::SSL 1.37 "inet4"; 1';
+use constant TLS => $ENV{MOJO_NO_TLS} ? 0
+  : eval(IPV6 ? 'use IO::Socket::SSL 1.37 (); 1'
+  : 'use IO::Socket::SSL 1.37 "inet4"; 1');
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
-
-# Fix IO::Socket::SSL to work with IO::Socket::IP
-$IO::Socket::SSL::ISA[0] = 'IO::Socket::IP' if IPV6 && TLS;
 
 # To regenerate the certificate run this command (18.04.2012)
 # openssl req -new -x509 -keyout server.key -out server.crt -nodes -days 7300
@@ -62,7 +59,7 @@ sub listen {
 
   # Reuse file descriptor
   my $handle;
-  my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
+  my $class = IPV6 ? 'IO::Socket::INET6' : 'IO::Socket::INET';
   if (defined $fd) {
     $handle = $class->new;
     $handle->fdopen($fd, 'r') or croak "Can't open file descriptor $fd: $!";
@@ -230,7 +227,7 @@ implements the following new ones.
   $server->listen(port => 3000);
 
 Create a new listen socket. Note that TLS support depends on
-L<IO::Socket::SSL> and IPv6 support on L<IO::Socket::IP>.
+L<IO::Socket::SSL> and IPv6 support on L<IO::Socket::INET6>.
 
 These options are currently available:
 

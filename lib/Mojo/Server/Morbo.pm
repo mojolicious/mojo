@@ -130,10 +130,9 @@ To start applications with it you can use the L<morbo> script.
   $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
-Optional modules L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and
-L<Net::Rendezvous::Publish> are supported transparently and used if installed.
-Individual features can also be disabled with the C<MOJO_NO_IPV6> and
-C<MOJO_NO_TLS> environment variables.
+Optional modules L<EV>, L<IO::Socket::INET6> and L<IO::Socket::SSL> are
+supported transparently and used if installed. Individual features can also be
+disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 

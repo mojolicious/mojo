@@ -19,7 +19,7 @@ has pair_separator => '&';
 sub new {
   my $self = shift->SUPER::new;
 
-  # Hash/Array
+  # Pairs
   if (@_ > 1) { $self->append(@_) }
 
   # String
@@ -29,15 +29,19 @@ sub new {
 }
 
 sub append {
-  my ($self, @params) = @_;
+  my ($self, @pairs) = @_;
 
-  # Filter array values
-  for (my $i = 1; $i < @params; $i += 2) {
-    next if ref $params[$i] ne 'ARRAY';
-    push @params, map { ($params[$i - 1], $_) } @{$params[$i]};
-    splice @params, $i - 1, 2;
+  my $params = $self->params;
+  for (my $i = 0; $i < @pairs; $i += 2) {
+    my $key   = $pairs[$i]     // '';
+    my $value = $pairs[$i + 1] // '';
+
+    # Single value
+    unless (ref $value eq 'ARRAY') { push @$params, $key => $value }
+
+    # Multiple values
+    else { push @$params, $key => (defined $_ ? "$_" : '') for @$value }
   }
-  push @{$self->params}, map { defined $_ ? "$_" : '' } @params;
 
   return $self;
 }

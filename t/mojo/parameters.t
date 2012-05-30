@@ -143,7 +143,7 @@ is "$p", 'a=works+too', 'right format';
 
 # Array values
 $p = Mojo::Parameters->new;
-$p->append(foo => [qw(bar baz)], a => 'b', bar => [qw(bas test)]);
+$p->append(foo => [qw(bar baz)], bar => [qw(bas test)], a => 'b');
 is_deeply [$p->param('foo')], [qw(bar baz)], 'right values';
 is $p->param('a'), 'b', 'right value';
 is_deeply [$p->param('bar')], [qw(bas test)], 'right values';

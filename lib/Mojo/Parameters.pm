@@ -249,18 +249,28 @@ following new ones.
 
   my $p = Mojo::Parameters->new;
   my $p = Mojo::Parameters->new('foo=b%3Bar&baz=23');
-  my $p = Mojo::Parameters->new(foo => 'b;ar', baz => 23);
+  my $p = Mojo::Parameters->new(foo => 'b;ar');
+  my $p = Mojo::Parameters->new(foo => ['ba;r', 'b;az']);
+  my $p = Mojo::Parameters->new(foo => ['ba;r', 'b;az'], bar => 23);
 
 Construct a new L<Mojo::Parameters> object.
 
 =head2 C<append>
 
   $p = $p->append(foo => 'ba;r');
+  $p = $p->append(foo => ['ba;r', 'b;az']);
+  $p = $p->append(foo => ['ba;r', 'b;az'], bar => 23);
 
 Append parameters.
 
   # "foo=bar&foo=baz"
   Mojo::Parameters->new('foo=bar')->append(foo => 'baz');
+
+  # "foo=bar&foo=baz&foo=yada"
+  Mojo::Parameters->new('foo=bar')->append(foo => ['baz', 'yada']);
+
+  # "foo=bar&foo=baz&foo=yada&bar=23"
+  Mojo::Parameters->new('foo=bar')->append(foo => ['baz', 'yada'], bar => 23);
 
 =head2 C<clone>
 

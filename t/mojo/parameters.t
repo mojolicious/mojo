@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 77;
+use Test::More tests => 80;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use Mojo::Parameters;
@@ -149,6 +149,13 @@ is $p->param('a'), 'b', 'right value';
 is_deeply [$p->param('bar')], [qw(bas test)], 'right values';
 is_deeply $p->to_hash,
   {foo => ['bar', 'baz'], a => 'b', bar => ['bas', 'test']}, 'right structure';
+$p = Mojo::Parameters->new(foo => ['ba;r', 'b;az']);
+is_deeply $p->to_hash, {foo => ['ba;r', 'b;az']}, 'right structure';
+$p->append(foo => ['bar'], foo => ['baz']);
+is_deeply $p->to_hash, {foo => ['ba;r', 'b;az', 'bar', 'baz']},
+  'right structure';
+$p = Mojo::Parameters->new(foo => ['ba;r', 'b;az'], bar => 23);
+is_deeply $p->to_hash, {foo => ['ba;r', 'b;az'], bar => 23}, 'right structure';
 
 # Unicode
 $p = Mojo::Parameters->new;

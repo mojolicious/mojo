@@ -916,8 +916,7 @@ C<namespace>, C<partial>, C<path>, C<status>, C<template> and C<text>.
 
   my $ua = $c->ua;
 
-Alias for C<$c-E<gt>app-E<gt>ua>. Usually refers to a L<Mojo::UserAgent>
-object.
+Alias for L<Mojo/"ua">.
 
   # Blocking
   my $tx = $c->ua->get('http://mojolicio.us');

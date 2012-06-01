@@ -155,7 +155,7 @@ sub _json {
   my ($self, $buffer, $pointer) = @_;
   my $json = Mojo::JSON->new;
   return unless my $data = $json->decode($buffer);
-  return unless $data = Mojo::JSON::Pointer->get($data, $pointer);
+  return unless defined($data = Mojo::JSON::Pointer->get($data, $pointer));
   ref $data ~~ ['HASH', 'ARRAY'] ? say($json->encode($data)) : _say($data);
 }
 

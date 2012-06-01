@@ -740,9 +740,11 @@ Andre Vieth
 
 Andreas Jaekel
 
+Andreas Koenig
+
 Andrew Fresh
 
-Andreas Koenig
+Andrey Khozov
 
 Andy Grundman
 

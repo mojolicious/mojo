@@ -1,6 +1,7 @@
 
-2.99  2012-05-31
+2.99  2012-06-01
   - Improved documentation.
+  - Fixed small JSON Pointer bug in get command. (avkhozov)
 
 2.98  2012-05-30
   - Switched from IO::Socket::IP to IO::Socket::INET6 for IPv6 support.

@@ -637,6 +637,9 @@ Replace elements.
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
 
+  # "<div></div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('');
+
 =head2 C<replace_content>
 
   $dom = $dom->replace_content('test');
@@ -645,6 +648,9 @@ Replace element content.
 
   # "<div><h1>B</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B');
+
+  # "<div><h1></h1></div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('');
 
 =head2 C<root>
 

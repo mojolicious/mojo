@@ -1,5 +1,5 @@
 
-2.99  2012-06-02
+2.99  2012-06-03
   - Improved documentation.
   - Improved tests.
   - Fixed small JSON Pointer bug in get command. (avkhozov)

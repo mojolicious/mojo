@@ -630,7 +630,7 @@ Prepend to element content.
 
 =head2 C<replace>
 
-  $dom = $dom->replace('<div>test</div>');
+  my $old = $dom->replace('<div>test</div>');
 
 Replace elements.
 

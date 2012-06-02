@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 764;
+use Test::More tests => 768;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -310,6 +310,10 @@ is "$dom", '<div>☃</div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>♥</div>');
 $dom->at('div')->replace_content("\x{2603}");
 is $dom->to_xml, '<div>☃</div>', 'right result';
+is $dom->at('div')->replace('<p>♥</p>')->root, '<p>♥</p>', 'right result';
+is $dom->to_xml, '<p>♥</p>', 'right result';
+is $dom->replace('<b>whatever</b>')->root, '<b>whatever</b>', 'right result';
+is $dom->to_xml, '<b>whatever</b>', 'right result';
 
 # Replace element content
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');

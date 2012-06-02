@@ -1,6 +1,7 @@
 
 2.99  2012-06-02
   - Improved documentation.
+  - Improved tests.
   - Fixed small JSON Pointer bug in get command. (avkhozov)
 
 2.98  2012-05-30

@@ -16,7 +16,7 @@ sub new { shift->SUPER::new(@_, content => '') }
 sub add_chunk {
   my ($self, $chunk) = @_;
 
-  $self->{content} .= $chunk if defined $chunk;
+  $self->{content} .= $chunk // '';
   return $self
     if !$self->auto_upgrade || $self->size <= $self->max_memory_size;
   my $file = Mojo::Asset::File->new;

@@ -339,12 +339,9 @@ sub _parse {
   my ($self, $until_body, $chunk) = @_;
 
   # Add chunk
-  $self->{buffer}   //= '';
-  $self->{raw_size} //= 0;
-  if (defined $chunk) {
-    $self->{raw_size} += length $chunk;
-    $self->{buffer} .= $chunk;
-  }
+  $chunk //= '';
+  $self->{raw_size} += length $chunk;
+  $self->{buffer} .= $chunk;
 
   # Check message size
   return $self->error('Maximum message size exceeded.', 413)

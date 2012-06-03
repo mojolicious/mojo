@@ -113,13 +113,12 @@ sub encode {
 }
 
 sub get_line {
-  my $stringref = shift;
 
   # Locate line ending
-  return if (my $pos = index $$stringref, "\x0a") == -1;
+  return if (my $pos = index ${$_[0]}, "\x0a") == -1;
 
   # Extract line and ending
-  my $line = substr $$stringref, 0, $pos + 1, '';
+  my $line = substr ${$_[0]}, 0, $pos + 1, '';
   $line =~ s/\x0d?\x0a$//;
 
   return $line;

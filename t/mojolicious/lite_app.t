@@ -867,29 +867,29 @@ $t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /0 ("X-Forwarded-For")
-$t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
-  ->status_is(200)->content_like(qr!^http\://localhost\:\d+!)
-  ->content_unlike(qr!/0-192\.168\.2\.1-0$!);
+$t->get_ok('/0', {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
+  ->content_like(qr!^http\://localhost\:\d+/0!)
+  ->content_unlike(qr!-192\.0\.2\.1-0$!);
 
 # GET /0 ("X-Forwarded-HTTPS")
 $t->get_ok('/0', {'X-Forwarded-HTTPS' => 1})->status_is(200)
-  ->content_like(qr!^http\://localhost\:\d+!)
-  ->content_unlike(qr!/0-192\.168\.2\.1-0$!);
+  ->content_like(qr!^http\://localhost\:\d+/0!)
+  ->content_unlike(qr!-192\.0\.2\.1-0$!);
 
 # GET /0 (reverse proxy with "X-Forwarded-For")
 {
   local $ENV{MOJO_REVERSE_PROXY} = 1;
-  $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
+  $t->get_ok('/0', {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
     ->status_is(200)
-    ->content_like(qr!http\://localhost\:\d+/0-192\.168\.2\.1-0!);
+    ->content_like(qr!http\://localhost\:\d+/0-192\.0\.2\.1-0$!);
 }
 
 # GET /0 (reverse proxy with "X-Forwarded-HTTPS")
 {
   local $ENV{MOJO_REVERSE_PROXY} = 1;
   $t->get_ok('/0', {'X-Forwarded-HTTPS' => 1})->status_is(200)
-    ->content_like(qr!^https\://localhost\:\d+!)
-    ->content_unlike(qr!/0-192\.168\.2\.1-0$!);
+    ->content_like(qr!^https\://localhost\:\d+/0!)
+    ->content_unlike(qr!-192\.0\.2\.1-0$!);
 }
 
 # DELETE /inline/epl

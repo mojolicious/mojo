@@ -151,16 +151,22 @@ Routes are basically just fancy paths that can contain different kinds of
 placeholders. C<$self> is a L<Mojolicious::Controller> object containing both,
 the HTTP request and response.
 
+  use Mojolicious::Lite;
+
   # /foo
   get '/foo' => sub {
     my $self = shift;
     $self->render(text => 'Hello World!');
   };
 
+  app->start;
+
 =head2 GET/POST parameters
 
 All C<GET> and C<POST> parameters are accessible via
 L<Mojolicious::Controller/"param">.
+
+  use Mojolicious::Lite;
 
   # /foo?user=sri
   get '/foo' => sub {
@@ -169,10 +175,14 @@ L<Mojolicious::Controller/"param">.
     $self->render(text => "Hello $user.");
   };
 
+  app->start;
+
 =head2 Stash and templates
 
 The L<Mojolicious::Controller/"stash"> is used to pass data to templates,
 which can be inlined in the C<DATA> section.
+
+  use Mojolicious::Lite;
 
   # /bar
   get '/bar' => sub {
@@ -181,6 +191,7 @@ which can be inlined in the C<DATA> section.
     $self->render('baz', two => 24);
   };
 
+  app->start;
   __DATA__
 
   @@ baz.html.ep
@@ -194,12 +205,16 @@ L<Mojolicious::Guides::Rendering/"Embedded Perl">.
 L<Mojolicious::Controller/"req"> and L<Mojolicious::Controller/"res"> give you
 full access to all HTTP features and information.
 
+  use Mojolicious::Lite;
+
   # /agent
   get '/agent' => sub {
     my $self = shift;
     $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
     $self->render(text => $self->req->headers->user_agent);
   };
+
+  app->start;
 
 =head2 Route names
 
@@ -210,6 +225,8 @@ L<Mojolicious::Plugin::TagHelpers/"link_to">. Nameless routes get an
 automatically generated one assigned that is simply equal to the route itself
 without non-word characters.
 
+  use Mojolicious::Lite;
+
   # /
   get '/' => sub {
     my $self = shift;
@@ -219,6 +236,7 @@ without non-word characters.
   # /hello
   get '/hello';
 
+  app->start;
   __DATA__
 
   @@ index.html.ep
@@ -235,12 +253,15 @@ L<Mojolicious::Plugin::DefaultHelpers/"layout"> and place the result of the
 current template with the helper
 L<Mojolicious::Plugin::DefaultHelpers/"content">.
 
+  use Mojolicious::Lite;
+
   # /with_layout
   get '/with_layout' => sub {
     my $self = shift;
     $self->render('with_layout');
   };
 
+  app->start;
   __DATA__
 
   @@ with_layout.html.ep
@@ -260,9 +281,12 @@ L<Mojolicious::Plugin::DefaultHelpers/"content">.
 Template blocks can be used like normal Perl functions and are always
 delimited by the C<begin> and C<end> keywords.
 
+  use Mojolicious::Lite;
+
   # /with_block
   get '/with_block' => 'block';
 
+  app->start;
   __DATA__
 
   @@ block.html.ep
@@ -284,12 +308,15 @@ delimited by the C<begin> and C<end> keywords.
 The helper L<Mojolicious::Plugin::TagHelpers/"content_for"> can be used to
 pass around blocks of captured content.
 
+  use Mojolicious::Lite;
+
   # /captured
   get '/captured' => sub {
     my $self = shift;
     $self->render('captured');
   };
 
+  app->start;
   __DATA__
 
   @@ captured.html.ep
@@ -318,6 +345,8 @@ You can also extend L<Mojolicious> with your own helpers, a list of all
 built-in ones can be found in L<Mojolicious::Plugin::DefaultHelpers> and
 L<Mojolicious::Plugin::TagHelpers>.
 
+  use Mojolicious::Lite;
+
   # "whois" helper
   helper whois => sub {
     my $self  = shift;
@@ -333,6 +362,7 @@ L<Mojolicious::Plugin::TagHelpers>.
     $self->app->log->debug("Request from $user.");
   };
 
+  app->start;
   __DATA__
 
   @@ secret.html.ep
@@ -343,6 +373,8 @@ L<Mojolicious::Plugin::TagHelpers>.
 Route placeholders allow capturing parts of a request path until a C</> or
 C<.> separator occurs, results are accessible via
 L<Mojolicious::Controller/"stash"> and L<Mojolicious::Controller/"param">.
+
+  use Mojolicious::Lite;
 
   # /foo/test
   # /foo/test123
@@ -360,15 +392,20 @@ L<Mojolicious::Controller/"stash"> and L<Mojolicious::Controller/"param">.
     $self->render(text => "Our :bar placeholder matched $bar");
   };
 
+  app->start;
+
 =head2 Relaxed Placeholders
 
 Relaxed placeholders allow matching of everything until a C</> occurs.
+
+  use Mojolicious::Lite;
 
   # /test/hello
   # /test123/hello
   # /test.123/hello
   get '/#you/hello' => 'groovy';
 
+  app->start;
   __DATA__
 
   @@ groovy.html.ep
@@ -379,11 +416,14 @@ Relaxed placeholders allow matching of everything until a C</> occurs.
 Wildcard placeholders allow matching absolutely everything, including C</> and
 C<.>.
 
+  use Mojolicious::Lite;
+
   # /hello/test
   # /hello/test123
   # /hello/test.123/test/123
   get '/hello/*you' => 'groovy';
 
+  app->start;
   __DATA__
 
   @@ groovy.html.ep
@@ -392,6 +432,8 @@ C<.>.
 =head2 HTTP methods
 
 Routes can be restricted to specific request methods.
+
+  use Mojolicious::Lite;
 
   # GET /hello
   get '/hello' => sub {
@@ -419,9 +461,13 @@ Routes can be restricted to specific request methods.
     $self->render(text => "You called /whatever with $method.");
   };
 
+  app->start;
+
 =head2 Optional placeholders
 
 Routes allow default values to make placeholders optional.
+
+  use Mojolicious::Lite;
 
   # /hello
   # /hello/Sara
@@ -430,6 +476,7 @@ Routes allow default values to make placeholders optional.
     $self->render('groovy', format => 'txt');
   };
 
+  app->start;
   __DATA__
 
   @@ groovy.txt.ep
@@ -440,6 +487,8 @@ Routes allow default values to make placeholders optional.
 The easiest way to make placeholders more restrictive are alternatives, you
 just make a list of possible values.
 
+  use Mojolicious::Lite;
+
   # /test
   # /123
   any '/:foo' => [foo => [qw(test 123)]] => sub {
@@ -448,8 +497,12 @@ just make a list of possible values.
     $self->render(text => "Our :foo placeholder matched $foo");
   };
 
+  app->start;
+
 All placeholders get compiled to a regex internally, this process can also be
 easily customized.
+
+  use Mojolicious::Lite;
 
   # /1
   # /123
@@ -458,6 +511,8 @@ easily customized.
     my $bar  = $self->param('bar');
     $self->render(text => "Our :bar placeholder matched $bar");
   };
+
+  app->start;
 
 Just make sure not to use C<^> and C<$> or capturing groups C<(...)>, because
 placeholders become part of a larger regular expression internally, C<(?:...)>
@@ -554,6 +609,8 @@ C<under> statements.
 
 Formats can be automatically detected by looking at file extensions.
 
+  use Mojolicious::Lite;
+
   # /detection.html
   # /detection.txt
   get '/detection' => sub {
@@ -561,6 +618,8 @@ Formats can be automatically detected by looking at file extensions.
     $self->render('detected');
   };
 
+
+  app->start;
   __DATA__
 
   @@ detected.html.ep
@@ -575,6 +634,8 @@ Formats can be automatically detected by looking at file extensions.
 
 Restrictive placeholders can also be used.
 
+  use Mojolicious::Lite;
+
   # /hello.json
   # /hello.txt
   get '/hello' => [format => [qw(json txt)]] => sub {
@@ -584,7 +645,11 @@ Restrictive placeholders can also be used.
     $self->render_text('hello world');
   };
 
+  app->start;
+
 Or you can just disable format detection.
+
+  use Mojolicious::Lite;
 
   # /hello
   get '/hello' => [format => 0] => {text => 'No format detection.'};
@@ -598,10 +663,14 @@ Or you can just disable format detection.
   # /bar.txt
   get '/bar' => [format => 'txt'] => {text => ' Just one format.'};
 
+  app->start;
+
 =head2 Content negotiation
 
 For resources with different representations and that require truly C<RESTful>
 content negotiation you can also use L<Mojolicious::Controller/"respond_to">.
+
+  use Mojolicious::Lite;
 
   # /hello (Accept: application/json)
   # /hello (Accept: text/xml)
@@ -618,6 +687,8 @@ content negotiation you can also use L<Mojolicious::Controller/"respond_to">.
     );
   };
 
+  app->start;
+
 MIME type mappings can be extended or changed easily with
 L<Mojolicious/"types">.
 
@@ -628,6 +699,8 @@ L<Mojolicious/"types">.
 Conditions such as C<agent> and C<host> from
 L<Mojolicious::Plugin::HeaderCondition> allow even more powerful route
 constructs.
+
+  use Mojolicious::Lite;
 
   # /foo (Firefox)
   get '/foo' => (agent => qr/Firefox/) => sub {
@@ -646,6 +719,8 @@ constructs.
     my $self = shift;
     $self->render(text => 'Hello Mojolicious.');
   };
+
+  app->start;
 
 =head2 Sessions
 
@@ -729,14 +804,20 @@ With L<Mojolicious::Controller/"ua"> there's a full featured HTTP 1.1 and
 WebSocket user agent built right in. Especially in combination with
 L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
 
+  use Mojolicious::Lite;
+
   get '/test' => sub {
     my $self = shift;
     $self->render(data => $self->ua->get('http://mojolicio.us')->res->body);
   };
 
+  app->start;
+
 =head2 WebSockets
 
 WebSocket applications have never been this easy before.
+
+  use Mojolicious::Lite;
 
   websocket '/echo' => sub {
     my $self = shift;
@@ -745,6 +826,8 @@ WebSocket applications have never been this easy before.
       $self->send("echo: $message");
     });
   };
+
+  app->start;
 
 The event L<Mojo::Transaction::WebSocket/"message">, which you can subscribe
 to with L<Mojolicious::Controller/"on">, will be emitted for every new
@@ -755,6 +838,8 @@ WebSocket message that is received.
 External templates will be searched by the renderer in a C<templates>
 directory.
 
+  use Mojolicious::Lite;
+
   # /external
   any '/external' => sub {
     my $self = shift;
@@ -762,6 +847,8 @@ directory.
     # templates/foo/bar.html.ep
     $self->render('foo/bar');
   };
+
+  app->start;
 
 =head2 Static files
 
@@ -816,12 +903,16 @@ C<log/$mode.log> file if a C<log> directory exists.
 
 For more control the L<Mojolicious> object can be accessed directly.
 
+  use Mojolicious::Lite;
+
   app->log->level('error');
   app->routes->get('/foo/:bar' => sub {
     my $self = shift;
     $self->app->log->debug('Got a request for "Hello Mojo!".');
     $self->render(text => 'Hello Mojo!');
   });
+
+  app->start;
 
 =head2 More
 

@@ -15,8 +15,8 @@ sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
 
 sub connection {
-  my ($self, $c) = @_;
-  return $self->emit(connection => $self->{connection} = $c) if $c;
+  my $self = shift;
+  return $self->emit(connection => $self->{connection} = shift) if @_;
   return $self->{connection};
 }
 

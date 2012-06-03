@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 55;
+use Test::More tests => 63;
 
 # "I was so bored I cut the pony tail off the guy in front of us.
 #  Look at me, I'm a grad student.
@@ -90,9 +90,14 @@ $app->routes->post(
 );
 
 # POST /upload
+my ($local_address, $local_port, $remote_address, $remote_port);
 $app->routes->post(
   '/upload' => sub {
     my $self = shift;
+    $local_address  = $self->tx->local_address;
+    $local_port     = $self->tx->local_port;
+    $remote_address = $self->tx->remote_address;
+    $remote_port    = $self->tx->remote_port;
     $self->render_data($self->req->upload('file')->slurp);
   }
 );
@@ -241,6 +246,14 @@ $tx = $ua->post_form(
   "http://127.0.0.1:$port/upload" => {file => {content => $result}});
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
+ok $tx->local_address, 'has local address';
+ok $tx->local_port > 0, 'has local port';
+ok $tx->remote_address, 'has local address';
+ok $tx->remote_port > 0, 'has local port';
+ok $local_address, 'has local address';
+ok $local_port > 0, 'has local port';
+ok $remote_address, 'has local address';
+ok $remote_port > 0, 'has local port';
 
 # Parallel requests
 my $delay = Mojo::IOLoop->delay;

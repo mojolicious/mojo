@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 685;
+use Test::More tests => 688;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -867,13 +867,14 @@ $t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /0 ("X-Forwarded-For")
-my $source = $t->tx->local_address;
 $t->get_ok('/0', {'X-Forwarded-For' => '192.168.2.2, 192.168.2.1'})
-  ->status_is(200)->content_like(qr!http\://localhost\:\d+/0-$source-0!);
+  ->status_is(200)->content_like(qr!^http\://localhost\:\d+!)
+  ->content_unlike(qr!/0-192\.168\.2\.1-0$!);
 
 # GET /0 ("X-Forwarded-HTTPS")
 $t->get_ok('/0', {'X-Forwarded-HTTPS' => 1})->status_is(200)
-  ->content_like(qr!http\://localhost\:\d+/0-$source-0!);
+  ->content_like(qr!^http\://localhost\:\d+!)
+  ->content_unlike(qr!/0-192\.168\.2\.1-0$!);
 
 # GET /0 (reverse proxy with "X-Forwarded-For")
 {
@@ -887,7 +888,8 @@ $t->get_ok('/0', {'X-Forwarded-HTTPS' => 1})->status_is(200)
 {
   local $ENV{MOJO_REVERSE_PROXY} = 1;
   $t->get_ok('/0', {'X-Forwarded-HTTPS' => 1})->status_is(200)
-    ->content_like(qr!https\://localhost\:\d+/0-$source-0!);
+    ->content_like(qr!^https\://localhost\:\d+!)
+    ->content_unlike(qr!/0-192\.168\.2\.1-0$!);
 }
 
 # DELETE /inline/epl

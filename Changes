@@ -1,7 +1,7 @@
 
-2.99  2012-06-05
+2.99  2012-06-06
   - Improved message parser performance slightly.
-  - Improved documentation.
+  - Improved documentation. (ichesnokov, sri)
   - Improved tests.
   - Fixed small JSON Pointer bug in get command. (avkhozov)
 

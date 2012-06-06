@@ -158,7 +158,7 @@ Clone bytestream.
 
   $stream = $stream->decamelize;
 
-Alias for L<Mojo::Util/"b64_decamelize">.
+Alias for L<Mojo::Util/"decamelize">.
 
 =head2 C<decode>
 

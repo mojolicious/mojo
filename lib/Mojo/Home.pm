@@ -10,7 +10,6 @@ use File::Basename 'dirname';
 use File::Find 'find';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
-use List::Util 'first';
 use Mojo::Asset::File;
 use Mojo::Command;
 use Mojo::Loader;
@@ -85,7 +84,7 @@ sub list_files {
   find {
     wanted => sub {
       my @parts = splitdir(abs2rel($File::Find::name, $dir));
-      push @files, join '/', @parts unless first {/^\./} @parts;
+      push @files, join '/', @parts unless /^\./ ~~ \@parts;
     },
     no_chdir => 1
   }, $dir;

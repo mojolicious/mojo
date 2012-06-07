@@ -224,11 +224,8 @@ sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
   # Find handler and render
-  my $handler 
-    = $options->{handler}
-    || $self->_detect_handler($options)
-    || $self->default_handler;
-  $options->{handler} = $handler;
+  my $handler = $options->{handler} || $self->_detect_handler($options);
+  $options->{handler} = $handler ||= $self->default_handler;
   if (my $renderer = $self->handlers->{$handler}) {
     return 1 if $renderer->($self, $c, $output, $options);
   }
@@ -252,8 +249,9 @@ Mojolicious::Renderer - MIME type based renderer
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer. See
-L<Mojolicious::Guides::Rendering> for more.
+L<Mojolicious::Renderer> is the standard L<Mojolicious> renderer.
+
+See L<Mojolicious::Guides::Rendering> for more.
 
 =head1 ATTRIBUTES
 

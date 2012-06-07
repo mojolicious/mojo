@@ -120,10 +120,11 @@ Mojo::Base - Minimal base class for Mojo projects
   has stripes => 42;
 
   package main;
+  use Mojo::Base -strict;
 
   my $mew = Cat->new(mouse => 'Mickey');
   say $mew->paws;
-  say $mew->paws(5)->paws;
+  say $mew->paws(5)->ears(4)->paws;
 
   my $rawr = Tiger->new(stripes => 23);
   say $rawr->ears * $rawr->stripes;

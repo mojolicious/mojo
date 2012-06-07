@@ -513,7 +513,7 @@ enabled by default.
 Append to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>');
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
 
 =head2 C<append_content>
 
@@ -522,7 +522,7 @@ Append to element.
 Append to element content.
 
   # "<div><h1>AB</h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B');
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
 
 =head2 C<at>
 
@@ -617,7 +617,7 @@ Alias for L<Mojo::DOM::HTML/"parse">.
 Prepend to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
-  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>');
+  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
 
 =head2 C<prepend_content>
 
@@ -626,16 +626,19 @@ Prepend to element.
 Prepend to element content.
 
   # "<div><h2>AB</h2></div>"
-  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A');
+  $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
 
 =head2 C<replace>
 
-  $dom = $dom->replace('<div>test</div>');
+  my $old = $dom->replace('<div>test</div>');
 
-Replace elements.
+Replace element.
 
   # "<div><h2>B</h2></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>')->root;
+
+  # "<div></div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('')->root;
 
 =head2 C<replace_content>
 
@@ -644,7 +647,10 @@ Replace elements.
 Replace element content.
 
   # "<div><h1>B</h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B');
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B')->root;
+
+  # "<div><h1></h1></div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('')->root;
 
 =head2 C<root>
 
@@ -700,8 +706,8 @@ is enabled by default.
 
 Render this element and its content to XML.
 
-  # "<div><b>test</b></div>"
-  $dom->parse('<div><b>test</b></div>')->div->to_xml;
+  # "<b>test</b>"
+  $dom->parse('<div><b>test</b></div>')->div->b->to_xml;
 
 =head2 C<tree>
 

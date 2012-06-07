@@ -165,15 +165,10 @@ sub parse_body_once {
 sub parse_until_body {
   my ($self, $chunk) = @_;
 
-  # Prepare first buffer
-  $self->{pre_buffer} //= '';
-  $self->{raw_size}   //= 0;
-
   # Add chunk
-  if (defined $chunk) {
-    $self->{raw_size} += length $chunk;
-    $self->{pre_buffer} .= $chunk;
-  }
+  $chunk //= '';
+  $self->{raw_size} += length $chunk;
+  $self->{pre_buffer} .= $chunk;
 
   # Parser started
   unless ($self->{state}) {
@@ -216,7 +211,7 @@ sub write {
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
 }
 
-# "Here's to alcohol, the cause of—and solution to—all life's problems."
+# "Here's to alcohol, the cause of-and solution to-all life's problems."
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
 

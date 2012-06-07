@@ -30,9 +30,8 @@ without compromises. While there are no rules in
 L<Mojolicious::Guides::CodingGuidelines> that forbid dependencies, we do
 currently discourage adding non-optional ones in favor of a faster and more
 painless installation process. And we do in fact already use several optional
-CPAN modules such as L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL>,
-L<Net::Rendezvous::Publish> and L<Plack> to provide advanced functionality if
-they are installed.
+CPAN modules such as L<EV>, L<IO::Socket::INET6>, L<IO::Socket::SSL> and
+L<Plack> to provide advanced functionality if they are installed.
 
 =head2 Why reinvent wheels?
 

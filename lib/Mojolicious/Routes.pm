@@ -272,8 +272,9 @@ Mojolicious::Routes - Always find your destination with routes
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Routes> is the core of the L<Mojolicious> web framework. See
-L<Mojolicious::Guides::Routing> for more.
+L<Mojolicious::Routes> is the core of the L<Mojolicious> web framework.
+
+See L<Mojolicious::Guides::Routing> for more.
 
 =head1 ATTRIBUTES
 

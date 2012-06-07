@@ -129,22 +129,18 @@ sub parse {
     my $base = $self->url->base;
     $base->scheme('http') unless $base->scheme;
     my $headers = $self->headers;
-    if (!$base->authority && (my $host = $headers->host)) {
+    if (!$base->host && (my $host = $headers->host)) {
       $base->authority($host);
     }
 
     # Basic authentication
-    if (my $auth = $headers->authorization) {
-      if (my $userinfo = $self->_parse_basic_auth($auth)) {
-        $base->userinfo($userinfo);
-      }
+    if (my $userinfo = _parse_basic_auth($headers->authorization)) {
+      $base->userinfo($userinfo);
     }
 
     # Basic proxy authentication
-    if (my $auth = $headers->proxy_authorization) {
-      if (my $userinfo = $self->_parse_basic_auth($auth)) {
-        $self->proxy(Mojo::URL->new->userinfo($userinfo));
-      }
+    if (my $userinfo = _parse_basic_auth($headers->proxy_authorization)) {
+      $self->proxy(Mojo::URL->new->userinfo($userinfo));
     }
 
     # "X-Forwarded-HTTPS"
@@ -200,9 +196,8 @@ sub _build_start_line {
 }
 
 sub _parse_basic_auth {
-  my ($self, $header) = @_;
-  return unless $header =~ /Basic (.+)$/;
-  return b64_decode $1;
+  return unless my $header = shift;
+  return $header =~ /Basic (.+)$/ ? b64_decode($1) : undef;
 }
 
 sub _parse_env {

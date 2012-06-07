@@ -208,6 +208,45 @@ But you could even use middleware right in your application.
     app->start;
   };
 
+=head2 Heroku
+
+But you don't have to run your own web server, L<Mojolicious> applications can
+also be deployed to many cloud hosting providers, such as Heroku. All you have
+to do is install the L<Heroku Toolbelt|https://toolbelt.herokuapp.com/> and
+sign up for a free account at L<https://api.heroku.com/signup>. The C<heroku>
+command line client will do the rest.
+
+  $ heroku login
+
+Lets start with a simple L<Mojolicious::Lite> application.
+
+  $ mkdir myapp
+  $ cd myapp
+  $ mojo generate lite_app
+
+A normal C<Makefile.PL> file is used to list all CPAN dependencies of your
+application, which allows Heroku to install them automatically.
+
+  $ mojo generate makefile
+
+Now create a C<Perloku> file to tell Heroku how to start the Mojolicious web
+server, the port to be used will be passed to it via environment variable.
+
+  #!/bin/sh
+  ./myapp.pl daemon -l http://*:$PORT -m production
+
+And make sure the file is executable.
+
+  $ chmod +x Perloku
+
+Finally just deploy your application with C<git>.
+
+  $ git init
+  $ git add .
+  $ git commit -m 'Initial version'
+  $ heroku create -s cedar --buildpack http://github.com/judofyr/perloku.git
+  $ git push heroku master
+
 =head2 Rewriting
 
 Sometimes you might have to deploy your application in a blackbox environment
@@ -1020,18 +1059,6 @@ choice.
 =head1 HACKS
 
 Fun hacks you might not use very often but that might come in handy some day.
-
-=head2 Faster tests
-
-Don't you hate waiting for C<make test> to finally finish? In newer Perl
-versions you can set the C<HARNESS_OPTIONS> environment variable to take
-advantage of multiple cpu cores and run tests parallel.
-
-  $ HARNESS_OPTIONS=j9 make test
-  ...
-
-The C<j9> allows 9 tests to run at the same time, which makes for example the
-L<Mojolicious> test suite finish 3 times as fast on a dual core laptop!
 
 =head2 Adding commands to Mojolicious
 

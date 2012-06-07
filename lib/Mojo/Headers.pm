@@ -89,12 +89,11 @@ sub names {
 }
 
 sub parse {
-  my ($self, $chunk) = @_;
+  my $self = shift;
 
   # Parse headers with size limit
   $self->{state} = 'headers';
-  $self->{buffer} //= '';
-  $self->{buffer} .= $chunk if defined $chunk;
+  $self->{buffer} .= shift // '';
   my $headers = $self->{cache} ||= [];
   my $max = $self->max_line_size;
   while (defined(my $line = get_line \$self->{buffer})) {
@@ -106,7 +105,7 @@ sub parse {
     }
 
     # New header
-    if ($line =~ /^(\S+)\s*:\s*(.*)$/) { push @$headers, $1, $2 }
+    elsif ($line =~ /^(\S+)\s*:\s*(.*)$/) { push @$headers, $1, $2 }
 
     # Multiline
     elsif (@$headers && $line =~ s/^\s+//) { $headers->[-1] .= " $line" }
@@ -354,10 +353,8 @@ Get or replace the current header values.
   for my $header ($headers->header('Set-Cookie')) {
     say 'Set-Cookie:';
 
-    # Each header contains an array of lines
-    for my $line (@$header) {
-      say $line;
-    }
+    # Multiple lines per header
+    say for @$header;
   }
 
 =head2 C<host>

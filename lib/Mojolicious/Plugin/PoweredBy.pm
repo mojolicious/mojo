@@ -33,9 +33,10 @@ Mojolicious::Plugin::PoweredBy - Powered by plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::PoweredBy> is a plugin that adds an C<X-Powered-By>
-header which defaults to C<Mojolicious (Perl)>. This is a core plugin, that
-means it is always enabled and its code a good example for learning to build
-new plugins.
+header which defaults to C<Mojolicious (Perl)>.
+
+This is a core plugin, that means it is always enabled and its code a good
+example for learning to build new plugins, you're welcome to fork it.
 
 =head1 OPTIONS
 

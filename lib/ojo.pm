@@ -23,9 +23,6 @@ sub import {
   no strict 'refs';
   no warnings 'redefine';
 
-  # Executable
-  $ENV{MOJO_EXE} ||= (caller)[1];
-
   # Mojolicious::Lite
   eval "package $caller; use Mojolicious::Lite;";
 
@@ -92,13 +89,13 @@ L<ojo> implements the following functions.
 
 =head2 C<a>
 
-  my $app = a('/' => sub { shift->render(json => {hello => 'world'}) });
+  my $app = a('/hello' => sub { shift->render(json => {hello => 'world'}) });
 
 Create a route with L<Mojolicious::Lite/"any"> and return the current
 L<Mojolicious::Lite> object. See also the L<Mojolicious::Lite> tutorial for
 more argument variations.
 
-  $ perl -Mojo -E 'a("/" => {text => "Hello Mojo!"})->start' daemon
+  $ perl -Mojo -E 'a("/hello" => {text => "Hello Mojo!"})->start' daemon
 
 =head2 C<b>
 

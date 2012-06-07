@@ -2,11 +2,11 @@ use Mojo::Base -strict;
 
 use utf8;
 
-# Disable Bonjour, IPv6 and libev
+# Disable IPv6 and libev
 BEGIN {
-  $ENV{MOJO_MODE}       = 'testing';
-  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
-  $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
+  $ENV{MOJO_MODE}    = 'testing';
+  $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
 use Test::More tests => 139;
@@ -135,8 +135,8 @@ get '/host' => {text => 'main application!'};
 
 my $t = Test::Mojo->new;
 
-# GET /foo/bar (plugin app)
-$t->get_ok('/foo/bar')->status_is(200)->content_is('plugin works!');
+# GET /plugin/foo (plugin app)
+$t->get_ok('/plugin/foo')->status_is(200)->content_is('plugin works!');
 
 # GET /hello (from main app)
 $t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");

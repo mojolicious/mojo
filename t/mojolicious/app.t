@@ -1,13 +1,13 @@
 use Mojo::Base -strict;
 
-# Disable Bonjour, IPv6 and libev
+# Disable IPv6 and libev
 BEGIN {
-  $ENV{MOJO_MODE}       = 'development';
-  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
-  $ENV{MOJO_REACTOR}    = 'Mojo::Reactor::Poll';
+  $ENV{MOJO_MODE}    = 'development';
+  $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 315;
+use Test::More tests => 325;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -301,6 +301,17 @@ $t->get_ok('/helper')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Welcome aboard!');
+
+# PluginWithEmbeddedApp (lite app in plugin)
+$t->get_ok('/plugin/foo')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('plugin works!');
+
+# SingleFileTestApp::Foo::conf (config file)
+$t->get_ok('/foo/conf')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('works!');
 
 # SingleFileTestApp::Foo::data_template
 $t->get_ok('/foo/data_template')->status_is(200)

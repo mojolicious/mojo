@@ -1,8 +1,8 @@
 use Mojo::Base -strict;
 
-# Disable Bonjour, IPv6 and libev
+# Disable IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_NO_IPV6} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
@@ -12,7 +12,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.37 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 19;
+plan tests => 24;
 
 # "That does not compute.
 #  Really?
@@ -55,6 +55,32 @@ $tx = $ua->get("https://localhost:$port");
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
+
+# Valid certificates (using an already prepared socket)
+my $sock;
+$ua->ioloop->client(
+  {
+    address  => 'localhost',
+    port     => $port,
+    tls      => 1,
+    tls_ca   => 't/mojo/certs/ca.crt',
+    tls_cert => 't/mojo/certs/client.crt',
+    tls_key  => 't/mojo/certs/client.key'
+  } => sub {
+    my ($loop, $err, $stream) = @_;
+    $sock = $stream->steal_handle;
+    $loop->stop;
+  }
+);
+$ua->ioloop->start;
+$tx = $ua->build_tx(GET => 'https://lalala/');
+$tx->connection($sock);
+$ua->start($tx);
+ok $tx->success, 'successful';
+is $tx->req->method, 'GET',             'right method';
+is $tx->req->url,    'https://lalala/', 'right url';
+is $tx->res->code,   200,               'right status';
+is $tx->res->body,   'works!',          'right content';
 
 # Valid certificates (env)
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);

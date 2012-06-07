@@ -197,14 +197,12 @@ sub _connect {
       # Connection error
       return $self->_error($id, $err) if $err;
 
-      # Events
+      # Connection established
       $stream->on(
         timeout => sub { $self->_error($id => 'Inactivity timeout.') });
       $stream->on(close => sub { $self->_handle($id => 1) });
       $stream->on(error => sub { $self->_error($id, pop, 1) });
       $stream->on(read => sub { $self->_read($id => pop) });
-
-      # Connection established
       $cb->();
     }
   );
@@ -555,9 +553,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
     say "Error: $message";
   }
 
-  # PUT request with content
+  # IPv6 PUT request with content
   my $tx
-    = $ua->put('kraih.com' => {'Content-Type' => 'text/plain'} => 'Hello!');
+    = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hello!');
 
   # Grab the latest Mojolicious release :)
   $ua->max_redirects(5)->get('latest.mojolicio.us')
@@ -609,9 +607,11 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP 1.1 and WebSocket
 user agent with C<IPv6>, C<TLS> and C<libev> support.
 
-Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are supported
-transparently and used if installed. Individual features can also be disabled
-with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+Optional modules L<EV>, L<IO::Socket::INET6> and L<IO::Socket::SSL> are
+supported transparently and used if installed. Individual features can also be
+disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+
+See L<Mojolicious::Guides::Cookbook> for more.
 
 =head1 EVENTS
 

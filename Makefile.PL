@@ -17,7 +17,7 @@ WriteMakefile(
     requires  => {perl => '5.010001'},
     resources => {
       homepage    => 'http://mojolicio.us',
-      license     => 'http://dev.perl.org/licenses/',
+      license     => 'http://www.opensource.org/licenses/artistic-license-2.0',
       MailingList => 'http://groups.google.com/group/mojolicious',
       repository  => 'http://github.com/kraih/mojo',
       bugtracker  => 'http://github.com/kraih/mojo/issues'

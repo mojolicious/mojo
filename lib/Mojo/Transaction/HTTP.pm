@@ -46,10 +46,8 @@ sub client_write {
 
     # Connection header
     my $headers = $req->headers;
-    unless ($headers->connection) {
-      if   ($self->keep_alive) { $headers->connection('keep-alive') }
-      else                     { $headers->connection('close') }
-    }
+    $headers->connection($self->keep_alive ? 'keep-alive' : 'close')
+      unless $headers->connection;
 
     # Write start line
     $self->{state} = 'write_start_line';
@@ -83,20 +81,16 @@ sub keep_alive {
   return 1 if $req_conn eq 'keep-alive' || $res_conn eq 'keep-alive';
 
   # No keep alive for 0.9 and 1.0
-  return if $req->version ~~ [qw(0.9 1.0)];
-  return if $res->version ~~ [qw(0.9 1.0)];
+  return if $req->version ~~ [qw(0.9 1.0)] || $res->version ~~ [qw(0.9 1.0)];
 
   return 1;
 }
 
 sub server_leftovers {
   my $self = shift;
-
-  # Check for leftovers
-  my $req = $self->req;
+  my $req  = $self->req;
   return unless $req->has_leftovers;
   $req->{state} = 'finished';
-
   return $req->leftovers;
 }
 
@@ -125,11 +119,10 @@ sub server_read {
 
   # Expect 100 Continue
   elsif ($req->content->is_parsing_body && !defined $self->{continued}) {
-    if (($req->headers->expect || '') =~ /100-continue/i) {
-      $self->{state} = 'write';
-      $res->code(100);
-      $self->{continued} = 0;
-    }
+    return unless ($req->headers->expect || '') =~ /100-continue/i;
+    $self->{state} = 'write';
+    $res->code(100);
+    $self->{continued} = 0;
   }
 }
 
@@ -148,10 +141,8 @@ sub server_write {
 
     # Connection header
     my $headers = $res->headers;
-    unless ($headers->connection) {
-      if   ($self->keep_alive) { $headers->connection('keep-alive') }
-      else                     { $headers->connection('close') }
-    }
+    $headers->connection($self->keep_alive ? 'keep-alive' : 'close')
+      unless $headers->connection;
 
     # Write start line
     $self->{state} = 'write_start_line';
@@ -171,9 +162,8 @@ sub server_write {
     if ($self->{write} <= 0) {
 
       # Continued
-      if (defined $self->{continued} && $self->{continued} == 0) {
-        $self->{continued} = 1;
-        $self->{state}     = 'read';
+      if (defined $self->{continued} && !$self->{continued}) {
+        $self->{continued} = $self->{state} = 'read';
         $self->res($res->new);
       }
 
@@ -194,9 +184,8 @@ sub _body {
   # Chunk
   my $buffer = $message->get_body_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $self->{write}  = $self->{write} - $written;
+  $self->{write} = $message->is_dynamic ? 1 : ($self->{write} - $written);
   $self->{offset} = $self->{offset} + $written;
-  $self->{write}  = 1 if $message->is_dynamic;
   if (defined $buffer) { delete $self->{delay} }
 
   # Delayed
@@ -231,9 +220,8 @@ sub _headers {
     # Body
     else {
       $self->{state}  = 'write_body';
+      $self->{write}  = $message->is_dynamic ? 1 : $message->body_size;
       $self->{offset} = 0;
-      $self->{write}  = $message->body_size;
-      $self->{write}  = 1 if $message->is_dynamic;
     }
   }
 
@@ -252,8 +240,8 @@ sub _start_line {
   # Write headers
   if ($self->{write} <= 0) {
     $self->{state}  = 'write_headers';
-    $self->{offset} = 0;
     $self->{write}  = $message->header_size;
+    $self->{offset} = 0;
   }
 
   return $buffer;

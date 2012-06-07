@@ -25,33 +25,24 @@ sub authority {
 
   # New authority
   if (defined $authority) {
-    my $host = $authority;
 
     # Userinfo
-    if ($authority =~ /^([^\@]+)\@(.+)$/) {
-      $self->userinfo(url_unescape $1);
-      $host = $2;
-    }
+    if ($authority =~ s/^([^\@]+)\@//) { $self->userinfo(url_unescape $1) }
 
     # Port
-    my $port = undef;
-    if ($host =~ /^(.+)\:(\d+)$/) {
-      $host = $1;
-      $self->port($2);
-    }
+    if ($authority =~ s/\:(\d+)$//) { $self->port($1) }
 
     # Host
-    $host = url_unescape $host;
+    my $host = url_unescape $authority;
     return $host =~ /[^\x00-\x7f]/ ? $self->ihost($host) : $self->host($host);
   }
 
   # Format
-  my $userinfo = $self->userinfo;
-  $authority .= url_escape($userinfo, "^$UNRESERVED$SUBDELIM\:") . '@'
-    if $userinfo;
+  if (my $userinfo = $self->userinfo) {
+    $authority .= url_escape($userinfo, "^$UNRESERVED$SUBDELIM\:") . '@';
+  }
   $authority .= lc($self->ihost || '');
-  my $port = $self->port;
-  $authority .= ":$port" if $port;
+  if (my $port = $self->port) { $authority .= ":$port" }
 
   return $authority;
 }
@@ -407,6 +398,9 @@ Query part of this URL, defaults to a L<Mojo::Parameters> object.
 
   # "http://mojolicio.us?a=2&c=3"
   Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => 2, c => 3);
+
+  # "http://mojolicio.us?a=2&a=3"
+  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => [2, 3]);
 
   # "http://mojolicio.us?a=2&b=2&c=3"
   Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => 2, c => 3]);

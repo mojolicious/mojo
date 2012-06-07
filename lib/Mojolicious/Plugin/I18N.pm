@@ -6,7 +6,7 @@ use I18N::LangTags::Detect;
 use Mojo::Loader;
 
 # "Can we have Bender burgers again?
-#  No, the cat shelter’s onto me."
+#  No, the cat shelter's onto me."
 sub register {
   my ($self, $app, $conf) = @_;
 
@@ -106,8 +106,7 @@ Mojolicious::Plugin::I18N - Internationalization plugin
 L<Mojolicious::Plugin::I18N> adds L<Locale::Maketext> support to
 L<Mojolicious>. All you have to do besides using this plugin is to add as many
 lexicon classes as you need. Languages can usually be detected automatically
-from the C<Accept-Languages> request header. The code of this plugin is a good
-example for learning to build new plugins.
+from the C<Accept-Languages> request header.
 
 This plugin can save a lot of typing, since it will generate the following
 code by default.
@@ -123,6 +122,9 @@ code by default.
 Namespace and default language of generated code are affected by their
 respective options. The default lexicon class will only be generated if it
 doesn't already exist.
+
+The code of this plugin is a good example for learning to build new plugins,
+you're welcome to fork it.
 
 =head1 OPTIONS
 

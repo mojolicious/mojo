@@ -31,8 +31,10 @@ Mojolicious::Plugin::Charset - Charset plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Charset> is a plugin to easily set the default charset
-and encoding on all layers of L<Mojolicious>. The code of this plugin is a
-good example for learning to build new plugins.
+and encoding on all layers of L<Mojolicious>.
+
+The code of this plugin is a good example for learning to build new plugins,
+you're welcome to fork it.
 
 =head1 OPTIONS
 

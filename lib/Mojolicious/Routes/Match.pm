@@ -1,7 +1,6 @@
 package Mojolicious::Routes::Match;
 use Mojo::Base -base;
 
-use List::Util 'first';
 use Mojo::Util qw(decode url_unescape);
 
 has captures => sub { {} };
@@ -40,7 +39,7 @@ sub match {
   # Method
   if (my $methods = $r->via) {
     my $method = $self->{method} eq 'HEAD' ? 'GET' : $self->{method};
-    return unless first { $method eq $_ } @$methods;
+    return unless $method ~~ $methods;
   }
 
   # Conditions

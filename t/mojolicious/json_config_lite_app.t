@@ -2,16 +2,19 @@ use Mojo::Base -strict;
 
 use utf8;
 
-# Disable Bonjour, IPv6 and libev
+# Disable IPv6 and libev
 BEGIN {
-  $ENV{MOJO_NO_BONJOUR} = $ENV{MOJO_NO_IPV6} = 1;
+  $ENV{MOJO_NO_IPV6} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 20;
+use Test::More tests => 26;
 
 # "Oh, I always feared he might run off like this.
 #  Why, why, why didn't I break his legs?"
+use Cwd 'abs_path';
+use File::Basename 'dirname';
+use File::Spec::Functions 'catfile';
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -19,19 +22,27 @@ use Test::Mojo;
 app->config(it => 'works');
 is_deeply app->config, {it => 'works'}, 'right value';
 
-# Load plugin
+# Load plugins
 my $config
   = plugin j_s_o_n_config => {default => {foo => 'baz', hello => 'there'}};
-is $config->{foo},   'bar',    'right value';
-is $config->{hello}, 'there',  'right value';
-is $config->{utf},   'утф', 'right value';
-is app->config->{foo},   'bar',    'right value';
-is app->config->{hello}, 'there',  'right value';
-is app->config->{utf},   'утф', 'right value';
-is app->config('foo'),   'bar',    'right value';
-is app->config('hello'), 'there',  'right value';
-is app->config('utf'),   'утф', 'right value';
-is app->config('it'),    'works',  'right value';
+plugin JSONConfig => {file =>
+    abs_path(catfile(dirname(__FILE__), 'json_config_lite_app_abs.json'))};
+is $config->{foo},          'bar',            'right value';
+is $config->{hello},        'there',          'right value';
+is $config->{utf},          'утф',         'right value';
+is $config->{absolute},     'works too!',     'right value';
+is $config->{absolute_dev}, 'dev works too!', 'right value';
+is app->config->{foo},          'bar',            'right value';
+is app->config->{hello},        'there',          'right value';
+is app->config->{utf},          'утф',         'right value';
+is app->config->{absolute},     'works too!',     'right value';
+is app->config->{absolute_dev}, 'dev works too!', 'right value';
+is app->config('foo'),          'bar',            'right value';
+is app->config('hello'),        'there',          'right value';
+is app->config('utf'),          'утф',         'right value';
+is app->config('absolute'),     'works too!',     'right value';
+is app->config('absolute_dev'), 'dev works too!', 'right value';
+is app->config('it'),           'works',          'right value';
 
 # GET /
 get '/' => 'index';

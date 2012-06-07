@@ -1,8 +1,34 @@
 
-2.96  2012-05-16
+2.99  2012-06-07
+  - Improved message parser performance slightly.
+  - Improved documentation. (ichesnokov, sri)
+  - Improved tests.
+  - Fixed small JSON Pointer bug in get command. (avkhozov)
+
+2.98  2012-05-30
+  - Switched from IO::Socket::IP to IO::Socket::INET6 for IPv6 support.
+  - Improved IPv6 exception handling in Mojo::IOLoop::Client.
+  - Improved documentation.
+  - Improved tests.
+  - Fixed array appending bug in Mojo::Parameters.
+
+2.97  2012-05-28
+  - Added workaround to make IO::Socket::SSL work with IO::Socket::IP.
+  - Removed Bonjour support.
+  - Improved documentation.
+  - Improved tests.
+  - Fixed bug that prevented Test::Mojo from working with normal Mojolicious
+    applications that use Mojolicious::Plugin::Config.
+  - Fixed a few small unicode bugs in documentation.
+
+2.96  2012-05-21
   - Added merge method to Mojo::Path.
   - Improved documentation.
   - Improved tests.
+  - Fixed small memory leak in Mojolicious.
+  - Fixed small bug that prevented already prepared IO::Socket::SSL handles to
+    be used by Mojo::UserAgent.
+  - Fixed small Mojo::URL and Mojo::Path stringification bugs.
 
 2.95  2012-05-10
   - Improved documentation.
@@ -255,7 +281,7 @@
   - Fixed small newline capture bug in Mojolicious::Routes::Match.
 
 2.62  2012-03-17
-  - Deprecated Mojolicious::Renderer->default_template_class in favor of 
+  - Deprecated Mojolicious::Renderer->default_template_class in favor of
     Mojolicious::Renderer->classes.
   - Deprecated Mojolicious::Static->default_static_class in favor of
     Mojolicious::Static->classes.

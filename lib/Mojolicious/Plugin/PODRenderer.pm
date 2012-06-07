@@ -160,7 +160,9 @@ Mojolicious::Plugin::PODRenderer - POD renderer plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::PODRenderer> is a renderer for true Perl hackers, rawr!
-The code of this plugin is a good example for learning to build new plugins.
+
+The code of this plugin is a good example for learning to build new plugins,
+you're welcome to fork it.
 
 =head1 OPTIONS
 

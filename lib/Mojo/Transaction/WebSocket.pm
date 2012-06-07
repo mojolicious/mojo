@@ -239,7 +239,7 @@ sub server_read {
   my ($self, $chunk) = @_;
 
   # Parse frames
-  $self->{read} .= $chunk if defined $chunk;
+  $self->{read} .= $chunk // '';
   while (my $frame = $self->parse_frame(\$self->{read})) {
     $self->emit(frame => $frame);
   }

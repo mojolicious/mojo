@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 755;
+use Test::More tests => 768;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -54,7 +54,7 @@ is $dom->tree->[1]->[4]->[5]->[6]->[0], 'text', 'right element';
 is $dom->tree->[1]->[4]->[5]->[6]->[1], 't',    'right text';
 is $dom->tree->[1]->[5]->[0], 'text',  'right element';
 is $dom->tree->[1]->[5]->[1], 'works', 'right text';
-is "$dom", <<EOF, 'stringified right';
+is "$dom", <<EOF, 'right result';
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz></bazz>t</baz></bar>works</foo>
 EOF
 
@@ -93,7 +93,7 @@ EOF
 is $dom->xml, undef, 'xml mode not detected';
 is $dom->tree->[1]->[0], 'doctype', 'right element';
 is $dom->tree->[1]->[1], ' foo',    'right doctype';
-is "$dom", <<EOF, 'stringified right';
+is "$dom", <<EOF, 'right result';
 <!DOCTYPE foo>
 <foo bar="ba&lt;z">
   test
@@ -284,54 +284,62 @@ is $dom->at('.test')->text, '♥', 'right text';
 
 # Replace elements
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->at('p')->replace('<foo>bar</foo>');
-is "$dom", '<div>foo<foo>bar</foo>bar</div>', 'right text';
+is $dom->at('p')->replace('<foo>bar</foo>'), '<p>lalala</p>', 'right result';
+is "$dom", '<div>foo<foo>bar</foo>bar</div>', 'right result';
 $dom->at('foo')->replace(Mojo::DOM->new->parse('text'));
-is "$dom", '<div>footextbar</div>', 'right text';
+is "$dom", '<div>footextbar</div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>foo</div><div>bar</div>');
 $dom->find('div')->each(sub { shift->replace('<p>test</p>') });
-is "$dom", '<p>test</p><p>test</p>', 'right text';
+is "$dom", '<p>test</p><p>test</p>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->replace('♥');
-is "$dom", '♥', 'right text';
+is $dom->replace('♥'), '♥', 'right result';
+is "$dom", '♥', 'right result';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
-is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
-$dom->replace('');
-is "$dom", '', 'right text';
+is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
+is $dom->at('p')->replace(''), '<p>lalala</p>', 'right result';
+is "$dom", '<div>foobar</div>', 'right result';
+is $dom->replace(''), '', 'right result';
+is "$dom", '', 'right result';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
-is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
+is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
 $dom->find('p')->each(sub { shift->replace('') });
-is "$dom", '<div>foobar</div>', 'right text';
+is "$dom", '<div>foobar</div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>♥</div>');
 $dom->at('div')->replace_content('☃');
-is "$dom", '<div>☃</div>', 'right text';
+is "$dom", '<div>☃</div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>♥</div>');
 $dom->at('div')->replace_content("\x{2603}");
-is "$dom", '<div>☃</div>', 'right text';
+is $dom->to_xml, '<div>☃</div>', 'right result';
+is $dom->at('div')->replace('<p>♥</p>')->root, '<p>♥</p>', 'right result';
+is $dom->to_xml, '<p>♥</p>', 'right result';
+is $dom->replace('<b>whatever</b>')->root, '<b>whatever</b>', 'right result';
+is $dom->to_xml, '<b>whatever</b>', 'right result';
 
 # Replace element content
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
-$dom->at('p')->replace_content('bar');
-is "$dom", '<div>foo<p>bar</p>bar</div>', 'right text';
+is $dom->at('p')->replace_content('bar'), '<p>bar</p>', 'right result';
+is "$dom", '<div>foo<p>bar</p>bar</div>', 'right result';
 $dom->at('p')->replace_content(Mojo::DOM->new->parse('text'));
-is "$dom", '<div>foo<p>text</p>bar</div>', 'right text';
+is "$dom", '<div>foo<p>text</p>bar</div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>foo</div><div>bar</div>');
 $dom->find('div')->each(sub { shift->replace_content('<p>test</p>') });
-is "$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right text';
+is "$dom", '<div><p>test</p></div><div><p>test</p></div>', 'right result';
 $dom->find('p')->each(sub { shift->replace_content('') });
-is "$dom", '<div><p></p></div><div><p></p></div>', 'right text';
+is "$dom", '<div><p></p></div><div><p></p></div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div><p id="☃" /></div>');
 $dom->at('#☃')->replace_content('♥');
-is "$dom", '<div><p id="☃">♥</p></div>', 'right text';
+is "$dom", '<div><p id="☃">♥</p></div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
 $dom->replace_content('♥');
-is "$dom", '♥', 'right text';
+is "$dom", '♥', 'right result';
+is $dom->replace_content('<div>foo<p>lalala</p>bar</div>'),
+  '<div>foo<p>lalala</p>bar</div>', 'right result';
+is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
+is $dom->replace_content(''), '', 'right result';
+is "$dom", '', 'right result';
 $dom->replace_content('<div>foo<p>lalala</p>bar</div>');
-is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
-$dom->replace_content('');
-is "$dom", '', 'right text';
-$dom->replace_content('<div>foo<p>lalala</p>bar</div>');
-is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right text';
+is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
+is $dom->at('p')->replace_content(''), '<p></p>', 'right result';
 
 # Mixed search and tree walk
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -2059,7 +2067,7 @@ is $dom->tree->[3]->[0], 'tag', 'right element';
 is $dom->tree->[3]->[1], 'bar', 'right tag';
 is $dom->tree->[3]->[4]->[0], 'text',  'right element';
 is $dom->tree->[3]->[4]->[1], 'after', 'right text';
-is "$dom", <<EOF, 'stringified right';
+is "$dom", <<EOF, 'right result';
 <foo bar="">
   test
 </foo>

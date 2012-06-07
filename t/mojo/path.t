@@ -4,7 +4,7 @@ use utf8;
 
 use Test::More tests => 212;
 
-# "This is the greatest case of false advertising I’ve seen since I sued the
+# "This is the greatest case of false advertising I've seen since I sued the
 #  movie 'The Never Ending Story.'"
 use Mojo::Path;
 

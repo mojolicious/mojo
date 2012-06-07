@@ -1,5 +1,8 @@
 use Mojo::Base -strict;
 
+# Disable libev
+BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
+
 use Test::More tests => 45;
 
 use FindBin;

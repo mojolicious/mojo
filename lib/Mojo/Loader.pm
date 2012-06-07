@@ -17,17 +17,14 @@ sub load {
   return if $module->can('new');
 
   # Load
-  unless (eval "require $module; 1") {
+  return if eval "require $module; 1";
 
-    # Exists
-    my $path = Mojo::Command->class_to_path($module);
-    return 1 if $@ =~ /^Can't locate $path in \@INC/;
+  # Exists
+  my $path = Mojo::Command->class_to_path($module);
+  return 1 if $@ =~ /^Can't locate $path in \@INC/;
 
-    # Real error
-    return Mojo::Exception->new($@);
-  }
-
-  return;
+  # Real error
+  return Mojo::Exception->new($@);
 }
 
 # "This is the worst thing you've ever done.
@@ -35,21 +32,20 @@ sub load {
 sub search {
   my ($self, $namespace) = @_;
 
-  # Scan
+  # Check all directories
   my (@modules, %found);
-  for my $directory (exists $INC{'blib.pm'} ? grep {/blib/} @INC : @INC) {
-    next unless -d (my $path = catdir $directory, (split /::/, $namespace));
+  for my $directory (@INC) {
+    next unless -d (my $path = catdir $directory, split(/::/, $namespace));
 
-    # Check files
+    # List "*.pm" files in directory
     opendir(my $dir, $path);
-    for my $file (grep /\.pm$/, readdir($dir)) {
+    for my $file (grep /\.pm$/, readdir $dir) {
       next if -d catfile splitdir($path), $file;
 
       # Module found
       my $class = "$namespace\::" . fileparse $file, qr/\.pm/;
       push @modules, $class unless $found{$class}++;
     }
-    closedir $dir;
   }
 
   return \@modules;
@@ -91,7 +87,7 @@ Load a class and catch exceptions. Note that classes are checked for a C<new>
 method to see if they are already loaded.
 
   if (my $e = $loader->load('Foo::Bar')) {
-    die "Exception: $e" if ref $e;
+    die ref $e ? "Exception: $e" : 'Already loaded!';
   }
 
 =head2 C<search>

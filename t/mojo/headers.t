@@ -1,6 +1,5 @@
 use Mojo::Base -strict;
 
-# "Remember, you can always find East by staring directly at the sun."
 use Test::More tests => 87;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,

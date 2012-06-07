@@ -341,22 +341,12 @@ sub _start {
     elsif ($start eq 'optgroup') { $self->_end('optgroup', $current) }
 
     # "<option>"
-    elsif ($start ~~ [qw(option optgroup)]) {
-      $self->_end('option', $current);
-      $self->_end('optgroup', $current) if $start eq 'optgroup';
+    elsif ($start eq 'option') { $self->_end('option', $current) }
+
+    # "<colgroup>", "<thead>", "tbody" and "tfoot"
+    elsif ($start ~~ [qw(colgroup thead tbody tfoot)]) {
+      $self->_close($current);
     }
-
-    # "<colgroup>"
-    elsif ($start eq 'colgroup') { $self->_close($current) }
-
-    # "<thead>"
-    elsif ($start eq 'thead') { $self->_close($current) }
-
-    # "<tbody>"
-    elsif ($start eq 'tbody') { $self->_close($current) }
-
-    # "<tfoot>"
-    elsif ($start eq 'tfoot') { $self->_close($current) }
 
     # "<tr>"
     elsif ($start eq 'tr') { $self->_close($current, {tr => 1}) }

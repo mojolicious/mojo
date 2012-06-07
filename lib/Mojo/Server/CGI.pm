@@ -124,7 +124,7 @@ Mojo::Server::CGI - CGI server
 
 L<Mojo::Server::CGI> is a simple and portable implementation of RFC 3875.
 
-See L<Mojolicious::Guides::Cookbook> for deployment recipes.
+See L<Mojolicious::Guides::Cookbook> for more.
 
 =head1 EVENTS
 

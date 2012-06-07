@@ -126,8 +126,7 @@ sub _detect {
       my $num  = shift;
       my $new  = "$name line $num";
       my $line = $lines[0]->[$num];
-      $new .= qq{, near "$line"} if defined $line;
-      return $new .= '.';
+      return defined $line ? qq{$new, near "$line".} : "$new.";
     };
     $message =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;
     $self->message($message);

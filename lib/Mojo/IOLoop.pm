@@ -19,7 +19,7 @@ has max_accepts     => 0;
 has max_connections => 1000;
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
-  warn "-- Mainloop ($class)\n" if DEBUG;
+  warn "-- Reactor ($class)\n" if DEBUG;
   return $class->new;
 };
 has server_class => 'Mojo::IOLoop::Server';
@@ -36,8 +36,8 @@ sub client {
   $self = $self->singleton unless ref $self;
   my $cb = pop;
 
-  # Make sure garbage gets collected
-  $self->_cleaner;
+  # Manage connections
+  $self->_manage;
 
   # New client
   my $client = $self->client_class->new;
@@ -46,7 +46,7 @@ sub client {
   $c->{client} = $client;
   weaken $client->reactor($self->reactor)->{reactor};
 
-  # Events
+  # Connect
   weaken $self;
   $client->on(
     connect => sub {
@@ -64,12 +64,10 @@ sub client {
   );
   $client->on(
     error => sub {
-      delete $self->{connections}{$id};
       $self->$cb(pop, undef);
+      delete $self->{connections}{$id};
     }
   );
-
-  # Connect
   $client->connect(@_);
 
   return $id;
@@ -118,14 +116,14 @@ sub remove {
 }
 
 # "Fat Tony is a cancer on this fair city!
-#  He is the cancer and I am the… uh… what cures cancer?"
+#  He is the cancer and I am the... uh... what cures cancer?"
 sub server {
   my $self = shift;
   $self = $self->singleton unless ref $self;
   my $cb = pop;
 
-  # Make sure garbage gets collected
-  $self->_cleaner;
+  # Manage connections
+  $self->_manage;
 
   # New server
   my $server = $self->server_class->new;
@@ -133,7 +131,7 @@ sub server {
   $self->{servers}{$id} = $server;
   weaken $server->reactor($self->reactor)->{reactor};
 
-  # Events
+  # Listen
   weaken $self;
   $server->on(
     accept => sub {
@@ -144,16 +142,18 @@ sub server {
       my $id     = $self->stream($stream);
       $self->$cb($stream, $id);
 
-      # Enforce limit
+      # Enforce connection limit
       $self->max_connections(0)
         if defined $self->{accepts} && --$self->{accepts} == 0;
+
+      # Stop listening
       $self->_not_listening;
     }
   );
-
-  # Listen
   $server->listen(@_);
   $self->{accepts} = $self->max_accepts if $self->max_accepts;
+
+  # Stop listening
   $self->_not_listening;
 
   return $id;
@@ -193,28 +193,6 @@ sub timer {
   return $self->reactor->timer($after => sub { $self->$cb });
 }
 
-sub _cleaner {
-  my $self = shift;
-  $self->{cleaner} ||= $self->recurring(
-    0.025 => sub {
-      my $self = shift;
-
-      # Manage connections
-      $self->_listening;
-      my $connections = $self->{connections} ||= {};
-      while (my ($id, $c) = each %$connections) {
-        $self->_remove($id)
-          if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
-      }
-
-      # Graceful shutdown
-      $self->_remove(delete $self->{cleaner})
-        unless keys(%$connections) || keys(%{$self->{servers}});
-      $self->stop if $self->max_connections == 0 && keys %$connections == 0;
-    }
-  );
-}
-
 sub _id {
   my $self = shift;
   my $id;
@@ -226,13 +204,15 @@ sub _id {
 sub _listening {
   my $self = shift;
 
-  # Check if we should be listening
+  # Check connection limit
   return if $self->{listening};
   my $servers = $self->{servers} ||= {};
   return unless keys %$servers;
   my $i   = keys %{$self->{connections}};
   my $max = $self->max_connections;
   return unless $i < $max;
+
+  # Acquire accept mutex
   if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
 
   # Check if multi-accept is desirable and start listening
@@ -240,10 +220,34 @@ sub _listening {
   $self->{listening} = 1;
 }
 
+sub _manage {
+  my $self = shift;
+  $self->{manager} ||= $self->recurring(
+    0.025 => sub {
+      my $self = shift;
+
+      # Start listening if possible
+      $self->_listening;
+
+      # Close connections gracefully
+      my $connections = $self->{connections} ||= {};
+      while (my ($id, $c) = each %$connections) {
+        $self->_remove($id)
+          if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
+      }
+
+      # Graceful shutdown
+      $self->_remove(delete $self->{manager})
+        unless keys %$connections || keys %{$self->{servers}};
+      $self->stop if $self->max_connections == 0 && keys %$connections == 0;
+    }
+  );
+}
+
 sub _not_listening {
   my $self = shift;
 
-  # Check if we are listening
+  # Release accept mutex
   return unless delete $self->{listening};
   return unless my $cb = $self->unlock;
   $self->$cb();
@@ -272,14 +276,14 @@ sub _remove {
 sub _stream {
   my ($self, $stream, $id) = @_;
 
-  # Make sure garbage gets collected
-  $self->_cleaner;
+  # Manage connections
+  $self->_manage;
 
   # Connect stream with reactor
   $self->{connections}{$id}{stream} = $stream;
   weaken $stream->reactor($self->reactor)->{reactor};
 
-  # Events
+  # Stream
   weaken $self;
   $stream->on(close => sub { $self->{connections}{$id}{finish} = 1 });
   $stream->start;
@@ -342,13 +346,15 @@ L<Mojo::IOLoop> is a very minimalistic reactor based on L<Mojo::Reactor>, it
 has been reduced to the absolute minimal feature set required to build solid
 and scalable non-blocking TCP clients and servers.
 
-Optional modules L<EV>, L<IO::Socket::IP> and L<IO::Socket::SSL> are supported
-transparently and used if installed. Individual features can also be disabled
-with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+Optional modules L<EV>, L<IO::Socket::INET6> and L<IO::Socket::SSL> are
+supported transparently and used if installed. Individual features can also be
+disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
 A TLS certificate and key are also built right in to make writing test servers
 as easy as possible. Also note that for convenience the C<PIPE> signal will be
 set to C<IGNORE> when L<Mojo::IOLoop> is loaded.
+
+See L<Mojolicious::Guides::Cookbook> for more.
 
 =head1 ATTRIBUTES
 
@@ -367,14 +373,14 @@ defaults to L<Mojo::IOLoop::Client>.
   my $cb = $loop->lock;
   $loop  = $loop->lock(sub {...});
 
-A locking callback that decides if this loop is allowed to accept new incoming
-connections, used to sync multiple server processes. The callback should
-return true or false. Note that exceptions in this callback are not captured.
+A callback for acquiring the accept mutex, used to sync multiple server
+processes. The callback should return true or false. Note that exceptions in
+this callback are not captured.
 
   $loop->lock(sub {
     my ($loop, $blocking) = @_;
 
-    # Got the lock, listen for new connections
+    # Got the accept mutex, start listening
     return 1;
   });
 
@@ -396,7 +402,8 @@ connections indefinitely.
 The maximum number of parallel connections this loop is allowed to handle
 before stopping to accept new incoming connections, defaults to C<1000>.
 Setting the value to C<0> will make this loop stop accepting new connections
-and allow it to shutdown gracefully without interrupting existing connections.
+and allow it to shut down gracefully without interrupting existing
+connections.
 
 =head2 C<reactor>
 
@@ -433,8 +440,8 @@ to L<Mojo::IOLoop::Stream>.
   my $cb = $loop->unlock;
   $loop  = $loop->unlock(sub {...});
 
-A callback to free the accept lock, used to sync multiple server processes.
-Note that exceptions in this callback are not captured.
+A callback for releasing the accept mutex, used to sync multiple server
+processes. Note that exceptions in this callback are not captured.
 
 =head1 METHODS
 
@@ -452,6 +459,7 @@ Open TCP connection with C<client_class>, which is usually
 L<Mojo::IOLoop::Client>, takes the same arguments as
 L<Mojo::IOLoop::Client/"connect">.
 
+  # Connect to localhost on port 3000
   Mojo::IOLoop->client({port => 3000} => sub {
     my ($loop, $err, $stream) = @_;
     ...
@@ -511,13 +519,16 @@ that this method can recurse back into the reactor, so you need to be careful.
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
 
+  # Invoke as soon as possible
+  Mojo::IOLoop->recurring(0 => sub { say 'Reactor tick.' });
+
 =head2 C<remove>
 
   Mojo::IOLoop->remove($id);
   $loop->remove($id);
 
-Remove anything with an id. Connections will be dropped gracefully by
-allowing them to finish writing all data in their write buffers.
+Remove anything with an id, connections will be dropped gracefully by allowing
+them to finish writing all data in their write buffers.
 
 =head2 C<server>
 
@@ -529,6 +540,7 @@ Accept TCP connections with C<server_class>, which is usually
 L<Mojo::IOLoop::Server>, takes the same arguments as
 L<Mojo::IOLoop::Server/"listen">.
 
+  # Listen on port 3000
   Mojo::IOLoop->server({port => 3000} => sub {
     my ($loop, $stream, $id) = @_;
     ...
@@ -561,8 +573,8 @@ watched anymore.
   Mojo::IOLoop->stop;
   $loop->stop;
 
-Stop the loop immediately, this will not interrupt any existing connections
-and the loop can be restarted by running C<start> again.
+Stop the loop, this will not interrupt any existing connections and the loop
+can be restarted by running C<start> again.
 
 =head2 C<stream>
 
@@ -583,6 +595,9 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds.
+
+  # Invoke as soon as possible
+  Mojo::IOLoop->timer(0 => sub { say 'Next tick.' });
 
 =head1 DEBUGGING
 

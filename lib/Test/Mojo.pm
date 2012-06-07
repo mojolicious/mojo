@@ -7,8 +7,8 @@ use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
 use Test::More ();
 
-has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
 has 'tx';
+has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
 
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
@@ -23,8 +23,7 @@ sub new {
 sub app {
   my ($self, $app) = @_;
   return $self->ua->app unless $app;
-  $ENV{MOJO_APP} ||= $app;
-  $self->ua->app($app);
+  $self->ua->app($ENV{MOJO_APP} = $app);
   return $self;
 }
 

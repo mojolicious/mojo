@@ -39,30 +39,29 @@ my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 
 # "Hey...That's not the wallet inspector..."
 sub decode {
-  my ($self, $string) = @_;
+  my ($self, $bytes) = @_;
 
   # Cleanup
   $self->error(undef);
 
   # Missing input
-  $self->error('Missing or empty input.') and return unless $string;
+  $self->error('Missing or empty input.') and return unless $bytes;
 
   # Remove BOM
-  $string
-    =~ s/^(?:\357\273\277|\377\376\0\0|\0\0\376\377|\376\377|\377\376)//g;
+  $bytes =~ s/^(?:\357\273\277|\377\376\0\0|\0\0\376\377|\376\377|\377\376)//g;
 
   # Wide characters
   $self->error('Wide character in input.') and return
-    unless utf8::downgrade($string, 1);
+    unless utf8::downgrade($bytes, 1);
 
   # Detect and decode unicode
   my $encoding = 'UTF-8';
-  $string =~ $UTF_PATTERNS->{$_} and $encoding = $_ for keys %$UTF_PATTERNS;
-  $string = Mojo::Util::decode $encoding, $string;
+  $bytes =~ $UTF_PATTERNS->{$_} and $encoding = $_ for keys %$UTF_PATTERNS;
+  $bytes = Mojo::Util::decode $encoding, $bytes;
 
   # Object or array
   my $res = eval {
-    local $_ = $string;
+    local $_ = $bytes;
 
     # Leading whitespace
     m/\G$WHITESPACE_RE/gc;
@@ -332,9 +331,9 @@ Mojo::JSON - Minimalistic JSON
 
   use Mojo::JSON;
 
-  my $json   = Mojo::JSON->new;
-  my $string = $json->encode({foo => [1, 2], bar => 'hello!'});
-  my $hash   = $json->decode('{"foo": [3, -2, 1]}');
+  my $json  = Mojo::JSON->new;
+  my $bytes = $json->encode({foo => [1, 2], bar => 'hello!'});
+  my $hash  = $json->decode($bytes);
 
 =head1 DESCRIPTION
 
@@ -378,14 +377,14 @@ following new ones.
 
 =head2 C<decode>
 
-  my $array = $json->decode('[1, 2, 3]');
-  my $hash  = $json->decode('{"foo": "bar"}');
+  my $array = $json->decode($bytes);
+  my $hash  = $json->decode($bytes);
 
-Decode JSON string.
+Decode JSON.
 
 =head2 C<encode>
 
-  my $string = $json->encode({foo => 'bar'});
+  my $bytes = $json->encode({foo => 'bar'});
 
 Encode Perl structure.
 

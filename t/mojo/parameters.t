@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 84;
+use Test::More tests => 90;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use Mojo::Parameters;
@@ -167,6 +167,20 @@ $p->parse('input=say%20%22%C2%AB~%22;');
 is $p->params->[1], 'say "«~"', 'right value';
 is $p->param('input'), 'say "«~"', 'right value';
 is "$p", 'input=say+%22%C2%AB~%22', 'right result';
+
+# URL escaped Unicode
+$p = Mojo::Parameters->new;
+$p->parse("input=ot%DA%AF%EF%BA%ADto");
+is $p->params->[1], 'otگﺭto', 'right value a';
+is $p->param('input'), 'otگﺭto', 'right value a';
+is "$p", 'input=ot%DA%AF%EF%BA%ADto', 'right result a';
+
+# Unescaped Unicode
+$p = Mojo::Parameters->new;
+$p->parse("input=ot\xDA\xAF\xEF\xBA\xADto");
+is $p->params->[1], 'otگﺭto', 'right value b';
+is $p->param('input'), 'otگﺭto', 'right value b';
+is "$p", 'input=ot%DA%AF%EF%BA%ADto', 'right result b';
 
 # Reparse
 $p = Mojo::Parameters->new('foo=bar&baz=23');

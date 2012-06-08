@@ -369,7 +369,7 @@ sub _unescape {
   # Remove escaped newlines
   $value =~ s/\\\n//g;
 
-  # Unescape unicode characters
+  # Unescape Unicode characters
   $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack('U', hex $1)/ge;
 
   # Remove backslash

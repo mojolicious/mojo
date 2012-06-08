@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 398;
+use Test::More tests => 407;
 
 # "I don't want you driving around in a car you built yourself.
 #  You can sit there complaining, or you can knit me some seat belts."
@@ -356,6 +356,36 @@ is $url->ihost,  'xn--n3h.net', 'right internationalized host';
 is $url->path,   '/', 'right path';
 is "$url", 'http://xn--n3h.net/', 'right format';
 
+# IRI/IDNA
+$url = Mojo::URL->new('http://☃.net/♥/?q=♥☃');
+is $url->path->parts->[0], '♥', 'right path part';
+is $url->path,  '/%E2%99%A5/',          'right path';
+is $url->query, 'q=%E2%99%A5%E2%98%83', 'right query';
+is $url->query->param('q'), '♥☃', 'right query value';
+$url = Mojo::URL->new('http://☃.net/♥/♥/?♥=☃');
+ok $url->is_abs, 'is absolute';
+is $url->scheme, 'http', 'right scheme';
+is $url->host,   '☃.net', 'right host';
+is $url->ihost,  'xn--n3h.net', 'right internationalized host';
+is $url->path,   '/%E2%99%A5/%E2%99%A5/', 'right path';
+is $url->path->parts->[0], '♥', 'right path part';
+is $url->path->parts->[1], '♥', 'right path part';
+is $url->query->param('♥'), '☃', 'right query value';
+is "$url", 'http://xn--n3h.net/%E2%99%A5/%E2%99%A5/?%E2%99%A5=%E2%98%83',
+  'right format';
+$url = Mojo::URL->new(
+  'http://xn--n3h.net/%E2%99%A5/%E2%99%A5/?%E2%99%A5=%E2%98%83');
+ok $url->is_abs, 'is absolute';
+is $url->scheme, 'http', 'right scheme';
+is $url->host,   'xn--n3h.net', 'right host';
+is $url->ihost,  'xn--n3h.net', 'right internationalized host';
+is $url->path,   '/%E2%99%A5/%E2%99%A5/', 'right path';
+is $url->path->parts->[0], '♥', 'right path part';
+is $url->path->parts->[1], '♥', 'right path part';
+is $url->query->param('♥'), '☃', 'right query value';
+is "$url", 'http://xn--n3h.net/%E2%99%A5/%E2%99%A5/?%E2%99%A5=%E2%98%83',
+  'right format';
+
 # Already absolute
 $url = Mojo::URL->new('http://foo.com/');
 is $url->to_abs, 'http://foo.com/', 'right absolute version';
@@ -365,34 +395,6 @@ $url = Mojo::URL->new('http://sri:foobar@kraih.com:8080/foo?foo=bar#23');
 $url->base->parse('http://sri:foobar@kraih.com:8080/');
 my $url2 = $url->to_rel;
 is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
-
-# IRI
-$url
-  = Mojo::URL->new('http://sharifulin.ru/привет/?q=шарифулин');
-is $url->path->parts->[0], 'привет', 'right path part';
-is $url->path, '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/', 'right path';
-is $url->query, 'q=%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD',
-  'right query';
-is $url->query->param('q'), 'шарифулин', 'right query value';
-
-# IRI/IDNA
-$url = Mojo::URL->new(
-  'http://☃.net/привет/привет/?привет=шарифулин');
-ok $url->is_abs, 'is absolute';
-is $url->scheme, 'http', 'right scheme';
-is $url->host,   '☃.net', 'right host';
-is $url->ihost,  'xn--n3h.net', 'right internationalized host';
-is $url->path,   '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
-  . '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/', 'right host';
-is $url->path->parts->[0], 'привет', 'right path part';
-is $url->path->parts->[1], 'привет', 'right path part';
-is $url->query->param('привет'), 'шарифулин',
-  'right query value';
-is "$url",
-    'http://xn--n3h.net/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82'
-  . '/%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82/'
-  . '?%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82='
-  . '%D1%88%D0%B0%D1%80%D0%B8%D1%84%D1%83%D0%BB%D0%B8%D0%BD', 'right format';
 
 # Empty path elements
 $url = Mojo::URL->new('http://kraih.com/foo//bar/23/');

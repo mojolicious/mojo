@@ -644,8 +644,8 @@ unescaped and decoded to Perl characters.
   # GET /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
   $r->get('/☃')->to(controller => 'foo', action => 'snowman');
 
-Just don't forget to use the L<utf8> pragma or you'll make the unicode
-snowman very sad.
+Just don't forget to use the L<utf8> pragma or you'll make the Unicode snowman
+very sad.
 
 =head2 WebSockets
 

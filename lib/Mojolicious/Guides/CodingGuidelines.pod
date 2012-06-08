@@ -62,7 +62,7 @@ New features can be marked as experimental to be excluded from deprecation
 policies.
 
 A major release is signaled by a new major version number and a unique code
-name based on a unicode character.
+name based on a Unicode character.
 
 Only add dependencies if absolutely necessary and make them optional if
 possible.

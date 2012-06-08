@@ -531,7 +531,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   use Mojo::UserAgent;
   my $ua = Mojo::UserAgent->new;
 
-  # Say hello to the unicode snowman with "Do Not Track" header
+  # Say hello to the Unicode snowman with "Do Not Track" header
   say $ua->get('www.☃.net?hello=there' => {DNT => 1})->res->body;
 
   # Quick JSON API request with Basic authentication

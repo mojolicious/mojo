@@ -19,7 +19,7 @@
   - Improved tests.
   - Fixed bug that prevented Test::Mojo from working with normal Mojolicious
     applications that use Mojolicious::Plugin::Config.
-  - Fixed a few small unicode bugs in documentation.
+  - Fixed a few small Unicode bugs in documentation.
 
 2.96  2012-05-21
   - Added merge method to Mojo::Path.
@@ -643,7 +643,7 @@
   - Changed default keep alive timeout of Mojo::UserAgent from 15 to 20
     seconds.
   - Improved documentation.
-  - Improved unicode tests.
+  - Improved Unicode tests.
   - Fixed inline template double encoding bug.
 
 2.36  2011-12-05
@@ -938,7 +938,7 @@
   - Fixed close event bug in Mojo::IOLoop.
   - Fixed small redirect_to bug. (judofyr, sri)
   - Fixed small attribute selector bug in Mojo::DOM::CSS.
-  - Fixed small unicode bug in Mojolicious::Plugin::EPRenderer.
+  - Fixed small Unicode bug in Mojolicious::Plugin::EPRenderer.
   - Fixed a few small route bugs.
   - Fixed Perl 5.8.7 compatibility.
   - Fixed typos.
@@ -961,7 +961,7 @@
   - Fixed small bug that caused exceptions to be logged twice.
 
 1.97  2011-09-03
-  - Improved unicode handling to be more correct and less forgiving.
+  - Improved Unicode handling to be more correct and less forgiving.
   - Fixed typos.
 
 1.96  2011-09-02
@@ -1084,7 +1084,7 @@
   - Improved Mojo::DOM to allow smart whitespace trimming to be disabled.
     (Akron)
   - Improved documentation.
-  - Fixed small unicode bug in get command.
+  - Fixed small Unicode bug in get command.
 
 1.76  2011-08-12
   - Fixed small Mojo::URL escaping bug.
@@ -1917,8 +1917,8 @@
   - Updated WebSocket implementation to draft 76, NOTE THAT THIS CHANGE IS
     NOT BACKWARDS COMPATIBLE!!!
     (sadly we have no choice when the spec changes)
-  - Increased Perl version requirement to 5.8.7 due to unicode bugs in
-    earlier releases.
+  - Increased Perl version requirement to 5.8.7 due to Unicode bugs in earlier
+    releases.
   - Switched to app->start instead of shagadelic as default way to start
     Mojolicious::Lite apps in the documentation.
   - Made tutorial examples more business friendly.
@@ -2193,7 +2193,7 @@
   - Updated Mojolicious::Lite tutorial.
   - Fixed a case where routes captures got false positives.
   - Fixed literal name handling in Mojo::JSON. (rsp)
-  - Fixed unicode detection in Mojo::JSON. (rsp)
+  - Fixed Unicode detection in Mojo::JSON. (rsp)
   - Fixed multiple small bugs in Mojo::JSON. (rsp)
   - Fixed Mojolicious default app tests. (yuki-kimoto)
   - Fixed Mojo::Server::FCGI compatibility.

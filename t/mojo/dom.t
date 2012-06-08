@@ -197,7 +197,7 @@ is $dom->at('[foo=bar]')->text, 'works', 'right text';
 is $dom->at('[foo=ba]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
-# Already decoded unicode snowman and quotes in selector
+# Already decoded Unicode snowman and quotes in selector
 $dom = Mojo::DOM->new->parse('<div id="snowm&quot;an">☃</div>');
 is $dom->at('[id="snowm\"an"]')->text,      '☃', 'right text';
 is $dom->at('[id="snowm\22 an"]')->text,    '☃', 'right text';

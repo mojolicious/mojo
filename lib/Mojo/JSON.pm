@@ -54,7 +54,7 @@ sub decode {
   $self->error('Wide character in input.') and return
     unless utf8::downgrade($bytes, 1);
 
-  # Detect and decode unicode
+  # Detect and decode Unicode
   my $encoding = 'UTF-8';
   $bytes =~ $UTF_PATTERNS->{$_} and $encoding = $_ for keys %$UTF_PATTERNS;
   $bytes = Mojo::Util::decode $encoding, $bytes;
@@ -356,7 +356,7 @@ similar native Perl value.
   null  -> undef
 
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
-encoding will only generate UTF-8. The two unicode whitespace characters
+encoding will only generate UTF-8. The two Unicode whitespace characters
 C<u2028> and C<u2029> will always be escaped to make JSONP easier.
 
 =head1 ATTRIBUTES

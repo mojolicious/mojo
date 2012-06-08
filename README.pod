@@ -21,7 +21,7 @@ through L<Mojolicious::Lite>.
 
 Powerful out of the box with RESTful routes, plugins, Perl-ish templates,
 session management, signed cookies, testing framework, static file server,
-I18N, first class unicode support and much more for you to discover.
+I18N, first class Unicode support and much more for you to discover.
 
 =back
 

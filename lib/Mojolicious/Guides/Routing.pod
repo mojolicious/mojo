@@ -642,10 +642,22 @@ unescaped and decoded to Perl characters.
   use utf8;
 
   # GET /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
-  $r->get('/☃')->to(controller => 'foo', action => 'snowman');
+  $r->get('/☃')->to('foo#snowman');
 
 Just don't forget to use the L<utf8> pragma or you'll make the Unicode snowman
 very sad.
+
+=head2 Rearranging routes
+
+Until the first request has been handled, all routes can still be moved around
+or even removed. Especially for rearranging routes created by plugins this can
+be very useful.
+
+  # GET /example/show -> {controller => 'example', action => 'show'}
+  $r->get('/show')->to('example#show')->name('show_example');
+  $r->any('/example')->add_child($r->find('show_example'));
+  $r->get('/secrets/show')->to('secrets#show')->name('show_secrets');
+  $r->find('show_secrets')->remove;
 
 =head2 WebSockets
 

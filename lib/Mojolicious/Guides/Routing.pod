@@ -486,6 +486,30 @@ methods to pass.
   $r->route('/bye')->via('GET', 'POST')
     ->to(controller => 'foo', action => 'bye');
 
+=head2 WebSockets
+
+With the method L<Mojolicious::Routes::Route/"websocket"> you can restrict
+access to WebSocket handshakes, which are normal C<GET> requests with some
+additional information.
+
+  # /echo (WebSocket handshake)
+  $r->websocket('/echo')->to(controller => 'foo', action => 'echo');
+
+  # Controller
+  package MyApp::Foo;
+  use Mojo::Base 'Mojolicious::Controller';
+
+  # Action
+  sub echo {
+    my $self = shift;
+    $self->on(message => sub {
+      my ($self, $message) = @_;
+      $self->send("echo: $message");
+    });
+  }
+
+  1;
+
 =head2 Bridges
 
 Bridges can be used to share code with multiple nested routes, because unlike
@@ -659,29 +683,6 @@ be very useful.
   $r->get('/secrets/show')->to('secrets#show')->name('show_secrets');
   $r->find('show_secrets')->remove;
 
-=head2 WebSockets
-
-You can restrict access to WebSocket handshakes using the method
-L<Mojolicious::Routes::Route/"websocket">.
-
-  # /echo (WebSocket handshake)
-  $r->websocket('/echo')->to(controller => 'foo', action => 'echo');
-
-  # Controller
-  package MyApp::Foo;
-  use Mojo::Base 'Mojolicious::Controller';
-
-  # Action
-  sub echo {
-    my $self = shift;
-    $self->on(message => sub {
-      my ($self, $message) = @_;
-      $self->send("echo: $message");
-    });
-  }
-
-  1;
-
 =head2 Conditions
 
 Sometimes you might need a little more power, for example to check the
@@ -708,9 +709,9 @@ play, they are basically router plugins.
   # /firefox_only (Firefox) -> {controller => 'foo', action => 'bar'}
   $r->get('/firefox_only')->over(agent => qr/Firefox/)->to('foo#bar');
 
-The method L<Mojolicious::Routes::Route/"add_condition"> registers the new
-condition in the router, while L<Mojolicious::Routes/"over"> actually applies
-it to the route.
+The method L<Mojolicious::Routes/"add_condition"> registers the new condition
+in the router, while L<Mojolicious::Routes/"over"> actually applies it to the
+route.
 
 =head2 Condition plugins
 

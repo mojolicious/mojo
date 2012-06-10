@@ -71,9 +71,6 @@ sub match {
     delete $captures->{app};
   }
 
-  # DEPRECATED in Leaf Fluttering In Wind!
-  return $self->endpoint($r) if $r->block && $empty;
-
   # Endpoint
   return $self->endpoint($r) if $endpoint && $empty;
 

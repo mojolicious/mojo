@@ -34,18 +34,6 @@ sub auto_render {
   $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub controller_base_class {
-  warn <<EOF;
-Mojolicious::Routes->controller_base_class is DEPRECATED in favor of
-Mojolicious::Routes->base_classes!
-EOF
-  my $self = shift;
-  return $self->base_classes->[0] unless @_;
-  $self->base_classes->[0] = shift;
-  return $self;
-}
-
 sub dispatch {
   my ($self, $c) = @_;
 

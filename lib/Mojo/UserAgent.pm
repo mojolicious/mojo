@@ -3,11 +3,11 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use List::Util 'first';
-use Mojo::CookieJar;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
+use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Transactor;
 use Scalar::Util 'weaken';
 
@@ -17,7 +17,7 @@ use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 has ca              => sub { $ENV{MOJO_CA_FILE} };
 has cert            => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
-has cookie_jar      => sub { Mojo::CookieJar->new };
+has cookie_jar      => sub { Mojo::UserAgent::CookieJar->new };
 has [qw(http_proxy https_proxy local_address no_proxy)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };
 has ioloop             => sub { Mojo::IOLoop->new };
@@ -682,10 +682,10 @@ environment variable or C<10>.
 =head2 C<cookie_jar>
 
   my $cookie_jar = $ua->cookie_jar;
-  $ua            = $ua->cookie_jar(Mojo::CookieJar->new);
+  $ua            = $ua->cookie_jar(Mojo::UserAgent::CookieJar->new);
 
 Cookie jar to use for this user agents requests, defaults to a
-L<Mojo::CookieJar> object.
+L<Mojo::UserAgent::CookieJar> object.
 
   # Disable cookie jar
   $ua->cookie_jar(0);

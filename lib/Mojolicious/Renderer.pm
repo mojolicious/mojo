@@ -58,18 +58,6 @@ sub add_helper {
   return $self;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub default_template_class {
-  warn <<EOF;
-Mojolicious::Renderer->default_template_class is DEPRECATED in favor of
-Mojolicious::Renderer->classes!
-EOF
-  my $self = shift;
-  return $self->classes->[0] unless @_;
-  $self->classes->[0] = shift;
-  return $self;
-}
-
 sub get_data_template {
   my ($self, $options, $template) = @_;
 

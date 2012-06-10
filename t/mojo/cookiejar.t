@@ -6,11 +6,11 @@ use Test::More tests => 85;
 #  Okay Mr. Burns, what's your first name.
 #  I don't know."
 use Mojo::Cookie::Response;
-use Mojo::CookieJar;
+use Mojo::UserAgent::CookieJar;
 use Mojo::URL;
 
 # Session cookie
-my $jar = Mojo::CookieJar->new;
+my $jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
@@ -57,7 +57,7 @@ is $cookies[1]->value, 'works', 'right value';
 is $cookies[2], undef, 'no third cookie';
 
 # Leading dot
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => '.kraih.com',
@@ -76,7 +76,7 @@ is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
 # "localhost"
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'localhost',
@@ -113,7 +113,7 @@ is $cookies[1]->value, 'bar', 'right value';
 is $cookies[2], undef, 'no third cookie';
 
 # Random top-level domain
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'com',
@@ -138,7 +138,7 @@ is $cookies[0]->value, 'baz', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
 # Huge cookie
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
@@ -165,7 +165,7 @@ is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
 # Expired cookies
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
@@ -194,7 +194,7 @@ is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
 # Multiple cookies
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
@@ -218,7 +218,7 @@ is $cookies[1]->value, 'bar', 'right value';
 is $cookies[2], undef, 'no third cookie';
 
 # Multiple cookies with leading dot
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => '.kraih.com',
@@ -249,7 +249,7 @@ is $cookies[2]->value, 'that', 'right value';
 is $cookies[3], undef, 'no fourth cookie';
 
 # Replace cookie
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
@@ -270,7 +270,7 @@ is $cookies[0]->value, 'bar2', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
 # Switch between secure and normal cookies
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'kraih.com',
@@ -302,7 +302,7 @@ is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
 # "(" in path
-$jar = Mojo::CookieJar->new;
+$jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => '.kraih.com',

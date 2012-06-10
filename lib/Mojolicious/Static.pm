@@ -12,18 +12,6 @@ use Mojo::Path;
 has classes => sub { ['main'] };
 has paths   => sub { [] };
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub default_static_class {
-  warn <<EOF;
-Mojolicious::Static->default_static_class is DEPRECATED in favor of
-Mojolicious::Static->classes!
-EOF
-  my $self = shift;
-  return $self->classes->[0] unless @_;
-  $self->classes->[0] = shift;
-  return $self;
-}
-
 # "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {
   my ($self, $c) = @_;

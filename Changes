@@ -1,5 +1,7 @@
 
-2.99  2012-06-10
+3.0  2012-06-10
+  - Code name "Rainbow", this is a major release.
+  - Renamed Mojo::CookieJar to Mojo::UserAgent::CookieJar.
   - Improved message parser performance slightly.
   - Improved documentation. (ichesnokov, sri)
   - Improved tests.

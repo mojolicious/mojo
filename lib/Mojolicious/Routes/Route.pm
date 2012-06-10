@@ -5,7 +5,7 @@ use Carp 'croak';
 use Mojolicious::Routes::Pattern;
 use Scalar::Util qw(blessed weaken);
 
-has [qw(block inline parent partial)];
+has [qw(inline parent partial)];
 has 'children' => sub { [] };
 has pattern    => sub { Mojolicious::Routes::Pattern->new };
 
@@ -86,9 +86,6 @@ sub is_endpoint {
 
   # Bridge
   return if $self->inline;
-
-  # DEPRECATED in Leaf Fluttering In Wind!
-  return 1 if $self->block;
 
   # Check number of children
   return !@{$self->children};
@@ -234,12 +231,6 @@ sub via {
   my $methods = [map uc($_), @{ref $_[0] ? $_[0] : [@_]}];
   $self->{via} = $methods if @$methods;
   return $self;
-}
-
-# DEPRECATED in Leaf Fluttering In Wind!
-sub waypoint {
-  warn "Mojolicious::Routes::Route->waypoint is DEPRECATED!\n";
-  shift->route(@_)->block(1);
 }
 
 sub websocket {

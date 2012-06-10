@@ -82,12 +82,6 @@ sub delay {
   return $delay;
 }
 
-# DEPRECATED in Leaf Fluttering In Wind!
-sub drop {
-  warn "Mojo::IOLoop->drop is DEPRECATED in favor of Mojo::IOLoop->remove!\n";
-  shift->remove(@_);
-}
-
 sub generate_port { Mojo::IOLoop::Server->generate_port }
 
 sub is_running {

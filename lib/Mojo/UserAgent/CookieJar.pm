@@ -1,4 +1,4 @@
-package Mojo::CookieJar;
+package Mojo::UserAgent::CookieJar;
 use Mojo::Base -base;
 
 use Mojo::Cookie::Request;
@@ -97,22 +97,22 @@ sub inject {
 
 =head1 NAME
 
-Mojo::CookieJar - Cookie jar for HTTP 1.1 user agents
+Mojo::UserAgent::CookieJar - Cookie jar for HTTP 1.1 user agents
 
 =head1 SYNOPSIS
 
-  use Mojo::CookieJar;
+  use Mojo::UserAgent::CookieJar;
 
-  my $jar = Mojo::CookieJar->new;
+  my $jar = Mojo::UserAgent::CookieJar->new;
 
 =head1 DESCRIPTION
 
-L<Mojo::CookieJar> is a minimalistic and relaxed cookie jar for HTTP 1.1 user
-agents.
+L<Mojo::UserAgent::CookieJar> is a minimalistic and relaxed cookie jar for
+HTTP 1.1 user agents.
 
 =head1 ATTRIBUTES
 
-L<Mojo::CookieJar> implements the following attributes.
+L<Mojo::UserAgent::CookieJar> implements the following attributes.
 
 =head2 C<max_cookie_size>
 
@@ -123,8 +123,8 @@ Maximum cookie size in bytes, defaults to C<4096>.
 
 =head1 METHODS
 
-L<Mojo::CookieJar> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::UserAgent::CookieJar> inherits all methods from L<Mojo::Base> and
+implements the following new ones.
 
 =head2 C<add>
 

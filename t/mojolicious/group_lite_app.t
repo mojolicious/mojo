@@ -12,7 +12,7 @@ use Test::More tests => 201;
 
 # "Let's see how crazy I am now, Nixon. The correct answer is very."
 use Mojo::ByteStream 'b';
-use Mojo::CookieJar;
+use Mojo::UserAgent::CookieJar;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -265,7 +265,7 @@ $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
 # GET /bridge2stash (again without cookie jar)
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!\n");
-$t->ua->cookie_jar(Mojo::CookieJar->new);
+$t->ua->cookie_jar(Mojo::UserAgent::CookieJar->new);
 
 # GET /bridge2stash (fresh start)
 $t->reset_session;

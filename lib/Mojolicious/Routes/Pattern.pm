@@ -203,12 +203,6 @@ sub _tokenize {
     # Inside a placeholder
     my $placeholder = $state ~~ [qw(relaxed symbol wildcard)];
 
-    # DEPRECATED in Leaf Fluttering In Wind!
-    if ($quoted && $char eq '.' && $state eq 'symbol') {
-      warn "Relaxed placeholders /(.foo) are DEPRECATED in favor of /#foo!\n";
-      $char = $relaxed;
-    }
-
     # Quote start
     if ($char eq $quote_start) {
       $quoted = 1;

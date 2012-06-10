@@ -12,10 +12,24 @@ sub get      { shift->_pointer(0, @_) }
 sub _pointer {
   my ($self, $contains, $data, $pointer) = @_;
 
-  # Parse pointer and walk data structure
-  return unless $pointer =~ s!^/!!;
-  for my $p (split '/', $pointer) {
-    $p = decode('UTF-8', url_unescape $p);
+  # Tokenize pointer
+  $pointer = decode('UTF-8', url_unescape $pointer);
+  my ($escaped, @parts);
+  while (length(my $char = substr $pointer, 0, 1, '')) {
+
+    # Caret escaped
+    ++$escaped and next if $char eq '^' && !$escaped;
+
+    # Slash
+    if ($char eq '/' && !$escaped) { push @parts, '' }
+
+    # Character
+    else { $parts[-1] .= $char }
+    $escaped = undef;
+  }
+
+  # Walk data structure
+  for my $p (@parts) {
 
     # Hash
     if (ref $data eq 'HASH' && exists $data->{$p}) { $data = $data->{$p} }
@@ -48,7 +62,7 @@ Mojo::JSON::Pointer - JSON Pointers
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON::Pointer> implements JSON Pointers without caret escaping.
+L<Mojo::JSON::Pointer> implements JSON Pointers.
 
 =head1 METHODS
 

@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 24;
+use Test::More tests => 27;
 
 # "I've had it with this school, Skinner.
 #  Low test scores, class after class of ugly, ugly children..."
@@ -10,11 +10,13 @@ use Mojo::JSON::Pointer;
 
 # "contains" (hash)
 my $p = Mojo::JSON::Pointer->new;
+ok $p->contains({foo => 23}, ''),     'contains ""';
 ok $p->contains({foo => 23}, '/foo'), 'contains "/foo"';
 ok !$p->contains({foo => 23}, '/bar'), 'does not contains "/bar"';
 ok $p->contains({foo => {bar => undef}}, '/foo/bar'), 'contains "/foo/bar"';
 
 # "contains" (mixed)
+ok $p->contains({foo => [0, 1, 2]}, ''),       'contains ""';
 ok $p->contains({foo => [0, 1, 2]}, '/foo/0'), 'contains "/foo/0"';
 ok !$p->contains({foo => [0, 1, 2]}, '/foo/9'), 'does not contain "/foo/9"';
 ok !$p->contains({foo => [0, 1, 2]}, '/foo/bar'),
@@ -22,6 +24,8 @@ ok !$p->contains({foo => [0, 1, 2]}, '/foo/bar'),
 ok !$p->contains({foo => [0, 1, 2]}, '/0'), 'does not contain "/0"';
 
 # "get" (hash)
+is_deeply $p->get({foo => 'bar'}, ''), {foo => 'bar'},
+  '"" is "{foo => "bar"}"';
 is $p->get({foo => 'bar'}, '/foo'), 'bar', '"/foo" is "bar"';
 is $p->get({foo => {bar => 42}}, '/foo/bar'), 42, '"/foo/bar" is "42"';
 is_deeply $p->get({foo => {23 => {baz => 0}}}, '/foo/23'), {baz => 0},

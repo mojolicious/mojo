@@ -48,8 +48,7 @@ Mojo::JSON::Pointer - JSON Pointers
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON::Pointer> implements JSON Pointers as described in
-L<http://tools.ietf.org/html/draft-ietf-appsawg-json-pointer>.
+L<Mojo::JSON::Pointer> implements JSON Pointers without caret escaping.
 
 =head1 METHODS
 

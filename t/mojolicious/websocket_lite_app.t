@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 91;
+use Test::More tests => 96;
 
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
@@ -114,6 +114,11 @@ $t->websocket_ok('/echo')->send_ok('hello')->message_is('echo: hello')
 $t->websocket_ok('/echo')->send_ok('hello again')
   ->message_is('echo: hello again')->send_ok('and one more time')
   ->message_is('echo: and one more time')->finish_ok;
+
+# WebSocket /echo (with custom protocol)
+$t->websocket_ok('/echo', {'Sec-WebSocket-Protocol' => 'foo, bar, baz'})
+  ->header_is('Sec-WebSocket-Protocol', 'foo')->send_ok('hello')
+  ->message_is('echo: hello')->finish_ok;
 
 # WebSocket /echo (zero)
 $t->websocket_ok('/echo')->send_ok(0)->message_is('echo: 0')->finish_ok;

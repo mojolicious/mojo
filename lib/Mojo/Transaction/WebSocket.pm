@@ -124,8 +124,7 @@ sub parse_frame {
   my ($self, $buffer) = @_;
 
   # Head
-  my $clone = $$buffer;
-  return unless length $clone >= 2;
+  return unless length(my $clone = $$buffer) >= 2;
   my $head = substr $clone, 0, 2;
 
   # FIN
@@ -149,8 +148,7 @@ sub parse_frame {
   elsif ($len == 126) {
     return unless length $clone > 4;
     $hlen = 4;
-    my $ext = substr $clone, 2, 2;
-    $len = unpack 'n', $ext;
+    $len = unpack 'n', substr($clone, 2, 2);
     warn "-- Extended 16bit payload ($len)\n" if DEBUG;
   }
 
@@ -222,14 +220,10 @@ sub server_handshake {
   my $self = shift;
 
   # WebSocket handshake
-  my $res         = $self->res;
-  my $res_headers = $res->headers;
-  $res->code(101);
-  $res_headers->upgrade('websocket');
-  $res_headers->connection('Upgrade');
+  my $res_headers = $self->res->code(101)->headers;
+  $res_headers->upgrade('websocket')->connection('Upgrade');
   my $req_headers = $self->req->headers;
-  my $protocol = $req_headers->sec_websocket_protocol || '';
-  $protocol =~ /^\s*([^,]+)/;
+  ($req_headers->sec_websocket_protocol || '') =~ /^\s*([^,]+)/;
   $res_headers->sec_websocket_protocol($1) if $1;
   $res_headers->sec_websocket_accept(
     $self->_challenge($req_headers->sec_websocket_key));

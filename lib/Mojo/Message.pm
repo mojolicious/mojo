@@ -99,9 +99,9 @@ sub body_size { shift->content->body_size }
 #  It cost 80 million dollars to make.
 #  How do you sleep at night?
 #  On top of a pile of money, with many beautiful women."
-sub build_body       { shift->_build('body') }
-sub build_headers    { shift->_build('header') }
-sub build_start_line { shift->_build('start_line') }
+sub build_body       { shift->_build('get_body_chunk') }
+sub build_headers    { shift->_build('get_header_chunk') }
+sub build_start_line { shift->_build('get_start_line_chunk') }
 
 sub cookie {
   my ($self, $name) = @_;
@@ -310,10 +310,9 @@ sub write       { shift->content->write(@_) }
 sub write_chunk { shift->content->write_chunk(@_) }
 
 sub _build {
-  my ($self, $part) = @_;
+  my ($self, $method) = @_;
 
   # Build part from chunks
-  my $method = "get_${part}_chunk";
   my $buffer = '';
   my $offset = 0;
   while (1) {

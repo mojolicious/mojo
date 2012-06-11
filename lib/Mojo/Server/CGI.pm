@@ -30,65 +30,46 @@ sub run {
   # Response start line
   STDOUT->autoflush(1);
   binmode STDOUT;
-  my $res    = $tx->res;
-  my $offset = 0;
-  while ($self->nph) {
-    my $chunk = $res->get_start_line_chunk($offset);
-
-    # No start line yet, try again
-    sleep 1 and next unless defined $chunk;
-
-    # End of start line
-    last unless length $chunk;
-
-    # Start line
-    return unless STDOUT->opened;
-    print STDOUT $chunk;
-    $offset += length $chunk;
-  }
+  my $res = $tx->res;
+  return if $self->nph && !_write($res, 'get_start_line_chunk');
 
   # Response headers
   $res->fix_headers;
   my $code    = $res->code    || 404;
   my $message = $res->message || $res->default_message;
   $res->headers->status("$code $message") unless $self->nph;
-  $offset = 0;
-  while (1) {
-    my $chunk = $res->get_header_chunk($offset);
-
-    # No headers yet, try again
-    sleep 1 and next unless defined $chunk;
-
-    # End of headers
-    last unless length $chunk;
-
-    # Headers
-    return unless STDOUT->opened;
-    print STDOUT $chunk;
-    $offset += length $chunk;
-  }
+  return unless _write($res, 'get_header_chunk');
 
   # Response body
-  $offset = 0;
-  while (1) {
-    my $chunk = $res->get_body_chunk($offset);
-
-    # No content yet, try again
-    sleep 1 and next unless defined $chunk;
-
-    # End of content
-    last unless length $chunk;
-
-    # Content
-    return unless STDOUT->opened;
-    print STDOUT $chunk;
-    $offset += length $chunk;
-  }
+  return unless _write($res, 'get_body_chunk');
 
   # Finish transaction
   $tx->server_close;
 
   return $res->code;
+}
+
+sub _write {
+  my ($res, $method) = @_;
+
+  # Write chunks to STDOUT
+  my $offset = 0;
+  while (1) {
+    my $chunk = $res->$method($offset);
+
+    # No chunk yet, try again
+    sleep 1 and next unless defined $chunk;
+
+    # End of part
+    last unless length $chunk;
+
+    # Part
+    return unless STDOUT->opened;
+    print STDOUT $chunk;
+    $offset += length $chunk;
+  }
+
+  return 1;
 }
 
 1;

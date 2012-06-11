@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 96;
+use Test::More tests => 97;
 
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
@@ -106,9 +106,9 @@ post {data => 'plain nested too!'};
 #  Ooh, wait! That's it! I'll fake it!"
 my $t = Test::Mojo->new;
 
-# WebSocket /echo
-$t->websocket_ok('/echo')->send_ok('hello')->message_is('echo: hello')
-  ->finish_ok;
+# WebSocket /echo (default protocol)
+$t->websocket_ok('/echo')->header_is('Sec-WebSocket-Protocol' => 'mojo')
+  ->send_ok('hello')->message_is('echo: hello')->finish_ok;
 
 # WebSocket /echo (multiple times)
 $t->websocket_ok('/echo')->send_ok('hello again')
@@ -117,7 +117,7 @@ $t->websocket_ok('/echo')->send_ok('hello again')
 
 # WebSocket /echo (with custom protocol)
 $t->websocket_ok('/echo', {'Sec-WebSocket-Protocol' => 'foo, bar, baz'})
-  ->header_is('Sec-WebSocket-Protocol', 'foo')->send_ok('hello')
+  ->header_is('Sec-WebSocket-Protocol' => 'foo')->send_ok('hello')
   ->message_is('echo: hello')->finish_ok;
 
 # WebSocket /echo (zero)

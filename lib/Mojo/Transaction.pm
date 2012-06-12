@@ -268,17 +268,10 @@ successful or C<undef> otherwise. Connection and parser errors have only a
 message in C<error>, 400 and 500 responses also a code.
 
   # Sensible exception handling
-  if (my $res = $tx->success) {
-    say $res->body;
-  }
+  if (my $res = $tx->success) { say $res->body }
   else {
     my ($message, $code) = $tx->error;
-    if ($code) {
-      say "$code $message response.";
-    }
-    else {
-      say "Connection error: $message";
-    }
+    say $code ? "$code $message response." : "Connection error: $message";
   }
 
 Error messages can be accessed with the C<error> method of the transaction

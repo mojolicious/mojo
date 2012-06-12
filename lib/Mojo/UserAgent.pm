@@ -534,6 +534,14 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   # Say hello to the Unicode snowman with "Do Not Track" header
   say $ua->get('www.☃.net?hello=there' => {DNT => 1})->res->body;
 
+  # Form POST with exception handling
+  my $tx = $ua->post_form('search.cpan.org/search' => {q => 'mojo'});
+  if (my $res = $tx->success) { say $res->body }
+  else {
+    my ($message, $code) = $tx->error;
+    say $code ? "$code $message response." : "Connection error: $message";
+  }
+
   # Quick JSON API request with Basic authentication
   say $ua->get('https://sri:s3cret@search.twitter.com/search.json?q=perl')
     ->res->json('/results/0/text');
@@ -544,14 +552,6 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   # Scrape the latest headlines from a news site
   $ua->max_redirects(5)->get('www.reddit.com/r/perl/')
     ->res->dom('p.title > a.title')->each(sub { say $_->text });
-
-  # Form POST with exception handling
-  my $tx = $ua->post_form('search.cpan.org/search' => {q => 'mojo'});
-  if (my $res = $tx->success) { say $res->body }
-  else {
-    my ($message, $code) = $tx->error;
-    say "Error: $message";
-  }
 
   # IPv6 PUT request with content
   my $tx

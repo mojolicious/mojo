@@ -678,8 +678,8 @@ or even removed. Especially for rearranging routes created by plugins this can
 be very useful.
 
   # GET /example/show -> {controller => 'example', action => 'show'}
-  $r->get('/show')->to('example#show')->name('show_example');
-  $r->any('/example')->add_child($r->find('show_example'));
+  my $show = $r->get('/show')->to('example#show');
+  $r->any('/example')->add_child($show);
   $r->get('/secrets/show')->to('secrets#show')->name('show_secrets');
   $r->find('show_secrets')->remove;
 

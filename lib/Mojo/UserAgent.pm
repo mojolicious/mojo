@@ -248,12 +248,11 @@ sub _connected {
   my ($self, $id) = @_;
 
   # Inactivity timeout
-  my $loop = $self->_loop;
-  $loop->stream($id)->timeout($self->inactivity_timeout);
+  my $stream = $self->_loop->stream($id)->timeout($self->inactivity_timeout);
 
   # Store connection information in transaction
   my $tx     = $self->{connections}{$id}{tx}->connection($id);
-  my $handle = $loop->stream($id)->handle;
+  my $handle = $stream->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
 
@@ -467,9 +466,8 @@ sub _start {
   # Request timeout
   if (my $t = $self->request_timeout) {
     weaken $self;
-    my $loop = $self->_loop;
-    $self->{connections}{$id}{timeout}
-      = $loop->timer($t => sub { $self->_error($id => 'Request timeout.') });
+    $self->{connections}{$id}{timeout} = $self->_loop->timer(
+      $t => sub { $self->_error($id => 'Request timeout.') });
   }
 
   return $id;
@@ -497,7 +495,7 @@ sub _upgrade {
 sub _write {
   my ($self, $id) = @_;
 
-  # Prepare outgoing data
+  # Get chunk
   return unless my $c  = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
@@ -506,16 +504,15 @@ sub _write {
   delete $self->{writing};
   warn "-- Client >>> Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
 
-  # More data to follow
-  my $cb;
-  if ($tx->is_writing) {
-    weaken $self;
-    $cb = sub { $self->_write($id) };
-  }
-
-  # Write data
-  $self->_loop->stream($id)->write($chunk, $cb);
+  # Write chunk
+  my $stream = $self->_loop->stream($id);
+  $stream->write($chunk);
   $self->_handle($id) if $tx->is_finished;
+
+  # Continue writing
+  return unless $tx->is_writing;
+  weaken $self;
+  $stream->write('', sub { $self->_write($id) });
 }
 
 1;

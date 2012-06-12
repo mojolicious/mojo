@@ -245,7 +245,7 @@ sub _write {
   delete $c->{writing};
   warn "-- Server >>> Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
 
-  # Write
+  # Write chunk
   my $stream = $self->ioloop->stream($id);
   $stream->write($chunk);
 

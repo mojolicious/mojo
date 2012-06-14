@@ -109,10 +109,10 @@ Traditionally all session data was stored on the server-side and only session
 ids were exchanged between browser and web server in the form of cookies.
 
   HTTP/1.1 200 OK
-  Set-Cookie: session=base64(hmac-md5(json($session)))
+  Set-Cookie: session=base64(hmac-sha1(json($session)))
 
 In L<Mojolicious> however we are taking this concept one step further by
-storing everything in C<HMAC-MD5> signed cookies, which is more compatible
+storing everything in C<HMAC-SHA1> signed cookies, which is more compatible
 with the REST philosophy and reduces infrastructure requirements.
 
 =head2 Test Driven Development
@@ -349,7 +349,7 @@ L<Mojolicious/"secret">.
 
   app->secret('Mojolicious rocks');
 
-This passphrase is used by the C<HMAC-MD5> algorithm to make signed cookies
+This passphrase is used by the C<HMAC-SHA1> algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.
 
   $self->session(user => 'sri');
@@ -373,7 +373,7 @@ method L<Mojolicious::Controller/"flash">.
   $self->flash(message => 'Everything is fine.');
   $self->redirect_to('goodbye');
 
-Just remember that everything is stored in C<HMAC-MD5> signed cookies, so
+Just remember that everything is stored in C<HMAC-SHA1> signed cookies, so
 there is usually a 4096 byte limit, depending on the browser.
 
 =head2 Final prototype

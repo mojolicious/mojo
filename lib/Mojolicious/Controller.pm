@@ -409,7 +409,7 @@ sub signed_cookie {
   # Response cookie
   my $secret = $self->app->secret;
   return $self->cookie($name,
-    "$value--" . Mojo::Util::hmac_md5_sum($value, $secret), $options)
+    "$value--" . Mojo::Util::hmac_sha1_sum($value, $secret), $options)
     if defined $value;
 
   # Request cookies
@@ -421,7 +421,7 @@ sub signed_cookie {
       my $sig = $1;
 
       # Verified
-      my $check = Mojo::Util::hmac_md5_sum $value, $secret;
+      my $check = Mojo::Util::hmac_sha1_sum $value, $secret;
       if (Mojo::Util::secure_compare $sig, $check) { push @results, $value }
 
       # Bad cookie

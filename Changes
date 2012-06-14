@@ -1,6 +1,7 @@
 
 3.0  2012-06-14
   - Code name "Rainbow", this is a major release.
+  - Switched from HMAC-MD5 to HMAC-SHA1 for signed cookies.
   - Added support for new HTTP status code.
   - Renamed Mojo::CookieJar to Mojo::UserAgent::CookieJar.
   - Improved message parser performance slightly.
@@ -1909,7 +1910,7 @@
   - Fixed path detection bug in generated scripts. (merlyn)
   - Fixed a small redirect bug in Mojo::Client.
   - Fixed a route callback inheritance bug.
-  - Fixed a security problem in the HMAC MD5 implementation. (vti)
+  - Fixed a security problem in the HMAC-MD5 implementation. (vti)
 
 0.999926  2010-06-07
   - Added version requirement for all optional dependencies.

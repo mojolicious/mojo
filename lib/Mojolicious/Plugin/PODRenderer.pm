@@ -111,6 +111,7 @@ sub register {
   ) unless $conf->{no_perldoc};
 }
 
+# "Aw, he looks like a little insane drunken angel."
 sub _pod_to_html {
   return unless defined(my $pod = shift);
 

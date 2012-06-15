@@ -3,6 +3,8 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Server;
 
+# "Can we have Bender burgers again?
+#  No, the cat shelter's onto me."
 sub register {
   my ($self, $app, $conf) = @_;
 

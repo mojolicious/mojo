@@ -32,6 +32,7 @@ sub parse {
   return $config;
 }
 
+# "Planet Express - Our crew is replaceable, your package isn't."
 sub register {
   my ($self, $app, $conf) = @_;
 

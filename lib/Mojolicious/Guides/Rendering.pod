@@ -744,37 +744,6 @@ templates.
 
 Less commonly used and more powerful features.
 
-=head2 Internationalization
-
-Thanks to L<Locale::Maketext> all you need for basic internationalization
-support in your application is the plugin L<Mojolicious::Plugin::I18N> and a
-few lexicon classes.
-
-  package MyApp::I18N::de;
-  use Mojo::Base -strict;
-  use base 'MyApp::I18N';
-
-  our %Lexicon = ('Hello World' => 'Hallo Welt');
-
-  package main;
-  use Mojolicious::Lite;
-
-  plugin I18N => {namespace => 'MyApp::I18N'};
-
-  get '/' => 'hello';
-
-  app->start;
-  __DATA__
-
-  @@ hello.html.ep
-  <%=l 'Hello World' %>!
-
-Preferred languages will be automatically detected from the C<Accept-Language>
-header or can be manually changed with the helper
-L<Mojolicious::Plugin::I18N/"languages">.
-
-  $ ./myapp.pl get -H 'Accept-Language: de' /
-
 =head2 Chunked transfer encoding
 
 For very dynamic content you might not know the response C<Content-Length> in

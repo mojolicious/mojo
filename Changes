@@ -1,6 +1,8 @@
 
 3.0  2012-06-15
   - Code name "Rainbow", this is a major release.
+  - Removed Mojolicious::Plugin::I18N so it can be maintained as a separate
+    distribution.
   - Switched from HMAC-MD5 to HMAC-SHA1 for signed cookies.
   - Added support for new HTTP status code.
   - Renamed Mojo::CookieJar to Mojo::UserAgent::CookieJar.

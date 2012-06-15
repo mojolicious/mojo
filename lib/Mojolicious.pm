@@ -570,10 +570,6 @@ automatically.
 
 Route condition for all kinds of headers, loaded automatically.
 
-=item L<Mojolicious::Plugin::I18N>
-
-Internationalization helpers.
-
 =item L<Mojolicious::Plugin::JSONConfig>
 
 JSON configuration files.

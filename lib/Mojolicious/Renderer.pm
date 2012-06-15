@@ -199,6 +199,7 @@ sub _detect_handler {
   return;
 }
 
+# "Robot 1-X, save my friends! And Zoidberg!"
 sub _extends {
   my ($self, $c) = @_;
   my $stash = $c->stash;

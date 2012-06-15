@@ -727,6 +727,9 @@ C<extends> features.
 Render the given content as raw bytes, similar to C<render_text> but data will
 not be encoded.
 
+  # Longer version
+  $c->render(data => $bytes);
+
 =head2 C<render_exception>
 
   $c->render_exception('Oops!');
@@ -741,6 +744,9 @@ C<exception.$format.*> and set the response status code to C<500>.
   $c->render_json([1, 2, -3], status => 201);
 
 Render a data structure as JSON.
+
+  # Longer version
+  $c->render(json => {foo => 'bar'});
 
 =head2 C<render_later>
 
@@ -770,6 +776,9 @@ C<not_found.$format.*> and set the response status code to C<404>.
 
 Same as C<render> but returns the rendered result.
 
+  # Longer version
+  my $output = $c->render('menubar', partial => 1);
+
 =head2 C<render_static>
 
   my $success = $c->render_static('images/logo.png');
@@ -787,6 +796,9 @@ Render the given content as Perl characters, which will be encoded to bytes.
 See C<render_data> for an alternative without encoding. Note that this does
 not change the content type of the response, which is
 C<text/html;charset=UTF-8> by default.
+
+  # Longer version
+  $c->render(text => 'Hello World!');
 
   # Render "text/plain" response
   $c->render_text('Hello World!', format => 'txt');

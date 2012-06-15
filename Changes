@@ -1,5 +1,5 @@
 
-3.0  2012-06-14
+3.0  2012-06-15
   - Code name "Rainbow", this is a major release.
   - Switched from HMAC-MD5 to HMAC-SHA1 for signed cookies.
   - Added support for new HTTP status code.

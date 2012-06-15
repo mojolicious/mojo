@@ -408,6 +408,9 @@ content with the L<Mojolicious> renderer.
 
 =head1 SYNTAX
 
+For all templates L<strict>, L<warnings> and Perl 5.10 features are
+automatically enabled.
+
   <% Perl code %>
   <%= Perl expression, replaced with result %>
   <%== Perl expression, replaced with XML escaped result %>

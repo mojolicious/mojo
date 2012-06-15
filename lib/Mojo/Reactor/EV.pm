@@ -101,7 +101,7 @@ Mojo::Reactor::EV - Low level event reactor with libev support
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::EV> is a low level event reactor based on L<EV>.
+L<Mojo::Reactor::EV> is a low level event reactor based on L<EV> (4.0+).
 
 =head1 EVENTS
 

@@ -227,7 +227,7 @@ implements the following new ones.
   $server->listen(port => 3000);
 
 Create a new listen socket. Note that TLS support depends on
-L<IO::Socket::SSL> and IPv6 support on L<IO::Socket::IP>.
+L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.12+).
 
 These options are currently available:
 

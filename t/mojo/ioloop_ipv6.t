@@ -7,7 +7,7 @@ use Test::More;
 use Mojo::IOLoop::Server;
 plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)'
   unless $ENV{TEST_IPV6};
-plan skip_all => 'IO::Socket::INET6 2.69 required for this test!'
+plan skip_all => 'IO::Socket::IP 0.12 required for this test!'
   unless Mojo::IOLoop::Server::IPV6;
 plan tests => 2;
 

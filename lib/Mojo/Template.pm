@@ -403,6 +403,11 @@ designed specifically for all those small tasks that come up during big
 projects. Like preprocessing a configuration file, generating text from
 heredocs and stuff like that.
 
+See L<Mojolicious::Guides::Rendering> for information on how to generate
+content with the L<Mojolicious> renderer.
+
+=head1 SYNTAX
+
   <% Perl code %>
   <%= Perl expression, replaced with result %>
   <%== Perl expression, replaced with XML escaped result %>
@@ -476,8 +481,6 @@ stringify to error messages with context.
   4: % my $i = 2; xx
   5: %= $i * 2
   6: </body>
-
-See L<Mojolicious::Guides::Rendering> for more.
 
 =head1 ATTRIBUTES
 

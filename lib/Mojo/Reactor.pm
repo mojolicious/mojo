@@ -182,7 +182,8 @@ seconds. Meant to be overloaded in a subclass.
   $reactor = $reactor->watch($handle, $readable, $writable);
 
 Change I/O events to watch handle for with C<true> and C<false> values, meant
-to be overloaded in a subclass.
+to be overloaded in a subclass. Note that this method requires an active I/O
+watcher.
 
   # Watch only for readable events
   $reactor->watch($handle, 1, 0);

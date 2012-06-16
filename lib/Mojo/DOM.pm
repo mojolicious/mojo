@@ -72,12 +72,7 @@ sub attrs {
   return $self;
 }
 
-sub charset {
-  my $self = shift;
-  return $self->[0]->charset unless @_;
-  $self->[0]->charset(shift);
-  return $self;
-}
+sub charset { shift->_parser(charset => @_) }
 
 # "Oh boy! Sleep! That's when I'm a Viking!"
 sub children {
@@ -139,8 +134,7 @@ sub namespace {
 
   # Prefix
   return if (my $current = $self->tree)->[0] eq 'root';
-  my $prefix = '';
-  if ($current->[1] =~ /^(.*?)\:/) { $prefix = $1 }
+  my $prefix = $current->[1] =~ /^(.*?)\:/ ? $1 : '';
 
   # Walk tree
   while ($current) {
@@ -149,9 +143,7 @@ sub namespace {
 
     # Namespace for prefix
     if ($prefix) {
-      for my $key (keys %$attrs) {
-        return $attrs->{$key} if $key =~ /^xmlns\:$prefix$/;
-      }
+      /^xmlns\:$prefix$/ and return $attrs->{$_} for keys %$attrs;
     }
 
     # Namespace attribute
@@ -194,11 +186,8 @@ sub replace {
 
   # Parse
   my $tree = $self->tree;
-  if ($tree->[0] eq 'root') {
-    $self->xml(undef);
-    return $self->parse($new);
-  }
-  else { $new = $self->_parse("$new") }
+  if   ($tree->[0] eq 'root') { return $self->xml(undef)->parse($new) }
+  else                        { $new = $self->_parse("$new") }
 
   # Find and replace
   my $parent = $tree->[3];
@@ -285,12 +274,7 @@ sub text_before {
 
 sub to_xml { shift->[0]->render }
 
-sub tree {
-  my $self = shift;
-  return $self->[0]->tree unless @_;
-  $self->[0]->tree(shift);
-  return $self;
-}
+sub tree { shift->_parser(tree => @_) }
 
 sub type {
   my ($self, $type) = @_;
@@ -308,12 +292,7 @@ sub type {
 }
 
 # "I want to set the record straight, I thought the cop was a prostitute."
-sub xml {
-  my $self = shift;
-  return $self->[0]->xml unless @_;
-  $self->[0]->xml(shift);
-  return $self;
-}
+sub xml { shift->_parser(xml => @_) }
 
 sub _add {
   my ($self, $offset, $new) = @_;
@@ -360,6 +339,13 @@ sub _parse {
   my $self = shift;
   Mojo::DOM::HTML->new(charset => $self->charset, xml => $self->xml)
     ->parse(shift)->tree;
+}
+
+sub _parser {
+  my ($self, $method) = (shift, shift);
+  return $self->[0]->$method unless @_;
+  $self->[0]->$method(shift);
+  return $self;
 }
 
 sub _text {

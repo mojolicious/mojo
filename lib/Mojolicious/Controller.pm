@@ -824,6 +824,10 @@ L<Mojo::Message::Request> object.
 
   # Extract request information
   my $userinfo = $c->req->url->userinfo;
+  my $agent    = $c->req->headers->user_agent;
+  my $body     = $c->req->body;
+  my $foo      = $c->req->json('/23/foo');
+  my $bar      = $c->req->dom('div.bar')->first->text;
 
 =head2 C<res>
 

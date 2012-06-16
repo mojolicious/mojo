@@ -22,19 +22,7 @@ has version          => '1.1';
 # "I'll keep it short and sweet. Family. Religion. Friendship.
 #  These are the three demons you must slay if you wish to succeed in
 #  business."
-sub at_least_version {
-  my ($self, $version) = @_;
-
-  # Major and minor
-  my ($search_major,  $search_minor)  = split /\./, $version;
-  my ($current_major, $current_minor) = split /\./, $self->version;
-
-  # Major version is newer
-  return 1 if $search_major < $current_major;
-
-  # Minor version is newer or equal
-  return $search_major == $current_major && $search_minor <= $current_minor;
-}
+sub at_least_version { shift->version >= shift }
 
 sub body {
   my $self = shift;

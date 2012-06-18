@@ -741,6 +741,8 @@ L<Mojolicious::Plugin::DefaultHelpers/"session">.
   @@ counter.html.ep
   Counter: <%= session 'counter' %>
 
+Just be aware that all session data gets serialized with L<Mojo::JSON>.
+
 =head2 Secret
 
 Note that you should use a custom L<Mojolicious/"secret"> to make signed

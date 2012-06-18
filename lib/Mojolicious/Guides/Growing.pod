@@ -373,8 +373,9 @@ method L<Mojolicious::Controller/"flash">.
   $self->flash(message => 'Everything is fine.');
   $self->redirect_to('goodbye');
 
-Just remember that everything is stored in C<HMAC-SHA1> signed cookies, so
-there is usually a 4096 byte limit, depending on the browser.
+Just remember that everything is stored serialized with L<Mojo::JSON> in
+C<HMAC-SHA1> signed cookies, so there is usually a 4096 byte limit, depending
+on the browser.
 
 =head2 Final prototype
 

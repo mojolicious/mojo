@@ -1,5 +1,5 @@
 
-3.0  2012-06-18
+3.0  2012-06-19
   - Code name "Rainbow", this is a major release.
   - Removed Mojolicious::Plugin::I18N so it can be maintained as a separate
     distribution.
@@ -7,6 +7,7 @@
   - Updated IO::Socket::SSL requirement to 1.75 for IO::Socket::IP support.
   - Switched back from IO::Socket::INET6 to IO::Socket::IP for IPv6 support.
   - Switched from HMAC-MD5 to HMAC-SHA1 for signed cookies.
+  - Added r function to ojo. (sharifulin, sri)
   - Added support for new HTTP status code.
   - Improved message parser performance slightly.
   - Improved documentation. (ichesnokov, sri)

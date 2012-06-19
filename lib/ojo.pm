@@ -36,16 +36,16 @@ sub import {
   $UA->app(*{"${caller}::app"}->());
 
   # Functions
+  *{"${caller}::a"} = sub { *{"${caller}::any"}->(@_) and return $UA->app };
   *{"${caller}::b"} = \&b;
   *{"${caller}::c"} = \&c;
-  *{"${caller}::a"}
-    = sub { *{"${caller}::any"}->(@_) and return *{"${caller}::app"}->() };
   *{"${caller}::d"} = sub { _request($UA->build_tx(DELETE => @_)) };
   *{"${caller}::f"} = sub { _request($UA->build_form_tx(@_)) };
   *{"${caller}::g"} = sub { _request($UA->build_tx(GET => @_)) };
   *{"${caller}::h"} = sub { _request($UA->build_tx(HEAD => @_)) };
   *{"${caller}::o"} = sub { _request($UA->build_tx(OPTIONS => @_)) };
   *{"${caller}::p"} = sub { _request($UA->build_tx(POST => @_)) };
+  *{"${caller}::r"} = sub { $UA->app->dumper(@_) };
   *{"${caller}::t"} = sub { _request($UA->build_tx(PATCH => @_)) };
   *{"${caller}::u"} = sub { _request($UA->build_tx(PUT => @_)) };
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
@@ -158,6 +158,12 @@ resulting L<Mojo::Message::Response> object.
 
 Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.
+
+=head2 C<r>
+
+  my $perl = r({data => 'structure'});
+
+Dump a Perl data structure using L<Data::Dumper>.
 
 =head2 C<t>
 

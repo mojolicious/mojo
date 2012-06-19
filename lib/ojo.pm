@@ -6,13 +6,19 @@ use Mojo::Base -strict;
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
+use Mojo::JSON;
 use Mojo::UserAgent;
+
+require Data::Dumper;
 
 # Silent oneliners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 
 # User agent
 my $UA = Mojo::UserAgent->new;
+
+# JSON
+my $JSON = Mojo::JSON->new;
 
 # "I'm sorry, guys. I never meant to hurt you.
 #  Just to destroy everything you ever believed in."
@@ -49,6 +55,8 @@ sub import {
   *{"${caller}::t"} = sub { _request($UA->build_tx(PATCH => @_)) };
   *{"${caller}::u"} = sub { _request($UA->build_tx(PUT => @_)) };
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
+  *{"${caller}::j"} = sub { $JSON };
+  *{"${caller}::r"} = sub { Data::Dumper->new([@_])->Indent(1)->Terse(1)->Dump };
 }
 
 # "I wonder what the shroud of Turin tastes like."

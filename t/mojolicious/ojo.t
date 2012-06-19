@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 13;
+use Test::More tests => 17;
 
 # "What do you mean 'we', flesh-tube?"
 use ojo;
@@ -50,6 +50,12 @@ is f('/' => {foo => 'bar'})->body, 'POSTbar', 'right content';
 
 # Parse XML
 is x('<title>works</title>')->at('title')->text, 'works', 'right text';
+
+# JSON
+is j([1, 2]), '[1,2]', 'right result';
+is_deeply j('[1,2]'), [1, 2], 'right structure';
+is j({foo => 'bar'}), '{"foo":"bar"}', 'right result';
+is_deeply j('{"foo":"bar"}'), {foo => 'bar'}, 'right structure';
 
 # ByteStream
 is b('<foo>')->url_escape, '%3Cfoo%3E', 'right result';

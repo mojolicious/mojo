@@ -331,7 +331,7 @@ sub _parse {
   $self->{buffer} .= $chunk;
 
   # Check message size
-  return $self->error('Maximum message size exceeded.', 413)
+  return $self->error('Maximum message size exceeded', 413)
     if $self->{raw_size} > $self->max_message_size;
 
   # Start line
@@ -340,7 +340,7 @@ sub _parse {
     # Check line size
     my $len = index $self->{buffer}, "\x0a";
     $len = length $self->{buffer} if $len < 0;
-    return $self->error('Maximum line size exceeded.', 431)
+    return $self->error('Maximum line size exceeded', 431)
       if $len > $self->max_line_size;
 
     # Parse
@@ -370,7 +370,7 @@ sub _parse {
   }
 
   # Check line size
-  return $self->error('Maximum line size exceeded.', 431)
+  return $self->error('Maximum line size exceeded', 431)
     if $self->headers->is_limit_exceeded;
 
   # Finished
@@ -642,8 +642,8 @@ to perform a C<find> on it right away, which returns a collection.
 
   my $message          = $message->error;
   my ($message, $code) = $message->error;
-  $message             = $message->error('Parser error.');
-  $message             = $message->error('Parser error.', 500);
+  $message             = $message->error('Parser error');
+  $message             = $message->error('Parser error', 500);
 
 Parser errors and codes.
 

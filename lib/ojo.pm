@@ -6,6 +6,7 @@ use Mojo::Base -strict;
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
+use Mojo::JSON;
 use Mojo::UserAgent;
 
 # Silent oneliners
@@ -43,11 +44,16 @@ sub import {
   *{"${caller}::f"} = sub { _request($UA->build_form_tx(@_)) };
   *{"${caller}::g"} = sub { _request($UA->build_tx(GET => @_)) };
   *{"${caller}::h"} = sub { _request($UA->build_tx(HEAD => @_)) };
+  *{"${caller}::j"} = sub {
+    my $d = shift;
+    my $j = Mojo::JSON->new;
+    return ref $d ~~ [qw(ARRAY HASH)] ? $j->encode($d) : $j->decode($d);
+  };
   *{"${caller}::o"} = sub { _request($UA->build_tx(OPTIONS => @_)) };
-  *{"${caller}::p"} = sub { _request($UA->build_tx(POST => @_)) };
+  *{"${caller}::p"} = sub { _request($UA->build_tx(POST    => @_)) };
   *{"${caller}::r"} = sub { $UA->app->dumper(@_) };
-  *{"${caller}::t"} = sub { _request($UA->build_tx(PATCH => @_)) };
-  *{"${caller}::u"} = sub { _request($UA->build_tx(PUT => @_)) };
+  *{"${caller}::t"} = sub { _request($UA->build_tx(PATCH   => @_)) };
+  *{"${caller}::u"} = sub { _request($UA->build_tx(PUT     => @_)) };
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
 }
 
@@ -142,6 +148,16 @@ L<Mojo::Message::Response> object.
 
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
+
+=head2 C<j>
+
+  my $bytes = j({foo => 'bar'});
+  my $array = j($bytes);
+  my $hash  = j($bytes);
+
+Encode Perl data structure or decode JSON with L<Mojo::JSON>.
+
+  $ perl -Mojo -E 'say j({hello => "world!"})'
 
 =head2 C<o>
 

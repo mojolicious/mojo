@@ -271,7 +271,7 @@ message in C<error>, 400 and 500 responses also a code.
   if (my $res = $tx->success) { say $res->body }
   else {
     my ($message, $code) = $tx->error;
-    say $code ? "$code $message response." : "Connection error: $message";
+    say $code ? "$code $message response" : "Connection error: $message";
   }
 
 Error messages can be accessed with the C<error> method of the transaction

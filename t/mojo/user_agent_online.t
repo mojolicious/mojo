@@ -92,7 +92,7 @@ ok $tx->error, 'has error';
 # Host does not exist
 $tx = $ua->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $ua->start($tx);
-is $tx->error, "Couldn't connect.", 'right error';
+is $tx->error, "Couldn't connect", 'right error';
 ok !$tx->is_finished, 'transaction is not finished';
 
 # Fresh user agent again
@@ -273,10 +273,10 @@ ok $tx->remote_port > 0, 'has local port';
 # Connect timeout (non-routable address)
 $tx = $ua->connect_timeout(0.5)->get('192.0.2.1');
 ok !$tx->is_finished, 'transaction is not finished';
-is $tx->error, 'Connect timeout.', 'right error';
+is $tx->error, 'Connect timeout', 'right error';
 $ua->connect_timeout(3);
 
 # Request timeout (non-routable address)
 $tx = $ua->request_timeout(0.5)->get('192.0.2.1');
 ok !$tx->is_finished, 'transaction is not finished';
-is $tx->error, 'Request timeout.', 'right error';
+is $tx->error, 'Request timeout', 'right error';

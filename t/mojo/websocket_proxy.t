@@ -222,4 +222,4 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 ok !$success, 'no success';
-is $err, 'Proxy connection failed.', 'right message';
+is $err, 'Proxy connection failed', 'right message';

@@ -284,7 +284,7 @@ sub _parse_start_line {
   return unless defined $line;
 
   # We have a (hopefully) full request line
-  return $self->error('Bad request start line.', 400)
+  return $self->error('Bad request start line', 400)
     unless $line =~ $START_LINE_RE;
   $self->method($1);
   my $url = $self->url;

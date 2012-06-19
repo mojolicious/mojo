@@ -58,12 +58,12 @@ sub _connect {
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    return $self->emit_safe(error => "Couldn't connect.")
+    return $self->emit_safe(error => "Couldn't connect")
       unless $handle = $class->new(%options);
 
     # Timer
     $self->{timer} = $reactor->timer($args->{timeout} || 10,
-      sub { $self->emit_safe(error => 'Connect timeout.') });
+      sub { $self->emit_safe(error => 'Connect timeout') });
   }
   $handle->blocking(0);
 
@@ -76,7 +76,7 @@ sub _connect {
 
     # No TLS support
     return $self->emit_safe(
-      error => 'IO::Socket::SSL 1.75 required for TLS support.')
+      error => 'IO::Socket::SSL 1.75 required for TLS support')
       unless TLS;
 
     # Upgrade
@@ -96,7 +96,7 @@ sub _connect {
       SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
     );
     $self->{tls} = 1;
-    return $self->emit_safe(error => 'TLS upgrade failed.')
+    return $self->emit_safe(error => 'TLS upgrade failed')
       unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
   }
 

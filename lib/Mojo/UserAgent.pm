@@ -198,8 +198,8 @@ sub _connect {
       return $self->_error($id, $err) if $err;
 
       # Connection established
-      $stream->on(
-        timeout => sub { $self->_error($id => 'Inactivity timeout.') });
+      $stream->on(timeout => sub { $self->_error($id => 'Inactivity timeout') }
+      );
       $stream->on(close => sub { $self->_handle($id => 1) });
       $stream->on(error => sub { $self->_error($id, pop, 1) });
       $stream->on(read => sub { $self->_read($id => pop) });
@@ -219,7 +219,7 @@ sub _connect_proxy {
 
       # CONNECT failed
       unless (($tx->res->code || '') eq '200') {
-        $old->req->error('Proxy connection failed.');
+        $old->req->error('Proxy connection failed');
         return $self->_finish($old, $cb);
       }
 
@@ -306,7 +306,7 @@ sub _finish {
   unless ($res->error) {
 
     # Premature connection close
-    if ($close && !$res->code) { $res->error('Premature connection close.') }
+    if ($close && !$res->code) { $res->error('Premature connection close') }
 
     # 400/500
     elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
@@ -467,7 +467,7 @@ sub _start {
   if (my $t = $self->request_timeout) {
     weaken $self;
     $self->{connections}{$id}{timeout} = $self->_loop->timer(
-      $t => sub { $self->_error($id => 'Request timeout.') });
+      $t => sub { $self->_error($id => 'Request timeout') });
   }
 
   return $id;
@@ -536,7 +536,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   if (my $res = $tx->success) { say $res->body }
   else {
     my ($message, $code) = $tx->error;
-    say $code ? "$code $message response." : "Connection error: $message";
+    say $code ? "$code $message response" : "Connection error: $message";
   }
 
   # Quick JSON API request with Basic authentication

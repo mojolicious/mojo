@@ -324,12 +324,12 @@ $tx->res->body(
   sub {
     my ($self, $chunk) = @_;
     $buffer .= $chunk;
-    $self->error('Interrupted!') if length $buffer == 3;
+    $self->error('Interrupted') if length $buffer == 3;
   }
 );
 $t->ua->start($tx);
-is $tx->res->code,  200,            'right status';
-is $tx->res->error, 'Interrupted!', 'right error';
+is $tx->res->code,  200,           'right status';
+is $tx->res->error, 'Interrupted', 'right error';
 is $buffer, 'hi ', 'right content';
 
 # GET /longpoll/nolength
@@ -427,7 +427,7 @@ $tx->res->body(
 );
 $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
-is $tx->error, 'Request timeout.', 'right error';
+is $tx->error, 'Request timeout', 'right error';
 is $buffer, 'how', 'right content';
 $t->ua->request_timeout(0);
 
@@ -442,5 +442,5 @@ $tx->res->body(
 );
 $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
-is $tx->error, 'Inactivity timeout.', 'right error';
+is $tx->error, 'Inactivity timeout', 'right error';
 is $buffer, 'how', 'right content';

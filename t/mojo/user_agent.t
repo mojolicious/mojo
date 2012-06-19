@@ -195,7 +195,7 @@ $tx = $ua->get('/timeout?timeout=0.5');
 app->log->level('fatal');
 app->log->on(message => $message);
 ok !$tx->success, 'not successful';
-is $tx->error, 'Premature connection close.', 'right error';
+is $tx->error, 'Premature connection close', 'right error';
 is $timeout, 1, 'finish event has been emitted';
 like $log, qr/Inactivity timeout\./, 'right log message';
 
@@ -213,7 +213,7 @@ $ua->once(
 );
 $tx = $ua->get('/timeout?timeout=5');
 ok !$tx->success, 'not successful';
-is $tx->error, 'Inactivity timeout.', 'right error';
+is $tx->error, 'Inactivity timeout', 'right error';
 
 # GET / (introspect)
 my $req = my $res = '';
@@ -347,4 +347,4 @@ my $id   = Mojo::IOLoop->server(
 );
 $tx = $ua->get("http://localhost:$port/");
 ok !$tx->success, 'not successful';
-is $tx->error, 'Premature connection close.', 'right error';
+is $tx->error, 'Premature connection close', 'right error';

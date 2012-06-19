@@ -37,7 +37,7 @@ to provide advanced functionality if they are installed.
 
 Because we can make them rounder. Components specifically designed for
 user-friendliness and development speed are not easy to come by. We are strong
-believers of the Perl mantra "There is more than one way to do it.", and our
+believers of the Perl mantra "There is more than one way to do it", and our
 quest is to develop the best possible solutions for these two criteria.
 
 =head2 What about backwards compatibility?
@@ -69,7 +69,7 @@ that it might not pass the vote. To increase the chances you can also discuss
 and refine ideas on the
 L<mailing-list|http://groups.google.com/group/mojolicious>.
 
-=head2 What does the error "Maximum message size exceeded." mean?
+=head2 What does the error "Maximum message size exceeded" mean?
 
 To protect your applications from excessively large requests and responses,
 our HTTP parser has a cap after which it will automatically stop accepting new
@@ -77,7 +77,7 @@ data, and in most cases force the connection to be closed. This limit is
 around C<5MB> by default, you can use the C<MOJO_MAX_MESSAGE_SIZE> environment
 variable to change this value.
 
-=head2 What does the error "Maximum line size exceeded." mean?
+=head2 What does the error "Maximum line size exceeded" mean?
 
 This is a very similar protection mechanism to the one described in the
 previous answer, but a little more specific. It limits the maximum length of
@@ -85,7 +85,7 @@ any C<\r\n> terminated part of a HTTP message, such as request line, status
 line and headers. This limit is around C<10KB> by default, you can use the
 C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
 
-=head2 What does "Your secret passphrase needs to be changed!!!" mean?
+=head2 What does "Your secret passphrase needs to be changed" mean?
 
 L<Mojolicious> uses a secret passphrase for security features such as signed
 cookies. It defaults to the name of your application, which is not very
@@ -94,7 +94,7 @@ passphrase with the attribute L<Mojolicious/"secret">.
 
   app->secret('My very secret passphrase.');
 
-=head2 What does "Inactivity timeout." mean.
+=head2 What does "Inactivity timeout" mean.
 
 To protect your applications from denial-of-service attacks, all connections
 have an inactivity timeout which limits how long a connection may be inactive
@@ -103,13 +103,13 @@ agent and C<15> seconds for all built-in web servers, and is commonly referred
 to as C<inactivity_timeout>. This timeout always applies, so you might have to
 tweak it for applications that take a long time to process a request.
 
-=head2 What does "Premature connection close." mean?
+=head2 What does "Premature connection close" mean?
 
 This error message is often related to the one above, and means that the web
 server closed the connection before the user agent could receive the whole
 response.
 
-=head2 What does "Worker 31842 has no heartbeat, restarting." mean?
+=head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 
 Hypnotoad worker processes send heartbeat messages to the manager process in
 regular intervals to signal that they are still responsive. A blocking

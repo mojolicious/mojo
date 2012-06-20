@@ -8,7 +8,7 @@
   - Switched back from IO::Socket::INET6 to IO::Socket::IP for IPv6 support.
   - Switched from HMAC-MD5 to HMAC-SHA1 for signed cookies.
   - Added j and r functions to ojo. (sharifulin, sri)
-  - Added idle_interval attribute to Mojo::IOLoop.
+  - Added accept_interval attribute to Mojo::IOLoop.
   - Added support for new HTTP status code.
   - Modernized ".perltidyrc".
   - Improved to method in Mojolicious::Routes::Route to give easier access to

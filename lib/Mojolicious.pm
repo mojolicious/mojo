@@ -144,6 +144,7 @@ sub handler {
   # Embedded application
   my $stash = {};
   if (my $sub = $tx->can('stash')) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
+  $stash->{'mojo.secret'} //= $self->secret;
 
   # Build default controller
   my $defaults = $self->defaults;

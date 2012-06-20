@@ -382,7 +382,7 @@ You can run the exact same command again for automatic hot deployment.
 For L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
 C<production> mode.
 
-Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.12+) and
+Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently and used if installed.
 Individual features can also be disabled with the C<MOJO_NO_IPV6> and
 C<MOJO_NO_TLS> environment variables.

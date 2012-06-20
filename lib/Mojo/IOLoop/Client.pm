@@ -1,6 +1,7 @@
 package Mojo::IOLoop::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
+use Errno 'EINPROGRESS';
 use IO::Socket::INET;
 use Scalar::Util 'weaken';
 use Socket qw(IPPROTO_TCP SO_ERROR TCP_NODELAY);
@@ -8,7 +9,7 @@ use Socket qw(IPPROTO_TCP SO_ERROR TCP_NODELAY);
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval 'use IO::Socket::IP 0.12 (); 1';
+  : eval 'use IO::Socket::IP 0.16 (); 1';
 
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS} ? 0
@@ -35,10 +36,10 @@ sub connect {
 
 sub _cleanup {
   my $self = shift;
-  return unless my $reactor = $self->{reactor};
-  $reactor->remove(delete $self->{delay})  if $self->{delay};
-  $reactor->remove(delete $self->{timer})  if $self->{timer};
-  $reactor->remove(delete $self->{handle}) if $self->{handle};
+  return $self unless my $reactor = $self->{reactor};
+  $self->{$_} && $reactor->remove(delete $self->{$_})
+    for qw(delay timer handle);
+  return $self;
 }
 
 sub _connect {
@@ -48,7 +49,7 @@ sub _connect {
   my $handle;
   my $reactor = $self->reactor;
   my $address = $args->{address} ||= 'localhost';
-  unless ($handle = $args->{handle}) {
+  unless ($handle = $self->{handle} = $args->{handle}) {
     my %options = (
       Blocking => 0,
       PeerAddr => $address eq 'localhost' ? '127.0.0.1' : $address,
@@ -59,19 +60,36 @@ sub _connect {
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
     return $self->emit_safe(error => "Couldn't connect")
-      unless $handle = $class->new(%options);
+      unless $self->{handle} = $handle = $class->new(%options);
 
-    # Timer
+    # Timeout
     $self->{timer} = $reactor->timer($args->{timeout} || 10,
       sub { $self->emit_safe(error => 'Connect timeout') });
   }
   $handle->blocking(0);
 
+  # Wait for handle to become writable
+  weaken $self;
+  $reactor->io($handle => sub { $self->_connecting($args) })
+    ->watch($handle, 0, 1);
+}
+
+# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
+#  And the Smurfs, well, they SUCK."
+sub _connecting {
+  my ($self, $args) = @_;
+
+  # Retry or handle exceptions
+  my $handle = $self->{handle};
+  return $! == EINPROGRESS ? undef : $self->emit_safe(error => $!)
+    if IPV6 && !$handle->connect;
+  return $self->emit_safe(error => $! = $handle->sockopt(SO_ERROR))
+    if !IPV6 && !$handle->connected;
+
   # Disable Nagle's algorithm
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
   # TLS
-  weaken $self;
   if ($args->{tls} && !$handle->isa('IO::Socket::SSL')) {
 
     # No TLS support
@@ -80,53 +98,45 @@ sub _connect {
       unless TLS;
 
     # Upgrade
+    weaken $self;
     my %options = (
       SSL_ca_file => $args->{tls_ca}
         && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-      SSL_cert_file  => $args->{tls_cert},
-      SSL_error_trap => sub {
-        $self->_cleanup;
-        $self->emit_safe(error => $_[1]);
-      },
-      SSL_hostname        => $args->{address},
-      SSL_key_file        => $args->{tls_key},
-      SSL_startHandshake  => 0,
-      SSL_verify_mode     => $args->{tls_ca} ? 0x01 : 0x00,
-      SSL_verifycn_name   => $args->{address},
+      SSL_cert_file      => $args->{tls_cert},
+      SSL_error_trap     => sub { $self->_cleanup->emit_safe(error => $_[1]) },
+      SSL_hostname       => $args->{address},
+      SSL_key_file       => $args->{tls_key},
+      SSL_startHandshake => 0,
+      SSL_verify_mode    => $args->{tls_ca} ? 0x01 : 0x00,
+      SSL_verifycn_name  => $args->{address},
       SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
     );
     $self->{tls} = 1;
+    my $reactor = $self->reactor;
+    $reactor->remove($handle);
     return $self->emit_safe(error => 'TLS upgrade failed')
       unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
+    return $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
   }
 
-  # Wait for handle to become writable
-  $self->{handle} = $handle;
-  $reactor->io($handle => sub { $self->_connecting })->watch($handle, 0, 1);
+  # Connected
+  $self->_cleanup->emit_safe(connect => $handle);
 }
 
-# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
-#  And the Smurfs, well, they SUCK."
-sub _connecting {
+sub _tls {
   my $self = shift;
 
   # Switch between reading and writing
-  my $handle  = $self->{handle};
-  my $reactor = $self->reactor;
+  my $handle = $self->{handle};
   if ($self->{tls} && !$handle->connect_SSL) {
     my $err = $IO::Socket::SSL::SSL_ERROR;
-    if    ($err == TLS_READ)  { $reactor->watch($handle, 1, 0) }
-    elsif ($err == TLS_WRITE) { $reactor->watch($handle, 1, 1) }
+    if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
+    elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
     return;
   }
 
-  # Check for errors
-  return $self->emit_safe(error => $! = $handle->sockopt(SO_ERROR))
-    unless $handle->connected;
-
   # Connected
-  $self->_cleanup;
-  $self->emit_safe(connect => $handle);
+  $self->_cleanup->emit_safe(connect => $handle);
 }
 
 1;
@@ -199,7 +209,7 @@ implements the following new ones.
   $client->connect(address => '127.0.0.1', port => 3000);
 
 Open a socket connection to a remote host. Note that TLS support depends on
-L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.12+).
+L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.16+).
 
 These options are currently available:
 

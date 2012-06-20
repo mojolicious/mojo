@@ -407,7 +407,7 @@ sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
 
   # Response cookie
-  my $secret = $self->app->secret;
+  my $secret = $self->stash->{'mojo.secret'};
   return $self->cookie($name,
     "$value--" . Mojo::Util::hmac_sha1_sum($value, $secret), $options)
     if defined $value;

@@ -9,8 +9,8 @@ sub register {
   my ($self, $app, $conf) = @_;
 
   # Load application
-  my $path = (keys %$conf)[0];
-  my $e    = Mojo::Server->new->load_app($conf->{$path})->secret($app->secret);
+  my $path  = (keys %$conf)[0];
+  my $embed = Mojo::Server->new->load_app($conf->{$path});
 
   # Extract host
   my $host;
@@ -20,7 +20,7 @@ sub register {
   }
 
   # Generate route
-  my $route = $app->routes->route($path)->detour(app => $e);
+  my $route = $app->routes->route($path)->detour(app => $embed);
   $route->over(host => $host) if $host;
 
   return $route;

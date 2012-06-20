@@ -56,7 +56,12 @@ Mojolicious::Plugin::Mount - Application mount plugin
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::Mount> is a plugin that allows you to mount whole
-L<Mojolicious> applications.
+L<Mojolicious> applications. Note that secrets need to be synchronized if
+sessions or signed cookies are being used.
+
+  # Synchronize secrets between applications
+  plugin(Mount => {'/foo' => '/home/sri/myapp.pl'})->to->{app}
+    ->secret(app->secret);
 
 The code of this plugin is a good example for learning to build new plugins,
 you're welcome to fork it.

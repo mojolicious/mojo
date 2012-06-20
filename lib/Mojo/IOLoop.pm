@@ -13,7 +13,8 @@ use Time::HiRes 'time';
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
-has client_class => 'Mojo::IOLoop::Client';
+has client_class  => 'Mojo::IOLoop::Client';
+has idle_interval => 0.025;
 has [qw(lock unlock)];
 has max_accepts     => 0;
 has max_connections => 1000;
@@ -217,7 +218,7 @@ sub _listening {
 sub _manage {
   my $self = shift;
   $self->{manager} ||= $self->recurring(
-    0.025 => sub {
+    $self->idle_interval => sub {
       my $self = shift;
 
       # Start listening if possible
@@ -362,6 +363,15 @@ L<Mojo::IOLoop> implements the following attributes.
 
 Class to be used for opening TCP connections with the C<client> method,
 defaults to L<Mojo::IOLoop::Client>.
+
+=head2 C<idle_interval>
+
+  my $interval = $loop->idle_interval;
+  $loop        = $loop->idle_interval(0.5);
+
+Interval in seconds for checking the accept mutex and managing connections,
+defaults to C<0.025>. Note that changing this value can affect performance and
+idle cpu usage.
 
 =head2 C<lock>
 

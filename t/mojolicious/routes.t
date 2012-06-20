@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 392;
+use Test::More tests => 393;
 
 # "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
@@ -209,6 +209,7 @@ is $r->find('test_edit')->to_string, '/:controller/test/edit', 'right pattern';
 is $r->find('articles_delete')->to_string, '/articles/:id/delete',
   'right pattern';
 is $r->find('nodetect')->pattern->reqs->{format}, 0, 'right value';
+is $r->find('nodetect')->to->{controller}, 'foo', 'right controller';
 
 # Null route
 $m = Mojolicious::Routes::Match->new(GET => '/0')->match($r);

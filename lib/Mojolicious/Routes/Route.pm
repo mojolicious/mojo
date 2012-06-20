@@ -168,6 +168,10 @@ sub route {
 sub to {
   my $self = shift;
 
+  # No argument
+  my $pattern = $self->pattern;
+  return $pattern->defaults unless @_;
+
   # Single argument
   my ($shortcut, $defaults);
   if (@_ == 1) {
@@ -210,7 +214,6 @@ sub to {
   }
 
   # Merge defaults
-  my $pattern = $self->pattern;
   $pattern->defaults({%{$pattern->defaults}, %$defaults}) if $defaults;
 
   return $self;
@@ -557,17 +560,18 @@ Generate route matching all HTTP request methods.
 
 =head2 C<to>
 
-  $r = $r->to(action => 'foo');
-  $r = $r->to({action => 'foo'});
-  $r = $r->to('controller#action');
-  $r = $r->to('controller#action', foo => 'bar');
-  $r = $r->to('controller#action', {foo => 'bar'});
-  $r = $r->to($app);
-  $r = $r->to($app, foo => 'bar');
-  $r = $r->to($app, {foo => 'bar'});
-  $r = $r->to('MyApp');
-  $r = $r->to('MyApp', foo => 'bar');
-  $r = $r->to('MyApp', {foo => 'bar'});
+  my $defaults = $r->to;
+  $r           = $r->to(action => 'foo');
+  $r           = $r->to({action => 'foo'});
+  $r           = $r->to('controller#action');
+  $r           = $r->to('controller#action', foo => 'bar');
+  $r           = $r->to('controller#action', {foo => 'bar'});
+  $r           = $r->to($app);
+  $r           = $r->to($app, foo => 'bar');
+  $r           = $r->to($app, {foo => 'bar'});
+  $r           = $r->to('MyApp');
+  $r           = $r->to('MyApp', foo => 'bar');
+  $r           = $r->to('MyApp', {foo => 'bar'});
 
 Set default parameters for this route.
 

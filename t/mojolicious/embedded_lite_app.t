@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 139;
+use Test::More tests => 140;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -89,7 +89,9 @@ app->routes->namespace('MyTestApp');
 # Mount full external application a few times
 my $external = "$FindBin::Bin/external/myapp.pl";
 plugin Mount => {'/x/1' => $external};
-plugin(Mount => ('/x/♥' => $external))->to(message => 'works 2!');
+my $route
+  = plugin(Mount => ('/x/♥' => $external))->to(message => 'works 2!');
+is $route->to->{message}, 'works 2!', 'right message';
 plugin Mount => {'/y/1'            => "$FindBin::Bin/external/myapp2.pl"};
 plugin Mount => {'mojolicious.org' => $external};
 plugin(Mount => ('/y/♥' => "$FindBin::Bin/external/myapp2.pl"))

@@ -1,4 +1,3 @@
-
 =head1 NAME
 
 Mojolicious::Guides::FAQ - Frequently Asked Questions
@@ -59,7 +58,7 @@ which we already have done in the past.
 
 =head2 Can you add feature XY to the core distribution?
 
-Probably not. While the L<Mojolicious> distribtion covers a wide range of
+Probably not. While the L<Mojolicious> distribution covers a wide range of
 features, we are rather conservative when it comes to adding new ones. The
 most important criteria are outlined in
 L<Mojolicious::Guides::CodingGuidelines>. But don't let this discourage you,

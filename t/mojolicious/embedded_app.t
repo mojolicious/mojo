@@ -9,11 +9,14 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 39;
+use Test::More tests => 54;
 
 # "I wax my rocket every day!"
 use Mojolicious::Lite;
 use Test::Mojo;
+
+# Custom secret
+app->secret('very secr3t!');
 
 # Mount full external application a few times
 use FindBin;
@@ -26,10 +29,31 @@ plugin(Mount => ('*.foo-bar.de/♥/123' => $external));
 # GET /hello
 get '/hello' => 'works';
 
+# GET /primary
+get '/primary' => sub {
+  my $self = shift;
+  $self->render(text => ++$self->session->{primary});
+};
+
 my $t = Test::Mojo->new;
 
 # GET /hello
 $t->get_ok('/hello')->status_is(200)->content_is("Hello from the main app!\n");
+
+# GET /primary (session)
+$t->get_ok('/primary')->status_is(200)->content_is(1);
+
+# GET /primary (session again)
+$t->get_ok('/primary')->status_is(200)->content_is(2);
+
+# GET /x/1/secondary (session in external app)
+$t->get_ok('/x/1/secondary')->status_is(200)->content_is(1);
+
+# GET /primary (session again)
+$t->get_ok('/primary')->status_is(200)->content_is(3);
+
+# GET /x/1/secondary (session in external app again)
+$t->get_ok('/x/1/secondary')->status_is(200)->content_is(2);
 
 # GET /x/1 (external app)
 $t->get_ok('/x/1')->status_is(200)->content_is('too%21');

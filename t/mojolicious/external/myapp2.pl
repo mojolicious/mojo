@@ -5,13 +5,14 @@
 #  And by "metaphorically", I mean get your coat."
 use Mojolicious::Lite;
 
-# Secret for config file tests
-app->secret('Insecure too!');
+# Default for config file tests
+app->defaults(secret => 'Insecure too!');
 
 # GET /
 get '/' => sub {
   my $self = shift;
-  $self->render_text($self->render_partial('menubar') . app->secret);
+  $self->render_text(
+    $self->render_partial('menubar') . app->defaults->{secret});
 };
 
 app->start;

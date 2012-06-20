@@ -25,6 +25,14 @@ sub startup {
       $self->render(text => $self->config->{whatever});
     }
   );
+
+  # GET /secondary
+  $r->get(
+    '/secondary' => sub {
+      my $self = shift;
+      $self->render(text => ++$self->session->{secondary});
+    }
+  );
 }
 
 1;

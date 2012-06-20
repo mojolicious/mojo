@@ -1,5 +1,4 @@
 -pbp     # Start with Perl Best Practices
--b       # Just rewrite the file
 -w       # Show all warnings
 -iob     # Ignore old breakpoints
 -l=79    # 79 characters per line

@@ -10,6 +10,8 @@
   - Added j and r functions to ojo. (sharifulin, sri)
   - Added idle_interval attribute to Mojo::IOLoop.
   - Added support for new HTTP status code.
+  - Modernized ".perltidyrc".
+  - Improved Mojolicious::Plugin::Mount to automatically synchronize secrets.
   - Improved to method in Mojolicious::Routes::Route to give easier access to
     default parameters.
   - Improved message parser performance slightly.

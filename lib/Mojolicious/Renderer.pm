@@ -70,7 +70,7 @@ sub get_data_template {
   }
 
   # Find template
-  return Mojo::Loader->get_data($template, $self->{index}{$template});
+  return Mojo::Loader->get_data($self->{index}{$template}, $template);
 }
 
 sub render {

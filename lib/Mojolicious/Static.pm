@@ -129,7 +129,7 @@ sub _get_data_file {
   }
 
   # Find file
-  return Mojo::Loader->get_data($rel, $self->{index}{$rel});
+  return Mojo::Loader->get_data($self->{index}{$rel}, $rel);
 }
 
 sub _get_file {

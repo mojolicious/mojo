@@ -42,7 +42,7 @@ sub get_all_data {
 }
 
 sub get_data {
-  my ($self, $data, $class) = @_;
+  my ($self, $class, $data) = @_;
   return $class ? $self->get_all_data($class)->{$data} : undef;
 }
 
@@ -122,13 +122,13 @@ following new ones.
 
 =head2 C<get_all_data>
 
-  my $all = $loader->get_all_data('Some::Class');
+  my $all = $loader->get_all_data('Foo::Bar');
 
 Extract all embedded files from the C<DATA> section of a class.
 
 =head2 C<get_data>
 
-  my $data = $loader->get_data('foo_bar', 'Some::Class');
+  my $data = $loader->get_data('Foo::Bar', 'foo_bar');
 
 Extract embedded file from the C<DATA> section of a class.
 

@@ -1,7 +1,7 @@
 package Mojolicious::Command::generate::plugin;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojolicious::Command';
 
-use Mojo::Util 'camelize';
+use Mojo::Util qw(camelize class_to_path);
 use Mojolicious;
 
 # "You know Santa may have killed Scruffy, but he makes a good point."
@@ -19,7 +19,7 @@ sub run {
   # Class
   my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
   $class = "Mojolicious::Plugin::$class";
-  my $app = $self->class_to_path($class);
+  my $app = class_to_path $class;
   $self->render_to_rel_file('class', "$name/lib/$app", $class, $name);
 
   # Test
@@ -133,7 +133,7 @@ fully functional L<Mojolicious> plugins.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::generate::plugin> inherits all attributes from
-L<Mojo::Command> and implements the following new ones.
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -152,7 +152,7 @@ Usage information for this command, used for the help screen.
 =head1 METHODS
 
 L<Mojolicious::Command::generate::plugin> inherits all methods from
-L<Mojo::Command> and implements the following new ones.
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<run>
 

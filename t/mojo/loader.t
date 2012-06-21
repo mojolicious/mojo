@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable libev
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
-use Test::More tests => 45;
+use Test::More tests => 55;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -80,3 +80,45 @@ is $loader->load('::Mojolicious::Lite'),   1,     'nothing to load';
 is $loader->load('Mojolicious::Lite::'),   1,     'nothing to load';
 is $loader->load('::Mojolicious::Lite::'), 1,     'nothing to load';
 is $loader->load('Mojolicious::Lite'),     undef, 'loaded successfully';
+
+# UNIX DATA templates
+my $unix = "@@ template1\nFirst Template\n@@ template2\r\nSecond Template\n";
+open my $data, '<', \$unix;
+no strict 'refs';
+*{"Example::Package::UNIX::DATA"} = $data;
+is $loader->get_data('template1', 'Example::Package::UNIX'),
+  "First Template\n", 'right template';
+is $loader->get_data('template2', 'Example::Package::UNIX'),
+  "Second Template\n", 'right template';
+is_deeply [sort keys %{$loader->get_all_data('Example::Package::UNIX')}],
+  [qw(template1 template2)], 'right DATA files';
+close $data;
+
+# Windows DATA templates
+my $windows
+  = "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
+open $data, '<', \$windows;
+no strict 'refs';
+*{"Example::Package::Windows::DATA"} = $data;
+is $loader->get_data('template3', 'Example::Package::Windows'),
+  "Third Template\r\n", 'right template';
+is $loader->get_data('template4', 'Example::Package::Windows'),
+  "Fourth Template\r\n", 'right template';
+is_deeply [sort keys %{$loader->get_all_data('Example::Package::Windows')}],
+  [qw(template3 template4)], 'right DATA files';
+close $data;
+
+# Mixed whitespace
+my $mixed = "@\@template5\n5\n\n@@  template6\n6\n@@     template7\n7";
+open $data, '<', \$mixed;
+no strict 'refs';
+*{"Example::Package::Mixed::DATA"} = $data;
+is $loader->get_data('template5', 'Example::Package::Mixed'), "5\n\n",
+  'right template';
+is $loader->get_data('template6', 'Example::Package::Mixed'), "6\n",
+  'right template';
+is $loader->get_data('template7', 'Example::Package::Mixed'), '7',
+  'right template';
+is_deeply [sort keys %{$loader->get_all_data('Example::Package::Mixed')}],
+  [qw(template5 template6 template7)], 'right DATA files';
+close $data;

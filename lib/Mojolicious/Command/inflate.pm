@@ -1,6 +1,7 @@
 package Mojolicious::Command::inflate;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojolicious::Command';
 
+use Mojo::Loader;
 use Mojo::Util 'encode';
 
 has description => "Inflate embedded files to real files.\n";
@@ -13,7 +14,7 @@ sub run {
   # Find all embedded files
   my %all;
   my $app = $self->app;
-  %all = (%{$self->get_all_data($_)}, %all)
+  %all = (%{Mojo::Loader->get_all_data($_)}, %all)
     for @{$app->renderer->classes}, @{$app->static->classes};
 
   # Turn them into real files
@@ -44,8 +45,8 @@ the C<DATA> sections of your application into real files.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::inflate> inherits all attributes from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::inflate> inherits all attributes from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -63,8 +64,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::inflate> inherits all methods from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::inflate> inherits all methods from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<run>
 

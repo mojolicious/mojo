@@ -4,9 +4,9 @@ use Mojo::Base -base;
 use File::Spec::Functions 'catfile';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
-use Mojo::Command;
 use Mojo::Content::Single;
 use Mojo::Home;
+use Mojo::Loader;
 use Mojo::Path;
 
 has classes => sub { ['main'] };
@@ -124,12 +124,12 @@ sub _get_data_file {
   unless ($self->{index}) {
     my $index = $self->{index} = {};
     for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{Mojo::Command->get_all_data($class)};
+      $index->{$_} = $class for keys %{Mojo::Loader->get_all_data($class)};
     }
   }
 
   # Find file
-  return Mojo::Command->get_data($rel, $self->{index}{$rel});
+  return Mojo::Loader->get_data($rel, $self->{index}{$rel});
 }
 
 sub _get_file {

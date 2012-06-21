@@ -1008,7 +1008,7 @@ L<Mojolicious::Commands>, but did you know that you can just add new ones and
 that they will be picked up automatically by the command line interface?
 
   package Mojolicious::Command::spy;
-  use Mojo::Base 'Mojo::Command';
+  use Mojo::Base 'Mojolicious::Command';
 
   has description => "Spy on application.\n";
   has usage       => "usage: $0 spy [TARGET]\n";
@@ -1025,8 +1025,8 @@ that they will be picked up automatically by the command line interface?
 
   1;
 
-There are many more useful methods and attributes in L<Mojo::Command> that you
-can use or overload.
+There are many more useful methods and attributes in L<Mojolicious::Command>
+that you can use or overload.
 
   $ mojo spy secret
   The secret of this application is "Mojolicious::Lite".

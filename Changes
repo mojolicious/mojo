@@ -1,9 +1,14 @@
 
-3.0  2012-06-21
+3.0  2012-06-22
   - Code name "Rainbow", this is a major release.
   - Removed Mojolicious::Plugin::I18N so it can be maintained as a separate
     distribution.
   - Renamed Mojo::CookieJar to Mojo::UserAgent::CookieJar.
+  - Renamed Mojo::Command to Mojolicious::Command.
+  - Moved get_all_data and get_data methods from Mojo::Command to
+    Mojo::Loader.
+  - Moved class_to_file and class_to_path methods from Mojo::Command to
+    Mojo::Util.
   - Updated IO::Socket::SSL requirement to 1.75 for IO::Socket::IP support.
   - Switched back from IO::Socket::INET6 to IO::Socket::IP for IPv6 support.
   - Switched from HMAC-MD5 to HMAC-SHA1 for signed cookies.

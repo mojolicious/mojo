@@ -11,8 +11,8 @@ use File::Find 'find';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
 use Mojo::Asset::File;
-use Mojo::Command;
 use Mojo::Loader;
+use Mojo::Util 'class_to_path';
 
 has app_class => 'Mojo::HelloWorld';
 
@@ -37,7 +37,7 @@ sub detect {
   if ($class) {
 
     # Load
-    my $file = Mojo::Command->class_to_path($class);
+    my $file = class_to_path $class;
     unless ($INC{$file}) {
       if (my $e = Mojo::Loader->load($class)) { die $e if ref $e }
     }

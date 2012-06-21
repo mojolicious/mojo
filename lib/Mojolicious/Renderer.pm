@@ -3,9 +3,9 @@ use Mojo::Base -base;
 
 use File::Spec::Functions 'catfile';
 use Mojo::Cache;
-use Mojo::Command;
 use Mojo::Home;
 use Mojo::JSON;
+use Mojo::Loader;
 use Mojo::Util 'encode';
 
 has cache   => sub { Mojo::Cache->new };
@@ -65,15 +65,14 @@ sub get_data_template {
   unless ($self->{index}) {
     my $index = $self->{index} = {};
     for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{Mojo::Command->get_all_data($class)};
+      $index->{$_} = $class for keys %{Mojo::Loader->get_all_data($class)};
     }
   }
 
   # Find template
-  return Mojo::Command->get_data($template, $self->{index}{$template});
+  return Mojo::Loader->get_data($template, $self->{index}{$template});
 }
 
-# "Bodies are for hookers and fat people."
 sub render {
   my ($self, $c, $args) = @_;
   $args ||= {};
@@ -190,7 +189,7 @@ sub _detect_handler {
   # DATA templates
   unless ($self->{data}) {
     my @templates
-      = map { sort keys %{Mojo::Command->get_all_data($_)} } @{$self->classes};
+      = map { sort keys %{Mojo::Loader->get_all_data($_)} } @{$self->classes};
     s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
   }
   return $self->{data}{$file} if exists $self->{data}{$file};
@@ -199,7 +198,6 @@ sub _detect_handler {
   return;
 }
 
-# "Robot 1-X, save my friends! And Zoidberg!"
 sub _extends {
   my ($self, $c) = @_;
   my $stash = $c->stash;

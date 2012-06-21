@@ -1,5 +1,5 @@
 package Mojolicious::Commands;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long
   qw(GetOptions :config no_auto_abbrev no_ignore_case pass_through);
@@ -126,7 +126,7 @@ sub start_app {
 sub _command {
   my $module = shift;
   if (my $e = Mojo::Loader->load($module)) { ref $e ? die $e : return }
-  return $module->isa('Mojo::Command') ? $module : undef;
+  return $module->isa('Mojolicious::Command') ? $module : undef;
 }
 
 1;
@@ -273,8 +273,8 @@ for debugging.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Commands> inherits all attributes from L<Mojo::Command> and
-implements the following new ones.
+L<Mojolicious::Commands> inherits all attributes from L<Mojolicious::Command>
+and implements the following new ones.
 
 =head2 C<hint>
 
@@ -302,7 +302,7 @@ Namespaces to load commands from, defaults to C<Mojolicious::Command>.
 
 =head1 METHODS
 
-L<Mojolicious::Commands> inherits all methods from L<Mojo::Command> and
+L<Mojolicious::Commands> inherits all methods from L<Mojolicious::Command> and
 implements the following new ones.
 
 =head2 C<detect>

@@ -16,15 +16,15 @@ use Cwd 'cwd';
 use File::Temp;
 use FindBin;
 use IO::Socket::INET;
-use Mojo::Command;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
+use Mojolicious::Command;
 
 # Prepare script
 my $cwd = cwd;
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 chdir $dir;
-my $command = Mojo::Command->new;
+my $command = Mojolicious::Command->new;
 my $script  = $command->rel_file('myapp.pl');
 my $port1   = Mojo::IOLoop->generate_port;
 my $port2   = Mojo::IOLoop->generate_port;

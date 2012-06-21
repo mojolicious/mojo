@@ -1,5 +1,7 @@
 package Mojolicious::Command::generate::app;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojolicious::Command';
+
+use Mojo::Util qw(class_to_file class_to_path);
 
 has description => "Generate Mojolicious application directory structure.\n";
 has usage       => "usage: $0 generate app [NAME]\n";
@@ -16,17 +18,17 @@ like "MyApp".
 EOF
 
   # Script
-  my $name = $self->class_to_file($class);
+  my $name = class_to_file $class;
   $self->render_to_rel_file('mojo', "$name/script/$name", $class);
   $self->chmod_file("$name/script/$name", 0744);
 
   # Appclass
-  my $app = $self->class_to_path($class);
+  my $app = class_to_path $class;
   $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
 
   # Controller
   my $controller = "${class}::Example";
-  my $path       = $self->class_to_path($controller);
+  my $path       = class_to_path $controller;
   $self->render_to_rel_file('controller', "$name/lib/$path", $controller);
 
   # Test
@@ -161,7 +163,7 @@ structures for fully functional L<Mojolicious> applications.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::generate::app> inherits all attributes from
-L<Mojo::Command> and implements the following new ones.
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -180,7 +182,7 @@ Usage information for this command, used for the help screen.
 =head1 METHODS
 
 L<Mojolicious::Command::generate::app> inherits all methods from
-L<Mojo::Command> and implements the following new ones.
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<run>
 

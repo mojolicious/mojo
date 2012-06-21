@@ -1,5 +1,5 @@
 package Mojolicious::Command::daemon;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Daemon;
@@ -72,8 +72,8 @@ L<Mojo::Server::Daemon> backend.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::daemon> inherits all attributes from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::daemon> inherits all attributes from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -91,8 +91,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::daemon> inherits all methods from L<Mojo::Command> and
-implements the following new ones.
+L<Mojolicious::Command::daemon> inherits all methods from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<run>
 

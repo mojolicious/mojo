@@ -1,5 +1,5 @@
 package Mojolicious::Command::test;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojolicious::Command';
 
 use Cwd 'realpath';
 use FindBin;
@@ -69,8 +69,8 @@ L<Mojolicious::Command::test> runs application tests from the C<t> directory.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::test> inherits all attributes from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::test> inherits all attributes from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -88,8 +88,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::test> inherits all methods from L<Mojo::Command> and
-implements the following new ones.
+L<Mojolicious::Command::test> inherits all methods from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<run>
 

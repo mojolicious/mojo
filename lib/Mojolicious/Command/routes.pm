@@ -1,5 +1,5 @@
 package Mojolicious::Command::routes;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojolicious::Command';
 
 use re 'regexp_pattern';
 use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
@@ -116,8 +116,8 @@ L<Mojolicious::Command::routes> lists all your application routes.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::routes> inherits all attributes from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::routes> inherits all attributes from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -135,8 +135,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::routes> inherits all methods from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::routes> inherits all methods from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<run>
 

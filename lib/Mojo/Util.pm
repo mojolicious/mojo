@@ -40,11 +40,11 @@ my %ENCODE;
 
 # "Bart, stop pestering Satan!"
 our @EXPORT_OK = (
-  qw(b64_decode b64_encode camelize decamelize decode encode get_line),
-  qw(hmac_md5_sum hmac_sha1_sum html_escape html_unescape md5_bytes md5_sum),
-  qw(punycode_decode punycode_encode qp_decode qp_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum trim unquote url_escape),
-  qw(url_unescape xml_escape)
+  qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
+  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
+  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode),
+  qw(qp_decode qp_encode quote secure_compare sha1_bytes sha1_sum trim),
+  qw(unquote url_escape url_unescape xml_escape)
 );
 
 sub b64_decode { decode_base64(shift) }
@@ -60,6 +60,15 @@ sub camelize {
     join '', map { ucfirst lc } split /_/, $_
   } split /-/, $string;
 }
+
+sub class_to_file {
+  my $class = shift;
+  $class =~ s/:://g;
+  $class =~ s/([A-Z])([A-Z]*)/$1.lc($2)/ge;
+  return decamelize($class);
+}
+
+sub class_to_path { join '.', join('/', split /::|'/, shift), 'pm' }
 
 sub decamelize {
   my $string = shift;
@@ -442,6 +451,25 @@ Convert snake case string to camel case and replace C<-> with C<::>.
 
   # "FooBar::Baz"
   camelize 'FooBar::Baz';
+
+=head2 C<class_to_file>
+
+  my $file = class_to_file 'Foo::Bar';
+
+Convert a class name to a file.
+
+  Foo::Bar -> foo_bar
+  FOO::Bar -> foobar
+  FooBar   -> foo_bar
+  FOOBar   -> foobar
+
+=head2 C<class_to_path>
+
+  my $path = class_to_path 'Foo::Bar';
+
+Convert class name to path.
+
+  Foo::Bar -> Foo/Bar.pm
 
 =head2 C<decamelize>
 

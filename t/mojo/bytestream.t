@@ -5,7 +5,7 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 146;
+use Test::More tests => 159;
 
 # Need to be loaded first to trigger edge case
 use MIME::Base64;
@@ -47,6 +47,23 @@ is $stream->camelize,   $original, 'successful roundtrip';
 is $stream->decamelize, $result,   'right decamelized result';
 isnt "$stream", $original, 'decamelized result is different';
 is $stream->camelize, $original, 'successful roundtrip again';
+
+# class_to_file
+is b('Foo::Bar')->class_to_file, 'foo_bar', 'right file';
+is b('FooBar')->class_to_file,   'foo_bar', 'right file';
+is b('FOOBar')->class_to_file,   'foobar',  'right file';
+is b('FOOBAR')->class_to_file,   'foobar',  'right file';
+is b('FOO::Bar')->class_to_file, 'foobar',  'right file';
+is b('FooBAR')->class_to_file,   'foo_bar', 'right file';
+is b('Foo::BAR')->class_to_file, 'foo_bar', 'right file';
+
+# class_to_path
+is b('Foo::Bar')->class_to_path,      'Foo/Bar.pm',     'right path';
+is b("Foo'Bar")->class_to_path,       'Foo/Bar.pm',     'right path';
+is b("Foo'Bar::Baz")->class_to_path,  'Foo/Bar/Baz.pm', 'right path';
+is b("Foo::Bar'Baz")->class_to_path,  'Foo/Bar/Baz.pm', 'right path';
+is b("Foo::Bar::Baz")->class_to_path, 'Foo/Bar/Baz.pm', 'right path';
+is b("Foo'Bar'Baz")->class_to_path,   'Foo/Bar/Baz.pm', 'right path';
 
 # b64_encode
 $stream = b('foobar$%^&3217');

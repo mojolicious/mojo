@@ -125,6 +125,8 @@ sub parse {
   return $self;
 }
 
+# "You don't like your job, you don't strike.
+#  You go in every day and do it really half-assed. That's the American way."
 sub referrer { scalar shift->header(Referer => @_) }
 
 sub remove {
@@ -156,6 +158,8 @@ sub to_hash {
   return \%hash;
 }
 
+# "The only thing I asked you to do for this party was put on clothes,
+#  and you didn't do it."
 sub to_string {
   my $self = shift;
 

@@ -1,5 +1,5 @@
 package Mojolicious::Command::cpanify;
-use Mojo::Base 'Mojo::Command';
+use Mojo::Base 'Mojolicious::Command';
 
 use File::Basename 'basename';
 use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
@@ -71,8 +71,8 @@ L<Mojolicious::Command::cpanify> uploads files to CPAN.
 
 =head1 ATTRIBUTES
 
-L<Mojolicious::Command::cpanify> inherits all attributes from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::cpanify> inherits all attributes from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<description>
 
@@ -90,8 +90,8 @@ Usage information for this command, used for the help screen.
 
 =head1 METHODS
 
-L<Mojolicious::Command::cpanify> inherits all methods from L<Mojo::Command>
-and implements the following new ones.
+L<Mojolicious::Command::cpanify> inherits all methods from
+L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<run>
 

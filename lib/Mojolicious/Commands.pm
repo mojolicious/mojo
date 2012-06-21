@@ -125,8 +125,10 @@ sub start_app {
 
 sub _command {
   my $module = shift;
-  if (my $e = Mojo::Loader->load($module)) { ref $e ? die $e : return }
-  return $module->isa('Mojolicious::Command') ? $module : undef;
+  return $module->isa('Mojolicious::Command') ? $module : undef
+    unless my $e = Mojo::Loader->load($module);
+  warn $e if ref $e;
+  return;
 }
 
 1;

@@ -70,8 +70,8 @@ sub run {
     my $module;
     $module = _command("${_}::$name") and last for @{$self->namespaces};
 
-    # Command missing
-    die qq{Command "$name" missing, maybe you need to install it?\n}
+    # Unknown command
+    die qq{Unknown command "$name", maybe you need to install it?\n}
       unless $module;
 
     # Run

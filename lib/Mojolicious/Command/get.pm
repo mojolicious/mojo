@@ -87,9 +87,9 @@ sub run {
       my $tx = pop;
 
       # Prepare request information
-      my $req       = $tx->req;
-      my $startline = $req->build_start_line;
-      my $headers   = $req->build_headers;
+      my $req         = $tx->req;
+      my $startline   = $req->build_start_line;
+      my $req_headers = $req->build_headers;
 
       # Verbose callback
       my $v  = $verbose;
@@ -100,14 +100,14 @@ sub run {
         return unless $v && $res->headers->is_finished;
 
         # Request
-        warn "$startline$headers";
+        warn "$startline$req_headers";
 
         # Response
-        my $version = $res->version;
-        my $code    = $res->code;
-        my $message = $res->message;
-        warn "HTTP/$version $code $message\n", $res->headers->to_string,
-          "\n\n";
+        my $version     = $res->version;
+        my $code        = $res->code;
+        my $message     = $res->message;
+        my $res_headers = $res->headers->to_string;
+        warn "HTTP/$version $code $message\n$res_headers\n\n";
 
         # Finished
         $v = 0;

@@ -12,8 +12,7 @@ usage: $0 generate GENERATOR [OPTIONS]
 
 These generators are currently available:
 EOF
-has namespaces =>
-  sub { [qw(Mojolicious::Command::generate Mojo::Command::generate)] };
+has namespaces => sub { ['Mojolicious::Command::generate'] };
 has usage => "usage: $0 generate GENERATOR [OPTIONS]\n";
 
 sub help { shift->run(@_) }
@@ -64,10 +63,10 @@ Short usage message shown before listing available generator commands.
 =head2 C<namespaces>
 
   my $namespaces = $generator->namespaces;
-  $generator     = $generator->namespaces(['Mojo::Command::generate']);
+  $generator     = $generator->namespaces(['MyApp::Command::generate']);
 
 Namespaces to search for available generator commands, defaults to
-L<Mojolicious::Command::generate> and L<Mojo::Command::generate>.
+L<Mojolicious::Command::generate>.
 
 =head1 METHODS
 

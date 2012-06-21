@@ -26,7 +26,7 @@ Tip: CGI and PSGI environments can be automatically detected very often and
 
 These commands are currently available:
 EOF
-has namespaces => sub { [qw(Mojolicious::Command Mojo::Command)] };
+has namespaces => sub { ['Mojolicious::Command'] };
 
 sub detect {
   my ($self, $guess) = @_;
@@ -293,10 +293,9 @@ Short usage message shown before listing available commands.
 =head2 C<namespaces>
 
   my $namespaces = $commands->namespaces;
-  $commands      = $commands->namespaces(['Mojolicious::Commands']);
+  $commands      = $commands->namespaces(['MyApp::Command']);
 
-Namespaces to load commands from, defaults to C<Mojolicious::Command> and
-C<Mojo::Command>.
+Namespaces to load commands from, defaults to C<Mojolicious::Command>.
 
   # Add another namespace to load commands from
   push @{$commands->namespaces}, 'MyApp::Command';

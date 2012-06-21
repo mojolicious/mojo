@@ -136,13 +136,10 @@ $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
 %% layout 'default';
 %% title 'Welcome';
 <h2><%%= $message %></h2>
-This page was generated from the template
-"templates/example/welcome.html.ep" and the layout
-"templates/layouts/default.html.ep",
-<a href="<%%== url_for %>">click here</a>
-to reload the page or
-<a href="/index.html">here</a>
-to move forward to a static page.
+This page was generated from the template "templates/example/welcome.html.ep"
+and the layout "templates/layouts/default.html.ep",
+<a href="<%%== url_for %>">click here</a> to reload the page or
+<a href="/index.html">here</a> to move forward to a static page.
 
 __END__
 =head1 NAME

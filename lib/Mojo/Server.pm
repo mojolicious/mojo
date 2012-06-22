@@ -9,11 +9,10 @@ use Scalar::Util 'blessed';
 has app => sub {
   my $self = shift;
   return $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
-  if (my $e = Mojo::Loader->load($self->app_class)) { die $e if ref $e }
-  return $ENV{MOJO_APP} = $self->app_class->new;
+  my $class = $ENV{MOJO_APP} ||= 'Mojo::HelloWorld';
+  if (my $e = Mojo::Loader->load($class)) { die $e if ref $e }
+  return $ENV{MOJO_APP} = $class->new;
 };
-has app_class =>
-  sub { ref $ENV{MOJO_APP} || $ENV{MOJO_APP} || 'Mojo::HelloWorld' };
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -109,14 +108,6 @@ L<Mojo::Server> implements the following attributes.
   $server = $server->app(MojoSubclass->new);
 
 Application this server handles, defaults to a L<Mojo::HelloWorld> object.
-
-=head2 C<app_class>
-
-  my $app_class = $server->app_class;
-  $server       = $server->app_class('MojoSubclass');
-
-Class of the application this server handles, defaults to the value of the
-C<MOJO_APP> environment variable or L<Mojo::HelloWorld>.
 
 =head1 METHODS
 

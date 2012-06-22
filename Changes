@@ -3,6 +3,7 @@
   - Code name "Rainbow", this is a major release.
   - Removed Mojolicious::Plugin::I18N so it can be maintained as a separate
     distribution.
+  - Removed app_class attribute from Mojo::Server.
   - Renamed Mojo::CookieJar to Mojo::UserAgent::CookieJar.
   - Renamed Mojo::Command to Mojolicious::Command.
   - Moved get_all_data and get_data methods from Mojo::Command to

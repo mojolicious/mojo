@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
 # "Would you kindly shut your noise-hole?"
-use Test::More tests => 4;
+use Test::More tests => 3;
 
 package Mojo::TestServerViaEnv;
 use Mojo::Base 'Mojo';
@@ -21,13 +21,6 @@ isa_ok $server, 'Mojo::Server', 'right object';
   local $ENV{MOJO_APP};
   my $app = $server->new->app;
   isa_ok $app, 'Mojolicious::Lite', 'right default app';
-}
-
-# Test an explicit class name
-{
-  local $ENV{MOJO_APP};
-  my $app = $server->new(app_class => 'Mojo::TestServerViaApp')->app;
-  isa_ok $app, 'Mojo::TestServerViaApp', 'right object';
 }
 
 # Test setting the class name through the environment

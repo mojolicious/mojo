@@ -48,7 +48,8 @@ sub app {
   # Try to detect application
   $self->{app} ||= $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
   return $self->{app} unless $app;
-  $self->{app} = ref $app ? $app : $self->_server->app_class($app)->app;
+  $ENV{MOJO_APP} = $app unless ref $app;
+  $self->{app} = ref $app ? $app : $self->_server->app;
   return $self;
 }
 

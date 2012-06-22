@@ -122,15 +122,16 @@ sub _get_data_file {
   return if $rel =~ /\.\w+\.\w+$/;
 
   # Index DATA files
+  my $loader = Mojo::Loader->new;
   unless ($self->{index}) {
     my $index = $self->{index} = {};
     for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{Mojo::Loader->data($class)};
+      $index->{$_} = $class for keys %{$loader->data($class)};
     }
   }
 
   # Find file
-  return Mojo::Loader->data($self->{index}{$rel}, $rel);
+  return $loader->data($self->{index}{$rel}, $rel);
 }
 
 sub _get_file {

@@ -13,8 +13,9 @@ sub run {
 
   # Find all embedded files
   my %all;
-  my $app = $self->app;
-  %all = (%{Mojo::Loader->data($_)}, %all)
+  my $app    = $self->app;
+  my $loader = Mojo::Loader->new;
+  %all = (%{$loader->data($_)}, %all)
     for @{$app->renderer->classes}, @{$app->static->classes};
 
   # Turn them into real files

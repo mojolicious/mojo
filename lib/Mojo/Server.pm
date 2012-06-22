@@ -13,7 +13,7 @@ has app => sub {
 
   # Load and initialize application
   my $class = $ENV{MOJO_APP} ||= 'Mojo::HelloWorld';
-  if (my $e = Mojo::Loader->load($class)) { die $e if ref $e }
+  if (my $e = Mojo::Loader->new->load($class)) { die $e if ref $e }
   return $ENV{MOJO_APP} = $class->new;
 };
 

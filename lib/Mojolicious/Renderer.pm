@@ -62,15 +62,16 @@ sub get_data_template {
   my ($self, $options, $template) = @_;
 
   # Index DATA templates
+  my $loader = Mojo::Loader->new;
   unless ($self->{index}) {
     my $index = $self->{index} = {};
     for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{Mojo::Loader->data($class)};
+      $index->{$_} = $class for keys %{$loader->data($class)};
     }
   }
 
   # Find template
-  return Mojo::Loader->data($self->{index}{$template}, $template);
+  return $loader->data($self->{index}{$template}, $template);
 }
 
 sub render {
@@ -188,8 +189,8 @@ sub _detect_handler {
 
   # DATA templates
   unless ($self->{data}) {
-    my @templates
-      = map { sort keys %{Mojo::Loader->data($_)} } @{$self->classes};
+    my $loader = Mojo::Loader->new;
+    my @templates = map { sort keys %{$loader->data($_)} } @{$self->classes};
     s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
   }
   return $self->{data}{$file} if exists $self->{data}{$file};

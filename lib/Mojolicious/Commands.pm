@@ -83,8 +83,9 @@ sub run {
 
   # Try all namespaces
   my (@commands, %seen);
+  my $loader = Mojo::Loader->new;
   for my $namespace (@{$self->namespaces}) {
-    for my $module (@{Mojo::Loader->search($namespace)}) {
+    for my $module (@{$loader->search($namespace)}) {
       next unless my $command = _command($module);
       $command =~ s/^$namespace\:\://;
       push @commands, [$command => $module] unless $seen{$command}++;
@@ -126,7 +127,7 @@ sub start_app {
 sub _command {
   my ($module, $fatal) = @_;
   return $module->isa('Mojolicious::Command') ? $module : undef
-    unless my $e = Mojo::Loader->load($module);
+    unless my $e = Mojo::Loader->new->load($module);
   $fatal && ref $e ? die $e : return;
 }
 

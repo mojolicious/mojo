@@ -96,7 +96,10 @@
             <td>
               <pre><%= uc(join ',', @{$node->via || []}) || '*' %></pre>
             </td>
-            <td><pre><%= $node->name %></pre></td>
+            <td>
+              % my $name = $node->name;
+              <pre><%= $node->has_custom_name ? qq{"$name"} : $name %></pre>
+            </td>
           </tr>
           % $depth++;
           %= $walk->($_, $depth) for @{$node->children};

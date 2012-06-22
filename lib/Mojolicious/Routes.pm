@@ -155,7 +155,7 @@ sub _load {
 
   # Load unless already loaded or application
   return 1 if $self->{loaded}{$app} || ref $app;
-  if (my $e = Mojo::Loader->load($app)) {
+  if (my $e = Mojo::Loader->new->load($app)) {
 
     # Doesn't exist
     $c->app->log->debug(qq{Controller "$app" does not exist.}) and return

@@ -7,7 +7,7 @@ use Mojo::Loader;
 
 sub detect {
   my $try = $ENV{MOJO_REACTOR} || 'Mojo::Reactor::EV';
-  return Mojo::Loader->load($try) ? 'Mojo::Reactor::Poll' : $try;
+  return Mojo::Loader->new->load($try) ? 'Mojo::Reactor::Poll' : $try;
 }
 
 sub io { croak 'Method "io" not implemented by subclass' }

@@ -1,5 +1,5 @@
 
-3.0  2012-06-22
+3.0  2012-06-23
   - Code name "Rainbow", this is a major release.
   - Removed Mojolicious::Plugin::I18N so it can be maintained as a separate
     distribution.
@@ -17,6 +17,7 @@
   - Added accept_interval attribute to Mojo::IOLoop.
   - Added support for new HTTP status code.
   - Modernized ".perltidyrc".
+  - Improved not found page to highlight custom route names.
   - Improved to method in Mojolicious::Routes::Route to give easier access to
     default parameters.
   - Improved message parser performance slightly.

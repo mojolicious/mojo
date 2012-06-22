@@ -65,11 +65,11 @@ sub _all {
   my $class = shift;
 
   # Refresh or use cached data
-  my $d = do { no strict 'refs'; \*{"$class\::DATA"} };
-  return $CACHE{$class} || {} unless fileno $d;
-  seek $d, 0, 0;
-  my $content = join '', <$d>;
-  close $d;
+  my $handle = do { no strict 'refs'; \*{"$class\::DATA"} };
+  return $CACHE{$class} || {} unless fileno $handle;
+  seek $handle, 0, 0;
+  my $content = join '', <$handle>;
+  close $handle;
 
   # Ignore everything before __DATA__ (windows will seek to start of file)
   $content =~ s/^.*\n__DATA__\r?\n/\n/s;
@@ -106,9 +106,12 @@ Mojo::Loader - Loader
   my $loader = Mojo::Loader->new;
   for my $module (@{$loader->search('Some::Namespace')}) {
 
-    # And load them safely
+    # Load them safely
     my $e = $loader->load($module);
-    warn qq{Loading "$module" failed: $e} if ref $e;
+    warn qq{Loading "$module" failed: $e} and next if ref $e;
+
+    # And extract files from the DATA section
+    say $loader->data($module, 'some_file.txt');
   }
 
 =head1 DESCRIPTION

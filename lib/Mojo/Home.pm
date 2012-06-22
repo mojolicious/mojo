@@ -180,7 +180,7 @@ diectory.
 
 =head2 C<mojo_lib_dir>
 
-  my $path = $home->mojo_lib_dir;
+  my $path = Mojo::Home->mojo_lib_dir;
 
 Path to C<lib> directory in which L<Mojolicious> is installed.
 

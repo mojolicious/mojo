@@ -127,8 +127,7 @@ sub _command {
   my ($module, $fatal) = @_;
   return $module->isa('Mojolicious::Command') ? $module : undef
     unless my $e = Mojo::Loader->load($module);
-  $fatal ? die $e : warn $e if ref $e;
-  return;
+  $fatal && ref $e ? die $e : return;
 }
 
 1;

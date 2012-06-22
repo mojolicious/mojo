@@ -24,6 +24,7 @@
   - Fixed bug that prevented sessions from working in embedded applications.
   - Fixed JSON Pointer escaping.
   - Fixed small JSON Pointer bug in get command. (avkhozov)
+  - Fixed small application initialization bug in Mojo::Server.
 
 2.98  2012-05-30
   - Switched from IO::Socket::IP to IO::Socket::INET6 for IPv6 support.

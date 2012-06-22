@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 691;
+use Test::More tests => 692;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -545,6 +545,7 @@ my $t = Test::Mojo->new;
 
 # Application is already available
 is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
+is $t->app, app->commands->app, 'applications are equal';
 
 # User agent timer
 my $ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);

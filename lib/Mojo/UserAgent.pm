@@ -48,8 +48,11 @@ sub app {
   # Try to detect application
   $self->{app} ||= $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
   return $self->{app} unless $app;
+
+  # Initialize application if necessary
   $ENV{MOJO_APP} = $app unless ref $app;
   $self->{app} = ref $app ? $app : $self->_server->app;
+
   return $self;
 }
 
@@ -57,9 +60,7 @@ sub app_url {
   my $self = shift;
 
   # Prepare application for testing
-  my $server = $self->_server(@_);
-  delete $server->{app};
-  $server->app($self->app);
+  $self->_server(@_)->app($self->app);
 
   # Build absolute URL for test server
   return Mojo::URL->new("$self->{scheme}://localhost:$self->{port}/");
@@ -799,8 +800,7 @@ implements the following new ones.
   $ua     = $ua->app(MyApp->new);
 
 Application relative URLs will be processed with, defaults to the value of the
-C<MOJO_APP> environment variable, which is usually a L<Mojo> or L<Mojolicious>
-object.
+C<MOJO_APP> environment variable or a L<Mojo::HelloWorld> object.
 
   # Introspect
   say $ua->app->secret;

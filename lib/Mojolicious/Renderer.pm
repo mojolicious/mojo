@@ -341,7 +341,7 @@ Register a new helper.
     handler        => 'epl'
   }, 'foo.html.ep');
 
-Get a DATA template by name, usually used by handlers.
+Get a C<DATA> section template by name, usually used by handlers.
 
 =head2 C<render>
 

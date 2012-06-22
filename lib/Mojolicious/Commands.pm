@@ -68,7 +68,7 @@ sub run {
 
     # Try all namespaces
     my $module;
-    $module = _command("${_}::$name") and last for @{$self->namespaces};
+    $module = _command("${_}::$name", 1) and last for @{$self->namespaces};
 
     # Unknown command
     die qq{Unknown command "$name", maybe you need to install it?\n}
@@ -124,10 +124,10 @@ sub start_app {
 }
 
 sub _command {
-  my $module = shift;
+  my ($module, $fatal) = @_;
   return $module->isa('Mojolicious::Command') ? $module : undef
     unless my $e = Mojo::Loader->load($module);
-  warn $e if ref $e;
+  $fatal ? die $e : warn $e if ref $e;
   return;
 }
 

@@ -86,11 +86,11 @@ my $unix = "@@ template1\nFirst Template\n@@ template2\r\nSecond Template\n";
 open my $data, '<', \$unix;
 no strict 'refs';
 *{"Example::Package::UNIX::DATA"} = $data;
-is $loader->get_data('Example::Package::UNIX', 'template1'),
-  "First Template\n", 'right template';
-is $loader->get_data('Example::Package::UNIX', 'template2'),
-  "Second Template\n", 'right template';
-is_deeply [sort keys %{$loader->get_all_data('Example::Package::UNIX')}],
+is $loader->data('Example::Package::UNIX', 'template1'), "First Template\n",
+  'right template';
+is $loader->data('Example::Package::UNIX', 'template2'), "Second Template\n",
+  'right template';
+is_deeply [sort keys %{$loader->data('Example::Package::UNIX')}],
   [qw(template1 template2)], 'right DATA files';
 close $data;
 
@@ -100,11 +100,11 @@ my $windows
 open $data, '<', \$windows;
 no strict 'refs';
 *{"Example::Package::Windows::DATA"} = $data;
-is $loader->get_data('Example::Package::Windows', 'template3'),
+is $loader->data('Example::Package::Windows', 'template3'),
   "Third Template\r\n", 'right template';
-is $loader->get_data('Example::Package::Windows', 'template4'),
+is $loader->data('Example::Package::Windows', 'template4'),
   "Fourth Template\r\n", 'right template';
-is_deeply [sort keys %{$loader->get_all_data('Example::Package::Windows')}],
+is_deeply [sort keys %{$loader->data('Example::Package::Windows')}],
   [qw(template3 template4)], 'right DATA files';
 close $data;
 
@@ -113,12 +113,12 @@ my $mixed = "@\@template5\n5\n\n@@  template6\n6\n@@     template7\n7";
 open $data, '<', \$mixed;
 no strict 'refs';
 *{"Example::Package::Mixed::DATA"} = $data;
-is $loader->get_data('Example::Package::Mixed', 'template5'), "5\n\n",
+is $loader->data('Example::Package::Mixed', 'template5'), "5\n\n",
   'right template';
-is $loader->get_data('Example::Package::Mixed', 'template6'), "6\n",
+is $loader->data('Example::Package::Mixed', 'template6'), "6\n",
   'right template';
-is $loader->get_data('Example::Package::Mixed', 'template7'), '7',
+is $loader->data('Example::Package::Mixed', 'template7'), '7',
   'right template';
-is_deeply [sort keys %{$loader->get_all_data('Example::Package::Mixed')}],
+is_deeply [sort keys %{$loader->data('Example::Package::Mixed')}],
   [qw(template5 template6 template7)], 'right DATA files';
 close $data;

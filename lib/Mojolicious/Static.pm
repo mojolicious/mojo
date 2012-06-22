@@ -124,12 +124,12 @@ sub _get_data_file {
   unless ($self->{index}) {
     my $index = $self->{index} = {};
     for my $class (reverse @{$self->classes}) {
-      $index->{$_} = $class for keys %{Mojo::Loader->get_all_data($class)};
+      $index->{$_} = $class for keys %{Mojo::Loader->data($class)};
     }
   }
 
   # Find file
-  return Mojo::Loader->get_data($self->{index}{$rel}, $rel);
+  return Mojo::Loader->data($self->{index}{$rel}, $rel);
 }
 
 sub _get_file {

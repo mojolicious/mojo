@@ -10,40 +10,9 @@ use Mojo::Util qw(b64_decode class_to_path);
 my %CACHE;
 
 # "Homer no function beer well without."
-sub get_all_data {
-  my ($self, $class) = @_;
-
-  # Refresh or use cached data
-  my $d = do { no strict 'refs'; \*{"$class\::DATA"} };
-  return $CACHE{$class} || {} unless fileno $d;
-  seek $d, 0, 0;
-  my $content = join '', <$d>;
-  close $d;
-
-  # Ignore everything before __DATA__ (windows will seek to start of file)
-  $content =~ s/^.*\n__DATA__\r?\n/\n/s;
-
-  # Ignore everything after __END__
-  $content =~ s/\n__END__\r?\n.*$/\n/s;
-
-  # Split
-  my @data = split /^@@\s*(.+?)\s*\r?\n/m, $content;
-  shift @data;
-
-  # Find data
-  my $all = $CACHE{$class} = {};
-  while (@data) {
-    my ($name, $content) = splice @data, 0, 2;
-    $content = b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
-    $all->{$name} = $content;
-  }
-
-  return $all;
-}
-
-sub get_data {
+sub data {
   my ($self, $class, $data) = @_;
-  return $class ? $self->get_all_data($class)->{$data} : undef;
+  return $class ? $data ? _all($class)->{$data} : _all($class) : undef;
 }
 
 # "Olive oil? Asparagus? If your mother wasn't so fancy,
@@ -92,6 +61,37 @@ sub search {
   return \@modules;
 }
 
+sub _all {
+  my $class = shift;
+
+  # Refresh or use cached data
+  my $d = do { no strict 'refs'; \*{"$class\::DATA"} };
+  return $CACHE{$class} || {} unless fileno $d;
+  seek $d, 0, 0;
+  my $content = join '', <$d>;
+  close $d;
+
+  # Ignore everything before __DATA__ (windows will seek to start of file)
+  $content =~ s/^.*\n__DATA__\r?\n/\n/s;
+
+  # Ignore everything after __END__
+  $content =~ s/\n__END__\r?\n.*$/\n/s;
+
+  # Split
+  my @data = split /^@@\s*(.+?)\s*\r?\n/m, $content;
+  shift @data;
+
+  # Find data
+  my $all = $CACHE{$class} = {};
+  while (@data) {
+    my ($name, $content) = splice @data, 0, 2;
+    $content = b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
+    $all->{$name} = $content;
+  }
+
+  return $all;
+}
+
 1;
 
 =head1 NAME
@@ -120,15 +120,10 @@ L<Mojo::Loader> is a class loader and plugin framework.
 L<Mojo::Loader> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<get_all_data>
+=head2 C<data>
 
-  my $all = $loader->get_all_data('Foo::Bar');
-
-Extract all embedded files from the C<DATA> section of a class.
-
-=head2 C<get_data>
-
-  my $data = $loader->get_data('Foo::Bar', 'foo_bar');
+  my $all   = $loader->data('Foo::Bar');
+  my $index = $loader->data('Foo::Bar', 'index.html');
 
 Extract embedded file from the C<DATA> section of a class.
 

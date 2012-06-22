@@ -60,7 +60,7 @@ sub rel_file { catfile(getcwd(), split /\//, pop) }
 
 sub render_data {
   my $self = shift;
-  Mojo::Template->new->render(Mojo::Loader->get_data(ref $self, shift), @_);
+  Mojo::Template->new->render(Mojo::Loader->data(ref $self, shift), @_);
 }
 
 sub render_to_file {

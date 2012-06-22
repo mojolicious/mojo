@@ -6,8 +6,8 @@
   - Removed app_class attribute from Mojo::Server.
   - Renamed Mojo::CookieJar to Mojo::UserAgent::CookieJar.
   - Renamed Mojo::Command to Mojolicious::Command.
-  - Moved get_all_data and get_data methods from Mojo::Command to
-    Mojo::Loader.
+  - Merged get_all_data and get_data methods from Mojo::Command into data
+    method in Mojo::Loader.
   - Moved class_to_file and class_to_path methods from Mojo::Command to
     Mojo::Util.
   - Updated IO::Socket::SSL requirement to 1.75 for IO::Socket::IP support.

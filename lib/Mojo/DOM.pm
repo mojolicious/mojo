@@ -1,5 +1,6 @@
 package Mojo::DOM;
-use Mojo::Base -strict;
+use Mojo::Base qw{Mojo::Collection};
+
 use overload
   '%{}'    => sub { shift->attrs },
   'bool'   => sub {1},
@@ -7,7 +8,6 @@ use overload
   fallback => 1;
 
 use Carp 'croak';
-use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
 use Scalar::Util qw(blessed weaken);
@@ -21,9 +21,7 @@ sub AUTOLOAD {
     unless blessed $self && $self->isa(__PACKAGE__);
 
   # Search children
-  my $children = $self->children($method);
-  return @$children > 1 ? $children : $children->[0] if @$children;
-  croak qq{Can't locate object method "$method" via package "$package"};
+  return $self->children($method);
 }
 
 sub DESTROY { }
@@ -32,8 +30,13 @@ sub DESTROY { }
 #  I dunno. Internet?"
 sub new {
   my $class = shift;
-  my $self = bless [Mojo::DOM::HTML->new], ref $class || $class;
-  return @_ ? $self->parse(@_) : $self;
+  $class = ref $class || $class;
+  if (ref $_[0]) {
+    return bless $_[0], $class;
+  } else {
+    my $self = bless [Mojo::DOM::HTML->new], $class;
+    return @_ ? $self->parse(@_) : $self;
+  }
 }
 
 sub all_text {
@@ -98,7 +101,7 @@ sub children {
       $self->new->charset($self->charset)->tree($e)->xml($self->xml);
   }
 
-  return Mojo::Collection->new(@children);
+  return __PACKAGE__->new(\@children);
 }
 
 sub content_xml {
@@ -131,7 +134,7 @@ sub find {
     = map { $self->new->charset($self->charset)->tree($_)->xml($self->xml) }
     @$results;
 
-  return Mojo::Collection->new(@$results);
+  return __PACKAGE__->new($results);
 }
 
 sub namespace {
@@ -283,7 +286,10 @@ sub text_before {
   return _text(\@elements, 0, _trim($tree->[3], $trim));
 }
 
-sub to_xml { shift->[0]->render }
+sub to_xml {
+  my $self = shift;
+  join("\n", map { (ref $_ eq __PACKAGE__ ? $_->[0] : $_)->render } @$self);
+}
 
 sub tree {
   my $self = shift;

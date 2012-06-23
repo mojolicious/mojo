@@ -100,9 +100,6 @@ sub peer {
   return $self->_proxy($tx, $self->endpoint($tx));
 }
 
-# "America's health care system is second only to Japan...
-#  Canada, Sweden, Great Britain... well, all of Europe.
-#  But you can thank your lucky stars we don't live in Paraguay!"
 sub proxy_connect {
   my ($self, $old) = @_;
 
@@ -152,7 +149,9 @@ sub redirect {
   return $new->previous($old);
 }
 
-# "If he is so smart, how come he is dead?"
+# "America's health care system is second only to Japan...
+#  Canada, Sweden, Great Britain... well, all of Europe.
+#  But you can thank your lucky stars we don't live in Paraguay!"
 sub tx {
   my $self = shift;
 

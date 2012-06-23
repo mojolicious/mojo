@@ -9,10 +9,10 @@ our @EXPORT_OK = ('b');
 
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
-  qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(hmac_md5_sum hmac_sha1_sum html_escape html_unescape md5_bytes md5_sum),
-  qw(punycode_decode punycode_encode qp_decode qp_encode quote sha1_bytes),
-  qw(sha1_sum trim unquote url_escape url_unescape xml_escape)
+  qw(b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum),
+  qw(html_escape html_unescape md5_bytes md5_sum punycode_decode),
+  qw(punycode_encode qp_decode qp_encode quote sha1_bytes sha1_sum trim),
+  qw(unquote url_escape url_unescape xml_escape)
 );
 {
   no strict 'refs';
@@ -148,18 +148,6 @@ Alias for L<Mojo::Util/"b64_encode">.
   $stream = $stream->camelize;
 
 Alias for L<Mojo::Util/"camelize">.
-
-=head2 C<class_to_file>
-
-  $stream = $stream->class_to_file;
-
-Alias for L<Mojo::Util/"class_to_file">.
-
-=head2 C<class_to_path>
-
-  $stream = $stream->class_to_path;
-
-Alias for L<Mojo::Util/"class_to_path">.
 
 =head2 C<clone>
 

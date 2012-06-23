@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 768;
+use Test::More tests => 777;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -1756,42 +1756,42 @@ $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 <a id="one">
   <B class="two" test>
     foo
-    <c id="three">bar</c>
-    <c ID="four">baz</c>
+    <d id="three">bar</d>
+    <d ID="four">baz</d>
   </B>
 </a>
 EOF
 is $dom->xml, 1, 'xml mode enabled';
 is $dom->a->B->text, 'foo', 'right text';
-is $dom->a->B->c->[0]->text, 'bar', 'right text';
-is $dom->a->B->c->[1]->text, 'baz', 'right text';
-is $dom->a->B->c->[2], undef, 'no result';
-is $dom->a->B->c->size, 2, 'right number of elements';
+is $dom->a->B->d->[0]->text, 'bar', 'right text';
+is $dom->a->B->d->[1]->text, 'baz', 'right text';
+is $dom->a->B->d->[2], undef, 'no result';
+is $dom->a->B->d->size, 2, 'right number of elements';
 
 # Autoload children in HTML mode
 $dom = Mojo::DOM->new(<<EOF);
 <a id="one">
   <B class="two" test>
     foo
-    <c id="three">bar</c>
-    <c ID="four">baz</c>
+    <d id="three">bar</d>
+    <d ID="four">baz</d>
   </B>
 </a>
 EOF
 is $dom->xml, undef, 'xml mode disabled';
 is $dom->a->b->text, 'foo', 'right text';
-is $dom->a->b->c->[0]->text, 'bar', 'right text';
-is $dom->a->b->c->[1]->text, 'baz', 'right text';
-is $dom->a->b->c->[2], undef, 'no result';
-is $dom->a->b->c->size, 2, 'right number of elements';
+is $dom->a->b->d->[0]->text, 'bar', 'right text';
+is $dom->a->b->d->[1]->text, 'baz', 'right text';
+is $dom->a->b->d->[2], undef, 'no result';
+is $dom->a->b->d->size, 2, 'right number of elements';
 
 # Direct hash access to attributes in XML mode
 $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 <a id="one">
   <B class="two" test>
     foo
-    <c id="three">bar</c>
-    <c ID="four">baz</c>
+    <d id="three">bar</d>
+    <d ID="four">baz</d>
   </B>
 </a>
 EOF
@@ -1805,18 +1805,18 @@ is $dom->a->B->{class}, 'two', 'right attribute';
 is $dom->at('a')->B->{class}, 'two', 'right attribute';
 is $dom->find('a')->[0]->B->{class}, 'two', 'right attribute';
 is_deeply [sort keys %{$dom->a->B}], [qw(class test)], 'right attributes';
-is $dom->a->B->c->[0]->text, 'bar', 'right text';
-is $dom->a->B->c->[0]{id}, 'three', 'right attribute';
-is_deeply [sort keys %{$dom->a->B->c->[0]}], ['id'], 'right attributes';
-is $dom->a->B->c->[1]->text, 'baz', 'right text';
-is $dom->a->B->c->[1]{ID}, 'four', 'right attribute';
-is_deeply [sort keys %{$dom->a->B->c->[1]}], ['ID'], 'right attributes';
-is $dom->a->B->c->[2], undef, 'no result';
-is $dom->a->B->c->size, 2, 'right number of elements';
+is $dom->a->B->d->[0]->text, 'bar', 'right text';
+is $dom->a->B->d->[0]{id}, 'three', 'right attribute';
+is_deeply [sort keys %{$dom->a->B->d->[0]}], ['id'], 'right attributes';
+is $dom->a->B->d->[1]->text, 'baz', 'right text';
+is $dom->a->B->d->[1]{ID}, 'four', 'right attribute';
+is_deeply [sort keys %{$dom->a->B->d->[1]}], ['ID'], 'right attributes';
+is $dom->a->B->d->[2], undef, 'no result';
+is $dom->a->B->d->size, 2, 'right number of elements';
 @results = ();
-$dom->a->B->c->each(sub { push @results, $_->text });
+$dom->a->B->d->each(sub { push @results, $_->text });
 is_deeply \@results, [qw(bar baz)], 'right results';
-is $dom->a->B->c, qq#<c id="three">bar</c>\n<c ID="four">baz</c>#,
+is $dom->a->B->d, qq#<d id="three">bar</d>\n<d ID="four">baz</d>#,
   'right result';
 is_deeply [keys %$dom], [], 'root has no attributes';
 is $dom->find('#nothing'), '', 'no result';
@@ -1826,8 +1826,8 @@ $dom = Mojo::DOM->new(<<EOF);
 <a id="one">
   <B class="two" test>
     foo
-    <c id="three">bar</c>
-    <c ID="four">baz</c>
+    <d id="three">bar</d>
+    <d ID="four">baz</d>
   </B>
 </a>
 EOF
@@ -1841,18 +1841,18 @@ is $dom->a->b->{class}, 'two', 'right attribute';
 is $dom->at('a')->b->{class}, 'two', 'right attribute';
 is $dom->find('a')->[0]->b->{class}, 'two', 'right attribute';
 is_deeply [sort keys %{$dom->a->b}], [qw(class test)], 'right attributes';
-is $dom->a->b->c->[0]->text, 'bar', 'right text';
-is $dom->a->b->c->[0]{id}, 'three', 'right attribute';
-is_deeply [sort keys %{$dom->a->b->c->[0]}], ['id'], 'right attributes';
-is $dom->a->b->c->[1]->text, 'baz', 'right text';
-is $dom->a->b->c->[1]{id}, 'four', 'right attribute';
-is_deeply [sort keys %{$dom->a->b->c->[1]}], ['id'], 'right attributes';
-is $dom->a->b->c->[2], undef, 'no result';
-is $dom->a->b->c->size, 2, 'right number of elements';
+is $dom->a->b->d->[0]->text, 'bar', 'right text';
+is $dom->a->b->d->[0]{id}, 'three', 'right attribute';
+is_deeply [sort keys %{$dom->a->b->d->[0]}], ['id'], 'right attributes';
+is $dom->a->b->d->[1]->text, 'baz', 'right text';
+is $dom->a->b->d->[1]{id}, 'four', 'right attribute';
+is_deeply [sort keys %{$dom->a->b->d->[1]}], ['id'], 'right attributes';
+is $dom->a->b->d->[2], undef, 'no result';
+is $dom->a->b->d->size, 2, 'right number of elements';
 @results = ();
-$dom->a->b->c->each(sub { push @results, $_->text });
+$dom->a->b->d->each(sub { push @results, $_->text });
 is_deeply \@results, [qw(bar baz)], 'right results';
-is $dom->a->b->c, qq#<c id="three">bar</c>\n<c id="four">baz</c>#,
+is $dom->a->b->d, qq#<d id="three">bar</d>\n<d id="four">baz</d>#,
   'right result';
 is_deeply [keys %$dom], [], 'root has no attributes';
 is $dom->find('#nothing'), '', 'no result';
@@ -2095,3 +2095,31 @@ is $dom->find('div > ul li')->[1]->text, 'B', 'right text';
 is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
+
+# dom collection also is a Mojo::DOM
+$dom = Mojo::DOM->new(<<EOF);
+<div>
+    A
+    <a>B</a>
+    <a>C</a>
+    <span>D</span>
+</div>
+<div>
+    E
+</div>
+EOF
+is ref $dom->find('div'), 'Mojo::DOM', 'right class';
+is $dom->find('div')->text, 'A', 'right text';
+is $dom->find('div')->find('a')->text, 'B', 'right text';
+is $dom->find('div')->find('a')->to_xml,
+    "<a>B</a>\n<a>C</a>", 'right result';
+is $dom->at('div')->children('a')->text, 'B';
+is $dom->at('div')->children('a')->to_xml,
+    "<a>B</a>\n<a>C</a>", 'right result';
+is ref $dom->a, 'Mojo::DOM', 'right class';
+is ref $dom->span, 'Mojo::DOM', 'right class';
+@div = ();
+$dom->div->each(sub {
+    push @div, shift->text
+});
+is_deeply \@div, [qw(A E)], 'found all div elements with id';

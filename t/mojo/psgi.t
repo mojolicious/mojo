@@ -5,8 +5,8 @@ use Test::More tests => 19;
 # "We need some more secret sauce. Put the mayonnaise in the sun."
 use Mojo::JSON;
 use Mojo::Server::PSGI;
-use Mojolicious::Lite;
 use Mojolicious::Command::psgi;
+use Mojolicious::Lite;
 
 # Silence
 app->log->level('fatal');

@@ -6,8 +6,8 @@ use Test::More tests => 85;
 #  Okay Mr. Burns, what's your first name.
 #  I don't know."
 use Mojo::Cookie::Response;
-use Mojo::UserAgent::CookieJar;
 use Mojo::URL;
+use Mojo::UserAgent::CookieJar;
 
 # Session cookie
 my $jar = Mojo::UserAgent::CookieJar->new;

@@ -27,9 +27,9 @@ use utf8;
 
 use Test::More tests => 85;
 
+use Mojo::Transaction::HTTP;
 use Mojo::Upload;
 use Mojolicious;
-use Mojo::Transaction::HTTP;
 use Mojolicious::Controller;
 use Mojolicious::Routes;
 

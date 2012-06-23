@@ -5,12 +5,12 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More tests => 15;
 
+# "Uh, no, you got the wrong number. This is 9-1... 2"
 use Cwd qw(cwd realpath);
 use File::Spec::Functions qw(canonpath catdir splitdir);
 use FindBin;
 use List::Util 'first';
-
-# "Uh, no, you got the wrong number. This is 9-1... 2"
+use Mojo::HelloWorld;
 use Mojo::Home;
 
 # ENV detection

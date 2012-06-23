@@ -717,7 +717,7 @@ Render template file to another file.
   my $exception = $mt->render_to_file($template, '/tmp/foo.txt');
   my $exception = $mt->render_to_file($template, '/tmp/foo.txt', @args);
 
-Render template to a file.
+Render template to file.
 
 =head1 SEE ALSO
 

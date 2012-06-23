@@ -3,8 +3,9 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Cwd 'getcwd';
+use File::Basename 'dirname';
 use File::Path 'mkpath';
-use File::Spec::Functions qw(catdir catfile splitdir);
+use File::Spec::Functions qw(catdir catfile);
 use IO::Handle;
 use Mojo::Loader;
 use Mojo::Server;
@@ -18,7 +19,7 @@ sub app { Mojo::Server->new->app }
 
 sub chmod_file {
   my ($self, $path, $mod) = @_;
-  chmod $mod, $path or croak qq{Can't chmod path "$path": $!};
+  chmod $mod, $path or croak qq{Can't chmod file "$path": $!};
   $mod = sprintf '%lo', $mod;
   say "  [chmod] $path $mod" unless $self->quiet;
   return $self;
@@ -33,14 +34,14 @@ sub create_dir {
   my ($self, $path) = @_;
 
   # Exists
-  if (-d $path) {
-    say "  [exist] $path" unless $self->quiet;
-    return $self;
-  }
+  if (-d $path) { say "  [exist] $path" unless $self->quiet }
 
   # Create
-  mkpath $path or croak qq{Can't make directory "$path": $!};
-  say "  [mkdir] $path" unless $self->quiet;
+  else {
+    mkpath $path or croak qq{Can't make directory "$path": $!};
+    say "  [mkdir] $path" unless $self->quiet;
+  }
+
   return $self;
 }
 
@@ -79,11 +80,8 @@ sub run { croak 'Method "run" not implemented by subclass' }
 sub write_file {
   my ($self, $path, $data) = @_;
 
-  # Directory
-  my @parts = splitdir $path;
-  pop @parts;
-  my $dir = catdir @parts;
-  $self->create_dir($dir);
+  # Create directory
+  $self->create_dir(dirname $path);
 
   # Write unbuffered
   croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
@@ -188,7 +186,7 @@ Currently active application.
 
   $command = $command->chmod_file('/home/sri/foo.txt', 0644);
 
-Portably change mode of a file.
+Change mode of a file.
 
 =head2 C<chmod_rel_file>
 
@@ -200,7 +198,7 @@ Portably change mode of a file relative to the current working directory.
 
   $command = $command->create_dir('/home/sri/foo/bar');
 
-Portably create a directory.
+Create a directory.
 
 =head2 C<create_rel_dir>
 
@@ -232,20 +230,23 @@ directory.
 
   my $data = $command->render_data('foo_bar', @args);
 
-Render a template from the C<DATA> section of the command class.
+Render a template from the C<DATA> section of the command class with
+L<Mojo::Template>.
 
 =head2 C<render_to_file>
 
   $command = $command->render_to_file('foo_bar', '/home/sri/foo.txt');
 
-Render a template from the C<DATA> section of the command class to a file.
+Render a template from the C<DATA> section of the command class with
+L<Mojo::Template> to a file and create directory if necessary.
 
 =head2 C<render_to_rel_file>
 
   $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
 
-Portably render a template from the C<DATA> section of the command class to a
-file relative to the current working directory.
+Portably render a template from the C<DATA> section of the command class with
+L<Mojo::Template> to a file relative to the current working directory and
+create directory if necessary.
 
 =head2 C<run>
 
@@ -258,13 +259,14 @@ Run command. Meant to be overloaded in a subclass.
 
   $command = $command->write_file('/home/sri/foo.txt', 'Hello World!');
 
-Portably write text to a file.
+Write text to a file and create directory if necessary.
 
 =head2 C<write_rel_file>
 
   $command = $command->write_rel_file('foo/bar.txt', 'Hello World!');
 
-Portably write text to a file relative to the current working directory.
+Portably write text to a file relative to the current working directory and
+create directory if necessary.
 
 =head1 SEE ALSO
 

@@ -3,7 +3,7 @@ use Mojo::Base 'Exporter';
 
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(sha1 sha1_hex);
-use Encode 'find_encoding';
+use Encode ();
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use MIME::Base64 qw(decode_base64 encode_base64);
@@ -34,9 +34,6 @@ my %ENTITIES;
 # Reverse entities for html_escape (without "apos")
 my %REVERSE = ("\x{0027}" => '#39;');
 $REVERSE{$ENTITIES{$_}} //= $_ for sort grep {/;/} keys %ENTITIES;
-
-# Encode cache
-my %ENCODE;
 
 # "Bart, stop pestering Satan!"
 our @EXPORT_OK = (
@@ -89,37 +86,11 @@ sub decamelize {
 
 sub decode {
   my ($encoding, $bytes) = @_;
-
-  # Try decoding
-  return unless eval {
-
-    # UTF-8
-    if ($encoding eq 'UTF-8') { die unless utf8::decode $bytes }
-
-    # Everything else
-    else {
-      $bytes
-        = ($ENCODE{$encoding} ||= find_encoding($encoding))->decode($bytes, 1);
-    }
-
-    1;
-  };
-
+  return unless eval { $bytes = Encode::decode($encoding, $bytes, 1); 1 };
   return $bytes;
 }
 
-sub encode {
-  my ($encoding, $chars) = @_;
-
-  # UTF-8
-  if ($encoding eq 'UTF-8') {
-    utf8::encode $chars;
-    return $chars;
-  }
-
-  # Everything else
-  return ($ENCODE{$encoding} ||= find_encoding($encoding))->encode($chars);
-}
+sub encode { Encode::encode(shift, shift) }
 
 sub get_line {
 
@@ -490,7 +461,7 @@ Convert camel case string to snake case and replace C<::> with C<->.
 
   my $chars = decode 'UTF-8', $bytes;
 
-Decode bytes to characters.
+Decode bytes to characters and return C<undef> if decoding failed.
 
 =head2 C<encode>
 

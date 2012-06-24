@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 214;
+use Test::More tests => 200;
 
 # "When I held that gun in my hand, I felt a surge of power...
 #  like God must feel when he's holding a gun."
@@ -1061,39 +1061,6 @@ is $output->lines_after->[0]->[0], 3,     'right number';
 is $output->lines_after->[0]->[1], '123', 'right line';
 like "$output", qr/foo\.mt line 2/, 'right result';
 
-# Exception in file (rendering to file)
-$mt = Mojo::Template->new;
-my $dir = File::Temp::tempdir(CLEANUP => 1);
-my $file2 = catfile $dir, 'test1.mt';
-$output = $mt->render_file_to_file($file, $file2);
-ok !-e $file2, 'file has not been rendered';
-isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message, qr/exception\.mt line 2/, 'message contains filename';
-is $output->lines_before->[0]->[0], 1,      'right number';
-is $output->lines_before->[0]->[1], 'test', 'right line';
-is $output->line->[0], 2,        'right number';
-is $output->line->[1], '% die;', 'right line';
-is $output->lines_after->[0]->[0], 3,     'right number';
-is $output->lines_after->[0]->[1], '123', 'right line';
-like "$output", qr/exception\.mt line 2/, 'right result';
-
-# File to file with utf8 data
-$mt = Mojo::Template->new;
-$mt->tag_start('[$-');
-$mt->tag_end('-$]');
-$file = catfile $dir, 'test.mt';
-is $mt->render_to_file(<<"EOF", $file), undef, 'file rendered';
-<% my \$i = 23; %> foo bar
-\x{df}\x{0100}bar\x{263a} <%= \$i %>
-test
-EOF
-$mt = Mojo::Template->new;
-$file2 = catfile $dir, 'test2.mt';
-is $mt->render_file_to_file($file, $file2), undef, 'file rendered to file';
-$mt     = Mojo::Template->new;
-$output = $mt->render_file($file2);
-is $output, " foo bar\n\x{df}\x{0100}bar\x{263a} 23\ntest\n", 'right result';
-
 # Exception with utf8 context
 $mt     = Mojo::Template->new;
 $file   = catfile(splitdir($FindBin::Bin), qw(lib utf8_exception.mt));
@@ -1107,9 +1074,7 @@ is utf8::is_utf8($output->line->[1]), 1, 'context has utf8 flag';
 is utf8::is_utf8($output->lines_after->[0]->[1]), 1, 'context has utf8 flag';
 
 # Different encodings
-$mt = Mojo::Template->new(encoding => 'ISO-8859-1');
-$file = catfile $dir, 'test3.mt';
-is $mt->render_to_file('ü', $file), undef, 'file rendered';
-$mt = Mojo::Template->new(encoding => 'UTF-8');
+$mt = Mojo::Template->new(encoding => 'shift_jis');
+$file = catfile(splitdir($FindBin::Bin), qw(lib utf8_exception.mt));
 ok !eval { $mt->render_file($file) }, 'file not rendered';
 like $@, qr/invalid encoding/, 'right error';

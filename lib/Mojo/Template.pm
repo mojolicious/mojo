@@ -307,18 +307,6 @@ sub render_file {
   return $self->render($tmpl, @_);
 }
 
-sub render_file_to_file {
-  my ($self, $spath, $tpath) = (shift, shift, shift);
-  my $output = $self->render_file($spath, @_);
-  return ref $output ? $output : $self->_write_file($tpath, $output);
-}
-
-sub render_to_file {
-  my ($self, $tmpl, $path) = (shift, shift, shift);
-  my $output = $self->render($tmpl, @_);
-  return ref $output ? $output : $self->_write_file($path, $output);
-}
-
 sub _trim {
   my ($self, $line) = @_;
 
@@ -341,18 +329,6 @@ sub _trim {
     # Text left
     return if length $value;
   }
-}
-
-sub _write_file {
-  my ($self, $path, $output) = @_;
-
-  # Encode and write to file
-  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
-  $output = encode $self->encoding, $output if $self->encoding;
-  croak qq{Can't write to file "$path": $!}
-    unless defined $file->syswrite($output);
-
-  return;
 }
 
 1;
@@ -703,21 +679,6 @@ Render template.
   my $output = $mt->render_file('/tmp/foo.mt', @args);
 
 Render template file.
-
-=head2 C<render_file_to_file>
-
-  my $exception = $mt->render_file_to_file('/tmp/foo.mt', '/tmp/foo.txt');
-  my $exception
-    = $mt->render_file_to_file('/tmp/foo.mt', '/tmp/foo.txt', @args);
-
-Render template file to another file.
-
-=head2 C<render_to_file>
-
-  my $exception = $mt->render_to_file($template, '/tmp/foo.txt');
-  my $exception = $mt->render_to_file($template, '/tmp/foo.txt', @args);
-
-Render template to file.
 
 =head1 SEE ALSO
 

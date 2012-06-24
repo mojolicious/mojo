@@ -18,7 +18,7 @@
   - Added support for new HTTP status code.
   - Modernized ".perltidyrc".
   - Improved Mojo::IOLoop::Server to prioritize RC4 cipher, which mitigates
-    the BEAST attack.
+    the BEAST attack. (Danny Thomas)
   - Improved not found page to highlight custom route names.
   - Improved to method in Mojolicious::Routes::Route to give easier access to
     default parameters.

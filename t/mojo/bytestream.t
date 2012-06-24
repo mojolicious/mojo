@@ -5,11 +5,10 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 146;
+use Test::More tests => 144;
 
 # Need to be loaded first to trigger edge case
 use MIME::Base64;
-use MIME::QuotedPrint;
 use Mojo::Util 'md5_bytes';
 use Mojo::ByteStream 'b';
 
@@ -97,14 +96,6 @@ is "$stream", 'foo%C3%9F%C4%80bar%E2%98%BA', 'right url escaped result';
 # utf8 url_unescape
 $stream = b('foo%C3%9F%C4%80bar%E2%98%BA')->url_unescape->decode('UTF-8');
 is "$stream", "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
-
-# qp_encode
-$stream = b("foo\x{99}bar$%^&3217");
-like $stream->qp_encode, qr/^foo\=99bar0\^\&3217/, 'right qp encoded result';
-
-# qp_decode
-$stream = b("foo=99bar0^&3217=\n");
-is $stream->qp_decode, "foo\x{99}bar$%^&3217", 'right qp decoded result';
 
 # quote
 $stream = b('foo; 23 "bar');

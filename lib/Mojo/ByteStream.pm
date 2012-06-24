@@ -11,8 +11,8 @@ our @EXPORT_OK = ('b');
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum),
   qw(html_escape html_unescape md5_bytes md5_sum punycode_decode),
-  qw(punycode_encode qp_decode qp_encode quote sha1_bytes sha1_sum trim),
-  qw(unquote url_escape url_unescape xml_escape)
+  qw(punycode_encode quote sha1_bytes sha1_sum trim unquote url_escape),
+  qw(url_unescape xml_escape)
 );
 {
   no strict 'refs';
@@ -233,18 +233,6 @@ Alias for L<Mojo::Util/"punycode_decode">.
   $stream = $stream->punycode_encode;
 
 Alias for L<Mojo::Util/"punycode_encode">.
-
-=head2 C<qp_decode>
-
-  $stream = $stream->qp_decode;
-
-Alias for L<Mojo::Util/"qp_decode">.
-
-=head2 C<qp_encode>
-
-  $stream = $stream->qp_encode;
-
-Alias for L<Mojo::Util/"qp_encode">.
 
 =head2 C<quote>
 

@@ -7,7 +7,6 @@ use Encode ();
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use MIME::Base64 qw(decode_base64 encode_base64);
-use MIME::QuotedPrint qw(decode_qp encode_qp);
 
 # Punycode bootstring parameters
 use constant {
@@ -40,8 +39,8 @@ our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
   qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode),
-  qw(qp_decode qp_encode quote secure_compare sha1_bytes sha1_sum trim),
-  qw(unquote url_escape url_unescape xml_escape)
+  qw(quote secure_compare sha1_bytes sha1_sum trim unquote url_escape),
+  qw(url_unescape xml_escape)
 );
 
 sub b64_decode { decode_base64(shift) }
@@ -245,10 +244,6 @@ sub punycode_encode {
 
   return $output;
 }
-
-sub qp_decode { decode_qp(shift) }
-
-sub qp_encode { encode_qp(shift) }
 
 sub quote {
   my $string = shift;
@@ -531,18 +526,6 @@ Punycode encode string.
   my $quoted = quote $string;
 
 Quote string.
-
-=head2 C<qp_decode>
-
-  my $string = qp_decode $qp;
-
-Quoted Printable decode string.
-
-=head2 C<qp_encode>
-
-  my $qp = qp_encode $string;
-
-Quoted Printable encode string.
 
 =head2 C<secure_compare>
 

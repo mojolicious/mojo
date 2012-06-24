@@ -4,6 +4,8 @@
   - Removed Mojolicious::Plugin::I18N so it can be maintained as a separate
     distribution.
   - Removed app_class attribute from Mojo::Server.
+  - Removed qp_decode and qp_encode methods from Mojo::ByteStream.
+  - Removed qp_decode and qp_encode functions from Mojo::Util.
   - Renamed Mojo::CookieJar to Mojo::UserAgent::CookieJar.
   - Renamed Mojo::Command to Mojolicious::Command.
   - Merged get_all_data and get_data methods from Mojo::Command into data

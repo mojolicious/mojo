@@ -17,8 +17,8 @@
   - Updated IO::Socket::SSL requirement to 1.75 for IO::Socket::IP support.
   - Switched back from IO::Socket::INET6 to IO::Socket::IP for IPv6 support.
   - Switched from HMAC-MD5 to HMAC-SHA1 for signed cookies.
-  - Added slurp_file function to Mojo::Util.
-  - Added slurp_file method to Mojo::ByteStream.
+  - Added slurp function to Mojo::Util.
+  - Added slurp method to Mojo::ByteStream.
   - Added j and r functions to ojo. (sharifulin, sri)
   - Added accept_interval attribute to Mojo::IOLoop.
   - Added support for new HTTP status code.

@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Mojo::ByteStream;
 use Mojo::Exception;
-use Mojo::Util qw(decode encode slurp_file);
+use Mojo::Util qw(decode encode slurp);
 
 # "If for any reason you're not completely satisfied, I hate you."
 has [qw(auto_escape compiled)];
@@ -294,7 +294,7 @@ sub render_file {
 
   # Slurp file
   $self->name($path) unless defined $self->{name};
-  my $tmpl = slurp_file $path;
+  my $tmpl = slurp $path;
 
   # Decode and render
   if (my $encoding = $self->encoding) {

@@ -402,11 +402,11 @@ b(1, 2, 3)->say;
 *STDOUT = $stdout;
 is $buffer, "test\n123\n", 'right output';
 
-# slurp_file
+# slurp
 my $file = catfile(splitdir($FindBin::Bin), qw(templates exception.mt));
-$stream = b('whatever')->slurp_file($file);
+$stream = b('whatever')->slurp($file);
 is $stream, "test\n% die;\n123\n", 'right content';
-$stream = b()->slurp_file($file)->b64_encode('');
+$stream = b()->slurp($file)->b64_encode('');
 is $stream, 'dGVzdAolIGRpZTsKMTIzCg==', 'right content';
 
 # secure_compare

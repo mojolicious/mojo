@@ -41,8 +41,8 @@ our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
   qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode),
-  qw(quote secure_compare sha1_bytes sha1_sum slurp_file trim unquote),
-  qw(url_escape url_unescape xml_escape)
+  qw(quote secure_compare sha1_bytes sha1_sum slurp trim unquote url_escape),
+  qw(url_unescape xml_escape)
 );
 
 sub b64_decode { decode_base64(shift) }
@@ -264,7 +264,7 @@ sub secure_compare {
 sub sha1_bytes { sha1(@_) }
 sub sha1_sum   { sha1_hex(@_) }
 
-sub slurp_file {
+sub slurp {
   my $path = shift;
   croak qq{Can't open file "$path": $!} unless open my $file, '<', $path;
   my $content = '';
@@ -555,9 +555,9 @@ Generate binary SHA1 checksum for string.
 
 Generate SHA1 checksum for string.
 
-=head2 C<slurp_file>
+=head2 C<slurp>
 
-  my $bytes = slurp_file '/etc/passwd';
+  my $content = slurp '/etc/passwd';
 
 Read all data at once from file.
 

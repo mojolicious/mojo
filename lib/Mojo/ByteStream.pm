@@ -70,9 +70,9 @@ sub secure_compare { Mojo::Util::secure_compare ${shift()}, @_ }
 
 sub size { length ${shift()} }
 
-sub slurp_file {
+sub slurp {
   my $self = shift;
-  $$self = Mojo::Util::slurp_file @_;
+  $$self = Mojo::Util::slurp @_;
   return $self;
 }
 
@@ -276,11 +276,11 @@ Alias for L<Mojo::Util/"sha1_sum">.
 
 Size of bytestream.
 
-=head2 C<slurp_file>
+=head2 C<slurp>
 
-  $stream = $stream->slurp_file('/etc/passwd');
+  $stream = $stream->slurp('/etc/passwd');
 
-Alias for L<Mojo::Util/"slurp_file">.
+Alias for L<Mojo::Util/"slurp">.
 
 =head2 C<split>
 

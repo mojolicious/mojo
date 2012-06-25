@@ -71,8 +71,8 @@ sub secure_compare { Mojo::Util::secure_compare ${shift()}, @_ }
 sub size { length ${shift()} }
 
 sub slurp {
-  my $self = shift;
-  $$self = Mojo::Util::slurp @_;
+  my ($self, $path) = @_;
+  $$self = Mojo::Util::slurp $path // $$self;
   return $self;
 }
 
@@ -278,9 +278,12 @@ Size of bytestream.
 
 =head2 C<slurp>
 
+  $stream = $stream->slurp;
   $stream = $stream->slurp('/etc/passwd');
 
 Alias for L<Mojo::Util/"slurp">.
+
+  b('/home/sri/myapp.pl')->slurp->b64_encode->say;
 
 =head2 C<split>
 

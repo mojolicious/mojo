@@ -5,7 +5,7 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 146;
+use Test::More tests => 147;
 
 # MIME::Base64 needs to be loaded first to trigger edge case
 use MIME::Base64;
@@ -408,6 +408,8 @@ $stream = b('whatever')->slurp($file);
 is $stream, "test\n% die;\n123\n", 'right content';
 $stream = b()->slurp($file)->b64_encode('');
 is $stream, 'dGVzdAolIGRpZTsKMTIzCg==', 'right content';
+$stream = b($file)->slurp->split("\n")->grep(sub {/die/})->join('');
+is $stream, '% die;', 'right content';
 
 # secure_compare
 ok b('hello')->secure_compare('hello'),  'values are equal';

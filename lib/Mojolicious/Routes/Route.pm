@@ -160,8 +160,8 @@ sub root {
 sub route {
   my $self   = shift;
   my $route  = $self->add_child($self->new(@_))->children->[-1];
-  my $format = $self->pattern->reqs->{format};
-  $route->pattern->reqs->{format} //= 0 if defined $format && !$format;
+  my $format = $self->pattern->constraints->{format};
+  $route->pattern->constraints->{format} //= 0 if defined $format && !$format;
   return $route;
 }
 

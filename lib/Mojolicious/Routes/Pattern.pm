@@ -1,13 +1,13 @@
 package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
-has [qw(defaults reqs)] => sub { {} };
-has [qw(format pattern regex)];
-has quote_end     => ')';
-has quote_start   => '(';
-has relaxed_start => '#';
-has symbol_start  => ':';
-has [qw(symbols tree)] => sub { [] };
+has [qw(constraints defaults)] => sub { {} };
+has [qw(format_regex pattern regex)];
+has placeholder_start => ':';
+has [qw(placeholders tree)] => sub { [] };
+has quote_end      => ')';
+has quote_start    => '(';
+has relaxed_start  => '#';
 has wildcard_start => '*';
 
 # "This is the worst kind of discrimination. The kind against me!"
@@ -26,8 +26,8 @@ sub parse {
   my $pattern = @_ % 2 ? (shift || '/') : '/';
   $pattern = "/$pattern" unless $pattern =~ m!^/!;
 
-  # Requirements
-  $self->reqs({@_});
+  # Constraints
+  $self->constraints({@_});
 
   # Tokenize
   return $pattern eq '/' ? $self : $self->pattern($pattern)->_tokenize;
@@ -56,8 +56,8 @@ sub render {
       $optional = 0;
     }
 
-    # Relaxed, symbol or wildcard
-    elsif ($op ~~ [qw(relaxed symbol wildcard)]) {
+    # Placeholder, relaxed or wildcard
+    elsif ($op ~~ [qw(placeholder relaxed wildcard)]) {
       my $name = $token->[1];
       $rendered = $values->{$name} // '';
       my $default = $self->defaults->{$name};
@@ -78,7 +78,8 @@ sub shape_match {
 
   # Compile on demand
   my $regex = $self->regex || $self->_compile;
-  my $format = $detect ? ($self->format || $self->_compile_format) : undef;
+  my $format
+    = $detect ? ($self->format_regex || $self->_compile_format) : undef;
 
   # Match
   return unless my @captures = $$pathref =~ $regex;
@@ -86,17 +87,17 @@ sub shape_match {
 
   # Merge captures
   my $result = {%{$self->defaults}};
-  for my $symbol (@{$self->symbols}) {
+  for my $placeholder (@{$self->placeholders}) {
     last unless @captures;
     my $capture = shift @captures;
-    $result->{$symbol} = $capture if defined $capture;
+    $result->{$placeholder} = $capture if defined $capture;
   }
 
   # Format
-  my $req = $self->reqs->{format};
-  return $result if !$detect || defined $req && !$req;
+  my $constraint = $self->constraints->{format};
+  return $result if !$detect || defined $constraint && !$constraint;
   if ($$pathref =~ s!^/?$format!!) { $result->{format} = $1 }
-  elsif ($req) { return unless $result->{format} }
+  elsif ($constraint) { return unless $result->{format} }
 
   return $result;
 }
@@ -106,9 +107,9 @@ sub _compile {
 
   # Compile tree to regex
   my $block = my $regex = '';
-  my $reqs = $self->reqs;
-  my $optional = 1;
-  my $defaults = $self->defaults;
+  my $constraints = $self->constraints;
+  my $optional    = 1;
+  my $defaults    = $self->defaults;
   for my $token (reverse @{$self->tree}) {
     my $op       = $token->[0];
     my $compiled = '';
@@ -129,23 +130,23 @@ sub _compile {
       $optional = 0;
     }
 
-    # Symbol
-    elsif ($op ~~ [qw(relaxed symbol wildcard)]) {
+    # Placeholder
+    elsif ($op ~~ [qw(placeholder relaxed wildcard)]) {
       my $name = $token->[1];
-      unshift @{$self->symbols}, $name;
+      unshift @{$self->placeholders}, $name;
+
+      # Placeholder
+      if ($op eq 'placeholder') { $compiled = '([^\/\.]+)' }
 
       # Relaxed
-      if ($op eq 'relaxed') { $compiled = '([^\/]+)' }
-
-      # Symbol
-      elsif ($op eq 'symbol') { $compiled = '([^\/\.]+)' }
+      elsif ($op eq 'relaxed') { $compiled = '([^\/]+)' }
 
       # Wildcard
       elsif ($op eq 'wildcard') { $compiled = '(.+)' }
 
       # Custom regex
-      my $req = $reqs->{$name};
-      $compiled = _compile_req($req) if $req;
+      my $constraint = $constraints->{$name};
+      $compiled = _compile_req($constraint) if $constraint;
 
       # Optional placeholder
       $optional = 0 unless exists $defaults->{$name};
@@ -167,14 +168,13 @@ sub _compile_format {
   my $self = shift;
 
   # Default regex
-  my $reqs = $self->reqs;
-  return $self->format(qr!\.([^/]+)$!)->format
-    if !exists $reqs->{format} && $reqs->{format};
+  my $c = $self->constraints;
+  return $self->format_regex(qr!\.([^/]+)$!)->format_regex
+    if !exists $c->{format} && $c->{format};
 
   # Compile custom regex
-  my $regex
-    = defined $reqs->{format} ? _compile_req($reqs->{format}) : '([^/]+)';
-  return $self->format(qr!\.$regex$!)->format;
+  my $regex = defined $c->{format} ? _compile_req($c->{format}) : '([^/]+)';
+  return $self->format_regex(qr!\.$regex$!)->format_regex;
 }
 
 # "Interesting... Oh no wait, the other thing, tedious."
@@ -190,8 +190,8 @@ sub _tokenize {
   # Token
   my $quote_end   = $self->quote_end;
   my $quote_start = $self->quote_start;
+  my $placeholder = $self->placeholder_start;
   my $relaxed     = $self->relaxed_start;
-  my $symbol      = $self->symbol_start;
   my $wildcard    = $self->wildcard_start;
 
   # Parse the pattern character wise
@@ -201,24 +201,24 @@ sub _tokenize {
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
     # Inside a placeholder
-    my $placeholder = $state ~~ [qw(relaxed symbol wildcard)];
+    my $inside = $state ~~ [qw(placeholder relaxed wildcard)];
 
     # Quote start
     if ($char eq $quote_start) {
       $quoted = 1;
-      $state  = 'symbol';
-      push @tree, ['symbol', ''];
+      $state  = 'placeholder';
+      push @tree, ['placeholder', ''];
     }
 
-    # Symbol start
-    elsif ($char eq $symbol) {
-      push @tree, ['symbol', ''] if $state ne 'symbol';
-      $state = 'symbol';
+    # Placeholder start
+    elsif ($char eq $placeholder) {
+      push @tree, ['placeholder', ''] if $state ne 'placeholder';
+      $state = 'placeholder';
     }
 
     # Relaxed or wildcard start (upgrade when quoted)
     elsif ($char ~~ [$relaxed, $wildcard]) {
-      push @tree, ['symbol', ''] unless $quoted;
+      push @tree, ['placeholder', ''] unless $quoted;
       $tree[-1]->[0] = $state = $char eq $relaxed ? 'relaxed' : 'wildcard';
     }
 
@@ -234,8 +234,8 @@ sub _tokenize {
       $state = 'text';
     }
 
-    # Relaxed, symbol or wildcard
-    elsif ($placeholder && $char =~ /\w/) { $tree[-1]->[-1] .= $char }
+    # Placeholder, relaxed or wildcard
+    elsif ($inside && $char =~ /\w/) { $tree[-1]->[-1] .= $char }
 
     # Text
     else {
@@ -277,6 +277,13 @@ L<Mojolicious::Routes::Pattern> is the core of L<Mojolicious::Routes>.
 
 L<Mojolicious::Routes::Pattern> implements the following attributes.
 
+=head2 C<constraints>
+
+  my $constraints = $pattern->constraints;
+  $pattern        = $pattern->constraints({foo => qr/\w+/});
+
+Regex constraints.
+
 =head2 C<defaults>
 
   my $defaults = $pattern->defaults;
@@ -284,10 +291,10 @@ L<Mojolicious::Routes::Pattern> implements the following attributes.
 
 Default parameters.
 
-=head2 C<format>
+=head2 C<format_regex>
 
-  my $regex = $pattern->format;
-  $pattern  = $pattern->format($regex);
+  my $regex = $pattern->format_regex;
+  $pattern  = $pattern->format_regex($regex);
 
 Compiled regex for format matching.
 
@@ -297,6 +304,20 @@ Compiled regex for format matching.
   $pattern    = $pattern->pattern('/(foo)/(bar)');
 
 Raw unparsed pattern.
+
+=head2 C<placeholder_start>
+
+  my $placeholder = $pattern->placeholder_start;
+  $pattern        = $pattern->placeholder_start(':');
+
+Character indicating a placeholder, defaults to C<:>.
+
+=head2 C<placeholders>
+
+  my $placeholders = $pattern->placeholders;
+  $pattern         = $pattern->placeholders(['foo', 'bar']);
+
+Placeholder names.
 
 =head2 C<quote_end>
 
@@ -325,27 +346,6 @@ Pattern in compiled regex form.
   $pattern    = $pattern->relaxed_start('*');
 
 Character indicating a relaxed placeholder, defaults to C<#>.
-
-=head2 C<reqs>
-
-  my $reqs = $pattern->reqs;
-  $pattern = $pattern->reqs({foo => qr/\w+/});
-
-Regex constraints.
-
-=head2 C<symbol_start>
-
-  my $symbol = $pattern->symbol_start;
-  $pattern   = $pattern->symbol_start(':');
-
-Character indicating a placeholder, defaults to C<:>.
-
-=head2 C<symbols>
-
-  my $symbols = $pattern->symbols;
-  $pattern    = $pattern->symbols(['foo', 'bar']);
-
-Placeholder names.
 
 =head2 C<tree>
 

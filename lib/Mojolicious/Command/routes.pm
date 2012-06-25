@@ -72,8 +72,9 @@ sub _draw {
     my $pattern = $node->[1]->pattern;
     $pattern->match('/', $node->[1]->is_endpoint);
     my $regex    = (regexp_pattern $pattern->regex)[0];
-    my $format   = (regexp_pattern $pattern->format || '')[0];
-    my $optional = !$pattern->reqs->{format} || $pattern->defaults->{format};
+    my $format   = (regexp_pattern $pattern->format_regex || '')[0];
+    my $optional = !$pattern->constraints->{format}
+      || $pattern->defaults->{format};
     $format .= '?' if $format && $optional;
     push @parts, $format ? "$regex$format" : $regex if $verbose;
 

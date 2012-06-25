@@ -6,7 +6,7 @@ use Test::More tests => 90;
 use Mojo::ByteStream 'b';
 use Mojolicious::Routes::Pattern;
 
-# Normal pattern with text, symbols and a default value
+# Normal pattern with text, placeholders and a default value
 my $pattern = Mojolicious::Routes::Pattern->new('/test/(controller)/:action');
 $pattern->defaults({action => 'index'});
 my $result = $pattern->match('/test/foo/bar', 1);
@@ -45,7 +45,7 @@ is $pattern->render({controller => 'zzz', action => 'index', id => 13}),
   '/test/zzz/index/13', 'right result';
 is $pattern->render({controller => 'zzz'}), '/test/zzz', 'right result';
 
-# Quoted symbol
+# Quoted placeholders
 $pattern = Mojolicious::Routes::Pattern->new('/(:controller)test/(action)');
 $pattern->defaults({action => 'index'});
 $result = $pattern->match('/footest/bar');
@@ -126,20 +126,20 @@ is $pattern->render({test => $value}), "/$value", 'right result';
 # Format detection
 $pattern = Mojolicious::Routes::Pattern->new('/test');
 $pattern->defaults({action => 'index'});
-ok !$pattern->regex,  'no regex';
-ok !$pattern->format, 'no format regex';
+ok !$pattern->regex,        'no regex';
+ok !$pattern->format_regex, 'no format regex';
 $result = $pattern->match('/test.xml', 1);
-ok $pattern->regex,  'regex has been compiled on demand';
-ok $pattern->format, 'format regex has been compiled on demand';
+ok $pattern->regex,        'regex has been compiled on demand';
+ok $pattern->format_regex, 'format regex has been compiled on demand';
 is $result->{action}, 'index', 'right value';
 is $result->{format}, 'xml',   'right value';
 $pattern = Mojolicious::Routes::Pattern->new('/test.json');
 $pattern->defaults({action => 'index'});
-ok !$pattern->regex,  'no regex';
-ok !$pattern->format, 'no format regex';
+ok !$pattern->regex,        'no regex';
+ok !$pattern->format_regex, 'no format regex';
 $result = $pattern->match('/test.json');
 ok $pattern->regex, 'regex has been compiled on demand';
-ok !$pattern->format, 'no format regex';
+ok !$pattern->format_regex, 'no format regex';
 is $result->{action}, 'index', 'right value';
 is $result->{format}, undef,   'no value';
 $result = $pattern->match('/test.json', 1);
@@ -153,11 +153,11 @@ is $result, undef, 'no result';
 # Formats without detection
 $pattern = Mojolicious::Routes::Pattern->new('/test');
 $pattern->defaults({action => 'index'});
-ok !$pattern->regex,  'no regex';
-ok !$pattern->format, 'no format regex';
+ok !$pattern->regex,        'no regex';
+ok !$pattern->format_regex, 'no format regex';
 $result = $pattern->match('/test.xml');
 ok $pattern->regex, 'regex has been compiled on demand';
-ok !$pattern->format, 'no format regex';
+ok !$pattern->format_regex, 'no format regex';
 is $result, undef, 'no result';
 $result = $pattern->match('/test');
 is $result->{action}, 'index', 'right value';
@@ -173,7 +173,7 @@ is $result, undef, 'no result';
 
 # Special pattern for disabling format detection
 $pattern = Mojolicious::Routes::Pattern->new(format => 0);
-is $pattern->reqs->{format}, 0, 'right value';
+is $pattern->constraints->{format}, 0, 'right value';
 $pattern->defaults({action => 'index'});
 $result = $pattern->match('/', 1);
 is $result->{action}, 'index', 'right value';

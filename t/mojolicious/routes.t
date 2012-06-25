@@ -208,7 +208,7 @@ is $r->find('0')->to_string,          '/0',     'right pattern';
 is $r->find('test_edit')->to_string, '/:controller/test/edit', 'right pattern';
 is $r->find('articles_delete')->to_string, '/articles/:id/delete',
   'right pattern';
-is $r->find('nodetect')->pattern->reqs->{format}, 0, 'right value';
+is $r->find('nodetect')->pattern->constraints->{format}, 0, 'right value';
 is $r->find('nodetect')->to->{controller}, 'foo', 'right controller';
 
 # Null route

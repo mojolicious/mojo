@@ -140,7 +140,7 @@ sub path_for {
     = defined $captures->{format}
     ? $captures->{format}
     : $pattern->defaults->{format}
-    if $pattern->reqs->{format};
+    if $pattern->constraints->{format};
 
   # Render
   my $path = $endpoint->render('', \%values);

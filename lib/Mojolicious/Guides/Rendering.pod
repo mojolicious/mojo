@@ -322,6 +322,34 @@ single render call.
 And if no viable representation could be found, the C<any> fallback will be
 used or an empty C<204> response rendered automatically.
 
+=head2 Rendering C<exception> and C<not_found> pages
+
+By now you've probably already encountered the built-in 404 (Not Found) and
+500 (Server Error) pages, that get rendered automatically when you make a
+mistake. Especially during development they can be a great help, the methods
+L<Mojolicious::Controller/"render_exception"> and
+L<Mojolicious::Controller/"render_not_found"> can be used to render them
+manually.
+
+  # 500
+  $self->render_exception("I've made a huge mistake!");
+
+  # 404
+  $self->render_not_found;
+
+You can also change the templates of those pages, since you most likely want
+to show your users something more closely related to your application in
+production. The renderer will always try to find C<exception.$mode.$format.*>
+or C<not_found.$mode.$format.*> before falling back to the built-in default
+templates.
+
+  @@ not_found.production.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head><title>Page not found</title></head>
+    <body>Page does not seem to exist.</body>
+  </html>
+
 =head2 Helpers
 
 Helpers are little functions you can use in templates and controller code.
@@ -723,22 +751,6 @@ plugin.
 
   @@ alertassets.html.ep
   %= javascript "/alertassets.js"
-
-=head2 Custom C<exception> and C<not_found> templates
-
-While the built-in C<exception> and C<not_found> templates are very useful
-during development, you most likely want to show your users something more
-related to your application in production. That's why L<Mojolicious> will
-always try to render C<exception.$mode.$format.*> or
-C<not_found.$mode.$format.*> before falling back to the built-in default
-templates.
-
-  @@ not_found.production.html.ep
-  <!DOCTYPE html>
-  <html>
-    <head><title>Page not found</title></head>
-    <body>Page does not seem to exist.</body>
-  </html>
 
 =head1 ADVANCED
 

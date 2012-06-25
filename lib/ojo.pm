@@ -205,7 +205,7 @@ L<Mojo::Message::Response> object.
 
 Turn HTML5/XML input into L<Mojo::DOM> object.
 
-  $ perl -Mojo -E 'say x("<div>Hello!</div>")->at("div")->text'
+  $ perl -Mojo -E 'say x(b("/home/sri/test.html")->slurp)->at("title")->text'
 
 =head1 SEE ALSO
 

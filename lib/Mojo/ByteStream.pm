@@ -276,7 +276,7 @@ Size of bytestream.
 
 Alias for L<Mojo::Util/"slurp">.
 
-  b("/home/sri/myapp.pl")->slurp->split("\n")->shuffle->join("\n")->say;
+  b('/home/sri/myapp.pl')->slurp->split("\n")->shuffle->join("\n")->say;
 
 =head2 C<split>
 

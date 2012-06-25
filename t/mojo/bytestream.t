@@ -5,7 +5,7 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 147;
+use Test::More tests => 146;
 
 # MIME::Base64 needs to be loaded first to trigger edge case
 use MIME::Base64;
@@ -404,10 +404,8 @@ is $buffer, "test\n123\n", 'right output';
 
 # slurp
 my $file = catfile(splitdir($FindBin::Bin), qw(templates exception.mt));
-$stream = b('whatever')->slurp($file);
+$stream = b($file)->slurp;
 is $stream, "test\n% die;\n123\n", 'right content';
-$stream = b()->slurp($file)->b64_encode('');
-is $stream, 'dGVzdAolIGRpZTsKMTIzCg==', 'right content';
 $stream = b($file)->slurp->split("\n")->grep(sub {/die/})->join('');
 is $stream, '% die;', 'right content';
 

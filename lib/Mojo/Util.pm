@@ -1,11 +1,13 @@
 package Mojo::Util;
 use Mojo::Base 'Exporter';
 
+use Carp 'croak';
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(sha1 sha1_hex);
 use Encode ();
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
+use IO::Handle;
 use MIME::Base64 qw(decode_base64 encode_base64);
 
 # Punycode bootstring parameters
@@ -39,8 +41,8 @@ our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
   qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode),
-  qw(quote secure_compare sha1_bytes sha1_sum trim unquote url_escape),
-  qw(url_unescape xml_escape)
+  qw(quote secure_compare sha1_bytes sha1_sum slurp_file trim unquote),
+  qw(url_escape url_unescape xml_escape)
 );
 
 sub b64_decode { decode_base64(shift) }
@@ -261,6 +263,14 @@ sub secure_compare {
 
 sub sha1_bytes { sha1(@_) }
 sub sha1_sum   { sha1_hex(@_) }
+
+sub slurp_file {
+  my $path = shift;
+  croak qq{Can't open file "$path": $!} unless open my $file, '<', $path;
+  my $content = '';
+  while ($file->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
+  return $content;
+}
 
 sub trim {
   my $string = shift;
@@ -544,6 +554,12 @@ Generate binary SHA1 checksum for string.
   my $checksum = sha1_sum $string;
 
 Generate SHA1 checksum for string.
+
+=head2 C<slurp_file>
+
+  my $bytes = slurp_file '/etc/passwd';
+
+Read all data at once from file.
 
 =head2 C<trim>
 

@@ -22,7 +22,6 @@ use Test::More tests => 200;
 # "When I held that gun in my hand, I felt a surge of power...
 #  like God must feel when he's holding a gun."
 use File::Spec::Functions qw(catfile splitdir);
-use File::Temp;
 use FindBin;
 use Mojo::Template;
 
@@ -1030,13 +1029,13 @@ EOF
 
 # File
 $mt = Mojo::Template->new;
-my $file = catfile(splitdir($FindBin::Bin), qw(lib test.mt));
+my $file = catfile(splitdir($FindBin::Bin), qw(templates test.mt));
 $output = $mt->render_file($file, 3);
 like $output, qr/23\nHello World!/, 'file';
 
 # Exception in file
 $mt     = Mojo::Template->new;
-$file   = catfile(splitdir($FindBin::Bin), qw(lib exception.mt));
+$file   = catfile(splitdir($FindBin::Bin), qw(templates exception.mt));
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/exception\.mt line 2/, 'message contains filename';
@@ -1063,7 +1062,7 @@ like "$output", qr/foo\.mt line 2/, 'right result';
 
 # Exception with utf8 context
 $mt     = Mojo::Template->new;
-$file   = catfile(splitdir($FindBin::Bin), qw(lib utf8_exception.mt));
+$file   = catfile(splitdir($FindBin::Bin), qw(templates utf8_exception.mt));
 $output = $mt->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->lines_before->[0]->[1], '☃', 'right line';
@@ -1075,6 +1074,6 @@ is utf8::is_utf8($output->lines_after->[0]->[1]), 1, 'context has utf8 flag';
 
 # Different encodings
 $mt = Mojo::Template->new(encoding => 'shift_jis');
-$file = catfile(splitdir($FindBin::Bin), qw(lib utf8_exception.mt));
+$file = catfile(splitdir($FindBin::Bin), qw(templates utf8_exception.mt));
 ok !eval { $mt->render_file($file) }, 'file not rendered';
 like $@, qr/invalid encoding/, 'right error';

@@ -10,8 +10,7 @@ use File::Basename 'dirname';
 use File::Find 'find';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
-use Mojo::Asset::File;
-use Mojo::Util 'class_to_path';
+use Mojo::Util qw(class_to_path slurp_file);
 
 has app_class => 'Mojo::HelloWorld';
 
@@ -95,9 +94,7 @@ sub rel_dir { catdir(@{shift->{parts} || []}, split '/', shift) }
 
 sub rel_file { catfile(@{shift->{parts} || []}, split '/', shift) }
 
-sub slurp_rel_file {
-  Mojo::Asset::File->new(path => shift->rel_file(@_))->slurp;
-}
+sub slurp_rel_file { slurp_file shift->rel_file(@_) }
 
 sub to_string { catdir(@{shift->{parts} || []}) }
 
@@ -192,7 +189,7 @@ Portably generate an absolute path for a file relative to the home directory.
 
 =head2 C<slurp_rel_file>
 
-  my $string = $home->slurp_rel_file('foo/bar.html');
+  my $bytes = $home->slurp_rel_file('foo/bar.html');
 
 Portably read all data at once from file relative to the home directory.
 

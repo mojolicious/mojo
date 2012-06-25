@@ -66,12 +66,15 @@ sub say {
   say $handle $$self;
 }
 
-sub secure_compare {
-  my ($self, $check) = @_;
-  return Mojo::Util::secure_compare $$self, $check;
-}
+sub secure_compare { Mojo::Util::secure_compare ${shift()}, @_ }
 
 sub size { length ${shift()} }
+
+sub slurp_file {
+  my $self = shift;
+  $$self = Mojo::Util::slurp_file @_;
+  return $self;
+}
 
 sub split {
   my ($self, $pattern) = @_;
@@ -272,6 +275,12 @@ Alias for L<Mojo::Util/"sha1_sum">.
   my $size = $stream->size;
 
 Size of bytestream.
+
+=head2 C<slurp_file>
+
+  $stream = $stream->slurp_file('/etc/passwd');
+
+Alias for L<Mojo::Util/"slurp_file">.
 
 =head2 C<split>
 

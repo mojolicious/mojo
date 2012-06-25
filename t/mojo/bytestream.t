@@ -5,10 +5,12 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 144;
+use Test::More tests => 146;
 
-# Need to be loaded first to trigger edge case
+# MIME::Base64 needs to be loaded first to trigger edge case
 use MIME::Base64;
+use File::Spec::Functions qw(catfile splitdir);
+use FindBin;
 use Mojo::Util 'md5_bytes';
 use Mojo::ByteStream 'b';
 
@@ -400,13 +402,14 @@ b(1, 2, 3)->say;
 *STDOUT = $stdout;
 is $buffer, "test\n123\n", 'right output';
 
-# Nested bytestreams
-$stream = b(b('test'));
-ok !ref $stream->to_string, 'nested bytestream stringified';
-$stream = Mojo::ByteStream->new(Mojo::ByteStream->new('test'));
-ok !ref $stream->to_string, 'nested bytestream stringified';
+# slurp_file
+my $file = catfile(splitdir($FindBin::Bin), qw(templates exception.mt));
+$stream = b('whatever')->slurp_file($file);
+is $stream, "test\n% die;\n123\n", 'right content';
+$stream = b()->slurp_file($file)->b64_encode('');
+is $stream, 'dGVzdAolIGRpZTsKMTIzCg==', 'right content';
 
-# Secure compare
+# secure_compare
 ok b('hello')->secure_compare('hello'),  'values are equal';
 ok !b('hell')->secure_compare('hello'),  'values are not equal';
 ok !b('hallo')->secure_compare('hello'), 'values are not equal';
@@ -424,3 +427,9 @@ ok b('♥1')->secure_compare('♥1'),    'values are equal';
 ok !b('♥')->secure_compare('♥0'),    'values are not equal';
 ok !b('0♥')->secure_compare('♥'),    'values are not equal';
 ok !b('0♥1')->secure_compare('1♥0'), 'values are not equal';
+
+# Nested bytestreams
+$stream = b(b('test'));
+ok !ref $stream->to_string, 'nested bytestream stringified';
+$stream = Mojo::ByteStream->new(Mojo::ByteStream->new('test'));
+ok !ref $stream->to_string, 'nested bytestream stringified';

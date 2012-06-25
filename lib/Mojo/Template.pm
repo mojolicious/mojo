@@ -2,10 +2,9 @@ package Mojo::Template;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use IO::Handle;
 use Mojo::ByteStream;
 use Mojo::Exception;
-use Mojo::Util qw(decode encode);
+use Mojo::Util qw(decode encode slurp_file);
 
 # "If for any reason you're not completely satisfied, I hate you."
 has [qw(auto_escape compiled)];
@@ -295,9 +294,7 @@ sub render_file {
 
   # Slurp file
   $self->name($path) unless defined $self->{name};
-  croak qq{Can't open template "$path": $!} unless open my $file, '<', $path;
-  my $tmpl = '';
-  while ($file->sysread(my $buffer, 131072, 0)) { $tmpl .= $buffer }
+  my $tmpl = slurp_file $path;
 
   # Decode and render
   if (my $encoding = $self->encoding) {

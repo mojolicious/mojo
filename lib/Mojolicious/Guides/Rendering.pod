@@ -341,7 +341,7 @@ manually.
 
     # 404
     return $self->render_not_found
-      unless looks_like_number($dividend) && looks_like_number($divisor);
+      unless looks_like_number $dividend && looks_like_number $divisor;
 
     # 500
     return $self->render_exception('Division by zero!') if $divisor == 0;
@@ -830,7 +830,6 @@ script, so don't forget to use the L<utf8> pragma if necessary.
   @@ heart.html.ep
   I ♥ Mojolicious!
 
-
 =head2 Base64 encoded DATA files
 
 Base64 encoded static files such as images can be easily stored in the C<DATA>
@@ -851,8 +850,8 @@ C<templates> and C<public> directories.
 
 =head2 Customizing the template syntax
 
-You can easily change the whole template syntax by loading the C<ep_renderer>
-plugin with a custom configuration.
+You can easily change the whole template syntax by loading
+L<Mojolicious::Plugin::EPRenderer> with a custom configuration.
 
   use Mojolicious::Lite;
 

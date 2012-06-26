@@ -331,11 +331,26 @@ L<Mojolicious::Controller/"render_exception"> and
 L<Mojolicious::Controller/"render_not_found"> can be used to render them
 manually.
 
-  # 500
-  $self->render_exception("I've made a huge mistake!");
+  use Mojolicious::Lite;
+  use Scalar::Util 'looks_like_number';
 
-  # 404
-  $self->render_not_found;
+  get '/divide/:dividend/by/:divisor' => sub {
+    my $self     = shift;
+    my $dividend = $self->param('dividend');
+    my $divisor  = $self->param('divisor');
+
+    # 404
+    return $self->render_not_found
+      unless looks_like_number($dividend) && looks_like_number($divisor);
+
+    # 500
+    return $self->render_exception('Division by zero!') if $divisor == 0;
+
+    # 200
+    $self->render_text($dividend / $divisor);
+  };
+
+  app->start;
 
 You can also change the templates of those pages, since you most likely want
 to show your users something more closely related to your application in

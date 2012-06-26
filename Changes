@@ -1,4 +1,7 @@
 
+3.01  2012-06-26
+  - Improved documentation. (diegok, sri)
+
 3.0  2012-06-25
   - Code name "Rainbow", this is a major release.
   - Removed Mojolicious::Plugin::I18N so it can be maintained as a separate

@@ -58,7 +58,10 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
   # Mojolicious::Lite
   my $config = plugin 'JSONConfig';
 
-  # Reads "myapp.json" by default
+  # foo.html.ep
+  %= $config->{foo}
+
+  # The configuration is available application wide
   my $config = app->config;
 
   # Everything can be customized with options

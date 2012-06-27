@@ -40,7 +40,7 @@ sub DESTROY {
 sub run {
   my ($self, $path) = @_;
 
-  # No windows support
+  # No Windows support
   _exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
 
   # Application

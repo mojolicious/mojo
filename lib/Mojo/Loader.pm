@@ -71,7 +71,7 @@ sub _all {
   my $content = join '', <$handle>;
   close $handle;
 
-  # Ignore everything before __DATA__ (windows will seek to start of file)
+  # Ignore everything before __DATA__ (Windows will seek to start of file)
   $content =~ s/^.*\n__DATA__\r?\n/\n/s;
 
   # Ignore everything after __END__

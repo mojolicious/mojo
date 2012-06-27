@@ -148,14 +148,13 @@ Mojolicious::Plugin::PODRenderer - POD renderer plugin
   my $route = $self->plugin('PODRenderer');
   my $route = $self->plugin(PODRenderer => {name => 'foo'});
   my $route = $self->plugin(PODRenderer => {preprocess => 'epl'});
-  $self->render('some_template', handler => 'pod');
-  %= pod_to_html "=head1 TEST\n\nC<123>"
 
   # Mojolicious::Lite
   my $route = plugin 'PODRenderer';
   my $route = plugin PODRenderer => {name => 'foo'};
   my $route = plugin PODRenderer => {preprocess => 'epl'};
-  $self->render('some_template', handler => 'pod');
+
+  # foo.html.ep
   %= pod_to_html "=head1 TEST\n\nC<123>"
 
 =head1 DESCRIPTION

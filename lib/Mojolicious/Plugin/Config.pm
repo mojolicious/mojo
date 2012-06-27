@@ -72,9 +72,8 @@ sub register {
   $config = {%$config, %{$self->load($mode, $conf, $app)}}
     if defined $mode && -e $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
-  my $current = $app->config;
+  my $current = $app->defaults(config => $app->config)->config;
   %$current = (%$current, %$config);
-  $app->defaults(config => $current);
 
   return $current;
 }
@@ -99,7 +98,10 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
   # Mojolicious::Lite
   my $config = plugin 'Config';
 
-  # Reads "myapp.conf" by default
+  # foo.html.ep
+  %= $config->{foo}
+
+  # The configuration is available application wide
   my $config = app->config;
 
   # Everything can be customized with options

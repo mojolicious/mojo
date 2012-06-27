@@ -661,7 +661,17 @@ L<Mojo::Transaction::WebSocket> object.
   $c        = $c->param(foo => qw(ba;r ba;z));
 
 Access GET/POST parameters, file uploads and route captures that are not
-reserved stash values.
+reserved stash values. Note that this method is context sensitive and
+therefore needs to be used with care, every GET/POST parameter can have
+multiple values, which might have unexpected consequences.
+
+  # List context is ambiguous and should be avoided
+  my $hash = {name => $self->param('name')};
+
+  # Better enforce scalar context
+  my $hash = {name => scalar $self->param('name')};
+
+For more control you can also access request information directly.
 
   # Only GET parameters
   my $foo = $c->req->url->query->param('foo');

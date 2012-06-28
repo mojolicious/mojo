@@ -693,7 +693,7 @@ Submit a C<POST> form and check for transport errors, takes the exact same
 arguments as L<Mojo::UserAgent/"post_form">.
 
   # Test file upload
-  $t->post_form_ok('/uplaod' => {foo => {content => 'bar'}})->status_is(200);
+  $t->post_form_ok('/upload' => {foo => {content => 'bar'}})->status_is(200);
 
 =head2 C<put_ok>
 

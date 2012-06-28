@@ -295,11 +295,15 @@ Actual endpoint for transaction.
 Versatile L<Mojo::Transaction::HTTP> builder for C<POST> requests with form
 data.
 
-  # Inspect generated request
-  say $t->form('mojolicio.us' => {a => [1, 2, 3]})->req->to_string;
+  # Multipart upload with filename
+  my $tx = $t->form(
+    'mojolicio.us' => {fun => {content => 'Hello!', filename => 'test.txt'}});
 
-  # Streaming multipart file upload
+  # Multipart upload streamed from file
   my $tx = $t->form('mojolicio.us' => {fun => {file => '/etc/passwd'}});
+
+  # Inspect generated request
+  say $t->form('mojolicio.us' => {a => [1, 2], b => 3})->req->to_string;
 
 While the "multipart/form-data" content type will be automatically used
 instead of "application/x-www-form-urlencoded" when necessary, you can also

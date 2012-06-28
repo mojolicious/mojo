@@ -512,9 +512,9 @@ additional information.
 
 =head2 Bridges
 
-Bridges can be used to share code with multiple nested routes, because unlike
-normal nested routes, they always match and result in additional dispatch
-cycles.
+Bridge routes can be used to share code with multiple nested routes, because
+unlike normal nested routes, they always match and result in additional
+dispatch cycles.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'baz'}

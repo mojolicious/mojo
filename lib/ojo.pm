@@ -13,7 +13,7 @@ use Mojo::UserAgent;
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 
 # User agent
-my $UA = Mojo::UserAgent->new;
+our $UA = Mojo::UserAgent->new;
 
 # "I'm sorry, guys. I never meant to hurt you.
 #  Just to destroy everything you ever believed in."

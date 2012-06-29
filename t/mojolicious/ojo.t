@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 # "What do you mean 'we', flesh-tube?"
 use ojo;
@@ -65,3 +65,5 @@ is c(1, 2, 3)->join('-'), '1-2-3', 'right result';
 
 # Dumper
 is r([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
+
+is defined $ojo::UA, 1, 'right $UA';

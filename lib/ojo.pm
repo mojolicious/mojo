@@ -70,7 +70,7 @@ sub _request {
 
 =head1 NAME
 
-ojo - Fun Oneliners with Mojo!
+ojo - Fun oneliners with Mojo!
 
 =head1 SYNOPSIS
 

@@ -1012,7 +1012,7 @@ requests. See also the tutorial above for more argument variations.
   my $route = under sub {...};
   my $route = under '/:foo';
 
-Generate bridge with L<Mojolicious::Routes::Route/"under">, to which all
+Generate bridge route with L<Mojolicious::Routes::Route/"under">, to which all
 following routes are automatically appended. See also the tutorial above for
 more argument variations.
 

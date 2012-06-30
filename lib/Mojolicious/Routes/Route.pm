@@ -377,7 +377,7 @@ also the L<Mojolicious::Lite> tutorial for more argument variations.
   my $bridge = $r->bridge('/:action', action => qr/\w+/);
   my $bridge = $r->bridge(format => 0);
 
-Generate bridge.
+Generate bridge route.
 
   my $auth = $r->bridge('/user')->to('user#auth');
   $auth->get('/show')->to('#show');
@@ -586,8 +586,8 @@ Stringify the whole route.
   my $route = $r->under(sub {...});
   my $route = $r->under('/:foo');
 
-Generate bridge. See also the L<Mojolicious::Lite> tutorial for more argument
-variations.
+Generate bridge route. See also the L<Mojolicious::Lite> tutorial for more
+argument variations.
 
   my $auth = $r->under('/user')->to('user#auth');
   $auth->get('/show')->to('#show');

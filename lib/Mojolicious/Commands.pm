@@ -172,7 +172,7 @@ List available options for the command with short descriptions.
 
   $ ./myapp.pl cgi
 
-Start application with CGI backend.
+Start application with CGI backend, usually auto detected.
 
 =head2 C<cpanify>
 
@@ -249,7 +249,7 @@ application into real files.
 
   $ ./myapp.pl psgi
 
-Start application with PSGI backend.
+Start application with PSGI backend, usually auto detected.
 
 =head2 C<routes>
 

@@ -690,6 +690,8 @@ be very useful.
   # GET /example/show -> {controller => 'example', action => 'show'}
   my $show = $r->get('/show')->to('example#show');
   $r->any('/example')->add_child($show);
+
+  # Nothing
   $r->get('/secrets/show')->to('secrets#show')->name('show_secrets');
   $r->find('show_secrets')->remove;
 

@@ -72,8 +72,11 @@
         margin: 0;
         text-shadow: #333 0 1px 0;
       }
-      #showcase td { padding: 0.1em }
-      #showcase td.value { padding-left: 1em }
+      #showcase td {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      #showcase .key { padding-right: 0 }
       #more, #trace {
         -moz-border-radius-bottomleft: 5px;
         border-bottom-left-radius: 5px;

@@ -713,11 +713,9 @@ C<url_for>.
   my $success = $c->render('foo/index');
   my $output  = $c->render('foo/index', partial => 1);
 
-This is a wrapper around L<Mojolicious::Renderer/"render"> exposing pretty
-much all functionality provided by it. It will set a default template to use
-based on the controller and action name or fall back to the route name. You
-can call it with a hash or hash reference of options which can be preceded by
-an optional template name.
+This is a wrapper around L<Mojolicious::Renderer/"render">, if no template is
+provided a default one based on controller and action or route name will be
+generated. All additional values get merged into the C<stash>.
 
 =head2 C<render_content>
 
@@ -735,7 +733,7 @@ C<extends> features.
   $c->render_data($bytes, format => 'png');
 
 Render the given content as raw bytes, similar to C<render_text> but data will
-not be encoded.
+not be encoded. All additional values get merged into the C<stash>.
 
   # Longer version
   $c->render(data => $bytes);
@@ -753,7 +751,8 @@ C<exception.$format.*> and set the response status code to C<500>.
   $c->render_json({foo => 'bar'});
   $c->render_json([1, 2, -3], status => 201);
 
-Render a data structure as JSON.
+Render a data structure as JSON. All additional values get merged into the
+C<stash>.
 
   # Longer version
   $c->render(json => {foo => 'bar'});
@@ -803,9 +802,9 @@ C<public> directory or C<DATA> section of your application.
   $c->render_text('Hello World', layout => 'green');
 
 Render the given content as Perl characters, which will be encoded to bytes.
-See C<render_data> for an alternative without encoding. Note that this does
-not change the content type of the response, which is
-C<text/html;charset=UTF-8> by default.
+All additional values get merged into the C<stash>. See C<render_data> for an
+alternative without encoding. Note that this does not change the content type
+of the response, which is C<text/html;charset=UTF-8> by default.
 
   # Longer version
   $c->render(text => 'Hello World!');
@@ -818,7 +817,8 @@ C<text/html;charset=UTF-8> by default.
   $c = $c->rendered;
   $c = $c->rendered(302);
 
-Finalize response and run C<after_dispatch> plugin hook.
+Finalize response and run C<after_dispatch> plugin hook, defaults to using a
+C<200> response code.
 
   # Stream content directly from file
   $c->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));

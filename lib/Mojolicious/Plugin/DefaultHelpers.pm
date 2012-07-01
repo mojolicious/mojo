@@ -203,7 +203,7 @@ Dump a Perl data structure using L<Data::Dumper>.
   % extends 'blue';
   % extends 'blue', title => 'Blue!';
 
-Extend a template, all arguments get merged into the stash.
+Extend a template. All additional values get merged into the C<stash>.
 
 =head2 C<flash>
 
@@ -224,7 +224,8 @@ only available in the partial template.
   % layout 'green';
   % layout 'green', title => 'Green!';
 
-Render this template with a layout, all arguments get merged into the stash.
+Render this template with a layout. All additional values get merged into the
+C<stash>.
 
 =head2 C<memorize>
 
@@ -268,7 +269,7 @@ Alias for L<Mojolicious::Controller/"stash">.
   % title 'Welcome!', foo => 'bar';
   %= title
 
-Page title, all arguments get merged into the stash.
+Page title. All additional values get merged into the C<stash>.
 
 =head2 C<url_for>
 

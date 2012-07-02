@@ -61,7 +61,7 @@ sub register {
           my $attrs = shift->attrs;
           $attrs->{href} =~ s!%3A%3A!/!gi
             if $attrs->{href}
-              =~ s!^http\://search\.cpan\.org/perldoc\?!$perldoc!;
+            =~ s!^http\://search\.cpan\.org/perldoc\?!$perldoc!;
         }
       );
 

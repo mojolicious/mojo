@@ -288,7 +288,7 @@ post '/with/body/and/headers/desc' => sub {
   my $self = shift;
   return
     if $self->req->headers->header('with') ne 'header'
-      || $self->req->body ne 'body';
+    || $self->req->body ne 'body';
   $self->render_text('bar');
 };
 

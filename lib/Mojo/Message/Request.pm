@@ -184,7 +184,7 @@ sub _build_start_line {
     $clone->userinfo(undef);
     $path = $clone
       unless lc($self->headers->upgrade || '') eq 'websocket'
-        || ($url->scheme || '') eq 'https';
+      || ($url->scheme || '') eq 'https';
   }
 
   # HTTP 0.9

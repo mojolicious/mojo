@@ -43,7 +43,7 @@ sub parse {
       # Attributes (Netscape and RFC 6265)
       next
         unless my @match
-          = $name =~ /^(expires|domain|path|secure|Max-Age|HttpOnly)$/msi;
+        = $name =~ /^(expires|domain|path|secure|Max-Age|HttpOnly)$/msi;
       my $attr = lc $match[0];
       $attr =~ tr/-/_/;
       $cookies[-1]->$attr($attr =~ /(?:secure|HttpOnly)/i ? 1 : $value);

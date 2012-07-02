@@ -97,8 +97,8 @@ sub register {
       my $expires = $args->{expires} || 0;
       delete $memorize{$name}
         if exists $memorize{$name}
-          && $expires > 0
-          && $memorize{$name}{expires} < time;
+        && $expires > 0
+        && $memorize{$name}{expires} < time;
 
       # Memorized
       return $memorize{$name}{content} if exists $memorize{$name};

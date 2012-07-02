@@ -119,7 +119,7 @@ sub parse {
     $self->{real_size} += length $self->{pre_buffer};
     $self->{buffer} .= $self->{pre_buffer}
       unless $self->is_finished
-        && length($self->{buffer}) > $self->max_leftover_size;
+      && length($self->{buffer}) > $self->max_leftover_size;
     $self->{pre_buffer} = '';
   }
 

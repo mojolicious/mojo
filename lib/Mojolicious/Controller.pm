@@ -713,7 +713,7 @@ C<url_for>.
   my $success = $c->render('foo/index');
   my $output  = $c->render('foo/index', partial => 1);
 
-This is a wrapper around L<Mojolicious::Renderer/"render">, if no template is
+Render content using L<Mojolicious::Renderer/"render">, if no template is
 provided a default one based on controller and action or route name will be
 generated. All additional values get merged into the C<stash>.
 
@@ -724,7 +724,7 @@ generated. All additional values get merged into the C<stash>.
   my $output = $c->render_content(header => 'Hello world!');
   my $output = $c->render_content(header => sub { 'Hello world!' });
 
-Contains partial rendered templates, used for the renderers C<layout> and
+Contains partial rendered content, used for the renderers C<layout> and
 C<extends> features.
 
 =head2 C<render_data>

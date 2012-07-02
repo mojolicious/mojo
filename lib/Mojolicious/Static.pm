@@ -16,9 +16,6 @@ has paths   => sub { [] };
 sub dispatch {
   my ($self, $c) = @_;
 
-  # Already rendered
-  return if $c->res->code;
-
   # Canonical path
   my $stash = $c->stash;
   my $path  = $stash->{path}

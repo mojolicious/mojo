@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 21;
+use Test::More tests => 24;
 
 # "Just once I'd like to eat dinner with a celebrity who isn't bound and
 #  gagged."
@@ -42,7 +42,14 @@ hook around_dispatch => sub {
   $next->();
 };
 
-# Custom dispatchers /custom
+# Custom dispatcher /hello.txt
+hook before_dispatch => sub {
+  my $self = shift;
+  $self->render_text('Custom static file works!')
+    if $self->req->url->path->contains('/hello.txt');
+};
+
+# Custom dispatcher /custom
 hook before_dispatch => sub {
   my $self = shift;
   $self->render_text($self->param('a'), status => 205)
@@ -66,6 +73,10 @@ my $t = Test::Mojo->new;
 
 # GET /
 $t->get_ok('/')->status_is(200)->content_is('works');
+
+# GET /hello.txt (override static file)
+$t->get_ok('/hello.txt')->status_is(200)
+  ->content_is('Custom static file works!');
 
 # GET /custom
 $t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');

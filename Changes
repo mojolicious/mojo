@@ -1,7 +1,9 @@
 
 3.02  2012-07-02
   - Improved documentation.
+  - Improved tests.
   - Fixed JSON Pointer escaping.
+  - Fixed small inconsistency between routes and static dispatchers.
 
 3.01  2012-07-01
   - Improved CSS of built-in templates.

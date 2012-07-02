@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 24;
+use Test::More tests => 25;
 
 # "I've had it with this school, Skinner.
 #  Low test scores, class after class of ugly, ugly children..."
@@ -51,6 +51,8 @@ is $p->get([{'foo/bar' => 'bar'}], '/0/foo%2Fbar'), undef,
   '"/0/foo%2Fbar" is "undef"';
 is $p->get([{'foo/bar' => 'bar'}], '/0/foo~1bar'), 'bar',
   '"/0/foo~1bar" is "bar"';
+is $p->get([{'foo/bar/baz' => 'yada'}], '/0/foo~1bar~1baz'), 'yada',
+  '"/0/foo~1bar~1baz" is "yada"';
 is $p->get([{'foo~/bar' => 'bar'}], '/0/foo~0~1bar'), 'bar',
   '"/0/foo~0~1bar" is "bar"';
 is $p->get(

@@ -1,6 +1,7 @@
 
 3.02  2012-07-02
   - Improved documentation.
+  - Fixed JSON Pointer escaping.
 
 3.01  2012-07-01
   - Improved CSS of built-in templates.

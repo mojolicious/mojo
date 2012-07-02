@@ -12,24 +12,12 @@ sub get      { shift->_pointer(0, @_) }
 sub _pointer {
   my ($self, $contains, $data, $pointer) = @_;
 
-  # Tokenize pointer
+  # Parse pointer and walk data structure
   $pointer = decode('UTF-8', url_unescape $pointer);
-  my ($escaped, @parts);
-  while (length(my $char = substr $pointer, 0, 1, '')) {
-
-    # Caret escaped
-    ++$escaped and next if $char eq '^' && !$escaped;
-
-    # Slash
-    if ($char eq '/' && !$escaped) { push @parts, '' }
-
-    # Character
-    else { $parts[-1] .= $char }
-    $escaped = undef;
-  }
-
-  # Walk data structure
-  for my $p (@parts) {
+  return $data unless $pointer =~ s!^/!!;
+  for my $p (split '/', $pointer) {
+    $p =~ s/~0/~/g;
+    $p =~ s!~1!/!g;
 
     # Hash
     if (ref $data eq 'HASH' && exists $data->{$p}) { $data = $data->{$p} }

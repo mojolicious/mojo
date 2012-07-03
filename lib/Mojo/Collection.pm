@@ -36,8 +36,7 @@ sub first {
 #  I can get by with one."
 sub grep {
   my ($self, $cb) = @_;
-  return $self->new(grep { $_->$cb } @$self) if ref $cb eq 'CODE';
-  return $self->new(grep { $_ =~ $cb } @$self);
+  return $self->new(grep { $_ ~~ $cb } @$self);
 }
 
 sub join {

@@ -1,6 +1,6 @@
 
 3.02  2012-07-03
-  - Added pluck method to Mojo::Collection.
+  - Added pluck and uniq methods to Mojo::Collection.
   - Added regular expression support to first and grep methods in
     Mojo::Collection.
   - Improved documentation.

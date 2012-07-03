@@ -77,6 +77,12 @@ sub sort {
   return $self->new(sort { $a->$cb($b) } @$self);
 }
 
+sub uniq {
+  my $self = shift;
+  my %seen;
+  return $self->new(grep { !$seen{$_}++ } @$self);
+}
+
 1;
 
 =head1 NAME
@@ -218,6 +224,12 @@ Sort elements based on return value of closure and create a new collection
 from the results.
 
   my $insensitive = $collection->sort(sub { uc(shift) cmp uc(shift) });
+
+=head2 C<uniq>
+
+  my $new = $collection->uniq;
+
+Create a new collection without duplicate elements.
 
 =head1 SEE ALSO
 

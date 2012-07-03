@@ -406,7 +406,7 @@ is $buffer, "test\n123\n", 'right output';
 my $file = catfile(splitdir($FindBin::Bin), qw(templates exception.mt));
 $stream = b($file)->slurp;
 is $stream, "test\n% die;\n123\n", 'right content';
-$stream = b($file)->slurp->split("\n")->grep(sub {/die/})->join('');
+$stream = b($file)->slurp->split("\n")->grep(qr/die/)->join('');
 is $stream, '% die;', 'right content';
 
 # secure_compare

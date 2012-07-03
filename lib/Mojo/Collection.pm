@@ -36,7 +36,8 @@ sub first {
 #  I can get by with one."
 sub grep {
   my ($self, $cb) = @_;
-  return $self->new(grep { $_->$cb } @$self);
+  return $self->new(grep { $_->$cb } @$self) if ref $cb eq 'CODE';
+  return $self->new(grep { $_ =~ $cb } @$self);
 }
 
 sub join {
@@ -141,12 +142,14 @@ which the closure returns true.
 
 =head2 C<grep>
 
+  my $new = $collection->grep(qr/foo/);
   my $new = $collection->grep(sub {...});
 
-Evaluate closure for each element in collection and create a new collection
-with all elements for which the closure returned true.
+Evaluate regular expression or closure for each element in collection and
+create a new collection with all elements that matched the regular expression,
+or for which the closure returned true.
 
-  my $interesting = $collection->grep(sub { /mojo/i });
+  my $interesting = $collection->grep(qr/mojo/i);
 
 =head2 C<join>
 

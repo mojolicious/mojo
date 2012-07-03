@@ -1,5 +1,6 @@
 
-3.02  2012-07-02
+3.02  2012-07-03
+  - Added regular expression support to grep method in Mojo::Collection.
   - Improved documentation.
   - Improved tests.
   - Fixed JSON Pointer escaping.

@@ -499,8 +499,8 @@ just make a list of possible values.
 
   app->start;
 
-All placeholders get compiled to a regex internally, this process can also be
-easily customized.
+All placeholders get compiled to a regular expression internally, this process
+can also be easily customized.
 
   use Mojolicious::Lite;
 

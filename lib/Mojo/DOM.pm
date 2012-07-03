@@ -133,12 +133,12 @@ sub namespace {
   my $self = shift;
 
   # Prefix
-  return if (my $current = $self->tree)->[0] eq 'root';
+  return '' if (my $current = $self->tree)->[0] eq 'root';
   my $prefix = $current->[1] =~ /^(.*?)\:/ ? $1 : '';
 
   # Walk tree
   while ($current) {
-    return if $current->[0] eq 'root';
+    return '' if $current->[0] eq 'root';
     my $attrs = $current->[2];
 
     # Namespace for prefix
@@ -147,11 +147,13 @@ sub namespace {
     }
 
     # Namespace attribute
-    elsif (defined $attrs->{xmlns}) { return $attrs->{xmlns} || undef }
+    elsif (defined $attrs->{xmlns}) { return $attrs->{xmlns} }
 
     # Parent
     $current = $current->[3];
   }
+
+  return '';
 }
 
 sub parent {
@@ -280,7 +282,7 @@ sub type {
   my ($self, $type) = @_;
 
   # Not a tag
-  return if (my $tree = $self->tree)->[0] eq 'root';
+  return '' if (my $tree = $self->tree)->[0] eq 'root';
 
   # Get
   return $tree->[1] unless $type;
@@ -318,7 +320,7 @@ sub _add {
 }
 
 sub _elements {
-  my $e = shift;
+  return [] unless my $e = shift;
   return [@$e[($e->[0] eq 'root' ? 1 : 4) .. $#$e]];
 }
 
@@ -391,7 +393,7 @@ sub _trim {
   my ($e, $trim) = @_;
 
   # Disabled
-  return 0 unless $trim = defined $trim ? $trim : 1;
+  return 0 unless $e && ($trim = defined $trim ? $trim : 1);
 
   # Detect "pre" tag
   while ($e->[0] eq 'tag') {

@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 768;
+use Test::More tests => 774;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -122,11 +122,17 @@ $simple->parent->attrs(bar => 'baz')->attrs({this => 'works', too => 'yea'});
 is $simple->parent->attrs('bar'),  'baz',   'right parent attribute';
 is $simple->parent->attrs('this'), 'works', 'right parent attribute';
 is $simple->parent->attrs('too'),  'yea',   'right parent attribute';
-is $dom->at('test#test')->type,         'test',   'right type';
-is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
-is $dom->at('[class="working"]')->type, 'simple', 'right type';
-is $dom->at('[class$=ing]')->type,      'simple', 'right type';
-is $dom->at('[class=working]')->type,   'simple', 'right type';
+is $dom->at('test#test')->type,            'test',   'right type';
+is $dom->at('[class$="ing"]')->type,       'simple', 'right type';
+is $dom->at('[class="working"]')->type,    'simple', 'right type';
+is $dom->at('[class$=ing]')->type,         'simple', 'right type';
+is $dom->at('[class=working]')->type,      'simple', 'right type';
+is $dom->at('[class=working]')->namespace, '',       'no namespace';
+is $dom->at('foo')->namespace,             '',       'no namespace';
+is $dom->namespace,   '', 'no namespace';
+is $dom->type,        '', 'no type';
+is $dom->text_before, '', 'no text';
+is $dom->text_after,  '', 'no text';
 
 # Class and ID
 $dom = Mojo::DOM->new->parse('<div id="id" class="class">a</div>');
@@ -418,7 +424,7 @@ EOF
 is $dom->xml, 1, 'xml mode detected';
 is $dom->at('book comment')->namespace, 'uri:default-ns', 'right namespace';
 is $dom->at('book comment')->text,      'rocks!',         'right text';
-is $dom->at('book nons section')->namespace, undef,         'no namespace';
+is $dom->at('book nons section')->namespace, '',            'no namespace';
 is $dom->at('book nons section')->text,      'Nothing',     'right text';
 is $dom->at('book meta number')->namespace,  'uri:isbn-ns', 'right namespace';
 is $dom->at('book meta number')->text, '978-0596000271', 'right text';

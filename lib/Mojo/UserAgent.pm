@@ -549,7 +549,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
 
   # Scrape the latest headlines from a news site
   $ua->max_redirects(5)->get('www.reddit.com/r/perl/')
-    ->res->dom('p.title > a.title')->each(sub { say $_->text });
+    ->res->dom('p.title > a.title')->pluck('text')->join("\n")->say;
 
   # IPv6 PUT request with content
   my $tx

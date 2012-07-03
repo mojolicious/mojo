@@ -14,7 +14,7 @@ my $dom = Mojo::DOM->new->parse(
   '<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');
 is $dom->at('#b')->text, 'B', 'right text';
 my @div;
-$dom->find('div[id]')->each(sub { push @div, shift->text });
+push @div, $dom->find('div[id]')->pluck('text')->each;
 is_deeply \@div, [qw(A B)], 'found all div elements with id';
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, $_->text });
@@ -301,7 +301,7 @@ is $dom->replace(''), '', 'right result';
 is "$dom", '', 'right result';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
-$dom->find('p')->each(sub { shift->replace('') });
+$dom->find('p')->pluck(replace => '');
 is "$dom", '<div>foobar</div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>♥</div>');
 $dom->at('div')->replace_content('☃');

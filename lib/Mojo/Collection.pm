@@ -80,7 +80,7 @@ sub sort {
 sub uniq {
   my $self = shift;
   my %seen;
-  return $self->new(grep { !$seen{$_}++ } @$self);
+  return $self->grep(sub { !$seen{$_}++ });
 }
 
 1;

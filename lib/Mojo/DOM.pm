@@ -56,11 +56,9 @@ sub at { shift->find(@_)->[0] }
 sub attrs {
   my $self = shift;
 
-  # Not a tag
-  return {} if (my $tree = $self->tree)->[0] eq 'root';
-
   # Hash
-  my $attrs = $tree->[2];
+  my $tree = $self->tree;
+  my $attrs = $tree->[0] eq 'root' ? {} : $tree->[2];
   return $attrs unless @_;
 
   # Get

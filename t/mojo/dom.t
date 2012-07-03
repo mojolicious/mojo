@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 774;
+use Test::More tests => 776;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -133,6 +133,8 @@ is $dom->namespace,   '', 'no namespace';
 is $dom->type,        '', 'no type';
 is $dom->text_before, '', 'no text';
 is $dom->text_after,  '', 'no text';
+is $dom->attrs('foo'), '', 'no attribute';
+is $dom->attrs(foo => 'bar')->attrs('foo'), '', 'no attribute';
 
 # Class and ID
 $dom = Mojo::DOM->new->parse('<div id="id" class="class">a</div>');

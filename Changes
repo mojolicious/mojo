@@ -6,7 +6,7 @@
   - Improved documentation.
   - Improved tests.
   - Fixed JSON Pointer escaping.
-  - Fixed small text and attribute extraction bug in Mojo::DOM.
+  - Fixed small text and attribute extraction bugs in Mojo::DOM.
   - Fixed small inconsistency between routes and static dispatchers.
 
 3.01  2012-07-01

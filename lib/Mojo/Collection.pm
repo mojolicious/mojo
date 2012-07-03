@@ -28,7 +28,7 @@ sub each {
 sub first {
   my ($self, $cb) = @_;
   return $self->[0] unless $cb;
-  return List::Util::first { $_->$cb } @$self;
+  return List::Util::first { $_ ~~ $cb } @$self;
 }
 
 # "All right, let's not panic.
@@ -132,10 +132,12 @@ Evaluate closure for each element in collection.
 =head2 C<first>
 
   my $first = $collection->first;
+  my $first = $collection->first(qr/foo/);
   my $first = $collection->first(sub {...});
 
-Evaluate closure for each element in collection and return the first one for
-which the closure returns true.
+Evaluate regular expression or closure for each element in collection and
+return the first one that matched the regular expression, or for which the
+closure returned true.
 
   my $five = $collection->first(sub { $_ == 5 });
 

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 52;
+use Test::More tests => 53;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 use Mojo::Collection 'c';
@@ -29,6 +29,7 @@ is $collection->first, 5, 'right result';
 is_deeply $collection->first(sub { ref $_ eq 'ARRAY' }), [3, 2],
   'right result';
 is $collection->first(sub { shift() < 5 }), 4, 'right result';
+is $collection->first(qr/[1-4]/), 4, 'right result';
 is $collection->first(sub { ref $_ eq 'CODE' }), undef, 'no result';
 $collection = c();
 is $collection->first, undef, 'no result';

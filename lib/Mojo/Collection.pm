@@ -49,6 +49,11 @@ sub map {
   return $self->new(map { $_->$cb } @$self);
 }
 
+sub pluck {
+  my ($self, $method, @args) = @_;
+  return $self->map(sub { $_->$method(@args) });
+}
+
 sub reverse {
   my $self = shift;
   return $self->new(reverse @$self);
@@ -168,6 +173,14 @@ Evaluate closure for each element in collection and create a new collection
 from the results.
 
   my $doubled = $collection->map(sub { $_ * 2 });
+
+=head2 C<pluck>
+
+  my $new = $collection->pluck($method);
+  my $new = $collection->pluck($method, @args);
+
+Call method on each element in collection and create a new collection from the
+results.
 
 =head2 C<reverse>
 

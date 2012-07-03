@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 53;
+use Test::More tests => 55;
 
 # "'What are you lookin at?' - the innocent words of a drunken child."
 use Mojo::Collection 'c';
@@ -114,3 +114,8 @@ is_deeply [$collection->slice(-3, -5)->each], [10, 6], 'right result';
 is_deeply [$collection->slice(1, 2, 3)->each], [2, 3, 4], 'right result';
 is_deeply [$collection->slice(6, 1, 4)->each], [7, 2, 5], 'right result';
 is_deeply [$collection->slice(6 .. 9)->each], [7, 10, 9, 8], 'right result';
+
+# pluck
+$collection = c(c(1, 2, 3), c(4, 5, 6), c(7, 8, 9));
+is $collection->pluck('reverse'), "3\n2\n1\n6\n5\n4\n9\n8\n7", 'right result';
+is $collection->pluck(join => '-'), "1-2-3\n4-5-6\n7-8-9", 'right result';

@@ -219,7 +219,7 @@ sub _tokenize {
     # Relaxed or wildcard start (upgrade when quoted)
     elsif ($char ~~ [$relaxed, $wildcard]) {
       push @tree, ['placeholder', ''] unless $quoted;
-      $tree[-1]->[0] = $state = $char eq $relaxed ? 'relaxed' : 'wildcard';
+      $tree[-1][0] = $state = $char eq $relaxed ? 'relaxed' : 'wildcard';
     }
 
     # Quote end
@@ -235,17 +235,17 @@ sub _tokenize {
     }
 
     # Placeholder, relaxed or wildcard
-    elsif ($inside && $char =~ /\w/) { $tree[-1]->[-1] .= $char }
+    elsif ($inside && $char =~ /\w/) { $tree[-1][-1] .= $char }
 
     # Text
     else {
       $state = 'text';
 
       # New text element
-      push @tree, ['text', $char] and next unless $tree[-1]->[0] eq 'text';
+      push @tree, ['text', $char] and next unless $tree[-1][0] eq 'text';
 
       # More text
-      $tree[-1]->[-1] .= $char;
+      $tree[-1][-1] .= $char;
     }
   }
 

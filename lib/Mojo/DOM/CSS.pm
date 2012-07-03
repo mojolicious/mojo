@@ -133,7 +133,7 @@ sub _compile {
 
     # Empty combinator
     push @$part, [combinator => ' ']
-      if $part->[-1] && $part->[-1]->[0] ne 'combinator';
+      if $part->[-1] && $part->[-1][0] ne 'combinator';
 
     # Selector
     push @$part, ['element'];
@@ -161,7 +161,7 @@ sub _compile {
 
       # "not"
       if ($1 eq 'not') {
-        my $subpattern = $self->_compile($2)->[-1]->[-1];
+        my $subpattern = $self->_compile($2)->[-1][-1];
         push @$selector, ['pc', 'not', $subpattern];
       }
 

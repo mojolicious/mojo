@@ -438,9 +438,9 @@ is $dom->at('ook'),     undef, 'no result';
 is $dom->at('[xmlns\:bk]')->{'xmlns:bk'}, 'uri:book-ns', 'right attribute';
 is $dom->at('[bk]')->{'xmlns:bk'},        'uri:book-ns', 'right attribute';
 is $dom->at('[bk]')->attrs('xmlns:bk'), 'uri:book-ns', 'right attribute';
-is $dom->at('[bk]')->attrs('s:bk'),     undef,         'no attribute';
-is $dom->at('[bk]')->attrs('bk'),       undef,         'no attribute';
-is $dom->at('[bk]')->attrs('k'),        undef,         'no attribute';
+is $dom->at('[bk]')->attrs('s:bk'),     '',            'no attribute';
+is $dom->at('[bk]')->attrs('bk'),       '',            'no attribute';
+is $dom->at('[bk]')->attrs('k'),        '',            'no attribute';
 is $dom->at('[s\:bk]'), undef, 'no result';
 is $dom->at('[k]'),     undef, 'no result';
 

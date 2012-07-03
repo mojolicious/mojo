@@ -64,7 +64,7 @@ sub attrs {
   return $attrs unless @_;
 
   # Get
-  return $attrs->{$_[0]} unless @_ > 1 || ref $_[0];
+  return $attrs->{$_[0]} // '' unless @_ > 1 || ref $_[0];
 
   # Set
   %$attrs = (%$attrs, %{ref $_[0] ? $_[0] : {@_}});

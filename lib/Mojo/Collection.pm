@@ -182,6 +182,9 @@ from the results.
 Call method on each element in collection and create a new collection from the
 results.
 
+  # Equal to but more convenient than
+  my $new = $collection->map(sub { $_->$method(@args) });
+
 =head2 C<reverse>
 
   my $new = $collection->reverse;

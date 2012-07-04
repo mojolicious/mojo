@@ -130,19 +130,17 @@ sub find {
 sub namespace {
   my $self = shift;
 
-  # Prefix
+  # Namespace prefix
   return '' if (my $current = $self->tree)->[0] eq 'root';
-  my $prefix = $current->[1] =~ /^(.*?)\:/ ? $1 : '';
+  my $ns = $current->[1] =~ /^(.*?)\:/ ? "xmlns:$1" : undef;
 
   # Walk tree
   while ($current) {
-    return '' if $current->[0] eq 'root';
-    my $attrs = $current->[2];
+    last if $current->[0] eq 'root';
 
     # Namespace for prefix
-    if ($prefix) {
-      /^xmlns\:$prefix$/ and return $attrs->{$_} for keys %$attrs;
-    }
+    my $attrs = $current->[2];
+    if ($ns) { /^\Q$ns\E$/ and return $attrs->{$_} for keys %$attrs }
 
     # Namespace attribute
     elsif (defined $attrs->{xmlns}) { return $attrs->{xmlns} }
@@ -279,10 +277,8 @@ sub tree { shift->_parser(tree => @_) }
 sub type {
   my ($self, $type) = @_;
 
-  # Not a tag
-  return '' if (my $tree = $self->tree)->[0] eq 'root';
-
   # Get
+  return '' if (my $tree = $self->tree)->[0] eq 'root';
   return $tree->[1] unless $type;
 
   # Set

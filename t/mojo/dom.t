@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 776;
+use Test::More tests => 779;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -122,19 +122,11 @@ $simple->parent->attrs(bar => 'baz')->attrs({this => 'works', too => 'yea'});
 is $simple->parent->attrs('bar'),  'baz',   'right parent attribute';
 is $simple->parent->attrs('this'), 'works', 'right parent attribute';
 is $simple->parent->attrs('too'),  'yea',   'right parent attribute';
-is $dom->at('test#test')->type,            'test',   'right type';
-is $dom->at('[class$="ing"]')->type,       'simple', 'right type';
-is $dom->at('[class="working"]')->type,    'simple', 'right type';
-is $dom->at('[class$=ing]')->type,         'simple', 'right type';
-is $dom->at('[class=working]')->type,      'simple', 'right type';
-is $dom->at('[class=working]')->namespace, '',       'no namespace';
-is $dom->at('foo')->namespace,             '',       'no namespace';
-is $dom->namespace,   '', 'no namespace';
-is $dom->type,        '', 'no type';
-is $dom->text_before, '', 'no text';
-is $dom->text_after,  '', 'no text';
-is $dom->attrs('foo'), '', 'no attribute';
-is $dom->attrs(foo => 'bar')->attrs('foo'), '', 'no attribute';
+is $dom->at('test#test')->type,         'test',   'right type';
+is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
+is $dom->at('[class="working"]')->type, 'simple', 'right type';
+is $dom->at('[class$=ing]')->type,      'simple', 'right type';
+is $dom->at('[class=working]')->type,   'simple', 'right type';
 
 # Class and ID
 $dom = Mojo::DOM->new->parse('<div id="id" class="class">a</div>');
@@ -445,6 +437,28 @@ is $dom->at('[bk]')->attrs('bk'),       '',            'no attribute';
 is $dom->at('[bk]')->attrs('k'),        '',            'no attribute';
 is $dom->at('[s\:bk]'), undef, 'no result';
 is $dom->at('[k]'),     undef, 'no result';
+
+# Namespace with dot
+$dom = Mojo::DOM->new(<<EOF);
+<?xml version="1.0"?>
+<foo xmlns:foo.bar="uri:first">
+  <bar xmlns:fooxbar="uri:second">
+    <foo.bar:baz>First</fooxbar:baz>
+    <fooxbar:yada>Second</foo.bar:yada>
+  </bar>
+</foo>
+EOF
+is $dom->at('foo bar baz')->text,  'First',      'right text';
+is $dom->at('baz')->namespace,     'uri:first',  'right namespace';
+is $dom->at('foo bar yada')->text, 'Second',     'right text';
+is $dom->at('yada')->namespace,    'uri:second', 'right namespace';
+is $dom->at('foo')->namespace,     '',           'no namespace';
+is $dom->namespace,   '', 'no namespace';
+is $dom->type,        '', 'no type';
+is $dom->text_before, '', 'no text';
+is $dom->text_after,  '', 'no text';
+is $dom->attrs('foo'), '', 'no attribute';
+is $dom->attrs(foo => 'bar')->attrs('foo'), '', 'no attribute';
 
 # Yadis
 $dom = Mojo::DOM->new->parse(<<'EOF');

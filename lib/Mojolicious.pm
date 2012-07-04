@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo';
 
 use Carp 'croak';
 use Mojo::Exception;
+use Mojo::Home;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -35,6 +36,15 @@ has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Rainbow';
 our $VERSION  = '3.03';
+
+# Bundled templates
+our $H = Mojo::Home->new;
+$H->parse($H->parse($H->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
+our $MOJOBAR = $H->slurp_rel_file('mojobar.html.ep');
+my $EXCEPTION     = $H->slurp_rel_file('exception.html.ep');
+my $DEV_EXCEPTION = $H->slurp_rel_file('exception.development.html.ep');
+my $NOT_FOUND     = $H->slurp_rel_file('not_found.html.ep');
+my $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -155,14 +165,16 @@ sub handler {
   weaken $c->{tx};
 
   # Dispatcher
-  unless ($self->{dispatch}) {
+  unless ($self->{started}) {
     $self->hook(
       around_dispatch => sub {
         my ($next, $c) = @_;
         $c->app->dispatch($c);
       }
     );
-    $self->{dispatch}++;
+    $self->hook(around_exception => sub { _exception(pop) });
+    $self->hook(around_not_found => sub { _not_found(pop) });
+    $self->{started}++;
   }
 
   # Process
@@ -202,6 +214,56 @@ sub plugin {
 sub start { ($ENV{MOJO_APP} = shift)->commands->start(@_) }
 
 sub startup { }
+
+sub _exception {
+  my $c = shift;
+
+  # Render with fallbacks
+  my $mode    = $c->app->mode;
+  my $options = {
+    template => "exception.$mode",
+    format   => $c->stash->{format} || 'html',
+    handler  => undef,
+    status   => 500
+  };
+  my $inline = $mode eq 'development' ? $DEV_EXCEPTION : $EXCEPTION;
+  return if _fallbacks($c, $options, 'exception', $inline);
+  _fallbacks($c, {%$options, format => 'html'}, 'exception', $inline);
+}
+
+sub _fallbacks {
+  my ($c, $options, $template, $inline) = @_;
+
+  # Mode specific template
+  unless ($c->render($options)) {
+
+    # Template
+    $options->{template} = $template;
+    unless ($c->render($options)) {
+
+      # Inline template
+      my $stash = $c->stash;
+      return unless $stash->{format} eq 'html';
+      delete $stash->{layout};
+      delete $stash->{extends};
+      delete $options->{template};
+      return $c->render(%$options, inline => $inline, handler => 'ep');
+    }
+  }
+}
+
+sub _not_found {
+  my $c = shift;
+
+  # Render with fallbacks
+  my $mode = $c->app->mode;
+  my $format = $c->stash->{format} || 'html';
+  my $options
+    = {template => "not_found.$mode", format => $format, status => 404};
+  my $inline = $mode eq 'development' ? $DEV_NOT_FOUND : $NOT_FOUND;
+  return if _fallbacks($c, $options, 'not_found', $inline);
+  _fallbacks($c, {%$options, format => 'html'}, 'not_found', $inline);
+}
 
 1;
 
@@ -451,9 +513,7 @@ Extend L<Mojolicious> with hooks.
 
 These hooks are currently available and are emitted in the listed order:
 
-=over 2
-
-=item B<after_build_tx>
+=head3 C<after_build_tx>
 
 Emitted right after the transaction is built and before the HTTP request gets
 parsed.
@@ -468,7 +528,7 @@ rather advanced features such as upload progress bars possible, just note that
 it will not work for embedded applications. (Passed the transaction and
 application object)
 
-=item B<before_dispatch>
+=head3 C<before_dispatch>
 
 Emitted right before the static dispatcher and router start their work.
 
@@ -480,7 +540,7 @@ Emitted right before the static dispatcher and router start their work.
 Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller object)
 
-=item B<after_static_dispatch>
+=head3 C<after_static_dispatch>
 
 Emitted in reverse order after the static dispatcher determined if a static
 file should be served and before the router starts its work.
@@ -493,7 +553,7 @@ file should be served and before the router starts its work.
 Mostly used for custom dispatchers and post-processing static file responses.
 (Passed the default controller object)
 
-=item B<after_dispatch>
+=head3 C<after_dispatch>
 
 Emitted in reverse order after a response has been rendered. Note that this
 hook can trigger before C<after_static_dispatch> due to its dynamic nature.
@@ -506,7 +566,41 @@ hook can trigger before C<after_static_dispatch> due to its dynamic nature.
 Useful for rewriting outgoing responses and other post-processing tasks.
 (Passed the current controller object)
 
-=item B<around_dispatch>
+=head3 C<around_exception>
+
+Emitted when an exception occurs or
+L<Mojolicious::Controller/"render_exception"> has been called. The last hook
+in the chain will use the renderer to try and find an exception template or
+fall back to a built-in one.
+
+  $app->hook(around_exception => sub {
+    my ($next, $c) = @_;
+    ...
+    $next->();
+    ...
+  });
+
+Useful for monitoring and generating custom exception responses. (Passed a
+closure leading to the next hook and the current controller object)
+
+=head3 C<around_not_found>
+
+Emitted when the static dispatcher and router didn't handle a request or
+L<Mojolicious::Controller/"render_not_found"> has been called. The last hook
+in the chain will use the renderer to try and find a not found template or
+fall back to a built-in one.
+
+  $app->hook(around_not_found => sub {
+    my ($next, $c) = @_;
+    ...
+    $next->();
+    ...
+  });
+
+Useful for monitoring and generating custom fallback responses. (Passed a
+closure leading to the next hook and the current controller object)
+
+=head3 C<around_dispatch>
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you want
@@ -525,8 +619,6 @@ This is a very powerful hook and should not be used lightly, it allows you to
 customize application wide exception handling for example, consider it the
 sledgehammer in your toolbox. (Passed a closure leading to the next hook and
 the default controller object)
-
-=back
 
 =head2 C<plugin>
 

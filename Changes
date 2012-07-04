@@ -1,5 +1,6 @@
 
-3.03  2012-07-04
+3.03  2012-07-05
+  - Added around_exception and around_not_found hooks.
   - Improved documentation.
   - Improved tests.
   - Fixed small namespace detection bug in Mojo::DOM.

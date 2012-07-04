@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 83;
+use Test::More tests => 90;
 
 # "This calls for a party, baby.
 #  I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
@@ -18,6 +18,22 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
+
+# Custom exception handling
+hook around_exception => sub {
+  my ($next, $self) = @_;
+  return $self->render(inline => 'Custom exception: <%= $exception %>')
+    if $self->req->url->path->contains('/custom/exception');
+  $next->();
+};
+
+# Custom not_found handling
+hook around_not_found => sub {
+  my ($next, $self) = @_;
+  return $self->render(text => 'Custom not_found!')
+    if $self->req->url->path->contains('/custom/not_found');
+  $next->();
+};
 
 # Logger
 app->log->handle(undef);
@@ -101,6 +117,9 @@ get '/reuse/exception' => sub { die "Reusable exception.\n" };
 # GET /custom
 get '/custom' => sub { die "CUSTOM\n" };
 
+# GET /custom/exception
+get '/custom/exception' => sub { die "Custom dead!\n" };
+
 my $t = Test::Mojo->new;
 
 # GET /logger (debug)
@@ -177,6 +196,15 @@ $t->get_ok('/trapped/too')->status_is(200)->content_is('works');
 
 # GET /custom
 $t->get_ok('/custom')->status_is(200)->content_is('Custom handling works!');
+
+# GET /custom/exception
+$t->get_ok('/custom/exception')->status_is(200)
+  ->content_is("Custom exception: Custom dead!\n\n");
+like $log, qr/Custom dead!/, 'right result';
+
+# GET /custom/not_found
+$t->get_ok('/custom/not_found')->status_is(200)
+  ->content_is('Custom not_found!');
 
 # GET /missing_template
 $t->get_ok('/missing_template')->status_is(404)

@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 779;
+use Test::More tests => 783;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -275,7 +275,11 @@ is $dom->at('[class~=x]')->text,                      'Heart',   'right text';
 is $dom->at('div[class~=x]')->text,                   'Heart',   'right text';
 is $dom->at('html div[class~=x]')->text,              'Heart',   'right text';
 is $dom->at('html > div[class~=x]')->text,            'Heart',   'right text';
+is $dom->to_xml,      $unicode, 'XML is equal';
+is $dom->content_xml, $unicode, 'XML is equal';
 $dom->charset(undef);
+isnt $dom->to_xml,      $unicode, 'XML is not equal';
+isnt $dom->content_xml, $unicode, 'XML is not equal';
 
 # Looks remotely like HTML
 $dom = Mojo::DOM->new->parse(

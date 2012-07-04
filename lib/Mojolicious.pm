@@ -23,7 +23,7 @@ has routes   => sub { Mojolicious::Routes->new };
 has secret   => sub {
   my $self = shift;
 
-  # Warn developers about unsecure default
+  # Warn developers about insecure default
   $self->log->debug('Your secret passphrase needs to be changed!!!');
 
   # Default to application name
@@ -332,7 +332,7 @@ startup method to define the url endpoints for your application.
 
 A secret passphrase used for signed cookies and the like, defaults to the
 application name which is not very secure, so you should change it!!! As long
-as you are using the unsecure default there will be debug messages in the log
+as you are using the insecure default there will be debug messages in the log
 file reminding you to change your passphrase.
 
 =head2 C<sessions>

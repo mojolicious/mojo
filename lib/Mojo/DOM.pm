@@ -547,7 +547,8 @@ similar to C<find>.
 
   my $xml = $dom->content_xml;
 
-Render content of this element to XML.
+Render content of this element to XML. Note that the XML will be encoded if a
+C<charset> has been defined.
 
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->content_xml;
@@ -686,7 +687,8 @@ is enabled by default.
 
   my $xml = $dom->to_xml;
 
-Render this element and its content to XML.
+Render this element and its content to XML. Note that the XML will be encoded
+if a C<charset> has been defined.
 
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->b->to_xml;

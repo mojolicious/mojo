@@ -368,7 +368,7 @@ sub _hmac {
   my $hash = $sha ? sub { sha1(@_) } : sub { md5(@_) };
 
   # Secret
-  $secret = $secret ? "$secret" : 'Very unsecure!';
+  $secret = $secret ? "$secret" : 'Very insecure!';
   $secret = $hash->($secret) if length $secret > 64;
 
   # HMAC

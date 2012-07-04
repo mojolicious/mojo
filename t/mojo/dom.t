@@ -89,7 +89,10 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   more text
 </foo>
 EOF
-is $dom->xml, undef, 'xml mode not detected';
+is $dom->xml,  undef, 'xml mode not detected';
+is $dom->type, '',    'no type';
+is $dom->attrs('foo'), '', 'no attribute';
+is $dom->attrs(foo => 'bar')->attrs('foo'), '', 'no attribute';
 is $dom->tree->[1][0], 'doctype', 'right element';
 is $dom->tree->[1][1], ' foo',    'right doctype';
 is "$dom", <<EOF, 'right result';
@@ -415,7 +418,8 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   </meta>
 </bk:book>
 EOF
-is $dom->xml, 1, 'xml mode detected';
+is $dom->xml,       1,  'xml mode detected';
+is $dom->namespace, '', 'no namespace';
 is $dom->at('book comment')->namespace, 'uri:default-ns', 'right namespace';
 is $dom->at('book comment')->text,      'rocks!',         'right text';
 is $dom->at('book nons section')->namespace, '',            'no namespace';
@@ -453,12 +457,6 @@ is $dom->at('baz')->namespace,     'uri:first',  'right namespace';
 is $dom->at('foo bar yada')->text, 'Second',     'right text';
 is $dom->at('yada')->namespace,    'uri:second', 'right namespace';
 is $dom->at('foo')->namespace,     '',           'no namespace';
-is $dom->namespace,   '', 'no namespace';
-is $dom->type,        '', 'no type';
-is $dom->text_before, '', 'no text';
-is $dom->text_after,  '', 'no text';
-is $dom->attrs('foo'), '', 'no attribute';
-is $dom->attrs(foo => 'bar')->attrs('foo'), '', 'no attribute';
 
 # Yadis
 $dom = Mojo::DOM->new->parse(<<'EOF');
@@ -1927,6 +1925,8 @@ is $dom->text(0), "\n", 'right text';
 is $dom->all_text, "looks like\n  it\n    really\n  works", 'right text';
 is $dom->all_text(0), "\n  looks\n  like\n  it\n    really\n  \n  works\n\n",
   'right text';
+is $dom->text_before, '', 'no text';
+is $dom->text_after,  '', 'no text';
 is $dom->div->text, 'looks works', 'right text';
 is $dom->div->text(0), "\n  looks\n  \n  works\n", 'right text';
 is $dom->div->all_text, "looks like\n  it\n    really\n  works", 'right text';

@@ -1,5 +1,6 @@
 
 3.03  2012-07-04
+  - Improved tests.
   - Fixed small namespace detection bug in Mojo::DOM.
 
 3.02  2012-07-03

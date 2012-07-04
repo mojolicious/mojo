@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 692;
+use Test::More tests => 697;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -102,6 +102,12 @@ post '/multipart/form' => sub {
 get '/auto_name' => sub {
   my $self = shift;
   $self->render(text => $self->url_for('auto_name'));
+};
+
+# GET /query_string
+get '/query_string' => sub {
+  my $self = shift;
+  $self->render_text(b($self->req->url->query)->url_unescape);
 };
 
 # GET /reserved
@@ -678,6 +684,12 @@ $t->get_ok('/auto_name')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('/custom_name');
+
+# GET /query_string (query string roundtrip)
+$t->get_ok('/query_string?http://mojolicio.us/perldoc?foo=bar')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('http://mojolicio.us/perldoc?foo=bar');
 
 # GET /reserved
 $t->get_ok('/reserved?data=just-works')->status_is(200)

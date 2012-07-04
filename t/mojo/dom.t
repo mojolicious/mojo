@@ -210,10 +210,11 @@ is $dom->at('[id="snowm\000021an"]'),  undef, 'no result';
 is $dom->at('[id="snowm\000021 an"]'), undef, 'no result';
 
 # Unicode and escaped selectors
-my $unicode = encode 'UTF-8',
-  qq#<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>#;
+my $chars
+  = qq#<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>#;
+my $bytes = encode 'UTF-8', $chars;
 $dom = Mojo::DOM->new->charset('UTF-8');
-$dom->parse($unicode);
+$dom->parse($bytes);
 is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';
 is $dom->at('#\\2603 x')->text,                       'Snowman', 'right text';
 is $dom->at("#\\\n\\2603 x")->text,                   'Snowman', 'right text';
@@ -275,11 +276,11 @@ is $dom->at('[class~=x]')->text,                      'Heart',   'right text';
 is $dom->at('div[class~=x]')->text,                   'Heart',   'right text';
 is $dom->at('html div[class~=x]')->text,              'Heart',   'right text';
 is $dom->at('html > div[class~=x]')->text,            'Heart',   'right text';
-is $dom->to_xml,      $unicode, 'XML is equal';
-is $dom->content_xml, $unicode, 'XML is equal';
+is $dom->to_xml,      $bytes, 'XML is encoded';
+is $dom->content_xml, $bytes, 'XML is encoded';
 $dom->charset(undef);
-isnt $dom->to_xml,      $unicode, 'XML is not equal';
-isnt $dom->content_xml, $unicode, 'XML is not equal';
+is $dom->to_xml,      $chars, 'XML is not encoded';
+is $dom->content_xml, $chars, 'XML is not encoded';
 
 # Looks remotely like HTML
 $dom = Mojo::DOM->new->parse(

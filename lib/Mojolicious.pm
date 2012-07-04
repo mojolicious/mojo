@@ -513,7 +513,9 @@ Extend L<Mojolicious> with hooks.
 
 These hooks are currently available and are emitted in the listed order:
 
-=head3 C<after_build_tx>
+=over 2
+
+=item C<after_build_tx>
 
 Emitted right after the transaction is built and before the HTTP request gets
 parsed.
@@ -528,7 +530,7 @@ rather advanced features such as upload progress bars possible, just note that
 it will not work for embedded applications. (Passed the transaction and
 application object)
 
-=head3 C<before_dispatch>
+=item C<before_dispatch>
 
 Emitted right before the static dispatcher and router start their work.
 
@@ -540,7 +542,7 @@ Emitted right before the static dispatcher and router start their work.
 Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller object)
 
-=head3 C<after_static_dispatch>
+=item C<after_static_dispatch>
 
 Emitted in reverse order after the static dispatcher determined if a static
 file should be served and before the router starts its work.
@@ -553,7 +555,7 @@ file should be served and before the router starts its work.
 Mostly used for custom dispatchers and post-processing static file responses.
 (Passed the default controller object)
 
-=head3 C<after_dispatch>
+=item C<after_dispatch>
 
 Emitted in reverse order after a response has been rendered. Note that this
 hook can trigger before C<after_static_dispatch> due to its dynamic nature.
@@ -566,7 +568,7 @@ hook can trigger before C<after_static_dispatch> due to its dynamic nature.
 Useful for rewriting outgoing responses and other post-processing tasks.
 (Passed the current controller object)
 
-=head3 C<around_exception>
+=item C<around_exception>
 
 Emitted when an exception occurs or
 L<Mojolicious::Controller/"render_exception"> has been called. The last hook
@@ -583,7 +585,7 @@ fall back to a built-in one.
 Useful for monitoring and generating custom exception responses. (Passed a
 closure leading to the next hook and the current controller object)
 
-=head3 C<around_not_found>
+=item C<around_not_found>
 
 Emitted when the static dispatcher and router didn't handle a request or
 L<Mojolicious::Controller/"render_not_found"> has been called. The last hook
@@ -600,7 +602,7 @@ fall back to a built-in one.
 Useful for monitoring and generating custom fallback responses. (Passed a
 closure leading to the next hook and the current controller object)
 
-=head3 C<around_dispatch>
+=item C<around_dispatch>
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you want
@@ -619,6 +621,8 @@ This is a very powerful hook and should not be used lightly, it allows you to
 customize application wide exception handling for example, consider it the
 sledgehammer in your toolbox. (Passed a closure leading to the next hook and
 the default controller object)
+
+=back
 
 =head2 C<plugin>
 

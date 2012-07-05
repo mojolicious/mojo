@@ -246,9 +246,8 @@ sub put_ok { shift->_request_ok(put => @_) }
 
 sub reset_session {
   my $self = shift;
-  $self->ua->cookie_jar->empty;
-  $self->tx(undef);
-  return $self;
+  if (my $jar = $self->ua->cookie_jar) { $jar->empty }
+  return $self->tx(undef);
 }
 
 sub send_ok {

@@ -1,9 +1,10 @@
 
-3.03  2012-07-05
+3.03  2012-07-06
   - Improved Hypnotoad log messages.
   - Improved documentation.
   - Improved tests.
   - Fixed small namespace detection bug in Mojo::DOM.
+  - Fixed small bug in Test::Mojo.
 
 3.02  2012-07-03
   - Added pluck and uniq methods to Mojo::Collection.

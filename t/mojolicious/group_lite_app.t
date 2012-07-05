@@ -265,10 +265,9 @@ $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
 # GET /bridge2stash (again without cookie jar)
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!\n");
-$t->ua->cookie_jar(Mojo::UserAgent::CookieJar->new);
+$t->reset_session->ua->cookie_jar(Mojo::UserAgent::CookieJar->new);
 
 # GET /bridge2stash (fresh start)
-$t->reset_session;
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!\n");
 

@@ -311,7 +311,7 @@ sub _trim {
   for (my $j = @$line - 4; $j >= 0; $j -= 2) {
 
     # Skip capture
-    next if $line->[$j] eq 'cpst' || $line->[$j] eq 'cpen';
+    next if $line->[$j] ~~ [qw(cpst cpen)];
 
     # Only trim text
     return unless $line->[$j] eq 'text';

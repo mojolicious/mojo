@@ -213,15 +213,15 @@ sub _manage {
   # Workers
   while (my ($pid, $w) = each %{$self->{workers}}) {
 
-    # No heartbeat (graceful stop)
+    # No heartbeat (graceful shutdown)
     my $interval = $c->{heartbeat_interval};
     my $timeout  = $c->{heartbeat_timeout};
-    if ($w->{time} + $interval + $timeout <= time) {
+    if (!$w->{graceful} && ($w->{time} + $interval + $timeout <= time)) {
       $self->{log}->info("Worker $pid has no heartbeat, restarting.");
-      $w->{graceful} ||= time;
+      $w->{graceful} = time;
     }
 
-    # Graceful stop with timeout
+    # Graceful shutdown with timeout
     $w->{graceful} ||= time if $self->{graceful};
     if ($w->{graceful}) {
       $self->{log}->debug("Trying to stop worker $pid gracefully.");
@@ -321,7 +321,7 @@ sub _spawn {
   );
   $loop->unlock(sub { flock $lock, LOCK_UN });
 
-  # Heartbeat
+  # Heartbeat messages (stop sending during graceful shutdown)
   weaken $self;
   $loop->recurring(
     $c->{heartbeat_interval} => sub {
@@ -460,7 +460,8 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
 Maximum number of connections a worker is allowed to accept before stopping
 gracefully, defaults to C<1000>. Setting the value to C<0> will allow workers
-to accept new connections indefinitely.
+to accept new connections indefinitely. Note that worker processes stop
+sending heartbeat messages once this limit has been reached.
 
 =head2 C<backlog>
 

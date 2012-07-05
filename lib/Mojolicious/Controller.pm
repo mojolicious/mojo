@@ -232,19 +232,9 @@ sub render_data { shift->render(data => @_) }
 #  Neat."
 sub render_exception {
   my ($self, $e) = @_;
-
-  # Log exception
   my $app = $self->app;
   $app->log->error($e = Mojo::Exception->new($e));
-
-  # Filtered stash snapshot
-  my $stash = $self->stash;
-  my %snapshot = map { $_ => $stash->{$_} }
-    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
-
-  # Delegate
-  %$stash = (%$stash, snapshot => \%snapshot, exception => $e);
-  $app->plugins->emit_chain(around_exception => $self);
+  $app->plugins->emit_chain('around_exception', $self, $e);
 }
 
 # "If you hate intolerance and being punched in the face by me,

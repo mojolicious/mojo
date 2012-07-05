@@ -21,8 +21,8 @@ app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
 
 # Custom exception handling
 hook around_exception => sub {
-  my ($next, $self) = @_;
-  return $self->render(inline => 'Custom exception: <%= $exception %>')
+  my ($next, $self, $e) = @_;
+  return $self->render(text => "Custom exception: $e")
     if $self->req->url->path->contains('/custom/exception');
   $next->();
 };
@@ -199,7 +199,7 @@ $t->get_ok('/custom')->status_is(200)->content_is('Custom handling works!');
 
 # GET /custom/exception
 $t->get_ok('/custom/exception')->status_is(200)
-  ->content_is("Custom exception: Custom dead!\n\n");
+  ->content_is("Custom exception: Custom dead!\n");
 like $log, qr/Custom dead!/, 'right result';
 
 # GET /custom/not_found

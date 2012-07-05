@@ -172,8 +172,8 @@ sub handler {
         $c->app->dispatch($c);
       }
     );
-    $self->hook(around_exception => sub { _exception(pop) });
-    $self->hook(around_not_found => sub { _not_found(pop) });
+    $self->hook(around_exception => sub { _exception(@_) });
+    $self->hook(around_not_found => sub { _not_found(@_) });
     $self->{started}++;
   }
 
@@ -216,15 +216,22 @@ sub start { ($ENV{MOJO_APP} = shift)->commands->start(@_) }
 sub startup { }
 
 sub _exception {
-  my $c = shift;
+  my ($next, $c, $e) = @_;
+
+  # Filtered stash snapshot
+  my $stash = $c->stash;
+  my %snapshot = map { $_ => $stash->{$_} }
+    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
 
   # Render with fallbacks
   my $mode    = $c->app->mode;
   my $options = {
-    template => "exception.$mode",
-    format   => $c->stash->{format} || 'html',
-    handler  => undef,
-    status   => 500
+    exception => $e,
+    snapshot  => \%snapshot,
+    template  => "exception.$mode",
+    format    => $stash->{format} || 'html',
+    handler   => undef,
+    status    => 500
   };
   my $inline = $mode eq 'development' ? $DEV_EXCEPTION : $EXCEPTION;
   return if _fallbacks($c, $options, 'exception', $inline);
@@ -253,7 +260,7 @@ sub _fallbacks {
 }
 
 sub _not_found {
-  my $c = shift;
+  my ($next, $c) = @_;
 
   # Render with fallbacks
   my $mode = $c->app->mode;
@@ -576,14 +583,15 @@ in the chain will use the renderer to try and find an exception template or
 fall back to a built-in one.
 
   $app->hook(around_exception => sub {
-    my ($next, $c) = @_;
+    my ($next, $c, $e) = @_;
     ...
     $next->();
     ...
   });
 
 Useful for monitoring and generating custom exception responses. (Passed a
-closure leading to the next hook and the current controller object)
+closure leading to the next hook, the current controller object and an
+exception object)
 
 =item C<around_not_found>
 

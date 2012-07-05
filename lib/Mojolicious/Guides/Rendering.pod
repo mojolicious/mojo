@@ -358,11 +358,11 @@ production. The renderer will always try to find C<exception.$mode.$format.*>
 or C<not_found.$mode.$format.*> before falling back to the built-in default
 templates.
 
-  @@ not_found.production.html.ep
+  @@ exception.production.html.ep
   <!DOCTYPE html>
   <html>
-    <head><title>Page not found</title></head>
-    <body>Page does not seem to exist.</body>
+    <head><title>Server error</title></head>
+    <body><%= $exception %></body>
   </html>
 
 =head2 Helpers

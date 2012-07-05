@@ -3,7 +3,6 @@ use Mojo::Base 'Mojo';
 
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Home;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -36,15 +35,6 @@ has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Rainbow';
 our $VERSION  = '3.03';
-
-# Bundled templates
-our $H = Mojo::Home->new;
-$H->parse($H->parse($H->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
-our $MOJOBAR = $H->slurp_rel_file('mojobar.html.ep');
-my $EXCEPTION     = $H->slurp_rel_file('exception.html.ep');
-my $DEV_EXCEPTION = $H->slurp_rel_file('exception.development.html.ep');
-my $NOT_FOUND     = $H->slurp_rel_file('not_found.html.ep');
-my $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -165,16 +155,14 @@ sub handler {
   weaken $c->{tx};
 
   # Dispatcher
-  unless ($self->{started}) {
+  unless ($self->{dispatch}) {
     $self->hook(
       around_dispatch => sub {
         my ($next, $c) = @_;
         $c->app->dispatch($c);
       }
     );
-    $self->hook(around_exception => sub { _exception(@_) });
-    $self->hook(around_not_found => sub { _not_found(@_) });
-    $self->{started}++;
+    $self->{dispatch}++;
   }
 
   # Process
@@ -214,63 +202,6 @@ sub plugin {
 sub start { ($ENV{MOJO_APP} = shift)->commands->start(@_) }
 
 sub startup { }
-
-sub _exception {
-  my ($next, $c, $e) = @_;
-
-  # Filtered stash snapshot
-  my $stash = $c->stash;
-  my %snapshot = map { $_ => $stash->{$_} }
-    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
-
-  # Render with fallbacks
-  my $mode    = $c->app->mode;
-  my $options = {
-    exception => $e,
-    snapshot  => \%snapshot,
-    template  => "exception.$mode",
-    format    => $stash->{format} || 'html',
-    handler   => undef,
-    status    => 500
-  };
-  my $inline = $mode eq 'development' ? $DEV_EXCEPTION : $EXCEPTION;
-  return if _fallbacks($c, $options, 'exception', $inline);
-  _fallbacks($c, {%$options, format => 'html'}, 'exception', $inline);
-}
-
-sub _fallbacks {
-  my ($c, $options, $template, $inline) = @_;
-
-  # Mode specific template
-  unless ($c->render($options)) {
-
-    # Template
-    $options->{template} = $template;
-    unless ($c->render($options)) {
-
-      # Inline template
-      my $stash = $c->stash;
-      return unless $stash->{format} eq 'html';
-      delete $stash->{layout};
-      delete $stash->{extends};
-      delete $options->{template};
-      return $c->render(%$options, inline => $inline, handler => 'ep');
-    }
-  }
-}
-
-sub _not_found {
-  my ($next, $c) = @_;
-
-  # Render with fallbacks
-  my $mode = $c->app->mode;
-  my $format = $c->stash->{format} || 'html';
-  my $options
-    = {template => "not_found.$mode", format => $format, status => 404};
-  my $inline = $mode eq 'development' ? $DEV_NOT_FOUND : $NOT_FOUND;
-  return if _fallbacks($c, $options, 'not_found', $inline);
-  _fallbacks($c, {%$options, format => 'html'}, 'not_found', $inline);
-}
 
 1;
 
@@ -574,41 +505,6 @@ hook can trigger before C<after_static_dispatch> due to its dynamic nature.
 
 Useful for rewriting outgoing responses and other post-processing tasks.
 (Passed the current controller object)
-
-=item C<around_exception>
-
-Emitted when an exception occurs or
-L<Mojolicious::Controller/"render_exception"> has been called. The last hook
-in the chain will use the renderer to try and find an exception template or
-fall back to a built-in one.
-
-  $app->hook(around_exception => sub {
-    my ($next, $c, $e) = @_;
-    ...
-    $next->();
-    ...
-  });
-
-Useful for monitoring and generating custom exception responses. (Passed a
-closure leading to the next hook, the current controller object and an
-exception object)
-
-=item C<around_not_found>
-
-Emitted when the static dispatcher and router didn't handle a request or
-L<Mojolicious::Controller/"render_not_found"> has been called. The last hook
-in the chain will use the renderer to try and find a not found template or
-fall back to a built-in one.
-
-  $app->hook(around_not_found => sub {
-    my ($next, $c) = @_;
-    ...
-    $next->();
-    ...
-  });
-
-Useful for monitoring and generating custom fallback responses. (Passed a
-closure leading to the next hook and the current controller object)
 
 =item C<around_dispatch>
 

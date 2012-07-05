@@ -12,7 +12,7 @@ use Pod::Simple::Search;
 my @PATHS = map { $_, "$_/pods" } @INC;
 
 # Bundled files
-my $PERLDOC = $Mojolicious::H->slurp_rel_file('perldoc.html.ep');
+my $PERLDOC = $Mojolicious::Controller::H->slurp_rel_file('perldoc.html.ep');
 
 # "This is my first visit to the Galaxy of Terror and I'd like it to be a
 #  pleasant one."

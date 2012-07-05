@@ -5,6 +5,7 @@ use Carp ();
 use Mojo::ByteStream;
 use Mojo::Cookie::Response;
 use Mojo::Exception;
+use Mojo::Home;
 use Mojo::Transaction::HTTP;
 use Mojo::URL;
 use Mojo::Util;
@@ -18,6 +19,15 @@ has match => sub {
   Mojolicious::Routes::Match->new(GET => '/')->root(shift->app->routes);
 };
 has tx => sub { Mojo::Transaction::HTTP->new };
+
+# Bundled templates
+our $H = Mojo::Home->new;
+$H->parse($H->parse($H->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
+our $MOJOBAR = $H->slurp_rel_file('mojobar.html.ep');
+my $EXCEPTION     = $H->slurp_rel_file('exception.html.ep');
+my $DEV_EXCEPTION = $H->slurp_rel_file('exception.development.html.ep');
+my $NOT_FOUND     = $H->slurp_rel_file('not_found.html.ep');
+my $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
@@ -232,9 +242,29 @@ sub render_data { shift->render(data => @_) }
 #  Neat."
 sub render_exception {
   my ($self, $e) = @_;
+
+  # Log exception
   my $app = $self->app;
   $app->log->error($e = Mojo::Exception->new($e));
-  $app->plugins->emit_chain('around_exception', $self, $e);
+
+  # Filtered stash snapshot
+  my $stash = $self->stash;
+  my %snapshot = map { $_ => $stash->{$_} }
+    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
+
+  # Render with fallbacks
+  my $mode    = $app->mode;
+  my $options = {
+    exception => $e,
+    snapshot  => \%snapshot,
+    template  => "exception.$mode",
+    format    => $stash->{format} || 'html',
+    handler   => undef,
+    status    => 500
+  };
+  my $inline = $mode eq 'development' ? $DEV_EXCEPTION : $EXCEPTION;
+  return if $self->_fallbacks($options, 'exception', $inline);
+  $self->_fallbacks({%$options, format => 'html'}, 'exception', $inline);
 }
 
 # "If you hate intolerance and being punched in the face by me,
@@ -247,7 +277,15 @@ sub render_later { shift->stash->{'mojo.rendered'}++ }
 #  Lick my frozen metal ass."
 sub render_not_found {
   my $self = shift;
-  $self->app->plugins->emit_chain(around_not_found => $self);
+
+  # Render with fallbacks
+  my $mode = $self->app->mode;
+  my $format = $self->stash->{format} || 'html';
+  my $options
+    = {template => "not_found.$mode", format => $format, status => 404};
+  my $inline = $mode eq 'development' ? $DEV_NOT_FOUND : $NOT_FOUND;
+  return if $self->_fallbacks($options, 'not_found', $inline);
+  $self->_fallbacks({%$options, format => 'html'}, 'not_found', $inline);
 }
 
 # "You called my thesis a fat sack of barf, and then you stole it?
@@ -472,6 +510,27 @@ sub write_chunk {
   return $self->rendered;
 }
 
+sub _fallbacks {
+  my ($self, $options, $template, $inline) = @_;
+
+  # Mode specific template
+  unless ($self->render($options)) {
+
+    # Template
+    $options->{template} = $template;
+    unless ($self->render($options)) {
+
+      # Inline template
+      my $stash = $self->stash;
+      return unless $stash->{format} eq 'html';
+      delete $stash->{layout};
+      delete $stash->{extends};
+      delete $options->{template};
+      return $self->render(%$options, inline => $inline, handler => 'ep');
+    }
+  }
+}
+
 1;
 
 =head1 NAME
@@ -672,9 +731,8 @@ not be encoded. All additional values get merged into the C<stash>.
   $c->render_exception('Oops!');
   $c->render_exception(Mojo::Exception->new('Oops!'));
 
-Emit C<around_exception> plugin hook, render the exception template
-C<exception.$mode.$format.*> or C<exception.$format.*> and set the response
-status code to C<500>.
+Render the exception template C<exception.$mode.$format.*> or
+C<exception.$format.*> and set the response status code to C<500>.
 
 =head2 C<render_json>
 
@@ -704,9 +762,8 @@ useful.
 
   $c->render_not_found;
 
-Emit C<around_not_found> plugin hook, render the not found template
-C<not_found.$mode.$format.*> or C<not_found.$format.*> and set the response
-status code to C<404>.
+Render the not found template C<not_found.$mode.$format.*> or
+C<not_found.$format.*> and set the response status code to C<404>.
 
 =head2 C<render_partial>
 

@@ -626,6 +626,15 @@ common use.
       if $self->res->code;
   });
 
+Same for monitoring tasks.
+
+  # Forward exceptions to a web service
+  $self->hook(after_dispatch => sub {
+    my $self = shift;
+    return unless my $e = $self->stash('exception');
+    $self->ua->post_form('https://kraih.com/bugs' => {exception => $e});
+  });
+
 For a full list of available hooks see L<Mojolicious/"hook">.
 
 =head2 Shortcuts

@@ -138,10 +138,9 @@ sub server {
       $self->$cb($stream, $id);
 
       # Enforce connection limit (randomize to improve load balancing)
-      if (defined $self->{accepts}) {
-        $self->{accepts} -= int(rand 2) ? 1 : 2;
-        $self->max_connections(0) if $self->{accepts} <= 0;
-      }
+      $self->max_connections(0)
+        if defined $self->{accepts}
+        && ($self->{accepts} -= int(rand 2) + 1) <= 0;
 
       # Stop listening
       $self->_not_listening;

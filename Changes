@@ -1,5 +1,6 @@
 
 3.03  2012-07-06
+  - Improved load balancing between Hypnotoad worker processes.
   - Improved Hypnotoad log messages.
   - Improved documentation.
   - Improved tests.

@@ -231,7 +231,7 @@ sub _manage {
           if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
       }
 
-      # Graceful shutdown
+      # Graceful stop
       $self->_remove(delete $self->{manager})
         unless keys %$connections || keys %{$self->{servers}};
       $self->stop if $self->max_connections == 0 && keys %$connections == 0;

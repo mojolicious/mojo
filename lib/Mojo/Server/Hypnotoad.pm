@@ -213,7 +213,7 @@ sub _manage {
   # Workers
   while (my ($pid, $w) = each %{$self->{workers}}) {
 
-    # No heartbeat (graceful shutdown)
+    # No heartbeat (graceful stop)
     my $interval = $c->{heartbeat_interval};
     my $timeout  = $c->{heartbeat_timeout};
     if (!$w->{graceful} && ($w->{time} + $interval + $timeout <= time)) {
@@ -221,7 +221,7 @@ sub _manage {
       $w->{graceful} = time;
     }
 
-    # Graceful shutdown with timeout
+    # Graceful stop with timeout
     $w->{graceful} ||= time if $self->{graceful};
     if ($w->{graceful}) {
       $self->{log}->debug("Trying to stop worker $pid gracefully.");
@@ -321,7 +321,7 @@ sub _spawn {
   );
   $loop->unlock(sub { flock $lock, LOCK_UN });
 
-  # Heartbeat messages (stop sending during graceful shutdown)
+  # Heartbeat messages (stop sending during graceful stop)
   weaken $self;
   $loop->recurring(
     $c->{heartbeat_interval} => sub {
@@ -482,8 +482,8 @@ performance.
 
   graceful_timeout => 15
 
-Maximum amount of time in seconds a graceful worker stop may take before being
-forced, defaults to C<30>.
+Maximum amount of time in seconds stopping a worker gracefully may take before
+being forced, defaults to C<30>.
 
 =head2 C<group>
 
@@ -502,7 +502,7 @@ Heartbeat interval in seconds, defaults to C<5>.
   heartbeat_timeout => 2
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped, defaults to C<20>.
+stopped gracefully, defaults to C<20>.
 
 =head2 C<inactivity_timeout>
 

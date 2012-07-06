@@ -88,8 +88,6 @@ L<Mojolicious::Config::JSONConfig> configuration file.
   # myapp.conf
   {hypnotoad => {listen => ['http://*:80'], workers => 10}};
 
-Or change the application configuration directly.
-
 But one of its biggest advantages is the support for effortless zero downtime
 software upgrades. That means you can upgrade L<Mojolicious>, Perl or even
 system libraries at runtime without ever stopping the server or losing a

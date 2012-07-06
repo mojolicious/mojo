@@ -90,10 +90,10 @@ $t->get_ok('/rest')->status_is(200)->content_is('foo works!');
 $t->get_ok('/rest.html')->status_is(200)->content_is('html works!');
 
 # GET /perldoc (disabled)
-$t->get_ok('/perldoc')->status_is(404)->content_is("Whatever not found!\n");
+$t->get_ok('/perldoc')->status_is(404)->content_is("foo not found!\n");
 
 # GET /dead (exception template with custom format)
-$t->get_ok('/dead')->status_is(500)->content_is("Whatever exception!\n");
+$t->get_ok('/dead')->status_is(500)->content_is("foo exception!\n");
 
 __DATA__
 @@ index.foo.twinkle
@@ -119,7 +119,7 @@ test<%= content %>123\
 .** '=head2 ' . $codename
 
 @@ exception.foo.ep
-Whatever exception!
+foo exception!
 
 @@ not_found.foo.ep
-Whatever not found!
+foo not found!

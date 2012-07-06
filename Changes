@@ -4,8 +4,10 @@
   - Improved Hypnotoad log messages.
   - Improved documentation.
   - Improved tests.
+  - Fixed default format handling bug in render_exception and
+    render_not_found.
   - Fixed small namespace detection bug in Mojo::DOM.
-  - Fixed small bug in Test::Mojo.
+  - Fixed small session reset bug in Test::Mojo.
 
 3.02  2012-07-03
   - Added pluck and uniq methods to Mojo::Collection.

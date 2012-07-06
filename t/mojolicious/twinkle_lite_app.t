@@ -6,13 +6,16 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 19;
+use Test::More tests => 23;
 
 # "Pizza delivery for...
 #  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
 #  one making the crank calls."
 use Mojolicious::Lite;
 use Test::Mojo;
+
+# Custom format
+app->renderer->default_format('foo');
 
 # Twinkle template syntax
 my $twinkle = {
@@ -51,6 +54,9 @@ get '/docs2' => {codename => 'snowman'} => 'docs2';
 # GET /docs3
 get '/docs3' => sub { shift->stash(codename => undef) } => 'docs';
 
+# GET /dead
+get '/dead' => sub {die};
+
 my $t = Test::Mojo->new;
 
 # GET /
@@ -70,17 +76,20 @@ $t->get_ok('/docs2')->status_is(200)->content_like(qr!<h2>snowman</h2>!);
 $t->get_ok('/docs3')->status_is(200)->content_like(qr!<h3></h3>!);
 
 # GET /perldoc (disabled)
-$t->get_ok('/perldoc')->status_is(404);
+$t->get_ok('/perldoc')->status_is(404)->content_is("Whatever not found!\n");
+
+# GET /dead (exception template with custom format)
+$t->get_ok('/dead')->status_is(500)->content_is("Whatever exception!\n");
 
 __DATA__
-@@ index.html.twinkle
+@@ index.foo.twinkle
 . layout 'twinkle';
 Hello **** $name **!\
 
-@@ layouts/twinkle.html.ep
+@@ layouts/twinkle.foo.ep
 test<%= content %>123\
 
-@@ advanced.html.twinkle
+@@ advanced.foo.twinkle
 .* '<escape me>'
 . my $numbers = [1 .. 4];
  ** for my $i (@$numbers) { ***
@@ -88,9 +97,15 @@ test<%= content %>123\
  ** } ***
  ** my $foo = (+*** 23 **-)->();*** *** $foo ***
 
-@@ docs.html.pod
+@@ docs.foo.pod
 % no warnings;
 <%= '=head3 ' . $codename %>
 
-@@ docs2.html.teapod
+@@ docs2.foo.teapod
 .** '=head2 ' . $codename
+
+@@ exception.foo.ep
+Whatever exception!
+
+@@ not_found.foo.ep
+Whatever not found!

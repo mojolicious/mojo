@@ -258,7 +258,7 @@ sub render_exception {
     exception => $e,
     snapshot  => \%snapshot,
     template  => "exception.$mode",
-    format    => $stash->{format} || 'html',
+    format    => $stash->{format} || $app->renderer->default_format,
     handler   => undef,
     status    => 500
   };
@@ -279,8 +279,9 @@ sub render_not_found {
   my $self = shift;
 
   # Render with fallbacks
-  my $mode = $self->app->mode;
-  my $format = $self->stash->{format} || 'html';
+  my $app    = $self->app;
+  my $mode   = $app->mode;
+  my $format = $self->stash->{format} || $app->renderer->default_format;
   my $options
     = {template => "not_found.$mode", format => $format, status => 404};
   my $inline = $mode eq 'development' ? $DEV_NOT_FOUND : $NOT_FOUND;

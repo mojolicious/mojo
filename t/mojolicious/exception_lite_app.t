@@ -17,6 +17,7 @@ use Test::More tests => 86;
 use Mojolicious::Lite;
 use Test::Mojo;
 
+# No real templates
 app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
 
 # Logger

@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 23;
+use Test::More tests => 29;
 
 # "Pizza delivery for...
 #  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
@@ -54,6 +54,14 @@ get '/docs2' => {codename => 'snowman'} => 'docs2';
 # GET /docs3
 get '/docs3' => sub { shift->stash(codename => undef) } => 'docs';
 
+# GET /rest
+get '/rest' => sub {
+  shift->respond_to(
+    foo  => {text => 'foo works!'},
+    html => {text => 'html works!'}
+  );
+};
+
 # GET /dead
 get '/dead' => sub {die};
 
@@ -74,6 +82,12 @@ $t->get_ok('/docs2')->status_is(200)->content_like(qr!<h2>snowman</h2>!);
 
 # GET /docs3
 $t->get_ok('/docs3')->status_is(200)->content_like(qr!<h3></h3>!);
+
+# GET /rest (foo format)
+$t->get_ok('/rest')->status_is(200)->content_is('foo works!');
+
+# GET /rest.html (html format)
+$t->get_ok('/rest.html')->status_is(200)->content_is('html works!');
 
 # GET /perldoc (disabled)
 $t->get_ok('/perldoc')->status_is(404)->content_is("Whatever not found!\n");

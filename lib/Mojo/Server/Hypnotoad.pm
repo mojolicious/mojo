@@ -117,7 +117,7 @@ sub _config {
 
   # Hypnotoad settings
   my $c = $self->{config} = $app->config('hypnotoad') || {};
-  $c->{graceful_timeout}   ||= 30;
+  $c->{graceful_timeout}   ||= 20;
   $c->{heartbeat_interval} ||= 5;
   $c->{heartbeat_timeout}  ||= 20;
   $c->{lock_file}          ||= catfile tmpdir, 'hypnotoad.lock';
@@ -484,7 +484,7 @@ performance.
   graceful_timeout => 15
 
 Maximum amount of time in seconds stopping a worker gracefully may take before
-being forced, defaults to C<30>.
+being forced, defaults to C<20>.
 
 =head2 C<group>
 
@@ -557,7 +557,7 @@ C<MOJO_REVERSE_PROXY> environment variable.
 
 =head2 C<upgrade_timeout>
 
-  upgrade_timeout => 30
+  upgrade_timeout => 45
 
 Maximum amount of time in seconds a zero downtime software upgrade may take
 before getting canceled, defaults to C<60>.

@@ -1,5 +1,7 @@
 
 3.05  2012-07-08
+  - Reduced default graceful_timeout from 30 to 20 seconds in
+    Mojo::Server::Hypnotoad.
   - Improved documentation.
   - Improved tests.
   - Fixed small initialization bug in Mojo::IOLoop::Stream.

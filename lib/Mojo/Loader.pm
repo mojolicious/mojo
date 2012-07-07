@@ -130,6 +130,8 @@ following new ones.
 
 Extract embedded file from the C<DATA> section of a class.
 
+  say for keys %{$loader->data('Foo::Bar')};
+
 =head2 C<load>
 
   my $e = $loader->load('Foo::Bar');

@@ -548,8 +548,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   say $ua->get('mojolicio.us')->res->dom->html->head->title->text;
 
   # Scrape the latest headlines from a news site
-  $ua->max_redirects(5)->get('www.reddit.com/r/perl/')
-    ->res->dom('p.title > a.title')->pluck('text')->join("\n")->say;
+  say $ua->max_redirects(5)->get('www.reddit.com/r/perl/')
+    ->res->dom('p.title > a.title')->pluck('text')->shuffle;
 
   # IPv6 PUT request with content
   my $tx

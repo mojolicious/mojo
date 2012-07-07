@@ -632,11 +632,11 @@ Turns message body into a L<Mojo::DOM> object and takes an optional selector
 to perform a C<find> on it right away, which returns a collection.
 
   # Perform "find" right away
-  $message->dom('h1, h2, h3')->pluck('text')->join("\n")->say;
+  say $message->dom('h1, h2, h3')->pluck('text');
 
   # Use everything else Mojo::DOM has to offer
   say $message->dom->at('title')->text;
-  $message->dom->html->body->children->pluck('type')->join("\n")->say;
+  say $message->dom->html->body->children->pluck('type')->uniq;
 
 =head2 C<error>
 

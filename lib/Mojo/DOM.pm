@@ -564,7 +564,7 @@ selectors from L<Mojo::DOM::CSS> are supported.
   my $id = $dom->find('div')->[23]{id};
 
   # Extract information from multiple elements
-  my @headers = $dom->find('h1, h2, h3')->map(sub { shift->text })->each;
+  my @headers = $dom->find('h1, h2, h3')->pluck('text')->each;
 
 =head2 C<namespace>
 
@@ -725,7 +725,7 @@ L<Mojo::Collection> object, depending on number of children.
 
   say $dom->p->text;
   say $dom->div->[23]->text;
-  $dom->div->each(sub { say $_->text });
+  say $dom->div->pluck('text');
 
 =head1 ELEMENT ATTRIBUTES
 

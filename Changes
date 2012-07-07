@@ -1,4 +1,7 @@
 
+3.05  2012-07-07
+  - Improved documentation.
+
 3.04  2012-07-07
   - Improved Mojo::IOLoop performance by reducing stream timeout precision
     from 0.025 to 0.5 seconds.

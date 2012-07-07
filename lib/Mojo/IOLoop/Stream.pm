@@ -54,7 +54,7 @@ sub start {
   my $reactor = $self->reactor;
   weaken $self;
   $self->{timer} ||= $reactor->recurring(
-    0.025 => sub {
+    0.5 => sub {
       return unless $self && (my $t = $self->timeout);
       $self->emit_safe('timeout')->close if (time - ($self->{active})) >= $t;
     }

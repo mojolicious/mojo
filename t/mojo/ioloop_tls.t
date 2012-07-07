@@ -98,7 +98,7 @@ $loop->client(
     $stream->on(read => sub { $client .= pop });
   }
 );
-$loop->timer(1 => sub { shift->stop });
+$loop->timer(2 => sub { shift->stop });
 $loop->start;
 is $server,       'tset123', 'right content';
 is $client,       'test321', 'right content';
@@ -191,7 +191,7 @@ $loop->client(
     $stream->on(read => sub { $client .= pop });
   }
 );
-$loop->timer(1 => sub { shift->stop });
+$loop->timer(2 => sub { shift->stop });
 $loop->start;
 is $server,       'tset123', 'right content';
 is $client,       'test321', 'right content';

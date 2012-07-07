@@ -49,25 +49,9 @@ sub is_writing {
 
 sub start {
   my $self = shift;
-
-  # Timeout
-  my $reactor = $self->reactor;
-  weaken $self;
-  $self->{timer} ||= $reactor->recurring(
-    0.5 => sub {
-      return unless $self && (my $t = $self->timeout);
-      $self->emit_safe('timeout')->close if (time - $self->{active}) >= $t;
-    }
-  );
-
-  # Start streaming
-  my $handle = $self->{handle};
-  return $reactor->io($handle => sub { pop() ? $self->_write : $self->_read })
-    unless $self->{streaming}++;
-
-  # Resume streaming
+  return $self->_startup unless $self->{startup}++;
   return unless delete $self->{paused};
-  $reactor->watch($handle, 1, $self->is_writing);
+  $self->reactor->watch($self->{handle}, 1, $self->is_writing);
 }
 
 sub stop {
@@ -125,6 +109,23 @@ sub _read {
   # Handle read
   $self->emit_safe(read => $buffer);
   $self->{active} = time;
+}
+
+sub _startup {
+  my $self = shift;
+
+  # Timeout (ignore 0 timeout)
+  my $reactor = $self->reactor;
+  weaken $self;
+  $self->{timer} = $reactor->recurring(
+    0.5 => sub {
+      return unless my $t = $self->timeout;
+      $self->emit_safe('timeout')->close if (time - $self->{active}) >= $t;
+    }
+  );
+
+  # Start streaming
+  $reactor->io($self->{handle}, sub { pop() ? $self->_write : $self->_read });
 }
 
 # "Oh, I'm in no condition to drive. Wait a minute.

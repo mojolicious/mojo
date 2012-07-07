@@ -1,6 +1,7 @@
 
 3.05  2012-07-08
   - Improved documentation.
+  - Improved tests.
   - Fixed small initialization bug in Mojo::IOLoop::Stream.
 
 3.04  2012-07-07

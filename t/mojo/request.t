@@ -498,7 +498,7 @@ is $req->url, '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27,           'right "Content-Length" value';
 
-# Parse full HTTP 1.0 request with utf8 form input
+# Parse full HTTP 1.0 request with UTF-8 form input
 $req = Mojo::Message::Request->new;
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");

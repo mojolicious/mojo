@@ -1059,7 +1059,7 @@ is $output->lines_after->[0][0], 3,     'right number';
 is $output->lines_after->[0][1], '123', 'right line';
 like "$output", qr/foo\.mt line 2/, 'right result';
 
-# Exception with utf8 context
+# Exception with UTF-8 context
 $mt     = Mojo::Template->new;
 $file   = catfile(splitdir($FindBin::Bin), qw(templates utf8_exception.mt));
 $output = $mt->render_file($file);

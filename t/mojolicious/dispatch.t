@@ -194,7 +194,7 @@ is $c->param('action'),     undef,         'no value';
 is $c->param('capture'),    'hello there', 'right value';
 ok $c->render_called, 'rendered';
 
-# Escaping utf8
+# Escaping UTF-8
 $c->reset_state;
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');

@@ -708,7 +708,7 @@ Alias for L<Mojo::DOM::HTML/"tree">.
 Element type.
 
   # List types of child elements
-  $dom->children->each(sub { say $_->type });
+  say $dom->children->pluck('type');
 
 =head2 C<xml>
 

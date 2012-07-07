@@ -284,7 +284,7 @@ Alias for L<Mojo::Util/"slurp">.
 
 Turn bytestream into L<Mojo::Collection>.
 
-  b('a,b,c')->split(',')->map(sub { $_->quote })->join("\n")->say;
+  b('a,b,c')->split(',')->pluck('quote')->join(',')->say;
 
 =head2 C<to_string>
 

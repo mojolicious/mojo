@@ -5,7 +5,7 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 40;
+use Test::More tests => 42;
 
 use File::Spec::Functions qw(catfile splitdir);
 use FindBin;
@@ -119,6 +119,12 @@ is b('foo bar baz')->size, 11, 'size is 11';
 $stream = b('0');
 is $stream->size,      1,   'size is 1';
 is $stream->to_string, '0', 'right content';
+
+# clone
+$stream = b('foo');
+my $clone = $stream->clone;
+isnt $stream->b64_encode->to_string, 'foo', 'original changed';
+is $clone->to_string, 'foo', 'clone did not change';
 
 # say and autojoin
 my $buffer = '';

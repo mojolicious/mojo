@@ -1,4 +1,7 @@
 
+3.06  2012-07-09
+  - Improved tests.
+
 3.05  2012-07-08
   - Reduced default graceful_timeout from 30 to 20 seconds in
     Mojo::Server::Hypnotoad.

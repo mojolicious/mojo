@@ -19,6 +19,7 @@ app->renderer->default_format('foo');
 
 # Twinkle template syntax
 my $twinkle = {
+  auto_escape     => 0,
   capture_end     => '-',
   capture_start   => '+',
   escape_mark     => '*',
@@ -98,13 +99,13 @@ $t->get_ok('/dead')->status_is(500)->content_is("foo exception!\n");
 __DATA__
 @@ index.foo.twinkle
 . layout 'twinkle';
-Hello **** $name **!\
+Hello *** $name **!\
 
 @@ layouts/twinkle.foo.ep
 test<%= content %>123\
 
 @@ advanced.foo.twinkle
-.* '<escape me>'
+.** '<escape me>'
 . my $numbers = [1 .. 4];
  ** for my $i (@$numbers) { ***
  *** $i ***

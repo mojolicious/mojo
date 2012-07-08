@@ -20,13 +20,10 @@ sub register {
       $path = md5_sum encode('UTF-8', $inline) if defined $inline;
       return unless defined $path;
 
-      # Cache
+      # Cached
       my $cache = $r->cache;
       my $key   = delete $options->{cache} || $path;
-      my $mt    = $cache->get($key);
-
-      # Cached
-      $mt ||= Mojo::Template->new;
+      my $mt    = $cache->get($key) || Mojo::Template->new;
       if ($mt->compiled) {
         $c->app->log->debug("Rendering cached @{[$mt->name]}.");
         $$output = $mt->interpret($c);

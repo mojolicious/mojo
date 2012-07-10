@@ -103,8 +103,8 @@ sub start {
     unless ($self->{nb}) {
       croak 'Blocking request in progress' if keys %{$self->{connections}};
       warn "-- Switching to non-blocking mode\n" if DEBUG;
-      $self->_cleanup;
-      $self->{nb} = 1;
+      $self->{nb}++;
+      $self->_cleanup(1);
     }
     return $self->_start($tx, $cb);
   }
@@ -114,7 +114,7 @@ sub start {
   if (delete $self->{nb}) {
     croak 'Non-blocking requests in progress' if keys %{$self->{connections}};
     warn "-- Switching to blocking mode\n" if DEBUG;
-    $self->_cleanup;
+    $self->_cleanup(1);
   }
   $self->_start($tx, sub { $tx = $_[1] });
 
@@ -163,17 +163,18 @@ sub _cache {
 }
 
 sub _cleanup {
-  my $self = shift;
+  my ($self, $restart) = @_;
   return unless my $loop = $self->_loop;
 
-  # Stop server
-  delete $self->{server};
-
   # Clean up active connections
-  $loop->remove($_) for keys %{$self->{connections} || {}};
+  $loop->remove($_) for keys %{delete $self->{connections} || {}};
 
   # Clean up keep alive connections
-  $loop->remove($_->[1]) for @{$self->{cache} || []};
+  $loop->remove($_->[1]) for @{delete $self->{cache} || []};
+
+  # Stop or restart server
+  delete $self->{server};
+  $self->_server if $restart;
 }
 
 sub _connect {
@@ -415,7 +416,7 @@ sub _server {
   my $loop   = $self->_loop;
   my $server = $self->{server}
     = Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
-  my $port = $self->{port} = $loop->generate_port;
+  my $port = $self->{port} ||= $loop->generate_port;
   die "Couldn't find a free TCP port for testing.\n" unless $port;
   $self->{scheme} = $scheme ||= 'http';
   $server->listen(["$scheme://127.0.0.1:$port"])->start;
@@ -816,8 +817,6 @@ C<MOJO_APP> environment variable or a L<Mojo::HelloWorld> object.
   my $url = $ua->app_url('https');
 
 Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
-Note that the port may change when switching from blocking to non-blocking
-requests.
 
   # Port currently used for processing relative URLs
   say $ua->app_url->port;

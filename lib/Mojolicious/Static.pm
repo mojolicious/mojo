@@ -11,6 +11,7 @@ use Mojo::Path;
 
 has classes => sub { ['main'] };
 has paths   => sub { [] };
+has enable_bundled => 1;
 
 # "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {
@@ -58,7 +59,7 @@ sub serve {
   }
 
   # Search bundled files
-  elsif (!$asset) {
+  elsif (!$asset && $self->enable_bundled) {
     my $b = $self->{bundled} ||= Mojo::Home->new(Mojo::Home->mojo_lib_dir)
       ->rel_dir('Mojolicious/public');
     my $data = $self->_get_file(catfile($b, split('/', $rel)));

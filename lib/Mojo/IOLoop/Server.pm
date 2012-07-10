@@ -100,7 +100,7 @@ sub listen {
   %$options = (
     %$options,
     SSL_ca_file => -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_verify_mode => 0x03
+    SSL_verify_mode => exists $args->{tls_verify} ? $args->{tls_verify} : 0x03
   ) if $args->{tls_ca};
 }
 

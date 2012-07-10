@@ -32,7 +32,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 28;
+plan tests => 29;
 
 # "To the panic room!
 #  We don't have a panic room.
@@ -270,3 +270,37 @@ $loop->timer(1 => sub { shift->stop });
 $loop->start;
 ok !$server_err, 'no error';
 ok $client_err, 'has error';
+
+# Ignore invalid client certificate
+$loop         = Mojo::IOLoop->new;
+$port         = Mojo::IOLoop->generate_port;
+$server_err = $client_err = '';
+$loop->server(
+  address    => '127.0.0.1',
+  port       => $port,
+  tls        => 1,
+  tls_ca     => 't/mojo/certs/ca.crt',
+  tls_cert   => 't/mojo/certs/server.crt',
+  tls_key    => 't/mojo/certs/server.key',
+  tls_verify => 0x00,
+  sub {
+    my ($loop, $stream) = @_;
+    $stream->write('test', sub { shift->write('321') });
+    $running = Mojo::IOLoop->is_running;
+    $stream->on(timeout => sub { $timeout++ });
+    $stream->on(close   => sub { $server_close++ });
+    $stream->on(error   => sub { $server_err = pop });
+    $stream->on(read    => sub { $server .= pop });
+    $stream->timeout(0.5);
+  }
+);
+$loop->client(
+  port     => $port,
+  tls      => 1,
+  tls_cert => 't/mojo/certs/badclient.crt',
+  tls_key  => 't/mojo/certs/badclient.key',
+  sub { shift; $client_err = shift }
+);
+$loop->timer(1 => sub { shift->stop });
+$loop->start;
+ok !$client_err, 'has error';

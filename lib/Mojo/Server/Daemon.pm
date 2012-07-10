@@ -157,6 +157,7 @@ sub _listen {
   };
   delete $options->{address} if $options->{address} eq '*';
   my $tls = $options->{tls} = $url->scheme eq 'https' ? 1 : undef;
+  $options->{tls_verify} = hex($query->param('verify')) if $query->param('verify');
 
   # Listen
   weaken $self;

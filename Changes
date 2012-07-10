@@ -1,5 +1,7 @@
 
-3.06  2012-07-10
+3.06  2012-07-11
+  - Added tls_verify option to Mojo::IOLoop::Server->listen. (scottw)
+  - Added verify parameter to Mojo::Server::Daemon->listen. (scottw)
   - Improved documentation.
   - Improved tests.
   - Fixed small bug in Mojo::UserAgent that prevented port reuse.

@@ -272,8 +272,8 @@ ok !$server_err, 'no error';
 ok $client_err, 'has error';
 
 # Ignore invalid client certificate
-$loop         = Mojo::IOLoop->new;
-$port         = Mojo::IOLoop->generate_port;
+$loop       = Mojo::IOLoop->new;
+$port       = Mojo::IOLoop->generate_port;
 $server_err = $client_err = '';
 $loop->server(
   address    => '127.0.0.1',

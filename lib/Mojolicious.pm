@@ -887,6 +887,8 @@ Ryan Jendoubi
 
 Sascha Kiefer
 
+Scott Wiersdorf
+
 Sergey Zasenko
 
 Simon Bertrang

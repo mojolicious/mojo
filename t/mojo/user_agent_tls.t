@@ -12,7 +12,7 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 24;
+plan tests => 26;
 
 # "That does not compute.
 #  Really?
@@ -117,3 +117,23 @@ $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
 $tx = $ua->cert('no file')->key('no file')->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
+
+# Disable peer certificate checks
+undef $daemon;
+$daemon
+  = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+$port = Mojo::IOLoop->new->generate_port;
+$listen
+  = "https://127.0.0.1:$port"
+  . '?cert=t/mojo/certs/server.crt'
+  . '&key=t/mojo/certs/server.key'
+  . '&ca=t/mojo/certs/ca.crt'
+  . '&verify=0x00';
+$daemon->listen([$listen])->start;
+
+# Invalid certificate
+$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
+$ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key');
+$tx = $ua->get("https://localhost:$port");
+ok $tx->success, 'is successful';
+ok !$tx->error, 'has no error';

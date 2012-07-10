@@ -292,18 +292,15 @@ is $stream, 1, 'no leaking subscribers';
 # Nested keep alive
 my @kept_alive;
 $ua->get(
-  '/',
-  sub {
+  '/' => sub {
     my ($self, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
     $self->get(
-      '/',
-      sub {
+      '/' => sub {
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
         $self->get(
-          '/',
-          sub {
+          '/' => sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             Mojo::IOLoop->stop;

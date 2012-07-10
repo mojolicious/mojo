@@ -167,7 +167,6 @@ sub _cleanup {
   return unless my $loop = $self->_loop;
 
   # Stop server
-  delete $self->{port};
   delete $self->{server};
 
   # Clean up active connections
@@ -409,9 +408,8 @@ sub _redirect {
 sub _server {
   my ($self, $scheme) = @_;
 
-  # Restart with different scheme
-  delete $self->{port}   if $scheme;
-  return $self->{server} if $self->{port};
+  # Reuse server
+  return $self->{server} if $self->{server} && !$scheme;
 
   # Start test server
   my $loop   = $self->_loop;
@@ -818,6 +816,8 @@ C<MOJO_APP> environment variable or a L<Mojo::HelloWorld> object.
   my $url = $ua->app_url('https');
 
 Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
+Note that the port may change when switching from blocking to non-blocking
+requests.
 
   # Port currently used for processing relative URLs
   say $ua->app_url->port;

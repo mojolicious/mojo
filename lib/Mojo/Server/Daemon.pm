@@ -157,6 +157,7 @@ sub _listen {
   };
   delete $options->{address} if $options->{address} eq '*';
   my $tls = $options->{tls} = $url->scheme eq 'https' ? 1 : undef;
+  $options->{tls_verify} = hex($query->param('verify')) if $query->param('verify');
 
   # Listen
   weaken $self;
@@ -382,6 +383,10 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 =item C<key>
 
 Path to the TLS key file, defaults to a built-in test key.
+
+=item C<verify>
+
+SSL verify mode flags, defaults to 0x03.
 
 =back
 

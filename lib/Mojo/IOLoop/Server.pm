@@ -100,7 +100,7 @@ sub listen {
   %$options = (
     %$options,
     SSL_ca_file => -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_verify_mode => 0x03
+    SSL_verify_mode => exists $args->{tls_verify} ? $args->{tls_verify} : 0x03
   ) if $args->{tls_ca};
 }
 
@@ -263,6 +263,10 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 =item C<tls_key>
 
 Path to the TLS key file, defaults to a built-in test key.
+
+=item C<tls_verify>
+
+SSL verify mode flags, defaults to 0x03.
 
 =back
 

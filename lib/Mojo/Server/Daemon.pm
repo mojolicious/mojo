@@ -153,7 +153,7 @@ sub _listen {
     port     => $url->port,
     tls_ca   => scalar $query->param('ca'),
     tls_cert => scalar $query->param('cert'),
-    tls_key  => scalar $query->param('key'),
+    tls_key  => scalar $query->param('key')
   };
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;

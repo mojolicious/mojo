@@ -118,11 +118,9 @@ $tx = $ua->cert('no file')->key('no file')->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
 
-# Disable peer certificate checks
-undef $daemon;
+# Web server with valid certificates and no verification
 $daemon
   = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
-$port = Mojo::IOLoop->new->generate_port;
 $listen
   = "https://127.0.0.1:$port"
   . '?cert=t/mojo/certs/server.crt'
@@ -135,5 +133,5 @@ $daemon->listen([$listen])->start;
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
 $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key');
 $tx = $ua->get("https://localhost:$port");
-ok $tx->success, 'is successful';
-ok !$tx->error, 'has no error';
+ok $tx->success, 'successful';
+ok !$tx->error, 'no error';

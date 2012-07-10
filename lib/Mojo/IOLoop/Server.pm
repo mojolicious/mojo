@@ -264,6 +264,10 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 
 Path to the TLS key file, defaults to a built-in test key.
 
+=item C<tls_verify>
+
+SSL verify mode flags, defaults to 0x03.
+
 =back
 
 =head2 C<generate_port>

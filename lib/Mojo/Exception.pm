@@ -45,8 +45,7 @@ sub trace {
   $start //= 1;
   my @frames;
   while (my @trace = caller($start++)) { push @frames, \@trace }
-  $self->frames(\@frames);
-  return $self;
+  return $self->frames(\@frames);
 }
 
 # "You killed zombie Flanders!

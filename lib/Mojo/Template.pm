@@ -38,8 +38,7 @@ sub build {
   my $self = shift;
 
   # Lines
-  my (@lines, $cpst);
-  my $multi = 0;
+  my (@lines, $cpst, $multi);
   for my $line (@{$self->tree}) {
 
     # New line
@@ -79,8 +78,8 @@ sub build {
         unless ($multi) {
 
           # Escaped
-          my $a = $self->auto_escape;
-          if (($type eq 'escp' && !$a) || ($type eq 'expr' && $a)) {
+          my $escape = $self->auto_escape;
+          if (($type eq 'escp' && !$escape) || ($type eq 'expr' && $escape)) {
             $lines[-1] .= "\$_M .= _escape";
             $lines[-1] .= " scalar $value" if length $value;
           }
@@ -199,8 +198,7 @@ sub parse {
 
   # Split lines
   my $state = 'text';
-  my @capture_token;
-  my $trimming = 0;
+  my ($trimming, @capture_token);
   for my $line (split /\n/, $tmpl) {
     $trimming = 0 if $state eq 'text';
 

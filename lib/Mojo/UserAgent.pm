@@ -72,13 +72,9 @@ sub build_websocket_tx { shift->transactor->websocket(@_) }
 
 sub detect_proxy {
   my $self = shift;
-
-  # Upper case gets priority
   $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
   $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
-  $self->no_proxy([split /,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
-
-  return $self;
+  return $self->no_proxy([split /,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
 }
 
 sub need_proxy {
@@ -536,7 +532,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   if (my $res = $tx->success) { say $res->body }
   else {
     my ($message, $code) = $tx->error;
-    say $code ? "$code $message response" : "Connection error: $message";
+    say $code ? "$code response: $message" : "Connection error: $message";
   }
 
   # Quick JSON API request with Basic authentication

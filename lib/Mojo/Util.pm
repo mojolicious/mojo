@@ -40,8 +40,8 @@ $REVERSE{$ENTITIES{$_}} //= $_ for sort grep {/;/} keys %ENTITIES;
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode),
-  qw(quote secure_compare sha1_bytes sha1_sum slurp trim unquote url_escape),
+  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
+  qw(secure_compare sha1_bytes sha1_sum slurp trim unquote url_escape),
   qw(url_unescape xml_escape)
 );
 

@@ -23,7 +23,6 @@ has tree      => sub { [] };
 
 # Helpers
 my $HELPERS = <<'EOF';
-use Mojo::Util;
 no warnings 'redefine';
 sub _escape {
   return $_[0] if ref $_[0] eq 'Mojo::ByteStream';

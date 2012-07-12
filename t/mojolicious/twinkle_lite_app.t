@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 29;
+use Test::More tests => 31;
 
 # "Pizza delivery for...
 #  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
@@ -19,6 +19,7 @@ app->renderer->default_format('foo');
 
 # Twinkle template syntax
 my $twinkle = {
+  append          => '$self->res->headers->header("X-Append" => $prepended);',
   auto_escape     => 0,
   capture_end     => '-',
   capture_start   => '+',
@@ -32,13 +33,23 @@ my $twinkle = {
   trim_mark       => '*'
 };
 
-# Plugins
+# Renderer
 plugin EPRenderer => {name => 'twinkle', template => $twinkle};
 plugin PODRenderer => {no_perldoc => 1};
 plugin PODRenderer =>
   {name => 'teapod', preprocess => 'twinkle', no_perldoc => 1};
-my $config = plugin JSONConfig =>
-  {default => {foo => 'bar'}, ext => 'conf', template => $twinkle};
+
+# Configuration
+app->defaults(foo_test => 23);
+my $config = plugin JSONConfig => {
+  default  => {foo => 'bar'},
+  ext      => 'conf',
+  template => {
+    %$twinkle,
+    append  => '',
+    prepend => 'my $foo = app->defaults("foo_test");'
+  }
+};
 is $config->{foo},  'bar', 'right value';
 is $config->{test}, 23,    'right value';
 
@@ -71,11 +82,11 @@ get '/dead' => sub {die};
 my $t = Test::Mojo->new;
 
 # GET /
-$t->get_ok('/')->status_is(200)
+$t->get_ok('/')->status_is(200)->header_is('X-Append' => 'bar')
   ->content_like(qr/testHello <sebastian>!bar TwinkleSandBoxTest123/);
 
 # GET /advanced
-$t->get_ok('/advanced')->status_is(200)
+$t->get_ok('/advanced')->status_is(200)->header_is('X-Append' => 'bar')
   ->content_is("&lt;escape me&gt;\n123423");
 
 # GET /docs

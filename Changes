@@ -3,7 +3,9 @@
   - Improved documentation.
   - Improved tests.
   - Fixed small bug in Mojolicious::Plugin::EPRenderer that prevented code to
-    be added to all templates.
+    be added to templates.
+  - Fixed small bug in Mojolicious::Plugin::JSONConfig that prevented code to
+    be added to config files.
 
 3.06  2012-07-11
   - Added tls_verify option to Mojo::IOLoop::Server->listen. (scottw)

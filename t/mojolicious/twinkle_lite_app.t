@@ -25,6 +25,7 @@ my $twinkle = {
   escape_mark     => '*',
   expression_mark => '*',
   line_start      => '.',
+  namespace       => 'TwinkleSandBoxTest',
   prepend         => 'no warnings "redefine"; sub bar { "bar!" }',
   tag_end         => '**',
   tag_start       => '**',
@@ -71,7 +72,7 @@ my $t = Test::Mojo->new;
 
 # GET /
 $t->get_ok('/')->status_is(200)
-  ->content_like(qr/testHello <sebastian>!bar!123/);
+  ->content_like(qr/testHello <sebastian>!bar! TwinkleSandBoxTest123/);
 
 # GET /advanced
 $t->get_ok('/advanced')->status_is(200)
@@ -102,7 +103,7 @@ __DATA__
 @@ index.foo.twinkle
 . layout 'twinkle';
 Hello *** $name **!\
-*** bar **\
+*** bar ** *** __PACKAGE__ **\
 
 @@ layouts/twinkle.foo.ep
 test<%= content %>123\

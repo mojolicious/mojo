@@ -1,5 +1,7 @@
 
 3.07  2012-07-12
+  - Improved documentation.
+  - Improved tests.
   - Fixed small bug in Mojolicious::Plugin::EPRenderer that prevented code to
     be added to all templates.
 

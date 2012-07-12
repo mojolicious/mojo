@@ -403,12 +403,13 @@ L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 
   <%= Mojo::ByteStream->new('<div>excluded!</div>') %>
 
-Newlines can be escaped with a backslash.
+Newline characters can be escaped with a backslash.
 
   This is <%= 1 + 1 %> a\
   single line
 
-And a backslash in front of a newline can be escaped with another backslash.
+And a backslash in front of a newline character can be escaped with another
+backslash.
 
   This will <%= 1 + 1 %> result\\
   in multiple\\
@@ -472,7 +473,9 @@ Activate automatic XML escaping.
   my $code = $mt->append;
   $mt      = $mt->append('warn "Processed template"');
 
-Append Perl code to compiled template.
+Append Perl code to compiled template. Note that this code should not contain
+newline characters, or line numbers in error messages might end up being
+wrong.
 
 =head2 C<capture_end>
 
@@ -566,7 +569,9 @@ Namespace used to compile templates, defaults to C<Mojo::Template::SandBox>.
   my $code = $mt->prepend;
   $mt      = $mt->prepend('my $self = shift;');
 
-Prepend Perl code to compiled template.
+Prepend Perl code to compiled template. Note that this code should not contain
+newline characters, or line numbers in error messages might end up being
+wrong.
 
 =head2 C<replace_mark>
 

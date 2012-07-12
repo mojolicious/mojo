@@ -95,7 +95,7 @@ sub attr {
     no strict 'refs';
     no warnings 'redefine';
     *{"${class}::$attr"} = eval $code or Carp::croak("Mojo::Base error: $@");
-    warn "\nATTRIBUTE: $class->$attr\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
+    warn "-- Attribute ($class->$attr)\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
   }
 }
 

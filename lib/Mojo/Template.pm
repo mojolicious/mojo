@@ -6,6 +6,8 @@ use Mojo::ByteStream;
 use Mojo::Exception;
 use Mojo::Util qw(decode encode slurp);
 
+use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
+
 # "If for any reason you're not completely satisfied, I hate you."
 has [qw(auto_escape compiled)];
 has [qw(append code prepend template)] => '';
@@ -109,6 +111,7 @@ sub build {
   $lines[0] = 'package ' . $self->namespace . "; $HELPERS ";
   $lines[0]  .= "sub { my \$_M = ''; " . $self->prepend . "; do { $first";
   $lines[-1] .= $self->append . "; \$_M; } };";
+  warn "-- Compiled (@{[$self->name]})\n", join("\n", @lines), "\n\n" if DEBUG;
 
   return $self->code(join "\n", @lines)->tree([]);
 }
@@ -678,6 +681,13 @@ Render template.
   my $output = $mt->render_file('/tmp/foo.mt', @args);
 
 Render template file.
+
+=head1 DEBUGGING
+
+You can set the C<MOJO_TEMPLATE_DEBUG> environment variable to get some
+advanced diagnostics information printed to C<STDERR>.
+
+  MOJO_TEMPLATE_DEBUG=1
 
 =head1 SEE ALSO
 

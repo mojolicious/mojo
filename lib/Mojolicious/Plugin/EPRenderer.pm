@@ -47,7 +47,7 @@ sub register {
           for grep {/^\w+$/} keys %{$c->stash};
 
         # Cache
-        $cache->set($key => $mt->prepend($prepend));
+        $cache->set($key => $mt->prepend($mt->prepend . $prepend));
       }
 
       # Render with "epl" handler

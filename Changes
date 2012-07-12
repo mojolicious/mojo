@@ -1,4 +1,8 @@
 
+3.07  2012-07-12
+  - Fixed small bug in Mojolicious::Plugin::EPRenderer that prevented code to
+    be added to all templates.
+
 3.06  2012-07-11
   - Added tls_verify option to Mojo::IOLoop::Server->listen. (scottw)
   - Added verify parameter to Mojo::Server::Daemon->listen. (scottw)

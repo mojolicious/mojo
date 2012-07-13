@@ -26,7 +26,8 @@ sub emit_safe {
   my ($self, $name) = (shift, shift);
 
   if (my $s = $self->{events}{$name}) {
-    warn "-- Safe $name in @{[blessed($self)]} (@{[scalar(@$s)]})\n" if DEBUG;
+    warn "-- Emit $name in @{[blessed($self)]} safely (@{[scalar(@$s)]})\n"
+      if DEBUG;
     for my $cb (@$s) {
       if (!eval { $self->$cb(@_); 1 } && $name ne 'error') {
         $self->once(error => sub { warn $_[1] })
@@ -35,7 +36,7 @@ sub emit_safe {
       }
     }
   }
-  elsif (DEBUG) { warn "-- Safe $name in @{[blessed($self)]} (0)\n" }
+  elsif (DEBUG) { warn "-- Emit $name in @{[blessed($self)]} safely (0)\n" }
 
   return $self;
 }

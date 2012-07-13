@@ -1,5 +1,6 @@
 
-3.07  2012-07-12
+3.07  2012-07-13
+  - Improved template error messages for generator commands and config files.
   - Improved documentation.
   - Improved tests.
   - Fixed small bug in Mojolicious::Plugin::EPRenderer that prevented code to

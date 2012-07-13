@@ -33,7 +33,7 @@ sub render {
   $prepend .= q[sub app; *app = sub { $app }; use Mojo::Base -strict;];
 
   # Render
-  my $mt = Mojo::Template->new($conf->{template} || {});
+  my $mt = Mojo::Template->new($conf->{template} || {})->name($file);
   my $json = $mt->prepend($prepend . $mt->prepend)->render($content, $app);
   return ref $json ? die($json) : encode('UTF-8', $json);
 }

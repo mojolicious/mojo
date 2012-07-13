@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 31;
+use Test::More tests => 32;
 
 # "Pizza delivery for...
 #  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
@@ -46,12 +46,13 @@ my $config = plugin JSONConfig => {
   ext      => 'conf',
   template => {
     %$twinkle,
-    append  => '',
+    append  => '$app->defaults(foo_test => 24)',
     prepend => 'my $foo = app->defaults("foo_test");'
   }
 };
 is $config->{foo},  'bar', 'right value';
 is $config->{test}, 23,    'right value';
+is app->defaults('foo_test'), 24, 'right value';
 
 # GET /
 get '/' => {name => '<sebastian>'} => 'index';

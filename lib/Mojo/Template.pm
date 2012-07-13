@@ -106,13 +106,13 @@ sub build {
     }
   }
 
-  # Closure
+  # Wrap lines
   my $first = $lines[0] ||= '';
   $lines[0] = 'package ' . $self->namespace . "; $HELPERS ";
   $lines[0]  .= "sub { my \$_M = ''; " . $self->prepend . "; do { $first";
   $lines[-1] .= $self->append . "; \$_M; } };";
-  warn "-- Compiled (@{[$self->name]})\n", join("\n", @lines), "\n\n" if DEBUG;
 
+  warn "-- Code (@{[$self->name]})\n", join("\n", @lines), "\n\n" if DEBUG;
   return $self->code(join "\n", @lines)->tree([]);
 }
 

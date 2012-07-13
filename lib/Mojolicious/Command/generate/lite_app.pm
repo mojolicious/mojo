@@ -17,7 +17,6 @@ sub run {
 __DATA__
 
 @@ liteapp
-% my $class = shift;
 #!/usr/bin/env perl
 use Mojolicious::Lite;
 

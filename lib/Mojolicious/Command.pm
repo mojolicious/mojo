@@ -60,8 +60,9 @@ sub rel_dir { catdir(getcwd(), split /\//, pop) }
 sub rel_file { catfile(getcwd(), split /\//, pop) }
 
 sub render_data {
-  my $self = shift;
-  Mojo::Template->new->render(Mojo::Loader->new->data(ref $self, shift), @_);
+  my ($self, $name) = (shift, shift);
+  Mojo::Template->new->name(qq{template "$name" from DATA section})
+    ->render(Mojo::Loader->new->data(ref $self, $name), @_);
 }
 
 sub render_to_file {

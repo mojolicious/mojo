@@ -23,8 +23,8 @@ has tag_start => '<%';
 has tag_end   => '%>';
 has tree      => sub { [] };
 
-# Helpers
-my $HELPERS = <<'EOF';
+# Escape
+my $ESCAPE = <<'EOF';
 no warnings 'redefine';
 sub _escape {
   return $_[0] if ref $_[0] eq 'Mojo::ByteStream';
@@ -33,7 +33,7 @@ sub _escape {
 }
 use Mojo::Base -strict;
 EOF
-$HELPERS =~ s/\n//g;
+$ESCAPE =~ s/\n//g;
 
 sub build {
   my $self = shift;
@@ -108,13 +108,13 @@ sub build {
 
   # Wrap lines
   my $first = $lines[0] ||= '';
-  $lines[0] = 'package ' . $self->namespace . "; $HELPERS ";
+  $lines[0] = 'package ' . $self->namespace . "; $ESCAPE ";
   $lines[0]  .= "sub { my \$_M = ''; " . $self->prepend . "; do { $first";
   $lines[-1] .= $self->append . "; \$_M; } };";
 
   # Code
   my $code = join "\n", @lines;
-  warn "-- Code (@{[$self->name]})\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
+  warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
   return $self->code($code)->tree([]);
 }
 

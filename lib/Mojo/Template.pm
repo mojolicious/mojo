@@ -112,8 +112,10 @@ sub build {
   $lines[0]  .= "sub { my \$_M = ''; " . $self->prepend . "; do { $first";
   $lines[-1] .= $self->append . "; \$_M; } };";
 
-  warn "-- Code (@{[$self->name]})\n", join("\n", @lines), "\n\n" if DEBUG;
-  return $self->code(join "\n", @lines)->tree([]);
+  # Code
+  my $code = join "\n", @lines;
+  warn "-- Code (@{[$self->name]})\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
+  return $self->code($code)->tree([]);
 }
 
 sub compile {

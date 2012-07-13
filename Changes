@@ -1,4 +1,7 @@
 
+3.08  2012-07-14
+  - Fixed small Mojo::Template bug.
+
 3.07  2012-07-13
   - Improved template error messages for generator commands and config files.
   - Improved documentation.

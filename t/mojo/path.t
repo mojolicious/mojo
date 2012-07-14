@@ -40,8 +40,8 @@ is $path->parts->[2], 'bar', 'right part';
 is $path->parts->[3], undef, 'no part';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
-is $path->parse('/foo/%E2%99%A5/~b@a:r+')->to_string, '/foo/%E2%99%A5/~b@a:r+',
-  'right path';
+is $path->parse('/foo/%E2%99%A5/~b@a:r+')->to_string,
+  '/foo/%E2%99%A5/~b@a:r+', 'right path';
 is $path->parts->[0], 'foo',     'right part';
 is $path->parts->[1], '♥',     'right part';
 is $path->parts->[2], '~b@a:r+', 'right part';

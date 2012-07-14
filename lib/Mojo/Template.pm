@@ -23,7 +23,7 @@ has tag_start => '<%';
 has tag_end   => '%>';
 has tree      => sub { [] };
 
-# Escape
+# Escape helper
 my $ESCAPE = <<'EOF';
 no warnings 'redefine';
 sub _escape {

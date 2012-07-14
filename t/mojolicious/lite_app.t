@@ -686,8 +686,8 @@ $t->get_ok('/auto_name')->status_is(200)
   ->content_is('/custom_name');
 
 # GET /query_string (query string roundtrip)
-$t->get_ok('/query_string?http://mojolicio.us/perldoc?foo=bar')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
+$t->get_ok('/query_string?http://mojolicio.us/perldoc?foo=bar')
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('http://mojolicio.us/perldoc?foo=bar');
 
@@ -875,14 +875,15 @@ $t->get_ok('/root.txt')->status_is(200)
   ->content_is('root fallback!');
 
 # GET /.html
-$t->get_ok('/.html')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/.html')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 
 # GET /0 ("X-Forwarded-For")
-$t->get_ok('/0', {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})->status_is(200)
-  ->content_like(qr!^http\://localhost\:\d+/0-!)->content_like(qr/-0$/)
-  ->content_unlike(qr!-192\.0\.2\.1-0$!);
+$t->get_ok('/0', {'X-Forwarded-For' => '192.0.2.2, 192.0.2.1'})
+  ->status_is(200)->content_like(qr!^http\://localhost\:\d+/0-!)
+  ->content_like(qr/-0$/)->content_unlike(qr!-192\.0\.2\.1-0$!);
 
 # GET /0 ("X-Forwarded-HTTPS")
 $t->get_ok('/0', {'X-Forwarded-HTTPS' => 1})->status_is(200)

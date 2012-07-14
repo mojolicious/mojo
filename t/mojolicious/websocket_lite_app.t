@@ -187,8 +187,8 @@ $t->websocket_ok('/once')->send_ok('hello')->message_is('ONE: hello')
   ->send_ok('hello')->message_is('ONE: hello')->finish_ok;
 
 # WebSocket /nested
-$t->websocket_ok('/nested')->send_ok('hello')->message_is('nested echo: hello')
-  ->finish_ok;
+$t->websocket_ok('/nested')->send_ok('hello')
+  ->message_is('nested echo: hello')->finish_ok;
 
 # GET /nested (plain alternative)
 $t->get_ok('/nested')->status_is(200)->content_is('plain nested!');

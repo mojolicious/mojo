@@ -81,8 +81,8 @@ is b('foo bar baz')->sha1_sum, 'c7567e8b39e2428e38bf9c9226ac68de4c67dc39',
   'right sha1 checksum';
 
 # hmac_md5_sum
-is b('Hi there')->hmac_md5_sum(1234567890), 'e3b5fab1b3f5b9d1fe391d09fce7b2ae',
-  'right hmac md5 checksum';
+is b('Hi there')->hmac_md5_sum(1234567890),
+  'e3b5fab1b3f5b9d1fe391d09fce7b2ae', 'right hmac md5 checksum';
 
 # hmac_sha1_sum
 is b('Hi there')->hmac_sha1_sum(1234567890),
@@ -109,8 +109,8 @@ is_deeply [b('')->split(qr/,/)->each], [], 'no elements';
 $stream = b('1/2/3');
 is $stream->split('/')->map(sub { $_->quote })->join(', '), '"1", "2", "3"',
   'right result';
-is $stream->split('/')->map(sub { shift->quote })->join(', '), '"1", "2", "3"',
-  'right result';
+is $stream->split('/')->map(sub { shift->quote })->join(', '),
+  '"1", "2", "3"', 'right result';
 
 # length
 is b('foo bar baz')->size, 11, 'size is 11';

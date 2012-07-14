@@ -114,8 +114,8 @@ is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition, qr/"mytext"/,
-  'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/"mytext"/, 'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
   qr/"transactor.t"/, 'right "Content-Disposition" value';
 like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
@@ -141,8 +141,8 @@ is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
-like $tx->req->content->parts->[0]->headers->content_disposition, qr/foo\.zip/,
-  'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/foo\.zip/, 'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 'whatever', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 

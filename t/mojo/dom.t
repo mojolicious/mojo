@@ -539,8 +539,8 @@ is $dom->find('xrds\3A Service > Type')->[1], undef, 'no result';
 is $dom->find('xrds\00003AService > Type')->[0]->text, 'http://o.r.g/sso/4.0',
   'right text';
 is $dom->find('xrds\00003AService > Type')->[1], undef, 'no result';
-is $dom->find('xrds\00003A Service > Type')->[0]->text, 'http://o.r.g/sso/4.0',
-  'right text';
+is $dom->find('xrds\00003A Service > Type')->[0]->text,
+  'http://o.r.g/sso/4.0', 'right text';
 is $dom->find('xrds\00003A Service > Type')->[1], undef, 'no result';
 is "$dom", $yadis, 'successful roundtrip';
 

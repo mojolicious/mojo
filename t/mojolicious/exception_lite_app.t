@@ -147,8 +147,8 @@ $t->get_ok('/dead_included_template')->status_is(500)->content_like(qr/1\./)
   ->content_like(qr/dead template!/);
 
 # GET /dead_template_with_layout
-$t->get_ok('/dead_template_with_layout')->status_is(500)->content_like(qr/2\./)
-  ->content_like(qr/dead template with layout!/);
+$t->get_ok('/dead_template_with_layout')->status_is(500)
+  ->content_like(qr/2\./)->content_like(qr/dead template with layout!/);
 like $log, qr/dead template with layout!/, 'right result';
 
 # GET /dead_action

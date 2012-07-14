@@ -97,11 +97,10 @@ sub listen {
     SSL_key_file           => $args->{tls_key} || $KEY,
     SSL_startHandshake     => 0
   };
-  %$options = (
-    %$options,
-    SSL_ca_file => -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-    SSL_verify_mode => defined $args->{tls_verify} ? $args->{tls_verify} : 0x03
-  ) if $args->{tls_ca};
+  return unless $args->{tls_ca};
+  $options->{SSL_ca_file} = -T $args->{tls_ca} ? $args->{tls_ca} : undef;
+  $options->{SSL_verify_mode}
+    = defined $args->{tls_verify} ? $args->{tls_verify} : 0x03;
 }
 
 sub generate_port {

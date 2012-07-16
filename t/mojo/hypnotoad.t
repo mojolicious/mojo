@@ -12,23 +12,20 @@ plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
 plan tests => 50;
 
-use Cwd 'cwd';
-use File::Temp;
+use File::Spec::Functions 'catdir';
+use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
-use Mojolicious::Command;
+use Mojo::Util 'spurt';
 
 # Prepare script
-my $cwd = cwd;
-my $dir = File::Temp::tempdir(CLEANUP => 1);
-chdir $dir;
-my $command = Mojolicious::Command->new;
-my $script  = $command->rel_file('myapp.pl');
-my $port1   = Mojo::IOLoop->generate_port;
-my $port2   = Mojo::IOLoop->generate_port;
-$command->write_rel_file('myapp.pl', <<EOF);
+my $dir = tempdir CLEANUP => 1;
+my $script = catdir $dir, 'myapp.pl';
+my $port1  = Mojo::IOLoop->generate_port;
+my $port2  = Mojo::IOLoop->generate_port;
+spurt <<EOF, $script;
 use Mojolicious::Lite;
 
 plugin Config => {
@@ -95,7 +92,7 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 
 # Update script
-$command->write_rel_file('myapp.pl', <<EOF);
+spurt <<EOF, $script;
 use Mojolicious::Lite;
 
 plugin Config => {
@@ -183,11 +180,8 @@ sleep 1
   PeerPort => $port2
   );
 
-# Cleanup
-chdir $cwd;
-
 sub _pid {
-  return unless open my $file, '<', $command->rel_file('hypnotoad.pid');
+  return unless open my $file, '<', catdir($dir, 'hypnotoad.pid');
   my $pid = <$file>;
   chomp $pid;
   return $pid;

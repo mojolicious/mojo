@@ -8,7 +8,7 @@ use Test::More tests => 5;
 # "Robot 1-X, save my friends! And Zoidberg!"
 use Cwd 'cwd';
 use File::Spec::Functions 'catdir';
-use File::Temp;
+use File::Temp 'tempdir';
 use Mojolicious::Command;
 
 # Application
@@ -17,7 +17,7 @@ isa_ok $command->app, 'Mojo', 'right application';
 
 # Generating files
 my $cwd = cwd;
-my $dir = File::Temp::tempdir(CLEANUP => 1);
+my $dir = tempdir CLEANUP => 1;
 chdir $dir;
 $command->create_rel_dir('foo/bar');
 ok -d catdir($dir, qw(foo bar)), 'directory exists';

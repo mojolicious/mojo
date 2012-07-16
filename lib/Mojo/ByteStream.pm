@@ -11,8 +11,8 @@ our @EXPORT_OK = ('b');
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum),
   qw(html_escape html_unescape md5_bytes md5_sum punycode_decode),
-  qw(punycode_encode quote sha1_bytes sha1_sum slurp trim unquote url_escape),
-  qw(url_unescape xml_escape)
+  qw(punycode_encode quote sha1_bytes sha1_sum slurp spurt trim unquote),
+  qw(url_escape url_unescape xml_escape)
 );
 {
   no strict 'refs';
@@ -277,6 +277,12 @@ Size of bytestream.
 Alias for L<Mojo::Util/"slurp">.
 
   b('/home/sri/myapp.pl')->slurp->split("\n")->shuffle->join("\n")->say;
+
+=head2 C<spurt>
+
+  $stream = $stream->spurt('/home/sri/myapp.pl');
+
+Alias for L<Mojo::Util/"spurt">.
 
 =head2 C<split>
 

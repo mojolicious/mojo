@@ -10,6 +10,7 @@ use IO::Handle;
 use Mojo::Loader;
 use Mojo::Server;
 use Mojo::Template;
+use Mojo::Util 'spurt';
 
 has description => 'No description.';
 has quiet       => 0;
@@ -80,16 +81,9 @@ sub run { croak 'Method "run" not implemented by subclass' }
 
 sub write_file {
   my ($self, $path, $data) = @_;
-
-  # Create directory
   $self->create_dir(dirname $path);
-
-  # Write unbuffered
-  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
-  croak qq{Can't write to file "$path": $!}
-    unless defined $file->syswrite($data);
+  spurt $data, $path;
   say "  [write] $path" unless $self->quiet;
-
   return $self;
 }
 

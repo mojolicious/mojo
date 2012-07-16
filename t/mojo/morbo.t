@@ -14,24 +14,21 @@ plan tests => 26;
 # "Morbo wishes these stalwart nomads peace among the Dutch tulips.
 #  At least all those windmills will keep them cool.
 #  WINDMILLS DO NOT WORK THAT WAY! GOODNIGHT!"
-use Cwd 'cwd';
-use File::Temp;
+use File::Spec::Functions 'catdir';
+use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
 use Mojo::IOLoop;
 use Mojo::Server::Morbo;
 use Mojo::UserAgent;
-use Mojolicious::Command;
+use Mojo::Util 'spurt';
 
 # Prepare script
-my $cwd = cwd;
-my $dir = File::Temp::tempdir(CLEANUP => 1);
-chdir $dir;
-my $command = Mojolicious::Command->new;
-my $script  = $command->rel_file('myapp.pl');
-my $morbo   = Mojo::Server::Morbo->new;
+my $dir = tempdir CLEANUP => 1;
+my $script = catdir $dir, 'myapp.pl';
+my $morbo = Mojo::Server::Morbo->new;
 ok !$morbo->check_file($script), 'file has not changed';
-$command->write_rel_file('myapp.pl', <<EOF);
+spurt <<EOF, $script;
 use Mojolicious::Lite;
 
 app->log->level('fatal');
@@ -70,7 +67,7 @@ is $tx->res->body, 'Hello Morbo!', 'right content';
 
 # Update script without changing size
 my ($size, $mtime) = (stat $script)[7, 9];
-$command->write_rel_file('myapp.pl', <<EOF);
+spurt <<EOF, $script;
 use Mojolicious::Lite;
 
 app->log->level('fatal');
@@ -105,7 +102,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 # Update script without changing mtime
 ($size, $mtime) = (stat $script)[7, 9];
 ok !$morbo->check_file($script), 'file has not changed';
-$command->write_rel_file('myapp.pl', <<EOF);
+spurt <<EOF, $script;
 use Mojolicious::Lite;
 
 app->log->level('fatal');
@@ -146,6 +143,3 @@ sleep 1
   PeerAddr => '127.0.0.1',
   PeerPort => $port
   );
-
-# Cleanup
-chdir $cwd;

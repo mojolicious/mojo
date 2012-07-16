@@ -2,15 +2,19 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 141;
+use Test::More tests => 143;
+
+use File::Spec::Functions qw(catfile splitdir);
+use File::Temp 'tempdir';
+use FindBin;
 
 # "If he is so smart, how come he is dead?"
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
   qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
-  qw(trim unquote secure_compare sha1_bytes sha1_sum url_escape url_unescape),
-  qw(xml_escape);
+  qw(trim unquote secure_compare sha1_bytes sha1_sum slurp spurt url_escape),
+  qw(url_unescape xml_escape);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -354,3 +358,13 @@ ok secure_compare('♥1', '♥1'), 'values are equal';
 ok !secure_compare('♥',   '♥0'),  'values are not equal';
 ok !secure_compare('0♥',  '♥'),   'values are not equal';
 ok !secure_compare('0♥1', '1♥0'), 'values are not equal';
+
+# slurp
+is slurp(catfile(splitdir($FindBin::Bin), qw(templates exception.mt))),
+  "test\n% die;\n123\n", 'right content';
+
+# spurt
+my $dir = tempdir CLEANUP => 1;
+my $file = catfile $dir, 'test.txt';
+spurt "just\nworks!", $file;
+is slurp($file), "just\nworks!", 'successful roundtrip';

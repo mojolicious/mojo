@@ -254,18 +254,18 @@ $string = $json->encode(["\x{2028}test\x{2029}123"]);
 is index($string, b("\x{2028}")->encode), -1, 'properly escaped';
 is index($string, b("\x{2029}")->encode), -1, 'properly escaped';
 is_deeply $json->decode($string), ["\x{2028}test\x{2029}123"],
-  'right roundtrip';
+  'successful roundtrip';
 
 # Blessed reference
 $string = $json->encode([b('test')]);
-is_deeply $json->decode($string), ['test'], 'right roundtrip';
+is_deeply $json->decode($string), ['test'], 'successful roundtrip';
 
 # Blessed reference with TO_JSON method
 $string = $json->encode(JSONTest->new);
-is_deeply $json->decode($string), {}, 'right roundtrip';
+is_deeply $json->decode($string), {}, 'successful roundtrip';
 $string = $json->encode(
   JSONTest->new(something => {just => 'works'}, else => {not => 'working'}));
-is_deeply $json->decode($string), {just => 'works'}, 'right roundtrip';
+is_deeply $json->decode($string), {just => 'works'}, 'successful roundtrip';
 
 # Errors
 is $json->decode('["♥"]'), undef, 'wide character in input';

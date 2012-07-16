@@ -41,7 +41,7 @@ our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
   qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum slurp trim unquote url_escape),
+  qw(secure_compare sha1_bytes sha1_sum slurp spurt trim unquote url_escape),
   qw(url_unescape xml_escape)
 );
 
@@ -269,6 +269,14 @@ sub slurp {
   croak qq{Can't open file "$path": $!} unless open my $file, '<', $path;
   my $content = '';
   while ($file->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
+  return $content;
+}
+
+sub spurt {
+  my ($content, $path) = @_;
+  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
+  croak qq{Can't write to file "$path": $!}
+    unless defined $file->syswrite($content);
   return $content;
 }
 
@@ -560,6 +568,12 @@ Generate SHA1 checksum for string.
   my $content = slurp '/etc/passwd';
 
 Read all data at once from file.
+
+=head2 C<spurt>
+
+  spurt $content, '/etc/passwd';
+
+Write all data at once to file.
 
 =head2 C<trim>
 

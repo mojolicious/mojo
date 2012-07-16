@@ -5,9 +5,10 @@ use utf8;
 # "Homer, we're going to ask you a few simple yes or no questions.
 #  Do you understand?
 #  Yes. *lie dectector blows up*"
-use Test::More tests => 42;
+use Test::More tests => 44;
 
 use File::Spec::Functions qw(catfile splitdir);
+use File::Temp 'tempdir';
 use FindBin;
 use Mojo::ByteStream 'b';
 
@@ -137,8 +138,14 @@ b(1, 2, 3)->say;
 is $buffer, "test\n123\n", 'right output';
 
 # slurp
-my $file = catfile(splitdir($FindBin::Bin), qw(templates exception.mt));
+my $file = catfile splitdir($FindBin::Bin), qw(templates exception.mt);
 $stream = b($file)->slurp;
 is $stream, "test\n% die;\n123\n", 'right content';
 $stream = b($file)->slurp->split("\n")->grep(qr/die/)->join('');
 is $stream, '% die;', 'right content';
+
+# spurt
+my $dir = tempdir CLEANUP => 1;
+$file = catfile $dir, 'test.txt';
+is b("just\nworks!")->spurt($file)->quote, qq{"just\nworks!"}, 'right result';
+is b($file)->slurp, "just\nworks!", 'successful roundtrip';

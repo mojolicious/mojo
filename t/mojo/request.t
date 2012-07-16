@@ -8,7 +8,7 @@ use Test::More tests => 989;
 #  The answer to life's problems aren't at the bottom of a bottle,
 #  they're on TV!"
 use File::Spec::Functions 'catfile';
-use File::Temp;
+use File::Temp 'tempdir';
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Cookie::Request;
@@ -817,8 +817,7 @@ is $req->body_params->to_hash->{text2}, '', 'right value';
 is $req->upload('upload')->filename,  'hello.pl',            'right filename';
 isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
-my $file
-  = catfile(File::Temp::tempdir(CLEANUP => 1), ("MOJO_TMP." . time . ".txt"));
+my $file = catfile(tempdir(CLEANUP => 1), ("MOJO_TMP." . time . ".txt"));
 ok $req->upload('upload')->move_to($file), 'moved file';
 ok unlink($file), 'unlinked file';
 is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';

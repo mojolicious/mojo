@@ -6,12 +6,12 @@ use Test::More tests => 45;
 #  People die all the time, just like that.
 #  Why, you could wake up dead tomorrow! Well, good night."
 use File::Spec::Functions 'catdir';
-use File::Temp;
+use File::Temp 'tempdir';
 use Mojo::Asset::File;
 use Mojo::Log;
 
 # Logging to file
-my $dir = File::Temp::tempdir(CLEANUP => 1);
+my $dir = tempdir CLEANUP => 1;
 my $path = catdir $dir, 'test.log';
 my $log = Mojo::Log->new(level => 'debug', path => $path);
 $log->debug('Just works.');

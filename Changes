@@ -1,6 +1,9 @@
 
-3.09  2012-07-15
+3.09  2012-07-16
+  - Added spurt function to Mojo::Util.
+  - Added spurt method to Mojo::ByteStream.
   - Improved documentation.
+  - Improved tests.
 
 3.08  2012-07-14
   - Fixed small Mojo::Template bug.

@@ -104,16 +104,13 @@ is $mem->contains('db'),    -1, 'does not contain "db"';
 }
 
 # Move memory asset to file
-$mem = Mojo::Asset::Memory->new;
-$mem->add_chunk('abc');
-my $tmp = Mojo::Asset::File->new;
-$tmp->add_chunk('x');
+$mem = Mojo::Asset::Memory->new->add_chunk('abc');
+my $tmp = Mojo::Asset::File->new->add_chunk('x');
 $path = $tmp->path;
 ok -e $path, 'file exists';
 undef $tmp;
 ok !-e $path, 'file has been cleaned up';
-$mem->move_to($path);
-is $mem->slurp, 'abc', 'right content';
+is $mem->move_to($path)->slurp, 'abc', 'right content';
 ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';
@@ -127,8 +124,7 @@ $path = $tmp->path;
 ok -e $path, 'file exists';
 undef $tmp;
 ok !-e $path, 'file has been cleaned up';
-$file->move_to($path);
-is $file->slurp, 'bcd', 'right content';
+is $file->move_to($path)->slurp, 'bcd', 'right content';
 undef $file;
 ok -e $path, 'file exists';
 unlink $path;

@@ -159,7 +159,7 @@ L<Mojo::Message::Response> object.
 
 Encode Perl data structure or decode JSON with L<Mojo::JSON>.
 
-  $ perl -Mojo -E 'say j({hello => "world!"})'
+  $ perl -Mojo -E 'b(j({hello => "world!"}))->spurt("/home/sri/hello.json")'
 
 =head2 C<o>
 

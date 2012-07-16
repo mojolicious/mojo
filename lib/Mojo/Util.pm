@@ -571,7 +571,7 @@ Read all data at once from file.
 
 =head2 C<spurt>
 
-  spurt $content, '/etc/passwd';
+  $content = spurt $content, '/etc/passwd';
 
 Write all data at once to file.
 

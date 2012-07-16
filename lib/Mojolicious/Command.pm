@@ -6,7 +6,6 @@ use Cwd 'getcwd';
 use File::Basename 'dirname';
 use File::Path 'mkpath';
 use File::Spec::Functions qw(catdir catfile);
-use IO::Handle;
 use Mojo::Loader;
 use Mojo::Server;
 use Mojo::Template;

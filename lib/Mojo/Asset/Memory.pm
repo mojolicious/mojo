@@ -1,9 +1,8 @@
 package Mojo::Asset::Memory;
 use Mojo::Base 'Mojo::Asset';
 
-use Carp 'croak';
-use IO::Handle;
 use Mojo::Asset::File;
+use Mojo::Util 'spurt';
 
 has 'auto_upgrade';
 has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };
@@ -48,9 +47,7 @@ sub get_chunk {
 
 sub move_to {
   my ($self, $path) = @_;
-  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
-  croak qq{Can't write to file "$path": $!}
-    unless defined $file->syswrite($self->{content});
+  spurt $self->{content}, $path;
   return $self;
 }
 

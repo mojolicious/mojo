@@ -120,15 +120,12 @@ sub move_to {
   my ($self, $to) = @_;
 
   # Windows requires that the handle is closed
-  close $self->handle;
-  delete $self->{handle};
+  close delete $self->{handle};
 
   # Move file and prevent clean up
   my $from = $self->path;
   move($from, $to) or croak qq{Can't move file "$from" to "$to": $!};
-  $self->path($to)->cleanup(0);
-
-  return $self;
+  return $self->path($to)->cleanup(0);
 }
 
 sub size {

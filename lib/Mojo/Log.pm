@@ -96,11 +96,11 @@ Mojo::Log - Simple logger
   my $log = Mojo::Log->new(path => '/var/log/mojo.log', level => 'warn');
 
   # Log messages
-  $log->debug("Why isn't this working?");
-  $log->info("FYI: it happened again");
-  $log->warn("This might be a problem");
-  $log->error("Garden variety error");
-  $log->fatal("Boom!");
+  $log->debug('Why isn't this working?');
+  $log->info('FYI: it happened again');
+  $log->warn('This might be a problem');
+  $log->error('Garden variety error');
+  $log->fatal('Boom!');
 
 =head1 DESCRIPTION
 

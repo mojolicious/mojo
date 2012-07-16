@@ -578,13 +578,13 @@ Parse content chunk.
 
 =head2 C<parse_body>
 
-  $content = $content->parse_body("Hi!");
+  $content = $content->parse_body('Hi!');
 
 Parse body chunk.
 
 =head2 C<parse_body_once>
 
-  $content = $content->parse_body_once("Hi!");
+  $content = $content->parse_body_once('Hi!');
 
 Parse body chunk once.
 

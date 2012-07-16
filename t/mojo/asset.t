@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 63;
+use Test::More tests => 69;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
@@ -114,6 +114,10 @@ is $mem->move_to($path)->slurp, 'abc', 'right content';
 ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';
+is(Mojo::Asset::Memory->new->move_to($path)->slurp, '', 'no content');
+ok -e $path, 'file exists';
+unlink $path;
+ok !-e $path, 'file has been cleaned up';
 
 # Move file asset to file
 $file = Mojo::Asset::File->new;
@@ -126,6 +130,10 @@ undef $tmp;
 ok !-e $path, 'file has been cleaned up';
 is $file->move_to($path)->slurp, 'bcd', 'right content';
 undef $file;
+ok -e $path, 'file exists';
+unlink $path;
+ok !-e $path, 'file has been cleaned up';
+is(Mojo::Asset::File->new->move_to($path)->slurp, '', 'no content');
 ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';

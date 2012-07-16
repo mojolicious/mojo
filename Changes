@@ -1,4 +1,8 @@
 
+3.10  2012-07-17
+  - Improved tests.
+  - Fixed small bug in Mojo::Asset::File.
+
 3.09  2012-07-16
   - Added spurt function to Mojo::Util.
   - Added spurt method to Mojo::ByteStream.

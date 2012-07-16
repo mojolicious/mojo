@@ -120,7 +120,8 @@ sub move_to {
   my ($self, $to) = @_;
 
   # Windows requires that the handle is closed
-  close delete $self->{handle};
+  close $self->handle;
+  delete $self->{handle};
 
   # Move file and prevent clean up
   my $from = $self->path;

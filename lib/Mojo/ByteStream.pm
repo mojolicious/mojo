@@ -284,7 +284,7 @@ Alias for L<Mojo::Util/"slurp">.
 
 Alias for L<Mojo::Util/"spurt">.
 
-  b('/home/sri/foo.html')->slurp->html_unescape->spurt("/home/sri/bar.html");
+  b('/home/sri/foo.html')->slurp->html_unescape->spurt('/home/sri/bar.html');
 
 =head2 C<split>
 

@@ -159,7 +159,7 @@ L<Mojo::Message::Response> object.
 
 Encode Perl data structure or decode JSON with L<Mojo::JSON>.
 
-  $ perl -Mojo -E 'b(j({hello => "world!"}))->spurt("/home/sri/hello.json")'
+  $ perl -Mojo -E 'b(j({hello => "world!"}))->spurt("hello.json")'
 
 =head2 C<o>
 
@@ -207,7 +207,7 @@ L<Mojo::Message::Response> object.
 
 Turn HTML5/XML input into L<Mojo::DOM> object.
 
-  $ perl -Mojo -E 'say x(b("/home/sri/test.html")->slurp)->at("title")->text'
+  $ perl -Mojo -E 'say x(b("test.html")->slurp)->at("title")->text'
 
 =head1 SEE ALSO
 

@@ -1,4 +1,7 @@
 
+3.11  2012-07-18
+  - Added or method to Test::Mojo. (moritz, sri)
+
 3.10  2012-07-17
   - Improved tests.
   - Fixed small bug in Mojo::Asset::File.

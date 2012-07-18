@@ -3,6 +3,7 @@
   - Added or method to Test::Mojo. (moritz, sri)
   - Improved documentation.
   - Improved tests.
+  - Fixed a few small encoding bugs in Test::Mojo.
 
 3.10  2012-07-17
   - Improved tests.

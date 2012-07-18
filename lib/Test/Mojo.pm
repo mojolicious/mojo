@@ -55,14 +55,15 @@ sub content_unlike {
 #  Everybody wears white shirts.
 #  I'm not popular enough to be different."
 sub content_type_is {
-  my ($self, $type) = @_;
-  return $self->_test('is', $self->tx->res->headers->content_type,
-    $type, "Content-Type: $type");
+  my ($self, $type, $desc) = @_;
+  $desc ||= "Content-Type: $type";
+  return $self->_test('is', $self->tx->res->headers->content_type, $type,
+    $desc);
 }
 
 sub content_type_isnt {
-  my ($self, $type) = @_;
-  my $desc = "not Content-Type: $type";
+  my ($self, $type, $desc) = @_;
+  $desc ||= "not Content-Type: $type";
   return $self->_test('isnt', $self->tx->res->headers->content_type, $type,
     $desc);
 }
@@ -88,13 +89,13 @@ sub delete_ok { shift->_request_ok(delete => @_) }
 
 sub element_exists {
   my ($self, $selector, $desc) = @_;
-  $desc ||= qq{"$selector" exists};
+  $desc ||= encode 'UTF-8', qq{"$selector" exists};
   return $self->_test('ok', $self->tx->res->dom->at($selector), $desc);
 }
 
 sub element_exists_not {
   my ($self, $selector, $desc) = @_;
-  $desc ||= qq{"$selector" exists not};
+  $desc ||= encode 'UTF-8', qq{"$selector" exists not};
   return $self->_test('ok', !$self->tx->res->dom->at($selector), $desc);
 }
 
@@ -109,15 +110,15 @@ sub get_ok  { shift->_request_ok(get  => @_) }
 sub head_ok { shift->_request_ok(head => @_) }
 
 sub header_is {
-  my ($self, $name, $value) = @_;
-  my $desc = "$name: " . ($value ? $value : '');
+  my ($self, $name, $value, $desc) = @_;
+  $desc ||= "$name: " . ($value ? $value : '');
   return $self->_test('is', scalar $self->tx->res->headers->header($name),
     $value, $desc);
 }
 
 sub header_isnt {
-  my ($self, $name, $value) = @_;
-  my $desc = "not $name: " . ($value ? $value : '');
+  my ($self, $name, $value, $desc) = @_;
+  $desc ||= "not $name: " . ($value ? $value : '');
   return $self->_test('isnt', scalar $self->tx->res->headers->header($name),
     $value, $desc);
 }
@@ -223,27 +224,28 @@ sub send_ok {
 
 # "Internet! Is that thing still around?"
 sub status_is {
-  my ($self, $status) = @_;
-  return $self->_test('is', $self->tx->res->code, $status,
-    "$status " . $self->tx->res->new(code => $status)->default_message);
+  my ($self, $status, $desc) = @_;
+  $desc ||= "$status " . $self->tx->res->new(code => $status)->default_message;
+  return $self->_test('is', $self->tx->res->code, $status, $desc);
 }
 
 sub status_isnt {
-  my ($self, $status) = @_;
-  return $self->_test('isnt', $self->tx->res->code, $status,
-    "not $status " . $self->tx->res->new(code => $status)->default_message);
+  my ($self, $status, $desc) = @_;
+  $desc
+    ||= "not $status " . $self->tx->res->new(code => $status)->default_message;
+  return $self->_test('isnt', $self->tx->res->code, $status, $desc);
 }
 
 sub text_is {
   my ($self, $selector, $value, $desc) = @_;
-  return $self->_test('is', $self->_text($selector), $value,
-    $desc || $selector);
+  $desc ||= encode 'UTF-8', $selector;
+  return $self->_test('is', $self->_text($selector), $value, $desc);
 }
 
 sub text_isnt {
   my ($self, $selector, $value, $desc) = @_;
-  return $self->_test('isnt', $self->_text($selector), $value,
-    $desc || $selector);
+  $desc ||= encode 'UTF-8', $selector;
+  return $self->_test('isnt', $self->_text($selector), $value, $desc);
 }
 
 # "Hello, my name is Barney Gumble, and I'm an alcoholic.
@@ -251,14 +253,14 @@ sub text_isnt {
 #  Is it, or is it you girls can't admit that you have a problem?"
 sub text_like {
   my ($self, $selector, $regex, $desc) = @_;
-  return $self->_test('like', $self->_text($selector), $regex,
-    $desc || $selector);
+  $desc ||= encode 'UTF-8', $selector;
+  return $self->_test('like', $self->_text($selector), $regex, $desc);
 }
 
 sub text_unlike {
   my ($self, $selector, $regex, $desc) = @_;
-  return $self->_test('unlike', $self->_text($selector), $regex,
-    $desc || $selector);
+  $desc ||= encode 'UTF-8', $selector;
+  return $self->_test('unlike', $self->_text($selector), $regex, $desc);
 }
 
 sub websocket_ok {
@@ -456,12 +458,14 @@ Opposite of C<content_like>.
 =head2 C<content_type_is>
 
   $t = $t->content_type_is('text/html');
+  $t = $t->content_type_is('text/html', 'right content type');
 
 Check response C<Content-Type> header for exact match.
 
 =head2 C<content_type_isnt>
 
   $t = $t->content_type_isnt('text/html');
+  $t = $t->content_type_isnt('text/html', 'different content type');
 
 Opposite of C<content_type_is>.
 
@@ -528,12 +532,14 @@ arguments as L<Mojo::UserAgent/"head">.
 =head2 C<header_is>
 
   $t = $t->header_is(Expect => 'fun');
+  $t = $t->header_is(Expect => 'fun', 'right header');
 
 Check response header for exact match.
 
 =head2 C<header_isnt>
 
   $t = $t->header_isnt(Expect => 'fun');
+  $t = $t->header_isnt(Expect => 'fun', 'different header');
 
 Opposite of C<header_is>.
 
@@ -683,12 +689,14 @@ Send message or frame via WebSocket.
 =head2 C<status_is>
 
   $t = $t->status_is(200);
+  $t = $t->status_is(200, 'right status');
 
 Check response status for exact match.
 
 =head2 C<status_isnt>
 
   $t = $t->status_isnt(200);
+  $t = $t->status_isnt(200, 'different status');
 
 Opposite of C<status_is>.
 

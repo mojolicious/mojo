@@ -1,6 +1,7 @@
 
 3.11  2012-07-18
   - Added or method to Test::Mojo. (moritz, sri)
+  - Improved default descriptions for many methods in Test::Mojo.
   - Improved documentation.
   - Improved tests.
   - Fixed a few small encoding bugs in Test::Mojo.

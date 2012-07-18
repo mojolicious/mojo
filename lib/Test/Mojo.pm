@@ -89,13 +89,13 @@ sub delete_ok { shift->_request_ok(delete => @_) }
 
 sub element_exists {
   my ($self, $selector, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{"$selector" exists};
+  $desc ||= encode 'UTF-8', qq{element for selector "$selector" exists};
   return $self->_test('ok', $self->tx->res->dom->at($selector), $desc);
 }
 
 sub element_exists_not {
   my ($self, $selector, $desc) = @_;
-  $desc ||= encode 'UTF-8', qq{"$selector" exists not};
+  $desc ||= encode 'UTF-8', qq{no element for selector "$selector"};
   return $self->_test('ok', !$self->tx->res->dom->at($selector), $desc);
 }
 
@@ -238,13 +238,13 @@ sub status_isnt {
 
 sub text_is {
   my ($self, $selector, $value, $desc) = @_;
-  $desc ||= encode 'UTF-8', $selector;
+  $desc ||= encode 'UTF-8', qq{exact match for selector "$selector"};
   return $self->_test('is', $self->_text($selector), $value, $desc);
 }
 
 sub text_isnt {
   my ($self, $selector, $value, $desc) = @_;
-  $desc ||= encode 'UTF-8', $selector;
+  $desc ||= encode 'UTF-8', qq{no match for selector "$selector"};
   return $self->_test('isnt', $self->_text($selector), $value, $desc);
 }
 
@@ -253,13 +253,13 @@ sub text_isnt {
 #  Is it, or is it you girls can't admit that you have a problem?"
 sub text_like {
   my ($self, $selector, $regex, $desc) = @_;
-  $desc ||= encode 'UTF-8', $selector;
+  $desc ||= encode 'UTF-8', qq{similar match for selector "$selector"};
   return $self->_test('like', $self->_text($selector), $regex, $desc);
 }
 
 sub text_unlike {
   my ($self, $selector, $regex, $desc) = @_;
-  $desc ||= encode 'UTF-8', $selector;
+  $desc ||= encode 'UTF-8', qq{no similar match for selector "$selector"};
   return $self->_test('unlike', $self->_text($selector), $regex, $desc);
 }
 

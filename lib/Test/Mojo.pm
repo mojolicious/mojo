@@ -315,10 +315,8 @@ sub _test {
 }
 
 sub _text {
-  my ($self, $selector) = @_;
-  my $text;
-  if (my $e = $self->tx->res->dom->at($selector)) { $text = $e->text }
-  return $text;
+  return unless my $e = shift->tx->res->dom->at(@_);
+  return $e->text;
 }
 
 1;

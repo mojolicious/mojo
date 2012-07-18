@@ -1,6 +1,7 @@
 
-3.11  2012-07-18
+3.11  2012-07-19
   - Added or method to Test::Mojo. (moritz, sri)
+  - Added file and serve_asset methods to Mojolicious::Static.
   - Improved default descriptions for many methods in Test::Mojo.
   - Improved Mojo::Cache performance. (nic)
   - Improved documentation.

@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 81;
+use Test::More tests => 82;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -33,6 +33,8 @@ is $t->app->sessions->cookie_path,   '/bar',         'right path';
 is_deeply $t->app->commands->namespaces,
   [qw(Mojolicious::Command MojoliciousTest::Command)], 'right namespaces';
 is $t->app, $t->app->commands->app, 'applications are equal';
+is $t->app->static->file('hello.txt')->slurp,
+  "Hello Mojo from a static file!\n", 'right content';
 
 # Plugin::Test::SomePlugin2::register (security violation)
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)

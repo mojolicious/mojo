@@ -4,7 +4,6 @@ use Mojo::Base -base;
 use File::Spec::Functions 'catfile';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
-use Mojo::Content::Single;
 use Mojo::Home;
 use Mojo::Loader;
 use Mojo::Path;
@@ -12,108 +11,100 @@ use Mojo::Path;
 has classes => sub { ['main'] };
 has paths   => sub { [] };
 
+# Last modified default
+my $MTIME = time;
+
+# Bundled files
+my $PUBLIC
+  = Mojo::Home->new(Mojo::Home->mojo_lib_dir)->rel_dir('Mojolicious/public');
+
 # "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {
   my ($self, $c) = @_;
 
   # Canonical path
   my $stash = $c->stash;
-  my $path  = $stash->{path}
-    || $c->req->url->path->clone->canonicalize->to_string;
+  my $path = $stash->{path} || $c->req->url->path->clone->canonicalize;
 
   # Split parts
-  my @parts = @{Mojo::Path->new->parse($path)->parts};
-  return unless @parts;
+  return unless my @parts = @{Mojo::Path->new("$path")->parts};
 
-  # Prevent directory traversal
-  return if $parts[0] eq '..';
-
-  # Serve static file
-  return unless $self->serve($c, join('/', @parts));
+  # Serve static file and prevent directory traversal
+  return if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));
   $stash->{'mojo.static'}++;
   return $c->rendered;
 }
 
-sub serve {
-  my ($self, $c, $rel) = @_;
+sub file {
+  my ($self, $rel) = @_;
 
   # Search all paths
-  my $asset;
-  my $mtime = $self->{mtime} ||= time;
-  my $res = $c->res;
   for my $path (@{$self->paths}) {
-    next unless my $data = $self->_get_file(catfile $path, split('/', $rel));
-
-    # Exists
-    last if ($asset, $mtime) = @$data;
-
-    # Forbidded
-    $c->app->log->debug(qq{File "$rel" is forbidden.});
-    $res->code(403) and return;
+    next unless my $asset = $self->_get_file(catfile $path, split('/', $rel));
+    return $asset;
   }
 
   # Search DATA
-  if (!$asset && defined(my $data = $self->_get_data_file($c, $rel))) {
-    $asset = Mojo::Asset::Memory->new->add_chunk($data);
-  }
+  if (my $asset = $self->_get_data_file($rel)) { return $asset }
 
   # Search bundled files
-  elsif (!$asset) {
-    my $b = $self->{bundled} ||= Mojo::Home->new(Mojo::Home->mojo_lib_dir)
-      ->rel_dir('Mojolicious/public');
-    my $data = $self->_get_file(catfile($b, split('/', $rel)));
-    ($asset, $mtime) = @$data if $data && @$data;
-  }
+  return $self->_get_file(catfile($PUBLIC, split('/', $rel)));
+}
 
-  # Not a static file
-  return unless $asset;
+sub serve {
+  my ($self, $c, $rel) = @_;
+  return unless my $asset = $self->file($rel);
+  $rel =~ /\.(\w+)$/;
+  $c->res->headers->content_type($c->app->types->type($1) || 'text/plain');
+  return $self->serve_asset($c, $asset);
+}
+
+sub serve_asset {
+  my ($self, $c, $asset) = @_;
+
+  # Last modified
+  my $mtime = $asset->is_file ? (stat $asset->path)[9] : $MTIME;
+  my $res = $c->res;
+  $res->code(200)->headers->last_modified(Mojo::Date->new($mtime))
+    ->accept_ranges('bytes');
 
   # If modified since
-  my $req_headers = $c->req->headers;
-  my $res_headers = $res->headers;
-  if (my $date = $req_headers->if_modified_since) {
+  my $headers = $c->req->headers;
+  if (my $date = $headers->if_modified_since) {
 
     # Not modified
     my $since = Mojo::Date->new($date)->epoch;
-    if (defined $since && $since == $mtime) {
-      $res_headers->remove('Content-Type')->remove('Content-Length')
-        ->remove('Content-Disposition');
-      return $res->code(304);
-    }
+    return $res->code(304)->headers->remove('Content-Type')
+      ->remove('Content-Length')->remove('Content-Disposition')
+      if defined $since && $since == $mtime;
   }
 
   # Range
   my $size  = $asset->size;
   my $start = 0;
   my $end   = $size - 1 >= 0 ? $size - 1 : 0;
-  if (my $range = $req_headers->range) {
+  if (my $range = $headers->range) {
 
     # Satisfiable
     if ($range =~ m/^bytes=(\d+)-(\d+)?/ && $1 <= $end) {
       $start = $1;
       $end = $2 if defined $2 && $2 <= $end;
-      $res->code(206);
-      $res_headers->content_length($end - $start + 1);
-      $res_headers->content_range("bytes $start-$end/$size");
+      $res->code(206)->headers->content_length($end - $start + 1)
+        ->content_range("bytes $start-$end/$size");
     }
 
     # Not satisfiable
     else { return $res->code(416) }
   }
-  $asset->start_range($start)->end_range($end);
 
-  # Serve file
-  $res->code(200) unless $res->code;
-  $res->content->asset($asset);
-  $rel =~ /\.(\w+)$/;
-  return $res_headers->content_type($c->app->types->type($1) || 'text/plain')
-    ->accept_ranges('bytes')->last_modified(Mojo::Date->new($mtime));
+  # Serve asset
+  return $res->content->asset($asset->start_range($start)->end_range($end));
 }
 
 # "I like being a women.
 #  Now when I say something stupid, everyone laughs and buys me things."
 sub _get_data_file {
-  my ($self, $c, $rel) = @_;
+  my ($self, $rel) = @_;
 
   # Protect templates
   return if $rel =~ /\.\w+\.\w+$/;
@@ -128,15 +119,14 @@ sub _get_data_file {
   }
 
   # Find file
-  return $loader->data($self->{index}{$rel}, $rel);
+  return unless defined(my $data = $loader->data($self->{index}{$rel}, $rel));
+  return Mojo::Asset::Memory->new->add_chunk($data);
 }
 
 sub _get_file {
-  my ($self, $path, $rel) = @_;
+  my ($self, $path) = @_;
   no warnings 'newline';
-  return unless -f $path;
-  return [] unless -r $path;
-  return [Mojo::Asset::File->new(path => $path), (stat $path)[9]];
+  return -r $path ? Mojo::Asset::File->new(path => $path) : undef;
 }
 
 1;
@@ -192,11 +182,25 @@ the following ones.
 
 Serve static file for L<Mojolicious::Controller> object.
 
+=head2 C<file>
+
+  my $asset = $static->file('foo/bar.html');
+
+Get L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object for a file, relative
+to C<paths> or from C<classes>.
+
 =head2 C<serve>
 
   my $success = $static->serve(Mojolicious::Controller->new, 'foo/bar.html');
 
 Serve a specific file, relative to C<paths> or from C<classes>.
+
+=head2 C<serve_asset>
+
+  $static->serve_asset(Mojolicious::Controller->new, Mojo::Asset::File->new);
+
+Serve a L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object with range and
+last modified support.
 
 =head1 SEE ALSO
 

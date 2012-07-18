@@ -172,7 +172,7 @@ sub _select {
   my $results = $dom->find($selector);
 
   # Commands
-  my $finished = 0;
+  my $finished;
   while (defined(my $command = shift @ARGV)) {
 
     # Number

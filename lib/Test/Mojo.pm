@@ -190,8 +190,9 @@ sub message_unlike {
 sub options_ok { shift->_request_ok(options => @_) }
 
 sub or {
-  my $self = shift;
-  Test::More::diag @_ unless $self->{latest};
+  my ($self, $diag) = @_;
+  Test::More::diag ref $diag eq 'CODE' ? $self->$diag : $diag
+    unless $self->{latest};
   return $self;
 }
 
@@ -624,10 +625,13 @@ same arguments as L<Mojo::UserAgent/"options">.
 =head2 C<or>
 
   $t = $t->or("Here's what went wrong.");
+  $t = $t->or(sub {...});
 
 Print a diagnostic message if previous test failed.
 
-  $t->get_ok('/fails')->or('Must have been Glen!');
+  # Diagnostics
+  $t->get_ok('/fails')->or('Must have been Glen!')
+    ->status_is(200)->or(sub { shift->tx->res->dom->at('title')->text });
 
 =head2 C<patch_ok>
 

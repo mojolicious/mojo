@@ -18,7 +18,8 @@ use Test::Mojo;
 my $t = Test::Mojo->new('MojoliciousTest');
 
 # SyntaxError::foo in testing mode (syntax error in controller)
-$t->get_ok('/syntax_error/foo')->status_is(500)->or('Bad error!')
+$t->get_ok('/syntax_error/foo')->status_is(500)
+  ->or(sub { shift->tx->res->headers->server })
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Testing Missing/);

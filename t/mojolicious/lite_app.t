@@ -571,8 +571,7 @@ $tua->ioloop->timer(
 );
 
 # GET /☃
-$t->get_ok('/☃')->status_is(200)->or('Bad snowman!')
-  ->content_is('/%E2%98%83/%E2%98%83');
+$t->get_ok('/☃')->status_is(200)->content_is('/%E2%98%83/%E2%98%83');
 
 # GET /☃ (with trailing slash)
 $t->get_ok('/☃/')->status_is(200)->content_is('/%E2%98%83//%E2%98%83/');

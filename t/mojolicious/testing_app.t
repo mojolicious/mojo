@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 25;
+use Test::More tests => 27;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -16,13 +16,16 @@ use Test::Mojo;
 
 # "Anything less than immortality is a complete waste of time!"
 my $t = Test::Mojo->new('MojoliciousTest');
+my $or;
+$t->or(sub { $or++ })->or(sub { $or++ });
+is $or, 2, 'both callbacks have been invoked';
 
 # SyntaxError::foo in testing mode (syntax error in controller)
-$t->get_ok('/syntax_error/foo')->status_is(500)
-  ->or(sub { shift->tx->res->headers->server })
+$t->get_ok('/syntax_error/foo')->status_is(500)->or(sub { $or++ })
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Testing Missing/);
+is $or, 2, 'callback has not been invoked';
 
 # Foo::syntaxerror in testing mode (syntax error in template)
 $t->get_ok('/foo/syntaxerror')->status_is(500)

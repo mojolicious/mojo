@@ -317,7 +317,7 @@ sub _test {
 }
 
 sub _text {
-  return unless my $e = shift->tx->res->dom->at(@_);
+  return '' unless my $e = shift->tx->res->dom->at(shift);
   return $e->text;
 }
 

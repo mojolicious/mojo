@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 697;
+use Test::More tests => 702;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -43,6 +43,9 @@ is app->test_helper2, 'Mojolicious::Controller', 'right value';
 
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
+
+# UTF-8 text
+app->types->type(txt => 'text/plain;charset=UTF-8');
 
 # GET /☃
 get '/☃' => sub {
@@ -1234,9 +1237,13 @@ $t->get_ok('/redirect_named')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is(Location       => undef)->element_exists('#foo')
-  ->element_exists_not('#bar')->text_isnt('div' => 'Redirect')
-  ->text_is('div' => 'Redirect works!')->text_unlike('[id="foo"]' => qr/Foo/)
-  ->text_like('[id="foo"]' => qr/^Redirect/);
+  ->element_exists_not('#bar')->text_isnt('#bar' => 'whatever')
+  ->text_isnt('div' => 'Redirect')->text_isnt('div.☃' => 'Redirect')
+  ->text_is('div'     => 'Redirect works!')
+  ->text_is('div.☃' => 'Redirect works!')
+  ->text_unlike('[id="foo"]' => qr/Foo/)->text_unlike('div.☃' => qr/Foo/)
+  ->text_like('[id="foo"]' => qr/^Redirect/)
+  ->text_like('div.☃'    => qr/^Redirect/);
 $t->ua->max_redirects(0);
 Test::Mojo->new->tx($t->tx->previous)->status_is(302)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1392,7 +1399,7 @@ Just some
 text!
 
 @@ template.txt.epl
-<div id="foo">Redirect works!</div>
+<div id="foo" class="☃">Redirect works!</div>
 
 @@ test(test)(\Qtest\E)(.html.ep
 <%= $self->match->endpoint->name %>

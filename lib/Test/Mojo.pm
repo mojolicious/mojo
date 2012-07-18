@@ -629,7 +629,7 @@ Invoke callback if previous test failed.
 
   # Diagnostics
   $t->get_ok('/bad')->or(sub { diag 'Must have been Glen!' })
-    ->status_is(200)->or(sub { diag shift->tx->res->dom->at('title')->text });
+    ->status_is(200)->or(sub { diag $t->tx->res->dom->at('title')->text });
 
 =head2 C<patch_ok>
 

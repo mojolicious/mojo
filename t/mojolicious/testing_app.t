@@ -17,14 +17,13 @@ use Test::Mojo;
 # "Anything less than immortality is a complete waste of time!"
 my $t  = Test::Mojo->new('MojoliciousTest');
 my $or = '';
-$t->or(sub { $or .= shift->ua->name })->or(sub { $or .= shift->ua->name });
+$t->or(sub { $or .= $t->ua->name })->or(sub { $or .= shift->ua->name });
 is $or, 'Mojolicious (Perl)Mojolicious (Perl)',
   'both callbacks have been invoked';
 
 # SyntaxError::foo in testing mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)
-  ->or(sub { $or .= shift->ua->name })
-  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->or(sub { $or .= $t->ua->name })->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Testing Missing/);
 is $or, 'Mojolicious (Perl)Mojolicious (Perl)',

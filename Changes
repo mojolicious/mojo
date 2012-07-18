@@ -1,6 +1,8 @@
 
 3.11  2012-07-18
   - Added or method to Test::Mojo. (moritz, sri)
+  - Improved documentation.
+  - Improved tests.
 
 3.10  2012-07-17
   - Improved tests.

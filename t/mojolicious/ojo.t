@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 # "What do you mean 'we', flesh-tube?"
 use ojo;
@@ -19,7 +19,7 @@ use ojo;
 a(
   '/' => sub {
     my $self = shift;
-    $self->render(text => $self->req->method . ($self->param('foo') || ''));
+    $self->render(data => $self->req->method . $self->req->body);
   }
 )->secret('foobarbaz');
 is a->secret, 'foobarbaz', 'right secret';
@@ -46,7 +46,10 @@ is u('/')->body, 'PUT', 'right content';
 is d('/')->body, 'DELETE', 'right content';
 
 # POST / (form)
-is f('/' => {foo => 'bar'})->body, 'POSTbar', 'right content';
+is f('/' => {foo => 'bar'})->body, 'POSTfoo=bar', 'right content';
+
+# POST / (JSON)
+is n('/' => {foo => 'bar'})->body, 'POST{"foo":"bar"}', 'right content';
 
 # Parse XML
 is x('<title>works</title>')->at('title')->text, 'works', 'right text';

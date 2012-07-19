@@ -35,7 +35,7 @@ has transactor => sub { Mojo::UserAgent::Transactor->new };
     *{__PACKAGE__ . '::' . lc($name)} = sub {
       my $self = shift;
       my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
-      $self->start($self->build_tx($name, @_), $cb);
+      return $self->start($self->build_tx($name, @_), $cb);
     };
   }
 }
@@ -67,6 +67,7 @@ sub app_url {
 }
 
 sub build_form_tx      { shift->transactor->form(@_) }
+sub build_json_tx      { shift->transactor->json(@_) }
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
 
@@ -85,7 +86,13 @@ sub need_proxy {
 sub post_form {
   my $self = shift;
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
-  $self->start($self->build_form_tx(@_), $cb);
+  return $self->start($self->build_form_tx(@_), $cb);
+}
+
+sub post_json {
+  my $self = shift;
+  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  return $self->start($self->build_json_tx(@_), $cb);
 }
 
 sub start {
@@ -824,6 +831,13 @@ Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
 
 Alias for L<Mojo::UserAgent::Transactor/"form">.
 
+=head2 C<build_json_tx>
+
+  my $tx = $ua->build_json_tx('http://kraih.com' => {a => 'b'});
+  my $tx = $ua->build_json_tx('kraih.com', {a => 'b'}, {DNT => 1});
+
+Alias for L<Mojo::UserAgent::Transactor/"json">.
+
 =head2 C<build_tx>
 
   my $tx = $ua->build_tx(GET => 'kraih.com');
@@ -964,6 +978,22 @@ L<Mojo::UserAgent::Transactor/"form">. You can also append a callback to
 perform requests non-blocking.
 
   $ua->post_form('http://kraih.com' => {q => 'test'} => sub {
+    my ($ua, $tx) = @_;
+    say $tx->res->body;
+  });
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+=head2 C<post_json>
+
+  my $tx = $ua->post_json('http://kraih.com' => {a => 'b'});
+  my $tx = $ua->post_json('kraih.com', {a => 'b'}, {DNT => 1});
+
+Perform blocking HTTP C<POST> request with JSON data and return resulting
+L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::UserAgent::Transactor/"json">. You can also append a callback to
+perform requests non-blocking.
+
+  $ua->post_json('http://kraih.com' => {q => 'test'} => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });

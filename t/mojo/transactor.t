@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 257;
+use Test::More tests => 275;
 
 # "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
@@ -42,6 +42,39 @@ is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
 is $tx->req->method, 'DELETE', 'right method';
 is $tx->req->headers->expect, undef, 'no "Expect" value';
 is $tx->req->body, 'test', 'right content';
+
+# Simple JSON POST
+$tx = $t->json('http://kraih.com/foo', => {test => 123});
+is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, 'application/json',
+  'right "Content-Type" value';
+is_deeply $tx->req->json, {test => 123}, 'right content';
+$tx = $t->json('http://kraih.com/foo', => [1, 2, 3]);
+is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, 'application/json',
+  'right "Content-Type" value';
+is_deeply $tx->req->json, [1, 2, 3], 'right content';
+
+# JSON POST with headers
+$tx = $t->json('http://kraih.com/foo', => {test => 123} => {DNT => 1});
+is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->dnt, 1, 'right "DNT" value';
+is $tx->req->headers->content_type, 'application/json',
+  'right "Content-Type" value';
+is_deeply $tx->req->json, {test => 123}, 'right content';
+
+# JSON POST with custom content type
+$tx = $t->json('http://kraih.com/foo', => [1, 2, 3] =>
+    {DNT => 1, 'Content-Type' => 'application/something'});
+is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->dnt, 1, 'right "DNT" value';
+is $tx->req->headers->content_type, 'application/something',
+  'right "Content-Type" value';
+is_deeply $tx->req->json, [1, 2, 3], 'right content';
 
 # Simple form
 $tx = $t->form('http://kraih.com/foo' => {test => 123});

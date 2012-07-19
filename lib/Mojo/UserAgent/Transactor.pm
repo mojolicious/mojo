@@ -6,11 +6,14 @@ use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
+use Mojo::JSON;
 use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util qw(encode url_escape);
+
+has json_class => 'Mojo::JSON';
 
 sub endpoint {
   my ($self, $tx) = @_;
@@ -91,6 +94,14 @@ sub form {
   }
 
   return $tx;
+}
+
+sub json {
+  my ($self, $url, $data) = (shift, shift, shift);
+  my $headers = ref $_[0] eq 'HASH' ? $_[0] : {@_};
+  $headers->{'Content-Type'} //= 'application/json';
+  return $self->tx(POST => $url, $headers,
+    $self->json_class->new->encode($data));
 }
 
 # "This kid's a wonder!
@@ -263,6 +274,18 @@ Mojo::UserAgent::Transactor - User agent transactor
 L<Mojo::UserAgent::Transactor> is the transaction building and manipulation
 framework used by L<Mojo::UserAgent>.
 
+=head1 ATTRIBUTES
+
+L<Mojo::UserAgent::Transactor> implements the following attributes.
+
+=head2 C<json_class>
+
+  my $class = $t->json_class;
+  $t        = $t->json_class('Mojo::JSON');
+
+Class to be used for JSON serialization with the C<json> method, defaults to
+L<Mojo::JSON>.
+
 =head1 METHODS
 
 L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and
@@ -315,6 +338,20 @@ enforce it by setting the header manually.
     {a => 'b'},
     {'Content-Type' => 'multipart/form-data'}
   );
+
+=head2 C<json>
+
+  my $tx = $t->json('kraih.com' => {a => 'b'});
+  my $tx = $t->json('http://kraih.com' => [1, 2, 3]);
+  my $tx = $t->json('http://kraih.com' => {a => 'b'} => {DNT => 1});
+  my $tx = $t->json('http://kraih.com' => [1, 2, 3] => {DNT => 1});
+
+Versatile L<Mojo::Transaction::HTTP> builder for C<POST> requests with JSON
+data.
+
+  # Change method to PATCH
+  my $tx = $t->json('mojolicio.us/hello', {hello => 'world'});
+  $tx->req->method('PATCH');
 
 =head2 C<peer>
 

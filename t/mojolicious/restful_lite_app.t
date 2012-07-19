@@ -6,11 +6,17 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 333;
+use Test::More tests => 344;
 
 # "Woohoo, time to go clubbin'! Baby seals here I come!"
 use Mojolicious::Lite;
 use Test::Mojo;
+
+# POST /json/echo
+post '/json/echo' => sub {
+  my $self = shift;
+  $self->respond_to(json => {json => $self->req->json});
+};
 
 # /rest
 under '/rest';
@@ -38,6 +44,21 @@ post sub {
 
 # "Raise the solar sails! I'm going after that Mobius Dick!"
 my $t = Test::Mojo->new;
+
+# POST /json/echo (hash without format)
+$t->post_json_ok('/json/echo' => {hello => 'world'})->status_is(204)
+  ->content_is('');
+
+# POST /json/echo (hash with json format)
+$t->post_json_ok(
+  '/json/echo' => {hello => 'world'} => {Accept => 'application/json'})
+  ->status_is(200)->content_type_is('application/json')
+  ->json_content_is({hello => 'world'});
+
+# POST /json/echo (array with json format)
+$t->post_json_ok('/json/echo' => [1, 2, 3] => {Accept => 'application/json'})
+  ->status_is(200)->content_type_is('application/json')
+  ->json_content_is([1, 2, 3]);
 
 # GET /rest
 $t->get_ok('/rest')->status_is(200)

@@ -206,6 +206,13 @@ sub post_form_ok {
     encode('UTF-8', "post $url"));
 }
 
+sub post_json_ok {
+  my ($self, $url) = (shift, shift);
+  $self->tx($self->ua->post_json($url, @_));
+  return $self->_test('ok', $self->tx->is_finished,
+    encode('UTF-8', "post $url"));
+}
+
 # "WHO IS FONZY!?! Don't they teach you anything at school?"
 sub put_ok { shift->_request_ok(put => @_) }
 
@@ -656,11 +663,19 @@ arguments as L<Mojo::UserAgent/"post">.
   $t = $t->post_form_ok('/foo' => {a => 'b'});
   $t = $t->post_form_ok('/foo' => 'UTF-8' => {a => 'b'} => {DNT => 1});
 
-Submit a C<POST> form and check for transport errors, takes the exact same
-arguments as L<Mojo::UserAgent/"post_form">.
+Perform a C<POST> request with form data and check for transport errors, takes
+the exact same arguments as L<Mojo::UserAgent/"post_form">.
 
   # Test file upload
   $t->post_form_ok('/upload' => {foo => {content => 'bar'}})->status_is(200);
+
+=head2 C<post_json_ok>
+
+  $t = $t->post_json_ok('/foo' => {a => 'b'});
+  $t = $t->post_json_ok('/foo' => {a => 'b'} => {DNT => 1});
+
+Perform a C<POST> request with JSON data and check for transport errors, takes
+the exact same arguments as L<Mojo::UserAgent/"post_json">.
 
 =head2 C<put_ok>
 

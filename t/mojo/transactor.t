@@ -68,7 +68,7 @@ is_deeply $tx->req->json, {test => 123}, 'right content';
 
 # JSON POST with custom content type
 $tx = $t->json('http://kraih.com/foo', => [1, 2, 3] =>
-    {DNT => 1, 'Content-Type' => 'application/something'});
+    {DNT => 1, 'content-type' => 'application/something'});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->dnt, 1, 'right "DNT" value';

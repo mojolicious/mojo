@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 87;
+use Test::More tests => 89;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -40,6 +40,12 @@ is $headers->header('ETag'), $headers->etag, 'values are equal';
 $headers->status('200 OK');
 is $headers->status, '200 OK', 'right value';
 is $headers->header('Status'), $headers->status, 'values are equal';
+
+# Mixed case
+is $headers->header('content-type' => 'text/plain')->content_type,
+  'text/plain', 'right value';
+is $headers->header('Content-Type' => 'text/html')->content_type, 'text/html',
+  'right value';
 
 # Common headers
 $headers = Mojo::Headers->new;
@@ -147,6 +153,7 @@ is_deeply $headers->to_hash,
 $headers->from_hash({});
 is_deeply $headers->to_hash, {}, 'right structure';
 
+# Multiline
 $headers = Mojo::Headers->new;
 $headers->from_hash(
   {'X-Test' => [[23, 24], ['single line'], [25, 26]], 'X-Test2' => 'foo'});

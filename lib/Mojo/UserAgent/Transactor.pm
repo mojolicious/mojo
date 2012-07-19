@@ -98,10 +98,10 @@ sub form {
 
 sub json {
   my ($self, $url, $data) = (shift, shift, shift);
-  my $headers = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-  $headers->{'Content-Type'} //= 'application/json';
-  return $self->tx(POST => $url, $headers,
-    $self->json_class->new->encode($data));
+  my $tx = $self->tx(POST => $url, @_, $self->json_class->new->encode($data));
+  my $headers = $tx->req->headers;
+  $headers->content_type('application/json') unless $headers->content_type;
+  return $tx;
 }
 
 # "This kid's a wonder!

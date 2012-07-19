@@ -221,7 +221,7 @@ sub register {
   );
 
   # Add "text_field" helper
-  $app->helper(text_field => sub { $self->_input(@_) });
+  $app->helper(text_field => sub { $self->_input(@_, type => 'text') });
 }
 
 sub _input {

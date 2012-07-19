@@ -231,7 +231,7 @@ $t->get_ok('/another/file')->status_is(200)
   ->content_type_is('text/plain')->content_like(qr/Hello Mojolicious!/);
 
 # Static directory /another
-$t->get_ok('/hidden')->status_is(404)
+$t->get_ok('/another')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)');
 

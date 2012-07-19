@@ -23,7 +23,7 @@ sub register {
 
   # Add "file_field" helper
   $app->helper(file_field =>
-      sub { shift; $self->_tag('input', name => shift, type => 'file', @_) });
+      sub { shift; $self->_tag('input', name => shift, @_, type => 'file') });
 
   # Add "form_for" helper
   $app->helper(
@@ -50,7 +50,7 @@ sub register {
   $app->helper(
     hidden_field => sub {
       shift;
-      my %attrs = (type => 'hidden', name => shift, value => shift, @_);
+      my %attrs = (name => shift, value => shift, @_, type => 'hidden');
       return $self->_tag('input', %attrs);
     }
   );
@@ -107,7 +107,7 @@ sub register {
   $app->helper(
     password_field => sub {
       shift;
-      $self->_tag('input', name => shift, type => 'password', @_);
+      $self->_tag('input', name => shift, @_, type => 'password');
     }
   );
 
@@ -192,7 +192,7 @@ sub register {
   $app->helper(
     submit_button => sub {
       shift;
-      $self->_tag('input', value => shift // 'Ok', type => 'submit', @_);
+      $self->_tag('input', value => shift // 'Ok', @_, type => 'submit');
     }
   );
 
@@ -221,7 +221,7 @@ sub register {
   );
 
   # Add "text_field" helper
-  $app->helper(text_field => sub { $self->_input(@_) });
+  $app->helper(text_field => sub { $self->_input(@_, type => 'text') });
 }
 
 sub _input {
@@ -574,9 +574,9 @@ accidental double escaping.
 Generate text input element. Previous input values will automatically get
 picked up and shown as default.
 
-  <input name="first_name" />
-  <input name="first_name" value="Default name" />
-  <input class="user" name="first_name" value="Default name" />
+  <input name="first_name" type="text" />
+  <input name="first_name" type="text" value="Default name" />
+  <input class="user" name="first_name" type="text" value="Default name" />
 
 =head2 C<text_area>
 

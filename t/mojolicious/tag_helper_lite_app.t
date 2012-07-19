@@ -128,9 +128,9 @@ EOF
 # GET /basicform
 $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 <form action="/links">
-  <input name="foo" value="bar" />
-  <input class="test" name="bar" value="baz" />
-  <input name="yada" value="" />
+  <input name="foo" type="text" value="bar" />
+  <input class="test" name="bar" type="text" value="baz" />
+  <input name="yada" type="text" value="" />
   <input class="tset" name="baz" value="yada" />
   <input type="submit" value="Ok" />
 </form>
@@ -188,7 +188,7 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   <input name="foo" />
 </form>
 <form action="/form/24" method="post">
-  <input name="foo" />
+  <input name="foo" type="text" />
   <input name="foo" type="checkbox" value="1" />
   <input checked="checked" name="a" type="checkbox" value="2" />
   <input name="b" type="radio" value="1" />
@@ -218,7 +218,7 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
   <input name="foo" />
 </form>
 <form action="/form/24" method="post">
-  <input name="foo" />
+  <input name="foo" type="text" />
   <input name="foo" type="checkbox" value="1" />
   <input name="a" type="checkbox" value="2" />
   <input name="b" type="radio" value="1" />

@@ -270,7 +270,7 @@ implements the following new ones.
 
 =head2 C<endpoint>
 
-  my ($scheme, $host, $port) = $t->endpoint($tx);
+  my ($scheme, $host, $port) = $t->endpoint(Mojo::Transaction::HTTP->new);
 
 Actual endpoint for transaction.
 
@@ -318,20 +318,20 @@ enforce it by setting the header manually.
 
 =head2 C<peer>
 
-  my ($scheme, $host, $port) = $t->peer($tx);
+  my ($scheme, $host, $port) = $t->peer(Mojo::Transaction::HTTP->new);
 
 Actual peer for transaction.
 
 =head2 C<proxy_connect>
 
-  my $tx = $t->proxy_connect($old);
+  my $tx = $t->proxy_connect(Mojo::Transaction::HTTP->new);
 
 Build L<Mojo::Transaction::HTTP> proxy connect request for transaction if
 possible.
 
 =head2 C<redirect>
 
-  my $tx = $t->redirect($old);
+  my $tx = $t->redirect(Mojo::Transaction::HTTP->new);
 
 Build L<Mojo::Transaction::HTTP> followup request for C<301>, C<302>, C<303>,
 C<307> or C<308> redirect response if possible.

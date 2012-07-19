@@ -1,4 +1,7 @@
 
+3.12  2012-07-20
+  - Improved documentation.
+
 3.11  2012-07-19
   - Added or method to Test::Mojo. (moritz, sri)
   - Added file and serve_asset methods to Mojolicious::Static.

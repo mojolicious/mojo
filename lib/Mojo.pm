@@ -91,7 +91,7 @@ Mojo - Duct tape for the HTML5 web!
 
 Mojo provides a flexible runtime environment for Perl real-time web
 frameworks. It provides all the basic tools and helpers needed to write
-simple web applications and higher level web frameworks such as
+simple web applications and higher level web frameworks, such as
 L<Mojolicious>.
 
 See L<Mojolicious> for more!
@@ -169,7 +169,7 @@ Application configuration.
 
 =head2 C<handler>
 
-  $app->handler($tx);
+  $app->handler(Mojo::Transaction::HTTP->new);
 
 The handler is the main entry point to your application or framework and will
 be called for each new transaction, which will usually be a

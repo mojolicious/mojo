@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Rainbow';
-our $VERSION  = '3.11';
+our $VERSION  = '3.12';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -407,7 +407,7 @@ request.
 
 =head2 C<dispatch>
 
-  $app->dispatch($c);
+  $app->dispatch(Mojolicious::Controller->new);
 
 The heart of every Mojolicious application, calls the C<static> and C<routes>
 dispatchers for every request and passes them a L<Mojolicious::Controller>
@@ -415,8 +415,8 @@ object.
 
 =head2 C<handler>
 
-  $app->handler($tx);
-  $app->handler($c);
+  $app->handler(Mojo::Transaction::HTTP->new);
+  $app->handler(Mojolicious::Controller->new);
 
 Sets up the default controller and calls process for every request.
 

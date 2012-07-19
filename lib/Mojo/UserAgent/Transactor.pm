@@ -53,7 +53,7 @@ sub form {
     elsif (ref $value eq 'HASH') {
 
       # Enforce "multipart/form-data"
-      $multipart = 1;
+      $multipart++;
 
       # File
       if (my $file = $value->{file}) {
@@ -75,11 +75,11 @@ sub form {
   }
 
   # New transaction
-  my $tx      = $self->tx(POST => $url);
-  my $req     = $tx->req;
-  my $headers = $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
+  my $tx = $self->tx(POST => $url, @_);
 
   # Multipart
+  my $req     = $tx->req;
+  my $headers = $req->headers;
   $headers->content_type('multipart/form-data') if $multipart;
   if (($headers->content_type || '') eq 'multipart/form-data') {
     my $parts = $self->_multipart($encoding, $p->to_hash);
@@ -166,20 +166,18 @@ sub redirect {
 sub tx {
   my $self = shift;
 
-  # New transaction
+  # Method and URL
   my $tx  = Mojo::Transaction::HTTP->new;
-  my $req = $tx->req;
-  $req->method(shift);
+  my $req = $tx->req->method(shift);
   my $url = shift;
   $url = "http://$url" unless $url =~ m!^/|\://!;
   ref $url ? $req->url($url) : $req->url->parse($url);
 
-  # Body
-  $req->body(pop)
-    if @_ & 1 == 1 && ref $_[0] ne 'HASH' || ref $_[-2] eq 'HASH';
-
   # Headers
-  $req->headers->from_hash(ref $_[0] eq 'HASH' ? $_[0] : {@_});
+  $req->headers->from_hash(shift) if ref $_[0] eq 'HASH';
+
+  # Body
+  $req->body(shift) if @_;
 
   return $tx;
 }
@@ -188,7 +186,7 @@ sub tx {
 sub websocket {
   my $self = shift;
 
-  # New WebSocket
+  # New WebSocket transaction
   my $tx  = $self->tx(GET => @_);
   my $req = $tx->req;
   my $abs = $req->url->to_abs;
@@ -349,7 +347,7 @@ enforce it by setting the header manually.
 Versatile L<Mojo::Transaction::HTTP> builder for C<POST> requests with JSON
 data.
 
-  # Change method to PATCH
+  # Change method
   my $tx = $t->json('mojolicio.us/hello', {hello => 'world'});
   $tx->req->method('PATCH');
 

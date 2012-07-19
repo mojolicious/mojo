@@ -561,8 +561,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
   $ua->max_redirects(5)->get('latest.mojolicio.us')
     ->res->content->asset->move_to('/Users/sri/mojo.tar.gz');
 
-  # TLS certificate authentication
-  my $tx = $ua->cert('tls.crt')->key('tls.key')->get('https://mojolicio.us');
+  # TLS certificate authentication and JSON POST
+  my $tx = $ua->cert('tls.crt')->key('tls.key')
+    ->post_json('https://mojolicio.us' => {top => 'secret'});
 
   # Blocking parallel requests (does not work inside a running event loop)
   my $delay = Mojo::IOLoop->delay;
@@ -834,7 +835,7 @@ Alias for L<Mojo::UserAgent::Transactor/"form">.
 =head2 C<build_json_tx>
 
   my $tx = $ua->build_json_tx('http://kraih.com' => {a => 'b'});
-  my $tx = $ua->build_json_tx('kraih.com', {a => 'b'}, {DNT => 1});
+  my $tx = $ua->build_json_tx('kraih.com' => {a => 'b'} => {DNT => 1});
 
 Alias for L<Mojo::UserAgent::Transactor/"json">.
 
@@ -986,7 +987,7 @@ perform requests non-blocking.
 =head2 C<post_json>
 
   my $tx = $ua->post_json('http://kraih.com' => {a => 'b'});
-  my $tx = $ua->post_json('kraih.com', {a => 'b'}, {DNT => 1});
+  my $tx = $ua->post_json('kraih.com' => {a => 'b'} => {DNT => 1});
 
 Perform blocking HTTP C<POST> request with JSON data and return resulting
 L<Mojo::Transaction::HTTP> object, takes the exact same arguments as

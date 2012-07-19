@@ -1,7 +1,7 @@
 
 3.12  2012-07-20
   - Added json method to Mojo::UserAgent::Transactor.
-  - Added built_json_tx and post_json methods to Mojo::UserAgent.
+  - Added build_json_tx and post_json methods to Mojo::UserAgent.
   - Added post_json_ok method to Test::Mojo.
   - Added json_class attribute to Mojo::UserAgent::Transactor.
   - Added n function to ojo.

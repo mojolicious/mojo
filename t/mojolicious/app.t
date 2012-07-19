@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 327;
+use Test::More tests => 337;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -223,6 +223,17 @@ $t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);
+
+# Static file /another/file (no extension)
+$t->get_ok('/another/file')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')->content_like(qr/Hello Mojolicious!/);
+
+# Static directory /another
+$t->get_ok('/hidden')->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)');
 
 # Check Last-Modified header for static files
 my $path  = catdir($FindBin::Bin, 'public_dev', 'hello.txt');

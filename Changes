@@ -8,6 +8,8 @@
   - Improved text_field helper to always set the type attribute. (marty, sri)
   - Improved documentation.
   - Improved tests.
+  - Fixed file and content type detection bugs in Mojolicious::Static.
+    (marty, sri)
 
 3.11  2012-07-19
   - Added or method to Test::Mojo. (moritz, sri)

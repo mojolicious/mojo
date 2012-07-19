@@ -54,8 +54,8 @@ sub file {
 sub serve {
   my ($self, $c, $rel) = @_;
   return unless my $asset = $self->file($rel);
-  $rel =~ /\.(\w+)$/;
-  $c->res->headers->content_type($c->app->types->type($1) || 'text/plain');
+  my $type = $rel =~ /\.(\w+)$/ ? $c->app->types->type($1) : undef;
+  $c->res->headers->content_type($type || 'text/plain');
   return $self->serve_asset($c, $asset);
 }
 
@@ -126,7 +126,7 @@ sub _get_data_file {
 sub _get_file {
   my ($self, $path) = @_;
   no warnings 'newline';
-  return -r $path ? Mojo::Asset::File->new(path => $path) : undef;
+  return -f $path && -r $path ? Mojo::Asset::File->new(path => $path) : undef;
 }
 
 1;

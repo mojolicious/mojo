@@ -8,6 +8,7 @@ has [qw(cookie_domain secure)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
+has json_class         => 'Mojo::JSON';
 
 # "Bender, quit destroying the universe!"
 sub load {
@@ -18,7 +19,8 @@ sub load {
 
   # Deserialize
   $value =~ s/-/=/g;
-  return unless my $session = Mojo::JSON->new->decode(b64_decode $value);
+  return
+    unless my $session = $self->json_class->new->decode(b64_decode $value);
 
   # Expiration
   my $expiration = $self->default_expiration;
@@ -56,7 +58,7 @@ sub store {
     if $expiration || $default;
 
   # Serialize
-  my $value = b64_encode(Mojo::JSON->new->encode($session), '');
+  my $value = b64_encode($self->json_class->new->encode($session), '');
   $value =~ s/=/-/g;
 
   # Session cookie
@@ -94,30 +96,30 @@ L<Mojolicious::Sessions> implements the following attributes.
 
 =head2 C<cookie_domain>
 
-  my $domain = $session->cookie_domain;
-  $session   = $session->cookie_domain('.example.com');
+  my $domain = $sessions->cookie_domain;
+  $sessions  = $sessions->cookie_domain('.example.com');
 
 Domain for session cookie, not defined by default.
 
 =head2 C<cookie_name>
 
-  my $name = $session->cookie_name;
-  $session = $session->cookie_name('session');
+  my $name  = $sessions->cookie_name;
+  $sessions = $sessions->cookie_name('session');
 
 Name of the signed cookie used to store session data, defaults to
 C<mojolicious>.
 
 =head2 C<cookie_path>
 
-  my $path = $session->cookie_path;
-  $session = $session->cookie_path('/foo');
+  my $path  = $sessions->cookie_path;
+  $sessions = $sessions->cookie_path('/foo');
 
 Path for session cookie, defaults to C</>.
 
 =head2 C<default_expiration>
 
-  my $time = $session->default_expiration;
-  $session = $session->default_expiration(3600);
+  my $time  = $sessions->default_expiration;
+  $sessions = $sessions->default_expiration(3600);
 
 Time for the session to expire in seconds from now, defaults to C<3600>. The
 expiration timeout gets refreshed for every request. Setting the value to C<0>
@@ -132,10 +134,18 @@ epoch seconds.
   # Expire a long long time ago
   $c->session(expires => 1);
 
+=head2 C<json_class>
+
+  my $class = $sessions->json_class;
+  $sessions = $sessions->json_class('Mojo::JSON');
+
+Class to be used for JSON serialization and deserialization of session data,
+defaults to L<Mojo::JSON>.
+
 =head2 C<secure>
 
-  my $secure = $session->secure;
-  $session   = $session->secure(1);
+  my $secure = $sessions->secure;
+  $sessions  = $sessions->secure(1);
 
 Set the secure flag on all session cookies, so that browsers send them only
 over HTTPS connections.
@@ -147,13 +157,13 @@ implements the following ones.
 
 =head2 C<load>
 
-  $session->load(Mojolicious::Controller->new);
+  $sessions->load(Mojolicious::Controller->new);
 
 Load session data from signed cookie.
 
 =head2 C<store>
 
-  $session->store(Mojolicious::Controller->new);
+  $sessions->store(Mojolicious::Controller->new);
 
 Store session data in signed cookie.
 

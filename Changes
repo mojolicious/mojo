@@ -1,5 +1,9 @@
 
 3.12  2012-07-20
+  - Deprecated Mojo::Home->app_class.
+  - Deprecated Mojo::IOLoop->client_class.
+  - Deprecated Mojo::IOLoop->server_class.
+  - Deprecated Mojo::IOLoop->stream_class.
   - Deprecated Mojo::Message->dom_class.
   - Deprecated Mojo::Message->json_class.
   - Added json method to Mojo::UserAgent::Transactor.

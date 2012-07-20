@@ -35,7 +35,7 @@ is_deeply [split /\\|\//, canonpath($home->to_string)],
   [split /\\|\//, canonpath(realpath cwd())], 'right path detected';
 
 # FindBin detection
-$home = Mojo::Home->new->app_class(undef)->detect;
+$home = Mojo::Home->new->detect(undef);
 is_deeply [split /\\|\//, catdir(splitdir($FindBin::Bin))],
   [split /\\|\//, $home], 'right path detected';
 

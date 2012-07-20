@@ -12,18 +12,18 @@ use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
 use Mojo::Util qw(class_to_path slurp);
 
-has app_class => 'Mojo::HelloWorld';
-
 # "I'm normally not a praying man, but if you're up there,
 #  please save me Superman."
 sub new { shift->SUPER::new->parse(@_) }
 
-sub detect {
-  my ($self, $class) = @_;
+# DEPRECATED in Rainbow!
+sub app_class {
+  warn "Mojo::Home->app_class is DEPRECATED!\n";
+  return @_ > 1 ? shift : 'Mojo::HelloWorld';
+}
 
-  # Class
-  $self->app_class($class) if $class;
-  $class ||= $self->app_class;
+sub detect {
+  my $self = shift;
 
   # Environment variable
   if ($ENV{MOJO_HOME}) {
@@ -32,7 +32,7 @@ sub detect {
   }
 
   # Try to find home from lib directory
-  if ($class) {
+  if (my $class = @_ ? shift : 'Mojo::HelloWorld') {
     my $file = class_to_path $class;
     if (my $path = $INC{$file}) {
       $path =~ s/$file$//;
@@ -118,13 +118,6 @@ L<Mojo::Home> is a container for home directories.
 =head1 ATTRIBUTES
 
 L<Mojo::Home> implements the following attributes.
-
-=head2 C<app_class>
-
-  my $class = $home->app_class;
-  $home     = $home->app_class('Foo::Bar');
-
-Application class.
 
 =head1 METHODS
 

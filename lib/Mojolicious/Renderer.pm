@@ -4,7 +4,6 @@ use Mojo::Base -base;
 use File::Spec::Functions 'catfile';
 use Mojo::Cache;
 use Mojo::Home;
-use Mojo::JSON;
 use Mojo::Loader;
 use Mojo::Util 'encode';
 
@@ -33,7 +32,7 @@ sub new {
   $self->add_handler(
     json => sub {
       my ($r, $c, $output, $options) = @_;
-      $$output = Mojo::JSON->new->encode($options->{json});
+      $$output = $c->req->json_class->new->encode($options->{json});
     }
   );
 

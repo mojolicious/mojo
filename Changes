@@ -3,8 +3,6 @@
   - Added json method to Mojo::UserAgent::Transactor.
   - Added build_json_tx and post_json methods to Mojo::UserAgent.
   - Added post_json_ok method to Test::Mojo.
-  - Added json_class attribute to Mojo::UserAgent::Transactor.
-  - Added json_class attribute to Mojolicious::Sessions.
   - Added n function to ojo.
   - Improved text_field helper to always set the type attribute. (marty, sri)
   - Improved documentation.

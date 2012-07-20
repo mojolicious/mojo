@@ -1,14 +1,12 @@
 package Mojolicious::Sessions;
 use Mojo::Base -base;
 
-use Mojo::JSON;
 use Mojo::Util qw(b64_decode b64_encode);
 
 has [qw(cookie_domain secure)];
 has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
-has json_class         => 'Mojo::JSON';
 
 # "Bender, quit destroying the universe!"
 sub load {
@@ -20,7 +18,7 @@ sub load {
   # Deserialize
   $value =~ s/-/=/g;
   return
-    unless my $session = $self->json_class->new->decode(b64_decode $value);
+    unless my $session = $c->req->json_class->new->decode(b64_decode $value);
 
   # Expiration
   my $expiration = $self->default_expiration;
@@ -58,7 +56,7 @@ sub store {
     if $expiration || $default;
 
   # Serialize
-  my $value = b64_encode($self->json_class->new->encode($session), '');
+  my $value = b64_encode $c->req->json_class->new->encode($session), '';
   $value =~ s/=/-/g;
 
   # Session cookie
@@ -133,14 +131,6 @@ epoch seconds.
 
   # Expire a long long time ago
   $c->session(expires => 1);
-
-=head2 C<json_class>
-
-  my $class = $sessions->json_class;
-  $sessions = $sessions->json_class('Mojo::JSON');
-
-Class to be used for JSON serialization and deserialization of session data,
-defaults to L<Mojo::JSON>.
 
 =head2 C<secure>
 

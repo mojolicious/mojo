@@ -1,6 +1,7 @@
 package Mojolicious::Sessions;
 use Mojo::Base -base;
 
+use Mojo::JSON;
 use Mojo::Util qw(b64_decode b64_encode);
 
 has [qw(cookie_domain secure)];
@@ -17,8 +18,7 @@ sub load {
 
   # Deserialize
   $value =~ s/-/=/g;
-  return
-    unless my $session = $c->req->json_class->new->decode(b64_decode $value);
+  return unless my $session = Mojo::JSON->new->decode(b64_decode $value);
 
   # Expiration
   my $expiration = $self->default_expiration;
@@ -56,7 +56,7 @@ sub store {
     if $expiration || $default;
 
   # Serialize
-  my $value = b64_encode $c->req->json_class->new->encode($session), '';
+  my $value = b64_encode(Mojo::JSON->new->encode($session), '');
   $value =~ s/=/-/g;
 
   # Session cookie

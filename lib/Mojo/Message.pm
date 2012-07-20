@@ -14,8 +14,6 @@ use Scalar::Util 'weaken';
 
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
-has dom_class        => 'Mojo::DOM';
-has json_class       => 'Mojo::JSON';
 has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 };
 has version          => '1.1';
 
@@ -125,10 +123,16 @@ sub cookies { croak 'Method "cookies" not implemented by subclass' }
 sub dom {
   my $self = shift;
   return if $self->is_multipart;
-  my $dom = $self->dom_class->new;
+  my $dom = Mojo::DOM->new;
   $dom->charset($self->content->charset);
   $dom->parse($self->body);
   return @_ ? $dom->find(@_) : $dom;
+}
+
+# DEPRECATED in Rainbow!
+sub dom_class {
+  warn "Mojo::Message->dom_class is DEPRECATED!\n";
+  return @_ > 1 ? shift : 'Mojo::DOM';
 }
 
 sub error {
@@ -214,8 +218,14 @@ sub is_multipart { shift->content->is_multipart }
 sub json {
   my ($self, $pointer) = @_;
   return if $self->is_multipart;
-  my $data = $self->json_class->new->decode($self->body);
+  my $data = Mojo::JSON->new->decode($self->body);
   return $pointer ? Mojo::JSON::Pointer->get($data, $pointer) : $data;
+}
+
+# DEPRECATED in Rainbow!
+sub json_class {
+  warn "Mojo::Message->json_class is DEPRECATED!\n";
+  return @_ > 1 ? shift : 'Mojo::JSON';
 }
 
 sub leftovers { shift->content->leftovers }
@@ -512,22 +522,6 @@ Content container, defaults to a L<Mojo::Content::Single> object.
   $message    = $message->default_charset('UTF-8');
 
 Default charset used for form data parsing, defaults to C<UTF-8>.
-
-=head2 C<dom_class>
-
-  my $class = $message->dom_class;
-  $message  = $message->dom_class('Mojo::DOM');
-
-Class to be used for DOM manipulation with the C<dom> method, defaults to
-L<Mojo::DOM>.
-
-=head2 C<json_class>
-
-  my $class = $message->json_class;
-  $message  = $message->json_class('Mojo::JSON');
-
-Class to be used for JSON deserialization with the C<json> method, defaults to
-L<Mojo::JSON>.
 
 =head2 C<max_message_size>
 

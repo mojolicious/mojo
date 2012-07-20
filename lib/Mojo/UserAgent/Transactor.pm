@@ -13,8 +13,6 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util qw(encode url_escape);
 
-has json_class => 'Mojo::JSON';
-
 sub endpoint {
   my ($self, $tx) = @_;
 
@@ -98,7 +96,7 @@ sub form {
 
 sub json {
   my ($self, $url, $data) = (shift, shift, shift);
-  my $tx = $self->tx(POST => $url, @_, $self->json_class->new->encode($data));
+  my $tx = $self->tx(POST => $url, @_, Mojo::JSON->new->encode($data));
   my $headers = $tx->req->headers;
   $headers->content_type('application/json') unless $headers->content_type;
   return $tx;
@@ -271,18 +269,6 @@ Mojo::UserAgent::Transactor - User agent transactor
 
 L<Mojo::UserAgent::Transactor> is the transaction building and manipulation
 framework used by L<Mojo::UserAgent>.
-
-=head1 ATTRIBUTES
-
-L<Mojo::UserAgent::Transactor> implements the following attributes.
-
-=head2 C<json_class>
-
-  my $class = $t->json_class;
-  $t        = $t->json_class('Mojo::JSON');
-
-Class to be used for JSON serialization with the C<json> method, defaults to
-L<Mojo::JSON>.
 
 =head1 METHODS
 

@@ -8,4 +8,4 @@ plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!'
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.
 #  It's also the food preparation."
-all_pod_coverage_ok();
+all_pod_coverage_ok({also_private => [qw(dom_class json_class)]});

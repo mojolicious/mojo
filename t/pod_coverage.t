@@ -12,4 +12,4 @@ my @rainbow
 
 # "Marge, I'm going to miss you so much. And it's not just the sex.
 #  It's also the food preparation."
-all_pod_coverage_ok({also_private => [@rainbow]});
+all_pod_coverage_ok({also_private => \@rainbow});

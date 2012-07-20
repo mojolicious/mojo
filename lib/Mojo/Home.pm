@@ -115,10 +115,6 @@ Mojo::Home - Detect and access the project root directory in Mojo
 
 L<Mojo::Home> is a container for home directories.
 
-=head1 ATTRIBUTES
-
-L<Mojo::Home> implements the following attributes.
-
 =head1 METHODS
 
 L<Mojo::Home> inherits all methods from L<Mojo::Base> and implements the

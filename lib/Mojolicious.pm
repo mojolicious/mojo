@@ -34,7 +34,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Rainbow';
-our $VERSION  = '3.12';
+our $VERSION  = '3.13';
 
 # "These old doomsday devices are dangerously unstable.
 #  I'll rest easier not knowing where they are."
@@ -814,6 +814,8 @@ Jan Jona Javorsek
 Jaroslav Muhin
 
 Jesse Vincent
+
+Joel Berger
 
 Johannes Plunien
 

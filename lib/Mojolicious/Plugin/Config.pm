@@ -64,7 +64,7 @@ sub register {
 
   # Check for default
   elsif ($conf->{default}) {
-    $app->log->debug(qq{Config file "$file" missing, using default config.});
+    $app->log->debug(qq{Config file "$file" not found, using default config.});
   }
   else { die qq{Config file "$file" missing, maybe you need to create it?\n} }
 

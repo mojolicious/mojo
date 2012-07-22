@@ -1,6 +1,7 @@
 
-3.13  2012-07-21
+3.13  2012-07-22
   - Improved Mojolicious::Plugin::Config log messages. (jberger)
+  - Improved documentation.
 
 3.12  2012-07-20
   - Deprecated Mojo::Home->app_class.

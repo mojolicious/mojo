@@ -317,8 +317,8 @@ with the router attribute L<Mojolicious::Routes/"namespace">.
 
 =head2 Route to callback
 
-The C<cb> stash value can be used to bypass controllers and execute a
-callback instead.
+The C<cb> stash value, which won't be inherited by nested routes, can be used
+to bypass controllers and execute a callback instead.
 
   $r->route('/bye')->to(cb => sub {
     my $self = shift;
@@ -864,8 +864,9 @@ package the whole thing as a self contained reusable plugin.
   @@ bar.html.ep
   Hello World!
 
-The C<app> stash value can be used for already instantiated applications. Now
-just load the plugin and you're done.
+The C<app> stash value, which won't be inherited by nested routes, can be used
+for already instantiated applications. Now just load the plugin and you're
+done.
 
   # Application
   package MyApp;

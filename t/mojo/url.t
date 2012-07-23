@@ -644,7 +644,7 @@ is $url->to_abs($base), 'http://a/b/c/d?y', 'right absolute version';
 $url = Mojo::URL->new('g?y');
 is $url->to_abs($base), 'http://a/b/c/g?y', 'right absolute version';
 $url = Mojo::URL->new('g?y/./x');
-is $url->to_abs($base), 'http://a/b/c/g?y%2F.%2Fx', 'right absolute version';
+is $url->to_abs($base), 'http://a/b/c/g?y/./x', 'right absolute version';
 $url = Mojo::URL->new('#s');
 is $url->to_abs($base), 'http://a/b/c/d?q#s', 'right absolute version';
 $url = Mojo::URL->new('g#s');

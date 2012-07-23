@@ -293,27 +293,6 @@ sub _pc {
   return;
 }
 
-sub _sibling {
-  my ($self, $selectors, $current, $tree, $immediate) = @_;
-
-  # Find preceding elements
-  my $parent = $current->[3];
-  my $found;
-  my $start = $parent->[0] eq 'root' ? 1 : 4;
-  for my $e (@$parent[$start .. $#$parent]) {
-    return $found if $e eq $current;
-    next unless $e->[0] eq 'tag';
-
-    # "+" (immediately preceding sibling)
-    if ($immediate) { $found = $self->_combinator($selectors, $e, $tree) }
-
-    # "~" (preceding sibling)
-    else { return 1 if $self->_combinator($selectors, $e, $tree) }
-  }
-
-  return;
-}
-
 sub _regex {
   my ($self, $op, $value) = @_;
   return unless defined $value;
@@ -335,9 +314,6 @@ sub _regex {
   return qr/^$value$/;
 }
 
-# "All right, brain.
-#  You don't like me and I don't like you,
-#  but let's just do this and I can get back to killing you with beer."
 sub _selector {
   my ($self, $selector, $current) = @_;
 
@@ -363,6 +339,30 @@ sub _selector {
   return 1;
 }
 
+sub _sibling {
+  my ($self, $selectors, $current, $tree, $immediate) = @_;
+
+  # Find preceding elements
+  my $parent = $current->[3];
+  my $found;
+  my $start = $parent->[0] eq 'root' ? 1 : 4;
+  for my $e (@$parent[$start .. $#$parent]) {
+    return $found if $e eq $current;
+    next unless $e->[0] eq 'tag';
+
+    # "+" (immediately preceding sibling)
+    if ($immediate) { $found = $self->_combinator($selectors, $e, $tree) }
+
+    # "~" (preceding sibling)
+    else { return 1 if $self->_combinator($selectors, $e, $tree) }
+  }
+
+  return;
+}
+
+# "All right, brain.
+#  You don't like me and I don't like you,
+#  but let's just do this and I can get back to killing you with beer."
 sub _unescape {
   my ($self, $value) = @_;
 

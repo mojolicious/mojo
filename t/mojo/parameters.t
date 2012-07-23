@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 92;
+use Test::More tests => 95;
 
 # "Now that's a wave of destruction that's easy on the eyes."
 use Mojo::Parameters;
@@ -184,7 +184,13 @@ $p->parse('foo=bar&baz=23');
 is "$p", 'foo=bar&baz=23', 'right result';
 
 # Query string
-$p = Mojo::Parameters->new('%AZaz09-._~&;=+');
-is "$p", '%AZaz09-._~&;=+', 'right result';
-$p = Mojo::Parameters->new('foo?bar');
-is "$p", 'foo%3Fbar', 'right result';
+$p = Mojo::Parameters->new('%AZaz09-._~&;=+!$\'()*,%:@/?');
+is "$p", '%AZaz09-._~&;=+!$\'()*,%:@/?', 'right result';
+$p = Mojo::Parameters->new('foo{}bar');
+is "$p", 'foo%7B%7Dbar', 'right result';
+
+# Special characters
+$p = Mojo::Parameters->new('foo=!$\'()*,%:@/?&bar=23');
+is $p->param('foo'), '!$\'()*,%:@/?', 'right value';
+is $p->param('bar'), 23, 'right value';
+is "$p", 'foo=!$\'()*,%:@/?&bar=23', 'right result';

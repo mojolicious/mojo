@@ -1,6 +1,7 @@
 
 3.13  2012-07-23
   - Added remove method to Mojo::DOM.
+  - Improved RFC 3986 compliance of Mojo::Parameters.
   - Improved Mojolicious::Plugin::Config log messages. (jberger)
   - Improved documentation.
   - Improved tests.

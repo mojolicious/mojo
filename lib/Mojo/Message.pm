@@ -122,10 +122,12 @@ sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
 sub dom {
   my $self = shift;
+
   return if $self->is_multipart;
-  my $dom = Mojo::DOM->new;
+  my $dom = $self->{dom} = Mojo::DOM->new;
   $dom->charset($self->content->charset);
   $dom->parse($self->body);
+
   return @_ ? $dom->find(@_) : $dom;
 }
 
@@ -623,7 +625,8 @@ Access message cookies, meant to be overloaded in a subclass.
   my $collection = $message->dom('a[href]');
 
 Turns message body into a L<Mojo::DOM> object and takes an optional selector
-to perform a C<find> on it right away, which returns a collection.
+to perform a C<find> on it right away, which returns a L<Mojo::Collection>
+object.
 
   # Perform "find" right away
   say $message->dom('h1, h2, h3')->pluck('text');

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 354;
+use Test::More tests => 371;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -9,6 +9,7 @@ use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Headers;
+use Mojo::JSON;
 use Mojo::Message::Response;
 
 # Common status codes
@@ -694,14 +695,48 @@ $res = Mojo::Message::Response->new(version => '0.9');
 ok !$res->at_least_version('1.0'), 'not version 1.0';
 ok $res->at_least_version('0.9'), 'at least version 0.9';
 
-# Build dom from request with charset
+# Parse response and extract JSON data
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200 OK\x0a");
+$res->parse("Content-Type: application/json\x0a");
+$res->parse("Content-Length: 27\x0a\x0a");
+$res->parse(Mojo::JSON->new->encode({foo => 'bar', baz => [1, 2, 3]}));
+ok $res->is_finished, 'response is finished';
+is $res->code,        200, 'right status';
+is $res->message,     'OK', 'right message';
+is $res->version,     '1.1', 'right version';
+is_deeply $res->json, {foo => 'bar', baz => [1, 2, 3]}, 'right JSON data';
+is $res->json('/foo'),   'bar', 'right result';
+is $res->json('/baz/1'), 2,     'right result';
+is_deeply $res->json('/baz'), [1, 2, 3], 'right result';
+
+# Parse response and extract HTML
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200 OK\x0a");
+$res->parse("Content-Type: text/html\x0a");
+$res->parse("Content-Length: 51\x0a\x0a");
+$res->parse('<p>foo<a href="/">bar</a><a href="/baz">baz</a></p>');
+ok $res->is_finished, 'response is finished';
+is $res->code,        200, 'right status';
+is $res->message,     'OK', 'right message';
+is $res->version,     '1.1', 'right version';
+is $res->dom->at('p')->text,     'foo', 'right value';
+is $res->dom->at('p > a')->text, 'bar', 'right value';
+is $res->dom('p')->first->text, 'foo', 'right value';
+is_deeply [$res->dom('p > a')->pluck('text')->each], [qw(bar baz)],
+  'right values';
+my @text = $res->dom('a')->pluck(replace_content => 'yada')
+  ->first->root->find('p > a')->pluck('text')->each;
+is_deeply \@text, [qw(yada yada)], 'right values';
+
+# Build DOM from response with charset
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0a");
 $res->parse(
   "Content-Type: application/atom+xml; charset=UTF-8; type=feed\x0a");
 $res->parse("\x0a");
 $res->body('<p>foo <a href="/">bar</a><a href="/baz">baz</a></p>');
-ok !$res->is_finished, 'request is not finished';
+ok !$res->is_finished, 'response is not finished';
 is $res->headers->content_type,
   'application/atom+xml; charset=UTF-8; type=feed',
   'right "Content-Type" value';

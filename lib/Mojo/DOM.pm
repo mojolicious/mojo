@@ -414,8 +414,8 @@ Mojo::DOM - Minimalistic HTML5/XML DOM parser with CSS3 selectors
   my $dom = Mojo::DOM->new('<div><p id="a">A</p><p id="b">B</p></div>');
 
   # Find
-  my $b = $dom->at('#b');
-  say $b->text;
+  say $dom->at('#b')->text;
+  say $dom->find('p')->pluck('text');
 
   # Walk
   say $dom->div->p->[0]->text;
@@ -574,11 +574,11 @@ selectors from L<Mojo::DOM::CSS> are supported.
 
 Find element namespace.
 
-   # Find namespace for an element with namespace prefix
-   my $namespace = $dom->at('svg > svg\:circle')->namespace;
+  # Find namespace for an element with namespace prefix
+  my $namespace = $dom->at('svg > svg\:circle')->namespace;
 
-   # Find namespace for an element that may or may not have a namespace prefix
-   my $namespace = $dom->at('svg > circle')->namespace;
+  # Find namespace for an element that may or may not have a namespace prefix
+  my $namespace = $dom->at('svg > circle')->namespace;
 
 =head2 C<parent>
 

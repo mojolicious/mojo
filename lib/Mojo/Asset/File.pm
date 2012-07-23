@@ -2,8 +2,8 @@ package Mojo::Asset::File;
 use Mojo::Base 'Mojo::Asset';
 
 use Carp 'croak';
-use Errno;
-use Fcntl;
+use Errno 'EEXIST';
+use Fcntl qw(O_CREAT O_EXCL O_RDWR);
 use File::Copy 'move';
 use File::Spec;
 use IO::File;

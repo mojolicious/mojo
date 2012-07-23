@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 783;
+use Test::More tests => 787;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -321,6 +321,13 @@ is $dom->at('div')->replace('<p>♥</p>')->root, '<p>♥</p>', 'right result';
 is $dom->to_xml, '<p>♥</p>', 'right result';
 is $dom->replace('<b>whatever</b>')->root, '<b>whatever</b>', 'right result';
 is $dom->to_xml, '<b>whatever</b>', 'right result';
+$dom->at('b')->prepend('<p>foo</p>')->append('<p>bar</p>');
+is "$dom", '<p>foo</p><b>whatever</b><p>bar</p>', 'right result';
+is $dom->find('p')->pluck('remove')->first->root->at('b')->text, 'whatever',
+  'right result';
+is "$dom", '<b>whatever</b>', 'right result';
+$dom->remove;
+is "$dom", '', 'right result';
 
 # Replace element content
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');

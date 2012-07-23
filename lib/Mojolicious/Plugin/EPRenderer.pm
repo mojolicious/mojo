@@ -116,7 +116,8 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-  $plugin->register($app, $conf);
+  $plugin->register(Mojolicious->new);
+  $plugin->register(Mojolicious->new, {name => 'foo'});
 
 Register renderer in L<Mojolicious> application.
 

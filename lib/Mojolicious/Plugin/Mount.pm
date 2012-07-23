@@ -68,7 +68,7 @@ and implements the following new ones.
 
 =head2 C<register>
 
-  my $route = $plugin->register($app, $conf);
+  my $route = $plugin->register(Mojolicious->new, {'/foo' => '/some/app.pl'});
 
 Mount L<Mojolicious> application.
 

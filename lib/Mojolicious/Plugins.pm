@@ -133,15 +133,17 @@ Load a plugin from the configured namespaces or by full module name.
 
 =head2 C<register_plugin>
 
-  $plugins->register_plugin('some_thing', $app);
-  $plugins->register_plugin('some_thing', $app, foo => 23);
-  $plugins->register_plugin('some_thing', $app, {foo => 23});
-  $plugins->register_plugin('SomeThing', $app);
-  $plugins->register_plugin('SomeThing', $app, foo => 23);
-  $plugins->register_plugin('SomeThing', $app, {foo => 23});
-  $plugins->register_plugin('MyApp::Plugin::SomeThing', $app);
-  $plugins->register_plugin('MyApp::Plugin::SomeThing', $app, foo => 23);
-  $plugins->register_plugin('MyApp::Plugin::SomeThing', $app, {foo => 23});
+  $plugins->register_plugin('some_thing', Mojolicious->new);
+  $plugins->register_plugin('some_thing', Mojolicious->new, foo => 23);
+  $plugins->register_plugin('some_thing', Mojolicious->new, {foo => 23});
+  $plugins->register_plugin('SomeThing', Mojolicious->new);
+  $plugins->register_plugin('SomeThing', Mojolicious->new, foo => 23);
+  $plugins->register_plugin('SomeThing', Mojolicious->new, {foo => 23});
+  $plugins->register_plugin('MyApp::Plugin::SomeThing', Mojolicious->new);
+  $plugins->register_plugin(
+    'MyApp::Plugin::SomeThing', Mojolicious->new, foo => 23);
+  $plugins->register_plugin(
+    'MyApp::Plugin::SomeThing', Mojolicious->new, {foo => 23});
 
 Load a plugin from the configured namespaces or by full module name and run
 C<register>, optional arguments are passed through.

@@ -399,9 +399,9 @@ L<Mojolicious::Lite> tutorial for more argument variations.
   $r = $r->detour('controller#action');
   $r = $r->detour('controller#action', foo => 'bar');
   $r = $r->detour('controller#action', {foo => 'bar'});
-  $r = $r->detour($app);
-  $r = $r->detour($app, foo => 'bar');
-  $r = $r->detour($app, {foo => 'bar'});
+  $r = $r->detour(Mojolicious->new);
+  $r = $r->detour(Mojolicious->new, foo => 'bar');
+  $r = $r->detour(Mojolicious->new, {foo => 'bar'});
   $r = $r->detour('MyApp');
   $r = $r->detour('MyApp', foo => 'bar');
   $r = $r->detour('MyApp', {foo => 'bar'});
@@ -566,9 +566,9 @@ Generate route matching all HTTP request methods.
   $r           = $r->to('controller#action');
   $r           = $r->to('controller#action', foo => 'bar');
   $r           = $r->to('controller#action', {foo => 'bar'});
-  $r           = $r->to($app);
-  $r           = $r->to($app, foo => 'bar');
-  $r           = $r->to($app, {foo => 'bar'});
+  $r           = $r->to(Mojolicious->new);
+  $r           = $r->to(Mojolicious->new, foo => 'bar');
+  $r           = $r->to(Mojolicious->new, {foo => 'bar'});
   $r           = $r->to('MyApp');
   $r           = $r->to('MyApp', foo => 'bar');
   $r           = $r->to('MyApp', {foo => 'bar'});

@@ -55,7 +55,8 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-  $plugin->register($app, $conf);
+  $plugin->register(Mojolicious->new);
+  $plugin->register(Mojolicious->new, {name => 'MyFramework 1.0'});
 
 Register plugin hooks in L<Mojolicious> application.
 

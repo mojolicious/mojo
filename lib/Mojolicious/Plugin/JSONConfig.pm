@@ -115,7 +115,8 @@ Process content with C<render> and parse it with L<Mojo::JSON>.
 
 =head2 C<register>
 
-  my $config = $plugin->register($app, $conf);
+  my $config = $plugin->register(Mojolicious->new);
+  my $config = $plugin->register(Mojolicious->new, {file => '/etc/foo.conf'});
 
 Register plugin in L<Mojolicious> application.
 

@@ -198,7 +198,7 @@ L<Mojolicious::Plugin::PODRenderer> implements the following helpers.
   %= pod_to_html '=head2 lalala'
   <%= pod_to_html begin %>=head2 lalala<% end %>
 
-Render POD to HTML.
+Render POD to HTML without preprocessing.
 
 =head1 METHODS
 
@@ -207,7 +207,8 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 C<register>
 
-  my $route = $plugin->register($app, $conf);
+  my $route = $plugin->register(Mojolicious->new);
+  my $route = $plugin->register(Mojolicious->new, {name => 'foo'});
 
 Register renderer in L<Mojolicious> application.
 

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 371;
+use Test::More tests => 372;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -728,6 +728,9 @@ is_deeply [$res->dom('p > a')->pluck('text')->each], [qw(bar baz)],
 my @text = $res->dom('a')->pluck(replace_content => 'yada')
   ->first->root->find('p > a')->pluck('text')->each;
 is_deeply \@text, [qw(yada yada)], 'right values';
+@text = $res->dom->find('a')->pluck(replace_content => 'test')
+  ->first->root->find('p > a')->pluck('text')->each;
+is_deeply \@text, [qw(test test)], 'right values';
 
 # Build DOM from response with charset
 $res = Mojo::Message::Response->new;

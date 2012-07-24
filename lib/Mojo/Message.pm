@@ -124,11 +124,11 @@ sub dom {
   my $self = shift;
 
   return if $self->is_multipart;
-  my $dom = $self->{dom} = Mojo::DOM->new;
+  my $dom = Mojo::DOM->new;
   $dom->charset($self->content->charset);
   $dom->parse($self->body);
 
-  return @_ ? $dom->find(@_) : $dom;
+  return @_ ? ($self->{dom} = $dom)->find(@_) : $dom;
 }
 
 # DEPRECATED in Rainbow!

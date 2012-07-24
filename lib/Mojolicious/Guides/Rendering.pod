@@ -336,9 +336,8 @@ manually.
   use Scalar::Util 'looks_like_number';
 
   get '/divide/:dividend/by/:divisor' => sub {
-    my $self     = shift;
-    my $dividend = $self->param('dividend');
-    my $divisor  = $self->param('divisor');
+    my $self = shift;
+    my ($dividend, $divisor) = $self->param(['dividend', 'divisor']);
 
     # 404
     return $self->render_not_found

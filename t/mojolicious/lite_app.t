@@ -117,9 +117,8 @@ get '/query_string' => sub {
 get '/multi/:bar' => sub {
   my $self = shift;
   my ($foo, $bar, $baz) = $self->param([qw(foo bar baz)]);
-  $foo //= '';
   $self->render(
-    data => join('', $foo, $bar, $baz),
+    data => join('', map { $_ // '' } $foo, $bar, $baz),
     test => $self->param(['yada'])
   );
 };

@@ -129,6 +129,9 @@ sub on {
 sub param {
   my ($self, $name) = (shift, shift);
 
+  # Multiple names
+  return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
+
   # List names
   my $captures = $self->stash->{'mojo.captures'} ||= {};
   my $req = $self->req;
@@ -643,22 +646,26 @@ L<Mojo::Transaction::WebSocket> object.
 
 =head2 C<param>
 
-  my @names = $c->param;
-  my $foo   = $c->param('foo');
-  my @foo   = $c->param('foo');
-  $c        = $c->param(foo => 'ba;r');
-  $c        = $c->param(foo => qw(ba;r ba;z));
+  my @names       = $c->param;
+  my $foo         = $c->param('foo');
+  my @foo         = $c->param('foo');
+  my ($foo, $bar) = $c->param(['foo', 'bar']);
+  $c              = $c->param(foo => 'ba;r');
+  $c              = $c->param(foo => qw(ba;r ba;z));
 
-Access GET/POST parameters, file uploads and route captures that are not
-reserved stash values. Note that this method is context sensitive and
-therefore needs to be used with care, every GET/POST parameter can have
-multiple values, which might have unexpected consequences.
+Access GET/POST parameters, file uploads and route placeholder values that are
+not reserved stash values. Note that this method is context sensitive in some
+cases and therefore needs to be used with care, every GET/POST parameter can
+have multiple values, which might have unexpected consequences.
 
   # List context is ambiguous and should be avoided
-  my $hash = {name => $self->param('name')};
+  my $hash = {foo => $self->param('foo')};
 
   # Better enforce scalar context
-  my $hash = {name => scalar $self->param('name')};
+  my $hash = {foo => scalar $self->param('foo')};
+
+  # The multi name form can also enforce scalar context
+  my $hash = {foo => $self->param(['foo'])};
 
 For more control you can also access request information directly.
 

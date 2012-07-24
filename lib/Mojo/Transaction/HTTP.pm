@@ -80,10 +80,8 @@ sub keep_alive {
   # Keep alive
   return 1 if $req_conn eq 'keep-alive' || $res_conn eq 'keep-alive';
 
-  # No keep alive for 0.9 and 1.0
-  return if $req->version ~~ [qw(0.9 1.0)] || $res->version ~~ [qw(0.9 1.0)];
-
-  return 1;
+  # No keep alive for 1.0
+  return $req->version eq '1.0' || $res->version eq '1.0' ? undef : 1;
 }
 
 sub server_leftovers {

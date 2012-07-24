@@ -109,16 +109,10 @@ sub is_status_class {
 }
 
 sub _build_start_line {
-  my $self = shift;
-
-  # HTTP 0.9 has no start line
-  my $version = $self->version;
-  return '' if $version eq '0.9';
-
-  # HTTP 1.0 and above
-  my $code    = $self->code    || 404;
+  my $self    = shift;
+  my $code    = $self->code || 404;
   my $message = $self->message || $self->default_message;
-  return "HTTP/$version $code $message\x0d\x0a";
+  return "HTTP/@{[$self->version]} $code $message\x0d\x0a";
 }
 
 # "Weaseling out of things is important to learn.
@@ -126,19 +120,11 @@ sub _build_start_line {
 sub _parse_start_line {
   my $self = shift;
 
-  # Try to detect HTTP 0.9
-  if ($self->{buffer} =~ /^\s*(\S.{4})/ && $1 !~ m!^HTTP/!) {
-    $self->version('0.9');
-    $self->content->relaxed(1);
-    return $self->{state} = 'content';
-  }
-
-  # We have a full HTTP 1.0+ response line
+  # We have a full response line
   return unless defined(my $line = get_line \$self->{buffer});
   return $self->error('Bad response start line')
     unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
-  $self->version($1)->code($2)->message($3);
-  $self->content->auto_relax(1);
+  $self->version($1)->code($2)->message($3)->content->auto_relax(1);
   $self->{state} = 'content';
 }
 

@@ -155,13 +155,6 @@ sub parse_body {
   return $self->parse(@_);
 }
 
-sub parse_body_once {
-  my $self = shift;
-  $self->parse_body(@_);
-  $self->{state} = 'finished';
-  return $self;
-}
-
 sub parse_until_body {
   my ($self, $chunk) = @_;
 
@@ -451,8 +444,8 @@ value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>.
   my $relaxed = $content->relaxed;
   $content    = $content->relaxed(1);
 
-Activate relaxed parsing for HTTP 0.9 and responses that are terminated with a
-connection close.
+Activate relaxed parsing for responses that are terminated with a connection
+close.
 
 =head1 METHODS
 
@@ -581,12 +574,6 @@ Parse content chunk.
   $content = $content->parse_body('Hi!');
 
 Parse body chunk.
-
-=head2 C<parse_body_once>
-
-  $content = $content->parse_body_once('Hi!');
-
-Parse body chunk once.
 
 =head2 C<parse_until_body>
 

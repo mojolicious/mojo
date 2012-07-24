@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 375;
+use Test::More tests => 310;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -109,8 +109,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 
 # Parse HTTP 1.1 response start line, no headers and body (small chunks)
 $res = Mojo::Message::Response->new;
@@ -155,8 +153,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 
 # Parse HTTP 1.1 response start line, no headers and body (no message)
 $res = Mojo::Message::Response->new;
@@ -165,18 +161,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     undef, 'no message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
-
-# Parse HTTP 0.9 response
-$res = Mojo::Message::Response->new;
-$res->parse("HTT... this is just a document and valid HTTP 0.9\n\n");
-ok $res->is_finished, 'response is finished';
-is $res->version, '0.9', 'right version';
-ok $res->at_least_version('0.9'), 'at least version 0.9';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
-is $res->body, "HTT... this is just a document and valid HTTP 0.9\n\n",
-  'right content';
 
 # Parse HTTP 1.0 response start line and headers but no body
 $res = Mojo::Message::Response->new;
@@ -187,8 +171,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        404, 'right status';
 is $res->message,     'Damn it', 'right message';
 is $res->version,     '1.0', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 0,            'right "Content-Length" value';
 
@@ -202,8 +184,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        500, 'right status';
 is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.0', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27,           'right "Content-Length" value';
 
@@ -217,8 +197,6 @@ ok !$res->is_finished, 'response is not finished';
 is $res->code,    500,                     'right status';
 is $res->message, 'Internal Server Error', 'right message';
 is $res->version, '1.0',                   'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, undef,        'no "Content-Length" value';
 is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
@@ -232,8 +210,6 @@ ok !$res->is_finished, 'response is not finished';
 is $res->code,    500,                     'right status';
 is $res->message, 'Internal Server Error', 'right message';
 is $res->version, '1.0',                   'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, undef,        'no "Content-Length" value';
 is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
@@ -248,8 +224,6 @@ ok !$res->is_finished, 'response is not finished';
 is $res->code,    500,                     'right status';
 is $res->message, 'Internal Server Error', 'right message';
 is $res->version, '1.1',                   'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, undef,        'no "Content-Length" value';
 is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
@@ -265,8 +239,6 @@ ok !$res->is_finished, 'response is not finished';
 is $res->code,    413,                        'right status';
 is $res->message, 'Request Entity Too Large', 'right message';
 is $res->version, '1.1',                      'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_length, undef, 'right "Content-Length" value';
 
 # Parse HTTP 1.1 chunked response
@@ -283,8 +255,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        500, 'right status';
 is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 13,           'right "Content-Length" value';
 is $res->content->body_size,      13,           'right size';
@@ -313,8 +283,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 ok $res->headers->content_type =~ m!multipart/form-data!,
   'right "Content-Type" value';
 isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
@@ -346,8 +314,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 ok $res->headers->content_type =~ m!multipart/form-data!,
   'right "Content-Type" value';
 isa_ok $res->content, 'Mojo::Content::Single', 'right content';
@@ -362,8 +328,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        '404', 'right status';
 is $res->message,     'Not Found', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
 
@@ -377,8 +341,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        '404', 'right status';
 is $res->message,     'Looks-0k!@ ;\':" #$%^<>,.\\o/ &*()', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
 
@@ -392,8 +354,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        '200', 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->connection, 'keep-alive', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, 0, 'right "Content-Length" value';
@@ -409,8 +369,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        '200', 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->connection, 'keep-alive', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, '13', 'right "Content-Length" value';
@@ -452,22 +410,6 @@ ok $finished, 'finished';
 is $res->build_headers, $res->content->build_headers, 'headers are equal';
 is $res->build_body,    $res->content->build_body,    'body is equal';
 
-# Build HTTP 0.9 response
-$res = Mojo::Message::Response->new;
-$res->version('0.9');
-$res->body("this is just a document and valid HTTP 0.9\nlalala\n");
-is $res->to_string, "this is just a document and valid HTTP 0.9\nlalala\n",
-  'right message';
-$res = Mojo::Message::Response->new->parse($res->to_string);
-ok $res->is_finished, 'response is finished';
-is $res->code,        undef, 'no status';
-is $res->message,     undef, 'no message';
-is $res->version,     '0.9', 'right version';
-ok $res->at_least_version('0.9'), 'at least version 0.9';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
-is $res->body, "this is just a document and valid HTTP 0.9\nlalala\n",
-  'right content';
-
 # Build HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;
 $res->content(Mojo::Content::MultiPart->new);
@@ -486,8 +428,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->content_length, '108', 'right "Content-Length" value';
 is $res->headers->content_type, 'multipart/mixed; boundary=7am1X',
@@ -510,8 +450,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';
 is $res->version,     '1.0', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27,           'right "Content-Length" value';
 is $res->headers->set_cookie, 'foo=bar; path=/test',
@@ -534,8 +472,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        101, 'right status';
 is $res->message,     'Switching Protocols', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->upgrade,    'websocket', 'right "Upgrade" value';
 is $res->headers->connection, 'Upgrade',   'right "Connection" value';
 is $res->headers->sec_websocket_accept, 'abcdef=',
@@ -557,8 +493,6 @@ ok $res->is_finished, 'response is finished';
 is $res->code,        '101', 'right status';
 is $res->message,     'Switching Protocols', 'right message';
 is $res->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res->headers->connection, 'Upgrade', 'right "Connection" value';
 is $res->headers->date, 'Sun, 17 Aug 2008 16:27:35 GMT', 'right "Date" value';
 is $res->headers->upgrade,        'websocket', 'right "Upgrade" value';
@@ -584,8 +518,6 @@ $res2->parse($res->to_string);
 ok $res2->is_finished, 'response is finished';
 is $res2->code,        404, 'right status';
 is $res2->version,     '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
 is $res2->headers->content_length, 0, 'right "Content-Length" value';
 ok defined $res2->cookie('foo'),   'cookie "foo" exists';
 ok defined $res2->cookie('bar'),   'cookie "bar" exists';
@@ -679,21 +611,6 @@ ok !$res->content->has_subscribers('read'), 'no subscribers';
 $res->content(Mojo::Content::MultiPart->new);
 $res->body('hi!');
 is $res->body, 'hi!', 'right content';
-
-# Version management
-$res = Mojo::Message::Response->new;
-is $res->version, '1.1', 'right version';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-ok !$res->at_least_version('1.2'), 'not version 1.2';
-ok $res->at_least_version('1.1'), 'at least version 1.1';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-$res = Mojo::Message::Response->new(version => '1.0');
-is $res->version, '1.0', 'right version';
-ok !$res->at_least_version('1.1'), 'not version 1.1';
-ok $res->at_least_version('1.0'), 'at least version 1.0';
-$res = Mojo::Message::Response->new(version => '0.9');
-ok !$res->at_least_version('1.0'), 'not version 1.0';
-ok $res->at_least_version('0.9'), 'at least version 0.9';
 
 # Parse response and extract JSON data
 $res = Mojo::Message::Response->new;

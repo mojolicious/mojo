@@ -184,12 +184,7 @@ sub _build_start_line {
       || ($url->scheme || '') eq 'https';
   }
 
-  # HTTP 0.9
-  my $version = $self->version;
-  return "$method $path\x0d\x0a" if $version eq '0.9';
-
-  # HTTP 1.0 and above
-  return "$method $path HTTP/$version\x0d\x0a";
+  return "$method $path HTTP/@{[$self->version]}\x0d\x0a";
 }
 
 sub _parse_basic_auth {
@@ -283,16 +278,9 @@ sub _parse_start_line {
   # We have a (hopefully) full request line
   return $self->error('Bad request start line', 400)
     unless $line =~ $START_LINE_RE;
-  $self->method($1);
-  my $url = $self->url;
+  my $url = $self->method($1)->version($3)->url;
   $1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2);
-
-  # HTTP 0.9 is identified by the missing version
   $self->{state} = 'content';
-  return $self->version($3) if defined $3;
-  $self->version('0.9');
-  $self->{state}  = 'finished';
-  $self->{buffer} = '';
 }
 
 1;

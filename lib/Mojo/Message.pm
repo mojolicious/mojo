@@ -20,8 +20,6 @@ has version          => '1.1';
 # "I'll keep it short and sweet. Family. Religion. Friendship.
 #  These are the three demons you must slay if you wish to succeed in
 #  business."
-sub at_least_version { shift->version >= shift }
-
 sub body {
   my $self = shift;
 
@@ -135,10 +133,9 @@ sub error {
 sub fix_headers {
   my $self = shift;
 
-  # Content-Length header or connection close is required in HTTP 1.0
-  # unless the chunked transfer encoding is used
-  return $self
-    if $self->{fix}++ || !$self->at_least_version('1.0') || $self->is_chunked;
+  # Content-Length header or connection close is required unless the chunked
+  # transfer encoding is used
+  return $self if $self->{fix}++ || $self->is_chunked;
   my $headers = $self->headers;
   $self->is_dynamic
     ? $headers->connection('close')
@@ -167,13 +164,7 @@ sub get_body_chunk {
 
 sub get_header_chunk {
   my ($self, $offset) = @_;
-
-  # Progress
   $self->emit(progress => 'headers', $offset);
-
-  # HTTP 0.9 has no headers
-  return '' if $self->version eq '0.9';
-
   return $self->fix_headers->content->get_header_chunk($offset);
 }
 
@@ -291,7 +282,9 @@ sub _build_start_line {''}
 
 sub _nest {
   my $array = shift;
-  my $hash  = {};
+
+  # Turn array of objects into hash
+  my $hash = {};
   for my $object (@$array) {
     my $name = $object->name;
 
@@ -301,7 +294,7 @@ sub _nest {
       push @{$hash->{$name}}, $object;
     }
 
-    # Object
+    # Single object
     else { $hash->{$name} = $object }
   }
 
@@ -344,11 +337,6 @@ sub _parse {
     # CGI
     elsif ($self->{state} eq 'body') {
       $self->content($content->parse_body($buffer));
-    }
-
-    # HTTP 0.9
-    elsif ($self->version eq '0.9') {
-      $self->content($content->parse_body_once($buffer));
     }
 
     # Parse
@@ -521,12 +509,6 @@ HTTP version of message.
 
 L<Mojo::Message> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
-
-=head2 C<at_least_version>
-
-  my $success = $message->at_least_version('1.1');
-
-Check if message is at least a specific version.
 
 =head2 C<body>
 

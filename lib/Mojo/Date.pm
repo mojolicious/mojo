@@ -127,6 +127,7 @@ Parse date in one of the following formats.
 =head2 C<to_string>
 
   my $string = $date->to_string;
+  my $string = "$date";
 
 Render date suitable for HTTP 1.1 messages.
 

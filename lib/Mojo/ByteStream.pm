@@ -297,6 +297,7 @@ Turn bytestream into L<Mojo::Collection>.
 =head2 C<to_string>
 
   my $string = $stream->to_string;
+  my $string = "$stream";
 
 Stringify bytestream.
 

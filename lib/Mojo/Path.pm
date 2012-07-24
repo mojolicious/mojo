@@ -231,6 +231,7 @@ Turn path into an absolute string.
 =head2 C<to_string>
 
   my $string = $path->to_string;
+  my $string = "$path";
 
 Turn path into a string.
 

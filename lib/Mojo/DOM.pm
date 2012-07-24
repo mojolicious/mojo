@@ -697,6 +697,7 @@ is enabled by default.
 =head2 C<to_xml>
 
   my $xml = $dom->to_xml;
+  my $xml = "$dom";
 
 Render this element and its content to XML. Note that the XML will be encoded
 if a C<charset> has been defined.

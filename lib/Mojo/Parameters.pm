@@ -317,6 +317,7 @@ Turn parameters into a hash reference.
 =head2 C<to_string>
 
   my $string = $p->to_string;
+  my $string = "$p";
 
 Turn parameters into a string.
 

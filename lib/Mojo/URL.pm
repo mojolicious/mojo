@@ -428,6 +428,7 @@ Clone absolute URL and turn it into a relative one.
 =head2 C<to_string>
 
   my $string = $url->to_string;
+  my $string = "$url";
 
 Turn URL into a string.
 

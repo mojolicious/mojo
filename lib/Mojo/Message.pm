@@ -51,7 +51,7 @@ sub body_params {
   return $self->{body_params} if $self->{body_params};
 
   # Charset
-  my $p = Mojo::Parameters->new;
+  my $p = $self->{body_params} = Mojo::Parameters->new;
   $p->charset($self->content->charset || $self->default_charset);
 
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
@@ -76,7 +76,7 @@ sub body_params {
     }
   }
 
-  return $self->{body_params} = $p;
+  return $p;
 }
 
 sub body_size { shift->content->body_size }
@@ -91,30 +91,9 @@ sub build_start_line { shift->_build('get_start_line_chunk') }
 
 sub cookie {
   my ($self, $name) = @_;
-
-  # Map
-  unless ($self->{cookies}) {
-    my $cookies = $self->{cookies} = {};
-    for my $cookie (@{$self->cookies}) {
-      my $cookie_name = $cookie->name;
-
-      # Multiple cookies with same name
-      if (exists $cookies->{$cookie_name}) {
-        $cookies->{$cookie_name} = [$cookies->{$cookie_name}]
-          unless ref $cookies->{$cookie_name} eq 'ARRAY';
-        push @{$cookies->{$cookie_name}}, $cookie;
-      }
-
-      # Cookie
-      else { $cookies->{$cookie_name} = $cookie }
-    }
-  }
-
-  # Multiple
-  my $cookies = $self->{cookies}{$name};
-  my @cookies;
-  @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies) if $cookies;
-
+  $self->{cookies} ||= _nest($self->cookies);
+  return unless my $cookies = $self->{cookies}{$name};
+  my @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies);
   return wantarray ? @cookies : $cookies[0];
 }
 
@@ -234,10 +213,7 @@ sub leftovers { shift->content->leftovers }
 
 sub max_line_size { shift->headers->max_line_size(@_) }
 
-sub param {
-  my $self = shift;
-  return ($self->{body_params} ||= $self->body_params)->param(@_);
-}
+sub param { shift->body_params->param(@_) }
 
 sub parse            { shift->_parse(0, @_) }
 sub parse_until_body { shift->_parse(1, @_) }
@@ -251,30 +227,9 @@ sub to_string {
 
 sub upload {
   my ($self, $name) = @_;
-
-  # Map
-  unless ($self->{uploads}) {
-    my $uploads = $self->{uploads} = {};
-    for my $upload (@{$self->uploads}) {
-      my $uname = $upload->name;
-
-      # Multiple uploads with same name
-      if (exists $uploads->{$uname}) {
-        $uploads->{$uname} = [$uploads->{$uname}]
-          unless ref $uploads->{$uname} eq 'ARRAY';
-        push @{$uploads->{$uname}}, $upload;
-      }
-
-      # Upload
-      else { $uploads->{$uname} = $upload }
-    }
-  }
-
-  # Multiple
-  my $uploads = $self->{uploads}{$name};
-  my @uploads;
-  @uploads = ref $uploads eq 'ARRAY' ? @$uploads : ($uploads) if $uploads;
-
+  $self->{uploads} ||= _nest($self->uploads);
+  return unless my $uploads = $self->{uploads}{$name};
+  my @uploads = ref $uploads eq 'ARRAY' ? @$uploads : ($uploads);
   return wantarray ? @uploads : $uploads[0];
 }
 
@@ -333,6 +288,25 @@ sub _build {
 }
 
 sub _build_start_line {''}
+
+sub _nest {
+  my $array = shift;
+  my $hash  = {};
+  for my $object (@$array) {
+    my $name = $object->name;
+
+    # Multiple objects with same name
+    if (exists $hash->{$name}) {
+      $hash->{$name} = [$hash->{$name}] unless ref $hash->{$name} eq 'ARRAY';
+      push @{$hash->{$name}}, $object;
+    }
+
+    # Object
+    else { $hash->{$name} = $object }
+  }
+
+  return $hash;
+}
 
 sub _parse {
   my ($self, $until_body, $chunk) = @_;

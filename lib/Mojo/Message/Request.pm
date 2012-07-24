@@ -93,15 +93,12 @@ sub is_xhr {
   (shift->headers->header('X-Requested-With') || '') =~ /XMLHttpRequest/i;
 }
 
-sub param {
-  my $self = shift;
-  return ($self->{params} ||= $self->params)->param(@_);
-}
+sub param { shift->params->param(@_) }
 
 sub params {
   my $self = shift;
-  my $p    = Mojo::Parameters->new;
-  return $p->merge($self->body_params, $self->query_params);
+  return $self->{params}
+    ||= Mojo::Parameters->new->merge($self->body_params, $self->query_params);
 }
 
 sub parse {
@@ -417,7 +414,9 @@ so it should not be called before the entire request body has been received.
 
   my $p = $req->params;
 
-All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object.
+All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object. Note
+that this method caches all data, so it should not be called before the entire
+request body has been received.
 
   say $req->params->param('foo');
 

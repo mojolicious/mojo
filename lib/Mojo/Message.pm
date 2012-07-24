@@ -124,11 +124,11 @@ sub dom {
   my $self = shift;
 
   return if $self->is_multipart;
-  my $dom = Mojo::DOM->new;
-  $dom->charset($self->content->charset);
-  $dom->parse($self->body);
+  my $dom = $self->{dom}
+    ||= Mojo::DOM->new->charset($self->content->charset // undef)
+    ->parse($self->body);
 
-  return @_ ? ($self->{dom} = $dom)->find(@_) : $dom;
+  return @_ ? $dom->find(@_) : $dom;
 }
 
 # DEPRECATED in Rainbow!
@@ -220,8 +220,8 @@ sub is_multipart { shift->content->is_multipart }
 sub json {
   my ($self, $pointer) = @_;
   return if $self->is_multipart;
-  my $data = Mojo::JSON->new->decode($self->body);
-  return $pointer ? Mojo::JSON::Pointer->get($data, $pointer) : $data;
+  my $data = $self->{json} ||= Mojo::JSON->new->decode($self->body);
+  return $pointer ? Mojo::JSON::Pointer->new->get($data, $pointer) : $data;
 }
 
 # DEPRECATED in Rainbow!
@@ -626,7 +626,8 @@ Access message cookies, meant to be overloaded in a subclass.
 
 Turns message body into a L<Mojo::DOM> object and takes an optional selector
 to perform a C<find> on it right away, which returns a L<Mojo::Collection>
-object.
+object. Note that this method caches all data, so it should not be called
+before the entire message body has been received.
 
   # Perform "find" right away
   say $message->dom('h1, h2, h3')->pluck('text');
@@ -726,7 +727,8 @@ Alias for L<Mojo::Content/"is_multipart">.
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise. An optional JSON Pointer can be used to extract a specific
-value with L<Mojo::JSON::Pointer>.
+value with L<Mojo::JSON::Pointer>. Note that this method caches all data, so
+it should not be called before the entire message body has been received.
 
   say $message->json->{foo}{bar}[23];
   say $message->json('/foo/bar/23');

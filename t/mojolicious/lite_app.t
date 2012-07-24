@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 708;
+use Test::More tests => 713;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -117,6 +117,7 @@ get '/query_string' => sub {
 get '/multi/:bar' => sub {
   my $self = shift;
   my ($foo, $bar, $baz) = $self->param([qw(foo bar baz)]);
+  $foo //= '';
   $self->render(
     data => join('', $foo, $bar, $baz),
     test => $self->param(['yada'])
@@ -713,6 +714,11 @@ $t->get_ok('/multi/B?foo=A&baz=C')->status_is(200)
 $t->get_ok('/multi/B?foo=A&foo=E&baz=C&yada=D&yada=text&yada=fail')
   ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('ABC');
+
+# GET /multi/B (missing parameter)
+$t->get_ok('/multi/B?baz=C')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('BC');
 
 # GET /reserved
 $t->get_ok('/reserved?data=just-works')->status_is(200)

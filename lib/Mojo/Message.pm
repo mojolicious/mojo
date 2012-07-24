@@ -532,6 +532,7 @@ C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
 usually a L<Mojo::Parameters> object. Note that this method caches all data,
 so it should not be called before the entire message body has been received.
 
+  # Get POST parameter value
   say $message->body_params->param('foo');
 
 =head2 C<body_size>
@@ -567,6 +568,7 @@ Access message cookies, usually L<Mojo::Cookie::Request> or
 L<Mojo::Cookie::Response> objects. Note that this method caches all data, so
 it should not be called before all headers have been received.
 
+  # Get cookie value
   say $message->cookie('foo')->value;
 
 =head2 C<cookies>
@@ -686,6 +688,7 @@ C<undef> otherwise. An optional JSON Pointer can be used to extract a specific
 value with L<Mojo::JSON::Pointer>. Note that this method caches all data, so
 it should not be called before the entire message body has been received.
 
+  # Extract JSON values
   say $message->json->{foo}{bar}[23];
   say $message->json('/foo/bar/23');
 
@@ -720,7 +723,7 @@ Parse message chunk.
 
   $message = $message->parse_until_body('HTTP/1.1 200 OK...');
 
-Parse message chunk until the body is reached.
+Parse message chunk and stop after headers.
 
 =head2 C<start_line_size>
 
@@ -743,6 +746,7 @@ Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 Note that this method caches all data, so it should not be called before the
 entire message body has been received.
 
+  # Get content of uploaded file
   say $message->upload('foo')->asset->slurp;
 
 =head2 C<uploads>
@@ -750,8 +754,6 @@ entire message body has been received.
   my $uploads = $message->uploads;
 
 All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
-
-  say $message->uploads->[2]->filename;
 
 =head2 C<write>
 

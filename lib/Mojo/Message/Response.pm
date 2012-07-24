@@ -194,8 +194,6 @@ implements the following new ones.
 
 Access response cookies, usually L<Mojo::Cookie::Response> objects.
 
-  say $res->cookies->[1]->value;
-
 =head2 C<default_message>
 
   my $message = $res->default_message;

@@ -348,7 +348,8 @@ HTTP request method, defaults to C<GET>.
 
 HTTP request URL, defaults to a L<Mojo::URL> object.
 
-  my $foo = $req->url->query->to_hash->{foo};
+  # Get request path
+  say $req->url->path;
 
 =head1 METHODS
 
@@ -368,8 +369,6 @@ Clone request if possible, otherwise return C<undef>.
   $req        = $req->cookies({name => 'foo', value => 'bar'});
 
 Access request cookies, usually L<Mojo::Cookie::Request> objects.
-
-  say $req->cookies->[1]->value;
 
 =head2 C<fix_headers>
 
@@ -406,6 +405,7 @@ All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object. Note
 that this method caches all data, so it should not be called before the entire
 request body has been received.
 
+  # Get parameter value
   say $req->params->param('foo');
 
 =head2 C<parse>
@@ -433,7 +433,8 @@ Proxy URL for request.
 
 All C<GET> parameters, usually a L<Mojo::Parameters> object.
 
-  say $req->query_params->to_hash->{'foo'};
+  # Turn GET parameters to hash and extract value
+  say $req->query_params->to_hash->{foo};
 
 =head1 SEE ALSO
 

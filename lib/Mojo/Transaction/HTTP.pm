@@ -260,7 +260,6 @@ Mojo::Transaction::HTTP - HTTP 1.1 transaction container
   $tx->req->method('GET');
   $tx->req->url->parse('http://mojolicio.us');
   $tx->req->headers->accept('application/json');
-  $tx->resume;
   say $tx->res->code;
   say $tx->res->headers->content_type;
   say $tx->res->body;
@@ -273,7 +272,6 @@ Mojo::Transaction::HTTP - HTTP 1.1 transaction container
   $tx->res->code(200);
   $tx->res->headers->content_type('text/plain');
   $tx->res->body('Hello World!');
-  $tx->resume;
 
 =head1 DESCRIPTION
 

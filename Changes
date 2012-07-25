@@ -1,4 +1,7 @@
 
+3.14  2012-07-25
+  - Improved documentation.
+
 3.13  2012-07-24
   - Added multi name support to param method in Mojolicious::Controller.
   - Added remove method to Mojo::DOM.

@@ -90,11 +90,14 @@ the following ones.
 
 =head2 C<detect>
 
-  my $ext = $types->detect('application/json;q=9');
+  my $exts = $types->detect('application/json;q=9');
 
 Detect file extensions from C<Accept> header value. Unspecific values that
 contain more than one MIME type are currently ignored, since browsers often
 don't really know what they actually want.
+
+  # List detected extensions
+  say for @{$types->detect('application/json')};
 
 =head2 C<type>
 

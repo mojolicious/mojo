@@ -626,7 +626,7 @@ is_deeply $res->json, {foo => 'bar', baz => [1, 2, 3]}, 'right JSON data';
 is $res->json('/foo'),   'bar', 'right result';
 is $res->json('/baz/1'), 2,     'right result';
 is_deeply $res->json('/baz'), [1, 2, 3], 'right result';
-$res->json->{baz}->[1] = 4;
+$res->json->{baz}[1] = 4;
 is_deeply $res->json('/baz'), [1, 4, 3], 'right result';
 
 # Parse response and extract HTML

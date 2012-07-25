@@ -306,7 +306,13 @@ Mojo::Transaction::WebSocket - WebSocket transaction container
 
   use Mojo::Transaction::WebSocket;
 
+  # Send and receive WebSocket messages
   my $ws = Mojo::Transaction::WebSocket->new;
+  $ws->send('Hello World!');
+  $ws->on(message => sub {
+    my ($ws, $message) = @_;
+    say "Message: $message";
+  });
 
 =head1 DESCRIPTION
 

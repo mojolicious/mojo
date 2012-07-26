@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
-require Data::Dumper;
+use Data::Dumper ();
 
 # "You're watching Futurama,
 #  the show that doesn't condone the cool crime of robbery."

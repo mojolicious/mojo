@@ -44,7 +44,7 @@ sub is_readable {
 sub is_writing {
   my $self = shift;
   return unless exists $self->{handle};
-  return length($self->{buffer}) || $self->has_subscribers('drain');
+  return !!length($self->{buffer}) || $self->has_subscribers('drain');
 }
 
 sub start {

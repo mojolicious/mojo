@@ -83,7 +83,7 @@ sub cookies {
   # Add cookies
   for my $cookie (@_) {
     $cookie = Mojo::Cookie::Response->new($cookie) if ref $cookie eq 'HASH';
-    $headers->add('Set-Cookie', "$cookie");
+    $headers->add('Set-Cookie' => "$cookie");
   }
 
   return $self;

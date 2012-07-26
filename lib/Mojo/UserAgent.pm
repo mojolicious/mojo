@@ -222,7 +222,7 @@ sub _connect_proxy {
       my ($self, $tx) = @_;
 
       # CONNECT failed
-      unless (($tx->res->code || '') eq '200') {
+      unless ($tx->res->code ~~ 200) {
         $old->req->error('Proxy connection failed');
         return $self->_finish($old, $cb);
       }
@@ -391,7 +391,7 @@ sub _remove {
 
   # Keep connection alive
   $self->_cache(join(':', $self->transactor->endpoint($tx)), $id)
-    unless $tx->req->method eq 'CONNECT' && ($tx->res->code || '') eq '200';
+    unless $tx->req->method eq 'CONNECT' && $tx->res->code ~~ 200;
 }
 
 sub _redirect {
@@ -483,7 +483,7 @@ sub _upgrade {
   my $c   = $self->{connections}{$id};
   my $old = $c->{tx};
   return unless $old->req->headers->upgrade;
-  return unless ($old->res->code || '') eq '101';
+  return unless $old->res->code ~~ 101;
 
   # Check challenge and upgrade to WebSocket transaction
   my $new = Mojo::Transaction::WebSocket->new(handshake => $old, masked => 1);

@@ -211,7 +211,7 @@ sub render {
   $res->body($output) unless $res->body;
   my $headers = $res->headers;
   $headers->content_type($type) unless $headers->content_type;
-  return $self->rendered($stash->{status});
+  return !!$self->rendered($stash->{status});
 }
 
 sub render_content {
@@ -304,7 +304,7 @@ sub render_partial {
 sub render_static {
   my ($self, $file) = @_;
   my $app = $self->app;
-  return $self->rendered if $app->static->serve($self, $file);
+  return !!$self->rendered if $app->static->serve($self, $file);
   $app->log->debug(qq{File "$file" not found, public directory missing?});
   return;
 }
@@ -459,7 +459,7 @@ sub url_for {
   my $target = shift // '';
 
   # Absolute URL
-  return $target if (Scalar::Util::blessed($target) || '') eq 'Mojo::URL';
+  return $target if Scalar::Util::blessed($target) ~~ 'Mojo::URL';
   return Mojo::URL->new($target) if $target =~ m!^\w+\://!;
 
   # Base
@@ -489,7 +489,7 @@ sub url_for {
       if (!$target || $target eq 'current') && $req->url->path->trailing_slash;
 
     # Fix scheme for WebSockets
-    $base->scheme(($base->scheme || '') eq 'https' ? 'wss' : 'ws') if $ws;
+    $base->scheme($base->scheme ~~ 'https' ? 'wss' : 'ws') if $ws;
   }
 
   # Make path absolute

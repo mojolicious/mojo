@@ -258,7 +258,7 @@ sub secure_compare {
   return if length $a != length $b;
   my $r = 0;
   $r |= ord(substr $a, $_) ^ ord(substr $b, $_) for 0 .. length($a) - 1;
-  return $r == 0 ? 1 : undef;
+  return $r == 0;
 }
 
 sub sha1_bytes { sha1(@_) }

@@ -72,7 +72,7 @@ sub has_conditions {
   return $parent->has_conditions;
 }
 
-sub has_custom_name { shift->{custom} }
+sub has_custom_name { !!shift->{custom} }
 
 sub has_websocket {
   my $self = shift;
@@ -91,7 +91,7 @@ sub is_endpoint {
   return !@{$self->children};
 }
 
-sub is_websocket { shift->{websocket} }
+sub is_websocket { !!shift->{websocket} }
 
 sub name {
   my $self = shift;

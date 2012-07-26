@@ -79,7 +79,7 @@ sub ihost {
     $host;
 }
 
-sub is_abs { shift->scheme }
+sub is_abs { !!shift->scheme }
 
 sub parse {
   my ($self, $url) = @_;

@@ -84,7 +84,7 @@ sub build_frame {
 sub client_challenge {
   my $self = shift;
   return $self->_challenge($self->req->headers->sec_websocket_key) eq
-    $self->res->headers->sec_websocket_accept ? 1 : undef;
+    $self->res->headers->sec_websocket_accept;
 }
 
 sub client_handshake {

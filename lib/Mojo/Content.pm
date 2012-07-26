@@ -71,7 +71,7 @@ sub get_header_chunk {
     $ENV{MOJO_CHUNK_SIZE} || 131072;
 }
 
-sub has_leftovers { length(shift->{buffer} || '') }
+sub has_leftovers { !!length(shift->{buffer} || '') }
 
 sub header_size { length shift->build_headers }
 
@@ -82,11 +82,11 @@ sub is_dynamic {
   return $self->{dynamic} && !defined $self->headers->content_length;
 }
 
-sub is_finished { (shift->{state} || '') eq 'finished' }
+sub is_finished { shift->{state} ~~ 'finished' }
 
 sub is_multipart {undef}
 
-sub is_parsing_body { (shift->{state} || '') eq 'body' }
+sub is_parsing_body { shift->{state} ~~ 'body' }
 
 sub leftovers { shift->{buffer} }
 
@@ -109,9 +109,9 @@ sub parse {
 
   # Parse chunked content
   $self->{real_size} = 0 unless exists $self->{real_size};
-  if ($self->is_chunked && ($self->{state} || '') ne 'headers') {
+  if ($self->is_chunked && !($self->{state} ~~ 'headers')) {
     $self->_parse_chunked;
-    $self->{state} = 'finished' if ($self->{chunked} || '') eq 'finished';
+    $self->{state} = 'finished' if $self->{chunked} ~~ 'finished';
   }
 
   # Not chunked, pass through to second buffer
@@ -174,14 +174,14 @@ sub parse_until_body {
   }
 
   # Parse headers
-  $self->_parse_headers if ($self->{state} || '') eq 'headers';
+  $self->_parse_headers if $self->{state} ~~ 'headers';
 
   return $self;
 }
 
 sub progress {
   my $self = shift;
-  return 0 unless ($self->{state} || '') ~~ [qw(body finished)];
+  return 0 unless $self->{state} ~~ [qw(body finished)];
   return $self->{raw_size} - ($self->{header_size} || 0);
 }
 
@@ -273,7 +273,7 @@ sub _parse_chunked {
 
   # Trailing headers
   return $self->_parse_chunked_trailing_headers
-    if ($self->{chunked} || '') eq 'trailing_headers';
+    if $self->{chunked} ~~ 'trailing_headers';
 
   # New chunk (ignore the chunk extension)
   while ($self->{pre_buffer} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
@@ -306,7 +306,7 @@ sub _parse_chunked {
 
   # Trailing headers
   $self->_parse_chunked_trailing_headers
-    if ($self->{chunked} || '') eq 'trailing_headers';
+    if $self->{chunked} ~~ 'trailing_headers';
 }
 
 sub _parse_chunked_trailing_headers {

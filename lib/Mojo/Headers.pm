@@ -78,9 +78,9 @@ sub header {
   return @$headers;
 }
 
-sub is_finished { (shift->{state} || '') eq 'finished' }
+sub is_finished { shift->{state} ~~ 'finished' }
 
-sub is_limit_exceeded { shift->{limit} }
+sub is_limit_exceeded { !!shift->{limit} }
 
 sub leftovers { delete shift->{buffer} }
 

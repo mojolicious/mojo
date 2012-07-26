@@ -26,7 +26,7 @@ sub client_read {
   }
 
   # Unexpected 100 Continue
-  if ($self->{state} eq 'finished' && ($res->code || '') eq '100') {
+  if ($self->{state} eq 'finished' && $res->code ~~ 100) {
     $self->res($res->new);
     $self->{state} = $preserved;
   }
@@ -81,7 +81,7 @@ sub keep_alive {
   return 1 if $req_conn eq 'keep-alive' || $res_conn eq 'keep-alive';
 
   # No keep alive for 1.0
-  return $req->version eq '1.0' || $res->version eq '1.0' ? undef : 1;
+  return !($req->version eq '1.0' || $res->version eq '1.0');
 }
 
 sub server_leftovers {

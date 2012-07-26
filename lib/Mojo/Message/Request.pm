@@ -15,7 +15,7 @@ my $START_LINE_RE = qr|
   ([a-zA-Z]+)                                  # Method
   \s+
   ([0-9a-zA-Z\-._~:/?#[\]\@!\$&'()*+,;=\%]+)   # Path
-  (?:\s+HTTP/(\d+\.\d+))?                      # Version
+  (?:\s+HTTP/(\d\.\d))?                        # Version
   $
 |x;
 
@@ -86,7 +86,7 @@ sub fix_headers {
 
 sub is_secure {
   my $url = shift->url;
-  return ($url->scheme || $url->base->scheme || '') eq 'https';
+  return ($url->scheme || $url->base->scheme) ~~ 'https';
 }
 
 sub is_xhr {
@@ -105,9 +105,7 @@ sub parse {
   my $self = shift;
 
   # CGI like environment
-  my $env;
-  if   (@_ > 1) { $env = {@_} }
-  else          { $env = $_[0] if ref $_[0] eq 'HASH' }
+  my $env = @_ > 1 ? {@_} : ref $_[0] eq 'HASH' ? $_[0] : undef;
 
   # Parse CGI like environment
   my $chunk;
@@ -177,11 +175,10 @@ sub _build_start_line {
 
   # Proxy
   elsif ($self->proxy) {
-    my $clone = $url = $url->clone;
-    $clone->userinfo(undef);
-    $path = $clone
-      unless lc($self->headers->upgrade || '') eq 'websocket'
-      || ($url->scheme || '') eq 'https';
+    my $clone = $url = $url->clone->userinfo(undef);
+    my $upgrade = lc($self->headers->upgrade || '');
+    my $scheme = $url->scheme || '';
+    $path = $clone unless $upgrade eq 'websocket' || $scheme eq 'https';
   }
 
   return "$method $path HTTP/@{[$self->version]}\x0d\x0a";
@@ -203,9 +200,8 @@ sub _parse_env {
   my $headers = $self->headers;
   my $url     = $self->url;
   my $base    = $url->base;
-  for my $name (keys %$env) {
+  while (my ($name, $value) = each %$env) {
     next unless $name =~ /^HTTP_/i;
-    my $value = $env->{$name};
     $name =~ s/^HTTP_//i;
     $name =~ s/_/-/g;
     $headers->header($name, $value);
@@ -241,9 +237,7 @@ sub _parse_env {
   $base->scheme('https') if $env->{HTTPS};
 
   # Path
-  my $path = $url->path;
-  if   (my $value = $env->{PATH_INFO}) { $path->parse($value) }
-  else                                 { $path->parse('') }
+  my $path = $url->path->parse($env->{PATH_INFO} ? $env->{PATH_INFO} : '');
 
   # Base path
   if (my $value = $env->{SCRIPT_NAME}) {
@@ -270,10 +264,8 @@ sub _parse_start_line {
   my $self = shift;
 
   # Ignore any leading empty lines
-  my $line = get_line \$self->{buffer};
-  $line = get_line \$self->{buffer}
-    while ((defined $line) && ($line =~ m/^\s*$/));
-  return unless defined $line;
+  $self->{buffer} =~ s/^\s+//;
+  return unless defined(my $line = get_line \$self->{buffer});
 
   # We have a (hopefully) full request line
   return $self->error('Bad request start line', 400)

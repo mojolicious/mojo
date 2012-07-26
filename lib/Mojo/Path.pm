@@ -58,7 +58,7 @@ sub contains {
     return unless $part eq $try;
   }
 
-  return @$parts ? undef : 1;
+  return !@$parts;
 }
 
 sub merge {

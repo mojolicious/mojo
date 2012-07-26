@@ -21,7 +21,7 @@ sub check_file {
   my $cache = $self->{cache} ||= {};
   my $stats = $cache->{$file} ||= [$^T, $size];
   return if $mtime <= $stats->[0] && $size == $stats->[1];
-  return $cache->{$file} = [$mtime, $size];
+  return !!($cache->{$file} = [$mtime, $size]);
 }
 
 sub run {

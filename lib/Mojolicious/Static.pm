@@ -32,7 +32,7 @@ sub dispatch {
   # Serve static file and prevent directory traversal
   return if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));
   $stash->{'mojo.static'}++;
-  return $c->rendered;
+  return !!$c->rendered;
 }
 
 sub file {
@@ -56,7 +56,7 @@ sub serve {
   return unless my $asset = $self->file($rel);
   my $type = $rel =~ /\.(\w+)$/ ? $c->app->types->type($1) : undef;
   $c->res->headers->content_type($type || 'text/plain');
-  return $self->serve_asset($c, $asset);
+  return !!$self->serve_asset($c, $asset);
 }
 
 sub serve_asset {

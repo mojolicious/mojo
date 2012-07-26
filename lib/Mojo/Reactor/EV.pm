@@ -11,7 +11,7 @@ sub DESTROY { undef $EV }
 # We have to fall back to Mojo::Reactor::Poll, since EV is unique
 sub new { $EV++ ? Mojo::Reactor::Poll->new : shift->SUPER::new }
 
-sub is_running {EV::depth}
+sub is_running { !!EV::depth }
 
 sub one_tick { EV::run(EV::RUN_ONCE) }
 

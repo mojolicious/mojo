@@ -90,8 +90,7 @@ sub build {
         }
 
         # Multiline
-        $multi = ($line->[$j + 2] || '') eq 'text'
-          && ($line->[$j + 3] || '') eq '' ? 0 : 1;
+        $multi = $line->[$j + 2] ~~ 'text' && $line->[$j + 3] ~~ '' ? 0 : 1;
 
         # Append semicolon
         $lines[-1] .= ';' if !$multi && !$cpst;

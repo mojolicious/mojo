@@ -43,8 +43,7 @@ sub register {
   # Add "current_route" helper
   $app->helper(
     current_route => sub {
-      my $self = shift;
-      return '' unless my $endpoint = $self->match->endpoint;
+      return '' unless my $endpoint = shift->match->endpoint;
       return $endpoint->name unless @_;
       return $endpoint->name eq shift;
     }
@@ -52,10 +51,7 @@ sub register {
 
   # Add "dumper" helper
   $app->helper(
-    dumper => sub {
-      shift;
-      Data::Dumper->new([@_])->Indent(1)->Terse(1)->Dump;
-    }
+    dumper => sub { shift; Data::Dumper->new([@_])->Indent(1)->Terse(1)->Dump }
   );
 
   # Add "include" helper
@@ -79,33 +75,28 @@ sub register {
   );
 
   # Add "memorize" helper
-  my %memorize;
+  my %mem;
   $app->helper(
     memorize => sub {
       shift;
-      my $cb = pop;
-      return '' unless ref $cb eq 'CODE';
-      my $name = shift;
-      my $args;
-      if (ref $name eq 'HASH') { ($args, $name) = ($name, undef) }
-      else                     { $args = shift || {} }
+      return '' unless ref(my $cb = pop) eq 'CODE';
+      my ($name, $args)
+        = ref $_[0] eq 'HASH' ? (undef, shift) : (shift, shift || {});
 
       # Default name
       $name ||= join '', map { $_ || '' } (caller(1))[0 .. 3];
 
-      # Expire
+      # Expire old results
       my $expires = $args->{expires} || 0;
-      delete $memorize{$name}
-        if exists $memorize{$name}
-        && $expires > 0
-        && $memorize{$name}{expires} < time;
+      delete $mem{$name}
+        if exists $mem{$name} && $expires > 0 && $mem{$name}{expires} < time;
 
-      # Memorized
-      return $memorize{$name}{content} if exists $memorize{$name};
+      # Memorized result
+      return $mem{$name}{content} if exists $mem{$name};
 
-      # Memorize
-      $memorize{$name}{expires} = $expires;
-      $memorize{$name}{content} = $cb->();
+      # Memorize new result
+      $mem{$name}{expires} = $expires;
+      return $mem{$name}{content} = $cb->();
     }
   );
 

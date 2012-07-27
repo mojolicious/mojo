@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Daemon;
 
-has description => "Start application with HTTP 1.1 and WebSocket server.\n";
+has description => "Start application with HTTP and WebSocket server.\n";
 has usage       => <<"EOF";
 usage: $0 daemon [OPTIONS]
 

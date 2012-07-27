@@ -524,7 +524,7 @@ sub _write {
 
 =head1 NAME
 
-Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
+Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
 =head1 SYNOPSIS
 
@@ -605,8 +605,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP 1.1 and WebSocket user agent
 
 =head1 DESCRIPTION
 
-L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP 1.1 and WebSocket
-user agent with C<IPv6>, C<TLS> and C<libev> support.
+L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
+agent with C<IPv6>, C<TLS> and C<libev> support.
 
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently and used if installed.

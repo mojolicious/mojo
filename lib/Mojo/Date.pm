@@ -70,7 +70,7 @@ sub to_string {
 
 =head1 NAME
 
-Mojo::Date - HTTP 1.1 date container
+Mojo::Date - HTTP date container
 
 =head1 SYNOPSIS
 
@@ -83,8 +83,7 @@ Mojo::Date - HTTP 1.1 date container
 
 =head1 DESCRIPTION
 
-L<Mojo::Date> implements HTTP 1.1 date and time functions according to RFC
-2616.
+L<Mojo::Date> implements HTTP date and time functions according to RFC 2616.
 
   Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
   Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036
@@ -129,7 +128,7 @@ Parse date in one of the following formats.
   my $string = $date->to_string;
   my $string = "$date";
 
-Render date suitable for HTTP 1.1 messages.
+Render date suitable for HTTP messages.
 
 =head1 SEE ALSO
 

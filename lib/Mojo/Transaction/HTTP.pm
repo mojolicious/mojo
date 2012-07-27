@@ -249,7 +249,7 @@ sub _start_line {
 
 =head1 NAME
 
-Mojo::Transaction::HTTP - HTTP 1.1 transaction container
+Mojo::Transaction::HTTP - HTTP transaction container
 
 =head1 SYNOPSIS
 
@@ -275,7 +275,7 @@ Mojo::Transaction::HTTP - HTTP 1.1 transaction container
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::HTTP> is a container for HTTP 1.1 transactions as
+L<Mojo::Transaction::HTTP> is a container for HTTP transactions as
 described in RFC 2616.
 
 =head1 EVENTS

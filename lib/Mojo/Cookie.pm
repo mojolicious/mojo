@@ -53,7 +53,7 @@ sub _tokenize {
 
 =head1 NAME
 
-Mojo::Cookie - HTTP 1.1 cookie base class
+Mojo::Cookie - HTTP cookie base class
 
 =head1 SYNOPSIS
 
@@ -61,7 +61,7 @@ Mojo::Cookie - HTTP 1.1 cookie base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie> is an abstract base class for HTTP 1.1 cookies.
+L<Mojo::Cookie> is an abstract base class for HTTP cookies.
 
 =head1 ATTRIBUTES
 

@@ -9,7 +9,7 @@ use Mojo::JSON::Pointer;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
 
-has description => "Perform HTTP 1.1 request.\n";
+has description => "Perform HTTP request.\n";
 has usage       => <<"EOF";
 usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
 

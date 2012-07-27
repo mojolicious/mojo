@@ -66,7 +66,7 @@ sub parse {
 
 =head1 NAME
 
-Mojo::Content::Single - HTTP 1.1 content container
+Mojo::Content::Single - HTTP content container
 
 =head1 SYNOPSIS
 
@@ -78,8 +78,8 @@ Mojo::Content::Single - HTTP 1.1 content container
 
 =head1 DESCRIPTION
 
-L<Mojo::Content::Single> is a container for HTTP 1.1 content as described in
-RFC 2616.
+L<Mojo::Content::Single> is a container for HTTP content as described in RFC
+2616.
 
 =head1 EVENTS
 

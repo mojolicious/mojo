@@ -528,7 +528,7 @@ line values are disabled by default.
 
   my $string = $headers->to_string;
 
-Turn headers into a string, suitable for HTTP 1.1 messages.
+Turn headers into a string, suitable for HTTP messages.
 
 =head2 C<trailer>
 

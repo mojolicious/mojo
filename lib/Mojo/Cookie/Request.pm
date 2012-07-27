@@ -33,7 +33,7 @@ sub to_string {
 
 =head1 NAME
 
-Mojo::Cookie::Request - HTTP 1.1 request cookie container
+Mojo::Cookie::Request - HTTP request cookie container
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ Mojo::Cookie::Request - HTTP 1.1 request cookie container
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie::Request> is a container for HTTP 1.1 request cookies.
+L<Mojo::Cookie::Request> is a container for HTTP request cookies.
 
 =head1 ATTRIBUTES
 

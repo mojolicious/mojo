@@ -126,8 +126,8 @@ The logging layer of your application, defaults to a L<Mojo::Log> object.
   my $ua = $app->ua;
   $app   = $app->ua(Mojo::UserAgent->new);
 
-A full featured HTTP 1.1 user agent for use in your applications, defaults to
-a L<Mojo::UserAgent> object. Note that this user agent should not be used in
+A full featured HTTP user agent for use in your applications, defaults to a
+L<Mojo::UserAgent> object. Note that this user agent should not be used in
 plugins, since non-blocking requests that are already in progress will
 interfere with new blocking ones.
 

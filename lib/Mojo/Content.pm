@@ -335,7 +335,7 @@ sub _parse_headers {
 
 =head1 NAME
 
-Mojo::Content - HTTP 1.1 content base class
+Mojo::Content - HTTP content base class
 
 =head1 SYNOPSIS
 
@@ -343,8 +343,8 @@ Mojo::Content - HTTP 1.1 content base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Content> is an abstract base class for HTTP 1.1 content as described
-in RFC 2616.
+L<Mojo::Content> is an abstract base class for HTTP content as described in
+RFC 2616.
 
 =head1 EVENTS
 

@@ -58,7 +58,7 @@ $morbo->run($app);
 
 =head1 NAME
 
-morbo - Morbo HTTP 1.1 and WebSocket development server
+morbo - Morbo HTTP and WebSocket development server
 
 =head1 SYNOPSIS
 

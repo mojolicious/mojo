@@ -132,7 +132,7 @@ sub _parse_start_line {
 
 =head1 NAME
 
-Mojo::Message::Response - HTTP 1.1 response container
+Mojo::Message::Response - HTTP response container
 
 =head1 SYNOPSIS
 
@@ -155,8 +155,8 @@ Mojo::Message::Response - HTTP 1.1 response container
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Response> is a container for HTTP 1.1 responses as described
-in RFC 2616.
+L<Mojo::Message::Response> is a container for HTTP responses as described in
+RFC 2616.
 
 =head1 EVENTS
 

@@ -184,7 +184,7 @@ Upload files to CPAN.
 
   $ ./myapp.pl daemon
 
-Start application with standalone HTTP 1.1 server backend.
+Start application with standalone HTTP server backend.
 
 =head2 C<eval>
 

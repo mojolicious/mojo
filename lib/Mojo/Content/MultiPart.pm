@@ -228,7 +228,7 @@ sub _parse_multipart_preamble {
 
 =head1 NAME
 
-Mojo::Content::MultiPart - HTTP 1.1 multipart content container
+Mojo::Content::MultiPart - HTTP multipart content container
 
 =head1 SYNOPSIS
 
@@ -240,7 +240,7 @@ Mojo::Content::MultiPart - HTTP 1.1 multipart content container
 
 =head1 DESCRIPTION
 
-L<Mojo::Content::MultiPart> is a container for HTTP 1.1 multipart content as
+L<Mojo::Content::MultiPart> is a container for HTTP multipart content as
 described in RFC 2616.
 
 =head1 EVENTS

@@ -279,7 +279,7 @@ sub _parse_start_line {
 
 =head1 NAME
 
-Mojo::Message::Request - HTTP 1.1 request container
+Mojo::Message::Request - HTTP request container
 
 =head1 SYNOPSIS
 
@@ -301,8 +301,8 @@ Mojo::Message::Request - HTTP 1.1 request container
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Request> is a container for HTTP 1.1 requests as described
-in RFC 2616.
+L<Mojo::Message::Request> is a container for HTTP requests as described in RFC
+2616.
 
 =head1 EVENTS
 

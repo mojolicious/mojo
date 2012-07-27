@@ -16,10 +16,10 @@ to be able to use them to their full potential.
 
 =head2 Built-in web server
 
-L<Mojolicious> contains a very portable non-blocking I/O HTTP 1.1 and
-WebSocket server with L<Mojo::Server::Daemon>. It is usually used during
-development and in the construction of more advanced web servers, but is solid
-and fast enough for small to mid sized applications.
+L<Mojolicious> contains a very portable non-blocking I/O HTTP and WebSocket
+server with L<Mojo::Server::Daemon>. It is usually used during development and
+in the construction of more advanced web servers, but is solid and fast enough
+for small to mid sized applications.
 
   $ ./script/myapp daemon
   Server available at http://127.0.0.1:3000.

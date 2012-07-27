@@ -59,7 +59,7 @@ sub slurp { shift->{content} }
 
 =head1 NAME
 
-Mojo::Asset::Memory - In-memory storage for HTTP 1.1 content
+Mojo::Asset::Memory - In-memory storage for HTTP content
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ Mojo::Asset::Memory - In-memory storage for HTTP 1.1 content
 
 =head1 DESCRIPTION
 
-L<Mojo::Asset::Memory> is an in-memory storage backend for HTTP 1.1 content.
+L<Mojo::Asset::Memory> is an in-memory storage backend for HTTP content.
 
 =head1 EVENTS
 

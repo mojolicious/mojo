@@ -34,7 +34,7 @@ they are installed).
 
 =item *
 
-Full stack HTTP 1.1 and WebSocket client/server implementation with IPv6, TLS,
+Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,
 IDNA, Comet (long polling), chunking and multipart support.
 
 =item *

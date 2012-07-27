@@ -21,7 +21,7 @@ sub slurp   { croak 'Method "slurp" not implemented by subclass' }
 
 =head1 NAME
 
-Mojo::Asset - HTTP 1.1 content storage base class
+Mojo::Asset - HTTP content storage base class
 
 =head1 SYNOPSIS
 
@@ -29,7 +29,7 @@ Mojo::Asset - HTTP 1.1 content storage base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Asset> is an abstract base class for HTTP 1.1 content storage.
+L<Mojo::Asset> is an abstract base class for HTTP content storage.
 
 =head1 ATTRIBUTES
 

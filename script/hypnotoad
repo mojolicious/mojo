@@ -44,7 +44,7 @@ Mojo::Server::Hypnotoad->new->run($app);
 
 =head1 NAME
 
-hypnotoad - Hypnotoad HTTP 1.1 and WebSocket server
+hypnotoad - Hypnotoad HTTP and WebSocket server
 
 =head1 SYNOPSIS
 

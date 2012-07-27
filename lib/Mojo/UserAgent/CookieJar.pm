@@ -97,7 +97,7 @@ sub inject {
 
 =head1 NAME
 
-Mojo::UserAgent::CookieJar - Cookie jar for HTTP 1.1 user agents
+Mojo::UserAgent::CookieJar - Cookie jar for HTTP user agents
 
 =head1 SYNOPSIS
 
@@ -108,7 +108,7 @@ Mojo::UserAgent::CookieJar - Cookie jar for HTTP 1.1 user agents
 =head1 DESCRIPTION
 
 L<Mojo::UserAgent::CookieJar> is a minimalistic and relaxed cookie jar for
-HTTP 1.1 user agents.
+HTTP user agents.
 
 =head1 ATTRIBUTES
 

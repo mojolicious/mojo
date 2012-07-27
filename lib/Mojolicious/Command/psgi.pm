@@ -21,7 +21,7 @@ Mojolicious::Command::psgi - PSGI command
   use Mojolicious::Command::psgi;
 
   my $psgi = Mojolicious::Command::psgi->new;
-  my $app = $psgi->run;
+  my $app  = $psgi->run;
 
 =head1 DESCRIPTION
 

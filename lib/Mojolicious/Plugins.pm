@@ -77,7 +77,6 @@ Mojolicious::Plugins - Plugin manager
   use Mojolicious::Plugins;
 
   my $plugins = Mojolicious::Plugin->new;
-  $plugins->load_plugin('Config');
 
 =head1 DESCRIPTION
 

@@ -205,7 +205,13 @@ Mojo::Parameters - Parameter container
 
   use Mojo::Parameters;
 
+  # Parse
+  my $p = Mojo::Parameters->new('foo=bar&baz=23');
+  say $p->param('baz');
+
+  # Build
   my $p = Mojo::Parameters->new(foo => 'bar', baz => 23);
+  say "$p";
 
 =head1 DESCRIPTION
 

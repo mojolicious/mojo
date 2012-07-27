@@ -74,6 +74,7 @@ Mojo::Content::Single - HTTP 1.1 content container
 
   my $single = Mojo::Content::Single->new;
   $single->parse("Content-Length: 12\r\n\r\nHello World!");
+  say $single->headers->content_length;
 
 =head1 DESCRIPTION
 

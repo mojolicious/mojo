@@ -96,7 +96,7 @@ Mojo::Cookie::Response - HTTP 1.1 response cookie container
   my $cookie = Mojo::Cookie::Response->new;
   $cookie->name('foo');
   $cookie->value('bar');
-  say $cookie;
+  say "$cookie";
 
 =head1 DESCRIPTION
 

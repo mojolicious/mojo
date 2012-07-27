@@ -8,13 +8,13 @@ use Scalar::Util 'blessed';
 
 has app => sub {
 
-  # Try to detect application
-  return $ENV{MOJO_APP} if ref $ENV{MOJO_APP};
+  # Already initialized application
+  my $app = $ENV{MOJO_APP} || 'Mojo::HelloWorld';
+  return $app if ref $app;
 
   # Load and initialize application
-  my $class = $ENV{MOJO_APP} ||= 'Mojo::HelloWorld';
-  if (my $e = Mojo::Loader->new->load($class)) { die $e if ref $e }
-  return $ENV{MOJO_APP} = $class->new;
+  if (my $e = Mojo::Loader->new->load($app)) { die $e if ref $e }
+  return $ENV{MOJO_APP} = $app->new;
 };
 
 sub new {

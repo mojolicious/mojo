@@ -264,7 +264,7 @@ Mojo::URL - Uniform Resource Locator
   $url->path('baz');
   $url->query->param(foo => 'bar');
   $url->fragment(23);
-  say $url;
+  say "$url";
 
 =head1 DESCRIPTION
 

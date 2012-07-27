@@ -28,8 +28,7 @@ sub import {
   my $routes = $app->routes->namespace('');
 
   # Default static and template class
-  $app->static->classes->[0]   = $caller;
-  $app->renderer->classes->[0] = $caller;
+  $app->static->classes->[0] = $app->renderer->classes->[0] = $caller;
 
   # Export
   no warnings 'redefine';

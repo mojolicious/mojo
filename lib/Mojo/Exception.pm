@@ -155,7 +155,8 @@ Mojo::Exception - Exceptions with context
 
   use Mojo::Exception;
 
-  my $e = Mojo::Exception->new;
+  my $e = Mojo::Exception->new('Not again!');
+  $e->throw;
 
 =head1 DESCRIPTION
 

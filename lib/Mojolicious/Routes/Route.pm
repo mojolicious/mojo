@@ -286,7 +286,7 @@ sub _generate_route {
 
 =head1 NAME
 
-Mojolicious::Routes::Route - Route container
+Mojolicious::Routes::Route - Route
 
 =head1 SYNOPSIS
 

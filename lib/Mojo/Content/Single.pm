@@ -66,7 +66,7 @@ sub parse {
 
 =head1 NAME
 
-Mojo::Content::Single - HTTP content container
+Mojo::Content::Single - HTTP content
 
 =head1 SYNOPSIS
 

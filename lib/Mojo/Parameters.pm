@@ -199,7 +199,7 @@ sub to_string {
 
 =head1 NAME
 
-Mojo::Parameters - Parameter container
+Mojo::Parameters - Parameters
 
 =head1 SYNOPSIS
 

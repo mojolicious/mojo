@@ -195,7 +195,7 @@ Mojo::Headers - Headers
 
 =head1 DESCRIPTION
 
-L<Mojo::Headers> is a container and parser for HTTP headers.
+L<Mojo::Headers> is a container for HTTP headers.
 
 =head1 ATTRIBUTES
 

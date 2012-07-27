@@ -53,8 +53,7 @@ sub detect {
 }
 
 sub lib_dir {
-  my $self = shift;
-  my $path = catdir @{$self->{parts} || []}, 'lib';
+  my $path = catdir @{shift->{parts} || []}, 'lib';
   return -d $path ? $path : undef;
 }
 

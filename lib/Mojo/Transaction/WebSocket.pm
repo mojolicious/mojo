@@ -300,7 +300,7 @@ sub _xor_mask {
 
 =head1 NAME
 
-Mojo::Transaction::WebSocket - WebSocket transaction container
+Mojo::Transaction::WebSocket - WebSocket transaction
 
 =head1 SYNOPSIS
 

@@ -279,7 +279,7 @@ sub _parse_start_line {
 
 =head1 NAME
 
-Mojo::Message::Request - HTTP request container
+Mojo::Message::Request - HTTP request
 
 =head1 SYNOPSIS
 

@@ -70,7 +70,7 @@ Mojolicious::Types - MIME types
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Types> is a container for MIME types.
+L<Mojolicious::Types> manages MIME types for L<Mojolicious>.
 
 =head1 ATTRIBUTES
 

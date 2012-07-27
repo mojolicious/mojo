@@ -33,7 +33,7 @@ sub to_string {
 
 =head1 NAME
 
-Mojo::Cookie::Request - HTTP request cookie container
+Mojo::Cookie::Request - HTTP request cookie
 
 =head1 SYNOPSIS
 

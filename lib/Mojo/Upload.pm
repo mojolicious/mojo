@@ -21,7 +21,7 @@ sub slurp   { shift->asset->slurp }
 
 =head1 NAME
 
-Mojo::Upload - Upload container
+Mojo::Upload - Upload
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ Mojo::Upload - Upload container
 
 =head1 DESCRIPTION
 
-L<Mojo::Upload> is a container for uploads.
+L<Mojo::Upload> is a container for uploaded files.
 
 =head1 ATTRIBUTES
 

@@ -87,7 +87,7 @@ sub to_string {
 
 =head1 NAME
 
-Mojo::Cookie::Response - HTTP response cookie container
+Mojo::Cookie::Response - HTTP response cookie
 
 =head1 SYNOPSIS
 

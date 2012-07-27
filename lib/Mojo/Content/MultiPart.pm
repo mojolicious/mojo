@@ -228,7 +228,7 @@ sub _parse_multipart_preamble {
 
 =head1 NAME
 
-Mojo::Content::MultiPart - HTTP multipart content container
+Mojo::Content::MultiPart - HTTP multipart content
 
 =head1 SYNOPSIS
 

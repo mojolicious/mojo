@@ -478,7 +478,7 @@ L<Mojo::Message> implements the following attributes.
   my $message = $message->content;
   $message    = $message->content(Mojo::Content::Single->new);
 
-Content container, defaults to a L<Mojo::Content::Single> object.
+Message content, defaults to a L<Mojo::Content::Single> object.
 
 =head2 C<default_charset>
 

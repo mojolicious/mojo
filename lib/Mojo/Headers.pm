@@ -348,6 +348,7 @@ Shortcut for the C<Expires> header.
 =head2 C<from_hash>
 
   $headers = $headers->from_hash({'Content-Type' => 'text/html'});
+  $headers = $headers->from_hash({});
 
 Parse headers from a hash reference.
 

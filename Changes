@@ -1,4 +1,7 @@
 
+3.16  2012-07-29
+  - Improved documentation.
+
 3.15  2012-07-28
   - Improved Mojo::Base to load IO::Handle.
   - Improved documentation.

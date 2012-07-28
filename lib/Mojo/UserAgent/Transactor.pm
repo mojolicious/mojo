@@ -79,7 +79,7 @@ sub form {
   my $req     = $tx->req;
   my $headers = $req->headers;
   $headers->content_type('multipart/form-data') if $multipart;
-  if (($headers->content_type || '') eq 'multipart/form-data') {
+  if ($headers->content_type ~~ 'multipart/form-data') {
     my $parts = $self->_multipart($encoding, $p->to_hash);
     $req->content(
       Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));

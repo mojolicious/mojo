@@ -76,10 +76,13 @@ Mojo::Date - HTTP date
 
   use Mojo::Date;
 
-  my $date = Mojo::Date->new(784111777);
-  my $http_date = $date->to_string;
-  $date->parse('Sun, 06 Nov 1994 08:49:37 GMT');
-  my $epoch = $date->epoch;
+  # Parse
+  my $date = Mojo::Date->new('Sun, 06 Nov 1994 08:49:37 GMT');
+  say $date->epoch;
+
+  # Build
+  my $date = Mojo::Date->new(time);
+  say "$date";
 
 =head1 DESCRIPTION
 
@@ -109,7 +112,7 @@ following new ones.
 =head2 C<new>
 
   my $date = Mojo::Date->new;
-  my $date = Mojo::Date->new($string);
+  my $date = Mojo::Date->new('Sun Nov  6 08:49:37 1994');
 
 Construct a new L<Mojo::Date> object.
 

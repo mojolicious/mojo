@@ -277,7 +277,7 @@ Clone parameters.
 
   $p = $p->merge(Mojo::Parameters->new(foo => 'b;ar', baz => 23));
 
-Merge parameters.
+Merge L<Mojo::Parameters> objects.
 
 =head2 C<param>
 

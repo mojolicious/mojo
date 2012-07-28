@@ -3,7 +3,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
-use IO::Handle;
 
 has handle => sub {
   my $self = shift;

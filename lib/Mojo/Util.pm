@@ -7,7 +7,6 @@ use Digest::SHA qw(sha1 sha1_hex);
 use Encode ();
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
-use IO::Handle;
 use MIME::Base64 qw(decode_base64 encode_base64);
 
 # Punycode bootstring parameters

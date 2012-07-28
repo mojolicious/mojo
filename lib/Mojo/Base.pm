@@ -9,6 +9,9 @@ use feature ();
 # No imports because we get subclassed, a lot!
 use Carp ();
 
+# Only Perl 5.14+ requires it on demand
+use IO::Handle;
+
 # "Kids, you tried your best and you failed miserably.
 #  The lesson is, never try."
 sub import {
@@ -144,11 +147,13 @@ All three forms save a lot of typing.
   use strict;
   use warnings;
   use feature ':5.10';
+  use IO::Handle;
 
   # use Mojo::Base -base;
   use strict;
   use warnings;
   use feature ':5.10';
+  use IO::Handle;
   use Mojo::Base;
   push @ISA, 'Mojo::Base';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
@@ -157,6 +162,7 @@ All three forms save a lot of typing.
   use strict;
   use warnings;
   use feature ':5.10';
+  use IO::Handle;
   require SomeBaseClass;
   push @ISA, 'SomeBaseClass';
   use Mojo::Base;

@@ -30,18 +30,16 @@ $SIG{PIPE} = 'IGNORE';
 __PACKAGE__->singleton->reactor;
 
 sub client {
-  my $self = shift;
+  my ($self, $cb) = (shift, pop);
   $self = $self->singleton unless ref $self;
-  my $cb = pop;
 
   # Manage connections
   $self->_manage;
 
   # New client
-  my $client = Mojo::IOLoop::Client->new;
   my $id     = $self->_id;
   my $c      = $self->{connections}{$id} ||= {};
-  $c->{client} = $client;
+  my $client = $c->{client} = Mojo::IOLoop::Client->new;
   weaken $client->reactor($self->reactor)->{reactor};
 
   # Connect
@@ -118,17 +116,15 @@ sub remove {
 # "Fat Tony is a cancer on this fair city!
 #  He is the cancer and I am the... uh... what cures cancer?"
 sub server {
-  my $self = shift;
+  my ($self, $cb) = (shift, pop);
   $self = $self->singleton unless ref $self;
-  my $cb = pop;
 
   # Manage connections
   $self->_manage;
 
   # New server
-  my $server = Mojo::IOLoop::Server->new;
-  my $id     = $self->_id;
-  $self->{servers}{$id} = $server;
+  my $id = $self->_id;
+  my $server = $self->{servers}{$id} = Mojo::IOLoop::Server->new;
   weaken $server->reactor($self->reactor)->{reactor};
 
   # Listen
@@ -139,8 +135,7 @@ sub server {
 
       # Accept
       my $stream = Mojo::IOLoop::Stream->new($handle);
-      my $id     = $self->stream($stream);
-      $self->$cb($stream, $id);
+      $self->$cb($stream, $self->stream($stream));
 
       # Enforce connection limit (randomize to improve load balancing)
       $self->max_connections(0)
@@ -181,11 +176,10 @@ sub stop {
 }
 
 sub stream {
-  my $self = shift;
+  my ($self, $stream) = @_;
   $self = $self->singleton unless ref $self;
 
   # Connect stream with reactor
-  my $stream = shift;
   return $self->_stream($stream, $self->_id) if blessed $stream;
 
   # Find stream for id
@@ -407,7 +401,7 @@ this callback are not captured.
 The maximum number of connections this loop is allowed to accept before
 shutting down gracefully without interrupting existing connections, defaults
 to C<0>. Setting the value to C<0> will allow this loop to accept new
-connections indefinitely. Note that half of this value can be subtracted
+connections indefinitely. Note that up to half of this value can be subtracted
 randomly to improve load balancing between multiple server processes.
 
 =head2 C<max_connections>

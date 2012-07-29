@@ -460,9 +460,9 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
 Maximum number of connections a worker is allowed to accept before stopping
 gracefully, defaults to C<1000>. Setting the value to C<0> will allow workers
-to accept new connections indefinitely. Note that half of this value can be
-subtracted randomly to improve load balancing, and that worker processes will
-stop sending heartbeat messages once the limit has been reached.
+to accept new connections indefinitely. Note that up to half of this value can
+be subtracted randomly to improve load balancing, and that worker processes
+will stop sending heartbeat messages once the limit has been reached.
 
 =head2 C<backlog>
 

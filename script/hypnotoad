@@ -31,10 +31,10 @@ usage: $0 [OPTIONS] [APPLICATION]
   hypnotoad -f myapp.pl
 
 These options are available:
-  -f, --foreground      Keep manager process in foreground.
-  -h, --help            Show this message.
-  -s, --stop            Stop server gracefully.
-  -t, --test            Test application and exit.
+  -f, --foreground   Keep manager process in foreground.
+  -h, --help         Show this message.
+  -s, --stop         Stop server gracefully.
+  -t, --test         Test application and exit.
 EOF
 
 # "This is it.

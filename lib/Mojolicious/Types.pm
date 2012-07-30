@@ -67,6 +67,8 @@ Mojolicious::Types - MIME types
   use Mojolicious::Types;
 
   my $types = Mojolicious::Types->new;
+  $types->type(foo => 'text/foo');
+  say $types->type('foo');
 
 =head1 DESCRIPTION
 

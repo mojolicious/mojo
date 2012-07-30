@@ -141,9 +141,8 @@ Mojolicious::Commands - Command line interface
 
   use Mojolicious::Commands;
 
-  # Command line interface
   my $commands = Mojolicious::Commands->new;
-  $commands->run(@ARGV);
+  push @{$commands->namespaces}, 'MyApp::Command';
 
 =head1 DESCRIPTION
 

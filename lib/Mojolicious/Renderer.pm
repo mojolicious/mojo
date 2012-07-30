@@ -234,6 +234,8 @@ Mojolicious::Renderer - MIME type based renderer
   use Mojolicious::Renderer;
 
   my $renderer = Mojolicious::Renderer->new;
+  push @{$renderer->classes}, 'MyApp::Foo';
+  push @{renderer->paths}, '/home/sri/templates';
 
 =head1 DESCRIPTION
 

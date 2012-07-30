@@ -543,7 +543,16 @@ Mojolicious::Controller - Controller base class
 
 =head1 SYNOPSIS
 
+  # Controller
+  package MyApp::Foo;
   use Mojo::Base 'Mojolicious::Controller';
+
+  # Action
+  sub bar {
+    my $self = shift;
+    my $name = $self->param('name');
+    $self->render(json => {hello => $name});
+  }
 
 =head1 DESCRIPTION
 

@@ -77,6 +77,7 @@ Mojolicious::Plugins - Plugin manager
   use Mojolicious::Plugins;
 
   my $plugins = Mojolicious::Plugin->new;
+  push @{$plugins->namespaces}, 'MyApp::Plugin';
 
 =head1 DESCRIPTION
 

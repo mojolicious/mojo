@@ -1,7 +1,6 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON;
@@ -39,19 +38,17 @@ EOF
 #  In the absence of pants, defense's suspenders serve no purpose.
 #  I'm going to allow them... for now."
 sub run {
-  my $self = shift;
+  my ($self, @args) = @_;
 
   # Options
-  local @ARGV = @_;
-  my ($method, $content, @headers) = ('GET', '');
-  my ($charset, $redirect, $verbose);
-  GetOptions(
-    'C|charset=s' => sub { $charset  = $_[1] },
-    'c|content=s' => sub { $content  = $_[1] },
-    'H|header=s'  => \@headers,
-    'M|method=s'  => sub { $method   = $_[1] },
-    'r|redirect'  => sub { $redirect = 1 },
-    'v|verbose'   => sub { $verbose  = 1 }
+  $self->_options(
+    \@args,
+    'C|charset=s' => \my $charset,
+    'c|content=s' => \(my $content = ''),
+    'H|header=s'  => \my @headers,
+    'M|method=s'  => \(my $method = 'GET'),
+    'r|redirect'  => \my $redirect,
+    'v|verbose'   => \my $verbose
   );
   $verbose = 1 if $method eq 'HEAD';
 
@@ -60,8 +57,8 @@ sub run {
   /^\s*([^:]+)\s*:\s*([^:]+)\s*$/ and $headers{$1} = $2 for @headers;
 
   # URL and selector
-  die $self->usage unless my $url = decode 'UTF-8', shift @ARGV // '';
-  my $selector = shift @ARGV;
+  die $self->usage unless my $url = decode 'UTF-8', shift @args // '';
+  my $selector = shift @args;
 
   # Fresh user agent
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
@@ -139,7 +136,7 @@ sub run {
   return _json($buffer, $selector) if $type =~ /json/i;
 
   # Selector
-  _select($buffer, $selector, $charset // $tx->res->content->charset);
+  _select($buffer, $selector, $charset // $tx->res->content->charset, @args);
 }
 
 sub _json {
@@ -155,7 +152,7 @@ sub _say {
 }
 
 sub _select {
-  my ($buffer, $selector, $charset) = @_;
+  my ($buffer, $selector, $charset, @args) = @_;
 
   # Find
   my $dom     = Mojo::DOM->new->charset($charset)->parse($buffer);
@@ -163,7 +160,7 @@ sub _select {
 
   # Commands
   my $finished;
-  while (defined(my $command = shift @ARGV)) {
+  while (defined(my $command = shift @args)) {
 
     # Number
     if ($command =~ /^\d+$/) {
@@ -179,7 +176,7 @@ sub _select {
 
     # Attribute
     elsif ($command eq 'attr') {
-      next unless my $name = shift @ARGV;
+      next unless my $name = shift @args;
       _say($_->attrs->{$name}) for @$results;
     }
 

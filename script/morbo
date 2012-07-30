@@ -16,17 +16,15 @@ my $lib = join('/', @base, 'lib');
 #  Across the galaxy my people are completing the mighty space fleet that
 #  will exterminate the human race!
 #  But first, this news from Tinseltown."
-my ($help, @listen, @watch);
 GetOptions(
-  'h|help' => sub { $help = 1 },
-  'l|listen=s' => \@listen,
+  'h|help'     => \my $help,
+  'l|listen=s' => \my @listen,
   'v|verbose'  => sub { $ENV{MORBO_VERBOSE} = 1 },
-  'w|watch=s'  => \@watch
+  'w|watch=s'  => \my @watch
 );
-$help = 1 unless my $app = shift;
 
 # Usage
-die <<"EOF" if $help;
+die <<"EOF" if $help || !(my $app = shift);
 usage: $0 [OPTIONS] [APPLICATION]
 
   morbo script/myapp

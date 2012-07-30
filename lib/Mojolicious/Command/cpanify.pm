@@ -2,7 +2,6 @@ package Mojolicious::Command::cpanify;
 use Mojo::Base 'Mojolicious::Command';
 
 use File::Basename 'basename';
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::UserAgent;
 
 has description => "Upload distribution to CPAN.\n";
@@ -18,16 +17,15 @@ EOF
 
 # "Hooray! A happy ending for the rich people!"
 sub run {
-  my $self = shift;
+  my ($self, @args) = @_;
 
   # Options
-  local @ARGV = @_;
-  my $password = my $user = '';
-  GetOptions(
-    'p|password=s' => sub { $password = $_[1] },
-    'u|user=s'     => sub { $user     = $_[1] }
+  $self->_options(
+    \@args,
+    'p|password=s' => \(my $password = ''),
+    'u|user=s'     => \(my $user     = '')
   );
-  die $self->usage unless my $file = shift @ARGV;
+  die $self->usage unless my $file = shift @args;
 
   # Upload
   my $tx = Mojo::UserAgent->new->detect_proxy->post_form(

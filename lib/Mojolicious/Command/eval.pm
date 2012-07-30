@@ -1,8 +1,6 @@
 package Mojolicious::Command::eval;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
-
 has description => "Run code against application.\n";
 has usage       => <<"EOF";
 usage: $0 eval [OPTIONS] CODE
@@ -19,13 +17,11 @@ EOF
 #  Air pressure returning.
 #  Terror replaced by cautious optimism."
 sub run {
-  my $self = shift;
+  my ($self, @args) = @_;
 
   # Options
-  local @ARGV = @_;
-  my $verbose;
-  GetOptions('v|verbose' => sub { $verbose = 1 });
-  my $code = shift @ARGV || '';
+  $self->_options(\@args, 'v|verbose' => \my $verbose);
+  my $code = shift @args || '';
 
   # Run code against application
   my $app = $self->app;
@@ -46,7 +42,7 @@ Mojolicious::Command::eval - Eval command
   use Mojolicious::Command::eval;
 
   my $eval = Mojolicious::Command::eval->new;
-  $eval->run;
+  $eval->run(@ARGV);
 
 =head1 DESCRIPTION
 
@@ -78,7 +74,7 @@ L<Mojolicious::Command> and implements the following new ones.
 
 =head2 C<run>
 
-  $eval->run;
+  $eval->run(@ARGV);
 
 Run this command.
 

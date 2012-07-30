@@ -1,7 +1,6 @@
 package Mojolicious::Command::daemon;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Daemon;
 
 has description => "Start application with HTTP and WebSocket server.\n";
@@ -30,18 +29,17 @@ EOF
 #  Why do they call it that?
 #  Cause it has no pigment."
 sub run {
-  my $self   = shift;
-  my $daemon = Mojo::Server::Daemon->new;
+  my ($self, @args) = @_;
 
   # Options
-  local @ARGV = @_;
-  my @listen;
-  GetOptions(
+  my $daemon = Mojo::Server::Daemon->new;
+  $self->_options(
+    \@args,
     'b|backlog=i'    => sub { $daemon->backlog($_[1]) },
     'c|clients=i'    => sub { $daemon->max_clients($_[1]) },
     'g|group=s'      => sub { $daemon->group($_[1]) },
     'i|inactivity=i' => sub { $daemon->inactivity_timeout($_[1]) },
-    'l|listen=s'     => \@listen,
+    'l|listen=s'     => \my @listen,
     'p|proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
     'r|requests=i' => sub { $daemon->max_requests($_[1]) },
     'u|user=s'     => sub { $daemon->user($_[1]) }

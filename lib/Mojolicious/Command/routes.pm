@@ -2,7 +2,6 @@ package Mojolicious::Command::routes;
 use Mojo::Base 'Mojolicious::Command';
 
 use re 'regexp_pattern';
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 
 has description => "Show available routes.\n";
 has usage       => <<"EOF";
@@ -14,12 +13,10 @@ EOF
 
 # "I'm finally richer than those snooty ATM machines."
 sub run {
-  my $self = shift;
+  my ($self, @args) = @_;
 
   # Options
-  local @ARGV = @_;
-  my $verbose;
-  GetOptions('v|verbose' => sub { $verbose = 1 });
+  $self->_options(\@args, 'v|verbose' => \my $verbose);
 
   # Walk and draw
   my $routes = [];

@@ -1,7 +1,6 @@
 package Mojolicious::Command::cgi;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::CGI;
 
 has description => "Start application with CGI.\n";
@@ -14,10 +13,9 @@ EOF
 
 # "Fire all weapons and open a hailing frequency for my victory yodel."
 sub run {
-  my $self = shift;
-  my $cgi  = Mojo::Server::CGI->new;
-  local @ARGV = @_;
-  GetOptions(nph => sub { $cgi->nph(1) });
+  my ($self, @args) = @_;
+  my $cgi = Mojo::Server::CGI->new;
+  $self->_options(\@args, nph => sub { $cgi->nph(1) });
   $cgi->run;
 }
 

@@ -4,7 +4,6 @@ use Mojo::Base 'Mojolicious::Command';
 use Cwd 'realpath';
 use FindBin;
 use File::Spec::Functions qw(abs2rel catdir splitdir);
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Home;
 
 has description => "Run unit tests.\n";
@@ -18,12 +17,11 @@ EOF
 # "Why, the secret ingredient was...water!
 #  Yes, ordinary water, laced with nothing more than a few spoonfuls of LSD."
 sub run {
-  my $self = shift;
+  my ($self, @args) = @_;
 
   # Options
-  local @ARGV = @_;
-  GetOptions('v|verbose' => sub { $ENV{HARNESS_VERBOSE} = 1 });
-  my @tests = @ARGV;
+  $self->_options(\@args, 'v|verbose' => sub { $ENV{HARNESS_VERBOSE} = 1 });
+  my @tests = @args;
 
   # Search tests
   unless (@tests) {

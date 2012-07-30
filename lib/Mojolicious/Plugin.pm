@@ -15,7 +15,16 @@ Mojolicious::Plugin - Plugin base class
 
 =head1 SYNOPSIS
 
+  # Camel case plugin name
+  package Mojolicious::Plugin::MyPlugin;
   use Mojo::Base 'Mojolicious::Plugin';
+
+  # <suitable Futurama quote here>
+  sub register {
+    my ($self, $app, $conf) = @_;
+
+    # Magic here! :)
+  }
 
 =head1 DESCRIPTION
 
@@ -28,7 +37,8 @@ the following new ones.
 
 =head2 C<register>
 
-  $plugin->register;
+  $plugin->register(Mojolicious->new);
+  $plugin->register(Mojolicious->new, {foo => 'bar'});
 
 This method will be called by L<Mojolicious::Plugins> at startup time. Meant
 to be overloaded in a subclass.

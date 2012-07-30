@@ -101,12 +101,7 @@ Mojolicious::Command - Command base class
 
   # Lower case command name
   package Mojolicious::Command::mycommand;
-
-  # Subclass
   use Mojo::Base 'Mojolicious::Command';
-
-  # Take care of command line options
-  use Getopt::Long 'GetOptions';
 
   # Short description
   has description => "My first Mojo command.\n";
@@ -121,11 +116,7 @@ Mojolicious::Command - Command base class
 
   # <suitable Futurama quote here>
   sub run {
-    my $self = shift;
-
-    # Handle options
-    local @ARGV = @_;
-    GetOptions('s|something' => sub { $something = 1 });
+    my ($self, @args) = @_;
 
     # Magic here! :)
   }

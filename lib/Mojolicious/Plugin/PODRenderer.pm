@@ -11,9 +11,6 @@ use Pod::Simple::Search;
 # Paths
 my @PATHS = map { $_, "$_/pods" } @INC;
 
-# Bundled files
-my $PERLDOC = $Mojolicious::Controller::H->slurp_rel_file('perldoc.html.ep');
-
 # "This is my first visit to the Galaxy of Terror and I'd like it to be a
 #  pleasant one."
 sub register {
@@ -21,7 +18,8 @@ sub register {
 
   # Add "pod" handler
   my $preprocess = $conf->{preprocess} || 'ep';
-  $app->renderer->add_handler(
+  my $renderer = $app->renderer;
+  $renderer->add_handler(
     $conf->{name} || 'pod' => sub {
       my ($r, $c, $output, $options) = @_;
 
@@ -36,6 +34,7 @@ sub register {
   $app->helper(pod_to_html => sub { shift; b(_pod_to_html(@_)) });
 
   # Perldoc
+  my $template = $renderer->_bundled('perldoc');
   return $app->routes->any(
     '/perldoc/*module' => {module => 'Mojolicious/Guides'} => sub {
       my $self = shift;
@@ -105,7 +104,7 @@ sub register {
 
       # Combine everything to a proper response
       $self->content_for(perldoc => "$dom");
-      $self->render(inline => $PERLDOC, title => $title, parts => \@parts);
+      $self->render(inline => $template, title => $title, parts => \@parts);
       $self->res->headers->content_type('text/html;charset="UTF-8"');
     }
   ) unless $conf->{no_perldoc};

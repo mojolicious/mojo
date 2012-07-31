@@ -5,7 +5,6 @@ use Carp ();
 use Mojo::ByteStream;
 use Mojo::Cookie::Response;
 use Mojo::Exception;
-use Mojo::Home;
 use Mojo::Transaction::HTTP;
 use Mojo::URL;
 use Mojo::Util;
@@ -19,15 +18,6 @@ has match => sub {
   Mojolicious::Routes::Match->new(GET => '/')->root(shift->app->routes);
 };
 has tx => sub { Mojo::Transaction::HTTP->new };
-
-# Bundled templates
-our $H = Mojo::Home->new;
-$H->parse($H->parse($H->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
-our $MOJOBAR = $H->slurp_rel_file('mojobar.html.ep');
-my $EXCEPTION     = $H->slurp_rel_file('exception.html.ep');
-my $DEV_EXCEPTION = $H->slurp_rel_file('exception.development.html.ep');
-my $NOT_FOUND     = $H->slurp_rel_file('not_found.html.ep');
-my $DEV_NOT_FOUND = $H->slurp_rel_file('not_found.development.html.ep');
 
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
@@ -256,16 +246,18 @@ sub render_exception {
     grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
 
   # Render with fallbacks
-  my $mode    = $app->mode;
-  my $options = {
+  my $mode     = $app->mode;
+  my $renderer = $app->renderer;
+  my $options  = {
     exception => $e,
     snapshot  => \%snapshot,
     template  => "exception.$mode",
-    format    => $stash->{format} || $app->renderer->default_format,
+    format    => $stash->{format} || $renderer->default_format,
     handler   => undef,
     status    => 500
   };
-  my $inline = $mode eq 'development' ? $DEV_EXCEPTION : $EXCEPTION;
+  my $inline = $renderer->_bundled(
+    $mode eq 'development' ? 'exception.development' : 'exception');
   return if $self->_fallbacks($options, 'exception', $inline);
   $self->_fallbacks({%$options, format => 'html'}, 'exception', $inline);
 }
@@ -282,12 +274,14 @@ sub render_not_found {
   my $self = shift;
 
   # Render with fallbacks
-  my $app    = $self->app;
-  my $mode   = $app->mode;
-  my $format = $self->stash->{format} || $app->renderer->default_format;
+  my $app      = $self->app;
+  my $mode     = $app->mode;
+  my $renderer = $app->renderer;
+  my $format   = $self->stash->{format} || $renderer->default_format;
   my $options
     = {template => "not_found.$mode", format => $format, status => 404};
-  my $inline = $mode eq 'development' ? $DEV_NOT_FOUND : $NOT_FOUND;
+  my $inline = $renderer->_bundled(
+    $mode eq 'development' ? 'not_found.development' : 'not_found');
   return if $self->_fallbacks($options, 'not_found', $inline);
   $self->_fallbacks({%$options, format => 'html'}, 'not_found', $inline);
 }

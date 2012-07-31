@@ -61,7 +61,7 @@
     % end
   </head>
   <body onload="prettyPrint()">
-    %= include inline => $Mojolicious::Controller::MOJOBAR
+    %= include inline => app->renderer->_bundled('mojobar')
     % my $link = begin
       %= link_to shift, shift, class => "mojoscroll"
     % end

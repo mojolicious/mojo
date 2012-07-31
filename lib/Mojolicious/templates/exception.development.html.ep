@@ -98,7 +98,7 @@
     % end
   </head>
   <body onload="prettyPrint()">
-    %= include inline => $Mojolicious::Controller::MOJOBAR
+    %= include inline => app->renderer->_bundled('mojobar')
     <div id="wrapperlicious">
       <div id="nothing" class="box spaced"></div>
       % my $cv = begin

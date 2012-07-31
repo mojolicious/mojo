@@ -12,10 +12,6 @@ use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
 has [qw(fragment host port scheme userinfo)];
 has base => sub { Mojo::URL->new };
 
-# Characters (RFC 3986)
-our $UNRESERVED = 'A-Za-z0-9\-._~';
-our $SUBDELIM   = '!$&\'()*+,;=';
-
 # "Homer, it's easy to criticize.
 #  Fun, too."
 sub new { shift->SUPER::new->parse(@_) }
@@ -39,7 +35,7 @@ sub authority {
 
   # Format
   if (my $userinfo = $self->userinfo) {
-    $authority .= url_escape($userinfo, "^$UNRESERVED$SUBDELIM\:") . '@';
+    $authority .= url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=\:') . '@';
   }
   $authority .= lc($self->ihost || '');
   if (my $port = $self->port) { $authority .= ":$port" }
@@ -225,7 +221,7 @@ sub to_string {
 
   # Fragment
   if (my $fragment = $self->fragment) {
-    $url .= '#' . url_escape $fragment, "^$UNRESERVED$SUBDELIM%:@/?";
+    $url .= '#' . url_escape $fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
   }
 
   return $url;

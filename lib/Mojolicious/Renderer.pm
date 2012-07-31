@@ -16,6 +16,12 @@ has encoding => 'UTF-8';
 has [qw(handlers helpers)] => sub { {} };
 has paths => sub { [] };
 
+# Bundled templates
+my $HOME = Mojo::Home->new;
+$HOME->parse(
+  $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
+my %TEMPLATES = map { $_ => $HOME->slurp_rel_file($_) } @{$HOME->list_files};
+
 # "This is not how Xmas is supposed to be.
 #  In my day Xmas was about bringing people together,
 #  not blowing them apart."
@@ -175,6 +181,8 @@ sub template_path {
   # Fall back to first path
   return catfile($self->paths->[0], split '/', $name);
 }
+
+sub _bundled { $TEMPLATES{"@{[pop]}.html.ep"} }
 
 sub _detect_handler {
   my ($self, $options) = @_;

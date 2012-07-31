@@ -6,7 +6,6 @@ use overload
   fallback => 1;
 
 use Mojo::Util qw(encode url_escape url_unescape);
-use Mojo::URL;
 
 has [qw(leading_slash trailing_slash)];
 has parts => sub { [] };
@@ -99,7 +98,7 @@ sub to_string {
   my $self = shift;
 
   # Escape
-  my $chars = "^$Mojo::URL::UNRESERVED$Mojo::URL::SUBDELIM:@";
+  my $chars = '^A-Za-z0-9\-._~!$&\'()*+,;=:@';
   my @parts = map { url_escape(encode('UTF-8', $_), $chars) } @{$self->parts};
 
   # Format

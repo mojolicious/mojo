@@ -148,10 +148,8 @@ sub handler {
   weaken $c->{tx};
 
   # Dispatcher
-  unless ($self->{dispatch}) {
-    $self->hook(around_dispatch => \&_dispatch);
-    $self->{dispatch}++;
-  }
+  ++$self->{dispatch} and $self->hook(around_dispatch => \&_dispatch)
+    unless $self->{dispatch};
 
   # Process
   unless (eval { $self->plugins->emit_chain(around_dispatch => $c) }) {
@@ -170,7 +168,7 @@ sub helper {
   my $r = $self->renderer;
   $self->log->debug(qq{Helper "$name" already exists, replacing.})
     if exists $r->helpers->{$name};
-  $r->add_helper($name, @_);
+  $r->add_helper($name => @_);
 }
 
 # "He knows when you are sleeping.
@@ -228,7 +226,7 @@ Mojolicious - Real-time web framework
   # Action
   sub hello {
     my $self = shift;
-    $self->render_text('Hello World!');
+    $self->render(text => 'Hello World!');
   }
 
 =head1 DESCRIPTION

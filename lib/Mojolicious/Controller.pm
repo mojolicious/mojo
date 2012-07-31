@@ -545,6 +545,7 @@ Mojolicious::Controller - Controller base class
   sub bar {
     my $self = shift;
     my $name = $self->param('name');
+    $self->res->headers->cache_control('max-age=1, no-cache');
     $self->render(json => {hello => $name});
   }
 

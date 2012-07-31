@@ -27,7 +27,7 @@ sub one_tick {
   $self->{running} = 1;
 
   # Wait for one event
-  my $i    = 0;
+  my $i;
   my $poll = $self->_poll;
   until ($i) {
 

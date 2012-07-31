@@ -26,8 +26,8 @@ my %TEMPLATES = map { $_ => $HOME->slurp_rel_file($_) } @{$HOME->list_files};
 #  In my day Xmas was about bringing people together,
 #  not blowing them apart."
 sub new {
-  shift->SUPER::new(@_)->add_handler(data => \&_data)
-    ->add_handler(json => \&_json)->add_handler(text => \&_text);
+  my $self = shift->SUPER::new(@_)->add_handler(json => \&_json);
+  return $self->add_handler(data => \&_data)->add_handler(text => \&_text);
 }
 
 sub add_handler {

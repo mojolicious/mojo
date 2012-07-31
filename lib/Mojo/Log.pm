@@ -26,19 +26,7 @@ my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 
 sub new {
   my $self = shift->SUPER::new(@_);
-
-  # Default logger
-  $self->on(
-    message => sub {
-      my $self = shift;
-      return unless my $handle = $self->handle;
-      flock $handle, LOCK_EX;
-      croak "Can't write to log: $!"
-        unless defined $handle->syswrite($self->format(@_));
-      flock $handle, LOCK_UN;
-    }
-  );
-
+  $self->on(message => \&_message);
   return $self;
 }
 
@@ -77,6 +65,15 @@ sub log {
 }
 
 sub warn { shift->log(warn => @_) }
+
+sub _message {
+  my $self = shift;
+  return unless my $handle = $self->handle;
+  flock $handle, LOCK_EX;
+  croak "Can't write to log: $!"
+    unless defined $handle->syswrite($self->format(@_));
+  flock $handle, LOCK_UN;
+}
 
 1;
 

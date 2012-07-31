@@ -33,8 +33,8 @@ sub client {
   my ($self, $cb) = (shift, pop);
   $self = $self->singleton unless ref $self;
 
-  # Manage connections
-  $self->_manage;
+  # Make sure connection manager is running
+  $self->_manager;
 
   # New client
   my $id     = $self->_id;
@@ -119,8 +119,8 @@ sub server {
   my ($self, $cb) = (shift, pop);
   $self = $self->singleton unless ref $self;
 
-  # Manage connections
-  $self->_manage;
+  # Make sure connection manager is running
+  $self->_manager;
 
   # New server
   my $id = $self->_id;
@@ -229,26 +229,26 @@ sub _listening {
 
 sub _manage {
   my $self = shift;
-  $self->{manager} ||= $self->recurring(
-    $self->accept_interval => sub {
-      my $self = shift;
 
-      # Start listening if possible
-      $self->_listening;
+  # Start listening if possible
+  $self->_listening;
 
-      # Close connections gracefully
-      my $connections = $self->{connections} ||= {};
-      while (my ($id, $c) = each %$connections) {
-        $self->_remove($id)
-          if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
-      }
+  # Close connections gracefully
+  my $connections = $self->{connections} ||= {};
+  while (my ($id, $c) = each %$connections) {
+    $self->_remove($id)
+      if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
+  }
 
-      # Graceful stop
-      $self->_remove(delete $self->{manager})
-        unless keys %$connections || keys %{$self->{servers}};
-      $self->stop if $self->max_connections == 0 && keys %$connections == 0;
-    }
-  );
+  # Graceful stop
+  $self->_remove(delete $self->{manager})
+    unless keys %$connections || keys %{$self->{servers}};
+  $self->stop if $self->max_connections == 0 && keys %$connections == 0;
+}
+
+sub _manager {
+  my $self = shift;
+  $self->{manager} ||= $self->recurring($self->accept_interval => \&_manage);
 }
 
 sub _not_listening {
@@ -283,8 +283,8 @@ sub _remove {
 sub _stream {
   my ($self, $stream, $id) = @_;
 
-  # Manage connections
-  $self->_manage;
+  # Make sure connection manager is running
+  $self->_manager;
 
   # Connect stream with reactor
   $self->{connections}{$id}{stream} = $stream;

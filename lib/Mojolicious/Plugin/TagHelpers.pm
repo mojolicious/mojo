@@ -11,227 +11,93 @@ sub register {
 
   # Add "base_tag" helper
   $app->helper(
-    base_tag => sub { $self->_tag('base', href => shift->req->url->base, @_) }
-  );
+    base_tag => sub { _tag('base', href => shift->req->url->base, @_) });
 
   # Add "checkbox" helper
-  $app->helper(
-    check_box => sub {
-      $self->_input(shift, shift, value => shift, @_, type => 'checkbox');
-    }
-  );
+  $app->helper(check_box =>
+      sub { _input(shift, shift, value => shift, @_, type => 'checkbox') });
 
   # Add "file_field" helper
   $app->helper(file_field =>
-      sub { shift; $self->_tag('input', name => shift, @_, type => 'file') });
+      sub { shift; _tag('input', name => shift, @_, type => 'file') });
 
   # Add "form_for" helper
-  $app->helper(
-    form_for => sub {
-      my ($c, @url) = (shift, shift);
-      push @url, shift if ref $_[0] eq 'HASH';
-
-      # POST detection
-      my @post;
-      if (my $r = $c->app->routes->find($url[0])) {
-        my %methods = (GET => 1, POST => 1);
-        do {
-          my @via = @{$r->via || []};
-          %methods = map { $_ => 1 } grep { $methods{$_} } @via if @via;
-        } while $r = $r->parent;
-        @post = (method => 'POST') if $methods{POST} && !$methods{GET};
-      }
-
-      return $self->_tag('form', action => $c->url_for(@url), @post, @_);
-    }
-  );
+  $app->helper(form_for => \&_form_for);
 
   # Add "hidden_field" helper
-  $app->helper(
-    hidden_field => sub {
-      shift;
-      my %attrs = (name => shift, value => shift, @_, type => 'hidden');
-      return $self->_tag('input', %attrs);
-    }
-  );
+  $app->helper(hidden_field => \&_hidden_field);
 
   # Add "image" helper
-  $app->helper(
-    image => sub { $self->_tag('img', src => shift->url_for(shift), @_) });
+  $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
 
   # Add "input_tag" helper
-  $app->helper(input_tag => sub { $self->_input(@_) });
+  $app->helper(input_tag => sub { _input(@_) });
 
   # Add "javascript" helper
-  $app->helper(
-    javascript => sub {
-      my $c = shift;
-
-      # CDATA
-      my $cb = sub {''};
-      if (ref $_[-1] eq 'CODE') {
-        my $old = pop;
-        $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
-      }
-
-      # URL
-      my $src = @_ % 2 ? $c->url_for(shift) : undef;
-
-      # Attributes
-      my %attrs = (@_, $src ? (src => $src) : ());
-
-      return $self->_tag('script', type => 'text/javascript', %attrs, $cb);
-    }
-  );
+  $app->helper(javascript => \&_javascript);
 
   # Add "link_to" helper
-  $app->helper(
-    link_to => sub {
-      my ($c, $content) = (shift, shift);
-      my @url = ($content);
-
-      # Content
-      unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
-        @url = (shift);
-        push @_, $content;
-      }
-
-      # Captures
-      push @url, shift if ref $_[0] eq 'HASH';
-
-      return $self->_tag('a', href => $c->url_for(@url), @_);
-    }
-  );
+  $app->helper(link_to => \&_link_to);
 
   # Add "password_field" helper
-  $app->helper(
-    password_field => sub {
-      shift;
-      $self->_tag('input', name => shift, @_, type => 'password');
-    }
-  );
+  $app->helper(password_field =>
+      sub { shift; _tag('input', name => shift, @_, type => 'password') });
 
   # Add "radio_button" helper
-  $app->helper(
-    radio_button => sub {
-      $self->_input(shift, shift, value => shift, @_, type => 'radio');
-    }
-  );
+  $app->helper(radio_button =>
+      sub { _input(shift, shift, value => shift, @_, type => 'radio') });
 
   # Add "select_field" helper
-  $app->helper(
-    select_field => sub {
-      my ($c, $name, $options, %attrs) = (shift, shift, shift, @_);
-
-      # "option" callback
-      my %values = map { $_ => 1 } $c->param($name);
-      my $option = sub {
-
-        # Pair
-        my $pair = shift;
-        $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
-
-        # Attributes
-        my %attrs = (value => $pair->[1]);
-        $attrs{selected} = 'selected' if exists $values{$pair->[1]};
-        %attrs = (%attrs, @$pair[2 .. $#$pair]);
-
-        return $self->_tag('option', %attrs, sub { xml_escape $pair->[0] });
-      };
-
-      # "optgroup" callback
-      my $optgroup = sub {
-
-        # Parts
-        my $parts = '';
-        for my $group (@$options) {
-
-          # "optgroup" tag
-          if (ref $group eq 'HASH') {
-            my ($label, $values) = each %$group;
-            my $content = join '', map { $option->($_) } @$values;
-            $parts .= $self->_tag('optgroup', label => $label, sub {$content});
-          }
-
-          # "option" tag
-          else { $parts .= $option->($group) }
-        }
-
-        return $parts;
-      };
-
-      return $self->_tag('select', name => $name, %attrs, $optgroup);
-    }
-  );
+  $app->helper(select_field => \&_select_field);
 
   # Add "stylesheet" helper
-  $app->helper(
-    stylesheet => sub {
-      my $c = shift;
-
-      # CDATA
-      my $cb;
-      if (ref $_[-1] eq 'CODE') {
-        my $old = pop;
-        $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
-      }
-
-      # URL
-      my $href = @_ % 2 ? $c->url_for(shift) : undef;
-
-      # "style" tag
-      return $self->_tag('style', type => 'text/css', @_, $cb) unless $href;
-
-      # "link" tag
-      my %attrs = (href => $href, type => 'text/css', media => 'screen', @_);
-      return $self->_tag('link', rel => 'stylesheet', %attrs);
-    }
-  );
+  $app->helper(stylesheet => \&_stylesheet);
 
   # Add "submit_button" helper
-  $app->helper(
-    submit_button => sub {
-      shift;
-      $self->_tag('input', value => shift // 'Ok', @_, type => 'submit');
-    }
-  );
+  $app->helper(submit_button => \&_submit_button);
 
-  # Add "t" helper
-  $app->helper(t => sub { shift; $self->_tag(@_) });
-
-  # Add "tag" helper
-  $app->helper(tag => sub { shift; $self->_tag(@_) });
+  # Add "t" and "tag" helpers
+  $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);
 
   # Add "text_area" helper
-  $app->helper(
-    text_area => sub {
-      my ($c, $name) = (shift, shift);
-
-      # Content
-      my $cb = ref $_[-1] eq 'CODE' ? pop : sub {''};
-      my $content = @_ % 2 ? shift : undef;
-
-      # Make sure content is wrapped
-      if (defined($content = $c->param($name) // $content)) {
-        $cb = sub { xml_escape $content }
-      }
-
-      return $self->_tag('textarea', name => $name, @_, $cb);
-    }
-  );
+  $app->helper(text_area => \&_text_area);
 
   # Add "text_field" helper
-  $app->helper(text_field => sub { $self->_input(@_, type => 'text') });
+  $app->helper(text_field => sub { _input(@_, type => 'text') });
+}
+
+sub _form_for {
+  my ($self, @url) = (shift, shift);
+  push @url, shift if ref $_[0] eq 'HASH';
+
+  # POST detection
+  my @post;
+  if (my $r = $self->app->routes->find($url[0])) {
+    my %methods = (GET => 1, POST => 1);
+    do {
+      my @via = @{$r->via || []};
+      %methods = map { $_ => 1 } grep { $methods{$_} } @via if @via;
+    } while $r = $r->parent;
+    @post = (method => 'POST') if $methods{POST} && !$methods{GET};
+  }
+
+  return _tag('form', action => $self->url_for(@url), @post, @_);
+}
+
+sub _hidden_field {
+  my $self = shift;
+  my %attrs = (name => shift, value => shift, @_, type => 'hidden');
+  return _tag('input', %attrs);
 }
 
 sub _input {
-  my ($self, $c, $name) = (shift, shift, shift);
+  my ($self, $name) = (shift, shift);
 
   # Attributes
   my %attrs = @_ % 2 ? (value => shift, @_) : @_;
 
   # Values
-  my @values = $c->param($name);
+  my @values = $self->param($name);
 
   # Special selection value
   my $type = $attrs{type} || '';
@@ -247,16 +113,120 @@ sub _input {
     # Others
     else { $attrs{value} = $values[0] }
 
-    return $self->_tag('input', name => $name, %attrs);
+    return _tag('input', name => $name, %attrs);
   }
 
   # Empty tag
-  return $self->_tag('input', name => $name, %attrs);
+  return _tag('input', name => $name, %attrs);
+}
+
+sub _javascript {
+  my $self = shift;
+
+  # CDATA
+  my $cb = sub {''};
+  if (ref $_[-1] eq 'CODE') {
+    my $old = pop;
+    $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
+  }
+
+  # URL
+  my $src = @_ % 2 ? $self->url_for(shift) : undef;
+
+  # Attributes
+  my %attrs = (@_, $src ? (src => $src) : ());
+
+  return _tag('script', type => 'text/javascript', %attrs, $cb);
+}
+
+sub _link_to {
+  my ($self, $content) = (shift, shift);
+  my @url = ($content);
+
+  # Content
+  unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
+    @url = (shift);
+    push @_, $content;
+  }
+
+  # Captures
+  push @url, shift if ref $_[0] eq 'HASH';
+
+  return _tag('a', href => $self->url_for(@url), @_);
+}
+
+sub _select_field {
+  my ($self, $name, $options, %attrs) = (shift, shift, shift, @_);
+
+  # "option" callback
+  my %values = map { $_ => 1 } $self->param($name);
+  my $option = sub {
+
+    # Pair
+    my $pair = shift;
+    $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
+
+    # Attributes
+    my %attrs = (value => $pair->[1]);
+    $attrs{selected} = 'selected' if exists $values{$pair->[1]};
+    %attrs = (%attrs, @$pair[2 .. $#$pair]);
+
+    return _tag('option', %attrs, sub { xml_escape $pair->[0] });
+  };
+
+  # "optgroup" callback
+  my $optgroup = sub {
+
+    # Parts
+    my $parts = '';
+    for my $group (@$options) {
+
+      # "optgroup" tag
+      if (ref $group eq 'HASH') {
+        my ($label, $values) = each %$group;
+        my $content = join '', map { $option->($_) } @$values;
+        $parts .= _tag('optgroup', label => $label, sub {$content});
+      }
+
+      # "option" tag
+      else { $parts .= $option->($group) }
+    }
+
+    return $parts;
+  };
+
+  return _tag('select', name => $name, %attrs, $optgroup);
+}
+
+sub _stylesheet {
+  my $self = shift;
+
+  # CDATA
+  my $cb;
+  if (ref $_[-1] eq 'CODE') {
+    my $old = pop;
+    $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
+  }
+
+  # URL
+  my $href = @_ % 2 ? $self->url_for(shift) : undef;
+
+  # "style" tag
+  return _tag('style', type => 'text/css', @_, $cb) unless $href;
+
+  # "link" tag
+  my %attrs = (href => $href, type => 'text/css', media => 'screen', @_);
+  return _tag('link', rel => 'stylesheet', %attrs);
+}
+
+sub _submit_button {
+  my $self = shift;
+  return _tag('input', value => shift // 'Ok', @_, type => 'submit');
 }
 
 # "We've lost power of the forward Gameboy! Mario not responding!"
 sub _tag {
-  my ($self, $name) = (shift, shift);
+  my $name = shift;
 
   # Content
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
@@ -281,6 +251,21 @@ sub _tag {
 
   # Prevent escaping
   return b($tag);
+}
+
+sub _text_area {
+  my ($self, $name) = (shift, shift);
+
+  # Content
+  my $cb = ref $_[-1] eq 'CODE' ? pop : sub {''};
+  my $content = @_ % 2 ? shift : undef;
+
+  # Make sure content is wrapped
+  if (defined($content = $self->param($name) // $content)) {
+    $cb = sub { xml_escape $content }
+  }
+
+  return _tag('textarea', name => $name, @_, $cb);
 }
 
 1;

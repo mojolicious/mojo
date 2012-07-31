@@ -18,8 +18,7 @@ sub register {
 
   # Add "pod" handler
   my $preprocess = $conf->{preprocess} || 'ep';
-  my $renderer = $app->renderer;
-  $renderer->add_handler(
+  $app->renderer->add_handler(
     $conf->{name} || 'pod' => sub {
       my ($r, $c, $output, $options) = @_;
 
@@ -34,80 +33,80 @@ sub register {
   $app->helper(pod_to_html => sub { shift; b(_pod_to_html(@_)) });
 
   # Perldoc
-  my $template = $renderer->_bundled('perldoc');
+  return if $conf->{no_perldoc};
   return $app->routes->any(
-    '/perldoc/*module' => {module => 'Mojolicious/Guides'} => sub {
-      my $self = shift;
+    '/perldoc/*module' => {module => 'Mojolicious/Guides'} => \&_perldoc);
+}
 
-      # Find module
-      my $module = $self->param('module');
-      $module =~ s!/!\:\:!g;
-      my $path = Pod::Simple::Search->new->find($module, @PATHS);
+sub _perldoc {
+  my $self = shift;
 
-      # Redirect to CPAN
-      return $self->redirect_to("http://metacpan.org/module/$module")
-        unless $path && -r $path;
+  # Find module
+  my $module = $self->param('module');
+  $module =~ s!/!\:\:!g;
+  my $path = Pod::Simple::Search->new->find($module, @PATHS);
 
-      # Turn POD into HTML
-      open my $file, '<', $path;
-      my $html = _pod_to_html(join '', <$file>);
+  # Redirect to CPAN
+  return $self->redirect_to("http://metacpan.org/module/$module")
+    unless $path && -r $path;
 
-      # Rewrite links
-      my $dom     = Mojo::DOM->new("$html");
-      my $perldoc = $self->url_for('/perldoc/');
-      $dom->find('a[href]')->each(
-        sub {
-          my $attrs = shift->attrs;
-          $attrs->{href} =~ s!%3A%3A!/!gi
-            if $attrs->{href}
-            =~ s!^http\://search\.cpan\.org/perldoc\?!$perldoc!;
-        }
-      );
+  # Turn POD into HTML
+  open my $file, '<', $path;
+  my $html = _pod_to_html(join '', <$file>);
 
-      # Rewrite code blocks for syntax highlighting
-      $dom->find('pre')->each(
-        sub {
-          my $e = shift;
-          return if $e->all_text =~ /^\s*\$\s+/m;
-          my $attrs = $e->attrs;
-          my $class = $attrs->{class};
-          $attrs->{class}
-            = defined $class ? "$class prettyprint" : 'prettyprint';
-        }
-      );
-
-      # Rewrite headers
-      my $url = $self->req->url->clone;
-      my @parts;
-      $dom->find('h1, h2, h3')->each(
-        sub {
-          my $e = shift;
-          my $anchor = my $text = $e->all_text;
-          $anchor =~ s/\s+/_/g;
-          $anchor = url_escape $anchor, '^A-Za-z0-9_';
-          $anchor =~ s/\%//g;
-          push @parts, [] if $e->type eq 'h1' || !@parts;
-          push @{$parts[-1]}, $text, $url->fragment($anchor)->to_abs;
-          $e->replace_content(
-            $self->link_to(
-              $text => $url->fragment('toc')->to_abs,
-              class => 'mojoscroll',
-              id    => $anchor
-            )
-          );
-        }
-      );
-
-      # Try to find a title
-      my $title = 'Perldoc';
-      $dom->find('h1 + p')->first(sub { $title = shift->text });
-
-      # Combine everything to a proper response
-      $self->content_for(perldoc => "$dom");
-      $self->render(inline => $template, title => $title, parts => \@parts);
-      $self->res->headers->content_type('text/html;charset="UTF-8"');
+  # Rewrite links
+  my $dom     = Mojo::DOM->new("$html");
+  my $perldoc = $self->url_for('/perldoc/');
+  $dom->find('a[href]')->each(
+    sub {
+      my $attrs = shift->attrs;
+      $attrs->{href} =~ s!%3A%3A!/!gi
+        if $attrs->{href} =~ s!^http\://search\.cpan\.org/perldoc\?!$perldoc!;
     }
-  ) unless $conf->{no_perldoc};
+  );
+
+  # Rewrite code blocks for syntax highlighting
+  $dom->find('pre')->each(
+    sub {
+      my $e = shift;
+      return if $e->all_text =~ /^\s*\$\s+/m;
+      my $attrs = $e->attrs;
+      my $class = $attrs->{class};
+      $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';
+    }
+  );
+
+  # Rewrite headers
+  my $url = $self->req->url->clone;
+  my @parts;
+  $dom->find('h1, h2, h3')->each(
+    sub {
+      my $e = shift;
+      my $anchor = my $text = $e->all_text;
+      $anchor =~ s/\s+/_/g;
+      $anchor = url_escape $anchor, '^A-Za-z0-9_';
+      $anchor =~ s/\%//g;
+      push @parts, [] if $e->type eq 'h1' || !@parts;
+      push @{$parts[-1]}, $text, $url->fragment($anchor)->to_abs;
+      $e->replace_content(
+        $self->link_to(
+          $text => $url->fragment('toc')->to_abs,
+          class => 'mojoscroll',
+          id    => $anchor
+        )
+      );
+    }
+  );
+
+  # Try to find a title
+  my $title = 'Perldoc';
+  $dom->find('h1 + p')->first(sub { $title = shift->text });
+
+  # Combine everything to a proper response
+  $self->content_for(perldoc => "$dom");
+  my $template = $self->app->renderer->_bundled('perldoc');
+  $self->render(inline => $template, title => $title, parts => \@parts);
+  $self->res->headers->content_type('text/html;charset="UTF-8"');
 }
 
 # "Aw, he looks like a little insane drunken angel."

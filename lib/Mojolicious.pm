@@ -86,14 +86,7 @@ sub new {
   $self->plugin($_) for qw(EPLRenderer EPRenderer RequestTimer PoweredBy);
 
   # Exception handling
-  $self->hook(
-    around_dispatch => sub {
-      my ($next, $c) = @_;
-      local $SIG{__DIE__}
-        = sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
-      $c->render_exception($@) unless eval { $next->(); 1 };
-    }
-  );
+  $self->hook(around_dispatch => \&_exception);
 
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';
@@ -156,12 +149,7 @@ sub handler {
 
   # Dispatcher
   unless ($self->{dispatch}) {
-    $self->hook(
-      around_dispatch => sub {
-        my ($next, $c) = @_;
-        $c->app->dispatch($c);
-      }
-    );
+    $self->hook(around_dispatch => \&_dispatch);
     $self->{dispatch}++;
   }
 
@@ -202,6 +190,18 @@ sub plugin {
 sub start { ($ENV{MOJO_APP} = shift)->commands->start(@_) }
 
 sub startup { }
+
+sub _dispatch {
+  my ($next, $c) = @_;
+  $c->app->dispatch($c);
+}
+
+sub _exception {
+  my ($next, $c) = @_;
+  local $SIG{__DIE__}
+    = sub { ref $_[0] ? CORE::die($_[0]) : Mojo::Exception->throw(@_) };
+  $c->render_exception($@) unless eval { $next->(); 1 };
+}
 
 1;
 

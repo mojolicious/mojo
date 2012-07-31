@@ -26,30 +26,8 @@ my %TEMPLATES = map { $_ => $HOME->slurp_rel_file($_) } @{$HOME->list_files};
 #  In my day Xmas was about bringing people together,
 #  not blowing them apart."
 sub new {
-
-  # Add "data" handler
-  my $self = shift->SUPER::new(@_)->add_handler(
-    data => sub {
-      my ($r, $c, $output, $options) = @_;
-      $$output = $options->{data};
-    }
-  );
-
-  # Add "json" handler
-  $self->add_handler(
-    json => sub {
-      my ($r, $c, $output, $options) = @_;
-      $$output = Mojo::JSON->new->encode($options->{json});
-    }
-  );
-
-  # Add "text" handler
-  return $self->add_handler(
-    text => sub {
-      my ($r, $c, $output, $options) = @_;
-      $$output = $options->{text};
-    }
-  );
+  shift->SUPER::new(@_)->add_handler(data => \&_data)
+    ->add_handler(json => \&_json)->add_handler(text => \&_text);
 }
 
 sub add_handler {
@@ -184,6 +162,11 @@ sub template_path {
 
 sub _bundled { $TEMPLATES{"@{[pop]}.html.ep"} }
 
+sub _data {
+  my ($self, $c, $output, $options) = @_;
+  $$output = $options->{data};
+}
+
 sub _detect_handler {
   my ($self, $options) = @_;
 
@@ -216,6 +199,11 @@ sub _extends {
   return delete $stash->{extends};
 }
 
+sub _json {
+  my ($self, $c, $output, $options) = @_;
+  $$output = Mojo::JSON->new->encode($options->{json});
+}
+
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
@@ -229,6 +217,11 @@ sub _render_template {
   # No handler
   else { $c->app->log->error(qq{No handler for "$handler" available.}) }
   return;
+}
+
+sub _text {
+  my ($self, $c, $output, $options) = @_;
+  $$output = $options->{text};
 }
 
 1;

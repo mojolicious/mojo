@@ -10,67 +10,66 @@ sub register {
   my ($self, $app) = @_;
 
   # Add "epl" handler
-  $app->renderer->add_handler(
-    epl => sub {
-      my ($r, $c, $output, $options) = @_;
+  $app->renderer->add_handler(epl => \&_epl);
+}
 
-      # Template
-      my $inline = $options->{inline};
-      my $path   = $r->template_path($options);
-      $path = md5_sum encode('UTF-8', $inline) if defined $inline;
-      return unless defined $path;
+sub _epl {
+  my ($r, $c, $output, $options) = @_;
 
-      # Cached
-      my $cache = $r->cache;
-      my $key   = delete $options->{cache} || $path;
-      my $mt    = $cache->get($key) || Mojo::Template->new;
-      if ($mt->compiled) {
-        $c->app->log->debug("Rendering cached @{[$mt->name]}.");
-        $$output = $mt->interpret($c);
-      }
+  # Template
+  my $inline = $options->{inline};
+  my $path   = $r->template_path($options);
+  $path = md5_sum encode('UTF-8', $inline) if defined $inline;
+  return unless defined $path;
 
-      # Not cached
-      else {
+  # Cached
+  my $cache = $r->cache;
+  my $key   = delete $options->{cache} || $path;
+  my $mt    = $cache->get($key) || Mojo::Template->new;
+  if ($mt->compiled) {
+    $c->app->log->debug("Rendering cached @{[$mt->name]}.");
+    $$output = $mt->interpret($c);
+  }
 
-        # Inline
-        if (defined $inline) {
-          $c->app->log->debug('Rendering inline template.');
-          $mt->name('inline template');
-          $$output = $mt->render($inline, $c);
-        }
+  # Not cached
+  else {
 
-        # File
-        else {
-          $mt->encoding($r->encoding) if $r->encoding;
-          return unless my $t = $r->template_name($options);
-
-          # Try template
-          if (-r $path) {
-            $c->app->log->debug(qq{Rendering template "$t".});
-            $mt->name(qq{template "$t"});
-            $$output = $mt->render_file($path, $c);
-          }
-
-          # Try DATA section
-          elsif (my $d = $r->get_data_template($options, $t)) {
-            $c->app->log->debug(
-              qq{Rendering template "$t" from DATA section.});
-            $mt->name(qq{template "$t" from DATA section});
-            $$output = $mt->render($d, $c);
-          }
-
-          # No template
-          else { $c->app->log->debug(qq{Template "$t" not found.}) and return }
-        }
-
-        # Cache
-        $cache->set($key => $mt);
-      }
-
-      # Exception or success
-      return ref $$output ? die($$output) : 1;
+    # Inline
+    if (defined $inline) {
+      $c->app->log->debug('Rendering inline template.');
+      $mt->name('inline template');
+      $$output = $mt->render($inline, $c);
     }
-  );
+
+    # File
+    else {
+      $mt->encoding($r->encoding) if $r->encoding;
+      return unless my $t = $r->template_name($options);
+
+      # Try template
+      if (-r $path) {
+        $c->app->log->debug(qq{Rendering template "$t".});
+        $mt->name(qq{template "$t"});
+        $$output = $mt->render_file($path, $c);
+      }
+
+      # Try DATA section
+      elsif (my $d = $r->get_data_template($options, $t)) {
+        $c->app->log->debug(qq{Rendering template "$t" from DATA section.});
+        $mt->name(qq{template "$t" from DATA section});
+        $$output = $mt->render($d, $c);
+      }
+
+      # No template
+      else { $c->app->log->debug(qq{Template "$t" not found.}) and return }
+    }
+
+    # Cache
+    $cache->set($key => $mt);
+  }
+
+  # Exception or success
+  return ref $$output ? die($$output) : 1;
 }
 
 1;

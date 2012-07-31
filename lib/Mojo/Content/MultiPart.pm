@@ -7,16 +7,7 @@ has parts => sub { [] };
 
 sub new {
   my $self = shift->SUPER::new(@_);
-
-  # Default content parser
-  $self->on(
-    read => sub {
-      my ($self, $chunk) = @_;
-      $self->{multipart} .= $chunk;
-      $self->_parse_multipart;
-    }
-  );
-
+  $self->on(read => \&_read);
   return $self;
 }
 
@@ -222,6 +213,12 @@ sub _parse_multipart_preamble {
 
   # No boundary yet
   return;
+}
+
+sub _read {
+  my ($self, $chunk) = @_;
+  $self->{multipart} .= $chunk;
+  $self->_parse_multipart;
 }
 
 1;

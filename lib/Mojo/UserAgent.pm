@@ -565,6 +565,11 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->cert('tls.crt')->key('tls.key')
     ->post_json('https://mojolicio.us' => {top => 'secret'});
 
+  # Custom JSON PUT request
+  my $tx = $ua->build_json_tx('http://mojolicious/foo' => {hi => 'there'});
+  $tx->req->method('PUT');
+  say $ua->start($tx)->res->body;
+
   # Blocking parallel requests (does not work inside a running event loop)
   my $delay = Mojo::IOLoop->delay;
   for my $url ('mojolicio.us', 'cpan.org') {
@@ -1020,9 +1025,10 @@ append a callback to perform requests non-blocking.
 
   my $tx = $ua->start(Mojo::Transaction::HTTP->new);
 
-Process blocking transaction. You can also append a callback to perform
-transactions non-blocking.
+Process blocking request. You can also append a callback to perform requests
+non-blocking.
 
+  my $tx = $ua->build_tx(GET => 'http://kraih.com');
   $ua->start($tx => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;

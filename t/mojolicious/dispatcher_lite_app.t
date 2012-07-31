@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 24;
+use Test::More tests => 27;
 
 # "Just once I'd like to eat dinner with a celebrity who isn't bound and
 #  gagged."
@@ -69,6 +69,15 @@ get '/' => sub { shift->render_text('works') };
 # GET /custom (never called if custom dispatchers work)
 get '/custom' => sub { shift->render_text('does not work') };
 
+# GET /res (custom response)
+get '/res' => sub {
+  my $self = shift;
+  my $res
+    = Mojo::Message::Response->new(code => 200)->body('Custom response!');
+  $self->tx->res($res);
+  $self->tx->resume;
+};
+
 my $t = Test::Mojo->new;
 
 # GET /
@@ -80,6 +89,9 @@ $t->get_ok('/hello.txt')->status_is(200)
 
 # GET /custom
 $t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
+
+# GET /res (custom response)
+$t->get_ok('/res')->status_is(200)->content_is('Custom response!');
 
 # GET /custom_too
 $t->get_ok('/custom_too')->status_is(200)->content_is('this works too');

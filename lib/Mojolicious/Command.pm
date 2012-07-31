@@ -221,6 +221,8 @@ directory.
 
 =head2 C<render_data>
 
+
+  my $data = $command->render_data('foo_bar');
   my $data = $command->render_data('foo_bar', @args);
 
 Render a template from the C<DATA> section of the command class with
@@ -229,6 +231,7 @@ L<Mojo::Template>.
 =head2 C<render_to_file>
 
   $command = $command->render_to_file('foo_bar', '/home/sri/foo.txt');
+  $command = $command->render_to_file('foo_bar', '/home/sri/foo.txt', @args);
 
 Render a template from the C<DATA> section of the command class with
 L<Mojo::Template> to a file and create directory if necessary.
@@ -236,6 +239,7 @@ L<Mojo::Template> to a file and create directory if necessary.
 =head2 C<render_to_rel_file>
 
   $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt');
+  $command = $command->render_to_rel_file('foo_bar', 'foo/bar.txt', @args);
 
 Portably render a template from the C<DATA> section of the command class with
 L<Mojo::Template> to a file relative to the current working directory and

@@ -575,7 +575,7 @@ it should not be called before all headers have been received.
 
   my $cookies = $message->cookies;
 
-Access message cookies, meant to be overloaded in a subclass.
+Access message cookies. Meant to be overloaded in a subclass.
 
 =head2 C<dom>
 

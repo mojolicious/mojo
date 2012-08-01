@@ -76,19 +76,22 @@ following new ones.
 
   $upload->move_to('/home/sri/foo.txt');
 
-Alias for L<Mojo::Asset::File/"move_to">.
+Alias for C<$upload-E<gt>asset-E<gt>move_to>, usually
+L<Mojo::Asset::File/"move_to">.
 
 =head2 C<size>
 
   my $size = $upload->size;
 
-Alias for L<Mojo::Asset::File/"size">.
+Alias for C<$upload-E<gt>asset-E<gt>size>, usually
+L<Mojo::Asset::File/"size">.
 
 =head2 C<slurp>
 
   my $string = $upload->slurp;
 
-Alias for L<Mojo::Asset::File/"slurp">.
+Alias for C<$upload-E<gt>asset-E<gt>slurp>, usually
+L<Mojo::Asset::File/"slurp">.
 
 =head1 SEE ALSO
 

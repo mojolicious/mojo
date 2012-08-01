@@ -829,8 +829,7 @@ C<200> response code.
 
   my $req = $c->req;
 
-Alias for C<$c-E<gt>tx-E<gt>req>. Usually refers to a
-L<Mojo::Message::Request> object.
+Alias for C<$c-E<gt>tx-E<gt>req>, usually L<Mojo::Transaction/"req">.
 
   # Extract request information
   my $userinfo = $c->req->url->userinfo;
@@ -843,8 +842,7 @@ L<Mojo::Message::Request> object.
 
   my $res = $c->res;
 
-Alias for C<$c-E<gt>tx-E<gt>res>. Usually refers to a
-L<Mojo::Message::Response> object.
+Alias for C<$c-E<gt>tx-E<gt>res>, usually L<Mojo::Transaction/"res">.
 
   # Force file download by setting a custom response header
   $c->res->headers->content_disposition('attachment; filename=foo.png;');
@@ -945,7 +943,7 @@ that all stash values with a C<mojo.*> prefix are reserved for internal use.
 
   my $ua = $c->ua;
 
-Alias for L<Mojo/"ua">.
+Alias for C<$c-E<gt>app-E<gt>ua>, usually L<Mojo/"ua">.
 
   # Blocking
   my $tx = $c->ua->get('http://mojolicio.us');

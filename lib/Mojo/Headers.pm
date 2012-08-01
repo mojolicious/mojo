@@ -206,7 +206,7 @@ L<Mojo::Headers> implements the following attributes.
   my $size = $headers->max_line_size;
   $headers = $headers->max_line_size(1024);
 
-Maximum line size in bytes, defaults to the value of the
+Maximum header line size in bytes, defaults to the value of the
 C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
 
 =head1 METHODS

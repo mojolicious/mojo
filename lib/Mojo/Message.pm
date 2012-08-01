@@ -14,6 +14,7 @@ use Scalar::Util 'weaken';
 
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
+has max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 };
 has version          => '1.1';
 
@@ -172,14 +173,16 @@ sub get_start_line_chunk {
   my ($self, $offset) = @_;
   $self->emit(progress => 'start_line', $offset);
   return substr $self->{start_line_buffer} //= $self->_build_start_line,
-    $offset, $ENV{MOJO_CHUNK_SIZE} || 131072;
+    $offset, 131072;
 }
 
 sub has_leftovers { shift->content->has_leftovers }
-sub header_size   { shift->fix_headers->content->header_size }
-sub headers       { shift->content->headers(@_) }
-sub is_chunked    { shift->content->is_chunked }
-sub is_dynamic    { shift->content->is_dynamic }
+
+sub header_size { shift->fix_headers->content->header_size }
+
+sub headers    { shift->content->headers }
+sub is_chunked { shift->content->is_chunked }
+sub is_dynamic { shift->content->is_dynamic }
 
 sub is_finished { shift->{state} ~~ 'finished' }
 
@@ -201,8 +204,6 @@ sub json_class {
 }
 
 sub leftovers { shift->content->leftovers }
-
-sub max_line_size { shift->headers->max_line_size(@_) }
 
 sub param { shift->body_params->param(@_) }
 
@@ -410,7 +411,7 @@ sub _parse_formdata {
   return \@formdata;
 }
 
-sub _parse_start_line { }
+sub _parse_start_line { shift->{state} = 'content' }
 
 1;
 
@@ -490,6 +491,14 @@ Message content, defaults to a L<Mojo::Content::Single> object.
 
 Default charset used for form data parsing, defaults to C<UTF-8>.
 
+=head2 C<max_line_size>
+
+  my $size = $message->max_line_size;
+  $message = $message->max_line_size(1024);
+
+Maximum start line size in bytes, defaults to the value of the
+C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
+
 =head2 C<max_message_size>
 
   my $size = $message->max_message_size;
@@ -542,7 +551,8 @@ so it should not be called before the entire message body has been received.
 
   my $size = $message->body_size;
 
-Alias for L<Mojo::Content/"body_size">.
+Alias for C<$message-E<gt>content-E<gt>body_size>, usually
+L<Mojo::Content/"body_size">.
 
 =head2 C<build_body>
 
@@ -634,7 +644,8 @@ Get a chunk of start line data starting from a specific position.
 
   my $success = $message->has_leftovers;
 
-Alias for L<Mojo::Content/"has_leftovers">.
+Alias for C<$message-E<gt>content-E<gt>has_leftovers>, usually
+L<Mojo::Content/"has_leftovers">.
 
 =head2 C<header_size>
 
@@ -646,7 +657,8 @@ Size of headers in bytes.
 
   my $headers = $message->headers;
 
-Alias for L<Mojo::Content/"headers">.
+Alias for C<$message-E<gt>content-E<gt>headers>, usually
+L<Mojo::Content/"headers">.
 
   say $message->headers->content_type;
 
@@ -654,13 +666,15 @@ Alias for L<Mojo::Content/"headers">.
 
   my $success = $message->is_chunked;
 
-Alias for L<Mojo::Content/"is_chunked">.
+Alias for C<$message-E<gt>content-E<gt>is_chunked>, usually
+L<Mojo::Content/"is_chunked">.
 
 =head2 C<is_dynamic>
 
   my $success = $message->is_dynamic;
 
-Alias for L<Mojo::Content/"is_dynamic">.
+Alias for C<$message-E<gt>content-E<gt>is_dynamic>, usually
+L<Mojo::Content/"is_dynamic">.
 
 =head2 C<is_finished>
 
@@ -678,7 +692,8 @@ Check if message has exceeded C<max_line_size> or C<max_message_size>.
 
   my $success = $message->is_multipart;
 
-Alias for L<Mojo::Content/"is_multipart">.
+Alias for C<$message-E<gt>content-E<gt>is_multipart>, usually
+L<Mojo::Content/"is_multipart">.
 
 =head2 C<json>
 
@@ -699,13 +714,8 @@ it should not be called before the entire message body has been received.
 
   my $bytes = $message->leftovers;
 
-Alias for L<Mojo::Content/"leftovers">.
-
-=head2 C<max_line_size>
-
-  $message->max_line_size(1024);
-
-Alias for L<Mojo::Headers/"max_line_size">.
+Alias for C<$message-E<gt>content-E<gt>leftovers>, usually
+L<Mojo::Content/"leftovers">.
 
 =head2 C<param>
 
@@ -763,14 +773,16 @@ All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
   $message->write('Hello!');
   $message->write('Hello!', sub {...});
 
-Alias for L<Mojo::Content/"write">.
+Alias for C<$message-E<gt>content-E<gt>write>, usually
+L<Mojo::Content/"write">.
 
 =head2 C<write_chunk>
 
   $message->write_chunk('Hello!');
   $message->write_chunk('Hello!', sub {...});
 
-Alias for L<Mojo::Content/"write_headers">.
+Alias for C<$message-E<gt>content-E<gt>write_chunk>, usually
+L<Mojo::Content/"write_chunk">.
 
 =head1 SEE ALSO
 

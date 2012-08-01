@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 839;
+use Test::More tests => 843;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -286,6 +286,7 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
       $size    = $file->size;
     }
   );
+  is $req->content->asset->max_memory_size, 12, 'right size';
   is $req->content->progress, 0, 'right progress';
   $req->parse('GET /foo/bar/baz.html?fo');
   is $req->content->progress, 0, 'right progress';
@@ -329,6 +330,7 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   $req = Mojo::Message::Request->new;
   ok !$req->is_limit_exceeded, 'limit is not exceeded';
   local $ENV{MOJO_MAX_LINE_SIZE} = 5;
+  is $req->headers->max_line_size, 5, 'right size';
   $req->parse('GET /foo/bar/baz.html HTTP/1');
   ok $req->is_finished, 'request is finished';
   is(($req->error)[0], 'Maximum line size exceeded', 'right error');
@@ -340,6 +342,7 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 {
   $req = Mojo::Message::Request->new;
   local $ENV{MOJO_MAX_LINE_SIZE} = 20;
+  is $req->max_line_size, 20, 'right size';
   $req->parse("GET / HTTP/1.0\x0d\x0a");
   $req->parse("Content-Type: text/plain\x0d\x0a");
   ok $req->is_finished, 'request is finished';
@@ -352,6 +355,7 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 {
   $req = Mojo::Message::Request->new;
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 5;
+  is $req->max_message_size, 5, 'right size';
   $req->parse('GET /foo/bar/baz.html HTTP/1');
   ok $req->is_finished, 'request is finished';
   is(($req->error)[0], 'Maximum message size exceeded', 'right error');

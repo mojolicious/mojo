@@ -65,8 +65,7 @@ sub get_header_chunk {
       = $headers ? "$headers\x0d\x0a\x0d\x0a" : "\x0d\x0a";
   }
 
-  return substr $self->{header_buffer}, $offset,
-    $ENV{MOJO_CHUNK_SIZE} || 131072;
+  return substr $self->{header_buffer}, $offset, 131072;
 }
 
 sub has_leftovers { !!length(shift->{buffer} || '') }

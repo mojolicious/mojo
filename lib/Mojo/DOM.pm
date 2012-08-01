@@ -532,7 +532,7 @@ Element attributes.
   my $charset = $dom->charset;
   $dom        = $dom->charset('UTF-8');
 
-Alias for L<Mojo::DOM::HTML/"charset">.
+Access charset with L<Mojo::DOM::HTML/"charset">.
 
 =head2 C<children>
 
@@ -590,7 +590,7 @@ Parent of element.
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
-Alias for L<Mojo::DOM::HTML/"parse">.
+Parse HTML5/XML document with L<Mojo::DOM::HTML/"parse">.
 
   # Parse UTF-8 encoded XML
   my $dom = Mojo::DOM->new->charset('UTF-8')->xml(1)->parse($xml);
@@ -710,7 +710,7 @@ if a C<charset> has been defined.
   my $tree = $dom->tree;
   $dom     = $dom->tree(['root', [qw(text lalala)]]);
 
-Alias for L<Mojo::DOM::HTML/"tree">.
+Access Document Object Model with L<Mojo::DOM::HTML/"tree">.
 
 =head2 C<type>
 
@@ -727,7 +727,7 @@ Element type.
   my $xml = $dom->xml;
   $dom    = $dom->xml(1);
 
-Alias for L<Mojo::DOM::HTML/"xml">.
+Change parser semantics with L<Mojo::DOM::HTML/"xml">.
 
 =head1 CHILD ELEMENTS
 

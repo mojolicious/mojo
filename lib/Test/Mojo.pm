@@ -23,8 +23,7 @@ sub new {
 sub app {
   my ($self, $app) = @_;
   return $self->ua->app unless $app;
-  $self->ua->app($app);
-  return $self;
+  $self->ua->app($app) and return $self;
 }
 
 sub content_is {
@@ -416,7 +415,7 @@ Construct a new L<Test::Mojo> object.
   my $app = $t->app;
   $t      = $t->app(MyApp->new);
 
-Alias for L<Mojo::UserAgent/"app">.
+Access application with L<Mojo::UserAgent/"app">.
 
   # Change log level
   $t->app->log->level('fatal');

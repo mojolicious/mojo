@@ -102,14 +102,12 @@ sub get_chunk {
 
   # Range support
   my $buffer;
-  my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
   if (defined(my $end = $self->end_range)) {
     my $chunk = $end + 1 - $start;
     return '' if $chunk <= 0;
-    $chunk = $size if $chunk > $size;
-    $handle->sysread($buffer, $chunk);
+    $handle->sysread($buffer, $chunk > 131072 ? 131072 : $chunk);
   }
-  else { $handle->sysread($buffer, $size) }
+  else { $handle->sysread($buffer, 131072) }
 
   return $buffer;
 }

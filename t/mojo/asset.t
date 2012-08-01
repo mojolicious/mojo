@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 69;
+use Test::More tests => 65;
 
 # "And now, in the spirit of the season: start shopping.
 #  And for every dollar of Krusty merchandise you buy,
@@ -56,52 +56,36 @@ is $mem->contains('cdef'),  1,  '"cdef" at position 1';
 is $mem->contains('db'),    -1, 'does not contain "db"';
 
 # File asset range support (ab[cdefghi]jk)
-{
-  local $ENV{MOJO_CHUNK_SIZE} = 1024;
-  $file = Mojo::Asset::File->new(start_range => 2, end_range => 8);
-  $file->add_chunk('abcdefghijk');
-  is $file->contains(''),        0,  'empty string at position 0';
-  is $file->contains('cdefghi'), 0,  '"cdefghi" at position 0';
-  is $file->contains('fghi'),    3,  '"fghi" at position 3';
-  is $file->contains('f'),       3,  '"f" at position 3';
-  is $file->contains('hi'),      5,  '"hi" at position 5';
-  is $file->contains('db'),      -1, 'does not contain "db"';
-  my $chunk = $file->get_chunk(0);
-  is $chunk, 'cdefghi', 'chunk from position 0';
-  $chunk = $file->get_chunk(1);
-  is $chunk, 'defghi', 'chunk from position 1';
-  $chunk = $file->get_chunk(5);
-  is $chunk, 'hi', 'chunk from position 5';
-  $ENV{MOJO_CHUNK_SIZE} = 1;
-  $chunk = $file->get_chunk(0);
-  is $chunk, 'c', 'chunk from position 0 with size 1';
-  $chunk = $file->get_chunk(5);
-  is $chunk, 'h', 'chunk from position 5 with size 1';
-}
+$file = Mojo::Asset::File->new(start_range => 2, end_range => 8);
+$file->add_chunk('abcdefghijk');
+is $file->contains(''),        0,  'empty string at position 0';
+is $file->contains('cdefghi'), 0,  '"cdefghi" at position 0';
+is $file->contains('fghi'),    3,  '"fghi" at position 3';
+is $file->contains('f'),       3,  '"f" at position 3';
+is $file->contains('hi'),      5,  '"hi" at position 5';
+is $file->contains('db'),      -1, 'does not contain "db"';
+my $chunk = $file->get_chunk(0);
+is $chunk, 'cdefghi', 'chunk from position 0';
+$chunk = $file->get_chunk(1);
+is $chunk, 'defghi', 'chunk from position 1';
+$chunk = $file->get_chunk(5);
+is $chunk, 'hi', 'chunk from position 5';
 
 # Memory asset range support (ab[cdefghi]jk)
-{
-  local $ENV{MOJO_CHUNK_SIZE} = 1024;
-  $mem = Mojo::Asset::Memory->new(start_range => 2, end_range => 8);
-  $mem->add_chunk('abcdefghijk');
-  is $mem->contains(''),        0,  'empty string at position 0';
-  is $mem->contains('cdefghi'), 0,  '"cdefghi" at position 0';
-  is $mem->contains('fghi'),    3,  '"fghi" at position 3';
-  is $mem->contains('f'),       3,  '"f" at position 3';
-  is $mem->contains('hi'),      5,  '"hi" at position 5';
-  is $mem->contains('db'),      -1, 'does not contain "db"';
-  my $chunk = $mem->get_chunk(0);
-  is $chunk, 'cdefghi', 'chunk from position 0';
-  $chunk = $mem->get_chunk(1);
-  is $chunk, 'defghi', 'chunk from position 1';
-  $chunk = $mem->get_chunk(5);
-  is $chunk, 'hi', 'chunk from position 5';
-  $ENV{MOJO_CHUNK_SIZE} = 1;
-  $chunk = $mem->get_chunk(0);
-  is $chunk, 'c', 'chunk from position 0 with size 1';
-  $chunk = $mem->get_chunk(5);
-  is $chunk, 'h', 'chunk from position 5 with size 1';
-}
+$mem = Mojo::Asset::Memory->new(start_range => 2, end_range => 8);
+$mem->add_chunk('abcdefghijk');
+is $mem->contains(''),        0,  'empty string at position 0';
+is $mem->contains('cdefghi'), 0,  '"cdefghi" at position 0';
+is $mem->contains('fghi'),    3,  '"fghi" at position 3';
+is $mem->contains('f'),       3,  '"f" at position 3';
+is $mem->contains('hi'),      5,  '"hi" at position 5';
+is $mem->contains('db'),      -1, 'does not contain "db"';
+$chunk = $mem->get_chunk(0);
+is $chunk, 'cdefghi', 'chunk from position 0';
+$chunk = $mem->get_chunk(1);
+is $chunk, 'defghi', 'chunk from position 1';
+$chunk = $mem->get_chunk(5);
+is $chunk, 'hi', 'chunk from position 5';
 
 # Move memory asset to file
 $mem = Mojo::Asset::Memory->new->add_chunk('abc');

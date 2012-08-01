@@ -11,6 +11,7 @@ has res => sub { Mojo::Message::Response->new };
 
 # "Please don't eat me! I have a wife and kids. Eat them!"
 sub client_close { shift->server_close(@_) }
+
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
 
@@ -64,6 +65,7 @@ sub resume {
 }
 
 sub server_close { shift->emit('finish') }
+
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 

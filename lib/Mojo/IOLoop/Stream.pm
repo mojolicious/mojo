@@ -87,8 +87,7 @@ sub _read {
   my $self = shift;
 
   # Read
-  my $read
-    = $self->{handle}->sysread(my $buffer, $ENV{MOJO_CHUNK_SIZE} || 131072, 0);
+  my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
 
   # Error
   unless (defined $read) {

@@ -18,8 +18,7 @@ sub run {
   # Request body
   my $len = $env->{CONTENT_LENGTH};
   until ($req->is_finished) {
-    my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
-    my $chunk = ($len && $len < $size) ? $len : $size;
+    my $chunk = ($len && $len < 131072) ? $len : 131072;
     last unless my $read = $env->{'psgi.input'}->read(my $buffer, $chunk, 0);
     $req->parse($buffer);
     last if ($len -= $read) <= 0;

@@ -19,8 +19,7 @@ sub run {
   # Request body
   binmode STDIN;
   until ($req->is_finished) {
-    my $size = $ENV{MOJO_CHUNK_SIZE} || 131072;
-    last unless my $read = STDIN->read(my $buffer, $size, 0);
+    last unless my $read = STDIN->read(my $buffer, 131072, 0);
     $req->parse($buffer);
   }
 

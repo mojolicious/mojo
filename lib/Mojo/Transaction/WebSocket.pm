@@ -106,7 +106,7 @@ sub client_handshake {
 sub client_read  { shift->server_read(@_) }
 sub client_write { shift->server_write(@_) }
 
-sub connection { shift->handshake->connection }
+sub connection { shift->handshake->connection(@_) }
 
 sub finish {
   my $self = shift;
@@ -117,9 +117,9 @@ sub finish {
 
 sub is_websocket {1}
 
-sub kept_alive    { shift->handshake->kept_alive }
-sub local_address { shift->handshake->local_address }
-sub local_port    { shift->handshake->local_port }
+sub kept_alive    { shift->handshake->kept_alive(@_) }
+sub local_address { shift->handshake->local_address(@_) }
+sub local_port    { shift->handshake->local_port(@_) }
 
 sub parse_frame {
   my ($self, $buffer) = @_;
@@ -183,10 +183,10 @@ sub parse_frame {
   return [$fin, $rsv1, $rsv2, $rsv3, $op, $payload];
 }
 
-sub remote_address { shift->handshake->remote_address }
-sub remote_port    { shift->handshake->remote_port }
-sub req            { shift->handshake->req }
-sub res            { shift->handshake->res }
+sub remote_address { shift->handshake->remote_address(@_) }
+sub remote_port    { shift->handshake->remote_port(@_) }
+sub req            { shift->handshake->req(@_) }
+sub res            { shift->handshake->res(@_) }
 
 sub resume {
   my $self = shift;
@@ -547,8 +547,7 @@ Alias for C<$ws-E<gt>handshake-E<gt>res>, usually L<Mojo::Transaction/"res">.
 
   $ws = $ws->resume;
 
-Alias for C<$ws-E<gt>handshake-E<gt>resume>, usually
-L<Mojo::Transaction/"resume">.
+Resume C<handshake> transaction.
 
 =head2 C<send>
 

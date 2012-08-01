@@ -328,8 +328,8 @@ sub rendered {
 }
 
 # "A three month calendar? What is this, Mercury?"
-sub req { shift->tx->req }
-sub res { shift->tx->res }
+sub req { shift->tx->req(@_) }
+sub res { shift->tx->res(@_) }
 
 sub respond_to {
   my $self = shift;
@@ -446,7 +446,7 @@ sub stash {
   return $self;
 }
 
-sub ua { shift->app->ua }
+sub ua { shift->app->ua(@_) }
 
 sub url_for {
   my $self = shift;

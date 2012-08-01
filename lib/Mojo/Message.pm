@@ -78,7 +78,7 @@ sub body_params {
   return $p;
 }
 
-sub body_size { shift->content->body_size }
+sub body_size { shift->content->body_size(@_) }
 
 # "My new movie is me, standing in front of a brick wall for 90 minutes.
 #  It cost 80 million dollars to make.
@@ -176,19 +176,19 @@ sub get_start_line_chunk {
     $offset, 131072;
 }
 
-sub has_leftovers { shift->content->has_leftovers }
+sub has_leftovers { shift->content->has_leftovers(@_) }
 
 sub header_size { shift->fix_headers->content->header_size }
 
-sub headers    { shift->content->headers }
-sub is_chunked { shift->content->is_chunked }
-sub is_dynamic { shift->content->is_dynamic }
+sub headers    { shift->content->headers(@_) }
+sub is_chunked { shift->content->is_chunked(@_) }
+sub is_dynamic { shift->content->is_dynamic(@_) }
 
 sub is_finished { shift->{state} ~~ 'finished' }
 
 sub is_limit_exceeded { (shift->error)[1] ~~ [413, 431] }
 
-sub is_multipart { shift->content->is_multipart }
+sub is_multipart { shift->content->is_multipart(@_) }
 
 sub json {
   my ($self, $pointer) = @_;
@@ -203,7 +203,7 @@ sub json_class {
   return @_ > 1 ? shift : 'Mojo::JSON';
 }
 
-sub leftovers { shift->content->leftovers }
+sub leftovers { shift->content->leftovers(@_) }
 
 sub param { shift->body_params->param(@_) }
 

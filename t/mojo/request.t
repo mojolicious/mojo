@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 843;
+use Test::More tests => 844;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -1546,6 +1546,15 @@ is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
 is $req->headers->host, '127.0.0.1', 'right "Host" value';
 is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $req->body, "hello world!hello world2!\n\n", 'right content';
+
+# Build HTTP 1.1 chunked request body
+$req = Mojo::Message::Request->new;
+$req->write_chunk('hello!');
+$req->write_chunk('hello world!');
+$req->write_chunk('');
+is $req->build_body,
+  "6\x0d\x0ahello!\x0d\x0ac\x0d\x0ahello world!\x0d\x0a0\x0d\x0a\x0d\x0a",
+  'right format';
 
 # Build full HTTP 1.1 request with cookies
 $req = Mojo::Message::Request->new;

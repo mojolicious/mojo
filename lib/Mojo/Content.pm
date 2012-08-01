@@ -250,7 +250,7 @@ sub _build_chunk {
   return "\x0d\x0a0\x0d\x0a\x0d\x0a" if length $chunk == 0;
 
   # First chunk has no leading CRLF
-  my $crlf = $self->{chunks}++ ? '' : "\x0d\x0a";
+  my $crlf = $self->{chunks}++ ? "\x0d\x0a" : '';
   return $crlf . sprintf('%x', length $chunk) . "\x0d\x0a$chunk";
 }
 

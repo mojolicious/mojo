@@ -1025,7 +1025,7 @@ append a callback to perform requests non-blocking.
 
   my $tx = $ua->start(Mojo::Transaction::HTTP->new);
 
-Process blocking request. You can also append a callback to perform requests
+Perform blocking request. You can also append a callback to perform requests
 non-blocking.
 
   my $tx = $ua->build_tx(GET => 'http://kraih.com');

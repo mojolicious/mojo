@@ -25,7 +25,15 @@ Mojo::Asset - HTTP content storage base class
 
 =head1 SYNOPSIS
 
+  package Mojo::Asset::MyAsset;
   use Mojo::Base 'Mojo::Asset';
+
+  sub add_chunk {...}
+  sub contains  {...}
+  sub get_chunk {...}
+  sub move_to   {...}
+  sub size      {...}
+  sub slurp     {...}
 
 =head1 DESCRIPTION
 

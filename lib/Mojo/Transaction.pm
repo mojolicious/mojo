@@ -80,7 +80,13 @@ Mojo::Transaction - Transaction base class
 
 =head1 SYNOPSIS
 
+  package Mojo::Transaction::MyTransaction;
   use Mojo::Base 'Mojo::Transaction';
+
+  sub client_read  {...}
+  sub client_write {...}
+  sub server_read  {...}
+  sub server_write {...}
 
 =head1 DESCRIPTION
 

@@ -63,6 +63,7 @@ Mojo::Server - HTTP server base class
 
 =head1 SYNOPSIS
 
+  package Mojo::Server::MyServer;
   use Mojo::Base 'Mojo::Server';
 
   sub run {

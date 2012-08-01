@@ -57,7 +57,11 @@ Mojo::Cookie - HTTP cookie base class
 
 =head1 SYNOPSIS
 
+  package Mojo::Cookie::MyCookie;
   use Mojo::Base 'Mojo::Cookie';
+
+  sub parse     {...}
+  sub to_string {...}
 
 =head1 DESCRIPTION
 

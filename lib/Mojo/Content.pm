@@ -339,7 +339,12 @@ Mojo::Content - HTTP content base class
 
 =head1 SYNOPSIS
 
+  package Mojo::Content::MyContent;
   use Mojo::Base 'Mojo::Content';
+
+  sub body_contains  {...}
+  sub body_size      {...}
+  sub get_body_chunk {...}
 
 =head1 DESCRIPTION
 

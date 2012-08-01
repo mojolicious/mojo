@@ -57,8 +57,6 @@ Mojo::Reactor - Low level event reactor base class
   sub timer      {...}
   sub watch      {...}
 
-  1;
-
 =head1 DESCRIPTION
 
 L<Mojo::Reactor> is an abstract base class for low level event reactors.

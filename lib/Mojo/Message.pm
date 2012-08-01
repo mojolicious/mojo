@@ -420,7 +420,10 @@ Mojo::Message - HTTP message base class
 
 =head1 SYNOPSIS
 
+  package Mojo::Message::MyMessage;
   use Mojo::Base 'Mojo::Message';
+
+  sub cookies {...}
 
 =head1 DESCRIPTION
 

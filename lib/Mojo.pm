@@ -67,6 +67,7 @@ Mojo - Duct tape for the HTML5 web!
 
 =head1 SYNOPSIS
 
+  package MyApp;
   use Mojo::Base 'Mojo';
 
   # All the complexities of CGI, PSGI, HTTP and WebSockets get reduced to a

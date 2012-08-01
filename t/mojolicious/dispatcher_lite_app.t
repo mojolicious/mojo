@@ -69,9 +69,7 @@ hook after_static_dispatch => sub {
   return
     unless $self->req->url->path->contains('/res.txt')
     && $self->param('route');
-  my $content = $self->res->body;
   $self->tx->res(Mojo::Message::Response->new);
-  $self->res->headers->header('X-Res' => $content);
 };
 
 # Response generating condition "res" for /res.txt
@@ -79,11 +77,10 @@ app->routes->add_condition(
   res => sub {
     my ($r, $c) = @_;
     return 1 unless $c->param('res');
-    my $res = Mojo::Message::Response->new(code => 200)
-      ->body('Conditional response!');
-    $c->tx->res($res);
-    $c->rendered;
-    return;
+    $c->tx->res(
+      Mojo::Message::Response->new(code => 201)->body('Conditional response!')
+    );
+    $c->rendered and return;
   }
 );
 
@@ -97,7 +94,7 @@ get '/custom' => sub { shift->render_text('does not work') };
 get '/res.txt' => (res => 1) => sub {
   my $self = shift;
   my $res
-    = Mojo::Message::Response->new(code => 200)->body('Custom response!');
+    = Mojo::Message::Response->new(code => 202)->body('Custom response!');
   $self->tx->res($res);
   $self->rendered;
 };
@@ -115,13 +112,13 @@ $t->get_ok('/hello.txt')->status_is(200)
 $t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
 
 # GET /res.txt (static file)
-$t->get_ok('/res.txt')->status_is(200)->content_is("Hello!\n");
+$t->get_ok('/res.txt')->status_is(200)->content_is("Static response!\n");
 
 # GET /res.txt?route=1 (custom response)
-$t->get_ok('/res.txt?route=1')->status_is(200)->content_is('Custom response!');
+$t->get_ok('/res.txt?route=1')->status_is(202)->content_is('Custom response!');
 
 # GET /res.txt?route=1&res=1 (conditional response)
-$t->get_ok('/res.txt?route=1&res=1')->status_is(200)
+$t->get_ok('/res.txt?route=1&res=1')->status_is(201)
   ->content_is('Conditional response!');
 
 # GET /custom_too
@@ -141,4 +138,4 @@ $t->get_ok('/not_found?wrap=1')->status_is(200)->content_is('Wrapped again!');
 
 __DATA__
 @@ res.txt
-Hello!
+Static response!

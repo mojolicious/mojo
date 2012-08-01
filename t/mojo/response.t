@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 310;
+use Test::More tests => 313;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -257,7 +257,7 @@ is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 13,           'right "Content-Length" value';
-is $res->content->body_size,      13,           'right size';
+is $res->body_size, 13, 'right size';
 
 # Parse HTTP 1.1 multipart response
 $res = Mojo::Message::Response->new;
@@ -529,6 +529,17 @@ is $res2->cookie('bar')->path,  '/test/23', 'right path';
 is $res2->cookie('bar')->value, 'baz',      'right value';
 is $res2->cookie('baz')->path,  '/foobar',  'right path';
 is $res2->cookie('baz')->value, 'yada',     'right value';
+
+# Build chunked response body
+$res = Mojo::Message::Response->new;
+$res->write_chunk('hello!');
+$res->write_chunk('hello world!');
+$res->write_chunk('');
+ok $res->is_chunked, 'chunked content';
+ok $res->is_dynamic, 'dynamic content';
+is $res->build_body,
+  "6\x0d\x0ahello!\x0d\x0ac\x0d\x0ahello world!\x0d\x0a0\x0d\x0a\x0d\x0a",
+  'right format';
 
 # Build response with callback (make sure it's called)
 $res = Mojo::Message::Response->new;

@@ -521,7 +521,7 @@ Parse WebSocket frame.
 
   my $remote_address = $ws->remote_address;
 
-Alias for C<$ws-E<gt>handshake-E<gt>remove_address>, usually
+Alias for C<$ws-E<gt>handshake-E<gt>remote_address>, usually
 L<Mojo::Transaction/"remote_address">.
 
 =head2 C<remote_port>

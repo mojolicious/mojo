@@ -328,8 +328,8 @@ sub rendered {
 }
 
 # "A three month calendar? What is this, Mercury?"
-sub req { shift->tx->req(@_) }
-sub res { shift->tx->res(@_) }
+sub req { shift->tx->req }
+sub res { shift->tx->res }
 
 sub respond_to {
   my $self = shift;
@@ -446,7 +446,7 @@ sub stash {
   return $self;
 }
 
-sub ua { shift->app->ua(@_) }
+sub ua { shift->app->ua }
 
 sub url_for {
   my $self = shift;
@@ -521,8 +521,7 @@ sub _fallbacks {
       # Inline template
       my $stash = $self->stash;
       return unless $stash->{format} eq 'html';
-      delete $stash->{layout};
-      delete $stash->{extends};
+      delete $stash->{$_} for qw(extends layout);
       delete $options->{template};
       return $self->render(%$options, inline => $inline, handler => 'ep');
     }
@@ -829,7 +828,10 @@ C<200> response code.
 
   my $req = $c->req;
 
-Alias for C<$c-E<gt>tx-E<gt>req>, usually L<Mojo::Transaction/"req">.
+Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
+
+  # Longer version
+  my $req = $c->tx->req;
 
   # Extract request information
   my $userinfo = $c->req->url->userinfo;
@@ -842,7 +844,10 @@ Alias for C<$c-E<gt>tx-E<gt>req>, usually L<Mojo::Transaction/"req">.
 
   my $res = $c->res;
 
-Alias for C<$c-E<gt>tx-E<gt>res>, usually L<Mojo::Transaction/"res">.
+Get L<Mojo::Message::Response> object from L<Mojo::Transaction/"res">.
+
+  # Longer version
+  my $res = $c->tx->res;
 
   # Force file download by setting a custom response header
   $c->res->headers->content_disposition('attachment; filename=foo.png;');
@@ -943,7 +948,10 @@ that all stash values with a C<mojo.*> prefix are reserved for internal use.
 
   my $ua = $c->ua;
 
-Alias for C<$c-E<gt>app-E<gt>ua>, usually L<Mojo/"ua">.
+Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
+
+  # Longer version
+  my $ua = $c->app->ua;
 
   # Blocking
   my $tx = $c->ua->get('http://mojolicio.us');
@@ -992,10 +1000,10 @@ to inherit query parameters from the current request.
 
 =head2 C<write>
 
-  $c->write;
-  $c->write('Hello!');
-  $c->write(sub {...});
-  $c->write('Hello!', sub {...});
+  $c = $c->write;
+  $c = $c->write('Hello!');
+  $c = $c->write(sub {...});
+  $c = $c->write('Hello!', sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be
 invoked once all data has been written.
@@ -1024,10 +1032,10 @@ timeout, which usually defaults to C<15> seconds.
 
 =head2 C<write_chunk>
 
-  $c->write_chunk;
-  $c->write_chunk('Hello!');
-  $c->write_chunk(sub {...});
-  $c->write_chunk('Hello!', sub {...});
+  $c = $c->write_chunk;
+  $c = $c->write_chunk('Hello!');
+  $c = $c->write_chunk(sub {...});
+  $c = $c->write_chunk('Hello!', sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.

@@ -270,8 +270,7 @@ sub _reap {
   # Clean up failed upgrade
   if (($self->{new} || '') eq $pid) {
     $self->{log}->info('Zero downtime software upgrade failed.');
-    delete $self->{upgrade};
-    delete $self->{new};
+    delete $self->{$_} for qw(new upgrade);
   }
 
   # Clean up worker
@@ -334,8 +333,7 @@ sub _spawn {
   $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = $SIG{USR2} = $SIG{TTIN} = $SIG{TTOU}
     = 'DEFAULT';
   $SIG{QUIT} = sub { $loop->max_connections(0) };
-  delete $self->{reader};
-  delete $self->{poll};
+  delete $self->{$_} for qw(poll reader);
 
   # Start
   $self->{log}->debug("Worker $$ started.");

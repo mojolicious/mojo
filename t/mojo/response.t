@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 313;
+use Test::More tests => 320;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -532,14 +532,29 @@ is $res2->cookie('baz')->value, 'yada',     'right value';
 
 # Build chunked response body
 $res = Mojo::Message::Response->new;
-$res->write_chunk('hello!');
+$res->code(200);
+my $invocant;
+$res->write_chunk('hello!', sub { $invocant = shift });
 $res->write_chunk('hello world!');
-$res->write_chunk('');
+is $res->write_chunk('')->code, 200, 'right status';
 ok $res->is_chunked, 'chunked content';
 ok $res->is_dynamic, 'dynamic content';
 is $res->build_body,
   "6\x0d\x0ahello!\x0d\x0ac\x0d\x0ahello world!\x0d\x0a0\x0d\x0a\x0d\x0a",
   'right format';
+isa_ok $invocant, 'Mojo::Message::Response', 'right invocant';
+
+# Build dynamic response body
+$res = Mojo::Message::Response->new;
+$res->code(200);
+$invocant = undef;
+$res->write('hello!', sub { $invocant = shift });
+$res->write('hello world!');
+is $res->write('')->code, 200, 'right status';
+ok !$res->is_chunked, 'no chunked content';
+ok $res->is_dynamic, 'dynamic content';
+is $res->build_body, "hello!hello world!", 'right format';
+isa_ok $invocant, 'Mojo::Message::Response', 'right invocant';
 
 # Build response with callback (make sure it's called)
 $res = Mojo::Message::Response->new;

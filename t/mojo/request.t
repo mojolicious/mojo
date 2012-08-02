@@ -752,7 +752,7 @@ is $req->upload('upload')->filename,  'hello.pl',            'right filename';
 isa_ok $req->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
 is $req->upload('upload')->asset->size, 69, 'right size';
 my $file = catfile(tempdir(CLEANUP => 1), ("MOJO_TMP." . time . ".txt"));
-ok $req->upload('upload')->move_to($file), 'moved file';
+isa_ok $req->upload('upload')->move_to($file), 'Mojo::Upload', 'moved file';
 ok unlink($file), 'unlinked file';
 is $req->content->boundary, '----------0xKhTmLbOuNdArY', 'right boundary';
 

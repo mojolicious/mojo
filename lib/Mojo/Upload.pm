@@ -13,9 +13,13 @@ has headers => sub { Mojo::Headers->new };
 #  You sunk my scrabbleship!
 #  This game makes no sense.
 #  Tell that to the good men who just lost their lives... SEMPER-FI!"
-sub move_to { shift->asset->move_to(@_) }
-sub size    { shift->asset->size(@_) }
-sub slurp   { shift->asset->slurp(@_) }
+sub move_to {
+  my $self = shift;
+  $self->asset->move_to(@_) and return $self;
+}
+
+sub size  { shift->asset->size }
+sub slurp { shift->asset->slurp }
 
 1;
 
@@ -74,24 +78,21 @@ following new ones.
 
 =head2 C<move_to>
 
-  $upload->move_to('/home/sri/foo.txt');
+  $upload = $upload->move_to('/home/sri/foo.txt');
 
-Alias for C<$upload-E<gt>asset-E<gt>move_to>, usually
-L<Mojo::Asset::File/"move_to">.
+Move uploaded data into a specific file.
 
 =head2 C<size>
 
   my $size = $upload->size;
 
-Alias for C<$upload-E<gt>asset-E<gt>size>, usually
-L<Mojo::Asset::File/"size">.
+Size of uploaded data in bytes.
 
 =head2 C<slurp>
 
   my $string = $upload->slurp;
 
-Alias for C<$upload-E<gt>asset-E<gt>slurp>, usually
-L<Mojo::Asset::File/"slurp">.
+Read all uploaded data at once.
 
 =head1 SEE ALSO
 

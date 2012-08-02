@@ -67,8 +67,7 @@ sub match {
   my $endpoint = $r->is_endpoint;
   if ($r->inline || ($endpoint && $empty)) {
     push @{$self->stack}, {%$captures};
-    delete $captures->{cb};
-    delete $captures->{app};
+    delete $captures->{$_} for qw(app cb);
   }
 
   # Endpoint

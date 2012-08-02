@@ -106,7 +106,7 @@ sub client_handshake {
 sub client_read  { shift->server_read(@_) }
 sub client_write { shift->server_write(@_) }
 
-sub connection { shift->handshake->connection(@_) }
+sub connection { shift->handshake->connection }
 
 sub finish {
   my $self = shift;
@@ -117,9 +117,9 @@ sub finish {
 
 sub is_websocket {1}
 
-sub kept_alive    { shift->handshake->kept_alive(@_) }
-sub local_address { shift->handshake->local_address(@_) }
-sub local_port    { shift->handshake->local_port(@_) }
+sub kept_alive    { shift->handshake->kept_alive }
+sub local_address { shift->handshake->local_address }
+sub local_port    { shift->handshake->local_port }
 
 sub parse_frame {
   my ($self, $buffer) = @_;
@@ -183,10 +183,10 @@ sub parse_frame {
   return [$fin, $rsv1, $rsv2, $rsv3, $op, $payload];
 }
 
-sub remote_address { shift->handshake->remote_address(@_) }
-sub remote_port    { shift->handshake->remote_port(@_) }
-sub req            { shift->handshake->req(@_) }
-sub res            { shift->handshake->res(@_) }
+sub remote_address { shift->handshake->remote_address }
+sub remote_port    { shift->handshake->remote_port }
+sub req            { shift->handshake->req }
+sub res            { shift->handshake->res }
 
 sub resume {
   my $self = shift;
@@ -466,8 +466,7 @@ Raw WebSocket data to write.
 
   my $connection = $ws->connection;
 
-Alias for C<$ws-E<gt>handshake-E<gt>connection>, usually
-L<Mojo::Transaction/"connection">.
+Connection identifier or socket.
 
 =head2 C<finish>
 
@@ -485,22 +484,19 @@ True.
 
   my $kept_alive = $ws->kept_alive;
 
-Alias for C<$ws-E<gt>handshake-E<gt>kept_alive>, usually
-L<Mojo::Transaction/"kept_alive">.
+Connection has been kept alive.
 
 =head2 C<local_address>
 
   my $local_address = $ws->local_address;
 
-Alias for C<$ws-E<gt>handshake-E<gt>local_address>, usually
-L<Mojo::Transaction/"local_address">.
+Local interface address.
 
 =head2 C<local_port>
 
   my $local_port = $ws->local_port;
 
-Alias for C<$ws-E<gt>handshake-E<gt>local_port>, usually
-L<Mojo::Transaction/"local_port">.
+Local interface port.
 
 =head2 C<parse_frame>
 
@@ -521,27 +517,25 @@ Parse WebSocket frame.
 
   my $remote_address = $ws->remote_address;
 
-Alias for C<$ws-E<gt>handshake-E<gt>remote_address>, usually
-L<Mojo::Transaction/"remote_address">.
+Remote interface address.
 
 =head2 C<remote_port>
 
   my $remote_port = $ws->remote_port;
 
-Alias for C<$ws-E<gt>handshake-E<gt>remote_port>, usually
-L<Mojo::Transaction/"remote_port">.
+Remote interface port.
 
 =head2 C<req>
 
   my $req = $ws->req;
 
-Alias for C<$ws-E<gt>handshake-E<gt>req>, usually L<Mojo::Transaction/"req">.
+Handshake request, usually a L<Mojo::Message::Request> object.
 
 =head2 C<res>
 
   my $res = $ws->res;
 
-Alias for C<$ws-E<gt>handshake-E<gt>res>, usually L<Mojo::Transaction/"res">.
+Handshake response, usually a L<Mojo::Message::Response> object.
 
 =head2 C<resume>
 

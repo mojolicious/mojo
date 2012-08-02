@@ -78,7 +78,7 @@ sub body_params {
   return $p;
 }
 
-sub body_size { shift->content->body_size(@_) }
+sub body_size { shift->content->body_size }
 
 # "My new movie is me, standing in front of a brick wall for 90 minutes.
 #  It cost 80 million dollars to make.
@@ -176,19 +176,19 @@ sub get_start_line_chunk {
     $offset, 131072;
 }
 
-sub has_leftovers { shift->content->has_leftovers(@_) }
+sub has_leftovers { shift->content->has_leftovers }
 
 sub header_size { shift->fix_headers->content->header_size }
 
-sub headers    { shift->content->headers(@_) }
-sub is_chunked { shift->content->is_chunked(@_) }
-sub is_dynamic { shift->content->is_dynamic(@_) }
+sub headers    { shift->content->headers }
+sub is_chunked { shift->content->is_chunked }
+sub is_dynamic { shift->content->is_dynamic }
 
 sub is_finished { shift->{state} ~~ 'finished' }
 
 sub is_limit_exceeded { (shift->error)[1] ~~ [413, 431] }
 
-sub is_multipart { shift->content->is_multipart(@_) }
+sub is_multipart { shift->content->is_multipart }
 
 sub json {
   my ($self, $pointer) = @_;
@@ -203,7 +203,7 @@ sub json_class {
   return @_ > 1 ? shift : 'Mojo::JSON';
 }
 
-sub leftovers { shift->content->leftovers(@_) }
+sub leftovers { shift->content->leftovers }
 
 sub param { shift->body_params->param(@_) }
 
@@ -253,8 +253,8 @@ sub uploads {
   return \@uploads;
 }
 
-sub write       { shift->content->write(@_) }
-sub write_chunk { shift->content->write_chunk(@_) }
+sub write       { shift->_write(write       => @_) }
+sub write_chunk { shift->_write(write_chunk => @_) }
 
 sub _build {
   my ($self, $method) = @_;
@@ -412,6 +412,14 @@ sub _parse_formdata {
 
 sub _parse_start_line { shift->{state} = 'content' }
 
+sub _write {
+  my ($self, $method, $chunk, $cb) = @_;
+  ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
+  weaken $self;
+  $self->content->$method($chunk, sub { shift and $self->$cb(@_) if $cb });
+  return $self;
+}
+
 1;
 
 =head1 NAME
@@ -550,8 +558,7 @@ so it should not be called before the entire message body has been received.
 
   my $size = $message->body_size;
 
-Alias for C<$message-E<gt>content-E<gt>body_size>, usually
-L<Mojo::Content/"body_size">.
+Content size in bytes.
 
 =head2 C<build_body>
 
@@ -643,8 +650,7 @@ Get a chunk of start line data starting from a specific position.
 
   my $success = $message->has_leftovers;
 
-Alias for C<$message-E<gt>content-E<gt>has_leftovers>, usually
-L<Mojo::Content/"has_leftovers">.
+Check if there are leftovers.
 
 =head2 C<header_size>
 
@@ -656,24 +662,20 @@ Size of headers in bytes.
 
   my $headers = $message->headers;
 
-Alias for C<$message-E<gt>content-E<gt>headers>, usually
-L<Mojo::Content/"headers">.
-
-  say $message->headers->content_type;
+Message headers, usually a L<Mojo::Headers> object.
 
 =head2 C<is_chunked>
 
   my $success = $message->is_chunked;
 
-Alias for C<$message-E<gt>content-E<gt>is_chunked>, usually
-L<Mojo::Content/"is_chunked">.
+Check if content is chunked.
 
 =head2 C<is_dynamic>
 
   my $success = $message->is_dynamic;
 
-Alias for C<$message-E<gt>content-E<gt>is_dynamic>, usually
-L<Mojo::Content/"is_dynamic">.
+Check if content will be dynamically generated, which prevents C<clone> from
+working.
 
 =head2 C<is_finished>
 
@@ -691,8 +693,7 @@ Check if message has exceeded C<max_line_size> or C<max_message_size>.
 
   my $success = $message->is_multipart;
 
-Alias for C<$message-E<gt>content-E<gt>is_multipart>, usually
-L<Mojo::Content/"is_multipart">.
+Check if content is a L<Mojo::Content::MultiPart> object.
 
 =head2 C<json>
 
@@ -769,19 +770,19 @@ All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 
 =head2 C<write>
 
-  $message->write('Hello!');
-  $message->write('Hello!', sub {...});
+  $message = $message->write('Hello!');
+  $message = $message->write('Hello!', sub {...});
 
-Alias for C<$message-E<gt>content-E<gt>write>, usually
-L<Mojo::Content/"write">.
+Write dynamic content non-blocking, the optional drain callback will be
+invoked once all data has been written.
 
 =head2 C<write_chunk>
 
-  $message->write_chunk('Hello!');
-  $message->write_chunk('Hello!', sub {...});
+  $message = $message->write_chunk('Hello!');
+  $message = $message->write_chunk('Hello!', sub {...});
 
-Alias for C<$message-E<gt>content-E<gt>write_chunk>, usually
-L<Mojo::Content/"write_chunk">.
+Write dynamic content non-blocking with C<chunked> transfer encoding, the
+optional drain callback will be invoked once all data has been written.
 
 =head1 SEE ALSO
 

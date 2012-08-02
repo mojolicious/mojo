@@ -835,7 +835,7 @@ Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
   my $tx = $ua->build_form_tx('http://kraih.com' => {a => 'b'});
   my $tx = $ua->build_form_tx('kraih.com', 'UTF-8', {a => 'b'}, {DNT => 1});
 
-Alias for C<$ua-E<gt>transactor-E<gt>form>, usually
+Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"form">.
 
 =head2 C<build_json_tx>
@@ -843,7 +843,7 @@ L<Mojo::UserAgent::Transactor/"form">.
   my $tx = $ua->build_json_tx('http://kraih.com' => {a => 'b'});
   my $tx = $ua->build_json_tx('kraih.com' => {a => 'b'} => {DNT => 1});
 
-Alias for C<$ua-E<gt>transactor-E<gt>json>, usually
+Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"json">.
 
 =head2 C<build_tx>
@@ -851,7 +851,7 @@ L<Mojo::UserAgent::Transactor/"json">.
   my $tx = $ua->build_tx(GET => 'kraih.com');
   my $tx = $ua->build_tx(PUT => 'http://kraih.com' => {DNT => 1} => 'Hi!');
 
-Alias for C<$ua-E<gt>transactor-E<gt>tx>, usually
+Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"tx">.
 
   # Request with cookie
@@ -864,7 +864,7 @@ L<Mojo::UserAgent::Transactor/"tx">.
   my $tx = $ua->build_websocket_tx('ws://localhost:3000');
   my $tx = $ua->build_websocket_tx('ws://localhost:3000' => {DNT => 1});
 
-Alias for C<$ua-E<gt>transactor-E<gt>websocket>, usually
+Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"websocket">.
 
 =head2 C<delete>

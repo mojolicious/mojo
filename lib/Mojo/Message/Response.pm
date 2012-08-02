@@ -144,6 +144,8 @@ Mojo::Message::Response - HTTP response
   $res->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
   $res->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");
   $res->parse('Hello World!');
+  say $res->code;
+  say $res->headers->content_type;
   say $res->body;
 
   # Build

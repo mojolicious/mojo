@@ -179,7 +179,7 @@ seconds. Meant to be overloaded in a subclass.
 
   $reactor = $reactor->watch($handle, $readable, $writable);
 
-Change I/O events to watch handle for with C<true> and C<false> values, meant
+Change I/O events to watch handle for with C<true> and C<false> values. Meant
 to be overloaded in a subclass. Note that this method requires an active I/O
 watcher.
 

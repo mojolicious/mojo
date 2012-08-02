@@ -291,6 +291,8 @@ Mojo::Message::Request - HTTP request
   $req->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
   $req->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");
   $req->parse('Hello World!');
+  say $req->method;
+  say $req->headers->content_type;
   say $req->body;
 
   # Build

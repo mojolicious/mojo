@@ -351,20 +351,6 @@ RFC 2616.
 
 L<Mojo::Content> can emit the following events.
 
-=head2 C<drain>
-
-  $content->on(drain => sub {
-    my ($content, $offset) = @_;
-    ...
-  });
-
-Emitted once all data has been written.
-
-  $content->on(drain => sub {
-    my $content = shift;
-    $content->write_chunk(time);
-  });
-
 =head2 C<body>
 
   $content->on(body => sub {
@@ -377,6 +363,20 @@ Emitted once all headers have been parsed and the body starts.
   $content->on(body => sub {
     my $content = shift;
     $content->auto_upgrade(0) if $content->headers->header('X-No-MultiPart');
+  });
+
+=head2 C<drain>
+
+  $content->on(drain => sub {
+    my ($content, $offset) = @_;
+    ...
+  });
+
+Emitted once all data has been written.
+
+  $content->on(drain => sub {
+    my $content = shift;
+    $content->write_chunk(time);
   });
 
 =head2 C<read>

@@ -967,13 +967,13 @@ Start a new route group.
 
   helper foo => sub {...};
 
-Alias for L<Mojolicious/"helper">.
+Add a new helper with L<Mojolicious/"helper">.
 
 =head2 C<hook>
 
   hook after_dispatch => sub {...};
 
-Alias for L<Mojolicious/"hook">.
+Share code with L<Mojolicious/"hook">.
 
 =head2 C<options>
 
@@ -992,9 +992,9 @@ C<PATCH> requests. See also the tutorial above for more argument variations.
 
 =head2 C<plugin>
 
-  plugin 'SomeThing';
+  plugin SomePlugin => {foo => 23};
 
-Alias for L<Mojolicious/"plugin">.
+Load a plugin with L<Mojolicious/"plugin">.
 
 =head2 C<post>
 

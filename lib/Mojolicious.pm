@@ -438,7 +438,8 @@ and the application object, as well as a function in C<ep> templates.
 
   $app->hook(after_dispatch => sub {...});
 
-Extend L<Mojolicious> with hooks.
+Extend L<Mojolicious> with hooks, which allow code to be shared with all
+requests indiscriminately.
 
   # Dispatchers will not run if there's already a response code defined
   $app->hook(before_dispatch => sub {

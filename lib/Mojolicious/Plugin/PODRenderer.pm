@@ -78,14 +78,19 @@ sub _perldoc {
 
   # Rewrite headers
   my $url = $self->req->url->clone;
-  my @parts;
+  my (%anchors, @parts);
   $dom->find('h1, h2, h3')->each(
     sub {
       my $e = shift;
-      my $anchor = my $text = $e->all_text;
-      $anchor =~ s/\s+/_/g;
-      $anchor = url_escape $anchor, '^A-Za-z0-9_';
-      $anchor =~ s/\%//g;
+
+      # Anchor and text
+      my $name = my $text = $e->all_text;
+      $name =~ s/\s+/_/g;
+      my $anchor = $name = url_escape $name, '^A-Za-z0-9\-._~!()*';
+      my $i = 1;
+      $anchor = $name . $i++ while $anchors{$anchor}++;
+
+      # Rewrite
       push @parts, [] if $e->type eq 'h1' || !@parts;
       push @{$parts[-1]}, $text, $url->fragment($anchor)->to_abs;
       $e->replace_content(

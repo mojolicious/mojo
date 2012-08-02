@@ -731,8 +731,8 @@ play, they are basically router plugins.
   $r->get('/firefox_only')->over(agent => qr/Firefox/)->to('foo#bar');
 
 The method L<Mojolicious::Routes/"add_condition"> registers the new condition
-in the router, while L<Mojolicious::Routes/"over"> actually applies it to the
-route.
+in the router, while L<Mojolicious::Routes::Route/"over"> actually applies it
+to the route.
 
 =head2 Condition plugins
 

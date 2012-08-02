@@ -263,10 +263,9 @@ sub _build {
   my $buffer = '';
   my $offset = 0;
   while (1) {
-    my $chunk = $self->$method($offset);
 
     # No chunk yet, try again
-    next unless defined $chunk;
+    next unless defined(my $chunk = $self->$method($offset));
 
     # End of part
     last unless length $chunk;

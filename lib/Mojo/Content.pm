@@ -95,11 +95,11 @@ sub parse {
   return $self if $self->{state} eq 'headers';
   $self->_body;
 
-  # Relaxed parsing for wonky web servers
+  # Relaxed parsing
+  my $headers = $self->headers;
   if ($self->auto_relax) {
-    my $headers    = $self->headers;
     my $connection = $headers->connection || '';
-    my $len        = $headers->content_length // '';
+    my $len = $headers->content_length // '';
     $self->relaxed(1)
       if !length $len && ($connection =~ /close/i || $headers->content_type);
   }
@@ -128,12 +128,10 @@ sub parse {
 
   # Normal content
   else {
-    my $len = $self->headers->content_length || 0;
-    $self->{size} ||= 0;
-    my $need = $len - $self->{size};
 
-    # Slurp
-    if ($need > 0) {
+    my $len = $headers->content_length || 0;
+    $self->{size} ||= 0;
+    if ((my $need = $len - $self->{size}) > 0) {
       my $chunk = substr $self->{buffer}, 0, $need, '';
       $self->{size} += length $chunk;
       $self->emit(read => $chunk);
@@ -227,10 +225,9 @@ sub _build {
   my $buffer = '';
   my $offset = 0;
   while (1) {
-    my $chunk = $self->$method($offset);
 
     # No chunk yet, try again
-    next unless defined $chunk;
+    next unless defined(my $chunk = $self->$method($offset));
 
     # End of part
     last unless length $chunk;

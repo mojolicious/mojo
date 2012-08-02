@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 843;
+use Test::More tests => 847;
 
 # "When will I learn?
 #  The answer to life's problems aren't at the bottom of a bottle,
@@ -28,6 +28,7 @@ is $req->cookie('a'), undef, 'no value';
 
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding line limit
 $req = Mojo::Message::Request->new;
+is $req->headers->max_line_size, 10240, 'right size';
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse('Cookie: ' . ('a=b; ' x 131072) . "\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
@@ -56,6 +57,7 @@ is $req->body, '', 'no content';
 
 # Parse HTTP 1.1 message with content exceeding line limit
 $req = Mojo::Message::Request->new;
+is $req->max_message_size, 5242880, 'right size';
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 655360\x0d\x0a\x0d\x0a" . ('a=b; ' x 131072));
 ok $req->is_finished, 'request is finished';
@@ -79,6 +81,7 @@ is $req->body, '', 'no content';
 
 # Parse broken HTTP 1.1 message with start line exceeding line limit
 $req = Mojo::Message::Request->new;
+is $req->max_line_size, 10240, 'right size';
 $req->parse('GET /' . ('abcd' x 131072) . ' HTTP/1.1');
 ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum line size exceeded', 'right error';
@@ -103,6 +106,7 @@ is $req->body, '', 'no content';
 
 # Parse pipelined HTTP 1.1 messages exceeding leftover limit
 $req = Mojo::Message::Request->new;
+is $req->content->max_leftover_size, 262144, 'right size';
 $req->parse("GET /one HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 120000\x0d\x0a\x0d\x0a" . 'a' x 120000);
 ok $req->is_finished, 'request is finished';

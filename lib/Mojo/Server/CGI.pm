@@ -54,10 +54,9 @@ sub _write {
   # Write chunks to STDOUT
   my $offset = 0;
   while (1) {
-    my $chunk = $res->$method($offset);
 
     # No chunk yet, try again
-    sleep 1 and next unless defined $chunk;
+    sleep 1 and next unless defined(my $chunk = $res->$method($offset));
 
     # End of part
     last unless length $chunk;

@@ -714,8 +714,7 @@ it should not be called before the entire message body has been received.
 
   my $bytes = $message->leftovers;
 
-Alias for C<$message-E<gt>content-E<gt>leftovers>, usually
-L<Mojo::Content/"leftovers">.
+Get leftover data from content parser.
 
 =head2 C<param>
 

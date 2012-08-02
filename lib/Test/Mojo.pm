@@ -23,7 +23,8 @@ sub new {
 sub app {
   my ($self, $app) = @_;
   return $self->ua->app unless $app;
-  $self->ua->app($app) and return $self;
+  $self->ua->app($app);
+  return $self;
 }
 
 sub content_is {

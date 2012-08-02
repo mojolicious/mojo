@@ -15,7 +15,8 @@ has headers => sub { Mojo::Headers->new };
 #  Tell that to the good men who just lost their lives... SEMPER-FI!"
 sub move_to {
   my $self = shift;
-  $self->asset->move_to(@_) and return $self;
+  $self->asset->move_to(@_);
+  return $self;
 }
 
 sub size  { shift->asset->size }

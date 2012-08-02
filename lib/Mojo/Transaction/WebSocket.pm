@@ -190,7 +190,8 @@ sub res            { shift->handshake->res }
 
 sub resume {
   my $self = shift;
-  $self->handshake->resume and return $self;
+  $self->handshake->resume;
+  return $self;
 }
 
 sub send {

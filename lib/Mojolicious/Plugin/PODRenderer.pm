@@ -86,8 +86,9 @@ sub _perldoc {
       # Anchor and text
       my $name = my $text = $e->all_text;
       $name =~ s/\s+/_/g;
-      my $anchor = $name = url_escape $name, '^A-Za-z0-9\-._~!()*';
-      my $i = 1;
+      $name =~ s/\W//g;
+      my $anchor = $name;
+      my $i      = 1;
       $anchor = $name . $i++ while $anchors{$anchor}++;
 
       # Rewrite

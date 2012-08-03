@@ -118,10 +118,10 @@ sub is_status_class {
 # "Weaseling out of things is important to learn.
 #  It's what separates us from the animals... except the weasel."
 sub parse_start_line {
-  my $self = shift;
+  my ($self, $bufferref) = @_;
 
   # We have a full response line
-  return unless defined(my $line = get_line \$self->{buffer});
+  return unless defined(my $line = get_line $bufferref);
   return $self->error('Bad response start line')
     unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
   $self->version($1)->code($2)->message($3)->content->auto_relax(1);
@@ -222,7 +222,7 @@ Check response status class.
 
 =head2 C<parse_start_line>
 
-  $req->parse_start_line;
+  $req->parse_start_line(\$string);
 
 Parse start line.
 

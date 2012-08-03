@@ -178,11 +178,11 @@ sub parse {
 # "Bart, with $10,000, we'd be millionaires!
 #  We could buy all kinds of useful things like...love!"
 sub parse_start_line {
-  my $self = shift;
+  my ($self, $bufferref) = @_;
 
   # Ignore any leading empty lines
-  $self->{buffer} =~ s/^\s+//;
-  return unless defined(my $line = get_line \$self->{buffer});
+  $$bufferref =~ s/^\s+//;
+  return unless defined(my $line = get_line $bufferref);
 
   # We have a (hopefully) full request line
   return $self->error('Bad request start line', 400)
@@ -418,7 +418,7 @@ Parse HTTP request chunks or environment hash.
 
 =head2 C<parse_start_line>
 
-  $req->parse_start_line;
+  $req->parse_start_line(\$string);
 
 Parse start line.
 

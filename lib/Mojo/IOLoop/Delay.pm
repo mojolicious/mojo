@@ -16,6 +16,7 @@ sub end {
   my $self = shift;
   push @{$self->{args} ||= []}, @_;
   $self->emit_safe('finish', @{$self->{args}}) if --$self->{counter} <= 0;
+  return $self->{counter};
 }
 
 # "Mrs. Simpson, bathroom is not for customers.
@@ -97,8 +98,8 @@ C<end>.
 
 =head2 C<end>
 
-  $delay->end;
-  $delay->end(@args);
+  my $remaining = $delay->end;
+  my $remaining = $delay->end(@args);
 
 Decrement active event counter.
 

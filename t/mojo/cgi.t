@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 18;
+use Test::More tests => 22;
 
 # "My ears are burning.
 #  I wasn't talking about you, Dad.
@@ -52,7 +52,7 @@ my $message = '';
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  Mojolicious::Command::cgi->new->run;
+  is(Mojolicious::Command::cgi->new->run, 200, 'right status');
 }
 my $res
   = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
@@ -75,7 +75,7 @@ $message = '';
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  Mojolicious::Command::cgi->new->run('--nph');
+  is(Mojolicious::Command::cgi->new->run('--nph'), 200, 'right status');
 }
 $res = Mojo::Message::Response->new->parse($message);
 is $res->code, 200, 'right status';
@@ -102,7 +102,7 @@ $message = '';
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  Mojolicious::Command::cgi->new->run;
+  is(Mojolicious::Command::cgi->new->run, 200, 'right status');
 }
 like $message, qr/chunked/, 'is chunked';
 $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
@@ -124,7 +124,7 @@ $message = '';
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  Mojolicious::Command::cgi->new->run;
+  is(Mojolicious::Command::cgi->new->run, 200, 'right status');
 }
 $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
 is $res->code, 200, 'right status';

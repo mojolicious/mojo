@@ -106,8 +106,7 @@ sub _read {
   return $self->close if $read == 0;
 
   # Handle read
-  $self->emit_safe(read => $buffer);
-  $self->{active} = time;
+  $self->emit_safe(read => $buffer)->{active} = time;
 }
 
 sub _startup {

@@ -1,8 +1,11 @@
 
 3.20  2012-08-04
-  - Improved documentation.
   - Added get_start_line and parse_start_line methods to Mojo::Message,
     Mojo::Message::Request and Mojo::Message::Response.
+  - Improved end method in Mojo::IOLoop::Delay to return the number of
+    remaining events.
+  - Improved documentation.
+  - Improved tests.
 
 3.19  2012-08-03
   - Improved documentation.

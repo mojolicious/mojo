@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 85;
+use Test::More tests => 86;
 
 # "Hello, my name is Mr. Burns. I believe you have a letter for me.
 #  Okay Mr. Burns, what's your first name.
@@ -55,6 +55,9 @@ is $cookies[0]->value, 'bar',   'right value';
 is $cookies[1]->name,  'just',  'right name';
 is $cookies[1]->value, 'works', 'right value';
 is $cookies[2], undef, 'no third cookie';
+$jar->empty;
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+is $cookies[0], undef, 'no cookies';
 
 # Leading dot
 $jar = Mojo::UserAgent::CookieJar->new;

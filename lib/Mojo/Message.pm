@@ -394,7 +394,6 @@ sub _parse_formdata {
 
 sub _write {
   my ($self, $method, $chunk, $cb) = @_;
-  ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
   weaken $self;
   $self->content->$method($chunk, sub { shift and $self->$cb(@_) if $cb });
   return $self;

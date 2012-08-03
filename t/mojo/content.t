@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 17;
+use Test::More tests => 25;
 
 # "No matter how good you are at something,
 #  there's always about a million people better than you."
@@ -31,6 +31,26 @@ ok $content->body_contains('foo'),     'content contains "foo"';
 ok $content->body_contains('bar+'),    'content contains "bar+"';
 ok $content->body_contains('.'),       'content contains "."';
 ok $content->body_contains('.*?foo+'), 'content contains ".*?foo+"';
+
+# Dynamic content
+$content = Mojo::Content::Single->new;
+$content->write('Hello ')->write('World!');
+ok $content->is_dynamic, 'dynamic content';
+ok !$content->is_chunked, 'no chunked content';
+$content->write('');
+ok $content->is_dynamic, 'dynamic content';
+is $content->build_body, 'Hello World!', 'right content';
+
+# Chunked content
+$content = Mojo::Content::Single->new;
+$content->write_chunk('Hello ')->write_chunk('World!');
+ok $content->is_dynamic, 'dynamic content';
+ok $content->is_chunked, 'chunked content';
+$content->write_chunk('');
+ok $content->is_dynamic, 'dynamic content';
+is $content->build_body,
+  "6\x0d\x0aHello \x0d\x0a6\x0d\x0aWorld!\x0d\x0a0\x0d\x0a\x0d\x0a",
+  'right content';
 
 # Tainted environment
 $content = Mojo::Content::MultiPart->new;

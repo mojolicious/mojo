@@ -128,7 +128,7 @@ the following new ones.
 
 =head2 C<run>
 
-  $cgi->run;
+  my $status = $cgi->run;
 
 Run CGI.
 

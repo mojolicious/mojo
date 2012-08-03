@@ -83,7 +83,7 @@ for a full list see L<Mojo::Server::Hypnotoad/"SETTINGS">.
   app->start;
 
 Or just add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config> or
-L<Mojolicious::Config::JSONConfig> configuration file.
+L<Mojolicious::Plugin::JSONConfig> configuration file.
 
   # myapp.conf
   {hypnotoad => {listen => ['http://*:80'], workers => 10}};

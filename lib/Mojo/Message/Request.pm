@@ -185,11 +185,10 @@ sub parse_start_line {
   return unless defined(my $line = get_line $bufferref);
 
   # We have a (hopefully) full request line
-  return $self->error('Bad request start line', 400)
+  $self->error('Bad request start line', 400) and return
     unless $line =~ $START_LINE_RE;
   my $url = $self->method($1)->version($3)->url;
-  $1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2);
-  $self->{state} = 'content';
+  return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
 }
 
 sub proxy {
@@ -418,7 +417,7 @@ Parse HTTP request chunks or environment hash.
 
 =head2 C<parse_start_line>
 
-  $req->parse_start_line(\$string);
+  my $success = $req->parse_start_line(\$string);
 
 Parse start line.
 

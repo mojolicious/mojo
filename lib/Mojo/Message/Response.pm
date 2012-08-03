@@ -122,10 +122,9 @@ sub parse_start_line {
 
   # We have a full response line
   return unless defined(my $line = get_line $bufferref);
-  return $self->error('Bad response start line')
+  $self->error('Bad response start line') and return
     unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
-  $self->version($1)->code($2)->message($3)->content->auto_relax(1);
-  $self->{state} = 'content';
+  return !!$self->version($1)->code($2)->message($3)->content->auto_relax(1);
 }
 
 1;
@@ -222,7 +221,7 @@ Check response status class.
 
 =head2 C<parse_start_line>
 
-  $req->parse_start_line(\$string);
+  my $success = $req->parse_start_line(\$string);
 
 Parse start line.
 

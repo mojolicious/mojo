@@ -330,7 +330,7 @@ sub _parse {
       if $len > $self->max_line_size;
 
     # Parse
-    $self->parse_start_line(\$self->{buffer});
+    $self->{state} = 'content' if $self->parse_start_line(\$self->{buffer});
   }
 
   # Content
@@ -746,7 +746,7 @@ Parse message chunk.
 
 =head2 C<parse_start_line>
 
-  $message->parse_start_line(\$string);
+  my $success = $message->parse_start_line(\$string);
 
 Parse start line. Meant to be overloaded in a subclass.
 

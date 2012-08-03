@@ -69,12 +69,6 @@ sub client {
   return $id;
 }
 
-# DEPRECATED in Rainbow!
-sub client_class {
-  warn "Mojo::IOLoop->client_class is DEPRECATED!\n";
-  return @_ > 1 ? shift : 'Mojo::IOLoop::Client';
-}
-
 sub delay {
   my ($self, $cb) = @_;
   $self = $self->singleton unless ref $self;
@@ -155,12 +149,6 @@ sub server {
   return $id;
 }
 
-# DEPRECATED in Rainbow!
-sub server_class {
-  warn "Mojo::IOLoop->server_class is DEPRECATED!\n";
-  return @_ > 1 ? shift : 'Mojo::IOLoop::Server';
-}
-
 sub singleton { state $loop ||= shift->SUPER::new }
 
 sub start {
@@ -185,12 +173,6 @@ sub stream {
   # Find stream for id
   return unless my $c = $self->{connections}{$stream};
   return $c->{stream};
-}
-
-# DEPRECATED in Rainbow!
-sub stream_class {
-  warn "Mojo::IOLoop->stream_class is DEPRECATED!\n";
-  return @_ > 1 ? shift : 'Mojo::IOLoop::Stream';
 }
 
 sub timer {

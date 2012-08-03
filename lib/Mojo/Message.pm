@@ -109,12 +109,6 @@ sub dom {
   return @_ ? $dom->find(@_) : $dom;
 }
 
-# DEPRECATED in Rainbow!
-sub dom_class {
-  warn "Mojo::Message->dom_class is DEPRECATED!\n";
-  return @_ > 1 ? shift : 'Mojo::DOM';
-}
-
 sub error {
   my $self = shift;
 
@@ -201,23 +195,17 @@ sub json {
   return $pointer ? Mojo::JSON::Pointer->new->get($data, $pointer) : $data;
 }
 
-# DEPRECATED in Rainbow!
-sub json_class {
-  warn "Mojo::Message->json_class is DEPRECATED!\n";
-  return @_ > 1 ? shift : 'Mojo::JSON';
-}
-
 sub leftovers { shift->content->leftovers }
 
 sub param { shift->body_params->param(@_) }
 
-sub parse { shift->_parse(0, @_) }
+sub parse { shift->_parse(parse => @_) }
 
 sub parse_start_line {
   croak 'Method "parse_start_line" not implemented by subclass';
 }
 
-sub parse_until_body { shift->_parse(1, @_) }
+sub parse_until_body { shift->_parse(parse_until_body => @_) }
 
 sub start_line_size { length shift->build_start_line }
 
@@ -309,7 +297,7 @@ sub _nest {
 }
 
 sub _parse {
-  my ($self, $until_body, $chunk) = @_;
+  my ($self, $method, $chunk) = @_;
 
   # Add chunk
   $chunk //= '';
@@ -334,10 +322,8 @@ sub _parse {
   }
 
   # Content
-  if ($self->{state} ~~ [qw(content finished)]) {
-    my $method = $until_body ? 'parse_until_body' : 'parse';
-    $self->content($self->content->$method(delete $self->{buffer}));
-  }
+  $self->content($self->content->$method(delete $self->{buffer}))
+    if $self->{state} ~~ [qw(content finished)];
 
   # Check line size
   return $self->error('Maximum line size exceeded', 431)

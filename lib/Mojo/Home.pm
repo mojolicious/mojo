@@ -16,12 +16,6 @@ use Mojo::Util qw(class_to_path slurp);
 #  please save me Superman."
 sub new { shift->SUPER::new->parse(@_) }
 
-# DEPRECATED in Rainbow!
-sub app_class {
-  warn "Mojo::Home->app_class is DEPRECATED!\n";
-  return @_ > 1 ? shift : 'Mojo::HelloWorld';
-}
-
 sub detect {
   my $self = shift;
 

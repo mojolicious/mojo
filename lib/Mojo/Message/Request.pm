@@ -130,15 +130,15 @@ sub params {
 
 sub parse {
   my $self = shift;
+  my $env  = @_ > 1 ? {@_} : ref $_[0] eq 'HASH' ? $_[0] : undef;
+  my @args = $env ? undef : @_;
 
   # CGI like environment
-  my $env = @_ > 1 ? {@_} : ref $_[0] eq 'HASH' ? $_[0] : undef;
   $self->env($env)->_parse_env($env) if $env;
-  $self->content($self->content->parse_body($env ? undef : shift))
-    if $self->{state} ~~ 'cgi';
+  $self->content($self->content->parse_body(@args)) if $self->{state} ~~ 'cgi';
 
   # Pass through
-  $self->SUPER::parse($env ? undef : @_);
+  $self->SUPER::parse(@args);
 
   # Check if we can fix things that require all headers
   return $self unless $self->is_finished;

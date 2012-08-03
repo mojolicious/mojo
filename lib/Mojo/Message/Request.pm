@@ -54,6 +54,20 @@ sub cookies {
   return $self;
 }
 
+sub extract_start_line {
+  my ($self, $bufferref) = @_;
+
+  # Ignore any leading empty lines
+  $$bufferref =~ s/^\s+//;
+  return unless defined(my $line = get_line $bufferref);
+
+  # We have a (hopefully) full request line
+  $self->error('Bad request start line', 400) and return
+    unless $line =~ $START_LINE_RE;
+  my $url = $self->method($1)->version($3)->url;
+  return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
+}
+
 sub fix_headers {
   my $self = shift;
   $self->{fix} ? return $self : $self->SUPER::fix_headers(@_);
@@ -178,20 +192,6 @@ sub parse {
 
 # "Bart, with $10,000, we'd be millionaires!
 #  We could buy all kinds of useful things like...love!"
-sub parse_start_line {
-  my ($self, $bufferref) = @_;
-
-  # Ignore any leading empty lines
-  $$bufferref =~ s/^\s+//;
-  return unless defined(my $line = get_line $bufferref);
-
-  # We have a (hopefully) full request line
-  $self->error('Bad request start line', 400) and return
-    unless $line =~ $START_LINE_RE;
-  my $url = $self->method($1)->version($3)->url;
-  return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
-}
-
 sub proxy {
   my $self = shift;
   return $self->{proxy} unless @_;
@@ -359,6 +359,12 @@ Clone request if possible, otherwise return C<undef>.
 
 Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
+=head2 C<extract_start_line>
+
+  my $success = $req->extract_start_line(\$string);
+
+Extract request line from string.
+
 =head2 C<fix_headers>
 
   $req = $req->fix_headers;
@@ -410,12 +416,6 @@ request body has been received.
   $req = $req->parse({REQUEST_METHOD => 'GET'});
 
 Parse HTTP request chunks or environment hash.
-
-=head2 C<parse_start_line>
-
-  my $success = $req->parse_start_line(\$string);
-
-Parse request line.
 
 =head2 C<proxy>
 

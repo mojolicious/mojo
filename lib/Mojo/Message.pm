@@ -125,6 +125,10 @@ sub error {
   return $self;
 }
 
+sub extract_start_line {
+  croak 'Method "extract_start_line" not implemented by subclass';
+}
+
 sub fix_headers {
   my $self = shift;
 
@@ -193,10 +197,6 @@ sub leftovers { shift->content->leftovers }
 sub param { shift->body_params->param(@_) }
 
 sub parse { shift->_parse(parse => @_) }
-
-sub parse_start_line {
-  croak 'Method "parse_start_line" not implemented by subclass';
-}
 
 sub parse_until_body { shift->_parse(parse_until_body => @_) }
 
@@ -293,8 +293,7 @@ sub _parse {
   my ($self, $method, $chunk) = @_;
 
   # Add chunk
-  $chunk //= '';
-  $self->{raw_size} += length $chunk;
+  $self->{raw_size} += length($chunk //= '');
   $self->{buffer} .= $chunk;
 
   # Check message size
@@ -310,8 +309,8 @@ sub _parse {
     return $self->error('Maximum line size exceeded', 431)
       if $len > $self->max_line_size;
 
-    # Parse
-    $self->{state} = 'content' if $self->parse_start_line(\$self->{buffer});
+    # Extract
+    $self->{state} = 'content' if $self->extract_start_line(\$self->{buffer});
   }
 
   # Content
@@ -404,8 +403,8 @@ Mojo::Message - HTTP message base class
   use Mojo::Base 'Mojo::Message';
 
   sub cookies              {...}
+  sub extract_start_line   {...}
   sub get_start_line_chunk {...}
-  sub parse_start_line     {...}
 
 =head1 DESCRIPTION
 
@@ -596,6 +595,12 @@ before the entire message body has been received.
 
 Parser errors and codes.
 
+=head2 C<extract_start_line>
+
+  my $success = $message->extract_start_line(\$string);
+
+Extract start line from string. Meant to be overloaded in a subclass.
+
 =head2 C<fix_headers>
 
   $message = $message->fix_headers;
@@ -705,12 +710,6 @@ not be called before the entire message body has been received.
   $message = $message->parse('HTTP/1.1 200 OK...');
 
 Parse message chunk.
-
-=head2 C<parse_start_line>
-
-  my $success = $message->parse_start_line(\$string);
-
-Parse start line. Meant to be overloaded in a subclass.
 
 =head2 C<parse_until_body>
 

@@ -28,14 +28,11 @@ sub DESTROY {
 sub run {
   my $self = shift;
 
-  # Start accepting connections
-  $self->start;
-
   # Signals
   $SIG{INT} = $SIG{TERM} = sub { exit 0 };
 
-  # Change user/group and start loop
-  $self->setuidgid->ioloop->start;
+  # Change user/group and start accepting connections
+  $self->start->setuidgid->ioloop->start;
 }
 
 sub setuidgid {
@@ -49,6 +46,7 @@ sub start {
   my $self = shift;
   $self->_listen($_) for @{$self->listen};
   $self->ioloop->max_connections($self->max_clients);
+  return $self;
 }
 
 sub _build_tx {
@@ -134,8 +132,7 @@ sub _finish {
 }
 
 sub _group {
-  my $self = shift;
-  return unless my $group = $self->group;
+  return unless my $group = shift->group;
   croak qq{Group "$group" does not exist}
     unless defined(my $gid = (getgrnam($group))[2]);
   POSIX::setgid($gid) or croak qq{Can't switch to group "$group": $!};
@@ -438,7 +435,7 @@ Set user and group for process.
 
 =head2 C<start>
 
-  $daemon->start;
+  $daemon = $daemon->start;
 
 Start accepting connections.
 

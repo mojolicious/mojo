@@ -152,8 +152,7 @@ sub parse_until_body {
   my ($self, $chunk) = @_;
 
   # Add chunk
-  $chunk //= '';
-  $self->{raw_size} += length $chunk;
+  $self->{raw_size} += length($chunk //= '');
   $self->{pre_buffer} .= $chunk;
 
   # Parser started

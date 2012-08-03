@@ -91,6 +91,18 @@ sub cookies {
 
 sub default_message { $MESSAGES{$_[1] || $_[0]->code || 404} || '' }
 
+# "Weaseling out of things is important to learn.
+#  It's what separates us from the animals... except the weasel."
+sub extract_start_line {
+  my ($self, $bufferref) = @_;
+
+  # We have a full response line
+  return unless defined(my $line = get_line $bufferref);
+  $self->error('Bad response start line') and return
+    unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
+  return !!$self->version($1)->code($2)->message($3)->content->auto_relax(1);
+}
+
 sub fix_headers {
   my $self = shift;
   $self->{fix} ? return $self : $self->SUPER::fix_headers(@_);
@@ -123,18 +135,6 @@ sub is_status_class {
   my ($self, $class) = @_;
   return unless my $code = $self->code;
   return $code >= $class && $code < ($class + 100);
-}
-
-# "Weaseling out of things is important to learn.
-#  It's what separates us from the animals... except the weasel."
-sub parse_start_line {
-  my ($self, $bufferref) = @_;
-
-  # We have a full response line
-  return unless defined(my $line = get_line $bufferref);
-  $self->error('Bad response start line') and return
-    unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
-  return !!$self->version($1)->code($2)->message($3)->content->auto_relax(1);
 }
 
 1;
@@ -211,6 +211,12 @@ Access response cookies, usually L<Mojo::Cookie::Response> objects.
 
 Generate default response message for code.
 
+=head2 C<extract_start_line>
+
+  my $success = $req->extract_start_line(\$string);
+
+Extract status line from string.
+
 =head2 C<fix_headers>
 
   $res = $res->fix_headers;
@@ -228,12 +234,6 @@ Get a chunk of status line data starting from a specific position.
   my $success = $res->is_status_class(200);
 
 Check response status class.
-
-=head2 C<parse_start_line>
-
-  my $success = $req->parse_start_line(\$string);
-
-Parse status line.
 
 =head1 SEE ALSO
 

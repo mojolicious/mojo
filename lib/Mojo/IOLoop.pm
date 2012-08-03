@@ -89,8 +89,7 @@ sub is_running {
 
 sub one_tick {
   my $self = shift;
-  $self = $self->singleton unless ref $self;
-  $self->reactor->one_tick;
+  (ref $self ? $self : $self->singleton)->reactor->one_tick;
 }
 
 sub recurring {
@@ -153,9 +152,8 @@ sub singleton { state $loop ||= shift->SUPER::new }
 
 sub start {
   my $self = shift;
-  $self = $self->singleton unless ref $self;
   croak 'Mojo::IOLoop already running' if $self->is_running;
-  $self->reactor->start;
+  (ref $self ? $self : $self->singleton)->reactor->start;
 }
 
 sub stop {

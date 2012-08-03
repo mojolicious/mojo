@@ -76,11 +76,13 @@ sub write {
 
   # Write with roundtrip
   if ($cb) { $self->once(drain => $cb) }
-  else     { return unless length $self->{buffer} }
+  else     { return $self unless length $self->{buffer} }
 
   # Start writing
   $self->reactor->watch($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};
+
+  return $self;
 }
 
 sub _read {
@@ -332,8 +334,8 @@ Steal handle from stream and prevent it from getting closed automatically.
 
 =head2 C<write>
 
-  $stream->write('Hello!');
-  $stream->write('Hello!', sub {...});
+  $stream = $stream->write('Hello!');
+  $stream = $stream->write('Hello!', sub {...});
 
 Write data to stream, the optional drain callback will be invoked once all
 data has been written.

@@ -140,7 +140,7 @@ Mojo::IOLoop->server(
         my ($stream, $chunk) = @_;
         $buffer .= $chunk;
         return unless $buffer eq 'acceptedhello';
-        $stream->write('world', sub { shift->close });
+        $stream->write('wo')->write('')->write('rld', sub { shift->close });
       }
     );
   }

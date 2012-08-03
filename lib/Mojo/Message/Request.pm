@@ -83,32 +83,42 @@ sub fix_headers {
   return $self;
 }
 
-sub get_start_line {
-  my $self = shift;
+sub get_start_line_chunk {
+  my ($self, $offset) = @_;
 
-  # Path
-  my $url   = $self->url;
-  my $path  = $url->path->to_string;
-  my $query = $url->query->to_string;
-  $path .= "?$query" if $query;
-  $path = "/$path" unless $path =~ m!^/!;
+  # Request line
+  unless (defined $self->{start_buffer}) {
 
-  # CONNECT
-  my $method = uc $self->method;
-  if ($method eq 'CONNECT') {
-    my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
-    $path = $url->host . ":$port";
+    # Path
+    my $url   = $self->url;
+    my $path  = $url->path->to_string;
+    my $query = $url->query->to_string;
+    $path .= "?$query" if $query;
+    $path = "/$path" unless $path =~ m!^/!;
+
+    # CONNECT
+    my $method = uc $self->method;
+    if ($method eq 'CONNECT') {
+      my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
+      $path = $url->host . ":$port";
+    }
+
+    # Proxy
+    elsif ($self->proxy) {
+      my $clone = $url = $url->clone->userinfo(undef);
+      my $upgrade = lc($self->headers->upgrade || '');
+      my $scheme = $url->scheme || '';
+      $path = $clone unless $upgrade eq 'websocket' || $scheme eq 'https';
+    }
+
+    $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";
   }
 
-  # Proxy
-  elsif ($self->proxy) {
-    my $clone = $url = $url->clone->userinfo(undef);
-    my $upgrade = lc($self->headers->upgrade || '');
-    my $scheme = $url->scheme || '';
-    $path = $clone unless $upgrade eq 'websocket' || $scheme eq 'https';
-  }
+  # Progress
+  $self->emit(progress => 'start_line', $offset);
 
-  return "$method $path HTTP/@{[$self->version]}\x0d\x0a";
+  # Chunk
+  return substr $self->{start_buffer}, $offset, 131072;
 }
 
 sub is_secure {
@@ -355,11 +365,11 @@ Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
 Make sure request has all required headers for the current HTTP version.
 
-=head2 C<get_start_line>
+=head2 C<get_start_line_chunk>
 
-  my $string = $req->get_start_line;
+  my $string = $req->get_start_line_chunk($offset);
 
-Get all start line data in one chunk.
+Get a chunk of request line data starting from a specific position.
 
 =head2 C<is_secure>
 
@@ -405,7 +415,7 @@ Parse HTTP request chunks or environment hash.
 
   my $success = $req->parse_start_line(\$string);
 
-Parse start line.
+Parse request line.
 
 =head2 C<proxy>
 

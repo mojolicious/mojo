@@ -163,15 +163,8 @@ sub get_header_chunk {
   return $self->fix_headers->content->get_header_chunk($offset);
 }
 
-sub get_start_line {
-  croak 'Method "get_start_line" not implemented by subclass';
-}
-
 sub get_start_line_chunk {
-  my ($self, $offset) = @_;
-  $self->emit(progress => 'start_line', $offset);
-  return substr $self->{start_line_buffer} //= $self->get_start_line, $offset,
-    131072;
+  croak 'Method "get_start_line_chunk" not implemented by subclass';
 }
 
 sub has_leftovers { shift->content->has_leftovers }
@@ -410,9 +403,9 @@ Mojo::Message - HTTP message base class
   package Mojo::Message::MyMessage;
   use Mojo::Base 'Mojo::Message';
 
-  sub cookies          {...}
-  sub get_start_line   {...}
-  sub parse_start_line {...}
+  sub cookies              {...}
+  sub get_start_line_chunk {...}
+  sub parse_start_line     {...}
 
 =head1 DESCRIPTION
 
@@ -621,17 +614,12 @@ Get a chunk of body data starting from a specific position.
 
 Get a chunk of header data, starting from a specific position.
 
-=head2 C<get_start_line>
-
-  my $string = $message->get_start_line;
-
-Get all start line data in one chunk. Meant to be overloaded in a subclass.
-
 =head2 C<get_start_line_chunk>
 
   my $string = $message->get_start_line_chunk($offset);
 
-Get a chunk of start line data starting from a specific position.
+Get a chunk of start line data starting from a specific position. Meant to be
+overloaded in a subclass.
 
 =head2 C<has_leftovers>
 

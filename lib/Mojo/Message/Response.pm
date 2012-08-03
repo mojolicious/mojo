@@ -102,11 +102,21 @@ sub fix_headers {
   return $self;
 }
 
-sub get_start_line {
-  my $self    = shift;
-  my $code    = $self->code || 404;
-  my $message = $self->message || $self->default_message;
-  return "HTTP/@{[$self->version]} $code $message\x0d\x0a";
+sub get_start_line_chunk {
+  my ($self, $offset) = @_;
+
+  # Status line
+  unless (defined $self->{start_buffer}) {
+    my $code    = $self->code    || 404;
+    my $message = $self->message || $self->default_message;
+    $self->{start_buffer} = "HTTP/@{[$self->version]} $code $message\x0d\x0a";
+  }
+
+  # Progress
+  $self->emit(progress => 'start_line', $offset);
+
+  # Chunk
+  return substr $self->{start_buffer}, $offset, 131072;
 }
 
 sub is_status_class {
@@ -207,11 +217,11 @@ Generate default response message for code.
 
 Make sure response has all required headers for the current HTTP version.
 
-=head2 C<get_start_line>
+=head2 C<get_start_line_chunk>
 
-  my $string = $res->get_start_line;
+  my $string = $res->get_start_line_chunk($offset);
 
-Get all start line data in one chunk.
+Get a chunk of status line data starting from a specific position.
 
 =head2 C<is_status_class>
 
@@ -223,7 +233,7 @@ Check response status class.
 
   my $success = $req->parse_start_line(\$string);
 
-Parse start line.
+Parse status line.
 
 =head1 SEE ALSO
 

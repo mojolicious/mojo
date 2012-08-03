@@ -129,14 +129,14 @@ Construct a new L<Mojo::ByteStream> object.
 
   $stream = $stream->b64_decode;
 
-Manipulate bytestream with L<Mojo::Util/"b64_decode">.
+Base64 decode bytestream with L<Mojo::Util/"b64_decode">.
 
 =head2 C<b64_encode>
 
   $stream = $stream->b64_encode;
   $stream = $stream->b64_encode("\n");
 
-Manipulate bytestream with L<Mojo::Util/"b64_encode">.
+Base64 encode bytestream with L<Mojo::Util/"b64_encode">.
 
   b('foo bar baz')->b64_encode('')->say;
 
@@ -144,7 +144,7 @@ Manipulate bytestream with L<Mojo::Util/"b64_encode">.
 
   $stream = $stream->camelize;
 
-Manipulate bytestream with L<Mojo::Util/"camelize">.
+Camelize bytestream with L<Mojo::Util/"camelize">.
 
 =head2 C<clone>
 
@@ -156,14 +156,14 @@ Clone bytestream.
 
   $stream = $stream->decamelize;
 
-Manipulate bytestream with L<Mojo::Util/"decamelize">.
+Decamelize bytestream with L<Mojo::Util/"decamelize">.
 
 =head2 C<decode>
 
   $stream = $stream->decode;
   $stream = $stream->decode('iso-8859-1');
 
-Manipulate bytestream with L<Mojo::Util/"decode">, defaults to C<UTF-8>.
+Decode bytestream with L<Mojo::Util/"decode">, defaults to C<UTF-8>.
 
   $stream->decode('UTF-16LE')->unquote->trim->say;
 
@@ -172,7 +172,7 @@ Manipulate bytestream with L<Mojo::Util/"decode">, defaults to C<UTF-8>.
   $stream = $stream->encode;
   $stream = $stream->encode('iso-8859-1');
 
-Manipulate bytestream with L<Mojo::Util/"encode">, defaults to C<UTF-8>.
+Encode bytestream with L<Mojo::Util/"encode">, defaults to C<UTF-8>.
 
   $stream->trim->quote->encode->say;
 
@@ -180,13 +180,13 @@ Manipulate bytestream with L<Mojo::Util/"encode">, defaults to C<UTF-8>.
 
   $stream = $stream->hmac_md5_sum('passw0rd');
 
-Manipulate bytestream with L<Mojo::Util/"hmac_md5_sum">.
+Generate HMAC-MD5 checksum for bytestream with L<Mojo::Util/"hmac_md5_sum">.
 
 =head2 C<hmac_sha1_sum>
 
   $stream = $stream->hmac_sha1_sum('passw0rd');
 
-Manipulate bytestream with L<Mojo::Util/"hmac_sha1_sum">.
+Generate HMAC-SHA1 checksum for bytestream with L<Mojo::Util/"hmac_sha1_sum">.
 
   b('foo bar baz')->hmac_sha1_sum('secr3t')->quote->say;
 
@@ -195,7 +195,7 @@ Manipulate bytestream with L<Mojo::Util/"hmac_sha1_sum">.
   $stream = $stream->html_escape;
   $stream = $stream->html_escape('^\n\r\t !#$%(-;=?-~');
 
-Manipulate bytestream with L<Mojo::Util/"html_escape">.
+Escape unsafe characters in bytestream with L<Mojo::Util/"html_escape">.
 
   b('<html>')->html_escape->say;
 
@@ -203,7 +203,7 @@ Manipulate bytestream with L<Mojo::Util/"html_escape">.
 
   $stream = $stream->html_unescape;
 
-Manipulate bytestream with L<Mojo::Util/"html_unescape">.
+Unescape all HTML5 entities in bytestream with L<Mojo::Util/"html_unescape">.
 
   b('&lt;html&gt;')->html_unescape->url_escape->say;
 
@@ -211,31 +211,31 @@ Manipulate bytestream with L<Mojo::Util/"html_unescape">.
 
   $stream = $stream->md5_bytes;
 
-Manipulate bytestream with L<Mojo::Util/"md5_bytes">.
+Generate binary MD5 checksum for bytestream with L<Mojo::Util/"md5_bytes">.
 
 =head2 C<md5_sum>
 
   $stream = $stream->md5_sum;
 
-Manipulate bytestream with L<Mojo::Util/"md5_sum">.
+Generate MD5 checksum for bytestream with L<Mojo::Util/"md5_sum">.
 
 =head2 C<punycode_decode>
 
   $stream = $stream->punycode_decode;
 
-Manipulate bytestream with L<Mojo::Util/"punycode_decode">.
+Punycode decode bytestream with L<Mojo::Util/"punycode_decode">.
 
 =head2 C<punycode_encode>
 
   $stream = $stream->punycode_encode;
 
-Manipulate bytestream with L<Mojo::Util/"punycode_encode">.
+Punycode encode bytestream with L<Mojo::Util/"punycode_encode">.
 
 =head2 C<quote>
 
   $stream = $stream->quote;
 
-Manipulate bytestream with L<Mojo::Util/"quote">.
+Quote bytestream with L<Mojo::Util/"quote">.
 
 =head2 C<say>
 
@@ -248,7 +248,7 @@ Print bytestream to handle or STDOUT and append a newline.
 
   my $success = $stream->secure_compare($string);
 
-Check bytestream with L<Mojo::Util/"secure_compare">.
+Compare bytestream with L<Mojo::Util/"secure_compare">.
 
   say 'Match!' if b('foo')->secure_compare('foo');
 
@@ -256,13 +256,13 @@ Check bytestream with L<Mojo::Util/"secure_compare">.
 
   $stream = $stream->sha1_bytes;
 
-Manipulate bytestream with L<Mojo::Util/"sha1_bytes">.
+Generate binary SHA1 checksum for bytestream with L<Mojo::Util/"sha1_bytes">.
 
 =head2 C<sha1_sum>
 
   $stream = $stream->sha1_sum;
 
-Manipulate bytestream with L<Mojo::Util/"sha1_sum">.
+Generate SHA1 checksum for bytestream with L<Mojo::Util/"sha1_sum">.
 
 =head2 C<size>
 
@@ -274,7 +274,7 @@ Size of bytestream.
 
   $stream = $stream->slurp;
 
-Manipulate bytestream with L<Mojo::Util/"slurp">.
+Read all data into bytestream with L<Mojo::Util/"slurp">.
 
   b('/home/sri/myapp.pl')->slurp->split("\n")->shuffle->join("\n")->say;
 
@@ -305,20 +305,22 @@ Stringify bytestream.
 
   $stream = $stream->trim;
 
-Manipulate bytestream with L<Mojo::Util/"trim">.
+Trim whitespace characters from both ends of bytestream with
+L<Mojo::Util/"trim">.
 
 =head2 C<unquote>
 
   $stream = $stream->unquote;
 
-Manipulate bytestream with L<Mojo::Util/"unquote">.
+Unquote bytestream with L<Mojo::Util/"unquote">.
 
 =head2 C<url_escape>
 
   $stream = $stream->url_escape;
   $stream = $stream->url_escape('^A-Za-z0-9\-._~');
 
-Manipulate bytestream with L<Mojo::Util/"url_escape">.
+Percent encode all unsafe characters in bytestream with
+L<Mojo::Util/"url_escape">.
 
   b('foo bar baz')->url_escape->say;
 
@@ -326,7 +328,8 @@ Manipulate bytestream with L<Mojo::Util/"url_escape">.
 
   $stream = $stream->url_unescape;
 
-Manipulate bytestream with L<Mojo::Util/"url_unescape">.
+Decode percent encoded characters in bytestream with
+L<Mojo::Util/"url_unescape">.
 
   b('%3Chtml%3E')->url_unescape->html_escape->say;
 
@@ -334,7 +337,8 @@ Manipulate bytestream with L<Mojo::Util/"url_unescape">.
 
   $stream = $stream->xml_escape;
 
-Manipulate bytestream with L<Mojo::Util/"xml_escape">.
+Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in
+bytestream, this is a much faster version of C<html_escape>.
 
 =head1 SEE ALSO
 

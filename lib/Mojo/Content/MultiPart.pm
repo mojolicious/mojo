@@ -24,24 +24,13 @@ sub body_size {
   my $self = shift;
 
   # Check for Content-Lenght header
-  my $content_length = $self->headers->content_length;
-  return $content_length if $content_length;
+  my $content_len = $self->headers->content_length;
+  return $content_len if $content_len;
 
   # Calculate length of whole body
-  my $boundary_length = length($self->build_boundary) + 6;
-  my $len             = 0;
-  $len += $boundary_length - 2;
-  for my $part (@{$self->parts}) {
-
-    # Header
-    $len += $part->header_size;
-
-    # Body
-    $len += $part->body_size;
-
-    # Boundary
-    $len += $boundary_length;
-  }
+  my $boundary_len = length($self->build_boundary) + 6;
+  my $len          = $boundary_len - 2;
+  $len += $_->header_size + $_->body_size + $boundary_len for @{$self->parts};
 
   return $len;
 }
@@ -52,19 +41,15 @@ sub build_boundary {
   # Check for existing boundary
   my $headers = $self->headers;
   my $type = $headers->content_type || '';
-  my $boundary;
-  $type =~ /boundary="?([^\s"]+)"?/i and $boundary = $1;
-  return $boundary if $boundary;
+  $type =~ /boundary="?([^\s"]+)"?/i and return $1;
 
   # Generate and check boundary
+  my $boundary;
   my $size = 1;
   while (1) {
-    $boundary = b64_encode join('', map chr(rand(256)), 1 .. $size * 3);
+    $boundary = b64_encode join('', map chr(rand(256)), 1 .. $size++ * 3);
     $boundary =~ s/\W/X/g;
-
-    # Check parts for boundary
     last unless $self->body_contains($boundary);
-    $size++;
   }
 
   # Add boundary to Content-Type header
@@ -89,9 +74,9 @@ sub get_body_chunk {
   return $self->generate_body_chunk($offset) if $self->{dynamic};
 
   # First boundary
-  my $boundary        = $self->build_boundary;
-  my $boundary_length = length($boundary) + 6;
-  my $len             = $boundary_length - 2;
+  my $boundary     = $self->build_boundary;
+  my $boundary_len = length($boundary) + 6;
+  my $len          = $boundary_len - 2;
   return substr "--$boundary\x0d\x0a", $offset if $len > $offset;
 
   # Parts
@@ -100,19 +85,19 @@ sub get_body_chunk {
     my $part = $parts->[$i];
 
     # Headers
-    my $header_length = $part->header_size;
+    my $header_len = $part->header_size;
     return $part->get_header_chunk($offset - $len)
-      if ($len + $header_length) > $offset;
-    $len += $header_length;
+      if ($len + $header_len) > $offset;
+    $len += $header_len;
 
     # Content
-    my $content_length = $part->body_size;
+    my $content_len = $part->body_size;
     return $part->get_body_chunk($offset - $len)
-      if ($len + $content_length) > $offset;
-    $len += $content_length;
+      if ($len + $content_len) > $offset;
+    $len += $content_len;
 
     # Boundary
-    if (($len + $boundary_length) > $offset) {
+    if (($len + $boundary_len) > $offset) {
 
       # Last boundary
       return substr "\x0d\x0a--$boundary--", $offset - $len
@@ -121,36 +106,11 @@ sub get_body_chunk {
       # Middle boundary
       return substr "\x0d\x0a--$boundary\x0d\x0a", $offset - $len;
     }
-    $len += $boundary_length;
+    $len += $boundary_len;
   }
 }
 
 sub is_multipart {1}
-
-sub _parse_multipart {
-  my $self = shift;
-
-  # Parse
-  $self->{multi_state} ||= 'multipart_preamble';
-  my $boundary = $self->boundary;
-  until ($self->is_finished) {
-
-    # Preamble
-    if ($self->{multi_state} ~~ 'multipart_preamble') {
-      last unless $self->_parse_multipart_preamble($boundary);
-    }
-
-    # Boundary
-    elsif ($self->{multi_state} ~~ 'multipart_boundary') {
-      last unless $self->_parse_multipart_boundary($boundary);
-    }
-
-    # Body
-    elsif ($self->{multi_state} ~~ 'multipart_body') {
-      last unless $self->_parse_multipart_body($boundary);
-    }
-  }
-}
 
 sub _parse_multipart_body {
   my ($self, $boundary) = @_;
@@ -217,8 +177,28 @@ sub _parse_multipart_preamble {
 
 sub _read {
   my ($self, $chunk) = @_;
+
+  # Parse
   $self->{multipart} .= $chunk;
-  $self->_parse_multipart;
+  $self->{multi_state} ||= 'multipart_preamble';
+  my $boundary = $self->boundary;
+  until ($self->is_finished) {
+
+    # Preamble
+    if ($self->{multi_state} ~~ 'multipart_preamble') {
+      last unless $self->_parse_multipart_preamble($boundary);
+    }
+
+    # Boundary
+    elsif ($self->{multi_state} ~~ 'multipart_boundary') {
+      last unless $self->_parse_multipart_boundary($boundary);
+    }
+
+    # Body
+    elsif ($self->{multi_state} ~~ 'multipart_body') {
+      last unless $self->_parse_multipart_body($boundary);
+    }
+  }
 }
 
 1;

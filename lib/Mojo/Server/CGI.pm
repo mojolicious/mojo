@@ -59,12 +59,12 @@ sub _write {
     sleep 1 and next unless defined(my $chunk = $res->$method($offset));
 
     # End of part
-    last unless length $chunk;
+    last unless my $len = length $chunk;
 
     # Part
+    $offset += $len;
     return unless STDOUT->opened;
     print STDOUT $chunk;
-    $offset += length $chunk;
   }
 
   return 1;

@@ -265,10 +265,10 @@ sub _build {
     next unless defined(my $chunk = $self->$method($offset));
 
     # End of part
-    last unless length $chunk;
+    last unless my $len = length $chunk;
 
     # Part
-    $offset += length $chunk;
+    $offset += $len;
     $buffer .= $chunk;
   }
 

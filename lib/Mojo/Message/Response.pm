@@ -102,22 +102,22 @@ sub fix_headers {
   return $self;
 }
 
-sub is_status_class {
-  my ($self, $class) = @_;
-  return unless my $code = $self->code;
-  return $code >= $class && $code < ($class + 100);
-}
-
-sub _build_start_line {
+sub get_start_line {
   my $self    = shift;
   my $code    = $self->code || 404;
   my $message = $self->message || $self->default_message;
   return "HTTP/@{[$self->version]} $code $message\x0d\x0a";
 }
 
+sub is_status_class {
+  my ($self, $class) = @_;
+  return unless my $code = $self->code;
+  return $code >= $class && $code < ($class + 100);
+}
+
 # "Weaseling out of things is important to learn.
 #  It's what separates us from the animals... except the weasel."
-sub _parse_start_line {
+sub parse_start_line {
   my $self = shift;
 
   # We have a full response line
@@ -208,11 +208,23 @@ Generate default response message for code.
 
 Make sure response has all required headers for the current HTTP version.
 
+=head2 C<get_start_line>
+
+  my $string = $res->get_start_line;
+
+Get all start line data as one chunk.
+
 =head2 C<is_status_class>
 
   my $success = $res->is_status_class(200);
 
 Check response status class.
+
+=head2 C<parse_start_line>
+
+  $req->parse_start_line;
+
+Parse start line.
 
 =head1 SEE ALSO
 

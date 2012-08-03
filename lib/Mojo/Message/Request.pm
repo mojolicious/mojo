@@ -84,6 +84,35 @@ sub fix_headers {
   return $self;
 }
 
+sub get_start_line {
+  my $self = shift;
+
+  # Path
+  my $url   = $self->url;
+  my $path  = $url->path->to_string;
+  my $query = $url->query->to_string;
+  $path .= "?$query" if $query;
+  $path = "/$path" unless $path =~ m!^/!;
+
+  # CONNECT
+  my $method = uc $self->method;
+  if ($method eq 'CONNECT') {
+    my $host = $url->host;
+    my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
+    $path = "$host:$port";
+  }
+
+  # Proxy
+  elsif ($self->proxy) {
+    my $clone = $url = $url->clone->userinfo(undef);
+    my $upgrade = lc($self->headers->upgrade || '');
+    my $scheme = $url->scheme || '';
+    $path = $clone unless $upgrade eq 'websocket' || $scheme eq 'https';
+  }
+
+  return "$method $path HTTP/@{[$self->version]}\x0d\x0a";
+}
+
 sub is_secure {
   my $url = shift->url;
   return ($url->scheme || $url->base->scheme) ~~ 'https';
@@ -146,6 +175,23 @@ sub parse {
   return $self;
 }
 
+# "Bart, with $10,000, we'd be millionaires!
+#  We could buy all kinds of useful things like...love!"
+sub parse_start_line {
+  my $self = shift;
+
+  # Ignore any leading empty lines
+  $self->{buffer} =~ s/^\s+//;
+  return unless defined(my $line = get_line \$self->{buffer});
+
+  # We have a (hopefully) full request line
+  return $self->error('Bad request start line', 400)
+    unless $line =~ $START_LINE_RE;
+  my $url = $self->method($1)->version($3)->url;
+  $1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2);
+  $self->{state} = 'content';
+}
+
 sub proxy {
   my $self = shift;
   return $self->{proxy} unless @_;
@@ -154,35 +200,6 @@ sub proxy {
 }
 
 sub query_params { shift->url->query }
-
-sub _build_start_line {
-  my $self = shift;
-
-  # Path
-  my $url   = $self->url;
-  my $path  = $url->path->to_string;
-  my $query = $url->query->to_string;
-  $path .= "?$query" if $query;
-  $path = "/$path" unless $path =~ m!^/!;
-
-  # CONNECT
-  my $method = uc $self->method;
-  if ($method eq 'CONNECT') {
-    my $host = $url->host;
-    my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
-    $path = "$host:$port";
-  }
-
-  # Proxy
-  elsif ($self->proxy) {
-    my $clone = $url = $url->clone->userinfo(undef);
-    my $upgrade = lc($self->headers->upgrade || '');
-    my $scheme = $url->scheme || '';
-    $path = $clone unless $upgrade eq 'websocket' || $scheme eq 'https';
-  }
-
-  return "$method $path HTTP/@{[$self->version]}\x0d\x0a";
-}
 
 sub _parse_basic_auth {
   return unless my $header = shift;
@@ -256,23 +273,6 @@ sub _parse_env {
 
   # There won't be a start line or headers
   $self->{state} = 'body';
-}
-
-# "Bart, with $10,000, we'd be millionaires!
-#  We could buy all kinds of useful things like...love!"
-sub _parse_start_line {
-  my $self = shift;
-
-  # Ignore any leading empty lines
-  $self->{buffer} =~ s/^\s+//;
-  return unless defined(my $line = get_line \$self->{buffer});
-
-  # We have a (hopefully) full request line
-  return $self->error('Bad request start line', 400)
-    unless $line =~ $START_LINE_RE;
-  my $url = $self->method($1)->version($3)->url;
-  $1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2);
-  $self->{state} = 'content';
 }
 
 1;
@@ -370,6 +370,12 @@ Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
 Make sure request has all required headers for the current HTTP version.
 
+=head2 C<get_start_line>
+
+  my $string = $req->get_start_line;
+
+Get all start line data as one chunk.
+
 =head2 C<is_secure>
 
   my $success = $req->is_secure;
@@ -409,6 +415,12 @@ request body has been received.
   $req = $req->parse({REQUEST_METHOD => 'GET'});
 
 Parse HTTP request chunks or environment hash.
+
+=head2 C<parse_start_line>
+
+  $req->parse_start_line;
+
+Parse start line.
 
 =head2 C<proxy>
 

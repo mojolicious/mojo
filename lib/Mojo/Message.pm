@@ -169,11 +169,15 @@ sub get_header_chunk {
   return $self->fix_headers->content->get_header_chunk($offset);
 }
 
+sub get_start_line {
+  croak 'Method "get_start_line" not implemented by subclass';
+}
+
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
   $self->emit(progress => 'start_line', $offset);
-  return substr $self->{start_line_buffer} //= $self->_build_start_line,
-    $offset, 131072;
+  return substr $self->{start_line_buffer} //= $self->get_start_line, $offset,
+    131072;
 }
 
 sub has_leftovers { shift->content->has_leftovers }
@@ -207,7 +211,12 @@ sub leftovers { shift->content->leftovers }
 
 sub param { shift->body_params->param(@_) }
 
-sub parse            { shift->_parse(0, @_) }
+sub parse { shift->_parse(0, @_) }
+
+sub parse_start_line {
+  croak 'Method "parse_start_line" not implemented by subclass';
+}
+
 sub parse_until_body { shift->_parse(1, @_) }
 
 sub start_line_size { length shift->build_start_line }
@@ -278,8 +287,6 @@ sub _build {
   return $buffer;
 }
 
-sub _build_start_line {''}
-
 sub _nest {
   my $array = shift;
 
@@ -323,7 +330,7 @@ sub _parse {
       if $len > $self->max_line_size;
 
     # Parse
-    $self->_parse_start_line;
+    $self->parse_start_line;
   }
 
   # Content
@@ -410,8 +417,6 @@ sub _parse_formdata {
   return \@formdata;
 }
 
-sub _parse_start_line { shift->{state} = 'content' }
-
 sub _write {
   my ($self, $method, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
@@ -431,7 +436,9 @@ Mojo::Message - HTTP message base class
   package Mojo::Message::MyMessage;
   use Mojo::Base 'Mojo::Message';
 
-  sub cookies {...}
+  sub cookies          {...}
+  sub get_start_line   {...}
+  sub parse_start_line {...}
 
 =head1 DESCRIPTION
 
@@ -640,6 +647,12 @@ Get a chunk of body data starting from a specific position.
 
 Get a chunk of header data, starting from a specific position.
 
+=head2 C<get_start_line>
+
+  my $string = $message->get_start_line;
+
+Get all start line data as one chunk. Meant to be overloaded in a subclass.
+
 =head2 C<get_start_line_chunk>
 
   my $string = $message->get_start_line_chunk($offset);
@@ -730,6 +743,12 @@ not be called before the entire message body has been received.
   $message = $message->parse('HTTP/1.1 200 OK...');
 
 Parse message chunk.
+
+=head2 C<parse_start_line>
+
+  $message->parse_start_line;
+
+Parse start line. Meant to be overloaded in a subclass.
 
 =head2 C<parse_until_body>
 

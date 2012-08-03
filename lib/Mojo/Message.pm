@@ -334,20 +334,9 @@ sub _parse {
   }
 
   # Content
-  if ($self->{state} ~~ [qw(body content finished)]) {
-
-    # Until body
-    my $content = $self->content;
-    my $buffer  = delete $self->{buffer};
-    if ($until_body) { $self->content($content->parse_until_body($buffer)) }
-
-    # CGI
-    elsif ($self->{state} eq 'body') {
-      $self->content($content->parse_body($buffer));
-    }
-
-    # Parse
-    else { $self->content($content->parse($buffer)) }
+  if ($self->{state} ~~ [qw(content finished)]) {
+    my $method = $until_body ? 'parse_until_body' : 'parse';
+    $self->content($self->content->$method(delete $self->{buffer}));
   }
 
   # Check line size
@@ -651,7 +640,7 @@ Get a chunk of header data, starting from a specific position.
 
   my $string = $message->get_start_line;
 
-Get all start line data as one chunk. Meant to be overloaded in a subclass.
+Get all start line data in one chunk. Meant to be overloaded in a subclass.
 
 =head2 C<get_start_line_chunk>
 

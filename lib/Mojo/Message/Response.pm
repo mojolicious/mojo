@@ -211,7 +211,7 @@ Make sure response has all required headers for the current HTTP version.
 
   my $string = $res->get_start_line;
 
-Get all start line data as one chunk.
+Get all start line data in one chunk.
 
 =head2 C<is_status_class>
 

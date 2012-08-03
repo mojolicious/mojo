@@ -78,8 +78,7 @@ sub fix_headers {
   # Host
   my $host = $url->ihost;
   my $port = $url->port;
-  $host .= ":$port" if $port;
-  $headers->host($host) unless $headers->host;
+  $headers->host($port ? "$host:$port" : $host) unless $headers->host;
 
   return $self;
 }
@@ -97,9 +96,8 @@ sub get_start_line {
   # CONNECT
   my $method = uc $self->method;
   if ($method eq 'CONNECT') {
-    my $host = $url->host;
     my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
-    $path = "$host:$port";
+    $path = $url->host . ":$port";
   }
 
   # Proxy
@@ -135,42 +133,35 @@ sub parse {
 
   # CGI like environment
   my $env = @_ > 1 ? {@_} : ref $_[0] eq 'HASH' ? $_[0] : undef;
-
-  # Parse CGI like environment
-  my $chunk;
-  if ($env) { $self->_parse_env($env) }
-
-  # Parse chunk
-  else { $chunk = shift }
+  $self->env($env)->_parse_env($env) if $env;
+  $self->content($self->content->parse_body($env ? undef : shift))
+    if $self->{state} ~~ 'cgi';
 
   # Pass through
-  $self->SUPER::parse($chunk);
+  $self->SUPER::parse($env ? undef : @_);
 
-  # Fix things we only know after parsing headers
-  if (!$self->{state} || $self->{state} ne 'headers') {
+  # Check if we can fix things that require all headers
+  return $self unless $self->is_finished;
 
-    # Base URL
-    my $base = $self->url->base;
-    $base->scheme('http') unless $base->scheme;
-    my $headers = $self->headers;
-    if (!$base->host && (my $host = $headers->host)) {
-      $base->authority($host);
-    }
+  # Base URL
+  my $base = $self->url->base;
+  $base->scheme('http') unless $base->scheme;
+  my $headers = $self->headers;
+  if (!$base->host && (my $host = $headers->host)) { $base->authority($host) }
 
-    # Basic authentication
-    if (my $userinfo = _parse_basic_auth($headers->authorization)) {
-      $base->userinfo($userinfo);
-    }
-
-    # Basic proxy authentication
-    if (my $userinfo = _parse_basic_auth($headers->proxy_authorization)) {
-      $self->proxy(Mojo::URL->new->userinfo($userinfo));
-    }
-
-    # "X-Forwarded-HTTPS"
-    $base->scheme('https')
-      if $ENV{MOJO_REVERSE_PROXY} && $headers->header('X-Forwarded-HTTPS');
+  # Basic authentication
+  if (my $userinfo = _parse_basic_auth($headers->authorization)) {
+    $base->userinfo($userinfo);
   }
+
+  # Basic proxy authentication
+  if (my $userinfo = _parse_basic_auth($headers->proxy_authorization)) {
+    $self->proxy(Mojo::URL->new->userinfo($userinfo));
+  }
+
+  # "X-Forwarded-HTTPS"
+  $base->scheme('https')
+    if $ENV{MOJO_REVERSE_PROXY} && $headers->header('X-Forwarded-HTTPS');
 
   return $self;
 }
@@ -207,10 +198,6 @@ sub _parse_basic_auth {
 
 sub _parse_env {
   my ($self, $env) = @_;
-  $env ||= \%ENV;
-
-  # Make environment accessible
-  $self->env($env);
 
   # Extract headers
   my $headers = $self->headers;
@@ -224,8 +211,7 @@ sub _parse_env {
 
     # Host/Port
     if ($name eq 'HOST') {
-      my $host = $value;
-      my $port;
+      my ($host, $port) = ($value, undef);
       ($host, $port) = ($1, $2) if $host =~ /^([^\:]*)\:?(.*)$/;
       $base->host($host)->port($port);
     }
@@ -270,8 +256,8 @@ sub _parse_env {
     $path->parse($buffer);
   }
 
-  # There won't be a start line or headers
-  $self->{state} = 'body';
+  # Bypass normal content parser
+  $self->{state} = 'cgi';
 }
 
 1;
@@ -373,7 +359,7 @@ Make sure request has all required headers for the current HTTP version.
 
   my $string = $req->get_start_line;
 
-Get all start line data as one chunk.
+Get all start line data in one chunk.
 
 =head2 C<is_secure>
 

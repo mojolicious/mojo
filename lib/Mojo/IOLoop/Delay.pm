@@ -90,7 +90,7 @@ implements the following new ones.
   my $cb = $delay->begin;
 
 Increment active event counter, the returned callback can be used instead of
-C<end>.
+C<end>. Note that the first argument passed to the callback will be ignored.
 
   my $delay = Mojo::IOLoop->delay;
   Mojo::UserAgent->new->get('mojolicio.us' => $delay->begin);
@@ -101,7 +101,8 @@ C<end>.
   my $remaining = $delay->end;
   my $remaining = $delay->end(@args);
 
-Decrement active event counter.
+Decrement active event counter, all arguments are queued for the C<finish>
+event and C<wait> method.
 
 =head2 C<wait>
 

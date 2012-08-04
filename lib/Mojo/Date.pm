@@ -120,12 +120,19 @@ Construct a new L<Mojo::Date> object.
 
   $date = $date->parse('Sun Nov  6 08:49:37 1994');
 
-Parse date in one of the following formats.
+Parse date.
 
-  - Epoch format (784111777)
-  - RFC 822/1123 (Sun, 06 Nov 1994 08:49:37 GMT)
-  - RFC 850/1036 (Sunday, 06-Nov-94 08:49:37 GMT)
-  - ANSI C asctime() (Sun Nov  6 08:49:37 1994)
+  # Epoch
+  say Mojo::Date->new('784111777')->epoch;
+
+  # RFC 822/1123
+  say Mojo::Date->new('Sun, 06 Nov 1994 08:49:37 GMT')->epoch;
+
+  # RFC 850/1036
+  say Mojo::Date->new('Sunday, 06-Nov-94 08:49:37 GMT')->epoch;
+
+  # Ansi C asctime()
+  say Mojo::Date->new('Sun Nov  6 08:49:37 1994')->epoch;
 
 =head2 C<to_string>
 

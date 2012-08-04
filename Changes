@@ -1,4 +1,8 @@
 
+3.21  2012-08-05
+  - Improved documentation.
+  - Improved tests.
+
 3.20  2012-08-04
   - Added extract_start_line method to Mojo::Message, Mojo::Message::Request
     and Mojo::Message::Response.

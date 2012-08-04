@@ -63,7 +63,7 @@ L<Mojo::IOLoop::Delay> can emit the following events.
 =head2 C<finish>
 
   $delay->on(finish => sub {
-    my $delay = shift;
+    my ($delay, @args) = @_;
     ...
   });
 

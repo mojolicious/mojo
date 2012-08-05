@@ -50,7 +50,7 @@ sub app {
   return $singleton = $app ? $app : $singleton unless ref $self;
 
   # Default to singleton application
-  return $self->{app} ||= $singleton unless $app;
+  return $self->{app} || $singleton unless $app;
   $self->{app} = $app;
 
   return $self;
@@ -808,7 +808,8 @@ implements the following new ones.
   my $app = $ua->app;
   $ua     = $ua->app(MyApp->new);
 
-Application relative URLs will be processed with.
+Application relative URLs will be processed with, instance specific
+applications override the global default.
 
   # Introspect
   say $ua->app->secret;

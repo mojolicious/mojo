@@ -41,8 +41,8 @@ sub register {
   unless ($file) {
 
     # Class or executable
-    $file = $ENV{MOJO_APP};
-    $file = $file && !ref $file ? decamelize($file) : basename($ENV{MOJO_EXE});
+    $file
+      = $ENV{MOJO_APP} ? decamelize($ENV{MOJO_APP}) : basename($ENV{MOJO_EXE});
 
     # Replace ".pl" and ".t" with default extension
     $file =~ s/\.(?:pl|t)$//i;

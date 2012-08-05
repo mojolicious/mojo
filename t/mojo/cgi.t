@@ -45,14 +45,13 @@ my $message = '';
   local *STDOUT;
   open STDOUT, '>', \$message;
   local %ENV = (
-    MOJO_APP        => $ENV{MOJO_APP},
     PATH_INFO       => '/',
     REQUEST_METHOD  => 'GET',
     SCRIPT_NAME     => '/',
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  is(Mojolicious::Command::cgi->new->run, 200, 'right status');
+  is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 }
 my $res
   = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
@@ -68,14 +67,14 @@ $message = '';
   local *STDOUT;
   open STDOUT, '>', \$message;
   local %ENV = (
-    MOJO_APP        => $ENV{MOJO_APP},
     PATH_INFO       => '/',
     REQUEST_METHOD  => 'GET',
     SCRIPT_NAME     => '/',
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  is(Mojolicious::Command::cgi->new->run('--nph'), 200, 'right status');
+  is(Mojolicious::Command::cgi->new(app => app)->run('--nph'),
+    200, 'right status');
 }
 $res = Mojo::Message::Response->new->parse($message);
 is $res->code, 200, 'right status';
@@ -93,7 +92,6 @@ $message = '';
   local *STDOUT;
   open STDOUT, '>', \$message;
   local %ENV = (
-    MOJO_APP        => $ENV{MOJO_APP},
     PATH_INFO       => '/chunked',
     CONTENT_LENGTH  => length($content),
     CONTENT_TYPE    => 'application/x-www-form-urlencoded',
@@ -102,7 +100,7 @@ $message = '';
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  is(Mojolicious::Command::cgi->new->run, 200, 'right status');
+  is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 }
 like $message, qr/chunked/, 'is chunked';
 $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
@@ -116,7 +114,6 @@ $message = '';
   local *STDOUT;
   open STDOUT, '>', \$message;
   local %ENV = (
-    MOJO_APP        => $ENV{MOJO_APP},
     PATH_INFO       => '/params',
     QUERY_STRING    => 'lalala=23&bar=baz',
     REQUEST_METHOD  => 'GET',
@@ -124,7 +121,7 @@ $message = '';
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.0'
   );
-  is(Mojolicious::Command::cgi->new->run, 200, 'right status');
+  is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 }
 $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
 is $res->code, 200, 'right status';

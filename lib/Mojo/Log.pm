@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Fcntl ':flock';
 
+# "Would you kindly shut your noise-hole?"
 has handle => sub {
   my $self = shift;
 

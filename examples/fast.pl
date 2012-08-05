@@ -11,4 +11,4 @@ sub handler {
 }
 
 # Fast "Hello World" application for profiling the HTTP stack
-__PACKAGE__->start;
+__PACKAGE__->new->start;

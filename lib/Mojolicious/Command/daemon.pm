@@ -32,7 +32,7 @@ sub run {
   my ($self, @args) = @_;
 
   # Options
-  my $daemon = Mojo::Server::Daemon->new;
+  my $daemon = Mojo::Server::Daemon->new(app => $self->app);
   $self->_options(
     \@args,
     'b|backlog=i'    => sub { $daemon->backlog($_[1]) },

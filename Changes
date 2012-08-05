@@ -2,6 +2,8 @@
 3.21  2012-08-05
   - Improved documentation.
   - Improved tests.
+  - Fixed Perl 5.17.3+ compatibility.
+  - Fixed small AUTOLOAD bug in Mojolicious::Lite.
 
 3.20  2012-08-04
   - Added extract_start_line method to Mojo::Message, Mojo::Message::Request

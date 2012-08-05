@@ -68,7 +68,7 @@ sub run {
   if ($url !~ m!/!) { $ua->detect_proxy }
 
   # Application
-  else { $ua->app($ENV{MOJO_APP} || 'Mojo::HelloWorld') }
+  else { $ua->app($self->app) }
 
   # Start
   my $v = my $buffer = '';

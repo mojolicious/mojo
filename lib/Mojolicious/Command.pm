@@ -12,11 +12,10 @@ use Mojo::Server;
 use Mojo::Template;
 use Mojo::Util 'spurt';
 
+has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
 has description => 'No description.';
 has quiet       => 0;
 has usage       => "usage: $0\n";
-
-sub app { Mojo::Server->new->app }
 
 sub chmod_file {
   my ($self, $path, $mod) = @_;
@@ -140,6 +139,16 @@ default.
 
 L<Mojolicious::Command> implements the following attributes.
 
+=head2 C<app>
+
+  my $app  = $command->app;
+  $command = $command->app(MyApp->new);
+
+Application for command, defaults to a L<Mojo::HelloWorld> object.
+
+  # Introspect
+  say "Template path: $_" for @{$command->app->renderer->paths};
+
 =head2 C<description>
 
   my $description = $command->description;
@@ -165,15 +174,6 @@ Usage information for command, used for the help screen.
 
 L<Mojolicious::Command> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
-
-=head2 C<app>
-
-  my $app = $command->app;
-
-Currently active application.
-
-  # Introspect
-  say "Template path: $_" for @{$command->app->renderer->paths};
 
 =head2 C<chmod_file>
 

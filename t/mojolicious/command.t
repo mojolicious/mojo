@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable libev
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
-use Test::More tests => 5;
+use Test::More tests => 4;
 
 # "Robot 1-X, save my friends! And Zoidberg!"
 use Cwd 'cwd';
@@ -11,14 +11,11 @@ use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use Mojolicious::Command;
 
-# Application
-my $command = Mojolicious::Command->new;
-isa_ok $command->app, 'Mojo', 'right application';
-
 # Generating files
 my $cwd = cwd;
 my $dir = tempdir CLEANUP => 1;
 chdir $dir;
+my $command = Mojolicious::Command->new;
 $command->create_rel_dir('foo/bar');
 ok -d catdir($dir, qw(foo bar)), 'directory exists';
 my $template = "@@ foo_bar\njust <%= 'works' %>!\n";

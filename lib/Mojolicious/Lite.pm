@@ -5,6 +5,7 @@ use Mojo::Base 'Mojolicious';
 #  August 6, 1991."
 use File::Basename 'dirname';
 use File::Spec::Functions 'catdir';
+use Mojo::UserAgent;
 
 # "It's the future, my parents, my co-workers, my girlfriend,
 #  I'll never see any of them ever again... YAHOOO!"
@@ -21,7 +22,7 @@ sub import {
   # Initialize app
   no strict 'refs';
   my $caller = caller;
-  push @{"${caller}::ISA"}, $class;
+  push @{"${caller}::ISA"}, 'Mojo';
   my $app = $class->new;
 
   # Initialize routes
@@ -48,8 +49,8 @@ sub import {
   *{"${caller}::plugin"} = sub { $app->plugin(@_) };
   *{"${caller}::under"}  = sub { $routes = $root->under(@_) };
 
-  # We are most likely the app in a lite environment
-  $ENV{MOJO_APP} ||= $app;
+  # Make sure there's a default application for testing
+  Mojo::UserAgent->app($app) unless Mojo::UserAgent->app;
 
   # Lite apps are strict!
   Mojo::Base->import(-strict);

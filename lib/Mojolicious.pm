@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo';
 
 use Carp 'croak';
 use Mojo::Exception;
+use Mojo::Server;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -14,7 +15,11 @@ use Mojolicious::Types;
 use Scalar::Util qw(blessed weaken);
 
 # "Robots don't have any emotions, and sometimes that makes me very sad."
-has commands => sub { Mojolicious::Commands->new };
+has commands => sub {
+  my $commands = Mojolicious::Commands->new(app => shift);
+  weaken $commands->{app};
+  return $commands;
+};
 has controller_class => 'Mojolicious::Controller';
 has mode => sub { $ENV{MOJO_MODE} || 'development' };
 has plugins  => sub { Mojolicious::Plugins->new };
@@ -185,7 +190,7 @@ sub plugin {
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
-sub start { ($ENV{MOJO_APP} = shift)->commands->start(@_) }
+sub start { shift->commands->start(@_) }
 
 sub startup { }
 

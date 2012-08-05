@@ -31,7 +31,7 @@ post '/params' => sub {
 };
 
 # Binding
-my $app     = Mojo::Server::PSGI->new->to_psgi_app;
+my $app = Mojo::Server::PSGI->new(app => app)->to_psgi_app;
 my $content = 'hello=world';
 open my $body, '<', \$content;
 my $env = {
@@ -87,7 +87,7 @@ $env = {
   'psgi.multiprocess' => 1,
   'psgi.run_once'     => 0
 };
-$app = Mojolicious::Command::psgi->new->run;
+$app = Mojolicious::Command::psgi->new(app => app)->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
 %headers = @{$res->[1]};
@@ -121,7 +121,7 @@ $env = {
   'psgi.multiprocess' => 1,
   'psgi.run_once'     => 0
 };
-$app = Mojolicious::Command::psgi->new->run;
+$app = Mojolicious::Command::psgi->new(app => app)->run;
 $res = $app->($env);
 is $res->[0], 200, 'right status';
 ok scalar @{$res->[1]} >= 10, 'enough headers';

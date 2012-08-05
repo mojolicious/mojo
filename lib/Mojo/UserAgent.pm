@@ -813,8 +813,7 @@ implements the following new ones.
   $ua     = $ua->app('MyApp');
   $ua     = $ua->app(MyApp->new);
 
-Application relative URLs will be processed with, defaults to a
-L<Mojo::HelloWorld> object.
+Application relative URLs will be processed with.
 
   # Introspect
   say $ua->app->secret;

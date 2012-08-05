@@ -3,7 +3,6 @@ use Mojo::Base 'Mojo';
 
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Server;
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;

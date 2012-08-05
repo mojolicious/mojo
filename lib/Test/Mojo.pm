@@ -271,18 +271,20 @@ sub text_unlike {
 sub websocket_ok {
   my ($self, $url) = (shift, shift);
 
+  # Establish WebSocket connection
   $self->{messages} = [];
   $self->{finished} = 0;
   $self->ua->websocket(
-    $url, @_,
-    sub {
-      $self->tx(my $tx = pop);
+    $url => @_ => sub {
+      my $tx = pop;
+      $self->tx($tx);
       $tx->on(finish => sub { $self->{finished} = 1 });
       $tx->on(message => sub { push @{$self->{messages}}, pop });
       Mojo::IOLoop->stop;
     }
   );
   Mojo::IOLoop->start;
+
   my $desc = encode 'UTF-8', "websocket $url";
   return $self->_test('ok', $self->tx->res->code eq 101, $desc);
 }

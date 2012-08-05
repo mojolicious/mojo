@@ -93,9 +93,6 @@ sub run {
     }
   }
 
-  # Print overview
-  print $self->message;
-
   # Make list
   my @list;
   my $max = 0;
@@ -106,6 +103,7 @@ sub run {
   }
 
   # Print list
+  print $self->message;
   for my $command (@list) {
     my ($name, $description) = @$command;
     print "  $name" . (' ' x ($max - length $name)) . "   $description";

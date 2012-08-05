@@ -13,7 +13,7 @@ my $lib = join('/', @base, 'lib');
 
 # "My eyes! The goggles do nothing!"
 require Mojolicious::Commands;
-Mojolicious::Commands->new->start;
+Mojolicious::Commands->start;
 
 =head1 NAME
 

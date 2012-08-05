@@ -189,7 +189,7 @@ sub plugin {
   $self->plugins->register_plugin(shift, $self, @_);
 }
 
-sub start { shift->commands->start(@_) }
+sub start { shift->commands->run(@_ ? @_ : @ARGV) }
 
 sub startup { }
 

@@ -113,11 +113,15 @@ sub run {
   return print $self->hint;
 }
 
-sub start { shift->run(@_ ? @_ : @ARGV) }
+sub start {
+  my $self = shift;
+  return $self->start_app($ENV{MOJO_APP} => @_) if $ENV{MOJO_APP};
+  return $self->new->app->start(@_);
+}
 
 sub start_app {
   my $self = shift;
-  Mojo::Server->new->build_app($ENV{MOJO_APP} = shift)->start(@_);
+  return Mojo::Server->new->build_app($ENV{MOJO_APP} = shift)->start(@_);
 }
 
 sub _command {
@@ -319,13 +323,15 @@ disabled with the C<MOJO_NO_DETECT> environment variable.
 
 =head2 C<start>
 
-  $commands->start;
-  $commands->start(@ARGV);
+  Mojolicious::Commands->start;
+  Mojolicious::Commands->start(@ARGV);
 
-Start the command line interface.
+Start the command line interface for automatically detected application,
+usually the value of the C<MOJO_APP> environment variable or
+L<Mojo::HelloWorld>.
 
   # Always start daemon and ignore @ARGV
-  $commands->start('daemon', '-l', 'http://*:8080');
+  Mojolicious::Commands->start('daemon', '-l', 'http://*:8080');
 
 =head2 C<start_app>
 

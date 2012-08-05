@@ -50,12 +50,8 @@ sub app {
   return $singleton = $app ? $app : $singleton unless ref $self;
 
   # Default to singleton application
-  $self->{app} ||= $singleton;
-  return $self->{app} unless $app;
-
-  # Initialize application if necessary
-  $self->{app}
-    = ref $app ? $app : $self->_server->build_app($ENV{MOJO_APP} = $app);
+  return $self->{app} ||= $singleton unless $app;
+  $self->{app} = $app;
 
   return $self;
 }
@@ -808,9 +804,8 @@ implements the following new ones.
 =head2 C<app>
 
   my $app = Mojo::UserAgent->app;
-  my $app = Mojo::UserAgent->app(MyApp->new);
+            Mojo::UserAgent->app(MyApp->new);
   my $app = $ua->app;
-  $ua     = $ua->app('MyApp');
   $ua     = $ua->app(MyApp->new);
 
 Application relative URLs will be processed with.

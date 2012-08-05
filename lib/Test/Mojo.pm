@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::IOLoop;
 use Mojo::Message::Response;
+use Mojo::Server;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
 use Test::More ();
@@ -17,7 +18,9 @@ $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
 #  How come you guys can go to the moon but can't make my shoes smell good?"
 sub new {
   my $self = shift->SUPER::new;
-  return @_ ? $self->app(shift) : $self;
+  return $self unless my $app = shift;
+  return $self->app(
+    ref $app ? $app : Mojo::Server->new->build_app($ENV{MOJO_APP} = $app));
 }
 
 sub app {

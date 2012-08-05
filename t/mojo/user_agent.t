@@ -109,14 +109,17 @@ post '/echo' => sub {
 # Default application
 is(Mojo::UserAgent->app,      app, 'applications are equal');
 is(Mojo::UserAgent->new->app, app, 'applications are equal');
-is(Mojo::UserAgent->app(app), app, 'applications are equal');
+Mojo::UserAgent->app(app);
+is(Mojo::UserAgent->app, app, 'applications are equal');
 my $dummy = Mojolicious::Lite->new;
 isnt(Mojo::UserAgent->new->app($dummy)->app, app,
   'applications are not equal');
 is(Mojo::UserAgent->app, app, 'applications are still equal');
-isnt(Mojo::UserAgent->app($dummy), app, 'applications are not equal');
-is(Mojo::UserAgent->app,      $dummy, 'application are equal');
-is(Mojo::UserAgent->app(app), app,    'applications are equal again');
+Mojo::UserAgent->app($dummy);
+isnt(Mojo::UserAgent->app, app, 'applications are not equal');
+is(Mojo::UserAgent->app, $dummy, 'application are equal');
+Mojo::UserAgent->app(app);
+is(Mojo::UserAgent->app, app, 'applications are equal again');
 
 # GET / (non-blocking)
 my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);

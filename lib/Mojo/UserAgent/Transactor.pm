@@ -267,7 +267,7 @@ Mojo::UserAgent::Transactor - User agent transactor
   say $t->tx(GET => 'http://mojolicio.us')->req->to_string;
 
   # PATCH request with "Do Not Track" header and content
-  say $t->tx(PATCH => 'mojolicio.us' => {DNT => 1}, 'Hello!')->req->to_string;
+  say $t->tx(PATCH => 'mojolicio.us' => {DNT => 1} => 'Hi!')->req->to_string;
 
   # POST request with form data
   say $t->form('http://kraih.com' => {a => [1, 2], b => 3})->req->to_string;

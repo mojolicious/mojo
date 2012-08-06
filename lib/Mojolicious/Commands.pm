@@ -141,6 +141,7 @@ Mojolicious::Commands - Command line interface
 
   my $commands = Mojolicious::Commands->new;
   push @{$commands->namespaces}, 'MyApp::Command';
+  $commands->run('daemon');
 
 =head1 DESCRIPTION
 

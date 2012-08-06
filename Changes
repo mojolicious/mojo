@@ -1,4 +1,7 @@
 
+3.23  2012-08-07
+  - Improved documentation.
+
 3.22  2012-08-06
   - Added mp4, ogg, ogv and webm MIME types.
   - Removed x- prefix from js and woff MIME types.

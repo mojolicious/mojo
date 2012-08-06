@@ -28,8 +28,7 @@ has types => sub {
     txt  => 'text/plain',
     webm => 'video/webm',
     woff => 'application/font-woff',
-    xml  => 'application/xml',
-    xsl  => 'application/xml',
+    xml  => ['application/xml', 'text/xml'],
     zip  => 'application/zip'
   };
 };

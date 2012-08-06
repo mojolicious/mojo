@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 46;
+use Test::More tests => 49;
 
 # "Your mistletoe is no match for my *tow* missile."
 use Mojolicious::Types;
@@ -34,12 +34,15 @@ is_deeply $t->detect('image/svg+xml'),          ['svg'],  'right formats';
 is_deeply $t->detect('text/plain'),             ['txt'],  'right formats';
 is_deeply $t->detect('video/webm'),             ['webm'], 'right formats';
 is_deeply $t->detect('application/font-woff'),  ['woff'], 'right formats';
-is_deeply $t->detect('application/xml'), ['xml', 'xsl'], 'right formats';
-is_deeply $t->detect('application/zip'), ['zip'], 'right format';
+is_deeply $t->detect('application/xml'),        ['xml'],  'right formats';
+is_deeply $t->detect('text/xml'),               ['xml'],  'right formats';
+is_deeply $t->detect('application/zip'),        ['zip'],  'right format';
 
 # Detect special cases
-is_deeply $t->detect('Application/Xml'), ['xml', 'xsl'],  'right formats';
-is_deeply $t->detect('APPLICATION/XML'), ['xml', 'xsl'],  'right formats';
+is_deeply $t->detect('Application/Xml'), ['xml'], 'right formats';
+is_deeply $t->detect('Text/Xml'),        ['xml'], 'right formats';
+is_deeply $t->detect('APPLICATION/XML'), ['xml'], 'right formats';
+is_deeply $t->detect('Text/XML'),        ['xml'], 'right formats';
 is_deeply $t->detect('text/html;q=0.9'), ['htm', 'html'], 'right formats';
 is_deeply $t->detect('text/html,*/*'),             [], 'no formats';
 is_deeply $t->detect('text/html;q=0.9,*/*'),       [], 'no formats';

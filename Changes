@@ -3,7 +3,7 @@
   - Added mp4, ogg, ogv and webm MIME types.
   - Removed x- prefix from js and woff MIME types.
   - Improved documentation.
-  - Fixed gz, xml and xsl MIME types.
+  - Fixed gz and xml MIME types.
 
 3.21  2012-08-05
   - Improved documentation.

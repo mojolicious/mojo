@@ -159,8 +159,8 @@ $t->get_ok('/dead_action')->status_is(500)
 like $log, qr/dead action!/, 'right result';
 
 # GET /dead_action.xml (different format)
-$t->get_ok('/dead_action.xml')->status_is(500)->content_type_is('text/xml')
-  ->content_is("<very>bad</very>\n");
+$t->get_ok('/dead_action.xml')->status_is(500)
+  ->content_type_is('application/xml')->content_is("<very>bad</very>\n");
 
 # GET /dead_action.json (unsupported format)
 $t->get_ok('/dead_action.json')->status_is(500)
@@ -189,7 +189,8 @@ $t->get_ok('/missing_template')->status_is(404)
 
 # GET /missing_template.xml (different format)
 $t->get_ok('/missing_template.xml')->status_is(404)
-  ->content_type_is('text/xml')->content_is("<somewhat>bad</somewhat>\n");
+  ->content_type_is('application/xml')
+  ->content_is("<somewhat>bad</somewhat>\n");
 
 # GET /missing_template.json (unsupported format)
 $t->get_ok('/missing_template.json')->status_is(404)

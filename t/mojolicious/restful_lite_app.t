@@ -158,44 +158,45 @@ $t->get_ok('/rest.json?format=json', {Accept => 'application/json'})
   ->json_content_is({just => 'works'});
 
 # GET /rest.xml (xml format)
-$t->get_ok('/rest.xml')->status_is(200)->content_type_is('text/xml')
+$t->get_ok('/rest.xml')->status_is(200)->content_type_is('application/xml')
   ->text_is(just => 'works');
 
 # GET /rest (accept xml)
-$t->get_ok('/rest', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works');
+$t->get_ok('/rest', {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # GET /rest (accept xml again)
-$t->get_ok('/rest', {Accept => 'TEXT/XML'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works');
+$t->get_ok('/rest', {Accept => 'APPLICATION/XML'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # GET /rest.xml (accept xml with format)
-$t->get_ok('/rest.xml', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works');
+$t->get_ok('/rest.xml', {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # GET /rest.txt (accept xml with wrong format)
-$t->get_ok('/rest.txt', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works');
+$t->get_ok('/rest.txt', {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # GET /rest (accept xml with quality)
-$t->get_ok('/rest', {Accept => 'text/xml;q=9'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works');
+$t->get_ok('/rest', {Accept => 'application/xml;q=9'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # GET /rest (xml query)
-$t->get_ok('/rest?format=xml')->status_is(200)->content_type_is('text/xml')
-  ->text_is(just => 'works');
+$t->get_ok('/rest?format=xml')->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # GET /rest (xml format with query)
 $t->get_ok('/rest.xml?format=xml')->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works');
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # GET /rest (accept json with query)
-$t->get_ok('/rest?format=xml', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works');
+$t->get_ok('/rest?format=xml', {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works');
 
 # GET /rest (accept json with everything)
-$t->get_ok('/rest.xml?format=xml', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works');
+$t->get_ok('/rest.xml?format=xml', {Accept => 'application/xml'})
+  ->status_is(200)->content_type_is('application/xml')
+  ->text_is(just => 'works');
 
 # GET /rest (unsupported accept)
 $t->get_ok('/rest', {Accept => 'image/png'})->status_is(204)->content_is('');
@@ -347,60 +348,64 @@ $t->post_form_ok(
   ->json_content_is({just => 'works too'});
 
 # POST /rest.xml (xml format)
-$t->post_ok('/rest.xml')->status_is(200)->content_type_is('text/xml')
+$t->post_ok('/rest.xml')->status_is(200)->content_type_is('application/xml')
   ->text_is(just => 'works too');
 
 # POST /rest (accept xml)
-$t->post_ok('/rest', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_ok('/rest', {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest (accept xml again)
-$t->post_ok('/rest', {Accept => 'TEXT/XML'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_ok('/rest', {Accept => 'APPLICATION/XML'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest.xml (accept xml with format)
-$t->post_ok('/rest.xml', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_ok('/rest.xml', {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest.txt (accept xml with wrong format)
-$t->post_ok('/rest.txt', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_ok('/rest.txt', {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest (accept xml with quality)
-$t->post_ok('/rest', {Accept => 'text/xml;q=9'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_ok('/rest', {Accept => 'application/xml;q=9'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest (xml query)
-$t->post_ok('/rest?format=xml')->status_is(200)->content_type_is('text/xml')
-  ->text_is(just => 'works too');
+$t->post_ok('/rest?format=xml')->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest (xml format with query)
 $t->post_ok('/rest.xml?format=xml')->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest (accept json with query)
-$t->post_ok('/rest?format=xml', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_ok('/rest?format=xml', {Accept => 'application/xml'})->status_is(200)
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest (accept json with everything)
-$t->post_ok('/rest.xml?format=xml', {Accept => 'text/xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_ok('/rest.xml?format=xml', {Accept => 'application/xml'})
+  ->status_is(200)->content_type_is('application/xml')
+  ->text_is(just => 'works too');
 
 # POST /rest (xml form)
 $t->post_form_ok('/rest' => {format => 'xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest (xml format with form)
 $t->post_form_ok('/rest.xml' => {format => 'xml'})->status_is(200)
-  ->content_type_is('text/xml')->text_is(just => 'works too');
+  ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # POST /rest (accept json with form)
-$t->post_form_ok('/rest' => {format => 'xml'} => {Accept => 'text/xml'})
-  ->status_is(200)->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_form_ok('/rest' => {format => 'xml'} => {Accept => 'application/xml'})
+  ->status_is(200)->content_type_is('application/xml')
+  ->text_is(just => 'works too');
 
 # POST /rest (accept json with everything, form alternative)
-$t->post_form_ok('/rest.xml' => {format => 'xml'} => {Accept => 'text/xml'})
-  ->status_is(200)->content_type_is('text/xml')->text_is(just => 'works too');
+$t->post_form_ok(
+  '/rest.xml' => {format => 'xml'} => {Accept => 'application/xml'})
+  ->status_is(200)->content_type_is('application/xml')
+  ->text_is(just => 'works too');
 
 # POST /rest (unsupported accept)
 $t->post_ok('/rest', {Accept => 'image/png'})->status_is(201)

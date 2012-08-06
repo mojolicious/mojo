@@ -280,7 +280,7 @@ L<Mojolicious::Controller/"respond_to"> instead of
 L<Mojolicious::Controller/"render">.
 
   # /hello (Accept: application/json) -> "json"
-  # /hello (Accept: text/xml)         -> "xml"
+  # /hello (Accept: application/xml)  -> "xml"
   # /hello.json                       -> "json"
   # /hello.xml                        -> "xml"
   # /hello?format=json                -> "json"

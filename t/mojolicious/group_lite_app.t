@@ -433,8 +433,8 @@ $t->get_ok('/one_format')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8');
 
 # GET /one_format.xml
-$t->get_ok('/one_format.xml')->status_is(200)->content_type_is('text/xml')
-  ->content_is('One format.');
+$t->get_ok('/one_format.xml')->status_is(200)
+  ->content_type_is('application/xml')->content_is('One format.');
 
 # GET /one_format.txt
 $t->get_ok('/one_format.txt')->status_is(404)

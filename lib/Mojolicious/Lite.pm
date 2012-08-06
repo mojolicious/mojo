@@ -673,7 +673,7 @@ content negotiation you can also use L<Mojolicious::Controller/"respond_to">.
   use Mojolicious::Lite;
 
   # /hello (Accept: application/json)
-  # /hello (Accept: text/xml)
+  # /hello (Accept: application/xml)
   # /hello.json
   # /hello.xml
   # /hello?format=json

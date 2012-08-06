@@ -262,8 +262,18 @@ Mojo::UserAgent::Transactor - User agent transactor
 
   use Mojo::UserAgent::Transactor;
 
-  my $t  = Mojo::UserAgent::Transactor->new;
-  my $tx = $t->tx(GET => 'http://mojolicio.us');
+  # Simple GET request
+  my $t = Mojo::UserAgent::Transactor->new;
+  say $t->tx(GET => 'http://mojolicio.us')->req->to_string;
+
+  # PATCH request with "Do Not Track" header and content
+  say $t->tx(PATCH => 'mojolicio.us' => {DNT => 1}, 'Hello!')->req->to_string;
+
+  # POST request with form data
+  say $t->form('http://kraih.com' => {a => [1, 2], b => 3})->req->to_string;
+
+  # POST request with JSON data
+  say $t->json('http://kraih.com' => {a => [1, 2], b => 3})->req->to_string;
 
 =head1 DESCRIPTION
 
@@ -308,9 +318,6 @@ data.
 
   # Multipart upload streamed from file
   my $tx = $t->form('mojolicio.us' => {fun => {file => '/etc/passwd'}});
-
-  # Inspect generated request
-  say $t->form('mojolicio.us' => {a => [1, 2], b => 3})->req->to_string;
 
 While the "multipart/form-data" content type will be automatically used
 instead of "application/x-www-form-urlencoded" when necessary, you can also

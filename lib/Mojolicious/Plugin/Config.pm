@@ -52,7 +52,7 @@ sub register {
   # Mode specific config file
   my $mode = $file =~ /^(.*)\.([^.]+)$/ ? join('.', $1, $app->mode, $2) : '';
 
-  # Absolute path
+  # Absolute paths
   my $home = $app->home;
   $file = $home->rel_file($file) unless file_name_is_absolute $file;
   $mode = $home->rel_file($mode) if $mode && !file_name_is_absolute $mode;
@@ -69,7 +69,7 @@ sub register {
 
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}}
-    if defined $mode && -e $mode;
+    if $mode && -e $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
   my $current = $app->defaults(config => $app->config)->config;
   %$current = (%$current, %$config);

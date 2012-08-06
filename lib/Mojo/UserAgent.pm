@@ -58,11 +58,7 @@ sub app {
 
 sub app_url {
   my $self = shift;
-
-  # Prepare application for testing
   $self->_server(@_);
-
-  # Build absolute URL for test server
   return Mojo::URL->new("$self->{scheme}://localhost:$self->{port}/");
 }
 
@@ -424,7 +420,6 @@ sub _server {
   $self->{scheme} = $scheme ||= 'http';
   $server->listen(["$scheme://127.0.0.1:$port"])->start;
   warn "-- Test server started ($scheme://127.0.0.1:$port)\n" if DEBUG;
-
   return $server;
 }
 
@@ -434,8 +429,8 @@ sub _start {
   # Embedded server
   my $req = $tx->req;
   if ($self->app) {
-    my $url = $req->url->to_abs;
     $self->_server->app($self->app);
+    my $url = $req->url->to_abs;
     $req->url($url->base($self->app_url)->to_abs) unless $url->host;
   }
 
@@ -447,12 +442,12 @@ sub _start {
 
     # HTTP proxy
     if (my $proxy = $self->http_proxy) {
-      $req->proxy($proxy) if !defined($req->proxy) && $scheme eq 'http';
+      $req->proxy($proxy) if !defined $req->proxy && $scheme eq 'http';
     }
 
     # HTTPS proxy
     if (my $proxy = $self->https_proxy) {
-      $req->proxy($proxy) if !defined($req->proxy) && $scheme eq 'https';
+      $req->proxy($proxy) if !defined $req->proxy && $scheme eq 'https';
     }
   }
 
@@ -482,8 +477,7 @@ sub _upgrade {
   # Check if connection needs to be upgraded
   my $c   = $self->{connections}{$id};
   my $old = $c->{tx};
-  return unless $old->req->headers->upgrade;
-  return unless $old->res->code ~~ 101;
+  return unless $old->req->headers->upgrade && $old->res->code ~~ 101;
 
   # Check challenge and upgrade to WebSocket transaction
   my $new = Mojo::Transaction::WebSocket->new(handshake => $old, masked => 1);

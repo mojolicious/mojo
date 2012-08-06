@@ -50,13 +50,12 @@ sub register {
   }
 
   # Mode specific config file
-  my $mode;
-  if ($file =~ /^(.*)\.([^.]+)$/) { $mode = join '.', $1, $app->mode, $2 }
+  my $mode = $file =~ /^(.*)\.([^.]+)$/ ? join('.', $1, $app->mode, $2) : '';
 
   # Absolute path
-  $file = $app->home->rel_file($file) unless file_name_is_absolute $file;
-  $mode = $app->home->rel_file($mode)
-    if defined $mode && !file_name_is_absolute $mode;
+  my $home = $app->home;
+  $file = $home->rel_file($file) unless file_name_is_absolute $file;
+  $mode = $home->rel_file($mode) if $mode && !file_name_is_absolute $mode;
 
   # Read config file
   my $config = {};

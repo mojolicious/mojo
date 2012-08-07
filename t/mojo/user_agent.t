@@ -320,7 +320,7 @@ my $drain;
 $drain = sub {
   my $req = shift;
   return $ua->ioloop->timer(
-    0.5 => sub {
+    0.25 => sub {
       $req->write_chunk('');
       $tx->resume;
       $stream
@@ -372,11 +372,11 @@ $ua->get(
   '/' => sub {
     push @kept_alive, pop->kept_alive;
     Mojo::IOLoop->timer(
-      0.25 => sub {
+      0 => sub {
         $ua->get(
           '/' => sub {
             push @kept_alive, pop->kept_alive;
-            Mojo::IOLoop->timer(0.25 => sub { Mojo::IOLoop->stop });
+            Mojo::IOLoop->timer(0 => sub { Mojo::IOLoop->stop });
           }
         );
       }

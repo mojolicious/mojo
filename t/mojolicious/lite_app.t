@@ -571,7 +571,7 @@ my $ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
 my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop)->app(app);
 my $timer;
 $tua->ioloop->timer(
-  '0.1' => sub {
+  0.1 => sub {
     my $nb = '';
     $tua->get(
       '/' => sub {

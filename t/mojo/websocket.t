@@ -295,7 +295,7 @@ $ua->websocket(
     $tx->on(
       finish => sub {
         $finished += 4;
-        $loop->timer(0.5 => sub { shift->stop });
+        $loop->timer(0 => sub { shift->stop });
       }
     );
   }
@@ -320,7 +320,7 @@ $ua->websocket(
         my ($tx, $message) = @_;
         $result .= $message;
         $tx->finish and $running-- if $message eq 'test1';
-        $loop->timer(0.5 => sub { $loop->stop }) unless $running;
+        $loop->timer(0.25 => sub { $loop->stop }) unless $running;
       }
     );
     $tx->on(finish => sub { $finished += 1 });
@@ -336,7 +336,7 @@ $ua->websocket(
         my ($tx, $message) = @_;
         $result2 .= $message;
         $tx->finish and $running-- if $message eq 'test1';
-        $loop->timer(0.5 => sub { $loop->stop }) unless $running;
+        $loop->timer(0.25 => sub { $loop->stop }) unless $running;
       }
     );
     $tx->on(finish => sub { $finished += 2 });

@@ -5,31 +5,32 @@ use Mojo::Base -base;
 #  hungry investor."
 has types => sub {
   {
-    atom => 'application/atom+xml',
-    bin  => 'application/octet-stream',
-    css  => 'text/css',
-    gif  => 'image/gif',
-    gz   => 'application/x-gzip',
-    htm  => 'text/html',
-    html => 'text/html;charset=UTF-8',
-    ico  => 'image/x-icon',
-    jpeg => 'image/jpeg',
-    jpg  => 'image/jpeg',
-    js   => 'application/javascript',
-    json => 'application/json',
-    mp3  => 'audio/mpeg',
-    mp4  => 'video/mp4',
-    ogg  => 'audio/ogg',
-    ogv  => 'video/ogg',
-    pdf  => 'application/pdf',
-    png  => 'image/png',
-    rss  => 'application/rss+xml',
-    svg  => 'image/svg+xml',
-    txt  => 'text/plain',
-    webm => 'video/webm',
-    woff => 'application/font-woff',
-    xml  => ['application/xml', 'text/xml'],
-    zip  => 'application/zip'
+    appcache => 'text/cache-manifest',
+    atom     => 'application/atom+xml',
+    bin      => 'application/octet-stream',
+    css      => 'text/css',
+    gif      => 'image/gif',
+    gz       => 'application/x-gzip',
+    htm      => 'text/html',
+    html     => 'text/html;charset=UTF-8',
+    ico      => 'image/x-icon',
+    jpeg     => 'image/jpeg',
+    jpg      => 'image/jpeg',
+    js       => 'application/javascript',
+    json     => 'application/json',
+    mp3      => 'audio/mpeg',
+    mp4      => 'video/mp4',
+    ogg      => 'audio/ogg',
+    ogv      => 'video/ogg',
+    pdf      => 'application/pdf',
+    png      => 'image/png',
+    rss      => 'application/rss+xml',
+    svg      => 'image/svg+xml',
+    txt      => 'text/plain',
+    webm     => 'video/webm',
+    woff     => 'application/font-woff',
+    xml      => ['application/xml', 'text/xml'],
+    zip      => 'application/zip'
   };
 };
 
@@ -76,31 +77,32 @@ Mojolicious::Types - MIME types
 
 L<Mojolicious::Types> manages MIME types for L<Mojolicious>.
 
-  atom -> application/atom+xml
-  bin  -> application/octet-stream
-  css  -> text/css
-  gif  -> image/gif
-  gz   -> application/x-gzip
-  htm  -> text/html
-  html -> text/html;charset=UTF-8
-  ico  -> image/x-icon
-  jpeg -> image/jpeg
-  jpg  -> image/jpeg
-  js   -> application/javascript
-  json -> application/json
-  mp3  -> audio/mpeg
-  mp4  -> video/mp4
-  ogg  -> audio/ogg
-  ogv  -> video/ogg
-  pdf  -> application/pdf
-  png  -> image/png
-  rss  -> application/rss+xml
-  svg  -> image/svg+xml
-  txt  -> text/plain
-  webm -> video/webm
-  woff -> application/font-woff
-  xml  -> application/xml,text/xml
-  zip  -> application/zip
+  appcache -> text/cache-manifest
+  atom     -> application/atom+xml
+  bin      -> application/octet-stream
+  css      -> text/css
+  gif      -> image/gif
+  gz       -> application/x-gzip
+  htm      -> text/html
+  html     -> text/html;charset=UTF-8
+  ico      -> image/x-icon
+  jpeg     -> image/jpeg
+  jpg      -> image/jpeg
+  js       -> application/javascript
+  json     -> application/json
+  mp3      -> audio/mpeg
+  mp4      -> video/mp4
+  ogg      -> audio/ogg
+  ogv      -> video/ogg
+  pdf      -> application/pdf
+  png      -> image/png
+  rss      -> application/rss+xml
+  svg      -> image/svg+xml
+  txt      -> text/plain
+  webm     -> video/webm
+  woff     -> application/font-woff
+  xml      -> application/xml,text/xml
+  zip      -> application/zip
 
 The most common ones are already defined.
 

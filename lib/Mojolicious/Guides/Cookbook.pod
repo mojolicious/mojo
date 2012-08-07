@@ -1033,8 +1033,8 @@ that you can use or overload.
   $ ./myapp.pl spy secret
   The secret of this application is "secr3t".
 
-You can also make your commands application specific by putting them in a
-different namespace.
+And to make your commands application specific, just put them in a different
+namespace.
 
   # Application
   package MyApp;
@@ -1075,6 +1075,7 @@ actually much easier than you might think.
 The trick is to move the C<public> and C<templates> directories so they can
 get automatically installed with the modules.
 
+  # Application
   package MyMojoliciousApp;
   use Mojo::Base 'Mojolicious';
 

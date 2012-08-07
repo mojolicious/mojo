@@ -1,6 +1,7 @@
 
 3.24  2012-08-08
   - Improved documentation.
+  - Improved tests.
 
 3.23  2012-08-07
   - Added appcache MIME type.

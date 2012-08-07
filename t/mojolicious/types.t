@@ -43,7 +43,7 @@ is_deeply $t->detect('application/zip'),        ['zip'],  'right format';
 is_deeply $t->detect('Application/Xml'), ['xml'], 'right formats';
 is_deeply $t->detect('Text/Xml'),        ['xml'], 'right formats';
 is_deeply $t->detect('APPLICATION/XML'), ['xml'], 'right formats';
-is_deeply $t->detect('Text/XML'),        ['xml'], 'right formats';
+is_deeply $t->detect('TEXT/XML'),        ['xml'], 'right formats';
 is_deeply $t->detect('text/html;q=0.9'), ['htm', 'html'], 'right formats';
 is_deeply $t->detect('text/html,*/*'),             [], 'no formats';
 is_deeply $t->detect('text/html;q=0.9,*/*'),       [], 'no formats';

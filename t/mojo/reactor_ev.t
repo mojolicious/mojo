@@ -26,7 +26,7 @@ is ref $reactor, 'Mojo::Reactor::EV', 'right object';
 # Make sure it stops automatically when not watching for events
 Mojo::IOLoop->one_tick;
 my $triggered;
-Mojo::IOLoop->timer(0 => sub { $triggered++ });
+Mojo::IOLoop->timer(0.25 => sub { $triggered++ });
 Mojo::IOLoop->start;
 ok $triggered, 'reactor waited for one event';
 Mojo::IOLoop->start;

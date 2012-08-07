@@ -414,7 +414,7 @@ $t->get_ok('/finish')->status_is(200)
 ok !$finish, 'finish event timing is right';
 
 # GET /too_long (request timeout)
-$tx = $t->ua->request_timeout(0.25)->build_tx(GET => '/too_long');
+$tx = $t->ua->request_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->body(
   sub {
@@ -429,7 +429,7 @@ is $buffer, 'how', 'right content';
 $t->ua->request_timeout(0);
 
 # GET /too_long (inactivity timeout)
-$tx = $t->ua->inactivity_timeout(0.25)->build_tx(GET => '/too_long');
+$tx = $t->ua->inactivity_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->body(
   sub {

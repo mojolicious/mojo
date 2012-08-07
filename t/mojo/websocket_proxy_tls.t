@@ -49,12 +49,10 @@ get '/proxy' => sub {
 # WebSocket /test
 websocket '/test' => sub {
   my $self = shift;
-  my $flag = 0;
   $self->on(
     message => sub {
       my ($self, $message) = @_;
       $self->send("${message}test2");
-      $flag = 24;
     }
   );
 };

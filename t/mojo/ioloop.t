@@ -45,18 +45,18 @@ Mojo::IOLoop->start;
 like $err, qr/^Mojo::IOLoop already running/, 'right error';
 
 # Basics
-my $ticks = my $flag = my $hiresflag = 0;
+my $ticks = my $timer = my $hirestimer = 0;
 my $id = $loop->recurring(0 => sub { $ticks++ });
 $loop->timer(
   1 => sub {
     shift->timer(0 => sub { shift->stop });
-    $flag = 23;
+    $timer++;
   }
 );
-$loop->timer(0.25 => sub { $hiresflag = 42 });
+$loop->timer(0.25 => sub { $hirestimer++ });
 $loop->start;
-is $flag,      23, 'recursive timer works';
-is $hiresflag, 42, 'hires timer';
+ok $timer,      'recursive timer works';
+ok $hirestimer, 'hires timer works';
 $loop->one_tick;
 ok $ticks > 2, 'more than two ticks';
 
@@ -65,7 +65,7 @@ my $before = $ticks;
 my $after  = 0;
 my $id2    = $loop->recurring(0 => sub { $after++ });
 $loop->remove($id);
-$loop->timer(1 => sub { shift->stop });
+$loop->timer(0.5 => sub { shift->stop });
 $loop->start;
 $loop->one_tick;
 $loop->remove($id2);
@@ -74,7 +74,7 @@ is $ticks, $before, 'no additional ticks';
 
 # Recurring timer
 my $count = 0;
-$id = $loop->recurring(0.25 => sub { $count++ });
+$id = $loop->recurring(0.1 => sub { $count++ });
 $loop->timer(0.5 => sub { shift->stop });
 $loop->start;
 $loop->one_tick;
@@ -86,9 +86,7 @@ ok $count < 10, 'less than ten recurring events';
 my $port = Mojo::IOLoop->generate_port;
 my $handle;
 $id = $loop->server(
-  address => '127.0.0.1',
-  port    => $port,
-  sub {
+  (address => '127.0.0.1', port => $port) => sub {
     my ($loop, $stream) = @_;
     $handle = $stream->handle;
     $loop->stop;
@@ -107,9 +105,7 @@ $loop->start;
 $port = Mojo::IOLoop->generate_port;
 my $buffer = '';
 Mojo::IOLoop->server(
-  address => '127.0.0.1',
-  port    => $port,
-  sub {
+  (address => '127.0.0.1', port => $port) => sub {
     my ($loop, $stream, $id) = @_;
     $buffer .= 'accepted';
     $stream->on(

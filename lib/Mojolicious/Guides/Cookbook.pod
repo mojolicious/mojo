@@ -1033,6 +1033,22 @@ that you can use or overload.
   $ ./myapp.pl spy secret
   The secret of this application is "secr3t".
 
+You can also make your commands application specific by putting them in a
+different namespace.
+
+  # Application
+  package MyApp;
+  use Mojo::Base 'Mojolicious';
+
+  sub startup {
+    my $self = shift;
+
+    # Add another namespace to load commands from
+    push @{$self->commands->namespaces}, 'MyApp::Command';
+  }
+
+  1;
+
 =head2 Running code against your application
 
 Ever thought about running a quick oneliner against your L<Mojolicious>

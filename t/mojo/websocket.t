@@ -153,7 +153,7 @@ websocket '/deadcallback' => sub {
 my $timeout;
 websocket '/timeout' => sub {
   my $self = shift;
-  Mojo::IOLoop->stream($self->tx->connection)->timeout(0.5);
+  Mojo::IOLoop->stream($self->tx->connection)->timeout(0.25);
   $self->on(finish => sub { $timeout = 'works!' });
 };
 

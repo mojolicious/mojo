@@ -244,7 +244,7 @@ $message = app->log->subscribers('message')->[0];
 app->log->unsubscribe(message => $message);
 app->log->level('debug');
 app->log->on(message => sub { $log .= pop });
-$tx = $ua->get('/timeout?timeout=0.5');
+$tx = $ua->get('/timeout?timeout=0.25');
 app->log->level('fatal');
 app->log->on(message => $message);
 ok !$tx->success, 'not successful';
@@ -259,7 +259,7 @@ $ua->once(
     $tx->on(
       connection => sub {
         my ($tx, $connection) = @_;
-        Mojo::IOLoop->stream($connection)->timeout(0.5);
+        Mojo::IOLoop->stream($connection)->timeout(0.25);
       }
     );
   }

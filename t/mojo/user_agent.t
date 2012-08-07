@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 100;
+use Test::More tests => 102;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -121,8 +121,20 @@ is(Mojo::UserAgent->app, $dummy, 'application are equal');
 Mojo::UserAgent->app(app);
 is(Mojo::UserAgent->app, app, 'applications are equal again');
 
+# GET / (clean up non-blocking requests)
+my $ua = Mojo::UserAgent->new;
+my $get = my $post = '';
+$ua->get('/' => sub { $get = pop->error });
+$ua->post('/' => sub { $post = pop->error });
+undef $ua;
+is $get,  'Premature connection close', 'right error';
+is $post, 'Premature connection close', 'right error';
+
+# Make sure event loop is clean and stops automatically
+Mojo::IOLoop->start;
+
 # GET / (non-blocking)
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+$ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my ($success, $code, $body);
 $ua->get(
   '/' => sub {

@@ -19,7 +19,7 @@ has max_requests => 25;
 sub DESTROY {
   my $self = shift;
   return unless my $loop = $self->ioloop;
-  $loop->remove($_) for keys %{$self->{connections} || {}};
+  $self->_remove($_) for keys %{$self->{connections} || {}};
   $loop->remove($_) for @{$self->{listening} || []};
 }
 
@@ -89,14 +89,21 @@ sub _build_tx {
   return $tx;
 }
 
+sub _close {
+  my ($self, $id) = @_;
+
+  # Finish gracefully
+  if (my $tx = $self->{connections}{$id}{tx}) { $tx->server_close }
+
+  # Remove connection
+  delete $self->{connections}{$id};
+}
+
 sub _finish {
   my ($self, $id, $tx) = @_;
 
   # Always remove connection for WebSockets
-  if ($tx->is_websocket) {
-    $self->_remove($id);
-    return $self->ioloop->remove($id);
-  }
+  return $self->_remove($id) if $tx->is_websocket;
 
   # Finish transaction
   $tx->server_close;
@@ -119,10 +126,7 @@ sub _finish {
   }
 
   # Close connection if necessary
-  if ($tx->req->error || !$tx->keep_alive) {
-    $self->_remove($id);
-    $self->ioloop->remove($id);
-  }
+  if ($tx->req->error || !$tx->keep_alive) { $self->_remove($id) }
 
   # Build new transaction for leftovers
   elsif (defined(my $leftovers = $tx->server_leftovers)) {
@@ -171,11 +175,11 @@ sub _listen {
       $stream->timeout($self->inactivity_timeout);
 
       # Events
-      $stream->on(close => sub { $self->_remove($id) });
+      $stream->on(close => sub { $self->_close($id) });
       $stream->on(
         error => sub {
           $self->app->log->error(pop);
-          $self->_remove($id);
+          $self->_close($id);
         }
       );
       $stream->on(read => sub { $self->_read($id => pop) });
@@ -214,12 +218,8 @@ sub _read {
 
 sub _remove {
   my ($self, $id) = @_;
-
-  # Finish gracefully
-  if (my $tx = $self->{connections}{$id}{tx}) { $tx->server_close }
-
-  # Remove connection
-  delete $self->{connections}{$id};
+  $self->ioloop->remove($id);
+  $self->_close($id);
 }
 
 sub _user {

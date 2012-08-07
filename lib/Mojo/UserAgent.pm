@@ -165,8 +165,8 @@ sub _cleanup {
   my ($self, $restart) = @_;
   return unless my $loop = $self->_loop;
 
-  # Clean up active connections
-  $loop->remove($_) for keys %{delete $self->{connections} || {}};
+  # Clean up active connections (by closing them)
+  $self->_handle($_ => 1) for keys %{$self->{connections} || {}};
 
   # Clean up keep alive connections
   $loop->remove($_->[1]) for @{delete $self->{cache} || []};

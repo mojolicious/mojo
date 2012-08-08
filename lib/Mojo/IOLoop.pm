@@ -481,8 +481,8 @@ Check if loop is running.
   Mojo::IOLoop->one_tick;
   $loop->one_tick;
 
-Run reactor until an event occurs or no events are being watched anymore. Note
-that this method can recurse back into the reactor, so you need to be careful.
+Run reactor until an event occurs. Note that this method can recurse back into
+the reactor, so you need to be careful.
 
 =head2 C<recurring>
 
@@ -534,8 +534,7 @@ object from everywhere inside the process.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the loop, this will block until C<stop> is called or no events are being
-watched anymore.
+Start the loop, this will block until C<stop> is called.
 
   # Start loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

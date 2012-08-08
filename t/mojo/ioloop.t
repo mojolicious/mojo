@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 32;
+use Test::More tests => 33;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -98,8 +98,11 @@ $loop->remove($id);
 $loop->remove($id2);
 isa_ok $handle, 'IO::Socket', 'right reference';
 
-# Make sure it stops automatically when not watching for events
-$loop->start;
+# The poll reactor stops when there are no events being watched anymore
+my $time = time;
+Mojo::IOLoop->start;
+Mojo::IOLoop->one_tick;
+ok time < ($time + 3), 'stopped automatically';
 
 # Stream
 $port = Mojo::IOLoop->generate_port;

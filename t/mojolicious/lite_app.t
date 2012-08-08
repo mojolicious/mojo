@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 713;
+use Test::More tests => 707;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -22,7 +22,6 @@ use Mojo::Date;
 use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
-use Mojo::UserAgent;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -416,21 +415,7 @@ get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 # GET /subrequest
 get '/subrequest' => sub {
   my $self = shift;
-  my $tx   = $self->ua->post('/template');
-  $self->render_text($tx->success->body);
-};
-
-# GET /subrequest_simple
-get '/subrequest_simple' => sub {
-  my $self = shift;
-  $self->render_text($self->ua->post('/template')->res->body);
-};
-
-# GET /subrequest_blocking
-get '/subrequest_blocking' => sub {
-  my $self = shift;
-  $self->ua->post('/template');
-  $self->render_text($self->ua->post('/template')->res->body);
+  $self->render_text($self->ua->post('/template')->success->body);
 };
 
 # Make sure hook runs non-blocking
@@ -565,23 +550,6 @@ my $t = Test::Mojo->new;
 # Application is already available
 is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
 is $t->app, app->commands->app, 'applications are equal';
-
-# User agent timer
-my $ua  = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app(app);
-my $tua = Mojo::UserAgent->new(ioloop => $ua->ioloop)->app(app);
-my $timer;
-$tua->ioloop->timer(
-  0.1 => sub {
-    my $nb = '';
-    $tua->get(
-      '/' => sub {
-        my $tx = pop;
-        $timer = $tx->res->body . $nb;
-      }
-    );
-    $nb = 'works!';
-  }
-);
 
 # GET /☃
 $t->get_ok('/☃')->status_is(200)->content_is('/%E2%98%83/%E2%98%83');
@@ -1144,7 +1112,7 @@ $tx->req->method('POST');
 $tx->req->url->parse('/malformed_utf8');
 $tx->req->headers->content_type('application/x-www-form-urlencoded');
 $tx->req->body('foo=%E1');
-$ua->start($tx);
+$t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
 is scalar $tx->res->headers->server, 'Mojolicious (Perl)',
   'right "Server" value';
@@ -1194,14 +1162,8 @@ $t->get_ok('/subrequest')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
 
-# GET /subrequest_simple
-$t->get_ok('/subrequest_simple')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('Just works!');
-
-# GET /subrequest_blocking
-$t->get_ok('/subrequest_blocking')->status_is(200)
+# GET /subrequest (again)
+$t->get_ok('/subrequest')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Just works!');
@@ -1391,12 +1353,6 @@ $t->get_ok('/dynamic/inline')->status_is(200)
 # GET /dynamic/inline (again)
 $t->get_ok('/dynamic/inline')->status_is(200)
   ->content_is("dynamic inline 2\n");
-
-# User agent timer
-$tua->ioloop->one_tick;
-is $timer,
-  "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\nworks!",
-  'right content';
 
 __DATA__
 @@ with-format.html.ep

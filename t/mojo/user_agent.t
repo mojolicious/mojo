@@ -130,7 +130,7 @@ undef $ua;
 is $get,  'Premature connection close', 'right error';
 is $post, 'Premature connection close', 'right error';
 
-# Make sure event loop is clean and stops automatically
+# The poll reactor stops when there are no events being watched anymore
 my $time = time;
 Mojo::IOLoop->start;
 ok time < ($time + 3), 'stopped automatically';

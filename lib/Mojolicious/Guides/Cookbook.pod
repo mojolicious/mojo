@@ -11,8 +11,8 @@ This document cotains many fun recipes for cooking with L<Mojolicious>.
 
 Getting L<Mojolicious> and L<Mojolicious::Lite> applications running on
 different platforms. Note that many real-time web features are based on the
-L<Mojo::IOLoop> reactor, and therefore require one of the built-in web servers
-to be able to use them to their full potential.
+L<Mojo::IOLoop> event loop, and therefore require one of the built-in web
+servers to be able to use them to their full potential.
 
 =head2 Built-in web server
 
@@ -274,13 +274,13 @@ The real-time web is a collection of technologies that include Comet
 (long-polling), EventSource and WebSockets, which allow content to be pushed
 to consumers with long-lived connections as soon as it is generated, instead
 of relying on the more traditional pull model. All built-in web servers use
-non-blocking I/O and are based on the L<Mojo::IOLoop> reactor, which provides
-many very powerful features that allow real-time web applications to scale up
-to thousands of clients.
+non-blocking I/O and are based on the L<Mojo::IOLoop> event loop, which
+provides many very powerful features that allow real-time web applications to
+scale up to thousands of clients.
 
 =head2 Backend web services
 
-Since L<Mojo::UserAgent> is also based on the L<Mojo::IOLoop> reactor, it
+Since L<Mojo::UserAgent> is also based on the L<Mojo::IOLoop> event loop, it
 won't block the built-in web servers when used non-blocking, even for high
 latency backend web services.
 
@@ -344,8 +344,8 @@ L<Mojo::IOLoop> delay.
 
 =head2 Timers
 
-Another primary feature of the L<Mojo::IOLoop> reactor are timers, which can
-for example be used to delay rendering of a response, and unlike C<sleep>,
+Another primary feature of the L<Mojo::IOLoop> event loop are timers, which
+can for example be used to delay rendering of a response, and unlike C<sleep>,
 won't block any other requests that might be processed in parallel.
 
   use Mojolicious::Lite;
@@ -621,9 +621,9 @@ which can be combined to solve some of hardest problems in web development.
 
 =head2 Event loops
 
-Internally the L<Mojo::IOLoop> reactor can use multiple event loop backends,
-L<EV> for example will be automatically used if installed. Which in turn
-allows event loops like L<AnyEvent> to just work.
+Internally the L<Mojo::IOLoop> event loop can use multiple event loop
+backends, L<EV> for example will be automatically used if installed. Which in
+turn allows event loops like L<AnyEvent> to just work.
 
   use Mojolicious::Lite;
   use EV;
@@ -908,11 +908,11 @@ can keep many parallel connections active at the same time.
   # Start a bunch of parallel crawlers sharing the same user agent
   crawl($_) for 1 .. 3;
 
-  # Start reactor if necessary
+  # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-You can take full control of the L<Mojo::IOLoop> reactor. Note that real web
-crawlers should respect C<robots.txt> files, and not overwhelm web servers
+You can take full control of the L<Mojo::IOLoop> event loop. Note that real
+web crawlers should respect C<robots.txt> files, and not overwhelm web servers
 with too frequent requests.
 
 =head2 Parallel blocking requests

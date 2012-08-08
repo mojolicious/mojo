@@ -282,7 +282,7 @@ sub _stream {
 
 =head1 NAME
 
-Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
+Mojo::IOLoop - Minimalistic event loop
 
 =head1 SYNOPSIS
 
@@ -324,14 +324,14 @@ Mojo::IOLoop - Minimalistic reactor for non-blocking TCP clients and servers
     $loop->remove($id);
   });
 
-  # Start loop if necessary
+  # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop> is a very minimalistic reactor based on L<Mojo::Reactor>, it
-has been reduced to the absolute minimal feature set required to build solid
-and scalable non-blocking TCP clients and servers.
+L<Mojo::IOLoop> is a very minimalistic event loop based on L<Mojo::Reactor>,
+it has been reduced to the absolute minimal feature set required to build
+solid and scalable non-blocking TCP clients and servers.
 
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently, and used if installed.
@@ -378,9 +378,9 @@ this callback are not captured.
   my $max = $loop->max_accepts;
   $loop   = $loop->max_accepts(1000);
 
-The maximum number of connections this loop is allowed to accept before
+The maximum number of connections this event loop is allowed to accept before
 shutting down gracefully without interrupting existing connections, defaults
-to C<0>. Setting the value to C<0> will allow this loop to accept new
+to C<0>. Setting the value to C<0> will allow this event loop to accept new
 connections indefinitely. Note that up to half of this value can be subtracted
 randomly to improve load balancing between multiple server processes.
 
@@ -389,11 +389,11 @@ randomly to improve load balancing between multiple server processes.
   my $max = $loop->max_connections;
   $loop   = $loop->max_connections(1000);
 
-The maximum number of parallel connections this loop is allowed to handle
-before stopping to accept new incoming connections, defaults to C<1000>.
-Setting the value to C<0> will make this loop stop accepting new connections
-and allow it to shut down gracefully without interrupting existing
-connections.
+The maximum number of parallel connections this event loop is allowed to
+handle before stopping to accept new incoming connections, defaults to
+C<1000>. Setting the value to C<0> will make this event loop stop accepting
+new connections and allow it to shut down gracefully without interrupting
+existing connections.
 
 =head2 C<reactor>
 
@@ -472,7 +472,7 @@ Find a free TCP port, this is a utility function primarily used for tests.
   my $success = Mojo::IOLoop->is_running;
   my $success = $loop->is_running;
 
-Check if loop is running.
+Check if event loop is running.
 
   exit unless Mojo::IOLoop->is_running;
 
@@ -481,8 +481,8 @@ Check if loop is running.
   Mojo::IOLoop->one_tick;
   $loop->one_tick;
 
-Run reactor until an event occurs. Note that this method can recurse back into
-the reactor, so you need to be careful.
+Run event loop until an event occurs. Note that this method can recurse back
+into the reactor, so you need to be careful.
 
 =head2 C<recurring>
 
@@ -522,8 +522,8 @@ as L<Mojo::IOLoop::Server/"listen">.
 
   my $loop = Mojo::IOLoop->singleton;
 
-The global L<Mojo::IOLoop> singleton, used to access a single shared loop
-object from everywhere inside the process.
+The global L<Mojo::IOLoop> singleton, used to access a single shared event
+loop object from everywhere inside the process.
 
   # Many methods also allow you to take shortcuts
   Mojo::IOLoop->timer(2 => sub { Mojo::IOLoop->stop });
@@ -534,9 +534,10 @@ object from everywhere inside the process.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the loop, this will block until C<stop> is called.
+Start the event loop, this will block until C<stop> is called. Note that some
+reactors stop automatically if there are no events being watched anymore.
 
-  # Start loop only if it is not running already
+  # Start event loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 =head2 C<stop>
@@ -544,8 +545,8 @@ Start the loop, this will block until C<stop> is called.
   Mojo::IOLoop->stop;
   $loop->stop;
 
-Stop the loop, this will not interrupt any existing connections and the loop
-can be restarted by running C<start> again.
+Stop the event loop, this will not interrupt any existing connections and the
+event loop can be restarted by running C<start> again.
 
 =head2 C<stream>
 

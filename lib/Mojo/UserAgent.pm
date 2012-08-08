@@ -117,7 +117,7 @@ sub start {
   }
   $self->_start($tx => sub { $tx = $_[1] });
 
-  # Start loop
+  # Start event loop
   $self->ioloop->start;
 
   return $tx;
@@ -352,7 +352,7 @@ sub _handle {
       unless $self->_redirect($c, $old);
   }
 
-  # Stop loop if necessary
+  # Stop event loop if necessary
   $self->ioloop->stop if !$self->{nb} && !keys %{$self->{connections}};
 }
 
@@ -720,8 +720,8 @@ inactive indefinitely.
   my $loop = $ua->ioloop;
   $ua      = $ua->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for blocking I/O operations, defaults to a L<Mojo::IOLoop>
-object.
+Event loop object to use for blocking I/O operations, defaults to a
+L<Mojo::IOLoop> object.
 
 =head2 C<key>
 

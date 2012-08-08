@@ -78,7 +78,8 @@ L<Mojo::IOLoop::Delay> implements the following attributes.
   my $ioloop = $delay->ioloop;
   $delay     = $delay->ioloop(Mojo::IOLoop->new);
 
-Loop object to control, defaults to the global L<Mojo::IOLoop> singleton.
+Event loop object to control, defaults to the global L<Mojo::IOLoop>
+singleton.
 
 =head1 METHODS
 

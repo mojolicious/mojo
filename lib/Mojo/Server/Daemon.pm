@@ -341,8 +341,8 @@ inactive indefinitely.
   my $loop = $daemon->ioloop;
   $daemon  = $daemon->ioloop(Mojo::IOLoop->new);
 
-Loop object to use for I/O operations, defaults to the global L<Mojo::IOLoop>
-singleton.
+Event loop object to use for I/O operations, defaults to the global
+L<Mojo::IOLoop> singleton.
 
 =head2 C<listen>
 

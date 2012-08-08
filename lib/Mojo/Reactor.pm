@@ -155,7 +155,8 @@ Remove handle or timer. Meant to be overloaded in a subclass.
   $reactor->start;
 
 Start watching for I/O and timer events, this will block until C<stop> is
-called. Meant to be overloaded in a subclass.
+called. Note that some reactors stop automatically if there are no events
+being watched anymore. Meant to be overloaded in a subclass.
 
 =head2 C<stop>
 

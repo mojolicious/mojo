@@ -344,14 +344,17 @@ Test::Mojo - Testing Mojo!
 
   my $t = Test::Mojo->new('MyApp');
 
+  # HTML5/XML
   $t->get_ok('/welcome')->status_is(200)->text_is('div#message' => 'Hello!');
 
+  # JSON
   $t->post_form_ok('/search.json' => {q => 'Perl'})
     ->status_is(200)
     ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
     ->header_isnt('X-Bender' => 'Bite my shiny metal ass!');
     ->json_is('/results/4/title' => 'Perl rocks!');
 
+  # WebSocket
   $t->websocket_ok('/echo')
     ->send_ok('hello')
     ->message_is('echo: hello')
@@ -506,7 +509,7 @@ same arguments as L<Mojo::UserAgent/"delete">.
   $t = $t->element_exists('div.foo[x=y]');
   $t = $t->element_exists('html head title', 'has a title');
 
-Checks for existence of the CSS3 selectors first matching XML/HTML element
+Checks for existence of the CSS3 selectors first matching HTML5/XML element
 with L<Mojo::DOM>.
 
 =head2 C<element_exists_not>
@@ -728,7 +731,7 @@ Opposite of C<status_is>.
   $t = $t->text_is('div.foo[x=y]' => 'Hello!');
   $t = $t->text_is('html head title' => 'Hello!', 'right title');
 
-Checks text content of the CSS3 selectors first matching XML/HTML element for
+Checks text content of the CSS3 selectors first matching HTML5/XML element for
 exact match with L<Mojo::DOM>.
 
 =head2 C<text_isnt>
@@ -743,7 +746,7 @@ Opposite of C<text_is>.
   $t = $t->text_like('div.foo[x=y]' => qr/Hello/);
   $t = $t->text_like('html head title' => qr/Hello/, 'right title');
 
-Checks text content of the CSS3 selectors first matching XML/HTML element for
+Checks text content of the CSS3 selectors first matching HTML5/XML element for
 similar match with L<Mojo::DOM>.
 
 =head2 C<text_unlike>

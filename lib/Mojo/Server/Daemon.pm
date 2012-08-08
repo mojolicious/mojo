@@ -126,13 +126,12 @@ sub _finish {
   }
 
   # Close connection if necessary
-  if ($tx->req->error || !$tx->keep_alive) { $self->_remove($id) }
+  return $self->_remove($id) if $tx->req->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  elsif (defined(my $leftovers = $tx->server_leftovers)) {
-    $tx = $c->{tx} = $self->_build_tx($id, $c);
-    $tx->server_read($leftovers);
-  }
+  return unless defined(my $leftovers = $tx->server_leftovers);
+  $tx = $c->{tx} = $self->_build_tx($id, $c);
+  $tx->server_read($leftovers);
 }
 
 sub _group {

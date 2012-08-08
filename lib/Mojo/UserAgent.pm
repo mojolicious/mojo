@@ -321,7 +321,7 @@ sub _finish {
 sub _handle {
   my ($self, $id, $close) = @_;
 
-  # Request timeout
+  # Remove request timeout
   my $c = $self->{connections}{$id};
   $self->_loop->remove($c->{timeout}) if $c->{timeout};
 
@@ -352,7 +352,7 @@ sub _handle {
       unless $self->_redirect($c, $old);
   }
 
-  # Stop loop
+  # Stop loop if necessary
   $self->ioloop->stop if !$self->{nb} && !keys %{$self->{connections}};
 }
 

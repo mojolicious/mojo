@@ -46,14 +46,14 @@ my ($server, $client);
 $loop->server(
   {address => '127.0.0.1', port => $port, tls => 1} => sub {
     my ($loop, $stream) = @_;
-    $stream->write('test', sub { shift->write('321') });
+    $stream->write('test' => sub { shift->write('321') });
     $stream->on(read => sub { $server .= pop });
   }
 );
 $loop->client(
   {port => $port, tls => 1} => sub {
     my ($loop, $err, $stream) = @_;
-    $stream->write('tset', sub { shift->write('123') });
+    $stream->write('tset' => sub { shift->write('123') });
     $stream->on(read => sub { $client .= pop });
   }
 );
@@ -77,7 +77,7 @@ $loop->server(
   tls_key  => 't/mojo/certs/server.key',
   sub {
     my ($loop, $stream) = @_;
-    $stream->write('test', sub { shift->write('321') });
+    $stream->write('test' => sub { shift->write('321') });
     $running = Mojo::IOLoop->is_running;
     $stream->on(timeout => sub { $timeout++ });
     $stream->on(close   => sub { $server_close++ });
@@ -93,7 +93,7 @@ $loop->client(
   tls_key  => 't/mojo/certs/client.key',
   sub {
     my ($loop, $err, $stream) = @_;
-    $stream->write('tset', sub { shift->write('123') });
+    $stream->write('tset' => sub { shift->write('123') });
     $stream->on(close => sub { $client_close++ });
     $stream->on(read => sub { $client .= pop });
   }
@@ -169,7 +169,7 @@ $loop->server(
   tls_key  => 't/mojo/certs/server.key',
   sub {
     my ($loop, $stream) = @_;
-    $stream->write('test', sub { shift->write('321') });
+    $stream->write('test' => sub { shift->write('321') });
     $running = Mojo::IOLoop->is_running;
     $stream->on(timeout => sub { $timeout++ });
     $stream->on(close   => sub { $server_close++ });
@@ -186,7 +186,7 @@ $loop->client(
   tls_key  => 't/mojo/certs/client.key',
   sub {
     my ($loop, $err, $stream) = @_;
-    $stream->write('tset', sub { shift->write('123') });
+    $stream->write('tset' => sub { shift->write('123') });
     $stream->on(close => sub { $client_close++ });
     $stream->on(read => sub { $client .= pop });
   }
@@ -285,7 +285,7 @@ $loop->server(
   tls_verify => 0x00,
   sub {
     my ($loop, $stream) = @_;
-    $stream->write('test', sub { shift->write('321') });
+    $stream->write('test' => sub { shift->write('321') });
     $running = Mojo::IOLoop->is_running;
     $stream->on(timeout => sub { $timeout++ });
     $stream->on(close   => sub { $server_close++ });

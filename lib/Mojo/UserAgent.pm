@@ -115,7 +115,7 @@ sub start {
     warn "-- Switching to blocking mode\n" if DEBUG;
     $self->_cleanup(1);
   }
-  $self->_start($tx, sub { $tx = $_[1] });
+  $self->_start($tx => sub { $tx = $_[1] });
 
   # Start loop
   $self->ioloop->start;
@@ -509,7 +509,7 @@ sub _write {
   # Continue writing
   return unless $tx->is_writing;
   weaken $self;
-  $stream->write('', sub { $self->_write($id) });
+  $stream->write('' => sub { $self->_write($id) });
 }
 
 1;

@@ -335,7 +335,7 @@ Steal handle from stream and prevent it from getting closed automatically.
 =head2 C<write>
 
   $stream = $stream->write('Hello!');
-  $stream = $stream->write('Hello!', sub {...});
+  $stream = $stream->write('Hello!' => sub {...});
 
 Write data to stream, the optional drain callback will be invoked once all
 data has been written.

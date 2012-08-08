@@ -779,7 +779,7 @@ common use would be to send the C<head> section of an HTML document to the
 browser in advance and speed up preloading of referenced images and
 stylesheets.
 
-  $self->write_chunk('<html><head><title>Example</title></head>', sub {
+  $self->write_chunk('<html><head><title>Example</title></head>' => sub {
     my $self = shift;
     $self->finish('<body>Example</body></html>');
   });

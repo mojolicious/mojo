@@ -216,7 +216,7 @@ $server = $client = '';
 Mojo::IOLoop->server(
   {address => '127.0.0.1', port => $port} => sub {
     my ($loop, $stream) = @_;
-    $stream->write('test', sub { shift->write('321') });
+    $stream->write('test' => sub { shift->write('321') });
     $stream->on(read => sub { $server .= pop });
     $server_running = Mojo::IOLoop->is_running;
     eval { Mojo::IOLoop->start };
@@ -226,7 +226,7 @@ Mojo::IOLoop->server(
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;
-    $stream->write('tset', sub { shift->write('123') });
+    $stream->write('tset' => sub { shift->write('123') });
     $stream->on(read => sub { $client .= pop });
     $client_running = Mojo::IOLoop->is_running;
     eval { Mojo::IOLoop->start };

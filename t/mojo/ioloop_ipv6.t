@@ -21,14 +21,14 @@ my ($server, $client);
 $loop->server(
   {address => '[::1]', port => $port} => sub {
     my ($loop, $stream) = @_;
-    $stream->write('test', sub { shift->write('321') });
+    $stream->write('test' => sub { shift->write('321') });
     $stream->on(read => sub { $server .= pop });
   }
 );
 $loop->client(
   {address => '[::1]', port => $port} => sub {
     my ($loop, $err, $stream) = @_;
-    $stream->write('tset', sub { shift->write('123') });
+    $stream->write('tset' => sub { shift->write('123') });
     $stream->on(read => sub { $client .= pop });
   }
 );

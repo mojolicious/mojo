@@ -327,7 +327,7 @@ is $tx->res->headers->location, undef, 'no "Location" value';
 $tx = $t->tx(POST => 'http://mojolico.us/foo');
 $tx->res->code(302);
 $tx->res->headers->location('http://kraih.com/bar');
-$tx->req->write_chunk('whatever', sub { shift->finish });
+$tx->req->write_chunk('whatever' => sub { shift->finish });
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
@@ -356,7 +356,7 @@ is $tx->res->headers->location, undef, 'no "Location" value';
 $tx = $t->tx(POST => 'http://mojolico.us/foo');
 $tx->res->code(303);
 $tx->res->headers->location('http://kraih.com/bar');
-$tx->req->write_chunk('whatever', sub { shift->finish });
+$tx->req->write_chunk('whatever' => sub { shift->finish });
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
@@ -428,7 +428,7 @@ is $tx->res->headers->location, undef, 'no "Location" value';
 $tx = $t->tx(POST => 'http://mojolico.us/foo');
 $tx->res->code(301);
 $tx->res->headers->location('http://kraih.com/bar');
-$tx->req->write_chunk('whatever', sub { shift->finish });
+$tx->req->write_chunk('whatever' => sub { shift->finish });
 is $t->redirect($tx), undef, 'unsupported redirect';
 
 # Simple 307 redirect
@@ -465,7 +465,7 @@ is $tx->res->headers->location, undef, 'no "Location" value';
 $tx = $t->tx(POST => 'http://mojolico.us/foo');
 $tx->res->code(307);
 $tx->res->headers->location('http://kraih.com/bar');
-$tx->req->write_chunk('whatever', sub { shift->finish });
+$tx->req->write_chunk('whatever' => sub { shift->finish });
 is $t->redirect($tx), undef, 'unsupported redirect';
 
 # 307 redirect (additional headers)
@@ -530,7 +530,7 @@ is $tx->res->headers->location, undef, 'no "Location" value';
 $tx = $t->tx(POST => 'http://mojolico.us/foo');
 $tx->res->code(308);
 $tx->res->headers->location('http://kraih.com/bar');
-$tx->req->write_chunk('whatever', sub { shift->finish });
+$tx->req->write_chunk('whatever' => sub { shift->finish });
 is $t->redirect($tx), undef, 'unsupported redirect';
 
 # 309 redirect (unsupported)

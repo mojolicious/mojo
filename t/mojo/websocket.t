@@ -35,16 +35,16 @@ get '/link' => sub {
 };
 
 # WebSocket /
-my $server_flag;
+my $server;
 websocket '/' => sub {
   my $self = shift;
-  $self->on(finish => sub { $server_flag += 4 });
+  $self->on(finish => sub { $server += 2 });
   $self->on(
     message => sub {
       my ($self, $message) = @_;
       my $url = $self->url_for->to_abs;
       $self->send("${message}test2$url");
-      $server_flag = 20;
+      $server = 1;
     }
   );
 } => 'index';
@@ -131,7 +131,7 @@ websocket '/double_echo' => sub {
   shift->on(
     message => sub {
       my ($self, $message) = @_;
-      $self->send($message, sub { shift->send($message) });
+      $self->send($message => sub { shift->send($message) });
     }
   );
 };
@@ -239,14 +239,14 @@ ok $local, 'local port';
 is $loop->stream($tx->connection)->handle, $sock, 'right connection id';
 
 # WebSocket /early_start (server directly sends a message)
-my $client_flag;
 $result = undef;
+my $client;
 $ua->websocket(
   '/early_start' => sub {
     my $tx = pop;
     $tx->on(
       finish => sub {
-        $client_flag += 5;
+        $client += 2;
         $loop->stop;
       }
     );
@@ -255,14 +255,14 @@ $ua->websocket(
         my ($tx, $message) = @_;
         $result = $message;
         $tx->send('test3');
-        $client_flag = 18;
+        $client = 1;
       }
     );
   }
 );
 $loop->start;
-is $result,      'test3test2', 'right result';
-is $client_flag, 23,           'finish event has been emitted';
+is $result, 'test3test2', 'right result';
+is $client, 3,            'finish event has been emitted';
 
 # WebSocket /denied (connection denied)
 $code = undef;
@@ -351,15 +351,14 @@ is $finished, 7,            'finished client websocket';
 is $subreq,   9,            'finished server websocket';
 
 # WebSocket /echo (client-side drain callback)
-$client_flag = undef;
-$result      = '';
-my $drain = my $counter = 0;
+$result = '';
+my $drain = my $counter = $client = 0;
 $ua->websocket(
   '/echo' => sub {
     my $tx = pop;
     $tx->on(
       finish => sub {
-        $client_flag += 5;
+        $client += 2;
         $loop->stop;
       }
     );
@@ -370,7 +369,7 @@ $ua->websocket(
         $tx->finish if ++$counter == 2;
       }
     );
-    $client_flag = 20;
+    $client = 1;
     $tx->send(
       'hi!',
       sub {
@@ -382,20 +381,19 @@ $ua->websocket(
   }
 );
 $loop->start;
-is $result,      'hi!there!', 'right result';
-is $client_flag, 25,          'finish event has been emitted';
-is $drain,       1,           'no leaking subscribers';
+is $result, 'hi!there!', 'right result';
+is $client, 3,           'finish event has been emitted';
+is $drain,  1,           'no leaking subscribers';
 
 # WebSocket /double_echo (server-side drain callback)
-$client_flag = undef;
-$result      = '';
-$counter     = 0;
+$result = '';
+$counter = $client = 0;
 $ua->websocket(
   '/double_echo' => sub {
     my $tx = pop;
     $tx->on(
       finish => sub {
-        $client_flag += 5;
+        $client += 2;
         $loop->stop;
       }
     );
@@ -406,13 +404,13 @@ $ua->websocket(
         $tx->finish if ++$counter == 2;
       }
     );
-    $client_flag = 19;
+    $client = 1;
     $tx->send('hi!');
   }
 );
 $loop->start;
-is $result,      'hi!hi!', 'right result';
-is $client_flag, 24,       'finish event has been emitted';
+is $result, 'hi!hi!', 'right result';
+is $client, 3,        'finish event has been emitted';
 
 # WebSocket /dead (dies)
 $finished = $code = undef;
@@ -457,9 +455,6 @@ $ua->websocket(
   }
 );
 $loop->start;
-
-# Server-side "finished" callback
-is $server_flag, 24, 'finish event has been emitted';
 
 # WebSocket /echo (16bit length)
 $result = undef;
@@ -514,3 +509,6 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 is $pong, 'test', 'received pong with payload';
+
+# The "finish" event has been emitted on the server side too
+is $server, 3, 'finish event has been emitted';

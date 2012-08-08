@@ -427,7 +427,7 @@ following new ones.
   my $id
     = Mojo::IOLoop->client(address => '127.0.0.1', port => 3000, sub {...});
   my $id = $loop->client(address => '127.0.0.1', port => 3000, sub {...});
-  my $id = $loop->client({address => '127.0.0.1', port => 3000}, sub {...});
+  my $id = $loop->client({address => '127.0.0.1', port => 3000} => sub {...});
 
 Open TCP connection with L<Mojo::IOLoop::Client>, takes the same arguments as
 L<Mojo::IOLoop::Client/"connect">.
@@ -481,8 +481,8 @@ Check if loop is running.
   Mojo::IOLoop->one_tick;
   $loop->one_tick;
 
-Run reactor until an event occurs. Note that this method can recurse back into
-the reactor, so you need to be careful.
+Run reactor until an event occurs or no events are being watched anymore. Note
+that this method can recurse back into the reactor, so you need to be careful.
 
 =head2 C<recurring>
 
@@ -507,7 +507,7 @@ them to finish writing all data in their write buffers.
 
   my $id = Mojo::IOLoop->server(port => 3000, sub {...});
   my $id = $loop->server(port => 3000, sub {...});
-  my $id = $loop->server({port => 3000}, sub {...});
+  my $id = $loop->server({port => 3000} => sub {...});
 
 Accept TCP connections with L<Mojo::IOLoop::Server>, takes the same arguments
 as L<Mojo::IOLoop::Server/"listen">.
@@ -534,7 +534,8 @@ object from everywhere inside the process.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the loop, this will block until C<stop> is called.
+Start the loop, this will block until C<stop> is called or no events are being
+watched anymore.
 
   # Start loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

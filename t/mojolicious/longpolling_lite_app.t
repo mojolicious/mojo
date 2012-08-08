@@ -100,7 +100,7 @@ get '/longpoll/nested' => sub {
   $self->cookie(foo => 'bar');
   $self->write_chunk(
     sub {
-      shift->write_chunk('nested!', sub { shift->write_chunk('') });
+      shift->write_chunk('nested!' => sub { shift->write_chunk('') });
     }
   );
 };
@@ -116,7 +116,7 @@ get '/longpoll/plain' => sub {
   Mojo::IOLoop->timer(
     0.25 => sub {
       $self->on(finish => sub { $longpoll_plain = 'finished!' });
-      $self->write('there plain,', sub { shift->write(' whats up?') });
+      $self->write('there plain,' => sub { shift->write(' whats up?') });
     }
   );
 };

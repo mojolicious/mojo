@@ -34,7 +34,7 @@ get '/stream' => sub {
   shift->write_chunk(
     'he',
     sub {
-      shift->write_chunk('ll', sub { shift->finish('o!') });
+      shift->write_chunk('ll' => sub { shift->finish('o!') });
     }
   );
 };

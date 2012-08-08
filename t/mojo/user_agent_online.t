@@ -99,7 +99,7 @@ ok !$tx->is_finished, 'transaction is not finished';
 $ua = Mojo::UserAgent->new;
 
 # Keep alive
-$ua->get('http://mojolicio.us', sub { Mojo::IOLoop->singleton->stop });
+$ua->get('http://mojolicio.us' => sub { Mojo::IOLoop->singleton->stop });
 Mojo::IOLoop->singleton->start;
 my $kept_alive;
 $ua->get(

@@ -387,7 +387,7 @@ sub _parse_formdata {
 sub _write {
   my ($self, $method, $chunk, $cb) = @_;
   weaken $self;
-  $self->content->$method($chunk, sub { shift and $self->$cb(@_) if $cb });
+  $self->content->$method($chunk => sub { shift and $self->$cb(@_) if $cb });
   return $self;
 }
 
@@ -750,7 +750,7 @@ All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 =head2 C<write>
 
   $message = $message->write('Hello!');
-  $message = $message->write('Hello!', sub {...});
+  $message = $message->write('Hello!' => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be
 invoked once all data has been written.
@@ -758,7 +758,7 @@ invoked once all data has been written.
 =head2 C<write_chunk>
 
   $message = $message->write_chunk('Hello!');
-  $message = $message->write_chunk('Hello!', sub {...});
+  $message = $message->write_chunk('Hello!' => sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.

@@ -367,7 +367,7 @@ sub send {
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to send message to')
     unless $tx->is_websocket;
-  $tx->send($message, sub { shift and $self->$cb(@_) if $cb });
+  $tx->send($message => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered(101);
 }
 
@@ -497,14 +497,14 @@ sub url_for {
 sub write {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
-  $self->res->write($chunk, sub { shift and $self->$cb(@_) if $cb });
+  $self->res->write($chunk => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered;
 }
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
-  $self->res->write_chunk($chunk, sub { shift and $self->$cb(@_) if $cb });
+  $self->res->write_chunk($chunk => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered;
 }
 
@@ -878,7 +878,7 @@ browsers often don't really know what they actually want.
   $c = $c->send({text   => $bytes});
   $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
   $c = $c->send('Hi there!');
-  $c = $c->send('Hi there!', sub {...});
+  $c = $c->send('Hi there!' => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
 will be invoked once all data has been written.
@@ -1003,22 +1003,22 @@ to inherit query parameters from the current request.
   $c = $c->write;
   $c = $c->write('Hello!');
   $c = $c->write(sub {...});
-  $c = $c->write('Hello!', sub {...});
+  $c = $c->write('Hello!' => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be
 invoked once all data has been written.
 
   # Keep connection alive (with Content-Length header)
   $c->res->headers->content_length(6);
-  $c->write('Hel', sub {
+  $c->write('Hel' => sub {
     my $c = shift;
     $c->write('lo!')
   });
 
   # Close connection when finished (without Content-Length header)
-  $c->write('Hel', sub {
+  $c->write('Hel' => sub {
     my $c = shift;
-    $c->write('lo!', sub {
+    $c->write('lo!' => sub {
       my $c = shift;
       $c->finish;
     });
@@ -1035,15 +1035,15 @@ timeout, which usually defaults to C<15> seconds.
   $c = $c->write_chunk;
   $c = $c->write_chunk('Hello!');
   $c = $c->write_chunk(sub {...});
-  $c = $c->write_chunk('Hello!', sub {...});
+  $c = $c->write_chunk('Hello!' => sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.
 
   # Make sure previous chunk has been written before continuing
-  $c->write_chunk('He', sub {
+  $c->write_chunk('He' => sub {
     my $c = shift;
-    $c->write_chunk('ll', sub {
+    $c->write_chunk('ll' => sub {
       my $c = shift;
       $c->finish('o!');
     });

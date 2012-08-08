@@ -122,6 +122,8 @@ sub start_app {
   return Mojo::Server->new->build_app($ENV{MOJO_APP} = shift)->start(@_);
 }
 
+# "After all this time, somebody else with one eye... who ISN'T a clumsy
+#  carpenter or a kid with a BB gun."
 sub _command {
   my ($module, $fatal) = @_;
   return $module->isa('Mojolicious::Command') ? $module : undef

@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 102;
+use Test::More tests => 103;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -131,7 +131,9 @@ is $get,  'Premature connection close', 'right error';
 is $post, 'Premature connection close', 'right error';
 
 # Make sure event loop is clean and stops automatically
+my $time = time;
 Mojo::IOLoop->start;
+ok time < ($time + 3), 'stopped automatically';
 
 # GET / (non-blocking)
 $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);

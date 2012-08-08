@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 67;
+use Test::More tests => 68;
 
 # "I don't mind being called a liar when I'm lying, or about to lie,
 #  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
@@ -29,7 +29,9 @@ my $triggered;
 Mojo::IOLoop->timer(0.25 => sub { $triggered++ });
 Mojo::IOLoop->start;
 ok $triggered, 'reactor waited for one event';
+my $time = time;
 Mojo::IOLoop->start;
+ok time < ($time + 3), 'stopped automatically';
 
 # Listen
 my $port   = Mojo::IOLoop->generate_port;

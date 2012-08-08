@@ -1,4 +1,7 @@
 
+3.26  2012-08-09
+  - Improved tests.
+
 3.25  2012-08-08
   - Improved documentation.
   - Fixed cleanup bugs in Mojo::Server::Daemon and Mojo::UserAgent.

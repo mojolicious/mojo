@@ -192,10 +192,9 @@ sub _detect_handler {
 
 sub _extends {
   my ($self, $c) = @_;
-  my $stash = $c->stash;
-  if (my $layout = delete $stash->{layout}) {
-    $stash->{extends} ||= 'layouts' . '/' . $layout;
-  }
+  my $stash  = $c->stash;
+  my $layout = delete $stash->{layout};
+  $stash->{extends} ||= join('/', 'layouts', $layout) if $layout;
   return delete $stash->{extends};
 }
 

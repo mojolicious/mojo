@@ -298,10 +298,9 @@ sub render_file {
   my $tmpl = slurp $path;
 
   # Decode and render
-  if (my $encoding = $self->encoding) {
-    croak qq{Template "$path" has invalid encoding.}
-      unless defined($tmpl = decode $encoding, $tmpl);
-  }
+  my $encoding = $self->encoding;
+  croak qq{Template "$path" has invalid encoding.}
+    if $encoding && !defined($tmpl = decode $encoding, $tmpl);
   return $self->render($tmpl, @_);
 }
 

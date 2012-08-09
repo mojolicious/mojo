@@ -185,12 +185,11 @@ sub websocket {
   my $self = shift;
 
   # New WebSocket transaction
-  my $tx  = $self->tx(GET => @_);
-  my $req = $tx->req;
-  my $abs = $req->url->to_abs;
-  if (my $scheme = $abs->scheme) {
-    $req->url($abs->scheme($scheme eq 'wss' ? 'https' : 'http'));
-  }
+  my $tx     = $self->tx(GET => @_);
+  my $req    = $tx->req;
+  my $abs    = $req->url->to_abs;
+  my $scheme = $abs->scheme;
+  $req->url($abs->scheme($scheme eq 'wss' ? 'https' : 'http')) if $scheme;
 
   # Handshake
   Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1)

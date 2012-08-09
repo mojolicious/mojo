@@ -34,9 +34,9 @@ sub authority {
   }
 
   # Format
-  if (my $userinfo = $self->userinfo) {
-    $authority .= url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=\:') . '@';
-  }
+  my $userinfo = $self->userinfo;
+  $authority .= url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=\:') . '@'
+    if $userinfo;
   $authority .= lc($self->ihost || '');
   if (my $port = $self->port) { $authority .= ":$port" }
 
@@ -220,9 +220,9 @@ sub to_string {
   $url .= "?$query" if length $query;
 
   # Fragment
-  if (my $fragment = $self->fragment) {
-    $url .= '#' . url_escape $fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
-  }
+  my $fragment = $self->fragment;
+  $url .= '#' . url_escape $fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?'
+    if $fragment;
 
   return $url;
 }

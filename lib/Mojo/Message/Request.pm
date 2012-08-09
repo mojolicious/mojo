@@ -174,14 +174,12 @@ sub parse {
   if (!$base->host && (my $host = $headers->host)) { $base->authority($host) }
 
   # Basic authentication
-  if (my $userinfo = _parse_basic_auth($headers->authorization)) {
-    $base->userinfo($userinfo);
-  }
+  my $auth = _parse_basic_auth($headers->authorization);
+  $base->userinfo($auth) if $auth;
 
   # Basic proxy authentication
-  if (my $userinfo = _parse_basic_auth($headers->proxy_authorization)) {
-    $self->proxy(Mojo::URL->new->userinfo($userinfo));
-  }
+  my $proxy_auth = _parse_basic_auth($headers->proxy_authorization);
+  $self->proxy(Mojo::URL->new->userinfo($proxy_auth)) if $proxy_auth;
 
   # "X-Forwarded-HTTPS"
   $base->scheme('https')

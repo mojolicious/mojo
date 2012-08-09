@@ -17,14 +17,12 @@ Mojo::IOLoop->server(
         my ($stream, $chunk) = @_;
 
         # Write chunk from client to server
-        if (my $server = $buffer{$client}{connection}) {
-          return Mojo::IOLoop->stream($server)->write($chunk);
-        }
+        my $server = $buffer{$client}{connection};
+        return Mojo::IOLoop->stream($server)->write($chunk) if $server;
 
         # Read connect request from client
-        $buffer{$client}{client} .= $chunk;
-        if ($buffer{$client}{client} =~ /\x0d?\x0a\x0d?\x0a$/) {
-          my $buffer = $buffer{$client}{client};
+        my $buffer = $buffer{$client}{client} .= $chunk;
+        if ($buffer =~ /\x0d?\x0a\x0d?\x0a$/) {
           $buffer{$client}{client} = '';
           if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
             my $address = $1;
@@ -74,9 +72,8 @@ Mojo::IOLoop->server(
     # Client closed connection
     $stream->on(
       close => sub {
-        Mojo::IOLoop->remove($buffer{$client}{connection})
-          if $buffer{$client}{connection};
-        delete $buffer{$client};
+        my $buffer = delete $buffer{$client};
+        Mojo::IOLoop->remove($buffer->{connection}) if $buffer->{connection};
       }
     );
   }

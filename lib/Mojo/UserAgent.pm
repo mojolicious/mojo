@@ -441,14 +441,13 @@ sub _start {
   if ($self->need_proxy($url->host)) {
 
     # HTTP proxy
-    if (my $proxy = $self->http_proxy) {
-      $req->proxy($proxy) if !defined $req->proxy && $scheme eq 'http';
-    }
+    my $http = $self->http_proxy;
+    $req->proxy($http) if $http && !defined $req->proxy && $scheme eq 'http';
 
     # HTTPS proxy
-    if (my $proxy = $self->https_proxy) {
-      $req->proxy($proxy) if !defined $req->proxy && $scheme eq 'https';
-    }
+    my $https = $self->https_proxy;
+    $req->proxy($https)
+      if $https && !defined $req->proxy && $scheme eq 'https';
   }
 
   # We identify ourselves

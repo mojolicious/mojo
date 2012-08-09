@@ -70,8 +70,7 @@ $daemon->listen([$listen])->start;
 
 # Connect proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;
-my (%buffer, $connected);
-my $read = my $sent = my $fail = 0;
+my (%buffer, $connected, $read, $sent, $fail);
 my $nf
   = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
@@ -169,7 +168,7 @@ Mojo::IOLoop->start;
 is $result, "Hello World! / https://localhost:$port/", 'right content';
 
 # GET /broken_redirect (broken redirect)
-my $start = 0;
+my $start;
 $ua->on(
   start => sub {
     $start++;

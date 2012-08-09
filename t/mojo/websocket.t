@@ -84,7 +84,7 @@ websocket '/early_start' => sub {
 };
 
 # WebSocket /denied
-my $handshake = my $denied = 0;
+my ($handshake, $denied);
 websocket '/denied' => sub {
   my $self = shift;
   $self->tx->handshake->on(finish => sub { $handshake += 1 });
@@ -93,7 +93,7 @@ websocket '/denied' => sub {
 };
 
 # WebSocket /subreq
-my $subreq = 0;
+my $subreq;
 websocket '/subreq' => sub {
   my $self = shift;
   $self->ua->websocket(
@@ -111,7 +111,7 @@ websocket '/subreq' => sub {
     }
   );
   $self->send('test0');
-  $self->on(finish => sub { $subreq += 3 });
+  $self->on(finish => sub { $subreq += 1 });
 };
 
 # WebSocket /echo
@@ -206,9 +206,9 @@ ok $body =~ /^(\d+)failed!$/, 'right content';
 is $1, 15, 'right timeout';
 
 # WebSocket /socket (using an already prepared socket)
-my $port     = $ua->app_url->port;
-my $tx       = $ua->build_websocket_tx('ws://lalala/socket');
-my $finished = 0;
+my $port = $ua->app_url->port;
+my $tx   = $ua->build_websocket_tx('ws://lalala/socket');
+my $finished;
 $tx->on(finish => sub { $finished++ });
 my $sock = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $sock->blocking(0);
@@ -304,7 +304,7 @@ $loop->start;
 is $code,     101,          'right status';
 is $result,   'test0test1', 'right result';
 is $finished, 4,            'finished client websocket';
-is $subreq,   3,            'finished server websocket';
+is $subreq,   1,            'finished server websocket';
 
 # WebSocket /subreq (non-blocking)
 my $running = 2;
@@ -348,11 +348,12 @@ is $result,   'test0test1', 'right result';
 is $code2,    101,          'right status';
 is $result2,  'test0test1', 'right result';
 is $finished, 7,            'finished client websocket';
-is $subreq,   9,            'finished server websocket';
+is $subreq,   3,            'finished server websocket';
 
 # WebSocket /echo (client-side drain callback)
 $result = '';
-my $drain = my $counter = $client = 0;
+$client = 0;
+my ($drain, $counter);
 $ua->websocket(
   '/echo' => sub {
     my $tx = pop;

@@ -6,8 +6,8 @@ use Test::More tests => 46;
 use Mojo::EventEmitter;
 
 # Normal event
-my $e      = Mojo::EventEmitter->new;
-my $called = 0;
+my $e = Mojo::EventEmitter->new;
+my $called;
 $e->on(test1 => sub { $called++ });
 $e->emit('test1');
 is $called, 1, 'event was emitted once';
@@ -54,7 +54,7 @@ $e->emit('test1');
 is $called, 3, 'event was not emitted again';
 
 # One time event
-my $once = 0;
+my $once;
 $e->once(one_time => sub { $once++ });
 is scalar @{$e->subscribers('one_time')}, 1, 'one subscriber';
 $e->emit('one_time');
@@ -111,7 +111,7 @@ is $once, 1, 'event was not emitted again';
 
 # Unsubscribe
 $e = Mojo::EventEmitter->new;
-my $counter = 0;
+my $counter;
 $cb = $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });
 $e->on(foo => sub { $counter++ });

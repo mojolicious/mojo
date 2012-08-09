@@ -45,7 +45,7 @@ Mojo::IOLoop->start;
 like $err, qr/^Mojo::IOLoop already running/, 'right error';
 
 # Basics
-my $ticks = my $timer = my $hirestimer = 0;
+my ($ticks, $timer, $hirestimer);
 my $id = $loop->recurring(0 => sub { $ticks++ });
 $loop->timer(
   1 => sub {
@@ -62,8 +62,8 @@ ok $ticks > 2, 'more than two ticks';
 
 # Run again without first tick event handler
 my $before = $ticks;
-my $after  = 0;
-my $id2    = $loop->recurring(0 => sub { $after++ });
+my $after;
+my $id2 = $loop->recurring(0 => sub { $after++ });
 $loop->remove($id);
 $loop->timer(0.5 => sub { shift->stop });
 $loop->start;
@@ -73,7 +73,7 @@ ok $after > 1, 'more than one tick';
 is $ticks, $before, 'no additional ticks';
 
 # Recurring timer
-my $count = 0;
+my $count;
 $id = $loop->recurring(0.1 => sub { $count++ });
 $loop->timer(0.5 => sub { shift->stop });
 $loop->start;

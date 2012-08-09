@@ -15,7 +15,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # GET /shortpoll
-my $shortpoll = 0;
+my $shortpoll;
 get '/shortpoll' => sub {
   my $self = shift;
   $self->res->headers->connection('close');
@@ -220,7 +220,7 @@ get '/longpoll/dynamic/delayed' => sub {
 } => 'dynamic';
 
 # GET /stream
-my $stream = 0;
+my $stream;
 get '/stream' => sub {
   my $self = shift;
   my $i    = 0;

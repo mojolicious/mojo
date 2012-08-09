@@ -376,8 +376,7 @@ is $res->body, "Hello World!\n", 'right content';
 
 # Build HTTP 1.1 response parts with progress
 $res = Mojo::Message::Response->new;
-my ($finished, $state);
-my $progress = 0;
+my ($finished, $state, $progress);
 $res->on(finish => sub { $finished = shift->is_finished });
 $res->on(
   progress => sub {

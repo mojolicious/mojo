@@ -327,10 +327,9 @@ $ua->unsubscribe(start => $start);
 ok !$ua->has_subscribers('start'), 'unsubscribed successfully';
 
 # GET /echo (stream with drain callback)
-my $stream = 0;
 $tx = $ua->build_tx(GET => '/echo');
 my $i = 0;
-my $drain;
+my ($stream, $drain);
 $drain = sub {
   my $req = shift;
   return $ua->ioloop->timer(

@@ -7,8 +7,8 @@ use Test::More tests => 162;
 use Mojo::Message::Request;
 
 # Parse Lighttpd like CGI environment variables and a body
-my $req  = Mojo::Message::Request->new;
-my $body = 0;
+my $req = Mojo::Message::Request->new;
+my $body;
 $req->content->on(body => sub { $body++ });
 $req->parse(
   HTTP_CONTENT_LENGTH => 11,
@@ -135,8 +135,7 @@ is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 
 # Parse Apache 2.2 (win32) like CGI environment variables and a body
 $req = Mojo::Message::Request->new;
-my $finished;
-my $progress = 0;
+my ($finished, $progress);
 $req->on(finish => sub { $finished = shift->is_finished });
 $req->on(progress => sub { $progress++ });
 ok !$finished, 'not finished';

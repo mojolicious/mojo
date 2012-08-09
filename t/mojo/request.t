@@ -1509,7 +1509,7 @@ $req = Mojo::Message::Request->new;
 $req->method('GET');
 $req->url->parse('http://127.0.0.1:8080/foo/bar');
 $req->headers->transfer_encoding('chunked');
-my $counter = 0;
+my $counter;
 $req->on(progress => sub { $counter++ });
 $req->write_chunk(
   'hello world!' => sub {

@@ -114,7 +114,7 @@ ok $readable,  'handle is readable again';
 ok $writable,  'handle is writable again';
 ok $timer,     'timer was triggered';
 ok $recurring, 'recurring was triggered';
-my $done = 0;
+my $done;
 ($readable, $writable, $timer, $recurring) = undef;
 $reactor->timer(0.025 => sub { $done = shift->is_running });
 $reactor->one_tick while !$done;
@@ -159,7 +159,7 @@ is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
 # Parallel reactors
 $timer = 0;
 $reactor->recurring(0 => sub { $timer++ });
-my $timer2 = 0;
+my $timer2;
 $reactor2->recurring(0 => sub { $timer2++ });
 $reactor->timer(0.025 => sub { shift->stop });
 $reactor->start;

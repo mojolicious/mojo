@@ -83,7 +83,7 @@ get '/late/session' => sub {
 };
 
 # Counter
-my $under = 0;
+my $under;
 under sub {
   shift->res->headers->header('X-Under' => ++$under);
   1;

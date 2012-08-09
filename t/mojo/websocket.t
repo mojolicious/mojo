@@ -84,10 +84,10 @@ websocket '/early_start' => sub {
 };
 
 # WebSocket /denied
-my ($handshake, $denied) = 0;
+my $handshake = my $denied = 0;
 websocket '/denied' => sub {
   my $self = shift;
-  $self->tx->handshake->on(finish => sub { $handshake += 2 });
+  $self->tx->handshake->on(finish => sub { $handshake += 1 });
   $self->on(finish => sub { $denied += 1 });
   $self->render(text => 'denied', status => 403);
 };
@@ -274,7 +274,7 @@ $ua->websocket(
 );
 $loop->start;
 is $code,      403, 'right status';
-is $handshake, 2,   'finished handshake';
+is $handshake, 1,   'finished handshake';
 is $denied,    1,   'finished websocket';
 
 # WebSocket /subreq

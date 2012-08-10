@@ -192,7 +192,7 @@ sub _headers {
     $self->{offset} = 0;
 
     # Response without body
-    $head = $head && ($self->req->method eq 'HEAD' || $message->has_no_body);
+    $head = $head && ($self->req->method eq 'HEAD' || $message->is_empty);
     if ($head) { $self->{state} = 'finished' }
 
     # Body

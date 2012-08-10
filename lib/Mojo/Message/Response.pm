@@ -100,7 +100,7 @@ sub extract_start_line {
   return unless defined(my $line = get_line $bufferref);
   $self->error('Bad response start line') and return
     unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
-  $self->content->skip_body(1) if $self->code($2)->has_no_body;
+  $self->content->skip_body(1) if $self->code($2)->is_empty;
   return !!$self->version($1)->message($3)->content->auto_relax(1);
 }
 
@@ -132,7 +132,7 @@ sub get_start_line_chunk {
   return substr $self->{start_buffer}, $offset, 131072;
 }
 
-sub has_no_body {
+sub is_empty {
   my $self = shift;
   return $self->is_status_class(100) || $self->code ~~ [qw(204 304)];
 }
@@ -235,9 +235,9 @@ Make sure response has all required headers for the current HTTP version.
 
 Get a chunk of status line data starting from a specific position.
 
-=head2 C<has_no_body>
+=head2 C<is_empty>
 
-  my $success = $res->has_no_body;
+  my $success = $res->is_empty;
 
 Check if this is a C<1xx>, C<204> or C<304> response.
 

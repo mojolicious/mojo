@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Mojo::Headers;
 
-has [qw(auto_relax no_body relaxed)];
+has [qw(auto_relax relaxed skip_body)];
 has headers => sub { Mojo::Headers->new };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
@@ -96,7 +96,7 @@ sub parse {
   $self->_body;
 
   # No content
-  if ($self->no_body) {
+  if ($self->skip_body) {
     $self->{state} = 'finished';
     return $self;
   }
@@ -423,13 +423,6 @@ Content headers, defaults to a L<Mojo::Headers> object.
 Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the
 value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>.
 
-=head2 C<no_body>
-
-  my $no_body = $content->no_body;
-  $content    = $content->no_body(1);
-
-Deactivate body parsing and finish after headers.
-
 =head2 C<relaxed>
 
   my $relaxed = $content->relaxed;
@@ -437,6 +430,13 @@ Deactivate body parsing and finish after headers.
 
 Activate relaxed parsing for responses that are terminated with a connection
 close.
+
+=head2 C<skip_body>
+
+  my $skip = $content->skip_body;
+  $content = $content->skip_body(1);
+
+Skip body parsing and finish after headers.
 
 =head1 METHODS
 

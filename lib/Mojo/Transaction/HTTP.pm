@@ -14,7 +14,7 @@ sub client_read {
 
   # Generate response without body for HEAD request
   my $res = $self->res;
-  $res->content->no_body(1) if $self->req->method eq 'HEAD';
+  $res->content->skip_body(1) if $self->req->method eq 'HEAD';
 
   # Parse response
   $res->parse($chunk);

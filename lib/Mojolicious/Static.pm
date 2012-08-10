@@ -71,12 +71,8 @@ sub serve_asset {
   # If modified since
   my $headers = $c->req->headers;
   if (my $date = $headers->if_modified_since) {
-
-    # Not modified
     my $since = Mojo::Date->new($date)->epoch;
-    return $res->code(304)->headers->remove('Content-Type')
-      ->remove('Content-Length')->remove('Content-Disposition')
-      if defined $since && $since == $mtime;
+    return $res->code(304) if defined $since && $since == $mtime;
   }
 
   # Range

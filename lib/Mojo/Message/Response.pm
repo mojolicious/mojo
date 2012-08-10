@@ -100,7 +100,7 @@ sub extract_start_line {
   return unless defined(my $line = get_line $bufferref);
   $self->error('Bad response start line') and return
     unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
-  $self->content->no_body(1) if $self->code($2)->has_no_body;
+  $self->content->skip_body(1) if $self->code($2)->has_no_body;
   return !!$self->version($1)->message($3)->content->auto_relax(1);
 }
 
@@ -239,7 +239,7 @@ Get a chunk of status line data starting from a specific position.
 
   my $success = $res->has_no_body;
 
-Check if this type of response has no body.
+Check if this is a C<1xx>, C<204> or C<304> response.
 
 =head2 C<is_status_class>
 

@@ -1,6 +1,6 @@
 
 3.28  2012-08-10
-  - Added no_body attribute to Mojo::Content.
+  - Added skip_body attribute to Mojo::Content.
   - Added has_no_body method to Mojo::Message::Response.
   - Updated jQuery to version 1.8.
   - Improved message parser performance slightly.

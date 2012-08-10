@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 346;
+use Test::More tests => 356;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -222,13 +222,29 @@ $res->parse("Connection: close\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
 ok !$res->is_finished, 'response is not finished';
 ok !$res->has_no_body, 'response has a body';
-ok !$res->content->no_body, 'response has a body';
+ok !$res->content->no_body, 'response body has been parsed';
 is $res->code,    500,                     'right status';
 is $res->message, 'Internal Server Error', 'right message';
 is $res->version, '1.1',                   'right version';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, undef,        'no "Content-Length" value';
 is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+
+# Parse full HTTP 1.1 response (100 Continue)
+$res = Mojo::Message::Response->new;
+$res->content->on(body => sub { shift->headers->header('X-Body' => 'one') });
+$res->on(finish => sub { shift->headers->header('X-Finish' => 'two') });
+$res->parse("HTTP/1.1 100 Continue\x0d\x0a\x0d\x0a");
+ok $res->is_finished, 'response is finished';
+ok $res->has_no_body, 'response has no body';
+ok $res->content->no_body, 'response body has not been parsed';
+is $res->code,    100,        'right status';
+is $res->message, 'Continue', 'right message';
+is $res->version, '1.1',      'right version';
+is $res->headers->content_length, undef, 'no "Content-Length" value';
+is $res->headers->header('X-Body'),   'one', 'right "X-Body" value';
+is $res->headers->header('X-Finish'), 'two', 'right "X-Finish" value';
+is $res->body, '', 'no content';
 
 # Parse full HTTP 1.1 response (304 Not Modified)
 $res = Mojo::Message::Response->new;
@@ -238,7 +254,7 @@ $res->parse("Content-Length: 9000\x0d\x0a");
 $res->parse("Connection: keep-alive\x0d\x0a\x0d\x0a");
 ok $res->is_finished, 'response is finished';
 ok $res->has_no_body, 'response has no body';
-ok $res->content->no_body, 'response has no body';
+ok $res->content->no_body, 'response body has not been parsed';
 is $res->code,    304,            'right status';
 is $res->message, 'Not Modified', 'right message';
 is $res->version, '1.1',          'right version';
@@ -257,7 +273,7 @@ $res->parse("Content-Length: 9001\x0d\x0a");
 $res->parse("Connection: keep-alive\x0d\x0a\x0d\x0a");
 ok $res->is_finished, 'response is finished';
 ok $res->has_no_body, 'response has no body';
-ok $res->content->no_body, 'response has no body';
+ok $res->content->no_body, 'response body has not been parsed';
 is $res->code,    204,          'right status';
 is $res->message, 'No Content', 'right message';
 is $res->version, '1.1',        'right version';
@@ -509,7 +525,7 @@ $res->parse("Sec-WebSocket-Accept: abcdef=\x0d\x0a");
 $res->parse("Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
 ok $res->is_finished, 'response is finished';
 ok $res->has_no_body, 'response has no body';
-ok $res->content->no_body, 'response has no body';
+ok $res->content->no_body, 'response body has not been parsed';
 is $res->code,    101,                   'right status';
 is $res->message, 'Switching Protocols', 'right message';
 is $res->version, '1.1',                 'right version';

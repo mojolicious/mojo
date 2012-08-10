@@ -3,7 +3,9 @@
   - Added skip_body attribute to Mojo::Content.
   - Added is_empty method to Mojo::Message::Response.
   - Updated jQuery to version 1.8.
+  - Improved Mojo::Base to assign names to generated subroutines.
   - Improved message parser performance slightly.
+  - Improved documentation.
   - Improved tests.
   - Fixed 1xx, 204 and 304 response support.
 

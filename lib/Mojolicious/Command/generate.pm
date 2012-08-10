@@ -53,6 +53,13 @@ Short description of this command, used for the command list.
 
 Short hint shown after listing available generator commands.
 
+=head2 C<usage>
+
+  my $usage  = $generator->usage;
+  $generator = $generator->usage('Foo!');
+
+Usage information for this command, used for the help screen.
+
 =head2 C<message>
 
   my $message = $generator->message;

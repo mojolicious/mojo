@@ -506,7 +506,7 @@ Keyword indicating the start of a capture block, defaults to C<begin>.
   my $code = $mt->code;
   $mt      = $mt->code($code);
 
-Compiled template code.
+Template code.
 
 =head2 C<comment_mark>
 
@@ -516,6 +516,13 @@ Compiled template code.
 Character indicating the start of a comment, defaults to C<#>.
 
   <%# This is a comment %>
+
+=head2 C<compiled>
+
+  my $compiled = $mt->compiled;
+  $mt          = $mt->compiled($code);
+
+Compiled template code.
 
 =head2 C<encoding>
 

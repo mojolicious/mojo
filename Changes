@@ -1,4 +1,8 @@
 
+3.29  2012-08-11
+  - Improved documentation.
+  - Improved tests.
+
 3.28  2012-08-10
   - Added skip_body attribute to Mojo::Content.
   - Added is_empty method to Mojo::Message::Response.

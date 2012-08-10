@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 707;
+use Test::More tests => 710;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -285,8 +285,10 @@ get '/foo_wildcard_too/*test' => sub {
 };
 
 # GET /with/header/condition
-get '/with/header/condition' => (headers => {'X-Secret-Header' => 'bar'}) =>
-  'with_header_condition';
+get '/with/header/condition' => (
+  headers => {'X-Secret-Header'  => 'bar'},
+  headers => {'X-Another-Header' => 'baz'}
+) => 'with_header_condition';
 
 # POST /with/header/condition
 post '/with/header/condition' => sub {
@@ -954,17 +956,22 @@ $t->get_ok('/foo_wildcard_too/123')->status_is(200)->content_is('123');
 $t->get_ok('/foo_wildcard_too/')->status_is(404);
 
 # GET /with/header/condition
-$t->get_ok('/with/header/condition', {'X-Secret-Header' => 'bar'})
-  ->status_is(200)->content_like(qr!^Test ok<base href="http://localhost!);
+$t->get_ok('/with/header/condition',
+  {'X-Secret-Header' => 'bar', 'X-Another-Header' => 'baz'})->status_is(200)
+  ->content_like(qr!^Test ok<base href="http://localhost!);
 
-# GET /with/header/condition (not found)
+# GET /with/header/condition (missing headers)
 $t->get_ok('/with/header/condition')->status_is(404)->content_like(qr/Oops!/);
+
+# GET /with/header/condition (missing header)
+$t->get_ok('/with/header/condition', {'X-Secret-Header' => 'bar'})
+  ->status_is(404)->content_like(qr/Oops!/);
 
 # POST /with/header/condition
 $t->post_ok('/with/header/condition', {'X-Secret-Header' => 'bar'}, 'bar')
   ->status_is(200)->content_is('foo bar');
 
-# POST /with/header/condition (not found)
+# POST /with/header/condition (missing header)
 $t->post_ok('/with/header/condition', {}, 'bar')->status_is(404)
   ->content_like(qr/Oops!/);
 

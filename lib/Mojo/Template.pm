@@ -520,7 +520,7 @@ Character indicating the start of a comment, defaults to C<#>.
 =head2 C<compiled>
 
   my $compiled = $mt->compiled;
-  $mt          = $mt->compiled($code);
+  $mt          = $mt->compiled($compiled);
 
 Compiled template code.
 

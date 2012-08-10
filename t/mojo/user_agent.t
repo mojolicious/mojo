@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 103;
+use Test::More tests => 109;
 
 # "The strong must protect the sweet."
 use Mojo::IOLoop;
@@ -35,6 +35,9 @@ get '/no_length' => sub {
   $self->finish('works too!');
   $self->rendered(200);
 };
+
+# GET /no_content
+get '/no_content' => {text => 'fail!', status => 204};
 
 # GET /echo
 get '/echo' => sub {
@@ -214,9 +217,18 @@ ok !$tx->keep_alive, 'keep connection not alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
 
-# GET / (built-in web server)
-$tx = $ua->get('/');
+# GET /no_content (204 No Content)
+$tx = $ua->get('/no_content');
 ok $tx->success, 'successful';
+ok !$tx->kept_alive, 'kept connection not alive';
+ok $tx->keep_alive, 'keep connection alive';
+is $tx->res->code, 204, 'right status';
+is $tx->res->body, '',  'no content';
+
+# GET / (connection was kept alive)
+$tx = $ua->get('/');
+ok $tx->success,    'successful';
+ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 

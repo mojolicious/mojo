@@ -41,7 +41,7 @@ sub parse {
   my $self = shift;
 
   # Parse headers
-  $self->parse_until_body(@_);
+  $self->_parse_until_body(@_);
 
   # Parse body
   return $self->SUPER::parse

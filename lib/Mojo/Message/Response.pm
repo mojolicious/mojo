@@ -100,7 +100,8 @@ sub extract_start_line {
   return unless defined(my $line = get_line $bufferref);
   $self->error('Bad response start line') and return
     unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
-  return !!$self->version($1)->code($2)->message($3)->content->auto_relax(1);
+  $self->content->no_body(1) if $self->code($2)->has_no_body;
+  return !!$self->version($1)->message($3)->content->auto_relax(1);
 }
 
 sub fix_headers {
@@ -129,6 +130,11 @@ sub get_start_line_chunk {
 
   # Chunk
   return substr $self->{start_buffer}, $offset, 131072;
+}
+
+sub has_no_body {
+  my $self = shift;
+  return $self->is_status_class(100) || $self->code ~~ [qw(204 304)];
 }
 
 sub is_status_class {
@@ -228,6 +234,12 @@ Make sure response has all required headers for the current HTTP version.
   my $string = $res->get_start_line_chunk($offset);
 
 Get a chunk of status line data starting from a specific position.
+
+=head2 C<has_no_body>
+
+  my $success = $res->has_no_body;
+
+Check if this type of response has no body.
 
 =head2 C<is_status_class>
 

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 320;
+use Test::More tests => 345;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -221,12 +221,50 @@ $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Connection: close\x0d\x0a\x0d\x0a");
 $res->parse("Hello World!\n1234\nlalalala\n");
 ok !$res->is_finished, 'response is not finished';
+ok !$res->has_no_body, 'response has a body';
+ok !$res->content->no_body, 'response has a body';
 is $res->code,    500,                     'right status';
 is $res->message, 'Internal Server Error', 'right message';
 is $res->version, '1.1',                   'right version';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, undef,        'no "Content-Length" value';
 is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+
+# Parse full HTTP 1.1 response (304 Not Modified)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 304 Not Modified\x0d\x0a");
+$res->parse("Content-Type: text/html\x0d\x0a");
+$res->parse("Content-Length: 9000\x0d\x0a");
+$res->parse("Connection: keep-alive\x0d\x0a\x0d\x0a");
+ok $res->is_finished, 'response is finished';
+ok $res->has_no_body, 'response has no body';
+ok $res->content->no_body, 'response has no body';
+is $res->code,    304,            'right status';
+is $res->message, 'Not Modified', 'right message';
+is $res->version, '1.1',          'right version';
+is $res->headers->content_type,   'text/html',  'right "Content-Type" value';
+is $res->headers->content_length, 9000,         'right "Content-Length" value';
+is $res->headers->connection,     'keep-alive', 'right "Connection" value';
+is $res->body, '', 'no content';
+
+# Parse full HTTP 1.1 response (204 No Content)
+$res = Mojo::Message::Response->new;
+$res->content->on(body => sub { shift->headers->header('X-Foo' => 'bar') });
+$res->parse("HTTP/1.1 204 No Content\x0d\x0a");
+$res->parse("Content-Type: text/html\x0d\x0a");
+$res->parse("Content-Length: 9001\x0d\x0a");
+$res->parse("Connection: keep-alive\x0d\x0a\x0d\x0a");
+ok $res->is_finished, 'response is finished';
+ok $res->has_no_body, 'response has no body';
+ok $res->content->no_body, 'response has no body';
+is $res->code,    204,          'right status';
+is $res->message, 'No Content', 'right message';
+is $res->version, '1.1',        'right version';
+is $res->headers->content_type,   'text/html',  'right "Content-Type" value';
+is $res->headers->content_length, 9001,         'right "Content-Length" value';
+is $res->headers->connection,     'keep-alive', 'right "Connection" value';
+is $res->headers->header('X-Foo'), 'bar', 'right "X-Foo" value';
+is $res->body, '', 'no content';
 
 # Parse HTTP 1.1 response (413 error in one big chunk)
 $res = Mojo::Message::Response->new;
@@ -468,9 +506,11 @@ $res->parse("Connection: Upgrade\x0d\x0a");
 $res->parse("Sec-WebSocket-Accept: abcdef=\x0d\x0a");
 $res->parse("Sec-WebSocket-Protocol: sample\x0d\x0a\x0d\x0a");
 ok $res->is_finished, 'response is finished';
-is $res->code,        101, 'right status';
-is $res->message,     'Switching Protocols', 'right message';
-is $res->version,     '1.1', 'right version';
+ok $res->has_no_body, 'response has no body';
+ok $res->content->no_body, 'response has no body';
+is $res->code,    101,                   'right status';
+is $res->message, 'Switching Protocols', 'right message';
+is $res->version, '1.1',                 'right version';
 is $res->headers->upgrade,    'websocket', 'right "Upgrade" value';
 is $res->headers->connection, 'Upgrade',   'right "Connection" value';
 is $res->headers->sec_websocket_accept, 'abcdef=',

@@ -196,9 +196,49 @@ sub leftovers { shift->content->leftovers }
 
 sub param { shift->body_params->param(@_) }
 
-sub parse { shift->_parse(parse => @_) }
+sub parse {
+  my ($self, $chunk) = @_;
 
-sub parse_until_body { shift->_parse(parse_until_body => @_) }
+  # Add chunk
+  $self->{raw_size} += length($chunk //= '');
+  $self->{buffer} .= $chunk;
+
+  # Check message size
+  return $self->error('Maximum message size exceeded', 413)
+    if $self->{raw_size} > $self->max_message_size;
+
+  # Start line
+  unless ($self->{state}) {
+
+    # Check line size
+    my $len = index $self->{buffer}, "\x0a";
+    $len = length $self->{buffer} if $len < 0;
+    return $self->error('Maximum line size exceeded', 431)
+      if $len > $self->max_line_size;
+
+    # Extract
+    $self->{state} = 'content' if $self->extract_start_line(\$self->{buffer});
+  }
+
+  # Content
+  $self->content($self->content->parse(delete $self->{buffer}))
+    if $self->{state} ~~ [qw(content finished)];
+
+  # Check line size
+  return $self->error('Maximum line size exceeded', 431)
+    if $self->headers->is_limit_exceeded;
+
+  # Finished
+  $self->{state} = 'finished' if $self->content->is_finished;
+
+  # Progress
+  $self->emit('progress');
+
+  # Finished
+  $self->emit('finish') if $self->is_finished;
+
+  return $self;
+}
 
 sub start_line_size { length shift->build_start_line }
 
@@ -287,50 +327,6 @@ sub _nest {
   }
 
   return $hash;
-}
-
-sub _parse {
-  my ($self, $method, $chunk) = @_;
-
-  # Add chunk
-  $self->{raw_size} += length($chunk //= '');
-  $self->{buffer} .= $chunk;
-
-  # Check message size
-  return $self->error('Maximum message size exceeded', 413)
-    if $self->{raw_size} > $self->max_message_size;
-
-  # Start line
-  unless ($self->{state}) {
-
-    # Check line size
-    my $len = index $self->{buffer}, "\x0a";
-    $len = length $self->{buffer} if $len < 0;
-    return $self->error('Maximum line size exceeded', 431)
-      if $len > $self->max_line_size;
-
-    # Extract
-    $self->{state} = 'content' if $self->extract_start_line(\$self->{buffer});
-  }
-
-  # Content
-  $self->content($self->content->$method(delete $self->{buffer}))
-    if $self->{state} ~~ [qw(content finished)];
-
-  # Check line size
-  return $self->error('Maximum line size exceeded', 431)
-    if $self->headers->is_limit_exceeded;
-
-  # Finished
-  $self->{state} = 'finished' if $self->content->is_finished;
-
-  # Progress
-  $self->emit('progress');
-
-  # Finished
-  $self->emit('finish') if $self->is_finished;
-
-  return $self;
 }
 
 sub _parse_formdata {
@@ -495,7 +491,7 @@ C<body_params>, C<dom> or C<json> methods.
   my $version = $message->version;
   $message    = $message->version('1.1');
 
-HTTP version of message.
+HTTP version of message, defaults to C<1.1>.
 
 =head1 METHODS
 
@@ -710,12 +706,6 @@ not be called before the entire message body has been received.
   $message = $message->parse('HTTP/1.1 200 OK...');
 
 Parse message chunk.
-
-=head2 C<parse_until_body>
-
-  $message = $message->parse_until_body('HTTP/1.1 200 OK...');
-
-Parse message chunk and stop after headers.
 
 =head2 C<start_line_size>
 

@@ -12,18 +12,13 @@ sub client_read {
   my $preserved = $self->{state};
   $self->{state} = 'finished' if length $chunk == 0;
 
-  # HEAD response
+  # Generate response without body for HEAD request
   my $res = $self->res;
-  if ($self->req->method eq 'HEAD') {
-    $res->parse_until_body($chunk);
-    $self->{state} = 'finished' if $res->content->is_parsing_body;
-  }
+  $res->content->no_body(1) if $self->req->method eq 'HEAD';
 
-  # Normal response
-  else {
-    $res->parse($chunk);
-    $self->{state} = 'finished' if $res->is_finished;
-  }
+  # Parse response
+  $res->parse($chunk);
+  $self->{state} = 'finished' if $res->is_finished;
 
   # Unexpected 100 Continue
   if ($self->{state} eq 'finished' && $res->code ~~ 100) {
@@ -39,8 +34,7 @@ sub client_write {
   my $self = shift;
 
   # Writing
-  $self->{offset} ||= 0;
-  $self->{write}  ||= 0;
+  $self->{$_} ||= 0 for qw(offset write);
   my $req = $self->req;
   unless ($self->{state}) {
 
@@ -85,11 +79,8 @@ sub keep_alive {
 }
 
 sub server_leftovers {
-  my $self = shift;
-  my $req  = $self->req;
-  return unless $req->has_leftovers;
-  $req->{state} = 'finished';
-  return $req->leftovers;
+  my $req = shift->req;
+  return $req->has_leftovers ? $req->leftovers : undef;
 }
 
 sub server_read {
@@ -127,13 +118,9 @@ sub server_read {
 sub server_write {
   my $self = shift;
 
-  # Not writing
-  my $chunk = '';
-  return $chunk unless $self->{state};
-
   # Writing
-  $self->{offset} ||= 0;
-  $self->{write}  ||= 0;
+  my $chunk = '';
+  $self->{$_} ||= 0 for qw(offset write);
   my $res = $self->res;
   if ($self->{state} eq 'write') {
 
@@ -151,27 +138,18 @@ sub server_write {
   $chunk .= $self->_start_line($res) if $self->{state} eq 'write_start_line';
 
   # Headers
-  $chunk .= $self->_headers($res, 1) if $self->{state} eq 'write_headers';
+  if ($self->{state} eq 'write_headers') {
+    $chunk .= $self->_headers($res, 1);
+
+    # Continued
+    if (defined $self->{continued} && !$self->{continued}) {
+      $self->{continued} = $self->{state} = 'read';
+      $self->res($self->res->new);
+    }
+  }
 
   # Body
-  if ($self->{state} eq 'write_body') {
-
-    # 100 Continue
-    if ($self->{write} <= 0) {
-
-      # Continued
-      if (defined $self->{continued} && !$self->{continued}) {
-        $self->{continued} = $self->{state} = 'read';
-        $self->res($res->new);
-      }
-
-      # Finished
-      elsif (!defined $self->{continued}) { $self->{state} = 'finished' }
-    }
-
-    # Normal body
-    else { $chunk .= $self->_body($res, 1) }
-  }
+  $chunk .= $self->_body($res, 1) if $self->{state} eq 'write_body';
 
   return $chunk;
 }
@@ -211,15 +189,16 @@ sub _headers {
 
   # Write body
   if ($self->{write} <= 0) {
+    $self->{offset} = 0;
 
-    # HEAD request
-    if ($head && $self->req->method eq 'HEAD') { $self->{state} = 'finished' }
+    # Response without body
+    $head = $head && ($self->req->method eq 'HEAD' || $message->has_no_body);
+    if ($head) { $self->{state} = 'finished' }
 
     # Body
     else {
-      $self->{state}  = 'write_body';
-      $self->{write}  = $message->is_dynamic ? 1 : $message->body_size;
-      $self->{offset} = 0;
+      $self->{state} = 'write_body';
+      $self->{write} = $message->is_dynamic ? 1 : $message->body_size;
     }
   }
 

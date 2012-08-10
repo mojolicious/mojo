@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 345;
+use Test::More tests => 346;
 
 # "Quick Smithers. Bring the mind eraser device!
 #  You mean the revolver, sir?
@@ -249,7 +249,8 @@ is $res->body, '', 'no content';
 
 # Parse full HTTP 1.1 response (204 No Content)
 $res = Mojo::Message::Response->new;
-$res->content->on(body => sub { shift->headers->header('X-Foo' => 'bar') });
+$res->content->on(body => sub { shift->headers->header('X-Body' => 'one') });
+$res->on(finish => sub { shift->headers->header('X-Finish' => 'two') });
 $res->parse("HTTP/1.1 204 No Content\x0d\x0a");
 $res->parse("Content-Type: text/html\x0d\x0a");
 $res->parse("Content-Length: 9001\x0d\x0a");
@@ -263,7 +264,8 @@ is $res->version, '1.1',        'right version';
 is $res->headers->content_type,   'text/html',  'right "Content-Type" value';
 is $res->headers->content_length, 9001,         'right "Content-Length" value';
 is $res->headers->connection,     'keep-alive', 'right "Connection" value';
-is $res->headers->header('X-Foo'), 'bar', 'right "X-Foo" value';
+is $res->headers->header('X-Body'),   'one', 'right "X-Body" value';
+is $res->headers->header('X-Finish'), 'two', 'right "X-Finish" value';
 is $res->body, '', 'no content';
 
 # Parse HTTP 1.1 response (413 error in one big chunk)

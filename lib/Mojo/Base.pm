@@ -20,7 +20,6 @@ sub import {
 
   # No limits!
   no strict 'refs';
-  no warnings 'redefine';
 
   # Base
   if ($flag eq '-base') { $flag = $class }
@@ -96,9 +95,8 @@ sub attr {
 
     # We compile custom attribute code for speed
     no strict 'refs';
-    no warnings 'redefine';
-    Carp::croak("Mojo::Base error: $@") unless eval "$code;1";
     warn "-- Attribute $attr in $class\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
+    Carp::croak("Mojo::Base error: $@") unless eval "$code;1";
   }
 }
 

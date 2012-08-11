@@ -61,8 +61,7 @@ get '/something/else' => sub {
 websocket '/socket' => sub {
   my $self = shift;
   $self->send(
-    $self->req->headers->host,
-    sub {
+    $self->req->headers->host => sub {
       my $self = shift;
       $self->send(Mojo::IOLoop->stream($self->tx->connection)->timeout);
       $self->finish;
@@ -372,8 +371,7 @@ $ua->websocket(
     );
     $client = 1;
     $tx->send(
-      'hi!',
-      sub {
+      'hi!' => sub {
         shift->send('there!');
         $drain
           += @{Mojo::IOLoop->stream($tx->connection)->subscribers('drain')};

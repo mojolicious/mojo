@@ -103,8 +103,7 @@ $ua->get('http://mojolicio.us' => sub { Mojo::IOLoop->singleton->stop });
 Mojo::IOLoop->singleton->start;
 my $kept_alive;
 $ua->get(
-  'http://mojolicio.us',
-  sub {
+  'http://mojolicio.us' => sub {
     my $tx = pop;
     Mojo::IOLoop->singleton->stop;
     $kept_alive = $tx->kept_alive;
@@ -116,18 +115,15 @@ ok $kept_alive, 'connection was kept alive';
 # Nested keep alive
 my @kept_alive;
 $ua->get(
-  'http://mojolicio.us',
-  sub {
+  'http://mojolicio.us' => sub {
     my ($self, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
     $self->get(
-      'http://mojolicio.us',
-      sub {
+      'http://mojolicio.us' => sub {
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
         $self->get(
-          'http://mojolicio.us',
-          sub {
+          'http://mojolicio.us' => sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             Mojo::IOLoop->singleton->stop;

@@ -38,20 +38,20 @@ is $tx->req->headers->expect, 'nothing', 'right "Expect" value';
 is $tx->req->body, 'test', 'right content';
 
 # DELETE with content
-$tx = $t->tx(DELETE => 'https://mojolicio.us', 'test');
+$tx = $t->tx(DELETE => 'https://mojolicio.us' => 'test');
 is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
 is $tx->req->method, 'DELETE', 'right method';
 is $tx->req->headers->expect, undef, 'no "Expect" value';
 is $tx->req->body, 'test', 'right content';
 
 # Simple JSON POST
-$tx = $t->json('http://kraih.com/foo', => {test => 123});
+$tx = $t->json('http://kraih.com/foo' => {test => 123});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/json',
   'right "Content-Type" value';
-is_deeply $tx->req->json, {test => 123} => 'right content';
-$tx = $t->json('http://kraih.com/foo', => [1, 2, 3]);
+is_deeply $tx->req->json, {test => 123}, 'right content';
+$tx = $t->json('http://kraih.com/foo' => [1, 2, 3]);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/json',
@@ -59,17 +59,17 @@ is $tx->req->headers->content_type, 'application/json',
 is_deeply $tx->req->json, [1, 2, 3], 'right content';
 
 # JSON POST with headers
-$tx = $t->json('http://kraih.com/foo', => {test => 123} => {DNT => 1});
+$tx = $t->json('http://kraih.com/foo' => {test => 123} => {DNT => 1});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->dnt, 1, 'right "DNT" value';
 is $tx->req->headers->content_type, 'application/json',
   'right "Content-Type" value';
-is_deeply $tx->req->json, {test => 123} => 'right content';
+is_deeply $tx->req->json, {test => 123}, 'right content';
 
 # JSON POST with custom content type
 $tx = $t->json(
-  'http://kraih.com/foo', => [1, 2, 3],
+  'http://kraih.com/foo' => [1, 2, 3],
   {DNT => 1, 'content-type' => 'application/something'}
 );
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
@@ -96,7 +96,7 @@ is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
 is $tx->req->body, 'test=1&test=2&test=3', 'right content';
 
 # UTF-8 form
-$tx = $t->form('http://kraih.com/foo', 'UTF-8' => {test => 123});
+$tx = $t->form('http://kraih.com/foo' => 'UTF-8' => {test => 123});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',

@@ -56,8 +56,8 @@ $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
 # Foo::fun
 my $url = $t->ua->app_url;
 $url->path('/fun/time');
-$t->get_ok($url, {'X-Test' => 'Hi there!'})->status_isnt(404)->status_is(200)
-  ->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
+$t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)
+  ->status_is(200)->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_isnt('Have')
   ->content_is('Have fun!');
@@ -98,7 +98,7 @@ $t->get_ok('/exceptional_too/this_one_dies')->status_is(500)
   ->content_is("double doh!\n\n");
 
 # Exceptional::this_one_dies (action behind bridge dies)
-$t->get_ok('/exceptional_too/this_one_dies', {'X-DoNotDie' => 1})
+$t->get_ok('/exceptional_too/this_one_dies' => {'X-DoNotDie' => 1})
   ->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("doh!\n\n");
 
@@ -109,31 +109,32 @@ $t->get_ok('/exceptional/this_one_does_not_exist')->status_is(404)
   ->content_like(qr/Page not found/);
 
 # Exceptional::this_one_does_not_exist (action behind bridge does not exist)
-$t->get_ok('/exceptional_too/this_one_does_not_exist', {'X-DoNotDie' => 1})
+$t->get_ok('/exceptional_too/this_one_does_not_exist' => {'X-DoNotDie' => 1})
   ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);
 
 # Foo::fun
-$t->get_ok('/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Have fun!');
 
 # Foo::fun
 $url = $t->ua->app_url;
 $url->path('/fun/time');
-$t->get_ok($url, {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok($url => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Have fun!');
 
 # Foo::fun
-$t->get_ok('/happy/fun/time', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/happy/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Have fun!');
 
 # Foo::authenticated (authentication bridge)
-$t->get_ok('/auth/authenticated', {'X-Bender' => 'Hi there!'})->status_is(200)
-  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/auth/authenticated' => {'X-Bender' => 'Hi there!'})
+  ->status_is(200)->header_is('X-Bender' => undef)
+  ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('authenticated');
 
@@ -144,82 +145,82 @@ $t->get_ok('/auth/authenticated')->status_is(404)
   ->content_like(qr/Page not found/);
 
 # Foo::test
-$t->get_ok('/foo/test', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/foo/test' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr!/bar/test!);
 
 # Foo::index
-$t->get_ok('/foo', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/foo' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr|<body>\s+23\nHello Mojo from the template /foo! He|);
 
 # Foo::Bar::index
-$t->get_ok('/foo-bar', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/foo-bar' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr|Hello Mojo from the other template /foo-bar!|);
 
 # Foo::something
-$t->get_ok('/somethingtest', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/somethingtest' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/test4/42');
 
 # Foo::url_for_missing
-$t->get_ok('/something_missing', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/something_missing' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('does_not_exist');
 
 # Foo::templateless
-$t->get_ok('/foo/templateless', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/foo/templateless' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Hello Mojo from a templateless renderer!/);
 
 # Foo::withlayout
-$t->get_ok('/foo/withlayout', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/foo/withlayout' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Same old in green Seems to work!/);
 
 # Foo::withblock
-$t->get_ok('/foo/withblock.txt', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/foo/withblock.txt' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_isnt('text/html')->content_type_is('text/plain')
   ->content_like(qr/Hello Baerbel\.\s+Hello Wolfgang\./);
 
 # MojoliciousTest2::Foo::test
-$t->get_ok('/test2', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/test2' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr!/test2!);
 
 # MojoliciousTestController::index
-$t->get_ok('/test3', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/test3' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/No class works!/);
 
 # MojoliciousTestController::index (only namespace)
-$t->get_ok('/test5', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/test5' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/test5');
 
 # MojoliciousTestController::index (no namespace)
-$t->get_ok('/test6', {'X-Test' => 'Hi there!'})->status_is(200)
+$t->get_ok('/test6' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/test6');
 
 # 404
-$t->get_ok('/', {'X-Test' => 'Hi there!'})->status_is(404)
+$t->get_ok('/' => {'X-Test' => 'Hi there!'})->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);
@@ -256,7 +257,7 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->content_like(qr/Page not found/);
 
 # Check If-Modified-Since
-$t->get_ok('/hello.txt', {'If-Modified-Since' => $mtime})->status_is(304)
+$t->get_ok('/hello.txt' => {'If-Modified-Since' => $mtime})->status_is(304)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
 
@@ -389,7 +390,7 @@ $t->get_ok('/plugin/camel_case')->status_is(200)
   ->content_is('Welcome aboard!');
 
 # MojoliciousTestController::Foo::stage2
-$t->get_ok('/staged', {'X-Pass' => '1'})->status_is(200)
+$t->get_ok('/staged' => {'X-Pass' => '1'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('Welcome aboard!');

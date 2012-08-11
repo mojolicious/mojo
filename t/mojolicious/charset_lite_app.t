@@ -60,30 +60,28 @@ get '/привет/мир' => sub { shift->render_json({foo => $yatta}) };
 my $t = Test::Mojo->new;
 
 # Plain old ASCII
-$t->post_form_ok('/', {foo => 'yatta'})->status_is(200)
+$t->post_form_ok('/' => {foo => 'yatta'})->status_is(200)
   ->content_is('foo: yatta');
 
 # Send raw Shift_JIS octets (like browsers do)
-$t->post_form_ok('/', '', {foo => $yatta_sjis})->status_is(200)
+$t->post_form_ok('/' => '' => {foo => $yatta_sjis})->status_is(200)
   ->content_type_unlike(qr/application/)->content_type_like(qr/Shift_JIS/)
   ->content_like(qr/$yatta/);
 
 # Send raw Shift_JIS octets (like browsers do, multipart message)
 $t->post_form_ok(
-  '/', '',
-  {foo            => $yatta_sjis},
+  '/' => '' => {foo => $yatta_sjis},
   {'Content-Type' => 'multipart/form-data'}
   )->status_is(200)->content_type_like(qr/Shift_JIS/)
   ->content_like(qr/$yatta/);
 
 # Send as string
-$t->post_form_ok('/', 'shift_jis', {foo => $yatta})->status_is(200)
+$t->post_form_ok('/' => 'shift_jis' => {foo => $yatta})->status_is(200)
   ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
 
 # Send as string (multipart message)
 $t->post_form_ok(
-  '/', 'shift_jis',
-  {foo            => $yatta},
+  '/' => 'shift_jis' => {foo => $yatta},
   {'Content-Type' => 'multipart/form-data'}
   )->status_is(200)->content_type_like(qr/Shift_JIS/)
   ->content_like(qr/$yatta/);

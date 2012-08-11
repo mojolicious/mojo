@@ -481,8 +481,8 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   my $over = $r->over;
   $r       = $r->over(foo => 1);
-  $r       = $r->over(foo => 1, bar => qr/\w+/);
-  $r       = $r->over([foo => 1, bar => qr/\w+/]);
+  $r       = $r->over(foo => 1, bar => {baz => 'yada'});
+  $r       = $r->over([foo => 1, bar => {baz => 'yada'}]);
 
 Activate conditions for this route. Note that this automatically disables the
 routing cache, since conditions are too complex for caching.

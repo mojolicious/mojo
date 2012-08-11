@@ -73,7 +73,7 @@ $t->get_ok('/exceptional_too/this_one_dies')->status_is(500)
   ->content_like(qr/Internal Server Error/);
 
 # Exceptional::this_one_might_die (action dies)
-$t->get_ok('/exceptional_too/this_one_dies', {'X-DoNotDie' => 1})
+$t->get_ok('/exceptional_too/this_one_dies' => {'X-DoNotDie' => 1})
   ->status_is(500)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Internal Server Error/);
@@ -85,7 +85,7 @@ $t->get_ok('/exceptional/this_one_does_not_exist')->status_is(404)
   ->content_like(qr/Page not found/);
 
 # Exceptional::this_one_does_not_exist (action behind bridge does not exist)
-$t->get_ok('/exceptional_too/this_one_does_not_exist', {'X-DoNotDie' => 1})
+$t->get_ok('/exceptional_too/this_one_does_not_exist' => {'X-DoNotDie' => 1})
   ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);

@@ -198,14 +198,14 @@ get '/one_format' => [format => 'xml'] => {text => 'One format.'};
 my $t = Test::Mojo->new;
 
 # GET /with_under
-$t->get_ok('/with_under', {'X-Bender' => 'Rodriguez'})->status_is(200)
+$t->get_ok('/with_under' => {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => '23, 24')->header_like('X-Under' => qr/23, 24/)
   ->content_is('Unders are cool!');
 
 # GET /with_under_too
-$t->get_ok('/with_under_too', {'X-Bender' => 'Rodriguez'})->status_is(200)
+$t->get_ok('/with_under_too' => {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => '23, 24')->header_like('X-Under' => qr/23, 24/)
@@ -305,13 +305,13 @@ $t->get_ok('/late/session')->status_is(200)->content_is('works!');
 $t->get_ok('/late/session')->status_is(200)->content_is('works!');
 
 # GET /with/under/count
-$t->get_ok('/with/under/count', {'X-Bender' => 'Rodriguez'})->status_is(200)
+$t->get_ok('/with/under/count' => {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => 1)->content_is("counter\n");
 
 # GET /bridge2stash (again)
-$t->get_ok('/bridge2stash', {'X-Flash' => 1})->status_is(200)
+$t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is(
   "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!\n");
 

@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 712;
+use Test::More tests => 704;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -209,8 +209,8 @@ get '/stream' => sub {
 my $finished;
 get '/finished' => sub {
   my $self = shift;
-  $self->on(finish => sub { $finished += 3 });
-  $finished = 20;
+  $self->on(finish => sub { $finished += 2 });
+  $finished = 1;
   $self->render(text => 'so far so good!');
 };
 
@@ -296,13 +296,6 @@ post '/with/header/condition' => sub {
   $self->render_text('foo ' . $self->req->headers->header('X-Secret-Header'));
 } => (headers => {'X-Secret-Header' => 'bar'});
 
-# POST /echo/body
-post '/echo/body' => sub {
-  my $self = shift;
-  $self->res->headers->header(Echo => $self->req->headers->header('Echo'));
-  $self->render_text($self->req->body);
-};
-
 # GET /session_cookie
 get '/session_cookie' => sub {
   my $self = shift;
@@ -384,8 +377,8 @@ post '/utf8' => 'form';
 
 # POST /malformed_UTF-8
 post '/malformed_utf8' => sub {
-  my $c = shift;
-  $c->render_text(b($c->param('foo'))->url_escape->to_string);
+  my $self = shift;
+  $self->render_text(b($self->param('foo'))->url_escape->to_string);
 };
 
 # GET /json
@@ -396,7 +389,7 @@ get '/json' =>
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') };
 
 # GET /app
-get '/app' => {layout => 'app'};
+get app => {layout => 'app'};
 
 # GET /helper
 get '/helper' => sub { shift->render(handler => 'ep') } => 'helper';
@@ -840,7 +833,7 @@ $t->get_ok('/finished')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('so far so good!');
-is $finished, 23, 'finished';
+is $finished, 3, 'finished';
 
 # GET / (IRI)
 $t->get_ok('/привет/мир')->status_is(200)
@@ -966,14 +959,6 @@ $t->post_ok('/with/header/condition' => {'X-Secret-Header' => 'bar'} => 'bar')
 # POST /with/header/condition (missing header)
 $t->post_ok('/with/header/condition' => {} => 'bar')->status_is(404)
   ->content_like(qr/Oops!/);
-
-# POST /echo/body (description and no header)
-$t->post_ok('/echo/body' => 'foo' => 'header missing')->status_is(200)
-  ->header_isnt(Echo => 'bar')->content_is('foo');
-
-# POST /echo/body (description and header)
-$t->post_ok('/echo/body' => {Echo => 'bar'} => 'foo' => 'header present')
-  ->status_is(200)->header_is(Echo => 'bar')->content_is('foo');
 
 # GET /session_cookie
 $t->get_ok('/session_cookie')->status_is(200)

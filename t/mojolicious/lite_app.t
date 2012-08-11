@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 710;
+use Test::More tests => 712;
 
 # "Wait you're the only friend I have...
 #  You really want a robot for a friend?
@@ -296,20 +296,11 @@ post '/with/header/condition' => sub {
   $self->render_text('foo ' . $self->req->headers->header('X-Secret-Header'));
 } => (headers => {'X-Secret-Header' => 'bar'});
 
-# POST /with/body/and/desc
-post '/with/body/and/desc' => sub {
+# POST /echo/body
+post '/echo/body' => sub {
   my $self = shift;
-  return if $self->req->body ne 'body';
-  $self->render_text('bar');
-};
-
-# POST /with/body/and/headers/desc
-post '/with/body/and/headers/desc' => sub {
-  my $self = shift;
-  return
-    if $self->req->headers->header('with') ne 'header'
-    || $self->req->body ne 'body';
-  $self->render_text('bar');
+  $self->res->headers->header(Echo => $self->req->headers->header('Echo'));
+  $self->render_text($self->req->body);
 };
 
 # GET /session_cookie
@@ -969,22 +960,20 @@ $t->get_ok('/with/header/condition' => {'X-Secret-Header' => 'bar'})
   ->status_is(404)->content_like(qr/Oops!/);
 
 # POST /with/header/condition
-$t->post_ok('/with/header/condition' => {'X-Secret-Header' => 'bar'}, 'bar')
+$t->post_ok('/with/header/condition' => {'X-Secret-Header' => 'bar'} => 'bar')
   ->status_is(200)->content_is('foo bar');
 
 # POST /with/header/condition (missing header)
-$t->post_ok('/with/header/condition' => {}, 'bar')->status_is(404)
+$t->post_ok('/with/header/condition' => {} => 'bar')->status_is(404)
   ->content_like(qr/Oops!/);
 
-# POST /with/body/and/desc
-$t->post_ok('/with/body/and/desc', 'body', 'desc')->status_is(200)
-  ->content_is('bar');
+# POST /echo/body (description and no header)
+$t->post_ok('/echo/body' => 'foo' => 'header missing')->status_is(200)
+  ->header_isnt(Echo => 'bar')->content_is('foo');
 
-# POST /with/body/and/headers/and/desc
-$t->post_ok(
-  '/with/body/and/headers/desc' => {with => 'header'},
-  'body', 'desc'
-)->status_is(200)->content_is('bar');
+# POST /echo/body (description and header)
+$t->post_ok('/echo/body' => {Echo => 'bar'} => 'foo' => 'header present')
+  ->status_is(200)->header_is(Echo => 'bar')->content_is('foo');
 
 # GET /session_cookie
 $t->get_ok('/session_cookie')->status_is(200)

@@ -30,7 +30,8 @@ is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->expect, 'nothing', 'right "Expect" value';
 
 # POST with header and content
-$tx = $t->tx(POST => 'https://mojolicio.us' => {Expect => 'nothing'}, 'test');
+$tx
+  = $t->tx(POST => 'https://mojolicio.us' => {Expect => 'nothing'} => 'test');
 is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->expect, 'nothing', 'right "Expect" value';
@@ -49,7 +50,7 @@ is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/json',
   'right "Content-Type" value';
-is_deeply $tx->req->json, {test => 123}, 'right content';
+is_deeply $tx->req->json, {test => 123} => 'right content';
 $tx = $t->json('http://kraih.com/foo', => [1, 2, 3]);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
@@ -64,7 +65,7 @@ is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->dnt, 1, 'right "DNT" value';
 is $tx->req->headers->content_type, 'application/json',
   'right "Content-Type" value';
-is_deeply $tx->req->json, {test => 123}, 'right content';
+is_deeply $tx->req->json, {test => 123} => 'right content';
 
 # JSON POST with custom content type
 $tx = $t->json(
@@ -419,8 +420,8 @@ is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
 # 301 redirect with content
-$tx
-  = $t->tx(POST => 'http://mojolico.us/foo' => {Accept => '*/*'}, 'whatever');
+$tx = $t->tx(
+  POST => 'http://mojolico.us/foo' => {Accept => '*/*'} => 'whatever');
 $tx->res->code(301);
 $tx->res->headers->location('http://kraih.com/bar');
 is $tx->req->headers->accept, '*/*', 'right "Accept" value';
@@ -458,8 +459,8 @@ is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
 # 307 redirect with content
-$tx
-  = $t->tx(POST => 'http://mojolico.us/foo' => {Accept => '*/*'}, 'whatever');
+$tx = $t->tx(
+  POST => 'http://mojolico.us/foo' => {Accept => '*/*'} => 'whatever');
 $tx->res->code(307);
 $tx->res->headers->location('http://kraih.com/bar');
 is $tx->req->headers->accept, '*/*', 'right "Accept" value';
@@ -525,8 +526,8 @@ is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
 # 308 redirect with content
-$tx
-  = $t->tx(POST => 'http://mojolico.us/foo' => {Accept => '*/*'}, 'whatever');
+$tx = $t->tx(
+  POST => 'http://mojolico.us/foo' => {Accept => '*/*'} => 'whatever');
 $tx->res->code(308);
 $tx->res->headers->location('http://kraih.com/bar');
 is $tx->req->headers->accept, '*/*', 'right "Accept" value';

@@ -257,9 +257,9 @@ ok $remote_port > 0, 'has local port';
 
 # Parallel requests
 my $delay = Mojo::IOLoop->delay;
-$ua->get('/13/', $delay->begin);
-$ua->post('/14/' => {Expect => 'fun'}, 'bar baz foo' x 128, $delay->begin);
-$ua->get('/15/', $delay->begin);
+$ua->get('/13/' => $delay->begin);
+$ua->post('/14/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
+$ua->get('/15/' => $delay->begin);
 ($tx, $tx2, my $tx3) = $delay->wait;
 ok $tx->is_finished, 'transaction is finished';
 is $tx->res->body, 'Your Mojo is working!', 'right content';

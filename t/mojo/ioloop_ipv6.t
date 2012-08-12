@@ -15,24 +15,28 @@ plan tests => 2;
 use Mojo::IOLoop;
 
 # IPv6 roundtrip
-my $loop = Mojo::IOLoop->new;
-my $port = Mojo::IOLoop->generate_port;
+my $delay = Mojo::IOLoop->delay;
+my $port  = Mojo::IOLoop->generate_port;
 my ($server, $client);
-$loop->server(
+$delay->begin;
+Mojo::IOLoop->server(
   {address => '[::1]', port => $port} => sub {
     my ($loop, $stream) = @_;
     $stream->write('test' => sub { shift->write('321') });
+    $stream->on(close => sub { $delay->end });
     $stream->on(read => sub { $server .= pop });
+    $stream->timeout(0.5);
   }
 );
-$loop->client(
+$delay->begin;
+Mojo::IOLoop->client(
   {address => '[::1]', port => $port} => sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
+    $stream->on(close => sub { $delay->end });
     $stream->on(read => sub { $client .= pop });
   }
 );
-$loop->timer(1 => sub { shift->stop });
-$loop->start;
+$delay->wait;
 is $server, 'tset123', 'right content';
 is $client, 'test321', 'right content';

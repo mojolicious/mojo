@@ -70,13 +70,28 @@ sub _connect {
 
   # Wait for handle to become writable
   weaken $self;
-  $reactor->io($handle => sub { $self->_connecting($args) })
-    ->watch($handle, 0, 1);
+  $reactor->io($handle => sub { $self->_try($args) })->watch($handle, 0, 1);
+}
+
+sub _tls {
+  my $self = shift;
+
+  # Switch between reading and writing
+  my $handle = $self->{handle};
+  if ($self->{tls} && !$handle->connect_SSL) {
+    my $err = $IO::Socket::SSL::SSL_ERROR;
+    if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
+    elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
+    return;
+  }
+
+  # Connected
+  $self->_cleanup->emit_safe(connect => $handle);
 }
 
 # "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
 #  And the Smurfs, well, they SUCK."
-sub _connecting {
+sub _try {
   my ($self, $args) = @_;
 
   # Retry or handle exceptions
@@ -117,22 +132,6 @@ sub _connecting {
     return $self->emit_safe(error => 'TLS upgrade failed')
       unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
     return $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
-  }
-
-  # Connected
-  $self->_cleanup->emit_safe(connect => $handle);
-}
-
-sub _tls {
-  my $self = shift;
-
-  # Switch between reading and writing
-  my $handle = $self->{handle};
-  if ($self->{tls} && !$handle->connect_SSL) {
-    my $err = $IO::Socket::SSL::SSL_ERROR;
-    if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
-    elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
-    return;
   }
 
   # Connected

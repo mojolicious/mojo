@@ -148,8 +148,7 @@ sub handler {
   @{$stash}{keys %$defaults} = values %$defaults;
   my $c
     = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
-  weaken $c->{app};
-  weaken $c->{tx};
+  weaken $c->{$_} for qw(app tx);
 
   # Dispatcher
   ++$self->{dispatch} and $self->hook(around_dispatch => \&_dispatch)

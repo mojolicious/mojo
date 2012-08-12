@@ -77,7 +77,7 @@ sub finish {
 
   # WebSocket
   my $tx = $self->tx;
-  return $tx->finish if $tx->is_websocket;
+  $tx->finish and return $self if $tx->is_websocket;
 
   # Chunked stream
   if ($tx->res->is_chunked) {
@@ -87,7 +87,7 @@ sub finish {
 
   # Normal stream
   $self->write($chunk) if defined $chunk;
-  $self->write('');
+  return $self->write('');
 }
 
 # "You two make me ashamed to call myself an idiot."
@@ -111,7 +111,7 @@ sub on {
   my ($self, $name, $cb) = @_;
   my $tx = $self->tx;
   $self->rendered(101) if $tx->is_websocket;
-  $tx->on($name => sub { shift and $self->$cb(@_) });
+  return $tx->on($name => sub { shift and $self->$cb(@_) });
 }
 
 # "Just make a simple cake. And this time, if someone's going to jump out of
@@ -266,7 +266,7 @@ sub render_exception {
 #  please support Proposition Infinity."
 sub render_json { shift->render(json => @_) }
 
-sub render_later { shift->stash->{'mojo.rendered'}++ }
+sub render_later { shift->stash('mojo.rendered' => 1) }
 
 # "Excuse me, sir, you're snowboarding off the trail.
 #  Lick my frozen metal ass."
@@ -308,16 +308,12 @@ sub render_text { shift->render(text => @_) }
 sub rendered {
   my ($self, $status) = @_;
 
-  # Disable auto rendering
-  $self->render_later;
-
-  # Make sure we have a status
-  my $res = $self->res;
-  $res->code($status) if $status;
+  # Disable auto rendering and make sure we have a status
+  my $res = $self->render_later->res;
+  $res->code($status || 200) if $status || !$res->code;
 
   # Finish transaction
   unless ($self->stash->{'mojo.finished'}++) {
-    $res->code(200) unless $res->code;
     my $app = $self->app;
     $app->plugins->emit_hook_reverse(after_dispatch => $self);
     $app->sessions->store($self);
@@ -611,8 +607,8 @@ Access request cookie values and create new response cookies.
 
 =head2 C<finish>
 
-  $c->finish;
-  $c->finish('Bye!');
+  $c = $c->finish;
+  $c = $c->finish('Bye!');
 
 Gracefully end WebSocket connection or long poll stream.
 
@@ -758,7 +754,7 @@ C<stash>.
 
 =head2 C<render_later>
 
-  $c->render_later;
+  $c = $c->render_later;
 
 Disable automatic rendering, especially for long polling this can be quite
 useful.
@@ -798,7 +794,7 @@ C<public> directory or C<DATA> section of your application.
 =head2 C<render_text>
 
   $c->render_text('Hello World!');
-  $c->render_text('Hello World', layout => 'green');
+  $c->render_text('Hello World!', layout => 'green');
 
 Render the given content as Perl characters, which will be encoded to bytes.
 All additional values get merged into the C<stash>. See C<render_data> for an

@@ -135,15 +135,15 @@ sub server {
         if defined $self->{accepts}
         && ($self->{accepts} -= int(rand 2) + 1) <= 0;
 
-      # Stop listening
-      $self->_not_listening;
+      # Stop accepting
+      $self->_not_accepting;
     }
   );
   $server->listen(@_);
   $self->{accepts} = $self->max_accepts if $self->max_accepts;
 
-  # Stop listening
-  $self->_not_listening;
+  # Stop accepting
+  $self->_not_accepting;
 
   return $id;
 }
@@ -180,19 +180,11 @@ sub timer {
   return $self->reactor->timer($after => sub { $self->$cb });
 }
 
-sub _id {
-  my $self = shift;
-  my $id;
-  do { $id = md5_sum('c' . time . rand 999) }
-    while $self->{connections}{$id} || $self->{servers}{$id};
-  return $id;
-}
-
-sub _listening {
+sub _accepting {
   my $self = shift;
 
   # Check connection limit
-  return if $self->{listening};
+  return if $self->{accepting};
   my $servers = $self->{servers} ||= {};
   return unless keys %$servers;
   my $i   = keys %{$self->{connections}};
@@ -202,16 +194,24 @@ sub _listening {
   # Acquire accept mutex
   if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
 
-  # Check if multi-accept is desirable and start listening
+  # Check if multi-accept is desirable and start accepting
   $_->accepts($max > 1 ? 10 : 1)->start for values %$servers;
-  $self->{listening} = 1;
+  $self->{accepting}++;
+}
+
+sub _id {
+  my $self = shift;
+  my $id;
+  do { $id = md5_sum('c' . time . rand 999) }
+    while $self->{connections}{$id} || $self->{servers}{$id};
+  return $id;
 }
 
 sub _manage {
   my $self = shift;
 
-  # Start listening if possible
-  $self->_listening;
+  # Start accepting if possible
+  $self->_accepting;
 
   # Close connections gracefully
   my $connections = $self->{connections} ||= {};
@@ -231,15 +231,15 @@ sub _manager {
   $self->{manager} ||= $self->recurring($self->accept_interval => \&_manage);
 }
 
-sub _not_listening {
+sub _not_accepting {
   my $self = shift;
 
   # Release accept mutex
-  return unless delete $self->{listening};
+  return unless delete $self->{accepting};
   return unless my $cb = $self->unlock;
   $self->$cb();
 
-  # Stop listening
+  # Stop accepting
   $_->stop for values %{$self->{servers} || {}};
 }
 
@@ -251,7 +251,7 @@ sub _remove {
   return if $reactor->remove($id);
 
   # Listen socket
-  if (delete $self->{servers}{$id}) { delete $self->{listening} }
+  if (delete $self->{servers}{$id}) { delete $self->{accepting} }
 
   # Connection (stream needs to be deleted first)
   else {
@@ -369,7 +369,7 @@ this callback are not captured.
   $loop->lock(sub {
     my ($loop, $blocking) = @_;
 
-    # Got the accept mutex, start listening
+    # Got the accept mutex, start accepting new connections
     return 1;
   });
 

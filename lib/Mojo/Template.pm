@@ -123,13 +123,11 @@ sub compile {
   # Compile
   return unless my $code = $self->code;
   my $compiled = eval $code;
+  $self->compiled($compiled) and return unless $@;
 
   # Use local stacktrace for compile exceptions
   return Mojo::Exception->new($@, [$self->template, $code], $self->name)
-    ->trace->verbose(1)
-    if $@;
-
-  $self->compiled($compiled) and return;
+    ->trace->verbose(1);
 }
 
 sub interpret {
@@ -144,9 +142,10 @@ sub interpret {
   # Interpret
   return unless my $compiled = $self->compiled;
   my $output = eval { $compiled->(@_) };
-  return $@
-    ? Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1)
-    : $output;
+  return $output unless $@;
+
+  # Exception
+  return Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1);
 }
 
 # "I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T..."

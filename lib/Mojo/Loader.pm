@@ -23,11 +23,8 @@ sub load {
   # Check module name
   return 1 if !$module || $module !~ /^\w(?:[\w:']*\w)?$/;
 
-  # Already loaded
-  return if $module->can('new');
-
   # Load
-  return if eval "require $module; 1";
+  return if $module->can('new') || eval "require $module; 1";
 
   # Exists
   my $path = class_to_path $module;

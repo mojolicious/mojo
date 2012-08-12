@@ -24,9 +24,9 @@ sub endpoint {
   my $port   = $url->port || ($scheme eq 'https' ? 443 : 80);
 
   # Proxy for normal HTTP requests
-  return $scheme eq 'http' && lc($req->headers->upgrade || '') ne 'websocket'
-    ? $self->_proxy($tx, $scheme, $host, $port)
-    : ($scheme, $host, $port);
+  return $self->_proxy($tx, $scheme, $host, $port)
+    if $scheme eq 'http' && lc($req->headers->upgrade || '') ne 'websocket';
+  return $scheme, $host, $port;
 }
 
 sub form {

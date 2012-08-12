@@ -14,11 +14,13 @@ use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 #  ...Where are we going?"
 sub emit {
   my ($self, $name) = (shift, shift);
+
   if (my $s = $self->{events}{$name}) {
     warn "-- Emit $name in @{[blessed($self)]} (@{[scalar(@$s)]})\n" if DEBUG;
     for my $cb (@$s) { $self->$cb(@_) }
   }
   elsif (DEBUG) { warn "-- Emit $name in @{[blessed($self)]} (0)\n" }
+
   return $self;
 }
 

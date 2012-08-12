@@ -15,8 +15,8 @@ has paths   => sub { [] };
 my $MTIME = time;
 
 # Bundled files
-my $PUBLIC = Mojo::Home->new(Mojo::Home->new->mojo_lib_dir)
-  ->rel_dir('Mojolicious/public');
+my $HOME   = Mojo::Home->new;
+my $PUBLIC = $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/public');
 
 # "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {

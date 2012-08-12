@@ -320,8 +320,7 @@ $ua->websocket(
       message => sub {
         my ($tx, $message) = @_;
         $result .= $message;
-        return unless $message eq 'test1';
-        $tx->finish;
+        $tx->finish if $message eq 'test1';
       }
     );
     $tx->on(
@@ -342,8 +341,7 @@ $ua->websocket(
       message => sub {
         my ($tx, $message) = @_;
         $result2 .= $message;
-        return unless $message eq 'test1';
-        $tx->finish;
+        $tx->finish if $message eq 'test1';
       }
     );
     $tx->on(

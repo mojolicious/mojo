@@ -83,12 +83,7 @@ sub has_websocket {
 
 sub is_endpoint {
   my $self = shift;
-
-  # Bridge
-  return if $self->inline;
-
-  # Check number of children
-  return !@{$self->children};
+  return $self->inline ? undef : !@{$self->children};
 }
 
 sub is_websocket { !!shift->{websocket} }
@@ -98,10 +93,8 @@ sub name {
 
   # Custom names have precedence
   return $self->{name} unless @_;
-  if (defined(my $name = shift)) {
-    $self->{name}   = $name;
-    $self->{custom} = 1;
-  }
+  $self->{name}   = shift;
+  $self->{custom} = 1;
 
   return $self;
 }
@@ -272,14 +265,14 @@ sub _generate_route {
   # Callback
   $defaults{cb} = $cb if $cb;
 
-  # Create bridge
-  return $self->bridge($pattern, @constraints)->over(\@conditions)
-    ->to(\%defaults)->name($name)
-    if !ref $methods && $methods eq 'under';
+  # Create bridge or route
+  my $route
+    = $methods eq 'under'
+    ? $self->bridge($pattern, @constraints)
+    : $self->route($pattern, @constraints)->via($methods);
+  $route->over(\@conditions)->to(\%defaults);
 
-  # Create route
-  return $self->route($pattern, @constraints)->over(\@conditions)
-    ->via($methods)->to(\%defaults)->name($name);
+  return defined $name ? $route->name($name) : $route;
 }
 
 1;

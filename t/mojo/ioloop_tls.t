@@ -51,7 +51,6 @@ $loop->server(
     $stream->write('test' => sub { shift->write('321') });
     $stream->on(close => sub { $delay->end });
     $stream->on(read => sub { $server .= pop });
-    $stream->timeout(0.5);
   }
 );
 $delay->begin;
@@ -61,6 +60,7 @@ $loop->client(
     $stream->write('tset' => sub { shift->write('123') });
     $stream->on(close => sub { $delay->end });
     $stream->on(read => sub { $client .= pop });
+    $stream->timeout(0.5);
   }
 );
 $delay->wait;
@@ -163,7 +163,7 @@ $loop->server(
   tls_ca   => 'no cert',
   tls_cert => 't/mojo/certs/server.crt',
   tls_key  => 't/mojo/certs/server.key',
-  sub { $server_err = 'connected' }
+  sub { $server_err = 'accepted' }
 );
 $loop->client(
   port     => $port,
@@ -196,7 +196,6 @@ Mojo::IOLoop->server(
     my ($loop, $stream) = @_;
     $stream->write('test' => sub { shift->write('321') });
     $running = Mojo::IOLoop->is_running;
-    $stream->on(timeout => sub { $timeout++ });
     $stream->on(
       close => sub {
         $server_close++;
@@ -205,7 +204,6 @@ Mojo::IOLoop->server(
     );
     $stream->on(error => sub { $server_err = pop });
     $stream->on(read => sub { $server .= pop });
-    $stream->timeout(0.5);
   }
 );
 $delay->begin;
@@ -218,6 +216,7 @@ Mojo::IOLoop->client(
   sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
+    $stream->on(timeout => sub { $timeout++ });
     $stream->on(
       close => sub {
         $client_close++;
@@ -225,6 +224,7 @@ Mojo::IOLoop->client(
       }
     );
     $stream->on(read => sub { $client .= pop });
+    $stream->timeout(0.5);
   }
 );
 $delay->wait;
@@ -246,7 +246,7 @@ $loop->server(
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',
   tls_key  => 't/mojo/certs/badclient.key',
-  sub { $server_err = 'connected' }
+  sub { $server_err = 'accepted' }
 );
 $loop->client(
   port   => $port,
@@ -271,7 +271,7 @@ $loop->server(
   tls      => 1,
   tls_cert => 't/mojo/certs/server.crt',
   tls_key  => 't/mojo/certs/server.key',
-  sub { $server_err = 'connected' }
+  sub { $server_err = 'accepted' }
 );
 $loop->client(
   address => '127.0.0.1',
@@ -297,7 +297,7 @@ $loop->server(
   tls      => 1,
   tls_cert => 't/mojo/certs/badclient.crt',
   tls_key  => 't/mojo/certs/badclient.key',
-  sub { $server_err = 'connected' }
+  sub { $server_err = 'accepted' }
 );
 $loop->client(
   port   => $port,
@@ -327,7 +327,6 @@ $loop->server(
   sub {
     my ($loop, $stream) = @_;
     $stream->on(close => sub { $loop->stop });
-    $stream->timeout(0.5);
     $server = 'accepted';
   }
 );
@@ -337,7 +336,8 @@ $loop->client(
   tls_cert => 't/mojo/certs/badclient.crt',
   tls_key  => 't/mojo/certs/badclient.key',
   sub {
-    my ($loop, $err) = @_;
+    my ($loop, $err, $stream) = @_;
+    $stream->timeout(0.5);
     $client_err = $err;
     $client     = 'connected';
   }

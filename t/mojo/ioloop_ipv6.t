@@ -25,7 +25,6 @@ Mojo::IOLoop->server(
     $stream->write('test' => sub { shift->write('321') });
     $stream->on(close => sub { $delay->end });
     $stream->on(read => sub { $server .= pop });
-    $stream->timeout(0.5);
   }
 );
 $delay->begin;
@@ -35,6 +34,7 @@ Mojo::IOLoop->client(
     $stream->write('tset' => sub { shift->write('123') });
     $stream->on(close => sub { $delay->end });
     $stream->on(read => sub { $client .= pop });
+    $stream->timeout(0.5);
   }
 );
 $delay->wait;

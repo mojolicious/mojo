@@ -9,12 +9,11 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 my @HEADERS = (
   qw(Accept Accept-Language Accept-Ranges Authorization Connection),
   qw(Cache-Control Content-Disposition Content-Length Content-Range),
-  qw(Content-Transfer-Encoding Content-Type Cookie DNT Date ETag Expect),
-  qw(Expires Host If-Modified-Since Last-Modified Location),
-  qw(Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept),
-  qw(Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol),
-  qw(Sec-WebSocket-Version Server Set-Cookie Status Trailer),
-  qw(Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
+  qw(Content-Type Cookie DNT Date ETag Expect Expires Host If-Modified-Since),
+  qw(Last-Modified Location Proxy-Authenticate Proxy-Authorization Range),
+  qw(Sec-WebSocket-Accept Sec-WebSocket-Key Sec-WebSocket-Origin),
+  qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
+  qw(TE Trailer Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
 );
 {
   no strict 'refs';
@@ -289,13 +288,6 @@ Shortcut for the C<Content-Length> header.
 
 Shortcut for the C<Content-Range> header.
 
-=head2 C<content_transfer_encoding>
-
-  my $encoding = $headers->content_transfer_encoding;
-  $headers     = $headers->content_transfer_encoding('foo');
-
-Shortcut for the C<Content-Transfer-Encoding> header.
-
 =head2 C<content_type>
 
   my $content_type = $headers->content_type;
@@ -516,6 +508,13 @@ Shortcut for the C<Set-Cookie> header.
   $headers   = $headers->status('200 OK');
 
 Shortcut for the C<Status> header.
+
+=head2 C<te>
+
+  my $te   = $headers->te;
+  $headers = $headers->te('chunked');
+
+Shortcut for the C<TE> header.
 
 =head2 C<to_hash>
 

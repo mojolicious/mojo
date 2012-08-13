@@ -57,10 +57,8 @@ is $headers->connection('foo')->connection,           'foo', 'right value';
 is $headers->cache_control('foo')->cache_control,     'foo', 'right value';
 is $headers->content_disposition('foo')->content_disposition, 'foo',
   'right value';
-is $headers->content_length('foo')->content_length, 'foo', 'right value';
-is $headers->content_range('foo')->content_range,   'foo', 'right value';
-is $headers->content_transfer_encoding('foo')->content_transfer_encoding,
-  'foo', 'right value';
+is $headers->content_length('foo')->content_length,       'foo', 'right value';
+is $headers->content_range('foo')->content_range,         'foo', 'right value';
 is $headers->content_type('foo')->content_type,           'foo', 'right value';
 is $headers->cookie('foo')->cookie,                       'foo', 'right value';
 is $headers->dnt('foo')->dnt,                             'foo', 'right value';
@@ -89,6 +87,7 @@ is $headers->sec_websocket_version('foo')->sec_websocket_version, 'foo',
 is $headers->server('foo')->server,                       'foo', 'right value';
 is $headers->set_cookie('foo')->set_cookie,               'foo', 'right value';
 is $headers->status('foo')->status,                       'foo', 'right value';
+is $headers->te('foo')->te,                               'foo', 'right value';
 is $headers->trailer('foo')->trailer,                     'foo', 'right value';
 is $headers->transfer_encoding('foo')->transfer_encoding, 'foo', 'right value';
 is $headers->upgrade('foo')->upgrade,                     'foo', 'right value';

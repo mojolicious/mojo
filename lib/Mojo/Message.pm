@@ -370,8 +370,7 @@ sub _parse_formdata {
     # Form value
     unless (defined $filename) {
       $value = $part->asset->slurp;
-      $value = decode($charset, $value) // $value
-        if $charset && !$part->headers->content_transfer_encoding;
+      $value = decode($charset, $value) // $value if $charset;
     }
 
     push @formdata, [$name, $filename, $value];

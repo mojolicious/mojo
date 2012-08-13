@@ -1,6 +1,7 @@
 
 3.30  2012-08-14
   - Added te method to Mojo::Headers.
+  - Improved documentation.
   - Fixed small content encoding bug in Mojo::Message.
 
 3.29  2012-08-13

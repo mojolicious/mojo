@@ -314,6 +314,10 @@ Mojo::Transaction::WebSocket - WebSocket transaction
     my ($ws, $message) = @_;
     say "Message: $message";
   });
+  $ws->on(finish => sub {
+    my $ws = shift;
+    say 'WebSocket closed.';
+  });
 
 =head1 DESCRIPTION
 

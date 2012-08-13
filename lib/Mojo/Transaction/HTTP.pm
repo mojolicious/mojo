@@ -242,12 +242,14 @@ Mojo::Transaction::HTTP - HTTP transaction
   say $tx->res->code;
   say $tx->res->headers->content_type;
   say $tx->res->body;
+  say $tx->remote_address;
 
   # Server
   my $tx = Mojo::Transaction::HTTP->new;
   say $tx->req->method;
   say $tx->req->url->to_abs;
   say $tx->req->headers->accept;
+  say $tx->remote_address;
   $tx->res->code(200);
   $tx->res->headers->content_type('text/plain');
   $tx->res->body('Hello World!');

@@ -443,7 +443,7 @@ use it for validation.
 
 =head1 CASE SENSITIVITY
 
-L<Mojo::DOM> defaults to HTML5 semantics, that means all tags and attributes
+L<Mojo::DOM> defaults to HTML semantics, that means all tags and attributes
 are lowercased and selectors need to be lowercase as well.
 
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
@@ -462,7 +462,7 @@ XML detection can also be disabled with the C<xml> method.
   # Force XML semantics
   $dom->xml(1);
 
-  # Force HTML5 semantics
+  # Force HTML semantics
   $dom->xml(0);
 
 =head1 METHODS
@@ -532,7 +532,7 @@ Element attributes.
   my $charset = $dom->charset;
   $dom        = $dom->charset('UTF-8');
 
-Charset used for decoding and encoding HTML5/XML.
+Charset used for decoding and encoding HTML/XML.
 
 =head2 C<children>
 

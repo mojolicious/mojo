@@ -22,10 +22,7 @@ __DATA__
     % my $url = url_for->to_abs->scheme('ws');
     %= javascript begin
       var ws;
-      if ("MozWebSocket" in window) {
-        ws = new MozWebSocket('<%= $url %>');
-      }
-      else if ("WebSocket" in window) {
+      if ("WebSocket" in window) {
         ws = new WebSocket('<%= $url %>');
       }
       if(typeof(ws) !== 'undefined') {

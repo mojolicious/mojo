@@ -789,7 +789,8 @@ Same as C<render> but returns the rendered result.
   my $success = $c->render_static('../lib/MyApp.pm');
 
 Render a static file using L<Mojolicious::Static/"serve">, usually from the
-C<public> directory or C<DATA> section of your application.
+C<public> directories or C<DATA> sections of your application. Note that this
+method does not protect from traversing to parent directories.
 
 =head2 C<render_text>
 

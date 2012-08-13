@@ -280,7 +280,7 @@ promote it wherever we can.
   $ chmod 644 t/login.t
 
 L<Test::Mojo> is a scriptable HTTP user agent designed specifically for
-testing, with many fun state of the art features such as CSS3 selectors based
+testing, with many fun state of the art features such as CSS selectors based
 on L<Mojo::DOM>.
 
   use Test::More tests => 16;

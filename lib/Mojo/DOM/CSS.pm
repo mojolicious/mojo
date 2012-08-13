@@ -382,7 +382,7 @@ sub _unescape {
 
 =head1 NAME
 
-Mojo::DOM::CSS - CSS3 selector engine
+Mojo::DOM::CSS - CSS selector engine
 
 =head1 SYNOPSIS
 
@@ -394,11 +394,11 @@ Mojo::DOM::CSS - CSS3 selector engine
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::CSS> is the CSS3 selector engine used by L<Mojo::DOM>.
+L<Mojo::DOM::CSS> is the CSS selector engine used by L<Mojo::DOM>.
 
 =head1 SELECTORS
 
-All CSS3 selectors that make sense for a standalone parser are supported.
+All CSS selectors that make sense for a standalone parser are supported.
 
 =head2 C<*>
 
@@ -616,7 +616,7 @@ following new ones.
 
   my $results = $css->select('head > title');
 
-Run CSS3 selector against C<tree>.
+Run CSS selector against C<tree>.
 
 =head1 SEE ALSO
 

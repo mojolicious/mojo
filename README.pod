@@ -48,7 +48,7 @@ Automatic CGI and L<PSGI> detection.
 
 =item *
 
-JSON and HTML5/XML parser with CSS3 selector support.
+JSON and HTML/XML parser with CSS selector support.
 
 =item *
 

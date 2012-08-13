@@ -386,20 +386,20 @@ sub _text {
 
 =head1 NAME
 
-Mojo::DOM::HTML - HTML5/XML engine
+Mojo::DOM::HTML - HTML/XML engine
 
 =head1 SYNOPSIS
 
   use Mojo::DOM::HTML;
 
-  # Turn HTML5 into DOM tree
+  # Turn HTML into DOM tree
   my $html = Mojo::DOM::HTML->new;
   $html->parse('<div><p id="a">A</p><p id="b">B</p></div>');
   my $tree = $html->tree;
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM::HTML> is the HTML5/XML engine used by L<Mojo::DOM>.
+L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM>.
 
 =head1 ATTRIBUTES
 
@@ -410,7 +410,7 @@ L<Mojo::DOM::HTML> implements the following attributes.
   my $charset = $html->charset;
   $html       = $html->charset('UTF-8');
 
-Charset used for decoding and encoding HTML5/XML.
+Charset used for decoding and encoding HTML/XML.
 
 =head2 C<tree>
 
@@ -424,7 +424,7 @@ Document Object Model.
   my $xml = $html->xml;
   $html   = $html->xml(1);
 
-Disable HTML5 semantics in parser and activate case sensitivity, defaults to
+Disable HTML semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.
 
 =head1 METHODS
@@ -436,7 +436,7 @@ following new ones.
 
   $html = $html->parse('<foo bar="baz">test</foo>');
 
-Parse HTML5/XML document.
+Parse HTML/XML document.
 
 =head2 C<render>
 

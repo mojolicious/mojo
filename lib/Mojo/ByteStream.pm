@@ -203,7 +203,7 @@ Escape unsafe characters in bytestream with L<Mojo::Util/"html_escape">.
 
   $stream = $stream->html_unescape;
 
-Unescape all HTML5 entities in bytestream with L<Mojo::Util/"html_unescape">.
+Unescape all HTML entities in bytestream with L<Mojo::Util/"html_unescape">.
 
   b('&lt;html&gt;')->html_unescape->url_escape->say;
 

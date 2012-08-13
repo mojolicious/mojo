@@ -214,7 +214,7 @@ L<Mojo::Message::Response> object.
 
   my $dom = x('<div>Hello!</div>');
 
-Turn HTML5/XML input into L<Mojo::DOM> object.
+Turn HTML/XML input into L<Mojo::DOM> object.
 
   $ perl -Mojo -E 'say x(b("test.html")->slurp)->at("title")->text'
 

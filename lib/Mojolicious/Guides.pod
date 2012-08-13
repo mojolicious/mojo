@@ -79,7 +79,7 @@ Full featured non-blocking I/O HTTP and WebSocket user agent.
 
 =item L<Mojo::DOM>
 
-Very fun and minimalistic HTML5/XML DOM parser with CSS3 selector support.
+Very fun and minimalistic HTML/XML DOM parser with CSS selector support.
 
 =item L<Mojo::JSON>
 

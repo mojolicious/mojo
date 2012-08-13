@@ -505,14 +505,14 @@ Generate HMAC-SHA1 checksum for string.
   my $escaped = html_escape $string;
   my $escaped = html_escape $string, '^\n\r\t !#$%(-;=?-~';
 
-Escape unsafe characters in string with HTML5 entities, the pattern used
+Escape unsafe characters in string with HTML entities, the pattern used
 defaults to C<^\n\r\t !#$%(-;=?-~>.
 
 =head2 C<html_unescape>
 
   my $string = html_unescape $escaped;
 
-Unescape all HTML5 entities in string.
+Unescape all HTML entities in string.
 
 =head2 C<md5_bytes>
 

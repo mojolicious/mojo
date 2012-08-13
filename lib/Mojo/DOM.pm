@@ -404,7 +404,7 @@ sub _trim {
 
 =head1 NAME
 
-Mojo::DOM - Minimalistic HTML5/XML DOM parser with CSS3 selectors
+Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
 =head1 SYNOPSIS
 
@@ -437,7 +437,7 @@ Mojo::DOM - Minimalistic HTML5/XML DOM parser with CSS3 selectors
 
 =head1 DESCRIPTION
 
-L<Mojo::DOM> is a minimalistic and relaxed HTML5/XML DOM parser with CSS3
+L<Mojo::DOM> is a minimalistic and relaxed HTML/XML DOM parser with CSS
 selector support. It will even try to interpret broken XML, so you should not
 use it for validation.
 
@@ -512,8 +512,8 @@ Append to element content.
 
   my $result = $dom->at('html title');
 
-Find a single element with CSS3 selectors. All selectors from
-L<Mojo::DOM::CSS> are supported.
+Find a single element with CSS selectors. All selectors from L<Mojo::DOM::CSS>
+are supported.
 
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
@@ -559,7 +559,7 @@ C<charset> has been defined.
 
   my $collection = $dom->find('html title');
 
-Find elements with CSS3 selectors and return a L<Mojo::Collection> object. All
+Find elements with CSS selectors and return a L<Mojo::Collection> object. All
 selectors from L<Mojo::DOM::CSS> are supported.
 
   # Find a specific element and extract information
@@ -590,7 +590,7 @@ Parent of element.
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
-Parse HTML5/XML document with L<Mojo::DOM::HTML>.
+Parse HTML/XML document with L<Mojo::DOM::HTML>.
 
   # Parse UTF-8 encoded XML
   my $dom = Mojo::DOM->new->charset('UTF-8')->xml(1)->parse($xml);
@@ -727,7 +727,7 @@ Element type.
   my $xml = $dom->xml;
   $dom    = $dom->xml(1);
 
-Disable HTML5 semantics in parser and activate case sensitivity, defaults to
+Disable HTML semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.
 
 =head1 CHILD ELEMENTS

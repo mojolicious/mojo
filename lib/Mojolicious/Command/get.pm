@@ -25,7 +25,7 @@ usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
   mojo get http://search.twitter.com/search.json /error
 
 These options are available:
-  -C, --charset <charset>     Charset of HTML5/XML content, defaults to auto
+  -C, --charset <charset>     Charset of HTML/XML content, defaults to auto
                               detection or "UTF-8".
   -c, --content <content>     Content to send with request.
   -H, --header <name:value>   Additional HTTP header.

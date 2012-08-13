@@ -500,9 +500,9 @@ L<Test::Mojo> API to be used.
 
 =head2 EventSource web service
 
-HTML5 EventSource is a special form of long-polling where you can directly
-send DOM events from servers to clients. It is uni-directional, that means you
-will have to use Ajax requests for sending data from clients to servers, the
+EventSource is a special form of long-polling where you can directly send DOM
+events from servers to clients. It is uni-directional, that means you will
+have to use Ajax requests for sending data from clients to servers, the
 advantage however is low infrastructure requirements, since it reuses the HTTP
 protocol for transport.
 
@@ -682,7 +682,7 @@ When we say L<Mojolicious> is a web framework we actually mean it.
 =head2 Web scraping
 
 Scraping information from web sites has never been this much fun before. The
-built-in HTML5/XML parser L<Mojo::DOM> supports all CSS3 selectors that make
+built-in HTML/XML parser L<Mojo::DOM> supports all CSS selectors that make
 sense for a standalone parser.
 
   use Mojo::UserAgent;
@@ -951,7 +951,7 @@ be able to work standalone as well as inside L<Mojolicious> applications.
 
 Don't you hate checking huge HTML files from the command line? Thanks to the
 C<mojo get> command that is about to change. You can just pick the parts that
-actually matter with the CSS3 selectors from L<Mojo::DOM> and JSON Pointers
+actually matter with the CSS selectors from L<Mojo::DOM> and JSON Pointers
 from L<Mojo::JSON::Pointer>.
 
   $ mojo get http://mojolicio.us 'head > title'

@@ -284,7 +284,7 @@ Mojolicious::Plugin::TagHelpers - Tag helpers plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::TagHelpers> is a collection of HTML5 tag helpers for
+L<Mojolicious::Plugin::TagHelpers> is a collection of HTML tag helpers for
 L<Mojolicious>.
 
 Most form helpers can automatically pick up previous input values and will
@@ -534,7 +534,7 @@ Alias for C<tag>.
   %= tag div => 'some & content'
   <%= tag div => begin %>some & content<% end %>
 
-HTML5 tag generator.
+HTML tag generator.
 
   <div />
   <div id="foo" />

@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 33;
+use Test::More tests => 32;
 
 # "Marge, you being a cop makes you the man!
 #  Which makes me the woman, and I have no interest in that,
@@ -170,26 +170,27 @@ $loop->client(
 $loop->start;
 ok $err, 'has error';
 
-# Removed connection
+# Removed connection (with delay)
+my $removed;
+$delay = Mojo::IOLoop->delay(sub { $removed++ });
 $port = Mojo::IOLoop->generate_port;
-my ($server_close, $client_close);
+$delay->begin;
 Mojo::IOLoop->server(
   (address => '127.0.0.1', port => $port) => sub {
     my ($loop, $stream) = @_;
-    $stream->on(close => sub { $server_close++ });
+    $stream->on(close => sub { $delay->end });
   }
 );
+$delay->begin;
 $id = Mojo::IOLoop->client(
   (port => $port) => sub {
     my ($loop, $err, $stream) = @_;
-    $stream->on(close => sub { $client_close++ });
+    $stream->on(close => sub { $delay->end });
     $loop->remove($id);
   }
 );
-Mojo::IOLoop->timer(0.5 => sub { shift->stop });
-Mojo::IOLoop->start;
-is $server_close, 1, 'server emitted close event once';
-is $client_close, 1, 'client emitted close event once';
+$delay->wait;
+is $removed, 1, 'connection has been removed';
 
 # Stream throttling
 $port = Mojo::IOLoop->generate_port;
@@ -239,7 +240,7 @@ is $client, 'works!', 'full message has been written';
 $err = '';
 $loop = Mojo::IOLoop->new(max_connections => 0);
 $loop->remove($loop->client({port => $loop->generate_port}));
-$loop->timer(1 => sub { shift->stop; $err = 'failed!' });
+$loop->timer(1 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 is $loop->max_connections, 0, 'right value';
@@ -251,7 +252,7 @@ $port = $loop->generate_port;
 $loop->server(
   {address => '127.0.0.1', port => $port} => sub { shift; shift->close });
 $loop->client({port => $port} => sub { });
-$loop->timer(1 => sub { shift->stop; $err = 'failed!' });
+$loop->timer(1 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';
 is $loop->max_accepts, 1, 'right value';

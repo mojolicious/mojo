@@ -184,12 +184,15 @@ Mojo::Headers - Headers
 
   # Parse
   my $headers = Mojo::Headers->new;
-  $headers->parse("Content-Type: text/html\n\n");
+  $headers->parse("Content-Length: 42\r\n");
+  $headers->parse("Content-Type: text/html\r\n\r\n");
+  say $headers->content_length;
   say $headers->content_type;
 
   # Build
   my $headers = Mojo::Headers->new;
-  $headers->content_length(9001);
+  $headers->content_length(42);
+  $headers->content_type('text/plain');
   say $headers->to_string;
 
 =head1 DESCRIPTION
@@ -414,7 +417,7 @@ Generate a list of all currently defined headers.
 
 =head2 C<parse>
 
-  $headers = $headers->parse("Content-Type: text/foo\n\n");
+  $headers = $headers->parse("Content-Type: text/plain\r\n\r\n");
 
 Parse formatted headers.
 

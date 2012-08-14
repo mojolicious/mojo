@@ -1,4 +1,7 @@
 
+3.31  2012-08-15
+  - Improved documentation.
+
 3.30  2012-08-14
   - Added te method to Mojo::Headers.
   - Improved documentation.

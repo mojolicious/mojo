@@ -194,7 +194,7 @@ Mojo::Headers - Headers
 
 =head1 DESCRIPTION
 
-L<Mojo::Headers> is a container for HTTP headers.
+L<Mojo::Headers> is a container for HTTP headers as described in RFC 2616.
 
 =head1 ATTRIBUTES
 
@@ -514,7 +514,7 @@ Shortcut for the C<Status> header.
   my $te   = $headers->te;
   $headers = $headers->te('chunked');
 
-Shortcut for the C<TE> header. Represents available transfer-encodings.
+Shortcut for the C<TE> header.
 
 =head2 C<to_hash>
 

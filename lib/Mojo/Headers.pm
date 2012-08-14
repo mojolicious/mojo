@@ -514,7 +514,7 @@ Shortcut for the C<Status> header.
   my $te   = $headers->te;
   $headers = $headers->te('chunked');
 
-Shortcut for the C<Transfer-Encoding> header.
+Shortcut for the C<TE> header. Represents available transfer-encodings.
 
 =head2 C<to_hash>
 

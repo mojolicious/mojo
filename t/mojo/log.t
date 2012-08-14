@@ -33,8 +33,8 @@ like $log->format(qw(debug Test 1 2 3)),
 my $messages = [];
 $log->unsubscribe('message')->on(
   message => sub {
-    my ($log, $level, @messages) = @_;
-    push @$messages, $level, @messages;
+    my ($log, $level, @lines) = @_;
+    push @$messages, $level, @lines;
   }
 );
 $log->info('Whatever.');

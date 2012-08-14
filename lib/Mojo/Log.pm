@@ -37,8 +37,8 @@ sub error { shift->log(error => @_) }
 sub fatal { shift->log(fatal => @_) }
 
 sub format {
-  my ($self, $level, @msgs) = @_;
-  return '[' . localtime(time) . "] [$level] " . join("\n", @msgs) . "\n";
+  my ($self, $level, @lines) = @_;
+  return '[' . localtime(time) . "] [$level] " . join("\n", @lines) . "\n";
 }
 
 sub info { shift->log(info => @_) }

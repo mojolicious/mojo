@@ -7,13 +7,14 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 
 # Common headers
 my @HEADERS = (
-  qw(Accept Accept-Language Accept-Ranges Authorization Connection),
-  qw(Cache-Control Content-Disposition Content-Length Content-Range),
-  qw(Content-Type Cookie DNT Date ETag Expect Expires Host If-Modified-Since),
-  qw(Last-Modified Location Proxy-Authenticate Proxy-Authorization Range),
-  qw(Sec-WebSocket-Accept Sec-WebSocket-Key Sec-WebSocket-Origin),
-  qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
-  qw(TE Trailer Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
+  qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
+  qw(Authorization Connection Cache-Control Content-Disposition),
+  qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
+  qw(Date ETag Expect Expires Host If-Modified-Since Last-Modified Location),
+  qw(Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept),
+  qw(Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol),
+  qw(Sec-WebSocket-Version Server Set-Cookie Status TE Trailer),
+  qw(Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
 );
 {
   no strict 'refs';
@@ -223,10 +224,24 @@ following new ones.
 
 Shortcut for the C<Accept> header.
 
+=head2 C<accept_charset>
+
+  my $charset = $headers->accept_charset;
+  $headers    = $headers->accept_charset('UTF-8');
+
+Shortcut for the C<Accept-Charset> header.
+
+=head2 C<accept_encoding>
+
+  my $encoding = $headers->accept_encoding;
+  $headers     = $headers->accept_encoding('gzip');
+
+Shortcut for the C<Accept-Encoding> header.
+
 =head2 C<accept_language>
 
-  my $accept_language = $headers->accept_language;
-  $headers            = $headers->accept_language('de, en');
+  my $language = $headers->accept_language;
+  $headers     = $headers->accept_language('de, en');
 
 Shortcut for the C<Accept-Language> header.
 
@@ -272,15 +287,22 @@ Shortcut for the C<Connection> header.
 
 =head2 C<content_disposition>
 
-  my $content_disposition = $headers->content_disposition;
-  $headers                = $headers->content_disposition('foo');
+  my $disposition = $headers->content_disposition;
+  $headers        = $headers->content_disposition('foo');
 
 Shortcut for the C<Content-Disposition> header.
 
+=head2 C<content_encoding>
+
+  my $encoding = $headers->content_encoding;
+  $headers     = $headers->content_encoding('gzip');
+
+Shortcut for the C<Content-Encoding> header.
+
 =head2 C<content_length>
 
-  my $content_length = $headers->content_length;
-  $headers           = $headers->content_length(4000);
+  my $length = $headers->content_length;
+  $headers   = $headers->content_length(4000);
 
 Shortcut for the C<Content-Length> header.
 
@@ -293,8 +315,8 @@ Shortcut for the C<Content-Range> header.
 
 =head2 C<content_type>
 
-  my $content_type = $headers->content_type;
-  $headers         = $headers->content_type('text/plain');
+  my $type = $headers->content_type;
+  $headers = $headers->content_type('text/plain');
 
 Shortcut for the C<Content-Type> header.
 
@@ -430,8 +452,8 @@ Shortcut for the C<Proxy-Authenticate> header.
 
 =head2 C<proxy_authorization>
 
-  my $proxy_authorization = $headers->proxy_authorization;
-  $headers = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
+  my $authorization = $headers->proxy_authorization;
+  $headers          = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Proxy-Authorization> header.
 
@@ -542,8 +564,8 @@ Shortcut for the C<Trailer> header.
 
 =head2 C<transfer_encoding>
 
-  my $transfer_encoding = $headers->transfer_encoding;
-  $headers              = $headers->transfer_encoding('chunked');
+  my $encoding = $headers->transfer_encoding;
+  $headers     = $headers->transfer_encoding('chunked');
 
 Shortcut for the C<Transfer-Encoding> header.
 
@@ -556,8 +578,8 @@ Shortcut for the C<Upgrade> header.
 
 =head2 C<user_agent>
 
-  my $user_agent = $headers->user_agent;
-  $headers       = $headers->user_agent('Mojo/1.0');
+  my $agent = $headers->user_agent;
+  $headers  = $headers->user_agent('Mojo/1.0');
 
 Shortcut for the C<User-Agent> header.
 

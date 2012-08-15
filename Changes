@@ -1,5 +1,7 @@
 
 3.31  2012-08-15
+  - Added accept_charset, accept_encoding and content_encoding methods to
+    Mojo::Headers.
   - Improved documentation.
   - Improved tests.
 

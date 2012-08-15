@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 89;
+use Test::More tests => 92;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -50,6 +50,8 @@ is $headers->header('Content-Type' => 'text/html')->content_type, 'text/html',
 # Common headers
 $headers = Mojo::Headers->new;
 is $headers->accept('foo')->accept,                   'foo', 'right value';
+is $headers->accept_charset('foo')->accept_charset,   'foo', 'right value';
+is $headers->accept_encoding('foo')->accept_encoding, 'foo', 'right value';
 is $headers->accept_language('foo')->accept_language, 'foo', 'right value';
 is $headers->accept_ranges('foo')->accept_ranges,     'foo', 'right value';
 is $headers->authorization('foo')->authorization,     'foo', 'right value';
@@ -57,6 +59,7 @@ is $headers->connection('foo')->connection,           'foo', 'right value';
 is $headers->cache_control('foo')->cache_control,     'foo', 'right value';
 is $headers->content_disposition('foo')->content_disposition, 'foo',
   'right value';
+is $headers->content_encoding('foo')->content_encoding,   'foo', 'right value';
 is $headers->content_length('foo')->content_length,       'foo', 'right value';
 is $headers->content_range('foo')->content_range,         'foo', 'right value';
 is $headers->content_type('foo')->content_type,           'foo', 'right value';

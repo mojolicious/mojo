@@ -7,7 +7,7 @@ use Test::More tests => 95;
 # "Now that's a wave of destruction that's easy on the eyes."
 use Mojo::Parameters;
 
-# Basics with custom pair separator
+# Basic functionality
 my $p = Mojo::Parameters->new('foo=b%3Bar&baz=23');
 my $p2 = Mojo::Parameters->new('x', 1, 'y', 2);
 is $p->pair_separator, '&',                 'right pair separator';

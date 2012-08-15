@@ -8,7 +8,7 @@ use Test::More tests => 212;
 #  movie 'The Never Ending Story.'"
 use Mojo::Path;
 
-# Basics
+# Basic functionality
 my $path = Mojo::Path->new;
 is $path->parse('/path')->to_string, '/path', 'right path';
 is $path->parts->[0], 'path', 'right part';

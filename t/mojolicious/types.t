@@ -5,7 +5,7 @@ use Test::More tests => 52;
 # "Your mistletoe is no match for my *tow* missile."
 use Mojolicious::Types;
 
-# Basics
+# Basic functionality
 my $t = Mojolicious::Types->new;
 is $t->type('json'), 'application/json', 'right type';
 is $t->type('foo'), undef, 'no type';

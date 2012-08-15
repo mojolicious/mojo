@@ -530,8 +530,8 @@ Shortcut for the C<Server> header.
 
 =head2 C<set_cookie>
 
-  my $set_cookie = $headers->set_cookie;
-  $headers       = $headers->set_cookie('f=b; path=/');
+  my $cookie = $headers->set_cookie;
+  $headers   = $headers->set_cookie('f=b; path=/');
 
 Shortcut for the C<Set-Cookie> header from RFC 6265.
 
@@ -556,6 +556,8 @@ Shortcut for the C<TE> header.
 
 Turn headers into hash reference, nested array references to represent multi
 line values are disabled by default.
+
+  say $headers->to_hash->{DNT};
 
 =head2 C<to_string>
 

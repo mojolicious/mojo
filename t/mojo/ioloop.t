@@ -44,7 +44,7 @@ Mojo::IOLoop->timer(
 Mojo::IOLoop->start;
 like $err, qr/^Mojo::IOLoop already running/, 'right error';
 
-# Basics
+# Basic functionality
 my ($ticks, $timer, $hirestimer);
 my $id = $loop->recurring(0 => sub { $ticks++ });
 $loop->timer(

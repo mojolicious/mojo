@@ -11,10 +11,10 @@ my @HEADERS = (
   qw(Authorization Connection Cache-Control Content-Disposition),
   qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
   qw(Date ETag Expect Expires Host If-Modified-Since Last-Modified Location),
-  qw(Proxy-Authenticate Proxy-Authorization Range Sec-WebSocket-Accept),
-  qw(Sec-WebSocket-Key Sec-WebSocket-Origin Sec-WebSocket-Protocol),
-  qw(Sec-WebSocket-Version Server Set-Cookie Status TE Trailer),
-  qw(Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
+  qw(Origin Proxy-Authenticate Proxy-Authorization Range),
+  qw(Sec-WebSocket-Accept Sec-WebSocket-Extensions Sec-WebSocket-Key),
+  qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
+  qw(TE Trailer Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
 );
 {
   no strict 'refs';
@@ -437,6 +437,13 @@ Shortcut for the C<Location> header.
 
 Generate a list of all currently defined headers.
 
+=head2 C<origin>
+
+  my $origin = $headers->origin;
+  $headers   = $headers->origin('http://example.com');
+
+Shortcut for the C<Origin> header.
+
 =head2 C<parse>
 
   $headers = $headers->parse("Content-Type: text/plain\r\n\r\n");
@@ -485,19 +492,19 @@ Remove a header.
 
 Shortcut for the C<Sec-WebSocket-Accept> header.
 
+=head2 C<sec_websocket_extensions>
+
+  my $extensions = $headers->sec_websocket_extensions;
+  $headers       = $headers->sec_websocket_extensions('foo');
+
+Shortcut for the C<Sec-WebSocket-Extensions> header.
+
 =head2 C<sec_websocket_key>
 
   my $key  = $headers->sec_websocket_key;
   $headers = $headers->sec_websocket_key('dGhlIHNhbXBsZSBub25jZQ==');
 
 Shortcut for the C<Sec-WebSocket-Key> header.
-
-=head2 C<sec_websocket_origin>
-
-  my $origin = $headers->sec_websocket_origin;
-  $headers   = $headers->sec_websocket_origin('http://example.com');
-
-Shortcut for the C<Sec-WebSocket-Origin> header.
 
 =head2 C<sec_websocket_protocol>
 

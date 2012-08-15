@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 92;
+use Test::More tests => 93;
 
 # "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
 #  a tip-top Tet, and a solemn, dignified, Ramadan.
@@ -73,16 +73,17 @@ is $headers->host('foo')->host,                           'foo', 'right value';
 is $headers->if_modified_since('foo')->if_modified_since, 'foo', 'right value';
 is $headers->last_modified('foo')->last_modified,         'foo', 'right value';
 is $headers->location('foo')->location,                   'foo', 'right value';
+is $headers->origin('foo')->origin,                       'foo', 'right value';
 is $headers->proxy_authenticate('foo')->proxy_authenticate, 'foo',
   'right value';
 is $headers->proxy_authorization('foo')->proxy_authorization, 'foo',
   'right value';
 is $headers->range('foo')->range, 'foo', 'right value';
-is $headers->sec_websocket_protocol('foo')->sec_websocket_protocol, 'foo',
+is $headers->sec_websocket_accept('foo')->sec_websocket_accept, 'foo',
+  'right value';
+is $headers->sec_websocket_extensions('foo')->sec_websocket_extensions, 'foo',
   'right value';
 is $headers->sec_websocket_key('foo')->sec_websocket_key, 'foo', 'right value';
-is $headers->sec_websocket_origin('foo')->sec_websocket_origin, 'foo',
-  'right value';
 is $headers->sec_websocket_protocol('foo')->sec_websocket_protocol, 'foo',
   'right value';
 is $headers->sec_websocket_version('foo')->sec_websocket_version, 'foo',

@@ -325,7 +325,7 @@ Shortcut for the C<Content-Type> header.
   my $cookie = $headers->cookie;
   $headers   = $headers->cookie('f=b');
 
-Shortcut for the C<Cookie> header.
+Shortcut for the C<Cookie> header from RFC 6265.
 
 =head2 C<date>
 
@@ -339,7 +339,7 @@ Shortcut for the C<Date> header.
   my $dnt  = $headers->dnt;
   $headers = $headers->dnt(1);
 
-Shortcut for the C<DNT> (Do Not Track) header.
+Shortcut for the C<DNT> (Do Not Track) header, which has no specification yet.
 
 =head2 C<etag>
 
@@ -442,7 +442,7 @@ Generate a list of all currently defined headers.
   my $origin = $headers->origin;
   $headers   = $headers->origin('http://example.com');
 
-Shortcut for the C<Origin> header.
+Shortcut for the C<Origin> header from RFC 6454.
 
 =head2 C<parse>
 
@@ -490,35 +490,35 @@ Remove a header.
   my $accept = $headers->sec_websocket_accept;
   $headers   = $headers->sec_websocket_accept('s3pPLMBiTxaQ9kYGzzhZRbK+xOo=');
 
-Shortcut for the C<Sec-WebSocket-Accept> header.
+Shortcut for the C<Sec-WebSocket-Accept> header from RFC 6455.
 
 =head2 C<sec_websocket_extensions>
 
   my $extensions = $headers->sec_websocket_extensions;
   $headers       = $headers->sec_websocket_extensions('foo');
 
-Shortcut for the C<Sec-WebSocket-Extensions> header.
+Shortcut for the C<Sec-WebSocket-Extensions> header from RFC 6455.
 
 =head2 C<sec_websocket_key>
 
   my $key  = $headers->sec_websocket_key;
   $headers = $headers->sec_websocket_key('dGhlIHNhbXBsZSBub25jZQ==');
 
-Shortcut for the C<Sec-WebSocket-Key> header.
+Shortcut for the C<Sec-WebSocket-Key> header from RFC 6455.
 
 =head2 C<sec_websocket_protocol>
 
   my $protocol = $headers->sec_websocket_protocol;
   $headers     = $headers->sec_websocket_protocol('sample');
 
-Shortcut for the C<Sec-WebSocket-Protocol> header.
+Shortcut for the C<Sec-WebSocket-Protocol> header from RFC 6455.
 
 =head2 C<sec_websocket_version>
 
   my $version = $headers->sec_websocket_version;
   $headers    = $headers->sec_websocket_version(13);
 
-Shortcut for the C<Sec-WebSocket-Version> header.
+Shortcut for the C<Sec-WebSocket-Version> header from RFC 6455.
 
 =head2 C<server>
 
@@ -532,14 +532,14 @@ Shortcut for the C<Server> header.
   my $set_cookie = $headers->set_cookie;
   $headers       = $headers->set_cookie('f=b; path=/');
 
-Shortcut for the C<Set-Cookie> header.
+Shortcut for the C<Set-Cookie> header from RFC 6265.
 
 =head2 C<status>
 
   my $status = $headers->status;
   $headers   = $headers->status('200 OK');
 
-Shortcut for the C<Status> header.
+Shortcut for the C<Status> header from RFC 3875.
 
 =head2 C<te>
 

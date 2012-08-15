@@ -136,7 +136,7 @@ is $post, 'Premature connection close', 'right error';
 # The poll reactor stops when there are no events being watched anymore
 my $time = time;
 Mojo::IOLoop->start;
-ok time < ($time + 3), 'stopped automatically';
+ok time < ($time + 10), 'stopped automatically';
 
 # GET / (non-blocking)
 $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);

@@ -31,7 +31,7 @@ ok $triggered, 'reactor waited for one event';
 my $time = time;
 Mojo::IOLoop->start;
 Mojo::IOLoop->one_tick;
-ok time < ($time + 3), 'stopped automatically';
+ok time < ($time + 10), 'stopped automatically';
 
 # Listen
 my $port   = Mojo::IOLoop->generate_port;

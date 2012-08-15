@@ -8,7 +8,7 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 # Common headers
 my @HEADERS = (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
-  qw(Authorization Connection Cache-Control Content-Disposition),
+  qw(Authorization Cache-Control Connection Content-Disposition),
   qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
   qw(Date ETag Expect Expires Host If-Modified-Since Last-Modified Location),
   qw(Origin Proxy-Authenticate Proxy-Authorization Range),
@@ -339,7 +339,8 @@ Shortcut for the C<Date> header.
   my $dnt  = $headers->dnt;
   $headers = $headers->dnt(1);
 
-Shortcut for the C<DNT> (Do Not Track) header, which has no specification yet.
+Shortcut for the C<DNT> (Do Not Track) header, which has no specification yet,
+but is very commonly used.
 
 =head2 C<etag>
 
@@ -394,7 +395,7 @@ Shortcut for the C<Host> header.
 
 =head2 C<if_modified_since>
 
-  my $m    = $headers->if_modified_since;
+  my $date = $headers->if_modified_since;
   $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<If-Modified-Since> header.
@@ -413,7 +414,7 @@ Check if a header has exceeded C<max_line_size>.
 
 =head2 C<last_modified>
 
-  my $m    = $headers->last_modified;
+  my $date = $headers->last_modified;
   $headers = $headers->last_modified('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<Last-Modified> header.

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 413;
+use Test::More tests => 415;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -52,14 +52,14 @@ ok(BaseTestTest->can('heads'), 'base class has heads');
 ok !BaseTest->can('mojo'), 'base class does not have mojo';
 ok(BaseTest->can('heads'), 'base class has heads');
 
-# "default" defined but false
+# Default value defined but false
 my $m = $monkeys[1];
 ok defined($m->coconuts);
 is $m->coconuts, 0, 'right attribute value';
 $m->coconuts(5);
 is $m->coconuts, 5, 'right attribute value';
 
-# "default" support
+# Default value support
 my $y = 1;
 for my $i (101 .. 150) {
   $y = !$y;
@@ -72,7 +72,7 @@ for my $i (101 .. 150) {
     : is($monkeys[$i]->heads, 1, 'right attribute default value');
 }
 
-# "chained" and coderef "default" support
+# Chained attributes and coderef default value support
 for my $i (151 .. 200) {
   $monkeys[$i] = BaseTest->new;
   is $monkeys[$i]->ears, 2, 'right attribute value';
@@ -80,6 +80,12 @@ for my $i (151 .. 200) {
   is $monkeys[$i]->eyes, 2, 'right attribute value';
   is $monkeys[$i]->eyes(6)->eyes, 6, 'right chained attribute value';
 }
+
+# Tap into chain
+$monkey = BaseTest->new;
+is $monkey->tap(sub { $_->name('foo') })->name, 'foo', 'right attribute value';
+is $monkey->tap(sub { shift->name('bar')->name })->name, 'bar',
+  'right attribute value';
 
 # Inherit -base flag
 $monkey = BaseTest::Base3->new(evil => 1);

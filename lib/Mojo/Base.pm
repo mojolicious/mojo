@@ -100,6 +100,12 @@ sub attr {
   }
 }
 
+sub tap {
+  my ($self, $cb) = @_;
+  $_->$cb for $self;
+  return $self;
+}
+
 1;
 
 =head1 NAME
@@ -111,24 +117,24 @@ Mojo::Base - Minimal base class for Mojo projects
   package Cat;
   use Mojo::Base -base;
 
-  has 'mouse';
-  has paws => 4;
+  has name => 'Nyan';
   has [qw(ears eyes)] => 2;
 
   package Tiger;
   use Mojo::Base 'Cat';
 
+  has friend => sub { Cat->new };
   has stripes => 42;
 
   package main;
   use Mojo::Base -strict;
 
-  my $mew = Cat->new(mouse => 'Mickey');
+  my $mew = Cat->new(name => 'Longcat');
   say $mew->paws;
   say $mew->paws(5)->ears(4)->paws;
 
   my $rawr = Tiger->new(stripes => 23);
-  say $rawr->ears * $rawr->stripes;
+  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->paws;
 
 =head1 DESCRIPTION
 
@@ -209,6 +215,12 @@ Create attributes. An array reference can be used to create more than one
 attribute. Pass an optional second argument to set a default value, it should
 be a constant or a sub reference. The sub reference will be excuted at
 accessor read time if there's no set value.
+
+=head2 C<tap>
+
+  $object = $object->tap(sub {...});
+
+Tap into a method chain to perform operations on an object within the chain.
 
 =head1 DEBUGGING
 

@@ -1,5 +1,6 @@
 
 3.32  2012-08-16
+  - Added tap method to Mojo::Base.
   - Improved documentation.
   - Fixed json_has method in Test::Mojo.
 

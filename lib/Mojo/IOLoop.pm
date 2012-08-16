@@ -550,7 +550,7 @@ reactors stop automatically if there are no events being watched anymore.
 
 Get L<Mojo::IOLoop::Steps> object to sequentialize events.
 
-  # Control the flow of multiple events
+  # Sequentialize multiple events
   Mojo::IOLoop->steps(
 
     # First step (simple timer)

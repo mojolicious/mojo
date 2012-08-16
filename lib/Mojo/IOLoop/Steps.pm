@@ -36,7 +36,7 @@ Mojo::IOLoop::Steps - Sequentialize events
 
   use Mojo::IOLoop::Steps;
 
-  # Control the flow of multiple events
+  # Sequentialize multiple events
   Mojo::IOLoop::Steps->new(
 
     # First step (simple timer)

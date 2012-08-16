@@ -555,20 +555,21 @@ Get L<Mojo::IOLoop::Steps> object to control the flow of events.
 
     # First step
     sub {
-      my $next = shift;
-      say 'Waiting 2 seconds.';
-      Mojo::IOLoop->timer(2 => $next);
+      my $steps = shift;
+      Mojo::IOLoop->timer(2 => $steps->next);
+      say 'Second step in 2 seconds.';
     },
 
     # Second step
     sub {
-      my $next = shift;
-      say 'Waiting 3 seconds.';
-      Mojo::IOLoop->timer(3 => $next);
+      my $steps = shift;
+      Mojo::IOLoop->timer(1 => $steps->next);
+      Mojo::IOLoop->timer(3 => $steps->next);
+      say 'Third step in 3 seconds.';
     },
 
     # Third step
-    sub { say 'And done after 5 seconds.' }
+    sub { say 'And done after 5 seconds total.' }
   );
 
 =head2 C<stop>

@@ -3,22 +3,27 @@ use Mojo::Base -base;
 
 sub new {
   my $self = shift->SUPER::new(steps => [@_]);
-  $self->_step();
+  $self->next->();
   return $self;
 }
 
 # "My god, it's full of geezers."
+sub next {
+  my $self = shift;
+  $self->{counter}++;
+  return sub { shift; $self->_step(@_) };
+}
+
 sub _step {
   my $self = shift;
 
-  # Arguments
   my $args = $self->{args} ||= [];
   push @$args, @_;
-  $self->{args} = [];
 
-  # Next step
+  return unless --$self->{counter} <= 0;
   return unless my $cb = shift @{$self->{steps}};
-  $cb->(sub { shift; $self->_step(@_) }, @$args);
+  $self->{args} = [];
+  $self->$cb(@$args);
 }
 
 1;
@@ -36,22 +41,23 @@ Mojo::IOLoop::Steps - Control flow of events
 
     # First step
     sub {
-      my $next = shift;
-      say 'Waiting 2 seconds.';
-      Mojo::IOLoop->timer(2 => $next);
+      my $steps = shift;
+      Mojo::IOLoop->timer(2 => $steps->next);
+      say 'Second step in 2 seconds.';
     },
 
     # Second step
     sub {
-      my ($next, @args) = @_;
-      say 'Waiting 3 seconds.';
-      Mojo::IOLoop->timer(3 => $next);
+      my ($steps, @args) = @_;
+      Mojo::IOLoop->timer(1 => $steps->next);
+      Mojo::IOLoop->timer(3 => $steps->next);
+      say 'Third step in 3 seconds.';
     },
 
     # Third step
     sub {
-      my ($next, @args) = @_;
-      say 'And done after 5 seconds.';
+      my ($steps, @args) = @_;
+      say 'And done after 5 seconds total.';
     }
   );
 
@@ -72,6 +78,14 @@ the following new ones.
   my $steps = Mojo::IOLoop::Steps->new(sub {...}, sub {...});
 
 Construct a new L<Mojo::IOLoop::Steps> object.
+
+=head2 C<next>
+
+  my $cb = $steps->next;
+
+Generate callback for next step, all generated callbacks need to be invoked
+before the next step can be reached. All arguments passed to the callback,
+except for the first one, are queued and passed through to the next step.
 
 =head1 SEE ALSO
 

@@ -552,19 +552,23 @@ Get L<Mojo::IOLoop::Steps> object to control the flow of events.
 
   # Control the flow of multiple events
   Mojo::IOLoop->steps(
+
+    # First step
     sub {
-      my $steps = shift;
-      Mojo::IOLoop->timer(3 => $steps->next);
-      Mojo::IOLoop->timer(1 => $steps->next);
+      my $next = shift;
+      say 'Waiting 2 seconds.';
+      Mojo::IOLoop->timer(2 => $next);
     },
+
+    # Second step
     sub {
-      my ($steps, @args) = @_;
-      Mojo::IOLoop->timer(2 => $steps->next);
+      my $next = shift;
+      say 'Waiting 3 seconds.';
+      Mojo::IOLoop->timer(3 => $next);
     },
-    sub {
-      my ($steps, @args) = @_;
-      say "Thank you for waiting 5 seconds.";
-    }
+
+    # Third step
+    sub { say 'And done after 5 seconds.' }
   );
 
 =head2 C<stop>

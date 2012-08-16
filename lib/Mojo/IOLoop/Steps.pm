@@ -3,29 +3,22 @@ use Mojo::Base -base;
 
 sub new {
   my $self = shift->SUPER::new(steps => [@_]);
-  $self->next->();
+  $self->_step();
   return $self;
 }
 
 # "My god, it's full of geezers."
-sub next {
-  my $self = shift;
-  $self->{counter}++;
-  return sub { shift; $self->_step(@_) };
-}
-
 sub _step {
   my $self = shift;
 
-  # Cache arguments
+  # Arguments
   my $args = $self->{args} ||= [];
   push @$args, @_;
+  $self->{args} = [];
 
   # Next step
-  return unless --$self->{counter} <= 0;
   return unless my $cb = shift @{$self->{steps}};
-  $self->{args} = [];
-  $self->$cb(@$args);
+  $cb->(sub { shift; $self->_step(@_) }, @$args);
 }
 
 1;
@@ -39,19 +32,26 @@ Mojo::IOLoop::Steps - Control flow of events
   use Mojo::IOLoop::Steps;
 
   # Control the flow of multiple events
-  my $steps = Mojo::IOLoop::Steps->new(
+  Mojo::IOLoop::Steps->new(
+
+    # First step
     sub {
-      my $steps = shift;
-      Mojo::IOLoop->timer(3 => $steps->next);
-      Mojo::IOLoop->timer(1 => $steps->next);
+      my $next = shift;
+      say 'Waiting 2 seconds.';
+      Mojo::IOLoop->timer(2 => $next);
     },
+
+    # Second step
     sub {
-      my ($steps, @args) = @_;
-      Mojo::IOLoop->timer(2 => $steps->next);
+      my ($next, @args) = @_;
+      say 'Waiting 3 seconds.';
+      Mojo::IOLoop->timer(3 => $next);
     },
+
+    # Third step
     sub {
-      my ($steps, @args) = @_;
-      say "Thank you for waiting 5 seconds.";
+      my ($next, @args) = @_;
+      say 'And done after 5 seconds.';
     }
   );
 
@@ -60,7 +60,7 @@ Mojo::IOLoop::Steps - Control flow of events
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Delay> controls the flow of events for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Steps> controls the flow of events for L<Mojo::IOLoop>.
 
 =head1 METHODS
 
@@ -72,14 +72,6 @@ the following new ones.
   my $steps = Mojo::IOLoop::Steps->new(sub {...}, sub {...});
 
 Construct a new L<Mojo::IOLoop::Steps> object.
-
-=head2 C<next>
-
-  my $cb = $steps->next;
-
-Generate callback for getting to the next step. If more than one is generated,
-they all have to be invoked before the next step can be reached. Note that the
-first argument passed to the callback will be ignored.
 
 =head1 SEE ALSO
 

@@ -553,14 +553,14 @@ Get L<Mojo::IOLoop::Steps> object to control the flow of events.
   # Control the flow of multiple events
   Mojo::IOLoop->steps(
 
-    # First step
+    # First step (simple timer)
     sub {
       my $steps = shift;
       Mojo::IOLoop->timer(2 => $steps->next);
       say 'Second step in 2 seconds.';
     },
 
-    # Second step
+    # Second step (parallel timers)
     sub {
       my $steps = shift;
       Mojo::IOLoop->timer(1 => $steps->next);
@@ -568,7 +568,7 @@ Get L<Mojo::IOLoop::Steps> object to control the flow of events.
       say 'Third step in 3 seconds.';
     },
 
-    # Third step
+    # Third step (the end)
     sub { say 'And done after 5 seconds total.' }
   );
 

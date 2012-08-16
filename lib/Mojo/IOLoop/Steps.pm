@@ -39,14 +39,14 @@ Mojo::IOLoop::Steps - Control flow of events
   # Control the flow of multiple events
   Mojo::IOLoop::Steps->new(
 
-    # First step
+    # First step (simple timer)
     sub {
       my $steps = shift;
       Mojo::IOLoop->timer(2 => $steps->next);
       say 'Second step in 2 seconds.';
     },
 
-    # Second step
+    # Second step (parallel timers)
     sub {
       my ($steps, @args) = @_;
       Mojo::IOLoop->timer(1 => $steps->next);
@@ -54,7 +54,7 @@ Mojo::IOLoop::Steps - Control flow of events
       say 'Third step in 3 seconds.';
     },
 
-    # Third step
+    # Third step (the end)
     sub {
       my ($steps, @args) = @_;
       say 'And done after 5 seconds total.';

@@ -1,6 +1,7 @@
 
 3.32  2012-08-16
   - Improved documentation.
+  - Fixed json_has method in Test::Mojo.
 
 3.31  2012-08-15
   - Added accept_charset, accept_encoding, content_encoding, origin and

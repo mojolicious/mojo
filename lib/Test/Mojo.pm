@@ -156,7 +156,7 @@ sub json_has {
   my ($self, $p, $desc) = @_;
   $desc ||= qq{has value for JSON Pointer "$p"};
   return $self->_test('ok',
-    Mojo::JSON::Pointer->new->contains($self->tx->res->json, $p), $desc);
+    !!Mojo::JSON::Pointer->new->contains($self->tx->res->json, $p), $desc);
 }
 
 sub json_hasnt {

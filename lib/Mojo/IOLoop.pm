@@ -548,7 +548,7 @@ reactors stop automatically if there are no events being watched anymore.
   my $steps = Mojo::IOLoop->steps(sub {...}, sub {...});
   my $steps = $loop->steps(sub {...}, sub {...});
 
-Get L<Mojo::IOLoop::Steps> object to control the flow of events.
+Get L<Mojo::IOLoop::Steps> object to sequentialize events.
 
   # Control the flow of multiple events
   Mojo::IOLoop->steps(

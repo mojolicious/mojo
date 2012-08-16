@@ -30,7 +30,7 @@ sub _step {
 
 =head1 NAME
 
-Mojo::IOLoop::Steps - Control flow of events
+Mojo::IOLoop::Steps - Sequentialize events
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Mojo::IOLoop::Steps - Control flow of events
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Steps> controls the flow of events for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Steps> sequentializes events for L<Mojo::IOLoop>.
 
 =head1 METHODS
 

@@ -47,7 +47,7 @@ for my $i (3, 3) {
 }
 is $delay->wait, 3, 'right results';
 
-# Mojo::IOLoop
+# Event loop
 $finished = undef;
 $delay = Mojo::IOLoop->delay(sub { shift; $finished = [@_, 'too!'] });
 for my $i (1, 1) {

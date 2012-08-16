@@ -5,6 +5,7 @@ use Carp 'croak';
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
+use Mojo::IOLoop::Steps;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
 use Mojo::Util 'md5_sum';
@@ -155,6 +156,8 @@ sub start {
   croak 'Mojo::IOLoop already running' if $self->is_running;
   (ref $self ? $self : $self->singleton)->reactor->start;
 }
+
+sub steps { shift; Mojo::IOLoop::Steps->new(@_) }
 
 sub stop {
   my $self = shift;
@@ -539,6 +542,30 @@ reactors stop automatically if there are no events being watched anymore.
 
   # Start event loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+=head2 C<steps>
+
+  my $steps = Mojo::IOLoop->steps(sub {...}, sub {...});
+  my $steps = $loop->steps(sub {...}, sub {...});
+
+Get L<Mojo::IOLoop::Steps> object to control the flow of events.
+
+  # Control the flow of multiple events
+  Mojo::IOLoop->steps(
+    sub {
+      my $steps = shift;
+      Mojo::IOLoop->timer(3 => $steps->next);
+      Mojo::IOLoop->timer(1 => $steps->next);
+    },
+    sub {
+      my ($steps, @args) = @_;
+      Mojo::IOLoop->timer(2 => $steps->next);
+    },
+    sub {
+      my ($steps, @args) = @_;
+      say "Thank you for waiting 5 seconds.";
+    }
+  );
 
 =head2 C<stop>
 

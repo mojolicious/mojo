@@ -77,11 +77,11 @@ sub render {
     handler  => $stash->{handler},
     template => delete $stash->{template}
   };
-  my $data   = $options->{data}   = delete $stash->{data};
+  my $data   = delete $stash->{data};
   my $format = $options->{format} = $stash->{format} || $self->default_format;
   my $inline = $options->{inline} = delete $stash->{inline};
-  my $json   = $options->{json}   = delete $stash->{json};
-  my $text   = $options->{test}   = delete $stash->{text};
+  my $json   = delete $stash->{json};
+  my $text   = delete $stash->{text};
   $options->{handler} //= $self->default_handler if defined $inline;
 
   # Text

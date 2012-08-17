@@ -465,15 +465,15 @@ ones as a chain of steps.
     # First step (simple timer)
     sub {
       my $delay = shift;
-      Mojo::IOLoop->timer(2 => $delay->next);
+      Mojo::IOLoop->timer(2 => $delay->begin);
       say 'Second step in 2 seconds.';
     },
 
     # Second step (parallel timers)
     sub {
       my $delay = shift;
-      Mojo::IOLoop->timer(1 => $delay->next);
-      Mojo::IOLoop->timer(3 => $delay->next);
+      Mojo::IOLoop->timer(1 => $delay->begin);
+      Mojo::IOLoop->timer(3 => $delay->begin);
       say 'Third step in 3 seconds.';
     },
 

@@ -51,6 +51,7 @@ sub file {
   return $self->_get_file(catfile($PUBLIC, split('/', $rel)));
 }
 
+# "It's not just safe, it's 40% safe!"
 sub serve {
   my ($self, $c, $rel) = @_;
   return unless my $asset = $self->file($rel);

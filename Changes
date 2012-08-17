@@ -1,7 +1,7 @@
 
 3.32  2012-08-17
-  - Added Mojo::IOLoop::Steps. (judofyr, marcus, sri)
-  - Added steps method to Mojo::IOLoop.
+  - Added event sequentialization support to Mojo::IOLoop::Delay.
+    (judofyr, marcus, sri)
   - Added tap method to Mojo::Base.
   - Improved documentation.
   - Fixed json_has method in Test::Mojo.

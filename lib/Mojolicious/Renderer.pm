@@ -58,6 +58,7 @@ sub get_data_template {
   return $loader->data($self->{index}{$template}, $template);
 }
 
+# "My god, it's full of geezers."
 sub render {
   my ($self, $c, $args) = @_;
   $args ||= {};

@@ -8,31 +8,53 @@ has ioloop => sub { Mojo::IOLoop->singleton };
 # "Ah, alcohol and night-swimming. It's a winning combination."
 sub begin {
   my $self = shift;
-  $self->{counter}++;
-  return sub { shift; $self->end(@_) };
+  my $id   = $self->{counter}++;
+  return sub { shift; $self->_step($id, @_) };
 }
 
-sub end {
+sub end { shift->_step(undef, @_) }
+
+sub steps {
   my $self = shift;
-  push @{$self->{args} ||= []}, @_;
-  $self->emit_safe('finish', @{$self->{args}}) if --$self->{counter} <= 0;
-  return $self->{counter};
+  $self->{steps} = [@_];
+  $self->begin->();
+  return $self;
 }
 
 # "Mrs. Simpson, bathroom is not for customers.
 #  Please use the crack house across the street."
 sub wait {
   my $self = shift;
-  $self->once(finish => sub { shift->ioloop->stop });
+  my @args;
+  $self->once(finish => sub { shift->ioloop->stop; @args = @_ });
   $self->ioloop->start;
-  return wantarray ? @{$self->{args}} : $self->{args}[0];
+  return wantarray ? @args : $args[0];
+}
+
+sub _step {
+  my ($self, $id) = (shift, shift);
+
+  my $ordered   = $self->{ordered}   ||= [];
+  my $unordered = $self->{unordered} ||= [];
+  if (defined $id) { $ordered->[$id] = [@_] }
+  else             { push @$unordered, @_ }
+
+  return $self->{counter} unless --$self->{counter} <= 0;
+
+  my $cb = shift @{$self->{steps} ||= []};
+  $self->{$_} = [] for qw(ordered unordered);
+  my @ordered = map {@$_} grep {defined} @$ordered;
+  $self->$cb(@ordered, @$unordered) if $cb;
+  $self->emit('finish', @ordered, @$unordered) unless @{$self->{steps}};
+
+  return 0;
 }
 
 1;
 
 =head1 NAME
 
-Mojo::IOLoop::Delay - Synchronize events
+Mojo::IOLoop::Delay - Control the flow of events
 
 =head1 SYNOPSIS
 
@@ -49,12 +71,38 @@ Mojo::IOLoop::Delay - Synchronize events
     });
   }
 
+  # Sequentialize multiple events
+  my $delay = Mojo::IOLoop::Delay->new;
+  $delay->steps(
+
+    # First step (simple timer)
+    sub {
+      my $delay = shift;
+      Mojo::IOLoop->timer(2 => $delay->next);
+      say 'Second step in 2 seconds.';
+    },
+
+    # Second step (parallel timers)
+    sub {
+      my ($delay, @args) = @_;
+      Mojo::IOLoop->timer(1 => $delay->next);
+      Mojo::IOLoop->timer(3 => $delay->next);
+      say 'Third step in 3 seconds.';
+    },
+
+    # Third step (the end)
+    sub {
+      my ($delay, @args) = @_;
+      say 'And done after 5 seconds total.';
+    }
+  );
+
   # Wait for events if necessary
   $delay->wait unless Mojo::IOLoop->is_running;
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Delay> synchronizes events for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Delay> controls the flow of events for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
@@ -67,7 +115,8 @@ L<Mojo::IOLoop::Delay> can emit the following events.
     ...
   });
 
-Emitted safely once the active event counter reaches zero.
+Emitted once the active event counter reaches zero and there are no more
+steps.
 
 =head1 ATTRIBUTES
 
@@ -91,7 +140,8 @@ implements the following new ones.
   my $cb = $delay->begin;
 
 Increment active event counter, the returned callback can be used instead of
-C<end>. Note that the first argument passed to the callback will be ignored.
+C<end>, which has the advantage of preserving the order of arguments. Note
+that the first argument passed to the callback will be ignored.
 
   my $delay = Mojo::IOLoop->delay;
   Mojo::UserAgent->new->get('mojolicio.us' => $delay->begin);
@@ -102,8 +152,16 @@ C<end>. Note that the first argument passed to the callback will be ignored.
   my $remaining = $delay->end;
   my $remaining = $delay->end(@args);
 
-Decrement active event counter, all arguments are queued for the C<finish>
-event and C<wait> method.
+Decrement active event counter, all arguments are queued for the next step or
+C<finish> event and C<wait> method.
+
+=head2 C<steps>
+
+  $delay = $delay->steps(sub {...}, sub {...});
+
+Sequentialize multiple events, the first callback will run right away, and the
+next one once the active event counter reaches zero, this chain will continue
+until there are no more callbacks left.
 
 =head2 C<wait>
 

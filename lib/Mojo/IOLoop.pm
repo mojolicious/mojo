@@ -5,7 +5,6 @@ use Carp 'croak';
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
-use Mojo::IOLoop::Steps;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
 use Mojo::Util 'md5_sum';
@@ -71,12 +70,12 @@ sub client {
 }
 
 sub delay {
-  my ($self, $cb) = @_;
+  my $self = shift;
   $self = $self->singleton unless ref $self;
 
   my $delay = Mojo::IOLoop::Delay->new;
   weaken $delay->ioloop($self)->{ioloop};
-  $delay->once(finish => $cb) if $cb;
+  @_ > 1 ? $delay->steps(@_) : $delay->once(finish => shift) if @_;
 
   return $delay;
 }
@@ -156,8 +155,6 @@ sub start {
   croak 'Mojo::IOLoop already running' if $self->is_running;
   (ref $self ? $self : $self->singleton)->reactor->start;
 }
-
-sub steps { shift; Mojo::IOLoop::Steps->new(@_) }
 
 sub stop {
   my $self = shift;
@@ -446,9 +443,11 @@ L<Mojo::IOLoop::Client/"connect">.
   my $delay = Mojo::IOLoop->delay;
   my $delay = $loop->delay;
   my $delay = $loop->delay(sub {...});
+  my $delay = $loop->delay(sub {...}, sub {...});
 
-Get L<Mojo::IOLoop::Delay> object to synchronize events and subscribe to event
-L<Mojo::IOLoop::Delay/"finish"> if optional callback is provided.
+Get L<Mojo::IOLoop::Delay> object to control the flow of events. A single
+callback will be treated as a subscriber to the C<finish> event, and multiple
+ones as a chain of steps.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
@@ -459,6 +458,28 @@ L<Mojo::IOLoop::Delay/"finish"> if optional callback is provided.
       $delay->end;
     });
   }
+
+  # Sequentialize multiple events
+  my $delay = Mojo::IOLoop->delay(
+
+    # First step (simple timer)
+    sub {
+      my $delay = shift;
+      Mojo::IOLoop->timer(2 => $delay->next);
+      say 'Second step in 2 seconds.';
+    },
+
+    # Second step (parallel timers)
+    sub {
+      my $delay = shift;
+      Mojo::IOLoop->timer(1 => $delay->next);
+      Mojo::IOLoop->timer(3 => $delay->next);
+      say 'Third step in 3 seconds.';
+    },
+
+    # Third step (the end)
+    sub { say 'And done after 5 seconds total.' }
+  );
 
   # Wait for events if necessary
   $delay->wait unless Mojo::IOLoop->is_running;
@@ -542,35 +563,6 @@ reactors stop automatically if there are no events being watched anymore.
 
   # Start event loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-
-=head2 C<steps>
-
-  my $steps = Mojo::IOLoop->steps(sub {...}, sub {...});
-  my $steps = $loop->steps(sub {...}, sub {...});
-
-Get L<Mojo::IOLoop::Steps> object to sequentialize events.
-
-  # Sequentialize multiple events
-  Mojo::IOLoop->steps(
-
-    # First step (simple timer)
-    sub {
-      my $steps = shift;
-      Mojo::IOLoop->timer(2 => $steps->next);
-      say 'Second step in 2 seconds.';
-    },
-
-    # Second step (parallel timers)
-    sub {
-      my $steps = shift;
-      Mojo::IOLoop->timer(1 => $steps->next);
-      Mojo::IOLoop->timer(3 => $steps->next);
-      say 'Third step in 3 seconds.';
-    },
-
-    # Third step (the end)
-    sub { say 'And done after 5 seconds total.' }
-  );
 
 =head2 C<stop>
 

@@ -220,7 +220,8 @@ accessor read time if there's no set value.
 
   $object = $object->tap(sub {...});
 
-Tap into a method chain to perform operations on an object within the chain.
+K combinator, tap into a method chain to perform operations on an object
+within the chain.
 
 =head1 DEBUGGING
 

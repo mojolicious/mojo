@@ -6,14 +6,14 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 8;
+use Test::More tests => 12;
 
 # "And now to create an unstoppable army of between one million and two
 #  million zombies!"
 use Mojo::IOLoop;
 use Mojo::IOLoop::Delay;
 
-# Minimal
+# Basic functionality
 my $delay = Mojo::IOLoop::Delay->new;
 my @results;
 for my $i (0, 0) {
@@ -27,7 +27,7 @@ is $delay->end, 2, 'two remaining';
 $delay->wait;
 is_deeply \@results, [0, 0], 'right results';
 
-# Everything
+# Arguments
 $delay = Mojo::IOLoop::Delay->new;
 my $finished;
 $delay->on(finish => sub { shift; $finished = [@_, 'works!'] });
@@ -47,6 +47,25 @@ for my $i (3, 3) {
 }
 is $delay->wait, 3, 'right results';
 
+# Steps
+my $result;
+$delay = Mojo::IOLoop::Delay->new;
+$delay->steps(
+  sub {
+    my $delay = shift;
+    my $cb    = $delay->begin;
+    $delay->begin->(3, 2, 1);
+    Mojo::IOLoop->timer(0 => sub { $cb->(1, 2, 3) });
+  },
+  sub { shift->begin->(@_, 4) },
+  sub {
+    my ($delay, @numbers) = @_;
+    $result = \@numbers;
+  }
+);
+is_deeply [$delay->wait], [2, 3, 2, 1, 4], 'right numbers';
+is_deeply $result, [2, 3, 2, 1, 4], 'right numbers';
+
 # Event loop
 $finished = undef;
 $delay = Mojo::IOLoop->delay(sub { shift; $finished = [@_, 'too!'] });
@@ -57,3 +76,33 @@ for my $i (1, 1) {
 @results = $delay->wait;
 is_deeply $finished, [1, 1, 'too!'], 'right results';
 is_deeply \@results, [1, 1], 'right results';
+
+# Nested delays
+$result = undef;
+$delay  = Mojo::IOLoop->delay(
+  sub {
+    my $first  = shift;
+    my $second = Mojo::IOLoop->delay($first->begin);
+    Mojo::IOLoop->timer(0 => $second->begin);
+    Mojo::IOLoop->timer(0 => $first->begin);
+    $second->begin;
+    Mojo::IOLoop->timer(0 => sub { $second->end(1, 2, 3) });
+  },
+  sub {
+    my ($first, @numbers) = @_;
+    $result = \@numbers;
+    my $cb = $first->begin;
+    $first->begin->(3, 2, 1);
+    $first->begin;
+    $first->begin;
+    $first->end(4);
+    $first->end(5, 6);
+    $cb->(1, 2, 3);
+  },
+  sub {
+    my ($first, @numbers) = @_;
+    push @$result, @numbers;
+  }
+);
+is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6], 'right numbers';
+is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6], 'right numbers';

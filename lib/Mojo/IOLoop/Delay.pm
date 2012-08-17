@@ -34,18 +34,23 @@ sub wait {
 sub _step {
   my ($self, $id) = (shift, shift);
 
+  # Arguments
   my $ordered   = $self->{ordered}   ||= [];
   my $unordered = $self->{unordered} ||= [];
   if (defined $id) { $ordered->[$id] = [@_] }
   else             { push @$unordered, @_ }
 
+  # Wait for more events
   return $self->{counter} unless --$self->{counter} <= 0;
 
+  # Next step
   my $cb = shift @{$self->{steps} ||= []};
   $self->{$_} = [] for qw(ordered unordered);
-  my @ordered = map {@$_} grep {defined} @$ordered;
-  $self->$cb(@ordered, @$unordered) if $cb;
-  $self->emit('finish', @ordered, @$unordered) unless @{$self->{steps}};
+  my @args = ((map {@$_} grep {defined} @$ordered), @$unordered);
+  $self->$cb(@args) if $cb;
+
+  # Finished
+  $self->emit('finish', @args) unless @{$self->{steps}} || $self->{finished}++;
 
   return 0;
 }

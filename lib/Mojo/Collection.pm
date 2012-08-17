@@ -1,10 +1,11 @@
 package Mojo::Collection;
-use Mojo::Base 'Exporter';
+use Mojo::Base -base;
 use overload
   'bool'   => sub {1},
   '""'     => sub { shift->join("\n") },
   fallback => 1;
 
+use Exporter 'import';
 use List::Util;
 use Mojo::ByteStream;
 
@@ -120,7 +121,8 @@ Construct a new L<Mojo::Collection> object.
 
 =head1 METHODS
 
-L<Mojo::Collection> implements the following methods.
+L<Mojo::Collection> inherits all methods from L<Mojo::Base> and implements the
+following new ones.
 
 =head2 C<new>
 

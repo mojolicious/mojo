@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 415;
+use Test::More tests => 416;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -86,6 +86,11 @@ $monkey = BaseTest->new;
 is $monkey->tap(sub { $_->name('foo') })->name, 'foo', 'right attribute value';
 is $monkey->tap(sub { shift->name('bar')->name })->name, 'bar',
   'right attribute value';
+
+# Dump object
+$monkey = BaseTest->new(name => 'foo');
+is $monkey->perl, "bless( {\n  'name' => 'foo'\n}, 'BaseTest' )\n",
+  'right result';
 
 # Inherit -base flag
 $monkey = BaseTest::Base3->new(evil => 1);

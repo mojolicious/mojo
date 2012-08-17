@@ -2,7 +2,7 @@
 3.32  2012-08-17
   - Added event sequentialization support to Mojo::IOLoop::Delay.
     (judofyr, marcus, sri)
-  - Added tap method to Mojo::Base.
+  - Added perl and tap methods to Mojo::Base.
   - Added squish method to Mojo::ByteStream.
   - Added squish function to Mojo::Util.
   - Improved documentation.

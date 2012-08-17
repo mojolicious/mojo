@@ -1,5 +1,5 @@
 package Mojo::DOM;
-use Mojo::Base -strict;
+use Mojo::Base -base;
 use overload
   '%{}'    => sub { shift->attrs },
   'bool'   => sub {1},
@@ -7,6 +7,7 @@ use overload
   fallback => 1;
 
 use Carp 'croak';
+use Exporter 'import';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
@@ -459,7 +460,8 @@ XML detection can also be disabled with the C<xml> method.
 
 =head1 METHODS
 
-L<Mojo::DOM> implements the following methods.
+L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
+following new ones.
 
 =head2 C<new>
 

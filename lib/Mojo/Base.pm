@@ -186,7 +186,7 @@ flag or a base class.
   has [qw(name1 name2 name3)] => 'foo';
   has [qw(name1 name2 name3)] => sub {...};
 
-Create attributes, just like the C<attr> method.
+Create attributes for hash-based objects, just like the C<attr> method.
 
 =head1 METHODS
 
@@ -198,8 +198,8 @@ L<Mojo::Base> implements the following methods.
   my $object = BaseSubClass->new(name => 'value');
   my $object = BaseSubClass->new({name => 'value'});
 
-This base class provides a basic object constructor. You can pass it either a
-hash or a hash reference with attribute values.
+This base class provides a basic constructor for hash-based objects. You can
+pass it either a hash or a hash reference with attribute values.
 
 =head2 C<attr>
 
@@ -211,10 +211,10 @@ hash or a hash reference with attribute values.
   BaseSubClass->attr([qw(name1 name2 name3)] => 'foo');
   BaseSubClass->attr([qw(name1 name2 name3)] => sub {...});
 
-Create attributes. An array reference can be used to create more than one
-attribute. Pass an optional second argument to set a default value, it should
-be a constant or a sub reference. The sub reference will be excuted at
-accessor read time if there's no set value.
+Create attributes for hash-based objects. An array reference can be used to
+create more than one attribute. Pass an optional second argument to set a
+default value, it should be a constant or a sub reference. The sub reference
+will be excuted at accessor read time if there's no set value.
 
 =head2 C<tap>
 

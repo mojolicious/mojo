@@ -1,5 +1,5 @@
 package Mojo::DOM;
-use Mojo::Base -strict;
+use Mojo::Base -base;
 use overload
   '%{}'    => sub { shift->attrs },
   'bool'   => sub {1},
@@ -459,14 +459,15 @@ XML detection can also be disabled with the C<xml> method.
 
 =head1 METHODS
 
-L<Mojo::DOM> implements the following methods.
+L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
+following new ones.
 
 =head2 C<new>
 
   my $dom = Mojo::DOM->new;
   my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
 
-Construct a new L<Mojo::DOM> object.
+Construct a new array-based L<Mojo::DOM> object.
 
 =head2 C<all_text>
 

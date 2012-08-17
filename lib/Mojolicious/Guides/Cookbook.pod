@@ -314,30 +314,30 @@ L<Mojo::IOLoop> delay.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
+  use Mojo::URL;
 
   # Search Twitter for "perl" and "python"
   get '/' => sub {
     my $self = shift;
 
-    # Delay rendering
-    my $delay = Mojo::IOLoop->delay(sub {
-      my ($delay, @results) = @_;
-      $self->render(json => {results => \@results});
-    });
+    # Prepare response in two steps
+    Mojo::IOLoop->delay(
 
-    # First request
-    $delay->begin;
-    $self->ua->get('http://search.twitter.com/search.json?q=perl' => sub {
-      my ($ua, $tx) = @_;
-      $delay->end($tx->res->json->{results}[0]{text});
-    });
+      # Parallel requests
+      sub {
+        my $delay = shift;
+        my $url = Mojo::URL->new('http://search.twitter.com/search.json');
+        $self->ua->get($url->clone->query({q => 'perl'})   => $delay->begin);
+        $self->ua->get($url->clone->query({q => 'python'}) => $delay->begin);
+      },
 
-    # Second request
-    $delay->begin;
-    $self->ua->get('http://search.twitter.com/search.json?q=python' => sub {
-      my ($ua, $tx) = @_;
-      $delay->end($tx->res->json->{results}[0]{text});
-    });
+      # Delayed rendering
+      sub {
+        my $delay = shift;
+        my @results = map { $_->res->json->{results}[0]{text} } @_;
+        $self->render(json => {results => \@results});
+      }
+    );
   };
 
   app->start;

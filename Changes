@@ -3,6 +3,8 @@
   - Added event sequentialization support to Mojo::IOLoop::Delay.
     (judofyr, marcus, sri)
   - Added tap method to Mojo::Base.
+  - Added squish method to Mojo::ByteStream.
+  - Added squish function to Mojo::Util.
   - Improved documentation.
   - Fixed json_has method in Test::Mojo.
 

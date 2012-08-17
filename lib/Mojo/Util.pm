@@ -40,8 +40,8 @@ our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
   qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum slurp spurt trim unquote url_escape),
-  qw(url_unescape xml_escape)
+  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
+  qw(url_escape url_unescape xml_escape)
 );
 
 sub b64_decode { decode_base64(shift) }
@@ -279,12 +279,16 @@ sub spurt {
   return $content;
 }
 
+sub squish {
+  my $string = trim(shift);
+  $string =~ s/\s+/ /g;
+  return $string;
+}
+
 sub trim {
   my $string = shift;
-  for ($string) {
-    s/^\s*//;
-    s/\s*$//;
-  }
+  $string =~ s/^\s*//;
+  $string =~ s/\s*$//;
   return $string;
 }
 
@@ -573,6 +577,13 @@ Read all data at once from file.
   $content = spurt $content, '/etc/passwd';
 
 Write all data at once to file.
+
+=head2 C<squish>
+
+  my $squished = squish $string;
+
+Trim whitespace characters from both ends of string and then change all
+consecutive groups of whitespace into one space each.
 
 =head2 C<trim>
 

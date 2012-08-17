@@ -11,8 +11,8 @@ our @EXPORT_OK = ('b');
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum),
   qw(html_escape html_unescape md5_bytes md5_sum punycode_decode),
-  qw(punycode_encode quote sha1_bytes sha1_sum slurp spurt trim unquote),
-  qw(url_escape url_unescape xml_escape)
+  qw(punycode_encode quote sha1_bytes sha1_sum slurp spurt squish trim),
+  qw(unquote url_escape url_unescape xml_escape)
 );
 {
   no strict 'refs';
@@ -293,6 +293,14 @@ Write bytestream to file with L<Mojo::Util/"spurt">.
 Turn bytestream into L<Mojo::Collection>.
 
   b('a,b,c')->split(',')->pluck('quote')->join(',')->say;
+
+=head2 C<squish>
+
+  $stream = $stream->squish;
+
+Trim whitespace characters from both ends of bytestream and then change all
+consecutive groups of whitespace into one space each with
+L<Mojo::Util/"squish">.
 
 =head2 C<to_string>
 

@@ -10,6 +10,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
+use Mojo::Util 'squish';
 use Scalar::Util qw(blessed weaken);
 
 sub AUTOLOAD {
@@ -361,16 +362,7 @@ sub _text {
     }
 
     # Text
-    elsif ($type eq 'text') {
-      $content = $e->[1];
-
-      # Trim whitespace
-      if ($trim) {
-        $content =~ s/^\s*\n+\s*//;
-        $content =~ s/\s*\n+\s*$//;
-        $content =~ s/\s*\n+\s*/\ /g;
-      }
-    }
+    elsif ($type eq 'text') { $content = $trim ? squish($e->[1]) : $e->[1] }
 
     # CDATA or raw text
     elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }

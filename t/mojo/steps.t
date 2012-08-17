@@ -42,7 +42,7 @@ $steps  = Mojo::IOLoop::Steps->new(
     $result = \@numbers;
   }
 );
-is_deeply $result, [2, 3, 2, 1], 'right numbers';
+is_deeply $result, [2, 1, 2, 3], 'right numbers';
 
 # Event loop
 $result = undef;

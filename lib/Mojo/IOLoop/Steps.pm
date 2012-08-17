@@ -10,20 +10,20 @@ sub new {
 # "My god, it's full of geezers."
 sub next {
   my $self = shift;
-  $self->{counter}++;
-  return sub { shift; $self->_step(@_) };
+  my $id   = $self->{counter}++;
+  return sub { shift; $self->_step($id, @_) };
 }
 
 sub _step {
-  my $self = shift;
+  my ($self, $id) = (shift, shift);
 
   my $args = $self->{args} ||= [];
-  push @$args, @_;
+  $args->[$id] = [@_];
 
   return unless --$self->{counter} <= 0;
   return unless my $cb = shift @{$self->{steps}};
   $self->{args} = [];
-  $self->$cb(@$args);
+  $self->$cb(map {@$_} @$args);
 }
 
 1;
@@ -83,9 +83,10 @@ Construct a new L<Mojo::IOLoop::Steps> object.
 
   my $cb = $steps->next;
 
-Generate callback for next step, all generated callbacks need to be invoked
-before the next step can be reached. All arguments passed to the callback,
-except for the first one, are queued and passed through to the next step.
+Generate callback to next step, which will only be reached after all generated
+callbacks have been invoked. The order in which callbacks have been generated
+is preserved, and all arguments, except for the first one, will be queued and
+passed through to the next step.
 
 =head1 SEE ALSO
 

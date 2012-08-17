@@ -1,6 +1,6 @@
 
 3.32  2012-08-17
-  - Added Mojo::IOLoop::Steps.
+  - Added Mojo::IOLoop::Steps. (judofyr, marcus, sri)
   - Added steps method to Mojo::IOLoop.
   - Added tap method to Mojo::Base.
   - Improved documentation.

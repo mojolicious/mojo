@@ -333,9 +333,11 @@ L<Mojo::IOLoop> delay.
 
       # Delayed rendering
       sub {
-        my $delay = shift;
-        my @results = map { $_->res->json->{results}[0]{text} } @_;
-        $self->render(json => {results => \@results});
+        my ($delay, $perl, $python) = @_;
+        $self->render(json => {
+          perl   => $perl->res->json->{results}[0]{text},
+          python => $python->res->json->{results}[0]{text}
+        });
       }
     );
   };

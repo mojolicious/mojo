@@ -7,8 +7,7 @@ use warnings;
 use feature ();
 
 # No imports because we get subclassed, a lot!
-use Carp         ();
-use Data::Dumper ();
+use Carp ();
 
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
@@ -101,8 +100,6 @@ sub attr {
   }
 }
 
-sub perl { Data::Dumper->new([@_])->Indent(1)->Terse(1)->Dump }
-
 sub tap {
   my ($self, $cb) = @_;
   $_->$cb for $self;
@@ -134,10 +131,10 @@ Mojo::Base - Minimal base class for Mojo projects
 
   my $mew = Cat->new(name => 'Longcat');
   say $mew->paws;
-  say $mew->paws(5)->ears(4)->perl;
+  say $mew->paws(5)->ears(4)->paws;
 
   my $rawr = Tiger->new(stripes => 23);
-  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->perl;
+  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->paws;
 
 =head1 DESCRIPTION
 
@@ -218,12 +215,6 @@ Create attributes. An array reference can be used to create more than one
 attribute. Pass an optional second argument to set a default value, it should
 be a constant or a sub reference. The sub reference will be excuted at
 accessor read time if there's no set value.
-
-=head2 C<perl>
-
-  my $string = $object->perl;
-
-Dump object with L<Data::Dumper>.
 
 =head2 C<tap>
 

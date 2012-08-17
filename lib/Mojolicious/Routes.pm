@@ -11,7 +11,7 @@ use Scalar::Util 'weaken';
 has base_classes => sub { [qw(Mojolicious::Controller Mojo)] };
 has cache        => sub { Mojo::Cache->new };
 has [qw(conditions shortcuts)] => sub { {} };
-has hidden => sub { [qw(attr has new perl tap)] };
+has hidden => sub { [qw(attr has new tap)] };
 has 'namespace';
 
 sub add_condition {
@@ -300,7 +300,7 @@ Contains all available conditions.
   $r         = $r->hidden([qw(attr has new)]);
 
 Controller methods and attributes that are hidden from routes, defaults to
-C<attr>, C<has>, C<new>, C<perl> and C<tap>.
+C<attr>, C<has>, C<new> and C<tap>.
 
 =head2 C<namespace>
 

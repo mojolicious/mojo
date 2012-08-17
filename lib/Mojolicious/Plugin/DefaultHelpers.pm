@@ -1,6 +1,8 @@
 package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Data::Dumper ();
+
 # "You're watching Futurama,
 #  the show that doesn't condone the cool crime of robbery."
 sub register {
@@ -37,7 +39,7 @@ sub register {
   $app->helper(current_route => \&_current_route);
 
   # Add "dumper" helper
-  $app->helper(dumper => sub { shift; Mojo::Base::perl(@_) });
+  $app->helper(dumper => \&_dumper);
 
   # Add "include" helper
   $app->helper(include => \&_include);
@@ -82,6 +84,8 @@ sub _current_route {
   return $endpoint->name unless @_;
   return $endpoint->name eq shift;
 }
+
+sub _dumper { shift; Data::Dumper->new([@_])->Indent(1)->Terse(1)->Dump }
 
 sub _include {
   my $self     = shift;

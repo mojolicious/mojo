@@ -1,8 +1,7 @@
 package Mojo::ByteStream;
-use Mojo::Base -base;
+use Mojo::Base 'Exporter';
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
-use Exporter 'import';
 use Mojo::Collection;
 use Mojo::Util;
 
@@ -118,8 +117,7 @@ Construct a new L<Mojo::ByteStream> object.
 
 =head1 METHODS
 
-L<Mojo::ByteStream> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::ByteStream> implements the following methods.
 
 =head2 C<new>
 

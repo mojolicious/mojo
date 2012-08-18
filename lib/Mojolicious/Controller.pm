@@ -449,7 +449,8 @@ sub url_for {
   my $target = shift // '';
 
   # Absolute URL
-  return $target if Scalar::Util::blessed($target) ~~ 'Mojo::URL';
+  return $target
+    if Scalar::Util::blessed($target) && $target->isa('Mojo::URL');
   return Mojo::URL->new($target) if $target =~ m!^\w+\://!;
 
   # Base

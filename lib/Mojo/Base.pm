@@ -123,7 +123,7 @@ Mojo::Base - Minimal base class for Mojo projects
   package Tiger;
   use Mojo::Base 'Cat';
 
-  has friend => sub { Cat->new };
+  has friend  => sub { Cat->new };
   has stripes => 42;
 
   package main;

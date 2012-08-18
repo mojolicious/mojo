@@ -25,9 +25,7 @@ sub new {
 
 sub app {
   my ($self, $app) = @_;
-  return $self->ua->app unless $app;
-  $self->ua->app($app);
-  return $self;
+  return $app ? $self->tap(sub { $_->ua->app($app) }) : $self->ua->app;
 }
 
 sub content_is {

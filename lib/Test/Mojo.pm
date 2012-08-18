@@ -192,8 +192,8 @@ sub message_unlike {
 sub options_ok { shift->_request_ok(options => @_) }
 
 sub or {
-  my ($self, $diag) = @_;
-  $self->$diag unless $self->{latest};
+  my ($self, $cb) = @_;
+  $self->$cb unless $self->{latest};
   return $self;
 }
 

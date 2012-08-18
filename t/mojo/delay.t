@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 14;
+use Test::More tests => 12;
 
 # "And now to create an unstoppable army of between one million and two
 #  million zombies!"
@@ -16,7 +16,7 @@ use Mojo::IOLoop::Delay;
 # Basic functionality
 my $delay = Mojo::IOLoop::Delay->new;
 my @results;
-for my $i (0, 0) {
+for my $i (1, 1) {
   $delay->begin;
   Mojo::IOLoop->timer(0 => sub { push @results, $i; $delay->end });
 }
@@ -25,19 +25,19 @@ $delay->begin;
 is $end->(), 3, 'three remaining';
 is $delay->end, 2, 'two remaining';
 $delay->wait;
-is_deeply \@results, [0, 0], 'right results';
+is_deeply \@results, [1, 1], 'right results';
 
 # Arguments
 $delay = Mojo::IOLoop::Delay->new;
 my $finished;
 $delay->on(finish => sub { shift; $finished = [@_, 'works!'] });
-for my $i (0, 0) {
+for my $i (2, 2) {
   $delay->begin;
   Mojo::IOLoop->timer(0 => sub { $delay->end($i) });
 }
 @results = $delay->wait;
-is_deeply $finished, [0, 0, 'works!'], 'right results';
-is_deeply \@results, [0, 0], 'right results';
+is_deeply $finished, [2, 2, 'works!'], 'right results';
+is_deeply \@results, [2, 2], 'right results';
 
 # Context
 $delay = Mojo::IOLoop::Delay->new;
@@ -72,17 +72,6 @@ $delay->steps(
 is_deeply [$delay->wait], [2, 3, 2, 1, 4], 'right numbers';
 is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [2, 3, 2, 1, 4], 'right numbers';
-
-# Event loop
-$finished = undef;
-$delay = Mojo::IOLoop->delay(sub { shift; $finished = [@_, 'too!'] });
-for my $i (1, 1) {
-  my $cb = $delay->begin;
-  Mojo::IOLoop->timer(0 => sub { $delay->$cb($i) });
-}
-@results = $delay->wait;
-is_deeply $finished, [1, 1, 'too!'], 'right results';
-is_deeply \@results, [1, 1], 'right results';
 
 # Nested delays
 ($result, $finished) = undef;

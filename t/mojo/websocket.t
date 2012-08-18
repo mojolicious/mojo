@@ -76,8 +76,7 @@ websocket '/early_start' => sub {
   $self->on(
     message => sub {
       my ($self, $message) = @_;
-      $self->send("${message}test2");
-      $self->finish;
+      $self->send("${message}test2")->finish;
     }
   );
 };

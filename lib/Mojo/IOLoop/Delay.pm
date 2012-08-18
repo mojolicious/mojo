@@ -41,7 +41,7 @@ sub _step {
   else             { push @$unordered, @_ }
 
   # Wait for more events
-  return $self->{counter} unless --$self->{counter} <= 0;
+  return $self->{counter} if --$self->{counter};
 
   # Next step
   my $cb = shift @{$self->{steps} ||= []};
@@ -50,7 +50,8 @@ sub _step {
   $self->$cb(@args) if $cb;
 
   # Finished
-  $self->emit('finish', @args) unless @{$self->{steps}} || $self->{finished}++;
+  $self->emit('finish', @args)
+    if !$self->{counter} && !@{$self->{steps}} && !$self->{finished}++;
 
   return 0;
 }

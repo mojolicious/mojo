@@ -11,14 +11,9 @@ has stack => sub { [] };
 sub new {
   my $self = shift->SUPER::new;
 
-  # Method
   $self->{method} = uc shift;
-
-  # Path
   my $path = url_unescape shift;
   $self->{path} = decode('UTF-8', $path) // $path;
-
-  # WebSocket
   $self->{websocket} = shift;
 
   return $self;

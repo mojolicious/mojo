@@ -21,7 +21,7 @@ sub load {
   return unless my $session = Mojo::JSON->new->decode(b64_decode $value);
 
   # Expiration
-  my $expiration = $self->default_expiration;
+  my $expiration = $session->{expiration} // $self->default_expiration;
   return if !(my $expires = delete $session->{expires}) && $expiration;
   return if defined $expires && $expires <= time;
 
@@ -50,8 +50,8 @@ sub store {
   delete $session->{new_flash} unless keys %{$session->{new_flash}};
 
   # Expiration
-  my $expiration = $self->default_expiration;
-  my $default    = delete $session->{expires};
+  my $expiration = $session->{expiration} // $self->default_expiration;
+  my $default = delete $session->{expires};
   $session->{expires} = $default || time + $expiration
     if $expiration || $default;
 
@@ -125,13 +125,12 @@ Time for the session to expire in seconds from now, defaults to C<3600>. The
 expiration timeout gets refreshed for every request. Setting the value to C<0>
 will allow sessions to persist until the browser window is closed, this can
 have security implications though. For more control you can also use the
-C<expires> session value to set the expiration date to a specific time in
-epoch seconds.
+C<expiration> and C<expires> session values.
 
-  # Expire a week from now
-  $c->session(expires => time + 604800);
+  # Expire a week from now (epoch seconds from now)
+  $c->session(expiration => 604800);
 
-  # Expire a long long time ago
+  # Expire a long long time ago (absolute time in epoch seconds)
   $c->session(expires => 1);
 
 =head2 C<secure>

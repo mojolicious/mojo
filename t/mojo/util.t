@@ -273,14 +273,15 @@ is unquote('"foo 23 \"bar"'),     'foo 23 "bar',   'right unquoted result';
 is unquote('"\"foo 23 \"bar\""'), '"foo 23 "bar"', 'right unquoted result';
 
 # trim
-is trim(' la la  la '),       'la la  la',   'right trimmed result';
-is trim(" \n la la la \n "), 'la la la',   'right trimmed result';
-is trim("\n la\nla la \n"),  "la\nla la",  'right trimmed result';
-is trim(" \nla \n  \t\nla\nla\n "), "la \n  \t\nla\nla", 'right trimmed result';
+is trim(' la la  la '),      'la la  la', 'right trimmed result';
+is trim(" \n la la la \n "), 'la la la',  'right trimmed result';
+is trim("\n la\nla la \n"),  "la\nla la", 'right trimmed result';
+is trim(" \nla \n  \t\nla\nla\n "), "la \n  \t\nla\nla",
+  'right trimmed result';
 
 # squish
-is squish(' la la  la '),       'la la la',   'right squished result';
-is squish("\n la\nla la \n"),  'la la la',  'right squished result';
+is squish(' la la  la '),             'la la la', 'right squished result';
+is squish("\n la\nla la \n"),         'la la la', 'right squished result';
 is squish(" \nla \n  \t\nla\nla\n "), 'la la la', 'right squished result';
 
 # md5_bytes

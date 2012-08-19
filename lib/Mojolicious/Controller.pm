@@ -906,7 +906,10 @@ and stored in C<HMAC-SHA1> signed cookies. Note that cookies usually have a
   my $foo = $c->session->{foo};
   delete $c->session->{foo};
 
-  # Delete whole session
+  # Expire a week from now (epoch seconds from now)
+  $c->session(expiration => 604800);
+
+  # Expire a long long time ago (absolute time in epoch seconds)
   $c->session(expires => 1);
 
 =head2 C<signed_cookie>

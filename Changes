@@ -2,6 +2,8 @@
 3.32  2012-08-19
   - Added event sequentialization support to Mojo::IOLoop::Delay.
     (judofyr, marcus, sri)
+  - Added support for expiration session value, which allows for more fine
+    grained control.
   - Added tap method to Mojo::Base.
   - Added squish method to Mojo::ByteStream.
   - Added squish function to Mojo::Util.

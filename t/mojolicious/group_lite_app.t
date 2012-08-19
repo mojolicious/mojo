@@ -8,13 +8,23 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 201;
+use Test::More tests => 208;
 
 # "Let's see how crazy I am now, Nixon. The correct answer is very."
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent::CookieJar;
 use Mojolicious::Lite;
 use Test::Mojo;
+
+# GET /expiration
+get '/expiration' => sub {
+  my $self = shift;
+  if ($self->param('redirect')) {
+    $self->session(expiration => 0);
+    return $self->redirect_to('expiration');
+  }
+  $self->render(text => $self->session('expiration'));
+};
 
 under sub {
   my $self = shift;
@@ -197,6 +207,14 @@ get '/one_format' => [format => 'xml'] => {text => 'One format.'};
 
 my $t = Test::Mojo->new;
 
+# GET /expiration (zero expiration persists)
+$t->ua->max_redirects(1);
+$t->get_ok('/expiration?redirect=1')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('0');
+ok !$t->tx->res->cookie('mojolicious')->expires, 'no expiration';
+$t->reset_session;
+
 # GET /with_under
 $t->get_ok('/with_under' => {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -242,6 +260,7 @@ $t->get_ok('/param_auth/too?name=Bender')->status_is(200)
 # GET /bridge2stash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!\n");
+ok $t->tx->res->cookie('mojolicious')->expires, 'has expiration';
 
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)

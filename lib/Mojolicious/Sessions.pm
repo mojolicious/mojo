@@ -127,10 +127,13 @@ will allow sessions to persist until the browser window is closed, this can
 have security implications though. For more control you can also use the
 C<expiration> and C<expires> session values.
 
-  # Expire a week from now (epoch seconds from now)
+  # Expiration date in epoch seconds from now (persists between requests)
   $c->session(expiration => 604800);
 
-  # Expire a long long time ago (absolute time in epoch seconds)
+  # Expiration date as absolute epoch time (only valid for one request)
+  $c->session(expires => time + 604800);
+
+  # Delete whole session by setting an expiration date in the past
   $c->session(expires => 1);
 
 =head2 C<secure>

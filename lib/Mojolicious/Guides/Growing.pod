@@ -355,13 +355,13 @@ secure and can be changed at any time to invalidate all existing sessions.
   $self->session(user => 'sri');
   my $user = $self->session('user');
 
-By default all sessions expire after one hour, for more control you can also
-use the C<expiration> session value.
+By default all sessions expire after one hour, for more control you can use
+the C<expiration> session value to set an expiration date in seconds from now.
 
   $self->session(expiration => 3600);
 
 And the whole session can be deleted by using the C<expires> session value to
-set an expiration date in the past.
+set an absolute expiration date in the past.
 
   $self->session(expires => 1);
 

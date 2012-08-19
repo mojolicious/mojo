@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 146;
+use Test::More tests => 148;
 
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
@@ -31,13 +31,15 @@ is decamelize('FooBB'),       'foo_b_b',     'right decamelized result';
 is decamelize('Foo::BB'),     'foo-b_b',     'right decamelized result';
 
 # class_to_file
-is class_to_file('Foo::Bar'), 'foo_bar', 'right file';
-is class_to_file('FooBar'),   'foo_bar', 'right file';
-is class_to_file('FOOBar'),   'foobar',  'right file';
-is class_to_file('FOOBAR'),   'foobar',  'right file';
-is class_to_file('FOO::Bar'), 'foobar',  'right file';
-is class_to_file('FooBAR'),   'foo_bar', 'right file';
-is class_to_file('Foo::BAR'), 'foo_bar', 'right file';
+is class_to_file('Foo::Bar'),     'foo_bar',     'right file';
+is class_to_file('FooBar'),       'foo_bar',     'right file';
+is class_to_file('FOOBar'),       'foobar',      'right file';
+is class_to_file('FOOBAR'),       'foobar',      'right file';
+is class_to_file('FOO::Bar'),     'foobar',      'right file';
+is class_to_file('FooBAR'),       'foo_bar',     'right file';
+is class_to_file('Foo::BAR'),     'foo_bar',     'right file';
+is class_to_file("Foo'BAR"),      'foo_bar',     'right file';
+is class_to_file("Foo'Bar::Baz"), 'foo_bar_baz', 'right file';
 
 # class_to_path
 is class_to_path('Foo::Bar'),      'Foo/Bar.pm',     'right path';

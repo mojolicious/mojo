@@ -10,6 +10,8 @@
   - Improved documentation.
   - Improved tests.
   - Fixed json_has method in Test::Mojo.
+  - Fixed small class_to_file bug.
+  - Fixed a few small namespace handling bugs.
 
 3.31  2012-08-15
   - Added accept_charset, accept_encoding, content_encoding, origin and

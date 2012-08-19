@@ -60,7 +60,7 @@ sub camelize {
 
 sub class_to_file {
   my $class = shift;
-  $class =~ s/:://g;
+  $class =~ s/::|'//g;
   $class =~ s/([A-Z])([A-Z]*)/$1.lc($2)/ge;
   return decamelize($class);
 }
@@ -457,6 +457,7 @@ Convert a class name to a file.
 Convert class name to path.
 
   Foo::Bar -> Foo/Bar.pm
+  FooBar   -> FooBar.pm
 
 =head2 C<decamelize>
 

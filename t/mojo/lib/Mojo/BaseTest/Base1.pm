@@ -1,4 +1,4 @@
-package BaseTest::Base1;
+package Mojo::BaseTest::Base1;
 use Mojo::Base -base;
 
 # "Okay folks, show's over. Nothing to see here, show's... Oh my god!

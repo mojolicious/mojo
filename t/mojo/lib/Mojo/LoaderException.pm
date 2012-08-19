@@ -1,4 +1,4 @@
-package LoaderException;
+package Mojo::LoaderException;
 
 use Mojo::Base -base;
 

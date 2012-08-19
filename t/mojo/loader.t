@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable libev
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
-use Test::More tests => 55;
+use Test::More tests => 57;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -18,7 +18,7 @@ ok !$loader->load('B');
 ok !!UNIVERSAL::can(B => 'svref_2object');
 
 # Exception
-my $e = $loader->load('LoaderException');
+my $e = $loader->load('Mojo::LoaderException');
 isa_ok $e, 'Mojo::Exception', 'right object';
 like $e->message, qr/Missing right curly/, 'right message';
 is $e->lines_before->[0][0],   5,         'right line';
@@ -37,39 +37,42 @@ like "$e", qr/Missing right curly/, 'right message';
 
 # Complicated exception
 $loader = Mojo::Loader->new;
-$e      = $loader->load('LoaderException2');
+$e      = $loader->load('Mojo::LoaderException2');
 isa_ok $e, 'Mojo::Exception', 'right object';
 like $e->message, qr/Exception/, 'right message';
-is $e->lines_before->[0][0], 1,                           'right line';
-is $e->lines_before->[0][1], 'package LoaderException2;', 'right value';
-is $e->lines_before->[1][0], 2,                           'right line';
-is $e->lines_before->[1][1], 'use Mojo::Base -strict;',   'right value';
-is $e->lines_before->[2][0], 3,                           'right line';
-is $e->lines_before->[2][1], '',                          'right value';
+is $e->lines_before->[0][0], 1,                                 'right line';
+is $e->lines_before->[0][1], 'package Mojo::LoaderException2;', 'right value';
+is $e->lines_before->[1][0], 2,                                 'right line';
+is $e->lines_before->[1][1], 'use Mojo::Base -strict;',         'right value';
+is $e->lines_before->[2][0], 3,                                 'right line';
+is $e->lines_before->[2][1], '',                                'right value';
 is $e->line->[0], 4, 'right line';
-is $e->line->[1], 'LoaderException2_2::throw_error();', 'right value';
+is $e->line->[1], 'Mojo::LoaderException2_2::throw_error();', 'right value';
 is $e->lines_after->[0][0], 5,    'right line';
 is $e->lines_after->[0][1], '',   'right value';
 is $e->lines_after->[1][0], 6,    'right line';
 is $e->lines_after->[1][1], '1;', 'right value';
 like "$e", qr/Exception/, 'right message';
 
-$loader = Mojo::Loader->new;
-my $modules = $loader->search('LoaderTest');
-my @modules = sort @$modules;
-
 # Search
-is_deeply \@modules, [qw(LoaderTest::A LoaderTest::B LoaderTest::C)],
+$loader = Mojo::Loader->new;
+my @modules = sort @{$loader->search('Mojo::LoaderTest')};
+is_deeply \@modules,
+  [qw(Mojo::LoaderTest::A Mojo::LoaderTest::B Mojo::LoaderTest::C)],
+  'found the right modules';
+is_deeply [sort @{$loader->search("Mojo'LoaderTest")}],
+  [qw(Mojo'LoaderTest::A Mojo'LoaderTest::B Mojo'LoaderTest::C)],
   'found the right modules';
 
 # Load
+ok !$loader->load("Mojo'LoaderTest::A"), 'loaded successfully';
+ok !!Mojo::LoaderTest::A->can('new'), 'loaded successfully';
 $loader->load($_) for @modules;
-ok !!LoaderTest::A->can('new'), 'loaded successfully';
-ok !!LoaderTest::B->can('new'), 'loaded successfully';
-ok !!LoaderTest::C->can('new'), 'loaded successfully';
+ok !!Mojo::LoaderTest::B->can('new'), 'loaded successfully';
+ok !!Mojo::LoaderTest::C->can('new'), 'loaded successfully';
 
 # Class does not exist
-is $loader->load('LoaderTest'), 1, 'nothing to load';
+is $loader->load('Mojo::LoaderTest'), 1, 'nothing to load';
 
 # Invalid class
 is $loader->load('Mojolicious/Lite'),      1,     'nothing to load';

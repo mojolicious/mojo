@@ -1,4 +1,4 @@
-package LoaderTest::A;
+package Mojo::LoaderTest::A;
 
 # "I have purchased the Springfield YMCA.
 #  I plan to tear it down and turn the land into a nature preserve.

@@ -310,7 +310,6 @@ sub unquote {
 sub url_escape {
   my ($string, $pattern) = @_;
   $pattern ||= '^A-Za-z0-9\-._~';
-  return $string unless $string =~ /[$pattern]/;
   $string =~ s/([$pattern])/sprintf('%%%02X',ord($1))/ge;
   return $string;
 }

@@ -58,21 +58,16 @@ sub is_warn { shift->is_level('warn') }
 
 # "If The Flintstones has taught us anything,
 #  it's that pelicans can be used to mix cement."
-sub log {
-  my $self  = shift;
-  my $level = lc shift;
-  return $self unless $self->is_level($level);
-  return $self->emit(message => $level => @_);
-}
+sub log { shift->emit('message', lc(shift), @_) }
 
 sub warn { shift->log(warn => @_) }
 
 sub _message {
-  my $self = shift;
-  return unless my $handle = $self->handle;
+  my ($self, $level) = (shift, shift);
+  return unless $self->is_level($level) && (my $handle = $self->handle);
   flock $handle, LOCK_EX;
   croak "Can't write to log: $!"
-    unless defined $handle->syswrite($self->format(@_));
+    unless defined $handle->syswrite($self->format($level, @_));
   flock $handle, LOCK_UN;
 }
 

@@ -156,17 +156,13 @@ is $code,    200, 'right status';
 is $body,    'works!', 'right content';
 
 # Error in callback is logged
-my $message = app->log->subscribers('message')->[0];
-app->log->unsubscribe(message => $message);
-app->log->level('error');
 app->ua->once(error => sub { Mojo::IOLoop->stop });
 ok app->ua->has_subscribers('error'), 'has subscribers';
 my $err;
-app->log->once(message => sub { $err .= pop });
+my $message = app->log->on(message => sub { $err .= pop });
 app->ua->get('/' => sub { die 'error event works' });
 Mojo::IOLoop->start;
-app->log->level('fatal');
-app->log->on(message => $message);
+app->log->unsubscribe(message => $message);
 like $err, qr/error event works/, 'right error';
 
 # GET / (HTTPS request without TLS support)
@@ -266,13 +262,9 @@ is $body,    '{"hello":"world"}', 'right content';
 
 # GET /timeout (built-in web server times out)
 my $log = '';
-$message = app->log->subscribers('message')->[0];
-app->log->unsubscribe(message => $message);
-app->log->level('debug');
-app->log->on(message => sub { $log .= pop });
+$message = app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.25');
-app->log->level('fatal');
-app->log->on(message => $message);
+app->log->unsubscribe(message => $message);
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close', 'right error';
 is $timeout, 1, 'finish event has been emitted';

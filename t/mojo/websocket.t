@@ -486,18 +486,14 @@ is $result, 'hi!' x 100, 'right result';
 
 # WebSocket /timeout
 my $log = '';
-$message = app->log->subscribers('message')->[0];
-app->log->unsubscribe(message => $message);
-app->log->level('debug');
-app->log->on(message => sub { $log .= pop });
+$message = app->log->on(message => sub { $log .= pop });
 $ua->websocket(
   '/timeout' => sub {
     pop->on(finish => sub { Mojo::IOLoop->stop });
   }
 );
 Mojo::IOLoop->start;
-app->log->level('fatal');
-app->log->on(message => $message);
+app->log->unsubscribe(message => $message);
 is $timeout, 'works!', 'finish event has been emitted';
 like $log, qr/Inactivity timeout\./, 'right log message';
 

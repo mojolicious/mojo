@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 45;
+use Test::More tests => 47;
 
 # "Don't let Krusty's death get you down, boy.
 #  People die all the time, just like that.
@@ -13,14 +13,15 @@ use Mojo::Log;
 # Logging to file
 my $dir = tempdir CLEANUP => 1;
 my $path = catdir $dir, 'test.log';
-my $log = Mojo::Log->new(level => 'debug', path => $path);
-$log->debug('Just works.');
+my $log = Mojo::Log->new(level => 'error', path => $path);
+$log->error('Just works.');
+$log->fatal('Works too.');
+$log->debug('Does not work.');
 undef $log;
-like(
-  Mojo::Asset::File->new(path => $path)->slurp,
-  qr/^\[.*\] \[debug\] Just works\.\n$/,
-  'right content'
-);
+my $content = Mojo::Asset::File->new(path => $path)->slurp;
+like $content,   qr/\[.*\] \[error\] Just works\.\n/,    'has error message';
+like $content,   qr/\[.*\] \[fatal\] Works too\.\n/,     'has fatal message';
+unlike $content, qr/\[.*\] \[debug\] Does not work\.\n/, 'no debug message';
 
 # Formatting
 $log = Mojo::Log->new;
@@ -37,19 +38,23 @@ $log->unsubscribe('message')->on(
     push @$messages, $level, @lines;
   }
 );
-$log->info('Whatever.');
-is_deeply $messages, [qw(info Whatever.)], 'right messages';
-$log->level('error')->info('Again.');
-is_deeply $messages, [qw(info Whatever.)], 'right messages';
-$log->fatal('Test', 123);
-is_deeply $messages, [qw(info Whatever. fatal Test 123)], 'right messages';
+$log->debug('Test', 1, 2, 3);
+is_deeply $messages, [qw(debug Test 1 2 3)], 'right message';
 $messages = [];
-$log->level('debug')->log(info => 'Whatever.');
-is_deeply $messages, [qw(info Whatever.)], 'right messages';
-$log->level('error')->log(info => 'Again.');
-is_deeply $messages, [qw(info Whatever.)], 'right messages';
-$log->log(fatal => 'Test', 1, 2, 3);
-is_deeply $messages, [qw(info Whatever. fatal Test 1 2 3)], 'right messages';
+$log->info('Test', 1, 2, 3);
+is_deeply $messages, [qw(info Test 1 2 3)], 'right message';
+$messages = [];
+$log->warn('Test', 1, 2, 3);
+is_deeply $messages, [qw(warn Test 1 2 3)], 'right message';
+$messages = [];
+$log->error('Test', 1, 2, 3);
+is_deeply $messages, [qw(error Test 1 2 3)], 'right message';
+$messages = [];
+$log->fatal('Test', 1, 2, 3);
+is_deeply $messages, [qw(fatal Test 1 2 3)], 'right message';
+$messages = [];
+$log->log('fatal', 'Test', 1, 2, 3);
+is_deeply $messages, [qw(fatal Test 1 2 3)], 'right message';
 
 # "debug"
 is $log->level('debug')->level, 'debug', 'right level';

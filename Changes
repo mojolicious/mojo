@@ -10,6 +10,8 @@
   - Improved documentation.
   - Improved tests.
   - Fixed json_has method in Test::Mojo.
+  - Fixed bug in Mojo::Log that prevented some message event from being
+    emitted.
   - Fixed small class_to_file bug.
   - Fixed a few small namespace handling bugs.
 

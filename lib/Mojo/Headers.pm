@@ -50,7 +50,7 @@ sub clone {
 }
 
 sub from_hash {
-  my ($self, $hash) = (shift, shift);
+  my ($self, $hash) = @_;
 
   # Empty hash deletes all headers
   delete $self->{headers} if keys %{$hash} == 0;

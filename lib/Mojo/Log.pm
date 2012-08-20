@@ -6,10 +6,9 @@ use Fcntl ':flock';
 
 # "Would you kindly shut your noise-hole?"
 has handle => sub {
-  my $self = shift;
 
   # File
-  if (my $path = $self->path) {
+  if (my $path = shift->path) {
     croak qq{Can't open log file "$path": $!}
       unless open my $file, '>>:utf8', $path;
     return $file;
@@ -63,11 +62,15 @@ sub log { shift->emit('message', lc(shift), @_) }
 sub warn { shift->log(warn => @_) }
 
 sub _message {
-  my ($self, $level) = (shift, shift);
+  my ($self, $level, @lines) = @_;
+
+  # Check level
   return unless $self->is_level($level) && (my $handle = $self->handle);
+
+  # Format lines and write to handle
   flock $handle, LOCK_EX;
   croak "Can't write to log: $!"
-    unless defined $handle->syswrite($self->format($level, @_));
+    unless defined $handle->syswrite($self->format($level, @lines));
   flock $handle, LOCK_UN;
 }
 

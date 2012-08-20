@@ -167,11 +167,11 @@ sub handler {
 }
 
 sub helper {
-  my ($self, $name) = (shift, shift);
+  my ($self, $name, $cb) = @_;
   my $r = $self->renderer;
   $self->log->debug(qq{Helper "$name" already exists, replacing.})
     if exists $r->helpers->{$name};
-  $r->add_helper($name => @_);
+  $r->add_helper($name => $cb);
 }
 
 # "He knows when you are sleeping.

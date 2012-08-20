@@ -326,7 +326,7 @@ L<Mojo::IOLoop> delay.
       # Parallel requests
       sub {
         my $delay = shift;
-        my $url = Mojo::URL->new('http://search.twitter.com/search.json');
+        my $url   = Mojo::URL->new('http://search.twitter.com/search.json');
         $self->ua->get($url->clone->query({q => 'perl'})   => $delay->begin);
         $self->ua->get($url->clone->query({q => 'python'}) => $delay->begin);
       },
@@ -335,8 +335,8 @@ L<Mojo::IOLoop> delay.
       sub {
         my ($delay, $perl, $python) = @_;
         $self->render(json => {
-          perl   => $perl->res->json->{results}[0]{text},
-          python => $python->res->json->{results}[0]{text}
+          perl   => $perl->res->json('/results/0/text'),
+          python => $python->res->json('/results/0/text')
         });
       }
     );
@@ -654,7 +654,7 @@ Who actually controls the event loop backend is not important.
   my $ua = Mojo::UserAgent->new;
   $ua->get('http://search.twitter.com/search.json?q=perl' => sub {
     my ($ua, $tx) = @_;
-    $cv->send($tx->res->json->{results}[0]{text});
+    $cv->send($tx->res->json('/results/0/text'));
   });
   say $cv->recv;
 

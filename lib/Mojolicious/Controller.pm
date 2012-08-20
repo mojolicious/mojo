@@ -754,8 +754,8 @@ C<stash>.
 
   $c = $c->render_later;
 
-Disable automatic rendering, especially for long polling this can be quite
-useful.
+Disable automatic rendering to delay response generation, only necessary if
+automatic rendring would result in a response.
 
   # Delayed rendering
   $c->render_later;

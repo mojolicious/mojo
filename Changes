@@ -12,6 +12,7 @@
   - Fixed json_has method in Test::Mojo.
   - Fixed bug in Mojo::Log that prevented some message events from being
     emitted.
+  - Fixed get command to allow ":" character in header values.
   - Fixed small class_to_file bug.
   - Fixed a few small namespace handling bugs.
 

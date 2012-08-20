@@ -54,7 +54,7 @@ sub run {
 
   # Headers
   my %headers;
-  /^\s*([^:]+)\s*:\s*([^:]+)\s*$/ and $headers{$1} = $2 for @headers;
+  /^\s*([^:]+)\s*:\s*(\S+)\s*$/ and $headers{$1} = $2 for @headers;
 
   # URL and selector
   die $self->usage unless my $url = decode 'UTF-8', shift @args // '';

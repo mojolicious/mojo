@@ -326,7 +326,6 @@ sub xml_escape {
   return $string;
 }
 
-# Helper for punycode
 sub _adapt {
   my ($delta, $numpoints, $firsttime) = @_;
 
@@ -342,7 +341,6 @@ sub _adapt {
   return $k + (((PC_BASE - PC_TMIN + 1) * $delta) / ($delta + PC_SKEW));
 }
 
-# Helper for html_unescape
 sub _decode {
 
   # Numeric
@@ -358,7 +356,6 @@ sub _decode {
   return "&$_[1]";
 }
 
-# Helper for html_escape
 sub _encode {
   return exists $REVERSE{$_[0]} ? "&$REVERSE{$_[0]}" : "&#@{[ord($_[0])]};";
 }

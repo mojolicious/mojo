@@ -82,12 +82,10 @@ sub parse {
   my ($self, $html) = @_;
 
   # Try to decode (and fall back to no charset)
-  if (my $charset = $self->charset) {
-    my $backup = $html;
-    unless (defined($html = decode $charset, $html)) {
-      $html = $backup;
-      $self->charset(undef);
-    }
+  my $charset = $self->charset;
+  if ($charset && !defined($html = decode $charset, my $backup = $html)) {
+    $html = $backup;
+    $self->charset(undef);
   }
 
   # Tokenize

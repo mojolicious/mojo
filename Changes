@@ -1,7 +1,6 @@
 
 3.33  2012-08-21
-  - Improved Mojo::DOM::HTML to sometimes recover from bad charset
-    information.
+  - Improved Mojo::DOM::HTML to handle bad charsets more gracefully.
   - Improved documentation.
   - Improved tests.
 

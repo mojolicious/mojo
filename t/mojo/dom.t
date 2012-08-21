@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 790;
+use Test::More tests => 789;
 
 # "Homer gave me a kidney: it wasn't his, I didn't need it,
 #  and it came postage due- but I appreciated the gesture!"
@@ -2129,11 +2129,8 @@ is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
-# Recover from bad charset
-$bytes = encode 'UTF-8',
-  qq{<html><div id="a">A</div><div class="b">♥</div></html>};
+# Bad charset
 $dom = Mojo::DOM->new->charset('doesnotexist');
-$dom->parse($bytes);
-is $dom->at('#a')->text, 'A', 'right text';
-is $dom->at('.b')->text, encode('UTF-8', '♥'), 'right text';
-is "$dom", $bytes, 'right result';
+$dom->parse(qq{<html><div id="a">A</div></html>});
+is $dom->at('#a'), undef, 'no result';
+is "$dom", '', 'right result';

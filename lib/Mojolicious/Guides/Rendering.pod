@@ -863,7 +863,7 @@ L<Mojolicious::Plugin::EPRenderer> with a custom configuration.
     }
   };
 
-  get '/' => 'index';
+  get '/:name' => {name => 'Anonymous'} => 'index';
 
   app->start;
   __DATA__

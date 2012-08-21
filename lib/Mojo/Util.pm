@@ -280,30 +280,22 @@ sub spurt {
 }
 
 sub squish {
-  my $string = trim(shift);
+  my $string = trim(@_);
   $string =~ s/\s+/ /g;
   return $string;
 }
 
 sub trim {
   my $string = shift;
-  $string =~ s/^\s*//;
-  $string =~ s/\s*$//;
+  $string =~ s/^\s+|\s+$//g;
   return $string;
 }
 
 sub unquote {
   my $string = shift;
-  return $string unless $string =~ /^".*"$/g;
-
-  # Unquote
-  for ($string) {
-    s/^"//g;
-    s/"$//g;
-    s/\\\\/\\/g;
-    s/\\"/"/g;
-  }
-
+  return $string unless $string =~ s/^"(.*)"$/$1/g;
+  $string =~ s/\\\\/\\/g;
+  $string =~ s/\\"/"/g;
   return $string;
 }
 
@@ -324,13 +316,13 @@ sub url_unescape {
 
 sub xml_escape {
   my $string = shift;
-  for ($string) {
-    s/&/&amp;/g;
-    s/</&lt;/g;
-    s/>/&gt;/g;
-    s/"/&quot;/g;
-    s/'/&#39;/g;
-  }
+
+  $string =~ s/&/&amp;/g;
+  $string =~ s/</&lt;/g;
+  $string =~ s/>/&gt;/g;
+  $string =~ s/"/&quot;/g;
+  $string =~ s/'/&#39;/g;
+
   return $string;
 }
 

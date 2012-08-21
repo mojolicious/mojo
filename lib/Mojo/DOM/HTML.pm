@@ -81,9 +81,14 @@ my %INLINE = map { $_ => 1 } @HTML4_INLINE, @HTML5_INLINE;
 sub parse {
   my ($self, $html) = @_;
 
-  # Try to decode
-  my $charset = $self->charset;
-  $html = decode($charset, $html) // $html if $charset;
+  # Try to decode (and fall back to no charset)
+  if (my $charset = $self->charset) {
+    my $backup = $html;
+    unless (defined($html = decode $charset, $html)) {
+      $html = $backup;
+      $self->charset(undef);
+    }
+  }
 
   # Tokenize
   my $tree    = ['root'];

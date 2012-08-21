@@ -1,5 +1,6 @@
 
 3.33  2012-08-21
+  - Improved resilience of Mojo::DOM::HTML.
   - Improved documentation.
 
 3.32  2012-08-20

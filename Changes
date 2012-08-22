@@ -1,5 +1,5 @@
 
-3.33  2012-08-22
+3.33  2012-08-23
   - Improved Mojo::DOM::HTML to handle bad charsets more gracefully.
   - Improved documentation.
   - Improved tests.

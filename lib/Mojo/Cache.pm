@@ -48,8 +48,8 @@ L<Mojo::Cache> implements the following attributes.
 
 =head2 C<max_keys>
 
-  my $max_keys = $cache->max_keys;
-  $cache       = $cache->max_keys(50);
+  my $max = $cache->max_keys;
+  $cache  = $cache->max_keys(50);
 
 Maximum number of cache keys, defaults to C<100>.
 

@@ -737,16 +737,16 @@ Local address to bind to.
 
 =head2 C<max_connections>
 
-  my $max_connections = $ua->max_connections;
-  $ua                 = $ua->max_connections(5);
+  my $max = $ua->max_connections;
+  $ua     = $ua->max_connections(5);
 
 Maximum number of keep alive connections that the user agent will retain
 before it starts closing the oldest cached ones, defaults to C<5>.
 
 =head2 C<max_redirects>
 
-  my $max_redirects = $ua->max_redirects;
-  $ua               = $ua->max_redirects(3);
+  my $max = $ua->max_redirects;
+  $ua     = $ua->max_redirects(3);
 
 Maximum number of redirects the user agent will follow before it fails,
 defaults to the value of the C<MOJO_MAX_REDIRECTS> environment variable or

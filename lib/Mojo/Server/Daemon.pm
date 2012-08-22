@@ -389,15 +389,15 @@ TLS verification mode, defaults to C<0x03>.
 
 =head2 C<max_clients>
 
-  my $max_clients = $daemon->max_clients;
-  $daemon         = $daemon->max_clients(1000);
+  my $max = $daemon->max_clients;
+  $daemon = $daemon->max_clients(1000);
 
 Maximum number of parallel client connections, defaults to C<1000>.
 
 =head2 C<max_requests>
 
-  my $max_requests = $daemon->max_requests;
-  $daemon          = $daemon->max_requests(100);
+  my $max = $daemon->max_requests;
+  $daemon = $daemon->max_requests(100);
 
 Maximum number of keep alive requests per connection, defaults to C<25>.
 

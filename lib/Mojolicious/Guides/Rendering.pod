@@ -899,8 +899,8 @@ do is add a new C<handler>.
       # Just die if an error happens
       die 'Something went wrong';
 
-      # Pass the rendered result back to the renderer
-      $$output = 'The rendered result';
+      # Or pass the rendered result back to the renderer
+      $$output = 'Hello World!';
 
       # Return true if something has been rendered and false otherwise
       return 1;

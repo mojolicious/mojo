@@ -69,7 +69,7 @@ sub _epl {
   }
 
   # Exception or success
-  return ref $$output ? die($$output) : 1;
+  return ref $$output ? die $$output : 1;
 }
 
 1;

@@ -28,7 +28,7 @@ sub run {
   no warnings;
   my $result = eval "package main; sub app { \$app }; $code";
   say $result if $verbose && defined $result;
-  return $@ ? die($@) : $result;
+  return $@ ? die $@ : $result;
 }
 
 1;

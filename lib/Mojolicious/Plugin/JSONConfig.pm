@@ -35,7 +35,7 @@ sub render {
   # Render
   my $mt = Mojo::Template->new($conf->{template} || {})->name($file);
   my $json = $mt->prepend($prepend . $mt->prepend)->render($content, $app);
-  return ref $json ? die($json) : encode('UTF-8', $json);
+  return ref $json ? die $json : encode 'UTF-8', $json;
 }
 
 1;

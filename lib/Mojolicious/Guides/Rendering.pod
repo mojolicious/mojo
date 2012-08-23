@@ -896,8 +896,8 @@ do is add a new C<handler>.
       # This part is up to you and your template system :)
       ...
 
-      # Just die or throw a Mojo::Exception object for errors
-      Mojo::Exception->new('Something went wrong')->throw;
+      # Just die if an error happens
+      die 'Something went wrong';
 
       # Pass the rendered result back to the renderer
       $$output = 'The rendered result';

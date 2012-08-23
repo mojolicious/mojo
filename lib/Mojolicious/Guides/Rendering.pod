@@ -887,11 +887,8 @@ do is add a new C<handler>.
       # One time use inline template
       my $inline = $options->{inline};
 
-      # Generate relative template path
-      my $name = $r->template_name($options);
-
       # Try to find appropriate template in DATA section
-      my $content = $r->get_data_template($options, $name);
+      my $content = $r->get_data_template($options);
 
       # Generate absolute template path
       my $path = $r->template_path($options);

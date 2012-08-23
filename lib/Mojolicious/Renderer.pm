@@ -43,7 +43,7 @@ sub add_helper {
 }
 
 sub get_data_template {
-  my ($self, $options, $template) = @_;
+  my ($self, $options) = @_;
 
   # Index DATA templates
   my $loader = Mojo::Loader->new;
@@ -55,6 +55,7 @@ sub get_data_template {
   }
 
   # Find template
+  my $template = $self->template_name($options);
   return $loader->data($self->{index}{$template}, $template);
 }
 
@@ -343,7 +344,7 @@ Register a new helper.
     template       => 'foo/bar',
     format         => 'html',
     handler        => 'epl'
-  }, 'foo.html.ep');
+  });
 
 Get a C<DATA> section template by name, usually used by handlers.
 

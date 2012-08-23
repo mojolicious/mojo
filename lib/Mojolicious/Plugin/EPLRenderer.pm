@@ -54,7 +54,7 @@ sub _epl {
       }
 
       # Try DATA section
-      elsif (my $d = $r->get_data_template($options, $t)) {
+      elsif (my $d = $r->get_data_template($options)) {
         $c->app->log->debug(qq{Rendering template "$t" from DATA section.});
         $mt->name(qq{template "$t" from DATA section});
         $$output = $mt->render($d, $c);

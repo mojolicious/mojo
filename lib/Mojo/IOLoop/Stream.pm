@@ -227,7 +227,7 @@ Emitted safely once all data has been written.
     ...
   });
 
-Emitted safely if an error happens on the stream.
+Emitted safely if an error occurs on the stream.
 
 =head2 C<read>
 

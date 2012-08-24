@@ -887,22 +887,22 @@ do is add a new C<handler>.
       # Check for one time use inline template
       my $inline = $options->{inline};
 
-      # Check for appropriate template in DATA section
-      my $data = $r->get_data_template($options);
-
       # Check for absolute template path
       my $path = $r->template_path($options);
+
+      # Check for appropriate template in DATA section
+      my $data = $r->get_data_template($options);
 
       # This part is up to you and your template system :)
       ...
 
-      # Just die if an error happens
+      # Just die if an error occurs
       die 'Something went wrong';
 
       # Or pass the rendered result back to the renderer
       $$output = 'Hello World!';
 
-      # Return true if something has been rendered and false otherwise
+      # And return true if something has been rendered or false otherwise
       return 1;
     }
   );

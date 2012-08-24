@@ -622,7 +622,7 @@ L<Mojo::UserAgent> can emit the following events.
     ...
   });
 
-Emitted if an error happens that can't be associated with a transaction.
+Emitted if an error occurs that can't be associated with a transaction.
 
   $ua->on(error => sub {
     my ($ua, $err) = @_;

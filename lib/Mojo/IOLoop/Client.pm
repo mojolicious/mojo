@@ -184,7 +184,7 @@ Emitted safely once the connection is established.
     ...
   });
 
-Emitted safely if an error happens on the connection.
+Emitted safely if an error occurs on the connection.
 
 =head1 ATTRIBUTES
 

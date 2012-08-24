@@ -341,7 +341,7 @@ file reminding you to change your passphrase.
   my $sessions = $app->sessions;
   $app         = $app->sessions(Mojolicious::Sessions->new);
 
-Simple signed cookie based sessions, defaults to a L<Mojolicious::Sessions>
+Signed cookie based session manager, defaults to a L<Mojolicious::Sessions>
 object. You can usually leave this alone, see
 L<Mojolicious::Controller/"session"> for more information about working with
 session data.

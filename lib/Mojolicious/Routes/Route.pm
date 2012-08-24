@@ -158,6 +158,7 @@ sub route {
   return $route;
 }
 
+# "I guess I could part with one doomsday device and still be feared."
 sub to {
   my $self = shift;
 
@@ -236,6 +237,8 @@ sub websocket {
   return $route;
 }
 
+# "Oh no! Can we switch back using four or more bodies?
+#  I'm not sure. I'm afraid we need to use... MATH."
 sub _generate_route {
   my ($self, $methods, @args) = @_;
 

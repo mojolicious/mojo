@@ -14,6 +14,9 @@ sub new {
   return $self;
 }
 
+# "Lisa, if the Bible has taught us nothing else, and it hasn't,
+#  it's that girls should stick to girls sports,
+#  such as hot oil wrestling and foxy boxing and such."
 sub build_app {
   my ($self, $app) = @_;
   local $ENV{MOJO_EXE};

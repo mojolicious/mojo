@@ -1,3 +1,1 @@
-%# "Oh no! Can we switch back using four or more bodies?
-%#  I'm not sure. I'm afraid we need to use... MATH."
 The answer is <%= 40 + 2 %>.

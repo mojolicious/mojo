@@ -1,4 +1,1 @@
-%# "You told Bart to kiss that girl?
-%#  Why not encourage him to knock her out and drag her to a cave?
-%#  Second base? Oh, Bart is a little too young for that."
 Testing <%= $exception->message %>!

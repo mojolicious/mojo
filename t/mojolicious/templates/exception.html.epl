@@ -1,4 +1,3 @@
-%# "Sweet Zombie Jesus!"
 % my $self = shift;
 % if ($self->app->mode eq 'development') {
 %= $self->stash('exception')->message

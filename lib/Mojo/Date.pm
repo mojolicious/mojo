@@ -57,6 +57,8 @@ sub parse {
   return $self;
 }
 
+# "But going through a divorce together,
+#  you can't pretend that didn't bring us closer together."
 sub to_string {
   my $self = shift;
 

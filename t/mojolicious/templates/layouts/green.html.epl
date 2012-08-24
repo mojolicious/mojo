@@ -1,6 +1,3 @@
-%# "This is the worst part. The calm before the battle.
-%#  And then the battle is not so bad?
-%#  Oh, right. I forgot about the battle."
 % my $self = shift;
 <!DOCTYPE html>
 <html>

@@ -5,6 +5,7 @@ use overload
   '""'     => sub { shift->join("\n") },
   fallback => 1;
 
+# "Sweet Zombie Jesus!"
 use Exporter 'import';
 use List::Util;
 use Mojo::ByteStream;
@@ -50,6 +51,8 @@ sub map {
   return $self->new(map { $_->$cb } @$self);
 }
 
+# "Facts are meaningless.
+#  You could use facts to prove anything that's even remotely true!"
 sub pluck {
   my ($self, $method, @args) = @_;
   return $self->map(sub { $_->$method(@args) });
@@ -60,6 +63,9 @@ sub reverse {
   return $self->new(reverse @$self);
 }
 
+# "You told Bart to kiss that girl?
+#  Why not encourage him to knock her out and drag her to a cave?
+#  Second base? Oh, Bart is a little too young for that."
 sub shuffle {
   my $self = shift;
   return $self->new(List::Util::shuffle @$self);

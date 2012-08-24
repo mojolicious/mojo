@@ -187,6 +187,8 @@ sub _method {
   return $method;
 }
 
+# "It would never work out, Fry. You're a male, I'm a female.
+#  We're just too different."
 sub _walk {
   my ($self, $c) = @_;
 

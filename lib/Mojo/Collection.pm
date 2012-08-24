@@ -84,6 +84,8 @@ sub sort {
   return $self->new(sort { $a->$cb($b) } @$self);
 }
 
+# "Christmas is a time when people of all religions come together to worship
+#  Jesus Christ."
 sub uniq {
   my $self = shift;
   my %seen;

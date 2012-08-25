@@ -525,7 +525,7 @@ and a call to C<dispatch> the last, yours will be in between.
 
 This is a very powerful hook and should not be used lightly, it allows you to
 customize application wide exception handling for example, consider it the
-sledgehammer in your toolbox. (Passed a closure leading to the next hook and
+sledgehammer in your toolbox. (Passed a callback leading to the next hook and
 the default controller object)
 
 =back

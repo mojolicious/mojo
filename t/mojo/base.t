@@ -72,7 +72,7 @@ for my $i (101 .. 150) {
     : is($monkeys[$i]->heads, 1, 'right attribute default value');
 }
 
-# Chained attributes and coderef default value support
+# Chained attributes and callback default value support
 for my $i (151 .. 200) {
   $monkeys[$i] = Mojo::BaseTest->new;
   is $monkeys[$i]->ears, 2, 'right attribute value';

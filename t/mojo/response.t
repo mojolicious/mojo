@@ -619,10 +619,10 @@ isa_ok $invocant, 'Mojo::Message::Response', 'right invocant';
 $res = Mojo::Message::Response->new;
 $res->code(200);
 $res->headers->content_length(10);
-$res->write('lala' => sub { die "Body coderef was called properly\n" });
+$res->write('lala' => sub { die "Body callback was called properly\n" });
 $res->get_body_chunk(0);
 eval { $res->get_body_chunk(3) };
-is $@, "Body coderef was called properly\n", 'right error';
+is $@, "Body callback was called properly\n", 'right error';
 
 # Build response with callback (consistency calls)
 $res = Mojo::Message::Response->new;

@@ -213,8 +213,8 @@ pass it either a hash or a hash reference with attribute values.
 
 Create attributes for hash-based objects. An array reference can be used to
 create more than one attribute. Pass an optional second argument to set a
-default value, it should be a constant or a sub reference. The sub reference
-will be excuted at accessor read time if there's no set value.
+default value, it should be a constant or a callback. The callback will be
+excuted at accessor read time if there's no set value.
 
 =head2 C<tap>
 

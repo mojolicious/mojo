@@ -89,8 +89,7 @@ sub _content {
   my $content = pop;
 
   # Set
-  my $stash = $self->stash;
-  my $c = $stash->{'mojo.content'} ||= {};
+  my $c = $self->stash->{'mojo.content'} ||= {};
   if (defined $content) {
 
     # Reset with multiple values
@@ -104,8 +103,7 @@ sub _content {
   }
 
   # Get
-  $content = $c->{$name} // '';
-  return Mojo::ByteStream->new("$content");
+  return Mojo::ByteStream->new($c->{$name} // '');
 }
 
 sub _content_for {

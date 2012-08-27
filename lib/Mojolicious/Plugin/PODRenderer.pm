@@ -115,7 +115,6 @@ sub _perldoc {
   $self->res->headers->content_type('text/html;charset="UTF-8"');
 }
 
-# "Aw, he looks like a little insane drunken angel."
 sub _pod_to_html {
   return unless defined(my $pod = shift);
 

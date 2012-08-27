@@ -27,7 +27,7 @@ use Test::Mojo;
 
 # Missing plugin
 eval { plugin 'does_not_exist' };
-is $@, "Plugin \"does_not_exist\" missing, maybe you need to install it?\n",
+is $@, qq{Plugin "does_not_exist" missing, maybe you need to install it?\n},
   'right error';
 
 # Default

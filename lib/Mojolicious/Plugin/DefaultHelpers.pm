@@ -74,7 +74,7 @@ sub register {
   # DEPRECATED in Rainbow!
   $app->helper(
     render_content => sub {
-      warn "Mojolicious::Controller->render_content has been DEPRECATED!\n";
+      warn "Mojolicious::Controller->render_content is DEPRECATED!\n";
       shift->content(@_);
     }
   );

@@ -1393,7 +1393,7 @@ Just works!\
 
 @@ layouts/layout.html.epl
 % my $self = shift;
-<%= $self->title %><%= $self->render_content %> with layout
+<%= $self->title %><%= $self->content %> with layout
 
 @@ autostash.html.ep
 % $self->layout('layout');

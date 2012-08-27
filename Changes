@@ -1,5 +1,7 @@
 
 3.35  2012-08-27
+  - Deprecated Mojolicious::Controller->render_content in favor of content
+    helper.
   - Improved Mojolicious::Plugin::Config to accept mode specific config files
     without a normal config file. (alexbyk, sri)
   - Improved documentation.

@@ -204,31 +204,6 @@ sub render {
   return !!$self->rendered($stash->{status});
 }
 
-sub render_content {
-  my $self    = shift;
-  my $name    = shift || 'content';
-  my $content = pop;
-
-  # Set
-  my $stash = $self->stash;
-  my $c = $stash->{'mojo.content'} ||= {};
-  if (defined $content) {
-
-    # Reset with multiple values
-    if (@_) {
-      $c->{$name}
-        = join('', map({ref $_ eq 'CODE' ? $_->() : $_} @_, $content));
-    }
-
-    # First come
-    else { $c->{$name} ||= ref $content eq 'CODE' ? $content->() : $content }
-  }
-
-  # Get
-  $content = $c->{$name} // '';
-  return Mojo::ByteStream->new("$content");
-}
-
 sub render_data { shift->render(data => @_) }
 
 # "The path to robot hell is paved with human flesh.
@@ -709,16 +684,6 @@ C<url_for>.
 Render content using L<Mojolicious::Renderer/"render">, if no template is
 provided a default one based on controller and action or route name will be
 generated. All additional values get merged into the C<stash>.
-
-=head2 C<render_content>
-
-  my $output = $c->render_content;
-  my $output = $c->render_content('header');
-  my $output = $c->render_content(header => 'Hello world!');
-  my $output = $c->render_content(header => sub { 'Hello world!' });
-
-Contains partial rendered content, used for the renderers C<layout> and
-C<extends> features.
 
 =head2 C<render_data>
 

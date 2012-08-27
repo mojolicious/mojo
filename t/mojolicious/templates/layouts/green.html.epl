@@ -3,6 +3,6 @@
 <html>
 <head></head>
 <body>
-Same old in green <%= $self->render_content %>
+Same old in green <%= $self->content %>
 </body>
 </html>

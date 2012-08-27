@@ -550,8 +550,9 @@ the server has been stopped.
 
   proxy => 1
 
-Activate reverse proxy support, defaults to the value of the
-C<MOJO_REVERSE_PROXY> environment variable.
+Activate reverse proxy support, which allows for the C<X-Forwarded-For> and
+C<X-Forwarded-HTTPS> headers to be picked up automatically, defaults to the
+value of the C<MOJO_REVERSE_PROXY> environment variable.
 
 =head2 C<upgrade_timeout>
 

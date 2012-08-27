@@ -56,6 +56,7 @@ sub register {
   my $home = $app->home;
   $file = $home->rel_file($file) unless file_name_is_absolute $file;
   $mode = $home->rel_file($mode) if $mode && !file_name_is_absolute $mode;
+  my $mode_exists = $mode && -e $mode ? 1 : undef;
 
   # Read config file
   my $config = {};
@@ -65,11 +66,16 @@ sub register {
   elsif ($conf->{default}) {
     $app->log->debug(qq{Config file "$file" not found, using default config.});
   }
+
+  # Check for $mode.conf
+  elsif ($mode_exists) {
+    $app->log->debug(qq{Config file "$mode" for this mode only.});
+  }
+
   else { die qq{Config file "$file" missing, maybe you need to create it?\n} }
 
   # Merge everything
-  $config = {%$config, %{$self->load($mode, $conf, $app)}}
-    if $mode && -e $mode;
+  $config = {%$config, %{$self->load($mode, $conf, $app)}} if $mode_exists;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
   my $current = $app->defaults(config => $app->config)->config;
   %$current = (%$current, %$config);

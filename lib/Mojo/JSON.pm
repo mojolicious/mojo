@@ -1,6 +1,8 @@
 package Mojo::JSON;
 use Mojo::Base -base;
 
+# "Bender: Ahhh, what an awful dream. Ones and zeroes everywhere... and I
+#          thought I saw a two."
 use B;
 use Mojo::Util;
 use Scalar::Util 'blessed';

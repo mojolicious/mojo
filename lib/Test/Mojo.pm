@@ -1,6 +1,13 @@
 package Test::Mojo;
 use Mojo::Base -base;
 
+# "Amy: He knows when you are sleeping,
+#  Farnsworth: He knows when you're on the can,
+#  Leela: He'll hunt you down and blast your ass from here to Pakistan.
+#  Zoidberg: Oh,
+#  Hermes: You'd better not breathe, you'd better not move,
+#  Bender: You're better off dead, I'm telling you, dude.
+#  Fry: Santa Claus is gunning you down!"
 use Mojo::IOLoop;
 use Mojo::Message::Response;
 use Mojo::Server;

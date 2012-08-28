@@ -1,6 +1,8 @@
 package Mojo::Log;
 use Mojo::Base 'Mojo::EventEmitter';
 
+# "Bender: I mean, being a robot's great, but we don't have emotions, and
+#          sometimes that makes me very sad."
 use Carp 'croak';
 use Fcntl ':flock';
 

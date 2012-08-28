@@ -1,6 +1,7 @@
 package Mojo::EventEmitter;
 use Mojo::Base -base;
 
+# "Bender: Woohoo, time to go clubbin'! Baby seals here I come!"
 use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;

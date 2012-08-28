@@ -5,6 +5,7 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
+# "Bender: This is the worst kind of discrimination: the kind against me!"
 use Scalar::Util 'blessed';
 
 has [qw(frames line lines_before lines_after)] => sub { [] };

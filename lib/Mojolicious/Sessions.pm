@@ -1,6 +1,7 @@
 package Mojolicious::Sessions;
 use Mojo::Base -base;
 
+# "Bender: Anything less than immortality is a complete waste of time!"
 use Mojo::JSON;
 use Mojo::Util qw(b64_decode b64_encode);
 

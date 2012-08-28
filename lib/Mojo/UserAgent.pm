@@ -1,6 +1,7 @@
 package Mojo::UserAgent;
 use Mojo::Base 'Mojo::EventEmitter';
 
+# "Bender: Bite my shiny metal ass!"
 use Carp 'croak';
 use List::Util 'first';
 use Mojo::IOLoop;

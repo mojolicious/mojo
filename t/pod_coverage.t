@@ -6,6 +6,4 @@ plan skip_all => 'set TEST_POD to enable this test (developer only!)'
 plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!'
   unless eval 'use Test::Pod::Coverage 1.04; 1';
 
-# "Marge, I'm going to miss you so much. And it's not just the sex.
-#  It's also the food preparation."
 all_pod_coverage_ok();

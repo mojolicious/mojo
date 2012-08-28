@@ -10,11 +10,6 @@ use Mojo::Util qw(decode encode url_escape url_unescape);
 has charset        => 'UTF-8';
 has pair_separator => '&';
 
-# "Yeah, Moe, that team sure did suck last night. They just plain sucked!
-#  I've seen teams suck before,
-#  but they were the suckiest bunch of sucks that ever sucked!
-#  HOMER!
-#  I gotta go Moe my damn weiner kids are listening."
 sub new {
   my $self = shift->SUPER::new;
 
@@ -122,8 +117,6 @@ sub parse {
   return $self;
 }
 
-# "Don't kid yourself, Jimmy. If a cow ever got the chance,
-#  he'd eat you and everyone you care about!"
 sub remove {
   my $self = shift;
   my $name = shift // '';

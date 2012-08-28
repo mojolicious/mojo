@@ -2,9 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 357;
 
-# "Quick Smithers. Bring the mind eraser device!
-#  You mean the revolver, sir?
-#  Precisely."
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;

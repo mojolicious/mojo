@@ -14,7 +14,6 @@ use lib "$FindBin::Bin/lib";
 
 use Test::Mojo;
 
-# "Anything less than immortality is a complete waste of time!"
 my $t    = Test::Mojo->new('MojoliciousTest');
 my $mode = '';
 $t->or(sub { $mode .= $t->app->mode })->or(sub { $mode .= shift->app->mode });

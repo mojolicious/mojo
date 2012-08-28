@@ -6,11 +6,6 @@ use List::Util 'min';
 use Mojo::Util 'md5_sum';
 use Time::HiRes qw(time usleep);
 
-# "I don't know.
-#  Can I really betray my country?
-#  I say the Pledge of Allegiance every day.
-#  You pledge allegiance to the flag.
-#  And the flag is made in China."
 sub io {
   my ($self, $handle, $cb) = @_;
   $self->{io}{fileno $handle} = {cb => $cb};
@@ -87,8 +82,6 @@ sub start {
 
 sub stop { delete shift->{running} }
 
-# "Bart, how did you get a cellphone?
-#  The same way you got me, by accident on a golf course."
 sub timer { shift->_timer(0, @_) }
 
 sub watch {

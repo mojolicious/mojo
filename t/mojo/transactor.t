@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 275;
 
-# "Once the government approves something, it's no longer immoral!"
 use File::Spec::Functions 'catdir';
 use FindBin;
 use Mojo::URL;

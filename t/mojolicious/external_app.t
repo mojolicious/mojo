@@ -9,8 +9,6 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-# "Of all the parasites I've had over the years,
-#  these worms are among the best."
 use Test::More tests => 9;
 
 use FindBin;

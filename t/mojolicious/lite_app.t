@@ -11,11 +11,6 @@ BEGIN {
 
 use Test::More tests => 704;
 
-# "Wait you're the only friend I have...
-#  You really want a robot for a friend?
-#  Yeah ever since I was six.
-#  Well, ok but I don't want people thinking we're robosexuals,
-#  so if anyone asks you're my debugger."
 use Mojo::ByteStream 'b';
 use Mojo::Cookie::Response;
 use Mojo::Date;

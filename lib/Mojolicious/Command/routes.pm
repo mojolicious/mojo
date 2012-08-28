@@ -11,7 +11,6 @@ These options are available:
   -v, --verbose   Print additional details about routes.
 EOF
 
-# "I'm finally richer than those snooty ATM machines."
 sub run {
   my ($self, @args) = @_;
 
@@ -80,7 +79,6 @@ sub _draw {
   }
 }
 
-# "I surrender, and volunteer for treason!"
 sub _walk {
   my ($self, $node, $depth, $routes) = @_;
 

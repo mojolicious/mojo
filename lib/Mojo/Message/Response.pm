@@ -91,8 +91,6 @@ sub cookies {
 
 sub default_message { $MESSAGES{$_[1] || $_[0]->code || 404} || '' }
 
-# "Weaseling out of things is important to learn.
-#  It's what separates us from the animals... except the weasel."
 sub extract_start_line {
   my ($self, $bufferref) = @_;
 

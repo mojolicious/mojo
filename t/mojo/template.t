@@ -19,8 +19,6 @@ use utf8;
 
 use Test::More tests => 200;
 
-# "When I held that gun in my hand, I felt a surge of power...
-#  like God must feel when he's holding a gun."
 use File::Spec::Functions qw(catfile splitdir);
 use FindBin;
 use Mojo::Template;

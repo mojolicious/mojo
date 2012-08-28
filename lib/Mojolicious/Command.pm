@@ -75,7 +75,6 @@ sub render_to_rel_file {
   $self->render_to_file(shift, $self->rel_dir(shift), @_);
 }
 
-# "Bodies are for hookers and fat people."
 sub run { croak 'Method "run" not implemented by subclass' }
 
 sub write_file {
@@ -121,7 +120,6 @@ Mojolicious::Command - Command base class
     -s, --something   Does something.
   EOF
 
-  # <suitable Futurama quote here>
   sub run {
     my ($self, @args) = @_;
 

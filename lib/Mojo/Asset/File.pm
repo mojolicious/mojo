@@ -37,10 +37,6 @@ has handle => sub {
 };
 has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
 
-# "The only monster here is the gambling monster that has enslaved your
-#  mother!
-#  I call him Gamblor, and it's time to snatch your mother from his neon
-#  claws!"
 sub DESTROY {
   my $self = shift;
   return unless $self->cleanup && defined(my $path = $self->path);

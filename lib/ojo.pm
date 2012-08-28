@@ -1,8 +1,6 @@
 package ojo;
 use Mojo::Base -strict;
 
-# "I heard beer makes you stupid.
-#  No I'm... doesn't."
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
@@ -15,8 +13,6 @@ $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 # User agent
 my $UA = Mojo::UserAgent->new;
 
-# "I'm sorry, guys. I never meant to hurt you.
-#  Just to destroy everything you ever believed in."
 sub import {
 
   # Prepare exports
@@ -58,7 +54,6 @@ sub import {
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
 }
 
-# "I wonder what the shroud of Turin tastes like."
 sub _request {
   my $tx = $UA->start(@_);
   my ($message, $code) = $tx->error;

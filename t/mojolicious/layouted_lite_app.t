@@ -11,8 +11,6 @@ use Test::More tests => 102;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-# "We're certainly not building anything sinster, if that's what you mean.
-#  Now come on, something sinister won't build itself."
 use Mojolicious::Lite;
 use Test::Mojo;
 

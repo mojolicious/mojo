@@ -2,10 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 65;
 
-# "And now, in the spirit of the season: start shopping.
-#  And for every dollar of Krusty merchandise you buy,
-#  I will be nice to a sick kid.
-#  For legal purposes, sick kids may include hookers with a cold."
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 

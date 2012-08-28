@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 46;
 
-# "Hi, Super Nintendo Chalmers!"
 use Mojo::EventEmitter;
 
 # Normal event

@@ -4,14 +4,9 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Util qw(camelize class_to_path);
 use Mojolicious;
 
-# "You know Santa may have killed Scruffy, but he makes a good point."
 has description => "Generate Mojolicious plugin directory structure.\n";
 has usage       => "usage: $0 generate plugin [NAME]\n";
 
-# "There we were in the park when suddenly some old lady says I stole her
-#  purse.
-#  I chucked the professor at her but she kept coming.
-#  So I had to hit her with this purse I found."
 sub run {
   my ($self, $name) = @_;
   $name ||= 'MyPlugin';

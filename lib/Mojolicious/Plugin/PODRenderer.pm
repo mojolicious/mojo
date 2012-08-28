@@ -11,8 +11,6 @@ use Pod::Simple::Search;
 # Paths
 my @PATHS = map { $_, "$_/pods" } @INC;
 
-# "This is my first visit to the Galaxy of Terror and I'd like it to be a
-#  pleasant one."
 sub register {
   my ($self, $app, $conf) = @_;
 

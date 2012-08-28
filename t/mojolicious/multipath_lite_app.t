@@ -6,8 +6,6 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-# "You are hereby conquered.
-#  Please line up in order of how much beryllium it takes to kill you."
 use Test::More tests => 30;
 
 use Mojolicious::Lite;

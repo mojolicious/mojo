@@ -10,9 +10,6 @@ use Mojo::Util 'unquote';
 
 has [qw(name value)];
 
-# "My Homer is not a communist.
-#  He may be a liar, a pig, an idiot, a communist,
-#  but he is not a porn star."
 sub parse     { croak 'Method "parse" not implemented by subclass' }
 sub to_string { croak 'Method "to_string" not implemented by subclass' }
 

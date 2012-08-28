@@ -5,12 +5,6 @@ use Mojo::Cookie::Request;
 
 has max_cookie_size => 4096;
 
-# "I can't help but feel this is all my fault.
-#  It was those North Korean fortune cookies - they were so insulting.
-#  'You are a coward'
-#  Nobody wants to hear that after a nice meal.
-#  Marge, you can't keep blaming yourself.
-#  Just blame yourself once, then move on."
 sub add {
   my ($self, @cookies) = @_;
 
@@ -48,10 +42,6 @@ sub extract {
   }
 }
 
-# "Dear Homer, IOU one emergency donut.
-#  Signed Homer.
-#  Bastard!
-#  He's always one step ahead."
 sub find {
   my ($self, $url) = @_;
 

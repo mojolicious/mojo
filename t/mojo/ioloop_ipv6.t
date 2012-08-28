@@ -11,7 +11,6 @@ plan skip_all => 'IO::Socket::IP 0.16 required for this test!'
   unless Mojo::IOLoop::Server::IPV6;
 plan tests => 2;
 
-# "Remember, you can always find East by staring directly at the sun."
 use Mojo::IOLoop;
 
 # IPv6 roundtrip

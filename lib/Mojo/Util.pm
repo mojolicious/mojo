@@ -35,7 +35,6 @@ my %ENTITIES;
 my %REVERSE = ("\x{0027}" => '#39;');
 $REVERSE{$ENTITIES{$_}} //= $_ for sort grep {/;/} keys %ENTITIES;
 
-# "Bart, stop pestering Satan!"
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
@@ -115,8 +114,6 @@ sub html_escape {
   return $string;
 }
 
-# "Daddy, I'm scared. Too scared to even wet my pants.
-#  Just relax and it'll come, son."
 sub html_unescape {
   my $string = shift;
   $string
@@ -306,7 +303,6 @@ sub url_escape {
   return $string;
 }
 
-# "I've gone back in time to when dinosaurs weren't just confined to zoos."
 sub url_unescape {
   my $string = shift;
   return $string if index($string, '%') == -1;

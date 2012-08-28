@@ -8,10 +8,6 @@ BEGIN {
 
 use Test::More tests => 32;
 
-# "Marge, you being a cop makes you the man!
-#  Which makes me the woman, and I have no interest in that,
-#  besides occasionally wearing the underwear,
-#  which as we discussed, is strictly a comfort thing."
 use Mojo::IOLoop;
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;

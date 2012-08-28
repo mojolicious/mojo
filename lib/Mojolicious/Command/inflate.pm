@@ -7,7 +7,6 @@ use Mojo::Util 'encode';
 has description => "Inflate embedded files to real files.\n";
 has usage       => "usage: $0 inflate\n";
 
-# "Come on stem cells! Work your astounding scientific nonsense!"
 sub run {
   my $self = shift;
 

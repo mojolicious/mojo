@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 19;
 
-# "We need some more secret sauce. Put the mayonnaise in the sun."
 use Mojo::JSON;
 use Mojo::Server::PSGI;
 use Mojolicious::Command::psgi;

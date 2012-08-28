@@ -12,7 +12,6 @@ use utf8;
 
 use Test::More tests => 119;
 
-# "We should be safe up here. I'm pretty sure fires can't climb trees."
 use Mojo::ByteStream 'b';
 use Mojo::JSON;
 

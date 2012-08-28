@@ -2,9 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 47;
 
-# "Don't let Krusty's death get you down, boy.
-#  People die all the time, just like that.
-#  Why, you could wake up dead tomorrow! Well, good night."
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use Mojo::Asset::File;

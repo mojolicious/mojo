@@ -1,7 +1,5 @@
 use Mojo::Base -strict;
 
-# "Being eaten by crocodile is just like going to sleep...
-#  in a giant blender."
 use Test::More tests => 117;
 
 use Mojo::Transaction::WebSocket;

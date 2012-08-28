@@ -2,9 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 22;
 
-# "My ears are burning.
-#  I wasn't talking about you, Dad.
-#  No, my ears are really burning. I wanted to see inside, so I lit a Q-tip."
 use Mojo::Message::Response;
 use Mojo::Server::CGI;
 use Mojolicious::Command::cgi;

@@ -2,8 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 20;
 
-# "You know, most people pray silently.
-#  Marge He's way the hell up there."
 use Mojo::Cache;
 
 my $cache = Mojo::Cache->new(max_keys => 2);

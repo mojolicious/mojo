@@ -10,7 +10,6 @@ BEGIN {
 
 use Test::More tests => 72;
 
-# "Hey! Bite my glorious golden ass!"
 use Mojolicious::Lite;
 use Test::Mojo;
 

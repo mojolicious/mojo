@@ -17,8 +17,6 @@ sub one_tick { EV::run(EV::RUN_ONCE) }
 
 sub recurring { shift->_timer(1, @_) }
 
-# "Wow, Barney. You brought a whole beer keg.
-#  Yeah... where do I fill it up?"
 sub start {EV::run}
 
 sub stop { EV::break(EV::BREAK_ALL) }
@@ -52,7 +50,6 @@ sub _io {
     if EV::WRITE &$revents && $self->{io}{$fd};
 }
 
-# "It's great! We can do *anything* now that Science has invented Magic."
 sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
   $after ||= '0.0001';

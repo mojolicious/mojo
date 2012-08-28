@@ -15,7 +15,6 @@ These options are available:
   -u, --user <name>           PAUSE username.
 EOF
 
-# "Hooray! A happy ending for the rich people!"
 sub run {
   my ($self, @args) = @_;
 

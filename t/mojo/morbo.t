@@ -11,9 +11,6 @@ plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
 plan tests => 26;
 
-# "Morbo wishes these stalwart nomads peace among the Dutch tulips.
-#  At least all those windmills will keep them cool.
-#  WINDMILLS DO NOT WORK THAT WAY! GOODNIGHT!"
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use FindBin;

@@ -14,7 +14,6 @@ use lib "$FindBin::Bin/lib";
 
 use Test::Mojo;
 
-# "This concludes the part of the tour where you stay alive."
 my $t = Test::Mojo->new('MojoliciousTest');
 
 # Application is already available

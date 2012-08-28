@@ -3,9 +3,6 @@ use Mojo::Base 'Mojo::Server';
 
 has 'nph';
 
-# "Lisa, you're a Buddhist, so you believe in reincarnation.
-#  Eventually, Snowball will be reborn as a higher lifeform...
-#  like a snowman."
 sub run {
   my $self = shift;
 

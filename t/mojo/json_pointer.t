@@ -4,8 +4,6 @@ use utf8;
 
 use Test::More tests => 27;
 
-# "I've had it with this school, Skinner.
-#  Low test scores, class after class of ugly, ugly children..."
 use Mojo::JSON::Pointer;
 
 # "contains" (hash)

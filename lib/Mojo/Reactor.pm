@@ -5,9 +5,6 @@ use Carp 'croak';
 use IO::Poll qw(POLLERR POLLHUP POLLIN);
 use Mojo::Loader;
 
-# "This is the worst part. The calm before the battle.
-#  And then the battle is not so bad?
-#  Oh, right. I forgot about the battle."
 sub detect {
   my $try = $ENV{MOJO_REACTOR} || 'Mojo::Reactor::EV';
   return Mojo::Loader->new->load($try) ? 'Mojo::Reactor::Poll' : $try;
@@ -15,7 +12,6 @@ sub detect {
 
 sub io { croak 'Method "io" not implemented by subclass' }
 
-# "This was such a pleasant St. Patrick's Day until Irish people showed up."
 sub is_readable {
   my ($self, $handle) = @_;
 

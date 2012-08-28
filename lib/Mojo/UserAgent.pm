@@ -13,7 +13,6 @@ use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_USERAGENT_DEBUG} || 0;
 
-# "You can't let a single bad experience scare you away from drugs."
 has ca              => sub { $ENV{MOJO_CA_FILE} };
 has cert            => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };

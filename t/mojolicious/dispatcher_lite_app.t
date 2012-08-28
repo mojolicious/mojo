@@ -8,8 +8,6 @@ BEGIN {
 
 use Test::More tests => 33;
 
-# "Just once I'd like to eat dinner with a celebrity who isn't bound and
-#  gagged."
 use Mojo::Message::Response;
 use Mojolicious::Lite;
 use Test::Mojo;

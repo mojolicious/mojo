@@ -1,8 +1,6 @@
 package Mojolicious::Types;
 use Mojo::Base -base;
 
-# "Once again, the conservative, sandwich-heavy portfolio pays off for the
-#  hungry investor."
 has types => sub {
   {
     appcache => 'text/cache-manifest',
@@ -34,7 +32,6 @@ has types => sub {
   };
 };
 
-# "Magic. Got it."
 sub detect {
   my ($self, $accept) = @_;
 

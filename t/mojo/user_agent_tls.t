@@ -14,9 +14,6 @@ plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
 plan tests => 26;
 
-# "That does not compute.
-#  Really?
-#  Well, it computes a little."
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;

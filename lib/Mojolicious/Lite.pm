@@ -1,14 +1,10 @@
 package Mojolicious::Lite;
 use Mojo::Base 'Mojolicious';
 
-# "Since when is the Internet all about robbing people of their privacy?
-#  August 6, 1991."
 use File::Basename 'dirname';
 use File::Spec::Functions 'catdir';
 use Mojo::UserAgent;
 
-# "It's the future, my parents, my co-workers, my girlfriend,
-#  I'll never see any of them ever again... YAHOOO!"
 sub import {
   my $class = shift;
 

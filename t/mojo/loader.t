@@ -8,8 +8,6 @@ use Test::More tests => 57;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-# "Bad bees. Get away from my sugar.
-#  Ow. OW. Oh, they're defending themselves somehow."
 use Mojo::Loader;
 
 # Single character core module
@@ -21,17 +19,17 @@ ok !!UNIVERSAL::can(B => 'svref_2object');
 my $e = $loader->load('Mojo::LoaderException');
 isa_ok $e, 'Mojo::Exception', 'right object';
 like $e->message, qr/Missing right curly/, 'right message';
-is $e->lines_before->[0][0],   5,         'right line';
-like $e->lines_before->[0][1], qr/Apu/,   'right value';
-is $e->lines_before->[1][0],   6,         'right line';
-like $e->lines_before->[1][1], qr/whizz/, 'right value';
-is $e->lines_before->[2][0],   7,         'right line';
-is $e->lines_before->[2][1],   '',        'right value';
-is $e->lines_before->[3][0],   8,         'right line';
-is $e->lines_before->[3][1],   'foo {',   'right value';
-is $e->lines_before->[4][0],   9,         'right line';
-is $e->lines_before->[4][1],   '',        'right value';
-is $e->line->[0], 10,   'right line';
+is $e->lines_before->[0][0], 2,                       'right line';
+is $e->lines_before->[0][1], '',                      'right value';
+is $e->lines_before->[1][0], 3,                       'right line';
+is $e->lines_before->[1][1], 'use Mojo::Base -base;', 'right value';
+is $e->lines_before->[2][0], 4,                       'right line';
+is $e->lines_before->[2][1], '',                      'right value';
+is $e->lines_before->[3][0], 5,                       'right line';
+is $e->lines_before->[3][1], 'foo {',                 'right value';
+is $e->lines_before->[4][0], 6,                       'right line';
+is $e->lines_before->[4][1], '',                      'right value';
+is $e->line->[0], 7,    'right line';
 is $e->line->[1], "1;", 'right value';
 like "$e", qr/Missing right curly/, 'right message';
 

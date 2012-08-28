@@ -5,13 +5,6 @@ use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 
-# "Are we there yet?
-#  No
-#  Are we there yet?
-#  No
-#  Are we there yet?
-#  No
-#  ...Where are we going?"
 sub emit {
   my ($self, $name) = (shift, shift);
 
@@ -68,9 +61,6 @@ sub once {
 
 sub subscribers { shift->{events}{shift()} || [] }
 
-# "Back you robots!
-#  Nobody ruins my family vacation but me!
-#  And maybe the boy."
 sub unsubscribe {
   my ($self, $name, $cb) = @_;
 

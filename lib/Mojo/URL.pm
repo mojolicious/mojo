@@ -12,8 +12,6 @@ use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
 has [qw(fragment host port scheme userinfo)];
 has base => sub { Mojo::URL->new };
 
-# "Homer, it's easy to criticize.
-#  Fun, too."
 sub new { shift->SUPER::new->parse(@_) }
 
 sub authority {
@@ -193,9 +191,6 @@ sub to_rel {
   return $rel;
 }
 
-# "Dad, what's a Muppet?
-#  Well, it's not quite a mop, not quite a puppet, but man... *laughs*
-#  So, to answer you question, I don't know."
 sub to_string {
   my $self = shift;
 

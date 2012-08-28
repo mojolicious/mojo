@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 393;
 
-# "They're not very heavy, but you don't hear me not complaining."
 use Mojolicious::Routes;
 use Mojolicious::Routes::Match;
 

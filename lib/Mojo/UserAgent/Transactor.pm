@@ -102,8 +102,6 @@ sub json {
   return $tx;
 }
 
-# "This kid's a wonder!
-#  He organized all the law suits against me into one class action suit."
 sub peer {
   my ($self, $tx) = @_;
   return $self->_proxy($tx, $self->endpoint($tx));
@@ -158,9 +156,6 @@ sub redirect {
   return $new->previous($old);
 }
 
-# "America's health care system is second only to Japan...
-#  Canada, Sweden, Great Britain... well, all of Europe.
-#  But you can thank your lucky stars we don't live in Paraguay!"
 sub tx {
   my $self = shift;
 
@@ -180,7 +175,6 @@ sub tx {
   return $tx;
 }
 
-# "She found my one weakness... that I'm weak!"
 sub websocket {
   my $self = shift;
 

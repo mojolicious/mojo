@@ -18,7 +18,6 @@ my $MTIME = time;
 my $HOME   = Mojo::Home->new;
 my $PUBLIC = $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/public');
 
-# "Valentine's Day's coming? Aw crap! I forgot to get a girlfriend again!"
 sub dispatch {
   my ($self, $c) = @_;
 
@@ -51,7 +50,6 @@ sub file {
   return $self->_get_file(catfile($PUBLIC, split('/', $rel)));
 }
 
-# "It's not just safe, it's 40% safe!"
 sub serve {
   my ($self, $c, $rel) = @_;
   return unless my $asset = $self->file($rel);
@@ -98,8 +96,6 @@ sub serve_asset {
   return $res->content->asset($asset->start_range($start)->end_range($end));
 }
 
-# "I like being a women.
-#  Now when I say something stupid, everyone laughs and buys me things."
 sub _get_data_file {
   my ($self, $rel) = @_;
 

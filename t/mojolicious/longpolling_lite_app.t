@@ -8,8 +8,6 @@ BEGIN {
 
 use Test::More tests => 128;
 
-# "I was God once.
-#  Yes, I saw. You were doing well until everyone died."
 use Mojo::IOLoop;
 use Mojolicious::Lite;
 use Test::Mojo;

@@ -1,8 +1,5 @@
 #!/usr/bin/env perl
 
-# "You may have to "metaphorically" make a deal with the "devil".
-#  And by "devil", I mean Robot Devil.
-#  And by "metaphorically", I mean get your coat."
 use Mojolicious::Lite;
 
 # Default for config file tests

@@ -5,7 +5,6 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More tests => 6;
 
-# "Robot 1-X, save my friends! And Zoidberg!"
 use Cwd 'cwd';
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';

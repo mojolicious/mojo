@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 57;
 
-# "'What are you lookin at?' - the innocent words of a drunken child."
 use Mojo::Collection 'c';
 
 # Array

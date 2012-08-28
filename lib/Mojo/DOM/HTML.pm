@@ -75,9 +75,6 @@ my @HTML5_INLINE = (
 );
 my %INLINE = map { $_ => 1 } @HTML4_INLINE, @HTML5_INLINE;
 
-# "No one believes me.
-#  I believe you, dad.
-#  Then can you stop the cats from swearing?"
 sub parse {
   my ($self, $html) = @_;
 
@@ -160,8 +157,6 @@ sub render {
   return $charset ? encode($charset, $content) : $content;
 }
 
-# "Woah! God is so in your face!
-#  Yeah, he's my favorite fictional character."
 sub _cdata {
   my ($self, $cdata, $current) = @_;
   push @$$current, ['cdata', $cdata];
@@ -321,8 +316,6 @@ sub _render {
   return $content;
 }
 
-# "It's not important to talk about who got rich off of whom,
-#  or who got exposed to tainted what..."
 sub _start {
   my ($self, $start, $attrs, $current) = @_;
 

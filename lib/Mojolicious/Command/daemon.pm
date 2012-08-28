@@ -25,9 +25,6 @@ These options are available:
   -u, --user <name>            Set username for process.
 EOF
 
-# "It's an albino humping worm!
-#  Why do they call it that?
-#  Cause it has no pigment."
 sub run {
   my ($self, @args) = @_;
 

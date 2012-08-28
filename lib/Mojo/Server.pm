@@ -14,9 +14,6 @@ sub new {
   return $self;
 }
 
-# "Lisa, if the Bible has taught us nothing else, and it hasn't,
-#  it's that girls should stick to girls sports,
-#  such as hot oil wrestling and foxy boxing and such."
 sub build_app {
   my ($self, $app) = @_;
   local $ENV{MOJO_EXE};
@@ -46,14 +43,6 @@ EOF
   return $self->app($app)->app;
 }
 
-# "Are you saying you're never going to eat any animal again? What about
-#  bacon?
-#  No.
-#  Ham?
-#  No.
-#  Pork chops?
-#  Dad, those all come from the same animal.
-#  Heh heh heh. Ooh, yeah, right, Lisa. A wonderful, magical animal."
 sub run { croak 'Method "run" not implemented by subclass' }
 
 1;

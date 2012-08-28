@@ -12,8 +12,6 @@ use Carp ();
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
-# "Kids, you tried your best and you failed miserably.
-#  The lesson is, never try."
 sub import {
   my $class = shift;
   return unless my $flag = shift;

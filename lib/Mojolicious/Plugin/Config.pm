@@ -5,7 +5,6 @@ use File::Basename 'basename';
 use File::Spec::Functions 'file_name_is_absolute';
 use Mojo::Util 'decamelize';
 
-# "Who are you, my warranty?!"
 sub load {
   my ($self, $file, $conf, $app) = @_;
   $app->log->debug(qq{Reading config file "$file".});
@@ -32,7 +31,6 @@ sub parse {
   return $config;
 }
 
-# "Planet Express - Our crew is replaceable, your package isn't."
 sub register {
   my ($self, $app, $conf) = @_;
 

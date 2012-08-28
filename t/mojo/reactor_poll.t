@@ -8,8 +8,6 @@ BEGIN {
 
 use Test::More tests => 68;
 
-# "I don't mind being called a liar when I'm lying, or about to lie,
-#  or just finished lying, but NOT WHEN I'M TELLING THE TRUTH."
 use IO::Socket::INET;
 use Mojo::Reactor::Poll;
 

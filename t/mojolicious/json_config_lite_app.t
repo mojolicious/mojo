@@ -10,8 +10,6 @@ BEGIN {
 
 use Test::More tests => 26;
 
-# "Oh, I always feared he might run off like this.
-#  Why, why, why didn't I break his legs?"
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';

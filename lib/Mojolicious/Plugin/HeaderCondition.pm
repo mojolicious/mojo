@@ -16,8 +16,6 @@ sub register {
     host => sub { _check($_[1]->req->url->to_abs->host, $_[3]) });
 }
 
-# "Wow, there's a million aliens! I've never seen something so mind-blowing!
-#  Ooh, a reception table with muffins!"
 sub _check {
   my ($value, $pattern) = @_;
   return 1

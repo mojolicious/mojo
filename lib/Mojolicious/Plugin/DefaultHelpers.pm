@@ -4,8 +4,6 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Data::Dumper ();
 use Mojo::ByteStream;
 
-# "You're watching Futurama,
-#  the show that doesn't condone the cool crime of robbery."
 sub register {
   my ($self, $app) = @_;
 

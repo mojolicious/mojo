@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Fcntl ':flock';
 
-# "Would you kindly shut your noise-hole?"
 has handle => sub {
 
   # File
@@ -30,7 +29,6 @@ sub new {
   return $self;
 }
 
-# "Yes, I got the most! I win X-Mas!"
 sub debug { shift->log(debug => @_) }
 sub error { shift->log(error => @_) }
 sub fatal { shift->log(fatal => @_) }
@@ -55,8 +53,6 @@ sub is_level {
 
 sub is_warn { shift->is_level('warn') }
 
-# "If The Flintstones has taught us anything,
-#  it's that pelicans can be used to mix cement."
 sub log { shift->emit('message', lc(shift), @_) }
 
 sub warn { shift->log(warn => @_) }

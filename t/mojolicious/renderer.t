@@ -2,8 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 7;
 
-# "Actually, she wasn't really my girlfriend,
-#  she just lived nextdoor and never closed her curtains."
 use Mojolicious;
 use Mojolicious::Controller;
 use Mojolicious::Renderer;

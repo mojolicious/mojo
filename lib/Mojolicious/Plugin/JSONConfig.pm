@@ -5,8 +5,6 @@ use Mojo::JSON;
 use Mojo::Template;
 use Mojo::Util 'encode';
 
-# "And so we say goodbye to our beloved pet, Nibbler, who's gone to a place
-#  where I, too, hope one day to go. The toilet."
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 

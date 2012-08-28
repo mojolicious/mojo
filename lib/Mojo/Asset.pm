@@ -6,7 +6,6 @@ use Carp 'croak';
 has 'end_range';
 has start_range => 0;
 
-# "Marge, it takes two to lie. One to lie and one to listen."
 sub add_chunk { croak 'Method "add_chunk" not implemented by subclass' }
 sub contains  { croak 'Method "contains" not implemented by subclass' }
 sub get_chunk { croak 'Method "get_chunk" not implemented by subclass' }

@@ -7,11 +7,6 @@ use POSIX 'WNOHANG';
 
 has watch => sub { [qw(lib templates)] };
 
-# "All in all, this is one day Mittens the kitten won't soon forget.
-#  Kittens give Morbo gas.
-#  In lighter news, the city of New New York is doomed.
-#  Blame rests with known human Professor Hubert Farnsworth and his tiny,
-#  inferior brain."
 sub check_file {
   my ($self, $file) = @_;
 
@@ -39,11 +34,6 @@ sub run {
   exit 0;
 }
 
-# "And so with two weeks left in the campaign, the question on everyone's
-#  mind is, who will be the president of Earth?
-#  Jack Johnson or bitter rival John Jackson.
-#  Two terrific candidates, Morbo?
-#  All humans are vermin in the eyes of Morbo!"
 sub _manage {
   my $self = shift;
 
@@ -77,10 +67,6 @@ sub _reap {
   while ((my $pid = waitpid -1, WNOHANG) > 0) { delete $self->{running} }
 }
 
-# "Morbo cannot read his teleprompter.
-#  He forgot how you say that letter that looks like a man wearing a hat.
-#  It's a T. It goes 'tuh'.
-#  Hello, little man. I will destroy you!"
 sub _spawn {
   my $self = shift;
 

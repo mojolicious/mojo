@@ -3,8 +3,6 @@ use Mojo::Base 'Mojo::Transaction';
 
 use Mojo::Transaction::WebSocket;
 
-# "What's a wedding?  Webster's dictionary describes it as the act of
-#  removing weeds from one's garden."
 sub client_read {
   my ($self, $chunk) = @_;
 

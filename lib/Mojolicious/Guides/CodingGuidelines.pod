@@ -91,9 +91,6 @@ No spaghetti code.
 Comments should be correctly capitalized, and funny if possible, punctuation
 is optional if it doesn't increase readability.
 
-Every file should contain at least one quote from C<The Simpsons> or
-C<Futurama>.
-
 No names outside of C<Mojolicious.pm>.
 
 No Elitism.

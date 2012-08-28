@@ -8,8 +8,6 @@ BEGIN {
 
 use Test::More tests => 14;
 
-# "And now to create an unstoppable army of between one million and two
-#  million zombies!"
 use Mojo::IOLoop;
 use Mojo::IOLoop::Delay;
 

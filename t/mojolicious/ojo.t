@@ -12,7 +12,6 @@ BEGIN {
 
 use Test::More tests => 18;
 
-# "What do you mean 'we', flesh-tube?"
 use ojo;
 
 # * /

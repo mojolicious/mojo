@@ -12,10 +12,6 @@ my @base = (splitdir(dirname(__FILE__)), '..');
 my $lib = join('/', @base, 'lib');
 -e catdir(@base, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
 
-# "Welcome to 'Entertainment And Earth Invasion Tonite'.
-#  Across the galaxy my people are completing the mighty space fleet that
-#  will exterminate the human race!
-#  But first, this news from Tinseltown."
 GetOptions(
   'h|help'     => \my $help,
   'l|listen=s' => \my @listen,
@@ -45,9 +41,6 @@ These options are available:
                                  working directory.
 EOF
 
-# "With Halley's Comet out of ice, Earth is experiencing a sudden case of
-#  global warming.
-#  Morbo is pleased but sticky."
 $ENV{MOJO_LISTEN} = join(',', @listen) if @listen;
 require Mojo::Server::Morbo;
 my $morbo = Mojo::Server::Morbo->new;

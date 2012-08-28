@@ -5,9 +5,6 @@ use Mojo::Template;
 use Mojo::Util qw(encode md5_sum);
 use Scalar::Util ();
 
-# "What do you want?
-#  I'm here to kick your ass!
-#  Wishful thinking. We have long since evolved beyond the need for asses."
 sub register {
   my ($self, $app, $conf) = @_;
 

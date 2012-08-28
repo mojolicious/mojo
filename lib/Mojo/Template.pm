@@ -8,7 +8,6 @@ use Mojo::Util qw(decode encode slurp);
 
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 
-# "If for any reason you're not completely satisfied, I hate you."
 has [qw(auto_escape compiled)];
 has [qw(append code prepend template)] => '';
 has capture_end   => 'end';
@@ -148,7 +147,6 @@ sub interpret {
   return Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1);
 }
 
-# "I am so smart! I am so smart! S-M-R-T! I mean S-M-A-R-T..."
 sub parse {
   my ($self, $tmpl) = @_;
 

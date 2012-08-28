@@ -4,7 +4,6 @@ use utf8;
 
 use Test::More tests => 95;
 
-# "Now that's a wave of destruction that's easy on the eyes."
 use Mojo::Parameters;
 
 # Basic functionality

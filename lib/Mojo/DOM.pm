@@ -29,8 +29,6 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-# "How are the kids supposed to get home?
-#  I dunno. Internet?"
 sub new {
   my $class = shift;
   my $self = bless [Mojo::DOM::HTML->new], ref $class || $class;
@@ -73,7 +71,6 @@ sub attrs {
 
 sub charset { shift->_parser(charset => @_) }
 
-# "Oh boy! Sleep! That's when I'm a Viking!"
 sub children {
   my ($self, $type) = @_;
 
@@ -113,7 +110,6 @@ sub content_xml {
   return $result;
 }
 
-# "But I was going to loot you a present."
 sub find {
   my ($self, $selector) = @_;
 
@@ -290,7 +286,6 @@ sub type {
   return $self;
 }
 
-# "I want to set the record straight, I thought the cop was a prostitute."
 sub xml { shift->_parser(xml => @_) }
 
 sub _add {

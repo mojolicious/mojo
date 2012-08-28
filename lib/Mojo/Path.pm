@@ -37,9 +37,6 @@ sub canonicalize {
   return $self->parts(\@parts);
 }
 
-# "Homer, the plant called.
-#  They said if you don't show up tomorrow don't bother showing up on Monday.
-#  Woo-hoo. Four-day weekend."
 sub clone {
   my $self  = shift;
   my $clone = Mojo::Path->new;
@@ -89,11 +86,6 @@ sub to_abs_string {
   return $self->leading_slash ? "$self" : "/$self";
 }
 
-# "How is education supposed to make me feel smarter?
-#  Besides, every time I learn something new,
-#  it pushes some old stuff out of my brain.
-#  Remember when I took that home winemaking course,
-#  and I forgot how to drive?"
 sub to_string {
   my $self = shift;
 

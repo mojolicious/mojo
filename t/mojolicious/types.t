@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 52;
 
-# "Your mistletoe is no match for my *tow* missile."
 use Mojolicious::Types;
 
 # Basic functionality

@@ -11,10 +11,6 @@ plan skip_all => 'set TEST_CACHING to enable this test (developer only!)'
   unless $ENV{TEST_CACHING};
 plan tests => 21;
 
-# "I want to see the edge of the universe.
-#  Ooh, that sounds cool.
-#  It's funny, you live in the universe, but you never get to do this things
-#  until someone comes to visit."
 use Mojolicious::Lite;
 use Test::Mojo;
 

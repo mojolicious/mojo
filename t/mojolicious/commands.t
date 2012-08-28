@@ -8,9 +8,6 @@ use Test::More tests => 41;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-# "I'm not a robot!
-#  I don't like having discs crammed into me, unless they're Oreos.
-#  And then, only in the mouth."
 use Mojolicious::Commands;
 
 # Environment detection

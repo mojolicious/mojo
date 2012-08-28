@@ -2,7 +2,6 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;
 
-# "Cheating in a fake fight. That's low."
 use Mojo::IOLoop;
 
 # Minimal connect proxy server to test TLS tunneling

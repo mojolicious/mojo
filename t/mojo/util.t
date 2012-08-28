@@ -8,7 +8,6 @@ use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
 use FindBin;
 
-# "If he is so smart, how come he is dead?"
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),

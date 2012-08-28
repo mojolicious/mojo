@@ -9,7 +9,6 @@ has [qw(kept_alive local_address local_port previous remote_port)];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
-# "Please don't eat me! I have a wife and kids. Eat them!"
 sub client_close { shift->server_close(@_) }
 
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }

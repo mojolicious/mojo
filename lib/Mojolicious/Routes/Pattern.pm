@@ -10,7 +10,6 @@ has quote_start    => '(';
 has relaxed_start  => '#';
 has wildcard_start => '*';
 
-# "This is the worst kind of discrimination. The kind against me!"
 sub new { shift->SUPER::new->parse(@_) }
 
 sub match {
@@ -177,7 +176,6 @@ sub _compile_format {
   return $self->format_regex(qr!\.$regex$!)->format_regex;
 }
 
-# "Interesting... Oh no wait, the other thing, tedious."
 sub _compile_req {
   my $req = shift;
   return "($req)" if ref $req ne 'ARRAY';

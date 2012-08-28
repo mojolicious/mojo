@@ -33,7 +33,6 @@ my $TOKEN_RE        = qr/
   )?
 /x;
 
-# "Why can't she just drink herself happy like a normal person?"
 sub select {
   my $self = shift;
 
@@ -182,7 +181,6 @@ sub _compile {
   return $pattern;
 }
 
-# "Rock stars... is there anything they don't know?"
 sub _equation {
   my ($self, $equation) = @_;
 
@@ -360,9 +358,6 @@ sub _sibling {
   return;
 }
 
-# "All right, brain.
-#  You don't like me and I don't like you,
-#  but let's just do this and I can get back to killing you with beer."
 sub _unescape {
   my ($self, $value) = @_;
 

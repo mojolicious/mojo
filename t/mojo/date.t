@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 20;
 
-# "Can't we have one meeting that doesn't end with digging up a corpse?"
 use Mojo::Date;
 
 # RFC 822/1123

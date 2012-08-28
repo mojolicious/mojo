@@ -6,9 +6,6 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-# "On the count of three, you will awaken feeling refreshed,
-#  as if Futurama had never been canceled by idiots,
-#  then brought back by bigger idiots. One. Two."
 use Test::More tests => 15;
 
 use Mojolicious::Lite;

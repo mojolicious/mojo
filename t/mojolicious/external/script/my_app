@@ -3,12 +3,6 @@
 use strict;
 use warnings;
 
-# "Behold, a time traveling machine.
-#  Time? I can't go back there!
-#  Ah, but this machine only goes forward in time.
-#  That way you can't accidentally change history or do something disgusting
-#  like sleep with your own grandmother.
-#  I wouldn't want to do that again."
 use File::Basename 'dirname';
 use File::Spec::Functions qw(catdir splitdir);
 

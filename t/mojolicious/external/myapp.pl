@@ -2,7 +2,6 @@
 
 use utf8;
 
-# "Boy, who knew a cooler could also make a handy wang coffin?"
 use Mojolicious::Lite;
 
 # Default for config file tests

@@ -2,9 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 93;
 
-# "So, have a merry Christmas, a happy Hanukkah, a kwaazy Kwanza,
-#  a tip-top Tet, and a solemn, dignified, Ramadan.
-#  And now a word from MY god, our sponsors!"
 use Mojo::Headers;
 
 # Basic functionality

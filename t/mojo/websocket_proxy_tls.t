@@ -6,7 +6,6 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-# "Hey, Weener Boy... where do you think you're going?"
 use Test::More;
 use Mojo::IOLoop::Server;
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'

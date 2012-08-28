@@ -10,7 +10,6 @@ BEGIN {
 
 use Test::More tests => 208;
 
-# "Let's see how crazy I am now, Nixon. The correct answer is very."
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent::CookieJar;
 use Mojolicious::Lite;

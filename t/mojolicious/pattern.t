@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 90;
 
-# "People said I was dumb, but I proved them."
 use Mojo::ByteStream 'b';
 use Mojolicious::Routes::Pattern;
 

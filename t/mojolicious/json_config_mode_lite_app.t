@@ -9,11 +9,8 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-# "Who are you, and why should I care?"
 use Test::More tests => 3;
 
-# "Ahhh, what an awful dream.
-#  Ones and zeroes everywhere... and I thought I saw a two."
 use Mojolicious::Lite;
 use Test::Mojo;
 

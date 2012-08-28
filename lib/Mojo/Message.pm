@@ -18,9 +18,6 @@ has max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 };
 has version          => '1.1';
 
-# "I'll keep it short and sweet. Family. Religion. Friendship.
-#  These are the three demons you must slay if you wish to succeed in
-#  business."
 sub body {
   my $self = shift;
 
@@ -80,10 +77,6 @@ sub body_params {
 
 sub body_size { shift->content->body_size }
 
-# "My new movie is me, standing in front of a brick wall for 90 minutes.
-#  It cost 80 million dollars to make.
-#  How do you sleep at night?
-#  On top of a pile of money, with many beautiful women."
 sub build_body       { shift->_build('get_body_chunk') }
 sub build_headers    { shift->_build('get_header_chunk') }
 sub build_start_line { shift->_build('get_start_line_chunk') }

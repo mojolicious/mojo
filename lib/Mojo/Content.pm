@@ -20,7 +20,6 @@ sub boundary {
   return;
 }
 
-# "Operator! Give me the number for 911!"
 sub build_body    { shift->_build('get_body_chunk') }
 sub build_headers { shift->_build('get_header_chunk') }
 
@@ -181,7 +180,6 @@ sub write {
   return $self;
 }
 
-# "Here's to alcohol, the cause of-and solution to-all life's problems."
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
 

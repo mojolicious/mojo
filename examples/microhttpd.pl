@@ -2,8 +2,6 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;
 
-# "Kif, I'm feeling the Captain's Itch.
-#  I'll get the powder, sir."
 use Mojo::IOLoop;
 
 # Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)

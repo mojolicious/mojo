@@ -27,8 +27,6 @@ my @UTILS = (
   }
 }
 
-# "Do we have any food that wasn't brutally slaughtered?
-#  Well, I think the veal died of loneliness."
 sub new {
   my $class = shift;
   return bless \(my $dummy = join '', @_), ref $class || $class;
@@ -41,11 +39,6 @@ sub clone {
   return $self->new($$self);
 }
 
-# "I want to share something with you: The three little sentences that will
-#  get you through life.
-#  Number 1: 'Cover for me.'
-#  Number 2: 'Oh, good idea, Boss!'
-#  Number 3: 'It was like that when I got here.'"
 sub decode {
   my $self = shift;
   $$self = Mojo::Util::decode shift || 'UTF-8', $$self;
@@ -58,9 +51,6 @@ sub encode {
   return $self;
 }
 
-# "Old people don't need companionship.
-#  They need to be isolated and studied so it can be determined what
-#  nutrients they have that might be extracted for our personal use."
 sub say {
   my ($self, $handle) = @_;
   $handle ||= \*STDOUT;
@@ -76,7 +66,6 @@ sub split {
   return Mojo::Collection->new(map { $self->new($_) } split $pattern, $$self);
 }
 
-# "My cat's breath smells like cat food."
 sub to_string { ${shift()} }
 
 1;

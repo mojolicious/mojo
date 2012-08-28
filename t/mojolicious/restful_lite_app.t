@@ -8,7 +8,6 @@ BEGIN {
 
 use Test::More tests => 344;
 
-# "Woohoo, time to go clubbin'! Baby seals here I come!"
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -42,7 +41,6 @@ post sub {
   );
 };
 
-# "Raise the solar sails! I'm going after that Mobius Dick!"
 my $t = Test::Mojo->new;
 
 # POST /json/echo (hash without format)

@@ -4,8 +4,6 @@ use utf8;
 
 use Test::More tests => 789;
 
-# "Homer gave me a kidney: it wasn't his, I didn't need it,
-#  and it came postage due- but I appreciated the gesture!"
 use Mojo::DOM;
 use Mojo::Util 'encode';
 

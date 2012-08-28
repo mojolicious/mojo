@@ -11,7 +11,6 @@ BEGIN {
 
 use Test::More tests => 54;
 
-# "I wax my rocket every day!"
 use Mojolicious::Lite;
 use Test::Mojo;
 

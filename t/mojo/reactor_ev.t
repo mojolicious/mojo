@@ -9,7 +9,6 @@ plan skip_all => 'set TEST_EV to enable this test (developer only!)'
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
 plan tests => 69;
 
-# "Oh well. At least we'll die doing what we love: inhaling molten rock."
 use IO::Socket::INET;
 
 # Instantiation

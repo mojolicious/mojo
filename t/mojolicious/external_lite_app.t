@@ -9,7 +9,6 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-# "Who are you, and why should I care?"
 use Test::More tests => 15;
 
 use FindBin;

@@ -12,7 +12,6 @@ my @base = (splitdir(dirname(__FILE__)), '..');
 my $lib = join('/', @base, 'lib');
 -e catdir(@base, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
 
-# "Hey sexy mama, wanna kill all humans?"
 GetOptions(
   'f|foreground' => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
   'h|help'       => \my $help,
@@ -35,8 +34,6 @@ These options are available:
   -t, --test         Test application and exit.
 EOF
 
-# "This is it.
-#  The moment we should've trained for."
 require Mojo::Server::Hypnotoad;
 Mojo::Server::Hypnotoad->new->run($app);
 

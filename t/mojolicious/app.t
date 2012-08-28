@@ -12,8 +12,6 @@ use Test::More tests => 339;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-# "Congratulations Fry, you've snagged the perfect girlfriend.
-#  Amy's rich, she's probably got other characteristics..."
 use File::Spec::Functions 'catdir';
 use Mojo::Date;
 use Mojo::Transaction::HTTP;

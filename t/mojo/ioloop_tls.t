@@ -6,6 +6,14 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
+use Test::More;
+use Mojo::IOLoop::Server;
+plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
+  unless $ENV{TEST_TLS};
+plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
+  unless Mojo::IOLoop::Server::TLS;
+plan tests => 31;
+
 # To regenerate all required certificates run these commands (18.04.2012)
 # openssl genrsa -out ca.key 1024
 # openssl req -new -key ca.key -out ca.csr -subj "/C=US/CN=ca"
@@ -26,17 +34,6 @@ BEGIN {
 #   -subj "/C=US/CN=badclient"
 # openssl req -x509 -days 7300 -key badclient.key -in badclient.csr \
 #   -out badclient.crt
-use Test::More;
-use Mojo::IOLoop::Server;
-plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
-  unless $ENV{TEST_TLS};
-plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
-  unless Mojo::IOLoop::Server::TLS;
-plan tests => 31;
-
-# "To the panic room!
-#  We don't have a panic room.
-#  To the panic room store!"
 use Mojo::IOLoop;
 
 # Built-in certificate

@@ -23,8 +23,6 @@ sub DESTROY {
   $loop->remove($_) for @{$self->{listening} || []};
 }
 
-# "40 dollars!? This better be the best damn beer ever..
-#  *drinks beer* You got lucky."
 sub run {
   my $self = shift;
 

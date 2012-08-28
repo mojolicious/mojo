@@ -11,9 +11,6 @@ BEGIN {
 
 use Test::More tests => 86;
 
-# "This calls for a party, baby.
-#  I'm ordering 100 kegs, 100 hookers and 100 Elvis impersonators that aren't
-#  above a little hooking should the occasion arise."
 use Mojolicious::Lite;
 use Test::Mojo;
 

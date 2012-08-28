@@ -10,7 +10,6 @@ BEGIN {
 
 use Test::More tests => 41;
 
-# "In the game of chess you can never let your adversary see your pieces."
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
 use Test::Mojo;

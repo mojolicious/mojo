@@ -14,10 +14,6 @@ plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
 plan tests => 40;
 
-# "Look at these low, low prices on famous brand-name electronics!
-#  Don't be a sap, Dad. These are just crappy knockoffs.
-#  Pfft. I know a genuine Panaphonics when I see it.
-#  And look, there's a Magnetbox and Sorny."
 use Mojo::IOLoop;
 use Mojo::UserAgent;
 use Mojolicious::Lite;

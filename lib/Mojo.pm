@@ -22,7 +22,6 @@ has ua   => sub {
   return $ua;
 };
 
-# "Oh, so they have internet on computers now!"
 sub new {
   my $self = shift->SUPER::new(@_);
 
@@ -40,7 +39,6 @@ sub build_tx { Mojo::Transaction::HTTP->new }
 
 sub config { shift->_dict(config => @_) }
 
-# "D'oh."
 sub handler { croak 'Method "handler" not implemented in subclass' }
 
 sub _dict {

@@ -4,8 +4,6 @@ use Mojo::Base 'Mojolicious::Command';
 has description => "Generate Mojolicious::Lite application.\n";
 has usage       => "usage: $0 generate lite_app [NAME]\n";
 
-# "As a scientist,
-#  I can assure you that we did in fact evolve from filthy monkey-men."
 sub run {
   my ($self, $name) = @_;
   $name ||= 'myapp.pl';

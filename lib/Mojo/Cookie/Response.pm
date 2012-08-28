@@ -22,9 +22,6 @@ sub expires {
   return $self;
 }
 
-# "Remember the time he ate my goldfish?
-#  And you lied and said I never had goldfish.
-#  Then why did I have the bowl Bart? Why did I have the bowl?"
 sub parse {
   my ($self, $string) = @_;
 

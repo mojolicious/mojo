@@ -12,10 +12,6 @@ These options are available:
   -v, --verbose   Print return value to STDOUT.
 EOF
 
-# "It worked!
-#  Gravity normal.
-#  Air pressure returning.
-#  Terror replaced by cautious optimism."
 sub run {
   my ($self, @args) = @_;
 

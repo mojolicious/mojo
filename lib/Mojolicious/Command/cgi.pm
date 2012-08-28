@@ -11,7 +11,6 @@ These options are available:
   --nph   Enable non-parsed-header mode.
 EOF
 
-# "Fire all weapons and open a hailing frequency for my victory yodel."
 sub run {
   my ($self, @args) = @_;
   my $cgi = Mojo::Server::CGI->new(app => $self->app);

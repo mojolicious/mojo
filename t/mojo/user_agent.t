@@ -8,7 +8,6 @@ BEGIN {
 
 use Test::More tests => 109;
 
-# "The strong must protect the sweet."
 use Mojo::IOLoop;
 use Mojo::UserAgent;
 use Mojolicious::Lite;

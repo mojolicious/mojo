@@ -2,9 +2,6 @@ use Mojo::Base -strict;
 
 use utf8;
 
-# "Homer, we're going to ask you a few simple yes or no questions.
-#  Do you understand?
-#  Yes. *lie dectector blows up*"
 use Test::More tests => 45;
 
 use File::Spec::Functions qw(catfile splitdir);

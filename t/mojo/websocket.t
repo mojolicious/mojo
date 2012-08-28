@@ -8,7 +8,6 @@ BEGIN {
 
 use Test::More tests => 48;
 
-# "I can't believe it! Reading and writing actually paid off!"
 use IO::Socket::INET;
 use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;

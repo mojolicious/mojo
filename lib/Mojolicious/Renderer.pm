@@ -22,9 +22,6 @@ $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 my %TEMPLATES = map { $_ => $HOME->slurp_rel_file($_) } @{$HOME->list_files};
 
-# "This is not how Xmas is supposed to be.
-#  In my day Xmas was about bringing people together,
-#  not blowing them apart."
 sub new {
   my $self = shift->SUPER::new(@_)->add_handler(json => \&_json);
   return $self->add_handler(data => \&_data)->add_handler(text => \&_text);
@@ -59,7 +56,6 @@ sub get_data_template {
   return $loader->data($self->{index}{$template}, $template);
 }
 
-# "My god, it's full of geezers."
 sub render {
   my ($self, $c, $args) = @_;
   $args ||= {};

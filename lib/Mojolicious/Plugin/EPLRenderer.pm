@@ -4,8 +4,6 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Template;
 use Mojo::Util qw(encode md5_sum);
 
-# "Clever things make people feel stupid and unexpected things make them feel
-#  scared."
 sub register {
   my ($self, $app) = @_;
 

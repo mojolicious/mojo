@@ -3,8 +3,6 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 
-# "This is Fry's decision.
-#  And he made it wrong, so it's time for us to interfere in his life."
 sub register { croak 'Method "register" not implemented by subclass' }
 
 1;
@@ -19,7 +17,6 @@ Mojolicious::Plugin - Plugin base class
   package Mojolicious::Plugin::MyPlugin;
   use Mojo::Base 'Mojolicious::Plugin';
 
-  # <suitable Futurama quote here>
   sub register {
     my ($self, $app, $conf) = @_;
 

@@ -9,14 +9,11 @@ use Mojo::Util qw(b64_decode class_to_path);
 # Cache
 my %CACHE;
 
-# "Homer no function beer well without."
 sub data {
   my ($self, $class, $data) = @_;
   return $class ? $data ? _all($class)->{$data} : _all($class) : undef;
 }
 
-# "Olive oil? Asparagus? If your mother wasn't so fancy,
-#  we could just shop at the gas station like normal people."
 sub load {
   my ($self, $module) = @_;
 
@@ -34,8 +31,6 @@ sub load {
   return Mojo::Exception->new($@);
 }
 
-# "This is the worst thing you've ever done.
-#  You say that so often that it lost its meaning."
 sub search {
   my ($self, $namespace) = @_;
 

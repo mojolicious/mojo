@@ -6,9 +6,6 @@ use Mojolicious;
 has description => qq{Generate "Makefile.PL".\n};
 has usage       => "usage: $0 generate makefile\n";
 
-# "If we don't go back there and make that event happen,
-#  the entire universe will be destroyed...
-#  And as an environmentalist, I'm against that."
 sub run { shift->render_to_rel_file('makefile', 'Makefile.PL') }
 
 1;

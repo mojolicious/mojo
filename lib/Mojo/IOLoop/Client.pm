@@ -18,7 +18,6 @@ use constant TLS => $ENV{MOJO_NO_TLS} ? 0
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
-# "It's like my dad always said: eventually, everybody gets shot."
 has reactor => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton->reactor;
@@ -26,7 +25,6 @@ has reactor => sub {
 
 sub DESTROY { shift->_cleanup }
 
-# "I wonder where Bart is, his dinner's getting all cold... and eaten."
 sub connect {
   my $self = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
@@ -89,8 +87,6 @@ sub _tls {
   $self->_cleanup->emit_safe(connect => $handle);
 }
 
-# "Have you ever seen that Blue Man Group? Total ripoff of the Smurfs.
-#  And the Smurfs, well, they SUCK."
 sub _try {
   my ($self, $args) = @_;
 

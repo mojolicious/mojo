@@ -8,9 +8,6 @@ BEGIN {
 
 use Test::More tests => 32;
 
-# "Pizza delivery for...
-#  I. C. Weiner. Aww... I always thought by this stage in my life I'd be the
-#  one making the crank calls."
 use Mojolicious::Lite;
 use Test::Mojo;
 

@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More tests => 190;
 
-# "What good is money if it can't inspire terror in your fellow man?"
 use Mojo::Cookie::Request;
 use Mojo::Cookie::Response;
 

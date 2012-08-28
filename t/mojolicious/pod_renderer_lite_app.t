@@ -8,9 +8,6 @@ BEGIN {
 
 use Test::More tests => 35;
 
-# "Amy get your pants back on and get to work.
-#  They think were making out.
-#  Why aren't we making out?"
 use Mojolicious::Lite;
 use Test::Mojo;
 

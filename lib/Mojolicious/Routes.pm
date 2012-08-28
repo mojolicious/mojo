@@ -26,7 +26,6 @@ sub add_shortcut {
   return $self;
 }
 
-# "Hey. What kind of party is this? There's no booze and only one hooker."
 sub auto_render {
   my ($self, $c) = @_;
   my $stash = $c->stash;
@@ -187,8 +186,6 @@ sub _method {
   return $method;
 }
 
-# "It would never work out, Fry. You're a male, I'm a female.
-#  We're just too different."
 sub _walk {
   my ($self, $c) = @_;
 

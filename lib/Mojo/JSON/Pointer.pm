@@ -7,8 +7,6 @@ use Scalar::Util 'looks_like_number';
 sub contains { shift->_pointer(1, @_) }
 sub get      { shift->_pointer(0, @_) }
 
-# "Google, even though you've enslaved half the world,
-#  you're still a damn fine search engine."
 sub _pointer {
   my ($self, $contains, $data, $pointer) = @_;
 

@@ -14,7 +14,6 @@ sub throw_error {
   croak $@ if $@;
 }
 
-# "Shoplifting is a victimless crime. Like punching someone in the dark."
 package Mojo::LoaderException2_3;
 
 use Carp 'croak';

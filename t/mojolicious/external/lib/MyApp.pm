@@ -1,8 +1,6 @@
 package MyApp;
 use Mojo::Base 'Mojolicious';
 
-# "Well, at least here you'll be treated with dignity.
-#  Now strip naked and get on the probulator."
 sub startup {
   my $self = shift;
   my $r    = $self->routes;

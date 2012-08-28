@@ -16,8 +16,6 @@ plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
 plan tests => 88;
 
-# "So then I said to the cop, "No, you're driving under the influence...
-#  of being a jerk"."
 use IO::Socket::INET;
 use Mojo::IOLoop;
 use Mojo::Transaction::HTTP;

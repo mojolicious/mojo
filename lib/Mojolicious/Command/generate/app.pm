@@ -6,7 +6,6 @@ use Mojo::Util qw(class_to_file class_to_path);
 has description => "Generate Mojolicious application directory structure.\n";
 has usage       => "usage: $0 generate app [NAME]\n";
 
-# "I say, you've damaged our servants quarters... and our servants."
 sub run {
   my ($self, $class) = @_;
   $class ||= 'MyMojoliciousApp';

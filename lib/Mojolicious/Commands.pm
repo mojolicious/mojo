@@ -5,8 +5,6 @@ use Getopt::Long
   qw(GetOptions :config no_auto_abbrev no_ignore_case pass_through);
 use Mojo::Server;
 
-# "One day a man has everything, the next day he blows up a $400 billion
-#  space station, and the next day he has nothing. It makes you think."
 has hint => <<"EOF";
 
 These options are available for all commands:
@@ -122,8 +120,6 @@ sub start_app {
   return Mojo::Server->new->build_app($ENV{MOJO_APP} = shift)->start(@_);
 }
 
-# "After all this time, somebody else with one eye... who ISN'T a clumsy
-#  carpenter or a kid with a BB gun."
 sub _command {
   my ($module, $fatal) = @_;
   return $module->isa('Mojolicious::Command') ? $module : undef

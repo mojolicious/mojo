@@ -2,9 +2,6 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Mojolicious::Lite;
 
-# "Stop being such a spineless jellyfish!
-#  You know full well I'm more closely related to the sea cucumber.
-#  Not where it counts."
 any '/' => sub {
   my $self = shift;
   $self->on(message => sub { shift->send(shift) }) if $self->tx->is_websocket;

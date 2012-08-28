@@ -1,7 +1,6 @@
 package Mojolicious::Command::generate;
 use Mojo::Base 'Mojolicious::Commands';
 
-# "Ah, nothing like a warm fire and a SuperSoaker of fine cognac."
 has description => "Generate files and directories from templates.\n";
 has hint        => <<"EOF";
 

@@ -4,9 +4,6 @@ use utf8;
 
 use Test::More tests => 847;
 
-# "When will I learn?
-#  The answer to life's problems aren't at the bottom of a bottle,
-#  they're on TV!"
 use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use Mojo::Content::Single;

@@ -1,10 +1,6 @@
 package Mojo::Server::PSGI;
 use Mojo::Base 'Mojo::Server';
 
-# "Things aren't as happy as they used to be down here at the unemployment
-#  office.
-#  Joblessness is no longer just for philosophy majors.
-#  Useful people are starting to feel the pinch."
 sub run {
   my ($self, $env) = @_;
 
@@ -48,9 +44,6 @@ sub to_psgi_app {
   return sub { $self->run(@_) }
 }
 
-# "Wow! Homer must have got one of those robot cars!
-#  *Car crashes in background*
-#  Yeah, one of those AMERICAN robot cars."
 package Mojo::Server::PSGI::_IO;
 use Mojo::Base -base;
 

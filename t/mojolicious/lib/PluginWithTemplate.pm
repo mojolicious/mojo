@@ -1,7 +1,6 @@
 package PluginWithTemplate;
 use Mojo::Base 'Mojolicious::Plugin';
 
-# "Good news, everyone! I've taught the toaster to feel love!"
 sub register {
   my ($self, $app) = @_;
   push @{$app->renderer->classes}, __PACKAGE__;

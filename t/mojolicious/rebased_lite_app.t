@@ -8,8 +8,6 @@ BEGIN {
 
 use Test::More tests => 24;
 
-# "For example, if you killed your grandfather, you'd cease to exist!
-#  But existing is basically all I do!"
 use Mojo::URL;
 use Mojolicious::Lite;
 use Test::Mojo;

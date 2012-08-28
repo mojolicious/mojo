@@ -8,8 +8,6 @@ BEGIN {
 
 use Test::More tests => 12;
 
-# "I cheated the wrong way!
-#  I wrote the Lisa name and gave the Ralph answers!"
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;

@@ -9,7 +9,6 @@ has cookie_name        => 'mojolicious';
 has cookie_path        => '/';
 has default_expiration => 3600;
 
-# "Bender, quit destroying the universe!"
 sub load {
   my ($self, $c) = @_;
 
@@ -34,7 +33,6 @@ sub load {
   $session->{flash} = delete $session->{new_flash} if $session->{new_flash};
 }
 
-# "Emotions are dumb and should be hated."
 sub store {
   my ($self, $c) = @_;
 

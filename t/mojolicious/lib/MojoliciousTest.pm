@@ -14,7 +14,6 @@ sub development_mode {
   unshift @{$self->static->paths}, $self->home->rel_dir('public_dev');
 }
 
-# "Let's face it, comedy's a dead art form. Tragedy, now that's funny."
 sub startup {
   my $self = shift;
 

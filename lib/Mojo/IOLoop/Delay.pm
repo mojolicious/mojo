@@ -5,7 +5,6 @@ use Mojo::IOLoop;
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 
-# "Ah, alcohol and night-swimming. It's a winning combination."
 sub begin {
   my $self = shift;
   my $id   = $self->{counter}++;
@@ -21,8 +20,6 @@ sub steps {
   return $self;
 }
 
-# "Mrs. Simpson, bathroom is not for customers.
-#  Please use the crack house across the street."
 sub wait {
   my $self = shift;
   my @args;

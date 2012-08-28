@@ -13,7 +13,6 @@ use Mojolicious::Static;
 use Mojolicious::Types;
 use Scalar::Util qw(blessed weaken);
 
-# "Robots don't have any emotions, and sometimes that makes me very sad."
 has commands => sub {
   my $commands = Mojolicious::Commands->new(app => shift);
   weaken $commands->{app};
@@ -38,10 +37,8 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Rainbow';
-our $VERSION  = '3.35';
+our $VERSION  = '3.36';
 
-# "These old doomsday devices are dangerously unstable.
-#  I'll rest easier not knowing where they are."
 sub AUTOLOAD {
   my $self = shift;
 
@@ -60,8 +57,6 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-# "I personalized each of your meals.
-#  For example, Amy: you're cute, so I baked you a pony."
 sub new {
   my $self = shift->SUPER::new(@_);
 
@@ -134,7 +129,6 @@ sub dispatch {
   $c->render_not_found unless $self->routes->dispatch($c) || $tx->res->code;
 }
 
-# "Bite my shiny metal ass!"
 sub handler {
   my ($self, $tx) = @_;
 
@@ -174,13 +168,6 @@ sub helper {
   $r->add_helper($name => $cb);
 }
 
-# "He knows when you are sleeping.
-#  He knows when you're on the can.
-#  He'll hunt you down and blast your ass, from here to Pakistan.
-#  Oh...
-#  You better not breathe, you better not move.
-#  You're better off dead, I'm tellin' you, dude.
-#  Santa Claus is gunning you down!"
 sub hook { shift->plugins->on(@_) }
 
 sub plugin {

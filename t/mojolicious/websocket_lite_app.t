@@ -1,7 +1,5 @@
 use Mojo::Base -strict;
 
-# "Oh, dear. She's stuck in an infinite loop and he's an idiot.
-#  Well, that's love for you."
 use utf8;
 
 # Disable IPv6 and libev
@@ -100,10 +98,6 @@ get {text => 'plain nested!'};
 # POST /nested
 post {data => 'plain nested too!'};
 
-# "I was a hero to broken robots 'cause I was one of them, but how can I sing
-#  about being damaged if I'm not?
-#  That's like Christina Aguilera singing Spanish.
-#  Ooh, wait! That's it! I'll fake it!"
 my $t = Test::Mojo->new;
 
 # WebSocket /echo (default protocol)

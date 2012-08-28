@@ -5,8 +5,6 @@ use Mojo::Util 'camelize';
 
 has namespaces => sub { ['Mojolicious::Plugin'] };
 
-# "Also you have a rectangular object in your colon.
-#  That's a calculator. I ate it to gain its power."
 sub emit_hook {
   my $self = shift;
   $_->(@_) for @{$self->subscribers(shift)};
@@ -26,7 +24,6 @@ sub emit_chain {
   return $self;
 }
 
-# "Everybody's a jerk. You, me, this jerk."
 sub emit_hook_reverse {
   my $self = shift;
   $_->(@_) for reverse @{$self->subscribers(shift)};
@@ -54,8 +51,6 @@ sub register_plugin {
   shift->load_plugin(shift)->register(shift, ref $_[0] ? $_[0] : {@_});
 }
 
-# "Hey, I don't see you planning for your old age.
-#  I got plans. I'm gonna turn my on/off switch to off."
 sub _load {
   my ($self, $module) = @_;
 

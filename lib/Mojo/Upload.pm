@@ -9,10 +9,6 @@ has asset => sub { Mojo::Asset::File->new };
 has [qw(filename name)];
 has headers => sub { Mojo::Headers->new };
 
-# "B-6
-#  You sunk my scrabbleship!
-#  This game makes no sense.
-#  Tell that to the good men who just lost their lives... SEMPER-FI!"
 sub move_to {
   my $self = shift;
   $self->asset->move_to(@_);

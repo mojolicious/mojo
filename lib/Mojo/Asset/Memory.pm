@@ -7,9 +7,6 @@ use Mojo::Util 'spurt';
 has 'auto_upgrade';
 has max_memory_size => sub { $ENV{MOJO_MAX_MEMORY_SIZE} || 262144 };
 
-# "There's your giraffe, little girl.
-#  I'm a boy.
-#  That's the spirit. Never give up."
 sub new { shift->SUPER::new(@_, content => '') }
 
 sub add_chunk {

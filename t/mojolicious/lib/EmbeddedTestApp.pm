@@ -3,7 +3,6 @@ use Mojolicious::Lite;
 
 plugin "JSONConfig";
 
-# "But you're better than normal, you're abnormal."
 get '/works';
 
 get '/works/too' => 'too';

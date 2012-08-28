@@ -2,7 +2,6 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Mojo::Base -strict;
 
-# "She's built like a steakhouse, but she handles like a bistro!"
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
 

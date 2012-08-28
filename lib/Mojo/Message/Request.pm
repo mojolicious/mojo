@@ -188,8 +188,6 @@ sub parse {
   return $self;
 }
 
-# "Bart, with $10,000, we'd be millionaires!
-#  We could buy all kinds of useful things like...love!"
 sub proxy {
   my $self = shift;
   return $self->{proxy} unless @_;

@@ -8,8 +8,6 @@ BEGIN {
 
 use Test::More tests => 18;
 
-# "Um, Leela,
-#  Armondo and I are going to the back seat of his car for coffee."
 use Mojo::Asset::File;
 use Mojolicious::Lite;
 use Test::Mojo;

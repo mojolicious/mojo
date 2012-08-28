@@ -1,6 +1,7 @@
 package ojo;
 use Mojo::Base -strict;
 
+# "Fry: Why am i sticky and naked? Did i miss something fun?"
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;

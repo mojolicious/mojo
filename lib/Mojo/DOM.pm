@@ -6,6 +6,7 @@ use overload
   '""'     => sub { shift->to_xml },
   fallback => 1;
 
+# "Bender: I'm Bender, baby, please insert liquor!"
 use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;

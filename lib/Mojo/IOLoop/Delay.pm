@@ -6,7 +6,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 #  Professor: Ah, but this machine only goes forward in time, so you won't be
 #             able to change history or do something disgusting like sleep
 #             with your own grandmother.
-#        Fry: I wouldn't wanna to do that again."
+#        Fry: I wouldn't wanna do that again."
 use Mojo::IOLoop;
 
 has ioloop => sub { Mojo::IOLoop->singleton };

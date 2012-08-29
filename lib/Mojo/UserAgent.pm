@@ -640,7 +640,7 @@ automatically prepared proxy C<CONNECT> requests and followed redirects.
 
   $ua->on(start => sub {
     my ($ua, $tx) = @_;
-    $tx->req->headers->header('X-Bender', 'Bite my shiny metal ass!');
+    $tx->req->headers->header('X-Bender' => 'Bite my shiny metal ass!');
   });
 
 =head1 ATTRIBUTES

@@ -736,7 +736,7 @@ is $req->query_params, 'foo13', 'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-is $req->headers->content_length, 416, 'right "Content-Type" value';
+is $req->headers->content_length, 416, 'right "Content-Length" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
@@ -798,7 +798,7 @@ is $req->query_params, 'foo13', 'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-is $req->headers->content_length, 418, 'right "Content-Type" value';
+is $req->headers->content_length, 418, 'right "Content-Length" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
@@ -874,7 +874,7 @@ is $req->query_params, 'foo13', 'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-is $req->headers->content_length, 418, 'right "Content-Type" value';
+is $req->headers->content_length, 418, 'right "Content-Length" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';
@@ -918,7 +918,7 @@ is $req->query_params, 'foo13',                      'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-is $req->headers->content_length, 418, 'right "Content-Type" value';
+is $req->headers->content_length, 418, 'right "Content-Length" value';
 isa_ok $req->content, 'Mojo::Content::Single', 'right content';
 like $req->content->asset->slurp, qr/------------0xKhTmLbOuNdArY--$/,
   'right content';
@@ -952,7 +952,7 @@ is $req->query_params, 'foo13', 'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-is $req->headers->content_length, 418, 'right "Content-Type" value';
+is $req->headers->content_length, 418, 'right "Content-Length" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';

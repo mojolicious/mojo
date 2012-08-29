@@ -1,8 +1,6 @@
 package Mojolicious;
 use Mojo::Base 'Mojo';
 
-# "Fry: Since when is the Internet all about robbing people of their privacy?
-#  Bender: August 6, 1991."
 use Carp 'croak';
 use Mojo::Exception;
 use Mojolicious::Commands;

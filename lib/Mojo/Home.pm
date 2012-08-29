@@ -5,11 +5,6 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-# "Orphan: Daddy Bender, we're hungry.
-#  Bender: What's with you kids? Every other day it's food, food, food.
-#          Alright, I'll get you some stupid food.
-#  Orphan: Can we have Bender Burgers again?
-#  Bender: No! The cat shelter's on to me."
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Find 'find';

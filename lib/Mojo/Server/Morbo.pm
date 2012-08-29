@@ -1,8 +1,6 @@
 package Mojo::Server::Morbo;
 use Mojo::Base -base;
 
-# "Morbo: With Halley's Comet out of ice, Earth is experiencing a sudden case
-#         of global warming. Morbo is pleased but sticky."
 use Mojo::Home;
 use Mojo::Server::Daemon;
 use POSIX 'WNOHANG';

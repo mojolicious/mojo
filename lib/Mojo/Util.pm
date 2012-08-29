@@ -1,7 +1,6 @@
 package Mojo::Util;
 use Mojo::Base 'Exporter';
 
-# "Professor: Good news, everyone! I've taught the toaster to feel love!"
 use Carp 'croak';
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(sha1 sha1_hex);

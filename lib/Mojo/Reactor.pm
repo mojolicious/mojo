@@ -1,8 +1,6 @@
 package Mojo::Reactor;
 use Mojo::Base 'Mojo::EventEmitter';
 
-# "Fry:   This snow is beautiful. I'm glad global warming never happened.
-#  Leela: Actually, it did. But thank God nuclear winter canceled it out."
 use Carp 'croak';
 use IO::Poll qw(POLLERR POLLHUP POLLIN);
 use Mojo::Loader;

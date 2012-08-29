@@ -1,13 +1,6 @@
 package Mojolicious::Lite;
 use Mojo::Base 'Mojolicious';
 
-# "Professor: Good news, everyone! The university is bringing me on
-#             disciplinary charges. Wait, that's not good news at all.
-#  Leela:     Whatever you did, professor, I'm sure there's a reasonable
-#             explanation.
-#  Professor: Yes, but they won't listen! Everybody's always in favor of
-#             saving Hitler's brain. But when you put it in the body of a
-#             great white shark, uuuh, suddenly you've gone too far.
 use File::Basename 'dirname';
 use File::Spec::Functions 'catdir';
 use Mojo::UserAgent;

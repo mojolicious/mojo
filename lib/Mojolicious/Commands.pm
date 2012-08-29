@@ -1,7 +1,6 @@
 package Mojolicious::Commands;
 use Mojo::Base 'Mojolicious::Command';
 
-# "Bender: I'm Bender, baby, please insert liquor!"
 use Getopt::Long
   qw(GetOptions :config no_auto_abbrev no_ignore_case pass_through);
 use Mojo::Server;

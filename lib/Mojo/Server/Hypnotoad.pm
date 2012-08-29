@@ -1,8 +1,6 @@
 package Mojo::Server::Hypnotoad;
 use Mojo::Base -base;
 
-# "Bender: You know, I was God once.
-#  God:    Yes, I saw. You were doing well, until everyone died."
 use Cwd 'abs_path';
 use Fcntl ':flock';
 use File::Basename 'dirname';

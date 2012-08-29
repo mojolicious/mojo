@@ -1,7 +1,6 @@
 package Mojo::Cache;
 use Mojo::Base -base;
 
-# "Fry: People said I was dumb, but I proved them."
 has 'max_keys' => 100;
 
 sub get { (shift->{cache} || {})->{shift()} }

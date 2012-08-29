@@ -1,8 +1,6 @@
 package Mojo;
 use Mojo::Base -base;
 
-# "Professor: These old Doomsday devices are dangerously unstable. I'll rest
-#             easier not knowing where they are."
 use Carp 'croak';
 use Mojo::Home;
 use Mojo::Log;

@@ -2,7 +2,7 @@ package Mojolicious::Renderer;
 use Mojo::Base -base;
 
 # "Computer: Also you have a rectangular object in your colon.
-#  Hermes: That's a calculator. I ate it to gain its power."
+#  Hermes:   That's a calculator. I ate it to gain its power."
 use File::Spec::Functions 'catfile';
 use Mojo::Cache;
 use Mojo::JSON;

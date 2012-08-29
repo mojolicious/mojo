@@ -1,7 +1,8 @@
 package Mojolicious::Plugins;
 use Mojo::Base 'Mojo::EventEmitter';
 
-# "Bender: I'm Bender, baby, please insert liquor!"
+# "Bender: Yeah, well... I'm gonna go build my own theme park, with blackjack
+#          and hookers! In fact, forget the park!"
 use Mojo::Util 'camelize';
 
 has namespaces => sub { ['Mojolicious::Plugin'] };

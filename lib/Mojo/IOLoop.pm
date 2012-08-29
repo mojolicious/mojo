@@ -1,8 +1,8 @@
 package Mojo::IOLoop;
 use Mojo::Base -base;
 
-# "Professor: Amy, technology isn't intrinsically good or evil. It's all in
-#             how you use it, Like the death ray."
+# "Professor: Amy, technology isn't intrinsically good or bad. It's all in how
+#             you use it, like the death ray."
 use Carp 'croak';
 use Mojo::IOLoop::Client;
 use Mojo::IOLoop::Delay;

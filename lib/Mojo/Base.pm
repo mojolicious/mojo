@@ -209,8 +209,8 @@ pass it either a hash or a hash reference with attribute values.
   BaseSubClass->attr([qw(name1 name2 name3)] => 'foo');
   BaseSubClass->attr([qw(name1 name2 name3)] => sub {...});
 
-Create attribute accessor for hash-based objects. An array reference can be
-used to create more than one attribute. Pass an optional second argument to
+Create attribute accessor for hash-based objects, an array reference can be
+used to create more than one at a time. Pass an optional second argument to
 set a default value, it should be a constant or a callback. The callback will
 be excuted at accessor read time if there's no set value. Accessors can be
 chained, that means they return their invocant when they are called with an

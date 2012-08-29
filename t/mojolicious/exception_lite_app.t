@@ -167,7 +167,7 @@ $t->get_ok('/dead_action.json')->status_is(500)
 
 # GET /double_dead_action_☃
 $t->get_ok('/double_dead_action_☃')->status_is(500)
-  ->content_like(qr!get &#39;/double_dead_action_☃&#39;.*lite_app\.t\:\d!s)
+  ->content_like(qr!get &#39;/double_dead_action_☃&#39;.*lite_app\.t:\d!s)
   ->content_like(qr/double dead action!/);
 
 # GET /trapped

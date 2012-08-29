@@ -86,7 +86,7 @@ sub run {
   for my $namespace (@{$self->namespaces}) {
     for my $module (@{$loader->search($namespace)}) {
       next unless my $command = _command($module);
-      $command =~ s/^$namespace\:\://;
+      $command =~ s/^${namespace}:://;
       push @commands, [$command => $module] unless $seen{$command}++;
     }
   }

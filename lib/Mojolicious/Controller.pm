@@ -28,7 +28,7 @@ sub AUTOLOAD {
   my $self = shift;
 
   # Method
-  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
+  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
   Carp::croak("Undefined subroutine &${package}::$method called")
     unless Scalar::Util::blessed($self) && $self->isa(__PACKAGE__);
 
@@ -398,7 +398,7 @@ sub url_for {
   # Absolute URL
   return $target
     if Scalar::Util::blessed($target) && $target->isa('Mojo::URL');
-  return Mojo::URL->new($target) if $target =~ m!^\w+\://!;
+  return Mojo::URL->new($target) if $target =~ m!^\w+://!;
 
   # Base
   my $url  = Mojo::URL->new;

@@ -33,7 +33,7 @@ has reactor => sub {
 
 sub DESTROY {
   my $self = shift;
-  if (my $port = $self->{port}) { $ENV{MOJO_REUSE} =~ s/(?:^|\,)$port\:\d+// }
+  if (my $port = $self->{port}) { $ENV{MOJO_REUSE} =~ s/(?:^|\,)${port}:\d+// }
   return unless my $reactor = $self->{reactor};
   $self->stop if $self->{handle};
   $reactor->remove($_) for values %{$self->{handles}};
@@ -47,7 +47,7 @@ sub listen {
   my $reuse = my $port = $self->{port} = $args->{port} || 3000;
   $ENV{MOJO_REUSE} ||= '';
   my $fd;
-  if ($ENV{MOJO_REUSE} =~ /(?:^|\,)$reuse\:(\d+)/) { $fd = $1 }
+  if ($ENV{MOJO_REUSE} =~ /(?:^|\,)${reuse}:(\d+)/) { $fd = $1 }
 
   # Allow file descriptor inheritance
   local $^F = 1000;

@@ -21,7 +21,7 @@ my $CLASS_ID_RE = qr/
     (?:\#((?:\\\#|[^.\#])+))   # ID
   )
 /x;
-my $PSEUDO_CLASS_RE = qr/(?:\:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?)/;
+my $PSEUDO_CLASS_RE = qr/(?::([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?)/;
 my $TOKEN_RE        = qr/
   (\s*,\s*)?                         # Separator
   ((?:[^[\\:\s,]|$ESCAPE_RE\s?)+)?   # Element
@@ -79,7 +79,7 @@ sub _attr {
   # Ignore namespace prefix
   my $attrs = $current->[2];
   for my $name (keys %$attrs) {
-    next unless $name =~ /(?:^|\:)$key$/;
+    next unless $name =~ /(?:^|:)$key$/;
     return 1 unless defined $attrs->{$name} && defined $regex;
     return 1 if $attrs->{$name} =~ $regex;
   }
@@ -322,7 +322,7 @@ sub _selector {
     # Tag (ignore namespace prefix)
     if ($type eq 'tag') {
       my $tag = $s->[1];
-      return unless $tag eq '*' || $current->[1] =~ /(?:^|\:)$tag$/;
+      return unless $tag eq '*' || $current->[1] =~ /(?:^|:)$tag$/;
     }
 
     # Attribute

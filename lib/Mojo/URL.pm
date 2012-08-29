@@ -24,7 +24,7 @@ sub authority {
     if ($authority =~ s/^([^\@]+)\@//) { $self->userinfo(url_unescape $1) }
 
     # Port
-    if ($authority =~ s/\:(\d+)$//) { $self->port($1) }
+    if ($authority =~ s/:(\d+)$//) { $self->port($1) }
 
     # Host
     my $host = url_unescape $authority;
@@ -33,7 +33,7 @@ sub authority {
 
   # Format
   my $userinfo = $self->userinfo;
-  $authority .= url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=\:') . '@'
+  $authority .= url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@'
     if $userinfo;
   $authority .= lc($self->ihost || '');
   if (my $port = $self->port) { $authority .= ":$port" }

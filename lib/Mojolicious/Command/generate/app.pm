@@ -11,7 +11,7 @@ sub run {
   $class ||= 'MyMojoliciousApp';
 
   # Prevent bad applications
-  die <<EOF unless $class =~ /^[A-Z](?:\w|\:\:)+$/;
+  die <<EOF unless $class =~ /^[A-Z](?:\w|::)+$/;
 Your application name has to be a well formed (camel case) Perl module name
 like "MyApp".
 EOF

@@ -17,7 +17,7 @@ sub AUTOLOAD {
   my $self = shift;
 
   # Method
-  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)\:\:(\w+)$/;
+  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 
@@ -129,7 +129,7 @@ sub namespace {
 
   # Namespace prefix
   return '' if (my $current = $self->tree)->[0] eq 'root';
-  my $ns = $current->[1] =~ /^(.*?)\:/ ? "xmlns:$1" : undef;
+  my $ns = $current->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
 
   # Walk tree
   while ($current) {

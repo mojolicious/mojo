@@ -45,7 +45,7 @@ sub search {
       next if -d catfile splitdir($path), $file;
 
       # Module found
-      my $class = "$namespace\::" . fileparse $file, qr/\.pm/;
+      my $class = "${namespace}::" . fileparse $file, qr/\.pm/;
       push @modules, $class unless $found{$class}++;
     }
   }
@@ -57,7 +57,7 @@ sub _all {
   my $class = shift;
 
   # Refresh or use cached data
-  my $handle = do { no strict 'refs'; \*{"$class\::DATA"} };
+  my $handle = do { no strict 'refs'; \*{"${class}::DATA"} };
   return $CACHE{$class} || {} unless fileno $handle;
   seek $handle, 0, 0;
   my $content = join '', <$handle>;

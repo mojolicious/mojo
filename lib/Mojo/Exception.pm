@@ -131,7 +131,7 @@ sub _detect {
   if ($self->message =~ /at\s+\Q$name\E\s+line\s+(\d+)/) { $line = $1 }
   else {
     for my $frame (@{$self->frames}) {
-      $line = $frame->[1] =~ /^\(eval\ \d+\)$/ ? $frame->[2] : next;
+      $line = $frame->[1] =~ /^\(eval \d+\)$/ ? $frame->[2] : next;
       last;
     }
   }

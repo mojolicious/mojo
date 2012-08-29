@@ -163,7 +163,7 @@ sub tx {
   my $tx  = Mojo::Transaction::HTTP->new;
   my $req = $tx->req->method(shift);
   my $url = shift;
-  $url = "http://$url" unless $url =~ m!^/|\://!;
+  $url = "http://$url" unless $url =~ m!^/|://!;
   ref $url ? $req->url($url) : $req->url->parse($url);
 
   # Headers

@@ -219,7 +219,7 @@ sub _parse_env {
     # Host/Port
     if ($name eq 'HOST') {
       my ($host, $port) = ($value, undef);
-      ($host, $port) = ($1, $2) if $host =~ /^([^\:]*)\:?(.*)$/;
+      ($host, $port) = ($1, $2) if $host =~ /^([^:]*):?(.*)$/;
       $base->host($host)->port($port);
     }
   }

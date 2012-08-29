@@ -351,8 +351,8 @@ sub _parse_formdata {
     # Content-Disposition header
     my $disposition = $part->headers->content_disposition;
     next unless $disposition;
-    my ($name)     = $disposition =~ /\ name="?([^";]+)"?/;
-    my ($filename) = $disposition =~ /\ filename="?([^"]*)"?/;
+    my ($name)     = $disposition =~ /[; ]name="?([^";]+)"?/;
+    my ($filename) = $disposition =~ /[; ]filename="?([^"]*)"?/;
     my $value      = $part;
 
     # Unescape

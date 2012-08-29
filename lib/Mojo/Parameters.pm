@@ -103,7 +103,7 @@ sub parse {
     my $value = $2 // '';
 
     # Replace "+" with whitespace
-    s/\+/\ /g for $name, $value;
+    s/\+/ /g for $name, $value;
 
     # Unescape
     $name  = url_unescape $name;

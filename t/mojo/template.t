@@ -610,9 +610,9 @@ test
 test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message, qr/^Missing right curly or square bracket/,
+like $output->message, qr/Missing right curly or square bracket/,
   'right message';
-like $output->message, qr/syntax error at template line 5.$/, 'right message';
+like $output->message, qr/syntax error at template line/, 'right message';
 is $output->lines_before->[0][0], 1,          'right number';
 is $output->lines_before->[0][1], 'test',     'right line';
 is $output->lines_before->[1][0], 2,          'right number';
@@ -623,7 +623,7 @@ is $output->lines_before->[3][0], 4,          'right number';
 is $output->lines_before->[3][1], '%= 1 + 1', 'right line';
 is $output->line->[0], 5,      'right number';
 is $output->line->[1], 'test', 'right line';
-like "$output", qr/^Missing right curly or square bracket/, 'right result';
+like "$output", qr/Missing right curly or square bracket/, 'right result';
 like $output->frames->[0][1], qr/Template\.pm$/, 'right file';
 
 # Exception in module
@@ -665,7 +665,7 @@ test
 test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message, qr/oops\!/, 'right message';
+like $output->message, qr/oops!/, 'right message';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->lines_before->[1][0], 2,      'right number';
@@ -676,7 +676,7 @@ is $output->lines_after->[0][0], 4,          'right number';
 is $output->lines_after->[0][1], '%= 1 + 1', 'right line';
 is $output->lines_after->[1][0], 5,          'right number';
 is $output->lines_after->[1][1], 'test',     'right line';
-like "$output", qr/oops\! at template line 3, near "%= 1 \+ 1"./,
+like "$output", qr/oops! at template line 3, near "%= 1 \+ 1"./,
   'right result';
 
 # Exception in template (empty perl lines)
@@ -693,7 +693,7 @@ test
 test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message, qr/oops\!/, 'right message';
+like $output->message, qr/oops!/, 'right message';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 ok $output->lines_before->[0][2], 'contains code';
@@ -714,7 +714,7 @@ is $output->lines_after->[1][2], ' ',   'right code';
 is $output->lines_after->[2][0], 7,     'right number';
 is $output->lines_after->[2][1], '%',   'right line';
 is $output->lines_after->[2][2], ' ',   'right code';
-like "$output", qr/oops\! at template line 4, near "%"./, 'right result';
+like "$output", qr/oops! at template line 4, near "%"./, 'right result';
 
 # Exception in nested template
 $mt = Mojo::Template->new;

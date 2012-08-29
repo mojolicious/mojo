@@ -1,6 +1,8 @@
 
-3.36  2012-08-29
+3.36  2012-08-30
   - Improved documentation.
+  - Improved tests.
+  - Fixed small multipart bug.
 
 3.35  2012-08-28
   - Deprecated Mojolicious::Controller->render_content in favor of content

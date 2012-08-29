@@ -72,7 +72,7 @@ sub decamelize {
 
   # Module parts
   my @parts;
-  for my $part (split /\:\:/, $string) {
+  for my $part (split /::/, $string) {
 
     # Snake case words
     my @words;

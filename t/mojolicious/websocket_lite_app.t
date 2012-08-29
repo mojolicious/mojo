@@ -19,8 +19,8 @@ websocket '/echo' => sub {
   my $self = shift;
   $self->on(
     message => sub {
-      my ($self, $message) = @_;
-      $self->send("echo: $message");
+      my ($self, $msg) = @_;
+      $self->send("echo: $msg");
     }
   );
 };
@@ -43,8 +43,8 @@ websocket '/unicode' => sub {
   my $self = shift;
   $self->on(
     message => sub {
-      my ($self, $message) = @_;
-      $self->send("♥: $message");
+      my ($self, $msg) = @_;
+      $self->send("♥: $msg");
     }
   );
 };
@@ -66,14 +66,14 @@ websocket '/once' => sub {
   my $self = shift;
   $self->on(
     message => sub {
-      my ($self, $message) = @_;
-      $self->send("ONE: $message");
+      my ($self, $msg) = @_;
+      $self->send("ONE: $msg");
     }
   );
   $self->tx->once(
     message => sub {
-      my ($tx, $message) = @_;
-      $self->send("TWO: $message");
+      my ($tx, $msg) = @_;
+      $self->send("TWO: $msg");
     }
   );
 };
@@ -86,8 +86,8 @@ websocket sub {
   my $self = shift;
   $self->on(
     message => sub {
-      my ($self, $message) = @_;
-      $self->send("nested echo: $message");
+      my ($self, $msg) = @_;
+      $self->send("nested echo: $msg");
     }
   );
 };

@@ -37,10 +37,10 @@ get '/params' => sub {
 };
 
 # Simple
-my $message = '';
+my $msg = '';
 {
   local *STDOUT;
-  open STDOUT, '>', \$message;
+  open STDOUT, '>', \$msg;
   local %ENV = (
     PATH_INFO       => '/',
     REQUEST_METHOD  => 'GET',
@@ -50,8 +50,7 @@ my $message = '';
   );
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 }
-my $res
-  = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
+my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
 is $res->code, 200, 'right status';
 is $res->headers->status, '200 OK', 'right "Status" value';
 is $res->headers->content_type, 'text/html;charset=UTF-8',
@@ -59,10 +58,10 @@ is $res->headers->content_type, 'text/html;charset=UTF-8',
 like $res->body, qr/Mojo/, 'right content';
 
 # Non-parsed headers
-$message = '';
+$msg = '';
 {
   local *STDOUT;
-  open STDOUT, '>', \$message;
+  open STDOUT, '>', \$msg;
   local %ENV = (
     PATH_INFO       => '/',
     REQUEST_METHOD  => 'GET',
@@ -73,7 +72,7 @@ $message = '';
   is(Mojolicious::Command::cgi->new(app => app)->run('--nph'),
     200, 'right status');
 }
-$res = Mojo::Message::Response->new->parse($message);
+$res = Mojo::Message::Response->new->parse($msg);
 is $res->code, 200, 'right status';
 is $res->headers->status, undef, 'no "Status" value';
 is $res->headers->content_type, 'text/html;charset=UTF-8',
@@ -82,12 +81,12 @@ like $res->body, qr/Mojo/, 'right content';
 
 # Chunked
 my $content = 'test1=1&test2=2&test3=3&test4=4&test5=5&test6=6&test7=7';
-$message = '';
+$msg = '';
 {
   local *STDIN;
   open STDIN, '<', \$content;
   local *STDOUT;
-  open STDOUT, '>', \$message;
+  open STDOUT, '>', \$msg;
   local %ENV = (
     PATH_INFO       => '/chunked',
     CONTENT_LENGTH  => length($content),
@@ -99,17 +98,17 @@ $message = '';
   );
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 }
-like $message, qr/chunked/, 'is chunked';
-$res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
+like $msg, qr/chunked/, 'is chunked';
+$res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
 is $res->code, 200, 'right status';
 is $res->headers->status, '200 OK', 'right "Status" value';
 is $res->body, '1234567', 'right content';
 
 # Parameters
-$message = '';
+$msg = '';
 {
   local *STDOUT;
-  open STDOUT, '>', \$message;
+  open STDOUT, '>', \$msg;
   local %ENV = (
     PATH_INFO       => '/params',
     QUERY_STRING    => 'lalala=23&bar=baz',
@@ -120,7 +119,7 @@ $message = '';
   );
   is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
 }
-$res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$message");
+$res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
 is $res->code, 200, 'right status';
 is $res->headers->status, '200 OK', 'right "Status" value';
 is $res->headers->content_type, 'application/json',

@@ -50,8 +50,8 @@ websocket '/test' => sub {
   my $self = shift;
   $self->on(
     message => sub {
-      my ($self, $message) = @_;
-      $self->send("${message}test2");
+      my ($self, $msg) = @_;
+      $self->send("${msg}test2");
     }
   );
 };
@@ -195,8 +195,8 @@ $ua->websocket(
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
       message => sub {
-        my ($tx, $message) = @_;
-        $result = $message;
+        my ($tx, $msg) = @_;
+        $result = $msg;
         $tx->finish;
       }
     );
@@ -248,8 +248,8 @@ $ua->websocket(
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
       message => sub {
-        my ($tx, $message) = @_;
-        $result = $message;
+        my ($tx, $msg) = @_;
+        $result = $msg;
         $tx->finish;
       }
     );

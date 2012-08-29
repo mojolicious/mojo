@@ -779,9 +779,9 @@ is $output, "<html foo=\"bar\">\n3 test 4 lala \n4\n\</html>\n", 'all tags';
 # Arguments
 $mt = Mojo::Template->new;
 $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
-% my $message = shift;
+% my $msg = shift;
 <html><% my $hash = $_[0]; %>
-%= $message . ' ' . $hash->{foo}
+%= $msg . ' ' . $hash->{foo}
 </html>
 EOF
 is $output, "<html>\ntest bar\n</html>\n", 'arguments';
@@ -1001,9 +1001,9 @@ $mt->tag_start('[$-');
 $mt->tag_end('-$]');
 $mt->line_start('$-');
 $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
-$- my $message = shift;
+$- my $msg = shift;
 <html>[$- my $hash = $_[0]; -$]
-$-= $message . ' ' . $hash->{foo}
+$-= $msg . ' ' . $hash->{foo}
 </html>
 EOF
 is $output, "<html>\ntest bar\n</html>\n", 'different tags and line start';
@@ -1013,9 +1013,9 @@ $mt = Mojo::Template->new;
 $mt->comment_mark('@@@');
 $mt->expression_mark('---');
 $output = $mt->render(<<'EOF', 'test', {foo => 'bar'});
-% my $message = shift;
+% my $msg = shift;
 <html><% my $hash = $_[0]; %><%@@@ comment lalala %>
-%--- $message . ' ' . $hash->{foo}
+%--- $msg . ' ' . $hash->{foo}
 </html>
 EOF
 is $output, <<EOF, 'different expression and comment mark';

@@ -28,30 +28,30 @@ like $log->format(qw(debug Test 1 2 3)),
   qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
 
 # Events
-my $messages = [];
+my $msgs = [];
 $log->unsubscribe('message')->on(
   message => sub {
     my ($log, $level, @lines) = @_;
-    push @$messages, $level, @lines;
+    push @$msgs, $level, @lines;
   }
 );
 $log->debug('Test', 1, 2, 3);
-is_deeply $messages, [qw(debug Test 1 2 3)], 'right message';
-$messages = [];
+is_deeply $msgs, [qw(debug Test 1 2 3)], 'right message';
+$msgs = [];
 $log->info('Test', 1, 2, 3);
-is_deeply $messages, [qw(info Test 1 2 3)], 'right message';
-$messages = [];
+is_deeply $msgs, [qw(info Test 1 2 3)], 'right message';
+$msgs = [];
 $log->warn('Test', 1, 2, 3);
-is_deeply $messages, [qw(warn Test 1 2 3)], 'right message';
-$messages = [];
+is_deeply $msgs, [qw(warn Test 1 2 3)], 'right message';
+$msgs = [];
 $log->error('Test', 1, 2, 3);
-is_deeply $messages, [qw(error Test 1 2 3)], 'right message';
-$messages = [];
+is_deeply $msgs, [qw(error Test 1 2 3)], 'right message';
+$msgs = [];
 $log->fatal('Test', 1, 2, 3);
-is_deeply $messages, [qw(fatal Test 1 2 3)], 'right message';
-$messages = [];
+is_deeply $msgs, [qw(fatal Test 1 2 3)], 'right message';
+$msgs = [];
 $log->log('fatal', 'Test', 1, 2, 3);
-is_deeply $messages, [qw(fatal Test 1 2 3)], 'right message';
+is_deeply $msgs, [qw(fatal Test 1 2 3)], 'right message';
 
 # "debug"
 is $log->level('debug')->level, 'debug', 'right level';

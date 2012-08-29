@@ -115,8 +115,8 @@ Web development for humans, making hard things possible and everything fun.
   websocket '/echo' => sub {
     my $self = shift;
     $self->on(message => sub {
-      my ($self, $message) = @_;
-      $self->send("echo: $message");
+      my ($self, $msg) = @_;
+      $self->send("echo: $msg");
     });
   };
 

@@ -209,7 +209,7 @@ any time.
     my $self = shift;
 
     # Get message from stash
-    my $message = $self->stash('mymessage');
+    my $msg = $self->stash('mymessage');
 
     # Change message in stash
     $self->stash(mymessage => 'Welcome');
@@ -503,8 +503,8 @@ additional information.
   sub echo {
     my $self = shift;
     $self->on(message => sub {
-      my ($self, $message) = @_;
-      $self->send("echo: $message");
+      my ($self, $msg) = @_;
+      $self->send("echo: $msg");
     });
   }
 

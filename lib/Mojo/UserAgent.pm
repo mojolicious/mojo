@@ -529,8 +529,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->post_form('search.cpan.org/search' => {q => 'mojo'});
   if (my $res = $tx->success) { say $res->body }
   else {
-    my ($message, $code) = $tx->error;
-    say $code ? "$code response: $message" : "Connection error: $message";
+    my ($msg, $code) = $tx->error;
+    say $code ? "$code response: $msg" : "Connection error: $msg";
   }
 
   # Quick JSON API request with Basic authentication
@@ -591,8 +591,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     my ($ua, $tx) = @_;
     $tx->on(finish  => sub { say 'WebSocket closed.' });
     $tx->on(message => sub {
-      my ($tx, $message) = @_;
-      say "WebSocket message: $message";
+      my ($tx, $msg) = @_;
+      say "WebSocket message: $msg";
       $tx->finish;
     });
     $tx->send('hi there!');
@@ -1042,8 +1042,8 @@ exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($ua, $tx) = @_;
     $tx->on(message => sub {
-      my ($tx, $message) = @_;
-      say $message;
+      my ($tx, $msg) = @_;
+      say $msg;
     });
     $tx->send('Hi!');
   });

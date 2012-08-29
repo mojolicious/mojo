@@ -408,39 +408,39 @@ L<Mojo::Message> can emit the following events.
 
 =head2 C<finish>
 
-  $message->on(finish => sub {
-    my $message = shift;
+  $msg->on(finish => sub {
+    my $msg = shift;
     ...
   });
 
 Emitted after message building or parsing is finished.
 
   my $before = time;
-  $message->on(finish => sub {
-    my $message = shift;
-    $message->headers->header('X-Parser-Time' => time - $before);
+  $msg->on(finish => sub {
+    my $msg = shift;
+    $msg->headers->header('X-Parser-Time' => time - $before);
   });
 
 =head2 C<progress>
 
-  $message->on(progress => sub {
-    my $message = shift;
+  $msg->on(progress => sub {
+    my $msg = shift;
     ...
   });
 
 Emitted when message building or parsing makes progress.
 
   # Building
-  $message->on(progress => sub {
-    my ($message, $state, $offset) = @_;
+  $msg->on(progress => sub {
+    my ($msg, $state, $offset) = @_;
     say qq{Building "$state" at offset $offset};
   });
 
   # Parsing
-  $message->on(progress => sub {
-    my $message = shift;
-    return unless my $len = $message->headers->content_length;
-    my $size = $message->content->progress;
+  $msg->on(progress => sub {
+    my $msg = shift;
+    return unless my $len = $msg->headers->content_length;
+    my $size = $msg->content->progress;
     say 'Progress: ', $size == $len ? 100 : int($size / ($len / 100)), '%';
   });
 
@@ -450,30 +450,30 @@ L<Mojo::Message> implements the following attributes.
 
 =head2 C<content>
 
-  my $message = $message->content;
-  $message    = $message->content(Mojo::Content::Single->new);
+  my $msg = $msg->content;
+  $msg    = $msg->content(Mojo::Content::Single->new);
 
 Message content, defaults to a L<Mojo::Content::Single> object.
 
 =head2 C<default_charset>
 
-  my $charset = $message->default_charset;
-  $message    = $message->default_charset('UTF-8');
+  my $charset = $msg->default_charset;
+  $msg        = $msg->default_charset('UTF-8');
 
 Default charset used for form data parsing, defaults to C<UTF-8>.
 
 =head2 C<max_line_size>
 
-  my $size = $message->max_line_size;
-  $message = $message->max_line_size(1024);
+  my $size = $msg->max_line_size;
+  $msg     = $msg->max_line_size(1024);
 
 Maximum start line size in bytes, defaults to the value of the
 C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
 
 =head2 C<max_message_size>
 
-  my $size = $message->max_message_size;
-  $message = $message->max_message_size(1024);
+  my $size = $msg->max_message_size;
+  $msg     = $msg->max_message_size(1024);
 
 Maximum message size in bytes, defaults to the value of the
 C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<5242880>. Note that
@@ -483,8 +483,8 @@ C<body_params>, C<dom> or C<json> methods.
 
 =head2 C<version>
 
-  my $version = $message->version;
-  $message    = $message->version('1.1');
+  my $version = $msg->version;
+  $msg        = $msg->version('1.1');
 
 HTTP version of message, defaults to C<1.1>.
 
@@ -495,20 +495,20 @@ implements the following new ones.
 
 =head2 C<body>
 
-  my $string = $message->body;
-  $message   = $message->body('Hello!');
-  my $cb     = $message->body(sub {...});
+  my $string = $msg->body;
+  $msg       = $msg->body('Hello!');
+  my $cb     = $msg->body(sub {...});
 
 Access C<content> data or replace all subscribers of the C<read> event.
 
-  $message->body(sub {
-    my ($message, $chunk) = @_;
+  $msg->body(sub {
+    my ($msg, $chunk) = @_;
     say "Streaming: $chunk";
   });
 
 =head2 C<body_params>
 
-  my $p = $message->body_params;
+  my $p = $msg->body_params;
 
 C<POST> parameters extracted from C<x-application-urlencoded>,
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
@@ -516,54 +516,54 @@ usually a L<Mojo::Parameters> object. Note that this method caches all data,
 so it should not be called before the entire message body has been received.
 
   # Get POST parameter value
-  say $message->body_params->param('foo');
+  say $msg->body_params->param('foo');
 
 =head2 C<body_size>
 
-  my $size = $message->body_size;
+  my $size = $msg->body_size;
 
 Content size in bytes.
 
 =head2 C<build_body>
 
-  my $string = $message->build_body;
+  my $string = $msg->build_body;
 
 Render whole body.
 
 =head2 C<build_headers>
 
-  my $string = $message->build_headers;
+  my $string = $msg->build_headers;
 
 Render all headers.
 
 =head2 C<build_start_line>
 
-  my $string = $message->build_start_line;
+  my $string = $msg->build_start_line;
 
 Render start line.
 
 =head2 C<cookie>
 
-  my $cookie  = $message->cookie('foo');
-  my @cookies = $message->cookie('foo');
+  my $cookie  = $msg->cookie('foo');
+  my @cookies = $msg->cookie('foo');
 
 Access message cookies, usually L<Mojo::Cookie::Request> or
 L<Mojo::Cookie::Response> objects. Note that this method caches all data, so
 it should not be called before all headers have been received.
 
   # Get cookie value
-  say $message->cookie('foo')->value;
+  say $msg->cookie('foo')->value;
 
 =head2 C<cookies>
 
-  my $cookies = $message->cookies;
+  my $cookies = $msg->cookies;
 
 Access message cookies. Meant to be overloaded in a subclass.
 
 =head2 C<dom>
 
-  my $dom        = $message->dom;
-  my $collection = $message->dom('a[href]');
+  my $dom        = $msg->dom;
+  my $collection = $msg->dom('a[href]');
 
 Turns message body into a L<Mojo::DOM> object and takes an optional selector
 to perform a C<find> on it right away, which returns a L<Mojo::Collection>
@@ -571,106 +571,106 @@ object. Note that this method caches all data, so it should not be called
 before the entire message body has been received.
 
   # Perform "find" right away
-  say $message->dom('h1, h2, h3')->pluck('text');
+  say $msg->dom('h1, h2, h3')->pluck('text');
 
   # Use everything else Mojo::DOM has to offer
-  say $message->dom->at('title')->text;
-  say $message->dom->html->body->children->pluck('type')->uniq;
+  say $msg->dom->at('title')->text;
+  say $msg->dom->html->body->children->pluck('type')->uniq;
 
 =head2 C<error>
 
-  my $message          = $message->error;
-  my ($message, $code) = $message->error;
-  $message             = $message->error('Parser error');
-  $message             = $message->error('Parser error', 500);
+  my $msg          = $msg->error;
+  my ($msg, $code) = $msg->error;
+  $msg             = $msg->error('Parser error');
+  $msg             = $msg->error('Parser error', 500);
 
 Parser errors and codes.
 
 =head2 C<extract_start_line>
 
-  my $success = $message->extract_start_line(\$string);
+  my $success = $msg->extract_start_line(\$string);
 
 Extract start line from string. Meant to be overloaded in a subclass.
 
 =head2 C<fix_headers>
 
-  $message = $message->fix_headers;
+  $msg = $msg->fix_headers;
 
 Make sure message has all required headers for the current HTTP version.
 
 =head2 C<get_body_chunk>
 
-  my $string = $message->get_body_chunk($offset);
+  my $string = $msg->get_body_chunk($offset);
 
 Get a chunk of body data starting from a specific position.
 
 =head2 C<get_header_chunk>
 
-  my $string = $message->get_header_chunk($offset);
+  my $string = $msg->get_header_chunk($offset);
 
 Get a chunk of header data, starting from a specific position.
 
 =head2 C<get_start_line_chunk>
 
-  my $string = $message->get_start_line_chunk($offset);
+  my $string = $msg->get_start_line_chunk($offset);
 
 Get a chunk of start line data starting from a specific position. Meant to be
 overloaded in a subclass.
 
 =head2 C<has_leftovers>
 
-  my $success = $message->has_leftovers;
+  my $success = $msg->has_leftovers;
 
 Check if there are leftovers.
 
 =head2 C<header_size>
 
-  my $size = $message->header_size;
+  my $size = $msg->header_size;
 
 Size of headers in bytes.
 
 =head2 C<headers>
 
-  my $headers = $message->headers;
+  my $headers = $msg->headers;
 
 Message headers, usually a L<Mojo::Headers> object.
 
 =head2 C<is_chunked>
 
-  my $success = $message->is_chunked;
+  my $success = $msg->is_chunked;
 
 Check if content is chunked.
 
 =head2 C<is_dynamic>
 
-  my $success = $message->is_dynamic;
+  my $success = $msg->is_dynamic;
 
 Check if content will be dynamically generated, which prevents C<clone> from
 working.
 
 =head2 C<is_finished>
 
-  my $success = $message->is_finished;
+  my $success = $msg->is_finished;
 
 Check if parser is finished.
 
 =head2 C<is_limit_exceeded>
 
-  my $success = $message->is_limit_exceeded;
+  my $success = $msg->is_limit_exceeded;
 
 Check if message has exceeded C<max_line_size> or C<max_message_size>.
 
 =head2 C<is_multipart>
 
-  my $success = $message->is_multipart;
+  my $success = $msg->is_multipart;
 
 Check if content is a L<Mojo::Content::MultiPart> object.
 
 =head2 C<json>
 
-  my $hash  = $message->json;
-  my $array = $message->json;
-  my $value = $message->json('/foo/bar');
+  my $hash  = $msg->json;
+  my $array = $msg->json;
+  my $value = $msg->json('/foo/bar');
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise. An optional JSON Pointer can be used to extract a specific
@@ -678,72 +678,72 @@ value with L<Mojo::JSON::Pointer>. Note that this method caches all data, so
 it should not be called before the entire message body has been received.
 
   # Extract JSON values
-  say $message->json->{foo}{bar}[23];
-  say $message->json('/foo/bar/23');
+  say $msg->json->{foo}{bar}[23];
+  say $msg->json('/foo/bar/23');
 
 =head2 C<leftovers>
 
-  my $bytes = $message->leftovers;
+  my $bytes = $msg->leftovers;
 
 Get leftover data from content parser.
 
 =head2 C<param>
 
-  my @names = $message->param;
-  my $foo   = $message->param('foo');
-  my @foo   = $message->param('foo');
+  my @names = $msg->param;
+  my $foo   = $msg->param('foo');
+  my @foo   = $msg->param('foo');
 
 Access C<POST> parameters. Note that this method caches all data, so it should
 not be called before the entire message body has been received.
 
 =head2 C<parse>
 
-  $message = $message->parse('HTTP/1.1 200 OK...');
+  $msg = $msg->parse('HTTP/1.1 200 OK...');
 
 Parse message chunk.
 
 =head2 C<start_line_size>
 
-  my $size = $message->start_line_size;
+  my $size = $msg->start_line_size;
 
 Size of the start line in bytes.
 
 =head2 C<to_string>
 
-  my $string = $message->to_string;
+  my $string = $msg->to_string;
 
 Render whole message.
 
 =head2 C<upload>
 
-  my $upload  = $message->upload('foo');
-  my @uploads = $message->upload('foo');
+  my $upload  = $msg->upload('foo');
+  my @uploads = $msg->upload('foo');
 
 Access C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 Note that this method caches all data, so it should not be called before the
 entire message body has been received.
 
   # Get content of uploaded file
-  say $message->upload('foo')->asset->slurp;
+  say $msg->upload('foo')->asset->slurp;
 
 =head2 C<uploads>
 
-  my $uploads = $message->uploads;
+  my $uploads = $msg->uploads;
 
 All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 
 =head2 C<write>
 
-  $message = $message->write('Hello!');
-  $message = $message->write('Hello!' => sub {...});
+  $msg = $msg->write('Hello!');
+  $msg = $msg->write('Hello!' => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be
 invoked once all data has been written.
 
 =head2 C<write_chunk>
 
-  $message = $message->write_chunk('Hello!');
-  $message = $message->write_chunk('Hello!' => sub {...});
+  $msg = $msg->write_chunk('Hello!');
+  $msg = $msg->write_chunk('Hello!' => sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.

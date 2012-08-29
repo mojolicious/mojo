@@ -25,11 +25,11 @@ app->log->on(message => sub { shift; $log .= join ':', @_ });
 
 # GET /logger
 get '/logger' => sub {
-  my $self    = shift;
-  my $level   = $self->param('level');
-  my $message = $self->param('message');
-  $self->app->log->log($level => $message);
-  $self->render(text => "$level: $message");
+  my $self  = shift;
+  my $level = $self->param('level');
+  my $msg   = $self->param('message');
+  $self->app->log->log($level => $msg);
+  $self->render(text => "$level: $msg");
 };
 
 # GET /dead_template

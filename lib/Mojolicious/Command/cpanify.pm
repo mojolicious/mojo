@@ -41,10 +41,10 @@ sub run {
   # Error
   unless ($tx->success) {
     my $code = $tx->res->code || '';
-    my $message = $tx->error;
-    if    ($code eq '401') { $message = 'Wrong username or password.' }
-    elsif ($code eq '409') { $message = 'File already exists on CPAN.' }
-    die qq{Problem uploading file "$file". ($message)\n};
+    my $msg = $tx->error;
+    if    ($code eq '401') { $msg = 'Wrong username or password.' }
+    elsif ($code eq '409') { $msg = 'File already exists on CPAN.' }
+    die qq{Problem uploading file "$file". ($msg)\n};
   }
   say 'Upload successful!';
 }

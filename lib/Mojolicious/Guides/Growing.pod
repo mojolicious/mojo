@@ -452,8 +452,8 @@ like this.
 
   @@ protected.html.ep
   % layout 'default';
-  % if (my $message = flash 'message') {
-    <b><%= $message %></b><br>
+  % if (my $msg = flash 'message') {
+    <b><%= $msg %></b><br>
   % }
   Welcome <%= session 'user' %>.<br>
   %= link_to Logout => 'logout'

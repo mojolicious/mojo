@@ -13,8 +13,8 @@ plugin 'Config';
 # Message condition
 app->routes->add_condition(
   message => sub {
-    my ($r, $c, $captures, $message) = @_;
-    $c->res->headers->header('X-Message' => $message);
+    my ($r, $c, $captures, $msg) = @_;
+    $c->res->headers->header('X-Message' => $msg);
     return 1;
   }
 );

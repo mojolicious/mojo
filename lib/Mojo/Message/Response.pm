@@ -118,9 +118,9 @@ sub get_start_line_chunk {
 
   # Status line
   unless (defined $self->{start_buffer}) {
-    my $code    = $self->code    || 404;
-    my $message = $self->message || $self->default_message;
-    $self->{start_buffer} = "HTTP/@{[$self->version]} $code $message\x0d\x0a";
+    my $code = $self->code    || 404;
+    my $msg  = $self->message || $self->default_message;
+    $self->{start_buffer} = "HTTP/@{[$self->version]} $code $msg\x0d\x0a";
   }
 
   # Progress
@@ -192,8 +192,8 @@ HTTP response code.
 
 =head2 C<message>
 
-  my $message = $res->message;
-  $res        = $res->message('OK');
+  my $msg = $res->message;
+  $res    = $res->message('OK');
 
 HTTP response message.
 
@@ -212,7 +212,7 @@ Access response cookies, usually L<Mojo::Cookie::Response> objects.
 
 =head2 C<default_message>
 
-  my $message = $res->default_message;
+  my $msg = $res->default_message;
 
 Generate default response message for code.
 

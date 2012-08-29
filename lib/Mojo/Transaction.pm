@@ -220,8 +220,8 @@ Connection identifier or socket.
 
 =head2 C<error>
 
-  my $message          = $tx->error;
-  my ($message, $code) = $tx->error;
+  my $msg          = $tx->error;
+  my ($msg, $code) = $tx->error;
 
 Parser errors and codes.
 
@@ -278,8 +278,8 @@ message in C<error>, 400 and 500 responses also a code.
   # Sensible exception handling
   if (my $res = $tx->success) { say $res->body }
   else {
-    my ($message, $code) = $tx->error;
-    say $code ? "$code response: $message" : "Connection error: $message";
+    my ($msg, $code) = $tx->error;
+    say $code ? "$code response: $msg" : "Connection error: $msg";
   }
 
 Error messages can be accessed with the C<error> method of the transaction

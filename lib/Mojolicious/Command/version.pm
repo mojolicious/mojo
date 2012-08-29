@@ -43,12 +43,12 @@ EOF
 
   # Message
   return unless $latest;
-  my $message = 'This version is up to date, have fun!';
-  $message = 'Thanks for testing a development release, you are awesome!'
+  my $msg = 'This version is up to date, have fun!';
+  $msg = 'Thanks for testing a development release, you are awesome!'
     if $latest < $Mojolicious::VERSION;
-  $message = "You might want to update your Mojolicious to $latest."
+  $msg = "You might want to update your Mojolicious to $latest."
     if $latest > $Mojolicious::VERSION;
-  say $message;
+  say $msg;
 }
 
 1;

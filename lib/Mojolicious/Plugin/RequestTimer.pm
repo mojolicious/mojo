@@ -22,11 +22,11 @@ sub _end {
   return if $stash->{'mojo.static'};
   my $elapsed = sprintf '%f',
     Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
-  my $rps     = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
-  my $res     = $self->res;
-  my $code    = $res->code || 200;
-  my $message = $res->message || $res->default_message($code);
-  $self->app->log->debug("$code $message (${elapsed}s, $rps/s).");
+  my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+  my $res  = $self->res;
+  my $code = $res->code || 200;
+  my $msg  = $res->message || $res->default_message($code);
+  $self->app->log->debug("$code $msg (${elapsed}s, $rps/s).");
 }
 
 sub _start {

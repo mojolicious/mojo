@@ -279,10 +279,9 @@ sub _message {
   return unless $frame->[0];
 
   # Message
-  my $message = delete $self->{message};
-  $message = decode 'UTF-8', $message
-    if $message && delete $self->{op} == TEXT;
-  $self->emit(message => $message);
+  my $msg = delete $self->{message};
+  $msg = decode 'UTF-8', $msg if $msg && delete $self->{op} == TEXT;
+  $self->emit(message => $msg);
 }
 
 sub _xor_mask {
@@ -309,8 +308,8 @@ Mojo::Transaction::WebSocket - WebSocket transaction
   my $ws = Mojo::Transaction::WebSocket->new;
   $ws->send('Hello World!');
   $ws->on(message => sub {
-    my ($ws, $message) = @_;
-    say "Message: $message";
+    my ($ws, $msg) = @_;
+    say "Message: $msg";
   });
   $ws->on(finish => sub {
     my $ws = shift;
@@ -365,15 +364,15 @@ Emitted when a WebSocket frame has been received.
 =head2 C<message>
 
   $ws->on(message => sub {
-    my ($ws, $message) = @_;
+    my ($ws, $msg) = @_;
     ...
   });
 
 Emitted when a complete WebSocket message has been received.
 
   $ws->on(message => sub {
-    my ($ws, $message) = @_;
-    say "Message: $message";
+    my ($ws, $msg) = @_;
+    say "Message: $msg";
   });
 
 =head1 ATTRIBUTES

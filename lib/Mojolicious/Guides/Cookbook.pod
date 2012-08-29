@@ -442,8 +442,8 @@ method L<Mojolicious::Controller/"on">.
 
     # Incoming message
     $self->on(message => sub {
-      my ($self, $message) = @_;
-      $self->send("echo: $message");
+      my ($self, $msg) = @_;
+      $self->send("echo: $msg");
     });
 
     # Disconnected
@@ -526,8 +526,8 @@ protocol for transport.
 
     # Subscribe to "message" event and forward "log" events to browser
     my $cb = $self->app->log->on(message => sub {
-      my ($log, $level, $message) = @_;
-      $self->write("event:log\ndata: [$level] $message\n\n");
+      my ($log, $level, @lines) = @_;
+      $self->write("event:log\ndata: [$level] @lines\n\n");
     });
 
     # Unsubscribe from "message" event again once we are done

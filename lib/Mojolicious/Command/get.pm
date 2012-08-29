@@ -92,9 +92,9 @@ sub run {
         # Response
         my $version     = $res->version;
         my $code        = $res->code;
-        my $message     = $res->message;
+        my $msg         = $res->message;
         my $res_headers = $res->headers->to_string;
-        warn "HTTP/$version $code $message\n$res_headers\n\n";
+        warn "HTTP/$version $code $msg\n$res_headers\n\n";
 
         # Finished
         $v = undef;
@@ -123,9 +123,9 @@ sub run {
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
 
   # Error
-  my ($message, $code) = $tx->error;
+  my ($msg, $code) = $tx->error;
   $url = encode 'UTF-8', $url;
-  warn qq{Problem loading URL "$url". ($message)\n} if $message && !$code;
+  warn qq{Problem loading URL "$url". ($msg)\n} if $msg && !$code;
 
   # JSON Pointer
   return unless $selector;

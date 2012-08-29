@@ -212,8 +212,8 @@ sub reset_session {
 }
 
 sub send_ok {
-  my ($self, $message, $desc) = @_;
-  $self->tx->send($message => sub { Mojo::IOLoop->stop });
+  my ($self, $msg, $desc) = @_;
+  $self->tx->send($msg => sub { Mojo::IOLoop->stop });
   Mojo::IOLoop->start;
   return $self->_test('ok', 1, $desc || 'send message');
 }

@@ -283,8 +283,8 @@ Short hint shown after listing available commands.
 
 =head2 C<message>
 
-  my $message = $commands->message;
-  $commands   = $commands->message('Hello World!');
+  my $msg   = $commands->message;
+  $commands = $commands->message('Hello World!');
 
 Short usage message shown before listing available commands.
 

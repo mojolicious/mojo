@@ -28,8 +28,7 @@ sub each {
 
 sub first {
   my ($self, $cb) = @_;
-  return $self->[0] unless $cb;
-  return List::Util::first { $_ ~~ $cb } @$self;
+  return $cb ? List::Util::first { $_ ~~ $cb } @$self : $self->[0];
 }
 
 sub grep {
@@ -38,8 +37,8 @@ sub grep {
 }
 
 sub join {
-  my ($self, $expression) = @_;
-  return Mojo::ByteStream->new(join $expression, map({"$_"} @$self));
+  my ($self, $expr) = @_;
+  return Mojo::ByteStream->new(join $expr, map({"$_"} @$self));
 }
 
 sub map {
@@ -71,8 +70,7 @@ sub slice {
 
 sub sort {
   my ($self, $cb) = @_;
-  return $self->new(sort @$self) unless $cb;
-  return $self->new(sort { $a->$cb($b) } @$self);
+  return $self->new($cb ? sort { $a->$cb($b) } @$self : sort @$self);
 }
 
 sub uniq {

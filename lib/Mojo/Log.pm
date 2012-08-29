@@ -191,8 +191,8 @@ Log fatal message.
 
 =head2 C<format>
 
-  my $message = $log->format('debug', 'Hi there!');
-  my $message = $log->format('debug', 'Hi', 'there!');
+  my $msg = $log->format('debug', 'Hi there!');
+  my $msg = $log->format('debug', 'Hi', 'there!');
 
 Format log message.
 

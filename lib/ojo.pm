@@ -57,9 +57,9 @@ sub import {
 
 sub _request {
   my $tx = $UA->start(@_);
-  my ($message, $code) = $tx->error;
-  warn qq/Problem loading URL "@{[$tx->req->url->to_abs]}". ($message)\n/
-    if $message && !$code;
+  my ($msg, $code) = $tx->error;
+  warn qq/Problem loading URL "@{[$tx->req->url->to_abs]}". ($msg)\n/
+    if $msg && !$code;
   return $tx->res;
 }
 

@@ -820,8 +820,8 @@ WebSocket applications have never been this easy before.
   websocket '/echo' => sub {
     my $self = shift;
     $self->on(message => sub {
-      my ($self, $message) = @_;
-      $self->send("echo: $message");
+      my ($self, $msg) = @_;
+      $self->send("echo: $msg");
     });
   };
 

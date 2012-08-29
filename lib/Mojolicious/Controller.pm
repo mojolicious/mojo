@@ -309,11 +309,11 @@ sub respond_to {
 }
 
 sub send {
-  my ($self, $message, $cb) = @_;
+  my ($self, $msg, $cb) = @_;
   my $tx = $self->tx;
   Carp::croak('No WebSocket connection to send message to')
     unless $tx->is_websocket;
-  $tx->send($message => sub { shift and $self->$cb(@_) if $cb });
+  $tx->send($msg => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered(101);
 }
 
@@ -585,8 +585,8 @@ L<Mojo::Transaction::WebSocket> object.
 
   # Emitted when new WebSocket messages arrive
   $c->on(message => sub {
-    my ($c, $message) = @_;
-    $c->app->log->debug("Message: $message");
+    my ($c, $msg) = @_;
+    $c->app->log->debug("Message: $msg");
   });
 
 =head2 C<param>

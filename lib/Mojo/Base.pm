@@ -128,11 +128,11 @@ Mojo::Base - Minimal base class for Mojo projects
   use Mojo::Base -strict;
 
   my $mew = Cat->new(name => 'Longcat');
-  say $mew->paws;
-  say $mew->paws(5)->ears(4)->paws;
+  say $mew->ears;
+  say $mew->ears(3)->eyes(4)->ears;
 
   my $rawr = Tiger->new(stripes => 23);
-  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->paws;
+  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->ears;
 
 =head1 DESCRIPTION
 

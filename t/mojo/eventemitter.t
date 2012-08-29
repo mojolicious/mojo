@@ -22,8 +22,8 @@ $e->on(error => sub { $err = pop });
 $e->on(test2 => sub { $echo .= 'echo: ' . pop });
 $e->on(
   test2 => sub {
-    my ($self, $message) = @_;
-    die "test2: $message\n";
+    my ($self, $msg) = @_;
+    die "test2: $msg\n";
   }
 );
 my $cb = sub { $echo .= 'echo2: ' . pop };

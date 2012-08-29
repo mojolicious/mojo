@@ -89,13 +89,13 @@ sub _detect {
   my $self = shift;
 
   # Message
-  my $message = shift;
-  return $message if blessed $message && $message->isa('Mojo::Exception');
-  $self->message($message)->raw_message($message);
+  my $msg = shift;
+  return $msg if blessed $msg && $msg->isa('Mojo::Exception');
+  $self->message($msg)->raw_message($msg);
 
   # Extract file and line from message
   my @trace;
-  while ($message =~ /at\s+(.+?)\s+line\s+(\d+)/g) { push @trace, [$1, $2] }
+  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { push @trace, [$1, $2] }
 
   # Extract file and line from stacktrace
   my $first = $self->frames->[0];
@@ -115,15 +115,15 @@ sub _detect {
 
   # Fix file in message
   return $self unless my $name = shift;
-  unless (ref $message) {
+  unless (ref $msg) {
     my $filter = sub {
       my $num  = shift;
       my $new  = "$name line $num";
       my $line = $lines[0][$num];
       return defined $line ? qq{$new, near "$line".} : "$new.";
     };
-    $message =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;
-    $self->message($message);
+    $msg =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;
+    $self->message($msg);
   }
 
   # Search for better context
@@ -191,15 +191,15 @@ Lines before the line where the exception occured.
 
 =head2 C<message>
 
-  my $message = $e->message;
-  $e          = $e->message('Oops!');
+  my $msg = $e->message;
+  $e      = $e->message('Oops!');
 
 Exception message.
 
 =head2 C<raw_message>
 
-  my $message = $e->raw_message;
-  $e          = $e->raw_message('Oops!');
+  my $msg = $e->raw_message;
+  $e      = $e->raw_message('Oops!');
 
 Raw unprocessed exception message.
 

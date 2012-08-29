@@ -463,8 +463,8 @@ L<Mojo::Template> implements the following attributes.
 
 =head2 C<auto_escape>
 
-  my $auto_escape = $mt->auto_escape;
-  $mt             = $mt->auto_escape(1);
+  my $escape = $mt->auto_escape;
+  $mt        = $mt->auto_escape(1);
 
 Activate automatic XML escaping.
 
@@ -479,8 +479,8 @@ wrong.
 
 =head2 C<capture_end>
 
-  my $capture_end = $mt->capture_end;
-  $mt             = $mt->capture_end('end');
+  my $end = $mt->capture_end;
+  $mt     = $mt->capture_end('end');
 
 Keyword indicating the end of a capture block, defaults to C<end>.
 
@@ -490,8 +490,8 @@ Keyword indicating the end of a capture block, defaults to C<end>.
 
 =head2 C<capture_start>
 
-  my $capture_start = $mt->capture_start;
-  $mt               = $mt->capture_start('begin');
+  my $start = $mt->capture_start;
+  $mt       = $mt->capture_start('begin');
 
 Keyword indicating the start of a capture block, defaults to C<begin>.
 
@@ -508,8 +508,8 @@ Template code.
 
 =head2 C<comment_mark>
 
-  my $comment_mark = $mt->comment_mark;
-  $mt              = $mt->comment_mark('#');
+  my $mark = $mt->comment_mark;
+  $mt      = $mt->comment_mark('#');
 
 Character indicating the start of a comment, defaults to C<#>.
 
@@ -531,8 +531,8 @@ Encoding used for template files.
 
 =head2 C<escape_mark>
 
-  my $escape_mark = $mt->escape_mark;
-  $mt             = $mt->escape_mark('=');
+  my $mark = $mt->escape_mark;
+  $mt      = $mt->escape_mark('=');
 
 Character indicating the start of an escaped expression, defaults to C<=>.
 
@@ -540,8 +540,8 @@ Character indicating the start of an escaped expression, defaults to C<=>.
 
 =head2 C<expression_mark>
 
-  my $expression_mark = $mt->expression_mark;
-  $mt                 = $mt->expression_mark('=');
+  my $mark = $mt->expression_mark;
+  $mt      = $mt->expression_mark('=');
 
 Character indicating the start of an expression, defaults to C<=>.
 
@@ -549,8 +549,8 @@ Character indicating the start of an expression, defaults to C<=>.
 
 =head2 C<line_start>
 
-  my $line_start = $mt->line_start;
-  $mt            = $mt->line_start('%');
+  my $start = $mt->line_start;
+  $mt       = $mt->line_start('%');
 
 Character indicating the start of a code line, defaults to C<%>.
 
@@ -582,8 +582,8 @@ wrong.
 
 =head2 C<replace_mark>
 
-  my $replace_mark = $mt->replace_mark;
-  $mt              = $mt->replace_mark('%');
+  my $mark = $mt->replace_mark;
+  $mt      = $mt->replace_mark('%');
 
 Character used for escaping the start of a tag or line, defaults to C<%>.
 
@@ -591,8 +591,8 @@ Character used for escaping the start of a tag or line, defaults to C<%>.
 
 =head2 C<tag_start>
 
-  my $tag_start = $mt->tag_start;
-  $mt           = $mt->tag_start('<%');
+  my $start = $mt->tag_start;
+  $mt       = $mt->tag_start('<%');
 
 Characters indicating the start of a tag, defaults to C<E<lt>%>.
 
@@ -600,8 +600,8 @@ Characters indicating the start of a tag, defaults to C<E<lt>%>.
 
 =head2 C<tag_end>
 
-  my $tag_end = $mt->tag_end;
-  $mt         = $mt->tag_end('%>');
+  my $end = $mt->tag_end;
+  $mt     = $mt->tag_end('%>');
 
 Characters indicating the end of a tag, defaults to C<%E<gt>>.
 
@@ -623,8 +623,8 @@ Parsed tree.
 
 =head2 C<trim_mark>
 
-  my $trim_mark = $mt->trim_mark;
-  $mt           = $mt->trim_mark('-');
+  my $mark = $mt->trim_mark;
+  $mt      = $mt->trim_mark('-');
 
 Character activating automatic whitespace trimming, defaults to C<=>.
 

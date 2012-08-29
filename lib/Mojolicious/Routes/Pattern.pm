@@ -305,8 +305,8 @@ Raw unparsed pattern.
 
 =head2 C<placeholder_start>
 
-  my $placeholder = $pattern->placeholder_start;
-  $pattern        = $pattern->placeholder_start(':');
+  my $start = $pattern->placeholder_start;
+  $pattern  = $pattern->placeholder_start(':');
 
 Character indicating a placeholder, defaults to C<:>.
 
@@ -319,14 +319,14 @@ Placeholder names.
 
 =head2 C<quote_end>
 
-  my $quote = $pattern->quote_end;
-  $pattern  = $pattern->quote_end(']');
+  my $end  = $pattern->quote_end;
+  $pattern = $pattern->quote_end(']');
 
 Character indicating the end of a quoted placeholder, defaults to C<)>.
 
 =head2 C<quote_start>
 
-  my $quote = $pattern->quote_start;
+  my $start = $pattern->quote_start;
   $pattern  = $pattern->quote_start('[');
 
 Character indicating the start of a quoted placeholder, defaults to C<(>.
@@ -340,8 +340,8 @@ Pattern in compiled regular expression form.
 
 =head2 C<relaxed_start>
 
-  my $relaxed = $pattern->relaxed_start;
-  $pattern    = $pattern->relaxed_start('*');
+  my $start = $pattern->relaxed_start;
+  $pattern  = $pattern->relaxed_start('*');
 
 Character indicating a relaxed placeholder, defaults to C<#>.
 
@@ -354,8 +354,8 @@ Pattern in parsed form.
 
 =head2 C<wildcard_start>
 
-  my $wildcard = $pattern->wildcard_start;
-  $pattern     = $pattern->wildcard_start('*');
+  my $start = $pattern->wildcard_start;
+  $pattern  = $pattern->wildcard_start('*');
 
 Character indicating the start of a wildcard placeholder, defaults to C<*>.
 

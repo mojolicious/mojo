@@ -123,9 +123,9 @@ sub run {
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
 
   # Error
-  my ($msg, $code) = $tx->error;
+  my ($err, $code) = $tx->error;
   $url = encode 'UTF-8', $url;
-  warn qq{Problem loading URL "$url". ($msg)\n} if $msg && !$code;
+  warn qq{Problem loading URL "$url". ($err)\n} if $err && !$code;
 
   # JSON Pointer
   return unless $selector;

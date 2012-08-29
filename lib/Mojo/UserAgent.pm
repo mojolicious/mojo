@@ -529,8 +529,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->post_form('search.cpan.org/search' => {q => 'mojo'});
   if (my $res = $tx->success) { say $res->body }
   else {
-    my ($msg, $code) = $tx->error;
-    say $code ? "$code response: $msg" : "Connection error: $msg";
+    my ($err, $code) = $tx->error;
+    say $code ? "$code response: $err" : "Connection error: $err";
   }
 
   # Quick JSON API request with Basic authentication

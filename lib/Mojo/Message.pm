@@ -579,8 +579,8 @@ before the entire message body has been received.
 
 =head2 C<error>
 
-  my $msg          = $msg->error;
-  my ($msg, $code) = $msg->error;
+  my $err          = $msg->error;
+  my ($err, $code) = $msg->error;
   $msg             = $msg->error('Parser error');
   $msg             = $msg->error('Parser error', 500);
 

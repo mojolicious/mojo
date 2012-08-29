@@ -137,7 +137,7 @@ sub get_start_line_chunk {
 
 sub is_secure {
   my $url = shift->url;
-  return ($url->scheme || $url->base->scheme) ~~ 'https';
+  return ($url->scheme || $url->base->scheme // '') eq 'https';
 }
 
 sub is_xhr {
@@ -159,7 +159,8 @@ sub parse {
 
   # CGI like environment
   $self->env($env)->_parse_env($env) if $env;
-  $self->content($self->content->parse_body(@args)) if $self->{state} ~~ 'cgi';
+  $self->content($self->content->parse_body(@args))
+    if ($self->{state} // '') eq 'cgi';
 
   # Pass through
   $self->SUPER::parse(@args);

@@ -427,7 +427,7 @@ sub url_for {
       if (!$target || $target eq 'current') && $req->url->path->trailing_slash;
 
     # Fix scheme for WebSockets
-    $base->scheme($base->scheme ~~ 'https' ? 'wss' : 'ws') if $ws;
+    $base->scheme(($base->scheme // '') eq 'https' ? 'wss' : 'ws') if $ws;
   }
 
   # Make path absolute

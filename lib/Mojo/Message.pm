@@ -172,9 +172,12 @@ sub headers    { shift->content->headers }
 sub is_chunked { shift->content->is_chunked }
 sub is_dynamic { shift->content->is_dynamic }
 
-sub is_finished { shift->{state} ~~ 'finished' }
+sub is_finished { (shift->{state} // '') eq 'finished' }
 
-sub is_limit_exceeded { (shift->error)[1] ~~ [413, 431] }
+sub is_limit_exceeded {
+  return unless my $code = (shift->error)[1];
+  return !!grep { $_ eq $code } 413, 431;
+}
 
 sub is_multipart { shift->content->is_multipart }
 
@@ -215,7 +218,7 @@ sub parse {
 
   # Content
   $self->content($self->content->parse(delete $self->{buffer}))
-    if $self->{state} ~~ [qw(content finished)];
+    if grep { $_ eq ($self->{state} // '') } qw(content finished);
 
   # Check line size
   return $self->error('Maximum line size exceeded', 431)

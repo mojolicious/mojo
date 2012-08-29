@@ -132,7 +132,8 @@ sub get_start_line_chunk {
 
 sub is_empty {
   my $self = shift;
-  return $self->is_status_class(100) || $self->code ~~ [qw(204 304)];
+  return unless my $code = $self->code;
+  return $self->is_status_class(100) || grep { $_ eq $code } qw(204 304);
 }
 
 sub is_status_class {

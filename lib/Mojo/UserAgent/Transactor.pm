@@ -79,7 +79,7 @@ sub form {
   my $req     = $tx->req;
   my $headers = $req->headers;
   $headers->content_type('multipart/form-data') if $multipart;
-  if ($headers->content_type ~~ 'multipart/form-data') {
+  if (($headers->content_type // '') eq 'multipart/form-data') {
     my $parts = $self->_multipart($encoding, $p->to_hash);
     $req->content(
       Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
@@ -132,8 +132,8 @@ sub redirect {
 
   # Commonly used codes
   my $res = $old->res;
-  my $code = $res->code || 0;
-  return unless $code ~~ [301, 302, 303, 307, 308];
+  my $code = $res->code // '';
+  return unless grep { $_ eq $code } 301, 302, 303, 307, 308;
 
   # Fix broken location without authority and/or scheme
   return unless my $location = $res->headers->location;
@@ -146,12 +146,12 @@ sub redirect {
   # Clone request if necessary
   my $new    = Mojo::Transaction::HTTP->new;
   my $method = $req->method;
-  if ($code ~~ [301, 307, 308]) {
+  if (grep { $_ eq $code } 301, 307, 308) {
     return unless $req = $req->clone;
     $new->req($req);
     $req->headers->remove('Host')->remove('Cookie')->remove('Referer');
   }
-  else { $method = 'GET' unless $method ~~ [qw(GET HEAD)] }
+  elsif ($method ne 'HEAD') { $method = 'GET' }
   $new->req->method($method)->url($location);
   return $new->previous($old);
 }

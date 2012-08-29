@@ -32,7 +32,7 @@ sub match {
   # Method
   if (my $methods = $r->via) {
     my $method = $self->{method} eq 'HEAD' ? 'GET' : $self->{method};
-    return unless $method ~~ $methods;
+    return unless grep { $_ eq $method } @$methods;
   }
 
   # Conditions

@@ -138,7 +138,7 @@ sub parse {
         if (!$self->xml && $VOID{$start}) || $attr =~ m!/\s*$!;
 
       # Relaxed "script" or "style"
-      if ($start ~~ [qw(script style)]) {
+      if (grep { $_ eq $start } qw(script style)) {
         if ($html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi) {
           $self->_raw($1, \$current);
           $self->_end($start, \$current);
@@ -338,7 +338,7 @@ sub _start {
     elsif ($start eq 'option') { $self->_end('option', $current) }
 
     # "<colgroup>", "<thead>", "tbody" and "tfoot"
-    elsif ($start ~~ [qw(colgroup thead tbody tfoot)]) {
+    elsif (grep { $_ eq $start } qw(colgroup thead tbody tfoot)) {
       $self->_close($current);
     }
 
@@ -346,19 +346,19 @@ sub _start {
     elsif ($start eq 'tr') { $self->_close($current, {tr => 1}) }
 
     # "<th>" and "<td>"
-    elsif ($start ~~ [qw(th td)]) {
+    elsif (grep { $_ eq $start } qw(th td)) {
       $self->_close($current, {th => 1});
       $self->_close($current, {td => 1});
     }
 
     # "<dt>" and "<dd>"
-    elsif ($start ~~ [qw(dt dd)]) {
+    elsif (grep { $_ eq $start } qw(dt dd)) {
       $self->_end('dt', $current);
       $self->_end('dd', $current);
     }
 
     # "<rt>" and "<rp>"
-    elsif ($start ~~ [qw(rt rp)]) {
+    elsif (grep { $_ eq $start } qw(rt rp)) {
       $self->_end('rt', $current);
       $self->_end('rp', $current);
     }

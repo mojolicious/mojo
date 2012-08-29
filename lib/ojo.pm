@@ -43,14 +43,15 @@ sub import {
   *{"${caller}::j"} = sub {
     my $d = shift;
     my $j = Mojo::JSON->new;
-    return ref $d ~~ [qw(ARRAY HASH)] ? $j->encode($d) : $j->decode($d);
+    return $j->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
+    return $j->decode($d);
   };
   *{"${caller}::n"} = sub { _request($UA->build_json_tx(@_)) };
   *{"${caller}::o"} = sub { _request($UA->build_tx(OPTIONS => @_)) };
-  *{"${caller}::p"} = sub { _request($UA->build_tx(POST    => @_)) };
+  *{"${caller}::p"} = sub { _request($UA->build_tx(POST => @_)) };
   *{"${caller}::r"} = sub { $UA->app->dumper(@_) };
-  *{"${caller}::t"} = sub { _request($UA->build_tx(PATCH   => @_)) };
-  *{"${caller}::u"} = sub { _request($UA->build_tx(PUT     => @_)) };
+  *{"${caller}::t"} = sub { _request($UA->build_tx(PATCH => @_)) };
+  *{"${caller}::u"} = sub { _request($UA->build_tx(PUT => @_)) };
   *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
 }
 

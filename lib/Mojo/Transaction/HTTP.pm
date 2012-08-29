@@ -19,7 +19,7 @@ sub client_read {
   $self->{state} = 'finished' if $res->is_finished;
 
   # Unexpected 100 Continue
-  if ($self->{state} eq 'finished' && $res->code ~~ 100) {
+  if ($self->{state} eq 'finished' && ($res->code // '') eq '100') {
     $self->res($res->new);
     $self->{state} = $preserved;
   }

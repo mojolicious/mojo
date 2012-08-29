@@ -27,7 +27,7 @@ sub canonicalize {
     }
 
     # "."
-    next if $part ~~ ['.', ''];
+    next if grep { $_ eq $part } '.', '';
 
     # Part
     push @parts, $part;

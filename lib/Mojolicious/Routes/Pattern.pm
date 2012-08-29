@@ -56,7 +56,7 @@ sub render {
     }
 
     # Placeholder, relaxed or wildcard
-    elsif ($op ~~ [qw(placeholder relaxed wildcard)]) {
+    elsif (grep { $_ eq $op } qw(placeholder relaxed wildcard)) {
       my $name = $token->[1];
       $rendered = $values->{$name} // '';
       my $default = $self->defaults->{$name};
@@ -130,7 +130,7 @@ sub _compile {
     }
 
     # Placeholder
-    elsif ($op ~~ [qw(placeholder relaxed wildcard)]) {
+    elsif (grep { $_ eq $op } qw(placeholder relaxed wildcard)) {
       my $name = $token->[1];
       unshift @{$self->placeholders}, $name;
 
@@ -199,7 +199,7 @@ sub _tokenize {
   while (length(my $char = substr $pattern, 0, 1, '')) {
 
     # Inside a placeholder
-    my $inside = $state ~~ [qw(placeholder relaxed wildcard)];
+    my $inside = !!grep { $_ eq $state } qw(placeholder relaxed wildcard);
 
     # Quote start
     if ($char eq $quote_start) {
@@ -215,7 +215,7 @@ sub _tokenize {
     }
 
     # Relaxed or wildcard start (upgrade when quoted)
-    elsif ($char ~~ [$relaxed, $wildcard]) {
+    elsif (grep { $_ eq $char } $relaxed, $wildcard) {
       push @tree, ['placeholder', ''] unless $quoted;
       $tree[-1][0] = $state = $char eq $relaxed ? 'relaxed' : 'wildcard';
     }

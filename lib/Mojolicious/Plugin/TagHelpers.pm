@@ -105,7 +105,7 @@ sub _input {
     my $value = $attrs{value} // '';
     if ($type eq 'checkbox' || $type eq 'radio') {
       $attrs{value} = $value;
-      $attrs{checked} = 'checked' if $value ~~ \@values;
+      $attrs{checked} = 'checked' if grep { $_ eq $value } @values;
     }
 
     # Others

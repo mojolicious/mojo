@@ -28,13 +28,14 @@ sub error {
   return $res->error ? $res->error : undef;
 }
 
-sub is_finished { shift->{state} ~~ 'finished' }
+sub is_finished { (shift->{state} // '') eq 'finished' }
 
 sub is_websocket {undef}
 
 sub is_writing {
   return 1 unless my $state = shift->{state};
-  return $state ~~ [qw(write write_start_line write_headers write_body)];
+  return !!grep { $_ eq $state }
+    qw(write write_start_line write_headers write_body);
 }
 
 sub remote_address {
@@ -58,7 +59,7 @@ sub remote_address {
 
 sub resume {
   my $self = shift;
-  if ($self->{state} ~~ 'paused') { $self->{state} = 'write_body' }
+  if (($self->{state} // '') eq 'paused') { $self->{state} = 'write_body' }
   elsif (!$self->is_writing) { $self->{state} = 'write' }
   return $self->emit('resume');
 }

@@ -72,7 +72,7 @@ sub build {
       if ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
 
       # Expression
-      if ($type ~~ [qw(expr escp)]) {
+      if (grep { $_ eq $type } qw(expr escp)) {
 
         # Start
         unless ($multi) {
@@ -89,7 +89,8 @@ sub build {
         }
 
         # Multiline
-        $multi = !($line->[$j + 2] ~~ 'text' && $line->[$j + 3] ~~ '');
+        $multi = !(($line->[$j + 2] // '') eq 'text'
+          && ($line->[$j + 3] // '') eq '');
 
         # Append semicolon
         $lines[-1] .= ';' if !$multi && !$cpst;
@@ -308,7 +309,7 @@ sub _trim {
   for (my $j = @$line - 4; $j >= 0; $j -= 2) {
 
     # Skip capture
-    next if $line->[$j] ~~ [qw(cpst cpen)];
+    next if grep { $_ eq $line->[$j] } qw(cpst cpen);
 
     # Only trim text
     return unless $line->[$j] eq 'text';

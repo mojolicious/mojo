@@ -78,11 +78,11 @@ sub is_dynamic {
   return $self->{dynamic} && !defined $self->headers->content_length;
 }
 
-sub is_finished { shift->{state} ~~ 'finished' }
+sub is_finished { (shift->{state} // '') eq 'finished' }
 
 sub is_multipart {undef}
 
-sub is_parsing_body { shift->{state} ~~ 'body' }
+sub is_parsing_body { (shift->{state} // '') eq 'body' }
 
 sub leftovers { shift->{buffer} }
 
@@ -113,7 +113,7 @@ sub parse {
   $self->{real_size} //= 0;
   if ($self->is_chunked && $self->{state} ne 'headers') {
     $self->_parse_chunked;
-    $self->{state} = 'finished' if $self->{chunked_state} ~~ 'finished';
+    $self->{state} = 'finished' if ($self->{chunk_state} // '') eq 'finished';
   }
 
   # Not chunked, pass through to second buffer
@@ -148,14 +148,13 @@ sub parse {
 }
 
 sub parse_body {
-  my $self = shift;
-  $self->{state} = 'body';
-  return $self->parse(@_);
+  shift->tap(sub { $_->{state} = 'body' })->parse(@_);
 }
 
 sub progress {
   my $self = shift;
-  return 0 unless $self->{state} ~~ [qw(body finished)];
+  return 0 unless my $state = $self->{state};
+  return 0 unless grep { $_ eq $state } qw(body finished);
   return $self->{raw_size} - ($self->{header_size} || 0);
 }
 
@@ -238,7 +237,7 @@ sub _parse_chunked {
 
   # Trailing headers
   return $self->_parse_chunked_trailing_headers
-    if $self->{chunked_state} ~~ 'trailing_headers';
+    if ($self->{chunk_state} // '') eq 'trailing_headers';
 
   # New chunk (ignore the chunk extension)
   while ($self->{pre_buffer} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
@@ -253,7 +252,7 @@ sub _parse_chunked {
 
     # Last chunk
     if ($len == 0) {
-      $self->{chunked_state} = 'trailing_headers';
+      $self->{chunk_state} = 'trailing_headers';
       last;
     }
 
@@ -267,7 +266,7 @@ sub _parse_chunked {
 
   # Trailing headers
   $self->_parse_chunked_trailing_headers
-    if $self->{chunked_state} ~~ 'trailing_headers';
+    if ($self->{chunk_state} // '') eq 'trailing_headers';
 }
 
 sub _parse_chunked_trailing_headers {
@@ -279,7 +278,7 @@ sub _parse_chunked_trailing_headers {
 
   # Check if we are finished
   return unless $headers->is_finished;
-  $self->{chunked_state} = 'finished';
+  $self->{chunk_state} = 'finished';
 
   # Replace Transfer-Encoding with Content-Length
   my $encoding = $headers->transfer_encoding;
@@ -325,7 +324,7 @@ sub _parse_until_body {
   }
 
   # Parse headers
-  $self->_parse_headers if $self->{state} ~~ 'headers';
+  $self->_parse_headers if ($self->{state} // '') eq 'headers';
 }
 
 1;

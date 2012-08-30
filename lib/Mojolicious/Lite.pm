@@ -1,6 +1,7 @@
 package Mojolicious::Lite;
 use Mojo::Base 'Mojolicious';
 
+# "Bender: Bite my shiny metal ass!"
 use File::Basename 'dirname';
 use File::Spec::Functions 'catdir';
 use Mojo::UserAgent;

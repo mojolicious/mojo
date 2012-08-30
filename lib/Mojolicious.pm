@@ -1,6 +1,7 @@
 package Mojolicious;
 use Mojo::Base 'Mojo';
 
+# "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
 use Mojolicious::Commands;

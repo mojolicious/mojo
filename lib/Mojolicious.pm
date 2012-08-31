@@ -571,7 +571,8 @@ Mount whole L<Mojolicious> applications.
 
 =item L<Mojolicious::Plugin::PODRenderer>
 
-Renderer for POD files and documentation browser.
+Renderer for turning POD into HTML and documentation browser for
+L<Mojolicious::Guides>.
 
 =item L<Mojolicious::Plugin::PoweredBy>
 

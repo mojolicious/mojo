@@ -174,21 +174,22 @@ L<Mojolicious::Plugin::PODRenderer> supports the following options.
   # Mojolicious::Lite
   plugin PODRenderer => {name => 'foo'};
 
-Handler name.
+Handler name, defaults to C<pod>.
 
 =head2 C<no_perldoc>
 
   # Mojolicious::Lite
   plugin PODRenderer => {no_perldoc => 1};
 
-Disable perldoc browser.
+Disable L<Mojolicious::Guides> documentation browser that will otherwise be
+available under C</perldoc>.
 
 =head2 C<preprocess>
 
   # Mojolicious::Lite
   plugin PODRenderer => {preprocess => 'epl'};
 
-Name of handler used to preprocess POD.
+Name of handler used to preprocess POD, defaults to C<ep>.
 
 =head1 HELPERS
 

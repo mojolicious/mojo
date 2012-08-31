@@ -97,7 +97,7 @@ L<Mojolicious::Plugin::EPRenderer> supports the following options.
   # Mojolicious::Lite
   plugin EPRenderer => {name => 'foo'};
 
-Handler name.
+Handler name, defaults to C<ep>.
 
 =head2 C<template>
 

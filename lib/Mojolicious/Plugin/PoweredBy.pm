@@ -40,7 +40,7 @@ L<Mojolicious::Plugin::PoweredBy> supports the following options.
 
   plugin PoweredBy => (name => 'MyApp 1.0');
 
-Value for C<X-Powered-By> header.
+Value for C<X-Powered-By> header, defaults to C<Mojolicious (Perl)>.
 
 =head1 METHODS
 

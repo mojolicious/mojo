@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 111;
+use Test::More tests => 112;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
@@ -191,6 +191,7 @@ is $tx->res->body, 'works!', 'right content';
 # GET / (events)
 my $finished;
 $tx = $ua->build_tx(GET => '/');
+ok !$tx->is_finished, 'transaction is not finished';
 $ua->once(
   start => sub {
     my ($self, $tx) = @_;

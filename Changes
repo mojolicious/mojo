@@ -2,6 +2,7 @@
 3.37  2012-09-01
   - Updated jQuery to version 1.8.1.
   - Improved documentation.
+  - Improved tests.
   - Fixed small state bug in Mojo::Transaction.
 
 3.36  2012-08-30

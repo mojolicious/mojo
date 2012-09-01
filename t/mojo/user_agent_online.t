@@ -90,8 +90,8 @@ ok $tx->error,       'has error';
 # Host does not exist
 $tx = $ua->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $ua->start($tx);
-is $tx->error, "Couldn't connect", 'right error';
 ok $tx->is_finished, 'transaction is finished';
+is $tx->error, "Couldn't connect", 'right error';
 
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;

@@ -349,7 +349,9 @@ Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
 L<Mojo::Server::Hypnotoad> is a full featured, UNIX optimized, preforking
 non-blocking I/O HTTP and WebSocket server, built around the very well tested
 and reliable L<Mojo::Server::Daemon>, with C<IPv6>, C<TLS>, C<libev> and hot
-deployment support that just works.
+deployment support that just works. Note that since multiple worker processes
+need to be managed by the server, you should avoid modifying signal handlers
+and forking in your applications.
 
 To start applications with it you can use the L<hypnotoad> script.
 

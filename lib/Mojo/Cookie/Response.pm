@@ -124,7 +124,7 @@ cookie.
   my $max_age = $cookie->max_age;
   $cookie     = $cookie->max_age(60);
 
-Max age for cookie in seconds.
+Max age for cookie.
 
 =head2 C<path>
 
@@ -152,7 +152,7 @@ implements the following new ones.
   $cookie     = $cookie->expires(time + 60);
   $cookie     = $cookie->expires(Mojo::Date->new(time + 60));
 
-Expiration for cookie in seconds.
+Expiration for cookie.
 
 =head2 C<parse>
 

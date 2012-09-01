@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 109;
+use Test::More tests => 111;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
@@ -188,7 +188,7 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# GET / (callbacks)
+# GET / (events)
 my $finished;
 $tx = $ua->build_tx(GET => '/');
 $ua->once(
@@ -198,14 +198,16 @@ $ua->once(
   }
 );
 $tx = $ua->start($tx);
-ok $tx->success, 'successful';
+ok $tx->success,     'successful';
+ok $tx->is_finished, 'transaction is finished';
 is $finished, 1, 'finish event has been emitted';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET /no_length (missing Content-Length header)
 $tx = $ua->get('/no_length');
-ok $tx->success, 'successful';
+ok $tx->success,     'successful';
+ok $tx->is_finished, 'transaction is finished';
 ok !$tx->error, 'no error';
 ok $tx->kept_alive, 'kept connection alive';
 ok !$tx->keep_alive, 'keep connection not alive';

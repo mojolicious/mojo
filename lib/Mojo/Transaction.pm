@@ -64,7 +64,9 @@ sub resume {
   return $self->emit('resume');
 }
 
-sub server_close { shift->emit('finish') }
+sub server_close {
+  shift->tap(sub { $_->{state} = 'finished' })->emit('finish');
+}
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }

@@ -302,7 +302,7 @@ delimited by the C<begin> and C<end> keywords.
 
 =head2 Captured content
 
-The helper L<Mojolicious::Plugin::TagHelpers/"content_for"> can be used to
+The helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> can be used to
 pass around blocks of captured content.
 
   use Mojolicious::Lite;

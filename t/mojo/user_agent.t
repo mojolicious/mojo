@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 118;
+use Test::More tests => 122;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
@@ -189,41 +189,46 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (events)
-my ($finished_tx, $finished_res);
+my ($finished_req, $finished_tx, $finished_res);
 $tx = $ua->build_tx(GET => '/');
 ok !$tx->is_finished, 'transaction is not finished';
 $ua->once(
   start => sub {
     my ($self, $tx) = @_;
+    $tx->req->on(finish => sub { $finished_req++ });
     $tx->on(finish => sub { $finished_tx++ });
     $tx->res->on(finish => sub { $finished_res++ });
   }
 );
 $tx = $ua->start($tx);
 ok $tx->success, 'successful';
+is $finished_req, 1, 'finish event has been emitted once';
 is $finished_tx,  1, 'finish event has been emitted once';
 is $finished_res, 1, 'finish event has been emitted once';
+ok $tx->req->is_finished, 'request is finished';
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->res->is_finished, 'response is finished';
 is $tx->res->code,        200, 'right status';
 is $tx->res->body,        'works!', 'right content';
 
 # GET /no_length (missing Content-Length header)
-($finished_tx, $finished_res) = undef;
+($finished_req, $finished_tx, $finished_res) = undef;
 $tx = $ua->build_tx(GET => '/no_length');
 ok !$tx->is_finished, 'transaction is not finished';
 $ua->once(
   start => sub {
     my ($self, $tx) = @_;
+    $tx->req->on(finish => sub { $finished_req++ });
     $tx->on(finish => sub { $finished_tx++ });
     $tx->res->on(finish => sub { $finished_res++ });
-
   }
 );
 $tx = $ua->start($tx);
 ok $tx->success, 'successful';
+is $finished_req, 1, 'finish event has been emitted once';
 is $finished_tx,  1, 'finish event has been emitted once';
 is $finished_res, 1, 'finish event has been emitted once';
+ok $tx->req->is_finished, 'request is finished';
 ok $tx->is_finished, 'transaction is finished';
 ok $tx->res->is_finished, 'response is finished';
 ok !$tx->error, 'no error';

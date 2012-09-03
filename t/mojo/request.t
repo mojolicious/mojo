@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 847;
+use Test::More tests => 848;
 
 use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
@@ -13,9 +13,12 @@ use Mojo::Message::Request;
 
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding all limits
 my $req = Mojo::Message::Request->new;
+my $finished;
+$req->on(finish => sub { $finished = shift->is_finished });
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse('Cookie: ' . ('a=b; ' x (1024 * 1024)) . "\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
+ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum message size exceeded', 'right error';
 is $req->method,      'GET', 'right method';
@@ -443,8 +446,8 @@ is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $req->headers->content_length, 27,           'right "Content-Length" value';
 
 # Parse full HTTP 1.0 request with zero chunk
-$req = Mojo::Message::Request->new;
-my $finished;
+$req      = Mojo::Message::Request->new;
+$finished = undef;
 $req->on(finish => sub { $finished = shift->is_finished });
 $req->parse('GET /foo/bar/baz.html?fo');
 $req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");

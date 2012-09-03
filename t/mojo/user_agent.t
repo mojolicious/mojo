@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 112;
+use Test::More tests => 118;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
@@ -189,26 +189,43 @@ is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
 # GET / (events)
-my $finished;
+my ($finished_tx, $finished_res);
 $tx = $ua->build_tx(GET => '/');
 ok !$tx->is_finished, 'transaction is not finished';
 $ua->once(
   start => sub {
     my ($self, $tx) = @_;
-    $tx->on(finish => sub { $finished++ });
+    $tx->on(finish => sub { $finished_tx++ });
+    $tx->res->on(finish => sub { $finished_res++ });
   }
 );
 $tx = $ua->start($tx);
-ok $tx->success,     'successful';
+ok $tx->success, 'successful';
+is $finished_tx,  1, 'finish event has been emitted once';
+is $finished_res, 1, 'finish event has been emitted once';
 ok $tx->is_finished, 'transaction is finished';
-is $finished, 1, 'finish event has been emitted';
-is $tx->res->code, 200,      'right status';
-is $tx->res->body, 'works!', 'right content';
+ok $tx->res->is_finished, 'response is finished';
+is $tx->res->code,        200, 'right status';
+is $tx->res->body,        'works!', 'right content';
 
 # GET /no_length (missing Content-Length header)
-$tx = $ua->get('/no_length');
-ok $tx->success,     'successful';
+($finished_tx, $finished_res) = undef;
+$tx = $ua->build_tx(GET => '/no_length');
+ok !$tx->is_finished, 'transaction is not finished';
+$ua->once(
+  start => sub {
+    my ($self, $tx) = @_;
+    $tx->on(finish => sub { $finished_tx++ });
+    $tx->res->on(finish => sub { $finished_res++ });
+
+  }
+);
+$tx = $ua->start($tx);
+ok $tx->success, 'successful';
+is $finished_tx,  1, 'finish event has been emitted once';
+is $finished_res, 1, 'finish event has been emitted once';
 ok $tx->is_finished, 'transaction is finished';
+ok $tx->res->is_finished, 'response is finished';
 ok !$tx->error, 'no error';
 ok $tx->kept_alive, 'kept connection alive';
 ok !$tx->keep_alive, 'keep connection not alive';

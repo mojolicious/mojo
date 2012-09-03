@@ -9,7 +9,9 @@ has [qw(kept_alive local_address local_port previous remote_port)];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
-sub client_close { shift->server_close(@_) }
+sub client_close {
+  shift->tap(sub { $_->res->finish })->server_close(@_);
+}
 
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
 sub client_write { croak 'Method "client_write" not implemented by subclass' }
@@ -39,13 +41,10 @@ sub is_writing {
 }
 
 sub remote_address {
-  my $self = shift;
+  my ($self, @args) = @_;
 
   # New address
-  if (@_) {
-    $self->{remote_address} = shift;
-    return $self;
-  }
+  return $self->tap(sub { $_->{remote_address} = shift @args }) if @args;
 
   # Reverse proxy
   if ($ENV{MOJO_REVERSE_PROXY}) {

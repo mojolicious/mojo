@@ -107,10 +107,7 @@ sub client_write { shift->server_write(@_) }
 sub connection { shift->handshake->connection }
 
 sub finish {
-  my $self = shift;
-  $self->send([1, 0, 0, 0, CLOSE, '']);
-  $self->{finished} = 1;
-  return $self;
+  shift->send([1, 0, 0, 0, CLOSE, ''])->tap(sub { $_->{finished} = 1 });
 }
 
 sub is_websocket {1}

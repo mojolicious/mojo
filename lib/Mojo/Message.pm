@@ -103,23 +103,23 @@ sub dom {
 }
 
 sub error {
-  my $self = shift;
-
-  # Get
-  unless (@_) {
-    return unless my $err = $self->{error};
-    return wantarray ? @$err : $err->[0];
-  }
+  my ($self, @args) = @_;
 
   # Set
-  $self->{error} = [@_];
-  $self->{state} = 'finished';
+  return $self->tap(sub { $_->{error} = [@args] })->finish if @args;
 
-  return $self;
+  # Get
+  return unless my $err = $self->{error};
+  return wantarray ? @$err : $err->[0];
 }
 
 sub extract_start_line {
   croak 'Method "extract_start_line" not implemented by subclass';
+}
+
+sub finish {
+  my $self = shift->tap(sub { $_->{state} = 'finished' });
+  return $self->{finished}++ ? $self : $self->emit('finish');
 }
 
 sub fix_headers {
@@ -141,22 +141,21 @@ sub get_body_chunk {
   my ($self, $offset) = @_;
 
   # Progress
-  $self->emit(progress => 'body', $offset);
+  $self->emit('progress', 'body', $offset);
 
   # Chunk
   my $chunk = $self->content->get_body_chunk($offset);
   return $chunk if !defined $chunk || length $chunk;
 
   # Finish
-  $self->{state} = 'finished';
-  $self->emit('finish');
+  $self->finish;
 
   return $chunk;
 }
 
 sub get_header_chunk {
   my ($self, $offset) = @_;
-  $self->emit(progress => 'headers', $offset);
+  $self->emit('progress', 'headers', $offset);
   return $self->fix_headers->content->get_header_chunk($offset);
 }
 
@@ -224,16 +223,10 @@ sub parse {
   return $self->error('Maximum line size exceeded', 431)
     if $self->headers->is_limit_exceeded;
 
-  # Finished
-  $self->{state} = 'finished' if $self->content->is_finished;
-
   # Progress
   $self->emit('progress');
 
-  # Finished
-  $self->emit('finish') if $self->is_finished;
-
-  return $self;
+  return $self->content->is_finished ? $self->finish : $self;
 }
 
 sub start_line_size { length shift->build_start_line }
@@ -592,6 +585,12 @@ Parser errors and codes.
 
 Extract start line from string. Meant to be overloaded in a subclass.
 
+=head2 C<finish>
+
+  $msg = $msg->finish;
+
+Finish message parser/generator.
+
 =head2 C<fix_headers>
 
   $msg = $msg->fix_headers;
@@ -652,7 +651,7 @@ working.
 
   my $success = $msg->is_finished;
 
-Check if parser is finished.
+Check if message parser/generator is finished.
 
 =head2 C<is_limit_exceeded>
 

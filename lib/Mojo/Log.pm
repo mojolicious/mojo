@@ -24,9 +24,7 @@ has 'path';
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 
 sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->on(message => \&_message);
-  return $self;
+  shift->SUPER::new(@_)->tap(sub { $_->on(message => \&_message) });
 }
 
 sub debug { shift->log(debug => @_) }

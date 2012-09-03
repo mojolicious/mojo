@@ -39,13 +39,13 @@ sub clone {
 }
 
 sub decode {
-  my ($self, $enc) = @_;
-  return $self->tap(sub { $$_ = Mojo::Util::decode $enc || 'UTF-8', $$_ });
+  my ($self, $e) = @_;
+  return $self->tap(sub { $$_ = Mojo::Util::decode $e || 'UTF-8', $$_ });
 }
 
 sub encode {
-  my ($self, $enc) = @_;
-  return $self->tap(sub { $$_ = Mojo::Util::encode $enc || 'UTF-8', $$_ });
+  my ($self, $e) = @_;
+  return $self->tap(sub { $$_ = Mojo::Util::encode $e || 'UTF-8', $$_ });
 }
 
 sub say {

@@ -116,7 +116,7 @@ Mojo::Base - Minimal base class for Mojo projects
   use Mojo::Base -base;
 
   has name => 'Nyan';
-  has [qw(ears eyes)] => 2;
+  has [qw(birds mice)] => 2;
 
   package Tiger;
   use Mojo::Base 'Cat';
@@ -128,11 +128,11 @@ Mojo::Base - Minimal base class for Mojo projects
   use Mojo::Base -strict;
 
   my $mew = Cat->new(name => 'Longcat');
-  say $mew->ears;
-  say $mew->ears(3)->eyes(4)->ears;
+  say $mew->mice;
+  say $mew->mice(3)->birds(4)->mice;
 
   my $rawr = Tiger->new(stripes => 23);
-  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->ears;
+  say $rawr->tap(sub { $_->friend->name('Tacgnol') })->mice;
 
 =head1 DESCRIPTION
 

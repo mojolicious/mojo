@@ -88,8 +88,6 @@ sub is_websocket { !!shift->{websocket} }
 
 sub name {
   my $self = shift;
-
-  # Custom names have precedence
   return $self->{name} unless @_;
   $self->{name} = shift;
   return $self->tap(sub { $_->{custom} = 1 });

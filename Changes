@@ -1,5 +1,5 @@
 
-3.37  2012-09-03
+3.37  2012-09-04
   - Added finish method to Mojo::Message.
   - Updated jQuery to version 1.8.1.
   - Improved documentation.

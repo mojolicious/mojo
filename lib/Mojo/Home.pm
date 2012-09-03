@@ -18,10 +18,8 @@ sub detect {
   my $self = shift;
 
   # Environment variable
-  if ($ENV{MOJO_HOME}) {
-    $self->{parts} = [splitdir(abs_path $ENV{MOJO_HOME})];
-    return $self;
-  }
+  return $self->tap(sub { $_->{parts} = [splitdir(abs_path $ENV{MOJO_HOME})] })
+    if $ENV{MOJO_HOME};
 
   # Try to find home from lib directory
   if (my $class = @_ ? shift : 'Mojo::HelloWorld') {
@@ -74,8 +72,7 @@ sub mojo_lib_dir { catdir(dirname(__FILE__), '..') }
 sub parse {
   my ($self, $path) = @_;
   return $self unless defined $path;
-  $self->{parts} = [splitdir $path];
-  return $self;
+  return $self->tap(sub { $_->{parts} = [splitdir $path] });
 }
 
 sub rel_dir { catdir(@{shift->{parts} || []}, split '/', shift) }

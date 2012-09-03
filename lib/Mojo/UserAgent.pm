@@ -501,8 +501,7 @@ sub _write {
   warn "-- Client >>> Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
 
   # Write chunk
-  my $stream = $self->_loop->stream($id);
-  $stream->write($chunk);
+  my $stream = $self->_loop->stream($id)->write($chunk);
   $self->_handle($id) if $tx->is_finished;
 
   # Continue writing

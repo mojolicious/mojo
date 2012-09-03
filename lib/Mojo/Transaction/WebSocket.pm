@@ -184,9 +184,7 @@ sub req            { shift->handshake->req }
 sub res            { shift->handshake->res }
 
 sub resume {
-  my $self = shift;
-  $self->handshake->resume;
-  return $self;
+  shift->tap(sub { $_->handshake->resume });
 }
 
 sub send {

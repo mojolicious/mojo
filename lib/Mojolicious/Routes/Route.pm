@@ -91,10 +91,8 @@ sub name {
 
   # Custom names have precedence
   return $self->{name} unless @_;
-  $self->{name}   = shift;
-  $self->{custom} = 1;
-
-  return $self;
+  $self->{name} = shift;
+  return $self->tap(sub { $_->{custom} = 1 });
 }
 
 sub options { shift->_generate_route(OPTIONS => @_) }
@@ -107,9 +105,7 @@ sub over {
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   return $self unless @$conditions;
   $self->{over} = $conditions;
-  $self->root->cache(0);
-
-  return $self;
+  return $self->tap(sub { $_->root->cache(0) });
 }
 
 sub parse {
@@ -228,10 +224,7 @@ sub via {
 }
 
 sub websocket {
-  my $self  = shift;
-  my $route = $self->get(@_);
-  $route->{websocket} = 1;
-  return $route;
+  shift->get(@_)->tap(sub { $_->{websocket} = 1 });
 }
 
 sub _generate_route {

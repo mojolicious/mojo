@@ -269,9 +269,7 @@ sub rendered {
     $app->plugins->emit_hook_reverse(after_dispatch => $self);
     $app->sessions->store($self);
   }
-  $self->tx->resume;
-
-  return $self;
+  return $self->tap(sub { $_->tx->resume });
 }
 
 sub req { shift->tx->req }

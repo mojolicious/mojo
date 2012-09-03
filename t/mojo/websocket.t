@@ -280,8 +280,7 @@ $finished = 0;
 $ua->websocket(
   '/subreq' => sub {
     my $tx = pop;
-    $code   = $tx->res->code;
-    $result = '';
+    $code = $tx->res->code;
     $tx->on(
       message => sub {
         my ($tx, $msg) = @_;
@@ -312,8 +311,7 @@ $delay->begin;
 $ua->websocket(
   '/subreq' => sub {
     my $tx = pop;
-    $code   = $tx->res->code;
-    $result = '';
+    $code = $tx->res->code;
     $tx->on(
       message => sub {
         my ($tx, $msg) = @_;
@@ -333,8 +331,7 @@ $delay->begin;
 $ua->websocket(
   '/subreq' => sub {
     my $tx = pop;
-    $code2   = $tx->res->code;
-    $result2 = '';
+    $code2 = $tx->res->code;
     $tx->on(
       message => sub {
         my ($tx, $msg) = @_;

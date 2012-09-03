@@ -10,9 +10,8 @@ has [qw(filename name)];
 has headers => sub { Mojo::Headers->new };
 
 sub move_to {
-  my $self = shift;
-  $self->asset->move_to(@_);
-  return $self;
+  my ($self, @args) = @_;
+  return $self->tap(sub { $_->asset->move_to(@args) });
 }
 
 sub size  { shift->asset->size }

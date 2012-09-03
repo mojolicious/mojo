@@ -163,9 +163,8 @@ sub parent {
 }
 
 sub parse {
-  my $self = shift;
-  $self->[0]->parse(@_);
-  return $self;
+  my ($self, @args) = @_;
+  return $self->tap(sub { $_->[0]->parse(@args) });
 }
 
 sub prepend { shift->_add(0, @_) }
@@ -338,10 +337,9 @@ sub _parse {
 }
 
 sub _parser {
-  my ($self, $method) = (shift, shift);
-  return $self->[0]->$method unless @_;
-  $self->[0]->$method(shift);
-  return $self;
+  my ($self, $method, @args) = @_;
+  return $self->[0]->$method unless @args;
+  return $self->tap(sub { $_->[0]->$method(@args) });
 }
 
 sub _text {

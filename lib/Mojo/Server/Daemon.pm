@@ -43,8 +43,7 @@ sub setuidgid {
 sub start {
   my $self = shift;
   $self->_listen($_) for @{$self->listen};
-  $self->ioloop->max_connections($self->max_clients);
-  return $self;
+  return $self->tap(sub { $_->ioloop->max_connections($_->max_clients) });
 }
 
 sub _build_tx {
@@ -69,8 +68,7 @@ sub _build_tx {
   $tx->on(
     upgrade => sub {
       my ($tx, $ws) = @_;
-      $ws->server_handshake;
-      $self->{connections}{$id}{ws} = $ws;
+      $self->{connections}{$id}{ws} = $ws->tap(sub { $_->server_handshake });
     }
   );
   $tx->on(
@@ -215,8 +213,7 @@ sub _read {
 
 sub _remove {
   my ($self, $id) = @_;
-  $self->ioloop->remove($id);
-  $self->_close($id);
+  $self->tap(sub { $_->ioloop->remove($id) })->_close($id);
 }
 
 sub _user {
@@ -242,8 +239,7 @@ sub _write {
   warn "-- Server >>> Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
 
   # Write chunk
-  my $stream = $self->ioloop->stream($id);
-  $stream->write($chunk);
+  my $stream = $self->ioloop->stream($id)->write($chunk);
 
   # Finish or continue writing
   weaken $self;

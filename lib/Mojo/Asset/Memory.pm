@@ -22,11 +22,13 @@ sub add_chunk {
 }
 
 sub contains {
-  my $self  = shift;
+  my $self = shift;
+
   my $start = $self->start_range;
-  my $pos   = index $self->{content}, shift, $start;
+  my $pos = index $self->{content}, shift, $start;
   $pos -= $start if $start && $pos >= 0;
   my $end = $self->end_range;
+
   return $end && $pos >= $end ? -1 : $pos;
 }
 
@@ -44,8 +46,7 @@ sub get_chunk {
 
 sub move_to {
   my ($self, $path) = @_;
-  spurt $self->{content}, $path;
-  return $self;
+  return $self->tap(sub { spurt $_->{content}, $path });
 }
 
 sub size { length shift->{content} }

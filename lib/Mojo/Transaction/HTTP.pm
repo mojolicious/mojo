@@ -19,10 +19,8 @@ sub client_read {
   $self->{state} = 'finished' if $res->is_finished;
 
   # Unexpected 100 Continue
-  if ($self->{state} eq 'finished' && ($res->code // '') eq '100') {
-    $self->res($res->new);
-    $self->{state} = $preserved;
-  }
+  $self->tap(sub { $_->{state} = $preserved })->res($res->new)
+    if $self->{state} eq 'finished' && ($res->code // '') eq '100';
 
   # Check for errors
   $self->{state} = 'finished' if $self->error;
@@ -90,10 +88,8 @@ sub server_read {
   $self->{state} ||= 'read';
 
   # Parser error
-  my $res = $self->res;
   if ($req->error && !$self->{handled}++) {
-    $self->emit('request');
-    $res->headers->connection('close');
+    $self->emit('request')->res->headers->connection('close');
   }
 
   # EOF
@@ -108,7 +104,7 @@ sub server_read {
   elsif ($req->content->is_parsing_body && !defined $self->{continued}) {
     return unless ($req->headers->expect || '') =~ /100-continue/i;
     $self->{state} = 'write';
-    $res->code(100);
+    $self->res->code(100);
     $self->{continued} = 0;
   }
 }

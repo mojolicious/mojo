@@ -29,14 +29,12 @@ sub new {
 
 sub add_handler {
   my ($self, $name, $cb) = @_;
-  $self->handlers->{$name} = $cb;
-  return $self;
+  return $self->tap(sub { $_->handlers->{$name} = $cb });
 }
 
 sub add_helper {
   my ($self, $name, $cb) = @_;
-  $self->helpers->{$name} = $cb;
-  return $self;
+  return $self->tap(sub { $_->helpers->{$name} = $cb });
 }
 
 sub get_data_template {

@@ -49,10 +49,10 @@ sub detect {
 }
 
 sub type {
-  my ($self, $ext, @args) = @_;
+  my ($self, $ext, $type) = @_;
   my $types = $self->types;
-  return ref $types->{$ext} ? $types->{$ext}[0] : $types->{$ext} unless @args;
-  return $self->tap(sub { $types->{$ext} = shift @args });
+  return ref $types->{$ext} ? $types->{$ext}[0] : $types->{$ext} unless $type;
+  return $self->tap(sub { $types->{$ext} = $type });
 }
 
 1;

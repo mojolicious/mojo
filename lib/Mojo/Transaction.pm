@@ -41,10 +41,10 @@ sub is_writing {
 }
 
 sub remote_address {
-  my ($self, @args) = @_;
+  my ($self, $address) = @_;
 
   # New address
-  return $self->tap(sub { $_->{remote_address} = shift @args }) if @args;
+  return $self->tap(sub { $_->{remote_address} = $address }) if $address;
 
   # Reverse proxy
   if ($ENV{MOJO_REVERSE_PROXY}) {

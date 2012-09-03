@@ -163,8 +163,8 @@ sub parent {
 }
 
 sub parse {
-  my ($self, @args) = @_;
-  return $self->tap(sub { $_->[0]->parse(@args) });
+  my ($self, $html) = @_;
+  return $self->tap(sub { $_->[0]->parse($html) });
 }
 
 sub prepend { shift->_add(0, @_) }

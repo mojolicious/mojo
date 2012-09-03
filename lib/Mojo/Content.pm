@@ -95,10 +95,7 @@ sub parse {
   $self->_body;
 
   # No content
-  if ($self->skip_body) {
-    $self->{state} = 'finished';
-    return $self;
-  }
+  return $self->tap(sub { $_->{state} = 'finished' }) if $self->skip_body;
 
   # Relaxed parsing
   my $headers = $self->headers;

@@ -9,7 +9,6 @@ use Mojo::Base -base;
 #  Bender: You're better off dead, I'm telling you, dude.
 #  Fry: Santa Claus is gunning you down!"
 use Mojo::IOLoop;
-use Mojo::Message::Response;
 use Mojo::Server;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
@@ -191,8 +190,7 @@ sub options_ok { shift->_request_ok(options => @_) }
 
 sub or {
   my ($self, $cb) = @_;
-  $self->$cb unless $self->{latest};
-  return $self;
+  return $self->tap(sub { $_->{latest} or $_->$cb });
 }
 
 sub patch_ok { shift->_request_ok(patch => @_) }
@@ -310,10 +308,9 @@ sub _request_ok {
 }
 
 sub _test {
-  my ($self, $name) = (shift, shift);
+  my ($self, $name, @args) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 2;
-  $self->{latest} = Test::More->can($name)->(@_);
-  return $self;
+  return $self->tap(sub { $_->{latest} = Test::More->can($name)->(@args) });
 }
 
 sub _text {

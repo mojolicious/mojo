@@ -65,10 +65,7 @@ sub unsubscribe {
   my ($self, $name, $cb) = @_;
 
   # All
-  unless ($cb) {
-    delete $self->{events}{$name};
-    return $self;
-  }
+  return $self->tap(sub { delete $_->{events}{$name} }) unless $cb;
 
   # One
   $self->{events}{$name} = [grep { $cb ne $_ } @{$self->{events}{$name}}];

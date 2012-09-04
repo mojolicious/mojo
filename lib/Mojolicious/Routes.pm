@@ -16,14 +16,12 @@ has 'namespace';
 
 sub add_condition {
   my ($self, $name, $cb) = @_;
-  $self->conditions->{$name} = $cb;
-  return $self;
+  return $self->tap(sub { $_->conditions->{$name} = $cb });
 }
 
 sub add_shortcut {
   my ($self, $name, $cb) = @_;
-  $self->shortcuts->{$name} = $cb;
-  return $self;
+  return $self->tap(sub { $_->shortcuts->{$name} = $cb });
 }
 
 sub auto_render {

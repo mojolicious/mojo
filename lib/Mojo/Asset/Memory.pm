@@ -15,10 +15,9 @@ sub add_chunk {
   $self->{content} .= $chunk // '';
   return $self
     if !$self->auto_upgrade || $self->size <= $self->max_memory_size;
-  my $file = Mojo::Asset::File->new;
-  $self->emit(upgrade => $file);
 
-  return $file->add_chunk($self->slurp);
+  my $file = Mojo::Asset::File->new;
+  return $file->add_chunk($self->emit(upgrade => $file)->slurp);
 }
 
 sub contains {

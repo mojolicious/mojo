@@ -26,6 +26,7 @@ sub endpoint {
   # Proxy for normal HTTP requests
   return $self->_proxy($tx, $scheme, $host, $port)
     if $scheme eq 'http' && lc($req->headers->upgrade || '') ne 'websocket';
+
   return $scheme, $host, $port;
 }
 

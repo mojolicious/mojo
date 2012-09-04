@@ -103,8 +103,8 @@ sub get_line {
   return $line;
 }
 
-sub hmac_md5_sum  { _hmac(0, @_) }
-sub hmac_sha1_sum { _hmac(1, @_) }
+sub hmac_md5_sum  { _hmac(\&md5,  @_) }
+sub hmac_sha1_sum { _hmac(\&sha1, @_) }
 
 sub html_escape {
   my ($string, $pattern) = @_;
@@ -117,7 +117,7 @@ sub html_escape {
 sub html_unescape {
   my $string = shift;
   $string
-    =~ s/&(?:\#((?:\d{1,7}|x[0-9A-Fa-f]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
+    =~ s/&(?:\#((?:\d{1,7}|x[[:xdigit:]]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
   return $string;
 }
 
@@ -306,7 +306,7 @@ sub url_escape {
 sub url_unescape {
   my $string = shift;
   return $string if index($string, '%') == -1;
-  $string =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+  $string =~ s/%([[:xdigit:]]{2})/chr(hex($1))/ge;
   return $string;
 }
 
@@ -357,10 +357,7 @@ sub _encode {
 }
 
 sub _hmac {
-  my ($sha, $string, $secret) = @_;
-
-  # Hash function
-  my $hash = $sha ? sub { sha1(@_) } : sub { md5(@_) };
+  my ($hash, $string, $secret) = @_;
 
   # Secret
   $secret = $secret ? "$secret" : 'Very insecure!';

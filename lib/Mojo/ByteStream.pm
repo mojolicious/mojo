@@ -275,7 +275,7 @@ Read all data into bytestream with L<Mojo::Util/"slurp">.
 
 Write bytestream to file with L<Mojo::Util/"spurt">.
 
-  b('/home/sri/foo.html')->slurp->html_unescape->spurt('/home/sri/bar.html');
+  b('/home/sri/foo.txt')->slurp->squish->spurt('/home/sri/bar.txt');
 
 =head2 C<split>
 

@@ -8,6 +8,8 @@ has [qw(auto_relax relaxed skip_body)];
 has headers => sub { Mojo::Headers->new };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
+my $CHUNK_RE = qr/^((?:\x0d?\x0a)?([[:xdigit:]]+).*\x0d?\x0a)/;
+
 sub body_contains {
   croak 'Method "body_contains" not implemented by subclass';
 }
@@ -242,7 +244,7 @@ sub _parse_chunked {
     if ($self->{chunk_state} // '') eq 'trailing_headers';
 
   # New chunk (ignore the chunk extension)
-  while ($self->{pre_buffer} =~ /^((?:\x0d?\x0a)?([\da-fA-F]+).*\x0d?\x0a)/) {
+  while ($self->{pre_buffer} =~ $CHUNK_RE) {
     my $header = $1;
     my $len    = hex $2;
 

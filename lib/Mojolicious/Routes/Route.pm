@@ -89,8 +89,9 @@ sub is_websocket { !!shift->{websocket} }
 sub name {
   my $self = shift;
   return $self->{name} unless @_;
-  $self->{name} = shift;
-  return $self->tap(sub { $_->{custom} = 1 });
+  $self->{name}   = shift;
+  $self->{custom} = 1;
+  return $self;
 }
 
 sub options { shift->_generate_route(OPTIONS => @_) }
@@ -103,7 +104,8 @@ sub over {
   my $conditions = ref $_[0] eq 'ARRAY' ? $_[0] : [@_];
   return $self unless @$conditions;
   $self->{over} = $conditions;
-  return $self->tap(sub { $_->root->cache(0) });
+  $self->root->cache(0);
+  return $self;
 }
 
 sub parse {
@@ -222,7 +224,9 @@ sub via {
 }
 
 sub websocket {
-  shift->get(@_)->tap(sub { $_->{websocket} = 1 });
+  my $route = shift->get(@_);
+  $route->{websocket} = 1;
+  return $route;
 }
 
 sub _generate_route {

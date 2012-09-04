@@ -98,8 +98,10 @@ sub parse {
   while (defined(my $line = get_line \$self->{buffer})) {
 
     # Check line size limit
-    return $self->tap(sub { $_->{limit} = $_->{state} = 'finished' })
-      if length $line > $max;
+    if (length $line > $max) {
+      $self->{limit} = $self->{state} = 'finished';
+      return $self;
+    }
 
     # New header
     if ($line =~ /^(\S+)\s*:\s*(.*)$/) { push @$headers, $1, $2 }
@@ -110,7 +112,8 @@ sub parse {
     # Empty line
     else {
       $self->add(splice @$headers, 0, 2) while @$headers;
-      return $self->tap(sub { $_->{state} = 'finished' });
+      $self->{state} = 'finished';
+      return $self;
     }
   }
 
@@ -125,7 +128,8 @@ sub referrer { scalar shift->header(Referer => @_) }
 
 sub remove {
   my ($self, $name) = @_;
-  return $self->tap(sub { delete $_->{headers}{lc $name} });
+  delete $self->{headers}{lc $name};
+  return $self;
 }
 
 sub to_hash {

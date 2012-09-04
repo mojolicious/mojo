@@ -29,7 +29,9 @@ sub new {
 
 sub app {
   my ($self, $app) = @_;
-  return $app ? $self->tap(sub { $_->ua->app($app) }) : $self->ua->app;
+  return $self->ua->app unless $app;
+  $self->ua->app($app);
+  return $self;
 }
 
 sub content_is {
@@ -190,7 +192,8 @@ sub options_ok { shift->_request_ok(options => @_) }
 
 sub or {
   my ($self, $cb) = @_;
-  return $self->tap(sub { $_->{latest} or $_->$cb });
+  $self->$cb unless $self->{latest};
+  return $self;
 }
 
 sub patch_ok { shift->_request_ok(patch => @_) }
@@ -310,7 +313,8 @@ sub _request_ok {
 sub _test {
   my ($self, $name, @args) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 2;
-  return $self->tap(sub { $_->{latest} = Test::More->can($name)->(@args) });
+  $self->{latest} = Test::More->can($name)->(@args);
+  return $self;
 }
 
 sub _text {

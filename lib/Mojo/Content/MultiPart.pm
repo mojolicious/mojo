@@ -6,7 +6,9 @@ use Mojo::Util 'b64_encode';
 has parts => sub { [] };
 
 sub new {
-  shift->SUPER::new(@_)->tap(sub { $_->on(read => \&_read) });
+  my $self = shift->SUPER::new(@_);
+  $self->on(read => \&_read);
+  return $self;
 }
 
 sub body_contains {

@@ -45,7 +45,8 @@ sub get_chunk {
 
 sub move_to {
   my ($self, $to) = @_;
-  return $self->tap(sub { spurt $_->{content}, $to });
+  spurt $self->{content}, $to;
+  return $self;
 }
 
 sub size { length shift->{content} }

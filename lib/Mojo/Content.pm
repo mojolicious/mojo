@@ -95,7 +95,10 @@ sub parse {
   $self->_body;
 
   # No content
-  return $self->tap(sub { $_->{state} = 'finished' }) if $self->skip_body;
+  if ($self->skip_body) {
+    $self->{state} = 'finished';
+    return $self;
+  }
 
   # Relaxed parsing
   my $headers = $self->headers;
@@ -145,7 +148,9 @@ sub parse {
 }
 
 sub parse_body {
-  shift->tap(sub { $_->{state} = 'body' })->parse(@_);
+  my $self = shift;
+  $self->{state} = 'body';
+  return $self->parse(@_);
 }
 
 sub progress {

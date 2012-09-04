@@ -152,7 +152,8 @@ sub handler {
   # Process
   unless (eval { $self->plugins->emit_chain(around_dispatch => $c) }) {
     $self->log->fatal("Processing request failed: $@");
-    $tx->tap(sub { $_->res->code(500) })->resume;
+    $tx->res->code(500);
+    $tx->resume;
   }
 
   # Delayed

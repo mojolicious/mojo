@@ -19,7 +19,7 @@ sub client_read {
   $self->{state} = 'finished' if $res->is_finished;
 
   # Unexpected 100 Continue
-  $self->tap(sub { $_->{state} = $preserved })->res($res->new)
+  $self->res($res->new)->{state} = $preserved
     if $self->{state} eq 'finished' && ($res->code // '') eq '100';
 
   # Check for errors

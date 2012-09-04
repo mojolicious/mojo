@@ -103,10 +103,13 @@ sub dom {
 }
 
 sub error {
-  my ($self, @args) = @_;
+  my $self = shift;
 
   # Set
-  return $self->tap(sub { $_->{error} = [@args] })->finish if @args;
+  if (@_) {
+    $self->{error} = [@_];
+    return $self->finish;
+  }
 
   # Get
   return unless my $err = $self->{error};
@@ -118,7 +121,8 @@ sub extract_start_line {
 }
 
 sub finish {
-  my $self = shift->tap(sub { $_->{state} = 'finished' });
+  my $self = shift;
+  $self->{state} = 'finished';
   return $self->{finished}++ ? $self : $self->emit('finish');
 }
 

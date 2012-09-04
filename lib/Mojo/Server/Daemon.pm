@@ -43,7 +43,8 @@ sub setuidgid {
 sub start {
   my $self = shift;
   $self->_listen($_) for @{$self->listen};
-  return $self->tap(sub { $_->ioloop->max_connections($_->max_clients) });
+  $self->ioloop->max_connections($self->max_clients);
+  return $self;
 }
 
 sub _build_tx {
@@ -68,7 +69,8 @@ sub _build_tx {
   $tx->on(
     upgrade => sub {
       my ($tx, $ws) = @_;
-      $self->{connections}{$id}{ws} = $ws->tap(sub { $_->server_handshake });
+      $ws->server_handshake;
+      $self->{connections}{$id}{ws} = $ws;
     }
   );
   $tx->on(
@@ -213,7 +215,8 @@ sub _read {
 
 sub _remove {
   my ($self, $id) = @_;
-  $self->tap(sub { $_->ioloop->remove($id) })->_close($id);
+  $self->ioloop->remove($id);
+  $self->_close($id);
 }
 
 sub _user {

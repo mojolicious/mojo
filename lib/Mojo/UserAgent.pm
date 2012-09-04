@@ -52,7 +52,8 @@ sub app {
 
   # Default to singleton application
   return $self->{app} || $singleton unless $app;
-  return $self->tap(sub { $_->{app} = $app });
+  $self->{app} = $app;
+  return $self;
 }
 
 sub app_url {

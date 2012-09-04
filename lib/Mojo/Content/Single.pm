@@ -8,7 +8,9 @@ has asset => sub { Mojo::Asset::Memory->new(auto_upgrade => 1) };
 has auto_upgrade => 1;
 
 sub new {
-  shift->SUPER::new(@_)->tap(sub { $_->{read} = $_->on(read => \&_read) });
+  my $self = shift->SUPER::new(@_);
+  $self->{read} = $self->on(read => \&_read);
+  return $self;
 }
 
 sub body_contains { shift->asset->contains(shift) >= 0 }

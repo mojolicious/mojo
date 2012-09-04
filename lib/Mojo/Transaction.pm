@@ -10,7 +10,9 @@ has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
 sub client_close {
-  shift->tap(sub { $_->res->finish })->server_close(@_);
+  my $self = shift;
+  $self->res->finish;
+  return $self->server_close(@_);
 }
 
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }
@@ -41,10 +43,13 @@ sub is_writing {
 }
 
 sub remote_address {
-  my ($self, $address) = @_;
+  my $self = shift;
 
   # New address
-  return $self->tap(sub { $_->{remote_address} = $address }) if $address;
+  if (@_) {
+    $self->{remote_address} = shift;
+    return $self;
+  }
 
   # Reverse proxy
   if ($ENV{MOJO_REVERSE_PROXY}) {
@@ -64,7 +69,9 @@ sub resume {
 }
 
 sub server_close {
-  shift->tap(sub { $_->{state} = 'finished' })->emit('finish');
+  my $self = shift;
+  $self->{state} = 'finished';
+  return $self->emit('finish');
 }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }

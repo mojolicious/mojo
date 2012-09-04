@@ -20,8 +20,9 @@ my @UTILS = (
   for my $name (@UTILS) {
     my $sub = Mojo::Util->can($name);
     *{__PACKAGE__ . "::$name"} = sub {
-      my ($self, @args) = @_;
-      return $self->tap(sub { $$_ = $sub->($$_, @args) });
+      my $self = shift;
+      $$self = $sub->($$self, @_);
+      return $self;
     };
   }
 }
@@ -39,13 +40,15 @@ sub clone {
 }
 
 sub decode {
-  my ($self, $e) = @_;
-  return $self->tap(sub { $$_ = Mojo::Util::decode $e || 'UTF-8', $$_ });
+  my $self = shift;
+  $$self = Mojo::Util::decode shift || 'UTF-8', $$self;
+  return $self;
 }
 
 sub encode {
-  my ($self, $e) = @_;
-  return $self->tap(sub { $$_ = Mojo::Util::encode $e || 'UTF-8', $$_ });
+  my $self = shift;
+  $$self = Mojo::Util::encode shift || 'UTF-8', $$self;
+  return $self;
 }
 
 sub say {

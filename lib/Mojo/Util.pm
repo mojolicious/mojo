@@ -324,6 +324,8 @@ sub xml_escape {
 
 sub xor_encode {
   my ($input, $key) = @_;
+
+  # Encode with variable key length
   my $len = length $key;
   my $buffer = my $output = '';
   $output .= $buffer ^ $key

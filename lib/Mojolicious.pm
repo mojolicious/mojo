@@ -784,6 +784,8 @@ Dmitriy Shalashov
 
 Dmitry Konstantinov
 
+Dominique Dumont
+
 Douglas Christopher Wilson
 
 Eugene Toropov

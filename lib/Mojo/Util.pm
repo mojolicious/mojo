@@ -324,11 +324,11 @@ sub xml_escape {
 
 sub xor_encode {
   my ($input, $key) = @_;
-  my $len    = length $key;
-  my $tmp = '';
-  my $output = '';
-  $output .= $tmp ^ $key while length($tmp = substr($input, 0, $len, '')) == $len;
-  return $output .= $tmp ^ substr($key, 0, length $tmp, '');
+  my $len = length $key;
+  my $buffer = my $output = '';
+  $output .= $buffer ^ $key
+    while length($buffer = substr($input, 0, $len, '')) == $len;
+  return $output .= $buffer ^ substr($key, 0, length $buffer, '');
 }
 
 sub _adapt {

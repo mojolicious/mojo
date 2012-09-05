@@ -1,5 +1,7 @@
 
 3.38  2012-09-05
+  - Added xor_encode method to Mojo::ByteStream.
+  - Added xor_encode function to Mojo::Util.
   - Improved documentation.
 
 3.37  2012-09-04

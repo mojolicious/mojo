@@ -40,7 +40,7 @@ our @EXPORT_OK = (
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
   qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
-  qw(url_escape url_unescape xml_escape)
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
 
 sub b64_decode { decode_base64(shift) }
@@ -322,6 +322,14 @@ sub xml_escape {
   return $string;
 }
 
+sub xor_encode {
+  my ($input, $key) = @_;
+  my $len    = length $key;
+  my $output = '';
+  $output .= $_ ^ $key while length($_ = substr($input, 0, $len, '')) == $len;
+  return $output .= $_ ^ substr($key, 0, length, '');
+}
+
 sub _adapt {
   my ($delta, $numpoints, $firsttime) = @_;
 
@@ -599,6 +607,12 @@ Decode percent encoded characters in string.
 
 Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string,
 this is a much faster version of C<html_escape>.
+
+=head2 C<xor_encode>
+
+  my $encoded = xor_encode $string, $key;
+
+XOR encode string.
 
 =head1 SEE ALSO
 

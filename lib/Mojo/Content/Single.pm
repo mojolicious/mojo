@@ -45,7 +45,7 @@ sub parse {
 
   # Parse body
   return $self->SUPER::parse
-    unless $self->auto_upgrade && defined($self->boundary);
+    unless $self->auto_upgrade && defined $self->boundary;
 
   # Content needs to be upgraded to multipart
   $self->unsubscribe(read => $self->{read});

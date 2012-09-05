@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::Transaction';
 
 use Config;
 use Mojo::Transaction::HTTP;
-use Mojo::Util qw(b64_encode decode encode sha1_bytes);
+use Mojo::Util qw(b64_encode decode encode sha1_bytes xor_encode);
 
 use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 
@@ -73,7 +73,7 @@ sub build_frame {
   # Mask payload
   if ($masked) {
     my $mask = pack 'N', int(rand 9999999);
-    $payload = $mask . _xor_mask($payload, $mask);
+    $payload = $mask . xor_encode($payload, $mask x 128);
   }
 
   return $frame . $payload;
@@ -173,7 +173,7 @@ sub parse_frame {
   my $payload = $len ? substr($clone, 0, $len, '') : '';
 
   # Unmask payload
-  $payload = _xor_mask($payload, substr($payload, 0, 4, '')) if $masked;
+  $payload = xor_encode($payload, substr($payload, 0, 4, '') x 128) if $masked;
   warn "$payload\n" if DEBUG;
   $$buffer = $clone;
 
@@ -281,16 +281,6 @@ sub _message {
   my $msg = delete $self->{message};
   $msg = decode 'UTF-8', $msg if $msg && delete $self->{op} == TEXT;
   $self->emit(message => $msg);
-}
-
-sub _xor_mask {
-  my ($input, $mask) = @_;
-
-  # 512 byte mask
-  $mask = $mask x 128;
-  my $output = '';
-  $output .= $_ ^ $mask while length($_ = substr($input, 0, 512, '')) == 512;
-  return $output .= $_ ^ substr($mask, 0, length, '');
 }
 
 1;

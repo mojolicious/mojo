@@ -296,8 +296,8 @@ Shortcut for the C<Content-Encoding> header.
 
 =head2 C<content_length>
 
-  my $length = $headers->content_length;
-  $headers   = $headers->content_length(4000);
+  my $len  = $headers->content_length;
+  $headers = $headers->content_length(4000);
 
 Shortcut for the C<Content-Length> header.
 

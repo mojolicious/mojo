@@ -62,7 +62,7 @@ sub _context {
   # Before
   for my $i (2 .. 6) {
     last if ((my $previous = $line - $i) < 0);
-    if (defined($lines->[0][$previous])) {
+    if (defined $lines->[0][$previous]) {
       unshift @{$self->lines_before}, [$previous + 1];
       for my $l (@$lines) {
         chomp(my $code = $l->[$previous]);
@@ -74,7 +74,7 @@ sub _context {
   # After
   for my $i (0 .. 4) {
     next if ((my $next = $line + $i) < 0);
-    if (defined($lines->[0][$next])) {
+    if (defined $lines->[0][$next]) {
       push @{$self->lines_after}, [$next + 1];
       for my $l (@$lines) {
         next unless defined(my $code = $l->[$next]);

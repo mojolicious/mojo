@@ -13,7 +13,7 @@ my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum),
   qw(html_escape html_unescape md5_bytes md5_sum punycode_decode),
   qw(punycode_encode quote sha1_bytes sha1_sum slurp spurt squish trim),
-  qw(unquote url_escape url_unescape xml_escape)
+  qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
 {
   no strict 'refs';
@@ -337,7 +337,13 @@ L<Mojo::Util/"url_unescape">.
   $stream = $stream->xml_escape;
 
 Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in
-bytestream, this is a much faster version of C<html_escape>.
+bytestream with L<Mojo::Util/"xml_escape">.
+
+=head2 C<xor_encode>
+
+  $stream = $stream->xor_encode($key);
+
+XOR encode bytestream with L<Mojo::Util/"xor_encode">.
 
 =head1 SEE ALSO
 

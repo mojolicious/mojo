@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 150;
+use Test::More tests => 152;
 
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
@@ -369,6 +369,10 @@ ok !secure_compare('0♥1', '1♥0'), 'values are not equal';
 # xor_encode
 is xor_encode('hello', 'foo'), "\x0e\x0a\x03\x0a\x00", 'right result';
 is xor_encode("\x0e\x0a\x03\x0a\x00", 'foo'), 'hello', 'right result';
+is xor_encode('hello world', 'x'),
+  "\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'right result';
+is xor_encode("\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'x'),
+  'hello world', 'right result';
 
 # slurp
 is slurp(catfile(splitdir($FindBin::Bin), qw(templates exception.mt))),

@@ -325,9 +325,10 @@ sub xml_escape {
 sub xor_encode {
   my ($input, $key) = @_;
   my $len    = length $key;
+  my $tmp = '';
   my $output = '';
-  $output .= $_ ^ $key while length($_ = substr($input, 0, $len, '')) == $len;
-  return $output .= $_ ^ substr($key, 0, length, '');
+  $output .= $tmp ^ $key while length($tmp = substr($input, 0, $len, '')) == $len;
+  return $output .= $tmp ^ substr($key, 0, length $tmp, '');
 }
 
 sub _adapt {

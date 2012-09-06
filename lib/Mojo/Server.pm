@@ -17,6 +17,7 @@ sub new {
 sub build_app {
   my ($self, $app) = @_;
   local $ENV{MOJO_EXE};
+  local $ENV{MOJO_APP} = $app;
   if (my $e = Mojo::Loader->new->load($app)) { die $e if ref $e }
   return $app->new;
 }

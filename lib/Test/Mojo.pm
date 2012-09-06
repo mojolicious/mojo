@@ -23,8 +23,7 @@ $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
 sub new {
   my $self = shift->SUPER::new;
   return $self unless my $app = shift;
-  return $self->app(
-    ref $app ? $app : Mojo::Server->new->build_app($ENV{MOJO_APP} = $app));
+  return $self->app(ref $app ? $app : Mojo::Server->new->build_app($app));
 }
 
 sub app {

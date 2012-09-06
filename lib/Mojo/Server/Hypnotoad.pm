@@ -342,7 +342,7 @@ Mojo::Server::Hypnotoad - ALL GLORY TO THE HYPNOTOAD!
   use Mojo::Server::Hypnotoad;
 
   my $toad = Mojo::Server::Hypnotoad->new;
-  $toad->run('./myapp.pl');
+  $toad->run('/home/sri/myapp.pl');
 
 =head1 DESCRIPTION
 

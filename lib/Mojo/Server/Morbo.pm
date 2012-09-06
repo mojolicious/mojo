@@ -106,7 +106,7 @@ Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
   use Mojo::Server::Morbo;
 
   my $morbo = Mojo::Server::Morbo->new;
-  $morbo->run('./myapp.pl');
+  $morbo->run('/home/sri/myapp.pl');
 
 =head1 DESCRIPTION
 

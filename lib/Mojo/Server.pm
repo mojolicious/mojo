@@ -130,7 +130,7 @@ Let application build a transaction.
 
 =head2 C<load_app>
 
-  my $app = $server->load_app('./myapp.pl');
+  my $app = $server->load_app('/home/sri/myapp.pl');
 
 Load application from script.
 

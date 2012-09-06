@@ -25,7 +25,7 @@ sub build_app {
 sub build_tx { shift->app->build_tx }
 
 sub load_app {
-  my ($self, $file) = @_;
+  my ($self, $path) = @_;
 
   # Clean up environment
   local $ENV{MOJO_APP_LOADER} = 1;
@@ -33,13 +33,13 @@ sub load_app {
 
   # Try to load application from script into sandbox
   my $app = eval <<EOF;
-package Mojo::Server::SandBox::@{[md5_sum($file . $$)]};
-my \$app = do \$file;
+package Mojo::Server::SandBox::@{[md5_sum($path . $$)]};
+my \$app = do \$path;
 if (!\$app && (my \$e = \$@ || \$!)) { die \$e }
 \$app;
 EOF
-  die qq{Couldn't load application from file "$file": $@} if !$app && $@;
-  die qq{File "$file" did not return an application object.\n}
+  die qq{Couldn't load application from file "$path": $@} if !$app && $@;
+  die qq{File "$path" did not return an application object.\n}
     unless blessed $app && $app->isa('Mojo');
   return $self->app($app)->app;
 }
@@ -120,7 +120,7 @@ default request handling.
 
   my $app = $server->build_app('Mojo::HelloWorld');
 
-Build application.
+Build application from class.
 
 =head2 C<build_tx>
 

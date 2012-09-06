@@ -131,7 +131,7 @@ Mojo::Base - Minimal base class for Mojo projects
   say $mew->mice;
   say $mew->mice(3)->birds(4)->mice;
 
-  my $rawr = Tiger->new(stripes => 23);
+  my $rawr = Tiger->new(stripes => 23, mice => 0);
   say $rawr->tap(sub { $_->friend->name('Tacgnol') })->mice;
 
 =head1 DESCRIPTION

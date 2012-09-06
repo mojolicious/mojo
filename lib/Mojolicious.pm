@@ -820,7 +820,7 @@ Kazuhiro Shibuya
 
 Kevin Old
 
-KITAMURA Akatsuki
+Kitamura Akatsuki
 
 Lars Balker Rasmussen
 

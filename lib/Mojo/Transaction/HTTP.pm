@@ -300,13 +300,13 @@ implements the following new ones.
 
   $tx->client_read($chunk);
 
-Read and process client data.
+Read and process data client-side.
 
 =head2 C<client_write>
 
   my $chunk = $tx->client_write;
 
-Write client data.
+Write data client-side.
 
 =head2 C<keep_alive>
 
@@ -318,19 +318,19 @@ Check if connection can be kept alive.
 
   my $leftovers = $tx->server_leftovers;
 
-Leftovers from the server request, used for pipelining.
+Leftovers from the request, used for pipelining server-side.
 
 =head2 C<server_read>
 
   $tx->server_read($chunk);
 
-Read and process server data.
+Read and process data server-side.
 
 =head2 C<server_write>
 
   my $chunk = $tx->server_write;
 
-Write server data.
+Write data server-side.
 
 =head1 SEE ALSO
 

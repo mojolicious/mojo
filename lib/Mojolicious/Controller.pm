@@ -808,15 +808,21 @@ browsers often don't really know what they actually want.
 
   $c = $c->send({binary => $bytes});
   $c = $c->send({text   => $bytes});
-  $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
-  $c = $c->send('Hi there!');
-  $c = $c->send('Hi there!' => sub {...});
+  $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
+  $c = $c->send($chars);
+  $c = $c->send($chars => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
 will be invoked once all data has been written.
 
-  # Send JSON object as text frame
+  # Send "Text" frame
+  $c->send('Hello World!');
+
+  # Send JSON object as "Text" frame
   $c->send({text => Mojo::JSON->new->encode({hello => 'world'})});
+
+  # Send JSON object as "Binary" frame
+  $c->send({binary => Mojo::JSON->new->encode({hello => 'world'})});
 
   # Send "Ping" frame
   $c->send([1, 0, 0, 0, 9, 'Hello World!']);

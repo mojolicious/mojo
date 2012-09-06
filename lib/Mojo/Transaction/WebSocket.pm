@@ -433,25 +433,25 @@ Build WebSocket frame.
 
   my $success = $ws->client_challenge;
 
-Check WebSocket handshake challenge.
+Check WebSocket handshake challenge client-side.
 
 =head2 C<client_handshake>
 
   $ws->client_handshake;
 
-WebSocket handshake.
+Perform WebSocket handshake client-side.
 
 =head2 C<client_read>
 
   $ws->client_read($data);
 
-Read raw WebSocket data.
+Read and process data client-side.
 
 =head2 C<client_write>
 
   my $chunk = $ws->client_write;
 
-Raw WebSocket data to write.
+Write data client-side.
 
 =head2 C<connection>
 
@@ -538,9 +538,9 @@ Resume C<handshake> transaction.
 
   $ws = $ws->send({binary => $bytes});
   $ws = $ws->send({text   => $bytes});
-  $ws = $ws->send([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
-  $ws = $ws->send('Hi there!');
-  $ws = $ws->send('Hi there!' => sub {...});
+  $ws = $ws->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
+  $ws = $ws->send($chars);
+  $ws = $ws->send($chars => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
 will be invoked once all data has been written.
@@ -552,19 +552,19 @@ will be invoked once all data has been written.
 
   $ws->server_handshake;
 
-WebSocket handshake.
+Perform WebSocket handshake server-side.
 
 =head2 C<server_read>
 
   $ws->server_read($data);
 
-Read raw WebSocket data.
+Read and process data server-side.
 
 =head2 C<server_write>
 
   my $chunk = $ws->server_write;
 
-Raw WebSocket data to write.
+Write data server-side.
 
 =head1 DEBUGGING
 

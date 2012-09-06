@@ -116,7 +116,7 @@ Cookie domain.
   my $httponly = $cookie->httponly;
   $cookie      = $cookie->httponly(1);
 
-HttpOnly flag, which can prevent client side scripts from accessing this
+HttpOnly flag, which can prevent client-side scripts from accessing this
 cookie.
 
 =head2 C<max_age>

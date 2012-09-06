@@ -198,19 +198,19 @@ implements the following new ones.
 
   $tx->client_close;
 
-Transaction closed.
+Transaction closed client-side.
 
 =head2 C<client_read>
 
   $tx->client_read($chunk);
 
-Read and process client data. Meant to be overloaded in a subclass.
+Read and process data client-side. Meant to be overloaded in a subclass.
 
 =head2 C<client_write>
 
   my $chunk = $tx->client_write;
 
-Write client data. Meant to be overloaded in a subclass.
+Write data client-side. Meant to be overloaded in a subclass.
 
 =head2 C<connection>
 
@@ -261,19 +261,19 @@ Remote interface address.
 
   $tx->server_close;
 
-Transaction closed.
+Transaction closed server-side.
 
 =head2 C<server_read>
 
   $tx->server_read($chunk);
 
-Read and process server data. Meant to be overloaded in a subclass.
+Read and process data server-side. Meant to be overloaded in a subclass.
 
 =head2 C<server_write>
 
   my $chunk = $tx->server_write;
 
-Write server data. Meant to be overloaded in a subclass.
+Write data server-side. Meant to be overloaded in a subclass.
 
 =head2 C<success>
 

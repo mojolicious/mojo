@@ -882,7 +882,7 @@ do is add a new C<handler>.
 
   app->renderer->add_handler(
     mine => sub {
-      my ($r, $c, $output, $options) = @_;
+      my ($renderer, $c, $output, $options) = @_;
 
       # Check for one time use inline template
       my $inline = $options->{inline};

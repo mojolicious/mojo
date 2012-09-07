@@ -473,7 +473,7 @@ get '/captures/:foo/:bar' => sub {
 # Default condition
 app->routes->add_condition(
   default => sub {
-    my ($r, $c, $captures, $num) = @_;
+    my ($route, $c, $captures, $num) = @_;
     $captures->{test} = $captures->{text} . "$num works!";
     return 1 if $c->stash->{default} == $num;
     return;
@@ -491,7 +491,7 @@ get '/default/:text' => (default => 23) => sub {
 # Redirect condition
 app->routes->add_condition(
   redirect => sub {
-    my ($r, $c, $captures, $active) = @_;
+    my ($route, $c, $captures, $active) = @_;
     return 1 unless $active;
     $c->redirect_to('index') and return
       unless $c->req->headers->header('X-Condition-Test');

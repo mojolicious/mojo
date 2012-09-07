@@ -23,7 +23,7 @@ plugin Charset => {charset => 'Shift_JIS'};
 # UTF-8 text renderer
 app->renderer->add_handler(
   test => sub {
-    my ($r, $c, $output, $options) = @_;
+    my ($renderer, $c, $output, $options) = @_;
     delete $options->{encoding};
     $$output = b($c->stash->{test})->encode('UTF-8')->to_string;
   }

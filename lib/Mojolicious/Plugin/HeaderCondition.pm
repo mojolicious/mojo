@@ -24,7 +24,7 @@ sub _check {
 }
 
 sub _headers {
-  my ($r, $c, $captures, $patterns) = @_;
+  my ($route, $c, $captures, $patterns) = @_;
   return unless $patterns && ref $patterns eq 'HASH' && keys %$patterns;
 
   # All headers need to match

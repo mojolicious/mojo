@@ -18,10 +18,11 @@ sub register {
   my $preprocess = $conf->{preprocess} || 'ep';
   $app->renderer->add_handler(
     $conf->{name} || 'pod' => sub {
-      my ($r, $c, $output, $options) = @_;
+      my ($renderer, $c, $output, $options) = @_;
 
       # Preprocess and render
-      return unless $r->handlers->{$preprocess}->($r, $c, $output, $options);
+      my $handler = $renderer->handlers->{$preprocess};
+      return unless $handler->($renderer, $c, $output, $options);
       $$output = _pod_to_html($$output);
       return 1;
     }

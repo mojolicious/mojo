@@ -14,16 +14,16 @@ sub register {
   # Add "ep" handler
   $app->renderer->add_handler(
     $conf->{name} || 'ep' => sub {
-      my ($r, $c, $output, $options) = @_;
+      my ($renderer, $c, $output, $options) = @_;
 
       # Generate name
-      my $path = $options->{inline} || $r->template_path($options);
+      my $path = $options->{inline} || $renderer->template_path($options);
       return unless defined $path;
       my $id = encode 'UTF-8', join(', ', $path, sort keys %{$c->stash});
       my $key = $options->{cache} = md5_sum $id;
 
       # Compile helpers and stash values
-      my $cache = $r->cache;
+      my $cache = $renderer->cache;
       unless ($cache->get($key)) {
         my $mt = Mojo::Template->new($template);
 
@@ -34,7 +34,7 @@ sub register {
         # Helpers
         $prepend .= 'my $_H = $self->app->renderer->helpers;';
         $prepend .= "sub $_; *$_ = sub { \$_H->{'$_'}->(\$self, \@_) };"
-          for grep {/^\w+$/} keys %{$r->helpers};
+          for grep {/^\w+$/} keys %{$renderer->helpers};
 
         # Be less relaxed for everything else
         $prepend .= 'use strict;';
@@ -49,7 +49,7 @@ sub register {
       }
 
       # Render with "epl" handler
-      return $r->handlers->{epl}->($r, $c, $output, $options);
+      return $renderer->handlers->{epl}->($renderer, $c, $output, $options);
     }
   );
 

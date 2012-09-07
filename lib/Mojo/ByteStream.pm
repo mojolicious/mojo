@@ -233,7 +233,7 @@ Quote bytestream with L<Mojo::Util/"quote">.
   $stream->say;
   $stream->say(*STDERR);
 
-Print bytestream to handle or STDOUT and append a newline.
+Print bytestream to handle and append a newline, defaults to C<STDOUT>.
 
 =head2 C<secure_compare>
 
@@ -265,7 +265,7 @@ Size of bytestream.
 
   $stream = $stream->slurp;
 
-Read all data into bytestream with L<Mojo::Util/"slurp">.
+Read all data at once from file into bytestream with L<Mojo::Util/"slurp">.
 
   b('/home/sri/myapp.pl')->slurp->split("\n")->shuffle->join("\n")->say;
 
@@ -273,7 +273,7 @@ Read all data into bytestream with L<Mojo::Util/"slurp">.
 
   $stream = $stream->spurt('/home/sri/myapp.pl');
 
-Write bytestream to file with L<Mojo::Util/"spurt">.
+Write all data from bytestream at once to file with L<Mojo::Util/"spurt">.
 
   b('/home/sri/foo.txt')->slurp->squish->spurt('/home/sri/bar.txt');
 

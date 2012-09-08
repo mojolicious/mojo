@@ -52,7 +52,7 @@ is $content->build_body,
 
 # Tainted environment
 $content = Mojo::Content::MultiPart->new;
-"a" =~ /(.)/;
+'a' =~ /(.)/;
 ok !$content->charset, 'no charset';
-"a" =~ /(.)/;
+'a' =~ /(.)/;
 ok !$content->boundary, 'no boundary';

@@ -8,7 +8,8 @@ sub register {
   return unless my $c = $conf->{charset};
   $app->types->type(html => "text/html;charset=$c");
   $app->renderer->encoding($c);
-  $app->hook(before_dispatch => sub { shift->req->default_charset($c) });
+  $app->hook(before_dispatch =>
+      sub { shift->req->default_charset($c)->url->query->charset($c) });
 }
 
 1;

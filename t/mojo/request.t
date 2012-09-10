@@ -556,9 +556,9 @@ is $req->headers->content_type, 'x-application-urlencoded',
 ok !$req->content->asset->is_file, 'stored in memory';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
-is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
 is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
+is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->params->to_hash->{foo}, [qw(bar bar 13)], 'right values';
 
 # Parse HTTP 1.1 "x-application-urlencoded" (too big for memory)
@@ -577,9 +577,9 @@ is $req->headers->content_type, 'x-application-urlencoded',
 ok $req->content->asset->is_file, 'stored in file';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar& tset=23+;&foo=bar', 'right content';
-is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
 is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
+is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->params->to_hash->{foo}, [qw(bar bar 13)], 'right values';
 
 # Parse HTTP 1.1 "application/x-www-form-urlencoded"
@@ -596,9 +596,9 @@ is $req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $req->content->asset->size, 26, 'right size';
 is $req->content->asset->slurp, 'foo=bar&+tset=23+;&foo=bar', 'right content';
-is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
 is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
+is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
 is_deeply $req->params->to_hash->{foo}, [qw(bar bar 13)], 'right values';
 is_deeply [$req->param('foo')], [qw(bar bar 13)], 'right values';
 is $req->param(' tset'), '23 ', 'right value';

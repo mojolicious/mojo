@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 41;
+use Test::More tests => 44;
 
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
@@ -55,6 +55,17 @@ get '/json' => sub { shift->render_json({test => $yatta}) };
 
 # GET /привет/мир
 get '/привет/мир' => sub { shift->render_json({foo => $yatta}) };
+
+# GET /params
+get '/params' => sub {
+  my $self = shift;
+  $self->render_json(
+    {
+      params => $self->req->url->query->to_hash,
+      yatta  => $self->param(['yatta'])
+    }
+  );
+};
 
 my $t = Test::Mojo->new;
 
@@ -107,6 +118,12 @@ $t->get_ok('/json')->status_is(200)->content_type_is('application/json')
 # IRI
 $t->get_ok('/привет/мир')->status_is(200)
   ->content_type_is('application/json')->json_content_is({foo => $yatta});
+
+# Shift_JIS parameters
+my $url = $t->ua->app_url->path('/params')->query(foo => 3, yatta => $yatta);
+$url->query->charset('shift_jis');
+$t->get_ok($url)->status_is(200)
+  ->json_content_is({params => {foo => 3, yatta => $yatta}, yatta => $yatta});
 
 __DATA__
 @@ index.html.ep

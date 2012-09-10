@@ -1,7 +1,9 @@
 
-3.39  2012-09-08
+3.39  2012-09-10
+  - Improved Mojo::URL and Mojo::Parameters performance.
   - Improved documentation.
   - Improved tests.
+  - Fixed support for query parameters in Mojolicious::Plugin::Charset.
 
 3.38  2012-09-07
   - Added xor_encode method to Mojo::ByteStream.

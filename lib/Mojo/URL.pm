@@ -107,14 +107,14 @@ sub query {
   my $self = shift;
 
   # Old parameters
-  return $self->{query} ||= Mojo::Parameters->new unless @_;
+  my $q = $self->{query} ||= Mojo::Parameters->new;
+  return $q unless @_;
 
   # Replace with list
   if (@_ > 1) { $self->{query} = Mojo::Parameters->new(@_) }
 
   # Merge with array
   elsif (ref $_[0] eq 'ARRAY') {
-    my $q = $self->{query} ||= Mojo::Parameters->new;
     while (my $name = shift @{$_[0]}) {
       my $value = shift @{$_[0]};
       defined $value ? $q->param($name => $value) : $q->remove($name);
@@ -122,12 +122,10 @@ sub query {
   }
 
   # Append hash
-  elsif (ref $_[0] eq 'HASH') {
-    ($self->{query} ||= Mojo::Parameters->new)->append(%{$_[0]});
-  }
+  elsif (ref $_[0] eq 'HASH') { $q->append(%{$_[0]}) }
 
   # Replace with string
-  else { $self->{query} = Mojo::Parameters->new($_[0]) }
+  else { $q->parse($_[0]) }
 
   return $self;
 }

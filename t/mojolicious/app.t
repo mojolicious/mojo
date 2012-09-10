@@ -91,7 +91,7 @@ $t->get_ok('/syntax_error/foo')->status_is(500)
 $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_like(qr/^Missing right curly/);
+  ->content_like(qr/Missing right curly/);
 
 # Exceptional::this_one_dies (action dies)
 $t->get_ok('/exceptional/this_one_dies')->status_is(500)

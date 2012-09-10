@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 95;
+use Test::More tests => 97;
 
 use Mojo::Parameters;
 
@@ -193,3 +193,8 @@ $p = Mojo::Parameters->new('foo=!$\'()*,%:@/?&bar=23');
 is $p->param('foo'), '!$\'()*,%:@/?', 'right value';
 is $p->param('bar'), 23, 'right value';
 is "$p", 'foo=!$\'()*,%:@/?&bar=23', 'right result';
+
+# No charset
+$p = Mojo::Parameters->new('foo=%E2%98%83')->charset(undef);
+is $p->param('foo'), "\xe2\x98\x83", 'right value';
+is "$p", 'foo=%E2%98%83', 'right result';

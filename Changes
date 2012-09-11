@@ -2,6 +2,7 @@
 3.40  2012-09-11
   - Improved tests.
   - Fixed Perl 5.10.1 compatibility.
+  - Fixed FindBin support in Mojolicious applications.
 
 3.39  2012-09-10
   - Improved Mojo::URL and Mojo::Parameters performance.

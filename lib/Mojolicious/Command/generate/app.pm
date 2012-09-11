@@ -52,15 +52,12 @@ __DATA__
 @@ mojo
 % my $class = shift;
 #!/usr/bin/env perl
-use Mojo::Base -strict;
 
-use File::Basename 'dirname';
-use File::Spec::Functions qw(catdir splitdir);
+use strict;
+use warnings;
 
-# Source directory has precedence
-my @base = (splitdir(dirname(__FILE__)), '..');
-my $lib = join('/', @base, 'lib');
--e catdir(@base, 't') ? unshift(@INC, $lib) : push(@INC, $lib);
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 
 # Start commands for application
 require Mojolicious::Commands;

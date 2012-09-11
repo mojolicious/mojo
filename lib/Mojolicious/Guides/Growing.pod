@@ -644,8 +644,7 @@ Finally C<myapp.pl> can be replaced with a proper L<Mojolicious> script.
   $ touch script/myapp
   $ chmod 744 script/myapp
 
-The library detection code was specifically designed for tricky production
-environments.
+Only a few small details change.
 
   #!/usr/bin/env perl
 

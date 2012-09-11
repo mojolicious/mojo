@@ -9,7 +9,7 @@ use Mojo::JSON;
 use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
-use Mojo::Util qw(decode url_unescape);
+use Mojo::Util 'decode';
 use Scalar::Util 'weaken';
 
 has content => sub { Mojo::Content::Single->new };
@@ -342,9 +342,6 @@ sub _parse_formdata {
       next;
     }
 
-    # Charset
-    my $charset = $part->charset || $default;
-
     # Content-Disposition header
     my $disposition = $part->headers->content_disposition;
     next unless $disposition;
@@ -352,9 +349,8 @@ sub _parse_formdata {
     my ($filename) = $disposition =~ /[; ]filename="?([^"]*)"?/;
     my $value      = $part;
 
-    # Unescape
-    $name     = url_unescape $name     if $name;
-    $filename = url_unescape $filename if $filename;
+    # Decode
+    my $charset = $part->charset || $default;
     if ($charset) {
       $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;

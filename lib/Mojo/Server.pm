@@ -28,10 +28,10 @@ sub build_tx { shift->app->build_tx }
 sub load_app {
   my ($self, $path) = @_;
 
-  # Clean environment
+  # Clean environment (and reset FindBin)
   {
     local $0 = $path;
-    FindBin::again();
+    FindBin->again;
     local $ENV{MOJO_APP_LOADER} = 1;
     local $ENV{MOJO_EXE};
 
@@ -46,7 +46,7 @@ EOF
     die qq{File "$path" did not return an application object.\n}
       unless blessed $app && $app->isa('Mojo');
   };
-  FindBin::again();
+  FindBin->again;
 
   return $self->app;
 }

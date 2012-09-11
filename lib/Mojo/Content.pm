@@ -39,7 +39,7 @@ sub generate_body_chunk {
 
   # Drain
   $self->emit(drain => $offset)
-    if !delete $self->{delay} && !length $self->{body_buffer};
+    if !delete $self->{delay} && !length($self->{body_buffer} // '');
 
   # Get chunk
   my $chunk = delete $self->{body_buffer} // '';

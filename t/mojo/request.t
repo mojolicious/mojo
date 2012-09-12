@@ -1652,7 +1652,7 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
 ok $req->is_finished, 'request is finished';
 is $req->param('Vorname'), 'T', 'right value';
 
-# Google Chrome multipart/form-data request
+# Google Chrome 5 multipart/form-data request
 $req = Mojo::Message::Request->new;
 $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "Host: 127.0.0.1:10002\x0d\x0a"
@@ -1717,7 +1717,7 @@ is $upload->filename, 'аватар.jpg', 'right filename';
 is $upload->size,     4,                  'right size';
 is $upload->slurp,    '1234',             'right content';
 
-# Firefox multipart/form-data request
+# Firefox 3.5.8 multipart/form-data request
 $req = Mojo::Message::Request->new;
 $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "Host: 127.0.0.1:10002\x0d\x0a"
@@ -1787,7 +1787,7 @@ is $upload->filename, 'аватар.jpg', 'right filename';
 is $upload->size,     4,                  'right size';
 is $upload->slurp,    '1234',             'right content';
 
-# Opera multipart/form-data request
+# Opera 9.8 multipart/form-data request
 $req = Mojo::Message::Request->new;
 $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "Host: 127.0.0.1:10002\x0d\x0a"
@@ -1852,7 +1852,7 @@ is $upload->filename, 'аватар.jpg', 'right filename';
 is $upload->size,     4,                  'right size';
 is $upload->slurp,    '1234',             'right content';
 
-# Firefox multipart/form-data request (UTF-8)
+# Firefox 14 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
 $req->parse("POST /foo HTTP/1.1\x0d\x0a");
 $req->parse("Host: 127.0.0.1:3000\x0d\x0a");

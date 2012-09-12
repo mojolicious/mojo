@@ -235,7 +235,7 @@ is $client, 'works!', 'full message has been written';
 # Graceful shutdown (max_connections)
 $err = '';
 $loop = Mojo::IOLoop->new(max_connections => 0);
-$loop->remove($loop->client({port => $loop->generate_port}));
+$loop->remove($loop->client({port => $loop->generate_port} => sub { }));
 $loop->timer(1 => sub { shift->stop; $err = 'failed' });
 $loop->start;
 ok !$err, 'no error';

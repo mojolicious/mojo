@@ -196,12 +196,13 @@ sub _connect {
       my ($loop, $err, $stream) = @_;
 
       # Connection error
+      return unless $self;
       return $self->_error($id, $err) if $err;
 
       # Connection established
       $stream->on(timeout => sub { $self->_error($id, 'Inactivity timeout') });
       $stream->on(close => sub { $self->_handle($id => 1) });
-      $stream->on(error => sub { $self->_error($id, pop, 1) });
+      $stream->on(error => sub { $self && $self->_error($id, pop, 1) });
       $stream->on(read => sub { $self->_read($id => pop) });
       $cb->();
     }

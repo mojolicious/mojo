@@ -175,6 +175,7 @@ sub _listen {
       $stream->on(close => sub { $self->_close($id) });
       $stream->on(
         error => sub {
+          return unless $self;
           $self->app->log->error(pop);
           $self->_close($id);
         }

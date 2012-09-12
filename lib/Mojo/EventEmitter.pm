@@ -24,10 +24,17 @@ sub emit_safe {
     warn "-- Emit $name in @{[blessed($self)]} safely (@{[scalar(@$s)]})\n"
       if DEBUG;
     for my $cb (@$s) {
-      if (!eval { $self->$cb(@_); 1 } && $name ne 'error') {
-        $self->once(error => sub { warn $_[1] })
-          unless $self->has_subscribers('error');
-        $self->emit_safe('error', qq{Event "$name" failed: $@});
+      unless (eval { $self->$cb(@_); 1 }) {
+
+        # Error event failed
+        if ($name eq 'error') { warn qq{Event "error" failed: $@} }
+
+        # Normal event failed
+        else {
+          $self->once(error => sub { warn $_[1] })
+            unless $self->has_subscribers('error');
+          $self->emit_safe('error', qq{Event "$name" failed: $@});
+        }
       }
     }
   }

@@ -10,7 +10,7 @@ my $body;
 $req->content->on(body => sub { $body++ });
 $req->parse(
   HTTP_CONTENT_LENGTH => 11,
-  HTTP_EXPECT         => '100-continue',
+  HTTP_DNT            => 1,
   PATH_INFO           => '/te+st/index.cgi/foo/bar',
   QUERY_STRING        => 'lalala=23&bar=baz',
   REQUEST_METHOD      => 'POST',
@@ -25,8 +25,8 @@ $req->parse('World');
 is $body, 1, 'body event has been emitted once';
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       'foo/bar',      'right path';
+is $req->headers->dnt, 1,         'right "DNT" value';
+is $req->url->path,    'foo/bar', 'right path';
 is $req->url->base->path, '/te+st/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',         'right base host';
 is $req->url->base->port, 8080,                'right base port';
@@ -42,7 +42,7 @@ is $req->url->to_abs->to_string,
 $req = Mojo::Message::Request->new;
 $req->parse(
   HTTP_CONTENT_LENGTH  => 11,
-  HTTP_EXPECT          => '100-continue',
+  HTTP_DNT             => 1,
   HTTP_X_FORWARDED_FOR => '127.0.0.1',
   PATH_INFO            => '/test/index.cgi/foo/bar',
   QUERY_STRING         => 'lalala=23&bar=baz',
@@ -54,8 +54,8 @@ $req->parse(
 $req->parse('Hello World');
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       'foo/bar',      'right path';
+is $req->headers->dnt, 1,         'right "DNT" value';
+is $req->url->path,    'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'mojolicio.us',     'right base host';
 is $req->url->base->port, '',                 'right base port';
@@ -71,7 +71,7 @@ $req = Mojo::Message::Request->new;
 $req->parse(
   CONTENT_LENGTH  => 11,
   CONTENT_TYPE    => 'application/x-www-form-urlencoded',
-  HTTP_EXPECT     => '100-continue',
+  HTTP_DNT        => 1,
   PATH_INFO       => '/test/index.cgi/foo/bar',
   QUERY_STRING    => 'lalala=23&bar=baz',
   REQUEST_METHOD  => 'POST',
@@ -82,8 +82,8 @@ $req->parse(
 $req->parse('hello=world');
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       'foo/bar',      'right path';
+is $req->headers->dnt, 1,         'right "DNT" value';
+is $req->url->path,    'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
@@ -102,7 +102,7 @@ $req->parse(
   HTTP_Authorization       => 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   HTTP_Proxy_Authorization => 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   CONTENT_TYPE             => 'application/x-www-form-urlencoded',
-  HTTP_EXPECT              => '100-continue',
+  HTTP_DNT                 => 1,
   PATH_INFO                => '/test/index.cgi/foo/bar',
   QUERY_STRING             => 'lalala=23&bar=baz',
   REQUEST_METHOD           => 'POST',
@@ -113,8 +113,8 @@ $req->parse(
 $req->parse('hello=world');
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
-is $req->headers->expect, '100-continue', 'right "Expect" value';
-is $req->url->path,       'foo/bar',      'right path';
+is $req->headers->dnt, 1,         'right "DNT" value';
+is $req->url->path,    'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';

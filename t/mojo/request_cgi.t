@@ -11,10 +11,10 @@ $req->content->on(body => sub { $body++ });
 $req->parse(
   HTTP_CONTENT_LENGTH => 11,
   HTTP_EXPECT         => '100-continue',
-  PATH_INFO           => '/test/index.cgi/foo/bar',
+  PATH_INFO           => '/te+st/index.cgi/foo/bar',
   QUERY_STRING        => 'lalala=23&bar=baz',
   REQUEST_METHOD      => 'POST',
-  SCRIPT_NAME         => '/test/index.cgi',
+  SCRIPT_NAME         => '/te+st/index.cgi',
   HTTP_HOST           => 'localhost:8080',
   SERVER_PROTOCOL     => 'HTTP/1.0'
 );
@@ -27,14 +27,14 @@ ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
 is $req->headers->expect, '100-continue', 'right "Expect" value';
 is $req->url->path,       'foo/bar',      'right path';
-is $req->url->base->path, '/test/index.cgi/', 'right base path';
-is $req->url->base->host, 'localhost',        'right base host';
-is $req->url->base->port, 8080,               'right base port';
+is $req->url->base->path, '/te+st/index.cgi/', 'right base path';
+is $req->url->base->host, 'localhost',         'right base host';
+is $req->url->base->port, 8080,                'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
 is $req->version, '1.0',         'right version';
 is $req->body,    'Hello World', 'right content';
 is $req->url->to_abs->to_string,
-  'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
+  'http://localhost:8080/te+st/index.cgi/foo/bar?lalala=23&bar=baz',
   'right absolute URL';
 
 # Parse Lighttpd like CGI environment variables and a body

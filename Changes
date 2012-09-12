@@ -1,4 +1,7 @@
 
+3.41  2012-09-12
+  - Fixed small CGI bug.
+
 3.40  2012-09-11
   - Improved tests.
   - Fixed Perl 5.10.1 compatibility.

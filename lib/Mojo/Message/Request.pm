@@ -211,10 +211,9 @@ sub _parse_env {
   my $url     = $self->url;
   my $base    = $url->base;
   while (my ($name, $value) = each %$env) {
-    next unless $name =~ /^HTTP_/i;
-    $name =~ s/^HTTP_//i;
+    next unless $name =~ s/^HTTP_//i;
     $name =~ s/_/-/g;
-    $headers->header($name, $value);
+    $headers->header($name => $value);
 
     # Host/Port
     if ($name eq 'HOST') {
@@ -256,9 +255,8 @@ sub _parse_env {
 
     # Remove SCRIPT_NAME prefix if necessary
     my $buffer = $path->to_string;
-    $value  =~ s!^/!!;
-    $value  =~ s!/$!!;
-    $buffer =~ s!^/?$value/?!!;
+    $value  =~ s!^/|/$!!g;
+    $buffer =~ s!^/?\Q$value\E/?!!;
     $buffer =~ s!^/!!;
     $path->parse($buffer);
   }

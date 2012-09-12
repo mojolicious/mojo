@@ -62,8 +62,8 @@ sub client {
   );
   $client->on(
     error => sub {
+      $self->_remove($id);
       $self->$cb(pop, undef);
-      delete $self->{connections}{$id};
     }
   );
   $client->connect(@_);

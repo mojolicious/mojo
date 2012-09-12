@@ -1,5 +1,6 @@
 
-3.41  2012-09-12
+3.41  2012-09-13
+  - Improved resilience of Mojo::IOLoop exception handling.
   - Improved tests.
   - Fixed small CGI bug.
 

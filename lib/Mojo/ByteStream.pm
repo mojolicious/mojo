@@ -103,7 +103,7 @@ L<Mojo::ByteStream> implements the following functions.
 
   my $stream = b('test123');
 
-Construct a new L<Mojo::ByteStream> object.
+Construct a new scalar-based L<Mojo::ByteStream> object.
 
 =head1 METHODS
 

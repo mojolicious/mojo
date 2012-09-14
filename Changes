@@ -1,4 +1,7 @@
 
+3.42  2012-09-14
+  - Improved documentation.
+
 3.41  2012-09-13
   - Improved Mojo::EventEmitter to warn about failed error events.
   - Improved resilience of Mojo::IOLoop exception handling.

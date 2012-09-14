@@ -112,7 +112,7 @@ L<Mojo::Collection> implements the following functions.
 
   my $collection = c(1, 2, 3);
 
-Construct a new L<Mojo::Collection> object.
+Construct a new array-based L<Mojo::Collection> object.
 
 =head1 METHODS
 

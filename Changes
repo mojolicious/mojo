@@ -1,5 +1,6 @@
 
-3.42  2012-09-14
+3.42  2012-09-15
+  - Improved Hypnotoad to clean up old PID files.
   - Improved documentation.
 
 3.41  2012-09-13

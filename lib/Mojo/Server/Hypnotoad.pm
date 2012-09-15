@@ -82,8 +82,9 @@ sub run {
   $self->{poll} = IO::Poll->new;
   $self->{poll}->mask($self->{reader}, POLLIN);
 
-  # Manager environment
+  # Clean manager environment
   my $c = $self->{config};
+  unlink $c->{pid_file} if $ENV{HYPNOTOAD_REV} < 3 && -w $c->{pid_file};
   $SIG{INT} = $SIG{TERM} = sub { $self->{finished} = 1 };
   $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }

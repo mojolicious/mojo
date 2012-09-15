@@ -28,7 +28,7 @@ sub build_tx { shift->app->build_tx }
 sub load_app {
   my ($self, $path) = @_;
 
-  # Clean environment (and reset FindBin)
+  # Clean environment (reset FindBin)
   {
     local $0 = $path;
     FindBin->again;

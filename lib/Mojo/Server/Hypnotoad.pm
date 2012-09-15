@@ -84,7 +84,6 @@ sub run {
 
   # Clean manager environment
   my $c = $self->{config};
-  unlink $c->{pid_file} if $ENV{HYPNOTOAD_REV} < 3 && -w $c->{pid_file};
   $SIG{INT} = $SIG{TERM} = sub { $self->{finished} = 1 };
   $SIG{CHLD} = sub {
     while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }
@@ -148,9 +147,10 @@ sub _heartbeat {
 sub _hot_deploy {
   my $self = shift;
 
-  # Make sure server is running
+  # Make sure server is running and clean up PID file if necessary
   return unless my $pid = $self->_pid;
-  return unless kill 0, $pid;
+  my $file = $self->{config}{pid_file};
+  return -w $file ? unlink $file : undef unless kill 0, $pid;
 
   # Start hot deployment
   kill 'USR2', $pid;

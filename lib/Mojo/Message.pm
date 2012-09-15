@@ -198,13 +198,10 @@ sub param { shift->body_params->param(@_) }
 sub parse {
   my ($self, $chunk) = @_;
 
-  # Add chunk
-  $self->{raw_size} += length($chunk //= '');
-  $self->{buffer} .= $chunk;
-
-  # Check message size
+  # Check message size and add chunk
   return $self->error('Maximum message size exceeded', 413)
-    if $self->{raw_size} > $self->max_message_size;
+    if ($self->{raw_size} += length($chunk //= '')) > $self->max_message_size;
+  $self->{buffer} .= $chunk;
 
   # Start line
   unless ($self->{state}) {

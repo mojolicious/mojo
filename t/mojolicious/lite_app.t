@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 704;
+use Test::More tests => 705;
 
 use Mojo::ByteStream 'b';
 use Mojo::Cookie::Response;
@@ -905,6 +905,7 @@ $t->get_ok('/source?fail=1')->status_is(404)->content_is('does not exist!');
 {
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 1024;
   $t->get_ok('/', '1234' x 1024)->status_is(413)
+    ->header_is(Connection => 'close')
     ->content_is(
     "/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");
 }

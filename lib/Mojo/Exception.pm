@@ -150,8 +150,7 @@ Mojo::Exception - Exceptions with context
 
   use Mojo::Exception;
 
-  my $e = Mojo::Exception->new('Not again!');
-  $e->throw;
+  Mojo::Exception->throw('Not again!');
 
 =head1 DESCRIPTION
 
@@ -171,21 +170,21 @@ Stacktrace.
 =head2 C<line>
 
   my $line = $e->line;
-  $e       = $e->line([3, 'foo']);
+  $e       = $e->line([3 => 'foo']);
 
 The line where the exception occured.
 
 =head2 C<lines_after>
 
   my $lines = $e->lines_after;
-  $e        = $e->lines_after([[1, 'bar'], [2, 'baz']]);
+  $e        = $e->lines_after([[1 => 'bar'], [2 => 'baz']]);
 
 Lines after the line where the exception occured.
 
 =head2 C<lines_before>
 
   my $lines = $e->lines_before;
-  $e        = $e->lines_before([[4, 'bar'], [5, 'baz']]);
+  $e        = $e->lines_before([[4 => 'bar'], [5 => 'baz']]);
 
 Lines before the line where the exception occured.
 

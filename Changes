@@ -1,7 +1,8 @@
 
-3.42  2012-09-15
+3.42  2012-09-16
   - Improved Hypnotoad to clean up old PID files.
   - Improved documentation.
+  - Imptoved tests.
 
 3.41  2012-09-13
   - Improved Mojo::EventEmitter to warn about failed error events.

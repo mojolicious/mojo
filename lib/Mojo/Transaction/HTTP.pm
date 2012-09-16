@@ -75,12 +75,12 @@ sub server_leftovers {
 sub server_read {
   my ($self, $chunk) = @_;
 
-  # Parse
+  # Parse request
   my $req = $self->req;
   $req->parse($chunk) unless $req->error;
   $self->{state} ||= 'read';
 
-  # EOF
+  # Generate response
   if ($req->is_finished && !$self->{handled}++) {
     $self->emit(
       upgrade => Mojo::Transaction::WebSocket->new(handshake => $self))

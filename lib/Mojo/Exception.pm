@@ -150,7 +150,11 @@ Mojo::Exception - Exceptions with context
 
   use Mojo::Exception;
 
+  # Throw exception
   Mojo::Exception->throw('Not again!');
+
+  # Customize exception
+  die Mojo::Exception->new('Not again!')->trace(2)->verbose(1);
 
 =head1 DESCRIPTION
 

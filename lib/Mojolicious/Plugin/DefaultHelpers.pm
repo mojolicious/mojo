@@ -187,7 +187,7 @@ Alias for L<Mojo/"config">.
   %= content 'bar'
   %= content
 
-Store partial rendered content and retrieve it.
+Store partial rendered content in named buffer and retrieve it.
 
 =head2 C<content_for>
 
@@ -196,7 +196,7 @@ Store partial rendered content and retrieve it.
   % end
   %= content_for 'foo'
 
-Append content to named buffer and retrieve it.
+Append partial rendered content to named buffer and retrieve it.
 
   % content_for message => begin
     Hello

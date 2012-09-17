@@ -37,6 +37,13 @@ These options are available:
                                  working directory.
 EOF
 
+if ($^O eq 'MSWin32') {
+  # morbo uses fork() which is on MS Windows emulated via threads
+  # however some pieces used by Mojo are not completely thread-safe
+  $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll'; # avoid using Mojo::Reactor::EV
+  $ENV{MOJO_NO_TLS} or require IO::Socket::SSL; # workaround for RT #79685
+}
+
 $ENV{MOJO_LISTEN} = join(',', @listen) if @listen;
 require Mojo::Server::Morbo;
 my $morbo = Mojo::Server::Morbo->new;

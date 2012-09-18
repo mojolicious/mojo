@@ -1,6 +1,7 @@
 
 3.43  2012-09-18
   - Improved Hypnotoad to clean up old PID files containing a 0.
+    (coffeemonster)
   - Improved documentation.
 
 3.42  2012-09-16

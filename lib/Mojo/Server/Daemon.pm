@@ -35,8 +35,21 @@ sub run {
 
 sub setuidgid {
   my $self = shift;
-  $self->_group;
-  $self->_user;
+
+  # Group
+  if (my $group = $self->group) {
+    croak qq{Group "$group" does not exist}
+      unless defined(my $gid = (getgrnam($group))[2]);
+    POSIX::setgid($gid) or croak qq{Can't switch to group "$group": $!};
+  }
+
+  # User
+  if (my $user = $self->user) {
+    croak qq{User "$user" does not exist}
+      unless defined(my $uid = (getpwnam($self->user))[2]);
+    POSIX::setuid($uid) or croak qq{Can't switch to user "$user": $!};
+  }
+
   return $self;
 }
 
@@ -132,13 +145,6 @@ sub _finish {
   $tx->server_read($leftovers);
 }
 
-sub _group {
-  return unless my $group = shift->group;
-  croak qq{Group "$group" does not exist}
-    unless defined(my $gid = (getgrnam($group))[2]);
-  POSIX::setgid($gid) or croak qq{Can't switch to group "$group": $!};
-}
-
 sub _listen {
   my ($self, $listen) = @_;
 
@@ -218,14 +224,6 @@ sub _remove {
   my ($self, $id) = @_;
   $self->ioloop->remove($id);
   $self->_close($id);
-}
-
-sub _user {
-  my $self = shift;
-  return unless my $user = $self->user;
-  croak qq{User "$user" does not exist}
-    unless defined(my $uid = (getpwnam($self->user))[2]);
-  POSIX::setuid($uid) or croak qq{Can't switch to user "$user": $!};
 }
 
 sub _write {

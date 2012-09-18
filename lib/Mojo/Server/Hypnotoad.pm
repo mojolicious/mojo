@@ -148,9 +148,9 @@ sub _hot_deploy {
   my $self = shift;
 
   # Make sure server is running and clean up PID file if necessary
-  return unless my $pid = $self->_pid;
+  return unless defined(my $pid = $self->_pid);
   my $file = $self->{config}{pid_file};
-  return -w $file ? unlink $file : undef unless kill 0, $pid;
+  return -w $file ? unlink $file : undef unless $pid && kill 0, $pid;
 
   # Start hot deployment
   kill 'USR2', $pid;

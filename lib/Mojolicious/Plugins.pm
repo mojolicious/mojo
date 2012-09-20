@@ -33,7 +33,7 @@ sub emit_hook_reverse {
 sub load_plugin {
   my ($self, $name) = @_;
 
-  # Try all namspaces
+  # Try all namespaces
   my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
   for my $namespace (@{$self->namespaces}) {
     my $module = "${namespace}::$class";

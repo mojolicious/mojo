@@ -244,7 +244,7 @@ with this little mock server you can just embed them.
   my $app = $server->load_app('./myapp.pl');
 
   # Access fully initialized application
-  say $app->static->root;
+  say for @{$app->static->paths};
   say $app->config->{secret_identity};
   say $app->dumper({just => 'a helper test'});
 
@@ -1078,11 +1078,11 @@ application to test something? Thanks to the C<eval> command you can do just
 that, the application object itself can be accessed via C<app>.
 
   $ mojo generate lite_app
-  $ ./myapp.pl eval 'say app->static->root'
+  $ ./myapp.pl eval 'say for @{app->static->paths}'
 
 The C<verbose> option will automatically print the return value to C<STDOUT>.
 
-  $ ./myapp.pl eval -v 'app->static->root'
+  $ ./myapp.pl eval -v 'app->static->paths->[0]'
 
 =head2 Making your application installable
 

@@ -1,5 +1,5 @@
 
-3.43  2012-09-21
+3.43  2012-09-22
   - Updated jQuery to version 1.8.2.
   - Improved Hypnotoad to clean up old PID files containing a 0.
     (coffeemonster)

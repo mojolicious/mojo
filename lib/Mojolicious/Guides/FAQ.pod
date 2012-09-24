@@ -94,7 +94,7 @@ passphrase with the attribute L<Mojolicious/"secret">.
 
   app->secret('My very secret passphrase.');
 
-=head2 What does "Inactivity timeout" mean.
+=head2 What does "Inactivity timeout" mean?
 
 To protect your applications from denial-of-service attacks, all connections
 have an inactivity timeout which limits how long a connection may be inactive
@@ -112,14 +112,14 @@ response.
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 
 As long as they are accepting new connections, Hypnotoad worker processes send
-heartbeat messages to the manager process in regular intervals, to signal that
+heartbeat messages to the manager process at regular intervals, to signal that
 they are still responsive. A blocking operation such as an infinite loop in
 your application (or active connections after a worker has stopped accepting
 new connections) can prevent this, and will force the affected worker to be
 restarted after a timeout. This C<heartbeat_timeout> defaults to C<20> seconds
 and can be extended if your application requires it.
 
-=head2 I think i have found a bug, what should i do now?
+=head2 I think I have found a bug, what should I do now?
 
 First make sure you are using the latest version of L<Mojolicious>, it is
 quite likely that the bug has already been fixed. If that doesn't help,

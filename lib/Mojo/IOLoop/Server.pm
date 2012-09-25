@@ -175,6 +175,9 @@ Mojo::IOLoop::Server - Non-blocking TCP server
   $server->start;
   $server->stop;
 
+  # Start reactor if necessary
+  $server->reactor->start unless $server->reactor->is_running;
+
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Server> accepts TCP connections for L<Mojo::IOLoop>.

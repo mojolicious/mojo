@@ -185,6 +185,9 @@ Mojo::IOLoop::Stream - Non-blocking I/O stream
   $stream->start;
   $stream->stop;
 
+  # Start reactor if necessary
+  $stream->reactor->start unless $stream->reactor->is_running;
+
 =head1 DESCRIPTION
 
 L<Mojo::IOLoop::Stream> is a container for I/O streams used by

@@ -131,10 +131,7 @@ sub _javascript {
   # URL
   my $src = @_ % 2 ? $self->url_for(shift) : undef;
 
-  # Attributes
-  my %attrs = (@_, $src ? (src => $src) : ());
-
-  return _tag('script', type => 'text/javascript', %attrs, $cb);
+  return _tag('script', @_, $src ? (src => $src) : (), $cb);
 }
 
 sub _link_to {
@@ -209,12 +206,10 @@ sub _stylesheet {
   # URL
   my $href = @_ % 2 ? $self->url_for(shift) : undef;
 
-  # "style" tag
-  return _tag('style', type => 'text/css', @_, $cb) unless $href;
-
-  # "link" tag
-  my %attrs = (href => $href, type => 'text/css', media => 'screen', @_);
-  return _tag('link', rel => 'stylesheet', %attrs);
+  # "link" or "style" tag
+  return $href
+    ? _tag('link', rel => 'stylesheet', href => $href, media => 'screen', @_)
+    : _tag('style', @_, $cb);
 }
 
 sub _submit_button {
@@ -411,8 +406,8 @@ picked up and shown as default.
 
 Generate portable script tag for C<Javascript> asset.
 
-  <script src="/script.js" type="text/javascript" />
-  <script type="text/javascript"><![CDATA[
+  <script src="/script.js" />
+  <script><![CDATA[
     var a = 'b';
   ]]></script>
 
@@ -501,8 +496,8 @@ automatically get picked up and shown as default.
 
 Generate portable style or link tag for C<CSS> asset.
 
-  <link href="/foo.css" media="screen" rel="stylesheet" type="text/css" />
-  <style type="text/css"><![CDATA[
+  <link href="/foo.css" media="screen" rel="stylesheet" />
+  <style><![CDATA[
     body {color: #000}
   ]]></style>
 

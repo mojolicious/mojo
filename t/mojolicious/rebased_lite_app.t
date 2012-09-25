@@ -49,7 +49,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
   ->content_is(<<EOF);
 <base href="http://kraih.com/rebased/" />
-<script src="/rebased/js/jquery.js" type="text/javascript"></script>
+<script src="/rebased/js/jquery.js"></script>
 <img src="/rebased/images/test.png" />
 http://kraih.com/rebased/foo
 /rebased/foo
@@ -62,7 +62,7 @@ EOF
 $t->get_ok('/foo')->status_is(200)->header_is('X-Route' => 'foo')
   ->content_is(<<EOF);
 <base href="http://kraih.com/rebased/" />
-<link href="/rebased/b.css" media="test" rel="stylesheet" type="text/css" />
+<link href="/rebased/b.css" media="test" rel="stylesheet" />
 <img alt="Test" src="/rebased/images/test.png" />
 http://kraih.com/rebased
 /rebased
@@ -80,7 +80,7 @@ ok $t->ua->cookie_jar->find($t->ua->app_url->path('/foo')), 'session cookie';
 # GET /foo (with flash message)
 $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
 <base href="http://kraih.com/rebased/" />works!too!
-<link href="/rebased/b.css" media="test" rel="stylesheet" type="text/css" />
+<link href="/rebased/b.css" media="test" rel="stylesheet" />
 <img alt="Test" src="/rebased/images/test.png" />
 http://kraih.com/rebased
 /rebased
@@ -92,7 +92,7 @@ EOF
 $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
   ->content_is(<<EOF);
 <base href="http://kraih.com/rebased/" />
-<script src="/rebased/js/jquery.js" type="text/javascript"></script>
+<script src="/rebased/js/jquery.js"></script>
 <img src="/rebased/images/test.png" />
 http://kraih.com/rebased/foo
 /rebased/foo

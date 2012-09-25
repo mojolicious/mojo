@@ -96,8 +96,8 @@ EOF
 
 # GET /script
 $t->get_ok('/script')->status_is(200)->content_is(<<EOF);
-<script src="/script.js" type="text/javascript"></script>
-<script type="text/javascript">//<![CDATA[
+<script src="/script.js"></script>
+<script>//<![CDATA[
 
   var a = 'b';
 
@@ -111,8 +111,8 @@ EOF
 
 # GET /style
 $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
-<link href="/foo.css" media="screen" rel="stylesheet" type="text/css" />
-<style type="text/css">/*<![CDATA[*/
+<link href="/foo.css" media="screen" rel="stylesheet" />
+<style>/*<![CDATA[*/
 
   body {color: #000}
 

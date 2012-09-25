@@ -171,7 +171,7 @@ is_deeply \@div, $ids, 'found all div elements';
 
 # Script tag
 $dom = Mojo::DOM->new->parse(<<EOF);
-<script type="text/javascript" charset="utf-8">alert('lalala');</script>
+<script charset="utf-8">alert('lalala');</script>
 EOF
 is $dom->at('script')->text, "alert('lalala');", 'right script content';
 
@@ -1419,9 +1419,9 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 <html>
   <head>
     <title>Foo</title>
-    <script type="text/javascript" src="/js/one.js"></script>
-    <script type="text/javascript" src="/js/two.js"></script>
-    <script type="text/javascript" src="/js/three.js"></script>
+    <script src="/js/one.js"></script>
+    <script src="/js/two.js"></script>
+    <script src="/js/three.js"></script>
   </head>
   <body>Bar</body>
 </html>
@@ -1442,9 +1442,9 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 <html>
   <head>
     <title>Foo</title>
-    <script type="text/javascript" src="/js/one.js"></script>
-    <script type="text/javascript" src="/js/two.js"></script>
-    <script type="text/javascript" src="/js/three.js">
+    <script src="/js/one.js"></script>
+    <script src="/js/two.js"></script>
+    <script src="/js/three.js">
   </head>
   <body>Bar</body>
 </html>

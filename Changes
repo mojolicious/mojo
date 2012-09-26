@@ -3,6 +3,7 @@
   - Improved javascript and stylesheet helpers to not generate type
     attributes.
   - Improved documentation.
+  - Improved tests.
 
 3.43  2012-09-22
   - Updated jQuery to version 1.8.2.

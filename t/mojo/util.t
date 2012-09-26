@@ -130,8 +130,8 @@ is html_unescape('&Ltf&amp&0oo&nbspba;&ltr'), "&Ltf&&0oo\x{00a0}ba;<r",
   'right html unescaped result';
 
 # UTF-8 html_escape
-is html_escape("fo\nobar<baz>&\"\x{152}"),
-  "fo\nobar&LT;baz&GT;&AMP;&QUOT;&OElig;", 'right html escaped result';
+is html_escape("fo\nobar<baz>&\"\x{152}\x{02ae4}"),
+  "fo\nobar&LT;baz&GT;&AMP;&QUOT;&OElig;&Dashv;", 'right html escaped result';
 
 # UTF-8 html_unescape
 is html_unescape(decode 'UTF-8', 'foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),

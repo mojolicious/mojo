@@ -1,5 +1,5 @@
 
-3.44  2012-09-25
+3.44  2012-09-27
   - Improved javascript and stylesheet helpers to not generate type
     attributes.
   - Improved documentation.

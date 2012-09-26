@@ -721,8 +721,8 @@ sense for a standalone parser.
     say 'Heading: ', shift->all_text;
   });
 
-  # Recurse through children and extract all text manually
-  sub all_text {
+  # Recurse through children manually to extract more than just text
+  sub text_and_images {
     my $elements = shift;
     for my $e ($elements->each) {
 
@@ -734,13 +734,13 @@ sense for a standalone parser.
 
       # Text from children
       my $children = $e->children;
-      $children->size ? all_text($children) : print $e->text(0);
+      $children->size ? text_and_images($children) : print $e->text(0);
     }
 
     # Text after last element
     print $elements->[-1]->text_after(0);
   }
-  all_text($tx->res->dom->children);
+  text_and_images($tx->res->dom->children);
 
 Especially for unit testing your L<Mojolicious> applications this can be a
 very powerful tool.

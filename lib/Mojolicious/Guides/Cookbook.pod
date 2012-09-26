@@ -738,7 +738,7 @@ sense for a standalone parser.
     }
 
     # Text after last element
-    say $elements->[-1]->text_after(0);
+    print $elements->[-1]->text_after(0);
   }
   all_text($tx->res->dom->children);
 

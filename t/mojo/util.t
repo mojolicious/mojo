@@ -103,7 +103,7 @@ is decode('UTF-8', url_unescape 'foo%C3%9F%C4%80bar%E2%98%BA'),
   "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
 
 # html_escape
-is html_escape("foo bar'<baz>"), 'foo bar&#39;&LT;baz&GT;',
+is html_escape("foo bar'<baz>"), 'foo bar&#39;&lt;baz&gt;',
   'right html escaped result';
 
 # html_escape (nothing to escape)
@@ -131,7 +131,7 @@ is html_unescape('&Ltf&amp&0oo&nbspba;&ltr'), "&Ltf&&0oo\x{00a0}ba;<r",
 
 # UTF-8 html_escape
 is html_escape("fo\nobar<baz>&\"\x{152}\x{02ae4}"),
-  "fo\nobar&LT;baz&GT;&AMP;&QUOT;&OElig;&Dashv;", 'right html escaped result';
+  "fo\nobar&lt;baz&gt;&amp;&quot;&OElig;&Dashv;", 'right html escaped result';
 
 # UTF-8 html_unescape
 is html_unescape(decode 'UTF-8', 'foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
@@ -142,7 +142,7 @@ is html_escape('/home/sri/perl/site_perl/5.10.0/Mojo.pm'),
   '/home/sri/perl/site_perl/5.10.0/Mojo.pm', 'right html escaped result';
 
 # html_escape (custom pattern)
-is html_escape("fo\no b<a>r", 'o<'), "f&#111;\n&#111; b&LT;a>r",
+is html_escape("fo\no b<a>r", 'o<'), "f&#111;\n&#111; b&lt;a>r",
   'right html escaped result';
 
 # xml_escape

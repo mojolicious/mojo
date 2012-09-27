@@ -33,7 +33,9 @@ my %ENTITIES;
 
 # Reverse entities for html_escape (without "apos")
 my %REVERSE = ("\x{0027}" => '#39;');
-$REVERSE{$ENTITIES{$_}} //= $_ for sort grep {/;/} keys %ENTITIES;
+$REVERSE{$ENTITIES{$_}} //= $_
+  for sort { split(/[A-Z]/, $a) <=> split(/[A-Z]/, $b) }
+  sort grep {/;/} keys %ENTITIES;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),

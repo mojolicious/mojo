@@ -433,7 +433,7 @@ use it for validation.
 =head1 CASE SENSITIVITY
 
 L<Mojo::DOM> defaults to HTML semantics, that means all tags and attributes
-are lowercased and selectors need to be lowercase as well.
+are lowercased and selectors need to be lower case as well.
 
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
   say $dom->at('p')->text;

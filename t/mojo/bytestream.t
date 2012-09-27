@@ -33,7 +33,7 @@ is b('foo%C3%9F%C4%80bar%E2%98%BA')->url_unescape->decode('UTF-8'),
   "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
 
 # html_escape
-is b("foo bar'<baz>")->html_escape, 'foo bar&#39;&LT;baz&GT;',
+is b("foo bar'<baz>")->html_escape, 'foo bar&#39;&lt;baz&gt;',
   'right html escaped result';
 
 # html_unescape

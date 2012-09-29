@@ -5,7 +5,6 @@
     attributes.
   - Improved documentation.
   - Improved tests.
-  - Fixed Mojo::Reactor::EV to work with Morbo on Windows.
 
 3.43  2012-09-22
   - Updated jQuery to version 1.8.2.

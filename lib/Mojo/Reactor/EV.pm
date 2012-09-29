@@ -7,7 +7,7 @@ use Scalar::Util 'weaken';
 my $EV;
 
 # Make EV work with ithreads
-sub CLONE {EV::loop_fork}
+sub CLONE { EV::loop_fork() }
 
 sub DESTROY { undef $EV }
 

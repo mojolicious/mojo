@@ -456,7 +456,7 @@ picked up and shown as default.
 =head2 C<select_field>
 
   %= select_field language => [qw(de en)]
-  %= select_field language => [qw(de en)], id => 'lang'
+  %= select_field language => [qw(de en)], id => 'lang', multiple => 'multiple'
   %= select_field country => [[Germany => 'de'], 'en']
   %= select_field country => [{Europe => [[Germany => 'de'], 'en']}]
   %= select_field country => [[Germany => 'de', class => 'europe'], 'en']
@@ -468,7 +468,7 @@ automatically get picked up and shown as default.
     <option value="de">de</option>
     <option value="en">en</option>
   </select>
-  <select id="lang" name="language">
+  <select id="lang" name="language" multiple="multiple">
     <option value="de">de</option>
     <option value="en">en</option>
   </select>

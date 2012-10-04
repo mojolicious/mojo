@@ -219,7 +219,7 @@ L<Mojo::Parameters> implements the following attributes.
   my $charset = $p->charset;
   $p          = $p->charset('UTF-8');
 
-Charset used for decoding parameters, defaults to C<UTF-8>.
+Charset used for encoding or decoding parameters, defaults to C<UTF-8>.
 
 =head2 C<pair_separator>
 

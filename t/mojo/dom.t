@@ -2140,9 +2140,8 @@ $dom = Mojo::DOM->new(<<EOF);
 <!-- HTML4 -- >
 <!-- bad idea -- HTML4 -- >
 EOF
-my $tree = $dom->tree;
-is $tree->[1][1], ' HTML5 ', 'HTML5 comment';
-is $tree->[3][1], ' bad idea -- HTML5 ', 'HTML5 comment with --';
-is $tree->[5][1], ' HTML4 ', 'HTML4 comment';
-is $tree->[7][1], ' bad idea -- HTML4 ', 'HTML4 comment with --';
+is $dom->tree->[1][1], ' HTML5 ',             'right comment';
+is $dom->tree->[3][1], ' bad idea -- HTML5 ', 'right comment';
+is $dom->tree->[5][1], ' HTML4 ',             'right comment';
+is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
 

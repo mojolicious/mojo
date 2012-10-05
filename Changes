@@ -1,4 +1,7 @@
 
+3.45  2012-10-05
+  - Improved documentation.
+
 3.44  2012-09-29
   - Improved html_escape to favor lower case entities. (judofyr)
   - Improved javascript and stylesheet helpers to not generate type

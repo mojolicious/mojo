@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 789;
+use Test::More tests => 793;
 
 use Mojo::DOM;
 use Mojo::Util 'encode';
@@ -2132,3 +2132,17 @@ $dom = Mojo::DOM->new->charset('doesnotexist');
 $dom->parse(qq{<html><div id="a">A</div></html>});
 is $dom->at('#a'), undef, 'no result';
 is "$dom", '', 'right result';
+
+# Comments
+$dom = Mojo::DOM->new(<<EOF);
+<!-- HTML5 -->
+<!-- bad idea -- HTML5 -->
+<!-- HTML4 -- >
+<!-- bad idea -- HTML4 -- >
+EOF
+my $tree = $dom->tree;
+is $tree->[1][1], ' HTML5 ', 'HTML5 comment';
+is $tree->[3][1], ' bad idea -- HTML5 ', 'HTML5 comment with --';
+is $tree->[5][1], ' HTML4 ', 'HTML4 comment';
+is $tree->[7][1], ' bad idea -- HTML4 ', 'HTML4 comment with --';
+

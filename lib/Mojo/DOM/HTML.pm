@@ -28,7 +28,7 @@ my $TOKEN_RE = qr/
   (?:
     <\?(.*?)\?>                                     # Processing Instruction
   |
-    <!--(.*?)-->                                    # Comment
+    <!--(.*?)--\s*>                                 # Comment
   |
     <!\[CDATA\[(.*?)\]\]>                           # CDATA
   |

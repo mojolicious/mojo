@@ -1,5 +1,5 @@
 
-3.45  2012-10-06
+3.45  2012-10-09
   - Relaxed comment handling in Mojo::DOM::HTML a little. (jberger)
   - Improved documentation.
   - Improved tests.

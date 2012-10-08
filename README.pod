@@ -14,8 +14,8 @@ implementing this idea using state of the art technology.
 
 =item *
 
-An amazing real-time web framework supporting a simplified single file mode
-through L<Mojolicious::Lite>.
+An amazing real-time web framework, allowing you to easily grow single file
+L<Mojolicious::Lite> prototypes into well structured web applications.
 
 =over 2
 

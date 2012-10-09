@@ -124,8 +124,10 @@ sub _config {
   $daemon->max_requests($c->{keep_alive_requests} || 25);
   $daemon->inactivity_timeout($c->{inactivity_timeout} // 15);
   $daemon->user($c->{user}) if defined $c->{user};
-  $daemon->ioloop->max_accepts($c->{accepts} // 1000);
   $daemon->listen($c->{listen} || ['http://*:8080']);
+  my $loop = $daemon->ioloop;
+  $loop->max_accepts($c->{accepts} // 1000);
+  $loop->multi_accept($c->{multi_accept}) if defined $c->{multi_accept};
 }
 
 sub _exit { say shift and exit 0 }
@@ -524,6 +526,12 @@ appended, defaults to a random temporary path.
 
 Maximum amount of time in seconds a worker may block when waiting for the
 accept mutex, defaults to C<0.5>.
+
+=head2 C<multi_accept>
+
+  multi_accept => 100
+
+Number of connections to accept at once, defaults to C<50>.
 
 =head2 C<pid_file>
 

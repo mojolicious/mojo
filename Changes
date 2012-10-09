@@ -2,6 +2,7 @@
 3.45  2012-10-10
   - Added multi_accept attribute to Mojo::IOLoop.
   - Added multi_accept attribute to Mojo::IOLoop::Server.
+  - Added multi_accept setting to Hypnotoad.
   - Relaxed comment handling in Mojo::DOM::HTML a little. (jberger)
   - Improved accept performance of all built-in web servers significantly.
   - Improved documentation.

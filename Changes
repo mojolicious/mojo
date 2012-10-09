@@ -5,6 +5,8 @@
   - Added multi_accept setting to Hypnotoad.
   - Relaxed comment handling in Mojo::DOM::HTML a little. (jberger)
   - Improved accept performance of all built-in web servers significantly.
+  - Improved responsiveness of documentation browser.
+  - Improved documentation browser CSS. (tempire)
   - Improved documentation.
   - Improved tests.
 

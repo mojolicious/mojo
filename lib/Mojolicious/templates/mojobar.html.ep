@@ -91,8 +91,8 @@
       }
     });
   });
-  $(document).ready(function(){
-    $(".mojoscroll").click(function(e){
+  $(document).ready(function() {
+    $(".mojoscroll").click(function(e) {
       e.preventDefault();
       e.stopPropagation();
       var parts  = this.href.split("#");
@@ -103,7 +103,7 @@
       target.attr('id', '');
       location.hash = hash;
       target.attr('id', old);
-      $('html, body').animate({scrollTop:top}, 500);
+      $('html, body').animate({scrollTop:top}, 1);
     });
   });
 % end

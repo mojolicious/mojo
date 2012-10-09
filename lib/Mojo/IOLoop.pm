@@ -19,6 +19,7 @@ has accept_interval => 0.025;
 has [qw(lock unlock)];
 has max_accepts     => 0;
 has max_connections => 1000;
+has multi_accept    => 50;
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
@@ -195,7 +196,8 @@ sub _accepting {
   if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
 
   # Check if multi-accept is desirable and start accepting
-  $_->accepts($max > 1 ? 10 : 1)->start for values %$servers;
+  my $multi = $self->multi_accept;
+  $_->multi_accept($max < $multi ? 1 : $multi)->start for values %$servers;
   $self->{accepting}++;
 }
 
@@ -394,6 +396,13 @@ handle before stopping to accept new incoming connections, defaults to
 C<1000>. Setting the value to C<0> will make this event loop stop accepting
 new connections and allow it to shut down gracefully without interrupting
 existing connections.
+
+=head2 C<multi_accept>
+
+  my $multi = $loop->multi_accept;
+  $loop     = $loop->multi_accept(100);
+
+Number of connections to accept at once, defaults to C<50>.
 
 =head2 C<reactor>
 

@@ -25,8 +25,8 @@ use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 my $CERT = catfile dirname(__FILE__), 'server.crt';
 my $KEY  = catfile dirname(__FILE__), 'server.key';
 
-has accepts => 10;
-has reactor => sub {
+has multi_accept => 50;
+has reactor      => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton->reactor;
 };
@@ -106,7 +106,7 @@ sub start {
   my $self = shift;
   weaken $self;
   $self->reactor->io(
-    $self->{handle} => sub { $self->_accept for 1 .. $self->accepts });
+    $self->{handle} => sub { $self->_accept for 1 .. $self->multi_accept });
 }
 
 sub stop {
@@ -199,12 +199,12 @@ Emitted safely for each accepted connection.
 
 L<Mojo::IOLoop::Server> implements the following attributes.
 
-=head2 C<accepts>
+=head2 C<multi_accept>
 
-  my $accepts = $server->accepts;
-  $server     = $server->accepts(10);
+  my $multi = $server->multi_accept;
+  $server   = $server->multi_accept(100);
 
-Number of connections to accept at once, defaults to C<10>.
+Number of connections to accept at once, defaults to C<50>.
 
 =head2 C<reactor>
 

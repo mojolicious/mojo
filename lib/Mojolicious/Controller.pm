@@ -166,7 +166,8 @@ sub render {
     my $controller = $args->{controller} || $stash->{controller};
     my $action     = $args->{action}     || $stash->{action};
     if ($controller && $action) {
-      $stash->{template} = join '/', split(/-/, $controller), $action;
+      $stash->{template} = join '/',
+        split(/-/, Mojo::Util::decamelize($controller)), $action;
     }
 
     # Try the route name if we don't have controller and action

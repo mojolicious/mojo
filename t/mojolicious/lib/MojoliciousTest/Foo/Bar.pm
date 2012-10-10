@@ -3,6 +3,6 @@ use Mojolicious::Controller -base;
 
 sub index {1}
 
-sub test { shift->render(text => 'Class works!') }
+sub test { shift->stash(message => 'works') }
 
 1;

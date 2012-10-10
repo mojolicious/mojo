@@ -303,12 +303,15 @@ route with all its children.
 
   # /bye -> MyApp::Controller::Foo->bye
   $r->route('/bye')
-    ->to(namespace => 'MyApp::Controller::Foo', action => 'bye');
+    ->to(namespace => 'MyApp::Controller::Foo::Bar', action => 'bye');
 
 The C<controller> is always appended to the C<namespace> if available.
 
-  # /bye -> MyApp::Controller::Foo->bye
-  $r->route('/bye')->to('foo#bye', namespace => 'MyApp::Controller');
+  # /bye -> MyApp::Controller::Foo::Bar->bye
+  $r->route('/bye')->to('foo-bar#bye', namespace => 'MyApp::Controller');
+
+  # /hey -> MyApp::Controller::Foo::Bar->hey
+  $r->route('/hey')->to('Foo::Bar#hey', namespace => 'MyApp::Controller');
 
 You can also change the default namespace for all routes in the application
 with the router attribute L<Mojolicious::Routes/"namespace">.

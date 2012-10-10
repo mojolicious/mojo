@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 339;
+use Test::More tests => 344;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -225,6 +225,12 @@ $t->get_ok('/test6' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender'     => 'Bite my shiny metal ass!')
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('/test6');
+
+# MojoliciousTest::Foo::Bar::test (controller class)
+$t->get_ok('/test7' => {'X-Test' => 'Hi there!'})->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Class works!');
 
 # 404
 $t->get_ok('/' => {'X-Test' => 'Hi there!'})->status_is(404)

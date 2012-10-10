@@ -118,6 +118,9 @@ sub startup {
     action     => 'test'
   );
 
+  # /test7 (controller class)
+  $r->route('/test7')->to('Foo::Bar#test');
+
   # /withblock (template with blocks)
   $r->route('/withblock')->to('foo#withblock');
 

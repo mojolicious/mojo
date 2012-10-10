@@ -194,7 +194,7 @@ sub to {
     }
 
     # Controller and action
-    elsif ($shortcut =~ /^([\w\-]+)?\#(\w+)?$/) {
+    elsif ($shortcut =~ /^([\w\-:]+)?\#(\w+)?$/) {
       $defaults->{controller} = $1 if defined $1;
       $defaults->{action}     = $2 if defined $2;
     }

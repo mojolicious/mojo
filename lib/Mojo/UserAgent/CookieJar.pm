@@ -30,6 +30,11 @@ sub add {
   return $self;
 }
 
+sub all {
+  my $jar = shift->{jar};
+  return map { @{$jar->{$_}} } sort keys %$jar;
+}
+
 sub empty { shift->{jar} = {} }
 
 sub extract {
@@ -136,6 +141,13 @@ implements the following new ones.
   $jar = $jar->add(@cookies);
 
 Add multiple L<Mojo::Cookie::Response> objects to the jar.
+
+=head2 C<all>
+
+  my @cookies = $jar->all;
+
+Return all L<Mojo::Cookie::Response> objects that are currently stored in the
+jar.
 
 =head2 C<empty>
 

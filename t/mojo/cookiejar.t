@@ -145,7 +145,7 @@ is $cookies[1]->domain, 'kraih.com', 'right domain';
 is $cookies[1]->path,   '/foo',      'right path';
 is $cookies[1]->name,   'bar',       'right name';
 is $cookies[1]->value,  'baz',       'right value';
-is $cookies[2], undef, 'no second cookie';
+is $cookies[2], undef, 'no third cookie';
 
 # Huge cookie
 $jar = Mojo::UserAgent::CookieJar->new->max_cookie_size(1024);

@@ -937,6 +937,8 @@ Generate a portable L<Mojo::URL> object with base for a route, path or URL.
   # "/myapp/perldoc?foo=bar" if application is deployed under "/myapp"
   $c->url_for('/perldoc')->query(foo => 'bar');
 
+Without arguments, generate the L<Mojo::URL> for the current request.
+
 You can also use the helper L<Mojolicious::Plugin::DefaultHelpers/"url_with">
 to inherit query parameters from the current request.
 

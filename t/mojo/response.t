@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 357;
+use Test::More tests => 370;
 
 use Mojo::Asset::File;
 use Mojo::Content::Single;
@@ -535,6 +535,31 @@ is $res->headers->sec_websocket_accept, 'abcdef=',
 is $res->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
 is $res->body, '', 'no content';
+
+# Parse WebSocket handshake response (with frame)
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 101 Switching Protocols\x0d\x0a");
+$res->parse("Upgrade: websocket\x0d\x0a");
+$res->parse("Connection: Upgrade\x0d\x0a");
+$res->parse("Sec-WebSocket-Accept: abcdef=\x0d\x0a");
+$res->parse("Sec-WebSocket-Protocol: sample\x0d\x0a");
+$res->parse("\x0d\x0a\x81\x08\x77\x68\x61\x74\x65\x76\x65\x72");
+ok $res->is_finished, 'response is finished';
+ok $res->is_empty,    'response is empty';
+ok $res->content->skip_body, 'body has been skipped';
+is $res->code,    101,                   'right status';
+is $res->message, 'Switching Protocols', 'right message';
+is $res->version, '1.1',                 'right version';
+is $res->headers->upgrade,    'websocket', 'right "Upgrade" value';
+is $res->headers->connection, 'Upgrade',   'right "Connection" value';
+is $res->headers->sec_websocket_accept, 'abcdef=',
+  'right "Sec-WebSocket-Accept" value';
+is $res->headers->sec_websocket_protocol, 'sample',
+  'right "Sec-WebSocket-Protocol" value';
+is $res->body, '', 'no content';
+ok $res->has_leftovers, 'has leftovers';
+is $res->leftovers,     "\x81\x08\x77\x68\x61\x74\x65\x76\x65\x72",
+  'frame in leftovers';
 
 # Build WebSocket handshake response
 $res = Mojo::Message::Response->new;

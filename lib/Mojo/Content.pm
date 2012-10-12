@@ -66,7 +66,7 @@ sub get_header_chunk {
   return substr $self->{header_buffer}, $offset, 131072;
 }
 
-sub has_leftovers { !!length(shift->{buffer} || '') }
+sub has_leftovers { !!length shift->leftovers }
 
 sub header_size { length shift->build_headers }
 
@@ -83,7 +83,10 @@ sub is_multipart {undef}
 
 sub is_parsing_body { (shift->{state} // '') eq 'body' }
 
-sub leftovers { shift->{buffer} }
+sub leftovers {
+  my $self = shift;
+  return ($self->{pre_buffer} // '') . ($self->{buffer} // '');
+}
 
 sub parse {
   my $self = shift;

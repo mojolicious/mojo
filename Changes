@@ -1,6 +1,7 @@
 
-3.47  2012-10-12
+3.47  2012-10-13
   - Added all method to Mojo::UserAgent::CookieJar.
+  - Fixed WebSocket bug in Mojo::Content.
 
 3.46  2012-10-11
   - Improved router and renderer to allow camel case controllers.

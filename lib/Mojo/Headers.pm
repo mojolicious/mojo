@@ -416,9 +416,9 @@ Shortcut for the C<Last-Modified> header.
 
 =head2 C<leftovers>
 
-  my $leftovers = $headers->leftovers;
+  my $bytes = $headers->leftovers;
 
-Leftovers.
+Get leftover data from header parser.
 
 =head2 C<location>
 

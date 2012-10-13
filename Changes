@@ -1,4 +1,7 @@
 
+3.48  2012-10-14
+  - Improved Mojo::Content performance slightly.
+
 3.47  2012-10-13
   - Added all method to Mojo::UserAgent::CookieJar.
   - Improved documentation.

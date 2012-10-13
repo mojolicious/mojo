@@ -83,10 +83,7 @@ sub is_multipart {undef}
 
 sub is_parsing_body { (shift->{state} // '') eq 'body' }
 
-sub leftovers {
-  my $self = shift;
-  return ($self->{pre_buffer} // '') . ($self->{buffer} // '');
-}
+sub leftovers { shift->{buffer} }
 
 sub parse {
   my $self = shift;
@@ -95,21 +92,6 @@ sub parse {
   $self->_parse_until_body(@_);
   return $self if $self->{state} eq 'headers';
   $self->_body;
-
-  # No content
-  if ($self->skip_body) {
-    $self->{state} = 'finished';
-    return $self;
-  }
-
-  # Relaxed parsing
-  my $headers = $self->headers;
-  if ($self->auto_relax) {
-    my $connection = $headers->connection || '';
-    my $len = $headers->content_length // '';
-    $self->relaxed(1)
-      if !length $len && ($connection =~ /close/i || $headers->content_type);
-  }
 
   # Parse chunked content
   $self->{real_size} //= 0;
@@ -125,6 +107,21 @@ sub parse {
       && length($self->{buffer}) > $self->max_leftover_size;
     $self->{buffer} .= $self->{pre_buffer} unless $limit;
     $self->{pre_buffer} = '';
+  }
+
+  # No content
+  if ($self->skip_body) {
+    $self->{state} = 'finished';
+    return $self;
+  }
+
+  # Relaxed parsing
+  my $headers = $self->headers;
+  if ($self->auto_relax) {
+    my $connection = $headers->connection || '';
+    my $len = $headers->content_length // '';
+    $self->relaxed(1)
+      if !length $len && ($connection =~ /close/i || $headers->content_type);
   }
 
   # Chunked or relaxed content

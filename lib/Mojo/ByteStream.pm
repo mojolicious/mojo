@@ -216,6 +216,8 @@ Generate MD5 checksum for bytestream with L<Mojo::Util/"md5_sum">.
 
 Prompt user with L<Mojo::Util/"prompt">.
 
+  b('Password: ')->prompt->xor_encode('s3cret')->say;
+
 =head2 C<punycode_decode>
 
   $stream = $stream->punycode_decode;

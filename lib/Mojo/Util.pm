@@ -537,8 +537,9 @@ Generate MD5 checksum for string.
 
   my $string = prompt 'Password: ';
 
-Print string to C<STDOUT>, wait for user to type something and finish with an
-C<ENTER> and return the string typed in wihout the trailing newline.
+Print string to C<STDOUT>, wait for user to type something on C<STDIN> and
+finish with an C<ENTER>, then return the string typed in wihout the trailing
+newline.
 
 =head2 C<punycode_decode>
 

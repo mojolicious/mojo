@@ -12,7 +12,7 @@ usage: $0 cpanify [OPTIONS] [FILE]
   mojo cpanify -u sri -p secr3t Mojolicious-Plugin-MyPlugin-0.01.tar.gz
 
 These options are available:
-  -p, --password <password>   PAUSE password.
+  -p, --password <password>   PAUSE password, defaults to a password prompt.
   -u, --user <name>           PAUSE username.
 EOF
 

@@ -1,6 +1,7 @@
 
-3.48  2012-10-14
+3.48  2012-10-15
   - Improved Mojo::Content performance slightly.
+  - Fixed memory leak in Mojo::Headers.
 
 3.47  2012-10-13
   - Added all method to Mojo::UserAgent::CookieJar.

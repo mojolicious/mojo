@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use File::Basename 'basename';
 use Mojo::UserAgent;
+use Mojo::Util 'prompt';
 
 has description => "Upload distribution to CPAN.\n";
 has usage       => <<"EOF";
@@ -21,10 +22,11 @@ sub run {
   # Options
   $self->_options(
     \@args,
-    'p|password=s' => \(my $password = ''),
-    'u|user=s'     => \(my $user     = '')
+    'p|password=s' => \(my $password),
+    'u|user=s'     => \(my $user = '')
   );
   die $self->usage unless my $file = shift @args;
+  $password //= prompt 'Password: ';
 
   # Upload
   my $tx = Mojo::UserAgent->new->detect_proxy->post_form(

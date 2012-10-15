@@ -13,6 +13,8 @@ usage: $0 cpanify [OPTIONS] [FILE]
 These options are available:
   -p, --password <password>   PAUSE password.
   -u, --user <name>           PAUSE username.
+
+Term::ReadKey is used to prompt for a password if none is given via command option.
 EOF
 
 sub run {
@@ -21,10 +23,14 @@ sub run {
   # Options
   $self->_options(
     \@args,
-    'p|password=s' => \(my $password = ''),
+    'p|password=s' => \(my $password),
     'u|user=s'     => \(my $user     = '')
   );
   die $self->usage unless my $file = shift @args;
+
+  unless ( defined $password ) {
+    $password = $self->_read_password;
+  }
 
   # Upload
   my $tx = Mojo::UserAgent->new->detect_proxy->post_form(
@@ -47,6 +53,28 @@ sub run {
     die qq{Problem uploading file "$file". ($msg)\n};
   }
   say 'Upload successful!';
+}
+
+sub _read_password {
+  my $self = shift;
+
+  # set to autoflush STDOUT
+  # this isn't strictly necessary, but it places the newline after reading the password
+  # and before any error from the uploader
+  local $| = 1;
+
+  eval 'use Term::ReadKey (); 1' or die "Prompt for password requires Term::ReadKey installed\n";
+  print "Password: ";
+
+  # set password mode
+  Term::ReadKey::ReadMode(2);
+  chomp( my $password = <STDIN> );
+
+  # return to previous read mode
+  Term::ReadKey::ReadMode(0);
+  print "\n";
+
+  return $password;
 }
 
 1;

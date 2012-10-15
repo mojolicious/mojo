@@ -61,7 +61,7 @@ sub _read_password {
   # set to autoflush STDOUT
   # this isn't strictly necessary, but it places the newline after reading the password
   # and before any error from the uploader
-  $| = 1;
+  local $| = 1;
 
   eval 'use Term::ReadKey (); 1' or die "Prompt for password requires Term::ReadKey installed\n";
   print "Password: ";

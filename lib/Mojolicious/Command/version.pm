@@ -69,6 +69,9 @@ Mojolicious::Command::version - Version command
 L<Mojolicious::Command::version> shows version information for installed core
 and optional modules.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::version> inherits all attributes from

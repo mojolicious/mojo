@@ -110,6 +110,9 @@ Mojolicious::Command::routes - Routes command
 
 L<Mojolicious::Command::routes> lists all your application routes.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::routes> inherits all attributes from

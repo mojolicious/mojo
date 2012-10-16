@@ -58,6 +58,9 @@ Mojolicious::Command::generate::lite_app - Lite app generator command
 L<Mojolicious::Command::generate::lite_app> generate fully functional
 L<Mojolicious::Lite> applications.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::generate::lite_app> inherits all attributes from

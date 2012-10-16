@@ -125,6 +125,9 @@ Mojolicious::Command::generate::plugin - Plugin generator command
 L<Mojolicious::Command::generate::plugin> generates directory structures for
 fully functional L<Mojolicious> plugins.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::generate::plugin> inherits all attributes from

@@ -43,6 +43,9 @@ Mojolicious::Command::inflate - Inflate command
 L<Mojolicious::Command::inflate> turns templates and static files embedded in
 the C<DATA> sections of your application into real files.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::inflate> inherits all attributes from

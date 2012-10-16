@@ -65,6 +65,9 @@ Mojolicious::Command::daemon - Daemon command
 L<Mojolicious::Command::daemon> starts applications with
 L<Mojo::Server::Daemon> backend.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::daemon> inherits all attributes from

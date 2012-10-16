@@ -36,6 +36,9 @@ Mojolicious::Command::cgi - CGI command
 L<Mojolicious::Command::cgi> starts applications with L<Mojo::Server::CGI>
 backend.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::cgi> inherits all attributes from

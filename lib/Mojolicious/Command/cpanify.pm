@@ -68,6 +68,9 @@ Mojolicious::Command::cpanify - Cpanify command
 
 L<Mojolicious::Command::cpanify> uploads files to CPAN.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::cpanify> inherits all attributes from

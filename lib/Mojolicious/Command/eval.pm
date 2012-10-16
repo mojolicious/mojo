@@ -44,6 +44,9 @@ Mojolicious::Command::eval - Eval command
 
 L<Mojolicious::Command::eval> runs code against applications.
 
+This is a core command, that means it is always enabled and its code a good
+example for learning to build new commands, you're welcome to fork it.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::eval> inherits all attributes from

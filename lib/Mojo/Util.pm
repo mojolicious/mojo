@@ -134,6 +134,23 @@ sub prompt {
   return $input;
 }
 
+sub prompt_password {
+  unless ( eval 'use Term::ReadKey (); 1' ) {
+    warn "Term::ReadKey not installed, reverting to standard prompt\n";
+    goto &prompt;
+  }
+
+  local $| = 1;
+
+  Term::ReadKey::ReadMode(2);
+  my $input = prompt(@_);
+  Term::ReadKey::ReadMode(0);
+
+  print "\n";
+
+  return $input;
+}
+
 sub punycode_decode {
   my $input = shift;
   use integer;

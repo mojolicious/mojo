@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 49;
+use Test::More tests => 47;
 
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
@@ -140,21 +140,6 @@ my $stdout = *STDOUT;
 b(1, 2, 3)->say;
 *STDOUT = $stdout;
 is $buffer, "test\n123\n", 'right output';
-
-# prompt
-my $input = "test123\n";
-open my $in, '<', \$input;
-my $output = '';
-open my $out, '>', \$output;
-my $stdin = *STDIN;
-*STDIN  = $in;
-$stdout = *STDOUT;
-*STDOUT = $out;
-$stream = b('Password: ')->prompt;
-*STDIN  = $stdin;
-*STDOUT = $stdout;
-is $output, 'Password: ', 'right output';
-is $stream, 'test123',    'right input';
 
 # slurp
 my $file = catfile splitdir($FindBin::Bin), qw(templates exception.mt);

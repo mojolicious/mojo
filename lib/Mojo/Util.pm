@@ -40,9 +40,9 @@ $REVERSE{$ENTITIES{$_}} //= $_
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum prompt punycode_decode punycode_encode),
-  qw(quote secure_compare sha1_bytes sha1_sum slurp spurt squish trim),
-  qw(unquote url_escape url_unescape xml_escape xor_encode)
+  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
+  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
 
 sub b64_decode { decode_base64(shift) }
@@ -125,14 +125,6 @@ sub html_unescape {
 
 sub md5_bytes { md5(@_) }
 sub md5_sum   { md5_hex(@_) }
-
-sub prompt {
-  local $| = 1;
-  print shift;
-  my $input = <STDIN>;
-  chomp $input;
-  return $input;
-}
 
 sub punycode_decode {
   my $input = shift;
@@ -532,14 +524,6 @@ Generate binary MD5 checksum for string.
   my $checksum = md5_sum $string;
 
 Generate MD5 checksum for string.
-
-=head2 C<prompt>
-
-  my $string = prompt 'Password: ';
-
-Print string to C<STDOUT>, wait for user to type something and finish with an
-C<ENTER> on C<STDIN>, then return the string typed in wihout the trailing
-newline.
 
 =head2 C<punycode_decode>
 

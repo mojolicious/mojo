@@ -1,9 +1,6 @@
 
 3.48  2012-10-16
-  - Added prompt method to Mojo::ByteStream.
-  - Added prompt function to Mojo::Util. (jberger, sri)
   - Improved Mojo::Content performance slightly.
-  - Improved cpanify command to prompt for password if necessary. (jberger)
   - Improved documentation.
   - Fixed memory leak in Mojo::Headers.
 

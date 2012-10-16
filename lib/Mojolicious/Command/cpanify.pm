@@ -3,7 +3,6 @@ use Mojo::Base 'Mojolicious::Command';
 
 use File::Basename 'basename';
 use Mojo::UserAgent;
-use Mojo::Util 'prompt';
 
 has description => "Upload distribution to CPAN.\n";
 has usage       => <<"EOF";
@@ -12,7 +11,7 @@ usage: $0 cpanify [OPTIONS] [FILE]
   mojo cpanify -u sri -p secr3t Mojolicious-Plugin-MyPlugin-0.01.tar.gz
 
 These options are available:
-  -p, --password <password>   PAUSE password, defaults to a password prompt.
+  -p, --password <password>   PAUSE password.
   -u, --user <name>           PAUSE username.
 EOF
 
@@ -22,11 +21,10 @@ sub run {
   # Options
   $self->_options(
     \@args,
-    'p|password=s' => \(my $password),
-    'u|user=s'     => \(my $user = '')
+    'p|password=s' => \(my $password = ''),
+    'u|user=s'     => \(my $user     = '')
   );
   die $self->usage unless my $file = shift @args;
-  $password //= prompt 'Password: ';
 
   # Upload
   my $tx = Mojo::UserAgent->new->detect_proxy->post_form(

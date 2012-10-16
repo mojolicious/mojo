@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 156;
+use Test::More tests => 154;
 
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
@@ -11,9 +11,9 @@ use FindBin;
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum prompt punycode_decode punycode_encode),
-  qw(quote squish trim unquote secure_compare sha1_bytes sha1_sum slurp),
-  qw(spurt url_escape url_unescape xml_escape xor_encode);
+  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
+  qw(squish trim unquote secure_compare sha1_bytes sha1_sum slurp spurt),
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -375,21 +375,6 @@ is xor_encode("\x10\x1d\x14\x14\x17\x58\x0f\x17\x0a\x14\x1c", 'x'),
   'hello world', 'right result';
 is xor_encode('hello', '123456789'), "\x59\x57\x5f\x58\x5a", 'right result';
 is xor_encode("\x59\x57\x5f\x58\x5a", '123456789'), 'hello', 'right result';
-
-# prompt
-my $input = "test123\n";
-open my $in, '<', \$input;
-my $output = '';
-open my $out, '>', \$output;
-my $stdin = *STDIN;
-*STDIN = $in;
-my $stdout = *STDOUT;
-*STDOUT = $out;
-my $string = prompt 'Password: ';
-*STDIN  = $stdin;
-*STDOUT = $stdout;
-is $output, 'Password: ', 'right output';
-is $string, 'test123',    'right input';
 
 # slurp
 is slurp(catfile(splitdir($FindBin::Bin), qw(templates exception.mt))),

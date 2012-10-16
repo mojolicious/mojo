@@ -11,7 +11,7 @@ our @EXPORT_OK = ('b');
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum),
-  qw(html_escape html_unescape md5_bytes md5_sum prompt punycode_decode),
+  qw(html_escape html_unescape md5_bytes md5_sum punycode_decode),
   qw(punycode_encode quote sha1_bytes sha1_sum slurp spurt squish trim),
   qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
@@ -209,14 +209,6 @@ Generate binary MD5 checksum for bytestream with L<Mojo::Util/"md5_bytes">.
   $stream = $stream->md5_sum;
 
 Generate MD5 checksum for bytestream with L<Mojo::Util/"md5_sum">.
-
-=head2 C<prompt>
-
-  $stream = $stream->prompt;
-
-Prompt user with L<Mojo::Util/"prompt">.
-
-  b('Password: ')->prompt->xor_encode('s3cret')->say;
 
 =head2 C<punycode_decode>
 

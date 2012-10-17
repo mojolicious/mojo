@@ -412,11 +412,14 @@ Number of connections to accept at once, defaults to C<50>.
 Low level event reactor, usually a L<Mojo::Reactor::Poll> or
 L<Mojo::Reactor::EV> object.
 
-  # Watch handle for I/O events
+  # Watch if handle becomes readable or writable
   $loop->reactor->io($handle => sub {
     my ($reactor, $writable) = @_;
     say $writable ? 'Handle is writable' : 'Handle is readable';
   });
+
+  # Change to watching only if handle becomes writable
+  $loop->reactor->watch($handle, 0, 1);
 
 =head2 C<unlock>
 

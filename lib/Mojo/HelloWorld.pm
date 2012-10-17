@@ -15,6 +15,9 @@ Mojo::HelloWorld - Hello World!
 
   use Mojo::HelloWorld;
 
+  my $hello = Mojo::HelloWorld->new;
+  $hello->start;
+
 =head1 DESCRIPTION
 
 L<Mojo::HelloWorld> is the default L<Mojolicious> application, used mostly

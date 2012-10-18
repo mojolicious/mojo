@@ -26,7 +26,7 @@ my $twinkle = {
   expression_mark => '*',
   line_start      => '.',
   namespace       => 'TwinkleSandBoxTest',
-  escape          => 'Mojo::Util::html_escape(@_)',
+  escape          => 'Mojo::Util::html_escape("$_[0]")',
   prepend         => 'my $prepended = $self->config("foo");',
   tag_end         => '**',
   tag_start       => '**',

@@ -527,10 +527,10 @@ Encoding used for template files.
 =head2 C<escape>
 
   my $code = $mt->escape;
-  $mt      = $mt->escape('Mojo::Util::html_escape(@_)');
+  $mt      = $mt->escape('Mojo::Util::html_escape("$_[0]")');
 
 Perl code used to escape the results of expressions, defaults to
-C<Mojo::Util::html_escape("$_[0]")>. Note that this code should not contain
+C<Mojo::Util::xml_escape("$_[0]")>. Note that this code should not contain
 newline characters, or line numbers in error messages might end up being
 wrong.
 

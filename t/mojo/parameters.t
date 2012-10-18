@@ -188,16 +188,16 @@ is "$p", '%AZaz09-._~&;=+!$\'()*,%:@/?', 'right result';
 $p = Mojo::Parameters->new('foo{}bar');
 is "$p", 'foo%7B%7Dbar', 'right result';
 
-# % character - RFC 3986 2.4
+# Value containing a "%" character
 $p = Mojo::Parameters->new;
 $p->param(foo => '%');
 is "$p", 'foo=%25', 'right result';
 
 # Special characters
-$p = Mojo::Parameters->new('foo=!$\'()*,%:@/?&bar=23');
-is $p->param('foo'), '!$\'()*,%:@/?', 'right value';
-is $p->param('bar'), 23, 'right value';
-is "$p", 'foo=!$\'()*,%25:@/?&bar=23', 'right result';
+$p = Mojo::Parameters->new('foo=!$\'()*,:@/?&bar=23');
+is $p->param('foo'), '!$\'()*,:@/?', 'right value';
+is $p->param('bar'), 23,             'right value';
+is "$p", 'foo=!$\'()*,:@/?&bar=23', 'right result';
 
 # No charset
 $p = Mojo::Parameters->new('foo=%E2%98%83')->charset(undef);

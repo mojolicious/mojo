@@ -95,16 +95,15 @@ sub build {
   }
 
   # Escape helper
-  my $escape = "no warnings \'redefine\';sub _escape {";
-  $escape .= q/return $_[0] if ref $_[0] eq 'Mojo::ByteStream';/;
-  $escape .= "no warnings 'uninitialized';" . $self->escape;
-  $escape .= "} use Mojo::Base -strict;";
+  my $escape = "no warnings 'redefine'; sub _escape {";
+  $escape .= q{return $_[0] if ref $_[0] eq 'Mojo::ByteStream';};
+  $escape .= "no warnings 'uninitialized'; @{[$self->escape]} }";
 
   # Wrap lines
   my $first = $lines[0] ||= '';
-  $lines[0] = 'package ' . $self->namespace . ";$escape";
-  $lines[0]  .= "sub { my \$_M = ''; " . $self->prepend . "; do { $first";
-  $lines[-1] .= $self->append . "; \$_M; } };";
+  $lines[0] = "package @{[$self->namespace]}; $escape use Mojo::Base -strict;";
+  $lines[0]  .= "sub { my \$_M = ''; @{[$self->prepend]}; do { $first";
+  $lines[-1] .= "@{[$self->append]}; \$_M } };";
 
   # Code
   my $code = join "\n", @lines;

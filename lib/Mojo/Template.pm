@@ -14,7 +14,7 @@ has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
 has encoding      => 'UTF-8';
-has escape        => 'Mojo::Util::xml_escape "$_[0]"';
+has escape        => 'Mojo::Util::xml_escape("$_[0])"';
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)] => '%';
 has name      => 'template';
@@ -529,9 +529,10 @@ Encoding used for template files.
   my $code = $mt->escape;
   $mt      = $mt->escape('Mojo::Util::html_escape(@_)');
 
-Perl code used to escape the results of expressions. Note that this code
-should not contain newline characters, or line numbers in error messages might
-end up being wrong.
+Perl code used to escape the results of expressions, defaults to
+C<Mojo::Util::html_escape("$_[0]")>. Note that this code should not contain
+newline characters, or line numbers in error messages might end up being
+wrong.
 
 =head2 C<escape_mark>
 

@@ -1,5 +1,6 @@
 
-3.49  2012-10-18
+3.49  2012-10-19
+  - Added escape attribute to Mojo::Template.
   - Improved documentation.
 
 3.48  2012-10-16

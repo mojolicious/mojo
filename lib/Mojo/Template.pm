@@ -14,6 +14,7 @@ has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
 has encoding      => 'UTF-8';
+has escape        => 'Mojo::Util::xml_escape "$_[0]"';
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)] => '%';
 has name      => 'template';
@@ -21,18 +22,6 @@ has namespace => 'Mojo::Template::SandBox';
 has tag_start => '<%';
 has tag_end   => '%>';
 has tree      => sub { [] };
-
-# Escape helper
-my $ESCAPE = <<'EOF';
-no warnings 'redefine';
-sub _escape {
-  return $_[0] if ref $_[0] eq 'Mojo::ByteStream';
-  no warnings 'uninitialized';
-  Mojo::Util::xml_escape "$_[0]";
-}
-use Mojo::Base -strict;
-EOF
-$ESCAPE =~ s/\n//g;
 
 sub build {
   my $self = shift;
@@ -105,9 +94,15 @@ sub build {
     }
   }
 
+  # Escape helper
+  my $escape = "no warnings \'redefine\';sub _escape {";
+  $escape .= q/return $_[0] if ref $_[0] eq 'Mojo::ByteStream';/;
+  $escape .= "no warnings 'uninitialized';" . $self->escape;
+  $escape .= "} use Mojo::Base -strict;";
+
   # Wrap lines
   my $first = $lines[0] ||= '';
-  $lines[0] = 'package ' . $self->namespace . "; $ESCAPE ";
+  $lines[0] = 'package ' . $self->namespace . ";$escape";
   $lines[0]  .= "sub { my \$_M = ''; " . $self->prepend . "; do { $first";
   $lines[-1] .= $self->append . "; \$_M; } };";
 
@@ -528,6 +523,15 @@ Compiled template code.
   $mt          = $mt->encoding('UTF-8');
 
 Encoding used for template files.
+
+=head2 C<escape>
+
+  my $code = $mt->escape;
+  $mt      = $mt->escape('Mojo::Util::html_escape(@_)');
+
+Code used to escape the results of escaped expressions. Note that this code
+should not contain newline characters, or line numbers in error messages might
+end up being wrong.
 
 =head2 C<escape_mark>
 

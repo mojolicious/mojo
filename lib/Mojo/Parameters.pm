@@ -173,11 +173,11 @@ sub to_string {
 
     # Escape and replace whitespace with "+"
     $name = encode $charset, $name if $charset;
-    $name = url_escape $name, '^A-Za-z0-9\-._~!$\'()*,%:@/?';
+    $name = url_escape $name, '^A-Za-z0-9\-._~!$\'()*,:@/?';
     $name =~ s/\%20/\+/g;
     if ($value) {
       $value = encode $charset, $value if $charset;
-      $value = url_escape $value, '^A-Za-z0-9\-._~!$\'()*,%:@/?';
+      $value = url_escape $value, '^A-Za-z0-9\-._~!$\'()*,:@/?';
       $value =~ s/\%20/\+/g;
     }
 

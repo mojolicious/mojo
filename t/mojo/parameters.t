@@ -194,10 +194,10 @@ $p->param('%foo%' => '%');
 is "$p", '%25foo%25=%25', 'right result';
 
 # Special characters
-$p = Mojo::Parameters->new('foo=!$\'()*,:@/?&bar=23');
-is $p->param('foo'), '!$\'()*,:@/?', 'right value';
-is $p->param('bar'), 23,             'right value';
-is "$p", 'foo=!$\'()*,:@/?&bar=23', 'right result';
+$p = Mojo::Parameters->new('!$\'()*,:@/foo?=!$\'()*,:@/?&bar=23');
+is $p->param('!$\'()*,:@/foo?'), '!$\'()*,:@/?', 'right value';
+is $p->param('bar'),             23,             'right value';
+is "$p", '!$\'()*,:@/foo?=!$\'()*,:@/?&bar=23', 'right result';
 
 # No charset
 $p = Mojo::Parameters->new('foo=%E2%98%83')->charset(undef);

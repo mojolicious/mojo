@@ -2,6 +2,7 @@
 3.49  2012-10-19
   - Added escape attribute to Mojo::Template.
   - Improved documentation.
+  - Improved tests.
   - Fixed % escaping bug in Mojo::Parameters. (dmw397)
 
 3.48  2012-10-16

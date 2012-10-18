@@ -188,10 +188,10 @@ is "$p", '%AZaz09-._~&;=+!$\'()*,%:@/?', 'right result';
 $p = Mojo::Parameters->new('foo{}bar');
 is "$p", 'foo%7B%7Dbar', 'right result';
 
-# Value containing a "%" character
+# "%"
 $p = Mojo::Parameters->new;
-$p->param(foo => '%');
-is "$p", 'foo=%25', 'right result';
+$p->param('%foo%' => '%');
+is "$p", '%25foo%25=%25', 'right result';
 
 # Special characters
 $p = Mojo::Parameters->new('foo=!$\'()*,:@/?&bar=23');

@@ -14,7 +14,7 @@ has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
 has encoding      => 'UTF-8';
-has escape        => 'Mojo::Util::xml_escape("$_[0])"';
+has escape        => 'Mojo::Util::xml_escape("$_[0]")';
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)] => '%';
 has name      => 'template';

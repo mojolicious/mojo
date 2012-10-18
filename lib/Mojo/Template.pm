@@ -461,7 +461,7 @@ L<Mojo::Template> implements the following attributes.
   my $escape = $mt->auto_escape;
   $mt        = $mt->auto_escape(1);
 
-Activate automatic XML escaping.
+Activate automatic escaping.
 
 =head2 C<append>
 
@@ -529,7 +529,7 @@ Encoding used for template files.
   my $code = $mt->escape;
   $mt      = $mt->escape('Mojo::Util::html_escape(@_)');
 
-Code used to escape the results of escaped expressions. Note that this code
+Perl code used to escape the results of expressions. Note that this code
 should not contain newline characters, or line numbers in error messages might
 end up being wrong.
 

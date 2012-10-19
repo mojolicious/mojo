@@ -498,7 +498,7 @@ Keyword indicating the start of a capture block, defaults to C<begin>.
   my $code = $mt->code;
   $mt      = $mt->code($code);
 
-Template code.
+Perl code for template.
 
 =head2 C<comment_mark>
 
@@ -649,20 +649,20 @@ Construct a new L<Mojo::Template> object.
 
   $mt = $mt->build;
 
-Build template.
+Build Perl code from tree.
 
 =head2 C<compile>
 
   my $exception = $mt->compile;
 
-Compile template.
+Compile Perl code for template.
 
 =head2 C<interpret>
 
   my $output = $mt->interpret;
   my $output = $mt->interpret(@args);
 
-Interpret template.
+Interpret compiled template code.
 
   # Reuse template
   say $mt->render('Hello <%= $_[0] %>!', 'Bender');
@@ -673,7 +673,7 @@ Interpret template.
 
   $mt = $mt->parse($template);
 
-Parse template.
+Parse template into tree.
 
 =head2 C<render>
 

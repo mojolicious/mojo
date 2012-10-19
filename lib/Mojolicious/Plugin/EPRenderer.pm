@@ -28,7 +28,7 @@ sub register {
         my $mt = Mojo::Template->new($template);
 
         # Be a bit more relaxed for helpers
-        my $prepend = q[my $self = shift; Scalar::Util::weaken $self;]
+        my $prepend = 'my $self = shift; Scalar::Util::weaken $self;'
           . q[no strict 'refs'; no warnings 'redefine';];
 
         # Helpers

@@ -16,6 +16,9 @@ use Test::Mojo;
 # Custom format
 app->renderer->default_format('foo');
 
+# Custom escape function
+my $escape = 'sub escape { Mojo::Util::html_escape("$_[0]") }';
+
 # Twinkle template syntax
 my $twinkle = {
   append          => '$self->res->headers->header("X-Append" => $prepended);',
@@ -26,8 +29,7 @@ my $twinkle = {
   expression_mark => '*',
   line_start      => '.',
   namespace       => 'TwinkleSandBoxTest',
-  escape          => 'Mojo::Util::html_escape("$_[0]")',
-  prepend         => 'my $prepended = $self->config("foo");',
+  prepend         => qq{my \$prepended = \$self->config("foo"); $escape},
   tag_end         => '**',
   tag_start       => '**',
   trim_mark       => '*'

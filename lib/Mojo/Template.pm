@@ -14,7 +14,6 @@ has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
 has encoding      => 'UTF-8';
-has escape        => 'Mojo::Util::xml_escape("$_[0]")';
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)] => '%';
 has name      => 'template';
@@ -94,10 +93,13 @@ sub build {
     }
   }
 
-  # Escape helper
-  my $escape = "no warnings 'redefine'; sub _escape {";
-  $escape .= q{return $_[0] if ref $_[0] eq 'Mojo::ByteStream';};
-  $escape .= "no warnings 'uninitialized'; @{[$self->escape]} }";
+  # XML escape function (can be redefined)
+  my $escape
+    = q/no warnings 'redefine'; sub escape { Mojo::Util::xml_escape($_[0]) }/;
+
+  # Escape function with Mojo::ByteStream support
+  $escape .= q[sub _escape { no warnings 'uninitialized';];
+  $escape .= q/ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : escape("$_[0]") }/;
 
   # Wrap lines
   my $first = $lines[0] ||= '';
@@ -522,16 +524,6 @@ Compiled template code.
   $mt          = $mt->encoding('UTF-8');
 
 Encoding used for template files.
-
-=head2 C<escape>
-
-  my $code = $mt->escape;
-  $mt      = $mt->escape('Mojo::Util::html_escape("$_[0]")');
-
-Perl code used to escape the results of expressions, defaults to
-C<Mojo::Util::xml_escape("$_[0]")>. Note that this code should not contain
-newline characters, or line numbers in error messages might end up being
-wrong.
 
 =head2 C<escape_mark>
 

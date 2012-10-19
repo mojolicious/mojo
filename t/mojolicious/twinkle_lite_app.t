@@ -1,7 +1,5 @@
 use Mojo::Base -strict;
 
-use utf8;
-
 # Disable IPv6 and libev
 BEGIN {
   $ENV{MOJO_NO_IPV6} = 1;
@@ -16,9 +14,6 @@ use Test::Mojo;
 # Custom format
 app->renderer->default_format('foo');
 
-# Custom escape function
-my $escape = 'sub escape { Mojo::Util::html_escape("$_[0]") }';
-
 # Twinkle template syntax
 my $twinkle = {
   append          => '$self->res->headers->header("X-Append" => $prepended);',
@@ -29,7 +24,7 @@ my $twinkle = {
   expression_mark => '*',
   line_start      => '.',
   namespace       => 'TwinkleSandBoxTest',
-  prepend         => qq{my \$prepended = \$self->config("foo"); $escape},
+  prepend         => 'my $prepended = $self->config("foo");',
   tag_end         => '**',
   tag_start       => '**',
   trim_mark       => '*'
@@ -92,7 +87,7 @@ $t->get_ok('/')->status_is(200)->header_is('X-Append' => 'bar')
 
 # GET /advanced
 $t->get_ok('/advanced')->status_is(200)->header_is('X-Append' => 'bar')
-  ->content_is("&lt;escape me&gt;&awconint;\n123423");
+  ->content_is("&lt;escape me&gt;\n123423");
 
 # GET /docs
 $t->get_ok('/docs')->status_is(200)->content_like(qr!<h3>snowman</h3>!);
@@ -125,7 +120,7 @@ Hello *** $name **!\
 test<%= content %>123\
 
 @@ advanced.foo.twinkle
-.** "<escape me>\x{2233}"
+.** '<escape me>'
 . my $numbers = [1 .. 4];
  ** for my $i (@$numbers) { ***
  *** $i ***

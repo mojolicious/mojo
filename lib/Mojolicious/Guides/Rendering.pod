@@ -99,7 +99,7 @@ Perl code, a naive translation could look like this.
   $output .= '<ul>';
   for my $j (1 .. $i) {
     $output .= '<li>';
-    $output .= escape scalar $j;
+    $output .= xml_escape scalar $j;
     $output .= '</li>';
   }
   $output .= '</ul>';
@@ -518,7 +518,7 @@ A naive translation to Perl code could look like this.
     my $name   = shift;
     my $output = '';
     $output .= 'Hello ';
-    $output .= escape scalar $name;
+    $output .= xml_escape scalar $name;
     $output .= '.';
     return Mojo::ByteStream->new($output);
   }

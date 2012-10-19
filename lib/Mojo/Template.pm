@@ -93,13 +93,10 @@ sub build {
     }
   }
 
-  # XML escape function (can be redefined)
-  my $escape
-    = q/no warnings 'redefine'; sub escape { Mojo::Util::xml_escape($_[0]) }/;
-
-  # Escape function with Mojo::ByteStream support
-  $escape .= q[sub _escape { no warnings 'uninitialized';];
-  $escape .= q/ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : escape("$_[0]") }/;
+  # Escape helper
+  my $escape = q[no warnings 'redefine'; sub _escape {];
+  $escape .= q/no warnings 'uninitialized'; ref $_[0] eq 'Mojo::ByteStream'/;
+  $escape .= '? $_[0] : Mojo::Util::xml_escape("$_[0]") }';
 
   # Wrap lines
   my $first = $lines[0] ||= '';

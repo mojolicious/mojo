@@ -2,6 +2,7 @@ package Mojolicious::Command::routes;
 use Mojo::Base 'Mojolicious::Command';
 
 use re 'regexp_pattern';
+use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 
 has description => "Show available routes.\n";
 has usage       => <<"EOF";
@@ -15,7 +16,7 @@ sub run {
   my ($self, @args) = @_;
 
   # Options
-  $self->_options(\@args, 'v|verbose' => \my $verbose);
+  GetOptionsFromArray \@args, 'v|verbose' => \my $verbose;
 
   # Walk and draw
   my $routes = [];

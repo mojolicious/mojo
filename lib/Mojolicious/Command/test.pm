@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Cwd 'realpath';
 use FindBin;
 use File::Spec::Functions qw(abs2rel catdir splitdir);
+use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Home;
 
 has description => "Run unit tests.\n";
@@ -18,7 +19,7 @@ sub run {
   my ($self, @args) = @_;
 
   # Options
-  $self->_options(\@args, 'v|verbose' => sub { $ENV{HARNESS_VERBOSE} = 1 });
+  GetOptionsFromArray \@args, 'v|verbose' => sub { $ENV{HARNESS_VERBOSE} = 1 };
 
   # Search tests
   unless (@args) {

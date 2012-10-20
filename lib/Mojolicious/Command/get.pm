@@ -1,6 +1,7 @@
 package Mojolicious::Command::get;
 use Mojo::Base 'Mojolicious::Command';
 
+use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::DOM;
 use Mojo::IOLoop;
 use Mojo::JSON;
@@ -38,15 +39,13 @@ sub run {
   my ($self, @args) = @_;
 
   # Options
-  $self->_options(
-    \@args,
+  GetOptionsFromArray \@args,
     'C|charset=s' => \my $charset,
     'c|content=s' => \(my $content = ''),
     'H|header=s'  => \my @headers,
     'M|method=s'  => \(my $method = 'GET'),
     'r|redirect'  => \my $redirect,
-    'v|verbose'   => \my $verbose
-  );
+    'v|verbose'   => \my $verbose;
   $verbose = 1 if $method eq 'HEAD';
 
   # Headers

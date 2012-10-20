@@ -1,6 +1,8 @@
 package Mojolicious::Command::eval;
 use Mojo::Base 'Mojolicious::Command';
 
+use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
+
 has description => "Run code against application.\n";
 has usage       => <<"EOF";
 usage: $0 eval [OPTIONS] CODE
@@ -16,7 +18,7 @@ sub run {
   my ($self, @args) = @_;
 
   # Options
-  $self->_options(\@args, 'v|verbose' => \my $verbose);
+  GetOptionsFromArray \@args, 'v|verbose' => \my $verbose;
   my $code = shift @args || '';
 
   # Run code against application

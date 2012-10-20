@@ -1,6 +1,7 @@
 package Mojolicious::Command::cgi;
 use Mojo::Base 'Mojolicious::Command';
 
+use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::CGI;
 
 has description => "Start application with CGI.\n";
@@ -14,7 +15,7 @@ EOF
 sub run {
   my ($self, @args) = @_;
   my $cgi = Mojo::Server::CGI->new(app => $self->app);
-  $self->_options(\@args, nph => sub { $cgi->nph(1) });
+  GetOptionsFromArray \@args, nph => sub { $cgi->nph(1) };
   $cgi->run;
 }
 

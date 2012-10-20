@@ -1,6 +1,7 @@
 package Mojolicious::Command::daemon;
 use Mojo::Base 'Mojolicious::Command';
 
+use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Daemon;
 
 has description => "Start application with HTTP and WebSocket server.\n";
@@ -30,8 +31,7 @@ sub run {
 
   # Options
   my $daemon = Mojo::Server::Daemon->new(app => $self->app);
-  $self->_options(
-    \@args,
+  GetOptionsFromArray \@args,
     'b|backlog=i'    => sub { $daemon->backlog($_[1]) },
     'c|clients=i'    => sub { $daemon->max_clients($_[1]) },
     'g|group=s'      => sub { $daemon->group($_[1]) },
@@ -39,8 +39,7 @@ sub run {
     'l|listen=s'     => \my @listen,
     'p|proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
     'r|requests=i' => sub { $daemon->max_requests($_[1]) },
-    'u|user=s'     => sub { $daemon->user($_[1]) }
-  );
+    'u|user=s'     => sub { $daemon->user($_[1]) };
 
   # Start
   $daemon->listen(\@listen) if @listen;

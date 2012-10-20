@@ -6,7 +6,6 @@ use Cwd 'getcwd';
 use File::Basename 'dirname';
 use File::Path 'mkpath';
 use File::Spec::Functions qw(catdir catfile);
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 use Mojo::Loader;
 use Mojo::Server;
 use Mojo::Template;
@@ -88,13 +87,6 @@ sub write_file {
 sub write_rel_file {
   my ($self, $path, $data) = @_;
   $self->write_file($self->rel_file($path), $data);
-}
-
-sub _options {
-  my ($self, $args) = (shift, shift);
-  local @ARGV = @$args;
-  GetOptions @_;
-  @$args = @ARGV;
 }
 
 1;

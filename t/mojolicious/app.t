@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 349;
+use Test::More tests => 351;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -65,7 +65,9 @@ my $url = $t->ua->app_url;
 $url->path('/fun/time');
 $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_isnt(404)
   ->status_is(200)->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
+  ->header_unlike('X-Bender' => qr/shiny metal/)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_unlike(Server => qr/Bender/)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_isnt('Have')
   ->content_is('Have fun!');
 

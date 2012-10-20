@@ -125,16 +125,15 @@ sub header_isnt {
 
 sub header_like {
   my ($self, $name, $regex, $desc) = @_;
-  $desc ||= "$name is similar";
   return $self->_test('like', scalar $self->tx->res->headers->header($name),
-    $regex, $desc);
+    $regex, $desc || "$name is similar");
 }
 
 sub header_unlike {
   my ($self, $name, $regex, $desc) = @_;
-  $desc ||= "$name is not similar";
-  return $self->_test('unlike', scalar $self->tx->res->headers->header($name),
-    $regex, $desc);
+  return $self->_test('unlike',
+    scalar $self->tx->res->headers->header($name) // '',
+    $regex, $desc || "$name is not similar");
 }
 
 sub json_content_is {

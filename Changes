@@ -1,6 +1,8 @@
 
 3.51  2012-10-21
   - Improved documentation.
+  - Improved tests.
+  - Fixed warning in Test::Mojo.
 
 3.50  2012-10-20
   - Improved option handling of all commands.

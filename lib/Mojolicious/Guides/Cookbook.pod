@@ -1056,10 +1056,10 @@ that they will be picked up automatically by the command line interface?
   has usage       => "usage: $0 spy [TARGET]\n";
 
   sub run {
-    my ($self, $whatever) = @_;
+    my ($self, $target) = @_;
 
     # Leak secret passphrase
-    if ($whatever eq 'secret') {
+    if ($target eq 'secret') {
       my $secret = $self->app->secret;
       say qq{The secret of this application is "$secret".};
     }

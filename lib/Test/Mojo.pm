@@ -145,7 +145,8 @@ sub json_content_is {
 sub json_is {
   my ($self, $p, $data, $desc) = @_;
   $desc ||= qq{exact match for JSON Pointer "$p"};
-  return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
+  return $self->_test('is_deeply', scalar $self->tx->res->json($p), $data,
+    $desc);
 }
 
 sub json_has {

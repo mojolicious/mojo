@@ -17,7 +17,7 @@ sub body_contains {
     return 1 if index($part->build_headers, $chunk) >= 0;
     return 1 if $part->body_contains($chunk);
   }
-  return;
+  return undef;
 }
 
 sub body_size {
@@ -63,7 +63,7 @@ sub build_boundary {
 
 sub clone {
   my $self = shift;
-  return unless my $clone = $self->SUPER::clone();
+  return undef unless my $clone = $self->SUPER::clone();
   return $clone->parts($self->parts);
 }
 
@@ -119,18 +119,18 @@ sub _parse_multipart_body {
   my $pos = index $self->{multipart}, "\x0d\x0a--$boundary";
   if ($pos < 0) {
     my $len = length($self->{multipart}) - (length($boundary) + 8);
-    return unless $len > 0;
+    return undef unless $len > 0;
 
     # Store chunk
     my $chunk = substr $self->{multipart}, 0, $len, '';
     $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
-    return;
+    return undef;
   }
 
   # Store chunk
   my $chunk = substr $self->{multipart}, 0, $pos, '';
   $self->parts->[-1] = $self->parts->[-1]->parse($chunk);
-  return $self->{multi_state} = 'multipart_boundary';
+  return !!($self->{multi_state} = 'multipart_boundary');
 }
 
 sub _parse_multipart_boundary {
@@ -144,7 +144,7 @@ sub _parse_multipart_boundary {
     my $part = Mojo::Content::Single->new(relaxed => 1);
     $self->emit(part => $part);
     push @{$self->parts}, $part;
-    return $self->{multi_state} = 'multipart_body';
+    return !!($self->{multi_state} = 'multipart_body');
   }
 
   # Boundary ends
@@ -156,7 +156,7 @@ sub _parse_multipart_boundary {
     $self->{state} = $self->{multi_state} = 'finished';
   }
 
-  return;
+  return undef;
 }
 
 sub _parse_multipart_preamble {
@@ -168,11 +168,11 @@ sub _parse_multipart_preamble {
     substr $self->{multipart}, 0, $pos, "\x0d\x0a";
 
     # Parse boundary
-    return $self->{multi_state} = 'multipart_boundary';
+    return !!($self->{multi_state} = 'multipart_boundary');
   }
 
   # No boundary yet
-  return;
+  return undef;
 }
 
 sub _read {

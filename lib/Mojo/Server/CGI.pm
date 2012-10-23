@@ -27,17 +27,17 @@ sub run {
   STDOUT->autoflush(1);
   binmode STDOUT;
   my $res = $tx->res;
-  return if $self->nph && !_write($res, 'get_start_line_chunk');
+  return undef if $self->nph && !_write($res, 'get_start_line_chunk');
 
   # Response headers
   $res->fix_headers;
   my $code = $res->code    || 404;
   my $msg  = $res->message || $res->default_message;
   $res->headers->status("$code $msg") unless $self->nph;
-  return unless _write($res, 'get_header_chunk');
+  return undef unless _write($res, 'get_header_chunk');
 
   # Response body
-  return unless _write($res, 'get_body_chunk');
+  return undef unless _write($res, 'get_body_chunk');
 
   # Finish transaction
   $tx->server_close;
@@ -60,7 +60,7 @@ sub _write {
 
     # Part
     $offset += $len;
-    return unless STDOUT->opened;
+    return undef unless STDOUT->opened;
     print STDOUT $chunk;
   }
 

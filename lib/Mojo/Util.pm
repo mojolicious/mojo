@@ -87,7 +87,8 @@ sub decamelize {
 
 sub decode {
   my ($encoding, $bytes) = @_;
-  return unless eval { $bytes = Encode::decode($encoding, $bytes, 1); 1 };
+  return undef
+    unless eval { $bytes = Encode::decode($encoding, $bytes, 1); 1 };
   return $bytes;
 }
 
@@ -96,7 +97,7 @@ sub encode { Encode::encode(shift, shift) }
 sub get_line {
 
   # Locate line ending
-  return if (my $pos = index ${$_[0]}, "\x0a") == -1;
+  return undef if (my $pos = index ${$_[0]}, "\x0a") == -1;
 
   # Extract line and ending
   my $line = substr ${$_[0]}, 0, $pos + 1, '';
@@ -253,7 +254,7 @@ sub quote {
 
 sub secure_compare {
   my ($a, $b) = @_;
-  return if length $a != length $b;
+  return undef if length $a != length $b;
   my $r = 0;
   $r |= ord(substr $a, $_) ^ ord(substr $b, $_) for 0 .. length($a) - 1;
   return $r == 0;

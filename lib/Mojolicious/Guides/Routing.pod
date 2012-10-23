@@ -539,7 +539,7 @@ be broken, this makes bridges a very powerful tool for authentication.
 
     # Not authenticated
     $self->render(text => "You're not Bender.");
-    return;
+    return undef;
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 
@@ -719,14 +719,14 @@ play, they are basically router plugins.
       my ($route, $c, $captures, $pattern) = @_;
 
       # User supplied regular expression
-      return unless $pattern && ref $pattern eq 'Regexp';
+      return undef unless $pattern && ref $pattern eq 'Regexp';
 
       # Match "User-Agent" header and return true on success
       my $agent = $c->req->headers->user_agent;
       return 1 if $agent && $agent =~ $pattern;
 
       # No success
-      return;
+      return undef;
     }
   );
 
@@ -756,7 +756,7 @@ You can also package your conditions as reusable plugins.
         my ($route, $c, $captures, $days) = @_;
 
         # Keep the werewolfs out!
-        return if abs(14 - (phase(time))[2]) > ($days / 2);
+        return undef if abs(14 - (phase(time))[2]) > ($days / 2);
 
         # It's ok, no werewolf
         return 1;

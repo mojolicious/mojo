@@ -229,7 +229,7 @@ sub _manage {
 }
 
 sub _pid {
-  return unless open my $file, '<', shift->{config}{pid_file};
+  return undef unless open my $file, '<', shift->{config}{pid_file};
   my $pid = <$file>;
   chomp $pid;
   return $pid;

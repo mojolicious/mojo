@@ -78,7 +78,7 @@ app->routes->add_condition(
     $c->tx->res(
       Mojo::Message::Response->new(code => 201)->body('Conditional response!')
     );
-    $c->rendered and return;
+    $c->rendered and return undef;
   }
 );
 

@@ -81,7 +81,7 @@ sub shape_match {
     = $detect ? ($self->format_regex || $self->_compile_format) : undef;
 
   # Match
-  return unless my @captures = $$pathref =~ $regex;
+  return undef unless my @captures = $$pathref =~ $regex;
   $$pathref =~ s/($regex)//;
 
   # Merge captures
@@ -96,7 +96,7 @@ sub shape_match {
   my $constraint = $self->constraints->{format};
   return $result if !$detect || defined $constraint && !$constraint;
   if ($$pathref =~ s!^/?$format!!) { $result->{format} = $1 }
-  elsif ($constraint) { return unless $result->{format} }
+  elsif ($constraint) { return undef unless $result->{format} }
 
   return $result;
 }

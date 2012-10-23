@@ -51,7 +51,7 @@ sub contains {
   my $parts = $self->new($path)->parts;
   for my $part (@{$self->parts}) {
     return 1 unless defined(my $try = shift @$parts);
-    return unless $part eq $try;
+    return undef unless $part eq $try;
   }
 
   return !@$parts;

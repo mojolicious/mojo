@@ -170,7 +170,7 @@ sub stream {
   return $self->_stream($stream, $self->_id) if blessed $stream;
 
   # Find stream for id
-  return unless my $c = $self->{connections}{$stream};
+  return undef unless my $c = $self->{connections}{$stream};
   return $c->{stream};
 }
 

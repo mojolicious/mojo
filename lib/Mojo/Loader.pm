@@ -21,7 +21,7 @@ sub load {
   return 1 if !$module || $module !~ /^\w(?:[\w:']*\w)?$/;
 
   # Load
-  return if $module->can('new') || eval "require $module; 1";
+  return undef if $module->can('new') || eval "require $module; 1";
 
   # Exists
   my $path = class_to_path $module;

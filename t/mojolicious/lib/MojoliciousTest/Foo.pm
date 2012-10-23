@@ -49,7 +49,7 @@ sub stage1 {
 
   # Fail
   $self->render_text('Go away!');
-  return;
+  return undef;
 }
 
 sub stage2 {

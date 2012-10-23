@@ -64,7 +64,7 @@ sub ihost {
     if @_;
 
   # Check if host needs to be encoded
-  return unless my $host = $self->host;
+  return undef unless my $host = $self->host;
   return $host unless $host =~ /[^\x00-\x7f]/;
 
   # Encode

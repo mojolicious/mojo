@@ -113,13 +113,13 @@ sub proxy_connect {
 
   # No proxy
   my $req = $old->req;
-  return unless my $proxy = $req->proxy;
+  return undef unless my $proxy = $req->proxy;
 
   # WebSocket and/or HTTPS
   my $url     = $req->url;
   my $upgrade = lc($req->headers->upgrade || '');
   my $scheme  = $url->scheme;
-  return unless $upgrade eq 'websocket' || $scheme eq 'https';
+  return undef unless $upgrade eq 'websocket' || $scheme eq 'https';
 
   # CONNECT request
   my $new = $self->tx(CONNECT => $url->clone->userinfo(undef));
@@ -134,7 +134,7 @@ sub redirect {
   # Commonly used codes
   my $res = $old->res;
   my $code = $res->code // '';
-  return unless grep { $_ eq $code } 301, 302, 303, 307, 308;
+  return undef unless grep { $_ eq $code } 301, 302, 303, 307, 308;
 
   # Fix broken location without authority and/or scheme
   return unless my $location = $res->headers->location;
@@ -148,7 +148,7 @@ sub redirect {
   my $new    = Mojo::Transaction::HTTP->new;
   my $method = $req->method;
   if (grep { $_ eq $code } 301, 307, 308) {
-    return unless $req = $req->clone;
+    return undef unless $req = $req->clone;
     $new->req($req);
     $req->headers->remove('Host')->remove('Cookie')->remove('Referer');
   }

@@ -44,13 +44,13 @@ sub decode {
   $self->error(undef);
 
   # Missing input
-  $self->error('Missing or empty input') and return unless $bytes;
+  $self->error('Missing or empty input') and return undef unless $bytes;
 
   # Remove BOM
   $bytes =~ s/^(?:\357\273\277|\377\376\0\0|\0\0\376\377|\376\377|\377\376)//g;
 
   # Wide characters
-  $self->error('Wide character in input') and return
+  $self->error('Wide character in input') and return undef
     unless utf8::downgrade($bytes, 1);
 
   # Detect and decode Unicode

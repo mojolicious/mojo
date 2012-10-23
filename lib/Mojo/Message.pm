@@ -94,7 +94,7 @@ sub cookies { croak 'Method "cookies" not implemented by subclass' }
 sub dom {
   my $self = shift;
 
-  return if $self->is_multipart;
+  return undef if $self->is_multipart;
   my $dom = $self->{dom}
     ||= Mojo::DOM->new->charset($self->content->charset // undef)
     ->parse($self->body);
@@ -178,7 +178,7 @@ sub is_dynamic { shift->content->is_dynamic }
 sub is_finished { (shift->{state} // '') eq 'finished' }
 
 sub is_limit_exceeded {
-  return unless my $code = (shift->error)[1];
+  return undef unless my $code = (shift->error)[1];
   return !!grep { $_ eq $code } 413, 431;
 }
 
@@ -186,7 +186,7 @@ sub is_multipart { shift->content->is_multipart }
 
 sub json {
   my ($self, $pointer) = @_;
-  return if $self->is_multipart;
+  return undef if $self->is_multipart;
   my $data = $self->{json} ||= Mojo::JSON->new->decode($self->body);
   return $pointer ? Mojo::JSON::Pointer->new->get($data, $pointer) : $data;
 }

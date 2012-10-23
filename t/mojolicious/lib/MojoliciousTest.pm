@@ -75,7 +75,7 @@ sub startup {
   my $auth = $r->bridge('/auth')->to(
     cb => sub {
       return 1 if shift->req->headers->header('X-Bender');
-      return;
+      return undef;
     }
   );
 

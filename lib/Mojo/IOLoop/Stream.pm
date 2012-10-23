@@ -39,7 +39,7 @@ sub is_readable {
 
 sub is_writing {
   my $self = shift;
-  return unless exists $self->{handle};
+  return undef unless exists $self->{handle};
   return !!length($self->{buffer}) || $self->has_subscribers('drain');
 }
 

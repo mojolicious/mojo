@@ -138,7 +138,7 @@ sub _cache {
     my $max = $self->max_connections;
     $self->_remove(shift(@$old)->[1]) while @$old > $max;
     push @$old, [$name, $id] if $max;
-    return;
+    return undef;
   }
 
   # Dequeue
@@ -279,7 +279,8 @@ sub _connection {
   }
 
   # CONNECT request to proxy required
-  return if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
+  return undef
+    if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
 
   # Connect
   warn "-- Connect ($scheme:$host:$port)\n" if DEBUG;
@@ -395,11 +396,11 @@ sub _redirect {
   my ($self, $c, $old) = @_;
 
   # Build followup transaction
-  return unless my $new = $self->transactor->redirect($old);
+  return undef unless my $new = $self->transactor->redirect($old);
 
   # Max redirects
   my $redirects = delete $c->{redirects} || 0;
-  return unless $redirects < $self->max_redirects;
+  return undef unless $redirects < $self->max_redirects;
 
   # Follow redirect
   return 1 unless my $id = $self->_start($new, delete $c->{cb});
@@ -459,7 +460,8 @@ sub _start {
   if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
   # Connection
-  return unless my $id = $self->emit(start => $tx)->_connection($tx, $cb);
+  return undef
+    unless my $id = $self->emit(start => $tx)->_connection($tx, $cb);
 
   # Request timeout
   if (my $t = $self->request_timeout) {
@@ -478,11 +480,11 @@ sub _upgrade {
   my $c    = $self->{connections}{$id};
   my $old  = $c->{tx};
   my $code = $old->res->code // '';
-  return unless $old->req->headers->upgrade && $code eq '101';
+  return undef unless $old->req->headers->upgrade && $code eq '101';
 
   # Check challenge and upgrade to WebSocket transaction
   my $new = Mojo::Transaction::WebSocket->new(handshake => $old, masked => 1);
-  return unless $new->client_challenge;
+  return undef unless $new->client_challenge;
   $c->{tx} = $new;
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });

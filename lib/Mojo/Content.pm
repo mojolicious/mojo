@@ -17,7 +17,7 @@ sub body_size { croak 'Method "body_size" not implemented by subclass' }
 sub boundary {
   my $type = shift->headers->content_type || '';
   $type =~ m!multipart.*boundary="*([a-zA-Z0-9'(),.:?\-_+/]+)!i and return $1;
-  return;
+  return undef;
 }
 
 sub build_body    { shift->_build('get_body_chunk') }
@@ -30,7 +30,7 @@ sub charset {
 
 sub clone {
   my $self = shift;
-  return if $self->is_dynamic;
+  return undef if $self->is_dynamic;
   return $self->new(headers => $self->headers->clone);
 }
 

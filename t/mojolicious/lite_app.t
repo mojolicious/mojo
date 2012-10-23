@@ -476,7 +476,7 @@ app->routes->add_condition(
     my ($route, $c, $captures, $num) = @_;
     $captures->{test} = $captures->{text} . "$num works!";
     return 1 if $c->stash->{default} == $num;
-    return;
+    return undef;
   }
 );
 
@@ -493,7 +493,7 @@ app->routes->add_condition(
   redirect => sub {
     my ($route, $c, $captures, $active) = @_;
     return 1 unless $active;
-    $c->redirect_to('index') and return
+    $c->redirect_to('index') and return undef
       unless $c->req->headers->header('X-Condition-Test');
     return 1;
   }

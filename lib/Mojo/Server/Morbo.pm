@@ -15,10 +15,10 @@ sub check_file {
 
   # Check if modify time and/or size have changed
   my ($size, $mtime) = (stat $file)[7, 9];
-  return unless defined $mtime;
+  return undef unless defined $mtime;
   my $cache = $self->{cache} ||= {};
   my $stats = $cache->{$file} ||= [$^T, $size];
-  return if $mtime <= $stats->[0] && $size == $stats->[1];
+  return undef if $mtime <= $stats->[0] && $size == $stats->[1];
   return !!($cache->{$file} = [$mtime, $size]);
 }
 

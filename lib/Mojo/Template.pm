@@ -114,9 +114,9 @@ sub compile {
   my $self = shift;
 
   # Compile
-  return unless my $code = $self->code;
+  return undef unless my $code = $self->code;
   my $compiled = eval $code;
-  $self->compiled($compiled) and return unless $@;
+  $self->compiled($compiled) and return undef unless $@;
 
   # Use local stacktrace for compile exceptions
   return Mojo::Exception->new($@, [$self->template, $code], $self->name)
@@ -133,7 +133,7 @@ sub interpret {
   };
 
   # Interpret
-  return unless my $compiled = $self->compiled;
+  return undef unless my $compiled = $self->compiled;
   my $output = eval { $compiled->(@_) };
   return $output unless $@;
 

@@ -67,10 +67,10 @@ sub select {
 sub _ancestor {
   my ($self, $selectors, $current, $tree) = @_;
   while ($current = $current->[3]) {
-    return if $current->[0] eq 'root' || $current eq $tree;
+    return undef if $current->[0] eq 'root' || $current eq $tree;
     return 1 if $self->_combinator($selectors, $current, $tree);
   }
-  return;
+  return undef;
 }
 
 sub _attr {
@@ -84,7 +84,7 @@ sub _attr {
     return 1 if $attrs->{$name} =~ $regex;
   }
 
-  return;
+  return undef;
 }
 
 sub _combinator {
@@ -92,24 +92,30 @@ sub _combinator {
 
   # Selector
   my @s = @$selectors;
-  return unless my $combinator = shift @s;
+  return undef unless my $combinator = shift @s;
   if ($combinator->[0] ne 'combinator') {
-    return unless $self->_selector($combinator, $current);
+    return undef unless $self->_selector($combinator, $current);
     return 1 unless $combinator = shift @s;
   }
 
   # " " (ancestor)
   my $c = $combinator->[1];
-  if ($c eq ' ') { return unless $self->_ancestor(\@s, $current, $tree) }
+  if ($c eq ' ') { return undef unless $self->_ancestor(\@s, $current, $tree) }
 
   # ">" (parent only)
-  elsif ($c eq '>') { return unless $self->_parent(\@s, $current, $tree) }
+  elsif ($c eq '>') {
+    return undef unless $self->_parent(\@s, $current, $tree);
+  }
 
   # "~" (preceding siblings)
-  elsif ($c eq '~') { return unless $self->_sibling(\@s, $current, $tree, 0) }
+  elsif ($c eq '~') {
+    return undef unless $self->_sibling(\@s, $current, $tree, 0);
+  }
 
   # "+" (immediately preceding siblings)
-  elsif ($c eq '+') { return unless $self->_sibling(\@s, $current, $tree, 1) }
+  elsif ($c eq '+') {
+    return undef unless $self->_sibling(\@s, $current, $tree, 1);
+  }
 
   return 1;
 }
@@ -204,8 +210,8 @@ sub _equation {
 
 sub _parent {
   my ($self, $selectors, $current, $tree) = @_;
-  return unless my $parent = $current->[3];
-  return if $parent->[0] eq 'root';
+  return undef unless my $parent = $current->[3];
+  return undef if $parent->[0] eq 'root';
   return $self->_combinator($selectors, $parent, $tree) ? 1 : undef;
 }
 
@@ -281,19 +287,19 @@ sub _pc {
     for my $i ($start .. $#$parent) {
       my $sibling = $parent->[$i];
       next if $sibling->[0] ne 'tag' || $sibling eq $current;
-      return unless defined $type && $sibling->[1] ne $type;
+      return undef unless defined $type && $sibling->[1] ne $type;
     }
 
     # No siblings
     return 1;
   }
 
-  return;
+  return undef;
 }
 
 sub _regex {
   my ($self, $op, $value) = @_;
-  return unless defined $value;
+  return undef unless defined $value;
   $value = quotemeta $self->_unescape($value);
 
   # "~=" (word)
@@ -322,15 +328,17 @@ sub _selector {
     # Tag (ignore namespace prefix)
     if ($type eq 'tag') {
       my $tag = $s->[1];
-      return unless $tag eq '*' || $current->[1] =~ /(?:^|:)$tag$/;
+      return undef unless $tag eq '*' || $current->[1] =~ /(?:^|:)$tag$/;
     }
 
     # Attribute
-    elsif ($type eq 'attr') { return unless $self->_attr(@$s[1, 2], $current) }
+    elsif ($type eq 'attr') {
+      return undef unless $self->_attr(@$s[1, 2], $current);
+    }
 
     # Pseudo class
     elsif ($type eq 'pc') {
-      return unless $self->_pc(lc $s->[1], $s->[2], $current);
+      return undef unless $self->_pc(lc $s->[1], $s->[2], $current);
     }
   }
 
@@ -355,7 +363,7 @@ sub _sibling {
     else { return 1 if $self->_combinator($selectors, $e, $tree) }
   }
 
-  return;
+  return undef;
 }
 
 sub _unescape {

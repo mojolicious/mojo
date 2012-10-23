@@ -22,7 +22,7 @@ sub register {
 
       # Preprocess and render
       my $handler = $renderer->handlers->{$preprocess};
-      return unless $handler->($renderer, $c, $output, $options);
+      return undef unless $handler->($renderer, $c, $output, $options);
       $$output = _pod_to_html($$output);
       return 1;
     }
@@ -115,7 +115,7 @@ sub _perldoc {
 }
 
 sub _pod_to_html {
-  return unless defined(my $pod = shift);
+  return undef unless defined(my $pod = shift);
 
   # Block
   $pod = $pod->() if ref $pod eq 'CODE';

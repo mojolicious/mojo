@@ -72,15 +72,13 @@ sub match {
     $self->match($child, $c);
 
     # Endpoint found
-    return $self if $self->endpoint;
+    return if $self->endpoint;
 
     # Reset
     $self->{path} = $path;
     if   ($r->parent) { $self->captures($captures)->stack([@$snapshot]) }
     else              { $self->captures({})->stack([]) }
   }
-
-  return $self;
 }
 
 sub path_for {

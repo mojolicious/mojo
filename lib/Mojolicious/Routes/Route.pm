@@ -66,7 +66,7 @@ sub get { shift->_generate_route(GET => @_) }
 sub has_conditions {
   my $self = shift;
   return 1 if @{$self->over || []};
-  return unless my $parent = $self->parent;
+  return undef unless my $parent = $self->parent;
   return $parent->has_conditions;
 }
 
@@ -75,7 +75,7 @@ sub has_custom_name { !!shift->{custom} }
 sub has_websocket {
   my $self = shift;
   return 1 if $self->is_websocket;
-  return unless my $parent = $self->parent;
+  return undef unless my $parent = $self->parent;
   return $parent->is_websocket;
 }
 

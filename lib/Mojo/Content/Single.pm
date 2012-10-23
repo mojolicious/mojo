@@ -23,7 +23,7 @@ sub body_size {
 
 sub clone {
   my $self = shift;
-  return unless my $clone = $self->SUPER::clone();
+  return undef unless my $clone = $self->SUPER::clone();
   return $clone->asset($self->asset);
 }
 

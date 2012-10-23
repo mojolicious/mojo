@@ -26,10 +26,10 @@ sub dispatch {
   my $path = $stash->{path} || $c->req->url->path->clone->canonicalize;
 
   # Split parts
-  return unless my @parts = @{Mojo::Path->new("$path")->parts};
+  return undef unless my @parts = @{Mojo::Path->new("$path")->parts};
 
   # Serve static file and prevent directory traversal
-  return if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));
+  return undef if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));
   $stash->{'mojo.static'}++;
   return !!$c->rendered;
 }
@@ -52,7 +52,7 @@ sub file {
 
 sub serve {
   my ($self, $c, $rel) = @_;
-  return unless my $asset = $self->file($rel);
+  return undef unless my $asset = $self->file($rel);
   my $type = $rel =~ /\.(\w+)$/ ? $c->app->types->type($1) : undef;
   $c->res->headers->content_type($type || 'text/plain');
   return !!$self->serve_asset($c, $asset);
@@ -100,7 +100,7 @@ sub _get_data_file {
   my ($self, $rel) = @_;
 
   # Protect templates
-  return if $rel =~ /\.\w+\.\w+$/;
+  return undef if $rel =~ /\.\w+\.\w+$/;
 
   # Index DATA files
   my $loader = Mojo::Loader->new;
@@ -112,7 +112,8 @@ sub _get_data_file {
   }
 
   # Find file
-  return unless defined(my $data = $loader->data($self->{index}{$rel}, $rel));
+  return undef
+    unless defined(my $data = $loader->data($self->{index}{$rel}, $rel));
   return Mojo::Asset::Memory->new->add_chunk($data);
 }
 

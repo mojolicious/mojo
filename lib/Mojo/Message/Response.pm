@@ -95,8 +95,8 @@ sub extract_start_line {
   my ($self, $bufferref) = @_;
 
   # We have a full response line
-  return unless defined(my $line = get_line $bufferref);
-  $self->error('Bad response start line') and return
+  return undef unless defined(my $line = get_line $bufferref);
+  $self->error('Bad response start line') and return undef
     unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
   $self->content->skip_body(1) if $self->code($2)->is_empty;
   return !!$self->version($1)->message($3)->content->auto_relax(1);
@@ -132,13 +132,13 @@ sub get_start_line_chunk {
 
 sub is_empty {
   my $self = shift;
-  return unless my $code = $self->code;
+  return undef unless my $code = $self->code;
   return $self->is_status_class(100) || grep { $_ eq $code } qw(204 304);
 }
 
 sub is_status_class {
   my ($self, $class) = @_;
-  return unless my $code = $self->code;
+  return undef unless my $code = $self->code;
   return $code >= $class && $code < ($class + 100);
 }
 

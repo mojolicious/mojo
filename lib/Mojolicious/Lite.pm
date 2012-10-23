@@ -533,7 +533,7 @@ are only evaluated if the callback returned a true value.
 
     # Not authenticated
     $self->render('denied');
-    return;
+    return undef;
   };
 
   # / (with authentication)
@@ -579,7 +579,7 @@ C<under> statements.
     my $self = shift;
     return 1 if $self->req->headers->header('X-Bender');
     $self->render(text => "You're not Bender.");
-    return;
+    return undef;
   };
 
   # Admin section
@@ -590,7 +590,7 @@ C<under> statements.
       my $self = shift;
       return 1 if $self->req->heaers->header('X-Awesome');
       $self->render(text => "You're not awesome enough.");
-      return;
+      return undef;
     };
 
     # GET /admin/dashboard

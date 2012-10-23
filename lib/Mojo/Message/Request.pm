@@ -23,7 +23,7 @@ sub clone {
   my $self = shift;
 
   # Dynamic requests cannot be cloned
-  return unless my $content = $self->content->clone;
+  return undef unless my $content = $self->content->clone;
   my $clone = $self->new(
     content => $content,
     method  => $self->method,
@@ -59,10 +59,10 @@ sub extract_start_line {
 
   # Ignore any leading empty lines
   $$bufferref =~ s/^\s+//;
-  return unless defined(my $line = get_line $bufferref);
+  return undef unless defined(my $line = get_line $bufferref);
 
   # We have a (hopefully) full request line
-  $self->error('Bad request start line', 400) and return
+  $self->error('Bad request start line', 400) and return undef
     unless $line =~ $START_LINE_RE;
   my $url = $self->method($1)->version($3)->url;
   return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
@@ -199,7 +199,7 @@ sub proxy {
 sub query_params { shift->url->query }
 
 sub _parse_basic_auth {
-  return unless my $header = shift;
+  return undef unless my $header = shift;
   return $header =~ /Basic (.+)$/ ? b64_decode($1) : undef;
 }
 

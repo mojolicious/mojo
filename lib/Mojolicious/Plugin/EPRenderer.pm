@@ -18,7 +18,7 @@ sub register {
 
       # Generate name
       my $path = $options->{inline} || $renderer->template_path($options);
-      return unless defined $path;
+      return undef unless defined $path;
       my $id = encode 'UTF-8', join(', ', $path, sort keys %{$c->stash});
       my $key = $options->{cache} = md5_sum $id;
 

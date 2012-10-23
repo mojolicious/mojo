@@ -61,7 +61,7 @@ sub cookie {
   return map { $_->value } $self->req->cookie($name) if wantarray;
 
   # Request cookie
-  return unless my $cookie = $self->req->cookie($name);
+  return undef unless my $cookie = $self->req->cookie($name);
   return $cookie->value;
 }
 
@@ -178,7 +178,7 @@ sub render {
 
   # Render
   my ($output, $type) = $self->app->renderer->render($self, $args);
-  return unless defined $output;
+  return undef unless defined $output;
   return Mojo::ByteStream->new($output) if $args->{partial};
 
   # Prepare response
@@ -252,7 +252,7 @@ sub render_static {
   my $app = $self->app;
   return !!$self->rendered if $app->static->serve($self, $file);
   $app->log->debug(qq{File "$file" not found, public directory missing?});
-  return;
+  return undef;
 }
 
 sub render_text { shift->render(text => @_) }
@@ -464,7 +464,7 @@ sub _fallbacks {
 
   # Inline template
   my $stash = $self->stash;
-  return unless $stash->{format} eq 'html';
+  return undef unless $stash->{format} eq 'html';
   delete $stash->{$_} for qw(extends layout);
   delete $options->{template};
   return $self->render(%$options, inline => $inline, handler => 'ep');

@@ -180,7 +180,7 @@ sleep 1
   );
 
 sub _pid {
-  return unless open my $file, '<', catdir($dir, 'hypnotoad.pid');
+  return undef unless open my $file, '<', catdir($dir, 'hypnotoad.pid');
   my $pid = <$file>;
   chomp $pid;
   return $pid;

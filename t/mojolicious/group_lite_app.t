@@ -27,7 +27,7 @@ get '/expiration' => sub {
 
 under sub {
   my $self = shift;
-  return unless $self->req->headers->header('X-Bender');
+  return undef unless $self->req->headers->header('X-Bender');
   $self->res->headers->add('X-Under' => 23);
   $self->res->headers->add('X-Under' => 24);
   1;
@@ -54,7 +54,7 @@ under sub {
 
   # Not authenticated
   $self->render('param_auth_denied');
-  return;
+  return undef;
 };
 
 # GET /param_auth
@@ -177,7 +177,7 @@ group {
     my $self = shift;
     return 1 if $self->req->param('ok');
     $self->render(text => "You're not ok.");
-    return;
+    return undef;
   };
 
   # GET /authgroup

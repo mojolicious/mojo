@@ -25,12 +25,12 @@ sub _check {
 
 sub _headers {
   my ($route, $c, $captures, $patterns) = @_;
-  return unless $patterns && ref $patterns eq 'HASH' && keys %$patterns;
+  return undef unless $patterns && ref $patterns eq 'HASH' && keys %$patterns;
 
   # All headers need to match
   my $headers = $c->req->headers;
   while (my ($name, $pattern) = each %$patterns) {
-    return unless _check(scalar $headers->header($name), $pattern);
+    return undef unless _check(scalar $headers->header($name), $pattern);
   }
   return 1;
 }

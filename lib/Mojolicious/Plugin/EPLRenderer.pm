@@ -18,7 +18,7 @@ sub _epl {
   my $inline = $options->{inline};
   my $path   = $renderer->template_path($options);
   $path = md5_sum encode('UTF-8', $inline) if defined $inline;
-  return unless defined $path;
+  return undef unless defined $path;
 
   # Cached
   my $cache = $renderer->cache;
@@ -42,7 +42,7 @@ sub _epl {
     # File
     else {
       $mt->encoding($renderer->encoding) if $renderer->encoding;
-      return unless my $t = $renderer->template_name($options);
+      return undef unless my $t = $renderer->template_name($options);
 
       # Try template
       if (-r $path) {
@@ -59,7 +59,9 @@ sub _epl {
       }
 
       # No template
-      else { $c->app->log->debug(qq{Template "$t" not found.}) and return }
+      else {
+        $c->app->log->debug(qq{Template "$t" not found.}) and return undef;
+      }
     }
 
     # Cache

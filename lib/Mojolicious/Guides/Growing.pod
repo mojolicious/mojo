@@ -228,7 +228,7 @@ logic related to matching usernames and passwords.
     return 1 if $USERS->{$user} && $USERS->{$user} eq $pass;
 
     # Fail
-    return;
+    return undef;
   }
 
   1;

@@ -29,7 +29,7 @@ sub add_shortcut {
 sub auto_render {
   my ($self, $c) = @_;
   my $stash = $c->stash;
-  return if $stash->{'mojo.rendered'} || $c->tx->is_websocket;
+  return undef if $stash->{'mojo.rendered'} || $c->tx->is_websocket;
   $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
 }
 
@@ -72,10 +72,10 @@ sub dispatch {
   }
 
   # No match
-  return unless $m && @{$m->stack};
+  return undef unless $m && @{$m->stack};
 
   # Dispatch
-  return if $self->_walk($c);
+  return undef if $self->_walk($c);
   $self->auto_render($c);
   return 1;
 }
@@ -100,7 +100,7 @@ sub _class {
   # Namespace and class
   my $namespace = $field->{namespace};
   my $class = camelize $field->{controller} || '';
-  return unless $class || $namespace;
+  return undef unless $class || $namespace;
   $class = length $class ? "${namespace}::$class" : $namespace
     if length($namespace //= $self->namespace);
 
@@ -113,7 +113,7 @@ sub _controller {
 
   # Load and instantiate controller/application
   return 1 unless my $app = $field->{app} || $self->_class($field, $c);
-  return unless $self->_load($c, $app);
+  return undef unless $self->_load($c, $app);
   $app = $app->new($c) unless ref $app;
 
   # Application
@@ -157,7 +157,8 @@ sub _load {
   if (my $e = Mojo::Loader->new->load($app)) {
 
     # Doesn't exist
-    $c->app->log->debug(qq{Controller "$app" does not exist.}) and return
+    $c->app->log->debug(qq{Controller "$app" does not exist.})
+      and return undef
       unless ref $e;
 
     # Error
@@ -165,7 +166,7 @@ sub _load {
   }
 
   # Check base classes
-  $c->app->log->debug(qq{Class "$app" is not a controller.}) and return
+  $c->app->log->debug(qq{Class "$app" is not a controller.}) and return undef
     unless first { $app->isa($_) } @{$self->base_classes};
   return ++$self->{loaded}{$app};
 }
@@ -175,12 +176,12 @@ sub _method {
 
   # Hidden
   $self->{hiding} = {map { $_ => 1 } @{$self->hidden}} unless $self->{hiding};
-  return unless my $method = $field->{action};
-  $c->app->log->debug(qq{Action "$method" is not allowed.}) and return
+  return undef unless my $method = $field->{action};
+  $c->app->log->debug(qq{Action "$method" is not allowed.}) and return undef
     if $self->{hiding}{$method} || index($method, '_') == 0;
 
   # Invalid
-  $c->app->log->debug(qq{Action "$method" is invalid.}) and return
+  $c->app->log->debug(qq{Action "$method" is invalid.}) and return undef
     unless $method =~ /^[a-zA-Z0-9_:]+$/;
 
   return $method;
@@ -211,7 +212,7 @@ sub _walk {
     return 1 if $staging && !$continue;
   }
 
-  return;
+  return undef;
 }
 
 1;

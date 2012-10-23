@@ -155,7 +155,7 @@ sub parent {
   my $self = shift;
 
   # Not a tag
-  return if (my $tree = $self->tree)->[0] eq 'root';
+  return undef if (my $tree = $self->tree)->[0] eq 'root';
 
   # Parent
   return $self->new->charset($self->charset)->tree($tree->[3])

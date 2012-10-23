@@ -108,7 +108,7 @@ sub render {
 
   # Template or templateless handler
   else {
-    return unless $self->_render_template($c, \$output, $options);
+    return undef unless $self->_render_template($c, \$output, $options);
     $content->{content} = $output
       if ($c->stash->{extends} || $c->stash->{layout});
   }
@@ -136,8 +136,8 @@ sub render {
 
 sub template_name {
   my ($self, $options) = @_;
-  return unless my $template = $options->{template};
-  return unless my $format   = $options->{format};
+  return undef unless my $template = $options->{template};
+  return undef unless my $format   = $options->{format};
   my $handler = $options->{handler};
   return defined $handler ? "$template.$format.$handler" : "$template.$format";
 }
@@ -146,7 +146,7 @@ sub template_path {
   my $self = shift;
 
   # Nameless
-  return unless my $name = $self->template_name(shift);
+  return undef unless my $name = $self->template_name(shift);
 
   # Search all paths
   for my $path (@{$self->paths}) {
@@ -169,7 +169,7 @@ sub _detect_handler {
   my ($self, $options) = @_;
 
   # Templates
-  return unless my $file = $self->template_name($options);
+  return undef unless my $file = $self->template_name($options);
   unless ($self->{templates}) {
     s/\.(\w+)$// and $self->{templates}{$_} ||= $1
       for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
@@ -185,7 +185,7 @@ sub _detect_handler {
   return $self->{data}{$file} if exists $self->{data}{$file};
 
   # Nothing
-  return;
+  return undef;
 }
 
 sub _extends {
@@ -213,7 +213,7 @@ sub _render_template {
 
   # No handler
   else { $c->app->log->error(qq{No handler for "$handler" available.}) }
-  return;
+  return undef;
 }
 
 sub _text {

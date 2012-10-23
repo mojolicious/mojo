@@ -26,7 +26,7 @@ sub _pointer {
     }
 
     # Nothing
-    else {return}
+    else { return undef }
   }
 
   return $contains ? 1 : $data;

@@ -58,7 +58,7 @@ sub keep_alive {
   my $res      = $self->res;
   my $req_conn = lc($req->headers->connection || '');
   my $res_conn = lc($res->headers->connection || '');
-  return if $req_conn eq 'close' || $res_conn eq 'close';
+  return undef if $req_conn eq 'close' || $res_conn eq 'close';
 
   # Keep alive
   return 1 if $req_conn eq 'keep-alive' || $res_conn eq 'keep-alive';

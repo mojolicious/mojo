@@ -276,7 +276,7 @@ is $denied,    1,   'finished websocket';
 
 # WebSocket /subreq
 $finished = 0;
-($code, $result) = undef;
+($code, $result) = ();
 $ua->websocket(
   '/subreq' => sub {
     my $tx = pop;
@@ -305,7 +305,7 @@ is $subreq,   1,            'finished server websocket';
 # WebSocket /subreq (parallel)
 my $delay = Mojo::IOLoop->delay;
 $finished = 0;
-($code, $result) = undef;
+($code, $result) = ();
 my ($code2, $result2);
 $delay->begin;
 $ua->websocket(
@@ -437,7 +437,7 @@ is $code, 500, 'right status';
 is $msg, 'Internal Server Error', 'right message';
 
 # WebSocket /foo (forbidden)
-($websocket, $code, $msg) = undef;
+($websocket, $code, $msg) = ();
 $ua->websocket(
   '/foo' => sub {
     my $tx = pop;

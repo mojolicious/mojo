@@ -67,7 +67,7 @@ is $client, 'test321', 'right content';
 # Valid client certificate
 $delay = Mojo::IOLoop->delay;
 $port  = Mojo::IOLoop->generate_port;
-($server, $client) = undef;
+($server, $client) = ();
 my ($remove, $running, $timeout, $server_err, $server_close, $client_close);
 Mojo::IOLoop->remove(Mojo::IOLoop->recurring(0 => sub { $remove++ }));
 $delay->begin;
@@ -138,7 +138,7 @@ Mojo::IOLoop->start;
 ok $client_err, 'has error';
 
 # Missing client certificate
-($server_err, $client_err) = undef;
+($server_err, $client_err) = ();
 Mojo::IOLoop->client(
   {port => $port, tls => 1} => sub {
     shift->stop;
@@ -152,7 +152,7 @@ ok $client_err, 'has error';
 # Invalid certificate authority (server)
 $loop = Mojo::IOLoop->new;
 $port = Mojo::IOLoop->generate_port;
-($server_err, $client_err) = undef;
+($server_err, $client_err) = ();
 $loop->server(
   address  => '127.0.0.1',
   port     => $port,
@@ -179,8 +179,8 @@ ok $client_err, 'has error';
 # Valid client and server certificates
 $delay = Mojo::IOLoop->delay;
 $port  = Mojo::IOLoop->generate_port;
-($running, $timeout, $server, $server_err, $server_close) = undef;
-($client, $client_close) = undef;
+($running, $timeout, $server, $server_err, $server_close) = ();
+($client, $client_close) = ();
 $delay->begin;
 Mojo::IOLoop->server(
   address  => '127.0.0.1',
@@ -236,7 +236,7 @@ ok !$server_err, 'no error';
 # Invalid server certificate (unsigned)
 $loop = Mojo::IOLoop->new;
 $port = Mojo::IOLoop->generate_port;
-($server_err, $client_err) = undef;
+($server_err, $client_err) = ();
 $loop->server(
   address  => '127.0.0.1',
   port     => $port,
@@ -261,7 +261,7 @@ ok $client_err, 'has error';
 # Invalid server certificate (hostname)
 $loop = Mojo::IOLoop->new;
 $port = Mojo::IOLoop->generate_port;
-($server_err, $client_err) = undef;
+($server_err, $client_err) = ();
 $loop->server(
   address  => '127.0.0.1',
   port     => $port,
@@ -287,7 +287,7 @@ ok $client_err, 'has error';
 # Invalid certificate authority (client)
 $loop = Mojo::IOLoop->new;
 $port = Mojo::IOLoop->generate_port;
-($server_err, $client_err) = undef;
+($server_err, $client_err) = ();
 $loop->server(
   address  => '127.0.0.1',
   port     => $port,
@@ -312,7 +312,7 @@ ok $client_err, 'has error';
 # Ignore invalid client certificate
 $loop = Mojo::IOLoop->new;
 $port = Mojo::IOLoop->generate_port;
-($server, $client, $client_err) = undef;
+($server, $client, $client_err) = ();
 $loop->server(
   address    => '127.0.0.1',
   port       => $port,

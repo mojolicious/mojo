@@ -236,7 +236,7 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 
 # Upload
-($code, $body) = undef;
+($code, $body) = ();
 $tx = $ua->post_form(
   "http://127.0.0.1:$port/upload" => {file => {content => $result}});
 is $tx->res->code, 200, 'right status';

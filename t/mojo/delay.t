@@ -95,7 +95,7 @@ is_deeply [$delay->wait], [2, 3, 4], 'right numbers';
 is_deeply $result, [2, 3, 4], 'right numbers';
 
 # Nested delays
-($finished, $result) = undef;
+($finished, $result) = ();
 $delay = Mojo::IOLoop->delay(
   sub {
     my $first = shift;

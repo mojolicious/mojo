@@ -225,7 +225,7 @@ ok !$kept_alive, 'connection was not kept alive';
 is $result, "https://localhost:$port/proxy", 'right content';
 
 # GET /proxy (kept alive proxy request)
-($kept_alive, $result) = undef;
+($kept_alive, $result) = ();
 $ua->get(
   "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
@@ -240,7 +240,7 @@ ok $kept_alive, 'connection was kept alive';
 
 # WebSocket /test (kept alive proxy websocket)
 $ua->https_proxy("http://localhost:$proxy");
-($kept_alive, $result) = undef;
+($kept_alive, $result) = ();
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
     my ($ua, $tx) = @_;

@@ -78,7 +78,7 @@ for a full list see L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   app->config(hypnotoad => {listen => ['http://*:3000']});
 
-  get '/' => {text => 'ALL GLORY TO THE HYPNOTOAD!'};
+  get '/' => {text => 'Hello Wor...ALL GLORY TO THE HYPNOTOAD!'};
 
   app->start;
 
@@ -102,6 +102,19 @@ C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
 
   # myapp.conf
   {hypnotoad => {proxy => 1}};
+
+Your application is preloaded in the manager process, and you can use
+L<Mojo::IOLoop> timers to run code whenever a new worker has been forked.
+
+  use Mojolicious::Lite;
+
+  Mojo::IOLoop->timer(0 => sub {
+    app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
+  });
+
+  get '/' => {text => 'Hello Wor...ALL GLORY TO THE HYPNOTOAD!'};
+
+  app->start;
 
 =head2 Nginx
 

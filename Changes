@@ -2,6 +2,8 @@
 3.52  2012-10-26
   - Added boolean shortcut support to Mojo::JSON.
   - Added escape attribute to Mojo::Template. (jberger)
+  - Added max_buffer_size attribute to Mojo::Content.
+  - Added is_limit_exceeded method to Mojo::Content.
   - Improved documentation.
   - Improved tests.
 

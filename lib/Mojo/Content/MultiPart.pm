@@ -199,6 +199,10 @@ sub _read {
       last unless $self->_parse_multipart_body($boundary);
     }
   }
+
+  # Check buffer size
+  $self->{limit} = 1
+    if length($self->{multipart} // '') > $self->max_buffer_size;
 }
 
 1;

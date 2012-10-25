@@ -224,6 +224,10 @@ sub parse {
   return $self->error('Maximum line size exceeded', 431)
     if $self->headers->is_limit_exceeded;
 
+  # Check buffer size
+  return $self->error('Maximum buffer size exceeded', 400)
+    if $self->content->is_limit_exceeded;
+
   # Progress
   $self->emit('progress');
 

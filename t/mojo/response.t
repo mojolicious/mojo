@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 370;
+use Test::More tests => 386;
 
 use Mojo::Asset::File;
 use Mojo::Content::Single;
@@ -295,6 +295,44 @@ is $res->code,    413,                        'right status';
 is $res->message, 'Request Entity Too Large', 'right message';
 is $res->version, '1.1',                      'right version';
 is $res->headers->content_length, undef, 'right "Content-Length" value';
+
+# Parse HTTP 1.1 chunked response (exceeding limit)
+{
+  local $ENV{MOJO_MAX_BUFFER_SIZE} = 12;
+  $res = Mojo::Message::Response->new;
+  is $res->content->max_buffer_size, 12, 'right size';
+  $res->parse("HTTP/1.1 200 OK\x0d\x0a");
+  $res->parse("Content-Type: text/plain\x0d\x0a");
+  $res->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
+  $res->parse('4' x 1000);
+  ok $res->is_finished, 'response is finished';
+  is(($res->error)[0], 'Maximum buffer size exceeded', 'right error');
+  is(($res->error)[1], 400, 'right status');
+  is $res->code,    200,   'right status';
+  is $res->message, 'OK',  'right message';
+  is $res->version, '1.1', 'right version';
+  is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
+}
+
+# Parse HTTP 1.1 multipart response (exceeding limit)
+{
+  local $ENV{MOJO_MAX_BUFFER_SIZE} = 12;
+  $res = Mojo::Message::Response->new;
+  is $res->content->max_buffer_size, 12, 'right size';
+  $res->parse("HTTP/1.1 200 OK\x0d\x0a");
+  $res->parse("Content-Length: 420\x0d\x0a");
+  $res->parse('Content-Type: multipart/form-data; bo');
+  $res->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
+  $res->parse(4 x 420);
+  ok $res->is_finished, 'response is finished';
+  is(($res->error)[0], 'Maximum buffer size exceeded', 'right error');
+  is(($res->error)[1], 400, 'right status');
+  is $res->code,    200,   'right status';
+  is $res->message, 'OK',  'right message';
+  is $res->version, '1.1', 'right version';
+  ok $res->headers->content_type =~ m!multipart/form-data!,
+    'right "Content-Type" value';
+}
 
 # Parse HTTP 1.1 chunked response
 $res = Mojo::Message::Response->new;

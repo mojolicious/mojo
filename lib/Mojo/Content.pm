@@ -5,7 +5,8 @@ use Carp 'croak';
 use Mojo::Headers;
 
 has [qw(auto_relax relaxed skip_body)];
-has headers => sub { Mojo::Headers->new };
+has headers           => sub { Mojo::Headers->new };
+has max_buffer_size   => sub { $ENV{MOJO_MAX_BUFFER_SIZE} || 262144 };
 has max_leftover_size => sub { $ENV{MOJO_MAX_LEFTOVER_SIZE} || 262144 };
 
 sub body_contains {
@@ -78,6 +79,8 @@ sub is_dynamic {
 }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
+
+sub is_limit_exceeded { !!shift->{limit} }
 
 sub is_multipart {undef}
 
@@ -268,6 +271,10 @@ sub _parse_chunked {
   # Trailing headers
   $self->_parse_chunked_trailing_headers
     if ($self->{chunk_state} // '') eq 'trailing_headers';
+
+  # Check buffer size
+  $self->{limit} = 1
+    if length($self->{pre_buffer} // '') > $self->max_buffer_size;
 }
 
 sub _parse_chunked_trailing_headers {
@@ -407,6 +414,14 @@ Try to detect when relaxed parsing is necessary.
 
 Content headers, defaults to a L<Mojo::Headers> object.
 
+=head2 C<max_buffer_size>
+
+  my $size = $content->max_buffer_size;
+  $content = $content->max_buffer_size(1024);
+
+Maximum size in bytes of buffer for content parser, defaults to the value of
+the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144>.
+
 =head2 C<max_leftover_size>
 
   my $size = $content->max_leftover_size;
@@ -527,6 +542,12 @@ working.
   my $success = $content->is_finished;
 
 Check if parser is finished.
+
+=head2 C<is_limit_exceeded>
+
+  my $success = $content->is_limit_exceeded;
+
+Check if buffer has exceeded C<max_buffer_size>.
 
 =head2 C<is_multipart>
 

@@ -3,7 +3,7 @@
   - Deprecated Mojo::JSON->true and Mojo::JSON->false in favor of native Perl
     booleans !!1 and !!0.
   - Added assigned_as_number function to Mojo::Util.
-  - Added looks_like_bool function to Mojo::Util.
+  - Added looks_like_bool function to Mojo::Util. (Adura, sri)
   - Improved documentation.
   - Improved tests.
 

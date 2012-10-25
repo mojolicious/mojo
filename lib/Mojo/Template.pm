@@ -531,8 +531,8 @@ Encoding used for template files.
 
 =head2 C<escape>
 
-  my $code = $mt->escape;
-  $mt      = $mt->escape(sub { reverse $_[0] });
+  my $cb = $mt->escape;
+  $mt    = $mt->escape(sub { reverse $_[0] });
 
 A callback used to escape the results of escaped expressions, defaults to
 L<Mojo::Util/"xml_escape">.
@@ -578,6 +578,8 @@ this method is attribute and might change without warning!
   $mt           = $mt->namespace('main');
 
 Namespace used to compile templates, defaults to C<Mojo::Template::SandBox>.
+Note that namespaces should only be shared very carefully between templates,
+since functions and global variables will not be cleared automatically.
 
 =head2 C<prepend>
 

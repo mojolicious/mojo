@@ -9,12 +9,11 @@ use File::Temp 'tempdir';
 use FindBin;
 
 use Mojo::Util
-  qw(assigned_as_number b64_decode b64_encode camelize class_to_file),
-  qw(class_to_path decamelize decode encode get_line hmac_md5_sum),
-  qw(hmac_sha1_sum html_escape html_unescape looks_like_bool md5_bytes),
-  qw(md5_sum punycode_decode punycode_encode quote squish trim unquote),
-  qw(secure_compare sha1_bytes sha1_sum slurp spurt url_escape url_unescape),
-  qw(xml_escape xor_encode);
+  qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
+  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
+  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
+  qw(squish trim unquote secure_compare sha1_bytes sha1_sum slurp spurt),
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';

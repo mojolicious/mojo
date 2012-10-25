@@ -1,10 +1,15 @@
 package Mojo::JSON;
 use Mojo::Base -base;
 
-use Mojo::Util qw(assigned_as_number looks_like_bool);
+use B;
+use Mojo::Util;
 use Scalar::Util 'blessed';
 
 has 'error';
+
+# Literal names
+my $FALSE = bless \(my $false = 0), 'Mojo::JSON::_Bool';
+my $TRUE  = bless \(my $true  = 1), 'Mojo::JSON::_Bool';
 
 # Escaped special character map (with u2028 and u2029)
 my %ESCAPE = (
@@ -93,18 +98,8 @@ sub encode {
   return Mojo::Util::encode 'UTF-8', _encode_values($ref);
 }
 
-# DEPRECATED in Rainbow!
-sub false {
-  warn qq/Mojo::JSON->false has been DEPRECATED in favor of "!!0"!\n/;
-  return !!0;
-}
-
-# DEPRECATED in Rainbow!
-sub true {
-  warn qq/Mojo::JSON->true has been DEPRECATED in favor of "!!1"!\n/;
-  return !!1;
-}
-
+sub false {$FALSE}
+sub true  {$TRUE}
 
 sub _decode_array {
   my @array;
@@ -232,10 +227,10 @@ sub _decode_value {
     if m/\G([-]?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)/gc;
 
   # True
-  return !!1 if m/\Gtrue/gc;
+  return $TRUE if m/\Gtrue/gc;
 
   # False
-  return !!0 if m/\Gfalse/gc;
+  return $FALSE if m/\Gfalse/gc;
 
   # Null
   return undef if m/\Gnull/gc;
@@ -281,6 +276,9 @@ sub _encode_values {
     # Object
     return _encode_object($value) if $ref eq 'HASH';
 
+    # True or false
+    return $value ? 'true' : 'false' if $ref eq 'Mojo::JSON::_Bool';
+
     # Blessed reference with TO_JSON method
     if (blessed $value && (my $sub = $value->can('TO_JSON'))) {
       return _encode_values($value->$sub);
@@ -290,11 +288,10 @@ sub _encode_values {
   # Null
   return 'null' unless defined $value;
 
-  # True or false
-  return $value ? 'true' : 'false' if looks_like_bool $value;
-
   # Number
-  return $value if assigned_as_number $value;
+  my $flags = B::svref_2object(\$value)->FLAGS;
+  return $value
+    if $flags & (B::SVp_IOK | B::SVp_NOK) && !($flags & B::SVp_POK);
 
   # String
   return _encode_string($value);
@@ -316,6 +313,10 @@ sub _exception {
   # Throw
   die "$context\n";
 }
+
+# Emulate boolean type
+package Mojo::JSON::_Bool;
+use overload '0+' => sub { ${$_[0]} }, '""' => sub { ${$_[0]} }, fallback => 1;
 
 1;
 
@@ -344,10 +345,11 @@ stringify them if it doesn't exist.
   [1, -2, 3]     -> [1, -2, 3]
   {"foo": "bar"} -> {foo => 'bar'}
 
-Literal names will be translated to and from a similar native Perl value.
+Literal names will be translated to and from L<Mojo::JSON> constants or a
+similar native Perl value.
 
-  true  -> !!1
-  false -> !!0
+  true  -> Mojo::JSON->true
+  false -> Mojo::JSON->false
   null  -> undef
 
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
@@ -382,6 +384,20 @@ Decode JSON.
   my $bytes = $json->encode({foo => 'bar'});
 
 Encode Perl data structure.
+
+=head2 C<false>
+
+  my $false = Mojo::JSON->false;
+  my $false = $json->false;
+
+False value, used because Perl has no native equivalent.
+
+=head2 C<true>
+
+  my $true = Mojo::JSON->true;
+  my $true = $json->true;
+
+True value, used because Perl has no native equivalent.
 
 =head1 SEE ALSO
 

@@ -51,11 +51,12 @@ cmp_ok $array->[0], '==', 1e3, 'value is 1e3';
 
 # Decode name
 $array = $json->decode('[true]');
-is_deeply $array, [!!1], 'decode [true]';
+is_deeply $array, [Mojo::JSON->true], 'decode [true]';
 $array = $json->decode('[null]');
 is_deeply $array, [undef], 'decode [null]';
 $array = $json->decode('[true, false]');
-is_deeply $array, [!!1, !!0], 'decode [true, false]';
+is_deeply $array, [Mojo::JSON->true, Mojo::JSON->false],
+  'decode [true, false]';
 
 # Decode string
 $array = $json->decode('[" "]');
@@ -148,12 +149,12 @@ $string = $json->encode({foo => ['bar']});
 is $string, '{"foo":["bar"]}', 'encode {foo => [\'bar\']}';
 
 # Encode name
-$string = $json->encode([!!1]);
-is $string, '[true]', 'encode [!!1]';
+$string = $json->encode([Mojo::JSON->true]);
+is $string, '[true]', 'encode [Mojo::JSON->true]';
 $string = $json->encode([undef]);
 is $string, '[null]', 'encode [undef]';
-$string = $json->encode([!!1, !!0]);
-is $string, '[true,false]', 'encode [!!1, !!0]';
+$string = $json->encode([Mojo::JSON->true, Mojo::JSON->false]);
+is $string, '[true,false]', 'encode [Mojo::JSON->true, Mojo::JSON->false]';
 
 # Encode number
 $string = $json->encode([1]);
@@ -181,7 +182,7 @@ is_deeply $array, ["\x{10346}"], 'successful roundtrip';
 
 # Decode UTF-16LE
 $array = $json->decode(b("\x{feff}[true]")->encode('UTF-16LE'));
-is_deeply $array, [!!1], 'decode \x{feff}[true]';
+is_deeply $array, [Mojo::JSON->true], 'decode \x{feff}[true]';
 
 # Decode UTF-16LE with faihu surrogate pair
 $array = $json->decode(b("\x{feff}[\"\\ud800\\udf46\"]")->encode('UTF-16LE'));
@@ -199,11 +200,11 @@ is_deeply $array, ["\x{10346}"], 'decode \x{feff}[\"\\ud800\\udf46\"]';
 
 # Decode UTF-32LE
 $array = $json->decode(b("\x{feff}[true]")->encode('UTF-32LE'));
-is_deeply $array, [!!1], 'decode \x{feff}[true]';
+is_deeply $array, [Mojo::JSON->true], 'decode \x{feff}[true]';
 
 # Decode UTF-32BE
 $array = $json->decode(b("\x{feff}[true]")->encode('UTF-32BE'));
-is_deeply $array, [!!1], 'decode \x{feff}[true]';
+is_deeply $array, [Mojo::JSON->true], 'decode \x{feff}[true]';
 
 # Decode UTF-16LE without BOM
 $array
@@ -230,7 +231,7 @@ $string = '[null,false,true,"",0,1]';
 $array  = $json->decode($string);
 isa_ok $array, 'ARRAY', 'decode [null,false,true,"",0,1]';
 is $json->encode($array), $string, 'reencode';
-$array = [undef, 0, 1, '', !!1, !!0];
+$array = [undef, 0, 1, '', Mojo::JSON->true, Mojo::JSON->false];
 $string = $json->encode($array);
 ok $string, 'defined value';
 is_deeply $json->decode($string), $array, 'successful roundtrip';

@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 167;
+use Test::More tests => 154;
 
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
@@ -58,27 +58,6 @@ is $buffer, "yada\x0d\x0a", 'right buffer content';
 is get_line(\$buffer), 'yada', 'right line';
 is $buffer, '', 'no buffer content';
 is get_line(\$buffer), undef, 'no line';
-
-# assigned_as_number
-ok assigned_as_number 23, 'has been assigned as number';
-$buffer = 23;
-ok assigned_as_number $buffer, 'has been assigned as number';
-ok !assigned_as_number "23", 'has not been assigned as number';
-$buffer = "23";
-ok !assigned_as_number $buffer, 'has not been assigned as number';
-
-# looks_like_bool
-ok looks_like_bool !!1, 'boolean true';
-$buffer = !!1;
-ok looks_like_bool $buffer, 'boolean true';
-ok looks_like_bool !!0, 'boolean false';
-$buffer = !!0;
-ok looks_like_bool $buffer, 'boolean false';
-ok !looks_like_bool 1,          'not a boolean';
-ok !looks_like_bool 0,          'not a boolean';
-ok !looks_like_bool 'whatever', 'not a boolean';
-ok !looks_like_bool 23,         'not a boolean';
-ok !looks_like_bool 23.23,      'not a boolean';
 
 # b64_encode
 is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",

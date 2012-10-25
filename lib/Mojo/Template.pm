@@ -93,10 +93,12 @@ sub build {
     }
   }
 
-  # Escape helper
-  my $escape = q[no warnings 'redefine'; sub _escape {];
-  $escape .= q/no warnings 'uninitialized'; ref $_[0] eq 'Mojo::ByteStream'/;
-  $escape .= '? $_[0] : Mojo::Util::xml_escape("$_[0]") }';
+  my $escape = '';
+  unless ( $self->namespace->can('_escape') ) {
+    $escape .= 'sub _escape {';
+    $escape .= q/no warnings 'uninitialized'; ref $_[0] eq 'Mojo::ByteStream'/;
+    $escape .= '? $_[0] : Mojo::Util::xml_escape("$_[0]") }';
+  }
 
   # Wrap lines
   my $first = $lines[0] ||= '';

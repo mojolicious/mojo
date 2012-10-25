@@ -94,7 +94,7 @@ sub build {
     }
   }
 
-  return $self->code($self->_lines(\@lines))->tree([]);
+  return $self->code($self->_wrap(\@lines))->tree([]);
 }
 
 sub compile {
@@ -282,30 +282,6 @@ sub render_file {
   return $self->render($tmpl, @_);
 }
 
-sub _lines {
-  my ($self, $lines) = @_;
-
-  # Escape function
-  no strict 'refs';
-  no warnings 'redefine';
-  my $escape = $self->escape;
-  *{$self->namespace . '::_escape'} = sub {
-    no warnings 'uninitialized';
-    ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : $escape->("$_[0]");
-  };
-
-  # Wrap lines
-  my $first = $lines->[0] ||= '';
-  $lines->[0] = "package @{[$self->namespace]}; use Mojo::Base -strict;";
-  $lines->[0]  .= "sub { my \$_M = ''; @{[$self->prepend]}; do { $first";
-  $lines->[-1] .= "@{[$self->append]}; \$_M } };";
-
-  # Code
-  my $code = join "\n", @$lines;
-  warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
-  return $code;
-}
-
 sub _trim {
   my ($self, $line) = @_;
 
@@ -328,6 +304,30 @@ sub _trim {
     # Text left
     return if length $value;
   }
+}
+
+sub _wrap {
+  my ($self, $lines) = @_;
+
+  # Escape function
+  no strict 'refs';
+  no warnings 'redefine';
+  my $escape = $self->escape;
+  *{$self->namespace . '::_escape'} = sub {
+    no warnings 'uninitialized';
+    ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : $escape->("$_[0]");
+  };
+
+  # Wrap lines
+  my $first = $lines->[0] ||= '';
+  $lines->[0] = "package @{[$self->namespace]}; use Mojo::Base -strict;";
+  $lines->[0]  .= "sub { my \$_M = ''; @{[$self->prepend]}; do { $first";
+  $lines->[-1] .= "@{[$self->append]}; \$_M } };";
+
+  # Code
+  my $code = join "\n", @$lines;
+  warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
+  return $code;
 }
 
 1;

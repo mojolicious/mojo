@@ -1,5 +1,9 @@
 
 3.52  2012-10-25
+  - Deprecated Mojo::JSON->true and Mojo::JSON->false in favor of native Perl
+    booleans !!1 and !!0.
+  - Added assigned_as_number function to Mojo::Util.
+  - Added looks_like_bool function to Mojo::Util.
   - Improved documentation.
   - Improved tests.
 

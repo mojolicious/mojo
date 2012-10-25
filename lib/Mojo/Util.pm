@@ -1,6 +1,7 @@
 package Mojo::Util;
 use Mojo::Base 'Exporter';
 
+use B;
 use Carp 'croak';
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(sha1 sha1_hex);
@@ -37,13 +38,28 @@ $REVERSE{$ENTITIES{$_}} //= $_
   for sort { @{[$a =~ /[A-Z]/g]} <=> @{[$b =~ /[A-Z]/g]} }
   sort grep {/;/} keys %ENTITIES;
 
+# Type and flags for looks_like_bool
+my ($TYPE, $FLAGS);
+{
+  my $obj = B::svref_2object(\(my $dummy = !!1));
+  $TYPE  = $obj->SvTYPE;
+  $FLAGS = $obj->FLAGS;
+}
+
 our @EXPORT_OK = (
-  qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
-  qw(url_escape url_unescape xml_escape xor_encode)
+  qw(assigned_as_number b64_decode b64_encode camelize class_to_file),
+  qw(class_to_path decamelize decode encode get_line hmac_md5_sum),
+  qw(hmac_sha1_sum html_escape html_unescape looks_like_bool md5_bytes),
+  qw(md5_sum punycode_decode punycode_encode quote secure_compare sha1_bytes),
+  qw(sha1_sum slurp spurt squish trim unquote url_escape url_unescape),
+  qw(xml_escape xor_encode)
 );
+
+sub assigned_as_number {
+  my $value = shift;
+  my $flags = B::svref_2object(\$value)->FLAGS;
+  return !!($flags & (B::SVp_IOK | B::SVp_NOK) && !($flags & B::SVp_POK));
+}
 
 sub b64_decode { decode_base64(shift) }
 
@@ -122,6 +138,26 @@ sub html_unescape {
   $string
     =~ s/&(?:\#((?:\d{1,7}|x[[:xdigit:]]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
   return $string;
+}
+
+sub looks_like_bool {
+  my $bool = shift;
+
+  # Compare type
+  my $obj = B::svref_2object(\$bool);
+  return !!0 unless $obj->SvTYPE == $TYPE;
+
+  # Compare flags
+  return !!0 unless $obj->FLAGS == $FLAGS;
+
+  # True value
+  return !!1 if $bool eq !!1;
+
+  # False value
+  return !!1 if $bool eq !!0;
+
+  # Not a boolean
+  return !!0;
 }
 
 sub md5_bytes { md5(@_) }
@@ -406,6 +442,18 @@ L<Mojo::Util> provides portable utility functions for L<Mojo>.
 
 L<Mojo::Util> implements the following functions.
 
+=head2 C<assigned_as_number>
+
+  my $success = assigned_as_number $scalar;
+
+Check if scalar value has been assigned as number.
+
+  # True
+  assigned_as_number 23;
+
+  # False
+  assigned_as_number "23";
+
 =head2 C<b64_decode>
 
   my $string = b64_decode $b64;
@@ -513,6 +561,20 @@ defaults to C<^\n\r\t !#$%(-;=?-~>.
   my $string = html_unescape $escaped;
 
 Unescape all HTML entities in string.
+
+=head2 C<looks_like_bool>
+
+  my $success = looks_like_bool $scalar;
+
+Check if scalar looks like a native Perl boolean value.
+
+  # True
+  looks_like_bool !!1;
+  looks_like_bool !!0;
+
+  # False
+  looks_like_bool 1;
+  looks_like_bool 0;
 
 =head2 C<md5_bytes>
 

@@ -2,18 +2,19 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 154;
+use Test::More tests => 167;
 
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
 use FindBin;
 
 use Mojo::Util
-  qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
-  qw(squish trim unquote secure_compare sha1_bytes sha1_sum slurp spurt),
-  qw(url_escape url_unescape xml_escape xor_encode);
+  qw(assigned_as_number b64_decode b64_encode camelize class_to_file),
+  qw(class_to_path decamelize decode encode get_line hmac_md5_sum),
+  qw(hmac_sha1_sum html_escape html_unescape looks_like_bool md5_bytes),
+  qw(md5_sum punycode_decode punycode_encode quote squish trim unquote),
+  qw(secure_compare sha1_bytes sha1_sum slurp spurt url_escape url_unescape),
+  qw(xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -57,6 +58,27 @@ is $buffer, "yada\x0d\x0a", 'right buffer content';
 is get_line(\$buffer), 'yada', 'right line';
 is $buffer, '', 'no buffer content';
 is get_line(\$buffer), undef, 'no line';
+
+# assigned_as_number
+ok assigned_as_number 23, 'has been assigned as number';
+$buffer = 23;
+ok assigned_as_number $buffer, 'has been assigned as number';
+ok !assigned_as_number "23", 'has not been assigned as number';
+$buffer = "23";
+ok !assigned_as_number $buffer, 'has not been assigned as number';
+
+# looks_like_bool
+ok looks_like_bool !!1, 'boolean true';
+$buffer = !!1;
+ok looks_like_bool $buffer, 'boolean true';
+ok looks_like_bool !!0, 'boolean false';
+$buffer = !!0;
+ok looks_like_bool $buffer, 'boolean false';
+ok !looks_like_bool 1,          'not a boolean';
+ok !looks_like_bool 0,          'not a boolean';
+ok !looks_like_bool 'whatever', 'not a boolean';
+ok !looks_like_bool 23,         'not a boolean';
+ok !looks_like_bool 23.23,      'not a boolean';
 
 # b64_encode
 is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",

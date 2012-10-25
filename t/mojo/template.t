@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 199;
+use Test::More tests => 200;
 
 use File::Spec::Functions qw(catfile splitdir);
 use FindBin;
@@ -1072,3 +1072,7 @@ $mt = Mojo::Template->new(encoding => 'shift_jis');
 $file = catfile(splitdir($FindBin::Bin), qw(templates utf8_exception.mt));
 ok !eval { $mt->render_file($file) }, 'file not rendered';
 like $@, qr/invalid encoding/, 'right error';
+
+# Custom escape function
+$mt = Mojo::Template->new(escape => sub { '+' . $_[0] });
+is $mt->render('<%== "hi" =%>'), '+hi', 'right escaped string';

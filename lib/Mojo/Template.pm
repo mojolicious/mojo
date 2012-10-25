@@ -14,6 +14,7 @@ has capture_end   => 'end';
 has capture_start => 'begin';
 has comment_mark  => '#';
 has encoding      => 'UTF-8';
+has escape        => sub { \&Mojo::Util::xml_escape };
 has [qw(escape_mark expression_mark trim_mark)] => '=';
 has [qw(line_start replace_mark)] => '%';
 has name      => 'template';
@@ -93,14 +94,20 @@ sub build {
     }
   }
 
-  # Escape helper
-  my $escape = q[no warnings 'redefine'; sub _escape {];
-  $escape .= q/no warnings 'uninitialized'; ref $_[0] eq 'Mojo::ByteStream'/;
-  $escape .= '? $_[0] : Mojo::Util::xml_escape("$_[0]") }';
+  # Escape function
+  {
+    no strict 'refs';
+    no warnings 'redefine';
+    my $escape = $self->escape;
+    *{$self->namespace . '::_escape'} = sub {
+      no warnings 'uninitialized';
+      ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : $escape->("$_[0]");
+    };
+  }
 
   # Wrap lines
   my $first = $lines[0] ||= '';
-  $lines[0] = "package @{[$self->namespace]}; $escape use Mojo::Base -strict;";
+  $lines[0] = "package @{[$self->namespace]}; use Mojo::Base -strict;";
   $lines[0]  .= "sub { my \$_M = ''; @{[$self->prepend]}; do { $first";
   $lines[-1] .= "@{[$self->append]}; \$_M } };";
 
@@ -521,6 +528,14 @@ Compiled template code.
   $mt          = $mt->encoding('UTF-8');
 
 Encoding used for template files.
+
+=head2 C<escape>
+
+  my $code = $mt->escape;
+  $mt      = $mt->escape(sub { reverse $_[0] });
+
+A callback used to escape the results of escaped expressions, defaults to
+L<Mojo::Util/"xml_escape">.
 
 =head2 C<escape_mark>
 

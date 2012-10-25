@@ -1,6 +1,7 @@
 
-3.52  2012-10-25
+3.52  2012-10-26
   - Added boolean shortcut support to Mojo::JSON.
+  - Added escape attribute to Mojo::Template. (jberger)
   - Improved documentation.
   - Improved tests.
 

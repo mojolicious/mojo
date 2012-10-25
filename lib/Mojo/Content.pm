@@ -273,7 +273,7 @@ sub _parse_chunked {
     if ($self->{chunk_state} // '') eq 'trailing_headers';
 
   # Check buffer size
-  $self->{limit} = 1
+  $self->{limit} = $self->{state} = 'finished'
     if length($self->{pre_buffer} // '') > $self->max_buffer_size;
 }
 

@@ -201,7 +201,7 @@ sub _read {
   }
 
   # Check buffer size
-  $self->{limit} = 1
+  $self->{limit} = $self->{state} = 'finished'
     if length($self->{multipart} // '') > $self->max_buffer_size;
 }
 

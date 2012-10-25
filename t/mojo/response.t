@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 386;
+use Test::More tests => 388;
 
 use Mojo::Asset::File;
 use Mojo::Content::Single;
@@ -306,6 +306,7 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
   $res->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
   $res->parse('4' x 1000);
   ok $res->is_finished, 'response is finished';
+  ok $res->content->is_finished, 'content is finished';
   is(($res->error)[0], 'Maximum buffer size exceeded', 'right error');
   is(($res->error)[1], 400, 'right status');
   is $res->code,    200,   'right status';
@@ -323,8 +324,9 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
   $res->parse("Content-Length: 420\x0d\x0a");
   $res->parse('Content-Type: multipart/form-data; bo');
   $res->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
-  $res->parse(4 x 420);
+  $res->parse(4 x 200);
   ok $res->is_finished, 'response is finished';
+  ok $res->content->is_finished, 'content is finished';
   is(($res->error)[0], 'Maximum buffer size exceeded', 'right error');
   is(($res->error)[1], 400, 'right status');
   is $res->code,    200,   'right status';

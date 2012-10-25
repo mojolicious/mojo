@@ -10,7 +10,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 119;
+use Test::More tests => 125;
 
 use Mojo::ByteStream 'b';
 use Mojo::JSON;
@@ -266,6 +266,20 @@ is_deeply $json->decode($string), {}, 'successful roundtrip';
 $string = $json->encode(
   JSONTest->new(something => {just => 'works'}, else => {not => 'working'}));
 is_deeply $json->decode($string), {just => 'works'}, 'successful roundtrip';
+
+# Boolean shortcut
+is $json->encode({true  => \1}), '{"true":true}',   'encode {true => \1}';
+is $json->encode({false => \0}), '{"false":false}', 'encode {false => \0}';
+$string = 'some true value';
+is $json->encode({true => \!!$string}), '{"true":true}',
+  'encode true boolean from string';
+is $json->encode({true => \$string}), '{"true":true}',
+  'encode true boolean from string';
+$string = '';
+is $json->encode({false => \!!$string}), '{"false":false}',
+  'encode false boolean from string';
+is $json->encode({false => \$string}), '{"false":false}',
+  'encode false boolean from string';
 
 # Errors
 is $json->decode('["♥"]'), undef, 'wide character in input';

@@ -1,5 +1,6 @@
 
 3.52  2012-10-25
+  - Added boolean shortcut support to Mojo::JSON.
   - Improved documentation.
   - Improved tests.
 

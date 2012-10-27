@@ -449,8 +449,8 @@ can access arguments simply via C<@_>.
   % my $x = shift;
   test 123 <%= $foo %>
 
-Since templates are just Perl code, debugging can get a bit tricky at times,
-but L<Mojo::Template> will return L<Mojo::Exception> objects that stringify to
+The compilation of templates to Perl code can make debugging a bit tricky, but
+L<Mojo::Template> will return L<Mojo::Exception> objects that stringify to
 error messages with context.
 
   Bareword "xx" not allowed while "strict subs" in use at template line 4.

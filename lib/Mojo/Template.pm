@@ -442,9 +442,9 @@ Perl lines can also be indented freely.
   %= $block->('Baerbel')
   %= $block->('Wolfgang')
 
-L<Mojo::Template> templates work just like Perl subs (actually they get
-compiled to a Perl sub internally). That means you can access arguments simply
-via C<@_>.
+L<Mojo::Template> templates work just like Perl subroutines (actually they get
+compiled to a Perl subroutine internally). That means you can access arguments
+simply via C<@_>.
 
   % my ($foo, $bar) = @_;
   % my $x = shift;

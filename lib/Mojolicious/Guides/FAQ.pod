@@ -68,7 +68,7 @@ L<GitHub issue|https://github.com/kraih/mojo/issues> and ask, just be prepared
 that it might not pass the vote. To increase the chances you should also
 discuss and refine ideas on the
 L<mailing-list|http://groups.google.com/group/mojolicious> or our official IRC
-channel C<#mojo> on C<irc.perl.org.
+channel C<#mojo> on C<irc.perl.org>.
 
 =head2 What does the error "Maximum message size exceeded" mean?
 

@@ -141,6 +141,10 @@ sub param {
   return $req->param($name);
 }
 
+sub params {
+  return shift->req->params;
+}
+
 sub redirect_to {
   my $self = shift;
 
@@ -622,6 +626,15 @@ For more control you can also access request information directly.
 
   # Only file uploads
   my $foo = $c->req->upload('foo');
+
+=head2 C<params>
+
+  my $params      = $c->params;
+  my $form_params = $params->to_hash;
+  $form->process( $form_params );
+
+Returns Mojo::Parameters object. Can be used to fetch hash of all 
+submitted parameters to process HTML::FormHandler form.
 
 =head2 C<redirect_to>
 

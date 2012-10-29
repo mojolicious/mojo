@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable libev
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
-use Test::More tests => 57;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -123,3 +123,5 @@ is $loader->data('Example::Package::Mixed', 'template7'), '7',
 is_deeply [sort keys %{$loader->data('Example::Package::Mixed')}],
   [qw(template5 template6 template7)], 'right DATA files';
 close $data;
+
+done_testing();

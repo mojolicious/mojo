@@ -9,7 +9,6 @@ BEGIN {
 use Test::More;
 plan skip_all => 'set TEST_HYPNOTOAD to enable this test (developer only!)'
   unless $ENV{TEST_HYPNOTOAD};
-plan tests => 50;
 
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
@@ -185,3 +184,5 @@ sub _pid {
   chomp $pid;
   return $pid;
 }
+
+done_testing();

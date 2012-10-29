@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 26;
+use Test::More;
 
 use Cwd 'abs_path';
 use File::Basename 'dirname';
@@ -65,6 +65,8 @@ is app->config('it'),  'works', 'right value';
   local $ENV{MOJO_CONFIG} = 'nonexistent';
   ok !(eval { plugin 'JSONConfig' }), 'no config file';
 }
+
+done_testing();
 
 __DATA__
 @@ index.html.ep

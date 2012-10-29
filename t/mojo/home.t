@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable libev
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
-use Test::More tests => 15;
+use Test::More;
 
 use Cwd qw(cwd realpath);
 use File::Spec::Functions qw(canonpath catdir splitdir);
@@ -64,3 +64,5 @@ like $home->slurp_rel_file('lib/Mojo/BaseTest/Base2.pm'), qr/Base2/,
   'right content';
 like $home->slurp_rel_file('lib/Mojo/BaseTest/Base3.pm'), qr/Base3/,
   'right content';
+
+done_testing();

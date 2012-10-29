@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable libev
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
-use Test::More tests => 41;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -156,3 +156,5 @@ require Mojolicious::Command::version;
 my $version = Mojolicious::Command::version->new;
 ok $version->description, 'has a description';
 ok $version->usage,       'has usage information';
+
+done_testing();

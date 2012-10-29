@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 44;
+use Test::More;
 
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
@@ -124,6 +124,8 @@ my $url = $t->ua->app_url->path('/params')->query(foo => 3, yatta => $yatta);
 $url->query->charset('shift_jis');
 $t->get_ok($url)->status_is(200)
   ->json_content_is({params => {foo => 3, yatta => $yatta}, yatta => $yatta});
+
+done_testing();
 
 __DATA__
 @@ index.html.ep

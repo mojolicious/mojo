@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 27;
+use Test::More;
 
 use Mojo::JSON::Pointer;
 
@@ -60,3 +60,5 @@ is $p->get([{'foo~/bar' => 'bar'}], '/0/foo%7E%30%7E%31bar'), 'bar',
 is $p->get(
   [{'f~o~o~/b~' => {'a~' => {'r' => 'baz'}}}] => '/0/f~0o~0o~0~1b~0/a~0/r'),
   'baz', '"/0/f~0o~0o~0~1b~0/a~0/r" is "baz"';
+
+done_testing();

@@ -9,7 +9,6 @@ BEGIN {
 use Test::More;
 plan skip_all => 'set TEST_MORBO to enable this test (developer only!)'
   unless $ENV{TEST_MORBO};
-plan tests => 26;
 
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
@@ -140,3 +139,5 @@ sleep 1
   PeerAddr => '127.0.0.1',
   PeerPort => $port
   );
+
+done_testing();

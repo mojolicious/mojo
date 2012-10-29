@@ -9,7 +9,6 @@ plan skip_all => 'set TEST_IPV6 to enable this test (developer only!)'
   unless $ENV{TEST_IPV6};
 plan skip_all => 'IO::Socket::IP 0.16 required for this test!'
   unless Mojo::IOLoop::Server::IPV6;
-plan tests => 2;
 
 use Mojo::IOLoop;
 
@@ -39,3 +38,5 @@ Mojo::IOLoop->client(
 $delay->wait;
 is $server, 'tset123', 'right content';
 is $client, 'test321', 'right content';
+
+done_testing();

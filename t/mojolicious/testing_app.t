@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 27;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -51,3 +51,5 @@ $t->get_ok('/../../mojolicious/secret.txt')->status_is(404)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Testing not found/);
+
+done_testing();

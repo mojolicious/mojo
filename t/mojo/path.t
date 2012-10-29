@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 212;
+use Test::More;
 
 use Mojo::Path;
 
@@ -274,3 +274,5 @@ is $path->parts->[1], undef,     'no part';
 is "$path", 'foo%2Fbar', 'right result';
 is $path->to_string,     'foo%2Fbar',  'right result';
 is $path->to_abs_string, '/foo%2Fbar', 'right result';
+
+done_testing();

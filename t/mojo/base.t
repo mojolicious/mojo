@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 415;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -97,4 +97,4 @@ like $@, qr/Default has to be a code reference or constant value/,
 eval { Mojo::BaseTest->attr(23) };
 like $@, qr/Attribute "23" invalid/, 'right error';
 
-1;
+done_testing();

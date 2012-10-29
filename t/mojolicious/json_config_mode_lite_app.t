@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 3;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -24,6 +24,8 @@ my $t = Test::Mojo->new;
 
 # GET /
 $t->get_ok('/')->status_is(200)->content_like(qr/bazfoo/);
+
+done_testing();
 
 __DATA__
 @@ index.html.ep

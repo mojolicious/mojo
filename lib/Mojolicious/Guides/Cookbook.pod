@@ -500,7 +500,7 @@ While the message flow on WebSocket connections can be rather dynamic, it
 more often than not is quite predictable, which allows this rather pleasant
 L<Test::Mojo> API to be used.
 
-  use Test::More tests => 4;
+  use Test::More;
   use Test::Mojo;
 
   # Include application
@@ -513,6 +513,8 @@ L<Test::Mojo> API to be used.
     ->send_ok('Hello Mojo!')
     ->message_is('echo: Hello Mojo!')
     ->finish_ok;
+
+  done_testing();
 
 =head2 EventSource web service
 

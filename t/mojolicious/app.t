@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 351;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -446,3 +446,5 @@ $t->get_ok('/foo/session')->status_is(200)
 # Mixed formats
 $t->get_ok('/rss.xml')->status_is(200)->content_type_is('application/rss+xml')
   ->content_like(qr!<\?xml version="1.0" encoding="UTF-8"\?><rss />!);
+
+done_testing();

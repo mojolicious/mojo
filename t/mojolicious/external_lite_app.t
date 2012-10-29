@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 15;
+use Test::More;
 
 use FindBin;
 require "$FindBin::Bin/external/myapp.pl";
@@ -41,3 +41,5 @@ $t->get_ok('/stream')->status_is(200)->content_is('hello!');
 # GET /url/☃
 $t->get_ok('/url/☃')->status_is(200)
   ->content_is('/url/%E2%98%83 -> /%E2%98%83/stream!');
+
+done_testing();

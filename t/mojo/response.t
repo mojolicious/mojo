@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 388;
+use Test::More;
 
 use Mojo::Asset::File;
 use Mojo::Content::Single;
@@ -817,3 +817,5 @@ ok $res->dom, 'dom built';
 $count = 0;
 $res->dom('a')->each(sub { $count++ });
 is $count, 2, 'all anchors found';
+
+done_testing();

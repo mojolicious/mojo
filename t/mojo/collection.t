@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 57;
+use Test::More;
 
 use Mojo::Collection 'c';
 
@@ -124,3 +124,5 @@ $collection = c(1, 2, 3, 2, 3, 4, 5, 4);
 is_deeply [$collection->uniq->each], [1, 2, 3, 4, 5], 'right result';
 is_deeply [$collection->uniq->reverse->uniq->each], [5, 4, 3, 2, 1],
   'right result';
+
+done_testing();

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 7;
+use Test::More;
 
 use Mojolicious;
 use Mojolicious::Controller;
@@ -52,3 +52,5 @@ is_deeply [$r->render($c)], ['Hello Mojo!', 'text/debug'],
 # Unrecognized handler
 $c->stash->{handler} = 'not_defined';
 is $r->render($c), undef, 'return undef for unrecognized handler';
+
+done_testing();

@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 162;
+use Test::More;
 
 use Mojo::Message::Request;
 
@@ -419,3 +419,5 @@ is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload',
   'right absolute URL';
 my $file = $req->upload('file');
 is $file->slurp, '11023456789', 'right uploaded content';
+
+done_testing();

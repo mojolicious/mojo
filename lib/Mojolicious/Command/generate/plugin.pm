@@ -78,7 +78,7 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 % my $name = shift;
 use Mojo::Base -strict;
 
-use Test::More tests => 3;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -92,6 +92,8 @@ get '/' => sub {
 
 my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->content_is('Hello Mojo!');
+
+done_testing();
 
 @@ makefile
 % my ($class, $path) = @_;

@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 154;
+use Test::More;
 
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';
@@ -385,3 +385,5 @@ my $dir = tempdir CLEANUP => 1;
 my $file = catfile $dir, 'test.txt';
 spurt "just\nworks!", $file;
 is slurp($file), "just\nworks!", 'successful roundtrip';
+
+done_testing();

@@ -9,7 +9,6 @@ BEGIN {
 use Test::More;
 plan skip_all => 'set TEST_CACHING to enable this test (developer only!)'
   unless $ENV{TEST_CACHING};
-plan tests => 21;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -41,6 +40,8 @@ $t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/\d+a\d+b\d+c\d+\nd\d+\ne\d+/)->content_isnt($memorized);
+
+done_testing();
 
 __DATA__
 

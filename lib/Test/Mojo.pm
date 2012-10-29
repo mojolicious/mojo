@@ -328,7 +328,7 @@ Test::Mojo - Testing Mojo!
 
 =head1 SYNOPSIS
 
-  use Test::More tests => 12;
+  use Test::More;
   use Test::Mojo;
 
   my $t = Test::Mojo->new('MyApp');
@@ -348,6 +348,8 @@ Test::Mojo - Testing Mojo!
     ->send_ok('hello')
     ->message_is('echo: hello')
     ->finish_ok;
+
+  done_testing();
 
 =head1 DESCRIPTION
 

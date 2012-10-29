@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 97;
+use Test::More;
 
 use Mojo::ByteStream 'b';
 use Mojolicious::Lite;
@@ -189,3 +189,5 @@ $t->get_ok('/nested')->status_is(200)->content_is('plain nested!');
 
 # POST /nested (another plain alternative)
 $t->post_ok('/nested')->status_is(200)->content_is('plain nested too!');
+
+done_testing();

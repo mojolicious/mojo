@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 47;
+use Test::More;
 
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
@@ -98,3 +98,5 @@ ok !$log->is_info,  '"info" log level is inactive';
 ok !$log->is_warn,  '"warn" log level is inactive';
 ok !$log->is_error, '"error" log level is inactive';
 ok $log->is_fatal, '"fatal" log level is active';
+
+done_testing();

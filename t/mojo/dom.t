@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 793;
+use Test::More;
 
 use Mojo::DOM;
 use Mojo::Util 'encode';
@@ -2145,3 +2145,4 @@ is $dom->tree->[3][1], ' bad idea -- HTML5 ', 'right comment';
 is $dom->tree->[5][1], ' HTML4 ',             'right comment';
 is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
 
+done_testing();

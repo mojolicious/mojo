@@ -14,7 +14,6 @@ plan skip_all => 'IO::Socket::IP 0.16 required for this test!'
   unless Mojo::IOLoop::Server::IPV6;
 plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 88;
 
 use IO::Socket::INET;
 use Mojo::IOLoop;
@@ -274,3 +273,5 @@ $ua->connect_timeout(3);
 $tx = $ua->request_timeout(0.5)->get('192.0.2.1');
 ok $tx->is_finished, 'transaction is finished';
 is $tx->error, 'Request timeout', 'right error';
+
+done_testing();

@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 9;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/external/lib";
@@ -27,3 +27,5 @@ $t->get_ok('/index.html')->status_is(200)
 
 # GET /test
 $t->get_ok('/test')->status_is(200)->content_is('works%21');
+
+done_testing();

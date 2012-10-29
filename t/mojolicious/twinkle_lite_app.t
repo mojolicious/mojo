@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 32;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -109,6 +109,8 @@ $t->get_ok('/perldoc')->status_is(404)->content_is("foo not found!\n");
 
 # GET /dead (exception template with custom format)
 $t->get_ok('/dead')->status_is(500)->content_is("foo exception!\n");
+
+done_testing();
 
 __DATA__
 @@ index.foo.twinkle

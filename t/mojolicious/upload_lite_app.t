@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 18;
+use Test::More;
 
 use Mojo::Asset::File;
 use Mojolicious::Lite;
@@ -77,3 +77,5 @@ $t->post_form_ok('/multi_reverse',
 $t->post_form_ok('/multi',
   {file1 => {content => '1111'}, file2 => {content => '11112222'},})
   ->status_is(200)->content_is('file11111file211112222');
+
+done_testing();

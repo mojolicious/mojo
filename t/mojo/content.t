@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 25;
+use Test::More;
 
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
@@ -56,3 +56,5 @@ $content = Mojo::Content::MultiPart->new;
 ok !$content->charset, 'no charset';
 'a' =~ /(.)/;
 ok !$content->boundary, 'no boundary';
+
+done_testing();

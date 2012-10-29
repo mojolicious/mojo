@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 54;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -97,6 +97,8 @@ $t->get_ok('/♥/123/index.html' => {Host => 'test.foo-bar.de'})
 # GET /♥/123/test (external app with a bit of everything)
 $t->get_ok('/♥/123/test' => {Host => 'test.foo-bar.de'})->status_is(200)
   ->content_is('works%21');
+
+done_testing();
 
 __DATA__
 

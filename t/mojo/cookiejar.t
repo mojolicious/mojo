@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 92;
+use Test::More;
 
 use Mojo::Cookie::Response;
 use Mojo::URL;
@@ -304,3 +304,4 @@ is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
+done_testing();

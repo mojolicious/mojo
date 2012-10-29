@@ -17,7 +17,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 200;
+use Test::More;
 
 use File::Spec::Functions qw(catfile splitdir);
 use FindBin;
@@ -1076,3 +1076,5 @@ like $@, qr/invalid encoding/, 'right error';
 # Custom escape function
 $mt = Mojo::Template->new(escape => sub { '+' . $_[0] });
 is $mt->render('<%== "hi" =%>'), '+hi', 'right escaped string';
+
+done_testing();

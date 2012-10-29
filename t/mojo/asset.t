@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 65;
+use Test::More;
 
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
@@ -147,3 +147,5 @@ undef $file;
 ok -e $path, 'file exists';
 unlink $path;
 ok !-e $path, 'file has been cleaned up';
+
+done_testing();

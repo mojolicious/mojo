@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 48;
+use Test::More;
 
 use IO::Socket::INET;
 use Mojo::IOLoop;
@@ -513,3 +513,5 @@ is $pong, 'test', 'received pong with payload';
 
 # The "finish" event has been emitted on the server side too
 is $server, 3, 'finish event has been emitted';
+
+done_testing();

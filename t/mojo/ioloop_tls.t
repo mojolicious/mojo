@@ -12,7 +12,6 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 31;
 
 # To regenerate all required certificates run these commands (18.04.2012)
 # openssl genrsa -out ca.key 1024
@@ -343,3 +342,5 @@ $loop->start;
 is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
+
+done_testing();

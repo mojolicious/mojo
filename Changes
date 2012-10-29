@@ -1,6 +1,7 @@
 
-3.53  2012-10-28
+3.53  2012-10-29
   - Improved documentation.
+  - Improved tests.
 
 3.52  2012-10-26
   - Added boolean shortcut support to Mojo::JSON.

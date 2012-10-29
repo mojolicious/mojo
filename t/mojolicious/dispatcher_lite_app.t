@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 33;
+use Test::More;
 
 use Mojo::Message::Response;
 use Mojolicious::Lite;
@@ -133,6 +133,8 @@ $t->get_ok('/not_found')->status_is(200)->content_is('works');
 
 # GET /not_found (internal redirect to second wrapper)
 $t->get_ok('/not_found?wrap=1')->status_is(200)->content_is('Wrapped again!');
+
+done_testing();
 
 __DATA__
 @@ res.txt

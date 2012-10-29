@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 24;
+use Test::More;
 
 use Mojo::URL;
 use Mojolicious::Lite;
@@ -102,6 +102,8 @@ EOF
 
 # GET /yada (does not exist)
 $t->get_ok('/yada')->status_is(404)->header_is('X-Route' => '');
+
+done_testing();
 
 __DATA__
 @@ root.html.ep

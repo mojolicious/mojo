@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 90;
+use Test::More;
 
 use Mojo::ByteStream 'b';
 use Mojolicious::Routes::Pattern;
@@ -199,3 +199,5 @@ is $pattern->render($result), '/foo/v1.0', 'right result';
 is $pattern->render($result, 1), '/foo/v1.0.txt', 'right result';
 $result = $pattern->match('/foo/v2.0', 1);
 is $result, undef, 'no result';
+
+done_testing();

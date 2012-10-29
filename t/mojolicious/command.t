@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 # Disable libev
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
-use Test::More tests => 6;
+use Test::More;
 
 use Cwd 'cwd';
 use File::Spec::Functions 'catdir';
@@ -34,3 +34,5 @@ $command->write_rel_file('123.xml', "seems\nto\nwork");
 open my $xml, '<', $command->rel_file('123.xml');
 is join('', <$xml>), "seems\nto\nwork", 'right result';
 chdir $cwd;
+
+done_testing();

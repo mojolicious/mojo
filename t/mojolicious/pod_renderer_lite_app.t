@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 35;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -67,6 +67,8 @@ $t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
 $t->get_ok('/perldoc/Mojolicious')->status_is(200)
   ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
   ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
+
+done_testing();
 
 __DATA__
 

@@ -23,7 +23,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 85;
+use Test::More;
 
 use Mojo::Transaction::HTTP;
 use Mojo::Upload;
@@ -207,3 +207,5 @@ is $c->param('controller'), undef,          'no value';
 is $c->param('action'),     undef,          'no value';
 is $c->param('capture'),    'привет', 'right value';
 ok $c->render_called, 'rendered';
+
+done_testing();

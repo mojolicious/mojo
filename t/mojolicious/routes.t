@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 393;
+use Test::More;
 
 use Mojolicious::Routes;
 use Mojolicious::Routes::Match;
@@ -857,3 +857,5 @@ is $m->path_for, '/source/third', 'right path';
 $m = Mojolicious::Routes::Match->new(GET => '/target/third');
 $m->match($r);
 is $m->stack->[0], undef, 'no value';
+
+done_testing();

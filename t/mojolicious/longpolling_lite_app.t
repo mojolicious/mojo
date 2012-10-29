@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 128;
+use Test::More;
 
 use Mojo::IOLoop;
 use Mojolicious::Lite;
@@ -439,3 +439,5 @@ $t->ua->start($tx);
 is $tx->res->code, 200, 'right status';
 is $tx->error, 'Inactivity timeout', 'right error';
 is $buffer, 'how', 'right content';
+
+done_testing();

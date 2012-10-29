@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 32;
+use Test::More;
 
 use Mojo::IOLoop;
 use Mojo::IOLoop::Client;
@@ -270,3 +270,5 @@ is(
   Mojo::IOLoop->singleton->reactor,
   'right default'
 );
+
+done_testing();

@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 86;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -200,6 +200,8 @@ $t->get_ok('/reuse/exception')->status_is(500)
   ->content_like(qr/Reusable exception/);
 isa_ok $exception, 'Mojo::Exception',      'right exception class';
 like $exception,   qr/Reusable exception/, 'right exception';
+
+done_testing();
 
 __DATA__
 @@ layouts/green.html.ep

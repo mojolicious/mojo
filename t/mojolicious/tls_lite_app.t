@@ -12,7 +12,6 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 40;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
@@ -110,3 +109,5 @@ $t->get_ok('/again' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
 # GET /logout (no session)
 $t->get_ok('/logout' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome anonymous!');
+
+done_testing();

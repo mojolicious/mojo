@@ -283,7 +283,7 @@ L<Test::Mojo> is a scriptable HTTP user agent designed specifically for
 testing, with many fun state of the art features such as CSS selectors based
 on L<Mojo::DOM>.
 
-  use Test::More tests => 16;
+  use Test::More;
   use Test::Mojo;
 
   # Include application
@@ -313,6 +313,8 @@ on L<Mojo::DOM>.
     ->element_exists('form input[name="user"]')
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');
+
+  done_testing();
 
 From now on you can always check your progress by running these unit tests
 against your application.
@@ -663,7 +665,7 @@ Only a few small details change.
 Normal L<Mojolicious> applications are a little easier to test, so
 C<t/login.t> can be simplified.
 
-  use Test::More tests => 16;
+  use Test::More;
   use Test::Mojo;
 
   # Load application class
@@ -685,6 +687,8 @@ C<t/login.t> can be simplified.
     ->element_exists('form input[name="user"]')
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');
+
+  done_testing();
 
 Test driven development takes a little getting used to, but is very well worth
 it!

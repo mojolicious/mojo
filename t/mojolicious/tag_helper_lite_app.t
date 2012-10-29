@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 72;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -372,6 +372,8 @@ $t->post_ok('/no_snowman?foo=1')->status_is(200)->content_is(<<'EOF');
   <input type="submit" value="whatever" />
 </form>
 EOF
+
+done_testing();
 
 __DATA__
 @@ tags.html.ep

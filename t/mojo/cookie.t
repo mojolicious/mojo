@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 190;
+use Test::More;
 
 use Mojo::Cookie::Request;
 use Mojo::Cookie::Response;
@@ -392,3 +392,5 @@ is $cookies->[0]->expires, 'Thu, 01 Jan 1970 00:00:00 GMT',
 is $cookies->[0]->expires->epoch, 0, 'right expires epoch value';
 is $cookies->[0]->secure, '1', 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
+
+done_testing();

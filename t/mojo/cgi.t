@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 
-use Test::More tests => 22;
+use Test::More;
 
 use Mojo::Message::Response;
 use Mojo::Server::CGI;
@@ -127,3 +127,5 @@ is $res->headers->content_type, 'application/json',
 is $res->headers->content_length, 27, 'right "Content-Length" value';
 is $res->json->{lalala}, 23,    'right value';
 is $res->json->{bar},    'baz', 'right value';
+
+done_testing();

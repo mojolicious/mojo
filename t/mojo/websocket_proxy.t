@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 12;
+use Test::More;
 
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
@@ -231,3 +231,5 @@ $ua->websocket(
 Mojo::IOLoop->start;
 ok !$success, 'no success';
 is $err, 'Proxy connection failed', 'right message';
+
+done_testing();

@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 30;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -58,3 +58,5 @@ $t->get_ok('/hello3.txt')->status_is(200)
 $t->get_ok('/yada')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("Higher precedence!\n");
+
+done_testing();

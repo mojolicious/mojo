@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 68;
+use Test::More;
 
 use IO::Socket::INET;
 use Mojo::Reactor::Poll;
@@ -240,3 +240,5 @@ ok $server_running, 'loop is running';
 ok $client_running, 'loop is running';
 is $server,         'tset123', 'right content';
 is $client,         'test321', 'right content';
+
+done_testing();

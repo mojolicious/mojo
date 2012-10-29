@@ -7,7 +7,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 82;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -119,3 +119,5 @@ $t->get_ok('/just/some/template')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("Production template with low precedence.\n");
+
+done_testing();

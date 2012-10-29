@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 15;
+use Test::More;
 
 use Mojolicious::Lite;
 use Scalar::Util 'weaken';
@@ -73,3 +73,5 @@ $t->get_ok('/download/24')->status_is(200)->content_is('1234' x 131072);
 
 # GET /download/23 (small download again)
 $t->get_ok('/download/23')->status_is(200)->content_is('whatever');
+
+done_testing();

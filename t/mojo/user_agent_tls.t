@@ -12,7 +12,6 @@ plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
 plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
-plan tests => 26;
 
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
@@ -132,3 +131,5 @@ $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key');
 $tx = $ua->get("https://localhost:$port");
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';
+
+done_testing();

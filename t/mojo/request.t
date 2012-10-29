@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 858;
+use Test::More;
 
 use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
@@ -1911,3 +1911,5 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/#09azAZ-._~:/?%5B%5D@!$&\'()*+,;=%', 'right URL';
+
+done_testing();

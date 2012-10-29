@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 122;
+use Test::More;
 
 use Mojo::IOLoop;
 use Mojo::UserAgent;
@@ -444,3 +444,5 @@ my $id   = Mojo::IOLoop->server(
 $tx = $ua->get("http://localhost:$port/");
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close', 'right error';
+
+done_testing();

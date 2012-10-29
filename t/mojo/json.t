@@ -10,7 +10,7 @@ use Mojo::Base -strict;
 
 use utf8;
 
-use Test::More tests => 125;
+use Test::More;
 
 use Mojo::ByteStream 'b';
 use Mojo::JSON;
@@ -329,3 +329,5 @@ is $json->decode("[\"foo\",\n\"bar\",\n\"bazra\"]lalala"), undef,
 is $json->error,
   'Malformed JSON: Unexpected data after array at line 3, offset 8',
   'right error';
+
+done_testing();

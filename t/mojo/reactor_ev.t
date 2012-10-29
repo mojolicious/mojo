@@ -7,7 +7,6 @@ use Test::More;
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
 plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
-plan tests => 69;
 
 use IO::Socket::INET;
 
@@ -241,3 +240,5 @@ ok $server_running, 'loop is running';
 ok $client_running, 'loop is running';
 is $server,         'tset123', 'right content';
 is $client,         'test321', 'right content';
+
+done_testing();

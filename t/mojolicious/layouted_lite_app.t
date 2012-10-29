@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 102;
+use Test::More;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -237,6 +237,8 @@ $t->get_ok('/inline/again')->status_is(200)
 # GET /data
 $t->get_ok('/data')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is(0);
+
+done_testing();
 
 __DATA__
 @@ layouts/default.html.ep

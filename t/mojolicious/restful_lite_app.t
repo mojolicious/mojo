@@ -6,7 +6,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 344;
+use Test::More;
 
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -451,3 +451,5 @@ $t->get_ok('/rest.html' => {Accept => $chrome})->status_is(200)
 $t->get_ok('/rest?format=html' => {Accept => $chrome})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');
+
+done_testing();

@@ -8,7 +8,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 208;
+use Test::More;
 
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent::CookieJar;
@@ -457,6 +457,8 @@ $t->get_ok('/one_format.xml')->status_is(200)
 # GET /one_format.txt
 $t->get_ok('/one_format.txt')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8');
+
+done_testing();
 
 __DATA__
 @@ not_found.html.epl

@@ -9,7 +9,7 @@ BEGIN {
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }
 
-use Test::More tests => 705;
+use Test::More;
 
 use Mojo::ByteStream 'b';
 use Mojo::Cookie::Response;
@@ -1331,6 +1331,8 @@ $t->get_ok('/dynamic/inline')->status_is(200)
 # GET /dynamic/inline (again)
 $t->get_ok('/dynamic/inline')->status_is(200)
   ->content_is("dynamic inline 2\n");
+
+done_testing();
 
 __DATA__
 @@ with-format.html.ep

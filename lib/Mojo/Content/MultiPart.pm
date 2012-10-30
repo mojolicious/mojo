@@ -39,9 +39,7 @@ sub build_boundary {
   my $self = shift;
 
   # Check for existing boundary
-  my $headers = $self->headers;
-  my $type = $headers->content_type || '';
-  $type =~ /boundary="?([^\s"]+)"?/i and return $1;
+  if (defined(my $boundary = $self->boundary)) { return $boundary }
 
   # Generate and check boundary
   my $boundary;
@@ -53,7 +51,8 @@ sub build_boundary {
   }
 
   # Add boundary to Content-Type header
-  $type =~ m!^(.*multipart/[^;]+)(.*)$!;
+  my $headers = $self->headers;
+  ($headers->content_type || '') =~ m!^(.*multipart/[^;]+)(.*)$!;
   my $before = $1 || 'multipart/mixed';
   my $after  = $2 || '';
   $headers->content_type("$before; boundary=$boundary$after");

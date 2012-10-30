@@ -29,6 +29,11 @@ ok $content->body_contains('foo'),     'content contains "foo"';
 ok $content->body_contains('bar+'),    'content contains "bar+"';
 ok $content->body_contains('.'),       'content contains "."';
 ok $content->body_contains('.*?foo+'), 'content contains ".*?foo+"';
+ok !$content->headers->content_type, 'no "Content-Type" header';
+ok my $boundary = $content->build_boundary, 'boundary has been generated';
+is $boundary, $content->boundary, 'same boundary';
+is $content->headers->content_type, "multipart/mixed; boundary=$boundary",
+  'right "Content-Type" header';
 
 # Dynamic content
 $content = Mojo::Content::Single->new;

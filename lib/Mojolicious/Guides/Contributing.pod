@@ -81,7 +81,8 @@ channel C<#mojo> on C<irc.perl.org>.
 
 The following mission statement and rules are the foundation of all L<Mojo>
 and L<Mojolicious> development. Please make sure that your contribution
-aligns well with them before sending a pull request.
+aligns well with them before sending a
+L<pull request|https://help.github.com/articles/using-pull-requests>.
 
 =head2 Mission statement
 

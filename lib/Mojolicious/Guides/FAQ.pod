@@ -27,11 +27,11 @@ foundation for more advanced ones in the future.
 
 We are optimizing L<Mojolicious> for user-friendliness and development speed,
 without compromises. While there are no rules in
-L<Mojolicious::Guides::CodingGuidelines> that forbid dependencies, we do
-currently discourage adding non-optional ones in favor of a faster and more
-painless installation process. And we do in fact already use several optional
-CPAN modules such as L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and L<Plack>
-to provide advanced functionality if they are installed.
+L<Mojolicious::Guides::Contributing> that forbid dependencies, we do currently
+discourage adding non-optional ones in favor of a faster and more painless
+installation process. And we do in fact already use several optional CPAN
+modules such as L<EV>, L<IO::Socket::IP>, L<IO::Socket::SSL> and L<Plack> to
+provide advanced functionality if they are installed.
 
 =head2 Why reinvent wheels?
 
@@ -42,7 +42,7 @@ quest is to develop the best possible solutions for these two criteria.
 
 =head2 What about backwards compatibility?
 
-In conformance with L<Mojolicious::Guides::CodingGuidelines>, we will always
+In conformance with L<Mojolicious::Guides::Contributing>, we will always
 deprecate a feature before removing or changing it in incompatible ways
 between major releases. New features can however be marked as experimental to
 explicitly exclude them from these rules. This gives us the necessary freedom
@@ -56,19 +56,6 @@ Because there are no advantages, it drastically increases maintenance costs
 and installation times without giving us anything in return. It would only
 make sense if we wanted to pass ownership of a module to a new maintainer,
 which we already have done in the past.
-
-=head2 Can you add feature XY to the core distribution?
-
-Probably not. While the L<Mojolicious> distribution covers a wide range of
-features, we are rather conservative when it comes to adding new ones. The
-most important criteria are outlined in
-L<Mojolicious::Guides::CodingGuidelines>. But don't let this discourage you,
-it doesn't hurt to open a
-L<GitHub issue|https://github.com/kraih/mojo/issues> and ask, just be prepared
-that it might not pass the vote. To increase the chances you should also
-discuss and refine ideas on the
-L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>.
 
 =head2 What does the error "Maximum message size exceeded" mean?
 
@@ -139,27 +126,10 @@ new connections) can prevent this, and will force the affected worker to be
 restarted after a timeout. This C<heartbeat_timeout> defaults to C<20> seconds
 and can be extended if your application requires it.
 
-=head2 I think I have found a bug, what should I do now?
-
-First make sure you are using the latest version of L<Mojolicious>, it is
-quite likely that the bug has already been fixed. If that doesn't help,
-prepare a test case demonstrating the bug, you are not expected to fix it
-yourself, but you'll have to make sure the developers can replicate your
-problem. Sending in your whole application generally does more harm than good,
-the C<t> directory of this distribution has many good examples for how to do
-it right. Writing a test is usually the hardest part of fixing a bug, so the
-better your test case the faster it can be fixed. ;)
-
-Once that's done you can contact the developers via
-L<GitHub issue|https://github.com/kraih/mojo/issues>.
-
-If you decide to fix the bug yourself, make sure to also take a look at
-L<Mojolicious::Guides::CodingGuidelines>.
-
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the
-Mojolicious wiki L<http://github.com/kraih/mojo/wiki>, which contains a lot
+Mojolicious L<wiki|http://github.com/kraih/mojo/wiki>, which contains a lot
 more documentation and examples by many different authors.
 
 =cut

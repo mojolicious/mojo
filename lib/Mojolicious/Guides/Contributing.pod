@@ -1,0 +1,181 @@
+
+=head1 NAME
+
+Mojolicious::Guides::Contributing - Contributing to Mojolicious
+
+=head1 OVERVIEW
+
+There are many ways to contribute to L<Mojolicious>, this guide will show you
+a few of them.
+
+=head1 REPORTING BUGS
+
+We use the L<GitHub issue tracker|https://github.com/kraih/mojo/issues>, so
+you'll need to create a (free) GitHub account to be able to submit issues,
+comments and pull requests.
+
+First of all, make sure you are using the latest version of L<Mojolicious>, it
+is quite likely that your bug has already been fixed. If that doesn't help,
+take a look at the list of currently open issues, perhaps it has already been
+reported by someone else and you can add a comment confirming it.
+
+If it hasn't been reported yet, try to prepare a test case demonstrating the
+bug, you are not expected to fix it yourself, but you'll have to make sure the
+developers can replicate your problem. Sending in your whole application
+generally does more harm than good, the C<t> directory of this distribution
+has many good examples for how to do it right. Writing a test is usually the
+hardest part of fixing a bug, so the better your test case the faster it can
+be fixed. ;)
+
+And don't forget to add a descriptive title and text when you create a new
+issue.
+
+=head2 Reporting security issues
+
+Please report security issues directly to the CPAN email address of the
+pumpking, which is currently C<sri@cpan.org>, and give us a few days to
+develop and release a proper fix.
+
+=head2 Feature requests
+
+Please do not open GitHub issues for feature requests, if there's something
+you would like to see in a future version of L<Mojolicious>, you have to write
+the code yourself.
+
+If you're looking for feedback on your ideas, you're welcome to discuss them
+on the L<mailing-list|http://groups.google.com/group/mojolicious> or the
+official IRC channel C<#mojo> on C<irc.perl.org>.
+
+=head1 RESOLVING ISSUES
+
+There are many ways for you to help us resolve existing issues on the
+L<GitHub issue tracker|https://github.com/kraih/mojo/issues>. Can you
+replicate the problem on your computer? Add a comment saying that you're
+seeing the same. Perhaps you can provide additional information that will make
+it easier for others to replicate the problem too, maybe even contribute a
+better test case.
+
+And for all code contributions we very much appreciate additional testing and
+code review, just add a comment to show your approval or point out flaws that
+need to be addressed.
+
+=head1 CONTRIBUTING DOCUMENTATION
+
+One of the easiest ways to contribute to L<Mojolicious> is through
+documentation improvements. While the L<Mojolicious::Guides> are carefully
+curated by the core team, everybody with a (free) GitHub account can make
+changes and additions to the Mojolicious
+L<wiki|http://github.com/kraih/mojo/wiki>.
+
+=head1 CONTRIBUTING CODE
+
+All code contributions should be sent via
+L<GitHub issue tracker|https://github.com/kraih/mojo/issues> as pull requests.
+
+While the L<Mojolicious> distribution covers a wide range of features, we are
+rather conservative when it comes to adding new ones. So if your contribution
+is not a bugfix, you can drastically increase its chances of getting accepted
+by discussing it in advance on the
+L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
+channel C<#mojo> on C<irc.perl.org>.
+
+The following mission statement and rules are the foundation of all L<Mojo>
+and L<Mojolicious> development. Please make sure that your contribution
+aligns well with them before sending a pull request.
+
+=head2 Mission statement
+
+L<Mojo> is a runtime environment for Perl real-time web frameworks. It
+provides all the basic tools and helpers needed to write simple web
+applications and higher level web frameworks, such as L<Mojolicious>.
+
+All components should be reusable in other projects, and in a UNIXish way only
+loosely coupled.
+
+Especially for people new to Perl it should be as easy as possible to install
+Mojolicious and get started. Writing web applications can be one of the most
+fun ways to learn a language!
+
+For developers of other web frameworks, it should be possible to reuse all the
+infrastructure and just consider the higher levels of the L<Mojolicious>
+distribution an example application.
+
+=head2 Rules
+
+=over 2
+
+Web development should be easy and fun, this is what we optimize for.
+
+The web is a moving target, to stay relevant we have to stay in motion too.
+
+Keep it simple, no magic unless absolutely necessary.
+
+The installation process should be as fast and painless as possible. (Less
+than a minute on most common hardware is a good rule of thumb)
+
+The addition and modification of features is decided by majority vote or the
+pumpking.
+
+Any core developer may nominate a new one, who must then be accepted by a 2/3
+majority vote.
+
+The pumpking has veto rights and may select his successor.
+
+It's not a feature without a test and documentation.
+
+A feature is only needed when the majority of the userbase benefits from it.
+
+Features may only be changed in a major release or after being deprecated for
+at least 3 months.
+
+Refactoring and deprecations should be avoided if no important feature depends
+on it.
+
+New features can be marked as experimental to be excluded from deprecation
+policies.
+
+A major release is signaled by a new major version number and a unique code
+name based on a Unicode character.
+
+Only add dependencies if absolutely necessary and make them optional if
+possible.
+
+Domain specific languages should be avoided in favor of Perl-ish solutions.
+
+No inline POD.
+
+Documentation belongs to the guides, module POD is just an API reference.
+
+The main focus of the included documentation should be on examples, no walls
+of text. (An example for every one or two sentences is a good rule of thumb)
+
+Everything should be ordered alphabetically if possible.
+
+The master source code repository should always be kept in a stable state, use
+feature branches for actual development.
+
+Code has to be run through L<Perl::Tidy> with the included C<.perltidyrc>, and
+everything should look like it was written by a single person.
+
+Code should be organized in blocks and those blocks should be commented.
+
+No spaghetti code.
+
+Comments should be correctly capitalized, and funny if possible, punctuation
+is optional if it doesn't increase readability.
+
+No names outside of C<Mojolicious.pm>.
+
+No Elitism.
+
+Peace!
+
+=back
+
+=head1 MORE
+
+You can continue with L<Mojolicious::Guides> now or take a look at the
+Mojolicious L<wiki|http://github.com/kraih/mojo/wiki>, which contains a lot
+more documentation and examples by many different authors.
+
+=cut

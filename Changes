@@ -1,5 +1,7 @@
 
-3.53  2012-10-30
+3.53  2012-10-31
+  - Replaced Mojolicious::Guides::CodingGuidelines with
+    Mojolicious::Guides::Contributing.
   - Improved documentation.
   - Improved tests.
 

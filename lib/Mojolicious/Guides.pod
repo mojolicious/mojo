@@ -54,14 +54,13 @@ Generating content with the L<Mojolicious> renderer.
 
 Cooking with L<Mojolicious>, recipes for every taste.
 
+=item L<Mojolicious::Guides::Contributing>
+
+Learn how to contribute to L<Mojolicious>.
+
 =item L<Mojolicious::Guides::FAQ>
 
 Frequently asked questions with the right answers.
-
-=item L<Mojolicious::Guides::CodingGuidelines>
-
-Coding guidelines and mission statement. A must read for developers and
-contributors!
 
 =back
 
@@ -125,6 +124,6 @@ Fun oneliners using everything above.
 =head1 MORE
 
 A lot more documentation and examples by many different authors can be found
-in the Mojolicious wiki at L<http://github.com/kraih/mojo/wiki>.
+in the Mojolicious L<wiki|http://github.com/kraih/mojo/wiki>.
 
 =cut

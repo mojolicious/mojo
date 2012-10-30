@@ -17,7 +17,7 @@ comments and pull requests.
 First of all, make sure you are using the latest version of L<Mojolicious>, it
 is quite likely that your bug has already been fixed. If that doesn't help,
 take a look at the list of currently open issues, perhaps it has already been
-reported by someone else and you can add a comment confirming it.
+reported by someone else and you can just add a comment confirming it.
 
 If it hasn't been reported yet, try to prepare a test case demonstrating the
 bug, you are not expected to fix it yourself, but you'll have to make sure the
@@ -48,29 +48,30 @@ official IRC channel C<#mojo> on C<irc.perl.org>.
 
 =head1 RESOLVING ISSUES
 
-There are many ways for you to help us resolve existing issues on the
-L<GitHub issue tracker|https://github.com/kraih/mojo/issues>. Can you
-replicate the problem on your computer? Add a comment saying that you're
-seeing the same. Perhaps you can provide additional information that will make
-it easier for others to replicate the problem too, maybe even contribute a
-better test case.
+There are many ways in which you can help us resolve existing issues on the
+L<GitHub issue tracker|https://github.com/kraih/mojo/issues>.
+
+Can you replicate the problem on your computer? Add a comment saying that
+you're seeing the same. Perhaps you can provide additional information that
+will make it easier for others to replicate the problem, maybe even contribute
+a better test case.
 
 And for all code contributions we very much appreciate additional testing and
-code review, just add a comment to show your approval or point out flaws that
-need to be addressed.
+code review, just add a comment to show your approval or to point out flaws
+that need to be addressed.
 
 =head1 CONTRIBUTING DOCUMENTATION
 
 One of the easiest ways to contribute to L<Mojolicious> is through
 documentation improvements. While the L<Mojolicious::Guides> are carefully
 curated by the core team, everybody with a (free) GitHub account can make
-changes and additions to the Mojolicious
+changes and add new information to the Mojolicious
 L<wiki|http://github.com/kraih/mojo/wiki>.
 
 =head1 CONTRIBUTING CODE
 
-All code contributions should be sent via
-L<GitHub issue tracker|https://github.com/kraih/mojo/issues> as pull requests.
+All code contributions should be sent as
+L<GitHub pull requests|https://help.github.com/articles/using-pull-requests>.
 
 While the L<Mojolicious> distribution covers a wide range of features, we are
 rather conservative when it comes to adding new ones. So if your contribution
@@ -80,9 +81,8 @@ L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
 channel C<#mojo> on C<irc.perl.org>.
 
 The following mission statement and rules are the foundation of all L<Mojo>
-and L<Mojolicious> development. Please make sure that your contribution
-aligns well with them before sending a
-L<pull request|https://help.github.com/articles/using-pull-requests>.
+and L<Mojolicious> development. Please make sure that your contribution aligns
+well with them before sending a pull request.
 
 =head2 Mission statement
 

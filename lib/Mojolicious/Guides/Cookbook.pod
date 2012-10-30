@@ -1206,7 +1206,7 @@ And you can use all the commands from L<Mojolicious::Commands>.
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the
-Mojolicious L<wiki|http://github.com/kraih/mojo/wiki>, which contains a lot
+L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>, which contains a lot
 more documentation and examples by many different authors.
 
 =cut

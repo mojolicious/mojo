@@ -65,8 +65,8 @@ that need to be addressed.
 One of the easiest ways to contribute to L<Mojolicious> is through
 documentation improvements. While the L<Mojolicious::Guides> are carefully
 curated by the core team, everybody with a (free) GitHub account can make
-changes and add new information to the Mojolicious
-L<wiki|http://github.com/kraih/mojo/wiki>.
+changes and add new information to the
+L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
 
 =head1 CONTRIBUTING CODE
 
@@ -176,7 +176,7 @@ Peace!
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the
-Mojolicious L<wiki|http://github.com/kraih/mojo/wiki>, which contains a lot
+L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>, which contains a lot
 more documentation and examples by many different authors.
 
 =cut

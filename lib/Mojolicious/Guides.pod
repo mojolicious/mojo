@@ -124,6 +124,6 @@ Fun oneliners using everything above.
 =head1 MORE
 
 A lot more documentation and examples by many different authors can be found
-in the Mojolicious L<wiki|http://github.com/kraih/mojo/wiki>.
+in the L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
 
 =cut

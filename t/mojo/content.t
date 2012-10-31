@@ -55,6 +55,13 @@ is $content->build_body,
   "6\x0d\x0aHello \x0d\x0a6\x0d\x0aWorld!\x0d\x0a0\x0d\x0a\x0d\x0a",
   'right content';
 
+# Multipart boundary detection
+$content = Mojo::Content::MultiPart->new;
+$content->headers->content_type(
+  'multipart/form-data; boundary="azAZ09\'(),.:?-_+/"');
+is $content->boundary, "azAZ09\'(),.:?-_+/", 'right boundary';
+is $content->boundary, $content->build_boundary, 'same boundary';
+
 # Tainted environment
 $content = Mojo::Content::MultiPart->new;
 'a' =~ /(.)/;

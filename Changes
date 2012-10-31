@@ -1,6 +1,7 @@
 
 3.54  2012-11-01
   - Added next and previous methods to Mojo::DOM.
+  - Improved documentation.
   - Improved tests.
 
 3.53  2012-10-31

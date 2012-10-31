@@ -598,6 +598,9 @@ Find element namespace.
 
 Next sibling of element.
 
+  # "<h2>B</h2>"
+  $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h1')->next;
+
 =head2 C<parent>
 
   my $parent = $dom->parent;
@@ -636,6 +639,9 @@ Prepend to element content.
   my $sibling = $dom->previous;
 
 Previous sibling of element.
+
+  # "<h1>A</h1>"
+  $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h2')->previous;
 
 =head2 C<remove>
 

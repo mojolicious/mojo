@@ -7,7 +7,6 @@ BEGIN {
 }
 
 use Test::More;
-
 use IO::Socket::INET;
 use Mojo::Reactor::Poll;
 

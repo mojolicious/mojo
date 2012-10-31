@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-
 use Mojo::Cookie::Request;
 use Mojo::Cookie::Response;
 

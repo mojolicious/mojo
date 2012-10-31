@@ -7,7 +7,6 @@ BEGIN {
 }
 
 use Test::More;
-
 use Mojo::Message::Response;
 use Mojolicious::Lite;
 use Test::Mojo;

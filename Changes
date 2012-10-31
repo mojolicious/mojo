@@ -1,4 +1,8 @@
 
+3.54  2012-11-01
+  - Added next and previous methods to Mojo::DOM.
+  - Improved tests.
+
 3.53  2012-10-31
   - Replaced Mojolicious::Guides::CodingGuidelines with
     Mojolicious::Guides::Contributing.

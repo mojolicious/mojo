@@ -151,6 +151,8 @@ sub namespace {
   return '';
 }
 
+sub next { shift->_sibling(1) }
+
 sub parent {
   my $self = shift;
 
@@ -177,6 +179,8 @@ sub prepend_content {
     @{_parent($self->_parse("$new"), $tree)};
   return $self;
 }
+
+sub previous { shift->_sibling(0) }
 
 sub remove { shift->replace('') }
 
@@ -342,6 +346,24 @@ sub _parser {
   return $self->[0]->$method unless @_;
   $self->[0]->$method(@_);
   return $self;
+}
+
+sub _sibling {
+  my ($self, $next) = @_;
+
+  # Root
+  return undef unless my $parent = $self->parent;
+
+  # Find previous or next sibling
+  my ($candidate, $current);
+  for my $child ($parent->children->each) {
+    ++$current and next if $child->tree eq $self->tree;
+    return $next ? $child : $candidate if $current;
+    $candidate = $child;
+  }
+
+  # No siblings
+  return undef;
 }
 
 sub _text {
@@ -570,6 +592,12 @@ Find element namespace.
   # Find namespace for an element that may or may not have a namespace prefix
   my $namespace = $dom->at('svg > circle')->namespace;
 
+=head2 C<next>
+
+  my $sibling = $dom->next;
+
+Next sibling of element.
+
 =head2 C<parent>
 
   my $parent = $dom->parent;
@@ -602,6 +630,12 @@ Prepend to element content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
+
+=head2 C<previous>
+
+  my $sibling = $dom->previous;
+
+Previous sibling of element.
 
 =head2 C<remove>
 

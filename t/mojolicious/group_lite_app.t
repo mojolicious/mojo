@@ -9,7 +9,6 @@ BEGIN {
 }
 
 use Test::More;
-
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent::CookieJar;
 use Mojolicious::Lite;

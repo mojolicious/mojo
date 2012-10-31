@@ -9,7 +9,6 @@ BEGIN {
 }
 
 use Test::More;
-
 use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';

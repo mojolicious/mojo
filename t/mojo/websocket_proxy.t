@@ -7,7 +7,6 @@ BEGIN {
 }
 
 use Test::More;
-
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;

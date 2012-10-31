@@ -4,7 +4,6 @@ use Mojo::Base -strict;
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 
 use Test::More;
-
 use Cwd 'cwd';
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';

@@ -24,7 +24,6 @@ use Mojo::Base -strict;
 use utf8;
 
 use Test::More;
-
 use Mojo::Transaction::HTTP;
 use Mojo::Upload;
 use Mojolicious;

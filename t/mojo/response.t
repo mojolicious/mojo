@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;

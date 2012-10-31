@@ -11,7 +11,6 @@ BEGIN {
 }
 
 use Test::More;
-
 use ojo;
 
 # * /

@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-
 use Mojo::ByteStream 'b';
 use Mojolicious::Routes::Pattern;
 

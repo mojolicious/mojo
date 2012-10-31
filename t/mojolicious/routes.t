@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-
 use Mojolicious::Routes;
 use Mojolicious::Routes::Match;
 

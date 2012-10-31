@@ -79,7 +79,6 @@ L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 use Mojo::Base -strict;
 
 use Test::More;
-
 use Mojolicious::Lite;
 use Test::Mojo;
 

@@ -3,7 +3,6 @@ use Mojo::Base -strict;
 use utf8;
 
 use Test::More;
-
 use Mojo::URL;
 
 # Simple

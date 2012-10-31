@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-
 use Mojo::Cache;
 
 my $cache = Mojo::Cache->new(max_keys => 2);

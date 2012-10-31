@@ -10,7 +10,6 @@ BEGIN {
 }
 
 use Test::More;
-
 use Mojo::ByteStream 'b';
 use Mojo::Cookie::Response;
 use Mojo::Date;

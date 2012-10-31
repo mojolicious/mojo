@@ -7,7 +7,6 @@ BEGIN {
 }
 
 use Test::More;
-
 use Mojo::IOLoop;
 use Mojolicious::Lite;
 use Test::Mojo;

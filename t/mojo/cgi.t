@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-
 use Mojo::Message::Response;
 use Mojo::Server::CGI;
 use Mojolicious::Command::cgi;

@@ -1,7 +1,6 @@
 use Mojo::Base -strict;
 
 use Test::More;
-
 use File::Spec::Functions 'catdir';
 use FindBin;
 use Mojo::URL;

@@ -3,7 +3,6 @@ use Mojo::Base -strict;
 use utf8;
 
 use Test::More;
-
 use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
 use Mojo::Content::Single;

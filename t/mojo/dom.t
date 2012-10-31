@@ -650,6 +650,10 @@ is_deeply \@div, [qw(A C)], 'found all div elements with the right atributes';
 $dom->find('div[foo^="b"][foo$="r"]')->each(sub { push @div, shift->text });
 is_deeply \@div, [qw(A B C)],
   'found all div elements with the right atributes';
+is $dom->at('[foo="bar"]')->previous, undef, 'no previous sibling';
+is $dom->at('[foo="bar"]')->next->text, 'B', 'right text';
+is $dom->at('[foo="bar"]')->next->previous->text, 'A', 'right text';
+is $dom->at('[foo="bar"]')->next->next->next->next, undef, 'no next sibling';
 
 # Pseudo classes
 $dom = Mojo::DOM->new->parse(<<EOF);

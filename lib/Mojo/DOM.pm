@@ -355,11 +355,11 @@ sub _sibling {
   return undef unless my $parent = $self->parent;
 
   # Find previous or next sibling
-  my ($candidate, $current);
+  my ($previous, $current);
   for my $child ($parent->children->each) {
     ++$current and next if $child->tree eq $self->tree;
-    return $next ? $child : $candidate if $current;
-    $candidate = $child;
+    return $next ? $child : $previous if $current;
+    $previous = $child;
   }
 
   # No siblings

@@ -5,8 +5,8 @@ Mojolicious::Guides::FAQ - Frequently Asked Questions
 
 =head1 OVERVIEW
 
-This document contains the most frequently asked questions about
-L<Mojolicious> together with the right answers.
+This document contains answers for the most frequently asked questions about
+L<Mojolicious>.
 
 =head1 QUESTIONS
 

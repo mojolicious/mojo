@@ -56,11 +56,11 @@ Cooking with L<Mojolicious>, recipes for every taste.
 
 =item L<Mojolicious::Guides::Contributing>
 
-Learn how to contribute to L<Mojolicious>.
+Become a part of the ongoing L<Mojolicious> development.
 
 =item L<Mojolicious::Guides::FAQ>
 
-Frequently asked questions with the right answers.
+Answers to the most frequently asked questions.
 
 =back
 

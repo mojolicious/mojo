@@ -8,6 +8,7 @@ BEGIN {
 
 use Test::More;
 use Mojo::IOLoop::Server;
+
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
 plan skip_all => 'IO::Socket::IP 0.16 required for this test!'

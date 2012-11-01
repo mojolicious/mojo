@@ -7,6 +7,7 @@ BEGIN {
 }
 
 use Test::More;
+
 plan skip_all => 'set TEST_CACHING to enable this test (developer only!)'
   unless $ENV{TEST_CACHING};
 

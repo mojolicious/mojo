@@ -237,6 +237,9 @@ $t->get_ok('/x/♥/url/☃')->status_is(200)
 # GET /y/1 (full secondary external application)
 $t->get_ok('/y/1')->status_is(200)->content_is("works 4!\nInsecure too!");
 
+# GET /y/1/2 (full secondary external application)
+$t->get_ok('/y/1/2')->status_is(404);
+
 # GET /y/♥ (full secondary external application)
 $t->get_ok('/y/♥')->status_is(200)->content_is("works 3!\nInsecure too!");
 

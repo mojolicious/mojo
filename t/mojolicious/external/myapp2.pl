@@ -1,9 +1,16 @@
 #!/usr/bin/env perl
 
 use Mojolicious::Lite;
+use Mojo::IOLoop;
 
 # Default for config file tests
 app->defaults(secret => 'Insecure too!');
+
+# Delay dispatching
+hook around_dispatch => sub {
+  my ($next, $c) = @_;
+  Mojo::IOLoop->timer(0 => sub { $next->() });
+};
 
 # GET /
 get '/' => sub {

@@ -57,6 +57,9 @@ get '/one' => sub { shift->render_text('One') };
 # GET /one/two
 get '/one/two' => {text => 'Two'};
 
+# GET /template/*
+get '/template/:template';
+
 app->start;
 __DATA__
 

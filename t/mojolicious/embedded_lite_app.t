@@ -210,6 +210,13 @@ $t->get_ok('/x/1/stream')->status_is(200)->content_is('hello!');
 $t->get_ok('/x/1/url/☃')->status_is(200)
   ->content_is('/x/1/url/%E2%98%83 -> /x/1/%E2%98%83/stream!');
 
+# GET /x/1/template/menubar (full external application)
+$t->get_ok('/x/1/template/menubar')->status_is(200)
+  ->content_is("works ♥!Insecure!Insecure!\n");
+
+# GET /x/1/template/does_not_exist (full external application)
+$t->get_ok('/x/1/template/does_not_exist')->status_is(404);
+
 # GET /x/♥/ (full external application)
 $t->get_ok('/x/♥/')->status_is(200)->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
@@ -234,6 +241,13 @@ $t->get_ok('/x/♥/stream')->status_is(200)->content_is('hello!');
 $t->get_ok('/x/♥/url/☃')->status_is(200)
   ->content_is('/x/%E2%99%A5/url/%E2%98%83 -> /x/%E2%99%A5/%E2%98%83/stream!');
 
+# GET /x/♥/template/menubar (full external application)
+$t->get_ok('/x/♥/template/menubar')->status_is(200)
+  ->content_is("works ♥!Insecure!Insecure!\n");
+
+# GET /x/♥/template/does_not_exist (full external application)
+$t->get_ok('/x/♥/template/does_not_exist')->status_is(404);
+
 # GET /y/1 (full secondary external application)
 $t->get_ok('/y/1')->status_is(200)->content_is("works 4!\nInsecure too!");
 
@@ -242,6 +256,9 @@ $t->get_ok('/y/1/2')->status_is(404);
 
 # GET /y/♥ (full secondary external application)
 $t->get_ok('/y/♥')->status_is(200)->content_is("works 3!\nInsecure too!");
+
+# GET /y/♥/2 (full secondary external application)
+$t->get_ok('/y/♥/2')->status_is(404);
 
 # GET /host (main application)
 $t->get_ok('/host')->status_is(200)->content_is('main application!');

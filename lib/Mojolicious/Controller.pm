@@ -842,8 +842,8 @@ timeout, which usually defaults to C<15> seconds.
   $c          = $c->session(foo => 'bar');
 
 Persistent data storage, all session data gets serialized with L<Mojo::JSON>
-and stored in C<HMAC-SHA1> signed cookies. Note that cookies usually have a
-4096 byte limit, depending on browser.
+and stored C<Base64> encoded in C<HMAC-SHA1> signed cookies. Note that cookies
+usually have a 4096 byte limit, depending on browser.
 
   # Manipulate session
   $c->session->{foo} = 'bar';

@@ -112,8 +112,9 @@ ids were exchanged between browser and web server in the form of cookies.
   Set-Cookie: session=hmac-sha1(base64(json($session)))
 
 In L<Mojolicious> however we are taking this concept one step further by
-storing everything in C<HMAC-SHA1> signed cookies, which is more compatible
-with the REST philosophy and reduces infrastructure requirements.
+storing everything C<JSON> serialized and C<Base64> encoded in C<HMAC-SHA1>
+signed cookies, which is more compatible with the REST philosophy and reduces
+infrastructure requirements.
 
 =head2 Test Driven Development
 

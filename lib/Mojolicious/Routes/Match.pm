@@ -187,7 +187,7 @@ The routes endpoint that actually matched.
   my $root = $m->root;
   $m       = $m->root($routes);
 
-The root of the routes tree.
+The root of the route tree.
 
 =head2 C<stack>
 
@@ -212,7 +212,7 @@ Construct a new match object.
 
   $m->match(Mojolicious::Routes->new, Mojolicious::Controller->new);
 
-Match against a routes tree.
+Match against a route tree.
 
 =head2 C<path_for>
 

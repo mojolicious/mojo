@@ -225,7 +225,7 @@ Mojolicious::Routes - Always find your destination with routes!
 
   use Mojolicious::Routes;
 
-  # New routes tree
+  # New route tree
   my $r = Mojolicious::Routes->new;
 
   # Normal route matching "/articles" with parameters "controller" and

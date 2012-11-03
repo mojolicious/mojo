@@ -60,7 +60,7 @@ sub render {
   my ($self, $c, $args) = @_;
   $args ||= {};
 
-  # Localize extends and layout
+  # Localize "extends" and "layout"
   my $partial = $args->{partial};
   my $stash   = $c->stash;
   local $stash->{layout}  = $partial ? undef : $stash->{layout};

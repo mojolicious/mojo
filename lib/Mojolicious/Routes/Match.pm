@@ -146,6 +146,7 @@ Mojolicious::Routes::Match - Routes visitor
 
 =head1 SYNOPSIS
 
+  use Mojolicious::Controller;
   use Mojolicious::Routes;
   use Mojolicious::Routes::Match;
 
@@ -155,8 +156,9 @@ Mojolicious::Routes::Match - Routes visitor
   $r->put('/bar')->to(action => 'bar');
 
   # Match
+  my $c = Mojolicious::Controller->new;
   my $m = Mojolicious::Routes::Match->new(PUT => '/bar');
-  $m->match($r);
+  $m->match($r, $c);
   say $m->captures->{action};
 
 =head1 DESCRIPTION

@@ -109,7 +109,7 @@ Traditionally all session data was stored on the server-side and only session
 ids were exchanged between browser and web server in the form of cookies.
 
   HTTP/1.1 200 OK
-  Set-Cookie: session=base64(hmac-sha1(json($session)))
+  Set-Cookie: session=hmac-sha1(base64(json($session)))
 
 In L<Mojolicious> however we are taking this concept one step further by
 storing everything in C<HMAC-SHA1> signed cookies, which is more compatible

@@ -182,7 +182,7 @@ Captured parameters.
   my $endpoint = $m->endpoint;
   $m           = $m->endpoint(Mojolicious::Routes->new);
 
-The routes endpoint that actually matched.
+The route endpoint that actually matched.
 
 =head2 C<root>
 
@@ -208,7 +208,7 @@ implements the following ones.
   my $m = Mojolicious::Routes::Match->new(GET => '/foo');
   my $m = Mojolicious::Routes::Match->new(GET => '/foo', $ws);
 
-Construct a new match object.
+Construct a new L<Mojolicious::Routes::Match> object.
 
 =head2 C<match>
 

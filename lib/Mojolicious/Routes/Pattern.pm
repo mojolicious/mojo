@@ -371,7 +371,7 @@ implements the following ones.
     = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
   my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
 
-Construct a new pattern object.
+Construct a new L<Mojolicious::Routes::Pattern> object.
 
 =head2 C<match>
 

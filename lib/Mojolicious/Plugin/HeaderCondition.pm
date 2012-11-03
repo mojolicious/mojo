@@ -66,7 +66,7 @@ Mojolicious::Plugin::HeaderCondition - Header condition plugin
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Plugin::HeaderCondition> is a routes condition for header based
+L<Mojolicious::Plugin::HeaderCondition> is a route condition for header based
 routes.
 
 This is a core plugin, that means it is always enabled and its code a good

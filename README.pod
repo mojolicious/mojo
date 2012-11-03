@@ -39,8 +39,8 @@ IDNA, Comet (long polling), chunking and multipart support.
 
 =item *
 
-Built-in non-blocking I/O web server supporting libev and hot deployment,
-perfect for embedding.
+Built-in non-blocking I/O web server, supporting multiple event loops and hot
+deployment, perfect for embedding.
 
 =item *
 

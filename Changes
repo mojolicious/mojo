@@ -1,8 +1,9 @@
 
-3.55  2012-11-02
+3.55  2012-11-03
+  - Improved documentation.
   - Improved tests.
-  - Fixed embedded application bug that prevented around_dispatch hook from
-    working correctly.
+  - Fixed bug that prevented around_dispatch hooks from working correctly in
+    embedded applications.
 
 3.54  2012-11-01
   - Added next and previous methods to Mojo::DOM.

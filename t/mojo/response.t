@@ -336,6 +336,25 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
     'right "Content-Type" value';
 }
 
+# Parse HTTP 1.1 gzip compressed response (garbage bytes exceeding limit)
+{
+  local $ENV{MOJO_MAX_BUFFER_SIZE} = 12;
+  $res = Mojo::Message::Response->new;
+  is $res->content->max_buffer_size, 12, 'right size';
+  $res->parse("HTTP/1.1 200 OK\x0d\x0a");
+  $res->parse("Content-Length: 1000\x0d\x0a");
+  $res->parse("Content-Encoding: gzip\x0d\x0a\x0d\x0a");
+  $res->parse('a' x 5);
+  $res->parse('a' x 995);
+  ok $res->is_finished, 'response is finished';
+  ok $res->content->is_finished, 'content is finished';
+  is(($res->error)[0], 'Maximum buffer size exceeded', 'right error');
+  is(($res->error)[1], 400, 'right status');
+  is $res->code,    200,   'right status';
+  is $res->message, 'OK',  'right message';
+  is $res->version, '1.1', 'right version';
+}
+
 # Parse HTTP 1.1 chunked response
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 500 Internal Server Error\x0d\x0a");

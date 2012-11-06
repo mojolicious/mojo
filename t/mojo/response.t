@@ -446,7 +446,7 @@ $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a");
 $res->parse("Content-Length: @{[length $compressed]}\x0d\x0a");
-$res->parse("Content-Encoding: gzip\x0d\x0a\x0d\x0a");
+$res->parse("Content-Encoding: GZip\x0d\x0a\x0d\x0a");
 ok $res->content->is_compressed, 'content is compressed';
 is $res->content->progress, 0, 'right progress';
 $res->parse(substr $compressed, 0, 1);

@@ -72,9 +72,9 @@ sub has_leftovers { !!length shift->leftovers }
 
 sub header_size { length shift->build_headers }
 
-sub is_chunked { (shift->headers->transfer_encoding || '') =~ /chunked/i }
+sub is_chunked { !!shift->headers->transfer_encoding }
 
-sub is_compressed { (shift->headers->content_encoding || '') eq 'gzip' }
+sub is_compressed { (shift->headers->content_encoding || '') =~ /^gzip$/i }
 
 sub is_dynamic {
   my $self = shift;
@@ -291,11 +291,7 @@ sub _parse_chunked_trailing_headers {
   $self->{chunk_state} = 'finished';
 
   # Replace Transfer-Encoding with Content-Length
-  my $encoding = $headers->transfer_encoding;
-  $encoding =~ s/,?\s*chunked//ig;
-  $encoding
-    ? $headers->transfer_encoding($encoding)
-    : $headers->remove('Transfer-Encoding');
+  $headers->remove('Transfer-Encoding');
   $headers->content_length($self->{real_size}) unless $headers->content_length;
 }
 

@@ -612,7 +612,7 @@ is $req->param('test23'), undef, 'no value';
 $req = Mojo::Message::Request->new;
 $req->parse("POST /foo/bar/baz.html?foo=13&bar=23#23 HTTP/1.1\x0d\x0a");
 $req->parse("Content-Type: text/plain\x0d\x0a");
-$req->parse("Transfer-Encoding: chunked\x0d\x0a");
+$req->parse("Transfer-Encoding: whatever\x0d\x0a");
 $req->parse("Trailer: X-Trailer1; X-Trailer2\x0d\x0a\x0d\x0a");
 $req->parse("4\x0d\x0a");
 $req->parse("abcd\x0d\x0a");

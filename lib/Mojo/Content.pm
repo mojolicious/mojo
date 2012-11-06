@@ -106,7 +106,7 @@ sub parse {
     $self->{state} = 'finished' if ($self->{chunk_state} // '') eq 'finished';
   }
 
-  # Not chunked, pass through to decompressor
+  # Not chunked, pass through to second buffer
   else {
     $self->{real_size} += length $self->{pre_buffer};
     my $limit = $self->is_finished

@@ -353,6 +353,7 @@ is $res->headers->content_length, undef, 'right "Content-Length" value';
   is $res->code,    200,   'right status';
   is $res->message, 'OK',  'right message';
   is $res->version, '1.1', 'right version';
+  is $res->body,    '',    'no content';
 }
 
 # Parse HTTP 1.1 chunked response

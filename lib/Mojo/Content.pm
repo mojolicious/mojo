@@ -296,7 +296,7 @@ sub _parse_chunked_trailing_headers {
   $encoding
     ? $headers->transfer_encoding($encoding)
     : $headers->remove('Transfer-Encoding');
-  $headers->content_length($self->{real_size});
+  $headers->content_length($self->{real_size}) unless $headers->content_length;
 }
 
 sub _parse_headers {
@@ -348,7 +348,7 @@ sub _uncompress {
   $self->emit(read => $out) if defined $out;
 
   # Replace Content-Encoding with Content-Length
-  $self->headers->content_length($gz->total_out)->remove('Transfer-Encoding')
+  $self->headers->content_length($gz->total_out)->remove('Content-Encoding')
     if $status == Z_STREAM_END;
 
   # Check buffer size

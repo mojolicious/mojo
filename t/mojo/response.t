@@ -372,6 +372,7 @@ is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.1', 'right version';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 13,           'right "Content-Length" value';
+is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $res->body_size, 13, 'right size';
 
 # Parse HTTP 1.1 multipart response
@@ -451,6 +452,35 @@ is $res->version, '1.1', 'right version';
 is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, length($uncompressed),
   'right "Content-Length" value';
+is $res->headers->content_encoding, undef, 'no "Content-Encoding" value';
+is $res->body, $uncompressed, 'right content';
+
+# Parse HTTP 1.1 chunked gzip compressed response
+$compressed = undef;
+gzip \($uncompressed = 'abc' x 1000), \$compressed;
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200 OK\x0d\x0a");
+$res->parse("Content-Type: text/plain\x0d\x0a");
+$res->parse("Content-Encoding: gzip\x0d\x0a");
+$res->parse("Transfer-Encoding: chunked\x0d\x0a\x0d\x0a");
+$res->parse("1\x0d\x0a");
+$res->parse(substr($compressed, 0, 1));
+$res->parse("\x0d\x0a");
+$res->parse(sprintf('%x', length($compressed) - 1));
+$res->parse("\x0d\x0a");
+$res->parse(substr($compressed, 1, length($compressed) - 1));
+$res->parse("\x0d\x0a");
+$res->parse("0\x0d\x0a\x0d\x0a");
+ok $res->is_finished, 'response is finished';
+ok !$res->error, 'no error';
+is $res->code,    200,   'right status';
+is $res->message, 'OK',  'right message';
+is $res->version, '1.1', 'right version';
+is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, length($uncompressed),
+  'right "Content-Length" value';
+is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
+is $res->headers->content_encoding,  undef, 'no "Content-Encoding" value';
 is $res->body, $uncompressed, 'right content';
 
 # Build HTTP 1.1 response start line with minimal headers

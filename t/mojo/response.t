@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use IO::Compress::Gzip 'gzip';
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
@@ -412,6 +413,25 @@ ok $res->headers->content_type =~ m!multipart/form-data!,
   'right "Content-Type" value';
 isa_ok $res->content, 'Mojo::Content::Single', 'right content';
 like $res->content->asset->slurp, qr/hallo welt/, 'right content';
+
+# Parse HTTP 1.1 gzip compressed response
+gzip \(my $uncompressed = 'abc' x 1000), \my $compressed;
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200 OK\x0d\x0a");
+$res->parse("Content-Type: text/plain\x0d\x0a");
+$res->parse("Content-Length: @{[length $compressed]}\x0d\x0a");
+$res->parse("Content-Encoding: gzip\x0d\x0a\x0d\x0a");
+$res->parse(substr $compressed, 0, 1);
+$res->parse(substr $compressed, 1, length($compressed));
+ok $res->is_finished, 'response is finished';
+ok !$res->error, 'no error';
+is $res->code,    200,   'right status';
+is $res->message, 'OK',  'right message';
+is $res->version, '1.1', 'right version';
+is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $res->headers->content_length, length($uncompressed),
+  'right "Content-Length" value';
+is $res->body, $uncompressed, 'right content';
 
 # Build HTTP 1.1 response start line with minimal headers
 $res = Mojo::Message::Response->new;

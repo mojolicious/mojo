@@ -1,5 +1,5 @@
 
-3.55  2012-11-06
+3.55  2012-11-07
   - Added gzip support to Mojo::UserAgent.
   - Added is_compressed method to Mojo::Content.
   - Improved documentation.

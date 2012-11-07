@@ -7,6 +7,7 @@ BEGIN {
 }
 
 use Test::More;
+use IO::Compress::Gzip 'gzip';
 use Mojo::IOLoop;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
@@ -40,7 +41,9 @@ get '/no_content' => {text => 'fail!', status => 204};
 # GET /echo
 get '/echo' => sub {
   my $self = shift;
-  $self->render_data($self->req->body);
+  gzip \(my $uncompressed = $self->req->body), \my $compressed;
+  $self->res->headers->content_encoding($self->req->headers->accept_encoding);
+  $self->render_data($compressed);
 };
 
 # POST /echo
@@ -353,7 +356,7 @@ like $res, qr|^HTTP/.*200 OK.*works!$|s, 'right response';
 $ua->unsubscribe(start => $start);
 ok !$ua->has_subscribers('start'), 'unsubscribed successfully';
 
-# GET /echo (stream with drain callback)
+# GET /echo (stream with drain callback and compressed response)
 $tx = $ua->build_tx(GET => '/echo');
 my $i = 0;
 my ($stream, $drain);

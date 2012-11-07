@@ -62,6 +62,8 @@ All you need is a oneliner, it takes less than a minute.
 
   $ curl get.mojolicio.us | sh
 
+We recommend the use of a L<Perlbrew|http://perlbrew.pl> environment.
+
 =head2 Getting Started
 
 These three lines are a whole web application.

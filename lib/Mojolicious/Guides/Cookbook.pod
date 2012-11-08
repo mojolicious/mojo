@@ -937,29 +937,24 @@ can keep many parallel connections active at the same time.
   # Crawler
   sub crawl {
 
-    # Dequeue or wait 2 seconds for more URLs
+    # Dequeue URL or wait 2 seconds for more
     return Mojo::IOLoop->timer(2 => \&crawl) unless my $url = shift @urls;
 
     # Fetch non-blocking just by adding a callback
     $ua->get($url => sub {
       my ($ua, $tx) = @_;
 
-      # Extract URLs
+      # Extract and enqueue URLs
       say $url;
       for my $e ($tx->res->dom('a[href]')->each) {
-
-        # Build absolute URL
-        my $url = Mojo::URL->new($e->{href})->to_abs($tx->req->url);
-        say " -> $url";
-
-        # Enqueue
-        push @urls, $url;
+        push @urls, Mojo::URL->new($e->{href})->to_abs($tx->req->url);
+        say " -> $urls[-1]";
       }
 
       # Next
       crawl();
     });
-  };
+  }
 
   # Start a bunch of parallel crawlers sharing the same user agent
   crawl() for 1 .. 3;

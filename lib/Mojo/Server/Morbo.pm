@@ -112,7 +112,8 @@ Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
 
 L<Mojo::Server::Morbo> is a full featured, self-restart capable non-blocking
 I/O HTTP and WebSocket server, built around the very well tested and reliable
-L<Mojo::Server::Daemon>, with C<IPv6>, C<TLS> and multiple event loop support.
+L<Mojo::Server::Daemon>, with C<IPv6>, C<TLS>, C<Comet> (long polling) and
+multiple event loop support.
 
 To start applications with it you can use the L<morbo> script.
 

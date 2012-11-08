@@ -290,8 +290,8 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP and WebSocket server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured, highly portable non-blocking I/O
-HTTP and WebSocket server, with C<IPv6>, C<TLS> and multiple event loop
-support.
+HTTP and WebSocket server, with C<IPv6>, C<TLS>, C<Comet> (long polling) and
+multiple event loop support.
 
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently through

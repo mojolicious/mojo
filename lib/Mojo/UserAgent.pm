@@ -608,7 +608,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 =head1 DESCRIPTION
 
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
-agent, with C<IPv6>, C<TLS> and multiple event loop support.
+agent, with C<IPv6>, C<TLS>, C<SNI>, C<IDNA>, C<Comet> (long polling), C<gzip>
+compression and multiple event loop support.
 
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently through

@@ -938,8 +938,7 @@ can keep many parallel connections active at the same time.
   sub crawl {
 
     # Dequeue or wait 2 seconds for more URLs
-    return Mojo::IOLoop->timer(2 => sub { crawl() })
-      unless my $url = shift @urls;
+    return Mojo::IOLoop->timer(2 => \&crawl) unless my $url = shift @urls;
 
     # Fetch non-blocking just by adding a callback
     $ua->get($url => sub {
@@ -947,8 +946,7 @@ can keep many parallel connections active at the same time.
 
       # Extract URLs
       say $url;
-      $tx->res->dom('a[href]')->each(sub {
-        my $e = shift;
+      for my $e ($tx->res->dom('a[href]')->each) {
 
         # Build absolute URL
         my $url = Mojo::URL->new($e->{href})->to_abs($tx->req->url);
@@ -956,7 +954,7 @@ can keep many parallel connections active at the same time.
 
         # Enqueue
         push @urls, $url;
-      });
+      };
 
       # Next
       crawl();

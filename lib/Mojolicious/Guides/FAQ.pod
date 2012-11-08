@@ -77,9 +77,9 @@ C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
 
 This protection mechanism is very similar to those mentioned in the two
 previous answers. It limits how much content the HTTP parser is allowed to
-buffer when parsing chunked and multipart messages. This limit is around
-C<256KB> by default, you can use the C<MOJO_MAX_BUFFER_SIZE> environment
-variable to change this value.
+buffer when parsing chunked, compressed and multipart messages. This limit is
+around C<256KB> by default, you can use the C<MOJO_MAX_BUFFER_SIZE>
+environment variable to change this value.
 
 =head2 What does the error "EV does not work with ithreads" mean?
 

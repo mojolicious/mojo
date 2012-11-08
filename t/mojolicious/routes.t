@@ -193,6 +193,7 @@ is $second->render('', {}), '/target/second', 'right result';
 my $c = Mojolicious::Controller->new;
 my $m = Mojolicious::Routes::Match->new(GET => '/clean');
 $m->match($r, $c);
+is $m->endpoint->name, 'very_clean', 'right name';
 is $m->stack->[0]{clean},     1,     'right value';
 is $m->stack->[0]{something}, undef, 'no value';
 is $m->path_for, '/clean', 'right path';

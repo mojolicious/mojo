@@ -35,7 +35,8 @@ they are installed).
 =item *
 
 Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,
-IDNA, Comet (long polling), chunking and multipart support.
+SNI, IDNA, Comet (long polling), gzip compression, chunking and multipart
+support.
 
 =item *
 

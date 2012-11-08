@@ -925,47 +925,58 @@ high latency tasks like web crawling this can be extremely useful, because you
 can keep many parallel connections active at the same time.
 
   use Mojo::UserAgent;
-  use Mojo::IOLoop;
-  use Mojo::URL;
 
   # FIFO queue
-  my @urls = ('google.com');
+  my @queue = (my $entry = Mojo::URL->new('http://localhost/manual'));
+
+  # Seen links counters
+  my %links;
 
   # User agent following up to 5 redirects
   my $ua = Mojo::UserAgent->new(max_redirects => 5);
 
   # Crawler
-  sub crawl {
-    my $id = shift;
+  my $active = 0;
+  my $crawl; $crawl = sub {
+    # Dequeue
+    if (my $url = shift @queue) {
+      # Fetch non-blocking just by adding a callback
+      ++$active;
+      $ua->get($url => sub {
+        my ($ua, $tx) = @_;
 
-    # Dequeue or wait 2 seconds for more URLs
-    return Mojo::IOLoop->timer(2 => sub { crawl($id) })
-      unless my $url = shift @urls;
+        # Extract URLs
+        say "[$active] $url";
+        $tx->res->dom('a[href]')->each(sub {
+          my $e = shift;
 
-    # Fetch non-blocking just by adding a callback
-    $ua->get($url => sub {
-      my ($ua, $tx) = @_;
+          # Build absolute URL and remove fragment
+          my $url = Mojo::URL->new($e->{href})->to_abs($tx->req->url);
+          $url->fragment(undef);
 
-      # Extract URLs
-      say "[$id] $url";
-      $tx->res->dom('a[href]')->each(sub {
-        my $e = shift;
+          # Constraint our crawler
+          if (not exists $links{$url} and lc $entry->host eq lc $url->host) {
+            say " -> $url";
 
-        # Build absolute URL
-        my $url = Mojo::URL->new($e->{href})->to_abs($tx->req->url);
-        say " -> $url";
+            # Enqueue
+            push @queue, $url;
+            ++$links{$url};
+          }
+        });
 
-        # Enqueue
-        push @urls, $url;
+        # Spawn  up to 4 parallel crawlers
+        $crawl->() for $active-- .. 4;
       });
-
-      # Next
-      crawl($id);
-    });
+    }
+    # No more URLs in the queue
+    else {
+      # All requests finished
+      Mojo::IOLoop->stop unless $active;
+    }
   };
 
-  # Start a bunch of parallel crawlers sharing the same user agent
-  crawl($_) for 1 .. 3;
+  # Bootstrap the crawler
+  $crawl->();
 
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

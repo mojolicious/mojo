@@ -205,6 +205,14 @@ is $m->stack->[0]{something}, 1,     'right value';
 is $m->path_for, '/clean/too', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
+# No match
+$m = Mojolicious::Routes::Match->new(GET => '/does_not_exist');
+$m->match($r, $c);
+is $m->endpoint, undef, 'no endpoint';
+is_deeply $m->stack, [], 'empty stack';
+is_deeply $m->captures, {}, 'empty captures';
+is $m->path_for, undef, 'no path';
+
 # Introspect
 is $r->find('very_clean')->to_string, '/clean', 'right pattern';
 is $r->find('0')->to_string,          '/0',     'right pattern';

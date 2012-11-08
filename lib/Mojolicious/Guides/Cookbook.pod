@@ -971,8 +971,8 @@ can keep many parallel connections active at the same time.
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
 You can take full control of the L<Mojo::IOLoop> event loop. Note that real
-web crawlers should respect C<robots.txt> files, and not overwhelm web servers
-with too frequent requests.
+web crawlers should be a lot smarter and respect C<robots.txt> files for
+example, so they don't overwhelm web servers with too frequent requests.
 
 =head2 Parallel blocking requests
 

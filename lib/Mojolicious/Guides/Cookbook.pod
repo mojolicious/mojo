@@ -941,6 +941,8 @@ can keep many parallel connections active at the same time.
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
+You can take full control of the L<Mojo::IOLoop> event loop.
+
 =head2 Parallel blocking requests
 
 You can emulate blocking behavior by using a L<Mojo::IOLoop> delay to

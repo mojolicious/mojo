@@ -926,45 +926,20 @@ can keep many parallel connections active at the same time.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
-  use Mojo::URL;
 
-  # FIFO queue
-  my @urls = ('google.com');
-
-  # User agent following up to 5 redirects
-  my $ua = Mojo::UserAgent->new(max_redirects => 5);
-
-  # Crawler
-  sub crawl {
-
-    # Dequeue URL or wait 2 seconds for more
-    return Mojo::IOLoop->timer(2 => \&crawl) unless my $url = shift @urls;
-
-    # Fetch non-blocking just by adding a callback
-    $ua->get($url => sub {
-      my ($ua, $tx) = @_;
-
-      # Extract and enqueue URLs
-      say $url;
-      for my $e ($tx->res->dom('a[href]')->each) {
-        push @urls, Mojo::URL->new($e->{href})->to_abs($tx->req->url);
-        say " -> $urls[-1]";
-      }
-
-      # Next
-      crawl();
-    });
-  }
-
-  # Start a bunch of parallel crawlers sharing the same user agent
-  crawl() for 1 .. 3;
+  # Parallel non-blocking requests
+  my $ua = Mojo::UserAgent->new;
+  $ua->get('http://mojolicio.us' => sub {
+    my ($ua, $tx) = @_;
+    ...
+  });
+  $ua->get('http://mojolicio.us/perldoc' => sub {
+    my ($ua, $tx) = @_;
+    ...
+  });
 
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-
-You can take full control of the L<Mojo::IOLoop> event loop. Note that real
-web crawlers should be a lot smarter and respect C<robots.txt> files for
-example, so they don't overwhelm web servers with too frequent requests.
 
 =head2 Parallel blocking requests
 

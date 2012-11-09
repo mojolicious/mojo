@@ -71,11 +71,11 @@ sub contains {
 
   # Sliding window search
   my $offset = 0;
-  $handle->sysread(my $window, $size);
+  my $start = $handle->sysread(my $window, $size);
   while ($offset < $end) {
 
     # Read as much as possible
-    my $diff = $end - $offset;
+    my $diff = $end - ($start + $offset);
     my $read = $handle->sysread(my $buffer, $diff < $size ? $diff : $size);
     $window .= $buffer;
 

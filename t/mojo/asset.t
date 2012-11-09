@@ -35,7 +35,6 @@ is $mem->contains('a'), -1, 'does not contain "a"';
 # File asset range support (a[bcdef])
 $file = Mojo::Asset::File->new(start_range => 1);
 $file->add_chunk('abcdef');
-is $file->contains(''),      0,  'empty string at position 0';
 is $file->contains('bcdef'), 0,  '"bcdef" at position 0';
 is $file->contains('cdef'),  1,  '"cdef" at position 1';
 is $file->contains('db'),    -1, 'does not contain "db"';
@@ -43,7 +42,6 @@ is $file->contains('db'),    -1, 'does not contain "db"';
 # Memory asset range support (a[bcdef])
 $mem = Mojo::Asset::Memory->new(start_range => 1);
 $mem->add_chunk('abcdef');
-is $mem->contains(''),      0,  'empty string at position 0';
 is $mem->contains('bcdef'), 0,  '"bcdef" at position 0';
 is $mem->contains('cdef'),  1,  '"cdef" at position 1';
 is $mem->contains('db'),    -1, 'does not contain "db"';
@@ -51,7 +49,6 @@ is $mem->contains('db'),    -1, 'does not contain "db"';
 # File asset range support (ab[cdefghi]jk)
 $file = Mojo::Asset::File->new(start_range => 2, end_range => 8);
 $file->add_chunk('abcdefghijk');
-is $file->contains(''),        0,  'empty string at position 0';
 is $file->contains('cdefghi'), 0,  '"cdefghi" at position 0';
 is $file->contains('fghi'),    3,  '"fghi" at position 3';
 is $file->contains('f'),       3,  '"f" at position 3';
@@ -67,7 +64,6 @@ is $chunk, 'hi', 'chunk from position 5';
 # Memory asset range support (ab[cdefghi]jk)
 $mem = Mojo::Asset::Memory->new(start_range => 2, end_range => 8);
 $mem->add_chunk('abcdefghijk');
-is $mem->contains(''),        0,  'empty string at position 0';
 is $mem->contains('cdefghi'), 0,  '"cdefghi" at position 0';
 is $mem->contains('fghi'),    3,  '"fghi" at position 3';
 is $mem->contains('f'),       3,  '"f" at position 3';
@@ -86,30 +82,32 @@ $file->add_chunk('a' x 131072);
 $file->add_chunk('b');
 $file->add_chunk('c' x 131072);
 $file->add_chunk('ddd');
-is $file->contains(''),    0,      'empty string at position 0';
-is $file->contains('a'),   0,      '"a" at position 0';
-is $file->contains('b'),   131072, '"b" at position 131072';
-is $file->contains('c'),   131073, '"c" at position 131073';
-is $file->contains('abc'), 131071, '"abc" at position 131071';
-is $file->contains('ddd'), 262145, '"ddd" at position 262145';
-is $file->contains('e'),   -1,     'does not contain "e"';
+is $file->contains('a'),    0,      '"a" at position 0';
+is $file->contains('b'),    131072, '"b" at position 131072';
+is $file->contains('c'),    131073, '"c" at position 131073';
+is $file->contains('abc'),  131071, '"abc" at position 131071';
+is $file->contains('ccdd'), 262143, '"ccdd" at position 262143';
+is $file->contains('dd'),   262145, '"dd" at position 262145';
+is $file->contains('ddd'),  262145, '"ddd" at position 262145';
+is $file->contains('e'),    -1,     'does not contain "e"';
 is $file->contains('a' x 131072), 0,      '"a" x 131072 at position 0';
 is $file->contains('c' x 131072), 131073, '"c" x 131072 at position 131073';
 is $file->contains('b' . ('c' x 131072) . "ddd"), 131072,
-  '"b" . ("c" x 131072) at position 131072';
+  '"b" . ("c" x 131072) . "ddd" at position 131072';
 
 # Huge file asset with range
-$file = Mojo::Asset::File->new(start_range => 1, end_range => 131073);
+$file = Mojo::Asset::File->new(start_range => 1, end_range => 262146);
 $file->add_chunk('a' x 131072);
 $file->add_chunk('b');
 $file->add_chunk('c' x 131072);
 $file->add_chunk('ddd');
-is $file->contains(''),    0,      'empty string at position 0';
-is $file->contains('a'),   0,      '"a" at position 0';
-is $file->contains('b'),   131071, '"b" at position 131071';
-is $file->contains('c'),   131072, '"c" at position 131072';
-is $file->contains('abc'), 131070, '"abc" at position 131070';
-is $file->contains('ddd'), -1,     'does not contain "ddd"';
+is $file->contains('a'),    0,      '"a" at position 0';
+is $file->contains('b'),    131071, '"b" at position 131071';
+is $file->contains('c'),    131072, '"c" at position 131072';
+is $file->contains('abc'),  131070, '"abc" at position 131070';
+is $file->contains('ccdd'), 262142, '"ccdd" at position 262142';
+is $file->contains('dd'),   262144, '"dd" at position 262144';
+is $file->contains('ddd'),  -1,     'does not contain "ddd"';
 is $file->contains('b' . ('c' x 131072) . 'ddd'), -1,
   'does not contain "b" . ("c" x 131072) . "ddd"';
 

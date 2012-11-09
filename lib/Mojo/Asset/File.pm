@@ -65,18 +65,16 @@ sub contains {
 
   # Calculate window
   my $end = $self->end_range // $self->size;
-  my $window_size = length($pattern) * 2;
-  $window_size = $end - $self->start_range
-    if $window_size > $end - $self->start_range;
-  my $read         = $handle->sysread(my $window, $window_size);
-  my $offset       = $read;
-  my $pattern_size = length $pattern;
-  my $range        = $self->end_range;
+  my $size = length($pattern) * 2;
+  $size = $size > 131072 ? $size : 131072;
+  $size = $end - $self->start_range if $size > $end - $self->start_range;
+  my $offset = $handle->sysread(my $window, $size);
+  my $range = $self->end_range;
 
-  # Moving window search
+  # Sliding window search
   while ($offset <= $end) {
-    return -1 if defined $range && ($pattern_size = $end + 1 - $offset) <= 0;
-    $read = $handle->sysread(my $buffer, $pattern_size);
+    return -1 if defined $range && ($size = $end + 1 - $offset) <= 0;
+    my $read = $handle->sysread(my $buffer, $size);
     $offset += $read;
     $window .= $buffer;
     my $pos = index $window, $pattern;

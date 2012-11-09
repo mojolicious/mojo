@@ -82,6 +82,22 @@ is $chunk, 'defghi', 'chunk from position 1';
 $chunk = $mem->get_chunk(5);
 is $chunk, 'hi', 'chunk from position 5';
 
+# Huge file asset
+$file = Mojo::Asset::File->new;
+$file->add_chunk('a' x 131072);
+$file->add_chunk('b');
+$file->add_chunk('c' x 131072);
+is $file->contains(''),    0,      'empty string at position 0';
+is $file->contains('a'),   0,      '"a" at position 0';
+is $file->contains('b'),   131072, '"b" at position 131072';
+is $file->contains('c'),   131073, '"c" at position 131073';
+is $file->contains('abc'), 131071, '"abc" at position 131071';
+is $file->contains('d'),   -1,     'does not contain "d"';
+is $file->contains('a' x 131072), 0,      '"a" x 131072 at position 0';
+is $file->contains('c' x 131072), 131073, '"c" x 131072 at position 131073';
+is $file->contains('b' . ('c' x 131072)), 131072,
+  '"b" . ("c" x 131072) at position 131072';
+
 # Move memory asset to file
 $mem = Mojo::Asset::Memory->new->add_chunk('abc');
 my $tmp = Mojo::Asset::File->new->add_chunk('x');

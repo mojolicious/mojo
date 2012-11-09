@@ -4,6 +4,7 @@
     significantly.
   - Improved documentation.
   - Improved tests.
+  - Fixed offset bug in Mojo::Asset::File.
 
 3.55  2012-11-08
   - Added gzip compression support to Mojo::UserAgent.

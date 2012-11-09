@@ -63,23 +63,29 @@ sub contains {
   my $handle = $self->handle;
   $handle->sysseek($self->start_range, SEEK_SET);
 
-  # Calculate window
+  # Calculate window size
   my $end = $self->end_range // $self->size;
   my $size = length($pattern) * 2;
   $size = $size > 131072 ? $size : 131072;
   $size = $end - $self->start_range if $size > $end - $self->start_range;
-  my $offset = $handle->sysread(my $window, $size);
-  my $range = $self->end_range;
 
   # Sliding window search
-  while ($offset <= $end) {
-    return -1 if defined $range && ($size = $end + 1 - $offset) <= 0;
-    my $read = $handle->sysread(my $buffer, $size);
-    $offset += $read;
+  my $offset = 0;
+  $handle->sysread(my $window, $size);
+  while ($offset < $end) {
+
+    # Read as much as possible
+    my $diff = $end - $offset;
+    my $read = $handle->sysread(my $buffer, $diff < $size ? $diff : $size);
     $window .= $buffer;
+
+    # Search window
     my $pos = index $window, $pattern;
-    return $pos if $pos >= 0;
-    return -1   if $read == 0;
+    return $offset + $pos if $pos >= 0;
+    $offset += $read;
+    return -1 if $read == 0 || $offset == $end;
+
+    # Resize window
     substr $window, 0, $read, '';
   }
 

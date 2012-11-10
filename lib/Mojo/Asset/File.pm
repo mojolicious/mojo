@@ -64,14 +64,14 @@ sub contains {
   $handle->sysseek($self->start_range, SEEK_SET);
 
   # Calculate window size
-  my $end = $self->end_range // $self->size;
-  my $size = length($string) * 2;
-  $size = $size > 131072 ? $size : 131072;
+  my $end  = $self->end_range // $self->size;
+  my $len  = length $string;
+  my $size = $len > 131072 ? $len : 131072;
   $size = $end - $self->start_range if $size > $end - $self->start_range;
 
   # Sliding window search
   my $offset = 0;
-  my $start = $handle->sysread(my $window, $size);
+  my $start = $handle->sysread(my $window, $len);
   while ($offset < $end) {
 
     # Read as much as possible

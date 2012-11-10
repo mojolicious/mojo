@@ -57,7 +57,7 @@ sub add_chunk {
 }
 
 sub contains {
-  my ($self, $pattern) = @_;
+  my ($self, $string) = @_;
 
   # Seek to start
   my $handle = $self->handle;
@@ -65,7 +65,7 @@ sub contains {
 
   # Calculate window size
   my $end = $self->end_range // $self->size;
-  my $size = length($pattern) * 2;
+  my $size = length($string) * 2;
   $size = $size > 131072 ? $size : 131072;
   $size = $end - $self->start_range if $size > $end - $self->start_range;
 
@@ -80,7 +80,7 @@ sub contains {
     $window .= $buffer;
 
     # Search window
-    my $pos = index $window, $pattern;
+    my $pos = index $window, $string;
     return $offset + $pos if $pos >= 0;
     $offset += $read;
     return -1 if $read == 0 || $offset == $end;

@@ -1,4 +1,8 @@
 
+3.57  2012-11-10
+  - Improved tests.
+  - Fixed range bug in Mojo::Asset::Memory.
+
 3.56  2012-11-09
   - Improved performance of contains method in Mojo::Asset::File
     significantly.

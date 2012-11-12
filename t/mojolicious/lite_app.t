@@ -683,19 +683,19 @@ $t->get_ok('/reserved?data=just-works&json=test')->status_is(200)
 $t->get_ok('/inline/exception')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Died at template line 1.\n\n");
+  ->content_is("Died at inline template line 1.\n\n");
 
 # GET /data/exception
 $t->get_ok('/data/exception')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Died at dies.html.ep line 2.\n\n");
+  ->content_is("Died at template dies.html.ep from DATA section line 2.\n\n");
 
 # GET /template/exception
 $t->get_ok('/template/exception')->status_is(500)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Died at dies_too.html.ep line 2.\n\n");
+  ->content_is("Died at template dies_too.html.ep line 2.\n\n");
 
 # GET /with-format
 $t->get_ok('/with-format')->content_is("/without-format\n");

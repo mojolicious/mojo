@@ -92,23 +92,22 @@ sub _context {
 }
 
 sub _detect {
-  my $self = shift;
+  my ($self, $msg, $files) = @_;
 
   # Message
-  my $msg = shift;
   return $msg if blessed $msg && $msg->isa('Mojo::Exception');
   $self->message($msg);
 
   # Extract file and line from message
   my @trace;
-  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { push @trace, [$1, $2] }
+  while ($msg =~ /at\s+(.+?)\s+line\s+(\d+)/g) { unshift @trace, [$1, $2] }
 
   # Extract file and line from stacktrace
   my $first = $self->frames->[0];
-  unshift @trace, [$first->[1], $first->[2]] if $first && $first->[1];
+  unshift @trace, [$first->[1], $first->[2]] if $first;
 
   # Search for context in files
-  for my $frame (reverse @trace) {
+  for my $frame (@trace) {
     next unless -r $frame->[0];
     open my $handle, '<:utf8', $frame->[0];
     $self->_context($frame->[1], [[<$handle>]]);
@@ -116,8 +115,7 @@ sub _detect {
   }
 
   # More context
-  return $self unless my $files = shift;
-  $self->_context($trace[0][1], [map { [split /\n/] } @$files]);
+  $self->_context($trace[0][1], [map { [split /\n/] } @$files]) if $files;
 
   return $self;
 }
@@ -213,7 +211,7 @@ Throw exception with stacktrace.
   my $string = $e->to_string;
   my $string = "$e";
 
-Render exception with context.
+Render exception.
 
 =head2 C<trace>
 

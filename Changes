@@ -4,6 +4,7 @@
   - Improved error message accuracy in Mojo::Template by using line
     directives.
   - Improved performance of contains method in Mojo::Asset::File by 100%.
+  - Improved documentation.
   - Improved tests.
   - Fixed range bug in Mojo::Asset::Memory.
 

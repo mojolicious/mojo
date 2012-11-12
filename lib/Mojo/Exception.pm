@@ -117,8 +117,7 @@ sub _detect {
 
   # More context
   return $self unless my $files = shift;
-  my @lines = map { [split /\n/] } @$files;
-  $self->_context($trace[0][1], \@lines) if $trace[0][1];
+  $self->_context($trace[0][1], [map { [split /\n/] } @$files]);
 
   return $self;
 }

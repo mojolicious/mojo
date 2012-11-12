@@ -100,7 +100,7 @@ sub build {
 sub compile {
   my $self = shift;
 
-  # Compile with line directives
+  # Compile with line directive
   return undef unless my $code = $self->code;
   my $compiled = eval qq{#line 1 "@{[$self->name]}"\n} . $code;
   $self->compiled($compiled) and return undef unless $@;

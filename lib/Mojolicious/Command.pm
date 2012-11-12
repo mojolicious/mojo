@@ -60,7 +60,7 @@ sub rel_file { catfile(getcwd(), split /\//, pop) }
 
 sub render_data {
   my ($self, $name) = (shift, shift);
-  Mojo::Template->new->name(qq{template "$name" from DATA section})
+  Mojo::Template->new->name("template $name from DATA section")
     ->render(Mojo::Loader->new->data(ref $self, $name), @_);
 }
 

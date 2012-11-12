@@ -673,8 +673,7 @@ is $output->lines_after->[0][0], 4,          'right number';
 is $output->lines_after->[0][1], '%= 1 + 1', 'right line';
 is $output->lines_after->[1][0], 5,          'right number';
 is $output->lines_after->[1][1], 'test',     'right line';
-like "$output", qr/oops! at template line 3, near "%= 1 \+ 1"./,
-  'right result';
+like "$output", qr/oops! at template line 3/, 'right result';
 
 # Exception in template (empty perl lines)
 $mt     = Mojo::Template->new;
@@ -711,7 +710,7 @@ is $output->lines_after->[1][2], ' ',   'right code';
 is $output->lines_after->[2][0], 7,     'right number';
 is $output->lines_after->[2][1], '%',   'right line';
 is $output->lines_after->[2][2], ' ',   'right code';
-like "$output", qr/oops! at template line 4, near "%"./, 'right result';
+like "$output", qr/oops! at template line 4/, 'right result';
 
 # Exception in nested template
 $mt = Mojo::Template->new;

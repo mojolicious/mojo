@@ -8,12 +8,18 @@ use overload
 use Scalar::Util 'blessed';
 
 has [qw(frames line lines_before lines_after)] => sub { [] };
-has [qw(message raw_message)] => 'Exception!';
+has message => 'Exception!';
 has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 };
 
 sub new {
   my $self = shift->SUPER::new;
   return @_ ? $self->_detect(@_) : $self;
+}
+
+# DEPRECATED in Rainbow!
+sub raw_message {
+  warn "Mojo::Exception->raw_message has been DEPRECATED!\n";
+  shift->message(@_);
 }
 
 sub throw { die shift->new->trace(2)->_detect(@_) }
@@ -91,7 +97,7 @@ sub _detect {
   # Message
   my $msg = shift;
   return $msg if blessed $msg && $msg->isa('Mojo::Exception');
-  $self->message($msg)->raw_message($msg);
+  $self->message($msg);
 
   # Extract file and line from message
   my @trace;
@@ -101,7 +107,7 @@ sub _detect {
   my $first = $self->frames->[0];
   unshift @trace, [$first->[1], $first->[2]] if $first && $first->[1];
 
-  # Search for context
+  # Search for context in files
   for my $frame (reverse @trace) {
     next unless -r $frame->[0];
     open my $handle, '<:utf8', $frame->[0];
@@ -112,30 +118,7 @@ sub _detect {
   # More context
   return $self unless my $files = shift;
   my @lines = map { [split /\n/] } @$files;
-
-  # Fix file in message
-  return $self unless my $name = shift;
-  unless (ref $msg) {
-    my $filter = sub {
-      my $num  = shift;
-      my $new  = "$name line $num";
-      my $line = $lines[0][$num];
-      return defined $line ? qq{$new, near "$line".} : "$new.";
-    };
-    $msg =~ s/\(eval\s+\d+\) line (\d+).*/$filter->($1)/ge;
-    $self->message($msg);
-  }
-
-  # Search for better context
-  my $line;
-  if ($self->message =~ /at\s+\Q$name\E\s+line\s+(\d+)/) { $line = $1 }
-  else {
-    for my $frame (@{$self->frames}) {
-      $line = $frame->[1] =~ /^\(eval \d+\)$/ ? $frame->[2] : next;
-      last;
-    }
-  }
-  $self->_context($line, \@lines) if $line;
+  $self->_context($trace[0][1], \@lines) if $trace[0][1];
 
   return $self;
 }
@@ -199,13 +182,6 @@ Lines before the line where the exception occured.
 
 Exception message.
 
-=head2 C<raw_message>
-
-  my $msg = $e->raw_message;
-  $e      = $e->raw_message('Oops!');
-
-Raw unprocessed exception message.
-
 =head2 C<verbose>
 
   my $verbose = $e->verbose;
@@ -222,14 +198,14 @@ following new ones.
 =head2 C<new>
 
   my $e = Mojo::Exception->new('Oops!');
-  my $e = Mojo::Exception->new('Oops!', $files, $name);
+  my $e = Mojo::Exception->new('Oops!', $files);
 
 Construct a new L<Mojo::Exception> object.
 
 =head2 C<throw>
 
   Mojo::Exception->throw('Oops!');
-  Mojo::Exception->throw('Oops!', $files, $name);
+  Mojo::Exception->throw('Oops!', $files);
 
 Throw exception with stacktrace.
 

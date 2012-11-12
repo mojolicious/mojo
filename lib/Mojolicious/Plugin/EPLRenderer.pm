@@ -35,7 +35,6 @@ sub _epl {
     # Inline
     if (defined $inline) {
       $c->app->log->debug('Rendering inline template.');
-      $mt->name('inline template');
       $$output = $mt->render($inline, $c);
     }
 
@@ -47,15 +46,13 @@ sub _epl {
       # Try template
       if (-r $path) {
         $c->app->log->debug(qq{Rendering template "$t".});
-        $mt->name(qq{template "$t"});
-        $$output = $mt->render_file($path, $c);
+        $$output = $mt->name($t)->render_file($path, $c);
       }
 
       # Try DATA section
       elsif (my $d = $renderer->get_data_template($options)) {
         $c->app->log->debug(qq{Rendering template "$t" from DATA section.});
-        $mt->name(qq{template "$t" from DATA section});
-        $$output = $mt->render($d, $c);
+        $$output = $mt->name($t)->render($d, $c);
       }
 
       # No template

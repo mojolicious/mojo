@@ -100,14 +100,13 @@ sub build {
 sub compile {
   my $self = shift;
 
-  # Compile
+  # Compile with line directives
   return undef unless my $code = $self->code;
-  my $compiled = eval $code;
+  my $compiled = eval qq{#line 1 "@{[$self->name]}"\n} . $code;
   $self->compiled($compiled) and return undef unless $@;
 
   # Use local stacktrace for compile exceptions
-  return Mojo::Exception->new($@, [$self->template, $code], $self->name)
-    ->trace->verbose(1);
+  return Mojo::Exception->new($@, [$self->template, $code])->trace->verbose(1);
 }
 
 sub interpret {
@@ -116,7 +115,7 @@ sub interpret {
   # Stacktrace
   local $SIG{__DIE__} = sub {
     CORE::die($_[0]) if ref $_[0];
-    Mojo::Exception->throw(shift, [$self->template, $self->code], $self->name);
+    Mojo::Exception->throw(shift, [$self->template, $self->code]);
   };
 
   # Interpret
@@ -125,7 +124,7 @@ sub interpret {
   return $output unless $@;
 
   # Exception
-  return Mojo::Exception->new($@, [$self->template], $self->name)->verbose(1);
+  return Mojo::Exception->new($@, [$self->template])->verbose(1);
 }
 
 sub parse {

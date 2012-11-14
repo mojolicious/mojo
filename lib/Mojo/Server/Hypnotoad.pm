@@ -70,7 +70,7 @@ sub run {
     open STDIN,  '</dev/null';
     open STDOUT, '>/dev/null';
     if ($ENV{ERROR_LOG} ) {
-        unless (open STDERR, ">>", "$ENV{ERROR_LOG}") or 
+        open STDERR, ">>", "$ENV{ERROR_LOG}" or 
             die "Error log file '$ENV{ERROR_LOG}' is not writeable";
     } else {
         open STDERR, '>&STDOUT';

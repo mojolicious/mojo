@@ -411,6 +411,43 @@ isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
 
+# Parse HTTP 1.1 chunked multipart response
+$res = Mojo::Message::Response->new;
+$res->parse("HTTP/1.1 200 OK\x0d\x0a");
+$res->parse("Transfer-Encoding: chunked\x0d\x0a");
+$res->parse('Content-Type: multipart/form-data; bo');
+$res->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
+$res->parse("\x0d\x0a1a1\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$res->parse("Content-Disposition: form-data; name=\"text1\"\x0d\x0a");
+$res->parse("\x0d\x0ahallo welt test123\n");
+$res->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$res->parse("Content-Disposition: form-data; name=\"text2\"\x0d\x0a");
+$res->parse("\x0d\x0a\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
+$res->parse('Content-Disposition: form-data; name="upload"; file');
+$res->parse("name=\"hello.pl\"\x0d\x0a\x0d\x0a");
+$res->parse("Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
+$res->parse("#!/usr/bin/perl\n\n");
+$res->parse("use strict;\n");
+$res->parse("use warnings;\n\n");
+$res->parse("print \"Hello World :)\\n\"\n");
+$res->parse("\x0d\x0a------------0xKhTmLbOuNdA");
+$res->parse("r\x0d\x0a3\x0d\x0aY--\x0d\x0a");
+$res->parse("0\x0d\x0a\x0d\x0a");
+ok $res->is_finished, 'response is finished';
+is $res->code,        200, 'right status';
+is $res->message,     'OK', 'right message';
+is $res->version,     '1.1', 'right version';
+ok $res->headers->content_type =~ m!multipart/form-data!,
+  'right "Content-Type" value';
+is $res->headers->content_length,    420,   'right "Content-Length" value';
+is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
+is $res->body_size, 420, 'right size';
+isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
+isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
+isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
+is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
+  'right content';
+
 # Parse HTTP 1.1 multipart response with missing boundary
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0d\x0a");

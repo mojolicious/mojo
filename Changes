@@ -1,6 +1,7 @@
 
 3.58  2012-11-14
   - Improved documentation.
+  - Improved tests.
 
 3.57  2012-11-12
   - Deprecated Mojo::Exception->raw_message.

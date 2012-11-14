@@ -12,7 +12,8 @@ GetOptions(
   'f|foreground' => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
   'h|help'       => \my $help,
   's|stop'       => sub { $ENV{HYPNOTOAD_STOP}       = 1 },
-  't|test'       => sub { $ENV{HYPNOTOAD_TEST}       = 1 }
+  't|test'       => sub { $ENV{HYPNOTOAD_TEST}       = 1 },
+  'e|errorlog=s' => \$ENV{ERROR_LOG}
 );
 
 # Usage
@@ -28,6 +29,7 @@ These options are available:
   -h, --help         Show this message.
   -s, --stop         Stop server gracefully.
   -t, --test         Test application and exit.
+  -e, --errorlog     Specify error.log path.
 EOF
 
 require Mojo::Server::Hypnotoad;

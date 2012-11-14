@@ -69,7 +69,12 @@ sub run {
     # Close file handles
     open STDIN,  '</dev/null';
     open STDOUT, '>/dev/null';
-    open STDERR, '>&STDOUT';
+    if ($ENV{ERROR_LOG} ) {
+        open STDERR, ">>", "$ENV{ERROR_LOG}" or 
+            die "Error log file '$ENV{ERROR_LOG}' is not writeable";
+    } else {
+        open STDERR, '>&STDOUT';
+    }
   }
 
   # Start accepting connections

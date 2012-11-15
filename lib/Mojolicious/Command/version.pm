@@ -2,7 +2,6 @@ package Mojolicious::Command::version;
 use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::IOLoop::Server;
-use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious;
 

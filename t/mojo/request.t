@@ -1641,7 +1641,7 @@ my $yatta_sjis = encode 'Shift_JIS', $yatta;
 my $multipart
   = "------1234567890\x0d\x0a"
   . "Content-Disposition: form-data; name=\"$yatta_sjis\"\x0d\x0a\x0d\x0a"
-  . "$yatta_sjis\x0d\x0a------1234567890--\x0d\x0a";
+  . "$yatta_sjis\x0d\x0a------1234567890--";
 $req->parse("POST /example/yatta HTTP/1.1\x0d\x0a"
     . "User-Agent: Mozilla/5.0\x0d\x0a"
     . 'Content-Type: multipart/form-data; charset=Shift_JIS; '
@@ -1659,20 +1659,21 @@ is $req->content->parts->[0]->asset->slurp, $yatta_sjis, 'right content';
 
 # WebKit multipart/form-data request
 $req = Mojo::Message::Request->new;
-$req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
-    . "User-Agent: Mozilla/5.0\x0d\x0a"
-    . 'Content-Type: multipart/form-data; '
-    . "boundary=----WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a"
-    . "Content-Length: 323\x0d\x0aConnection: keep-alive\x0d\x0a"
-    . "Host: 127.0.0.1:3000\x0d\x0a\x0d\x0a"
-    . "------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"Vorname\"\x0d\x0a"
-    . "\x0d\x0aT\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d"
-    . "\x0aContent-Disposition: form-data; name=\"Zuname\"\x0d\x0a"
-    . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d"
-    . "\x0aContent-Disposition: form-data; name=\"Text\"\x0d\x0a"
-    . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
-    . "\x0d\x0a");
+$req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a");
+$req->parse("User-Agent: Mozilla/5.0\x0d\x0a");
+$req->parse('Content-Type: multipart/form-data; ');
+$req->parse("boundary=----WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a");
+$req->parse("Content-Length: 321\x0d\x0aConnection: keep-alive\x0d\x0a");
+$req->parse("Host: 127.0.0.1:3000\x0d\x0a\x0d\x0a");
+$req->parse("------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d\x0a");
+$req->parse("Content-Disposition: form-data; name=\"Vorname\"\x0d\x0a");
+$req->parse("\x0d\x0aT\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d");
+$req->parse("\x0aContent-Disposition: form-data; name=\"Zuname\"\x0d\x0a");
+$req->parse("\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP\x0d");
+$req->parse("\x0aContent-Disposition: form-data; name=\"Text\"\x0d\x0a");
+$req->parse("\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP-");
+ok !$req->is_finished, 'request is not finished';
+$req->parse('-');
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
@@ -1703,7 +1704,7 @@ my $chrome
   . "\x0d\x0aContent-Type: image/jpeg\x0d\x0a\x0d\x0a1234"
   . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
   . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
-  . "$submit\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--\x0d\x0a";
+  . "$submit\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--";
 $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "Host: 127.0.0.1:10002\x0d\x0a"
     . "Connection: close\x0d\x0a"

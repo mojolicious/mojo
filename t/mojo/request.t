@@ -9,6 +9,7 @@ use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Cookie::Request;
 use Mojo::Message::Request;
+use Mojo::Util 'encode';
 
 # Parse HTTP 1.1 message with huge "Cookie" header exceeding all limits
 my $req = Mojo::Message::Request->new;
@@ -1632,6 +1633,30 @@ is $cookies->[0]->value, 'bar', 'right value';
 is $cookies->[1]->name,  'bar', 'right name';
 is $cookies->[1]->value, 'baz', 'right value';
 
+# Parse multipart/form-data request with charset
+$req = Mojo::Message::Request->new;
+is $req->default_charset, 'UTF-8', 'default charset is UTF-8';
+my $yatta = 'やった';
+my $yatta_sjis = encode 'Shift_JIS', $yatta;
+my $multipart
+  = "------1234567890\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"$yatta_sjis\"\x0d\x0a\x0d\x0a"
+  . "$yatta_sjis\x0d\x0a------1234567890--\x0d\x0a";
+$req->parse("POST /example/yatta HTTP/1.1\x0d\x0a"
+    . "User-Agent: Mozilla/5.0\x0d\x0a"
+    . 'Content-Type: multipart/form-data; charset=Shift_JIS; '
+    . "boundary=----1234567890\x0d\x0a"
+    . "Content-Length: @{[length $multipart]}\x0d\x0a"
+    . "Connection: keep-alive\x0d\x0a"
+    . "Host: 127.0.0.1:3000\x0d\x0a\x0d\x0a"
+    . $multipart);
+ok $req->is_finished, 'request is finished';
+is $req->method,      'POST', 'right method';
+is $req->version,     '1.1', 'right version';
+is $req->url,         '/example/yatta', 'right URL';
+is $req->param($yatta), $yatta, 'right value';
+is $req->content->parts->[0]->asset->slurp, $yatta_sjis, 'right content';
+
 # WebKit multipart/form-data request
 $req = Mojo::Message::Request->new;
 $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
@@ -1649,17 +1674,43 @@ $req->parse("POST /example/testform_handler HTTP/1.1\x0d\x0a"
     . "\x0d\x0a\x0d\x0a------WebKitFormBoundaryi5BnD9J9zoTMiSuP--"
     . "\x0d\x0a");
 ok $req->is_finished, 'request is finished';
+is $req->method,      'POST', 'right method';
+is $req->version,     '1.1', 'right version';
+is $req->url,         '/example/testform_handler', 'right URL';
 is $req->param('Vorname'), 'T', 'right value';
+is $req->param('Zuname'),  '',  'right value';
+is $req->param('Text'),    '',  'right value';
+is $req->content->parts->[0]->asset->slurp, 'T', 'right content';
 
-# Google Chrome 5 multipart/form-data request
+# Google Chrome 5 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
+my ($fname, $sname, $sex, $avatar, $submit)
+  = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
+  'аватар.jpg', 'Сохранить';
+my $chrome
+  = "------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+  . "$fname\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+  . "$sname\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+  . "$sex\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+  . "16.02.1987\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+  . "1234567890\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"avatar\"; filename=\"$avatar\""
+  . "\x0d\x0aContent-Type: image/jpeg\x0d\x0a\x0d\x0a1234"
+  . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+  . "$submit\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--\x0d\x0a";
 $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "Host: 127.0.0.1:10002\x0d\x0a"
     . "Connection: close\x0d\x0a"
     . 'User-Agent: Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/5'
     . "32.9 (KHTML, like Gecko) Chrome/5.0.307.11 Safari/532.9\x0d\x0a"
     . "Referer: http://example.org/\x0d\x0a"
-    . "Content-Length: 819\x0d\x0a"
+    . "Content-Length: @{[length $chrome]}\x0d\x0a"
     . "Cache-Control: max-age=0\x0d\x0a"
     . "Origin: http://example.org\x0d\x0a"
     . 'Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryY'
@@ -1672,29 +1723,7 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "153a\x0d\x0a"
     . "Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4\x0d\x0a"
     . "Accept-Charset: windows-1251,utf-8;q=0.7,*;q=0.3\x0d\x0a\x0d\x0a"
-    . "------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
-    . 'Иван'
-    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
-    . 'Иванов'
-    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
-    . 'мужской'
-    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
-    . '16.02.1987'
-    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
-    . '1234567890'
-    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-    . 'Content-Disposition: form-data; name="avatar"; filename="аватар.'
-    . "jpg\"\x0d\x0a"
-    . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a1234"
-    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
-    . 'Сохранить'
-    . "\x0d\x0a------WebKitFormBoundaryYGjwdkpB6ZLCZQbX--\x0d\x0a");
+    . $chrome);
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.0', 'right version';
@@ -1704,20 +1733,48 @@ is $req->cookie('mojolicious')->value,
   . 'AAGV4cGlyZXM=--1641adddfe885276cda0deb7475f153a', 'right value';
 like $req->headers->content_type, qr!multipart/form-data!,
   'right "Content-Type" value';
-is $req->param('fname'), 'Иван',       'right value';
-is $req->param('sname'), 'Иванов',   'right value';
-is $req->param('sex'),   'мужской', 'right value';
-is $req->param('bdate'), '16.02.1987',     'right value';
-is $req->param('phone'), '1234567890',     'right value';
+is $req->param('fname'),  'Иван',           'right value';
+is $req->param('sname'),  'Иванов',       'right value';
+is $req->param('sex'),    'мужской',     'right value';
+is $req->param('bdate'),  '16.02.1987',         'right value';
+is $req->param('phone'),  '1234567890',         'right value';
+is $req->param('submit'), 'Сохранить', 'right value';
 my $upload = $req->upload('avatar');
 is $upload->isa('Mojo::Upload'), 1, 'right upload';
 is $upload->headers->content_type, 'image/jpeg', 'right "Content-Type" value';
 is $upload->filename, 'аватар.jpg', 'right filename';
 is $upload->size,     4,                  'right size';
 is $upload->slurp,    '1234',             'right content';
+is $req->content->parts->[0]->asset->slurp, $fname, 'right content';
 
-# Firefox 3.5.8 multipart/form-data request
+# Firefox 3.5.8 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
+($fname, $sname, $sex, $avatar, $submit)
+  = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
+  'аватар.jpg', 'Сохранить';
+my $firefox
+  = "-----------------------------213090722714721300002030499922\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+  . "$fname\x0d\x0a"
+  . "-----------------------------213090722714721300002030499922\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+  . "$sname\x0d\x0a"
+  . "-----------------------------213090722714721300002030499922\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+  . "$sex\x0d\x0a"
+  . "-----------------------------213090722714721300002030499922\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+  . "16.02.1987\x0d\x0a"
+  . "-----------------------------213090722714721300002030499922\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+  . "1234567890\x0d\x0a"
+  . "-----------------------------213090722714721300002030499922\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"avatar\"; filename=\"$avatar\""
+  . "\x0d\x0aContent-Type: image/jpeg\x0d\x0a\x0d\x0a1234\x0d\x0a"
+  . "-----------------------------213090722714721300002030499922\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+  . "$submit\x0d\x0a"
+  . '-----------------------------213090722714721300002030499922--';
 $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "Host: 127.0.0.1:10002\x0d\x0a"
     . "Connection: close\x0d\x0a"
@@ -1734,37 +1791,8 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "93a7\x0d\x0a"
     . 'Content-Type: multipart/form-data; boundary=-----------------------'
     . "----213090722714721300002030499922\x0d\x0a"
-    . "Content-Length: 971\x0d\x0a\x0d\x0a"
-    . "-----------------------------213090722714721300002030499922\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
-    . 'Иван'
-    . "\x0d\x0a-----------------------------213090722714721300002030499922"
-    . "\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
-    . 'Иванов'
-    . "\x0d\x0a-----------------------------213090722714721300002030499922"
-    . "\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
-    . 'мужской'
-    . "\x0d\x0a-----------------------------213090722714721300002030499922"
-    . "\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
-    . '16.02.1987'
-    . "\x0d\x0a-----------------------------213090722714721300002030499922"
-    . "\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
-    . '1234567890'
-    . "\x0d\x0a-----------------------------213090722714721300002030499922"
-    . "\x0d\x0a"
-    . 'Content-Disposition: form-data; name="avatar"; filename="аватар.'
-    . "jpg\"\x0d\x0a"
-    . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a1234"
-    . "\x0d\x0a-----------------------------213090722714721300002030499922"
-    . "\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
-    . 'Сохранить'
-    . "\x0d\x0a-----------------------------2130907227147213000020304999"
-    . '22--');
+    . "Content-Length: @{[length $firefox]}\x0d\x0a\x0d\x0a"
+    . $firefox);
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.0', 'right version';
@@ -1774,20 +1802,42 @@ is $req->cookie('mojolicious')->value,
   . 'AAGV4cGlyZXM=--cd933a37999e0fa8d7804205e89193a7', 'right value';
 like $req->headers->content_type, qr!multipart/form-data!,
   'right "Content-Type" value';
-is $req->param('fname'), 'Иван',       'right value';
-is $req->param('sname'), 'Иванов',   'right value';
-is $req->param('sex'),   'мужской', 'right value';
-is $req->param('bdate'), '16.02.1987',     'right value';
-is $req->param('phone'), '1234567890',     'right value';
+is $req->param('fname'),  'Иван',           'right value';
+is $req->param('sname'),  'Иванов',       'right value';
+is $req->param('sex'),    'мужской',     'right value';
+is $req->param('bdate'),  '16.02.1987',         'right value';
+is $req->param('phone'),  '1234567890',         'right value';
+is $req->param('submit'), 'Сохранить', 'right value';
 $upload = $req->upload('avatar');
 is $upload->isa('Mojo::Upload'), 1, 'right upload';
 is $upload->headers->content_type, 'image/jpeg', 'right "Content-Type" value';
 is $upload->filename, 'аватар.jpg', 'right filename';
 is $upload->size,     4,                  'right size';
 is $upload->slurp,    '1234',             'right content';
+is $req->content->parts->[0]->asset->slurp, $fname, 'right content';
 
-# Opera 9.8 multipart/form-data request
+# Opera 9.8 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
+($fname, $sname, $sex, $avatar, $submit)
+  = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
+  'аватар.jpg', 'Сохранить';
+my $opera
+  = "------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
+  . "$fname\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
+  . "$sname\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
+  . "$sex\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
+  . "16.02.1987\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
+  . "1234567890\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"avatar\"; filename=\"$avatar\""
+  . "\x0d\x0aContent-Type: image/jpeg\x0d\x0a\x0d\x0a"
+  . "1234\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
+  . "$submit\x0d\x0a------------IWq9cR9mYYG668xwSn56f0--";
 $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "Host: 127.0.0.1:10002\x0d\x0a"
     . "Connection: close\x0d\x0a"
@@ -1804,32 +1854,10 @@ $req->parse("POST / HTTP/1.0\x0d\x0a"
     . "2672\x0d\x0a"
     . "Cookie2: \$Version=1\x0d\x0a"
     . "TE: deflate, gzip, chunked, identity, trailers\x0d\x0a"
-    . "Content-Length: 771\x0d\x0a"
+    . "Content-Length: @{[length $opera]}\x0d\x0a"
     . 'Content-Type: multipart/form-data; boundary=----------IWq9cR9mYYG66'
     . "8xwSn56f0\x0d\x0a\x0d\x0a"
-    . "------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"fname\"\x0d\x0a\x0d\x0a"
-    . 'Иван'
-    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"sname\"\x0d\x0a\x0d\x0a"
-    . 'Иванов'
-    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"sex\"\x0d\x0a\x0d\x0a"
-    . 'мужской'
-    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"bdate\"\x0d\x0a\x0d\x0a"
-    . '16.02.1987'
-    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"phone\"\x0d\x0a\x0d\x0a"
-    . '1234567890'
-    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-    . 'Content-Disposition: form-data; name="avatar"; filename="аватар.'
-    . "jpg\"\x0d\x0a"
-    . "Content-Type: image/jpeg\x0d\x0a\x0d\x0a" . "1234"
-    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0\x0d\x0a"
-    . "Content-Disposition: form-data; name=\"submit\"\x0d\x0a\x0d\x0a"
-    . 'Сохранить'
-    . "\x0d\x0a------------IWq9cR9mYYG668xwSn56f0--");
+    . $opera);
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.0', 'right version';
@@ -1839,20 +1867,28 @@ is $req->cookie('mojolicious')->value,
   . 'AAGV4cGlyZXM=--78a58a94f98ae5b75a489be1189f2672', 'right value';
 like $req->headers->content_type, qr!multipart/form-data!,
   'right "Content-Type" value';
-is $req->param('fname'), 'Иван',       'right value';
-is $req->param('sname'), 'Иванов',   'right value';
-is $req->param('sex'),   'мужской', 'right value';
-is $req->param('bdate'), '16.02.1987',     'right value';
-is $req->param('phone'), '1234567890',     'right value';
+is $req->param('fname'),  'Иван',           'right value';
+is $req->param('sname'),  'Иванов',       'right value';
+is $req->param('sex'),    'мужской',     'right value';
+is $req->param('bdate'),  '16.02.1987',         'right value';
+is $req->param('phone'),  '1234567890',         'right value';
+is $req->param('submit'), 'Сохранить', 'right value';
 $upload = $req->upload('avatar');
 is $upload->isa('Mojo::Upload'), 1, 'right upload';
 is $upload->headers->content_type, 'image/jpeg', 'right "Content-Type" value';
 is $upload->filename, 'аватар.jpg', 'right filename';
 is $upload->size,     4,                  'right size';
 is $upload->slurp,    '1234',             'right content';
+is $req->content->parts->[0]->asset->slurp, $fname, 'right content';
 
 # Firefox 14 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
+my ($name, $filename) = map { encode 'UTF-8', $_ } '☃', 'foo bär ☃.txt';
+$firefox
+  = "-----------------------------1264369278903768281481663536\x0d\x0a"
+  . "Content-Disposition: form-data; name=\"$name\"; filename=\"$filename\""
+  . "\x0d\x0aContent-Type: text/plain\x0d\x0a\x0d\x0atest 123\x0d\x0a"
+  . '-----------------------------1264369278903768281481663536--';
 $req->parse("POST /foo HTTP/1.1\x0d\x0a");
 $req->parse("Host: 127.0.0.1:3000\x0d\x0a");
 $req->parse('User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv');
@@ -1866,12 +1902,8 @@ $req->parse("Referer: http://127.0.0.1:3000/\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data;');
 $req->parse('boundary=---------------------------126436927890376828148');
 $req->parse("1663536\x0d\x0a");
-$req->parse("Content-Length: 233\x0d\x0a\x0d\x0a--------");
-$req->parse("---------------------1264369278903768281481663536\x0d\x0a");
-$req->parse('Content-Disposition: form-data; name="☃"; filen');
-$req->parse("ame=\"foo bär ☃.txt\"\x0d\x0aContent-Type: text/plain");
-$req->parse("\x0d\x0a\x0d\x0atest 123\x0d\x0a-------");
-$req->parse('----------------------1264369278903768281481663536--');
+$req->parse("Content-Length: @{[length $firefox]}\x0d\x0a\x0d\x0a");
+$req->parse($firefox);
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';

@@ -180,17 +180,17 @@ sub _read {
   until (($self->{multi_state} //= 'multipart_preamble') eq 'finished') {
 
     # Preamble
-    if (($self->{multi_state} // '') eq 'multipart_preamble') {
+    if ($self->{multi_state} eq 'multipart_preamble') {
       last unless $self->_parse_multipart_preamble($boundary);
     }
 
     # Boundary
-    elsif (($self->{multi_state} // '') eq 'multipart_boundary') {
+    elsif ($self->{multi_state} eq 'multipart_boundary') {
       last unless $self->_parse_multipart_boundary($boundary);
     }
 
     # Body
-    elsif (($self->{multi_state} // '') eq 'multipart_body') {
+    elsif ($self->{multi_state} eq 'multipart_body') {
       last unless $self->_parse_multipart_body($boundary);
     }
   }
@@ -280,7 +280,7 @@ Content size in bytes.
 
   my $boundary = $multi->build_boundary;
 
-Generate a suitable boundary for content.
+Generate a suitable boundary for content and add it to C<Content-Type> header.
 
 =head2 C<clone>
 

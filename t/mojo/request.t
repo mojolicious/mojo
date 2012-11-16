@@ -929,7 +929,7 @@ like $req->content->asset->slurp, qr/------------0xKhTmLbOuNdArY--$/,
 # Parse HTTP 1.1 multipart request with "0" filename
 $req = Mojo::Message::Request->new;
 $req->parse("GET /foo/bar/baz.html?foo13#23 HTTP/1.1\x0d\x0a");
-$req->parse("Content-Length: 418\x0d\x0a");
+$req->parse("Content-Length: 410\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; bo');
 $req->parse("undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a");
 $req->parse("\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a");
@@ -955,7 +955,7 @@ is $req->query_params, 'foo13', 'right parameters';
 is $req->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-is $req->headers->content_length, 418, 'right "Content-Length" value';
+is $req->headers->content_length, 410, 'right "Content-Length" value';
 isa_ok $req->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $req->content->parts->[2], 'Mojo::Content::Single', 'right part';

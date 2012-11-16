@@ -152,7 +152,7 @@ sub _parse_multipart_boundary {
     substr $self->{multipart}, 0, length $end, '';
 
     # Finished
-    $self->{state} = $self->{multi_state} = 'finished';
+    $self->{multi_state} = 'finished';
   }
 
   return undef;

@@ -161,17 +161,14 @@ sub _parse_multipart_boundary {
 sub _parse_multipart_preamble {
   my ($self, $boundary) = @_;
 
-  # Replace preamble with carriage return and line feed
-  my $pos = index $self->{multipart}, "--$boundary";
-  unless ($pos < 0) {
-    substr $self->{multipart}, 0, $pos, "\x0d\x0a";
-
-    # Parse boundary
-    return !!($self->{multi_state} = 'multipart_boundary');
-  }
-
   # No boundary yet
-  return undef;
+  return undef if (my $pos = index $self->{multipart}, "--$boundary") < 0;
+
+  # Replace preamble with carriage return and line feed
+  substr $self->{multipart}, 0, $pos, "\x0d\x0a";
+
+  # Parse boundary
+  return !!($self->{multi_state} = 'multipart_boundary');
 }
 
 sub _read {
@@ -179,9 +176,8 @@ sub _read {
 
   # Parse
   $self->{multipart} .= $chunk;
-  $self->{multi_state} ||= 'multipart_preamble';
   my $boundary = $self->boundary;
-  until ($self->{multi_state} eq 'finished') {
+  until (($self->{multi_state} //= 'multipart_preamble') eq 'finished') {
 
     # Preamble
     if (($self->{multi_state} // '') eq 'multipart_preamble') {

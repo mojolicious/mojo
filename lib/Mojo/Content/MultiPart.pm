@@ -181,7 +181,7 @@ sub _read {
   $self->{multipart} .= $chunk;
   $self->{multi_state} ||= 'multipart_preamble';
   my $boundary = $self->boundary;
-  until ($self->is_finished) {
+  until ($self->{multi_state} eq 'finished') {
 
     # Preamble
     if (($self->{multi_state} // '') eq 'multipart_preamble') {

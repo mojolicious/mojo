@@ -420,14 +420,14 @@ my $multipart
   . "Transfer-Encoding: chunked\x0d\x0a"
   . 'Content-Type: multipart/form-data; bo'
   . "undary=----------0xKhTmLbOuNdArY\x0d\x0a\x0d\x0a"
-  . "1a1\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a"
+  . "19f\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a"
   . "Content-Disposition: form-data; name=\"text1\"\x0d\x0a"
   . "\x0d\x0ahallo welt test123\n"
   . "\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a"
   . "Content-Disposition: form-data; name=\"text2\"\x0d\x0a"
   . "\x0d\x0a\x0d\x0a------------0xKhTmLbOuNdArY\x0d\x0a"
   . 'Content-Disposition: form-data; name="upload"; file'
-  . "name=\"hello.pl\"\x0d\x0a\x0d\x0a"
+  . "name=\"hello.pl\"\x0d\x0a"
   . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a"
   . "#!/usr/bin/perl\n\n"
   . "use strict;\n"
@@ -444,14 +444,19 @@ is $res->version,     '1.1', 'right version';
 is $res->headers->content_type,
   'multipart/form-data; boundary=----------0xKhTmLbOuNdArY',
   'right "Content-Type" value';
-is $res->headers->content_length,    420,   'right "Content-Length" value';
+is $res->headers->content_length,    418,   'right "Content-Length" value';
 is $res->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
-is $res->body_size, 420, 'right size';
+is $res->body_size, 418, 'right size';
 isa_ok $res->content->parts->[0], 'Mojo::Content::Single', 'right part';
 isa_ok $res->content->parts->[1], 'Mojo::Content::Single', 'right part';
 isa_ok $res->content->parts->[2], 'Mojo::Content::Single', 'right part';
 is $res->content->parts->[0]->asset->slurp, "hallo welt test123\n",
   'right content';
+is $res->upload('upload')->filename,  'hello.pl',            'right filename';
+isa_ok $res->upload('upload')->asset, 'Mojo::Asset::Memory', 'right file';
+is $res->upload('upload')->asset->size, 69, 'right size';
+is $res->content->parts->[2]->headers->content_type,
+  'application/octet-stream', 'right "Content-Type" value';
 
 # Parse HTTP 1.1 chunked multipart response (in multiple small chunks)
 $res = Mojo::Message::Response->new;

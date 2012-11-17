@@ -1,5 +1,5 @@
 
-3.58  2012-11-16
+3.58  2012-11-18
   - Improved documentation.
   - Improved tests.
   - Fixed state bugs in Mojo::Content::MultiPart.

@@ -572,7 +572,8 @@ Character indicating the start of a code line, defaults to C<%>.
   $mt      = $mt->name('foo.mt');
 
 Name of template currently being processed, defaults to C<template>. Note that
-this method is attribute and might change without warning!
+this value should not contain quotes or newline characters, or error messages
+might end up being wrong.
 
 =head2 C<namespace>
 

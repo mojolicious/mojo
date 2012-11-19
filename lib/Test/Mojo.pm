@@ -431,6 +431,10 @@ Access application with L<Mojo::UserAgent/"app">.
       if $self->req->url->path->contains('/user');
   });
 
+  # Extract additional information
+  my $stash;
+  $t->app->hook(after_dispatch => sub { $stash = shift->stash });
+
 =head2 C<content_is>
 
   $t = $t->content_is('working!');

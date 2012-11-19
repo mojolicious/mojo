@@ -205,6 +205,10 @@ get '/one_format' => [format => 'xml'] => {text => 'One format.'};
 
 my $t = Test::Mojo->new;
 
+# Preserve stash
+my $stash;
+$t->app->hook(after_dispatch => sub { $stash = shift->stash });
+
 # GET /expiration (zero expiration persists)
 $t->ua->max_redirects(1);
 $t->get_ok('/expiration?redirect=1')->status_is(200)
@@ -237,6 +241,7 @@ $t->get_ok('/param_auth')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("Not Bender!\n");
+is $stash->{_name}, undef, 'no "_name" value';
 
 # GET /param_auth?name=Bender
 $t->get_ok('/param_auth?name=Bender')->status_is(200)
@@ -259,6 +264,7 @@ $t->get_ok('/param_auth/too?name=Bender')->status_is(200)
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is("stash too!!!!!!!\n");
 ok $t->tx->res->cookie('mojolicious')->expires, 'has expiration';
+is $stash->{_name}, 'stash', 'right "_name" value';
 
 # GET /bridge2stash (with cookies, session and flash)
 $t->get_ok('/bridge2stash')->status_is(200)
@@ -326,6 +332,7 @@ $t->get_ok('/with/under/count' => {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_is('X-Under'      => 1)->content_is("counter\n");
+is $stash->{_name}, undef, 'no "_name" value';
 
 # GET /bridge2stash (again)
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)

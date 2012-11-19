@@ -303,7 +303,7 @@ sub _error {
 sub _finish {
   my ($self, $tx, $cb, $close) = @_;
 
-  # Remove code
+  # Remove code from parser errors
   my $res = $tx->res;
   if (my $err = $res->error) { $res->error($err) }
 
@@ -320,7 +320,7 @@ sub _finish {
   }
 
   # Callback
-  $self->$cb($tx) if $cb;
+  $self->$cb($tx);
 }
 
 sub _handle {

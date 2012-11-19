@@ -454,8 +454,8 @@ parsed.
   });
 
 This is a very powerful hook and should not be used lightly, it makes some
-rather advanced features such as upload progress bars possible, just note that
-it will not work for embedded applications. (Passed the transaction and
+rather advanced features such as upload progress bars possible. Note that it
+will not work for embedded applications. (Passed the transaction and
 application object)
 
 =item C<before_dispatch>
@@ -486,7 +486,9 @@ Mostly used for custom dispatchers and post-processing static file responses.
 =item C<after_dispatch>
 
 Emitted in reverse order after a response has been rendered. Note that this
-hook can trigger before C<after_static_dispatch> due to its dynamic nature.
+hook can trigger before C<after_static_dispatch> due to its dynamic nature,
+and with embedded applications will only work for the application rendering
+the response.
 
   $app->hook(after_dispatch => sub {
     my $c = shift;

@@ -577,7 +577,7 @@ before the entire message body has been received.
   $msg             = $msg->error('Parser error');
   $msg             = $msg->error('Parser error', 500);
 
-Parser errors and codes.
+Error and code.
 
 =head2 C<extract_start_line>
 

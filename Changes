@@ -3,6 +3,7 @@
   - Improved documentation.
   - Improved tests.
   - Fixed state bugs in Mojo::Content::MultiPart.
+  - Fixed Mojo::UserAgent to remove codes from parser errors.
 
 3.57  2012-11-12
   - Deprecated Mojo::Exception->raw_message.

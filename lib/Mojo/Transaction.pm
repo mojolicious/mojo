@@ -224,7 +224,7 @@ Connection identifier or socket.
   my $err          = $tx->error;
   my ($err, $code) = $tx->error;
 
-Parser errors and codes.
+Error and code.
 
 =head2 C<is_finished>
 

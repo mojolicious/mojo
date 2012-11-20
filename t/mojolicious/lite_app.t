@@ -1231,21 +1231,21 @@ $t->get_ok('/hello.txt' => {'Range' => 'bytes=2-8'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 7)
-  ->content_is('llo Moj');
+  ->header_is('Content-Range: bytes 2-8/31')->content_is('llo Moj');
 
 # GET /hello.txt (partial static file, starting at first byte)
 $t->get_ok('/hello.txt' => {'Range' => 'bytes=0-8'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 9)
-  ->content_is('Hello Moj');
+  ->header_is('Content-Range: bytes 0-8/31')->content_is('Hello Moj');
 
 # GET /hello.txt (partial static file, first byte)
 $t->get_ok('/hello.txt' => {'Range' => 'bytes=0-0'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
-  ->content_is('H');
+  ->header_is('Content-Range: bytes 0-0/31')->content_is('H');
 
 # GET /hello3.txt (render_static and single byte file)
 $t->get_ok('/hello3.txt')->status_is(200)
@@ -1259,7 +1259,7 @@ $t->get_ok('/hello3.txt' => {'Range' => 'bytes=0-0'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
-  ->content_is('X');
+  ->header_is('Content-Range: bytes 0-0/1')->content_is('X');
 
 # GET /default/condition
 $t->get_ok('/default/condition')->status_is(200)

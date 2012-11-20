@@ -38,12 +38,25 @@ $t->get_ok('/hello.txt' => {Range => 'bytes=8-'})->status_is(206)
   ->header_is('Content-Range' => 'bytes 8-30/31')
   ->content_is("jo from a static file!\n");
 
+# GET /hello.txt (partial static file, no start)
+$t->get_ok('/hello.txt' => {Range => 'bytes=-8'})->status_is(206)
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 9)
+  ->header_is('Content-Range' => 'bytes 0-8/31')->content_is('Hello Moj');
+
 # GET /hello.txt (partial static file, starting at first byte)
 $t->get_ok('/hello.txt' => {Range => 'bytes=0-8'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 9)
   ->header_is('Content-Range' => 'bytes 0-8/31')->content_is('Hello Moj');
+
+# GET /hello.txt (partial static file, invalid range)
+$t->get_ok('/hello.txt' => {Range => 'bytes=8-1'})->status_is(416)
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->content_is('');
 
 # GET /hello.txt (partial static file, first byte)
 $t->get_ok('/hello.txt' => {Range => 'bytes=0-0'})->status_is(206)
@@ -80,8 +93,9 @@ $t->get_ok('/hello4.txt')->status_is(200)
 
 # GET /hello4.txt (partial empty file)
 $t->get_ok('/hello4.txt' => {Range => 'bytes=0-0'})->status_is(416)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
+  ->header_is(Server          => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
+  ->header_is('Accept-Ranges' => 'bytes')->content_is('');
 
 # GET /static.txt (base64 static inline file, If-Modified-Since)
 my $modified = Mojo::Date->new->epoch(time - 3600);

@@ -109,7 +109,7 @@ sub _input {
     }
 
     # Others
-    else { $attrs{value} = $values[0] }
+    else { $attrs{value} //= $values[0] }
 
     return _tag('input', name => $name, %attrs);
   }

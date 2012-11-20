@@ -97,6 +97,7 @@ is $req->url->to_abs->to_string,
 {
   local $ENV{MOJO_MAX_MEMORY_SIZE} = 10;
   $req = Mojo::Message::Request->new;
+  is $req->content->asset->max_memory_size, 10, 'right size';
   $req->parse(
     CONTENT_LENGTH  => 12,
     CONTENT_TYPE    => 'text/plain',

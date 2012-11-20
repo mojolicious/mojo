@@ -24,14 +24,14 @@ $req->parse('World');
 is $body, 1, 'body event has been emitted once';
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
-is $req->headers->dnt, 1,         'right "DNT" value';
-is $req->url->path,    'foo/bar', 'right path';
+is $req->url->path, 'foo/bar', 'right path';
 is $req->url->base->path, '/te+st/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',         'right base host';
 is $req->url->base->port, 8080,                'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0',         'right version';
-is $req->body,    'Hello World', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->headers->dnt, 1, 'right "DNT" value';
+is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/te+st/index.cgi/foo/bar?lalala=23&bar=baz',
   'right absolute URL';
@@ -52,14 +52,14 @@ $req->parse(
 $req->parse('Hello World');
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
-is $req->headers->dnt, 1,         'right "DNT" value';
-is $req->url->path,    'foo/bar', 'right path';
+is $req->url->path, 'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'mojolicio.us',     'right base host';
 is $req->url->base->port, '',                 'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0',         'right version';
-is $req->body,    'Hello World', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->headers->dnt, 1, 'right "DNT" value';
+is $req->body, 'Hello World', 'right content';
 is $req->url->to_abs->to_string,
   'http://mojolicio.us/test/index.cgi/foo/bar?lalala=23&bar=baz',
   'right absolute URL';
@@ -80,18 +80,55 @@ $req->parse(
 $req->parse('hello=world');
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
-is $req->headers->dnt, 1,         'right "DNT" value';
-is $req->url->path,    'foo/bar', 'right path';
+is $req->url->path, 'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0',         'right version';
-is $req->body,    'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->headers->dnt, 1, 'right "DNT" value';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string,
   'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
   'right absolute URL';
+
+# Parse Apache CGI environment variables and body (file storage)
+{
+  local $ENV{MOJO_MAX_MEMORY_SIZE} = 10;
+  $req = Mojo::Message::Request->new;
+  $req->parse(
+    CONTENT_LENGTH  => 12,
+    CONTENT_TYPE    => 'text/plain',
+    HTTP_DNT        => 1,
+    PATH_INFO       => '/test/index.cgi/foo/bar',
+    QUERY_STRING    => 'lalala=23&bar=baz',
+    REQUEST_METHOD  => 'POST',
+    SCRIPT_NAME     => '/test/index.cgi',
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.1'
+  );
+  $req->parse('Hello ');
+  ok !$req->content->asset->is_file, 'stored in memory';
+  $req->parse('World!');
+  ok $req->content->asset->is_file, 'stored in file';
+  ok $req->is_finished, 'request is finished';
+  ok !$req->is_multipart, 'no multipart content';
+  is $req->method, 'POST', 'right method';
+  is $req->url->path, 'foo/bar', 'right path';
+  is $req->url->base->path, '/test/index.cgi/', 'right base path';
+  is $req->url->base->host, 'localhost',        'right base host';
+  is $req->url->base->port, 8080,               'right base port';
+  is $req->url->query, 'lalala=23&bar=baz', 'right query';
+  is $req->version, '1.1', 'right version';
+  is $req->headers->dnt,          1,            'right "DNT" value';
+  is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
+  is $req->headers->content_length, 12, 'right "Content-Length" value';
+  is $req->body, 'Hello World!', 'right content';
+  is $req->url->to_abs->to_string,
+    'http://localhost:8080/test/index.cgi/foo/bar?lalala=23&bar=baz',
+    'right absolute URL';
+}
 
 # Parse Apache CGI environment variables with basic authentication
 $req = Mojo::Message::Request->new;
@@ -111,14 +148,14 @@ $req->parse(
 $req->parse('hello=world');
 ok $req->is_finished, 'request is finished';
 is $req->method, 'POST', 'right method';
-is $req->headers->dnt, 1,         'right "DNT" value';
-is $req->url->path,    'foo/bar', 'right path';
+is $req->url->path, 'foo/bar', 'right path';
 is $req->url->base->path, '/test/index.cgi/', 'right base path';
 is $req->url->base->host, 'localhost',        'right base host';
 is $req->url->base->port, 8080,               'right base port';
 is $req->url->query, 'lalala=23&bar=baz', 'right query';
-is $req->version, '1.0',         'right version';
-is $req->body,    'hello=world', 'right content';
+is $req->version, '1.0', 'right version';
+is $req->headers->dnt, 1, 'right "DNT" value';
+is $req->body, 'hello=world', 'right content';
 is_deeply $req->param('hello'), 'world', 'right value';
 is $req->url->to_abs->to_string, 'http://Aladdin:open%20sesame@localhost:8080'
   . '/test/index.cgi/foo/bar?lalala=23&bar=baz', 'right absolute URL';
@@ -275,8 +312,7 @@ is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'https://localhost/test/index.cgi/foo/bar',
   'right absolute URL';
 
-# Parse Apache 2.2.11 CGI environment variables and body
-# (trailing slash)
+# Parse Apache 2.2.11 CGI environment variables and body (trailing slash)
 $req = Mojo::Message::Request->new;
 $req->parse(
   CONTENT_LENGTH  => 11,
@@ -300,8 +336,7 @@ is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/test/index.cgi/foo/bar/',
   'right absolute URL';
 
-# Parse Apache 2.2.11 CGI environment variables and body
-# (no SCRIPT_NAME)
+# Parse Apache 2.2.11 CGI environment variables and body (no SCRIPT_NAME)
 $req = Mojo::Message::Request->new;
 $req->parse(
   CONTENT_LENGTH  => 11,
@@ -324,8 +359,7 @@ is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://localhost/foo/bar',
   'right absolute URL';
 
-# Parse Apache 2.2.11 CGI environment variables and body
-# (no PATH_INFO)
+# Parse Apache 2.2.11 CGI environment variables and body (no PATH_INFO)
 $req = Mojo::Message::Request->new;
 $req->parse(
   CONTENT_LENGTH  => 11,
@@ -408,8 +442,9 @@ $req->parse('11023456789');
 is $req->content->progress, 124, 'right progress';
 $req->parse("\x0d\x0a--8jXGX--");
 is $req->content->progress, 135, 'right progress';
-ok $req->is_finished, 'request is finished';
-is $req->method, 'POST', 'right method';
+ok $req->is_finished,  'request is finished';
+ok $req->is_multipart, 'multipart content';
+is $req->method,       'POST', 'right method';
 is $req->url->base->host, '127.0.0.1', 'right base host';
 is $req->url->path, '/upload', 'right path';
 is $req->url->base->path, '', 'no base path';

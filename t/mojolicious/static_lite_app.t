@@ -72,6 +72,18 @@ $t->get_ok('/hello3.txt' => {Range => 'bytes=0-0'})->status_is(206)
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
   ->header_is('Content-Range' => 'bytes 0-0/1')->content_is('X');
 
+# GET /hello4.txt (empty file)
+$t->get_ok('/hello4.txt')->status_is(200)
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 0)->content_is('');
+
+# GET /hello4.txt (empty file, invalid range)
+$t->get_ok('/hello4.txt' => {Range => 'bytes=0-0'})->status_is(416)
+  ->header_is(Server           => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 0)->content_is('');
+
 # GET /static.txt (base64 static inline file, If-Modified-Since)
 my $modified = Mojo::Date->new->epoch(time - 3600);
 $t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})

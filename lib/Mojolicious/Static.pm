@@ -77,11 +77,11 @@ sub serve_asset {
   # Range
   my $size  = $asset->size;
   my $start = 0;
-  my $end   = $size - 1 >= 0 ? $size - 1 : 0;
+  my $end   = $size - 1;
   if (my $range = $headers->range) {
 
     # Satisfiable
-    if ($range =~ m/^bytes=(\d+)-(\d+)?/ && $1 <= $end) {
+    if ($size && $range =~ m/^bytes=(\d+)-(\d+)?/ && $1 <= $end) {
       $start = $1;
       $end = $2 if defined $2 && $2 <= $end;
       $res->code(206)->headers->content_length($end - $start + 1)

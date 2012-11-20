@@ -12,7 +12,6 @@ BEGIN {
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::Cookie::Response;
-use Mojo::Date;
 use Mojo::IOLoop;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
@@ -448,9 +447,7 @@ get '/redirect_callback' => sub {
 };
 
 # GET /static_render
-get '/static_render' => sub {
-  shift->render_static('hello.txt');
-};
+get '/static_render' => sub { shift->render_static('hello.txt') };
 
 # GET /koi8-r
 app->types->type('koi8-r' => 'text/html; charset=koi8-r');
@@ -459,9 +456,6 @@ get '/koi8-r' => sub {
   shift->render('encoding', format => 'koi8-r', handler => 'ep');
   app->renderer->encoding(undef);
 };
-
-# GET /hello3.txt
-get '/hello3.txt' => sub { shift->render_static('hello2.txt') };
 
 # GET /captures/*/*
 get '/captures/:foo/:bar' => sub {
@@ -715,47 +709,12 @@ $t->get_ok('/static.txt')->status_is(200)
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->content_is("Just some\ntext!\n\n");
 
-# GET /static.txt (static inline file, If-Modified-Since)
-my $modified = Mojo::Date->new->epoch(time - 3600);
-$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->content_is("Just some\ntext!\n\n");
-$modified = $t->tx->res->headers->last_modified;
-$t->get_ok('/static.txt' => {'If-Modified-Since' => $modified})
-  ->status_is(304)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
-
 # GET /static.txt (partial inline file)
-$t->get_ok('/static.txt' => {'Range' => 'bytes=2-5'})->status_is(206)
+$t->get_ok('/static.txt' => {Range => 'bytes=2-5'})->status_is(206)
   ->header_is(Server          => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
   ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)
   ->content_is('st s');
-
-# GET /static.txt (base64 static inline file)
-$t->get_ok('/static2.txt')->status_is(200)
-  ->header_is(Server          => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
-
-# GET /static.txt (base64 static inline file, If-Modified-Since)
-$modified = Mojo::Date->new->epoch(time - 3600);
-$t->get_ok('/static2.txt' => {'If-Modified-Since' => $modified})
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->content_is("test 123\nlalala");
-$modified = $t->tx->res->headers->last_modified;
-$t->get_ok('/static2.txt' => {'If-Modified-Since' => $modified})
-  ->status_is(304)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
-
-# GET /static.txt (base64 partial inline file)
-$t->get_ok('/static2.txt' => {'Range' => 'bytes=2-5'})->status_is(206)
-  ->header_is(Server          => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 4)
-  ->content_is('st 1');
 
 # GET /template.txt.epl (protected DATA template)
 $t->get_ok('/template.txt.epl')->status_is(404)
@@ -1219,48 +1178,6 @@ $t->get_ok('/koi8-r')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/html; charset=koi8-r')->content_like(qr/^$koi8/);
 
-# GET /hello.txt (static file)
-$t->get_ok('/hello.txt')->status_is(200)
-  ->header_is(Server          => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 31)
-  ->content_is("Hello Mojo from a static file!\n");
-
-# GET /hello.txt (partial static file)
-$t->get_ok('/hello.txt' => {'Range' => 'bytes=2-8'})->status_is(206)
-  ->header_is(Server          => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 7)
-  ->header_is('Content-Range: bytes 2-8/31')->content_is('llo Moj');
-
-# GET /hello.txt (partial static file, starting at first byte)
-$t->get_ok('/hello.txt' => {'Range' => 'bytes=0-8'})->status_is(206)
-  ->header_is(Server          => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 9)
-  ->header_is('Content-Range: bytes 0-8/31')->content_is('Hello Moj');
-
-# GET /hello.txt (partial static file, first byte)
-$t->get_ok('/hello.txt' => {'Range' => 'bytes=0-0'})->status_is(206)
-  ->header_is(Server          => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
-  ->header_is('Content-Range: bytes 0-0/31')->content_is('H');
-
-# GET /hello3.txt (render_static and single byte file)
-$t->get_ok('/hello3.txt')->status_is(200)
-  ->header_is(Server          => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
-  ->content_is('X');
-
-# GET /hello3.txt (render_static and partial single byte file)
-$t->get_ok('/hello3.txt' => {'Range' => 'bytes=0-0'})->status_is(206)
-  ->header_is(Server          => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'  => 'Mojolicious (Perl)')
-  ->header_is('Accept-Ranges' => 'bytes')->header_is('Content-Length' => 1)
-  ->header_is('Content-Range: bytes 0-0/1')->content_is('X');
-
 # GET /default/condition
 $t->get_ok('/default/condition')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -1358,9 +1275,6 @@ text!
 
 @@ test(test)(\Qtest\E)(.html.ep
 <%= $self->match->endpoint->name %>
-
-@@ static2.txt (base64)
-dGVzdCAxMjMKbGFsYWxh
 
 @@ with_header_condition.html.ep
 Test ok<%= base_tag %>

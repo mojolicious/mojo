@@ -211,9 +211,9 @@ sub _read {
   warn "-- Server <<< Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
 
-  # Last keep alive request
+  # Last keep alive request or corrupted connection
   $tx->res->headers->connection('close')
-    if ($c->{requests} || 0) >= $self->max_requests;
+    if (($c->{requests} || 0) >= $self->max_requests) || $tx->req->error;
 
   # Finish or start writing
   if ($tx->is_finished) { $self->_finish($id, $tx) }

@@ -159,11 +159,11 @@ sub parse {
 
   # CGI like environment
   $self->env($env)->_parse_env($env) if $env;
-  $self->content($self->content->parse_body(@args))
-    if ($self->{state} // '') eq 'cgi';
+  my $cgi = ($self->{state} // '') eq 'cgi';
+  $self->content($self->content->parse_body(@args)) if $cgi;
 
-  # Pass through
-  $self->SUPER::parse(@args);
+  # Pass through for normal requests
+  $self->SUPER::parse($cgi ? undef : @args);
 
   # Check if we can fix things that require all headers
   return $self unless $self->is_finished;

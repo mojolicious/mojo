@@ -229,9 +229,7 @@ sub parse {
     if $self->content->is_limit_exceeded;
 
   # Progress
-  $self->emit('progress');
-
-  return $self->content->is_finished ? $self->finish : $self;
+  return $self->emit('progress')->content->is_finished ? $self->finish : $self;
 }
 
 sub start_line_size { length shift->build_start_line }

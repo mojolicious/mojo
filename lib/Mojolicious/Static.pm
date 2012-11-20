@@ -83,7 +83,7 @@ sub serve_asset {
     # Not satisfiable
     return $res->code(416) unless $size && $range =~ m/^bytes=(\d+)?-(\d+)?/;
     $start = $1 if defined $1;
-    $end   = $2 if defined $2;
+    $end = $2 if defined $2 && $2 <= $end;
     return $res->code(416) if $start > $end || $end > ($size - 1);
 
     # Satisfiable

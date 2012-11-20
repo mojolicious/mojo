@@ -78,11 +78,10 @@ $t->get_ok('/hello4.txt')->status_is(200)
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 0)->content_is('');
 
-# GET /hello4.txt (empty file, invalid range)
+# GET /hello4.txt (partial empty file)
 $t->get_ok('/hello4.txt' => {Range => 'bytes=0-0'})->status_is(416)
-  ->header_is(Server           => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
-  ->header_is('Content-Length' => 0)->content_is('');
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('');
 
 # GET /static.txt (base64 static inline file, If-Modified-Since)
 my $modified = Mojo::Date->new->epoch(time - 3600);

@@ -154,16 +154,17 @@ sub params {
 
 sub parse {
   my $self = shift;
-  my $env  = @_ > 1 ? {@_} : ref $_[0] eq 'HASH' ? $_[0] : undef;
-  my @args = $env ? undef : @_;
 
-  # CGI like environment
+  # Parse CGI like environment
+  my $env = @_ > 1 ? {@_} : ref $_[0] eq 'HASH' ? $_[0] : undef;
   $self->env($env)->_parse_env($env) if $env;
-  my $cgi = ($self->{state} // '') eq 'cgi';
-  $self->content($self->content->parse_body(@args)) if $cgi;
 
-  # Pass through for normal requests
-  $self->SUPER::parse($cgi ? undef : @args);
+  # Parse normal message
+  my @args = $env ? undef : @_;
+  if (($self->{state} // '') ne 'cgi') { $self->SUPER::parse(@args) }
+
+  # Parse CGI content
+  else { $self->content($self->content->parse_body(@args))->SUPER::parse }
 
   # Check if we can fix things that require all headers
   return $self unless $self->is_finished;
@@ -261,7 +262,7 @@ sub _parse_env {
     $path->parse($buffer);
   }
 
-  # Bypass normal content parser
+  # Bypass normal message parser
   $self->{state} = 'cgi';
 }
 

@@ -207,7 +207,7 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 </form>
 <input name="escaped" value="1&quot; &quot;2" />
 <input name="a" value="2" />
-<input name="a" value="2" />
+<input name="a" value="c" />
 EOF
 
 # GET /form (alternative)

@@ -98,6 +98,7 @@ is $req->url->to_abs->to_string,
   local $ENV{MOJO_MAX_MEMORY_SIZE} = 10;
   $req = Mojo::Message::Request->new;
   is $req->content->asset->max_memory_size, 10, 'right size';
+  ok !$req->content->is_parsing_body, 'is not parsing body';
   $req->parse(
     CONTENT_LENGTH  => 12,
     CONTENT_TYPE    => 'text/plain',
@@ -109,10 +110,16 @@ is $req->url->to_abs->to_string,
     HTTP_HOST       => 'localhost:8080',
     SERVER_PROTOCOL => 'HTTP/1.1'
   );
+  ok $req->content->is_parsing_body, 'is parsing body';
+  is $req->content->progress, 0, 'right progress';
   $req->parse('Hello ');
+  ok $req->content->is_parsing_body, 'is parsing body';
   ok !$req->content->asset->is_file, 'stored in memory';
+  is $req->content->progress, 6, 'right progress';
   $req->parse('World!');
+  ok !$req->content->is_parsing_body, 'is not parsing body';
   ok $req->content->asset->is_file, 'stored in file';
+  is $req->content->progress, 12, 'right progress';
   ok $req->is_finished, 'request is finished';
   ok !$req->is_multipart, 'no multipart content';
   is $req->method, 'POST', 'right method';

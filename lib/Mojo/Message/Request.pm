@@ -155,12 +155,12 @@ sub params {
 sub parse {
   my $self = shift;
 
-  # Parse CGI like environment
+  # Parse CGI environment
   my $env = @_ > 1 ? {@_} : ref $_[0] eq 'HASH' ? $_[0] : undef;
   $self->env($env)->_parse_env($env) if $env;
 
   # Parse normal message
-  my @args = $env ? undef : @_;
+  my @args = $env ? () : @_;
   if (($self->{state} // '') ne 'cgi') { $self->SUPER::parse(@args) }
 
   # Parse CGI content

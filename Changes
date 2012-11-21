@@ -1,4 +1,7 @@
 
+3.60  2012-11-21
+  - Improved tests.
+
 3.59  2012-11-20
   - Improved tests.
   - Fixed memory leak in Mojo::Message::Request.

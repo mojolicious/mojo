@@ -75,9 +75,9 @@ L<GitHub pull requests|https://help.github.com/articles/using-pull-requests>.
 
 An expressive title and detailed description are invaluable during the review
 process, which usually ends when members of the community have voiced their
-opinions and members of the core developer team voted for or against a change.
-All code changes should emulate the style of the surrounding code, include
-tests that fail without them, and update relevant documentation.
+opinions and the core team voted for or against a change. All code changes
+should emulate the style of the surrounding code, include tests that fail
+without them, and update relevant documentation.
 
 While the L<Mojolicious> distribution covers a wide range of features, we are
 rather conservative when it comes to adding new ones. So if your contribution

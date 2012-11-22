@@ -9,8 +9,8 @@ BEGIN {
 use Test::More;
 use Mojo;
 use Mojo::IOLoop;
+use Mojo::Log;
 use Mojo::Server::Daemon;
-use Mojo::Transaction::HTTP;
 use Mojo::UserAgent;
 use Mojolicious;
 
@@ -124,30 +124,20 @@ Mojo::IOLoop->start;
 like $buffer, qr/Mojo$/, 'transactions were pipelined';
 
 # Normal request
-my $tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse('/3/');
-$ua->start($tx);
+my $tx = $ua->get('/3/');
 ok $tx->keep_alive, 'will be kept alive';
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # Keep alive request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse('/4/');
-$ua->start($tx);
+$tx = $ua->get('/4/');
 ok $tx->keep_alive, 'will be kept alive';
 ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # Non keep alive request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse('/5/');
-$tx->req->headers->connection('close');
-$ua->start($tx);
+$tx = $ua->get('/5/' => {Connection => 'close'});
 ok !$tx->keep_alive, 'will not be kept alive';
 ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code, 200, 'right status';
@@ -155,11 +145,7 @@ is $tx->res->headers->connection, 'close', 'right "Connection" value';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # Second non keep alive request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse('/6/');
-$tx->req->headers->connection('close');
-$ua->start($tx);
+$tx = $ua->get('/6/' => {Connection => 'close'});
 ok !$tx->keep_alive, 'will not be kept alive';
 ok !$tx->kept_alive, 'was not kept alive';
 is $tx->res->code, 200, 'right status';
@@ -167,39 +153,26 @@ is $tx->res->headers->connection, 'close', 'right "Connection" value';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # POST request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('POST');
-$tx->req->url->parse('/7/');
-$tx->req->headers->expect('fun');
-$tx->req->body('foo bar baz' x 128);
-$ua->start($tx);
-is $tx->res->code,   200,      'right status';
-like $tx->res->body, qr/Mojo/, 'right content';
-
-# POST request
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('POST');
-$tx->req->url->parse('/8/');
-$tx->req->headers->expect('fun');
-$tx->req->body('bar baz foo' x 128);
-$ua->start($tx);
+$tx = $ua->post('/7/' => {Expect => 'fun'} => 'foo bar baz' x 128);
 ok defined $tx->connection, 'has connection id';
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
 
-# Multiple requests
-$tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('GET');
-$tx->req->url->parse('/9/');
-my $tx2 = Mojo::Transaction::HTTP->new;
-$tx2->req->method('GET');
-$tx2->req->url->parse('/10/');
-$ua->start($tx);
-$ua->start($tx2);
-ok defined $tx->connection,  'has connection id';
-ok defined $tx2->connection, 'has connection id';
-ok $tx->is_finished,  'transaction is finished';
+# Parallel requests
+my $delay = Mojo::IOLoop->delay;
+$ua->get('/8/' => $delay->begin);
+$ua->post('/9/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
+$ua->get('/10/' => $delay->begin);
+($tx, my $tx2, my $tx3) = $delay->wait;
+ok $tx->is_finished, 'transaction is finished';
+is $tx->res->body, 'Your Mojo is working!', 'right content';
+ok !$tx->error, 'no error';
 ok $tx2->is_finished, 'transaction is finished';
+is $tx2->res->body, 'Your Mojo is working!', 'right content';
+ok !$tx2->error, 'no error';
+ok $tx3->is_finished, 'transaction is finished';
+is $tx3->res->body, 'Your Mojo is working!', 'right content';
+ok !$tx3->error, 'no error';
 
 # Form with chunked response
 my %params;
@@ -225,21 +198,5 @@ ok $local_address, 'has local address';
 ok $local_port > 0, 'has local port';
 ok $remote_address, 'has local address';
 ok $remote_port > 0, 'has local port';
-
-# Parallel requests
-my $delay = Mojo::IOLoop->delay;
-$ua->get('/13/' => $delay->begin);
-$ua->post('/14/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
-$ua->get('/15/' => $delay->begin);
-($tx, $tx2, my $tx3) = $delay->wait;
-ok $tx->is_finished, 'transaction is finished';
-is $tx->res->body, 'Your Mojo is working!', 'right content';
-ok !$tx->error, 'no error';
-ok $tx2->is_finished, 'transaction is finished';
-is $tx2->res->body, 'Your Mojo is working!', 'right content';
-ok !$tx2->error, 'no error';
-ok $tx3->is_finished, 'transaction is finished';
-is $tx3->res->body, 'Your Mojo is working!', 'right content';
-ok !$tx3->error, 'no error';
 
 done_testing();

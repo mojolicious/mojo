@@ -12,10 +12,6 @@ sub client_read {
 
   # Parse response
   $self->{state} = 'finished' if $res->parse($chunk)->is_finished;
-
-  # Unexpected 100 Continue
-  $self->res($res->new)->emit('continue')->{state} = 'write_body'
-    if $self->{state} eq 'finished' && ($res->code // '') eq '100';
 }
 
 sub client_write {
@@ -80,20 +76,10 @@ sub server_read {
   $self->{state} ||= 'read';
 
   # Generate response
-  if ($req->is_finished && !$self->{handled}++) {
-    $self->emit(
-      upgrade => Mojo::Transaction::WebSocket->new(handshake => $self))
-      if lc($req->headers->upgrade || '') eq 'websocket';
-    $self->emit('request');
-  }
-
-  # Expect 100 Continue
-  elsif ($req->content->is_parsing_body && !defined $self->{continued}) {
-    return unless ($req->headers->expect || '') =~ /100-continue/i;
-    $self->{state} = 'write';
-    $self->res->code(100);
-    $self->{continued} = 0;
-  }
+  return unless $req->is_finished && !$self->{handled}++;
+  $self->emit(upgrade => Mojo::Transaction::WebSocket->new(handshake => $self))
+    if lc($req->headers->upgrade || '') eq 'websocket';
+  $self->emit('request');
 }
 
 sub server_write {
@@ -119,13 +105,7 @@ sub server_write {
   $chunk .= $self->_start_line($res) if $self->{state} eq 'write_start_line';
 
   # Headers
-  if ($self->{state} eq 'write_headers') {
-    $chunk .= $self->_headers($res, 1);
-
-    # Continued
-    $self->res($self->res->new)->{continued} = $self->{state} = 'read'
-      if defined $self->{continued} && !$self->{continued};
-  }
+  $chunk .= $self->_headers($res, 1) if $self->{state} eq 'write_headers';
 
   # Body
   $chunk .= $self->_body($res, 1) if $self->{state} eq 'write_body';
@@ -241,21 +221,6 @@ in RFC 2616.
 
 L<Mojo::Transaction::HTTP> inherits all events from L<Mojo::Transaction> and
 can emit the following new ones.
-
-=head2 C<continue>
-
-  $tx->on(continue => sub {
-    my $tx = shift;
-    ...
-  });
-
-Emitted when a C<100 Continue> response has been received and another response
-will follow.
-
-  $tx->on(continue => sub {
-    my $tx = shift;
-    $tx->res->on(finish => sub { say 'Finished followup response.' });
-  });
 
 =head2 C<request>
 

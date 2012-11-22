@@ -213,20 +213,13 @@ ok $tx->res->is_finished, 'response is finished';
 is $tx->res->code,        200, 'right status';
 is $tx->res->body,        'works!', 'right content';
 
-# POST /echo (100 Continue)
-my $continue;
-$tx = $ua->build_tx(
-  POST => '/echo' => {'Content-Length' => 15, Expect => '100-continue'});
-$tx->on(continue => sub { $continue++ });
-my $cb;
-$cb = sub {
-  my $req = shift;
-  $continue ? $req->write('Hello Continue!') : $req->write(undef, $cb);
-};
-$tx->req->$cb;
-$tx = $ua->start($tx);
+# GET /echo (removed Expect header)
+my $expect;
+$ua->once(start => sub { $expect = pop->req->headers->expect });
+$tx = $ua->get('/echo' => {Expect => '100-Continue'} => 'Hello Continue!');
 ok $tx->success, 'successful';
-is $continue, 1, 'continue event has been emitted once';
+ok !$expect, 'no "Expect" header';
+ok !$tx->req->headers->expect, 'no "Expect" header';
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'Hello Continue!', 'right content';
 

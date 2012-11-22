@@ -18,36 +18,7 @@ sub client_read {
   $self->client_read($res->leftovers) if $res->has_leftovers;
 }
 
-sub client_write {
-  my $self = shift;
-
-  # Start writing
-  $self->{$_} ||= 0 for qw(offset write);
-  my $req = $self->req;
-  unless ($self->{state}) {
-
-    # Connection header
-    my $headers = $req->headers;
-    $headers->connection($self->keep_alive ? 'keep-alive' : 'close')
-      unless $headers->connection;
-
-    # Write start line
-    $self->{state} = 'write_start_line';
-    $self->{write} = $req->start_line_size;
-  }
-
-  # Start line
-  my $chunk = '';
-  $chunk .= $self->_start_line($req) if $self->{state} eq 'write_start_line';
-
-  # Headers
-  $chunk .= $self->_headers($req, 0) if $self->{state} eq 'write_headers';
-
-  # Body
-  $chunk .= $self->_body($req, 0) if $self->{state} eq 'write_body';
-
-  return $chunk;
-}
+sub client_write { shift->_write(0) }
 
 sub keep_alive {
   my $self = shift;
@@ -86,36 +57,7 @@ sub server_read {
   $self->emit('request');
 }
 
-sub server_write {
-  my $self = shift;
-
-  # Writing
-  my $chunk = '';
-  $self->{$_} ||= 0 for qw(offset write);
-  my $res = $self->res;
-  if ($self->{state} eq 'write') {
-
-    # Connection header
-    my $headers = $res->headers;
-    $headers->connection($self->keep_alive ? 'keep-alive' : 'close')
-      unless $headers->connection;
-
-    # Write start line
-    $self->{state} = 'write_start_line';
-    $self->{write} = $res->start_line_size;
-  }
-
-  # Start line
-  $chunk .= $self->_start_line($res) if $self->{state} eq 'write_start_line';
-
-  # Headers
-  $chunk .= $self->_headers($res, 1) if $self->{state} eq 'write_headers';
-
-  # Body
-  $chunk .= $self->_body($res, 1) if $self->{state} eq 'write_body';
-
-  return $chunk;
-}
+sub server_write { shift->_write(1) }
 
 sub _body {
   my ($self, $msg, $finish) = @_;
@@ -184,6 +126,38 @@ sub _start_line {
   }
 
   return $buffer;
+}
+
+sub _write {
+  my ($self, $server) = @_;
+
+  # Start writing
+  $self->{$_} ||= 0 for qw(offset write);
+  my $msg = $server ? $self->res : $self->req;
+  if ($server ? ($self->{state} eq 'write') : !$self->{state}) {
+
+    # Connection header
+    my $headers = $msg->headers;
+    $headers->connection($self->keep_alive ? 'keep-alive' : 'close')
+      unless $headers->connection;
+
+    # Write start line
+    $self->{state} = 'write_start_line';
+    $self->{write} = $msg->start_line_size;
+  }
+
+  # Start line
+  my $chunk = '';
+  $chunk .= $self->_start_line($msg) if $self->{state} eq 'write_start_line';
+
+  # Headers
+  $chunk .= $self->_headers($msg, $server)
+    if $self->{state} eq 'write_headers';
+
+  # Body
+  $chunk .= $self->_body($msg, $server) if $self->{state} eq 'write_body';
+
+  return $chunk;
 }
 
 1;

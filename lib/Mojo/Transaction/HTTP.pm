@@ -251,7 +251,7 @@ implements the following new ones.
 
   $tx->client_read($chunk);
 
-Read and process data client-side.
+Read data client-side.
 
 =head2 C<client_write>
 
@@ -269,7 +269,7 @@ Check if connection can be kept alive.
 
   $tx->server_read($chunk);
 
-Read and process data server-side.
+Read data server-side.
 
 =head2 C<server_write>
 

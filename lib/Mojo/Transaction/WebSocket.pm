@@ -445,7 +445,7 @@ Perform WebSocket handshake client-side.
 
   $ws->client_read($data);
 
-Read and process data client-side.
+Read data client-side.
 
 =head2 C<client_write>
 
@@ -558,7 +558,7 @@ Perform WebSocket handshake server-side.
 
   $ws->server_read($data);
 
-Read and process data server-side.
+Read data server-side.
 
 =head2 C<server_write>
 

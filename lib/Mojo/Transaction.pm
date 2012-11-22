@@ -204,7 +204,7 @@ Transaction closed client-side.
 
   $tx->client_read($chunk);
 
-Read and process data client-side. Meant to be overloaded in a subclass.
+Read data client-side. Meant to be overloaded in a subclass.
 
 =head2 C<client_write>
 
@@ -267,7 +267,7 @@ Transaction closed server-side.
 
   $tx->server_read($chunk);
 
-Read and process data server-side. Meant to be overloaded in a subclass.
+Read data server-side. Meant to be overloaded in a subclass.
 
 =head2 C<server_write>
 

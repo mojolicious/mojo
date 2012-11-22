@@ -14,7 +14,6 @@ use Mojo::ByteStream 'b';
 use Mojo::Cookie::Response;
 use Mojo::IOLoop;
 use Mojo::JSON;
-use Mojo::Transaction::HTTP;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -1041,12 +1040,8 @@ $t->post_form_ok(
   ->content_is("табак ангел\n");
 
 # POST /malformed_utf8
-my $tx = Mojo::Transaction::HTTP->new;
-$tx->req->method('POST');
-$tx->req->url->parse('/malformed_utf8');
-$tx->req->headers->content_type('application/x-www-form-urlencoded');
-$tx->req->body('foo=%E1');
-$t->ua->start($tx);
+my $tx = $t->ua->post('/malformed_utf8' =>
+    {'Content-Type' => 'application/x-www-form-urlencoded'} => 'foo=%E1');
 is $tx->res->code, 200, 'right status';
 is scalar $tx->res->headers->server, 'Mojolicious (Perl)',
   'right "Server" value';

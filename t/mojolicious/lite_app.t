@@ -13,7 +13,6 @@ use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::Cookie::Response;
 use Mojo::IOLoop;
-use Mojo::JSON;
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -1040,14 +1039,10 @@ $t->post_form_ok(
   ->content_is("табак ангел\n");
 
 # POST /malformed_utf8
-my $tx = $t->ua->post('/malformed_utf8' =>
-    {'Content-Type' => 'application/x-www-form-urlencoded'} => 'foo=%E1');
-is $tx->res->code, 200, 'right status';
-is scalar $tx->res->headers->server, 'Mojolicious (Perl)',
-  'right "Server" value';
-is scalar $tx->res->headers->header('X-Powered-By'), 'Mojolicious (Perl)',
-  'right "X-Powered-By" value';
-is $tx->res->body, '%E1', 'right content';
+$t->post_ok('/malformed_utf8' =>
+    {'Content-Type' => 'application/x-www-form-urlencoded'} => 'foo=%E1')
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('%E1');
 
 # GET /json
 $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

@@ -13,7 +13,7 @@ sub client_read {
 
   # Unexpected 1xx reponse
   return $self->{state} = 'finished'
-    if $res->headers->upgrade || !$res->is_status_class(100);
+    if !$res->is_status_class(100) || $res->headers->upgrade;
   $self->res($res->new)->emit(unexpected => $res);
   $self->client_read($res->leftovers) if $res->has_leftovers;
 }

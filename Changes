@@ -1,4 +1,7 @@
 
+3.61  2012-11-23
+  - Improved tests.
+
 3.60  2012-11-22
   - Added unexpected event to Mojo::Transaction::HTTP.
   - Improved documentation.

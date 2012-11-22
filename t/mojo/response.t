@@ -5,7 +5,6 @@ use IO::Compress::Gzip 'gzip';
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
-use Mojo::Headers;
 use Mojo::JSON;
 use Mojo::Message::Response;
 

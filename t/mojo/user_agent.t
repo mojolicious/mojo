@@ -213,6 +213,23 @@ ok $tx->res->is_finished, 'response is finished';
 is $tx->res->code,        200, 'right status';
 is $tx->res->body,        'works!', 'right content';
 
+# POST /echo (100 Continue)
+my $continue;
+$tx = $ua->build_tx(
+  POST => '/echo' => {'Content-Length' => 15, Expect => '100-continue'});
+$tx->on(continue => sub { $continue++ });
+my $cb;
+$cb = sub {
+  my $req = shift;
+  $continue ? $req->write('Hello Continue!') : $req->write(undef, $cb);
+};
+$tx->req->$cb;
+$tx = $ua->start($tx);
+ok $tx->success, 'successful';
+is $continue, 1, 'continue event has been emitted once';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Hello Continue!', 'right content';
+
 # GET /no_length (missing Content-Length header)
 ($finished_req, $finished_tx, $finished_res) = ();
 $tx = $ua->build_tx(GET => '/no_length');

@@ -11,11 +11,10 @@ sub client_read {
   $res->content->skip_body(1) if $self->req->method eq 'HEAD';
 
   # Parse response
-  my $state = $self->{state};
   $self->{state} = 'finished' if $res->parse($chunk)->is_finished;
 
   # Unexpected 100 Continue
-  $self->res($res->new)->{state} = $state
+  $self->res($res->new)->emit('continue')->{state} = 'write_body'
     if $self->{state} eq 'finished' && ($res->code // '') eq '100';
 }
 
@@ -242,6 +241,21 @@ in RFC 2616.
 
 L<Mojo::Transaction::HTTP> inherits all events from L<Mojo::Transaction> and
 can emit the following new ones.
+
+=head2 C<continue>
+
+  $tx->on(continue => sub {
+    my $tx = shift;
+    ...
+  });
+
+Emitted when a C<100 Continue> response has been received and another response
+will follow.
+
+  $tx->on(continue => sub {
+    my $tx = shift;
+    $tx->res->on(finish => sub { say 'Finished followup response.' });
+  });
 
 =head2 C<request>
 

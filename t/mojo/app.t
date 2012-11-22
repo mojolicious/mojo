@@ -99,7 +99,7 @@ $app->routes->post(
 # /*
 $app->routes->any('/*whatever' => {text => 'Your Mojo is working!'});
 
-# Continue
+# Pipelined
 my $port   = $ua->app_url->port;
 my $buffer = '';
 my $id;
@@ -111,35 +111,12 @@ $id = Mojo::IOLoop->client(
         my ($stream, $chunk) = @_;
         $buffer .= $chunk;
         Mojo::IOLoop->remove($id) and Mojo::IOLoop->stop
-          if $buffer =~ s/ is working!$//;
-        $stream->write('4321')
-          if $buffer =~ m!HTTP/1.1 100 Continue.*\x0d\x0a\x0d\x0a!gs;
-      }
-    );
-    $stream->write("GET /1/ HTTP/1.1\x0d\x0a"
-        . "Expect: 100-continue\x0d\x0a"
-        . "Content-Length: 4\x0d\x0a\x0d\x0a");
-  }
-);
-Mojo::IOLoop->start;
-like $buffer, qr!HTTP/1.1 100 Continue.*Mojo$!s, 'request was continued';
-
-# Pipelined
-$buffer = '';
-$id     = Mojo::IOLoop->client(
-  {port => $port} => sub {
-    my ($loop, $err, $stream) = @_;
-    $stream->on(
-      read => sub {
-        my ($stream, $chunk) = @_;
-        $buffer .= $chunk;
-        Mojo::IOLoop->remove($id) and Mojo::IOLoop->stop
           if $buffer =~ s/ is working!.*is working!$//gs;
       }
     );
-    $stream->write("GET /2/ HTTP/1.1\x0d\x0a"
+    $stream->write("GET /1/ HTTP/1.1\x0d\x0a"
         . "Content-Length: 0\x0d\x0a\x0d\x0a"
-        . "GET /3/ HTTP/1.1\x0d\x0a"
+        . "GET /2/ HTTP/1.1\x0d\x0a"
         . "Content-Length: 0\x0d\x0a\x0d\x0a");
   }
 );
@@ -149,7 +126,7 @@ like $buffer, qr/Mojo$/, 'transactions were pipelined';
 # Normal request
 my $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/5/');
+$tx->req->url->parse('/3/');
 $ua->start($tx);
 ok $tx->keep_alive, 'will be kept alive';
 is $tx->res->code,   200,      'right status';
@@ -158,7 +135,7 @@ like $tx->res->body, qr/Mojo/, 'right content';
 # Keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/6/');
+$tx->req->url->parse('/4/');
 $ua->start($tx);
 ok $tx->keep_alive, 'will be kept alive';
 ok $tx->kept_alive, 'was kept alive';
@@ -168,7 +145,7 @@ like $tx->res->body, qr/Mojo/, 'right content';
 # Non keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/7/');
+$tx->req->url->parse('/5/');
 $tx->req->headers->connection('close');
 $ua->start($tx);
 ok !$tx->keep_alive, 'will not be kept alive';
@@ -180,7 +157,7 @@ like $tx->res->body, qr/Mojo/, 'right content';
 # Second non keep alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/8/');
+$tx->req->url->parse('/6/');
 $tx->req->headers->connection('close');
 $ua->start($tx);
 ok !$tx->keep_alive, 'will not be kept alive';
@@ -192,7 +169,7 @@ like $tx->res->body, qr/Mojo/, 'right content';
 # POST request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
-$tx->req->url->parse('/9/');
+$tx->req->url->parse('/7/');
 $tx->req->headers->expect('fun');
 $tx->req->body('foo bar baz' x 128);
 $ua->start($tx);
@@ -202,7 +179,7 @@ like $tx->res->body, qr/Mojo/, 'right content';
 # POST request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('POST');
-$tx->req->url->parse('/10/');
+$tx->req->url->parse('/8/');
 $tx->req->headers->expect('fun');
 $tx->req->body('bar baz foo' x 128);
 $ua->start($tx);
@@ -213,10 +190,10 @@ like $tx->res->body, qr/Mojo/, 'right content';
 # Multiple requests
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
-$tx->req->url->parse('/11/');
+$tx->req->url->parse('/9/');
 my $tx2 = Mojo::Transaction::HTTP->new;
 $tx2->req->method('GET');
-$tx2->req->url->parse('/12/');
+$tx2->req->url->parse('/10/');
 $ua->start($tx);
 $ua->start($tx2);
 ok defined $tx->connection,  'has connection id';

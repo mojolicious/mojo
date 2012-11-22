@@ -1,7 +1,9 @@
 
 3.60  2012-11-22
+  - Added continue event to Mojo::Transaction::HTTP.
   - Improved documentation.
   - Improved tests.
+  - Fixed 100 Continue support in Mojo::UserAgent.
 
 3.59  2012-11-20
   - Improved tests.

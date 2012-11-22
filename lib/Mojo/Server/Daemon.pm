@@ -137,12 +137,13 @@ sub _finish {
   }
 
   # Close connection if necessary
-  return $self->_remove($id) if $tx->req->error || !$tx->keep_alive;
+  my $req = $tx->req;
+  return $self->_remove($id) if $req->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return unless defined(my $leftovers = $tx->server_leftovers);
+  return unless $req->has_leftovers;
   $tx = $c->{tx} = $self->_build_tx($id, $c);
-  $tx->server_read($leftovers);
+  $tx->server_read($req->leftovers);
 }
 
 sub _listen {

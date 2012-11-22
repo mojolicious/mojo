@@ -114,9 +114,9 @@ $id = Mojo::IOLoop->client(
           if $buffer =~ s/ is working!.*is working!$//gs;
       }
     );
-    $stream->write("GET /1/ HTTP/1.1\x0d\x0a"
+    $stream->write("GET /pipeline1/ HTTP/1.1\x0d\x0a"
         . "Content-Length: 0\x0d\x0a\x0d\x0a"
-        . "GET /2/ HTTP/1.1\x0d\x0a"
+        . "GET /pipeline2/ HTTP/1.1\x0d\x0a"
         . "Content-Length: 0\x0d\x0a\x0d\x0a");
   }
 );
@@ -124,20 +124,20 @@ Mojo::IOLoop->start;
 like $buffer, qr/Mojo$/, 'transactions were pipelined';
 
 # Normal request
-my $tx = $ua->get('/3/');
+my $tx = $ua->get('/normal/');
 ok $tx->keep_alive, 'will be kept alive';
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # Keep alive request
-$tx = $ua->get('/4/');
+$tx = $ua->get('/normal/');
 ok $tx->keep_alive, 'will be kept alive';
 ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # Non keep alive request
-$tx = $ua->get('/5/' => {Connection => 'close'});
+$tx = $ua->get('/close/' => {Connection => 'close'});
 ok !$tx->keep_alive, 'will not be kept alive';
 ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code, 200, 'right status';
@@ -145,7 +145,7 @@ is $tx->res->headers->connection, 'close', 'right "Connection" value';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # Second non keep alive request
-$tx = $ua->get('/6/' => {Connection => 'close'});
+$tx = $ua->get('/close/' => {Connection => 'close'});
 ok !$tx->keep_alive, 'will not be kept alive';
 ok !$tx->kept_alive, 'was not kept alive';
 is $tx->res->code, 200, 'right status';
@@ -153,16 +153,17 @@ is $tx->res->headers->connection, 'close', 'right "Connection" value';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # POST request
-$tx = $ua->post('/7/' => {Expect => 'fun'} => 'foo bar baz' x 128);
+$tx = $ua->post('/fun/' => {Expect => 'fun'} => 'foo bar baz' x 128);
 ok defined $tx->connection, 'has connection id';
 is $tx->res->code,   200,      'right status';
 like $tx->res->body, qr/Mojo/, 'right content';
 
 # Parallel requests
 my $delay = Mojo::IOLoop->delay;
-$ua->get('/8/' => $delay->begin);
-$ua->post('/9/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
-$ua->get('/10/' => $delay->begin);
+$ua->get('/parallel1/' => $delay->begin);
+$ua->post(
+  '/parallel2/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
+$ua->get('/parallel3/' => $delay->begin);
 ($tx, my $tx2, my $tx3) = $delay->wait;
 ok $tx->is_finished, 'transaction is finished';
 is $tx->res->body, 'Your Mojo is working!', 'right content';

@@ -37,11 +37,6 @@ sub keep_alive {
   return !($req->version eq '1.0' || $res->version eq '1.0');
 }
 
-sub server_leftovers {
-  my $req = shift->req;
-  return $req->has_leftovers ? $req->leftovers : undef;
-}
-
 sub server_read {
   my ($self, $chunk) = @_;
 
@@ -269,12 +264,6 @@ Write data client-side.
   my $success = $tx->keep_alive;
 
 Check if connection can be kept alive.
-
-=head2 C<server_leftovers>
-
-  my $leftovers = $tx->server_leftovers;
-
-Leftovers from the request, used for pipelining server-side.
 
 =head2 C<server_read>
 

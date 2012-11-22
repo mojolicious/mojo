@@ -9,9 +9,13 @@ sub client_read {
   # Skip body for HEAD request
   my $res = $self->res;
   $res->content->skip_body(1) if $self->req->method eq 'HEAD';
+  return unless $res->parse($chunk)->is_finished;
 
-  # Parse response
-  $self->{state} = 'finished' if $res->parse($chunk)->is_finished;
+  # Unexpected 1xx reponse
+  return $self->{state} = 'finished'
+    if $res->headers->upgrade || !$res->is_status_class(100);
+  $self->res($res->new)->emit(unexpected => $res);
+  $self->client_read($res->leftovers) if $res->has_leftovers;
 }
 
 sub client_write {
@@ -234,6 +238,20 @@ Emitted when a request is ready and needs to be handled.
   $tx->on(request => sub {
     my $tx = shift;
     $tx->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
+  });
+
+=head2 C<unexpected>
+
+  $tx->on(unexpected => sub {
+    my ($tx, $res) = @_;
+    ...
+  });
+
+Emitted for unexpected C<1xx> responses that will be ignored.
+
+  $tx->on(unexpected => sub {
+    my $tx = shift;
+    $tx->res->on(finish => sub { say 'Followup response is finished.' });
   });
 
 =head2 C<upgrade>

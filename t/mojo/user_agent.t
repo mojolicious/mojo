@@ -9,6 +9,7 @@ BEGIN {
 use Test::More;
 use IO::Compress::Gzip 'gzip';
 use Mojo::IOLoop;
+use Mojo::Message::Request;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
 
@@ -212,16 +213,6 @@ ok $tx->is_finished, 'transaction is finished';
 ok $tx->res->is_finished, 'response is finished';
 is $tx->res->code,        200, 'right status';
 is $tx->res->body,        'works!', 'right content';
-
-# GET /echo (removed Expect header)
-my $expect;
-$ua->once(start => sub { $expect = pop->req->headers->expect });
-$tx = $ua->get('/echo' => {Expect => '100-Continue'} => 'Hello Continue!');
-ok $tx->success, 'successful';
-ok !$expect, 'no "Expect" header';
-ok !$tx->req->headers->expect, 'no "Expect" header';
-is $tx->res->code, 200, 'right status';
-is $tx->res->body, 'Hello Continue!', 'right content';
 
 # GET /no_length (missing Content-Length header)
 ($finished_req, $finished_tx, $finished_res) = ();
@@ -464,12 +455,40 @@ ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# Premature connection close
+# Unexpected 1xx responses
 my $port = Mojo::IOLoop->generate_port;
-my $id   = Mojo::IOLoop->server(
-  address => '127.0.0.1',
-  port    => $port,
-  sub { Mojo::IOLoop->remove(pop) }
+$req = Mojo::Message::Request->new;
+Mojo::IOLoop->server(
+  {address => '127.0.0.1', port => $port} => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(
+      read => sub {
+        my ($stream, $chunk) = @_;
+        $stream->write("HTTP/1.1 100 Continue\x0d\x0a"
+            . "X-Foo: Bar\x0d\x0a\x0d\x0a"
+            . "HTTP/1.1 101 Switching Protocols\x0d\x0a\x0d\x0a"
+            . "HTTP/1.1 200 OK\x0d\x0a"
+            . "Content-Length: 3\x0d\x0a\x0d\x0a" . 'Hi!')
+          if $req->parse($chunk)->is_finished;
+      }
+    );
+  }
+);
+$tx = $ua->build_tx(GET => "http://localhost:$port/");
+my @unexpected;
+$tx->on(unexpected => sub { push @unexpected, pop });
+$tx = $ua->start($tx);
+is $unexpected[0]->code, 100, 'right status';
+is $unexpected[0]->headers->header('X-Foo'), 'Bar', 'right "X-Foo" value';
+is $unexpected[1]->code, 101, 'right status';
+ok $tx->success, 'successful';
+is $tx->res->code, 200,   'right status';
+is $tx->res->body, 'Hi!', 'right content';
+
+# Premature connection close
+$port = Mojo::IOLoop->generate_port;
+Mojo::IOLoop->server(
+  {address => '127.0.0.1', port => $port} => sub { Mojo::IOLoop->remove(pop) }
 );
 $tx = $ua->get("http://localhost:$port/");
 ok !$tx->success, 'not successful';

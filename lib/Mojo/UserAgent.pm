@@ -455,11 +455,10 @@ sub _start {
       if $https && !defined $req->proxy && $scheme eq 'https';
   }
 
-  # We identify ourselves and accept gzip compression but no 100 Continue
+  # We identify ourselves and accept gzip compression
   my $headers = $req->headers;
   $headers->user_agent($self->name) unless $headers->user_agent;
   $headers->accept_encoding('gzip') unless $headers->accept_encoding;
-  $headers->remove('Expect') if ($headers->expect // '') =~ /100-continue/i;
 
   # Inject cookies
   if (my $jar = $self->cookie_jar) { $jar->inject($tx) }

@@ -129,8 +129,7 @@ sub finish {
 sub fix_headers {
   my $self = shift;
 
-  # Content-Length header or connection close is required unless the chunked
-  # transfer encoding is used
+  # Content-Length or Connection (unless chunked transfer encoding is used)
   return $self if $self->{fix}++ || $self->is_chunked;
   my $headers = $self->headers;
   $self->is_dynamic
@@ -593,7 +592,7 @@ Finish message parser/generator.
 
   $msg = $msg->fix_headers;
 
-Make sure message has all required headers for the current HTTP version.
+Make sure message has all required headers.
 
 =head2 C<get_body_chunk>
 

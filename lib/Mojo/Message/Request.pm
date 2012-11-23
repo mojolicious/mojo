@@ -365,7 +365,7 @@ Extract request line from string.
 
   $req = $req->fix_headers;
 
-Make sure request has all required headers for the current HTTP version.
+Make sure request has all required headers.
 
 =head2 C<get_start_line_chunk>
 

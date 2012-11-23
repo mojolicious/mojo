@@ -226,7 +226,7 @@ Extract status line from string.
 
   $res = $res->fix_headers;
 
-Make sure response has all required headers for the current HTTP version.
+Make sure response has all required headers.
 
 =head2 C<get_start_line_chunk>
 

@@ -634,7 +634,12 @@ $url->parse('http://foo.bar/%E4/?%E5=%E4');
 is $url->scheme, 'http',    'right scheme';
 is $url->host,   'foo.bar', 'right host';
 is $url->path,   '/%E4/',   'right path';
-is $url->query,  '%E5=%E4', 'right query';
+is $url->path->parts->[0], "\xe4", 'right part';
+is $url->path->parts->[1], undef,  'no part';
+ok $url->path->leading_slash,  'has leading slash';
+ok $url->path->trailing_slash, 'has trailing slash';
+is $url->query, '%E5=%E4', 'right query';
+is $url->query->param("\xe5"), "\xe4", 'right value';
 is "$url", 'http://foo.bar/%E4/?%E5=%E4', 'right format';
 
 # Resolve RFC 1808 examples

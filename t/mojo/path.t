@@ -274,4 +274,13 @@ is "$path", 'foo%2Fbar', 'right result';
 is $path->to_string,     'foo%2Fbar',  'right result';
 is $path->to_abs_string, '/foo%2Fbar', 'right result';
 
+# Latin-1
+$path = Mojo::Path->new->charset('Latin-1')->parse('/foob%E4r');
+is $path->parts->[0], 'foobär', 'right part';
+is $path->parts->[1], undef,     'no part';
+is "$path", '/foob%E4r', 'right result';
+is $path->to_string,     '/foob%E4r', 'right result';
+is $path->to_abs_string, '/foob%E4r', 'right result';
+is $path->clone->to_string, '/foob%E4r', 'right result';
+
 done_testing();

@@ -626,6 +626,17 @@ is $url->path->parts->[0], '100%_fun', 'right part';
 is $url->path, '/100%25_fun', 'right path';
 is "$url", 'http://mojolicio.us/100%25_fun', 'right format';
 
+# No charset
+$url = Mojo::URL->new;
+$url->path->charset(undef);
+$url->query->charset(undef);
+$url->parse('http://foo.bar/%E4/?%E5=%E4');
+is $url->scheme, 'http',    'right scheme';
+is $url->host,   'foo.bar', 'right host';
+is $url->path,   '/%E4/',   'right path';
+is $url->query,  '%E5=%E4', 'right query';
+is "$url", 'http://foo.bar/%E4/?%E5=%E4', 'right format';
+
 # Resolve RFC 1808 examples
 my $base = Mojo::URL->new('http://a/b/c/d?q#f');
 $url = Mojo::URL->new('g');

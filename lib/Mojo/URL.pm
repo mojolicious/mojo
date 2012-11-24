@@ -194,9 +194,9 @@ sub to_rel {
 sub to_string {
   my $self = shift;
 
-  # Scheme
+  # Protocol
   my $url = '';
-  if (my $scheme = $self->scheme) { $url .= lc "$scheme://" }
+  if (my $proto = $self->protocol) { $url .= "$proto://" }
 
   # Authority
   my $authority = $self->authority;

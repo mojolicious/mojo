@@ -1,10 +1,12 @@
 
 3.61  2012-11-25
+  - Added protocol method to Mojo::URL.
   - Added charset attribute to Mojo::Path.
   - Improved support for relative redirects in Mojo::UserAgent::Transactor.
   - Improved documentation.
   - Improved tests.
   - Fixed clone bug in Mojo::Parameters.
+  - Fixed case sensitivity bugs in Mojo::UserAgent::Transactor.
 
 3.60  2012-11-22
   - Added unexpected event to Mojo::Transaction::HTTP.

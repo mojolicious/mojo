@@ -59,7 +59,7 @@ sub app {
 sub app_url {
   my $self = shift;
   $self->_server(@_);
-  return Mojo::URL->new("$self->{scheme}://localhost:$self->{port}/");
+  return Mojo::URL->new("$self->{proto}://localhost:$self->{port}/");
 }
 
 sub build_form_tx      { shift->transactor->form(@_) }
@@ -177,7 +177,7 @@ sub _cleanup {
 }
 
 sub _connect {
-  my ($self, $scheme, $host, $port, $handle, $cb) = @_;
+  my ($self, $proto, $host, $port, $handle, $cb) = @_;
 
   # Open connection
   weaken $self;
@@ -188,7 +188,7 @@ sub _connect {
     local_address => $self->local_address,
     port          => $port,
     timeout       => $self->connect_timeout,
-    tls           => $scheme eq 'https' ? 1 : 0,
+    tls           => $proto eq 'https' ? 1 : 0,
     tls_ca        => $self->ca,
     tls_cert      => $self->cert,
     tls_key       => $self->key,
@@ -229,7 +229,7 @@ sub _connect_proxy {
 
       # Start real transaction
       return $self->_start($old->connection($tx->connection), $cb)
-        unless $tx->req->url->scheme eq 'https';
+        unless $tx->req->url->protocol eq 'https';
 
       # TLS upgrade
       return unless my $id = $tx->connection;
@@ -268,10 +268,10 @@ sub _connection {
 
   # Reuse connection
   my $id = $tx->connection;
-  my ($scheme, $host, $port) = $self->transactor->endpoint($tx);
-  $id ||= $self->_cache("$scheme:$host:$port");
+  my ($proto, $host, $port) = $self->transactor->endpoint($tx);
+  $id ||= $self->_cache("$proto:$host:$port");
   if ($id && !ref $id) {
-    warn "-- Reusing connection ($scheme:$host:$port)\n" if DEBUG;
+    warn "-- Reusing connection ($proto:$host:$port)\n" if DEBUG;
     $self->{connections}{$id} = {cb => $cb, tx => $tx};
     $tx->kept_alive(1) unless $tx->connection;
     $self->_connected($id);
@@ -283,11 +283,11 @@ sub _connection {
     if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
 
   # Connect
-  warn "-- Connect ($scheme:$host:$port)\n" if DEBUG;
-  ($scheme, $host, $port) = $self->transactor->peer($tx);
+  warn "-- Connect ($proto:$host:$port)\n" if DEBUG;
+  ($proto, $host, $port) = $self->transactor->peer($tx);
   weaken $self;
   $id = $self->_connect(
-    ($scheme, $host, $port, $id) => sub { $self->_connected($id) });
+    ($proto, $host, $port, $id) => sub { $self->_connected($id) });
   $self->{connections}{$id} = {cb => $cb, tx => $tx};
 
   return $id;
@@ -411,10 +411,10 @@ sub _redirect {
 }
 
 sub _server {
-  my ($self, $scheme) = @_;
+  my ($self, $proto) = @_;
 
   # Reuse server
-  return $self->{server} if $self->{server} && !$scheme;
+  return $self->{server} if $self->{server} && !$proto;
 
   # Start test server
   my $loop   = $self->_loop;
@@ -422,9 +422,9 @@ sub _server {
     = Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
   my $port = $self->{port} ||= $loop->generate_port;
   die "Couldn't find a free TCP port for testing.\n" unless $port;
-  $self->{scheme} = $scheme ||= 'http';
-  $server->listen(["$scheme://127.0.0.1:$port"])->start;
-  warn "-- Test server started ($scheme://127.0.0.1:$port)\n" if DEBUG;
+  $self->{proto} = $proto ||= 'http';
+  $server->listen(["$proto://127.0.0.1:$port"])->start;
+  warn "-- Test server started ($proto://127.0.0.1:$port)\n" if DEBUG;
   return $server;
 }
 
@@ -441,18 +441,17 @@ sub _start {
 
   # Proxy
   $self->detect_proxy if $ENV{MOJO_PROXY};
-  my $url = $req->url;
-  my $scheme = $url->scheme || '';
+  my $url   = $req->url;
+  my $proto = $url->protocol;
   if ($self->need_proxy($url->host)) {
 
     # HTTP proxy
     my $http = $self->http_proxy;
-    $req->proxy($http) if $http && !defined $req->proxy && $scheme eq 'http';
+    $req->proxy($http) if $http && !defined $req->proxy && $proto eq 'http';
 
     # HTTPS proxy
     my $https = $self->https_proxy;
-    $req->proxy($https)
-      if $https && !defined $req->proxy && $scheme eq 'https';
+    $req->proxy($https) if $https && !defined $req->proxy && $proto eq 'https';
   }
 
   # We identify ourselves and accept gzip compression

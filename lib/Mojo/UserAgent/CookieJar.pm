@@ -67,7 +67,7 @@ sub find {
       push @$new, $cookie;
 
       # Taste cookie
-      next if $cookie->secure && $url->scheme ne 'https';
+      next if $cookie->secure && $url->protocol ne 'https';
       next unless $path =~ /^\Q@{[$cookie->path]}/;
       my $name  = $cookie->name;
       my $value = $cookie->value;

@@ -205,7 +205,7 @@ is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
 is(($t->endpoint($tx))[2], 80,             'right port');
 
 # HTTPS endpoint
-$tx = $t->tx(GET => 'https://mojolicio.us');
+$tx = $t->tx(GET => 'HTTPS://mojolicio.us');
 is(($t->endpoint($tx))[0], 'https',        'right scheme');
 is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
 is(($t->endpoint($tx))[2], 443,            'right port');
@@ -218,7 +218,7 @@ is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
 is(($t->endpoint($tx))[2], 443,            'right port');
 
 # TLS WebSocket endpoint with proxy
-$tx = $t->websocket('wss://mojolicio.us');
+$tx = $t->websocket('WSS://mojolicio.us');
 $tx->req->proxy('http://127.0.0.1:3000');
 is(($t->endpoint($tx))[0], 'https',        'right scheme');
 is(($t->endpoint($tx))[1], 'mojolicio.us', 'right host');
@@ -236,6 +236,20 @@ $tx->req->proxy('http://127.0.0.1:3000');
 is(($t->peer($tx))[0], 'http',      'right scheme');
 is(($t->peer($tx))[1], '127.0.0.1', 'right host');
 is(($t->peer($tx))[2], 3000,        'right port');
+
+# Simple peer with proxy (no port)
+$tx = $t->tx(GET => 'http://mojolicio.us');
+$tx->req->proxy('http://127.0.0.1');
+is(($t->peer($tx))[0], 'http',      'right scheme');
+is(($t->peer($tx))[1], '127.0.0.1', 'right host');
+is(($t->peer($tx))[2], 80,          'right port');
+
+# Simple peer with HTTPS proxy (no port)
+$tx = $t->tx(GET => 'http://mojolicio.us');
+$tx->req->proxy('HTTPS://127.0.0.1');
+is(($t->peer($tx))[0], 'https',     'right scheme');
+is(($t->peer($tx))[1], '127.0.0.1', 'right host');
+is(($t->peer($tx))[2], 443,         'right port');
 
 # Simple WebSocket peer with proxy
 $tx = $t->websocket('ws://mojolicio.us');
@@ -290,7 +304,7 @@ ok $tx->req->headers->sec_websocket_version,
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
 
 # Proxy CONNECT
-$tx = $t->tx(GET => 'https://sri:secr3t@mojolicio.us');
+$tx = $t->tx(GET => 'HTTPS://sri:secr3t@mojolicio.us');
 $tx->req->proxy('http://sri:secr3t@127.0.0.1:3000');
 ok !$tx->req->headers->authorization,       'no "Authorization" header';
 ok !$tx->req->headers->proxy_authorization, 'no "Proxy-Authorization" header';

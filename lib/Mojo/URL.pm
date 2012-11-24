@@ -103,6 +103,8 @@ sub path {
   return $self;
 }
 
+sub protocol { lc(shift->scheme // '') }
+
 sub query {
   my $self = shift;
 
@@ -298,6 +300,15 @@ Host part of this URL.
   $url     = $url->port(8080);
 
 Port part of this URL.
+
+=head2 C<protocol>
+
+  my $proto = $url->protocol;
+
+Normalized version of C<scheme>.
+
+  # "http"
+  Mojo::URL->new('HtTp://mojolicio.us')->protocol;
 
 =head2 C<scheme>
 

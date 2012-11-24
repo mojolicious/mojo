@@ -113,7 +113,7 @@ sub get_start_line_chunk {
     # CONNECT
     my $method = uc $self->method;
     if ($method eq 'CONNECT') {
-      my $port = $url->port || ($url->scheme eq 'https' ? '443' : '80');
+      my $port = $url->port || ($url->protocol eq 'https' ? '443' : '80');
       $path = $url->host . ":$port";
     }
 
@@ -121,8 +121,8 @@ sub get_start_line_chunk {
     elsif ($self->proxy) {
       my $clone = $url = $url->clone->userinfo(undef);
       my $upgrade = lc($self->headers->upgrade || '');
-      my $scheme = $url->scheme || '';
-      $path = $clone unless $upgrade eq 'websocket' || $scheme eq 'https';
+      $path = $clone
+        unless $upgrade eq 'websocket' || $url->protocol eq 'https';
     }
 
     $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";
@@ -137,7 +137,7 @@ sub get_start_line_chunk {
 
 sub is_secure {
   my $url = shift->url;
-  return ($url->scheme || $url->base->scheme // '') eq 'https';
+  return ($url->protocol || $url->base->protocol) eq 'https';
 }
 
 sub is_xhr {

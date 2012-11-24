@@ -199,9 +199,9 @@ is $p->param('bar'),             23,             'right value';
 is "$p", '!$\'()*,:@/foo?=!$\'()*,:@/?&bar=23', 'right result';
 
 # No charset
-$p = Mojo::Parameters->new('foo=%E4')->charset(undef);
-is $p->param('foo'), "\xe4", 'right value';
-is "$p", 'foo=%E4', 'right result';
-is $p->clone->to_string, 'foo=%E4', 'right result';
+$p = Mojo::Parameters->new('%E5=%E4')->charset(undef);
+is $p->param("\xe5"), "\xe4", 'right value';
+is "$p", '%E5=%E4', 'right result';
+is $p->clone->to_string, '%E5=%E4', 'right result';
 
 done_testing();

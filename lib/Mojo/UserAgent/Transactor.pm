@@ -139,7 +139,7 @@ sub redirect {
   # Fix broken location without authority and/or scheme
   return unless my $location = $res->headers->location;
   $location = Mojo::URL->new($location);
-  $location = $location->base($old->req->url)->to_abs unless $location->scheme;
+  $location = $location->base($old->req->url)->to_abs unless $location->is_abs;
 
   # Clone request if necessary
   my $new    = Mojo::Transaction::HTTP->new;

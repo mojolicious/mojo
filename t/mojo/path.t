@@ -278,9 +278,20 @@ is $path->to_abs_string, '/foo%2Fbar', 'right result';
 $path = Mojo::Path->new->charset('Latin-1')->parse('/foob%E4r');
 is $path->parts->[0], 'foobär', 'right part';
 is $path->parts->[1], undef,     'no part';
+ok $path->leading_slash, 'has leading slash';
+ok !$path->trailing_slash, 'no trailing slash';
 is "$path", '/foob%E4r', 'right result';
 is $path->to_string,     '/foob%E4r', 'right result';
 is $path->to_abs_string, '/foob%E4r', 'right result';
 is $path->clone->to_string, '/foob%E4r', 'right result';
+
+# No charset
+$path = Mojo::Path->new->charset(undef)->parse('/%E4');
+is $path->parts->[0], "\xe4", 'right part';
+is $path->parts->[1], undef,  'no part';
+ok $path->leading_slash, 'has leading slash';
+ok !$path->trailing_slash, 'no trailing slash';
+is "$path", '/%E4', 'right result';
+is $path->clone->to_string, '/%E4', 'right result';
 
 done_testing();

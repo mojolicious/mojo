@@ -4,6 +4,7 @@
   - Improved support for relative redirects in Mojo::UserAgent::Transactor.
   - Improved documentation.
   - Improved tests.
+  - Fixed clone bug in Mojo::Parameters.
 
 3.60  2012-11-22
   - Added unexpected event to Mojo::Transaction::HTTP.

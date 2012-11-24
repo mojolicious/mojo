@@ -75,7 +75,8 @@ sub parse {
   my ($self, $path) = @_;
 
   $path = url_unescape $path // '';
-  $path = decode($self->charset, $path) // $path;
+  my $charset = $self->charset;
+  $path = decode($charset, $path) // $path if $charset;
   $self->leading_slash($path  =~ s!^/!! ? 1 : undef);
   $self->trailing_slash($path =~ s!/$!! ? 1 : undef);
 
@@ -90,10 +91,11 @@ sub to_abs_string {
 sub to_string {
   my $self = shift;
 
-  my $chars   = '^A-Za-z0-9\-._~!$&\'()*+,;=:@';
+  my @parts   = @{$self->parts};
   my $charset = $self->charset;
-  my @parts = map { url_escape(encode($charset, $_), $chars) } @{$self->parts};
-  my $path = join '/', @parts;
+  @parts = map { encode $charset, $_ } @parts if $charset;
+  my $path = join '/',
+    map { url_escape $_, '^A-Za-z0-9\-._~!$&\'()*+,;=:@' } @parts;
   $path = "/$path" if $self->leading_slash;
   $path = "$path/" if $self->trailing_slash;
 

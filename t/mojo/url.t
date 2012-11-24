@@ -250,11 +250,16 @@ is $url->scheme,   'http', 'right scheme';
 is $url->userinfo, undef, 'no userinfo';
 is $url->host,     'acme.s3.amazonaws.com', 'right host';
 is $url->port,     undef, 'no port';
-is $url->path,     '/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb', 'right path';
+is $url->path,     '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb',
+  'right path';
 ok !$url->query->to_string, 'no query';
 is_deeply $url->query->to_hash, {}, 'right structure';
 is $url->fragment, undef, 'no fragment';
-is "$url", 'http://acme.s3.amazonaws.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb',
+is "$url",
+  'http://acme.s3.amazonaws.com/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb',
+  'right format';
+is $url->tap(sub { $_->path->normalize }),
+  'http://acme.s3.amazonaws.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb',
   'right format';
 
 # Clone (advanced)
@@ -615,11 +620,13 @@ is $url->host, '1.1.1.1.1.1', 'right host';
 # "%" in path
 $url = Mojo::URL->new('http://mojolicio.us/100%_fun');
 is $url->path->parts->[0], '100%_fun', 'right part';
-is $url->path, '/100%25_fun', 'right path';
+is $url->path, '/100%_fun', 'right path';
+is $url->path->normalize, '/100%25_fun', 'right normalized path';
 is "$url", 'http://mojolicio.us/100%25_fun', 'right format';
 $url = Mojo::URL->new('http://mojolicio.us/100%fun');
 is $url->path->parts->[0], '100%fun', 'right part';
-is $url->path, '/100%25fun', 'right path';
+is $url->path, '/100%fun', 'right path';
+is $url->path->normalize, '/100%25fun', 'right normalized path';
 is "$url", 'http://mojolicio.us/100%25fun', 'right format';
 $url = Mojo::URL->new('http://mojolicio.us/100%25_fun');
 is $url->path->parts->[0], '100%_fun', 'right part';

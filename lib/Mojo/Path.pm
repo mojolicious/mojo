@@ -5,10 +5,9 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-use Mojo::Util qw(encode url_escape url_unescape);
+use Mojo::Util qw(decode encode url_escape url_unescape);
 
 has [qw(leading_slash trailing_slash)];
-has parts => sub { [] };
 
 sub new { shift->SUPER::new->parse(@_) }
 
@@ -38,11 +37,14 @@ sub canonicalize {
 }
 
 sub clone {
-  my $self  = shift;
+  my $self = shift;
+
   my $clone = Mojo::Path->new;
+  $clone->{string} = $self->{string};
   $clone->leading_slash($self->leading_slash);
   $clone->trailing_slash($self->trailing_slash);
-  return $clone->parts([@{$self->parts}]);
+
+  return $clone;
 }
 
 sub contains {
@@ -64,21 +66,35 @@ sub merge {
   return $self->parse($path) if $path =~ m!^/!;
 
   # Merge
-  pop @{$self->parts} unless $self->trailing_slash;
+  my $parts = $self->parts;
+  pop @$parts unless $self->trailing_slash;
   $path = $self->new($path);
-  push @{$self->parts}, @{$path->parts};
+  $self->parts([@$parts, @{$path->parts}]);
   return $self->trailing_slash($path->trailing_slash);
+}
+
+sub normalize {
+  my $self = shift;
+  $self->{string} = _parts_to_string(_string_to_parts($self->{string}));
+  return $self;
 }
 
 sub parse {
   my ($self, $path) = @_;
 
-  $path = url_unescape $path // '';
-  utf8::decode $path;
-  $path =~ s!^/!! ? $self->leading_slash(1)  : $self->leading_slash(undef);
-  $path =~ s!/$!! ? $self->trailing_slash(1) : $self->trailing_slash(undef);
+  $path //= '';
+  $self->leading_slash($path  =~ s!^(?:%2F|/)!!i ? 1 : undef);
+  $self->trailing_slash($path =~ s!(?:%2F|/)$!!i ? 1 : undef);
+  $self->{string} = $path;
 
-  return $self->parts([split '/', $path, -1]);
+  return $self;
+}
+
+sub parts {
+  my ($self, $parts) = @_;
+  return [_string_to_parts($self->{string})] unless $parts;
+  $self->{string} = _parts_to_string(@$parts);
+  return $self;
 }
 
 sub to_abs_string {
@@ -89,16 +105,23 @@ sub to_abs_string {
 sub to_string {
   my $self = shift;
 
-  # Escape
-  my $chars = '^A-Za-z0-9\-._~!$&\'()*+,;=:@';
-  my @parts = map { url_escape(encode('UTF-8', $_), $chars) } @{$self->parts};
-
-  # Format
-  my $path = join '/', @parts;
+  my $path = url_escape encode('UTF-8', $self->{string}),
+    '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/';
   $path = "/$path" if $self->leading_slash;
   $path = "$path/" if $self->trailing_slash;
 
   return $path;
+}
+
+sub _parts_to_string {
+  my $chars = '^A-Za-z0-9\-._~!$&\'()*+,;=:@';
+  return join '/', map { url_escape(encode('UTF-8', $_), $chars) } @_;
+}
+
+sub _string_to_parts {
+  my $path = url_unescape shift;
+  $path = decode('UTF-8', $path) // $path;
+  return split '/', $path, -1;
 }
 
 1;
@@ -111,8 +134,8 @@ Mojo::Path - Path
 
   use Mojo::Path;
 
-  my $path = Mojo::Path->new('/foo%2Fbar%3B/baz.html');
-  shift @{$path->parts};
+  my $path = Mojo::Path->new('/foo%2Fbar%3B/../baz.html');
+  $path->canonicalize;
   say "$path";
 
 =head1 DESCRIPTION
@@ -129,16 +152,6 @@ L<Mojo::Path> implements the following attributes.
   $path             = $path->leading_slash(1);
 
 Path has a leading slash.
-
-=head2 C<parts>
-
-  my $parts = $path->parts;
-  $path     = $path->parts([qw(foo bar baz)]);
-
-The path parts.
-
-  # Part with slash
-  push @{$path->parts}, 'foo/bar';
 
 =head2 C<trailing_slash>
 
@@ -207,11 +220,24 @@ Merge paths.
   # "/foo/bar/baz/yada"
   Mojo::Path->new('/foo/bar/')->merge('baz/yada');
 
+=head2 C<normalize>
+
+  $path = $path->normalize;
+
+Normalize path.
+
 =head2 C<parse>
 
   $path = $path->parse('/foo%2Fbar%3B/baz.html');
 
 Parse path. Note that C<%2F> will be treated as C</> for security reasons.
+
+=head2 C<parts>
+
+  my $parts = $path->parts;
+  $path     = $path->parts([qw(foo bar baz)]);
+
+The path parts.
 
 =head2 C<to_abs_string>
 

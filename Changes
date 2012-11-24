@@ -1,5 +1,7 @@
 
-3.61  2012-11-23
+3.61  2012-11-24
+  - Added normalize method to Mojo::Path.
+  - Improved Mojo::Path performance significantly.
   - Improved documentation.
   - Improved tests.
 

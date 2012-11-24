@@ -52,7 +52,7 @@ sub find {
 
   # Look through the jar
   return unless my $domain = $url->host;
-  my $path = $url->path->to_string || '/';
+  my $path = $url->path->clone->normalize->to_abs_string;
   my @found;
   while ($domain =~ /[^.]+\.[^.]+|localhost$/) {
     next unless my $old = $self->{jar}{$domain};

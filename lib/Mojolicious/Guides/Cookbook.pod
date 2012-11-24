@@ -241,8 +241,13 @@ incoming requests is also quite common.
   # Move first part from path to base path in production mode
   app->hook(before_dispatch => sub {
     my $self = shift;
-    push @{$self->req->url->base->path->parts},
-      shift @{$self->req->url->path->parts};
+
+    my $path = $self->req->url->path->parts;
+    my $base = $self->req->url->base->path->parts;
+    push @$base, shift @$path;
+    $self->req->url->path->parts($path);
+    $self->req->url->base->path->parts($base);
+
   }) if app->mode eq 'production';
 
 =head2 Application embedding

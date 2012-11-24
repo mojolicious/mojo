@@ -23,7 +23,8 @@ sub dispatch {
 
   # Canonical path
   my $stash = $c->stash;
-  my $path = $stash->{path} || $c->req->url->path->clone->canonicalize;
+  my $path  = $stash->{path}
+    || $c->req->url->path->clone->normalize->canonicalize;
 
   # Split parts
   return undef unless my @parts = @{Mojo::Path->new("$path")->parts};

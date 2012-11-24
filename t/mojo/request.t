@@ -1056,7 +1056,7 @@ $clone = $req->clone;
 $clone->method('POST');
 $clone->headers->expect('nothing');
 $clone->version('1.2');
-push @{$clone->url->path->parts}, 'baz';
+$clone->url->path->parts([@{$clone->url->path->parts}, 'baz']);
 $req = Mojo::Message::Request->new->parse($req->to_string);
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';

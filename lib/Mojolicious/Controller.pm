@@ -432,7 +432,7 @@ sub url_for {
 
   # Make path absolute
   my $base_path = $base->path;
-  unshift @{$path->parts}, @{$base_path->parts};
+  $path->parts([@{$base_path->parts}, @{$path->parts}]);
   $base_path->parts([])->trailing_slash(0);
 
   return $url;

@@ -1,5 +1,6 @@
 
-3.61  2012-11-23
+3.61  2012-11-24
+  - Improved support for relative redirects in Mojo::UserAgent::Transactor.
   - Improved documentation.
   - Improved tests.
 

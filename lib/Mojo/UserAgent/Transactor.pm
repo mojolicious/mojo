@@ -139,16 +139,14 @@ sub redirect {
   # Fix broken location without authority and/or scheme
   return unless my $location = $res->headers->location;
   $location = Mojo::URL->new($location);
-  my $req = $old->req;
-  my $url = $req->url;
-  $location->authority($url->authority) unless $location->authority;
-  $location->scheme($url->scheme)       unless $location->scheme;
+  $location = $location->base($old->req->url)->to_abs unless $location->scheme;
 
   # Clone request if necessary
   my $new    = Mojo::Transaction::HTTP->new;
+  my $req    = $old->req;
   my $method = $req->method;
   if (grep { $_ eq $code } 301, 307, 308) {
-    return undef unless $req = $req->clone;
+    return undef unless my $req = $req->clone;
     $new->req($req);
     $req->headers->remove('Host')->remove('Cookie')->remove('Referer');
   }

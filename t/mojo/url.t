@@ -104,8 +104,10 @@ is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
 # Relative without scheme
 $url = Mojo::URL->new('//localhost/23/');
 ok !$url->is_abs, 'is not absolute';
-is $url->host, 'localhost', 'right host';
-is $url->path, '/23/',      'right path';
+is $url->scheme,   undef,       'no scheme';
+is $url->protocol, '',          'no protocol';
+is $url->host,     'localhost', 'right host';
+is $url->path,     '/23/',      'right path';
 is "$url", '//localhost/23/', 'right relative version';
 is $url->to_abs(Mojo::URL->new('http://')), 'http://localhost/23/',
   'right absolute version';

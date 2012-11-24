@@ -111,7 +111,7 @@ sub query {
   return $q unless @_;
 
   # Replace with list
-  if (@_ > 1) { $self->{query} = $q->params([])->parse(@_) }
+  if (@_ > 1) { $q->params([])->parse(@_) }
 
   # Merge with array
   elsif (ref $_[0] eq 'ARRAY') {

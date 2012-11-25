@@ -203,13 +203,14 @@ is $rel->to_abs, 'http://kraih.com/a/b/c/d/index.html',
   'right absolute version';
 is $rel->to_abs->to_rel, 'c/d/index.html', 'right relative version';
 $url = Mojo::URL->new('/foo');
-ok !$url->base->is_abs, 'right base';
-ok $url->to_abs(Mojo::URL->new('http://kraih.com'))->base->is_abs,
+is $url->base, '', 'no base';
+is $url->to_abs(Mojo::URL->new('http://kraih.com'))->base, 'http://kraih.com',
   'right base';
 $url = Mojo::URL->new('http://kraih.com/foo');
-ok !$url->base->is_abs, 'right base';
-ok $url->to_rel(Mojo::URL->new('http://kraih.com'))->base->is_abs,
+is $url->base, '', 'no base';
+is $url->to_rel(Mojo::URL->new('http://kraih.com'))->base, 'http://kraih.com',
   'right base';
+
 
 # Relative path
 $url = Mojo::URL->new('http://kraih.com/foo/?foo=bar#23');

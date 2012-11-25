@@ -9,8 +9,8 @@ use Mojo::Parameters;
 use Mojo::Path;
 use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
 
-has [qw(fragment host port scheme userinfo)];
 has base => sub { Mojo::URL->new };
+has [qw(fragment host port scheme userinfo)];
 
 sub new { shift->SUPER::new->parse(@_) }
 
@@ -266,13 +266,6 @@ Resource Locators with support for IDNA and IRIs.
 
 L<Mojo::URL> implements the following attributes.
 
-=head2 C<authority>
-
-  my $authority = $url->authority;
-  $url          = $url->authority('root:pass%3Bw0rd@localhost:8080');
-
-Authority part of this URL.
-
 =head2 C<base>
 
   my $base = $url->base;
@@ -301,15 +294,6 @@ Host part of this URL.
 
 Port part of this URL.
 
-=head2 C<protocol>
-
-  my $proto = $url->protocol;
-
-Normalized version of C<scheme>.
-
-  # "http"
-  Mojo::URL->new('HtTp://mojolicio.us')->protocol;
-
 =head2 C<scheme>
 
   my $scheme = $url->scheme;
@@ -335,6 +319,13 @@ following new ones.
   my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
 
 Construct a new L<Mojo::URL> object.
+
+=head2 C<authority>
+
+  my $authority = $url->authority;
+  $url          = $url->authority('root:pass%3Bw0rd@localhost:8080');
+
+Authority part of this URL.
 
 =head2 C<clone>
 
@@ -382,6 +373,15 @@ defaults to a L<Mojo::Path> object.
 
   # "http://mojolicio.us/perldoc/Mojo/DOM/HTML"
   Mojo::URL->new('http://mojolicio.us/perldoc/Mojo/')->path('DOM/HTML');
+
+=head2 C<protocol>
+
+  my $proto = $url->protocol;
+
+Normalized version of C<scheme>.
+
+  # "http"
+  Mojo::URL->new('HtTp://mojolicio.us')->protocol;
 
 =head2 C<query>
 

@@ -305,7 +305,7 @@ EOF
 
 # GET /host (full external application with domain)
 $t->get_ok('/host' => {Host => 'KRaIH.CoM'})->status_is(200)
-  ->header_is('X-Message' => 'it works!')->content_is('kraih.com');
+  ->header_is('X-Message' => 'it works!')->content_is('KRaIH.CoM');
 
 # GET /host (full external application with wildcard domain)
 $t->get_ok('/host' => {Host => 'www.kraih.com'})->status_is(200)

@@ -21,10 +21,10 @@ sub authority {
   if (defined $authority) {
 
     # Userinfo
-    if ($authority =~ s/^([^\@]+)\@//) { $self->userinfo(url_unescape $1) }
+    $authority =~ s/^([^\@]+)\@// and $self->userinfo(url_unescape $1);
 
     # Port
-    if ($authority =~ s/:(\d+)$//) { $self->port($1) }
+    $authority =~ s/:(\d+)$// and $self->port($1);
 
     # Host
     my $host = url_unescape $authority;
@@ -46,7 +46,9 @@ sub clone {
 
   my $clone = Mojo::URL->new;
   $clone->scheme($self->scheme);
-  $clone->authority($self->authority);
+  $clone->userinfo($self->userinfo);
+  $clone->host($self->host);
+  $clone->port($self->port);
   $clone->path($self->path->clone);
   $clone->query($self->query->clone);
   $clone->fragment($self->fragment);

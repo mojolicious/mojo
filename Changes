@@ -5,7 +5,7 @@
   - Improved support for relative redirects in Mojo::UserAgent::Transactor.
   - Improved documentation.
   - Improved tests.
-  - Fixed clone bug in Mojo::Parameters.
+  - Fixed clone bugs in Mojo::Parameters and Mojo::URL.
   - Fixed case sensitivity bugs in Mojo::UserAgent::Transactor.
 
 3.60  2012-11-22

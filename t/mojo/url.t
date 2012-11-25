@@ -288,7 +288,7 @@ $clone = $url->clone;
 is "$url", '/test/index.html', 'right format';
 ok !$clone->is_abs, 'not absolute';
 is $clone->scheme, undef, 'no scheme';
-is $clone->host,   '',    'no host';
+is $clone->host,   undef, 'no host';
 is $clone->base->scheme, 'http',      'right base scheme';
 is $clone->base->host,   '127.0.0.1', 'right base host';
 is $clone->path, '/test/index.html', 'right path';
@@ -303,7 +303,7 @@ $clone = $url->clone;
 is "$url", 'test/index.html', 'right format';
 ok !$clone->is_abs, 'not absolute';
 is $clone->scheme, undef, 'no scheme';
-is $clone->host,   '',    'no host';
+is $clone->host,   undef, 'no host';
 is $clone->base->scheme, 'http',      'right base scheme';
 is $clone->base->host,   '127.0.0.1', 'right base host';
 is $clone->path, 'test/index.html', 'right path';
@@ -347,6 +347,13 @@ is $url->port, 3000,   'right port';
 is $url->path, '/foo', 'right path';
 is "$url", 'http://xn--bcher-kva.xn--bcher-kva.xn--bcher-kva.ch:3000/foo',
   'right format';
+
+# IDNA (escaped userinfo and host)
+$url = Mojo::URL->new('https://foo:b%E4r@kr%E4ih.com:3000');
+is $url->host,  "kr\xe4ih.com",     'right host';
+is $url->ihost, 'xn--krih-moa.com', 'right internationalized host';
+is $url->port,  3000,               'right port';
+is "$url", 'https://foo:b%E4r@xn--krih-moa.com:3000', 'right format';
 
 # IDNA (snowman)
 $url = Mojo::URL->new('http://☃.net/');

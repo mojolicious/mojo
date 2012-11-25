@@ -1,6 +1,7 @@
 
 3.62  2012-11-26
   - Improved compatibility with IO::Socket::SSL 1.79.
+  - Improved encode/decode performance in Mojo::Util by using a cache.
   - Improved tests.
   - Fixed clone bugs in Mojo::URL.
 

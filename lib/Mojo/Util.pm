@@ -4,7 +4,7 @@ use Mojo::Base 'Exporter';
 use Carp 'croak';
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(sha1 sha1_hex);
-use Encode ();
+use Encode 'find_encoding';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use MIME::Base64 qw(decode_base64 encode_base64);
@@ -36,6 +36,9 @@ my %REVERSE = ("\x{0027}" => '#39;');
 $REVERSE{$ENTITIES{$_}} //= $_
   for sort { @{[$a =~ /[A-Z]/g]} <=> @{[$b =~ /[A-Z]/g]} }
   sort grep {/;/} keys %ENTITIES;
+
+# Encoding cache
+my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
@@ -88,11 +91,11 @@ sub decamelize {
 sub decode {
   my ($encoding, $bytes) = @_;
   return undef
-    unless eval { $bytes = Encode::decode($encoding, $bytes, 1); 1 };
+    unless eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
   return $bytes;
 }
 
-sub encode { Encode::encode(shift, shift) }
+sub encode { _encoding($_[0])->encode("$_[1]") }
 
 sub get_line {
 
@@ -368,6 +371,10 @@ sub _decode {
 
 sub _encode {
   return exists $REVERSE{$_[0]} ? "&$REVERSE{$_[0]}" : "&#@{[ord($_[0])]};";
+}
+
+sub _encoding {
+  $CACHE{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
 }
 
 sub _hmac {

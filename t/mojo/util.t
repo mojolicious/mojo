@@ -65,11 +65,11 @@ is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",
 is b64_decode("Zm9vYmFyJCVeJjMyMTc=\n"), 'foobar$%^&3217',
   'right base64 decoded result';
 
-# UTF-8 b64_encode
+# b64_encode (UTF-8)
 is b64_encode(encode 'UTF-8', "foo\x{df}\x{0100}bar%23\x{263a}"),
   "Zm9vw5/EgGJhciUyM+KYug==\n", 'right base64 encoded result';
 
-# UTF-8 b64_decode
+# b64_decode (UTF-8)
 is decode('UTF-8', b64_decode "Zm9vw5/EgGJhciUyM+KYug==\n"),
   "foo\x{df}\x{0100}bar%23\x{263a}", 'right base64 decoded result';
 
@@ -77,8 +77,16 @@ is decode('UTF-8', b64_decode "Zm9vw5/EgGJhciUyM+KYug==\n"),
 is b64_encode('foobar$%^&3217', ''), 'Zm9vYmFyJCVeJjMyMTc=',
   'right base64 encoded result';
 
-# Decode invalid UTF-8
+# decode (invalid UTF-8)
 is decode('UTF-8', "\x{1000}"), undef, 'decoding invalid UTF-8 worked';
+
+# decode (invalid encoding)
+is decode('does_not_exist', ''), undef,
+  'decoding with invalid encoding worked';
+
+# encode (invalid encoding)
+eval { encode('does_not_exist', '') };
+like $@, qr/Unknown encoding 'does_not_exist'/, 'right error';
 
 # url_escape
 is url_escape('business;23'), 'business%3B23', 'right url escaped result';
@@ -128,11 +136,11 @@ is html_unescape('foobar'), 'foobar', 'right html unescaped result';
 is html_unescape('&Ltf&amp&0oo&nbspba;&ltr'), "&Ltf&&0oo\x{00a0}ba;<r",
   'right html unescaped result';
 
-# UTF-8 html_escape
+# html_escape (UTF-8)
 is html_escape("fo\nobar<baz>&\"\x{152}\x{02ae4}"),
   "fo\nobar&lt;baz&gt;&amp;&quot;&OElig;&Dashv;", 'right html escaped result';
 
-# UTF-8 html_unescape
+# html_unescape (UTF-8)
 is html_unescape(decode 'UTF-8', 'foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
   "foo<baz>&\"\x{152}&Foo;", 'right html unescaped result';
 
@@ -149,10 +157,10 @@ is xml_escape(qq{la<f>\nbar"baz"'yada\n'&lt;la}),
   "la&lt;f&gt;\nbar&quot;baz&quot;&#39;yada\n&#39;&amp;lt;la",
   'right xml escaped result';
 
-# UTF-8 xml_escape with nothing to escape
+# xml_escape (UTF-8 with nothing to escape)
 is xml_escape('привет'), 'привет', 'right xml escaped result';
 
-# UTF-8 xml_escape
+# xml_escape (UTF-8)
 is xml_escape('привет<foo>'), 'привет&lt;foo&gt;',
   'right xml escaped result';
 

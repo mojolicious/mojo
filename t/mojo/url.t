@@ -10,6 +10,7 @@ my $url = Mojo::URL->new('HtTp://Kraih.Com');
 is $url->scheme,   'HtTp',      'right scheme';
 is $url->protocol, 'http',      'right protocol';
 is $url->host,     'Kraih.Com', 'right host';
+is $url->ihost,    'kraih.com', 'right internationalized host';
 is "$url", 'http://kraih.com', 'right format';
 
 # Advanced

@@ -35,7 +35,7 @@ sub authority {
   my $userinfo = $self->userinfo;
   $authority .= url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@'
     if $userinfo;
-  $authority .= lc($self->ihost || '');
+  $authority .= $self->ihost // '';
   if (my $port = $self->port) { $authority .= ":$port" }
 
   return $authority;
@@ -67,7 +67,7 @@ sub ihost {
 
   # Check if host needs to be encoded
   return undef unless my $host = $self->host;
-  return $host unless $host =~ /[^\x00-\x7f]/;
+  return lc $host unless $host =~ /[^\x00-\x7f]/;
 
   # Encode
   return join '.',

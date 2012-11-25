@@ -42,9 +42,9 @@ Mojo::JSON::Pointer - JSON Pointers
 
   use Mojo::JSON::Pointer;
 
-  my $p = Mojo::JSON::Pointer->new;
-  say $p->get({foo => [23, 'bar']}, '/foo/1');
-  say 'Contains "/foo".' if $p->contains({foo => [23, 'bar']}, '/foo');
+  my $pointer = Mojo::JSON::Pointer->new;
+  say $pointer->get({foo => [23, 'bar']}, '/foo/1');
+  say 'Contains "/foo".' if $pointer->contains({foo => [23, 'bar']}, '/foo');
 
 =head1 DESCRIPTION
 
@@ -54,33 +54,33 @@ L<Mojo::JSON::Pointer> implements JSON Pointers.
 
 =head2 C<contains>
 
-  my $success = $p->contains($data, '/foo/1');
+  my $success = $pointer->contains($data, '/foo/1');
 
 Check if data structure contains a value that can be identified with the given
 JSON Pointer.
 
   # True
-  $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/foo');
-  $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
+  $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/foo');
+  $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
 
   # False
-  $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/bar');
-  $p->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/9');
+  $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/bar');
+  $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/9');
 
 =head2 C<get>
 
-  my $value = $p->get($data, '/foo/bar');
+  my $value = $pointer->get($data, '/foo/bar');
 
 Extract value identified by the given JSON Pointer.
 
   # "bar"
-  $p->get({foo => 'bar', baz => [4, 5, 6]}, '/foo');
+  $pointer->get({foo => 'bar', baz => [4, 5, 6]}, '/foo');
 
   # "4"
-  $p->get({foo => 'bar', baz => [4, 5, 6]}, '/baz/0');
+  $pointer->get({foo => 'bar', baz => [4, 5, 6]}, '/baz/0');
 
   # "6"
-  $p->get({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
+  $pointer->get({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
 
 =head1 SEE ALSO
 

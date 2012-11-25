@@ -47,13 +47,13 @@ sub body_params {
   return $self->{body_params} if $self->{body_params};
 
   # Charset
-  my $p = $self->{body_params} = Mojo::Parameters->new;
-  $p->charset($self->content->charset || $self->default_charset);
+  my $params = $self->{body_params} = Mojo::Parameters->new;
+  $params->charset($self->content->charset || $self->default_charset);
 
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
   my $type = $self->headers->content_type || '';
   if ($type =~ m!(?:x-application|application/x-www-form)-urlencoded!i) {
-    $p->parse($self->content->asset->slurp);
+    $params->parse($self->content->asset->slurp);
   }
 
   # "multipart/formdata"
@@ -68,11 +68,11 @@ sub body_params {
       next if defined $filename;
 
       # Form value
-      $p->append($name, $value);
+      $params->append($name, $value);
     }
   }
 
-  return $p;
+  return $params;
 }
 
 sub body_size { shift->content->body_size }
@@ -498,7 +498,7 @@ Access C<content> data or replace all subscribers of the C<read> event.
 
 =head2 C<body_params>
 
-  my $p = $msg->body_params;
+  my $params = $msg->body_params;
 
 C<POST> parameters extracted from C<x-application-urlencoded>,
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,

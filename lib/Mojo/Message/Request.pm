@@ -396,7 +396,7 @@ so it should not be called before the entire request body has been received.
 
 =head2 C<params>
 
-  my $p = $req->params;
+  my $params = $req->params;
 
 All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object. Note
 that this method caches all data, so it should not be called before the entire
@@ -426,7 +426,7 @@ Proxy URL for request.
 
 =head2 C<query_params>
 
-  my $p = $req->query_params;
+  my $params = $req->query_params;
 
 All C<GET> parameters, usually a L<Mojo::Parameters> object.
 

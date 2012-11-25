@@ -131,6 +131,9 @@ L<Mojo::Path> implements the following attributes.
 
 Charset used for encoding and decoding, defaults to C<UTF-8>.
 
+  # Disable encoding and decoding
+  $path->charset(undef);
+
 =head2 C<leading_slash>
 
   my $leading_slash = $path->leading_slash;

@@ -202,12 +202,12 @@ Mojo::Parameters - Parameters
   use Mojo::Parameters;
 
   # Parse
-  my $p = Mojo::Parameters->new('foo=bar&baz=23');
-  say $p->param('baz');
+  my $params = Mojo::Parameters->new('foo=bar&baz=23');
+  say $params->param('baz');
 
   # Build
-  my $p = Mojo::Parameters->new(foo => 'bar', baz => 23);
-  say "$p";
+  my $params = Mojo::Parameters->new(foo => 'bar', baz => 23);
+  say "$params";
 
 =head1 DESCRIPTION
 
@@ -219,15 +219,18 @@ L<Mojo::Parameters> implements the following attributes.
 
 =head2 C<charset>
 
-  my $charset = $p->charset;
-  $p          = $p->charset('UTF-8');
+  my $charset = $params->charset;
+  $params     = $params->charset('UTF-8');
 
 Charset used for encoding and decoding parameters, defaults to C<UTF-8>.
 
+  # Disable encoding and decoding
+  $params->charset(undef);
+
 =head2 C<pair_separator>
 
-  my $separator = $p->pair_separator;
-  $p            = $p->pair_separator(';');
+  my $separator = $params->pair_separator;
+  $params       = $params->pair_separator(';');
 
 Separator for parameter pairs, defaults to C<&>.
 
@@ -238,19 +241,19 @@ following new ones.
 
 =head2 C<new>
 
-  my $p = Mojo::Parameters->new;
-  my $p = Mojo::Parameters->new('foo=b%3Bar&baz=23');
-  my $p = Mojo::Parameters->new(foo => 'b;ar');
-  my $p = Mojo::Parameters->new(foo => ['ba;r', 'b;az']);
-  my $p = Mojo::Parameters->new(foo => ['ba;r', 'b;az'], bar => 23);
+  my $params = Mojo::Parameters->new;
+  my $params = Mojo::Parameters->new('foo=b%3Bar&baz=23');
+  my $params = Mojo::Parameters->new(foo => 'b;ar');
+  my $params = Mojo::Parameters->new(foo => ['ba;r', 'b;az']);
+  my $params = Mojo::Parameters->new(foo => ['ba;r', 'b;az'], bar => 23);
 
 Construct a new L<Mojo::Parameters> object.
 
 =head2 C<append>
 
-  $p = $p->append(foo => 'ba;r');
-  $p = $p->append(foo => ['ba;r', 'b;az']);
-  $p = $p->append(foo => ['ba;r', 'b;az'], bar => 23);
+  $params = $params->append(foo => 'ba;r');
+  $params = $params->append(foo => ['ba;r', 'b;az']);
+  $params = $params->append(foo => ['ba;r', 'b;az'], bar => 23);
 
 Append parameters.
 
@@ -265,42 +268,42 @@ Append parameters.
 
 =head2 C<clone>
 
-  my $p2 = $p->clone;
+  my $params2 = $params->clone;
 
 Clone parameters.
 
 =head2 C<merge>
 
-  $p = $p->merge(Mojo::Parameters->new(foo => 'b;ar', baz => 23));
+  $params = $params->merge(Mojo::Parameters->new(foo => 'b;ar', baz => 23));
 
 Merge L<Mojo::Parameters> objects.
 
 =head2 C<param>
 
-  my @names = $p->param;
-  my $foo   = $p->param('foo');
-  my @foo   = $p->param('foo');
-  my $foo   = $p->param(foo => 'ba;r');
-  my @foo   = $p->param(foo => qw(ba;r ba;z));
+  my @names = $params->param;
+  my $foo   = $params->param('foo');
+  my @foo   = $params->param('foo');
+  my $foo   = $params->param(foo => 'ba;r');
+  my @foo   = $params->param(foo => qw(ba;r ba;z));
 
 Check and replace parameter values.
 
 =head2 C<params>
 
-  my $params = $p->params;
-  $p         = $p->params([foo => 'b;ar', baz => 23]);
+  my $array = $params->params;
+  $params   = $params->params([foo => 'b;ar', baz => 23]);
 
 Parsed parameters.
 
 =head2 C<parse>
 
-  $p = $p->parse('foo=b%3Bar&baz=23');
+  $params = $params->parse('foo=b%3Bar&baz=23');
 
 Parse parameters.
 
 =head2 C<remove>
 
-  $p = $p->remove('foo');
+  $params = $params->remove('foo');
 
 Remove parameters.
 
@@ -309,7 +312,7 @@ Remove parameters.
 
 =head2 C<to_hash>
 
-  my $hash = $p->to_hash;
+  my $hash = $params->to_hash;
 
 Turn parameters into a hash reference.
 
@@ -318,8 +321,8 @@ Turn parameters into a hash reference.
 
 =head2 C<to_string>
 
-  my $string = $p->to_string;
-  my $string = "$p";
+  my $string = $params->to_string;
+  my $string = "$params";
 
 Turn parameters into a string.
 

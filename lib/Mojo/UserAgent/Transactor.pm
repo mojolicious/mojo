@@ -39,14 +39,14 @@ sub form {
   $encoding = undef if ref $encoding;
 
   # Parameters
-  my $p = Mojo::Parameters->new;
-  $p->charset($encoding) if defined $encoding;
+  my $params = Mojo::Parameters->new;
+  $params->charset($encoding) if defined $encoding;
   my $multipart;
   for my $name (sort keys %$form) {
     my $value = $form->{$name};
 
     # Array
-    if (ref $value eq 'ARRAY') { $p->append($name, $_) for @$value }
+    if (ref $value eq 'ARRAY') { $params->append($name, $_) for @$value }
 
     # Hash
     elsif (ref $value eq 'HASH') {
@@ -66,11 +66,11 @@ sub form {
         $value->{file} = Mojo::Asset::Memory->new->add_chunk($content);
       }
 
-      push @{$p->params}, $name, $value;
+      push @{$params->params}, $name, $value;
     }
 
     # Single value
-    else { $p->append($name, $value) }
+    else { $params->append($name, $value) }
   }
 
   # New transaction
@@ -81,7 +81,7 @@ sub form {
   my $headers = $req->headers;
   $headers->content_type('multipart/form-data') if $multipart;
   if (($headers->content_type // '') eq 'multipart/form-data') {
-    my $parts = $self->_multipart($encoding, $p->to_hash);
+    my $parts = $self->_multipart($encoding, $params->to_hash);
     $req->content(
       Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
   }
@@ -89,7 +89,7 @@ sub form {
   # Urlencoded
   else {
     $headers->content_type('application/x-www-form-urlencoded');
-    $req->body($p->to_string);
+    $req->body($params->to_string);
   }
 
   return $tx;
@@ -184,8 +184,7 @@ sub websocket {
   $req->url($abs->scheme($proto eq 'wss' ? 'https' : 'http')) if $proto;
 
   # Handshake
-  Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1)
-    ->client_handshake;
+  Mojo::Transaction::WebSocket->new(handshake => $tx)->client_handshake;
 
   return $tx;
 }

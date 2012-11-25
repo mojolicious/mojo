@@ -1,4 +1,7 @@
 
+3.62  2012-11-26
+  - Improved tests.
+
 3.61  2012-11-25
   - Added protocol method to Mojo::URL.
   - Added charset attribute to Mojo::Path.

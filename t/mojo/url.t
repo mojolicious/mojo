@@ -33,12 +33,16 @@ is "$url",
   'https://sri:foobar@kraih.com:8080/index.xml?monkey=biz&foo=1#/!%?@3',
   'right format';
 
-# Advanced fragment roundtrip
-$url = Mojo::URL->new('http://localhost#AZaz09-._~!$&\'()*+,;=%:@/?');
+# Advanced userinfo and fragment roundtrip
+$url = Mojo::URL->new(
+  'http://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?');
 is $url->scheme,   'http',                        'right scheme';
+is $url->userinfo, 'AZaz09-._~!$&\'()*+,;=:',     'right userinfo';
 is $url->host,     'localhost',                   'right host';
 is $url->fragment, 'AZaz09-._~!$&\'()*+,;=%:@/?', 'right fragment';
-is "$url", 'http://localhost#AZaz09-._~!$&\'()*+,;=%:@/?', 'right format';
+is "$url",
+  'http://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?',
+  'right format';
 
 # Parameters
 $url = Mojo::URL->new(

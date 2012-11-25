@@ -136,12 +136,14 @@ sub query {
 
 sub to_abs {
   my $self = shift;
-  my $base = shift || $self->base->clone;
 
-  # Scheme
+  # Already absolute
   my $abs = $self->clone;
   return $abs if $abs->is_abs;
-  $abs->scheme($base->scheme);
+
+  # Scheme
+  my $base = shift || $abs->base;
+  $abs->base($base)->scheme($base->scheme);
 
   # Authority
   return $abs if $abs->authority;
@@ -170,10 +172,14 @@ sub to_abs {
 
 sub to_rel {
   my $self = shift;
-  my $base = shift || $self->base->clone;
+
+  # Already relative
+  my $rel = $self->clone;
+  return $rel unless $rel->is_abs;
 
   # Scheme and authority
-  my $rel = $self->clone->base($base)->scheme(undef);
+  my $base = shift || $rel->base;
+  $rel->base($base)->scheme(undef);
   $rel->userinfo(undef)->host(undef)->port(undef) if $base->authority;
 
   # Path

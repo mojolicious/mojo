@@ -1,6 +1,7 @@
 
 3.62  2012-11-26
   - Improved tests.
+  - Fixed clone bugs in Mojo::URL.
 
 3.61  2012-11-25
   - Added protocol method to Mojo::URL.

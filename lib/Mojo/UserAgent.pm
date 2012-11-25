@@ -213,7 +213,7 @@ sub _connect_proxy {
   my ($self, $old, $cb) = @_;
 
   # Start CONNECT request
-  return unless my $new = $self->transactor->proxy_connect($old);
+  return undef unless my $new = $self->transactor->proxy_connect($old);
   return $self->_start(
     $new => sub {
       my ($self, $tx) = @_;
@@ -416,15 +416,15 @@ sub _server {
   # Reuse server
   return $self->{server} if $self->{server} && !$proto;
 
-  # Start test server
+  # Start application server
   my $loop   = $self->_loop;
   my $server = $self->{server}
     = Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
   my $port = $self->{port} ||= $loop->generate_port;
-  die "Couldn't find a free TCP port for testing.\n" unless $port;
+  die "Couldn't find a free TCP port for application.\n" unless $port;
   $self->{proto} = $proto ||= 'http';
   $server->listen(["$proto://127.0.0.1:$port"])->start;
-  warn "-- Test server started ($proto://127.0.0.1:$port)\n" if DEBUG;
+  warn "-- Application server started ($proto://127.0.0.1:$port)\n" if DEBUG;
   return $server;
 }
 
@@ -436,7 +436,7 @@ sub _start {
   if ($self->app) {
     $self->_server->app($self->app);
     my $url = $req->url->to_abs;
-    $req->url($url->base($self->app_url)->to_abs) unless $url->host;
+    $req->url($url->base($self->app_url)->to_abs) unless $url->is_abs;
   }
 
   # Proxy

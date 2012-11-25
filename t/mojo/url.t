@@ -211,7 +211,6 @@ is $url->base, '', 'no base';
 is $url->to_rel(Mojo::URL->new('http://kraih.com'))->base, 'http://kraih.com',
   'right base';
 
-
 # Relative path
 $url = Mojo::URL->new('http://kraih.com/foo/?foo=bar#23');
 $url->path('bar');

@@ -431,17 +431,17 @@ sub _server {
 sub _start {
   my ($self, $tx, $cb) = @_;
 
-  # Embedded server
+  # Embedded server (only start if necessary)
   my $req = $tx->req;
-  if ($self->app) {
+  my $url = $req->url;
+  if ($self->app && ($self->{port} || !$url->is_abs)) {
     $self->_server->app($self->app);
-    my $url = $req->url->to_abs;
-    $req->url($url->base($self->app_url)->to_abs) unless $url->is_abs;
+    $url = $req->url($url->base($self->app_url)->to_abs)->url
+      unless $url->is_abs;
   }
 
   # Proxy
   $self->detect_proxy if $ENV{MOJO_PROXY};
-  my $url   = $req->url;
   my $proto = $url->protocol;
   if ($self->need_proxy($url->host)) {
 

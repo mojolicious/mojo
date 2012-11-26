@@ -431,11 +431,11 @@ sub _server {
 sub _start {
   my ($self, $tx, $cb) = @_;
 
-  # Embedded server (only start if necessary)
+  # Embedded server (update application if necessary)
   my $req = $tx->req;
   my $url = $req->url;
-  if ($self->app && ($self->{port} || !$url->is_abs)) {
-    $self->_server->app($self->app);
+  if ($self->{port} || !$url->is_abs) {
+    if (my $app = $self->app) { $self->_server->app($app) }
     $url = $req->url($url->base($self->app_url)->to_abs)->url
       unless $url->is_abs;
   }

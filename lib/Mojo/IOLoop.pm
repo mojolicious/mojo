@@ -588,7 +588,7 @@ event loop can be restarted by running C<start> again.
 
   my $stream = Mojo::IOLoop->stream($id);
   my $stream = $loop->stream($id);
-  my $id     = $loop->stream($stream);
+  my $id     = $loop->stream(Mojo::IOLoop::Stream->new);
 
 Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 

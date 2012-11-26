@@ -10,6 +10,7 @@ use Test::More;
 use IO::Compress::Gzip 'gzip';
 use Mojo::IOLoop;
 use Mojo::Message::Request;
+use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
 
@@ -493,5 +494,26 @@ Mojo::IOLoop->server(
 $tx = $ua->get("http://localhost:$port/");
 ok !$tx->success, 'not successful';
 is $tx->error, 'Premature connection close', 'right error';
+
+# Inactivity timeout (throttling)
+$port = Mojo::IOLoop->generate_port;
+my $daemon = Mojo::Server::Daemon->new(app => app,
+  listen => ["http://127.0.0.1:$port"]);
+$daemon->start;
+$tx = $ua->get("http://127.0.0.1:$port" => {Connection => 'close'});
+ok $tx->success, 'successful';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
+$daemon->stop;
+$tx = $ua->inactivity_timeout(0.5)
+  ->get("http://127.0.0.1:$port" => {Connection => 'close'});
+ok !$tx->success, 'not successful';
+is $tx->error, 'Inactivity timeout', 'right error';
+$daemon->start;
+$tx = $ua->inactivity_timeout(10)
+  ->get("http://127.0.0.1:$port" => {Connection => 'close'});
+ok $tx->success, 'successful';
+is $tx->res->code, 200,      'right status';
+is $tx->res->body, 'works!', 'right content';
 
 done_testing();

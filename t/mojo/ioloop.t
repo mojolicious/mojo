@@ -79,7 +79,7 @@ ok $count < 10, 'less than ten recurring events';
 
 # Handle
 my $port = Mojo::IOLoop->generate_port;
-my $handle;
+my ($handle, $handle2);
 $id = $loop->server(
   (address => '127.0.0.1', port => $port) => sub {
     my ($loop, $stream) = @_;
@@ -87,10 +87,12 @@ $id = $loop->server(
     $loop->stop;
   }
 );
+$loop->accepting($id)->on(accept => sub { $handle2 = pop });
 $id2 = $loop->client((address => 'localhost', port => $port) => sub { });
 $loop->start;
 $loop->remove($id);
 $loop->remove($id2);
+is $handle, $handle2, 'handles are equal';
 isa_ok $handle, 'IO::Socket', 'right reference';
 
 # The poll reactor stops when there are no events being watched anymore

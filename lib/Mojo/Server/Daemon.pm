@@ -20,7 +20,7 @@ sub DESTROY {
   my $self = shift;
   return unless my $loop = $self->ioloop;
   $self->_remove($_) for keys %{$self->{connections} || {}};
-  $loop->remove($_) for @{$self->{listening} || []};
+  $loop->remove($_) for @{$self->{accepting} || []};
 }
 
 sub run {
@@ -55,8 +55,31 @@ sub setuidgid {
 
 sub start {
   my $self = shift;
-  $self->_listen($_) for @{$self->listen};
-  $self->ioloop->max_connections($self->max_clients);
+
+  # Resume accepting connections
+  my $loop = $self->ioloop;
+  if (my $accepting = $self->{accepting}) {
+    push @$accepting, $loop->accepting(delete $self->{servers}{$_})
+      for keys %{$self->{servers}};
+  }
+
+  # Start listening
+  else { $self->_listen($_) for @{$self->listen} }
+  $loop->max_connections($self->max_clients);
+
+  return $self;
+}
+
+sub stop {
+  my $self = shift;
+
+  my $loop = $self->ioloop;
+  while (my $id = shift @{$self->{accepting}}) {
+    $self->{servers}{$id} = my $server = $loop->accepting($id);
+    $loop->remove($id);
+    $server->stop;
+  }
+
   return $self;
 }
 
@@ -192,7 +215,7 @@ sub _listen {
           sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
     }
   );
-  push @{$self->{listening} ||= []}, $id;
+  push @{$self->{accepting} ||= []}, $id;
 
   # Friendly message
   return if $self->silent;
@@ -435,6 +458,12 @@ Set user and group for process.
   $daemon = $daemon->start;
 
 Start accepting connections.
+
+=head2 C<stop>
+
+  $daemon = $daemon->stop;
+
+Stop accepting connections.
 
 =head1 DEBUGGING
 

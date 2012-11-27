@@ -59,7 +59,7 @@ sub start {
   # Resume accepting connections
   my $loop = $self->ioloop;
   if (my $accepting = $self->{accepting}) {
-    push @$accepting, $loop->accepting(delete $self->{servers}{$_})
+    push @$accepting, $loop->acceptor(delete $self->{servers}{$_})
       for keys %{$self->{servers}};
   }
 
@@ -75,7 +75,7 @@ sub stop {
 
   my $loop = $self->ioloop;
   while (my $id = shift @{$self->{accepting}}) {
-    $self->{servers}{$id} = my $server = $loop->accepting($id);
+    $self->{servers}{$id} = my $server = $loop->acceptor($id);
     $loop->remove($id);
     $server->stop;
   }

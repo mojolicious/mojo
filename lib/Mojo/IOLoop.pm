@@ -32,7 +32,7 @@ $SIG{PIPE} = 'IGNORE';
 # Initialize singleton reactor early
 __PACKAGE__->singleton->reactor;
 
-sub accepting {
+sub acceptor {
   my ($self, $server) = @_;
   $self = $self->singleton unless ref $self;
 
@@ -156,7 +156,7 @@ sub server {
   );
   $server->listen(@_);
 
-  return $self->accepting($server);
+  return $self->acceptor($server);
 }
 
 sub singleton { state $loop ||= shift->SUPER::new }
@@ -444,14 +444,13 @@ processes. Note that exceptions in this callback are not captured.
 L<Mojo::IOLoop> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<accepting>
+=head2 C<acceptor>
 
-  my $server = Mojo::IOLoop->accepting($id);
-  my $server = $loop->accepting($id);
-  my $id     = $loop->accepting(Mojo::IOLoop::Server->new);
+  my $server = Mojo::IOLoop->acceptor($id);
+  my $server = $loop->acceptor($id);
+  my $id     = $loop->acceptor(Mojo::IOLoop::Server->new);
 
-Get L<Mojo::IOLoop::Server> object for id or start accepting connections from
-object.
+Get L<Mojo::IOLoop::Server> object for id or turn object into an acceptor.
 
 =head2 C<client>
 

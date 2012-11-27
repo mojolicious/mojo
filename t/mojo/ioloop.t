@@ -87,7 +87,7 @@ $id = $loop->server(
     $loop->stop;
   }
 );
-$loop->accepting($id)->on(accept => sub { $handle2 = pop });
+$loop->acceptor($id)->on(accept => sub { $handle2 = pop });
 $id2 = $loop->client((address => 'localhost', port => $port) => sub { });
 $loop->start;
 $loop->remove($id);

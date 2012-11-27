@@ -25,7 +25,7 @@ sub check_file {
 sub run {
   my ($self, $app) = @_;
 
-  # Watch files and manage worker
+  # Prepare environment
   $SIG{CHLD} = sub { $self->_reap };
   $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub {
     $self->{finished} = 1;
@@ -33,6 +33,11 @@ sub run {
   };
   unshift @{$self->watch}, $app;
   $self->{modified} = 1;
+
+  # Prepare listen sockets
+  my $daemon = Mojo::Server::Daemon->new->start->stop;
+
+  # Manage
   $self->_manage while !$self->{finished} || $self->{running};
   exit 0;
 }

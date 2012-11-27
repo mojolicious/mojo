@@ -40,7 +40,6 @@ my $port   = Mojo::IOLoop->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
   "http://127.0.0.1:$port", $script;
-sleep 3;
 sleep 1
   while !IO::Socket::INET->new(
   Proto    => 'tcp',
@@ -77,12 +76,6 @@ ok $morbo->check_file($script), 'file has changed';
 ok((stat $script)[9] > $mtime, 'modify time has changed');
 is((stat $script)[7], $size, 'still equal size');
 sleep 3;
-sleep 1
-  while !IO::Socket::INET->new(
-  Proto    => 'tcp',
-  PeerAddr => '127.0.0.1',
-  PeerPort => $port
-  );
 
 # Application has been reloaded
 $tx = $ua->get("http://127.0.0.1:$port/hello");
@@ -113,12 +106,6 @@ ok $morbo->check_file($script), 'file has changed';
 ok((stat $script)[9] == $mtime, 'modify time has not changed');
 isnt((stat $script)[7], $size, 'size has changed');
 sleep 3;
-sleep 1
-  while !IO::Socket::INET->new(
-  Proto    => 'tcp',
-  PeerAddr => '127.0.0.1',
-  PeerPort => $port
-  );
 
 # Application has been reloaded again
 $tx = $ua->get("http://127.0.0.1:$port/hello");

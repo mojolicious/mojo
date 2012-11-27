@@ -10,7 +10,7 @@ use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
 use Mojo::Util 'md5_sum';
-use Scalar::Util qw(blessed weaken);
+use Scalar::Util 'weaken';
 use Time::HiRes 'time';
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
@@ -31,6 +31,28 @@ $SIG{PIPE} = 'IGNORE';
 
 # Initialize singleton reactor early
 __PACKAGE__->singleton->reactor;
+
+sub acceptor {
+  my ($self, $server) = @_;
+  $self = $self->singleton unless ref $self;
+
+  # Find server for id
+  return $self->{servers}{$server} unless ref $server;
+
+  # Make sure connection manager is running
+  $self->_manager;
+
+  # New server
+  my $id = $self->_id;
+  $self->{servers}{$id} = $server;
+  weaken $server->reactor($self->reactor)->{reactor};
+  $self->{accepts} = $self->max_accepts if $self->max_accepts;
+
+  # Stop accepting
+  $self->_not_accepting;
+
+  return $id;
+}
 
 sub client {
   my ($self, $cb) = (shift, pop);
@@ -113,15 +135,7 @@ sub server {
   my ($self, $cb) = (shift, pop);
   $self = $self->singleton unless ref $self;
 
-  # Make sure connection manager is running
-  $self->_manager;
-
-  # New server
-  my $id = $self->_id;
-  my $server = $self->{servers}{$id} = Mojo::IOLoop::Server->new;
-  weaken $server->reactor($self->reactor)->{reactor};
-
-  # Listen
+  my $server = Mojo::IOLoop::Server->new;
   weaken $self;
   $server->on(
     accept => sub {
@@ -141,12 +155,8 @@ sub server {
     }
   );
   $server->listen(@_);
-  $self->{accepts} = $self->max_accepts if $self->max_accepts;
 
-  # Stop accepting
-  $self->_not_accepting;
-
-  return $id;
+  return $self->acceptor($server);
 }
 
 sub singleton { state $loop ||= shift->SUPER::new }
@@ -167,7 +177,7 @@ sub stream {
   $self = $self->singleton unless ref $self;
 
   # Connect stream with reactor
-  return $self->_stream($stream, $self->_id) if blessed $stream;
+  return $self->_stream($stream, $self->_id) if ref $stream;
 
   # Find stream for id
   return undef unless my $c = $self->{connections}{$stream};
@@ -433,6 +443,14 @@ processes. Note that exceptions in this callback are not captured.
 
 L<Mojo::IOLoop> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 C<acceptor>
+
+  my $server = Mojo::IOLoop->acceptor($id);
+  my $server = $loop->acceptor($id);
+  my $id     = $loop->acceptor(Mojo::IOLoop::Server->new);
+
+Get L<Mojo::IOLoop::Server> object for id or turn object into an acceptor.
 
 =head2 C<client>
 

@@ -200,4 +200,25 @@ ok $local_port > 0, 'has local port';
 ok $remote_address, 'has local address';
 ok $remote_port > 0, 'has local port';
 
+# Throttling
+$port = Mojo::IOLoop->generate_port;
+my $daemon = Mojo::Server::Daemon->new(app => $app,
+  listen => ["http://127.0.0.1:$port"]);
+$daemon->start;
+$tx = $ua->get("http://127.0.0.1:$port/throttle1" => {Connection => 'close'});
+ok $tx->success, 'successful';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Your Mojo is working!', 'right content';
+$daemon->stop;
+$tx = $ua->inactivity_timeout(0.5)
+  ->get("http://127.0.0.1:$port/throttle2" => {Connection => 'close'});
+ok !$tx->success, 'not successful';
+is $tx->error, 'Inactivity timeout', 'right error';
+$daemon->start;
+$tx = $ua->inactivity_timeout(10)
+  ->get("http://127.0.0.1:$port/throttle3" => {Connection => 'close'});
+ok $tx->success, 'successful';
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, 'Your Mojo is working!', 'right content';
+
 done_testing();

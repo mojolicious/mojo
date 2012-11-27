@@ -35,7 +35,7 @@ sub run {
   $self->{modified} = 1;
 
   # Prepare and cache listen sockets for smooth restarting
-  my $daemon = Mojo::Server::Daemon->new->start->stop;
+  my $daemon = Mojo::Server::Daemon->new(silent => 1)->start->stop;
 
   # Watch files and manage worker
   $self->_manage while !$self->{finished} || $self->{running};

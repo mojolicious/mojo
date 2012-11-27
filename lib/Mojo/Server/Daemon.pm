@@ -73,9 +73,10 @@ sub start {
 sub stop {
   my $self = shift;
 
+  # Pause accepting connections
   my $loop = $self->ioloop;
   while (my $id = shift @{$self->{acceptors}}) {
-    $self->{servers}{$id} = my $server = $loop->acceptor($id);
+    my $server = $self->{servers}{$id} = $loop->acceptor($id);
     $loop->remove($id);
     $server->stop;
   }

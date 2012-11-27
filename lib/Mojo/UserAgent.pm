@@ -115,7 +115,7 @@ sub start {
     warn "-- Switching to blocking mode\n" if DEBUG;
     $self->_cleanup(1);
   }
-  $self->_start($tx => sub { $tx = $_[1] });
+  $self->_start($tx => sub { $tx = pop });
 
   # Start event loop
   $self->ioloop->start;

@@ -34,10 +34,10 @@ sub run {
   unshift @{$self->watch}, $app;
   $self->{modified} = 1;
 
-  # Prepare listen sockets
+  # Prepare and cache listen sockets for smooth restarting
   my $daemon = Mojo::Server::Daemon->new->start->stop;
 
-  # Manage
+  # Watch files and manage worker
   $self->_manage while !$self->{finished} || $self->{running};
   exit 0;
 }

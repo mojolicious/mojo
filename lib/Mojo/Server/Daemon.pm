@@ -20,7 +20,7 @@ sub DESTROY {
   my $self = shift;
   return unless my $loop = $self->ioloop;
   $self->_remove($_) for keys %{$self->{connections} || {}};
-  $loop->remove($_) for @{$self->{accepting} || []};
+  $loop->remove($_) for @{$self->{acceptors} || []};
 }
 
 sub run {
@@ -58,8 +58,8 @@ sub start {
 
   # Resume accepting connections
   my $loop = $self->ioloop;
-  if (my $accepting = $self->{accepting}) {
-    push @$accepting, $loop->acceptor(delete $self->{servers}{$_})
+  if (my $acceptors = $self->{acceptors}) {
+    push @$acceptors, $loop->acceptor(delete $self->{servers}{$_})
       for keys %{$self->{servers}};
   }
 
@@ -74,7 +74,7 @@ sub stop {
   my $self = shift;
 
   my $loop = $self->ioloop;
-  while (my $id = shift @{$self->{accepting}}) {
+  while (my $id = shift @{$self->{acceptors}}) {
     $self->{servers}{$id} = my $server = $loop->acceptor($id);
     $loop->remove($id);
     $server->stop;
@@ -215,7 +215,7 @@ sub _listen {
           sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
     }
   );
-  push @{$self->{accepting} ||= []}, $id;
+  push @{$self->{acceptors} ||= []}, $id;
 
   # Friendly message
   return if $self->silent;

@@ -118,13 +118,13 @@ sub _config {
   # Daemon settings
   $ENV{MOJO_REVERSE_PROXY} = $c->{proxy} if defined $c->{proxy};
   my $daemon = $self->{daemon};
-  $daemon->backlog($c->{backlog}) if defined $c->{backlog};
-  $daemon->max_clients($c->{clients} || 1000);
-  $daemon->group($c->{group}) if defined $c->{group};
+  defined $c->{$_} and $daemon->$_($c->{$_}) for qw(backlog group user);
+  $daemon->max_clients($c->{clients}              || 1000);
   $daemon->max_requests($c->{keep_alive_requests} || 25);
   $daemon->inactivity_timeout($c->{inactivity_timeout} // 15);
-  $daemon->user($c->{user}) if defined $c->{user};
   $daemon->listen($c->{listen} || ['http://*:8080']);
+
+  # Event loop settings
   my $loop = $daemon->ioloop;
   $loop->max_accepts($c->{accepts} // 1000);
   $loop->multi_accept($c->{multi_accept}) if defined $c->{multi_accept};
@@ -317,8 +317,7 @@ sub _spawn {
   );
 
   # Clean worker environment
-  $SIG{INT} = $SIG{TERM} = $SIG{CHLD} = $SIG{USR2} = $SIG{TTIN} = $SIG{TTOU}
-    = 'DEFAULT';
+  $SIG{$_} = 'DEFAULT' for qw(INT TERM CHLD USR2 TTIN TTOU);
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete $self->{$_} for qw(poll reader);
 

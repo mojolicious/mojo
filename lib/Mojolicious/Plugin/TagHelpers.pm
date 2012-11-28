@@ -558,8 +558,9 @@ picked up and shown as default.
 =head2 C<text_area>
 
   %= text_area 'foo'
+  %= text_area 'foo', cols => 40
   %= text_area foo => 'Default!', cols => 40
-  %= text_area foo => begin
+  %= text_area foo => (cols => 40) => begin
     Default!
   % end
 
@@ -567,8 +568,9 @@ Generate textarea element. Previous input values will automatically get picked
 up and shown as default.
 
   <textarea name="foo"></textarea>
+  <textarea cols="40" name="foo"></textarea>
   <textarea cols="40" name="foo">Default!</textarea>
-  <textarea name="foo">
+  <textarea cols="40" name="foo">
     Default!
   </textarea>
 

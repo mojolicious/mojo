@@ -249,7 +249,7 @@ sub _parse_chunked {
     if ($self->{chunk_state} // '') eq 'trailing_headers';
 
   # Parse chunks
-  while (length $self->{pre_buffer}) {
+  while (my $len = length $self->{pre_buffer}) {
 
     # Start new chunk (ignore the chunk extension)
     unless ($self->{chunk_len}) {
@@ -257,13 +257,12 @@ sub _parse_chunked {
         unless $self->{pre_buffer} =~ s/^(?:\x0d?\x0a)?([[:xdigit:]]+).*\x0a//;
       next if $self->{chunk_len} = hex $1;
 
-      # Last chunk_state
+      # Last chunk
       $self->{chunk_state} = 'trailing_headers';
       last;
     }
 
     # Remove as much as possible from payload
-    last unless my $len = length $self->{pre_buffer};
     $len = $self->{chunk_len} if $self->{chunk_len} < $len;
     $self->{buffer} .= substr $self->{pre_buffer}, 0, $len, '';
     $self->{real_size} += $len;

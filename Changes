@@ -1,8 +1,10 @@
 
-3.63  2012-11-27
+3.63  2012-11-28
   - Added support for smooth restarting to Morbo.
   - Added acceptor method to Mojo::IOLoop.
   - Added stop method to Mojo::Server::Daemon.
+  - Improved memory usage of chunked transfer encoding parser in
+    Mojo::Content.
   - Improved documentation.
   - Improved tests.
 

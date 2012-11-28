@@ -248,29 +248,26 @@ sub _parse_chunked {
   return $self->_parse_chunked_trailing_headers
     if ($self->{chunk_state} // '') eq 'trailing_headers';
 
-  # New chunk (ignore the chunk extension)
-  while ($self->{pre_buffer} =~ /^((?:\x0d?\x0a)?([[:xdigit:]]+).*\x0a)/) {
-    my $header = $1;
-    my $len    = hex $2;
+  # Parse chunks
+  while (length $self->{pre_buffer}) {
 
-    # Check if we have a whole chunk yet
-    last unless length($self->{pre_buffer}) >= (length($header) + $len);
+    # Start new chunk (ignore the chunk extension)
+    unless ($self->{chunk_len}) {
+      last
+        unless $self->{pre_buffer} =~ s/^(?:\x0d?\x0a)?([[:xdigit:]]+).*\x0a//;
+      next if $self->{chunk_len} = hex $1;
 
-    # Remove header
-    substr $self->{pre_buffer}, 0, length $header, '';
-
-    # Last chunk
-    if ($len == 0) {
+      # Last chunk_state
       $self->{chunk_state} = 'trailing_headers';
       last;
     }
 
-    # Remove payload
-    $self->{real_size} += $len;
+    # Remove as much as possible from payload
+    last unless my $len = length $self->{pre_buffer};
+    $len = $self->{chunk_len} if $self->{chunk_len} < $len;
     $self->{buffer} .= substr $self->{pre_buffer}, 0, $len, '';
-
-    # Remove newline at end of chunk
-    $self->{pre_buffer} =~ s/^(\x0d?\x0a)//;
+    $self->{real_size} += $len;
+    $self->{chunk_len} -= $len;
   }
 
   # Trailing headers

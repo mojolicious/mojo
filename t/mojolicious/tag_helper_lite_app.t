@@ -361,6 +361,7 @@ EOF
 # POST /no_snowman (POST form)
 $t->post_ok('/no_snowman')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
+  <textarea cols="40" name="bar"></textarea>
   <input type="submit" value="whatever" />
 </form>
 EOF
@@ -368,6 +369,7 @@ EOF
 # POST /no_snowman (PATCH form)
 $t->post_ok('/no_snowman?foo=1')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="PATCH">
+  <textarea cols="40" name="bar"></textarea>
   <input type="submit" value="whatever" />
 </form>
 EOF
@@ -481,5 +483,6 @@ __DATA__
 @@ no_snowman.html.ep
 % my @attrs = param('foo') ? (method => 'PATCH') : ();
 %= form_for 'snowman', @attrs => begin
+  %= text_area 'bar', cols => 40
   %= submit_button 'whatever'
 %= end

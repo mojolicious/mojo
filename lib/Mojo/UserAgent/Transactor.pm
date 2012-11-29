@@ -11,7 +11,7 @@ use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util qw(encode url_escape);
+use Mojo::Util 'encode';
 
 sub endpoint {
   my ($self, $tx) = @_;
@@ -204,7 +204,6 @@ sub _multipart {
     if (ref $values eq 'HASH') {
       $filename = delete $values->{filename} || $name;
       $filename = encode $encoding, $filename if $encoding;
-      $filename = url_escape $filename, '^A-Za-z0-9\-._~';
       push @parts, $part->asset(delete $values->{file});
       $headers->from_hash($values);
     }
@@ -220,7 +219,6 @@ sub _multipart {
 
     # Content-Disposition
     $name = encode $encoding, $name if $encoding;
-    $name = url_escape $name, '^A-Za-z0-9\-._~';
     my $disposition = qq{form-data; name="$name"};
     $disposition .= qq{; filename="$filename"} if $filename;
     $headers->content_disposition($disposition);

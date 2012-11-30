@@ -251,13 +251,13 @@ implements the following new ones.
 
   $tx->client_read($chunk);
 
-Read data client-side.
+Read data client-side, used to implement user agents.
 
 =head2 C<client_write>
 
   my $chunk = $tx->client_write;
 
-Write data client-side.
+Write data client-side, used to implement user agents.
 
 =head2 C<keep_alive>
 
@@ -269,13 +269,13 @@ Check if connection can be kept alive.
 
   $tx->server_read($chunk);
 
-Read data server-side.
+Read data server-side, used to implement web servers.
 
 =head2 C<server_write>
 
   my $chunk = $tx->server_write;
 
-Write data server-side.
+Write data server-side, used to implement web servers.
 
 =head1 SEE ALSO
 

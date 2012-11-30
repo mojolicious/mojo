@@ -1,5 +1,5 @@
 
-3.64  2012-11-29
+3.64  2012-11-30
   - Improved documentation.
   - Fixed bug where Mojo::UserAgent::Transactor would escape
     Content-Disposition values.

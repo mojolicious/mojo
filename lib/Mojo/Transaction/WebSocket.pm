@@ -433,25 +433,26 @@ Build WebSocket frame.
 
   my $success = $ws->client_challenge;
 
-Check WebSocket handshake challenge client-side.
+Check WebSocket handshake challenge client-side, used to implement user
+agents.
 
 =head2 C<client_handshake>
 
   $ws->client_handshake;
 
-Perform WebSocket handshake client-side.
+Perform WebSocket handshake client-side, used to implement user agents.
 
 =head2 C<client_read>
 
   $ws->client_read($data);
 
-Read data client-side.
+Read data client-side, used to implement user agents.
 
 =head2 C<client_write>
 
   my $chunk = $ws->client_write;
 
-Write data client-side.
+Write data client-side, used to implement user agents.
 
 =head2 C<connection>
 
@@ -552,19 +553,19 @@ will be invoked once all data has been written.
 
   $ws->server_handshake;
 
-Perform WebSocket handshake server-side.
+Perform WebSocket handshake server-side, used to implement web servers.
 
 =head2 C<server_read>
 
   $ws->server_read($data);
 
-Read data server-side.
+Read data server-side, used to implement web servers.
 
 =head2 C<server_write>
 
   my $chunk = $ws->server_write;
 
-Write data server-side.
+Write data server-side, used to implement web servers.
 
 =head1 DEBUGGING
 

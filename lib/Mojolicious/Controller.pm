@@ -182,9 +182,7 @@ sub render {
   return Mojo::ByteStream->new($output) if $args->{partial};
 
   # Prepare response
-  my $res = $self->res;
-  $res->body($output) unless $res->body;
-  my $headers = $res->headers;
+  my $headers = $self->res->body($output)->headers;
   $headers->content_type($type) unless $headers->content_type;
   return !!$self->rendered($stash->{status});
 }

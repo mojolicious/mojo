@@ -147,7 +147,7 @@ sub redirect_to {
   # Don't override 3xx status
   my $res = $self->res;
   $res->headers->location($self->url_for(@_)->to_abs);
-  return $self->rendered($res->is_status_class(300) ? undef : 302);
+  return $self->rendered($res->is_status_class(300) ? () : 302);
 }
 
 sub render {

@@ -147,6 +147,7 @@ like $tx->req->content->parts->[2]->headers->content_disposition, qr/"test"/,
   'right "Content-Disposition" value';
 is $tx->req->content->parts->[2]->asset->slurp, 3, 'right part';
 is $tx->req->content->parts->[3], undef, 'no more parts';
+is_deeply [$tx->req->param('test')], [1, 2, 3], 'right values';
 
 # Multipart form with real file and custom header
 $tx = $t->form('http://kraih.com/foo',
@@ -186,6 +187,9 @@ like $tx->req->content->parts->[0]->headers->content_disposition,
   qr/foo\.zip/, 'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 'whatever', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
+is $tx->req->upload('myzip')->filename, 'foo.zip',  'right filename';
+is $tx->req->upload('myzip')->size,     8,          'right size';
+is $tx->req->upload('myzip')->slurp,    'whatever', 'right content';
 
 # Multipart form with filename (UTF-8)
 my $snowman = encode 'UTF-8', '☃';

@@ -1,6 +1,7 @@
 
 3.64  2012-12-01
   - Improved documentation.
+  - Improved tests.
   - Fixed bug where Mojo::UserAgent::Transactor would escape
     Content-Disposition values.
 

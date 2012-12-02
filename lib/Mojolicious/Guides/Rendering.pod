@@ -771,6 +771,14 @@ plugin.
 
 Less commonly used and more powerful features.
 
+=head2 Rendering static files
+
+You can manually render static files from your C<public> directories with
+L<Mojolicious::Controller/"render_static">.
+
+  $self->res->headers->content_disposition('attachment; filename=bar.png;');
+  $self->render_static('foo/bar.png');
+
 =head2 Chunked transfer encoding
 
 For very dynamic content you might not know the response C<Content-Length> in

@@ -773,11 +773,22 @@ Less commonly used and more powerful features.
 
 =head2 Rendering static files
 
-You can manually render static files from your C<public> directories with
+If automatic rendering of static files is not enough, you can also render them
+manually from your C<DATA> sections and C<public> directories with
 L<Mojolicious::Controller/"render_static">.
 
   $self->res->headers->content_disposition('attachment; filename=bar.png;');
   $self->render_static('foo/bar.png');
+
+=head2 Custom responses
+
+For entirely custom responses to, for example, stream content directly from
+static files, you can use L<Mojolicious::Controller/"rendered"> to tell the
+renderer that a response has been generated.
+
+  $self->res->headers->content_type('text/plain');
+  $self->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
+  $self->rendered(200);
 
 =head2 Chunked transfer encoding
 

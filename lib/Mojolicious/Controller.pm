@@ -750,11 +750,6 @@ of the response, which is C<text/html;charset=UTF-8> by default.
 Finalize response and emit C<after_dispatch> plugin hook, defaults to using a
 C<200> response code.
 
-  # Stream content directly from file
-  $c->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));
-  $c->res->headers->content_type('text/plain');
-  $c->rendered(200);
-
 =head2 C<req>
 
   my $req = $c->req;

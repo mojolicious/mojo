@@ -783,8 +783,8 @@ L<Mojolicious::Controller/"render_static">.
 =head2 Custom responses
 
 For entirely custom responses to, for example, stream content directly from
-static files, you can use L<Mojolicious::Controller/"rendered"> to tell the
-renderer that a response has been generated.
+files, you can use L<Mojolicious::Controller/"rendered"> to tell the renderer
+that a response has been generated.
 
   $self->res->headers->content_type('text/plain');
   $self->res->content->asset(Mojo::Asset::File->new(path => '/etc/passwd'));

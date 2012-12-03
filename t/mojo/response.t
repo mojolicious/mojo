@@ -939,6 +939,17 @@ $res->content(Mojo::Content::MultiPart->new);
 $res->body('hi!');
 is $res->body, 'hi!', 'right content';
 
+# Body exceeding memory limit (no upgrade)
+{
+  local $ENV{MOJO_MAX_MEMORY_SIZE} = 8;
+  $res = Mojo::Message::Response->new;
+  $res->body('hi there!');
+  is $res->body, 'hi there!', 'right content';
+  is $res->content->asset->max_memory_size, 8, 'right size';
+  is $res->content->asset->size,            9, 'right size';
+  ok !$res->content->asset->is_file, 'stored in memory';
+}
+
 # Parse response and extract JSON data
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0a");

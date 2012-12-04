@@ -76,6 +76,10 @@ is "$url", 'http://sri:foobar@kraih.com:8080?foo=23&bar=24&baz=25#23',
   'right format';
 $url->query([foo => 26, bar => undef, baz => undef]);
 is "$url", 'http://sri:foobar@kraih.com:8080?foo=26#23', 'right format';
+$url->query(Mojo::Parameters->new(a => 1, b => 2));
+is "$url", 'http://sri:foobar@kraih.com:8080?a=1&b=2#23';
+$url->query(z => 3);
+is "$url", 'http://sri:foobar@kraih.com:8080?z=3#23';
 
 # Query string
 $url = Mojo::URL->new(
@@ -118,8 +122,8 @@ is $url->to_abs(Mojo::URL->new('http://')), 'http://localhost/23/',
   'right absolute version';
 is $url->to_abs(Mojo::URL->new('https://')), 'https://localhost/23/',
   'right absolute version';
-is $url->to_abs(Mojo::URL->new('http://mojolicio.us')),
-  'http://localhost/23/', 'right absolute version';
+is $url->to_abs(Mojo::URL->new('http://mojolicio.us')), 'http://localhost/23/',
+  'right absolute version';
 is $url->to_abs(Mojo::URL->new('http://mojolicio.us:8080')),
   'http://localhost/23/', 'right absolute version';
 $url = Mojo::URL->new('///bar/23/');

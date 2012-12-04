@@ -73,6 +73,7 @@ sub params {
   # Replace parameters
   if (@_) {
     $self->{params} = shift;
+    delete $self->{string};
     return $self;
   }
 

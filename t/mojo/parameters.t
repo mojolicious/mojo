@@ -32,6 +32,7 @@ is $params->to_string, 'foo=b%3Bar;baz=23;a=4;a=5;b=6;b=7;x=1;y=2',
   'right format';
 is $params2->to_string, 'x=1&y=2', 'right format';
 
+
 # Param
 is_deeply $params->param('foo'), 'b;ar', 'right structure';
 is_deeply [$params->param('a')], [4, 5], 'right structure';
@@ -57,8 +58,8 @@ is_deeply [$params->param], [qw(q t w)], 'right structure';
 
 # Append
 $params->append('a', 4, 'a', 5, 'b', 6, 'b', 7);
-is_deeply $params->to_hash,
-  {a => [4, 5], b => [6, 7], q => 1, w => 2, t => 7}, 'right structure';
+is_deeply $params->to_hash, {a => [4, 5], b => [6, 7], q => 1, w => 2, t => 7},
+  'right structure';
 $params = Mojo::Parameters->new(foo => undef, bar => 'bar');
 is $params->to_string, 'foo=&bar=bar', 'right format';
 $params = Mojo::Parameters->new(bar => 'bar', foo => undef);
@@ -206,5 +207,11 @@ $params = Mojo::Parameters->new('%E5=%E4')->charset(undef);
 is $params->param("\xe5"), "\xe4", 'right value';
 is "$params", '%E5=%E4', 'right result';
 is $params->clone->to_string, '%E5=%E4', 'right result';
+
+# Replace
+$params = Mojo::Parameters->new('x=3&z=4');
+$params->params($params2->params);
+is_deeply $params->to_hash, $params2->to_hash,   'right structure';
+is $params->to_string,      $params2->to_string, 'right result';
 
 done_testing();

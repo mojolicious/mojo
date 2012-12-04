@@ -184,6 +184,11 @@ $params = Mojo::Parameters->new('foo=bar&baz=23');
 $params->parse('foo=bar&baz=23');
 is "$params", 'foo=bar&baz=23', 'right result';
 
+# Replace
+$params = Mojo::Parameters->new('a=1&b=2');
+$params->params([a => 2, b => 3]);
+is $params->to_string, 'a=2&b=3', 'right result';
+
 # Query string
 $params = Mojo::Parameters->new('%AZaz09-._~&;=+!$\'()*,%:@/?');
 is "$params", '%AZaz09-._~&;=+!$\'()*,%:@/?', 'right result';

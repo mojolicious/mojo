@@ -2,6 +2,7 @@
 3.65  2012-12-04
   - Improved documentation.
   - Improved tests.
+  - Fixed parameter replacement bug in Mojo::Parameters. (alexbyk, sri)
 
 3.64  2012-12-01
   - Improved documentation.

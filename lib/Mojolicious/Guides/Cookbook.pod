@@ -76,7 +76,7 @@ for a full list see L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   use Mojolicious::Lite;
 
-  app->config(hypnotoad => {listen => ['http://*:3000']});
+  app->config(hypnotoad => {listen => ['http://*:80']});
 
   get '/' => {text => 'Hello Wor...ALL GLORY TO THE HYPNOTOAD!'};
 
@@ -86,7 +86,12 @@ Or just add a C<hypnotoad> section to your L<Mojolicious::Plugin::Config> or
 L<Mojolicious::Plugin::JSONConfig> configuration file.
 
   # myapp.conf
-  {hypnotoad => {listen => ['http://*:80'], workers => 10}};
+  {
+    hypnotoad => {
+      listen  => ['https://*:443?cert=/etc/server.crt&key=/etc/server.key'],
+      workers => 10
+    }
+  };
 
 But one of its biggest advantages is the support for effortless zero downtime
 software upgrades. That means you can upgrade L<Mojolicious>, Perl or even

@@ -949,7 +949,7 @@ generated content and content that is streamed directly from files.
   hook after_dispatch => sub {
     my $self = shift;
 
-    # Check if user has set "gzip => 1" in the stash
+    # Check if "gzip => 1" has been set in the stash
     return unless $self->stash->{gzip};
 
     # Check if user agent accepts GZip compression

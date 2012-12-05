@@ -30,10 +30,12 @@ is $file->contains('a'), -1, 'does not contain "a"';
 
 # Empty memory asset
 $mem = Mojo::Asset::Memory->new;
+ok !$mem->is_range, 'no range';
 is $mem->contains('a'), -1, 'does not contain "a"';
 
 # File asset range support (a[bcdef])
 $file = Mojo::Asset::File->new(start_range => 1);
+ok $file->is_range, 'has range';
 $file->add_chunk('abcdef');
 is $file->contains('bcdef'), 0,  '"bcdef" at position 0';
 is $file->contains('cdef'),  1,  '"cdef" at position 1';
@@ -41,6 +43,7 @@ is $file->contains('db'),    -1, 'does not contain "db"';
 
 # Memory asset range support (a[bcdef])
 $mem = Mojo::Asset::Memory->new(start_range => 1);
+ok $mem->is_range, 'has range';
 $mem->add_chunk('abcdef');
 is $mem->contains('bcdef'), 0,  '"bcdef" at position 0';
 is $mem->contains('cdef'),  1,  '"cdef" at position 1';
@@ -48,6 +51,7 @@ is $mem->contains('db'),    -1, 'does not contain "db"';
 
 # File asset range support (ab[cdefghi]jk)
 $file = Mojo::Asset::File->new(start_range => 2, end_range => 8);
+ok $file->is_range, 'has range';
 $file->add_chunk('abcdefghijk');
 is $file->contains('cdefghi'), 0,  '"cdefghi" at position 0';
 is $file->contains('fghi'),    3,  '"fghi" at position 3';
@@ -64,6 +68,7 @@ is $chunk, 'hi', 'chunk from position 5';
 
 # Memory asset range support (ab[cdefghi]jk)
 $mem = Mojo::Asset::Memory->new(start_range => 2, end_range => 8);
+ok $mem->is_range, 'has range';
 $mem->add_chunk('abcdefghijk');
 is $mem->contains('cdefghi'), 0,  '"cdefghi" at position 0';
 is $mem->contains('fghi'),    3,  '"fghi" at position 3';
@@ -80,6 +85,7 @@ is $chunk, 'hi', 'chunk from position 5';
 
 # Huge file asset
 $file = Mojo::Asset::File->new;
+ok !$file->is_range, 'no range';
 $file->add_chunk('a' x 131072);
 $file->add_chunk('b');
 $file->add_chunk('c' x 131072);

@@ -1,5 +1,6 @@
 
-3.65  2012-12-04
+3.65  2012-12-05
+  - Added is_range method to Mojo::Asset.
   - Improved documentation.
   - Improved tests.
   - Fixed parameter replacement bug in Mojo::Parameters. (alexbyk, sri)

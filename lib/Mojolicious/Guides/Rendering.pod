@@ -934,8 +934,42 @@ do is add a new C<handler>.
   @@ index.html.mine
   ...
 
-Since most template systems don't support templates in the C<DATA> section the
-renderer provides methods to help you with that.
+Since most template systems don't support templates in the C<DATA> section,
+the renderer provides methods to help you with that.
+
+=head2 Post-processing content
+
+While post-processing tasks are generally very easy with the C<after_dispatch>
+hook, there are a few things you need to watch out for, such as dynamically
+generated content and content that is streamed directly from files.
+
+  use Mojolicious::Lite;
+  use IO::Compress::Gzip 'gzip';
+
+  hook after_dispatch => sub {
+    my $self = shift;
+
+    # Check if user has set "gzip => 1" in the stash
+    return unless $self->stash->{gzip};
+
+    # Check if user agent accepts GZip compression
+    return unless ($self->req->headers->accept_encoding // '') =~ /gzip/i;
+
+    # Check if content is streamed from a file or dynamically generated
+    my $asset = $self->res->content->asset;
+    return if $asset->is_file || !$asset->size || $asset->is_range;
+
+    # Compress content
+    gzip \(my $dummy = $asset->slurp), \my $compressed;
+    $self->res->body($compressed)->headers->content_encoding('gzip');
+  };
+
+  get '/' => sub {
+    my $self = shift;
+    $self->render(text => 'Hello World!', gzip => 1);
+  };
+
+  app->start;
 
 =head1 MORE
 

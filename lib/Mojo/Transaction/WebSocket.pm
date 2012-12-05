@@ -81,7 +81,7 @@ sub build_frame {
 
 sub client_challenge {
   my $self = shift;
-  return $self->_challenge($self->req->headers->sec_websocket_key) eq
+  return _challenge($self->req->headers->sec_websocket_key) eq
     $self->res->headers->sec_websocket_accept;
 }
 
@@ -224,7 +224,7 @@ sub server_handshake {
   ($req_headers->sec_websocket_protocol || '') =~ /^\s*([^,]+)/
     and $res_headers->sec_websocket_protocol($1);
   $res_headers->sec_websocket_accept(
-    $self->_challenge($req_headers->sec_websocket_key));
+    _challenge($req_headers->sec_websocket_key));
 }
 
 sub server_read {
@@ -253,7 +253,7 @@ sub server_write {
   return delete $self->{write} // '';
 }
 
-sub _challenge { b64_encode(sha1_bytes(($_[1] || '') . GUID), '') }
+sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
 
 sub _message {
   my ($self, $frame) = @_;

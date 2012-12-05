@@ -161,10 +161,7 @@ sub start {
   (ref $self ? $self : $self->singleton)->reactor->start;
 }
 
-sub stop {
-  my $self = shift;
-  (ref $self ? $self : $self->singleton)->reactor->stop;
-}
+sub stop { (ref $_[0] ? $_[0] : $_[0]->singleton)->reactor->stop }
 
 sub stream {
   my ($self, $stream) = @_;

@@ -361,10 +361,7 @@ sub _handle {
   $self->ioloop->stop if !$self->{nb} && !keys %{$self->{connections}};
 }
 
-sub _loop {
-  my $self = shift;
-  return $self->{nb} ? Mojo::IOLoop->singleton : $self->ioloop;
-}
+sub _loop { $_[0]->{nb} ? Mojo::IOLoop->singleton : $_[0]->ioloop }
 
 sub _read {
   my ($self, $id, $chunk) = @_;

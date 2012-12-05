@@ -253,7 +253,7 @@ sub server_write {
   return delete $self->{write} // '';
 }
 
-sub _challenge { b64_encode(sha1_bytes((pop() || '') . GUID), '') }
+sub _challenge { b64_encode(sha1_bytes(($_[1] || '') . GUID), '') }
 
 sub _message {
   my ($self, $frame) = @_;

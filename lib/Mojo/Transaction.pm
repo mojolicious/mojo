@@ -77,10 +77,7 @@ sub server_close {
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
-sub success {
-  my $self = shift;
-  return $self->error ? undef : $self->res;
-}
+sub success { $_[0]->error ? undef : $_[0]->res }
 
 1;
 

@@ -48,9 +48,9 @@ our @EXPORT_OK = (
   qw(url_escape url_unescape xml_escape xor_encode)
 );
 
-sub b64_decode { decode_base64(shift) }
+sub b64_decode { decode_base64($_[0]) }
 
-sub b64_encode { encode_base64(shift, shift) }
+sub b64_encode { encode_base64($_[0], $_[1]) }
 
 sub camelize {
   my $string = shift;

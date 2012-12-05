@@ -34,10 +34,7 @@ sub new {
 
 sub b { __PACKAGE__->new(@_) }
 
-sub clone {
-  my $self = shift;
-  return $self->new($$self);
-}
+sub clone { $_[0]->new(${$_[0]}) }
 
 sub decode {
   my $self = shift;
@@ -59,14 +56,14 @@ sub say {
 
 sub secure_compare { Mojo::Util::secure_compare ${shift()}, @_ }
 
-sub size { length ${shift()} }
+sub size { length ${$_[0]} }
 
 sub split {
   my ($self, $pattern) = @_;
   return Mojo::Collection->new(map { $self->new($_) } split $pattern, $$self);
 }
 
-sub to_string { ${shift()} }
+sub to_string { ${$_[0]} }
 
 1;
 

@@ -69,7 +69,7 @@ sub recurring { shift->_timer(1, @_) }
 
 sub remove {
   my ($self, $remove) = @_;
-  return !!delete shift->{timers}{shift()} unless ref $remove;
+  return !!delete $self->{timers}{$remove} unless ref $remove;
   $self->_poll->remove($remove);
   return !!delete $self->{io}{fileno $remove};
 }

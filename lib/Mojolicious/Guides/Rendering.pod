@@ -964,10 +964,7 @@ generated content and content that is streamed directly from files.
     $self->res->body($compressed)->headers->content_encoding('gzip');
   };
 
-  get '/' => sub {
-    my $self = shift;
-    $self->render(template => 'hello', gzip => 1);
-  };
+  get '/' => {template => 'hello', title => 'Hello', gzip => 1};
 
   app->start;
   __DATA__
@@ -975,7 +972,7 @@ generated content and content that is streamed directly from files.
   @@ hello.html.ep
   <!DOCTYPE html>
   <html>
-    <head><title>Hello</title></head>
+    <head><title><%= title %></title></head>
     <body>Compressed content.</body>
   </html>
 

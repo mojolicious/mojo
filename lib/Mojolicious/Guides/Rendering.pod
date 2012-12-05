@@ -966,10 +966,18 @@ generated content and content that is streamed directly from files.
 
   get '/' => sub {
     my $self = shift;
-    $self->render(text => 'Hello World!', gzip => 1);
+    $self->render(template => 'hello', gzip => 1);
   };
 
   app->start;
+  __DATA__
+
+  @@ hello.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head><title>Hello</title></head>
+    <body>Compressed content.</body>
+  </html>
 
 =head1 MORE
 

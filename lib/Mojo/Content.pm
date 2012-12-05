@@ -76,10 +76,7 @@ sub is_chunked { !!shift->headers->transfer_encoding }
 
 sub is_compressed { (shift->headers->content_encoding || '') =~ /^gzip$/i }
 
-sub is_dynamic {
-  my $self = shift;
-  return $self->{dynamic} && !defined $self->headers->content_length;
-}
+sub is_dynamic { $_[0]->{dynamic} && !defined $_[0]->headers->content_length }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
 
@@ -97,7 +94,7 @@ sub parse {
   # Parse headers
   $self->_parse_until_body(@_);
   return $self if $self->{state} eq 'headers';
-  $self->_body;
+  $self->emit('body') unless $self->{body}++;
 
   # Parse chunked content
   $self->{real_size} //= 0;
@@ -203,11 +200,6 @@ sub write_chunk {
   return $self;
 }
 
-sub _body {
-  my $self = shift;
-  $self->emit('body') unless $self->{body}++;
-}
-
 sub _build {
   my ($self, $method) = @_;
 
@@ -302,7 +294,7 @@ sub _parse_headers {
   # Take care of leftovers
   my $leftovers = $self->{pre_buffer} = $headers->leftovers;
   $self->{header_size} = $self->{raw_size} - length $leftovers;
-  $self->_body;
+  $self->emit('body') unless $self->{body}++;
 }
 
 sub _parse_until_body {

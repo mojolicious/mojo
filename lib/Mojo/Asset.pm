@@ -12,10 +12,7 @@ sub get_chunk { croak 'Method "get_chunk" not implemented by subclass' }
 
 sub is_file {undef}
 
-sub is_range {
-  my $self = shift;
-  return !!($self->end_range || $self->start_range);
-}
+sub is_range { !!($_[0]->end_range || $_[0]->start_range) }
 
 sub move_to { croak 'Method "move_to" not implemented by subclass' }
 sub size    { croak 'Method "size" not implemented by subclass' }

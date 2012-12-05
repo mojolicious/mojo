@@ -46,9 +46,8 @@ sub is_fatal { shift->is_level('fatal') }
 sub is_info  { shift->is_level('info') }
 
 sub is_level {
-  my $self  = shift;
-  my $level = lc shift;
-  return $LEVEL->{$level} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || $self->level};
+  my ($self, $level) = @_;
+  return $LEVEL->{lc $level} >= $LEVEL->{$ENV{MOJO_LOG_LEVEL} || $self->level};
 }
 
 sub is_warn { shift->is_level('warn') }

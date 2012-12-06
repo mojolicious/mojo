@@ -531,7 +531,7 @@ into the reactor, so you need to be careful.
 
 =head2 C<recurring>
 
-  my $id = Mojo::IOLoop->recurring(0 => sub {...});
+  my $id = Mojo::IOLoop->recurring(0.5 => sub {...});
   my $id = $loop->recurring(3 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given

@@ -34,7 +34,7 @@ sub body {
     return $content->unsubscribe('read')->on(read => sub { $self->$new(pop) });
   }
 
-  # Set text content
+  # Set raw content
   else { $content->asset(Mojo::Asset::Memory->new->add_chunk($new)) }
 
   return $self;

@@ -21,7 +21,7 @@ EOF
   $self->render_to_rel_file('mojo', "$name/script/$name", $class);
   $self->chmod_file("$name/script/$name", 0744);
 
-  # Appclass
+  # Application class
   my $app = class_to_path $class;
   $self->render_to_rel_file('appclass', "$name/lib/$app", $class);
 
@@ -33,13 +33,13 @@ EOF
   # Test
   $self->render_to_rel_file('test', "$name/t/basic.t", $class);
 
-  # Log
+  # Log directory
   $self->create_rel_dir("$name/log");
 
-  # Static
+  # Static file
   $self->render_to_rel_file('static', "$name/public/index.html");
 
-  # Layout and Templates
+  # Templates
   $self->render_to_rel_file('layout',
     "$name/templates/layouts/default.html.ep");
   $self->render_to_rel_file('welcome',

@@ -319,8 +319,9 @@ sub _finish {
     }
   }
 
-  # Callback
+  # Stop event loop if necessary
   $self->$cb($tx);
+  $self->ioloop->stop unless $self->{nb};
 }
 
 sub _handle {
@@ -356,9 +357,6 @@ sub _handle {
     $self->_finish($new || $old, $c->{cb}, $close)
       unless $self->_redirect($c, $old);
   }
-
-  # Stop event loop if necessary
-  $self->ioloop->stop if !$self->{nb} && !keys %{$self->{connections}};
 }
 
 sub _loop { $_[0]->{nb} ? Mojo::IOLoop->singleton : $_[0]->ioloop }

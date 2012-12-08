@@ -211,8 +211,11 @@ sub _connect {
 sub _connect_proxy {
   my ($self, $old, $cb) = @_;
 
-  # Start CONNECT request
+  # Check if CONNECT request is necessary
+  return undef unless $old->req->method ne 'CONNECT';
   return undef unless my $new = $self->transactor->proxy_connect($old);
+
+  # Start CONNECT request
   return $self->_start(
     $new => sub {
       my ($self, $tx) = @_;
@@ -278,9 +281,7 @@ sub _connection {
   }
 
   # CONNECT request to proxy required
-  if ($tx->req->method ne 'CONNECT') {
-    if (my $id = $self->_connect_proxy($tx, $cb)) { return $id }
-  }
+  if (my $id = $self->_connect_proxy($tx, $cb)) { return $id }
 
   # Connect
   warn "-- Connect ($proto:$host:$port)\n" if DEBUG;

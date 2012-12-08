@@ -223,10 +223,8 @@ sub _connect_proxy {
         return $self->_finish($old, $cb);
       }
 
-      # Prevent proxy reassignment
+      # Prevent proxy reassignment and start real transaction
       $old->req->proxy(0);
-
-      # Start real transaction
       return $self->_start($old->connection($tx->connection), $cb)
         unless $tx->req->url->protocol eq 'https';
 
@@ -470,7 +468,6 @@ sub _upgrade {
   return undef unless my $new = $self->transactor->upgrade($c->{tx});
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });
-
   return $c->{tx} = $new;
 }
 

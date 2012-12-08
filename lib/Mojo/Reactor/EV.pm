@@ -161,8 +161,8 @@ seconds.
 
   $reactor = $reactor->watch($handle, $readable, $writable);
 
-Change I/O events to watch handle for with C<true> and C<false> values. Note
-that this method requires an active I/O watcher.
+Change I/O events to watch handle for with true and false values. Note that
+this method requires an active I/O watcher.
 
 =head1 SEE ALSO
 

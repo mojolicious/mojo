@@ -131,7 +131,7 @@ sub websocket {
 sub _cache {
   my ($self, $name, $id) = @_;
 
-  # Enqueue
+  # Enqueue and enforce connection limit
   my $old = $self->{cache} ||= [];
   if ($id) {
     my $max = $self->max_connections;
@@ -391,14 +391,12 @@ sub _remove {
 sub _redirect {
   my ($self, $c, $old) = @_;
 
-  # Build followup transaction
+  # Try to build followup transaction
   return undef unless my $new = $self->transactor->redirect($old);
 
-  # Max redirects
+  # Follow redirect unless the maximum has been reached already
   my $redirects = delete $c->{redirects} || 0;
   return undef unless $redirects < $self->max_redirects;
-
-  # Follow redirect
   my $id = $self->_start($new, delete $c->{cb});
   return $self->{connections}{$id}{redirects} = $redirects + 1;
 }
@@ -451,14 +449,10 @@ sub _start {
   my $headers = $req->headers;
   $headers->user_agent($self->name) unless $headers->user_agent;
   $headers->accept_encoding('gzip') unless $headers->accept_encoding;
-
-  # Inject cookies
   if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
-  # Connection
+  # Connect and add request timeout if necessary
   my $id = $self->emit(start => $tx)->_connection($tx, $cb);
-
-  # Request timeout
   if (my $t = $self->request_timeout) {
     weaken $self;
     $self->{connections}{$id}{timeout} = $self->_loop->timer(
@@ -471,6 +465,7 @@ sub _start {
 sub _upgrade {
   my ($self, $id) = @_;
 
+  # Try to upgrade transaction
   my $c = $self->{connections}{$id};
   return undef unless my $new = $self->transactor->upgrade($c->{tx});
   weaken $self;
@@ -486,9 +481,9 @@ sub _write {
   return unless my $c  = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
-  return if $self->{writing}++;
+  return if $c->{writing}++;
   my $chunk = $tx->client_write;
-  delete $self->{writing};
+  delete $c->{writing};
   warn "-- Client >>> Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
 
   # Write chunk

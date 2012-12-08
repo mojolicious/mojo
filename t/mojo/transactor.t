@@ -355,6 +355,7 @@ ok !$tx->req->headers->authorization, 'no "Authorization" header';
 is $tx->req->headers->proxy_authorization, 'Basic c3JpOnNlY3IzdA==',
   'right "Proxy-Authorization" header';
 is $tx->req->headers->host, '127.0.0.1:3000', 'right "Host" header';
+is $t->proxy_connect($tx), undef, 'already a CONNECT request';
 
 # Simple 302 redirect
 $tx = $t->tx(

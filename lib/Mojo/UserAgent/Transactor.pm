@@ -111,8 +111,11 @@ sub peer {
 sub proxy_connect {
   my ($self, $old) = @_;
 
-  # No proxy
+  # Already a CONNECT request
   my $req = $old->req;
+  return undef if $req->method eq 'CONNECT';
+
+  # No proxy
   return undef unless my $proxy = $req->proxy;
 
   # WebSocket and/or HTTPS

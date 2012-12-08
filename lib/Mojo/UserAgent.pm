@@ -211,11 +211,8 @@ sub _connect {
 sub _connect_proxy {
   my ($self, $old, $cb) = @_;
 
-  # Check if CONNECT request is necessary
-  return undef unless $old->req->method ne 'CONNECT';
-  return undef unless my $new = $self->transactor->proxy_connect($old);
-
   # Start CONNECT request
+  return undef unless my $new = $self->transactor->proxy_connect($old);
   return $self->_start(
     $new => sub {
       my ($self, $tx) = @_;

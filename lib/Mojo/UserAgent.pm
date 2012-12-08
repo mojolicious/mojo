@@ -278,8 +278,9 @@ sub _connection {
   }
 
   # CONNECT request to proxy required
-  return undef
-    if $tx->req->method ne 'CONNECT' && $self->_connect_proxy($tx, $cb);
+  if ($tx->req->method ne 'CONNECT') {
+    if (my $id = $self->_connect_proxy($tx, $cb)) { return $id }
+  }
 
   # Connect
   warn "-- Connect ($proto:$host:$port)\n" if DEBUG;
@@ -400,7 +401,7 @@ sub _redirect {
   return undef unless $redirects < $self->max_redirects;
 
   # Follow redirect
-  return 1 unless my $id = $self->_start($new, delete $c->{cb});
+  my $id = $self->_start($new, delete $c->{cb});
   return $self->{connections}{$id}{redirects} = $redirects + 1;
 }
 
@@ -457,8 +458,7 @@ sub _start {
   if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
   # Connection
-  return undef
-    unless my $id = $self->emit(start => $tx)->_connection($tx, $cb);
+  my $id = $self->emit(start => $tx)->_connection($tx, $cb);
 
   # Request timeout
   if (my $t = $self->request_timeout) {

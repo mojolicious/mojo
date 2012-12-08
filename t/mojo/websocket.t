@@ -196,7 +196,7 @@ $ua->websocket(
   }
 );
 $loop->start;
-ok !$ws, 'not a websocket';
+ok !$ws, 'not a WebSocket';
 is $code, 426, 'right code';
 ok $body =~ /^(\d+)failed!$/, 'right content';
 is $1, 15, 'right timeout';

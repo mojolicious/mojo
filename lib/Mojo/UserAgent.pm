@@ -7,7 +7,6 @@ use Carp 'croak';
 use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
-use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Transactor;
@@ -474,20 +473,12 @@ sub _start {
 sub _upgrade {
   my ($self, $id) = @_;
 
-  # Check if connection needs to be upgraded
-  my $c    = $self->{connections}{$id};
-  my $old  = $c->{tx};
-  my $code = $old->res->code // '';
-  return undef unless $old->req->headers->upgrade && $code eq '101';
-
-  # Check challenge and upgrade to WebSocket transaction
-  my $new = Mojo::Transaction::WebSocket->new(handshake => $old, masked => 1);
-  return undef unless $new->client_challenge;
-  $c->{tx} = $new;
+  my $c = $self->{connections}{$id};
+  return undef unless my $new = $self->transactor->upgrade($c->{tx});
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });
 
-  return $new;
+  return $c->{tx} = $new;
 }
 
 sub _write {

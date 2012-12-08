@@ -5,6 +5,7 @@ use utf8;
 use Test::More;
 use File::Spec::Functions 'catdir';
 use FindBin;
+use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::UserAgent::Transactor;
 use Mojo::Util 'encode';
@@ -303,6 +304,7 @@ is(($t->peer($tx))[2], 3000,        'right port');
 
 # WebSocket handshake
 $tx = $t->websocket('ws://127.0.0.1:3000/echo');
+ok !$tx->is_websocket, 'not a WebSocket';
 is $tx->req->url->to_abs, 'http://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
@@ -312,6 +314,10 @@ ok $tx->req->headers->sec_websocket_protocol,
 ok $tx->req->headers->sec_websocket_version,
   'has "Sec-WebSocket-Version" value';
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
+is $t->upgrade($tx), undef, 'not upgraded';
+Mojo::Transaction::WebSocket->new(handshake => $tx)->server_handshake;
+$tx = $t->upgrade($tx);
+ok $tx->is_websocket, 'is a WebSocket';
 
 # WebSocket handshake with header
 $tx = $t->websocket('wss://127.0.0.1:3000/echo' => {Expect => 'foo'});

@@ -173,6 +173,14 @@ sub tx {
   return $tx;
 }
 
+sub upgrade {
+  my ($self, $tx) = @_;
+  my $code = $tx->res->code // '';
+  return undef unless $tx->req->headers->upgrade && $code eq '101';
+  my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1);
+  return $ws->client_challenge ? $ws : undef;
+}
+
 sub websocket {
   my $self = shift;
 
@@ -297,8 +305,8 @@ Actual endpoint for transaction.
   my $tx = $t->form('http://kraih.com' => {a => 'b'} => {DNT => 1});
   my $tx = $t->form('http://kraih.com', 'UTF-8', {a => 'b'}, {DNT => 1});
 
-Versatile L<Mojo::Transaction::HTTP> builder for C<POST> requests with form
-data.
+Versatile L<Mojo::Transaction::HTTP> transaction builder for C<POST> requests
+with form data.
 
   # Multipart upload with filename
   my $tx = $t->form(
@@ -325,8 +333,8 @@ enforce it by setting the header manually.
   my $tx = $t->json('http://kraih.com' => {a => 'b'} => {DNT => 1});
   my $tx = $t->json('http://kraih.com' => [1, 2, 3] => {DNT => 1});
 
-Versatile L<Mojo::Transaction::HTTP> builder for C<POST> requests with JSON
-data.
+Versatile L<Mojo::Transaction::HTTP> transaction builder for C<POST> requests
+with JSON data.
 
   # Change method
   my $tx = $t->json('mojolicio.us/hello', {hello => 'world'});
@@ -360,7 +368,8 @@ C<307> or C<308> redirect response if possible.
   my $tx = $t->tx(PUT  => 'http://kraih.com' => 'Hi!');
   my $tx = $t->tx(POST => 'http://kraih.com' => {DNT => 1} => 'Hi!');
 
-Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
+Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
+requests.
 
   # Inspect generated request
   say $t->tx(GET => 'mojolicio.us' => {DNT => 1} => 'Bye!')->req->to_string;
@@ -373,13 +382,20 @@ Versatile general purpose L<Mojo::Transaction::HTTP> builder for requests.
   my $tx = $t->tx(GET => 'http://mojolicio.us');
   $tx->connection($sock);
 
+=head2 C<upgrade>
+
+  my $tx = $t->upgrade(Mojo::Transaction::HTTP->new);
+
+Build L<Mojo::Transaction::WebSocket> followup transaction for WebSocket
+handshake if possible.
+
 =head2 C<websocket>
 
   my $tx = $t->websocket('ws://localhost:3000');
   my $tx = $t->websocket('ws://localhost:3000' => {DNT => 1});
 
-Versatile L<Mojo::Transaction::WebSocket> builder for WebSocket handshake
-requests.
+Versatile L<Mojo::Transaction::HTTP> transaction builder for WebSocket
+handshake requests.
 
 =head1 SEE ALSO
 

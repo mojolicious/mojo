@@ -77,7 +77,7 @@ sub parse {
   $path = url_unescape $path // '';
   my $charset = $self->charset;
   $path = decode($charset, $path) // $path if $charset;
-  $self->leading_slash($path  =~ s!^/!! ? 1 : undef);
+  $self->leading_slash($path =~ s!^/!!  ? 1 : undef);
   $self->trailing_slash($path =~ s!/$!! ? 1 : undef);
 
   return $self->parts([split '/', $path, -1]);

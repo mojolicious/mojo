@@ -1,4 +1,7 @@
 
+3.66  2012-12-10
+  - Improved documentation.
+
 3.65  2012-12-09
   - Added upgrade method to Mojo::UserAgent::Transactor.
   - Added is_range method to Mojo::Asset.

@@ -327,7 +327,7 @@ Generate file input element.
 
 =head2 C<form_for>
 
-  %= form_for login => (method => 'POST') => begin
+  %= form_for login => begin
     %= text_field 'first_name'
     %= submit_button
   % end
@@ -347,7 +347,7 @@ Generate file input element.
 Generate portable form for route, path or URL. For routes that allow C<POST>
 but not C<GET>, a C<method> attribute will be automatically added.
 
-  <form action="/path/to/login" method="POST">
+  <form action="/path/to/login">
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
@@ -428,7 +428,9 @@ capitalized link target as content.
 
   <a href="/path/to/index">Home</a>
   <a class="links" href="/path/to/index.txt">Home</a>
-  <a class="links" href="/path/to/index.txt">Home</a>
+  <a class="links" href="/path/to/index.txt">
+    Home
+  </a>
   <a href="/path/to/index">Home</a>
   <a href="/path/to/file">File</a>
   <a href="http://mojolicio.us">Mojolicious</a>

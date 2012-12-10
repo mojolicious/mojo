@@ -331,7 +331,7 @@ Generate file input element.
     %= text_field 'first_name'
     %= submit_button
   % end
-  %= form_for login => {foo => 'bar'} => (method => 'POST') => begin
+  %= form_for login => {format => 'txt'} => (method => 'POST') => begin
     %= text_field 'first_name'
     %= submit_button
   % end
@@ -351,7 +351,7 @@ but not C<GET>, a C<method> attribute will be automatically added.
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
-  <form action="/path/to/login/bar" method="POST">
+  <form action="/path/to/login.txt" method="POST">
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
@@ -414,7 +414,8 @@ Generate portable script tag for C<Javascript> asset.
 =head2 C<link_to>
 
   %= link_to Home => 'index'
-  %= link_to index => {foo => 'bar'} => (class => 'links') => begin
+  %= link_to Home => 'index' => {format => 'txt'} => (class => 'links')
+  %= link_to index => {format => 'txt'} => (class => 'links') => begin
     Home
   % end
   <%= link_to index => begin %>Home<% end %>
@@ -426,7 +427,8 @@ Generate portable link to route, path or URL, defaults to using the
 capitalized link target as content.
 
   <a href="/path/to/index">Home</a>
-  <a class="links" href="/path/to/index/bar">Home</a>
+  <a class="links" href="/path/to/index.txt">Home</a>
+  <a class="links" href="/path/to/index.txt">Home</a>
   <a href="/path/to/index">Home</a>
   <a href="/path/to/file">File</a>
   <a href="http://mojolicio.us">Mojolicious</a>

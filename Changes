@@ -1,6 +1,7 @@
 
 3.66  2012-12-10
   - Improved documentation.
+  - Improved tests.
 
 3.65  2012-12-09
   - Added upgrade method to Mojo::UserAgent::Transactor.

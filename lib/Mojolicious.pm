@@ -417,13 +417,15 @@ Add a new helper that will be available as a method of the controller object
 and the application object, as well as a function in C<ep> templates.
 
   # Helper
-  $app->helper(add => sub { $_[1] + $_[2] });
+  $app->helper(cache => sub { state $cache = {} });
 
   # Controller/Application
-  my $result = $self->add(2, 3);
+  $self->cache->{foo} = 'bar';
+  my $result = $self->cache->{foo};
 
   # Template
-  %= add 2, 3
+  % cache->{foo} = 'bar';
+  %= cache->{foo}
 
 =head2 C<hook>
 

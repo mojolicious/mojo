@@ -234,8 +234,9 @@ logic related to matching usernames and passwords.
 
   1;
 
-A simple helper can be registered with the method L<Mojolicious/"helper"> to
-make our C<model> available to all actions and templates.
+A simple helper can be registered with the function
+L<Mojolicious::Lite/"helper"> to make our C<model> available to all actions
+and templates.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;

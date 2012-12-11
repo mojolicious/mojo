@@ -234,9 +234,8 @@ logic related to matching usernames and passwords.
 
   1;
 
-A simple helper function can be registered with the method
-L<Mojolicious/"helper"> to make our C<model> available to all actions and
-templates.
+A simple helper can be registered with the method L<Mojolicious/"helper"> to
+make our C<model> available to all actions and templates.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
@@ -244,11 +243,8 @@ templates.
   use lib 'lib';
   use MyUsers;
 
-  # Model object
-  my $users = MyUsers->new;
-
-  # Helper function returning our model object
-  helper users => sub { return $users };
+  # Helper returning our model object
+  helper users => sub { state $users = MyUsers->new };
 
   # /?user=sri&pass=secr3t
   any '/' => sub {
@@ -393,8 +389,7 @@ like this.
   # Make signed cookies secure
   app->secret('Mojolicious rocks');
 
-  my $users = MyUsers->new;
-  helper users => sub { return $users };
+  helper users => sub { state $users = MyUsers->new };
 
   # Main login action
   any '/' => sub {
@@ -509,8 +504,7 @@ actual action code needs to be changed.
     my $self = shift;
 
     $self->secret('Mojolicious rocks');
-    my $users = MyUsers->new;
-    $self->helper(users => sub { return $users });
+    $self->helper(users => sub { state $users = MyUsers->new });
 
     my $r = $self->routes;
 
@@ -615,8 +609,7 @@ information.
     my $self = shift;
 
     $self->secret('Mojolicious rocks');
-    my $users = MyUsers->new;
-    $self->helper(users => sub { return $users });
+    $self->helper(users => sub { state $users = MyUsers->new });
 
     my $r = $self->routes;
     $r->any('/')->to('login#index')->name('index');

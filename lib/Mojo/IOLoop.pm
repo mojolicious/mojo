@@ -153,7 +153,7 @@ sub server {
   return $self->acceptor($server);
 }
 
-sub singleton { state $loop ||= shift->SUPER::new }
+sub singleton { state $loop = shift->SUPER::new }
 
 sub start {
   my $self = shift;

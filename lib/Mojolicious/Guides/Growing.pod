@@ -243,7 +243,7 @@ make our C<model> available to all actions and templates.
   use lib 'lib';
   use MyUsers;
 
-  # Helper returning our model object
+  # Helper to lazy initialize and store our model object
   helper users => sub { state $users = MyUsers->new };
 
   # /?user=sri&pass=secr3t

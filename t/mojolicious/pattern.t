@@ -163,6 +163,8 @@ is $result->{action}, 'index', 'right value';
 # Format detection disabled
 $pattern = Mojolicious::Routes::Pattern->new('/test', format => 0);
 $pattern->defaults({action => 'index'});
+ok !$pattern->regex,        'no regex';
+ok !$pattern->format_regex, 'no format regex';
 $result = $pattern->match('/test', 1);
 ok $pattern->regex, 'regex has been compiled on demand';
 ok !$pattern->format_regex, 'no format regex';

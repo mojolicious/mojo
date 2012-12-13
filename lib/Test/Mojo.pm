@@ -377,6 +377,9 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
   is $t->tx->res->json->{foo}, 'bar', 'right value';
   ok $t->tx->res->is_multipart, 'multipart content';
 
+  # Test custom transactions
+  $t->tx($t->tx->previous)->status_is(302)->header_like(Location => qr/foo/);
+
 =head2 C<ua>
 
   my $ua = $t->ua;
@@ -697,7 +700,7 @@ arguments as L<Mojo::UserAgent/"put">.
 
 Perform request and check for transport errors.
 
-  # Test custom transaction
+  # Customize transaction
   my $tx = $t->ua->build_json_tx('/user/99' => {name => 'sri'});
   $tx->req->method('PUT');
   $t->request_ok($tx)

@@ -164,6 +164,8 @@ is $result->{action}, 'index', 'right value';
 $pattern = Mojolicious::Routes::Pattern->new('/test', format => 0);
 $pattern->defaults({action => 'index'});
 $result = $pattern->match('/test', 1);
+ok $pattern->regex, 'regex has been compiled on demand';
+ok !$pattern->format_regex, 'no format regex';
 is $result->{action}, 'index', 'right value';
 is $result->{format}, undef,   'no value';
 $result = $pattern->match('/test.xml', 1);

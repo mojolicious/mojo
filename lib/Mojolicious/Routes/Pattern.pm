@@ -169,10 +169,13 @@ sub _compile_format {
   # Default regex
   my $c = $self->constraints;
   return $self->format_regex(qr!\.([^/]+)$!)->format_regex
-    if !exists $c->{format} && $c->{format};
+    unless defined $c->{format};
+
+  # No regex
+  return undef unless $c->{format};
 
   # Compile custom regex
-  my $regex = defined $c->{format} ? _compile_req($c->{format}) : '([^/]+)';
+  my $regex = _compile_req($c->{format});
   return $self->format_regex(qr!\.$regex$!)->format_regex;
 }
 

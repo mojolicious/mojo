@@ -11,7 +11,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # POST /json/echo
-post '/json/echo' => sub {
+any [qw(POST PUT)] => '/json/echo' => sub {
   my $self = shift;
   $self->respond_to(json => {json => $self->req->json});
 };
@@ -52,10 +52,19 @@ $t->post_json_ok(
   ->status_is(200)->content_type_is('application/json')
   ->json_content_is({hello => 'world'});
 
-# POST /json/echo (array with json format)
-$t->post_json_ok('/json/echo' => [1, 2, 3] => {Accept => 'application/json'})
-  ->status_is(200)->content_type_is('application/json')
-  ->json_content_is([1, 2, 3]);
+# PUT /json/echo (hash with json format)
+my $tx = $t->ua->build_json_tx(
+  '/json/echo' => {hello => 'world'} => {Accept => 'application/json'});
+$tx->req->method('PUT');
+$t->request_ok($tx)->status_is(200)->content_type_is('application/json')
+  ->json_content_is({hello => 'world'});
+
+# PUT /json/echo (array with json format)
+$tx = $t->ua->build_json_tx(
+  '/json/echo' => [1, 2, 3] => {Accept => 'application/json'});
+$tx->req->method('PUT');
+$t->request_ok($tx, 'request succesful')->status_is(200)
+  ->content_type_is('application/json')->json_content_is([1, 2, 3]);
 
 # GET /rest
 $t->get_ok('/rest')->status_is(200)

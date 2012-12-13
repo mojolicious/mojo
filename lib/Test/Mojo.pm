@@ -211,6 +211,12 @@ sub post_json_ok {
 
 sub put_ok { shift->_request_ok(put => @_) }
 
+sub request_ok {
+  my $self = shift;
+  my $tx   = $self->tx($self->ua->start(shift))->tx;
+  return $self->_test('ok', $tx->is_finished, shift || 'perform request');
+}
+
 sub reset_session {
   my $self = shift;
   if (my $jar = $self->ua->cookie_jar) { $jar->empty }
@@ -370,13 +376,6 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
   # More specific tests
   is $t->tx->res->json->{foo}, 'bar', 'right value';
   ok $t->tx->res->is_multipart, 'multipart content';
-
-  # Test custom transaction
-  my $tx = $t->ua->build_json_tx('/user/99' => {name => 'sri'});
-  $tx->req->method('PUT');
-  $t->tx($t->ua->start($tx))
-    ->status_is(200)
-    ->json_is('/message' => 'User has been replaced.');
 
 =head2 C<ua>
 
@@ -690,6 +689,20 @@ the exact same arguments as L<Mojo::UserAgent/"post_json">.
 
 Perform a C<PUT> request and check for transport errors, takes the exact same
 arguments as L<Mojo::UserAgent/"put">.
+
+=head2 C<request_ok>
+
+  $t = $t->request_ok(Mojo::Transaction::HTTP->new);
+  $t = $t->request_ok(Mojo::Transaction::HTTP->new, 'request successful');
+
+Perform request and check for transport errors.
+
+  # Test custom transaction
+  my $tx = $t->ua->build_json_tx('/user/99' => {name => 'sri'});
+  $tx->req->method('PUT');
+  $t->request_ok($tx)
+    ->status_is(200)
+    ->json_is('/message' => 'User has been replaced.');
 
 =head2 C<reset_session>
 

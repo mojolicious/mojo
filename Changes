@@ -1,5 +1,6 @@
 
 3.66  2012-12-13
+  - Added request_ok method to Test::Mojo.
   - Improved documentation.
   - Improved tests.
   - Fixed multipart boundary detection bug in Mojo::Content.

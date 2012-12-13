@@ -1,7 +1,8 @@
 
-3.66  2012-12-11
+3.66  2012-12-13
   - Improved documentation.
   - Improved tests.
+  - Fixed multipart boundary detection bug in Mojo::Content.
 
 3.65  2012-12-09
   - Added upgrade method to Mojo::UserAgent::Transactor.

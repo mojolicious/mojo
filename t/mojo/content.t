@@ -56,9 +56,15 @@ is $content->build_body,
 
 # Multipart boundary detection
 $content = Mojo::Content::MultiPart->new;
+is $content->boundary, undef, 'no boundary';
 $content->headers->content_type(
   'multipart/form-data; boundary="azAZ09\'(),.:?-_+/"');
 is $content->boundary, "azAZ09\'(),.:?-_+/", 'right boundary';
+is $content->boundary, $content->build_boundary, 'same boundary';
+$content->headers->content_type('multipart/form-data');
+is $content->boundary, undef, 'no boundary';
+$content->headers->content_type('multipart/form-data; boundary="foo bar baz"');
+is $content->boundary, 'foo bar baz', 'right boundary';
 is $content->boundary, $content->build_boundary, 'same boundary';
 
 # Tainted environment

@@ -372,11 +372,11 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
   ok $t->tx->res->is_multipart, 'multipart content';
 
   # Test custom transaction
-  my $tx = $t->ua->build_form_tx('/user/99' => {name => 'sri'});
+  my $tx = $t->ua->build_json_tx('/user/99' => {name => 'sri'});
   $tx->req->method('PUT');
   $t->tx($t->ua->start($tx))
     ->status_is(200)
-    ->text_is('div#message' => 'User has been replaced.');
+    ->json_is('/message' => 'User has been replaced.');
 
 =head2 C<ua>
 

@@ -850,7 +850,7 @@ L<Mojo::UserAgent::Transactor/"websocket">.
   my $tx = $ua->delete('http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Perform blocking HTTP C<DELETE> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
@@ -874,7 +874,7 @@ proxy detection can be enabled with the C<MOJO_PROXY> environment variable.
   my $tx = $ua->get('http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Perform blocking HTTP C<GET> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
@@ -890,7 +890,7 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->head('http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Perform blocking HTTP C<HEAD> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
@@ -912,7 +912,7 @@ Check if request for domain would use a proxy server.
   my $tx = $ua->options('http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Perform blocking HTTP C<OPTIONS> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
@@ -928,7 +928,7 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->patch('http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Perform blocking HTTP C<PATCH> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
@@ -944,7 +944,7 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->post('http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Perform blocking HTTP C<POST> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
@@ -960,7 +960,7 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->post_form('kraih.com', 'UTF-8', {a => 'b'}, {DNT => 1});
 
 Perform blocking HTTP C<POST> request with form data and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"form">. You can also append a callback to
 perform requests non-blocking.
 
@@ -976,7 +976,7 @@ perform requests non-blocking.
   my $tx = $ua->post_json('kraih.com' => {a => 'b'} => {DNT => 1});
 
 Perform blocking HTTP C<POST> request with JSON data and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"json">. You can also append a callback to
 perform requests non-blocking.
 
@@ -992,7 +992,7 @@ perform requests non-blocking.
   my $tx = $ua->put('http://kraih.com' => {DNT => 1} => 'Hi!');
 
 Perform blocking HTTP C<PUT> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the exact same arguments as
+L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
@@ -1022,7 +1022,7 @@ non-blocking.
   $ua->websocket('ws://localhost:3000' => {DNT => 1} => sub {...});
 
 Open a non-blocking WebSocket connection with transparent handshake, takes the
-exact same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
+same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($ua, $tx) = @_;

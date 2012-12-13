@@ -628,8 +628,7 @@ For more control you can also access request information directly.
   $c = $c->redirect_to('/path');
   $c = $c->redirect_to('http://127.0.0.1/foo/bar');
 
-Prepare a C<302> redirect response, takes the exact same arguments as
-C<url_for>.
+Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
 
   # Conditional redirect
   return $c->redirect_to('login') unless $c->session('user');

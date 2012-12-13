@@ -360,7 +360,7 @@ To start applications with it you can use the L<hypnotoad> script.
   $ hypnotoad myapp.pl
   Server available at http://127.0.0.1:8080.
 
-You can run the exact same command again for automatic hot deployment.
+You can run the same command again for automatic hot deployment.
 
   $ hypnotoad myapp.pl
   Starting hot deployment for Hypnotoad server 31841.

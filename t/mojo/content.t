@@ -66,6 +66,9 @@ is $content->boundary, undef, 'no boundary';
 $content->headers->content_type('multipart/form-data; boundary="foo bar baz"');
 is $content->boundary, 'foo bar baz', 'right boundary';
 is $content->boundary, $content->build_boundary, 'same boundary';
+$content->headers->content_type('MultiPart/Form-Data; BounDaRy="foo 123"');
+is $content->boundary, 'foo 123', 'right boundary';
+is $content->boundary, $content->build_boundary, 'same boundary';
 
 # Tainted environment
 $content = Mojo::Content::MultiPart->new;

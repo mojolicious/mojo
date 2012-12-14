@@ -135,8 +135,8 @@ the following ones.
 Detect file extensions from C<Accept> header value, prioritization of
 unspecific values that contain more than one MIME type is disabled by default.
 
-  # List detected extensions
-  say for @{$types->detect('application/json')};
+  # List detected extensions prioritized
+  say for @{$types->detect('application/json, text/xml;q=0.1', 1)};
 
 =head2 C<type>
 

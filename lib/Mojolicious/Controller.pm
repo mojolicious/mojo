@@ -788,10 +788,10 @@ Get L<Mojo::Message::Response> object from L<Mojo::Transaction/"res">.
 
 Automatically select best possible representation for resource from C<Accept>
 request header, C<format> stash value or C<format> GET/POST parameter,
-defaults to rendering an empty C<204> response. Unspecific C<Accept> request
-headers that contain more than one MIME type are currently ignored, unless the
-C<X-Requested-With> header is set to the value C<XMLHttpRequest>, since
-browsers often don't really know what they actually want.
+defaults to rendering an empty C<204> response. Since browsers often don't
+really know what they actually want, unspecific C<Accept> request headers with
+more than one MIME type will be ignored, unless the C<X-Requested-With> header
+is set to the value C<XMLHttpRequest>.
 
   $c->respond_to(
     json => sub { $c->render_json({just => 'works'}) },

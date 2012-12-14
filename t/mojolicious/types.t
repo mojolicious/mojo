@@ -39,7 +39,7 @@ is_deeply $t->detect('application/zip'),        ['zip'],  'right format';
 
 # Detect special cases
 is_deeply $t->detect('Application/Xml'), ['xml'], 'right formats';
-is_deeply $t->detect('Text/Xml'),        ['xml'], 'right formats';
+is_deeply $t->detect(' Text/Xml '),      ['xml'], 'right formats';
 is_deeply $t->detect('APPLICATION/XML'), ['xml'], 'right formats';
 is_deeply $t->detect('TEXT/XML'),        ['xml'], 'right formats';
 is_deeply $t->detect('text/html;q=0.9'), ['htm', 'html'], 'right formats';
@@ -68,8 +68,7 @@ is $t->type('html'), 'text/html;charset=UTF-8', 'right type';
 
 # Prioritize
 is_deeply $t->detect('text/plain', 1), ['txt'], 'right formats';
-is_deeply $t->detect('TEXT/HTML;V=1.0; q=0.8 ; foo=bar', 1), ['htm', 'html'],
-  'right formats';
+is_deeply $t->detect('TEXT/HTML; q=0.8 ', 1), ['htm', 'html'], 'right formats';
 is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9', 1),
   ['txt', 'htm', 'html'], 'right formats';
 is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9', 1),

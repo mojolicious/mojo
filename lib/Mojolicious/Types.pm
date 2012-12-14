@@ -38,7 +38,7 @@ sub detect {
   # Extract and prioritize MIME types
   my %types;
   for my $type (split /,/, $accept // '') {
-    next unless $type =~ /^\s*([^,; ]+)(?:.*\;\s*q=([\d.]+))?.*$/i;
+    next unless $type =~ /^\s*([^,; ]+)(?:\s*\;\s*q=([\d.]+))?\s*$/i;
     $types{lc $1} = $2 // 1;
   }
   my @types = sort { $types{$b} <=> $types{$a} } keys %types;

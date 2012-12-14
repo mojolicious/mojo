@@ -75,5 +75,7 @@ is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9', 1),
   ['txt', 'htm', 'html'], 'right formats';
 is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9', 1),
   ['htm', 'html', 'txt'], 'right formats';
+is_deeply $t->detect('text/plain;q=0.5, text/xml, application/xml;q=0.1', 1),
+  ['xml', 'txt', 'xml'], 'right formats';
 
 done_testing();

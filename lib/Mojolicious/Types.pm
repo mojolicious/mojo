@@ -45,8 +45,8 @@ sub detect {
 
   # Detect extensions from MIME types
   my @exts;
+  my $types = $self->types;
   for my $type (@types) {
-    my $types = $self->types;
     for my $ext (sort keys %$types) {
       my @types = ref $types->{$ext} ? @{$types->{$ext}} : ($types->{$ext});
       $type eq $_ and push @exts, $ext for map { s/\;.*$//; lc $_ } @types;

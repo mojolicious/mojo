@@ -37,11 +37,10 @@ sub detect {
 
   # Extract and prioritize MIME types
   my %types;
-  for my $type (split /,/, $accept // '') {
-    next unless $type =~ /^\s*([^,; ]+)(?:\s*\;\s*q=([\d.]+))?\s*$/i;
-    $types{lc $1} = $2 // 1;
-  }
-  my @types = sort { $types{$b} <=> $types{$a} } keys %types;
+  /^\s*([^,; ]+)(?:\s*\;\s*q=(\d+(?:\.\d+)?))?\s*$/i
+    and $types{lc $1} = $2 // 1
+    for split /,/, $accept // '';
+  my @types = sort { $types{$b} <=> $types{$a} } sort keys %types;
   return [] if !$prioritize && @types > 1;
 
   # Detect extensions from MIME types

@@ -1,4 +1,9 @@
 
+3.67  2012-12-15
+  - Added support for MIME type prioritization to Mojolicious::Types.
+  - Improved respond_to to prioritize multiple MIME types if the
+    X-Requested-With header is set to the value "XMLHttpRequest".
+
 3.66  2012-12-14
   - Added request_ok method to Test::Mojo.
   - Improved documentation.

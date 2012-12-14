@@ -33,16 +33,25 @@ has types => sub {
 };
 
 sub detect {
-  my ($self, $accept) = @_;
+  my ($self, $accept, $prioritize) = @_;
 
-  # Detect extensions from MIME type
-  return [] unless (($accept || '') =~ /^([^,]+?)(?:\;[^,]*)*$/);
-  my $type = lc $1;
+  # Extract and prioritize MIME types
+  my %types;
+  for my $type (split /,/, $accept // '') {
+    next unless $type =~ /^\s*([^,; ]+)(?:.*\;\s*q=([\d.]+))?.*$/i;
+    $types{lc $1} = $2 // 1;
+  }
+  my @types = sort { $types{$b} <=> $types{$a} } keys %types;
+  return [] if !$prioritize && @types > 1;
+
+  # Detect extensions from MIME types
   my @exts;
-  my $types = $self->types;
-  for my $ext (sort keys %$types) {
-    my @types = ref $types->{$ext} ? @{$types->{$ext}} : ($types->{$ext});
-    $type eq $_ and push @exts, $ext for map { s/\;.*$//; lc $_ } @types;
+  for my $type (@types) {
+    my $types = $self->types;
+    for my $ext (sort keys %$types) {
+      my @types = ref $types->{$ext} ? @{$types->{$ext}} : ($types->{$ext});
+      $type eq $_ and push @exts, $ext for map { s/\;.*$//; lc $_ } @types;
+    }
   }
 
   return \@exts;
@@ -122,10 +131,10 @@ the following ones.
 =head2 C<detect>
 
   my $exts = $types->detect('application/json;q=9');
+  my $exts = $types->detect('text/html, application/json;q=9', 1);
 
-Detect file extensions from C<Accept> header value. Unspecific values that
-contain more than one MIME type are currently ignored, since browsers often
-don't really know what they actually want.
+Detect file extensions from C<Accept> header value, prioritization of
+unspecific values that contain more than one MIME type is disabled by default.
 
   # List detected extensions
   say for @{$types->detect('application/json')};

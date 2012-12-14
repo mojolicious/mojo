@@ -460,4 +460,11 @@ $t->get_ok('/rest?format=html' => {Accept => $chrome})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works');
 
+# GET /rest (jQuery Ajax)
+my $jquery = 'application/json, text/javascript, */*; q=0.01';
+$t->get_ok(
+  '/rest' => {Accept => $jquery, 'X-Requested-With' => 'XMLHttpRequest'})
+  ->status_is(200)->content_type_is('application/json')
+  ->json_content_is({just => 'works'});
+
 done_testing();

@@ -281,10 +281,11 @@ sub respond_to {
 
   # Detect formats
   my $app     = $self->app;
-  my @formats = @{$app->types->detect($self->req->headers->accept)};
+  my $req     = $self->req;
+  my @formats = @{$app->types->detect($req->headers->accept, $req->is_xhr)};
   my $stash   = $self->stash;
   unless (@formats) {
-    my $format = $stash->{format} || $self->req->param('format');
+    my $format = $stash->{format} || $req->param('format');
     push @formats, $format ? $format : $app->renderer->default_format;
   }
 
@@ -788,7 +789,8 @@ Get L<Mojo::Message::Response> object from L<Mojo::Transaction/"res">.
 Automatically select best possible representation for resource from C<Accept>
 request header, C<format> stash value or C<format> GET/POST parameter,
 defaults to rendering an empty C<204> response. Unspecific C<Accept> request
-headers that contain more than one MIME type are currently ignored, since
+headers that contain more than one MIME type are currently ignored, unless the
+C<X-Requested-With> header is set to the value C<XMLHttpRequest>, since
 browsers often don't really know what they actually want.
 
   $c->respond_to(

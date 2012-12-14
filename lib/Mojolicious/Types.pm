@@ -44,16 +44,13 @@ sub detect {
   return [] if !$prioritize && @types > 1;
 
   # Detect extensions from MIME types
-  my @exts;
+  my %reverse;
   my $types = $self->types;
-  for my $type (@types) {
-    for my $ext (sort keys %$types) {
-      my @types = ref $types->{$ext} ? @{$types->{$ext}} : ($types->{$ext});
-      $type eq $_ and push @exts, $ext for map { s/\;.*$//; lc $_ } @types;
-    }
+  for my $ext (sort keys %$types) {
+    my @types = ref $types->{$ext} ? @{$types->{$ext}} : ($types->{$ext});
+    push @{$reverse{$_}}, $ext for map { s/\;.*$//; lc $_ } @types;
   }
-
-  return \@exts;
+  return [map { @{$reverse{$_} // []} } @types];
 }
 
 sub type {

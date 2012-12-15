@@ -106,8 +106,8 @@ passphrase with the attribute L<Mojolicious/"secret">.
 L<Mojolicious> has been designed from the ground up for non-blocking I/O and
 event loops. So when a new request comes in and no response is generated right
 away, it will assume that this was intentional and return control to the web
-server, which then waits for events such as timers to finally generate a
-response.
+server, which can then handle other requests while waiting for events such as
+timers to finally generate a response.
 
 =head2 What does "Inactivity timeout" mean?
 

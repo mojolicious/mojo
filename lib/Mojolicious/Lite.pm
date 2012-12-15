@@ -34,7 +34,8 @@ sub import {
   for my $name (qw(any get options patch post put websocket)) {
     *{"${caller}::$name"} = sub { $routes->$name(@_) };
   }
-  *{"${caller}::new"} = *{"${caller}::app"} = sub {$app};
+  *{"${caller}::$_"} = sub {$app}
+    for qw(new app);
   *{"${caller}::del"} = sub { $routes->delete(@_) };
   *{"${caller}::group"} = sub (&) {
     my $old = $root;

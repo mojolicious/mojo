@@ -3,6 +3,7 @@
   - Added monkey_patch function to Mojo::Util.
   - Updated jQuery to version 1.8.3.
   - Improved documentation.
+  - Improved tests.
   - Fixed small export bug in Mojolicious::Lite. (jberger)
 
 3.67  2012-12-15

@@ -405,6 +405,8 @@ ok !MojoMonkeyTest->can('bar'), 'function "bar" does not exist';
 monkey_patch 'MojoMonkeyTest', 'bar', sub {'bar'};
 ok !!MojoMonkeyTest->can('bar'), 'function "bar" exists';
 is MojoMonkeyTest::bar(), 'bar', 'right result';
-
+monkey_patch 'MojoMonkeyTest', 'foo', sub {'baz'};
+ok !!MojoMonkeyTest->can('foo'), 'function "foo" exists';
+is MojoMonkeyTest::foo(), 'baz', 'right result';
 
 done_testing();

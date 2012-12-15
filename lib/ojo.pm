@@ -6,6 +6,7 @@ use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::JSON;
 use Mojo::UserAgent;
+use Mojo::Util 'monkey_patch';
 
 # Silent oneliners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
@@ -15,12 +16,8 @@ my $UA = Mojo::UserAgent->new;
 
 sub import {
 
-  # Prepare exports
-  my $caller = caller;
-  no strict 'refs';
-  no warnings 'redefine';
-
   # Mojolicious::Lite
+  my $caller = caller;
   eval "package $caller; use Mojolicious::Lite;";
 
   # Allow redirects
@@ -30,29 +27,30 @@ sub import {
   $UA->detect_proxy unless defined $ENV{MOJO_PROXY};
 
   # Application
-  $UA->app(*{"${caller}::app"}->());
+  $UA->app($caller->app);
 
   # Functions
-  *{"${caller}::a"} = sub { *{"${caller}::any"}->(@_) and return $UA->app };
-  *{"${caller}::b"} = \&b;
-  *{"${caller}::c"} = \&c;
-  *{"${caller}::d"} = sub { _request($UA->build_tx(DELETE => @_)) };
-  *{"${caller}::f"} = sub { _request($UA->build_form_tx(@_)) };
-  *{"${caller}::g"} = sub { _request($UA->build_tx(GET => @_)) };
-  *{"${caller}::h"} = sub { _request($UA->build_tx(HEAD => @_)) };
-  *{"${caller}::j"} = sub {
+  monkey_patch $caller, 'a',
+    sub { $caller->can('any')->(@_) and return $UA->app };
+  monkey_patch $caller, 'b', \&b;
+  monkey_patch $caller, 'c', \&c;
+  monkey_patch $caller, 'd', sub { _request($UA->build_tx(DELETE => @_)) };
+  monkey_patch $caller, 'f', sub { _request($UA->build_form_tx(@_)) };
+  monkey_patch $caller, 'g', sub { _request($UA->build_tx(GET => @_)) };
+  monkey_patch $caller, 'h', sub { _request($UA->build_tx(HEAD => @_)) };
+  monkey_patch $caller, 'j', sub {
     my $d = shift;
     my $j = Mojo::JSON->new;
     return $j->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
     return $j->decode($d);
   };
-  *{"${caller}::n"} = sub { _request($UA->build_json_tx(@_)) };
-  *{"${caller}::o"} = sub { _request($UA->build_tx(OPTIONS => @_)) };
-  *{"${caller}::p"} = sub { _request($UA->build_tx(POST => @_)) };
-  *{"${caller}::r"} = sub { $UA->app->dumper(@_) };
-  *{"${caller}::t"} = sub { _request($UA->build_tx(PATCH => @_)) };
-  *{"${caller}::u"} = sub { _request($UA->build_tx(PUT => @_)) };
-  *{"${caller}::x"} = sub { Mojo::DOM->new(@_) };
+  monkey_patch $caller, 'n', sub { _request($UA->build_json_tx(@_)) };
+  monkey_patch $caller, 'o', sub { _request($UA->build_tx(OPTIONS => @_)) };
+  monkey_patch $caller, 'p', sub { _request($UA->build_tx(POST => @_)) };
+  monkey_patch $caller, 'r', sub { $UA->app->dumper(@_) };
+  monkey_patch $caller, 't', sub { _request($UA->build_tx(PATCH => @_)) };
+  monkey_patch $caller, 'u', sub { _request($UA->build_tx(PUT => @_)) };
+  monkey_patch $caller, 'x', sub { Mojo::DOM->new(@_) };
 }
 
 sub _request {

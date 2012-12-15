@@ -8,6 +8,7 @@ use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::URL;
+use Mojo::Util 'monkey_patch';
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Transactor;
 use Scalar::Util 'weaken';
@@ -29,15 +30,12 @@ has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 
 # Common HTTP methods
-{
-  no strict 'refs';
-  for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
-    *{__PACKAGE__ . '::' . lc($name)} = sub {
-      my $self = shift;
-      my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
-      return $self->start($self->build_tx($name, @_), $cb);
-    };
-  }
+for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
+  monkey_patch __PACKAGE__, lc($name), sub {
+    my $self = shift;
+    my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+    return $self->start($self->build_tx($name, @_), $cb);
+  };
 }
 
 sub DESTROY { shift->_cleanup }

@@ -1,7 +1,7 @@
 package Mojo::Headers;
 use Mojo::Base -base;
 
-use Mojo::Util 'get_line';
+use Mojo::Util qw(get_line monkey_patch);
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 
@@ -16,13 +16,10 @@ my @HEADERS = (
   qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
   qw(TE Trailer Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
 );
-{
-  no strict 'refs';
-  for my $header (@HEADERS) {
-    my $name = lc $header;
-    $name =~ s/-/_/g;
-    *{__PACKAGE__ . "::$name"} = sub { scalar shift->header($header => @_) };
-  }
+for my $header (@HEADERS) {
+  my $name = lc $header;
+  $name =~ s/-/_/g;
+  monkey_patch __PACKAGE__, $name, sub { scalar shift->header($header => @_) };
 }
 
 # Lower case headers

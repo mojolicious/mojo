@@ -10,9 +10,9 @@ use FindBin;
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
-  qw(squish trim unquote secure_compare sha1_bytes sha1_sum slurp spurt),
-  qw(url_escape url_unescape xml_escape xor_encode);
+  qw(html_unescape md5_bytes md5_sum monkey_patch punycode_decode),
+  qw(punycode_encode quote squish trim unquote secure_compare sha1_bytes),
+  qw(sha1_sum slurp spurt url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -392,5 +392,19 @@ my $dir = tempdir CLEANUP => 1;
 my $file = catfile $dir, 'test.txt';
 spurt "just\nworks!", $file;
 is slurp($file), "just\nworks!", 'successful roundtrip';
+
+# monkey_patch
+{
+
+  package MojoMonkeyTest;
+  sub foo {'foo'}
+}
+ok !!MojoMonkeyTest->can('foo'), 'function "foo" exists';
+is MojoMonkeyTest::foo(), 'foo', 'right result';
+ok !MojoMonkeyTest->can('bar'), 'function "bar" does not exist';
+monkey_patch 'MojoMonkeyTest', 'bar', sub {'bar'};
+ok !!MojoMonkeyTest->can('bar'), 'function "bar" exists';
+is MojoMonkeyTest::bar(), 'bar', 'right result';
+
 
 done_testing();

@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Mojo::ByteStream;
 use Mojo::Exception;
-use Mojo::Util qw(decode encode slurp);
+use Mojo::Util qw(decode encode monkey_patch slurp);
 
 use constant DEBUG => $ENV{MOJO_TEMPLATE_DEBUG} || 0;
 
@@ -309,10 +309,8 @@ sub _wrap {
   my ($self, $lines) = @_;
 
   # Escape function
-  no strict 'refs';
-  no warnings 'redefine';
   my $escape = $self->escape;
-  *{$self->namespace . '::_escape'} = sub {
+  monkey_patch $self->namespace, '_escape', sub {
     no warnings 'uninitialized';
     ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : $escape->("$_[0]");
   };

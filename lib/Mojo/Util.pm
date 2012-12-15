@@ -43,9 +43,9 @@ my %CACHE;
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
-  qw(url_escape url_unescape xml_escape xor_encode)
+  qw(html_unescape md5_bytes md5_sum monkey_patch punycode_decode),
+  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum slurp spurt),
+  qw(squish trim unquote url_escape url_unescape xml_escape xor_encode)
 );
 
 sub b64_decode { decode_base64($_[0]) }
@@ -129,6 +129,13 @@ sub html_unescape {
 
 sub md5_bytes { md5(@_) }
 sub md5_sum   { md5_hex(@_) }
+
+sub monkey_patch {
+  my ($class, $name, $cb) = @_;
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"${class}::$name"} = $cb;
+}
 
 sub punycode_decode {
   my $input = shift;
@@ -532,6 +539,14 @@ Generate binary MD5 checksum for string.
   my $checksum = md5_sum $string;
 
 Generate MD5 checksum for string.
+
+=head2 C<monkey_patch>
+
+  monkey_patch $class, $name, sub {...};
+
+Monkey patch function into class.
+
+  monkey_patch 'MyApp', 'hello', sub { say 'Hello!' };
 
 =head2 C<punycode_decode>
 

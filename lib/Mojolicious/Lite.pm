@@ -5,6 +5,7 @@ use Mojo::Base 'Mojolicious';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catdir';
 use Mojo::UserAgent;
+use Mojo::Util 'monkey_patch';
 
 sub import {
   my $class = shift;
@@ -17,8 +18,8 @@ sub import {
     unless $ENV{MOJO_HOME};
 
   # Initialize app
-  no strict 'refs';
   my $caller = caller;
+  no strict 'refs';
   push @{"${caller}::ISA"}, 'Mojo';
   my $app = $class->new;
 
@@ -29,23 +30,22 @@ sub import {
   $app->static->classes->[0] = $app->renderer->classes->[0] = $caller;
 
   # Export
-  no warnings 'redefine';
   my $root = $routes;
   for my $name (qw(any get options patch post put websocket)) {
-    *{"${caller}::$name"} = sub { $routes->$name(@_) };
+    monkey_patch $caller, $name, sub { $routes->$name(@_) };
   }
-  *{"${caller}::$_"} = sub {$app}
+  monkey_patch $caller, $_, sub {$app}
     for qw(new app);
-  *{"${caller}::del"} = sub { $routes->delete(@_) };
-  *{"${caller}::group"} = sub (&) {
+  monkey_patch $caller, 'del', sub { $routes->delete(@_) };
+  monkey_patch $caller, 'group', sub (&) {
     my $old = $root;
     $_[0]->($root = $routes);
     ($routes, $root) = ($root, $old);
   };
-  *{"${caller}::helper"} = sub { $app->helper(@_) };
-  *{"${caller}::hook"}   = sub { $app->hook(@_) };
-  *{"${caller}::plugin"} = sub { $app->plugin(@_) };
-  *{"${caller}::under"}  = sub { $routes = $root->under(@_) };
+  monkey_patch $caller, 'helper', sub { $app->helper(@_) };
+  monkey_patch $caller, 'hook',   sub { $app->hook(@_) };
+  monkey_patch $caller, 'plugin', sub { $app->plugin(@_) };
+  monkey_patch $caller, 'under',  sub { $routes = $root->under(@_) };
 
   # Make sure there's a default application for testing
   Mojo::UserAgent->app($app) unless Mojo::UserAgent->app;

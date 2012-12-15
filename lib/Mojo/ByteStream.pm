@@ -15,16 +15,13 @@ my @UTILS = (
   qw(punycode_encode quote sha1_bytes sha1_sum slurp spurt squish trim),
   qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
-{
-  no strict 'refs';
-  for my $name (@UTILS) {
-    my $sub = Mojo::Util->can($name);
-    *{__PACKAGE__ . "::$name"} = sub {
-      my $self = shift;
-      $$self = $sub->($$self, @_);
-      return $self;
-    };
-  }
+for my $name (@UTILS) {
+  my $sub = Mojo::Util->can($name);
+  Mojo::Util::monkey_patch __PACKAGE__, $name, sub {
+    my $self = shift;
+    $$self = $sub->($$self, @_);
+    return $self;
+  };
 }
 
 sub new {

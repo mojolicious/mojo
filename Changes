@@ -1,9 +1,9 @@
 
 3.68  2012-12-16
   - Added monkey_patch function to Mojo::Util.
-  - Updated ".travis.yml".
+  - Added ".travis.yml".
+  - Modernized ".gitignore".
   - Updated jQuery to version 1.8.3.
-  - Updated ".gitignore".
   - Improved documentation.
   - Improved tests.
   - Fixed small export bug in Mojolicious::Lite. (jberger)

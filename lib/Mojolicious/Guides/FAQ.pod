@@ -101,6 +101,14 @@ passphrase with the attribute L<Mojolicious/"secret">.
 
   app->secret('My very secret passphrase.');
 
+=head2 What does "Nothing has been rendered, expecting delayed response" mean?
+
+L<Mojolicious> has been designed from the ground up for non-blocking I/O and
+event loops. So when a new request comes in and no response is generated right
+away, it will assume that this was intentional and return control to the web
+server, which then waits for events such as timers to finally generate a
+response.
+
 =head2 What does "Inactivity timeout" mean?
 
 To protect your applications from denial-of-service attacks, all connections

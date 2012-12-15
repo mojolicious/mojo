@@ -542,9 +542,9 @@ Generate MD5 checksum for string.
 
 =head2 C<monkey_patch>
 
-  monkey_patch $class, $name, sub {...};
+  monkey_patch $package, $name, sub {...};
 
-Monkey patch function into class.
+Monkey patch function into package.
 
   monkey_patch 'MyApp', 'hello', sub { say 'Hello!' };
 

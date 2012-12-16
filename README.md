@@ -11,28 +11,22 @@
 ## Features
 
   * An amazing real-time web framework, allowing you to easily grow single
-    file Mojolicious::Lite prototypes into well structured web applications.
-
+    file [Mojolicious::Lite](http://mojolicio.us/perldoc/Mojolicious/Lite)
+    prototypes into well structured web applications.
     * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish
       templates, content negotiation, session management, testing framework,
       static file server, first class Unicode support and much more for you to
       discover.
-
   * Very clean, portable and Object Oriented pure-Perl API without any hidden
     magic and no requirements besides Perl 5.10.1 (although 5.14+ is
     recommended, and optional CPAN modules will be used to provide advanced
     functionality if they are installed).
-
   * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,
     SNI, IDNA, Comet (long polling) and gzip compression support.
-
   * Built-in non-blocking I/O web server, supporting multiple event loops and
     hot deployment, perfect for embedding.
-
   * Automatic CGI and PSGI detection.
-
   * JSON and HTML/XML parser with CSS selector support.
-
   * Fresh code based upon years of experience developing Catalyst.
 
 ## Installation

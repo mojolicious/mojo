@@ -2,11 +2,12 @@
 # Mojolicious [![Build Status](https://secure.travis-ci.org/kraih/mojo.png)](http://travis-ci.org/kraih/mojo)
 
   Back in the early days of the web, many people learned Perl because of a
-  wonderful Perl library called CGI. It was simple enough to get started
-  without knowing much about the language and powerful enough to keep you
-  going, learning by doing was much fun. While most of the techniques used are
-  outdated now, the idea behind it is not. Mojolicious is a new attempt at
-  implementing this idea using state of the art technology.
+  wonderful Perl library called [CGI](http://metacpan.org/module/CGI). It was
+  simple enough to get started without knowing much about the language and
+  powerful enough to keep you going, learning by doing was much fun. While
+  most of the techniques used are outdated now, the idea behind it is not.
+  Mojolicious is a new attempt at implementing this idea using state of the
+  art technology.
 
 ## Features
 
@@ -25,9 +26,10 @@
     SNI, IDNA, Comet (long polling) and gzip compression support.
   * Built-in non-blocking I/O web server, supporting multiple event loops and
     hot deployment, perfect for embedding.
-  * Automatic CGI and PSGI detection.
+  * Automatic CGI and [PSGI](http://plackperl.org) detection.
   * JSON and HTML/XML parser with CSS selector support.
-  * Fresh code based upon years of experience developing Catalyst.
+  * Fresh code based upon years of experience developing
+    [Catalyst](http://www.catalystframework.org).
 
 ## Installation
 

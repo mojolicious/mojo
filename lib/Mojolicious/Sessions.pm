@@ -125,7 +125,7 @@ C<0> will allow sessions to persist until the browser window is closed, this
 can have security implications though. For more control you can also use the
 C<expiration> and C<expires> session values.
 
-  # Expiration date in epoch seconds from now (persists between requests)
+  # Expiration date in seconds from now (persists between requests)
   $c->session(expiration => 604800);
 
   # Expiration date as absolute epoch time (only valid for one request)

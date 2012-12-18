@@ -844,7 +844,7 @@ usually have a 4096 byte limit, depending on browser.
   my $foo = $c->session->{foo};
   delete $c->session->{foo};
 
-  # Expiration date in epoch seconds from now (persists between requests)
+  # Expiration date in seconds from now (persists between requests)
   $c->session(expiration => 604800);
 
   # Expiration date as absolute epoch time (only valid for one request)

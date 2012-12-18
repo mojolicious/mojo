@@ -38,7 +38,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Rainbow';
-our $VERSION  = '3.68';
+our $VERSION  = '3.69';
 
 sub AUTOLOAD {
   my $self = shift;

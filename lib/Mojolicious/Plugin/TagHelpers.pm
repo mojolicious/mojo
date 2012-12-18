@@ -7,6 +7,12 @@ use Mojo::Util 'xml_escape';
 sub register {
   my ($self, $app) = @_;
 
+  # Text field variations
+  my @time = qw(date datetime month time week);
+  for my $name (@time, qw(color email number range search tel text url)) {
+    $app->helper("${name}_field" => sub { _input(@_, type => $name) });
+  }
+
   # Add "base_tag" helper
   $app->helper(
     base_tag => sub { _tag('base', href => shift->req->url->base, @_) });
@@ -59,9 +65,6 @@ sub register {
 
   # Add "text_area" helper
   $app->helper(text_area => \&_text_area);
-
-  # Add "text_field" helper
-  $app->helper(text_field => sub { _input(@_, type => 'text') });
 }
 
 sub _form_for {
@@ -315,6 +318,58 @@ picked up and shown as default.
   <input name="employed" type="checkbox" value="1" />
   <input id="foo" name="employed" type="checkbox" value="1" />
 
+=head2 C<color_field>
+
+  %= color_field 'background'
+  %= color_field background => '#ffffff'
+  %= color_field background => '#ffffff', id => 'foo'
+
+Generate color input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="background" type="color" />
+  <input name="background" type="color" value="#ffffff" />
+  <input id="foo" name="background" type="color" value="#ffffff" />
+
+=head2 C<date_field>
+
+  %= date_field 'end'
+  %= date_field end => '2012-12-21'
+  %= date_field end => '2012-12-21', id => 'foo'
+
+Generate date input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="end" type="date" />
+  <input name="end" type="date" value="2012-12-21" />
+  <input id="foo" name="end" type="date" value="2012-12-21" />
+
+=head2 C<datetime_field>
+
+  %= datetime_field 'end'
+  %= datetime_field end => '2012-12-21T23:59:59Z'
+  %= datetime_field end => '2012-12-21T23:59:59Z', id => 'foo'
+
+Generate datetime input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="end" type="datetime" />
+  <input name="end" type="datetime" value="2012-12-21T23:59:59Z" />
+  <input id="foo" name="end" type="datetime" value="2012-12-21T23:59:59Z" />
+
+=head2 C<email_field>
+
+  %= email_field 'notify'
+  %= email_field notify => 'nospam@example.com'
+  %= email_field notify => 'nospam@example.com', id => 'foo'
+
+Generate email input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="notify" type="email" />
+  <input name="notify" type="email" value="nospam@example.com" />
+  <input id="foo" name="notify" type="email" value="nospam@example.com" />
+
 =head2 C<file_field>
 
   %= file_field 'avatar'
@@ -436,6 +491,32 @@ capitalized link target as content.
   <a href="http://mojolicio.us">Mojolicious</a>
   <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
 
+=head2 C<month_field>
+
+  %= month_field 'vacation'
+  %= month_field vacation => '2012-12'
+  %= month_field vacation => '2012-12', id => 'foo'
+
+Generate month input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="vacation" type="month" />
+  <input name="vacation" type="month" value="2012-12" />
+  <input id="foo" name="vacation" type="month" value="2012-12" />
+
+=head2 C<number_field>
+
+  %= number_field 'age'
+  %= number_field age => 25
+  %= number_field age => 25, id => 'foo', min => 0, max => 200
+
+Generate number input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="age" type="number" />
+  <input name="age" type="number" value="25" />
+  <input id="foo" max="200" min="0" name="age" type="number" value="25" />
+
 =head2 C<password_field>
 
   %= password_field 'pass'
@@ -456,6 +537,32 @@ picked up and shown as default.
 
   <input name="country" type="radio" value="germany" />
   <input id="foo" name="country" type="radio" value="germany" />
+
+=head2 C<range_field>
+
+  %= range_field 'age'
+  %= range_field age => 25
+  %= range_field age => 25, id => 'foo', min => 0, max => 200
+
+Generate range input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="age" type="range" />
+  <input name="age" type="range" value="25" />
+  <input id="foo" max="200" min="200" name="age" type="range" value="25" />
+
+=head2 C<search_field>
+
+  %= search_field 'q'
+  %= search_field q => 'perl'
+  %= search_field q => 'perl', id => 'foo'
+
+Generate search input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="q" type="search" />
+  <input name="q" type="search" value="perl" />
+  <input id="foo" name="q" type="search" value="perl" />
 
 =head2 C<select_field>
 
@@ -546,18 +653,18 @@ Very useful for reuse in more specific tag helpers.
 Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
 accidental double escaping.
 
-=head2 C<text_field>
+=head2 C<tel_field>
 
-  %= text_field 'first_name'
-  %= text_field first_name => 'Default name'
-  %= text_field first_name => 'Default name', class => 'user'
+  %= tel_field 'work'
+  %= tel_field work => '123456789'
+  %= tel_field work => '123456789', id => 'foo'
 
-Generate text input element. Previous input values will automatically get
+Generate tel input element. Previous input values will automatically get
 picked up and shown as default.
 
-  <input name="first_name" type="text" />
-  <input name="first_name" type="text" value="Default name" />
-  <input class="user" name="first_name" type="text" value="Default name" />
+  <input name="work" type="tel" />
+  <input name="work" type="tel" value="123456789" />
+  <input id="foo" name="work" type="tel" value="123456789" />
 
 =head2 C<text_area>
 
@@ -577,6 +684,58 @@ up and shown as default.
   <textarea cols="40" name="foo">
     Default!
   </textarea>
+
+=head2 C<text_field>
+
+  %= text_field 'first_name'
+  %= text_field first_name => 'Default name'
+  %= text_field first_name => 'Default name', class => 'user'
+
+Generate text input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="first_name" type="text" />
+  <input name="first_name" type="text" value="Default name" />
+  <input class="user" name="first_name" type="text" value="Default name" />
+
+=head2 C<time_field>
+
+  %= time_field 'start'
+  %= time_field start => '23:59:59'
+  %= time_field start => '23:59:59', id => 'foo'
+
+Generate time input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="start" type="time" />
+  <input name="start" type="time" value="23:59:59" />
+  <input id="foo" name="start" type="time" value="23:59:59" />
+
+=head2 C<url_field>
+
+  %= url_field 'address'
+  %= url_field address => 'http://mojolicio.us'
+  %= url_field address => 'http://mojolicio.us', id => 'foo'
+
+Generate url input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="address" type="url" />
+  <input name="address" type="url" value="http://mojolicio.us" />
+  <input id="foo" name="address" type="url" value="http://mojolicio.us" />
+
+=head2 C<week_field>
+
+  %= week_field 'vacation'
+  %= week_field vacation => '2012-W17'
+  %= week_field vacation => '2012-W17', id => 'foo'
+
+Generate week input element. Previous input values will automatically get
+picked up and shown as default.
+
+  <input name="vacation" type="week" />
+  <input name="vacation" type="week" value="2012-W17" />
+  <input id="foo" name="vacation" type="week" value="2012-W17" />
 
 =head1 METHODS
 

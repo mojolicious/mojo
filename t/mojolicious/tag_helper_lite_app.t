@@ -33,6 +33,9 @@ get 'style';
 # GET /basicform
 get '/basicform';
 
+# POST /text
+post '/text';
+
 # GET /multibox
 get '/multibox';
 
@@ -132,6 +135,59 @@ $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
   <input class="test" name="bar" type="text" value="baz" />
   <input name="yada" type="text" value="" />
   <input class="tset" name="baz" value="yada" />
+  <input type="submit" value="Ok" />
+</form>
+EOF
+
+# POST /text
+$t->post_ok('/text')->status_is(200)->content_is(<<'EOF');
+<form action="/text" method="POST">
+  <input class="foo" name="color" type="color" value="#ffffff" />
+  <input class="foo" name="date" type="date" value="2012-12-12" />
+  <input class="foo" name="dt" type="datetime" value="2012-12-12T23:59:59Z" />
+  <input class="foo" name="email" type="email" value="nospam@example.com" />
+  <input class="foo" name="month" type="month" value="2012-12" />
+  <input class="foo" name="number" type="number" value="23" />
+  <input class="foo" name="range" type="range" value="24" />
+  <input class="foo" name="search" type="search" value="perl" />
+  <input class="foo" name="tel" type="tel" value="123456789" />
+  <input class="foo" name="time" type="time" value="23:59:59" />
+  <input class="foo" name="url" type="url" value="http://mojolicio.us" />
+  <input class="foo" name="week" type="week" value="2012-W16" />
+  <input type="submit" value="Ok" />
+</form>
+EOF
+
+# POST /text (with values)
+$t->post_form_ok(
+  '/text' => {
+    color  => '#000000',
+    date   => '2012-12-13',
+    dt     => '2012-12-13T23:59:59Z',
+    email  => 'spam@example.com',
+    month  => '2012-11',
+    number => 25,
+    range  => 26,
+    search => 'c',
+    tel    => '987654321',
+    time   => '23:59:58',
+    url    => 'http://kraih.com',
+    week   => '2012-W17'
+  }
+)->status_is(200)->content_is(<<'EOF');
+<form action="/text" method="POST">
+  <input class="foo" name="color" type="color" value="#000000" />
+  <input class="foo" name="date" type="date" value="2012-12-13" />
+  <input class="foo" name="dt" type="datetime" value="2012-12-13T23:59:59Z" />
+  <input class="foo" name="email" type="email" value="spam@example.com" />
+  <input class="foo" name="month" type="month" value="2012-11" />
+  <input class="foo" name="number" type="number" value="25" />
+  <input class="foo" name="range" type="range" value="26" />
+  <input class="foo" name="search" type="search" value="c" />
+  <input class="foo" name="tel" type="tel" value="987654321" />
+  <input class="foo" name="time" type="time" value="23:59:58" />
+  <input class="foo" name="url" type="url" value="http://kraih.com" />
+  <input class="foo" name="week" type="week" value="2012-W17" />
   <input type="submit" value="Ok" />
 </form>
 EOF
@@ -430,6 +486,23 @@ __DATA__
   %= text_field bar => 'baz', class => 'test'
   %= text_field yada => undef
   %= input_tag baz => 'yada', class => 'tset'
+  %= submit_button
+%= end
+
+@@ text.html.ep
+%= form_for text => begin
+  %= color_field color => '#ffffff', class => 'foo'
+  %= date_field date => '2012-12-12', class => 'foo'
+  %= datetime_field dt => '2012-12-12T23:59:59Z', class => 'foo'
+  %= email_field email => 'nospam@example.com', class => 'foo'
+  %= month_field month => '2012-12', class => 'foo'
+  %= number_field number => 23, class => 'foo'
+  %= range_field range => 24, class => 'foo'
+  %= search_field search => 'perl', class => 'foo'
+  %= tel_field tel => '123456789', class => 'foo'
+  %= time_field time => '23:59:59', class => 'foo'
+  %= url_field url => 'http://mojolicio.us', class => 'foo'
+  %= week_field week => '2012-W16', class => 'foo'
   %= submit_button
 %= end
 

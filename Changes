@@ -1,4 +1,19 @@
 
+3.69  2012-12-18
+  - Added color_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added date_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added datetime_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added email_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added month_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added number_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added range_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added search_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added tel_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added time_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added url_field helper to Mojolicious::Plugin::TagHelpers.
+  - Added week_field helper to Mojolicious::Plugin::TagHelpers.
+  - Improved documentation.
+
 3.68  2012-12-16
   - Added monkey_patch function to Mojo::Util.
   - Added ".travis.yml".

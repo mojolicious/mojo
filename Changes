@@ -12,6 +12,7 @@
   - Added time_field helper to Mojolicious::Plugin::TagHelpers.
   - Added url_field helper to Mojolicious::Plugin::TagHelpers.
   - Added week_field helper to Mojolicious::Plugin::TagHelpers.
+  - Improved Mojo::Base to use utf8.
   - Improved documentation.
 
 3.68  2012-12-16

@@ -685,13 +685,8 @@ Less commonly used and more powerful features.
 IRIs are handled transparently, that means paths are guaranteed to be
 unescaped and decoded to Perl characters.
 
-  use utf8;
-
   # GET /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
   $r->get('/☃')->to('foo#snowman');
-
-Just don't forget to use the L<utf8> pragma or you'll make the Unicode snowman
-very sad.
 
 =head2 Rearranging routes
 

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 # Mojo modules are modern!
+use utf8;
 use feature ();
 
 # No imports because we get subclassed, a lot!
@@ -44,6 +45,7 @@ sub import {
   # Mojo modules are strict!
   strict->import;
   warnings->import;
+  utf8->import;
   feature->import(':5.10');
 }
 
@@ -138,7 +140,7 @@ Mojo::Base - Minimal base class for Mojo projects
 
 L<Mojo::Base> is a simple base class for L<Mojo> projects.
 
-  # Automatically enables "strict", "warnings" and Perl 5.10 features
+  # Automatically enables "strict", "warnings", "utf8" and Perl 5.10 features
   use Mojo::Base -strict;
   use Mojo::Base -base;
   use Mojo::Base 'SomeBaseClass';
@@ -148,12 +150,14 @@ All three forms save a lot of typing.
   # use Mojo::Base -strict;
   use strict;
   use warnings;
+  use utf8;
   use feature ':5.10';
   use IO::Handle ();
 
   # use Mojo::Base -base;
   use strict;
   use warnings;
+  use utf8;
   use feature ':5.10';
   use IO::Handle ();
   use Mojo::Base;
@@ -163,6 +167,7 @@ All three forms save a lot of typing.
   # use Mojo::Base 'SomeBaseClass';
   use strict;
   use warnings;
+  use utf8;
   use feature ':5.10';
   use IO::Handle ();
   require SomeBaseClass;

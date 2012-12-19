@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-use utf8;
-
 use Mojolicious::Lite;
 
 # Default for config file tests

@@ -62,7 +62,7 @@ Mojolicious::Lite - Real-time micro web framework
 
 =head1 SYNOPSIS
 
-  # Automatically enables "strict", "warnings" and Perl 5.10 features
+  # Automatically enables "strict", "warnings", "utf8" and Perl 5.10 features
   use Mojolicious::Lite;
 
   # Route with placeholder
@@ -88,10 +88,10 @@ applications.
 
 =head2 Hello World
 
-A simple Hello World application can look like this, L<strict>, L<warnings>
-and Perl 5.10 features are automatically enabled and a few functions imported
-when you use L<Mojolicious::Lite>, turning your script into a full featured
-web application.
+A simple Hello World application can look like this, L<strict>, L<warnings>,
+L<utf8> and Perl 5.10 features are automatically enabled and a few functions
+imported when you use L<Mojolicious::Lite>, turning your script into a full
+featured web application.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;

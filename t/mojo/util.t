@@ -1,7 +1,5 @@
 use Mojo::Base -strict;
 
-use utf8;
-
 use Test::More;
 use File::Spec::Functions qw(catfile splitdir);
 use File::Temp 'tempdir';

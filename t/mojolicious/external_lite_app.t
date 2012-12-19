@@ -1,7 +1,5 @@
 use Mojo::Base -strict;
 
-use utf8;
-
 # Disable IPv6 and libev
 BEGIN {
   $ENV{MOJO_MODE}    = 'testing';

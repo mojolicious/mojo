@@ -380,7 +380,7 @@ content with the L<Mojolicious> renderer.
 
 =head1 SYNTAX
 
-For all templates L<strict>, L<warnings> and Perl 5.10 features are
+For all templates L<strict>, L<warnings>, L<utf8> and Perl 5.10 features are
 automatically enabled.
 
   <% Perl code %>

@@ -8,8 +8,6 @@ sub TO_JSON { shift->something }
 package main;
 use Mojo::Base -strict;
 
-use utf8;
-
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::JSON;

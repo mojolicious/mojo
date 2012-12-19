@@ -11,8 +11,8 @@ use Scalar::Util 'weaken';
 has base_classes => sub { [qw(Mojolicious::Controller Mojo)] };
 has cache        => sub { Mojo::Cache->new };
 has [qw(conditions shortcuts)] => sub { {} };
-has hidden => sub { [qw(attr has new tap)] };
-has 'namespace';
+has hidden     => sub { [qw(attr has new tap)] };
+has namespaces => sub { [] };
 
 sub add_condition {
   my ($self, $name, $cb) = @_;
@@ -82,6 +82,18 @@ sub dispatch {
 
 sub hide { push @{shift->hidden}, @_ }
 
+# DEPRECATED in Rainbow!
+sub namespace {
+  warn <<EOF;
+Mojolicious::Routes->namespace is DEPRECATED in favor of
+Mojolicious::Routes->namespaces!
+EOF
+  my $self = shift;
+  return $self->namespaces->[0] unless @_;
+  $self->namespaces->[0] = shift;
+  return $self;
+}
+
 sub route {
   shift->add_child(Mojolicious::Routes::Route->new(@_))->children->[-1];
 }
@@ -95,32 +107,58 @@ sub _callback {
 }
 
 sub _class {
-  my ($self, $field, $c) = @_;
+  my ($self, $c, $field) = @_;
 
-  # Namespace and class
-  my $namespace = $field->{namespace};
+  # Application instance
+  return $field->{app} if ref $field->{app};
+
+  # Application class
+  my @classes;
   my $class = camelize $field->{controller} || '';
-  return undef unless $class || $namespace;
-  $class = length $class ? "${namespace}::$class" : $namespace
-    if length($namespace //= $self->namespace);
+  if ($field->{app}) { push @classes, $field->{app} }
 
-  # Check if it looks like a class
-  return $class =~ /^[a-zA-Z0-9_:]+$/ ? $class : undef;
+  # Specific namespace
+  elsif (defined(my $namespace = $field->{namespace})) {
+    if ($class) { push @classes, $namespace ? "${namespace}::$class" : $class }
+    elsif ($namespace) { push @classes, $namespace }
+  }
+
+  # All namespaces
+  elsif ($class) { push @classes, "${_}::$class" for @{$self->namespaces} }
+
+  # Try to load all classes
+  my $log = $c->app->log;
+  for my $class (@classes) {
+
+    # Failed
+    unless (my $found = $self->_load($class)) {
+      next unless defined $found;
+      $log->debug(qq{Class "$class" is not a controller.});
+      return undef;
+    }
+
+    # Success
+    return $class->new($c);
+  }
+
+  # Nothing found
+  $log->debug(qq{Controller "$classes[-1]" does not exist.}) if @classes;
+  return @classes ? undef : 0;
 }
 
 sub _controller {
   my ($self, $c, $field, $staging) = @_;
 
   # Load and instantiate controller/application
-  return 1 unless my $app = $field->{app} || $self->_class($field, $c);
-  return undef unless $self->_load($c, $app);
-  $app = $app->new($c) unless ref $app;
+  my $app;
+  unless ($app = $self->_class($c, $field)) { return defined $app ? 1 : undef }
 
   # Application
   my $continue;
   my $class = ref $app;
+  my $log   = $c->app->log;
   if (my $sub = $app->can('handler')) {
-    $c->app->log->debug(qq{Routing to application "$class".});
+    $log->debug(qq{Routing to application "$class".});
 
     # Try to connect routes
     if (my $sub = $app->can('routes')) {
@@ -132,8 +170,7 @@ sub _controller {
   }
 
   # Action
-  elsif (my $method = $self->_method($field, $c)) {
-    my $log = $c->app->log;
+  elsif (my $method = $self->_method($c, $field)) {
     $log->debug(qq{Routing to controller "$class" and action "$method".});
 
     # Try to call action
@@ -150,29 +187,19 @@ sub _controller {
 }
 
 sub _load {
-  my ($self, $c, $app) = @_;
+  my ($self, $app) = @_;
 
-  # Load unless already loaded or application
-  return 1 if $self->{loaded}{$app} || ref $app;
-  if (my $e = Mojo::Loader->new->load($app)) {
-
-    # Doesn't exist
-    $c->app->log->debug(qq{Controller "$app" does not exist.})
-      and return undef
-      unless ref $e;
-
-    # Error
-    die $e;
-  }
+  # Load unless already loaded
+  return 1 if $self->{loaded}{$app};
+  if (my $e = Mojo::Loader->new->load($app)) { ref $e ? die $e : return undef }
 
   # Check base classes
-  $c->app->log->debug(qq{Class "$app" is not a controller.}) and return undef
-    unless first { $app->isa($_) } @{$self->base_classes};
+  return 0 unless first { $app->isa($_) } @{$self->base_classes};
   return ++$self->{loaded}{$app};
 }
 
 sub _method {
-  my ($self, $field, $c) = @_;
+  my ($self, $c, $field) = @_;
 
   # Hidden
   $self->{hiding} = {map { $_ => 1 } @{$self->hidden}} unless $self->{hiding};
@@ -302,12 +329,12 @@ Contains all available conditions.
 Controller methods and attributes that are hidden from routes, defaults to
 C<attr>, C<has>, C<new> and C<tap>.
 
-=head2 C<namespace>
+=head2 C<namespaces>
 
-  my $namespace = $r->namespace;
-  $r            = $r->namespace('Foo::Bar::Controller');
+  my $namespaces = $r->namespaces;
+  $r             = $r->namespaces(['Foo::Bar::Controller']);
 
-Namespace used by C<dispatch> to search for controllers.
+Namespaces used by C<dispatch> to search for controllers.
 
 =head2 C<shortcuts>
 

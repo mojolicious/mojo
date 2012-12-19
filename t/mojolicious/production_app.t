@@ -120,4 +120,10 @@ $t->get_ok('/just/some/template')->status_is(200)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("Production template with low precedence.\n");
 
+# MojoliciousTest3::Bar::index (controller class in development namespace)
+$t->get_ok('/test9' => {'X-Test' => 'Hi there!'})->status_is(404)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_like(qr/Page not found/);
+
 done_testing();

@@ -12,6 +12,9 @@ sub development_mode {
 
   # Static root for development
   unshift @{$self->static->paths}, $self->home->rel_dir('public_dev');
+
+  # Development namespace
+  push @{$self->routes->namespaces}, 'MojoliciousTest3';
 }
 
 sub startup {
@@ -25,7 +28,8 @@ sub startup {
   push @{$self->commands->namespaces}, 'MojoliciousTest::Command';
 
   # Plugins in custom namespace
-  unshift @{$self->plugins->namespaces}, $self->routes->namespace . '::Plugin';
+  unshift @{$self->plugins->namespaces},
+    $self->routes->namespaces->[0] . '::Plugin';
   $self->plugin('test-some_plugin2');
   $self->plugin('UPPERCASETestPlugin');
 
@@ -123,6 +127,9 @@ sub startup {
 
   # /test8 (controller class)
   $r->route('/test8')->to(controller => 'Foo::Bar', action => 'test');
+
+  # /test9 (controller in additional namespace)
+  $r->route('/test9')->to('bar#index');
 
   # /withblock (template with blocks)
   $r->route('/withblock')->to('foo#withblock');

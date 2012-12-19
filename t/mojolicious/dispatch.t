@@ -87,7 +87,7 @@ $c->app->log->path(undef);
 $c->app->log->level('fatal');
 my $d = Mojolicious::Routes->new;
 ok $d, 'initialized';
-$d->namespace('Test');
+$d->namespaces(['Test']);
 $d->route('/')->over([])->to(controller => 'foo', action => 'home');
 $d->route('/foo/(capture)')->to(controller => 'foo', action => 'bar');
 

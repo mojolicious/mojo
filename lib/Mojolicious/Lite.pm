@@ -24,7 +24,7 @@ sub import {
   my $app = $class->new;
 
   # Initialize routes
-  my $routes = $app->routes->namespace('');
+  my $routes = $app->routes->namespaces([]);
 
   # Default static and template class
   $app->static->classes->[0] = $app->renderer->classes->[0] = $caller;

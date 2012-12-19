@@ -78,7 +78,7 @@ package main;
 # /foo/* (plugin app)
 plugin 'PluginWithEmbeddedApp';
 
-app->routes->namespace('MyTestApp');
+app->routes->namespaces(['MyTestApp']);
 
 # Mount full external application a few times
 my $external = "$FindBin::Bin/external/myapp.pl";

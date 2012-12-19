@@ -313,10 +313,10 @@ The C<controller> is always appended to the C<namespace> if available.
   # /hey -> MyApp::Controller::Foo::Bar->hey
   $r->route('/hey')->to('Foo::Bar#hey', namespace => 'MyApp::Controller');
 
-You can also change the default namespace for all routes in the application
-with the router attribute L<Mojolicious::Routes/"namespace">.
+You can also change the default namespaces for all routes in the application
+with the router attribute L<Mojolicious::Routes/"namespaces">.
 
-  $r->namespace('MyApp::Controller');
+  $r->namespaces(['MyApp::Controller']);
 
 =head2 Route to callback
 

@@ -128,7 +128,7 @@ sub startup {
   # /test8 (controller class)
   $r->route('/test8')->to(controller => 'Foo::Bar', action => 'test');
 
-  # /test9 (controller in additional namespace)
+  # /test9 (controller in development namespace)
   $r->route('/test9')->to('bar#index');
 
   # /withblock (template with blocks)

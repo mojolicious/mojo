@@ -1082,36 +1082,6 @@ namespace.
 
   1;
 
-=head2 Adding keywords to Mojolicious::Lite
-
-Since L<Mojolicious::Lite> keywords have to be added at compile time, they
-require their own exporter module instead of a plugin.
-
-  package Mojolicious::Lite::GetPost;
-  use Mojo::Base 'Exporter';
-
-  our @EXPORT = ('get_post');
-
-  # Add a route that only accepts GET and POST requests
-  sub get_post { caller->app->routes->any([qw(GET POST)] => @_) }
-
-  1;
-
-Just access the application through the caller's package and you have its full
-functionality at your disposal.
-
-  use Mojolicious::Lite;
-  use Mojolicious::Lite::GetPost;
-
-  # Accept only GET and POST requests
-  get_post '/whatever' => sub {
-    my $self   = shift;
-    my $method = $self->req->method;
-    $self->render(text => "You called /whatever with $method.");
-  };
-
-  app->start;
-
 =head2 Running code against your application
 
 Ever thought about running a quick oneliner against your L<Mojolicious>

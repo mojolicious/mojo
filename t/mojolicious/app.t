@@ -249,7 +249,7 @@ $t->get_ok('/test9')->status_is(200)
 $t->get_ok('/test10')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('Development namespace works again!');
+  ->content_is('Development namespace has high precedence!');
 
 # 404
 $t->get_ok('/' => {'X-Test' => 'Hi there!'})->status_is(404)

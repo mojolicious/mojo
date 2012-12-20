@@ -1,9 +1,6 @@
 package MojoliciousTest::Baz;
 use Mojo::Base 'Mojolicious::Controller';
 
-sub index {
-  my $self = shift;
-  $self->render(text => 'Production namespace works again!');
-}
+sub index { shift->render_text('Production namespace has low precedence!') }
 
 1;

@@ -1,9 +1,6 @@
 package MojoliciousTest3::Baz;
-use Mojo::Base 'Mojolicious::Controller';
+use Mojo::Base 'MojoliciousTest::Baz';
 
-sub index {
-  my $self = shift;
-  $self->render(text => 'Development namespace works again!');
-}
+sub index { shift->render_text('Development namespace has high precedence!') }
 
 1;

@@ -1086,7 +1086,7 @@ namespace.
 
 Since L<Mojolicious::Lite> keywords have to be added at compile time, they
 require their own exporter module instead of a plugin.
-	
+
   package Mojolicious::Lite::GetPost;
   use Mojo::Base -base;
 
@@ -1113,6 +1113,7 @@ functionality at your disposal.
     my $method = $self->req->method;
     $self->render(text => "You called /whatever with $method.");
   };
+
   app->start;
 
 =head2 Running code against your application

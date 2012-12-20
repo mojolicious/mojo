@@ -12,7 +12,6 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use Mojolicious::Lite;
-use LiteTestKeyword;
 use Test::Mojo;
 
 # Plugin with a template
@@ -23,8 +22,8 @@ app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
 # Default layout for whole application
 app->defaults(layout => 'default');
 
-# GET /works (custom keyword)
-test_keyword '/works';
+# GET /works
+get '/works';
 
 # GET /doenotexist
 get '/doesnotexist';

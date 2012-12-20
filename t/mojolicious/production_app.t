@@ -126,4 +126,10 @@ $t->get_ok('/test9' => {'X-Test' => 'Hi there!'})->status_is(404)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_like(qr/Page not found/);
 
+# MojoliciousTest::Baz::index (controller class precedence)
+$t->get_ok('/test10')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('Production namespace works again!');
+
 done_testing();

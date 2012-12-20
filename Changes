@@ -16,6 +16,7 @@
   - Added week_field helper to Mojolicious::Plugin::TagHelpers.
   - Improved Mojo::Base to use utf8.
   - Improved documentation.
+  - Improved tests.
 
 3.68  2012-12-16
   - Added monkey_patch function to Mojo::Util.

@@ -14,7 +14,7 @@ sub development_mode {
   unshift @{$self->static->paths}, $self->home->rel_dir('public_dev');
 
   # Development namespace
-  push @{$self->routes->namespaces}, 'MojoliciousTest3';
+  unshift @{$self->routes->namespaces}, 'MojoliciousTest3';
 }
 
 sub startup {
@@ -29,7 +29,7 @@ sub startup {
 
   # Plugins in custom namespace
   unshift @{$self->plugins->namespaces},
-    $self->routes->namespaces->[0] . '::Plugin';
+    $self->routes->namespaces->[-1] . '::Plugin';
   $self->plugin('test-some_plugin2');
   $self->plugin('UPPERCASETestPlugin');
 
@@ -130,6 +130,9 @@ sub startup {
 
   # /test9 (controller in development namespace)
   $r->route('/test9')->to('bar#index');
+
+  # /test10 (controller in both namespaces)
+  $r->route('/test10')->to('baz#index');
 
   # /withblock (template with blocks)
   $r->route('/withblock')->to('foo#withblock');

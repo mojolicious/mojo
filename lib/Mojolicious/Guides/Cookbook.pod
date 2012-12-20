@@ -1092,7 +1092,7 @@ require their own exporter module instead of a plugin.
 
   our @EXPORT = ('get_post');
 
-  # Access the router through the application
+  # Add a route that only accepts GET and POST requests
   sub get_post { caller->app->routes->any([qw(GET POST)] => @_) }
 
   1;

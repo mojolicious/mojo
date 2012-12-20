@@ -334,7 +334,10 @@ C<attr>, C<has>, C<new> and C<tap>.
   my $namespaces = $r->namespaces;
   $r             = $r->namespaces(['Foo::Bar::Controller']);
 
-Namespaces used by C<dispatch> to search for controllers.
+Namespaces to load controllers from.
+
+  # Add another namespace to load controllers from
+  push @{$r->namespaces}, 'MyApp::Controller';
 
 =head2 C<shortcuts>
 

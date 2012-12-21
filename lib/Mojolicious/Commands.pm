@@ -255,7 +255,6 @@ List application routes.
 
 =head2 C<test>
 
-  $ mojo test
   $ ./myapp.pl test
   $ ./myapp.pl test t/fun.t
 

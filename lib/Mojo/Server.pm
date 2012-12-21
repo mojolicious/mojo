@@ -20,7 +20,7 @@ sub build_app {
   local $ENV{MOJO_EXE};
   local $ENV{MOJO_APP} = $app;
   return $app->new unless my $e = Mojo::Loader->new->load($app);
-  die ref $e ? $e : qq{Application class "$app" could not be found.\n};
+  die ref $e ? $e : qq{Couldn't find application class "$app".\n};
 }
 
 sub build_tx { shift->app->build_tx }

@@ -179,22 +179,18 @@ simple to deploy with L<Plack>.
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
 L<Plack> provides many server and protocol adapters for you to choose from
-such as C<FCGI>, C<SCGI> and C<mod_perl>. Make sure to run C<plackup> from
-your applications home directory, otherwise libraries might not be found.
+such as C<FCGI>, C<SCGI> and C<mod_perl>.
 
   $ plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 
-Because of the way C<plackup> loads your script, L<Mojolicious> is not always
-able to detect the applications home directory, if that's the case you can
-simply use the C<MOJO_HOME> environment variable. Also note that
-C<app-E<gt>start> needs to be the last Perl statement in the application
-script for the same reason.
+If an older server adapter is not be able to correctly detect the application
+home directory, you can simply use the C<MOJO_HOME> environment variable.
 
   $ MOJO_HOME=/home/sri/myapp plackup ./script/myapp
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
 Some server adapters might ask for a C<.psgi> file, if that's the case you can
-just point them at your application script because it will automatically act
+just point them at your application script, because it will automatically act
 like one if it detects the presence of a C<PLACK_ENV> environment variable.
 
 =head2 Plack middleware

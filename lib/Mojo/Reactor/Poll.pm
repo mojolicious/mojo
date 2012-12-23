@@ -31,7 +31,7 @@ sub one_tick {
 
     # Calculate ideal timeout based on timers
     my $min = min map { $_->{time} } values %{$self->{timers}};
-    my $timeout = defined $min ? ($min - time) : 0.025;
+    my $timeout = defined $min ? ($min - time) : 0.5;
     $timeout = 0 if $timeout < 0;
 
     # I/O

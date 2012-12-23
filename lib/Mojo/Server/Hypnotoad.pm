@@ -447,7 +447,7 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
 Interval in seconds for trying to reacquire the accept mutex and connection
 management, defaults to C<0.025>. Note that changing this value can affect
-performance and idle cpu usage.
+performance and idle CPU usage.
 
 =head2 C<accepts>
 
@@ -575,7 +575,7 @@ Username for worker processes.
   workers => 10
 
 Number of worker processes, defaults to C<4>. A good rule of thumb is two
-worker processes per cpu core.
+worker processes per CPU core.
 
 =head1 METHODS
 

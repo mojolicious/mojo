@@ -140,7 +140,7 @@ Most commonly used features every L<Mojolicious> developer should know about.
 =head2 Minimal route
 
 Every L<Mojolicious> application has a router object you can use to generate
-route structures.
+route structures, that match in the same order in which they were defined.
 
   # Application
   package MyApp;

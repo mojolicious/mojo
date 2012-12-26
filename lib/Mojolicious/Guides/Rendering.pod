@@ -906,10 +906,10 @@ do is add a new C<handler>.
       my $inline = $options->{inline};
 
       # Check for absolute template path
-      my $path = $r->template_path($options);
+      my $path = $renderer->template_path($options);
 
       # Check for appropriate template in DATA section
-      my $data = $r->get_data_template($options);
+      my $data = $renderer->get_data_template($options);
 
       # This part is up to you and your template system :)
       ...

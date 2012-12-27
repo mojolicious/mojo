@@ -30,7 +30,7 @@ sub import {
   $UA->app($caller->app);
 
   # Functions
-  monkey_patch $caller, {
+  monkey_patch $caller,
     'a' => sub { $caller->can('any')->(@_) and return $UA->app },
     'b' => \&b,
     'c' => \&c,
@@ -45,8 +45,7 @@ sub import {
     'r' => sub { $UA->app->dumper(@_) },
     't' => sub { _request($UA->build_tx(PATCH => @_)) },
     'u' => sub { _request($UA->build_tx(PUT => @_)) },
-    'x' => sub { Mojo::DOM->new(@_) },
-  };
+    'x' => sub { Mojo::DOM->new(@_) };
 }
 
 sub _request {

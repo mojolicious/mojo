@@ -406,10 +406,9 @@ is MojoMonkeyTest::bar(), 'bar', 'right result';
 monkey_patch 'MojoMonkeyTest', 'foo', sub {'baz'};
 ok !!MojoMonkeyTest->can('foo'), 'function "foo" exists';
 is MojoMonkeyTest::foo(), 'baz', 'right result';
-monkey_patch 'MojoMonkeyTest', {
+monkey_patch 'MojoMonkeyTest',
   yin  => sub { 'yin' },
-  yang => sub { 'yang' },
-};
+  yang => sub { 'yang' };
 ok !!MojoMonkeyTest->can('yin'), 'function "yin" exists';
 is MojoMonkeyTest::yin(), 'yin', 'right result';
 ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';

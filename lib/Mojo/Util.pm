@@ -132,10 +132,10 @@ sub md5_sum   { md5_hex(@_) }
 
 sub monkey_patch {
   my $class = shift;
-  my $spec  = ref $_[0] ? shift : { shift, shift }; 
+  my %spec  = @_; 
   no strict 'refs';
   no warnings 'redefine';
-  *{"${class}::$_"} = $spec->{$_} for keys %$spec;
+  *{"${class}::$_"} = $spec{$_} for keys %spec;
 }
 
 sub punycode_decode {
@@ -543,8 +543,7 @@ Generate MD5 checksum for string.
 
 =head2 C<monkey_patch>
 
-  monkey_patch $package, $name, sub {...};
-  monkey_patch $package, { $name => sub {...}, ... };
+  monkey_patch $package, $name, sub {...}, ... ;
 
 Monkey patch function(s) into package.
 

@@ -894,12 +894,16 @@ L<Mojo::Template> contains the whole list of available options.
 =head2 Adding your favorite template system
 
 Maybe you would prefer a different template system than C<ep>, all you have to
-do is add a new C<handler>.
+do is add a new C<handler> when C<register> is called.
 
-  use Mojolicious::Lite;
+  package Mojolicious::Plugin::MyRenderer;
+  use Mojo::Base 'Mojolicious::Plugin';
 
-  app->renderer->add_handler(
-    mine => sub {
+  sub register {
+    my ($self, $app) = @_;
+
+    # Add "mine" handler
+    $app->renderer->add_handler(mine => sub {
       my ($renderer, $c, $output, $options) = @_;
 
       # Check for one time use inline template
@@ -922,8 +926,17 @@ do is add a new C<handler>.
 
       # And return true if something has been rendered or false otherwise
       return 1;
-    }
-  );
+    });
+  }
+
+  1;
+
+Since most template systems don't support templates in the C<DATA> section,
+the renderer provides methods to help you with that.
+
+  use Mojolicious::Lite;
+
+  plugin 'MyRenderer';
 
   get '/' => 'index';
 
@@ -932,9 +945,6 @@ do is add a new C<handler>.
 
   @@ index.html.mine
   ...
-
-Since most template systems don't support templates in the C<DATA> section,
-the renderer provides methods to help you with that.
 
 =head2 Post-processing content
 

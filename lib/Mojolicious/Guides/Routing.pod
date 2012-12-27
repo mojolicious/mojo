@@ -746,17 +746,15 @@ You can also package your conditions as reusable plugins.
     my ($self, $app) = @_;
 
     # Add "werewolf" condition
-    $app->routes->add_condition(
-      werewolf => sub {
-        my ($route, $c, $captures, $days) = @_;
+    $app->routes->add_condition(werewolf => sub {
+      my ($route, $c, $captures, $days) = @_;
 
-        # Keep the werewolfs out!
-        return undef if abs(14 - (phase(time))[2]) > ($days / 2);
+      # Keep the werewolfs out!
+      return undef if abs(14 - (phase(time))[2]) > ($days / 2);
 
-        # It's ok, no werewolf
-        return 1;
-      }
-    );
+      # It's ok, no werewolf
+      return 1;
+    });
   }
 
   1;

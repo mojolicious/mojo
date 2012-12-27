@@ -132,10 +132,10 @@ sub md5_sum   { md5_hex(@_) }
 
 sub monkey_patch {
   my $class = shift;
-  my %spec  = ref $_[0] ? %{ shift() } : (shift, shift); 
+  my $spec  = ref $_[0] ? shift : { shift, shift }; 
   no strict 'refs';
   no warnings 'redefine';
-  *{"${class}::$_"} = $spec{$_} for keys %spec;
+  *{"${class}::$_"} = $spec->{$_} for keys %$spec;
 }
 
 sub punycode_decode {

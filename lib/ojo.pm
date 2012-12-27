@@ -31,21 +31,26 @@ sub import {
 
   # Functions
   monkey_patch $caller,
-    'a' => sub { $caller->can('any')->(@_) and return $UA->app },
-    'b' => \&b,
-    'c' => \&c,
-    'd' => sub { _request($UA->build_tx(DELETE => @_)) },
-    'f' => sub { _request($UA->build_form_tx(@_)) },
-    'g' => sub { _request($UA->build_tx(GET => @_)) },
-    'h' => sub { _request($UA->build_tx(HEAD => @_)) },
-    'j' => \&j,
-    'n' => sub { _request($UA->build_json_tx(@_)) },
-    'o' => sub { _request($UA->build_tx(OPTIONS => @_)) },
-    'p' => sub { _request($UA->build_tx(POST => @_)) },
-    'r' => sub { $UA->app->dumper(@_) },
-    't' => sub { _request($UA->build_tx(PATCH => @_)) },
-    'u' => sub { _request($UA->build_tx(PUT => @_)) },
-    'x' => sub { Mojo::DOM->new(@_) };
+    a => sub { $caller->can('any')->(@_) and return $UA->app },
+    b => \&b,
+    c => \&c,
+    d => sub { _request($UA->build_tx(DELETE => @_)) },
+    f => sub { _request($UA->build_form_tx(@_)) },
+    g => sub { _request($UA->build_tx(GET => @_)) },
+    h => sub { _request($UA->build_tx(HEAD => @_)) },
+    j => sub {
+      my $d = shift;
+      my $j = Mojo::JSON->new;
+      return $j->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
+      return $j->decode($d);
+    },
+    n => sub { _request($UA->build_json_tx(@_)) },
+    o => sub { _request($UA->build_tx(OPTIONS => @_)) },
+    p => sub { _request($UA->build_tx(POST => @_)) },
+    r => sub { $UA->app->dumper(@_) },
+    t => sub { _request($UA->build_tx(PATCH => @_)) },
+    u => sub { _request($UA->build_tx(PUT => @_)) },
+    x => sub { Mojo::DOM->new(@_) };
 }
 
 sub _request {
@@ -54,13 +59,6 @@ sub _request {
   warn qq/Problem loading URL "@{[$tx->req->url->to_abs]}". ($err)\n/
     if $err && !$code;
   return $tx->res;
-}
-
-sub j {
-  my $d = shift;
-  my $j = Mojo::JSON->new;
-  return $j->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
-  return $j->decode($d);
 }
 
 1;

@@ -43,10 +43,10 @@ sub import {
     ($routes, $root) = ($root, $old);
   };
   monkey_patch $caller,
-    'helper' => sub { $app->helper(@_) },
-    'hook'   => sub { $app->hook(@_) },
-    'plugin' => sub { $app->plugin(@_) },
-    'under'  => sub { $routes = $root->under(@_) };
+    helper => sub { $app->helper(@_) },
+    hook   => sub { $app->hook(@_) },
+    plugin => sub { $app->plugin(@_) },
+    under  => sub { $routes = $root->under(@_) };
 
   # Make sure there's a default application for testing
   Mojo::UserAgent->app($app) unless Mojo::UserAgent->app;

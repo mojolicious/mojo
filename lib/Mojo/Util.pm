@@ -131,8 +131,7 @@ sub md5_bytes { md5(@_) }
 sub md5_sum   { md5_hex(@_) }
 
 sub monkey_patch {
-  my $class = shift;
-  my %spec  = @_; 
+  my ($class, %spec) = @_; 
   no strict 'refs';
   no warnings 'redefine';
   *{"${class}::$_"} = $spec{$_} for keys %spec;

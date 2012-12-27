@@ -674,14 +674,14 @@ The C<register> method will be called when you load the plugin.
 
   app->start;
 
-A skeleton for a full C<CPAN> compatible plugin distribution can be
-automatically generated.
+A skeleton for a full CPAN compatible plugin distribution can be automatically
+generated.
 
   $ mojo generate plugin DebugHelper
 
 And if you have a C<PAUSE> account (which can be requested at
 L<http://pause.perl.org>), you are only a few commands away from relasing it
-to C<CPAN>.
+to CPAN.
 
   $ perl Makefile.PL
   $ make test
@@ -692,7 +692,7 @@ to C<CPAN>.
 =head2 Bundling assets with plugins
 
 Assets such as templates and static files can be easily bundled with your
-plugins, even if you plan to release them to C<CPAN>.
+plugins, even if you plan to release them to CPAN.
 
   $ mojo generate plugin AlertAssets
   $ mkdir AlertAssets/lib/Mojolicious/Plugin/AlertAssets
@@ -893,8 +893,9 @@ L<Mojo::Template> contains the whole list of available options.
 
 =head2 Adding your favorite template system
 
-Maybe you would prefer a different template system than C<ep>, all you have to
-do is add a new C<handler> when C<register> is called.
+Maybe you would prefer a different template system than C<ep>, and there is
+not already a plugin on CPAN for your favorite one, all you have to do is add
+a new C<handler> when C<register> is called.
 
   package Mojolicious::Plugin::MyRenderer;
   use Mojo::Base 'Mojolicious::Plugin';

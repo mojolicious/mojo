@@ -29,7 +29,7 @@ sub import {
   # Default static and template class
   $app->static->classes->[0] = $app->renderer->classes->[0] = $caller;
 
-  # Export
+  # Functions
   my $root = $routes;
   for my $name (qw(any get options patch post put websocket)) {
     monkey_patch $caller, $name, sub { $routes->$name(@_) };

@@ -644,7 +644,7 @@ this is a much faster version of C<html_escape>.
 
   my $encoded = xor_encode $string, $key;
 
-XOR encode string.
+XOR encode string with variable length key.
 
 =head1 SEE ALSO
 

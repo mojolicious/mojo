@@ -131,10 +131,10 @@ sub md5_bytes { md5(@_) }
 sub md5_sum   { md5_hex(@_) }
 
 sub monkey_patch {
-  my ($class, %spec) = @_; 
+  my ($class, %patch) = @_;
   no strict 'refs';
   no warnings 'redefine';
-  *{"${class}::$_"} = $spec{$_} for keys %spec;
+  *{"${class}::$_"} = $patch{$_} for keys %patch;
 }
 
 sub punycode_decode {
@@ -542,11 +542,15 @@ Generate MD5 checksum for string.
 
 =head2 C<monkey_patch>
 
-  monkey_patch $package, $name, sub {...}, ... ;
+  monkey_patch $package, foo => sub {...};
+  monkey_patch $package, foo => sub {...}, bar => sub {...};
 
-Monkey patch function(s) into package.
+Monkey patch functions into package.
 
-  monkey_patch 'MyApp', 'hello', sub { say 'Hello!' };
+  monkey_patch 'MyApp',
+    one   => sub { say 'One!' },
+    two   => sub { say 'Two!' },
+    three => sub { say 'Three!' };
 
 =head2 C<punycode_decode>
 

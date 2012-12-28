@@ -310,7 +310,7 @@ sub _wrap {
 
   # Escape function
   my $escape = $self->escape;
-  monkey_patch $self->namespace, '_escape', sub {
+  monkey_patch $self->namespace, _escape => sub {
     no warnings 'uninitialized';
     ref $_[0] eq 'Mojo::ByteStream' ? $_[0] : $escape->("$_[0]");
   };

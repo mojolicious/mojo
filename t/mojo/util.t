@@ -400,15 +400,17 @@ is slurp($file), "just\nworks!", 'successful roundtrip';
 ok !!MojoMonkeyTest->can('foo'), 'function "foo" exists';
 is MojoMonkeyTest::foo(), 'foo', 'right result';
 ok !MojoMonkeyTest->can('bar'), 'function "bar" does not exist';
-monkey_patch 'MojoMonkeyTest', 'bar', sub {'bar'};
+monkey_patch 'MojoMonkeyTest', bar => sub {'bar'};
 ok !!MojoMonkeyTest->can('bar'), 'function "bar" exists';
 is MojoMonkeyTest::bar(), 'bar', 'right result';
-monkey_patch 'MojoMonkeyTest', 'foo', sub {'baz'};
+monkey_patch 'MojoMonkeyTest', foo => sub {'baz'};
 ok !!MojoMonkeyTest->can('foo'), 'function "foo" exists';
 is MojoMonkeyTest::foo(), 'baz', 'right result';
+ok !MojoMonkeyTest->can('yin'),  'function "yin" does not exist';
+ok !MojoMonkeyTest->can('yang'), 'function "yang" does not exist';
 monkey_patch 'MojoMonkeyTest',
-  yin  => sub { 'yin' },
-  yang => sub { 'yang' };
+  yin  => sub {'yin'},
+  yang => sub {'yang'};
 ok !!MojoMonkeyTest->can('yin'), 'function "yin" exists';
 is MojoMonkeyTest::yin(), 'yin', 'right result';
 ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';

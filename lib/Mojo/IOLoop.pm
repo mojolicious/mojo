@@ -240,7 +240,7 @@ sub _not_accepting {
   # Release accept mutex
   return unless delete $self->{accepting};
   return unless my $cb = $self->unlock;
-  $self->$cb();
+  $self->$cb;
 
   # Stop accepting
   $_->stop for values %{$self->{acceptors} || {}};

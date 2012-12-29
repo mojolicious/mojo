@@ -79,7 +79,7 @@ $app->routes->post(
       $cb = undef unless my $chunk = shift @chunks || '';
       $self->write_chunk($chunk, $cb);
     };
-    $self->$cb();
+    $self->$cb;
   }
 );
 

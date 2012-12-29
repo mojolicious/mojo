@@ -26,7 +26,7 @@ post '/chunked' => sub {
     $cb = undef unless my $chunk = shift @chunks || '';
     $self->write_chunk($chunk, $cb);
   };
-  $self->$cb();
+  $self->$cb;
 };
 
 # GET /params

@@ -78,8 +78,10 @@ sub children {
 
   # Walk tree
   my @children;
-  my $tree = $self->tree;
-  my $start = $tree->[0] eq 'root' ? 1 : 4;
+  my $charset = $self->charset;
+  my $xml     = $self->xml;
+  my $tree    = $self->tree;
+  my $start   = $tree->[0] eq 'root' ? 1 : 4;
   for my $e (@$tree[$start .. $#$tree]) {
 
     # Make sure child is a tag
@@ -87,8 +89,7 @@ sub children {
     next if defined $type && $e->[1] ne $type;
 
     # Add child
-    push @children,
-      $self->new->charset($self->charset)->tree($e)->xml($self->xml);
+    push @children, $self->new->charset($charset)->tree($e)->xml($xml);
   }
 
   return Mojo::Collection->new(@children);
@@ -115,15 +116,12 @@ sub content_xml {
 sub find {
   my ($self, $selector) = @_;
 
-  # Match selector against tree
-  my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select($selector);
-
-  # Upgrade results
-  @$results
-    = map { $self->new->charset($self->charset)->tree($_)->xml($self->xml) }
-    @$results;
-
-  return Mojo::Collection->new(@$results);
+  # Match selector against tree and upgrade results
+  my $charset = $self->charset;
+  my $xml     = $self->xml;
+  return Mojo::Collection->new(
+    map { $self->new->charset($charset)->tree($_)->xml($xml) }
+      @{Mojo::DOM::CSS->new(tree => $self->tree)->select($selector)});
 }
 
 sub namespace {
@@ -324,6 +322,8 @@ sub _elements {
 
 sub _parent {
   my ($children, $parent) = @_;
+
+  # Link parent to children
   my @new;
   for my $e (@$children[1 .. $#$children]) {
     if ($e->[0] eq 'tag') {
@@ -332,6 +332,7 @@ sub _parent {
     }
     push @new, $e;
   }
+
   return \@new;
 }
 

@@ -734,12 +734,10 @@ sense for a standalone parser.
   say 'Title: ', $tx->res->dom->at('head > title')->text;
 
   # Extract headings
-  $tx->res->dom('h1, h2, h3')->each(sub {
-    say 'Heading: ', shift->all_text;
-  });
+  $tx->res->dom('h1, h2, h3')->each(sub { say 'Heading: ', shift->all_text });
 
   # Visit all elements recursively to extract more than just text
-  for my $e ($tx->res->dom->find('*')->each) {
+  for my $e ($tx->res->dom('*')->each) {
 
     # Text before this element
     print $e->text_before(0);

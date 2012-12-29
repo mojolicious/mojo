@@ -1,5 +1,5 @@
 
-3.71  2012-12-29
+3.71  2012-12-30
   - Modernized ".travis.yml".
   - Improved monkey_patch to patch multiple functions at once. (jberger)
   - Improved documentation.

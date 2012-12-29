@@ -738,7 +738,7 @@ sense for a standalone parser.
     say 'Heading: ', shift->all_text;
   });
 
-  # Visit all children to extract more than just text
+  # Visit all elements recursively to extract more than just text
   for my $e ($tx->res->dom->find('*')->each) {
 
     # Text before this element

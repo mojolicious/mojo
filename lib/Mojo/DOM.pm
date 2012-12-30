@@ -71,7 +71,7 @@ sub attrs {
   return $self;
 }
 
-sub charset { shift->_parser(charset => @_) }
+sub charset { shift->_html(charset => @_) }
 
 sub children {
   my ($self, $type) = @_;
@@ -81,14 +81,11 @@ sub children {
   my $charset = $self->charset;
   my $xml     = $self->xml;
   my $tree    = $self->tree;
-  my $start   = $tree->[0] eq 'root' ? 1 : 4;
-  for my $e (@$tree[$start .. $#$tree]) {
+  for my $e (@$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree]) {
 
-    # Make sure child is a tag
+    # Make sure child is the right type
     next unless $e->[0] eq 'tag';
     next if defined $type && $e->[1] ne $type;
-
-    # Add child
     push @children, $self->new->charset($charset)->tree($e)->xml($xml);
   }
 
@@ -98,19 +95,13 @@ sub children {
 sub content_xml {
   my $self = shift;
 
-  # Walk tree
-  my $result = '';
-  my $tree   = $self->tree;
-  my $start  = $tree->[0] eq 'root' ? 1 : 4;
-  for my $e (@$tree[$start .. $#$tree]) {
-    $result .= Mojo::DOM::HTML->new(
-      charset => $self->charset,
-      tree    => $e,
-      xml     => $self->xml
-    )->render;
-  }
-
-  return $result;
+  # Render children
+  my $tree    = $self->tree;
+  my $charset = $self->charset;
+  my $xml     = $self->xml;
+  return join '', map {
+    Mojo::DOM::HTML->new(charset => $charset, tree => $_, xml => $xml)->render
+  } @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
 }
 
 sub find {
@@ -153,11 +144,7 @@ sub next { shift->_sibling(1) }
 
 sub parent {
   my $self = shift;
-
-  # Not a tag
   return undef if (my $tree = $self->tree)->[0] eq 'root';
-
-  # Parent
   return $self->new->charset($self->charset)->tree($tree->[3])
     ->xml($self->xml);
 }
@@ -204,22 +191,9 @@ sub replace {
 
 sub replace_content {
   my ($self, $new) = @_;
-
-  # Parse
-  $new = $self->_parse("$new");
-
-  # Replacements
   my $tree = $self->tree;
-  my @new;
-  for my $e (@$new[1 .. $#$new]) {
-    $e->[3] = $tree if $e->[0] eq 'tag';
-    push @new, $e;
-  }
-
-  # Replace
-  my $start = $tree->[0] eq 'root' ? 1 : 4;
-  splice @$tree, $start, $#$tree, @new;
-
+  splice @$tree, $tree->[0] eq 'root' ? 1 : 4, $#$tree,
+    @{_parent($self->_parse("$new"), $tree)};
   return $self;
 }
 
@@ -275,7 +249,7 @@ sub text_before {
 
 sub to_xml { shift->[0]->render }
 
-sub tree { shift->_parser(tree => @_) }
+sub tree { shift->_html(tree => @_) }
 
 sub type {
   my ($self, $type) = @_;
@@ -290,18 +264,15 @@ sub type {
   return $self;
 }
 
-sub xml { shift->_parser(xml => @_) }
+sub xml { shift->_html(xml => @_) }
 
 sub _add {
   my ($self, $offset, $new) = @_;
 
-  # Parse
-  $new = $self->_parse("$new");
-
   # Not a tag
   return $self if (my $tree = $self->tree)->[0] eq 'root';
 
-  # Find
+  # Find parent
   my $parent = $tree->[3];
   my $i = $parent->[0] eq 'root' ? 1 : 4;
   for my $e (@$parent[$i .. $#$parent]) {
@@ -309,8 +280,8 @@ sub _add {
     $i++;
   }
 
-  # Add
-  splice @$parent, $i + $offset, 0, @{_parent($new, $parent)};
+  # Add children
+  splice @$parent, $i + $offset, 0, @{_parent($self->_parse("$new"), $parent)};
 
   return $self;
 }
@@ -318,6 +289,13 @@ sub _add {
 sub _elements {
   return [] unless my $e = shift;
   return [@$e[($e->[0] eq 'root' ? 1 : 4) .. $#$e]];
+}
+
+sub _html {
+  my ($self, $method) = (shift, shift);
+  return $self->[0]->$method unless @_;
+  $self->[0]->$method(@_);
+  return $self;
 }
 
 sub _parent {
@@ -342,17 +320,10 @@ sub _parse {
     ->parse(shift)->tree;
 }
 
-sub _parser {
-  my ($self, $method) = (shift, shift);
-  return $self->[0]->$method unless @_;
-  $self->[0]->$method(@_);
-  return $self;
-}
-
 sub _sibling {
   my ($self, $next) = @_;
 
-  # Root
+  # Make sure we have a parent
   return undef unless my $parent = $self->parent;
 
   # Find previous or next sibling

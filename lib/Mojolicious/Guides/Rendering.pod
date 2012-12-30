@@ -186,7 +186,7 @@ shortcut.
 
 Some renderers such as C<ep> allow templates to be passed inline.
 
-  $self->render(inline => 'The result is <%= 1 + 1%>.');
+  $self->render(inline => 'The result is <%= 1 + 1 %>.');
 
 Since auto detection depends on a path you might have to supply a C<handler>
 too.

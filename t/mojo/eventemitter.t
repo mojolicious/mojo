@@ -15,6 +15,15 @@ $e->on(die => sub { die "works!\n" });
 eval { $e->emit('die') };
 is $@, "works!\n", 'right error';
 
+# Unhandled error event
+my $error;
+{
+  local *STDERR;
+  open STDERR, '>', \$error;
+  $e->emit(error => "just works!\n");
+}
+is $error, "just works!\n", 'right error';
+
 # Error fallback
 my ($echo, $err);
 $e->on(error => sub { $err = pop });

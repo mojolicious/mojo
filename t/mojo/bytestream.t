@@ -132,10 +132,10 @@ is $clone->to_string, 'foo', 'clone did not change';
 my $buffer = '';
 open my $handle, '>', \$buffer;
 b('te', 'st')->say($handle);
-my $stdout = *STDOUT;
-*STDOUT = $handle;
-b(1, 2, 3)->say;
-*STDOUT = $stdout;
+{
+  local *STDOUT = $handle;
+  b(1, 2, 3)->say;
+}
 is $buffer, "test\n123\n", 'right output';
 
 # slurp

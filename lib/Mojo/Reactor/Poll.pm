@@ -100,18 +100,17 @@ sub _poll { shift->{poll} ||= IO::Poll->new }
 
 sub _sandbox {
   my ($self, $desc, $cb) = (shift, shift, shift);
-  return if eval { $self->$cb(@_); 1 };
-  $self->once(error => sub { warn $_[1] })
-    unless $self->has_subscribers('error');
-  $self->emit_safe(error => "$desc failed: $@");
+  eval { $self->$cb(@_); 1 } or $self->emit_safe(error => "$desc failed: $@");
 }
 
 sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
+
   my $id;
   do { $id = md5_sum('t' . time . rand 999) } while $self->{timers}{$id};
   my $t = $self->{timers}{$id} = {cb => $cb, time => time + $after};
   $t->{recurring} = $after if $recurring;
+
   return $id;
 }
 

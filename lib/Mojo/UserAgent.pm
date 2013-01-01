@@ -289,11 +289,7 @@ sub _connection {
 
 sub _error {
   my ($self, $id, $err, $emit) = @_;
-
-  # Add error to transaction if possible
   if (my $tx = $self->{connections}{$id}{tx}) { $tx->res->error($err) }
-  $self->once(error => sub { warn $_[1] })
-    if $emit && !$self->has_subscribers('error');
   $self->emit(error => $err) if $emit;
   $self->_handle($id => $err);
 }

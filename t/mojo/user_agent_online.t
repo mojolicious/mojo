@@ -196,10 +196,10 @@ is $tx->req->url,    'http://ipv6.google.com', 'right url';
 is $tx->res->code,   200,                      'right status';
 
 # Simple HTTPS request
-$tx = $ua->get('https://www.metacpan.org');
-is $tx->req->method, 'GET',                      'right method';
-is $tx->req->url,    'https://www.metacpan.org', 'right url';
-is $tx->res->code,   200,                        'right status';
+$tx = $ua->get('https://metacpan.org');
+is $tx->req->method, 'GET',                  'right method';
+is $tx->req->url,    'https://metacpan.org', 'right url';
+is $tx->res->code,   200,                    'right status';
 
 # HTTPS request that requires IPv6
 $tx = $ua->get('https://ipv6.google.com');

@@ -5,6 +5,12 @@ use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->on(error => sub { warn $_[1] if @{$_[0]->subscribers('error')} < 2 });
+  return $self;
+}
+
 sub emit {
   my ($self, $name) = (shift, shift);
 
@@ -30,11 +36,7 @@ sub emit_safe {
         if ($name eq 'error') { warn qq{Event "error" failed: $@} }
 
         # Normal event failed
-        else {
-          $self->once(error => sub { warn $_[1] })
-            unless $self->has_subscribers('error');
-          $self->emit_safe('error', qq{Event "$name" failed: $@});
-        }
+        else { $self->emit_safe('error', qq{Event "$name" failed: $@}) }
       }
     }
   }
@@ -117,6 +119,13 @@ L<Mojo::EventEmitter> is a simple base class for event emitting objects.
 
 L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
+
+=head2 C<new>
+
+  my $e = Mojo::EventEmitter->new;
+
+Construct a new L<Mojo::EventEmitter> object and subscribe to C<error> event
+with default error handling.
 
 =head2 C<emit>
 

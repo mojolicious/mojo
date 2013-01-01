@@ -40,12 +40,6 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
 
 sub DESTROY { shift->_cleanup }
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->on(error => sub { warn $_[1] });
-  return $self;
-}
-
 sub app {
   my ($self, $app) = @_;
 
@@ -295,7 +289,11 @@ sub _connection {
 
 sub _error {
   my ($self, $id, $err, $emit) = @_;
+
+  # Add error to transaction if possible
   if (my $tx = $self->{connections}{$id}{tx}) { $tx->res->error($err) }
+  $self->once(error => sub { warn $_[1] })
+    if $emit && !$self->has_subscribers('error');
   $self->emit(error => $err) if $emit;
   $self->_handle($id => $err);
 }
@@ -780,13 +778,6 @@ Transaction builder, defaults to a L<Mojo::UserAgent::Transactor> object.
 
 L<Mojo::UserAgent> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
-
-=head2 C<new>
-
-  my $ua = Mojo::UserAgent->new;
-
-Construct a new L<Mojo::UserAgent> object and subscribe to C<error> event with
-default error handling.
 
 =head2 C<app>
 

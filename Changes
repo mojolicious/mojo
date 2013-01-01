@@ -1,6 +1,7 @@
 
-3.71  2013-01-01
+3.71  2013-01-02
   - Modernized ".travis.yml".
+  - Improved Mojo::UserAgent to warn more often about failed events.
   - Improved monkey_patch to patch multiple functions at once. (jberger)
   - Improved documentation.
   - Fixed small memory leak in Mojo::DOM.

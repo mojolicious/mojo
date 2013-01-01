@@ -18,7 +18,7 @@ has ua   => sub {
   # Fresh user agent
   my $ua = Mojo::UserAgent->new->app($self);
   weaken $self;
-  $ua->unsubscribe('error')->on(error => sub { $self->log->error(pop) });
+  $ua->on(error => sub { $self->log->error($_[1]) });
   weaken $ua->{app};
 
   return $ua;

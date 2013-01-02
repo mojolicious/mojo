@@ -596,7 +596,8 @@ See L<Mojolicious::Guides::Cookbook> for more.
 
 =head1 EVENTS
 
-L<Mojo::UserAgent> can emit the following events.
+L<Mojo::UserAgent> inherits all events from L<Mojo::EventEmitter> and can emit
+the following new ones.
 
 =head2 C<error>
 

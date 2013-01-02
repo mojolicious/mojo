@@ -98,7 +98,8 @@ L<Mojo::Log> is a simple logger for L<Mojo> projects.
 
 =head1 EVENTS
 
-L<Mojo::Log> can emit the following events.
+L<Mojo::Log> inherits all events from L<Mojo::EventEmitter> and can emit the
+following new ones.
 
 =head2 C<message>
 

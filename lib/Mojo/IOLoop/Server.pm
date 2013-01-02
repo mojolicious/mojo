@@ -182,7 +182,8 @@ L<Mojo::IOLoop::Server> accepts TCP connections for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::Server> can emit the following events.
+L<Mojo::IOLoop::Server> inherits all events from L<Mojo::EventEmitter> and can
+emit the following new ones.
 
 =head2 C<accept>
 

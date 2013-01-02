@@ -101,7 +101,8 @@ L<Mojo::Transaction> is an abstract base class for transactions.
 
 =head1 EVENTS
 
-L<Mojo::Transaction> can emit the following events.
+L<Mojo::Transaction> inherits all events from L<Mojo::EventEmitter> and can
+emit the following new ones.
 
 =head2 C<connection>
 

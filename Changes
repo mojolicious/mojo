@@ -1,4 +1,7 @@
 
+3.72  2013-01-03
+  - Improved documentation.
+
 3.71  2013-01-02
   - Modernized ".travis.yml".
   - Improved Mojo::EventEmitter to warn about unhandled error events.

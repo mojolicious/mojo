@@ -109,7 +109,8 @@ L<Mojo::IOLoop::Delay> controls the flow of events for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::Delay> can emit the following events.
+L<Mojo::IOLoop::Delay> inherits all events from L<Mojo::EventEmitter> and can
+emit the following new ones.
 
 =head2 C<finish>
 

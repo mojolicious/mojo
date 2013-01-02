@@ -165,6 +165,10 @@ Mojo::Asset::File - File storage for HTTP content
 
 L<Mojo::Asset::File> is a file storage backend for HTTP content.
 
+=head1 EVENTS
+
+L<Mojo::Asset::File> inherits all events from L<Mojo::Asset>.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and

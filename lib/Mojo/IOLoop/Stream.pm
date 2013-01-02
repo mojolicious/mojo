@@ -195,7 +195,8 @@ L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::Stream> can emit the following events.
+L<Mojo::IOLoop::Stream> inherits all events from L<Mojo::EventEmitter> and can
+emit the following new ones.
 
 =head2 C<close>
 

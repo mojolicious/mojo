@@ -40,6 +40,10 @@ Mojo::Asset - HTTP content storage base class
 
 L<Mojo::Asset> is an abstract base class for HTTP content storage.
 
+=head1 EVENTS
+
+L<Mojo::Asset> inherits all events from L<Mojo::EventEmitter>.
+
 =head1 ATTRIBUTES
 
 L<Mojo::Asset> implements the following attributes.

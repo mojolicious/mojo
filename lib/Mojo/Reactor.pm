@@ -62,7 +62,8 @@ L<Mojo::Reactor> is an abstract base class for low level event reactors.
 
 =head1 EVENTS
 
-L<Mojo::Reactor> can emit the following events.
+L<Mojo::Reactor> inherits all events from L<Mojo::EventEmitter> and can emit
+the following new ones.
 
 =head2 C<error>
 

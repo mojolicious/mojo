@@ -394,7 +394,8 @@ RFC 2616 and RFC 2388.
 
 =head1 EVENTS
 
-L<Mojo::Message> can emit the following events.
+L<Mojo::Message> inherits all events from L<Mojo::EventEmitter> and can emit
+the following new ones.
 
 =head2 C<finish>
 

@@ -80,6 +80,10 @@ Mojolicious::Plugins - Plugin manager
 
 L<Mojolicious::Plugins> is the plugin manager of L<Mojolicious>.
 
+=head1 EVENTS
+
+L<Mojolicious::Plugins> inherits all events from L<Mojo::EventEmitter>.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Plugins> implements the following attributes.

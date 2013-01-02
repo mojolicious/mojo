@@ -115,6 +115,24 @@ Mojo::EventEmitter - Event emitter base class
 
 L<Mojo::EventEmitter> is a simple base class for event emitting objects.
 
+=head1 EVENTS
+
+L<Mojo::EventEmitter> can emit the following events.
+
+=head2 C<error>
+
+  $e->on(error => sub {
+    my ($e, $err) = @_;
+    ...
+  });
+
+Emitted safely for event errors.
+
+  $e->on(error => sub {
+    my ($e, $err) = @_;
+    say "This looks bad: $err";
+  });
+
 =head1 METHODS
 
 L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and

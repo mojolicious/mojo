@@ -165,7 +165,8 @@ L<Mojo::IOLoop::Client> opens TCP connections for L<Mojo::IOLoop>.
 
 =head1 EVENTS
 
-L<Mojo::IOLoop::Client> can emit the following events.
+L<Mojo::IOLoop::Client> inherits all events from L<Mojo::EventEmitter> and can
+emit the following new ones.
 
 =head2 C<connect>
 

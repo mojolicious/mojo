@@ -363,7 +363,8 @@ RFC 2616.
 
 =head1 EVENTS
 
-L<Mojo::Content> can emit the following events.
+L<Mojo::Content> inherits all events from L<Mojo::EventEmitter> and can emit
+the following new ones.
 
 =head2 C<body>
 

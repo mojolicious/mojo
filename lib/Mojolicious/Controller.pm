@@ -547,8 +547,8 @@ implements the following new ones.
 
 Access request cookie values and create new response cookies.
 
-  # Create response cookie with domain
-  $c->cookie(name => 'sebastian', {domain => 'mojolicio.us'});
+  # Create response cookie with domain and expiration date
+  $c->cookie(user => 'sri', {domain => 'mojolicio.us', expires => time + 60});
 
 =head2 C<finish>
 

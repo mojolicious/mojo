@@ -107,6 +107,10 @@ Very Perl-ish and minimalistic template system.
 
 Countless portable and very convenient bytestream manipulation methods.
 
+=item L<Mojolicious::Plugins>
+
+Versatile plugin system.
+
 =item L<Mojolicious::Commands>
 
 Pluggable command line system and the backbone of the L<mojo> script.

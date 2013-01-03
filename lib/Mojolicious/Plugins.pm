@@ -82,57 +82,62 @@ L<Mojolicious::Plugins> is the plugin manager of L<Mojolicious>.
 
 =head1 PLUGINS
 
-These plugins are included in the L<Mojolicious> distribution as examples.
+The following plugins are included in the L<Mojolicious> distribution as
+examples.
 
-=head2 L<Mojolicious::Plugin::Charset>
+=over 2
+
+=item L<Mojolicious::Plugin::Charset>
 
 Change the application charset.
 
-=head2 L<Mojolicious::Plugin::Config>
+=item L<Mojolicious::Plugin::Config>
 
 Perl-ish configuration files.
 
-=head2 L<Mojolicious::Plugin::DefaultHelpers>
+=item L<Mojolicious::Plugin::DefaultHelpers>
 
 General purpose helper collection, loaded automatically.
 
-=head2 L<Mojolicious::Plugin::EPLRenderer>
+=item L<Mojolicious::Plugin::EPLRenderer>
 
 Renderer for plain embedded Perl templates, loaded automatically.
 
-=head2 L<Mojolicious::Plugin::EPRenderer>
+=item L<Mojolicious::Plugin::EPRenderer>
 
 Renderer for more sophisiticated embedded Perl templates, loaded
 automatically.
 
-=head2 L<Mojolicious::Plugin::HeaderCondition>
+=item L<Mojolicious::Plugin::HeaderCondition>
 
 Route condition for all kinds of headers, loaded automatically.
 
-=head2 L<Mojolicious::Plugin::JSONConfig>
+=item L<Mojolicious::Plugin::JSONConfig>
 
 JSON configuration files.
 
-=head2 L<Mojolicious::Plugin::Mount>
+=item L<Mojolicious::Plugin::Mount>
 
 Mount whole L<Mojolicious> applications.
 
-=head2 L<Mojolicious::Plugin::PODRenderer>
+=item L<Mojolicious::Plugin::PODRenderer>
 
 Renderer for turning POD into HTML and documentation browser for
 L<Mojolicious::Guides>.
 
-=head2 L<Mojolicious::Plugin::PoweredBy>
+=item L<Mojolicious::Plugin::PoweredBy>
 
 Add an C<X-Powered-By> header to outgoing responses, loaded automatically.
 
-=head2 L<Mojolicious::Plugin::RequestTimer>
+=item L<Mojolicious::Plugin::RequestTimer>
 
 Log timing information, loaded automatically.
 
-=head2 L<Mojolicious::Plugin::TagHelpers>
+=item L<Mojolicious::Plugin::TagHelpers>
 
 Template specific helper collection, loaded automatically.
+
+=back
 
 =head1 EVENTS
 

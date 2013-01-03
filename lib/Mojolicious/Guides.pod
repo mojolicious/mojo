@@ -105,7 +105,8 @@ Very Perl-ish and minimalistic template system.
 
 =item L<Mojo::ByteStream>
 
-Countless portable and very convenient bytestream manipulation methods.
+A friendly API for many of the portable and very convenient utility functions
+provided by L<Mojo::Util>.
 
 =item L<Mojolicious::Plugins>
 
@@ -113,7 +114,7 @@ Versatile plugin system.
 
 =item L<Mojolicious::Commands>
 
-Pluggable command line system and the backbone of the L<mojo> script.
+Pluggable command line system.
 
 =item L<Test::Mojo>
 

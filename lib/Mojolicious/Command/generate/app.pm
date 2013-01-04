@@ -63,6 +63,10 @@ use lib "$FindBin::Bin/../lib";
 require Mojolicious::Commands;
 Mojolicious::Commands->start_app('<%= $class %>');
 
+# or so even then you define app constructor 
+# use <%= $class %>;
+# <%= $class %>->new(%foo_args)->start(@ARGV);
+
 @@ appclass
 % my $class = shift;
 package <%= $class %>;

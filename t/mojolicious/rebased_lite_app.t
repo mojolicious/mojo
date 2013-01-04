@@ -47,7 +47,7 @@ my $t = Test::Mojo->new;
 # GET /
 $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
   ->content_is(<<EOF);
-<base href="http://kraih.com/rebased/" />
+http://kraih.com/rebased/
 <script src="/rebased/js/jquery.js"></script>
 <img src="/rebased/images/test.png" />
 http://kraih.com/rebased/foo
@@ -60,7 +60,7 @@ EOF
 # GET /foo
 $t->get_ok('/foo')->status_is(200)->header_is('X-Route' => 'foo')
   ->content_is(<<EOF);
-<base href="http://kraih.com/rebased/" />
+http://kraih.com/rebased/
 <link href="/rebased/b.css" media="test" rel="stylesheet" />
 <img alt="Test" src="/rebased/images/test.png" />
 http://kraih.com/rebased
@@ -78,7 +78,7 @@ ok $t->ua->cookie_jar->find($t->ua->app_url->path('/foo')), 'session cookie';
 
 # GET /foo (with flash message)
 $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
-<base href="http://kraih.com/rebased/" />works!too!
+http://kraih.com/rebased/works!too!
 <link href="/rebased/b.css" media="test" rel="stylesheet" />
 <img alt="Test" src="/rebased/images/test.png" />
 http://kraih.com/rebased
@@ -90,7 +90,7 @@ EOF
 # GET /baz
 $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
   ->content_is(<<EOF);
-<base href="http://kraih.com/rebased/" />
+http://kraih.com/rebased/
 <script src="/rebased/js/jquery.js"></script>
 <img src="/rebased/images/test.png" />
 http://kraih.com/rebased/foo
@@ -106,7 +106,7 @@ done_testing();
 
 __DATA__
 @@ root.html.ep
-%= base_tag
+%= $self->req->url->base
 %= javascript '/js/jquery.js'
 %= image '/images/test.png'
 %= url_for('foo')->to_abs
@@ -118,7 +118,7 @@ __DATA__
 % }
 
 @@ foo.html.ep
-<%= base_tag %><%= flash 'just' || '' %><%= flash 'works' || '' %>
+<%= $self->req->url->base %><%= flash 'just' || '' %><%= flash 'works' || '' %>
 %= stylesheet '/b.css', media => 'test'
 %= image '/images/test.png', alt => 'Test'
 %= url_for('root')->to_abs

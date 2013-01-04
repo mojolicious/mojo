@@ -1,5 +1,6 @@
 
-3.72  2013-01-04
+3.72  2013-01-05
+  - Deprecated base_tag helper.
   - Improved documentation.
 
 3.71  2013-01-02

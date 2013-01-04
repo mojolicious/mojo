@@ -893,7 +893,7 @@ $t->get_ok('/foo_wildcard_too/')->status_is(404);
 # GET /with/header/condition
 $t->get_ok('/with/header/condition',
   {'X-Secret-Header' => 'bar', 'X-Another-Header' => 'baz'})->status_is(200)
-  ->content_like(qr!^Test ok<base href="http://localhost!);
+  ->content_is("Test ok!\n");
 
 # GET /with/header/condition (missing headers)
 $t->get_ok('/with/header/condition')->status_is(404)->content_like(qr/Oops!/);
@@ -1268,7 +1268,7 @@ text!
 <%= $self->match->endpoint->name %>
 
 @@ with_header_condition.html.ep
-Test ok<%= base_tag %>
+Test ok!
 
 @@ root.html.epl
 % my $self = shift;

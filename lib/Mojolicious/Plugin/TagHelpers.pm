@@ -13,9 +13,13 @@ sub register {
     $app->helper("${name}_field" => sub { _input(@_, type => $name) });
   }
 
-  # Add "base_tag" helper
+  # DEPRECATED in Rainbow!
   $app->helper(
-    base_tag => sub { _tag('base', href => shift->req->url->base, @_) });
+    base_tag => sub {
+      warn "base_tag is DEPRECATED!!!\n";
+      _tag('base', href => shift->req->url->base, @_);
+    }
+  );
 
   # Add "checkbox" helper
   $app->helper(check_box =>
@@ -298,14 +302,6 @@ example for learning how to build new plugins, you're welcome to fork it.
 =head1 HELPERS
 
 L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
-
-=head2 C<base_tag>
-
-  %= base_tag
-
-Generate portable C<base> tag refering to the current base URL.
-
-  <base href="http://localhost/cgi-bin/myapp.pl" />
 
 =head2 C<check_box>
 

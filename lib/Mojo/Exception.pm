@@ -16,12 +16,6 @@ sub new {
   return @_ ? $self->_detect(@_) : $self;
 }
 
-# DEPRECATED in Rainbow!
-sub raw_message {
-  warn "Mojo::Exception->raw_message has been DEPRECATED!\n";
-  shift->message(@_);
-}
-
 sub throw { die shift->new->trace(2)->_detect(@_) }
 
 sub to_string {
@@ -184,8 +178,8 @@ Exception message.
   my $verbose = $e->verbose;
   $e          = $e->verbose(1);
 
-Activate verbose rendering, defaults to the value of
-C<MOJO_EXCEPTION_VERBOSE> or C<0>.
+Activate verbose rendering, defaults to the value of the
+C<MOJO_EXCEPTION_VERBOSE> environment variable or C<0>.
 
 =head1 METHODS
 

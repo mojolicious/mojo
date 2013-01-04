@@ -8,7 +8,7 @@ plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!'
   unless eval 'use Test::Pod::Coverage 1.04; 1';
 
 # DEPRECATED in Rainbow!
-my @rainbow = qw(namespace raw_message);
+my @rainbow = qw(namespace);
 
 # False positive constants
 all_pod_coverage_ok({also_private => [@rainbow, qw(IPV6 TLS)]});

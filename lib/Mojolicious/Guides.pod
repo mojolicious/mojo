@@ -107,11 +107,6 @@ A minimalistic event loop with support for multiple reactor backends.
 
 Very Perl-ish and minimalistic template system.
 
-=item L<Mojo::ByteStream>
-
-A friendly API for many of the portable and very convenient utility functions
-provided by L<Mojo::Util>.
-
 =item L<Test::Mojo>
 
 Test driven development toolkit for web applications.

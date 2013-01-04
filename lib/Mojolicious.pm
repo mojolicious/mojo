@@ -534,7 +534,9 @@ the default controller object)
   $app->plugin('MyApp::Plugin::SomeThing', foo => 23);
   $app->plugin('MyApp::Plugin::SomeThing', {foo => 23});
 
-Load a plugin with L<Mojolicious::Plugins/"register_plugin">.
+Load a plugin with L<Mojolicious::Plugins/"register_plugin">, for a full list
+of example plugins included in the L<Mojolicious> distribution see
+L<Mojolicious::Plugins/"PLUGINS">.
 
 =head2 C<start>
 
@@ -542,7 +544,8 @@ Load a plugin with L<Mojolicious::Plugins/"register_plugin">.
   $app->start(@ARGV);
 
 Start the command line interface for your application with
-L<Mojolicious::Commands/"start">.
+L<Mojolicious::Commands/"start">, for a full list of commands available by
+default see L<Mojolicious::Commands/"COMMANDS">.
 
   # Always start daemon and ignore @ARGV
   $app->start('daemon', '-l', 'http://*:8080');

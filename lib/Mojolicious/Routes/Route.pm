@@ -446,7 +446,7 @@ Check if this route is a WebSocket.
   $r       = $r->name('foo');
 
 The name of this route, defaults to an automatically generated name based on
-the route pattern. Note that the name C<current> is reserved for refering to
+the route pattern. Note that the name C<current> is reserved for referring to
 the current route.
 
   $r->get('/user')->to('user#show')->name('show_user');

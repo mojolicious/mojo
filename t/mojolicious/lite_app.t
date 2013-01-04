@@ -516,6 +516,9 @@ get '/dynamic/inline' => sub {
   $self->render(inline => 'dynamic inline ' . $dynamic_inline++);
 };
 
+# GET /base_tag
+get '/base_tag';
+
 # Oh Fry, I love you more than the moon, and the stars,
 # and the POETIC IMAGE NUMBER 137 NOT FOUND
 my $t = Test::Mojo->new;
@@ -1237,6 +1240,9 @@ $t->get_ok('/dynamic/inline')->status_is(200)
 $t->get_ok('/dynamic/inline')->status_is(200)
   ->content_is("dynamic inline 2\n");
 
+$t->get_ok( $t->ua->app_url->userinfo('secret:pass')->path('/base_tag') )
+  ->status_is(200)->content_unlike(qr/secret/);
+
 done_testing();
 
 __DATA__
@@ -1329,6 +1335,9 @@ Not a favicon!
 %== url_with('http://mojolicio.us/test')
 %== url_with('/test')->query([foo => undef])
 %== url_with('bartest', test => 23)->query([foo => 'yada'])
+
+@@ base_tag.html.ep
+base tag : <%= base_tag %>
 
 __END__
 This is not a template!

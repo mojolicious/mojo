@@ -1,4 +1,7 @@
 
+3.73  2013-01-06
+  - Improved name detection in Mojolicious::Plugin::Config.
+
 3.72  2013-01-05
   - Deprecated base_tag helper.
   - Improved documentation.

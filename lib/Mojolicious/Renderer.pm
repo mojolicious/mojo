@@ -27,17 +27,8 @@ sub new {
   return $self->add_handler(data => \&_data)->add_handler(text => \&_text);
 }
 
-sub add_handler {
-  my ($self, $name, $cb) = @_;
-  $self->handlers->{$name} = $cb;
-  return $self;
-}
-
-sub add_helper {
-  my ($self, $name, $cb) = @_;
-  $self->helpers->{$name} = $cb;
-  return $self;
-}
+sub add_handler { shift->_add(handlers => @_) }
+sub add_helper  { shift->_add(helpers  => @_) }
 
 sub get_data_template {
   my ($self, $options) = @_;
@@ -156,6 +147,12 @@ sub template_path {
 
   # Fall back to first path
   return catfile($self->paths->[0], split '/', $name);
+}
+
+sub _add {
+  my ($self, $attr, $name, $cb) = @_;
+  $self->$attr->{$name} = $cb;
+  return $self;
 }
 
 sub _bundled { $TEMPLATES{"@{[pop]}.html.ep"} }

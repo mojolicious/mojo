@@ -201,7 +201,7 @@ Captured parameters with nesting history.
 =head1 METHODS
 
 L<Mojolicious::Routes::Match> inherits all methods from L<Mojo::Base> and
-implements the following ones.
+implements the following new ones.
 
 =head2 C<new>
 

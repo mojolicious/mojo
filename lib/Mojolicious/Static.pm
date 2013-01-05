@@ -169,7 +169,7 @@ Directories to serve static files from, first one has the highest precedence.
 =head1 METHODS
 
 L<Mojolicious::Static> inherits all methods from L<Mojo::Base> and implements
-the following ones.
+the following new ones.
 
 =head2 C<dispatch>
 

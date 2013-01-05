@@ -349,7 +349,7 @@ Contains all available shortcuts.
 =head1 METHODS
 
 L<Mojolicious::Routes> inherits all methods from
-L<Mojolicious::Routes::Route> and implements the following ones.
+L<Mojolicious::Routes::Route> and implements the following new ones.
 
 =head2 C<add_condition>
 

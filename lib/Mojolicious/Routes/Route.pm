@@ -324,7 +324,7 @@ Pattern for this route, defaults to a L<Mojolicious::Routes::Pattern> object.
 =head1 METHODS
 
 L<Mojolicious::Routes::Route> inherits all methods from L<Mojo::Base> and
-implements the following ones.
+implements the following new ones.
 
 =head2 C<new>
 

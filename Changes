@@ -3,6 +3,7 @@
   - Deprecated Mojolicious::Commands->start in favor of
     Mojolicious::Commands->start_app.
   - Improved name detection in Mojolicious::Plugin::Config.
+  - Improved documentation.
 
 3.72  2013-01-05
   - Deprecated base_tag helper.

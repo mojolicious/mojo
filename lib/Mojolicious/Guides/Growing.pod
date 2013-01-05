@@ -551,7 +551,7 @@ allow running unit tests again.
   use lib 'lib';
   use Mojolicious::Commands;
 
-  # Start commands for application
+  # Start command line interface for application
   Mojolicious::Commands->start_app('MyApp');
 
 =head2 Controller class
@@ -651,7 +651,7 @@ Only a few small details change.
   use FindBin;
   use lib "$FindBin::Bin/../lib";
 
-  # Start commands for application
+  # Start command line interface for application
   require Mojolicious::Commands;
   Mojolicious::Commands->start_app('MyApp');
 

@@ -59,7 +59,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-# Start commands for application
+# Start command line interface for application
 require Mojolicious::Commands;
 Mojolicious::Commands->start_app('<%= $class %>');
 

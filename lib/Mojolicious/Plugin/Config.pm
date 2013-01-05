@@ -39,10 +39,10 @@ sub register {
   unless ($file) {
 
     # Executable
-    if ($app->isa('Mojolicious::Lite')) { $file = basename($ENV{MOJO_EXE}) }
+    if ($app->isa('Mojolicious::Lite')) { $file = basename $ENV{MOJO_EXE} }
 
     # Class
-    else { $file = decamelize(ref $app) }
+    else { $file = decamelize ref $app }
 
     # Replace ".pl" and ".t" with default extension
     $file =~ s/\.(?:pl|t)$//i;

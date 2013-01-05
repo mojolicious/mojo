@@ -34,25 +34,11 @@ is ref Mojolicious::Commands->run('psgi'), 'CODE', 'right reference';
   is ref Mojolicious::Commands->start_app('MojoliciousTest'),
     'MojoliciousTest', 'right class';
 }
-{
-  local $ENV{MOJO_APP_LOADER} = 1;
-  local $ENV{MOJO_APP}        = 'MojoliciousTest';
-  is ref Mojolicious::Commands->start, 'MojoliciousTest', 'right class';
-}
-{
-  local $ENV{MOJO_APP_LOADER} = 1;
-  local $ENV{MOJO_APP};
-  is ref Mojolicious::Commands->start, 'Mojolicious::Lite', 'right class';
-}
 
 # Start application with command
 {
   is ref Mojolicious::Commands->start_app(MojoliciousTest => 'psgi'), 'CODE',
     'right reference';
-}
-{
-  local $ENV{MOJO_APP};
-  is ref Mojolicious::Commands->start('psgi'), 'CODE', 'right reference';
 }
 
 # Start application with application specific command

@@ -109,7 +109,12 @@ sub run {
   return print $self->hint;
 }
 
+# DEPRECATED in Rainbow!
 sub start {
+  warn <<EOF;
+Mojolicious::Commands->start is DEPRECATED in favor of
+Mojolicious::Commands->start_app!!!
+EOF
   my $self = shift;
   return $self->start_app($ENV{MOJO_APP} => @_) if $ENV{MOJO_APP};
   return $self->new->app->start(@_);
@@ -316,17 +321,6 @@ Try to detect environment.
 
 Load and run commands. Automatic deployment environment detection can be
 disabled with the C<MOJO_NO_DETECT> environment variable.
-
-=head2 C<start>
-
-  Mojolicious::Commands->start;
-  Mojolicious::Commands->start(@ARGV);
-
-Start the command line interface for application from the value of the
-C<MOJO_APP> environment variable or L<Mojo::HelloWorld>.
-
-  # Always start daemon and ignore @ARGV
-  Mojolicious::Commands->start('daemon', '-l', 'http://*:8080');
 
 =head2 C<start_app>
 

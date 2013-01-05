@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 require Mojolicious::Commands;
-Mojolicious::Commands->start;
+Mojolicious::Commands->start_app('Mojo::HelloWorld');
 
 =head1 NAME
 

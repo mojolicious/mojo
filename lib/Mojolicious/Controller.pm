@@ -967,7 +967,7 @@ invoked once all data has been written.
     });
   });
 
-For Comet (C<long polling>) you might also want to increase the inactivity
+For Comet (long polling) you might also want to increase the inactivity
 timeout, which usually defaults to C<15> seconds.
 
   # Increase inactivity timeout for connection to 300 seconds

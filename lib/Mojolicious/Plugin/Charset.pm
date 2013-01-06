@@ -54,7 +54,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
   $plugin->register(Mojolicious->new, {charset => 'Shift_JIS'});
 
-Register plugin hooks in L<Mojolicious> application.
+Register hooks in L<Mojolicious> application.
 
 =head1 SEE ALSO
 

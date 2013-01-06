@@ -751,8 +751,8 @@ of the response, which is C<text/html;charset=UTF-8> by default.
   $c = $c->rendered;
   $c = $c->rendered(302);
 
-Finalize response and emit C<after_dispatch> plugin hook, defaults to using a
-C<200> response code.
+Finalize response and emit C<after_dispatch> hook, defaults to using a C<200>
+response code.
 
 =head2 C<req>
 

@@ -52,7 +52,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
   $plugin->register(Mojolicious->new);
   $plugin->register(Mojolicious->new, {name => 'MyFramework 1.0'});
 
-Register plugin hooks in L<Mojolicious> application.
+Register hooks in L<Mojolicious> application.
 
 =head1 SEE ALSO
 

@@ -523,6 +523,7 @@ my $t = Test::Mojo->new;
 # Application is already available
 is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
 is $t->app, app->commands->app, 'applications are equal';
+is $t->app->moniker, 'lite_app', 'right moniker';
 
 # GET /☃
 $t->get_ok('/☃')->status_is(200)->content_is('/%E2%98%83/%E2%98%83');

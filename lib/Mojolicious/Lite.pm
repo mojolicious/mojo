@@ -2,7 +2,7 @@ package Mojolicious::Lite;
 use Mojo::Base 'Mojolicious';
 
 # "Bender: Bite my shiny metal ass!"
-use File::Basename 'dirname';
+use File::Basename qw(basename dirname);
 use File::Spec::Functions 'catdir';
 use Mojo::UserAgent;
 use Mojo::Util 'monkey_patch';
@@ -21,6 +21,11 @@ sub import {
   no strict 'refs';
   push @{"${caller}::ISA"}, 'Mojo';
   my $app = shift->new;
+
+  # Moniker
+  my $moniker = basename $ENV{MOJO_EXE};
+  $moniker =~ s/\.(?:pl|t)$//i;
+  $app->moniker($moniker);
 
   # Initialize routes
   my $routes = $app->routes->namespaces([]);

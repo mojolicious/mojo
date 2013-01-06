@@ -4,6 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
+use Mojo::Util 'decamelize';
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -21,6 +22,7 @@ has commands => sub {
 };
 has controller_class => 'Mojolicious::Controller';
 has mode => sub { $ENV{MOJO_MODE} || 'development' };
+has moniker  => sub { decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };
 has routes   => sub { Mojolicious::Routes->new };
@@ -271,6 +273,15 @@ the application class, which will be called right before C<startup>.
 Right before calling C<startup> and mode specific methods, L<Mojolicious>
 will pick up the current mode, name the log file after it and raise the log
 level from C<debug> to C<info> if it has a value other than C<development>.
+
+=head2 C<moniker>
+
+  my $moniker = $app->moniker;
+  $app        = $app->moniker('foo_bar');
+
+Moniker of this application, often used as default filename for configuration
+files and the like, defaults to decamelizing the application class with
+L<Mojo::Util/"decamelize">.
 
 =head2 C<plugins>
 

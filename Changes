@@ -2,6 +2,7 @@
 3.73  2013-01-06
   - Deprecated Mojolicious::Commands->start in favor of
     Mojolicious::Commands->start_app.
+  - Added moniker attribute to Mojolicious.
   - Added after_render hook.
   - Improved name detection in Mojolicious::Plugin::Config.
   - Improved documentation.

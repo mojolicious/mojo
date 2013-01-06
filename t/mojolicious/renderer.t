@@ -1,51 +1,44 @@
 use Mojo::Base -strict;
 
 use Test::More;
-use Mojolicious;
 use Mojolicious::Controller;
-use Mojolicious::Renderer;
 
-# Fresh controller
+# Partial rendering
 my $c = Mojolicious::Controller->new;
+$c->app->log->level('fatal');
 is $c->render(text => 'works', partial => 1), 'works', 'renderer is working';
 
-# Controller with application
-$c = Mojolicious::Controller->new(app => Mojolicious->new);
-$c->app->log->path(undef);
-$c->app->log->level('fatal');
-$c->app->types->type(debug => 'text/debug');
-my $r = Mojolicious::Renderer->new(default_format => 'debug');
+# Normal rendering with default format
+my $r = $c->app->renderer->default_format('test');
 $r->add_handler(
   debug => sub {
     my ($self, $c, $output) = @_;
     $$output .= 'Hello Mojo!';
   }
 );
-
-# Normal rendering with custom format
 $c->stash->{template} = 'something';
 $c->stash->{handler}  = 'debug';
-is_deeply [$r->render($c)], ['Hello Mojo!', 'text/debug'], 'normal rendering';
+is_deeply [$r->render($c)], ['Hello Mojo!', 'test'], 'normal rendering';
 
 # Normal rendering with custom format
 $c->stash->{format}   = 'something';
 $c->stash->{template} = 'something';
 $c->stash->{handler}  = 'debug';
-is_deeply [$r->render($c)], ['Hello Mojo!', 'text/plain'], 'normal rendering';
+is_deeply [$r->render($c)], ['Hello Mojo!', 'something'], 'normal rendering';
 
 # Normal rendering with layout
 delete $c->stash->{format};
 $c->stash->{template} = 'something';
 $c->stash->{layout}   = 'something';
 $c->stash->{handler}  = 'debug';
-is_deeply [$r->render($c)], ['Hello Mojo!Hello Mojo!', 'text/debug'],
+is_deeply [$r->render($c)], ['Hello Mojo!Hello Mojo!', 'test'],
   'normal rendering with layout';
 is delete $c->stash->{layout}, 'something';
 
 # Rendering a path with dots
 $c->stash->{template} = 'some.path.with.dots/template';
 $c->stash->{handler}  = 'debug';
-is_deeply [$r->render($c)], ['Hello Mojo!', 'text/debug'],
+is_deeply [$r->render($c)], ['Hello Mojo!', 'test'],
   'rendering a path with dots';
 
 # Unrecognized handler

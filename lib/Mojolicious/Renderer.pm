@@ -122,7 +122,7 @@ sub render {
       if !$partial && $options->{encoding} && $output;
   }
 
-  return $output, $c->app->types->type($format) || 'text/plain';
+  return $output, $format;
 }
 
 sub template_name {
@@ -265,8 +265,7 @@ highest precedence, defaults to C<main>.
   my $default = $renderer->default_format;
   $renderer   = $renderer->default_format('html');
 
-The default format to render if C<format> is not set in the stash. The
-renderer will use L<Mojolicious/"types"> to look up the content MIME type.
+The default format to render if C<format> is not set in the stash.
 
 =head2 C<default_handler>
 
@@ -343,8 +342,8 @@ Get a C<DATA> section template by name, usually used by handlers.
 
 =head2 C<render>
 
-  my ($output, $type) = $renderer->render(Mojolicious::Controller->new);
-  my ($output, $type) = $renderer->render(Mojolicious::Controller->new, {
+  my ($output, $format) = $renderer->render(Mojolicious::Controller->new);
+  my ($output, $format) = $renderer->render(Mojolicious::Controller->new, {
     template => 'foo/bar',
     foo      => 'bar'
   });

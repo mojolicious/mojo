@@ -35,6 +35,13 @@ is app->test_helper3->{foo}, 'bar', 'right result';
 # Test renderer
 app->renderer->add_handler(dead => sub { die 'renderer works!' });
 
+# Test filter
+hook after_render => sub {
+  my ($self, $output, $format) = @_;
+  return unless $self->stash->{reverse};
+  $$output = reverse $$output . $format;
+};
+
 # UTF-8 text
 app->types->type(txt => 'text/plain;charset=UTF-8');
 
@@ -80,7 +87,7 @@ get '/noformat' => [format => 0] => {format => 'xml'} => sub {
 };
 
 # DELETE /
-del sub { shift->render(text => 'Hello!') };
+del sub { shift->render(text => 'Hello!', reverse => 1) };
 
 # * /
 any sub { shift->render(text => 'Bye!') };
@@ -565,7 +572,8 @@ $t->get_ok('/', '1234' x 1024)->status_is(200)
 
 # DELETE /
 $t->delete_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Hello!');
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_is('lmth!olleH');
 
 # POST /
 $t->post_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')

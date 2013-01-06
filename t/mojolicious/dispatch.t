@@ -24,9 +24,7 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::Transaction::HTTP;
 use Mojo::Upload;
-use Mojolicious;
 use Mojolicious::Controller;
-use Mojolicious::Routes;
 
 # Fresh controller
 my $c = Mojolicious::Controller->new;
@@ -82,10 +80,9 @@ is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name,
   'bar', 'right value';
 
 # Controller with application and routes
-$c = Test::Controller->new(app => Mojolicious->new);
-$c->app->log->path(undef);
+$c = Test::Controller->new;
 $c->app->log->level('fatal');
-my $d = Mojolicious::Routes->new;
+my $d = $c->app->routes;
 ok $d, 'initialized';
 $d->namespaces(['Test']);
 $d->route('/')->over([])->to(controller => 'foo', action => 'home');

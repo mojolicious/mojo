@@ -73,6 +73,9 @@ get '/localized/include' => sub {
   $self->render('localized', test => 'foo', reverse => 1);
 };
 
+# GET /plain/reverse
+get '/plain/reverse' => {text => 'Hello!', format => 'foo', reverse => 1};
+
 # GET /outerlayout
 get '/outerlayout' => sub {
   my $self = shift;
@@ -199,7 +202,14 @@ $t->get_ok('/nested-includes')->status_is(200)
 $t->get_ok('/localized/include')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/html;charset=UTF-8')
   ->content_is("lmth\n\noof\n\n\n123 2dezilacol\noof 1dezilacol");
+
+# GET /plain/reverse
+$t->get_ok('/plain/reverse')->status_is(200)
+  ->header_is(Server         => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->content_type_is('text/plain')->content_is('oof!olleH');
 
 # GET /outerlayout
 $t->get_ok('/outerlayout')->status_is(200)

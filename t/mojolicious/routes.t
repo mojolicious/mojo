@@ -468,17 +468,16 @@ is $m->stack->[0]{wildcard},   'hello/there', 'right value';
 is $m->path_for, '/wildcards/4/hello/there/foo', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 
-# Escaped
-$m = Mojolicious::Routes::Match->new(
-  GET => '/wildcards/1/http://www.google.com');
+# Special characters
+$m = Mojolicious::Routes::Match->new(GET => '/wildcards/1/♥');
 $m->match($r, $c);
-is $m->stack->[0]{controller}, 'wild',                  'right value';
-is $m->stack->[0]{action},     'card',                  'right value';
-is $m->stack->[0]{wildcard},   'http://www.google.com', 'right value';
-is $m->path_for, '/wildcards/1/http://www.google.com', 'right path';
+is $m->stack->[0]{controller}, 'wild', 'right value';
+is $m->stack->[0]{action},     'card', 'right value';
+is $m->stack->[0]{wildcard},   '♥',  'right value';
+is $m->path_for, '/wildcards/1/♥', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(
-  GET => '/wildcards/1/http%3A%2F%2Fwww.google.com');
+  GET => '/wildcards/1/http://www.google.com');
 $m->match($r, $c);
 is $m->stack->[0]{controller}, 'wild',                  'right value';
 is $m->stack->[0]{action},     'card',                  'right value';

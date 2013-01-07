@@ -40,7 +40,7 @@ sub dispatch {
   my $req  = $c->req;
   my $path = $c->stash->{path};
   if (defined $path) { $path = "/$path" if $path !~ m!^/! }
-  else               { $path = $req->url->path->to_abs_string }
+  else               { $path = $req->url->path->to_route }
 
   # Prepare match
   my $method = $req->method;

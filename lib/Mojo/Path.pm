@@ -96,9 +96,11 @@ sub parse {
   return $self->parts([split '/', $path, -1]);
 }
 
-sub to_abs_string {
+sub to_abs_string { $_[0]->leading_slash ? "$_[0]" : "/$_[0]" }
+
+sub to_route {
   my $self = shift;
-  return $self->leading_slash ? "$self" : "/$self";
+  return '/' . join('/', @{$self->parts}) . ($self->trailing_slash ? '/' : '');
 }
 
 sub to_string {
@@ -116,6 +118,8 @@ sub to_string {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -254,6 +258,15 @@ Parse path. Note that C<%2F> will be treated as C</> for security reasons.
   my $string = $path->to_abs_string;
 
 Turn path into an absolute string.
+
+=head2 to_route
+
+  my $route = $path->to_route;
+
+Turn path into a route.
+
+  # "/i/♥/mojolicious"
+  Mojo::Path->new('/i/%E2%99%A5/mojolicious')->to_route;
 
 =head2 to_string
 

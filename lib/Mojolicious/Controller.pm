@@ -411,8 +411,7 @@ sub url_for {
   my $path = $url->path;
   if ($target =~ m!^/!) {
     if (my $prefix = $self->stash->{path}) {
-      my $real = Mojo::Util::url_unescape($req->url->path->to_abs_string);
-      $real = Mojo::Util::decode('UTF-8', $real) // $real;
+      my $real = $req->url->path->to_route;
       $real =~ s!/?$prefix$!$target!;
       $target = $real;
     }

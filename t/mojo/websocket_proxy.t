@@ -41,9 +41,12 @@ websocket '/test' => sub {
 };
 
 # HTTP server for testing
-my $ua = Mojo::UserAgent->new;
-my $daemon
-  = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+my $ua     = Mojo::UserAgent->new;
+my $daemon = Mojo::Server::Daemon->new(
+  app    => app,
+  ioloop => Mojo::IOLoop->singleton,
+  silent => 1
+);
 my $port = Mojo::IOLoop->new->generate_port;
 $daemon->listen(["http://127.0.0.1:$port"])->start;
 

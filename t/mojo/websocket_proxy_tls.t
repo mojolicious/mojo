@@ -57,8 +57,11 @@ websocket '/test' => sub {
 };
 
 # Web server with valid certificates
-my $daemon
-  = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+my $daemon = Mojo::Server::Daemon->new(
+  app    => app,
+  ioloop => Mojo::IOLoop->singleton,
+  silent => 1
+);
 my $port = Mojo::IOLoop->new->generate_port;
 my $listen
   = "https://127.0.0.1:$port"

@@ -1,4 +1,10 @@
 
+3.74  2013-01-07
+  - Improved documentation.
+  - Improved tests.
+  - Fixed bug where Mojolicious::Lite applications in modules would generate
+    the wrong moniker.
+
 3.73  2013-01-06
   - Deprecated Mojolicious::Commands->start in favor of
     Mojolicious::Commands->start_app.

@@ -24,7 +24,7 @@ sub import {
 
   # Moniker
   my $moniker = basename $ENV{MOJO_EXE};
-  $moniker =~ s/\.(?:pl|t)$//i;
+  $moniker =~ s/\.(?:pl|pm|t)$//i;
   $app->moniker($moniker);
 
   # Initialize routes

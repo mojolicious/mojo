@@ -26,8 +26,11 @@ app->log->level('fatal');
 get '/' => {text => 'works!'};
 
 # Web server with valid certificates
-my $daemon
-  = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+my $daemon = Mojo::Server::Daemon->new(
+  app    => app,
+  ioloop => Mojo::IOLoop->singleton,
+  silent => 1
+);
 my $port = Mojo::IOLoop->new->generate_port;
 my $listen
   = "https://127.0.0.1:$port"
@@ -116,8 +119,11 @@ ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
 
 # Web server with valid certificates and no verification
-$daemon
-  = Mojo::Server::Daemon->new(app => app, ioloop => Mojo::IOLoop->singleton);
+$daemon = Mojo::Server::Daemon->new(
+  app    => app,
+  ioloop => Mojo::IOLoop->singleton,
+  silent => 1
+);
 $listen
   = "https://127.0.0.1:$port"
   . '?cert=t/mojo/certs/server.crt'

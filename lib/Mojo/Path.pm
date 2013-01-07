@@ -58,19 +58,6 @@ sub contains {
   return !@$parts;
 }
 
-sub like {
-  my ($self, $regexp) = @_;
-
-  return undef unless ref $regexp eq 'Regexp';
-  
-  my $joint_path = join('/', @{$self->parts});
-  
-  $joint_path = "/$joint_path" if $self->leading_slash;
-  $joint_path = "$joint_path/" if $self->trailing_slash;
-  
-  return $joint_path =~ $regexp;
-}
-
 sub merge {
   my ($self, $path) = @_;
 
@@ -217,18 +204,6 @@ Check if path contains given prefix.
   Mojo::Path->new('/foo/bar')->contains('/f');
   Mojo::Path->new('/foo/bar')->contains('/bar');
   Mojo::Path->new('/foo/bar')->contains('/whatever');
-
-=head2 like
-
-  my $success = $path->like( qr(^/\w+) )
-
-Check if path matches a given regular expression
-
-  # True
-  Mojo::Path->new('/foo/bar')->like( qr(^/\w+) )
-
-  # False
-  Mojo::Path->new('/')->like( qr(^/\w+) )
 
 =head2 merge
 

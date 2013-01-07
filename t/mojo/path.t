@@ -174,6 +174,15 @@ ok !$path->contains('/0.html'),   'does not contain path';
 ok !$path->contains('/♥.html'), 'does not contain path';
 
 # Like
+my $opt_qr = qr!^/(?:foo|bar|baz)!;
+$path = Mojo::Path->new('/foo/bar');
+ok $path->like($opt_qr), 'like path';
+$path = Mojo::Path->new('/bar/baz');
+ok $path->like($opt_qr), 'like path';
+$path = Mojo::Path->new('/baz/foo/');
+ok $path->like($opt_qr), 'like path';
+$path = Mojo::Path->new('/moo/bar');
+ok !$path->like($opt_qr), 'not like path';
 $path = Mojo::Path->new('/foo/bar');
 ok $path->like(qr(^/)),         'like path';
 ok $path->like(qr(^/foo)),      'like path';

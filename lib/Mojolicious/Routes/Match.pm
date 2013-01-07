@@ -170,28 +170,28 @@ structures.
 
 L<Mojolicious::Routes::Match> implements the following attributes.
 
-=head2 C<captures>
+=head2 captures
 
   my $captures = $m->captures;
   $m           = $m->captures({foo => 'bar'});
 
 Captured parameters.
 
-=head2 C<endpoint>
+=head2 endpoint
 
   my $endpoint = $m->endpoint;
   $m           = $m->endpoint(Mojolicious::Routes->new);
 
 The route endpoint that actually matched.
 
-=head2 C<root>
+=head2 root
 
   my $root = $m->root;
   $m       = $m->root($routes);
 
 The root of the route tree.
 
-=head2 C<stack>
+=head2 stack
 
   my $stack = $m->stack;
   $m        = $m->stack([{foo => 'bar'}]);
@@ -203,20 +203,20 @@ Captured parameters with nesting history.
 L<Mojolicious::Routes::Match> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $m = Mojolicious::Routes::Match->new(GET => '/foo');
   my $m = Mojolicious::Routes::Match->new(GET => '/foo', $ws);
 
 Construct a new L<Mojolicious::Routes::Match> object.
 
-=head2 C<match>
+=head2 match
 
   $m->match(Mojolicious::Routes->new, Mojolicious::Controller->new);
 
 Match against a route tree.
 
-=head2 C<path_for>
+=head2 path_for
 
   my $path        = $m->path_for;
   my $path        = $m->path_for(foo => 'bar');

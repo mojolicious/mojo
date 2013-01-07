@@ -420,20 +420,20 @@ L<Mojo::Util> provides portable utility functions for L<Mojo>.
 
 L<Mojo::Util> implements the following functions.
 
-=head2 C<b64_decode>
+=head2 b64_decode
 
   my $string = b64_decode $b64;
 
 Base64 decode string.
 
-=head2 C<b64_encode>
+=head2 b64_encode
 
   my $b64 = b64_encode $string;
   my $b64 = b64_encode $string, "\n";
 
 Base64 encode string, the line ending defaults to a newline.
 
-=head2 C<camelize>
+=head2 camelize
 
   my $camelcase = camelize $snakecase;
 
@@ -448,7 +448,7 @@ Convert snake case string to camel case and replace C<-> with C<::>.
   # "FooBar::Baz"
   camelize 'FooBar::Baz';
 
-=head2 C<class_to_file>
+=head2 class_to_file
 
   my $file = class_to_file 'Foo::Bar';
 
@@ -459,7 +459,7 @@ Convert a class name to a file.
   FooBar   -> foo_bar
   FOOBar   -> foobar
 
-=head2 C<class_to_path>
+=head2 class_to_path
 
   my $path = class_to_path 'Foo::Bar';
 
@@ -468,7 +468,7 @@ Convert class name to path.
   Foo::Bar -> Foo/Bar.pm
   FooBar   -> FooBar.pm
 
-=head2 C<decamelize>
+=head2 decamelize
 
   my $snakecase = decamelize $camelcase;
 
@@ -483,38 +483,38 @@ Convert camel case string to snake case and replace C<::> with C<->.
   # "foo_bar-baz"
   decamelize 'foo_bar-baz';
 
-=head2 C<decode>
+=head2 decode
 
   my $chars = decode 'UTF-8', $bytes;
 
 Decode bytes to characters and return C<undef> if decoding failed.
 
-=head2 C<encode>
+=head2 encode
 
   my $bytes = encode 'UTF-8', $chars;
 
 Encode characters to bytes.
 
-=head2 C<get_line>
+=head2 get_line
 
   my $line = get_line \$string;
 
 Extract whole line from string or return C<undef>. Lines are expected to end
 with C<0x0d 0x0a> or C<0x0a>.
 
-=head2 C<hmac_md5_sum>
+=head2 hmac_md5_sum
 
   my $checksum = hmac_md5_sum $string, 'passw0rd';
 
 Generate HMAC-MD5 checksum for string.
 
-=head2 C<hmac_sha1_sum>
+=head2 hmac_sha1_sum
 
   my $checksum = hmac_sha1_sum $string, 'passw0rd';
 
 Generate HMAC-SHA1 checksum for string.
 
-=head2 C<html_escape>
+=head2 html_escape
 
   my $escaped = html_escape $string;
   my $escaped = html_escape $string, '^\n\r\t !#$%(-;=?-~';
@@ -522,25 +522,25 @@ Generate HMAC-SHA1 checksum for string.
 Escape unsafe characters in string with HTML entities, the pattern used
 defaults to C<^\n\r\t !#$%(-;=?-~>.
 
-=head2 C<html_unescape>
+=head2 html_unescape
 
   my $string = html_unescape $escaped;
 
 Unescape all HTML entities in string.
 
-=head2 C<md5_bytes>
+=head2 md5_bytes
 
   my $checksum = md5_bytes $string;
 
 Generate binary MD5 checksum for string.
 
-=head2 C<md5_sum>
+=head2 md5_sum
 
   my $checksum = md5_sum $string;
 
 Generate MD5 checksum for string.
 
-=head2 C<monkey_patch>
+=head2 monkey_patch
 
   monkey_patch $package, foo => sub {...};
   monkey_patch $package, foo => sub {...}, bar => sub {...};
@@ -552,74 +552,74 @@ Monkey patch functions into package.
     two   => sub { say 'Two!' },
     three => sub { say 'Three!' };
 
-=head2 C<punycode_decode>
+=head2 punycode_decode
 
   my $string = punycode_decode $punycode;
 
 Punycode decode string.
 
-=head2 C<punycode_encode>
+=head2 punycode_encode
 
   my $punycode = punycode_encode $string;
 
 Punycode encode string.
 
-=head2 C<quote>
+=head2 quote
 
   my $quoted = quote $string;
 
 Quote string.
 
-=head2 C<secure_compare>
+=head2 secure_compare
 
   my $success = secure_compare $string1, $string2;
 
 Constant time comparison algorithm to prevent timing attacks.
 
-=head2 C<sha1_bytes>
+=head2 sha1_bytes
 
   my $checksum = sha1_bytes $string;
 
 Generate binary SHA1 checksum for string.
 
-=head2 C<sha1_sum>
+=head2 sha1_sum
 
   my $checksum = sha1_sum $string;
 
 Generate SHA1 checksum for string.
 
-=head2 C<slurp>
+=head2 slurp
 
   my $content = slurp '/etc/passwd';
 
 Read all data at once from file.
 
-=head2 C<spurt>
+=head2 spurt
 
   $content = spurt $content, '/etc/passwd';
 
 Write all data at once to file.
 
-=head2 C<squish>
+=head2 squish
 
   my $squished = squish $string;
 
 Trim whitespace characters from both ends of string and then change all
 consecutive groups of whitespace into one space each.
 
-=head2 C<trim>
+=head2 trim
 
   my $trimmed = trim $string;
 
 Trim whitespace characters from both ends of string.
 
-=head2 C<unquote>
+=head2 unquote
 
   my $string = unquote $quoted;
 
 Unquote string.
 
-=head2 C<url_escape>
+=head2 url_escape
 
   my $escaped = url_escape $string;
   my $escaped = url_escape $string, '^A-Za-z0-9\-._~';
@@ -627,20 +627,20 @@ Unquote string.
 Percent encode unsafe characters in string, the pattern used defaults to
 C<^A-Za-z0-9\-._~>.
 
-=head2 C<url_unescape>
+=head2 url_unescape
 
   my $string = url_unescape $escaped;
 
 Decode percent encoded characters in string.
 
-=head2 C<xml_escape>
+=head2 xml_escape
 
   my $escaped = xml_escape $string;
 
 Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string,
 this is a much faster version of C<html_escape>.
 
-=head2 C<xor_encode>
+=head2 xor_encode
 
   my $encoded = xor_encode $string, $key;
 

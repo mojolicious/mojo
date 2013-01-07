@@ -93,28 +93,28 @@ with a C<HMAC-SHA1> signature.
 
 L<Mojolicious::Sessions> implements the following attributes.
 
-=head2 C<cookie_domain>
+=head2 cookie_domain
 
   my $domain = $sessions->cookie_domain;
   $sessions  = $sessions->cookie_domain('.example.com');
 
 Domain for session cookies, not defined by default.
 
-=head2 C<cookie_name>
+=head2 cookie_name
 
   my $name  = $sessions->cookie_name;
   $sessions = $sessions->cookie_name('session');
 
 Name for session cookies, defaults to C<mojolicious>.
 
-=head2 C<cookie_path>
+=head2 cookie_path
 
   my $path  = $sessions->cookie_path;
   $sessions = $sessions->cookie_path('/foo');
 
 Path for session cookies, defaults to C</>.
 
-=head2 C<default_expiration>
+=head2 default_expiration
 
   my $time  = $sessions->default_expiration;
   $sessions = $sessions->default_expiration(3600);
@@ -134,7 +134,7 @@ C<expiration> and C<expires> session values.
   # Delete whole session by setting an expiration date in the past
   $c->session(expires => 1);
 
-=head2 C<secure>
+=head2 secure
 
   my $secure = $sessions->secure;
   $sessions  = $sessions->secure(1);
@@ -147,13 +147,13 @@ over HTTPS connections.
 L<Mojolicious::Sessions> inherits all methods from L<Mojo::Base> and
 implements the following ones.
 
-=head2 C<load>
+=head2 load
 
   $sessions->load(Mojolicious::Controller->new);
 
 Load session data from signed cookie.
 
-=head2 C<store>
+=head2 store
 
   $sessions->store(Mojolicious::Controller->new);
 

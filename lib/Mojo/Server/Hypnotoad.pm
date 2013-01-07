@@ -385,23 +385,23 @@ signals.
 
 =over 2
 
-=item C<INT>, C<TERM>
+=item INT, TERM
 
 Shutdown server immediately.
 
-=item C<QUIT>
+=item QUIT
 
 Shutdown server gracefully.
 
-=item C<TTIN>
+=item TTIN
 
 Increase worker pool by one.
 
-=item C<TTOU>
+=item TTOU
 
 Decrease worker pool by one.
 
-=item C<USR2>
+=item USR2
 
 Attempt zero downtime software upgrade (hot deployment) without losing any
 incoming connections.
@@ -426,11 +426,11 @@ and take over serving requests after starting up successfully.
 
 =over 2
 
-=item C<INT>, C<TERM>
+=item INT, TERM
 
 Stop worker immediately.
 
-=item C<QUIT>
+=item QUIT
 
 Stop worker gracefully.
 
@@ -441,7 +441,7 @@ Stop worker gracefully.
 L<Mojo::Server::Hypnotoad> can be configured with the following settings, see
 L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
-=head2 C<accept_interval>
+=head2 accept_interval
 
   accept_interval => 0.5
 
@@ -449,7 +449,7 @@ Interval in seconds for trying to reacquire the accept mutex and connection
 management, defaults to C<0.025>. Note that changing this value can affect
 performance and idle CPU usage.
 
-=head2 C<accepts>
+=head2 accepts
 
   accepts => 100
 
@@ -459,13 +459,13 @@ to accept new connections indefinitely. Note that up to half of this value can
 be subtracted randomly to improve load balancing, and that worker processes
 will stop sending heartbeat messages once the limit has been reached.
 
-=head2 C<backlog>
+=head2 backlog
 
   backlog => 128
 
 Listen backlog size, defaults to C<SOMAXCONN>.
 
-=head2 C<clients>
+=head2 clients
 
   clients => 100
 
@@ -474,33 +474,33 @@ C<1000>. Note that depending on how much your application may block, you might
 want to decrease this value and increase C<workers> instead for better
 performance.
 
-=head2 C<graceful_timeout>
+=head2 graceful_timeout
 
   graceful_timeout => 15
 
 Maximum amount of time in seconds stopping a worker gracefully may take before
 being forced, defaults to C<20>.
 
-=head2 C<group>
+=head2 group
 
   group => 'staff'
 
 Group name for worker processes.
 
-=head2 C<heartbeat_interval>
+=head2 heartbeat_interval
 
   heartbeat_interval => 3
 
 Heartbeat interval in seconds, defaults to C<5>.
 
-=head2 C<heartbeat_timeout>
+=head2 heartbeat_timeout
 
   heartbeat_timeout => 2
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
 stopped gracefully, defaults to C<20>.
 
-=head2 C<inactivity_timeout>
+=head2 inactivity_timeout
 
   inactivity_timeout => 10
 
@@ -508,40 +508,40 @@ Maximum amount of time in seconds a connection can be inactive before getting
 closed, defaults to C<15>. Setting the value to C<0> will allow connections to
 be inactive indefinitely.
 
-=head2 C<keep_alive_requests>
+=head2 keep_alive_requests
 
   keep_alive_requests => 50
 
 Number of keep alive requests per connection, defaults to C<25>.
 
-=head2 C<listen>
+=head2 listen
 
   listen => ['http://*:80']
 
 List of one or more locations to listen on, defaults to C<http://*:8080>. See
 also L<Mojo::Server::Daemon/"listen"> for more examples.
 
-=head2 C<lock_file>
+=head2 lock_file
 
   lock_file => '/tmp/hypnotoad.lock'
 
 Full path of accept mutex lock file prefix, to which the process id will be
 appended, defaults to a random temporary path.
 
-=head2 C<lock_timeout>
+=head2 lock_timeout
 
   lock_timeout => 1
 
 Maximum amount of time in seconds a worker may block when waiting for the
 accept mutex, defaults to C<0.5>.
 
-=head2 C<multi_accept>
+=head2 multi_accept
 
   multi_accept => 100
 
 Number of connections to accept at once, defaults to C<50>.
 
-=head2 C<pid_file>
+=head2 pid_file
 
   pid_file => '/var/run/hypnotoad.pid'
 
@@ -549,7 +549,7 @@ Full path to process id file, defaults to C<hypnotoad.pid> in the same
 directory as the application. Note that this value can only be changed after
 the server has been stopped.
 
-=head2 C<proxy>
+=head2 proxy
 
   proxy => 1
 
@@ -557,20 +557,20 @@ Activate reverse proxy support, which allows for the C<X-Forwarded-For> and
 C<X-Forwarded-HTTPS> headers to be picked up automatically, defaults to the
 value of the C<MOJO_REVERSE_PROXY> environment variable.
 
-=head2 C<upgrade_timeout>
+=head2 upgrade_timeout
 
   upgrade_timeout => 45
 
 Maximum amount of time in seconds a zero downtime software upgrade may take
 before getting canceled, defaults to C<60>.
 
-=head2 C<user>
+=head2 user
 
   user => 'sri'
 
 Username for worker processes.
 
-=head2 C<workers>
+=head2 workers
 
   workers => 10
 
@@ -582,7 +582,7 @@ worker processes per CPU core.
 L<Mojo::Server::Hypnotoad> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<run>
+=head2 run
 
   $toad->run('script/myapp');
 

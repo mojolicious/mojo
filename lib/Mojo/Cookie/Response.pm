@@ -104,14 +104,14 @@ L<Mojo::Cookie::Response> is a container for HTTP response cookies.
 L<Mojo::Cookie::Response> inherits all attributes from L<Mojo::Cookie> and
 implements the followign new ones.
 
-=head2 C<domain>
+=head2 domain
 
   my $domain = $cookie->domain;
   $cookie    = $cookie->domain('localhost');
 
 Cookie domain.
 
-=head2 C<httponly>
+=head2 httponly
 
   my $httponly = $cookie->httponly;
   $cookie      = $cookie->httponly(1);
@@ -119,21 +119,21 @@ Cookie domain.
 HttpOnly flag, which can prevent client-side scripts from accessing this
 cookie.
 
-=head2 C<max_age>
+=head2 max_age
 
   my $max_age = $cookie->max_age;
   $cookie     = $cookie->max_age(60);
 
 Max age for cookie.
 
-=head2 C<path>
+=head2 path
 
   my $path = $cookie->path;
   $cookie  = $cookie->path('/test');
 
 Cookie path.
 
-=head2 C<secure>
+=head2 secure
 
   my $secure = $cookie->secure;
   $cookie    = $cookie->secure(1);
@@ -146,7 +146,7 @@ connections.
 L<Mojo::Cookie::Response> inherits all methods from L<Mojo::Cookie> and
 implements the following new ones.
 
-=head2 C<expires>
+=head2 expires
 
   my $expires = $cookie->expires;
   $cookie     = $cookie->expires(time + 60);
@@ -154,13 +154,13 @@ implements the following new ones.
 
 Expiration for cookie.
 
-=head2 C<parse>
+=head2 parse
 
   my $cookies = $cookie->parse('f=b; path=/');
 
 Parse cookies.
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $cookie->to_string;
 

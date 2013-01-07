@@ -82,7 +82,7 @@ L<Mojo::Server> is an abstract HTTP server base class.
 L<Mojo::Server> inherits all events from L<Mojo::EventEmitter> and can emit
 the following new ones.
 
-=head2 C<request>
+=head2 request
 
   $server->on(request => sub {
     my ($server, $tx) = @_;
@@ -104,7 +104,7 @@ Emitted when a request is ready and needs to be handled.
 
 L<Mojo::Server> implements the following attributes.
 
-=head2 C<app>
+=head2 app
 
   my $app = $server->app;
   $server = $server->app(MojoSubclass->new);
@@ -116,26 +116,26 @@ Application this server handles, defaults to a L<Mojo::HelloWorld> object.
 L<Mojo::Server> inherits all methods from L<Mojo::EventEmitter> and implements
 the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $server = Mojo::Server->new;
 
 Construct a new L<Mojo::Server> object and subscribe to C<request> event with
 default request handling.
 
-=head2 C<build_app>
+=head2 build_app
 
   my $app = $server->build_app('Mojo::HelloWorld');
 
 Build application from class.
 
-=head2 C<build_tx>
+=head2 build_tx
 
   my $tx = $server->build_tx;
 
 Let application build a transaction.
 
-=head2 C<load_app>
+=head2 load_app
 
   my $app = $server->load_app('/home/sri/myapp.pl');
 
@@ -143,7 +143,7 @@ Load application from script.
 
   say Mojo::Server->new->load_app('./myapp.pl')->home;
 
-=head2 C<run>
+=head2 run
 
   $server->run;
 

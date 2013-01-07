@@ -334,21 +334,21 @@ L<Mojo::Server::Daemon> inherits all events from L<Mojo::Server>.
 L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
 
-=head2 C<backlog>
+=head2 backlog
 
   my $backlog = $daemon->backlog;
   $daemon     = $daemon->backlog(128);
 
 Listen backlog size, defaults to C<SOMAXCONN>.
 
-=head2 C<group>
+=head2 group
 
   my $group = $daemon->group;
   $daemon   = $daemon->group('users');
 
 Group for server process.
 
-=head2 C<inactivity_timeout>
+=head2 inactivity_timeout
 
   my $timeout = $daemon->inactivity_timeout;
   $daemon     = $daemon->inactivity_timeout(5);
@@ -358,7 +358,7 @@ closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
 variable or C<15>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
 
-=head2 C<ioloop>
+=head2 ioloop
 
   my $loop = $daemon->ioloop;
   $daemon  = $daemon->ioloop(Mojo::IOLoop->new);
@@ -366,7 +366,7 @@ inactive indefinitely.
 Event loop object to use for I/O operations, defaults to the global
 L<Mojo::IOLoop> singleton.
 
-=head2 C<listen>
+=head2 listen
 
   my $listen = $daemon->listen;
   $daemon    = $daemon->listen(['https://localhost:3000']);
@@ -391,46 +391,46 @@ These parameters are currently available:
 
 =over 4
 
-=item C<ca>
+=item ca
 
 Path to TLS certificate authority file.
 
-=item C<cert>
+=item cert
 
 Path to the TLS cert file, defaults to a built-in test certificate.
 
-=item C<key>
+=item key
 
 Path to the TLS key file, defaults to a built-in test key.
 
-=item C<verify>
+=item verify
 
 TLS verification mode, defaults to C<0x03>.
 
 =back
 
-=head2 C<max_clients>
+=head2 max_clients
 
   my $max = $daemon->max_clients;
   $daemon = $daemon->max_clients(1000);
 
 Maximum number of parallel client connections, defaults to C<1000>.
 
-=head2 C<max_requests>
+=head2 max_requests
 
   my $max = $daemon->max_requests;
   $daemon = $daemon->max_requests(100);
 
 Maximum number of keep alive requests per connection, defaults to C<25>.
 
-=head2 C<silent>
+=head2 silent
 
   my $silent = $daemon->silent;
   $daemon    = $daemon->silent(1);
 
 Disable console messages.
 
-=head2 C<user>
+=head2 user
 
   my $user = $daemon->user;
   $daemon  = $daemon->user('web');
@@ -442,25 +442,25 @@ User for the server process.
 L<Mojo::Server::Daemon> inherits all methods from L<Mojo::Server> and
 implements the following new ones.
 
-=head2 C<run>
+=head2 run
 
   $daemon->run;
 
 Run server.
 
-=head2 C<setuidgid>
+=head2 setuidgid
 
   $daemon = $daemon->setuidgid;
 
 Set user and group for process.
 
-=head2 C<start>
+=head2 start
 
   $daemon = $daemon->start;
 
 Start accepting connections.
 
-=head2 C<stop>
+=head2 stop
 
   $daemon = $daemon->stop;
 

@@ -316,7 +316,7 @@ integer support, or they are limited to 32bit.
 L<Mojo::Transaction::WebSocket> inherits all events from L<Mojo::Transaction>
 and can emit the following new ones.
 
-=head2 C<drain>
+=head2 drain
 
   $ws->on(drain => sub {
     my $ws = shift;
@@ -330,7 +330,7 @@ Emitted once all data has been sent.
     $ws->send(time);
   });
 
-=head2 C<frame>
+=head2 frame
 
   $ws->on(frame => sub {
     my ($ws, $frame) = @_;
@@ -350,7 +350,7 @@ Emitted when a WebSocket frame has been received.
     say "Payload: $frame->[5]";
   });
 
-=head2 C<message>
+=head2 message
 
   $ws->on(message => sub {
     my ($ws, $msg) = @_;
@@ -369,7 +369,7 @@ Emitted when a complete WebSocket message has been received.
 L<Mojo::Transaction::WebSocket> inherits all attributes from
 L<Mojo::Transaction> and implements the following new ones.
 
-=head2 C<handshake>
+=head2 handshake
 
   my $handshake = $ws->handshake;
   $ws           = $ws->handshake(Mojo::Transaction::HTTP->new);
@@ -377,14 +377,14 @@ L<Mojo::Transaction> and implements the following new ones.
 The original handshake transaction, defaults to a L<Mojo::Transaction::HTTP>
 object.
 
-=head2 C<masked>
+=head2 masked
 
   my $masked = $ws->masked;
   $ws        = $ws->masked(1);
 
 Mask outgoing frames with XOR cipher and a random 32bit key.
 
-=head2 C<max_websocket_size>
+=head2 max_websocket_size
 
   my $size = $ws->max_websocket_size;
   $ws      = $ws->max_websocket_size(1024);
@@ -397,7 +397,7 @@ C<MOJO_MAX_WEBSOCKET_SIZE> environment variable or C<262144>.
 L<Mojo::Transaction::WebSocket> inherits all methods from
 L<Mojo::Transaction> and implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $multi = Mojo::Content::MultiPart->new;
 
@@ -405,7 +405,7 @@ Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
 C<frame> event with default message parser, which also handles C<PING> and
 C<CLOSE> frames automatically.
 
-=head2 C<build_frame>
+=head2 build_frame
 
   my $bytes = $ws->build_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload);
 
@@ -429,68 +429,68 @@ Build WebSocket frame.
   # Pong frame with FIN bit and payload
   say $ws->build_frame(1, 0, 0, 0, 10, 'Test 123');
 
-=head2 C<client_challenge>
+=head2 client_challenge
 
   my $success = $ws->client_challenge;
 
 Check WebSocket handshake challenge client-side, used to implement user
 agents.
 
-=head2 C<client_handshake>
+=head2 client_handshake
 
   $ws->client_handshake;
 
 Perform WebSocket handshake client-side, used to implement user agents.
 
-=head2 C<client_read>
+=head2 client_read
 
   $ws->client_read($data);
 
 Read data client-side, used to implement user agents.
 
-=head2 C<client_write>
+=head2 client_write
 
   my $chunk = $ws->client_write;
 
 Write data client-side, used to implement user agents.
 
-=head2 C<connection>
+=head2 connection
 
   my $connection = $ws->connection;
 
 Connection identifier or socket.
 
-=head2 C<finish>
+=head2 finish
 
   $ws = $ws->finish;
 
 Finish the WebSocket connection gracefully.
 
-=head2 C<is_websocket>
+=head2 is_websocket
 
   my $true = $ws->is_websocket;
 
 True.
 
-=head2 C<kept_alive>
+=head2 kept_alive
 
   my $kept_alive = $ws->kept_alive;
 
 Connection has been kept alive.
 
-=head2 C<local_address>
+=head2 local_address
 
   my $address = $ws->local_address;
 
 Local interface address.
 
-=head2 C<local_port>
+=head2 local_port
 
   my $port = $ws->local_port;
 
 Local interface port.
 
-=head2 C<parse_frame>
+=head2 parse_frame
 
   my $frame = $ws->parse_frame(\$bytes);
 
@@ -505,37 +505,37 @@ Parse WebSocket frame.
   say "Opcode: $frame->[4]";
   say "Payload: $frame->[5]";
 
-=head2 C<remote_address>
+=head2 remote_address
 
   my $address = $ws->remote_address;
 
 Remote interface address.
 
-=head2 C<remote_port>
+=head2 remote_port
 
   my $port = $ws->remote_port;
 
 Remote interface port.
 
-=head2 C<req>
+=head2 req
 
   my $req = $ws->req;
 
 Handshake request, usually a L<Mojo::Message::Request> object.
 
-=head2 C<res>
+=head2 res
 
   my $res = $ws->res;
 
 Handshake response, usually a L<Mojo::Message::Response> object.
 
-=head2 C<resume>
+=head2 resume
 
   $ws = $ws->resume;
 
 Resume C<handshake> transaction.
 
-=head2 C<send>
+=head2 send
 
   $ws = $ws->send({binary => $bytes});
   $ws = $ws->send({text   => $bytes});
@@ -549,19 +549,19 @@ will be invoked once all data has been written.
   # Send "Ping" frame
   $ws->send([1, 0, 0, 0, 9, 'Hello World!']);
 
-=head2 C<server_handshake>
+=head2 server_handshake
 
   $ws->server_handshake;
 
 Perform WebSocket handshake server-side, used to implement web servers.
 
-=head2 C<server_read>
+=head2 server_read
 
   $ws->server_read($data);
 
 Read data server-side, used to implement web servers.
 
-=head2 C<server_write>
+=head2 server_write
 
   my $chunk = $ws->server_write;
 

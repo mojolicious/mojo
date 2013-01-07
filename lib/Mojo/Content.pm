@@ -366,7 +366,7 @@ RFC 2616.
 L<Mojo::Content> inherits all events from L<Mojo::EventEmitter> and can emit
 the following new ones.
 
-=head2 C<body>
+=head2 body
 
   $content->on(body => sub {
     my $content = shift;
@@ -380,7 +380,7 @@ Emitted once all headers have been parsed and the body starts.
     $content->auto_upgrade(0) if $content->headers->header('X-No-MultiPart');
   });
 
-=head2 C<drain>
+=head2 drain
 
   $content->on(drain => sub {
     my ($content, $offset) = @_;
@@ -394,7 +394,7 @@ Emitted once all data has been written.
     $content->write_chunk(time);
   });
 
-=head2 C<read>
+=head2 read
 
   $content->on(read => sub {
     my ($content, $chunk) = @_;
@@ -413,21 +413,21 @@ Emitted when a new chunk of content arrives.
 
 L<Mojo::Content> implements the following attributes.
 
-=head2 C<auto_relax>
+=head2 auto_relax
 
   my $relax = $content->auto_relax;
   $content  = $content->auto_relax(1);
 
 Try to detect when relaxed parsing is necessary.
 
-=head2 C<headers>
+=head2 headers
 
   my $headers = $content->headers;
   $content    = $content->headers(Mojo::Headers->new);
 
 Content headers, defaults to a L<Mojo::Headers> object.
 
-=head2 C<max_buffer_size>
+=head2 max_buffer_size
 
   my $size = $content->max_buffer_size;
   $content = $content->max_buffer_size(1024);
@@ -435,7 +435,7 @@ Content headers, defaults to a L<Mojo::Headers> object.
 Maximum size in bytes of buffer for content parser, defaults to the value of
 the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144>.
 
-=head2 C<max_leftover_size>
+=head2 max_leftover_size
 
   my $size = $content->max_leftover_size;
   $content = $content->max_leftover_size(1024);
@@ -443,7 +443,7 @@ the C<MOJO_MAX_BUFFER_SIZE> environment variable or C<262144>.
 Maximum size in bytes of buffer for pipelined HTTP requests, defaults to the
 value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>.
 
-=head2 C<relaxed>
+=head2 relaxed
 
   my $relaxed = $content->relaxed;
   $content    = $content->relaxed(1);
@@ -451,7 +451,7 @@ value of the C<MOJO_MAX_LEFTOVER_SIZE> environment variable or C<262144>.
 Activate relaxed parsing for responses that are terminated with a connection
 close.
 
-=head2 C<skip_body>
+=head2 skip_body
 
   my $skip = $content->skip_body;
   $content = $content->skip_body(1);
@@ -463,148 +463,148 @@ Skip body parsing and finish after headers.
 L<Mojo::Content> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 C<body_contains>
+=head2 body_contains
 
   my $success = $content->body_contains('foo bar baz');
 
 Check if content contains a specific string. Meant to be overloaded in a
 subclass.
 
-=head2 C<body_size>
+=head2 body_size
 
   my $size = $content->body_size;
 
 Content size in bytes. Meant to be overloaded in a subclass.
 
-=head2 C<boundary>
+=head2 boundary
 
   my $boundary = $content->boundary;
 
 Extract multipart boundary from C<Content-Type> header.
 
-=head2 C<build_body>
+=head2 build_body
 
   my $string = $content->build_body;
 
 Render whole body.
 
-=head2 C<build_headers>
+=head2 build_headers
 
   my $string = $content->build_headers;
 
 Render all headers.
 
-=head2 C<charset>
+=head2 charset
 
   my $charset = $content->charset;
 
 Extract charset from C<Content-Type> header.
 
-=head2 C<clone>
+=head2 clone
 
   my $clone = $content->clone;
 
 Clone content if possible, otherwise return C<undef>.
 
-=head2 C<generate_body_chunk>
+=head2 generate_body_chunk
 
   my $chunk = $content->generate_body_chunk(0);
 
 Generate dynamic content.
 
-=head2 C<get_body_chunk>
+=head2 get_body_chunk
 
   my $chunk = $content->get_body_chunk(0);
 
 Get a chunk of content starting from a specfic position. Meant to be
 overloaded in a subclass.
 
-=head2 C<get_header_chunk>
+=head2 get_header_chunk
 
   my $chunk = $content->get_header_chunk(13);
 
 Get a chunk of the headers starting from a specfic position.
 
-=head2 C<has_leftovers>
+=head2 has_leftovers
 
   my $success = $content->has_leftovers;
 
 Check if there are leftovers.
 
-=head2 C<header_size>
+=head2 header_size
 
   my $size = $content->header_size;
 
 Size of headers in bytes.
 
-=head2 C<is_chunked>
+=head2 is_chunked
 
   my $success = $content->is_chunked;
 
 Check if content is chunked.
 
-=head2 C<is_compressed>
+=head2 is_compressed
 
   my $success = $content->is_compressed;
 
 Check if content is C<gzip> compressed.
 
-=head2 C<is_dynamic>
+=head2 is_dynamic
 
   my $success = $content->is_dynamic;
 
 Check if content will be dynamically generated, which prevents C<clone> from
 working.
 
-=head2 C<is_finished>
+=head2 is_finished
 
   my $success = $content->is_finished;
 
 Check if parser is finished.
 
-=head2 C<is_limit_exceeded>
+=head2 is_limit_exceeded
 
   my $success = $content->is_limit_exceeded;
 
 Check if buffer has exceeded C<max_buffer_size>.
 
-=head2 C<is_multipart>
+=head2 is_multipart
 
   my $false = $content->is_multipart;
 
 False.
 
-=head2 C<is_parsing_body>
+=head2 is_parsing_body
 
   my $success = $content->is_parsing_body;
 
 Check if body parsing started yet.
 
-=head2 C<leftovers>
+=head2 leftovers
 
   my $bytes = $content->leftovers;
 
 Get leftover data from content parser.
 
-=head2 C<parse>
+=head2 parse
 
   $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
 
 Parse content chunk.
 
-=head2 C<parse_body>
+=head2 parse_body
 
   $content = $content->parse_body('Hi!');
 
 Parse body chunk and skip headers.
 
-=head2 C<progress>
+=head2 progress
 
   my $size = $content->progress;
 
 Size of content already received from message in bytes.
 
-=head2 C<write>
+=head2 write
 
   $content = $content->write('Hello!');
   $content = $content->write('Hello!' => sub {...});
@@ -612,7 +612,7 @@ Size of content already received from message in bytes.
 Write dynamic content non-blocking, the optional drain callback will be
 invoked once all data has been written.
 
-=head2 C<write_chunk>
+=head2 write_chunk
 
   $content = $content->write_chunk('Hello!');
   $content = $content->write_chunk('Hello!' => sub {...});

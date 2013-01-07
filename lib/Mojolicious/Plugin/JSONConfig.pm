@@ -83,7 +83,7 @@ you're welcome to fork it.
 L<Mojolicious::Plugin::JSONConfig> inherits all options from
 L<Mojolicious::Plugin::Config> and supports the following new ones.
 
-=head2 C<template>
+=head2 template
 
   # Mojolicious::Lite
   plugin JSONConfig => {template => {line_start => '.'}};
@@ -96,7 +96,7 @@ configuration files.
 L<Mojolicious::Plugin::JSONConfig> inherits all methods from
 L<Mojolicious::Plugin::Config> and implements the following new ones.
 
-=head2 C<parse>
+=head2 parse
 
   $plugin->parse($content, $file, $conf, $app);
 
@@ -110,14 +110,14 @@ Process content with C<render> and parse it with L<Mojo::JSON>.
     return $hash;
   }
 
-=head2 C<register>
+=head2 register
 
   my $config = $plugin->register(Mojolicious->new);
   my $config = $plugin->register(Mojolicious->new, {file => '/etc/foo.conf'});
 
 Register plugin in L<Mojolicious> application.
 
-=head2 C<render>
+=head2 render
 
   $plugin->render($content, $file, $conf, $app);
 

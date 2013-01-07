@@ -88,7 +88,7 @@ C<MOJO_PROXY> environment variable.
 
 L<ojo> implements the following functions.
 
-=head2 C<a>
+=head2 a
 
   my $app = a('/hello' => sub { shift->render(json => {hello => 'world'}) });
 
@@ -98,7 +98,7 @@ more argument variations.
 
   $ perl -Mojo -E 'a("/hello" => {text => "Hello Mojo!"})->start' daemon
 
-=head2 C<b>
+=head2 b
 
   my $stream = b('lalala');
 
@@ -106,13 +106,13 @@ Turn string into a L<Mojo::ByteStream> object.
 
   $ perl -Mojo -E 'b(g("mojolicio.us")->body)->html_unescape->say'
 
-=head2 C<c>
+=head2 c
 
   my $collection = c(1, 2, 3);
 
 Turn list into a L<Mojo::Collection> object.
 
-=head2 C<d>
+=head2 d
 
   my $res = d('mojolicio.us');
   my $res = d('http://mojolicio.us' => {DNT => 1} => 'Hi!');
@@ -120,7 +120,7 @@ Turn list into a L<Mojo::Collection> object.
 Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return
 resulting L<Mojo::Message::Response> object.
 
-=head2 C<f>
+=head2 f
 
   my $res = f('http://kraih.com' => {a => 'b'});
   my $res = f('kraih.com' => 'UTF-8' => {a => 'b'} => {DNT => 1});
@@ -128,7 +128,7 @@ resulting L<Mojo::Message::Response> object.
 Perform C<POST> request with L<Mojo::UserAgent/"post_form"> and return
 resulting L<Mojo::Message::Response> object.
 
-=head2 C<g>
+=head2 g
 
   my $res = g('mojolicio.us');
   my $res = g('http://mojolicio.us' => {DNT => 1} => 'Hi!');
@@ -138,7 +138,7 @@ L<Mojo::Message::Response> object.
 
   $ perl -Mojo -E 'say g("mojolicio.us")->dom("h1, h2, h3")->pluck("text")'
 
-=head2 C<h>
+=head2 h
 
   my $res = h('mojolicio.us');
   my $res = h('http://mojolicio.us' => {DNT => 1} => 'Hi!');
@@ -146,7 +146,7 @@ L<Mojo::Message::Response> object.
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
 
-=head2 C<j>
+=head2 j
 
   my $bytes = j({foo => 'bar'});
   my $array = j($bytes);
@@ -156,7 +156,7 @@ Encode Perl data structure or decode JSON with L<Mojo::JSON>.
 
   $ perl -Mojo -E 'b(j({hello => "world!"}))->spurt("hello.json")'
 
-=head2 C<n>
+=head2 n
 
   my $res = n('http://kraih.com' => {a => 'b'});
   my $res = n('kraih.com' => {a => 'b'} => {DNT => 1});
@@ -164,7 +164,7 @@ Encode Perl data structure or decode JSON with L<Mojo::JSON>.
 Perform C<POST> request with L<Mojo::UserAgent/"post_json"> and return
 resulting L<Mojo::Message::Response> object.
 
-=head2 C<o>
+=head2 o
 
   my $res = o('mojolicio.us');
   my $res = o('http://mojolicio.us' => {DNT => 1} => 'Hi!');
@@ -172,7 +172,7 @@ resulting L<Mojo::Message::Response> object.
 Perform C<OPTIONS> request with L<Mojo::UserAgent/"options"> and return
 resulting L<Mojo::Message::Response> object.
 
-=head2 C<p>
+=head2 p
 
   my $res = p('mojolicio.us');
   my $res = p('http://mojolicio.us' => {DNT => 1} => 'Hi!');
@@ -180,7 +180,7 @@ resulting L<Mojo::Message::Response> object.
 Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.
 
-=head2 C<r>
+=head2 r
 
   my $perl = r({data => 'structure'});
 
@@ -188,7 +188,7 @@ Dump a Perl data structure with L<Data::Dumper>.
 
   perl -Mojo -E 'say r(g("mojolicio.us")->headers->to_hash)'
 
-=head2 C<t>
+=head2 t
 
   my $res = t('mojolicio.us');
   my $res = t('http://mojolicio.us' => {DNT => 1} => 'Hi!');
@@ -196,7 +196,7 @@ Dump a Perl data structure with L<Data::Dumper>.
 Perform C<PATCH> request with L<Mojo::UserAgent/"patch"> and return resulting
 L<Mojo::Message::Response> object.
 
-=head2 C<u>
+=head2 u
 
   my $res = u('mojolicio.us');
   my $res = u('http://mojolicio.us' => {DNT => 1} => 'Hi!');
@@ -204,7 +204,7 @@ L<Mojo::Message::Response> object.
 Perform C<PUT> request with L<Mojo::UserAgent/"put"> and return resulting
 L<Mojo::Message::Response> object.
 
-=head2 C<x>
+=head2 x
 
   my $dom = x('<div>Hello!</div>');
 

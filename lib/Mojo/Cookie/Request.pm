@@ -54,13 +54,13 @@ L<Mojo::Cookie::Request> inherits all attributes from L<Mojo::Cookie>.
 L<Mojo::Cookie::Request> inherits all methods from L<Mojo::Cookie> and
 implements the following new ones.
 
-=head2 C<parse>
+=head2 parse
 
   my $cookies = $cookie->parse('f=b; g=a');
 
 Parse cookies.
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $cookie->to_string;
 

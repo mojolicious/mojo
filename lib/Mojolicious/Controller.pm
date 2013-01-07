@@ -503,7 +503,7 @@ unless you set C<controller_class> in your application.
 L<Mojolicious::Controller> inherits all attributes from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<app>
+=head2 app
 
   my $app = $c->app;
   $c      = $c->app(Mojolicious->new);
@@ -514,7 +514,7 @@ defaults to a L<Mojolicious> object.
   # Use application logger
   $c->app->log->debug('Hello Mojo!');
 
-=head2 C<match>
+=head2 match
 
   my $m = $c->match;
   $c    = $c->match(Mojolicious::Routes::Match->new);
@@ -525,7 +525,7 @@ L<Mojolicious::Routes::Match> object.
   # Introspect
   my $foo = $c->match->endpoint->pattern->defaults->{foo};
 
-=head2 C<tx>
+=head2 tx
 
   my $tx = $c->tx;
   $c     = $c->tx(Mojo::Transaction::HTTP->new);
@@ -541,7 +541,7 @@ L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<cookie>
+=head2 cookie
 
   my $value  = $c->cookie('foo');
   my @values = $c->cookie('foo');
@@ -553,14 +553,14 @@ Access request cookie values and create new response cookies.
   # Create response cookie with domain and expiration date
   $c->cookie(user => 'sri', {domain => 'mojolicio.us', expires => time + 60});
 
-=head2 C<finish>
+=head2 finish
 
   $c = $c->finish;
   $c = $c->finish('Bye!');
 
 Gracefully end WebSocket connection or long poll stream.
 
-=head2 C<flash>
+=head2 flash
 
   my $foo = $c->flash('foo');
   $c      = $c->flash({foo => 'bar'});
@@ -572,7 +572,7 @@ Data storage persistent only for the next request, stored in the C<session>.
   $c->flash(message => 'User created successfully!');
   $c->redirect_to('show_user', id => 23);
 
-=head2 C<on>
+=head2 on
 
   my $cb = $c->on(finish => sub {...});
 
@@ -591,7 +591,7 @@ L<Mojo::Transaction::WebSocket> object.
     $c->app->log->debug("Message: $msg");
   });
 
-=head2 C<param>
+=head2 param
 
   my @names       = $c->param;
   my $foo         = $c->param('foo');
@@ -625,7 +625,7 @@ For more control you can also access request information directly.
   # Only file uploads
   my $foo = $c->req->upload('foo');
 
-=head2 C<redirect_to>
+=head2 redirect_to
 
   $c = $c->redirect_to('named');
   $c = $c->redirect_to('named', foo => 'bar');
@@ -641,7 +641,7 @@ Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
   $c->res->code(301);
   $c->redirect_to('some_route');
 
-=head2 C<render>
+=head2 render
 
   my $success = $c->render;
   my $success = $c->render(controller => 'foo', action => 'bar');
@@ -660,7 +660,7 @@ C<after_render> hook unless the result is C<partial>. If no template is
 provided a default one based on controller and action or route name will be
 generated, all additional values get merged into the C<stash>.
 
-=head2 C<render_data>
+=head2 render_data
 
   $c->render_data($bytes);
   $c->render_data($bytes, format => 'png');
@@ -671,7 +671,7 @@ not be encoded. All additional values get merged into the C<stash>.
   # Longer version
   $c->render(data => $bytes);
 
-=head2 C<render_exception>
+=head2 render_exception
 
   $c->render_exception('Oops!');
   $c->render_exception(Mojo::Exception->new('Oops!'));
@@ -679,7 +679,7 @@ not be encoded. All additional values get merged into the C<stash>.
 Render the exception template C<exception.$mode.$format.*> or
 C<exception.$format.*> and set the response status code to C<500>.
 
-=head2 C<render_json>
+=head2 render_json
 
   $c->render_json({foo => 'bar'});
   $c->render_json([1, 2, -3], status => 201);
@@ -690,7 +690,7 @@ C<stash>.
   # Longer version
   $c->render(json => {foo => 'bar'});
 
-=head2 C<render_later>
+=head2 render_later
 
   $c = $c->render_later;
 
@@ -703,14 +703,14 @@ automatic rendring would result in a response.
     $c->render(text => 'Delayed by 2 seconds!');
   });
 
-=head2 C<render_not_found>
+=head2 render_not_found
 
   $c->render_not_found;
 
 Render the not found template C<not_found.$mode.$format.*> or
 C<not_found.$format.*> and set the response status code to C<404>.
 
-=head2 C<render_partial>
+=head2 render_partial
 
   my $output = $c->render_partial('menubar');
   my $output = $c->render_partial('menubar', format => 'txt');
@@ -721,7 +721,7 @@ Same as C<render> but returns the rendered result.
   # Longer version
   my $output = $c->render('menubar', partial => 1);
 
-=head2 C<render_static>
+=head2 render_static
 
   my $success = $c->render_static('images/logo.png');
   my $success = $c->render_static('../lib/MyApp.pm');
@@ -730,7 +730,7 @@ Render a static file using L<Mojolicious::Static/"serve">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this
 method does not protect from traversing to parent directories.
 
-=head2 C<render_text>
+=head2 render_text
 
   $c->render_text('Hello World!');
   $c->render_text('Hello World!', layout => 'green');
@@ -746,7 +746,7 @@ of the response, which is C<text/html;charset=UTF-8> by default.
   # Render "text/plain" response
   $c->render_text('Hello World!', format => 'txt');
 
-=head2 C<rendered>
+=head2 rendered
 
   $c = $c->rendered;
   $c = $c->rendered(302);
@@ -754,7 +754,7 @@ of the response, which is C<text/html;charset=UTF-8> by default.
 Finalize response and emit C<after_dispatch> hook, defaults to using a C<200>
 response code.
 
-=head2 C<req>
+=head2 req
 
   my $req = $c->req;
 
@@ -770,7 +770,7 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $foo      = $c->req->json('/23/foo');
   my $bar      = $c->req->dom('div.bar')->first->text;
 
-=head2 C<res>
+=head2 res
 
   my $res = $c->res;
 
@@ -782,7 +782,7 @@ Get L<Mojo::Message::Response> object from L<Mojo::Transaction/"res">.
   # Force file download by setting a custom response header
   $c->res->headers->content_disposition('attachment; filename=foo.png;');
 
-=head2 C<respond_to>
+=head2 respond_to
 
   $c->respond_to(
     json => {json => {message => 'Welcome!'}},
@@ -803,7 +803,7 @@ is set to the value C<XMLHttpRequest>.
     any  => {data => '', status => 204}
   );
 
-=head2 C<send>
+=head2 send
 
   $c = $c->send({binary => $bytes});
   $c = $c->send({text   => $bytes});
@@ -832,7 +832,7 @@ timeout, which usually defaults to C<15> seconds.
   # Increase inactivity timeout for connection to 300 seconds
   Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
 
-=head2 C<session>
+=head2 session
 
   my $session = $c->session;
   my $foo     = $c->session('foo');
@@ -857,7 +857,7 @@ usually have a 4096 byte limit, depending on browser.
   # Delete whole session by setting an expiration date in the past
   $c->session(expires => 1);
 
-=head2 C<signed_cookie>
+=head2 signed_cookie
 
   my $value  = $c->signed_cookie('foo');
   my @values = $c->signed_cookie('foo');
@@ -868,7 +868,7 @@ Access signed request cookie values and create new signed response cookies.
 Cookies failing C<HMAC-SHA1> signature verification will be automatically
 discarded.
 
-=head2 C<stash>
+=head2 stash
 
   my $stash = $c->stash;
   my $foo   = $c->stash('foo');
@@ -887,7 +887,7 @@ that all stash values with a C<mojo.*> prefix are reserved for internal use.
   my $foo = $c->stash->{foo};
   delete $c->stash->{foo};
 
-=head2 C<ua>
+=head2 ua
 
   my $ua = $c->ua;
 
@@ -919,7 +919,7 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
     });
   }
 
-=head2 C<url_for>
+=head2 url_for
 
   my $url = $c->url_for;
   my $url = $c->url_for(name => 'sebastian');
@@ -941,7 +941,7 @@ to inherit query parameters from the current request.
   # "/list?q=mojo&page=2" if current request was for "/list?q=mojo&page=1"
   $c->url_with->query([page => 2]);
 
-=head2 C<write>
+=head2 write
 
   $c = $c->write;
   $c = $c->write('Hello!');
@@ -973,7 +973,7 @@ timeout, which usually defaults to C<15> seconds.
   # Increase inactivity timeout for connection to 300 seconds
   Mojo::IOLoop->stream($c->tx->connection)->timeout(300);
 
-=head2 C<write_chunk>
+=head2 write_chunk
 
   $c = $c->write_chunk;
   $c = $c->write_chunk('Hello!');

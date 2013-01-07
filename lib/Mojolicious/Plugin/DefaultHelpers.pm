@@ -157,19 +157,19 @@ example for learning to build new plugins, you're welcome to fork it.
 
 L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
 
-=head2 C<app>
+=head2 app
 
   %= app->secret
 
 Alias for L<Mojolicious::Controller/"app">.
 
-=head2 C<config>
+=head2 config
 
   %= config 'something'
 
 Alias for L<Mojo/"config">.
 
-=head2 C<content>
+=head2 content
 
   %= content foo => begin
     test
@@ -181,7 +181,7 @@ Alias for L<Mojo/"config">.
 
 Store partial rendered content in named buffer and retrieve it.
 
-=head2 C<content_for>
+=head2 content_for
 
   % content_for foo => begin
     test
@@ -198,7 +198,7 @@ Append partial rendered content to named buffer and retrieve it.
   % end
   %= content_for 'message'
 
-=head2 C<current_route>
+=head2 current_route
 
   % if (current_route 'login') {
     Welcome to Mojolicious!
@@ -207,26 +207,26 @@ Append partial rendered content to named buffer and retrieve it.
 
 Check or get name of current route.
 
-=head2 C<dumper>
+=head2 dumper
 
   %= dumper {some => 'data'}
 
 Dump a Perl data structure with L<Data::Dumper>.
 
-=head2 C<extends>
+=head2 extends
 
   % extends 'blue';
   % extends 'blue', title => 'Blue!';
 
 Extend a template. All additional values get merged into the C<stash>.
 
-=head2 C<flash>
+=head2 flash
 
   %= flash 'foo'
 
 Alias for L<Mojolicious::Controller/"flash">.
 
-=head2 C<include>
+=head2 include
 
   %= include 'menubar'
   %= include 'menubar', format => 'txt'
@@ -234,7 +234,7 @@ Alias for L<Mojolicious::Controller/"flash">.
 Include a partial template, all arguments get localized automatically and are
 only available in the partial template.
 
-=head2 C<layout>
+=head2 layout
 
   % layout 'green';
   % layout 'green', title => 'Green!';
@@ -242,7 +242,7 @@ only available in the partial template.
 Render this template with a layout. All additional values get merged into the
 C<stash>.
 
-=head2 C<memorize>
+=head2 memorize
 
   %= memorize begin
     %= time
@@ -259,19 +259,19 @@ C<stash>.
 
 Memorize block result in memory and prevent future execution.
 
-=head2 C<param>
+=head2 param
 
   %= param 'foo'
 
 Alias for L<Mojolicious::Controller/"param">.
 
-=head2 C<session>
+=head2 session
 
   %= session 'foo'
 
 Alias for L<Mojolicious::Controller/"session">.
 
-=head2 C<stash>
+=head2 stash
 
   %= stash 'foo'
   % stash foo => 'bar';
@@ -280,7 +280,7 @@ Alias for L<Mojolicious::Controller/"stash">.
 
   %= stash 'name' // 'Somebody'
 
-=head2 C<title>
+=head2 title
 
   % title 'Welcome!';
   % title 'Welcome!', foo => 'bar';
@@ -288,13 +288,13 @@ Alias for L<Mojolicious::Controller/"stash">.
 
 Page title. All additional values get merged into the C<stash>.
 
-=head2 C<url_for>
+=head2 url_for
 
   %= url_for 'named', controller => 'bar', action => 'baz'
 
 Alias for L<Mojolicious::Controller/"url_for">.
 
-=head2 C<url_with>
+=head2 url_with
 
   %= url_with 'named', controller => 'bar', action => 'baz'
 
@@ -308,7 +308,7 @@ request.
 L<Mojolicious::Plugin::DefaultHelpers> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
-=head2 C<register>
+=head2 register
 
   $plugin->register(Mojolicious->new);
 

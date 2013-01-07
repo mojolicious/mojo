@@ -124,7 +124,7 @@ L<Mojo::UserAgent>.
 
 L<Mojo::UserAgent::CookieJar> implements the following attributes.
 
-=head2 C<max_cookie_size>
+=head2 max_cookie_size
 
   my $size = $jar->max_cookie_size;
   $jar     = $jar->max_cookie_size(4096);
@@ -136,38 +136,38 @@ Maximum cookie size in bytes, defaults to C<4096>.
 L<Mojo::UserAgent::CookieJar> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<add>
+=head2 add
 
   $jar = $jar->add(@cookies);
 
 Add multiple L<Mojo::Cookie::Response> objects to the jar.
 
-=head2 C<all>
+=head2 all
 
   my @cookies = $jar->all;
 
 Return all L<Mojo::Cookie::Response> objects that are currently stored in the
 jar.
 
-=head2 C<empty>
+=head2 empty
 
   $jar->empty;
 
 Empty the jar.
 
-=head2 C<extract>
+=head2 extract
 
   $jar->extract($tx);
 
 Extract response cookies from transaction.
 
-=head2 C<find>
+=head2 find
 
   my @cookies = $jar->find($url);
 
 Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 
-=head2 C<inject>
+=head2 inject
 
   $jar->inject($tx);
 

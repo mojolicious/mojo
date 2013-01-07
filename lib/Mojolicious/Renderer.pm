@@ -242,14 +242,14 @@ See L<Mojolicious::Guides::Rendering> for more.
 
 L<Mojolicious::Renderer> implements the following attributes.
 
-=head2 C<cache>
+=head2 cache
 
   my $cache = $renderer->cache;
   $renderer = $renderer->cache(Mojo::Cache->new);
 
 Renderer cache, defaults to a L<Mojo::Cache> object.
 
-=head2 C<classes>
+=head2 classes
 
   my $classes = $renderer->classes;
   $renderer   = $renderer->classes(['main']);
@@ -260,14 +260,14 @@ highest precedence, defaults to C<main>.
   # Add another class with templates in DATA section
   push @{$renderer->classes}, 'Mojolicious::Plugin::Fun';
 
-=head2 C<default_format>
+=head2 default_format
 
   my $default = $renderer->default_format;
   $renderer   = $renderer->default_format('html');
 
 The default format to render if C<format> is not set in the stash.
 
-=head2 C<default_handler>
+=head2 default_handler
 
   my $default = $renderer->default_handler;
   $renderer   = $renderer->default_handler('ep');
@@ -275,28 +275,28 @@ The default format to render if C<format> is not set in the stash.
 The default template handler to use for rendering in cases where auto
 detection doesn't work, like for C<inline> templates.
 
-=head2 C<encoding>
+=head2 encoding
 
   my $encoding = $renderer->encoding;
   $renderer    = $renderer->encoding('koi8-r');
 
 Will encode the content if set, defaults to C<UTF-8>.
 
-=head2 C<handlers>
+=head2 handlers
 
   my $handlers = $renderer->handlers;
   $renderer    = $renderer->handlers({epl => sub {...}});
 
 Registered handlers.
 
-=head2 C<helpers>
+=head2 helpers
 
   my $helpers = $renderer->helpers;
   $renderer   = $renderer->helpers({url_for => sub {...}});
 
 Registered helpers.
 
-=head2 C<paths>
+=head2 paths
 
   my $paths = $renderer->paths;
   $renderer = $renderer->paths(['/home/sri/templates']);
@@ -311,26 +311,26 @@ Directories to look for templates in, first one has the highest precedence.
 L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $renderer = Mojolicious::Renderer->new;
 
 Construct a new renderer and register C<data>, C<json> as well as C<text>
 handlers.
 
-=head2 C<add_handler>
+=head2 add_handler
 
   $renderer = $renderer->add_handler(epl => sub {...});
 
 Register a new handler.
 
-=head2 C<add_helper>
+=head2 add_helper
 
   $renderer = $renderer->add_helper(url_for => sub {...});
 
 Register a new helper.
 
-=head2 C<get_data_template>
+=head2 get_data_template
 
   my $template = $renderer->get_data_template({
     template       => 'foo/bar',
@@ -340,7 +340,7 @@ Register a new helper.
 
 Get a C<DATA> section template by name, usually used by handlers.
 
-=head2 C<render>
+=head2 render
 
   my ($output, $format) = $renderer->render(Mojolicious::Controller->new);
   my ($output, $format) = $renderer->render(Mojolicious::Controller->new, {
@@ -351,7 +351,7 @@ Get a C<DATA> section template by name, usually used by handlers.
 Render output through one of the renderers. See
 L<Mojolicious::Controller/"render"> for a more user-friendly interface.
 
-=head2 C<template_name>
+=head2 template_name
 
   my $template = $renderer->template_name({
     template => 'foo/bar',
@@ -362,7 +362,7 @@ L<Mojolicious::Controller/"render"> for a more user-friendly interface.
 Builds a template name based on an options hash reference with C<template>,
 C<format> and C<handler>, usually used by handlers.
 
-=head2 C<template_path>
+=head2 template_path
 
   my $path = $renderer->template_path({
     template => 'foo/bar',

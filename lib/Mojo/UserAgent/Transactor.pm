@@ -284,13 +284,13 @@ framework used by L<Mojo::UserAgent>.
 L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<endpoint>
+=head2 endpoint
 
   my ($proto, $host, $port) = $t->endpoint(Mojo::Transaction::HTTP->new);
 
 Actual endpoint for transaction.
 
-=head2 C<form>
+=head2 form
 
   my $tx = $t->form('kraih.com' => {a => 'b'});
   my $tx = $t->form('http://kraih.com' => {a => 'b'});
@@ -329,7 +329,7 @@ enforce it by setting the header manually.
     {'Content-Type' => 'multipart/form-data'}
   );
 
-=head2 C<json>
+=head2 json
 
   my $tx = $t->json('kraih.com' => {a => 'b'});
   my $tx = $t->json('http://kraih.com' => [1, 2, 3]);
@@ -343,27 +343,27 @@ with JSON data.
   my $tx = $t->json('mojolicio.us/hello', {hello => 'world'});
   $tx->req->method('PATCH');
 
-=head2 C<peer>
+=head2 peer
 
   my ($proto, $host, $port) = $t->peer(Mojo::Transaction::HTTP->new);
 
 Actual peer for transaction.
 
-=head2 C<proxy_connect>
+=head2 proxy_connect
 
   my $tx = $t->proxy_connect(Mojo::Transaction::HTTP->new);
 
 Build L<Mojo::Transaction::HTTP> proxy connect request for transaction if
 possible.
 
-=head2 C<redirect>
+=head2 redirect
 
   my $tx = $t->redirect(Mojo::Transaction::HTTP->new);
 
 Build L<Mojo::Transaction::HTTP> followup request for C<301>, C<302>, C<303>,
 C<307> or C<308> redirect response if possible.
 
-=head2 C<tx>
+=head2 tx
 
   my $tx = $t->tx(GET  => 'kraih.com');
   my $tx = $t->tx(POST => 'http://kraih.com');
@@ -385,14 +385,14 @@ requests.
   my $tx = $t->tx(GET => 'http://mojolicio.us');
   $tx->connection($sock);
 
-=head2 C<upgrade>
+=head2 upgrade
 
   my $tx = $t->upgrade(Mojo::Transaction::HTTP->new);
 
 Build L<Mojo::Transaction::WebSocket> followup transaction for WebSocket
 handshake if possible.
 
-=head2 C<websocket>
+=head2 websocket
 
   my $tx = $t->websocket('ws://localhost:3000');
   my $tx = $t->websocket('ws://localhost:3000' => {DNT => 1});

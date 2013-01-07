@@ -185,7 +185,7 @@ L<Mojo::IOLoop::Server> accepts TCP connections for L<Mojo::IOLoop>.
 L<Mojo::IOLoop::Server> inherits all events from L<Mojo::EventEmitter> and can
 emit the following new ones.
 
-=head2 C<accept>
+=head2 accept
 
   $server->on(accept => sub {
     my ($server, $handle) = @_;
@@ -198,14 +198,14 @@ Emitted safely for each accepted connection.
 
 L<Mojo::IOLoop::Server> implements the following attributes.
 
-=head2 C<multi_accept>
+=head2 multi_accept
 
   my $multi = $server->multi_accept;
   $server   = $server->multi_accept(100);
 
 Number of connections to accept at once, defaults to C<50>.
 
-=head2 C<reactor>
+=head2 reactor
 
   my $reactor = $server->reactor;
   $server     = $server->reactor(Mojo::Reactor::Poll->new);
@@ -218,7 +218,7 @@ global L<Mojo::IOLoop> singleton.
 L<Mojo::IOLoop::Server> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 C<listen>
+=head2 listen
 
   $server->listen(port => 3000);
 
@@ -229,53 +229,53 @@ These options are currently available:
 
 =over 2
 
-=item C<address>
+=item address
 
 Local address to listen on, defaults to all.
 
-=item C<backlog>
+=item backlog
 
 Maximum backlog size, defaults to C<SOMAXCONN>.
 
-=item C<port>
+=item port
 
 Port to listen on.
 
-=item C<tls>
+=item tls
 
 Enable TLS.
 
-=item C<tls_ca>
+=item tls_ca
 
 Path to TLS certificate authority file.
 
-=item C<tls_cert>
+=item tls_cert
 
 Path to the TLS cert file, defaults to a built-in test certificate.
 
-=item C<tls_key>
+=item tls_key
 
 Path to the TLS key file, defaults to a built-in test key.
 
-=item C<tls_verify>
+=item tls_verify
 
 TLS verification mode, defaults to C<0x03>.
 
 =back
 
-=head2 C<generate_port>
+=head2 generate_port
 
   my $port = $server->generate_port;
 
 Find a free TCP port, this is a utility function primarily used for tests.
 
-=head2 C<start>
+=head2 start
 
   $server->start;
 
 Start accepting connections.
 
-=head2 C<stop>
+=head2 stop
 
   $server->stop;
 

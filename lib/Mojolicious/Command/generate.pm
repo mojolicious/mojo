@@ -41,35 +41,35 @@ example for learning to build new commands, you're welcome to fork it.
 L<Mojolicious::Command::generate> inherits all attributes from
 L<Mojolicious::Commands> and implements the following new ones.
 
-=head2 C<description>
+=head2 description
 
   my $description = $generator->description;
   $generator      = $generator->description('Foo!');
 
 Short description of this command, used for the command list.
 
-=head2 C<hint>
+=head2 hint
 
   my $hint   = $generator->hint;
   $generator = $generator->hint('Foo!');
 
 Short hint shown after listing available generator commands.
 
-=head2 C<usage>
+=head2 usage
 
   my $usage  = $generator->usage;
   $generator = $generator->usage('Foo!');
 
 Usage information for this command, used for the help screen.
 
-=head2 C<message>
+=head2 message
 
   my $msg    = $generator->message;
   $generator = $generator->message('Bar!');
 
 Short usage message shown before listing available generator commands.
 
-=head2 C<namespaces>
+=head2 namespaces
 
   my $namespaces = $generator->namespaces;
   $generator     = $generator->namespaces(['MyApp::Command::generate']);
@@ -82,7 +82,7 @@ L<Mojolicious::Command::generate>.
 L<Mojolicious::Command::generate> inherits all methods from
 L<Mojolicious::Commands> and implements the following new ones.
 
-=head2 C<help>
+=head2 help
 
   $generator->help('app');
 

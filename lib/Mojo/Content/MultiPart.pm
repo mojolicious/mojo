@@ -224,7 +224,7 @@ described in RFC 2616.
 L<Mojo::Content::Multipart> inherits all events from L<Mojo::Content> and can
 emit the following new ones.
 
-=head2 C<part>
+=head2 part
 
   $multi->on(part => sub {
     my ($multi, $single) = @_;
@@ -244,7 +244,7 @@ Emitted when a new L<Mojo::Content::Single> part starts.
 L<Mojo::Content::MultiPart> inherits all attributes from L<Mojo::Content> and
 implements the following new ones.
 
-=head2 C<parts>
+=head2 parts
 
   my $parts = $multi->parts;
   $multi    = $multi->parts([]);
@@ -257,44 +257,44 @@ L<Mojo::Content::Single> objects.
 L<Mojo::Content::MultiPart> inherits all methods from L<Mojo::Content> and
 implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $multi = Mojo::Content::MultiPart->new;
 
 Construct a new L<Mojo::Content::MultiPart> object and subscribe to C<read>
 event with default content parser.
 
-=head2 C<body_contains>
+=head2 body_contains
 
   my $success = $multi->body_contains('foobarbaz');
 
 Check if content parts contain a specific string.
 
-=head2 C<body_size>
+=head2 body_size
 
   my $size = $multi->body_size;
 
 Content size in bytes.
 
-=head2 C<build_boundary>
+=head2 build_boundary
 
   my $boundary = $multi->build_boundary;
 
 Generate a suitable boundary for content and add it to C<Content-Type> header.
 
-=head2 C<clone>
+=head2 clone
 
   my $clone = $multi->clone;
 
 Clone content if possible, otherwise return C<undef>.
 
-=head2 C<get_body_chunk>
+=head2 get_body_chunk
 
   my $chunk = $multi->get_body_chunk(0);
 
 Get a chunk of content starting from a specfic position.
 
-=head2 C<is_multipart>
+=head2 is_multipart
 
   my $true = $multi->is_multipart;
 

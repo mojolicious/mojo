@@ -286,35 +286,35 @@ L<Mojolicious::Routes>.
 
 L<Mojolicious::Routes::Route> implements the following attributes.
 
-=head2 C<children>
+=head2 children
 
   my $children = $r->children;
   $r           = $r->children([Mojolicious::Routes::Route->new]);
 
 The children of this route, used for nesting routes.
 
-=head2 C<inline>
+=head2 inline
 
   my $inline = $r->inline;
   $r         = $r->inline(1);
 
 Allow C<bridge> semantics for this route.
 
-=head2 C<parent>
+=head2 parent
 
   my $parent = $r->parent;
   $r         = $r->parent(Mojolicious::Routes::Route->new);
 
 The parent of this route, used for nesting routes.
 
-=head2 C<partial>
+=head2 partial
 
   my $partial = $r->partial;
   $r          = $r->partial(1);
 
 Route has no specific end, remaining characters will be captured in C<path>.
 
-=head2 C<pattern>
+=head2 pattern
 
   my $pattern = $r->pattern;
   $r          = $r->pattern(Mojolicious::Routes::Pattern->new);
@@ -326,14 +326,14 @@ Pattern for this route, defaults to a L<Mojolicious::Routes::Pattern> object.
 L<Mojolicious::Routes::Route> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $r = Mojolicious::Routes::Route->new;
   my $r = Mojolicious::Routes::Route->new('/:controller/:action');
 
 Construct a new L<Mojolicious::Routes::Route> object.
 
-=head2 C<add_child>
+=head2 add_child
 
   $r = $r->add_child(Mojolicious::Route->new);
 
@@ -343,7 +343,7 @@ current parent if necessary.
   # Reattach route
   $r->add_child($r->find('foo'));
 
-=head2 C<any>
+=head2 any
 
   my $route = $r->any('/:foo' => sub {...});
   my $route = $r->any([qw(GET POST)] => '/:foo' => sub {...});
@@ -353,7 +353,7 @@ also the L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->any('/user')->to('user#whatever');
 
-=head2 C<bridge>
+=head2 bridge
 
   my $bridge = $r->bridge;
   my $bridge = $r->bridge('/:action');
@@ -366,7 +366,7 @@ Generate bridge route.
   $auth->get('/show')->to('#show');
   $auth->post('/create')->to('#create');
 
-=head2 C<delete>
+=head2 delete
 
   my $route = $r->delete('/:foo' => sub {...});
 
@@ -375,7 +375,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->delete('/user')->to('user#remove');
 
-=head2 C<detour>
+=head2 detour
 
   $r = $r->detour(action => 'foo');
   $r = $r->detour({action => 'foo'});
@@ -392,7 +392,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 Set default parameters for this route and allow partial matching to simplify
 application embedding.
 
-=head2 C<find>
+=head2 find
 
   my $route = $r->find('foo');
 
@@ -401,7 +401,7 @@ generated ones.
 
   $r->find('show_user')->to(foo => 'bar');
 
-=head2 C<get>
+=head2 get
 
   my $route = $r->get('/:foo' => sub {...});
 
@@ -410,37 +410,37 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->get('/user')->to('user#show');
 
-=head2 C<has_conditions>
+=head2 has_conditions
 
   my $success = $r->has_conditions;
 
 Check if this route has active conditions.
 
-=head2 C<has_custom_name>
+=head2 has_custom_name
 
   my $success = $r->has_custom_name;
 
 Check if this route has a custom name.
 
-=head2 C<has_websocket>
+=head2 has_websocket
 
   my $success = $r->has_websocket;
 
 Check if this route has a WebSocket ancestor.
 
-=head2 C<is_endpoint>
+=head2 is_endpoint
 
   my $success = $r->is_endpoint;
 
 Check if this route qualifies as an endpoint.
 
-=head2 C<is_websocket>
+=head2 is_websocket
 
   my $success = $r->is_websocket;
 
 Check if this route is a WebSocket.
 
-=head2 C<name>
+=head2 name
 
   my $name = $r->name;
   $r       = $r->name('foo');
@@ -451,7 +451,7 @@ the current route.
 
   $r->get('/user')->to('user#show')->name('show_user');
 
-=head2 C<options>
+=head2 options
 
   my $route = $r->options('/:foo' => sub {...});
 
@@ -460,7 +460,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->options('/user')->to('user#overview');
 
-=head2 C<over>
+=head2 over
 
   my $over = $r->over;
   $r       = $r->over(foo => 1);
@@ -472,7 +472,7 @@ routing cache, since conditions are too complex for caching.
 
   $r->get('/foo')->over(host => qr/mojolicio\.us/)->to('foo#bar');
 
-=head2 C<parse>
+=head2 parse
 
   $r = $r->parse('/:action');
   $r = $r->parse('/:action', action => qr/\w+/);
@@ -480,7 +480,7 @@ routing cache, since conditions are too complex for caching.
 
 Parse a pattern.
 
-=head2 C<patch>
+=head2 patch
 
   my $route = $r->patch('/:foo' => sub {...});
 
@@ -489,7 +489,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->patch('/user')->to('user#update');
 
-=head2 C<post>
+=head2 post
 
   my $route = $r->post('/:foo' => sub {...});
 
@@ -498,7 +498,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->post('/user')->to('user#create');
 
-=head2 C<put>
+=head2 put
 
   my $route = $r->put('/:foo' => sub {...});
 
@@ -507,7 +507,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->put('/user')->to('user#replace');
 
-=head2 C<remove>
+=head2 remove
 
   $r = $r->remove;
 
@@ -519,14 +519,14 @@ Remove route from parent.
   # Reattach route to new parent
   $r->route('/foo')->add_child($r->find('bar')->remove);
 
-=head2 C<render>
+=head2 render
 
   my $path = $r->render($suffix);
   my $path = $r->render($suffix, {foo => 'bar'});
 
 Render route with parameters into a path.
 
-=head2 C<root>
+=head2 root
 
   my $root = $r->root;
 
@@ -534,7 +534,7 @@ The L<Mojolicious::Routes> object this route is an descendent of.
 
   $r->root->cache(0);
 
-=head2 C<route>
+=head2 route
 
   my $route = $r->route;
   my $route = $r->route('/:action');
@@ -543,7 +543,7 @@ The L<Mojolicious::Routes> object this route is an descendent of.
 
 Generate route matching all HTTP request methods.
 
-=head2 C<to>
+=head2 to
 
   my $defaults = $r->to;
   $r           = $r->to(action => 'foo');
@@ -560,13 +560,13 @@ Generate route matching all HTTP request methods.
 
 Set default parameters for this route.
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $r->to_string;
 
 Stringify the whole route.
 
-=head2 C<under>
+=head2 under
 
   my $route = $r->under(sub {...});
   my $route = $r->under('/:foo');
@@ -578,7 +578,7 @@ argument variations.
   $auth->get('/show')->to('#show');
   $auth->post('/create')->to('#create');
 
-=head2 C<via>
+=head2 via
 
   my $methods = $r->via;
   $r          = $r->via('GET');
@@ -590,7 +590,7 @@ restrictions.
 
   $r->route('/foo')->via(qw(GET POST))->to('foo#bar');
 
-=head2 C<websocket>
+=head2 websocket
 
   my $websocket = $r->websocket('/:foo' => sub {...});
 

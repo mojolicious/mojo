@@ -64,7 +64,7 @@ you're welcome to fork it.
 L<Mojolicious::Plugin::Mount> inherits all methods from L<Mojolicious::Plugin>
 and implements the following new ones.
 
-=head2 C<register>
+=head2 register
 
   my $route = $plugin->register(Mojolicious->new, {'/foo' => '/some/app.pl'});
 

@@ -174,21 +174,21 @@ L<Mojo::Asset::File> inherits all events from L<Mojo::Asset>.
 L<Mojo::Asset::File> inherits all attributes from L<Mojo::Asset> and
 implements the following new ones.
 
-=head2 C<cleanup>
+=head2 cleanup
 
   my $cleanup = $file->cleanup;
   $file       = $file->cleanup(1);
 
 Delete file automatically once it's not used anymore.
 
-=head2 C<handle>
+=head2 handle
 
   my $handle = $file->handle;
   $file      = $file->handle(IO::File->new);
 
 File handle, created on demand.
 
-=head2 C<path>
+=head2 path
 
   my $path = $file->path;
   $file    = $file->path('/home/sri/foo.txt');
@@ -196,7 +196,7 @@ File handle, created on demand.
 File path used to create C<handle>, can also be automatically generated if
 necessary.
 
-=head2 C<tmpdir>
+=head2 tmpdir
 
   my $tmpdir = $file->tmpdir;
   $file      = $file->tmpdir('/tmp');
@@ -209,43 +209,43 @@ C<MOJO_TMPDIR> environment variable or auto detection.
 L<Mojo::Asset::File> inherits all methods from L<Mojo::Asset> and implements
 the following new ones.
 
-=head2 C<add_chunk>
+=head2 add_chunk
 
   $file = $file->add_chunk('foo bar baz');
 
 Add chunk of data.
 
-=head2 C<contains>
+=head2 contains
 
   my $position = $file->contains('bar');
 
 Check if asset contains a specific string.
 
-=head2 C<get_chunk>
+=head2 get_chunk
 
   my $chunk = $file->get_chunk($start);
 
 Get chunk of data starting from a specific position.
 
-=head2 C<is_file>
+=head2 is_file
 
   my $true = $file->is_file;
 
 True.
 
-=head2 C<move_to>
+=head2 move_to
 
   $file = $file->move_to('/home/sri/bar.txt');
 
 Move asset data into a specific file and disable C<cleanup>.
 
-=head2 C<size>
+=head2 size
 
   my $size = $file->size;
 
 Size of asset data in bytes.
 
-=head2 C<slurp>
+=head2 slurp
 
   my $string = $file->slurp;
 

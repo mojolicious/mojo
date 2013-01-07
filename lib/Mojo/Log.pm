@@ -101,7 +101,7 @@ L<Mojo::Log> is a simple logger for L<Mojo> projects.
 L<Mojo::Log> inherits all events from L<Mojo::EventEmitter> and can emit the
 following new ones.
 
-=head2 C<message>
+=head2 message
 
   $log->on(message => sub {
     my ($log, $level, @lines) = @_;
@@ -120,7 +120,7 @@ Emitted when a new message gets logged.
 
 L<Mojo::Log> implements the following attributes.
 
-=head2 C<handle>
+=head2 handle
 
   my $handle = $log->handle;
   $log       = $log->handle(IO::Handle->new);
@@ -128,7 +128,7 @@ L<Mojo::Log> implements the following attributes.
 Log file handle used by default C<message> event, defaults to opening C<path>
 or C<STDERR>.
 
-=head2 C<level>
+=head2 level
 
   my $level = $log->level;
   $log      = $log->level('debug');
@@ -140,19 +140,19 @@ These levels are currently available:
 
 =over 2
 
-=item C<debug>
+=item debug
 
-=item C<info>
+=item info
 
-=item C<warn>
+=item warn
 
-=item C<error>
+=item error
 
-=item C<fatal>
+=item fatal
 
 =back
 
-=head2 C<path>
+=head2 path
 
   my $path = $log->path
   $log     = $log->path('/var/log/mojo.log');
@@ -164,87 +164,87 @@ Log file path used by C<handle>.
 L<Mojo::Log> inherits all methods from L<Mojo::EventEmitter> and implements
 the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $log = Mojo::Log->new;
 
 Construct a new L<Mojo::Log> object and subscribe to C<message> event with
 default logger.
 
-=head2 C<debug>
+=head2 debug
 
   $log = $log->debug('You screwed up, but that is ok');
 
 Log debug message.
 
-=head2 C<error>
+=head2 error
 
   $log = $log->error('You really screwed up this time');
 
 Log error message.
 
-=head2 C<fatal>
+=head2 fatal
 
   $log = $log->fatal('Its over...');
 
 Log fatal message.
 
-=head2 C<format>
+=head2 format
 
   my $msg = $log->format('debug', 'Hi there!');
   my $msg = $log->format('debug', 'Hi', 'there!');
 
 Format log message.
 
-=head2 C<info>
+=head2 info
 
   $log = $log->info('You are bad, but you prolly know already');
 
 Log info message.
 
-=head2 C<is_level>
+=head2 is_level
 
   my $success = $log->is_level('debug');
 
 Check log level.
 
-=head2 C<is_debug>
+=head2 is_debug
 
   my $success = $log->is_debug;
 
 Check for debug log level.
 
-=head2 C<is_error>
+=head2 is_error
 
   my $success = $log->is_error;
 
 Check for error log level.
 
-=head2 C<is_fatal>
+=head2 is_fatal
 
   my $success = $log->is_fatal;
 
 Check for fatal log level.
 
-=head2 C<is_info>
+=head2 is_info
 
   my $success = $log->is_info;
 
 Check for info log level.
 
-=head2 C<is_warn>
+=head2 is_warn
 
   my $success = $log->is_warn;
 
 Check for warn log level.
 
-=head2 C<log>
+=head2 log
 
   $log = $log->log(debug => 'This should work');
 
 Emit C<message> event.
 
-=head2 C<warn>
+=head2 warn
 
   $log = $log->warn('Dont do that Dave...');
 

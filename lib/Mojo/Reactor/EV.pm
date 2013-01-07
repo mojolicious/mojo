@@ -111,53 +111,53 @@ L<Mojo::Reactor::EV> inherits all events from L<Mojo::Reactor::Poll>.
 L<Mojo::Reactor::EV> inherits all methods from L<Mojo::Reactor::Poll> and
 implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $reactor = Mojo::Reactor::EV->new;
 
 Construct a new L<Mojo::Reactor::EV> object.
 
-=head2 C<is_running>
+=head2 is_running
 
   my $success = $reactor->is_running;
 
 Check if reactor is running.
 
-=head2 C<one_tick>
+=head2 one_tick
 
   $reactor->one_tick;
 
 Run reactor until an event occurs or no events are being watched anymore. Note
 that this method can recurse back into the reactor, so you need to be careful.
 
-=head2 C<recurring>
+=head2 recurring
 
   my $id = $reactor->recurring(0.25 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
 
-=head2 C<start>
+=head2 start
 
   $reactor->start;
 
 Start watching for I/O and timer events, this will block until C<stop> is
 called or no events are being watched anymore.
 
-=head2 C<stop>
+=head2 stop
 
   $reactor->stop;
 
 Stop watching for I/O and timer events.
 
-=head2 C<timer>
+=head2 timer
 
   my $id = $reactor->timer(0.5 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds.
 
-=head2 C<watch>
+=head2 watch
 
   $reactor = $reactor->watch($handle, $readable, $writable);
 

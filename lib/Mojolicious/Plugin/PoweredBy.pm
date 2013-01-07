@@ -36,7 +36,7 @@ example for learning to build new plugins, you're welcome to fork it.
 
 L<Mojolicious::Plugin::PoweredBy> supports the following options.
 
-=head2 C<name>
+=head2 name
 
   plugin PoweredBy => (name => 'MyApp 1.0');
 
@@ -47,7 +47,7 @@ Value for C<X-Powered-By> header, defaults to C<Mojolicious (Perl)>.
 L<Mojolicious::Plugin::PoweredBy> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
-=head2 C<register>
+=head2 register
 
   $plugin->register(Mojolicious->new);
   $plugin->register(Mojolicious->new, {name => 'MyFramework 1.0'});

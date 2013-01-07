@@ -115,7 +115,7 @@ L<Mojo::Loader> is a class loader and plugin framework.
 L<Mojo::Loader> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<data>
+=head2 data
 
   my $all   = $loader->data('Foo::Bar');
   my $index = $loader->data('Foo::Bar', 'index.html');
@@ -124,7 +124,7 @@ Extract embedded file from the C<DATA> section of a class.
 
   say for keys %{$loader->data('Foo::Bar')};
 
-=head2 C<load>
+=head2 load
 
   my $e = $loader->load('Foo::Bar');
 
@@ -135,7 +135,7 @@ method to see if they are already loaded.
     die ref $e ? "Exception: $e" : 'Already loaded!';
   }
 
-=head2 C<search>
+=head2 search
 
   my $modules = $loader->search('MyApp::Namespace');
 

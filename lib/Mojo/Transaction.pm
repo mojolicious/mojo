@@ -104,7 +104,7 @@ L<Mojo::Transaction> is an abstract base class for transactions.
 L<Mojo::Transaction> inherits all events from L<Mojo::EventEmitter> and can
 emit the following new ones.
 
-=head2 C<connection>
+=head2 connection
 
   $tx->on(connection => sub {
     my ($tx, $connection) = @_;
@@ -113,7 +113,7 @@ emit the following new ones.
 
 Emitted when a connection has been assigned to transaction.
 
-=head2 C<finish>
+=head2 finish
 
   $tx->on(finish => sub {
     my $tx = shift;
@@ -122,7 +122,7 @@ Emitted when a connection has been assigned to transaction.
 
 Emitted when transaction is finished.
 
-=head2 C<resume>
+=head2 resume
 
   $tx->on(resume => sub {
     my $tx = shift;
@@ -135,28 +135,28 @@ Emitted when transaction is resumed.
 
 L<Mojo::Transaction> implements the following attributes.
 
-=head2 C<kept_alive>
+=head2 kept_alive
 
   my $kept_alive = $tx->kept_alive;
   $tx            = $tx->kept_alive(1);
 
 Connection has been kept alive.
 
-=head2 C<local_address>
+=head2 local_address
 
   my $address = $tx->local_address;
   $tx         = $tx->local_address('127.0.0.1');
 
 Local interface address.
 
-=head2 C<local_port>
+=head2 local_port
 
   my $port = $tx->local_port;
   $tx      = $tx->local_port(8080);
 
 Local interface port.
 
-=head2 C<previous>
+=head2 previous
 
   my $previous = $tx->previous;
   $tx          = $tx->previous(Mojo::Transaction->new);
@@ -166,21 +166,21 @@ Previous transaction that triggered this followup transaction.
   # Path of previous request
   say $tx->previous->req->url->path;
 
-=head2 C<remote_port>
+=head2 remote_port
 
   my $port = $tx->remote_port;
   $tx      = $tx->remote_port(8081);
 
 Remote interface port.
 
-=head2 C<req>
+=head2 req
 
   my $req = $tx->req;
   $tx     = $tx->req(Mojo::Message::Request->new);
 
 HTTP request, defaults to a L<Mojo::Message::Request> object.
 
-=head2 C<res>
+=head2 res
 
   my $res = $tx->res;
   $tx     = $tx->res(Mojo::Message::Response->new);
@@ -192,92 +192,92 @@ HTTP response, defaults to a L<Mojo::Message::Response> object.
 L<Mojo::Transaction> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 C<client_close>
+=head2 client_close
 
   $tx->client_close;
 
 Transaction closed client-side, used to implement user agents.
 
-=head2 C<client_read>
+=head2 client_read
 
   $tx->client_read($chunk);
 
 Read data client-side, used to implement user agents. Meant to be overloaded
 in a subclass.
 
-=head2 C<client_write>
+=head2 client_write
 
   my $chunk = $tx->client_write;
 
 Write data client-side, used to implement user agents. Meant to be overloaded
 in a subclass.
 
-=head2 C<connection>
+=head2 connection
 
   my $connection = $tx->connection;
   $tx            = $tx->connection($connection);
 
 Connection identifier or socket.
 
-=head2 C<error>
+=head2 error
 
   my $err          = $tx->error;
   my ($err, $code) = $tx->error;
 
 Error and code.
 
-=head2 C<is_finished>
+=head2 is_finished
 
   my $success = $tx->is_finished;
 
 Check if transaction is finished.
 
-=head2 C<is_websocket>
+=head2 is_websocket
 
   my $false = $tx->is_websocket;
 
 False.
 
-=head2 C<is_writing>
+=head2 is_writing
 
   my $success = $tx->is_writing;
 
 Check if transaction is writing.
 
-=head2 C<resume>
+=head2 resume
 
   $tx = $tx->resume;
 
 Resume transaction.
 
-=head2 C<remote_address>
+=head2 remote_address
 
   my $address = $tx->remote_address;
   $tx         = $tx->remote_address('127.0.0.1');
 
 Remote interface address.
 
-=head2 C<server_close>
+=head2 server_close
 
   $tx->server_close;
 
 Transaction closed server-side, used to implement web servers.
 
-=head2 C<server_read>
+=head2 server_read
 
   $tx->server_read($chunk);
 
 Read data server-side, used to implement web servers. Meant to be overloaded
 in a subclass.
 
-=head2 C<server_write>
+=head2 server_write
 
   my $chunk = $tx->server_write;
 
 Write data server-side, used to implement web servers. Meant to be overloaded
 in a subclass.
 
-=head2 C<success>
+=head2 success
 
   my $res = $tx->success;
 

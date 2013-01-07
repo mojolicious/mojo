@@ -136,7 +136,7 @@ See L<Mojolicious::Guides::Cookbook> for more.
 
 L<Mojo::Server::Morbo> implements the following attributes.
 
-=head2 C<watch>
+=head2 watch
 
   my $watch = $morbo->watch;
   $morbo    = $morbo->watch(['/home/sri/myapp']);
@@ -150,13 +150,13 @@ directory.
 L<Mojo::Server::Morbo> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
-=head2 C<check_file>
+=head2 check_file
 
   my $success = $morbo->check_file('/home/sri/lib/MyApp.pm');
 
 Check if file has been modified since last check.
 
-=head2 C<run>
+=head2 run
 
   $morbo->run('script/myapp');
 

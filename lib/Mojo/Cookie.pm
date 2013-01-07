@@ -68,14 +68,14 @@ L<Mojo::Cookie> is an abstract base class for HTTP cookies.
 
 L<Mojo::Cookie> implements the following attributes.
 
-=head2 C<name>
+=head2 name
 
   my $name = $cookie->name;
   $cookie  = $cookie->name('foo');
 
 Cookie name.
 
-=head2 C<value>
+=head2 value
 
   my $value = $cookie->value;
   $cookie   = $cookie->value('/test');
@@ -87,13 +87,13 @@ Cookie value.
 L<Mojo::Cookie> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<parse>
+=head2 parse
 
   my $cookies = $cookie->parse($string);
 
 Parse cookies. Meant to be overloaded in a subclass.
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $cookie->to_string;
   my $string = "$cookie";

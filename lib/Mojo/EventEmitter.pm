@@ -119,7 +119,7 @@ L<Mojo::EventEmitter> is a simple base class for event emitting objects.
 
 L<Mojo::EventEmitter> can emit the following events.
 
-=head2 C<error>
+=head2 error
 
   $e->on(error => sub {
     my ($e, $err) = @_;
@@ -138,34 +138,34 @@ Emitted safely for event errors.
 L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $e = Mojo::EventEmitter->new;
 
 Construct a new L<Mojo::EventEmitter> object and subscribe to C<error> event
 with default error handling.
 
-=head2 C<emit>
+=head2 emit
 
   $e = $e->emit('foo');
   $e = $e->emit('foo', 123);
 
 Emit event.
 
-=head2 C<emit_safe>
+=head2 emit_safe
 
   $e = $e->emit_safe('foo');
   $e = $e->emit_safe('foo', 123);
 
 Emit event safely and emit C<error> event on failure.
 
-=head2 C<has_subscribers>
+=head2 has_subscribers
 
   my $success = $e->has_subscribers('foo');
 
 Check if event has subscribers.
 
-=head2 C<on>
+=head2 on
 
   my $cb = $e->on(foo => sub {...});
 
@@ -176,7 +176,7 @@ Subscribe to event.
     ...
   });
 
-=head2 C<once>
+=head2 once
 
   my $cb = $e->once(foo => sub {...});
 
@@ -187,7 +187,7 @@ Subscribe to event and unsubscribe again after it has been emitted once.
     ...
   });
 
-=head2 C<subscribers>
+=head2 subscribers
 
   my $subscribers = $e->subscribers('foo');
 
@@ -196,7 +196,7 @@ All subscribers for event.
   # Unsubscribe last subscriber
   $e->unsubscribe(foo => $e->subscribers('foo')->[-1]);
 
-=head2 C<unsubscribe>
+=head2 unsubscribe
 
   $e = $e->unsubscribe('foo');
   $e = $e->unsubscribe(foo => $cb);

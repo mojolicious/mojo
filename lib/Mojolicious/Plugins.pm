@@ -147,7 +147,7 @@ L<Mojolicious::Plugins> inherits all events from L<Mojo::EventEmitter>.
 
 L<Mojolicious::Plugins> implements the following attributes.
 
-=head2 C<namespaces>
+=head2 namespaces
 
   my $namespaces = $plugins->namespaces;
   $plugins       = $plugins->namespaces(['Mojolicious::Plugin']);
@@ -162,28 +162,28 @@ Namespaces to load plugins from, defaults to L<Mojolicious::Plugin>.
 L<Mojolicious::Plugins> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 C<emit_chain>
+=head2 emit_chain
 
   $plugins = $plugins->emit_chain('foo');
   $plugins = $plugins->emit_chain(foo => 123);
 
 Emit events as chained hooks.
 
-=head2 C<emit_hook>
+=head2 emit_hook
 
   $plugins = $plugins->emit_hook('foo');
   $plugins = $plugins->emit_hook(foo => 123);
 
 Emit events as hooks.
 
-=head2 C<emit_hook_reverse>
+=head2 emit_hook_reverse
 
   $plugins = $plugins->emit_hook_reverse('foo');
   $plugins = $plugins->emit_hook_reverse(foo => 123);
 
 Emit events as hooks in reverse order.
 
-=head2 C<load_plugin>
+=head2 load_plugin
 
   my $plugin = $plugins->load_plugin('some_thing');
   my $plugin = $plugins->load_plugin('SomeThing');
@@ -191,7 +191,7 @@ Emit events as hooks in reverse order.
 
 Load a plugin from the configured namespaces or by full module name.
 
-=head2 C<register_plugin>
+=head2 register_plugin
 
   $plugins->register_plugin('some_thing', Mojolicious->new);
   $plugins->register_plugin('some_thing', Mojolicious->new, foo => 23);

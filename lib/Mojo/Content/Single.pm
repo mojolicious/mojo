@@ -83,7 +83,7 @@ L<Mojo::Content::Single> is a container for HTTP content as described in RFC
 L<Mojo::Content::Single> inherits all events from L<Mojo::Content> and can
 emit the following new ones.
 
-=head2 C<upgrade>
+=head2 upgrade
 
   $single->on(upgrade => sub {
     my ($single, $multi) = @_;
@@ -103,7 +103,7 @@ Emitted when content gets upgraded to a L<Mojo::Content::MultiPart> object.
 L<Mojo::Content::Single> inherits all attributes from L<Mojo::Content> and
 implements the following new ones.
 
-=head2 C<asset>
+=head2 asset
 
   my $asset = $single->asset;
   $single   = $single->asset(Mojo::Asset::Memory->new);
@@ -111,7 +111,7 @@ implements the following new ones.
 The actual content, defaults to a L<Mojo::Asset::Memory> object with
 C<auto_upgrade> enabled.
 
-=head2 C<auto_upgrade>
+=head2 auto_upgrade
 
   my $upgrade = $single->auto_upgrade;
   $single     = $single->auto_upgrade(0);
@@ -124,38 +124,38 @@ L<Mojo::Content::MultiPart> object, defaults to C<1>.
 L<Mojo::Content::Single> inherits all methods from L<Mojo::Content> and
 implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $single = Mojo::Content::Single->new;
 
 Construct a new L<Mojo::Content::Single> object and subscribe to C<read> event
 with default content parser.
 
-=head2 C<body_contains>
+=head2 body_contains
 
   my $success = $single->body_contains('1234567');
 
 Check if content contains a specific string.
 
-=head2 C<body_size>
+=head2 body_size
 
   my $size = $single->body_size;
 
 Content size in bytes.
 
-=head2 C<clone>
+=head2 clone
 
   my $clone = $single->clone;
 
 Clone content if possible, otherwise return C<undef>.
 
-=head2 C<get_body_chunk>
+=head2 get_body_chunk
 
   my $chunk = $single->get_body_chunk(0);
 
 Get a chunk of content starting from a specfic position.
 
-=head2 C<parse>
+=head2 parse
 
   $single   = $single->parse("Content-Length: 12\r\n\r\nHello World!");
   my $multi = $single->parse("Content-Type: multipart/form-data\r\n\r\n");

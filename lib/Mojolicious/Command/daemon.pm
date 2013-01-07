@@ -72,14 +72,14 @@ example for learning to build new commands, you're welcome to fork it.
 L<Mojolicious::Command::daemon> inherits all attributes from
 L<Mojolicious::Command> and implements the following new ones.
 
-=head2 C<description>
+=head2 description
 
   my $description = $daemon->description;
   $daemon         = $daemon->description('Foo!');
 
 Short description of this command, used for the command list.
 
-=head2 C<usage>
+=head2 usage
 
   my $usage = $daemon->usage;
   $daemon   = $daemon->usage('Foo!');
@@ -91,7 +91,7 @@ Usage information for this command, used for the help screen.
 L<Mojolicious::Command::daemon> inherits all methods from
 L<Mojolicious::Command> and implements the following new ones.
 
-=head2 C<run>
+=head2 run
 
   $daemon->run(@ARGV);
 

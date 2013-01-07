@@ -231,7 +231,7 @@ Take a look at our excellent documentation in L<Mojolicious::Guides>!
 L<Mojolicious> inherits all attributes from L<Mojo> and implements the
 following new ones.
 
-=head2 C<commands>
+=head2 commands
 
   my $commands = $app->commands;
   $app         = $app->commands(Mojolicious::Commands->new);
@@ -242,7 +242,7 @@ L<Mojolicious::Commands> object.
   # Add another namespace to load commands from
   push @{$app->commands->namespaces}, 'MyApp::Command';
 
-=head2 C<controller_class>
+=head2 controller_class
 
   my $class = $app->controller_class;
   $app      = $app->controller_class('Mojolicious::Controller');
@@ -250,7 +250,7 @@ L<Mojolicious::Commands> object.
 Class to be used for the default controller, defaults to
 L<Mojolicious::Controller>.
 
-=head2 C<mode>
+=head2 mode
 
   my $mode = $app->mode;
   $app     = $app->mode('production');
@@ -274,7 +274,7 @@ Right before calling C<startup> and mode specific methods, L<Mojolicious>
 will pick up the current mode, name the log file after it and raise the log
 level from C<debug> to C<info> if it has a value other than C<development>.
 
-=head2 C<moniker>
+=head2 moniker
 
   my $moniker = $app->moniker;
   $app        = $app->moniker('foo_bar');
@@ -283,7 +283,7 @@ Moniker of this application, often used as default filename for configuration
 files and the like, defaults to decamelizing the application class with
 L<Mojo::Util/"decamelize">.
 
-=head2 C<plugins>
+=head2 plugins
 
   my $plugins = $app->plugins;
   $app        = $app->plugins(Mojolicious::Plugins->new);
@@ -294,7 +294,7 @@ C<plugin> method below if you want to load a plugin.
   # Add another namespace to load plugins from
   push @{$app->plugins->namespaces}, 'MyApp::Plugin';
 
-=head2 C<renderer>
+=head2 renderer
 
   my $renderer = $app->renderer;
   $app         = $app->renderer(Mojolicious::Renderer->new);
@@ -310,7 +310,7 @@ contain more information.
   # Add another class with templates in DATA section
   push @{$app->renderer->classes}, 'Mojolicious::Plugin::Fun';
 
-=head2 C<routes>
+=head2 routes
 
   my $routes = $app->routes;
   $app       = $app->routes(Mojolicious::Routes->new);
@@ -325,7 +325,7 @@ startup method to define the url endpoints for your application.
     $r->get('/:controller/:action')->to('test#welcome');
   }
 
-=head2 C<secret>
+=head2 secret
 
   my $secret = $app->secret;
   $app       = $app->secret('passw0rd');
@@ -335,7 +335,7 @@ application name which is not very secure, so you should change it!!! As long
 as you are using the insecure default there will be debug messages in the log
 file reminding you to change your passphrase.
 
-=head2 C<sessions>
+=head2 sessions
 
   my $sessions = $app->sessions;
   $app         = $app->sessions(Mojolicious::Sessions->new);
@@ -345,7 +345,7 @@ object. You can usually leave this alone, see
 L<Mojolicious::Controller/"session"> for more information about working with
 session data.
 
-=head2 C<static>
+=head2 static
 
   my $static = $app->static;
   $app       = $app->static(Mojolicious::Static->new);
@@ -359,7 +359,7 @@ L<Mojolicious::Static> object.
   # Add another class with static files in DATA section
   push @{$app->static->classes}, 'Mojolicious::Plugin::Fun';
 
-=head2 C<types>
+=head2 types
 
   my $types = $app->types;
   $app      = $app->types(Mojolicious::Types->new);
@@ -374,7 +374,7 @@ L<Mojolicious::Types> object.
 L<Mojolicious> inherits all methods from L<Mojo> and implements the following
 new ones.
 
-=head2 C<new>
+=head2 new
 
   my $app = Mojolicious->new;
 
@@ -383,14 +383,14 @@ C<startup> in the process. Will automatically detect your home directory and
 set up logging based on your current operating mode. Also sets up the
 renderer, static dispatcher and a default set of plugins.
 
-=head2 C<build_tx>
+=head2 build_tx
 
   my $tx = $app->build_tx;
 
 Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
 object.
 
-=head2 C<defaults>
+=head2 defaults
 
   my $defaults = $app->defaults;
   my $foo      = $app->defaults('foo');
@@ -405,7 +405,7 @@ request.
   my $foo = $app->defaults->{foo};
   delete $app->defaults->{foo};
 
-=head2 C<dispatch>
+=head2 dispatch
 
   $app->dispatch(Mojolicious::Controller->new);
 
@@ -413,14 +413,14 @@ The heart of every Mojolicious application, calls the C<static> and C<routes>
 dispatchers for every request and passes them a L<Mojolicious::Controller>
 object.
 
-=head2 C<handler>
+=head2 handler
 
   $app->handler(Mojo::Transaction::HTTP->new);
   $app->handler(Mojolicious::Controller->new);
 
 Sets up the default controller and calls process for every request.
 
-=head2 C<helper>
+=head2 helper
 
   $app->helper(foo => sub {...});
 
@@ -438,7 +438,7 @@ and the application object, as well as a function in C<ep> templates.
   % cache->{foo} = 'bar';
   %= cache->{foo}
 
-=head2 C<hook>
+=head2 hook
 
   $app->hook(after_dispatch => sub {...});
 
@@ -456,7 +456,7 @@ These hooks are currently available and are emitted in the listed order:
 
 =over 2
 
-=item C<after_build_tx>
+=item after_build_tx
 
 Emitted right after the transaction is built and before the HTTP request gets
 parsed.
@@ -471,7 +471,7 @@ rather advanced features such as upload progress bars possible. Note that this
 hook will not work for embedded applications. (Passed the transaction and
 application object)
 
-=item C<before_dispatch>
+=item before_dispatch
 
 Emitted right before the static dispatcher and router start their work.
 
@@ -483,7 +483,7 @@ Emitted right before the static dispatcher and router start their work.
 Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller object)
 
-=item C<after_static_dispatch>
+=item after_static_dispatch
 
 Emitted in reverse order after the static dispatcher determined if a static
 file should be served and before the router starts its work.
@@ -496,7 +496,7 @@ file should be served and before the router starts its work.
 Mostly used for custom dispatchers and post-processing static file responses.
 (Passed the default controller object)
 
-=item C<after_render>
+=item after_render
 
 Emitted after content has been generated by the renderer that is not partial.
 Note that this hook can trigger out of order due to its dynamic nature, and
@@ -511,7 +511,7 @@ rendering.
 Mostly used for post-processing dynamically generated content. (Passed the
 current controller object, a reference to the content and the format)
 
-=item C<after_dispatch>
+=item after_dispatch
 
 Emitted in reverse order after a response has been rendered. Note that this
 hook can trigger out of order due to its dynamic nature, and with embedded
@@ -525,7 +525,7 @@ applications will only work for the application that is rendering.
 Useful for rewriting outgoing responses and other post-processing tasks.
 (Passed the current controller object)
 
-=item C<around_dispatch>
+=item around_dispatch
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you want
@@ -547,7 +547,7 @@ the default controller object)
 
 =back
 
-=head2 C<plugin>
+=head2 plugin
 
   $app->plugin('some_thing');
   $app->plugin('some_thing', foo => 23);
@@ -562,7 +562,7 @@ the default controller object)
 Load a plugin, for a full list of example plugins included in the
 L<Mojolicious> distribution see L<Mojolicious::Plugins/"PLUGINS">.
 
-=head2 C<start>
+=head2 start
 
   $app->start;
   $app->start(@ARGV);
@@ -573,7 +573,7 @@ commands available by default see L<Mojolicious::Commands/"COMMANDS">.
   # Always start daemon and ignore @ARGV
   $app->start('daemon', '-l', 'http://*:8080');
 
-=head2 C<startup>
+=head2 startup
 
   $app->startup;
 

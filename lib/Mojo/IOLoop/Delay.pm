@@ -112,7 +112,7 @@ L<Mojo::IOLoop::Delay> controls the flow of events for L<Mojo::IOLoop>.
 L<Mojo::IOLoop::Delay> inherits all events from L<Mojo::EventEmitter> and can
 emit the following new ones.
 
-=head2 C<finish>
+=head2 finish
 
   $delay->on(finish => sub {
     my ($delay, @args) = @_;
@@ -126,7 +126,7 @@ steps.
 
 L<Mojo::IOLoop::Delay> implements the following attributes.
 
-=head2 C<ioloop>
+=head2 ioloop
 
   my $ioloop = $delay->ioloop;
   $delay     = $delay->ioloop(Mojo::IOLoop->new);
@@ -139,7 +139,7 @@ singleton.
 L<Mojo::IOLoop::Delay> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 C<begin>
+=head2 begin
 
   my $cb = $delay->begin;
 
@@ -151,7 +151,7 @@ that the first argument passed to the callback will be ignored.
   Mojo::UserAgent->new->get('mojolicio.us' => $delay->begin);
   my $tx = $delay->wait;
 
-=head2 C<end>
+=head2 end
 
   my $remaining = $delay->end;
   my $remaining = $delay->end(@args);
@@ -159,7 +159,7 @@ that the first argument passed to the callback will be ignored.
 Decrement active event counter, all arguments are queued for the next step or
 C<finish> event and C<wait> method.
 
-=head2 C<steps>
+=head2 steps
 
   $delay = $delay->steps(sub {...}, sub {...});
 
@@ -167,7 +167,7 @@ Sequentialize multiple events, the first callback will run right away, and the
 next one once the active event counter reaches zero, this chain will continue
 until there are no more callbacks left.
 
-=head2 C<wait>
+=head2 wait
 
   my @args = $delay->wait;
 

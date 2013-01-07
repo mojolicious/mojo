@@ -145,7 +145,7 @@ C<If-Modified-Since> support.
 
 L<Mojolicious::Static> implements the following attributes.
 
-=head2 C<classes>
+=head2 classes
 
   my $classes = $static->classes;
   $static     = $static->classes(['main']);
@@ -156,7 +156,7 @@ highest precedence, defaults to C<main>.
   # Add another class with static files in DATA section
   push @{$static->classes}, 'Mojolicious::Plugin::Fun';
 
-=head2 C<paths>
+=head2 paths
 
   my $paths = $static->paths;
   $static   = $static->paths(['/home/sri/public']);
@@ -171,13 +171,13 @@ Directories to serve static files from, first one has the highest precedence.
 L<Mojolicious::Static> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
-=head2 C<dispatch>
+=head2 dispatch
 
   my $success = $static->dispatch(Mojolicious::Controller->new);
 
 Serve static file for L<Mojolicious::Controller> object.
 
-=head2 C<file>
+=head2 file
 
   my $asset = $static->file('foo/bar.html');
 
@@ -186,13 +186,13 @@ to C<paths> or from C<classes>.
 
   my $content = $static->file('foo/bar.html')->slurp;
 
-=head2 C<serve>
+=head2 serve
 
   my $success = $static->serve(Mojolicious::Controller->new, 'foo/bar.html');
 
 Serve a specific file, relative to C<paths> or from C<classes>.
 
-=head2 C<serve_asset>
+=head2 serve_asset
 
   $static->serve_asset(Mojolicious::Controller->new, Mojo::Asset::File->new);
 

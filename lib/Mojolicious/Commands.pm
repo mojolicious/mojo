@@ -156,7 +156,7 @@ the C<Mojolicious::Command> namespace.
 
 These commands are available by default.
 
-=head2 C<help>
+=head2 help
 
   $ mojo
   $ mojo help
@@ -169,31 +169,31 @@ List available commands with short descriptions.
 
 List available options for the command with short descriptions.
 
-=head2 C<cgi>
+=head2 cgi
 
   $ ./myapp.pl cgi
 
 Start application with CGI backend, usually auto detected.
 
-=head2 C<cpanify>
+=head2 cpanify
 
   $ mojo cpanify -u sri -p secr3t Mojolicious-Plugin-Fun-0.1.tar.gz
 
 Upload files to CPAN.
 
-=head2 C<daemon>
+=head2 daemon
 
   $ ./myapp.pl daemon
 
 Start application with standalone HTTP server backend.
 
-=head2 C<eval>
+=head2 eval
 
   $ ./myapp.pl eval 'say app->home'
 
 Run code against application.
 
-=head2 C<generate>
+=head2 generate
 
   $ mojo generate
   $ mojo generate help
@@ -232,40 +232,40 @@ Generate C<Makefile.PL> file for application.
 
 Generate directory structure for a fully functional L<Mojolicious> plugin.
 
-=head2 C<get>
+=head2 get
 
   $ mojo get http://mojolicio.us
   $ ./myapp.pl get /foo
 
 Perform requests to remote host or local application.
 
-=head2 C<inflate>
+=head2 inflate
 
   $ ./myapp.pl inflate
 
 Turn templates and static files embedded in the C<DATA> sections of your
 application into real files.
 
-=head2 C<psgi>
+=head2 psgi
 
   $ ./myapp.pl psgi
 
 Start application with PSGI backend, usually auto detected.
 
-=head2 C<routes>
+=head2 routes
 
   $ ./myapp.pl routes
 
 List application routes.
 
-=head2 C<test>
+=head2 test
 
   $ ./myapp.pl test
   $ ./myapp.pl test t/fun.t
 
 Runs application tests from the C<t> directory.
 
-=head2 C<version>
+=head2 version
 
   $ mojo version
   $ ./myapp.pl version
@@ -278,21 +278,21 @@ for debugging.
 L<Mojolicious::Commands> inherits all attributes from L<Mojolicious::Command>
 and implements the following new ones.
 
-=head2 C<hint>
+=head2 hint
 
   my $hint  = $commands->hint;
   $commands = $commands->hint('Foo!');
 
 Short hint shown after listing available commands.
 
-=head2 C<message>
+=head2 message
 
   my $msg   = $commands->message;
   $commands = $commands->message('Hello World!');
 
 Short usage message shown before listing available commands.
 
-=head2 C<namespaces>
+=head2 namespaces
 
   my $namespaces = $commands->namespaces;
   $commands      = $commands->namespaces(['MyApp::Command']);
@@ -307,14 +307,14 @@ Namespaces to load commands from, defaults to C<Mojolicious::Command>.
 L<Mojolicious::Commands> inherits all methods from L<Mojolicious::Command> and
 implements the following new ones.
 
-=head2 C<detect>
+=head2 detect
 
   my $env = $commands->detect;
   my $env = $commands->detect($guess);
 
 Try to detect environment.
 
-=head2 C<run>
+=head2 run
 
   $commands->run;
   $commands->run(@ARGV);
@@ -322,7 +322,7 @@ Try to detect environment.
 Load and run commands. Automatic deployment environment detection can be
 disabled with the C<MOJO_NO_DETECT> environment variable.
 
-=head2 C<start_app>
+=head2 start_app
 
   Mojolicious::Commands->start_app('MyApp');
   Mojolicious::Commands->start_app(MyApp => @ARGV);

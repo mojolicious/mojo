@@ -112,7 +112,7 @@ The most common ones are already defined.
 
 L<Mojolicious::Types> implements the following attributes.
 
-=head2 C<types>
+=head2 types
 
   my $map = $types->types;
   $types  = $types->types({png => 'image/png'});
@@ -124,7 +124,7 @@ List of MIME types.
 L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
-=head2 C<detect>
+=head2 detect
 
   my $exts = $types->detect('application/json;q=9');
   my $exts = $types->detect('text/html, application/json;q=9', 1);
@@ -135,7 +135,7 @@ unspecific values that contain more than one MIME type is disabled by default.
   # List detected extensions prioritized
   say for @{$types->detect('application/json, text/xml;q=0.1', 1)};
 
-=head2 C<type>
+=head2 type
 
   my $type = $types->type('png');
   $types   = $types->type(png => 'image/png');

@@ -77,7 +77,7 @@ example for learning to build new plugins, you're welcome to fork it.
 L<Mojolicious::Plugin::HeaderCondition> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
-=head2 C<register>
+=head2 register
 
   $plugin->register(Mojolicious->new);
 

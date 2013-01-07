@@ -109,13 +109,13 @@ L<Mojo::Server::PSGI> inherits all events from L<Mojo::Server>.
 L<Mojo::Server::PSGI> inherits all methods from L<Mojo::Server> and implements
 the following new ones.
 
-=head2 C<run>
+=head2 run
 
   my $res = $psgi->run($env);
 
 Run L<PSGI>.
 
-=head2 C<to_psgi_app>
+=head2 to_psgi_app
 
   my $app = $psgi->to_psgi_app;
 

@@ -92,14 +92,14 @@ example for learning to build new plugins, you're welcome to fork it.
 
 L<Mojolicious::Plugin::EPRenderer> supports the following options.
 
-=head2 C<name>
+=head2 name
 
   # Mojolicious::Lite
   plugin EPRenderer => {name => 'foo'};
 
 Handler name, defaults to C<ep>.
 
-=head2 C<template>
+=head2 template
 
   # Mojolicious::Lite
   plugin EPRenderer => {template => {line_start => '.'}};
@@ -111,7 +111,7 @@ Attribute values passed to L<Mojo::Template> object used to render templates.
 L<Mojolicious::Plugin::EPRenderer> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
-=head2 C<register>
+=head2 register
 
   $plugin->register(Mojolicious->new);
   $plugin->register(Mojolicious->new, {name => 'foo'});

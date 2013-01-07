@@ -168,7 +168,7 @@ L<Mojo::IOLoop::Client> opens TCP connections for L<Mojo::IOLoop>.
 L<Mojo::IOLoop::Client> inherits all events from L<Mojo::EventEmitter> and can
 emit the following new ones.
 
-=head2 C<connect>
+=head2 connect
 
   $client->on(connect => sub {
     my ($client, $handle) = @_;
@@ -177,7 +177,7 @@ emit the following new ones.
 
 Emitted safely once the connection is established.
 
-=head2 C<error>
+=head2 error
 
   $client->on(error => sub {
     my ($client, $err) = @_;
@@ -190,7 +190,7 @@ Emitted safely if an error occurs on the connection.
 
 L<Mojo::IOLoop::Client> implements the following attributes.
 
-=head2 C<reactor>
+=head2 reactor
 
   my $reactor = $client->reactor;
   $client     = $client->reactor(Mojo::Reactor::Poll->new);
@@ -203,7 +203,7 @@ global L<Mojo::IOLoop> singleton.
 L<Mojo::IOLoop::Client> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 C<connect>
+=head2 connect
 
   $client->connect(address => '127.0.0.1', port => 3000);
 
@@ -214,40 +214,40 @@ These options are currently available:
 
 =over 2
 
-=item C<address>
+=item address
 
 Address or host name of the peer to connect to, defaults to C<localhost>.
 
-=item C<handle>
+=item handle
 
 Use an already prepared handle.
 
-=item C<local_address>
+=item local_address
 
 Local address to bind to.
 
-=item C<port>
+=item port
 
 Port to connect to.
 
-=item C<timeout>
+=item timeout
 
 Maximum amount of time in seconds establishing connection may take before
 getting canceled, defaults to C<10>.
 
-=item C<tls>
+=item tls
 
 Enable TLS.
 
-=item C<tls_ca>
+=item tls_ca
 
 Path to TLS certificate authority file. Also activates hostname verification.
 
-=item C<tls_cert>
+=item tls_cert
 
 Path to the TLS certificate file.
 
-=item C<tls_key>
+=item tls_key
 
 Path to the TLS key file.
 

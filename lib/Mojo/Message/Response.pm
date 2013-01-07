@@ -183,14 +183,14 @@ L<Mojo::Message::Response> inherits all events from L<Mojo::Message>.
 L<Mojo::Message::Response> inherits all attributes from L<Mojo::Message> and
 implements the following new ones.
 
-=head2 C<code>
+=head2 code
 
   my $code = $res->code;
   $res     = $res->code(200);
 
 HTTP response code.
 
-=head2 C<message>
+=head2 message
 
   my $msg = $res->message;
   $res    = $res->message('OK');
@@ -202,7 +202,7 @@ HTTP response message.
 L<Mojo::Message::Response> inherits all methods from L<Mojo::Message> and
 implements the following new ones.
 
-=head2 C<cookies>
+=head2 cookies
 
   my $cookies = $res->cookies;
   $res        = $res->cookies(Mojo::Cookie::Response->new);
@@ -210,37 +210,37 @@ implements the following new ones.
 
 Access response cookies, usually L<Mojo::Cookie::Response> objects.
 
-=head2 C<default_message>
+=head2 default_message
 
   my $msg = $res->default_message;
 
 Generate default response message for code.
 
-=head2 C<extract_start_line>
+=head2 extract_start_line
 
   my $success = $req->extract_start_line(\$string);
 
 Extract status line from string.
 
-=head2 C<fix_headers>
+=head2 fix_headers
 
   $res = $res->fix_headers;
 
 Make sure response has all required headers.
 
-=head2 C<get_start_line_chunk>
+=head2 get_start_line_chunk
 
   my $string = $res->get_start_line_chunk($offset);
 
 Get a chunk of status line data starting from a specific position.
 
-=head2 C<is_empty>
+=head2 is_empty
 
   my $success = $res->is_empty;
 
 Check if this is a C<1xx>, C<204> or C<304> response.
 
-=head2 C<is_status_class>
+=head2 is_status_class
 
   my $success = $res->is_status_class(200);
 

@@ -363,7 +363,7 @@ C<u2028> and C<u2029> will always be escaped to make JSONP easier.
 
 L<Mojo::JSON> implements the following attributes.
 
-=head2 C<error>
+=head2 error
 
   my $err = $json->error;
   $json   = $json->error('Parser error');
@@ -375,27 +375,27 @@ Parser errors.
 L<Mojo::JSON> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<decode>
+=head2 decode
 
   my $array = $json->decode($bytes);
   my $hash  = $json->decode($bytes);
 
 Decode JSON.
 
-=head2 C<encode>
+=head2 encode
 
   my $bytes = $json->encode({foo => 'bar'});
 
 Encode Perl data structure.
 
-=head2 C<false>
+=head2 false
 
   my $false = Mojo::JSON->false;
   my $false = $json->false;
 
 False value, used because Perl has no native equivalent.
 
-=head2 C<true>
+=head2 true
 
   my $true = Mojo::JSON->true;
   my $true = $json->true;

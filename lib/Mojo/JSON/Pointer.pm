@@ -52,7 +52,7 @@ L<Mojo::JSON::Pointer> implements JSON Pointers.
 
 =head1 METHODS
 
-=head2 C<contains>
+=head2 contains
 
   my $success = $pointer->contains($data, '/foo/1');
 
@@ -67,7 +67,7 @@ JSON Pointer.
   $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/bar');
   $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/9');
 
-=head2 C<get>
+=head2 get
 
   my $value = $pointer->get($data, '/foo/bar');
 

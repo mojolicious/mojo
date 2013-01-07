@@ -111,7 +111,7 @@ L<Mojo::Server::CGI> inherits all events from L<Mojo::Server>.
 L<Mojo::Server::CGI> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
 
-=head2 C<nph>
+=head2 nph
 
   my $nph = $cgi->nph;
   $cgi    = $cgi->nph(1);
@@ -123,7 +123,7 @@ Activate non parsed header mode.
 L<Mojo::Server::CGI> inherits all methods from L<Mojo::Server> and implements
 the following new ones.
 
-=head2 C<run>
+=head2 run
 
   my $status = $cgi->run;
 

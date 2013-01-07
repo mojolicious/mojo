@@ -109,21 +109,21 @@ you're welcome to fork it.
 
 L<Mojolicious::Plugin::Config> supports the following options.
 
-=head2 C<default>
+=head2 default
 
   # Mojolicious::Lite
   plugin Config => {default => {foo => 'bar'}};
 
 Default configuration, making configuration files optional.
 
-=head2 C<ext>
+=head2 ext
 
   # Mojolicious::Lite
   plugin Config => {ext => 'stuff'};
 
 File extension for generated configuration filenames, defaults to C<conf>.
 
-=head2 C<file>
+=head2 file
 
   # Mojolicious::Lite
   plugin Config => {file => 'myapp.conf'};
@@ -137,7 +137,7 @@ environment variable or C<myapp.conf> in the application home directory.
 L<Mojolicious::Plugin::Config> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
-=head2 C<load>
+=head2 load
 
   $plugin->load($file, $conf, $app);
 
@@ -149,7 +149,7 @@ Loads configuration file and passes the content to C<parse>.
     return $self->parse($content, $file, $conf, $app);
   }
 
-=head2 C<parse>
+=head2 parse
 
   $plugin->parse($content, $file, $conf, $app);
 
@@ -161,7 +161,7 @@ Parse configuration file.
     return $hash;
   }
 
-=head2 C<register>
+=head2 register
 
   my $config = $plugin->register(Mojolicious->new);
   my $config = $plugin->register(Mojolicious->new, {file => '/etc/app.conf'});

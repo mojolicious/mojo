@@ -461,14 +461,14 @@ error messages with context.
 
 L<Mojo::Template> implements the following attributes.
 
-=head2 C<auto_escape>
+=head2 auto_escape
 
   my $escape = $mt->auto_escape;
   $mt        = $mt->auto_escape(1);
 
 Activate automatic escaping.
 
-=head2 C<append>
+=head2 append
 
   my $code = $mt->append;
   $mt      = $mt->append('warn "Processed template"');
@@ -477,7 +477,7 @@ Append Perl code to compiled template. Note that this code should not contain
 newline characters, or line numbers in error messages might end up being
 wrong.
 
-=head2 C<capture_end>
+=head2 capture_end
 
   my $end = $mt->capture_end;
   $mt     = $mt->capture_end('end');
@@ -488,7 +488,7 @@ Keyword indicating the end of a capture block, defaults to C<end>.
     Some data!
   <% end %>
 
-=head2 C<capture_start>
+=head2 capture_start
 
   my $start = $mt->capture_start;
   $mt       = $mt->capture_start('begin');
@@ -499,14 +499,14 @@ Keyword indicating the start of a capture block, defaults to C<begin>.
     Some data!
   <% end %>
 
-=head2 C<code>
+=head2 code
 
   my $code = $mt->code;
   $mt      = $mt->code($code);
 
 Perl code for template.
 
-=head2 C<comment_mark>
+=head2 comment_mark
 
   my $mark = $mt->comment_mark;
   $mt      = $mt->comment_mark('#');
@@ -515,21 +515,21 @@ Character indicating the start of a comment, defaults to C<#>.
 
   <%# This is a comment %>
 
-=head2 C<compiled>
+=head2 compiled
 
   my $compiled = $mt->compiled;
   $mt          = $mt->compiled($compiled);
 
 Compiled template code.
 
-=head2 C<encoding>
+=head2 encoding
 
   my $encoding = $mt->encoding;
   $mt          = $mt->encoding('UTF-8');
 
 Encoding used for template files.
 
-=head2 C<escape>
+=head2 escape
 
   my $cb = $mt->escape;
   $mt    = $mt->escape(sub { reverse $_[0] });
@@ -537,7 +537,7 @@ Encoding used for template files.
 A callback used to escape the results of escaped expressions, defaults to
 L<Mojo::Util/"xml_escape">.
 
-=head2 C<escape_mark>
+=head2 escape_mark
 
   my $mark = $mt->escape_mark;
   $mt      = $mt->escape_mark('=');
@@ -546,7 +546,7 @@ Character indicating the start of an escaped expression, defaults to C<=>.
 
   <%== $foo %>
 
-=head2 C<expression_mark>
+=head2 expression_mark
 
   my $mark = $mt->expression_mark;
   $mt      = $mt->expression_mark('=');
@@ -555,7 +555,7 @@ Character indicating the start of an expression, defaults to C<=>.
 
   <%= $foo %>
 
-=head2 C<line_start>
+=head2 line_start
 
   my $start = $mt->line_start;
   $mt       = $mt->line_start('%');
@@ -564,7 +564,7 @@ Character indicating the start of a code line, defaults to C<%>.
 
   % $foo = 23;
 
-=head2 C<name>
+=head2 name
 
   my $name = $mt->name;
   $mt      = $mt->name('foo.mt');
@@ -573,7 +573,7 @@ Name of template currently being processed, defaults to C<template>. Note that
 this value should not contain quotes or newline characters, or error messages
 might end up being wrong.
 
-=head2 C<namespace>
+=head2 namespace
 
   my $namespace = $mt->namespace;
   $mt           = $mt->namespace('main');
@@ -582,7 +582,7 @@ Namespace used to compile templates, defaults to C<Mojo::Template::SandBox>.
 Note that namespaces should only be shared very carefully between templates,
 since functions and global variables will not be cleared automatically.
 
-=head2 C<prepend>
+=head2 prepend
 
   my $code = $mt->prepend;
   $mt      = $mt->prepend('my $self = shift;');
@@ -591,7 +591,7 @@ Prepend Perl code to compiled template. Note that this code should not contain
 newline characters, or line numbers in error messages might end up being
 wrong.
 
-=head2 C<replace_mark>
+=head2 replace_mark
 
   my $mark = $mt->replace_mark;
   $mt      = $mt->replace_mark('%');
@@ -600,7 +600,7 @@ Character used for escaping the start of a tag or line, defaults to C<%>.
 
   <%% my $foo = 23; %>
 
-=head2 C<tag_start>
+=head2 tag_start
 
   my $start = $mt->tag_start;
   $mt       = $mt->tag_start('<%');
@@ -609,7 +609,7 @@ Characters indicating the start of a tag, defaults to C<E<lt>%>.
 
   <% $foo = 23; %>
 
-=head2 C<tag_end>
+=head2 tag_end
 
   my $end = $mt->tag_end;
   $mt     = $mt->tag_end('%>');
@@ -618,21 +618,21 @@ Characters indicating the end of a tag, defaults to C<%E<gt>>.
 
   <%= $foo %>
 
-=head2 C<template>
+=head2 template
 
   my $template = $mt->template;
   $mt          = $mt->template($template);
 
 Raw template.
 
-=head2 C<tree>
+=head2 tree
 
   my $tree = $mt->tree;
   $mt      = $mt->tree($tree);
 
 Parsed tree.
 
-=head2 C<trim_mark>
+=head2 trim_mark
 
   my $mark = $mt->trim_mark;
   $mt      = $mt->trim_mark('-');
@@ -646,25 +646,25 @@ Character activating automatic whitespace trimming, defaults to C<=>.
 L<Mojo::Template> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $mt = Mojo::Template->new;
 
 Construct a new L<Mojo::Template> object.
 
-=head2 C<build>
+=head2 build
 
   $mt = $mt->build;
 
 Build Perl code from tree.
 
-=head2 C<compile>
+=head2 compile
 
   my $exception = $mt->compile;
 
 Compile Perl code for template.
 
-=head2 C<interpret>
+=head2 interpret
 
   my $output = $mt->interpret;
   my $output = $mt->interpret(@args);
@@ -676,13 +676,13 @@ Interpret compiled template code.
   say $mt->interpret('Fry');
   say $mt->interpret('Leela');
 
-=head2 C<parse>
+=head2 parse
 
   $mt = $mt->parse($template);
 
 Parse template into tree.
 
-=head2 C<render>
+=head2 render
 
   my $output = $mt->render($template);
   my $output = $mt->render($template, @args);
@@ -691,7 +691,7 @@ Render template.
 
   say $mt->render('Hello <%= $_[0] %>!', 'Bender');
 
-=head2 C<render_file>
+=head2 render_file
 
   my $output = $mt->render_file('/tmp/foo.mt');
   my $output = $mt->render_file('/tmp/foo.mt', @args);

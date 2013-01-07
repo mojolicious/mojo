@@ -101,7 +101,7 @@ See L<Mojolicious> for more!
 
 L<Mojo> implements the following attributes.
 
-=head2 C<home>
+=head2 home
 
   my $home = $app->home;
   $app     = $app->home(Mojo::Home->new);
@@ -112,7 +112,7 @@ which stringifies to the actual path.
   # Generate portable path relative to home directory
   my $path = $app->home->rel_file('data/important.txt');
 
-=head2 C<log>
+=head2 log
 
   my $log = $app->log;
   $app    = $app->log(Mojo::Log->new);
@@ -122,7 +122,7 @@ The logging layer of your application, defaults to a L<Mojo::Log> object.
   # Log debug message
   $app->log->debug('It works!');
 
-=head2 C<ua>
+=head2 ua
 
   my $ua = $app->ua;
   $app   = $app->ua(Mojo::UserAgent->new);
@@ -140,21 +140,21 @@ interfere with new blocking ones.
 L<Mojo> inherits all methods from L<Mojo::Base> and implements the following
 new ones.
 
-=head2 C<new>
+=head2 new
 
   my $app = Mojo->new;
 
 Construct a new L<Mojo> application. Will automatically detect your home
 directory and set up logging to C<log/mojo.log> if there's a C<log> directory.
 
-=head2 C<build_tx>
+=head2 build_tx
 
   my $tx = $app->build_tx;
 
 Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
 object.
 
-=head2 C<config>
+=head2 config
 
   my $config = $app->config;
   my $foo    = $app->config('foo');
@@ -168,7 +168,7 @@ Application configuration.
   my $foo = $app->config->{foo};
   delete $app->config->{foo};
 
-=head2 C<handler>
+=head2 handler
 
   $app->handler(Mojo::Transaction::HTTP->new);
 

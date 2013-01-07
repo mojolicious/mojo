@@ -211,14 +211,14 @@ example for learning to build new commands, you're welcome to fork it.
 L<Mojolicious::Command::get> performs requests to remote hosts or local
 applications.
 
-=head2 C<description>
+=head2 description
 
   my $description = $get->description;
   $get            = $get->description('Foo!');
 
 Short description of this command, used for the command list.
 
-=head2 C<usage>
+=head2 usage
 
   my $usage = $get->usage;
   $get      = $get->usage('Foo!');
@@ -230,7 +230,7 @@ Usage information for this command, used for the help screen.
 L<Mojolicious::Command::get> inherits all methods from L<Mojolicious::Command>
 and implements the following new ones.
 
-=head2 C<run>
+=head2 run
 
   $get->run(@ARGV);
 

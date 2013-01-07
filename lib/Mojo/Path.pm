@@ -124,7 +124,7 @@ L<Mojo::Path> is a container for URL paths.
 
 L<Mojo::Path> implements the following attributes.
 
-=head2 C<charset>
+=head2 charset
 
   my $charset = $path->charset;
   $path       = $path->charset('UTF-8');
@@ -134,14 +134,14 @@ Charset used for encoding and decoding, defaults to C<UTF-8>.
   # Disable encoding and decoding
   $path->charset(undef);
 
-=head2 C<leading_slash>
+=head2 leading_slash
 
   my $leading_slash = $path->leading_slash;
   $path             = $path->leading_slash(1);
 
 Path has a leading slash.
 
-=head2 C<parts>
+=head2 parts
 
   my $parts = $path->parts;
   $path     = $path->parts([qw(foo bar baz)]);
@@ -151,7 +151,7 @@ The path parts.
   # Part with slash
   push @{$path->parts}, 'foo/bar';
 
-=head2 C<trailing_slash>
+=head2 trailing_slash
 
   my $trailing_slash = $path->trailing_slash;
   $path              = $path->trailing_slash(1);
@@ -163,14 +163,14 @@ Path has a trailing slash.
 L<Mojo::Path> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $path = Mojo::Path->new;
   my $path = Mojo::Path->new('/foo%2Fbar%3B/baz.html');
 
 Construct a new L<Mojo::Path> object.
 
-=head2 C<canonicalize>
+=head2 canonicalize
 
   $path = $path->canonicalize;
 
@@ -179,13 +179,13 @@ Canonicalize path.
   # "/foo/baz"
   Mojo::Path->new('/foo/bar/../baz')->canonicalize;
 
-=head2 C<clone>
+=head2 clone
 
   my $clone = $path->clone;
 
 Clone path.
 
-=head2 C<contains>
+=head2 contains
 
   my $success = $path->contains('/foo');
 
@@ -201,7 +201,7 @@ Check if path contains given prefix.
   Mojo::Path->new('/foo/bar')->contains('/bar');
   Mojo::Path->new('/foo/bar')->contains('/whatever');
 
-=head2 C<merge>
+=head2 merge
 
   $path = $path->merge('/foo/bar');
   $path = $path->merge('foo/bar');
@@ -218,19 +218,19 @@ Merge paths.
   # "/foo/bar/baz/yada"
   Mojo::Path->new('/foo/bar/')->merge('baz/yada');
 
-=head2 C<parse>
+=head2 parse
 
   $path = $path->parse('/foo%2Fbar%3B/baz.html');
 
 Parse path. Note that C<%2F> will be treated as C</> for security reasons.
 
-=head2 C<to_abs_string>
+=head2 to_abs_string
 
   my $string = $path->to_abs_string;
 
 Turn path into an absolute string.
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $path->to_string;
   my $string = "$path";

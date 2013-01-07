@@ -40,28 +40,28 @@ L<Mojo::Upload> is a container for uploaded files.
 
 L<Mojo::Upload> implements the following attributes.
 
-=head2 C<asset>
+=head2 asset
 
   my $asset = $upload->asset;
   $upload   = $upload->asset(Mojo::Asset::File->new);
 
 Asset containing the uploaded data, defaults to a L<Mojo::Asset::File> object.
 
-=head2 C<filename>
+=head2 filename
 
   my $filename = $upload->filename;
   $upload      = $upload->filename('foo.txt');
 
 Name of the uploaded file.
 
-=head2 C<headers>
+=head2 headers
 
   my $headers = $upload->headers;
   $upload     = $upload->headers(Mojo::Headers->new);
 
 Headers for upload, defaults to a L<Mojo::Headers> object.
 
-=head2 C<name>
+=head2 name
 
   my $name = $upload->name;
   $upload  = $upload->name('foo');
@@ -73,19 +73,19 @@ Name of the upload.
 L<Mojo::Upload> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<move_to>
+=head2 move_to
 
   $upload = $upload->move_to('/home/sri/foo.txt');
 
 Move uploaded data into a specific file.
 
-=head2 C<size>
+=head2 size
 
   my $size = $upload->size;
 
 Size of uploaded data in bytes.
 
-=head2 C<slurp>
+=head2 slurp
 
   my $string = $upload->slurp;
 

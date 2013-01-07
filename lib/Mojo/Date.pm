@@ -93,7 +93,7 @@ L<Mojo::Date> implements HTTP date and time functions as described in RFC
 
 L<Mojo::Date> implements the following attributes.
 
-=head2 C<epoch>
+=head2 epoch
 
   my $epoch = $date->epoch;
   $date     = $date->epoch(784111777);
@@ -105,14 +105,14 @@ Epoch seconds.
 L<Mojo::Date> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $date = Mojo::Date->new;
   my $date = Mojo::Date->new('Sun Nov  6 08:49:37 1994');
 
 Construct a new L<Mojo::Date> object.
 
-=head2 C<parse>
+=head2 parse
 
   $date = $date->parse('Sun Nov  6 08:49:37 1994');
 
@@ -130,7 +130,7 @@ Parse date.
   # Ansi C asctime()
   say Mojo::Date->new('Sun Nov  6 08:49:37 1994')->epoch;
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $date->to_string;
   my $string = "$date";

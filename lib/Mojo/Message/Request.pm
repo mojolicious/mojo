@@ -306,7 +306,7 @@ L<Mojo::Message::Request> inherits all events from L<Mojo::Message>.
 L<Mojo::Message::Request> inherits all attributes from L<Mojo::Message> and
 implements the following new ones.
 
-=head2 C<env>
+=head2 env
 
   my $env = $req->env;
   $req    = $req->env({});
@@ -319,14 +319,14 @@ Direct access to the C<CGI> or C<PSGI> environment hash if available.
   # Check PSGI version
   my $version = $req->env->{'psgi.version'};
 
-=head2 C<method>
+=head2 method
 
   my $method = $req->method;
   $req       = $req->method('POST');
 
 HTTP request method, defaults to C<GET>.
 
-=head2 C<url>
+=head2 url
 
   my $url = $req->url;
   $req    = $req->url(Mojo::URL->new);
@@ -341,13 +341,13 @@ HTTP request URL, defaults to a L<Mojo::URL> object.
 L<Mojo::Message::Request> inherits all methods from L<Mojo::Message> and
 implements the following new ones.
 
-=head2 C<clone>
+=head2 clone
 
   my $clone = $req->clone;
 
 Clone request if possible, otherwise return C<undef>.
 
-=head2 C<cookies>
+=head2 cookies
 
   my $cookies = $req->cookies;
   $req        = $req->cookies(Mojo::Cookie::Request->new);
@@ -355,37 +355,37 @@ Clone request if possible, otherwise return C<undef>.
 
 Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
-=head2 C<extract_start_line>
+=head2 extract_start_line
 
   my $success = $req->extract_start_line(\$string);
 
 Extract request line from string.
 
-=head2 C<fix_headers>
+=head2 fix_headers
 
   $req = $req->fix_headers;
 
 Make sure request has all required headers.
 
-=head2 C<get_start_line_chunk>
+=head2 get_start_line_chunk
 
   my $string = $req->get_start_line_chunk($offset);
 
 Get a chunk of request line data starting from a specific position.
 
-=head2 C<is_secure>
+=head2 is_secure
 
   my $success = $req->is_secure;
 
 Check if connection is secure.
 
-=head2 C<is_xhr>
+=head2 is_xhr
 
   my $success = $req->is_xhr;
 
 Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 
-=head2 C<param>
+=head2 param
 
   my @names = $req->param;
   my $foo   = $req->param('foo');
@@ -394,7 +394,7 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 Access C<GET> and C<POST> parameters. Note that this method caches all data,
 so it should not be called before the entire request body has been received.
 
-=head2 C<params>
+=head2 params
 
   my $params = $req->params;
 
@@ -405,7 +405,7 @@ request body has been received.
   # Get parameter value
   say $req->params->param('foo');
 
-=head2 C<parse>
+=head2 parse
 
   $req = $req->parse('GET /foo/bar HTTP/1.1');
   $req = $req->parse(REQUEST_METHOD => 'GET');
@@ -413,7 +413,7 @@ request body has been received.
 
 Parse HTTP request chunks or environment hash.
 
-=head2 C<proxy>
+=head2 proxy
 
   my $proxy = $req->proxy;
   $req      = $req->proxy('http://foo:bar@127.0.0.1:3000');
@@ -424,7 +424,7 @@ Proxy URL for request.
   # Disable proxy
   $req->proxy(0);
 
-=head2 C<query_params>
+=head2 query_params
 
   my $params = $req->query_params;
 

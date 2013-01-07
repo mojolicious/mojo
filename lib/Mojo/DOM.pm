@@ -453,14 +453,14 @@ XML detection can also be disabled with the C<xml> method.
 L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $dom = Mojo::DOM->new;
   my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
 
 Construct a new array-based L<Mojo::DOM> object.
 
-=head2 C<all_text>
+=head2 all_text
 
   my $trimmed   = $dom->all_text;
   my $untrimmed = $dom->all_text(0);
@@ -474,7 +474,7 @@ enabled by default.
   # "foo\nbarbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->all_text(0);
 
-=head2 C<append>
+=head2 append
 
   $dom = $dom->append('<p>Hi!</p>');
 
@@ -483,7 +483,7 @@ Append to element.
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
 
-=head2 C<append_content>
+=head2 append_content
 
   $dom = $dom->append_content('<p>Hi!</p>');
 
@@ -492,7 +492,7 @@ Append to element content.
   # "<div><h1>AB</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
 
-=head2 C<at>
+=head2 at
 
   my $result = $dom->at('html title');
 
@@ -502,7 +502,7 @@ are supported.
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
 
-=head2 C<attrs>
+=head2 attrs
 
   my $attrs = $dom->attrs;
   my $foo   = $dom->attrs('foo');
@@ -511,14 +511,14 @@ are supported.
 
 Element attributes.
 
-=head2 C<charset>
+=head2 charset
 
   my $charset = $dom->charset;
   $dom        = $dom->charset('UTF-8');
 
 Charset used for decoding and encoding HTML/XML.
 
-=head2 C<children>
+=head2 children
 
   my $collection = $dom->children;
   my $collection = $dom->children('div');
@@ -529,7 +529,7 @@ similar to C<find>.
   # Show type of random child element
   say $dom->children->shuffle->first->type;
 
-=head2 C<content_xml>
+=head2 content_xml
 
   my $xml = $dom->content_xml;
 
@@ -539,7 +539,7 @@ C<charset> has been defined.
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->content_xml;
 
-=head2 C<find>
+=head2 find
 
   my $collection = $dom->find('html title');
 
@@ -552,7 +552,7 @@ selectors from L<Mojo::DOM::CSS> are supported.
   # Extract information from multiple elements
   my @headers = $dom->find('h1, h2, h3')->pluck('text')->each;
 
-=head2 C<namespace>
+=head2 namespace
 
   my $namespace = $dom->namespace;
 
@@ -564,7 +564,7 @@ Find element namespace.
   # Find namespace for an element that may or may not have a namespace prefix
   my $namespace = $dom->at('svg > circle')->namespace;
 
-=head2 C<next>
+=head2 next
 
   my $sibling = $dom->next;
 
@@ -573,13 +573,13 @@ Next sibling of element.
   # "<h2>B</h2>"
   $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h1')->next;
 
-=head2 C<parent>
+=head2 parent
 
   my $parent = $dom->parent;
 
 Parent of element.
 
-=head2 C<parse>
+=head2 parse
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
@@ -588,7 +588,7 @@ Parse HTML/XML document with L<Mojo::DOM::HTML>.
   # Parse UTF-8 encoded XML
   my $dom = Mojo::DOM->new->charset('UTF-8')->xml(1)->parse($xml);
 
-=head2 C<prepend>
+=head2 prepend
 
   $dom = $dom->prepend('<p>Hi!</p>');
 
@@ -597,7 +597,7 @@ Prepend to element.
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
 
-=head2 C<prepend_content>
+=head2 prepend_content
 
   $dom = $dom->prepend_content('<p>Hi!</p>');
 
@@ -606,7 +606,7 @@ Prepend to element content.
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
 
-=head2 C<previous>
+=head2 previous
 
   my $sibling = $dom->previous;
 
@@ -615,7 +615,7 @@ Previous sibling of element.
   # "<h1>A</h1>"
   $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h2')->previous;
 
-=head2 C<remove>
+=head2 remove
 
   my $old = $dom->remove;
 
@@ -624,7 +624,7 @@ Remove element.
   # "<div></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->remove->root;
 
-=head2 C<replace>
+=head2 replace
 
   my $old = $dom->replace('<div>test</div>');
 
@@ -636,7 +636,7 @@ Replace element.
   # "<div></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('')->root;
 
-=head2 C<replace_content>
+=head2 replace_content
 
   $dom = $dom->replace_content('test');
 
@@ -648,13 +648,13 @@ Replace element content.
   # "<div><h1></h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('')->root;
 
-=head2 C<root>
+=head2 root
 
   my $root = $dom->root;
 
 Find root node.
 
-=head2 C<text>
+=head2 text
 
   my $trimmed   = $dom->text;
   my $untrimmed = $dom->text(0);
@@ -668,7 +668,7 @@ whitespace trimming is enabled by default.
   # "foo\nbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->text(0);
 
-=head2 C<text_after>
+=head2 text_after
 
   my $trimmed   = $dom->text_after;
   my $untrimmed = $dom->text_after(0);
@@ -682,7 +682,7 @@ is enabled by default.
   # "baz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_after(0);
 
-=head2 C<text_before>
+=head2 text_before
 
   my $trimmed   = $dom->text_before;
   my $untrimmed = $dom->text_before(0);
@@ -696,7 +696,7 @@ is enabled by default.
   # "foo\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_before(0);
 
-=head2 C<to_xml>
+=head2 to_xml
 
   my $xml = $dom->to_xml;
   my $xml = "$dom";
@@ -707,14 +707,14 @@ if a C<charset> has been defined.
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->b->to_xml;
 
-=head2 C<tree>
+=head2 tree
 
   my $tree = $dom->tree;
   $dom     = $dom->tree(['root', [qw(text lalala)]]);
 
 Document Object Model.
 
-=head2 C<type>
+=head2 type
 
   my $type = $dom->type;
   $dom     = $dom->type('div');
@@ -724,7 +724,7 @@ Element type.
   # List types of child elements
   say $dom->children->pluck('type');
 
-=head2 C<xml>
+=head2 xml
 
   my $xml = $dom->xml;
   $dom    = $dom->xml(1);

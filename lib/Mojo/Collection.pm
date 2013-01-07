@@ -108,7 +108,7 @@ L<Mojo::Collection> is a container for collections.
 
 L<Mojo::Collection> implements the following functions.
 
-=head2 C<c>
+=head2 c
 
   my $collection = c(1, 2, 3);
 
@@ -119,13 +119,13 @@ Construct a new array-based L<Mojo::Collection> object.
 L<Mojo::Collection> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $collection = Mojo::Collection->new(1, 2, 3);
 
 Construct a new array-based L<Mojo::Collection> object.
 
-=head2 C<each>
+=head2 each
 
   my @elements = $collection->each;
   $collection  = $collection->each(sub {...});
@@ -137,7 +137,7 @@ Evaluate callback for each element in collection.
     say "$count: $e";
   });
 
-=head2 C<first>
+=head2 first
 
   my $first = $collection->first;
   my $first = $collection->first(qr/foo/);
@@ -149,7 +149,7 @@ callback returned true.
 
   my $five = $collection->first(sub { $_ == 5 });
 
-=head2 C<grep>
+=head2 grep
 
   my $new = $collection->grep(qr/foo/);
   my $new = $collection->grep(sub {...});
@@ -160,7 +160,7 @@ or for which the callback returned true.
 
   my $interesting = $collection->grep(qr/mojo/i);
 
-=head2 C<join>
+=head2 join
 
   my $stream = $collection->join("\n");
 
@@ -168,7 +168,7 @@ Turn collection into L<Mojo::ByteStream>.
 
   $collection->join("\n")->say;
 
-=head2 C<map>
+=head2 map
 
   my $new = $collection->map(sub {...});
 
@@ -177,7 +177,7 @@ from the results.
 
   my $doubled = $collection->map(sub { $_ * 2 });
 
-=head2 C<pluck>
+=head2 pluck
 
   my $new = $collection->pluck($method);
   my $new = $collection->pluck($method, @args);
@@ -188,31 +188,31 @@ results.
   # Equal to but more convenient than
   my $new = $collection->map(sub { $_->$method(@args) });
 
-=head2 C<reverse>
+=head2 reverse
 
   my $new = $collection->reverse;
 
 Create a new collection with all elements in reverse order.
 
-=head2 C<slice>
+=head2 slice
 
   my $new = $collection->slice(4 .. 7);
 
 Create a new collection with all selected elements.
 
-=head2 C<shuffle>
+=head2 shuffle
 
   my $new = $collection->shuffle;
 
 Create a new collection with all elements in random order.
 
-=head2 C<size>
+=head2 size
 
   my $size = $collection->size;
 
 Number of elements in collection.
 
-=head2 C<sort>
+=head2 sort
 
   my $new = $collection->sort;
   my $new = $collection->sort(sub {...});
@@ -222,7 +222,7 @@ from the results.
 
   my $insensitive = $collection->sort(sub { uc(shift) cmp uc(shift) });
 
-=head2 C<uniq>
+=head2 uniq
 
   my $new = $collection->uniq;
 

@@ -409,7 +409,7 @@ Any element.
 
   my $all = $css->select('*');
 
-=head2 C<E>
+=head2 E
 
 An element of type C<E>.
 
@@ -603,7 +603,7 @@ An C<E> element whose attributes match all following attribute selectors.
 
 L<Mojo::DOM::CSS> implements the following attributes.
 
-=head2 C<tree>
+=head2 tree
 
   my $tree = $css->tree;
   $css     = $css->tree(['root', [qw(text lalala)]]);
@@ -615,7 +615,7 @@ Document Object Model.
 L<Mojo::DOM::CSS> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<select>
+=head2 select
 
   my $results = $css->select('head > title');
 

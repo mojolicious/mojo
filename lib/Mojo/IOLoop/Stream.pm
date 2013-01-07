@@ -198,7 +198,7 @@ L<Mojo::IOLoop>.
 L<Mojo::IOLoop::Stream> inherits all events from L<Mojo::EventEmitter> and can
 emit the following new ones.
 
-=head2 C<close>
+=head2 close
 
   $stream->on(close => sub {
     my $stream = shift;
@@ -207,7 +207,7 @@ emit the following new ones.
 
 Emitted safely if the stream gets closed.
 
-=head2 C<drain>
+=head2 drain
 
   $stream->on(drain => sub {
     my $stream = shift;
@@ -216,7 +216,7 @@ Emitted safely if the stream gets closed.
 
 Emitted safely once all data has been written.
 
-=head2 C<error>
+=head2 error
 
   $stream->on(error => sub {
     my ($stream, $err) = @_;
@@ -225,7 +225,7 @@ Emitted safely once all data has been written.
 
 Emitted safely if an error occurs on the stream.
 
-=head2 C<read>
+=head2 read
 
   $stream->on(read => sub {
     my ($stream, $chunk) = @_;
@@ -234,7 +234,7 @@ Emitted safely if an error occurs on the stream.
 
 Emitted safely if new data arrives on the stream.
 
-=head2 C<timeout>
+=head2 timeout
 
   $stream->on(timeout => sub {
     my $stream = shift;
@@ -244,7 +244,7 @@ Emitted safely if new data arrives on the stream.
 Emitted safely if the stream has been inactive for too long and will get
 closed automatically.
 
-=head2 C<write>
+=head2 write
 
   $stream->on(write => sub {
     my ($stream, $chunk) = @_;
@@ -257,7 +257,7 @@ Emitted safely if new data has been written to the stream.
 
 L<Mojo::IOLoop::Stream> implements the following attributes.
 
-=head2 C<reactor>
+=head2 reactor
 
   my $reactor = $stream->reactor;
   $stream     = $stream->reactor(Mojo::Reactor::Poll->new);
@@ -265,7 +265,7 @@ L<Mojo::IOLoop::Stream> implements the following attributes.
 Low level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.
 
-=head2 C<timeout>
+=head2 timeout
 
   my $timeout = $stream->timeout;
   $stream     = $stream->timeout(45);
@@ -279,56 +279,56 @@ stream to be inactive indefinitely.
 L<Mojo::IOLoop::Stream> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $stream = Mojo::IOLoop::Stream->new($handle);
 
 Construct a new L<Mojo::IOLoop::Stream> object.
 
-=head2 C<close>
+=head2 close
 
   $stream->close;
 
 Close stream immediately.
 
-=head2 C<handle>
+=head2 handle
 
   my $handle = $stream->handle;
 
 Get handle for stream.
 
-=head2 C<is_readable>
+=head2 is_readable
 
   my $success = $stream->is_readable;
 
 Quick non-blocking check if stream is readable, useful for identifying tainted
 sockets.
 
-=head2 C<is_writing>
+=head2 is_writing
 
   my $success = $stream->is_writing;
 
 Check if stream is writing.
 
-=head2 C<start>
+=head2 start
 
   $stream->start;
 
 Start watching for new data on the stream.
 
-=head2 C<stop>
+=head2 stop
 
   $stream->stop;
 
 Stop watching for new data on the stream.
 
-=head2 C<steal_handle>
+=head2 steal_handle
 
   my $handle = $stream->steal_handle;
 
 Steal handle from stream and prevent it from getting closed automatically.
 
-=head2 C<write>
+=head2 write
 
   $stream = $stream->write('Hello!');
   $stream = $stream->write('Hello!' => sub {...});

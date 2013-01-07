@@ -170,14 +170,14 @@ you're welcome to fork it.
 
 L<Mojolicious::Plugin::PODRenderer> supports the following options.
 
-=head2 C<name>
+=head2 name
 
   # Mojolicious::Lite
   plugin PODRenderer => {name => 'foo'};
 
 Handler name, defaults to C<pod>.
 
-=head2 C<no_perldoc>
+=head2 no_perldoc
 
   # Mojolicious::Lite
   plugin PODRenderer => {no_perldoc => 1};
@@ -185,7 +185,7 @@ Handler name, defaults to C<pod>.
 Disable L<Mojolicious::Guides> documentation browser that will otherwise be
 available under C</perldoc>.
 
-=head2 C<preprocess>
+=head2 preprocess
 
   # Mojolicious::Lite
   plugin PODRenderer => {preprocess => 'epl'};
@@ -196,7 +196,7 @@ Name of handler used to preprocess POD, defaults to C<ep>.
 
 L<Mojolicious::Plugin::PODRenderer> implements the following helpers.
 
-=head2 C<pod_to_html>
+=head2 pod_to_html
 
   %= pod_to_html '=head2 lalala'
   <%= pod_to_html begin %>=head2 lalala<% end %>
@@ -208,7 +208,7 @@ Render POD to HTML without preprocessing.
 L<Mojolicious::Plugin::PODRenderer> inherits all methods from
 L<Mojolicious::Plugin> and implements the following new ones.
 
-=head2 C<register>
+=head2 register
 
   my $route = $plugin->register(Mojolicious->new);
   my $route = $plugin->register(Mojolicious->new, {name => 'foo'});

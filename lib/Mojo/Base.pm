@@ -180,7 +180,7 @@ All three forms save a lot of typing.
 L<Mojo::Base> exports the following functions if imported with the C<-base>
 flag or a base class.
 
-=head2 C<has>
+=head2 has
 
   has 'name';
   has [qw(name1 name2 name3)];
@@ -195,7 +195,7 @@ Create attributes for hash-based objects, just like the C<attr> method.
 
 L<Mojo::Base> implements the following methods.
 
-=head2 C<new>
+=head2 new
 
   my $object = BaseSubClass->new;
   my $object = BaseSubClass->new(name => 'value');
@@ -204,7 +204,7 @@ L<Mojo::Base> implements the following methods.
 This base class provides a basic constructor for hash-based objects. You can
 pass it either a hash or a hash reference with attribute values.
 
-=head2 C<attr>
+=head2 attr
 
   $object->attr('name');
   BaseSubClass->attr('name');
@@ -221,7 +221,7 @@ be excuted at accessor read time if there's no set value. Accessors can be
 chained, that means they return their invocant when they are called with an
 argument.
 
-=head2 C<tap>
+=head2 tap
 
   $object = $object->tap(sub {...});
 

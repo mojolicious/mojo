@@ -138,42 +138,42 @@ L<Mojo::Exception> is a container for exceptions with context information.
 
 L<Mojo::Exception> implements the following attributes.
 
-=head2 C<frames>
+=head2 frames
 
   my $frames = $e->frames;
   $e         = $e->frames($frames);
 
 Stacktrace.
 
-=head2 C<line>
+=head2 line
 
   my $line = $e->line;
   $e       = $e->line([3 => 'foo']);
 
 The line where the exception occured.
 
-=head2 C<lines_after>
+=head2 lines_after
 
   my $lines = $e->lines_after;
   $e        = $e->lines_after([[1 => 'bar'], [2 => 'baz']]);
 
 Lines after the line where the exception occured.
 
-=head2 C<lines_before>
+=head2 lines_before
 
   my $lines = $e->lines_before;
   $e        = $e->lines_before([[4 => 'bar'], [5 => 'baz']]);
 
 Lines before the line where the exception occured.
 
-=head2 C<message>
+=head2 message
 
   my $msg = $e->message;
   $e      = $e->message('Oops!');
 
 Exception message.
 
-=head2 C<verbose>
+=head2 verbose
 
   my $verbose = $e->verbose;
   $e          = $e->verbose(1);
@@ -186,28 +186,28 @@ C<MOJO_EXCEPTION_VERBOSE> environment variable or C<0>.
 L<Mojo::Exception> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $e = Mojo::Exception->new('Oops!');
   my $e = Mojo::Exception->new('Oops!', $files);
 
 Construct a new L<Mojo::Exception> object.
 
-=head2 C<throw>
+=head2 throw
 
   Mojo::Exception->throw('Oops!');
   Mojo::Exception->throw('Oops!', $files);
 
 Throw exception with stacktrace.
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $e->to_string;
   my $string = "$e";
 
 Render exception.
 
-=head2 C<trace>
+=head2 trace
 
   $e = $e->trace;
   $e = $e->trace(2);

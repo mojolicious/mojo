@@ -93,7 +93,7 @@ manipulation functions in L<Mojo::Util>.
 
 L<Mojo::ByteStream> implements the following functions.
 
-=head2 C<b>
+=head2 b
 
   my $stream = b('test123');
 
@@ -104,19 +104,19 @@ Construct a new scalar-based L<Mojo::ByteStream> object.
 L<Mojo::ByteStream> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<new>
+=head2 new
 
   my $stream = Mojo::ByteStream->new('test123');
 
 Construct a new scalar-based L<Mojo::ByteStream> object.
 
-=head2 C<b64_decode>
+=head2 b64_decode
 
   $stream = $stream->b64_decode;
 
 Base64 decode bytestream with L<Mojo::Util/"b64_decode">.
 
-=head2 C<b64_encode>
+=head2 b64_encode
 
   $stream = $stream->b64_encode;
   $stream = $stream->b64_encode("\n");
@@ -125,25 +125,25 @@ Base64 encode bytestream with L<Mojo::Util/"b64_encode">.
 
   b('foo bar baz')->b64_encode('')->say;
 
-=head2 C<camelize>
+=head2 camelize
 
   $stream = $stream->camelize;
 
 Camelize bytestream with L<Mojo::Util/"camelize">.
 
-=head2 C<clone>
+=head2 clone
 
   my $stream2 = $stream->clone;
 
 Clone bytestream.
 
-=head2 C<decamelize>
+=head2 decamelize
 
   $stream = $stream->decamelize;
 
 Decamelize bytestream with L<Mojo::Util/"decamelize">.
 
-=head2 C<decode>
+=head2 decode
 
   $stream = $stream->decode;
   $stream = $stream->decode('iso-8859-1');
@@ -152,7 +152,7 @@ Decode bytestream with L<Mojo::Util/"decode">, defaults to C<UTF-8>.
 
   $stream->decode('UTF-16LE')->unquote->trim->say;
 
-=head2 C<encode>
+=head2 encode
 
   $stream = $stream->encode;
   $stream = $stream->encode('iso-8859-1');
@@ -161,13 +161,13 @@ Encode bytestream with L<Mojo::Util/"encode">, defaults to C<UTF-8>.
 
   $stream->trim->quote->encode->say;
 
-=head2 C<hmac_md5_sum>
+=head2 hmac_md5_sum
 
   $stream = $stream->hmac_md5_sum('passw0rd');
 
 Generate HMAC-MD5 checksum for bytestream with L<Mojo::Util/"hmac_md5_sum">.
 
-=head2 C<hmac_sha1_sum>
+=head2 hmac_sha1_sum
 
   $stream = $stream->hmac_sha1_sum('passw0rd');
 
@@ -175,7 +175,7 @@ Generate HMAC-SHA1 checksum for bytestream with L<Mojo::Util/"hmac_sha1_sum">.
 
   b('foo bar baz')->hmac_sha1_sum('secr3t')->quote->say;
 
-=head2 C<html_escape>
+=head2 html_escape
 
   $stream = $stream->html_escape;
   $stream = $stream->html_escape('^\n\r\t !#$%(-;=?-~');
@@ -184,7 +184,7 @@ Escape unsafe characters in bytestream with L<Mojo::Util/"html_escape">.
 
   b('<html>')->html_escape->say;
 
-=head2 C<html_unescape>
+=head2 html_unescape
 
   $stream = $stream->html_unescape;
 
@@ -192,44 +192,44 @@ Unescape all HTML entities in bytestream with L<Mojo::Util/"html_unescape">.
 
   b('&lt;html&gt;')->html_unescape->url_escape->say;
 
-=head2 C<md5_bytes>
+=head2 md5_bytes
 
   $stream = $stream->md5_bytes;
 
 Generate binary MD5 checksum for bytestream with L<Mojo::Util/"md5_bytes">.
 
-=head2 C<md5_sum>
+=head2 md5_sum
 
   $stream = $stream->md5_sum;
 
 Generate MD5 checksum for bytestream with L<Mojo::Util/"md5_sum">.
 
-=head2 C<punycode_decode>
+=head2 punycode_decode
 
   $stream = $stream->punycode_decode;
 
 Punycode decode bytestream with L<Mojo::Util/"punycode_decode">.
 
-=head2 C<punycode_encode>
+=head2 punycode_encode
 
   $stream = $stream->punycode_encode;
 
 Punycode encode bytestream with L<Mojo::Util/"punycode_encode">.
 
-=head2 C<quote>
+=head2 quote
 
   $stream = $stream->quote;
 
 Quote bytestream with L<Mojo::Util/"quote">.
 
-=head2 C<say>
+=head2 say
 
   $stream->say;
   $stream->say(*STDERR);
 
 Print bytestream to handle and append a newline, defaults to C<STDOUT>.
 
-=head2 C<secure_compare>
+=head2 secure_compare
 
   my $success = $stream->secure_compare($string);
 
@@ -237,25 +237,25 @@ Compare bytestream with L<Mojo::Util/"secure_compare">.
 
   say 'Match!' if b('foo')->secure_compare('foo');
 
-=head2 C<sha1_bytes>
+=head2 sha1_bytes
 
   $stream = $stream->sha1_bytes;
 
 Generate binary SHA1 checksum for bytestream with L<Mojo::Util/"sha1_bytes">.
 
-=head2 C<sha1_sum>
+=head2 sha1_sum
 
   $stream = $stream->sha1_sum;
 
 Generate SHA1 checksum for bytestream with L<Mojo::Util/"sha1_sum">.
 
-=head2 C<size>
+=head2 size
 
   my $size = $stream->size;
 
 Size of bytestream.
 
-=head2 C<slurp>
+=head2 slurp
 
   $stream = $stream->slurp;
 
@@ -263,7 +263,7 @@ Read all data at once from file into bytestream with L<Mojo::Util/"slurp">.
 
   b('/home/sri/myapp.pl')->slurp->split("\n")->shuffle->join("\n")->say;
 
-=head2 C<spurt>
+=head2 spurt
 
   $stream = $stream->spurt('/home/sri/myapp.pl');
 
@@ -271,7 +271,7 @@ Write all data from bytestream at once to file with L<Mojo::Util/"spurt">.
 
   b('/home/sri/foo.txt')->slurp->squish->spurt('/home/sri/bar.txt');
 
-=head2 C<split>
+=head2 split
 
   my $collection = $stream->split(',');
 
@@ -279,7 +279,7 @@ Turn bytestream into L<Mojo::Collection>.
 
   b('a,b,c')->split(',')->pluck('quote')->join(',')->say;
 
-=head2 C<squish>
+=head2 squish
 
   $stream = $stream->squish;
 
@@ -287,27 +287,27 @@ Trim whitespace characters from both ends of bytestream and then change all
 consecutive groups of whitespace into one space each with
 L<Mojo::Util/"squish">.
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $stream->to_string;
   my $string = "$stream";
 
 Stringify bytestream.
 
-=head2 C<trim>
+=head2 trim
 
   $stream = $stream->trim;
 
 Trim whitespace characters from both ends of bytestream with
 L<Mojo::Util/"trim">.
 
-=head2 C<unquote>
+=head2 unquote
 
   $stream = $stream->unquote;
 
 Unquote bytestream with L<Mojo::Util/"unquote">.
 
-=head2 C<url_escape>
+=head2 url_escape
 
   $stream = $stream->url_escape;
   $stream = $stream->url_escape('^A-Za-z0-9\-._~');
@@ -317,7 +317,7 @@ L<Mojo::Util/"url_escape">.
 
   b('foo bar baz')->url_escape->say;
 
-=head2 C<url_unescape>
+=head2 url_unescape
 
   $stream = $stream->url_unescape;
 
@@ -326,14 +326,14 @@ L<Mojo::Util/"url_unescape">.
 
   b('%3Chtml%3E')->url_unescape->html_escape->say;
 
-=head2 C<xml_escape>
+=head2 xml_escape
 
   $stream = $stream->xml_escape;
 
 Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in
 bytestream with L<Mojo::Util/"xml_escape">.
 
-=head2 C<xor_encode>
+=head2 xor_encode
 
   $stream = $stream->xor_encode($key);
 

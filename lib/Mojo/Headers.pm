@@ -198,7 +198,7 @@ L<Mojo::Headers> is a container for HTTP headers as described in RFC 2616.
 
 L<Mojo::Headers> implements the following attributes.
 
-=head2 C<max_line_size>
+=head2 max_line_size
 
   my $size = $headers->max_line_size;
   $headers = $headers->max_line_size(1024);
@@ -211,124 +211,124 @@ C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
 L<Mojo::Headers> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 C<accept>
+=head2 accept
 
   my $accept = $headers->accept;
   $headers   = $headers->accept('application/json');
 
 Shortcut for the C<Accept> header.
 
-=head2 C<accept_charset>
+=head2 accept_charset
 
   my $charset = $headers->accept_charset;
   $headers    = $headers->accept_charset('UTF-8');
 
 Shortcut for the C<Accept-Charset> header.
 
-=head2 C<accept_encoding>
+=head2 accept_encoding
 
   my $encoding = $headers->accept_encoding;
   $headers     = $headers->accept_encoding('gzip');
 
 Shortcut for the C<Accept-Encoding> header.
 
-=head2 C<accept_language>
+=head2 accept_language
 
   my $language = $headers->accept_language;
   $headers     = $headers->accept_language('de, en');
 
 Shortcut for the C<Accept-Language> header.
 
-=head2 C<accept_ranges>
+=head2 accept_ranges
 
   my $ranges = $headers->accept_ranges;
   $headers   = $headers->accept_ranges('bytes');
 
 Shortcut for the C<Accept-Ranges> header.
 
-=head2 C<add>
+=head2 add
 
   $headers = $headers->add('Content-Type', 'text/plain');
 
 Add one or more header lines.
 
-=head2 C<authorization>
+=head2 authorization
 
   my $authorization = $headers->authorization;
   $headers          = $headers->authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Authorization> header.
 
-=head2 C<cache_control>
+=head2 cache_control
 
   my $cache_control = $headers->cache_control;
   $headers          = $headers->cache_control('max-age=1, no-cache');
 
 Shortcut for the C<Cache-Control> header.
 
-=head2 C<clone>
+=head2 clone
 
   my $clone = $headers->clone;
 
 Clone headers.
 
-=head2 C<connection>
+=head2 connection
 
   my $connection = $headers->connection;
   $headers       = $headers->connection('close');
 
 Shortcut for the C<Connection> header.
 
-=head2 C<content_disposition>
+=head2 content_disposition
 
   my $disposition = $headers->content_disposition;
   $headers        = $headers->content_disposition('foo');
 
 Shortcut for the C<Content-Disposition> header.
 
-=head2 C<content_encoding>
+=head2 content_encoding
 
   my $encoding = $headers->content_encoding;
   $headers     = $headers->content_encoding('gzip');
 
 Shortcut for the C<Content-Encoding> header.
 
-=head2 C<content_length>
+=head2 content_length
 
   my $len  = $headers->content_length;
   $headers = $headers->content_length(4000);
 
 Shortcut for the C<Content-Length> header.
 
-=head2 C<content_range>
+=head2 content_range
 
   my $range = $headers->content_range;
   $headers  = $headers->content_range('bytes 2-8/100');
 
 Shortcut for the C<Content-Range> header.
 
-=head2 C<content_type>
+=head2 content_type
 
   my $type = $headers->content_type;
   $headers = $headers->content_type('text/plain');
 
 Shortcut for the C<Content-Type> header.
 
-=head2 C<cookie>
+=head2 cookie
 
   my $cookie = $headers->cookie;
   $headers   = $headers->cookie('f=b');
 
 Shortcut for the C<Cookie> header from RFC 6265.
 
-=head2 C<date>
+=head2 date
 
   my $date = $headers->date;
   $headers = $headers->date('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<Date> header.
 
-=head2 C<dnt>
+=head2 dnt
 
   my $dnt  = $headers->dnt;
   $headers = $headers->dnt(1);
@@ -336,35 +336,35 @@ Shortcut for the C<Date> header.
 Shortcut for the C<DNT> (Do Not Track) header, which has no specification yet,
 but is very commonly used.
 
-=head2 C<etag>
+=head2 etag
 
   my $etag = $headers->etag;
   $headers = $headers->etag('abc321');
 
 Shortcut for the C<ETag> header.
 
-=head2 C<expect>
+=head2 expect
 
   my $expect = $headers->expect;
   $headers   = $headers->expect('100-continue');
 
 Shortcut for the C<Expect> header.
 
-=head2 C<expires>
+=head2 expires
 
   my $expires = $headers->expires;
   $headers    = $headers->expires('Thu, 01 Dec 1994 16:00:00 GMT');
 
 Shortcut for the C<Expires> header.
 
-=head2 C<from_hash>
+=head2 from_hash
 
   $headers = $headers->from_hash({'Content-Type' => 'text/html'});
   $headers = $headers->from_hash({});
 
 Parse headers from a hash reference.
 
-=head2 C<header>
+=head2 header
 
   my $string = $headers->header('Content-Type');
   my @lines  = $headers->header('Content-Type');
@@ -380,93 +380,93 @@ Get or replace the current header values.
     say for @$header;
   }
 
-=head2 C<host>
+=head2 host
 
   my $host = $headers->host;
   $headers = $headers->host('127.0.0.1');
 
 Shortcut for the C<Host> header.
 
-=head2 C<if_modified_since>
+=head2 if_modified_since
 
   my $date = $headers->if_modified_since;
   $headers = $headers->if_modified_since('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<If-Modified-Since> header.
 
-=head2 C<is_finished>
+=head2 is_finished
 
   my $success = $headers->is_finished;
 
 Check if header parser is finished.
 
-=head2 C<is_limit_exceeded>
+=head2 is_limit_exceeded
 
   my $success = $headers->is_limit_exceeded;
 
 Check if a header has exceeded C<max_line_size>.
 
-=head2 C<last_modified>
+=head2 last_modified
 
   my $date = $headers->last_modified;
   $headers = $headers->last_modified('Sun, 17 Aug 2008 16:27:35 GMT');
 
 Shortcut for the C<Last-Modified> header.
 
-=head2 C<leftovers>
+=head2 leftovers
 
   my $bytes = $headers->leftovers;
 
 Get leftover data from header parser.
 
-=head2 C<location>
+=head2 location
 
   my $location = $headers->location;
   $headers     = $headers->location('http://127.0.0.1/foo');
 
 Shortcut for the C<Location> header.
 
-=head2 C<names>
+=head2 names
 
   my $names = $headers->names;
 
 Generate a list of all currently defined headers.
 
-=head2 C<origin>
+=head2 origin
 
   my $origin = $headers->origin;
   $headers   = $headers->origin('http://example.com');
 
 Shortcut for the C<Origin> header from RFC 6454.
 
-=head2 C<parse>
+=head2 parse
 
   $headers = $headers->parse("Content-Type: text/plain\r\n\r\n");
 
 Parse formatted headers.
 
-=head2 C<proxy_authenticate>
+=head2 proxy_authenticate
 
   my $authenticate = $headers->proxy_authenticate;
   $headers         = $headers->proxy_authenticate('Basic "realm"');
 
 Shortcut for the C<Proxy-Authenticate> header.
 
-=head2 C<proxy_authorization>
+=head2 proxy_authorization
 
   my $authorization = $headers->proxy_authorization;
   $headers          = $headers->proxy_authorization('Basic Zm9vOmJhcg==');
 
 Shortcut for the C<Proxy-Authorization> header.
 
-=head2 C<range>
+=head2 range
 
   my $range = $headers->range;
   $headers  = $headers->range('bytes=2-8');
 
 Shortcut for the C<Range> header.
 
-=head2 C<referrer>
+=head2 referrer
 
   my $referrer = $headers->referrer;
   $headers     = $headers->referrer('http://mojolicio.us');
@@ -474,76 +474,76 @@ Shortcut for the C<Range> header.
 Shortcut for the C<Referer> header, there was a typo in RFC 2068 which
 resulted in C<Referer> becoming an official header.
 
-=head2 C<remove>
+=head2 remove
 
   $headers = $headers->remove('Content-Type');
 
 Remove a header.
 
-=head2 C<sec_websocket_accept>
+=head2 sec_websocket_accept
 
   my $accept = $headers->sec_websocket_accept;
   $headers   = $headers->sec_websocket_accept('s3pPLMBiTxaQ9kYGzzhZRbK+xOo=');
 
 Shortcut for the C<Sec-WebSocket-Accept> header from RFC 6455.
 
-=head2 C<sec_websocket_extensions>
+=head2 sec_websocket_extensions
 
   my $extensions = $headers->sec_websocket_extensions;
   $headers       = $headers->sec_websocket_extensions('foo');
 
 Shortcut for the C<Sec-WebSocket-Extensions> header from RFC 6455.
 
-=head2 C<sec_websocket_key>
+=head2 sec_websocket_key
 
   my $key  = $headers->sec_websocket_key;
   $headers = $headers->sec_websocket_key('dGhlIHNhbXBsZSBub25jZQ==');
 
 Shortcut for the C<Sec-WebSocket-Key> header from RFC 6455.
 
-=head2 C<sec_websocket_protocol>
+=head2 sec_websocket_protocol
 
   my $protocol = $headers->sec_websocket_protocol;
   $headers     = $headers->sec_websocket_protocol('sample');
 
 Shortcut for the C<Sec-WebSocket-Protocol> header from RFC 6455.
 
-=head2 C<sec_websocket_version>
+=head2 sec_websocket_version
 
   my $version = $headers->sec_websocket_version;
   $headers    = $headers->sec_websocket_version(13);
 
 Shortcut for the C<Sec-WebSocket-Version> header from RFC 6455.
 
-=head2 C<server>
+=head2 server
 
   my $server = $headers->server;
   $headers   = $headers->server('Mojo');
 
 Shortcut for the C<Server> header.
 
-=head2 C<set_cookie>
+=head2 set_cookie
 
   my $cookie = $headers->set_cookie;
   $headers   = $headers->set_cookie('f=b; path=/');
 
 Shortcut for the C<Set-Cookie> header from RFC 6265.
 
-=head2 C<status>
+=head2 status
 
   my $status = $headers->status;
   $headers   = $headers->status('200 OK');
 
 Shortcut for the C<Status> header from RFC 3875.
 
-=head2 C<te>
+=head2 te
 
   my $te   = $headers->te;
   $headers = $headers->te('chunked');
 
 Shortcut for the C<TE> header.
 
-=head2 C<to_hash>
+=head2 to_hash
 
   my $single = $headers->to_hash;
   my $multi  = $headers->to_hash(1);
@@ -553,41 +553,41 @@ line values are disabled by default.
 
   say $headers->to_hash->{DNT};
 
-=head2 C<to_string>
+=head2 to_string
 
   my $string = $headers->to_string;
 
 Turn headers into a string, suitable for HTTP messages.
 
-=head2 C<trailer>
+=head2 trailer
 
   my $trailer = $headers->trailer;
   $headers    = $headers->trailer('X-Foo');
 
 Shortcut for the C<Trailer> header.
 
-=head2 C<transfer_encoding>
+=head2 transfer_encoding
 
   my $encoding = $headers->transfer_encoding;
   $headers     = $headers->transfer_encoding('chunked');
 
 Shortcut for the C<Transfer-Encoding> header.
 
-=head2 C<upgrade>
+=head2 upgrade
 
   my $upgrade = $headers->upgrade;
   $headers    = $headers->upgrade('websocket');
 
 Shortcut for the C<Upgrade> header.
 
-=head2 C<user_agent>
+=head2 user_agent
 
   my $agent = $headers->user_agent;
   $headers  = $headers->user_agent('Mojo/1.0');
 
 Shortcut for the C<User-Agent> header.
 
-=head2 C<www_authenticate>
+=head2 www_authenticate
 
   my $authenticate = $headers->www_authenticate;
   $headers         = $headers->www_authenticate('Basic realm="realm"');

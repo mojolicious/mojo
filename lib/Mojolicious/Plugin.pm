@@ -32,7 +32,7 @@ L<Mojolicious::Plugin> is an abstract base class for L<Mojolicious> plugins.
 L<Mojolicious::Plugin> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
-=head2 C<register>
+=head2 register
 
   $plugin->register(Mojolicious->new);
   $plugin->register(Mojolicious->new, {foo => 'bar'});

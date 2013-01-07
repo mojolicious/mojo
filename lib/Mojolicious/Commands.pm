@@ -206,27 +206,27 @@ List available generator commands with short descriptions.
 
 List available options for generator command with short descriptions.
 
-=head2 C<generate app>
+=head2 generate app
 
   $ mojo generate app <AppName>
 
 Generate application directory structure for a fully functional L<Mojolicious>
 application.
 
-=head2 C<generate lite_app>
+=head2 generate lite_app
 
   $ mojo generate lite_app
 
 Generate a fully functional L<Mojolicious::Lite> application.
 
-=head2 C<generate makefile>
+=head2 generate makefile
 
   $ mojo generate makefile
   $ ./myapp.pl generate makefile
 
 Generate C<Makefile.PL> file for application.
 
-=head2 C<generate plugin>
+=head2 generate plugin
 
   $ mojo generate plugin <PluginName>
 

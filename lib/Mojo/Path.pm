@@ -64,12 +64,10 @@ sub like {
   return undef unless ref $regexp eq 'Regexp';
   
   my $joint_path = join('/', @{$self->parts});
-  my $path_str = $self->to_string;
   
   $joint_path = "/$joint_path" if $self->leading_slash;
   $joint_path = "$joint_path/" if $self->trailing_slash;
   
-  return $path_str =~ $regexp if $joint_path eq $path_str;
   return $joint_path =~ $regexp;
 }
 

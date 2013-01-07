@@ -484,6 +484,13 @@ is $m->stack->[0]{action},     'card',                  'right value';
 is $m->stack->[0]{wildcard},   'http://www.google.com', 'right value';
 is $m->path_for, '/wildcards/1/http://www.google.com', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
+$m = Mojolicious::Routes::Match->new(GET => '/wildcards/1/%foo%bar%');
+$m->match($r, $c);
+is $m->stack->[0]{controller}, 'wild',      'right value';
+is $m->stack->[0]{action},     'card',      'right value';
+is $m->stack->[0]{wildcard},   '%foo%bar%', 'right value';
+is $m->path_for, '/wildcards/1/%foo%bar%', 'right path';
+is @{$m->stack}, 1, 'right number of elements';
 
 # Format
 $m = Mojolicious::Routes::Match->new(GET => '/format');

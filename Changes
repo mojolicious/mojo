@@ -2,6 +2,7 @@
 3.75  2013-01-08
   - Added to_route method to Mojo::Path.
   - Improved router performance slightly.
+  - Improved tests.
 
 3.74  2013-01-07
   - Improved documentation.

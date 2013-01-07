@@ -173,6 +173,35 @@ ok !$path->contains('/0/0.html'), 'does not contain path';
 ok !$path->contains('/0.html'),   'does not contain path';
 ok !$path->contains('/♥.html'), 'does not contain path';
 
+# Like
+$path = Mojo::Path->new('/foo/bar');
+ok $path->like(qr(^/)),         'like path';
+ok $path->like(qr(^/foo)),      'like path';
+ok $path->like(qr(^/foo/)),     'like path';
+ok $path->like(qr(^/foo/bar)),  'like path';
+ok $path->like(qr(^/foo/bar$)), 'like path';
+ok $path->like(qr(/foo/bar$)),  'like path';
+ok $path->like(qr(/foo/bar)),   'like path';
+ok $path->like(qr(/foo)),       'like path';
+ok $path->like(qr(/bar)),       'like path';
+ok $path->like(qr(/)),          'like path';
+ok $path->like(qr(^/\w+)),      'like path';
+ok !$path->like(qr(^/$)),       'not like path';
+$path = Mojo::Path->new('/bar/baz/');
+ok $path->like(qr(bar)),    'like path';
+ok $path->like(qr(/bar)),   'like path';
+ok $path->like(qr(/bar/)),  'like path';
+ok $path->like(qr(bar/)),   'like path';
+ok $path->like(qr(/baz)),   'like path';
+ok $path->like(qr(/baz/)),  'like path';
+ok $path->like(qr(/baz/$)), 'like path';
+ok $path->like(qr(baz/$)),  'like path';
+ok $path->like(qr(/$)),     'like path';
+ok !$path->like(qr(^/$)),   'not like path';
+$path = Mojo::Path->new('/0/♥.html');
+ok $path->like(qr(♥)),    'like path';
+ok !$path->like(qr(^/$)), 'not like path';
+
 # Merge
 $path = Mojo::Path->new('/foo');
 $path->merge('bar/baz');

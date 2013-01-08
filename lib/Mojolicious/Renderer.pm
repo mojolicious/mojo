@@ -23,8 +23,14 @@ $HOME->parse(
 my %TEMPLATES = map { $_ => $HOME->slurp_rel_file($_) } @{$HOME->list_files};
 
 sub new {
-  my $self = shift->SUPER::new(@_)->add_handler(json => \&_json);
-  return $self->add_handler(data => \&_data)->add_handler(text => \&_text);
+  my $self = shift->SUPER::new(@_);
+
+  $self->add_handler(
+    json => sub { ${$_[2]} = Mojo::JSON->new->encode($_[3]->{json}) });
+  $self->add_handler(data => sub { ${$_[2]} = $_[3]->{data} });
+  $self->add_handler(text => sub { ${$_[2]} = $_[3]->{text} });
+
+  return $self;
 }
 
 sub add_handler { shift->_add(handlers => @_) }
@@ -157,11 +163,6 @@ sub _add {
 
 sub _bundled { $TEMPLATES{"@{[pop]}.html.ep"} }
 
-sub _data {
-  my ($self, $c, $output, $options) = @_;
-  $$output = $options->{data};
-}
-
 sub _detect_handler {
   my ($self, $options) = @_;
 
@@ -193,11 +194,6 @@ sub _extends {
   return delete $stash->{extends};
 }
 
-sub _json {
-  my ($self, $c, $output, $options) = @_;
-  $$output = Mojo::JSON->new->encode($options->{json});
-}
-
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
@@ -211,11 +207,6 @@ sub _render_template {
   # No handler
   else { $c->app->log->error(qq{No handler for "$handler" available.}) }
   return undef;
-}
-
-sub _text {
-  my ($self, $c, $output, $options) = @_;
-  $$output = $options->{text};
 }
 
 1;

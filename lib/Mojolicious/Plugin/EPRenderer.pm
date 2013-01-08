@@ -11,8 +11,8 @@ sub register {
   # Auto escape by default to prevent XSS attacks
   my $template = {auto_escape => 1, %{$conf->{template} || {}}};
 
-  # Add "ep" handler
-  $app->renderer->add_handler(
+  # Add "ep" handler and make it the default
+  $app->renderer->default_handler('ep')->add_handler(
     $conf->{name} || 'ep' => sub {
       my ($renderer, $c, $output, $options) = @_;
 
@@ -52,9 +52,6 @@ sub register {
       return $renderer->handlers->{epl}->($renderer, $c, $output, $options);
     }
   );
-
-  # Set default handler
-  $app->renderer->default_handler('ep');
 }
 
 1;

@@ -4,12 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Template;
 use Mojo::Util qw(encode md5_sum);
 
-sub register {
-  my ($self, $app) = @_;
-
-  # Add "epl" handler
-  $app->renderer->add_handler(epl => \&_epl);
-}
+sub register { $_[1]->renderer->add_handler(epl => \&_epl) }
 
 sub _epl {
   my ($renderer, $c, $output, $options) = @_;

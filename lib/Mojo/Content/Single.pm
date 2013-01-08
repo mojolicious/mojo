@@ -9,7 +9,8 @@ has auto_upgrade => 1;
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->{read} = $self->on(read => \&_read);
+  $self->{read}
+    = $self->on(read => sub { $_[0]->asset($_[0]->asset->add_chunk($_[1])) });
   return $self;
 }
 
@@ -52,11 +53,6 @@ sub parse {
   my $multi = Mojo::Content::MultiPart->new($self);
   $self->emit(upgrade => $multi);
   return $multi->parse;
-}
-
-sub _read {
-  my ($self, $chunk) = @_;
-  $self->asset($self->asset->add_chunk($chunk));
 }
 
 1;

@@ -148,7 +148,8 @@ sub handler {
   weaken $c->{$_} for qw(app tx);
 
   # Dispatcher
-  ++$self->{dispatch} and $self->hook(around_dispatch => \&_dispatch)
+  ++$self->{dispatch}
+    and $self->hook(around_dispatch => sub { $_[1]->app->dispatch($_[1]) })
     unless $self->{dispatch};
 
   # Process
@@ -181,11 +182,6 @@ sub plugin {
 sub start { shift->commands->run(@_ ? @_ : @ARGV) }
 
 sub startup { }
-
-sub _dispatch {
-  my ($next, $c) = @_;
-  $c->app->dispatch($c);
-}
 
 sub _exception {
   my ($next, $c) = @_;

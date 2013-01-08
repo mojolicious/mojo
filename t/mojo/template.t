@@ -1059,9 +1059,6 @@ isa_ok $output, 'Mojo::Exception', 'right exception';
 is $output->lines_before->[0][1], '☃', 'right line';
 is $output->line->[1], '% die;♥', 'right line';
 is $output->lines_after->[0][1], '☃', 'right line';
-is utf8::is_utf8($output->lines_before->[0][1]), 1, 'context has utf8 flag';
-is utf8::is_utf8($output->line->[1]), 1, 'context has utf8 flag';
-is utf8::is_utf8($output->lines_after->[0][1]), 1, 'context has utf8 flag';
 
 # Different encodings
 $mt = Mojo::Template->new(encoding => 'shift_jis');

@@ -129,7 +129,6 @@ sub path_for {
 
   # Render
   my $path = $endpoint->render('', \%values);
-  utf8::downgrade $path, 1;
   return wantarray ? ($path, $endpoint->has_websocket) : $path;
 }
 

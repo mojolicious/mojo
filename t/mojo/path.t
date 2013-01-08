@@ -208,6 +208,7 @@ $path->merge('baz/yada');
 is "$path", 'foo/baz/yada', 'right path';
 ok !$path->leading_slash,  'no leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
+is $path->to_route, '/foo/baz/yada', 'right route';
 
 # Empty path elements
 $path = Mojo::Path->new('//');

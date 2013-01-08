@@ -234,6 +234,9 @@ Parse path. Note that C<%2F> will be treated as C</> for security reasons.
 
 Turn path into an absolute string.
 
+  # "/i/%E2%99%A5/mojolicious"
+  Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_abs_string;
+
 =head2 to_route
 
   my $route = $path->to_route;
@@ -249,6 +252,9 @@ Turn path into a route.
   my $string = "$path";
 
 Turn path into a string.
+
+  # "/i/%E2%99%A5/mojolicious"
+  Mojo::Path->new('/i/%E2%99%A5/mojolicious')->to_string;
 
 =head1 SEE ALSO
 

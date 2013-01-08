@@ -244,7 +244,7 @@ Turn path into an absolute string.
 Turn path into a route.
 
   # "/i/♥/mojolicious"
-  Mojo::Path->new('/i/%E2%99%A5/mojolicious')->to_route;
+  Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_route;
 
 =head2 to_string
 
@@ -253,8 +253,8 @@ Turn path into a route.
 
 Turn path into a string.
 
-  # "/i/%E2%99%A5/mojolicious"
-  Mojo::Path->new('/i/%E2%99%A5/mojolicious')->to_string;
+  # "i/%E2%99%A5/mojolicious"
+  Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_string;
 
 =head1 SEE ALSO
 

@@ -7,7 +7,7 @@ use Mojo::IOLoop;
 # Minimal ioloop example demonstrating how to cheat at HTTP benchmarks :)
 my %buffer;
 Mojo::IOLoop->server(
-  {port => 3000} => sub {
+  {port => 8080} => sub {
     my ($loop, $stream, $id) = @_;
     $buffer{$id} = '';
     $stream->on(
@@ -35,8 +35,8 @@ Mojo::IOLoop->server(
 ) or die "Couldn't create listen socket!\n";
 
 print <<'EOF';
-Starting server on port 3000.
-Try something like "ab -c 30 -n 100000 -k http://127.0.0.1:3000/" for testing.
+Starting server on port 8080.
+Try something like "ab -c 30 -n 100000 -k http://127.0.0.1:8080/" for testing.
 On a MacBook Air this results in about 18k req/s.
 EOF
 

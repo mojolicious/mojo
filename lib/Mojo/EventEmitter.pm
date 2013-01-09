@@ -5,12 +5,6 @@ use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_EVENTEMITTER_DEBUG} || 0;
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->on(error => sub { warn $_[1] if @{$_[0]->subscribers('error')} < 2 });
-  return $self;
-}
-
 sub emit {
   my ($self, $name) = (shift, shift);
 
@@ -18,6 +12,7 @@ sub emit {
     warn "-- Emit $name in @{[blessed($self)]} (@{[scalar(@$s)]})\n" if DEBUG;
     $self->$_(@_) for @$s;
   }
+  elsif ($name eq 'error') { warn $_[0] }
   elsif (DEBUG) { warn "-- Emit $name in @{[blessed($self)]} (0)\n" }
 
   return $self;
@@ -40,6 +35,7 @@ sub emit_safe {
       }
     }
   }
+  elsif ($name eq 'error') { warn $_[0] }
   elsif (DEBUG) { warn "-- Emit $name in @{[blessed($self)]} safely (0)\n" }
 
   return $self;
@@ -137,13 +133,6 @@ Emitted safely for event errors.
 
 L<Mojo::EventEmitter> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
-
-=head2 new
-
-  my $e = Mojo::EventEmitter->new;
-
-Construct a new L<Mojo::EventEmitter> object and subscribe to C<error> event
-with default error handling.
 
 =head2 emit
 

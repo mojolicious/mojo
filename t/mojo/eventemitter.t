@@ -20,9 +20,10 @@ my $error;
 {
   local *STDERR;
   open STDERR, '>', \$error;
-  $e->emit(error => "just works!\n");
+  $e->emit(error => "just\n");
+  $e->emit_safe(error => "works\n");
 }
-is $error, "just works!\n", 'right error';
+is $error, "just\nworks\n", 'right error';
 
 # Error fallback
 my ($echo, $err);

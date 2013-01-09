@@ -1,4 +1,7 @@
 
+3.76  2013-01-09
+  - Fixed support for multiple uploads in Mojolicious::Controller.
+
 3.75  2013-01-08
   - Added to_route method to Mojo::Path.
   - Improved router performance slightly.

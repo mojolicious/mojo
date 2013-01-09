@@ -134,8 +134,7 @@ sub param {
   }
 
   # Upload
-  my $upload = $req->upload($name);
-  return $upload if $upload;
+  return $req->upload($name) if $req->upload($name);
 
   # Param values
   return $req->param($name);

@@ -1,5 +1,5 @@
 
-3.76  2013-01-09
+3.76  2013-01-10
   - Added support for multiple uploads sharing the same name to
     Mojo::UserAgent::Transactor.
   - Improved performance and memory usage of Mojo::EventEmitter.

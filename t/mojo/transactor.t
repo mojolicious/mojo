@@ -162,7 +162,6 @@ like $tx->req->content->parts->[0]->headers->content_disposition,
 like $tx->req->content->parts->[0]->asset->slurp, qr/mytext/, 'right part';
 ok !$tx->req->content->parts->[0]->headers->header('file'), 'no "file" header';
 is $tx->req->content->parts->[0]->headers->dnt, 1, 'right "DNT" header';
-ok !$tx->req->content->parts->[0]->headers->header('file'), 'no leaked header';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
 # Multipart form with in-memory content
@@ -174,7 +173,7 @@ is $tx->req->headers->content_type, 'multipart/form-data',
 like $tx->req->content->parts->[0]->headers->content_disposition, qr/mytext/,
   'right "Content-Disposition" value';
 ok !$tx->req->content->parts->[0]->headers->header('content'),
-  'no leaked header';
+  'no "content" header';
 is $tx->req->content->parts->[0]->asset->slurp, 'lalala', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
@@ -187,9 +186,9 @@ is $tx->req->headers->content_type, 'multipart/form-data',
   'right "Content-Type" value';
 like $tx->req->content->parts->[0]->headers->content_disposition,
   qr/foo\.zip/, 'right "Content-Disposition" value';
-is $tx->req->content->parts->[0]->asset->slurp, 'whatever', 'right part';
 ok !$tx->req->content->parts->[0]->headers->header('filename'),
-  'no leaked header';
+  'no "filename" header';
+is $tx->req->content->parts->[0]->asset->slurp, 'whatever', 'right part';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 is $tx->req->upload('myzip')->filename, 'foo.zip',  'right filename';
 is $tx->req->upload('myzip')->size,     8,          'right size';

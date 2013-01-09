@@ -35,39 +35,21 @@ sub form {
   my $form = ref $encoding ? $encoding : shift;
   $encoding = undef if ref $encoding;
 
-  # Prepare parameters
-  my $params = Mojo::Parameters->new;
-  $params->charset($encoding) if defined $encoding;
-  my $multipart;
-  for my $name (sort keys %$form) {
-    my $value = $form->{$name};
-
-    # Array
-    if (ref $value eq 'ARRAY') {
-      for my $value (@$value) {
-        $multipart++ if ref $value eq 'HASH';
-        $params->append($name, $value);
-      }
-    }
-
-    # Hash
-    elsif (ref $value eq 'HASH') {
-      ++$multipart and $params->append($name, $value);
-    }
-
-    # Single value
-    else { $params->append($name, $value) }
-  }
-
   # New transaction
   my $tx = $self->tx(POST => $url, @_);
 
-  # Multipart
+  # Check for uploads and force multipart
+  my $multipart;
+  for my $value (map { ref $_ eq 'ARRAY' ? @$_ : $_ } values %$form) {
+    ++$multipart and last if ref $value eq 'HASH';
+  }
   my $req     = $tx->req;
   my $headers = $req->headers;
   $headers->content_type('multipart/form-data') if $multipart;
+
+  # Multipart
   if (($headers->content_type // '') eq 'multipart/form-data') {
-    my $parts = $self->_multipart($encoding, $params->to_hash);
+    my $parts = $self->_multipart($encoding, $form);
     $req->content(
       Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
   }
@@ -75,6 +57,8 @@ sub form {
   # Urlencoded
   else {
     $headers->content_type('application/x-www-form-urlencoded');
+    my $params = Mojo::Parameters->new(%$form);
+    $params->charset($encoding) if defined $encoding;
     $req->body($params->to_string);
   }
 

@@ -12,8 +12,10 @@ sub emit {
     warn "-- Emit $name in @{[blessed($self)]} (@{[scalar(@$s)]})\n" if DEBUG;
     $self->$_(@_) for @$s;
   }
-  elsif ($name eq 'error') { warn $_[0] }
-  elsif (DEBUG) { warn "-- Emit $name in @{[blessed($self)]} (0)\n" }
+  else {
+    warn "-- Emit $name in @{[blessed($self)]} (0)\n" if DEBUG;
+    warn $_[0] if $name eq 'error';
+  }
 
   return $self;
 }
@@ -35,8 +37,10 @@ sub emit_safe {
       }
     }
   }
-  elsif ($name eq 'error') { warn $_[0] }
-  elsif (DEBUG) { warn "-- Emit $name in @{[blessed($self)]} safely (0)\n" }
+  else {
+    warn "-- Emit $name in @{[blessed($self)]} safely (0)\n" if DEBUG;
+    warn $_[0] if $name eq 'error';
+  }
 
   return $self;
 }

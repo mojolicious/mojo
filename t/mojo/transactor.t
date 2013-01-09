@@ -206,6 +206,31 @@ is $tx->req->upload('☃')->filename, '☃.jpg', 'right filename';
 is $tx->req->upload('☃')->size,     7,         'right size';
 is $tx->req->upload('☃')->slurp,    'snowman', 'right content';
 
+# Multipart form with multiple uploads sharing the same name
+$tx = $t->form(
+  'http://kraih.com/foo' => {
+    mytext => [
+      {content => 'just',  filename => 'one.txt'},
+      {content => 'works', filename => 'two.txt'}
+    ]
+  }
+);
+is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
+is $tx->req->method, 'POST', 'right method';
+is $tx->req->headers->content_type, 'multipart/form-data',
+  'right "Content-Type" value';
+like $tx->req->content->parts->[0]->headers->content_disposition, qr/mytext/,
+  'right "Content-Disposition" value';
+like $tx->req->content->parts->[0]->headers->content_disposition,
+  qr/one\.txt/, 'right "Content-Disposition" value';
+is $tx->req->content->parts->[0]->asset->slurp, 'just', 'right part';
+like $tx->req->content->parts->[1]->headers->content_disposition, qr/mytext/,
+  'right "Content-Disposition" value';
+like $tx->req->content->parts->[1]->headers->content_disposition,
+  qr/two\.txt/, 'right "Content-Disposition" value';
+is $tx->req->content->parts->[1]->asset->slurp, 'works', 'right part';
+is $tx->req->content->parts->[2], undef, 'no more parts';
+
 # Simple endpoint
 $tx = $t->tx(GET => 'mojolicio.us');
 is(($t->endpoint($tx))[0], 'http',         'right scheme');

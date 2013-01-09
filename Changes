@@ -1,5 +1,7 @@
 
 3.76  2013-01-09
+  - Added support for multiple uploads sharing the same name to
+    Mojo::UserAgent::Transactor.
   - Fixed support for multiple uploads in Mojolicious::Controller.
 
 3.75  2013-01-08

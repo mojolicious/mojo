@@ -1,7 +1,7 @@
 package Mojo::UserAgent::Transactor;
 use Mojo::Base -base;
 
-use File::Spec::Functions 'splitpath';
+use File::Basename 'basename';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
@@ -46,27 +46,16 @@ sub form {
     my $value = $form->{$name};
 
     # Array
-    if (ref $value eq 'ARRAY') { $params->append($name, $_) for @$value }
+    if (ref $value eq 'ARRAY') {
+      for my $value (@$value) {
+        $params->append($name, $value) and next unless ref $value eq 'HASH';
+        ++$multipart and $params->append($name, _asset($value));
+      }
+    }
 
     # Hash
     elsif (ref $value eq 'HASH') {
-
-      # Enforce "multipart/form-data"
-      $multipart++;
-
-      # File
-      if (my $file = $value->{file}) {
-        $value->{file} = Mojo::Asset::File->new(path => $file) if !ref $file;
-        $value->{filename} ||= (splitpath($value->{file}->path))[2]
-          if $value->{file}->isa('Mojo::Asset::File');
-      }
-
-      # Memory
-      elsif (defined(my $content = delete $value->{content})) {
-        $value->{file} = Mojo::Asset::Memory->new->add_chunk($content);
-      }
-
-      push @{$params->params}, $name, $value;
+      ++$multipart and $params->append($name, _asset($value));
     }
 
     # Single value
@@ -200,6 +189,24 @@ sub websocket {
   return $tx;
 }
 
+sub _asset {
+  my $value = shift;
+
+  # File
+  if (my $file = $value->{file}) {
+    $value->{file} = Mojo::Asset::File->new(path => $file) if !ref $file;
+    $value->{filename} ||= basename $value->{file}->path
+      if $value->{file}->isa('Mojo::Asset::File');
+  }
+
+  # Memory
+  elsif (defined(my $content = delete $value->{content})) {
+    $value->{file} = Mojo::Asset::Memory->new->add_chunk($content);
+  }
+
+  return $value;
+}
+
 sub _multipart {
   my ($self, $encoding, $form) = @_;
 
@@ -207,32 +214,32 @@ sub _multipart {
   my @parts;
   for my $name (sort keys %$form) {
     my $values = $form->{$name};
-    my $part   = Mojo::Content::Single->new;
+    for my $value (ref $values eq 'ARRAY' ? @$values : ($values)) {
+      my $part = Mojo::Content::Single->new;
 
-    # File
-    my $filename;
-    my $headers = $part->headers;
-    if (ref $values eq 'HASH') {
-      $filename = delete $values->{filename} || $name;
-      $filename = encode $encoding, $filename if $encoding;
-      push @parts, $part->asset(delete $values->{file});
-      $headers->from_hash($values);
-    }
+      # File
+      my $filename;
+      my $headers = $part->headers;
+      if (ref $value eq 'HASH') {
+        $filename = delete $value->{filename} || $name;
+        $filename = encode $encoding, $filename if $encoding;
+        push @parts, $part->asset(delete $value->{file});
+        $headers->from_hash($value);
+      }
 
-    # Fields
-    else {
-      for my $value (ref $values ? @$values : ($values)) {
+      # Fields
+      else {
         push @parts, $part = Mojo::Content::Single->new(headers => $headers);
         $value = encode $encoding, $value if $encoding;
         $part->asset->add_chunk($value);
       }
-    }
 
-    # Content-Disposition
-    $name = encode $encoding, $name if $encoding;
-    my $disposition = qq{form-data; name="$name"};
-    $disposition .= qq{; filename="$filename"} if $filename;
-    $headers->content_disposition($disposition);
+      # Content-Disposition
+      $name = encode $encoding, $name if $encoding;
+      my $disposition = qq{form-data; name="$name"};
+      $disposition .= qq{; filename="$filename"} if $filename;
+      $headers->content_disposition($disposition);
+    }
   }
 
   return \@parts;
@@ -297,6 +304,8 @@ Actual endpoint for transaction.
   my $tx = $t->form('http://kraih.com' => {a => [qw(b c d)]});
   my $tx = $t->form('http://kraih.com' => {mytext => {file => '/foo.txt'}});
   my $tx = $t->form('http://kraih.com' => {mytext => {content => 'lalala'}});
+  my $tx = $t->form('http://kraih.com' =>
+    {mytexts => [{content => 'first'}, {content => 'second'}]});
   my $tx = $t->form('http://kraih.com' => {
     myzip => {
       file     => Mojo::Asset::Memory->new->add_chunk('lalala'),

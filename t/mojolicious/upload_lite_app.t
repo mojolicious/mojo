@@ -90,17 +90,13 @@ $t->post_form_ok('/multi',
   ->status_is(200)->content_is('file11111file211112222');
 
 # POST /same_name (multiple file uploads with same name)
-my $tx = $t->ua->build_tx(POST => '/same_name');
-$tx->req->content(Mojo::Content::MultiPart->new);
-$tx->req->headers->content_type('multipart/form-data');
-push @{$tx->req->content->parts}, Mojo::Content::Single->new;
-$tx->req->content->parts->[-1]
-  ->headers->content_disposition('form-data;name="file";filename="one.txt"');
-$tx->req->content->parts->[-1]->asset->add_chunk('just');
-push @{$tx->req->content->parts}, Mojo::Content::Single->new;
-$tx->req->content->parts->[-1]
-  ->headers->content_disposition('form-data;name="file";filename="two.txt"');
-$tx->req->content->parts->[-1]->asset->add_chunk('works');
-$t->request_ok($tx)->status_is(200)->content_is('one.txtjusttwo.txtworks');
+$t->post_form_ok(
+  '/same_name' => {
+    file => [
+      {content => 'just',  filename => 'one.txt'},
+      {content => 'works', filename => 'two.txt'}
+    ]
+  }
+)->status_is(200)->content_is('one.txtjusttwo.txtworks');
 
 done_testing();

@@ -38,7 +38,7 @@ sub form {
   # New transaction
   my $tx = $self->tx(POST => $url, @_);
 
-  # Check for uploads and force multipart
+  # Check for uploads and force multipart if necessary
   my $multipart;
   for my $value (map { ref $_ eq 'ARRAY' ? @$_ : $_ } values %$form) {
     ++$multipart and last if ref $value eq 'HASH';
@@ -57,9 +57,9 @@ sub form {
   # Urlencoded
   else {
     $headers->content_type('application/x-www-form-urlencoded');
-    my $params = Mojo::Parameters->new(%$form);
-    $params->charset($encoding) if defined $encoding;
-    $req->body($params->to_string);
+    my $p = Mojo::Parameters->new(map { $_ => $form->{$_} } sort keys %$form);
+    $p->charset($encoding) if defined $encoding;
+    $req->body($p->to_string);
   }
 
   return $tx;

@@ -215,7 +215,7 @@ sub _multipart {
   for my $name (sort keys %$form) {
     my $values = $form->{$name};
     for my $value (ref $values eq 'ARRAY' ? @$values : ($values)) {
-      my $part = Mojo::Content::Single->new;
+      push @parts, my $part = Mojo::Content::Single->new;
 
       # File
       my $filename;
@@ -223,13 +223,12 @@ sub _multipart {
       if (ref $value eq 'HASH') {
         $filename = delete $value->{filename} || $name;
         $filename = encode $encoding, $filename if $encoding;
-        push @parts, $part->asset(delete $value->{file});
+        $part->asset(delete $value->{file});
         $headers->from_hash($value);
       }
 
-      # Fields
+      # Field
       else {
-        push @parts, $part = Mojo::Content::Single->new(headers => $headers);
         $value = encode $encoding, $value if $encoding;
         $part->asset->add_chunk($value);
       }

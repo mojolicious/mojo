@@ -31,14 +31,11 @@ sub endpoint {
 }
 
 sub form {
-  my ($self, $url) = (shift, shift);
-
-  # Form
-  my $encoding = shift;
+  my ($self, $url, $encoding) = (shift, shift, shift);
   my $form = ref $encoding ? $encoding : shift;
   $encoding = undef if ref $encoding;
 
-  # Parameters
+  # Prepare parameters
   my $params = Mojo::Parameters->new;
   $params->charset($encoding) if defined $encoding;
   my $multipart;
@@ -48,14 +45,14 @@ sub form {
     # Array
     if (ref $value eq 'ARRAY') {
       for my $value (@$value) {
-        $params->append($name, $value) and next unless ref $value eq 'HASH';
-        ++$multipart and $params->append($name, _asset($value));
+        $multipart++ if ref $value eq 'HASH';
+        $params->append($name, $value);
       }
     }
 
     # Hash
     elsif (ref $value eq 'HASH') {
-      ++$multipart and $params->append($name, _asset($value));
+      ++$multipart and $params->append($name, $value);
     }
 
     # Single value
@@ -189,24 +186,6 @@ sub websocket {
   return $tx;
 }
 
-sub _asset {
-  my $value = shift;
-
-  # File
-  if (my $file = $value->{file}) {
-    $value->{file} = Mojo::Asset::File->new(path => $file) if !ref $file;
-    $value->{filename} ||= basename $value->{file}->path
-      if $value->{file}->isa('Mojo::Asset::File');
-  }
-
-  # Memory
-  elsif (defined(my $content = delete $value->{content})) {
-    $value->{file} = Mojo::Asset::Memory->new->add_chunk($content);
-  }
-
-  return $value;
-}
-
 sub _multipart {
   my ($self, $encoding, $form) = @_;
 
@@ -217,13 +196,25 @@ sub _multipart {
     for my $value (ref $values eq 'ARRAY' ? @$values : ($values)) {
       push @parts, my $part = Mojo::Content::Single->new;
 
-      # File
+      # Upload
       my $filename;
       my $headers = $part->headers;
       if (ref $value eq 'HASH') {
+
+        # File
+        if (my $file = delete $value->{file}) {
+          $file = Mojo::Asset::File->new(path => $file) unless ref $file;
+          $part->asset($file);
+          $value->{filename} ||= basename $file->path
+            if $file->isa('Mojo::Asset::File');
+        }
+
+        # Memory
+        else { $part->asset->add_chunk(delete $value->{content}) }
+
+        # Filename and headers
         $filename = delete $value->{filename} || $name;
         $filename = encode $encoding, $filename if $encoding;
-        $part->asset(delete $value->{file});
         $headers->from_hash($value);
       }
 

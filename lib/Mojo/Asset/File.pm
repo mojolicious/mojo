@@ -5,7 +5,7 @@ use Carp 'croak';
 use Errno 'EEXIST';
 use Fcntl qw(O_CREAT O_EXCL O_RDWR);
 use File::Copy 'move';
-use File::Spec;
+use File::Spec::Functions 'catfile';
 use IO::File;
 use Mojo::Util 'md5_sum';
 
@@ -22,7 +22,7 @@ has handle => sub {
   }
 
   # Open new or temporary file
-  my $base = File::Spec->catfile($self->tmpdir, 'mojo.tmp');
+  my $base = catfile File::Spec::Functions::tmpdir, 'mojo.tmp';
   my $name = $path // $base;
   until ($handle->open($name, O_CREAT | O_EXCL | O_RDWR)) {
     croak qq{Can't open file "$name": $!} if defined $path || $! != $!{EEXIST};
@@ -35,7 +35,7 @@ has handle => sub {
 
   return $handle;
 };
-has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec->tmpdir };
+has tmpdir => sub { $ENV{MOJO_TMPDIR} || File::Spec::Functions::tmpdir };
 
 sub DESTROY {
   my $self = shift;

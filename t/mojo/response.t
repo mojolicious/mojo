@@ -913,6 +913,8 @@ is $full, $body, 'right content';
 # Body helper
 $res = Mojo::Message::Response->new;
 $res->body('hi there!');
+ok !$res->content->asset->is_file,      'stored in memory';
+ok !$res->content->asset->auto_upgrade, 'no upgrade';
 is $res->body, 'hi there!', 'right content';
 $res->body('');
 is $res->body, '', 'right content';

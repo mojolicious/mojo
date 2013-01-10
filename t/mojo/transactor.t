@@ -4,6 +4,7 @@ use Test::More;
 use File::Spec::Functions 'catdir';
 use FindBin;
 use Mojo::Asset::File;
+use Mojo::Asset::Memory;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::UserAgent::Transactor;
@@ -217,10 +218,16 @@ is $tx->req->upload('myzip')->filename, 'foo.zip',  'right filename';
 is $tx->req->upload('myzip')->size,     8,          'right size';
 is $tx->req->upload('myzip')->slurp,    'whatever', 'right content';
 
-# Multipart form with filename (UTF-8)
+# Multipart form with asset and filename (UTF-8)
 my $snowman = encode 'UTF-8', '☃';
-$tx = $t->form('http://kraih.com/foo' => 'UTF-8' =>
-    {'☃' => {content => 'snowman', filename => '☃.jpg'}});
+$tx = $t->form(
+  'http://kraih.com/foo' => 'UTF-8' => {
+    '☃' => {
+      file     => Mojo::Asset::Memory->new->add_chunk('snowman'),
+      filename => '☃.jpg'
+    }
+  }
+);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',

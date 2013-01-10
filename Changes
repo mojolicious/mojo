@@ -1,4 +1,7 @@
 
+3.77  2013-01-11
+  - Fixed small upgrade bug in Mojo::UserAgent::Transactor.
+
 3.76  2013-01-10
   - Added support for multiple uploads sharing the same name to
     Mojo::UserAgent::Transactor.

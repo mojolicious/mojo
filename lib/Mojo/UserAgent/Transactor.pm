@@ -194,7 +194,9 @@ sub _multipart {
         }
 
         # Memory
-        else { $part->asset->add_chunk(delete $value->{content}) }
+        elsif (defined(my $content = delete $value->{content})) {
+          $part->asset(Mojo::Asset::Memory->new->add_chunk($content));
+        }
 
         # Filename and headers
         $filename = delete $value->{filename} || $name;

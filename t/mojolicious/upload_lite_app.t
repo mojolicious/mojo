@@ -26,36 +26,11 @@ post '/upload' => sub {
       . join(',', $self->param));
 };
 
-# POST /multi_reverse
-post '/multi_reverse' => sub {
-  my $self  = shift;
-  my $file2 = $self->param('file2');
-  my $file1 = $self->param('file1');
-  $self->render_text($file1->filename
-      . $file1->asset->slurp
-      . $file2->filename
-      . $file2->asset->slurp);
-};
-
 # POST /multi
 post '/multi' => sub {
-  my $self  = shift;
-  my $file1 = $self->param('file1');
-  my $file2 = $self->param('file2');
-  $self->render_text($file1->filename
-      . $file1->asset->slurp
-      . $file2->filename
-      . $file2->asset->slurp);
-};
-
-# POST /same_name
-post '/same_name' => sub {
-  my $self  = shift;
-  my @files = $self->param('file');
-  $self->render_text($files[0]->filename
-      . $files[0]->asset->slurp
-      . $files[1]->filename
-      . $files[1]->asset->slurp);
+  my $self = shift;
+  my @uploads = map { $self->param($_) } $self->param('name');
+  $self->render_text(join '', map { $_->filename, $_->asset->slurp } @uploads);
 };
 
 my $t = Test::Mojo->new;
@@ -79,19 +54,19 @@ my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
 $t->post_form_ok('/upload' => {file => $hash, test => 'tset'})->status_is(200)
   ->content_is('filealalaltsetfoo/barYfile,test');
 
-# POST /multi_reverse
-$t->post_form_ok('/multi_reverse',
-  {file1 => {content => '1111'}, file2 => {content => '11112222'}})
-  ->status_is(200)->content_is('file11111file211112222');
-
 # POST /multi
-$t->post_form_ok('/multi',
+$t->post_form_ok('/multi?name=file1&name=file2',
   {file1 => {content => '1111'}, file2 => {content => '11112222'}})
   ->status_is(200)->content_is('file11111file211112222');
 
-# POST /same_name (multiple file uploads with same name)
+# POST /multi (reverse)
+$t->post_form_ok('/multi?name=file2&name=file1',
+  {file1 => {content => '1111'}, file2 => {content => '11112222'}})
+  ->status_is(200)->content_is('file211112222file11111');
+
+# POST /multi (multiple file uploads with same name)
 $t->post_form_ok(
-  '/same_name' => {
+  '/multi?name=file' => {
     file => [
       {content => 'just',  filename => 'one.txt'},
       {content => 'works', filename => 'two.txt'}

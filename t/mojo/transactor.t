@@ -127,6 +127,8 @@ is $tx->req->headers->content_type, 'multipart/form-data',
 like $tx->req->content->parts->[0]->headers->content_disposition, qr/"test"/,
   'right "Content-Disposition" value';
 is $tx->req->content->parts->[0]->asset->slurp, 123, 'right part';
+ok !$tx->req->content->parts->[0]->asset->is_file,      'stored in memory';
+ok !$tx->req->content->parts->[0]->asset->auto_upgrade, 'no upgrade';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
 # Multipart form with multiple values

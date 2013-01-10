@@ -207,7 +207,7 @@ sub _multipart {
       # Field
       else {
         $value = encode $encoding, $value if $encoding;
-        $part->asset->add_chunk($value);
+        $part->asset(Mojo::Asset::Memory->new->add_chunk($value));
       }
 
       # Content-Disposition

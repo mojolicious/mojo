@@ -81,10 +81,12 @@ under '/nested';
 # WebSocket /nested
 websocket sub {
   my $self = shift;
+  my $echo = $self->cookie('echo') // '';
+  $self->cookie(echo => 'again');
   $self->on(
     message => sub {
       my ($self, $msg) = @_;
-      $self->send("nested echo: $msg");
+      $self->send("nested echo: $msg$echo");
     }
   );
 };
@@ -180,6 +182,10 @@ $t->websocket_ok('/once')->send_ok('hello')->message_is('ONE: hello')
 # WebSocket /nested
 $t->websocket_ok('/nested')->send_ok('hello')
   ->message_is('nested echo: hello')->finish_ok;
+
+# WebSocket /nested (with cookie)
+$t->websocket_ok('/nested')->send_ok('hello')
+  ->message_is('nested echo: helloagain')->finish_ok;
 
 # GET /nested (plain alternative)
 $t->get_ok('/nested')->status_is(200)->content_is('plain nested!');

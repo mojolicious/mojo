@@ -335,6 +335,7 @@ sub _handle {
 
   # Upgrade connection to WebSocket
   elsif ($old && (my $new = $self->_upgrade($id))) {
+    if (my $jar = $self->cookie_jar) { $jar->extract($old) }
     $old->client_close;
     $self->_finish($new, $c->{cb});
     $new->client_read($old->res->leftovers);

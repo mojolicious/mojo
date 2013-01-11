@@ -164,26 +164,22 @@ sub json_hasnt {
 
 sub message_is {
   my ($self, $value, $desc) = @_;
-  $desc ||= 'exact match for message';
-  return $self->_test('is', $self->_message, $value, $desc);
+  return $self->_message('is', $value, $desc || 'exact match for message');
 }
 
 sub message_isnt {
   my ($self, $value, $desc) = @_;
-  $desc ||= 'no match for message';
-  return $self->_test('isnt', $self->_message, $value, $desc);
+  return $self->_message('isnt', $value, $desc || 'no match for message');
 }
 
 sub message_like {
   my ($self, $regex, $desc) = @_;
-  $desc ||= 'message is similar';
-  return $self->_test('like', $self->_message, $regex, $desc);
+  return $self->_message('like', $regex, $desc || 'message is similar');
 }
 
 sub message_unlike {
   my ($self, $regex, $desc) = @_;
-  $desc ||= 'message is not similar';
-  return $self->_test('unlike', $self->_message, $regex, $desc);
+  return $self->_message('unlike', $regex, $desc || 'message is not similar');
 }
 
 sub options_ok { shift->_request_ok(options => @_) }
@@ -278,7 +274,8 @@ sub websocket_ok {
       my $tx = pop;
       $self->tx($tx);
       $tx->on(finish => sub { $self->{finished} = 1 });
-      $tx->on(message => sub { push @{$self->{messages}}, pop });
+      $tx->on(binary => sub { push @{$self->{messages}}, [binary => pop] });
+      $tx->on(text   => sub { push @{$self->{messages}}, [text   => pop] });
       Mojo::IOLoop->stop;
     }
   );
@@ -296,6 +293,24 @@ sub _get_content {
 }
 
 sub _message {
+  my ($self, $name, $value, $desc) = @_;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  my ($type, $msg) = @{$self->_next || ['']};
+
+  # Type check
+  if (ref $value eq 'HASH') {
+    my $expect = exists $value->{text} ? 'text' : 'binary';
+    $value = $value->{$expect};
+    $msg = '' unless $type eq $expect;
+  }
+
+  # Decode text frame if there is no type check
+  else { $msg = decode 'UTF-8', $msg if $type eq 'text' }
+
+  return $self->_test($name, $msg // '', $value, $desc);
+}
+
+sub _next {
   my $self = shift;
   Mojo::IOLoop->one_tick while !$self->{finished} && !@{$self->{messages}};
   return shift @{$self->{messages}};
@@ -601,6 +616,8 @@ Opposite of C<json_has>.
 
 =head2 message_is
 
+  $t = $t->message_is({binary => $bytes});
+  $t = $t->message_is({text   => $bytes});
   $t = $t->message_is('working!');
   $t = $t->message_is('working!', 'right message');
 
@@ -608,6 +625,8 @@ Check WebSocket message for exact match.
 
 =head2 message_isnt
 
+  $t = $t->message_isnt({binary => $bytes});
+  $t = $t->message_isnt({text   => $bytes});
   $t = $t->message_isnt('working!');
   $t = $t->message_isnt('working!', 'different message');
 
@@ -615,6 +634,8 @@ Opposite of C<message_is>.
 
 =head2 message_like
 
+  $t = $t->message_like({binary => qr/$bytes/});
+  $t = $t->message_like({text   => qr/$bytes/});
   $t = $t->message_like(qr/working!/);
   $t = $t->message_like(qr/working!/, 'right message');
 
@@ -622,6 +643,8 @@ Check WebSocket message for similar match.
 
 =head2 message_unlike
 
+  $t = $t->message_unlike({binary => qr/$bytes/});
+  $t = $t->message_unlike({text   => qr/$bytes/});
   $t = $t->message_unlike(qr/working!/);
   $t = $t->message_unlike(qr/working!/, 'different message');
 

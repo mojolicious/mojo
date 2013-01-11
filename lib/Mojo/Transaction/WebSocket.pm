@@ -375,7 +375,8 @@ Emitted when a WebSocket frame has been received.
     ...
   });
 
-Emitted when a complete WebSocket message has been received.
+Emitted when a complete WebSocket message has been received, text messages
+will be automatically decoded.
 
   $ws->on(message => sub {
     my ($ws, $msg) = @_;

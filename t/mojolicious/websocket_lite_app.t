@@ -114,11 +114,13 @@ $t->websocket_ok('/echo', {'Sec-WebSocket-Protocol' => 'foo, bar, baz'})
   ->message_is('echo: hello')->finish_ok;
 
 # WebSocket /echo (bytes)
-$t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})->message_is('bytes!')
-  ->finish_ok;
+$t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})
+  ->message_is({binary => 'bytes!'})->send_ok({binary => 'bytes!'})
+  ->message_isnt({text => 'bytes!'})->finish_ok;
 
 # WebSocket /echo (zero)
-$t->websocket_ok('/echo')->send_ok(0)->message_is('echo: 0')->finish_ok;
+$t->websocket_ok('/echo')->send_ok(0)->message_is('echo: 0')->send_ok(0)
+  ->message_like({text => qr/0/})->finish_ok;
 
 # GET /echo (plain alternative)
 $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
@@ -132,7 +134,7 @@ $t->websocket_ok('/push')->message_is('push')->message_is('push')
 
 # WebSocket /push (again)
 $t->websocket_ok('/push')->message_unlike(qr/shift/)->message_isnt('shift')
-  ->message_like(qr/us/)->finish_ok;
+  ->message_like(qr/us/)->message_unlike({binary => qr/push/})->finish_ok;
 
 # GET /plain (again)
 $t->get_ok('/plain')->status_is(200)->content_is('Nothing to see here!');

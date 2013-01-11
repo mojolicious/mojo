@@ -8,6 +8,7 @@ BEGIN {
 
 use Test::More;
 use Mojo::ByteStream 'b';
+use Mojo::JSON 'j';
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -25,6 +26,20 @@ websocket '/echo' => sub {
 
 # GET /echo
 get '/echo' => {text => 'plain echo!'};
+
+# WebSocket /json
+websocket '/json' => sub {
+  my $self = shift;
+  $self->on(binary => sub { shift->send({binary => j([@{j(shift)}, 4])}) });
+  $self->on(
+    text => sub {
+      my ($self, $json) = @_;
+      my $hash = j($json);
+      $hash->{test} += 1;
+      $self->send({text => j($hash)});
+    }
+  );
+};
 
 # GET /plain
 get '/plain' => {text => 'Nothing to see here!'};
@@ -124,6 +139,13 @@ $t->websocket_ok('/echo')->send_ok(0)->message_is('echo: 0')->send_ok(0)
 
 # GET /echo (plain alternative)
 $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
+
+# WebSocket /json
+$t->websocket_ok('/json')
+  ->send_ok({text => j({test => 23, snowman => '☃'})})
+  ->json_message_content_is({test => 24, snowman => '☃'})
+  ->send_ok({binary => j([1, 2, 3])})
+  ->json_message_content_is([1, 2, 3, 4], 'right content')->finish_ok;
 
 # GET /plain
 $t->get_ok('/plain')->status_is(200)->content_is('Nothing to see here!');

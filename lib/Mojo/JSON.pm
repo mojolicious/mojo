@@ -347,9 +347,9 @@ Mojo::JSON - Minimalistic JSON
   # Check for errors
   my $json = Mojo::JSON->new;
   if (defined(my $hash = $json->decode($bytes))) { say $hash->{message} }
-  else { say "Error: ", $json->error }
+  else { say 'Error: ', $json->error }
 
-  # Use alternative interface
+  # Use the alternative interface
   use Mojo::JSON 'j';
   my $bytes = j({foo => [1, 2], bar => 'hello!', baz => \1});
   my $hash  = j($bytes);
@@ -385,11 +385,12 @@ L<Mojo::JSON> implements the following functions.
 
 =head2 j
 
+  my $bytes = j({foo => 'bar'});
   my $array = j($bytes);
   my $hash  = j($bytes);
-  my $bytes = j({foo => 'bar'});
 
-Decode JSON or encode Perl data structure.
+Encode Perl data structure or decode JSON and return C<undef> if decoding
+fails.
 
 =head1 ATTRIBUTES
 
@@ -412,13 +413,13 @@ following new ones.
   my $array = $json->decode($bytes);
   my $hash  = $json->decode($bytes);
 
-Decode JSON.
+Decode JSON to Perl data structure and return C<undef> if decoding fails.
 
 =head2 encode
 
   my $bytes = $json->encode({foo => 'bar'});
 
-Encode Perl data structure.
+Encode Perl data structure to JSON.
 
 =head2 false
 

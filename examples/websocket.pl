@@ -1,10 +1,12 @@
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Mojolicious::Lite;
+use Mojo::JSON 'j';
 
 any '/' => sub {
   my $self = shift;
-  $self->on(message => sub { shift->send(shift) }) if $self->tx->is_websocket;
+  $self->on(text => sub { shift->send(j(shift)->{test}) })
+    if $self->tx->is_websocket;
 } => 'websocket';
 
 # Minimal WebSocket application for browser testing
@@ -28,7 +30,7 @@ __DATA__
           alert(data);
         }
         function wsopen(event) {
-          ws.send("WebSocket support works!");
+          ws.send(JSON.stringify({test: "♥ WebSocket support works! ♥"}));
         }
         ws.onmessage = wsmessage;
         ws.onopen = wsopen;

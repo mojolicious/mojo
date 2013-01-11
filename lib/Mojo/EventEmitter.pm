@@ -10,7 +10,7 @@ sub emit {
 
   if (my $s = $self->{events}{$name}) {
     warn "-- Emit $name in @{[blessed($self)]} (@{[scalar(@$s)]})\n" if DEBUG;
-    $self->$_(@_) for @$s;
+    for my $cb (@$s) { $self->$cb(@_) }
   }
   else {
     warn "-- Emit $name in @{[blessed($self)]} (0)\n" if DEBUG;

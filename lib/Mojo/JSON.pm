@@ -385,6 +385,7 @@ L<Mojo::JSON> implements the following functions.
 
 =head2 j
 
+  my $bytes = j([1, 2, 3]);
   my $bytes = j({foo => 'bar'});
   my $array = j($bytes);
   my $hash  = j($bytes);
@@ -417,6 +418,7 @@ Decode JSON to Perl data structure and return C<undef> if decoding fails.
 
 =head2 encode
 
+  my $bytes = $json->encode([1, 2, 3]);
   my $bytes = $json->encode({foo => 'bar'});
 
 Encode Perl data structure to JSON.

@@ -279,7 +279,11 @@ sub _message {
 
   # Message
   my $msg = delete $self->{message};
-  $msg = decode 'UTF-8', $msg if $msg && delete $self->{op} == TEXT;
+  if (delete $self->{op} == TEXT) {
+    $msg = decode 'UTF-8', $msg if $msg;
+    $self->emit(text => $msg);
+  }
+  else { $self->emit(binary => $msg); }
   $self->emit(message => $msg);
 }
 
@@ -315,6 +319,20 @@ integer support, or they are limited to 32bit.
 
 L<Mojo::Transaction::WebSocket> inherits all events from L<Mojo::Transaction>
 and can emit the following new ones.
+
+=head2 binary
+
+  $ws->on(binary => sub {
+    my ($ws, $bytes) = @_;
+    ...
+  });
+
+Emitted when a complete WebSocket binary message has been received.
+
+  $ws->on(binary => sub {
+    my ($ws, $bytes) = @_;
+    say "Binary: $bytes";
+  });
 
 =head2 drain
 
@@ -362,6 +380,20 @@ Emitted when a complete WebSocket message has been received.
   $ws->on(message => sub {
     my ($ws, $msg) = @_;
     say "Message: $msg";
+  });
+
+=head2 text
+
+  $ws->on(text => sub {
+    my ($ws, $chars) = @_;
+    ...
+  });
+
+Emitted when a complete WebSocket text message has been received.
+
+  $ws->on(text => sub {
+    my ($ws, $chars) = @_;
+    say "Text: $chars";
   });
 
 =head1 ATTRIBUTES

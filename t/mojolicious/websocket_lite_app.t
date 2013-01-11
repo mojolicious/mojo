@@ -14,10 +14,11 @@ use Test::Mojo;
 # WebSocket /echo
 websocket '/echo' => sub {
   my $self = shift;
+  $self->on(binary => sub { shift->send({binary => shift}) });
   $self->on(
-    message => sub {
-      my ($self, $msg) = @_;
-      $self->send("echo: $msg");
+    text => sub {
+      my ($self, $chars) = @_;
+      $self->send("echo: $chars");
     }
   );
 };
@@ -49,13 +50,12 @@ websocket '/unicode' => sub {
 # WebSocket /bytes
 websocket '/bytes' => sub {
   my $self = shift;
-  $self->tx->on(
+  $self->on(
     frame => sub {
       my ($ws, $frame) = @_;
       $ws->send({$frame->[4] == 2 ? 'binary' : 'text', $frame->[5]});
     }
   );
-  $self->rendered(101);
 };
 
 # WebSocket /once
@@ -112,6 +112,10 @@ $t->websocket_ok('/echo')->send_ok('hello again')
 $t->websocket_ok('/echo', {'Sec-WebSocket-Protocol' => 'foo, bar, baz'})
   ->header_is('Sec-WebSocket-Protocol' => 'foo')->send_ok('hello')
   ->message_is('echo: hello')->finish_ok;
+
+# WebSocket /echo (bytes)
+$t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})->message_is('bytes!')
+  ->finish_ok;
 
 # WebSocket /echo (zero)
 $t->websocket_ok('/echo')->send_ok(0)->message_is('echo: 0')->finish_ok;

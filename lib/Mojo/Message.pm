@@ -493,8 +493,8 @@ implements the following new ones.
 Access C<content> data or replace all subscribers of the C<read> event.
 
   $msg->body(sub {
-    my ($msg, $chunk) = @_;
-    say "Streaming: $chunk";
+    my ($msg, $bytes) = @_;
+    say "Streaming: $bytes";
   });
 
 =head2 body_params
@@ -731,16 +731,16 @@ All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
 
 =head2 write
 
-  $msg = $msg->write('Hello!');
-  $msg = $msg->write('Hello!' => sub {...});
+  $msg = $msg->write($bytes);
+  $msg = $msg->write($bytes => sub {...});
 
 Write dynamic content non-blocking, the optional drain callback will be
 invoked once all data has been written.
 
 =head2 write_chunk
 
-  $msg = $msg->write_chunk('Hello!');
-  $msg = $msg->write_chunk('Hello!' => sub {...});
+  $msg = $msg->write_chunk($bytes);
+  $msg = $msg->write_chunk($bytes => sub {...});
 
 Write dynamic content non-blocking with C<chunked> transfer encoding, the
 optional drain callback will be invoked once all data has been written.

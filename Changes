@@ -1,9 +1,10 @@
 
-3.77  2013-01-11
+3.77  2013-01-12
   - Added support for advanced binary WebSocket message tests to Test::Mojo.
   - Added binary and text events to Mojo::Transaction::WebSocket.
   - Added json_message_content_is method to Test::Mojo.
   - Added j function to Mojo::JSON.
+  - Improved documentation.
   - Improved tests.
   - Fixed aliasing bug in Mojo::EventEmitter.
   - Fixed WebSocket cookie bug in Mojo::UserAgent.

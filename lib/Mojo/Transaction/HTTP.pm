@@ -249,7 +249,7 @@ implements the following new ones.
 
 =head2 client_read
 
-  $tx->client_read($chunk);
+  $tx->client_read($bytes);
 
 Read data client-side, used to implement user agents.
 
@@ -267,7 +267,7 @@ Check if connection can be kept alive.
 
 =head2 server_read
 
-  $tx->server_read($chunk);
+  $tx->server_read($bytes);
 
 Read data server-side, used to implement web servers.
 

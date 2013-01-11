@@ -296,12 +296,12 @@ Mojo::IOLoop - Minimalistic event loop
     my ($loop, $stream) = @_;
 
     $stream->on(read => sub {
-      my ($stream, $chunk) = @_;
+      my ($stream, $bytes) = @_;
 
-      # Process input
-      say $chunk;
+      # Process input chunk
+      say $bytes;
 
-      # Got some data, time to write
+      # Write response
       $stream->write('HTTP/1.1 200 OK');
     });
   });
@@ -311,10 +311,10 @@ Mojo::IOLoop - Minimalistic event loop
     my ($loop, $err, $stream) = @_;
 
     $stream->on(read => sub {
-      my ($stream, $chunk) = @_;
+      my ($stream, $bytes) = @_;
 
       # Process input
-      say "Input: $chunk";
+      say "Input: $bytes";
     });
 
     # Write request

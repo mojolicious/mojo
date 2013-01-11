@@ -611,10 +611,10 @@ which can be combined to solve some of hardest problems in web development.
         # Make sure we have the right part and replace "read" event
         return unless $single->headers->content_disposition =~ /example/;
         $single->unsubscribe('read')->on(read => sub {
-          my ($single, $chunk) = @_;
+          my ($single, $bytes) = @_;
 
           # Log size of every chunk we receive
-          $self->app->log->debug(length($chunk) . ' bytes uploaded.');
+          $self->app->log->debug(length($bytes) . ' bytes uploaded.');
         });
       });
     }) unless $self->req->is_finished;
@@ -827,8 +827,8 @@ L<Mojo::UserAgent> makes it actually easy.
 
   # Replace "read" events to disable default content parser
   $tx->res->content->unsubscribe('read')->on(read => sub {
-    my ($content, $chunk) = @_;
-    say "Streaming: $chunk";
+    my ($content, $bytes) = @_;
+    say "Streaming: $bytes";
   });
 
   # Process transaction

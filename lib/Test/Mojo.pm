@@ -757,8 +757,8 @@ Reset user agent session.
   $t = $t->send_ok({binary => $bytes});
   $t = $t->send_ok({text   => $bytes});
   $t = $t->send_ok([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
-  $t = $t->send_ok('hello');
-  $t = $t->send_ok('hello', 'sent successfully');
+  $t = $t->send_ok($chars);
+  $t = $t->send_ok($chars, 'sent successfully');
 
 Send message or frame via WebSocket.
 

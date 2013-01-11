@@ -169,7 +169,7 @@ Mojo::IOLoop::Stream - Non-blocking I/O stream
   # Create stream
   my $stream = Mojo::IOLoop::Stream->new($handle);
   $stream->on(read => sub {
-    my ($stream, $chunk) = @_;
+    my ($stream, $bytes) = @_;
     ...
   });
   $stream->on(close => sub {
@@ -228,7 +228,7 @@ Emitted safely if an error occurs on the stream.
 =head2 read
 
   $stream->on(read => sub {
-    my ($stream, $chunk) = @_;
+    my ($stream, $bytes) = @_;
     ...
   });
 
@@ -247,7 +247,7 @@ closed automatically.
 =head2 write
 
   $stream->on(write => sub {
-    my ($stream, $chunk) = @_;
+    my ($stream, $bytes) = @_;
     ...
   });
 
@@ -330,8 +330,8 @@ Steal handle from stream and prevent it from getting closed automatically.
 
 =head2 write
 
-  $stream = $stream->write('Hello!');
-  $stream = $stream->write('Hello!' => sub {...});
+  $stream = $stream->write($bytes);
+  $stream = $stream->write($bytes => sub {...});
 
 Write data to stream, the optional drain callback will be invoked once all
 data has been written.

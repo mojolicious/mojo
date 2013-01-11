@@ -10,6 +10,7 @@ use Mojo::Base -base;
 #  Fry: Santa Claus is gunning you down!"
 use Mojo::IOLoop;
 use Mojo::JSON;
+use Mojo::JSON::Pointer;
 use Mojo::Server;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
@@ -163,10 +164,11 @@ sub json_is {
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 
-sub json_message_content_is {
-  my ($self, $data, $desc) = @_;
-  my $structure = Mojo::JSON->new->decode(@{$self->_next || []}[1]);
-  return $self->_test('is_deeply', $structure, $data,
+sub json_message_is {
+  my ($self, $p, $data, $desc) = @_;
+  my $value = Mojo::JSON::Pointer->new->get(
+    Mojo::JSON->new->decode(@{$self->_next || []}[1]), $p);
+  return $self->_test('is_deeply', $value, $data,
     $desc || 'exact match for JSON structure');
 }
 
@@ -622,13 +624,14 @@ Opposite of C<json_has>.
 Check the value extracted from JSON response using the given JSON Pointer with
 L<Mojo::JSON::Pointer>.
 
-=head2 json_message_content_is
+=head2 json_message_is
 
-  $t = $t->json_message_content_is([1, 2, 3]);
-  $t = $t->json_message_content_is([1, 2, 3], 'right content');
-  $t = $t->json_message_content_is({foo => 'bar', baz => 23}, 'right content');
+  $t = $t->json_message_is('/foo' => {bar => [1, 2, 3]});
+  $t = $t->json_message_is('/foo/bar' => [1, 2, 3]);
+  $t = $t->json_message_is('/foo/bar/1' => 2, 'right value');
 
-Check WebSocket message content for JSON data.
+Check the value extracted from JSON WebSocket message using the given JSON
+Pointer with L<Mojo::JSON::Pointer>.
 
 =head2 message_is
 

@@ -143,9 +143,10 @@ $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
 # WebSocket /json
 $t->websocket_ok('/json')
   ->send_ok({text => j({test => 23, snowman => '☃'})})
-  ->json_message_content_is({test => 24, snowman => '☃'})
+  ->json_message_is('/' => {test => 24, snowman => '☃'})
   ->send_ok({binary => j([1, 2, 3])})
-  ->json_message_content_is([1, 2, 3, 4], 'right content')->finish_ok;
+  ->json_message_is('/' => [1, 2, 3, 4], 'right content')
+  ->send_ok({binary => j([1, 2, 3])})->json_message_is('/2' => 3)->finish_ok;
 
 # GET /plain
 $t->get_ok('/plain')->status_is(200)->content_is('Nothing to see here!');

@@ -369,7 +369,7 @@ Make sure request has all required headers.
 
 =head2 get_start_line_chunk
 
-  my $string = $req->get_start_line_chunk($offset);
+  my $bytes = $req->get_start_line_chunk($offset);
 
 Get a chunk of request line data starting from a specific position.
 

@@ -87,7 +87,7 @@ Size of uploaded data in bytes.
 
 =head2 slurp
 
-  my $string = $upload->slurp;
+  my $bytes = $upload->slurp;
 
 Read all uploaded data at once.
 

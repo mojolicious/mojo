@@ -207,7 +207,7 @@ in a subclass.
 
 =head2 client_write
 
-  my $chunk = $tx->client_write;
+  my $bytes = $tx->client_write;
 
 Write data client-side, used to implement user agents. Meant to be overloaded
 in a subclass.
@@ -272,7 +272,7 @@ in a subclass.
 
 =head2 server_write
 
-  my $chunk = $tx->server_write;
+  my $bytes = $tx->server_write;
 
 Write data server-side, used to implement web servers. Meant to be overloaded
 in a subclass.

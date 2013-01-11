@@ -10,7 +10,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::ByteStream 'b';
-use Mojo::JSON;
+use Mojo::JSON 'j';
 
 # Decode array
 my $json  = Mojo::JSON->new;
@@ -111,70 +111,70 @@ is $hash->{Image}{IDs}[2], 234,   'right value';
 is $hash->{Image}{IDs}[3], 38793, 'right value';
 
 # Encode array
-my $string = $json->encode([]);
-is $string, '[]', 'encode []';
-$string = $json->encode([[]]);
-is $string, '[[]]', 'encode [[]]';
-$string = $json->encode([[], []]);
-is $string, '[[],[]]', 'encode [[], []]';
-$string = $json->encode([[], [[]], []]);
-is $string, '[[],[[]],[]]', 'encode [[], [[]], []]';
+my $bytes = $json->encode([]);
+is $bytes, '[]', 'encode []';
+$bytes = $json->encode([[]]);
+is $bytes, '[[]]', 'encode [[]]';
+$bytes = $json->encode([[], []]);
+is $bytes, '[[],[]]', 'encode [[], []]';
+$bytes = $json->encode([[], [[]], []]);
+is $bytes, '[[],[[]],[]]', 'encode [[], [[]], []]';
 
 # Encode string
-$string = $json->encode(['foo']);
-is $string, '["foo"]', 'encode [\'foo\']';
-$string = $json->encode(["hello\nworld!"]);
-is $string, '["hello\nworld!"]', 'encode ["hello\nworld!"]';
-$string = $json->encode(["hello\t\"world!"]);
-is $string, '["hello\t\"world!"]', 'encode ["hello\t\"world!"]';
-$string = $json->encode(["hello\x{0003}\x{0152}world\x{0152}!"]);
-is b($string)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
+$bytes = $json->encode(['foo']);
+is $bytes, '["foo"]', 'encode [\'foo\']';
+$bytes = $json->encode(["hello\nworld!"]);
+is $bytes, '["hello\nworld!"]', 'encode ["hello\nworld!"]';
+$bytes = $json->encode(["hello\t\"world!"]);
+is $bytes, '["hello\t\"world!"]', 'encode ["hello\t\"world!"]';
+$bytes = $json->encode(["hello\x{0003}\x{0152}world\x{0152}!"]);
+is b($bytes)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
   'encode ["hello\x{0003}\x{0152}world\x{0152}!"]';
-$string = $json->encode(["123abc"]);
-is $string, '["123abc"]', 'encode ["123abc"]';
+$bytes = $json->encode(["123abc"]);
+is $bytes, '["123abc"]', 'encode ["123abc"]';
 
 # Encode object
-$string = $json->encode({});
-is $string, '{}', 'encode {}';
-$string = $json->encode({foo => {}});
-is $string, '{"foo":{}}', 'encode {foo => {}}';
-$string = $json->encode({foo => 'bar'});
-is $string, '{"foo":"bar"}', 'encode {foo => \'bar\'}';
-$string = $json->encode({foo => []});
-is $string, '{"foo":[]}', 'encode {foo => []}';
-$string = $json->encode({foo => ['bar']});
-is $string, '{"foo":["bar"]}', 'encode {foo => [\'bar\']}';
+$bytes = $json->encode({});
+is $bytes, '{}', 'encode {}';
+$bytes = $json->encode({foo => {}});
+is $bytes, '{"foo":{}}', 'encode {foo => {}}';
+$bytes = $json->encode({foo => 'bar'});
+is $bytes, '{"foo":"bar"}', 'encode {foo => \'bar\'}';
+$bytes = $json->encode({foo => []});
+is $bytes, '{"foo":[]}', 'encode {foo => []}';
+$bytes = $json->encode({foo => ['bar']});
+is $bytes, '{"foo":["bar"]}', 'encode {foo => [\'bar\']}';
 
 # Encode name
-$string = $json->encode([Mojo::JSON->true]);
-is $string, '[true]', 'encode [Mojo::JSON->true]';
-$string = $json->encode([undef]);
-is $string, '[null]', 'encode [undef]';
-$string = $json->encode([Mojo::JSON->true, Mojo::JSON->false]);
-is $string, '[true,false]', 'encode [Mojo::JSON->true, Mojo::JSON->false]';
+$bytes = $json->encode([Mojo::JSON->true]);
+is $bytes, '[true]', 'encode [Mojo::JSON->true]';
+$bytes = $json->encode([undef]);
+is $bytes, '[null]', 'encode [undef]';
+$bytes = $json->encode([Mojo::JSON->true, Mojo::JSON->false]);
+is $bytes, '[true,false]', 'encode [Mojo::JSON->true, Mojo::JSON->false]';
 
 # Encode number
-$string = $json->encode([1]);
-is $string, '[1]', 'encode [1]';
-$string = $json->encode(["1"]);
-is $string, '["1"]', 'encode ["1"]';
-$string = $json->encode(['-122.026020']);
-is $string, '["-122.026020"]', 'encode [\'-122.026020\']';
-$string = $json->encode([-122.026020]);
-is $string, '[-122.02602]', 'encode [-122.026020]';
-$string = $json->encode([1, -2]);
-is $string, '[1,-2]', 'encode [1, -2]';
-$string = $json->encode(['10e12', [2]]);
-is $string, '["10e12",[2]]', 'encode [\'10e12\', [2]]';
-$string = $json->encode([10e12, [2]]);
-is $string, '[10000000000000,[2]]', 'encode [10e12, [2]]';
-$string = $json->encode([37.7668, [20]]);
-is $string, '[37.7668,[20]]', 'encode [37.7668, [20]]';
+$bytes = $json->encode([1]);
+is $bytes, '[1]', 'encode [1]';
+$bytes = $json->encode(["1"]);
+is $bytes, '["1"]', 'encode ["1"]';
+$bytes = $json->encode(['-122.026020']);
+is $bytes, '["-122.026020"]', 'encode [\'-122.026020\']';
+$bytes = $json->encode([-122.026020]);
+is $bytes, '[-122.02602]', 'encode [-122.026020]';
+$bytes = $json->encode([1, -2]);
+is $bytes, '[1,-2]', 'encode [1, -2]';
+$bytes = $json->encode(['10e12', [2]]);
+is $bytes, '["10e12",[2]]', 'encode [\'10e12\', [2]]';
+$bytes = $json->encode([10e12, [2]]);
+is $bytes, '[10000000000000,[2]]', 'encode [10e12, [2]]';
+$bytes = $json->encode([37.7668, [20]]);
+is $bytes, '[37.7668,[20]]', 'encode [37.7668, [20]]';
 
 # Faihu roundtrip
-$string = $json->encode(["\x{10346}"]);
-is b($string)->decode('UTF-8'), "[\"\x{10346}\"]", 'encode ["\x{10346}"]';
-$array = $json->decode($string);
+$bytes = j(["\x{10346}"]);
+is b($bytes)->decode('UTF-8'), "[\"\x{10346}\"]", 'encode ["\x{10346}"]';
+$array = j($bytes);
 is_deeply $array, ["\x{10346}"], 'successful roundtrip';
 
 # Decode UTF-16LE
@@ -224,58 +224,58 @@ $array
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
 # Complicated roudtrips
-$string = '[null,false,true,"",0,1]';
-$array  = $json->decode($string);
+$bytes = '[null,false,true,"",0,1]';
+$array = $json->decode($bytes);
 isa_ok $array, 'ARRAY', 'decode [null,false,true,"",0,1]';
-is $json->encode($array), $string, 'reencode';
+is $json->encode($array), $bytes, 'reencode';
 $array = [undef, 0, 1, '', Mojo::JSON->true, Mojo::JSON->false];
-$string = $json->encode($array);
-ok $string, 'defined value';
-is_deeply $json->decode($string), $array, 'successful roundtrip';
+$bytes = $json->encode($array);
+ok $bytes, 'defined value';
+is_deeply $json->decode($bytes), $array, 'successful roundtrip';
 
 # Real world roundtrip
-$string = $json->encode({foo => 'c:\progra~1\mozill~1\firefox.exe'});
-is $string, '{"foo":"c:\\\\progra~1\\\\mozill~1\\\\firefox.exe"}',
+$bytes = $json->encode({foo => 'c:\progra~1\mozill~1\firefox.exe'});
+is $bytes, '{"foo":"c:\\\\progra~1\\\\mozill~1\\\\firefox.exe"}',
   'encode {foo => \'c:\progra~1\mozill~1\firefox.exe\'}';
-$hash = $json->decode($string);
+$hash = $json->decode($bytes);
 is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
   'successful roundtrip';
 
 # Huge string
-$string = $json->encode(['a' x 32768]);
-is_deeply $json->decode($string), ['a' x 32768], 'successful roundtrip';
+$bytes = $json->encode(['a' x 32768]);
+is_deeply $json->decode($bytes), ['a' x 32768], 'successful roundtrip';
 is $json->error, undef, 'no error';
 
 # u2028 and u2029
-$string = $json->encode(["\x{2028}test\x{2029}123"]);
-is index($string, b("\x{2028}")->encode), -1, 'properly escaped';
-is index($string, b("\x{2029}")->encode), -1, 'properly escaped';
-is_deeply $json->decode($string), ["\x{2028}test\x{2029}123"],
+$bytes = $json->encode(["\x{2028}test\x{2029}123"]);
+is index($bytes, b("\x{2028}")->encode), -1, 'properly escaped';
+is index($bytes, b("\x{2029}")->encode), -1, 'properly escaped';
+is_deeply $json->decode($bytes), ["\x{2028}test\x{2029}123"],
   'successful roundtrip';
 
 # Blessed reference
-$string = $json->encode([b('test')]);
-is_deeply $json->decode($string), ['test'], 'successful roundtrip';
+$bytes = $json->encode([b('test')]);
+is_deeply $json->decode($bytes), ['test'], 'successful roundtrip';
 
 # Blessed reference with TO_JSON method
-$string = $json->encode(JSONTest->new);
-is_deeply $json->decode($string), {}, 'successful roundtrip';
-$string = $json->encode(
+$bytes = $json->encode(JSONTest->new);
+is_deeply $json->decode($bytes), {}, 'successful roundtrip';
+$bytes = $json->encode(
   JSONTest->new(something => {just => 'works'}, else => {not => 'working'}));
-is_deeply $json->decode($string), {just => 'works'}, 'successful roundtrip';
+is_deeply $json->decode($bytes), {just => 'works'}, 'successful roundtrip';
 
 # Boolean shortcut
 is $json->encode({true  => \1}), '{"true":true}',   'encode {true => \1}';
 is $json->encode({false => \0}), '{"false":false}', 'encode {false => \0}';
-$string = 'some true value';
-is $json->encode({true => \!!$string}), '{"true":true}',
+$bytes = 'some true value';
+is $json->encode({true => \!!$bytes}), '{"true":true}',
   'encode true boolean from string';
-is $json->encode({true => \$string}), '{"true":true}',
+is $json->encode({true => \$bytes}), '{"true":true}',
   'encode true boolean from string';
-$string = '';
-is $json->encode({false => \!!$string}), '{"false":false}',
+$bytes = '';
+is $json->encode({false => \!!$bytes}), '{"false":false}',
   'encode false boolean from string';
-is $json->encode({false => \$string}), '{"false":false}',
+is $json->encode({false => \$bytes}), '{"false":false}',
   'encode false boolean from string';
 
 # Errors

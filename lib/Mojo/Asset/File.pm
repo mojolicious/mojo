@@ -223,7 +223,7 @@ Check if asset contains a specific string.
 
 =head2 get_chunk
 
-  my $chunk = $file->get_chunk($start);
+  my $bytes = $file->get_chunk($start);
 
 Get chunk of data starting from a specific position.
 
@@ -247,7 +247,7 @@ Size of asset data in bytes.
 
 =head2 slurp
 
-  my $string = $file->slurp;
+  my $bytes = $file->slurp;
 
 Read all asset data at once.
 

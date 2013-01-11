@@ -138,7 +138,7 @@ Check if asset contains a specific string.
 
 =head2 get_chunk
 
-  my $chunk = $mem->get_chunk($offset);
+  my $bytes = $mem->get_chunk($offset);
 
 Get chunk of data starting from a specific position.
 
@@ -156,7 +156,7 @@ Size of asset data in bytes.
 
 =head2 slurp
 
-  my $string = mem->slurp;
+  my $bytes = mem->slurp;
 
 Read all asset data at once.
 

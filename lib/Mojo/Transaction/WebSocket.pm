@@ -450,7 +450,7 @@ Read data client-side, used to implement user agents.
 
 =head2 client_write
 
-  my $chunk = $ws->client_write;
+  my $bytes = $ws->client_write;
 
 Write data client-side, used to implement user agents.
 
@@ -563,7 +563,7 @@ Read data server-side, used to implement web servers.
 
 =head2 server_write
 
-  my $chunk = $ws->server_write;
+  my $bytes = $ws->server_write;
 
 Write data server-side, used to implement web servers.
 

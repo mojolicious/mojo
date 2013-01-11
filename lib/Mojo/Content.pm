@@ -508,20 +508,20 @@ Clone content if possible, otherwise return C<undef>.
 
 =head2 generate_body_chunk
 
-  my $chunk = $content->generate_body_chunk(0);
+  my $bytes = $content->generate_body_chunk(0);
 
 Generate dynamic content.
 
 =head2 get_body_chunk
 
-  my $chunk = $content->get_body_chunk(0);
+  my $bytes = $content->get_body_chunk(0);
 
 Get a chunk of content starting from a specfic position. Meant to be
 overloaded in a subclass.
 
 =head2 get_header_chunk
 
-  my $chunk = $content->get_header_chunk(13);
+  my $bytes = $content->get_header_chunk(13);
 
 Get a chunk of the headers starting from a specfic position.
 

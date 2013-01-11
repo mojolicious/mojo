@@ -230,7 +230,7 @@ Make sure response has all required headers.
 
 =head2 get_start_line_chunk
 
-  my $string = $res->get_start_line_chunk($offset);
+  my $bytes = $res->get_start_line_chunk($offset);
 
 Get a chunk of status line data starting from a specific position.
 

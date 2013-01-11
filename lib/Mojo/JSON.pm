@@ -2,10 +2,13 @@ package Mojo::JSON;
 use Mojo::Base -base;
 
 use B;
+use Exporter 'import';
 use Mojo::Util;
 use Scalar::Util 'blessed';
 
 has 'error';
+
+our @EXPORT_OK = ('j');
 
 # Literal names
 my $FALSE = bless \(my $false = 0), 'Mojo::JSON::_Bool';
@@ -99,7 +102,14 @@ sub encode {
 }
 
 sub false {$FALSE}
-sub true  {$TRUE}
+
+sub j {
+  my $d = shift;
+  return __PACKAGE__->new->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
+  return __PACKAGE__->new->decode($d);
+}
+
+sub true {$TRUE}
 
 sub _decode_array {
   my @array;
@@ -328,11 +338,21 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 SYNOPSIS
 
+  # Encode and decode JSON
   use Mojo::JSON;
-
   my $json  = Mojo::JSON->new;
   my $bytes = $json->encode({foo => [1, 2], bar => 'hello!', baz => \1});
   my $hash  = $json->decode($bytes);
+
+  # Check for errors
+  my $json = Mojo::JSON->new;
+  if (defined(my $hash = $json->decode($bytes))) { say $hash->{message} }
+  else { say "Error: ", $json->error }
+
+  # Use alternative interface
+  use Mojo::JSON 'j';
+  my $bytes = j({foo => [1, 2], bar => 'hello!', baz => \1});
+  my $hash  = j($bytes);
 
 =head1 DESCRIPTION
 
@@ -358,6 +378,18 @@ generate booleans, based on if their values are true or false.
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
 encoding will only generate UTF-8. The two Unicode whitespace characters
 C<u2028> and C<u2029> will always be escaped to make JSONP easier.
+
+=head1 FUNCTIONS
+
+L<Mojo::JSON> implements the following functions.
+
+=head2 j
+
+  my $array = j($bytes);
+  my $hash  = j($bytes);
+  my $bytes = j({foo => 'bar'});
+
+Decode JSON or encode Perl data structure.
 
 =head1 ATTRIBUTES
 

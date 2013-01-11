@@ -4,7 +4,7 @@ use Mojo::Base -strict;
 use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
-use Mojo::JSON;
+use Mojo::JSON 'j';
 use Mojo::UserAgent;
 use Mojo::Util 'monkey_patch';
 
@@ -34,23 +34,18 @@ sub import {
     a => sub { $caller->can('any')->(@_) and return $UA->app },
     b => \&b,
     c => \&c,
-    d => sub { _request($UA->build_tx(DELETE  => @_)) },
+    d => sub { _request($UA->build_tx(DELETE => @_)) },
     f => sub { _request($UA->build_form_tx(@_)) },
-    g => sub { _request($UA->build_tx(GET     => @_)) },
-    h => sub { _request($UA->build_tx(HEAD    => @_)) },
+    g => sub { _request($UA->build_tx(GET    => @_)) },
+    h => sub { _request($UA->build_tx(HEAD   => @_)) },
+    j => \&j,
     n => sub { _request($UA->build_json_tx(@_)) },
     o => sub { _request($UA->build_tx(OPTIONS => @_)) },
-    p => sub { _request($UA->build_tx(POST    => @_)) },
+    p => sub { _request($UA->build_tx(POST => @_)) },
     r => sub { $UA->app->dumper(@_) },
-    t => sub { _request($UA->build_tx(PATCH   => @_)) },
-    u => sub { _request($UA->build_tx(PUT     => @_)) },
+    t => sub { _request($UA->build_tx(PATCH => @_)) },
+    u => sub { _request($UA->build_tx(PUT => @_)) },
     x => sub { Mojo::DOM->new(@_) };
-  monkey_patch $caller, j => sub {
-    my $d = shift;
-    my $j = Mojo::JSON->new;
-    return $j->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
-    return $j->decode($d);
-  };
 }
 
 sub _request {

@@ -82,7 +82,7 @@ subclass.
 
 =head2 get_chunk
 
-  my $chunk = $asset->get_chunk($offset);
+  my $bytes = $asset->get_chunk($offset);
 
 Get chunk of data starting from a specific position. Meant to be overloaded
 in a subclass.
@@ -113,7 +113,7 @@ Size of asset data in bytes. Meant to be overloaded in a subclass.
 
 =head2 slurp
 
-  my $string = $asset->slurp;
+  my $bytes = $asset->slurp;
 
 Read all asset data at once. Meant to be overloaded in a subclass.
 

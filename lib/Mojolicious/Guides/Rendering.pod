@@ -114,7 +114,8 @@ which is the default to prevent XSS attacks against your application.
 
 Only L<Mojo::ByteStream> objects are excluded from automatic escaping.
 
-  <%= Mojo::ByteStream->new('<p>test</p>') %>
+  % use Mojo::ByteStream 'b';
+  <%= b('<p>test</p>') %>
 
 Newline characters can be escaped with a backslash.
 

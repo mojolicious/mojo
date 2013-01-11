@@ -402,7 +402,8 @@ the default in L<Mojolicious> C<.ep> templates for example.
 
 L<Mojo::ByteStream> objects are always excluded from automatic escaping.
 
-  <%= Mojo::ByteStream->new('<div>excluded!</div>') %>
+  % use Mojo::ByteStream 'b';
+  <%= b('<div>excluded!</div>') %>
 
 Newline characters can be escaped with a backslash.
 

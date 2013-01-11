@@ -816,10 +816,12 @@ will be invoked once all data has been written.
   $c->send('Hello World!');
 
   # Send JSON object as "Text" frame
-  $c->send({text => Mojo::JSON->new->encode({hello => 'world'})});
+  use Mojo::JSON 'j';
+  $c->send({text => j({hello => 'world'})});
 
   # Send JSON object as "Binary" frame
-  $c->send({binary => Mojo::JSON->new->encode({hello => 'world'})});
+  use Mojo::JSON 'j';
+  $c->send({binary => j({hello => 'world'})});
 
   # Send "Ping" frame
   $c->send([1, 0, 0, 0, 9, 'Hello World!']);

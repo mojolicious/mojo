@@ -280,8 +280,8 @@ sub _message {
   # Message
   my $msg = delete $self->{message};
   if (delete $self->{op} == TEXT) {
-    $msg = decode 'UTF-8', $msg if $msg;
     $self->emit(text => $msg);
+    $msg = decode 'UTF-8', $msg if $msg;
   }
   else { $self->emit(binary => $msg); }
   $self->emit(message => $msg);
@@ -385,15 +385,15 @@ Emitted when a complete WebSocket message has been received.
 =head2 text
 
   $ws->on(text => sub {
-    my ($ws, $chars) = @_;
+    my ($ws, $bytes) = @_;
     ...
   });
 
 Emitted when a complete WebSocket text message has been received.
 
   $ws->on(text => sub {
-    my ($ws, $chars) = @_;
-    say "Text: $chars";
+    my ($ws, $bytes) = @_;
+    say "Text: $bytes";
   });
 
 =head1 ATTRIBUTES

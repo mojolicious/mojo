@@ -17,8 +17,8 @@ websocket '/echo' => sub {
   $self->on(binary => sub { shift->send({binary => shift}) });
   $self->on(
     text => sub {
-      my ($self, $chars) = @_;
-      $self->send("echo: $chars");
+      my ($self, $bytes) = @_;
+      $self->send("echo: $bytes");
     }
   );
 };

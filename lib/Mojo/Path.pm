@@ -197,7 +197,7 @@ Clone path.
 
 =head2 contains
 
-  my $success = $path->contains('/foo');
+  my $success = $path->contains('/i/♥/mojolicious');
 
 Check if path contains given prefix.
 

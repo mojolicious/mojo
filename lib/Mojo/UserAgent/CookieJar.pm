@@ -61,7 +61,7 @@ sub find {
   my ($self, $url) = @_;
 
   # Look through the jar
-  return unless my $domain = lc($url->host // '');
+  return unless my $domain = lc($url->ihost // '');
   my $path = $url->path->to_abs_string;
   my @found;
   while ($domain =~ /[^.]+\.[^.]+|localhost$/) {

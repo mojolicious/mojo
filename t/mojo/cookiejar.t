@@ -118,7 +118,7 @@ is $cookies[1]->name,  'foo', 'right name';
 is $cookies[1]->value, 'bar', 'right value';
 is $cookies[2], undef, 'no third cookie';
 
-# Random top-level domain
+# Random top-level domain and IDNA
 $jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(
   Mojo::Cookie::Response->new(
@@ -128,29 +128,29 @@ $jar->add(
     value  => 'bar'
   ),
   Mojo::Cookie::Response->new(
-    domain => 'kraih.com',
+    domain => 'xn--bcher-kva.com',
     path   => '/foo',
     name   => 'bar',
     value  => 'baz'
   )
 );
-@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+@cookies = $jar->find(Mojo::URL->new('http://bücher.com/foo'));
 is $cookies[0]->name,  'bar', 'right name';
 is $cookies[0]->value, 'baz', 'right value';
 is $cookies[1], undef, 'no second cookie';
-@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo'));
+@cookies = $jar->find(Mojo::URL->new('http://bücher.com/foo'));
 is $cookies[0]->name,  'bar', 'right name';
 is $cookies[0]->value, 'baz', 'right value';
 is $cookies[1], undef, 'no second cookie';
 @cookies = $jar->all;
-is $cookies[0]->domain, 'com',       'right domain';
-is $cookies[0]->path,   '/foo',      'right path';
-is $cookies[0]->name,   'foo',       'right name';
-is $cookies[0]->value,  'bar',       'right value';
-is $cookies[1]->domain, 'kraih.com', 'right domain';
-is $cookies[1]->path,   '/foo',      'right path';
-is $cookies[1]->name,   'bar',       'right name';
-is $cookies[1]->value,  'baz',       'right value';
+is $cookies[0]->domain, 'com',               'right domain';
+is $cookies[0]->path,   '/foo',              'right path';
+is $cookies[0]->name,   'foo',               'right name';
+is $cookies[0]->value,  'bar',               'right value';
+is $cookies[1]->domain, 'xn--bcher-kva.com', 'right domain';
+is $cookies[1]->path,   '/foo',              'right path';
+is $cookies[1]->name,   'bar',               'right name';
+is $cookies[1]->value,  'baz',               'right value';
 is $cookies[2], undef, 'no third cookie';
 
 # Huge cookie

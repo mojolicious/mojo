@@ -617,18 +617,18 @@ Opposite of C<json_has>.
 
 =head2 json_is
 
-  $t = $t->json_is('/foo' => {bar => [1, 2, 3]});
-  $t = $t->json_is('/foo/bar' => [1, 2, 3]);
-  $t = $t->json_is('/foo/bar/1' => 2, 'right value');
+  $t = $t->json_is('/' => {foo => [1, 2, 3]});
+  $t = $t->json_is('/foo' => [1, 2, 3]);
+  $t = $t->json_is('/foo/1' => 2, 'right value');
 
 Check the value extracted from JSON response using the given JSON Pointer with
 L<Mojo::JSON::Pointer>.
 
 =head2 json_message_is
 
-  $t = $t->json_message_is('/foo' => {bar => [1, 2, 3]});
-  $t = $t->json_message_is('/foo/bar' => [1, 2, 3]);
-  $t = $t->json_message_is('/foo/bar/1' => 2, 'right value');
+  $t = $t->json_message_is('/' => {foo => [1, 2, 3]});
+  $t = $t->json_message_is('/foo' => [1, 2, 3]);
+  $t = $t->json_message_is('/foo/1' => 2, 'right value');
 
 Check the value extracted from JSON WebSocket message using the given JSON
 Pointer with L<Mojo::JSON::Pointer>.

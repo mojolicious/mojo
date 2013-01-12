@@ -239,6 +239,43 @@ is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
 
+# Ignore leading dot
+$jar = Mojo::UserAgent::CookieJar->new;
+$jar->add(
+  Mojo::Cookie::Response->new(
+    domain => '.kraih.com',
+    path   => '/foo',
+    name   => 'foo',
+    value  => 'bar'
+  ),
+  Mojo::Cookie::Response->new(
+    domain => 'kraih.com',
+    path   => '/foo',
+    name   => 'bar',
+    value  => 'baz'
+  )
+);
+@cookies = $jar->find(Mojo::URL->new('http://www.labs.kraih.com/foo'));
+is $cookies[0]->name,  'foo', 'right name';
+is $cookies[0]->value, 'bar', 'right value';
+is $cookies[1]->name,  'bar', 'right name';
+is $cookies[1]->value, 'baz', 'right value';
+is $cookies[2], undef, 'no third cookie';
+@cookies = $jar->find(Mojo::URL->new('http://labs.kraih.com/foo'));
+is $cookies[0]->name,  'foo', 'right name';
+is $cookies[0]->value, 'bar', 'right value';
+is $cookies[1]->name,  'bar', 'right name';
+is $cookies[1]->value, 'baz', 'right value';
+is $cookies[2], undef, 'no third cookie';
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo/bar'));
+is $cookies[0]->name,  'foo', 'right name';
+is $cookies[0]->value, 'bar', 'right value';
+is $cookies[1]->name,  'bar', 'right name';
+is $cookies[1]->value, 'baz', 'right value';
+is $cookies[2], undef, 'no third cookie';
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foobar'));
+is $cookies[0], undef, 'no cookies';
+
 # "(" in path
 $jar = Mojo::UserAgent::CookieJar->new;
 $jar->add(

@@ -44,8 +44,9 @@ sub extract {
   for my $cookie (@{$tx->res->cookies}) {
 
     # Validate domain
-    my $host = lc $url->host;
+    my $host = lc $url->ihost;
     my $domain = lc($cookie->domain // $host);
+    $domain =~ s/^\.//;
     next unless $host eq $domain || $host =~ /\Q.$domain\E$/;
     $cookie->domain($domain);
 

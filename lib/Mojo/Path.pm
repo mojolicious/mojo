@@ -249,8 +249,8 @@ Turn path into an absolute string.
 
 Clone path and remove everything after the right-most slash.
 
-  # "/foo/bar/"
-  Mojo::Path->new('/foo/bar/index.html');
+  # "/i/%E2%99%A5/"
+  Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_dir->to_abs_string;
 
 =head2 to_route
 

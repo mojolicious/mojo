@@ -4,6 +4,7 @@
   - Added binary and text events to Mojo::Transaction::WebSocket.
   - Added json_message_is method to Test::Mojo.
   - Added j function to Mojo::JSON.
+  - Updated a few example scripts.
   - Improved documentation.
   - Improved tests.
   - Fixed aliasing bug in Mojo::EventEmitter.

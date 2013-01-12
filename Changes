@@ -1,4 +1,9 @@
 
+3.78  2013-01-13
+  - Added to_dir method to Mojo::Path.
+  - Improved tests.
+  - Fixed domain and path detection bugs in Mojo::UserAgent::CookieJar.
+
 3.77  2013-01-12
   - Added support for advanced binary WebSocket message tests to Test::Mojo.
   - Added binary and text events to Mojo::Transaction::WebSocket.

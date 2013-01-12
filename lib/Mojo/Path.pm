@@ -85,6 +85,12 @@ sub parse {
 
 sub to_abs_string { $_[0]->leading_slash ? "$_[0]" : "/$_[0]" }
 
+sub to_dir {
+  my $clone = shift->clone;
+  pop @{$clone->parts} unless $clone->trailing_slash;
+  return $clone->trailing_slash(@{$clone->parts} ? 1 : 0);
+}
+
 sub to_route {
   my $self = shift;
   return '/' . join('/', @{$self->parts}) . ($self->trailing_slash ? '/' : '');
@@ -236,6 +242,15 @@ Turn path into an absolute string.
 
   # "/i/%E2%99%A5/mojolicious"
   Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_abs_string;
+
+=head2 to_dir
+
+  my $dir = $route->to_dir;
+
+Clone path and remove everything after the right-most slash.
+
+  # "/foo/bar/"
+  Mojo::Path->new('/foo/bar/index.html');
 
 =head2 to_route
 

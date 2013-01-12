@@ -2,6 +2,7 @@ package Mojo::UserAgent::CookieJar;
 use Mojo::Base -base;
 
 use Mojo::Cookie::Request;
+use Mojo::Path;
 
 has max_cookie_size => 4096;
 
@@ -41,9 +42,18 @@ sub extract {
   my ($self, $tx) = @_;
   my $url = $tx->req->url;
   for my $cookie (@{$tx->res->cookies}) {
-    $cookie->domain($url->host) unless $cookie->domain;
-    $cookie->path($url->path)   unless $cookie->path;
-    $self->add($cookie);
+
+    # Validate domain
+    my $host = lc $url->host;
+    my $domain = lc($cookie->domain // $host);
+    next unless $host eq $domain || $host =~ /\Q.$domain\E$/;
+    $cookie->domain($domain);
+
+    # Validate path
+    my $path = $cookie->path // $url->path->to_dir->to_abs_string;
+    $path =~ s!/$!!;
+    next unless $url->path->contains(Mojo::Path->new($path)->to_route);
+    $self->add($cookie->path($path));
   }
 }
 
@@ -51,8 +61,8 @@ sub find {
   my ($self, $url) = @_;
 
   # Look through the jar
-  return unless my $domain = $url->host;
-  my $path = $url->path->to_string || '/';
+  return unless my $domain = lc($url->host // '');
+  my $path = $url->path->to_abs_string;
   my @found;
   while ($domain =~ /[^.]+\.[^.]+|localhost$/) {
     next unless my $old = $self->{jar}{$domain};
@@ -68,7 +78,8 @@ sub find {
 
       # Taste cookie
       next if $cookie->secure && $url->protocol ne 'https';
-      next unless $path =~ /^\Q@{[$cookie->path]}/;
+      my $cpath = $cookie->path;
+      next unless $cpath eq '/' || $path eq $cpath || $path =~ m!^\Q$cpath/!;
       my $name  = $cookie->name;
       my $value = $cookie->value;
       push @found, Mojo::Cookie::Request->new(name => $name, value => $value);

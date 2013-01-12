@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::Cookie::Response;
+use Mojo::Transaction::HTTP;
 use Mojo::URL;
 use Mojo::UserAgent::CookieJar;
 
@@ -73,6 +74,12 @@ is $cookies[1], undef, 'no second cookie';
 is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo/bar'));
+is $cookies[0]->name,  'foo', 'right name';
+is $cookies[0]->value, 'bar', 'right value';
+is $cookies[1], undef, 'no second cookie';
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foobar'));
+is $cookies[0], undef, 'no cookies';
 
 # "localhost"
 $jar = Mojo::UserAgent::CookieJar->new;
@@ -302,5 +309,107 @@ $jar->add(
 is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo%28bar/baz'));
+is $cookies[0]->name,  'foo', 'right name';
+is $cookies[0]->value, 'bar', 'right value';
+is $cookies[1], undef, 'no second cookie';
+
+# Extract and inject cookies without domain and path
+$jar = Mojo::UserAgent::CookieJar->new;
+my $tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://mojolicio.us/perldoc/Mojolicious');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(name => 'foo', value => 'without'));
+$jar->extract($tx);
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://mojolicio.us/perldoc');
+$jar->inject($tx);
+is $tx->req->cookie('foo')->name,  'foo',     'right name';
+is $tx->req->cookie('foo')->value, 'without', 'right value';
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://mojolicio.us/perldoc');
+$jar->inject($tx);
+is $tx->req->cookie('foo')->name,  'foo',     'right name';
+is $tx->req->cookie('foo')->value, 'without', 'right value';
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://mojolicio.us/whatever');
+$jar->inject($tx);
+is $tx->req->cookie('foo'), undef, 'no cookie';
+
+# Extract and inject cookies with domain and path
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://LABS.Kraih.Com/perldoc/Mojolicious');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'with',
+    domain => 'labs.KRAIH.com',
+    path   => '/perldoc'
+  ),
+  Mojo::Cookie::Response->new(
+    name   => 'bar',
+    value  => 'with',
+    domain => 'KRAIH.com',
+    path   => '/'
+  )
+);
+$jar->extract($tx);
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://labs.kraih.COM/perldoc');
+$jar->inject($tx);
+is $tx->req->cookie('foo')->name,  'foo',  'right name';
+is $tx->req->cookie('foo')->value, 'with', 'right value';
+is $tx->req->cookie('bar')->name,  'bar',  'right name';
+is $tx->req->cookie('bar')->value, 'with', 'right value';
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://labs.kraih.COM/Perldoc');
+$jar->inject($tx);
+is $tx->req->cookie('foo'), undef, 'no cookie';
+is $tx->req->cookie('bar')->name,  'bar',  'right name';
+is $tx->req->cookie('bar')->value, 'with', 'right value';
+
+# Extract cookies with invalid domain
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://labs.kraih.com/perldoc/Mojolicious');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'invalid',
+    domain => 'a.s.kraih.com'
+  ),
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'invalid',
+    domain => 'mojolicio.us'
+  )
+);
+$jar->extract($tx);
+is_deeply [$jar->all], [], 'no cookies';
+
+# Extract cookies with invalid path
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://labs.kraih.com/perldoc/Mojolicious');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(
+    name  => 'foo',
+    value => 'invalid',
+    path  => '/perldoc/index.html'
+  ),
+  Mojo::Cookie::Response->new(
+    name  => 'foo',
+    value => 'invalid',
+    path  => '/perldocMojolicious'
+  ),
+  Mojo::Cookie::Response->new(
+    name  => 'foo',
+    value => 'invalid',
+    path  => '/perldoc.Mojolicious'
+  )
+);
+$jar->extract($tx);
+is_deeply [$jar->all], [], 'no cookies';
 
 done_testing();

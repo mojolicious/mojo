@@ -352,16 +352,24 @@ $tx->res->cookies(
     value  => 'with',
     domain => 'KRAIH.com',
     path   => '/'
-  )
+  ),
+  Mojo::Cookie::Response->new(
+    name   => 'baz',
+    value  => 'with',
+    domain => 'labs.KRAIH.com',
+    path   => '/%70erldoc/Mojolicious/'
+  ),
 );
 $jar->extract($tx);
 $tx = Mojo::Transaction::HTTP->new;
-$tx->req->url->parse('http://labs.kraih.COM/perldoc');
+$tx->req->url->parse('http://labs.kraih.COM/perldoc/Mojolicious/Lite');
 $jar->inject($tx);
 is $tx->req->cookie('foo')->name,  'foo',  'right name';
 is $tx->req->cookie('foo')->value, 'with', 'right value';
 is $tx->req->cookie('bar')->name,  'bar',  'right name';
 is $tx->req->cookie('bar')->value, 'with', 'right value';
+is $tx->req->cookie('baz')->name,  'baz',  'right name';
+is $tx->req->cookie('baz')->value, 'with', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://labs.kraih.COM/Perldoc');
 $jar->inject($tx);

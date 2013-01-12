@@ -51,8 +51,8 @@ sub extract {
 
     # Validate path
     my $path = $cookie->path // $url->path->to_dir->to_abs_string;
-    $path =~ s!/$!!;
-    next unless $url->path->contains(Mojo::Path->new($path)->to_route);
+    $path = Mojo::Path->new($path)->trailing_slash(0)->to_abs_string;
+    next unless _path($path, $url->path->to_abs_string);
     $self->add($cookie->path($path));
   }
 }
@@ -78,8 +78,7 @@ sub find {
 
       # Taste cookie
       next if $cookie->secure && $url->protocol ne 'https';
-      my $cpath = $cookie->path;
-      next unless $cpath eq '/' || $path eq $cpath || $path =~ m!^\Q$cpath/!;
+      next unless _path($cookie->path, $path);
       my $name  = $cookie->name;
       my $value = $cookie->value;
       push @found, Mojo::Cookie::Request->new(name => $name, value => $value);
@@ -98,6 +97,8 @@ sub inject {
   my $req = $tx->req;
   $req->cookies($self->find($req->url));
 }
+
+sub _path { $_[0] eq '/' || $_[0] eq $_[1] || $_[1] =~ m!^\Q$_[0]/! }
 
 1;
 

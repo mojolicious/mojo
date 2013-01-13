@@ -1,4 +1,7 @@
 
+3.79  2013-01-13
+  - Fixed small domain detection bug in Mojo::UserAgent::CookieJar.
+
 3.78  2013-01-13
   - Added to_dir method to Mojo::Path.
   - Improved documentation.

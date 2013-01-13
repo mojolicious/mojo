@@ -317,6 +317,30 @@ $tx->req->url->parse('http://mojolicio.us/whatever');
 $jar->inject($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 
+# Extract and inject cookies for "localhost" (valid and invalid)
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://localhost:3000');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'local',
+    domain => 'localhost'
+  ),
+  Mojo::Cookie::Response->new(
+    name   => 'bar',
+    value  => 'local',
+    domain => 'bar.localhost'
+  )
+);
+$jar->extract($tx);
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://localhost:8080');
+$jar->inject($tx);
+is $tx->req->cookie('foo')->name,  'foo',   'right name';
+is $tx->req->cookie('foo')->value, 'local', 'right value';
+is $tx->req->cookie('bar'), undef, 'no cookie';
+
 # Extract and inject cookies with domain and path
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
@@ -372,6 +396,30 @@ $tx->res->cookies(
     name   => 'foo',
     value  => 'invalid',
     domain => 'mojolicio.us'
+  )
+);
+$jar->extract($tx);
+is_deeply [$jar->all], [], 'no cookies';
+
+# Extract cookies with invalid domain (IP address)
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'invalid',
+    domain => '213.133.102.53'
+  ),
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'invalid',
+    domain => '102.53'
+  ),
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'invalid',
+    domain => '53'
   )
 );
 $jar->extract($tx);

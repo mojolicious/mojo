@@ -117,7 +117,9 @@ sub hmac_sha1_sum { _hmac(\&sha1, @_) }
 
 # DEPRECATED in Rainbow!
 sub html_escape {
-  warn "Mojo::Util->html_escape is DEPRECATED!\n";
+  warn <<EOF;
+Mojo::Util->html_escape is DEPRECATED in favor of Mojo::Util->xml_escape!!!
+EOF
   my ($string, $pattern) = @_;
   $pattern ||= '^\n\r\t !#$%(-;=?-~';
   return $string unless $string =~ /[^$pattern]/;

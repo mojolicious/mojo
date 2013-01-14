@@ -1,7 +1,8 @@
 
 3.80  2013-01-14
-  - Deprecated Mojo::Util->html_escape.
-  - Deprecated Mojo::ByteStream->html_escape.
+  - Deprecated Mojo::Util->html_escape in favor of Mojo::Util->xml_escape.
+  - Deprecated Mojo::ByteStream->html_escape in favor of
+    Mojo::ByteStream->xml_escape.
   - Fixed support for multi byte entities in Mojo::Util.
 
 3.79  2013-01-13

@@ -5,8 +5,14 @@ use Mojo::JSON 'j';
 
 any '/' => sub {
   my $self = shift;
-  $self->on(text => sub { shift->send(j(shift)->{test}) })
-    if $self->tx->is_websocket;
+  $self->on(
+    text => sub {
+      my ($self, $message) = @_;
+      my $hash = j($message);
+      $hash->{test} = "♥ $hash->{test}";
+      $self->send({text => j($hash)});
+    }
+  ) if $self->tx->is_websocket;
 } => 'websocket';
 
 # Minimal WebSocket application for browser testing
@@ -26,11 +32,10 @@ __DATA__
       }
       if(typeof(ws) !== 'undefined') {
         function wsmessage(event) {
-          data = event.data;
-          alert(data);
+          alert(JSON.parse(event.data).test);
         }
         function wsopen(event) {
-          ws.send(JSON.stringify({test: "♥ WebSocket support works! ♥"}));
+          ws.send(JSON.stringify({test: "WebSocket support works! ♥"}));
         }
         ws.onmessage = wsmessage;
         ws.onopen = wsopen;

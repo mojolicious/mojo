@@ -3,17 +3,19 @@ use lib "$FindBin::Bin/../lib";
 use Mojolicious::Lite;
 use Mojo::JSON 'j';
 
-any '/' => sub {
+websocket '/' => sub {
   my $self = shift;
   $self->on(
     text => sub {
-      my ($self, $message) = @_;
-      my $hash = j($message);
+      my ($self, $data) = @_;
+      my $hash = j($data);
       $hash->{test} = "♥ $hash->{test}";
       $self->send({text => j($hash)});
     }
-  ) if $self->tx->is_websocket;
-} => 'websocket';
+  );
+};
+
+get '/' => 'websocket';
 
 # Minimal WebSocket application for browser testing
 app->start;

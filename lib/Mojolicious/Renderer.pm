@@ -6,7 +6,7 @@ use Mojo::Cache;
 use Mojo::JSON;
 use Mojo::Home;
 use Mojo::Loader;
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode slurp);
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
@@ -20,7 +20,7 @@ has paths => sub { [] };
 my $HOME = Mojo::Home->new;
 $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
-my %TEMPLATES = map { $_ => $HOME->slurp_rel_file($_) } @{$HOME->list_files};
+my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
 
 sub new {
   my $self = shift->SUPER::new(@_);

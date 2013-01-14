@@ -80,7 +80,13 @@ sub parse {
 sub rel_dir { catdir(@{shift->{parts} || []}, split '/', shift) }
 sub rel_file { catfile(@{shift->{parts} || []}, split '/', shift) }
 
-sub slurp_rel_file { slurp shift->rel_file(@_) }
+# DEPRECATED in Rainbow!
+sub slurp_rel_file {
+  warn <<EOF;
+Mojo::Home->slurp_rel_file is DEPRECATED in favor of Mojo::Util->slurp!!!
+EOF
+  slurp shift->rel_file(@_);
+}
 
 sub to_string { catdir(@{shift->{parts} || []}) }
 
@@ -165,14 +171,6 @@ directory.
   my $path = $home->rel_file('foo/bar.html');
 
 Portably generate an absolute path for a file relative to the home directory.
-
-=head2 slurp_rel_file
-
-  my $content = $home->slurp_rel_file('foo/bar.html');
-
-Portably read all data at once from file relative to the home directory.
-
-  my $content = $home->slurp_rel_file($home->list_files('public')->[1]);
 
 =head2 to_string
 

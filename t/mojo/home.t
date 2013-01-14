@@ -56,12 +56,4 @@ is first(sub {/Base2\.pm$/}, @{$home->list_files('lib')}),
 is first(sub {/Base3\.pm$/}, @{$home->list_files('lib')}),
   'Mojo/BaseTest/Base3.pm', 'right result';
 
-# Slurp files
-like $home->slurp_rel_file('lib/Mojo/BaseTest/Base1.pm'), qr/Base1/,
-  'right content';
-like $home->slurp_rel_file('lib/Mojo/BaseTest/Base2.pm'), qr/Base2/,
-  'right content';
-like $home->slurp_rel_file('lib/Mojo/BaseTest/Base3.pm'), qr/Base3/,
-  'right content';
-
 done_testing();

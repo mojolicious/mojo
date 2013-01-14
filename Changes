@@ -3,6 +3,7 @@
   - Deprecated Mojo::Util->html_escape in favor of Mojo::Util->xml_escape.
   - Deprecated Mojo::ByteStream->html_escape in favor of
     Mojo::ByteStream->xml_escape.
+  - Deprecated Mojo::Home->slurp_rel_file in favor of Mojo::Util->slurp.
   - Improved documentation.
   - Fixed support for multi byte entities in Mojo::Util.
 

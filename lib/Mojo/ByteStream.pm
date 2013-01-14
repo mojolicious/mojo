@@ -315,7 +315,7 @@ L<Mojo::Util/"url_escape">.
 Decode percent encoded characters in bytestream with
 L<Mojo::Util/"url_unescape">.
 
-  b('%3Chtml%3E')->url_unescape->b64_encode('')->say;
+  b('%3Chtml%3E')->url_unescape->xml_escape->say;
 
 =head2 xml_escape
 

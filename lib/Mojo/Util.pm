@@ -45,11 +45,14 @@ my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum monkey_patch punycode_decode),
-  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum slurp spurt),
-  qw(squish trim unquote url_escape url_unescape xml_escape xor_encode)
+  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_unescape),
+  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
+  qw(url_escape url_unescape xml_escape xor_encode)
 );
+
+# DEPRECATED in Rainbow!
+push @EXPORT_OK, 'html_escape';
 
 sub b64_decode { decode_base64($_[0]) }
 

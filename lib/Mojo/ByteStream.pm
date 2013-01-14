@@ -11,10 +11,11 @@ our @EXPORT_OK = ('b');
 # Turn most functions from Mojo::Util into methods
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_md5_sum hmac_sha1_sum),
-  qw(html_escape html_unescape md5_bytes md5_sum punycode_decode),
-  qw(punycode_encode quote sha1_bytes sha1_sum slurp spurt squish trim),
-  qw(unquote url_escape url_unescape xml_escape xor_encode)
+  qw(html_unescape md5_bytes md5_sum punycode_decode punycode_encode quote),
+  qw(sha1_bytes sha1_sum slurp spurt squish trim unquote url_escape),
+  qw(url_unescape xml_escape xor_encode)
 );
+push @UTILS, 'html_escape';    # DEPRECATED in Rainbow!
 for my $name (@UTILS) {
   my $sub = Mojo::Util->can($name);
   Mojo::Util::monkey_patch __PACKAGE__, $name, sub {

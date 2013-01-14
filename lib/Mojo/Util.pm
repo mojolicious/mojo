@@ -28,10 +28,13 @@ my $DELIMITER = chr 0x2D;
 my %ENTITIES;
 {
   open my $entities, '<', catfile(dirname(__FILE__), 'entities.txt');
-  /^(\S+)\s+U\+(\S+)/ and $ENTITIES{$1} = chr hex($2) for <$entities>;
+  for my $entity (<$entities>) {
+    next unless $entity =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
+    $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
+  }
 }
 
-# Reverse entities for html_escape (without "apos")
+# DEPRECATED in Rainbow!
 my %REVERSE = ("\x{0027}" => '#39;');
 $REVERSE{$ENTITIES{$_}} //= $_
   for sort  { @{[$a =~ /[A-Z]/g]} <=> @{[$b =~ /[A-Z]/g]} }
@@ -112,7 +115,9 @@ sub get_line {
 sub hmac_md5_sum  { _hmac(\&md5,  @_) }
 sub hmac_sha1_sum { _hmac(\&sha1, @_) }
 
+# DEPRECATED in Rainbow!
 sub html_escape {
+  warn "Mojo::Util->html_escape is DEPRECATED!\n";
   my ($string, $pattern) = @_;
   $pattern ||= '^\n\r\t !#$%(-;=?-~';
   return $string unless $string =~ /[^$pattern]/;
@@ -376,6 +381,7 @@ sub _decode {
   return "&$_[1]";
 }
 
+# DEPRECATED in Rainbow!
 sub _encode {
   return exists $REVERSE{$_[0]} ? "&$REVERSE{$_[0]}" : "&#@{[ord($_[0])]};";
 }
@@ -514,14 +520,6 @@ Generate HMAC-MD5 checksum for string.
 
 Generate HMAC-SHA1 checksum for string.
 
-=head2 html_escape
-
-  my $escaped = html_escape $string;
-  my $escaped = html_escape $string, '^\n\r\t !#$%(-;=?-~';
-
-Escape unsafe characters in string with HTML entities, the pattern used
-defaults to C<^\n\r\t !#$%(-;=?-~>.
-
 =head2 html_unescape
 
   my $string = html_unescape $escaped;
@@ -637,8 +635,7 @@ Decode percent encoded characters in string.
 
   my $escaped = xml_escape $string;
 
-Escape only the characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string,
-this is a much faster version of C<html_escape>.
+Escape unsafe characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string.
 
 =head2 xor_encode
 

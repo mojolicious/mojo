@@ -16,11 +16,15 @@ app->renderer->default_format('foo');
 
 # Twinkle template syntax
 my $twinkle = {
-  append          => '$self->res->headers->header("X-Append" => $prepended);',
-  auto_escape     => 0,
-  capture_end     => '-',
-  capture_start   => '+',
-  escape          => \&Mojo::Util::html_escape,
+  append        => '$self->res->headers->header("X-Append" => $prepended);',
+  auto_escape   => 0,
+  capture_end   => '-',
+  capture_start => '+',
+  escape        => sub {
+    my $string = shift;
+    $string =~ s/</&LT;/g;
+    return $string;
+  },
   escape_mark     => '*',
   expression_mark => '*',
   line_start      => '.',
@@ -88,7 +92,7 @@ $t->get_ok('/')->status_is(200)->header_is('X-Append' => 'bar')
 
 # GET /advanced
 $t->get_ok('/advanced')->status_is(200)->header_is('X-Append' => 'bar')
-  ->content_is("&lt;escape me&gt;&awconint;\n123423");
+  ->content_is("&LT;escape me>\n123423");
 
 # GET /docs
 $t->get_ok('/docs')->status_is(200)->content_like(qr!<h3>snowman</h3>!);
@@ -123,7 +127,7 @@ Hello *** $name **!\
 test<%= content %>123\
 
 @@ advanced.foo.twinkle
-.** "<escape me>\x{2233}"
+.** "<escape me>"
 . my $numbers = [1 .. 4];
  ** for my $i (@$numbers) { ***
  *** $i ***

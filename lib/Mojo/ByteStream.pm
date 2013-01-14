@@ -82,7 +82,7 @@ Mojo::ByteStream - ByteStream
 
   # Use the alternative constructor
   use Mojo::ByteStream 'b';
-  my $stream = b('foobarbaz')->html_escape;
+  my $stream = b('foobarbaz')->b64_encode('')->say;
 
 =head1 DESCRIPTION
 
@@ -174,15 +174,6 @@ Generate HMAC-MD5 checksum for bytestream with L<Mojo::Util/"hmac_md5_sum">.
 Generate HMAC-SHA1 checksum for bytestream with L<Mojo::Util/"hmac_sha1_sum">.
 
   b('foo bar baz')->hmac_sha1_sum('secr3t')->quote->say;
-
-=head2 html_escape
-
-  $stream = $stream->html_escape;
-  $stream = $stream->html_escape('^\n\r\t !#$%(-;=?-~');
-
-Escape unsafe characters in bytestream with L<Mojo::Util/"html_escape">.
-
-  b('<html>')->html_escape->say;
 
 =head2 html_unescape
 
@@ -324,7 +315,7 @@ L<Mojo::Util/"url_escape">.
 Decode percent encoded characters in bytestream with
 L<Mojo::Util/"url_unescape">.
 
-  b('%3Chtml%3E')->url_unescape->html_escape->say;
+  b('%3Chtml%3E')->url_unescape->b64_encode('')->say;
 
 =head2 xml_escape
 

@@ -7,10 +7,10 @@ use FindBin;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_escape),
-  qw(html_unescape md5_bytes md5_sum monkey_patch punycode_decode),
-  qw(punycode_encode quote squish trim unquote secure_compare sha1_bytes),
-  qw(sha1_sum slurp spurt url_escape url_unescape xml_escape xor_encode);
+  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_unescape),
+  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(squish trim unquote secure_compare sha1_bytes sha1_sum slurp spurt),
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -107,14 +107,6 @@ is url_escape(encode 'UTF-8', "foo\x{df}\x{0100}bar\x{263a}"),
 is decode('UTF-8', url_unescape 'foo%C3%9F%C4%80bar%E2%98%BA'),
   "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
 
-# html_escape
-is html_escape("foo bar'<baz>"), 'foo bar&#39;&lt;baz&gt;',
-  'right html escaped result';
-
-# html_escape (nothing to escape)
-is html_escape("foobar123\n\r\t !#\$\%()*+,-./:;=?[\\]^-{|}@~"),
-  "foobar123\n\r\t !#\$\%()*+,-./:;=?[\\]^-{|}@~", 'right html escaped result';
-
 # html_unescape
 is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x26;&#34;'),
   "<foo>bar<baz>&\"", 'right html unescaped result';
@@ -122,6 +114,10 @@ is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x26;&#34;'),
 # html_unescape (special entities)
 is html_unescape('foo &CounterClockwiseContourIntegral; bar &sup1baz'),
   "foo \x{2233} bar \x{00b9}baz", 'right html unescaped result';
+
+# html_unescape (multi byte entity)
+is html_unescape(decode 'UTF-8', '&acE;'), "\x{223e}\x{0333}",
+  'right html unescaped result';
 
 # html_unescape (apos)
 is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
@@ -134,21 +130,9 @@ is html_unescape('foobar'), 'foobar', 'right html unescaped result';
 is html_unescape('&Ltf&amp&0oo&nbspba;&ltr'), "&Ltf&&0oo\x{00a0}ba;<r",
   'right html unescaped result';
 
-# html_escape (UTF-8)
-is html_escape("fo\nobar<baz>&\"\x{152}\x{02ae4}"),
-  "fo\nobar&lt;baz&gt;&amp;&quot;&OElig;&Dashv;", 'right html escaped result';
-
 # html_unescape (UTF-8)
 is html_unescape(decode 'UTF-8', 'foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
   "foo<baz>&\"\x{152}&Foo;", 'right html unescaped result';
-
-# html_escape (path)
-is html_escape('/home/sri/perl/site_perl/5.10.0/Mojo.pm'),
-  '/home/sri/perl/site_perl/5.10.0/Mojo.pm', 'right html escaped result';
-
-# html_escape (custom pattern)
-is html_escape("fo\no b<a>r", 'o<'), "f&#111;\n&#111; b&lt;a>r",
-  'right html escaped result';
 
 # xml_escape
 is xml_escape(qq{la<f>\nbar"baz"'yada\n'&lt;la}),

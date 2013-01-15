@@ -366,14 +366,17 @@ sub _text {
   return $e->text;
 }
 
-# DEPRECATED in Rainbow!
 sub _wait {
   my ($self, $wait) = @_;
+
+  # DEPRECATED in Rainbow!
   my $new = $self->{new} //= $wait;
   warn <<EOF unless $new;
 Testing WebSocket messages without Test::Mojo->message_ok is DEPRECATED!!!
 EOF
   return $self->message if $new && !$wait;
+
+  # Wait for message
   Mojo::IOLoop->one_tick while !$self->{finished} && !@{$self->{messages}};
   return $self->message(shift @{$self->{messages}})->message;
 }
@@ -428,8 +431,9 @@ Current WebSocket message.
 
   # Test custom message
   $t->message([binary => $bytes])
-    ->json_message_has('/foo')
-    ->json_message_is('/foo/bar' => {baz => 'yada'});
+    ->json_message_has('/foo/bar')
+    ->json_message_hasnt('/bar')
+    ->json_message_is('/foo/baz' => {yada => [1, 2, 3]});
 
 =head2 tx
 

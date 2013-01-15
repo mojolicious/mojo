@@ -606,14 +606,14 @@ everything.
 
   get '/' => sub {
     my $self = shift;
-    $self->debug('action');
+    $self->debug('Hello from an action!');
   } => 'index';
 
   app->start;
   __DATA__
 
   @@ index.html.ep
-  % debug 'template';
+  % debug 'Hello from a template!';
 
 Helpers can also accept template blocks as last argument, this for example
 allows very pleasant to use tag helpers and filters.

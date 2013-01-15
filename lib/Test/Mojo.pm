@@ -730,7 +730,8 @@ Wait for next WebSocket message to arrive.
   $t->websocket_ok('/time')
     ->message_ok
     ->message_like(qr/\d+/)
-    ->message_unlike(qr/\w+/);
+    ->message_unlike(qr/\w+/)
+    ->finish_ok;
 
 =head2 message_unlike
 

@@ -1,4 +1,7 @@
 
+3.81  2013-01-16
+  - Improved documentation.
+
 3.80  2013-01-15
   - Deprecated testing WebSocket messages without calling
     Test::Mojo->message_ok.

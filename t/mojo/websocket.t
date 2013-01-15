@@ -26,13 +26,11 @@ app->log->level('fatal');
 # Avoid exception template
 app->renderer->paths->[0] = app->home->rel_dir('public');
 
-# GET /link
 get '/link' => sub {
   my $self = shift;
   $self->render(text => $self->url_for('index')->to_abs);
 };
 
-# WebSocket /
 my $server;
 websocket '/' => sub {
   my $self = shift;
@@ -47,7 +45,6 @@ websocket '/' => sub {
   );
 } => 'index';
 
-# GET /something/else
 get '/something/else' => sub {
   my $self = shift;
   my $timeout
@@ -55,7 +52,6 @@ get '/something/else' => sub {
   $self->render(text => "${timeout}failed!");
 };
 
-# WebSocket /socket
 websocket '/socket' => sub {
   my $self = shift;
   $self->send(
@@ -67,7 +63,6 @@ websocket '/socket' => sub {
   );
 };
 
-# WebSocket /early_start
 websocket '/early_start' => sub {
   my $self = shift;
   $self->send('test1');
@@ -79,7 +74,6 @@ websocket '/early_start' => sub {
   );
 };
 
-# WebSocket /denied
 my ($handshake, $denied);
 websocket '/denied' => sub {
   my $self = shift;
@@ -88,7 +82,6 @@ websocket '/denied' => sub {
   $self->render(text => 'denied', status => 403);
 };
 
-# WebSocket /subreq
 my $subreq;
 websocket '/subreq' => sub {
   my $self = shift;
@@ -110,7 +103,6 @@ websocket '/subreq' => sub {
   $self->on(finish => sub { $subreq += 1 });
 };
 
-# WebSocket /echo
 websocket '/echo' => sub {
   my $self = shift;
   $self->on(
@@ -121,7 +113,6 @@ websocket '/echo' => sub {
   );
 };
 
-# WebSocket /double_echo
 my $buffer = '';
 websocket '/double_echo' => sub {
   shift->on(
@@ -132,20 +123,16 @@ websocket '/double_echo' => sub {
   );
 };
 
-# WebSocket /dead
 websocket '/dead' => sub { die 'i see dead processes' };
 
-# WebSocket /foo
 websocket '/foo' =>
   sub { shift->rendered->res->code('403')->message("i'm a teapot") };
 
-# WebSocket /deadcallback
 websocket '/deadcallback' => sub {
   my $self = shift;
   $self->on(message => sub { die 'i see dead callbacks' });
 };
 
-# WebSocket /timeout
 my $timeout;
 websocket '/timeout' => sub {
   my $self = shift;
@@ -153,18 +140,17 @@ websocket '/timeout' => sub {
   $self->on(finish => sub { $timeout = 'works!' });
 };
 
-# GET /link
 my $ua  = app->ua;
 my $res = $ua->get('/link')->success;
 is $res->code, 200, 'right status';
 like $res->body, qr!ws://localhost:\d+/!, 'right content';
 
-# GET /socket (plain HTTP request)
+# Plain HTTP request
 $res = $ua->get('/socket')->res;
 is $res->code, 404, 'right status';
 like $res->body, qr/Page not found/, 'right content';
 
-# WebSocket /
+# Plain WebSocket
 my $loop = Mojo::IOLoop->singleton;
 my $result;
 $ua->websocket(
@@ -184,7 +170,7 @@ $ua->websocket(
 $loop->start;
 like $result, qr!test1test2ws://localhost:\d+/!, 'right result';
 
-# WebSocket /something/else (failed websocket connection)
+# Failed websocket connection
 my ($code, $body, $ws);
 $ua->websocket(
   '/something/else' => sub {
@@ -201,7 +187,7 @@ is $code, 426, 'right code';
 ok $body =~ /^(\d+)failed!$/, 'right content';
 is $1, 15, 'right timeout';
 
-# WebSocket /socket (using an already prepared socket)
+# Using an already prepared socket
 my $port = $ua->app_url->port;
 my $tx   = $ua->build_websocket_tx('ws://lalala/socket');
 my $finished;
@@ -234,7 +220,7 @@ is $1, 15, 'right timeout';
 ok $local, 'local port';
 is $loop->stream($tx->connection)->handle, $sock, 'right connection id';
 
-# WebSocket /early_start (server directly sends a message)
+# Server directly sends a message
 $result = undef;
 my $client;
 $ua->websocket(
@@ -260,7 +246,7 @@ $loop->start;
 is $result, 'test3test2', 'right result';
 is $client, 3,            'finish event has been emitted';
 
-# WebSocket /denied (connection denied)
+# Connection denied
 $code = undef;
 $ua->websocket(
   '/denied' => sub {
@@ -273,7 +259,7 @@ is $code,      403, 'right status';
 is $handshake, 1,   'finished handshake';
 is $denied,    1,   'finished websocket';
 
-# WebSocket /subreq
+# Subrequests
 $finished = 0;
 ($code, $result) = ();
 $ua->websocket(
@@ -301,7 +287,7 @@ is $result,   'test0test1', 'right result';
 is $finished, 4,            'finished client websocket';
 is $subreq,   1,            'finished server websocket';
 
-# WebSocket /subreq (parallel)
+# Parallel subrequests
 my $delay = Mojo::IOLoop->delay;
 $finished = 0;
 ($code, $result) = ();
@@ -354,7 +340,7 @@ is $result2,  'test0test1', 'right result';
 is $finished, 3,            'finished client websocket';
 is $subreq,   3,            'finished server websocket';
 
-# WebSocket /echo (client-side drain callback)
+# Client-side drain callback
 $result = '';
 $client = 0;
 my ($drain, $counter);
@@ -389,7 +375,7 @@ is $result, 'hi!there!', 'right result';
 is $client, 3,           'finish event has been emitted';
 is $drain,  1,           'no leaking subscribers';
 
-# WebSocket /double_echo (server-side drain callback)
+# Server-side drain callback
 $result = '';
 $counter = $client = 0;
 $ua->websocket(
@@ -416,7 +402,7 @@ $loop->start;
 is $result, 'hi!hi!', 'right result';
 is $client, 3,        'finish event has been emitted';
 
-# WebSocket /dead (dies)
+# Dies
 $finished = $code = undef;
 my ($websocket, $msg);
 $ua->websocket(
@@ -435,7 +421,7 @@ ok !$websocket, 'no websocket';
 is $code, 500, 'right status';
 is $msg, 'Internal Server Error', 'right message';
 
-# WebSocket /foo (forbidden)
+# Forbidden
 ($websocket, $code, $msg) = ();
 $ua->websocket(
   '/foo' => sub {
@@ -451,7 +437,7 @@ ok !$websocket, 'no websocket';
 is $code, 403,            'right status';
 is $msg,  "i'm a teapot", 'right message';
 
-# WebSocket /deadcallback (dies in callback)
+# Dies in callback
 $ua->websocket(
   '/deadcallback' => sub {
     pop->send('test1');
@@ -460,7 +446,7 @@ $ua->websocket(
 );
 $loop->start;
 
-# WebSocket /echo (16bit length)
+# 16bit length
 $result = undef;
 $ua->websocket(
   '/echo' => sub {
@@ -479,7 +465,7 @@ $ua->websocket(
 $loop->start;
 is $result, 'hi!' x 100, 'right result';
 
-# WebSocket /timeout
+# Timeout
 my $log = '';
 $msg = app->log->on(message => sub { $log .= pop });
 $ua->websocket(
@@ -492,7 +478,7 @@ app->log->unsubscribe(message => $msg);
 is $timeout, 'works!', 'finish event has been emitted';
 like $log, qr/Inactivity timeout\./, 'right log message';
 
-# WebSocket /echo (ping/pong)
+# Ping/pong
 my $pong;
 $ua->websocket(
   '/echo' => sub {

@@ -81,13 +81,12 @@ app->routes->add_condition(
   }
 );
 
-# GET /
 get '/' => sub { shift->render_text('works') };
 
-# GET /custom (never called if custom dispatchers work)
+# Never called if custom dispatchers work
 get '/custom' => sub { shift->render_text('does not work') };
 
-# GET /res.txt (custom response)
+# Custom response
 get '/res.txt' => (res => 1) => sub {
   my $self = shift;
   my $res
@@ -98,39 +97,39 @@ get '/res.txt' => (res => 1) => sub {
 
 my $t = Test::Mojo->new;
 
-# GET /
+# Normal request
 $t->get_ok('/')->status_is(200)->content_is('works');
 
-# GET /hello.txt (override static file)
+# Override static file
 $t->get_ok('/hello.txt')->status_is(200)
   ->content_is('Custom static file works!');
 
-# GET /custom
+# Custom dispatcher
 $t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
 
-# GET /res.txt (static file)
+# Static file
 $t->get_ok('/res.txt')->status_is(200)->content_is("Static response!\n");
 
-# GET /res.txt?route=1 (custom response)
+# Custom response
 $t->get_ok('/res.txt?route=1')->status_is(202)->content_is('Custom response!');
 
-# GET /res.txt?route=1&res=1 (conditional response)
+# Conditional response
 $t->get_ok('/res.txt?route=1&res=1')->status_is(201)
   ->content_is('Conditional response!');
 
-# GET /custom_too
+# Another custom dispatcher
 $t->get_ok('/custom_too')->status_is(200)->content_is('this works too');
 
-# GET /wrap (first wrapper)
+# First wrapper
 $t->get_ok('/wrap')->status_is(200)->content_is('Wrapped!');
 
-# GET /wrap/again (second wrapper)
+# Second wrapper
 $t->get_ok('/wrap/again')->status_is(200)->content_is('Wrapped again!');
 
-# GET /not_found (internal redirect to root)
+# Internal redirect to root
 $t->get_ok('/not_found')->status_is(200)->content_is('works');
 
-# GET /not_found (internal redirect to second wrapper)
+# Internal redirect to second wrapper
 $t->get_ok('/not_found?wrap=1')->status_is(200)->content_is('Wrapped again!');
 
 done_testing();

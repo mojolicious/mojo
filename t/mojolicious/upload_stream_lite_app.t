@@ -22,7 +22,6 @@ hook after_build_tx => sub {
   );
 };
 
-# POST /upload/*
 my %cache;
 post '/upload/:id' => sub {
   my $self = shift;
@@ -48,7 +47,6 @@ post '/upload/:id' => sub {
   $self->render(data => $cache{$id});
 };
 
-# GET /download/*
 get '/download/:id' => sub {
   my $self = shift;
   $self->render(data => $cache{$self->param('id')});
@@ -56,21 +54,21 @@ get '/download/:id' => sub {
 
 my $t = Test::Mojo->new;
 
-# POST /upload/23 (small upload)
+# Small upload
 $t->post_form_ok('/upload/23' => {my_file => {content => 'whatever'}})
   ->status_is(200)->content_is('whatever');
 
-# GET /download/23 (small download)
+# Small download
 $t->get_ok('/download/23')->status_is(200)->content_is('whatever');
 
-# POST /upload/24 (big upload)
+# Big upload
 $t->post_form_ok('/upload/24' => {my_file => {content => '1234' x 131072}})
   ->status_is(200)->content_is('1234' x 131072);
 
-# GET /download/24 (big download)
+# Big download
 $t->get_ok('/download/24')->status_is(200)->content_is('1234' x 131072);
 
-# GET /download/23 (small download again)
+# Small download again
 $t->get_ok('/download/23')->status_is(200)->content_is('whatever');
 
 done_testing();

@@ -16,14 +16,14 @@ use Test::Mojo;
 
 my $t = Test::Mojo->new('MyApp');
 
-# GET /
+# Text from config file
 $t->get_ok('/')->status_is(200)->content_is('too%21');
 
-# GET /index.html
+# Static file
 $t->get_ok('/index.html')->status_is(200)
   ->content_is("External static file!\n");
 
-# GET /test
+# More text from config file
 $t->get_ok('/test')->status_is(200)->content_is('works%21');
 
 done_testing();

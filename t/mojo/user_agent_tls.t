@@ -22,7 +22,6 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('fatal');
 
-# GET /
 get '/' => {text => 'works!'};
 
 # Web server with valid certificates

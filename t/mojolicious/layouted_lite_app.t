@@ -29,19 +29,14 @@ hook after_render => sub {
 # Default layout for whole application
 app->defaults(layout => 'default');
 
-# GET /works
 get '/works';
 
-# GET /doenotexist
 get '/doesnotexist';
 
-# GET /dies
 get '/dies' => sub {die};
 
-# GET /template_inheritance
 get '/template_inheritance' => sub { shift->render('template_inheritance') };
 
-# GET /layout_without_inheritance
 get '/layout_without_inheritance' => sub {
   shift->render(
     template => 'layouts/template_inheritance',
@@ -50,14 +45,11 @@ get '/layout_without_inheritance' => sub {
   );
 };
 
-# GET /double_inheritance
 get '/double_inheritance' =>
   sub { shift->render(template => 'double_inheritance') };
 
-# GET /triple_inheritance
 get '/triple_inheritance';
 
-# GET /nested-includes
 get '/nested-includes' => sub {
   my $self = shift;
   $self->render(
@@ -67,16 +59,13 @@ get '/nested-includes' => sub {
   );
 };
 
-# GET /localized/include
 get '/localized/include' => sub {
   my $self = shift;
   $self->render('localized', test => 'foo', reverse => 1);
 };
 
-# GET /plain/reverse
 get '/plain/reverse' => {text => 'Hello!', format => 'foo', reverse => 1};
 
-# GET /outerlayout
 get '/outerlayout' => sub {
   my $self = shift;
   $self->render(
@@ -86,7 +75,6 @@ get '/outerlayout' => sub {
   );
 };
 
-# GET /outerlayouttwo
 get '/outerlayouttwo' => {layout => 'layout'} => sub {
   my $self = shift;
   is($self->stash->{layout}, 'layout', 'right value');
@@ -94,7 +82,6 @@ get '/outerlayouttwo' => {layout => 'layout'} => sub {
   is($self->stash->{layout}, 'layout', 'right value');
 } => 'outerlayout';
 
-# GET /outerinnerlayout
 get '/outerinnerlayout' => sub {
   my $self = shift;
   $self->render(
@@ -104,154 +91,149 @@ get '/outerinnerlayout' => sub {
   );
 };
 
-# GET /withblocklayout
 get '/withblocklayout' => sub {
   my $self = shift;
   $self->render(template => 'index', layout => 'with_block', handler => 'epl');
 };
 
-# GET /content_for
 get '/content_for';
 
-# GET /inline
 get '/inline' => {inline => '<%= "inline!" %>'};
 
-# GET /inline/again
 get '/inline/again' => {inline => 0};
 
-# GET /data
 get '/data' => {data => 0};
 
 my $t = Test::Mojo->new;
 
-# GET /works
+# Template with layout
 $t->get_ok('/works')->status_is(200)
   ->content_is("DefaultJust worksThis <template> just works!\n\n");
 
-# GET /works (different layout)
+# Different layout
 $t->get_ok('/works?green=1')->status_is(200)
   ->content_is("GreenJust worksThis <template> just works!\n\n");
 
-# GET /works (extended)
+# Extended
 $t->get_ok('/works?blue=1')->status_is(200)
   ->content_is("BlueJust worksThis <template> just works!\n\n");
 
-# GET /doesnotexist
+# Missing template
 $t->get_ok('/doesnotexist')->status_is(404)
   ->content_is("DefaultNot found happenedNot found happened!\n\n");
 
-# GET /doesnotexist (different layout)
+# Missing template with different layout
 $t->get_ok('/doesnotexist?green=1')->status_is(404)
   ->content_is("GreenNot found happenedNot found happened!\n\n");
 
-# GET /doesnotexist (extended)
+# Extended missing template
 $t->get_ok('/doesnotexist?blue=1')->status_is(404)
   ->content_is("BlueNot found happenedNot found happened!\n\n");
 
-# GET /dies
+# Dead action
 $t->get_ok('/dies')->status_is(500)
   ->content_is("DefaultException happenedException happened!\n\n");
 
-# GET /dies (different layout)
+# Dead action with different layout
 $t->get_ok('/dies?green=1')->status_is(500)
   ->content_is("GreenException happenedException happened!\n\n");
 
-# GET /dies (extended)
+# Extended dead action
 $t->get_ok('/dies?blue=1')->status_is(500)
   ->content_is("BlueException happenedException happened!\n\n");
 
-# GET /template_inheritance
+# Template inheritance
 $t->get_ok('/template_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
   "<title>Works!</title>\n<br>\nSidebar!\nHello World!\n\nDefault footer!\n");
 
-# GET /layout_without_inheritance
+# Just the layout
 $t->get_ok('/layout_without_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is(
   "<title></title>\nDefault header!\nDefault sidebar!\n\nDefault footer!\n");
 
-# GET /double_inheritance
+# Double inheritance
 $t->get_ok('/double_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n"
     . "Hello World!\n\nDefault footer!\n");
 
-# GET /triple_inheritance
+# Triple inheritance
 $t->get_ok('/triple_inheritance')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("<title>Works!</title>\n<br>\nSidebar too!\n"
     . "New <content>.\n\nDefault footer!\n");
 
-# GET /plugin_with_template
+# Template from plugin
 $t->get_ok('/plugin_with_template')->status_is(200)
   ->content_is("layout_with_template\nwith template\n\n");
 
-# GET /nested-includes
+# Nested partial templates
 $t->get_ok('/nested-includes')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted Nested Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 
-# GET /localized/include
+# Partial template with localized stash values
 $t->get_ok('/localized/include')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is("lmth\n\noof\n\n\n123 2dezilacol\noof 1dezilacol");
 
-# GET /plain/reverse
+# Filter
 $t->get_ok('/plain/reverse')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('oof!olleH');
 
-# GET /outerlayout
+# Layout in render call
 $t->get_ok('/outerlayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 
-# GET /outerlayouttwo
+# Layout in route
 $t->get_ok('/outerlayouttwo')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 
-# GET /outerinnerlayout
+# Partial template with layout
 $t->get_ok('/outerinnerlayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("layouted Hello\nlayouted [\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 
-# GET /withblocklayout
+# Layout with block
 $t->get_ok('/withblocklayout')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("\nwith_block \n\nOne: one\nTwo: two\n\n");
 
-# GET /content_for
+# Content blocks
 $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is("DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\n\n");
 
-# GET /inline
+# Inline template
 $t->get_ok('/inline')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("inline!\n");
 
-# GET /inline/again
+# "0" inline template
 $t->get_ok('/inline/again')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("0\n");
 
-# GET /data
+# "0" data
 $t->get_ok('/data')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is(0);
 

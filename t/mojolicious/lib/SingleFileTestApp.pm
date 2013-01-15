@@ -27,7 +27,7 @@ sub startup {
     }
   );
 
-  # /*/* - the default route
+  # The default route
   $self->routes->route('/:controller/:action')->to(action => 'index');
 }
 

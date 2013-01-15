@@ -23,7 +23,6 @@ use Mojo::UserAgent;
 use Mojolicious::Lite;
 use ojo;
 
-# GET /remote_address
 get '/remote_address' => sub {
   my $self = shift;
   $self->render(text => $self->tx->remote_address);

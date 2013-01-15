@@ -11,7 +11,6 @@ use Mojo::IOLoop;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# GET /shortpoll
 my $shortpoll;
 get '/shortpoll' => sub {
   my $self = shift;
@@ -22,7 +21,6 @@ get '/shortpoll' => sub {
   $self->finish('this was short.');
 } => 'shortpoll';
 
-# GET /shortpoll/plain
 my $shortpoll_plain;
 get '/shortpoll/plain' => sub {
   my $self = shift;
@@ -33,7 +31,6 @@ get '/shortpoll/plain' => sub {
   $self->write('this was short and plain.');
 };
 
-# GET /shortpoll/nolength
 my $shortpoll_nolength;
 get '/shortpoll/nolength' => sub {
   my $self = shift;
@@ -44,7 +41,6 @@ get '/shortpoll/nolength' => sub {
   $self->write('');
 };
 
-# GET /longpoll
 my $longpoll;
 get '/longpoll' => sub {
   my $self = shift;
@@ -68,7 +64,6 @@ get '/longpoll' => sub {
   );
 };
 
-# GET /longpoll/nolength
 my $longpoll_nolength;
 get '/longpoll/nolength' => sub {
   my $self = shift;
@@ -87,7 +82,6 @@ get '/longpoll/nolength' => sub {
   );
 };
 
-# GET /longpoll/nested
 my $longpoll_nested;
 get '/longpoll/nested' => sub {
   my $self = shift;
@@ -102,7 +96,6 @@ get '/longpoll/nested' => sub {
   );
 };
 
-# GET /longpoll/plain
 my $longpoll_plain;
 get '/longpoll/plain' => sub {
   my $self = shift;
@@ -118,7 +111,6 @@ get '/longpoll/plain' => sub {
   );
 };
 
-# GET /longpoll/delayed
 my $longpoll_delayed;
 get '/longpoll/delayed' => sub {
   my $self = shift;
@@ -139,7 +131,6 @@ get '/longpoll/delayed' => sub {
   );
 };
 
-# GET /longpoll/plain/delayed
 my $longpoll_plain_delayed;
 get '/longpoll/plain/delayed' => sub {
   my $self = shift;
@@ -161,7 +152,6 @@ get '/longpoll/plain/delayed' => sub {
   );
 } => 'delayed';
 
-# GET /longpoll/nolength/delayed
 my $longpoll_nolength_delayed;
 get '/longpoll/nolength/delayed' => sub {
   my $self = shift;
@@ -182,7 +172,6 @@ get '/longpoll/nolength/delayed' => sub {
   );
 };
 
-# GET /longpoll/static/delayed
 my $longpoll_static_delayed;
 get '/longpoll/static/delayed' => sub {
   my $self = shift;
@@ -190,7 +179,6 @@ get '/longpoll/static/delayed' => sub {
   Mojo::IOLoop->timer(0.25 => sub { $self->render_static('hello.txt') });
 };
 
-# GET /longpoll/static/delayed_too
 my $longpoll_static_delayed_too;
 get '/longpoll/static/delayed_too' => sub {
   my $self = shift;
@@ -201,7 +189,6 @@ get '/longpoll/static/delayed_too' => sub {
   Mojo::IOLoop->timer(0.25 => sub { $self->render_static('hello.txt') });
 } => 'delayed_too';
 
-# GET /longpoll/dynamic/delayed
 my $longpoll_dynamic_delayed;
 get '/longpoll/dynamic/delayed' => sub {
   my $self = shift;
@@ -216,7 +203,6 @@ get '/longpoll/dynamic/delayed' => sub {
   );
 } => 'dynamic';
 
-# GET /stream
 my $stream;
 get '/stream' => sub {
   my $self = shift;
@@ -232,7 +218,6 @@ get '/stream' => sub {
   $self->$drain;
 };
 
-# GET /finish
 my $finish;
 get '/finish' => sub {
   my $self   = shift;
@@ -241,7 +226,6 @@ get '/finish' => sub {
   $self->render(text => 'Finish!');
 };
 
-# GET /too_long
 my $too_long;
 get '/too_long' => sub {
   my $self = shift;
@@ -255,7 +239,7 @@ get '/too_long' => sub {
 
 my $t = Test::Mojo->new;
 
-# GET /shortpoll
+# Stream without delay and finish
 $t->get_ok('/shortpoll')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -264,7 +248,7 @@ ok !$t->tx->kept_alive, 'connection was not kept alive';
 ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $shortpoll, 1, 'finished';
 
-# GET /shortpoll/plain
+# Stream without delay and content length
 $t->get_ok('/shortpoll/plain')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -273,7 +257,7 @@ ok !$t->tx->kept_alive, 'connection was not kept alive';
 ok $t->tx->keep_alive, 'connection will be kept alive';
 is $shortpoll_plain, 'finished!', 'finished';
 
-# GET /shortpoll/nolength
+# Stream without delay and empty write
 $t->get_ok('/shortpoll/nolength')->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
@@ -283,7 +267,7 @@ ok $t->tx->kept_alive, 'connection was kept alive';
 ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $shortpoll_nolength, 'finished!', 'finished';
 
-# GET /longpoll
+# Chunked response with delay
 $t->get_ok('/longpoll')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -292,7 +276,7 @@ ok !$t->tx->kept_alive, 'connection was not kept alive';
 ok $t->tx->keep_alive, 'connection will be kept alive';
 is $longpoll, 'finished!', 'finished';
 
-# GET /longpoll (interrupted)
+# Interrupted by closing the connection
 $longpoll = undef;
 my $port = $t->ua->app_url->port;
 Mojo::IOLoop->client(
@@ -311,7 +295,7 @@ Mojo::IOLoop->client(
 Mojo::IOLoop->start;
 is $longpoll, 'finished!', 'finished';
 
-# GET /longpoll (also interrupted)
+# Interrupted by raising an error
 my $tx = $t->ua->build_tx(GET => '/longpoll');
 my $buffer = '';
 $tx->res->body(
@@ -326,7 +310,7 @@ is $tx->res->code,  200,           'right status';
 is $tx->res->error, 'Interrupted', 'right error';
 is $buffer, 'hi ', 'right content';
 
-# GET /longpoll/nolength
+# Stream with delay and finish
 $t->get_ok('/longpoll/nolength')->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
@@ -335,7 +319,7 @@ $t->get_ok('/longpoll/nolength')->status_is(200)
 ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $longpoll_nolength, 'finished!', 'finished';
 
-# GET /longpoll/nested
+# Stream with delay and empty write
 $t->get_ok('/longpoll/nested')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -343,28 +327,28 @@ $t->get_ok('/longpoll/nested')->status_is(200)
   ->content_is('nested!');
 is $longpoll_nested, 'finished!', 'finished';
 
-# GET /longpoll/plain
+# Stream with delay and content length
 $t->get_ok('/longpoll/plain')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('hi there plain, whats up?');
 is $longpoll_plain, 'finished!', 'finished';
 
-# GET /longpoll/delayed
+# Chunked response delayed multiple times with finish
 $t->get_ok('/longpoll/delayed')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('howdy!');
 is $longpoll_delayed, 'finished!', 'finished';
 
-# GET /longpoll/plain/delayed
+# Stream delayed multiple times with content length
 $t->get_ok('/longpoll/plain/delayed')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_type_is('text/plain')->content_is('howdy plain!');
 is $longpoll_plain_delayed, 'finished!', 'finished';
 
-# GET /longpoll/nolength/delayed
+# Stream delayed multiple times with finish
 $t->get_ok('/longpoll/nolength/delayed')->status_is(200)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
@@ -372,7 +356,7 @@ $t->get_ok('/longpoll/nolength/delayed')->status_is(200)
   ->content_is('howdy nolength!');
 is $longpoll_nolength_delayed, 'finished!', 'finished';
 
-# GET /longpoll/static/delayed
+# Delayed static file
 $t->get_ok('/longpoll/static/delayed')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -380,7 +364,7 @@ $t->get_ok('/longpoll/static/delayed')->status_is(200)
   ->content_is("Hello Mojo from a static file!\n");
 is $longpoll_static_delayed, 'finished!', 'finished';
 
-# GET /longpoll/static/delayed_too
+# Delayed static file with cookies and session
 $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
@@ -390,27 +374,27 @@ $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
   ->content_is("Hello Mojo from a static file!\n");
 is $longpoll_static_delayed_too, 'finished!', 'finished';
 
-# GET /longpoll/dynamic/delayed
+# Delayed custom response
 $t->get_ok('/longpoll/dynamic/delayed')->status_is(201)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->header_like('Set-Cookie' => qr/baz=yada/)->content_is('Dynamic!');
 is $longpoll_dynamic_delayed, 'finished!', 'finished';
 
-# GET /stream
+# Chunked response streaming with drain event
 $t->get_ok('/stream')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
   ->content_is('0123456789');
 is $stream, 0, 'no leaking subscribers';
 
-# GET /finish
+# Finish event timing
 $t->get_ok('/finish')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('Finish!');
 ok !$finish, 'finish event timing is right';
 
-# GET /too_long (request timeout)
+# Request timeout
 $tx = $t->ua->request_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->body(
@@ -425,7 +409,7 @@ is $tx->error, 'Request timeout', 'right error';
 is $buffer, 'how', 'right content';
 $t->ua->request_timeout(0);
 
-# GET /too_long (inactivity timeout)
+# Inactivity timeout
 $tx = $t->ua->inactivity_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
 $tx->res->body(

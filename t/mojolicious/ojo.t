@@ -11,7 +11,7 @@ BEGIN {
 use Test::More;
 use ojo;
 
-# * /
+# Application
 a(
   '/' => sub {
     my $self = shift;
@@ -20,31 +20,15 @@ a(
 )->secret('foobarbaz');
 is a->secret, 'foobarbaz', 'right secret';
 
-# GET /
-is g('/')->body, 'GET', 'right content';
-
-# HEAD /
-is h('/')->body, '', 'no content';
-
-# OPTIONS /
+# Requests
+is g('/')->body, 'GET',     'right content';
+is h('/')->body, '',        'no content';
 is o('/')->body, 'OPTIONS', 'right content';
-
-# PATCH /
-is t('/')->body, 'PATCH', 'right content';
-
-# POST /
-is p('/')->body, 'POST', 'right content';
-
-# PUT /
-is u('/')->body, 'PUT', 'right content';
-
-# DELETE /
-is d('/')->body, 'DELETE', 'right content';
-
-# POST / (form)
+is t('/')->body, 'PATCH',   'right content';
+is p('/')->body, 'POST',    'right content';
+is u('/')->body, 'PUT',     'right content';
+is d('/')->body, 'DELETE',  'right content';
 is f('/' => {foo => 'bar'})->body, 'POSTfoo=bar', 'right content';
-
-# POST / (JSON)
 is n('/' => {foo => 'bar'})->body, 'POST{"foo":"bar"}', 'right content';
 
 # Parse XML

@@ -14,7 +14,6 @@ under sub {
   shift->on(finish => sub { $ENV{MOJO_HELLO} = 'world' });
 };
 
-# GET /cookies
 get '/cookies' => sub {
   my $self   = shift;
   my $params = $self->req->params->to_hash;
@@ -22,7 +21,6 @@ get '/cookies' => sub {
   $self->render_text('nomnomnom');
 };
 
-# POST /params
 post '/params' => sub {
   my $self = shift;
   $self->render_json($self->req->params->to_hash);

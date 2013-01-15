@@ -9,7 +9,6 @@ sub register {
 package PluginWithEmbeddedApp::App;
 use Mojolicious::Lite;
 
-# GET /foo
 get '/foo';
 
 1;

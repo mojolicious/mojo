@@ -10,55 +10,40 @@ use Test::More;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# OPTIONS /tags
 options 'tags';
 
-# PATCH /more_tags
 patch 'more_tags';
 
-# GET /small_tags
 get 'small_tags';
 
-# GET|POST /links
 any [qw(GET POST)] => 'links';
 
-# GET /script
 get 'script';
 
-# GET /style
 get 'style';
 
-# GET /basicform
 get '/basicform';
 
-# POST /text
 post '/text';
 
-# GET /multibox
 get '/multibox';
 
-# GET /form
 get 'form/:test' => 'form';
 
-# PUT /selection
 put 'selection';
 
-# PATCH|POST /☃
 any [qw(PATCH POST)] => '/☃' => 'snowman';
 
-# POST /no_snowman
 post '/no_snowman';
 
 my $t = Test::Mojo->new;
 
-# OPTIONS /tags
+# Basic tags
 $t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="t&lt;wo" three="four">Hello</foo>
 EOF
-
-# PATCH /more_tags
 $t->patch_ok('/more_tags')->status_is(200)->content_is(<<EOF);
 <bar>b&lt;a&gt;z</bar>
 <bar>0</bar>
@@ -66,7 +51,7 @@ $t->patch_ok('/more_tags')->status_is(200)->content_is(<<EOF);
 <bar class="test"></bar>
 EOF
 
-# GET /small_tags
+# Shortcut
 $t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
 <div>some &amp; content</div>
 <div>
@@ -76,7 +61,7 @@ $t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
 <div>works</div>
 EOF
 
-# GET /links
+# Links
 $t->get_ok('/links')->status_is(200)->content_is(<<EOF);
 <a href="/path">Pa&lt;th</a>
 <a href="http://example.com/" title="Foo">Foo</a>
@@ -85,8 +70,6 @@ $t->get_ok('/links')->status_is(200)->content_is(<<EOF);
 <a href="/form/23" title="Foo">Foo</a>
 <a href="/form/23" title="Foo">Foo</a>
 EOF
-
-# POST /links
 $t->post_ok('/links')->status_is(200)->content_is(<<EOF);
 <a href="/path">Pa&lt;th</a>
 <a href="http://example.com/" title="Foo">Foo</a>
@@ -96,7 +79,7 @@ $t->post_ok('/links')->status_is(200)->content_is(<<EOF);
 <a href="/form/23" title="Foo">Foo</a>
 EOF
 
-# GET /script
+# Scripts
 $t->get_ok('/script')->status_is(200)->content_is(<<EOF);
 <script src="/script.js"></script>
 <script>//<![CDATA[
@@ -111,7 +94,7 @@ $t->get_ok('/script')->status_is(200)->content_is(<<EOF);
 //]]></script>
 EOF
 
-# GET /style
+# Stylesheets
 $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
 <link href="/foo.css" media="screen" rel="stylesheet" />
 <style>/*<![CDATA[*/
@@ -126,7 +109,7 @@ $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
 /*]]>*/</style>
 EOF
 
-# GET /basicform
+# Basic form
 $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 <form action="/links">
   <input name="foo" type="text" value="bar" />
@@ -137,7 +120,7 @@ $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 </form>
 EOF
 
-# POST /text
+# Text input fields
 $t->post_ok('/text')->status_is(200)->content_is(<<'EOF');
 <form action="/text" method="POST">
   <input class="foo" name="color" type="color" value="#ffffff" />
@@ -156,7 +139,7 @@ $t->post_ok('/text')->status_is(200)->content_is(<<'EOF');
 </form>
 EOF
 
-# POST /text (with values)
+# Text input fields with values
 $t->post_form_ok(
   '/text' => {
     color  => '#000000',
@@ -190,7 +173,7 @@ $t->post_form_ok(
 </form>
 EOF
 
-# GET /multibox
+# Checkboxes
 $t->get_ok('/multibox')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input name="foo" type="checkbox" value="one" />
@@ -199,7 +182,7 @@ $t->get_ok('/multibox')->status_is(200)->content_is(<<EOF);
 </form>
 EOF
 
-# GET /multibox (with one value)
+# Checkboxes with one value
 $t->get_ok('/multibox?foo=two')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input name="foo" type="checkbox" value="one" />
@@ -208,7 +191,7 @@ $t->get_ok('/multibox?foo=two')->status_is(200)->content_is(<<EOF);
 </form>
 EOF
 
-# GET /multibox (with one right and one wrong value)
+# Checkboxes with one right and one wrong value
 $t->get_ok('/multibox?foo=one&foo=three')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input checked="checked" name="foo" type="checkbox" value="one" />
@@ -217,7 +200,7 @@ $t->get_ok('/multibox?foo=one&foo=three')->status_is(200)->content_is(<<EOF);
 </form>
 EOF
 
-# GET /multibox (with wrong value)
+# Checkboxes with wrong value
 $t->get_ok('/multibox?foo=bar')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input name="foo" type="checkbox" value="one" />
@@ -226,7 +209,7 @@ $t->get_ok('/multibox?foo=bar')->status_is(200)->content_is(<<EOF);
 </form>
 EOF
 
-# GET /multibox (with two values)
+# Checkboxes with two values
 $t->get_ok('/multibox?foo=two&foo=one')->status_is(200)->content_is(<<EOF);
 <form action="/multibox">
   <input checked="checked" name="foo" type="checkbox" value="one" />
@@ -235,7 +218,7 @@ $t->get_ok('/multibox?foo=two&foo=one')->status_is(200)->content_is(<<EOF);
 </form>
 EOF
 
-# GET /form
+# Advanced form with values
 $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   ->content_is(<<EOF);
 <form action="/links" method="post">
@@ -266,7 +249,7 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 <input name="a" value="2" />
 EOF
 
-# GET /form (alternative)
+# Advanced form with different values
 $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
 <form action="/links" method="post">
   <input name="foo" />
@@ -294,7 +277,7 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
 <input name="a" value="c" />
 EOF
 
-# PUT /selection (empty)
+# Empty selection
 $t->put_ok('/selection')->status_is(200)
   ->content_is("<form action=\"/selection\">\n  "
     . '<select name="a">'
@@ -318,7 +301,7 @@ $t->put_ok('/selection')->status_is(200)
     . '</form>'
     . "\n");
 
-# PUT /selection (values)
+# Selection with values
 $t->put_ok('/selection?a=e&foo=bar&bar=baz')->status_is(200)
   ->content_is("<form action=\"/selection\">\n  "
     . '<select name="a">'
@@ -342,7 +325,7 @@ $t->put_ok('/selection?a=e&foo=bar&bar=baz')->status_is(200)
     . '</form>'
     . "\n");
 
-# PUT /selection (multiple values)
+# Selection with multiple values
 $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d')->status_is(200)
   ->content_is("<form action=\"/selection\">\n  "
     . '<select name="a">'
@@ -366,7 +349,7 @@ $t->put_ok('/selection?foo=bar&a=e&foo=baz&bar=d')->status_is(200)
     . '</form>'
     . "\n");
 
-# PUT /selection (multiple values preselected)
+# Selection with multiple values preselected
 $t->put_ok('/selection?preselect=1')->status_is(200)
   ->content_is("<form action=\"/selection\">\n  "
     . '<select name="a">'
@@ -390,7 +373,7 @@ $t->put_ok('/selection?preselect=1')->status_is(200)
     . '</form>'
     . "\n");
 
-# PATCH /☃
+# Snowman form
 $t->post_ok('/☃')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo">b&lt;a&gt;r</textarea>
@@ -398,7 +381,7 @@ $t->post_ok('/☃')->status_is(200)->content_is(<<'EOF');
 </form>
 EOF
 
-# POST /☃ (form value)
+# Snowman form with value
 $t->post_ok('/☃?foo=ba<z')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo">ba&lt;z</textarea>
@@ -406,7 +389,7 @@ $t->post_ok('/☃?foo=ba<z')->status_is(200)->content_is(<<'EOF');
 </form>
 EOF
 
-# PATCH /☃ (empty form value)
+# Snowman form with empty value
 $t->patch_ok('/☃?foo=')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="foo"></textarea>
@@ -414,7 +397,7 @@ $t->patch_ok('/☃?foo=')->status_is(200)->content_is(<<'EOF');
 </form>
 EOF
 
-# POST /no_snowman (POST form)
+# Snowman POST form
 $t->post_ok('/no_snowman')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="POST">
   <textarea cols="40" name="bar"></textarea>
@@ -422,7 +405,7 @@ $t->post_ok('/no_snowman')->status_is(200)->content_is(<<'EOF');
 </form>
 EOF
 
-# POST /no_snowman (PATCH form)
+# Form with alternative method
 $t->post_ok('/no_snowman?foo=1')->status_is(200)->content_is(<<'EOF');
 <form action="/%E2%98%83" method="PATCH">
   <textarea cols="40" name="bar"></textarea>

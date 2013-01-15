@@ -25,7 +25,6 @@ app->log->level('fatal');
 # Secure sessions
 app->sessions->secure(1);
 
-# GET /login
 get '/login' => sub {
   my $self = shift;
   my $name = $self->param('name') || 'anonymous';
@@ -33,14 +32,12 @@ get '/login' => sub {
   $self->render_text("Welcome $name!");
 };
 
-# GET /again
 get '/again' => sub {
   my $self = shift;
   my $name = $self->session('name') || 'anonymous';
   $self->render_text("Welcome back $name!");
 };
 
-# GET /logout
 get '/logout' => sub {
   my $self = shift;
   $self->session(expires => 1);
@@ -52,62 +49,62 @@ my $t = Test::Mojo->new;
 $t->ua->max_redirects(5);
 $t->reset_session->ua->app_url('https');
 
-# GET /login
+# Login
 $t->get_ok('/login?name=sri' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome sri!');
 ok $t->tx->res->cookie('mojolicious')->expires, 'session cookie expires';
 ok $t->tx->res->cookie('mojolicious')->secure,  'session cookie is secure';
 
-# GET /again
+# Return
 $t->get_ok('/again' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome back sri!');
 
-# GET /logout
+# Logout
 $t->get_ok('/logout' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome anonymous!');
 
-# GET /again (expired session)
+# Expired session
 $t->get_ok('/again' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome back anonymous!');
 
-# GET /logout (no session)
+# No session
 $t->get_ok('/logout' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome anonymous!');
 
 # Use HTTP
 $t->reset_session->ua->app_url('http');
 
-# GET /login
+# Login again
 $t->reset_session->get_ok('/login?name=sri')->status_is(200)
   ->content_is('Welcome sri!');
 
-# GET /again
+# Return
 $t->get_ok('/again')->status_is(200)->content_is('Welcome back anonymous!');
 
 # Use HTTPS again (without expiration)
 $t->reset_session->ua->app_url('https');
 app->sessions->default_expiration(0);
 
-# GET /login
+# Login again
 $t->get_ok('/login?name=sri' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome sri!');
 ok !$t->tx->res->cookie('mojolicious')->expires,
   'session cookie does not expire';
 ok $t->tx->res->cookie('mojolicious')->secure, 'session cookie is secure';
 
-# GET /again
+# Return
 $t->get_ok('/again' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome back sri!');
 
-# GET /logout
+# Logout
 $t->get_ok('/logout' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome anonymous!');
 
-# GET /again (expired session)
+# Expired session
 $t->get_ok('/again' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome back anonymous!');
 
-# GET /logout (no session)
+# No session
 $t->get_ok('/logout' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome anonymous!');
 

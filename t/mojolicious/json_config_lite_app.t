@@ -39,12 +39,10 @@ is app->config('absolute'),     'works too!',     'right value';
 is app->config('absolute_dev'), 'dev works too!', 'right value';
 is app->config('it'),           'works',          'right value';
 
-# GET /
 get '/' => 'index';
 
 my $t = Test::Mojo->new;
 
-# GET /
 $t->get_ok('/')->status_is(200)->content_is("barbarbar\n");
 
 # No config file, default only

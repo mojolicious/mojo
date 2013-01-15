@@ -16,10 +16,8 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('fatal');
 
-# GET /
 get '/' => {text => 'works!'};
 
-# GET /timeout
 my $timeout = undef;
 get '/timeout' => sub {
   my $self = shift;
@@ -29,17 +27,14 @@ get '/timeout' => sub {
   $self->render_later;
 };
 
-# GET /no_length
 get '/no_length' => sub {
   my $self = shift;
   $self->finish('works too!');
   $self->rendered(200);
 };
 
-# GET /no_content
 get '/no_content' => {text => 'fail!', status => 204};
 
-# GET /echo
 get '/echo' => sub {
   my $self = shift;
   gzip \(my $uncompressed = $self->req->body), \my $compressed;
@@ -47,7 +42,6 @@ get '/echo' => sub {
   $self->render_data($compressed);
 };
 
-# POST /echo
 post '/echo' => sub {
   my $self = shift;
   $self->render_data($self->req->body);
@@ -126,7 +120,7 @@ is(Mojo::UserAgent->app, $dummy, 'application are equal');
 Mojo::UserAgent->app(app);
 is(Mojo::UserAgent->app, app, 'applications are equal again');
 
-# GET / (clean up non-blocking requests)
+# Clean up non-blocking requests
 my $ua = Mojo::UserAgent->new;
 my $get = my $post = '';
 $ua->get('/' => sub { $get = pop->error });
@@ -140,7 +134,7 @@ my $time = time;
 Mojo::IOLoop->start;
 ok time < ($time + 10), 'stopped automatically';
 
-# GET / (non-blocking)
+# Non-blocking
 $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my ($success, $code, $body);
 $ua->get(
@@ -167,31 +161,29 @@ Mojo::IOLoop->start;
 app->log->unsubscribe(message => $msg);
 like $err, qr/error event works/, 'right error';
 
-# GET / (HTTPS request without TLS support)
+# HTTPS request without TLS support
 my $tx = $ua->get($ua->app_url->scheme('https'));
 ok $tx->error, 'has error';
 
-# GET / (blocking)
+# Blocking
 $tx = $ua->get('/');
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# GET / (again)
+# Again
 $tx = $ua->get('/');
 ok $tx->success,    'successful';
 ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
-
-# GET /
 $tx = $ua->get('/');
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# GET / (events)
+# Events
 my ($finished_req, $finished_tx, $finished_res);
 $tx = $ua->build_tx(GET => '/');
 ok !$tx->is_finished, 'transaction is not finished';
@@ -214,7 +206,7 @@ ok $tx->res->is_finished, 'response is finished';
 is $tx->res->code,        200, 'right status';
 is $tx->res->body,        'works!', 'right content';
 
-# GET /no_length (missing Content-Length header)
+# Missing Content-Length header
 ($finished_req, $finished_tx, $finished_res) = ();
 $tx = $ua->build_tx(GET => '/no_length');
 ok !$tx->is_finished, 'transaction is not finished';
@@ -240,7 +232,7 @@ ok !$tx->keep_alive, 'keep connection not alive';
 is $tx->res->code, 200,          'right status';
 is $tx->res->body, 'works too!', 'right content';
 
-# GET /no_content (204 No Content)
+# 204 No Content
 $tx = $ua->get('/no_content');
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
@@ -248,14 +240,14 @@ ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 204, 'right status';
 is $tx->res->body, '',  'no content';
 
-# GET / (connection was kept alive)
+# Connection was kept alive
 $tx = $ua->get('/');
 ok $tx->success,    'successful';
 ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
 
-# POST /echo (non-blocking form)
+# Non-blocking form
 ($success, $code, $body) = ();
 $ua->post_form(
   '/echo' => {hello => 'world'} => sub {
@@ -271,7 +263,7 @@ ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    'hello=world', 'right content';
 
-# POST /echo (non-blocking JSON)
+# Non-blocking JSON
 ($success, $code, $body) = ();
 $ua->post_json(
   '/echo' => {hello => 'world'} => sub {
@@ -287,7 +279,7 @@ ok $success, 'successful';
 is $code,    200, 'right status';
 is $body,    '{"hello":"world"}', 'right content';
 
-# GET /timeout (built-in web server times out)
+# Built-in web server times out
 my $log = '';
 $msg = app->log->on(message => sub { $log .= pop });
 $tx = $ua->get('/timeout?timeout=0.25');
@@ -297,7 +289,7 @@ is $tx->error, 'Premature connection close', 'right error';
 is $timeout, 1, 'finish event has been emitted';
 like $log, qr/Inactivity timeout\./, 'right log message';
 
-# GET /timeout (client times out)
+# Client times out
 $ua->once(
   start => sub {
     my ($ua, $tx) = @_;
@@ -313,7 +305,7 @@ $tx = $ua->get('/timeout?timeout=5');
 ok !$tx->success, 'not successful';
 is $tx->error, 'Inactivity timeout', 'right error';
 
-# GET /echo (response exceeding message size limit)
+# Response exceeding message size limit
 $ua->once(
   start => sub {
     my ($ua, $tx) = @_;
@@ -325,13 +317,13 @@ ok !$tx->success, 'not successful';
 is(($tx->error)[0], 'Maximum message size exceeded', 'right error');
 is(($tx->error)[1], undef, 'no code');
 
-# GET /does_not_exist (404 response)
+# 404 response
 $tx = $ua->get('/does_not_exist');
 ok !$tx->success, 'not successful';
 is(($tx->error)[0], 'Not Found', 'right error');
 is(($tx->error)[1], 404,         'right code');
 
-# GET / (introspect)
+# Introspect
 my $req = my $res = '';
 my $start = $ua->on(
   start => sub {
@@ -375,7 +367,7 @@ like $res, qr|^HTTP/.*200 OK.*works!$|s, 'right response';
 $ua->unsubscribe(start => $start);
 ok !$ua->has_subscribers('start'), 'unsubscribed successfully';
 
-# GET /echo (stream with drain callback and compressed response)
+# Stream with drain callback and compressed response
 $tx = $ua->build_tx(GET => '/echo');
 my $i = 0;
 my ($stream, $drain);
@@ -404,7 +396,7 @@ is $tx->res->code, 200,          'right status';
 is $tx->res->body, '0123456789', 'right content';
 is $stream, 1, 'no leaking subscribers';
 
-# GET / (nested non-blocking requests after blocking one, with custom URL)
+# Nested non-blocking requests after blocking one, with custom URL
 my @kept_alive;
 $ua->get(
   $ua->app_url => sub {
@@ -428,7 +420,7 @@ $ua->get(
 Mojo::IOLoop->start;
 is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
 
-# GET / (simple nested non-blocking requests with timers)
+# Simple nested non-blocking requests with timers
 @kept_alive = ();
 $ua->get(
   '/' => sub {
@@ -448,7 +440,7 @@ $ua->get(
 Mojo::IOLoop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';
 
-# GET / (blocking request after non-blocking one, with custom URL)
+# Blocking request after non-blocking one, with custom URL
 $tx = $ua->get($ua->app_url);
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';

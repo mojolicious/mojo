@@ -65,7 +65,6 @@ is $ua->app->moniker, 'mojolicious', 'right moniker';
 # Silence
 $app->log->level('fatal');
 
-# POST /chunked
 $app->routes->post(
   '/chunked' => sub {
     my $self = shift;
@@ -84,7 +83,6 @@ $app->routes->post(
   }
 );
 
-# POST /upload
 my ($local_address, $local_port, $remote_address, $remote_port);
 $app->routes->post(
   '/upload' => sub {
@@ -97,7 +95,6 @@ $app->routes->post(
   }
 );
 
-# /*
 $app->routes->any('/*whatever' => {text => 'Whatever!'});
 
 # Normal request

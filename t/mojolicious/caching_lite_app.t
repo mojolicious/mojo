@@ -14,10 +14,9 @@ plan skip_all => 'set TEST_CACHING to enable this test (developer only!)'
 use Mojolicious::Lite;
 use Test::Mojo;
 
-# GET /memorized
 get '/memorized' => 'memorized';
 
-# GET /memorized
+# Normal request
 my $t = Test::Mojo->new;
 $t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
@@ -25,17 +24,17 @@ $t->get_ok('/memorized')->status_is(200)
   ->content_like(qr/\d+a\d+b\d+c\d+\nd\d+\ne\d+/);
 my $memorized = $t->tx->res->body;
 
-# GET /memorized
+# Memorized
 $t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($memorized);
 
-# GET /memorized
+# Again
 $t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($memorized);
 
-# GET /memorized (expired)
+# Expired
 sleep 2;
 $t->get_ok('/memorized')->status_is(200)
   ->header_is(Server         => 'Mojolicious (Perl)')

@@ -9,10 +9,8 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('fatal');
 
-# GET /
 get '/' => {text => 'Your Mojo is working!'};
 
-# POST /chunked
 post '/chunked' => sub {
   my $self = shift;
 
@@ -29,7 +27,6 @@ post '/chunked' => sub {
   $self->$cb;
 };
 
-# GET /params
 get '/params' => sub {
   my $self = shift;
   $self->render_json($self->req->params->to_hash);

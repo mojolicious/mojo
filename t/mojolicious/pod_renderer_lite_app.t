@@ -17,19 +17,15 @@ ok app->routes->find('perldoc'), 'route found';
 # Default layout
 app->defaults(layout => 'gray');
 
-# GET /
 get '/' => sub {
   my $self = shift;
   $self->render('simple', handler => 'pod');
 };
 
-# POST /
 post '/' => 'index';
 
-# GET /block
 post '/block' => 'block';
 
-# GET /empty
 get '/empty' => {inline => '', handler => 'pod'};
 
 my $t = Test::Mojo->new;

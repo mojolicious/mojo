@@ -17,16 +17,13 @@ app->routes->add_condition(
   }
 );
 
-# GET /
 get '/' => 'index';
 
-# GET /echo
 get '/echo' => sub {
   my $self = shift;
   $self->render_text('echo: ' . ($self->stash('message') || 'nothing!'));
 };
 
-# GET /stream
 get '/stream' => sub {
   shift->write_chunk(
     'he' => sub {
@@ -35,7 +32,6 @@ get '/stream' => sub {
   );
 };
 
-# GET /url/☃
 get '/url/☃' => sub {
   my $self  = shift;
   my $route = $self->url_for;
@@ -43,19 +39,15 @@ get '/url/☃' => sub {
   $self->render_text("$route -> $rel!");
 };
 
-# GET /host
 get '/host' => (message => 'it works!') => sub {
   my $self = shift;
   $self->render(text => $self->url_for->base->host);
 };
 
-# GET /one
 get '/one' => sub { shift->render_text('One') };
 
-# GET /one/two
 get '/one/two' => {text => 'Two'};
 
-# GET /template/*
 get '/template/:template';
 
 app->start;

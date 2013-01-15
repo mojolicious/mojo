@@ -15,7 +15,6 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('fatal');
 
-# GET /
 get '/' => sub {
   my $self = shift;
   my $rel  = $self->req->url;
@@ -23,13 +22,11 @@ get '/' => sub {
   $self->render_text("Hello World! $rel $abs");
 };
 
-# GET /proxy
 get '/proxy' => sub {
   my $self = shift;
   $self->render_text($self->req->url);
 };
 
-# WebSocket /test
 websocket '/test' => sub {
   my $self = shift;
   $self->on(
@@ -128,7 +125,7 @@ Mojo::IOLoop->server(
   }
 );
 
-# GET / (normal request)
+# Normal request
 my $result;
 $ua->get(
   "http://localhost:$port/" => sub {
@@ -139,7 +136,7 @@ $ua->get(
 Mojo::IOLoop->start;
 is $result, "Hello World! / http://localhost:$port/", 'right content';
 
-# WebSocket /test (normal websocket)
+# Normal websocket
 $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
@@ -158,7 +155,7 @@ $ua->websocket(
 Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
-# GET http://kraih.com/proxy (proxy request)
+# Proxy request
 $ua->http_proxy("http://localhost:$port");
 my $kept_alive;
 $result = undef;
@@ -174,7 +171,7 @@ Mojo::IOLoop->start;
 ok !$kept_alive, 'connection was not kept alive';
 is $result, 'http://kraih.com/proxy', 'right content';
 
-# WebSocket /test (kept alive proxy websocket)
+# Kept alive proxy websocket
 ($kept_alive, $result) = ();
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
@@ -195,7 +192,7 @@ Mojo::IOLoop->start;
 ok $kept_alive, 'connection was kept alive';
 is $result, 'test1test2', 'right result';
 
-# WebSocket /test (proxy websocket)
+# Proxy websocket
 $ua = Mojo::UserAgent->new(http_proxy => "http://localhost:$proxy");
 $result = undef;
 $ua->websocket(
@@ -218,7 +215,7 @@ is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
-# WebSocket /test (proxy websocket with bad target)
+# Proxy websocket with bad target
 $ua->http_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $err);

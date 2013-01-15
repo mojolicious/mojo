@@ -22,7 +22,6 @@ use Mojolicious::Lite;
 # Silence
 app->log->level('fatal');
 
-# GET /
 get '/' => sub {
   my $self = shift;
   $self->res->headers->header('X-Works',
@@ -32,20 +31,17 @@ get '/' => sub {
   $self->render_text("Hello World! $rel $abs");
 };
 
-# GET /broken_redirect
 get '/broken_redirect' => sub {
   my $self = shift;
   $self->render(text => 'Redirecting!', status => 302);
   $self->res->headers->location('/');
 };
 
-# GET /proxy
 get '/proxy' => sub {
   my $self = shift;
   $self->render_text($self->req->url->to_abs);
 };
 
-# WebSocket /test
 websocket '/test' => sub {
   my $self = shift;
   $self->on(
@@ -155,7 +151,7 @@ my $ua = Mojo::UserAgent->new(
   key  => 't/mojo/certs/client.key'
 );
 
-# GET / (normal request)
+# Normal request
 my $result;
 $ua->get(
   "https://localhost:$port/" => sub {
@@ -166,7 +162,7 @@ $ua->get(
 Mojo::IOLoop->start;
 is $result, "Hello World! / https://localhost:$port/", 'right content';
 
-# GET /broken_redirect (broken redirect)
+# Broken redirect
 my $start;
 $ua->on(
   start => sub {
@@ -190,7 +186,7 @@ is $works,  'it does!',                                'right header';
 is $start,  2,                                         'redirected once';
 $ua->unsubscribe('start');
 
-# WebSocket /test (normal websocket)
+# Normal websocket
 $result = undef;
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
@@ -209,7 +205,7 @@ $ua->websocket(
 Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
-# GET /proxy (proxy request)
+# Proxy request
 $ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
 $result = undef;
 my ($auth, $kept_alive);
@@ -227,7 +223,7 @@ ok !$auth,       'no "Proxy-Authorization" header';
 ok !$kept_alive, 'connection was not kept alive';
 is $result, "https://localhost:$port/proxy", 'right content';
 
-# GET /proxy (kept alive proxy request)
+# Kept alive proxy request
 ($kept_alive, $result) = ();
 $ua->get(
   "https://localhost:$port/proxy" => sub {
@@ -241,7 +237,7 @@ Mojo::IOLoop->start;
 is $result, "https://localhost:$port/proxy", 'right content';
 ok $kept_alive, 'connection was kept alive';
 
-# WebSocket /test (kept alive proxy websocket)
+# Kept alive proxy websocket
 $ua->https_proxy("http://localhost:$proxy");
 ($kept_alive, $result) = ();
 $ua->websocket(
@@ -266,7 +262,7 @@ is $result,     'test1test2', 'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
-# WebSocket /test (proxy websocket with bad target)
+# Proxy websocket with bad target
 $ua->https_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $err);

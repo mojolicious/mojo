@@ -5,10 +5,8 @@ sub startup {
   my $self = shift;
   my $r    = $self->routes;
 
-  # Load plugin
   $self->plugin('Config');
 
-  # GET /
   $r->get(
     '/' => sub {
       my $self = shift;
@@ -16,7 +14,6 @@ sub startup {
     }
   );
 
-  # GET /test
   $r->get(
     '/test' => sub {
       my $self = shift;
@@ -24,7 +21,6 @@ sub startup {
     }
   );
 
-  # GET /secondary
   $r->get(
     '/secondary' => sub {
       my $self = shift;

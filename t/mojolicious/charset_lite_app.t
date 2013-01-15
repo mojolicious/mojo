@@ -26,34 +26,27 @@ app->renderer->add_handler(
   }
 );
 
-# GET /
 get '/' => 'index';
 
-# POST /
 post '/' => sub {
   my $self = shift;
   $self->render_text("foo: " . $self->param('foo'));
 };
 
-# POST /data
 post '/data' => sub {
   my $self = shift;
   $self->render_data($self->req->body, format => 'bin');
 };
 
-# GET /unicode
 get '/unicode' => sub {
   my $self = shift;
   $self->render(test => $yatta, handler => 'test', format => 'txt');
 };
 
-# GET /json
 get '/json' => sub { shift->render_json({test => $yatta}) };
 
-# GET /привет/мир
 get '/привет/мир' => sub { shift->render_json({foo => $yatta}) };
 
-# GET /params
 get '/params' => sub {
   my $self = shift;
   $self->render_json(

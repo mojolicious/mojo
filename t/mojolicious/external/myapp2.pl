@@ -12,7 +12,6 @@ hook around_dispatch => sub {
   Mojo::IOLoop->timer(0 => sub { $next->() });
 };
 
-# GET /
 get '/' => sub {
   my $self = shift;
   $self->render_text(

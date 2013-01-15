@@ -11,7 +11,7 @@
     Test::Mojo.
   - Improved documentation.
   - Improved tests.
-  - Fixed support for multi byte entities in Mojo::Util.
+  - Fixed support for multi-character entities in Mojo::Util.
 
 3.79  2013-01-13
   - Fixed small domain detection bug in Mojo::UserAgent::CookieJar.

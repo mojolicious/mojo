@@ -115,7 +115,7 @@ is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x26;&#34;'),
 is html_unescape('foo &CounterClockwiseContourIntegral; bar &sup1baz'),
   "foo \x{2233} bar \x{00b9}baz", 'right html unescaped result';
 
-# html_unescape (multi byte entity)
+# html_unescape (multi-character entity)
 is html_unescape(decode 'UTF-8', '&acE;'), "\x{223e}\x{0333}",
   'right html unescaped result';
 

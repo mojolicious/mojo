@@ -726,6 +726,12 @@ Check WebSocket message for similar match.
 
 Wait for next WebSocket message to arrive.
 
+  # Wait for message and perform multiple tests on it
+  $t->websocket_ok('/time')
+    ->message_ok
+    ->message_like(qr/\d+/)
+    ->message_unlike(qr/\w+/);
+
 =head2 message_unlike
 
   $t = $t->message_unlike({binary => qr/$bytes/});

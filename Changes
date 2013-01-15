@@ -1,9 +1,14 @@
 
 3.80  2013-01-15
+  - Deprecated testing WebSocket messages without calling
+    Test::Mojo->message_ok.
   - Deprecated Mojo::Util->html_escape in favor of Mojo::Util->xml_escape.
   - Deprecated Mojo::ByteStream->html_escape in favor of
     Mojo::ByteStream->xml_escape.
   - Deprecated Mojo::Home->slurp_rel_file in favor of Mojo::Util->slurp.
+  - Added message attribute to Test::Mojo.
+  - Added json_message_has, json_message_hasnt and message_ok methods to
+    Test::Mojo.
   - Improved documentation.
   - Improved tests.
   - Fixed support for multi byte entities in Mojo::Util.

@@ -16,7 +16,7 @@ use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
 use Test::More ();
 
-has 'tx';
+has [qw(message tx)];
 has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
 
 # Silent or loud tests
@@ -164,12 +164,22 @@ sub json_is {
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 
+sub json_message_has {
+  my ($self, $p, $desc) = @_;
+  $desc ||= qq{has value for JSON Pointer "$p"};
+  return $self->_test('ok', $self->_json(contains => $p), $desc);
+}
+
+sub json_message_hasnt {
+  my ($self, $p, $desc) = @_;
+  $desc ||= qq{has no value for JSON Pointer "$p"};
+  return $self->_test('ok', !$self->_json(contains => $p), $desc);
+}
+
 sub json_message_is {
   my ($self, $p, $data, $desc) = @_;
-  my $value = Mojo::JSON::Pointer->new->get(
-    Mojo::JSON->new->decode(@{$self->_next || []}[1]), $p);
-  return $self->_test('is_deeply', $value, $data,
-    $desc || 'exact match for JSON structure');
+  $desc ||= qq{exact match for JSON Pointer "$p"};
+  return $self->_test('is_deeply', $self->_json(get => $p), $data, $desc);
 }
 
 sub message_is {
@@ -185,6 +195,11 @@ sub message_isnt {
 sub message_like {
   my ($self, $regex, $desc) = @_;
   return $self->_message('like', $regex, $desc || 'message is similar');
+}
+
+sub message_ok {
+  my ($self, $desc) = @_;
+  return $self->_test('ok', !!$self->_wait(1), $desc, 'message received');
 }
 
 sub message_unlike {
@@ -302,10 +317,16 @@ sub _get_content {
   return $charset ? decode($charset, $content) : $content;
 }
 
+sub _json {
+  my ($self, $method, $p) = @_;
+  return Mojo::JSON::Pointer->new->$method(
+    Mojo::JSON->new->decode(@{$self->_wait || []}[1]), $p);
+}
+
 sub _message {
   my ($self, $name, $value, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  my ($type, $msg) = @{$self->_next || ['']};
+  my ($type, $msg) = @{$self->_wait || ['']};
 
   # Type check
   if (ref $value eq 'HASH') {
@@ -318,12 +339,6 @@ sub _message {
   else { $msg = decode 'UTF-8', $msg if $type eq 'text' }
 
   return $self->_test($name, $msg // '', $value, $desc);
-}
-
-sub _next {
-  my $self = shift;
-  Mojo::IOLoop->one_tick while !$self->{finished} && !@{$self->{messages}};
-  return shift @{$self->{messages}};
 }
 
 sub _request_ok {
@@ -349,6 +364,18 @@ sub _test {
 sub _text {
   return '' unless my $e = shift->tx->res->dom->at(shift);
   return $e->text;
+}
+
+# DEPRECATED in Rainbow!
+sub _wait {
+  my ($self, $wait) = @_;
+  my $new = $self->{new} //= $wait;
+  warn <<EOF unless $new;
+Testing WebSocket messages without Test::Mojo->message_ok is DEPRECATED!!!
+EOF
+  return $self->message if $new && !$wait;
+  Mojo::IOLoop->one_tick while !$self->{finished} && !@{$self->{messages}};
+  return $self->message(shift @{$self->{messages}})->message;
 }
 
 1;
@@ -377,6 +404,7 @@ Test::Mojo - Testing Mojo!
   # WebSocket
   $t->websocket_ok('/echo')
     ->send_ok('hello')
+    ->message_ok
     ->message_is('echo: hello')
     ->finish_ok;
 
@@ -390,6 +418,18 @@ L<Mojo> and L<Mojolicious> applications.
 =head1 ATTRIBUTES
 
 L<Test::Mojo> implements the following attributes.
+
+=head2 message
+
+  my $msg = $t->message;
+  $t      = $t->message([text => $bytes]);
+
+Current WebSocket message.
+
+  # Test custom message
+  $t->message([binary => $bytes])
+    ->json_message_has('/foo')
+    ->json_message_is('/foo/bar' => {baz => 'yada'});
 
 =head2 tx
 
@@ -624,6 +664,21 @@ Opposite of C<json_has>.
 Check the value extracted from JSON response using the given JSON Pointer with
 L<Mojo::JSON::Pointer>.
 
+=head2 json_message_has
+
+  $t = $t->json_message_has('/foo');
+  $t = $t->json_message_has('/minibar', 'has a minibar');
+
+Check if JSON WebSocket message contains a value that can be identified using
+the given JSON Pointer with L<Mojo::JSON::Pointer>.
+
+=head2 json_message_hasnt
+
+  $t = $t->json_message_hasnt('/foo');
+  $t = $t->json_message_hasnt('/minibar', 'no minibar');
+
+Opposite of C<json_message_has>.
+
 =head2 json_message_is
 
   $t = $t->json_message_is('/' => {foo => [1, 2, 3]});
@@ -659,6 +714,13 @@ Opposite of C<message_is>.
   $t = $t->message_like(qr/working!/, 'right message');
 
 Check WebSocket message for similar match.
+
+=head2 message_ok
+
+  $t = $t->message_ok;
+  $t = $t->message_ok('got a message');
+
+Wait for next WebSocket message to arrive.
 
 =head2 message_unlike
 

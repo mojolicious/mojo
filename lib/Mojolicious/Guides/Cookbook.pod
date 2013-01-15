@@ -512,6 +512,7 @@ L<Test::Mojo> API to be used.
   my $t = Test::Mojo->new;
   $t->websocket_ok('/echo')
     ->send_ok('Hello Mojo!')
+    ->message_ok
     ->message_is('echo: Hello Mojo!')
     ->finish_ok;
 

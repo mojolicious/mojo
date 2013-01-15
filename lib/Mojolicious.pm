@@ -776,6 +776,8 @@ James Duncan
 
 Jan Jona Javorsek
 
+Jan Schmidt
+
 Jaroslav Muhin
 
 Jesse Vincent

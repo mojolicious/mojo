@@ -1,6 +1,8 @@
 
 3.81  2013-01-16
   - Improved documentation.
+  - Fixed small memory leak in Hypnotoad that only shows when Perl is compiled
+    with -DPERL_USE_SAFE_PUTENV. (lewoberst)
 
 3.80  2013-01-15
   - Deprecated testing WebSocket messages without calling

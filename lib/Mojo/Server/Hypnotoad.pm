@@ -182,7 +182,9 @@ sub _manage {
     $self->{log}->info("Upgrade successful, stopping $ENV{HYPNOTOAD_PID}.");
     kill 'QUIT', $ENV{HYPNOTOAD_PID};
   }
-  $ENV{HYPNOTOAD_PID} = $$;
+  if (!exists $ENV{HYPNOTOAD_PID} || $ENV{HYPNOTOAD_PID} ne $$) {
+    $ENV{HYPNOTOAD_PID} = $$;
+  }
 
   # Check heartbeat
   $self->_heartbeat;

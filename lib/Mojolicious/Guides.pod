@@ -23,7 +23,7 @@ L<learn.perl.org|http://learn.perl.org/>.
 =head1 SCREENCASTS
 
 Before starting with the tutorial below, you should take a look at the
-excellent L<Mojocasts|http://mojocasts.com/>, they will give you a general
+excellent L<Mojocasts|http://mojocasts.com/e1>, they will give you a general
 overview of what L<Mojolicious> is all about.
 
 =head1 TUTORIAL

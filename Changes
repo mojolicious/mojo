@@ -1,5 +1,6 @@
 
 3.81  2013-01-16
+  - Updated jQuery to version 1.9.
   - Improved documentation.
   - Fixed small memory leak in Hypnotoad that only shows when Perl is compiled
     with -DPERL_USE_SAFE_PUTENV. (lewoberst)

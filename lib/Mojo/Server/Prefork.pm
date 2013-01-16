@@ -315,6 +315,11 @@ can emit the following new ones.
 
 Emitted when the server shuts down.
 
+  $prefork->on(finish => sub {
+    my ($prefork, $graceful) = @_;
+    say $graceful ? 'Graceful server shutdown' : 'Server shutdown';
+  });
+
 =head2 heartbeat
 
   $prefork->on(heartbeat => sub {
@@ -323,6 +328,11 @@ Emitted when the server shuts down.
   });
 
 Emitted when a heartbeat message has been received from a worker.
+
+  $prefork->on(heartbeat => sub {
+    my ($prefork, $pid) = @_;
+    say "Worker $pid has a heartbeat";
+  });
 
 =head2 reap
 
@@ -333,6 +343,11 @@ Emitted when a heartbeat message has been received from a worker.
 
 Emitted when a child process dies.
 
+  $prefork->on(reap => sub {
+    my ($prefork, $pid) = @_;
+    say "Worker $pid stopped";
+  });
+
 =head2 spawn
 
   $prefork->on(spawn => sub {
@@ -342,6 +357,11 @@ Emitted when a child process dies.
 
 Emitted when a worker process is spawned.
 
+  $prefork->on(spawn => sub {
+    my ($prefork, $pid) = @_;
+    say "Worker $pid started";
+  });
+
 =head2 wait
 
   $prefork->on(wait => sub {
@@ -350,6 +370,12 @@ Emitted when a worker process is spawned.
   });
 
 Emitted when the manager starts waiting for new heartbeat messages.
+
+  $prefork->on(wait => sub {
+    my $prefork = shift;
+    my $workers = $prefork->workers;
+    say "Waiting for heartbeat messages from $workers workers";
+  });
 
 =head1 ATTRIBUTES
 

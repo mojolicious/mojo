@@ -77,12 +77,9 @@ ok !$content->charset, 'no charset';
 'a' =~ /(.)/;
 ok !$content->boundary, 'no boundary';
 
-# Partial upload with 64bit content length
+# Partial content with 64bit content length
 $content = Mojo::Content::Single->new;
-$content->parse("Content-Length: 2222222222\x0d\x0a\x0d\x0aHello World!");
-is $content->asset->size, 12, 'right size';
-$content = Mojo::Content::Single->new;
-$content->parse("Content-Length: 4444444444\x0d\x0a\x0d\x0aHello World!");
+$content->parse("Content-Length: 9999999999\x0d\x0a\x0d\x0aHello World!");
 is $content->asset->size, 12, 'right size';
 
 done_testing();

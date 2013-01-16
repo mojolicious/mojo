@@ -140,6 +140,7 @@ sub parse {
     my $len = $headers->content_length || 0;
     $self->{size} ||= 0;
     if ((my $need = $len - $self->{size}) > 0) {
+      $need = length($self->{buffer}) if $need > length($self->{buffer});
       my $chunk = substr $self->{buffer}, 0, $need, '';
       $self->_uncompress($chunk);
       $self->{size} += length $chunk;

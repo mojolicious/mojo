@@ -105,27 +105,28 @@ sub _manage {
 
   # Manage workers
   $self->emit('manage')->_heartbeat;
+  my $log = $self->app->log;
   while (my ($pid, $w) = each %{$self->{pool}}) {
 
     # No heartbeat (graceful stop)
     my $interval = $self->heartbeat_interval;
     my $timeout  = $self->heartbeat_timeout;
     if (!$w->{graceful} && ($w->{time} + $interval + $timeout <= time)) {
-      $self->app->log->info("Worker $pid has no heartbeat, restarting.");
+      $log->info("Worker $pid has no heartbeat, restarting.");
       $w->{graceful} = time;
     }
 
     # Graceful stop with timeout
     $w->{graceful} ||= time if $self->{graceful};
     if ($w->{graceful}) {
-      $self->app->log->debug("Trying to stop worker $pid gracefully.");
+      $log->debug("Trying to stop worker $pid gracefully.");
       kill 'QUIT', $pid;
       $w->{force} = 1 if $w->{graceful} + $self->graceful_timeout <= time;
     }
 
     # Normal stop
     if (($self->{finished} && !$self->{graceful}) || $w->{force}) {
-      $self->app->log->debug("Stopping worker $pid.");
+      $log->debug("Stopping worker $pid.");
       kill 'KILL', $pid;
     }
   }
@@ -332,7 +333,7 @@ Emitted when a heartbeat message has been received from a worker.
 =head2 manage
 
   $prefork->on(manage => sub {
-    my ($prefork, $pid) = @_;
+    my $prefork = shift;
     ...
   });
 

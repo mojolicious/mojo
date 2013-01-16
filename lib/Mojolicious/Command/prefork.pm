@@ -10,10 +10,9 @@ has usage => <<"EOF";
 usage: $0 prefork [OPTIONS]
 
 These options are available:
-  -A, --accepts <number>               Set number of connections a worker is
-                                       allowed to accept, defaults to 1000.
-  -a, --accept-interval <seconds>      Set interval for reacquiring the accept
-                                       mutex, defaults to 0.025.
+  -A, --accepts <number>               Set number of connections for workers
+                                       to accept, defaults to 1000.
+  -a, --accept-interval <seconds>      Set accept interval, defaults to 0.025.
   -b, --backlog <size>                 Set listen backlog size, defaults to
                                        SOMAXCONN.
   -c, --clients <number>               Set maximum number of concurrent
@@ -30,7 +29,7 @@ These options are available:
   -l, --listen <location>              Set one or more locations you want to
                                        listen on, defaults to the value of
                                        MOJO_LISTEN or "http://*:3000".
-      --multi-accept <number>          Set number of connection to acceot at
+      --multi-accept <number>          Set number of connection to accept at
                                        once, defaults to 50.
   -P, --pid-file <path>                Set path to process id file, defaults
                                        to a random file.
@@ -40,7 +39,8 @@ These options are available:
   -r, --requests <number>              Set maximum number of requests per
                                        keep-alive connection, defaults to 25.
   -u, --user <name>                    Set username for process.
-  -w, --workers <number>               Set number of worker processes.
+  -w, --workers <number>               Set number of worker processes,
+                                       defaults to 4.
 EOF
 
 sub run {

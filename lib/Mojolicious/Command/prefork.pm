@@ -10,30 +10,31 @@ has usage => <<"EOF";
 usage: $0 prefork [OPTIONS]
 
 These options are available:
-  -B <seconds>                 Set heartbeat interval, defaults to 5.
-  -b, --backlog <size>         Set listen backlog size, defaults to
-                               SOMAXCONN.
-  -c, --clients <number>       Set maximum number of concurrent clients,
-                               defaults to 1000.
-  -f <path>                    Set path to lock file, defaults to a random
-                               file.
-  -G, --graceful <seconds>     Set graceful timeout, defaults to 20.
-  -g, --group <name>           Set group name for process.
-  -H <seconds>                 Set heartbeat timeout, defaults to 20.
-  -i, --inactivity <seconds>   Set inactivity timeout, defaults to the value
-                               of MOJO_INACTIVITY_TIMEOUT or 15.
-  -L <seconds>                 Set lock timeout, defaults to 0.5.
-  -l, --listen <location>      Set one or more locations you want to listen
-                               on, defaults to the value of MOJO_LISTEN or
-                               "http://*:3000".
-  -P, --pid <path>             Set path to process id file, defaults to a
-                               random file.
-  -p, --proxy                  Activate reverse proxy support, defaults to
-                               the value of MOJO_REVERSE_PROXY.
-  -r, --requests <number>      Set maximum number of requests per keep-alive
-                               connection, defaults to 25.
-  -u, --user <name>            Set username for process.
-  -w, --workers <number>       Set number of worker processes.
+  -b, --backlog <size>                 Set listen backlog size, defaults to
+                                       SOMAXCONN.
+  -c, --clients <number>               Set maximum number of concurrent
+                                       clients, defaults to 1000.
+  -G, --graceful-timeout <seconds>     Set graceful timeout, defaults to 20.
+  -g, --group <name>                   Set group name for process.
+      --heartbeat-interval <seconds>   Set heartbeat interval, defaults to 5.
+  -H, --heartbeat-timeout <seconds>    Set heartbeat timeout, defaults to 20.
+  -i, --inactivity <seconds>           Set inactivity timeout, defaults to the
+                                       value of MOJO_INACTIVITY_TIMEOUT or 15.
+      --lock-file <path>               Set path to lock file, defaults to a
+                                       random file.
+  -L, --lock-timeout <seconds>         Set lock timeout, defaults to 0.5.
+  -l, --listen <location>              Set one or more locations you want to
+                                       listen on, defaults to the value of
+                                       MOJO_LISTEN or "http://*:3000".
+  -P, --pid-file <path>                Set path to process id file, defaults
+                                       to a random file.
+  -p, --proxy                          Activate reverse proxy support,
+                                       defaults to the value of
+                                       MOJO_REVERSE_PROXY.
+  -r, --requests <number>              Set maximum number of requests per
+                                       keep-alive connection, defaults to 25.
+  -u, --user <name>                    Set username for process.
+  -w, --workers <number>               Set number of worker processes.
 EOF
 
 sub run {
@@ -42,18 +43,18 @@ sub run {
   # Options
   my $prefork = Mojo::Server::Prefork->new(app => $self->app);
   GetOptionsFromArray \@args,
-    'B=i'            => sub { $prefork->heartbeat_interval($_[1]) },
-    'b|backlog=i'    => sub { $prefork->backlog($_[1]) },
-    'c|clients=i'    => sub { $prefork->max_clients($_[1]) },
-    'f=i'            => sub { $prefork->lock_file($_[1]) },
-    'G|graceful=i'   => sub { $prefork->graceful_timeout($_[1]) },
-    'g|group=s'      => sub { $prefork->group($_[1]) },
-    'H=i'            => sub { $prefork->heartbeat_timeout($_[1]) },
-    'i|inactivity=i' => sub { $prefork->inactivity_timeout($_[1]) },
-    'L=i'            => sub { $prefork->lock_timeout($_[1]) },
-    'l|listen=s'     => \my @listen,
-    'P|pid=i'        => sub { $prefork->pid_file($_[1]) },
-    'p|proxy' => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
+    'b|backlog=i'           => sub { $prefork->backlog($_[1]) },
+    'c|clients=i'           => sub { $prefork->max_clients($_[1]) },
+    'G|graceful-timeout=i'  => sub { $prefork->graceful_timeout($_[1]) },
+    'g|group=s'             => sub { $prefork->group($_[1]) },
+    'heartbeat-interval=i'  => sub { $prefork->heartbeat_interval($_[1]) },
+    'H|heartbeat-timeout=i' => sub { $prefork->heartbeat_timeout($_[1]) },
+    'i|inactivity=i'        => sub { $prefork->inactivity_timeout($_[1]) },
+    'lock-file=i'           => sub { $prefork->lock_file($_[1]) },
+    'L|lock-timeout=i'      => sub { $prefork->lock_timeout($_[1]) },
+    'l|listen=s'   => \my @listen,
+    'P|pid-file=i' => sub { $prefork->pid_file($_[1]) },
+    'p|proxy'      => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
     'r|requests=i' => sub { $prefork->max_requests($_[1]) },
     'u|user=s'     => sub { $prefork->user($_[1]) },
     'w|workers=i'  => sub { $prefork->workers($_[1]) };

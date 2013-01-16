@@ -16,15 +16,17 @@ use Mojo::IOLoop;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
 
-# Basic functionality
-my $port = Mojo::IOLoop->generate_port;
-my $prefork = Mojo::Server::Prefork->new(listen => ["http://*:$port"]);
+# Multiple workers and graceful shutdown
+my $port    = Mojo::IOLoop->generate_port;
+my $prefork = Mojo::Server::Prefork->new(
+  heartbeat_interval => 0.5,
+  listen             => ["http://*:$port"]
+);
 $prefork->unsubscribe('request');
 $prefork->on(
   request => sub {
     my ($prefork, $tx) = @_;
-    $tx->res->code(200);
-    $tx->res->body('just works!');
+    $tx->res->code(200)->body('just works!');
     $tx->resume;
   }
 );
@@ -58,5 +60,38 @@ ok -e $lock, 'lock file has been created';
 undef $prefork;
 ok !-e $pid,  'process id file has been removed';
 ok !-e $lock, 'lock file has been removed';
+
+# One worker and immediate shutdown
+$port    = Mojo::IOLoop->generate_port;
+$prefork = Mojo::Server::Prefork->new(
+  heartbeat_interval => 0.5,
+  listen             => ["http://*:$port"],
+  workers            => 1
+);
+$prefork->unsubscribe('request');
+$prefork->on(
+  request => sub {
+    my ($prefork, $tx) = @_;
+    $tx->res->code(200)->body('works too!');
+    $tx->resume;
+  }
+);
+my $count = $tx = $graceful, undef;
+@spawn = @reap = ();
+$prefork->on(spawn => sub { push @spawn, pop });
+$prefork->once(
+  heartbeat => sub {
+    $tx = Mojo::UserAgent->new->get("http://localhost:$port");
+    kill 'TERM', $$;
+  }
+);
+$prefork->on(reap => sub { push @reap, pop });
+$prefork->on(finish => sub { $graceful = pop });
+$prefork->run;
+is scalar @spawn, 1, 'one worker spawned';
+is scalar @reap,  1, 'one worker reaped';
+ok !$graceful, 'server has been stopped immediately';
+is $tx->res->code, 200,          'right status';
+is $tx->res->body, 'works too!', 'right content';
 
 done_testing();

@@ -9,10 +9,13 @@ use POSIX qw(setsid WNOHANG);
 use Scalar::Util 'weaken';
 use Time::HiRes 'ualarm';
 
+has accepts         => 1000;
+has accept_interval => 0.025;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
 has lock_file          => sub { catfile tmpdir, 'hypnotoad.lock' };
 has lock_timeout       => 0.5;
+has multi_accept       => 50;
 has pid_file           => sub { catfile tmpdir, 'hypnotoad.pid' };
 has workers            => 4;
 
@@ -49,6 +52,8 @@ sub run {
   # Preload application and start accepting connections
   $self->{lock_file} = $self->lock_file . ".$$";
   $self->start->app;
+  my $loop = $self->ioloop->max_accepts($self->accepts);
+  $loop->$_($self->$_) for qw(accept_interval multi_accept);
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
@@ -362,6 +367,26 @@ Emitted when the manager starts waiting for new heartbeat messages.
 L<Mojo::Server::Prefork> inherits all attributes from L<Mojo::Server::Daemon>
 and implements the following new ones.
 
+=head2 accept_interval
+
+  my $interval = $prefork->accept_interval;
+  $prefork     = $prefork->accept_interval(0.5);
+
+Interval in seconds for trying to reacquire the accept mutex and connection
+management, defaults to C<0.025>. Note that changing this value can affect
+performance and idle CPU usage.
+
+=head2 accepts
+
+  my $accepts = $prefork->accepts;
+  $prefork    = $prefork->accepts(100);
+
+Maximum number of connections a worker is allowed to accept before stopping
+gracefully, defaults to C<1000>. Setting the value to C<0> will allow workers
+to accept new connections indefinitely. Note that up to half of this value can
+be subtracted randomly to improve load balancing, and that worker processes
+will stop sending heartbeat messages once the limit has been reached.
+
 =head2 graceful_timeout
 
   my $timeout = $prefork->graceful_timeout;
@@ -400,6 +425,13 @@ appended, defaults to a random temporary path.
 
 Maximum amount of time in seconds a worker may block when waiting for the
 accept mutex, defaults to C<0.5>.
+
+=head2 multi_accept
+
+  my $multi = $prefork->multi_accept;
+  $prefork  = $prefork->multi_accept(100);
+
+Number of connections to accept at once, defaults to C<50>.
 
 =head2 pid_file
 

@@ -10,6 +10,10 @@ has usage => <<"EOF";
 usage: $0 prefork [OPTIONS]
 
 These options are available:
+  -A, --accepts <number>               Set number of connections a worker is
+                                       allowed to accept, defaults to 1000.
+  -a, --accept-interval <seconds>      Set interval for reacquiring the accept
+                                       mutex, defaults to 0.025.
   -b, --backlog <size>                 Set listen backlog size, defaults to
                                        SOMAXCONN.
   -c, --clients <number>               Set maximum number of concurrent
@@ -26,6 +30,8 @@ These options are available:
   -l, --listen <location>              Set one or more locations you want to
                                        listen on, defaults to the value of
                                        MOJO_LISTEN or "http://*:3000".
+      --multi-accept <number>          Set number of connection to acceot at
+                                       once, defaults to 50.
   -P, --pid-file <path>                Set path to process id file, defaults
                                        to a random file.
   -p, --proxy                          Activate reverse proxy support,
@@ -43,6 +49,8 @@ sub run {
   # Options
   my $prefork = Mojo::Server::Prefork->new(app => $self->app);
   GetOptionsFromArray \@args,
+    'A|accepts=i'           => sub { $prefork->accepts($_[1]) },
+    'a|accept-interval=i'   => sub { $prefork->accept_interval($_[1]) },
     'b|backlog=i'           => sub { $prefork->backlog($_[1]) },
     'c|clients=i'           => sub { $prefork->max_clients($_[1]) },
     'G|graceful-timeout=i'  => sub { $prefork->graceful_timeout($_[1]) },
@@ -52,9 +60,10 @@ sub run {
     'i|inactivity=i'        => sub { $prefork->inactivity_timeout($_[1]) },
     'lock-file=i'           => sub { $prefork->lock_file($_[1]) },
     'L|lock-timeout=i'      => sub { $prefork->lock_timeout($_[1]) },
-    'l|listen=s'   => \my @listen,
-    'P|pid-file=i' => sub { $prefork->pid_file($_[1]) },
-    'p|proxy'      => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
+    'l|listen=s'     => \my @listen,
+    'multi-accept=i' => sub { $prefork->multi_accept($_[1]) },
+    'P|pid-file=i'   => sub { $prefork->pid_file($_[1]) },
+    'p|proxy'        => sub { $ENV{MOJO_REVERSE_PROXY} = 1 },
     'r|requests=i' => sub { $prefork->max_requests($_[1]) },
     'u|user=s'     => sub { $prefork->user($_[1]) },
     'w|workers=i'  => sub { $prefork->workers($_[1]) };

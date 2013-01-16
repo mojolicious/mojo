@@ -71,20 +71,15 @@ sub _config {
   $prefork->pid_file($c->{pid_file}
       || catfile(dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid'));
   my @settings = (
-    qw(backlog graceful_timeout group heartbeat_interval),
-    qw(heartbeat_timeout lock_file lock_timeout user workers)
+    qw(accept_interval accepts backlog graceful_timeout group),
+    qw(heartbeat_interval heartbeat_timeout inactivity_timeout lock_file),
+    qw(lock_timeout multi_accept user workers)
   );
   defined $c->{$_} and $prefork->$_($c->{$_}) for @settings;
-  $prefork->max_clients($c->{clients}              || 1000);
-  $prefork->max_requests($c->{keep_alive_requests} || 25);
-  $prefork->inactivity_timeout($c->{inactivity_timeout} // 15);
+  $prefork->max_clients($c->{clients}) if $c->{clients};
+  $prefork->max_requests($c->{keep_alive_requests})
+    if $c->{keep_alive_requests};
   $prefork->listen($c->{listen} || ['http://*:8080']);
-
-  # Event loop settings
-  my $loop = $prefork->ioloop;
-  $loop->max_accepts($c->{accepts} // 1000);
-  defined $c->{$_} and $loop->$_($c->{$_})
-    for qw(accept_interval multi_accept);
 }
 
 sub _exit { say shift and exit 0 }

@@ -41,7 +41,7 @@ sub daemonize {
 }
 
 sub run {
-  my ($self, $path) = @_;
+  my $self = shift;
 
   # No Windows support
   say 'Preforking not available for Windows.' and exit 0 if $^O eq 'MSWin32';

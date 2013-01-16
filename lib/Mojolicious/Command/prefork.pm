@@ -15,7 +15,8 @@ These options are available:
                                SOMAXCONN.
   -c, --clients <number>       Set maximum number of concurrent clients,
                                defaults to 1000.
-  -f <path>                    Set lock file path, defaults to a random file.
+  -f <path>                    Set path to lock file, defaults to a random
+                               file.
   -G, --graceful <seconds>     Set graceful timeout, defaults to 20.
   -g, --group <name>           Set group name for process.
   -H <seconds>                 Set heartbeat timeout, defaults to 20.

@@ -119,6 +119,12 @@ my $inflate = Mojolicious::Command::inflate->new;
 ok $inflate->description, 'has a description';
 ok $inflate->usage,       'has usage information';
 
+# prefork
+require Mojolicious::Command::prefork;
+my $prefork = Mojolicious::Command::prefork->new;
+ok $prefork->description, 'has a description';
+ok $prefork->usage,       'has usage information';
+
 # psgi
 require Mojolicious::Command::psgi;
 my $psgi = Mojolicious::Command::psgi->new;

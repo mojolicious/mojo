@@ -30,13 +30,17 @@ works on.
   $ ./script/myapp daemon -h
   ...List of available options...
 
-Another huge advantage is that it supports TLS and WebSockets out of the box.
+Another huge advantage is that it supports TLS and WebSockets out of the box,
+a development certificate for testing purposes is built right in, so it just
+works.
 
   $ ./script/myapp daemon -l https://*:3000
   Server available at https://127.0.0.1:3000.
 
-A development certificate for testing purposes is built right in, so it just
-works.
+On UNIX platforms you can also add preforking with L<Mojo::Server::Prefork>.
+
+  $ ./script/myapp prefork
+  Server available at http://127.0.0.1:3000.
 
 =head2 Morbo
 
@@ -65,8 +69,9 @@ multiple CPU cores and copy-on-write.
   |- Mojo::Server::Daemon [3]
   +- Mojo::Server::Daemon [4]
 
-It is also based on the L<Mojo::Server::Daemon> web server, but optimized
-specifically for production environments out of the box.
+It is based on the L<Mojo::Server::Prefork> web server, which adds preforking
+to L<Mojo::Server::Daemon>, but optimized specifically for production
+environments out of the box.
 
   $ hypnotoad script/myapp
   Server available at http://127.0.0.1:8080.

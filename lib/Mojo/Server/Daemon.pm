@@ -27,7 +27,7 @@ sub run {
   my $self = shift;
 
   # Signals
-  $SIG{INT} = $SIG{TERM} = sub { exit 0 };
+  local $SIG{INT} = local $SIG{TERM} = sub { $self->ioloop->stop };
 
   # Change user/group and start accepting connections
   $self->start->setuidgid->ioloop->start;

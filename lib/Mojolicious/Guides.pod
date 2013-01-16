@@ -96,10 +96,11 @@ Full featured, highly portable non-blocking I/O HTTP and WebSocket server,
 with self-restart support through L<Mojo::Server::Morbo>, perfect for
 development and testing.
 
-=item L<Mojo::Server::Hypnotoad>
+=item L<Mojo::Server::Prefork>
 
 Full featured, UNIX optimized, preforking non-blocking I/O HTTP and WebSocket
-server with support for zero downtime software upgrades (hot deployment).
+server with support for zero downtime software upgrades (hot deployment)
+through L<Mojo::Server::Hypnotoad>.
 
 =item L<Mojo::Server::CGI>, L<Mojo::Server::PSGI>
 

@@ -7,6 +7,7 @@ use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use Mojo::Server::Prefork;
+use POSIX 'setsid';
 use Scalar::Util 'weaken';
 
 sub run {
@@ -47,8 +48,18 @@ sub run {
   $self->_hot_deploy unless $ENV{HYPNOTOAD_PID};
 
   # Daemonize as early as possible (but not for restarts)
-  $prefork->daemonize
-    if !$ENV{HYPNOTOAD_FOREGROUND} && $ENV{HYPNOTOAD_REV} < 3;
+  if (!$ENV{HYPNOTOAD_FOREGROUND} && $ENV{HYPNOTOAD_REV} < 3) {
+
+    # Fork and kill parent
+    die "Can't fork: $!" unless defined(my $pid = fork);
+    exit 0 if $pid;
+    setsid or die "Can't start a new session: $!";
+
+    # Close file handles
+    open STDIN,  '</dev/null';
+    open STDOUT, '>/dev/null';
+    open STDERR, '>&STDOUT';
+  }
 
   # Clean manager environment
   local $SIG{USR2} = sub { $self->{upgrade} ||= time };

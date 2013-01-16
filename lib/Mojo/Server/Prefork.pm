@@ -5,7 +5,7 @@ use Fcntl ':flock';
 use File::Spec::Functions qw(catfile tmpdir);
 use IO::Poll 'POLLIN';
 use List::Util 'shuffle';
-use POSIX qw(setsid WNOHANG);
+use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 use Time::HiRes 'ualarm';
 
@@ -28,19 +28,6 @@ sub DESTROY {
   # Manager
   if (my $file = $self->{lock_file}) { unlink $file if -w $file }
   if (my $file = $self->{pid_file})  { unlink $file if -w $file }
-}
-
-sub daemonize {
-
-  # Fork and kill parent
-  die "Can't fork: $!" unless defined(my $pid = fork);
-  exit 0 if $pid;
-  setsid or die "Can't start a new session: $!";
-
-  # Close file handles
-  open STDIN,  '</dev/null';
-  open STDOUT, '>/dev/null';
-  open STDERR, '>&STDOUT';
 }
 
 sub run {
@@ -454,12 +441,6 @@ worker processes per CPU core.
 
 L<Mojo::Server::Prefork> inherits all methods from L<Mojo::Server::Daemon> and
 implements the following new ones.
-
-=head2 daemonize
-
-  $prefork->daemonize;
-
-Daemonize process.
 
 =head2 run
 

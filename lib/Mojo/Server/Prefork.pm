@@ -41,9 +41,6 @@ sub run {
   my $loop = $self->ioloop->max_accepts($self->accepts);
   $loop->$_($self->$_) for qw(accept_interval multi_accept);
 
-  # Preload application and start accepting connections
-  $self->start->app;
-
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
   $self->{poll} = IO::Poll->new;
@@ -62,7 +59,8 @@ sub run {
     $self->{pool}{shuffle keys %{$self->{pool}}}{graceful} ||= time;
   };
 
-  # Mainloop
+  # Preload application and start accepting connections
+  $self->start->app->log->info("Manager $$ started.");
   $self->{running} = 1;
   $self->_manage while $self->{running};
 }

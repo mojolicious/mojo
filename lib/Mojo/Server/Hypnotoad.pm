@@ -61,11 +61,8 @@ sub run {
     open STDERR, '>&STDOUT';
   }
 
-  # Clean manager environment
-  local $SIG{USR2} = sub { $self->{upgrade} ||= time };
-
   # Start accepting connections
-  $app->log->info(qq[Hypnotoad server $$ started for "$ENV{HYPNOTOAD_APP}".]);
+  local $SIG{USR2} = sub { $self->{upgrade} ||= time };
   $prefork->run;
 }
 

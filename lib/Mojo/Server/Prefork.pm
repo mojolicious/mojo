@@ -83,7 +83,7 @@ sub _heartbeat {
   return unless $self->{reader}->sysread(my $chunk, 4194304);
 
   # Update heartbeats
-  $self->{pool}{$1} and $self->{pool}{$1}{time} = time
+  $self->{pool}{$1} and $self->emit(heartbeat => $1)->{pool}{$1}{time} = time
     while $chunk =~ /(\d+)\n/g;
 }
 
@@ -320,10 +320,19 @@ can emit the following new ones.
 
 Emitted when the server shuts down.
 
+=head2 heartbeat
+
+  $prefork->on(heartbeat => sub {
+    my ($prefork, $pid) = @_;
+    ...
+  });
+
+Emitted when a heartbeat message has been received from a worker.
+
 =head2 manage
 
   $prefork->on(manage => sub {
-    my $prefork = shift;
+    my ($prefork, $pid) = @_;
     ...
   });
 

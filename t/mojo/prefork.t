@@ -11,27 +11,31 @@ use Test::More;
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
   unless $ENV{TEST_PREFORK};
 
+use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
-use Mojolicious::Lite;
-
-# Silence
-app->log->level('fatal');
-
-get '/' => {text => 'just works!'};
 
 # Basic functionality
 my $port = Mojo::IOLoop->generate_port;
-my $prefork
-  = Mojo::Server::Prefork->new(app => app, listen => ["http://*:$port"]);
-is $prefork->workers, 4, 'start with four workers';
-my (@spawn, @reap, $tx, $graceful);
-$prefork->on(spawn => sub { push @spawn, pop });
+my $prefork = Mojo::Server::Prefork->new(listen => ["http://*:$port"]);
+$prefork->unsubscribe('request');
 $prefork->on(
-  manage => sub {
-    my $prefork = shift;
-    $tx = Mojo::UserAgent->new->get("http://localhost:$port");
+  request => sub {
+    my ($prefork, $tx) = @_;
+    $tx->res->code(200);
+    $tx->res->body('just works!');
+    $tx->resume;
+  }
+);
+is $prefork->workers, 4, 'start with four workers';
+my (@spawn, @reap, $worker, $tx, $graceful);
+$prefork->on(spawn => sub { push @spawn, pop });
+$prefork->once(
+  heartbeat => sub {
+    my ($prefork, $pid) = @_;
+    $worker = $pid;
+    $tx     = Mojo::UserAgent->new->get("http://localhost:$port");
     kill 'QUIT', $$;
   }
 );
@@ -40,6 +44,7 @@ $prefork->on(finish => sub { $graceful = pop });
 $prefork->run;
 is scalar @spawn, 4, 'four workers spawned';
 is scalar @reap,  4, 'four workers reaped';
+ok !!first { $worker eq $_ } @spawn, 'worker has a heartbeat';
 ok $graceful, 'server has been stopped gracefully';
 is_deeply [sort @spawn], [sort @reap], 'same process ids';
 is $tx->res->code, 200,           'right status';

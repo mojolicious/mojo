@@ -15,10 +15,20 @@ use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
+use Mojo::Util 'spurt';
+
+# Clean up PID file
+my $prefork = Mojo::Server::Prefork->new;
+my $file    = $prefork->pid_file;
+ok !$prefork->pid_from_file, 'no process id';
+spurt "\n", $file;
+ok -e $file, 'file exists';
+ok !$prefork->pid_from_file, 'no process id';
+ok !-e $file, 'file has been cleaned up';
 
 # Multiple workers and graceful shutdown
-my $port    = Mojo::IOLoop->generate_port;
-my $prefork = Mojo::Server::Prefork->new(
+my $port = Mojo::IOLoop->generate_port;
+$prefork = Mojo::Server::Prefork->new(
   heartbeat_interval => 0.5,
   listen             => ["http://*:$port"]
 );
@@ -53,6 +63,7 @@ is $tx->res->code, 200,           'right status';
 is $tx->res->body, 'just works!', 'right content';
 
 # Process id and lock files
+is $prefork->pid_from_file, $$, 'right process id';
 my $pid = $prefork->pid_file;
 ok -e $pid, 'process id file has been created';
 my $lock = $prefork->lock_file;

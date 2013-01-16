@@ -93,10 +93,8 @@ sub _exit { say shift and exit 0 }
 sub _hot_deploy {
   my $self = shift;
 
-  # Make sure server is running and clean up PID file if necessary
-  return unless defined(my $pid = $self->_pid);
-  my $file = $self->{prefork}->pid_file;
-  return -w $file ? unlink $file : undef unless $pid && kill 0, $pid;
+  # Make sure server is running
+  return unless my $pid = $self->{prefork}->pid_from_file;
 
   # Start hot deployment
   kill 'USR2', $pid;
@@ -130,13 +128,6 @@ sub _manage {
   }
 }
 
-sub _pid {
-  return undef unless open my $file, '<', shift->{prefork}->pid_file;
-  my $pid = <$file>;
-  chomp $pid;
-  return $pid;
-}
-
 sub _reap {
   my ($self, $pid) = @_;
 
@@ -147,7 +138,8 @@ sub _reap {
 }
 
 sub _stop {
-  _exit('Hypnotoad server not running.') unless my $pid = shift->_pid;
+  _exit('Hypnotoad server not running.')
+    unless my $pid = shift->{prefork}->pid_from_file;
   kill 'QUIT', $pid;
   _exit("Stopping Hypnotoad server $pid gracefully.");
 }

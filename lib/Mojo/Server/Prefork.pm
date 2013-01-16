@@ -27,7 +27,23 @@ sub DESTROY {
 
   # Manager
   if (my $file = $self->{lock_file}) { unlink $file if -w $file }
-  if (my $file = $self->{pid_file})  { unlink $file if -w $file }
+  if (my $file = $self->pid_file)    { unlink $file if -w $file }
+}
+
+sub pid_from_file {
+
+  # Get PID
+  my $file = shift->pid_file;
+  return undef unless open my $handle, '<', $file;
+  my $pid = <$handle>;
+  chomp $pid;
+
+  # Running
+  return $pid if $pid && kill 0, $pid;
+
+  # Not running
+  unlink $file if -w $file;
+  return undef;
 }
 
 sub run {
@@ -126,9 +142,6 @@ sub _manage {
 
 sub _pid_file {
   my $self = shift;
-
-  # Don't need a PID file anymore
-  return if $self->{finished};
 
   # Check if PID file already exists
   return if -e (my $file = $self->pid_file);
@@ -465,6 +478,15 @@ worker processes per CPU core.
 
 L<Mojo::Server::Prefork> inherits all methods from L<Mojo::Server::Daemon> and
 implements the following new ones.
+
+=head2 pid_from_file
+
+  my $pid = $prefork->pid_from_file;
+
+Get process id from C<pid_file> and clean up process id file if server is not
+running.
+
+  say 'Server is not running' unless $prefork->pid_from_file;
 
 =head2 run
 

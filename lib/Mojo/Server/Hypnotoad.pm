@@ -33,7 +33,7 @@ sub run {
   my $app = $prefork->load_app($ENV{HYPNOTOAD_APP});
   $self->_config($app);
   weaken $self;
-  $prefork->on(manage => sub { $self->_manage });
+  $prefork->on(wait   => sub { $self->_manage });
   $prefork->on(reap   => sub { $self->_reap(pop) });
   $prefork->on(finish => sub { $self->{finished} = 1 });
 

@@ -104,7 +104,7 @@ sub _manage {
   elsif (!keys %{$self->{pool}}) { return delete $self->{running} }
 
   # Manage workers
-  $self->emit('manage')->_heartbeat;
+  $self->emit('wait')->_heartbeat;
   my $log = $self->app->log;
   while (my ($pid, $w) = each %{$self->{pool}}) {
 
@@ -330,15 +330,6 @@ Emitted when the server shuts down.
 
 Emitted when a heartbeat message has been received from a worker.
 
-=head2 manage
-
-  $prefork->on(manage => sub {
-    my $prefork = shift;
-    ...
-  });
-
-Emitted when the server starts managing worker processes.
-
 =head2 reap
 
   $prefork->on(reap => sub {
@@ -356,6 +347,15 @@ Emitted when a child process dies.
   });
 
 Emitted when a worker process is spawned.
+
+=head2 wait
+
+  $prefork->on(wait => sub {
+    my $prefork = shift;
+    ...
+  });
+
+Emitted when the server starts waiting for new heartbeat messages.
 
 =head1 ATTRIBUTES
 

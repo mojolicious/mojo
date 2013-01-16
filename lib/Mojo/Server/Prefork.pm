@@ -49,11 +49,13 @@ sub run {
   # No Windows support
   say 'Preforking not available for Windows.' and exit 0 if $^O eq 'MSWin32';
 
-  # Preload application and start accepting connections
+  # Prepare lock file and event loop
   $self->{lock_file} = $self->lock_file . ".$$";
-  $self->start->app;
   my $loop = $self->ioloop->max_accepts($self->accepts);
   $loop->$_($self->$_) for qw(accept_interval multi_accept);
+
+  # Preload application and start accepting connections
+  $self->start->app;
 
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";

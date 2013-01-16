@@ -318,7 +318,7 @@ Mojo::IOLoop - Minimalistic event loop
     });
 
     # Write request
-    $stream->write("GET / HTTP/1.1\r\n\r\n");
+    $stream->write("GET / HTTP/1.1\x0d\x0a\x0d\x0a");
   });
 
   # Add a timer

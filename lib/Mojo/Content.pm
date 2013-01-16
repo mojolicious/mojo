@@ -589,7 +589,8 @@ Get leftover data from content parser.
 
 =head2 parse
 
-  $content = $content->parse("Content-Length: 12\r\n\r\nHello World!");
+  $content
+    = $content->parse("Content-Length: 12\x0d\x0a\x0d\x0aHello World!");
 
 Parse content chunk.
 

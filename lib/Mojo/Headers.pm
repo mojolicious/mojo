@@ -179,8 +179,8 @@ Mojo::Headers - Headers
 
   # Parse
   my $headers = Mojo::Headers->new;
-  $headers->parse("Content-Length: 42\r\n");
-  $headers->parse("Content-Type: text/html\r\n\r\n");
+  $headers->parse("Content-Length: 42\x0d\x0a");
+  $headers->parse("Content-Type: text/html\x0d\x0a\x0d\x0a");
   say $headers->content_length;
   say $headers->content_type;
 
@@ -441,7 +441,7 @@ Shortcut for the C<Origin> header from RFC 6454.
 
 =head2 parse
 
-  $headers = $headers->parse("Content-Type: text/plain\r\n\r\n");
+  $headers = $headers->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
 
 Parse formatted headers.
 

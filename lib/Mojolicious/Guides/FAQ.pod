@@ -69,9 +69,9 @@ variable to change this value.
 
 This is a very similar protection mechanism to the one described in the
 previous answer, but a little more specific. It limits the maximum length of
-any C<\r\n> terminated part of a HTTP message, such as request line, status
-line and headers. This limit is around C<10KB> by default, you can use the
-C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
+any C<\x0d\x0a> terminated part of a HTTP message, such as request line,
+status line and headers. This limit is around C<10KB> by default, you can use
+the C<MOJO_MAX_LINE_SIZE> environment variable to change this value.
 
 =head2 What does the error "Maximum buffer size exceeded" mean?
 

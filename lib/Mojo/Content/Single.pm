@@ -66,7 +66,7 @@ Mojo::Content::Single - HTTP content
   use Mojo::Content::Single;
 
   my $single = Mojo::Content::Single->new;
-  $single->parse("Content-Length: 12\r\n\r\nHello World!");
+  $single->parse("Content-Length: 12\x0d\x0a\x0d\x0aHello World!");
   say $single->headers->content_length;
 
 =head1 DESCRIPTION
@@ -153,8 +153,9 @@ Get a chunk of content starting from a specfic position.
 
 =head2 parse
 
-  $single   = $single->parse("Content-Length: 12\r\n\r\nHello World!");
-  my $multi = $single->parse("Content-Type: multipart/form-data\r\n\r\n");
+  $single = $single->parse("Content-Length: 12\x0d\x0a\x0d\x0aHello World!");
+  my $multi
+    = $single->parse("Content-Type: multipart/form-data\x0d\x0a\x0d\x0a");
 
 Parse content chunk and upgrade to L<Mojo::Content::MultiPart> object if
 possible.

@@ -13,10 +13,10 @@ has accepts         => 1000;
 has accept_interval => 0.025;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
-has lock_file          => sub { catfile tmpdir, 'hypnotoad.lock' };
+has lock_file          => sub { catfile tmpdir, 'prefork.lock' };
 has lock_timeout       => 0.5;
 has multi_accept       => 50;
-has pid_file           => sub { catfile tmpdir, 'hypnotoad.pid' };
+has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
 has workers            => 4;
 
 sub DESTROY {
@@ -246,7 +246,7 @@ Mojo::Server::Prefork - Preforking non-blocking I/O HTTP and WebSocket server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::Hypnotoad> is a full featured, UNIX optimized, preforking
+L<Mojo::Server::Prefork> is a full featured, UNIX optimized, preforking
 non-blocking I/O HTTP and WebSocket server, built around the very well tested
 and reliable L<Mojo::Server::Daemon>, with C<IPv6>, C<TLS>, C<Comet> (long
 polling) and multiple event loop support. Note that the server uses signals
@@ -402,7 +402,7 @@ stopped gracefully, defaults to C<20>.
 =head2 lock_file
 
   my $file = $prefork->lock_file;
-  $prefork = $prefork->lock_file('/tmp/hypnotoad.lock');
+  $prefork = $prefork->lock_file('/tmp/prefork.lock');
 
 Full path of accept mutex lock file prefix, to which the process id will be
 appended, defaults to a random temporary path.
@@ -425,7 +425,7 @@ Number of connections to accept at once, defaults to C<50>.
 =head2 pid_file
 
   my $file = $prefork->pid_file;
-  $prefork = $prefork->pid_file('/tmp/hypnotoad.pid');
+  $prefork = $prefork->pid_file('/tmp/prefork.pid');
 
 Full path of process id file, defaults to a random temporary path.
 

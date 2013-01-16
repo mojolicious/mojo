@@ -81,12 +81,10 @@ sub _config {
   my $prefork = $self->{prefork};
   $prefork->pid_file($c->{pid_file}
       || catfile(dirname($ENV{HYPNOTOAD_APP}), 'hypnotoad.pid'));
-  my @settings = (
-    qw(accept_interval accepts backlog graceful_timeout group),
+  defined $c->{$_} and $prefork->$_($c->{$_})
+    for qw(accept_interval accepts backlog graceful_timeout group),
     qw(heartbeat_interval heartbeat_timeout inactivity_timeout lock_file),
-    qw(lock_timeout multi_accept user workers)
-  );
-  defined $c->{$_} and $prefork->$_($c->{$_}) for @settings;
+    qw(lock_timeout multi_accept user workers);
   $prefork->max_clients($c->{clients}) if $c->{clients};
   $prefork->max_requests($c->{keep_alive_requests})
     if $c->{keep_alive_requests};

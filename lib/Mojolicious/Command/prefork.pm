@@ -10,37 +10,36 @@ has usage => <<"EOF";
 usage: $0 prefork [OPTIONS]
 
 These options are available:
-  -A, --accepts <number>               Set number of connections for workers
-                                       to accept, defaults to 1000.
-  -a, --accept-interval <seconds>      Set accept interval, defaults to 0.025.
-  -b, --backlog <size>                 Set listen backlog size, defaults to
+  -A, --accepts <number>               Number of connections for workers to
+                                       accept, defaults to 1000.
+  -a, --accept-interval <seconds>      Accept interval, defaults to 0.025.
+  -b, --backlog <size>                 Listen backlog size, defaults to
                                        SOMAXCONN.
-  -c, --clients <number>               Set maximum number of concurrent
-                                       clients, defaults to 1000.
-  -G, --graceful-timeout <seconds>     Set graceful timeout, defaults to 20.
-  -g, --group <name>                   Set group name for process.
-      --heartbeat-interval <seconds>   Set heartbeat interval, defaults to 5.
-  -H, --heartbeat-timeout <seconds>    Set heartbeat timeout, defaults to 20.
-  -i, --inactivity <seconds>           Set inactivity timeout, defaults to the
+  -c, --clients <number>               Maximum number of concurrent clients,
+                                       defaults to 1000.
+  -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 20.
+  -g, --group <name>                   Group name for process.
+      --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5.
+  -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20.
+  -i, --inactivity <seconds>           Inactivity timeout, defaults to the
                                        value of MOJO_INACTIVITY_TIMEOUT or 15.
-      --lock-file <path>               Set path to lock file, defaults to a
-                                       random file.
-  -L, --lock-timeout <seconds>         Set lock timeout, defaults to 0.5.
-  -l, --listen <location>              Set one or more locations you want to
+      --lock-file <path>               Path to lock file, defaults to a random
+                                       file.
+  -L, --lock-timeout <seconds>         Lock timeout, defaults to 0.5.
+  -l, --listen <location>              One or more locations you want to
                                        listen on, defaults to the value of
                                        MOJO_LISTEN or "http://*:3000".
-      --multi-accept <number>          Set number of connection to accept at
-                                       once, defaults to 50.
-  -P, --pid-file <path>                Set path to process id file, defaults
-                                       to a random file.
+      --multi-accept <number>          Number of connection to accept at once,
+                                       defaults to 50.
+  -P, --pid-file <path>                Path to process id file, defaults to a
+                                       random file.
   -p, --proxy                          Activate reverse proxy support,
                                        defaults to the value of
                                        MOJO_REVERSE_PROXY.
-  -r, --requests <number>              Set maximum number of requests per
+  -r, --requests <number>              Maximum number of requests per
                                        keep-alive connection, defaults to 25.
-  -u, --user <name>                    Set username for process.
-  -w, --workers <number>               Set number of worker processes,
-                                       defaults to 4.
+  -u, --user <name>                    Username for process.
+  -w, --workers <number>               Number of workers, defaults to 4.
 EOF
 
 sub run {

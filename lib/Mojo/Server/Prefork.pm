@@ -355,7 +355,7 @@ Emitted when a worker process is spawned.
     ...
   });
 
-Emitted when the server starts waiting for new heartbeat messages.
+Emitted when the manager starts waiting for new heartbeat messages.
 
 =head1 ATTRIBUTES
 

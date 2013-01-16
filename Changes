@@ -3,6 +3,7 @@
   - Added modules Mojo::Server::Prefork and Mojolicious::Command::prefork.
   - Updated jQuery to version 1.9.
   - Improved documentation.
+  - Improved tests.
   - Fixed small memory leak in Hypnotoad that only shows when Perl is compiled
     with -DPERL_USE_SAFE_PUTENV. (lewoberst)
 

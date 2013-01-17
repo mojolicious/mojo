@@ -115,7 +115,7 @@ sub path_for {
   }
 
   # Find endpoint
-  else { return $name unless $endpoint = $self->root->find($name) }
+  else { return $name unless $endpoint = $self->root->lookup($name) }
 
   # Merge values
   my $captures = $self->captures;

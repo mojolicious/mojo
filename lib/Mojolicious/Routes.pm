@@ -73,6 +73,14 @@ sub dispatch {
 
 sub hide { push @{shift->hidden}, @_ }
 
+sub lookup {
+  my ($self, $name) = @_;
+  my $reverse = $self->{reverse} ||= {};
+  return $reverse->{$name} if exists $reverse->{$name};
+  return undef unless my $route = $self->find($name);
+  return $reverse->{$name} = $route;
+}
+
 # DEPRECATED in Rainbow!
 sub namespace {
   warn <<EOF;
@@ -377,6 +385,13 @@ Match routes with L<Mojolicious::Routes::Match> and dispatch.
   $r = $r->hide(qw(foo bar));
 
 Hide controller methods and attributes from routes.
+
+=head2 lookup
+
+  my $route = $r->lookup('foo');
+
+Find route by name with L<Mojolicious::Routes::Route/"find"> and cache the
+results.
 
 =head2 route
 

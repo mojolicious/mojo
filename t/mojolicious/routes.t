@@ -189,6 +189,14 @@ is $second->render('', {}), '/second', 'right result';
 $target->add_child($first)->add_child($second);
 is $second->render('', {}), '/target/second', 'right result';
 
+# Cached lookup
+my $old = $r->route('/fast');
+is $r->find('fast'),   $old, 'old route found';
+is $r->lookup('fast'), $old, 'old route found';
+my $new = $r->route('/faster')->name('fast');
+is $r->find('fast'),   $new, 'new route found';
+is $r->lookup('fast'), $old, 'old route found';
+
 # Make sure stash stays clean
 my $c = Mojolicious::Controller->new;
 my $m = Mojolicious::Routes::Match->new(GET => '/clean');

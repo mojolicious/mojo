@@ -20,10 +20,10 @@ use Mojo::Util 'spurt';
 # Clean up PID file
 my $prefork = Mojo::Server::Prefork->new;
 my $file    = $prefork->pid_file;
-ok !$prefork->pid_from_file, 'no process id';
+ok !$prefork->check_pid, 'no process id';
 spurt "\n", $file;
 ok -e $file, 'file exists';
-ok !$prefork->pid_from_file, 'no process id';
+ok !$prefork->check_pid, 'no process id';
 ok !-e $file, 'file has been cleaned up';
 
 # Multiple workers and graceful shutdown
@@ -63,7 +63,7 @@ is $tx->res->code, 200,           'right status';
 is $tx->res->body, 'just works!', 'right content';
 
 # Process id and lock files
-is $prefork->pid_from_file, $$, 'right process id';
+is $prefork->check_pid, $$, 'right process id';
 my $pid = $prefork->pid_file;
 ok -e $pid, 'process id file has been created';
 my $lock = $prefork->lock_file;

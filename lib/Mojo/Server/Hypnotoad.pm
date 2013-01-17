@@ -94,7 +94,7 @@ sub _hot_deploy {
   my $self = shift;
 
   # Make sure server is running
-  return unless my $pid = $self->{prefork}->pid_from_file;
+  return unless my $pid = $self->{prefork}->check_pid;
 
   # Start hot deployment
   kill 'USR2', $pid;
@@ -139,7 +139,7 @@ sub _reap {
 
 sub _stop {
   _exit('Hypnotoad server not running.')
-    unless my $pid = shift->{prefork}->pid_from_file;
+    unless my $pid = shift->{prefork}->check_pid;
   kill 'QUIT', $pid;
   _exit("Stopping Hypnotoad server $pid gracefully.");
 }

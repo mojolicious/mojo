@@ -26,8 +26,8 @@ sub run {
   my ($self, $app) = @_;
 
   # Prepare environment
-  $SIG{CHLD} = sub { $self->_reap };
-  $SIG{INT} = $SIG{TERM} = $SIG{QUIT} = sub {
+  local $SIG{CHLD} = sub { $self->_reap };
+  local $SIG{INT} = local $SIG{TERM} = local $SIG{QUIT} = sub {
     $self->{finished} = 1;
     kill 'TERM', $self->{running} if $self->{running};
   };

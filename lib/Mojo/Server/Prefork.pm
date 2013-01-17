@@ -149,9 +149,9 @@ sub _pid_file {
   # Create PID file
   $self->app->log->info(qq{Creating process id file "$file".});
   die qq{Can't create process id file "$file": $!}
-    unless open my $pid, '>', $file;
-  chmod 0644, $pid;
-  print $pid $$;
+    unless open my $handle, '>', $file;
+  chmod 0644, $handle;
+  print $handle $$;
 }
 
 sub _reap {
@@ -171,7 +171,7 @@ sub _spawn {
 
   # Prepare lock file
   my $file = $self->{lock_file};
-  die qq{Can't open lock file "$file": $!} unless open my $lock, '>', $file;
+  die qq{Can't open lock file "$file": $!} unless open my $handle, '>', $file;
 
   # Change user/group
   my $loop = $self->setuidgid->ioloop;
@@ -186,19 +186,19 @@ sub _spawn {
         eval {
           local $SIG{ALRM} = sub { die "alarm\n" };
           my $old = ualarm $self->lock_timeout * 1000000;
-          $l = flock $lock, LOCK_EX;
+          $l = flock $handle, LOCK_EX;
           ualarm $old;
         };
         if ($@) { $l = $@ eq "alarm\n" ? 0 : die($@) }
       }
 
       # Non blocking
-      else { $l = flock $lock, LOCK_EX | LOCK_NB }
+      else { $l = flock $handle, LOCK_EX | LOCK_NB }
 
       return $l;
     }
   );
-  $loop->unlock(sub { flock $lock, LOCK_UN });
+  $loop->unlock(sub { flock $handle, LOCK_UN });
 
   # Heartbeat messages (stop sending during graceful stop)
   weaken $self;
@@ -483,8 +483,8 @@ implements the following new ones.
 
   my $pid = $prefork->pid_from_file;
 
-Get process id from C<pid_file> and clean up process id file if server is not
-running.
+Get process id for running server from C<pid_file> or delete it if it has been
+abandoned.
 
   say 'Server is not running' unless $prefork->pid_from_file;
 

@@ -390,8 +390,8 @@ Hide controller methods and attributes from routes.
 
   my $route = $r->lookup('foo');
 
-Find route by name with L<Mojolicious::Routes::Route/"find"> and cache the
-results.
+Find route by name with L<Mojolicious::Routes::Route/"find"> and cache all
+results for future lookups.
 
 =head2 route
 

@@ -1,12 +1,15 @@
 use Mojo::Base -strict;
 
+use Test::More;
+
 # Disable IPv6 and libev
 BEGIN {
   $ENV{MOJO_NO_IPV6} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
+  
+  #preventing 'Time::HiRes::ualarm(): unimplemented in this platform' on MS Windows
+  plan skip_all => "fork() not supported on $^O" if $^O eq 'MSWin32';
 }
-
-use Test::More;
 
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
   unless $ENV{TEST_PREFORK};

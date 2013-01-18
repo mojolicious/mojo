@@ -7,7 +7,7 @@ use IO::Poll 'POLLIN';
 use List::Util 'shuffle';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
-use Time::HiRes 'ualarm';
+use Time::HiRes ();
 
 has accepts         => 1000;
 has accept_interval => 0.025;
@@ -185,9 +185,9 @@ sub _spawn {
       if ($_[1]) {
         eval {
           local $SIG{ALRM} = sub { die "alarm\n" };
-          my $old = ualarm $self->lock_timeout * 1000000;
+          my $old = Time::HiRes::ualarm $self->lock_timeout * 1000000;
           $l = flock $handle, LOCK_EX;
-          ualarm $old;
+          Time::HiRes::ualarm $old;
         };
         if ($@) { $l = $@ eq "alarm\n" ? 0 : die($@) }
       }

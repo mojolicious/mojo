@@ -1,4 +1,7 @@
 
+3.82  2013-01-18
+  - Fixed Windows bugs in tests. (kmx, sri)
+
 3.81  2013-01-17
   - Added modules Mojo::Server::Prefork and Mojolicious::Command::prefork.
   - Added lookup method to Mojolicious::Routes.

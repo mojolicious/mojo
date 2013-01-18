@@ -592,26 +592,6 @@ request, response and stash.
 
   $app->log->debug($app->dumper({foo => 'bar'}));
 
-=head1 SUPPORT
-
-=head2 Web
-
-L<http://mojolicio.us>
-
-=head2 IRC
-
-C<#mojo> on C<irc.perl.org>
-
-=head2 Mailing-List
-
-L<http://groups.google.com/group/mojolicious>
-
-=head1 DEVELOPMENT
-
-=head2 Repository
-
-L<http://github.com/kraih/mojo>
-
 =head1 BUNDLED FILES
 
 The L<Mojolicious> distribution includes a few files with different licenses
@@ -912,5 +892,9 @@ Copyright (C) 2008-2013, Sebastian Riedel.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
+
+=head1 SEE ALSO
+
+L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut

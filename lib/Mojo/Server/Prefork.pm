@@ -180,7 +180,7 @@ sub _spawn {
   $loop->lock(
     sub {
 
-      # Blocking
+      # Blocking ("ualarm" can't be imported on Windows)
       my $l;
       if ($_[1]) {
         eval {

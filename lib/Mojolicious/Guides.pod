@@ -129,4 +129,11 @@ Fun oneliners using everything above.
 A lot more documentation and examples by many different authors can be found
 in the L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
 
+=head1 SUPPORT
+
+If you have any questions the documentation might not yet answer, don't
+hesitate to ask on the
+L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
+channel C<#mojo> on C<irc.perl.org>.
+
 =cut

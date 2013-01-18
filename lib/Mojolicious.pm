@@ -40,7 +40,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Rainbow';
-our $VERSION  = '3.82';
+our $VERSION  = '3.83';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -314,12 +314,11 @@ contain more information.
 The router, defaults to a L<Mojolicious::Routes> object. You use this in your
 startup method to define the url endpoints for your application.
 
-  sub startup {
-    my $self = shift;
+  # Add route
+  $app->routes->get('/:controller/:action')->to('test#welcome');
 
-    my $r = $self->routes;
-    $r->get('/:controller/:action')->to('test#welcome');
-  }
+  # Add another namespace to load controllers from
+  push @{$app->routes->namespaces}, 'MyApp::Controller';
 
 =head2 secret
 

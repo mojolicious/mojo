@@ -55,11 +55,11 @@ sub cookies {
 }
 
 sub extract_start_line {
-  my ($self, $bufferref) = @_;
+  my ($self, $bufref) = @_;
 
   # Ignore any leading empty lines
-  $$bufferref =~ s/^\s+//;
-  return undef unless defined(my $line = get_line $bufferref);
+  $$bufref =~ s/^\s+//;
+  return undef unless defined(my $line = get_line $bufref);
 
   # We have a (hopefully) full request line
   $self->error('Bad request start line', 400) and return undef

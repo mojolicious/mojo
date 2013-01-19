@@ -20,9 +20,6 @@ use constant {
   PC_INITIAL_N    => 128
 };
 
-# Punycode delimiter
-my $DELIMITER = chr 0x2D;
-
 # To update HTML5 entities run this command
 # perl examples/entities.pl > lib/Mojo/entities.txt
 my %ENTITIES;
@@ -147,20 +144,19 @@ sub monkey_patch {
   *{"${class}::$_"} = $patch{$_} for keys %patch;
 }
 
+# Direct translation of RFC 3492
 sub punycode_decode {
   my $input = shift;
   use integer;
 
-  # Defaults
+  # Delimiter
+  my @output;
+  push @output, split //, $1 if $input =~ s/(.*)\x2d//s;
+
+  # Decode
   my $n    = PC_INITIAL_N;
   my $i    = 0;
   my $bias = PC_INITIAL_BIAS;
-  my @output;
-
-  # Delimiter
-  if ($input =~ s/(.*)$DELIMITER//s) { push @output, split //, $1 }
-
-  # Decode (direct translation of RFC 3492)
   while (length $input) {
     my $oldi = $i;
     my $w    = 1;
@@ -184,47 +180,38 @@ sub punycode_decode {
     $n += $i / (@output + 1);
     $i = $i % (@output + 1);
 
-    # Insert
-    splice @output, $i, 0, chr($n);
-    $i++;
+    splice @output, $i++, 0, chr $n;
   }
 
   return join '', @output;
 }
 
+# Direct translation of RFC 3492
 sub punycode_encode {
+  my $output = shift;
   use integer;
 
-  # Defaults
-  my $output = shift;
-  my $len    = length $output;
-
   # Split input
-  my @input = map ord, split //, $output;
+  my $len   = length $output;
+  my @input = map {ord} split //, $output;
   my @chars = sort grep { $_ >= PC_INITIAL_N } @input;
 
-  # Remove non basic characters
+  # Handle non basic characters
   $output =~ s/[^\x00-\x7f]+//gs;
-
-  # Non basic characters in input
   my $h = my $b = length $output;
-  $output .= $DELIMITER if $b > 0;
+  $output .= "\x2d" if $b > 0;
 
-  # Defaults
+  # Encode
   my $n     = PC_INITIAL_N;
   my $delta = 0;
   my $bias  = PC_INITIAL_BIAS;
-
-  # Encode (direct translation of RFC 3492)
   for my $m (@chars) {
 
     # Basic character
     next if $m < $n;
 
-    # Delta
-    $delta += ($m - $n) * ($h + 1);
-
     # Walk all code points in order
+    $delta += ($m - $n) * ($h + 1);
     $n = $m;
     for (my $i = 0; $i < $len; $i++) {
       my $c = $input[$i];

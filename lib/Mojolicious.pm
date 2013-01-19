@@ -314,8 +314,10 @@ contain more information.
 The router, defaults to a L<Mojolicious::Routes> object. You use this in your
 startup method to define the url endpoints for your application.
 
-  # Add route
-  $app->routes->get('/:controller/:action')->to('test#welcome');
+  # Add routes
+  my $r = $app->routes;
+  $r->get('/foo/bar')->to('test#foo', title => 'Hello Mojo!');
+  $r->post('/baz')->to('test#baz');
 
   # Add another namespace to load controllers from
   push @{$app->routes->namespaces}, 'MyApp::Controller';

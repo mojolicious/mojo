@@ -17,7 +17,6 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Check options
   GetOptionsFromArray \@args, 'v|verbose' => \my $verbose;
   my $code = shift @args || '';
 

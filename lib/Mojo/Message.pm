@@ -307,13 +307,13 @@ sub _nest {
 sub _parse_formdata {
   my $self = shift;
 
-  # Check content
+  # Check for multipart content
   my @formdata;
   my $content = $self->content;
   return \@formdata unless $content->is_multipart;
   my $charset = $content->charset || $self->default_charset;
 
-  # Walk tree
+  # Check all parts for form data
   my @parts;
   push @parts, $content;
   while (my $part = shift @parts) {
@@ -324,20 +324,18 @@ sub _parse_formdata {
       next;
     }
 
-    # Content-Disposition header
+    # Extract information from Content-Disposition header
     my $disposition = $part->headers->content_disposition;
     next unless $disposition;
     my ($name)     = $disposition =~ /[; ]name="?([^";]+)"?/;
     my ($filename) = $disposition =~ /[; ]filename="?([^"]*)"?/;
-    my $value      = $part;
-
-    # Decode
     if ($charset) {
       $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;
     }
 
-    # Form value
+    # Upload
+    my $value = $part;
     unless (defined $filename) {
       $value = $part->asset->slurp;
       $value = decode($charset, $value) // $value if $charset;

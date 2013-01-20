@@ -301,7 +301,7 @@ sub _render {
     $content .= '>';
   }
 
-  # Walk tree
+  # Render whole tree
   $content .= $self->_render($tree->[$_]) for $start .. $#$tree;
 
   # End tag

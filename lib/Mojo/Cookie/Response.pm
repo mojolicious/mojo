@@ -23,7 +23,6 @@ sub expires {
 sub parse {
   my ($self, $string) = @_;
 
-  # Walk tree
   my @cookies;
   for my $token ($self->_tokenize($string)) {
     for my $i (0 .. $#$token) {

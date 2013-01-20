@@ -76,7 +76,6 @@ sub charset { shift->_html(charset => @_) }
 sub children {
   my ($self, $type) = @_;
 
-  # Walk tree
   my @children;
   my $charset = $self->charset;
   my $xml     = $self->xml;
@@ -118,11 +117,9 @@ sub find {
 sub namespace {
   my $self = shift;
 
-  # Namespace prefix
+  # Extract namespace prefix and search parents
   return '' if (my $current = $self->tree)->[0] eq 'root';
   my $ns = $current->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
-
-  # Walk tree
   while ($current) {
     last if $current->[0] eq 'root';
 
@@ -341,7 +338,6 @@ sub _sibling {
 sub _text {
   my ($elements, $recurse, $trim) = @_;
 
-  # Walk tree
   my $text = '';
   for my $e (@$elements) {
     my $type = $e->[0];

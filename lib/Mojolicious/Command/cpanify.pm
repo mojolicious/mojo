@@ -19,7 +19,6 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Check options
   GetOptionsFromArray \@args,
     'p|password=s' => \(my $password = ''),
     'u|user=s'     => \(my $user     = '');

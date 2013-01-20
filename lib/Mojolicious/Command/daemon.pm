@@ -28,7 +28,6 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Check options
   my $daemon = Mojo::Server::Daemon->new(app => $self->app);
   GetOptionsFromArray \@args,
     'b|backlog=i'    => sub { $daemon->backlog($_[1]) },
@@ -40,7 +39,6 @@ sub run {
     'r|requests=i' => sub { $daemon->max_requests($_[1]) },
     'u|user=s'     => sub { $daemon->user($_[1]) };
 
-  # Start
   $daemon->listen(\@listen) if @listen;
   $daemon->run;
 }

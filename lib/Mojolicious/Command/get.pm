@@ -38,7 +38,6 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Options
   GetOptionsFromArray \@args,
     'C|charset=s' => \my $charset,
     'c|content=s' => \(my $content = ''),
@@ -66,7 +65,7 @@ sub run {
   # Application
   else { $ua->app($self->app) }
 
-  # Start
+  # Do the real work with "start" event
   my $v = my $buffer = '';
   $ua->on(
     start => sub {
@@ -107,15 +106,13 @@ sub run {
 
           # Ignore intermediate content
           return if $redirect && $res->is_status_class(300);
-
-          # Chunk
           $selector ? ($buffer .= pop) : print(pop);
         }
       );
     }
   );
 
-  # Get
+  # Perform request
   STDOUT->autoflush(1);
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
 
@@ -149,11 +146,11 @@ sub _say {
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;
 
-  # Find
+  # Find elements for selector
   my $dom     = Mojo::DOM->new->charset($charset)->parse($buffer);
   my $results = $dom->find($selector);
 
-  # Commands
+  # Process commands
   my $finished;
   while (defined(my $command = shift @args)) {
 
@@ -180,7 +177,6 @@ sub _select {
     $finished++;
   }
 
-  # Render
   unless ($finished) { _say($_) for @$results }
 }
 

@@ -45,7 +45,6 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Check options
   my $prefork = Mojo::Server::Prefork->new(app => $self->app);
   GetOptionsFromArray \@args,
     'A|accepts=i'           => sub { $prefork->accepts($_[1]) },
@@ -67,7 +66,6 @@ sub run {
     'u|user=s'     => sub { $prefork->user($_[1]) },
     'w|workers=i'  => sub { $prefork->workers($_[1]) };
 
-  # Start
   $prefork->listen(\@listen) if @listen;
   $prefork->run;
 }

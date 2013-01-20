@@ -169,7 +169,6 @@ sub _finish {
 sub _listen {
   my ($self, $listen) = @_;
 
-  # Options
   my $url     = Mojo::URL->new($listen);
   my $query   = $url->query;
   my $options = {

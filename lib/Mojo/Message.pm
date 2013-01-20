@@ -318,7 +318,7 @@ sub _parse_formdata {
   push @parts, $content;
   while (my $part = shift @parts) {
 
-    # Multipart
+    # Nested multipart content
     if ($part->is_multipart) {
       unshift @parts, @{$part->parts};
       next;
@@ -334,7 +334,7 @@ sub _parse_formdata {
       $filename = decode($charset, $filename) // $filename if $filename;
     }
 
-    # Upload
+    # Check for file upload
     my $value = $part;
     unless (defined $filename) {
       $value = $part->asset->slurp;

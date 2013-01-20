@@ -21,7 +21,6 @@ sub throw { die shift->new->trace(2)->_detect(@_) }
 sub to_string {
   my $self = shift;
 
-  # Message
   return $self->message unless $self->verbose;
   my $string = $self->message ? $self->message : '';
 
@@ -88,7 +87,6 @@ sub _context {
 sub _detect {
   my ($self, $msg, $files) = @_;
 
-  # Message
   return $msg if blessed $msg && $msg->isa('Mojo::Exception');
   $self->message($msg);
 

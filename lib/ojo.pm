@@ -11,7 +11,7 @@ use Mojo::Util 'monkey_patch';
 # Silent oneliners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 
-# User agent
+# Singleton user agent for oneliners
 my $UA = Mojo::UserAgent->new;
 
 sub import {
@@ -21,13 +21,10 @@ sub import {
   eval "package $caller; use Mojolicious::Lite;";
   $UA->app($caller->app);
 
-  # Allow redirects
   $UA->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
-
-  # Detect proxy
   $UA->detect_proxy unless defined $ENV{MOJO_PROXY};
 
-  # Functions
+  # The ojo DSL
   monkey_patch $caller,
     a => sub { $caller->can('any')->(@_) and return $UA->app },
     b => \&b,

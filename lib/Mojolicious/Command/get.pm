@@ -45,25 +45,21 @@ sub run {
     'M|method=s'  => \(my $method = 'GET'),
     'r|redirect'  => \my $redirect,
     'v|verbose'   => \my $verbose;
-  $verbose = 1 if $method eq 'HEAD';
 
-  # Headers
-  my %headers;
-  /^\s*([^:]+)\s*:\s*(.+)$/ and $headers{$1} = $2 for @headers;
-
-  # URL and selector
   die $self->usage unless my $url = decode 'UTF-8', shift @args // '';
   my $selector = shift @args;
 
-  # Fresh user agent
+  # Parse header pairs
+  my %headers;
+  /^\s*([^:]+)\s*:\s*(.+)$/ and $headers{$1} = $2 for @headers;
+
+  # Use global event loop singleton
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   $ua->max_redirects(10) if $redirect;
 
-  # Absolute URL
-  if ($url !~ m!/!) { $ua->detect_proxy }
-
-  # Application
-  else { $ua->app($self->app) }
+  # Detect proxy for absolute URLs
+  if   ($url !~ m!/!) { $ua->detect_proxy }
+  else                { $ua->app($self->app) }
 
   # Do the real work with "start" event
   my $v = my $buffer = '';
@@ -71,7 +67,6 @@ sub run {
     start => sub {
       my $tx = pop;
 
-      # Prepare request information
       my $req         = $tx->req;
       my $startline   = $req->build_start_line;
       my $req_headers = $req->build_headers;
@@ -85,18 +80,16 @@ sub run {
         return unless $v && $res->headers->is_finished;
         $v = undef;
 
-        # Request
+        # Show request
         warn "$startline$req_headers";
 
-        # Response
+        # Show response
         my $version     = $res->version;
         my $code        = $res->code;
         my $msg         = $res->message;
         my $res_headers = $res->headers->to_string;
         warn "HTTP/$version $code $msg\n$res_headers\n\n";
       };
-
-      # Progress
       $tx->res->on(progress => $cb);
 
       # Stream content
@@ -112,11 +105,10 @@ sub run {
     }
   );
 
-  # Perform request
+  # Perform request and handle errors
+  $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
-
-  # Error
   my ($err, $code) = $tx->error;
   $url = encode 'UTF-8', $url;
   warn qq{Problem loading URL "$url". ($err)\n} if $err && !$code;

@@ -78,7 +78,7 @@ sub new {
   $r->hide(qw(rendered req res respond_to send session signed_cookie stash));
   $r->hide(qw(tx ua url_for write write_chunk));
 
-  # Prepare log
+  # Check if we have a log directory
   my $mode = $self->mode;
   $self->log->path($home->rel_file("log/$mode.log"))
     if -w $home->rel_file('log');
@@ -145,12 +145,12 @@ sub handler {
     = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{$_} for qw(app tx);
 
-  # Dispatcher
+  # Dispatcher has to be last in the chain
   ++$self->{dispatch}
     and $self->hook(around_dispatch => sub { $_[1]->app->dispatch($_[1]) })
     unless $self->{dispatch};
 
-  # Process
+  # Process with chain
   unless (eval { $self->plugins->emit_chain(around_dispatch => $c) }) {
     $self->log->fatal("Processing request failed: $@");
     $tx->res->code(500);

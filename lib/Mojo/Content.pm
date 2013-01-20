@@ -293,12 +293,8 @@ sub _parse_until_body {
 
   # Parser started
   unless ($self->{state}) {
-
-    # Update size
     $self->{header_size} = $self->{raw_size} - length $self->{pre_buffer};
-
-    # Headers
-    $self->{state} = 'headers';
+    $self->{state}       = 'headers';
   }
 
   # Parse headers

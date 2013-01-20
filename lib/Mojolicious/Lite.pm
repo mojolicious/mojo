@@ -22,18 +22,18 @@ sub import {
   push @{"${caller}::ISA"}, 'Mojo';
   my $app = shift->new;
 
-  # Moniker
+  # Generate moniker based on filename
   my $moniker = basename $ENV{MOJO_EXE};
   $moniker =~ s/\.(?:pl|pm|t)$//i;
   $app->moniker($moniker);
 
-  # Initialize routes
+  # Initialize routes without namespaces
   my $routes = $app->routes->namespaces([]);
 
   # Default static and template class
   $app->static->classes->[0] = $app->renderer->classes->[0] = $caller;
 
-  # Functions
+  # The Mojolicious::Lite DSL
   my $root = $routes;
   for my $name (qw(any get options patch post put websocket)) {
     monkey_patch $caller, $name, sub { $routes->$name(@_) };

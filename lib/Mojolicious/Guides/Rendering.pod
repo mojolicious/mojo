@@ -944,7 +944,7 @@ a new C<handler> when C<register> is called.
     $app->renderer->add_handler(mine => sub {
       my ($renderer, $c, $output, $options) = @_;
 
-      # Check for one time use inline template
+      # Check for one-time use inline template
       my $inline = $options->{inline};
 
       # Check for absolute template path

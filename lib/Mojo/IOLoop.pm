@@ -48,7 +48,7 @@ sub acceptor {
   weaken $acceptor->reactor($self->reactor)->{reactor};
   $self->{accepts} = $self->max_accepts if $self->max_accepts;
 
-  # Stop accepting
+  # Stop accepting so new acceptor can get picked up
   $self->_not_accepting;
 
   return $id;
@@ -144,7 +144,7 @@ sub server {
         if defined $self->{accepts}
         && ($self->{accepts} -= int(rand 2) + 1) <= 0;
 
-      # Stop accepting
+      # Stop accepting to release accept mutex
       $self->_not_accepting;
     }
   );
@@ -273,7 +273,7 @@ sub _stream {
   $self->{connections}{$id}{stream} = $stream;
   weaken $stream->reactor($self->reactor)->{reactor};
 
-  # Stream
+  # Start streaming
   weaken $self;
   $stream->on(close => sub { $self->{connections}{$id}{finish} = 1 });
   $stream->start;

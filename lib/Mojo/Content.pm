@@ -44,7 +44,7 @@ sub generate_body_chunk {
   $self->emit(drain => $offset)
     if !delete $self->{delay} && !length($self->{body_buffer} // '');
 
-  # Get chunk
+  # Empty buffer
   my $chunk = delete $self->{body_buffer} // '';
 
   # EOF or delay
@@ -171,10 +171,10 @@ sub write {
   $self->{dynamic} = 1;
   if (defined $chunk) { $self->{body_buffer} .= $chunk }
 
-  # Delay
+  # Delay content generation
   else { $self->{delay} = 1 }
 
-  # Drain
+  # Add one-time drain event
   $self->once(drain => $cb) if $cb;
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
 
@@ -260,7 +260,7 @@ sub _parse_chunked {
 sub _parse_chunked_trailing_headers {
   my $self = shift;
 
-  # Parse
+  # Parse and empty buffer
   my $headers = $self->headers->parse(delete $self->{pre_buffer});
   return unless $headers->is_finished;
   $self->{chunk_state} = 'finished';
@@ -273,7 +273,7 @@ sub _parse_chunked_trailing_headers {
 sub _parse_headers {
   my $self = shift;
 
-  # Parse
+  # Parse and empty buffer
   my $headers = $self->headers->parse(delete $self->{pre_buffer});
   return unless $headers->is_finished;
   $self->{state} = 'body';

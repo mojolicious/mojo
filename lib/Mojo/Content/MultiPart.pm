@@ -78,7 +78,7 @@ sub get_body_chunk {
   my $len          = $boundary_len - 2;
   return substr "--$boundary\x0d\x0a", $offset if $len > $offset;
 
-  # Parts
+  # Prepare content part by part
   my $parts = $self->parts;
   for (my $i = 0; $i < @$parts; $i++) {
     my $part = $parts->[$i];
@@ -172,7 +172,7 @@ sub _parse_multipart_preamble {
 sub _read {
   my ($self, $chunk) = @_;
 
-  # Parse
+  # Buffer chunk and parse multipart content
   $self->{multipart} .= $chunk;
   my $boundary = $self->boundary;
   until (($self->{multi_state} //= 'multipart_preamble') eq 'finished') {

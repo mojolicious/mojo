@@ -44,7 +44,7 @@ sub body_params {
   my $self = shift;
   return $self->{body_params} if $self->{body_params};
 
-  # Charset
+  # Detect charset
   my $params = $self->{body_params} = Mojo::Parameters->new;
   $params->charset($self->content->charset || $self->default_charset);
 
@@ -198,7 +198,6 @@ sub parse {
     return $self->error('Maximum line size exceeded', 431)
       if $len > $self->max_line_size;
 
-    # Extract
     $self->{state} = 'content' if $self->extract_start_line(\$self->{buffer});
   }
 
@@ -235,11 +234,7 @@ sub upload {
 sub uploads {
   my $self = shift;
 
-  # Only multipart messages have uploads
   my @uploads;
-  return \@uploads unless $self->is_multipart;
-
-  # Extract formdata
   my $formdata = $self->_parse_formdata;
   for my $data (@$formdata) {
     my ($name, $filename, $part) = @$data;

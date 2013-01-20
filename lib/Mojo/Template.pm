@@ -29,8 +29,6 @@ sub build {
   # Lines
   my (@lines, $cpst, $multi);
   for my $line (@{$self->tree}) {
-
-    # New line
     push @lines, '';
     for (my $j = 0; $j < @{$line}; $j += 2) {
       my $type    = $line->[$j];
@@ -123,7 +121,7 @@ sub interpret {
   my $output = eval { $compiled->(@_) };
   return $output unless $@;
 
-  # Exception
+  # Exception with template context
   return Mojo::Exception->new($@, [$self->template])->verbose(1);
 }
 
@@ -270,14 +268,12 @@ sub render {
 sub render_file {
   my ($self, $path) = (shift, shift);
 
-  # Slurp file
   $self->name($path) unless defined $self->{name};
-  my $tmpl = slurp $path;
-
-  # Decode and render
+  my $tmpl     = slurp $path;
   my $encoding = $self->encoding;
   croak qq{Template "$path" has invalid encoding.}
     if $encoding && !defined($tmpl = decode $encoding, $tmpl);
+
   return $self->render($tmpl, @_);
 }
 

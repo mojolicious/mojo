@@ -57,7 +57,7 @@ sub server_write { shift->_write(1) }
 sub _body {
   my ($self, $msg, $finish) = @_;
 
-  # Chunk
+  # Prepare chunk
   my $buffer = $msg->get_body_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write} = $msg->is_dynamic ? 1 : ($self->{write} - $written);
@@ -80,7 +80,7 @@ sub _body {
 sub _headers {
   my ($self, $msg, $head) = @_;
 
-  # Chunk
+  # Prepare chunk
   my $buffer = $msg->get_header_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write}  = $self->{write} - $written;
@@ -107,7 +107,7 @@ sub _headers {
 sub _start_line {
   my ($self, $msg) = @_;
 
-  # Chunk
+  # Prepare chunk
   my $buffer = $msg->get_start_line_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write}  = $self->{write} - $written;

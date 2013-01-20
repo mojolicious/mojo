@@ -15,8 +15,6 @@ sub expires {
     ? Mojo::Date->new($self->{expires})
     : $self->{expires}
     unless @_;
-
-  # New expires value
   $self->{expires} = shift;
 
   return $self;

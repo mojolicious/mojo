@@ -6,11 +6,9 @@ has 'nph';
 sub run {
   my $self = shift;
 
-  # Environment
+  # Prepare transaction and store connection information
   my $tx  = $self->build_tx;
   my $req = $tx->req->parse(\%ENV);
-
-  # Store connection information
   $tx->local_port($ENV{SERVER_PORT})->remote_address($ENV{REMOTE_ADDR});
 
   # Request body
@@ -20,7 +18,7 @@ sub run {
     $req->parse($buffer);
   }
 
-  # Handle
+  # Handle request
   $self->emit(request => $tx);
 
   # Response start line
@@ -48,7 +46,6 @@ sub run {
 sub _write {
   my ($res, $method) = @_;
 
-  # Write chunks to STDOUT
   my $offset = 0;
   while (1) {
 
@@ -58,7 +55,7 @@ sub _write {
     # End of part
     last unless my $len = length $chunk;
 
-    # Part
+    # Make sure we can still write
     $offset += $len;
     return undef unless STDOUT->opened;
     print STDOUT $chunk;

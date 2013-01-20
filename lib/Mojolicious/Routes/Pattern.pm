@@ -24,11 +24,8 @@ sub parse {
   # Make sure we have a viable pattern
   my $pattern = @_ % 2 ? (shift || '/') : '/';
   $pattern = "/$pattern" unless $pattern =~ m!^/!;
-
-  # Constraints
   $self->constraints({@_});
 
-  # Tokenize
   return $pattern eq '/' ? $self : $self->pattern($pattern)->_tokenize;
 }
 
@@ -152,7 +149,6 @@ sub _compile {
       $compiled .= '?' if $optional;
     }
 
-    # Add to block
     $block = "$compiled$block";
   }
 
@@ -195,7 +191,7 @@ sub _tokenize {
   my $relaxed     = $self->relaxed_start;
   my $wildcard    = $self->wildcard_start;
 
-  # Parse the pattern character wise
+  # Parse char by char
   my $pattern = $self->pattern;
   my $state   = 'text';
   my (@tree, $quoted);

@@ -69,7 +69,7 @@ sub _all {
   # Ignore everything after __END__
   $content =~ s/\n__END__\r?\n.*$/\n/s;
 
-  # Split
+  # Split files
   my @data = split /^@@\s*(.+?)\s*\r?\n/m, $content;
   shift @data;
 

@@ -30,7 +30,6 @@ sub canonicalize {
     # "."
     next if grep { $_ eq $part } '.', '';
 
-    # Part
     push @parts, $part;
   }
   $self->trailing_slash(undef) unless @parts;

@@ -28,7 +28,7 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Options
+  # Check options
   my $daemon = Mojo::Server::Daemon->new(app => $self->app);
   GetOptionsFromArray \@args,
     'b|backlog=i'    => sub { $daemon->backlog($_[1]) },

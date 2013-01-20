@@ -210,7 +210,6 @@ sub send {
   $self->{write} .= $self->build_frame(@$frame);
   $self->{state} = 'write';
 
-  # Resume
   return $self->emit('resume');
 }
 
@@ -230,13 +229,11 @@ sub server_handshake {
 sub server_read {
   my ($self, $chunk) = @_;
 
-  # Parse frames
   $self->{read} .= $chunk // '';
   while (my $frame = $self->parse_frame(\$self->{read})) {
     $self->emit(frame => $frame);
   }
 
-  # Resume
   $self->emit('resume');
 }
 

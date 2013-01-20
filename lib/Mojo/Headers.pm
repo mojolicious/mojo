@@ -134,7 +134,6 @@ sub remove {
 sub to_hash {
   my ($self, $multi) = @_;
 
-  # Build
   my %hash;
   for my $header (@{$self->names}) {
     my @headers = $self->header($header);

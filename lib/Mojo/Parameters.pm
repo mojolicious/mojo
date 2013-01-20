@@ -88,16 +88,12 @@ sub params {
     # W3C suggests to also accept ";" as a separator
     my $charset = $self->charset;
     for my $pair (split /[\&\;]+/, $string) {
-
-      # Parse
       $pair =~ /^([^=]*)(?:=(.*))?$/;
       my $name  = $1 // '';
       my $value = $2 // '';
 
-      # Replace "+" with whitespace
+      # Replace "+" with whitespace, unescape and decode
       s/\+/ /g for $name, $value;
-
-      # Unescape
       $name  = url_unescape $name;
       $name  = decode($charset, $name) // $name if $charset;
       $value = url_unescape $value;
@@ -126,7 +122,6 @@ sub remove {
   my $self = shift;
   my $name = shift // '';
 
-  # Remove
   my $params = $self->params;
   for (my $i = 0; $i < @$params;) {
     if ($params->[$i] eq $name) { splice @$params, $i, 2 }
@@ -188,7 +183,6 @@ sub to_string {
     push @pairs, defined $value ? "$name=$value" : $name;
   }
 
-  # Concatenate pairs
   return join $self->pair_separator, @pairs;
 }
 

@@ -45,7 +45,7 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Options
+  # Check options
   my $prefork = Mojo::Server::Prefork->new(app => $self->app);
   GetOptionsFromArray \@args,
     'A|accepts=i'           => sub { $prefork->accepts($_[1]) },

@@ -36,13 +36,11 @@ my $TOKEN_RE        = qr/
 sub select {
   my $self = shift;
 
-  # Compile selectors
-  my $pattern = $self->_compile(shift);
-
-  # Walk tree
+  # Compile selectors and walk tree
   my @results;
-  my $tree  = $self->tree;
-  my @queue = ($tree);
+  my $pattern = $self->_compile(shift);
+  my $tree    = $self->tree;
+  my @queue   = ($tree);
   while (my $current = shift @queue) {
     my $type = $current->[0];
 

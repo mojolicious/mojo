@@ -4,11 +4,9 @@ use Mojo::Base 'Mojo::Server';
 sub run {
   my ($self, $env) = @_;
 
-  # Environment
+  # Prepare transaction and store connection information
   my $tx  = $self->build_tx;
   my $req = $tx->req->parse($env);
-
-  # Store connection information
   $tx->local_port($env->{SERVER_PORT})->remote_address($env->{REMOTE_ADDR});
 
   # Request body
@@ -20,7 +18,7 @@ sub run {
     last if ($len -= $read) <= 0;
   }
 
-  # Handle
+  # Handle request
   $self->emit(request => $tx);
 
   # Response headers
@@ -59,7 +57,6 @@ sub getline {
   # End of content
   return undef unless length $chunk;
 
-  # Content
   $self->{offset} += length $chunk;
   return $chunk;
 }

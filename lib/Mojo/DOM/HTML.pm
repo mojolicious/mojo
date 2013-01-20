@@ -269,14 +269,10 @@ sub _render {
   # Processing instruction
   return "<?" . $tree->[1] . "?>" if $e eq 'pi';
 
-  # Offset
-  my $start = $e eq 'root' ? 1 : 2;
-
   # Start tag
+  my $start = $e eq 'root' ? 1 : 2;
   my $content = '';
   if ($e eq 'tag') {
-
-    # Offset
     $start = 4;
 
     # Open tag

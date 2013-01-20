@@ -157,7 +157,7 @@ sub render {
   my $args = ref $_[0] ? $_[0] : {@_};
   $args->{template} = $template if $template;
 
-  # Template
+  # Detect template name
   my $stash = $self->stash;
   unless ($args->{template} || $stash->{template}) {
 
@@ -458,7 +458,7 @@ sub _fallbacks {
   # Mode specific template
   return 1 if $self->render($options);
 
-  # Template
+  # Normal template
   $options->{template} = $template;
   return 1 if $self->render($options);
 

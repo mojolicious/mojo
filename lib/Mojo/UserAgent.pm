@@ -388,13 +388,12 @@ sub _remove {
 sub _redirect {
   my ($self, $c, $old) = @_;
 
-  # Try to build followup transaction
-  return undef unless my $new = $self->transactor->redirect($old);
-
   # Follow redirect unless the maximum has been reached already
+  return undef unless my $new = $self->transactor->redirect($old);
   my $redirects = delete $c->{redirects} || 0;
   return undef unless $redirects < $self->max_redirects;
   my $id = $self->_start($new, delete $c->{cb});
+
   return $self->{connections}{$id}{redirects} = $redirects + 1;
 }
 
@@ -462,18 +461,18 @@ sub _start {
 sub _upgrade {
   my ($self, $id) = @_;
 
-  # Try to upgrade transaction
   my $c = $self->{connections}{$id};
   return undef unless my $new = $self->transactor->upgrade($c->{tx});
   weaken $self;
   $new->on(resume => sub { $self->_write($id) });
+
   return $c->{tx} = $new;
 }
 
 sub _write {
   my ($self, $id) = @_;
 
-  # Get chunk
+  # Get and write chunk
   return unless my $c  = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
@@ -481,8 +480,6 @@ sub _write {
   my $chunk = $tx->client_write;
   delete $c->{writing};
   warn "-- Client >>> Server (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
-
-  # Write chunk
   my $stream = $self->_loop->stream($id)->write($chunk);
   $self->_handle($id) if $tx->is_finished;
 

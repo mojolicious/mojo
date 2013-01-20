@@ -145,8 +145,6 @@ sub parse {
       $self->_uncompress($chunk);
       $self->{size} += length $chunk;
     }
-
-    # Finished
     $self->{state} = 'finished' if $len <= $self->progress;
   }
 
@@ -169,10 +167,8 @@ sub progress {
 sub write {
   my ($self, $chunk, $cb) = @_;
 
-  # Dynamic content
+  # Buffer chunk
   $self->{dynamic} = 1;
-
-  # Add chunk
   if (defined $chunk) { $self->{body_buffer} .= $chunk }
 
   # Delay
@@ -180,8 +176,6 @@ sub write {
 
   # Drain
   $self->once(drain => $cb) if $cb;
-
-  # Finish
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
 
   return $self;
@@ -189,23 +183,15 @@ sub write {
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
-
-  # Chunked transfer encoding
   $self->headers->transfer_encoding('chunked') unless $self->is_chunked;
-
-  # Write
   $self->write(defined $chunk ? $self->_build_chunk($chunk) : $chunk, $cb);
-
-  # Finish
   $self->{eof} = 1 if defined $chunk && $chunk eq '';
-
   return $self;
 }
 
 sub _build {
   my ($self, $method) = @_;
 
-  # Build part from chunks
   my $buffer = '';
   my $offset = 0;
   while (1) {
@@ -216,7 +202,6 @@ sub _build {
     # End of part
     last unless my $len = length $chunk;
 
-    # Part
     $offset += $len;
     $buffer .= $chunk;
   }
@@ -302,7 +287,7 @@ sub _parse_headers {
 sub _parse_until_body {
   my ($self, $chunk) = @_;
 
-  # Add chunk
+  # Buffer chunk
   $self->{raw_size} += length($chunk //= '');
   $self->{pre_buffer} .= $chunk;
 

@@ -72,7 +72,7 @@ sub run {
     die qq{Unknown command "$name", maybe you need to install it?\n}
       unless $module;
 
-    # Run
+    # Run command
     my $command = $module->new(app => $self->app);
     return $help ? $command->help(@args) : $command->run(@args);
   }

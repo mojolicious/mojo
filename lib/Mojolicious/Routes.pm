@@ -222,7 +222,7 @@ sub _method {
 sub _walk {
   my ($self, $c) = @_;
 
-  # Walk the stack
+  # Walk stack
   my $stack   = $c->match->stack;
   my $stash   = $c->stash;
   my $staging = @$stack;

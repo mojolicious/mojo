@@ -34,13 +34,13 @@ OPTIONAL
 
 EOF
 
-  # Latest version
+  # Check latest version
   my $latest = eval {
     my $ua = Mojo::UserAgent->new(max_redirects => 10)->detect_proxy;
     $ua->get('api.metacpan.org/v0/release/Mojolicious')->res->json->{version};
   };
 
-  # Message
+  # Friendly message
   return unless $latest;
   my $msg = 'This version is up to date, have fun!';
   $msg = 'Thanks for testing a development release, you are awesome!'

@@ -43,7 +43,7 @@ my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 sub decode {
   my ($self, $bytes) = @_;
 
-  # Cleanup
+  # Clean start
   $self->error(undef);
 
   # Missing input
@@ -256,22 +256,14 @@ sub _encode_array {
 
 sub _encode_object {
   my $object = shift;
-
-  # Encode pairs
   my @pairs = map { _encode_string($_) . ':' . _encode_values($object->{$_}) }
     keys %$object;
-
-  # Stringify
   return '{' . join(',', @pairs) . '}';
 }
 
 sub _encode_string {
   my $string = shift;
-
-  # Escape string
   $string =~ s!([\x00-\x1F\x7F\x{2028}\x{2029}\\"/\b\f\n\r\t])!$REVERSE{$1}!gs;
-
-  # Stringify
   return "\"$string\"";
 }
 
@@ -322,7 +314,6 @@ sub _exception {
     $context .= ' at line ' . @lines . ', offset ' . length(pop @lines || '');
   }
 
-  # Throw
   die "$context\n";
 }
 

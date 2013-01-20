@@ -15,7 +15,7 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Options
+  # Check options
   GetOptionsFromArray \@args, 'v|verbose' => \my $verbose;
 
   # Walk and draw

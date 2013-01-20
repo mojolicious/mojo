@@ -73,7 +73,6 @@ sub start {
 sub stop {
   my $self = shift;
 
-  # Pause accepting connections
   my $loop = $self->ioloop;
   while (my $id = shift @{$self->{acceptors}}) {
     my $server = $self->{servers}{$id} = $loop->acceptor($id);
@@ -89,8 +88,6 @@ sub _build_tx {
 
   # Build transaction
   my $tx = $self->build_tx->connection($id);
-
-  # Identify
   $tx->res->headers->server('Mojolicious (Perl)');
 
   # Store connection information
@@ -130,7 +127,6 @@ sub _close {
   # Finish gracefully
   if (my $tx = $self->{connections}{$id}{tx}) { $tx->server_close }
 
-  # Remove connection
   delete $self->{connections}{$id};
 }
 
@@ -198,11 +194,8 @@ sub _listen {
       # Add new connection
       my $c = $self->{connections}{$id} = {tls => $tls};
       warn "-- Accept (@{[$stream->handle->peerhost]})\n" if DEBUG;
-
-      # Inactivity timeout
       $stream->timeout($self->inactivity_timeout);
 
-      # Events
       $stream->on(close => sub { $self->_close($id) });
       $stream->on(
         error => sub {
@@ -228,11 +221,9 @@ sub _listen {
 sub _read {
   my ($self, $id, $chunk) = @_;
 
-  # Make sure we have a transaction
+  # Make sure we have a transaction and parse chunk
   my $c = $self->{connections}{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
-
-  # Parse chunk
   warn "-- Server <<< Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
 
@@ -259,13 +250,11 @@ sub _write {
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
 
-  # Get chunk
+  # Get chunk and write
   return if $c->{writing}++;
   my $chunk = $tx->server_write;
   delete $c->{writing};
   warn "-- Server >>> Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
-
-  # Write chunk
   my $stream = $self->ioloop->stream($id)->write($chunk);
 
   # Finish or continue writing

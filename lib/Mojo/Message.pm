@@ -42,8 +42,6 @@ sub body {
 
 sub body_params {
   my $self = shift;
-
-  # Cached
   return $self->{body_params} if $self->{body_params};
 
   # Charset
@@ -59,15 +57,9 @@ sub body_params {
   # "multipart/formdata"
   elsif ($type =~ m!multipart/form-data!i) {
     my $formdata = $self->_parse_formdata;
-
-    # Formdata
     for my $data (@$formdata) {
       my ($name, $filename, $value) = @$data;
-
-      # File
       next if defined $filename;
-
-      # Form value
       $params->append($name, $value);
     }
   }
@@ -143,14 +135,9 @@ sub fix_headers {
 sub get_body_chunk {
   my ($self, $offset) = @_;
 
-  # Progress
   $self->emit('progress', 'body', $offset);
-
-  # Chunk
   my $chunk = $self->content->get_body_chunk($offset);
   return $chunk if !defined $chunk || length $chunk;
-
-  # Finish
   $self->finish;
 
   return $chunk;
@@ -227,7 +214,6 @@ sub parse {
   return $self->error('Maximum buffer size exceeded', 400)
     if $self->content->is_limit_exceeded;
 
-  # Progress
   return $self->emit('progress')->content->is_finished ? $self->finish : $self;
 }
 
@@ -280,7 +266,6 @@ sub write_chunk { shift->_write(write_chunk => @_) }
 sub _build {
   my ($self, $method) = @_;
 
-  # Build part from chunks
   my $buffer = '';
   my $offset = 0;
   while (1) {
@@ -291,7 +276,6 @@ sub _build {
     # End of part
     last unless my $len = length $chunk;
 
-    # Part
     $offset += $len;
     $buffer .= $chunk;
   }
@@ -329,7 +313,7 @@ sub _parse_formdata {
   return \@formdata unless $content->is_multipart;
   my $charset = $content->charset || $self->default_charset;
 
-  # Walk the tree
+  # Walk tree
   my @parts;
   push @parts, $content;
   while (my $part = shift @parts) {

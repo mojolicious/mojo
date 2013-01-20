@@ -30,11 +30,7 @@ sub clone {
 
 sub get_body_chunk {
   my ($self, $offset) = @_;
-
-  # Body generator
   return $self->generate_body_chunk($offset) if $self->{dynamic};
-
-  # Normal content
   return $self->asset->get_chunk($offset);
 }
 

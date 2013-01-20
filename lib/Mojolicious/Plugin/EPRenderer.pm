@@ -39,7 +39,7 @@ sub register {
         # Be less relaxed for everything else
         $prepend .= 'use strict;';
 
-        # Stash
+        # Stash values
         $prepend .= 'my $_S = $self->stash;';
         $prepend .= " my \$$_ = \$_S->{'$_'};"
           for grep {/^\w+$/} keys %{$c->stash};

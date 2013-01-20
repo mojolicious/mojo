@@ -84,6 +84,7 @@ sub run {
 
         # Wait for headers
         return unless $v && $res->headers->is_finished;
+        $v = undef;
 
         # Request
         warn "$startline$req_headers";
@@ -94,9 +95,6 @@ sub run {
         my $msg         = $res->message;
         my $res_headers = $res->headers->to_string;
         warn "HTTP/$version $code $msg\n$res_headers\n\n";
-
-        # Finished
-        $v = undef;
       };
 
       # Progress

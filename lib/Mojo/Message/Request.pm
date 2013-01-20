@@ -100,7 +100,7 @@ sub fix_headers {
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
 
-  # Request line
+  # Prepare request line
   unless (defined $self->{start_buffer}) {
 
     # Path
@@ -128,10 +128,7 @@ sub get_start_line_chunk {
     $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";
   }
 
-  # Progress
   $self->emit(progress => 'start_line', $offset);
-
-  # Chunk
   return substr $self->{start_buffer}, $offset, 131072;
 }
 

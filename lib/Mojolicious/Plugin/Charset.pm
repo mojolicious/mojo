@@ -4,7 +4,6 @@ use Mojo::Base 'Mojolicious::Plugin';
 sub register {
   my ($self, $app, $conf) = @_;
 
-  # Change default charset on all layers
   return unless my $c = $conf->{charset};
   $app->types->type(html => "text/html;charset=$c");
   $app->renderer->encoding($c);

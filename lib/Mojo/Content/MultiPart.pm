@@ -150,8 +150,6 @@ sub _parse_multipart_boundary {
   my $end = "\x0d\x0a--$boundary--";
   if ((index $self->{multipart}, $end) == 0) {
     substr $self->{multipart}, 0, length $end, '';
-
-    # Finished
     $self->{multi_state} = 'finished';
   }
 

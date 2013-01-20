@@ -116,17 +116,14 @@ sub fix_headers {
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
 
-  # Status line
+  # Prepare status line
   unless (defined $self->{start_buffer}) {
     my $code = $self->code    || 404;
     my $msg  = $self->message || $self->default_message;
     $self->{start_buffer} = "HTTP/@{[$self->version]} $code $msg\x0d\x0a";
   }
 
-  # Progress
   $self->emit(progress => 'start_line', $offset);
-
-  # Chunk
   return substr $self->{start_buffer}, $offset, 131072;
 }
 

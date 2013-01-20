@@ -93,10 +93,8 @@ sub new {
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';
 
-  # Run mode
+  # Run mode before startup
   if (my $sub = $self->can("${mode}_mode")) { $self->$sub(@_) }
-
-  # Startup
   $self->startup(@_);
 
   return $self;

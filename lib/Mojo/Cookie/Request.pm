@@ -6,7 +6,6 @@ use Mojo::Util 'quote';
 sub parse {
   my ($self, $string) = @_;
 
-  # Walk tree
   my @cookies;
   for my $token (map {@$_} $self->_tokenize($string)) {
     my ($name, $value) = @$token;

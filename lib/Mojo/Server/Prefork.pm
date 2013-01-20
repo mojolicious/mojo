@@ -98,13 +98,9 @@ sub _heartbeat {
 sub _manage {
   my $self = shift;
 
-  # Housekeeping
+  # Spawn more workers and check PID file
   if (!$self->{finished}) {
-
-    # Spawn more workers
     $self->_spawn while keys %{$self->{pool}} < $self->workers;
-
-    # Check PID file
     $self->_pid_file;
   }
 

@@ -65,10 +65,8 @@ sub steal_handle {
 sub write {
   my ($self, $chunk, $cb) = @_;
 
-  # Prepare chunk for writing
-  $self->{buffer} .= $chunk;
-
   # Write with roundtrip
+  $self->{buffer} .= $chunk;
   if ($cb) { $self->once(drain => $cb) }
   else     { return $self unless length $self->{buffer} }
 
@@ -82,10 +80,7 @@ sub write {
 sub _read {
   my $self = shift;
 
-  # Read
   my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
-
-  # Error
   unless (defined $read) {
 
     # Retry
@@ -101,7 +96,6 @@ sub _read {
   # EOF
   return $self->close if $read == 0;
 
-  # Handle read
   $self->emit_safe(read => $buffer)->{active} = time;
 }
 
@@ -129,8 +123,6 @@ sub _write {
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
     my $written = $handle->syswrite($self->{buffer});
-
-    # Error
     unless (defined $written) {
 
       # Retry
@@ -148,7 +140,7 @@ sub _write {
     $self->{active} = time;
   }
 
-  # Handle drain
+  # Drain
   $self->emit_safe('drain') if !length $self->{buffer};
 
   # Stop writing

@@ -30,8 +30,6 @@ sub _tokenize {
     # Value
     my $value;
     $value = unquote $1 if $string =~ s/^("(?:\\\\|\\"|[^"])+"|[^;,]+)\s*//;
-
-    # Token
     push @token, [$name, $value];
 
     # Separator

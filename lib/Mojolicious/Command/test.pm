@@ -18,7 +18,7 @@ EOF
 sub run {
   my ($self, @args) = @_;
 
-  # Options
+  # Check options
   GetOptionsFromArray \@args, 'v|verbose' => sub { $ENV{HARNESS_VERBOSE} = 1 };
 
   # Search tests

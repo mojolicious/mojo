@@ -235,11 +235,23 @@ $t->get_ok('/x/♥/template/does_not_exist')->status_is(404);
 # A little bit of everything from myapp2.pl
 $t->get_ok('/y/1')->status_is(200)->content_is("works 4!\nInsecure too!");
 
+# Caching helper from myapp2.pl
+$t->get_ok('/y/1/cached?cache=foo')->status_is(200)->content_is('foo');
+
+# Caching helper with cached value from myapp2.pl
+$t->get_ok('/y/1/cached?cache=fail')->status_is(200)->content_is('foo');
+
 # 404 from myapp2.pl
 $t->get_ok('/y/1/2')->status_is(404);
 
 # myapp2.pl with unicode prefix
 $t->get_ok('/y/♥')->status_is(200)->content_is("works 3!\nInsecure too!");
+
+# Caching helper from myapp2.pl with unicode prefix
+$t->get_ok('/y/♥/cached?cache=bar')->status_is(200)->content_is('bar');
+
+# Caching helper with cached value from myapp2.pl with unicode prefix
+$t->get_ok('/y/♥/cached?cache=fail')->status_is(200)->content_is('bar');
 
 # 404 from myapp2.pl with unicode prefix
 $t->get_ok('/y/♥/2')->status_is(404);

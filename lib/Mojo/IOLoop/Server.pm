@@ -115,7 +115,6 @@ sub stop { $_[0]->reactor->remove($_[0]->{handle}) }
 sub _accept {
   my $self = shift;
 
-  # Accept
   return unless my $handle = $self->{handle}->accept;
   $handle->blocking(0);
 

@@ -59,7 +59,6 @@ sub add_chunk {
 sub contains {
   my ($self, $string) = @_;
 
-  # Seek to start
   my $handle = $self->handle;
   $handle->sysseek($self->start_range, SEEK_SET);
 
@@ -95,12 +94,10 @@ sub contains {
 sub get_chunk {
   my ($self, $start) = @_;
 
-  # Seek to start
   $start += $self->start_range;
   my $handle = $self->handle;
   $handle->sysseek($start, SEEK_SET);
 
-  # Range support
   my $buffer;
   if (defined(my $end = $self->end_range)) {
     my $chunk = $end + 1 - $start;

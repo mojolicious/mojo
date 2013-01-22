@@ -8,7 +8,6 @@ sub get { (shift->{cache} || {})->{shift()} }
 sub set {
   my ($self, $key, $value) = @_;
 
-  # Cache with size limit
   my $cache = $self->{cache} ||= {};
   my $queue = $self->{queue} ||= [];
   delete $cache->{shift @$queue} if @$queue >= $self->max_keys;

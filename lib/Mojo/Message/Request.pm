@@ -100,7 +100,6 @@ sub fix_headers {
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
 
-  # Prepare request line
   unless (defined $self->{start_buffer}) {
 
     # Path

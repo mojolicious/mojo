@@ -42,7 +42,7 @@ sub acceptor {
   # Make sure connection manager is running
   $self->_manager;
 
-  # New acceptor
+  # Connect acceptor with reactor
   my $id = $self->_id;
   $self->{acceptors}{$id} = $acceptor;
   weaken $acceptor->reactor($self->reactor)->{reactor};
@@ -61,13 +61,11 @@ sub client {
   # Make sure connection manager is running
   $self->_manager;
 
-  # New client
   my $id     = $self->_id;
   my $c      = $self->{connections}{$id} ||= {};
   my $client = $c->{client} = Mojo::IOLoop::Client->new;
   weaken $client->reactor($self->reactor)->{reactor};
 
-  # Connect
   weaken $self;
   $client->on(
     connect => sub {
@@ -128,7 +126,6 @@ sub server {
   my ($self, $cb) = (shift, pop);
   $self = $self->singleton unless ref $self;
 
-  # New server
   my $server = Mojo::IOLoop::Server->new;
   weaken $self;
   $server->on(
@@ -213,7 +210,7 @@ sub _id {
 sub _manage {
   my $self = shift;
 
-  # Start accepting if possible
+  # Try to acquire accept mutex
   $self->_accepting;
 
   # Close connections gracefully
@@ -242,7 +239,6 @@ sub _not_accepting {
   return unless my $cb = $self->unlock;
   $self->$cb;
 
-  # Stop accepting
   $_->stop for values %{$self->{acceptors} || {}};
 }
 

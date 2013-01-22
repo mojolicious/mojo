@@ -59,10 +59,8 @@ sub warn { shift->log(warn => @_) }
 sub _message {
   my ($self, $level, @lines) = @_;
 
-  # Check level
   return unless $self->is_level($level) && (my $handle = $self->handle);
 
-  # Format lines and write to handle
   flock $handle, LOCK_EX;
   croak "Can't write to log: $!"
     unless defined $handle->syswrite($self->format($level, @lines));

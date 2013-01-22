@@ -63,7 +63,6 @@ sub _manage {
     $self->{modified} = 1;
   }
 
-  # Housekeeping
   $self->_reap;
   delete $self->{running} if $self->{running} && !kill 0, $self->{running};
   $self->_spawn if !$self->{running} && delete $self->{modified};

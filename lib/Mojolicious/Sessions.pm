@@ -12,52 +12,41 @@ has default_expiration => 3600;
 sub load {
   my ($self, $c) = @_;
 
-  # Session cookie
   return unless my $value = $c->signed_cookie($self->cookie_name);
-
-  # Deserialize
   $value =~ s/-/=/g;
   return unless my $session = Mojo::JSON->new->decode(b64_decode $value);
 
-  # Expiration
+  # "expiration" value is inherited
   my $expiration = $session->{expiration} // $self->default_expiration;
   return if !(my $expires = delete $session->{expires}) && $expiration;
   return if defined $expires && $expires <= time;
 
-  # Content
   my $stash = $c->stash;
   return unless $stash->{'mojo.active_session'} = keys %$session;
   $stash->{'mojo.session'} = $session;
-
-  # Flash
   $session->{flash} = delete $session->{new_flash} if $session->{new_flash};
 }
 
 sub store {
   my ($self, $c) = @_;
 
-  # Session
   my $stash = $c->stash;
   return unless my $session = $stash->{'mojo.session'};
   return unless keys %$session || $stash->{'mojo.active_session'};
 
-  # Flash
   my $old = delete $session->{flash};
   @{$session->{new_flash}}{keys %$old} = values %$old
     if $stash->{'mojo.static'};
   delete $session->{new_flash} unless keys %{$session->{new_flash}};
 
-  # Expiration
+  # Generate "expires" value from "expiration" if necessary
   my $expiration = $session->{expiration} // $self->default_expiration;
   my $default = delete $session->{expires};
   $session->{expires} = $default || time + $expiration
     if $expiration || $default;
 
-  # Serialize
   my $value = b64_encode(Mojo::JSON->new->encode($session), '');
   $value =~ s/=/-/g;
-
-  # Session cookie
   my $options = {
     domain   => $self->cookie_domain,
     expires  => $session->{expires},

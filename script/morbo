@@ -15,7 +15,6 @@ GetOptions(
   'w|watch=s'  => \my @watch
 );
 
-# Usage
 die <<"EOF" if $help || !(my $app = shift);
 usage: $0 [OPTIONS] [APPLICATION]
 

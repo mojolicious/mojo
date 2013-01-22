@@ -173,7 +173,6 @@ sub websocket {
 sub _multipart {
   my ($self, $encoding, $form) = @_;
 
-  # Parts
   my @parts;
   for my $name (sort keys %$form) {
     my $values = $form->{$name};

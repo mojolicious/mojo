@@ -135,12 +135,10 @@ sub _write {
       return $self->emit_safe(error => $!)->close;
     }
 
-    # Remove written chunk from buffer
     $self->emit_safe(write => substr($self->{buffer}, 0, $written, ''));
     $self->{active} = time;
   }
 
-  # Drain
   $self->emit_safe('drain') if !length $self->{buffer};
 
   # Stop writing

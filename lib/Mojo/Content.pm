@@ -40,14 +40,9 @@ sub clone {
 sub generate_body_chunk {
   my ($self, $offset) = @_;
 
-  # Drain
   $self->emit(drain => $offset)
     if !delete $self->{delay} && !length($self->{body_buffer} // '');
-
-  # Empty buffer
   my $chunk = delete $self->{body_buffer} // '';
-
-  # EOF or delay
   return $self->{eof} ? '' : undef unless length $chunk;
 
   return $chunk;
@@ -287,17 +282,13 @@ sub _parse_headers {
 sub _parse_until_body {
   my ($self, $chunk) = @_;
 
-  # Buffer chunk
   $self->{raw_size} += length($chunk //= '');
   $self->{pre_buffer} .= $chunk;
 
-  # Parser started
   unless ($self->{state}) {
     $self->{header_size} = $self->{raw_size} - length $self->{pre_buffer};
     $self->{state}       = 'headers';
   }
-
-  # Parse headers
   $self->_parse_headers if ($self->{state} // '') eq 'headers';
 }
 

@@ -77,7 +77,7 @@ sub run {
     return $help ? $command->help(@args) : $command->run(@args);
   }
 
-  # Test
+  # Hide list for tests
   return 1 if $ENV{HARNESS_ACTIVE};
 
   # Try all namespaces

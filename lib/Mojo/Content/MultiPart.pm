@@ -23,7 +23,7 @@ sub body_contains {
 sub body_size {
   my $self = shift;
 
-  # Check for Content-Lenght header
+  # Check for existing Content-Lenght header
   my $content_len = $self->headers->content_length;
   return $content_len if $content_len;
 
@@ -172,7 +172,6 @@ sub _parse_multipart_preamble {
 sub _read {
   my ($self, $chunk) = @_;
 
-  # Buffer chunk and parse multipart content
   $self->{multipart} .= $chunk;
   my $boundary = $self->boundary;
   until (($self->{multi_state} //= 'multipart_preamble') eq 'finished') {

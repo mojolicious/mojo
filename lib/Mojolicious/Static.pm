@@ -24,8 +24,6 @@ sub dispatch {
   # Canonical path
   my $stash = $c->stash;
   my $path = $stash->{path} || $c->req->url->path->clone->canonicalize;
-
-  # Split parts
   return undef unless my @parts = @{Mojo::Path->new("$path")->parts};
 
   # Serve static file and prevent directory traversal

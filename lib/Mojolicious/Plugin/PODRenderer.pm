@@ -8,13 +8,12 @@ use Mojo::Util 'url_escape';
 use Pod::Simple::HTML;
 use Pod::Simple::Search;
 
-# Paths
+# Paths to search
 my @PATHS = map { $_, "$_/pods" } @INC;
 
 sub register {
   my ($self, $app, $conf) = @_;
 
-  # Add "pod" handler
   my $preprocess = $conf->{preprocess} || 'ep';
   $app->renderer->add_handler(
     $conf->{name} || 'pod' => sub {
@@ -28,10 +27,9 @@ sub register {
     }
   );
 
-  # Add "pod_to_html" helper
   $app->helper(pod_to_html => sub { shift; b(_pod_to_html(@_)) });
 
-  # Perldoc
+  # Perldoc browser
   return if $conf->{no_perldoc};
   return $app->routes->any(
     '/perldoc/*module' => {module => 'Mojolicious/Guides'} => \&_perldoc);
@@ -40,12 +38,10 @@ sub register {
 sub _perldoc {
   my $self = shift;
 
-  # Find module
+  # Find module or redirect to CPAN
   my $module = $self->param('module');
   $module =~ s!/!::!g;
   my $path = Pod::Simple::Search->new->find($module, @PATHS);
-
-  # Redirect to CPAN
   return $self->redirect_to("http://metacpan.org/module/$module")
     unless $path && -r $path;
 
@@ -120,14 +116,11 @@ sub _pod_to_html {
   # Block
   $pod = $pod->() if ref $pod eq 'CODE';
 
-  # Parser
   my $parser = Pod::Simple::HTML->new;
   $parser->force_title('');
   $parser->html_header_before_title('');
   $parser->html_header_after_title('');
   $parser->html_footer('');
-
-  # Parse
   $parser->output_string(\(my $output));
   return $@ unless eval { $parser->parse_string_document("$pod"); 1 };
 

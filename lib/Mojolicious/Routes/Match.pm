@@ -16,7 +16,7 @@ sub new {
 sub match {
   my ($self, $r, $c) = @_;
 
-  # Match
+  # Pattern
   $self->root($r) unless $self->root;
   my $path    = $self->{path};
   my $pattern = $r->pattern;

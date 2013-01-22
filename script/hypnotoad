@@ -15,7 +15,6 @@ GetOptions(
   't|test'       => sub { $ENV{HYPNOTOAD_TEST}       = 1 }
 );
 
-# Usage
 die <<"EOF" if $help || !(my $app = shift || $ENV{HYPNOTOAD_APP});
 usage: $0 [OPTIONS] [APPLICATION]
 

@@ -5,12 +5,8 @@ use Time::HiRes qw(gettimeofday tv_interval);
 
 sub register {
   my ($self, $app) = @_;
-
-  # Start timer
   $app->hook(after_static_dispatch => \&_start);
-
-  # End timer
-  $app->hook(after_dispatch => \&_end);
+  $app->hook(after_dispatch        => \&_end);
 }
 
 sub _end {

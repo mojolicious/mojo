@@ -17,7 +17,7 @@ sub is_running { !!shift->{running} }
 sub one_tick {
   my $self = shift;
 
-  # Remember state
+  # Remember state for later
   my $running = $self->{running};
   $self->{running} = 1;
 
@@ -56,7 +56,6 @@ sub one_tick {
       # Normal timer
       else { $self->remove($id) }
 
-      # Handle timer
       ++$i and $self->_sandbox("Timer $id", $t->{cb}) if $t->{cb};
     }
   }

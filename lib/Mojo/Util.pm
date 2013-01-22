@@ -153,7 +153,6 @@ sub punycode_decode {
   my @output;
   push @output, split //, $1 if $input =~ s/(.*)\x2d//s;
 
-  # Decode
   my $n    = PC_INITIAL_N;
   my $i    = 0;
   my $bias = PC_INITIAL_BIAS;
@@ -201,7 +200,6 @@ sub punycode_encode {
   my $h = my $b = length $output;
   $output .= "\x2d" if $b > 0;
 
-  # Encode
   my $n     = PC_INITIAL_N;
   my $delta = 0;
   my $bias  = PC_INITIAL_BIAS;

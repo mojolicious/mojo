@@ -25,25 +25,13 @@ sub register {
     );
   }
 
-  # Add "config" helper
   $app->helper(config => sub { shift->app->config(@_) });
-
-  # Add "content" helper
-  $app->helper(content => \&_content);
-
-  # Add "content_for" helper
-  $app->helper(content_for => \&_content_for);
-
-  # Add "current_route" helper
+  $app->helper(content       => \&_content);
+  $app->helper(content_for   => \&_content_for);
   $app->helper(current_route => \&_current_route);
+  $app->helper(dumper        => \&_dumper);
+  $app->helper(include       => \&_include);
 
-  # Add "dumper" helper
-  $app->helper(dumper => \&_dumper);
-
-  # Add "include" helper
-  $app->helper(include => \&_include);
-
-  # Add "memorize" helper
   my %mem;
   $app->helper(
     memorize => sub {
@@ -77,7 +65,6 @@ sub register {
     }
   );
 
-  # Add "url_with" helper
   $app->helper(url_with => \&_url_with);
 }
 

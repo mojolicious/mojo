@@ -2,8 +2,6 @@ package Mojo::Base;
 
 use strict;
 use warnings;
-
-# Mojo modules are modern!
 use utf8;
 use feature ();
 
@@ -16,8 +14,6 @@ use IO::Handle ();
 sub import {
   my $class = shift;
   return unless my $flag = shift;
-
-  # No limits!
   no strict 'refs';
 
   # Base
@@ -37,8 +33,6 @@ sub import {
   if ($flag) {
     my $caller = caller;
     push @{"${caller}::ISA"}, $flag;
-
-    # Can haz?
     *{"${caller}::has"} = sub { attr($caller, @_) };
   }
 
@@ -61,11 +55,10 @@ sub attr {
   my ($class, $attrs, $default) = @_;
   return unless ($class = ref $class || $class) && $attrs;
 
-  # Check default
   Carp::croak('Default has to be a code reference or constant value')
     if ref $default && ref $default ne 'CODE';
 
-  # Create attributes
+  # Compile attributes
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
     Carp::croak(qq{Attribute "$attr" invalid})
       unless $attr =~ /^[a-zA-Z_]\w*$/;

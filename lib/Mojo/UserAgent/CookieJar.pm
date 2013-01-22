@@ -9,7 +9,6 @@ has max_cookie_size => 4096;
 sub add {
   my ($self, @cookies) = @_;
 
-  # Add cookies
   my $size = $self->max_cookie_size;
   for my $cookie (@cookies) {
 
@@ -62,7 +61,6 @@ sub extract {
 sub find {
   my ($self, $url) = @_;
 
-  # Look through the jar
   return unless my $domain = lc($url->ihost // '');
   my $path = $url->path->to_abs_string;
   my @found;

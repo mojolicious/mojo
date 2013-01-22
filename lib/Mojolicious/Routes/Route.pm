@@ -45,7 +45,6 @@ sub detour { shift->partial(1)->to(@_) }
 sub find {
   my ($self, $name) = @_;
 
-  # Check all children
   my @children = (@{$self->children});
   my $candidate;
   while (my $child = shift @children) {
@@ -160,8 +159,6 @@ sub to {
   # Single argument
   my ($shortcut, $defaults);
   if (@_ == 1) {
-
-    # Hash
     $defaults = shift if ref $_[0] eq 'HASH';
     $shortcut = shift if $_[0];
   }
@@ -230,7 +227,6 @@ sub websocket {
 sub _generate_route {
   my ($self, $methods, @args) = @_;
 
-  # Route information
   my ($cb, @conditions, @constraints, %defaults, $name, $pattern);
   while (defined(my $arg = shift @args)) {
 

@@ -21,53 +21,30 @@ sub register {
     }
   );
 
-  # Add "checkbox" helper
   $app->helper(check_box =>
       sub { _input(shift, shift, value => shift, @_, type => 'checkbox') });
-
-  # Add "file_field" helper
   $app->helper(file_field =>
       sub { shift; _tag('input', name => shift, @_, type => 'file') });
 
-  # Add "form_for" helper
-  $app->helper(form_for => \&_form_for);
-
-  # Add "hidden_field" helper
+  $app->helper(form_for     => \&_form_for);
   $app->helper(hidden_field => \&_hidden_field);
-
-  # Add "image" helper
   $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
-
-  # Add "input_tag" helper
   $app->helper(input_tag => sub { _input(@_) });
-
-  # Add "javascript" helper
   $app->helper(javascript => \&_javascript);
+  $app->helper(link_to    => \&_link_to);
 
-  # Add "link_to" helper
-  $app->helper(link_to => \&_link_to);
-
-  # Add "password_field" helper
   $app->helper(password_field =>
       sub { shift; _tag('input', name => shift, @_, type => 'password') });
-
-  # Add "radio_button" helper
   $app->helper(radio_button =>
       sub { _input(shift, shift, value => shift, @_, type => 'radio') });
 
-  # Add "select_field" helper
-  $app->helper(select_field => \&_select_field);
-
-  # Add "stylesheet" helper
-  $app->helper(stylesheet => \&_stylesheet);
-
-  # Add "submit_button" helper
+  $app->helper(select_field  => \&_select_field);
+  $app->helper(stylesheet    => \&_stylesheet);
   $app->helper(submit_button => \&_submit_button);
 
-  # Add "t" and "tag" helpers
+  # "t" is just a shortcut for the "tag" helper
   $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);
 
-  # Add "text_area" helper
   $app->helper(text_area => \&_text_area);
 }
 
@@ -97,14 +74,10 @@ sub _hidden_field {
 
 sub _input {
   my ($self, $name) = (shift, shift);
-
-  # Attributes
   my %attrs = @_ % 2 ? (value => shift, @_) : @_;
 
-  # Values
-  my @values = $self->param($name);
-
   # Special selection value
+  my @values = $self->param($name);
   my $type = $attrs{type} || '';
   if (@values && $type ne 'submit') {
 
@@ -210,10 +183,8 @@ sub _stylesheet {
     $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
   }
 
-  # URL
-  my $href = @_ % 2 ? $self->url_for(shift) : undef;
-
   # "link" or "style" tag
+  my $href = @_ % 2 ? $self->url_for(shift) : undef;
   return $href
     ? _tag('link', rel => 'stylesheet', href => $href, media => 'screen', @_)
     : _tag('style', @_, $cb);

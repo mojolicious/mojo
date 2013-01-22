@@ -16,13 +16,13 @@ sub run {
   # No Windows support
   _exit('Hypnotoad not available for Windows.') if $^O eq 'MSWin32';
 
-  # Application
+  # Remember application for later
   $ENV{HYPNOTOAD_APP} ||= abs_path $path;
 
   # This is a production server
   $ENV{MOJO_MODE} ||= 'production';
 
-  # Executable
+  # Remember executable for later
   $ENV{HYPNOTOAD_EXE} ||= $0;
   $0 = $ENV{HYPNOTOAD_APP};
 

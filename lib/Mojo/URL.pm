@@ -31,7 +31,7 @@ sub authority {
     return $host =~ /[^\x00-\x7f]/ ? $self->ihost($host) : $self->host($host);
   }
 
-  # Format
+  # Build authority
   my $userinfo = $self->userinfo;
   $authority .= url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@'
     if $userinfo;
@@ -137,7 +137,6 @@ sub query {
 sub to_abs {
   my $self = shift;
 
-  # Already absolute
   my $abs = $self->clone;
   return $abs if $abs->is_abs;
 
@@ -173,7 +172,6 @@ sub to_abs {
 sub to_rel {
   my $self = shift;
 
-  # Already relative
   my $rel = $self->clone;
   return $rel unless $rel->is_abs;
 

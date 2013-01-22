@@ -62,10 +62,8 @@ sub dispatch {
     }
   }
 
-  # No match
-  return undef unless $m && @{$m->stack};
-
   # Dispatch
+  return undef unless $m && @{$m->stack};
   return undef if $self->_walk($c);
   $self->auto_render($c);
   return 1;

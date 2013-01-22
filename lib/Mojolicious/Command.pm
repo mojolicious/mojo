@@ -32,10 +32,7 @@ sub chmod_rel_file {
 sub create_dir {
   my ($self, $path) = @_;
 
-  # Exists
   if (-d $path) { say "  [exist] $path" unless $self->quiet }
-
-  # Create
   else {
     mkpath $path or croak qq{Can't make directory "$path": $!};
     say "  [mkdir] $path" unless $self->quiet;

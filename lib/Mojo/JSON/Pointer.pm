@@ -10,7 +10,6 @@ sub get      { shift->_pointer(0, @_) }
 sub _pointer {
   my ($self, $contains, $data, $pointer) = @_;
 
-  # Parse pointer and walk data structure
   $pointer = decode('UTF-8', url_unescape $pointer);
   return $data unless $pointer =~ s!^/!!;
   for my $p (split '/', $pointer) {

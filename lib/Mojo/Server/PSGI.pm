@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::Server';
 sub run {
   my ($self, $env) = @_;
 
-  # Prepare transaction and store connection information
   my $tx  = $self->build_tx;
   my $req = $tx->req->parse($env);
   $tx->local_port($env->{SERVER_PORT})->remote_address($env->{REMOTE_ADDR});
@@ -45,6 +44,7 @@ sub to_psgi_app {
 package Mojo::Server::PSGI::_IO;
 use Mojo::Base -base;
 
+# Finish transaction
 sub close { shift->{tx}->server_close }
 
 sub getline {

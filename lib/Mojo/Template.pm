@@ -116,7 +116,6 @@ sub interpret {
     Mojo::Exception->throw(shift, [$self->template, $self->code]);
   };
 
-  # Interpret
   return undef unless my $compiled = $self->compiled;
   my $output = eval { $compiled->(@_) };
   return $output unless $@;
@@ -131,7 +130,6 @@ sub parse {
   # Clean start
   delete $self->template($tmpl)->{tree};
 
-  # Token
   my $tag     = $self->tag_start;
   my $replace = $self->replace_mark;
   my $expr    = $self->expression_mark;
@@ -317,7 +315,6 @@ sub _wrap {
   $lines->[0]  .= "sub { my \$_M = ''; @{[$self->prepend]}; do { $first";
   $lines->[-1] .= "@{[$self->append]}; \$_M } };";
 
-  # Code
   my $code = join "\n", @$lines;
   warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
   return $code;

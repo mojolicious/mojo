@@ -11,14 +11,9 @@ has usage       => "usage: $0 version\n";
 sub run {
   my $self = shift;
 
-  # EV
   my $ev = eval 'use Mojo::Reactor::EV; 1' ? $EV::VERSION : 'not installed';
-
-  # IPv6
   my $ipv6
     = Mojo::IOLoop::Server::IPV6 ? $IO::Socket::IP::VERSION : 'not installed';
-
-  # TLS
   my $tls
     = Mojo::IOLoop::Server::TLS ? $IO::Socket::SSL::VERSION : 'not installed';
 
@@ -34,13 +29,12 @@ OPTIONAL
 
 EOF
 
-  # Check latest version
+  # Check latest version on CPAN
   my $latest = eval {
     my $ua = Mojo::UserAgent->new(max_redirects => 10)->detect_proxy;
     $ua->get('api.metacpan.org/v0/release/Mojolicious')->res->json->{version};
   };
 
-  # Friendly message
   return unless $latest;
   my $msg = 'This version is up to date, have fun!';
   $msg = 'Thanks for testing a development release, you are awesome!'

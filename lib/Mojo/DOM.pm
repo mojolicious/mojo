@@ -106,7 +106,6 @@ sub content_xml {
 sub find {
   my ($self, $selector) = @_;
 
-  # Match selector against tree and upgrade results
   my $charset = $self->charset;
   my $xml     = $self->xml;
   return Mojo::Collection->new(
@@ -197,7 +196,6 @@ sub replace_content {
 sub root {
   my $self = shift;
 
-  # Find root
   my $root = $self->tree;
   while ($root->[0] eq 'tag') {
     last unless my $parent = $root->[3];

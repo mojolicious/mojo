@@ -16,7 +16,6 @@ sub new { shift->SUPER::new->parse(@_) }
 sub canonicalize {
   my $self = shift;
 
-  # Resolve path
   my @parts;
   for my $part (@{$self->parts}) {
 

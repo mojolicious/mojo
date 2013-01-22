@@ -31,8 +31,6 @@ sub DESTROY {
 }
 
 sub check_pid {
-
-  # Get PID
   my $file = shift->pid_file;
   return undef unless open my $handle, '<', $file;
   my $pid = <$handle>;
@@ -210,7 +208,7 @@ sub _spawn {
   $SIG{QUIT} = sub { $loop->max_connections(0) };
   delete $self->{$_} for qw(poll reader);
 
-  # Start
+  # Start event loop
   $self->app->log->debug("Worker $$ started.");
   $loop->start;
   exit 0;

@@ -59,8 +59,6 @@ sub cookie {
 
   # Request cookies
   return map { $_->value } $self->req->cookie($name) if wantarray;
-
-  # Request cookie
   return undef unless my $cookie = $self->req->cookie($name);
   return $cookie->value;
 }
@@ -194,7 +192,6 @@ sub render_data { shift->render(data => @_) }
 sub render_exception {
   my ($self, $e) = @_;
 
-  # Log exception
   my $app = $self->app;
   $app->log->error($e = Mojo::Exception->new($e));
 

@@ -67,10 +67,6 @@ sub run {
     start => sub {
       my $tx = pop;
 
-      my $req         = $tx->req;
-      my $startline   = $req->build_start_line;
-      my $req_headers = $req->build_headers;
-
       # Verbose callback
       my $v  = $verbose;
       my $cb = sub {
@@ -81,6 +77,9 @@ sub run {
         $v = undef;
 
         # Show request
+        my $req         = $tx->req;
+        my $startline   = $req->build_start_line;
+        my $req_headers = $req->build_headers;
         warn "$startline$req_headers";
 
         # Show response
@@ -105,7 +104,7 @@ sub run {
     }
   );
 
-  # Perform request and handle errors
+  # Switch to verbose for HEAD requests
   $verbose = 1 if $method eq 'HEAD';
   STDOUT->autoflush(1);
   my $tx = $ua->start($ua->build_tx($method, $url, \%headers, $content));
@@ -138,11 +137,9 @@ sub _say {
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;
 
-  # Find elements for selector
   my $dom     = Mojo::DOM->new->charset($charset)->parse($buffer);
   my $results = $dom->find($selector);
 
-  # Process commands
   my $finished;
   while (defined(my $command = shift @args)) {
 

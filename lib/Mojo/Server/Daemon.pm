@@ -25,11 +25,7 @@ sub DESTROY {
 
 sub run {
   my $self = shift;
-
-  # Signals
   local $SIG{INT} = local $SIG{TERM} = sub { $self->ioloop->stop };
-
-  # Change user/group and start accepting connections
   $self->start->setuidgid->ioloop->start;
 }
 
@@ -73,6 +69,7 @@ sub start {
 sub stop {
   my $self = shift;
 
+  # Suspend accepting connections but keep listen sockets open
   my $loop = $self->ioloop;
   while (my $id = shift @{$self->{acceptors}}) {
     my $server = $self->{servers}{$id} = $loop->acceptor($id);
@@ -86,16 +83,11 @@ sub stop {
 sub _build_tx {
   my ($self, $id, $c) = @_;
 
-  # Build transaction
   my $tx = $self->build_tx->connection($id);
   $tx->res->headers->server('Mojolicious (Perl)');
-
-  # Store connection information
   my $handle = $self->ioloop->stream($id)->handle;
   $tx->local_address($handle->sockhost)->local_port($handle->sockport);
   $tx->remote_address($handle->peerhost)->remote_port($handle->peerport);
-
-  # TLS
   $tx->req->url->base->scheme('https') if $c->{tls};
 
   # Handle upgrades and requests
@@ -184,13 +176,11 @@ sub _listen {
   delete $options->{address} if $options->{address} eq '*';
   my $tls = $options->{tls} = $url->protocol eq 'https' ? 1 : undef;
 
-  # Listen
   weaken $self;
   my $id = $self->ioloop->server(
     $options => sub {
       my ($loop, $stream, $id) = @_;
 
-      # Add new connection
       my $c = $self->{connections}{$id} = {tls => $tls};
       warn "-- Accept (@{[$stream->handle->peerhost]})\n" if DEBUG;
       $stream->timeout($self->inactivity_timeout);
@@ -210,7 +200,6 @@ sub _listen {
   );
   push @{$self->{acceptors} ||= []}, $id;
 
-  # Friendly message
   return if $self->silent;
   $self->app->log->info(qq{Listening at "$listen".});
   $listen =~ s!//\*!//127.0.0.1!i;

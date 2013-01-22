@@ -9,14 +9,14 @@ use Mojo::Util 'monkey_patch';
 
 sub import {
 
-  # Executable
+  # Remember executable for later
   $ENV{MOJO_EXE} ||= (caller)[1];
 
-  # Home
+  # Reuse home directory if possible
   local $ENV{MOJO_HOME} = catdir(split '/', dirname $ENV{MOJO_EXE})
     unless $ENV{MOJO_HOME};
 
-  # Initialize app
+  # Initialize application class
   my $caller = caller;
   no strict 'refs';
   push @{"${caller}::ISA"}, 'Mojo';

@@ -25,7 +25,7 @@ sub run {
 sub _draw {
   my ($self, $routes, $verbose) = @_;
 
-  # Calculate length
+  # Calculate column widths
   my @length = (0, 0, 0);
   for my $node (@$routes) {
 

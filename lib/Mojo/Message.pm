@@ -42,9 +42,8 @@ sub body {
 
 sub body_params {
   my $self = shift;
-  return $self->{body_params} if $self->{body_params};
 
-  # Detect charset
+  return $self->{body_params} if $self->{body_params};
   my $params = $self->{body_params} = Mojo::Parameters->new;
   $params->charset($self->content->charset || $self->default_charset);
 

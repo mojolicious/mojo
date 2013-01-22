@@ -116,7 +116,6 @@ sub fix_headers {
 sub get_start_line_chunk {
   my ($self, $offset) = @_;
 
-  # Prepare status line
   unless (defined $self->{start_buffer}) {
     my $code = $self->code    || 404;
     my $msg  = $self->message || $self->default_message;

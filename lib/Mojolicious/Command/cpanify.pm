@@ -24,7 +24,6 @@ sub run {
     'u|user=s'     => \(my $user     = '');
   die $self->usage unless my $file = shift @args;
 
-  # Upload
   my $tx = Mojo::UserAgent->new->detect_proxy->post_form(
     "https://$user:$password\@pause.perl.org/pause/authenquery" => {
       HIDDENNAME                        => $user,
@@ -36,7 +35,6 @@ sub run {
     }
   );
 
-  # Error
   unless ($tx->success) {
     my $code = $tx->res->code || '';
     my $msg = $tx->error;
@@ -44,6 +42,7 @@ sub run {
     elsif ($code eq '409') { $msg = 'File already exists on CPAN.' }
     die qq{Problem uploading file "$file". ($msg)\n};
   }
+
   say 'Upload successful!';
 }
 

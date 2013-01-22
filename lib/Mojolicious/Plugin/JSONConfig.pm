@@ -8,12 +8,8 @@ use Mojo::Util 'encode';
 sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
-  # Render
-  $content = $self->render($content, $file, $conf, $app);
-
-  # Parse
   my $json   = Mojo::JSON->new;
-  my $config = $json->decode($content);
+  my $config = $json->decode($self->render($content, $file, $conf, $app));
   my $err    = $json->error;
   die qq{Couldn't parse config "$file": $err} if !$config && $err;
   die qq{Invalid config "$file".} if !$config || ref $config ne 'HASH';
@@ -30,7 +26,7 @@ sub render {
   my $prepend = q[my $app = shift; no strict 'refs'; no warnings 'redefine';];
   $prepend .= q[sub app; *app = sub { $app }; use Mojo::Base -strict;];
 
-  # Render
+  # Render and encode for JSON decoding
   my $mt = Mojo::Template->new($conf->{template} || {})->name($file);
   my $json = $mt->prepend($prepend . $mt->prepend)->render($content, $app);
   return ref $json ? die $json : encode 'UTF-8', $json;

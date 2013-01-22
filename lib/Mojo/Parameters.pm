@@ -134,7 +134,6 @@ sub remove {
 sub to_hash {
   my $self = shift;
 
-  # Format
   my $params = $self->params;
   my %hash;
   for (my $i = 0; $i < @$params; $i += 2) {

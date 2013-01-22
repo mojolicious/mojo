@@ -63,7 +63,6 @@ sub DESTROY { }
 sub new {
   my $self = shift->SUPER::new(@_);
 
-  # Paths
   my $home = $self->home;
   push @{$self->renderer->paths}, $home->rel_dir('templates');
   push @{$self->static->paths},   $home->rel_dir('public');
@@ -83,11 +82,10 @@ sub new {
   $self->log->path($home->rel_file("log/$mode.log"))
     if -w $home->rel_file('log');
 
-  # Load default plugins
   $self->plugin($_) for qw(HeaderCondition DefaultHelpers TagHelpers);
   $self->plugin($_) for qw(EPLRenderer EPRenderer RequestTimer PoweredBy);
 
-  # Exception handling
+  # Exception handling should be first in chain
   $self->hook(around_dispatch => \&_exception);
 
   # Reduced log output outside of development mode
@@ -157,7 +155,7 @@ sub handler {
     $tx->resume;
   }
 
-  # Delayed
+  # Delayed response
   $self->log->debug('Nothing has been rendered, expecting delayed response.')
     unless $stash->{'mojo.rendered'} || $tx->is_writing;
 }

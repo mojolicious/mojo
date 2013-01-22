@@ -162,7 +162,6 @@ sub to_string {
     push @headers, "$name: " . join("\x0d\x0a ", @$_) for $self->header($name);
   }
 
-  # Format headers
   return join "\x0d\x0a", @headers;
 }
 

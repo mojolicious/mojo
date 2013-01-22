@@ -164,9 +164,7 @@ feature branches for actual development.
 Code has to be run through L<Perl::Tidy> with the included C<.perltidyrc>, and
 everything should look like it was written by a single person.
 
-Code should be organized in blocks and those blocks should be commented.
-
-No spaghetti code.
+Methods and functions should be as short as possible, no spaghetti code.
 
 Comments should be correctly capitalized, and funny if possible, punctuation
 is optional if it doesn't increase readability.

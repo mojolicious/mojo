@@ -26,7 +26,6 @@ has tree      => sub { [] };
 sub build {
   my $self = shift;
 
-  # Lines
   my (@lines, $cpst, $multi);
   for my $line (@{$self->tree}) {
     push @lines, '';
@@ -198,7 +197,7 @@ sub parse {
     # Normal line ending
     else { $line .= "\n" }
 
-    # Tokenize
+    # Mixed line
     my @token;
     for my $token (split $token_re, $line) {
 

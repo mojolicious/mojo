@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long
   qw(GetOptions :config no_auto_abbrev no_ignore_case pass_through);
+use List::Util 'max';
 use Mojo::Server;
 
 has hint => <<"EOF";
@@ -64,7 +65,6 @@ sub run {
     $name = shift @args if my $help = $name eq 'help';
     $help = $ENV{MOJO_HELP} = $ENV{MOJO_HELP} ? 1 : $help;
 
-    # Try all namespaces
     my $module;
     $module = _command("${_}::$name", 1) and last for @{$self->namespaces};
 
@@ -80,7 +80,7 @@ sub run {
   # Hide list for tests
   return 1 if $ENV{HARNESS_ACTIVE};
 
-  # Try all namespaces
+  # Find all available commands
   my (@commands, %seen);
   my $loader = Mojo::Loader->new;
   for my $namespace (@{$self->namespaces}) {
@@ -91,20 +91,13 @@ sub run {
     }
   }
 
-  # Make list
-  my @list;
-  my $max = 0;
-  for my $command (@commands) {
-    my $len = length $command->[0];
-    $max = $len if $len > $max;
-    push @list, [$command->[0], $command->[1]->new->description];
-  }
-
-  # Print list
+  # Print list of all available commands
+  my $max = max map { length $_->[0] } @commands;
   print $self->message;
-  for my $command (@list) {
-    my ($name, $description) = @$command;
-    print "  $name" . (' ' x ($max - length $name)) . "   $description";
+  for my $command (@commands) {
+    my $name        = $command->[0];
+    my $description = $command->[1]->new->description;
+    print "  $name", (' ' x ($max - length $name)), "   $description";
   }
   return print $self->hint;
 }

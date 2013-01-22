@@ -33,7 +33,6 @@ sub register {
   # Mode specific config file
   my $mode = $file =~ /^(.*)\.([^.]+)$/ ? join('.', $1, $app->mode, $2) : '';
 
-  # Absolute paths
   my $home = $app->home;
   $file = $home->rel_file($file) unless file_name_is_absolute $file;
   $mode = $home->rel_file($mode) if $mode && !file_name_is_absolute $mode;

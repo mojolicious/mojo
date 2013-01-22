@@ -176,7 +176,6 @@ sub _cleanup {
 sub _connect {
   my ($self, $proto, $host, $port, $handle, $cb) = @_;
 
-  # Open connection
   weaken $self;
   my $id;
   return $id = $self->_loop->client(
@@ -301,7 +300,6 @@ sub _finish {
   my $res = $tx->res;
   if (my $err = $res->error) { $res->error($err) }
 
-  # Common errors
   else {
 
     # Premature connection close

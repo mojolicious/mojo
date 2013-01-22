@@ -89,7 +89,6 @@ sub names {
 sub parse {
   my $self = shift;
 
-  # Parse headers with size limit
   $self->{state} = 'headers';
   $self->{buffer} .= shift // '';
   my $headers = $self->{cache} ||= [];

@@ -71,13 +71,12 @@ sub client {
     connect => sub {
       my $handle = pop;
 
-      # New stream
+      # Turn handle into stream
       my $c = $self->{connections}{$id};
       delete $c->{client};
       my $stream = $c->{stream} = Mojo::IOLoop::Stream->new($handle);
       $self->_stream($stream => $id);
 
-      # Connected
       $self->$cb(undef, $stream);
     }
   );
@@ -132,7 +131,7 @@ sub server {
     accept => sub {
       my $handle = pop;
 
-      # Accept
+      # Turn handle into stream
       my $stream = Mojo::IOLoop::Stream->new($handle);
       $self->$cb($stream, $self->stream($stream));
 

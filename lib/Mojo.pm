@@ -26,7 +26,6 @@ has ua   => sub {
 sub new {
   my $self = shift->SUPER::new(@_);
 
-  # Detect home directory
   my $home = $self->home->detect(ref $self);
 
   # Check if we have a log directory

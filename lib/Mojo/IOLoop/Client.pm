@@ -43,7 +43,6 @@ sub _cleanup {
 sub _connect {
   my ($self, $args) = @_;
 
-  # New socket
   my $handle;
   my $reactor = $self->reactor;
   my $address = $args->{address} ||= 'localhost';
@@ -83,7 +82,6 @@ sub _tls {
     return;
   }
 
-  # Connected
   $self->_cleanup->emit_safe(connect => $handle);
 }
 
@@ -102,8 +100,6 @@ sub _try {
 
   # TLS
   if ($args->{tls} && !$handle->isa('IO::Socket::SSL')) {
-
-    # No TLS support
     return $self->emit_safe(
       error => 'IO::Socket::SSL 1.75 required for TLS support')
       unless TLS;
@@ -130,7 +126,6 @@ sub _try {
     return $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
   }
 
-  # Connected
   $self->_cleanup->emit_safe(connect => $handle);
 }
 

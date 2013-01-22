@@ -24,7 +24,6 @@ sub close {
   return unless my $handle = delete $self->{handle};
   $reactor->remove($handle);
 
-  # Close
   close $handle;
   $self->emit_safe('close');
 }
@@ -65,12 +64,9 @@ sub steal_handle {
 sub write {
   my ($self, $chunk, $cb) = @_;
 
-  # Write with roundtrip
   $self->{buffer} .= $chunk;
   if ($cb) { $self->once(drain => $cb) }
   else     { return $self unless length $self->{buffer} }
-
-  # Start writing
   $self->reactor->watch($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};
 
@@ -112,14 +108,12 @@ sub _startup {
     }
   );
 
-  # Start streaming
   $reactor->io($self->{handle}, sub { pop() ? $self->_write : $self->_read });
 }
 
 sub _write {
   my $self = shift;
 
-  # Write as much as possible
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
     my $written = $handle->syswrite($self->{buffer});
@@ -140,8 +134,6 @@ sub _write {
   }
 
   $self->emit_safe('drain') if !length $self->{buffer};
-
-  # Stop writing
   return if $self->is_writing;
   $self->reactor->watch($handle, !$self->{paused}, 0);
 }

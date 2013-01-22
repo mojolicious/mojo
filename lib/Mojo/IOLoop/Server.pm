@@ -78,7 +78,6 @@ sub listen {
   $handle->blocking(0);
   $self->{handle} = $handle;
 
-  # TLS
   return unless $args->{tls};
   croak "IO::Socket::SSL 1.75 required for TLS support" unless TLS;
 

@@ -10,7 +10,7 @@
         top: 60%;
       }
       #notfound {
-        background: url(<%= url_for '/mojolicious-notfound.png' %>);
+        background: url(<%= url_for '/mojo/notfound.png' %>);
         height: 62px;
         left: 50%;
         margin-left: -153px;
@@ -22,7 +22,7 @@
     % end
   <body>
     %= link_to url_for->base => begin
-      %= image '/mojolicious-noraptor.png', alt => 'Bye!', id => 'noraptor'
+      %= image '/mojo/noraptor.png', alt => 'Bye!', id => 'noraptor'
     % end
     <div id="notfound"></div>
   </body>

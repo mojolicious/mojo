@@ -4,7 +4,7 @@
    %= stylesheet begin
       body { background-color: #caecf6 }
       #raptor {
-        background: url(<%= url_for '/mojolicious-failraptor.png' %>);
+        background: url(<%= url_for '/mojo/failraptor.png' %>);
         height: 488px;
         left: 50%;
         margin-left: -371px;

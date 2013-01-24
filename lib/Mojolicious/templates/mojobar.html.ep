@@ -1,4 +1,4 @@
-%= javascript '/js/jquery.js'
+%= javascript '/mojo/jquery/jquery.js'
 <div id="mojobar">
   %= stylesheet scoped => 'scoped', begin
     #mojobar {
@@ -56,7 +56,7 @@
   % end
   <div id="mojobar-logo">
     %= link_to 'http://mojolicio.us' => begin
-      %= image '/mojolicious-white.png', alt => 'Mojolicious logo'
+      %= image '/mojo/logo-white.png', alt => 'Mojolicious logo'
     % end
   </div>
   <div id="mojobar-links">

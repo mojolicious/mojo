@@ -4,9 +4,9 @@
     <title>Server error</title>
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
-    %= javascript '/js/jquery.js'
-    %= stylesheet '/css/prettify-mojo.css'
-    %= javascript '/js/prettify.js'
+    %= javascript '/mojo/jquery/jquery.js'
+    %= stylesheet '/mojo/prettify/prettify-mojo.css'
+    %= javascript '/mojo/prettify/prettify.js'
     %= stylesheet begin
       a img { border: 0 }
       body {
@@ -39,7 +39,7 @@
       }
       .code {
         background-color: #1a1a1a;
-        background: url(<%= url_for '/mojolicious-pinstripe.gif' %>);
+        background: url(<%= url_for '/mojo/pinstripe.gif' %>);
         color: #eee;
         text-shadow: #333 0 1px 0;
       }
@@ -219,7 +219,7 @@
     </div>
     <div id="footer">
       %= link_to 'http://mojolicio.us' => begin
-        %= image '/mojolicious-black.png', alt => 'Mojolicious logo'
+        %= image '/mojo/logo-black.png', alt => 'Mojolicious logo'
       % end
     </div>
     %= javascript begin

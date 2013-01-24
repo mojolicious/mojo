@@ -44,7 +44,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
   ->content_is(<<EOF);
 http://kraih.com/rebased/
-<script src="/rebased/js/jquery.js"></script>
+<script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
 http://kraih.com/rebased/foo
 /rebased/foo
@@ -87,7 +87,7 @@ EOF
 $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
   ->content_is(<<EOF);
 http://kraih.com/rebased/
-<script src="/rebased/js/jquery.js"></script>
+<script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
 http://kraih.com/rebased/foo
 /rebased/foo
@@ -103,7 +103,7 @@ done_testing();
 __DATA__
 @@ root.html.ep
 %= $self->req->url->base
-%= javascript '/js/jquery.js'
+%= javascript '/mojo/jquery/jquery.js'
 %= image '/images/test.png'
 %= url_for('foo')->to_abs
 %= url_for 'foo'

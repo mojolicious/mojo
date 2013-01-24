@@ -469,6 +469,8 @@ sub _fallbacks {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Controller - Controller base class
@@ -574,16 +576,33 @@ Data storage persistent only for the next request, stored in the C<session>.
 Subscribe to events of C<tx>, which is usually a L<Mojo::Transaction::HTTP> or
 L<Mojo::Transaction::WebSocket> object.
 
-  # Emitted when the transaction has been finished
+  # Do something after the transaction has been finished
   $c->on(finish => sub {
     my $c = shift;
     $c->app->log->debug('We are done!');
   });
 
-  # Emitted when new WebSocket messages arrive
+  # Receive WebSocket message
+  use Mojo::JSON 'j';
   $c->on(message => sub {
     my ($c, $msg) = @_;
     $c->app->log->debug("Message: $msg");
+  });
+
+  # Receive JSON object via WebSocket "Text" message
+  use Mojo::JSON 'j';
+  $c->on(text => sub {
+    my ($c, $bytes) = @_;
+    my $test = j($bytes)->{test};
+    $c->app->log->debug("Test: $test");
+  });
+
+  # Receive JSON object via WebSocket "Binary" message
+  use Mojo::JSON 'j';
+  $c->on(binary => sub {
+    my ($c, $bytes) = @_;
+    my $test = j($bytes)->{test};
+    $c->app->log->debug("Test: $test");
   });
 
 =head2 param
@@ -809,16 +828,16 @@ is set to the value C<XMLHttpRequest>.
 Send message or frame non-blocking via WebSocket, the optional drain callback
 will be invoked once all data has been written.
 
-  # Send "Text" frame
-  $c->send('Hello World!');
+  # Send "Text" message
+  $c->send('I ♥ Mojolicious!');
 
-  # Send JSON object as "Text" frame
+  # Send JSON object as "Text" message
   use Mojo::JSON 'j';
-  $c->send({text => j({hello => 'world'})});
+  $c->send({text => j({test => 'I ♥ Mojolicious!'})});
 
-  # Send JSON object as "Binary" frame
+  # Send JSON object as "Binary" message
   use Mojo::JSON 'j';
-  $c->send({binary => j({hello => 'world'})});
+  $c->send({binary => j({test => 'I ♥ Mojolicious!'})});
 
   # Send "Ping" frame
   $c->send([1, 0, 0, 0, 9, 'Hello World!']);

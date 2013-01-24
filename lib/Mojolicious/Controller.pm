@@ -583,7 +583,6 @@ L<Mojo::Transaction::WebSocket> object.
   });
 
   # Receive WebSocket message
-  use Mojo::JSON 'j';
   $c->on(message => sub {
     my ($c, $msg) = @_;
     $c->app->log->debug("Message: $msg");

@@ -1,5 +1,6 @@
 
 3.83  2013-01-25
+  - Moved bundled static files to mojo directory.
   - Improved documentation.
   - Improved tests.
 

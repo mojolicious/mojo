@@ -26,9 +26,8 @@ has ua   => sub {
 sub new {
   my $self = shift->SUPER::new(@_);
 
-  my $home = $self->home->detect(ref $self);
-
   # Check if we have a log directory
+  my $home = $self->home->detect(ref $self);
   $self->log->path($home->rel_file('log/mojo.log'))
     if -w $home->rel_file('log');
 

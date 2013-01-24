@@ -187,6 +187,24 @@ $t->get_ok('/reuse/exception')->status_is(500)
 isa_ok $exception, 'Mojo::Exception',      'right exception class';
 like $exception,   qr/Reusable exception/, 'right exception';
 
+# Bundled static files
+$t->get_ok('/mojo/jquery/jquery.js')->status_is(200)
+  ->content_type_is('application/javascript');
+$t->get_ok('/mojo/prettify/prettify.js')->status_is(200)
+  ->content_type_is('application/javascript');
+$t->get_ok('/mojo/prettify/prettify-mojo.css')->status_is(200)
+  ->content_type_is('text/css');
+$t->get_ok('/mojo/failraptor.png')->status_is(200)
+  ->content_type_is('image/png');
+$t->get_ok('/mojo/logo-black.png')->status_is(200)
+  ->content_type_is('image/png');
+$t->get_ok('/mojo/logo-white.png')->status_is(200)
+  ->content_type_is('image/png');
+$t->get_ok('/mojo/noraptor.png')->status_is(200)->content_type_is('image/png');
+$t->get_ok('/mojo/notfound.png')->status_is(200)->content_type_is('image/png');
+$t->get_ok('/mojo/pinstripe.gif')->status_is(200)
+  ->content_type_is('image/gif');
+
 done_testing();
 
 __DATA__

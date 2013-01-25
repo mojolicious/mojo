@@ -490,7 +490,7 @@ the partial template.
 =head2 Reusable template blocks
 
 It's never fun to repeat yourself, that's why you can build reusable template
-blocks in C<ep> that work very similar normal Perl functions.
+blocks in C<ep> that work very similar to normal Perl functions.
 
   @@ welcome.html.ep
   <% my $block = begin %>

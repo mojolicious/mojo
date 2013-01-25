@@ -55,13 +55,12 @@ sub attr {
   my ($class, $attrs, $default) = @_;
   return unless ($class = ref $class || $class) && $attrs;
 
-  Carp::croak('Default has to be a code reference or constant value')
+  Carp::croak 'Default has to be a code reference or constant value'
     if ref $default && ref $default ne 'CODE';
 
   # Compile attributes
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
-    Carp::croak(qq{Attribute "$attr" invalid})
-      unless $attr =~ /^[a-zA-Z_]\w*$/;
+    Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
 
     # Header (check arguments)
     my $code = "package $class;\nsub $attr {\n  if (\@_ == 1) {\n";
@@ -89,7 +88,7 @@ sub attr {
     # We compile custom attribute code for speed
     no strict 'refs';
     warn "-- Attribute $attr in $class\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
-    Carp::croak("Mojo::Base error: $@") unless eval "$code;1";
+    Carp::croak "Mojo::Base error: $@" unless eval "$code;1";
   }
 }
 

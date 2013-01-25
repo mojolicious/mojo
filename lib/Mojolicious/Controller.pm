@@ -1,6 +1,7 @@
 package Mojolicious::Controller;
 use Mojo::Base -base;
 
+# No imports, for security reasons!
 use Carp ();
 use Mojo::ByteStream;
 use Mojo::Cookie::Response;
@@ -29,11 +30,11 @@ sub AUTOLOAD {
 
   # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
-  Carp::croak("Undefined subroutine &${package}::$method called")
-    unless Scalar::Util::blessed($self) && $self->isa(__PACKAGE__);
+  Carp::croak "Undefined subroutine &${package}::$method called"
+    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
 
   # Call helper
-  Carp::croak(qq{Can't locate object method "$method" via package "$package"})
+  Carp::croak qq{Can't locate object method "$method" via package "$package"}
     unless my $helper = $self->app->renderer->helpers->{$method};
   return $self->$helper(@_);
 }
@@ -309,7 +310,7 @@ sub respond_to {
 sub send {
   my ($self, $msg, $cb) = @_;
   my $tx = $self->tx;
-  Carp::croak('No WebSocket connection to send message to')
+  Carp::croak 'No WebSocket connection to send message to'
     unless $tx->is_websocket;
   $tx->send($msg => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered(101);
@@ -394,8 +395,7 @@ sub url_for {
   my $target = shift // '';
 
   # Absolute URL
-  return $target
-    if Scalar::Util::blessed($target) && $target->isa('Mojo::URL');
+  return $target if Scalar::Util::blessed $target && $target->isa('Mojo::URL');
   return Mojo::URL->new($target) if $target =~ m!^\w+://!;
 
   # Base

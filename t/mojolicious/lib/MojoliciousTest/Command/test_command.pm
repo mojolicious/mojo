@@ -1,6 +1,12 @@
 package MojoliciousTest::Command::test_command;
 use Mojo::Base 'Mojolicious::Command';
 
-sub run { return 'works!' }
+use Getopt::Long 'GetOptionsFromArray';
+
+sub run {
+  my ($self, @args) = @_;
+  GetOptionsFromArray \@args, 'too' => \my $too;
+  return $too ? 'works too!' : 'works!';
+}
 
 1;

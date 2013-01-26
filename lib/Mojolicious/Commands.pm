@@ -1,8 +1,7 @@
 package Mojolicious::Commands;
 use Mojo::Base 'Mojolicious::Command';
 
-use Getopt::Long
-  qw(GetOptions :config no_auto_abbrev no_ignore_case pass_through);
+use Getopt::Long 'GetOptions';
 use List::Util 'max';
 use Mojo::Server;
 
@@ -42,11 +41,13 @@ sub detect {
 
 # Command line options for MOJO_HELP, MOJO_HOME and MOJO_MODE
 BEGIN {
+  Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case pass_through));
   GetOptions(
     'h|help'   => sub { $ENV{MOJO_HELP} = 1 },
     'home=s'   => sub { $ENV{MOJO_HOME} = $_[1] },
     'm|mode=s' => sub { $ENV{MOJO_MODE} = $_[1] }
   ) unless __PACKAGE__->detect;
+  Getopt::Long::Configure('default');
 }
 
 sub run {

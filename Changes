@@ -1,8 +1,9 @@
 
-3.83  2013-01-26
+3.83  2013-01-27
   - Moved bundled static files to mojo directory.
   - Improved documentation.
   - Improved tests.
+  - Fixed small Getopt::Long configuration bug in Mojolicious::Commands.
 
 3.82  2013-01-18
   - Improved documentation.

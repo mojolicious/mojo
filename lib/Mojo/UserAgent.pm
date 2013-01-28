@@ -99,18 +99,19 @@ sub start {
     unless ($self->{nb}) {
       croak 'Blocking request in progress' if keys %{$self->{connections}};
       warn "-- Switching to non-blocking mode\n" if DEBUG;
+      $self->_cleanup;
       $self->{nb}++;
-      $self->_cleanup(1);
     }
     return $self->_start($tx, $cb);
   }
 
   # Start blocking
   warn "-- Blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
-  if (delete $self->{nb}) {
+  if ($self->{nb}) {
     croak 'Non-blocking requests in progress' if keys %{$self->{connections}};
     warn "-- Switching to blocking mode\n" if DEBUG;
-    $self->_cleanup(1);
+    $self->_cleanup;
+    delete $self->{nb};
   }
   $self->_start($tx => sub { $tx = pop });
 
@@ -159,7 +160,7 @@ sub _cache {
 }
 
 sub _cleanup {
-  my ($self, $restart) = @_;
+  my $self = shift;
   return unless my $loop = $self->_loop;
 
   # Clean up active connections (by closing them)
@@ -168,9 +169,8 @@ sub _cleanup {
   # Clean up keep alive connections
   $loop->remove($_->[1]) for @{delete $self->{cache} || []};
 
-  # Stop or restart server
+  # Stop server
   delete $self->{server};
-  $self->_server if $restart;
 }
 
 sub _connect {

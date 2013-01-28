@@ -1,4 +1,7 @@
 
+3.84  2013-01-29
+  - Fixed small file descriptor leak in Mojo::UserAgent.
+
 3.83  2013-01-27
   - Moved bundled static files to mojo directory.
   - Improved documentation.

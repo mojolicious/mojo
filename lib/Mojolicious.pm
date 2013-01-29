@@ -123,7 +123,7 @@ sub dispatch {
   # DEPRECATED in Rainbow!
   if ($plugins->has_subscribers('after_static_dispatch')) {
     warn <<EOF and $plugins->emit_hook_reverse(after_static_dispatch => $c);
-after_static_dispatch hook is DEPRECATED in favor of before_routes hook!!!
+after_static_dispatch hook is DEPRECATED in favor of before_routes!!!
 EOF
   }
 
@@ -382,7 +382,7 @@ new ones.
 Construct a new L<Mojolicious> application, calling C<${mode}_mode> and
 C<startup> in the process. Will automatically detect your home directory and
 set up logging based on your current operating mode. Also sets up the
-renderer, static dispatcher and a default set of plugins.
+renderer, static file server and a default set of plugins.
 
 =head2 build_tx
 
@@ -474,7 +474,7 @@ application object)
 
 =item before_dispatch
 
-Emitted right before the static dispatcher and router start their work.
+Emitted right before the static file server and router start their work.
 
   $app->hook(before_dispatch => sub {
     my $c = shift;
@@ -486,8 +486,7 @@ Very useful for rewriting incoming requests and other preprocessing tasks.
 
 =item after_static
 
-Emitted after the static dispatcher determined that a static file should be
-served.
+Emitted after the static file server decided to serve a static file.
 
   $app->hook(after_static => sub {
     my $c = shift;
@@ -499,8 +498,8 @@ controller object)
 
 =item before_routes
 
-Emitted after the static dispatcher determined if a static file should be
-served and before the router starts its work.
+Emitted after the static file server decided if a static file should be served
+and before the router starts its work.
 
   $app->hook(before_routes => sub {
     my $c = shift;

@@ -5,8 +5,8 @@ use Time::HiRes qw(gettimeofday tv_interval);
 
 sub register {
   my ($self, $app) = @_;
-  $app->hook(after_static_dispatch => \&_start);
-  $app->hook(after_dispatch        => \&_end);
+  $app->hook(before_routes  => \&_start);
+  $app->hook(after_dispatch => \&_end);
 }
 
 sub _end {

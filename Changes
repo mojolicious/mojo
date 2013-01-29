@@ -1,5 +1,7 @@
 
 3.84  2013-01-30
+  - Deprecated after_static_dispatch hook in favor of before_routes.
+  - Added after_static hook.
   - Fixed small file descriptor leak in Mojo::UserAgent.
 
 3.83  2013-01-27

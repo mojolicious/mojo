@@ -623,10 +623,9 @@ Post-processing tasks such as setting additional response headers are a very
 common use.
 
   # Make sure static files are cached
-  $self->hook(after_static_dispatch => sub {
+  $self->hook(after_static => sub {
     my $self = shift;
-    $self->res->headers->cache_control('max-age=3600, must-revalidate')
-      if $self->res->code;
+    $self->res->headers->cache_control('max-age=3600, must-revalidate');
   });
 
 Same for monitoring tasks.

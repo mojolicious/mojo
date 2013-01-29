@@ -54,19 +54,25 @@ hook before_dispatch => sub {
 };
 
 # Custom dispatcher /custom_too
-hook after_static_dispatch => sub {
+hook before_routes => sub {
   my $self = shift;
   $self->render_text('this works too')
     if $self->req->url->path->contains('/custom_too');
 };
 
 # Cleared response for /res.txt
-hook after_static_dispatch => sub {
+hook before_routes => sub {
   my $self = shift;
   return
     unless $self->req->url->path->contains('/res.txt')
     && $self->param('route');
   $self->tx->res(Mojo::Message::Response->new);
+};
+
+# Set additional headers for static files
+hook after_static => sub {
+  my $self = shift;
+  $self->res->headers->cache_control('max-age=3600, must-revalidate');
 };
 
 # Response generating condition "res" for /res.txt
@@ -108,10 +114,14 @@ $t->get_ok('/hello.txt')->status_is(200)
 $t->get_ok('/custom?a=works+too')->status_is(205)->content_is('works too');
 
 # Static file
-$t->get_ok('/res.txt')->status_is(200)->content_is("Static response!\n");
+$t->get_ok('/res.txt')->status_is(200)
+  ->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
+  ->content_is("Static response!\n");
 
 # Custom response
-$t->get_ok('/res.txt?route=1')->status_is(202)->content_is('Custom response!');
+$t->get_ok('/res.txt?route=1')->status_is(202)
+  ->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+  ->content_is('Custom response!');
 
 # Conditional response
 $t->get_ok('/res.txt?route=1&res=1')->status_is(201)

@@ -117,10 +117,18 @@ sub dispatch {
   my $plugins = $self->plugins->emit_hook(before_dispatch => $c);
 
   # Try to find a static file
-  $self->static->dispatch($c) unless $tx->res->code;
-  $plugins->emit_hook_reverse(after_static_dispatch => $c);
+  $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c)
+    unless $tx->res->code;
+
+  # DEPRECATED in Rainbow!
+  if ($plugins->has_subscribers('after_static_dispatch')) {
+    warn <<EOF and $plugins->emit_hook_reverse(after_static_dispatch => $c);
+after_static_dispatch hook is DEPRECATED in favor of before_routes hook!!!
+EOF
+  }
 
   # Routes
+  $plugins->emit_hook(before_routes => $c);
   my $res = $tx->res;
   return if $res->code;
   if (my $code = ($tx->req->error)[1]) { $res->code($code) }
@@ -476,18 +484,31 @@ Emitted right before the static dispatcher and router start their work.
 Very useful for rewriting incoming requests and other preprocessing tasks.
 (Passed the default controller object)
 
-=item after_static_dispatch
+=item after_static
 
-Emitted in reverse order after the static dispatcher determined if a static
-file should be served and before the router starts its work.
+Emitted after the static dispatcher determined that a static file should be
+served.
 
-  $app->hook(after_static_dispatch => sub {
+  $app->hook(after_static => sub {
     my $c = shift;
     ...
   });
 
-Mostly used for custom dispatchers and post-processing static file responses.
-(Passed the default controller object)
+Mostly used for post-processing static file responses. (Passed the default
+controller object)
+
+=item before_routes
+
+Emitted after the static dispatcher determined if a static file should be
+served and before the router starts its work.
+
+  $app->hook(before_routes => sub {
+    my $c = shift;
+    ...
+  });
+
+Mostly used for custom dispatchers and collecting metrics. (Passed the default
+controller object)
 
 =item after_render
 

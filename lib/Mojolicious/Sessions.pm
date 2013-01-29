@@ -30,10 +30,12 @@ sub load {
 sub store {
   my ($self, $c) = @_;
 
+  # Make sure session was active
   my $stash = $c->stash;
   return unless my $session = $stash->{'mojo.session'};
   return unless keys %$session || $stash->{'mojo.active_session'};
 
+  # Don't reset flash for static files
   my $old = delete $session->{flash};
   @{$session->{new_flash}}{keys %$old} = values %$old
     if $stash->{'mojo.static'};

@@ -89,7 +89,6 @@ sub serve_asset {
       ->content_range("bytes $start-$end/$size");
   }
 
-  # Serve asset
   return $res->content->asset($asset->start_range($start)->end_range($end));
 }
 

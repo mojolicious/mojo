@@ -1,5 +1,5 @@
 
-3.84  2013-01-29
+3.84  2013-01-30
   - Fixed small file descriptor leak in Mojo::UserAgent.
 
 3.83  2013-01-27

@@ -103,8 +103,15 @@ get '/res.txt' => (res => 1) => sub {
 
 my $t = Test::Mojo->new;
 
-# Normal request
-$t->get_ok('/')->status_is(200)->content_is('works');
+# Normal route
+$t->get_ok('/')->status_is(200)
+  ->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+  ->content_is('works');
+
+# Normal static file
+$t->get_ok('/test.txt')->status_is(200)
+  ->header_is('Cache-Control' => 'max-age=3600, must-revalidate')
+  ->content_is("Normal static file!\n");
 
 # Override static file
 $t->get_ok('/hello.txt')->status_is(200)
@@ -125,10 +132,13 @@ $t->get_ok('/res.txt?route=1')->status_is(202)
 
 # Conditional response
 $t->get_ok('/res.txt?route=1&res=1')->status_is(201)
+  ->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
   ->content_is('Conditional response!');
 
 # Another custom dispatcher
-$t->get_ok('/custom_too')->status_is(200)->content_is('this works too');
+$t->get_ok('/custom_too')->status_is(200)
+  ->header_isnt('Cache-Control' => 'max-age=3600, must-revalidate')
+  ->content_is('this works too');
 
 # First wrapper
 $t->get_ok('/wrap')->status_is(200)->content_is('Wrapped!');
@@ -147,3 +157,5 @@ done_testing();
 __DATA__
 @@ res.txt
 Static response!
+@@ test.txt
+Normal static file!

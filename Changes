@@ -1,4 +1,7 @@
 
+3.85  2013-01-31
+  - Improved documentation.
+
 3.84  2013-01-30
   - Deprecated after_static_dispatch hook in favor of before_routes.
   - Added after_static hook.

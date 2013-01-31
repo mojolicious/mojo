@@ -26,9 +26,9 @@ sub new {
   my $self = shift->SUPER::new(@_);
 
   $self->add_handler(
-    json => sub { ${$_[2]} = Mojo::JSON->new->encode($_[3]->{json}) });
-  $self->add_handler(data => sub { ${$_[2]} = $_[3]->{data} });
-  $self->add_handler(text => sub { ${$_[2]} = $_[3]->{text} });
+    json => sub { ${$_[2]} = Mojo::JSON->new->encode($_[3]{json}) });
+  $self->add_handler(data => sub { ${$_[2]} = $_[3]{data} });
+  $self->add_handler(text => sub { ${$_[2]} = $_[3]{text} });
 
   return $self;
 }

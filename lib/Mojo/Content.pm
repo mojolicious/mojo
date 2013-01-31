@@ -72,7 +72,7 @@ sub is_chunked { !!shift->headers->transfer_encoding }
 
 sub is_compressed { (shift->headers->content_encoding || '') =~ /^gzip$/i }
 
-sub is_dynamic { $_[0]->{dynamic} && !defined $_[0]->headers->content_length }
+sub is_dynamic { $_[0]{dynamic} && !defined $_[0]->headers->content_length }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
 

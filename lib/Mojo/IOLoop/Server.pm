@@ -109,7 +109,7 @@ sub start {
     $self->{handle} => sub { $self->_accept for 1 .. $self->multi_accept });
 }
 
-sub stop { $_[0]->reactor->remove($_[0]->{handle}) }
+sub stop { $_[0]->reactor->remove($_[0]{handle}) }
 
 sub _accept {
   my $self = shift;

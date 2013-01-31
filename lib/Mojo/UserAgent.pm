@@ -352,7 +352,7 @@ sub _handle {
   }
 }
 
-sub _loop { $_[0]->{nb} ? Mojo::IOLoop->singleton : $_[0]->ioloop }
+sub _loop { $_[0]{nb} ? Mojo::IOLoop->singleton : $_[0]->ioloop }
 
 sub _read {
   my ($self, $id, $chunk) = @_;

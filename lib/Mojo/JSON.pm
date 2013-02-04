@@ -98,7 +98,7 @@ sub decode {
 
 sub encode {
   my ($self, $ref) = @_;
-  return Mojo::Util::encode 'UTF-8', _encode_values($ref);
+  return Mojo::Util::encode 'UTF-8', _encode_value($ref);
 }
 
 sub false {$FALSE}
@@ -251,12 +251,12 @@ sub _decode_value {
 
 sub _encode_array {
   my $array = shift;
-  return '[' . join(',', map { _encode_values($_) } @$array) . ']';
+  return '[' . join(',', map { _encode_value($_) } @$array) . ']';
 }
 
 sub _encode_object {
   my $object = shift;
-  my @pairs = map { _encode_string($_) . ':' . _encode_values($object->{$_}) }
+  my @pairs = map { _encode_string($_) . ':' . _encode_value($object->{$_}) }
     keys %$object;
   return '{' . join(',', @pairs) . '}';
 }
@@ -267,7 +267,7 @@ sub _encode_string {
   return "\"$string\"";
 }
 
-sub _encode_values {
+sub _encode_value {
   my $value = shift;
 
   # Reference
@@ -285,7 +285,7 @@ sub _encode_values {
 
     # Blessed reference with TO_JSON method
     if (blessed $value && (my $sub = $value->can('TO_JSON'))) {
-      return _encode_values($value->$sub);
+      return _encode_value($value->$sub);
     }
   }
 

@@ -269,14 +269,14 @@ is $json->encode({true  => \1}), '{"true":true}',   'encode {true => \1}';
 is $json->encode({false => \0}), '{"false":false}', 'encode {false => \0}';
 $bytes = 'some true value';
 is $json->encode({true => \!!$bytes}), '{"true":true}',
-  'encode true boolean from string';
+  'encode true boolean from double negated reference';
 is $json->encode({true => \$bytes}), '{"true":true}',
-  'encode true boolean from string';
+  'encode true boolean from reference';
 $bytes = '';
 is $json->encode({false => \!!$bytes}), '{"false":false}',
-  'encode false boolean from string';
+  'encode false boolean from double negated reference';
 is $json->encode({false => \$bytes}), '{"false":false}',
-  'encode false boolean from string';
+  'encode false boolean from reference';
 
 # Errors
 is $json->decode('["♥"]'), undef, 'wide character in input';

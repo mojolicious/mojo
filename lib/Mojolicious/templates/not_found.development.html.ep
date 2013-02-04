@@ -84,9 +84,8 @@
           <code><%= $self->req->url->path %></code>, maybe you need to add a
           new one?
         </p>
-        % my $walk;
-        % $walk = begin
-          % my ($node, $depth) = @_;
+        % my $walk = begin
+          % my ($walk, $node, $depth) = @_;
           <tr>
             <td>
               % my $pattern = $node->pattern->pattern || '/';
@@ -102,7 +101,7 @@
             </td>
           </tr>
           % $depth++;
-          %= $walk->($_, $depth) for @{$node->children};
+          %= $walk->($walk, $_, $depth) for @{$node->children};
           % $depth--;
         % end
         <table>
@@ -111,7 +110,7 @@
             <th>Methods</th>
             <th>Name</th>
           </tr>
-          %= $walk->($_, 0) for @{app->routes->children};
+          %= $walk->($walk, $_, 0) for @{app->routes->children};
         </table>
       </div>
     </div>

@@ -1,5 +1,6 @@
 
 3.85  2013-02-05
+  - Updated jQuery to version 1.9.1.
   - Improved documentation.
   - Improved tests.
   - Fixed memory leak in development not found page.

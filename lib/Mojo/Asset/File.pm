@@ -22,7 +22,7 @@ has handle => sub {
   }
 
   # Open new or temporary file
-  my $base = catfile File::Spec::Functions::tmpdir, 'mojo.tmp';
+  my $base = catfile $self->tmpdir, 'mojo.tmp';
   my $name = $path // $base;
   until ($handle->open($name, O_CREAT | O_EXCL | O_RDWR)) {
     croak qq{Can't open file "$name": $!} if defined $path || $! != $!{EEXIST};

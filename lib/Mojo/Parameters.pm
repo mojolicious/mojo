@@ -282,8 +282,8 @@ Merge L<Mojo::Parameters> objects.
 
 Check and replace parameter value. Be aware that if you request a parameter by
 name in scalar context, you will receive only the I<first> value for that
-parameter, if there are multiple values for that name. In list context you will
-receive I<all> of the values for that name.
+parameter, if there are multiple values for that name. In list context you
+will receive I<all> of the values for that name.
 
 =head2 params
 

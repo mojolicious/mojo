@@ -114,8 +114,6 @@ sub start {
     delete $self->{nb};
   }
   $self->_start($tx => sub { $tx = pop });
-
-  # Start event loop
   $self->ioloop->start;
 
   return $tx;

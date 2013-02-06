@@ -280,7 +280,10 @@ Merge L<Mojo::Parameters> objects.
   my $foo   = $params->param(foo => 'ba;r');
   my @foo   = $params->param(foo => qw(ba;r ba;z));
 
-Check and replace parameter values.
+Check and replace parameter value. Be aware that if you request a parameter by
+name in scalar context, you will receive only the I<first> value for that
+parameter, if there are multiple values for that name. In list context you will
+receive I<all> of the values for that name.
 
 =head2 params
 

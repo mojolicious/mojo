@@ -9,7 +9,7 @@ use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 
 # Perl with support for quads
 use constant MODERN =>
-  ($Config{use64bitint} eq 'define' || $Config{longsize} >= 8);
+  (($Config{use64bitint} // '') eq 'define' || $Config{longsize} >= 8);
 
 # Unique value from the spec
 use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';

@@ -1,5 +1,6 @@
 use Mojo::Base -strict;
 
+use File::Basename 'dirname';
 use Test::More;
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
@@ -169,7 +170,16 @@ ok !$asset->is_file, 'stored in memory';
 # Temporary directory
 {
   local $ENV{MOJO_TMPDIR} = '/does/not/exist';
-  is(Mojo::Asset::File->new->tmpdir, '/does/not/exist', 'right value');
+  $asset = Mojo::Asset::File->new;
+  is($asset->tmpdir, '/does/not/exist', 'right value');
+  my $h = eval { $asset->handle };
+  if ($h) {
+    # in case /does/not/exist actually exists
+    is dirname($asset->path), '/does/not/exist', 'right tmpdir';
+  }
+  else {
+    like $@, qr(^Can't open file "/does/not/exist/mojo.tmp"), 'right tmpdir';
+  }
 }
 
 # Temporary file without cleanup

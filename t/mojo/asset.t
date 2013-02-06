@@ -1,6 +1,9 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use File::Basename 'dirname';
+use File::Path 'mkpath';
+use File::Spec::Functions qw(catdir tmpdir);
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 
@@ -168,8 +171,13 @@ ok !$asset->is_file, 'stored in memory';
 
 # Temporary directory
 {
-  local $ENV{MOJO_TMPDIR} = '/does/not/exist';
-  is(Mojo::Asset::File->new->tmpdir, '/does/not/exist', 'right value');
+  mkpath my $tmpdir = catdir tmpdir, 'test';
+  local $ENV{MOJO_TMPDIR} = $tmpdir;
+  $file = Mojo::Asset::File->new;
+  is($file->tmpdir, $tmpdir, 'same directory');
+  $file->add_chunk('works!');
+  is $file->slurp, 'works!', 'right content';
+  is dirname($file->path), $tmpdir, 'same directory';
 }
 
 # Temporary file without cleanup

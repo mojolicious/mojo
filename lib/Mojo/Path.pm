@@ -39,9 +39,8 @@ sub canonicalize {
 sub clone {
   my $self  = shift;
   my $clone = Mojo::Path->new;
-  $clone->leading_slash($self->leading_slash);
-  $clone->trailing_slash($self->trailing_slash);
-  return $clone->charset($self->charset)->parts([@{$self->parts}]);
+  $clone->$_($self->$_) for qw(charset leading_slash trailing_slash);
+  return $clone->parts([@{$self->parts}]);
 }
 
 sub contains {

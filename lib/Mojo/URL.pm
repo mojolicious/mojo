@@ -45,13 +45,9 @@ sub clone {
   my $self = shift;
 
   my $clone = Mojo::URL->new;
-  $clone->scheme($self->scheme);
-  $clone->userinfo($self->userinfo);
-  $clone->host($self->host);
-  $clone->port($self->port);
+  $clone->$_($self->$_) for qw(scheme userinfo host port fragment);
   $clone->path($self->path->clone);
   $clone->query($self->query->clone);
-  $clone->fragment($self->fragment);
   $clone->base($self->base->clone) if $self->{base};
 
   return $clone;

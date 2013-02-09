@@ -426,7 +426,7 @@ L<Mojo::Transaction> and implements the following new ones.
 
 =head2 new
 
-  my $multi = Mojo::Content::MultiPart->new;
+  my $ws = Mojo::Transaction::WebSocket->new;
 
 Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
 C<frame> event with default message parser, which also handles C<PING> and

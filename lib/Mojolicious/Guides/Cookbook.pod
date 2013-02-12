@@ -986,7 +986,7 @@ use L<Mojo::UserAgent::Transactor> generators.
 
   # Add "stream" generator
   my $ua = Mojo::UserAgent->new;
-  $ua->transactor->add_generator(stream = sub {
+  $ua->transactor->add_generator(stream => sub {
     my ($transactor, $tx, $path) = @_;
     $tx->req->content->asset(Mojo::Asset::File->new(path => $path));
   });

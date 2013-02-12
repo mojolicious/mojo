@@ -247,14 +247,17 @@ is $result, 'test3test2', 'right result';
 is $client, 3,            'finish event has been emitted';
 
 # Connection denied
-$code = undef;
+$code = $ws = undef;
 $ua->websocket(
   '/denied' => sub {
-    $code = pop->res->code;
+    my $tx = pop;
+    $ws   = $tx->is_websocket;
+    $code = $tx->res->code;
     $loop->stop;
   }
 );
 $loop->start;
+ok !$ws, 'not a WebSocket';
 is $code,      403, 'right status';
 is $handshake, 1,   'finished handshake';
 is $denied,    1,   'finished websocket';

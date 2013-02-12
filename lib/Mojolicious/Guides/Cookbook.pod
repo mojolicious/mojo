@@ -984,16 +984,16 @@ use L<Mojo::UserAgent::Transactor> generators.
   use Mojo::UserAgent;
   use Mojo::Asset::File;
 
-  # Add "large" generator
+  # Add "stream" generator
   my $ua = Mojo::UserAgent->new;
-  $ua->transactor->add_generator(large = sub {
+  $ua->transactor->add_generator(stream = sub {
     my ($transactor, $tx, $path) = @_;
     $tx->req->content->asset(Mojo::Asset::File->new(path => $path));
   });
 
-  # Upload multiple files streaming via PUT
-  $ua->put('http://mojolicio.us/upload' => large => '/home/sri/mojo.png');
-  $ua->put('http://mojolicio.us/upload' => large => '/home/sri/mango.png');
+  # Upload multiple files streaming via PUT and POST
+  $ua->put('http://mojolicio.us/upload'  => stream => '/home/sri/mojo.png');
+  $ua->post('http://mojolicio.us/upload' => stream => '/home/sri/mango.png');
 
 =head2 Command line
 

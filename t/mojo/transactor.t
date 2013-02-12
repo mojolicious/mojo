@@ -10,8 +10,16 @@ use Mojo::URL;
 use Mojo::UserAgent::Transactor;
 use Mojo::Util 'encode';
 
-# Simle GET
+# Custom content generator
 my $t = Mojo::UserAgent::Transactor->new;
+$t->add_generator(
+  reverse => sub {
+    my ($t, $tx, $content) = @_;
+    $tx->req->body(scalar reverse $content);
+  }
+);
+
+# Simle GET
 my $tx = $t->tx(GET => 'mojolicio.us/foo.html?bar=baz');
 is $tx->req->url->to_abs, 'http://mojolicio.us/foo.html?bar=baz', 'right URL';
 is $tx->req->method, 'GET', 'right method';
@@ -46,14 +54,26 @@ is $tx->req->method, 'DELETE', 'right method';
 is $tx->req->headers->expect, undef, 'no "Expect" value';
 is $tx->req->body, 'test', 'right content';
 
+# PUT with custom content generator
+$tx = $t->tx(PUT => 'mojolicio.us', reverse => 'hello!');
+is $tx->req->url->to_abs, 'http://mojolicio.us', 'right URL';
+is $tx->req->method, 'PUT', 'right method';
+is $tx->req->headers->dnt, undef, 'no "DNT" value';
+is $tx->req->body, '!olleh', 'right content';
+$tx = $t->tx(PUT => 'mojolicio.us', {DNT => 1}, reverse => 'hello!');
+is $tx->req->url->to_abs, 'http://mojolicio.us', 'right URL';
+is $tx->req->method, 'PUT', 'right method';
+is $tx->req->headers->dnt, 1, 'right "DNT" value';
+is $tx->req->body, '!olleh', 'right content';
+
 # Simple JSON POST
-$tx = $t->json('http://kraih.com/foo' => {test => 123});
+$tx = $t->tx(POST => 'http://kraih.com/foo', json => {test => 123});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/json',
   'right "Content-Type" value';
 is_deeply $tx->req->json, {test => 123}, 'right content';
-$tx = $t->json('http://kraih.com/foo' => [1, 2, 3]);
+$tx = $t->tx(POST => 'http://kraih.com/foo', json => [1, 2, 3]);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/json',
@@ -61,7 +81,8 @@ is $tx->req->headers->content_type, 'application/json',
 is_deeply $tx->req->json, [1, 2, 3], 'right content';
 
 # JSON POST with headers
-$tx = $t->json('http://kraih.com/foo' => {test => 123} => {DNT => 1});
+$tx
+  = $t->tx(POST => 'http://kraih.com/foo', {DNT => 1}, json => {test => 123});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->dnt, 1, 'right "DNT" value';
@@ -70,9 +91,9 @@ is $tx->req->headers->content_type, 'application/json',
 is_deeply $tx->req->json, {test => 123}, 'right content';
 
 # JSON POST with custom content type
-$tx = $t->json(
-  'http://kraih.com/foo' => [1, 2, 3],
-  {DNT => 1, 'content-type' => 'application/something'}
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  {DNT => 1, 'content-type' => 'application/something'}, json => [1, 2, 3],
 );
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
@@ -82,7 +103,7 @@ is $tx->req->headers->content_type, 'application/something',
 is_deeply $tx->req->json, [1, 2, 3], 'right content';
 
 # Simple form
-$tx = $t->form('http://kraih.com/foo' => {test => 123});
+$tx = $t->tx(POST => 'http://kraih.com/foo' => form => {test => 123});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
@@ -90,7 +111,8 @@ is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
 is $tx->req->body, 'test=123', 'right content';
 
 # Simple form with multiple values
-$tx = $t->form('http://kraih.com/foo' => {a => [1, 2, 3], b => 4});
+$tx
+  = $t->tx(POST => 'http://kraih.com/foo' => form => {a => [1, 2, 3], b => 4});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
@@ -98,7 +120,11 @@ is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
 is $tx->req->body, 'a=1&a=2&a=3&b=4', 'right content';
 
 # UTF-8 form
-$tx = $t->form('http://kraih.com/foo' => 'UTF-8' => {test => 123});
+$tx = $t->tx(
+  POST    => 'http://kraih.com/foo',
+  form    => {test => 123},
+  charset => 'UTF-8'
+);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
@@ -106,8 +132,12 @@ is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
 is $tx->req->body, 'test=123', 'right content';
 
 # UTF-8 form with header
-$tx = $t->form(
-  'http://kraih.com/foo' => 'UTF-8' => {test => 123} => {Accept => '*/*'});
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  {Accept => '*/*'},
+  form    => {test => 123},
+  charset => 'UTF-8'
+);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
@@ -116,9 +146,9 @@ is $tx->req->headers->accept, '*/*', 'right "Accept" value';
 is $tx->req->body, 'test=123', 'right content';
 
 # Multipart form
-$tx = $t->form(
-  'http://kraih.com/foo' => {test => 123},
-  {'Content-Type' => 'multipart/form-data'}
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  {'Content-Type' => 'multipart/form-data'}, form => {test => 123}
 );
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
@@ -132,9 +162,9 @@ ok !$tx->req->content->parts->[0]->asset->auto_upgrade, 'no upgrade';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
 # Multipart form with multiple values
-$tx = $t->form(
-  'http://kraih.com/foo' => {a => [1, 2, 3], b => 4},
-  {'Content-Type' => 'multipart/form-data'}
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  {'Content-Type' => 'multipart/form-data'}, form => {a => [1, 2, 3], b => 4}
 );
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
@@ -158,7 +188,10 @@ is_deeply [$tx->req->param('b')], [4], 'right values';
 
 # Multipart form with real file and custom header
 my $path = catdir $FindBin::Bin, 'transactor.t';
-$tx = $t->form('http://kraih.com/foo', {mytext => {file => $path, DNT => 1}});
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  form => {mytext => {file => $path, DNT => 1}}
+);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -174,8 +207,10 @@ is $tx->req->content->parts->[0]->headers->dnt, 1, 'right "DNT" header';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
 # Multipart form with asset
-$tx = $t->form('http://kraih.com/foo',
-  {mytext => {file => Mojo::Asset::File->new(path => $path)}});
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  form => {mytext => {file => Mojo::Asset::File->new(path => $path)}}
+);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -189,7 +224,10 @@ ok $tx->req->content->parts->[0]->asset->is_file, 'stored in file';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
 # Multipart form with in-memory content
-$tx = $t->form('http://kraih.com/foo' => {mytext => {content => 'lalala'}});
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  form => {mytext => {content => 'lalala'}}
+);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -204,8 +242,10 @@ ok !$tx->req->content->parts->[0]->asset->auto_upgrade, 'no upgrade';
 is $tx->req->content->parts->[1], undef, 'no more parts';
 
 # Multipart form with filename
-$tx = $t->form('http://kraih.com/foo',
-  {myzip => {content => 'whatever', filename => 'foo.zip'}});
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  form => {myzip => {content => 'whatever', filename => 'foo.zip'}}
+);
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'multipart/form-data',
@@ -222,13 +262,15 @@ is $tx->req->upload('myzip')->slurp,    'whatever', 'right content';
 
 # Multipart form with asset and filename (UTF-8)
 my $snowman = encode 'UTF-8', '☃';
-$tx = $t->form(
-  'http://kraih.com/foo' => 'UTF-8' => {
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  form => {
     '☃' => {
       file     => Mojo::Asset::Memory->new->add_chunk('snowman'),
       filename => '☃.jpg'
     }
-  }
+  },
+  charset => 'UTF-8'
 );
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
@@ -243,8 +285,9 @@ is $tx->req->upload('☃')->size,     7,         'right size';
 is $tx->req->upload('☃')->slurp,    'snowman', 'right content';
 
 # Multipart form with multiple uploads sharing the same name
-$tx = $t->form(
-  'http://kraih.com/foo' => {
+$tx = $t->tx(
+  POST => 'http://kraih.com/foo',
+  form => {
     mytext => [
       {content => 'just',  filename => 'one.txt'},
       {content => 'works', filename => 'two.txt'}

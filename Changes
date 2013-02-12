@@ -1,5 +1,23 @@
 
-3.85  2013-02-09
+3.85  2013-02-12
+  - Deprecated Mojo::UserAgent->build_form_tx in favor of
+    Mojo::UserAgent->build_tx.
+  - Deprecated Mojo::UserAgent->build_json_tx in favor of
+    Mojo::UserAgent->build_tx.
+  - Deprecated Mojo::UserAgent->post_form in favor of Mojo::UserAgent->post.
+  - Deprecated Mojo::UserAgent->post_json in favor of Mojo::UserAgent->post.
+  - Deprecated Mojo::UserAgent::Transactor->form in favor of
+    Mojo::UserAgent::Transactor->tx.
+  - Deprecated Mojo::UserAgent::Transactor->json in favor of
+    Mojo::UserAgent::Transactor->tx.
+  - Deprecated Test::Mojo->post_form_ok in favor of Test::Mojo->post_ok.
+  - Deprecated Test::Mojo->post_json_ok in favor of Test::Mojo->post_ok.
+  - Deprecated ojo->f in favor of ojo->p.
+  - Deprecated ojo->n in favor of ojo->p.
+  - Added pluggable generator system to Mojo::UserAgent::Transactor.
+    (judofyr, sri)
+  - Added generators attribute to Mojo::UserAgent::Transactor.
+  - Added add_generator method to Mojo::UserAgent::Transactor.
   - Updated jQuery to version 1.9.1.
   - Improved documentation.
   - Improved tests.

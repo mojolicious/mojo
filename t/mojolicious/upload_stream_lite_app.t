@@ -55,14 +55,14 @@ get '/download/:id' => sub {
 my $t = Test::Mojo->new;
 
 # Small upload
-$t->post_form_ok('/upload/23' => {my_file => {content => 'whatever'}})
+$t->post_ok('/upload/23' => form => {my_file => {content => 'whatever'}})
   ->status_is(200)->content_is('whatever');
 
 # Small download
 $t->get_ok('/download/23')->status_is(200)->content_is('whatever');
 
 # Big upload
-$t->post_form_ok('/upload/24' => {my_file => {content => '1234' x 131072}})
+$t->post_ok('/upload/24' => form => {my_file => {content => '1234' x 131072}})
   ->status_is(200)->content_is('1234' x 131072);
 
 # Big download

@@ -542,12 +542,12 @@ $t->get_ok('/noformat.xml')->status_is(404)
   ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Oops!\n");
 
 # "application/x-www-form-urlencoded"
-$t->post_form_ok('/multipart/form' => {test => [1 .. 5]})->status_is(200)
+$t->post_ok('/multipart/form' => form => {test => [1 .. 5]})->status_is(200)
   ->content_is(join "\n", 1 .. 5);
 
 # "multipart/form-data"
-$t->post_form_ok(
-  '/multipart/form' => {test => [1 .. 5], file => {content => '123'}})
+$t->post_ok(
+  '/multipart/form' => form => {test => [1 .. 5], file => {content => '123'}})
   ->status_is(200)->content_is(join "\n", 1 .. 5);
 
 # Generated name
@@ -903,18 +903,17 @@ $t->get_ok('/url_for_foxy')->status_is(200)
   ->content_is('/firefox/%23test');
 
 # UTF-8 form
-$t->post_form_ok('/utf8' => 'UTF-8' => {name => 'табак'})->status_is(200)
-  ->header_is(Server           => 'Mojolicious (Perl)')
+$t->post_ok('/utf8' => form => {name => 'табак'} => charset => 'UTF-8')
+  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 22)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_is("табак ангел\n");
 
 # UTF-8 "multipart/form-data" form
-$t->post_form_ok(
-  '/utf8' => 'UTF-8' => {name => 'табак'},
-  {'Content-Type' => 'multipart/form-data'}
-  )->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+$t->post_ok('/utf8' => {'Content-Type' => 'multipart/form-data'} => form =>
+    {name => 'табак'} => charset => 'UTF-8')->status_is(200)
+  ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 22)
   ->content_type_is('text/html;charset=UTF-8')

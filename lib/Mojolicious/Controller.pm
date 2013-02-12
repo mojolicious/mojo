@@ -913,7 +913,7 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
 
   # Blocking
   my $tx = $c->ua->get('http://mojolicio.us');
-  my $tx = $c->ua->post_form('http://kraih.com/login' => {user => 'mojo'});
+  my $tx = $c->ua->post('http://kraih.com/login', form => {user => 'mojo'});
 
   # Non-blocking
   $c->ua->get('http://mojolicio.us' => sub {

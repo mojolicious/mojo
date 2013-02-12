@@ -215,8 +215,8 @@ like $ua->ioloop->stream($tx->connection)
 $ua = Mojo::UserAgent->new;
 
 # Simple keep alive form POST
-$tx = $ua->post_form(
-  'http://search.cpan.org/search' => {query => 'mojolicious'});
+$tx = $ua->post(
+  'http://search.cpan.org/search' => form => {query => 'mojolicious'});
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->url, 'http://search.cpan.org/search', 'right url';
 is $tx->req->headers->content_length, 17, 'right content length';
@@ -224,8 +224,8 @@ is $tx->req->body,   'query=mojolicious', 'right content';
 like $tx->res->body, qr/Mojolicious/,     'right content';
 is $tx->res->code,   200,                 'right status';
 ok $tx->keep_alive, 'connection will be kept alive';
-$tx = $ua->post_form(
-  'http://search.cpan.org/search' => {query => 'mojolicious'});
+$tx = $ua->post(
+  'http://search.cpan.org/search' => form => {query => 'mojolicious'});
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->url, 'http://search.cpan.org/search', 'right url';
 is $tx->req->headers->content_length, 17, 'right content length';

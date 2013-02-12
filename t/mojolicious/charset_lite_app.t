@@ -60,31 +60,27 @@ get '/params' => sub {
 my $t = Test::Mojo->new;
 
 # Plain old ASCII
-$t->post_form_ok('/' => {foo => 'yatta'})->status_is(200)
+$t->post_ok('/' => form => {foo => 'yatta'})->status_is(200)
   ->content_is('foo: yatta');
 
 # Send raw Shift_JIS octets (like browsers do)
-$t->post_form_ok('/' => '' => {foo => $yatta_sjis})->status_is(200)
-  ->content_type_unlike(qr/application/)->content_type_like(qr/Shift_JIS/)
-  ->content_like(qr/$yatta/);
-
-# Send raw Shift_JIS octets (like browsers do, multipart message)
-$t->post_form_ok(
-  '/' => '' => {foo => $yatta_sjis},
-  {'Content-Type' => 'multipart/form-data'}
-  )->status_is(200)->content_type_like(qr/Shift_JIS/)
-  ->content_like(qr/$yatta/);
-
-# Send as string
-$t->post_form_ok('/' => 'shift_jis' => {foo => $yatta})->status_is(200)
+$t->post_ok('/' => form => {foo => $yatta_sjis} => charset => '')
+  ->status_is(200)->content_type_unlike(qr/application/)
   ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
 
+# Send raw Shift_JIS octets (like browsers do, multipart message)
+$t->post_ok('/' => {'Content-Type' => 'multipart/form-data'} => form =>
+    {foo => $yatta_sjis} => charset => '')->status_is(200)
+  ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
+
+# Send as string
+$t->post_ok('/' => form => {foo => $yatta} => charset => 'shift_jis')
+  ->status_is(200)->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
+
 # Send as string (multipart message)
-$t->post_form_ok(
-  '/' => 'shift_jis' => {foo => $yatta},
-  {'Content-Type' => 'multipart/form-data'}
-  )->status_is(200)->content_type_like(qr/Shift_JIS/)
-  ->content_like(qr/$yatta/);
+$t->post_ok('/' => {'Content-Type' => 'multipart/form-data'} => form =>
+    {foo => $yatta} => charset => 'shift_jis')->status_is(200)
+  ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
 
 # Unicode renderer
 $t->get_ok('/unicode')->status_is(200)->content_type_is('text/plain')

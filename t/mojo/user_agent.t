@@ -249,8 +249,8 @@ is $tx->res->body, 'works!', 'right content';
 
 # Non-blocking form
 ($success, $code, $body) = ();
-$ua->post_form(
-  '/echo' => {hello => 'world'} => sub {
+$ua->post(
+  '/echo' => form => {hello => 'world'} => sub {
     my ($self, $tx) = @_;
     $success = $tx->success;
     $code    = $tx->res->code;
@@ -265,8 +265,8 @@ is $body,    'hello=world', 'right content';
 
 # Non-blocking JSON
 ($success, $code, $body) = ();
-$ua->post_json(
-  '/echo' => {hello => 'world'} => sub {
+$ua->post(
+  '/echo' => json => {hello => 'world'} => sub {
     my ($self, $tx) = @_;
     $success = $tx->success;
     $code    = $tx->res->code;

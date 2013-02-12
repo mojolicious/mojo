@@ -28,8 +28,9 @@ is t('/')->body, 'PATCH',   'right content';
 is p('/')->body, 'POST',    'right content';
 is u('/')->body, 'PUT',     'right content';
 is d('/')->body, 'DELETE',  'right content';
-is f('/' => {foo => 'bar'})->body, 'POSTfoo=bar', 'right content';
-is n('/' => {foo => 'bar'})->body, 'POST{"foo":"bar"}', 'right content';
+is p('/' => form => {foo => 'bar'})->body, 'POSTfoo=bar', 'right content';
+is p('/' => json => {foo => 'bar'})->body, 'POST{"foo":"bar"}',
+  'right content';
 
 # Parse XML
 is x('<title>works</title>')->at('title')->text, 'works', 'right text';

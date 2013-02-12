@@ -156,14 +156,14 @@ my $result = '';
 for my $key (sort keys %params) { $result .= $params{$key} }
 my ($code, $body);
 my $port = $ua->app_url->port;
-$tx = $ua->post_form("http://127.0.0.1:$port/chunked" => \%params);
+$tx = $ua->post("http://127.0.0.1:$port/chunked" => form => \%params);
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 
 # Upload
 ($code, $body) = ();
-$tx = $ua->post_form(
-  "http://127.0.0.1:$port/upload" => {file => {content => $result}});
+$tx = $ua->post(
+  "http://127.0.0.1:$port/upload" => form => {file => {content => $result}});
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
 ok $tx->local_address, 'has local address';

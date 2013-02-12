@@ -35,36 +35,36 @@ my $t = Test::Mojo->new;
 
 # Asset and filename
 my $file = Mojo::Asset::File->new->add_chunk('lalala');
-$t->post_form_ok(
-  '/upload' => {file => {file => $file, filename => 'x'}, test => 'tset'})
+$t->post_ok('/upload' => form =>
+    {file => {file => $file, filename => 'x'}, test => 'tset'})
   ->status_is(200)->content_is('xlalalatsetfile,test');
 
 # Path
-$t->post_form_ok('/upload' => {file => {file => $file->path}, test => 'foo'})
+$t->post_ok('/upload', form => {file => {file => $file->path}, test => 'foo'})
   ->status_is(200)->content_like(qr!lalalafoofile,test$!);
 
 # Memory
-$t->post_form_ok('/upload' => {file => {content => 'alalal'}, test => 'tset'})
+$t->post_ok('/upload', form => {file => {content => 'alalal'}, test => 'tset'})
   ->status_is(200)->content_is('filealalaltsetfile,test');
 
 # Memory with headers
 my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
-$t->post_form_ok('/upload' => {file => $hash, test => 'tset'})->status_is(200)
-  ->content_is('filealalaltsetfoo/barYfile,test');
+$t->post_ok('/upload', form => {file => $hash, test => 'tset'})
+  ->status_is(200)->content_is('filealalaltsetfoo/barYfile,test');
 
 # Multiple file uploads
-$t->post_form_ok('/multi?name=file1&name=file2',
-  {file1 => {content => '1111'}, file2 => {content => '11112222'}})
+$t->post_ok('/multi?name=file1&name=file2' => form =>
+    {file1 => {content => '1111'}, file2 => {content => '11112222'}})
   ->status_is(200)->content_is('file11111file211112222');
 
 # Multiple file uploads reverse
-$t->post_form_ok('/multi?name=file2&name=file1',
-  {file1 => {content => '1111'}, file2 => {content => '11112222'}})
+$t->post_ok('/multi?name=file2&name=file1' => form =>
+    {file1 => {content => '1111'}, file2 => {content => '11112222'}})
   ->status_is(200)->content_is('file211112222file11111');
 
 # Multiple file uploads with same name
-$t->post_form_ok(
-  '/multi?name=file' => {
+$t->post_ok(
+  '/multi?name=file' => form => {
     file => [
       {content => 'just',  filename => 'one.txt'},
       {content => 'works', filename => 'two.txt'}

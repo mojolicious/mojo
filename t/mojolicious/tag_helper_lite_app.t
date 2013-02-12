@@ -140,8 +140,8 @@ $t->post_ok('/text')->status_is(200)->content_is(<<'EOF');
 EOF
 
 # Text input fields with values
-$t->post_form_ok(
-  '/text' => {
+$t->post_ok(
+  '/text' => form => {
     color  => '#000000',
     date   => '2012-12-13',
     dt     => '2012-12-13T23:59:59Z',

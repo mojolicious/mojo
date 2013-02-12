@@ -24,8 +24,9 @@ sub run {
     'u|user=s'     => \(my $user     = '');
   die $self->usage unless my $file = shift @args;
 
-  my $tx = Mojo::UserAgent->new->detect_proxy->post_form(
-    "https://$user:$password\@pause.perl.org/pause/authenquery" => {
+  my $tx = Mojo::UserAgent->new->detect_proxy->post(
+    "https://$user:$password\@pause.perl.org/pause/authenquery",
+    form => {
       HIDDENNAME                        => $user,
       CAN_MULTIPART                     => 1,
       pause99_add_uri_upload            => basename($file),

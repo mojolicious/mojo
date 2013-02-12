@@ -39,24 +39,26 @@ post sub {
 my $t = Test::Mojo->new;
 
 # Hash without format
-$t->post_json_ok('/json/echo' => {hello => 'world'})->status_is(204)
+$t->post_ok('/json/echo' => json => {hello => 'world'})->status_is(204)
   ->content_is('');
 
 # Hash with "json" format
-$t->post_json_ok(
-  '/json/echo' => {hello => 'world'} => {Accept => 'application/json'})
+$t->post_ok(
+  '/json/echo' => {Accept => 'application/json'} => json => {hello => 'world'})
   ->status_is(200)->content_type_is('application/json')
   ->json_content_is({hello => 'world'});
-my $tx = $t->ua->build_json_tx(
-  '/json/echo' => {hello => 'world'} => {Accept => 'application/json'});
-$tx->req->method('PUT');
+my $tx = $t->ua->build_tx(
+  PUT => '/json/echo',
+  {Accept => 'application/json'} => json => {hello => 'world'}
+);
 $t->request_ok($tx)->status_is(200)->content_type_is('application/json')
   ->json_content_is({hello => 'world'});
 
 # Array with "json" format
-$tx = $t->ua->build_json_tx(
-  '/json/echo' => [1, 2, 3] => {Accept => 'application/json'});
-$tx->req->method('PUT');
+$tx = $t->ua->build_tx(
+  PUT => '/json/echo',
+  {Accept => 'application/json'} => json => [1, 2, 3]
+);
 $t->request_ok($tx, 'request succesful')->status_is(200)
   ->content_type_is('application/json')->json_content_is([1, 2, 3]);
 
@@ -258,22 +260,23 @@ $t->post_ok('/rest.html?format=html' => {Accept => 'text/html'})
   ->text_is('html > body', 'works too');
 
 # "html" form
-$t->post_form_ok('/rest' => {format => 'html'})->status_is(200)
+$t->post_ok('/rest' => form => {format => 'html'})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works too');
 
 # "html" format with form
-$t->post_form_ok('/rest.html' => {format => 'html'})->status_is(200)
+$t->post_ok('/rest.html' => form => {format => 'html'})->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works too');
 
 # Accept "html" with form
-$t->post_form_ok('/rest' => {format => 'html'} => {Accept => 'text/html'})
+$t->post_ok('/rest' => {Accept => 'text/html'} => form => {format => 'html'})
   ->status_is(200)->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works too');
 
 # Accept "html" with everything, form alternative
-$t->post_form_ok('/rest.html' => {format => 'html'} => {Accept => 'text/html'})
+$t->post_ok(
+  '/rest.html' => {Accept => 'text/html'} => form => {format => 'html'})
   ->status_is(200)->content_type_is('text/html;charset=UTF-8')
   ->text_is('html > body', 'works too');
 
@@ -327,24 +330,24 @@ $t->post_ok('/rest.json?format=json' => {Accept => 'application/json'})
   ->json_content_is({just => 'works too'});
 
 # "json" form
-$t->post_form_ok('/rest' => {format => 'json'})->status_is(200)
+$t->post_ok('/rest' => form => {format => 'json'})->status_is(200)
   ->content_type_is('application/json')
   ->json_content_is({just => 'works too'});
 
 # "json" format with form
-$t->post_form_ok('/rest.json' => {format => 'json'})->status_is(200)
+$t->post_ok('/rest.json' => form => {format => 'json'})->status_is(200)
   ->content_type_is('application/json')
   ->json_content_is({just => 'works too'});
 
 # Accept "json" with form
-$t->post_form_ok(
-  '/rest' => {format => 'json'} => {Accept => 'application/json'})
+$t->post_ok(
+  '/rest' => {Accept => 'application/json'} => form => {format => 'json'})
   ->status_is(200)->content_type_is('application/json')
   ->json_content_is({just => 'works too'});
 
 # Accept "json" with everything, form alternative
-$t->post_form_ok(
-  '/rest.json' => {format => 'json'} => {Accept => 'application/json'})
+$t->post_ok(
+  '/rest.json' => {Accept => 'application/json'} => form => {format => 'json'})
   ->status_is(200)->content_type_is('application/json')
   ->json_content_is({just => 'works too'});
 
@@ -391,21 +394,22 @@ $t->post_ok('/rest.xml?format=xml' => {Accept => 'application/xml'})
   ->text_is(just => 'works too');
 
 # "xml" form
-$t->post_form_ok('/rest' => {format => 'xml'})->status_is(200)
+$t->post_ok('/rest' => form => {format => 'xml'})->status_is(200)
   ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # "xml" format with form
-$t->post_form_ok('/rest.xml' => {format => 'xml'})->status_is(200)
+$t->post_ok('/rest.xml' => form => {format => 'xml'})->status_is(200)
   ->content_type_is('application/xml')->text_is(just => 'works too');
 
 # Accept "json" with form
-$t->post_form_ok('/rest' => {format => 'xml'} => {Accept => 'application/xml'})
+$t->post_ok(
+  '/rest' => {Accept => 'application/xml'} => form => {format => 'xml'})
   ->status_is(200)->content_type_is('application/xml')
   ->text_is(just => 'works too');
 
 # Accept "json" with everything, form alternative
-$t->post_form_ok(
-  '/rest.xml' => {format => 'xml'} => {Accept => 'application/xml'})
+$t->post_ok(
+  '/rest.xml' => {Accept => 'application/xml'} => form => {format => 'xml'})
   ->status_is(200)->content_type_is('application/xml')
   ->text_is(just => 'works too');
 

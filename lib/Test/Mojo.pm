@@ -218,13 +218,21 @@ sub or {
 sub patch_ok { shift->_request_ok(patch => @_) }
 sub post_ok  { shift->_request_ok(post  => @_) }
 
+# DEPRECATED in Rainbow!
 sub post_form_ok {
+  warn <<EOF;
+Test::Mojo->post_form_ok is DEPRECATED in favor of Test::Mojo->post_ok!!!
+EOF
   my ($self, $url) = (shift, shift);
   my $tx = $self->tx($self->ua->post_form($url, @_))->tx;
   return $self->_test('ok', $tx->is_finished, encode('UTF-8', "post $url"));
 }
 
+# DEPRECATED in Rainbow!
 sub post_json_ok {
+  warn <<EOF;
+Test::Mojo->post_json_ok is DEPRECATED in favor of Test::Mojo->post_ok!!!
+EOF
   my ($self, $url) = (shift, shift);
   my $tx = $self->tx($self->ua->post_json($url, @_))->tx;
   return $self->_test('ok', $tx->is_finished, encode('UTF-8', "post $url"));
@@ -342,12 +350,10 @@ sub _message {
 }
 
 sub _request_ok {
-  my ($self, $method, $url, $headers, $body) = @_;
-  $body = $headers if !ref $headers && @_ > 3;
-  $headers = {} if !ref $headers;
+  my ($self, $method, $url) = (shift, shift, shift);
 
   # Perform request against application
-  $self->tx($self->ua->$method($url, $headers, $body));
+  $self->tx($self->ua->$method($url, @_));
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($err, $code) = $self->tx->error;
   Test::More::diag $err if !(my $ok = !$err || $code) && $err;
@@ -566,6 +572,8 @@ Opposite of C<content_type_like>.
 
   $t = $t->delete_ok('/foo');
   $t = $t->delete_ok('/foo' => {DNT => 1} => 'Hi!');
+  $t = $t->delete_ok('/foo' => {DNT => 1} => form => {a => 'b'});
+  $t = $t->delete_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
 Perform a C<DELETE> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"delete">.
@@ -596,6 +604,8 @@ Finish C<WebSocket> connection.
 
   $t = $t->get_ok('/foo');
   $t = $t->get_ok('/foo' => {DNT => 1} => 'Hi!');
+  $t = $t->get_ok('/foo' => {DNT => 1} => form => {a => 'b'});
+  $t = $t->get_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
 Perform a C<GET> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"get">.
@@ -604,6 +614,8 @@ arguments as L<Mojo::UserAgent/"get">.
 
   $t = $t->head_ok('/foo');
   $t = $t->head_ok('/foo' => {DNT => 1} => 'Hi!');
+  $t = $t->head_ok('/foo' => {DNT => 1} => form => {a => 'b'});
+  $t = $t->head_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
 Perform a C<HEAD> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"head">.
@@ -746,6 +758,8 @@ Opposite of C<message_like>.
 
   $t = $t->options_ok('/foo');
   $t = $t->options_ok('/foo' => {DNT => 1} => 'Hi!');
+  $t = $t->options_ok('/foo' => {DNT => 1} => form => {a => 'b'});
+  $t = $t->options_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
 Perform a C<OPTIONS> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"options">.
@@ -764,6 +778,8 @@ Invoke callback if previous test failed.
 
   $t = $t->patch_ok('/foo');
   $t = $t->patch_ok('/foo' => {DNT => 1} => 'Hi!');
+  $t = $t->patch_ok('/foo' => {DNT => 1} => form => {a => 'b'});
+  $t = $t->patch_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
 Perform a C<PATCH> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"patch">.
@@ -772,38 +788,18 @@ arguments as L<Mojo::UserAgent/"patch">.
 
   $t = $t->post_ok('/foo');
   $t = $t->post_ok('/foo' => {DNT => 1} => 'Hi!');
+  $t = $t->post_ok('/foo' => {DNT => 1} => form => {a => 'b'});
+  $t = $t->post_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
 Perform a C<POST> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"post">.
-
-=head2 post_form_ok
-
-  $t = $t->post_form_ok('/foo' => {a => 'b'});
-  $t = $t->post_form_ok('/foo' => 'UTF-8' => {a => 'b'} => {DNT => 1});
-
-Perform a C<POST> request with form data and check for transport errors, takes
-the same arguments as L<Mojo::UserAgent/"post_form">.
-
-  # Test file upload
-  $t->post_form_ok('/upload' => {foo => {content => 'bar'}})->status_is(200);
-
-=head2 post_json_ok
-
-  $t = $t->post_json_ok('/foo' => {a => 'b'});
-  $t = $t->post_json_ok('/foo' => {a => 'b'} => {DNT => 1});
-
-Perform a C<POST> request with JSON data and check for transport errors, takes
-the same arguments as L<Mojo::UserAgent/"post_json">.
-
-  # Test JSON API
-  $t->post_json_ok('/hello.json' => {hello => 'world'})
-    ->status_is(200)
-    ->json_content_is({bye => 'world'});
 
 =head2 put_ok
 
   $t = $t->put_ok('/foo');
   $t = $t->put_ok('/foo' => {DNT => 1} => 'Hi!');
+  $t = $t->put_ok('/foo' => {DNT => 1} => form => {a => 'b'});
+  $t = $t->put_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
 Perform a C<PUT> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"put">.
@@ -814,13 +810,6 @@ arguments as L<Mojo::UserAgent/"put">.
   $t = $t->request_ok(Mojo::Transaction::HTTP->new, 'request successful');
 
 Perform request and check for transport errors.
-
-  # Customize transaction
-  my $tx = $t->ua->build_json_tx('/user/99' => {name => 'sri'});
-  $tx->req->method('PUT');
-  $t->request_ok($tx)
-    ->status_is(200)
-    ->json_is('/message' => 'User has been replaced.');
 
 =head2 reset_session
 

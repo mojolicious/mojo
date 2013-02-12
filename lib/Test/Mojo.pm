@@ -404,7 +404,7 @@ Test::Mojo - Testing Mojo!
   $t->get_ok('/welcome')->status_is(200)->text_is('div#message' => 'Hello!');
 
   # JSON
-  $t->post_form_ok('/search.json' => {q => 'Perl'})
+  $t->post_ok('/search.json' => form => {q => 'Perl'})
     ->status_is(200)
     ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
     ->header_isnt('X-Bender' => 'Bite my shiny metal ass!');

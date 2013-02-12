@@ -526,7 +526,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('www.☃.net?hello=there' => {DNT => 1})->res->body;
 
   # Form POST with exception handling
-  my $tx = $ua->post_form('search.cpan.org/search' => {q => 'mojo'});
+  my $tx = $ua->post('search.cpan.org/search' => form => {q => 'mojo'});
   if (my $res = $tx->success) { say $res->body }
   else {
     my ($err, $code) = $tx->error;
@@ -554,7 +554,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   # TLS certificate authentication and JSON POST
   my $tx = $ua->cert('tls.crt')->key('tls.key')
-    ->post_json('https://mojolicio.us' => {top => 'secret'});
+    ->post('https://mojolicio.us' => json => {top => 'secret'});
 
   # Blocking parallel requests (does not work inside a running event loop)
   my $delay = Mojo::IOLoop->delay;

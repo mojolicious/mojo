@@ -909,6 +909,7 @@ And once again you don't have to worry about memory usage, all data will be
 streamed directly from the file.
 
   use Mojo::UserAgent;
+  use Mojo::Asset::File;
 
   # Upload file via PUT
   my $ua     = Mojo::UserAgent->new;
@@ -974,6 +975,25 @@ be able to work standalone as well as inside L<Mojolicious> applications.
   $ua->get('http://mojolicio.us'         => $delay->begin);
   $ua->get('http://mojolicio.us/perldoc' => $delay->begin);
   $delay->wait unless Mojo::IOLoop->is_running;
+
+=head2 Content generators
+
+To generate the same type of content repeatedly for multiple requests, you can
+use L<Mojo::UserAgent::Transactor> generators.
+
+  use Mojo::UserAgent;
+  use Mojo::Asset::File;
+
+  # Add "large" generator
+  my $ua = Mojo::UserAgent->new;
+  $ua->transactor->add_generator(large = sub {
+    my ($transactor, $tx, $path) = @_;
+    $tx->req->content->asset(Mojo::Asset::File->new(path => $path));
+  });
+
+  # Upload multiple files streaming via PUT
+  $ua->put('http://mojolicio.us/upload' => large => '/home/sri/mojo.png');
+  $ua->put('http://mojolicio.us/upload' => large => '/home/sri/mango.png');
 
 =head2 Command line
 

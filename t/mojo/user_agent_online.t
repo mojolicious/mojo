@@ -153,7 +153,7 @@ is h('mojolicio.us')->body,          '',  'no content';
 is p('mojolicio.us/lalalala')->code, 404, 'right status';
 is g('http://mojolicio.us')->code,   200, 'right status';
 is p('http://mojolicio.us')->code,   404, 'right status';
-my $res = f('search.cpan.org/search' => {query => 'mojolicious'});
+my $res = p('search.cpan.org/search' => form => {query => 'mojolicious'});
 like $res->body, qr/Mojolicious/, 'right content';
 is $res->code,   200,             'right status';
 

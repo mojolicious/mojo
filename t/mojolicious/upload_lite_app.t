@@ -40,16 +40,18 @@ $t->post_ok('/upload' => form =>
   ->status_is(200)->content_is('xlalalatsetfile,test');
 
 # Path
-$t->post_ok('/upload', form => {file => {file => $file->path}, test => 'foo'})
+$t->post_ok(
+  '/upload' => form => {file => {file => $file->path}, test => 'foo'})
   ->status_is(200)->content_like(qr!lalalafoofile,test$!);
 
 # Memory
-$t->post_ok('/upload', form => {file => {content => 'alalal'}, test => 'tset'})
+$t->post_ok(
+  '/upload' => form => {file => {content => 'alalal'}, test => 'tset'})
   ->status_is(200)->content_is('filealalaltsetfile,test');
 
 # Memory with headers
 my $hash = {content => 'alalal', 'Content-Type' => 'foo/bar', 'X-X' => 'Y'};
-$t->post_ok('/upload', form => {file => $hash, test => 'tset'})
+$t->post_ok('/upload' => form => {file => $hash, test => 'tset'})
   ->status_is(200)->content_is('filealalaltsetfoo/barYfile,test');
 
 # Multiple file uploads

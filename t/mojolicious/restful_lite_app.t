@@ -47,18 +47,16 @@ $t->post_ok(
   '/json/echo' => {Accept => 'application/json'} => json => {hello => 'world'})
   ->status_is(200)->content_type_is('application/json')
   ->json_content_is({hello => 'world'});
-my $tx = $t->ua->build_tx(
-  PUT => '/json/echo',
-  {Accept => 'application/json'} => json => {hello => 'world'}
-);
+my $tx
+  = $t->ua->build_tx(
+  PUT => '/json/echo' => {Accept => 'application/json'} => json =>
+    {hello => 'world'});
 $t->request_ok($tx)->status_is(200)->content_type_is('application/json')
   ->json_content_is({hello => 'world'});
 
 # Array with "json" format
 $tx = $t->ua->build_tx(
-  PUT => '/json/echo',
-  {Accept => 'application/json'} => json => [1, 2, 3]
-);
+  PUT => '/json/echo' => {Accept => 'application/json'} => json => [1, 2, 3]);
 $t->request_ok($tx, 'request succesful')->status_is(200)
   ->content_type_is('application/json')->json_content_is([1, 2, 3]);
 

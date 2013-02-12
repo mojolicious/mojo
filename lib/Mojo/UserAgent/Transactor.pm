@@ -135,7 +135,7 @@ sub tx {
   $req->headers->from_hash(shift) if ref $_[0] eq 'HASH';
 
   # Generator
-  if (@_ >= 2) {
+  if (@_ > 1) {
     return $tx unless my $generator = $self->generators->{shift()};
     $self->$generator($tx, @_);
   }
@@ -368,7 +368,7 @@ C<307> or C<308> redirect response if possible.
     PUT  => 'http://kraih.com' => {DNT => 1} => json => {a => 'b'});
 
 Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
-requests.
+requests, with support for generators.
 
   # Inspect generated request
   say $t->tx(GET => 'mojolicio.us' => {DNT => 1} => 'Bye!')->req->to_string;
@@ -381,6 +381,10 @@ requests.
   my $tx = $t->tx(GET => 'http://mojolicio.us');
   $tx->connection($sock);
 
+  # Use form generator with custom charset
+  my $tx = $t->tx(
+    PUT => 'http://kraih.com' => form => {a => 'b'} => charset => 'UTF-8');
+
   # Multiple form values with the same name
   my $tx = $t->tx(PUT => 'http://kraih.com' => form => {a => [qw(b c d)]});
 
@@ -388,15 +392,15 @@ requests.
   my $tx = $t->tx(
     PUT => 'http://kraih.com' => form => {mytext => {file => '/foo.txt'}});
 
-  # Multipart upload (in memory)
+  # Multipart upload with in-memory content
   my $tx = $t->tx(
     POST => 'http://kraih.com' => form => {mytext => {content => 'lalala'}});
 
-  # Multiple files
+  # Upload multiple files
   my $tx = $t->tx(POST => 'http://kraih.com' => form =>
       {mytext => [{content => 'first'}, {content => 'second'}]});
 
-  # Part with filename and custom header
+  # Customized upload with filename and header
   my $tx = $t->tx(POST => 'http://kraih.com' => form => {
     myzip => {
       file     => Mojo::Asset::Memory->new->add_chunk('lalala'),
@@ -404,10 +408,6 @@ requests.
       DNT      => 1
     }
   });
-
-  # Custom charset
-  my $tx = $t->tx(
-    PUT => 'http://kraih.com' => form => {a => 'b'} => charset => 'UTF-8');
 
 While the "multipart/form-data" content type will be automatically used
 instead of "application/x-www-form-urlencoded" when necessary, you can also

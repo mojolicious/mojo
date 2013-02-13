@@ -397,8 +397,8 @@ requests, with support for generators.
     POST => 'http://kraih.com' => form => {mytext => {content => 'lalala'}});
 
   # Upload multiple files
-  my $tx = $t->tx(POST => 'http://kraih.com' => form =>
-      {mytext => [{content => 'first'}, {content => 'second'}]});
+  my $tx = $t->tx(POST => 'http://kraih.com' =>
+    form => {mytext => [{content => 'first'}, {content => 'second'}]});
 
   # Customized upload with filename and header
   my $tx = $t->tx(POST => 'http://kraih.com' => form => {

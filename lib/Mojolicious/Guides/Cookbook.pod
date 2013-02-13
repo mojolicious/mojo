@@ -995,8 +995,7 @@ use generators.
   $ua->put('http://mojolicio.us/upload'  => stream => '/home/sri/mojo.png');
   $ua->post('http://mojolicio.us/upload' => stream => '/home/sri/mango.png');
 
-For JSON as well as "application/x-www-form-urlencoded" and
-"multipart/form-data" content there are already generators defined.
+The C<json> and C<form> generators are always available.
 
   use Mojo::UserAgent;
 
@@ -1011,7 +1010,7 @@ For JSON as well as "application/x-www-form-urlencoded" and
   my $tx3 = $ua->put('http://upload.mojolicio.us' =>
     form => {image => {file => '/home/sri/hello.png'}});
 
-For more information about generators see also
+For more information about available generators see also
 L<Mojo::UserAgent::Transactor/"tx">.
 
 =head2 Command line

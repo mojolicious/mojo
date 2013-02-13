@@ -902,7 +902,7 @@ Uploading a large file is even easier.
 
   # Upload file via POST and "multipart/form-data"
   my $ua = Mojo::UserAgent->new;
-  $ua->post('mojolicio.us/upload',
+  $ua->post('mojolicio.us/upload' =>
     form => {image => {file => '/home/sri/hello.png'}});
 
 And once again you don't have to worry about memory usage, all data will be
@@ -979,7 +979,7 @@ be able to work standalone as well as inside L<Mojolicious> applications.
 =head2 Content generators
 
 To generate the same type of content repeatedly for multiple requests, you can
-use L<Mojo::UserAgent::Transactor> generators.
+use generators.
 
   use Mojo::UserAgent;
   use Mojo::Asset::File;
@@ -994,6 +994,25 @@ use L<Mojo::UserAgent::Transactor> generators.
   # Upload multiple files streaming via PUT and POST
   $ua->put('http://mojolicio.us/upload'  => stream => '/home/sri/mojo.png');
   $ua->post('http://mojolicio.us/upload' => stream => '/home/sri/mango.png');
+
+For JSON as well as "application/x-www-form-urlencoded" and
+"multipart/form-data" content there are already generators defined.
+
+  use Mojo::UserAgent;
+
+  # Send JSON content via PATCH
+  my $ua = Mojo::UserAgent->new;
+  my $tx = $ua->patch('http://api.mojolicio.us' => json => {foo => 'bar'});
+
+  # Send "application/x-www-form-urlencoded" content via POST
+  my $tx2 = $ua->put('http://search.mojolicio.us' => form => {q => 'test'});
+
+  # Send "multipart/form-data" content via PUT
+  my $tx3 = $ua->put('http://upload.mojolicio.us' =>
+    form => {image => {file => '/home/sri/hello.png'}});
+
+For more information about generators see also
+L<Mojo::UserAgent::Transactor/"tx">.
 
 =head2 Command line
 

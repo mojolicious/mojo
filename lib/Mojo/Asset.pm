@@ -83,9 +83,10 @@ subclass.
 =head2 get_chunk
 
   my $bytes = $asset->get_chunk($offset);
+  my $bytes = $asset->get_chunk($offset, $size);
 
-Get chunk of data starting from a specific position. Meant to be overloaded
-in a subclass.
+Get chunk of data starting from a specific position. Optionally takes a 
+maximum number of bytes to return. Meant to be overloaded in a subclass.
 
 =head2 is_file
 

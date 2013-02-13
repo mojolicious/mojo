@@ -92,7 +92,8 @@ sub contains {
 }
 
 sub get_chunk {
-  my ($self, $start) = @_;
+  my ($self, $start, $size) = @_;
+  $size //= 131072;
 
   $start += $self->start_range;
   my $handle = $self->handle;
@@ -102,9 +103,9 @@ sub get_chunk {
   if (defined(my $end = $self->end_range)) {
     my $chunk = $end + 1 - $start;
     return '' if $chunk <= 0;
-    $handle->sysread($buffer, $chunk > 131072 ? 131072 : $chunk);
+    $handle->sysread($buffer, $chunk > $size ? $size : $chunk);
   }
-  else { $handle->sysread($buffer, 131072) }
+  else { $handle->sysread($buffer, $size) }
 
   return $buffer;
 }
@@ -221,8 +222,10 @@ Check if asset contains a specific string.
 =head2 get_chunk
 
   my $bytes = $file->get_chunk($start);
+  my $bytes = $file->get_chunk($start, $size);
 
-Get chunk of data starting from a specific position.
+Get chunk of data starting from a specific position. Optionally takes a 
+maximum number of bytes to return.
 
 =head2 is_file
 

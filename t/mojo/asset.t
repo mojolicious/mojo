@@ -68,6 +68,12 @@ $chunk = $file->get_chunk(1);
 is $chunk, 'defghi', 'chunk from position 1';
 $chunk = $file->get_chunk(5);
 is $chunk, 'hi', 'chunk from position 5';
+$chunk = $file->get_chunk(0,2);
+is $chunk, 'cd', 'chunk from position 0 (size 2)';
+$chunk = $file->get_chunk(1,3);
+is $chunk, 'def', 'chunk from position 1 (size 3)';
+$chunk = $file->get_chunk(5,1);
+is $chunk, 'h', 'chunk from position 5 (size 1)';
 
 # Memory asset range support (ab[cdefghi]jk)
 $mem = Mojo::Asset::Memory->new(start_range => 2, end_range => 8);
@@ -85,6 +91,12 @@ $chunk = $mem->get_chunk(1);
 is $chunk, 'defghi', 'chunk from position 1';
 $chunk = $mem->get_chunk(5);
 is $chunk, 'hi', 'chunk from position 5';
+$chunk = $mem->get_chunk(0,2);
+is $chunk, 'cd', 'chunk from position 0 (size 2)';
+$chunk = $mem->get_chunk(1,3);
+is $chunk, 'def', 'chunk from position 1 (size 3)';
+$chunk = $mem->get_chunk(5,1);
+is $chunk, 'h', 'chunk from position 5 (size 1)';
 
 # Huge file asset
 $file = Mojo::Asset::File->new;

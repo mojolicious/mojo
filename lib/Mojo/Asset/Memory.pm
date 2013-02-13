@@ -32,10 +32,11 @@ sub contains {
 }
 
 sub get_chunk {
-  my ($self, $start) = @_;
+  my ($self, $start, $size) = @_;
+  $size //= 131072;
 
   $start += $self->start_range;
-  my $size = 131072;
+
   if (my $end = $self->end_range) {
     $size = $end + 1 - $start if ($start + $size) > $end;
   }
@@ -139,8 +140,10 @@ Check if asset contains a specific string.
 =head2 get_chunk
 
   my $bytes = $mem->get_chunk($offset);
+  my $bytes = $mem->get_chunk($offset, $size);
 
-Get chunk of data starting from a specific position.
+Get chunk of data starting from a specific position. Optionally takes a 
+maximum number of bytes to return.
 
 =head2 move_to
 

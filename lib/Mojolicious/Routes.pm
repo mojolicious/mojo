@@ -20,7 +20,7 @@ sub add_shortcut  { shift->_add(shortcuts  => @_) }
 sub auto_render {
   my ($self, $c) = @_;
   my $stash = $c->stash;
-  return undef if $stash->{'mojo.rendered'} || $c->tx->is_websocket;
+  return undef if $stash->{'mojo.rendered'};
   $c->render or ($stash->{'mojo.routed'} or $c->render_not_found);
 }
 

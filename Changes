@@ -14,7 +14,7 @@
   - Deprecated Test::Mojo->post_json_ok in favor of Test::Mojo->post_ok.
   - Deprecated ojo->f in favor of ojo->p.
   - Deprecated ojo->n in favor of ojo->p.
-  - Added pluggable generator system to Mojo::UserAgent::Transactor.
+  - Added pluggable content generator system to Mojo::UserAgent::Transactor.
     (judofyr, sri)
   - Added generators attribute to Mojo::UserAgent::Transactor.
   - Added add_generator method to Mojo::UserAgent::Transactor.

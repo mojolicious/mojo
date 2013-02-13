@@ -1,6 +1,7 @@
 
 3.86  2013-02-14
   - Improved documentation.
+  - Improved tests. (jberger, sri)
 
 3.85  2013-02-13
   - Deprecated Mojo::UserAgent->build_form_tx in favor of

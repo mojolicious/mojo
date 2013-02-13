@@ -32,15 +32,15 @@ sub contains {
 }
 
 sub get_chunk {
-  my ($self, $offset) = @_;
+  my ($self, $offset, $max) = @_;
+  $max //= 131072;
 
   $offset += $self->start_range;
-  my $size = 131072;
   if (my $end = $self->end_range) {
-    $size = $end + 1 - $offset if ($offset + $size) > $end;
+    $max = $end + 1 - $offset if ($offset + $max) > $end;
   }
 
-  return substr shift->{content}, $offset, $size;
+  return substr shift->{content}, $offset, $max;
 }
 
 sub move_to {
@@ -139,8 +139,10 @@ Check if asset contains a specific string.
 =head2 get_chunk
 
   my $bytes = $mem->get_chunk($offset);
+  my $bytes = $mem->get_chunk($offset, $max);
 
-Get chunk of data starting from a specific position.
+Get chunk of data starting from a specific position, defaults to a maximum
+chunk size of C<131072> bytes.
 
 =head2 move_to
 

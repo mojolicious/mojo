@@ -300,7 +300,7 @@ on L<Mojo::DOM>.
     ->element_exists('form input[type="submit"]');
 
   # Test login with valid credentials
-  $t->post_ok('/', form => {user => 'sri', pass => 'secr3t'})
+  $t->post_ok('/' => form => {user => 'sri', pass => 'secr3t'})
     ->status_is(200)->text_like('html body' => qr/Welcome sri/);
 
   # Test accessing a protected page
@@ -673,7 +673,7 @@ C<t/login.t> can be simplified.
     ->element_exists('form input[name="pass"]')
     ->element_exists('form input[type="submit"]');
 
-  $t->post_ok('/', form => {user => 'sri', pass => 'secr3t'})
+  $t->post_ok('/' => form => {user => 'sri', pass => 'secr3t'})
     ->status_is(200)->text_like('html body' => qr/Welcome sri/);
 
   $t->get_ok('/protected')->status_is(200)->text_like('a' => qr/Logout/);

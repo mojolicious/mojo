@@ -794,6 +794,15 @@ arguments as L<Mojo::UserAgent/"patch">.
 Perform a C<POST> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"post">.
 
+  # Test file upload
+  $t->post_ok('/upload' => form => {foo => {content => 'bar'}})
+    ->status_is(200);
+
+  # Test JSON API
+  $t->post_json_ok('/hello.json' => json => {hello => 'world'})
+    ->status_is(200)
+    ->json_content_is({bye => 'world'});
+
 =head2 put_ok
 
   $t = $t->put_ok('/foo');

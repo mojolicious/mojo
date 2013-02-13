@@ -945,16 +945,6 @@ Uploading a large file is even easier.
 And once again you don't have to worry about memory usage, all data will be
 streamed directly from the file.
 
-  use Mojo::UserAgent;
-  use Mojo::Asset::File;
-
-  # Upload file via PUT
-  my $ua     = Mojo::UserAgent->new;
-  my $asset  = Mojo::Asset::File->new(path => '/home/sri/hello.png');
-  my $tx     = $ua->build_tx(PUT => 'mojolicio.us/upload');
-  $tx->req->content->asset($asset);
-  $ua->start($tx);
-
 =head2 Non-blocking
 
 L<Mojo::UserAgent> has been designed from the ground up to be non-blocking,

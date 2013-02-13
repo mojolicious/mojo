@@ -848,7 +848,7 @@ The C<json> and C<form> generators are always available.
   my $tx = $ua->patch('http://api.mojolicio.us' => json => {foo => 'bar'});
 
   # Send "application/x-www-form-urlencoded" content via POST
-  my $tx2 = $ua->put('http://search.mojolicio.us' => form => {q => 'test'});
+  my $tx2 = $ua->post('http://search.mojolicio.us' => form => {q => 'test'});
 
   # Send "multipart/form-data" content via PUT
   my $tx3 = $ua->put('http://upload.mojolicio.us' =>

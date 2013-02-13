@@ -1008,7 +1008,7 @@ The C<json> and C<form> generators are always available.
 
   # Send "multipart/form-data" content via PUT
   my $tx3 = $ua->put('http://upload.mojolicio.us' =>
-    form => {image => {file => '/home/sri/hello.png'}});
+    form => {test => {content => 'Hello World!'}});
 
 For more information about available generators see also
 L<Mojo::UserAgent::Transactor/"tx">.

@@ -32,15 +32,15 @@ sub contains {
 }
 
 sub get_chunk {
-  my ($self, $start) = @_;
+  my ($self, $offset) = @_;
 
-  $start += $self->start_range;
+  $offset += $self->start_range;
   my $size = 131072;
   if (my $end = $self->end_range) {
-    $size = $end + 1 - $start if ($start + $size) > $end;
+    $size = $end + 1 - $offset if ($offset + $size) > $end;
   }
 
-  return substr shift->{content}, $start, $size;
+  return substr shift->{content}, $offset, $size;
 }
 
 sub move_to {

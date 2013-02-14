@@ -173,7 +173,7 @@ ok !$asset->is_file, 'stored in memory';
 
 # Temporary directory
 {
-  mkpath my $tmpdir = catdir tmpdir, 'test';
+  mkpath my $tmpdir = catdir tmpdir, "mojo_asset_test_$$";
   local $ENV{MOJO_TMPDIR} = $tmpdir;
   $file = Mojo::Asset::File->new;
   is($file->tmpdir, $tmpdir, 'same directory');

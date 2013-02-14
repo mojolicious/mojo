@@ -2,8 +2,8 @@ use Mojo::Base -strict;
 
 use Test::More;
 use File::Basename 'dirname';
-use File::Path 'mkpath';
-use File::Spec::Functions qw(catdir tmpdir);
+use File::Spec::Functions 'catdir';
+use File::Temp 'tempdir';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 
@@ -173,7 +173,7 @@ ok !$asset->is_file, 'stored in memory';
 
 # Temporary directory
 {
-  mkpath my $tmpdir = catdir tmpdir, "mojo_asset_test_$$";
+  my $tmpdir = tempdir CLEANUP => 1;
   local $ENV{MOJO_TMPDIR} = $tmpdir;
   $file = Mojo::Asset::File->new;
   is($file->tmpdir, $tmpdir, 'same directory');

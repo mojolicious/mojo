@@ -289,10 +289,10 @@ Mojo::UserAgent::Transactor - User agent transactor
   say $t->tx(PATCH => 'mojolicio.us' => {DNT => 1} => 'Hi!')->req->to_string;
 
   # POST request with form data
-  say $t->tx(POST => 'http://kraih.com' => form => {a => 'b')->req->to_string;
+  say $t->tx(POST => 'kraih.com' => form => {a => 'b'})->req->to_string;
 
   # PUT request with JSON data
-  say $t->tx(PUT => 'http://kraih.com' => json => {a => 'b')->req->to_string;
+  say $t->tx(PUT => 'http://kraih.com' => json => {a => 'b'})->req->to_string;
 
 =head1 DESCRIPTION
 

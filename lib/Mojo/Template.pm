@@ -190,12 +190,7 @@ sub parse {
     }
 
     # Escaped line ending
-    if ($line =~ /(\\+)$/) {
-      length $1 > 1 ? ($line =~ s/\\\\$/\\\n/) : ($line =~ s/\\$//);
-    }
-
-    # Normal line ending
-    else { $line .= "\n" }
+    $line .= "\n" unless $line =~ s/\\\\$/\\\n/ || $line =~ s/\\$//;
 
     # Mixed line
     my @token;

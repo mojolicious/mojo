@@ -664,8 +664,8 @@ have been used in the past.
 
 =head1 SPONSORS
 
-Some of the work on this distribution has been sponsored by The Perl
-Foundation, thank you!
+Some of the work on this distribution has been sponsored by
+L<The Perl Foundation|http://www.perlfoundation.org>, thank you!
 
 =head1 PROJECT FOUNDER
 

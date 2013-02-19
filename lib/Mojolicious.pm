@@ -346,6 +346,9 @@ object. You can usually leave this alone, see
 L<Mojolicious::Controller/"session"> for more information about working with
 session data.
 
+  # Change name of cookie used for all sessions
+  $app->sessions->cookie_name('mysession');
+
 =head2 static
 
   my $static = $app->static;
@@ -368,6 +371,7 @@ L<Mojolicious::Static> object.
 Responsible for connecting file extensions with MIME types, defaults to a
 L<Mojolicious::Types> object.
 
+  # Add custom MIME type
   $app->types->type(twt => 'text/tweet');
 
 =head1 METHODS

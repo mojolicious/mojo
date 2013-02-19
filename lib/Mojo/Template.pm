@@ -140,7 +140,6 @@ sub parse {
   my $end     = $self->tag_end;
   my $start   = $self->line_start;
 
-  # Precompile
   my $token_re = qr/
     (
       \Q$tag$replace\E                       # Replace
@@ -177,7 +176,7 @@ sub parse {
   for my $line (split /\n/, $tmpl) {
     $trimming = 0 if $state eq 'text';
 
-    # Perl line
+    # Turn Perl line into mixed line
     if ($state eq 'text' && $line !~ s/^(\s*)\Q$start$replace\E/$1$start/) {
       if ($line =~ s/^(\s*)\Q$start\E(?:(\Q$cmnt\E)|(\Q$expr\E))?//) {
 
@@ -275,7 +274,7 @@ sub _trim {
   # Walk line backwards
   for (my $j = @$line - 4; $j >= 0; $j -= 2) {
 
-    # Skip capture
+    # Skip captures
     next if grep { $_ eq $line->[$j] } qw(cpst cpen);
 
     # Only trim text

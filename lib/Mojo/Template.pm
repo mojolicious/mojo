@@ -180,20 +180,18 @@ sub parse {
     # Perl line
     if ($state eq 'text' && $line !~ s/^(\s*)\Q$start$replace\E/$1$start/) {
       if ($line =~ s/^(\s*)\Q$start\E(?:(\Q$cmnt\E)|(\Q$expr\E))?//) {
-        if   ($2) { $line = "$tag$cmnt $trim$end" }
-        else      { $line = $3 ? "$1$tag$3$line $end" : "$tag$line $trim$end" }
+
+        # Comment
+        if ($2) { $line = "$tag$2 $trim$end" }
+
+        # Expression or code
+        else { $line = $3 ? "$1$tag$3$line $end" : "$tag$line $trim$end" }
       }
     }
 
     # Escaped line ending
     if ($line =~ /(\\+)$/) {
-      my $len = length $1;
-
-      # Newline
-      if ($len == 1) { $line =~ s/\\$// }
-
-      # Backslash
-      elsif ($len > 1) { $line =~ s/\\\\$/\\\n/ }
+      length $1 > 1 ? ($line =~ s/\\\\$/\\\n/) : ($line =~ s/\\$//);
     }
 
     # Normal line ending
@@ -235,7 +233,7 @@ sub parse {
       # Comment
       elsif ($token =~ /^\Q$tag$cmnt\E$/) { $state = 'cmnt' }
 
-      # Value
+      # Text
       else {
 
         # Replace

@@ -4,6 +4,7 @@
   - Improved documentation.
   - Improved tests. (jberger, sri)
   - Fixed small domain detection bug in Mojo::UserAgent::CookieJar.
+    (dione, sri)
   - Fixed comment lines in Mojo::Template to cover the whole line.
 
 3.85  2013-02-13

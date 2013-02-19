@@ -179,8 +179,10 @@ sub parse {
 
     # Perl line
     if ($state eq 'text' && $line !~ s/^(\s*)\Q$start$replace\E/$1$start/) {
-      $line =~ s/^(\s*)\Q$start\E(\Q$expr\E)?//
-        and $line = $2 ? "$1$tag$2$line $end" : "$tag$line $trim$end";
+      if ($line =~ s/^(\s*)\Q$start\E(?:(\Q$cmnt\E)|(\Q$expr\E))?//) {
+        if   ($2) { $line = "$tag$cmnt $trim$end" }
+        else      { $line = $3 ? "$1$tag$3$line $end" : "$tag$line $trim$end" }
+      }
     }
 
     # Escaped line ending
@@ -383,7 +385,7 @@ automatically enabled.
   % Perl code line, treated as "<% line =%>"
   %= Perl expression line, treated as "<%= line %>"
   %== Perl expression line, treated as "<%== line %>"
-  %# Comment line, treated as "<%# line =%>"
+  %# Comment line, useful for debugging
   %% Replaced with "%", useful for generating templates
 
 Escaping behavior can be reversed with the C<auto_escape> attribute, this is

@@ -655,23 +655,26 @@ $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
 test
 123
+ %# This dies
 % die 'oops!';
 %= 1 + 1
 test
 EOF
 isa_ok $output, 'Mojo::Exception', 'right exception';
 like $output->message, qr/oops!/, 'right message';
-is $output->lines_before->[0][0], 1,      'right number';
-is $output->lines_before->[0][1], 'test', 'right line';
-is $output->lines_before->[1][0], 2,      'right number';
-is $output->lines_before->[1][1], '123',  'right line';
-is $output->line->[0], 3, 'right number';
+is $output->lines_before->[0][0], 1,               'right number';
+is $output->lines_before->[0][1], 'test',          'right line';
+is $output->lines_before->[1][0], 2,               'right number';
+is $output->lines_before->[1][1], '123',           'right line';
+is $output->lines_before->[2][0], 3,               'right number';
+is $output->lines_before->[2][1], ' %# This dies', 'right line';
+is $output->line->[0], 4, 'right number';
 is $output->line->[1], "% die 'oops!';", 'right line';
-is $output->lines_after->[0][0], 4,          'right number';
+is $output->lines_after->[0][0], 5,          'right number';
 is $output->lines_after->[0][1], '%= 1 + 1', 'right line';
-is $output->lines_after->[1][0], 5,          'right number';
+is $output->lines_after->[1][0], 6,          'right number';
 is $output->lines_after->[1][1], 'test',     'right line';
-like "$output", qr/oops! at template line 3/, 'right result';
+like "$output", qr/oops! at template line 4/, 'right result';
 
 # Exception in template (empty perl lines)
 $mt     = Mojo::Template->new;
@@ -898,6 +901,15 @@ comment %>this not
 </html>
 EOF
 is $output, "<html>this not\n1\n2\n3\n4\n</html>\n", 'multiline comment';
+
+# Commented out tags
+$mt     = Mojo::Template->new;
+$output = $mt->render(<<'EOF');
+<html>
+ %# <%= 23 %>test<%= 24 %>
+</html>
+EOF
+is $output, "<html>\n</html>\n", 'commented out tags';
 
 # Oneliner
 $mt     = Mojo::Template->new;

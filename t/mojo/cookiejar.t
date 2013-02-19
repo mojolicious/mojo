@@ -382,6 +382,27 @@ is $tx->req->cookie('foo'), undef, 'no cookie';
 is $tx->req->cookie('bar')->name,  'bar',  'right name';
 is $tx->req->cookie('bar')->value, 'with', 'right value';
 
+# Extract and inject cookies with IP address
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'valid',
+    domain => '213.133.102.53'
+  ),
+  Mojo::Cookie::Response->new(name => 'bar', value => 'too')
+);
+$jar->extract($tx);
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
+$jar->inject($tx);
+is $tx->req->cookie('foo')->name,  'foo',   'right name';
+is $tx->req->cookie('foo')->value, 'valid', 'right value';
+is $tx->req->cookie('bar')->name,  'bar',   'right name';
+is $tx->req->cookie('bar')->value, 'too',   'right value';
+
 # Extract cookies with invalid domain
 $jar = Mojo::UserAgent::CookieJar->new;
 $tx  = Mojo::Transaction::HTTP->new;
@@ -408,8 +429,8 @@ $tx->req->url->parse('http://213.133.102.53/perldoc/Mojolicious');
 $tx->res->cookies(
   Mojo::Cookie::Response->new(
     name   => 'foo',
-    value  => 'invalid',
-    domain => '213.133.102.53'
+    value  => 'valid',
+    domain => '.213.133.102.53'
   ),
   Mojo::Cookie::Response->new(
     name   => 'foo',

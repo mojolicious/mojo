@@ -662,6 +662,11 @@ have been used in the past.
 
 0.999920, C<Snowman> (u2603)
 
+=head1 SPONSORS
+
+Some of the work on this distribution has been sponsored by The Perl
+Foundation, thank you!
+
 =head1 PROJECT FOUNDER
 
 Sebastian Riedel, C<sri@cpan.org>
@@ -883,8 +888,6 @@ Stephane Este-Gracias
 Tatsuhiko Miyagawa
 
 Terrence Brannon
-
-The Perl Foundation
 
 Tomas Znamenacek
 

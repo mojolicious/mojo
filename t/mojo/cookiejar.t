@@ -409,21 +409,35 @@ $tx->res->cookies(
   Mojo::Cookie::Response->new(
     name   => 'foo',
     value  => 'invalid',
-    domain => '213.133.102.53'
+    domain => '.213.133.102.53'
   ),
   Mojo::Cookie::Response->new(
-    name   => 'foo',
+    name   => 'bar',
     value  => 'invalid',
     domain => '102.53'
   ),
   Mojo::Cookie::Response->new(
-    name   => 'foo',
+    name   => 'baz',
     value  => 'invalid',
     domain => '53'
-  )
+  ),
+  Mojo::Cookie::Response->new(
+    name   => 'no',
+    value  => 'domain',
+  ),
+  Mojo::Cookie::Response->new(
+    name   => 'domain',
+    value  => 'equals',
+    domain => '213.133.102.53'
+  ),
 );
 $jar->extract($tx);
-is_deeply [$jar->all], [], 'no cookies';
+@cookies = $jar->all;
+is $cookies[0]->name,  'no',     'right name';
+is $cookies[0]->value, 'domain', 'right value';
+is $cookies[1]->name,  'domain', 'right name';
+is $cookies[1]->value, 'equals', 'right value';
+is $cookies[2], undef, 'no third cookie';
 
 # Extract cookies with invalid path
 $jar = Mojo::UserAgent::CookieJar->new;

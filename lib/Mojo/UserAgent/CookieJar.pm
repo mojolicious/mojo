@@ -43,11 +43,19 @@ sub extract {
   for my $cookie (@{$tx->res->cookies}) {
 
     # Validate domain
-    my $host = lc $url->ihost;
+    # RFC6265 - 5.1.3 (Domain Matching)
+    my $is_valid_domain;
+
+    my $host   = lc $url->ihost;
     my $domain = lc($cookie->domain // $host);
+
+    $is_valid_domain ||= $host eq $domain;
+
     $domain =~ s/^\.//;
-    next unless $host eq $domain || $host =~ /\Q.$domain\E$/;
-    next if $host =~ /\.\d+$/;
+    $is_valid_domain ||= ($host =~ /\Q.$domain\E$/ && $domain !~ /\d+$/);
+    
+    next unless $is_valid_domain;
+    
     $cookie->domain($domain);
 
     # Validate path

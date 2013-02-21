@@ -36,8 +36,10 @@ sub render {
   my $format = ($values ||= {})->{format};
   $values = {%{$self->defaults}, %$values};
 
-  my $string   = '';
-  my $optional = 1;
+  # Placeholders can only be optional without a format
+  my $optional = !$format;
+
+  my $string = '';
   for my $token (reverse @{$self->tree}) {
     my $op       = $token->[0];
     my $rendered = '';

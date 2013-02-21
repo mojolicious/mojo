@@ -3,6 +3,7 @@
   - Improved portability of Mojo::Asset::File tests.
   - Improved documentation.
   - Improved tests. (jberger, sri)
+  - Fixed path generation bug in Mojolicious::Routes::Pattern. (jberger)
   - Fixed small domain detection bug in Mojo::UserAgent::CookieJar.
     (dione, sri)
   - Fixed comment lines in Mojo::Template to cover the whole line.

@@ -248,6 +248,7 @@ $m->match($r, $c);
 is $m->stack->[0]{foo}, 11, 'right value';
 is @{$m->stack}, 1, 'right number of elements';
 is $m->path_for, '/alternatives', 'right path';
+is $m->path_for(format => 'txt'), '/alternatives/11.txt', 'right path';
 $m = Mojolicious::Routes::Match->new(GET => '/alternatives/0');
 $m->match($r, $c);
 is $m->stack->[0]{foo}, 0, 'right value';
@@ -273,6 +274,8 @@ $m = Mojolicious::Routes::Match->new(GET => '/alternatives/00');
 $m->match($r, $c);
 is @{$m->stack}, 0, 'right number of elements';
 is $m->path_for('alternativesfoo'), '/alternatives', 'right path';
+is $m->path_for('alternativesfoo', format => 'txt'), '/alternatives/11.txt',
+  'right path';
 
 # Alternatives without default
 $m = Mojolicious::Routes::Match->new(GET => '/alternatives2');

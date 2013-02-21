@@ -1,5 +1,5 @@
 
-3.86  2013-02-20
+3.86  2013-02-21
   - Improved portability of Mojo::Asset::File tests.
   - Improved documentation.
   - Improved tests. (jberger, sri)

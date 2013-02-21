@@ -223,6 +223,10 @@ $array
   = $json->decode(b("[\"\\ud800\\udf46\"]")->encode('UTF-32BE')->to_string);
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
+# Decode object with duplicate keys
+$hash = $json->decode('{"foo": 1, "foo": 2}');
+is_deeply $hash, {foo => 2}, 'decode {"foo": 1, "foo": 2}';
+
 # Complicated roudtrips
 $bytes = '[null,false,true,"",0,1]';
 $array = $json->decode($bytes);

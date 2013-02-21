@@ -37,7 +37,10 @@ sub render {
   $values = {%{$self->defaults}, %$values};
 
   my $string   = '';
-  my $optional = 1;
+
+  # trailing optional path is not optional with a format
+  my $optional = ! defined $format;
+
   for my $token (reverse @{$self->tree}) {
     my $op       = $token->[0];
     my $rendered = '';

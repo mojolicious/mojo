@@ -105,7 +105,7 @@ sub _callback {
   my ($self, $c, $field, $staging) = @_;
   $c->stash->{'mojo.routed'}++;
   $c->app->log->debug('Routing to a callback.');
-  my $continue = $field->{cb}->($c, @{$c->match->args});
+  my $continue = $field->{cb}->($c);
   return !$staging || $continue ? 1 : undef;
 }
 
@@ -179,7 +179,7 @@ sub _controller {
     # Try to call action
     if (my $sub = $app->can($method)) {
       $c->stash->{'mojo.routed'}++ unless $staging;
-      $continue = $app->$sub(@{$c->match->args});
+      $continue = $app->$sub;
     }
 
     # Action not found

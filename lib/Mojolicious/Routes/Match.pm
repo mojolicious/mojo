@@ -1,9 +1,9 @@
 package Mojolicious::Routes::Match;
 use Mojo::Base -base;
 
+has [qw(args stack)] => sub { [] };
 has captures => sub { {} };
 has [qw(endpoint root)];
-has stack => sub { [] };
 
 sub new {
   my $self = shift->SUPER::new;
@@ -163,6 +163,13 @@ structures.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Routes::Match> implements the following attributes.
+
+=head2 args
+
+  my $args = $m->args;
+  $m       = $m->args(['Hello World!']);
+
+Arguments for actions.
 
 =head2 captures
 

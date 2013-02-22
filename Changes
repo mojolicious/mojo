@@ -1,5 +1,6 @@
 
 3.87  2013-02-23
+  - Added args attribute to Mojolicious::Routes::Match.
   - Improved tests.
 
 3.86  2013-02-22

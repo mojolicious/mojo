@@ -23,6 +23,7 @@ get '/expiration' => sub {
 
 under sub {
   my $self = shift;
+  $self->match->args(['cool']);
   return undef unless $self->req->headers->header('X-Bender');
   $self->res->headers->add('X-Under' => 23);
   $self->res->headers->add('X-Under' => 24);
@@ -30,13 +31,13 @@ under sub {
 };
 
 get '/with_under' => sub {
-  my $self = shift;
-  $self->render_text('Unders are cool!');
+  my ($self, $msg) = @_;
+  $self->render_text("Unders are $msg!");
 };
 
 get '/with_under_too' => sub {
-  my $self = shift;
-  $self->render_text('Unders are cool too!');
+  my ($self, $msg) = @_;
+  $self->render_text("Unders are $msg too!");
 };
 
 under sub {

@@ -45,7 +45,8 @@ sub stage1 {
   my $self = shift;
 
   # Authenticated
-  return 1 if $self->req->headers->header('X-Pass');
+  $self->match->args([$self->some_plugin]) and return 1
+    if $self->req->headers->header('X-Pass');
 
   # Fail
   $self->render_text('Go away!');
@@ -53,8 +54,8 @@ sub stage1 {
 }
 
 sub stage2 {
-  my $self = shift;
-  $self->render_text($self->some_plugin);
+  my ($self, $msg) = @_;
+  $self->render_text($msg);
 }
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }

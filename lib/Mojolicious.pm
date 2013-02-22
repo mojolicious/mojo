@@ -681,6 +681,8 @@ Abhijit Menon-Sen, C<ams@cpan.org>
 
 Glen Hinkle, C<tempire@cpan.org>
 
+Joel Berger, C<jberger@cpan.org>
+
 Marcus Ramberg, C<mramberg@cpan.org>
 
 =back
@@ -790,8 +792,6 @@ Jan Schmidt
 Jaroslav Muhin
 
 Jesse Vincent
-
-Joel Berger
 
 Johannes Plunien
 

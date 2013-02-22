@@ -34,6 +34,10 @@ $r->route('/alternatives3/:foo', foo => [qw(foo foobar)]);
 # /alternatives4/foo.bar
 $r->route('/alternatives4/:foo', foo => [qw(foo foo.bar)]);
 
+# /optional/*
+# /optional/*/*
+$r->route('/optional/:foo/:bar')->to(bar => 'test');
+
 # /*/test
 my $test = $r->route('/:controller/test')->to(action => 'test');
 
@@ -345,6 +349,28 @@ is @{$m->stack}, 0, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(GET => '/alternatives4/bar.foo');
 $m->match($r, $c);
 is @{$m->stack}, 0, 'right number of elements';
+
+# Optional placeholder
+$m = Mojolicious::Routes::Match->new(GET => '/optional/23');
+$m->match($r, $c);
+is $m->stack->[0]{foo}, 23,     'right value';
+is $m->stack->[0]{bar}, 'test', 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/optional/23', 'right path';
+is $m->path_for(format => 'txt'), '/optional/23/test.txt', 'right path';
+is $m->path_for(foo => 12, format => 'txt'), '/optional/12/test.txt',
+  'right path';
+is $m->path_for('optionalfoobar', format => 'txt'), '/optional/23/test.txt',
+  'right path';
+$m = Mojolicious::Routes::Match->new(GET => '/optional/23/24');
+$m->match($r, $c);
+is $m->stack->[0]{foo}, 23, 'right value';
+is $m->stack->[0]{bar}, 24, 'right value';
+is @{$m->stack}, 1, 'right number of elements';
+is $m->path_for, '/optional/23/24', 'right path';
+is $m->path_for(format => 'txt'), '/optional/23/24.txt', 'right path';
+is $m->path_for('optionalfoobar'), '/optional/23/24', 'right path';
+is $m->path_for('optionalfoobar', foo => 0), '/optional/0/24', 'right path';
 
 # Real world example using most features at once
 $m = Mojolicious::Routes::Match->new(GET => '/articles/1/edit');

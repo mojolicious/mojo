@@ -1,6 +1,9 @@
 
+3.87  2013-02-23
+  - Improved tests.
+
 3.86  2013-02-22
-  - Welcome to the Mojolicious Core Team Joel Berger.
+  - Welcome to the Mojolicious core team Joel Berger.
   - Improved portability of Mojo::Asset::File tests.
   - Improved documentation.
   - Improved tests. (jberger, sri)

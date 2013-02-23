@@ -8,7 +8,7 @@ use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::URL;
-use Mojo::Util qw(monkey_patch warn_deprecated);
+use Mojo::Util qw(monkey_patch deprecated);
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Transactor;
 use Scalar::Util 'weaken';
@@ -61,14 +61,14 @@ sub app_url {
 
 # DEPRECATED in Rainbow!
 sub build_form_tx {
-  warn_deprecated "Mojo::UserAgent->build_form_tx is DEPRECATED "
+  deprecated "Mojo::UserAgent->build_form_tx is DEPRECATED "
     . "in favor of Mojo::UserAgent->build_tx!!!";
   shift->transactor->form(@_);
 }
 
 # DEPRECATED in Rainbow!
 sub build_json_tx {
-  warn_deprecated "Mojo::UserAgent->build_json_tx is DEPRECATED "
+  deprecated "Mojo::UserAgent->build_json_tx is DEPRECATED "
     . "in favor of Mojo::UserAgent->build_tx!!!";
   shift->transactor->json(@_);
 }
@@ -90,7 +90,7 @@ sub need_proxy {
 
 # DEPRECATED in Rainbow!
 sub post_form {
-  warn_deprecated
+  deprecated
     "Mojo::UserAgent->post_form is DEPRECATED in favor of Mojo::UserAgent->post!!!";
   my $self = shift;
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;

@@ -13,7 +13,7 @@ use Mojo::JSON;
 use Mojo::JSON::Pointer;
 use Mojo::Server;
 use Mojo::UserAgent;
-use Mojo::Util qw(decode encode warn_deprecated);
+use Mojo::Util qw(decode encode deprecated);
 use Test::More ();
 
 has [qw(message tx)];
@@ -220,7 +220,7 @@ sub post_ok  { shift->_request_ok(post  => @_) }
 
 # DEPRECATED in Rainbow!
 sub post_form_ok {
-  warn_deprecated "Test::Mojo->post_form_ok is DEPRECATED "
+  deprecated "Test::Mojo->post_form_ok is DEPRECATED "
     . "in favor of Test::Mojo->post_ok!!!";
   my ($self, $url) = (shift, shift);
   my $tx = $self->tx($self->ua->post_form($url, @_))->tx;
@@ -229,7 +229,7 @@ sub post_form_ok {
 
 # DEPRECATED in Rainbow!
 sub post_json_ok {
-  warn_deprecated "Test::Mojo->post_json_ok is DEPRECATED "
+  deprecated "Test::Mojo->post_json_ok is DEPRECATED "
     . "in favor of Test::Mojo->post_ok!!!";
   my ($self, $url) = (shift, shift);
   my $tx = $self->tx($self->ua->post_json($url, @_))->tx;
@@ -375,7 +375,7 @@ sub _wait {
 
   # DEPRECATED in Rainbow!
   my $new = $self->{new} //= $wait;
-  warn_deprecated "Testing WebSocket messages without "
+  deprecated "Testing WebSocket messages without "
     . "Test::Mojo->message_ok is DEPRECATED!!!"
     unless $new;
   return $self->message if $new && !$wait;

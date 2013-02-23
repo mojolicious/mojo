@@ -45,7 +45,7 @@ our @EXPORT_OK = (
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
-  qw(url_escape url_unescape warn_deprecated xml_escape xor_encode)
+  qw(url_escape url_unescape deprecated xml_escape xor_encode)
 );
 
 # DEPRECATED in Rainbow!
@@ -96,6 +96,12 @@ sub decode {
   return undef
     unless eval { $bytes = _encoding($encoding)->decode("$bytes", 1); 1 };
   return $bytes;
+}
+
+sub deprecated {
+  my $deprecation = shift;
+  local $Carp::CarpLevel = 1;
+  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak($deprecation) : carp($deprecation);
 }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
@@ -394,12 +400,6 @@ sub _hmac {
   return unpack 'H*', $hash->($opad . $hash->($ipad . $string));
 }
 
-sub warn_deprecated {
-  my $deprecation = shift;
-  local $Carp::CarpLevel = 1;
-  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak($deprecation) : carp($deprecation);
-}
-
 1;
 
 =head1 NAME
@@ -491,6 +491,10 @@ Convert camel case string to snake case and replace C<::> with C<->.
   my $chars = decode 'UTF-8', $bytes;
 
 Decode bytes to characters and return C<undef> if decoding failed.
+
+=head2 deprecated
+
+  deprecated "Mojo::foo DEPRECATED in favor of Mojo::bar";
 
 =head2 encode
 
@@ -627,10 +631,6 @@ C<^A-Za-z0-9\-._~>.
   my $string = url_unescape $escaped;
 
 Decode percent encoded characters in string.
-
-=head2 warn_deprecated
-
-  warn_deprecated "Mojo::foo DEPRECATED in favor of Mojo::bar";
 
 Warn about deprecated feature from perspective of caller. Set environment
 variable MOJO_FATAL_DEPRECATIONS to make deprecations fatal.

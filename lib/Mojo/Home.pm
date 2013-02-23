@@ -10,7 +10,7 @@ use File::Basename 'dirname';
 use File::Find 'find';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
-use Mojo::Util qw(class_to_path slurp warn_deprecated);
+use Mojo::Util qw(class_to_path slurp deprecated);
 
 sub new { shift->SUPER::new->parse(@_) }
 
@@ -82,7 +82,7 @@ sub rel_file { catfile(@{shift->{parts} || []}, split '/', shift) }
 
 # DEPRECATED in Rainbow!
 sub slurp_rel_file {
-  warn_deprecated
+  deprecated
     "Mojo::Home->slurp_rel_file is DEPRECATED in favor of Mojo::Util->slurp!!!";
   slurp shift->rel_file(@_);
 }

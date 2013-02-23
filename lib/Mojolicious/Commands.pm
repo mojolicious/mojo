@@ -106,8 +106,8 @@ sub run {
 
 # DEPRECATED in Rainbow!
 sub start {
-  warn_deprecated
-    "Mojolicious::Commands->start is DEPRECATED in favor of Mojolicious::Commands->start_app!!!";
+  warn_deprecated "Mojolicious::Commands->start is DEPRECATED "
+    . "in favor of Mojolicious::Commands->start_app!!!";
   my $self = shift;
   return $self->start_app($ENV{MOJO_APP} => @_) if $ENV{MOJO_APP};
   return $self->new->app->start(@_);

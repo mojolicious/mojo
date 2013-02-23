@@ -122,10 +122,9 @@ sub dispatch {
 
   # DEPRECATED in Rainbow!
   if ($plugins->has_subscribers('after_static_dispatch')) {
-    warn_deprecated
-      <<EOF and $plugins->emit_hook_reverse(after_static_dispatch => $c);
-after_static_dispatch hook is DEPRECATED in favor of before_routes!!!
-EOF
+    warn_deprecated "after_static_dispatch hook is DEPRECATED "
+      . "in favor of before_routes!!!"
+      and $plugins->emit_hook_reverse(after_static_dispatch => $c);
   }
 
   # Routes

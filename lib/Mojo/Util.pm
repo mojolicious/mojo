@@ -330,11 +330,6 @@ sub xml_escape {
   return $string;
 }
 
-sub warn_deprecated {
-  my $deprecation=shift;
-  local $Carp::CarpLevel=1;
-  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak($deprecation) : carp($deprecation);
-}
 
 sub xor_encode {
   my ($input, $key) = @_;
@@ -397,6 +392,12 @@ sub _hmac {
   my $ipad = $secret ^ (chr(0x36) x 64);
   my $opad = $secret ^ (chr(0x5c) x 64);
   return unpack 'H*', $hash->($opad . $hash->($ipad . $string));
+}
+
+sub warn_deprecated {
+  my $deprecation = shift;
+  local $Carp::CarpLevel = 1;
+  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak($deprecation) : carp($deprecation);
 }
 
 1;
@@ -626,6 +627,13 @@ C<^A-Za-z0-9\-._~>.
   my $string = url_unescape $escaped;
 
 Decode percent encoded characters in string.
+
+=head2 warn_deprecated
+
+  warn_deprecated "Mojo::foo DEPRECATED in favor of Mojo::bar";
+
+Warn about deprecated feature from perspective of caller. Set environment
+variable MOJO_FATAL_DEPRECATIONS to make deprecations fatal.
 
 =head2 xml_escape
 

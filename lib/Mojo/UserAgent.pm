@@ -61,15 +61,15 @@ sub app_url {
 
 # DEPRECATED in Rainbow!
 sub build_form_tx {
-  warn_deprecated
-    "Mojo::UserAgent->build_form_tx is DEPRECATED in favor of Mojo::UserAgent->build_tx!!!";
+  warn_deprecated "Mojo::UserAgent->build_form_tx is DEPRECATED "
+    . "in favor of Mojo::UserAgent->build_tx!!!";
   shift->transactor->form(@_);
 }
 
 # DEPRECATED in Rainbow!
 sub build_json_tx {
-  warn_deprecated
-    "Mojo::UserAgent->build_json_tx is DEPRECATED in favor of Mojo::UserAgent->build_tx!!!";
+  warn_deprecated "Mojo::UserAgent->build_json_tx is DEPRECATED "
+    . "in favor of Mojo::UserAgent->build_tx!!!";
   shift->transactor->json(@_);
 }
 

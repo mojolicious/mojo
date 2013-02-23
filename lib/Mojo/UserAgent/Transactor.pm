@@ -11,7 +11,7 @@ use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode deprecated);
 
 has generators => sub { {} };
 
@@ -47,10 +47,8 @@ sub endpoint {
 
 # DEPRECATED in Rainbow!
 sub form {
-  warn <<EOF;
-Mojo::UserAgent::Transactor->form is DEPRECATED in favor of
-Mojo::UserAgent::Transactor->tx!!!
-EOF
+  deprecated "Mojo::UserAgent::Transactor->form is DEPRECATED "
+    . "in favor of Mojo::UserAgent::Transactor->tx!!!";
   my ($self, $url, $charset) = (shift, shift, shift);
   my $form = ref $charset ? $charset : shift;
   $charset = undef if ref $charset;
@@ -59,10 +57,8 @@ EOF
 
 # DEPRECATED in Rainbow!
 sub json {
-  warn <<EOF;
-Mojo::UserAgent::Transactor->json is DEPRECATED in favor of
-Mojo::UserAgent::Transactor->tx!!!
-EOF
+  deprecated "Mojo::UserAgent::Transactor->json is DEPRECATED "
+    . "in favor of Mojo::UserAgent::Transactor->tx!!!";
   my ($self, $url, $data) = (shift, shift, shift);
   return $self->tx(POST => $url, @_, json => $data);
 }

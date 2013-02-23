@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Util 'decamelize';
+use Mojo::Util qw(decamelize warn_deprecated);
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -122,7 +122,8 @@ sub dispatch {
 
   # DEPRECATED in Rainbow!
   if ($plugins->has_subscribers('after_static_dispatch')) {
-    warn <<EOF and $plugins->emit_hook_reverse(after_static_dispatch => $c);
+    warn_deprecated
+      <<EOF and $plugins->emit_hook_reverse(after_static_dispatch => $c);
 after_static_dispatch hook is DEPRECATED in favor of before_routes!!!
 EOF
   }

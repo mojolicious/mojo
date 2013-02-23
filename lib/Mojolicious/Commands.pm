@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Getopt::Long 'GetOptions';
 use List::Util 'max';
 use Mojo::Server;
+use Mojo::Util 'warn_deprecated';
 
 has hint => <<"EOF";
 
@@ -105,10 +106,8 @@ sub run {
 
 # DEPRECATED in Rainbow!
 sub start {
-  warn <<EOF;
-Mojolicious::Commands->start is DEPRECATED in favor of
-Mojolicious::Commands->start_app!!!
-EOF
+  warn_deprecated
+    "Mojolicious::Commands->start is DEPRECATED in favor of Mojolicious::Commands->start_app!!!";
   my $self = shift;
   return $self->start_app($ENV{MOJO_APP} => @_) if $ENV{MOJO_APP};
   return $self->new->app->start(@_);

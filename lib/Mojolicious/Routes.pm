@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Routes::Route';
 use List::Util 'first';
 use Mojo::Cache;
 use Mojo::Loader;
-use Mojo::Util 'camelize';
+use Mojo::Util qw(camelize warn_deprecated);
 use Mojolicious::Routes::Match;
 use Scalar::Util 'weaken';
 
@@ -81,10 +81,8 @@ sub lookup {
 
 # DEPRECATED in Rainbow!
 sub namespace {
-  warn <<EOF;
-Mojolicious::Routes->namespace is DEPRECATED in favor of
-Mojolicious::Routes->namespaces!
-EOF
+  warn_deprecated
+    "Mojolicious::Routes->namespace is DEPRECATED in favor of Mojolicious::Routes->namespaces!";
   my $self = shift;
   return $self->namespaces->[0] unless @_;
   $self->namespaces->[0] = shift;

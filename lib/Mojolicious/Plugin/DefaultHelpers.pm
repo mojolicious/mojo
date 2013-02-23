@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Data::Dumper ();
 use Mojo::ByteStream;
+use Mojo::Util 'warn_deprecated';
 
 sub register {
   my ($self, $app) = @_;
@@ -60,7 +61,7 @@ sub register {
   # DEPRECATED in Rainbow!
   $app->helper(
     render_content => sub {
-      warn "Mojolicious::Controller->render_content is DEPRECATED!\n";
+      warn_deprecated "Mojolicious::Controller->render_content is DEPRECATED!";
       shift->content(@_);
     }
   );

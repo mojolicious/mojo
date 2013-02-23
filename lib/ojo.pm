@@ -6,7 +6,7 @@ use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::JSON 'j';
 use Mojo::UserAgent;
-use Mojo::Util 'monkey_patch';
+use Mojo::Util qw(monkey_patch warn_deprecated);
 
 # Silent oneliners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
@@ -42,11 +42,11 @@ sub import {
 
   # DEPRECATED in Rainbow!
   my $f = sub {
-    warn "ojo->f is DEPRECATED in favor of ojo->p!!!\n";
+    warn_deprecated "ojo->f is DEPRECATED in favor of ojo->p!!!";
     _request($UA->build_form_tx(@_));
   };
   my $n = sub {
-    warn "ojo->n is DEPRECATED in favor of ojo->p!!!\n";
+    warn_deprecated "ojo->n is DEPRECATED in favor of ojo->p!!!";
     _request($UA->build_json_tx(@_));
   };
   monkey_patch $caller, f => $f, n => $n;

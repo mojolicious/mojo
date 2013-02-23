@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Data::Dumper ();
 use Mojo::ByteStream;
+use Mojo::Util 'deprecated';
 
 sub register {
   my ($self, $app) = @_;

@@ -1,7 +1,7 @@
 package Mojo::Util;
 use Mojo::Base 'Exporter';
 
-use Carp 'croak';
+use Carp qw(croak carp);
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(sha1 sha1_hex);
 use Encode 'find_encoding';
@@ -45,7 +45,7 @@ our @EXPORT_OK = (
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
-  qw(url_escape url_unescape xml_escape xor_encode)
+  qw(url_escape url_unescape deprecated xml_escape xor_encode)
 );
 
 # DEPRECATED in Rainbow!
@@ -98,6 +98,12 @@ sub decode {
   return $bytes;
 }
 
+sub deprecated {
+  my $deprecation = shift;
+  local $Carp::CarpLevel = 1;
+  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak($deprecation) : carp($deprecation);
+}
+
 sub encode { _encoding($_[0])->encode("$_[1]") }
 
 sub get_line {
@@ -117,9 +123,8 @@ sub hmac_sha1_sum { _hmac(\&sha1, @_) }
 
 # DEPRECATED in Rainbow!
 sub html_escape {
-  warn <<EOF;
-Mojo::Util->html_escape is DEPRECATED in favor of Mojo::Util->xml_escape!!!
-EOF
+  deprecated "Mojo::Util->html_escape is DEPRECATED "
+    . "in favor of Mojo::Util->xml_escape!!!";
   my ($string, $pattern) = @_;
   $pattern ||= '^\n\r\t !#$%(-;=?-~';
   return $string unless $string =~ /[^$pattern]/;
@@ -330,6 +335,7 @@ sub xml_escape {
   return $string;
 }
 
+
 sub xor_encode {
   my ($input, $key) = @_;
 
@@ -485,6 +491,10 @@ Convert camel case string to snake case and replace C<::> with C<->.
 
 Decode bytes to characters and return C<undef> if decoding failed.
 
+=head2 deprecated
+
+  deprecated "Mojo::foo DEPRECATED in favor of Mojo::bar";
+
 =head2 encode
 
   my $bytes = encode 'UTF-8', $chars;
@@ -620,6 +630,9 @@ C<^A-Za-z0-9\-._~>.
   my $string = url_unescape $escaped;
 
 Decode percent encoded characters in string.
+
+Warn about deprecated feature from perspective of caller. Set environment
+variable MOJO_FATAL_DEPRECATIONS to make deprecations fatal.
 
 =head2 xml_escape
 

@@ -1,7 +1,7 @@
 
 3.87  2013-02-23
   - Added deprecated function to Mojo::Util. (marcus)
-  - Remove deprecated render_content helper.
+  - Removed deprecated render_content helper.
   - Improved documentation.
   - Improved tests.
 

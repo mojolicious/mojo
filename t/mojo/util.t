@@ -401,24 +401,17 @@ ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';
 is MojoMonkeyTest::yang(), 'yang', 'right result';
 
 # deprecated
-
 {
   my ($warn, $die) = @_;
-  local $SIG{__WARN__} = sub { $warn = shift; };
-  local $SIG{__DIE__} = sub { $die = shift; return undef; };
-  deprecated("This warns from caller");
+  local $SIG{__WARN__} = sub { $warn = shift };
+  local $SIG{__DIE__}  = sub { $die  = shift };
+  deprecated 'This warns from caller';
   local $ENV{MOJO_FATAL_DEPRECATIONS} = 1;
-  eval { deprecated("This dies from caller"); };
-  like(
-    $warn,
-    qr/This warns from caller at t\/mojo\/util.t line \d+/,
-    "warn message is right deprecation"
-  );
-  like(
-    $die,
-    qr/This dies from caller at t\/mojo\/util.t line \d+/,
-    "die message is right for deprecation"
-  );
+  eval { deprecated 'This dies from caller' };
+  like $warn, qr/This warns from caller at .*util\.t line \d+/,
+    "warn message is right deprecation";
+  like $die, qr/This dies from caller at .*util\.t line \d+/,
+    "die message is right for deprecation";
 }
 
 done_testing();

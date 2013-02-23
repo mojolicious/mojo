@@ -298,7 +298,7 @@ multiple event loop support.
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently through
 L<Mojo::IOLoop>, and used if installed. Individual features can also be
-disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 
@@ -331,7 +331,7 @@ Group for server process.
   $daemon     = $daemon->inactivity_timeout(5);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
+closed, defaults to the value of the MOJO_INACTIVITY_TIMEOUT environment
 variable or C<15>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
 
@@ -349,7 +349,7 @@ L<Mojo::IOLoop> singleton.
   $daemon    = $daemon->listen(['https://localhost:3000']);
 
 List of one or more locations to listen on, defaults to the value of the
-C<MOJO_LISTEN> environment variable or C<http://*:3000>.
+MOJO_LISTEN environment variable or C<http://*:3000>.
 
   # Listen on IPv6 interface
   $daemon->listen(['http://[::1]:4000']);
@@ -445,7 +445,7 @@ Stop accepting connections.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_DAEMON_DEBUG> environment variable to get some advanced
+You can set the MOJO_DAEMON_DEBUG environment variable to get some advanced
 diagnostics information printed to C<STDERR>.
 
   MOJO_DAEMON_DEBUG=1

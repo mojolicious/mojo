@@ -8,7 +8,7 @@ use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::URL;
-use Mojo::Util qw(monkey_patch deprecated);
+use Mojo::Util qw(deprecated monkey_patch);
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Transactor;
 use Scalar::Util 'weaken';
@@ -61,15 +61,15 @@ sub app_url {
 
 # DEPRECATED in Rainbow!
 sub build_form_tx {
-  deprecated "Mojo::UserAgent->build_form_tx is DEPRECATED "
-    . "in favor of Mojo::UserAgent->build_tx!!!";
+  deprecated 'Mojo::UserAgent->build_form_tx is DEPRECATED in favor of '
+    . 'Mojo::UserAgent->build_tx';
   shift->transactor->form(@_);
 }
 
 # DEPRECATED in Rainbow!
 sub build_json_tx {
-  deprecated "Mojo::UserAgent->build_json_tx is DEPRECATED "
-    . "in favor of Mojo::UserAgent->build_tx!!!";
+  deprecated 'Mojo::UserAgent->build_json_tx is DEPRECATED in favor of '
+    . 'Mojo::UserAgent->build_tx';
   shift->transactor->json(@_);
 }
 
@@ -90,8 +90,8 @@ sub need_proxy {
 
 # DEPRECATED in Rainbow!
 sub post_form {
-  deprecated
-    "Mojo::UserAgent->post_form is DEPRECATED in favor of Mojo::UserAgent->post!!!";
+  deprecated 'Mojo::UserAgent->post_form is DEPRECATED in favor of '
+    . 'Mojo::UserAgent->post';
   my $self = shift;
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   return $self->start($self->build_form_tx(@_), $cb);
@@ -99,9 +99,8 @@ sub post_form {
 
 # DEPRECATED in Rainbow!
 sub post_json {
-  warn <<EOF;
-Mojo::UserAgent->post_json is DEPRECATED in favor of Mojo::UserAgent->post!!!
-EOF
+  deprecated 'Mojo::UserAgent->post_json is DEPRECATED in favor of '
+    . 'Mojo::UserAgent->post';
   my $self = shift;
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   return $self->start($self->build_json_tx(@_), $cb);
@@ -598,7 +597,7 @@ compression and multiple event loop support.
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently through
 L<Mojo::IOLoop>, and used if installed. Individual features can also be
-disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 
@@ -646,7 +645,7 @@ L<Mojo::UserAgent> implements the following attributes.
   $ua    = $ua->ca('/etc/tls/ca.crt');
 
 Path to TLS certificate authority file, defaults to the value of the
-C<MOJO_CA_FILE> environment variable. Also activates hostname verification.
+MOJO_CA_FILE environment variable. Also activates hostname verification.
 
   # Show certificate authorities for debugging
   IO::Socket::SSL::set_defaults(
@@ -657,7 +656,7 @@ C<MOJO_CA_FILE> environment variable. Also activates hostname verification.
   my $cert = $ua->cert;
   $ua      = $ua->cert('/etc/tls/client.crt');
 
-Path to TLS certificate file, defaults to the value of the C<MOJO_CERT_FILE>
+Path to TLS certificate file, defaults to the value of the MOJO_CERT_FILE
 environment variable.
 
 =head2 connect_timeout
@@ -666,7 +665,7 @@ environment variable.
   $ua         = $ua->connect_timeout(5);
 
 Maximum amount of time in seconds establishing a connection may take before
-getting canceled, defaults to the value of the C<MOJO_CONNECT_TIMEOUT>
+getting canceled, defaults to the value of the MOJO_CONNECT_TIMEOUT
 environment variable or C<10>.
 
 =head2 cookie_jar
@@ -700,7 +699,7 @@ Proxy server to use for HTTPS and WebSocket requests.
   $ua         = $ua->inactivity_timeout(15);
 
 Maximum amount of time in seconds a connection can be inactive before getting
-closed, defaults to the value of the C<MOJO_INACTIVITY_TIMEOUT> environment
+closed, defaults to the value of the MOJO_INACTIVITY_TIMEOUT environment
 variable or C<20>. Setting the value to C<0> will allow connections to be
 inactive indefinitely.
 
@@ -717,8 +716,8 @@ L<Mojo::IOLoop> object.
   my $key = $ua->key;
   $ua     = $ua->key('/etc/tls/client.crt');
 
-Path to TLS key file, defaults to the value of the C<MOJO_KEY_FILE>
-environment variable.
+Path to TLS key file, defaults to the value of the MOJO_KEY_FILE environment
+variable.
 
 =head2 local_address
 
@@ -741,8 +740,7 @@ before it starts closing the oldest cached ones, defaults to C<5>.
   $ua     = $ua->max_redirects(3);
 
 Maximum number of redirects the user agent will follow before it fails,
-defaults to the value of the C<MOJO_MAX_REDIRECTS> environment variable or
-C<0>.
+defaults to the value of the MOJO_MAX_REDIRECTS environment variable or C<0>.
 
 =head2 name
 
@@ -765,7 +763,7 @@ Domains that don't require a proxy server to be used.
 
 Maximum amount of time in seconds establishing a connection, sending the
 request and receiving a whole response may take before getting canceled,
-defaults to the value of the C<MOJO_REQUEST_TIMEOUT> environment variable or
+defaults to the value of the MOJO_REQUEST_TIMEOUT environment variable or
 C<0>. Setting the value to C<0> will allow the user agent to wait
 indefinitely. The timeout will reset for every followed redirect.
 
@@ -863,9 +861,9 @@ append a callback to perform requests non-blocking.
 
   $ua = $ua->detect_proxy;
 
-Check environment variables C<HTTP_PROXY>, C<http_proxy>, C<HTTPS_PROXY>,
-C<https_proxy>, C<NO_PROXY> and C<no_proxy> for proxy information. Automatic
-proxy detection can be enabled with the C<MOJO_PROXY> environment variable.
+Check environment variables HTTP_PROXY, http_proxy, HTTPS_PROXY, https_proxy,
+NO_PROXY and no_proxy for proxy information. Automatic proxy detection can be
+enabled with the MOJO_PROXY environment variable.
 
 =head2 get
 
@@ -1017,8 +1015,8 @@ same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_USERAGENT_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
+You can set the MOJO_USERAGENT_DEBUG environment variable to get some advanced
+diagnostics information printed to C<STDERR>.
 
   MOJO_USERAGENT_DEBUG=1
 

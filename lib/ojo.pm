@@ -6,7 +6,7 @@ use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::JSON 'j';
 use Mojo::UserAgent;
-use Mojo::Util qw(monkey_patch deprecated);
+use Mojo::Util qw(deprecated monkey_patch);
 
 # Silent oneliners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
@@ -42,11 +42,11 @@ sub import {
 
   # DEPRECATED in Rainbow!
   my $f = sub {
-    deprecated "ojo->f is DEPRECATED in favor of ojo->p!!!";
+    deprecated 'ojo->f is DEPRECATED in favor of ojo->p';
     _request($UA->build_form_tx(@_));
   };
   my $n = sub {
-    deprecated "ojo->n is DEPRECATED in favor of ojo->p!!!";
+    deprecated 'ojo->n is DEPRECATED in favor of ojo->p';
     _request($UA->build_json_tx(@_));
   };
   monkey_patch $caller, f => $f, n => $n;
@@ -74,12 +74,12 @@ ojo - Fun oneliners with Mojo!
 
 A collection of automatically exported functions for fun Perl oneliners. Ten
 redirects will be followed by default, you can change this behavior with the
-C<MOJO_MAX_REDIRECTS> environment variable.
+MOJO_MAX_REDIRECTS environment variable.
 
   $ MOJO_MAX_REDIRECTS=0 perl -Mojo -E 'say g("mojolicio.us")->code'
 
 Proxy detection is enabled by default, but you can disable it with the
-C<MOJO_PROXY> environment variable.
+MOJO_PROXY environment variable.
 
   $ MOJO_PROXY=0 perl -Mojo -E 'say g("mojolicio.us")->body'
 

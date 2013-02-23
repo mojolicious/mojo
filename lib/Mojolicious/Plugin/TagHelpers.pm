@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream 'b';
-use Mojo::Util qw(xml_escape deprecated);
+use Mojo::Util qw(deprecated xml_escape);
 
 sub register {
   my ($self, $app) = @_;
@@ -16,7 +16,7 @@ sub register {
   # DEPRECATED in Rainbow!
   $app->helper(
     base_tag => sub {
-      deprecated "base_tag is DEPRECATED!!!";
+      deprecated 'base_tag is DEPRECATED';
       _tag('base', href => shift->req->url->base, @_);
     }
   );

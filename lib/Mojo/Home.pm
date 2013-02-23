@@ -10,7 +10,7 @@ use File::Basename 'dirname';
 use File::Find 'find';
 use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
-use Mojo::Util qw(class_to_path slurp deprecated);
+use Mojo::Util qw(class_to_path deprecated slurp);
 
 sub new { shift->SUPER::new->parse(@_) }
 
@@ -82,8 +82,8 @@ sub rel_file { catfile(@{shift->{parts} || []}, split '/', shift) }
 
 # DEPRECATED in Rainbow!
 sub slurp_rel_file {
-  deprecated "Mojo::Home->slurp_rel_file is DEPRECATED "
-    . "in favor of Mojo::Util->slurp!!!";
+  deprecated 'Mojo::Home->slurp_rel_file is DEPRECATED in favor of '
+    . 'Mojo::Util->slurp';
   slurp shift->rel_file(@_);
 }
 
@@ -127,8 +127,8 @@ Construct a new L<Mojo::Home> object.
   $home = $home->detect;
   $home = $home->detect('My::App');
 
-Detect home directory from the value of the C<MOJO_HOME> environment variable
-or application class.
+Detect home directory from the value of the MOJO_HOME environment variable or
+application class.
 
 =head2 lib_dir
 

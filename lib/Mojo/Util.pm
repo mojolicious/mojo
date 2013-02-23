@@ -1,7 +1,7 @@
 package Mojo::Util;
 use Mojo::Base 'Exporter';
 
-use Carp qw(croak carp);
+use Carp qw(carp croak);
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(sha1 sha1_hex);
 use Encode 'find_encoding';
@@ -42,10 +42,10 @@ my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_unescape),
-  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish trim unquote),
-  qw(url_escape url_unescape deprecated xml_escape xor_encode)
+  qw(decode deprecated encode get_line hmac_md5_sum hmac_sha1_sum),
+  qw(html_unescape md5_bytes md5_sum monkey_patch punycode_decode),
+  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum slurp spurt),
+  qw(squish trim unquote url_escape url_unescape xml_escape xor_encode)
 );
 
 # DEPRECATED in Rainbow!
@@ -99,9 +99,8 @@ sub decode {
 }
 
 sub deprecated {
-  my $deprecation = shift;
   local $Carp::CarpLevel = 1;
-  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak($deprecation) : carp($deprecation);
+  $ENV{MOJO_FATAL_DEPRECATIONS} ? croak(@_) : carp(@_);
 }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
@@ -123,8 +122,8 @@ sub hmac_sha1_sum { _hmac(\&sha1, @_) }
 
 # DEPRECATED in Rainbow!
 sub html_escape {
-  deprecated "Mojo::Util->html_escape is DEPRECATED "
-    . "in favor of Mojo::Util->xml_escape!!!";
+  deprecated 'Mojo::Util->html_escape is DEPRECATED in favor of '
+    . 'Mojo::Util->xml_escape';
   my ($string, $pattern) = @_;
   $pattern ||= '^\n\r\t !#$%(-;=?-~';
   return $string unless $string =~ /[^$pattern]/;
@@ -493,7 +492,10 @@ Decode bytes to characters and return C<undef> if decoding failed.
 
 =head2 deprecated
 
-  deprecated "Mojo::foo DEPRECATED in favor of Mojo::bar";
+  deprecated 'foo is DEPRECATED in favor of bar';
+
+Warn about deprecated feature from perspective of caller. You can also set the
+MOJO_FATAL_DEPRECATIONS environment variable to make deprecations fatal.
 
 =head2 encode
 
@@ -630,9 +632,6 @@ C<^A-Za-z0-9\-._~>.
   my $string = url_unescape $escaped;
 
 Decode percent encoded characters in string.
-
-Warn about deprecated feature from perspective of caller. Set environment
-variable MOJO_FATAL_DEPRECATIONS to make deprecations fatal.
 
 =head2 xml_escape
 

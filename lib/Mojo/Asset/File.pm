@@ -200,7 +200,7 @@ necessary.
   $file      = $file->tmpdir('/tmp');
 
 Temporary directory used to generate C<path>, defaults to the value of the
-C<MOJO_TMPDIR> environment variable or auto detection.
+MOJO_TMPDIR environment variable or auto detection.
 
 =head1 METHODS
 

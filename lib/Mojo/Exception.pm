@@ -177,7 +177,7 @@ Exception message.
   $e          = $e->verbose(1);
 
 Activate verbose rendering, defaults to the value of the
-C<MOJO_EXCEPTION_VERBOSE> environment variable or C<0>.
+MOJO_EXCEPTION_VERBOSE environment variable or C<0>.
 
 =head1 METHODS
 

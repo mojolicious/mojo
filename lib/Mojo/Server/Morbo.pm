@@ -127,7 +127,7 @@ To start applications with it you can use the L<morbo> script.
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently through
 L<Mojo::IOLoop>, and used if installed. Individual features can also be
-disabled with the C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
+disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 

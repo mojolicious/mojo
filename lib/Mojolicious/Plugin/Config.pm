@@ -122,7 +122,7 @@ File extension for generated configuration filenames, defaults to C<conf>.
   plugin Config => {file => 'myapp.conf'};
   plugin Config => {file => '/etc/foo.stuff'};
 
-Full path to configuration file, defaults to the value of the C<MOJO_CONFIG>
+Full path to configuration file, defaults to the value of the MOJO_CONFIG
 environment variable or C<myapp.conf> in the application home directory.
 
 =head1 METHODS

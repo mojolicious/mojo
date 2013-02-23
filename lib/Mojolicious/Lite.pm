@@ -797,7 +797,7 @@ temporary file.
   </html>
 
 To protect you from excessively large files there is also a limit of C<5MB> by
-default, which you can tweak with the C<MOJO_MAX_MESSAGE_SIZE> environment
+default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
 variable.
 
   # Increase limit to 1GB
@@ -897,7 +897,7 @@ change the application log level directly in your test files.
 =head2 Mode
 
 To disable debug messages later in a production setup, you can change the
-L<Mojolicious> operating mode with command line options or the C<MOJO_MODE>
+L<Mojolicious> operating mode with command line options or the MOJO_MODE
 environment variable, the default will usually be C<development>.
 
   $ ./myapp.pl daemon -m production

@@ -122,8 +122,8 @@ sub dispatch {
 
   # DEPRECATED in Rainbow!
   if ($plugins->has_subscribers('after_static_dispatch')) {
-    deprecated "after_static_dispatch hook is DEPRECATED "
-      . "in favor of before_routes!!!"
+    deprecated
+      'after_static_dispatch hook is DEPRECATED in favor of before_routes'
       and $plugins->emit_hook_reverse(after_static_dispatch => $c);
   }
 
@@ -256,7 +256,7 @@ L<Mojolicious::Controller>.
   $app     = $app->mode('production');
 
 The operating mode for your application, defaults to the value of the
-C<MOJO_MODE> environment variable or C<development>. You can also add per
+MOJO_MODE environment variable or C<development>. You can also add per
 mode logic to your application by defining methods named C<${mode}_mode> in
 the application class, which will be called right before C<startup>.
 

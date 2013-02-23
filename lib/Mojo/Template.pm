@@ -687,8 +687,8 @@ Render template file.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_TEMPLATE_DEBUG> environment variable to get some
-advanced diagnostics information printed to C<STDERR>.
+You can set the MOJO_TEMPLATE_DEBUG environment variable to get some advanced
+diagnostics information printed to C<STDERR>.
 
   MOJO_TEMPLATE_DEBUG=1
 

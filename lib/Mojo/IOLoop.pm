@@ -333,8 +333,8 @@ solid and scalable non-blocking TCP clients and servers.
 
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently, and used if installed.
-Individual features can also be disabled with the C<MOJO_NO_IPV6> and
-C<MOJO_NO_TLS> environment variables.
+Individual features can also be disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS
+environment variables.
 
 A TLS certificate and key are also built right in, to make writing test
 servers as easy as possible. Also note that for convenience the C<PIPE> signal
@@ -613,7 +613,7 @@ seconds.
 
 =head1 DEBUGGING
 
-You can set the C<MOJO_IOLOOP_DEBUG> environment variable to get some advanced
+You can set the MOJO_IOLOOP_DEBUG environment variable to get some advanced
 diagnostics information printed to C<STDERR>.
 
   MOJO_IOLOOP_DEBUG=1

@@ -1,8 +1,9 @@
 
 3.87  2013-02-23
+  - Added deprecated function to Mojo::Util. (marcus)
+  - Remove deprecated render_content helper.
+  - Improved documentation.
   - Improved tests.
-  - Remove deprecated render_content helper
-  - Add Mojo::Util::deprecated
 
 3.86  2013-02-22
   - Welcome to the Mojolicious core team Joel Berger.

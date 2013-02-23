@@ -89,7 +89,7 @@ implements the following new ones.
   my $class = Mojo::Reactor->detect;
 
 Detect and load the best reactor implementation available, will try the value
-of the C<MOJO_REACTOR> environment variable, L<Mojo::Reactor::EV> or
+of the MOJO_REACTOR environment variable, L<Mojo::Reactor::EV> or
 L<Mojo::Reactor::Poll>.
 
   # Instantiate best reactor implementation available

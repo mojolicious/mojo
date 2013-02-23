@@ -409,9 +409,9 @@ is MojoMonkeyTest::yang(), 'yang', 'right result';
   local $ENV{MOJO_FATAL_DEPRECATIONS} = 1;
   eval { deprecated 'This dies from caller' };
   like $warn, qr/This warns from caller at .*util\.t line \d+/,
-    "warn message is right deprecation";
+    'right warning';
   like $die, qr/This dies from caller at .*util\.t line \d+/,
-    "die message is right for deprecation";
+    'right exception';
 }
 
 done_testing();

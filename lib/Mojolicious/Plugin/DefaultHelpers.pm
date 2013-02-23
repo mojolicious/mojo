@@ -58,14 +58,6 @@ sub register {
     }
   );
 
-  # DEPRECATED in Rainbow!
-  $app->helper(
-    render_content => sub {
-      deprecated "Mojolicious::Controller->render_content is DEPRECATED!";
-      shift->content(@_);
-    }
-  );
-
   $app->helper(url_with => \&_url_with);
 }
 

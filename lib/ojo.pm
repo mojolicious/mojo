@@ -42,11 +42,11 @@ sub import {
 
   # DEPRECATED in Rainbow!
   my $f = sub {
-    deprecated 'ojo->f is DEPRECATED in favor of ojo->p';
+    deprecated 'ojo::f is DEPRECATED in favor of ojo::p';
     _request($UA->build_form_tx(@_));
   };
   my $n = sub {
-    deprecated 'ojo->n is DEPRECATED in favor of ojo->p';
+    deprecated 'ojo::n is DEPRECATED in favor of ojo::p';
     _request($UA->build_json_tx(@_));
   };
   monkey_patch $caller, f => $f, n => $n;

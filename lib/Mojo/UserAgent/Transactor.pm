@@ -47,8 +47,8 @@ sub endpoint {
 
 # DEPRECATED in Rainbow!
 sub form {
-  deprecated 'Mojo::UserAgent::Transactor->form is DEPRECATED in favor of '
-    . 'Mojo::UserAgent::Transactor->tx';
+  deprecated 'Mojo::UserAgent::Transactor::form is DEPRECATED in favor of '
+    . 'Mojo::UserAgent::Transactor::tx';
   my ($self, $url, $charset) = (shift, shift, shift);
   my $form = ref $charset ? $charset : shift;
   $charset = undef if ref $charset;
@@ -57,8 +57,8 @@ sub form {
 
 # DEPRECATED in Rainbow!
 sub json {
-  deprecated 'Mojo::UserAgent::Transactor->json is DEPRECATED in favor of '
-    . 'Mojo::UserAgent::Transactor->tx';
+  deprecated 'Mojo::UserAgent::Transactor::json is DEPRECATED in favor of '
+    . 'Mojo::UserAgent::Transactor::tx';
   my ($self, $url, $data) = (shift, shift, shift);
   return $self->tx(POST => $url, @_, json => $data);
 }

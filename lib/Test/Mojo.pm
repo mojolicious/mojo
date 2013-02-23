@@ -220,8 +220,8 @@ sub post_ok  { shift->_request_ok(post  => @_) }
 
 # DEPRECATED in Rainbow!
 sub post_form_ok {
-  deprecated 'Test::Mojo->post_form_ok is DEPRECATED in favor of '
-    . 'Test::Mojo->post_ok';
+  deprecated
+    'Test::Mojo::post_form_ok is DEPRECATED in favor of Test::Mojo::post_ok';
   my ($self, $url) = (shift, shift);
   my $tx = $self->tx($self->ua->post_form($url, @_))->tx;
   return $self->_test('ok', $tx->is_finished, encode('UTF-8', "post $url"));
@@ -229,8 +229,8 @@ sub post_form_ok {
 
 # DEPRECATED in Rainbow!
 sub post_json_ok {
-  deprecated 'Test::Mojo->post_json_ok is DEPRECATED in favor of '
-    . 'Test::Mojo->post_ok';
+  deprecated
+    'Test::Mojo::post_json_ok is DEPRECATED in favor of Test::Mojo::post_ok';
   my ($self, $url) = (shift, shift);
   my $tx = $self->tx($self->ua->post_json($url, @_))->tx;
   return $self->_test('ok', $tx->is_finished, encode('UTF-8', "post $url"));
@@ -376,7 +376,7 @@ sub _wait {
   # DEPRECATED in Rainbow!
   my $new = $self->{new} //= $wait;
   deprecated
-    'Testing WebSocket messages without Test::Mojo->message_ok is DEPRECATED'
+    'Testing WebSocket messages without Test::Mojo::message_ok is DEPRECATED'
     unless $new;
   return $self->message if $new && !$wait;
 

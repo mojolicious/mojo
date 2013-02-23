@@ -81,8 +81,8 @@ sub lookup {
 
 # DEPRECATED in Rainbow!
 sub namespace {
-  deprecated 'Mojolicious::Routes->namespace is DEPRECATED in favor of '
-    . 'Mojolicious::Routes->namespaces';
+  deprecated 'Mojolicious::Routes::namespace is DEPRECATED in favor of '
+    . 'Mojolicious::Routes::namespaces';
   my $self = shift;
   return $self->namespaces->[0] unless @_;
   $self->namespaces->[0] = shift;

@@ -82,8 +82,8 @@ sub rel_file { catfile(@{shift->{parts} || []}, split '/', shift) }
 
 # DEPRECATED in Rainbow!
 sub slurp_rel_file {
-  deprecated 'Mojo::Home->slurp_rel_file is DEPRECATED in favor of '
-    . 'Mojo::Util->slurp';
+  deprecated
+    'Mojo::Home::slurp_rel_file is DEPRECATED in favor of Mojo::Util::slurp';
   slurp shift->rel_file(@_);
 }
 

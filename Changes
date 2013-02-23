@@ -16,20 +16,20 @@
   - Fixed comment lines in Mojo::Template to cover the whole line.
 
 3.85  2013-02-13
-  - Deprecated Mojo::UserAgent->build_form_tx in favor of
-    Mojo::UserAgent->build_tx.
-  - Deprecated Mojo::UserAgent->build_json_tx in favor of
-    Mojo::UserAgent->build_tx.
-  - Deprecated Mojo::UserAgent->post_form in favor of Mojo::UserAgent->post.
-  - Deprecated Mojo::UserAgent->post_json in favor of Mojo::UserAgent->post.
-  - Deprecated Mojo::UserAgent::Transactor->form in favor of
-    Mojo::UserAgent::Transactor->tx.
-  - Deprecated Mojo::UserAgent::Transactor->json in favor of
-    Mojo::UserAgent::Transactor->tx.
-  - Deprecated Test::Mojo->post_form_ok in favor of Test::Mojo->post_ok.
-  - Deprecated Test::Mojo->post_json_ok in favor of Test::Mojo->post_ok.
-  - Deprecated ojo->f in favor of ojo->p.
-  - Deprecated ojo->n in favor of ojo->p.
+  - Deprecated Mojo::UserAgent::build_form_tx in favor of
+    Mojo::UserAgent::build_tx.
+  - Deprecated Mojo::UserAgent::build_json_tx in favor of
+    Mojo::UserAgent::build_tx.
+  - Deprecated Mojo::UserAgent::post_form in favor of Mojo::UserAgent::post.
+  - Deprecated Mojo::UserAgent::post_json in favor of Mojo::UserAgent::post.
+  - Deprecated Mojo::UserAgent::Transactor::form in favor of
+    Mojo::UserAgent::Transactor::tx.
+  - Deprecated Mojo::UserAgent::Transactor::json in favor of
+    Mojo::UserAgent::Transactor::tx.
+  - Deprecated Test::Mojo::post_form_ok in favor of Test::Mojo::post_ok.
+  - Deprecated Test::Mojo::post_json_ok in favor of Test::Mojo::post_ok.
+  - Deprecated ojo::f in favor of ojo::p.
+  - Deprecated ojo::n in favor of ojo::p.
   - Added support for pluggable content generators to
     Mojo::UserAgent::Transactor. (judofyr, sri)
   - Added generators attribute to Mojo::UserAgent::Transactor.
@@ -69,11 +69,11 @@
 
 3.80  2013-01-15
   - Deprecated testing WebSocket messages without calling
-    Test::Mojo->message_ok.
-  - Deprecated Mojo::Util->html_escape in favor of Mojo::Util->xml_escape.
-  - Deprecated Mojo::ByteStream->html_escape in favor of
-    Mojo::ByteStream->xml_escape.
-  - Deprecated Mojo::Home->slurp_rel_file in favor of Mojo::Util->slurp.
+    Test::Mojo::message_ok.
+  - Deprecated Mojo::Util::html_escape in favor of Mojo::Util::xml_escape.
+  - Deprecated Mojo::ByteStream::html_escape in favor of
+    Mojo::ByteStream::xml_escape.
+  - Deprecated Mojo::Home::slurp_rel_file in favor of Mojo::Util::slurp.
   - Added message attribute to Test::Mojo.
   - Added json_message_has, json_message_hasnt and message_ok methods to
     Test::Mojo.
@@ -122,8 +122,8 @@
     the wrong moniker.
 
 3.73  2013-01-06
-  - Deprecated Mojolicious::Commands->start in favor of
-    Mojolicious::Commands->start_app.
+  - Deprecated Mojolicious::Commands::start in favor of
+    Mojolicious::Commands::start_app.
   - Added moniker attribute to Mojolicious.
   - Added after_render hook.
   - Improved name detection in Mojolicious::Plugin::Config.
@@ -151,8 +151,8 @@
   - Improved documentation.
 
 3.69  2012-12-20
-  - Deprecated Mojolicious::Routes->namespace in favor of
-    Mojolicious::Routes->namespaces.
+  - Deprecated Mojolicious::Routes::namespace in favor of
+    Mojolicious::Routes::namespaces.
   - Added color_field helper to Mojolicious::Plugin::TagHelpers.
   - Added date_field helper to Mojolicious::Plugin::TagHelpers.
   - Added datetime_field helper to Mojolicious::Plugin::TagHelpers.
@@ -248,7 +248,7 @@
   - Fixed Mojo::UserAgent to remove codes from parser errors.
 
 3.57  2012-11-12
-  - Deprecated Mojo::Exception->raw_message.
+  - Deprecated Mojo::Exception::raw_message.
   - Improved error message accuracy in Mojo::Template by using line
     directives.
   - Improved performance of contains method in Mojo::Asset::File by 100%.
@@ -386,7 +386,7 @@
   - Fixed small multipart bug.
 
 3.35  2012-08-28
-  - Deprecated Mojolicious::Controller->render_content in favor of content
+  - Deprecated Mojolicious::Controller::render_content in favor of content
     helper.
   - Improved Mojolicious::Plugin::Config to accept mode specific config files
     without a normal config file. (alexbyk, sri)
@@ -525,12 +525,12 @@
   - Fixed small charset bug in get command.
 
 3.12  2012-07-20
-  - Deprecated Mojo::Home->app_class.
-  - Deprecated Mojo::IOLoop->client_class.
-  - Deprecated Mojo::IOLoop->server_class.
-  - Deprecated Mojo::IOLoop->stream_class.
-  - Deprecated Mojo::Message->dom_class.
-  - Deprecated Mojo::Message->json_class.
+  - Deprecated Mojo::Home::app_class.
+  - Deprecated Mojo::IOLoop::client_class.
+  - Deprecated Mojo::IOLoop::server_class.
+  - Deprecated Mojo::IOLoop::stream_class.
+  - Deprecated Mojo::Message::dom_class.
+  - Deprecated Mojo::Message::json_class.
   - Added json method to Mojo::UserAgent::Transactor.
   - Added build_json_tx and post_json methods to Mojo::UserAgent.
   - Added post_json_ok method to Test::Mojo.
@@ -573,8 +573,8 @@
     be added to config files.
 
 3.06  2012-07-11
-  - Added tls_verify option to Mojo::IOLoop::Server->listen. (scottw)
-  - Added verify parameter to Mojo::Server::Daemon->listen. (scottw)
+  - Added tls_verify option to Mojo::IOLoop::Server::listen. (scottw)
+  - Added verify parameter to Mojo::Server::Daemon::listen. (scottw)
   - Improved documentation.
   - Improved tests.
   - Fixed small bug in Mojo::UserAgent that prevented port reuse.
@@ -774,8 +774,8 @@
 
 2.82  2012-04-16
   - Deprecated relaxed placeholders "/(.foo)" in favor of "/#foo".
-  - Deprecated Mojolicious::Routes::Route->waypoint.
-  - Deprecated Mojolicious::Routes::Route->block.
+  - Deprecated Mojolicious::Routes::Route::waypoint.
+  - Deprecated Mojolicious::Routes::Route::block.
   - Improved Mojolicious::Routes::Pattern to render formats.
   - Improved regex formatting in routes command.
   - Improved documentation.
@@ -893,8 +893,8 @@
     Mojo::Reactor::EV.
 
 2.65  2012-03-22
-  - Deprecated Mojo::IOLoop->drop in favor of Mojo::IOLoop->remove.
-  - Renamed Mojo::Reactor->drop to Mojo::Reactor->remove.
+  - Deprecated Mojo::IOLoop::drop in favor of Mojo::IOLoop::remove.
+  - Renamed Mojo::Reactor::drop to Mojo::Reactor::remove.
   - Added Mojo::Reactor::Poll.
   - Added one_tick method to Mojo::Reactor and Mojo::Reactor::EV.
   - Removed experimental status from Mojo::IOLoop::Client.
@@ -911,8 +911,8 @@
   - Improved tests.
 
 2.64  2012-03-21
-  - Deprecated Mojolicious::Routes->controller_base_class in favor of
-    Mojolicious::Routes->base_classes.
+  - Deprecated Mojolicious::Routes::controller_base_class in favor of
+    Mojolicious::Routes::base_classes.
   - Removed handle argument from io watchers in Mojo::Reactor.
   - Improved documentation.
 
@@ -930,10 +930,10 @@
   - Fixed small newline capture bug in Mojolicious::Routes::Match.
 
 2.62  2012-03-17
-  - Deprecated Mojolicious::Renderer->default_template_class in favor of
-    Mojolicious::Renderer->classes.
-  - Deprecated Mojolicious::Static->default_static_class in favor of
-    Mojolicious::Static->classes.
+  - Deprecated Mojolicious::Renderer::default_template_class in favor of
+    Mojolicious::Renderer::classes.
+  - Deprecated Mojolicious::Static::default_static_class in favor of
+    Mojolicious::Static::classes.
   - Added options function to Mojolicious::Lite.
   - Added options method to Mojolicious::Routes.
   - Added options method to Mojo::UserAgent.
@@ -1112,10 +1112,10 @@
   - Fixed small bugs in makefile command. (tempire, marcus, sri)
 
 2.49  2012-02-13
-  - Deprecated Mojolicious::Renderer->root in favor of
-    Mojolicious::Renderer->paths. (memowe, sri)
-  - Deprecated Mojolicious::Static->root in favor of
-    Mojolicious::Static->paths. (memowe, sri)
+  - Deprecated Mojolicious::Renderer::root in favor of
+    Mojolicious::Renderer::paths. (memowe, sri)
+  - Deprecated Mojolicious::Static::root in favor of
+    Mojolicious::Static::paths. (memowe, sri)
   - Added support for multiple "templates" and "public" directories to
     Mojolicious. (memowe, sri)
   - Improved version command to be more responsive. (crab)
@@ -1135,16 +1135,16 @@
 2.47  2012-02-06
   - Deprecated Hypnotoad configuration files in favor of more powerful
     application configuration files.
-  - Deprecated Mojo::Server::Daemon->prepare_ioloop in favor of
-    Mojo::Server::Daemon->start.
-  - Deprecated Mojo::Headers->x_forwarded_for.
+  - Deprecated Mojo::Server::Daemon::prepare_ioloop in favor of
+    Mojo::Server::Daemon::start.
+  - Deprecated Mojo::Headers::x_forwarded_for.
   - Added EXPERIMENTAL config method to Mojo.
   - Added EXPERIMENTAL ca attribute to Mojo::UserAgent.
   - Added EXPERIMENTAL drain event to Mojo::Content.
   - Added EXPERIMENTAL drain event to Mojo::Transaction::WebSocket.
   - Added EXPERIMENTAL support for RSV1-3 flags to
     Mojo::Transaction::WebSocket.
-  - Added EXPERIMENTAL tls_ca option to Mojo::IOLoop::Client->connect.
+  - Added EXPERIMENTAL tls_ca option to Mojo::IOLoop::Client::connect.
   - Added lock_timeout parameter to Hypnotoad.
   - Removed experimental status from JSON Pointer support.
   - Removed Cygwin exception from Hypnotoad.
@@ -1191,7 +1191,7 @@
   - Improved syntax highlighting in documentation browser slightly.
   - Improved Mojo::Base tests.
   - Improved documentation.
-  - Fixed Mojo::Command->app to be an attribute and not a method.
+  - Fixed Mojo::Command::app to be an attribute and not a method.
   - Fixed Mojo::ByteStream, Mojo::Collection and Mojo::DOM to not be
     subclasses of Mojo::Base.
 
@@ -1202,7 +1202,7 @@
   - Improved documentation.
 
 2.42  2012-01-02
-  - Deprecated Test::Mojo->max_redirects.
+  - Deprecated Test::Mojo::max_redirects.
   - Removed exprimental status from respond_to method in
     Mojolicious::Controller.
   - Removed experimental status from error event in Mojo::UserAgent.
@@ -1228,9 +1228,9 @@
   - Fixed bug that prevented sessions without expiration.
 
 2.41  2011-12-28
-  - Deprecated Mojo::Cookie->version.
-  - Deprecated Mojo::Cookie::Response->comment and
-    Mojo::Cookie::Response->port.
+  - Deprecated Mojo::Cookie::version.
+  - Deprecated Mojo::Cookie::Response::comment and
+    Mojo::Cookie::Response::port.
   - Removed experimental status from group feature of Mojolicious::Lite.
   - Removed experimental status from Mojo::Collection.
   - Removed experimental status from Mojolicious::Plugin::Mount.
@@ -1256,7 +1256,7 @@
     inactivity_timeout.
   - Added EXPERIMENTAL error event to Mojo::UserAgent.
   - Added EXPERIMENTAL local_address attribute to Mojo::UserAgent.
-  - Added EXPERIMENTAL local_address option to Mojo::IOLoop::Client->connect.
+  - Added EXPERIMENTAL local_address option to Mojo::IOLoop::Client::connect.
   - Added EXPERIMENTAL close method to Mojo::IOLoop::Stream.
   - Added "hello.pl" and "fast.pl" to example scripts.
   - Removed log attribute from Mojo::UserAgent.
@@ -1270,7 +1270,7 @@
   - Fixed online tests to not be affected by geographical location. (marcus)
 
 2.38  2011-12-17
-  - Changed Mojo::IOLoop->client arguments from ($loop, $stream, $err) to
+  - Changed Mojo::IOLoop::client arguments from ($loop, $stream, $err) to
     ($loop, $err, $stream).
   - Improved resilience of Mojo::IOLoop::Stream.
   - Improved documentation. (marcus, sri)
@@ -1285,8 +1285,8 @@
   - Welcome to the Mojolicious core team Marcus Ramberg, Glen Hinkle and
     Abhijit Menon-Sen.
   - Removed cleanup_interval attribute from Mojo::IOLoop.
-  - Deprecated Mojo::IOLoop->timeout in favor of
-    Mojo::IOLoop::Stream->timeout.
+  - Deprecated Mojo::IOLoop::timeout in favor of
+    Mojo::IOLoop::Stream::timeout.
   - Added EXPERIMENTAL timeout event to Mojo::IOLoop::Stream.
   - Added EXPERIMENTAL timeout attribute to Mojo::IOLoop::Stream.
   - Changed default keep alive timeout of Mojo::UserAgent from 15 to 20
@@ -1332,11 +1332,11 @@
   - Improved tests.
 
 2.30  2011-11-20
-  - Deprecated Mojo::IOLoop->on_lock in favor of Mojo::IOLoop->lock.
-  - Deprecated Mojo::IOLoop->on_unlock in favor of Mojo::IOLoop->unlock.
+  - Deprecated Mojo::IOLoop::on_lock in favor of Mojo::IOLoop::lock.
+  - Deprecated Mojo::IOLoop::on_unlock in favor of Mojo::IOLoop::unlock.
 
 2.29  2011-11-19
-  - Deprecated Mojolicious->on_process in favor of around_dispatch hook.
+  - Deprecated Mojolicious::on_process in favor of around_dispatch hook.
   - Added EXPERIMENTAL emit_chain method to Mojolicious::Plugins.
     (Akron, sri)
   - Added EXPERIMENTAL around_dispatch hook.
@@ -1347,12 +1347,12 @@
   - Fixed small IPv6 portabilty issue in Mojo::IOLoop::Client.
 
 2.27  2011-11-16
-  - Deprecated Mojo::IOLoop->connect in favor of Mojo::IOLoop->client.
-  - Deprecated Mojo::IOLoop->listen in favor of Mojo::IOLoop->server.
-  - Deprecated Mojo::IOLoop->connection_timeout in favor of
-    Mojo::IOLoop->timeout.
-  - Deprecated Mojo::IOLoop->write in favor of Mojo::IOLoop::Stream->write.
-  - Deprecated Mojo::IOLoop->connect_timeout in favor of timeout argument.
+  - Deprecated Mojo::IOLoop::connect in favor of Mojo::IOLoop::client.
+  - Deprecated Mojo::IOLoop::listen in favor of Mojo::IOLoop::server.
+  - Deprecated Mojo::IOLoop::connection_timeout in favor of
+    Mojo::IOLoop::timeout.
+  - Deprecated Mojo::IOLoop::write in favor of Mojo::IOLoop::Stream::write.
+  - Deprecated Mojo::IOLoop::connect_timeout in favor of timeout argument.
   - Deprecated on_* methods in Mojo::IOLoop.
   - Removed Mojo::IOLoop::Resolver.
   - Added EXPERIMENTAL connect_timeout attribute to Mojo::UserAgent.
@@ -1415,12 +1415,12 @@
   - Documentation improvements.
 
 2.19  2011-10-31
-  - Deprecated Mojolicious::Plugins->add_hook in favor of
-    Mojolicious::Plugins->on.
-  - Deprecated Mojolicious::Plugins->run_hook in favor of
-    Mojolicious::Plugins->emit_hook.
-  - Deprecated Mojolicious::Plugins->run_hook_reverse in favor of
-    Mojolicious::Plugins->emit_hook_reverse.
+  - Deprecated Mojolicious::Plugins::add_hook in favor of
+    Mojolicious::Plugins::on.
+  - Deprecated Mojolicious::Plugins::run_hook in favor of
+    Mojolicious::Plugins::emit_hook.
+  - Deprecated Mojolicious::Plugins::run_hook_reverse in favor of
+    Mojolicious::Plugins::emit_hook_reverse.
   - Improved documentation.
   - Improved tests.
 
@@ -1437,16 +1437,16 @@
   - Improved documentation.
 
 2.15  2011-10-29
-  - Deprecated Mojolicious::Controller->on_finish in favor of
-    Mojolicious::Controller->on.
-  - Removed Mojolicious::Controller->on_message, you can now use
-    Mojolicious::Controller->on instead.
+  - Deprecated Mojolicious::Controller::on_finish in favor of
+    Mojolicious::Controller::on.
+  - Removed Mojolicious::Controller::on_message, you can now use
+    Mojolicious::Controller::on instead.
       $c->on(message => sub {...})
   - Added EXPERIMENTAL message event to Mojo::Log.
   - Improved documentation.
 
 2.14  2011-10-29
-  - Deprecated Mojo::DOM->new with arguments.
+  - Deprecated Mojo::DOM::new with arguments.
   - Renamed Mojo::IOLoop::Trigger to Mojo::IOLoop::Delay.
   - Renamed watch method in Mojo::IOWatcher to change.
   - Renamed io method in Mojo::IOWatcher to watch.
@@ -1727,7 +1727,7 @@
   - Fixed small command bug.
 
 1.77  2011-08-14
-  - Deprecated Mojo::Path->append in favor of using Mojo::Path->parts
+  - Deprecated Mojo::Path::append in favor of using Mojo::Path::parts
     directly.
   - Improved handling of preformatted text in Mojo::DOM.
   - Improved Mojo::DOM to allow smart whitespace trimming to be disabled.
@@ -2301,7 +2301,7 @@
   - Added on_idle and on_tick event handlers to Mojo::IOLoop.
   - Added "*" query support to the Mojo::IOLoop resolver.
   - Added ability to pass plain connection ids to Mojo::Client.
-  - Added ability to call Mojo::Base->attr as an instance method. (charsbar)
+  - Added ability to call Mojo::Base::attr as an instance method. (charsbar)
   - Improved Mojolicious::Lite ability to recover from syntax errors.
   - Improved number detection in Mojo::JSON.
   - Improved Mojo::ByteStream encode/decode. (marcus)

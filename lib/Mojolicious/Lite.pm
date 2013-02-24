@@ -546,7 +546,7 @@ are only evaluated if the callback returned a true value.
   get '/' => 'index';
 
   app->start;
-  __DATA__;
+  __DATA__
 
   @@ denied.html.ep
   You are not Bender, permission denied.
@@ -594,7 +594,7 @@ C<under> statements.
     # Local logic shared only by routes in this group
     under '/admin' => sub {
       my $self = shift;
-      return 1 if $self->req->heaers->header('X-Awesome');
+      return 1 if $self->req->headers->header('X-Awesome');
       $self->render(text => "You're not awesome enough.");
       return undef;
     };

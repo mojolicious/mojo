@@ -301,7 +301,7 @@ dispatching to it.
 You can use the C<namespace> stash value to change the namespace of a whole
 route with all its children.
 
-  # /bye -> MyApp::Controller::Foo->bye
+  # /bye -> MyApp::Controller::Foo::Bar->bye
   $r->route('/bye')
     ->to(namespace => 'MyApp::Controller::Foo::Bar', action => 'bye');
 

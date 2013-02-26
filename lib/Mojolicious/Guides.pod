@@ -33,9 +33,11 @@ overview of what L<Mojolicious> is all about.
 =item L<Mojolicious::Lite>
 
 A really fast and fun way to get started developing web applications with
-Mojolicious is the L<Mojolicious::Lite> tutorial. Almost everything you learn
-there can also be applied to normal L<Mojolicious> applications and is
-considered a prerequisite for the guides. You should definitely take a look!
+Mojolicious is the L<Mojolicious::Lite> tutorial. Since L<Mojolicious::Lite>
+is a very thin wrapper around L<Mojolicious>, almost everything you learn
+there can also be applied to normal L<Mojolicious> applications. The Lite
+syntax is used regularly in the documentation and therefore is considered a
+prerequisite for the guides. You should definitely take a look!
 
 =back
 

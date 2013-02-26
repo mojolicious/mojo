@@ -153,7 +153,7 @@ every change.
 Routes are basically just fancy paths that can contain different kinds of
 placeholders and usually lead to an action. The first argument passed to all
 actions (the invocant C<$self>) is a L<Mojolicious::Controller> object
-containing both, the HTTP request and response.
+containing both the HTTP request and response.
 
   use Mojolicious::Lite;
 

@@ -32,12 +32,12 @@ overview of what L<Mojolicious> is all about.
 
 =item L<Mojolicious::Lite>
 
-A really fast and fun way to get started developing web applications with
-Mojolicious is the L<Mojolicious::Lite> tutorial. This micro web framework is
-only a thin wrapper around the normal web framework, so almost everything you
-learn here also applies to full L<Mojolicious> applications. The simplified
-notation introduced in the tutorial is commonly used throughout the guides and
-is therefore considered a prerequisite, you should definitely take a look!
+A fast and fun way to get started developing web applications with Mojolicious
+is the L<Mojolicious::Lite> tutorial. This micro web framework is only a thin
+wrapper around the normal web framework, so almost everything you learn here
+also applies to full L<Mojolicious> applications. The simplified notation
+introduced in the tutorial is commonly used throughout the guides and is
+therefore considered a prerequisite, you should definitely take a look!
 
 =back
 

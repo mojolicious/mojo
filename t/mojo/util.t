@@ -13,7 +13,7 @@ use Mojo::Util
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode squish trim unquote),
   qw(secure_compare sha1_bytes sha1_sum slurp spurt punycode_encode quote),
-  qw(url_escape url_unescape  xml_escape xor_encode);
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';

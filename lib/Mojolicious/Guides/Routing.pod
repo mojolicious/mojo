@@ -221,7 +221,7 @@ L<Mojolicious::Controller/"stash">.
 =head2 Nested routes
 
 It is also possible to build tree structures from routes to remove repetitive
-code. A route with children can't match on it's own though, only the actual
+code. A route with children can't match on its own though, only the actual
 endpoints of these nested routes can.
 
   # /foo     -> undef

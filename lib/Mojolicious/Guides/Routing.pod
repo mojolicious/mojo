@@ -425,12 +425,12 @@ routes and allows selective re-enabling.
   # /foo      -> {controller => 'foo', action => 'bar'}
   # /foo.html -> undef
   # /baz      -> undef
-  # /baz.txt  -> {controller => 'bar', action => 'baz', format => 'txt'}
-  # /baz.html -> {controller => 'bar', action => 'baz', format => 'html'}
+  # /baz.txt  -> {controller => 'baz', action => 'yada', format => 'txt'}
+  # /baz.html -> {controller => 'baz', action => 'yada', format => 'html'}
   # /baz.xml  -> undef
   my $inactive = $r->route(format => 0);
-  $inactive->route('/foo')->to('foo#none');
-  $inactive->route('/baz', format => [qw(txt html)])->to('bar#baz');
+  $inactive->route('/foo')->to('foo#bar');
+  $inactive->route('/baz', format => [qw(txt html)])->to('baz#yada');
 
 =head2 Named routes
 

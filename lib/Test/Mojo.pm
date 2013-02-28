@@ -405,7 +405,7 @@ Test::Mojo - Testing Mojo!
   $t->post_ok('/search.json' => form => {q => 'Perl'})
     ->status_is(200)
     ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-    ->header_isnt('X-Bender' => 'Bite my shiny metal ass!');
+    ->header_isnt('X-Bender' => 'Bite my shiny metal ass!')
     ->json_is('/results/4/title' => 'Perl rocks!');
 
   # WebSocket

@@ -196,14 +196,14 @@ too.
 
 =head2 Rendering text
 
-Perl characters can be rendered with the C<text> stash value, the given
+Characters can be rendered to bytes with the C<text> stash value, the given
 content will be automatically encoded to bytes.
 
   $self->render(text => 'Hello Wörld!');
 
 =head2 Rendering data
 
-Raw bytes can be rendered with the C<data> stash value, no encoding will be
+Bytes can be rendered with the C<data> stash value, no encoding will be
 performed.
 
   $self->render(data => $octets);

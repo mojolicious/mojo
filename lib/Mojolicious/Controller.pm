@@ -678,8 +678,8 @@ generated, all additional values get merged into the C<stash>.
   $c->render_data($bytes);
   $c->render_data($bytes, format => 'png');
 
-Render the given content as raw bytes, similar to C<render_text> but data will
-not be encoded. All additional values get merged into the C<stash>.
+Render the given content as bytes, similar to C<render_text> but data will not
+be encoded. All additional values get merged into the C<stash>.
 
   # Longer version
   $c->render(data => $bytes);
@@ -748,8 +748,8 @@ method does not protect from traversing to parent directories.
   $c->render_text('Hello World!');
   $c->render_text('Hello World!', layout => 'green');
 
-Render the given content as Perl characters, which will be encoded to bytes.
-All additional values get merged into the C<stash>. See C<render_data> for an
+Render the given content as characters, which will be encoded to bytes. All
+additional values get merged into the C<stash>. See C<render_data> for an
 alternative without encoding. Note that this does not change the content type
 of the response, which is C<text/html;charset=UTF-8> by default.
 

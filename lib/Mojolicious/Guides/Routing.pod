@@ -682,7 +682,7 @@ Less commonly used and more powerful features.
 =head2 IRIs
 
 IRIs are handled transparently, that means paths are guaranteed to be
-unescaped and decoded to Perl characters.
+unescaped and decoded from bytes to characters.
 
   # GET /☃ (unicode snowman) -> {controller => 'foo', action => 'snowman'}
   $r->get('/☃')->to('foo#snowman');

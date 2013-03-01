@@ -777,7 +777,8 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $req = $c->tx->req;
 
   # Extract request information
-  my $userinfo = $c->req->url->userinfo;
+  my $url      = $c->req->url->to_abs;
+  my $userinfo = $c->req->url->to_abs->userinfo;
   my $agent    = $c->req->headers->user_agent;
   my $body     = $c->req->body;
   my $foo      = $c->req->json('/23/foo');

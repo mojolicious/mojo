@@ -1,5 +1,5 @@
 
-3.88  2013-02-29
+3.88  2013-03-01
   - Improved documentation.
   - Improved tests.
   - Fixed small domain detection bug in Mojo::UserAgent::CookieJar.

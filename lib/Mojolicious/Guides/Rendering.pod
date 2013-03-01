@@ -217,8 +217,9 @@ renderer which get directly encoded to JSON.
 
 =head2 Partial rendering
 
-Sometimes you might want to access the rendered result, for example to
-generate emails, this can be done using the C<partial> stash value.
+Sometimes you might want to use the rendered result directly instead of
+generating a response, for example to send emails, this can be done using the
+C<partial> stash value.
 
   my $html = $self->render('mail', partial => 1);
 
@@ -328,10 +329,10 @@ used or an empty C<204> response rendered automatically.
 
 By now you've probably already encountered the built-in 404 (Not Found) and
 500 (Server Error) pages, that get rendered automatically when you make a
-mistake. Especially during development they can be a great help, the methods
+mistake. Especially during development they can be a great help, you can
+render them manually with the methods
 L<Mojolicious::Controller/"render_exception"> and
-L<Mojolicious::Controller/"render_not_found"> can be used to render them
-manually.
+L<Mojolicious::Controller/"render_not_found">.
 
   use Mojolicious::Lite;
   use Scalar::Util 'looks_like_number';

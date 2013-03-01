@@ -2,5 +2,6 @@
 .*\.old$
 \.tar\.gz$
 ^Makefile$
+^MYMETA\.
 ^blib
 ^pm_to_blib

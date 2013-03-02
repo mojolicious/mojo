@@ -286,11 +286,11 @@ $jar->add(
     value  => 'bar'
   )
 );
-@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo%28bar'));
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo(bar'));
 is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';
-@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo%28bar/baz'));
+@cookies = $jar->find(Mojo::URL->new('http://kraih.com/foo(bar/baz'));
 is $cookies[0]->name,  'foo', 'right name';
 is $cookies[0]->value, 'bar', 'right value';
 is $cookies[1], undef, 'no second cookie';

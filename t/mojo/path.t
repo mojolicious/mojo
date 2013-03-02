@@ -66,7 +66,9 @@ is $path->to_abs_string, '/0', 'right result';
 # Canonicalizing
 $path = Mojo::Path->new(
   '/%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd');
-is "$path", '//../../../../../../../../../../etc/passwd', 'right result';
+is "$path",
+  '/%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd',
+  'same path';
 is $path->parts->[0],  '',       'right part';
 is $path->parts->[1],  '..',     'right part';
 is $path->parts->[2],  '..',     'right part';
@@ -81,8 +83,9 @@ is $path->parts->[10], '..',     'right part';
 is $path->parts->[11], 'etc',    'right part';
 is $path->parts->[12], 'passwd', 'right part';
 is $path->parts->[13], undef,    'no part';
+is "$path", '//../../../../../../../../../../etc/passwd', 'normalized path';
 is $path->canonicalize, '/../../../../../../../../../../etc/passwd',
-  'right result';
+  'canonicalized path';
 is $path->parts->[0],  '..',     'right part';
 is $path->parts->[1],  '..',     'right part';
 is $path->parts->[2],  '..',     'right part';
@@ -102,7 +105,9 @@ ok !$path->trailing_slash, 'no trailing slash';
 # Canonicalizing (alternative)
 $path = Mojo::Path->new(
   '%2ftest%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd');
-is "$path", '/test/../../../../../../../../../etc/passwd', 'right result';
+is "$path",
+  '%2ftest%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd',
+  'right result';
 is $path->parts->[0],  'test',   'right part';
 is $path->parts->[1],  '..',     'right part';
 is $path->parts->[2],  '..',     'right part';
@@ -116,7 +121,9 @@ is $path->parts->[9],  '..',     'right part';
 is $path->parts->[10], 'etc',    'right part';
 is $path->parts->[11], 'passwd', 'right part';
 is $path->parts->[12], undef,    'no part';
-is $path->canonicalize, '/../../../../../../../../etc/passwd', 'right result';
+is "$path", '/test/../../../../../../../../../etc/passwd', 'normalized path';
+is $path->canonicalize, '/../../../../../../../../etc/passwd',
+  'canonicalized path';
 is $path->parts->[0],  '..',     'right part';
 is $path->parts->[1],  '..',     'right part';
 is $path->parts->[2],  '..',     'right part';
@@ -133,7 +140,7 @@ ok !$path->trailing_slash, 'no trailing slash';
 
 # Canonicalizing (with escaped "%")
 $path = Mojo::Path->new('%2ftest%2f..%252f..%2f..%2f..%2f..%2fetc%2fpasswd');
-is "$path", '/test/..%252f../../../../etc/passwd', 'right result';
+is "$path", '%2ftest%2f..%252f..%2f..%2f..%2f..%2fetc%2fpasswd', 'same path';
 is $path->parts->[0], 'test',    'right part';
 is $path->parts->[1], '..%2f..', 'right part';
 is $path->parts->[2], '..',      'right part';
@@ -142,7 +149,8 @@ is $path->parts->[4], '..',      'right part';
 is $path->parts->[5], 'etc',     'right part';
 is $path->parts->[6], 'passwd',  'right part';
 is $path->parts->[7], undef,     'no part';
-is $path->canonicalize, '/../etc/passwd', 'right result';
+is "$path", '/test/..%252f../../../../etc/passwd', 'normalized path';
+is $path->canonicalize, '/../etc/passwd', 'canonicalized path';
 is $path->parts->[0], '..',     'right part';
 is $path->parts->[1], 'etc',    'right part';
 is $path->parts->[2], 'passwd', 'right part';
@@ -280,6 +288,12 @@ is $path->parts->[1], undef,     'no part';
 is "$path", 'foo%2Fbar', 'right result';
 is $path->to_string,     'foo%2Fbar',  'right result';
 is $path->to_abs_string, '/foo%2Fbar', 'right result';
+
+# Unchanged path
+$path = Mojo::Path->new('/foob%E4r');
+is $path->to_string,     '/foob%E4r', 'right result';
+is $path->to_abs_string, '/foob%E4r', 'right result';
+is $path->clone->to_string, '/foob%E4r', 'right result';
 
 # Latin-1
 $path = Mojo::Path->new->charset('Latin-1')->parse('/foob%E4r');

@@ -155,10 +155,9 @@ sub websocket {
 
   # New WebSocket transaction
   my $tx    = $self->tx(GET => @_);
-  my $req   = $tx->req;
-  my $abs   = $req->url->to_abs;
-  my $proto = $abs->protocol;
-  $req->url($abs->scheme($proto eq 'wss' ? 'https' : 'http')) if $proto;
+  my $url   = $tx->req->url;
+  my $proto = $url->protocol;
+  $url->scheme($proto eq 'wss' ? 'https' : 'http') if $proto;
 
   # Handshake
   Mojo::Transaction::WebSocket->new(handshake => $tx)->client_handshake;

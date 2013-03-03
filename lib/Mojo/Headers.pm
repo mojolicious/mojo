@@ -500,8 +500,8 @@ Shortcut for the C<Sec-WebSocket-Key> header from RFC 6455.
 
 =head2 sec_websocket_protocol
 
-  my $protocol = $headers->sec_websocket_protocol;
-  $headers     = $headers->sec_websocket_protocol('sample');
+  my $proto = $headers->sec_websocket_protocol;
+  $headers  = $headers->sec_websocket_protocol('sample');
 
 Shortcut for the C<Sec-WebSocket-Protocol> header from RFC 6455.
 

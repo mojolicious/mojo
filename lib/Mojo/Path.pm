@@ -49,14 +49,7 @@ sub clone {
 
 sub contains {
   my ($self, $path) = @_;
-
-  my $parts = $self->new($path)->parts;
-  for my $part (@{$self->parts}) {
-    return 1 unless defined(my $try = shift @$parts);
-    return undef unless $part eq $try;
-  }
-
-  return !@$parts;
+  return $path eq '/' || $self->to_route =~ m!^$path(/|$)!;
 }
 
 sub leading_slash { shift->_lazy(leading_slash => @_) }
@@ -75,8 +68,8 @@ sub merge {
 }
 
 sub parse {
-  my ($self, $path) = @_;
-  $self->{path} = $path;
+  my $self = shift;
+  $self->{path} = shift;
   $self->_parse if $self->{parts};
   return $self;
 }
@@ -158,7 +151,9 @@ Mojo::Path - Path
 
 =head1 DESCRIPTION
 
-L<Mojo::Path> is a container for URL paths.
+L<Mojo::Path> is a container for URL paths. Note that C<%2F> will be treated
+as C</> for security reasons if the path has to be normalized for an
+operation.
 
 =head1 ATTRIBUTES
 
@@ -245,7 +240,7 @@ Merge paths.
 
   $path = $path->parse('/foo%2Fbar%3B/baz.html');
 
-Parse path. Note that C<%2F> will be treated as C</> for security reasons.
+Parse path.
 
 =head2 to_abs_string
 

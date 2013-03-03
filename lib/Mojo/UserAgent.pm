@@ -438,7 +438,7 @@ sub _start {
   if ($self->{port} || !$url->is_abs) {
     if (my $app = $self->app) { $self->_server->app($app) }
     my $base = $self->app_url;
-    $url = $req->url->scheme($base->scheme)->authority($base->authority)
+    $url->scheme($base->scheme)->authority($base->authority)
       unless $url->is_abs;
   }
 

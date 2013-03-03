@@ -214,8 +214,8 @@ Check if path contains given prefix.
 
 =head2 leading_slash
 
-  my $leading_slash = $path->leading_slash;
-  $path             = $path->leading_slash(1);
+  my $slash = $path->leading_slash;
+  $path     = $path->leading_slash(1);
 
 Path has a leading slash.
 
@@ -291,8 +291,8 @@ Turn path into a string.
 
 =head2 trailing_slash
 
-  my $trailing_slash = $path->trailing_slash;
-  $path              = $path->trailing_slash(1);
+  my $slash = $path->trailing_slash;
+  $path     = $path->trailing_slash(1);
 
 Path has a trailing slash.
 

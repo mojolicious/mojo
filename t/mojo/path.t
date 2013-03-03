@@ -107,7 +107,7 @@ $path = Mojo::Path->new(
   '%2ftest%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd');
 is "$path",
   '%2ftest%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2f..%2fetc%2fpasswd',
-  'right result';
+  'same path';
 is $path->parts->[0],  'test',   'right part';
 is $path->parts->[1],  '..',     'right part';
 is $path->parts->[2],  '..',     'right part';

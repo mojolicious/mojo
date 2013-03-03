@@ -292,13 +292,14 @@ is $path->to_abs_string, '/foo%2Fbar', 'right absolute path';
 is $path->to_route,      '/foo/bar',   'right route';
 
 # Unchanged path
-$path = Mojo::Path->new('/foob%E4r');
-is $path->to_string,     '/foob%E4r',  'right path';
-is $path->to_abs_string, '/foob%E4r',  'right absolute path';
-is $path->to_route,      "/foob\xe4r", 'right route';
-is $path->clone->to_string,     '/foob%E4r',  'right path';
-is $path->clone->to_abs_string, '/foob%E4r',  'right absolute path';
-is $path->clone->to_route,      "/foob\xe4r", 'right route';
+$path = Mojo::Path->new('/foob%E4r/-._~!$&\'()*+,;=:@');
+is $path->to_string,     '/foob%E4r/-._~!$&\'()*+,;=:@', 'right path';
+is $path->to_abs_string, '/foob%E4r/-._~!$&\'()*+,;=:@', 'right absolute path';
+is $path->to_route, "/foob\xe4r/-._~!\$&'()*+,;=:@", 'right route';
+is $path->clone->to_string, '/foob%E4r/-._~!$&\'()*+,;=:@', 'right path';
+is $path->clone->to_abs_string, '/foob%E4r/-._~!$&\'()*+,;=:@',
+  'right absolute path';
+is $path->clone->to_route, "/foob\xe4r/-._~!\$&'()*+,;=:@", 'right route';
 
 # Latin-1
 $path = Mojo::Path->new->charset('Latin-1')->parse('/foob%E4r');

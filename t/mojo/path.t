@@ -293,12 +293,12 @@ is $path->to_route,      '/foo/bar',   'right route';
 
 # Unchanged path
 $path = Mojo::Path->new('/foob%E4r');
-is $path->to_string,     '/foob%E4r',    'right path';
-is $path->to_abs_string, '/foob%E4r',    'right absolute path';
-is $path->to_route,      "/foob\x{e4}r", 'right route';
-is $path->clone->to_string,     '/foob%E4r',    'right path';
-is $path->clone->to_abs_string, '/foob%E4r',    'right absolute path';
-is $path->clone->to_route,      "/foob\x{e4}r", 'right route';
+is $path->to_string,     '/foob%E4r',  'right path';
+is $path->to_abs_string, '/foob%E4r',  'right absolute path';
+is $path->to_route,      "/foob\xe4r", 'right route';
+is $path->clone->to_string,     '/foob%E4r',  'right path';
+is $path->clone->to_abs_string, '/foob%E4r',  'right absolute path';
+is $path->clone->to_route,      "/foob\xe4r", 'right route';
 
 # Latin-1
 $path = Mojo::Path->new->charset('Latin-1')->parse('/foob%E4r');
@@ -319,7 +319,7 @@ is $path->parts->[1], undef,  'no part';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 is "$path", '/%E4', 'right path';
-is $path->to_route, "/\x{e4}", 'right route';
+is $path->to_route, "/\xe4", 'right route';
 is $path->clone->to_string, '/%E4', 'right path';
 
 done_testing();

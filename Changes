@@ -1,5 +1,7 @@
 
-3.88  2013-03-01
+3.88  2013-03-03
+  - Improved Mojo::Path to delay normalization as long as possible.
+  - Improved Mojo::Path performance.
   - Improved documentation.
   - Improved tests.
   - Fixed small domain detection bug in Mojo::UserAgent::CookieJar.

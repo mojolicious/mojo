@@ -52,7 +52,7 @@ sub contains {
   return $path eq '/' || $self->to_route =~ m!^$path(?:/|$)!;
 }
 
-sub leading_slash { shift->_lazy(leading_slash => @_) }
+sub leading_slash { shift->_parse(leading_slash => @_) }
 
 sub merge {
   my ($self, $path) = @_;
@@ -74,7 +74,7 @@ sub parse {
   return $self;
 }
 
-sub parts { shift->_lazy(parts => @_) }
+sub parts { shift->_parse(parts => @_) }
 
 sub to_abs_string {
   my $path = shift->to_string;
@@ -113,25 +113,23 @@ sub to_string {
   return $path;
 }
 
-sub trailing_slash { shift->_lazy(trailing_slash => @_) }
+sub trailing_slash { shift->_parse(trailing_slash => @_) }
 
-sub _lazy {
+sub _parse {
   my ($self, $name) = (shift, shift);
-  $self->_parse unless $self->{parts};
+
+  unless ($self->{parts}) {
+    my $path = url_unescape delete($self->{path}) // '';
+    my $charset = $self->charset;
+    $path = decode($charset, $path) // $path if $charset;
+    $self->{leading_slash}  = $path =~ s!^/!! ? 1 : undef;
+    $self->{trailing_slash} = $path =~ s!/$!! ? 1 : undef;
+    $self->{parts} = [split '/', $path, -1];
+  }
+
   return $self->{$name} unless @_;
   $self->{$name} = shift;
   return $self;
-}
-
-sub _parse {
-  my $self = shift;
-
-  my $path = url_unescape delete($self->{path}) // '';
-  my $charset = $self->charset;
-  $path = decode($charset, $path) // $path if $charset;
-  $self->{leading_slash}  = $path =~ s!^/!! ? 1 : undef;
-  $self->{trailing_slash} = $path =~ s!/$!! ? 1 : undef;
-  $self->{parts} = [split '/', $path, -1];
 }
 
 1;

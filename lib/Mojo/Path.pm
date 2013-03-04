@@ -49,7 +49,7 @@ sub clone {
 
 sub contains {
   my ($self, $path) = @_;
-  return $path eq '/' || $self->to_route =~ m!^$path(?:/|$)!;
+  return $path eq '/' || $self->to_route =~ m!^\Q$path\E(?:/|$)!;
 }
 
 sub leading_slash { shift->_parse(leading_slash => @_) }

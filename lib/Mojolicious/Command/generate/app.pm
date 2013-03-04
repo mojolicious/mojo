@@ -56,7 +56,6 @@ __DATA__
 use strict;
 use warnings;
 
-# Make sure dual-life modules can be updated
 use FindBin;
 BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 

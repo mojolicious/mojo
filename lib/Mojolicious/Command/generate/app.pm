@@ -56,8 +56,9 @@ __DATA__
 use strict;
 use warnings;
 
+# Make sure dual-life modules can be updated
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 
 # Start command line interface for application
 require Mojolicious::Commands;

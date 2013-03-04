@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 
+# Make sure dual-life modules can be updated
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 
 use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 

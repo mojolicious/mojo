@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 
+# Make sure dual-life modules can be updated
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 
 require Mojolicious::Commands;
 Mojolicious::Commands->start_app('Mojo::HelloWorld');

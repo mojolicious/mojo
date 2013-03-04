@@ -70,7 +70,7 @@ sub merge {
 sub parse {
   my $self = shift;
   $self->{path} = shift;
-  $self->_parse if $self->{parts};
+  delete $self->{$_} for qw(leading_slash parts trailing_slash);
   return $self;
 }
 

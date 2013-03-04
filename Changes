@@ -1,6 +1,8 @@
 
 3.89  2013-03-04
   - Improved documentation.
+  - Improved tests.
+  - Fixed bug preventing delayed normalization for reused Mojo::Path objects.
 
 3.88  2013-03-03
   - Improved Mojo::Path to delay normalization as long as possible.

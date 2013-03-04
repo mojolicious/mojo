@@ -293,6 +293,9 @@ is $path->to_route,      '/foo/bar',   'right route';
 
 # Unchanged path
 $path = Mojo::Path->new('/foob%E4r/-._~!$&\'()*+,;=:@');
+is $path->clone->parts->[0], "foob\xe4r",          'right part';
+is $path->clone->parts->[1], '-._~!$&\'()*+,;=:@', 'right part';
+is $path->clone->parts->[2], undef,                'no part';
 is $path->to_string,     '/foob%E4r/-._~!$&\'()*+,;=:@', 'right path';
 is $path->to_abs_string, '/foob%E4r/-._~!$&\'()*+,;=:@', 'right absolute path';
 is $path->to_route, "/foob\xe4r/-._~!\$&'()*+,;=:@", 'right route';
@@ -300,6 +303,16 @@ is $path->clone->to_string, '/foob%E4r/-._~!$&\'()*+,;=:@', 'right path';
 is $path->clone->to_abs_string, '/foob%E4r/-._~!$&\'()*+,;=:@',
   'right absolute path';
 is $path->clone->to_route, "/foob\xe4r/-._~!\$&'()*+,;=:@", 'right route';
+
+# Reuse path
+$path = Mojo::Path->new('/foob%E4r');
+is $path->to_string, '/foob%E4r', 'right path';
+is $path->parts->[0], "foob\xe4r", 'right part';
+is $path->parts->[1], undef,       'no part';
+$path->parse('/foob%E4r');
+is $path->to_string, '/foob%E4r', 'right path';
+is $path->parts->[0], "foob\xe4r", 'right part';
+is $path->parts->[1], undef,       'no part';
 
 # Latin-1
 $path = Mojo::Path->new->charset('Latin-1')->parse('/foob%E4r');

@@ -187,7 +187,7 @@ Construct a new L<Mojo::Path> object.
 Canonicalize path.
 
   # "/foo/baz"
-  Mojo::Path->new('/foo/bar/../baz')->canonicalize;
+  Mojo::Path->new('/foo/./bar/../baz')->canonicalize;
 
 =head2 clone
 
@@ -248,6 +248,7 @@ Parse path.
 Turn path into an absolute string.
 
   # "/i/%E2%99%A5/mojolicious"
+  Mojo::Path->new('/i/%E2%99%A5/mojolicious')->to_abs_string;
   Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_abs_string;
 
 =head2 parts
@@ -267,6 +268,9 @@ The path parts.
 Clone path and remove everything after the right-most slash.
 
   # "/i/%E2%99%A5/"
+  Mojo::Path->new('/i/%E2%99%A5/mojolicious')->to_dir->to_abs_string;
+
+  # "i/%E2%99%A5/"
   Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_dir->to_abs_string;
 
 =head2 to_route
@@ -276,6 +280,7 @@ Clone path and remove everything after the right-most slash.
 Turn path into a route.
 
   # "/i/♥/mojolicious"
+  Mojo::Path->new('/i/%E2%99%A5/mojolicious')->to_route;
   Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_route;
 
 =head2 to_string
@@ -284,6 +289,9 @@ Turn path into a route.
   my $string = "$path";
 
 Turn path into a string.
+
+  # "/i/%E2%99%A5/mojolicious"
+  Mojo::Path->new('/i/%E2%99%A5/mojolicious')->to_string;
 
   # "i/%E2%99%A5/mojolicious"
   Mojo::Path->new('i/%E2%99%A5/mojolicious')->to_string;

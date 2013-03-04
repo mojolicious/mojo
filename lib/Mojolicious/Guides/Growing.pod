@@ -641,8 +641,8 @@ Finally C<myapp.pl> can be replaced with a proper L<Mojolicious> script.
   $ touch script/myapp
   $ chmod 744 script/myapp
 
-Only a few small details change, since installable scripts can't use
-L<lib> without breaking updated dual-life modules.
+Only a few small details change, since installable scripts can't use L<lib>
+without breaking updated dual-life modules.
 
   #!/usr/bin/env perl
 

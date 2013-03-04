@@ -2,8 +2,8 @@
 3.89  2013-03-04
   - Improved documentation.
   - Improved tests.
-  - Fixed scripts to not "use lib", which sadly breaks updated dual-life
-    modules. (jberger, sri)
+  - Fixed installable scripts to not "use lib", which sadly breaks updated
+    dual-life modules. (jberger, sri)
   - Fixed bug preventing delayed normalization for reused Mojo::Path objects.
   - Fixed path matching bug in Mojo::Path.
 

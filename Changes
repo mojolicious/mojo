@@ -1,5 +1,6 @@
 
 3.90  2013-03-05
+  - Improved dumper helper to sort hash keys.
   - Improved documentation.
 
 3.89  2013-03-04

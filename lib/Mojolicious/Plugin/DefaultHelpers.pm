@@ -86,7 +86,10 @@ sub _current_route {
   return $endpoint->name eq shift;
 }
 
-sub _dumper { shift; Data::Dumper->new([@_])->Indent(1)->Terse(1)->Dump }
+sub _dumper {
+  my $self = shift;
+  return Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Dump;
+}
 
 sub _include {
   my $self     = shift;

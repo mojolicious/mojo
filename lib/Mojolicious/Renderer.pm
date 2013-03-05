@@ -70,7 +70,8 @@ sub render {
   my $options = {
     encoding => $self->encoding,
     handler  => $stash->{handler},
-    template => delete $stash->{template}
+    template => delete $stash->{template},
+    file_extension => delete $stash->{file_extension}
   };
   my $data   = delete $stash->{data};
   my $format = $options->{format} = $stash->{format} || $self->default_format;
@@ -134,6 +135,10 @@ sub render {
 sub template_name {
   my ($self, $options) = @_;
   return undef unless my $template = $options->{template};
+  my $file_extension  = $options->{file_extension};
+  if($file_extension){
+    return "$template.$file_extension";
+  }
   return undef unless my $format   = $options->{format};
   my $handler = $options->{handler};
   return defined $handler ? "$template.$format.$handler" : "$template.$format";

@@ -129,7 +129,7 @@ timers.
 
 =head2 Nginx
 
-One of the most popular setups these days is Hypnotoad behind a Nginx reverse
+One of the most popular setups these days is Hypnotoad behind an Nginx reverse
 proxy, which even supports WebSockets in newer versions.
 
   upstream myapp {
@@ -153,7 +153,7 @@ proxy, which even supports WebSockets in newer versions.
 =head2 Apache/mod_proxy
 
 Another good reverse proxy is Apache with C<mod_proxy>, the configuration
-looks very similar to the Nginx one above.
+looks quite similar to the Nginx one above.
 
   <VirtualHost *:80>
     ServerName localhost

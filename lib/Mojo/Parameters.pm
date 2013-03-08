@@ -249,7 +249,7 @@ Construct a new L<Mojo::Parameters> object.
   $params = $params->append(foo => ['ba;r', 'b;az']);
   $params = $params->append(foo => ['ba;r', 'b;az'], bar => 23);
 
-Append parameters.
+Append parameters. Note that this method will normalize the parameters.
 
   # "foo=bar&foo=baz"
   Mojo::Parameters->new('foo=bar')->append(foo => 'baz');
@@ -270,7 +270,8 @@ Clone parameters.
 
   $params = $params->merge(Mojo::Parameters->new(foo => 'b;ar', baz => 23));
 
-Merge L<Mojo::Parameters> objects.
+Merge L<Mojo::Parameters> objects. Note that this method will normalize the
+parameters.
 
 =head2 param
 
@@ -283,14 +284,15 @@ Merge L<Mojo::Parameters> objects.
 Check and replace parameter value. Be aware that if you request a parameter by
 name in scalar context, you will receive only the I<first> value for that
 parameter, if there are multiple values for that name. In list context you
-will receive I<all> of the values for that name.
+will receive I<all> of the values for that name. Note that this method will
+normalize the parameters.
 
 =head2 params
 
   my $array = $params->params;
   $params   = $params->params([foo => 'b;ar', baz => 23]);
 
-Parsed parameters.
+Parsed parameters. Note that this method will normalize the parameters.
 
 =head2 parse
 
@@ -302,7 +304,7 @@ Parse parameters.
 
   $params = $params->remove('foo');
 
-Remove parameters.
+Remove parameters. Note that this method will normalize the parameters.
 
   # "bar=yada"
   Mojo::Parameters->new('foo=bar&foo=baz&bar=yada')->remove('foo');
@@ -311,7 +313,8 @@ Remove parameters.
 
   my $hash = $params->to_hash;
 
-Turn parameters into a hash reference.
+Turn parameters into a hash reference. Note that this method will normalize
+the parameters.
 
   # "baz"
   Mojo::Parameters->new('foo=bar&foo=baz')->to_hash->{foo}[1];

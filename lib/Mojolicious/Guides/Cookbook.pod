@@ -139,7 +139,6 @@ proxy, which even supports WebSockets in newer versions.
     listen 80;
     server_name localhost;
     location / {
-      proxy_read_timeout 300;
       proxy_pass http://myapp;
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;

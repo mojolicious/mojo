@@ -18,12 +18,11 @@ use Scalar::Util qw(blessed weaken);
 sub AUTOLOAD {
   my $self = shift;
 
-  # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 
-  # Search children
+  # Search children of current element
   my $children = $self->children($method);
   return @$children > 1 ? $children : $children->[0] if @$children;
   croak qq{Can't locate object method "$method" via package "$package"};

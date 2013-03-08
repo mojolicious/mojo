@@ -12,12 +12,11 @@ has pattern    => sub { Mojolicious::Routes::Pattern->new };
 sub AUTOLOAD {
   my $self = shift;
 
-  # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 
-  # Call shortcut
+  # Call shortcut with current route
   croak qq{Can't locate object method "$method" via package "$package"}
     unless my $shortcut = $self->root->shortcuts->{$method};
   return $self->$shortcut(@_);

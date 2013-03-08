@@ -28,12 +28,11 @@ my %RESERVED = map { $_ => 1 } (
 sub AUTOLOAD {
   my $self = shift;
 
-  # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
   Carp::croak "Undefined subroutine &${package}::$method called"
     unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
 
-  # Call helper
+  # Call helper with current controller
   Carp::croak qq{Can't locate object method "$method" via package "$package"}
     unless my $helper = $self->app->renderer->helpers->{$method};
   return $self->$helper(@_);

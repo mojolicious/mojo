@@ -45,16 +45,13 @@ our $VERSION  = '3.90';
 sub AUTOLOAD {
   my $self = shift;
 
-  # Method
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 
-  # Check for helper
+  # Call helper with fresh controller
   croak qq{Can't locate object method "$method" via package "$package"}
     unless my $helper = $self->renderer->helpers->{$method};
-
-  # Call helper with fresh controller
   return $self->controller_class->new(app => $self)->$helper(@_);
 }
 

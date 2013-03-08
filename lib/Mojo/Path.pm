@@ -150,9 +150,7 @@ Mojo::Path - Path
 
 =head1 DESCRIPTION
 
-L<Mojo::Path> is a container for URL paths. Note that C<%2F> will be treated
-as C</> for security reasons if the path has to be normalized for an
-operation.
+L<Mojo::Path> is a container for URL paths.
 
 =head1 ATTRIBUTES
 
@@ -216,7 +214,8 @@ Check if path contains given prefix.
   my $slash = $path->leading_slash;
   $path     = $path->leading_slash(1);
 
-Path has a leading slash. Note that this method will normalize the path.
+Path has a leading slash. Note that this method will normalize the path and
+that C<%2F> will be treated as C</> for security reasons.
 
 =head2 merge
 
@@ -224,7 +223,8 @@ Path has a leading slash. Note that this method will normalize the path.
   $path = $path->merge('foo/bar');
   $path = $path->merge(Mojo::Path->new('foo/bar'));
 
-Merge paths. Note that this method will normalize both paths if necessary.
+Merge paths. Note that this method will normalize both paths if necessary and
+that C<%2F> will be treated as C</> for security reasons.
 
   # "/baz/yada"
   Mojo::Path->new('/foo/bar')->merge('/baz/yada');
@@ -256,7 +256,8 @@ Turn path into an absolute string.
   my $parts = $path->parts;
   $path     = $path->parts([qw(foo bar baz)]);
 
-The path parts. Note that this method will normalize the path.
+The path parts. Note that this method will normalize the path and that C<%2F>
+will be treated as C</> for security reasons.
 
   # Part with slash
   push @{$path->parts}, 'foo/bar';
@@ -301,7 +302,8 @@ Turn path into a string.
   my $slash = $path->trailing_slash;
   $path     = $path->trailing_slash(1);
 
-Path has a trailing slash. Note that this method will normalize the path.
+Path has a trailing slash. Note that this method will normalize the path and
+that C<%2F> will be treated as C</> for security reasons.
 
 =head1 SEE ALSO
 

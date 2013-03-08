@@ -216,7 +216,7 @@ Check if path contains given prefix.
   my $slash = $path->leading_slash;
   $path     = $path->leading_slash(1);
 
-Path has a leading slash.
+Path has a leading slash. Note that this method will normalize the path.
 
 =head2 merge
 
@@ -224,7 +224,7 @@ Path has a leading slash.
   $path = $path->merge('foo/bar');
   $path = $path->merge(Mojo::Path->new('foo/bar'));
 
-Merge paths.
+Merge paths. Note that this method will normalize both paths if necessary.
 
   # "/baz/yada"
   Mojo::Path->new('/foo/bar')->merge('/baz/yada');
@@ -256,7 +256,7 @@ Turn path into an absolute string.
   my $parts = $path->parts;
   $path     = $path->parts([qw(foo bar baz)]);
 
-The path parts.
+The path parts. Note that this method will normalize the path.
 
   # Part with slash
   push @{$path->parts}, 'foo/bar';
@@ -301,7 +301,7 @@ Turn path into a string.
   my $slash = $path->trailing_slash;
   $path     = $path->trailing_slash(1);
 
-Path has a trailing slash.
+Path has a trailing slash. Note that this method will normalize the path.
 
 =head1 SEE ALSO
 

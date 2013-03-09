@@ -24,8 +24,8 @@ is $path->to_abs_string, '/', 'right absolute path';
 
 # Advanced
 $path = Mojo::Path->new('/AZaz09-._~!$&\'()*+,;=:@');
-is $path->parts->[0], 'AZaz09-._~!$&\'()*+,;=:@', 'right part';
-is $path->parts->[1], undef, 'no part';
+is $path->[0], 'AZaz09-._~!$&\'()*+,;=:@', 'right part';
+is $path->[1], undef, 'no part';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 is "$path", '/AZaz09-._~!$&\'()*+,;=:@', 'right path';

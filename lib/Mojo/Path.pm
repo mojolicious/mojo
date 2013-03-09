@@ -1,6 +1,7 @@
 package Mojo::Path;
 use Mojo::Base -base;
 use overload
+  '@{}'    => sub { shift->parts },
   'bool'   => sub {1},
   '""'     => sub { shift->to_string },
   fallback => 1;
@@ -304,6 +305,15 @@ Turn path into a string.
 
 Path has a trailing slash. Note that this method will normalize the path and
 that C<%2F> will be treated as C</> for security reasons.
+
+=head1 PATH PARTS
+
+Direct array reference access to path parts is also possible. Note that this
+will normalize the path and that C<%2F> will be treated as C</> for security
+reasons.
+
+  say $path->[0];
+  say for @$path;
 
 =head1 SEE ALSO
 

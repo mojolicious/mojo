@@ -364,7 +364,7 @@ Parse URL.
   $url     = $url->path('foo/bar');
   $url     = $url->path(Mojo::Path->new);
 
-Path part of this URL, relative paths will be appended to the existing path,
+Path part of this URL, relative paths will be merged with the existing path,
 defaults to a L<Mojo::Path> object.
 
   # "http://mojolicio.us/DOM/HTML"
@@ -393,7 +393,8 @@ Normalized version of C<scheme>.
   $url      = $url->query({append => 'to'});
   $url      = $url->query(Mojo::Parameters->new);
 
-Query part of this URL, defaults to a L<Mojo::Parameters> object.
+Query part of this URL, pairs in an array will be merged and pairs in a hash
+appended, defaults to a L<Mojo::Parameters> object.
 
   # "2"
   Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query->param('b');

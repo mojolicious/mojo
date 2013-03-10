@@ -145,8 +145,13 @@ Mojo::Path - Path
 
   use Mojo::Path;
 
+  # Parse
   my $path = Mojo::Path->new('/foo%2Fbar%3B/baz.html');
-  shift @{$path->parts};
+  say $path->[0];
+
+  # Build
+  my $path = Mojo::Path->new('/i/♥');
+  push @$path, 'mojolicious';
   say "$path";
 
 =head1 DESCRIPTION

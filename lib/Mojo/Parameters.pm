@@ -188,6 +188,8 @@ sub to_string {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Parameters - Parameters
@@ -202,6 +204,7 @@ Mojo::Parameters - Parameters
 
   # Build
   my $params = Mojo::Parameters->new(foo => 'bar', baz => 23);
+  push @$params, i => '♥ mojolicious';
   say "$params";
 
 =head1 DESCRIPTION

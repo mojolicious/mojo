@@ -1,6 +1,7 @@
 package Mojo::Parameters;
 use Mojo::Base -base;
 use overload
+  '@{}'    => sub { shift->params },
   'bool'   => sub {1},
   '""'     => sub { shift->to_string },
   fallback => 1;
@@ -325,6 +326,14 @@ the parameters.
   my $string = "$params";
 
 Turn parameters into a string.
+
+=head1 PARAMETERS
+
+Direct array reference access to the parsed parameters is also possible. Note
+that this will normalize the parameters.
+
+  say $params->[0];
+  say for @$params;
 
 =head1 SEE ALSO
 

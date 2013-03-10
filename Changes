@@ -1,5 +1,6 @@
 
 3.90  2013-03-10
+  - Added direct array access for parsed parameters to Mojo::Parameters.
   - Added direct array access for path parts to Mojo::Path.
   - Improved dumper helper to sort hash keys.
   - Improved documentation.

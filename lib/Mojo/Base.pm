@@ -218,7 +218,8 @@ argument.
   $object = $object->tap(sub {...});
 
 K combinator, tap into a method chain to perform operations on an object
-within the chain.
+within the chain. The object will be the first argument passed to the closure
+and is also available via C<$_>.
 
 =head1 DEBUGGING
 

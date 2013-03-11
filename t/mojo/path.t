@@ -29,6 +29,8 @@ is $path->[1], undef, 'no part';
 ok $path->leading_slash, 'has leading slash';
 ok !$path->trailing_slash, 'no trailing slash';
 is "$path", '/AZaz09-._~!$&\'()*+,;=:@', 'right path';
+push @$path, 'foo';
+is "$path", '/AZaz09-._~!$&\'()*+,;=:@/foo', 'right path';
 
 # Unicode
 is $path->parse('/foo/♥/bar')->to_string, '/foo/%E2%99%A5/bar', 'right path';

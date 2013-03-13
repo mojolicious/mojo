@@ -122,8 +122,8 @@ my @array = $headers->header('X-Test');
 is_deeply \@array, [[23, 24], ['single line'], [25, 26]], 'right structure';
 is_deeply $headers->to_hash(1),
   {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
-is_deeply $headers->to_hash,
-  {'X-Test' => [[23, 24], 'single line', [25, 26]]}, 'right structure';
+is_deeply $headers->to_hash, {'X-Test' => '23, 24, single line, 25, 26'},
+  'right structure';
 my $string = $headers->header('X-Test');
 is $string, "23, 24, single line, 25, 26", 'right format';
 
@@ -155,14 +155,19 @@ Foo: first again
 EOF
 ok $headers->is_finished, 'parser is finished';
 my $multi = [['first', 'second', 'third'], ['first again', 'second again']];
-$hash = {'Content-Type' => 'text/plain', Foo => $multi};
-is_deeply $headers->to_hash, $hash, 'right structure';
+$hash = {'Content-Type' => [['text/plain']], Foo => $multi};
+is_deeply $headers->to_hash(1), $hash, 'right structure';
 is_deeply [$headers->header('Foo')], $multi, 'right structure';
 is scalar $headers->header('Foo'),
   'first, second, third, first again, second again', 'right value';
 $headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");
 ok $headers->is_finished, 'parser is finished';
-is_deeply $headers->to_hash, $hash, 'successful roundtrip';
+is_deeply $headers->to_hash(1), $hash, 'successful roundtrip';
+$hash = {
+  'Content-Type' => 'text/plain',
+  Foo            => 'first, second, third, first again, second again'
+};
+is_deeply $headers->to_hash, $hash, 'right structure';
 
 # Set headers from hash
 $headers = Mojo::Headers->new;
@@ -179,9 +184,8 @@ $headers = Mojo::Headers->new;
 $headers->from_hash(
   {'X-Test' => [[23, 24], ['single line'], [25, 26]], 'X-Test2' => 'foo'});
 $hash = $headers->to_hash;
-is_deeply $hash->{'X-Test'}, [[23, 24], 'single line', [25, 26]],
-  'right structure';
-is_deeply $hash->{'X-Test2'}, 'foo', 'right structure';
+is $hash->{'X-Test'}, '23, 24, single line, 25, 26', 'right value';
+is $hash->{'X-Test2'}, 'foo', 'right value';
 $hash = $headers->to_hash(1);
 is_deeply $hash->{'X-Test'}, [[23, 24], ['single line'], [25, 26]],
   'right structure';

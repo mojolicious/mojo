@@ -132,23 +132,9 @@ sub remove {
 
 sub to_hash {
   my ($self, $multi) = @_;
-
   my %hash;
-  for my $header (@{$self->names}) {
-    my @headers = $self->header($header);
-
-    # Multi line
-    if ($multi) { $hash{$header} = [@headers] }
-
-    # Flat
-    else {
-
-      # Turn single value arrays into strings
-      @$_ == 1 and $_ = $_->[0] for @headers;
-      $hash{$header} = @headers > 1 ? [@headers] : $headers[0];
-    }
-  }
-
+  $hash{$_} = $multi ? [$self->header($_)] : scalar $self->header($_)
+    for @{$self->names};
   return \%hash;
 }
 
@@ -365,8 +351,8 @@ Parse headers from a hash reference.
 
 =head2 header
 
-  my $string = $headers->header('Foo');
-  my @lines  = $headers->header('Foo');
+  my $value  = $headers->header('Foo');
+  my @values = $headers->header('Foo');
   $headers   = $headers->header(Foo => 'one value');
   $headers   = $headers->header(Foo => 'first value', 'second value');
   $headers   = $headers->header(Foo => ['first line', 'second line']);
@@ -477,7 +463,7 @@ resulted in C<Referer> becoming an official header.
 
 =head2 remove
 
-  $headers = $headers->remove('Content-Type');
+  $headers = $headers->remove('Foo');
 
 Remove a header.
 
@@ -549,8 +535,8 @@ Shortcut for the C<TE> header.
   my $single = $headers->to_hash;
   my $multi  = $headers->to_hash(1);
 
-Turn headers into hash reference, nested array references to represent multi
-line values are disabled by default.
+Turn headers into hash reference, nested array references to represent
+multiline values are disabled by default.
 
   say $headers->to_hash->{DNT};
 

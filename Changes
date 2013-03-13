@@ -7,6 +7,7 @@
   - Improved tests.
   - Fixed bug in Mojo::Headers that prevented multiline headers from being
     parsed correctly.
+  - Fixed multiline header support in hash representation of Mojo::Headers.
 
 3.89  2013-03-04
   - Improved documentation.

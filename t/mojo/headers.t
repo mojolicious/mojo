@@ -5,8 +5,8 @@ use Mojo::Headers;
 
 # Basic functionality
 my $headers = Mojo::Headers->new;
-$headers->add('Connection', 'close');
-$headers->add('Connection', 'keep-alive');
+$headers->add(Connection => 'close');
+$headers->add(Connection => 'keep-alive');
 is $headers->header('Connection'), 'close, keep-alive', 'right value';
 $headers->remove('Connection');
 is $headers->header('Connection'), undef, 'no value';
@@ -96,8 +96,8 @@ is $headers->www_authenticate('foo')->www_authenticate,   'foo', 'right value';
 
 # Clone
 $headers = Mojo::Headers->new;
-$headers->add('Connection', 'close');
-$headers->add('Connection', 'keep-alive');
+$headers->add(Connection => 'close');
+$headers->add(Connection => 'keep-alive');
 is $headers->header('Connection'), 'close, keep-alive', 'right value';
 my $clone = $headers->clone;
 $headers->connection('nothing');
@@ -141,6 +141,28 @@ is $headers->content_type,  'text/plain', 'right value';
 is $headers->expect,        '100-continue', 'right value';
 is $headers->cache_control, 'public', 'right value';
 is $headers->expires,       'Thu, 01 Dec 1994 16:00:00 GMT', 'right value';
+
+# Parse multiline headers
+$headers = Mojo::Headers->new;
+$headers->parse(<<'EOF');
+Foo: first
+ second
+ third
+Content-Type: text/plain
+Foo: first again
+  second again
+
+EOF
+ok $headers->is_finished, 'parser is finished';
+my $multi = [['first', 'second', 'third'], ['first again', 'second again']];
+$hash = {'Content-Type' => 'text/plain', Foo => $multi};
+is_deeply $headers->to_hash, $hash, 'right structure';
+is_deeply [$headers->header('Foo')], $multi, 'right structure';
+is scalar $headers->header('Foo'),
+  'first, second, third, first again, second again', 'right value';
+$headers = Mojo::Headers->new->parse($headers->to_string . "\x0d\x0a\x0d\x0a");
+ok $headers->is_finished, 'parser is finished';
+is_deeply $headers->to_hash, $hash, 'successful roundtrip';
 
 # Set headers from hash
 $headers = Mojo::Headers->new;

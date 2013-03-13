@@ -5,6 +5,8 @@
   - Improved dumper helper to sort hash keys.
   - Improved documentation.
   - Improved tests.
+  - Fixed bug in Mojo::Headers that prevented multiline headers from being
+    parsed correctly.
 
 3.89  2013-03-04
   - Improved documentation.

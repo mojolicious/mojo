@@ -102,10 +102,10 @@ sub parse {
     }
 
     # New header
-    if ($line =~ /^(\S+)\s*:\s*(.*)$/) { push @$headers, $1, $2 }
+    if ($line =~ /^(\S+)\s*:\s*(.*)$/) { push @$headers, $1, [$2] }
 
     # Multiline
-    elsif (@$headers && $line =~ s/^\s+//) { $headers->[-1] .= " $line" }
+    elsif (@$headers && $line =~ s/^\s+//) { push @{$headers->[-1]}, $line }
 
     # Empty line
     else {
@@ -245,7 +245,9 @@ Shortcut for the C<Accept-Ranges> header.
 
 =head2 add
 
-  $headers = $headers->add('Content-Type', 'text/plain');
+  $headers = $headers->add(Foo => 'one value');
+  $headers = $headers->add(Foo => 'first value', 'second value');
+  $headers = $headers->add(Foo => ['first line', 'second line']);
 
 Add one or more header lines.
 
@@ -363,9 +365,11 @@ Parse headers from a hash reference.
 
 =head2 header
 
-  my $string = $headers->header('Content-Type');
-  my @lines  = $headers->header('Content-Type');
-  $headers   = $headers->header('Content-Type' => 'text/plain');
+  my $string = $headers->header('Foo');
+  my @lines  = $headers->header('Foo');
+  $headers   = $headers->header(Foo => 'one value');
+  $headers   = $headers->header(Foo => 'first value', 'second value');
+  $headers   = $headers->header(Foo => ['first line', 'second line']);
 
 Get or replace the current header values.
 

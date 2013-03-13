@@ -152,7 +152,8 @@ implements the following new ones.
 
   $jar = $jar->add(@cookies);
 
-Add multiple L<Mojo::Cookie::Response> objects to the jar.
+Add multiple L<Mojo::Cookie::Response> objects to the jar. Note that cookies
+in the jar are overwritten if they have the same domain, path, and name.
 
 =head2 all
 

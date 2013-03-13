@@ -110,6 +110,8 @@ $clone = $headers->clone;
 $clone->expect('nothing');
 is $headers->expect, '100-continue', 'right value';
 is $clone->expect,   'nothing',      'right value';
+$clone = Mojo::Headers->new->add(Foo => [qw(bar baz)])->clone;
+is_deeply $clone->to_hash(1)->{Foo}, [[qw(bar baz)]], 'right structure';
 
 # Multiline values
 $headers = Mojo::Headers->new;

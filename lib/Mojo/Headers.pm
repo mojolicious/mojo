@@ -39,11 +39,8 @@ sub add {
 }
 
 sub clone {
-  my $self  = shift;
-  my $clone = $self->new;
-  $clone->{headers}{$_} = [@{$self->{headers}{$_}}]
-    for keys %{$self->{headers}};
-  return $clone;
+  my $self = shift;
+  return $self->new->from_hash($self->to_hash(1));
 }
 
 sub from_hash {

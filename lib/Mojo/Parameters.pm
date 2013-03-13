@@ -209,7 +209,7 @@ Mojo::Parameters - Parameters
 
 =head1 DESCRIPTION
 
-L<Mojo::Parameters> is a container for form parameters.
+L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL>.
 
 =head1 ATTRIBUTES
 

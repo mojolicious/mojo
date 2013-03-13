@@ -129,8 +129,8 @@ Mojo::UserAgent::CookieJar - Cookie jar for HTTP user agents
 
 =head1 DESCRIPTION
 
-L<Mojo::UserAgent::CookieJar> is a minimalistic and relaxed cookie jar used by
-L<Mojo::UserAgent>.
+L<Mojo::UserAgent::CookieJar> is a minimalistic and relaxed cookie jar based
+on RFC 6265 for L<Mojo::UserAgent>.
 
 =head1 ATTRIBUTES
 

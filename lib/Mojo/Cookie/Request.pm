@@ -42,7 +42,8 @@ Mojo::Cookie::Request - HTTP request cookie
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie::Request> is a container for HTTP request cookies.
+L<Mojo::Cookie::Request> is a container for HTTP request cookies as described
+in RFC 6265.
 
 =head1 ATTRIBUTES
 

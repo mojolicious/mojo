@@ -219,7 +219,7 @@ sub server_handshake {
   my $res_headers = $self->res->code(101)->headers;
   $res_headers->upgrade('websocket')->connection('Upgrade');
   my $req_headers = $self->req->headers;
-  ($req_headers->sec_websocket_protocol || '') =~ /^\s*([^,]+)/
+  ($req_headers->sec_websocket_protocol // '') =~ /^\s*([^,]+)/
     and $res_headers->sec_websocket_protocol($1);
   $res_headers->sec_websocket_accept(
     _challenge($req_headers->sec_websocket_key));

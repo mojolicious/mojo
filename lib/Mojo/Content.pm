@@ -27,7 +27,7 @@ sub build_body    { shift->_build('get_body_chunk') }
 sub build_headers { shift->_build('get_header_chunk') }
 
 sub charset {
-  my $type = shift->headers->content_type || '';
+  my $type = shift->headers->content_type // '';
   return $type =~ /charset="?([^"\s;]+)"?/i ? $1 : undef;
 }
 
@@ -70,7 +70,7 @@ sub header_size { length shift->build_headers }
 
 sub is_chunked { !!shift->headers->transfer_encoding }
 
-sub is_compressed { (shift->headers->content_encoding || '') =~ /^gzip$/i }
+sub is_compressed { (shift->headers->content_encoding // '') =~ /^gzip$/i }
 
 sub is_dynamic { $_[0]{dynamic} && !defined $_[0]->headers->content_length }
 
@@ -117,8 +117,8 @@ sub parse {
   # Relaxed parsing
   my $headers = $self->headers;
   if ($self->auto_relax) {
-    my $connection = $headers->connection || '';
-    my $len = $headers->content_length // '';
+    my $connection = $headers->connection     // '';
+    my $len        = $headers->content_length // '';
     $self->relaxed(1)
       if !length $len && ($connection =~ /close/i || $headers->content_type);
   }

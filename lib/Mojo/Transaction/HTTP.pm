@@ -26,8 +26,8 @@ sub keep_alive {
   # Close
   my $req      = $self->req;
   my $res      = $self->res;
-  my $req_conn = lc($req->headers->connection || '');
-  my $res_conn = lc($res->headers->connection || '');
+  my $req_conn = lc($req->headers->connection // '');
+  my $res_conn = lc($res->headers->connection // '');
   return undef if $req_conn eq 'close' || $res_conn eq 'close';
 
   # Keep alive
@@ -48,7 +48,7 @@ sub server_read {
   # Generate response
   return unless $req->is_finished && !$self->{handled}++;
   $self->emit(upgrade => Mojo::Transaction::WebSocket->new(handshake => $self))
-    if lc($req->headers->upgrade || '') eq 'websocket';
+    if lc($req->headers->upgrade // '') eq 'websocket';
   $self->emit('request');
 }
 

@@ -114,7 +114,7 @@ sub run {
 
   # JSON Pointer
   return unless $selector;
-  my $type = $tx->res->headers->content_type || '';
+  my $type = $tx->res->headers->content_type // '';
   return _json($buffer, $selector) if $type =~ /json/i;
 
   # Selector

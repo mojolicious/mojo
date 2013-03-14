@@ -119,7 +119,7 @@ sub get_start_line_chunk {
     # Proxy
     elsif ($self->proxy) {
       my $clone = $url = $url->clone->userinfo(undef);
-      my $upgrade = lc($self->headers->upgrade || '');
+      my $upgrade = lc($self->headers->upgrade // '');
       $path = $clone
         unless $upgrade eq 'websocket' || $url->protocol eq 'https';
     }
@@ -137,7 +137,7 @@ sub is_secure {
 }
 
 sub is_xhr {
-  (shift->headers->header('X-Requested-With') || '') =~ /XMLHttpRequest/i;
+  (shift->headers->header('X-Requested-With') // '') =~ /XMLHttpRequest/i;
 }
 
 sub param { shift->params->param(@_) }
@@ -233,7 +233,7 @@ sub _parse_env {
   $self->method($env->{REQUEST_METHOD}) if $env->{REQUEST_METHOD};
 
   # Scheme/Version
-  if (($env->{SERVER_PROTOCOL} || '') =~ m!^([^/]+)/([^/]+)$!) {
+  if (($env->{SERVER_PROTOCOL} // '') =~ m!^([^/]+)/([^/]+)$!) {
     $base->scheme($1);
     $self->version($2);
   }

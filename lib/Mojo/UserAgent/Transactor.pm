@@ -40,7 +40,7 @@ sub endpoint {
 
   # Proxy for normal HTTP requests
   return $self->_proxy($tx, $proto, $host, $port)
-    if $proto eq 'http' && lc($req->headers->upgrade || '') ne 'websocket';
+    if $proto eq 'http' && lc($req->headers->upgrade // '') ne 'websocket';
 
   return $proto, $host, $port;
 }
@@ -80,7 +80,7 @@ sub proxy_connect {
 
   # WebSocket and/or HTTPS
   my $url = $req->url;
-  my $upgrade = lc($req->headers->upgrade || '');
+  my $upgrade = lc($req->headers->upgrade // '');
   return undef unless $upgrade eq 'websocket' || $url->protocol eq 'https';
 
   # CONNECT request

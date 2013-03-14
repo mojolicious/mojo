@@ -48,7 +48,7 @@ sub body_params {
   $params->charset($self->content->charset || $self->default_charset);
 
   # "x-application-urlencoded" and "application/x-www-form-urlencoded"
-  my $type = $self->headers->content_type || '';
+  my $type = $self->headers->content_type // '';
   if ($type =~ m!(?:x-application|application/x-www-form)-urlencoded!i) {
     $params->parse($self->content->asset->slurp);
   }

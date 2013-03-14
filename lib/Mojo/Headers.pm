@@ -138,7 +138,7 @@ sub to_hash {
 sub to_string {
   my $self = shift;
 
-  # Format multiline values
+  # Make sure multiline values are formatted correctly
   my @headers;
   for my $name (@{$self->names}) {
     push @headers, "$name: " . join("\x0d\x0a ", @$_) for $self->header($name);

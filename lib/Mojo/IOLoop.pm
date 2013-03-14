@@ -267,8 +267,6 @@ sub _stream {
   # Connect stream with reactor
   $self->{connections}{$id}{stream} = $stream;
   weaken $stream->reactor($self->reactor)->{reactor};
-
-  # Start streaming
   weaken $self;
   $stream->on(close => sub { $self->{connections}{$id}{finish} = 1 });
   $stream->start;

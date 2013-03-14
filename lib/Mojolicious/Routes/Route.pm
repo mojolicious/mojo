@@ -331,7 +331,7 @@ Construct a new L<Mojolicious::Routes::Route> object.
 
 =head2 add_child
 
-  $r = $r->add_child(Mojolicious::Route->new);
+  $r = $r->add_child(Mojolicious::Routes::Route->new);
 
 Add a new child to this route, it will be automatically removed from its
 current parent if necessary.

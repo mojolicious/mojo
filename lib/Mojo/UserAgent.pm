@@ -111,8 +111,6 @@ sub start {
 
   # Non-blocking
   if ($cb) {
-
-    # Start non-blocking
     warn "-- Non-blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
     unless ($self->{nb}) {
       croak 'Blocking request in progress' if keys %{$self->{connections}};
@@ -123,7 +121,7 @@ sub start {
     return $self->_start($tx, $cb);
   }
 
-  # Start blocking
+  # Blocking
   warn "-- Blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
   if ($self->{nb}) {
     croak 'Non-blocking requests in progress' if keys %{$self->{connections}};

@@ -57,7 +57,7 @@ sub server_write { shift->_write(1) }
 sub _body {
   my ($self, $msg, $finish) = @_;
 
-  # Prepare chunk
+  # Prepare body chunk
   my $buffer = $msg->get_body_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write} = $msg->is_dynamic ? 1 : ($self->{write} - $written);
@@ -80,13 +80,13 @@ sub _body {
 sub _headers {
   my ($self, $msg, $head) = @_;
 
-  # Prepare chunk
+  # Prepare header chunk
   my $buffer = $msg->get_header_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write}  = $self->{write} - $written;
   $self->{offset} = $self->{offset} + $written;
 
-  # Write body
+  # Switch to body
   if ($self->{write} <= 0) {
     $self->{offset} = 0;
 
@@ -107,13 +107,13 @@ sub _headers {
 sub _start_line {
   my ($self, $msg) = @_;
 
-  # Prepare chunk
+  # Prepare start line chunk
   my $buffer = $msg->get_start_line_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write}  = $self->{write} - $written;
   $self->{offset} = $self->{offset} + $written;
 
-  # Write headers
+  # Switch to headers
   if ($self->{write} <= 0) {
     $self->{state}  = 'write_headers';
     $self->{write}  = $msg->header_size;
@@ -126,7 +126,7 @@ sub _start_line {
 sub _write {
   my ($self, $server) = @_;
 
-  # Start writing
+  # Nothing written yet
   $self->{$_} ||= 0 for qw(offset write);
   my $msg = $server ? $self->res : $self->req;
   if ($server ? ($self->{state} eq 'write') : !$self->{state}) {
@@ -136,7 +136,7 @@ sub _write {
     $headers->connection($self->keep_alive ? 'keep-alive' : 'close')
       unless $headers->connection;
 
-    # Write start line
+    # Switch to start line
     $self->{state} = 'write_start_line';
     $self->{write} = $msg->start_line_size;
   }

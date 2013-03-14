@@ -73,7 +73,7 @@ sub run {
     $self->{pool}{shuffle keys %{$self->{pool}}}{graceful} ||= time;
   };
 
-  # Preload application and start accepting connections
+  # Preload application before starting workers
   $self->start->app->log->info("Manager $$ started.");
   $self->{running} = 1;
   $self->_manage while $self->{running};

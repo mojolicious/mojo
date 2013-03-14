@@ -232,7 +232,7 @@ Shortcut for the C<Accept-Ranges> header.
   $headers = $headers->add(Foo => 'first value', 'second value');
   $headers = $headers->add(Foo => ['first line', 'second line']);
 
-Add one or more header lines.
+Add one or more header values with one or more lines.
 
 =head2 authorization
 
@@ -344,7 +344,7 @@ Shortcut for the C<Expires> header.
   $headers = $headers->from_hash({'Content-Type' => 'text/html'});
   $headers = $headers->from_hash({});
 
-Parse headers from a hash reference.
+Parse headers from a hash reference, an empty hash removes all headers.
 
 =head2 header
 

@@ -1,4 +1,7 @@
 
+3.91  2013-03-15
+  - Improved tests.
+
 3.90  2013-03-14
   - Added direct array access for parsed parameters to Mojo::Parameters.
   - Added direct array access for path parts to Mojo::Path.

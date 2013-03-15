@@ -3,8 +3,8 @@ use Mojo::Base -strict;
 use Test::More;
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
-use Mojo::Asset::File;
 use Mojo::Log;
+use Mojo::Util 'slurp';
 
 # Logging to file
 my $dir = tempdir CLEANUP => 1;
@@ -14,7 +14,7 @@ $log->error('Just works.');
 $log->fatal('Works too.');
 $log->debug('Does not work.');
 undef $log;
-my $content = Mojo::Asset::File->new(path => $path)->slurp;
+my $content = slurp $path;
 like $content,   qr/\[.*\] \[error\] Just works\.\n/,    'has error message';
 like $content,   qr/\[.*\] \[fatal\] Works too\.\n/,     'has fatal message';
 unlike $content, qr/\[.*\] \[debug\] Does not work\.\n/, 'no debug message';

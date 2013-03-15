@@ -8,7 +8,6 @@ has [qw(charset xml)];
 has tree => sub { ['root'] };
 
 my $ATTR_RE = qr/
-  \s*
   ([^=\s>]+)       # Key
   (?:
     \s*=\s*

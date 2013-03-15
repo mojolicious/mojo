@@ -2135,6 +2135,13 @@ is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
+# Extra whitespace
+$dom = Mojo::DOM->new('< span>a< /span><b >b</b><span >c</ span>');
+is $dom->at('span')->text,     'a', 'right text';
+is $dom->at('span + b')->text, 'b', 'right text';
+is $dom->at('b + span')->text, 'c', 'right text';
+is "$dom", '<span>a</span><b>b</b><span>c</span>', 'right result';
+
 # Bad charset
 $dom = Mojo::DOM->new->charset('doesnotexist');
 $dom->parse(qq{<html><div id="a">A</div></html>});

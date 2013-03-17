@@ -1,5 +1,5 @@
 
-3.91  2013-03-15
+3.91  2013-03-17
   - Improved tests.
   - Fixed whitespace bug in Mojo::DOM::HTML.
 

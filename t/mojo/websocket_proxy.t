@@ -38,12 +38,8 @@ websocket '/test' => sub {
 };
 
 # HTTP server for testing
-my $ua     = Mojo::UserAgent->new;
-my $daemon = Mojo::Server::Daemon->new(
-  app    => app,
-  ioloop => Mojo::IOLoop->singleton,
-  silent => 1
-);
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
 my $port = Mojo::IOLoop->new->generate_port;
 $daemon->listen(["http://127.0.0.1:$port"])->start;
 
@@ -125,7 +121,7 @@ Mojo::IOLoop->server(
   }
 );
 
-# Normal request
+# Normal non-blocking request
 my $result;
 $ua->get(
   "http://localhost:$port/" => sub {
@@ -136,7 +132,7 @@ $ua->get(
 Mojo::IOLoop->start;
 is $result, "Hello World! / http://localhost:$port/", 'right content';
 
-# Normal websocket
+# Normal WebSocket
 $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
@@ -155,12 +151,12 @@ $ua->websocket(
 Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
-# Proxy request
+# Non-blocking proxy request
 $ua->http_proxy("http://localhost:$port");
 my $kept_alive;
 $result = undef;
 $ua->get(
-  "http://kraih.com/proxy" => sub {
+  'http://kraih.com/proxy' => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $result     = $tx->success->body;
@@ -171,7 +167,7 @@ Mojo::IOLoop->start;
 ok !$kept_alive, 'connection was not kept alive';
 is $result, 'http://kraih.com/proxy', 'right content';
 
-# Kept alive proxy websocket
+# Kept alive proxy WebSocket
 ($kept_alive, $result) = ();
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
@@ -192,7 +188,12 @@ Mojo::IOLoop->start;
 ok $kept_alive, 'connection was kept alive';
 is $result, 'test1test2', 'right result';
 
-# Proxy websocket
+# Blocking proxy request
+my $tx = $ua->get('http://kraih.com/proxy');
+is $tx->res->code, 200, 'right status';
+is $tx->success->body, 'http://kraih.com/proxy', 'right content';
+
+# Proxy WebSocket
 $ua = Mojo::UserAgent->new(http_proxy => "http://localhost:$proxy");
 $result = undef;
 $ua->websocket(
@@ -215,7 +216,7 @@ is $result,    'test1test2',      'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
-# Proxy websocket with bad target
+# Proxy WebSocket with bad target
 $ua->http_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $err);

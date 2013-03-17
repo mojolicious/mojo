@@ -53,11 +53,7 @@ websocket '/test' => sub {
 };
 
 # Web server with valid certificates
-my $daemon = Mojo::Server::Daemon->new(
-  app    => app,
-  ioloop => Mojo::IOLoop->singleton,
-  silent => 1
-);
+my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
 my $port = Mojo::IOLoop->new->generate_port;
 my $listen
   = "https://127.0.0.1:$port"
@@ -146,12 +142,13 @@ Mojo::IOLoop->server(
 
 # User agent with valid certificates
 my $ua = Mojo::UserAgent->new(
-  ca   => 't/mojo/certs/ca.crt',
-  cert => 't/mojo/certs/client.crt',
-  key  => 't/mojo/certs/client.key'
+  ioloop => Mojo::IOLoop->singleton,
+  ca     => 't/mojo/certs/ca.crt',
+  cert   => 't/mojo/certs/client.crt',
+  key    => 't/mojo/certs/client.key'
 );
 
-# Normal request
+# Normal non-blocking request
 my $result;
 $ua->get(
   "https://localhost:$port/" => sub {
@@ -186,7 +183,7 @@ is $works,  'it does!',                                'right header';
 is $start,  2,                                         'redirected once';
 $ua->unsubscribe('start');
 
-# Normal websocket
+# Normal WebSocket
 $result = undef;
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
@@ -205,7 +202,7 @@ $ua->websocket(
 Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
-# Proxy request
+# Non-blocking proxy request
 $ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
 $result = undef;
 my ($auth, $kept_alive);
@@ -223,7 +220,7 @@ ok !$auth,       'no "Proxy-Authorization" header';
 ok !$kept_alive, 'connection was not kept alive';
 is $result, "https://localhost:$port/proxy", 'right content';
 
-# Kept alive proxy request
+# Non-blocking kept alive proxy request
 ($kept_alive, $result) = ();
 $ua->get(
   "https://localhost:$port/proxy" => sub {
@@ -237,7 +234,7 @@ Mojo::IOLoop->start;
 is $result, "https://localhost:$port/proxy", 'right content';
 ok $kept_alive, 'connection was kept alive';
 
-# Kept alive proxy websocket
+# Kept alive proxy WebSocket
 $ua->https_proxy("http://localhost:$proxy");
 ($kept_alive, $result) = ();
 $ua->websocket(
@@ -262,7 +259,13 @@ is $result,     'test1test2', 'right result';
 ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
-# Proxy websocket with bad target
+# Blocking proxy request
+$ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
+my $tx = $ua->get("https://localhost:$port/proxy");
+is $tx->res->code, 200, 'right status';
+is $tx->success->body, "https://localhost:$port/proxy", 'right content';
+
+# Proxy WebSocket with bad target
 $ua->https_proxy("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $err);

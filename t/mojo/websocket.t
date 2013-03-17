@@ -170,7 +170,7 @@ $ua->websocket(
 $loop->start;
 like $result, qr!test1test2ws://localhost:\d+/!, 'right result';
 
-# Failed websocket connection
+# Failed WebSocket connection
 my ($code, $body, $ws);
 $ua->websocket(
   '/something/else' => sub {

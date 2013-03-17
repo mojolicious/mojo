@@ -23,12 +23,9 @@ use constant {
 # To update HTML5 entities run this command
 # perl examples/entities.pl > lib/Mojo/entities.txt
 my %ENTITIES;
-{
-  open my $entities, '<', catfile(dirname(__FILE__), 'entities.txt');
-  for my $entity (<$entities>) {
-    next unless $entity =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
-    $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
-  }
+for my $line (split "\x0a", slurp(catfile dirname(__FILE__), 'entities.txt')) {
+  next unless $line =~ /^(\S+)\s+U\+(\S+)(?:\s+U\+(\S+))?/;
+  $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
 }
 
 # DEPRECATED in Rainbow!

@@ -2144,9 +2144,15 @@ is "$dom", '<span>a</span><b>b</b><span>c</span>', 'right result';
 
 # Bad charset
 $dom = Mojo::DOM->new->charset('doesnotexist');
-$dom->parse(qq{<html><div id="a">A</div></html>});
-is $dom->at('#a'), undef, 'no result';
-is "$dom", '', 'right result';
+$dom->parse('<html><div id="a">A</div></html>');
+is $dom->charset, undef, 'no charset';
+is $dom->at('#a')->text, 'A', 'right text';
+is "$dom", '<html><div id="a">A</div></html>', 'right result';
+$dom = Mojo::DOM->new->charset('UTF-8');
+$dom->parse(qq{<div id="invalid">\x89</div>});
+is $dom->charset, undef, 'no charset';
+is $dom->at('#invalid')->text, "\x89", 'right text';
+is "$dom", qq{<div id="invalid">\x89</div>}, 'right result';
 
 # Comments
 $dom = Mojo::DOM->new(<<EOF);

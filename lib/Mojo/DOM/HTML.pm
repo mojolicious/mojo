@@ -76,8 +76,10 @@ my %INLINE = map { $_ => 1 } (
 sub parse {
   my ($self, $html) = @_;
 
-  my $charset = $self->charset;
-  $html = decode($charset, $html) // return $self->charset(undef) if $charset;
+  if (my $charset = $self->charset) {
+    if (my $chars = decode $charset, $html) { $html = $chars }
+    else                                    { $self->charset(undef) }
+  }
 
   my $tree    = ['root'];
   my $current = $tree;

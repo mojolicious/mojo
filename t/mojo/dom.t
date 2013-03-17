@@ -2154,6 +2154,14 @@ is $dom->charset, undef, 'no charset';
 is $dom->at('#invalid')->text, "\x89", 'right text';
 is "$dom", qq{<div id="invalid">\x89</div>}, 'right result';
 
+# "0" with charset
+$dom = Mojo::DOM->new->charset('UTF-8');
+$dom->parse('0');
+is $dom->charset, 'UTF-8', 'right charset';
+is "$dom", '0', 'right result';
+$dom->append_content('☃');
+is "$dom", encode('UTF-8', '0☃'), 'right result';
+
 # Comments
 $dom = Mojo::DOM->new(<<EOF);
 <!-- HTML5 -->

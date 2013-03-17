@@ -77,8 +77,8 @@ sub parse {
   my ($self, $html) = @_;
 
   if (my $charset = $self->charset) {
-    if (my $chars = decode $charset, $html) { $html = $chars }
-    else                                    { $self->charset(undef) }
+    if (defined(my $chars = decode $charset, $html)) { $html = $chars }
+    else                                             { $self->charset(undef) }
   }
 
   my $tree    = ['root'];

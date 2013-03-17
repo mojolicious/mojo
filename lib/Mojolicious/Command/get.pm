@@ -58,8 +58,8 @@ sub run {
   $ua->max_redirects(10) if $redirect;
 
   # Detect proxy for absolute URLs
-  if   ($url !~ m!/!) { $ua->detect_proxy }
-  else                { $ua->app($self->app) }
+  if   ($url !~ m!^/!) { $ua->detect_proxy }
+  else                 { $ua->app($self->app) }
 
   # Do the real work with "start" event
   my $v = my $buffer = '';

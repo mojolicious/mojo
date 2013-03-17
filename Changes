@@ -4,6 +4,7 @@
   - Improved tests.
   - Fixed support for RFC 2817 in Mojo::Message::Request.
   - Fixed whitespace bug in Mojo::DOM::HTML.
+  - Fixed proxy detection bug in get command.
 
 3.90  2013-03-14
   - Added direct array access for parsed parameters to Mojo::Parameters.

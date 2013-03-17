@@ -985,7 +985,7 @@ is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 # Parse full HTTP 1.1 proxy connect request with basic authentication
 $req = Mojo::Message::Request->new;
 $req->parse("CONNECT 127.0.0.1:3000 HTTP/1.1\x0d\x0a");
-$req->parse("Host: 127.0.0.1\x0d\x0a");
+$req->parse("Host: 127.0.0.1:3000\x0d\x0a");
 $req->parse("Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
@@ -1423,7 +1423,7 @@ is $req->url->to_abs,     'http://127.0.0.1:3000', 'right absolute URL';
 is $req->proxy->userinfo, 'Aladdin:open sesame',   'right proxy userinfo';
 is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Authorization" value';
-is $req->headers->host, '127.0.0.2:8080', 'right "Host" value';
+is $req->headers->host, '127.0.0.1:3000', 'right "Host" value';
 is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Proxy-Authorization" value';
 

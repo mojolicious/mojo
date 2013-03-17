@@ -79,11 +79,8 @@ sub fix_headers {
   $headers->authorization('Basic ' . b64_encode($auth, ''))
     if $auth && !$headers->authorization;
 
-  # Proxy
+  # Basic proxy authentication
   if (my $proxy = $self->proxy) {
-    $url = $proxy if $self->method eq 'CONNECT';
-
-    # Basic proxy authentication
     my $proxy_auth = $proxy->userinfo;
     $headers->proxy_authorization('Basic ' . b64_encode($proxy_auth, ''))
       if $proxy_auth && !$headers->proxy_authorization;
@@ -291,7 +288,7 @@ Mojo::Message::Request - HTTP request
 =head1 DESCRIPTION
 
 L<Mojo::Message::Request> is a container for HTTP requests as described in RFC
-2616.
+2616 and RFC 2817.
 
 =head1 EVENTS
 

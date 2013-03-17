@@ -1,6 +1,7 @@
 
 3.91  2013-03-17
   - Improved tests.
+  - Fixed support for RFC 2817 in Mojo::Message::Request.
   - Fixed whitespace bug in Mojo::DOM::HTML.
 
 3.90  2013-03-14

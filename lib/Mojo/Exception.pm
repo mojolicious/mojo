@@ -100,8 +100,7 @@ sub _detect {
 
   # Search for context in files
   for my $frame (@trace) {
-    next unless -r $frame->[0];
-    open my $handle, '<:utf8', $frame->[0];
+    next unless -r $frame->[0] && open my $handle, '<:utf8', $frame->[0];
     $self->_context($frame->[1], [[<$handle>]]);
     return $self;
   }

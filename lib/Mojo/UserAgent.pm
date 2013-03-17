@@ -129,7 +129,7 @@ sub start {
     $self->_cleanup;
     delete $self->{nb};
   }
-  $self->_start($tx => sub { $tx = pop });
+  $self->_start($tx => sub { shift->ioloop->stop; $tx = shift });
   $self->ioloop->start;
 
   return $tx;
@@ -325,9 +325,7 @@ sub _finish {
     }
   }
 
-  # Stop event loop if necessary
   $self->$cb($tx);
-  $self->ioloop->stop unless $self->{nb};
 }
 
 sub _handle {

@@ -1,4 +1,8 @@
 
+3.92  2013-03-18
+  - Improved documentation.
+  - Improved tests.
+
 3.91  2013-03-17
   - Improved bad charset handling in Mojo::DOM::HTML.
   - Improved documentation.

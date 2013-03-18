@@ -575,7 +575,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Non-blocking WebSocket connection
   $ua->websocket('ws://websockets.org:8787' => sub {
     my ($ua, $tx) = @_;
-    return say 'WebSocket handshake failed!' unless $tx->is_websocket;
+    say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(finish  => sub { say 'WebSocket closed.' });
     $tx->on(message => sub {
       my ($tx, $msg) = @_;
@@ -1003,7 +1003,7 @@ same arguments as L<Mojo::UserAgent::Transactor/"websocket">.
 
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($ua, $tx) = @_;
-    return say 'WebSocket handshake failed!' unless $tx->is_websocket;
+    say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(message => sub {
       my ($tx, $msg) = @_;
       say $msg;

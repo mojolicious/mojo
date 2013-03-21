@@ -79,16 +79,6 @@ sub lookup {
   return $reverse->{$name} = $route;
 }
 
-# DEPRECATED in Rainbow!
-sub namespace {
-  deprecated 'Mojolicious::Routes::namespace is DEPRECATED in favor of '
-    . 'Mojolicious::Routes::namespaces';
-  my $self = shift;
-  return $self->namespaces->[0] unless @_;
-  $self->namespaces->[0] = shift;
-  return $self;
-}
-
 sub route {
   shift->add_child(Mojolicious::Routes::Route->new(@_))->children->[-1];
 }

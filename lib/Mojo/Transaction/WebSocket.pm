@@ -202,8 +202,8 @@ sub send {
       : [1, 0, 0, 0, BINARY, $frame->{binary}];
   }
 
-  # Text
-  elsif (!ref $frame) { $frame = [1, 0, 0, 0, TEXT, encode('UTF-8', $frame)] }
+  # Text or object (forcing stringification)
+  elsif (ref $frame ne 'ARRAY') { $frame = [1, 0, 0, 0, TEXT, encode('UTF-8', "$frame")] }
 
   $self->once(drain => $cb) if $cb;
   $self->{write} .= $self->build_frame(@$frame);
@@ -568,6 +568,7 @@ Resume C<handshake> transaction.
   $ws = $ws->send({text   => $bytes});
   $ws = $ws->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
   $ws = $ws->send($chars);
+  $ws = $ws->send(Mojo::ByteStream->new($chars));
   $ws = $ws->send($chars => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback

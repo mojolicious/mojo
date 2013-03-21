@@ -12,6 +12,7 @@ use Mojo::IOLoop;
 use Mojo::Transaction::WebSocket;
 use Mojo::UserAgent;
 use Mojolicious::Lite;
+use Mojo::ByteStream 'b';
 
 # Max WebSocket size
 {
@@ -113,6 +114,16 @@ websocket '/echo' => sub {
   );
 };
 
+websocket '/echo_object' => sub {
+  my $self = shift;
+  $self->on(
+    message => sub {
+      my ($self, $msg) = @_;
+      $self->send(b($msg));
+    }
+  );
+};
+
 my $buffer = '';
 websocket '/double_echo' => sub {
   shift->on(
@@ -168,6 +179,24 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 like $result, qr!test1test2ws://localhost:\d+/!, 'right result';
+
+# Plain WebSocket sending Mojo::ByteStream object
+$ua->websocket(
+  '/echo_object' => sub {
+    my $tx = pop;
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(
+      message => sub {
+        my ($tx, $msg) = @_;
+        $result = $msg;
+        $tx->finish;
+      }
+    );
+    $tx->send('test1');
+  }
+);
+Mojo::IOLoop->start;
+is $result, 'test1', 'right result';
 
 # Failed WebSocket connection
 my ($code, $body, $ws);

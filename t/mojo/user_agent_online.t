@@ -34,7 +34,7 @@ my $ua   = Mojo::UserAgent->new;
 my ($id, $code);
 $ua->get(
   'http://metacpan.org' => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $id   = $tx->connection;
     $code = $tx->res->code;
     $loop->stop;
@@ -101,7 +101,7 @@ Mojo::IOLoop->singleton->start;
 my $kept_alive;
 $ua->get(
   'http://mojolicio.us' => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     Mojo::IOLoop->singleton->stop;
     $kept_alive = $tx->kept_alive;
   }

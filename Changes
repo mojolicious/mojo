@@ -1,8 +1,8 @@
 
-3.92  2013-03-18
+3.92  2013-03-21
+  - Improved WebSocket send method to stringify objects. (jberger)
   - Improved documentation.
   - Improved tests.
-  - Improved WebSocket send method to force stringification on object.
 
 3.91  2013-03-17
   - Improved bad charset handling in Mojo::DOM::HTML.

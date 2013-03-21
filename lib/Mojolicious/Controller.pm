@@ -822,6 +822,7 @@ is set to the value C<XMLHttpRequest>.
   $c = $c->send({binary => $bytes});
   $c = $c->send({text   => $bytes});
   $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
+  $c = $c->send(Mojo::ByteStream->new($chars));
   $c = $c->send($chars);
   $c = $c->send($chars => sub {...});
 

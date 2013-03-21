@@ -136,7 +136,7 @@ is $result, "Hello World! / http://localhost:$port/", 'right content';
 $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
       message => sub {

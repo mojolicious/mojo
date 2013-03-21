@@ -337,7 +337,7 @@ get '/subrequest_non_blocking' => sub {
   my $self = shift;
   $self->ua->post(
     '/template' => sub {
-      my $tx = pop;
+      my ($ua, $tx) = @_;
       $self->render_text($tx->res->body . $self->stash->{nb});
       $nb = $self->stash->{nb};
     }

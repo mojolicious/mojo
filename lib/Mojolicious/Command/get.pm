@@ -65,7 +65,7 @@ sub run {
   my $v = my $buffer = '';
   $ua->on(
     start => sub {
-      my $tx = pop;
+      my ($ua, $tx) = @_;
 
       # Verbose callback
       my $v  = $verbose;

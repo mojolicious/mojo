@@ -187,7 +187,7 @@ $ua->unsubscribe('start');
 $result = undef;
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
-    my $tx = pop;
+    my ($ua, $tx) = @_;
     $tx->on(finish => sub { Mojo::IOLoop->stop });
     $tx->on(
       message => sub {

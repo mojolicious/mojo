@@ -302,7 +302,7 @@ sub websocket_ok {
   $self->{finished} = 0;
   $self->ua->websocket(
     $url => @_ => sub {
-      my $tx = pop;
+      my ($ua, $tx) = @_;
       $self->tx($tx);
       $tx->on(finish => sub { $self->{finished} = 1 });
       $tx->on(binary => sub { push @{$self->{messages}}, [binary => pop] });

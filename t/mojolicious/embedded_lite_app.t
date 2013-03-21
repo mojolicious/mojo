@@ -41,7 +41,7 @@ get '/bye' => sub {
   $self->render_later;
   $self->ua->app(main::app())->get(
     '/hello/hello' => sub {
-      my $tx = pop;
+      my ($ua, $tx) = @_;
       $self->render_text($tx->res->body . "$name! $nb");
     }
   );

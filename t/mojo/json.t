@@ -330,5 +330,6 @@ is $json->decode("[\"foo\",\n\"bar\",\n\"bazra\"]lalala"), undef,
 is $json->error,
   'Malformed JSON: Unexpected data after array at line 3, offset 8',
   'right error';
+is j('{'), undef, 'decoding failed';
 
 done_testing();

@@ -1,5 +1,5 @@
 
-3.92  2013-03-21
+3.92  2013-03-22
   - Removed deprecated namespace method from Mojolicious::Routes.
   - Improved WebSocket send method to stringify objects. (jberger)
   - Improved documentation.

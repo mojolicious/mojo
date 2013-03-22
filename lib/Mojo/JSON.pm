@@ -5,6 +5,7 @@ use B;
 use Exporter 'import';
 use Mojo::Util;
 use Scalar::Util 'blessed';
+use Carp 'croak';
 
 has 'error';
 
@@ -104,9 +105,12 @@ sub encode {
 sub false {$FALSE}
 
 sub j {
-  my $d = shift;
-  return __PACKAGE__->new->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
-  return __PACKAGE__->new->decode($d);
+  my $d    = shift;
+  my $json = __PACKAGE__->new;
+  my $res
+    = ref($d) =~ /^(?:ARRAY|HASH)$/ ? $json->encode($d) : $json->decode($d);
+  $res // croak($json->error);
+  return $res;
 }
 
 sub true {$TRUE}
@@ -381,7 +385,7 @@ L<Mojo::JSON> implements the following functions.
   my $array = j($bytes);
   my $hash  = j($bytes);
 
-Encode Perl data structure or decode JSON and return C<undef> if decoding
+Encode Perl data structure or decode JSON and die with error if decoding
 fails.
 
 =head1 ATTRIBUTES

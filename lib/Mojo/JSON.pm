@@ -2,10 +2,10 @@ package Mojo::JSON;
 use Mojo::Base -base;
 
 use B;
+use Carp 'croak';
 use Exporter 'import';
 use Mojo::Util;
 use Scalar::Util 'blessed';
-use Carp 'croak';
 
 has 'error';
 
@@ -107,10 +107,8 @@ sub false {$FALSE}
 sub j {
   my $d    = shift;
   my $json = __PACKAGE__->new;
-  my $res
-    = ref($d) =~ /^(?:ARRAY|HASH)$/ ? $json->encode($d) : $json->decode($d);
-  $res // croak($json->error);
-  return $res;
+  return $json->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
+  return $json->decode($d) // croak $json->error;
 }
 
 sub true {$TRUE}

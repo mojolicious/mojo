@@ -40,6 +40,8 @@ is j([1, 2]), '[1,2]', 'right result';
 is_deeply j('[1,2]'), [1, 2], 'right structure';
 is j({foo => 'bar'}), '{"foo":"bar"}', 'right result';
 is_deeply j('{"foo":"bar"}'), {foo => 'bar'}, 'right structure';
+eval { j('{') };
+like $@, qr/Malformed JSON/, 'JSON exceptions are fatal';
 
 # ByteStream
 is b('<foo>')->url_escape, '%3Cfoo%3E', 'right result';

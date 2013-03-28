@@ -818,6 +818,10 @@ arguments as L<Mojo::UserAgent/"put">.
 
 Perform request and check for transport errors.
 
+  # Request with custom method
+  my $tx = $t->ua->build_tx(FOO => '/test.json' => json => {foo => 1});
+  $t->request_ok($tx)->status_is(200)->json_content_is({success => 1});
+
 =head2 reset_session
 
   $t = $t->reset_session;

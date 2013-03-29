@@ -7,6 +7,7 @@ use Cwd 'abs_path';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
 use Mojo::Server::Prefork;
+use Mojo::Util 'steady_time';
 use POSIX 'setsid';
 use Scalar::Util 'weaken';
 
@@ -62,7 +63,7 @@ sub run {
   }
 
   # Start accepting connections
-  local $SIG{USR2} = sub { $self->{upgrade} ||= time };
+  local $SIG{USR2} = sub { $self->{upgrade} ||= steady_time };
   $prefork->run;
 }
 
@@ -123,7 +124,7 @@ sub _manage {
 
     # Timeout
     kill 'KILL', $self->{new}
-      if $self->{upgrade} + $self->{upgrade_timeout} <= time;
+      if $self->{upgrade} + $self->{upgrade_timeout} <= steady_time;
   }
 }
 

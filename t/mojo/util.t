@@ -12,8 +12,8 @@ use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode squish trim unquote),
-  qw(secure_compare sha1_bytes sha1_sum slurp spurt punycode_encode quote),
-  qw(url_escape url_unescape xml_escape xor_encode);
+  qw(secure_compare sha1_bytes sha1_sum slurp spurt steady_time),
+  qw(punycode_encode quote url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -377,6 +377,9 @@ my $dir = tempdir CLEANUP => 1;
 my $file = catfile $dir, 'test.txt';
 spurt "just\nworks!", $file;
 is slurp($file), "just\nworks!", 'successful roundtrip';
+
+# steady_time
+like steady_time, qr/^\d+\.\d+$/, 'high resolution time';
 
 # monkey_patch
 {

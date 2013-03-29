@@ -5,6 +5,7 @@ use Fcntl ':flock';
 use File::Spec::Functions qw(catfile tmpdir);
 use IO::Poll 'POLLIN';
 use List::Util 'shuffle';
+use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 use Time::HiRes ();
@@ -70,7 +71,7 @@ sub run {
   local $SIG{TTOU} = sub {
     $self->workers($self->workers - 1) if $self->workers > 0;
     return unless $self->workers;
-    $self->{pool}{shuffle keys %{$self->{pool}}}{graceful} ||= time;
+    $self->{pool}{shuffle keys %{$self->{pool}}}{graceful} ||= steady_time;
   };
 
   # Preload application before starting workers
@@ -89,7 +90,8 @@ sub _heartbeat {
   return unless $self->{reader}->sysread(my $chunk, 4194304);
 
   # Update heartbeats
-  $self->{pool}{$1} and $self->emit(heartbeat => $1)->{pool}{$1}{time} = time
+  my $time = steady_time;
+  $self->{pool}{$1} and $self->emit(heartbeat => $1)->{pool}{$1}{time} = $time
     while $chunk =~ /(\d+)\n/g;
 }
 
@@ -113,17 +115,18 @@ sub _manage {
     # No heartbeat (graceful stop)
     my $interval = $self->heartbeat_interval;
     my $timeout  = $self->heartbeat_timeout;
-    if (!$w->{graceful} && ($w->{time} + $interval + $timeout <= time)) {
+    my $time     = steady_time;
+    if (!$w->{graceful} && ($w->{time} + $interval + $timeout <= $time)) {
       $log->info("Worker $pid has no heartbeat, restarting.");
-      $w->{graceful} = time;
+      $w->{graceful} = $time;
     }
 
     # Graceful stop with timeout
-    $w->{graceful} ||= time if $self->{graceful};
+    $w->{graceful} ||= $time if $self->{graceful};
     if ($w->{graceful}) {
       $log->debug("Trying to stop worker $pid gracefully.");
       kill 'QUIT', $pid;
-      $w->{force} = 1 if $w->{graceful} + $self->graceful_timeout <= time;
+      $w->{force} = 1 if $w->{graceful} + $self->graceful_timeout <= $time;
     }
 
     # Normal stop
@@ -161,7 +164,8 @@ sub _spawn {
 
   # Manager
   die "Can't fork: $!" unless defined(my $pid = fork);
-  return $self->emit(spawn => $pid)->{pool}{$pid} = {time => time} if $pid;
+  return $self->emit(spawn => $pid)->{pool}{$pid} = {time => steady_time}
+    if $pid;
 
   # Prepare lock file
   my $file = $self->{lock_file};

@@ -460,10 +460,10 @@ sub _start {
 
   # Connect and add request timeout if necessary
   my $id = $self->emit(start => $tx)->_connection($tx, $cb);
-  if (my $t = $self->request_timeout) {
+  if (my $timeout = $self->request_timeout) {
     weaken $self;
     $self->{connections}{$id}{timeout} = $self->_loop->timer(
-      $t => sub { $self->_error($id => 'Request timeout') });
+      $timeout => sub { $self->_error($id => 'Request timeout') });
   }
 
   return $id;

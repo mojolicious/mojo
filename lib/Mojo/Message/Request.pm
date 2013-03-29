@@ -326,8 +326,10 @@ HTTP request method, defaults to C<GET>.
 
 HTTP request URL, defaults to a L<Mojo::URL> object.
 
-  # Get request path
-  say $req->url->path;
+  # Get request information
+  say $req->url->to_abs->userinfo;
+  say $req->url->to_abs->host;
+  say $req->url->to_abs->path;
 
 =head1 METHODS
 

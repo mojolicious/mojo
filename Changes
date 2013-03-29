@@ -1,5 +1,8 @@
 
-3.92  2013-03-28
+3.92  2013-03-29
+  - Added monotonic clock support to make Mojolicious more resilient to time
+    jumps.
+  - Added steady_time function to Mojo::Util.
   - Removed deprecated namespace method from Mojolicious::Routes.
   - Improved WebSocket send method to stringify objects. (jberger)
   - Improved documentation.

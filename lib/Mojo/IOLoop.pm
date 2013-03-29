@@ -9,9 +9,8 @@ use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
-use Mojo::Util 'md5_sum';
+use Mojo::Util qw(md5_sum steady_time);
 use Scalar::Util 'weaken';
-use Time::HiRes 'time';
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
@@ -201,7 +200,7 @@ sub _accepting {
 sub _id {
   my $self = shift;
   my $id;
-  do { $id = md5_sum('c' . time . rand 999) }
+  do { $id = md5_sum('c' . steady_time . rand 999) }
     while $self->{connections}{$id} || $self->{acceptors}{$id};
   return $id;
 }

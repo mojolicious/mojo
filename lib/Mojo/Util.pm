@@ -620,7 +620,8 @@ consecutive groups of whitespace into one space each.
 
   my $time = steady_time;
 
-High resolution time, monotonic if possible.
+High resolution time, resilient to time jumps if a monotonic clock is
+available through L<Time::HiRes>.
 
 =head2 trim
 

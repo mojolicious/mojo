@@ -333,9 +333,11 @@ L<IO::Socket::SSL> (1.75+) are supported transparently, and used if installed.
 Individual features can also be disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS
 environment variables.
 
-A TLS certificate and key are also built right in, to make writing test
-servers as easy as possible. Also note that for convenience the C<PIPE> signal
-will be set to C<IGNORE> when L<Mojo::IOLoop> is loaded.
+The event loop will be resilient to time jumps if a monotonic clock is
+available through L<Time::HiRes>. A TLS certificate and key are also built
+right in, to make writing test servers as easy as possible. Also note that for
+convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop>
+is loaded.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 

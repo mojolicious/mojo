@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Routes::Route';
 use List::Util 'first';
 use Mojo::Cache;
 use Mojo::Loader;
-use Mojo::Util qw(camelize deprecated);
+use Mojo::Util 'camelize';
 use Mojolicious::Routes::Match;
 use Scalar::Util 'weaken';
 

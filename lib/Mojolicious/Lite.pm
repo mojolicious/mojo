@@ -214,13 +214,13 @@ full access to all HTTP features and information.
 
   use Mojolicious::Lite;
 
-  # Access response and request headers
+  # Access request and reponse information
   get '/agent' => sub {
     my $self = shift;
     my $host = $self->req->url->to_abs->host;
     my $ua   = $self->req->headers->user_agent;
     $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-    $self->render(text => qq{Request by "$ua" reached $host.});
+    $self->render(text => "Request by $ua reached $host.");
   };
 
   app->start;

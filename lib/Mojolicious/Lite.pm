@@ -217,8 +217,10 @@ full access to all HTTP features and information.
   # Access response and request headers
   get '/agent' => sub {
     my $self = shift;
+    my $host = $self->req->url->to_abs->host;
+    my $ua   = $self->req->headers->user_agent;
     $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-    $self->render(text => $self->req->headers->user_agent);
+    $self->render(text => qq{Request by "$ua" reached $host.});
   };
 
   app->start;

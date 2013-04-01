@@ -469,8 +469,10 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
     $tx->req->headers->accept_language('en-US');
   });
 
-  # Request with Basic authentication
-  $t->get_ok($t->ua->app_url->userinfo('sri:secr3t')->path('/secrets'));
+  # Use absolute URL for request with Basic authentication
+  $t->get_ok($t->ua->app_url->userinfo('sri:secr3t')->path('/secrets.json'))
+    ->status_is(200)
+    ->json_is('/1/content', 'Mojo rocks!');
 
 =head1 METHODS
 

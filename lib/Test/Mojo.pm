@@ -463,16 +463,17 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
   # Allow redirects
   $t->ua->max_redirects(10);
 
+  # Use absolute URL for request with Basic authentication
+  my $url = $t->ua->app_url->userinfo('sri:secr3t')->path('/secrets.json');
+  $t->post_ok($url => json => {limit => 10})
+    ->status_is(200)
+    ->json_is('/1/content', 'Mojo rocks!');
+
   # Customize all transactions (including followed redirects)
   $t->ua->on(start => sub {
     my ($ua, $tx) = @_;
     $tx->req->headers->accept_language('en-US');
   });
-
-  # Use absolute URL for request with Basic authentication
-  $t->get_ok($t->ua->app_url->userinfo('sri:secr3t')->path('/secrets.json'))
-    ->status_is(200)
-    ->json_is('/1/content', 'Mojo rocks!');
 
 =head1 METHODS
 

@@ -42,6 +42,15 @@ On UNIX platforms you can also add preforking with L<Mojo::Server::Prefork>.
   $ ./script/myapp prefork
   Server available at http://127.0.0.1:3000.
 
+Since all built-in web servers are based on the L<Mojo::IOLoop> event loop,
+they scale best with non-blocking operations. But if your application for some
+reason needs to perform many blocking operations, you can improve performance
+by increasing the number of worker processes and decrease the number of
+concurrent connections each worker is allowed to handle.
+
+  $ ./script/myapp prefork -m production -w 10 -c 1
+  Server available at http://127.0.0.1:3000.
+
 =head2 Morbo
 
 After reading the L<Mojolicious::Lite> tutorial, you should already be

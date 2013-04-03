@@ -11,6 +11,12 @@ sub begin {
   return sub { shift; $self->_step($id, @_) };
 }
 
+sub clear {
+  my $self = shift;
+  $self->{steps} = [];
+  return $self;
+}
+
 sub end { shift->_step(undef, @_) }
 
 sub steps {
@@ -150,6 +156,12 @@ that the first argument passed to the callback will be ignored.
   my $delay = Mojo::IOLoop->delay;
   Mojo::UserAgent->new->get('mojolicio.us' => $delay->begin);
   my $tx = $delay->wait;
+
+=head2 clear
+
+  $delay = $delay->clear;
+
+Clear all remaining steps.
 
 =head2 end
 

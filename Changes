@@ -1,5 +1,6 @@
 
 3.93  2013-04-04
+  - Added clear method to Mojo::IOLoop::Delay.
   - Improved documentation.
 
 3.92  2013-04-03

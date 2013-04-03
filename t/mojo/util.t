@@ -414,7 +414,7 @@ is MojoMonkeyTest::yang(), 'yang', 'right result';
   is Mojo::DeprecationTest::foo(), 'bar', 'right result';
   like $warn, qr/foo is DEPRECATED at .*util\.t line \d+/, 'right warning';
   ok !$die, 'no exception';
-  $warn = $die = undef;
+  ($warn, $die) = ();
   local $ENV{MOJO_FATAL_DEPRECATIONS} = 1;
   ok !eval { Mojo::DeprecationTest::foo() }, 'no result';
   ok !$warn, 'no warning';

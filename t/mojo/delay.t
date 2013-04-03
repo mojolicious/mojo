@@ -69,6 +69,44 @@ is_deeply [$delay->wait], [2, 3, 2, 1, 4], 'right numbers';
 is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [2, 3, 2, 1, 4], 'right numbers';
 
+# Clear all remaining steps
+($finished, $result) = ();
+$delay = Mojo::IOLoop::Delay->new;
+$delay->on(finish => sub { $finished++ });
+$delay->steps(
+  sub {
+    my $delay = shift;
+    Mojo::IOLoop->timer(0 => $delay->begin);
+  },
+  sub {
+    my $delay = shift;
+    $delay->clear;
+    Mojo::IOLoop->timer(0 => $delay->begin);
+  },
+  sub {
+    my $delay = shift;
+    $result = 'fail';
+    Mojo::IOLoop->timer(0 => $delay->begin);
+  },
+  sub { $result = 'fail' }
+);
+$delay->wait;
+is $finished, 1, 'finish event has been emitted once';
+ok !$result, 'no result';
+
+# Clear all steps (except for the first)
+$result = undef;
+$delay  = Mojo::IOLoop::Delay->new;
+$delay->steps(
+  sub {
+    my $delay = shift;
+    Mojo::IOLoop->timer(0 => $delay->begin);
+  },
+  sub { $result = 'fail' }
+);
+$delay->clear->wait;
+ok !$result, 'no result';
+
 # Finish steps with event
 $result = undef;
 $delay  = Mojo::IOLoop::Delay->new;

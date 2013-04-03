@@ -674,7 +674,7 @@ Opposite of C<json_has>.
 
 =head2 json_is
 
-  $t = $t->json_is('/' => {foo => [1, 2, 3]});
+  $t = $t->json_is('' => {foo => [1, 2, 3]});
   $t = $t->json_is('/foo' => [1, 2, 3]);
   $t = $t->json_is('/foo/1' => 2, 'right value');
 

@@ -12,7 +12,7 @@ sub _pointer {
 
   $pointer = decode('UTF-8', url_unescape $pointer);
   return $data unless $pointer =~ s!^/!!;
-  for my $p (split '/', $pointer) {
+  for my $p ($pointer eq '' ? ($pointer) : (split '/', $pointer)) {
     $p =~ s/~0/~/g;
     $p =~ s!~1!/!g;
 

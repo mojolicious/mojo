@@ -5,6 +5,8 @@
   - Added steady_time function to Mojo::Util.
   - Removed deprecated namespace method from Mojolicious::Routes.
   - Improved WebSocket send method to stringify objects. (jberger)
+  - Improved version command to show required versions of optional
+    dependencies.
   - Improved documentation.
   - Improved tests.
   - Fixed RFC 6901 compliance of Mojo::JSON::Pointer. (jberger, sri)

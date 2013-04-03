@@ -23,9 +23,9 @@ CORE
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
 
 OPTIONAL
-  EV              ($ev)
-  IO::Socket::IP  ($ipv6)
-  IO::Socket::SSL ($tls)
+  EV 4.0+               ($ev)
+  IO::Socket::IP 0.16+  ($ipv6)
+  IO::Socket::SSL 1.75+ ($tls)
 
 EOF
 

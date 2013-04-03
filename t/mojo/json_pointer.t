@@ -51,6 +51,11 @@ is $pointer->get(
   [{'f~o~o~/b~' => {'a~' => {'r' => 'baz'}}}] => '/0/f~0o~0o~0~1b~0/a~0/r'),
   'baz', '"/0/f~0o~0o~0~1b~0/a~0/r" is "baz"';
 
+# Unicode
+is $pointer->get({'☃' => 'snowman'}, '/☃'), 'snowman', 'found the snowman';
+is $pointer->get({'☃' => ['snowman']}, '/☃/0'), 'snowman',
+  'found the snowman';
+
 # RFC 6901
 my $hash = {
   foo    => ['bar', 'baz'],

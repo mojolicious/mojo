@@ -17,9 +17,9 @@ for my $i (1, 1) {
   $delay->begin;
   Mojo::IOLoop->timer(0 => sub { push @results, $i; $delay->end });
 }
-my $cb = $delay->begin;
+my $end = $delay->begin;
 $delay->begin;
-is $cb->(), 3, 'three remaining';
+is $end->(), 3, 'three remaining';
 is $delay->end, 2, 'two remaining';
 $delay->wait;
 is_deeply \@results, [1, 1], 'right results';
@@ -51,14 +51,14 @@ $delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub {
     my $delay = shift;
-    my $cb    = $delay->begin;
+    my $end   = $delay->begin;
     $delay->begin->(3, 2, 1);
-    Mojo::IOLoop->timer(0 => sub { $cb->(1, 2, 3) });
+    Mojo::IOLoop->timer(0 => sub { $end->(1, 2, 3) });
   },
   sub {
     my ($delay, @numbers) = @_;
-    my $cb = $delay->begin;
-    Mojo::IOLoop->timer(0 => sub { $cb->(undef, @numbers, 4) });
+    my $end = $delay->begin;
+    Mojo::IOLoop->timer(0 => sub { $end->(undef, @numbers, 4) });
   },
   sub {
     my ($delay, @numbers) = @_;
@@ -74,20 +74,9 @@ is_deeply $result, [2, 3, 2, 1, 4], 'right numbers';
 $delay = Mojo::IOLoop::Delay->new;
 $delay->on(finish => sub { $finished++ });
 $delay->steps(
-  sub {
-    my $delay = shift;
-    Mojo::IOLoop->timer(0 => $delay->begin);
-  },
-  sub {
-    my $delay = shift;
-    $delay->clear;
-    Mojo::IOLoop->timer(0 => $delay->begin);
-  },
-  sub {
-    my $delay = shift;
-    $result = 'fail';
-    Mojo::IOLoop->timer(0 => $delay->begin);
-  },
+  sub { Mojo::IOLoop->timer(0 => shift->begin) },
+  sub { Mojo::IOLoop->timer(0 => shift->clear->begin) },
+  sub { $result = 'fail' },
   sub { $result = 'fail' }
 );
 $delay->wait;
@@ -97,13 +86,8 @@ ok !$result, 'no result';
 # Clear all steps (except for the first)
 $result = undef;
 $delay  = Mojo::IOLoop::Delay->new;
-$delay->steps(
-  sub {
-    my $delay = shift;
-    Mojo::IOLoop->timer(0 => $delay->begin);
-  },
-  sub { $result = 'fail' }
-);
+$delay->steps(sub { Mojo::IOLoop->timer(0 => shift->begin) },
+  sub { $result = 'fail' });
 $delay->clear->wait;
 ok !$result, 'no result';
 
@@ -119,13 +103,13 @@ $delay->on(
 $delay->steps(
   sub {
     my $delay = shift;
-    my $cb    = $delay->begin;
-    Mojo::IOLoop->timer(0 => sub { $cb->(1, 2, 3) });
+    my $end   = $delay->begin;
+    Mojo::IOLoop->timer(0 => sub { $end->(1, 2, 3) });
   },
   sub {
     my ($delay, @numbers) = @_;
-    my $cb = $delay->begin;
-    Mojo::IOLoop->timer(0 => sub { $cb->(undef, @numbers, 4) });
+    my $end = $delay->begin;
+    Mojo::IOLoop->timer(0 => sub { $end->(undef, @numbers, 4) });
   }
 );
 is_deeply [$delay->wait], [2, 3, 4], 'right numbers';
@@ -146,13 +130,13 @@ $delay = Mojo::IOLoop->delay(
   sub {
     my ($first, @numbers) = @_;
     $result = \@numbers;
-    my $cb = $first->begin;
+    my $end = $first->begin;
     $first->begin->(3, 2, 1);
     $first->begin;
     $first->begin;
     $first->end(4);
     $first->end(5, 6);
-    $cb->(1, 2, 3);
+    $end->(1, 2, 3);
   },
   sub {
     my ($first, @numbers) = @_;

@@ -10,6 +10,7 @@
   - Improved documentation.
   - Improved tests.
   - Fixed RFC 6901 compliance of Mojo::JSON::Pointer. (jberger, sri)
+  - Fixed a few small Unicode bugs in get command.
 
 3.91  2013-03-17
   - Improved bad charset handling in Mojo::DOM::HTML.

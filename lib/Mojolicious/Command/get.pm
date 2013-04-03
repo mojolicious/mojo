@@ -46,7 +46,8 @@ sub run {
     'r|redirect'  => \my $redirect,
     'v|verbose'   => \my $verbose;
 
-  die $self->usage unless my $url = decode 'UTF-8', shift @args // '';
+  @args = map { decode 'UTF-8', $_ } @args;
+  die $self->usage unless my $url = shift @args;
   my $selector = shift @args;
 
   # Parse header pairs
@@ -113,7 +114,7 @@ sub run {
   warn qq{Problem loading URL "$url". ($err)\n} if $err && !$code;
 
   # JSON Pointer
-  return unless $selector;
+  return unless defined $selector;
   my $type = $tx->res->headers->content_type // '';
   return _json($buffer, $selector) if $type =~ /json/i;
 
@@ -126,7 +127,7 @@ sub _json {
   return unless my $data = $json->decode(shift);
   return unless defined($data = Mojo::JSON::Pointer->new->get($data, shift));
   return _say($data) unless ref $data eq 'HASH' || ref $data eq 'ARRAY';
-  say($json->encode($data));
+  say $json->encode($data);
 }
 
 sub _say {
@@ -166,7 +167,7 @@ sub _select {
     $finished++;
   }
 
-  unless ($finished) { _say($_) for @$results }
+  unless ($finished) { say for @$results }
 }
 
 1;

@@ -31,6 +31,8 @@ sub _pointer {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::JSON::Pointer - JSON Pointers
@@ -57,10 +59,12 @@ Check if data structure contains a value that can be identified with the given
 JSON Pointer.
 
   # True
+  $pointer->contains({'♥' => 'mojolicious'}, '/♥');
   $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/foo');
   $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
 
   # False
+  $pointer->contains({'♥' => 'mojolicious'}, '/☃');
   $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/bar');
   $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/9');
 
@@ -69,6 +73,9 @@ JSON Pointer.
   my $value = $pointer->get($data, '/foo/bar');
 
 Extract value identified by the given JSON Pointer.
+
+  # "mojolicious"
+  $pointer->get({'♥' => 'mojolicious'}, '/♥');
 
   # "bar"
   $pointer->get({foo => 'bar', baz => [4, 5, 6]}, '/foo');

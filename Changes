@@ -7,7 +7,7 @@
   - Improved WebSocket send method to stringify objects. (jberger)
   - Improved documentation.
   - Improved tests.
-  - Fixed RFC 6901 compliance of Mojo::JSON::Pointer.
+  - Fixed RFC 6901 compliance of Mojo::JSON::Pointer. (jberger, sri)
 
 3.91  2013-03-17
   - Improved bad charset handling in Mojo::DOM::HTML.

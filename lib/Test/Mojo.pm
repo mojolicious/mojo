@@ -387,6 +387,8 @@ sub _wait {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Test::Mojo - Testing Mojo!
@@ -698,7 +700,7 @@ Opposite of C<json_message_has>.
 
 =head2 json_message_is
 
-  $t = $t->json_message_is('/' => {foo => [1, 2, 3]});
+  $t = $t->json_message_is('' => {foo => [1, 2, 3]});
   $t = $t->json_message_is('/foo' => [1, 2, 3]);
   $t = $t->json_message_is('/foo/1' => 2, 'right value');
 
@@ -840,6 +842,14 @@ Reset user agent session.
   $t = $t->send_ok($chars, 'sent successfully');
 
 Send message or frame via WebSocket.
+
+  # Send JSON object as "Text" message
+  use Mojo::JSON 'j';
+  $t->websocket_ok('/echo.json')
+    ->send_ok({text => j({test => 'I ♥ Mojolicious!'})})
+    ->message_ok
+    ->json_message_is('' => {test => 'I ♥ Mojolicious!'})
+    ->finish_ok;
 
 =head2 status_is
 

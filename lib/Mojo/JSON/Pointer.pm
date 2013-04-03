@@ -56,30 +56,31 @@ L<Mojo::JSON::Pointer> is a relaxed implementation of RFC 6901.
   my $success = $pointer->contains($data, '/foo/1');
 
 Check if data structure contains a value that can be identified with the given
-JSON Pointer.
+JSON Pointer in fragment identifier representation.
 
   # True
-  $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/foo');
-  $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
+  $pointer->contains({'fo o' => 'bar', baz => [4, 5, 6]}, '/fo%20o');
+  $pointer->contains({'fo o' => 'bar', baz => [4, 5, 6]}, '/baz/2');
 
   # False
-  $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/bar');
-  $pointer->contains({foo => 'bar', baz => [4, 5, 6]}, '/baz/9');
+  $pointer->contains({'fo o' => 'bar', baz => [4, 5, 6]}, '/bar');
+  $pointer->contains({'fo o' => 'bar', baz => [4, 5, 6]}, '/baz/9');
 
 =head2 get
 
   my $value = $pointer->get($data, '/foo/bar');
 
-Extract value identified by the given JSON Pointer.
+Extract value identified by the given JSON Pointer in fragment identifier
+representation.
 
   # "bar"
-  $pointer->get({foo => 'bar', baz => [4, 5, 6]}, '/foo');
+  $pointer->get({'fo o' => 'bar', baz => [4, 5, 6]}, '/fo%20o');
 
   # "4"
-  $pointer->get({foo => 'bar', baz => [4, 5, 6]}, '/baz/0');
+  $pointer->get({'fo o' => 'bar', baz => [4, 5, 6]}, '/baz/0');
 
   # "6"
-  $pointer->get({foo => 'bar', baz => [4, 5, 6]}, '/baz/2');
+  $pointer->get({'fo o' => 'bar', baz => [4, 5, 6]}, '/baz/2');
 
 =head1 SEE ALSO
 

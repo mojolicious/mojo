@@ -47,7 +47,7 @@ Mojo::JSON::Pointer - JSON Pointers
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON::Pointer> implements JSON Pointers.
+L<Mojo::JSON::Pointer> is a relaxed implementation of RFC 6901.
 
 =head1 METHODS
 

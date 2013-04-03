@@ -1,5 +1,5 @@
 
-3.92  2013-04-02
+3.92  2013-04-03
   - Added monotonic clock support to make Mojolicious more resilient to time
     jumps.
   - Added steady_time function to Mojo::Util.

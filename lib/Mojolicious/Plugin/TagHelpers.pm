@@ -2,7 +2,7 @@ package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream 'b';
-use Mojo::Util qw(deprecated xml_escape);
+use Mojo::Util 'xml_escape';
 
 sub register {
   my ($self, $app) = @_;
@@ -12,14 +12,6 @@ sub register {
   for my $name (@time, qw(color email number range search tel text url)) {
     $app->helper("${name}_field" => sub { _input(@_, type => $name) });
   }
-
-  # DEPRECATED in Rainbow!
-  $app->helper(
-    base_tag => sub {
-      deprecated 'base_tag is DEPRECATED';
-      _tag('base', href => shift->req->url->base, @_);
-    }
-  );
 
   $app->helper(check_box =>
       sub { _input(shift, shift, value => shift, @_, type => 'checkbox') });

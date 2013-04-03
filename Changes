@@ -4,6 +4,7 @@
     jumps.
   - Added steady_time function to Mojo::Util.
   - Removed deprecated namespace method from Mojolicious::Routes.
+  - Removed deprecated base_tag helper.
   - Improved WebSocket send method to stringify objects. (jberger)
   - Improved version command to show required versions of optional
     dependencies.

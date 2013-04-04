@@ -42,12 +42,11 @@ sub _step {
   return $self->{counter} if --$self->{counter} || $self->{step};
 
   # Next step
-  my $cb = shift @{$self->{steps} ||= []};
   $self->{$_} = [] for qw(ordered unordered);
   my @args = ((map {@$_} grep {defined} @$ordered), @$unordered);
   local $self->{step} = 1;
-  $self->$cb(@args) if $cb;
-  $self->emit('finish', @args) unless $self->{counter};
+  if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }
+  $self->emit(finish => @args) unless $self->{counter};
 
   return 0;
 }

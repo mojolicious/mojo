@@ -162,7 +162,7 @@ C<finish> event and C<wait> method.
 
 Sequentialize multiple events, the first callback will run right away, and the
 next one once the active event counter reaches zero, this chain will continue
-until there are no more callbacks left.
+until there are no more callbacks or active events left.
 
 =head2 wait
 

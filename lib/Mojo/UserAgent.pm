@@ -550,10 +550,10 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Blocking parallel requests (does not work inside a running event loop)
   my $delay = Mojo::IOLoop->delay;
   for my $url ('mojolicio.us', 'cpan.org') {
-    $delay->begin;
+    my $end = $delay->begin(0);
     $ua->get($url => sub {
       my ($ua, $tx) = @_;
-      $delay->end($tx->res->dom->at('title')->text);
+      $end->($tx->res->dom->at('title')->text);
     });
   }
   my @titles = $delay->wait;
@@ -564,10 +564,10 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     ...
   });
   for my $url ('mojolicio.us', 'cpan.org') {
-    $delay->begin;
+    my $end = $delay->begin(0);
     $ua->get($url => sub {
       my ($ua, $tx) = @_;
-      $delay->end($tx->res->dom->at('title')->text);
+      $end->($tx->res->dom->at('title')->text);
     });
   }
   $delay->wait unless Mojo::IOLoop->is_running;

@@ -929,10 +929,10 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
     $c->render_json(\@titles);
   });
   for my $url ('http://mojolicio.us', 'https://metacpan.org') {
-    $delay->begin;
+    my $end = $delay->begin(0);
     $c->ua->get($url => sub {
       my ($ua, $tx) = @_;
-      $delay->end($tx->res->dom->html->head->title->text);
+      $end->($tx->res->dom->html->head->title->text);
     });
   }
 

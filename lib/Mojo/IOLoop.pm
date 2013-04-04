@@ -467,10 +467,10 @@ ones as a chain of steps.
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
   for my $i (1 .. 10) {
-    $delay->begin;
+    my $end = $delay->begin;
     Mojo::IOLoop->timer($i => sub {
       say 10 - $i;
-      $delay->end;
+      $end->();
     });
   }
 

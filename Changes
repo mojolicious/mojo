@@ -1,5 +1,8 @@
 
 3.93  2013-04-04
+  - Deprecated Mojo::IOLoop::Delay::end in favor of generated callbacks.
+  - Improved Mojo::IOLoop::Delay to be able to generate callbacks that can
+    capture all arguments.
   - Improved prefork command to allow -a and -L values below 1 second.
   - Improved documentation.
   - Fixed multiple timing bugs in Mojo::IOLoop::Delay.

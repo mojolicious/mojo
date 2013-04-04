@@ -120,11 +120,11 @@ Mojo::IOLoop->server(
   }
 );
 my $delay = Mojo::IOLoop->delay;
-$delay->begin;
+my $end   = $delay->begin(0);
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;
-    $delay->end($stream);
+    $end->($stream);
     $stream->on(close => sub { $buffer .= 'should not happen' });
     $stream->on(error => sub { $buffer .= 'should not happen either' });
   }
@@ -171,19 +171,19 @@ ok $err, 'has error';
 # Removed connection (with delay)
 my $removed;
 $delay = Mojo::IOLoop->delay(sub { $removed++ });
-$port = Mojo::IOLoop->generate_port;
-$delay->begin;
+$port  = Mojo::IOLoop->generate_port;
+$end   = $delay->begin;
 Mojo::IOLoop->server(
   (address => '127.0.0.1', port => $port) => sub {
     my ($loop, $stream) = @_;
-    $stream->on(close => sub { $delay->end });
+    $stream->on(close => $end);
   }
 );
-$delay->begin;
+my $end2 = $delay->begin;
 $id = Mojo::IOLoop->client(
   (port => $port) => sub {
     my ($loop, $err, $stream) = @_;
-    $stream->on(close => sub { $delay->end });
+    $stream->on(close => $end2);
     $loop->remove($id);
   }
 );

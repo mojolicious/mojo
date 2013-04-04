@@ -41,21 +41,21 @@ my $loop  = Mojo::IOLoop->new;
 my $delay = $loop->delay;
 my $port  = Mojo::IOLoop->generate_port;
 my ($server, $client);
-$delay->begin;
+my $end = $delay->begin;
 $loop->server(
   {address => '127.0.0.1', port => $port, tls => 1} => sub {
     my ($loop, $stream) = @_;
     $stream->write('test' => sub { shift->write('321') });
-    $stream->on(close => sub { $delay->end });
+    $stream->on(close => $end);
     $stream->on(read => sub { $server .= pop });
   }
 );
-$delay->begin;
+my $end2 = $delay->begin;
 $loop->client(
   {port => $port, tls => 1} => sub {
     my ($loop, $err, $stream) = @_;
     $stream->write('tset' => sub { shift->write('123') });
-    $stream->on(close => sub { $delay->end });
+    $stream->on(close => $end2);
     $stream->on(read => sub { $client .= pop });
     $stream->timeout(0.5);
   }
@@ -70,7 +70,7 @@ $port  = Mojo::IOLoop->generate_port;
 ($server, $client) = ();
 my ($remove, $running, $timeout, $server_err, $server_close, $client_close);
 Mojo::IOLoop->remove(Mojo::IOLoop->recurring(0 => sub { $remove++ }));
-$delay->begin;
+$end = $delay->begin;
 Mojo::IOLoop->server(
   address  => '127.0.0.1',
   port     => $port,
@@ -86,7 +86,7 @@ Mojo::IOLoop->server(
     $stream->on(
       close => sub {
         $server_close++;
-        $delay->end;
+        $end->();
       }
     );
     $stream->on(error => sub { $server_err = pop });
@@ -94,7 +94,7 @@ Mojo::IOLoop->server(
     $stream->timeout(0.5);
   }
 );
-$delay->begin;
+$end2 = $delay->begin;
 Mojo::IOLoop->client(
   port     => $port,
   tls      => 1,
@@ -106,7 +106,7 @@ Mojo::IOLoop->client(
     $stream->on(
       close => sub {
         $client_close++;
-        $delay->end;
+        $end2->();
       }
     );
     $stream->on(read => sub { $client .= pop });
@@ -181,7 +181,7 @@ $delay = Mojo::IOLoop->delay;
 $port  = Mojo::IOLoop->generate_port;
 ($running, $timeout, $server, $server_err, $server_close) = ();
 ($client, $client_close) = ();
-$delay->begin;
+$end = $delay->begin;
 Mojo::IOLoop->server(
   address  => '127.0.0.1',
   port     => $port,
@@ -196,14 +196,14 @@ Mojo::IOLoop->server(
     $stream->on(
       close => sub {
         $server_close++;
-        $delay->end;
+        $end->();
       }
     );
     $stream->on(error => sub { $server_err = pop });
     $stream->on(read => sub { $server .= pop });
   }
 );
-$delay->begin;
+$end2 = $delay->begin;
 Mojo::IOLoop->client(
   port     => $port,
   tls      => 1,
@@ -217,7 +217,7 @@ Mojo::IOLoop->client(
     $stream->on(
       close => sub {
         $client_close++;
-        $delay->end;
+        $end2->();
       }
     );
     $stream->on(read => sub { $client .= pop });

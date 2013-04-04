@@ -14,13 +14,13 @@ use Mojo::IOLoop::Delay;
 my $delay = Mojo::IOLoop::Delay->new;
 my @results;
 for my $i (1, 1) {
-  $delay->begin;
-  Mojo::IOLoop->timer(0 => sub { push @results, $i; $delay->end });
+  my $end = $delay->begin;
+  Mojo::IOLoop->timer(0 => sub { push @results, $i; $end->() });
 }
-my $end = $delay->begin;
-$delay->begin;
-is $end->(), 3, 'three remaining';
-is $delay->end, 2, 'two remaining';
+my $end  = $delay->begin;
+my $end2 = $delay->begin;
+is $end->(),  3, 'three remaining';
+is $end2->(), 2, 'two remaining';
 $delay->wait;
 is_deeply \@results, [1, 1], 'right results';
 
@@ -29,8 +29,8 @@ $delay = Mojo::IOLoop::Delay->new;
 my $result;
 $delay->on(finish => sub { shift; $result = [@_] });
 for my $i (2, 2) {
-  $delay->begin;
-  Mojo::IOLoop->timer(0 => sub { $delay->end($i) });
+  my $end = $delay->begin(0);
+  Mojo::IOLoop->timer(0 => sub { $end->($i) });
 }
 is_deeply [$delay->wait], [2, 2], 'right results';
 is_deeply $result, [2, 2], 'right results';
@@ -38,8 +38,8 @@ is_deeply $result, [2, 2], 'right results';
 # Scalar context
 $delay = Mojo::IOLoop::Delay->new;
 for my $i (3, 3) {
-  $delay->begin;
-  Mojo::IOLoop->timer(0 => sub { $delay->end($i) });
+  my $end = $delay->begin(0);
+  Mojo::IOLoop->timer(0 => sub { $end->($i) });
 }
 is $delay->wait, 3, 'right results';
 
@@ -130,18 +130,18 @@ $delay = Mojo::IOLoop->delay(
     my $second = Mojo::IOLoop->delay($first->begin);
     Mojo::IOLoop->timer(0 => $second->begin);
     Mojo::IOLoop->timer(0 => $first->begin);
-    $second->begin;
-    Mojo::IOLoop->timer(0 => sub { $second->end(1, 2, 3) });
+    my $end = $second->begin(0);
+    Mojo::IOLoop->timer(0 => sub { $end->(1, 2, 3) });
   },
   sub {
     my ($first, @numbers) = @_;
     $result = \@numbers;
     my $end = $first->begin;
     $first->begin->(3, 2, 1);
-    $first->begin;
-    $first->begin;
-    $first->end(4);
-    $first->end(5, 6);
+    my $end2 = $first->begin(0);
+    my $end3 = $first->begin(0);
+    $end2->(4);
+    $end3->(5, 6);
     $end->(1, 2, 3);
     Mojo::IOLoop->timer(0 => $first->begin);
   },

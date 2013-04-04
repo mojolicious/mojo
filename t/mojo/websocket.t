@@ -306,7 +306,7 @@ my $delay = Mojo::IOLoop->delay;
 $finished = 0;
 ($code, $result) = ();
 my ($code2, $result2);
-$delay->begin;
+my $end = $delay->begin;
 $ua->websocket(
   '/subreq' => sub {
     my ($ua, $tx) = @_;
@@ -321,12 +321,12 @@ $ua->websocket(
     $tx->on(
       finish => sub {
         $finished += 1;
-        $delay->end;
+        $end->();
       }
     );
   }
 );
-$delay->begin;
+my $end2 = $delay->begin;
 $ua->websocket(
   '/subreq' => sub {
     my ($ua, $tx) = @_;
@@ -341,7 +341,7 @@ $ua->websocket(
     $tx->on(
       finish => sub {
         $finished += 2;
-        $delay->end;
+        $end2->();
       }
     );
   }

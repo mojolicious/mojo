@@ -1,8 +1,8 @@
 
 3.93  2013-04-04
-  - Added clear method to Mojo::IOLoop::Delay.
   - Improved prefork command to allow -a and -L values below 1 second.
   - Improved documentation.
+  - Fixed multiple timing bugs in Mojo::IOLoop::Delay.
 
 3.92  2013-04-03
   - Added monotonic clock support to make Mojolicious more resilient to time

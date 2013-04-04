@@ -69,27 +69,31 @@ is_deeply [$delay->wait], [2, 3, 2, 1, 4], 'right numbers';
 is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [2, 3, 2, 1, 4], 'right numbers';
 
-# Clear all remaining steps
+# End chain after first step
+($finished, $result) = ();
+$delay = Mojo::IOLoop::Delay->new;
+$delay->on(finish => sub { $finished++ });
+$delay->steps(sub { $result = 'success' }, sub { $result = 'fail' });
+$delay->wait;
+is $finished, 1,         'finish event has been emitted once';
+is $result,   'success', 'right result';
+
+# End chain after second step
 ($finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
 $delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub { Mojo::IOLoop->timer(0 => shift->begin) },
-  sub { Mojo::IOLoop->timer(0 => shift->clear->begin) },
+  sub {
+    $result = 'success';
+    shift->begin->();
+  },
   sub { $result = 'fail' },
   sub { $result = 'fail' }
 );
 $delay->wait;
-is $finished, 1, 'finish event has been emitted once';
-ok !$result, 'no result';
-
-# Clear all steps (except for the first)
-$result = undef;
-$delay  = Mojo::IOLoop::Delay->new;
-$delay->steps(sub { Mojo::IOLoop->timer(0 => shift->begin) },
-  sub { $result = 'fail' });
-$delay->clear->wait;
-ok !$result, 'no result';
+is $finished, 1,         'finish event has been emitted once';
+is $result,   'success', 'right result';
 
 # Finish steps with event
 $result = undef;
@@ -137,6 +141,7 @@ $delay = Mojo::IOLoop->delay(
     $first->end(4);
     $first->end(5, 6);
     $end->(1, 2, 3);
+    Mojo::IOLoop->timer(0 => $first->begin);
   },
   sub {
     my ($first, @numbers) = @_;

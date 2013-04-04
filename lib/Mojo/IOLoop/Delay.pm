@@ -7,14 +7,9 @@ has ioloop => sub { Mojo::IOLoop->singleton };
 
 sub begin {
   my $self = shift;
-  my $id   = $self->{counter}++;
+  $self->{counter}++;
+  my $id = $self->{id}++;
   return sub { shift; $self->_step($id, @_) };
-}
-
-sub clear {
-  my $self = shift;
-  $self->{steps} = [];
-  return $self;
 }
 
 sub end { shift->_step(undef, @_) }
@@ -44,17 +39,15 @@ sub _step {
   else             { push @$unordered, @_ }
 
   # Wait for more events
-  return $self->{counter} if --$self->{counter};
+  return $self->{counter} if --$self->{counter} || $self->{step};
 
   # Next step
   my $cb = shift @{$self->{steps} ||= []};
   $self->{$_} = [] for qw(ordered unordered);
   my @args = ((map {@$_} grep {defined} @$ordered), @$unordered);
+  local $self->{step} = 1;
   $self->$cb(@args) if $cb;
-
-  # Finished
-  $self->emit('finish', @args)
-    if !$self->{counter} && !@{$self->{steps}} && !$self->{finished}++;
+  $self->emit('finish', @args) unless $self->{counter};
 
   return 0;
 }
@@ -125,8 +118,7 @@ emit the following new ones.
     ...
   });
 
-Emitted once the active event counter reaches zero and there are no more
-steps.
+Emitted once the active event counter reaches zero or there are no more steps.
 
 =head1 ATTRIBUTES
 
@@ -156,12 +148,6 @@ that the first argument passed to the callback will be ignored.
   my $delay = Mojo::IOLoop->delay;
   Mojo::UserAgent->new->get('mojolicio.us' => $delay->begin);
   my $tx = $delay->wait;
-
-=head2 clear
-
-  $delay = $delay->clear;
-
-Clear all remaining steps.
 
 =head2 end
 

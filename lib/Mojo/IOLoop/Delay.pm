@@ -118,7 +118,7 @@ emit the following new ones.
     ...
   });
 
-Emitted once the active event counter reaches zero or there are no more steps.
+Emitted once the active event counter reaches zero.
 
 =head1 ATTRIBUTES
 

@@ -79,21 +79,23 @@ is $finished, 1,         'finish event has been emitted once';
 is $result,   'success', 'right result';
 
 # End chain after second step
+my $remaining;
 ($finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
 $delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub { Mojo::IOLoop->timer(0 => shift->begin) },
   sub {
-    $result = 'success';
-    shift->begin->();
+    $result    = 'success';
+    $remaining = shift->begin->();
   },
   sub { $result = 'fail' },
   sub { $result = 'fail' }
 );
 $delay->wait;
-is $finished, 1,         'finish event has been emitted once';
-is $result,   'success', 'right result';
+is $remaining, 0,         'none remaining';
+is $finished,  1,         'finish event has been emitted once';
+is $result,    'success', 'right result';
 
 # Finish steps with event
 $result = undef;

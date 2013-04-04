@@ -152,9 +152,10 @@ the active event counter again, all arguments are queued in the right order
 for the next step or C<finish> event and C<wait> method. The first argument
 passed to the callback will be ignored by default.
 
+  # Capture all arguments
   my $delay = Mojo::IOLoop->delay;
-  Mojo::UserAgent->new->get('mojolicio.us' => $delay->begin);
-  my $tx = $delay->wait;
+  Mojo::IOLoop->client({port => 3000} => $delay->begin(0));
+  my ($loop, $err, $stream) = $delay->wait;
 
 =head2 steps
 

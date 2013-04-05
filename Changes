@@ -5,6 +5,7 @@
     capture all arguments.
   - Improved prefork command to allow -a and -L values below 1 second.
   - Improved documentation.
+  - Improved tests.
   - Fixed multiple timing bugs in Mojo::IOLoop::Delay.
 
 3.92  2013-04-03

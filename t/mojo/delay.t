@@ -21,27 +21,27 @@ my $end  = $delay->begin;
 my $end2 = $delay->begin;
 is $end->(),  3, 'three remaining';
 is $end2->(), 2, 'two remaining';
-$delay->wait;
+is_deeply [$delay->wait], [], 'no return values';
 is_deeply \@results, [1, 1], 'right results';
 
 # Arguments
 $delay = Mojo::IOLoop::Delay->new;
 my $result;
 $delay->on(finish => sub { shift; $result = [@_] });
-for my $i (2, 2) {
+for my $i (1, 2) {
   my $end = $delay->begin(0);
   Mojo::IOLoop->timer(0 => sub { $end->($i) });
 }
-is_deeply [$delay->wait], [2, 2], 'right results';
-is_deeply $result, [2, 2], 'right results';
+is_deeply [$delay->wait], [1, 2], 'right return values';
+is_deeply $result, [1, 2], 'right results';
 
 # Scalar context
 $delay = Mojo::IOLoop::Delay->new;
-for my $i (3, 3) {
+for my $i (1, 2) {
   my $end = $delay->begin(0);
   Mojo::IOLoop->timer(0 => sub { $end->($i) });
 }
-is $delay->wait, 3, 'right results';
+is scalar $delay->wait, 1, 'right return value';
 
 # Steps
 my $finished;
@@ -65,16 +65,16 @@ $delay->steps(
     $result = \@numbers;
   }
 );
-is_deeply [$delay->wait], [2, 3, 2, 1, 4], 'right numbers';
+is_deeply [$delay->wait], [2, 3, 2, 1, 4], 'right return values';
 is $finished, 1, 'finish event has been emitted once';
-is_deeply $result, [2, 3, 2, 1, 4], 'right numbers';
+is_deeply $result, [2, 3, 2, 1, 4], 'right results';
 
 # End chain after first step
 ($finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
 $delay->on(finish => sub { $finished++ });
 $delay->steps(sub { $result = 'success' }, sub { $result = 'fail' });
-$delay->wait;
+is_deeply [$delay->wait], [], 'no return values';
 is $finished, 1,         'finish event has been emitted once';
 is $result,   'success', 'right result';
 
@@ -92,10 +92,22 @@ $delay->steps(
   sub { $result = 'success' },
   sub { $result = 'fail' }
 );
-$delay->wait;
+is_deeply [$delay->wait], [], 'no return values';
 is $remaining, 0,         'none remaining';
 is $finished,  1,         'finish event has been emitted once';
 is $result,    'success', 'right result';
+
+# End chain after second step
+@results = ();
+$delay   = Mojo::IOLoop::Delay->new;
+$delay->on(finish => sub { shift; push @results, [@_] });
+$delay->steps(
+  sub { shift->begin(0)->(23) },
+  sub { shift; push @results, [@_] },
+  sub { push @results, 'fail' }
+);
+is_deeply [$delay->wait], [23], 'right return values';
+is_deeply \@results, [[23], [23]], 'right results';
 
 # Finish steps with event
 $result = undef;
@@ -118,8 +130,8 @@ $delay->steps(
     Mojo::IOLoop->timer(0 => sub { $end->(undef, @numbers, 4) });
   }
 );
-is_deeply [$delay->wait], [2, 3, 4], 'right numbers';
-is_deeply $result, [2, 3, 4], 'right numbers';
+is_deeply [$delay->wait], [2, 3, 4], 'right return values';
+is_deeply $result, [2, 3, 4], 'right results';
 
 # Nested delays
 ($finished, $result) = ();
@@ -150,8 +162,8 @@ $delay = Mojo::IOLoop->delay(
     push @$result, @numbers;
   }
 );
-is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6, 23], 'right numbers';
+is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6, 23], 'right return values';
 is $finished, 1, 'finish event has been emitted once';
-is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23], 'right numbers';
+is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23], 'right results';
 
 done_testing();

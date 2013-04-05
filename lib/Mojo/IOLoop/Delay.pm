@@ -8,8 +8,8 @@ has ioloop => sub { Mojo::IOLoop->singleton };
 
 sub begin {
   my ($self, $ignore) = @_;
-  $self->{counter}++;
-  my $id = $self->{id}++;
+  $self->{pending}++;
+  my $id = $self->{counter}++;
   return sub { $ignore // 1 and shift; $self->_step($id, @_) };
 }
 
@@ -43,17 +43,21 @@ sub _step {
   # DEPRECATED in Rainbow!
   else { push @{$self->{unordered}}, @_ }
 
-  return $self->{counter} if --$self->{counter} || $self->{step};
-
+  return $self->{pending} if --$self->{pending} || $self->{step};
   my @args = (map {@$_} grep {defined} @{delete($self->{args}) || []});
 
   # DEPRECATED in Rainbow!
   push @args, @{delete($self->{unordered}) || []};
 
-  local $self->{step} = 1;
-  if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }
-  $self->emit(finish => @args) unless $self->{counter};
+  $self->{counter} = 0;
+  if (my $cb = shift @{$self->{steps} ||= []}) {
+    local $self->{step} = 1;
+    $self->$cb(@args);
+  }
 
+  return 0 if $self->{pending};
+  if ($self->{counter}) { $self->ioloop->timer(0 => $self->begin) }
+  else { $self->emit(finish => @args) unless $self->{counter} }
   return 0;
 }
 

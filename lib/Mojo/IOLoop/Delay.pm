@@ -43,17 +43,15 @@ sub _step {
   # DEPRECATED in Rainbow!
   else { push @{$self->{unordered}}, @_ }
 
-  return $self->{pending} if --$self->{pending} || $self->{step};
+  return $self->{pending} if --$self->{pending} || $self->{lock};
+  local $self->{lock} = 1;
   my @args = (map {@$_} grep {defined} @{delete($self->{args}) || []});
 
   # DEPRECATED in Rainbow!
   push @args, @{delete($self->{unordered}) || []};
 
   $self->{counter} = 0;
-  if (my $cb = shift @{$self->{steps} ||= []}) {
-    local $self->{step} = 1;
-    $self->$cb(@args);
-  }
+  if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }
 
   return 0 if $self->{pending};
   if ($self->{counter}) { $self->ioloop->timer(0 => $self->begin) }

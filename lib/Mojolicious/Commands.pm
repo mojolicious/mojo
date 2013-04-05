@@ -4,7 +4,6 @@ use Mojo::Base 'Mojolicious::Command';
 use Getopt::Long 'GetOptions';
 use List::Util 'max';
 use Mojo::Server;
-use Mojo::Util 'deprecated';
 
 has hint => <<"EOF";
 
@@ -102,15 +101,6 @@ sub run {
     print "  $name", (' ' x ($max - length $name)), "   $description";
   }
   return print $self->hint;
-}
-
-# DEPRECATED in Rainbow!
-sub start {
-  deprecated 'Mojolicious::Commands::start is DEPRECATED in favor of '
-    . 'Mojolicious::Commands::start_app';
-  my $self = shift;
-  return $self->start_app($ENV{MOJO_APP} => @_) if $ENV{MOJO_APP};
-  return $self->new->app->start(@_);
 }
 
 sub start_app {

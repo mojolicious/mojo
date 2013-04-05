@@ -10,7 +10,7 @@ plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!'
 # DEPRECATED in Rainbow!
 my @rainbow = (
   qw(build_form_tx build_json_tx end form html_escape json post_form),
-  qw(post_form_ok post_json post_json_ok slurp_rel_file start)
+  qw(post_form_ok post_json post_json_ok slurp_rel_file)
 );
 
 # False positive constants

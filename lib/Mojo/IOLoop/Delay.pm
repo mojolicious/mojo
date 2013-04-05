@@ -57,7 +57,7 @@ sub _step {
 
   return 0 if $self->{pending};
   if ($self->{counter}) { $self->ioloop->timer(0 => $self->begin) }
-  else { $self->emit(finish => @args) unless $self->{counter} }
+  else                  { $self->emit(finish => @args) }
   return 0;
 }
 
@@ -127,7 +127,8 @@ emit the following new ones.
     ...
   });
 
-Emitted once the active event counter reaches zero.
+Emitted once the active event counter reaches zero and there are no more
+steps.
 
 =head1 ATTRIBUTES
 
@@ -152,9 +153,9 @@ implements the following new ones.
   my $cb = $delay->begin(0);
 
 Increment active event counter, the returned callback can be used to decrement
-the active event counter again, all arguments are queued in the right order
-for the next step or C<finish> event and C<wait> method. The first argument
-passed to the callback will be ignored by default.
+the active event counter again. Arguments passed to the callback are queued in
+the right order for the next step or C<finish> event and C<wait> method, the
+first argument will be ignored by default.
 
   # Capture all arguments
   my $delay = Mojo::IOLoop->delay;
@@ -167,7 +168,8 @@ passed to the callback will be ignored by default.
 
 Sequentialize multiple events, the first callback will run right away, and the
 next one once the active event counter reaches zero, this chain will continue
-until there are no more callbacks or active events left.
+until there are no more callbacks or a callback does not increment the active
+event counter.
 
 =head2 wait
 

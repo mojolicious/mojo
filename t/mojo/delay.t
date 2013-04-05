@@ -143,15 +143,15 @@ $delay = Mojo::IOLoop->delay(
     $end2->(4);
     $end3->(5, 6);
     $end->(1, 2, 3);
-    Mojo::IOLoop->timer(0 => $first->begin);
+    $first->begin(0)->(23);
   },
   sub {
     my ($first, @numbers) = @_;
     push @$result, @numbers;
   }
 );
-is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6], 'right numbers';
+is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6, 23], 'right numbers';
 is $finished, 1, 'finish event has been emitted once';
-is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6], 'right numbers';
+is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23], 'right numbers';
 
 done_testing();

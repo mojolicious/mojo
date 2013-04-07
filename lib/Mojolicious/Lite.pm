@@ -867,12 +867,14 @@ served automatically.
   @@ test.txt (base64)
   dGVzdCAxMjMKbGFsYWxh
 
-External static files will be served automatically from a C<public> directory
-if it exists and are not limited to a single file extension.
+External static files are not limited to a single file extension and will be
+served automatically from a C<public> directory if it exists.
 
   $ mkdir public
   $ mv something.js public/something.js
   $ mv mojolicious.tar.gz public/mojolicious.tar.gz
+
+Both have a higher precedence than routes.
 
 =head2 Testing
 

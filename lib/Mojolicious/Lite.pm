@@ -750,6 +750,47 @@ cookies really secure.
 
   app->secret('My secret passphrase here');
 
+=head2 Static files
+
+Similar to templates, but with only a single file extension and optional
+Base64 encoding, static files can be inlined in the C<DATA> section and are
+served automatically.
+
+  use Mojolicious::Lite;
+
+  app->start;
+  __DATA__
+
+  @@ something.js
+  alert('hello!');
+
+  @@ test.txt (base64)
+  dGVzdCAxMjMKbGFsYWxh
+
+External static files are not limited to a single file extension and will be
+served automatically from a C<public> directory if it exists.
+
+  $ mkdir public
+  $ mv something.js public/something.js
+  $ mv mojolicious.tar.gz public/mojolicious.tar.gz
+
+Both have a higher precedence than routes.
+
+=head2 External templates
+
+External templates will be searched by the renderer in a C<templates>
+directory.
+
+  use Mojolicious::Lite;
+
+  # Render template "templates/foo/bar.html.ep"
+  any '/external' => sub {
+    my $self = shift;
+    $self->render('foo/bar');
+  };
+
+  app->start;
+
 =head2 File uploads
 
 All files uploaded via C<multipart/form-data> request are automatically
@@ -835,51 +876,11 @@ The event L<Mojo::Transaction::WebSocket/"message">, which you can subscribe
 to with L<Mojolicious::Controller/"on">, will be emitted for every new
 WebSocket message that is received.
 
-=head2 External templates
-
-External templates will be searched by the renderer in a C<templates>
-directory.
-
-  use Mojolicious::Lite;
-
-  # Render template "templates/foo/bar.html.ep"
-  any '/external' => sub {
-    my $self = shift;
-    $self->render('foo/bar');
-  };
-
-  app->start;
-
-=head2 Static files
-
-Similar to templates, but with only a single file extension and optional
-Base64 encoding, static files can be inlined in the C<DATA> section and are
-served automatically.
-
-  use Mojolicious::Lite;
-
-  app->start;
-  __DATA__
-
-  @@ something.js
-  alert('hello!');
-
-  @@ test.txt (base64)
-  dGVzdCAxMjMKbGFsYWxh
-
-External static files are not limited to a single file extension and will be
-served automatically from a C<public> directory if it exists.
-
-  $ mkdir public
-  $ mv something.js public/something.js
-  $ mv mojolicious.tar.gz public/mojolicious.tar.gz
-
-Both have a higher precedence than routes.
-
 =head2 Testing
 
 Testing your application is as easy as creating a C<t> directory and filling
-it with normal Perl unit tests.
+it with normal Perl unit tests, which can be a lot of fun thanks to
+L<Test::Mojo>.
 
   use Test::More;
   use Test::Mojo;

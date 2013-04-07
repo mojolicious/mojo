@@ -693,6 +693,47 @@ L<Mojolicious/"types">.
 
   app->types->type(rdf => 'application/rdf+xml');
 
+=head2 Static files
+
+Similar to templates, but with only a single file extension and optional
+Base64 encoding, static files can be inlined in the C<DATA> section and are
+served automatically.
+
+  use Mojolicious::Lite;
+
+  app->start;
+  __DATA__
+
+  @@ something.js
+  alert('hello!');
+
+  @@ test.txt (base64)
+  dGVzdCAxMjMKbGFsYWxh
+
+External static files are not limited to a single file extension and will be
+served automatically from a C<public> directory if it exists.
+
+  $ mkdir public
+  $ mv something.js public/something.js
+  $ mv mojolicious.tar.gz public/mojolicious.tar.gz
+
+Both have a higher precedence than routes.
+
+=head2 External templates
+
+External templates will be searched by the renderer in a C<templates>
+directory if it exists.
+
+  use Mojolicious::Lite;
+
+  # Render template "templates/foo/bar.html.ep"
+  any '/external' => sub {
+    my $self = shift;
+    $self->render('foo/bar');
+  };
+
+  app->start;
+
 =head2 Conditions
 
 Conditions such as C<agent> and C<host> from
@@ -749,47 +790,6 @@ Note that you should use a custom L<Mojolicious/"secret"> to make signed
 cookies really secure.
 
   app->secret('My secret passphrase here');
-
-=head2 Static files
-
-Similar to templates, but with only a single file extension and optional
-Base64 encoding, static files can be inlined in the C<DATA> section and are
-served automatically.
-
-  use Mojolicious::Lite;
-
-  app->start;
-  __DATA__
-
-  @@ something.js
-  alert('hello!');
-
-  @@ test.txt (base64)
-  dGVzdCAxMjMKbGFsYWxh
-
-External static files are not limited to a single file extension and will be
-served automatically from a C<public> directory if it exists.
-
-  $ mkdir public
-  $ mv something.js public/something.js
-  $ mv mojolicious.tar.gz public/mojolicious.tar.gz
-
-Both have a higher precedence than routes.
-
-=head2 External templates
-
-External templates will be searched by the renderer in a C<templates>
-directory.
-
-  use Mojolicious::Lite;
-
-  # Render template "templates/foo/bar.html.ep"
-  any '/external' => sub {
-    my $self = shift;
-    $self->render('foo/bar');
-  };
-
-  app->start;
 
 =head2 File uploads
 

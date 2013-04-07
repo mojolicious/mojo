@@ -1,6 +1,7 @@
 
-3.94  2013-04-06
+3.94  2013-04-07
   - Removed deprecated start method from Mojolicious::Commands.
+  - Improved documentation.
 
 3.93  2013-04-05
   - Deprecated Mojo::IOLoop::Delay::end in favor of generated callbacks.

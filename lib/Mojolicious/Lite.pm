@@ -852,8 +852,14 @@ directory.
 
 =head2 Static files
 
-Static files will be automatically served from the C<DATA> section (even
-Base64 encoded) or a C<public> directory if it exists.
+Similar to templates, but with only a single file extension and optional
+Base64 encoding, static files can be inlined in the C<DATA> section and are
+served automatically.
+
+  use Mojolicious::Lite;
+
+  app->start;
+  __DATA__
 
   @@ something.js
   alert('hello!');
@@ -861,8 +867,12 @@ Base64 encoded) or a C<public> directory if it exists.
   @@ test.txt (base64)
   dGVzdCAxMjMKbGFsYWxh
 
+External static files will be served automatically from a C<public> directory
+if it exists and are not limited to a single file extension.
+
   $ mkdir public
   $ mv something.js public/something.js
+  $ mv mojolicious.tar.gz public/mojolicious.tar.gz
 
 =head2 Testing
 

@@ -49,7 +49,9 @@ is $t->app->static->file('hello.txt')->slurp,
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 
 # Hidden controller methods and attributes
+$t->app->routes->hide('bar');
 ok !$t->app->routes->is_hidden('foo'), 'not hidden';
+ok $t->app->routes->is_hidden('bar'),              'is hidden';
 ok $t->app->routes->is_hidden('_foo'),             'is hidden';
 ok $t->app->routes->is_hidden('AUTOLOAD'),         'is hidden';
 ok $t->app->routes->is_hidden('DESTROY'),          'is hidden';

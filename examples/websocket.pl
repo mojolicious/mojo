@@ -3,7 +3,7 @@ use lib "$FindBin::Bin/../lib";
 use Mojolicious::Lite;
 use Mojo::JSON 'j';
 
-websocket '/' => sub {
+websocket '/test' => sub {
   my $self = shift;
   $self->on(
     text => sub {
@@ -25,29 +25,24 @@ __DATA__
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WebSocket</title>
-    % my $url = url_for->to_abs->scheme('ws');
+    <title>WebSocket Test</title>
     %= javascript begin
       var ws;
       if ("WebSocket" in window) {
-        ws = new WebSocket('<%= $url %>');
+        ws = new WebSocket('<%= url_for('test')->to_abs %>');
       }
       if(typeof(ws) !== 'undefined') {
-        function wsmessage(event) {
-          alert(JSON.parse(event.data).test);
-        }
-        function wsopen(event) {
-          ws.send(JSON.stringify({test: "WebSocket support works! ♥"}));
-        }
-        ws.onmessage = wsmessage;
-        ws.onopen = wsopen;
+        ws.onmessage = function (event) {
+          document.body.innerHTML += JSON.parse(event.data).test;
+        };
+        ws.onopen = function (event) {
+          ws.send(JSON.stringify({test: 'WebSocket support works! ♥'}));
+        };
       }
       else {
-        alert("Sorry, your browser does not support WebSockets.");
+        document.body.innerHTML += 'Browser does not support WebSockets.';
       }
     % end
   </head>
-  <body>
-    Testing WebSockets, please make sure you have JavaScript enabled.
-  </body>
+  <body>Testing WebSockets: </body>
 </html>

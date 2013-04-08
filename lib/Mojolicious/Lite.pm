@@ -884,14 +884,14 @@ L<Mojolicious::Controller/"send">.
   <!DOCTYPE html>
   <html>
     <head>
-      <title>WebSocket</title>
+      <title>Echo</title>
       %= javascript begin
         var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
         ws.onmessage = function (event) {
           document.body.innerHTML += event.data + '<br/>';
         };
         ws.onopen = function (event) {
-          ws.send("I ♥ Mojolicious!");
+          ws.send('I ♥ Mojolicious!');
         };
       % end
     </head>

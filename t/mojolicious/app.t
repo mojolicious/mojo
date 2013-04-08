@@ -48,6 +48,45 @@ is $t->app->static->file('hello.txt')->slurp,
   "Hello Mojo from a development static file!\n", 'right content';
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 
+# Hidden controller methods and attributes
+ok !$t->app->routes->is_hidden('foo'), 'not hidden';
+ok $t->app->routes->is_hidden('_foo'),             'is hidden';
+ok $t->app->routes->is_hidden('AUTOLOAD'),         'is hidden';
+ok $t->app->routes->is_hidden('DESTROY'),          'is hidden';
+ok $t->app->routes->is_hidden('app'),              'is hidden';
+ok $t->app->routes->is_hidden('attr'),             'is hidden';
+ok $t->app->routes->is_hidden('cookie'),           'is hidden';
+ok $t->app->routes->is_hidden('finish'),           'is hidden';
+ok $t->app->routes->is_hidden('flash'),            'is hidden';
+ok $t->app->routes->is_hidden('handler'),          'is hidden';
+ok $t->app->routes->is_hidden('has'),              'is hidden';
+ok $t->app->routes->is_hidden('new'),              'is hidden';
+ok $t->app->routes->is_hidden('on'),               'is hidden';
+ok $t->app->routes->is_hidden('param'),            'is hidden';
+ok $t->app->routes->is_hidden('redirect_to'),      'is hidden';
+ok $t->app->routes->is_hidden('render'),           'is hidden';
+ok $t->app->routes->is_hidden('render_data'),      'is hidden';
+ok $t->app->routes->is_hidden('render_exception'), 'is hidden';
+ok $t->app->routes->is_hidden('render_json'),      'is hidden';
+ok $t->app->routes->is_hidden('render_not_found'), 'is hidden';
+ok $t->app->routes->is_hidden('render_partial'),   'is hidden';
+ok $t->app->routes->is_hidden('render_static'),    'is hidden';
+ok $t->app->routes->is_hidden('render_text'),      'is hidden';
+ok $t->app->routes->is_hidden('rendered'),         'is hidden';
+ok $t->app->routes->is_hidden('req'),              'is hidden';
+ok $t->app->routes->is_hidden('res'),              'is hidden';
+ok $t->app->routes->is_hidden('respond_to'),       'is hidden';
+ok $t->app->routes->is_hidden('send'),             'is hidden';
+ok $t->app->routes->is_hidden('session'),          'is hidden';
+ok $t->app->routes->is_hidden('signed_cookie'),    'is hidden';
+ok $t->app->routes->is_hidden('stash'),            'is hidden';
+ok $t->app->routes->is_hidden('tap'),              'is hidden';
+ok $t->app->routes->is_hidden('tx'),               'is hidden';
+ok $t->app->routes->is_hidden('ua'),               'is hidden';
+ok $t->app->routes->is_hidden('url_for'),          'is hidden';
+ok $t->app->routes->is_hidden('write'),            'is hidden';
+ok $t->app->routes->is_hidden('write_chunk'),      'is hidden';
+
 # MojoliciousTest::Command::test_command (with abbreviation)
 is $t->app->start(qw(test_command --to)), 'works too!', 'right result';
 

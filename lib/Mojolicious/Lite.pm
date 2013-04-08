@@ -136,7 +136,7 @@ just work without commands.
 
 =head2 Start
 
-The app->start call that starts the L<Mojolicious> command system can be
+The C<app-E<gt>start call that starts the L<Mojolicious> command system can be
 customized to override normal C<@ARGV> use.
 
   app->start('cgi');
@@ -897,6 +897,24 @@ L<Mojolicious::Controller/"send">.
     </head>
   </html>
 
+=head2 Mode
+
+To disable debug messages later in a production setup, you can change the
+L<Mojolicious> operating mode with command line options or the MOJO_MODE
+environment variable, the default will usually be C<development>.
+
+  $ ./myapp.pl daemon -m production
+
+This also affects many other aspects of the framework, such as mode specific
+C<exception> and C<not_found> templates.
+
+=head2 Logging
+
+L<Mojo::Log> messages will be automatically written to C<STDERR> or a
+C<log/$mode.log> file if a C<log> directory exists.
+
+  $ mkdir log
+
 =head2 Testing
 
 Testing your application is as easy as creating a C<t> directory and filling
@@ -922,37 +940,6 @@ To make your tests more noisy and show you all log messages you can also
 change the application log level directly in your test files.
 
   $t->app->log->level('debug');
-
-=head2 Mode
-
-To disable debug messages later in a production setup, you can change the
-L<Mojolicious> operating mode with command line options or the MOJO_MODE
-environment variable, the default will usually be C<development>.
-
-  $ ./myapp.pl daemon -m production
-
-This also affects many other aspects of the framework, such as mode specific
-C<exception> and C<not_found> templates.
-
-=head2 Logging
-
-L<Mojo::Log> messages will be automatically written to C<STDERR> or a
-C<log/$mode.log> file if a C<log> directory exists.
-
-  $ mkdir log
-
-For more control the L<Mojolicious> object can be accessed directly.
-
-  use Mojolicious::Lite;
-
-  app->log->level('error');
-  app->routes->get('/foo/:bar' => sub {
-    my $self = shift;
-    $self->app->log->debug('Got a request for "Hello Mojo!".');
-    $self->render(text => 'Hello Mojo!');
-  });
-
-  app->start;
 
 =head2 More
 

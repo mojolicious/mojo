@@ -4,6 +4,7 @@
   - Removed deprecated start method from Mojolicious::Commands.
   - Improved documentation.
   - Improved tests.
+  - Fixed small selector bug in get command.
 
 3.93  2013-04-05
   - Deprecated Mojo::IOLoop::Delay::end in favor of generated callbacks.

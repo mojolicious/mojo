@@ -99,7 +99,7 @@ sub run {
 
           # Ignore intermediate content
           return if $redirect && $res->is_status_class(300);
-          $selector ? ($buffer .= pop) : print(pop);
+          defined $selector ? ($buffer .= pop) : print(pop);
         }
       );
     }

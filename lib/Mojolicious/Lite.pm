@@ -136,8 +136,8 @@ just work without commands.
 
 =head2 Start
 
-The C<app-E<gt>start call that starts the L<Mojolicious> command system can be
-customized to override normal C<@ARGV> use.
+The C<app-E<gt>start> call that starts the L<Mojolicious> command system can
+be customized to override normal C<@ARGV> use.
 
   app->start('cgi');
 

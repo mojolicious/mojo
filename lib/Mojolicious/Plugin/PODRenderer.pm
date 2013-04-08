@@ -78,7 +78,7 @@ sub _perldoc {
       # Anchor and text
       my $name = my $text = $e->all_text;
       $name =~ s/\s+/_/g;
-      $name =~ s/\W//g;
+      $name =~ s/[^\w\-]//g;
       my $anchor = $name;
       my $i      = 1;
       $anchor = $name . $i++ while $anchors{$anchor}++;

@@ -132,8 +132,9 @@ just work without commands.
   $ ./myapp.pl
   ...List of available commands (or automatically detected environment)...
 
-The C<app-E<gt>start> call that starts the L<Mojolicious> command system can
-be customized to override normal C<@ARGV> use.
+The C<app-E<gt>start> call that starts the L<Mojolicious> command system
+should usually be the last expression in your application and can be
+customized to override normal C<@ARGV> use.
 
   app->start('cgi');
 

@@ -860,7 +860,10 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
 
 =head2 WebSockets
 
-WebSocket applications have never been this easy before.
+WebSocket applications have never been this simple before. Just receive
+messages by subscribing to the event L<Mojo::Transaction::WebSocket/"message">
+with L<Mojolicious::Controller/"on"> and return them with
+L<Mojolicious::Controller/"send">.
 
   use Mojolicious::Lite;
 
@@ -893,10 +896,6 @@ WebSocket applications have never been this easy before.
       % end
     </head>
   </html>
-
-The event L<Mojo::Transaction::WebSocket/"message">, which you can subscribe
-to with L<Mojolicious::Controller/"on">, will be emitted for every new
-WebSocket message that is received.
 
 =head2 Testing
 

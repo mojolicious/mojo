@@ -870,7 +870,27 @@ WebSocket applications have never been this easy before.
     });
   };
 
+  get '/' => 'index';
+
   app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>WebSocket</title>
+      %= javascript begin
+        var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
+        ws.onmessage = function (event) {
+          document.body.innerHTML += event.data + '<br/>';
+        };
+        ws.onopen = function (event) {
+          ws.send("I ♥ Mojolicious!");
+        };
+      % end
+    </head>
+  </html>
 
 The event L<Mojo::Transaction::WebSocket/"message">, which you can subscribe
 to with L<Mojolicious::Controller/"on">, will be emitted for every new

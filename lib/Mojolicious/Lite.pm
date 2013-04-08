@@ -897,6 +897,9 @@ L<Mojolicious::Controller/"send">.
     </head>
   </html>
 
+For more information about real-time web features see also
+L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
+
 =head2 Mode
 
 To disable debug messages later in a production setup, you can change the

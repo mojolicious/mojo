@@ -905,15 +905,13 @@ environment variable, the default will usually be C<development>.
 
   $ ./myapp.pl daemon -m production
 
-This also affects many other aspects of the framework, such as mode specific
-C<exception> and C<not_found> templates.
-
-=head2 Logging
-
 L<Mojo::Log> messages will be automatically written to C<STDERR> or a
 C<log/$mode.log> file if a C<log> directory exists.
 
   $ mkdir log
+
+Mode changes also affects many other aspects of the framework, such as mode
+specific C<exception> and C<not_found> templates.
 
 =head2 Testing
 

@@ -110,8 +110,6 @@ featured web application.
 
   app->start;
 
-=head2 Generator
-
 There is also a helper command to generate a small example application.
 
   $ mojo generate lite_app
@@ -133,8 +131,6 @@ just work without commands.
 
   $ ./myapp.pl
   ...List of available commands (or automatically detected environment)...
-
-=head2 Start
 
 The C<app-E<gt>start> call that starts the L<Mojolicious> command system can
 be customized to override normal C<@ARGV> use.
@@ -768,7 +764,8 @@ constructs.
 
 Signed cookie based sessions just work out of the box as soon as you start
 using them through the helper
-L<Mojolicious::Plugin::DefaultHelpers/"session">.
+L<Mojolicious::Plugin::DefaultHelpers/"session">, just be aware that all
+session data gets serialized with L<Mojo::JSON>.
 
   use Mojolicious::Lite;
 
@@ -783,10 +780,6 @@ L<Mojolicious::Plugin::DefaultHelpers/"session">.
 
   @@ counter.html.ep
   Counter: <%= session 'counter' %>
-
-Just be aware that all session data gets serialized with L<Mojo::JSON>.
-
-=head2 Secret
 
 Note that you should use a custom L<Mojolicious/"secret"> to make signed
 cookies really secure.

@@ -131,8 +131,8 @@ or C<STDERR>.
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Active log level, defaults to the value of the MOJO_LOG_LEVEL environment
-variable or C<debug>.
+Active log level, defaults to C<debug>. Note that the MOJO_LOG_LEVEL
+environment variable can override this value.
 
 These levels are currently available:
 

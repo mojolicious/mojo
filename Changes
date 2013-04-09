@@ -1,6 +1,6 @@
 
-3.95  2013-04-09
-  - Improved documentation.
+3.95  2013-04-10
+  - Improved documentation. (jberger, sri)
 
 3.94  2013-04-08
   - Added is_hidden method to Mojolicious::Routes.

@@ -413,12 +413,18 @@ like this.
     $self->redirect_to('protected');
   } => 'index';
 
-  # A protected page auto rendering "protected.html.ep"
-  get '/protected' => sub {
-    my $self = shift;
+  # Make sure user is logged in for actions in this group
+  group {
+    under sub {
+      my $self = shift;
 
-    # Redirect to main page with a 302 response if user is not logged in
-    return $self->redirect_to('index') unless $self->session('user');
+      # Redirect to main page with a 302 response if user is not logged in
+      return 1 if $self->session('user');
+      $self->redirect_to('index') and return;
+    };
+
+    # A protected page auto rendering "protected.html.ep"
+    get '/protected';
   };
 
   # Logout action
@@ -521,10 +527,12 @@ actual action code needs to be changed.
       $self->redirect_to('protected');
     } => 'index');
 
-    $r->get('/protected' => sub {
+    my $logged_in = $r->under(sub {
       my $self = shift;
-      return $self->redirect_to('index') unless $self->session('user');
+      return 1 if $self->session('user');
+      $self->redirect_to('index') and return;
     });
+    $logged_in->get('/protected');
 
     $r->get('/logout' => sub {
       my $self = shift;
@@ -580,9 +588,10 @@ Once again the actual action code does not change at all.
     $self->redirect_to('protected');
   }
 
-  sub protected {
+  sub logged_in {
     my $self = shift;
-    return $self->redirect_to('index') unless $self->session('user');
+    return 1 if $self->session('user');
+    $self->redirect_to('index') and return;
   }
 
   sub logout {
@@ -614,8 +623,9 @@ information.
 
     my $r = $self->routes;
     $r->any('/')->to('login#index')->name('index');
-    $r->get('/protected')->to('login#protected')->name('protected');
-    $r->get('/logout')->to('login#logout')->name('logout');
+    my $logged_in = $r->under->to('login#logged_in');
+    $logged_in->get('/protected');
+    $r->get('/logout')->to('login#logout');
   }
 
   1;

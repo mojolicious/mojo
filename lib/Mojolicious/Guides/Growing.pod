@@ -542,7 +542,8 @@ actual action code needs to be changed.
   1;
 
 The C<startup> method gets called right after instantiation and is the place
-where the whole application gets set up.
+where the whole application gets set up. Since full L<Mojolicious>
+applications can use nested routes they have no need for C<group> blocks.
 
 =head2 Simplified application script
 

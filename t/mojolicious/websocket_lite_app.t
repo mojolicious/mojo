@@ -14,6 +14,7 @@ use Test::Mojo;
 
 websocket '/echo' => sub {
   my $self = shift;
+  $self->tx->max_websocket_size(262145);
   $self->on(binary => sub { shift->send({binary => shift}) });
   $self->on(
     text => sub {
@@ -126,6 +127,13 @@ $t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})
 # Zero
 $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
   ->send_ok(0)->message_ok->message_like({text => qr/0/})->finish_ok;
+
+# 64bit binary message (extended limit)
+$t->websocket_ok('/echo');
+is $t->tx->max_websocket_size, 262144, 'right size';
+$t->tx->max_websocket_size(262145);
+$t->send_ok({binary => 'x' x 262145})
+  ->message_ok->message_is({binary => 'x' x 262145})->finish_ok;
 
 # Plain alternative
 $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');

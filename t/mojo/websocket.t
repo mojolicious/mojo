@@ -302,6 +302,21 @@ is $result,   'test0test1', 'right result';
 is $finished, 4,            'finished client websocket';
 is $subreq,   1,            'finished server websocket';
 
+# 64bit message (too large)
+my ($echo, $size);
+$ua->websocket(
+  '/echo' => sub {
+    my ($ua, $tx) = @_;
+    $tx->on(message => sub { $echo = pop });
+    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->send('x' x 262145);
+    $size = $tx->max_websocket_size;
+  }
+);
+Mojo::IOLoop->start;
+is $size, 262144, 'right size';
+ok !$echo, 'no echo';
+
 # Parallel subrequests
 my $delay = Mojo::IOLoop->delay;
 $finished = 0;

@@ -210,7 +210,7 @@ sub _read {
   my ($self, $id, $chunk) = @_;
 
   # Make sure we have a transaction and parse chunk
-  my $c = $self->{connections}{$id};
+  return unless my $c = $self->{connections}{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
   warn "-- Server <<< Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
@@ -234,7 +234,7 @@ sub _write {
   my ($self, $id) = @_;
 
   # Not writing
-  my $c = $self->{connections}{$id};
+  return unless my $c  = $self->{connections}{$id};
   return unless my $tx = $c->{tx};
   return unless $tx->is_writing;
 

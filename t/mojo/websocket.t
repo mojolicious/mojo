@@ -151,6 +151,7 @@ websocket '/timeout' => sub {
   $self->on(finish => sub { $timeout = 'works!' });
 };
 
+# URL for WebSocket
 my $ua  = app->ua;
 my $res = $ua->get('/link')->success;
 is $res->code, 200, 'right status';

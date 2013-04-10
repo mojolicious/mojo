@@ -931,11 +931,6 @@ Run all unit tests with the C<test> command.
 
   $ ./myapp.pl test
 
-To make your tests more noisy and show you all log messages you can also
-change the application log level directly in your test files.
-
-  $t->app->log->level('debug');
-
 =head2 More
 
 You can continue with L<Mojolicious::Guides> now, and don't forget to have

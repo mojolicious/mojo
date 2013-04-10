@@ -320,19 +320,21 @@ against your application.
   $ ./myapp.pl test
   $ ./myapp.pl test t/login.t
 
-To make the tests less noisy and limit log output to just C<error> messages
-you can also add a line like this.
-
-  $t->app->log->level('error');
-
-Quick C<GET> requests can be performed right from the command line.
+Or perform quick requests right from the command line.
 
   $ ./myapp.pl get /
   Wrong username or password.
 
   $ ./myapp.pl get -v '/?user=sri&pass=secr3t'
+  GET /?user=sri&pass=secr3t HTTP/1.1
+  User-Agent: Mojolicious (Perl)
+  Connection: keep-alive
+  Accept-Encoding: gzip
+  Content-Length: 0
+  Host: localhost:59472
+
   HTTP/1.1 200 OK
-  Connection: Keep-Alive
+  Connection: keep-alive
   Date: Sun, 18 Jul 2010 13:09:58 GMT
   Server: Mojolicious (Perl)
   Content-Length: 12

@@ -102,10 +102,10 @@ sub element_exists_not {
 }
 
 sub finish_ok {
-  my ($self, $desc) = @_;
+  my $self = shift;
   $self->tx->finish;
   Mojo::IOLoop->one_tick while !$self->{finished};
-  return $self->_test('ok', 1, $desc || 'finished websocket');
+  return $self->_test('ok', 1, 'finished websocket');
 }
 
 sub get_ok  { shift->_request_ok(get  => @_) }
@@ -599,7 +599,6 @@ Opposite of C<element_exists>.
 =head2 finish_ok
 
   $t = $t->finish_ok;
-  $t = $t->finish_ok('finished successfully');
 
 Finish C<WebSocket> connection.
 

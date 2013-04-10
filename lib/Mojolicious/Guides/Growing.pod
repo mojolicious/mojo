@@ -319,6 +319,7 @@ against your application.
 
   $ ./myapp.pl test
   $ ./myapp.pl test t/login.t
+  $ ./myapp.pl test -v t/login.t
 
 Or perform quick requests right from the command line.
 

@@ -930,6 +930,7 @@ L<Test::Mojo>.
 Run all unit tests with the C<test> command.
 
   $ ./myapp.pl test
+  $ ./myapp.pl test -v
 
 =head2 More
 

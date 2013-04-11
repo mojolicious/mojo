@@ -11,7 +11,7 @@ use constant DEBUG => $ENV{MOJO_WEBSOCKET_DEBUG} || 0;
 use constant MODERN =>
   (($Config{use64bitint} // '') eq 'define' || $Config{longsize} >= 8);
 
-# Unique value from the spec
+# Unique value from RFC 6455
 use constant GUID => '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
 # Opcodes
@@ -227,7 +227,6 @@ sub server_close {
 sub server_handshake {
   my $self = shift;
 
-  # WebSocket handshake
   my $res_headers = $self->res->code(101)->headers;
   $res_headers->upgrade('websocket')->connection('Upgrade');
   my $req_headers = $self->req->headers;
@@ -289,7 +288,7 @@ sub _message {
   # No FIN bit (Continuation)
   return unless $frame->[0];
 
-  # Message
+  # Whole message
   my $msg = delete $self->{message};
   if (delete $self->{op} == TEXT) {
     $self->emit(text => $msg);

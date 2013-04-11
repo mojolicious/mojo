@@ -845,9 +845,11 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
 
   use Mojolicious::Lite;
 
-  get '/test' => sub {
+  get '/headers' => sub {
     my $self = shift;
-    $self->render(data => $self->ua->get('http://mojolicio.us')->res->body);
+    my $url  = $self->param('url') || 'http://mojolicio.us';
+    my $dom  = $self->ua->get($url)->res->dom;
+    $self->render(json => [$dom->find('h1, h2, h3')->pluck('text')->each]);
   };
 
   app->start;

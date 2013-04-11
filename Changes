@@ -3,7 +3,8 @@
   - Added finished_ok method to Test::Mojo.
   - Removed deprecated slurp_rel_file method from Mojo::Home.
   - Removed deprecated html_escape function from Mojo::Util.
-  - Improved Mojo::Transaction::WebSocket with support for status codes.
+  - Improved Mojo::Transaction::WebSocket with support for status codes and
+    reasons.
   - Improved documentation. (jberger, sri)
   - Improved tests.
   - Fixed a few small timing bugs in Mojo::Server::Daemon.

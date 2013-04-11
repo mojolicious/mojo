@@ -517,7 +517,7 @@ Connection identifier or socket.
 
   $ws = $ws->finish;
   $ws = $ws->finish(1000);
-  $ws = $ws->finish(1003, 'What was that?');
+  $ws = $ws->finish(1003 => 'Cannot accept data!');
 
 Finish the WebSocket connection gracefully.
 

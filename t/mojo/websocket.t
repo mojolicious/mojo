@@ -59,7 +59,7 @@ websocket '/socket' => sub {
     $self->req->headers->host => sub {
       my $self = shift;
       $self->send(Mojo::IOLoop->stream($self->tx->connection)->timeout);
-      $self->finish(1000, 'I ♥ Mojolicious!');
+      $self->finish(1000 => 'I ♥ Mojolicious!');
     }
   );
 };

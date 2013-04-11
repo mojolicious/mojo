@@ -282,7 +282,7 @@ sub _message {
   # Append chunk and check message size
   $self->{op} = $op unless exists $self->{op};
   $self->{message} .= $frame->[5];
-  $self->finish(1009) and last
+  return $self->finish(1009)
     if length $self->{message} > $self->max_websocket_size;
 
   # No FIN bit (Continuation)

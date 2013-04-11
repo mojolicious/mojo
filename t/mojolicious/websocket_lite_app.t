@@ -141,6 +141,10 @@ $t->send_ok({binary => 'x' x 262145})
 $t->websocket_ok('/echo')->send_ok({binary => 'x' x 262145})
   ->finished_ok(1009);
 
+# Binary message in two 64bit frames without FIN bit (too large)
+$t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'x' x 100000])
+  ->send_ok([0, 0, 0, 0, 0, 'x' x 162146])->finished_ok(1009);
+
 # Plain alternative
 $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
 

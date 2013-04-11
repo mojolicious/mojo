@@ -15,7 +15,6 @@ my @UTILS = (
   qw(sha1_bytes sha1_sum slurp spurt squish trim unquote url_escape),
   qw(url_unescape xml_escape xor_encode)
 );
-push @UTILS, 'html_escape';    # DEPRECATED in Rainbow!
 for my $name (@UTILS) {
   my $sub = Mojo::Util->can($name);
   Mojo::Util::monkey_patch __PACKAGE__, $name, sub {

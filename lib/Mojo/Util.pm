@@ -33,12 +33,6 @@ for my $line (split "\x0a", slurp(catfile dirname(__FILE__), 'entities.txt')) {
   $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
 }
 
-# DEPRECATED in Rainbow!
-my %REVERSE = ("\x{0027}" => '#39;');
-$REVERSE{$ENTITIES{$_}} //= $_
-  for sort  { @{[$a =~ /[A-Z]/g]} <=> @{[$b =~ /[A-Z]/g]} }
-  sort grep {/;/} keys %ENTITIES;
-
 # Encoding cache
 my %CACHE;
 
@@ -50,9 +44,6 @@ our @EXPORT_OK = (
   qw(squish steady_time trim unquote url_escape url_unescape xml_escape),
   qw(xor_encode)
 );
-
-# DEPRECATED in Rainbow!
-push @EXPORT_OK, 'html_escape';
 
 sub b64_decode { decode_base64($_[0]) }
 
@@ -122,17 +113,6 @@ sub get_line {
 
 sub hmac_md5_sum  { _hmac(\&md5,  @_) }
 sub hmac_sha1_sum { _hmac(\&sha1, @_) }
-
-# DEPRECATED in Rainbow!
-sub html_escape {
-  deprecated 'Mojo::Util::html_escape is DEPRECATED in favor of '
-    . 'Mojo::Util::xml_escape';
-  my ($string, $pattern) = @_;
-  $pattern ||= '^\n\r\t !#$%(-;=?-~';
-  return $string unless $string =~ /[^$pattern]/;
-  $string =~ s/([$pattern])/_encode($1)/ge;
-  return $string;
-}
 
 sub html_unescape {
   my $string = shift;
@@ -383,11 +363,6 @@ sub _decode {
     $rest = chop($entity) . $rest;
   }
   return "&$_[1]";
-}
-
-# DEPRECATED in Rainbow!
-sub _encode {
-  return exists $REVERSE{$_[0]} ? "&$REVERSE{$_[0]}" : "&#@{[ord($_[0])]};";
 }
 
 sub _encoding {

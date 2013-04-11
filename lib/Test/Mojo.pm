@@ -205,7 +205,7 @@ sub message_like {
 
 sub message_ok {
   my ($self, $desc) = @_;
-  return $self->_test('ok', !!$self->_wait(1), $desc, 'message received');
+  return $self->_test('ok', !!$self->_wait, $desc, 'message received');
 }
 
 sub message_unlike {
@@ -332,13 +332,13 @@ sub _get_content {
 sub _json {
   my ($self, $method, $p) = @_;
   return Mojo::JSON::Pointer->new->$method(
-    Mojo::JSON->new->decode(@{$self->_wait || []}[1]), $p);
+    Mojo::JSON->new->decode(@{$self->message}[1]), $p);
 }
 
 sub _message {
   my ($self, $name, $value, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  my ($type, $msg) = @{$self->_wait || ['']};
+  my ($type, $msg) = @{$self->message};
 
   # Type check
   if (ref $value eq 'HASH') {
@@ -377,16 +377,7 @@ sub _text {
 }
 
 sub _wait {
-  my ($self, $wait) = @_;
-
-  # DEPRECATED in Rainbow!
-  my $new = $self->{new} //= $wait;
-  deprecated
-    'Testing WebSocket messages without Test::Mojo::message_ok is DEPRECATED'
-    unless $new;
-  return $self->message if $new && !$wait;
-
-  # Wait for message
+  my $self = shift;
   Mojo::IOLoop->one_tick while !$self->{finished} && !@{$self->{messages}};
   return $self->message(shift @{$self->{messages}})->message;
 }

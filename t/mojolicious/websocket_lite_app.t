@@ -133,17 +133,17 @@ $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
 $t->websocket_ok('/echo');
 is $t->tx->max_websocket_size, 262144, 'right size';
 $t->tx->max_websocket_size(262145);
-$t->send_ok({binary => 'x' x 262145})
-  ->message_ok->message_is({binary => 'x' x 262145})
+$t->send_ok({binary => 'a' x 262145})
+  ->message_ok->message_is({binary => 'a' x 262145})
   ->finish_ok->finished_ok(1005);
 
 # 64bit binary message (too large)
-$t->websocket_ok('/echo')->send_ok({binary => 'x' x 262145})
+$t->websocket_ok('/echo')->send_ok({binary => 'b' x 262145})
   ->finished_ok(1009);
 
 # Binary message in two 64bit frames without FIN bit (too large)
-$t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'x' x 100000])
-  ->send_ok([0, 0, 0, 0, 0, 'x' x 162146])->finished_ok(1009);
+$t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'c' x 100000])
+  ->send_ok([0, 0, 0, 0, 0, 'c' x 162146])->finished_ok(1009);
 
 # Plain alternative
 $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');

@@ -191,7 +191,7 @@ $t->websocket_ok('/unicode')->send_ok('hello again')
   ->send_ok('and one ☃ more time')
   ->message_ok->message_is('♥: and one ☃ more time')->finish_ok;
 
-# Binary frame and frame event
+# Binary frame and events
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
 $t->websocket_ok('/bytes');
 my $binary;
@@ -201,11 +201,15 @@ $t->tx->on(
     $binary++ if $frame->[4] == 2;
   }
 );
+my $close;
+$t->tx->on(finish => sub { shift; $close = [@_] });
 $t->send_ok({binary => $bytes})->message_ok->message_is($bytes);
 ok $binary, 'received binary frame';
 $binary = undef;
-$t->send_ok({text => $bytes})->message_ok->message_is($bytes)->finish_ok;
+$t->send_ok({text => $bytes})->message_ok->message_is($bytes);
 ok !$binary, 'received text frame';
+$t->finish_ok(1000 => 'Have a nice day!');
+is_deeply $close, [1000, 'Have a nice day!'], 'right status and message';
 
 # Binary roundtrips
 $t->websocket_ok('/bytes')->send_ok({binary => $bytes})

@@ -109,7 +109,7 @@ sub connection { shift->handshake->connection }
 sub finish {
   my ($self, $code) = @_;
   my $payload = $code ? pack('n', $code) : '';
-  $self->{status} = $code ? $code : 1005;
+  $self->{status} //= $code ? $code : 1005;
   $self->send([1, 0, 0, 0, CLOSE, $payload])->{finished} = 1;
   return $self;
 }

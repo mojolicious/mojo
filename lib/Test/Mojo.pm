@@ -111,7 +111,7 @@ sub finish_ok {
 sub finished_ok {
   my ($self, $code) = @_;
   Mojo::IOLoop->one_tick while !$self->{finished};
-  return $self->_test('is', $code, $self->{finished}, 'finished websocket');
+  return $self->_test('is', $self->{finished}, $code, 'finished websocket');
 }
 
 sub get_ok  { shift->_request_ok(get  => @_) }

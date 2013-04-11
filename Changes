@@ -7,6 +7,7 @@
   - Improved documentation. (jberger, sri)
   - Improved tests.
   - Fixed a few small timing bugs in Mojo::Server::Daemon.
+  - Fixed small description bug in Test::Mojo.
 
 3.94  2013-04-08
   - Added is_hidden method to Mojolicious::Routes.

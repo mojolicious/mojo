@@ -205,7 +205,7 @@ sub message_like {
 
 sub message_ok {
   my ($self, $desc) = @_;
-  return $self->_test('ok', !!$self->_wait, $desc, 'message received');
+  return $self->_test('ok', !!$self->_wait, $desc || 'message received');
 }
 
 sub message_unlike {

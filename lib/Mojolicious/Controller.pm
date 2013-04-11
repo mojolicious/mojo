@@ -64,20 +64,20 @@ sub cookie {
 }
 
 sub finish {
-  my ($self, $chunk) = @_;
+  my $self = shift;
 
   # WebSocket
   my $tx = $self->tx;
-  $tx->finish($chunk) and return $self if $tx->is_websocket;
+  $tx->finish(@_) and return $self if $tx->is_websocket;
 
   # Chunked stream
   if ($tx->res->is_chunked) {
-    $self->write_chunk($chunk) if defined $chunk;
+    $self->write_chunk(@_) if @_;
     return $self->write_chunk('');
   }
 
   # Normal stream
-  $self->write($chunk) if defined $chunk;
+  $self->write(@_) if @_;
   return $self->write('');
 }
 
@@ -553,6 +553,7 @@ Access request cookie values and create new response cookies.
 
   $c = $c->finish;
   $c = $c->finish(1000);
+  $c = $c->finish(1003, 'What was that?');
   $c = $c->finish('Bye!');
 
 Gracefully end WebSocket connection or long poll stream.

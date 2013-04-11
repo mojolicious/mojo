@@ -59,7 +59,7 @@ websocket '/socket' => sub {
     $self->req->headers->host => sub {
       my $self = shift;
       $self->send(Mojo::IOLoop->stream($self->tx->connection)->timeout);
-      $self->finish(1000);
+      $self->finish(1000, 'I ♥ Mojolicious!');
     }
   );
 };
@@ -207,15 +207,16 @@ my $sock = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $sock->blocking(0);
 $tx->connection($sock);
 $result = '';
-my ($local, $early, $status);
+my ($local, $early, $status, $msg);
 $ua->start(
   $tx => sub {
     my ($ua, $tx) = @_;
     $early = $finished;
     $tx->on(
       finish => sub {
-        my ($tx, $code) = @_;
+        my ($tx, $code, $reason) = @_;
         $status = $code;
+        $msg    = $reason;
         Mojo::IOLoop->stop;
       }
     );
@@ -233,6 +234,7 @@ Mojo::IOLoop->start;
 is $finished, 1,    'finish event has been emitted';
 is $early,    1,    'finish event has been emitted at the right time';
 is $status,   1000, 'right status';
+is $msg, 'I ♥ Mojolicious!', 'right message';
 ok $result =~ /^lalala(\d+)$/, 'right result';
 is $1, 15, 'right timeout';
 ok $local, 'local port';
@@ -467,8 +469,8 @@ Mojo::IOLoop->start;
 is $result, 'foo bar', 'right result';
 
 # Dies
-($finished, $code) = ();
-my ($websocket, $msg);
+($finished, $code, $msg) = ();
+my $websocket;
 $ua->websocket(
   '/dead' => sub {
     my ($ua, $tx) = @_;

@@ -107,10 +107,14 @@ sub client_write { shift->server_write(@_) }
 sub connection { shift->handshake->connection }
 
 sub finish {
-  my ($self, $code) = @_;
-  my $payload = $code ? pack('n', $code) : '';
-  $self->{status} //= $code ? $code : 1005;
+  my $self = shift;
+
+  my $close = $self->{close} = [@_];
+  my $payload = $close->[0] ? pack('n', $close->[0]) : '';
+  $payload .= encode 'UTF-8', $close->[1] if defined $close->[1];
+  $close->[0] //= 1005;
   $self->send([1, 0, 0, 0, CLOSE, $payload])->{finished} = 1;
+
   return $self;
 }
 
@@ -217,7 +221,7 @@ sub send {
 sub server_close {
   my $self = shift;
   $self->{state} = 'finished';
-  return $self->emit(finish => $self->{status} // 1006);
+  return $self->emit(finish => $self->{close} ? (@{$self->{close}}) : 1006);
 }
 
 sub server_handshake {
@@ -269,10 +273,11 @@ sub _message {
 
   # Close
   if ($op == CLOSE) {
-    my $code;
-    $code = unpack 'n', substr($frame->[5], 0, 2) if length $frame->[5] >= 2;
-    $self->{status} = $code // 1005;
-    return $self->finish($code);
+    return $self->finish(1005) unless length $frame->[5] >= 2;
+    my $close = $self->{close} = [];
+    $close->[0] = unpack 'n', substr($frame->[5], 0, 2, '');
+    $close->[1] = decode 'UTF-8', $frame->[5];
+    return $self->finish(@$close);
   }
 
   # Append chunk and check message size
@@ -358,7 +363,7 @@ Emitted once all data has been sent.
 =head2 finish
 
   $ws->on(finish => sub {
-    my ($ws, $code) = @_;
+    my ($ws, $code, $reason) = @_;
     ...
   });
 
@@ -513,6 +518,7 @@ Connection identifier or socket.
 
   $ws = $ws->finish;
   $ws = $ws->finish(1000);
+  $ws = $ws->finish(1003, 'What was that?');
 
 Finish the WebSocket connection gracefully.
 

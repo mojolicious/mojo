@@ -111,7 +111,7 @@ sub finish_ok {
 sub finished_ok {
   my ($self, $code) = @_;
   Mojo::IOLoop->one_tick while !$self->{finished};
-  return $self->_test('is', $self->{finished}, $code, 'finished websocket');
+  return $self->_test('is', $self->{finished}[0], $code, 'finished websocket');
 }
 
 sub get_ok  { shift->_request_ok(get  => @_) }
@@ -305,12 +305,12 @@ sub websocket_ok {
 
   # Establish WebSocket connection
   $self->{messages} = [];
-  $self->{finished} = 0;
+  $self->{finished} = undef;
   $self->ua->websocket(
     $url => @_ => sub {
       my ($ua, $tx) = @_;
       $self->tx($tx);
-      $tx->on(finish => sub { $self->{finished} = pop });
+      $tx->on(finish => sub { shift; $self->{finished} = [@_] });
       $tx->on(binary => sub { push @{$self->{messages}}, [binary => pop] });
       $tx->on(text   => sub { push @{$self->{messages}}, [text   => pop] });
       Mojo::IOLoop->stop;
@@ -606,6 +606,7 @@ Opposite of C<element_exists>.
 
   $t = $t->finish_ok;
   $t = $t->finish_ok(1000);
+  $t = $t->finish_ok(1003, 'What was that?');
 
 Finish WebSocket connection gracefully.
 

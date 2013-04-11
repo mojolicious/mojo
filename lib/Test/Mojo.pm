@@ -103,9 +103,15 @@ sub element_exists_not {
 
 sub finish_ok {
   my $self = shift;
-  $self->tx->finish;
+  $self->tx->finish(@_);
   Mojo::IOLoop->one_tick while !$self->{finished};
   return $self->_test('ok', 1, 'finished websocket');
+}
+
+sub finished_ok {
+  my ($self, $code) = @_;
+  Mojo::IOLoop->one_tick while !$self->{finished};
+  return $self->_test('is', $code, $self->{finished}, 'finished websocket');
 }
 
 sub get_ok  { shift->_request_ok(get  => @_) }
@@ -304,7 +310,7 @@ sub websocket_ok {
     $url => @_ => sub {
       my ($ua, $tx) = @_;
       $self->tx($tx);
-      $tx->on(finish => sub { $self->{finished} = 1 });
+      $tx->on(finish => sub { $self->{finished} = pop });
       $tx->on(binary => sub { push @{$self->{messages}}, [binary => pop] });
       $tx->on(text   => sub { push @{$self->{messages}}, [text   => pop] });
       Mojo::IOLoop->stop;
@@ -599,8 +605,15 @@ Opposite of C<element_exists>.
 =head2 finish_ok
 
   $t = $t->finish_ok;
+  $t = $t->finish_ok(1000);
 
-Finish C<WebSocket> connection.
+Finish WebSocket connection gracefully.
+
+=head2 finished_ok
+
+  $t = $t->finished_ok(1000);
+
+Wait for WebSocket connection to finish gracefully and check status.
 
 =head2 get_ok
 
@@ -899,7 +912,7 @@ Opposite of C<text_like>.
   $t = $t->websocket_ok('/echo');
   $t = $t->websocket_ok('/echo' => {DNT => 1});
 
-Open a C<WebSocket> connection with transparent handshake, takes the same
+Open a WebSocket connection with transparent handshake, takes the same
 arguments as L<Mojo::UserAgent/"websocket">, except for the callback.
 
 =head1 SEE ALSO

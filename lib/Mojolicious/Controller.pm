@@ -68,7 +68,7 @@ sub finish {
 
   # WebSocket
   my $tx = $self->tx;
-  $tx->finish and return $self if $tx->is_websocket;
+  $tx->finish($chunk) and return $self if $tx->is_websocket;
 
   # Chunked stream
   if ($tx->res->is_chunked) {
@@ -552,6 +552,7 @@ Access request cookie values and create new response cookies.
 =head2 finish
 
   $c = $c->finish;
+  $c = $c->finish(1000);
   $c = $c->finish('Bye!');
 
 Gracefully end WebSocket connection or long poll stream.

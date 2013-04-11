@@ -1037,7 +1037,7 @@ more argument variations.
   my $route = websocket '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"websocket">, matching only
-C<WebSocket> handshakes. See also the tutorial above for more argument
+WebSocket handshakes. See also the tutorial above for more argument
 variations.
 
 =head1 ATTRIBUTES

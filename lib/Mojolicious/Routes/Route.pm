@@ -590,7 +590,7 @@ restrictions.
 
   my $websocket = $r->websocket('/:foo' => sub {...});
 
-Generate route matching only C<WebSocket> handshakes. See also the
+Generate route matching only WebSocket handshakes. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->websocket('/echo')->to('example#echo');

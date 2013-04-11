@@ -12,7 +12,7 @@ has res => sub { Mojo::Message::Response->new };
 sub client_close {
   my $self = shift;
   $self->res->finish;
-  return $self->server_close(@_);
+  return $self->server_close;
 }
 
 sub client_read  { croak 'Method "client_read" not implemented by subclass' }

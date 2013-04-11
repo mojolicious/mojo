@@ -1,5 +1,7 @@
 
 3.95  2013-04-11
+  - Added finished_ok method to Test::Mojo.
+  - Improved Mojo::Transaction::WebSocket with support for status codes.
   - Improved documentation. (jberger, sri)
   - Improved tests.
   - Fixed a few small timing bugs in Mojo::Server::Daemon.

@@ -92,7 +92,7 @@ websocket sub {
   $self->on(
     message => sub {
       my ($self, $msg) = @_;
-      $self->send("nested echo: $msg$echo");
+      $self->send("nested echo: $msg$echo")->finish(1000);
     }
   );
 };
@@ -126,14 +126,20 @@ $t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})
 
 # Zero
 $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
-  ->send_ok(0)->message_ok->message_like({text => qr/0/})->finish_ok;
+  ->send_ok(0)->message_ok->message_like({text => qr/0/})->finish_ok(1000)
+  ->finished_ok(1000);
 
 # 64bit binary message (extended limit)
 $t->websocket_ok('/echo');
 is $t->tx->max_websocket_size, 262144, 'right size';
 $t->tx->max_websocket_size(262145);
 $t->send_ok({binary => 'x' x 262145})
-  ->message_ok->message_is({binary => 'x' x 262145})->finish_ok;
+  ->message_ok->message_is({binary => 'x' x 262145})
+  ->finish_ok->finished_ok(1005);
+
+# 64bit binary message (too large)
+$t->websocket_ok('/echo')->send_ok({binary => 'x' x 262145})
+  ->finished_ok(1009);
 
 # Plain alternative
 $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
@@ -210,7 +216,7 @@ $t->websocket_ok('/once')->send_ok('hello')
 
 # Nested WebSocket
 $t->websocket_ok('/nested')->send_ok('hello')
-  ->message_ok->message_is('nested echo: hello')->finish_ok;
+  ->message_ok->message_is('nested echo: hello')->finished_ok(1000);
 
 # Test custom message
 $t->message([binary => 'foobarbaz'])->message_like(qr/bar/)
@@ -218,7 +224,7 @@ $t->message([binary => 'foobarbaz'])->message_like(qr/bar/)
 
 # Nested WebSocket with cookie
 $t->websocket_ok('/nested')->send_ok('hello')
-  ->message_ok->message_is('nested echo: helloagain')->finish_ok;
+  ->message_ok->message_is('nested echo: helloagain')->finished_ok(1000);
 
 # Nested plain request
 $t->get_ok('/nested')->status_is(200)->content_is('plain nested!');

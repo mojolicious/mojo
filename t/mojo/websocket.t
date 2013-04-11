@@ -59,7 +59,7 @@ websocket '/socket' => sub {
     $self->req->headers->host => sub {
       my $self = shift;
       $self->send(Mojo::IOLoop->stream($self->tx->connection)->timeout);
-      $self->finish;
+      $self->finish(1000);
     }
   );
 };
@@ -139,9 +139,9 @@ websocket '/dead' => sub { die 'i see dead processes' };
 websocket '/foo' =>
   sub { shift->rendered->res->code('403')->message("i'm a teapot") };
 
-websocket '/deadcallback' => sub {
+websocket '/close' => sub {
   my $self = shift;
-  $self->on(message => sub { die 'i see dead callbacks' });
+  $self->on(message => sub { Mojo::IOLoop->remove(shift->tx->connection) });
 };
 
 my $timeout;
@@ -207,12 +207,18 @@ my $sock = IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => $port);
 $sock->blocking(0);
 $tx->connection($sock);
 $result = '';
-my ($local, $early);
+my ($local, $early, $status);
 $ua->start(
   $tx => sub {
     my ($ua, $tx) = @_;
     $early = $finished;
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(
+      finish => sub {
+        my ($tx, $code) = @_;
+        $status = $code;
+        Mojo::IOLoop->stop;
+      }
+    );
     $tx->on(
       message => sub {
         my ($tx, $msg) = @_;
@@ -224,8 +230,9 @@ $ua->start(
   }
 );
 Mojo::IOLoop->start;
-is $finished, 1, 'finish event has been emitted';
-is $early,    1, 'finish event has been emitted at the right time';
+is $finished, 1,    'finish event has been emitted';
+is $early,    1,    'finish event has been emitted at the right time';
+is $status,   1000, 'right status';
 ok $result =~ /^lalala(\d+)$/, 'right result';
 is $1, 15, 'right timeout';
 ok $local, 'local port';
@@ -303,18 +310,26 @@ is $finished, 4,            'finished client websocket';
 is $subreq,   1,            'finished server websocket';
 
 # 64bit message (too large)
+$status = undef;
 my ($echo, $size);
 $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
     $tx->on(message => sub { $echo = pop });
-    $tx->on(finish => sub { Mojo::IOLoop->stop });
+    $tx->on(
+      finish => sub {
+        my ($tx, $code) = @_;
+        $status = $code;
+        Mojo::IOLoop->stop;
+      }
+    );
     $tx->send('x' x 262145);
     $size = $tx->max_websocket_size;
   }
 );
 Mojo::IOLoop->start;
-is $size, 262144, 'right size';
+is $size,   262144, 'right size';
+is $status, 1009,   'right status';
 ok !$echo, 'no echo';
 
 # Parallel subrequests
@@ -486,14 +501,23 @@ ok !$websocket, 'no websocket';
 is $code, 403,            'right status';
 is $msg,  "i'm a teapot", 'right message';
 
-# Dies in callback
+# Connection close
+$status = undef;
 $ua->websocket(
-  '/deadcallback' => sub {
-    pop->send('test1');
-    Mojo::IOLoop->stop;
+  '/close' => sub {
+    my ($ua, $tx) = @_;
+    $tx->on(
+      finish => sub {
+        my ($tx, $code) = @_;
+        $status = $code;
+        Mojo::IOLoop->stop;
+      }
+    );
+    $tx->send('test1');
   }
 );
 Mojo::IOLoop->start;
+is $status, 1006, 'right status';
 
 # 16bit length
 $result = undef;

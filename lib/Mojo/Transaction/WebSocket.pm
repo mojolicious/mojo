@@ -107,8 +107,10 @@ sub client_write { shift->server_write(@_) }
 sub connection { shift->handshake->connection }
 
 sub finish {
-  my $self = shift;
-  $self->send([1, 0, 0, 0, CLOSE, ''])->{finished} = 1;
+  my ($self, $code) = @_;
+  my $payload = $code ? pack('n', $code) : '';
+  $self->{status} = $code ? $code : 1005;
+  $self->send([1, 0, 0, 0, CLOSE, $payload])->{finished} = 1;
   return $self;
 }
 
@@ -160,7 +162,7 @@ sub parse_frame {
   }
 
   # Check message size
-  $self->finish and return undef if $len > $self->max_websocket_size;
+  $self->finish(1009) and return undef if $len > $self->max_websocket_size;
 
   # Check if whole packet has arrived
   my $masked = vec($head, 1, 8) & 0b10000000;
@@ -212,6 +214,12 @@ sub send {
   return $self->emit('resume');
 }
 
+sub server_close {
+  my $self = shift;
+  $self->{state} = 'finished';
+  return $self->emit(finish => $self->{status} // 1006);
+}
+
 sub server_handshake {
   my $self = shift;
 
@@ -260,12 +268,17 @@ sub _message {
   return if $op == PONG;
 
   # Close
-  return $self->finish if $op == CLOSE;
+  if ($op == CLOSE) {
+    my $code;
+    $code = unpack 'n', substr($frame->[5], 0, 2) if length $frame->[5] >= 2;
+    $self->{status} = $code // 1005;
+    return $self->finish($code);
+  }
 
   # Append chunk and check message size
   $self->{op} = $op unless exists $self->{op};
   $self->{message} .= $frame->[5];
-  $self->finish and last
+  $self->finish(1009) and last
     if length $self->{message} > $self->max_websocket_size;
 
   # No FIN bit (Continuation)
@@ -341,6 +354,15 @@ Emitted once all data has been sent.
     my $ws = shift;
     $ws->send(time);
   });
+
+=head2 finish
+
+  $ws->on(finish => sub {
+    my ($ws, $code) = @_;
+    ...
+  });
+
+Emitted when transaction is finished.
 
 =head2 frame
 
@@ -490,6 +512,7 @@ Connection identifier or socket.
 =head2 finish
 
   $ws = $ws->finish;
+  $ws = $ws->finish(1000);
 
 Finish the WebSocket connection gracefully.
 
@@ -576,6 +599,12 @@ will be invoked once all data has been written.
 
   # Send "Ping" frame
   $ws->send([1, 0, 0, 0, 9, 'Hello World!']);
+
+=head2 server_close
+
+  $ws->server_close;
+
+Transaction closed server-side, used to implement web servers.
 
 =head2 server_handshake
 

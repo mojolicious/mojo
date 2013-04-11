@@ -292,7 +292,7 @@ sub _message {
   my $msg = delete $self->{message};
   if (delete $self->{op} == TEXT) {
     $self->emit(text => $msg);
-    $msg = decode 'UTF-8', $msg if $msg;
+    $msg = decode 'UTF-8', $msg;
   }
   else { $self->emit(binary => $msg); }
   $self->emit(message => $msg);
@@ -464,14 +464,14 @@ C<CLOSE> frames automatically.
 
 Build WebSocket frame.
 
-  # Continuation frame with FIN bit and payload
-  say $ws->build_frame(1, 0, 0, 0, 0, 'World!');
-
-  # Text frame with payload
-  say $ws->build_frame(0, 0, 0, 0, 1, 'Hello');
-
   # Binary frame with FIN bit and payload
   say $ws->build_frame(1, 0, 0, 0, 2, 'Hello World!');
+
+  # Text frame with payload but without FIN bit
+  say $ws->build_frame(0, 0, 0, 0, 1, 'Hello ');
+
+  # Continuation frame with FIN bit and payload
+  say $ws->build_frame(1, 0, 0, 0, 0, 'World!');
 
   # Close frame with FIN bit and without payload
   say $ws->build_frame(1, 0, 0, 0, 8, '');

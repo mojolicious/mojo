@@ -599,13 +599,13 @@ Opposite of C<element_exists>.
   $t = $t->finish_ok(1000);
   $t = $t->finish_ok(1003 => 'Cannot accept data!');
 
-Finish WebSocket connection gracefully.
+Close WebSocket connection gracefully.
 
 =head2 finished_ok
 
   $t = $t->finished_ok(1000);
 
-Wait for WebSocket connection to finish gracefully and check status.
+Wait for WebSocket connection to be closed gracefully and check status.
 
 =head2 get_ok
 

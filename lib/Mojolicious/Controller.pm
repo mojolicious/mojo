@@ -556,7 +556,7 @@ Access request cookie values and create new response cookies.
   $c = $c->finish(1003 => 'Cannot accept data!');
   $c = $c->finish('Bye!');
 
-Gracefully end WebSocket connection or long poll stream.
+Close WebSocket connection or long poll stream gracefully.
 
 =head2 flash
 

@@ -1007,7 +1007,10 @@ L<Mojo::Transaction::HTTP> object.
   $ua->websocket('ws://localhost:3000/echo' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
-    $tx->on(finish  => sub { say 'WebSocket closed.' });
+    $tx->on(finish => sub {
+      my ($tx, $code, $reason) = @_;
+      say "WebSocket closed with status $code.";
+    });
     $tx->on(message => sub {
       my ($tx, $msg) = @_;
       say "WebSocket message: $msg";

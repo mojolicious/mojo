@@ -314,8 +314,8 @@ Mojo::Transaction::WebSocket - WebSocket transaction
     say "Message: $msg";
   });
   $ws->on(finish => sub {
-    my $ws = shift;
-    say 'WebSocket closed.';
+    my ($ws, $code, $reason) = @_;
+    say "WebSocket closed with status $code.";
   });
 
 =head1 DESCRIPTION
@@ -517,7 +517,7 @@ Connection identifier or socket.
   $ws = $ws->finish(1000);
   $ws = $ws->finish(1003 => 'Cannot accept data!');
 
-Finish the WebSocket connection gracefully.
+Close WebSocket connection gracefully.
 
 =head2 is_websocket
 

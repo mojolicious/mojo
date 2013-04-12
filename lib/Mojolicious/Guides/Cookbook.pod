@@ -464,8 +464,8 @@ method L<Mojolicious::Controller/"on">.
   websocket '/echo' => sub {
     my $self = shift;
 
-    # Connected
-    $self->app->log->debug('WebSocket connected.');
+    # Opened
+    $self->app->log->debug('WebSocket opened.');
 
     # Increase inactivity timeout for connection a bit
     Mojo::IOLoop->stream($self->tx->connection)->timeout(300);
@@ -476,10 +476,10 @@ method L<Mojolicious::Controller/"on">.
       $self->send("echo: $msg");
     });
 
-    # Disconnected
+    # Closed
     $self->on(finish => sub {
-      my $self = shift;
-      $self->app->log->debug('WebSocket disconnected.');
+      my ($self, $code, $reason) = @_;
+      $self->app->log->debug("WebSocket closed with status $code.");
     });
   };
 

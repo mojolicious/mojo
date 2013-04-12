@@ -105,13 +105,13 @@ sub finish_ok {
   my $self = shift;
   $self->tx->finish(@_);
   Mojo::IOLoop->one_tick while !$self->{finished};
-  return $self->_test('ok', 1, 'finished websocket');
+  return $self->_test('ok', 1, 'finished WebSocket');
 }
 
 sub finished_ok {
   my ($self, $code) = @_;
   Mojo::IOLoop->one_tick while !$self->{finished};
-  return $self->_test('is', $self->{finished}[0], $code, 'finished websocket');
+  return $self->_test('is', $self->{finished}[0], $code, 'finished WebSocket');
 }
 
 sub get_ok  { shift->_request_ok(get  => @_) }
@@ -230,7 +230,7 @@ sub post_form_ok {
     'Test::Mojo::post_form_ok is DEPRECATED in favor of Test::Mojo::post_ok';
   my ($self, $url) = (shift, shift);
   my $tx = $self->tx($self->ua->post_form($url, @_))->tx;
-  return $self->_test('ok', $tx->is_finished, encode('UTF-8', "post $url"));
+  return $self->_test('ok', $tx->is_finished, encode('UTF-8', "POST $url"));
 }
 
 # DEPRECATED in Rainbow!
@@ -239,7 +239,7 @@ sub post_json_ok {
     'Test::Mojo::post_json_ok is DEPRECATED in favor of Test::Mojo::post_ok';
   my ($self, $url) = (shift, shift);
   my $tx = $self->tx($self->ua->post_json($url, @_))->tx;
-  return $self->_test('ok', $tx->is_finished, encode('UTF-8', "post $url"));
+  return $self->_test('ok', $tx->is_finished, encode('UTF-8', "POST $url"));
 }
 
 sub put_ok { shift->_request_ok(put => @_) }
@@ -318,7 +318,7 @@ sub websocket_ok {
   );
   Mojo::IOLoop->start;
 
-  my $desc = encode 'UTF-8', "websocket $url";
+  my $desc = encode 'UTF-8', "WebSocket $url";
   return $self->_test('ok', $self->tx->res->code eq 101, $desc);
 }
 
@@ -361,7 +361,7 @@ sub _request_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   my ($err, $code) = $self->tx->error;
   Test::More::diag $err if !(my $ok = !$err || $code) && $err;
-  return $self->_test('ok', $ok, encode('UTF-8', "$method $url"));
+  return $self->_test('ok', $ok, encode('UTF-8', "@{[uc $method]} $url"));
 }
 
 sub _test {

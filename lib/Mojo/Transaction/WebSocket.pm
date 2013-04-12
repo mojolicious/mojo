@@ -272,11 +272,9 @@ sub _message {
 
   # Close
   if ($op == CLOSE) {
-    return $self->finish(1005) unless length $frame->[5] >= 2;
-    my $close = $self->{close} = [];
-    $close->[0] = unpack 'n', substr($frame->[5], 0, 2, '');
-    $close->[1] = decode 'UTF-8', $frame->[5];
-    return $self->finish(@$close);
+    return $self->finish unless length $frame->[5] >= 2;
+    return $self->finish(unpack('n', substr($frame->[5], 0, 2, '')),
+      decode('UTF-8', $frame->[5]));
   }
 
   # Append chunk and check message size

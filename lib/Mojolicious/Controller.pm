@@ -691,7 +691,9 @@ be encoded. All additional values get merged into the C<stash>.
   $c->render_exception(Mojo::Exception->new('Oops!'));
 
 Render the exception template C<exception.$mode.$format.*> or
-C<exception.$format.*> and set the response status code to C<500>.
+C<exception.$format.*> and set the response status code to C<500>. Also sets
+the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot>
+to a copy of the C<stash> for use in the templates.
 
 =head2 render_json
 

@@ -1,6 +1,7 @@
 
 3.96  2013-04-13
   - Improved default descriptions in Test::Mojo.
+  - Improved documentation.
 
 3.95  2013-04-12
   - Added finished_ok method to Test::Mojo.

@@ -195,7 +195,7 @@ simple to deploy with L<Plack>.
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
 L<Plack> provides many server and protocol adapters for you to choose from,
-such as C<FCGI>, C<SCGI> and C<mod_perl>.
+such as C<FCGI>, C<uWSGI> and C<mod_perl>.
 
   $ plackup ./script/myapp -s FCGI -l /tmp/myapp.sock
 

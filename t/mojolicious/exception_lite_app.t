@@ -64,12 +64,13 @@ get '/trapped/too' => sub {
   $self->render_text("$@" || 'failed');
 };
 
-# Reuse exception
-my $exception;
+# Reuse exception and snapshot
+my ($exception, $snapshot);
 hook after_dispatch => sub {
   my $self = shift;
   return unless $self->req->url->path->contains('/reuse/exception');
   $exception = $self->stash('exception');
+  $snapshot  = $self->stash('snapshot');
 };
 
 # Custom exception handling
@@ -81,7 +82,8 @@ hook around_dispatch => sub {
   }
 };
 
-get '/reuse/exception' => sub { die "Reusable exception.\n" };
+get '/reuse/exception' => {foo => 'bar'} =>
+  sub { die "Reusable exception.\n" };
 
 get '/custom' => sub { die "CUSTOM\n" };
 
@@ -182,10 +184,13 @@ $t->get_ok('/missing_template.json')->status_is(404)
 
 # Reuse exception
 ok !$exception, 'no exception';
+ok !$snapshot,  'no snapshot';
 $t->get_ok('/reuse/exception')->status_is(500)
   ->content_like(qr/Reusable exception/);
 isa_ok $exception, 'Mojo::Exception',      'right exception class';
 like $exception,   qr/Reusable exception/, 'right exception';
+is $snapshot->{foo}, 'bar', 'right snapshot value';
+ok !$snapshot->{exception}, 'no exception in snapshot';
 
 # Bundled static files
 $t->get_ok('/mojo/jquery/jquery.js')->status_is(200)

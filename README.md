@@ -23,8 +23,8 @@
     recommended, and optional CPAN modules will be used to provide advanced
     functionality if they are installed).
   * Full stack HTTP and WebSocket client/server implementation with IPv6, TLS,
-    SNI, IDNA, Comet (long polling), keep-alive, connection pooling, timeouts
-    and gzip compression support.
+    SNI, IDNA, Comet (long polling), keep-alive, connection pooling, timeout,
+    cookie, multipart, proxy, and gzip compression support.
   * Built-in non-blocking I/O web server, supporting multiple event loops and
     hot deployment, perfect for embedding.
   * Automatic CGI and [PSGI](http://plackperl.org) detection.

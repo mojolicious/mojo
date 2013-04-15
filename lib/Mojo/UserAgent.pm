@@ -180,7 +180,7 @@ sub _cleanup {
   # Clean up active connections (by closing them)
   $self->_handle($_ => 1) for keys %{$self->{connections} || {}};
 
-  # Clean up keep alive connections
+  # Clean up keep-alive connections
   $loop->remove($_->[1]) for @{delete $self->{cache} || []};
 
   # Stop server
@@ -590,8 +590,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 =head1 DESCRIPTION
 
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
-agent, with C<IPv6>, C<TLS>, C<SNI>, C<IDNA>, C<Comet> (long polling), C<gzip>
-compression and multiple event loop support.
+agent, with C<IPv6>, C<TLS>, C<SNI>, C<IDNA>, C<Comet> (long polling),
+C<keep-alive>, connection pooling, timeouts, C<gzip> compression and multiple
+event loop support.
 
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently through
@@ -730,7 +731,7 @@ Local address to bind to.
   my $max = $ua->max_connections;
   $ua     = $ua->max_connections(5);
 
-Maximum number of keep alive connections that the user agent will retain
+Maximum number of keep-alive connections that the user agent will retain
 before it starts closing the oldest cached ones, defaults to C<5>.
 
 =head2 max_redirects

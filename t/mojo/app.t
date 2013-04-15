@@ -103,14 +103,14 @@ ok $tx->keep_alive, 'will be kept alive';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
 
-# Keep alive request
+# Keep-alive request
 $tx = $ua->get('/normal/');
 ok $tx->keep_alive, 'will be kept alive';
 ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
 
-# Non keep alive request
+# Non keep-alive request
 $tx = $ua->get('/close/' => {Connection => 'close'});
 ok !$tx->keep_alive, 'will not be kept alive';
 ok $tx->kept_alive, 'was kept alive';
@@ -118,7 +118,7 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->headers->connection, 'close', 'right "Connection" value';
 is $tx->res->body, 'Whatever!', 'right content';
 
-# Second non keep alive request
+# Second non keep-alive request
 $tx = $ua->get('/close/' => {Connection => 'close'});
 ok !$tx->keep_alive, 'will not be kept alive';
 ok !$tx->kept_alive, 'was not kept alive';

@@ -215,7 +215,7 @@ sub _read {
   warn "-- Server <<< Client (@{[$tx->req->url->to_abs]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
 
-  # Last keep alive request or corrupted connection
+  # Last keep-alive request or corrupted connection
   $tx->res->headers->connection('close')
     if (($c->{requests} || 0) >= $self->max_requests) || $tx->req->error;
 
@@ -292,8 +292,8 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP and WebSocket server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured, highly portable non-blocking I/O
-HTTP and WebSocket server, with C<IPv6>, C<TLS>, C<Comet> (long polling) and
-multiple event loop support.
+HTTP and WebSocket server, with C<IPv6>, C<TLS>, C<Comet> (long polling),
+C<keep-alive>, connection pooling, timeouts and multiple event loop support.
 
 Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
 L<IO::Socket::SSL> (1.75+) are supported transparently through
@@ -398,7 +398,7 @@ Maximum number of parallel client connections, defaults to C<1000>.
   my $max = $daemon->max_requests;
   $daemon = $daemon->max_requests(100);
 
-Maximum number of keep alive requests per connection, defaults to C<25>.
+Maximum number of keep-alive requests per connection, defaults to C<25>.
 
 =head2 silent
 

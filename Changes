@@ -1,5 +1,5 @@
 
-3.96  2013-04-14
+3.96  2013-04-16
   - Improved default descriptions in Test::Mojo.
   - Improved documentation.
   - Improved tests.
@@ -322,7 +322,7 @@
 3.59  2012-11-20
   - Improved tests.
   - Fixed memory leak in Mojo::Message::Request.
-  - Fixed keep alive bug in Mojo::Server::Daemon.
+  - Fixed keep-alive bug in Mojo::Server::Daemon.
 
 3.58  2012-11-19
   - Improved documentation.
@@ -881,7 +881,7 @@
   - Added support for alternative MIME types to Mojolicious::Types.
   - Added endpoint method to Mojo::UserAgent::Transactor.
   - Improved tests.
-  - Fixed HTTPS proxy keep alive bug in Mojo::UserAgent.
+  - Fixed HTTPS proxy keep-alive bug in Mojo::UserAgent.
 
 2.79  2012-04-10
   - Improved makefile and plugin generators to always use the latest
@@ -1372,7 +1372,7 @@
     Mojo::IOLoop::Stream::timeout.
   - Added EXPERIMENTAL timeout event to Mojo::IOLoop::Stream.
   - Added EXPERIMENTAL timeout attribute to Mojo::IOLoop::Stream.
-  - Changed default keep alive timeout of Mojo::UserAgent from 15 to 20
+  - Changed default keep-alive timeout of Mojo::UserAgent from 15 to 20
     seconds.
   - Improved documentation.
   - Improved Unicode tests.
@@ -1381,7 +1381,7 @@
 2.36  2011-12-05
   - Changed default heartbeat timeout of Hypnotoad from 5 to 10 seconds.
   - Improved documentation.
-  - Fixed default keep alive timeout of Hypnotoad.
+  - Fixed default keep-alive timeout of Hypnotoad.
 
 2.35  2011-12-01
   - Added EXPERIMENTAL etag method to Mojo::Headers.
@@ -1844,7 +1844,7 @@
   - Improved documentation.
 
 1.72  2011-08-05
-  - Changed default keep alive timeout in Mojo::Server::Daemon from 5 to 15
+  - Changed default keep-alive timeout in Mojo::Server::Daemon from 5 to 15
     seconds.
   - Improved documentation.
   - Fixed small alternative placeholder value bug in routes.
@@ -2528,7 +2528,7 @@
   - Improved RFC 3986 compliance of Mojo::Path. (janus)
   - Improved Mojo::Server::PSGI to preload applications.
   - Improved FastCGI detection for Dreamhost. (garu)
-  - Improved keep alive timeout handling in Mojo::Client.
+  - Improved keep-alive timeout handling in Mojo::Client.
   - Improved documentation. (rhaen)
   - Improved Mojo::ByteStream performance. (mons)
   - Improved Mojo::Parameters performance. (kimoto)
@@ -2674,7 +2674,7 @@
   - Improved routes by making the leading slash optional and storing route
     names in the stash.
   - Converted README to markdown. (memowe)
-  - Fixed connection keep alive with epoll.
+  - Fixed connection keep-alive with epoll.
   - Fixed bridge bug in MojoX::Routes::Match.
     (Oleg Zhelo, Dmitry Konstantinov)
   - Fixed argument handling of Mojo::Template blocks. (afresh1)
@@ -3005,7 +3005,7 @@
   - Fixed body callbacks to get automatic buffering.
   - Fixed a case where Mojo::Server::Daemon and Mojo::Client were too
     defensive and made them in turn 20 times faster.
-  - Fixed keep alive problem in Mojo::Transaction::Pipeline.
+  - Fixed keep-alive problem in Mojo::Transaction::Pipeline.
   - Fixed and simplified Mojo::Parameters. (gbarr)
   - Fixed xml_escape to use character semantics. (vti)
   - Fixed utf8 handling of routes captures. (vti)
@@ -3433,7 +3433,7 @@
   - Added prepare_parser and prepare_builder callbacks to Mojo::Message.
   - Added done and is_done to Mojo::Stateful.
   - Fixed many win32 related bugs.
-  - Fixed keep alive related bugs in daemon and client. (Pedro Melo)
+  - Fixed keep-alive related bugs in daemon and client. (Pedro Melo)
   - Allow default in Mojo::Base to have false values. (Pedro Melo)
   - Fixed chmod_rel_file in Mojo::Script. (Shu Cho).
   - Mojo::Base attributes can't start with a digit. (Shu Cho).

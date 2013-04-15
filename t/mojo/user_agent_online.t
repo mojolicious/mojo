@@ -95,7 +95,7 @@ is $tx->error, "Couldn't connect", 'right error';
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;
 
-# Keep alive
+# Keep-alive
 $ua->get('http://mojolicio.us' => sub { Mojo::IOLoop->singleton->stop });
 Mojo::IOLoop->singleton->start;
 my $kept_alive;
@@ -109,7 +109,7 @@ $ua->get(
 Mojo::IOLoop->singleton->start;
 ok $kept_alive, 'connection was kept alive';
 
-# Nested keep alive
+# Nested keep-alive
 my @kept_alive;
 $ua->get(
   'http://mojolicio.us' => sub {
@@ -136,7 +136,7 @@ is_deeply \@kept_alive, [1, 1, 1], 'connections kept alive';
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;
 
-# Custom non keep alive request
+# Custom non keep-alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://metacpan.org');
@@ -167,7 +167,7 @@ is $tx->req->method, 'GET',               'right method';
 is $tx->req->url,    'http://google.com', 'right url';
 is $tx->res->code,   301,                 'right status';
 
-# Simple keep alive requests
+# Simple keep-alive requests
 $tx = $ua->get('http://www.wikipedia.org');
 is $tx->req->method, 'GET',                      'right method';
 is $tx->req->url,    'http://www.wikipedia.org', 'right url';
@@ -214,7 +214,7 @@ like $ua->ioloop->stream($tx->connection)
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;
 
-# Simple keep alive form POST
+# Simple keep-alive form POST
 $tx = $ua->post(
   'http://search.cpan.org/search' => form => {query => 'mojolicious'});
 is $tx->req->method, 'POST', 'right method';

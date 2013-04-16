@@ -3,6 +3,7 @@
   - Improved default descriptions in Test::Mojo.
   - Improved documentation.
   - Improved tests.
+  - Fixed small html_unescape bug in Mojo::Util.
 
 3.95  2013-04-12
   - Added finished_ok method to Test::Mojo.

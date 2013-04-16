@@ -351,18 +351,19 @@ sub _adapt {
 }
 
 sub _decode {
+  my ($point, $name) = @_;
 
-  # Numeric
-  return substr($_[0], 0, 1) eq 'x' ? chr(hex $_[0]) : chr($_[0]) unless $_[1];
+  # Code point
+  return substr($point, 0, 1) eq 'x' ? chr(hex $point) : chr($point)
+    unless defined $name;
 
   # Find entity name
-  my $rest   = '';
-  my $entity = $_[1];
-  while (length $entity) {
-    return "$ENTITIES{$entity}$rest" if exists $ENTITIES{$entity};
-    $rest = chop($entity) . $rest;
+  my $rest = '';
+  while (length $name) {
+    return "$ENTITIES{$name}$rest" if exists $ENTITIES{$name};
+    $rest = chop($name) . $rest;
   }
-  return "&$_[1]";
+  return "&$rest";
 }
 
 sub _encoding {

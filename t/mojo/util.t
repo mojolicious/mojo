@@ -130,7 +130,7 @@ is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
 is html_unescape('foobar'), 'foobar', 'right html unescaped result';
 
 # html_unescape (relaxed)
-is html_unescape('&Ltf&amp&0oo&nbspba;&ltr'), "&Ltf&&0oo\x{00a0}ba;<r",
+is html_unescape('&0&Ltf&amp&0oo&nbspba;&ltr'), "&0&Ltf&&0oo\x{00a0}ba;<r",
   'right html unescaped result';
 
 # html_unescape (UTF-8)

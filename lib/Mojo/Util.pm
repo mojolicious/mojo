@@ -354,8 +354,7 @@ sub _decode {
   my ($point, $name) = @_;
 
   # Code point
-  return substr($point, 0, 1) eq 'x' ? chr(hex $point) : chr($point)
-    unless defined $name;
+  return chr($point !~ /^x/ ? $point : hex $point) unless defined $name;
 
   # Find entity name
   my $rest = '';

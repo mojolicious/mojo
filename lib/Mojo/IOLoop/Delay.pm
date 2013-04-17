@@ -63,7 +63,7 @@ sub _step {
 
 =head1 NAME
 
-Mojo::IOLoop::Delay - Control the flow of events
+Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
 
 =head1 SYNOPSIS
 
@@ -111,7 +111,8 @@ Mojo::IOLoop::Delay - Control the flow of events
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::Delay> controls the flow of events for L<Mojo::IOLoop>.
+L<Mojo::IOLoop::Delay> manages callbacks and controls the flow of events for
+L<Mojo::IOLoop>.
 
 =head1 EVENTS
 

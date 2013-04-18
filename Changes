@@ -1,5 +1,6 @@
 
-3.96  2013-04-18
+3.96  2013-04-19
+  - Updated jQuery to version 2.0.
   - Improved default descriptions in Test::Mojo.
   - Improved documentation.
   - Improved tests.

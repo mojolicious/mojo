@@ -2,8 +2,8 @@
 <html>
   <head>
     <title><%= $title %></title>
+    %= javascript '/mojo/prettify/run_prettify.js'
     %= stylesheet '/mojo/prettify/prettify-mojo.css'
-    %= javascript '/mojo/prettify/prettify.js'
     %= stylesheet begin
       a { color: inherit }
       a:hover { color: #2a2a2a }
@@ -61,7 +61,7 @@
       }
     % end
   </head>
-  <body onload="prettyPrint()">
+  <body>
     %= include inline => app->renderer->_bundled('mojobar')
     % my $link = begin
       %= link_to shift, shift, class => "mojoscroll"

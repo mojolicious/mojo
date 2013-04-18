@@ -625,13 +625,13 @@ L<http://creativecommons.org/licenses/by-sa/3.0>.
 
 =head2 jQuery
 
-  Copyright (C) 2005, 2012 jQuery Foundation, Inc.
+  Copyright (C) 2005, 2013 jQuery Foundation, Inc.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
 =head2 prettify.js
 
-  Copyright (C) 2006, Google Inc.
+  Copyright (C) 2006, 2013 Google Inc.
 
 Licensed under the Apache License, Version 2.0
 L<http://www.apache.org/licenses/LICENSE-2.0>.

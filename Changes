@@ -1,6 +1,7 @@
 
 3.96  2013-04-19
   - Updated jQuery to version 2.0.
+  - Updated prettify.js to version 4-Mar-2013.
   - Improved default descriptions in Test::Mojo.
   - Improved documentation.
   - Improved tests.

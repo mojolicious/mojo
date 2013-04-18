@@ -5,8 +5,8 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
+    %= javascript '/mojo/prettify/run_prettify.js'
     %= stylesheet '/mojo/prettify/prettify-mojo.css'
-    %= javascript '/mojo/prettify/prettify.js'
     %= stylesheet begin
       a img { border: 0 }
       body {
@@ -97,7 +97,7 @@
       }
     % end
   </head>
-  <body onload="prettyPrint()">
+  <body>
     %= include inline => app->renderer->_bundled('mojobar')
     <div id="wrapperlicious">
       <div id="nothing" class="box spaced"></div>

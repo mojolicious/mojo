@@ -109,7 +109,12 @@ L<Mojo::Collection> is a container for collections.
 
 =head1 FUNCTIONS
 
-L<Mojo::Collection> implements the following functions.
+It is possible to access the i-th element of a L<Mojo::Collection>, 
+in the same way that you would access the elements of an array :
+
+    my $elem = $collection->[$i-1];
+
+L<Mojo::Collection> implements the following functions. 
 
 =head2 c
 

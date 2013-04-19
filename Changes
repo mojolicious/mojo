@@ -6,6 +6,7 @@
   - Improved documentation.
   - Improved tests.
   - Fixed small html_unescape bug in Mojo::Util.
+  - Fixed small encoding bug in routes command.
 
 3.95  2013-04-12
   - Added finished_ok method to Test::Mojo.

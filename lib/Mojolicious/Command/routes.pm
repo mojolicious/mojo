@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use re 'regexp_pattern';
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
+use Mojo::Util 'encode';
 
 has description => "Show available routes.\n";
 has usage       => <<"EOF";
@@ -73,7 +74,7 @@ sub _draw {
     $format .= '?' if $format && $optional;
     push @parts, $format ? "$regex$format" : $regex if $verbose;
 
-    say join('  ', @parts);
+    say encode('UTF-8', join('  ', @parts));
   }
 }
 

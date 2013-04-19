@@ -489,7 +489,7 @@ Append to element content.
 
   my $result = $dom->at('html title');
 
-Find a single element with CSS selectors. All selectors from L<Mojo::DOM::CSS>
+Find a single element with CSS selectors, and returns it as a L<Mojo::DOM> object. All selectors from L<Mojo::DOM::CSS>
 are supported.
 
   # Find first element with "svg" namespace definition
@@ -516,8 +516,8 @@ Charset used for decoding and encoding HTML/XML.
   my $collection = $dom->children;
   my $collection = $dom->children('div');
 
-Return a L<Mojo::Collection> object containing the children of this element,
-similar to C<find>.
+Return a L<Mojo::Collection> object containing the children of this element, as L<Mojo::DOM> objects.
+Similar to C<find>.
 
   # Show type of random child element
   say $dom->children->shuffle->first->type;
@@ -536,7 +536,7 @@ C<charset> has been defined.
 
   my $collection = $dom->find('html title');
 
-Find elements with CSS selectors and return a L<Mojo::Collection> object. All
+Find elements with CSS selectors and return a L<Mojo::Collection> of L<Mojo::DOM>. All
 selectors from L<Mojo::DOM::CSS> are supported.
 
   # Find a specific element and extract information
@@ -705,7 +705,7 @@ if a C<charset> has been defined.
   my $tree = $dom->tree;
   $dom     = $dom->tree(['root', [qw(text lalala)]]);
 
-Document Object Model.
+Document Object Model. If you want to see the guts of your L<Mojo::DOM> object, or if you want to create a L<Mojo::DOM> by supplying a DOM yourself.
 
 =head2 type
 

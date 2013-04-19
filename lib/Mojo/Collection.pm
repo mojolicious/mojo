@@ -231,6 +231,13 @@ from the results.
 
 Create a new collection without duplicate elements.
 
+=head1 ELEMENTS
+
+Direct array reference access to elements is also possible.
+
+  say $collection->[23];
+  say for @$collection;
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

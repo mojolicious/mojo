@@ -85,7 +85,8 @@
     post '/title' => sub {
       my $self = shift;
       my $url  = $self->param('url') || 'http://mojolicio.us';
-      $self->render_text($self->ua->get($url)->res->dom->at('title')->text);
+      $self->render(
+        text => $self->ua->get($url)->res->dom->at('title')->text);
     };
 
     # WebSocket echo service

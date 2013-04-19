@@ -489,8 +489,9 @@ Append to element content.
 
   my $result = $dom->at('html title');
 
-Find a single element with CSS selectors and return it as a L<Mojo::DOM>
-object. All selectors from L<Mojo::DOM::CSS> are supported.
+Find first element matching the CSS selector and return it as a L<Mojo::DOM>
+object or return C<undef> if none could be found. All selectors from
+L<Mojo::DOM::CSS> are supported.
 
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
@@ -536,8 +537,8 @@ C<charset> has been defined.
 
   my $collection = $dom->find('html title');
 
-Find elements with CSS selectors and return a L<Mojo::Collection> object
-containing these elements as L<Mojo::DOM> objects. All selectors from
+Find all elements matching the CSS selector and return a L<Mojo::Collection>
+object containing these elements as L<Mojo::DOM> objects. All selectors from
 L<Mojo::DOM::CSS> are supported.
 
   # Find a specific element and extract information
@@ -562,7 +563,8 @@ Find element namespace.
 
   my $sibling = $dom->next;
 
-Return L<Mojo::DOM> object for next sibling of element.
+Return L<Mojo::DOM> object for next sibling of element or C<undef> if there
+are no more siblings.
 
   # "<h2>B</h2>"
   $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h1')->next;
@@ -571,7 +573,8 @@ Return L<Mojo::DOM> object for next sibling of element.
 
   my $parent = $dom->parent;
 
-Return L<Mojo::DOM> object for parent of element.
+Return L<Mojo::DOM> object for parent of element or C<undef> if this element
+has no parent.
 
 =head2 parse
 
@@ -604,7 +607,8 @@ Prepend to element content.
 
   my $sibling = $dom->previous;
 
-Return L<Mojo::DOM> object for previous sibling of element.
+Return L<Mojo::DOM> object for previous sibling of element or C<undef> if
+there are no more siblings.
 
   # "<h1>A</h1>"
   $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h2')->previous;

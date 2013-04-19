@@ -602,7 +602,8 @@ L<Mojo::DOM::CSS> implements the following attributes.
   my $tree = $css->tree;
   $css     = $css->tree(['root', [qw(text lalala)]]);
 
-Document Object Model.
+Document Object Model. Note that this structure should only be used very
+carefully since it is very dynamic.
 
 =head1 METHODS
 

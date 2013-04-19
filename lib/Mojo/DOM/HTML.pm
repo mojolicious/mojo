@@ -405,7 +405,8 @@ Charset used for decoding and encoding HTML/XML.
   my $tree = $html->tree;
   $html    = $html->tree(['root', [qw(text lalala)]]);
 
-Document Object Model.
+Document Object Model. Note that this structure should only be used very
+carefully since it is very dynamic.
 
 =head2 xml
 

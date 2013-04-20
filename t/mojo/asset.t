@@ -2,7 +2,7 @@ use Mojo::Base -strict;
 
 use Test::More;
 use File::Basename 'dirname';
-use File::Spec::Functions 'catdir';
+use File::Spec::Functions qw(catdir catfile);
 use File::Temp 'tempdir';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
@@ -145,6 +145,7 @@ $file = Mojo::Asset::File->new;
 $file->add_chunk('bcd');
 $tmp = Mojo::Asset::File->new;
 $tmp->add_chunk('x');
+isnt $file->path, $tmp->path, 'different paths';
 $path = $tmp->path;
 ok -e $path, 'file exists';
 undef $tmp;
@@ -180,6 +181,21 @@ ok !$asset->is_file, 'stored in memory';
   $file->add_chunk('works!');
   is $file->slurp, 'works!', 'right content';
   is dirname($file->path), $tmpdir, 'same directory';
+}
+
+# Custom temporary file
+{
+  my $tmpdir = tempdir CLEANUP => 1;
+  my $path = catfile $tmpdir, 'test.file';
+  ok !-e $path, 'file does not exist';
+  $file = Mojo::Asset::File->new(path => $path);
+  is $file->path, $path, 'right path';
+  ok !-e $path, 'file still does not exist';
+  $file->add_chunk('works!');
+  ok -e $path, 'file exists';
+  is $file->slurp, 'works!', 'right content';
+  undef $file;
+  ok !-e $path, 'file has been cleaned up';
 }
 
 # Temporary file without cleanup

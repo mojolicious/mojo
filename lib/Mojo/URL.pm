@@ -83,7 +83,7 @@ sub parse {
 
   # URL
   my $proto = $self->scheme($1)->protocol;
-  unless ($proto && !grep { $proto eq $_ } qw(http https ws wss)) {
+  if (!$proto || grep { $proto eq $_ } qw(http https ws wss)) {
     $self->authority($2);
     $self->path->parse($3);
     $self->query($4)->fragment($5);
@@ -367,6 +367,12 @@ Check if URL is absolute.
 
 Parse relative or absolute URL for the C<http>, C<https>, C<ws> as well as
 C<wss> schemes and preserve scheme data for all unknown ones.
+
+  # "/test/123"
+  $url->parse('/test/123?foo=bar')->path;
+
+  # "example.com"
+  $url->parse('http://example.com/test/123?foo=bar')->host;
 
   # "mailto:sri@example.com"
   $url->parse('mailto:sri@example.com')->to_string;

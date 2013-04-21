@@ -121,6 +121,10 @@ $url = Mojo::URL->new->parse('mailto:sri@example.com');
 is $url->scheme,   'mailto', 'right scheme';
 is $url->protocol, 'mailto', 'right protocol';
 is "$url", 'mailto:sri@example.com', 'right format';
+$url = Mojo::URL->new->parse('foo://test/123');
+is $url->scheme,   'foo', 'right scheme';
+is $url->protocol, 'foo', 'right protocol';
+is "$url", 'foo://test/123', 'right format';
 
 # Relative
 $url = Mojo::URL->new('foo?foo=bar#23');

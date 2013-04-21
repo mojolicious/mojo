@@ -81,7 +81,7 @@ sub parse {
   # Official regex
   $url =~ m!(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
 
-  # URL
+  # Supported scheme
   my $proto = $self->scheme($1)->protocol;
   if (!$proto || grep { $proto eq $_ } qw(http https ws wss)) {
     $self->authority($2);
@@ -89,7 +89,7 @@ sub parse {
     $self->query($4)->fragment($5);
   }
 
-  # Scheme and scheme data
+  # Preserve scheme data
   else { $self->{data} = $url }
 
   return $self;

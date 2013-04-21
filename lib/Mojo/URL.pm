@@ -44,7 +44,8 @@ sub authority {
 sub clone {
   my $self = shift;
 
-  my $clone = Mojo::URL->new;
+  my $clone = $self->new;
+  $clone->{data} = $self->{data};
   $clone->$_($self->$_) for qw(scheme userinfo host port fragment);
   $clone->path($self->path->clone);
   $clone->query($self->query->clone);
@@ -79,11 +80,17 @@ sub parse {
 
   # Official regex
   $url =~ m!(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
-  $self->scheme($1);
-  $self->authority($2);
-  $self->path->parse($3);
-  $self->query($4);
-  $self->fragment($5);
+
+  # URL
+  my $proto = $self->scheme($1)->protocol;
+  unless ($proto && !grep { $proto eq $_ } qw(http https ws wss)) {
+    $self->authority($2);
+    $self->path->parse($3);
+    $self->query($4)->fragment($5);
+  }
+
+  # Scheme and scheme data
+  else { $self->{data} = $url }
 
   return $self;
 }
@@ -195,6 +202,9 @@ sub to_rel {
 
 sub to_string {
   my $self = shift;
+
+  # Scheme data
+  return $self->{data} if defined $self->{data};
 
   # Protocol
   my $url = '';
@@ -355,7 +365,11 @@ Check if URL is absolute.
 
   $url = $url->parse('http://127.0.0.1:3000/foo/bar?fo=o&baz=23#foo');
 
-Parse URL.
+Parse relative or absolute URL for the C<http>, C<https>, C<ws> as well as
+C<wss> schemes and preserve scheme data for all unknown ones.
+
+  # "mailto:sri@example.com"
+  $url->parse('mailto:sri@example.com')->to_string;
 
 =head2 path
 

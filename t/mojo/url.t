@@ -96,6 +96,32 @@ is $url->fragment, '23', 'right fragment';
 is "$url", 'http://sri:foobar@kraih.com:8080?_monkeybiz%3B=&_monkey=&23=#23',
   'right format';
 
+# Unknown scheme
+$url = Mojo::URL->new('DATA:helloworld123');
+is $url->scheme,   'DATA', 'right scheme';
+is $url->protocol, 'data', 'right protocol';
+is $url->userinfo, undef,  'no userinfo';
+is $url->host,     undef,  'no host';
+is $url->port,     undef,  'no port';
+is $url->path,     '',     'no path';
+is $url->query,    '',     'no query';
+is $url->fragment, undef,  'no fragment';
+is "$url", 'DATA:helloworld123', 'right format';
+$url = $url->clone;
+is $url->scheme,   'DATA', 'right scheme';
+is $url->protocol, 'data', 'right protocol';
+is $url->userinfo, undef,  'no userinfo';
+is $url->host,     undef,  'no host';
+is $url->port,     undef,  'no port';
+is $url->path,     '',     'no path';
+is $url->query,    '',     'no query';
+is $url->fragment, undef,  'no fragment';
+is "$url", 'DATA:helloworld123', 'right format';
+$url = Mojo::URL->new->parse('mailto:sri@example.com');
+is $url->scheme,   'mailto', 'right scheme';
+is $url->protocol, 'mailto', 'right protocol';
+is "$url", 'mailto:sri@example.com', 'right format';
+
 # Relative
 $url = Mojo::URL->new('foo?foo=bar#23');
 ok !$url->is_abs, 'is not absolute';

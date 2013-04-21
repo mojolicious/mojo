@@ -34,7 +34,7 @@ sub append {
 sub clone {
   my $self = shift;
 
-  my $clone = Mojo::Parameters->new->charset($self->charset)
+  my $clone = $self->new->charset($self->charset)
     ->pair_separator($self->pair_separator);
   if (defined $self->{string}) { $clone->{string} = $self->{string} }
   else                         { $clone->params([@{$self->params}]) }

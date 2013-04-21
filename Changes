@@ -2,11 +2,13 @@
 3.96  2013-04-22
   - Updated jQuery to version 2.0.
   - Updated prettify.js to version 4-Mar-2013.
+  - Improved Mojo::URL to be able to contain scheme data for unknown schemes.
   - Improved default descriptions in Test::Mojo.
   - Improved documentation.
   - Improved tests.
   - Fixed small html_unescape bug in Mojo::Util.
   - Fixed small encoding bug in routes command.
+  - Fixed a few small clone bugs.
 
 3.95  2013-04-12
   - Added finished_ok method to Test::Mojo.

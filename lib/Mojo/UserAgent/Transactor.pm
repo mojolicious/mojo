@@ -303,7 +303,7 @@ L<Mojo::UserAgent::Transactor> implements the following attributes.
   my $generators = $t->generators;
   $t             = $t->generators({foo => sub {...}});
 
-Registered generators.
+Registered content generators.
 
 =head1 METHODS
 
@@ -314,13 +314,14 @@ implements the following new ones.
 
   my $t = Mojo::UserAgent::Transactor->new;
 
-Construct a new transactor and register C<form> and C<json> generators.
+Construct a new transactor and register C<form> and C<json> content
+generators.
 
 =head2 add_generator
 
   $t = $t->add_generator(foo => sub {...});
 
-Register a new generator.
+Register a new content generator.
 
 =head2 endpoint
 
@@ -363,7 +364,7 @@ C<307> or C<308> redirect response if possible.
     PUT  => 'http://kraih.com' => {DNT => 1} => json => {a => 'b'});
 
 Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
-requests, with support for generators.
+requests, with support for content generators.
 
   # Inspect generated request
   say $t->tx(GET => 'mojolicio.us' => {DNT => 1} => 'Bye!')->req->to_string;

@@ -832,8 +832,7 @@ This even works for proxy C<CONNECT> requests.
 
 =head2 Content generators
 
-Generators can be used to generate the same type of content repeatedly for
-multiple requests.
+Generate the same type of content repeatedly for multiple requests.
 
   use Mojo::UserAgent;
   use Mojo::Asset::File;

@@ -67,7 +67,7 @@ sub ihost {
   return lc $host unless $host =~ /[^\x00-\x7f]/;
 
   # Encode
-  return join '.',
+  return lc join '.',
     map { /[^\x00-\x7f]/ ? ('xn--' . punycode_encode $_) : $_ } split /\./,
     $host;
 }

@@ -7,6 +7,7 @@
   - Improved default descriptions in Test::Mojo.
   - Improved documentation.
   - Improved tests.
+  - Fixed host normalization bug in Mojo::URL.
   - Fixed small html_unescape bug in Mojo::Util.
   - Fixed small encoding bug in routes command.
   - Fixed a few small clone bugs.

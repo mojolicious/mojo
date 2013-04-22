@@ -11,6 +11,7 @@
   - Fixed a few small clone bugs.
   - Fixed a few small redirect and proxy connect bugs in
     Mojo::UserAgent::Transactor.
+  - Improved form content generator for GET and HEAD requests (jberger)
 
 3.95  2013-04-12
   - Added finished_ok method to Test::Mojo.

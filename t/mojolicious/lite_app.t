@@ -476,6 +476,12 @@ $t->head_ok('/')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 55)->content_is('');
 
+# HEAD request (lowercase)
+my $tx = $t->ua->build_tx(head => '/');
+$t->request_ok($tx)->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Powered-By'   => 'Mojolicious (Perl)')
+  ->header_is('Content-Length' => 55)->content_is('');
+
 # Root with body
 $t->get_ok('/', '1234' x 1024)->status_is(200)
   ->content_is("/root.html\n/root.html\n/root.html\n/root.html\n/root.html\n");

@@ -11,6 +11,7 @@
   - Fixed a few small clone bugs.
   - Fixed a few small redirect and proxy connect bugs in
     Mojo::UserAgent::Transactor.
+  - Fixed a few small method handling bugs in Mojo::Transaction::HTTP.
 
 3.95  2013-04-12
   - Added finished_ok method to Test::Mojo.

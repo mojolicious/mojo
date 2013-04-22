@@ -73,7 +73,7 @@ sub proxy_connect {
 
   # Already a CONNECT request
   my $req = $old->req;
-  return undef if $req->method eq 'CONNECT';
+  return undef if uc $req->method eq 'CONNECT';
 
   # No proxy
   return undef unless my $proxy = $req->proxy;
@@ -106,7 +106,7 @@ sub redirect {
   # Clone request if necessary
   my $new    = Mojo::Transaction::HTTP->new;
   my $req    = $old->req;
-  my $method = $req->method;
+  my $method = uc $req->method;
   if (grep { $_ eq $code } 301, 307, 308) {
     return undef unless my $req = $req->clone;
     $new->req($req);
@@ -182,16 +182,14 @@ sub _form {
     my $parts = $self->_multipart($options{charset}, $form);
     $req->content(
       Mojo::Content::MultiPart->new(headers => $headers, parts => $parts));
+    return $tx;
   }
 
   # Urlencoded
-  else {
-    $headers->content_type('application/x-www-form-urlencoded');
-    my $p = Mojo::Parameters->new(map { $_ => $form->{$_} } sort keys %$form);
-    $p->charset($options{charset}) if defined $options{charset};
-    $req->body($p->to_string);
-  }
-
+  $headers->content_type('application/x-www-form-urlencoded');
+  my $p = Mojo::Parameters->new(map { $_ => $form->{$_} } sort keys %$form);
+  $p->charset($options{charset}) if defined $options{charset};
+  $req->body($p->to_string);
   return $tx;
 }
 

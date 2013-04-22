@@ -436,6 +436,8 @@ is $tx->req->headers->proxy_authorization, 'Basic c3JpOnNlY3IzdA==',
   'right "Proxy-Authorization" header';
 is $tx->req->headers->host, 'mojolicio.us', 'right "Host" header';
 is $t->proxy_connect($tx), undef, 'already a CONNECT request';
+$tx->req->method('Connect');
+is $t->proxy_connect($tx), undef, 'already a CONNECT request';
 
 # Simple 302 redirect
 $tx = $t->tx(
@@ -446,6 +448,19 @@ is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
+is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
+is $tx->req->headers->accept,   undef,                  'no "Accept" value';
+is $tx->req->headers->location, undef,                  'no "Location" value';
+is $tx->req->body, '',    'no content';
+is $tx->res->code, undef, 'no status';
+is $tx->res->headers->location, undef, 'no "Location" value';
+
+# 302 redirect (lowecase HEAD)
+$tx = $t->tx(head => 'http://mojolicio.us/foo');
+$tx->res->code(302);
+$tx->res->headers->location('http://kraih.com/bar');
+$tx = $t->redirect($tx);
+is $tx->req->method, 'HEAD', 'right method';
 is $tx->req->url->to_abs,       'http://kraih.com/bar', 'right URL';
 is $tx->req->headers->accept,   undef,                  'no "Accept" value';
 is $tx->req->headers->location, undef,                  'no "Location" value';

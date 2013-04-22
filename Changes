@@ -9,6 +9,8 @@
   - Fixed small html_unescape bug in Mojo::Util.
   - Fixed small encoding bug in routes command.
   - Fixed a few small clone bugs.
+  - Fixed a few small redirect and proxy connect bugs in
+    Mojo::UserAgent::Transactor.
 
 3.95  2013-04-12
   - Added finished_ok method to Test::Mojo.

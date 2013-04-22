@@ -3,6 +3,7 @@
   - Updated jQuery to version 2.0.
   - Updated prettify.js to version 4-Mar-2013.
   - Improved Mojo::URL to be able to contain scheme data for unknown schemes.
+  - Improved form content generator for GET and HEAD requests. (jberger)
   - Improved default descriptions in Test::Mojo.
   - Improved documentation.
   - Improved tests.

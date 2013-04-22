@@ -248,7 +248,7 @@ Mojo::URL - Uniform Resource Locator
 
   # Parse
   my $url
-    = Mojo::URL->new('http://sri:foobar@kraih.com:3000/foo/bar?foo=bar#23');
+    = Mojo::URL->new('http://sri:foobar@example.com:3000/foo/bar?foo=bar#23');
   say $url->scheme;
   say $url->userinfo;
   say $url->host;
@@ -261,7 +261,7 @@ Mojo::URL - Uniform Resource Locator
   my $url = Mojo::URL->new;
   $url->scheme('http');
   $url->userinfo('sri:foobar');
-  $url->host('kraih.com');
+  $url->host('example.com');
   $url->port(3000);
   $url->path('/foo/bar');
   $url->path('baz');
@@ -437,14 +437,14 @@ appended, defaults to a L<Mojo::Parameters> object.
 =head2 to_abs
 
   my $abs = $url->to_abs;
-  my $abs = $url->to_abs(Mojo::URL->new('http://kraih.com/foo'));
+  my $abs = $url->to_abs(Mojo::URL->new('http://example.com/foo'));
 
 Clone relative URL and turn it into an absolute one.
 
 =head2 to_rel
 
   my $rel = $url->to_rel;
-  my $rel = $url->to_rel(Mojo::URL->new('http://kraih.com/foo'));
+  my $rel = $url->to_rel(Mojo::URL->new('http://example.com/foo'));
 
 Clone absolute URL and turn it into a relative one.
 

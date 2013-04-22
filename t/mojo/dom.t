@@ -384,14 +384,14 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
   <channel>
     <title>Test Blog</title>
-    <link>http://blog.kraih.com</link>
+    <link>http://blog.example.com</link>
     <description>lalala</description>
     <generator>Mojolicious</generator>
     <item>
       <pubDate>Mon, 12 Jul 2010 20:42:00</pubDate>
       <title>Works!</title>
-      <link>http://blog.kraih.com/test</link>
-      <guid>http://blog.kraih.com/test</guid>
+      <link>http://blog.example.com/test</link>
+      <guid>http://blog.example.com/test</guid>
       <description>
         <![CDATA[<p>trololololo>]]>
       </description>

@@ -156,7 +156,7 @@ $ua->http_proxy("http://localhost:$port");
 my $kept_alive;
 $result = undef;
 $ua->get(
-  'http://kraih.com/proxy' => sub {
+  'http://example.com/proxy' => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
     $result     = $tx->success->body;
@@ -165,7 +165,7 @@ $ua->get(
 );
 Mojo::IOLoop->start;
 ok !$kept_alive, 'connection was not kept alive';
-is $result, 'http://kraih.com/proxy', 'right content';
+is $result, 'http://example.com/proxy', 'right content';
 
 # Kept alive proxy WebSocket
 ($kept_alive, $result) = ();
@@ -189,9 +189,9 @@ ok $kept_alive, 'connection was kept alive';
 is $result, 'test1test2', 'right result';
 
 # Blocking proxy request
-my $tx = $ua->get('http://kraih.com/proxy');
+my $tx = $ua->get('http://example.com/proxy');
 is $tx->res->code, 200, 'right status';
-is $tx->success->body, 'http://kraih.com/proxy', 'right content';
+is $tx->success->body, 'http://example.com/proxy', 'right content';
 
 # Proxy WebSocket
 $ua = Mojo::UserAgent->new(http_proxy => "http://localhost:$proxy");

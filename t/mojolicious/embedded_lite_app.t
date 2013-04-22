@@ -87,7 +87,7 @@ plugin Mount => {'mojolicious.org' => $external};
 plugin(Mount => ('/y/♥' => "$FindBin::Bin/external/myapp2.pl"))
   ->to(message => 'works 3!');
 plugin Mount => {'MOJOLICIO.US/' => $external};
-plugin Mount => {'*.kraih.com'   => $external};
+plugin Mount => {'*.example.com' => $external};
 plugin(Mount => ('*.foo-bar.de/♥/123' => $external))
   ->to(message => 'works 3!');
 
@@ -290,7 +290,8 @@ $t->get_ok('/host' => {Host => 'mojolicio.us'})->status_is(200)
   ->header_is('X-Message' => 'it works!')->content_is('mojolicio.us');
 
 # Template from myapp.pl with wildcard domain
-$t->get_ok('/' => {Host => 'kraih.com'})->status_is(200)->content_is(<<'EOF');
+$t->get_ok('/' => {Host => 'example.com'})->status_is(200)
+  ->content_is(<<'EOF');
 works ♥!Insecure!Insecure!
 
 too!works!!!Mojolicious::Plugin::Config::Sandbox
@@ -300,16 +301,16 @@ too!works!!!Mojolicious::Plugin::Config::Sandbox
 EOF
 
 # Host from myapp.pl with wildcard domain
-$t->get_ok('/host' => {Host => 'KRaIH.CoM'})->status_is(200)
-  ->header_is('X-Message' => 'it works!')->content_is('KRaIH.CoM');
+$t->get_ok('/host' => {Host => 'ExAmPlE.CoM'})->status_is(200)
+  ->header_is('X-Message' => 'it works!')->content_is('ExAmPlE.CoM');
 
 # Host from myapp.pl with wildcard domain again
-$t->get_ok('/host' => {Host => 'www.kraih.com'})->status_is(200)
-  ->header_is('X-Message' => 'it works!')->content_is('www.kraih.com');
+$t->get_ok('/host' => {Host => 'www.example.com'})->status_is(200)
+  ->header_is('X-Message' => 'it works!')->content_is('www.example.com');
 
 # Host from myapp.pl with wildcard domain again
-$t->get_ok('/host' => {Host => 'foo.bar.kraih.com'})->status_is(200)
-  ->header_is('X-Message' => 'it works!')->content_is('foo.bar.kraih.com');
+$t->get_ok('/host' => {Host => 'foo.bar.example.com'})->status_is(200)
+  ->header_is('X-Message' => 'it works!')->content_is('foo.bar.example.com');
 
 # Template from myapp.pl with wildcard domain and unicode prefix
 $t->get_ok('/♥/123/' => {Host => 'foo-bar.de'})->status_is(200)

@@ -353,7 +353,7 @@ Generate file input element.
     %= text_field 'first_name'
     %= submit_button
   % end
-  %= form_for 'http://kraih.com/login' => (method => 'POST') => begin
+  %= form_for 'http://example.com/login' => (method => 'POST') => begin
     %= text_field 'first_name'
     %= submit_button
   % end
@@ -373,7 +373,7 @@ but not C<GET>, a C<method> attribute will be automatically added.
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
-  <form action="http://kraih.com/login" method="POST">
+  <form action="http://example.com/login" method="POST">
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>

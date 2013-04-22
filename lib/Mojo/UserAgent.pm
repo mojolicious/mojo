@@ -814,18 +814,18 @@ Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
 
 =head2 build_tx
 
-  my $tx = $ua->build_tx(GET => 'kraih.com');
-  my $tx = $ua->build_tx(PUT => 'http://kraih.com' => {DNT => 1} => 'Hi!');
+  my $tx = $ua->build_tx(GET => 'example.com');
+  my $tx = $ua->build_tx(PUT => 'http://example.com' => {DNT => 1} => 'Hi!');
   my $tx = $ua->build_tx(
-    PUT => 'http://kraih.com' => {DNT => 1} => form => {a => 'b'});
+    PUT => 'http://example.com' => {DNT => 1} => form => {a => 'b'});
   my $tx = $ua->build_tx(
-    PUT => 'http://kraih.com' => {DNT => 1} => json => {a => 'b'});
+    PUT => 'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"tx">.
 
   # Request with cookie
-  my $tx = $ua->build_tx(GET => 'kraih.com');
+  my $tx = $ua->build_tx(GET => 'example.com');
   $tx->req->cookies({name => 'foo', value => 'bar'});
   $ua->start($tx);
 
@@ -839,19 +839,19 @@ L<Mojo::UserAgent::Transactor/"websocket">.
 
 =head2 delete
 
-  my $tx = $ua->delete('kraih.com');
-  my $tx = $ua->delete('http://kraih.com' => {DNT => 1} => 'Hi!');
+  my $tx = $ua->delete('example.com');
+  my $tx = $ua->delete('http://example.com' => {DNT => 1} => 'Hi!');
   my $tx = $ua->delete(
-    'http://kraih.com' => {DNT => 1} => form => {a => 'b'});
+    'http://example.com' => {DNT => 1} => form => {a => 'b'});
   my $tx = $ua->delete(
-    'http://kraih.com' => {DNT => 1} => json => {a => 'b'});
+    'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Perform blocking HTTP C<DELETE> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
-  $ua->delete('http://kraih.com' => sub {
+  $ua->delete('http://example.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -867,17 +867,17 @@ enabled with the MOJO_PROXY environment variable.
 
 =head2 get
 
-  my $tx = $ua->get('kraih.com');
-  my $tx = $ua->get('http://kraih.com' => {DNT => 1} => 'Hi!');
-  my $tx = $ua->get('http://kraih.com' => {DNT => 1} => form => {a => 'b'});
-  my $tx = $ua->get('http://kraih.com' => {DNT => 1} => json => {a => 'b'});
+  my $tx = $ua->get('example.com');
+  my $tx = $ua->get('http://example.com' => {DNT => 1} => 'Hi!');
+  my $tx = $ua->get('http://example.com' => {DNT => 1} => form => {a => 'b'});
+  my $tx = $ua->get('http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Perform blocking HTTP C<GET> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
-  $ua->get('http://kraih.com' => sub {
+  $ua->get('http://example.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -885,17 +885,19 @@ append a callback to perform requests non-blocking.
 
 =head2 head
 
-  my $tx = $ua->head('kraih.com');
-  my $tx = $ua->head('http://kraih.com' => {DNT => 1} => 'Hi!');
-  my $tx = $ua->head('http://kraih.com' => {DNT => 1} => form => {a => 'b'});
-  my $tx = $ua->head('http://kraih.com' => {DNT => 1} => json => {a => 'b'});
+  my $tx = $ua->head('example.com');
+  my $tx = $ua->head('http://example.com' => {DNT => 1} => 'Hi!');
+  my $tx = $ua->head(
+    'http://example.com' => {DNT => 1} => form => {a => 'b'});
+  my $tx = $ua->head(
+    'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Perform blocking HTTP C<HEAD> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
-  $ua->head('http://kraih.com' => sub {
+  $ua->head('http://example.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -909,19 +911,19 @@ Check if request for domain would use a proxy server.
 
 =head2 options
 
-  my $tx = $ua->options('kraih.com');
-  my $tx = $ua->options('http://kraih.com' => {DNT => 1} => 'Hi!');
+  my $tx = $ua->options('example.com');
+  my $tx = $ua->options('http://example.com' => {DNT => 1} => 'Hi!');
   my $tx = $ua->options(
-    'http://kraih.com' => {DNT => 1} => form => {a => 'b'});
+    'http://example.com' => {DNT => 1} => form => {a => 'b'});
   my $tx = $ua->options(
-    'http://kraih.com' => {DNT => 1} => json => {a => 'b'});
+    'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Perform blocking HTTP C<OPTIONS> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
-  $ua->options('http://kraih.com' => sub {
+  $ua->options('http://example.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -929,17 +931,19 @@ append a callback to perform requests non-blocking.
 
 =head2 patch
 
-  my $tx = $ua->patch('kraih.com');
-  my $tx = $ua->patch('http://kraih.com' => {DNT => 1} => 'Hi!');
-  my $tx = $ua->patch('http://kraih.com' => {DNT => 1} => form => {a => 'b'});
-  my $tx = $ua->patch('http://kraih.com' => {DNT => 1} => json => {a => 'b'});
+  my $tx = $ua->patch('example.com');
+  my $tx = $ua->patch('http://example.com' => {DNT => 1} => 'Hi!');
+  my $tx = $ua->patch(
+    'http://example.com' => {DNT => 1} => form => {a => 'b'});
+  my $tx = $ua->patch(
+    'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Perform blocking HTTP C<PATCH> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
-  $ua->patch('http://kraih.com' => sub {
+  $ua->patch('http://example.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -947,17 +951,19 @@ append a callback to perform requests non-blocking.
 
 =head2 post
 
-  my $tx = $ua->post('kraih.com');
-  my $tx = $ua->post('http://kraih.com' => {DNT => 1} => 'Hi!');
-  my $tx = $ua->post('http://kraih.com' => {DNT => 1} => form => {a => 'b'});
-  my $tx = $ua->post('http://kraih.com' => {DNT => 1} => json => {a => 'b'});
+  my $tx = $ua->post('example.com');
+  my $tx = $ua->post('http://example.com' => {DNT => 1} => 'Hi!');
+  my $tx = $ua->post(
+    'http://example.com' => {DNT => 1} => form => {a => 'b'});
+  my $tx = $ua->post(
+    'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Perform blocking HTTP C<POST> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
-  $ua->post('http://kraih.com' => sub {
+  $ua->post('http://example.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -965,17 +971,17 @@ append a callback to perform requests non-blocking.
 
 =head2 put
 
-  my $tx = $ua->put('kraih.com');
-  my $tx = $ua->put('http://kraih.com' => {DNT => 1} => 'Hi!');
-  my $tx = $ua->put('http://kraih.com' => {DNT => 1} => form => {a => 'b'});
-  my $tx = $ua->put('http://kraih.com' => {DNT => 1} => json => {a => 'b'});
+  my $tx = $ua->put('example.com');
+  my $tx = $ua->put('http://example.com' => {DNT => 1} => 'Hi!');
+  my $tx = $ua->put('http://example.com' => {DNT => 1} => form => {a => 'b'});
+  my $tx = $ua->put('http://example.com' => {DNT => 1} => json => {a => 'b'});
 
 Perform blocking HTTP C<PUT> request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
 
-  $ua->put('http://kraih.com' => sub {
+  $ua->put('http://example.com' => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;
   });
@@ -988,7 +994,7 @@ append a callback to perform requests non-blocking.
 Perform blocking request. You can also append a callback to perform requests
 non-blocking.
 
-  my $tx = $ua->build_tx(GET => 'http://kraih.com');
+  my $tx = $ua->build_tx(GET => 'http://example.com');
   $ua->start($tx => sub {
     my ($ua, $tx) = @_;
     say $tx->res->body;

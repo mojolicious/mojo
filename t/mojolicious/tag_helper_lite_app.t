@@ -154,7 +154,7 @@ $t->post_ok(
     search => 'c',
     tel    => '987654321',
     time   => '23:59:58',
-    url    => 'http://kraih.com',
+    url    => 'http://example.com',
     week   => '2012-W17'
   }
 )->status_is(200)->content_is(<<'EOF');
@@ -169,7 +169,7 @@ $t->post_ok(
   <input class="foo" name="search" type="search" value="c" />
   <input class="foo" name="tel" type="tel" value="987654321" />
   <input class="foo" name="time" type="time" value="23:59:58" />
-  <input class="foo" name="url" type="url" value="http://kraih.com" />
+  <input class="foo" name="url" type="url" value="http://example.com" />
   <input class="foo" name="week" type="week" value="2012-W17" />
   <input type="submit" value="Ok" />
 </form>

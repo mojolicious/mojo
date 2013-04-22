@@ -634,7 +634,7 @@ Same for monitoring tasks.
   $self->hook(after_dispatch => sub {
     my $self = shift;
     return unless my $e = $self->stash('exception');
-    $self->ua->post('https://kraih.com/bugs' => form => {exception => $e});
+    $self->ua->post('https://example.com/bugs' => form => {exception => $e});
   });
 
 For a full list of available hooks see L<Mojolicious/"hook">.

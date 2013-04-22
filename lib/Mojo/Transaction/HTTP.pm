@@ -8,7 +8,7 @@ sub client_read {
 
   # Skip body for HEAD request
   my $res = $self->res;
-  $res->content->skip_body(1) if $self->req->method eq 'HEAD';
+  $res->content->skip_body(1) if uc $self->req->method eq 'HEAD';
   return unless $res->parse($chunk)->is_finished;
 
   # Unexpected 1xx reponse
@@ -91,7 +91,7 @@ sub _headers {
     $self->{offset} = 0;
 
     # Response without body
-    $head = $head && ($self->req->method eq 'HEAD' || $msg->is_empty);
+    $head = $head && (uc $self->req->method eq 'HEAD' || $msg->is_empty);
     if ($head) { $self->{state} = 'finished' }
 
     # Body

@@ -100,13 +100,21 @@ is $tx->req->headers->content_type, 'application/something',
   'right "Content-Type" value';
 is_deeply $tx->req->json, [1, 2], 'right content';
 
-# Simple form
+# Simple form (POST)
 $tx = $t->tx(POST => 'http://kraih.com/foo' => form => {test => 123});
 is $tx->req->url->to_abs, 'http://kraih.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $tx->req->body, 'test=123', 'right content';
+
+# Simple form (GET)
+$tx = $t->tx(GET => 'http://kraih.com/foo' => form => {test => 123});
+is $tx->req->url->to_abs, 'http://kraih.com/foo?test=123', 'right URL';
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
+  'right "Content-Type" value';
+is $tx->req->body, '', 'right content';
 
 # Simple form with multiple values
 $tx

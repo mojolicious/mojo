@@ -189,7 +189,9 @@ sub _form {
   $headers->content_type('application/x-www-form-urlencoded');
   my $p = Mojo::Parameters->new(map { $_ => $form->{$_} } sort keys %$form);
   $p->charset($options{charset}) if defined $options{charset};
-  $req->body($p->to_string);
+  my $method = uc $req->method;
+  if   ($method eq 'GET' || $method eq 'HEAD') { $req->url->query->merge($p) }
+  else                                         { $req->body($p->to_string) }
   return $tx;
 }
 
@@ -405,7 +407,8 @@ requests, with support for content generators.
 
 While the "multipart/form-data" content type will be automatically used
 instead of "application/x-www-form-urlencoded" when necessary, you can also
-enforce it by setting the header manually.
+enforce it by setting the header manually. GET and HEAD transactions merge 
+form paramters into the url query parameters.
 
 =head2 upgrade
 

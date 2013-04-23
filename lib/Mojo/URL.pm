@@ -10,7 +10,7 @@ use Mojo::Path;
 use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
 
 has base => sub { Mojo::URL->new };
-has [qw(fragment host port scheme userinfo)];
+has [qw(fragment host port scheme scheme_data userinfo)];
 
 sub new { shift->SUPER::new->parse(@_) }
 
@@ -45,8 +45,7 @@ sub clone {
   my $self = shift;
 
   my $clone = $self->new;
-  $clone->{data} = $self->{data};
-  $clone->$_($self->$_) for qw(scheme userinfo host port fragment);
+  $clone->$_($self->$_) for qw(scheme scheme_data userinfo host port fragment);
   $clone->path($self->path->clone);
   $clone->query($self->query->clone);
   $clone->base($self->base->clone) if $self->{base};
@@ -90,7 +89,7 @@ sub parse {
   }
 
   # Preserve scheme data
-  else { $self->{data} = $url }
+  else { $self->scheme_data(substr($url, length($proto) + 1)) }
 
   return $self;
 }
@@ -204,7 +203,8 @@ sub to_string {
   my $self = shift;
 
   # Scheme data
-  return $self->{data} if defined $self->{data};
+  my $data = $self->scheme_data;
+  return join ':', $self->scheme, $data if defined $data;
 
   # Protocol
   my $url = '';
@@ -312,6 +312,16 @@ Port part of this URL.
   $url       = $url->scheme('http');
 
 Scheme part of this URL.
+
+=head2 scheme_data
+
+  my $data = $url->scheme_data;
+  $url     = $url->scheme_data('foo')
+
+Data for unknown schemes.
+
+  # "sri@example.com"
+  Mojo::URL->new('mailto:sri@example.com')->scheme_data;
 
 =head2 userinfo
 

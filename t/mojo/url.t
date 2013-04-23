@@ -33,13 +33,13 @@ is "$url",
 
 # Advanced userinfo and fragment roundtrip
 $url = Mojo::URL->new(
-  'http://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?');
-is $url->scheme,   'http',                        'right scheme';
+  'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?');
+is $url->scheme,   'ws',                          'right scheme';
 is $url->userinfo, 'AZaz09-._~!$&\'()*+,;=:',     'right userinfo';
 is $url->host,     'localhost',                   'right host';
 is $url->fragment, 'AZaz09-._~!$&\'()*+,;=%:@/?', 'right fragment';
 is "$url",
-  'http://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?',
+  'ws://AZaz09-._~!$&\'()*+,;=:@localhost#AZaz09-._~!$&\'()*+,;=%:@/?',
   'right format';
 
 # Parameters
@@ -81,9 +81,9 @@ is "$url", 'http://sri:foobar@example.com:8080?c=3#23', 'right format';
 
 # Query string
 $url = Mojo::URL->new(
-  'http://sri:foobar@example.com:8080?_monkeybiz%3B&_monkey;23#23');
+  'wss://sri:foobar@example.com:8080?_monkeybiz%3B&_monkey;23#23');
 ok $url->is_abs,   'is absolute';
-is $url->scheme,   'http', 'right scheme';
+is $url->scheme,   'wss', 'right scheme';
 is $url->userinfo, 'sri:foobar', 'right userinfo';
 is $url->host,     'example.com', 'right host';
 is $url->port,     '8080', 'right port';
@@ -93,7 +93,7 @@ is_deeply $url->query->params, ['_monkeybiz;', '', '_monkey', '', 23, ''],
   'right structure';
 is $url->query, '_monkeybiz%3B=&_monkey=&23=', 'right query';
 is $url->fragment, '23', 'right fragment';
-is "$url", 'http://sri:foobar@example.com:8080?_monkeybiz%3B=&_monkey=&23=#23',
+is "$url", 'wss://sri:foobar@example.com:8080?_monkeybiz%3B=&_monkey=&23=#23',
   'right format';
 
 # Unknown scheme
@@ -313,10 +313,10 @@ is "$url", 'http://acme.s3.amazonaws.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb',
 
 # Clone (advanced)
 $url = Mojo::URL->new(
-  'http://sri:foobar@example.com:8080/test/index.html?monkey=biz&foo=1#23');
+  'ws://sri:foobar@example.com:8080/test/index.html?monkey=biz&foo=1#23');
 my $clone = $url->clone;
 ok $clone->is_abs,   'is absolute';
-is $clone->scheme,   'http', 'right scheme';
+is $clone->scheme,   'ws', 'right scheme';
 is $clone->userinfo, 'sri:foobar', 'right userinfo';
 is $clone->host,     'example.com', 'right host';
 is $clone->port,     '8080', 'right port';
@@ -324,11 +324,10 @@ is $clone->path,     '/test/index.html', 'right path';
 is $clone->query,    'monkey=biz&foo=1', 'right query';
 is $clone->fragment, '23', 'right fragment';
 is "$clone",
-  'http://sri:foobar@example.com:8080/test/index.html?monkey=biz&foo=1#23',
+  'ws://sri:foobar@example.com:8080/test/index.html?monkey=biz&foo=1#23',
   'right format';
 $clone->path('/index.xml');
-is "$clone",
-  'http://sri:foobar@example.com:8080/index.xml?monkey=biz&foo=1#23',
+is "$clone", 'ws://sri:foobar@example.com:8080/index.xml?monkey=biz&foo=1#23',
   'right format';
 
 # Clone (with base)
@@ -362,13 +361,13 @@ is $clone->to_abs->to_string, 'http://127.0.0.1/foo/test/index.html',
   'right absolute version';
 
 # IPv6
-$url = Mojo::URL->new('http://[::1]:3000/');
+$url = Mojo::URL->new('wss://[::1]:3000/');
 ok $url->is_abs, 'is absolute';
-is $url->scheme, 'http', 'right scheme';
+is $url->scheme, 'wss', 'right scheme';
 is $url->host,   '[::1]', 'right host';
 is $url->port,   3000, 'right port';
 is $url->path,   '/', 'right path';
-is "$url", 'http://[::1]:3000/', 'right format';
+is "$url", 'wss://[::1]:3000/', 'right format';
 
 # IDNA
 $url = Mojo::URL->new('http://bücher.ch:3000/foo');

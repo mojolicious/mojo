@@ -118,19 +118,19 @@ is $url->query,    '',     'no query';
 is $url->fragment, undef,  'no fragment';
 is "$url", 'DATA:helloworld123', 'right format';
 $url = Mojo::URL->new->parse('mailto:sri@example.com');
-is $url->scheme,      'mailto',          'right scheme';
-is $url->protocol,    'mailto',          'right protocol';
-is $url->scheme_data, 'sri@example.com', 'right scheme data';
+is $url->scheme,   'mailto',          'right scheme';
+is $url->protocol, 'mailto',          'right protocol';
+is $url->data,     'sri@example.com', 'right data';
 is "$url", 'mailto:sri@example.com', 'right format';
 $url = Mojo::URL->new->parse('foo://test/123');
-is $url->scheme,      'foo',        'right scheme';
-is $url->protocol,    'foo',        'right protocol';
-is $url->scheme_data, '//test/123', 'right scheme data';
+is $url->scheme,   'foo',        'right scheme';
+is $url->protocol, 'foo',        'right protocol';
+is $url->data,     '//test/123', 'right data';
 is "$url", 'foo://test/123', 'right format';
 is $url->scheme('Bar')->to_string, 'Bar://test/123', 'right format';
-is $url->scheme,      'Bar',        'right scheme';
-is $url->protocol,    'bar',        'right protocol';
-is $url->scheme_data, '//test/123', 'right scheme data';
+is $url->scheme,   'Bar',        'right scheme';
+is $url->protocol, 'bar',        'right protocol';
+is $url->data,     '//test/123', 'right data';
 
 # Relative
 $url = Mojo::URL->new('foo?foo=bar#23');

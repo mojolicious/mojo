@@ -113,7 +113,7 @@ following new ones.
   my $home = Mojo::Home->new;
   my $home = Mojo::Home->new('/home/sri/myapp');
 
-Construct a new L<Mojo::Home> object.
+Construct a new L<Mojo::Home> object and C<parse> home directory if necessary.
 
 =head2 detect
 

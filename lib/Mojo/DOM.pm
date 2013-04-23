@@ -451,7 +451,8 @@ following new ones.
   my $dom = Mojo::DOM->new;
   my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
 
-Construct a new array-based L<Mojo::DOM> object.
+Construct a new array-based L<Mojo::DOM> object and C<parse> HTML/XML document
+if necessary.
 
 =head2 all_text
 

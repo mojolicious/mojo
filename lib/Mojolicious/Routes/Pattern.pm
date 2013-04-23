@@ -368,7 +368,8 @@ implements the following new ones.
     = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
   my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
 
-Construct a new L<Mojolicious::Routes::Pattern> object.
+Construct a new L<Mojolicious::Routes::Pattern> object and C<parse> pattern if
+necessary.
 
 =head2 match
 
@@ -383,7 +384,7 @@ Match pattern against entire path, format detection is disabled by default.
   $pattern = $pattern->parse('/:action', action => qr/\w+/);
   $pattern = $pattern->parse(format => 0);
 
-Parse a raw pattern.
+Parse pattern.
 
 =head2 render
 

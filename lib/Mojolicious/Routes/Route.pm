@@ -327,7 +327,8 @@ implements the following new ones.
   my $r = Mojolicious::Routes::Route->new;
   my $r = Mojolicious::Routes::Route->new('/:controller/:action');
 
-Construct a new L<Mojolicious::Routes::Route> object.
+Construct a new L<Mojolicious::Routes::Route> object and <parse> pattern if
+necessary.
 
 =head2 add_child
 
@@ -474,7 +475,7 @@ routing cache, since conditions are too complex for caching.
   $r = $r->parse('/:action', action => qr/\w+/);
   $r = $r->parse(format => 0);
 
-Parse a pattern.
+Parse pattern.
 
 =head2 patch
 

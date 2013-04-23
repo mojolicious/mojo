@@ -340,7 +340,7 @@ following new ones.
   my $url = Mojo::URL->new;
   my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
 
-Construct a new L<Mojo::URL> object.
+Construct a new L<Mojo::URL> object and C<parse> URL if necessary.
 
 =head2 authority
 

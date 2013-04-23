@@ -633,12 +633,6 @@ Character activating automatic whitespace trimming, defaults to C<=>.
 L<Mojo::Template> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 new
-
-  my $mt = Mojo::Template->new;
-
-Construct a new L<Mojo::Template> object.
-
 =head2 build
 
   $mt = $mt->build;

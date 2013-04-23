@@ -1,6 +1,7 @@
 
-3.97  2013-04-23
+3.97  2013-04-24
   - Added data attribute to Mojo::URL.
+  - Improved documentation.
   - Improved tests.
 
 3.96  2013-04-22

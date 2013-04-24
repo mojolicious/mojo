@@ -517,7 +517,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   say $ua->get('www.☃.net?hello=there' => {DNT => 1})->res->body;
 
   # Form POST with exception handling
-  my $tx = $ua->post('search.cpan.org/search' => form => {q => 'mojo'});
+  my $tx = $ua->post('https://metacpan.org/search' => form => {q => 'mojo'});
   if (my $res = $tx->success) { say $res->body }
   else {
     my ($err, $code) = $tx->error;

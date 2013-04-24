@@ -43,7 +43,7 @@ my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
 my $tx = $ua->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
-$tx = $ua->cert('')->key('')->get("https://localhost:$port");
+$tx = $ua->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
 
@@ -96,9 +96,9 @@ $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
   is $tx->res->body, 'works!', 'right content';
 }
 
-# Invalid certificate authority
+# Empty certificate authority
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
-$ua->ca('no file')->cert('t/mojo/certs/client.crt')
+$ua->ca('t/mojo/certs/empty.crt')->cert('t/mojo/certs/client.crt')
   ->key('t/mojo/certs/client.key');
 $tx = $ua->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
@@ -113,7 +113,8 @@ ok $tx->error, 'has error';
 
 # Empty certificate
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
-$tx = $ua->cert('no file')->key('no file')->get("https://localhost:$port");
+$tx = $ua->cert('t/mojo/certs/empty.crt')->key('t/mojo/certs/empty.crt')
+  ->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
 

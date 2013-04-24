@@ -105,13 +105,7 @@ websocket '/subreq' => sub {
 };
 
 websocket '/echo' => sub {
-  my $self = shift;
-  $self->on(
-    message => sub {
-      my ($self, $msg) = @_;
-      $self->send($msg);
-    }
-  );
+  shift->on(message => sub { shift->send(shift) });
 };
 
 my $buffer = '';
@@ -125,13 +119,7 @@ websocket '/double_echo' => sub {
 };
 
 websocket '/squish' => sub {
-  my $self = shift;
-  $self->on(
-    message => sub {
-      my ($self, $msg) = @_;
-      $self->send(b($msg)->squish);
-    }
-  );
+  shift->on(message => sub { shift->send(b(shift)->squish) });
 };
 
 websocket '/dead' => sub { die 'i see dead processes' };
@@ -140,8 +128,7 @@ websocket '/foo' =>
   sub { shift->rendered->res->code('403')->message("i'm a teapot") };
 
 websocket '/close' => sub {
-  my $self = shift;
-  $self->on(message => sub { Mojo::IOLoop->remove(shift->tx->connection) });
+  shift->on(message => sub { Mojo::IOLoop->remove(shift->tx->connection) });
 };
 
 my $timeout;
@@ -220,13 +207,7 @@ $ua->start(
         Mojo::IOLoop->stop;
       }
     );
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $tx->finish if length $result;
-        $result .= $msg;
-      }
-    );
+    $tx->on(message => sub { $result .= pop });
     $local = Mojo::IOLoop->stream($tx->connection)->handle->sockport;
   }
 );
@@ -290,13 +271,7 @@ $ua->websocket(
   '/subreq' => sub {
     my ($ua, $tx) = @_;
     $code = $tx->res->code;
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result .= $msg;
-        $tx->finish if $msg eq 'test1';
-      }
-    );
+    $tx->on(message => sub { $result .= pop });
     $tx->on(
       finish => sub {
         $finished += 4;
@@ -364,13 +339,7 @@ $ua->websocket(
   '/subreq' => sub {
     my ($ua, $tx) = @_;
     $code2 = $tx->res->code;
-    $tx->on(
-      message => sub {
-        my ($tx, $msg) = @_;
-        $result2 .= $msg;
-        $tx->finish if $msg eq 'test1';
-      }
-    );
+    $tx->on(message => sub { $result2 .= pop });
     $tx->on(
       finish => sub {
         $finished += 2;

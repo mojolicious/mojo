@@ -112,7 +112,7 @@ sub finished_ok {
   my ($self, $code) = @_;
   Mojo::IOLoop->one_tick while !$self->{finished};
   my $ok = grep { $self->{finished}[0] == $_ } $code, 1006;
-  return $self->_test('ok', $ok, 'finished WebSocket');
+  return $self->_test('ok', $ok, "finished WebSocket with status $code");
 }
 
 sub get_ok  { shift->_request_ok(get  => @_) }

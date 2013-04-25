@@ -2,6 +2,7 @@
 3.97  2013-04-25
   - Added data attribute to Mojo::URL.
   - Improved compatibility with IO::Socket::SSL 1.87.
+  - Improved Test::Mojo diagnostics messages.
   - Improved documentation.
   - Improved tests.
   - Fixed a few small timing bugs in WebSocket tests.

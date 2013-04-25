@@ -111,7 +111,7 @@ sub finish_ok {
 sub finished_ok {
   my ($self, $code) = @_;
   Mojo::IOLoop->one_tick while !$self->{finished};
-  Test::More::diag "Status $self->{finished}[0]"
+  Test::More::diag "WebSocket closed with status $self->{finished}[0]"
     unless my $ok = grep { $self->{finished}[0] == $_ } $code, 1006;
   return $self->_test('ok', $ok, "finished WebSocket with status $code");
 }

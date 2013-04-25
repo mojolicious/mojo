@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Util qw(decamelize deprecated);
+use Mojo::Util 'decamelize';
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -40,7 +40,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Rainbow';
-our $VERSION  = '3.97';
+our $VERSION  = '3.98';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -116,13 +116,6 @@ sub dispatch {
   # Try to find a static file
   $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c)
     unless $tx->res->code;
-
-  # DEPRECATED in Rainbow!
-  if ($plugins->has_subscribers('after_static_dispatch')) {
-    deprecated
-      'after_static_dispatch hook is DEPRECATED in favor of before_routes'
-      and $plugins->emit_hook_reverse(after_static_dispatch => $c);
-  }
 
   # Routes
   $plugins->emit_hook(before_routes => $c);

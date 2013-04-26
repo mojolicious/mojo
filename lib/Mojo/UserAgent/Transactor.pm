@@ -397,16 +397,16 @@ requests, with support for content generators.
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {mytext => {content => 'lala'}});
 
-  # Upload multiple files
+  # Upload multiple files with same name
   my $tx = $t->tx(POST => 'http://example.com' =>
     form => {mytext => [{content => 'first'}, {content => 'second'}]});
 
   # Customized upload with filename and header
   my $tx = $t->tx(POST => 'http://example.com' => form => {
     myzip => {
-      file     => Mojo::Asset::Memory->new->add_chunk('lalala'),
-      filename => 'foo.zip',
-      DNT      => 1
+      file           => Mojo::Asset::Memory->new->add_chunk('lalala'),
+      filename       => 'foo.zip',
+      'Content-Type' => 'text/plain'
     }
   });
 
@@ -415,6 +415,10 @@ C<GET>/C<HEAD> requests and the "application/x-www-form-urlencoded" content
 type for everything else. Both get upgraded automatically to using the
 "multipart/form-data" content type when necessary or when the header has been
 set manually.
+
+  # Force "multipart/form-data"
+  my $headers = {'Content-Type' => 'multipart/form-data'};
+  my $tx = $t->tx(POST => 'example.com' => $headers => form => {a => 'b'});
 
 =head2 upgrade
 

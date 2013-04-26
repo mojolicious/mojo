@@ -323,7 +323,6 @@ sub xml_escape {
   return $string;
 }
 
-
 sub xor_encode {
   my ($input, $key) = @_;
 
@@ -371,12 +370,9 @@ sub _encoding {
 
 sub _hmac {
   my ($hash, $string, $secret) = @_;
-
-  # Secret
   $secret = $secret ? "$secret" : 'Very insecure!';
   $secret = $hash->($secret) if length $secret > 64;
 
-  # HMAC
   my $ipad = $secret ^ (chr(0x36) x 64);
   my $opad = $secret ^ (chr(0x5c) x 64);
   return unpack 'H*', $hash->($opad . $hash->($ipad . $string));

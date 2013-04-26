@@ -490,7 +490,7 @@ methods to pass.
     ->to(controller => 'foo', action => 'bye');
 
 With one small exception, C<HEAD> requests are considered equal to C<GET> and
-content will be automatically removed from responses.
+content will automatically not be sent with the response.
 
   # GET /test  -> {controller => 'bar', action => 'test'}
   # HEAD /test -> {controller => 'bar', action => 'test'}

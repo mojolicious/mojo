@@ -19,7 +19,7 @@ is $path->parts->[1], undef,  'no part';
 ok !$path->leading_slash, 'no leading slash';
 ok $path->trailing_slash, 'has trailing slash';
 $path = Mojo::Path->new;
-is $path->to_string,     '',  'right path';
+is $path->to_string,     '',  'no path';
 is $path->to_abs_string, '/', 'right absolute path';
 
 # Advanced

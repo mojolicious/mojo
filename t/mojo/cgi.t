@@ -48,10 +48,33 @@ my $msg = '';
 }
 my $res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
 is $res->code, 200, 'right status';
-is $res->headers->status, '200 OK', 'right "Status" value';
+is $res->headers->status,         '200 OK', 'right "Status" value';
+is $res->headers->content_length, 21,       'right "Content-Length" value';
 is $res->headers->content_type, 'text/html;charset=UTF-8',
   'right "Content-Type" value';
-like $res->body, qr/Mojo/, 'right content';
+is $res->body, 'Your Mojo is working!', 'right content';
+
+# HEAD request
+$msg = '';
+{
+  local *STDOUT;
+  open STDOUT, '>', \$msg;
+  local %ENV = (
+    PATH_INFO       => '/',
+    REQUEST_METHOD  => 'HEAD',
+    SCRIPT_NAME     => '/',
+    HTTP_HOST       => 'localhost:8080',
+    SERVER_PROTOCOL => 'HTTP/1.0'
+  );
+  is(Mojolicious::Command::cgi->new(app => app)->run, 200, 'right status');
+}
+$res = Mojo::Message::Response->new->parse("HTTP/1.1 200 OK\x0d\x0a$msg");
+is $res->code, 200, 'right status';
+is $res->headers->status,         '200 OK', 'right "Status" value';
+is $res->headers->content_length, 21,       'right "Content-Length" value';
+is $res->headers->content_type, 'text/html;charset=UTF-8',
+  'right "Content-Type" value';
+is $res->body, '', 'no content';
 
 # Non-parsed headers
 $msg = '';
@@ -70,10 +93,11 @@ $msg = '';
 }
 $res = Mojo::Message::Response->new->parse($msg);
 is $res->code, 200, 'right status';
-is $res->headers->status, undef, 'no "Status" value';
+is $res->headers->status,         undef, 'no "Status" value';
+is $res->headers->content_length, 21,    'right "Content-Length" value';
 is $res->headers->content_type, 'text/html;charset=UTF-8',
   'right "Content-Type" value';
-like $res->body, qr/Mojo/, 'right content';
+is $res->body, 'Your Mojo is working!', 'right content';
 
 # Chunked
 my $content = 'test1=1&test2=2&test3=3&test4=4&test5=5&test6=6&test7=7';

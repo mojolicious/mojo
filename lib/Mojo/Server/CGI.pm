@@ -34,7 +34,7 @@ sub run {
   return undef unless _write($res, 'get_header_chunk');
 
   # Response body
-  return undef unless _write($res, 'get_body_chunk');
+  uc $req->method eq 'HEAD' or _write($res, 'get_body_chunk') or return undef;
 
   # Finish transaction
   $tx->server_close;

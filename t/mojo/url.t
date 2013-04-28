@@ -583,7 +583,7 @@ is $url->userinfo, undef,                                      'no userinfo';
 is $url->host,     'foo.bar',                                  'right host';
 is $url->port,     undef,                                      'no port';
 is $url->path,     '/zzz',                                     'right path';
-is $url->query,    '',                                         'right query';
+is $url->query,    '',                                         'no query';
 is $url->fragment, 'test2', 'right fragment';
 is "$url", 'http://foo.bar/zzz#test2', 'right absolute URL';
 
@@ -605,7 +605,7 @@ is $url->userinfo, undef,                                      'no userinfo';
 is $url->host,     'foo.bar',                                  'right host';
 is $url->port,     undef,                                      'no port';
 is $url->path,     '/baz/zzz',                                 'right path';
-is $url->query,    '',                                         'right query';
+is $url->query,    '',                                         'no query';
 is $url->fragment, 'test2', 'right fragment';
 is "$url", 'http://foo.bar/baz/zzz#test2', 'right absolute URL';
 
@@ -627,7 +627,7 @@ is $url->userinfo, undef,                                      'no userinfo';
 is $url->host,     'foo.bar',                                  'right host';
 is $url->port,     undef,                                      'no port';
 is $url->path,     '/zzz',                                     'right path';
-is $url->query,    '',                                         'right query';
+is $url->query,    '',                                         'no query';
 is $url->fragment, undef,                                      'no fragment';
 is "$url", 'http://foo.bar/zzz', 'right absolute URL';
 
@@ -649,7 +649,7 @@ is $url->userinfo, undef,                                      'no userinfo';
 is $url->host,     'foo.bar',                                  'right host';
 is $url->port,     undef,                                      'no port';
 is $url->path,     '/baz/zzz',                                 'right path';
-is $url->query,    '',                                         'right query';
+is $url->query,    '',                                         'no query';
 is $url->fragment, undef,                                      'no fragment';
 is "$url", 'http://foo.bar/baz/zzz', 'right absolute URL';
 

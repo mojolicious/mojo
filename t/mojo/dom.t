@@ -307,8 +307,8 @@ $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
 is $dom->at('p')->replace(''), '<p>lalala</p>', 'right result';
 is "$dom", '<div>foobar</div>', 'right result';
-is $dom->replace(''), '', 'right result';
-is "$dom", '', 'right result';
+is $dom->replace(''), '', 'no result';
+is "$dom", '', 'no result';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
 $dom->find('p')->pluck(replace => '');
@@ -329,7 +329,7 @@ is $dom->find('p')->pluck('remove')->first->root->at('b')->text, 'whatever',
   'right result';
 is "$dom", '<b>whatever</b>', 'right result';
 $dom->remove;
-is "$dom", '', 'right result';
+is "$dom", '', 'no result';
 
 # Replace element content
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
@@ -351,8 +351,8 @@ is "$dom", '♥', 'right result';
 is $dom->replace_content('<div>foo<p>lalala</p>bar</div>'),
   '<div>foo<p>lalala</p>bar</div>', 'right result';
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
-is $dom->replace_content(''), '', 'right result';
-is "$dom", '', 'right result';
+is $dom->replace_content(''), '', 'no result';
+is "$dom", '', 'no result';
 $dom->replace_content('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
 is $dom->at('p')->replace_content(''), '<p></p>', 'right result';
@@ -1938,7 +1938,7 @@ $dom = Mojo::DOM->new(<<EOF);
   works
 </div>
 EOF
-is $dom->text, '', 'right text';
+is $dom->text, '', 'no text';
 is $dom->text(0), "\n", 'right text';
 is $dom->all_text, "looks like\n  it\n    really\n  works", 'right text';
 is $dom->all_text(0), "\n  looks\n  like\n  it\n    really\n  \n  works\n\n",
@@ -1974,27 +1974,27 @@ ok
 </div>
 wow
 EOF
-is $dom->text_before, '', 'right text';
-is $dom->text_before(0), '', 'right text';
+is $dom->text_before, '', 'no text';
+is $dom->text_before(0), '', 'no text';
 is $dom->div->text_before, 'ok', 'right text';
 is $dom->div->text_before(0), "ok\n", 'right text';
 is $dom->div->p->[0]->text_before, 'looks', 'right text';
 is $dom->div->p->[0]->text_before(0), "\n  looks", 'right text';
 is $dom->div->p->[1]->text_before, 'thi s', 'right text';
 is $dom->div->p->[1]->text_before(0), "\n  thi s\n  ", 'right text';
-is $dom->div->p->[2]->text_before, '', 'right text';
-is $dom->div->p->[2]->text_before(0), '', 'right text';
-is $dom->div->p->[3]->text_before, '', 'right text';
+is $dom->div->p->[2]->text_before, '', 'no text';
+is $dom->div->p->[2]->text_before(0), '', 'no text';
+is $dom->div->p->[3]->text_before, '', 'no text';
 is $dom->div->p->[3]->text_before(0), "\n  ", 'right text';
-is $dom->text_after, '', 'right text';
-is $dom->text_after(0), '', 'right text';
+is $dom->text_after, '', 'no text';
+is $dom->text_after(0), '', 'no text';
 is $dom->div->text_after, 'wow', 'right text';
 is $dom->div->text_after(0), "\nwow\n", 'right text';
 is $dom->div->p->[0]->text_after, 'thi s', 'right text';
 is $dom->div->p->[0]->text_after(0), "\n  thi s\n  ", 'right text';
-is $dom->div->p->[1]->text_after, '', 'right text';
-is $dom->div->p->[1]->text_after(0), '', 'right text';
-is $dom->div->p->[2]->text_after, '', 'right text';
+is $dom->div->p->[1]->text_after, '', 'no text';
+is $dom->div->p->[1]->text_after(0), '', 'no text';
+is $dom->div->p->[2]->text_after, '', 'no text';
 is $dom->div->p->[2]->text_after(0), "\n  ", 'right text';
 is $dom->div->p->[3]->text_after, 'work', 'right text';
 is $dom->div->p->[3]->text_after(0), "work\n", 'right text';

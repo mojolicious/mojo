@@ -85,7 +85,7 @@ ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum line size exceeded', 'right error';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '', 'right URL';
+is $req->url,         '', 'no URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 
@@ -98,7 +98,7 @@ ok $req->is_finished, 'request is finished';
 is $req->error,       'Maximum line size exceeded', 'right error';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '', 'right URL';
+is $req->url,         '', 'no URL';
 is $req->cookie('a'), undef, 'no value';
 is $req->body, '', 'no content';
 

@@ -141,7 +141,7 @@ $e = Mojo::EventEmitter->new;
 my $buffer = '';
 $e->on(one => sub { $_ = $_[1] .= 'abc' . $_[2] });
 $e->on(one => sub { $_[1] .= '123' . pop });
-is $buffer, '', 'right result';
+is $buffer, '', 'no result';
 $e->emit(one => $buffer => 'two');
 is $buffer, 'abctwo123two', 'right result';
 $e->once(one => sub { $_[1] .= 'def' });

@@ -238,7 +238,7 @@ ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 204, 'right status';
-ok $tx->has_empty_res, 'response needs to be empty';
+ok $tx->is_empty, 'transaction is empty';
 is $tx->res->body, '', 'no content';
 
 # Connection was kept alive
@@ -246,7 +246,7 @@ $tx = $ua->get('/');
 ok $tx->success,    'successful';
 ok $tx->kept_alive, 'kept connection alive';
 is $tx->res->code, 200, 'right status';
-ok !$tx->has_empty_res, 'response does not need to be empty';
+ok !$tx->is_empty, 'transaction is not empty';
 is $tx->res->body, 'works!', 'right content';
 
 # Non-blocking form

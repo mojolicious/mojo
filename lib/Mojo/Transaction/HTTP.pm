@@ -20,9 +20,7 @@ sub client_read {
 
 sub client_write { shift->_write(0) }
 
-sub has_empty_res {
-  !!(uc $_[0]->req->method eq 'HEAD' || $_[0]->res->is_empty);
-}
+sub is_empty { !!(uc $_[0]->req->method eq 'HEAD' || $_[0]->res->is_empty) }
 
 sub keep_alive {
   my $self = shift;
@@ -95,7 +93,7 @@ sub _headers {
     $self->{offset} = 0;
 
     # Response without body
-    if ($head && $self->has_empty_res) { $self->{state} = 'finished' }
+    if ($head && $self->is_empty) { $self->{state} = 'finished' }
 
     # Body
     else {
@@ -262,9 +260,9 @@ Read data client-side, used to implement user agents.
 
 Write data client-side, used to implement user agents.
 
-=head2 has_empty_res
+=head2 is_empty
 
-  my $success = $tx->has_empty_res;
+  my $success = $tx->is_empty;
 
 Check transaction for C<HEAD> request and C<1xx>, C<204> or C<304> response.
 

@@ -29,8 +29,7 @@ sub run {
   }
 
   # PSGI response
-  my $io
-    = Mojo::Server::PSGI::_IO->new(tx => $tx, empty => $tx->has_empty_res);
+  my $io = Mojo::Server::PSGI::_IO->new(tx => $tx, empty => $tx->is_empty);
   return [$res->code || 404, \@headers, $io];
 }
 

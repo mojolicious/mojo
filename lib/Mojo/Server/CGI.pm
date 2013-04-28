@@ -34,7 +34,7 @@ sub run {
   return undef unless _write($res, 'get_header_chunk');
 
   # Response body
-  $tx->has_empty_res or _write($res, 'get_body_chunk') or return undef;
+  $tx->is_empty or _write($res, 'get_body_chunk') or return undef;
 
   # Finish transaction
   $tx->server_close;

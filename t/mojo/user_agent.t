@@ -238,13 +238,15 @@ ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 204, 'right status';
-is $tx->res->body, '',  'no content';
+ok $tx->has_empty_res, 'response needs to be empty';
+is $tx->res->body, '', 'no content';
 
 # Connection was kept alive
 $tx = $ua->get('/');
 ok $tx->success,    'successful';
 ok $tx->kept_alive, 'kept connection alive';
-is $tx->res->code, 200,      'right status';
+is $tx->res->code, 200, 'right status';
+ok !$tx->has_empty_res, 'response does not need to be empty';
 is $tx->res->body, 'works!', 'right content';
 
 # Non-blocking form

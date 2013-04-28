@@ -124,6 +124,7 @@ is $tx->req->url->to_abs, 'http://example.com/foo', 'right URL';
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
+ok !$tx->has_empty_res, 'response does not need to be empty';
 is $tx->req->body, 'a=1&a=2&a=3&b=4', 'right content';
 
 # Existing query string (lowercase HEAD)
@@ -132,6 +133,7 @@ is $tx->req->url->to_abs, 'http://example.com?foo=bar&baz=1&baz=2',
   'right URL';
 is $tx->req->method, 'head', 'right method';
 is $tx->req->headers->content_type, undef, 'no "Content-Type" value';
+ok $tx->has_empty_res, 'response needs to be empty';
 is $tx->req->body, '', 'no content';
 
 # UTF-8 form

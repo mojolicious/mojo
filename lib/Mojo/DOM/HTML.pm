@@ -206,9 +206,7 @@ sub _end {
     if ($end eq $$current->[1]) { return $$current = $$current->[3] }
 
     # Optional elements
-    elsif ($OPTIONAL{$$current->[1]}) {
-      $self->_end($$current->[1], $current);
-    }
+    elsif ($OPTIONAL{$$current->[1]}) { $self->_end($$current->[1], $current) }
 
     # Table
     elsif ($end eq 'table') { $self->_close($current) }
@@ -312,20 +310,17 @@ sub _start {
 
     # "<th>" and "<td>"
     elsif (grep { $_ eq $start } qw(th td)) {
-      $self->_close($current, {th => 1});
-      $self->_close($current, {td => 1});
+      $self->_close($current, {$_ => 1}) for qw(th td);
     }
 
     # "<dt>" and "<dd>"
     elsif (grep { $_ eq $start } qw(dt dd)) {
-      $self->_end('dt', $current);
-      $self->_end('dd', $current);
+      $self->_end($_, $current) for qw(dt dd);
     }
 
     # "<rt>" and "<rp>"
     elsif (grep { $_ eq $start } qw(rt rp)) {
-      $self->_end('rt', $current);
-      $self->_end('rp', $current);
+      $self->_end($_, $current) for qw(rt rp);
     }
   }
 

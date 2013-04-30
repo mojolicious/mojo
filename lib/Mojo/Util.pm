@@ -116,6 +116,7 @@ sub hmac_sha1_sum { _hmac(\&sha1, @_) }
 
 sub html_unescape {
   my $string = shift;
+  return $string if index($string, '&') == -1;
   $string
     =~ s/&(?:\#((?:\d{1,7}|x[[:xdigit:]]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
   return $string;

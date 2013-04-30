@@ -2,6 +2,7 @@
 3.98  2013-04-30
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Removed deprecated after_static_dispatch hook.
+  - Improved html_unescape performance in Mojo::Util.
   - Improved documentation.
   - Improved tests.
   - Fixed support for HEAD request method in Mojo::Server::CGI and

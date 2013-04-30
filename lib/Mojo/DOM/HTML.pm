@@ -88,10 +88,7 @@ sub parse {
       = ($1, $2, $3, $4, $5, $6);
 
     # Text
-    if (length $text) {
-      $text = html_unescape $text if (index $text, '&') >= 0;
-      $self->_text($text, \$current);
-    }
+    if (length $text) { $self->_text(html_unescape($text), \$current) }
 
     # DOCTYPE
     if ($doctype) { $self->_doctype($doctype, \$current) }
@@ -123,9 +120,7 @@ sub parse {
         # Empty tag
         next if $key eq '/';
 
-        # Add unescaped value
-        $value = html_unescape $value if $value && (index $value, '&') >= 0;
-        $attrs{$key} = $value;
+        $attrs{$key} = defined $value ? html_unescape($value) : $value;
       }
 
       # Start

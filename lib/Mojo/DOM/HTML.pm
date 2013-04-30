@@ -88,19 +88,22 @@ sub parse {
       = ($1, $2, $3, $4, $5, $6);
 
     # Text
-    if (length $text) { $self->_text(html_unescape($text), \$current) }
+    if (length $text) { push @$current, ['text', html_unescape($text)] }
 
     # DOCTYPE
-    if ($doctype) { $self->_doctype($doctype, \$current) }
+    if ($doctype) { push @$current, ['doctype', $doctype] }
 
     # Comment
-    elsif ($comment) { $self->_comment($comment, \$current) }
+    elsif ($comment) { push @$current, ['comment', $comment] }
 
     # CDATA
-    elsif ($cdata) { $self->_cdata($cdata, \$current) }
+    elsif ($cdata) { push @$current, ['cdata', $cdata] }
 
-    # Processing instruction
-    elsif ($pi) { $self->_pi($pi, \$current) }
+    # Processing instruction (try to detect XML)
+    elsif ($pi) {
+      $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
+      push @$current, ['pi', $pi];
+    }
 
     # End
     next unless $tag;
@@ -123,7 +126,7 @@ sub parse {
         $attrs{$key} = defined $value ? html_unescape($value) : $value;
       }
 
-      # Start
+      # Tag
       $self->_start($start, \%attrs, \$current);
 
       # Empty element
@@ -133,7 +136,7 @@ sub parse {
       # Relaxed "script" or "style"
       if (grep { $_ eq $start } qw(script style)) {
         if ($html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi) {
-          $self->_raw($1, \$current);
+          push @$current, ['raw', $1];
           $self->_end($start, \$current);
         }
       }
@@ -148,11 +151,6 @@ sub render {
   my $content = $self->_render($self->tree);
   my $charset = $self->charset;
   return $charset ? encode($charset, $content) : $content;
-}
-
-sub _cdata {
-  my ($self, $cdata, $current) = @_;
-  push @$$current, ['cdata', $cdata];
 }
 
 sub _close {
@@ -171,16 +169,6 @@ sub _close {
     # Try next
     $parent = $parent->[3];
   }
-}
-
-sub _comment {
-  my ($self, $comment, $current) = @_;
-  push @$$current, ['comment', $comment];
-}
-
-sub _doctype {
-  my ($self, $doctype, $current) = @_;
-  push @$$current, ['doctype', $doctype];
 }
 
 sub _end {
@@ -228,18 +216,6 @@ sub _end {
     # Missing end tag
     $self->_end($$current->[1], $current);
   }
-}
-
-# Try to detect XML from processing instructions
-sub _pi {
-  my ($self, $pi, $current) = @_;
-  $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
-  push @$$current, ['pi', $pi];
-}
-
-sub _raw {
-  my ($self, $raw, $current) = @_;
-  push @$$current, ['raw', $raw];
 }
 
 sub _render {
@@ -358,11 +334,6 @@ sub _start {
   weaken $new->[3];
   push @$$current, $new;
   $$current = $new;
-}
-
-sub _text {
-  my ($self, $text, $current) = @_;
-  push @$$current, ['text', $text];
 }
 
 1;

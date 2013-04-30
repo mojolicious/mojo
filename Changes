@@ -1,5 +1,5 @@
 
-3.98  2013-04-28
+3.98  2013-04-30
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Removed deprecated after_static_dispatch hook.
   - Improved documentation.

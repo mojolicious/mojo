@@ -20,19 +20,17 @@ $cookie->value('');
 is $cookie->to_string, 'foo=', 'right format';
 
 # Empty request cookie
-$cookie = Mojo::Cookie::Request->new;
-is_deeply $cookie->parse, [], 'no cookies';
+is_deeply(Mojo::Cookie::Request->parse, [], 'no cookies');
 
 # Parse normal request cookie (RFC 2965)
-$cookie = Mojo::Cookie::Request->new;
-my $cookies = $cookie->parse('$Version=1; foo=bar; $Path="/test"');
+my $cookies
+  = Mojo::Cookie::Request->parse('$Version=1; foo=bar; $Path="/test"');
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse request cookies from multiple header values (RFC 2965)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse(
+$cookies = Mojo::Cookie::Request->parse(
   '$Version=1; foo=bar; $Path="/test", $Version=0; baz=yada; $Path="/tset"');
 is $cookies->[0]->name,  'foo',  'right name';
 is $cookies->[0]->value, 'bar',  'right value';
@@ -41,16 +39,14 @@ is $cookies->[1]->value, 'yada', 'right value';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse request cookie (Netscape)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('CUSTOMER=WILE_E_COYOTE');
+$cookies = Mojo::Cookie::Request->parse('CUSTOMER=WILE_E_COYOTE');
 is $cookies->[0]->name,  'CUSTOMER',      'right name';
 is $cookies->[0]->value, 'WILE_E_COYOTE', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse multiple request cookies (Netscape)
-$cookie = Mojo::Cookie::Request->new;
-$cookies
-  = $cookie->parse('CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001');
+$cookies = Mojo::Cookie::Request->parse(
+  'CUSTOMER=WILE_E_COYOTE; PART_NUMBER=ROCKET_LAUNCHER_0001');
 is $cookies->[0]->name,  'CUSTOMER',             'right name';
 is $cookies->[0]->value, 'WILE_E_COYOTE',        'right value';
 is $cookies->[1]->name,  'PART_NUMBER',          'right name';
@@ -58,9 +54,8 @@ is $cookies->[1]->value, 'ROCKET_LAUNCHER_0001', 'right value';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse multiple request cookies from multiple header values (Netscape)
-$cookie = Mojo::Cookie::Request->new;
-$cookies
-  = $cookie->parse('CUSTOMER=WILE_E_COYOTE, PART_NUMBER=ROCKET_LAUNCHER_0001');
+$cookies = Mojo::Cookie::Request->parse(
+  'CUSTOMER=WILE_E_COYOTE, PART_NUMBER=ROCKET_LAUNCHER_0001');
 is $cookies->[0]->name,  'CUSTOMER',             'right name';
 is $cookies->[0]->value, 'WILE_E_COYOTE',        'right value';
 is $cookies->[1]->name,  'PART_NUMBER',          'right name';
@@ -68,64 +63,62 @@ is $cookies->[1]->value, 'ROCKET_LAUNCHER_0001', 'right value';
 is $cookies->[2], undef, 'no more cookies';
 
 # Parse request cookie without value (RFC 2965)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo=; $Path="/test"');
+$cookies = Mojo::Cookie::Request->parse('$Version=1; foo=; $Path="/test"');
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, '',    'no value';
 is $cookies->[1], undef, 'no more cookies';
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo=""; $Path="/test"');
+$cookies = Mojo::Cookie::Request->parse('$Version=1; foo=""; $Path="/test"');
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, '',    'no value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted request cookie (RFC 2965)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo="b ,a\" r\"\\\\"; $Path="/test"');
+$cookies = Mojo::Cookie::Request->parse(
+  '$Version=1; foo="b ,a\" r\"\\\\"; $Path="/test"');
 is $cookies->[0]->name,  'foo',        'right name';
 is $cookies->[0]->value, 'b ,a" r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted request cookie roundtrip (RFC 2965)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo="b ,a\";= r\"\\\\"; $Path="/test"');
+$cookies = Mojo::Cookie::Request->parse(
+  '$Version=1; foo="b ,a\";= r\"\\\\"; $Path="/test"');
 is $cookies->[0]->name,  'foo',          'right name';
 is $cookies->[0]->value, 'b ,a";= r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
-$cookies = $cookie->parse($cookies->[0]->to_string);
+$cookies = Mojo::Cookie::Request->parse($cookies->[0]->to_string);
 is $cookies->[0]->name,  'foo',          'right name';
 is $cookies->[0]->value, 'b ,a";= r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted request cookie roundtrip (RFC 2965, alternative)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo="b ,a\" r\"\\\\"; $Path="/test"');
+$cookies = Mojo::Cookie::Request->parse(
+  '$Version=1; foo="b ,a\" r\"\\\\"; $Path="/test"');
 is $cookies->[0]->name,  'foo',        'right name';
 is $cookies->[0]->value, 'b ,a" r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
-$cookies = $cookie->parse($cookies->[0]->to_string);
+$cookies = Mojo::Cookie::Request->parse($cookies->[0]->to_string);
 is $cookies->[0]->name,  'foo',        'right name';
 is $cookies->[0]->value, 'b ,a" r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted request cookie roundtrip (RFC 2965, another alternative)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo="b ;a\" r\"\\\\"; $Path="/test"');
+$cookies = Mojo::Cookie::Request->parse(
+  '$Version=1; foo="b ;a\" r\"\\\\"; $Path="/test"');
 is $cookies->[0]->name,  'foo',        'right name';
 is $cookies->[0]->value, 'b ;a" r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
-$cookies = $cookie->parse($cookies->[0]->to_string);
+$cookies = Mojo::Cookie::Request->parse($cookies->[0]->to_string);
 is $cookies->[0]->name,  'foo',        'right name';
 is $cookies->[0]->value, 'b ;a" r"\\', 'right value';
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse quoted request cookie roundtrip (RFC 2965, yet another alternative)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo="\"b a\" r\""; $Path="/test"');
+$cookies = Mojo::Cookie::Request->parse(
+  '$Version=1; foo="\"b a\" r\""; $Path="/test"');
 is $cookies->[0]->name,  'foo',      'right name';
 is $cookies->[0]->value, '"b a" r"', 'right value';
 is $cookies->[1], undef, 'no more cookies';
-$cookies = $cookie->parse($cookies->[0]->to_string);
+$cookies = Mojo::Cookie::Request->parse($cookies->[0]->to_string);
 is $cookies->[0]->name,  'foo',      'right name';
 is $cookies->[0]->value, '"b a" r"', 'right value';
 is $cookies->[1], undef, 'no more cookies';
@@ -172,8 +165,7 @@ is $cookie->to_string,
   . ' path=/test; secure; Max-Age=60; HttpOnly', 'right format';
 
 # Empty response cookie
-$cookie = Mojo::Cookie::Response->new;
-is_deeply $cookie->parse, [], 'no cookies';
+is_deeply(Mojo::Cookie::Response->parse, [], 'no cookies');
 
 # Parse response cookie (RFC 6265)
 $cookies

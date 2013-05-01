@@ -150,7 +150,7 @@ Expiration for cookie.
 
 =head2 parse
 
-  my $cookies = $cookie->parse('f=b; path=/');
+  my $cookies = Mojo::Cookie::Response->parse('f=b; path=/');
 
 Parse cookies.
 

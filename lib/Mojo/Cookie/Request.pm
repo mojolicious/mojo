@@ -55,7 +55,7 @@ implements the following new ones.
 
 =head2 parse
 
-  my $cookies = $cookie->parse('f=b; g=a');
+  my $cookies = Mojo::Cookie::Request->parse('f=b; g=a');
 
 Parse cookies.
 

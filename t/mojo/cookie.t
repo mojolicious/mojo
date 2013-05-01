@@ -19,13 +19,13 @@ $cookie->name('foo');
 $cookie->value('');
 is $cookie->to_string, 'foo=', 'right format';
 
-# Empty cookie
+# Empty request cookie
 $cookie = Mojo::Cookie::Request->new;
-my $cookies = $cookie->parse();
+is_deeply $cookie->parse, [], 'no cookies';
 
 # Parse normal request cookie (RFC 2965)
-$cookie  = Mojo::Cookie::Request->new;
-$cookies = $cookie->parse('$Version=1; foo=bar; $Path="/test"');
+$cookie = Mojo::Cookie::Request->new;
+my $cookies = $cookie->parse('$Version=1; foo=bar; $Path="/test"');
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';
 is $cookies->[1], undef, 'no more cookies';
@@ -170,6 +170,10 @@ $cookie->httponly(1);
 is $cookie->to_string,
   'foo=ba r; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
   . ' path=/test; secure; Max-Age=60; HttpOnly', 'right format';
+
+# Empty response cookie
+$cookie = Mojo::Cookie::Response->new;
+is_deeply $cookie->parse, [], 'no cookies';
 
 # Parse response cookie (RFC 6265)
 $cookies

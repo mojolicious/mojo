@@ -7,11 +7,10 @@ sub parse {
   my ($self, $string) = @_;
 
   my @cookies;
-  for my $token (map {@$_} $self->_tokenize($string)) {
+  for my $token (map {@$_} $self->_tokenize($string // '')) {
     my ($name, $value) = @$token;
     next if $name =~ /^\$/;
-    push @cookies,
-      Mojo::Cookie::Request->new(name => $name, value => $value // '');
+    push @cookies, $self->new(name => $name, value => $value // '');
   }
 
   return \@cookies;

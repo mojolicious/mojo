@@ -31,7 +31,7 @@ sub run {
     die "Can't find test directory.\n" unless -d $path;
 
     my $home = Mojo::Home->new($path);
-    /\.t$/ and push(@args, $home->rel_file($_)) for @{$home->list_files};
+    /\.t$/ and push @args, $home->rel_file($_) for @{$home->list_files};
     say "Running tests from '", realpath($path), "'.";
   }
 

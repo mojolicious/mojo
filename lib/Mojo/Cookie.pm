@@ -18,10 +18,7 @@ sub _tokenize {
 
   # Nibbling parser
   my (@tree, @token);
-  while ($string) {
-
-    # Name
-    last unless $string =~ s/^\s*([^=;,]+)\s*=?\s*//;
+  while ($string =~ s/^\s*([^=;,]+)\s*=?\s*//) {
     my $name = $1;
 
     # "expires" is a special case, thank you Netscape...
@@ -34,10 +31,9 @@ sub _tokenize {
 
     # Separator
     $string =~ s/^\s*;\s*//;
-    if ($string =~ s/^\s*,\s*//) {
-      push @tree, [@token];
-      @token = ();
-    }
+    next unless $string =~ s/^\s*,\s*//;
+    push @tree, [@token];
+    @token = ();
   }
 
   # Take care of final token

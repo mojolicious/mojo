@@ -52,7 +52,7 @@ sub select {
 
       # Try all selectors with element
       for my $part (@$pattern) {
-        push(@results, $current) and last
+        push @results, $current and last
           if $self->_combinator([reverse @$part], $current, $tree);
       }
     }

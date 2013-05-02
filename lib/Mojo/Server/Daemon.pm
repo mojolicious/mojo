@@ -108,9 +108,7 @@ sub _build_tx {
   );
 
   # Kept alive if we have more than one request on the connection
-  $tx->kept_alive(1) if ++$c->{requests} > 1;
-
-  return $tx;
+  return ++$c->{requests} > 1 ? $tx->kept_alive(1) : $tx;
 }
 
 sub _close {

@@ -29,11 +29,11 @@ sub add {
   my ($self, $name) = (shift, shift);
 
   # Make sure we have a normal case entry for name
-  my $lcname = lc $name;
-  $self->{normalcase}{$lcname} //= $name unless $NORMALCASE{$lcname};
+  my $key = lc $name;
+  $self->{normalcase}{$key} //= $name unless $NORMALCASE{$key};
 
   # Add lines
-  push @{$self->{headers}{$lcname}}, map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
+  push @{$self->{headers}{$key}}, map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
 
   return $self;
 }

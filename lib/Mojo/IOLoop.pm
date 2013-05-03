@@ -38,9 +38,6 @@ sub acceptor {
   # Find acceptor for id
   return $self->{acceptors}{$acceptor} unless ref $acceptor;
 
-  # Make sure timers are running
-  $self->_timers;
-
   # Connect acceptor with reactor
   my $id = $self->_id;
   $self->{acceptors}{$id} = $acceptor;
@@ -209,6 +206,9 @@ sub _id {
 
 sub _not_accepting {
   my $self = shift;
+
+  # Make sure timers are running
+  $self->_timers;
 
   # Release accept mutex
   return unless delete $self->{accepting};

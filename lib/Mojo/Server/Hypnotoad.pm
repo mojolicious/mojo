@@ -256,9 +256,9 @@ L<Mojolicious::Guides::Cookbook/"Hypnotoad"> for examples.
 
   accept_interval => 0.5
 
-Interval in seconds for trying to reacquire the accept mutex and connection
-management, defaults to C<0.025>. Note that changing this value can affect
-performance and idle CPU usage.
+Interval in seconds for trying to reacquire the accept mutex, defaults to
+C<0.025>. Note that changing this value can affect performance and idle CPU
+usage.
 
 =head2 accepts
 

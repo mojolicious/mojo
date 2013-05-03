@@ -3,6 +3,7 @@
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Added close_gracefully method to Mojo::IOLoop::Stream.
   - Removed deprecated after_static_dispatch hook.
+  - Reduced idle CPU usage of Mojo::IOLoop.
   - Improved Mojo::DOM::HTML performance.
   - Improved html_unescape performance in Mojo::Util.
   - Improved documentation.

@@ -26,7 +26,7 @@ my $commands = Mojolicious::Commands->new;
 }
 
 # Run command
-is ref Mojolicious::Commands->run('psgi'), 'CODE', 'right reference';
+is ref Mojolicious::Commands->new->run('psgi'), 'CODE', 'right reference';
 
 # Start application
 {

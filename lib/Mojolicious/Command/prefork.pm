@@ -25,7 +25,7 @@ These options are available:
                                        value of MOJO_INACTIVITY_TIMEOUT or 15.
       --lock-file <path>               Path to lock file, defaults to a random
                                        file.
-  -L, --lock-timeout <seconds>         Lock timeout, defaults to 0.5.
+  -L, --lock-timeout <seconds>         Lock timeout, defaults to 1.
   -l, --listen <location>              One or more locations you want to
                                        listen on, defaults to the value of
                                        MOJO_LISTEN or "http://*:3000".

@@ -15,7 +15,7 @@ has accept_interval => 0.025;
 has [qw(graceful_timeout heartbeat_timeout)] => 20;
 has heartbeat_interval => 5;
 has lock_file          => sub { catfile tmpdir, 'prefork.lock' };
-has lock_timeout       => 0.5;
+has lock_timeout       => 1;
 has multi_accept       => 50;
 has pid_file           => sub { catfile tmpdir, 'prefork.pid' };
 has workers            => 4;
@@ -445,10 +445,10 @@ appended, defaults to a random temporary path.
 =head2 lock_timeout
 
   my $timeout = $prefork->lock_timeout;
-  $prefork    = $prefork->lock_timeout(1);
+  $prefork    = $prefork->lock_timeout(0.5);
 
 Maximum amount of time in seconds a worker may block when waiting for the
-accept mutex, defaults to C<0.5>.
+accept mutex, defaults to C<1>.
 
 =head2 multi_accept
 

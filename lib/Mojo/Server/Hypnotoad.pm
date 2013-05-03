@@ -341,10 +341,10 @@ appended, defaults to a random temporary path.
 
 =head2 lock_timeout
 
-  lock_timeout => 1
+  lock_timeout => 0.5
 
 Maximum amount of time in seconds a worker may block when waiting for the
-accept mutex, defaults to C<0.5>.
+accept mutex, defaults to C<1>.
 
 =head2 multi_accept
 

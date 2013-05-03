@@ -47,7 +47,8 @@ sub one_tick {
     elsif ($timeout) { usleep $timeout * 1000000 }
 
     # Timers
-    while (my ($id, $t) = each %{$self->{timers} || {}}) {
+    for my $id (keys %{$self->{timers}}) {
+      next unless my $t = $self->{timers}{$id};
       next unless $t->{time} <= (my $time = steady_time);
 
       # Recurring timer

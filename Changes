@@ -1,5 +1,5 @@
 
-3.98  2013-05-03
+3.98  2013-05-04
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Added close_gracefully method to Mojo::IOLoop::Stream.
   - Removed deprecated after_static_dispatch hook.
@@ -12,6 +12,7 @@
   - Improved html_unescape performance in Mojo::Util.
   - Improved documentation.
   - Improved tests.
+  - Fixed Perl 5.17.11+ compatibility.
   - Fixed support for HEAD request method in Mojo::Server::CGI and
     Mojo::Server::PSGI.
 

@@ -226,7 +226,7 @@ sub _remove {
   return if $reactor->remove($id);
 
   # Acceptor
-  if (delete $self->{acceptors}{$id}) { delete $self->{accepting} }
+  if (delete $self->{acceptors}{$id}) { $self->_not_accepting }
 
   # Connection
   else { delete $self->{connections}{$id} }

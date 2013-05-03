@@ -259,7 +259,7 @@ sub _stream {
 sub _timers {
   my $self = shift;
   $self->{accept} ||= $self->recurring($self->accept_interval => \&_accepting);
-  $self->{stop} ||= $self->recurring(0.5 => \&_stop);
+  $self->{stop} ||= $self->recurring(1 => \&_stop);
 }
 
 1;

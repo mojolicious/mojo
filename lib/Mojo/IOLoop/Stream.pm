@@ -108,7 +108,7 @@ sub _startup {
   my $reactor = $self->reactor;
   weaken $self;
   $self->{timer} = $reactor->recurring(
-    0.5 => sub {
+    1 => sub {
       return unless my $timeout = $self->timeout;
       $self->emit_safe('timeout')->close
         if (steady_time - $self->{active}) >= $timeout;

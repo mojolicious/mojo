@@ -448,7 +448,8 @@ appended, defaults to a random temporary path.
   $prefork    = $prefork->lock_timeout(0.5);
 
 Maximum amount of time in seconds a worker may block when waiting for the
-accept mutex, defaults to C<1>.
+accept mutex, defaults to C<1>. Note that changing this value can affect
+performance and idle CPU usage.
 
 =head2 multi_accept
 

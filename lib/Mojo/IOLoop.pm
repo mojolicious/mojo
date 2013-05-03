@@ -116,7 +116,8 @@ sub recurring {
 sub remove {
   my ($self, $id) = @_;
   $self = $self->singleton unless ref $self;
-  if (my $c = $self->{connections}{$id}) { return $c->{finish} = 1 }
+  my $c = $self->{connections}{$id};
+  if ($c && (my $stream = $c->{stream})) { return $stream->close_gracefully }
   $self->_remove($id);
 }
 
@@ -211,14 +212,8 @@ sub _manage {
   # Try to acquire accept mutex
   $self->_accepting;
 
-  # Close connections gracefully
-  my $connections = $self->{connections} ||= {};
-  while (my ($id, $c) = each %$connections) {
-    $self->_remove($id)
-      if $c->{finish} && (!$c->{stream} || !$c->{stream}->is_writing);
-  }
-
   # Graceful stop
+  my $connections = $self->{connections} ||= {};
   $self->_remove(delete $self->{manager})
     unless keys %$connections || keys %{$self->{acceptors}};
   $self->stop if $self->max_connections == 0 && keys %$connections == 0;
@@ -250,11 +245,8 @@ sub _remove {
   # Acceptor
   if (delete $self->{acceptors}{$id}) { delete $self->{accepting} }
 
-  # Connection (stream needs to be deleted first)
-  else {
-    delete(($self->{connections}{$id} || {})->{stream});
-    delete $self->{connections}{$id};
-  }
+  # Connection
+  else { delete $self->{connections}{$id} }
 }
 
 sub _stream {
@@ -267,7 +259,7 @@ sub _stream {
   $self->{connections}{$id}{stream} = $stream;
   weaken $stream->reactor($self->reactor)->{reactor};
   weaken $self;
-  $stream->on(close => sub { $self->{connections}{$id}{finish} = 1 });
+  $stream->on(close => sub { $self && $self->_remove($id) });
   $stream->start;
 
   return $id;

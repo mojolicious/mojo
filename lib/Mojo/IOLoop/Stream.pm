@@ -28,6 +28,12 @@ sub close {
   $self->emit_safe('close');
 }
 
+sub close_gracefully {
+  my $self = shift;
+  return $self->{graceful} = 1 if $self->is_writing;
+  $self->close;
+}
+
 sub handle { shift->{handle} }
 
 sub is_readable {
@@ -136,7 +142,8 @@ sub _write {
   }
 
   $self->emit_safe('drain') if !length $self->{buffer};
-  return if $self->is_writing;
+  return                    if $self->is_writing;
+  return $self->close       if $self->{graceful};
   $self->reactor->watch($handle, !$self->{paused}, 0);
 }
 
@@ -274,6 +281,12 @@ Construct a new L<Mojo::IOLoop::Stream> object.
   $stream->close;
 
 Close stream immediately.
+
+=head2 close_gracefully
+
+  $stream->close_gracefully;
+
+Close stream gracefully.
 
 =head2 handle
 

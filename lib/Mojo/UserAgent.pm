@@ -332,8 +332,9 @@ sub _handle {
   my ($self, $id, $close) = @_;
 
   # Remove request timeout
+  return unless my $loop = $self->_loop;
   my $c = $self->{connections}{$id};
-  $self->_loop->remove($c->{timeout}) if $c->{timeout};
+  $loop->remove($c->{timeout}) if $c->{timeout};
 
   # Finish WebSocket
   my $old = $c->{tx};

@@ -50,15 +50,34 @@ sub is_writing {
 
 sub start {
   my $self = shift;
-  return $self->_startup unless $self->{startup}++;
-  return unless delete $self->{paused};
-  $self->reactor->watch($self->{handle}, 1, $self->is_writing);
+
+  my $reactor = $self->reactor;
+  unless ($self->{timer}) {
+
+    # Timeout (ignore 0 timeout)
+    weaken $self;
+    $self->{timer} = $reactor->recurring(
+      1 => sub {
+        return unless my $timeout = $self->timeout;
+        my $diff = steady_time - $self->{active};
+        $self->emit_safe('timeout')->close if $diff >= $timeout;
+      }
+    );
+
+    $self->{active} = steady_time;
+    $reactor->io($self->{handle},
+      sub { pop() ? $self->_write : $self->_read });
+  }
+
+  # Resume
+  $reactor->watch($self->{handle}, 1, $self->is_writing)
+    if delete $self->{paused};
 }
 
 sub stop {
   my $self = shift;
-  return if $self->{paused}++;
-  $self->reactor->watch($self->{handle}, 0, $self->is_writing);
+  $self->reactor->watch($self->{handle}, 0, $self->is_writing)
+    unless $self->{paused}++;
 }
 
 sub steal_handle {
@@ -99,24 +118,6 @@ sub _read {
   return $self->close if $read == 0;
 
   $self->emit_safe(read => $buffer)->{active} = steady_time;
-}
-
-sub _startup {
-  my $self = shift;
-
-  # Timeout (ignore 0 timeout)
-  my $reactor = $self->reactor;
-  weaken $self;
-  $self->{timer} = $reactor->recurring(
-    1 => sub {
-      return unless my $timeout = $self->timeout;
-      $self->emit_safe('timeout')->close
-        if (steady_time - $self->{active}) >= $timeout;
-    }
-  );
-
-  $self->{active} = steady_time;
-  $reactor->io($self->{handle}, sub { pop() ? $self->_write : $self->_read });
 }
 
 sub _write {

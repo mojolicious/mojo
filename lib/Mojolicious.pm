@@ -443,7 +443,7 @@ requests indiscriminately.
   # Dispatchers will not run if there's already a response code defined
   $app->hook(before_dispatch => sub {
     my $c = shift;
-    $c->render(text => 'Skipped dispatchers!')
+    $c->render(text => 'Skipped static file server and router!')
       if $c->req->url->path->to_route =~ /do_not_dispatch/;
   });
 

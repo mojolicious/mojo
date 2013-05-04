@@ -332,7 +332,10 @@ is "$dom", '<p>foo</p><b>whatever</b><p>bar</p>', 'right result';
 is $dom->find('p')->pluck('remove')->first->root->at('b')->text, 'whatever',
   'right result';
 is "$dom", '<b>whatever</b>', 'right result';
-$dom->remove;
+$dom->charset('UTF-8');
+$dom->at('b')->replace_content(encode('UTF-8', '♥'));
+is "$dom", encode('UTF-8', '<b>♥</b>'), 'right result';
+$dom->charset(undef)->remove;
 is "$dom", '', 'no result';
 
 # Replace element content

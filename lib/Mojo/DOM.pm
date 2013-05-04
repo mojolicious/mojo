@@ -472,7 +472,8 @@ enabled by default.
 
   $dom = $dom->append('<p>Hi!</p>');
 
-Append to element.
+Append HTML/XML to element. Note that the HTML/XML will be decoded if a
+C<charset> has been defined.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
@@ -481,7 +482,8 @@ Append to element.
 
   $dom = $dom->append_content('<p>Hi!</p>');
 
-Append to element content.
+Append HTML/XML to element content. Note that the HTML/XML will be decoded if
+a C<charset> has been defined.
 
   # "<div><h1>AB</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
@@ -511,8 +513,7 @@ Element attributes.
   my $charset = $dom->charset;
   $dom        = $dom->charset('UTF-8');
 
-Charset used by C<parse>, C<content_xml> and C<to_xml> for decoding and
-encoding HTML/XML.
+Charset used for decoding and encoding HTML/XML.
 
 =head2 children
 
@@ -592,7 +593,8 @@ be decoded if a C<charset> has been defined.
 
   $dom = $dom->prepend('<p>Hi!</p>');
 
-Prepend to element.
+Prepend HTML/XML to element. Note that the HTML/XML will be decoded if a
+C<charset> has been defined.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
@@ -601,7 +603,8 @@ Prepend to element.
 
   $dom = $dom->prepend_content('<p>Hi!</p>');
 
-Prepend to element content.
+Prepend HTML/XML to element content. Note that the HTML/XML will be decoded if
+a C<charset> has been defined.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
@@ -629,7 +632,8 @@ Remove element and return it as a L<Mojo::DOM> object.
 
   my $old = $dom->replace('<div>test</div>');
 
-Replace element and return the replaced element as a L<Mojo::DOM> object.
+Replace element and return the replaced element as a L<Mojo::DOM> object. Note
+that the HTML/XML will be decoded if a C<charset> has been defined.
 
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>')->root;
@@ -641,7 +645,8 @@ Replace element and return the replaced element as a L<Mojo::DOM> object.
 
   $dom = $dom->replace_content('test');
 
-Replace element content.
+Replace element content with HTML/XML. Note that the HTML/XML will be decoded
+if a C<charset> has been defined.
 
   # "<div><h1>B</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B')->root;

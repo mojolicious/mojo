@@ -386,13 +386,15 @@ following new ones.
 
   $html = $html->parse('<foo bar="baz">test</foo>');
 
-Parse HTML/XML document.
+Parse HTML/XML document. Note that the HTML/XML will be decoded if a
+C<charset> has been defined.
 
 =head2 render
 
   my $xml = $html->render;
 
-Render DOM to XML.
+Render DOM to XML. Note that the XML will be encoded if a C<charset> has been
+defined.
 
 =head1 SEE ALSO
 

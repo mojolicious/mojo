@@ -582,7 +582,8 @@ has no parent.
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
-Parse HTML/XML document with L<Mojo::DOM::HTML>.
+Parse HTML/XML document with L<Mojo::DOM::HTML>. Note that the HTML/XML will
+be decoded if a C<charset> has been defined.
 
   # Parse UTF-8 encoded XML
   my $dom = Mojo::DOM->new->charset('UTF-8')->xml(1)->parse($xml);

@@ -11,7 +11,7 @@ use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
-use Mojo::Util qw(deprecated encode);
+use Mojo::Util 'encode';
 
 has generators => sub { {} };
 
@@ -43,24 +43,6 @@ sub endpoint {
     if $proto eq 'http' && lc($req->headers->upgrade // '') ne 'websocket';
 
   return $proto, $host, $port;
-}
-
-# DEPRECATED in Rainbow!
-sub form {
-  deprecated 'Mojo::UserAgent::Transactor::form is DEPRECATED in favor of '
-    . 'Mojo::UserAgent::Transactor::tx';
-  my ($self, $url, $charset) = (shift, shift, shift);
-  my $form = ref $charset ? $charset : shift;
-  $charset = undef if ref $charset;
-  return $self->tx(POST => $url, @_, form => $form, charset => $charset);
-}
-
-# DEPRECATED in Rainbow!
-sub json {
-  deprecated 'Mojo::UserAgent::Transactor::json is DEPRECATED in favor of '
-    . 'Mojo::UserAgent::Transactor::tx';
-  my ($self, $url, $data) = (shift, shift, shift);
-  return $self->tx(POST => $url, @_, json => $data);
 }
 
 sub peer {

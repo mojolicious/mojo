@@ -13,7 +13,7 @@ use Mojo::JSON;
 use Mojo::JSON::Pointer;
 use Mojo::Server;
 use Mojo::UserAgent;
-use Mojo::Util qw(decode deprecated encode);
+use Mojo::Util qw(decode encode);
 use Test::More ();
 
 has [qw(message tx)];
@@ -225,24 +225,6 @@ sub or {
 
 sub patch_ok { shift->_request_ok(patch => @_) }
 sub post_ok  { shift->_request_ok(post  => @_) }
-
-# DEPRECATED in Rainbow!
-sub post_form_ok {
-  deprecated
-    'Test::Mojo::post_form_ok is DEPRECATED in favor of Test::Mojo::post_ok';
-  my ($self, $url) = (shift, shift);
-  my $tx = $self->tx($self->ua->post_form($url, @_))->tx;
-  return $self->_test('ok', $tx->is_finished, encode('UTF-8', "POST $url"));
-}
-
-# DEPRECATED in Rainbow!
-sub post_json_ok {
-  deprecated
-    'Test::Mojo::post_json_ok is DEPRECATED in favor of Test::Mojo::post_ok';
-  my ($self, $url) = (shift, shift);
-  my $tx = $self->tx($self->ua->post_json($url, @_))->tx;
-  return $self->_test('ok', $tx->is_finished, encode('UTF-8', "POST $url"));
-}
 
 sub put_ok { shift->_request_ok(put => @_) }
 

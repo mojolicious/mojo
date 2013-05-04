@@ -6,7 +6,7 @@ use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::JSON 'j';
 use Mojo::UserAgent;
-use Mojo::Util qw(deprecated monkey_patch);
+use Mojo::Util 'monkey_patch';
 
 # Silent oneliners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
@@ -39,17 +39,6 @@ sub import {
     t => sub { _request($UA->build_tx(PATCH => @_)) },
     u => sub { _request($UA->build_tx(PUT => @_)) },
     x => sub { Mojo::DOM->new(@_) };
-
-  # DEPRECATED in Rainbow!
-  my $f = sub {
-    deprecated 'ojo::f is DEPRECATED in favor of ojo::p';
-    _request($UA->build_form_tx(@_));
-  };
-  my $n = sub {
-    deprecated 'ojo::n is DEPRECATED in favor of ojo::p';
-    _request($UA->build_json_tx(@_));
-  };
-  monkey_patch $caller, f => $f, n => $n;
 }
 
 sub _request {

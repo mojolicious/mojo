@@ -2,6 +2,11 @@
 3.98  2013-05-05
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Added close_gracefully method to Mojo::IOLoop::Stream.
+  - Removed deprecated build_form_tx, build_json_tx, post_form and post_json
+    methods from Mojo::UserAgent.
+  - Removed deprecated form and json methods from Mojo::UserAgent::Transactor.
+  - Removed deprecated post_form_ok and post_json_ok methods from Test::Mojo.
+  - Removed deprecated f and n functions from ojo.
   - Removed deprecated after_static_dispatch hook.
   - Reduced idle CPU usage of Mojo::IOLoop.
   - Increased default lock_timeout from 0.5 to 1 second in

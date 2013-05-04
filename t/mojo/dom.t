@@ -84,8 +84,8 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   more text
 </foo>
 EOF
-is $dom->xml,  undef, 'xml mode not detected';
-is $dom->type, '',    'no type';
+ok !$dom->xml, 'XML mode not detected';
+is $dom->type, '', 'no type';
 is $dom->attrs('foo'), '', 'no attribute';
 is $dom->attrs(foo => 'bar')->attrs('foo'), '', 'no attribute';
 is $dom->tree->[1][0], 'doctype', 'right element';
@@ -408,7 +408,7 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   </channel>
 </rss>
 EOF
-is $dom->xml, 1, 'xml mode detected';
+ok $dom->xml, 'XML mode detected';
 is $dom->find('rss')->[0]->attrs('version'), '2.0', 'right version';
 is $dom->at('extension')->attrs('foo:id'), 'works', 'right id';
 like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
@@ -419,6 +419,10 @@ like $dom->at('[id*="ork"]')->text,  qr/\[awesome\]\]/,           'right text';
 like $dom->at('[id*="orks"]')->text, qr/\[awesome\]\]/,           'right text';
 like $dom->at('[id*="work"]')->text, qr/\[awesome\]\]/,           'right text';
 like $dom->at('[id*="or"]')->text,   qr/\[awesome\]\]/,           'right text';
+ok $dom->at('rss')->xml,             'XML mode active';
+ok $dom->at('extension')->parent->xml, 'XML mode active';
+ok $dom->at('extension')->root->xml,   'XML mode active';
+ok $dom->children('rss')->first->xml,  'XML mode active';
 
 # Namespace
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -436,7 +440,7 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   </meta>
 </bk:book>
 EOF
-is $dom->xml,       1,  'xml mode detected';
+ok $dom->xml, 'XML mode detected';
 is $dom->namespace, '', 'no namespace';
 is $dom->at('book comment')->namespace, 'uri:default-ns', 'right namespace';
 is $dom->at('book comment')->text,      'rocks!',         'right text';
@@ -490,7 +494,7 @@ $dom = Mojo::DOM->new->parse(<<'EOF');
   </XRD>
 </XRDS>
 EOF
-is $dom->xml, 1, 'xml mode detected';
+ok $dom->xml, 'XML mode detected';
 is $dom->at('XRDS')->namespace, 'xri://$xrds',         'right namespace';
 is $dom->at('XRD')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace';
 my $s = $dom->find('XRDS XRD Service');
@@ -524,7 +528,7 @@ my $yadis = <<'EOF';
 </xrds:XRDS>
 EOF
 $dom = Mojo::DOM->new->parse($yadis);
-is $dom->xml, 1, 'xml mode detected';
+ok $dom->xml, 'XML mode detected';
 is $dom->at('XRDS')->namespace, 'xri://$xrds',         'right namespace';
 is $dom->at('XRD')->namespace,  'xri://$xrd*($v*2.0)', 'right namespace';
 $s = $dom->find('XRDS XRD Service');
@@ -1483,7 +1487,7 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   <![CDATA[<hello>world</hello>]]>
 </root>
 EOF
-is $dom->xml, 1, 'xml mode detected';
+ok $dom->xml, 'XML mode detected';
 is $dom->at('root')->attrs('att'), 'test', 'right attribute';
 is $dom->tree->[5][1], ' root [
   <!ELEMENT root (#PCDATA)>
@@ -1503,7 +1507,7 @@ SYSTEM "usr.dtd"
 [
   <!ENTITY test "yeah">
 ]', 'right doctype';
-is $dom->xml, undef, 'xml mode not detected';
+ok !$dom->xml, 'XML mode not detected';
 is $dom->at('foo'), '<foo></foo>', 'right element';
 $dom = Mojo::DOM->new->parse(<<EOF);
 <?xml version="1.0" encoding = 'utf-8'?>
@@ -1515,7 +1519,7 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 ]  >
 <foo xml:lang="de">Check!</fOo>
 EOF
-is $dom->xml, 1, 'xml mode detected';
+ok $dom->xml, 'XML mode detected';
 is $dom->tree->[3][1], ' foo [
   <!ELEMENT foo ANY>
   <!ATTLIST foo xml:lang CDATA #IMPLIED>
@@ -1688,23 +1692,23 @@ $dom = Mojo::DOM->new->parse(<<'EOF');
 <?xml version='1.0' encoding='UTF-8'?>
 <XMLTest />
 EOF
-is $dom->xml, 1, 'xml mode detected';
+ok $dom->xml, 'XML mode detected';
 $dom->at('XMLTest')->replace_content('<Element />');
 my $element = $dom->at('Element');
 is $element->type, 'Element', 'right type';
-is $element->xml,  1,         'xml mode detected';
+ok $element->xml, 'XML mode active';
 $element = $dom->at('XMLTest')->children->[0];
 is $element->type, 'Element', 'right child';
 is $element->parent->type, 'XMLTest', 'right parent';
-is $element->root->xml,    1,         'xml mode detected';
+ok $element->root->xml, 'XML mode active';
 $dom->replace('<XMLTest2 />');
-is $dom->xml, undef, 'xml mode not detected';
+ok !$dom->xml, 'XML mode not detected';
 is $dom->children->[0], '<xmltest2></xmltest2>', 'right result';
 $dom->replace(<<EOF);
 <?xml version='1.0' encoding='UTF-8'?>
 <XMLTest3 />
 EOF
-is $dom->xml, 1, 'xml mode detected';
+ok $dom->xml, 'XML mode detected';
 is $dom->children->[0], '<XMLTest3 />', 'right result';
 
 # Ensure XML semantics
@@ -1802,7 +1806,7 @@ $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
   </B>
 </a>
 EOF
-is $dom->xml, 1, 'xml mode enabled';
+ok $dom->xml, 'XML mode active';
 is $dom->a->B->text, 'foo', 'right text';
 is $dom->a->B->c->[0]->text, 'bar', 'right text';
 is $dom->a->B->c->[1]->text, 'baz', 'right text';
@@ -1819,7 +1823,7 @@ $dom = Mojo::DOM->new(<<EOF);
   </B>
 </a>
 EOF
-is $dom->xml, undef, 'xml mode disabled';
+ok !$dom->xml, 'XML mode not active';
 is $dom->a->b->text, 'foo', 'right text';
 is $dom->a->b->c->[0]->text, 'bar', 'right text';
 is $dom->a->b->c->[1]->text, 'baz', 'right text';
@@ -1836,7 +1840,7 @@ $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
   </B>
 </a>
 EOF
-is $dom->xml, 1, 'xml mode enabled';
+ok $dom->xml, 'XML mode active';
 is $dom->a->{id}, 'one', 'right attribute';
 is_deeply [sort keys %{$dom->a}], ['id'], 'right attributes';
 is $dom->a->B->text, 'foo', 'right text';
@@ -1872,7 +1876,7 @@ $dom = Mojo::DOM->new(<<EOF);
   </B>
 </a>
 EOF
-is $dom->xml, undef, 'xml mode disabled';
+ok !$dom->xml, 'XML mode not active';
 is $dom->a->{id}, 'one', 'right attribute';
 is_deeply [sort keys %{$dom->a}], ['id'], 'right attributes';
 is $dom->a->b->text, 'foo', 'right text';

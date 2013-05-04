@@ -359,7 +359,7 @@ L<Mojo::DOM::HTML> implements the following attributes.
   my $charset = $html->charset;
   $html       = $html->charset('UTF-8');
 
-Charset used for decoding and encoding HTML/XML.
+Charset used by C<parse> and C<render> for decoding and encoding HTML/XML.
 
 =head2 tree
 

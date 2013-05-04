@@ -511,7 +511,8 @@ Element attributes.
   my $charset = $dom->charset;
   $dom        = $dom->charset('UTF-8');
 
-Charset used for decoding and encoding HTML/XML.
+Charset used by C<parse>, C<content_xml> and C<to_xml> for decoding and
+encoding HTML/XML.
 
 =head2 children
 

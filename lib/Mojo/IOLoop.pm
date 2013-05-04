@@ -178,10 +178,11 @@ sub timer {
 sub _accepting {
   my $self = shift;
 
-  # Check connection limit
-  return if $self->{accepting};
+  # Check if we have acceptors
   my $acceptors = $self->{acceptors} ||= {};
-  return unless keys %$acceptors;
+  return $self->_remove(delete $self->{accept}) unless keys %$acceptors;
+
+  # Check connection limit
   my $i   = keys %{$self->{connections}};
   my $max = $self->max_connections;
   return unless $i < $max;
@@ -190,7 +191,7 @@ sub _accepting {
   if (my $cb = $self->lock) { return unless $self->$cb(!$i) }
   $self->_remove(delete $self->{accept});
 
-  # Check if multi-accept is desirable and start accepting
+  # Check if multi-accept is desirable
   my $multi = $self->multi_accept;
   $_->multi_accept($max < $multi ? 1 : $multi)->start for values %$acceptors;
   $self->{accepting}++;

@@ -632,8 +632,9 @@ Remove element and return it as a L<Mojo::DOM> object.
 
   my $old = $dom->replace('<div>test</div>');
 
-Replace element and return the replaced element as a L<Mojo::DOM> object. Note
-that the HTML/XML will be decoded if a C<charset> has been defined.
+Replace element with HTML/XML and return the replaced element as a
+L<Mojo::DOM> object. Note that the HTML/XML will be decoded if a C<charset>
+has been defined.
 
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>')->root;
@@ -643,7 +644,7 @@ that the HTML/XML will be decoded if a C<charset> has been defined.
 
 =head2 replace_content
 
-  $dom = $dom->replace_content('test');
+  $dom = $dom->replace_content('<p>test</p>');
 
 Replace element content with HTML/XML. Note that the HTML/XML will be decoded
 if a C<charset> has been defined.

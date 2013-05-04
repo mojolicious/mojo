@@ -278,6 +278,11 @@ is $dom->at('[class~=x]')->text,                      'Heart',   'right text';
 is $dom->at('div[class~=x]')->text,                   'Heart',   'right text';
 is $dom->at('html div[class~=x]')->text,              'Heart',   'right text';
 is $dom->at('html > div[class~=x]')->text,            'Heart',   'right text';
+is $dom->at('#☃x'), encode('UTF-8', '<div id="☃x">Snowman</div>'),
+  'XML is encoded';
+is $dom->at('#☃x')->parent,     $bytes, 'XML is encoded';
+is $dom->at('#☃x')->root,       $bytes, 'XML is encoded';
+is $dom->children('html')->first, $bytes, 'XML is encoded';
 is $dom->to_xml,      $bytes, 'XML is encoded';
 is $dom->content_xml, $bytes, 'XML is encoded';
 $dom->charset(undef);

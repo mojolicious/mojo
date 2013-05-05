@@ -66,7 +66,7 @@
     use Mojolicious::Lite;
 
     # Simple plain text response
-    get '/' => {text => 'Hello World!'};
+    get '/' => {text => 'I ♥ Mojolicious!'};
 
     # Route associating "/time" with template in DATA section
     get '/time' => 'clock';

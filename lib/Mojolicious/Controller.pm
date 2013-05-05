@@ -711,7 +711,7 @@ C<stash>.
   $c = $c->render_later;
 
 Disable automatic rendering to delay response generation, only necessary if
-automatic rendring would result in a response.
+automatic rendering would result in a response.
 
   # Delayed rendering
   $c->render_later;

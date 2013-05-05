@@ -11,7 +11,7 @@ sub client_read {
   $res->content->skip_body(1) if uc $self->req->method eq 'HEAD';
   return unless $res->parse($chunk)->is_finished;
 
-  # Unexpected 1xx reponse
+  # Unexpected 1xx response
   return $self->{state} = 'finished'
     if !$res->is_status_class(100) || $res->headers->upgrade;
   $self->res($res->new)->emit(unexpected => $res);

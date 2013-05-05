@@ -154,7 +154,7 @@ sub _pid_file {
 sub _reap {
   my ($self, $pid) = @_;
 
-  # CLean up dead worker
+  # Clean up dead worker
   $self->app->log->debug("Worker $pid stopped.")
     if delete $self->emit(reap => $pid)->{pool}{$pid};
 }

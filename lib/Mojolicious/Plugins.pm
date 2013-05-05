@@ -101,7 +101,7 @@ Renderer for plain embedded Perl templates, loaded automatically.
 
 =item L<Mojolicious::Plugin::EPRenderer>
 
-Renderer for more sophisiticated embedded Perl templates, loaded
+Renderer for more sophisticated embedded Perl templates, loaded
 automatically.
 
 =item L<Mojolicious::Plugin::HeaderCondition>

@@ -147,21 +147,21 @@ Stacktrace.
   my $line = $e->line;
   $e       = $e->line([3 => 'foo']);
 
-The line where the exception occured.
+The line where the exception occurred.
 
 =head2 lines_after
 
   my $lines = $e->lines_after;
   $e        = $e->lines_after([[1 => 'bar'], [2 => 'baz']]);
 
-Lines after the line where the exception occured.
+Lines after the line where the exception occurred.
 
 =head2 lines_before
 
   my $lines = $e->lines_before;
   $e        = $e->lines_before([[4 => 'bar'], [5 => 'baz']]);
 
-Lines before the line where the exception occured.
+Lines before the line where the exception occurred.
 
 =head2 message
 

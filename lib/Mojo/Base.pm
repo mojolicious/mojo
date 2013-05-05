@@ -209,7 +209,7 @@ pass it either a hash or a hash reference with attribute values.
 Create attribute accessor for hash-based objects, an array reference can be
 used to create more than one at a time. Pass an optional second argument to
 set a default value, it should be a constant or a callback. The callback will
-be excuted at accessor read time if there's no set value. Accessors can be
+be executed at accessor read time if there's no set value. Accessors can be
 chained, that means they return their invocant when they are called with an
 argument.
 

@@ -130,7 +130,7 @@ The pumpking has veto rights and may select his successor.
 
 It's not a feature without a test and documentation.
 
-A feature is only needed when the majority of the userbase benefits from it.
+A feature is only needed when the majority of the user base benefits from it.
 
 Features may only be changed in a major release or after being deprecated for
 at least 3 months.

@@ -687,7 +687,7 @@ generated.
   $ mojo generate plugin DebugHelper
 
 And if you have a C<PAUSE> account (which can be requested at
-L<http://pause.perl.org>), you are only a few commands away from relasing it
+L<http://pause.perl.org>), you are only a few commands away from releasing it
 to CPAN.
 
   $ perl Makefile.PL

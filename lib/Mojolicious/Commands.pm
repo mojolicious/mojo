@@ -168,7 +168,7 @@ Upload files to CPAN.
 
   $ ./myapp.pl daemon
 
-Start application with standalone HTTP and WebSocket server server.
+Start application with standalone HTTP and WebSocket server.
 
 =head2 eval
 

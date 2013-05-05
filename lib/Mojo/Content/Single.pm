@@ -145,7 +145,7 @@ Clone content if possible, otherwise return C<undef>.
 
   my $bytes = $single->get_body_chunk(0);
 
-Get a chunk of content starting from a specfic position.
+Get a chunk of content starting from a specific position.
 
 =head2 parse
 

@@ -96,7 +96,7 @@ described in RFC 6265.
 =head1 ATTRIBUTES
 
 L<Mojo::Cookie::Response> inherits all attributes from L<Mojo::Cookie> and
-implements the followign new ones.
+implements the following new ones.
 
 =head2 domain
 

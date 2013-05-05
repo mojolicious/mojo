@@ -65,12 +65,12 @@ A collection of automatically exported functions for fun Perl oneliners. Ten
 redirects will be followed by default, you can change this behavior with the
 MOJO_MAX_REDIRECTS environment variable.
 
-  $ MOJO_MAX_REDIRECTS=0 perl -Mojo -E 'say g("mojolicio.us")->code'
+  $ MOJO_MAX_REDIRECTS=0 perl -Mojo -E 'say g("example.com")->code'
 
 Proxy detection is enabled by default, but you can disable it with the
 MOJO_PROXY environment variable.
 
-  $ MOJO_PROXY=0 perl -Mojo -E 'say g("mojolicio.us")->body'
+  $ MOJO_PROXY=0 perl -Mojo -E 'say g("example.com")->body'
 
 =head1 FUNCTIONS
 
@@ -102,16 +102,16 @@ Turn list into a L<Mojo::Collection> object.
 
 =head2 d
 
-  my $res = d('mojolicio.us');
-  my $res = d('http://mojolicio.us' => {DNT => 1} => 'Hi!');
+  my $res = d('example.com');
+  my $res = d('http://example.com' => {DNT => 1} => 'Hi!');
 
 Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return
 resulting L<Mojo::Message::Response> object.
 
 =head2 g
 
-  my $res = g('mojolicio.us');
-  my $res = g('http://mojolicio.us' => {DNT => 1} => 'Hi!');
+  my $res = g('example.com');
+  my $res = g('http://example.com' => {DNT => 1} => 'Hi!');
 
 Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
 L<Mojo::Message::Response> object.
@@ -120,8 +120,8 @@ L<Mojo::Message::Response> object.
 
 =head2 h
 
-  my $res = h('mojolicio.us');
-  my $res = h('http://mojolicio.us' => {DNT => 1} => 'Hi!');
+  my $res = h('example.com');
+  my $res = h('http://example.com' => {DNT => 1} => 'Hi!');
 
 Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
@@ -138,16 +138,16 @@ Encode Perl data structure or decode JSON with L<Mojo::JSON>.
 
 =head2 o
 
-  my $res = o('mojolicio.us');
-  my $res = o('http://mojolicio.us' => {DNT => 1} => 'Hi!');
+  my $res = o('example.com');
+  my $res = o('http://example.com' => {DNT => 1} => 'Hi!');
 
 Perform C<OPTIONS> request with L<Mojo::UserAgent/"options"> and return
 resulting L<Mojo::Message::Response> object.
 
 =head2 p
 
-  my $res = p('mojolicio.us');
-  my $res = p('http://mojolicio.us' => {DNT => 1} => 'Hi!');
+  my $res = p('example.com');
+  my $res = p('http://example.com' => {DNT => 1} => 'Hi!');
 
 Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.
@@ -158,20 +158,20 @@ L<Mojo::Message::Response> object.
 
 Dump a Perl data structure with L<Data::Dumper>.
 
-  perl -Mojo -E 'say r(g("mojolicio.us")->headers->to_hash)'
+  perl -Mojo -E 'say r(g("example.com")->headers->to_hash)'
 
 =head2 t
 
-  my $res = t('mojolicio.us');
-  my $res = t('http://mojolicio.us' => {DNT => 1} => 'Hi!');
+  my $res = t('example.com');
+  my $res = t('http://example.com' => {DNT => 1} => 'Hi!');
 
 Perform C<PATCH> request with L<Mojo::UserAgent/"patch"> and return resulting
 L<Mojo::Message::Response> object.
 
 =head2 u
 
-  my $res = u('mojolicio.us');
-  my $res = u('http://mojolicio.us' => {DNT => 1} => 'Hi!');
+  my $res = u('example.com');
+  my $res = u('http://example.com' => {DNT => 1} => 'Hi!');
 
 Perform C<PUT> request with L<Mojo::UserAgent/"put"> and return resulting
 L<Mojo::Message::Response> object.

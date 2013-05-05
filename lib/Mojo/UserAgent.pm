@@ -874,7 +874,7 @@ append a callback to perform requests non-blocking.
 
 =head2 need_proxy
 
-  my $success = $ua->need_proxy('intranet.mojolicio.us');
+  my $success = $ua->need_proxy('intranet.example.com');
 
 Check if request for domain would use a proxy server.
 

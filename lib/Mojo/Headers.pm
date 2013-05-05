@@ -453,7 +453,7 @@ Shortcut for the C<Range> header.
 =head2 referrer
 
   my $referrer = $headers->referrer;
-  $headers     = $headers->referrer('http://mojolicio.us');
+  $headers     = $headers->referrer('http://example.com');
 
 Shortcut for the C<Referer> header, there was a typo in RFC 2068 which
 resulted in C<Referer> becoming an official header.

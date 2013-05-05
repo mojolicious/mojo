@@ -262,10 +262,10 @@ Mojo::UserAgent::Transactor - User agent transactor
 
   # Simple GET request
   my $t = Mojo::UserAgent::Transactor->new;
-  say $t->tx(GET => 'http://mojolicio.us')->req->to_string;
+  say $t->tx(GET => 'http://example.com')->req->to_string;
 
   # PATCH request with "Do Not Track" header and content
-  say $t->tx(PATCH => 'mojolicio.us' => {DNT => 1} => 'Hi!')->req->to_string;
+  say $t->tx(PATCH => 'example.com' => {DNT => 1} => 'Hi!')->req->to_string;
 
   # POST request with form data
   say $t->tx(POST => 'example.com' => form => {a => 'b'})->req->to_string;
@@ -351,14 +351,14 @@ Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
 requests, with support for content generators.
 
   # Inspect generated request
-  say $t->tx(GET => 'mojolicio.us' => {DNT => 1} => 'Bye!')->req->to_string;
+  say $t->tx(GET => 'example.com' => {DNT => 1} => 'Bye!')->req->to_string;
 
   # Streaming response
-  my $tx = $t->tx(GET => 'http://mojolicio.us');
+  my $tx = $t->tx(GET => 'http://example.com');
   $tx->res->body(sub { say $_[1] });
 
   # Custom socket
-  my $tx = $t->tx(GET => 'http://mojolicio.us');
+  my $tx = $t->tx(GET => 'http://example.com');
   $tx->connection($sock);
 
   # Generate query parameters

@@ -547,7 +547,7 @@ implements the following new ones.
 Access request cookie values and create new response cookies.
 
   # Create response cookie with domain and expiration date
-  $c->cookie(user => 'sri', {domain => 'mojolicio.us', expires => time + 60});
+  $c->cookie(user => 'sri', {domain => 'example.com', expires => time + 60});
 
 =head2 finish
 
@@ -918,11 +918,11 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
   my $ua = $c->app->ua;
 
   # Blocking
-  my $tx = $c->ua->get('http://mojolicio.us');
+  my $tx = $c->ua->get('http://example.com');
   my $tx = $c->ua->post('example.com/login' => form => {user => 'mojo'});
 
   # Non-blocking
-  $c->ua->get('http://mojolicio.us' => sub {
+  $c->ua->get('http://example.com' => sub {
     my ($ua, $tx) = @_;
     $c->render_data($tx->res->body);
   });

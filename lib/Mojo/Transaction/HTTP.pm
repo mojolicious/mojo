@@ -169,7 +169,7 @@ Mojo::Transaction::HTTP - HTTP transaction
   # Client
   my $tx = Mojo::Transaction::HTTP->new;
   $tx->req->method('GET');
-  $tx->req->url->parse('http://mojolicio.us');
+  $tx->req->url->parse('http://example.com');
   $tx->req->headers->accept('application/json');
   say $tx->res->code;
   say $tx->res->headers->content_type;

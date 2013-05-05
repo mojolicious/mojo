@@ -397,14 +397,14 @@ C<wss> schemes and preserve scheme data for all unknown ones.
 Path part of this URL, relative paths will be merged with the existing path,
 defaults to a L<Mojo::Path> object.
 
-  # "http://mojolicio.us/DOM/HTML"
-  Mojo::URL->new('http://mojolicio.us/perldoc/Mojo')->path('/DOM/HTML');
+  # "http://example.com/DOM/HTML"
+  Mojo::URL->new('http://example.com/perldoc/Mojo')->path('/DOM/HTML');
 
-  # "http://mojolicio.us/perldoc/DOM/HTML"
-  Mojo::URL->new('http://mojolicio.us/perldoc/Mojo')->path('DOM/HTML');
+  # "http://example.com/perldoc/DOM/HTML"
+  Mojo::URL->new('http://example.com/perldoc/Mojo')->path('DOM/HTML');
 
-  # "http://mojolicio.us/perldoc/Mojo/DOM/HTML"
-  Mojo::URL->new('http://mojolicio.us/perldoc/Mojo/')->path('DOM/HTML');
+  # "http://example.com/perldoc/Mojo/DOM/HTML"
+  Mojo::URL->new('http://example.com/perldoc/Mojo/')->path('DOM/HTML');
 
 =head2 protocol
 
@@ -413,7 +413,7 @@ defaults to a L<Mojo::Path> object.
 Normalized version of C<scheme>.
 
   # "http"
-  Mojo::URL->new('HtTp://mojolicio.us')->protocol;
+  Mojo::URL->new('HtTp://example.com')->protocol;
 
 =head2 query
 
@@ -427,22 +427,22 @@ Query part of this URL, pairs in an array will be merged and pairs in a hash
 appended, defaults to a L<Mojo::Parameters> object.
 
   # "2"
-  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query->param('b');
+  Mojo::URL->new('http://example.com?a=1&b=2')->query->param('b');
 
-  # "http://mojolicio.us?a=2&c=3"
-  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => 2, c => 3);
+  # "http://example.com?a=2&c=3"
+  Mojo::URL->new('http://example.com?a=1&b=2')->query(a => 2, c => 3);
 
-  # "http://mojolicio.us?a=2&a=3"
-  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query(a => [2, 3]);
+  # "http://example.com?a=2&a=3"
+  Mojo::URL->new('http://example.com?a=1&b=2')->query(a => [2, 3]);
 
-  # "http://mojolicio.us?a=2&b=2&c=3"
-  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => 2, c => 3]);
+  # "http://example.com?a=2&b=2&c=3"
+  Mojo::URL->new('http://example.com?a=1&b=2')->query([a => 2, c => 3]);
 
-  # "http://mojolicio.us?b=2"
-  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query([a => undef]);
+  # "http://example.com?b=2"
+  Mojo::URL->new('http://example.com?a=1&b=2')->query([a => undef]);
 
-  # "http://mojolicio.us?a=1&b=2&a=2&c=3"
-  Mojo::URL->new('http://mojolicio.us?a=1&b=2')->query({a => 2, c => 3});
+  # "http://example.com?a=1&b=2&a=2&c=3"
+  Mojo::URL->new('http://example.com?a=1&b=2')->query({a => 2, c => 3});
 
 =head2 to_abs
 

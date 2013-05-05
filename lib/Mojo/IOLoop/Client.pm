@@ -149,7 +149,7 @@ Mojo::IOLoop::Client - Non-blocking TCP client
     my ($client, $err) = @_;
     ...
   });
-  $client->connect(address => 'mojolicio.us', port => 80);
+  $client->connect(address => 'example.com', port => 80);
 
   # Start reactor if necessary
   $client->reactor->start unless $client->reactor->is_running;

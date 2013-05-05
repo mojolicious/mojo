@@ -130,7 +130,7 @@ plugins, since non-blocking requests that are already in progress will
 interfere with new blocking ones.
 
   # Perform blocking request
-  my $body = $app->ua->get('mojolicio.us')->res->body;
+  my $body = $app->ua->get('example.com')->res->body;
 
 =head1 METHODS
 

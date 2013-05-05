@@ -804,7 +804,7 @@ You can just add username and password to the URL.
   use Mojo::UserAgent;
 
   my $ua = Mojo::UserAgent->new;
-  say $ua->get('https://sri:secret@mojolicio.us/hideout')->res->body;
+  say $ua->get('https://sri:secret@example.com/hideout')->res->body;
 
 =head2 Decorating followup requests
 
@@ -845,8 +845,8 @@ Generate the same type of content repeatedly for multiple requests.
   });
 
   # Send multiple files streaming via PUT and POST
-  $ua->put('http://mojolicio.us/upload'  => stream => '/home/sri/mojo.png');
-  $ua->post('http://mojolicio.us/upload' => stream => '/home/sri/mango.png');
+  $ua->put('http://example.com/upload'  => stream => '/home/sri/mojo.png');
+  $ua->post('http://example.com/upload' => stream => '/home/sri/mango.png');
 
 The C<json> and C<form> content generators are always available.
 
@@ -854,13 +854,13 @@ The C<json> and C<form> content generators are always available.
 
   # Send JSON content via PATCH
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->patch('http://api.mojolicio.us' => json => {foo => 'bar'});
+  my $tx = $ua->patch('http://api.example.com' => json => {foo => 'bar'});
 
   # Send "application/x-www-form-urlencoded" content via POST
-  my $tx2 = $ua->post('http://search.mojolicio.us' => form => {q => 'test'});
+  my $tx2 = $ua->post('http://search.example.com' => form => {q => 'test'});
 
   # Send "multipart/form-data" content via PUT
-  my $tx3 = $ua->put('http://upload.mojolicio.us' =>
+  my $tx3 = $ua->put('http://upload.example.com' =>
     form => {test => {content => 'Hello World!'}});
 
 For more information about available content generators see also
@@ -875,7 +875,7 @@ L<Mojo::UserAgent> makes it actually easy.
 
   # Build a normal transaction
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->build_tx(GET => 'http://mojolicio.us');
+  my $tx = $ua->build_tx(GET => 'http://example.com');
 
   # Replace "read" events to disable default content parser
   $tx->res->content->unsubscribe('read')->on(read => sub {
@@ -898,7 +898,7 @@ Sending a streaming request is almost just as easy.
 
   # Build a normal transaction
   my $ua = Mojo::UserAgent->new;
-  my $tx = $ua->build_tx(GET => 'http://mojolicio.us');
+  my $tx = $ua->build_tx(GET => 'http://example.com');
 
   # Prepare content
   my $content = 'Hello world!';
@@ -948,7 +948,7 @@ Uploading a large file is even easier.
 
   # Upload file via POST and "multipart/form-data"
   my $ua = Mojo::UserAgent->new;
-  $ua->post('mojolicio.us/upload' =>
+  $ua->post('example.com/upload' =>
     form => {image => {file => '/home/sri/hello.png'}});
 
 And once again you don't have to worry about memory usage, all data will be

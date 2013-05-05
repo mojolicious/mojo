@@ -14,10 +14,10 @@ sub _end {
 
   # Ignore static files
   my $stash = $self->stash;
-  return unless my $started = delete $stash->{'mojo.started'};
   return if $stash->{'mojo.static'};
-  my $elapsed = sprintf '%f',
-    Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
+
+  return unless my $started = delete $stash->{'mojo.started'};
+  my $elapsed = sprintf '%f', tv_interval($started, [gettimeofday]);
   my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
   my $res  = $self->res;
   my $code = $res->code || 200;
@@ -31,12 +31,13 @@ sub _start {
   # Ignore static files
   my $stash = $self->stash;
   return if $stash->{'mojo.static'} || $stash->{'mojo.started'};
+
   my $req    = $self->req;
   my $method = $req->method;
   my $path   = $req->url->path->to_abs_string;
   my $ua     = $req->headers->user_agent || 'Anonymojo';
   $self->app->log->debug("$method $path ($ua).");
-  $stash->{'mojo.started'} = [Time::HiRes::gettimeofday()];
+  $stash->{'mojo.started'} = [gettimeofday];
 }
 
 1;

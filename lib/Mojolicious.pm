@@ -109,7 +109,7 @@ sub dispatch {
 
   # Prepare transaction
   my $tx = $c->tx;
-  $c->res->code(undef) if $tx->is_websocket;
+  $tx->res->code(undef) if $tx->is_websocket;
   $self->sessions->load($c);
   my $plugins = $self->plugins->emit_hook(before_dispatch => $c);
 

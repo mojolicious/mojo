@@ -164,7 +164,7 @@ sub is_finished { (shift->{state} // '') eq 'finished' }
 
 sub is_limit_exceeded {
   return undef unless my $code = (shift->error)[1];
-  return !!grep { $_ eq $code } 413, 431;
+  return !!($code eq 413 || $code eq 431);
 }
 
 sub is_multipart { shift->content->is_multipart }
@@ -202,8 +202,9 @@ sub parse {
   }
 
   # Content
+  my $state = $self->{state} // '';
   $self->content($self->content->parse(delete $self->{buffer}))
-    if grep { $_ eq ($self->{state} // '') } qw(content finished);
+    if $state eq 'content' || $state eq 'finished';
 
   # Check line size
   return $self->error('Maximum line size exceeded', 431)

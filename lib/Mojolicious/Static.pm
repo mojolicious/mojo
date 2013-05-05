@@ -6,7 +6,6 @@ use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Home;
 use Mojo::Loader;
-use Mojo::Path;
 
 has classes => sub { ['main'] };
 has paths   => sub { [] };
@@ -23,8 +22,9 @@ sub dispatch {
 
   # Canonical path
   my $stash = $c->stash;
-  my $path = $stash->{path} || $c->req->url->path->clone->canonicalize;
-  return undef unless my @parts = @{Mojo::Path->new("$path")->parts};
+  my $path  = $c->req->url->path;
+  $path = $stash->{path} ? $path->new($stash->{path}) : $path->clone;
+  return undef unless my @parts = @{$path->canonicalize->parts};
 
   # Serve static file and prevent directory traversal
   return undef if $parts[0] eq '..' || !$self->serve($c, join('/', @parts));

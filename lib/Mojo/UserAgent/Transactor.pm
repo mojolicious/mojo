@@ -89,7 +89,7 @@ sub redirect {
   my $new    = Mojo::Transaction::HTTP->new;
   my $req    = $old->req;
   my $method = uc $req->method;
-  if (grep { $_ eq $code } 301, 307, 308) {
+  if ($code eq 301 || $code eq 307 || $code eq 308) {
     return undef unless my $req = $req->clone;
     $new->req($req);
     $req->headers->remove('Host')->remove('Cookie')->remove('Referer');

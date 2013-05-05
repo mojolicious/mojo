@@ -105,10 +105,10 @@ sub _read {
   unless (defined $read) {
 
     # Retry
-    return if grep { $_ == $! } EAGAIN, EINTR, EWOULDBLOCK;
+    return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
     # Closed
-    return $self->close if grep { $_ == $! } ECONNRESET, EPIPE;
+    return $self->close if $! == ECONNRESET || $! == EPIPE;
 
     # Read error
     return $self->emit_safe(error => $!)->close;
@@ -129,10 +129,10 @@ sub _write {
     unless (defined $written) {
 
       # Retry
-      return if grep { $_ == $! } EAGAIN, EINTR, EWOULDBLOCK;
+      return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
 
       # Closed
-      return $self->close if grep { $_ == $! } ECONNRESET, EPIPE;
+      return $self->close if $! == ECONNRESET || $! == EPIPE;
 
       # Write error
       return $self->emit_safe(error => $!)->close;

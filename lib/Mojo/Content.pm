@@ -155,7 +155,7 @@ sub parse_body {
 sub progress {
   my $self = shift;
   return 0 unless my $state = $self->{state};
-  return 0 unless grep { $_ eq $state } qw(body finished);
+  return 0 unless $state eq 'body' || $state eq 'finished';
   return $self->{raw_size} - ($self->{header_size} || 0);
 }
 

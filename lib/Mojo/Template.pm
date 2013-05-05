@@ -58,7 +58,7 @@ sub build {
       if ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
 
       # Expression
-      if (grep { $_ eq $type } qw(expr escp)) {
+      if ($type eq 'expr' || $type eq 'escp') {
 
         # Start
         unless ($multi) {
@@ -275,7 +275,7 @@ sub _trim {
   for (my $j = @$line - 4; $j >= 0; $j -= 2) {
 
     # Skip captures
-    next if grep { $_ eq $line->[$j] } qw(cpst cpen);
+    next if $line->[$j] eq 'cpst' || $line->[$j] eq 'cpen';
 
     # Only trim text
     return unless $line->[$j] eq 'text';

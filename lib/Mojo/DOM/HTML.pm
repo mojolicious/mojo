@@ -134,7 +134,7 @@ sub parse {
         if (!$self->xml && $VOID{$start}) || $attr =~ m!/\s*$!;
 
       # Relaxed "script" or "style"
-      if (grep { $_ eq $start } qw(script style)) {
+      if ($start eq 'script' || $start eq 'style') {
         if ($html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi) {
           push @$current, ['raw', $1];
           $self->_end($start, \$current);
@@ -309,17 +309,17 @@ sub _start {
     elsif ($start eq 'tr') { $self->_close($current, {tr => 1}) }
 
     # "<th>" and "<td>"
-    elsif (grep { $_ eq $start } qw(th td)) {
+    elsif ($start eq 'th' || $start eq 'td') {
       $self->_close($current, {$_ => 1}) for qw(th td);
     }
 
     # "<dt>" and "<dd>"
-    elsif (grep { $_ eq $start } qw(dt dd)) {
+    elsif ($start eq 'dt' || $start eq 'dd') {
       $self->_end($_, $current) for qw(dt dd);
     }
 
     # "<rt>" and "<rp>"
-    elsif (grep { $_ eq $start } qw(rt rp)) {
+    elsif ($start eq 'rt' || $start eq 'rp') {
       $self->_end($_, $current) for qw(rt rp);
     }
   }

@@ -98,25 +98,24 @@ sub write {
   return $self;
 }
 
-sub _read {
+sub _error {
   my $self = shift;
 
+  # Retry
+  return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
+
+  # Closed
+  return $self->close if $! == ECONNRESET || $! == EPIPE;
+
+  # Error
+  $self->emit_safe(error => $!)->close;
+}
+
+sub _read {
+  my $self = shift;
   my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
-  unless (defined $read) {
-
-    # Retry
-    return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
-
-    # Closed
-    return $self->close if $! == ECONNRESET || $! == EPIPE;
-
-    # Read error
-    return $self->emit_safe(error => $!)->close;
-  }
-
-  # EOF
+  return $self->_error unless defined $read;
   return $self->close if $read == 0;
-
   $self->emit_safe(read => $buffer)->{active} = steady_time;
 }
 
@@ -126,25 +125,14 @@ sub _write {
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
     my $written = $handle->syswrite($self->{buffer});
-    unless (defined $written) {
-
-      # Retry
-      return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
-
-      # Closed
-      return $self->close if $! == ECONNRESET || $! == EPIPE;
-
-      # Write error
-      return $self->emit_safe(error => $!)->close;
-    }
-
+    return $self->_error unless defined $written;
     $self->emit_safe(write => substr($self->{buffer}, 0, $written, ''));
     $self->{active} = steady_time;
   }
 
-  $self->emit_safe('drain') if !length $self->{buffer};
-  return                    if $self->is_writing;
-  return $self->close       if $self->{graceful};
+  $self->emit_safe('drain') unless length $self->{buffer};
+  return if $self->is_writing;
+  return $self->close if $self->{graceful};
   $self->reactor->watch($handle, !$self->{paused}, 0);
 }
 

@@ -112,7 +112,7 @@ implements the following new ones.
   my $nph = $cgi->nph;
   $cgi    = $cgi->nph(1);
 
-Activate non parsed header mode.
+Activate non-parsed header mode.
 
 =head1 METHODS
 

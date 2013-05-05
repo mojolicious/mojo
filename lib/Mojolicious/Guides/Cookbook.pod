@@ -1067,7 +1067,7 @@ Fun hacks you might not use very often but that might come in handy some day.
 
 =head2 Adding commands to Mojolicious
 
-By now you've propably used many of the built-in commands described in
+By now you've probably used many of the built-in commands described in
 L<Mojolicious::Commands>, but did you know that you can just add new ones and
 that they will be picked up automatically by the command line interface?
 

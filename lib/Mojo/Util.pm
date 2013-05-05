@@ -183,7 +183,7 @@ sub punycode_encode {
   my @input = map {ord} split //, $output;
   my @chars = sort grep { $_ >= PC_INITIAL_N } @input;
 
-  # Handle non basic characters
+  # Handle non-basic characters
   $output =~ s/[^\x00-\x7f]+//gs;
   my $h = my $b = length $output;
   $output .= "\x2d" if $b > 0;

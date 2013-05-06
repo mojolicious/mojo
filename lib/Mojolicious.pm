@@ -376,7 +376,8 @@ new ones.
 Construct a new L<Mojolicious> application, calling C<${mode}_mode> and
 C<startup> in the process. Will automatically detect your home directory and
 set up logging based on your current operating mode. Also sets up the
-renderer, static file server and a default set of plugins.
+renderer, static file server, a default set of plugins and an
+C<around_dispatch> hook with the default exception handling.
 
 =head2 build_tx
 

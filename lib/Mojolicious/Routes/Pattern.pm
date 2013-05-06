@@ -80,7 +80,7 @@ sub shape_match {
 
   # Match
   return undef unless my @captures = $$pathref =~ $regex;
-  $$pathref =~ s/($regex)//;
+  $$pathref =~ s/$regex//;
 
   # Merge captures
   my $result = {%{$self->defaults}};
@@ -103,8 +103,8 @@ sub _compile {
   my $self = shift;
 
   my $block = my $regex = '';
-  my $constraints = $self->constraints;
   my $optional    = 1;
+  my $constraints = $self->constraints;
   my $defaults    = $self->defaults;
   for my $token (reverse @{$self->tree}) {
     my $op       = $token->[0];
@@ -112,10 +112,7 @@ sub _compile {
 
     # Slash
     if ($op eq 'slash') {
-
-      # Full block
-      $block = $optional ? "(?:/$block)?" : "/$block";
-      $regex = "$block$regex";
+      $regex = ($optional ? "(?:/$block)?" : "/$block") . $regex;
       $block = '';
       next;
     }
@@ -155,7 +152,6 @@ sub _compile {
   # Not rooted with a slash
   $regex = "$block$regex" if $block;
 
-  # Compile
   return $self->regex(qr/^$regex/s)->regex;
 }
 

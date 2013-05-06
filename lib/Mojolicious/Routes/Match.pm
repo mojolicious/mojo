@@ -7,24 +7,23 @@ has stack => sub { [] };
 
 sub new {
   my $self = shift->SUPER::new;
-  $self->{method}    = uc shift;
-  $self->{path}      = shift;
-  $self->{websocket} = shift;
+  $self->{method} = uc shift;
+  $self->{$_} = shift for qw(path websocket);
   return $self;
 }
 
 sub match {
   my ($self, $r, $c) = @_;
+  $self->root($r) unless $self->root;
 
   # Pattern
-  $self->root($r) unless $self->root;
   my $path    = $self->{path};
   my $pattern = $r->pattern;
   return unless my $captures = $pattern->shape_match(\$path, $r->is_endpoint);
-  $self->{path} = $path;
+  local $self->{path} = $path;
   $captures = {%{$self->captures}, %$captures};
 
-  # Method
+  # Method (HEAD will be treated as GET)
   if (my $methods = $r->via) {
     my $method = $self->{method} eq 'HEAD' ? 'GET' : $self->{method};
     return unless grep { $_ eq $method } @$methods;
@@ -50,16 +49,14 @@ sub match {
     $empty = 1;
   }
 
-  # Update stack
+  # Endpoint
   $self->captures($captures);
   my $endpoint = $r->is_endpoint;
   if ($r->inline || ($endpoint && $empty)) {
     push @{$self->stack}, {%$captures};
     delete $captures->{$_} for qw(app cb);
+    return $self->endpoint($r) if $endpoint && $empty;
   }
-
-  # Endpoint
-  return $self->endpoint($r) if $endpoint && $empty;
 
   # Match children
   my $snapshot = [@{$self->stack}];
@@ -70,7 +67,6 @@ sub match {
     return if $self->endpoint;
 
     # Reset
-    $self->{path} = $path;
     if   ($r->parent) { $self->captures($captures)->stack([@$snapshot]) }
     else              { $self->captures({})->stack([]) }
   }

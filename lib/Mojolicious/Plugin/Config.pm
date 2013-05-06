@@ -159,7 +159,7 @@ Parse configuration file.
   my $config = $plugin->register(Mojolicious->new);
   my $config = $plugin->register(Mojolicious->new, {file => '/etc/app.conf'});
 
-Register plugin in L<Mojolicious> application.
+Register plugin in L<Mojolicious> application and merge configuration.
 
 =head1 SEE ALSO
 

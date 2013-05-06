@@ -919,12 +919,12 @@ than C<development> will raise the log level from C<debug> to C<info>.
 
   $ ./myapp.pl daemon -m production
 
-All messages will be automatically written to C<STDERR> or a C<log/$mode.log>
-file if a C<log> directory exists.
+All messages will be written to C<STDERR> or a C<log/$mode.log> file if a
+C<log> directory exists.
 
   $ mkdir log
 
-Mode changes also affects many other aspects of the framework, such as mode
+Mode changes also affects a few other aspects of the framework, such as mode
 specific C<exception> and C<not_found> templates.
 
 =head2 Testing

@@ -63,8 +63,7 @@ sub dispatch {
   }
 
   # Dispatch
-  return undef unless $m && @{$m->stack};
-  return undef if $self->_walk($c);
+  return undef unless $self->_walk($c);
   $self->auto_render($c);
   return 1;
 }
@@ -96,11 +95,11 @@ sub _add {
 }
 
 sub _callback {
-  my ($self, $c, $field, $staging) = @_;
+  my ($self, $c, $field, $nested) = @_;
   $c->stash->{'mojo.routed'}++;
   $c->app->log->debug('Routing to a callback.');
   my $continue = $field->{cb}->($c);
-  return !$staging || $continue ? 1 : undef;
+  return !$nested || $continue ? 1 : undef;
 }
 
 sub _class {
@@ -144,7 +143,7 @@ sub _class {
 }
 
 sub _controller {
-  my ($self, $c, $field, $staging) = @_;
+  my ($self, $c, $field, $nested) = @_;
 
   # Load and instantiate controller/application
   my $app;
@@ -172,7 +171,7 @@ sub _controller {
 
     # Try to call action
     if (my $sub = $app->can($method)) {
-      $c->stash->{'mojo.routed'}++ unless $staging;
+      $c->stash->{'mojo.routed'}++ unless $nested;
       $continue = $app->$sub;
     }
 
@@ -180,7 +179,7 @@ sub _controller {
     else { $log->debug('Action not found in controller.') }
   }
 
-  return !$staging || $continue ? 1 : undef;
+  return !$nested || $continue ? 1 : undef;
 }
 
 sub _load {
@@ -213,28 +212,28 @@ sub _method {
 sub _walk {
   my ($self, $c) = @_;
 
-  my $stack   = $c->match->stack;
-  my $stash   = $c->stash;
-  my $staging = @$stack;
+  my $stack = $c->match->stack;
+  return undef unless my $nested = @$stack;
+  my $stash = $c->stash;
   $stash->{'mojo.captures'} ||= {};
   for my $field (@$stack) {
-    $staging--;
+    $nested--;
 
-    # Merge in captures
+    # Merge captures into stash
     my @keys = keys %$field;
     @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
 
     # Dispatch
     my $continue
       = $field->{cb}
-      ? $self->_callback($c, $field, $staging)
-      : $self->_controller($c, $field, $staging);
+      ? $self->_callback($c, $field, $nested)
+      : $self->_controller($c, $field, $nested);
 
     # Break the chain
-    return 1 if $staging && !$continue;
+    return undef if $nested && !$continue;
   }
 
-  return undef;
+  return 1;
 }
 
 1;

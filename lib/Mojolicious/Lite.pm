@@ -906,10 +906,11 @@ changing the L<Mojolicious> operating mode.
 
   get '/' => sub {
     my $self = shift;
-    $self->app->log->debug('Rendering "Hello World" message.');
+    $self->app->log->debug('Rendering "Hello World!" message.');
     $self->render(text => 'Hello World!');
   };
 
+  app->log->debug('Starting application.');
   app->start;
 
 The default operating mode will usually be C<development> and can be changed

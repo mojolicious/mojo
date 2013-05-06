@@ -898,14 +898,28 @@ L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
 
 =head2 Mode
 
-To disable debug messages later in a production setup, you can change the
-L<Mojolicious> operating mode with command line options or the MOJO_MODE
-environment variable, the default will usually be C<development>.
+You can use the L<Mojo::Log> object from L<Mojo/"log"> to portably collect
+debug messages and automatically disable them later in a production setup by
+changing the L<Mojolicious> operating mode.
+
+  use Mojolicious::Lite;
+
+  get '/' => sub {
+    my $self = shift;
+    $self->app->log->debug('Rendering "Hello World" message.');
+    $self->render(text => 'Hello World!');
+  };
+
+  app->start;
+
+The default operating mode will usually be C<development> and can be changed
+with command line options or the MOJO_MODE environment variable. A mode other
+than C<development> will raise the log level from C<debug> to C<info>.
 
   $ ./myapp.pl daemon -m production
 
-L<Mojo::Log> messages will be automatically written to C<STDERR> or a
-C<log/$mode.log> file if a C<log> directory exists.
+All messages will be automatically written to C<STDERR> or a C<log/$mode.log>
+file if a C<log> directory exists.
 
   $ mkdir log
 

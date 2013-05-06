@@ -203,7 +203,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
   my $route = $plugin->register(Mojolicious->new);
   my $route = $plugin->register(Mojolicious->new, {name => 'foo'});
 
-Register renderer in L<Mojolicious> application.
+Register renderer and helper in L<Mojolicious> application.
 
 =head1 SEE ALSO
 

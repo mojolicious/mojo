@@ -76,7 +76,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
   $plugin->register(Mojolicious->new);
 
-Register condition in L<Mojolicious> application.
+Register conditions in L<Mojolicious> application.
 
 =head1 SEE ALSO
 

@@ -160,8 +160,7 @@ sub _close {
 
   # Check if parents need to be closed
   my $parent = $$current;
-  while ($parent) {
-    last if $parent->[0] eq 'root' || $parent->[1] eq $stop;
+  while ($parent->[0] ne 'root' && $parent->[1] ne $stop) {
 
     # Close
     $tags->{$parent->[1]} and $self->_end($parent->[1], $current);
@@ -174,14 +173,10 @@ sub _close {
 sub _end {
   my ($self, $end, $current) = @_;
 
-  # Not a tag
-  return if $$current->[0] eq 'root';
-
   # Search stack for start tag
   my $found = 0;
   my $next  = $$current;
-  while ($next) {
-    last if $next->[0] eq 'root';
+  while ($next->[0] ne 'root') {
 
     # Right tag
     ++$found and last if $next->[1] eq $end;
@@ -198,8 +193,7 @@ sub _end {
 
   # Walk backwards
   $next = $$current;
-  while ($$current = $next) {
-    last if $$current->[0] eq 'root';
+  while (($$current = $next) && $$current->[0] ne 'root') {
     $next = $$current->[3];
 
     # Match

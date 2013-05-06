@@ -37,9 +37,8 @@ sub new {
 }
 
 sub all_text {
-  my ($self, $trim) = @_;
-  my $tree = $self->tree;
-  return _text(_elements($tree), 1, _trim($tree, $trim));
+  my $tree = shift->tree;
+  return _text(_elements($tree), 1, _trim($tree, @_));
 }
 
 sub append { shift->_add(1, @_) }
@@ -82,8 +81,7 @@ sub children {
   for my $e (@$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree]) {
 
     # Make sure child is the right type
-    next unless $e->[0] eq 'tag';
-    next if defined $type && $e->[1] ne $type;
+    next if $e->[0] ne 'tag' || (defined $type && $e->[1] ne $type);
     push @children, $self->new->charset($charset)->tree($e)->xml($xml);
   }
 
@@ -93,7 +91,7 @@ sub children {
 sub content_xml {
   my $self = shift;
 
-  # Render children
+  # Render children individually
   my $tree    = $self->tree;
   my $charset = $self->charset;
   my $xml     = $self->xml;
@@ -107,9 +105,9 @@ sub find {
 
   my $charset = $self->charset;
   my $xml     = $self->xml;
+  my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select($selector);
   return Mojo::Collection->new(
-    map { $self->new->charset($charset)->tree($_)->xml($xml) }
-      @{Mojo::DOM::CSS->new(tree => $self->tree)->select($selector)});
+    map { $self->new->charset($charset)->tree($_)->xml($xml) } @$results);
 }
 
 sub namespace {
@@ -118,8 +116,7 @@ sub namespace {
   # Extract namespace prefix and search parents
   return '' if (my $current = $self->tree)->[0] eq 'root';
   my $ns = $current->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
-  while ($current) {
-    last if $current->[0] eq 'root';
+  while ($current->[0] ne 'root') {
 
     # Namespace for prefix
     my $attrs = $current->[2];
@@ -167,12 +164,10 @@ sub remove { shift->replace('') }
 sub replace {
   my ($self, $new) = @_;
 
-  # Parse
   my $tree = $self->tree;
   if   ($tree->[0] eq 'root') { return $self->xml(undef)->parse($new) }
   else                        { $new = $self->_parse("$new") }
 
-  # Find and replace
   my $parent = $tree->[3];
   my $i = $parent->[0] eq 'root' ? 1 : 4;
   for my $e (@$parent[$i .. $#$parent]) {
@@ -205,9 +200,8 @@ sub root {
 }
 
 sub text {
-  my ($self, $trim) = @_;
-  my $tree = $self->tree;
-  return _text(_elements($tree), 0, _trim($tree, $trim));
+  my $tree = shift->tree;
+  return _text(_elements($tree), 0, _trim($tree, @_));
 }
 
 sub text_after {

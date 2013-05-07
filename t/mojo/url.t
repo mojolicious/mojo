@@ -122,19 +122,21 @@ is $url->scheme,   'mailto',          'right scheme';
 is $url->protocol, 'mailto',          'right protocol';
 is $url->path,     'sri@example.com', 'right path';
 is "$url", 'mailto:sri@example.com', 'right format';
-$url = Mojo::URL->new->parse('foo:/test/123?foo=bar');
+$url = Mojo::URL->new->parse('foo:/test/123?foo=bar#baz');
 is $url->scheme,   'foo',       'right scheme';
 is $url->protocol, 'foo',       'right protocol';
 is $url->path,     '/test/123', 'right path';
 is $url->query,    'foo=bar',   'right query';
-is "$url", 'foo:/test/123?foo=bar', 'right format';
-is $url->scheme('Bar')->to_string, 'bar:/test/123?foo=bar', 'right format';
+is $url->fragment, 'baz',       'right fragment';
+is "$url", 'foo:/test/123?foo=bar#baz', 'right format';
+is $url->scheme('Bar')->to_string, 'bar:/test/123?foo=bar#baz', 'right format';
 is $url->scheme,   'Bar',       'right scheme';
 is $url->protocol, 'bar',       'right protocol';
 is $url->host,     undef,       'no host';
 is $url->path,     '/test/123', 'right path';
 is $url->query,    'foo=bar',   'right query';
-is "$url", 'bar:/test/123?foo=bar', 'right format';
+is $url->fragment, 'baz',       'right fragment';
+is "$url", 'bar:/test/123?foo=bar#baz', 'right format';
 
 # Relative
 $url = Mojo::URL->new('foo?foo=bar#23');

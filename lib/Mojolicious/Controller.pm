@@ -266,10 +266,9 @@ sub rendered {
   my $stash = $self->stash;
   unless ($stash->{'mojo.finished'}++) {
 
-    # Stop timer (ignore static files)
-    my $app     = $self->app;
-    my $started = delete $stash->{'mojo.started'};
-    if (!$stash->{'mojo.static'} && $started) {
+    # Stop timer
+    my $app = $self->app;
+    if (my $started = delete $stash->{'mojo.started'}) {
       my $elapsed = sprintf '%f',
         Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
       my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;

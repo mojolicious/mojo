@@ -34,10 +34,10 @@ sub authority {
 
   # Build authority
   return undef unless defined(my $authority = $self->ihost);
-  my $userinfo = $self->userinfo;
-  $authority
-    = url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $authority
-    if $userinfo;
+  if (my $userinfo = $self->userinfo) {
+    $userinfo = url_escape $userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=:';
+    $authority = $userinfo . '@' . $authority;
+  }
   if (my $port = $self->port) { $authority .= ":$port" }
 
   return $authority;
@@ -81,20 +81,18 @@ sub parse {
 
   # Official regex
   $url =~ m!(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
-
-  $self->scheme($1)->authority($2);
-  $self->path->parse($3);
-  return $self->query($4)->fragment($5);
+  return $self->scheme($1)->authority($2)->path($3)->query($4)->fragment($5);
 }
 
 sub path {
-  my ($self, $path) = @_;
+  my $self = shift;
 
   # Old path
   $self->{path} ||= Mojo::Path->new;
-  return $self->{path} unless $path;
+  return $self->{path} unless @_;
 
   # New path
+  my $path = shift;
   $self->{path} = ref $path ? $path : $self->{path}->merge($path);
 
   return $self;

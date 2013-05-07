@@ -11,6 +11,7 @@ use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
 
 has base => sub { Mojo::URL->new };
 has [qw(data fragment host port scheme userinfo)];
+has schemes => sub { [qw(http https ws wss)] };
 
 sub new { shift->SUPER::new->parse(@_) }
 
@@ -45,7 +46,8 @@ sub clone {
   my $self = shift;
 
   my $clone = $self->new;
-  $clone->$_($self->$_) for qw(scheme data userinfo host port fragment);
+  $clone->$_($self->$_)
+    for qw(schemes scheme data userinfo host port fragment);
   $clone->path($self->path->clone);
   $clone->query($self->query->clone);
   $clone->base($self->base->clone) if $self->{base};
@@ -80,18 +82,15 @@ sub parse {
   # Official regex
   $url =~ m!(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
 
-  # Supported scheme
-  my $proto = $self->scheme($1)->protocol;
-  if (!$proto || grep { $proto eq $_ } qw(http https ws wss)) {
-    $self->authority($2);
-    $self->path->parse($3);
-    $self->query($4)->fragment($5);
-  }
-
   # Preserve scheme data
-  else { $self->data(substr($url, length($proto) + 1)) }
+  my $proto = $self->scheme($1)->protocol;
+  return $self->data(substr($url, length($proto) + 1))
+    if $proto && !grep { $proto eq $_ } @{$self->schemes};
 
-  return $self;
+  # Supported scheme or relative
+  $self->authority($2);
+  $self->path->parse($3);
+  return $self->query($4)->fragment($5);
 }
 
 sub path {
@@ -323,6 +322,13 @@ Port part of this URL.
 
 Scheme part of this URL.
 
+=head2 schemes
+
+  my $schemes = $url->schemes;
+  $url        = $url->schemes([qw(http https)]);
+
+Schemes that can be parsed, defaults to C<http>, C<https>, C<ws> and C<wss>.
+
 =head2 userinfo
 
   my $userinfo = $url->userinfo;
@@ -375,8 +381,8 @@ Check if URL is absolute.
 
   $url = $url->parse('http://127.0.0.1:3000/foo/bar?fo=o&baz=23#foo');
 
-Parse relative or absolute URL for the C<http>, C<https>, C<ws> as well as
-C<wss> schemes and preserve scheme data for all unknown ones.
+Parse relative or absolute URL for supported C<schemes> and preserve scheme
+data for all unknown ones.
 
   # "/test/123"
   $url->parse('/test/123?foo=bar')->path;
@@ -384,8 +390,11 @@ C<wss> schemes and preserve scheme data for all unknown ones.
   # "example.com"
   $url->parse('http://example.com/test/123?foo=bar')->host;
 
-  # "mailto:sri@example.com"
-  $url->parse('mailto:sri@example.com')->to_string;
+  # "sri@example.com"
+  $url->parse('mailto:sri@example.com')->data;
+
+  # "/baz"
+  $url->schemes(['foo'])->parse('foo://bar/baz')->path;
 
 =head2 path
 

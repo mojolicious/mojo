@@ -130,7 +130,17 @@ is "$url", 'foo://test/123', 'right format';
 is $url->scheme('Bar')->to_string, 'Bar://test/123', 'right format';
 is $url->scheme,   'Bar',        'right scheme';
 is $url->protocol, 'bar',        'right protocol';
+is $url->host,     undef,        'no host';
+is $url->path,     '',           'no path';
 is $url->data,     '//test/123', 'right data';
+$url = Mojo::URL->new->schemes(['foo'])->parse('foo://test/123');
+is $url->scheme,   'foo',  'right scheme';
+is $url->protocol, 'foo',  'right protocol';
+is $url->host,     'test', 'right host';
+is $url->path,     '/123', 'right path';
+is $url->data,     undef,  'no data';
+is "$url", 'foo://test/123', 'right format';
+is_deeply $url->clone->schemes, ['foo'], 'right schemes';
 
 # Relative
 $url = Mojo::URL->new('foo?foo=bar#23');

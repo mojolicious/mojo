@@ -79,9 +79,9 @@ sub parse {
   my ($self, $url) = @_;
   return $self unless $url;
 
-  # Official regex
-  $url =~ m!(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
-  return $self->scheme($1)->authority($2)->path($3)->query($4)->fragment($5);
+  # Official regex from RFC 3986
+  $url =~ m!^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?!;
+  return $self->scheme($2)->authority($4)->path($5)->query($7)->fragment($9);
 }
 
 sub path {

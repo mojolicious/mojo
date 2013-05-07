@@ -15,10 +15,11 @@ has [qw(fragment host port scheme userinfo)];
 sub new { shift->SUPER::new->parse(@_) }
 
 sub authority {
-  my ($self, $authority) = @_;
+  my $self = shift;
 
   # New authority
-  if (defined $authority) {
+  if (@_) {
+    return $self unless defined(my $authority = shift);
 
     # Userinfo
     $authority =~ s/^([^\@]+)\@// and $self->userinfo(url_unescape $1);
@@ -32,10 +33,11 @@ sub authority {
   }
 
   # Build authority
+  return undef unless defined(my $authority = $self->ihost);
   my $userinfo = $self->userinfo;
-  $authority .= url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@'
+  $authority
+    = url_escape($userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $authority
     if $userinfo;
-  $authority .= $self->ihost // '';
   if (my $port = $self->port) { $authority .= ":$port" }
 
   return $authority;
@@ -62,7 +64,7 @@ sub ihost {
     if @_;
 
   # Check if host needs to be encoded
-  return undef unless my $host = $self->host;
+  return undef unless defined(my $host = $self->host);
   return lc $host unless $host =~ /[^\x00-\x7f]/;
 
   # Encode
@@ -199,7 +201,7 @@ sub to_string {
 
   # Authority
   my $authority = $self->authority;
-  $url .= "//$authority" if $authority;
+  $url .= "//$authority" if defined $authority;
 
   # Relative path
   my $path = $self->path;

@@ -21,6 +21,7 @@
   - Improved documentation.
   - Improved tests.
   - Fixed Perl 5.17.11+ compatibility.
+  - Fixed a few authority bugs in Mojo::URL.
   - Fixed support for HEAD request method in Mojo::Server::CGI and
     Mojo::Server::PSGI.
 

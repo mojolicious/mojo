@@ -80,7 +80,7 @@ sub new {
     if -w $home->rel_file('log');
 
   $self->plugin($_) for qw(HeaderCondition DefaultHelpers TagHelpers);
-  $self->plugin($_) for qw(EPLRenderer EPRenderer RequestTimer PoweredBy);
+  $self->plugin($_) for qw(EPLRenderer EPRenderer RequestTimer);
 
   # Exception handling should be first in chain
   $self->hook(around_dispatch => \&_exception);

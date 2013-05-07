@@ -19,26 +19,22 @@ get '/memorized' => 'memorized';
 # Normal request
 my $t = Test::Mojo->new;
 $t->get_ok('/memorized')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/\d+a\d+b\d+c\d+\nd\d+\ne\d+/);
 my $memorized = $t->tx->res->body;
 
 # Memorized
 $t->get_ok('/memorized')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($memorized);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is($memorized);
 
 # Again
 $t->get_ok('/memorized')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is($memorized);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is($memorized);
 
 # Expired
 sleep 2;
 $t->get_ok('/memorized')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/\d+a\d+b\d+c\d+\nd\d+\ne\d+/)->content_isnt($memorized);
 
 done_testing();

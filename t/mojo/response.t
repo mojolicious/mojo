@@ -298,8 +298,7 @@ $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 413 Request Entity Too Large\x0d\x0a"
     . "Connection: Close\x0d\x0a"
     . "Date: Tue, 09 Feb 2010 16:34:51 GMT\x0d\x0a"
-    . "Server: Mojolicious (Perl)\x0d\x0a"
-    . "X-Powered-By: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
+    . "Server: Mojolicious (Perl)\x0d\x0a\x0d\x0a");
 ok !$res->is_finished, 'response is not finished';
 is $res->code,    413,                        'right status';
 is $res->message, 'Request Entity Too Large', 'right message';

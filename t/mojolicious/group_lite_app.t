@@ -181,52 +181,42 @@ $t->app->hook(after_dispatch => sub { $stash = shift->stash });
 # Zero expiration persists
 $t->ua->max_redirects(1);
 $t->get_ok('/expiration?redirect=1')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is('0');
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('0');
 ok !$t->tx->res->cookie('mojolicious')->expires, 'no expiration';
 $t->reset_session;
 
 # Authenticated with header
 $t->get_ok('/with_under' => {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => '23, 24')->header_like('X-Under' => qr/23, 24/)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
   ->content_is('Unders are cool!');
 
 # Authenticated with header too
 $t->get_ok('/with_under_too' => {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => '23, 24')->header_like('X-Under' => qr/23, 24/)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Under' => '23, 24')->header_like('X-Under' => qr/23, 24/)
   ->content_is('Unders are cool too!');
 
 # Not authenticated with header
 $t->get_ok('/with_under_too')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
 
 # Not authenticated with parameter
 $t->get_ok('/param_auth')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Not Bender!\n");
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("Not Bender!\n");
 is $stash->{_name}, undef, 'no "_name" value';
 
 # Authenticated with parameter
 $t->get_ok('/param_auth?name=Bender')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')->content_is("Bender!\n");
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("Bender!\n");
 
 # Not authenticated with parameter
 $t->get_ok('/param_auth/too')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is("Not Bender!\n");
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is("Not Bender!\n");
 
 # Authenticated with parameter too
 $t->get_ok('/param_auth/too?name=Bender')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('You could be Bender too!');
 
 # No cookies, session or flash
@@ -296,9 +286,8 @@ $t->get_ok('/late/session')->status_is(200)->content_is('works!');
 
 # Counter
 $t->get_ok('/with/under/count' => {'X-Bender' => 'Rodriguez'})->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Under'      => 1)->content_is("counter\n");
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is('X-Under' => 1)
+  ->content_is("counter\n");
 is $stash->{_name}, undef, 'no "_name" value';
 
 # Cookies, session and no flash again
@@ -318,35 +307,28 @@ $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
 
 # Reachable route
 $t->get_ok('/possible')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Possible'   => 1)->header_is('X-Impossible' => undef)
-  ->content_is("Possible!\n");
+  ->header_is(Server => 'Mojolicious (Perl)')->header_is('X-Possible' => 1)
+  ->header_is('X-Impossible' => undef)->content_is("Possible!\n");
 
 # Unreachable route
 $t->get_ok('/impossible')->status_is(404)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->header_is('X-Possible'   => undef)->header_is('X-Impossible' => 1)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->header_is('X-Possible' => undef)->header_is('X-Impossible' => 1)
   ->content_is("Oops!\n");
 
 # Prefix
 $t->get_ok('/prefix')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('prefixed GET works!');
 
 # POST request with prefix
 $t->post_ok('/prefix')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
+  ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('prefixed POST works!');
 
 # GET request with prefix
 $t->get_ok('/prefix/works')->status_is(200)
-  ->header_is(Server         => 'Mojolicious (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)')
-  ->content_is('prefix works!');
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('prefix works!');
 
 # Another prefix
 $t->get_ok('/prefix2/foo')->status_is(200)->content_is("prefixed!\n");

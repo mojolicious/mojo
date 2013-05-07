@@ -120,10 +120,6 @@ Mount whole L<Mojolicious> applications.
 Renderer for turning POD into HTML and documentation browser for
 L<Mojolicious::Guides>.
 
-=item L<Mojolicious::Plugin::PoweredBy>
-
-Add an C<X-Powered-By> header to outgoing responses, loaded automatically.
-
 =item L<Mojolicious::Plugin::RequestTimer>
 
 Log timing information, loaded automatically.

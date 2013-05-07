@@ -2,6 +2,7 @@ use Mojo::Base -strict;
 
 # Disable IPv6 and libev
 BEGIN {
+  $ENV{MOJO_MODE}    = 'development';
   $ENV{MOJO_NO_IPV6} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
 }

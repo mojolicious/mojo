@@ -9,7 +9,7 @@ use Scalar::Util 'blessed';
 
 has [qw(frames line lines_before lines_after)] => sub { [] };
 has message => 'Exception!';
-has verbose => sub { $ENV{MOJO_EXCEPTION_VERBOSE} || 0 };
+has 'verbose';
 
 sub new {
   my $self = shift->SUPER::new;
@@ -175,8 +175,7 @@ Exception message.
   my $verbose = $e->verbose;
   $e          = $e->verbose(1);
 
-Activate verbose rendering, defaults to the value of the
-MOJO_EXCEPTION_VERBOSE environment variable or C<0>.
+Render exception with context.
 
 =head1 METHODS
 

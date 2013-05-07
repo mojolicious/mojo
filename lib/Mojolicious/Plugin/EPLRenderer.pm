@@ -16,11 +16,13 @@ sub _epl {
   return undef unless defined $path;
 
   # Cached
-  my $cache = $renderer->cache;
   my $key   = delete $options->{cache} || $path;
-  my $mt    = $cache->get($key) || Mojo::Template->new;
+  my $cache = $renderer->cache;
+  my $mt    = $cache->get($key);
+  $mt ||= $cache->set($key => Mojo::Template->new)->get($key);
+  my $log = $c->app->log;
   if ($mt->compiled) {
-    $c->app->log->debug("Rendering cached @{[$mt->name]}.");
+    $log->debug("Rendering cached @{[$mt->name]}.");
     $$output = $mt->interpret($c);
   }
 
@@ -29,7 +31,7 @@ sub _epl {
 
     # Inline
     if (defined $inline) {
-      $c->app->log->debug('Rendering inline template.');
+      $log->debug('Rendering inline template.');
       $$output = $mt->name('inline template')->render($inline, $c);
     }
 
@@ -40,24 +42,19 @@ sub _epl {
 
       # Try template
       if (-r $path) {
-        $c->app->log->debug(qq{Rendering template "$t".});
+        $log->debug(qq{Rendering template "$t".});
         $$output = $mt->name("template $t")->render_file($path, $c);
       }
 
       # Try DATA section
       elsif (my $d = $renderer->get_data_template($options)) {
-        $c->app->log->debug(qq{Rendering template "$t" from DATA section.});
+        $log->debug(qq{Rendering template "$t" from DATA section.});
         $$output = $mt->name("template $t from DATA section")->render($d, $c);
       }
 
       # No template
-      else {
-        $c->app->log->debug(qq{Template "$t" not found.}) and return undef;
-      }
+      else { $log->debug(qq{Template "$t" not found.}) and return undef }
     }
-
-    # Cache
-    $cache->set($key => $mt);
   }
 
   # Exception or success

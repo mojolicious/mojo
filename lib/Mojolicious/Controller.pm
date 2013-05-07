@@ -12,6 +12,7 @@ use Mojo::Util;
 use Mojolicious;
 use Mojolicious::Routes::Match;
 use Scalar::Util ();
+use Time::HiRes  ();
 
 has app => sub { Mojolicious->new };
 has match => sub {
@@ -262,8 +263,21 @@ sub rendered {
   $res->code($status || 200) if $status || !$res->code;
 
   # Finish transaction
-  unless ($self->stash->{'mojo.finished'}++) {
-    my $app = $self->app;
+  my $stash = $self->stash;
+  unless ($stash->{'mojo.finished'}++) {
+
+    # Stop timer (ignore static files)
+    my $app     = $self->app;
+    my $started = delete $stash->{'mojo.started'};
+    if (!$stash->{'mojo.static'} && $started) {
+      my $elapsed = sprintf '%f',
+        Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
+      my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+      my $code = $res->code;
+      my $msg  = $res->message || $res->default_message($code);
+      $app->log->debug("$code $msg (${elapsed}s, $rps/s).");
+    }
+
     $app->plugins->emit_hook_reverse(after_dispatch => $self);
     $app->sessions->store($self);
   }

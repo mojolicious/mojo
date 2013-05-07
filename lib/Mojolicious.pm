@@ -14,6 +14,7 @@ use Mojolicious::Sessions;
 use Mojolicious::Static;
 use Mojolicious::Types;
 use Scalar::Util qw(blessed weaken);
+use Time::HiRes 'gettimeofday';
 
 has commands => sub {
   my $commands = Mojolicious::Commands->new(app => shift);
@@ -79,8 +80,8 @@ sub new {
   $self->log->path($home->rel_file("log/$mode.log"))
     if -w $home->rel_file('log');
 
-  $self->plugin($_) for qw(HeaderCondition DefaultHelpers TagHelpers);
-  $self->plugin($_) for qw(EPLRenderer EPRenderer RequestTimer);
+  $self->plugin($_)
+    for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
 
   # Exception handling should be first in chain
   $self->hook(around_dispatch => \&_exception);
@@ -116,6 +117,17 @@ sub dispatch {
   # Try to find a static file
   $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c)
     unless $tx->res->code;
+
+  # Start timer (ignore static files)
+  my $stash = $c->stash;
+  unless ($stash->{'mojo.static'} || $stash->{'mojo.started'}) {
+    my $req    = $c->req;
+    my $method = $req->method;
+    my $path   = $req->url->path->to_abs_string;
+    my $ua     = $req->headers->user_agent || 'Anonymojo';
+    $self->log->debug("$method $path ($ua).");
+    $stash->{'mojo.started'} = [gettimeofday];
+  }
 
   # Routes
   $plugins->emit_hook(before_routes => $c);

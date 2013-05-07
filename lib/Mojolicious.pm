@@ -39,8 +39,8 @@ has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
-our $CODENAME = 'Rainbow';
-our $VERSION  = '3.98';
+our $CODENAME = 'Top Hat';
+our $VERSION  = '4.0';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -634,6 +634,8 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 
 Every major release of L<Mojolicious> has a code name, these are the ones that
 have been used in the past.
+
+4.0, C<Top Hat> (u1F3A9)
 
 3.0, C<Rainbow> (u1F308)
 

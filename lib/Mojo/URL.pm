@@ -10,8 +10,7 @@ use Mojo::Path;
 use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
 
 has base => sub { Mojo::URL->new };
-has [qw(data fragment host port scheme userinfo)];
-has schemes => sub { [qw(http https ws wss)] };
+has [qw(fragment host port scheme userinfo)];
 
 sub new { shift->SUPER::new->parse(@_) }
 
@@ -46,8 +45,7 @@ sub clone {
   my $self = shift;
 
   my $clone = $self->new;
-  $clone->$_($self->$_)
-    for qw(schemes scheme data userinfo host port fragment);
+  $clone->$_($self->$_) for qw(scheme userinfo host port fragment);
   $clone->path($self->path->clone);
   $clone->query($self->query->clone);
   $clone->base($self->base->clone) if $self->{base};
@@ -82,13 +80,7 @@ sub parse {
   # Official regex
   $url =~ m!(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?!;
 
-  # Preserve scheme data
-  my $proto = $self->scheme($1)->protocol;
-  return $self->data(substr($url, length($proto) + 1))
-    if $proto && !grep { $proto eq $_ } @{$self->schemes};
-
-  # Supported scheme or relative
-  $self->authority($2);
+  $self->scheme($1)->authority($2);
   $self->path->parse($3);
   return $self->query($4)->fragment($5);
 }
@@ -201,29 +193,24 @@ sub to_rel {
 sub to_string {
   my $self = shift;
 
-  # Scheme data
-  my $data = $self->data;
-  return join ':', $self->scheme, $data if defined $data;
-
   # Protocol
   my $url = '';
-  if (my $proto = $self->protocol) { $url .= "$proto://" }
+  if (my $proto = $self->protocol) { $url .= "$proto:" }
 
   # Authority
   my $authority = $self->authority;
-  $url .= $url ? $authority : $authority ? "//$authority" : '';
+  $url .= "//$authority" if $authority;
 
   # Relative path
   my $path = $self->path;
-  if (!$url) { $url .= "$path" }
+  if (!$authority) { $url .= "$path" }
 
   # Absolute path
   elsif ($path->leading_slash) { $url .= "$path" }
   else                         { $url .= @{$path->parts} ? "/$path" : '' }
 
   # Query
-  my $query = join '', $self->query;
-  $url .= "?$query" if length $query;
+  if (length(my $query = $self->query)) { $url .= "?$query" }
 
   # Fragment
   my $fragment = $self->fragment;
@@ -284,16 +271,6 @@ L<Mojo::URL> implements the following attributes.
 
 Base of this URL.
 
-=head2 data
-
-  my $data = $url->data;
-  $url     = $url->data('foo')
-
-Data preserved for unknown schemes.
-
-  # "sri@example.com"
-  Mojo::URL->new('mailto:sri@example.com')->data;
-
 =head2 fragment
 
   my $fragment = $url->fragment;
@@ -321,13 +298,6 @@ Port part of this URL.
   $url       = $url->scheme('http');
 
 Scheme part of this URL.
-
-=head2 schemes
-
-  my $schemes = $url->schemes;
-  $url        = $url->schemes([qw(http https)]);
-
-Schemes that can be parsed, defaults to C<http>, C<https>, C<ws> and C<wss>.
 
 =head2 userinfo
 
@@ -381,8 +351,7 @@ Check if URL is absolute.
 
   $url = $url->parse('http://127.0.0.1:3000/foo/bar?fo=o&baz=23#foo');
 
-Parse relative or absolute URL for supported C<schemes> and preserve scheme
-data for all unknown ones.
+Parse relative or absolute URL.
 
   # "/test/123"
   $url->parse('/test/123?foo=bar')->path;
@@ -391,10 +360,7 @@ data for all unknown ones.
   $url->parse('http://example.com/test/123?foo=bar')->host;
 
   # "sri@example.com"
-  $url->parse('mailto:sri@example.com')->data;
-
-  # "/baz"
-  $url->schemes(['foo'])->parse('foo://bar/baz')->path;
+  $url->parse('mailto:sri@example.com')->path;
 
 =head2 path
 

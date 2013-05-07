@@ -1,8 +1,9 @@
 
-3.98  2013-05-07
-  - Added schemes attribute to Mojo::URL.
+4.0  2013-05-07
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Added close_gracefully method to Mojo::IOLoop::Stream.
+  - Removed data attribute from Mojo::URL.
+  - Removed deprecated end method from Mojo::IOLoop::Delay.
   - Removed deprecated build_form_tx, build_json_tx, post_form and post_json
     methods from Mojo::UserAgent.
   - Removed deprecated form and json methods from Mojo::UserAgent::Transactor.

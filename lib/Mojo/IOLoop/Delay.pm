@@ -2,7 +2,6 @@ package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Mojo::IOLoop;
-use Mojo::Util 'deprecated';
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 
@@ -11,13 +10,6 @@ sub begin {
   $self->{pending}++;
   my $id = $self->{counter}++;
   return sub { $ignore // 1 and shift; $self->_step($id, @_) };
-}
-
-# DEPRECATED in Rainbow!
-sub end {
-  deprecated
-    'Mojo::IOLoop::Delay::end is DEPRECATED in favor of generated callbacks';
-  shift->_step(undef, @_);
 }
 
 sub steps {
@@ -38,17 +30,10 @@ sub wait {
 sub _step {
   my ($self, $id) = (shift, shift);
 
-  if (defined $id) { $self->{args}[$id] = [@_] }
-
-  # DEPRECATED in Rainbow!
-  else { push @{$self->{unordered}}, @_ }
-
+  $self->{args}[$id] = [@_];
   return $self->{pending} if --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = (map {@$_} grep {defined} @{delete($self->{args}) || []});
-
-  # DEPRECATED in Rainbow!
-  push @args, @{delete($self->{unordered}) || []};
 
   $self->{counter} = 0;
   if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }

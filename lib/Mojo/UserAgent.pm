@@ -550,7 +550,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
       say "WebSocket message via JSON: $hash->{msg}";
       $tx->finish;
     });
-    $tx->send({json => {msg => 'Hello World!'});
+    $tx->send({json => {msg => 'Hello World!'}});
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 

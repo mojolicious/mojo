@@ -848,7 +848,7 @@ will be invoked once all data has been written.
   $c->send('I ♥ Mojolicious!');
 
   # Send JSON object as "Text" message
-  $c->send({json => {test => 'I ♥ Mojolicious!'});
+  $c->send({json => {test => 'I ♥ Mojolicious!'}});
 
   # Send JSON object as "Binary" message
   use Mojo::JSON 'j';

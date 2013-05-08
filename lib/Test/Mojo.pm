@@ -834,7 +834,7 @@ Send message or frame via WebSocket.
 
   # Send JSON object as "Text" message
   $t->websocket_ok('/echo.json')
-    ->send_ok({json => {test => 'I ♥ Mojolicious!'})
+    ->send_ok({json => {test => 'I ♥ Mojolicious!'}})
     ->message_ok
     ->json_message_is('/test' => 'I ♥ Mojolicious!')
     ->finish_ok;

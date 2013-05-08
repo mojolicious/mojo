@@ -57,7 +57,7 @@ sub to_string {
 
   # RFC 2616 (Sun, 06 Nov 1994 08:49:37 GMT)
   my ($s, $m, $h, $mday, $month, $year, $wday) = gmtime($self->epoch // time);
-  return sprintf "%s, %02d %s %04d %02d:%02d:%02d GMT", $DAYS[$wday], $mday,
+  return sprintf '%s, %02d %s %04d %02d:%02d:%02d GMT', $DAYS[$wday], $mday,
     $MONTHS[$month], $year + 1900, $h, $m, $s;
 }
 

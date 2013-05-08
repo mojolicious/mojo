@@ -223,6 +223,8 @@ C<partial> stash value.
 
   my $html = $self->render('mail', partial => 1);
 
+No encoding will be performed on the result.
+
 =head2 Status code
 
 Response status codes can be changed with the C<status> stash value.

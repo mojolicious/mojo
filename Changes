@@ -16,6 +16,8 @@
   - Reduced idle CPU usage of Mojo::IOLoop.
   - Increased default lock_timeout from 0.5 to 1 second in
     Mojo::Server::Prefork and Mojo::Server::Hypnotoad.
+  - Improved Mojolicious to be able to detect the current operating mode from
+    the PLACK_ENV environment variable.
   - Improved Mojo::IOLoop performance by reducing stream timeout precision
     from 0.5 to 1 second.
   - Improved Mojo::DOM::HTML performance.

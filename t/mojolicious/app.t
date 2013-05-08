@@ -1,7 +1,7 @@
 use Mojo::Base -strict;
 
-# Disable IPv6 and libev
 BEGIN {
+  $ENV{PLACK_ENV}    = undef;
   $ENV{MOJO_MODE}    = 'development';
   $ENV{MOJO_NO_IPV6} = 1;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';
@@ -24,6 +24,18 @@ use Test::Mojo;
   local $ENV{MOJO_MODE} = 'whatever';
   is(Test::Mojo->new('MojoliciousConfigTest')->app->config->{it},
     'works', 'right result');
+}
+
+# Mode detection
+{
+  local $ENV{MOJO_MODE} = undef;
+  local $ENV{PLACK_ENV} = 'something';
+  is(Test::Mojo->new('MojoliciousTest')->app->mode, 'something', 'right mode');
+}
+{
+  local $ENV{MOJO_MODE} = 'else';
+  local $ENV{PLACK_ENV} = 'something';
+  is(Test::Mojo->new('MojoliciousTest')->app->mode, 'else', 'right mode');
 }
 
 my $t = Test::Mojo->new('MojoliciousTest');

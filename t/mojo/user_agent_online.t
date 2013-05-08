@@ -1,6 +1,5 @@
 use Mojo::Base -strict;
 
-# Disable libev and proxy detection
 BEGIN {
   $ENV{MOJO_PROXY}   = 0;
   $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll';

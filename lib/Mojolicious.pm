@@ -22,7 +22,7 @@ has commands => sub {
   return $commands;
 };
 has controller_class => 'Mojolicious::Controller';
-has mode => sub { $ENV{MOJO_MODE} || 'development' };
+has mode => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
 has moniker  => sub { decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };
@@ -257,10 +257,11 @@ L<Mojolicious::Controller>.
   my $mode = $app->mode;
   $app     = $app->mode('production');
 
-The operating mode for your application, defaults to the value of the
-MOJO_MODE environment variable or C<development>. You can also add per
-mode logic to your application by defining methods named C<${mode}_mode> in
-the application class, which will be called right before C<startup>.
+The operating mode for your application, defaults to a value from the
+MOJO_MODE and PLACK_ENV environment variables or C<development>. You can also
+add per mode logic to your application by defining methods named
+C<${mode}_mode> in the application class, which will be called right before
+C<startup>.
 
   sub development_mode {
     my $self = shift;

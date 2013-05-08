@@ -11,8 +11,8 @@ These options are available for all commands:
     -h, --help          Get more information on a specific command.
         --home <path>   Path to your applications home directory, defaults to
                         the value of MOJO_HOME or auto detection.
-    -m, --mode <name>   Run mode of your application, defaults to the value
-                        of MOJO_MODE or "development".
+    -m, --mode <name>   Run mode of your application, defaults to the value of
+                        MOJO_MODE/PLACK_ENV or "development".
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF

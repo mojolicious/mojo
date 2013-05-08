@@ -1,6 +1,5 @@
 use Mojo::Base -strict;
 
-# Disable IPv6
 BEGIN { $ENV{MOJO_NO_IPV6} = 1 }
 
 use Test::More;

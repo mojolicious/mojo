@@ -914,8 +914,9 @@ changing the L<Mojolicious> operating mode.
   app->start;
 
 The default operating mode will usually be C<development> and can be changed
-with command line options or the MOJO_MODE environment variable. A mode other
-than C<development> will raise the log level from C<debug> to C<info>.
+with command line options or the MOJO_MODE and PLACK_ENV environment
+variables. A mode other than C<development> will raise the log level from
+C<debug> to C<info>.
 
   $ ./myapp.pl daemon -m production
 

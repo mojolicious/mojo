@@ -1,6 +1,5 @@
 use Mojo::Base -strict;
 
-# Disable IPv6, libev and proxy detection
 BEGIN {
   $ENV{MOJO_MODE}    = 'development';
   $ENV{MOJO_NO_IPV6} = 1;

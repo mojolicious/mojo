@@ -329,8 +329,8 @@ Mojo::Transaction::WebSocket - WebSocket transaction
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions as
-described in RFC 6455. Note that 64bit frames require a Perl with 64bit
-integer support, or they are limited to 32bit.
+described in RFC 6455. Note that 64bit frames require a Perl with support for
+quads or they are limited to 32bit.
 
 =head1 EVENTS
 
@@ -401,8 +401,9 @@ Emitted when a WebSocket frame has been received.
     ...
   });
 
-Emitted when a complete WebSocket message has been received and there are
-subscribers, messages will be automatically JSON decoded.
+Emitted when a complete WebSocket message has been received, all text and
+binary messages will be automatically JSON decoded. Note that this event only
+gets emitted when it has at least one subscriber.
 
   $ws->on(json => sub {
     my ($ws, $hash) = @_;

@@ -206,7 +206,7 @@ content will be automatically encoded to bytes.
 Bytes can be rendered with the C<data> stash value, no encoding will be
 performed.
 
-  $self->render(data => $octets);
+  $self->render(data => $bytes);
 
 =head2 Rendering JSON
 
@@ -223,7 +223,11 @@ C<partial> stash value.
 
   my $html = $self->render('mail', partial => 1);
 
-No encoding will be performed on the result.
+No encoding will be performed, making it easy to reuse the result or generate
+binary data.
+
+  my $pdf = $self->render('pdf_invoice', partial => 1);
+  $self->render(data => $pdf, format => 'pdf');
 
 =head2 Status code
 

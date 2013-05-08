@@ -531,6 +531,13 @@ L<Test::Mojo> API to be used.
     ->message_is('echo: Hello Mojo!')
     ->finish_ok;
 
+  # Test JSON web service
+  $t->websocket_ok('/echo.json')
+    ->send_ok({json => {test => [1, 2, 3]}})
+    ->message_ok
+    ->json_message_is('/test', [1, 2, 3])
+    ->finish_ok;
+
   done_testing();
 
 =head2 EventSource web service

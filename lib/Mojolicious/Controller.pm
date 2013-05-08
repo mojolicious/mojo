@@ -602,20 +602,17 @@ L<Mojo::Transaction::WebSocket> object.
     $c->app->log->debug("Message: $msg");
   });
 
-  # Receive JSON object via WebSocket "Text" message
-  use Mojo::JSON 'j';
-  $c->on(text => sub {
-    my ($c, $bytes) = @_;
-    my $test = j($bytes)->{test};
-    $c->app->log->debug("Test: $test");
+  # Receive JSON object via WebSocket message
+  $c->on(json => sub {
+    my ($c, $hash) = @_;
+    $c->app->log->debug("Test: $hash->{test}");
   });
 
-  # Receive JSON object via WebSocket "Binary" message
-  use Mojo::JSON 'j';
+  # Receive WebSocket "Binary" message
   $c->on(binary => sub {
     my ($c, $bytes) = @_;
-    my $test = j($bytes)->{test};
-    $c->app->log->debug("Test: $test");
+    my $len = length $bytes;
+    $c->app->log->debug("Received $len bytes.");
   });
 
 =head2 param
@@ -838,6 +835,7 @@ is set to the value C<XMLHttpRequest>.
 
   $c = $c->send({binary => $bytes});
   $c = $c->send({text   => $bytes});
+  $c = $c->send({json   => {test => [1, 2, 3]}});
   $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
   $c = $c->send(Mojo::ByteStream->new($chars));
   $c = $c->send($chars);
@@ -850,8 +848,7 @@ will be invoked once all data has been written.
   $c->send('I ♥ Mojolicious!');
 
   # Send JSON object as "Text" message
-  use Mojo::JSON 'j';
-  $c->send({text => j({test => 'I ♥ Mojolicious!'})});
+  $c->send({json => {test => 'I ♥ Mojolicious!'});
 
   # Send JSON object as "Binary" message
   use Mojo::JSON 'j';

@@ -1,16 +1,14 @@
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Mojolicious::Lite;
-use Mojo::JSON 'j';
 
 websocket '/test' => sub {
   my $self = shift;
   $self->on(
-    text => sub {
-      my ($self, $data) = @_;
-      my $hash = j($data);
+    json => sub {
+      my ($self, $hash) = @_;
       $hash->{test} = "♥ $hash->{test}";
-      $self->send({text => j($hash)});
+      $self->send({json => $hash});
     }
   );
 };

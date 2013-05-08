@@ -825,6 +825,7 @@ Reset user agent session.
 
   $t = $t->send_ok({binary => $bytes});
   $t = $t->send_ok({text   => $bytes});
+  $t = $t->send_ok({json   => {test => [1, 2, 3]}});
   $t = $t->send_ok([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
   $t = $t->send_ok($chars);
   $t = $t->send_ok($chars, 'sent successfully');
@@ -832,9 +833,8 @@ Reset user agent session.
 Send message or frame via WebSocket.
 
   # Send JSON object as "Text" message
-  use Mojo::JSON 'j';
   $t->websocket_ok('/echo.json')
-    ->send_ok({text => j({test => 'I ♥ Mojolicious!'})})
+    ->send_ok({json => {test => 'I ♥ Mojolicious!'})
     ->message_ok
     ->json_message_is('/test' => 'I ♥ Mojolicious!')
     ->finish_ok;

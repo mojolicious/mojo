@@ -1,6 +1,8 @@
 
-4.0  2013-05-08
+4.0  2013-05-09
   - Code name "Top Hat", this is a major release.
+  - Added simple JSON serialization support to Mojo::Transaction::WebSocket.
+  - Added json event to Mojo::Transaction::WebSocket.
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Added close_gracefully method to Mojo::IOLoop::Stream.
   - Removed Mojolicious::Plugin::PoweredBy and

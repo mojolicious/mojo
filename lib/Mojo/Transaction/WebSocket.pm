@@ -2,6 +2,7 @@ package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
 use Config;
+use Mojo::JSON;
 use Mojo::Transaction::HTTP;
 use Mojo::Util qw(b64_encode decode encode sha1_bytes xor_encode);
 
@@ -200,12 +201,17 @@ sub resume {
 sub send {
   my ($self, $frame, $cb) = @_;
 
-  # Binary or raw text
-  $frame
-    = exists $frame->{text}
-    ? [1, 0, 0, 0, TEXT, $frame->{text}]
-    : [1, 0, 0, 0, BINARY, $frame->{binary}]
-    if ref $frame eq 'HASH';
+  if (ref $frame eq 'HASH') {
+
+    # JSON
+    $frame->{text} = Mojo::JSON->new->encode($frame->{json}) if $frame->{json};
+
+    # Binary or raw text
+    $frame
+      = exists $frame->{text}
+      ? [1, 0, 0, 0, TEXT, $frame->{text}]
+      : [1, 0, 0, 0, BINARY, $frame->{binary}];
+  }
 
   # Text or object (forcing stringification)
   $frame = [1, 0, 0, 0, TEXT, encode('UTF-8', "$frame")]
@@ -288,6 +294,8 @@ sub _message {
 
   # Whole message
   my $msg = delete $self->{message};
+  $self->emit(json => Mojo::JSON->new->decode($msg))
+    if $self->has_subscribers('json');
   if (delete $self->{op} == TEXT) {
     $self->emit(text => $msg);
     $msg = decode 'UTF-8', $msg;
@@ -384,6 +392,21 @@ Emitted when a WebSocket frame has been received.
     say "RSV3: $frame->[3]";
     say "Opcode: $frame->[4]";
     say "Payload: $frame->[5]";
+  });
+
+=head2 json
+
+  $ws->on(json => sub {
+    my ($ws, $json) = @_;
+    ...
+  });
+
+Emitted when a complete WebSocket message has been received and there are
+subscribers, messages will be automatically JSON decoded.
+
+  $ws->on(json => sub {
+    my ($ws, $hash) = @_;
+    say "Message: $hash->{msg}";
   });
 
 =head2 message
@@ -592,6 +615,7 @@ Resume C<handshake> transaction.
 
   $ws = $ws->send({binary => $bytes});
   $ws = $ws->send({text   => $bytes});
+  $ws = $ws->send({json   => {test => [1, 2, 3]}});
   $ws = $ws->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
   $ws = $ws->send(Mojo::ByteStream->new($chars));
   $ws = $ws->send($chars);

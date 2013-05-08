@@ -541,18 +541,16 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   }
   $delay->wait unless Mojo::IOLoop->is_running;
 
-  # Non-blocking WebSocket connection sending and receiving JSON text messages
-  use Mojo::JSON 'j';
+  # Non-blocking WebSocket connection sending and receiving JSON messages
   $ua->websocket('ws://localhost:3000/echo.json' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
-    $tx->on(text => sub {
-      my ($tx, $bytes) = @_;
-      my $hash = j($bytes);
+    $tx->on(json => sub {
+      my ($tx, $hash) = @_;
       say "WebSocket message via JSON: $hash->{msg}";
       $tx->finish;
     });
-    $tx->send({text => j({msg => 'Hello World!'})});
+    $tx->send({json => {msg => 'Hello World!'});
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 

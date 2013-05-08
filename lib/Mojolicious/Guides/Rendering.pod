@@ -224,7 +224,7 @@ C<partial> stash value.
   my $html = $self->render('mail', partial => 1);
 
 No encoding will be performed, making it easy to reuse the result in other
-templates or generate binary data.
+templates or to generate binary data.
 
   $self->render(data => $self->render('pdf_invoice', partial => 1));
 

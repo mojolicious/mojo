@@ -296,12 +296,10 @@ sub _message {
   my $msg = delete $self->{message};
   $self->emit(json => Mojo::JSON->new->decode($msg))
     if $self->has_subscribers('json');
-  if (delete $self->{op} == TEXT) {
-    $self->emit(text => $msg);
-    $msg = decode 'UTF-8', $msg;
-  }
-  else { $self->emit(binary => $msg); }
-  $self->emit(message => $msg);
+  $op = delete $self->{op};
+  $self->emit($op == TEXT ? 'text' : 'binary' => $msg);
+  $self->emit(message => $op == TEXT ? decode('UTF-8', $msg) : $msg)
+    if $self->has_subscribers('message');
 }
 
 1;
@@ -418,7 +416,8 @@ gets emitted when it has at least one subscriber.
   });
 
 Emitted when a complete WebSocket message has been received, text messages
-will be automatically decoded.
+will be automatically decoded. Note that this event only gets emitted when it
+has at least one subscriber.
 
   $ws->on(message => sub {
     my ($ws, $msg) = @_;

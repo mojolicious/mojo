@@ -3,13 +3,11 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK);
 use Scalar::Util 'weaken';
-use Mojo::Util 'steady_time';
 
 has reactor => sub {
   require Mojo::IOLoop;
   Mojo::IOLoop->singleton->reactor;
 };
-has timeout => 15;
 
 sub DESTROY { shift->close }
 
@@ -38,7 +36,7 @@ sub handle { shift->{handle} }
 
 sub is_readable {
   my $self = shift;
-  $self->{active} = steady_time;
+  $self->_again;
   return $self->{handle} && $self->reactor->is_readable($self->{handle});
 }
 
@@ -52,22 +50,9 @@ sub start {
   my $self = shift;
 
   my $reactor = $self->reactor;
-  unless ($self->{timer}) {
-
-    # Timeout (ignore 0 timeout)
-    weaken $self;
-    $self->{timer} = $reactor->recurring(
-      1 => sub {
-        return unless my $timeout = $self->timeout;
-        my $diff = steady_time - $self->{active};
-        $self->emit_safe('timeout')->close if $diff >= $timeout;
-      }
-    );
-
-    $self->{active} = steady_time;
-    $reactor->io($self->{handle},
-      sub { pop() ? $self->_write : $self->_read });
-  }
+  $reactor->io($self->timeout(15)->{handle},
+    sub { pop() ? $self->_write : $self->_read })
+    unless $self->{timer};
 
   # Resume
   $reactor->watch($self->{handle}, 1, $self->is_writing)
@@ -86,6 +71,21 @@ sub steal_handle {
   return delete $self->{handle};
 }
 
+sub timeout {
+  my $self = shift;
+
+  return $self->{timeout} unless @_;
+  my $reactor = $self->reactor;
+  $reactor->remove(delete $self->{timer}) if $self->{timer};
+  return $self unless my $timeout = $self->{timeout} = shift;
+
+  weaken $self;
+  $self->{timer} = $reactor->recurring(
+    $timeout => sub { $self->emit_safe('timeout')->close });
+
+  return $self;
+}
+
 sub write {
   my ($self, $chunk, $cb) = @_;
 
@@ -96,6 +96,11 @@ sub write {
     if $self->{handle};
 
   return $self;
+}
+
+sub _again {
+  my $self = shift;
+  $self->reactor->again($self->{timer}) if $self->{timer};
 }
 
 sub _error {
@@ -116,7 +121,7 @@ sub _read {
   my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
   return $self->_error unless defined $read;
   return $self->close if $read == 0;
-  $self->emit_safe(read => $buffer)->{active} = steady_time;
+  $self->emit_safe(read => $buffer)->_again;
 }
 
 sub _write {
@@ -127,7 +132,7 @@ sub _write {
     my $written = $handle->syswrite($self->{buffer});
     return $self->_error unless defined $written;
     $self->emit_safe(write => substr($self->{buffer}, 0, $written, ''));
-    $self->{active} = steady_time;
+    $self->_again;
   }
 
   $self->emit_safe('drain') unless length $self->{buffer};
@@ -245,15 +250,6 @@ L<Mojo::IOLoop::Stream> implements the following attributes.
 Low level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.
 
-=head2 timeout
-
-  my $timeout = $stream->timeout;
-  $stream     = $stream->timeout(45);
-
-Maximum amount of time in seconds stream can be inactive before getting closed
-automatically, defaults to C<15>. Setting the value to C<0> will allow this
-stream to be inactive indefinitely.
-
 =head1 METHODS
 
 L<Mojo::IOLoop::Stream> inherits all methods from L<Mojo::EventEmitter> and
@@ -313,6 +309,15 @@ Stop watching for new data on the stream.
   my $handle = $stream->steal_handle;
 
 Steal handle from stream and prevent it from getting closed automatically.
+
+=head2 timeout
+
+  my $timeout = $stream->timeout;
+  $stream     = $stream->timeout(45);
+
+Maximum amount of time in seconds stream can be inactive before getting closed
+automatically, defaults to C<15>. Setting the value to C<0> will allow this
+stream to be inactive indefinitely.
 
 =head2 write
 

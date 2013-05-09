@@ -6,6 +6,11 @@ use List::Util 'min';
 use Mojo::Util qw(md5_sum steady_time);
 use Time::HiRes 'usleep';
 
+sub again {
+  my $timer = shift->{timers}{shift()};
+  $timer->{time} = steady_time + $timer->{after};
+}
+
 sub io {
   my ($self, $handle, $cb) = @_;
   $self->{io}{fileno $handle} = {cb => $cb};
@@ -109,7 +114,8 @@ sub _timer {
   my $timers = $self->{timers} //= {};
   my $id;
   do { $id = md5_sum('t' . steady_time . rand 999) } while $timers->{$id};
-  my $timer = $timers->{$id} = {cb => $cb, time => steady_time + $after};
+  my $timer = $timers->{$id}
+    = {cb => $cb, after => $after, time => steady_time + $after};
   $timer->{recurring} = $after if $recurring;
 
   return $id;
@@ -157,6 +163,12 @@ L<Mojo::Reactor::Poll> inherits all events from L<Mojo::Reactor>.
 
 L<Mojo::Reactor::Poll> inherits all methods from L<Mojo::Reactor> and
 implements the following new ones.
+
+=head2 again
+
+  $reactor->again($id);
+
+Restart timer.
 
 =head2 io
 

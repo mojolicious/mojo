@@ -18,8 +18,7 @@ sub close {
 
   # Cleanup
   return unless my $reactor = $self->{reactor};
-  $reactor->remove(delete $self->{timer}) if $self->{timer};
-  return unless my $handle = delete $self->{handle};
+  return unless my $handle  = delete $self->timeout(0)->{handle};
   $reactor->remove($handle);
 
   close $handle;
@@ -75,10 +74,10 @@ sub timeout {
   my $self = shift;
 
   return $self->{timeout} unless @_;
+
   my $reactor = $self->reactor;
   $reactor->remove(delete $self->{timer}) if $self->{timer};
   return $self unless my $timeout = $self->{timeout} = shift;
-
   weaken $self;
   $self->{timer} = $reactor->recurring(
     $timeout => sub { $self->emit_safe('timeout')->close });

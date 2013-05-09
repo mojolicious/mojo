@@ -98,10 +98,7 @@ sub write {
   return $self;
 }
 
-sub _again {
-  my $self = shift;
-  $self->reactor->again($self->{timer}) if $self->{timer};
-}
+sub _again { $_[0]->reactor->again($_[0]->{timer}) if $_[0]->{timer} }
 
 sub _error {
   my $self = shift;

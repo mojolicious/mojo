@@ -91,7 +91,7 @@ implements the following new ones.
 
   $reactor->again($id);
 
-Restart timer.
+Restart timer. Meant to be overloaded in a subclass.
 
 =head2 detect
 

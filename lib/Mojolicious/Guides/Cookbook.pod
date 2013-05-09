@@ -1100,7 +1100,7 @@ There are many more useful methods and attributes in L<Mojolicious::Command>
 that you can use or overload.
 
   $ mojo spy secret
-  The secret of this application is "Mojolicious::Lite".
+  The secret of this application is "HelloWorld".
 
   $ ./myapp.pl spy secret
   The secret of this application is "secr3t".

@@ -33,8 +33,8 @@ has secret   => sub {
   # Warn developers about insecure default
   $self->log->debug('Your secret passphrase needs to be changed!!!');
 
-  # Default to application name
-  return ref $self;
+  # Default to moniker
+  return $self->moniker;
 };
 has sessions => sub { Mojolicious::Sessions->new };
 has static   => sub { Mojolicious::Static->new };
@@ -335,9 +335,9 @@ startup method to define the url endpoints for your application.
   $app       = $app->secret('passw0rd');
 
 A secret passphrase used for signed cookies and the like, defaults to the
-application name which is not very secure, so you should change it!!! As long
-as you are using the insecure default there will be debug messages in the log
-file reminding you to change your passphrase.
+C<moniker> of this application, which is not very secure, so you should change
+it!!! As long as you are using the insecure default there will be debug
+messages in the log file reminding you to change your passphrase.
 
 =head2 sessions
 

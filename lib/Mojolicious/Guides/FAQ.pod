@@ -94,7 +94,7 @@ to use the MOJO_REACTOR environment variable to enforce a more portable one.
 =head2 What does "Your secret passphrase needs to be changed" mean?
 
 L<Mojolicious> uses a secret passphrase for security features such as signed
-cookies. It defaults to the name of your application, which is not very
+cookies. It defaults to the moniker of your application, which is not very
 secure, so we added this log message as a reminder. You can change the
 passphrase with the attribute L<Mojolicious/"secret">.
 

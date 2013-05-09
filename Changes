@@ -5,6 +5,8 @@
   - Added json event to Mojo::Transaction::WebSocket.
   - Added is_empty method to Mojo::Transaction::HTTP.
   - Added close_gracefully method to Mojo::IOLoop::Stream.
+  - Changed Mojolicious default secret to the application moniker to make it
+    slightly more secure.
   - Removed Mojolicious::Plugin::PoweredBy and
     Mojolicious::Plugin::RequestTimer.
   - Removed data attribute from Mojo::URL.

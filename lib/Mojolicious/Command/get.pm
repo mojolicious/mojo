@@ -93,8 +93,8 @@ sub run {
       $tx->res->on(progress => $cb);
 
       # Stream content
-      $tx->res->body(
-        sub {
+      $tx->res->content->unsubscribe('read')->on(
+        read => sub {
           $cb->(my $res = shift);
 
           # Ignore intermediate content

@@ -355,7 +355,7 @@ requests, with support for content generators.
 
   # Streaming response
   my $tx = $t->tx(GET => 'http://example.com');
-  $tx->res->body(sub { say $_[1] });
+  $tx->res->content->unsubscribe('read')->on(read => sub { say $_[1] });
 
   # Custom socket
   my $tx = $t->tx(GET => 'http://example.com');

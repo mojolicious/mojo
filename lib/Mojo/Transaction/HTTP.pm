@@ -15,7 +15,8 @@ sub client_read {
   return $self->{state} = 'finished'
     if !$res->is_status_class(100) || $res->headers->upgrade;
   $self->res($res->new)->emit(unexpected => $res);
-  $self->client_read($res->leftovers) if $res->has_leftovers;
+  my $content = $res->content;
+  $self->client_read($content->leftovers) if $content->has_leftovers;
 }
 
 sub client_write { shift->_write(0) }
@@ -62,7 +63,7 @@ sub _body {
   # Prepare body chunk
   my $buffer = $msg->get_body_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $self->{write} = $msg->is_dynamic ? 1 : ($self->{write} - $written);
+  $self->{write} = $msg->content->is_dynamic ? 1 : ($self->{write} - $written);
   $self->{offset} = $self->{offset} + $written;
   if (defined $buffer) { delete $self->{delay} }
 
@@ -98,7 +99,7 @@ sub _headers {
     # Body
     else {
       $self->{state} = 'write_body';
-      $self->{write} = $msg->is_dynamic ? 1 : $msg->body_size;
+      $self->{write} = $msg->content->is_dynamic ? 1 : $msg->body_size;
     }
   }
 

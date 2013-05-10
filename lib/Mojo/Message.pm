@@ -10,7 +10,6 @@ use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
 use Mojo::Util 'decode';
-use Scalar::Util 'weaken';
 
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
@@ -28,14 +27,8 @@ sub body {
   # Get
   return $content->asset->slurp unless defined(my $new = shift);
 
-  # Callback
-  if (ref $new eq 'CODE') {
-    weaken $self;
-    return $content->unsubscribe('read')->on(read => sub { $self->$new(pop) });
-  }
-
   # Set raw content
-  else { $content->asset(Mojo::Asset::Memory->new->add_chunk($new)) }
+  $content->asset(Mojo::Asset::Memory->new->add_chunk($new));
 
   return $self;
 }
@@ -85,7 +78,7 @@ sub cookies { croak 'Method "cookies" not implemented by subclass' }
 sub dom {
   my $self = shift;
 
-  return undef if $self->is_multipart;
+  return undef if $self->content->is_multipart;
   my $dom = $self->{dom}
     ||= Mojo::DOM->new->charset($self->content->charset // undef)
     ->parse($self->body);
@@ -121,9 +114,10 @@ sub fix_headers {
   my $self = shift;
 
   # Content-Length or Connection (unless chunked transfer encoding is used)
-  return $self if $self->{fix}++ || $self->is_chunked;
+  my $content = $self->content;
+  return $self if $self->{fix}++ || $content->is_chunked;
   my $headers = $self->headers;
-  $self->is_dynamic
+  $content->is_dynamic
     ? $headers->connection('close')
     : $headers->content_length($self->body_size)
     unless $headers->content_length;
@@ -152,13 +146,9 @@ sub get_start_line_chunk {
   croak 'Method "get_start_line_chunk" not implemented by subclass';
 }
 
-sub has_leftovers { shift->content->has_leftovers }
-
 sub header_size { shift->fix_headers->content->header_size }
 
-sub headers    { shift->content->headers }
-sub is_chunked { shift->content->is_chunked }
-sub is_dynamic { shift->content->is_dynamic }
+sub headers { shift->content->headers }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
 
@@ -167,16 +157,12 @@ sub is_limit_exceeded {
   return !!($code eq 413 || $code eq 431);
 }
 
-sub is_multipart { shift->content->is_multipart }
-
 sub json {
   my ($self, $pointer) = @_;
-  return undef if $self->is_multipart;
+  return undef if $self->content->is_multipart;
   my $data = $self->{json} ||= Mojo::JSON->new->decode($self->body);
   return $pointer ? Mojo::JSON::Pointer->new->get($data, $pointer) : $data;
 }
-
-sub leftovers { shift->content->leftovers }
 
 sub param { shift->body_params->param(@_) }
 
@@ -255,9 +241,6 @@ sub uploads {
 
   return \@uploads;
 }
-
-sub write       { shift->_write(write       => @_) }
-sub write_chunk { shift->_write(write_chunk => @_) }
 
 sub _build {
   my ($self, $method) = @_;
@@ -341,13 +324,6 @@ sub _parse_formdata {
   }
 
   return \@formdata;
-}
-
-sub _write {
-  my ($self, $method, $chunk, $cb) = @_;
-  weaken $self;
-  $self->content->$method($chunk => sub { shift and $self->$cb(@_) if $cb });
-  return $self;
 }
 
 1;
@@ -466,14 +442,8 @@ implements the following new ones.
 
   my $bytes = $msg->body;
   $msg      = $msg->body('Hello!');
-  my $cb    = $msg->body(sub {...});
 
-Access C<content> data or replace all subscribers of the C<read> event.
-
-  $msg->body(sub {
-    my ($msg, $bytes) = @_;
-    say "Streaming: $bytes";
-  });
+Slurp or replace C<content>.
 
 =head2 body_params
 
@@ -592,12 +562,6 @@ Get a chunk of header data, starting from a specific position.
 Get a chunk of start line data starting from a specific position. Meant to be
 overloaded in a subclass.
 
-=head2 has_leftovers
-
-  my $success = $msg->has_leftovers;
-
-Check if there are leftovers.
-
 =head2 header_size
 
   my $size = $msg->header_size;
@@ -610,19 +574,6 @@ Size of headers in bytes.
 
 Message headers, usually a L<Mojo::Headers> object.
 
-=head2 is_chunked
-
-  my $success = $msg->is_chunked;
-
-Check if content is chunked.
-
-=head2 is_dynamic
-
-  my $success = $msg->is_dynamic;
-
-Check if content will be dynamically generated, which prevents C<clone> from
-working.
-
 =head2 is_finished
 
   my $success = $msg->is_finished;
@@ -634,12 +585,6 @@ Check if message parser/generator is finished.
   my $success = $msg->is_limit_exceeded;
 
 Check if message has exceeded C<max_line_size> or C<max_message_size>.
-
-=head2 is_multipart
-
-  my $success = $msg->is_multipart;
-
-Check if content is a L<Mojo::Content::MultiPart> object.
 
 =head2 json
 
@@ -655,12 +600,6 @@ it should not be called before the entire message body has been received.
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];
   say $msg->json('/foo/bar/23');
-
-=head2 leftovers
-
-  my $bytes = $msg->leftovers;
-
-Get leftover data from content parser.
 
 =head2 param
 
@@ -706,22 +645,6 @@ entire message body has been received.
   my $uploads = $msg->uploads;
 
 All C<multipart/form-data> file uploads, usually L<Mojo::Upload> objects.
-
-=head2 write
-
-  $msg = $msg->write($bytes);
-  $msg = $msg->write($bytes => sub {...});
-
-Write dynamic content non-blocking, the optional drain callback will be
-invoked once all data has been written.
-
-=head2 write_chunk
-
-  $msg = $msg->write_chunk($bytes);
-  $msg = $msg->write_chunk($bytes => sub {...});
-
-Write dynamic content non-blocking with C<chunked> transfer encoding, the
-optional drain callback will be invoked once all data has been written.
 
 =head1 SEE ALSO
 

@@ -70,7 +70,7 @@ sub finish {
   $tx->finish(@_) and return $self if $tx->is_websocket;
 
   # Chunked stream
-  if ($tx->res->is_chunked) {
+  if ($tx->res->content->is_chunked) {
     $self->write_chunk(@_) if @_;
     return $self->write_chunk('');
   }
@@ -430,14 +430,16 @@ sub url_for {
 sub write {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
-  $self->res->write($chunk => sub { shift and $self->$cb(@_) if $cb });
+  my $content = $self->res->content;
+  $content->write($chunk => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered;
 }
 
 sub write_chunk {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
-  $self->res->write_chunk($chunk => sub { shift and $self->$cb(@_) if $cb });
+  my $content = $self->res->content;
+  $content->write_chunk($chunk => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered;
 }
 

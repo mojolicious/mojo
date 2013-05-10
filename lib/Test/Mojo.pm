@@ -431,7 +431,7 @@ Current transaction, usually a L<Mojo::Transaction::HTTP> object.
 
   # More specific tests
   is $t->tx->res->json->{foo}, 'bar', 'right value';
-  ok $t->tx->res->is_multipart, 'multipart content';
+  ok $t->tx->res->content->is_multipart, 'multipart content';
 
   # Test custom transactions
   $t->tx($t->tx->previous)->status_is(302)->header_like(Location => qr/foo/);

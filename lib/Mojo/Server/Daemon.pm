@@ -151,9 +151,10 @@ sub _finish {
   return $self->_remove($id) if $req->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return unless $req->has_leftovers;
+  my $content = $req->content;
+  return unless $content->has_leftovers;
   $tx = $c->{tx} = $self->_build_tx($id, $c);
-  $tx->server_read($req->leftovers);
+  $tx->server_read($content->leftovers);
 }
 
 sub _listen {

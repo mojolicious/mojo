@@ -787,8 +787,8 @@ is $res->headers->sec_websocket_accept, 'abcdef=',
 is $res->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
 is $res->body, '', 'no content';
-ok $res->has_leftovers, 'has leftovers';
-is $res->leftovers,     "\x81\x08\x77\x68\x61\x74\x65\x76\x65\x72",
+ok $res->content->has_leftovers, 'has leftovers';
+is $res->content->leftovers,     "\x81\x08\x77\x68\x61\x74\x65\x76\x65\x72",
   'frame in leftovers';
 
 # Build WebSocket handshake response
@@ -845,33 +845,32 @@ is $res2->cookie('baz')->value, 'yada',     'right value';
 $res = Mojo::Message::Response->new;
 $res->code(200);
 my $invocant;
-$res->write_chunk('hello!' => sub { $invocant = shift });
-$res->write_chunk('hello world!');
-is $res->write_chunk('')->code, 200, 'right status';
-ok $res->is_chunked, 'chunked content';
-ok $res->is_dynamic, 'dynamic content';
+$res->content->write_chunk('hello!' => sub { $invocant = shift });
+$res->content->write_chunk('hello world!')->write_chunk('');
+ok $res->content->is_chunked, 'chunked content';
+ok $res->content->is_dynamic, 'dynamic content';
 is $res->build_body,
   "6\x0d\x0ahello!\x0d\x0ac\x0d\x0ahello world!\x0d\x0a0\x0d\x0a\x0d\x0a",
   'right format';
-isa_ok $invocant, 'Mojo::Message::Response', 'right invocant';
+isa_ok $invocant, 'Mojo::Content::Single', 'right invocant';
 
 # Build dynamic response body
 $res = Mojo::Message::Response->new;
 $res->code(200);
 $invocant = undef;
-$res->write('hello!' => sub { $invocant = shift });
-$res->write('hello world!');
-is $res->write('')->code, 200, 'right status';
-ok !$res->is_chunked, 'no chunked content';
-ok $res->is_dynamic, 'dynamic content';
+$res->content->write('hello!' => sub { $invocant = shift });
+$res->content->write('hello world!')->write('');
+ok !$res->content->is_chunked, 'no chunked content';
+ok $res->content->is_dynamic, 'dynamic content';
 is $res->build_body, "hello!hello world!", 'right format';
-isa_ok $invocant, 'Mojo::Message::Response', 'right invocant';
+isa_ok $invocant, 'Mojo::Content::Single', 'right invocant';
 
 # Build response with callback (make sure it's called)
 $res = Mojo::Message::Response->new;
 $res->code(200);
 $res->headers->content_length(10);
-$res->write('lala' => sub { die "Body callback was called properly\n" });
+$res->content->write(
+  'lala' => sub { die "Body callback was called properly\n" });
 $res->get_body_chunk(0);
 eval { $res->get_body_chunk(3) };
 is $@, "Body callback was called properly\n", 'right error';
@@ -882,7 +881,7 @@ my $body = 'I is here';
 $res->headers->content_length(length($body));
 my $cb;
 $cb = sub { shift->write(substr($body, pop, 1), $cb) };
-$res->write('', $cb);
+$res->content->write('', $cb);
 my $full   = '';
 my $count  = 0;
 my $offset = 0;
@@ -895,7 +894,7 @@ while (1) {
 }
 $res->fix_headers;
 is $res->headers->connection, undef, 'no "Connection" value';
-ok !$res->is_dynamic, 'no dynamic content';
+ok !$res->content->is_dynamic, 'no dynamic content';
 is $count, length($body), 'right length';
 is $full, $body, 'right content';
 
@@ -903,7 +902,7 @@ is $full, $body, 'right content';
 $res  = Mojo::Message::Response->new;
 $body = 'I is here';
 $cb   = sub { shift->write(substr($body, pop, 1), $cb) };
-$res->write('', $cb);
+$res->content->write('', $cb);
 $res->fix_headers;
 $full   = '';
 $count  = 0;
@@ -916,7 +915,7 @@ while (1) {
   $count++;
 }
 is $res->headers->connection, 'close', 'right "Connection" value';
-ok $res->is_dynamic, 'dynamic content';
+ok $res->content->is_dynamic, 'dynamic content';
 is $count, length($body), 'right length';
 is $full, $body, 'right content';
 
@@ -930,23 +929,9 @@ $res->body('');
 is $res->body, '', 'no content';
 $res->body('hi there!');
 is $res->body, 'hi there!', 'right content';
-ok $res->content->has_subscribers('read'), 'has subscribers';
-$cb = $res->body(sub { });
-ok $res->content->has_subscribers('read'), 'has subscribers';
-$res->content->unsubscribe(read => $cb);
-ok !$res->content->has_subscribers('read'), 'no subscribers';
-$res->body('');
-is $res->body, '', 'no content';
 $res->body(0);
 is $res->body, 0, 'right content';
-ok !$res->content->has_subscribers('read'), 'no subscribers';
-$cb = $res->body(sub { });
-ok $res->content->has_subscribers('read'), 'has subscribers';
-$res->content->unsubscribe(read => $cb);
-$res->body('hello!');
-ok !$res->content->has_subscribers('read'), 'no subscribers';
-is $res->body, 'hello!', 'right content';
-ok !$res->content->has_subscribers('read'), 'no subscribers';
+is $res->body('hello!')->body, 'hello!', 'right content';
 $res->content(Mojo::Content::MultiPart->new);
 $res->body('hi!');
 is $res->body, 'hi!', 'right content';

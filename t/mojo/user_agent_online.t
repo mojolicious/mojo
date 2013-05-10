@@ -247,7 +247,7 @@ $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://www.google.com');
 $tx->req->headers->transfer_encoding('chunked');
-$tx->req->write_chunk(
+$tx->req->content->write_chunk(
   'hello world!' => sub {
     shift->write_chunk('hello world2!' => sub { shift->write_chunk('') });
   }

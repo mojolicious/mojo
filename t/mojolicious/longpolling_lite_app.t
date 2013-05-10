@@ -293,11 +293,11 @@ is $longpoll, 'finished!', 'finished';
 # Interrupted by raising an error
 my $tx = $t->ua->build_tx(GET => '/longpoll');
 my $buffer = '';
-$tx->res->body(
-  sub {
+$tx->res->content->unsubscribe('read')->on(
+  read => sub {
     my ($self, $chunk) = @_;
     $buffer .= $chunk;
-    $self->error('Interrupted') if length $buffer == 3;
+    $tx->res->error('Interrupted') if length $buffer == 3;
   }
 );
 $t->ua->start($tx);
@@ -379,8 +379,8 @@ ok !$finish, 'finish event timing is right';
 # Request timeout
 $tx = $t->ua->request_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
-$tx->res->body(
-  sub {
+$tx->res->content->unsubscribe('read')->on(
+  read => sub {
     my ($self, $chunk) = @_;
     $buffer .= $chunk;
   }
@@ -394,8 +394,8 @@ $t->ua->request_timeout(0);
 # Inactivity timeout
 $tx = $t->ua->inactivity_timeout(0.5)->build_tx(GET => '/too_long');
 $buffer = '';
-$tx->res->body(
-  sub {
+$tx->res->content->unsubscribe('read')->on(
+  read => sub {
     my ($self, $chunk) = @_;
     $buffer .= $chunk;
   }

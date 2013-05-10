@@ -373,21 +373,21 @@ $tx = $ua->build_tx(GET => '/echo');
 my $i = 0;
 my ($stream, $drain);
 $drain = sub {
-  my $req = shift;
+  my $content = shift;
   return $ua->ioloop->timer(
     0.25 => sub {
-      $req->write_chunk('');
+      $content->write_chunk('');
       $tx->resume;
       $stream
         += @{Mojo::IOLoop->stream($tx->connection)->subscribers('drain')};
     }
   ) if $i >= 10;
-  $req->write_chunk($i++, $drain);
+  $content->write_chunk($i++, $drain);
   $tx->resume;
   return unless my $id = $tx->connection;
   $stream += @{Mojo::IOLoop->stream($id)->subscribers('drain')};
 };
-$tx->req->$drain;
+$tx->req->content->$drain;
 $ua->start($tx);
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';

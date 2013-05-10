@@ -317,7 +317,7 @@ sub _handle {
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
     $old->client_close;
     $self->_finish($new, $c->{cb});
-    $new->client_read($old->res->leftovers);
+    $new->client_read($old->res->content->leftovers);
   }
 
   # Finish normal connection

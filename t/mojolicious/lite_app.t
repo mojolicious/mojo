@@ -156,11 +156,11 @@ get '/stream' => sub {
   $self->res->headers->content_type('text/plain');
   my $cb;
   $cb = sub {
-    my $self = shift;
+    my $content = shift;
     my $chunk = shift @$chunks || '';
-    $self->write_chunk($chunk, $chunk ? $cb : undef);
+    $content->write_chunk($chunk, $chunk ? $cb : undef);
   };
-  $cb->($self->res);
+  $self->res->content->$cb;
   $self->rendered;
 };
 

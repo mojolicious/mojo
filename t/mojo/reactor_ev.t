@@ -179,6 +179,28 @@ $reactor2->start;
 ok !$timer, 'timer was not triggered';
 ok $timer2, 'timer was triggered';
 
+# Restart timer
+my ($single, $pair, $one, $two, $last);
+$reactor->timer(0.025 => sub { $single++ });
+$one = $reactor->timer(
+  0.025 => sub {
+    my $reactor = shift;
+    $last++ if $single;
+    $pair++ ? $reactor->stop : $reactor->again($two);
+  }
+);
+$two = $reactor->timer(
+  0.025 => sub {
+    my $reactor = shift;
+    $last++ if $single;
+    $pair++ ? $reactor->stop : $reactor->again($one);
+  }
+);
+$reactor->start;
+is $pair, 2, 'timer pair was triggered';
+ok $single, 'single timer was triggered';
+ok $last,   'timers were triggered in the right order';
+
 # Error
 my $err;
 $reactor->on(

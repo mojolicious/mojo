@@ -71,41 +71,37 @@ sub render {
     handler  => $stash->{handler},
     template => delete $stash->{template}
   };
-  my $data   = delete $stash->{data};
-  my $json   = delete $stash->{json};
   my $inline = $options->{inline} = delete $stash->{inline};
-  $options->{format} = $stash->{format} || $self->default_format;
   $options->{handler} //= $self->default_handler if defined $inline;
-
-  # Text
-  my $output;
-  if (defined(my $text = delete $stash->{text})) {
-    $self->handlers->{text}->($self, $c, \$output, {text => $text});
-  }
+  $options->{format} = $stash->{format} || $self->default_format;
 
   # Data
-  elsif (defined $data) {
+  my $output;
+  if (defined(my $data = delete $stash->{data})) {
     $self->handlers->{data}->($self, $c, \$output, {data => $data});
+    return $output, $options->{format};
   }
 
   # JSON
-  elsif (defined $json) {
+  elsif (my $json = delete $stash->{json}) {
     $self->handlers->{json}->($self, $c, \$output, {json => $json});
-    $options->{format} = 'json';
+    return $output, 'json';
+  }
+
+  # Text
+  elsif (defined(my $text = delete $stash->{text})) {
+    $self->handlers->{text}->($self, $c, \$output, {text => $text});
   }
 
   # Template or templateless handler
   else { return unless $self->_render_template($c, \$output, $options) }
 
-  # Data and JSON can't be extended
-  return $output, $options->{format} if defined $data || $json;
-
   # Extends
   my $content = $stash->{'mojo.content'} ||= {};
-  $content->{content} = $output if $stash->{extends} || $stash->{layout};
+  local $content->{content} = $output if $stash->{extends} || $stash->{layout};
   while ((my $extends = $self->_extends($stash)) && !defined $inline) {
-    $options->{format}   = $stash->{format} || $self->default_format;
     $options->{handler}  = $stash->{handler};
+    $options->{format}   = $stash->{format} || $self->default_format;
     $options->{template} = $extends;
     $self->_render_template($c, \$output, $options);
     $content->{content} = $output

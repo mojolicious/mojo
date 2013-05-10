@@ -156,24 +156,6 @@ sub render {
   my $args = ref $_[0] ? $_[0] : {@_};
   $args->{template} = $template if $template;
 
-  # Detect template name
-  my $stash = $self->stash;
-  unless ($args->{template} || $stash->{template}) {
-
-    # Normal default template
-    my $controller = $args->{controller} || $stash->{controller};
-    my $action     = $args->{action}     || $stash->{action};
-    if ($controller && $action) {
-      $stash->{template} = join '/',
-        split(/-/, Mojo::Util::decamelize($controller)), $action;
-    }
-
-    # Try the route name if we don't have controller and action
-    elsif (my $endpoint = $self->match->endpoint) {
-      $stash->{template} = $endpoint->name;
-    }
-  }
-
   # Render
   my $app = $self->app;
   my ($output, $format) = $app->renderer->render($self, $args);
@@ -185,7 +167,7 @@ sub render {
   my $headers = $self->res->body($output)->headers;
   $headers->content_type($app->types->type($format) || 'text/plain')
     unless $headers->content_type;
-  return !!$self->rendered($stash->{status});
+  return !!$self->rendered($self->stash->{status});
 }
 
 sub render_data { shift->render(data => @_) }

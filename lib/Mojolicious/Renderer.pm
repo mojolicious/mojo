@@ -6,7 +6,7 @@ use Mojo::Cache;
 use Mojo::JSON;
 use Mojo::Home;
 use Mojo::Loader;
-use Mojo::Util qw(encode slurp);
+use Mojo::Util qw(decamelize encode slurp);
 
 has cache   => sub { Mojo::Cache->new };
 has classes => sub { ['main'] };
@@ -94,7 +94,10 @@ sub render {
   }
 
   # Template or templateless handler
-  else { return unless $self->_render_template($c, \$output, $options) }
+  else {
+    $options->{template} ||= $self->_generate_template($c);
+    return unless $self->_render_template($c, \$output, $options);
+  }
 
   # Extends
   my $content = $stash->{'mojo.content'} ||= {};
@@ -175,6 +178,21 @@ sub _extends {
   my $layout = delete $stash->{layout};
   $stash->{extends} ||= join('/', 'layouts', $layout) if $layout;
   return delete $stash->{extends};
+}
+
+sub _generate_template {
+  my ($self, $c) = @_;
+
+  # Normal default template
+  my $stash      = $c->stash;
+  my $controller = $stash->{controller};
+  my $action     = $stash->{action};
+  return join '/', split(/-/, decamelize($controller)), $action
+    if $controller && $action;
+
+  # Try the route name if we don't have controller and action
+  return undef unless my $endpoint = $c->match->endpoint;
+  return $endpoint->name;
 }
 
 sub _render_template {

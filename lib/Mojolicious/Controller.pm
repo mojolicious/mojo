@@ -42,19 +42,17 @@ sub AUTOLOAD {
 sub DESTROY { }
 
 sub cookie {
-  my ($self, $name, $value, $options) = @_;
-  $options ||= {};
+  my ($self, $name) = (shift, shift);
 
   # Response cookie
-  if (defined $value) {
+  if (@_) {
 
     # Cookie too big
+    my $cookie = {name => $name, value => shift, %{shift || {}}};
     $self->app->log->error(qq{Cookie "$name" is bigger than 4096 bytes.})
-      if length $value > 4096;
+      if length $cookie->{value} > 4096;
 
-    # Create new cookie
-    $self->res->cookies(
-      Mojo::Cookie::Response->new(name => $name, value => $value, %$options));
+    $self->res->cookies(Mojo::Cookie::Response->new(%$cookie));
     return $self;
   }
 

@@ -52,12 +52,13 @@ sub one_tick {
     elsif ($timeout) { usleep $timeout * 1000000 }
 
     # Timers
+    my $now = steady_time;
     for my $id (keys %{$self->{timers}}) {
       next unless my $t = $self->{timers}{$id};
-      next unless $t->{time} <= (my $time = steady_time);
+      next unless $t->{time} <= $now;
 
       # Recurring timer
-      if (exists $t->{recurring}) { $t->{time} = $time + $t->{recurring} }
+      if (exists $t->{recurring}) { $t->{time} = $now + $t->{recurring} }
 
       # Normal timer
       else { $self->remove($id) }

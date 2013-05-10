@@ -185,14 +185,14 @@ $reactor->timer(0.025 => sub { $single++ });
 $one = $reactor->timer(
   0.025 => sub {
     my $reactor = shift;
-    $last++ if $single;
+    $last++ if $single && $pair;
     $pair++ ? $reactor->stop : $reactor->again($two);
   }
 );
 $two = $reactor->timer(
   0.025 => sub {
     my $reactor = shift;
-    $last++ if $single;
+    $last++ if $single && $pair;
     $pair++ ? $reactor->stop : $reactor->again($one);
   }
 );

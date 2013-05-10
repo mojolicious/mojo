@@ -66,69 +66,57 @@ sub render {
   # Merge stash and arguments
   @{$stash}{keys %$args} = values %$args;
 
-  # Extract important stash values
   my $options = {
     encoding => $self->encoding,
     handler  => $stash->{handler},
     template => delete $stash->{template}
   };
   my $data   = delete $stash->{data};
-  my $format = $options->{format} = $stash->{format} || $self->default_format;
-  my $inline = $options->{inline} = delete $stash->{inline};
   my $json   = delete $stash->{json};
-  my $text   = delete $stash->{text};
+  my $inline = $options->{inline} = delete $stash->{inline};
+  $options->{format} = $stash->{format} || $self->default_format;
   $options->{handler} //= $self->default_handler if defined $inline;
 
   # Text
   my $output;
-  my $content = $stash->{'mojo.content'} ||= {};
-  if (defined $text) {
+  if (defined(my $text = delete $stash->{text})) {
     $self->handlers->{text}->($self, $c, \$output, {text => $text});
-    $content->{content} = $output
-      if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # Data
   elsif (defined $data) {
     $self->handlers->{data}->($self, $c, \$output, {data => $data});
-    $content->{content} = $output
-      if ($c->stash->{extends} || $c->stash->{layout});
   }
 
   # JSON
   elsif (defined $json) {
     $self->handlers->{json}->($self, $c, \$output, {json => $json});
-    $format = 'json';
-    $content->{content} = $output
-      if ($c->stash->{extends} || $c->stash->{layout});
+    $options->{format} = 'json';
   }
 
   # Template or templateless handler
-  else {
-    return undef unless $self->_render_template($c, \$output, $options);
+  else { return unless $self->_render_template($c, \$output, $options) }
+
+  # Data and JSON can't be extended
+  return $output, $options->{format} if defined $data || $json;
+
+  # Extends
+  my $content = $stash->{'mojo.content'} ||= {};
+  $content->{content} = $output if $stash->{extends} || $stash->{layout};
+  while ((my $extends = $self->_extends($stash)) && !defined $inline) {
+    $options->{format}   = $stash->{format} || $self->default_format;
+    $options->{handler}  = $stash->{handler};
+    $options->{template} = $extends;
+    $self->_render_template($c, \$output, $options);
     $content->{content} = $output
-      if ($c->stash->{extends} || $c->stash->{layout});
+      if $content->{content} !~ /\S/ && $output =~ /\S/;
   }
 
-  # Extendable content
-  if (!$json && !defined $data) {
+  # Encoding
+  $output = encode $options->{encoding}, $output
+    if !$partial && $options->{encoding} && $output;
 
-    # Extends
-    while ((my $extends = $self->_extends($c)) && !defined $inline) {
-      $options->{handler}  = $stash->{handler};
-      $options->{format}   = $stash->{format} || $self->default_format;
-      $options->{template} = $extends;
-      $self->_render_template($c, \$output, $options);
-      $content->{content} = $output
-        if $content->{content} !~ /\S/ && $output =~ /\S/;
-    }
-
-    # Encoding
-    $output = encode $options->{encoding}, $output
-      if !$partial && $options->{encoding} && $output;
-  }
-
-  return $output, $format;
+  return $output, $options->{format};
 }
 
 sub template_name {
@@ -187,8 +175,7 @@ sub _detect_handler {
 }
 
 sub _extends {
-  my ($self, $c) = @_;
-  my $stash  = $c->stash;
+  my ($self, $stash) = @_;
   my $layout = delete $stash->{layout};
   $stash->{extends} ||= join('/', 'layouts', $layout) if $layout;
   return delete $stash->{extends};

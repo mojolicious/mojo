@@ -30,6 +30,8 @@ app->defaults(layout => 'default');
 
 get '/works';
 
+get '/mixed';
+
 get '/doesnotexist';
 
 get '/dies' => sub {die};
@@ -107,15 +109,22 @@ my $t = Test::Mojo->new;
 
 # Template with layout
 $t->get_ok('/works')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
   ->content_is("DefaultJust worksThis <template> just works!\n\n");
 
 # Different layout
 $t->get_ok('/works?green=1')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
   ->content_is("GreenJust worksThis <template> just works!\n\n");
 
 # Extended
 $t->get_ok('/works?blue=1')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')
   ->content_is("BlueJust worksThis <template> just works!\n\n");
+
+# Mixed formats
+$t->get_ok('/mixed')->status_is(200)->content_type_is('text/plain')
+  ->content_is("Mixed formats\n\n");
 
 # Missing template
 $t->get_ok('/doesnotexist')->status_is(404)
@@ -231,6 +240,9 @@ Default<%= title %><%= content %>
 @@ layouts/green.html.ep
 Green<%= title %><%= content %>
 
+@@ layouts/mixed.txt.ep
+Mixed <%= content %>
+
 @@ blue.html.ep
 Blue<%= title %><%= content %>
 
@@ -239,6 +251,10 @@ Blue<%= title %><%= content %>
 % layout 'green' if param 'green';
 % extends 'blue' if param 'blue';
 This <template> just works!
+
+@@ mixed.html.ep
+% layout 'mixed', format => 'txt';
+formats
 
 @@ exception.html.ep
 % title 'Exception happened';

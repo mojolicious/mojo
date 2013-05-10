@@ -26,6 +26,7 @@
     managing more than 10k concurrent connections.
   - Improved Mojolicious to be able to detect the current operating mode from
     the PLACK_ENV environment variable.
+  - Improved renderer performance.
   - Improved Mojo::DOM::HTML performance.
   - Improved html_unescape performance in Mojo::Util.
   - Improved Mojolicious::Plugin::EPLRenderer to cache templates more
@@ -34,6 +35,7 @@
   - Improved tests.
   - Fixed Perl 5.17.11+ compatibility.
   - Fixed a few authority bugs in Mojo::URL.
+  - Fixed layout bugs in Mojolicious::Renderer.
   - Fixed support for HEAD request method in Mojo::Server::CGI and
     Mojo::Server::PSGI.
 

@@ -123,7 +123,7 @@ Construct a new L<Mojo::Reactor::EV> object.
 
   $reactor->again($id);
 
-Restart timer.
+Restart active timer.
 
 =head2 is_running
 

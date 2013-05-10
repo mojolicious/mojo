@@ -168,7 +168,7 @@ implements the following new ones.
 
   $reactor->again($id);
 
-Restart timer.
+Restart active timer.
 
 =head2 io
 

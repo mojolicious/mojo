@@ -51,7 +51,7 @@ sub one_tick {
     # Wait for timeout if poll can't be used
     elsif ($timeout) { usleep $timeout * 1000000 }
 
-    # Timers
+    # Timers (time should not change in between timers)
     my $now = steady_time;
     for my $id (keys %{$self->{timers}}) {
       next unless my $t = $self->{timers}{$id};

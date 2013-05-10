@@ -79,8 +79,8 @@ sub timeout {
   $reactor->remove(delete $self->{timer}) if $self->{timer};
   return $self unless my $timeout = $self->{timeout} = shift;
   weaken $self;
-  $self->{timer} = $reactor->recurring(
-    $timeout => sub { $self->emit_safe('timeout')->close });
+  $self->{timer}
+    = $reactor->timer($timeout => sub { $self->emit_safe('timeout')->close });
 
   return $self;
 }

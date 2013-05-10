@@ -61,7 +61,7 @@ my $server = $listen->accept;
 $reactor->remove($listen);
 ($readable, $writable) = ();
 $reactor->io($client => sub { pop() ? $writable++ : $readable++ });
-$reactor->timer(0.025 => sub { shift->stop });
+$reactor->again($reactor->timer(0.025 => sub { shift->stop }));
 $reactor->start;
 ok !$readable, 'handle is not readable';
 ok $writable, 'handle is writable';

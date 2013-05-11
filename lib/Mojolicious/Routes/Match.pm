@@ -11,65 +11,7 @@ sub new {
   return $self;
 }
 
-sub match {
-  my ($self, $r, $c) = @_;
-  $self->root($r) unless $self->root;
-
-  # Pattern
-  my $path    = $self->{path};
-  my $pattern = $r->pattern;
-  return
-    unless my $captures = $pattern->match_partial(\$path, $r->is_endpoint);
-  local $self->{path} = $path;
-  $captures = $self->{captures} = {%{$self->{captures} || {}}, %$captures};
-
-  # Method (HEAD will be treated as GET)
-  if (my $methods = $r->via) {
-    my $method = $self->{method} eq 'HEAD' ? 'GET' : $self->{method};
-    return unless grep { $_ eq $method } @$methods;
-  }
-
-  # Conditions
-  if (my $over = $r->over) {
-    my $conditions = $self->{conditions} ||= $self->root->conditions;
-    for (my $i = 0; $i < @$over; $i += 2) {
-      return unless my $condition = $conditions->{$over->[$i]};
-      return if !$condition->($r, $c, $captures, $over->[$i + 1]);
-    }
-  }
-
-  # WebSocket
-  return if $r->is_websocket && !$self->{websocket};
-
-  # Partial
-  my $empty = !length $path || $path eq '/';
-  if ($r->partial) {
-    $captures->{path} = $path;
-    $self->endpoint($r);
-    $empty = 1;
-  }
-
-  # Endpoint
-  my $endpoint = $r->is_endpoint;
-  if ($r->inline || ($endpoint && $empty)) {
-    push @{$self->stack}, {%$captures};
-    delete $captures->{$_} for qw(app cb);
-    return $self->endpoint($r) if $endpoint && $empty;
-  }
-
-  # Match children
-  my $snapshot = [@{$self->stack}];
-  for my $child (@{$r->children}) {
-    $self->match($child, $c);
-
-    # Endpoint found
-    return if $self->endpoint;
-
-    # Reset
-    if   ($r->parent) { $self->stack([@$snapshot])->{captures} = $captures }
-    else              { $self->stack([])->{captures}           = {} }
-  }
-}
+sub match { $_[0]->_match($_[0]->root, $_[1]) }
 
 sub path_for {
   my $self = shift;
@@ -127,6 +69,65 @@ sub path_for {
   return wantarray ? ($path, $endpoint->has_websocket) : $path;
 }
 
+sub _match {
+  my ($self, $r, $c) = @_;
+
+  # Pattern
+  my $path    = $self->{path};
+  my $pattern = $r->pattern;
+  return
+    unless my $captures = $pattern->match_partial(\$path, $r->is_endpoint);
+  local $self->{path} = $path;
+  $captures = $self->{captures} = {%{$self->{captures} || {}}, %$captures};
+
+  # Method (HEAD will be treated as GET)
+  if (my $methods = $r->via) {
+    my $method = $self->{method} eq 'HEAD' ? 'GET' : $self->{method};
+    return unless grep { $_ eq $method } @$methods;
+  }
+
+  # Conditions
+  if (my $over = $r->over) {
+    my $conditions = $self->{conditions} ||= $self->root->conditions;
+    for (my $i = 0; $i < @$over; $i += 2) {
+      return unless my $condition = $conditions->{$over->[$i]};
+      return if !$condition->($r, $c, $captures, $over->[$i + 1]);
+    }
+  }
+
+  # WebSocket
+  return if $r->is_websocket && !$self->{websocket};
+
+  # Partial
+  my $empty = !length $path || $path eq '/';
+  if ($r->partial) {
+    $captures->{path} = $path;
+    $self->endpoint($r);
+    $empty = 1;
+  }
+
+  # Endpoint
+  my $endpoint = $r->is_endpoint;
+  if ($r->inline || ($endpoint && $empty)) {
+    push @{$self->stack}, {%$captures};
+    delete $captures->{$_} for qw(app cb);
+    return $self->endpoint($r) if $endpoint && $empty;
+  }
+
+  # Match children
+  my $snapshot = [@{$self->stack}];
+  for my $child (@{$r->children}) {
+    $self->_match($child, $c);
+
+    # Endpoint found
+    return if $self->endpoint;
+
+    # Reset
+    if   ($r->parent) { $self->stack([@$snapshot])->{captures} = $captures }
+    else              { $self->stack([])->{captures}           = {} }
+  }
+}
+
 1;
 
 =head1 NAME
@@ -147,7 +148,7 @@ Mojolicious::Routes::Match - Routes visitor
   # Match
   my $c = Mojolicious::Controller->new;
   my $m = Mojolicious::Routes::Match->new(PUT => '/bar');
-  $m->match($r, $c);
+  $m->root($r)->match($c);
   say $m->stack->[0]{controller};
   say $m->stack->[0]{action};
 
@@ -163,14 +164,14 @@ L<Mojolicious::Routes::Match> implements the following attributes.
 =head2 endpoint
 
   my $endpoint = $m->endpoint;
-  $m           = $m->endpoint(Mojolicious::Routes->new);
+  $m           = $m->endpoint(Mojolicious::Routes::Route->new);
 
 The route endpoint that actually matched.
 
 =head2 root
 
   my $root = $m->root;
-  $m       = $m->root($routes);
+  $m       = $m->root(Mojolicious::Routes->new);
 
 The root of the route tree.
 
@@ -195,9 +196,9 @@ Construct a new L<Mojolicious::Routes::Match> object.
 
 =head2 match
 
-  $m->match(Mojolicious::Routes->new, Mojolicious::Controller->new);
+  $m->match(Mojolicious::Controller->new);
 
-Match against a route tree.
+Match against C<root>.
 
 =head2 path_for
 

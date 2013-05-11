@@ -37,17 +37,17 @@ sub dispatch {
   my $method = $req->method;
   my $websocket = $c->tx->is_websocket ? 1 : 0;
   my $m = Mojolicious::Routes::Match->new($method => $path, $websocket);
-  $c->match($m);
+  $c->match($m->root($self));
 
   # Check cache
   my $cache = $self->cache;
   if ($cache && (my $cached = $cache->get("$method:$path:$websocket"))) {
-    $m->root($self)->endpoint($cached->{endpoint})->stack($cached->{stack});
+    $m->endpoint($cached->{endpoint})->stack($cached->{stack});
   }
 
   # Check routes
   else {
-    $m->match($self, $c);
+    $m->match($c);
 
     # Cache routes without conditions
     if ($cache && (my $endpoint = $m->endpoint)) {

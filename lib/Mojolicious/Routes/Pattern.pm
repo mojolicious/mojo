@@ -341,7 +341,7 @@ Character indicating a relaxed placeholder, defaults to C<#>.
 =head2 tree
 
   my $tree = $pattern->tree;
-  $pattern = $pattern->tree([ ... ]);
+  $pattern = $pattern->tree([['slash'], ['text', 'foo']]);
 
 Pattern in parsed form.
 

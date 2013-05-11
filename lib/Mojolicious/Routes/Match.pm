@@ -148,6 +148,7 @@ Mojolicious::Routes::Match - Routes visitor
   my $c = Mojolicious::Controller->new;
   my $m = Mojolicious::Routes::Match->new(PUT => '/bar');
   $m->match($r, $c);
+  say $m->stack->[0]{controller};
   say $m->stack->[0]{action};
 
 =head1 DESCRIPTION

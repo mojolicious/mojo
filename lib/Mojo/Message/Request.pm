@@ -2,7 +2,6 @@ package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
-use Mojo::Parameters;
 use Mojo::Util qw(b64_encode b64_decode get_line);
 use Mojo::URL;
 
@@ -142,7 +141,7 @@ sub param { shift->params->param(@_) }
 sub params {
   my $self = shift;
   return $self->{params}
-    ||= Mojo::Parameters->new->merge($self->body_params, $self->query_params);
+    ||= $self->body_params->clone->merge($self->query_params);
 }
 
 sub parse {

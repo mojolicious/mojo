@@ -22,6 +22,8 @@
   - Removed deprecated post_form_ok and post_json_ok methods from Test::Mojo.
   - Removed deprecated f and n functions from ojo.
   - Removed deprecated after_static_dispatch hook.
+  - Renamed shape_match method in Mojolicious::Routes::Pattern to
+    match_partial.
   - Reduced idle CPU usage of Mojo::IOLoop.
   - Increased default lock_timeout from 0.5 to 1 second in
     Mojo::Server::Prefork and Mojo::Server::Hypnotoad.

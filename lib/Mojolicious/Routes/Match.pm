@@ -19,7 +19,8 @@ sub match {
   # Pattern
   my $path    = $self->{path};
   my $pattern = $r->pattern;
-  return unless my $captures = $pattern->shape_match(\$path, $r->is_endpoint);
+  return
+    unless my $captures = $pattern->match_partial(\$path, $r->is_endpoint);
   local $self->{path} = $path;
   $captures = {%{$self->captures}, %$captures};
 

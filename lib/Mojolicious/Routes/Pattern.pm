@@ -14,8 +14,37 @@ sub new { shift->SUPER::new->parse(@_) }
 
 sub match {
   my ($self, $path, $detect) = @_;
-  my $result = $self->shape_match(\$path, $detect);
+  my $result = $self->match_partial(\$path, $detect);
   return !$path || $path eq '/' ? $result : undef;
+}
+
+sub match_partial {
+  my ($self, $pathref, $detect) = @_;
+
+  # Compile on demand
+  my $regex = $self->regex || $self->_compile;
+  my $format
+    = $detect ? ($self->format_regex || $self->_compile_format) : undef;
+
+  # Match
+  return undef unless my @captures = $$pathref =~ $regex;
+  $$pathref =~ s/$regex//;
+
+  # Merge captures
+  my $result = {%{$self->defaults}};
+  for my $placeholder (@{$self->placeholders}) {
+    last unless @captures;
+    my $capture = shift @captures;
+    $result->{$placeholder} = $capture if defined $capture;
+  }
+
+  # Format
+  my $constraint = $self->constraints->{format};
+  return $result if !$detect || defined $constraint && !$constraint;
+  if ($$pathref =~ s!^/?$format!!) { $result->{format} = $1 }
+  elsif ($constraint) { return undef unless $result->{format} }
+
+  return $result;
 }
 
 sub parse {
@@ -68,35 +97,6 @@ sub render {
   # Format is optional
   $string ||= '/';
   return $render && $format ? "$string.$format" : $string;
-}
-
-sub shape_match {
-  my ($self, $pathref, $detect) = @_;
-
-  # Compile on demand
-  my $regex = $self->regex || $self->_compile;
-  my $format
-    = $detect ? ($self->format_regex || $self->_compile_format) : undef;
-
-  # Match
-  return undef unless my @captures = $$pathref =~ $regex;
-  $$pathref =~ s/$regex//;
-
-  # Merge captures
-  my $result = {%{$self->defaults}};
-  for my $placeholder (@{$self->placeholders}) {
-    last unless @captures;
-    my $capture = shift @captures;
-    $result->{$placeholder} = $capture if defined $capture;
-  }
-
-  # Format
-  my $constraint = $self->constraints->{format};
-  return $result if !$detect || defined $constraint && !$constraint;
-  if ($$pathref =~ s!^/?$format!!) { $result->{format} = $1 }
-  elsif ($constraint) { return undef unless $result->{format} }
-
-  return $result;
 }
 
 sub _compile {
@@ -374,6 +374,14 @@ necessary.
 
 Match pattern against entire path, format detection is disabled by default.
 
+=head2 match_partial
+
+  my $result = $pattern->match_partial(\$path);
+  my $result = $pattern->match_partial(\$path, 1);
+
+Match pattern against path and remove matching parts, format detection is
+disabled by default.
+
 =head2 parse
 
   $pattern = $pattern->parse('/:action');
@@ -389,14 +397,6 @@ Parse pattern.
 
 Render pattern into a path with parameters, format rendering is disabled by
 default.
-
-=head2 shape_match
-
-  my $result = $pattern->shape_match(\$path);
-  my $result = $pattern->shape_match(\$path, 1);
-
-Match pattern against path and remove matching parts, format detection is
-disabled by default.
 
 =head1 SEE ALSO
 

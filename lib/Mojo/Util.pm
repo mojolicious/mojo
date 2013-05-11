@@ -38,11 +38,10 @@ my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated encode get_line hmac_md5_sum hmac_sha1_sum),
-  qw(html_unescape md5_bytes md5_sum monkey_patch punycode_decode),
-  qw(punycode_encode quote secure_compare sha1_bytes sha1_sum slurp spurt),
-  qw(squish steady_time trim unquote url_escape url_unescape xml_escape),
-  qw(xor_encode)
+  qw(decode deprecated encode get_line hmac_sha1_sum html_unescape md5_bytes),
+  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish steady_time trim),
+  qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
 
 sub b64_decode { decode_base64($_[0]) }
@@ -111,8 +110,15 @@ sub get_line {
   return $line;
 }
 
-sub hmac_md5_sum  { _hmac(\&md5,  @_) }
-sub hmac_sha1_sum { _hmac(\&sha1, @_) }
+sub hmac_sha1_sum {
+  my ($string, $secret) = @_;
+  $secret = $secret ? "$secret" : 'Very insecure!';
+  $secret = sha1 $secret if length $secret > 64;
+
+  my $ipad = $secret ^ (chr(0x36) x 64);
+  my $opad = $secret ^ (chr(0x5c) x 64);
+  return unpack 'H*', sha1($opad . sha1($ipad . $string));
+}
 
 sub html_unescape {
   my $string = shift;
@@ -369,16 +375,6 @@ sub _encoding {
   $CACHE{$_[0]} //= find_encoding($_[0]) // croak "Unknown encoding '$_[0]'";
 }
 
-sub _hmac {
-  my ($hash, $string, $secret) = @_;
-  $secret = $secret ? "$secret" : 'Very insecure!';
-  $secret = $hash->($secret) if length $secret > 64;
-
-  my $ipad = $secret ^ (chr(0x36) x 64);
-  my $opad = $secret ^ (chr(0x5c) x 64);
-  return unpack 'H*', $hash->($opad . $hash->($ipad . $string));
-}
-
 1;
 
 =head1 NAME
@@ -490,12 +486,6 @@ Encode characters to bytes.
 
 Extract whole line from string or return C<undef>. Lines are expected to end
 with C<0x0d 0x0a> or C<0x0a>.
-
-=head2 hmac_md5_sum
-
-  my $checksum = hmac_md5_sum $string, 'passw0rd';
-
-Generate HMAC-MD5 checksum for string.
 
 =head2 hmac_sha1_sum
 

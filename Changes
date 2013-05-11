@@ -15,6 +15,8 @@
   - Removed data attribute from Mojo::URL.
   - Removed is_chunked, is_dynamic, is_multipart, has_leftovers, leftovers,
     write and write_chunk methods from Mojo::Message.
+  - Removed hmac_md5_sum method from Mojo::ByteStream.
+  - Removed hmac_md5_sum function from Mojo::Util.
   - Removed deprecated end method from Mojo::IOLoop::Delay.
   - Removed deprecated build_form_tx, build_json_tx, post_form and post_json
     methods from Mojo::UserAgent.

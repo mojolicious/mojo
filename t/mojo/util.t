@@ -10,10 +10,10 @@ use Mojo::DeprecationTest;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode encode get_line hmac_md5_sum hmac_sha1_sum html_unescape),
-  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
-  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish steady_time trim),
-  qw(unquote url_escape url_unescape xml_escape xor_encode);
+  qw(decode encode get_line hmac_sha1_sum html_unescape md5_bytes md5_sum),
+  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
+  qw(sha1_bytes sha1_sum slurp spurt squish steady_time trim unquote),
+  qw(url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -292,29 +292,6 @@ is unpack('H*', sha1_bytes 'foo bar baz'),
 # sha1_sum
 is sha1_sum('foo bar baz'), 'c7567e8b39e2428e38bf9c9226ac68de4c67dc39',
   'right sha1 checksum';
-
-# hmac_md5_sum (RFC 2202)
-is hmac_md5_sum('Hi There', chr(0x0b) x 16),
-  '9294727a3638bb1c13f48ef8158bfc9d', 'right hmac md5 checksum';
-is hmac_md5_sum('what do ya want for nothing?', 'Jefe'),
-  '750c783e6ab0b503eaa86e310a5db738', 'right hmac md5 checksum';
-is hmac_md5_sum(chr(0xdd) x 50, chr(0xaa) x 16),
-  '56be34521d144c88dbb8c733f0e8b3f6', 'right hmac md5 checksum';
-is hmac_md5_sum(chr(0xcd) x 50,
-  pack 'H*' => '0102030405060708090a0b0c0d0e0f10111213141516171819'),
-  '697eaf0aca3a3aea3a75164746ffaa79', 'right hmac md5 checksum';
-is hmac_md5_sum('Test With Truncation', chr(0x0c) x 16),
-  '56461ef2342edc00f9bab995690efd4c', 'right hmac md5 checksum';
-is hmac_md5_sum('Test Using Larger Than Block-Size Key - Hash Key First',
-  chr(0xaa) x 80),
-  '6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd', 'right hmac md5 checksum';
-is hmac_md5_sum(
-  'Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data',
-  chr(0xaa) x 80
-  ),
-  '6f630fad67cda0ee1fb1f562db3aa53e', 'right hmac md5 checksum';
-is hmac_md5_sum('Hi there', 1234567890), 'e3b5fab1b3f5b9d1fe391d09fce7b2ae',
-  'right hmac md5 checksum';
 
 # hmac_sha1_sum (RFC 2202)
 is hmac_sha1_sum('Hi There', chr(0x0b) x 20),

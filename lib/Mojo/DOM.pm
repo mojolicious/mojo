@@ -134,11 +134,7 @@ sub parent {
   return $self->new->tree($tree->[3])->xml($self->xml);
 }
 
-sub parse {
-  my $self = shift;
-  $self->[0]->parse(@_);
-  return $self;
-}
+sub parse { shift->_html(parse => shift) }
 
 sub prepend { shift->_add(0, @_) }
 
@@ -392,7 +388,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
   $dom->div->p->[1]->append('<p id="c">C</p>');
 
   # Render
-  say $dom;
+  say "$dom";
 
 =head1 DESCRIPTION
 

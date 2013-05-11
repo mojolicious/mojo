@@ -2,7 +2,6 @@ use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::DOM;
-use Mojo::Util 'encode';
 
 # Simple (basics)
 my $dom = Mojo::DOM->new->parse(
@@ -212,11 +211,9 @@ is $dom->at('[id="snowm\000021an"]'),  undef, 'no result';
 is $dom->at('[id="snowm\000021 an"]'), undef, 'no result';
 
 # Unicode and escaped selectors
-my $chars
+my $html
   = qq{<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>};
-my $bytes = encode 'UTF-8', $chars;
-$dom = Mojo::DOM->new->charset('UTF-8');
-$dom->parse($bytes);
+$dom = Mojo::DOM->new($html);
 is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';
 is $dom->at('#\\2603 x')->text,                       'Snowman', 'right text';
 is $dom->at("#\\\n\\2603 x")->text,                   'Snowman', 'right text';
@@ -278,15 +275,12 @@ is $dom->at('[class~=x]')->text,                      'Heart',   'right text';
 is $dom->at('div[class~=x]')->text,                   'Heart',   'right text';
 is $dom->at('html div[class~=x]')->text,              'Heart',   'right text';
 is $dom->at('html > div[class~=x]')->text,            'Heart',   'right text';
-is $dom->at('html'), $bytes, 'XML is encoded';
-is $dom->at('#☃x')->parent,     $bytes, 'XML is encoded';
-is $dom->at('#☃x')->root,       $bytes, 'XML is encoded';
-is $dom->children('html')->first, $bytes, 'XML is encoded';
-is $dom->to_xml,      $bytes, 'XML is encoded';
-is $dom->content_xml, $bytes, 'XML is encoded';
-$dom->charset(undef);
-is $dom->to_xml,      $chars, 'XML is not encoded';
-is $dom->content_xml, $chars, 'XML is not encoded';
+is $dom->at('html'), $html, 'right result';
+is $dom->at('#☃x')->parent,     $html, 'right result';
+is $dom->at('#☃x')->root,       $html, 'right result';
+is $dom->children('html')->first, $html, 'right result';
+is $dom->to_xml,      $html, 'right result';
+is $dom->content_xml, $html, 'right result';
 
 # Looks remotely like HTML
 $dom = Mojo::DOM->new->parse(
@@ -332,11 +326,6 @@ is "$dom", '<p>foo</p><b>whatever</b><p>bar</p>', 'right result';
 is $dom->find('p')->pluck('remove')->first->root->at('b')->text, 'whatever',
   'right result';
 is "$dom", '<b>whatever</b>', 'right result';
-$dom->charset('UTF-8');
-$dom->at('b')->replace_content(encode('UTF-8', '♥'));
-is "$dom", encode('UTF-8', '<b>♥</b>'), 'right result';
-$dom->charset(undef)->remove;
-is "$dom", '', 'no result';
 
 # Replace element content
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
@@ -2153,25 +2142,11 @@ is $dom->at('span + b')->text, 'b', 'right text';
 is $dom->at('b + span')->text, 'c', 'right text';
 is "$dom", '<span>a</span><b>b</b><span>c</span>', 'right result';
 
-# Bad charset
-$dom = Mojo::DOM->new->charset('doesnotexist');
-$dom->parse('<html><div id="a">A</div></html>');
-is $dom->charset, undef, 'no charset';
-is $dom->at('#a')->text, 'A', 'right text';
-is "$dom", '<html><div id="a">A</div></html>', 'right result';
-$dom = Mojo::DOM->new->charset('UTF-8');
-$dom->parse(qq{<div id="invalid">\x89</div>});
-is $dom->charset, undef, 'no charset';
-is $dom->at('#invalid')->text, "\x89", 'right text';
-is "$dom", qq{<div id="invalid">\x89</div>}, 'right result';
-
-# "0" with charset
-$dom = Mojo::DOM->new->charset('UTF-8');
-$dom->parse('0');
-is $dom->charset, 'UTF-8', 'right charset';
+# "0"
+$dom = Mojo::DOM->new('0');
 is "$dom", '0', 'right result';
 $dom->append_content('☃');
-is "$dom", encode('UTF-8', '0☃'), 'right result';
+is "$dom", '0☃', 'right result';
 
 # Comments
 $dom = Mojo::DOM->new(<<EOF);

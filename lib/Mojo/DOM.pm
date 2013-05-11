@@ -69,20 +69,17 @@ sub attrs {
   return $self;
 }
 
-sub charset { shift->_html(charset => @_) }
-
 sub children {
   my ($self, $type) = @_;
 
   my @children;
-  my $charset = $self->charset;
-  my $xml     = $self->xml;
-  my $tree    = $self->tree;
+  my $xml  = $self->xml;
+  my $tree = $self->tree;
   for my $e (@$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree]) {
 
     # Make sure child is the right type
     next if $e->[0] ne 'tag' || (defined $type && $e->[1] ne $type);
-    push @children, $self->new->charset($charset)->tree($e)->xml($xml);
+    push @children, $self->new->tree($e)->xml($xml);
   }
 
   return Mojo::Collection->new(@children);
@@ -92,22 +89,19 @@ sub content_xml {
   my $self = shift;
 
   # Render children individually
-  my $tree    = $self->tree;
-  my $charset = $self->charset;
-  my $xml     = $self->xml;
-  return join '', map {
-    Mojo::DOM::HTML->new(charset => $charset, tree => $_, xml => $xml)->render
-  } @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
+  my $tree = $self->tree;
+  my $xml  = $self->xml;
+  return join '',
+    map { Mojo::DOM::HTML->new(tree => $_, xml => $xml)->render }
+    @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
 }
 
 sub find {
   my ($self, $selector) = @_;
-
-  my $charset = $self->charset;
-  my $xml     = $self->xml;
+  my $xml = $self->xml;
   my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select($selector);
-  return Mojo::Collection->new(
-    map { $self->new->charset($charset)->tree($_)->xml($xml) } @$results);
+  return Mojo::Collection->new(map { $self->new->tree($_)->xml($xml) }
+      @$results);
 }
 
 sub namespace {
@@ -137,8 +131,7 @@ sub next { shift->_sibling(1) }
 sub parent {
   my $self = shift;
   return undef if (my $tree = $self->tree)->[0] eq 'root';
-  return $self->new->charset($self->charset)->tree($tree->[3])
-    ->xml($self->xml);
+  return $self->new->tree($tree->[3])->xml($self->xml);
 }
 
 sub parse {
@@ -196,7 +189,7 @@ sub root {
     $root = $parent;
   }
 
-  return $self->new->charset($self->charset)->tree($root)->xml($self->xml);
+  return $self->new->tree($root)->xml($self->xml);
 }
 
 sub text {
@@ -302,11 +295,7 @@ sub _parent {
   return \@new;
 }
 
-sub _parse {
-  my $self = shift;
-  Mojo::DOM::HTML->new(charset => $self->charset, xml => $self->xml)
-    ->parse(shift)->tree;
-}
+sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
 
 sub _sibling {
   my ($self, $next) = @_;
@@ -466,8 +455,7 @@ enabled by default.
 
   $dom = $dom->append('<p>Hi!</p>');
 
-Append HTML/XML to element. Note that the HTML/XML will be decoded if a
-C<charset> has been defined.
+Append HTML/XML to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
@@ -476,8 +464,7 @@ C<charset> has been defined.
 
   $dom = $dom->append_content('<p>Hi!</p>');
 
-Append HTML/XML to element content. Note that the HTML/XML will be decoded if
-a C<charset> has been defined.
+Append HTML/XML to element content.
 
   # "<div><h1>AB</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
@@ -502,13 +489,6 @@ L<Mojo::DOM::CSS> are supported.
 
 Element attributes.
 
-=head2 charset
-
-  my $charset = $dom->charset;
-  $dom        = $dom->charset('UTF-8');
-
-Charset used for decoding and encoding HTML/XML.
-
 =head2 children
 
   my $collection = $dom->children;
@@ -524,8 +504,7 @@ L<Mojo::DOM> objects, similar to C<find>.
 
   my $xml = $dom->content_xml;
 
-Render content of this element to XML. Note that the XML will be encoded if a
-C<charset> has been defined.
+Render content of this element to XML.
 
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->content_xml;
@@ -577,18 +556,16 @@ has no parent.
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
-Parse HTML/XML document with L<Mojo::DOM::HTML>. Note that the HTML/XML will
-be decoded if a C<charset> has been defined.
+Parse HTML/XML document with L<Mojo::DOM::HTML>.
 
-  # Parse UTF-8 encoded XML
-  my $dom = Mojo::DOM->new->charset('UTF-8')->xml(1)->parse($xml);
+  # Parse XML
+  my $dom = Mojo::DOM->new->xml(1)->parse($xml);
 
 =head2 prepend
 
   $dom = $dom->prepend('<p>Hi!</p>');
 
-Prepend HTML/XML to element. Note that the HTML/XML will be decoded if a
-C<charset> has been defined.
+Prepend HTML/XML to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
@@ -597,8 +574,7 @@ C<charset> has been defined.
 
   $dom = $dom->prepend_content('<p>Hi!</p>');
 
-Prepend HTML/XML to element content. Note that the HTML/XML will be decoded if
-a C<charset> has been defined.
+Prepend HTML/XML to element content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
@@ -627,8 +603,7 @@ Remove element and return it as a L<Mojo::DOM> object.
   my $old = $dom->replace('<div>test</div>');
 
 Replace element with HTML/XML and return the replaced element as a
-L<Mojo::DOM> object. Note that the HTML/XML will be decoded if a C<charset>
-has been defined.
+L<Mojo::DOM> object.
 
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>')->root;
@@ -640,8 +615,7 @@ has been defined.
 
   $dom = $dom->replace_content('<p>test</p>');
 
-Replace element content with HTML/XML. Note that the HTML/XML will be decoded
-if a C<charset> has been defined.
+Replace element content with HTML/XML.
 
   # "<div><h1>B</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B')->root;
@@ -702,8 +676,7 @@ is enabled by default.
   my $xml = $dom->to_xml;
   my $xml = "$dom";
 
-Render this element and its content to XML. Note that the XML will be encoded
-if a C<charset> has been defined.
+Render this element and its content to XML.
 
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->b->to_xml;

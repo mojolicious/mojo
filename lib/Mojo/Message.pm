@@ -79,9 +79,10 @@ sub dom {
   my $self = shift;
 
   return undef if $self->content->is_multipart;
-  my $dom = $self->{dom}
-    ||= Mojo::DOM->new->charset($self->content->charset // undef)
-    ->parse($self->body);
+  my $html    = $self->body;
+  my $charset = $self->content->charset;
+  $html = decode($charset, $html) // $html if $charset;
+  my $dom = $self->{dom} ||= Mojo::DOM->new($html);
 
   return @_ ? $dom->find(@_) : $dom;
 }

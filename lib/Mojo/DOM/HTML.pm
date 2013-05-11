@@ -1,10 +1,10 @@
 package Mojo::DOM::HTML;
 use Mojo::Base -base;
 
-use Mojo::Util qw(decode encode html_unescape xml_escape);
+use Mojo::Util qw(html_unescape xml_escape);
 use Scalar::Util 'weaken';
 
-has [qw(charset xml)];
+has 'xml';
 has tree => sub { ['root'] };
 
 my $ATTR_RE = qr/
@@ -76,11 +76,6 @@ my %INLINE = map { $_ => 1 } (
 sub parse {
   my ($self, $html) = @_;
 
-  if (my $charset = $self->charset) {
-    if (defined(my $chars = decode $charset, $html)) { $html = $chars }
-    else                                             { $self->charset(undef) }
-  }
-
   my $tree    = ['root'];
   my $current = $tree;
   while ($html =~ m/\G$TOKEN_RE/gcs) {
@@ -146,12 +141,7 @@ sub parse {
   return $self->tree($tree);
 }
 
-sub render {
-  my $self    = shift;
-  my $content = $self->_render($self->tree);
-  my $charset = $self->charset;
-  return $charset ? encode($charset, $content) : $content;
-}
+sub render { $_[0]->_render($_[0]->tree) }
 
 sub _close {
   my ($self, $current, $tags, $stop) = @_;
@@ -348,13 +338,6 @@ L<Mojo::DOM::HTML> is the HTML/XML engine used by L<Mojo::DOM>.
 
 L<Mojo::DOM::HTML> implements the following attributes.
 
-=head2 charset
-
-  my $charset = $html->charset;
-  $html       = $html->charset('UTF-8');
-
-Charset used for decoding and encoding HTML/XML.
-
 =head2 tree
 
   my $tree = $html->tree;
@@ -380,15 +363,13 @@ following new ones.
 
   $html = $html->parse('<foo bar="baz">test</foo>');
 
-Parse HTML/XML document. Note that the HTML/XML will be decoded if a
-C<charset> has been defined.
+Parse HTML/XML document.
 
 =head2 render
 
   my $xml = $html->render;
 
-Render DOM to XML. Note that the XML will be encoded if a C<charset> has been
-defined.
+Render DOM to XML.
 
 =head1 SEE ALSO
 

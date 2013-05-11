@@ -27,7 +27,7 @@ usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
 
 These options are available:
   -C, --charset <charset>     Charset of HTML/XML content, defaults to auto
-                              detection or "UTF-8".
+                              detection.
   -c, --content <content>     Content to send with request.
   -H, --header <name:value>   Additional HTTP header.
   -M, --method <method>       HTTP method to use, defaults to "GET".
@@ -138,8 +138,8 @@ sub _say {
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;
 
-  my $dom     = Mojo::DOM->new->charset($charset)->parse($buffer);
-  my $results = $dom->find($selector);
+  $buffer = decode($charset, $buffer) // $buffer if $charset;
+  my $results = Mojo::DOM->new($buffer)->find($selector);
 
   my $finished;
   while (defined(my $command = shift @args)) {
@@ -167,7 +167,7 @@ sub _select {
     $finished++;
   }
 
-  unless ($finished) { say for @$results }
+  unless ($finished) { _say($_) for @$results }
 }
 
 1;

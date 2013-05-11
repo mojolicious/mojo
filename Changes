@@ -13,6 +13,8 @@
   - Removed Mojolicious::Plugin::PoweredBy and
     Mojolicious::Plugin::RequestTimer.
   - Removed data attribute from Mojo::URL.
+  - Removed charset attribute from Mojo::DOM::HTML.
+  - Removed charset method from Mojo::DOM.
   - Removed is_chunked, is_dynamic, is_multipart, has_leftovers, leftovers,
     write and write_chunk methods from Mojo::Message.
   - Removed hmac_md5_sum method from Mojo::ByteStream.

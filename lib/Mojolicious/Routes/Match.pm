@@ -1,7 +1,6 @@
 package Mojolicious::Routes::Match;
 use Mojo::Base -base;
 
-has captures => sub { {} };
 has [qw(endpoint root)];
 has stack => sub { [] };
 
@@ -22,7 +21,7 @@ sub match {
   return
     unless my $captures = $pattern->match_partial(\$path, $r->is_endpoint);
   local $self->{path} = $path;
-  $captures = {%{$self->captures}, %$captures};
+  $captures = $self->{captures} = {%{$self->{captures} || {}}, %$captures};
 
   # Method (HEAD will be treated as GET)
   if (my $methods = $r->via) {
@@ -51,7 +50,6 @@ sub match {
   }
 
   # Endpoint
-  $self->captures($captures);
   my $endpoint = $r->is_endpoint;
   if ($r->inline || ($endpoint && $empty)) {
     push @{$self->stack}, {%$captures};
@@ -68,8 +66,8 @@ sub match {
     return if $self->endpoint;
 
     # Reset
-    if   ($r->parent) { $self->captures($captures)->stack([@$snapshot]) }
-    else              { $self->captures({})->stack([]) }
+    if   ($r->parent) { $self->stack([@$snapshot])->{captures} = $captures }
+    else              { $self->stack([])->{captures}           = {} }
   }
 }
 
@@ -115,7 +113,7 @@ sub path_for {
   else { return $name unless $endpoint = $self->root->lookup($name) }
 
   # Merge values
-  my $captures = $self->captures;
+  my $captures = $self->stack->[-1] || {};
   %values = (%$captures, format => undef, %values);
   my $pattern = $endpoint->pattern;
   $values{format}
@@ -150,7 +148,7 @@ Mojolicious::Routes::Match - Routes visitor
   my $c = Mojolicious::Controller->new;
   my $m = Mojolicious::Routes::Match->new(PUT => '/bar');
   $m->match($r, $c);
-  say $m->captures->{action};
+  say $m->stack->[0]{action};
 
 =head1 DESCRIPTION
 
@@ -160,13 +158,6 @@ structures.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Routes::Match> implements the following attributes.
-
-=head2 captures
-
-  my $captures = $m->captures;
-  $m           = $m->captures({foo => 'bar'});
-
-Captured parameters.
 
 =head2 endpoint
 

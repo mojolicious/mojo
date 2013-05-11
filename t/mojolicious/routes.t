@@ -229,7 +229,6 @@ $m->match($r, $c);
 is $m->root, $r, 'right root';
 is $m->endpoint, undef, 'no endpoint';
 is_deeply $m->stack, [], 'empty stack';
-is_deeply $m->captures, {}, 'empty captures';
 
 # Introspect
 is $r->find('very_clean')->to_string, '/clean', 'right pattern';
@@ -397,8 +396,6 @@ is @{$m->stack}, 2, 'right number of elements';
 # Root
 $m = Mojolicious::Routes::Match->new(GET => '/');
 $m->match($r, $c);
-is $m->captures->{controller}, 'hello', 'right value';
-is $m->captures->{action},     'world', 'right value';
 is $m->stack->[0]{controller}, 'hello', 'right value';
 is $m->stack->[0]{action},     'world', 'right value';
 is $m->path_for, '/', 'right path';
@@ -407,16 +404,12 @@ is @{$m->stack}, 1, 'right number of elements';
 # Path and captures
 $m = Mojolicious::Routes::Match->new(GET => '/foo/test/edit');
 $m->match($r, $c);
-is $m->captures->{controller}, 'foo',  'right value';
-is $m->captures->{action},     'edit', 'right value';
 is $m->stack->[0]{controller}, 'foo',  'right value';
 is $m->stack->[0]{action},     'edit', 'right value';
 is $m->path_for, '/foo/test/edit', 'right path';
 is @{$m->stack}, 1, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(GET => '/foo/testedit');
 $m->match($r, $c);
-is $m->captures->{controller}, 'foo',      'right value';
-is $m->captures->{action},     'testedit', 'right value';
 is $m->stack->[0]{controller}, 'foo',      'right value';
 is $m->stack->[0]{action},     'testedit', 'right value';
 is $m->path_for, '/foo/testedit', 'right path';
@@ -425,9 +418,6 @@ is @{$m->stack}, 1, 'right number of elements';
 # Optional captures in sub route with requirement
 $m = Mojolicious::Routes::Match->new(GET => '/bar/test/delete/22');
 $m->match($r, $c);
-is $m->captures->{controller}, 'bar',    'right value';
-is $m->captures->{action},     'delete', 'right value';
-is $m->captures->{id},         22,       'right value';
 is $m->stack->[0]{controller}, 'bar',    'right value';
 is $m->stack->[0]{action},     'delete', 'right value';
 is $m->stack->[0]{id},         22,       'right value';
@@ -437,9 +427,6 @@ is @{$m->stack}, 1, 'right number of elements';
 # Defaults in sub route
 $m = Mojolicious::Routes::Match->new(GET => '/bar/test/delete');
 $m->match($r, $c);
-is $m->captures->{controller}, 'bar',    'right value';
-is $m->captures->{action},     'delete', 'right value';
-is $m->captures->{id},         23,       'right value';
 is $m->stack->[0]{controller}, 'bar',    'right value';
 is $m->stack->[0]{action},     'delete', 'right value';
 is $m->stack->[0]{id},         23,       'right value';
@@ -452,7 +439,6 @@ $m->match($r, $c);
 is $m->stack->[0]{controller}, 'test2', 'right value';
 is $m->stack->[1]{controller}, 'index', 'right value';
 is $m->stack->[2]{controller}, 'baz',   'right value';
-is $m->captures->{controller}, 'baz', 'right value';
 is $m->path_for, '/test2/foo', 'right path';
 is @{$m->stack}, 3, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(GET => '/test2/bar');
@@ -460,7 +446,6 @@ $m->match($r, $c);
 is $m->stack->[0]{controller}, 'test2',  'right value';
 is $m->stack->[1]{controller}, 'index',  'right value';
 is $m->stack->[2]{controller}, 'lalala', 'right value';
-is $m->captures->{controller}, 'lalala', 'right value';
 is $m->path_for, '/test2/bar', 'right path';
 is @{$m->stack}, 3, 'right number of elements';
 $m = Mojolicious::Routes::Match->new(GET => '/test2/baz');
@@ -469,7 +454,6 @@ is $m->stack->[0]{controller}, 'test2', 'right value';
 is $m->stack->[1]{controller}, 'just',  'right value';
 is $m->stack->[1]{action},     'works', 'right value';
 is $m->stack->[2], undef, 'no value';
-is $m->captures->{controller}, 'just', 'right value';
 is $m->path_for, '/test2/baz', 'right path';
 is @{$m->stack}, 2, 'right number of elements';
 

@@ -13,6 +13,7 @@
   - Removed Mojolicious::Plugin::PoweredBy and
     Mojolicious::Plugin::RequestTimer.
   - Removed data attribute from Mojo::URL.
+  - Removed captures attribute from Mojolicious::Routes::Match.
   - Removed charset attribute from Mojo::DOM::HTML.
   - Removed charset method from Mojo::DOM.
   - Removed is_chunked, is_dynamic, is_multipart, has_leftovers, leftovers,

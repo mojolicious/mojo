@@ -42,8 +42,7 @@ sub dispatch {
   # Check cache
   my $cache = $self->cache;
   if ($cache && (my $cached = $cache->get("$method:$path:$websocket"))) {
-    $m->root($self)->endpoint($cached->{endpoint});
-    $m->stack($cached->{stack})->captures($cached->{captures});
+    $m->root($self)->endpoint($cached->{endpoint})->stack($cached->{stack});
   }
 
   # Check routes
@@ -52,13 +51,9 @@ sub dispatch {
 
     # Cache routes without conditions
     if ($cache && (my $endpoint = $m->endpoint)) {
-      $cache->set(
-        "$method:$path:$websocket" => {
-          endpoint => $endpoint,
-          stack    => $m->stack,
-          captures => $m->captures
-        }
-      ) unless $endpoint->has_conditions;
+      my $result = {endpoint => $endpoint, stack => $m->stack};
+      $cache->set("$method:$path:$websocket" => $result)
+        unless $endpoint->has_conditions;
     }
   }
 

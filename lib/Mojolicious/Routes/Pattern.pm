@@ -14,8 +14,8 @@ sub new { shift->SUPER::new->parse(@_) }
 
 sub match {
   my ($self, $path, $detect) = @_;
-  my $result = $self->match_partial(\$path, $detect);
-  return !$path || $path eq '/' ? $result : undef;
+  my $captures = $self->match_partial(\$path, $detect);
+  return !$path || $path eq '/' ? $captures : undef;
 }
 
 sub match_partial {
@@ -31,20 +31,20 @@ sub match_partial {
   $$pathref =~ s/$regex//;
 
   # Merge captures
-  my $result = {%{$self->defaults}};
+  my $captures = {%{$self->defaults}};
   for my $placeholder (@{$self->placeholders}) {
     last unless @captures;
     my $capture = shift @captures;
-    $result->{$placeholder} = $capture if defined $capture;
+    $captures->{$placeholder} = $capture if defined $capture;
   }
 
   # Format
   my $constraint = $self->constraints->{format};
-  return $result if !$detect || defined $constraint && !$constraint;
-  if ($$pathref =~ s!^/?$format!!) { $result->{format} = $1 }
-  elsif ($constraint) { return undef unless $result->{format} }
+  return $captures if !$detect || defined $constraint && !$constraint;
+  if ($$pathref =~ s!^/?$format!!) { $captures->{format} = $1 }
+  elsif ($constraint) { return undef unless $captures->{format} }
 
-  return $result;
+  return $captures;
 }
 
 sub parse {
@@ -257,8 +257,8 @@ Mojolicious::Routes::Pattern - Routes pattern engine
   my $pattern = Mojolicious::Routes::Pattern->new('/test/:name');
 
   # Match routes
-  my $result  = $pattern->match('/test/sebastian');
-  say $result->{name};
+  my $captures = $pattern->match('/test/sebastian');
+  say $captures->{name};
 
 =head1 DESCRIPTION
 
@@ -343,7 +343,8 @@ Character indicating a relaxed placeholder, defaults to C<#>.
   my $tree = $pattern->tree;
   $pattern = $pattern->tree([['slash'], ['text', 'foo']]);
 
-Pattern in parsed form.
+Pattern in parsed form. Note that this structure should only be used very
+carefully since it is very dynamic.
 
 =head2 wildcard_start
 
@@ -369,15 +370,15 @@ necessary.
 
 =head2 match
 
-  my $result = $pattern->match('/foo/bar');
-  my $result = $pattern->match('/foo/bar', 1);
+  my $captures = $pattern->match('/foo/bar');
+  my $captures = $pattern->match('/foo/bar', 1);
 
 Match pattern against entire path, format detection is disabled by default.
 
 =head2 match_partial
 
-  my $result = $pattern->match_partial(\$path);
-  my $result = $pattern->match_partial(\$path, 1);
+  my $captures = $pattern->match_partial(\$path);
+  my $captures = $pattern->match_partial(\$path, 1);
 
 Match pattern against path and remove matching parts, format detection is
 disabled by default.

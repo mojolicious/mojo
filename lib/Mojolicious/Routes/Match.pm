@@ -8,35 +8,7 @@ sub match { $_[0]->_match($_[0]->root, $_[1], $_[2]) }
 
 sub path_for {
   my $self = shift;
-
-  # Single argument
-  my (%values, $name);
-  if (@_ == 1) {
-
-    # Hash
-    %values = %{shift()} if ref $_[0] eq 'HASH';
-
-    # Name
-    $name = $_[0] if $_[0];
-  }
-
-  # Multiple arguments
-  elsif (@_ > 1) {
-
-    # Odd
-    if (@_ % 2) { ($name, %values) = (shift, @_) }
-
-    # Even
-    else {
-
-      # Name and hash
-      if (ref $_[1] eq 'HASH') { ($name, %values) = (shift, %{shift()}) }
-
-      # Just values
-      else { %values = @_ }
-
-    }
-  }
+  my ($name, %values) = _values(@_);
 
   # Current route
   my $endpoint;
@@ -57,7 +29,6 @@ sub path_for {
     : $pattern->defaults->{format}
     if $pattern->constraints->{format};
 
-  # Render
   my $path = $endpoint->render('', \%values);
   return wantarray ? ($path, $endpoint->has_websocket) : $path;
 }
@@ -66,17 +37,15 @@ sub _match {
   my ($self, $r, $c, $options) = @_;
 
   # Pattern
-  my $path    = $options->{path};
-  my $pattern = $r->pattern;
+  my $path = $options->{path};
   return
-    unless my $captures = $pattern->match_partial(\$path, $r->is_endpoint);
+    unless my $captures = $r->pattern->match_partial(\$path, $r->is_endpoint);
   local $options->{path} = $path;
   $captures = $self->{captures} = {%{$self->{captures} || {}}, %$captures};
 
   # Method
-  if (my $methods = $r->via) {
-    return unless grep { $_ eq $options->{method} } @$methods;
-  }
+  my $methods = $r->via;
+  return if $methods && !grep { $_ eq $options->{method} } @$methods;
 
   # Conditions
   if (my $over = $r->over) {
@@ -98,12 +67,12 @@ sub _match {
     $empty = 1;
   }
 
-  # Endpoint
+  # Endpoint (or bridge)
   my $endpoint = $r->is_endpoint;
-  if ($r->inline || ($endpoint && $empty)) {
+  if (($endpoint && $empty) || $r->inline) {
     push @{$self->stack}, {%$captures};
-    delete $captures->{$_} for qw(app cb);
     return $self->endpoint($r) if $endpoint && $empty;
+    delete $captures->{$_} for qw(app cb);
   }
 
   # Match children
@@ -118,6 +87,28 @@ sub _match {
     if   ($r->parent) { $self->stack([@$snapshot])->{captures} = $captures }
     else              { $self->stack([])->{captures}           = {} }
   }
+}
+
+sub _values {
+
+  # Single argument
+  if (@_ == 1) {
+
+    # Hash
+    return undef, %{shift()} if ref $_[0] eq 'HASH';
+
+    # Name
+    return $_[0];
+  }
+
+  # Name and values
+  return shift, @_ if @_ % 2;
+
+  # Name and hash
+  return shift, %{shift()} if ref $_[1] eq 'HASH';
+
+  # Just values
+  return undef, @_;
 }
 
 1;
@@ -158,7 +149,7 @@ L<Mojolicious::Routes::Match> implements the following attributes.
   my $endpoint = $match->endpoint;
   $match       = $match->endpoint(Mojolicious::Routes::Route->new);
 
-The route endpoint that actually matched.
+The route endpoint that matched.
 
 =head2 root
 
@@ -183,7 +174,7 @@ implements the following new ones.
 
   $match->match(Mojolicious::Controller->new, {method => 'GET', path => '/'});
 
-Match against C<root>.
+Match controller and options against C<root> to find appropriate C<endpoint>.
 
 =head2 path_for
 

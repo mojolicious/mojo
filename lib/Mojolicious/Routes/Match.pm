@@ -4,14 +4,7 @@ use Mojo::Base -base;
 has [qw(endpoint root)];
 has stack => sub { [] };
 
-sub new {
-  my $self = shift->SUPER::new;
-  $self->{method} = uc shift;
-  $self->{$_} = shift for qw(path websocket);
-  return $self;
-}
-
-sub match { $_[0]->_match($_[0]->root, $_[1]) }
+sub match { $_[0]->_match($_[0]->root, $_[1], $_[2]) }
 
 sub path_for {
   my $self = shift;
@@ -70,20 +63,19 @@ sub path_for {
 }
 
 sub _match {
-  my ($self, $r, $c) = @_;
+  my ($self, $r, $c, $options) = @_;
 
   # Pattern
-  my $path    = $self->{path};
+  my $path    = $options->{path};
   my $pattern = $r->pattern;
   return
     unless my $captures = $pattern->match_partial(\$path, $r->is_endpoint);
-  local $self->{path} = $path;
+  local $options->{path} = $path;
   $captures = $self->{captures} = {%{$self->{captures} || {}}, %$captures};
 
-  # Method (HEAD will be treated as GET)
+  # Method
   if (my $methods = $r->via) {
-    my $method = $self->{method} eq 'HEAD' ? 'GET' : $self->{method};
-    return unless grep { $_ eq $method } @$methods;
+    return unless grep { $_ eq $options->{method} } @$methods;
   }
 
   # Conditions
@@ -96,7 +88,7 @@ sub _match {
   }
 
   # WebSocket
-  return if $r->is_websocket && !$self->{websocket};
+  return if $r->is_websocket && !$options->{websocket};
 
   # Partial
   my $empty = !length $path || $path eq '/';
@@ -117,7 +109,7 @@ sub _match {
   # Match children
   my $snapshot = [@{$self->stack}];
   for my $child (@{$r->children}) {
-    $self->_match($child, $c);
+    $self->_match($child, $c, $options);
 
     # Endpoint found
     return if $self->endpoint;
@@ -142,15 +134,15 @@ Mojolicious::Routes::Match - Routes visitor
 
   # Routes
   my $r = Mojolicious::Routes->new;
-  $r->get('/foo')->to(action => 'foo');
-  $r->put('/bar')->to(action => 'bar');
+  $r->get('/foo')->to('test#foo');
+  $r->put('/bar')->to('test#bar');
 
   # Match
   my $c = Mojolicious::Controller->new;
-  my $m = Mojolicious::Routes::Match->new(PUT => '/bar');
-  $m->root($r)->match($c);
-  say $m->stack->[0]{controller};
-  say $m->stack->[0]{action};
+  my $match = Mojolicious::Routes::Match->new(root => $r);
+  $match->match($c => {method => 'PUT', path => '/bar'});
+  say $match->stack->[0]{controller};
+  say $match->stack->[0]{action};
 
 =head1 DESCRIPTION
 
@@ -163,22 +155,22 @@ L<Mojolicious::Routes::Match> implements the following attributes.
 
 =head2 endpoint
 
-  my $endpoint = $m->endpoint;
-  $m           = $m->endpoint(Mojolicious::Routes::Route->new);
+  my $endpoint = $match->endpoint;
+  $match       = $match->endpoint(Mojolicious::Routes::Route->new);
 
 The route endpoint that actually matched.
 
 =head2 root
 
-  my $root = $m->root;
-  $m       = $m->root(Mojolicious::Routes->new);
+  my $root = $match->root;
+  $match   = $match->root(Mojolicious::Routes->new);
 
 The root of the route tree.
 
 =head2 stack
 
-  my $stack = $m->stack;
-  $m        = $m->stack([{foo => 'bar'}]);
+  my $stack = $match->stack;
+  $match    = $match->stack([{foo => 'bar'}]);
 
 Captured parameters with nesting history.
 
@@ -187,33 +179,26 @@ Captured parameters with nesting history.
 L<Mojolicious::Routes::Match> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 new
-
-  my $m = Mojolicious::Routes::Match->new(GET => '/foo');
-  my $m = Mojolicious::Routes::Match->new(GET => '/foo', $ws);
-
-Construct a new L<Mojolicious::Routes::Match> object.
-
 =head2 match
 
-  $m->match(Mojolicious::Controller->new);
+  $match->match(Mojolicious::Controller->new, {method => 'GET', path => '/'});
 
 Match against C<root>.
 
 =head2 path_for
 
-  my $path        = $m->path_for;
-  my $path        = $m->path_for(foo => 'bar');
-  my $path        = $m->path_for({foo => 'bar'});
-  my $path        = $m->path_for('named');
-  my $path        = $m->path_for('named', foo => 'bar');
-  my $path        = $m->path_for('named', {foo => 'bar'});
-  my ($path, $ws) = $m->path_for;
-  my ($path, $ws) = $m->path_for(foo => 'bar');
-  my ($path, $ws) = $m->path_for({foo => 'bar'});
-  my ($path, $ws) = $m->path_for('named');
-  my ($path, $ws) = $m->path_for('named', foo => 'bar');
-  my ($path, $ws) = $m->path_for('named', {foo => 'bar'});
+  my $path        = $match->path_for;
+  my $path        = $match->path_for(foo => 'bar');
+  my $path        = $match->path_for({foo => 'bar'});
+  my $path        = $match->path_for('named');
+  my $path        = $match->path_for('named', foo => 'bar');
+  my $path        = $match->path_for('named', {foo => 'bar'});
+  my ($path, $ws) = $match->path_for;
+  my ($path, $ws) = $match->path_for(foo => 'bar');
+  my ($path, $ws) = $match->path_for({foo => 'bar'});
+  my ($path, $ws) = $match->path_for('named');
+  my ($path, $ws) = $match->path_for('named', foo => 'bar');
+  my ($path, $ws) = $match->path_for('named', {foo => 'bar'});
 
 Render matching route with parameters into path.
 

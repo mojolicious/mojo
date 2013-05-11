@@ -15,9 +15,8 @@ use Scalar::Util ();
 use Time::HiRes  ();
 
 has app => sub { Mojolicious->new };
-has match => sub {
-  Mojolicious::Routes::Match->new(GET => '/')->root(shift->app->routes);
-};
+has match =>
+  sub { Mojolicious::Routes::Match->new(root => shift->app->routes) };
 has tx => sub { Mojo::Transaction::HTTP->new };
 
 # Reserved stash values

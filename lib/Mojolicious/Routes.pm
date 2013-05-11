@@ -27,31 +27,33 @@ sub auto_render {
 sub dispatch {
   my ($self, $c) = @_;
 
-  # Prepare path
+  # Path (partial path gets priority)
   my $req  = $c->req;
   my $path = $c->stash->{path};
   if (defined $path) { $path = "/$path" if $path !~ m!^/! }
   else               { $path = $req->url->path->to_route }
 
-  # Prepare match
-  my $method = $req->method;
-  my $websocket = $c->tx->is_websocket ? 1 : 0;
-  my $m = Mojolicious::Routes::Match->new($method => $path, $websocket);
-  $c->match($m->root($self));
+  # Method (HEAD will be treated as GET)
+  my $method = uc $req->method;
+  $method = 'GET' if $method eq 'HEAD';
 
   # Check cache
-  my $cache = $self->cache;
+  my $cache     = $self->cache;
+  my $websocket = $c->tx->is_websocket ? 1 : 0;
+  my $match     = Mojolicious::Routes::Match->new(root => $self);
+  $c->match($match);
   if ($cache && (my $cached = $cache->get("$method:$path:$websocket"))) {
-    $m->endpoint($cached->{endpoint})->stack($cached->{stack});
+    $match->endpoint($cached->{endpoint})->stack($cached->{stack});
   }
 
   # Check routes
   else {
-    $m->match($c);
+    my $options = {method => $method, path => $path, websocket => $websocket};
+    $match->match($c => $options);
 
     # Cache routes without conditions
-    if ($cache && (my $endpoint = $m->endpoint)) {
-      my $result = {endpoint => $endpoint, stack => $m->stack};
+    if ($cache && (my $endpoint = $match->endpoint)) {
+      my $result = {endpoint => $endpoint, stack => $match->stack};
       $cache->set("$method:$path:$websocket" => $result)
         unless $endpoint->has_conditions;
     }

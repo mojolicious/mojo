@@ -45,7 +45,6 @@ our @EXPORT_OK = (
 );
 
 sub b64_decode { decode_base64($_[0]) }
-
 sub b64_encode { encode_base64($_[0], $_[1]) }
 
 sub camelize {

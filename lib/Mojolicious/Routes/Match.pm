@@ -124,6 +124,9 @@ Mojolicious::Routes::Match - Routes visitor
   say $match->stack->[0]{controller};
   say $match->stack->[0]{action};
 
+  # Render
+  say $match->path_for;
+
 =head1 DESCRIPTION
 
 L<Mojolicious::Routes::Match> is a visitor for L<Mojolicious::Routes>

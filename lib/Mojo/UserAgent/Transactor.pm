@@ -17,9 +17,7 @@ has generators => sub { {} };
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->add_generator(form => \&_form);
-  $self->add_generator(json => \&_json);
-  return $self;
+  return $self->add_generator(form => \&_form)->add_generator(json => \&_json);
 }
 
 sub add_generator {

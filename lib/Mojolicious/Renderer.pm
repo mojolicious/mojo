@@ -24,10 +24,10 @@ my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->add_handler(
-    json => sub { ${$_[2]} = Mojo::JSON->new->encode($_[3]{json}) });
   $self->add_handler(data => sub { ${$_[2]} = $_[3]{data} });
-  return $self->add_handler(text => sub { ${$_[2]} = $_[3]{text} });
+  $self->add_handler(text => sub { ${$_[2]} = $_[3]{text} });
+  return $self->add_handler(
+    json => sub { ${$_[2]} = Mojo::JSON->new->encode($_[3]{json}) });
 }
 
 sub add_handler { shift->_add(handlers => @_) }

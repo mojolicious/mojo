@@ -114,18 +114,19 @@ Mojolicious::Routes::Match - Routes visitor
 
   # Routes
   my $r = Mojolicious::Routes->new;
-  $r->get('/foo')->to('test#foo');
-  $r->put('/bar')->to('test#bar');
+  $r->get('/:controller/:action');
+  $r->put('/:controller/:action');
 
   # Match
   my $c = Mojolicious::Controller->new;
   my $match = Mojolicious::Routes::Match->new(root => $r);
-  $match->match($c => {method => 'PUT', path => '/bar'});
+  $match->match($c => {method => 'PUT', path => '/foo/bar'});
   say $match->stack->[0]{controller};
   say $match->stack->[0]{action};
 
   # Render
   say $match->path_for;
+  say $match->path_for(action => 'baz');
 
 =head1 DESCRIPTION
 

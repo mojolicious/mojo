@@ -224,7 +224,7 @@ is $req->content->leftovers, "GET / HTTP/1.1\x0d\x0a\x0d\x0a",
 # Parse HTTP 1.1 start line, no headers and body with leading CRLFs
 # (SHOULD be ignored, RFC 2616, Section 4.1)
 $req = Mojo::Message::Request->new;
-$req->parse("\x0d\x0aGET / HTTP/1.1\x0d\x0a\x0d\x0a");
+$req->parse("\x0d\x0a GET / HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
@@ -391,14 +391,14 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   ok $req->is_limit_exceeded, 'limit is exceeded';
 }
 
-# Parse full HTTP 1.0 request
+# Parse full HTTP 1.0 request (solitary LF)
 $req = Mojo::Message::Request->new;
 my $body = '';
 $req->content->on(read => sub { $body .= pop });
 $req->parse('GET /foo/bar/baz.html?fo');
-$req->parse("o=13#23 HTTP/1.0\x0d\x0aContent");
+$req->parse("o=13#23 HTTP/1.0\x0aContent");
 $req->parse('-Type: text/');
-$req->parse("plain\x0d\x0aContent-Length: 27\x0d\x0a\x0d\x0aH");
+$req->parse("plain\x0aContent-Length: 27\x0a\x0aH");
 $req->parse("ello World!\n1234\nlalalala\n");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';

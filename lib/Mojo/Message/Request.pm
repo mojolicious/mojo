@@ -10,7 +10,7 @@ has method => 'GET';
 has url => sub { Mojo::URL->new };
 
 my $START_LINE_RE = qr|
-  ^\s*
+  ^
   ([a-zA-Z]+)                                  # Method
   \s+
   ([0-9a-zA-Z\-._~:/?#[\]\@!\$&'()*+,;=\%]+)   # Path

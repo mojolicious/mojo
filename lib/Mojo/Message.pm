@@ -66,13 +66,7 @@ sub build_body       { shift->_build('get_body_chunk') }
 sub build_headers    { shift->_build('get_header_chunk') }
 sub build_start_line { shift->_build('get_start_line_chunk') }
 
-sub cookie {
-  my ($self, $name) = @_;
-  $self->{cookies} ||= _nest($self->cookies);
-  return unless my $cookies = $self->{cookies}{$name};
-  my @cookies = ref $cookies eq 'ARRAY' ? @$cookies : ($cookies);
-  return wantarray ? @cookies : $cookies[0];
-}
+sub cookie { shift->_cache(cookies => @_) }
 
 sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
@@ -212,13 +206,7 @@ sub to_string {
   return $self->build_start_line . $self->build_headers . $self->build_body;
 }
 
-sub upload {
-  my ($self, $name) = @_;
-  $self->{uploads} ||= _nest($self->uploads);
-  return unless my $uploads = $self->{uploads}{$name};
-  my @uploads = ref $uploads eq 'ARRAY' ? @$uploads : ($uploads);
-  return wantarray ? @uploads : $uploads[0];
-}
+sub upload { shift->_cache(uploads => @_) }
 
 sub uploads {
   my $self = shift;
@@ -264,25 +252,17 @@ sub _build {
   return $buffer;
 }
 
-sub _nest {
-  my $array = shift;
+sub _cache {
+  my ($self, $method, $name) = @_;
 
-  # Turn array of objects into hash
-  my $hash = {};
-  for my $object (@$array) {
-    my $name = $object->name;
-
-    # Multiple objects with same name
-    if (exists $hash->{$name}) {
-      $hash->{$name} = [$hash->{$name}] unless ref $hash->{$name} eq 'ARRAY';
-      push @{$hash->{$name}}, $object;
-    }
-
-    # Single object
-    else { $hash->{$name} = $object }
+  # Cache objects by name
+  unless ($self->{$method}) {
+    $self->{$method} = {};
+    push @{$self->{$method}{$_->name}}, $_ for @{$self->$method};
   }
 
-  return $hash;
+  return unless my $objects = $self->{$method}{$name};
+  return wantarray ? @$objects : $objects->[0];
 }
 
 sub _parse_formdata {

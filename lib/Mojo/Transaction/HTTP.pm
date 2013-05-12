@@ -74,7 +74,7 @@ sub _body {
   }
 
   # Finished
-  $self->{state} = $finish ? 'finished' : 'read_response'
+  $self->{state} = $finish ? 'finished' : 'read'
     if $self->{write} <= 0 || (defined $buffer && !length $buffer);
 
   return defined $buffer ? $buffer : '';
@@ -98,7 +98,7 @@ sub _headers {
 
     # Body
     else {
-      $self->{state} = 'write_body';
+      $self->{http_state} = 'body';
       $self->{write} = $msg->content->is_dynamic ? 1 : $msg->body_size;
     }
   }
@@ -117,9 +117,9 @@ sub _start_line {
 
   # Switch to headers
   if ($self->{write} <= 0) {
-    $self->{state}  = 'write_headers';
-    $self->{write}  = $msg->header_size;
-    $self->{offset} = 0;
+    $self->{http_state} = 'headers';
+    $self->{write}      = $msg->header_size;
+    $self->{offset}     = 0;
   }
 
   return $buffer;
@@ -128,10 +128,14 @@ sub _start_line {
 sub _write {
   my ($self, $server) = @_;
 
+  # Client starts writing right away
+  $self->{state} ||= 'write' unless $server;
+  return '' unless $self->{state} eq 'write';
+
   # Nothing written yet
   $self->{$_} ||= 0 for qw(offset write);
   my $msg = $server ? $self->res : $self->req;
-  if ($server ? ($self->{state} eq 'write') : !$self->{state}) {
+  unless ($self->{http_state}) {
 
     # Connection header
     my $headers = $msg->headers;
@@ -139,20 +143,19 @@ sub _write {
       unless $headers->connection;
 
     # Switch to start line
-    $self->{state} = 'write_start_line';
-    $self->{write} = $msg->start_line_size;
+    $self->{http_state} = 'start_line';
+    $self->{write}      = $msg->start_line_size;
   }
 
   # Start line
   my $chunk = '';
-  $chunk .= $self->_start_line($msg) if $self->{state} eq 'write_start_line';
+  $chunk .= $self->_start_line($msg) if $self->{http_state} eq 'start_line';
 
   # Headers
-  $chunk .= $self->_headers($msg, $server)
-    if $self->{state} eq 'write_headers';
+  $chunk .= $self->_headers($msg, $server) if $self->{http_state} eq 'headers';
 
   # Body
-  $chunk .= $self->_body($msg, $server) if $self->{state} eq 'write_body';
+  $chunk .= $self->_body($msg, $server) if $self->{http_state} eq 'body';
 
   return $chunk;
 }

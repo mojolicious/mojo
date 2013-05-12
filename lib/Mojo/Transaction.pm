@@ -36,11 +36,7 @@ sub is_finished { (shift->{state} // '') eq 'finished' }
 
 sub is_websocket {undef}
 
-sub is_writing {
-  return 1 unless my $state = shift->{state};
-  return !!grep { $_ eq $state }
-    qw(write write_start_line write_headers write_body);
-}
+sub is_writing { (shift->{state} // 'write') eq 'write' }
 
 sub remote_address {
   my $self = shift;
@@ -61,23 +57,19 @@ sub remote_address {
   return $self->{remote_address};
 }
 
-sub resume {
-  my $self = shift;
-  if (($self->{state} // '') eq 'paused') { $self->{state} = 'write_body' }
-  elsif (!$self->is_writing) { $self->{state} = 'write' }
-  return $self->emit('resume');
-}
-
-sub server_close {
-  my $self = shift;
-  $self->{state} = 'finished';
-  return $self->emit('finish');
-}
+sub resume       { shift->_state(qw(write resume)) }
+sub server_close { shift->_state(qw(finished finish)) }
 
 sub server_read  { croak 'Method "server_read" not implemented by subclass' }
 sub server_write { croak 'Method "server_write" not implemented by subclass' }
 
 sub success { $_[0]->error ? undef : $_[0]->res }
+
+sub _state {
+  my ($self, $state, $event) = @_;
+  $self->{state} = $state;
+  return $self->emit($event);
+}
 
 1;
 

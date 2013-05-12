@@ -49,11 +49,8 @@ sub body_params {
 
   # "multipart/formdata"
   elsif ($type =~ m!multipart/form-data!i) {
-    my $formdata = $self->_parse_formdata;
-    for my $data (@$formdata) {
-      my ($name, $filename, $value) = @$data;
-      next if defined $filename;
-      $params->append($name, $value);
+    for my $data (@{$self->_parse_formdata}) {
+      $params->append($data->[0], $data->[2]) unless defined $data->[1];
     }
   }
 
@@ -212,19 +209,17 @@ sub uploads {
   my $self = shift;
 
   my @uploads;
-  my $formdata = $self->_parse_formdata;
-  for my $data (@$formdata) {
-    my ($name, $filename, $part) = @$data;
+  for my $data (@{$self->_parse_formdata}) {
 
     # Just a form value
-    next unless defined $filename;
+    next unless defined $data->[1];
 
     # Uploaded file
     my $upload = Mojo::Upload->new(
-      name     => $name,
-      asset    => $part->asset,
-      filename => $filename,
-      headers  => $part->headers
+      name     => $data->[0],
+      filename => $data->[1],
+      asset    => $data->[2]->asset,
+      headers  => $data->[2]->headers
     );
     push @uploads, $upload;
   }
@@ -275,8 +270,7 @@ sub _parse_formdata {
   my $charset = $content->charset || $self->default_charset;
 
   # Check all parts for form data
-  my @parts;
-  push @parts, $content;
+  my @parts = ($content);
   while (my $part = shift @parts) {
 
     # Nested multipart content
@@ -286,8 +280,7 @@ sub _parse_formdata {
     }
 
     # Extract information from Content-Disposition header
-    my $disposition = $part->headers->content_disposition;
-    next unless $disposition;
+    next unless my $disposition = $part->headers->content_disposition;
     my ($name)     = $disposition =~ /[; ]name="?([^";]+)"?/;
     my ($filename) = $disposition =~ /[; ]filename="?([^"]*)"?/;
     if ($charset) {

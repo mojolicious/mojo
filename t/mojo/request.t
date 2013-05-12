@@ -222,7 +222,6 @@ is $req->content->leftovers, "GET / HTTP/1.1\x0d\x0a\x0d\x0a",
   'second request in leftovers';
 
 # Parse HTTP 1.1 start line, no headers and body with leading CRLFs
-# (SHOULD be ignored, RFC 2616, Section 4.1)
 $req = Mojo::Message::Request->new;
 $req->parse("\x0d\x0a GET / HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';

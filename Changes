@@ -36,6 +36,8 @@
     managing more than 10k concurrent connections.
   - Improved Mojolicious to be able to detect the current operating mode from
     the PLACK_ENV environment variable.
+  - Improved Mojolicious to not trap exceptions if the default exception
+    handling has been deactivated.
   - Improved renderer performance.
   - Improved Mojo::DOM::HTML performance.
   - Improved Mojo::Reactor::Poll performance.

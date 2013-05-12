@@ -3,32 +3,32 @@ use Mojo::Base -base;
 
 has types => sub {
   {
-    appcache => 'text/cache-manifest',
-    atom     => 'application/atom+xml',
-    bin      => 'application/octet-stream',
-    css      => 'text/css',
-    gif      => 'image/gif',
-    gz       => 'application/x-gzip',
-    htm      => 'text/html',
-    html     => 'text/html;charset=UTF-8',
-    ico      => 'image/x-icon',
-    jpeg     => 'image/jpeg',
-    jpg      => 'image/jpeg',
-    js       => 'application/javascript',
-    json     => 'application/json',
-    mp3      => 'audio/mpeg',
-    mp4      => 'video/mp4',
-    ogg      => 'audio/ogg',
-    ogv      => 'video/ogg',
-    pdf      => 'application/pdf',
-    png      => 'image/png',
-    rss      => 'application/rss+xml',
-    svg      => 'image/svg+xml',
-    txt      => 'text/plain',
-    webm     => 'video/webm',
-    woff     => 'application/font-woff',
+    appcache => ['text/cache-manifest'],
+    atom     => ['application/atom+xml'],
+    bin      => ['application/octet-stream'],
+    css      => ['text/css'],
+    gif      => ['image/gif'],
+    gz       => ['application/x-gzip'],
+    htm      => ['text/html'],
+    html     => ['text/html;charset=UTF-8'],
+    ico      => ['image/x-icon'],
+    jpeg     => ['image/jpeg'],
+    jpg      => ['image/jpeg'],
+    js       => ['application/javascript'],
+    json     => ['application/json'],
+    mp3      => ['audio/mpeg'],
+    mp4      => ['video/mp4'],
+    ogg      => ['audio/ogg'],
+    ogv      => ['video/ogg'],
+    pdf      => ['application/pdf'],
+    png      => ['image/png'],
+    rss      => ['application/rss+xml'],
+    svg      => ['image/svg+xml'],
+    txt      => ['text/plain'],
+    webm     => ['video/webm'],
+    woff     => ['application/font-woff'],
     xml      => ['application/xml', 'text/xml'],
-    zip      => 'application/zip'
+    zip      => ['application/zip']
   };
 };
 
@@ -40,24 +40,23 @@ sub detect {
   /^\s*([^,; ]+)(?:\s*\;\s*q=(\d+(?:\.\d+)?))?\s*$/i
     and $types{lc $1} = $2 // 1
     for split /,/, $accept // '';
-  my @types = sort { $types{$b} <=> $types{$a} } sort keys %types;
-  return [] if !$prioritize && @types > 1;
+  my @detected = sort { $types{$b} <=> $types{$a} } sort keys %types;
+  return [] if !$prioritize && @detected > 1;
 
   # Detect extensions from MIME types
   my %reverse;
   my $types = $self->types;
   for my $ext (sort keys %$types) {
-    my @types = ref $types->{$ext} ? @{$types->{$ext}} : ($types->{$ext});
+    my @types = @{$types->{$ext}};
     push @{$reverse{$_}}, $ext for map { s/\;.*$//; lc $_ } @types;
   }
-  return [map { @{$reverse{$_} // []} } @types];
+  return [map { @{$reverse{$_} // []} } @detected];
 }
 
 sub type {
   my ($self, $ext, $type) = @_;
-  my $types = $self->types;
-  return ref $types->{$ext} ? $types->{$ext}[0] : $types->{$ext} unless $type;
-  $types->{$ext} = $type;
+  return $self->types->{$ext}[0] unless $type;
+  $self->types->{$ext} = ref $type ? $type : [$type];
   return $self;
 }
 
@@ -115,7 +114,7 @@ L<Mojolicious::Types> implements the following attributes.
 =head2 types
 
   my $map = $types->types;
-  $types  = $types->types({png => 'image/png'});
+  $types  = $types->types({png => ['image/png']});
 
 List of MIME types.
 

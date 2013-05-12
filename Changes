@@ -9,6 +9,7 @@
   - Added close_gracefully method to Mojo::IOLoop::Stream.
   - Changed Mojolicious default secret to the application moniker to make it
     slightly more secure.
+  - Changed types in Mojolicious::Types to consistently use arrays.
   - Removed callback support from body method in Mojo::Message.
   - Removed Mojolicious::Plugin::PoweredBy and
     Mojolicious::Plugin::RequestTimer.

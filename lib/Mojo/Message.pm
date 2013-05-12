@@ -21,14 +21,15 @@ sub body {
   my $self = shift;
 
   # Downgrade multipart content
-  $self->content(Mojo::Content::Single->new) if $self->content->is_multipart;
   my $content = $self->content;
+  $content = $self->content(Mojo::Content::Single->new)->content
+    if $content->is_multipart;
 
   # Get
-  return $content->asset->slurp unless defined(my $new = shift);
+  return $content->asset->slurp unless @_;
 
   # Set raw content
-  $content->asset(Mojo::Asset::Memory->new->add_chunk($new));
+  $content->asset(Mojo::Asset::Memory->new->add_chunk(@_));
 
   return $self;
 }

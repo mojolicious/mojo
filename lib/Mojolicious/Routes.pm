@@ -38,23 +38,23 @@ sub dispatch {
   $method = 'GET' if $method eq 'HEAD';
 
   # Check cache
-  my $cache     = $self->cache;
-  my $websocket = $c->tx->is_websocket ? 1 : 0;
-  my $match     = Mojolicious::Routes::Match->new(root => $self);
+  my $cache = $self->cache;
+  my $ws    = $c->tx->is_websocket ? 1 : 0;
+  my $match = Mojolicious::Routes::Match->new(root => $self);
   $c->match($match);
-  if ($cache && (my $cached = $cache->get("$method:$path:$websocket"))) {
+  if ($cache && (my $cached = $cache->get("$method:$path:$ws"))) {
     $match->endpoint($cached->{endpoint})->stack($cached->{stack});
   }
 
   # Check routes
   else {
-    my $options = {method => $method, path => $path, websocket => $websocket};
+    my $options = {method => $method, path => $path, websocket => $ws};
     $match->match($c => $options);
 
     # Cache routes without conditions
     if ($cache && (my $endpoint = $match->endpoint)) {
       my $result = {endpoint => $endpoint, stack => $match->stack};
-      $cache->set("$method:$path:$websocket" => $result)
+      $cache->set("$method:$path:$ws" => $result)
         unless $endpoint->has_conditions;
     }
   }
@@ -107,7 +107,7 @@ sub _class {
 
   # Application class
   my @classes;
-  my $class = camelize $field->{controller} || '';
+  my $class = $field->{controller} ? camelize($field->{controller}) : '';
   if ($field->{app}) { push @classes, $field->{app} }
 
   # Specific namespace

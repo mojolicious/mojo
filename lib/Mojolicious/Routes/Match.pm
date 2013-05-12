@@ -7,8 +7,7 @@ has stack => sub { [] };
 sub match { $_[0]->_match($_[0]->root, $_[1], $_[2]) }
 
 sub path_for {
-  my $self = shift;
-  my ($name, %values) = _values(@_);
+  my ($self, $name, %values) = (shift, _values(@_));
 
   # Current route
   my $endpoint;
@@ -91,24 +90,14 @@ sub _match {
 
 sub _values {
 
-  # Single argument
-  if (@_ == 1) {
+  # Hash or name (one)
+  return ref $_[0] eq 'HASH' ? (undef, %{shift()}) : @_ if @_ == 1;
 
-    # Hash
-    return undef, %{shift()} if ref $_[0] eq 'HASH';
-
-    # Name
-    return $_[0];
-  }
-
-  # Name and values
+  # Name and values (odd)
   return shift, @_ if @_ % 2;
 
-  # Name and hash
-  return shift, %{shift()} if ref $_[1] eq 'HASH';
-
-  # Just values
-  return undef, @_;
+  # Name and hash or just values (even)
+  return ref $_[1] eq 'HASH' ? (shift, %{shift()}) : (undef, @_);
 }
 
 1;

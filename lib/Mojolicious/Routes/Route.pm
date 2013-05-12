@@ -589,7 +589,7 @@ restrictions.
 
 =head2 websocket
 
-  my $websocket = $r->websocket('/:foo' => sub {...});
+  my $ws = $r->websocket('/:foo' => sub {...});
 
 Generate route matching only WebSocket handshakes. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.

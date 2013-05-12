@@ -225,8 +225,7 @@ sub or {
 
 sub patch_ok { shift->_request_ok(patch => @_) }
 sub post_ok  { shift->_request_ok(post  => @_) }
-
-sub put_ok { shift->_request_ok(put => @_) }
+sub put_ok   { shift->_request_ok(put   => @_) }
 
 sub request_ok {
   my $self = shift;

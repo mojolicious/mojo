@@ -104,7 +104,7 @@ sub _values {
 
 =head1 NAME
 
-Mojolicious::Routes::Match - Routes visitor
+Mojolicious::Routes::Match - Find routes
 
 =head1 SYNOPSIS
 
@@ -130,7 +130,7 @@ Mojolicious::Routes::Match - Routes visitor
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Routes::Match> is a visitor for L<Mojolicious::Routes>
+L<Mojolicious::Routes::Match> finds routes in L<Mojolicious::Routes>
 structures.
 
 =head1 ATTRIBUTES
@@ -149,7 +149,7 @@ The route endpoint that matched.
   my $root = $match->root;
   $match   = $match->root(Mojolicious::Routes->new);
 
-The root of the route tree.
+The root of the route structure.
 
 =head2 stack
 

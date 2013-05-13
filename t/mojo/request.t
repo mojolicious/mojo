@@ -328,11 +328,11 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 
 # Parse HTTP 1.0 start line (with line size limit)
 {
+  local $ENV{MOJO_MAX_LINE_SIZE} = 5;
   $req = Mojo::Message::Request->new;
   my $limit;
   $req->on(finish => sub { $limit = shift->is_limit_exceeded });
   ok !$req->is_limit_exceeded, 'limit is not exceeded';
-  local $ENV{MOJO_MAX_LINE_SIZE} = 5;
   is $req->headers->max_line_size, 5, 'right size';
   $req->parse('GET /foo/bar/baz.html HTTP/1');
   ok $req->is_finished, 'request is finished';
@@ -346,8 +346,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 
 # Parse HTTP 1.0 start line and headers (with line size limit)
 {
-  $req = Mojo::Message::Request->new;
   local $ENV{MOJO_MAX_LINE_SIZE} = 20;
+  $req = Mojo::Message::Request->new;
   is $req->max_line_size, 20, 'right size';
   $req->parse("GET / HTTP/1.0\x0d\x0a");
   $req->parse("Content-Type: text/plain\x0d\x0a");
@@ -359,10 +359,10 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 
 # Parse HTTP 1.0 start line (with message size limit)
 {
+  local $ENV{MOJO_MAX_MESSAGE_SIZE} = 5;
   $req = Mojo::Message::Request->new;
   my $limit;
   $req->on(finish => sub { $limit = shift->is_limit_exceeded });
-  local $ENV{MOJO_MAX_MESSAGE_SIZE} = 5;
   is $req->max_message_size, 5, 'right size';
   $req->parse('GET /foo/bar/baz.html HTTP/1');
   ok $req->is_finished, 'request is finished';
@@ -374,8 +374,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 
 # Parse HTTP 1.0 start line and headers (with message size limit)
 {
-  $req = Mojo::Message::Request->new;
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 20;
+  $req = Mojo::Message::Request->new;
   $req->parse("GET / HTTP/1.0\x0d\x0a");
   $req->parse("Content-Type: text/plain\x0d\x0a");
   ok $req->is_finished, 'request is finished';
@@ -386,8 +386,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 
 # Parse HTTP 1.0 start line, headers and body (with message size limit)
 {
-  $req = Mojo::Message::Request->new;
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 50;
+  $req = Mojo::Message::Request->new;
   $req->parse("GET / HTTP/1.0\x0d\x0a");
   $req->parse("Content-Length: 24\x0d\x0a\x0d\x0a");
   $req->parse('Hello World!');

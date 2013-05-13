@@ -216,7 +216,7 @@ Print bytestream to handle and append a newline, defaults to C<STDOUT>.
 
 =head2 secure_compare
 
-  my $success = $stream->secure_compare($string);
+  my $success = $stream->secure_compare($str);
 
 Compare bytestream with L<Mojo::Util/"secure_compare">.
 
@@ -274,8 +274,8 @@ L<Mojo::Util/"squish">.
 
 =head2 to_string
 
-  my $string = $stream->to_string;
-  my $string = "$stream";
+  my $str = $stream->to_string;
+  my $str = "$stream";
 
 Stringify bytestream.
 

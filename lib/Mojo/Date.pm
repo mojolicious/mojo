@@ -131,8 +131,8 @@ Parse date.
 
 =head2 to_string
 
-  my $string = $date->to_string;
-  my $string = "$date";
+  my $str = $date->to_string;
+  my $str = "$date";
 
 Render date suitable for HTTP messages.
 

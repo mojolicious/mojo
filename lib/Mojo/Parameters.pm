@@ -79,16 +79,16 @@ sub params {
   }
 
   # Parse string
-  if (defined(my $string = delete $self->{string})) {
+  if (defined(my $str = delete $self->{string})) {
     my $params = $self->{params} = [];
 
     # Detect pair separator for reconstruction
-    return $params unless length($string // '');
-    $self->pair_separator(';') if $string =~ /;/ && $string !~ /\&/;
+    return $params unless length($str // '');
+    $self->pair_separator(';') if $str =~ /;/ && $str !~ /\&/;
 
     # W3C suggests to also accept ";" as a separator
     my $charset = $self->charset;
-    for my $pair (split /[\&\;]+/, $string) {
+    for my $pair (split /[\&\;]+/, $str) {
       $pair =~ /^([^=]*)(?:=(.*))?$/;
       my $name  = $1 // '';
       my $value = $2 // '';
@@ -158,9 +158,9 @@ sub to_string {
 
   # String
   my $charset = $self->charset;
-  if (defined(my $string = $self->{string})) {
-    $string = encode $charset, $string if $charset;
-    return url_escape $string, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
+  if (defined(my $str = $self->{string})) {
+    $str = encode $charset, $str if $charset;
+    return url_escape $str, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
   }
 
   # Build pairs
@@ -326,8 +326,8 @@ the parameters.
 
 =head2 to_string
 
-  my $string = $params->to_string;
-  my $string = "$params";
+  my $str = $params->to_string;
+  my $str = "$params";
 
 Turn parameters into a string.
 

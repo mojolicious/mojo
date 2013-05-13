@@ -214,7 +214,7 @@ Generate default response message for code.
 
 =head2 extract_start_line
 
-  my $success = $res->extract_start_line(\$string);
+  my $success = $res->extract_start_line(\$str);
 
 Extract status line from string.
 

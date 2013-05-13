@@ -57,14 +57,14 @@ sub add_chunk {
 }
 
 sub contains {
-  my ($self, $string) = @_;
+  my ($self, $str) = @_;
 
   my $handle = $self->handle;
   $handle->sysseek($self->start_range, SEEK_SET);
 
   # Calculate window size
   my $end  = $self->end_range // $self->size;
-  my $len  = length $string;
+  my $len  = length $str;
   my $size = $len > 131072 ? $len : 131072;
   $size = $end - $self->start_range if $size > $end - $self->start_range;
 
@@ -79,7 +79,7 @@ sub contains {
     $window .= $buffer;
 
     # Search window
-    my $pos = index $window, $string;
+    my $pos = index $window, $str;
     return $offset + $pos if $pos >= 0;
     $offset += $read;
     return -1 if $read == 0 || $offset == $end;

@@ -14,24 +14,24 @@ sub parse     { croak 'Method "parse" not implemented by subclass' }
 sub to_string { croak 'Method "to_string" not implemented by subclass' }
 
 sub _tokenize {
-  my ($self, $string) = @_;
+  my ($self, $str) = @_;
 
   # Nibbling parser
   my (@tree, @token);
-  while ($string =~ s/^\s*([^=;,]+)\s*=?\s*//) {
+  while ($str =~ s/^\s*([^=;,]+)\s*=?\s*//) {
     my $name = $1;
 
     # "expires" is a special case, thank you Netscape...
-    $string =~ s/^([^;,]+,?[^;,]+)/"$1"/ if $name =~ /^expires$/i;
+    $str =~ s/^([^;,]+,?[^;,]+)/"$1"/ if $name =~ /^expires$/i;
 
     # Value
     my $value;
-    $value = unquote $1 if $string =~ s/^("(?:\\\\|\\"|[^"])+"|[^;,]+)\s*//;
+    $value = unquote $1 if $str =~ s/^("(?:\\\\|\\"|[^"])+"|[^;,]+)\s*//;
     push @token, [$name, $value];
 
     # Separator
-    $string =~ s/^\s*;\s*//;
-    next unless $string =~ s/^\s*,\s*//;
+    $str =~ s/^\s*;\s*//;
+    next unless $str =~ s/^\s*,\s*//;
     push @tree, [@token];
     @token = ();
   }
@@ -84,14 +84,14 @@ following new ones.
 
 =head2 parse
 
-  my $cookies = $cookie->parse($string);
+  my $cookies = $cookie->parse($str);
 
 Parse cookies. Meant to be overloaded in a subclass.
 
 =head2 to_string
 
-  my $string = $cookie->to_string;
-  my $string = "$cookie";
+  my $str = $cookie->to_string;
+  my $str = "$cookie";
 
 Render cookie. Meant to be overloaded in a subclass.
 

@@ -185,8 +185,8 @@ get ':number' => [number => qr/0/] => sub {
   my $self    = shift;
   my $url     = $self->req->url->to_abs;
   my $address = $self->tx->remote_address;
-  my $number  = $self->param('number');
-  $self->render_text("$url-$address-$number");
+  my $num     = $self->param('number');
+  $self->render_text("$url-$address-$num");
 };
 
 del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1 %> ☃') };

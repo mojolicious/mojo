@@ -68,7 +68,7 @@ sub render {
   # Placeholders can only be optional without a format
   my $optional = !$format;
 
-  my $string = '';
+  my $str = '';
   for my $token (reverse @{$self->tree}) {
     my $op       = $token->[0];
     my $rendered = '';
@@ -91,12 +91,12 @@ sub render {
       elsif ($optional) { $rendered = '' }
     }
 
-    $string = "$rendered$string";
+    $str = "$rendered$str";
   }
 
   # Format is optional
-  $string ||= '/';
-  return $render && $format ? "$string.$format" : $string;
+  $str ||= '/';
+  return $render && $format ? "$str.$format" : $str;
 }
 
 sub _compile {

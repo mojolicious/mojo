@@ -126,8 +126,8 @@ is_deeply $headers->to_hash(1),
   {'X-Test' => [[23, 24], ['single line'], [25, 26]]}, 'right structure';
 is_deeply $headers->to_hash, {'X-Test' => '23, 24, single line, 25, 26'},
   'right structure';
-my $string = $headers->header('X-Test');
-is $string, "23, 24, single line, 25, 26", 'right format';
+my $str = $headers->header('X-Test');
+is $str, "23, 24, single line, 25, 26", 'right format';
 
 # Parse headers
 $headers = Mojo::Headers->new;

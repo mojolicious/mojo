@@ -166,8 +166,8 @@ Portably generate an absolute path for a file relative to the home directory.
 
 =head2 to_string
 
-  my $string = $home->to_string;
-  my $string = "$home";
+  my $str = $home->to_string;
+  my $str = "$home";
 
 Home directory.
 

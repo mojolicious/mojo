@@ -21,14 +21,14 @@ sub add_chunk {
 }
 
 sub contains {
-  my ($self, $string) = @_;
+  my ($self, $str) = @_;
 
   my $start = $self->start_range;
-  my $pos = index $self->{content}, $string, $start;
+  my $pos = index $self->{content}, $str, $start;
   $pos -= $start if $start && $pos >= 0;
   my $end = $self->end_range;
 
-  return $end && ($pos + length $string) >= $end ? -1 : $pos;
+  return $end && ($pos + length $str) >= $end ? -1 : $pos;
 }
 
 sub get_chunk {

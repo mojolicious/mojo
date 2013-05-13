@@ -611,8 +611,8 @@ everything.
   use Mojolicious::Lite;
 
   helper debug => sub {
-    my ($self, $string) = @_;
-    $self->app->log->debug($string);
+    my ($self, $str) = @_;
+    $self->app->log->debug($str);
   };
 
   get '/' => sub {
@@ -665,8 +665,8 @@ applications, plugins make that very simple.
   sub register {
     my ($self, $app) = @_;
     $app->helper(debug => sub {
-      my ($self, $string) = @_;
-      $self->app->log->debug($string);
+      my ($self, $str) = @_;
+      $self->app->log->debug($str);
     });
   }
 

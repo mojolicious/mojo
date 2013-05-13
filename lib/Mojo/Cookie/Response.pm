@@ -19,10 +19,10 @@ sub expires {
 }
 
 sub parse {
-  my ($self, $string) = @_;
+  my ($self, $str) = @_;
 
   my @cookies;
-  for my $token ($self->_tokenize($string // '')) {
+  for my $token ($self->_tokenize($str // '')) {
     for my $i (0 .. $#$token) {
       my ($name, $value) = @{$token->[$i]};
 
@@ -156,7 +156,7 @@ Parse cookies.
 
 =head2 to_string
 
-  my $string = $cookie->to_string;
+  my $str = $cookie->to_string;
 
 Render cookie.
 

@@ -539,7 +539,7 @@ multiline values are disabled by default.
 
 =head2 to_string
 
-  my $string = $headers->to_string;
+  my $str = $headers->to_string;
 
 Turn headers into a string, suitable for HTTP messages.
 

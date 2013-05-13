@@ -48,13 +48,13 @@ sub b64_decode { decode_base64($_[0]) }
 sub b64_encode { encode_base64($_[0], $_[1]) }
 
 sub camelize {
-  my $string = shift;
-  return $string if $string =~ /^[A-Z]/;
+  my $str = shift;
+  return $str if $str =~ /^[A-Z]/;
 
   # Camel case words
   return join '::', map {
     join '', map { ucfirst lc } split /_/, $_
-  } split /-/, $string;
+  } split /-/, $str;
 }
 
 sub class_to_file {
@@ -67,12 +67,12 @@ sub class_to_file {
 sub class_to_path { join '.', join('/', split /::|'/, shift), 'pm' }
 
 sub decamelize {
-  my $string = shift;
-  return $string if $string !~ /^[A-Z]/;
+  my $str = shift;
+  return $str if $str !~ /^[A-Z]/;
 
   # Module parts
   my @parts;
-  for my $part (split /::/, $string) {
+  for my $part (split /::/, $str) {
 
     # Snake case words
     my @words;
@@ -110,21 +110,21 @@ sub get_line {
 }
 
 sub hmac_sha1_sum {
-  my ($string, $secret) = @_;
+  my ($str, $secret) = @_;
   $secret = $secret ? "$secret" : 'Very insecure!';
   $secret = sha1 $secret if length $secret > 64;
 
   my $ipad = $secret ^ (chr(0x36) x 64);
   my $opad = $secret ^ (chr(0x5c) x 64);
-  return unpack 'H*', sha1($opad . sha1($ipad . $string));
+  return unpack 'H*', sha1($opad . sha1($ipad . $str));
 }
 
 sub html_unescape {
-  my $string = shift;
-  return $string if index($string, '&') == -1;
-  $string
+  my $str = shift;
+  return $str if index($str, '&') == -1;
+  $str
     =~ s/&(?:\#((?:\d{1,7}|x[[:xdigit:]]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
-  return $string;
+  return $str;
 }
 
 sub md5_bytes { md5(@_) }
@@ -245,9 +245,9 @@ sub punycode_encode {
 }
 
 sub quote {
-  my $string = shift;
-  $string =~ s/(["\\])/\\$1/g;
-  return qq{"$string"};
+  my $str = shift;
+  $str =~ s/(["\\])/\\$1/g;
+  return qq{"$str"};
 }
 
 sub secure_compare {
@@ -278,9 +278,9 @@ sub spurt {
 }
 
 sub squish {
-  my $string = trim(@_);
-  $string =~ s/\s+/ /g;
-  return $string;
+  my $str = trim(@_);
+  $str =~ s/\s+/ /g;
+  return $str;
 }
 
 sub steady_time () {
@@ -290,43 +290,43 @@ sub steady_time () {
 }
 
 sub trim {
-  my $string = shift;
-  $string =~ s/^\s+|\s+$//g;
-  return $string;
+  my $str = shift;
+  $str =~ s/^\s+|\s+$//g;
+  return $str;
 }
 
 sub unquote {
-  my $string = shift;
-  return $string unless $string =~ s/^"(.*)"$/$1/g;
-  $string =~ s/\\\\/\\/g;
-  $string =~ s/\\"/"/g;
-  return $string;
+  my $str = shift;
+  return $str unless $str =~ s/^"(.*)"$/$1/g;
+  $str =~ s/\\\\/\\/g;
+  $str =~ s/\\"/"/g;
+  return $str;
 }
 
 sub url_escape {
-  my ($string, $pattern) = @_;
+  my ($str, $pattern) = @_;
   $pattern ||= '^A-Za-z0-9\-._~';
-  $string =~ s/([$pattern])/sprintf('%%%02X',ord($1))/ge;
-  return $string;
+  $str =~ s/([$pattern])/sprintf('%%%02X',ord($1))/ge;
+  return $str;
 }
 
 sub url_unescape {
-  my $string = shift;
-  return $string if index($string, '%') == -1;
-  $string =~ s/%([[:xdigit:]]{2})/chr(hex($1))/ge;
-  return $string;
+  my $str = shift;
+  return $str if index($str, '%') == -1;
+  $str =~ s/%([[:xdigit:]]{2})/chr(hex($1))/ge;
+  return $str;
 }
 
 sub xml_escape {
-  my $string = shift;
+  my $str = shift;
 
-  $string =~ s/&/&amp;/g;
-  $string =~ s/</&lt;/g;
-  $string =~ s/>/&gt;/g;
-  $string =~ s/"/&quot;/g;
-  $string =~ s/'/&#39;/g;
+  $str =~ s/&/&amp;/g;
+  $str =~ s/</&lt;/g;
+  $str =~ s/>/&gt;/g;
+  $str =~ s/"/&quot;/g;
+  $str =~ s/'/&#39;/g;
 
-  return $string;
+  return $str;
 }
 
 sub xor_encode {
@@ -384,8 +384,8 @@ Mojo::Util - Portable utility functions
 
   use Mojo::Util qw(b64_encode url_escape url_unescape);
 
-  my $string = 'test=23';
-  my $escaped = url_escape $string;
+  my $str = 'test=23';
+  my $escaped = url_escape $str;
   say url_unescape $escaped;
   say b64_encode $escaped, '';
 
@@ -399,14 +399,14 @@ L<Mojo::Util> implements the following functions.
 
 =head2 b64_decode
 
-  my $string = b64_decode $b64;
+  my $str = b64_decode $b64;
 
 Base64 decode string.
 
 =head2 b64_encode
 
-  my $b64 = b64_encode $string;
-  my $b64 = b64_encode $string, "\n";
+  my $b64 = b64_encode $str;
+  my $b64 = b64_encode $str, "\n";
 
 Base64 encode string, the line ending defaults to a newline.
 
@@ -481,32 +481,32 @@ Encode characters to bytes.
 
 =head2 get_line
 
-  my $line = get_line \$string;
+  my $line = get_line \$str;
 
 Extract whole line from string or return C<undef>. Lines are expected to end
 with C<0x0d 0x0a> or C<0x0a>.
 
 =head2 hmac_sha1_sum
 
-  my $checksum = hmac_sha1_sum $string, 'passw0rd';
+  my $checksum = hmac_sha1_sum $str, 'passw0rd';
 
 Generate HMAC-SHA1 checksum for string.
 
 =head2 html_unescape
 
-  my $string = html_unescape $escaped;
+  my $str = html_unescape $escaped;
 
 Unescape all HTML entities in string.
 
 =head2 md5_bytes
 
-  my $checksum = md5_bytes $string;
+  my $checksum = md5_bytes $str;
 
 Generate binary MD5 checksum for string.
 
 =head2 md5_sum
 
-  my $checksum = md5_sum $string;
+  my $checksum = md5_sum $str;
 
 Generate MD5 checksum for string.
 
@@ -524,37 +524,37 @@ Monkey patch functions into package.
 
 =head2 punycode_decode
 
-  my $string = punycode_decode $punycode;
+  my $str = punycode_decode $punycode;
 
 Punycode decode string.
 
 =head2 punycode_encode
 
-  my $punycode = punycode_encode $string;
+  my $punycode = punycode_encode $str;
 
 Punycode encode string.
 
 =head2 quote
 
-  my $quoted = quote $string;
+  my $quoted = quote $str;
 
 Quote string.
 
 =head2 secure_compare
 
-  my $success = secure_compare $string1, $string2;
+  my $success = secure_compare $str1, $str2;
 
 Constant time comparison algorithm to prevent timing attacks.
 
 =head2 sha1_bytes
 
-  my $checksum = sha1_bytes $string;
+  my $checksum = sha1_bytes $str;
 
 Generate binary SHA1 checksum for string.
 
 =head2 sha1_sum
 
-  my $checksum = sha1_sum $string;
+  my $checksum = sha1_sum $str;
 
 Generate SHA1 checksum for string.
 
@@ -572,7 +572,7 @@ Write all data at once to file.
 
 =head2 squish
 
-  my $squished = squish $string;
+  my $squished = squish $str;
 
 Trim whitespace characters from both ends of string and then change all
 consecutive groups of whitespace into one space each.
@@ -586,39 +586,39 @@ available through L<Time::HiRes>.
 
 =head2 trim
 
-  my $trimmed = trim $string;
+  my $trimmed = trim $str;
 
 Trim whitespace characters from both ends of string.
 
 =head2 unquote
 
-  my $string = unquote $quoted;
+  my $str = unquote $quoted;
 
 Unquote string.
 
 =head2 url_escape
 
-  my $escaped = url_escape $string;
-  my $escaped = url_escape $string, '^A-Za-z0-9\-._~';
+  my $escaped = url_escape $str;
+  my $escaped = url_escape $str, '^A-Za-z0-9\-._~';
 
 Percent encode unsafe characters in string, the pattern used defaults to
 C<^A-Za-z0-9\-._~>.
 
 =head2 url_unescape
 
-  my $string = url_unescape $escaped;
+  my $str = url_unescape $escaped;
 
 Decode percent encoded characters in string.
 
 =head2 xml_escape
 
-  my $escaped = xml_escape $string;
+  my $escaped = xml_escape $str;
 
 Escape unsafe characters C<&>, C<E<lt>>, C<E<gt>>, C<"> and C<'> in string.
 
 =head2 xor_encode
 
-  my $encoded = xor_encode $string, $key;
+  my $encoded = xor_encode $str, $key;
 
 XOR encode string with variable length key.
 

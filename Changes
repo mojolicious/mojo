@@ -10,6 +10,8 @@
   - Changed Mojolicious default secret to the application moniker to make it
     slightly more secure.
   - Changed types in Mojolicious::Types to consistently use arrays.
+  - Changed heuristics for number detection in Mojo::JSON to better line up
+    with user expectations.
   - Removed callback support from body method in Mojo::Message.
   - Removed Mojolicious::Plugin::PoweredBy and
     Mojolicious::Plugin::RequestTimer.

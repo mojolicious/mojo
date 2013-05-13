@@ -447,13 +447,13 @@ Extract multipart boundary from C<Content-Type> header.
 
 =head2 build_body
 
-  my $string = $content->build_body;
+  my $str = $content->build_body;
 
 Render whole body.
 
 =head2 build_headers
 
-  my $string = $content->build_headers;
+  my $str = $content->build_headers;
 
 Render all headers.
 

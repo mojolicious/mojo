@@ -22,19 +22,19 @@ sub to_string {
   my $self = shift;
 
   return $self->message unless $self->verbose;
-  my $string = $self->message ? $self->message : '';
+  my $str = $self->message ? $self->message : '';
 
   # Before
-  $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
+  $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_before};
 
   # Line
-  $string .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
+  $str .= ($self->line->[0] . ': ' . $self->line->[1] . "\n")
     if $self->line->[0];
 
   # After
-  $string .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};
+  $str .= $_->[0] . ': ' . $_->[1] . "\n" for @{$self->lines_after};
 
-  return $string;
+  return $str;
 }
 
 sub trace {
@@ -198,8 +198,8 @@ Throw exception with stacktrace.
 
 =head2 to_string
 
-  my $string = $e->to_string;
-  my $string = "$e";
+  my $str = $e->to_string;
+  my $str = "$e";
 
 Render exception.
 

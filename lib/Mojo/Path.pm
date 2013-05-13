@@ -245,7 +245,7 @@ Parse path.
 
 =head2 to_abs_string
 
-  my $string = $path->to_abs_string;
+  my $str = $path->to_abs_string;
 
 Turn path into an absolute string.
 
@@ -288,8 +288,8 @@ Turn path into a route.
 
 =head2 to_string
 
-  my $string = $path->to_string;
-  my $string = "$path";
+  my $str = $path->to_string;
+  my $str = "$path";
 
 Turn path into a string.
 

@@ -559,7 +559,7 @@ Set default parameters for this route.
 
 =head2 to_string
 
-  my $string = $r->to_string;
+  my $str = $r->to_string;
 
 Stringify the whole route.
 

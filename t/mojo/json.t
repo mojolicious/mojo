@@ -282,6 +282,20 @@ is $json->encode({false => \!!$bytes}), '{"false":false}',
 is $json->encode({false => \$bytes}), '{"false":false}',
   'encode false boolean from reference';
 
+# Upgraded numbers
+my $num = 3;
+my $str = "$num";
+is $json->encode({test => [$num, $str]}), '{"test":[3,"3"]}',
+  'upgraded number detected';
+$num = 3.21;
+$str = "$num";
+is $json->encode({test => [$num, $str]}), '{"test":[3.21,"3.21"]}',
+  'upgraded number detected';
+$str = '0 but true';
+$num = 1 + $str;
+is $json->encode({test => [$num, $str]}), '{"test":[1,0]}',
+  'upgraded number detected';
+
 # Errors
 is $json->decode('["♥"]'), undef, 'wide character in input';
 is $json->error, 'Wide character in input', 'right error';

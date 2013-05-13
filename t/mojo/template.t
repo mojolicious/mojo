@@ -132,10 +132,10 @@ is $output, "  %# 1 + 1\n", 'comment line has been replaced';
 # Replace mixed
 $mt     = Mojo::Template->new;
 $output = $mt->render(<<'EOF');
-%% my $number = <%= 20 + 3%>;
-The number is <%%= <%= '$' %>number %>.
+%% my $num = <%= 20 + 3%>;
+The number is <%%= <%= '$' %>num %>.
 EOF
-is $output, "% my \$number = 23;\nThe number is <%= \$number %>.\n",
+is $output, "% my \$num = 23;\nThe number is <%= \$num %>.\n",
   'mixed lines have been replaced';
 
 # Helper starting with "end"

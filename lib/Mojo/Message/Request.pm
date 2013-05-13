@@ -351,7 +351,7 @@ Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
 =head2 extract_start_line
 
-  my $success = $req->extract_start_line(\$string);
+  my $success = $req->extract_start_line(\$str);
 
 Extract request line from string.
 

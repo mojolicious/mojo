@@ -4,10 +4,10 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Util 'quote';
 
 sub parse {
-  my ($self, $string) = @_;
+  my ($self, $str) = @_;
 
   my @cookies;
-  for my $token (map {@$_} $self->_tokenize($string // '')) {
+  for my $token (map {@$_} $self->_tokenize($str // '')) {
     my ($name, $value) = @$token;
     next if $name =~ /^\$/;
     push @cookies, $self->new(name => $name, value => $value // '');
@@ -61,7 +61,7 @@ Parse cookies.
 
 =head2 to_string
 
-  my $string = $cookie->to_string;
+  my $str = $cookie->to_string;
 
 Render cookie.
 

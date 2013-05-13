@@ -20,9 +20,9 @@ my $twinkle = {
   capture_end   => '-',
   capture_start => '+',
   escape        => sub {
-    my $string = shift;
-    $string =~ s/</&LT;/g;
-    return $string;
+    my $str = shift;
+    $str =~ s/</&LT;/g;
+    return $str;
   },
   escape_mark     => '*',
   expression_mark => '*',

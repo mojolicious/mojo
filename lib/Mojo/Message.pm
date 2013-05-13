@@ -505,7 +505,7 @@ Error and code.
 
 =head2 extract_start_line
 
-  my $success = $msg->extract_start_line(\$string);
+  my $success = $msg->extract_start_line(\$str);
 
 Extract start line from string. Meant to be overloaded in a subclass.
 
@@ -602,7 +602,7 @@ Size of the start line in bytes.
 
 =head2 to_string
 
-  my $string = $msg->to_string;
+  my $str = $msg->to_string;
 
 Render whole message.
 

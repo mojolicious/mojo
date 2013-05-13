@@ -340,8 +340,10 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   is(($req->error)[1], 431, 'right status');
   ok $req->is_limit_exceeded, 'limit is exceeded';
   ok $limit, 'limit is exceeded';
-  ok $req->error('Nothing important.')->is_limit_exceeded,
-    'limit is still exceeded';
+  $req->error('Nothing important.');
+  is(($req->error)[0], 'Nothing important.', 'right error');
+  is(($req->error)[1], undef, 'no status');
+  ok $req->is_limit_exceeded, 'limit is still exceeded';
 }
 
 # Parse HTTP 1.0 start line and headers (with line size limit)

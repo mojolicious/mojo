@@ -317,6 +317,7 @@ $tx = $ua->get('/echo' => 'Hello World!');
 ok !$tx->success, 'not successful';
 is(($tx->error)[0], 'Maximum message size exceeded', 'right error');
 is(($tx->error)[1], undef, 'no code');
+ok $tx->res->is_limit_exceeded, 'limit is exceeded';
 
 # 404 response
 $tx = $ua->get('/does_not_exist');

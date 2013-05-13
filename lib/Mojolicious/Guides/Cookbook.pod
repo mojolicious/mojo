@@ -450,9 +450,9 @@ shouldn't block for too long.
 =head2 WebSocket web service
 
 The WebSocket protocol offers full bi-directional low-latency communication
-channels between clients and servers. Receiving messages is as easy as
-subscribing to the event L<Mojo::Transaction::WebSocket/"message"> with the
-method L<Mojolicious::Controller/"on"> and returning it with
+channels between clients and servers. Receive messages just by subscribing to
+events such as L<Mojo::Transaction::WebSocket/"message"> with the method
+L<Mojolicious::Controller/"on"> and return them with
 L<Mojolicious::Controller/"send">.
 
   use Mojolicious::Lite;

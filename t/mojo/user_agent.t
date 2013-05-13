@@ -316,14 +316,14 @@ $ua->once(
 $tx = $ua->get('/echo' => 'Hello World!');
 ok !$tx->success, 'not successful';
 is(($tx->error)[0], 'Maximum message size exceeded', 'right error');
-is(($tx->error)[1], undef, 'no code');
+is(($tx->error)[1], undef, 'no status');
 ok $tx->res->is_limit_exceeded, 'limit is exceeded';
 
 # 404 response
 $tx = $ua->get('/does_not_exist');
 ok !$tx->success, 'not successful';
 is(($tx->error)[0], 'Not Found', 'right error');
-is(($tx->error)[1], 404,         'right code');
+is(($tx->error)[1], 404,         'right status');
 
 # Introspect
 my $req = my $res = '';

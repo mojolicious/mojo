@@ -180,7 +180,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 ok !$ws, 'not a WebSocket';
-is $code, 426, 'right code';
+is $code, 426, 'right status';
 ok $body =~ /^(\d+)failed!$/, 'right content';
 is $1, 15, 'right timeout';
 

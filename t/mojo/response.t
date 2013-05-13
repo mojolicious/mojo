@@ -787,8 +787,7 @@ is $res->headers->sec_websocket_accept, 'abcdef=',
 is $res->headers->sec_websocket_protocol, 'sample',
   'right "Sec-WebSocket-Protocol" value';
 is $res->body, '', 'no content';
-ok $res->content->has_leftovers, 'has leftovers';
-is $res->content->leftovers,     "\x81\x08\x77\x68\x61\x74\x65\x76\x65\x72",
+is $res->content->leftovers, "\x81\x08\x77\x68\x61\x74\x65\x76\x65\x72",
   'frame in leftovers';
 
 # Build WebSocket handshake response

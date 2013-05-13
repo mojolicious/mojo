@@ -64,8 +64,6 @@ sub get_header_chunk {
   return substr $self->{header_buffer}, $offset, 131072;
 }
 
-sub has_leftovers { !!length shift->leftovers }
-
 sub header_size { length shift->build_headers }
 
 sub is_chunked { !!shift->headers->transfer_encoding }
@@ -489,12 +487,6 @@ overloaded in a subclass.
   my $bytes = $content->get_header_chunk(13);
 
 Get a chunk of the headers starting from a specfic position.
-
-=head2 has_leftovers
-
-  my $success = $content->has_leftovers;
-
-Check if there are leftovers.
 
 =head2 header_size
 

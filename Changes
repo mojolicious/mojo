@@ -17,6 +17,7 @@
   - Removed captures attribute from Mojolicious::Routes::Match.
   - Removed charset attribute from Mojo::DOM::HTML.
   - Removed charset method from Mojo::DOM.
+  - Removed has_leftovers method from Mojo::Content.
   - Removed is_chunked, is_dynamic, is_multipart, has_leftovers, leftovers,
     write and write_chunk methods from Mojo::Message.
   - Removed hmac_md5_sum method from Mojo::ByteStream.

@@ -15,8 +15,8 @@ sub client_read {
   return $self->{state} = 'finished'
     if !$res->is_status_class(100) || $res->headers->upgrade;
   $self->res($res->new)->emit(unexpected => $res);
-  my $content = $res->content;
-  $self->client_read($content->leftovers) if $content->has_leftovers;
+  return unless length(my $leftovers = $res->content->leftovers);
+  $self->client_read($leftovers);
 }
 
 sub client_write { shift->_write(0) }

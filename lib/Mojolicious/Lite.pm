@@ -857,17 +857,18 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
 =head2 WebSockets
 
 WebSocket applications have never been this simple before. Just receive
-messages by subscribing to the event L<Mojo::Transaction::WebSocket/"message">
-with L<Mojolicious::Controller/"on"> and return them with
-L<Mojolicious::Controller/"send">.
+messages by subscribing to events such as
+L<Mojo::Transaction::WebSocket/"json"> with L<Mojolicious::Controller/"on">
+and return them with L<Mojolicious::Controller/"send">.
 
   use Mojolicious::Lite;
 
   websocket '/echo' => sub {
     my $self = shift;
-    $self->on(message => sub {
-      my ($self, $msg) = @_;
-      $self->send("echo: $msg");
+    $self->on(json => sub {
+      my ($self, $hash) = @_;
+      $hash->{msg} = "echo: $hash->{msg}";
+      $self->send({json => $hash});
     });
   };
 
@@ -884,10 +885,10 @@ L<Mojolicious::Controller/"send">.
       %= javascript begin
         var ws = new WebSocket('<%= url_for('echo')->to_abs %>');
         ws.onmessage = function (event) {
-          document.body.innerHTML += event.data + '<br/>';
+          document.body.innerHTML += JSON.parse(event.data).msg;
         };
         ws.onopen = function (event) {
-          ws.send('I ♥ Mojolicious!');
+          ws.send(JSON.stringify({msg: 'I ♥ Mojolicious!'}));
         };
       % end
     </head>

@@ -452,7 +452,8 @@ shouldn't block for too long.
 The WebSocket protocol offers full bi-directional low-latency communication
 channels between clients and servers. Receiving messages is as easy as
 subscribing to the event L<Mojo::Transaction::WebSocket/"message"> with the
-method L<Mojolicious::Controller/"on">.
+method L<Mojolicious::Controller/"on"> and returning it with
+L<Mojolicious::Controller/"send">.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;

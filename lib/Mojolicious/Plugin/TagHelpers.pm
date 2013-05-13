@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Mojo::ByteStream 'b';
+use Mojo::ByteStream;
 use Mojo::Util 'xml_escape';
 
 sub register {
@@ -212,7 +212,7 @@ sub _tag {
   else { $tag .= ' />' }
 
   # Prevent escaping
-  return b($tag);
+  return Mojo::ByteStream->new($tag);
 }
 
 sub _text_area {

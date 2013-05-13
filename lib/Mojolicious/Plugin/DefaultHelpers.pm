@@ -16,11 +16,9 @@ sub register {
   for my $name (qw(extends layout title)) {
     $app->helper(
       $name => sub {
-        my $self  = shift;
-        my $stash = $self->stash;
-        $stash->{$name} = shift if @_;
-        $self->stash(@_) if @_;
-        return $stash->{$name};
+        my $self = shift;
+        $self->stash($name => @_) if @_;
+        return $self->stash->{$name};
       }
     );
   }

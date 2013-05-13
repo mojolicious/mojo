@@ -1052,16 +1052,17 @@ like "$output", qr/exception\.mt line 2/, 'right result';
 
 # Exception in file (different name)
 $mt     = Mojo::Template->new;
-$output = $mt->name('foo.mt')->render_file($file);
+$output = $mt->name('"foo.mt" from DATA section')->render_file($file);
 isa_ok $output, 'Mojo::Exception', 'right exception';
-like $output->message, qr/foo\.mt line 2/, 'message contains filename';
+like $output->message, qr/foo\.mt from DATA section line 2/,
+  'message contains filename';
 is $output->lines_before->[0][0], 1,      'right number';
 is $output->lines_before->[0][1], 'test', 'right line';
 is $output->line->[0], 2,        'right number';
 is $output->line->[1], '% die;', 'right line';
 is $output->lines_after->[0][0], 3,     'right number';
 is $output->lines_after->[0][1], '123', 'right line';
-like "$output", qr/foo\.mt line 2/, 'right result';
+like "$output", qr/foo\.mt from DATA section line 2/, 'right result';
 
 # Exception with UTF-8 context
 $mt     = Mojo::Template->new;

@@ -53,6 +53,7 @@
   - Fixed layout bugs in Mojolicious::Renderer.
   - Fixed support for HEAD request method in Mojo::Server::CGI and
     Mojo::Server::PSGI.
+  - Fixed small line directive bug in Mojo::Template.
   - Fixed small limit bug in Mojo::Message.
 
 3.97  2013-04-25

@@ -43,13 +43,14 @@ sub _epl {
       # Try template
       if (-r $path) {
         $log->debug(qq{Rendering template "$t".});
-        $$output = $mt->name("template $t")->render_file($path, $c);
+        $$output = $mt->name(qq{template "$t"})->render_file($path, $c);
       }
 
       # Try DATA section
       elsif (my $d = $renderer->get_data_template($options)) {
         $log->debug(qq{Rendering template "$t" from DATA section.});
-        $$output = $mt->name("template $t from DATA section")->render($d, $c);
+        $$output
+          = $mt->name(qq{template "$t" from DATA section})->render($d, $c);
       }
 
       # No template

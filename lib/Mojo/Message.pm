@@ -145,10 +145,7 @@ sub headers { shift->content->headers }
 
 sub is_finished { (shift->{state} // '') eq 'finished' }
 
-sub is_limit_exceeded {
-  return undef unless my $code = (shift->error)[1];
-  return !!($code eq 413 || $code eq 431);
-}
+sub is_limit_exceeded { !!shift->{limit} }
 
 sub json {
   my ($self, $pointer) = @_;
@@ -163,7 +160,7 @@ sub parse {
   my ($self, $chunk) = @_;
 
   # Check message size
-  return $self->error('Maximum message size exceeded', 413)
+  return $self->_limit('Maximum message size exceeded', 413)
     if ($self->{raw_size} += length($chunk //= '')) > $self->max_message_size;
 
   $self->{buffer} .= $chunk;
@@ -174,7 +171,7 @@ sub parse {
     # Check line size
     my $len = index $self->{buffer}, "\x0a";
     $len = length $self->{buffer} if $len < 0;
-    return $self->error('Maximum line size exceeded', 431)
+    return $self->_limit('Maximum line size exceeded', 431)
       if $len > $self->max_line_size;
 
     $self->{state} = 'content' if $self->extract_start_line(\$self->{buffer});
@@ -186,7 +183,7 @@ sub parse {
     if $state eq 'content' || $state eq 'finished';
 
   # Check line size
-  return $self->error('Maximum line size exceeded', 431)
+  return $self->_limit('Maximum line size exceeded', 431)
     if $self->headers->is_limit_exceeded;
 
   # Check buffer size
@@ -258,6 +255,12 @@ sub _cache {
 
   return unless my $objects = $self->{$method}{$name};
   return wantarray ? @$objects : $objects->[0];
+}
+
+sub _limit {
+  my $self = shift;
+  $self->{limit} = 1;
+  $self->error(@_);
 }
 
 sub _parse_formdata {

@@ -329,6 +329,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 # Parse HTTP 1.0 start line (with line size limit)
 {
   $req = Mojo::Message::Request->new;
+  my $limit;
+  $req->on(finish => sub { $limit = shift->is_limit_exceeded });
   ok !$req->is_limit_exceeded, 'limit is not exceeded';
   local $ENV{MOJO_MAX_LINE_SIZE} = 5;
   is $req->headers->max_line_size, 5, 'right size';
@@ -337,6 +339,9 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   is(($req->error)[0], 'Maximum line size exceeded', 'right error');
   is(($req->error)[1], 431, 'right status');
   ok $req->is_limit_exceeded, 'limit is exceeded';
+  ok $limit, 'limit is exceeded';
+  ok $req->error('Nothing important.')->is_limit_exceeded,
+    'limit is still exceeded';
 }
 
 # Parse HTTP 1.0 start line and headers (with line size limit)
@@ -355,6 +360,8 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
 # Parse HTTP 1.0 start line (with message size limit)
 {
   $req = Mojo::Message::Request->new;
+  my $limit;
+  $req->on(finish => sub { $limit = shift->is_limit_exceeded });
   local $ENV{MOJO_MAX_MESSAGE_SIZE} = 5;
   is $req->max_message_size, 5, 'right size';
   $req->parse('GET /foo/bar/baz.html HTTP/1');
@@ -362,6 +369,7 @@ is $req->headers->content_length, undef,        'no "Content-Length" value';
   is(($req->error)[0], 'Maximum message size exceeded', 'right error');
   is(($req->error)[1], 413, 'right status');
   ok $req->is_limit_exceeded, 'limit is exceeded';
+  ok $limit, 'limit is exceeded';
 }
 
 # Parse HTTP 1.0 start line and headers (with message size limit)

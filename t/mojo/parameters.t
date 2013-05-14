@@ -10,18 +10,13 @@ is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
 is $params2->to_string, 'x=1&y=2',           'right format';
 is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
 is_deeply $params->params, ['foo', 'b;ar', 'baz', 23], 'right structure';
-is $params->[0], 'foo',  'right value';
-is $params->[1], 'b;ar', 'right value';
-is $params->[2], 'baz',  'right value';
-is $params->[3], 23,     'right value';
-is $params->[4], undef,  'no value';
 
 # Append
 is_deeply $params->params, ['foo', 'b;ar', 'baz', 23], 'right structure';
 $params->append(a => 4, a => 5, b => 6, b => 7);
-is $params->to_string, "foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7", 'right format';
+is $params->to_string, 'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7', 'right format';
 push @$params, c => 'f;oo';
-is $params->to_string, "foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo",
+is $params->to_string, 'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo',
   'right format';
 
 # Clone
@@ -63,17 +58,17 @@ is_deeply [$params->param], [qw(q t w)], 'right structure';
 $params->append('a', 4, 'a', 5, 'b', 6, 'b', 7);
 is_deeply $params->to_hash,
   {a => [4, 5], b => [6, 7], q => 1, w => 2, t => 7}, 'right structure';
-$params = Mojo::Parameters->new(foo => undef, bar => 'bar');
+$params = Mojo::Parameters->new(foo => '', bar => 'bar');
 is $params->to_string, 'foo=&bar=bar', 'right format';
-$params = Mojo::Parameters->new(bar => 'bar', foo => undef);
+$params = Mojo::Parameters->new(bar => 'bar', foo => '');
 is $params->to_string, 'bar=bar&foo=', 'right format';
 
 # "0"
 $params = Mojo::Parameters->new(foo => 0);
-is_deeply $params->param('foo'), 0, 'right structure';
+is $params->param('foo'), 0, 'right value';
 is $params->to_string, 'foo=0', 'right format';
 $params = Mojo::Parameters->new($params->to_string);
-is_deeply $params->param('foo'), 0, 'right structure';
+is $params->param('foo'), 0, 'right value';
 is $params->to_hash->{foo}, 0, 'right value';
 is_deeply $params->to_hash, {foo => 0}, 'right structure';
 is $params->to_string, 'foo=0', 'right format';
@@ -95,41 +90,26 @@ is "$params", 'foo=bar&baz=23', 'right format';
 $params = Mojo::Parameters->new('foo=bar;baz=23');
 is "$params", 'foo=bar;baz=23', 'right format';
 
-# Undefined params
-$params = Mojo::Parameters->new;
-$params->append('c',   undef);
-$params->append(undef, 'c');
-$params->append(undef, undef);
-is $params->to_string, "c=&=c&=", 'right format';
-is_deeply $params->to_hash, {c => '', '' => ['c', '']}, 'right structure';
-$params->remove('c');
-is $params->to_string, "=c&=", 'right format';
-$params->remove(undef);
-ok !$params->to_string, 'empty';
-$params->parse('');
-ok !$params->to_string, 'empty';
-is_deeply $params->to_hash, {}, 'right structure';
-
 # Empty params
 $params = Mojo::Parameters->new('c=');
 is $params->to_hash->{c}, '', 'right value';
 is_deeply $params->to_hash, {c => ''}, 'right structure';
-$params = Mojo::Parameters->new('c=&d=');
-is $params->to_hash->{c}, '', 'right value';
+$params = Mojo::Parameters->new('c=&c=&d=');
+is_deeply $params->to_hash->{c}, ['', ''], 'right values';
 is $params->to_hash->{d}, '', 'right value';
-is_deeply $params->to_hash, {c => '', d => ''}, 'right structure';
+is_deeply $params->to_hash, {c => ['', ''], d => ''}, 'right structure';
 $params = Mojo::Parameters->new('c=&d=0&e=');
 is $params->to_hash->{c}, '', 'right value';
 is $params->to_hash->{d}, 0,  'right value';
 is $params->to_hash->{e}, '', 'right value';
 is_deeply $params->to_hash, {c => '', d => 0, e => ''}, 'right structure';
 
-# +
+# "+"
 $params = Mojo::Parameters->new('foo=%2B');
 is $params->param('foo'), '+', 'right value';
 is_deeply $params->to_hash, {foo => '+'}, 'right structure';
 $params->param('foo ' => 'a');
-is $params->to_string, "foo=%2B&foo+=a", 'right format';
+is $params->to_string, 'foo=%2B&foo+=a', 'right format';
 $params->remove('foo ');
 is_deeply $params->to_hash, {foo => '+'}, 'right structure';
 $params->append('1 2', '3+3');
@@ -166,17 +146,15 @@ is_deeply [$params->param('foo')], [qw(ba;r b;az)], 'right values';
 # Unicode
 $params = Mojo::Parameters->new;
 $params->parse('input=say%20%22%C2%AB~%22;');
-is $params->params->[1], 'say "«~"', 'right value';
+is_deeply $params->params, ['input', 'say "«~"'], 'right structure';
 is $params->param('input'), 'say "«~"', 'right value';
 is "$params", 'input=say+%22%C2%AB~%22', 'right result';
 $params = Mojo::Parameters->new('♥=☃');
-is $params->params->[0], '♥', 'right value';
-is $params->params->[1], '☃', 'right value';
+is_deeply $params->params, ['♥', '☃'], 'right structure';
 is $params->param('♥'), '☃', 'right value';
 is "$params", '%E2%99%A5=%E2%98%83', 'right result';
 $params = Mojo::Parameters->new('%E2%99%A5=%E2%98%83');
-is $params->params->[0], '♥', 'right value';
-is $params->params->[1], '☃', 'right value';
+is_deeply $params->params, ['♥', '☃'], 'right structure';
 is $params->param('♥'), '☃', 'right value';
 is "$params", '%E2%99%A5=%E2%98%83', 'right result';
 

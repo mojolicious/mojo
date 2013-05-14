@@ -90,7 +90,7 @@ $app->routes->post(
     $local_port     = $self->tx->local_port;
     $remote_address = $self->tx->remote_address;
     $remote_port    = $self->tx->remote_port;
-    $self->render_data($self->req->upload('file')->slurp);
+    $self->render(data => $self->req->upload('file')->slurp);
   }
 );
 

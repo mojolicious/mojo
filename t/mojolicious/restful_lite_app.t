@@ -19,9 +19,9 @@ under '/rest';
 get sub {
   my $self = shift;
   $self->respond_to(
-    json => sub { $self->render_json({just => 'works'}) },
-    html => sub { $self->render_data('<html><body>works') },
-    xml  => sub { $self->render_data('<just>works</just>') }
+    json => sub { $self->render(json => {just => 'works'}) },
+    html => sub { $self->render(data => '<html><body>works') },
+    xml  => sub { $self->render(data => '<just>works</just>') }
   );
 };
 

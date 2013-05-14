@@ -354,7 +354,7 @@ L<Mojolicious::Controller/"render_not_found">.
     return $self->render_exception('Division by zero!') if $divisor == 0;
 
     # 200
-    $self->render_text($dividend / $divisor);
+    $self->render(text => $dividend / $divisor);
   };
 
   app->start;
@@ -681,7 +681,7 @@ The C<register> method will be called when you load the plugin.
   get '/' => sub {
     my $self = shift;
     $self->debug('It works.');
-    $self->render_text('Hello.');
+    $self->render(text => 'Hello.');
   };
 
   app->start;

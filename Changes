@@ -3,6 +3,7 @@
   - Code name "Top Hat", this is a major release.
   - Added simple JSON serialization support to Mojo::Transaction::WebSocket.
   - Added json event to Mojo::Transaction::WebSocket.
+  - Added render_maybe method to Mojolicious::Controller.
   - Added again method to Mojo::Reactor, Mojo::Reactor::Poll and
     Mojo::Reactor::EV.
   - Added is_empty method to Mojo::Transaction::HTTP.
@@ -20,6 +21,8 @@
   - Removed captures attribute from Mojolicious::Routes::Match.
   - Removed charset attribute from Mojo::DOM::HTML.
   - Removed charset method from Mojo::DOM.
+  - Removed render_data, render_json, render_partial and render_text methods
+    from Mojolicious::Controller.
   - Removed has_leftovers method from Mojo::Content.
   - Removed is_chunked, is_dynamic, is_multipart, has_leftovers, leftovers,
     write and write_chunk methods from Mojo::Message.

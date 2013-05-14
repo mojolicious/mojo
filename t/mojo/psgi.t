@@ -19,12 +19,12 @@ get '/cookies' => sub {
   my $self   = shift;
   my $params = $self->req->params->to_hash;
   for my $key (sort keys %$params) { $self->cookie($key, $params->{$key}) }
-  $self->render_text('nomnomnom');
+  $self->render(text => 'nomnomnom');
 };
 
 post '/params' => sub {
   my $self = shift;
-  $self->render_json($self->req->params->to_hash);
+  $self->render(json => $self->req->params->to_hash);
 };
 
 # Binding

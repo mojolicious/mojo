@@ -29,7 +29,7 @@ post '/chunked' => sub {
 
 get '/params' => sub {
   my $self = shift;
-  $self->render_json($self->req->params->to_hash);
+  $self->render(json => $self->req->params->to_hash);
 };
 
 # Simple

@@ -27,7 +27,7 @@ get '/' => sub {
     $self->req->headers->header('X-Works'));
   my $rel = $self->req->url;
   my $abs = $rel->to_abs;
-  $self->render_text("Hello World! $rel $abs");
+  $self->render(text => "Hello World! $rel $abs");
 };
 
 get '/broken_redirect' => sub {
@@ -38,7 +38,7 @@ get '/broken_redirect' => sub {
 
 get '/proxy' => sub {
   my $self = shift;
-  $self->render_text($self->req->url->to_abs);
+  $self->render(text => $self->req->url->to_abs);
 };
 
 websocket '/test' => sub {

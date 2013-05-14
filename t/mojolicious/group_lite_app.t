@@ -30,12 +30,12 @@ under sub {
 
 get '/with_under' => sub {
   my $self = shift;
-  $self->render_text('Unders are cool!');
+  $self->render(text => 'Unders are cool!');
 };
 
 get '/with_under_too' => sub {
   my $self = shift;
-  $self->render_text('Unders are cool too!');
+  $self->render(text => 'Unders are cool too!');
 };
 
 under sub {
@@ -53,7 +53,7 @@ under sub {
 get '/param_auth';
 
 get '/param_auth/too' =>
-  sub { shift->render_text('You could be Bender too!') };
+  sub { shift->render(text => 'You could be Bender too!') };
 
 under sub {
   my $self = shift;
@@ -77,7 +77,7 @@ hook after_dispatch => sub {
 get '/late/session' => sub {
   my $self = shift;
   my $late = $self->session('late') || 'not yet!';
-  $self->render_text($late);
+  $self->render(text => $late);
 };
 
 # Counter

@@ -18,12 +18,12 @@ get '/' => sub {
   my $self = shift;
   my $rel  = $self->req->url;
   my $abs  = $rel->to_abs;
-  $self->render_text("Hello World! $rel $abs");
+  $self->render(text => "Hello World! $rel $abs");
 };
 
 get '/proxy' => sub {
   my $self = shift;
-  $self->render_text($self->req->url);
+  $self->render(text => $self->req->url);
 };
 
 websocket '/test' => sub {

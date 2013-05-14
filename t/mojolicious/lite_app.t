@@ -39,7 +39,7 @@ app->types->type(txt => 'text/plain;charset=UTF-8');
 
 get '/☃' => sub {
   my $self = shift;
-  $self->render_text($self->url_for . $self->url_for('current'));
+  $self->render(text => $self->url_for . $self->url_for('current'));
 };
 
 get '/uni/aäb' => sub {
@@ -56,17 +56,17 @@ get '/' => 'root';
 
 get '/alternatives/:char' => [char => [qw(☃ ♥)]] => sub {
   my $self = shift;
-  $self->render_text($self->url_for);
+  $self->render(text => $self->url_for);
 };
 
 get '/alterformat' => [format => ['json']] => {format => 'json'} => sub {
   my $self = shift;
-  $self->render_text($self->stash('format'));
+  $self->render(text => $self->stash('format'));
 };
 
 get '/noformat' => [format => 0] => {format => 'xml'} => sub {
   my $self = shift;
-  $self->render_text($self->stash('format') . $self->url_for);
+  $self->render(text => $self->stash('format') . $self->url_for);
 };
 
 del sub { shift->render(text => 'Hello!') };
@@ -76,7 +76,7 @@ any sub { shift->render(text => 'Bye!') };
 post '/multipart/form' => sub {
   my $self = shift;
   my @test = $self->param('test');
-  $self->render_text(join "\n", @test);
+  $self->render(text => join "\n", @test);
 };
 
 get '/auto_name' => sub {
@@ -86,7 +86,7 @@ get '/auto_name' => sub {
 
 get '/query_string' => sub {
   my $self = shift;
-  $self->render_text(b($self->req->url->query)->url_unescape);
+  $self->render(text => b($self->req->url->query)->url_unescape);
 };
 
 get '/multi/:bar' => sub {
@@ -100,7 +100,7 @@ get '/multi/:bar' => sub {
 
 get '/reserved' => sub {
   my $self = shift;
-  $self->render_text($self->param('data') . join(',', $self->param));
+  $self->render(text => $self->param('data') . join(',', $self->param));
 };
 
 get '/custom_name' => 'auto_name';
@@ -177,7 +177,7 @@ get '/привет/мир' =>
 
 get '/root.html' => 'root_path';
 
-get '/root' => sub { shift->render_text('root fallback!') };
+get '/root' => sub { shift->render(text => 'root fallback!') };
 
 get '/template.txt' => {template => 'template', format => 'txt'};
 
@@ -186,7 +186,7 @@ get ':number' => [number => qr/0/] => sub {
   my $url     = $self->req->url->to_abs;
   my $address = $self->tx->remote_address;
   my $num     = $self->param('number');
-  $self->render_text("$url-$address-$num");
+  $self->render(text => "$url-$address-$num");
 };
 
 del '/inline/epl' => sub { shift->render(inline => '<%= 1 + 1 %> ☃') };
@@ -210,23 +210,23 @@ get '/source' => sub {
   my $file = $self->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
   $self->render('this_does_not_ever_exist')
     or $self->render_static($file)
-    or $self->render_text('does not exist!', status => 404);
+    or $self->render(text => 'does not exist!', status => 404);
 };
 
 get '/foo_relaxed/#test' => sub {
   my $self = shift;
-  $self->render_text(
-    $self->stash('test') . ($self->req->headers->dnt ? 1 : 0));
+  $self->render(
+    text => $self->stash('test') . ($self->req->headers->dnt ? 1 : 0));
 };
 
 get '/foo_wildcard/(*test)' => sub {
   my $self = shift;
-  $self->render_text($self->stash('test'));
+  $self->render(text => $self->stash('test'));
 };
 
 get '/foo_wildcard_too/*test' => sub {
   my $self = shift;
-  $self->render_text($self->stash('test'));
+  $self->render(text => $self->stash('test'));
 };
 
 get '/with/header/condition' => (
@@ -236,12 +236,13 @@ get '/with/header/condition' => (
 
 post '/with/header/condition' => sub {
   my $self = shift;
-  $self->render_text('foo ' . $self->req->headers->header('X-Secret-Header'));
+  $self->render(
+    text => 'foo ' . $self->req->headers->header('X-Secret-Header'));
 } => (headers => {'X-Secret-Header' => 'bar'});
 
 get '/session_cookie' => sub {
   my $self = shift;
-  $self->render_text('Cookie set!');
+  $self->render(text => 'Cookie set!');
   $self->res->cookies(
     Mojo::Cookie::Response->new(
       path  => '/session_cookie',
@@ -255,17 +256,17 @@ get '/session_cookie/2' => sub {
   my $self    = shift;
   my $session = $self->req->cookie('session');
   my $value   = $session ? $session->value : 'missing';
-  $self->render_text("Session is $value!");
+  $self->render(text => "Session is $value!");
 };
 
 get '/foo' => sub {
   my $self = shift;
-  $self->render_text('Yea baby!');
+  $self->render(text => 'Yea baby!');
 };
 
 get '/layout' => sub {
-  shift->render_text(
-    'Yea baby!',
+  shift->render(
+    text    => 'Yea baby!',
     layout  => 'layout',
     handler => 'epl',
     title   => 'Layout'
@@ -276,27 +277,27 @@ post '/template' => 'index';
 
 any '/something' => sub {
   my $self = shift;
-  $self->render_text('Just works!');
+  $self->render(text => 'Just works!');
 };
 
 any [qw(get post)] => '/something/else' => sub {
   my $self = shift;
-  $self->render_text('Yay!');
+  $self->render(text => 'Yay!');
 };
 
 get '/regex/:test' => [test => qr/\d+/] => sub {
   my $self = shift;
-  $self->render_text($self->stash('test'));
+  $self->render(text => $self->stash('test'));
 };
 
 post '/bar/:test' => {test => 'default'} => sub {
   my $self = shift;
-  $self->render_text($self->stash('test'));
+  $self->render(text => $self->stash('test'));
 };
 
 patch '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
   my $self = shift;
-  $self->render_text($self->url_for('foxy', stuff => 'foo'));
+  $self->render(text => $self->url_for('foxy', stuff => 'foo'));
 } => 'foxy';
 
 get '/url_for_foxy' => sub {
@@ -308,11 +309,12 @@ post '/utf8' => 'form';
 
 post '/malformed_utf8' => sub {
   my $self = shift;
-  $self->render_text(b($self->param('foo'))->url_escape->to_string);
+  $self->render(text => b($self->param('foo'))->url_escape->to_string);
 };
 
-get '/json' =>
-  sub { shift->render_json({foo => [1, -2, 3, 'b☃r']}, layout => 'layout') };
+get '/json' => sub {
+  shift->render(json => {foo => [1, -2, 3, 'b☃r']}, layout => 'layout');
+};
 
 get '/autostash' => sub { shift->render(handler => 'ep', foo => 'bar') };
 
@@ -325,7 +327,7 @@ get '/eperror' => sub { shift->render(handler => 'ep') } => 'eperror';
 
 get '/subrequest' => sub {
   my $self = shift;
-  $self->render_text($self->ua->post('/template')->success->body);
+  $self->render(text => $self->ua->post('/template')->success->body);
 };
 
 # Make sure hook runs non-blocking
@@ -337,7 +339,7 @@ get '/subrequest_non_blocking' => sub {
   $self->ua->post(
     '/template' => sub {
       my ($ua, $tx) = @_;
-      $self->render_text($tx->res->body . $self->stash->{nb});
+      $self->render(text => $tx->res->body . $self->stash->{nb});
       $nb = $self->stash->{nb};
     }
   );
@@ -345,15 +347,15 @@ get '/subrequest_non_blocking' => sub {
 };
 
 get '/redirect_url' => sub {
-  shift->redirect_to('http://127.0.0.1/foo')->render_text('Redirecting!');
+  shift->redirect_to('http://127.0.0.1/foo')->render(text => 'Redirecting!');
 };
 
 get '/redirect_path' => sub {
-  shift->redirect_to('/foo/bar?foo=bar')->render_text('Redirecting!');
+  shift->redirect_to('/foo/bar?foo=bar')->render(text => 'Redirecting!');
 };
 
 get '/redirect_named' => sub {
-  shift->redirect_to('index', format => 'txt')->render_text('Redirecting!');
+  shift->redirect_to('index', format => 'txt')->render(text => 'Redirecting!');
 };
 
 get '/redirect_no_render' => sub {

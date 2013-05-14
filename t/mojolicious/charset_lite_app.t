@@ -29,12 +29,12 @@ get '/' => 'index';
 
 post '/' => sub {
   my $self = shift;
-  $self->render_text("foo: " . $self->param('foo'));
+  $self->render(text => "foo: " . $self->param('foo'));
 };
 
 post '/data' => sub {
   my $self = shift;
-  $self->render_data($self->req->body, format => 'bin');
+  $self->render(data => $self->req->body, format => 'bin');
 };
 
 get '/unicode' => sub {
@@ -42,14 +42,14 @@ get '/unicode' => sub {
   $self->render(test => $yatta, handler => 'test', format => 'txt');
 };
 
-get '/json' => sub { shift->render_json({test => $yatta}) };
+get '/json' => sub { shift->render(json => {test => $yatta}) };
 
-get '/привет/мир' => sub { shift->render_json({foo => $yatta}) };
+get '/привет/мир' => sub { shift->render(json => {foo => $yatta}) };
 
 get '/params' => sub {
   my $self = shift;
-  $self->render_json(
-    {
+  $self->render(
+    json => {
       params => $self->req->url->query->to_hash,
       yatta  => $self->param(['yatta'])
     }

@@ -8,7 +8,7 @@ sub authenticated {
 
 sub config {
   my $self = shift;
-  $self->render_text($self->stash('config')->{test});
+  $self->render(text => $self->stash('config')->{test});
 }
 
 sub fun { shift->render(text => 'Have fun!') }
@@ -21,24 +21,24 @@ sub index {
 
 sub plugin_camel_case {
   my $self = shift;
-  $self->render_text($self->some_plugin);
+  $self->render(text => $self->some_plugin);
 }
 
 sub plugin_upper_case {
   my $self = shift;
-  $self->render_text($self->upper_case_test_plugin);
+  $self->render(text => $self->upper_case_test_plugin);
 }
 
 sub session_domain {
   my $self = shift;
   $self->session(user => 'Bender');
-  $self->render_text('Bender rockzzz!');
+  $self->render(text => 'Bender rockzzz!');
 }
 
 sub something {
   my $self = shift;
   $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-  $self->render_text($self->url_for('something', something => '42'));
+  $self->render(text => $self->url_for('something', something => '42'));
 }
 
 sub stage1 {
@@ -48,13 +48,13 @@ sub stage1 {
   return 1 if $self->req->headers->header('X-Pass');
 
   # Fail
-  $self->render_text('Go away!');
+  $self->render(text => 'Go away!');
   return undef;
 }
 
 sub stage2 {
   my $self = shift;
-  $self->render_text($self->some_plugin);
+  $self->render(text => $self->some_plugin);
 }
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }
@@ -64,12 +64,12 @@ sub templateless { shift->render(handler => 'test') }
 sub test {
   my $self = shift;
   $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
-  $self->render_text($self->url_for(controller => 'bar'));
+  $self->render(text => $self->url_for(controller => 'bar'));
 }
 
 sub url_for_missing {
   my $self = shift;
-  $self->render_text($self->url_for('does_not_exist', something => '42'));
+  $self->render(text => $self->url_for('does_not_exist', something => '42'));
 }
 
 sub willdie { die 'for some reason' }

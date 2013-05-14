@@ -21,7 +21,7 @@ get '/' => 'index';
 
 get '/echo' => sub {
   my $self = shift;
-  $self->render_text('echo: ' . ($self->stash('message') || 'nothing!'));
+  $self->render(text => 'echo: ' . ($self->stash('message') || 'nothing!'));
 };
 
 get '/stream' => sub {
@@ -36,7 +36,7 @@ get '/url/☃' => sub {
   my $self  = shift;
   my $route = $self->url_for;
   my $rel   = $self->url_for('/☃/stream');
-  $self->render_text("$route -> $rel!");
+  $self->render(text => "$route -> $rel!");
 };
 
 get '/host' => (message => 'it works!') => sub {
@@ -44,7 +44,7 @@ get '/host' => (message => 'it works!') => sub {
   $self->render(text => $self->url_for->base->host);
 };
 
-get '/one' => sub { shift->render_text('One') };
+get '/one' => sub { shift->render(text => 'One') };
 
 get '/one/two' => {text => 'Two'};
 

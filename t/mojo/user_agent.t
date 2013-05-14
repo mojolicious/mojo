@@ -38,12 +38,12 @@ get '/echo' => sub {
   my $self = shift;
   gzip \(my $uncompressed = $self->req->body), \my $compressed;
   $self->res->headers->content_encoding($self->req->headers->accept_encoding);
-  $self->render_data($compressed);
+  $self->render(data => $compressed);
 };
 
 post '/echo' => sub {
   my $self = shift;
-  $self->render_data($self->req->body);
+  $self->render(data => $self->req->body);
 };
 
 # Proxy detection

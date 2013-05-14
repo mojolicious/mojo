@@ -150,14 +150,18 @@ sub render {
 
   # Template may be first argument
   my $template = @_ % 2 && !ref $_[0] ? shift : undef;
-  my $args = ref $_[0] ? $_[0] : {@_};
+  my $args = {@_};
   $args->{template} = $template if $template;
+  my $maybe = delete $args->{'mojo.maybe'};
 
   # Render
   my $app = $self->app;
   my ($output, $format) = $app->renderer->render($self, $args);
-  return undef unless defined $output;
-  return Mojo::ByteStream->new($output) if $args->{partial};
+  return defined $output ? Mojo::ByteStream->new($output) : undef
+    if $args->{partial};
+
+  # Maybe
+  return $maybe ? undef : !!$self->render_not_found unless defined $output;
 
   # Prepare response
   $app->plugins->emit_hook(after_render => $self, \$output, $format);
@@ -166,8 +170,6 @@ sub render {
     unless $headers->content_type;
   return !!$self->rendered($self->stash->{status});
 }
-
-sub render_data { shift->render(data => @_) }
 
 sub render_exception {
   my ($self, $e) = @_;
@@ -197,9 +199,9 @@ sub render_exception {
   $self->_fallbacks({%$options, format => 'html'}, 'exception', $inline);
 }
 
-sub render_json { shift->render(json => @_) }
-
 sub render_later { shift->stash('mojo.rendered' => 1) }
+
+sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
 sub render_not_found {
   my $self = shift;
@@ -217,13 +219,6 @@ sub render_not_found {
   $self->_fallbacks({%$options, format => 'html'}, 'not_found', $inline);
 }
 
-sub render_partial {
-  my $self = shift;
-  my $template = @_ % 2 ? shift : undef;
-  return $self->render(
-    {@_, partial => 1, defined $template ? (template => $template) : ()});
-}
-
 sub render_static {
   my ($self, $file) = @_;
   my $app = $self->app;
@@ -231,8 +226,6 @@ sub render_static {
   $app->log->debug(qq{File "$file" not found, public directory missing?});
   return undef;
 }
-
-sub render_text { shift->render(text => @_) }
 
 sub rendered {
   my ($self, $status) = @_;
@@ -295,7 +288,7 @@ sub respond_to {
   }
 
   # Dispatch
-  ref $target eq 'CODE' ? $target->($self) : $self->render($target);
+  ref $target eq 'CODE' ? $target->($self) : $self->render(%$target);
 }
 
 sub send {
@@ -446,18 +439,18 @@ sub _fallbacks {
   my ($self, $options, $template, $inline) = @_;
 
   # Mode specific template
-  return 1 if $self->render($options);
+  return 1 if $self->render_maybe(%$options);
 
   # Normal template
   $options->{template} = $template;
-  return 1 if $self->render($options);
+  return 1 if $self->render_maybe(%$options);
 
   # Inline template
   my $stash = $self->stash;
   return undef unless $stash->{format} eq 'html';
   delete $stash->{$_} for qw(extends layout);
   delete $options->{template};
-  return $self->render(%$options, inline => $inline, handler => 'ep');
+  return $self->render_maybe(%$options, inline => $inline, handler => 'ep');
 }
 
 1;
@@ -650,7 +643,6 @@ Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
 
   my $success = $c->render;
   my $success = $c->render(controller => 'foo', action => 'bar');
-  my $success = $c->render({controller => 'foo', action => 'bar'});
   my $success = $c->render(template => 'foo/index');
   my $success = $c->render(template => 'index', format => 'html');
   my $success = $c->render(data => $bytes);
@@ -665,17 +657,6 @@ C<after_render> hook unless the result is C<partial>. If no template is
 provided a default one based on controller and action or route name will be
 generated, all additional values get merged into the C<stash>.
 
-=head2 render_data
-
-  $c->render_data($bytes);
-  $c->render_data($bytes, format => 'png');
-
-Render the given content as bytes, similar to C<render_text> but data will not
-be encoded. All additional values get merged into the C<stash>.
-
-  # Longer version
-  $c->render(data => $bytes);
-
 =head2 render_exception
 
   $c->render_exception('Oops!');
@@ -685,17 +666,6 @@ Render the exception template C<exception.$mode.$format.*> or
 C<exception.$format.*> and set the response status code to C<500>. Also sets
 the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot>
 to a copy of the C<stash> for use in the templates.
-
-=head2 render_json
-
-  $c->render_json({foo => 'bar'});
-  $c->render_json([1, 2, -3], status => 201);
-
-Render a data structure as JSON. All additional values get merged into the
-C<stash>.
-
-  # Longer version
-  $c->render(json => {foo => 'bar'});
 
 =head2 render_later
 
@@ -710,23 +680,27 @@ automatic rendering would result in a response.
     $c->render(text => 'Delayed by 2 seconds!');
   });
 
+=head2 render_maybe
+
+  my $success = $c->render_maybe;
+  my $success = $c->render_maybe(controller => 'foo', action => 'bar');
+  my $success = $c->render_maybe(template => 'foo/index');
+  my $success = $c->render_maybe(template => 'index', format => 'html');
+  my $success = $c->render_maybe(data => $bytes);
+  my $success = $c->render_maybe(text => 'Hello!');
+  my $success = $c->render_maybe(json => {foo => 'bar'});
+  my $success = $c->render_maybe(handler => 'something');
+  my $success = $c->render_maybe('foo/index');
+
+Try to render content, takes the same arguments as C<render> but does not call
+C<render_not_found> if rendering fails.
+
 =head2 render_not_found
 
   $c->render_not_found;
 
 Render the not found template C<not_found.$mode.$format.*> or
 C<not_found.$format.*> and set the response status code to C<404>.
-
-=head2 render_partial
-
-  my $output = $c->render_partial('menubar');
-  my $output = $c->render_partial('menubar', format => 'txt');
-  my $output = $c->render_partial(template => 'menubar');
-
-Same as C<render> but returns the rendered result.
-
-  # Longer version
-  my $output = $c->render('menubar', partial => 1);
 
 =head2 render_static
 
@@ -736,22 +710,6 @@ Same as C<render> but returns the rendered result.
 Render a static file using L<Mojolicious::Static/"serve">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this
 method does not protect from traversing to parent directories.
-
-=head2 render_text
-
-  $c->render_text('Hello World!');
-  $c->render_text('Hello World!', layout => 'green');
-
-Render the given content as characters, which will be encoded to bytes. All
-additional values get merged into the C<stash>. See C<render_data> for an
-alternative without encoding. Note that this does not change the content type
-of the response, which is C<text/html;charset=UTF-8> by default.
-
-  # Longer version
-  $c->render(text => 'Hello World!');
-
-  # Render "text/plain" response
-  $c->render_text('Hello World!', format => 'txt');
 
 =head2 rendered
 
@@ -807,7 +765,7 @@ more than one MIME type will be ignored, unless the C<X-Requested-With> header
 is set to the value C<XMLHttpRequest>.
 
   $c->respond_to(
-    json => sub { $c->render_json({just => 'works'}) },
+    json => sub { $c->render(json => {just => 'works'}) },
     xml  => {text => '<just>works</just>'},
     any  => {data => '', status => 204}
   );
@@ -915,13 +873,13 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
   # Non-blocking
   $c->ua->get('http://example.com' => sub {
     my ($ua, $tx) = @_;
-    $c->render_data($tx->res->body);
+    $c->render(data => $tx->res->body);
   });
 
   # Parallel non-blocking
   my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, @titles) = @_;
-    $c->render_json(\@titles);
+    $c->render(json => \@titles);
   });
   for my $url ('http://mojolicio.us', 'https://metacpan.org') {
     my $end = $delay->begin(0);

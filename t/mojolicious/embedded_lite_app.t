@@ -21,7 +21,7 @@ get '/hello' => sub {
   my $self    = shift;
   my $name    = $self->stash('name');
   my $counter = ++$self->session->{counter};
-  $self->render_text("Hello from the $name ($counter) app!");
+  $self->render(text => "Hello from the $name ($counter) app!");
 };
 
 package MyTestApp::Test1;
@@ -41,7 +41,7 @@ get '/bye' => sub {
   $self->ua->app(main::app())->get(
     '/hello/hello' => sub {
       my ($ua, $tx) = @_;
-      $self->render_text($tx->res->body . "$name! $nb");
+      $self->render(text => $tx->res->body . "$name! $nb");
     }
   );
   $nb .= 'success!';
@@ -54,7 +54,7 @@ get '/' => sub {
   my $self = shift;
   my $name = $self->param('name');
   my $url  = $self->url_for;
-  $self->render_text("Bye from the $name app! $url!");
+  $self->render(text => "Bye from the $name app! $url!");
 };
 
 package MyTestApp::Basic;

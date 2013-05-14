@@ -41,21 +41,21 @@ hook around_dispatch => sub {
 # Custom dispatcher /hello.txt
 hook before_dispatch => sub {
   my $self = shift;
-  $self->render_text('Custom static file works!')
+  $self->render(text => 'Custom static file works!')
     if $self->req->url->path->contains('/hello.txt');
 };
 
 # Custom dispatcher /custom
 hook before_dispatch => sub {
   my $self = shift;
-  $self->render_text($self->param('a'), status => 205)
+  $self->render(text => $self->param('a'), status => 205)
     if $self->req->url->path->contains('/custom');
 };
 
 # Custom dispatcher /custom_too
 hook before_routes => sub {
   my $self = shift;
-  $self->render_text('this works too')
+  $self->render(text => 'this works too')
     if $self->req->url->path->contains('/custom_too');
 };
 
@@ -86,10 +86,10 @@ app->routes->add_condition(
   }
 );
 
-get '/' => sub { shift->render_text('works') };
+get '/' => sub { shift->render(text => 'works') };
 
 # Never called if custom dispatchers work
-get '/custom' => sub { shift->render_text('does not work') };
+get '/custom' => sub { shift->render(text => 'does not work') };
 
 # Custom response
 get '/res.txt' => (res => 1) => sub {

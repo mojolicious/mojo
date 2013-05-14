@@ -103,7 +103,7 @@ sub _include {
   my @keys = keys %$args;
   local @{$self->stash}{@keys} = @{$args}{@keys};
 
-  return $self->render_partial(layout => $layout, extend => $extends);
+  return $self->render(partial => 1, layout => $layout, extend => $extends);
 }
 
 sub _url_with {

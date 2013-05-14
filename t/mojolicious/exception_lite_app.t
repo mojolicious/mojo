@@ -43,7 +43,7 @@ get '/double_dead_action_☃' => sub {
 get '/trapped' => sub {
   my $self = shift;
   eval { die {foo => 'bar'} };
-  $self->render_text($@->{foo} || 'failed');
+  $self->render(text => $@->{foo} || 'failed');
 };
 
 get '/missing_template';
@@ -60,7 +60,7 @@ package main;
 get '/trapped/too' => sub {
   my $self = shift;
   eval { die MyException->new(error => 'works') };
-  $self->render_text("$@" || 'failed');
+  $self->render(text => "$@" || 'failed');
 };
 
 # Reuse exception and snapshot

@@ -837,7 +837,7 @@ self-contained applications under a prefix.
   plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
 
   # Normal route
-  get '/' => sub { shift->render_text('Hello World!') };
+  get '/' => sub { shift->render(text => 'Hello World!') };
 
   app->start;
 

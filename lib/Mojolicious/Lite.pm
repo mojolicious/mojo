@@ -638,9 +638,9 @@ Restrictive placeholders can also be used.
   # /hello.txt
   get '/hello' => [format => [qw(json txt)]] => sub {
     my $self = shift;
-    return $self->render_json({hello => 'world'})
+    return $self->render(json => {hello => 'world'})
       if $self->stash('format') eq 'json';
-    $self->render_text('hello world');
+    $self->render(text => 'hello world');
   };
 
   app->start;

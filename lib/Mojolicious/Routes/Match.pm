@@ -18,7 +18,7 @@ sub path_for {
   # Find endpoint
   else { return $name unless $endpoint = $self->root->lookup($name) }
 
-  # Merge values
+  # Merge values (clear format)
   my $captures = $self->stack->[-1] || {};
   %values = (%$captures, format => undef, %values);
   my $pattern = $endpoint->pattern;

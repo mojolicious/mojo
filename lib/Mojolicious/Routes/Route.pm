@@ -155,10 +155,9 @@ sub to {
   return $pattern->defaults unless @_;
   my ($shortcut, %defaults) = _defaults(@_);
 
-  # Shortcut
   if ($shortcut) {
 
-    # App
+    # Application
     if (ref $shortcut || $shortcut =~ /^[\w:]+$/) {
       $defaults{app} = $shortcut;
     }
@@ -170,8 +169,7 @@ sub to {
     }
   }
 
-  # Merge defaults
-  $pattern->defaults({%{$pattern->defaults}, %defaults}) if %defaults;
+  $pattern->defaults({%{$pattern->defaults}, %defaults});
 
   return $self;
 }
@@ -363,19 +361,12 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 =head2 detour
 
   $r = $r->detour(action => 'foo');
-  $r = $r->detour({action => 'foo'});
   $r = $r->detour('controller#action');
-  $r = $r->detour('controller#action', foo => 'bar');
-  $r = $r->detour('controller#action', {foo => 'bar'});
-  $r = $r->detour(Mojolicious->new);
   $r = $r->detour(Mojolicious->new, foo => 'bar');
-  $r = $r->detour(Mojolicious->new, {foo => 'bar'});
-  $r = $r->detour('MyApp');
-  $r = $r->detour('MyApp', foo => 'bar');
   $r = $r->detour('MyApp', {foo => 'bar'});
 
 Set default parameters for this route and allow partial matching to simplify
-application embedding.
+application embedding, takes the same arguments as C<to>.
 
 =head2 find
 

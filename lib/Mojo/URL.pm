@@ -193,7 +193,7 @@ sub to_rel {
 sub to_string {
   my $self = shift;
 
-  # Protocol
+  # Scheme
   my $url = '';
   if (my $proto = $self->protocol) { $url .= "$proto:" }
 
@@ -206,14 +206,11 @@ sub to_string {
   $url .= !$authority || $path eq '' || $path =~ m!^/! ? $path : "/$path";
 
   # Query
-  if (length(my $query = $self->query)) { $url .= "?$query" }
+  if (length(my $query = $self->query->to_string)) { $url .= "?$query" }
 
   # Fragment
-  my $fragment = $self->fragment;
-  $url .= '#' . url_escape $fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?'
-    if $fragment;
-
-  return $url;
+  return $url unless my $fragment = $self->fragment;
+  return $url . '#' . url_escape $fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
 }
 
 1;

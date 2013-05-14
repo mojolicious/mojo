@@ -8,8 +8,7 @@ use overload
 
 use Mojo::Util qw(decode encode url_escape url_unescape);
 
-has charset        => 'UTF-8';
-has pair_separator => '&';
+has charset => 'UTF-8';
 
 sub new { shift->SUPER::new->parse(@_) }
 
@@ -34,8 +33,7 @@ sub append {
 sub clone {
   my $self = shift;
 
-  my $clone = $self->new->charset($self->charset)
-    ->pair_separator($self->pair_separator);
+  my $clone = $self->new->charset($self->charset);
   if (defined $self->{string}) { $clone->{string} = $self->{string} }
   else                         { $clone->params([@{$self->params}]) }
 
@@ -81,16 +79,13 @@ sub params {
   # Parse string
   if (defined(my $str = delete $self->{string})) {
     my $params = $self->{params} = [];
-
-    # Detect pair separator for reconstruction
-    return $params unless length($str // '');
-    $self->pair_separator(';') if $str =~ /;/ && $str !~ /\&/;
+    return $params unless length $str;
 
     # W3C suggests to also accept ";" as a separator
     my $charset = $self->charset;
-    for my $pair (split /[\&\;]+/, $str) {
-      $pair =~ /^([^=]*)(?:=(.*))?$/;
-      my $name  = $1 // '';
+    for my $pair (split /&|;/, $str) {
+      next unless $pair =~ /^([^=]+)(?:=(.*))?$/;
+      my $name = $1;
       my $value = $2 // '';
 
       # Replace "+" with whitespace, unescape and decode
@@ -171,19 +166,16 @@ sub to_string {
     my ($name, $value) = @{$params}[$i, $i + 1];
 
     # Escape and replace whitespace with "+"
-    $name = encode $charset, $name if $charset;
-    $name = url_escape $name, '^A-Za-z0-9\-._~!$\'()*,:@/?';
-    $name =~ s/\%20/\+/g;
-    if ($value) {
-      $value = encode $charset, $value if $charset;
-      $value = url_escape $value, '^A-Za-z0-9\-._~!$\'()*,:@/?';
-      $value =~ s/\%20/\+/g;
-    }
+    $name  = encode $charset,   $name if $charset;
+    $name  = url_escape $name,  '^A-Za-z0-9\-._~!$\'()*,:@/?';
+    $value = encode $charset,   $value if $charset;
+    $value = url_escape $value, '^A-Za-z0-9\-._~!$\'()*,:@/?';
+    s/\%20/\+/g for $name, $value;
 
-    push @pairs, defined $value ? "$name=$value" : $name;
+    push @pairs, "$name=$value";
   }
 
-  return join $self->pair_separator, @pairs;
+  return join '&', @pairs;
 }
 
 1;
@@ -224,13 +216,6 @@ Charset used for encoding and decoding parameters, defaults to C<UTF-8>.
 
   # Disable encoding and decoding
   $params->charset(undef);
-
-=head2 pair_separator
-
-  my $separator = $params->pair_separator;
-  $params       = $params->pair_separator(';');
-
-Separator for parameter pairs, defaults to C<&>.
 
 =head1 METHODS
 

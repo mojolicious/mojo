@@ -6,26 +6,22 @@ use Mojo::Parameters;
 # Basic functionality
 my $params = Mojo::Parameters->new('foo=b%3Bar&baz=23');
 my $params2 = Mojo::Parameters->new('x', 1, 'y', 2);
-is $params->pair_separator, '&',                 'right pair separator';
-is $params->to_string,      'foo=b%3Bar&baz=23', 'right format';
-is $params2->to_string,     'x=1&y=2',           'right format';
-is $params->to_string,      'foo=b%3Bar&baz=23', 'right format';
+is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
+is $params2->to_string, 'x=1&y=2',           'right format';
+is $params->to_string,  'foo=b%3Bar&baz=23', 'right format';
 is_deeply $params->params, ['foo', 'b;ar', 'baz', 23], 'right structure';
 is $params->[0], 'foo',  'right value';
 is $params->[1], 'b;ar', 'right value';
 is $params->[2], 'baz',  'right value';
 is $params->[3], 23,     'right value';
 is $params->[4], undef,  'no value';
-$params->pair_separator(';');
-is $params->to_string, 'foo=b%3Bar;baz=23', 'right format';
-is "$params", 'foo=b%3Bar;baz=23', 'right format';
 
 # Append
 is_deeply $params->params, ['foo', 'b;ar', 'baz', 23], 'right structure';
 $params->append(a => 4, a => 5, b => 6, b => 7);
-is $params->to_string, "foo=b%3Bar;baz=23;a=4;a=5;b=6;b=7", 'right format';
+is $params->to_string, "foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7", 'right format';
 push @$params, c => 'f;oo';
-is $params->to_string, "foo=b%3Bar;baz=23;a=4;a=5;b=6;b=7;c=f%3Boo",
+is $params->to_string, "foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo",
   'right format';
 
 # Clone
@@ -36,7 +32,7 @@ isnt "$params", "$clone", 'unequal parameters';
 
 # Merge
 $params->merge($params2);
-is $params->to_string, 'foo=b%3Bar;baz=23;a=4;a=5;b=6;b=7;c=f%3Boo;x=1;y=2',
+is $params->to_string, 'foo=b%3Bar&baz=23&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=2',
   'right format';
 is $params2->to_string, 'x=1&y=2', 'right format';
 
@@ -53,9 +49,9 @@ $params->parse('q=1;w=2;e=3;e=4;r=6;t=7');
 is $params->to_string, 'q=1;w=2;e=3;e=4;r=6;t=7', 'right format';
 
 # Remove
-is $params->remove('r')->to_string, 'q=1;w=2;e=3;e=4;t=7', 'right format';
+is $params->remove('r')->to_string, 'q=1&w=2&e=3&e=4&t=7', 'right format';
 $params->remove('e');
-is $params->to_string, 'q=1;w=2;t=7', 'right format';
+is $params->to_string, 'q=1&w=2&t=7', 'right format';
 
 # Hash
 is_deeply $params->to_hash, {q => 1, w => 2, t => 7}, 'right structure';
@@ -72,7 +68,7 @@ is $params->to_string, 'foo=&bar=bar', 'right format';
 $params = Mojo::Parameters->new(bar => 'bar', foo => undef);
 is $params->to_string, 'bar=bar&foo=', 'right format';
 
-# 0 value
+# "0"
 $params = Mojo::Parameters->new(foo => 0);
 is_deeply $params->param('foo'), 0, 'right structure';
 is $params->to_string, 'foo=0', 'right format';
@@ -84,14 +80,11 @@ is $params->to_string, 'foo=0', 'right format';
 
 # Semicolon
 $params = Mojo::Parameters->new('foo=bar;baz');
-is $params->pair_separator, '&',           'right pair separator';
-is $params->to_string,      'foo=bar;baz', 'right format';
+is $params->to_string, 'foo=bar;baz', 'right format';
 is_deeply $params->params, [foo => 'bar', baz => ''], 'right structure';
 is_deeply $params->to_hash, {foo => 'bar', baz => ''}, 'right structure';
-is $params->pair_separator, ';',            'right pair separator';
-is $params->to_string,      'foo=bar;baz=', 'right format';
+is $params->to_string, 'foo=bar&baz=', 'right format';
 $params = Mojo::Parameters->new('foo=bar%3Bbaz');
-is $params->pair_separator, '&', 'right pair separator';
 is_deeply $params->params, [foo => 'bar;baz'], 'right structure';
 is_deeply $params->to_hash, {foo => 'bar;baz'}, 'right structure';
 is $params->to_string, 'foo=bar%3Bbaz', 'right format';

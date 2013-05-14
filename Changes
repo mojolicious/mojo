@@ -15,6 +15,7 @@
   - Removed callback support from body method in Mojo::Message.
   - Removed Mojolicious::Plugin::PoweredBy and
     Mojolicious::Plugin::RequestTimer.
+  - Removed pair_separator attribute from Mojolicious::Parameters.
   - Removed data attribute from Mojo::URL.
   - Removed captures attribute from Mojolicious::Routes::Match.
   - Removed charset attribute from Mojo::DOM::HTML.

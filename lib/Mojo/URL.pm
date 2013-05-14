@@ -201,7 +201,7 @@ sub to_string {
   my $authority = $self->authority;
   $url .= "//$authority" if defined $authority;
 
-  # Relative or no path
+  # Path
   my $path = $self->path->to_string;
   $url .= !$authority || $path eq '' || $path =~ m!^/! ? $path : "/$path";
 

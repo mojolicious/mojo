@@ -209,7 +209,7 @@ sub to_string {
   if (length(my $query = $self->query->to_string)) { $url .= "?$query" }
 
   # Fragment
-  return $url unless my $fragment = $self->fragment;
+  return $url unless defined(my $fragment = $self->fragment);
   return $url . '#' . url_escape $fragment, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
 }
 

@@ -97,6 +97,16 @@ is $url->query, '_monkeybiz%3B=&_monkey=&23=', 'right query';
 is $url->fragment, '23', 'right fragment';
 is "$url", 'wss://sri:foobar@example.com:8080?_monkeybiz%3B=&_monkey=&23=#23',
   'right format';
+$url = Mojo::URL->new('https://example.com/0?0#0');
+ok $url->is_abs,   'is absolute';
+is $url->scheme,   'https', 'right scheme';
+is $url->userinfo, undef, 'no userinfo';
+is $url->host,     'example.com', 'right host';
+is $url->port,     undef, 'no port';
+is $url->path,     '/0', 'no path';
+is $url->query,    '0', 'right query';
+is $url->fragment, '0', 'right fragment';
+is "$url", 'https://example.com/0?0#0', 'right format';
 
 # No authority
 $url = Mojo::URL->new('DATA:image/png;base64,helloworld123');

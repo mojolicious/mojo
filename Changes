@@ -51,7 +51,7 @@
   - Improved documentation.
   - Improved tests.
   - Fixed Perl 5.17.11+ compatibility.
-  - Fixed a few authority bugs in Mojo::URL.
+  - Fixed a few authority and rendering bugs in Mojo::URL.
   - Fixed layout bugs in Mojolicious::Renderer.
   - Fixed support for HEAD request method in Mojo::Server::CGI and
     Mojo::Server::PSGI.

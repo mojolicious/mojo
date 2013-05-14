@@ -151,51 +151,27 @@ sub route {
 sub to {
   my $self = shift;
 
-  # No argument
   my $pattern = $self->pattern;
   return $pattern->defaults unless @_;
-
-  # Single argument
-  my ($shortcut, $defaults);
-  if (@_ == 1) {
-    $defaults = shift if ref $_[0] eq 'HASH';
-    $shortcut = shift if $_[0];
-  }
-
-  # Multiple arguments
-  else {
-
-    # Odd
-    if (@_ % 2) { ($shortcut, $defaults) = (shift, {@_}) }
-
-    # Even
-    else {
-
-      # Shortcut and defaults
-      if (ref $_[1] eq 'HASH') { ($shortcut, $defaults) = (shift, shift) }
-
-      # Just defaults
-      else { $defaults = {@_} }
-    }
-  }
+  my ($shortcut, %defaults) = _defaults(@_);
 
   # Shortcut
   if ($shortcut) {
 
     # App
     if (ref $shortcut || $shortcut =~ /^[\w:]+$/) {
-      $defaults->{app} = $shortcut;
+      $defaults{app} = $shortcut;
     }
 
     # Controller and action
     elsif ($shortcut =~ /^([\w\-:]+)?\#(\w+)?$/) {
-      $defaults->{controller} = $1 if defined $1;
-      $defaults->{action}     = $2 if defined $2;
+      $defaults{controller} = $1 if defined $1;
+      $defaults{action}     = $2 if defined $2;
     }
   }
 
   # Merge defaults
-  $pattern->defaults({%{$pattern->defaults}, %$defaults}) if $defaults;
+  $pattern->defaults({%{$pattern->defaults}, %defaults}) if %defaults;
 
   return $self;
 }
@@ -221,6 +197,18 @@ sub websocket {
   my $route = shift->get(@_);
   $route->{websocket} = 1;
   return $route;
+}
+
+sub _defaults {
+
+  # Hash or shortcut (one)
+  return ref $_[0] eq 'HASH' ? (undef, %{shift()}) : @_ if @_ == 1;
+
+  # Shortcut and values (odd)
+  return shift, @_ if @_ % 2;
+
+  # Shortcut and hash or just values (even)
+  return ref $_[1] eq 'HASH' ? (shift, %{shift()}) : (undef, @_);
 }
 
 sub _generate_route {

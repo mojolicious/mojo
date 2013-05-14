@@ -148,8 +148,7 @@ sub render {
   my $self = shift;
 
   # Template may be first argument
-  my $template = @_ % 2 && !ref $_[0] ? shift : undef;
-  my $args = {@_};
+  my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
   $args->{template} = $template if $template;
   my $maybe = delete $args->{'mojo.maybe'};
 

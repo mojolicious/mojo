@@ -4,7 +4,6 @@ use Mojo::Base -base;
 # No imports, for security reasons!
 use Carp ();
 use Mojo::ByteStream;
-use Mojo::Cookie::Response;
 use Mojo::Exception;
 use Mojo::Transaction::HTTP;
 use Mojo::URL;
@@ -51,7 +50,7 @@ sub cookie {
     $self->app->log->error(qq{Cookie "$name" is bigger than 4096 bytes.})
       if length $cookie->{value} > 4096;
 
-    $self->res->cookies(Mojo::Cookie::Response->new(%$cookie));
+    $self->res->cookies($cookie);
     return $self;
   }
 
@@ -161,7 +160,7 @@ sub render {
     if $args->{partial};
 
   # Maybe
-  return $maybe ? undef : !!$self->render_not_found unless defined $output;
+  return $maybe ? undef : !$self->render_not_found unless defined $output;
 
   # Prepare response
   $app->plugins->emit_hook(after_render => $self, \$output, $format);
@@ -195,8 +194,9 @@ sub render_exception {
   };
   my $inline = $renderer->_bundled(
     $mode eq 'development' ? 'exception.development' : 'exception');
-  return if $self->_fallbacks($options, 'exception', $inline);
+  return $self if $self->_fallbacks($options, 'exception', $inline);
   $self->_fallbacks({%$options, format => 'html'}, 'exception', $inline);
+  return $self;
 }
 
 sub render_later { shift->stash('mojo.rendered' => 1) }
@@ -215,8 +215,9 @@ sub render_not_found {
     = {template => "not_found.$mode", format => $format, status => 404};
   my $inline = $renderer->_bundled(
     $mode eq 'development' ? 'not_found.development' : 'not_found');
-  return if $self->_fallbacks($options, 'not_found', $inline);
+  return $self if $self->_fallbacks($options, 'not_found', $inline);
   $self->_fallbacks({%$options, format => 'html'}, 'not_found', $inline);
+  return $self;
 }
 
 sub render_static {
@@ -224,7 +225,7 @@ sub render_static {
   my $app = $self->app;
   return !!$self->rendered if $app->static->serve($self, $file);
   $app->log->debug(qq{File "$file" not found, public directory missing?});
-  return undef;
+  return !$self->render_not_found;
 }
 
 sub rendered {
@@ -442,14 +443,12 @@ sub _fallbacks {
   return 1 if $self->render_maybe(%$options);
 
   # Normal template
-  $options->{template} = $template;
-  return 1 if $self->render_maybe(%$options);
+  return 1 if $self->render_maybe(%$options, template => $template);
 
   # Inline template
   my $stash = $self->stash;
   return undef unless $stash->{format} eq 'html';
   delete $stash->{$_} for qw(extends layout);
-  delete $options->{template};
   return $self->render_maybe(%$options, inline => $inline, handler => 'ep');
 }
 
@@ -659,8 +658,8 @@ generated, all additional values get merged into the C<stash>.
 
 =head2 render_exception
 
-  $c->render_exception('Oops!');
-  $c->render_exception(Mojo::Exception->new('Oops!'));
+  $c = $c->render_exception('Oops!');
+  $c = $c->render_exception(Mojo::Exception->new('Oops!'));
 
 Render the exception template C<exception.$mode.$format.*> or
 C<exception.$format.*> and set the response status code to C<500>. Also sets
@@ -684,20 +683,14 @@ automatic rendering would result in a response.
 
   my $success = $c->render_maybe;
   my $success = $c->render_maybe(controller => 'foo', action => 'bar');
-  my $success = $c->render_maybe(template => 'foo/index');
-  my $success = $c->render_maybe(template => 'index', format => 'html');
-  my $success = $c->render_maybe(data => $bytes);
-  my $success = $c->render_maybe(text => 'Hello!');
-  my $success = $c->render_maybe(json => {foo => 'bar'});
-  my $success = $c->render_maybe(handler => 'something');
-  my $success = $c->render_maybe('foo/index');
+  my $success = $c->render_maybe('foo/index', format => 'html');
 
 Try to render content, takes the same arguments as C<render> but does not call
 C<render_not_found> if rendering fails.
 
 =head2 render_not_found
 
-  $c->render_not_found;
+  $c = $c->render_not_found;
 
 Render the not found template C<not_found.$mode.$format.*> or
 C<not_found.$format.*> and set the response status code to C<404>.

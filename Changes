@@ -13,6 +13,8 @@
   - Changed types in Mojolicious::Types to consistently use arrays.
   - Changed heuristics for number detection in Mojo::JSON to better line up
     with user expectations.
+  - Changed render and render_static methods in Mojolicious::Controller to
+    call render_not_found if generating a response fails.
   - Removed callback support from body method in Mojo::Message.
   - Removed Mojolicious::Plugin::PoweredBy and
     Mojolicious::Plugin::RequestTimer.

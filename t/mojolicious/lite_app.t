@@ -208,9 +208,9 @@ get '/inline/ep/partial' => sub {
 get '/source' => sub {
   my $self = shift;
   my $file = $self->param('fail') ? 'does_not_exist.txt' : '../lite_app.t';
-  $self->render('this_does_not_ever_exist')
+  $self->render_maybe('this_does_not_ever_exist')
     or $self->render_static($file)
-    or $self->render(text => 'does not exist!', status => 404);
+    or $self->res->headers->header('X-Missing' => 1);
 };
 
 get '/foo_relaxed/#test' => sub {
@@ -723,10 +723,12 @@ $t->get_ok('/inline/ep/partial')->status_is(200)
   ->content_is("♥just ♥\nworks!\n");
 
 # Render static file outside of public directory
-$t->get_ok('/source')->status_is(200)->content_like(qr!get_ok\('/source!);
+$t->get_ok('/source')->status_is(200)->header_isnt('X-Missing' => 1)
+  ->content_like(qr!get_ok\('/source!);
 
 # File does not exist
-$t->get_ok('/source?fail=1')->status_is(404)->content_is('does not exist!');
+$t->get_ok('/source?fail=1')->status_is(404)->header_is('X-Missing' => 1)
+  ->content_is("Oops!\n");
 
 # With body and max message size
 {

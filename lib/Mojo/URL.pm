@@ -201,13 +201,9 @@ sub to_string {
   my $authority = $self->authority;
   $url .= "//$authority" if defined $authority;
 
-  # Relative path
-  my $path = $self->path;
-  if (!$authority) { $url .= "$path" }
-
-  # Absolute path
-  elsif ($path->leading_slash) { $url .= "$path" }
-  else                         { $url .= @{$path->parts} ? "/$path" : '' }
+  # Relative or no path
+  my $path = $self->path->to_string;
+  $url .= !$authority || $path eq '' || $path =~ m!^/! ? $path : "/$path";
 
   # Query
   if (length(my $query = $self->query)) { $url .= "?$query" }

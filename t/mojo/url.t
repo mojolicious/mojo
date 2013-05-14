@@ -327,20 +327,23 @@ is $url->to_abs, 'http://example.com/bar/foo?foo=bar#23',
   'right absolute version';
 is $url->to_abs->base, 'http://example.com/bar/baz/', 'right base';
 
-# Real world tests
-$url = Mojo::URL->new('http://acme.s3.amazonaws.com'
-    . '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
+# Canonicalize (escaped path)
+$url = Mojo::URL->new(
+  'http://example.com/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
 ok $url->is_abs,   'is absolute';
 is $url->scheme,   'http', 'right scheme';
 is $url->userinfo, undef, 'no userinfo';
-is $url->host,     'acme.s3.amazonaws.com', 'right host';
+is $url->host,     'example.com', 'right host';
 is $url->port,     undef, 'no port';
 is $url->path,     '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb',
   'right path';
-ok !$url->query->to_string, 'no query';
-is_deeply $url->query->to_hash, {}, 'right structure';
+is $url->query,    '',    'no query';
 is $url->fragment, undef, 'no fragment';
-is "$url", 'http://acme.s3.amazonaws.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb',
+is "$url",
+  'http://example.com/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb',
+  'right format';
+$url->path->canonicalize;
+is "$url", 'http://example.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb',
   'right format';
 
 # Clone (advanced)

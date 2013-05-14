@@ -685,8 +685,11 @@ automatic rendering would result in a response.
   my $success = $c->render_maybe(controller => 'foo', action => 'bar');
   my $success = $c->render_maybe('foo/index', format => 'html');
 
-Try to render content, takes the same arguments as C<render> but does not call
-C<render_not_found> if rendering fails.
+Try to render content but do not call C<render_not_found> if no response could
+be generated, takes the same arguments as C<render>.
+
+  # Render template "index_local" only if it exists
+  $self->render_maybe('index_local') or $self->render('index');
 
 =head2 render_not_found
 

@@ -71,7 +71,7 @@ get '/rest' => sub {
   shift->respond_to(
     foo  => {text => 'foo works!'},
     html => {text => 'html works!'}
-  );
+  )->res->headers->header('X-Rest' => 1);
 };
 
 get '/dead' => sub {die};
@@ -96,10 +96,12 @@ $t->get_ok('/docs2')->status_is(200)->content_like(qr!<h2>snowman</h2>!);
 $t->get_ok('/docs3')->status_is(200)->content_like(qr!<h3></h3>!);
 
 # REST request for "foo" format
-$t->get_ok('/rest')->status_is(200)->content_is('foo works!');
+$t->get_ok('/rest')->status_is(200)->header_is('X-Rest' => 1)
+  ->content_is('foo works!');
 
 # REST request for "html" format
-$t->get_ok('/rest.html')->status_is(200)->content_is('html works!');
+$t->get_ok('/rest.html')->status_is(200)->header_is('X-Rest' => 1)
+  ->content_is('html works!');
 
 # Perldoc browser is disabled
 $t->get_ok('/perldoc')->status_is(404)->content_is("foo not found!\n");

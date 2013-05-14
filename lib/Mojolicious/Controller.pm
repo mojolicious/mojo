@@ -290,6 +290,8 @@ sub respond_to {
 
   # Dispatch
   ref $target eq 'CODE' ? $target->($self) : $self->render(%$target);
+
+  return $self;
 }
 
 sub send {
@@ -747,7 +749,7 @@ Get L<Mojo::Message::Response> object from L<Mojo::Transaction/"res">.
 
 =head2 respond_to
 
-  $c->respond_to(
+  $c = $c->respond_to(
     json => {json => {message => 'Welcome!'}},
     html => {template => 'welcome'},
     any  => sub {...}

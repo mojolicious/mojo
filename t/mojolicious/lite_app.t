@@ -297,7 +297,7 @@ post '/bar/:test' => {test => 'default'} => sub {
 
 patch '/firefox/:stuff' => (agent => qr/Firefox/) => sub {
   my $self = shift;
-  $self->render(text => $self->url_for('foxy', stuff => 'foo'));
+  $self->render(text => $self->url_for('foxy', {stuff => 'foo'}));
 } => 'foxy';
 
 get '/url_for_foxy' => sub {
@@ -426,7 +426,7 @@ get '/url_with';
 
 get '/url_with/:foo' => sub {
   my $self = shift;
-  $self->render(text => $self->url_with(foo => 'bar')->to_abs);
+  $self->render(text => $self->url_with({foo => 'bar'})->to_abs);
 };
 
 my $dynamic_inline = 1;

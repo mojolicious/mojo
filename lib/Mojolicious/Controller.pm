@@ -890,7 +890,9 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
 
   my $url = $c->url_for;
   my $url = $c->url_for(name => 'sebastian');
+  my $url = $c->url_for({name => 'sebastian'});
   my $url = $c->url_for('test', name => 'sebastian');
+  my $url = $c->url_for('test', {name => 'sebastian'});
   my $url = $c->url_for('/perldoc');
   my $url = $c->url_for('http://mojolicio.us/perldoc');
 

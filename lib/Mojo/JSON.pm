@@ -293,8 +293,8 @@ sub _encode_value {
   return 'null' unless defined $value;
 
   # Number
-  return 0 + $value
-    if B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK);
+  my $flags = B::svref_2object(\$value)->FLAGS;
+  return 0 + $value if $flags & (B::SVp_IOK | B::SVp_NOK) && $value * 0 == 0;
 
   # String
   return _encode_string($value);

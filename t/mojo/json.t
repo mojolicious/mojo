@@ -296,6 +296,10 @@ $num = 1 + $str;
 is $json->encode({test => [$num, $str]}), '{"test":[1,0]}',
   'upgraded number detected';
 
+# "inf" and "nan"
+is $json->encode({test => 9**9**9}), '{"test":"inf"}', 'encode "inf"';
+is $json->encode({test => -sin(9**9**9)}), '{"test":"nan"}', 'encode "nan"';
+
 # Errors
 is $json->decode('["♥"]'), undef, 'wide character in input';
 is $json->error, 'Wide character in input', 'right error';

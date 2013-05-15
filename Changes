@@ -51,7 +51,7 @@
   - Improved Mojolicious to not trap exceptions if the default exception
     handling has been deactivated.
   - Improved json_is and json_message_is methods in Test::Mojo by making the
-    JSON Pointer optional.
+    JSON Pointer optional. (jberger)
   - Improved renderer performance.
   - Improved Mojo::DOM::HTML performance.
   - Improved Mojo::Reactor::Poll performance.
@@ -61,6 +61,7 @@
   - Improved documentation.
   - Improved tests.
   - Fixed Perl 5.17.11+ compatibility.
+  - Fixed Mojo::JSON to encode "inf" and "nan" values as strings. (chansen)
   - Fixed a few authority and rendering bugs in Mojo::URL.
   - Fixed layout bugs in Mojolicious::Renderer.
   - Fixed support for HEAD request method in Mojo::Server::CGI and

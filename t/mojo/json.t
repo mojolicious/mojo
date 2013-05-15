@@ -299,7 +299,7 @@ is $json->encode({test => [$num, $str]}), '{"test":[1,0]}',
 # "inf" and "nan"
 like $json->encode({test => 9**9**9}), qr/^{"test":".*"}$/,
   'encode "inf" as string';
-like $json->encode({test => -sin(9**9**9)}), qr/{"test":".*"}$/,
+like $json->encode({test => -sin(9**9**9)}), qr/^{"test":".*"}$/,
   'encode "nan" as string';
 
 # Errors

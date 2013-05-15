@@ -1,7 +1,8 @@
 
 4.0  2013-05-15
   - Code name "Top Hat", this is a major release.
-  - Added simple JSON serialization support to Mojo::Transaction::WebSocket.
+  - Added simple JSON serialization and deserialization support to
+    Mojo::Transaction::WebSocket.
   - Added json event to Mojo::Transaction::WebSocket.
   - Added render_maybe method to Mojolicious::Controller.
   - Added again method to Mojo::Reactor, Mojo::Reactor::Poll and

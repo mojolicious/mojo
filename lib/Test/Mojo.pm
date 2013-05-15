@@ -161,8 +161,8 @@ sub json_hasnt {
 }
 
 sub json_is {
-  my ($self, $p) = (shift, shift);
-  my $data = ref $p ? $p : shift;
+  my $self = shift;
+  my ($p, $data) = ref $_[0] ? ('', shift) : (shift, shift);
   my $desc = shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
@@ -180,8 +180,8 @@ sub json_message_hasnt {
 }
 
 sub json_message_is {
-  my ($self, $p) = (shift, shift);
-  my $data = ref $p ? $p : shift;
+  my $self = shift;
+  my ($p, $data) = ref $_[0] ? ('', shift) : (shift, shift);
   my $desc = shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->_json(get => $p), $data, $desc);
 }

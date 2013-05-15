@@ -137,7 +137,7 @@ Path to C<lib> directory of application.
 Portably list all files recursively in directory relative to the home
 directory.
 
-  $home->rel_file($home->list_files('templates/layouts')->[1]);
+  say $home->rel_file($home->list_files('templates/layouts')->[1]);
 
 =head2 mojo_lib_dir
 

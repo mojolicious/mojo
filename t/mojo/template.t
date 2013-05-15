@@ -753,7 +753,7 @@ foo
 EOF
 is $output, "foo\nbar\n", 'control structure';
 
-# All tags
+# Mixed tags
 $mt = Mojo::Template->new;
 $mt->parse(<<'EOF');
 <html foo="bar">

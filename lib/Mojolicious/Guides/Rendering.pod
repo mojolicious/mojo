@@ -591,18 +591,6 @@ template with named blocks that child templates can override.
 
 This chain could go on and on to allow a very high level of template reuse.
 
-=head2 Memorizing template blocks
-
-Compiled templates are always cached in memory, but with the helper
-L<Mojolicious::Plugin::DefaultHelpers/"memorize"> you can go one step further
-and prevent template blocks from getting executed more than once.
-
-  @@ cached.html.ep
-  % use Time::Piece;
-  %= memorize begin
-    This template was compiled at <%= localtime->hms %>.
-  % end
-
 =head2 Adding helpers
 
 Adding and redefining helpers is very easy, you can use them to do pretty much

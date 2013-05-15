@@ -98,17 +98,17 @@ $t->post_ok('/data', $yatta_sjis)->status_is(200)->content_is($yatta_sjis);
 
 # JSON data
 $t->get_ok('/json')->status_is(200)->content_type_is('application/json')
-  ->json_content_is({test => $yatta});
+  ->json_is({test => $yatta});
 
 # IRI
 $t->get_ok('/привет/мир')->status_is(200)
-  ->content_type_is('application/json')->json_content_is({foo => $yatta});
+  ->content_type_is('application/json')->json_is({foo => $yatta});
 
 # Shift_JIS parameters
 my $url = $t->ua->app_url->path('/params')->query(foo => 3, yatta => $yatta);
 $url->query->charset('shift_jis');
 $t->get_ok($url)->status_is(200)
-  ->json_content_is({params => {foo => 3, yatta => $yatta}, yatta => $yatta});
+  ->json_is({params => {foo => 3, yatta => $yatta}, yatta => $yatta});
 
 done_testing();
 

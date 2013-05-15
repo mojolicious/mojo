@@ -146,12 +146,6 @@ sub header_unlike {
     $regex, $desc || "$name is not similar");
 }
 
-sub json_content_is {
-  my ($self, $data, $desc) = @_;
-  $desc ||= 'exact match for JSON structure';
-  return $self->_test('is_deeply', $self->tx->res->json, $data, $desc);
-}
-
 sub json_has {
   my ($self, $p, $desc) = @_;
   $desc ||= qq{has value for JSON Pointer "$p"};
@@ -167,8 +161,9 @@ sub json_hasnt {
 }
 
 sub json_is {
-  my ($self, $p, $data, $desc) = @_;
-  $desc ||= qq{exact match for JSON Pointer "$p"};
+  my ($self, $p) = (shift, shift);
+  my $data = ref $p ? $p : shift;
+  my $desc = shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 
@@ -185,8 +180,9 @@ sub json_message_hasnt {
 }
 
 sub json_message_is {
-  my ($self, $p, $data, $desc) = @_;
-  $desc ||= qq{exact match for JSON Pointer "$p"};
+  my ($self, $p) = (shift, shift);
+  my $data = ref $p ? $p : shift;
+  my $desc = shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->_json(get => $p), $data, $desc);
 }
 
@@ -638,14 +634,6 @@ Check response header for similar match.
 
 Opposite of C<header_like>.
 
-=head2 json_content_is
-
-  $t = $t->json_content_is([1, 2, 3]);
-  $t = $t->json_content_is([1, 2, 3], 'right content');
-  $t = $t->json_content_is({foo => 'bar', baz => 23}, 'right content');
-
-Check response content for JSON data.
-
 =head2 json_has
 
   $t = $t->json_has('/foo');
@@ -663,12 +651,13 @@ Opposite of C<json_has>.
 
 =head2 json_is
 
-  $t = $t->json_is('' => {foo => [1, 2, 3]});
+  $t = $t->json_is({foo => [1, 2, 3]});
+  $t = $t->json_is({foo => [1, 2, 3]}, 'right content');
   $t = $t->json_is('/foo' => [1, 2, 3]);
   $t = $t->json_is('/foo/1' => 2, 'right value');
 
 Check the value extracted from JSON response using the given JSON Pointer with
-L<Mojo::JSON::Pointer>.
+L<Mojo::JSON::Pointer>, which defaults to the root value if it is omitted.
 
 =head2 json_message_has
 
@@ -687,12 +676,14 @@ Opposite of C<json_message_has>.
 
 =head2 json_message_is
 
-  $t = $t->json_message_is('' => {foo => [1, 2, 3]});
+  $t = $t->json_message_is({foo => [1, 2, 3]});
+  $t = $t->json_message_is({foo => [1, 2, 3]}, 'right content');
   $t = $t->json_message_is('/foo' => [1, 2, 3]);
   $t = $t->json_message_is('/foo/1' => 2, 'right value');
 
 Check the value extracted from JSON WebSocket message using the given JSON
-Pointer with L<Mojo::JSON::Pointer>.
+Pointer with L<Mojo::JSON::Pointer>, which defaults to the root value if it is
+omitted.
 
 =head2 message_is
 
@@ -791,7 +782,7 @@ arguments as L<Mojo::UserAgent/"post">, except for the callback.
   # Test JSON API
   $t->post_json_ok('/hello.json' => json => {hello => 'world'})
     ->status_is(200)
-    ->json_content_is({bye => 'world'});
+    ->json_is({bye => 'world'});
 
 =head2 put_ok
 
@@ -812,7 +803,7 @@ Perform request and check for transport errors.
 
   # Request with custom method
   my $tx = $t->ua->build_tx(FOO => '/test.json' => json => {foo => 1});
-  $t->request_ok($tx)->status_is(200)->json_content_is({success => 1});
+  $t->request_ok($tx)->status_is(200)->json_is({success => 1});
 
 =head2 reset_session
 

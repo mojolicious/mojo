@@ -25,6 +25,7 @@
   - Removed charset method from Mojo::DOM.
   - Removed render_data, render_json, render_partial and render_text methods
     from Mojolicious::Controller.
+  - Removed json_content_is method from Test::Mojo.
   - Removed has_leftovers method from Mojo::Content.
   - Removed is_chunked, is_dynamic, is_multipart, has_leftovers, leftovers,
     write and write_chunk methods from Mojo::Message.
@@ -49,6 +50,8 @@
     the PLACK_ENV environment variable.
   - Improved Mojolicious to not trap exceptions if the default exception
     handling has been deactivated.
+  - Improved json_is and json_message_is methods in Test::Mojo by making the
+    JSON Pointer optional.
   - Improved renderer performance.
   - Improved Mojo::DOM::HTML performance.
   - Improved Mojo::Reactor::Poll performance.

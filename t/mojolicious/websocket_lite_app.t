@@ -149,9 +149,11 @@ $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
 # JSON roundtrips
 $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})
   ->message_ok->json_message_is('' => {test => 24, snowman => '☃'})
+  ->json_message_is('' => {test => 24, snowman => '☃'}, 'right content')
   ->json_message_has('/test')->json_message_hasnt('/test/2')
   ->send_ok({binary => j([1, 2, 3])})
-  ->message_ok->json_message_is('' => [1, 2, 3, 4], 'right content')
+  ->message_ok->json_message_is([1, 2, 3, 4])
+  ->json_message_is([1, 2, 3, 4], 'right content')
   ->send_ok({binary => j([1, 2, 3])})
   ->message_ok->json_message_has('/2', 'has two elements')
   ->json_message_is('/2' => 3)->json_message_hasnt('/5', 'not five elements')

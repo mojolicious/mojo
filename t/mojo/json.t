@@ -297,8 +297,10 @@ is $json->encode({test => [$num, $str]}), '{"test":[1,0]}',
   'upgraded number detected';
 
 # "inf" and "nan"
-is $json->encode({test => 9**9**9}), '{"test":"inf"}', 'encode "inf"';
-is $json->encode({test => -sin(9**9**9)}), '{"test":"nan"}', 'encode "nan"';
+like $json->encode({test => 9**9**9}), qr/^{"test":".*"}$/,
+  'encode "inf" as string';
+like $json->encode({test => -sin(9**9**9)}), qr/{"test":".*"}$/,
+  'encode "nan" as string';
 
 # Errors
 is $json->decode('["♥"]'), undef, 'wide character in input';

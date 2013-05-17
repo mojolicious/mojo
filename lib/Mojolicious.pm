@@ -396,18 +396,16 @@ object.
 
 =head2 defaults
 
-  my $defaults = $app->defaults;
-  my $foo      = $app->defaults('foo');
-  $app         = $app->defaults({foo => 'bar'});
-  $app         = $app->defaults(foo => 'bar');
+  my $hash = $app->defaults;
+  my $foo  = $app->defaults('foo');
+  $app     = $app->defaults({foo => 'bar'});
+  $app     = $app->defaults(foo => 'bar');
 
 Default values for L<Mojolicious::Controller/"stash">, assigned for every new
 request.
 
-  # Manipulate defaults
-  $app->defaults->{foo} = 'bar';
-  my $foo = $app->defaults->{foo};
-  delete $app->defaults->{foo};
+  # Remove value
+  my $foo = delete $app->defaults->{foo};
 
 =head2 dispatch
 

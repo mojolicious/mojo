@@ -27,6 +27,7 @@ sub build {
   my $self = shift;
 
   my (@lines, $cpst, $multi);
+  my $escape = $self->auto_escape;
   for my $line (@{$self->tree}) {
     push @lines, '';
     for (my $j = 0; $j < @{$line}; $j += 2) {
@@ -64,7 +65,6 @@ sub build {
         unless ($multi) {
 
           # Escaped
-          my $escape = $self->auto_escape;
           if (($type eq 'escp' && !$escape) || ($type eq 'expr' && $escape)) {
             $lines[-1] .= "\$_M .= _escape";
             $lines[-1] .= " scalar $value" if length $value;
@@ -126,10 +126,11 @@ sub interpret {
 }
 
 sub parse {
-  my ($self, $tmpl) = @_;
+  my $self = shift;
 
   # Clean start
-  delete $self->template($tmpl)->{tree};
+  my $template = @_ ? $self->template(shift)->template : $self->template;
+  my $tree = $self->tree([])->tree;
 
   my $tag     = $self->tag_start;
   my $replace = $self->replace_mark;
@@ -175,7 +176,7 @@ sub parse {
   # Split lines
   my $state = 'text';
   my ($trimming, @capture_token);
-  for my $line (split /\n/, $tmpl) {
+  for my $line (split /\n/, $template) {
     $trimming = 0 if $state eq 'text';
 
     # Turn Perl line into mixed line
@@ -247,27 +248,27 @@ sub parse {
         @capture_token = ();
       }
     }
-    push @{$self->tree}, \@token;
+    push @$tree, \@token;
   }
 
   return $self;
 }
 
 sub render {
-  my $self = shift->parse(shift)->build;
-  return $self->compile || $self->interpret(@_);
+  my $self = shift;
+  return $self->parse(shift)->build->compile || $self->interpret(@_);
 }
 
 sub render_file {
   my ($self, $path) = (shift, shift);
 
   $self->name($path) unless defined $self->{name};
-  my $tmpl     = slurp $path;
+  my $template = slurp $path;
   my $encoding = $self->encoding;
   croak qq{Template "$path" has invalid encoding.}
-    if $encoding && !defined($tmpl = decode $encoding, $tmpl);
+    if $encoding && !defined($template = decode $encoding, $template);
 
-  return $self->render($tmpl, @_);
+  return $self->render($template, @_);
 }
 
 sub _trim {
@@ -661,6 +662,7 @@ Interpret compiled template code.
 
 =head2 parse
 
+  $mt = $mt->parse;
   $mt = $mt->parse($template);
 
 Parse template into tree.

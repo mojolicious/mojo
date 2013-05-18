@@ -341,7 +341,7 @@ L<Mojo::DOM::HTML> implements the following attributes.
 =head2 tree
 
   my $tree = $html->tree;
-  $html    = $html->tree(['root', [qw(text lalala)]]);
+  $html    = $html->tree(['root', ['text', 'foo']]);
 
 Document Object Model. Note that this structure should only be used very
 carefully since it is very dynamic.

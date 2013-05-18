@@ -680,7 +680,7 @@ Render this element and its content to XML.
 =head2 tree
 
   my $tree = $dom->tree;
-  $dom     = $dom->tree(['root', [qw(text lalala)]]);
+  $dom     = $dom->tree(['root', ['text', 'foo']]);
 
 Document Object Model. Note that this structure should only be used very
 carefully since it is very dynamic.

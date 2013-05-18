@@ -618,9 +618,10 @@ Raw template.
 =head2 tree
 
   my $tree = $mt->tree;
-  $mt      = $mt->tree($tree);
+  $mt      = $mt->tree([['text', 'foo']]);
 
-Parsed tree.
+Template in parsed form. Note that this structure should only be used very
+carefully since it is very dynamic.
 
 =head2 trim_mark
 

@@ -125,6 +125,16 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->headers->connection, 'close', 'right "Connection" value';
 is $tx->res->body, 'Whatever!', 'right content';
 
+# HTTP/1.0 request
+$tx = $ua->build_tx(GET => '/normal/');
+$tx->req->version('1.0');
+$tx = $ua->start($tx);
+ok !$tx->keep_alive, 'will not be kept alive';
+is $tx->res->version, '1.1', 'right version';
+is $tx->res->code,    200,   'right status';
+is $tx->res->headers->connection, 'close', 'right "Connection" value';
+is $tx->res->body, 'Whatever!', 'right content';
+
 # POST request
 $tx = $ua->post('/fun/' => {Expect => 'fun'} => 'foo bar baz' x 128);
 ok defined $tx->connection, 'has connection id';

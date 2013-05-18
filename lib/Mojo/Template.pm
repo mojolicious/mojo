@@ -126,11 +126,10 @@ sub interpret {
 }
 
 sub parse {
-  my $self = shift;
+  my ($self, $template) = @_;
 
   # Clean start
-  my $template = @_ ? $self->template(shift)->template : $self->template;
-  my $tree = $self->tree([])->tree;
+  my $tree = $self->template($template)->tree([])->tree;
 
   my $tag     = $self->tag_start;
   my $replace = $self->replace_mark;
@@ -613,7 +612,7 @@ Characters indicating the end of a tag, defaults to C<%E<gt>>.
   my $template = $mt->template;
   $mt          = $mt->template($template);
 
-Raw template.
+Raw unparsed template.
 
 =head2 tree
 
@@ -663,7 +662,6 @@ Interpret compiled template code.
 
 =head2 parse
 
-  $mt = $mt->parse;
   $mt = $mt->parse($template);
 
 Parse template into tree.

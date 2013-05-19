@@ -1,6 +1,6 @@
 
-4.01  2013-05-18
-  - Fixed small drain event bug in Mojo::IOLoop::Stream.
+4.01  2013-05-19
+  - Fixed small drain event bug in Mojo::IOLoop::Stream. (ChinaXing)
 
 4.0  2013-05-15
   - Code name "Top Hat", this is a major release.

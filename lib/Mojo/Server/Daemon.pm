@@ -255,7 +255,7 @@ sub _write {
       return unless $c->{tx};
     }
   }
-  $stream->write('', $cb);
+  $stream->write('' => $cb);
 }
 
 1;

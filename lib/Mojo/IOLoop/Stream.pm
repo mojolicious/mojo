@@ -134,7 +134,7 @@ sub _write {
   $self->emit_safe('drain') unless length $self->{buffer};
   return if $self->is_writing;
   return $self->close if $self->{graceful};
-  $self->reactor->watch($handle, !$self->{paused}, 0);
+  $self->reactor->watch($handle, !$self->{paused}, 0) if $self->{handle};
 }
 
 1;

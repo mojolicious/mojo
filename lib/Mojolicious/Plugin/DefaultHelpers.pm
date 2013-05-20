@@ -12,13 +12,15 @@ sub register {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
-  # Stash key shortcuts
+  # Stash key shortcuts (should not generate log messages)
   for my $name (qw(extends layout title)) {
     $app->helper(
       $name => sub {
-        my $self = shift;
-        $self->stash($name => @_) if @_;
-        return $self->stash->{$name};
+        my $self  = shift;
+        my $stash = $self->stash;
+        $stash->{$name} = shift if @_;
+        $self->stash(@_) if @_;
+        return $stash->{$name};
       }
     );
   }

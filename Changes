@@ -1,4 +1,8 @@
 
+4.02  2013-05-20
+  - Fixed extends, layout and title helpers not to generate unnecessary log
+    messages.
+
 4.01  2013-05-19
   - Fixed small drain event bug in Mojo::IOLoop::Stream. (ChinaXing)
 

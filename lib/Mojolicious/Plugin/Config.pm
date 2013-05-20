@@ -64,7 +64,7 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
 
 =head1 SYNOPSIS
 
-  # myapp.conf
+  # myapp.conf (it's just Perl returning a hash)
   {
     foo       => "bar",
     music_dir => app->home->rel_dir('music')
@@ -72,15 +72,18 @@ Mojolicious::Plugin::Config - Perl-ish configuration plugin
 
   # Mojolicious
   my $config = $self->plugin('Config');
+  say $config->{foo};
 
   # Mojolicious::Lite
   my $config = plugin 'Config';
+  say $config->{foo};
 
   # foo.html.ep
   %= $config->{foo}
 
   # The configuration is available application wide
   my $config = app->config;
+  say $config->{foo};
 
   # Everything can be customized with options
   my $config = plugin Config => {file => '/etc/myapp.stuff'};

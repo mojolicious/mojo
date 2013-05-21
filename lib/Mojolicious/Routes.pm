@@ -250,8 +250,8 @@ Mojolicious::Routes - Always find your destination with routes!
   # More advanced routes
   my $blog = $r->under('/blog');
   $blog->post('/list')->to('blog#list');
-  $blog->get('/:id' => [id => qr/\d+/] => {id => 23})->to('blog#show');
-  $blog->options(sub { shift->render(text => 'Go away!') });
+  $blog->get('/:id' => [id => qr/\d+/])->to('blog#show', id => 23);
+  $blog->put(sub { shift->render(text => 'Go away!', status => 405) });
 
 =head1 DESCRIPTION
 

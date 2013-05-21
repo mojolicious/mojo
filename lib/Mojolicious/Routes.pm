@@ -243,8 +243,11 @@ Mojolicious::Routes - Always find your destination with routes!
 
   use Mojolicious::Routes;
 
+  # Simple route
   my $r = Mojolicious::Routes->new;
   $r->route('/')->to(controller => 'blog', action => 'welcome');
+
+  # More advanced routes
   my $blog = $r->under('/blog');
   $blog->post('/list')->to('blog#list');
   $blog->get('/:id' => [id => qr/\d+/] => {id => 23})->to('blog#show');

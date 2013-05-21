@@ -243,38 +243,12 @@ Mojolicious::Routes - Always find your destination with routes!
 
   use Mojolicious::Routes;
 
-  # New route tree
   my $r = Mojolicious::Routes->new;
-
-  # Normal route matching "/articles" with parameters "controller" and
-  # "action"
-  $r->route('/articles')->to(controller => 'article', action => 'list');
-
-  # Route with a placeholder matching everything but "/" and "."
-  $r->route('/:controller')->to(action => 'list');
-
-  # Route with a placeholder and regex constraint
-  $r->route('/articles/:id', id => qr/\d+/)
-    ->to(controller => 'article', action => 'view');
-
-  # Route with an optional parameter "year"
-  $r->route('/archive/:year')
-    ->to(controller => 'archive', action => 'list', year => undef);
-
-  # Nested route for two actions sharing the same "controller" parameter
-  my $books = $r->route('/books/:id')->to(controller => 'book');
-  $books->route('/edit')->to(action => 'edit');
-  $books->route('/delete')->to(action => 'delete');
-
-  # Bridges can be used to chain multiple routes
-  $r->bridge->to(controller => 'foo', action =>'auth')
-    ->route('/blog')->to(action => 'list');
-
-  # Simplified Mojolicious::Lite style route generation is also possible
-  $r->get('/')->to(controller => 'blog', action => 'welcome');
+  $r->route('/')->to(controller => 'blog', action => 'welcome');
   my $blog = $r->under('/blog');
   $blog->post('/list')->to('blog#list');
-  $blog->get(sub { shift->render(text => 'Go away!') });
+  $blog->get('/:id' => [id => qr/\d+/] => {id => 23})->to('blog#show');
+  $blog->options(sub { shift->render(text => 'Go away!') });
 
 =head1 DESCRIPTION
 

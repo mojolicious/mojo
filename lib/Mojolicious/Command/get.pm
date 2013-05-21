@@ -71,14 +71,8 @@ sub run {
       weaken $tx;
       $tx->res->content->on(
         body => sub {
-
-          # Request
-          my $req = $tx->req;
-          warn $req->$_ for qw(build_start_line build_headers);
-
-          # Response
-          my $res = $tx->res;
-          warn $res->$_ for qw(build_start_line build_headers);
+          warn $tx->req->$_ for qw(build_start_line build_headers);
+          warn $tx->res->$_ for qw(build_start_line build_headers);
         }
       ) if $verbose;
 

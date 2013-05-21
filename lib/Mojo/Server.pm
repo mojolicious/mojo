@@ -35,7 +35,7 @@ sub load_app {
     local $ENV{MOJO_EXE};
 
     # Try to load application from script into sandbox
-    $self->app(my $app = eval sprintf <<'EOF', md5_sum($path . $$));
+    my $app = eval sprintf <<'EOF', md5_sum($path . $$);
 package Mojo::Server::SandBox::%s;
 my $app = do $path;
 if (!$app && (my $e = $@ || $!)) { die $e }
@@ -44,6 +44,7 @@ EOF
     die qq{Couldn't load application from file "$path": $@} if !$app && $@;
     die qq{File "$path" did not return an application object.\n}
       unless blessed $app && $app->isa('Mojo');
+    $self->app($app);
   };
   FindBin->again;
 

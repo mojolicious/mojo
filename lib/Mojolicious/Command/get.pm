@@ -8,6 +8,7 @@ use Mojo::JSON;
 use Mojo::JSON::Pointer;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
+use Scalar::Util 'weaken';
 
 has description => "Perform HTTP request.\n";
 has usage       => <<"EOF";
@@ -54,7 +55,6 @@ sub run {
   my %headers;
   /^\s*([^:]+)\s*:\s*(.+)$/ and $headers{$1} = $2 for @headers;
 
-  # Use global event loop singleton
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
   $ua->max_redirects(10) if $redirect;
 
@@ -62,44 +62,31 @@ sub run {
   if   ($url !~ m!^/!) { $ua->detect_proxy }
   else                 { $ua->app($self->app) }
 
-  # Do the real work with "start" event
-  my $v = my $buffer = '';
+  my $buffer = '';
   $ua->on(
     start => sub {
       my ($ua, $tx) = @_;
 
-      # Verbose callback
-      my $v  = $verbose;
-      my $cb = sub {
-        my $res = shift;
+      # Verbose
+      weaken $tx;
+      $tx->res->content->on(
+        body => sub {
 
-        # Wait for headers
-        return unless $v && $res->headers->is_finished;
-        $v = undef;
+          # Request
+          my $req = $tx->req;
+          warn $req->$_ for qw(build_start_line build_headers);
 
-        # Show request
-        my $req         = $tx->req;
-        my $startline   = $req->build_start_line;
-        my $req_headers = $req->build_headers;
-        warn "$startline$req_headers";
+          # Response
+          my $res = $tx->res;
+          warn $res->$_ for qw(build_start_line build_headers);
+        }
+      ) if $verbose;
 
-        # Show response
-        my $version     = $res->version;
-        my $code        = $res->code;
-        my $msg         = $res->message;
-        my $res_headers = $res->headers->to_string;
-        warn "HTTP/$version $code $msg\n$res_headers\n\n";
-      };
-      $tx->res->on(progress => $cb);
-
-      # Stream content
+      # Stream content (ignore redirects)
       $tx->res->content->unsubscribe('read')->on(
         read => sub {
-          $cb->(my $res = shift);
-
-          # Ignore intermediate content
-          return if $redirect && $res->is_status_class(300);
-          defined $selector ? ($buffer .= pop) : print(pop);
+          return if $redirect && $tx->res->is_status_class(300);
+          defined $selector ? ($buffer .= pop) : print pop;
         }
       );
     }

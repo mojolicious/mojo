@@ -55,12 +55,10 @@ sub run {
   my %headers;
   /^\s*([^:]+)\s*:\s*(.+)$/ and $headers{$1} = $2 for @headers;
 
-  my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-  $ua->max_redirects(10) if $redirect;
-
   # Detect proxy for absolute URLs
-  if   ($url !~ m!^/!) { $ua->detect_proxy }
-  else                 { $ua->app($self->app) }
+  my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+  $url !~ m!^/! ? $ua->detect_proxy : $ua->app($self->app);
+  $ua->max_redirects(10) if $redirect;
 
   my $buffer = '';
   $ua->on(

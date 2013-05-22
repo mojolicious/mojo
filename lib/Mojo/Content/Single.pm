@@ -154,7 +154,7 @@ Get a chunk of content starting from a specific position.
     = $single->parse("Content-Type: multipart/form-data\x0d\x0a\x0d\x0a");
 
 Parse content chunk and upgrade to L<Mojo::Content::MultiPart> object if
-possible.
+necessary.
 
 =head1 SEE ALSO
 

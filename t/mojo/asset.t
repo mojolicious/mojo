@@ -162,10 +162,15 @@ ok !-e $path, 'file has been cleaned up';
 
 # Upgrade
 my $asset = Mojo::Asset::Memory->new(max_memory_size => 5, auto_upgrade => 1);
+my $upgrade;
+$asset->on(upgrade => sub { $upgrade++ });
 $asset = $asset->add_chunk('lala');
+ok !$upgrade, 'upgrade event has not been emitted';
 ok !$asset->is_file, 'stored in memory';
 $asset = $asset->add_chunk('lala');
+is $upgrade, 1, 'upgrade event has been emitted once';
 ok $asset->is_file, 'stored in file';
+ok $asset->cleanup, 'file will be cleaned up';
 $asset = Mojo::Asset::Memory->new(max_memory_size => 5);
 $asset = $asset->add_chunk('lala');
 ok !$asset->is_file, 'stored in memory';

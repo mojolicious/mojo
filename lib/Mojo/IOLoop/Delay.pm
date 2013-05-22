@@ -38,9 +38,8 @@ sub _step {
   $self->{counter} = 0;
   if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }
 
-  return 0 if $self->{pending};
-  if ($self->{counter}) { $self->ioloop->timer(0 => $self->begin) }
-  else                  { $self->emit(finish => @args) }
+  if (!$self->{counter}) { $self->emit(finish => @args) }
+  elsif (!$self->{pending}) { $self->ioloop->timer(0 => $self->begin) }
   return 0;
 }
 

@@ -33,7 +33,7 @@ sub _step {
   $self->{args}[$id] = [@_];
   return $self->{pending} if --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
-  my @args = (map {@$_} grep {defined} @{delete($self->{args}) || []});
+  my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
   if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }

@@ -409,8 +409,8 @@ is $tx->req->url->to_abs, 'http://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
 ok $tx->req->headers->sec_websocket_key, 'has "Sec-WebSocket-Key" value';
-ok $tx->req->headers->sec_websocket_protocol,
-  'has "Sec-WebSocket-Protocol" value';
+ok !$tx->req->headers->sec_websocket_protocol,
+  'no "Sec-WebSocket-Protocol" header';
 ok $tx->req->headers->sec_websocket_version,
   'has "Sec-WebSocket-Version" value';
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
@@ -423,11 +423,38 @@ ok $tx->is_websocket, 'is a WebSocket';
 $tx = $t->websocket('wss://127.0.0.1:3000/echo' => {Expect => 'foo'});
 is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->headers->expect,     'foo',     'right "Upgrade" value';
+is $tx->req->headers->expect,     'foo',     'right "Expect" value';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
 ok $tx->req->headers->sec_websocket_key, 'has "Sec-WebSocket-Key" value';
-ok $tx->req->headers->sec_websocket_protocol,
-  'has "Sec-WebSocket-Protocol" value';
+ok !$tx->req->headers->sec_websocket_protocol,
+  'no "Sec-WebSocket-Protocol" header';
+ok $tx->req->headers->sec_websocket_version,
+  'has "Sec-WebSocket-Version" value';
+is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
+
+# WebSocket handshake with protocol
+$tx = $t->websocket('wss://127.0.0.1:3000/echo' => ['foo']);
+is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
+ok $tx->req->headers->sec_websocket_key,      'has "Sec-WebSocket-Key" value';
+is $tx->req->headers->sec_websocket_protocol, 'foo',
+  'right "Sec-WebSocket-Protocol" value';
+ok $tx->req->headers->sec_websocket_version,
+  'has "Sec-WebSocket-Version" value';
+is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
+
+# WebSocket handshake with header and protocols
+$tx = $t->websocket('wss://127.0.0.1:3000/echo' => {DNT => 1} =>
+    ['v1.bar.example.com', 'foo', 'v2.baz.example.com']);
+is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->dnt,        '1',       'right "DNT" value';
+is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
+ok $tx->req->headers->sec_websocket_key, 'has "Sec-WebSocket-Key" value';
+is $tx->req->headers->sec_websocket_protocol,
+  'v1.bar.example.com, foo, v2.baz.example.com',
+  'right "Sec-WebSocket-Protocol" value';
 ok $tx->req->headers->sec_websocket_version,
   'has "Sec-WebSocket-Version" value';
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';

@@ -1,5 +1,6 @@
 
 4.04  2013-05-23
+  - Added WebSocket protocol support to Mojo::UserAgent::Transactor.
 
 4.03  2013-05-21
   - Fixed redirect support in get command.

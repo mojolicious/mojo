@@ -91,10 +91,8 @@ sub client_handshake {
   my $self = shift;
 
   my $headers = $self->req->headers;
-  $headers->upgrade('websocket')  unless $headers->upgrade;
-  $headers->connection('Upgrade') unless $headers->connection;
-  $headers->sec_websocket_protocol('mojo')
-    unless $headers->sec_websocket_protocol;
+  $headers->upgrade('websocket')      unless $headers->upgrade;
+  $headers->connection('Upgrade')     unless $headers->connection;
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
   # Generate WebSocket challenge

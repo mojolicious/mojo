@@ -971,7 +971,8 @@ non-blocking.
 =head2 websocket
 
   $ua->websocket('ws://localhost:3000' => sub {...});
-  $ua->websocket('ws://localhost:3000' => {DNT => 1} => sub {...});
+  $ua->websocket(
+    'ws://localhost:3000' => {DNT => 1} => ['proto'] => sub {...});
 
 Open a non-blocking WebSocket connection with transparent handshake, takes the
 same arguments as L<Mojo::UserAgent::Transactor/"websocket">. The callback

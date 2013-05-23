@@ -876,7 +876,7 @@ Opposite of C<text_like>.
 =head2 websocket_ok
 
   $t = $t->websocket_ok('/echo');
-  $t = $t->websocket_ok('/echo' => {DNT => 1});
+  $t = $t->websocket_ok('/echo' => {DNT => 1} => ['proto']);
 
 Open a WebSocket connection with transparent handshake, takes the same
 arguments as L<Mojo::UserAgent/"websocket">, except for the callback.

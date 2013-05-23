@@ -542,7 +542,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   $delay->wait unless Mojo::IOLoop->is_running;
 
   # Non-blocking WebSocket connection sending and receiving JSON messages
-  $ua->websocket('ws://localhost:3000/echo.json' => sub {
+  $ua->websocket('ws://example.com/echo.json' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(json => sub {
@@ -798,8 +798,9 @@ L<Mojo::UserAgent::Transactor/"tx">.
 
 =head2 build_websocket_tx
 
-  my $tx = $ua->build_websocket_tx('ws://localhost:3000');
-  my $tx = $ua->build_websocket_tx('ws://localhost:3000' => {DNT => 1});
+  my $tx = $ua->build_websocket_tx('ws://example.com');
+  my $tx =
+    $ua->build_websocket_tx('ws://example.com' => {DNT => 1} => ['v1.proto']);
 
 Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"websocket">.
@@ -970,16 +971,16 @@ non-blocking.
 
 =head2 websocket
 
-  $ua->websocket('ws://localhost:3000' => sub {...});
+  $ua->websocket('ws://example.com' => sub {...});
   $ua->websocket(
-    'ws://localhost:3000' => {DNT => 1} => ['v1.proto'] => sub {...});
+    'ws://example.com' => {DNT => 1} => ['v1.proto'] => sub {...});
 
 Open a non-blocking WebSocket connection with transparent handshake, takes the
 same arguments as L<Mojo::UserAgent::Transactor/"websocket">. The callback
 will receive either a L<Mojo::Transaction::WebSocket> or
 L<Mojo::Transaction::HTTP> object.
 
-  $ua->websocket('ws://localhost:3000/echo' => sub {
+  $ua->websocket('ws://example.com/echo' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(finish => sub {

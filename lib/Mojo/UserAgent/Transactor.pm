@@ -412,8 +412,8 @@ handshake if possible.
 
 =head2 websocket
 
-  my $tx = $t->websocket('ws://localhost:3000');
-  my $tx = $t->websocket('ws://localhost:3000' => {DNT => 1} => ['v1.proto']);
+  my $tx = $t->websocket('ws://example.com');
+  my $tx = $t->websocket('ws://example.com' => {DNT => 1} => ['v1.proto']);
 
 Versatile L<Mojo::Transaction::HTTP> transaction builder for WebSocket
 handshake requests.

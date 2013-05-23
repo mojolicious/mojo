@@ -405,7 +405,7 @@ $t->get_ok('/plugin/camel_case')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Welcome aboard!');
 
 # MojoliciousTestController::Foo::stage2
-$t->get_ok('/staged' => {'X-Pass' => '1'})->status_is(200)
+$t->get_ok('/staged' => {'X-Pass' => 1})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Welcome aboard!');
 
 # MojoliciousTestController::Foo::stage1

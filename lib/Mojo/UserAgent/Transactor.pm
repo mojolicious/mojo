@@ -134,10 +134,10 @@ sub websocket {
   my $self = shift;
 
   # New WebSocket transaction
-  my $protos = ref $_[-1] eq 'ARRAY' ? pop : [];
+  my $sub = ref $_[-1] eq 'ARRAY' ? pop : [];
   my $tx = $self->tx(GET => @_);
   my $req = $tx->req;
-  $req->headers->sec_websocket_protocol(join ', ', @$protos) if @$protos;
+  $req->headers->sec_websocket_protocol(join ', ', @$sub) if @$sub;
   my $url   = $req->url;
   my $proto = $url->protocol;
   $url->scheme($proto eq 'wss' ? 'https' : 'http') if $proto;
@@ -413,7 +413,7 @@ handshake if possible.
 =head2 websocket
 
   my $tx = $t->websocket('ws://localhost:3000');
-  my $tx = $t->websocket('ws://localhost:3000' => {DNT => 1} => ['proto']);
+  my $tx = $t->websocket('ws://localhost:3000' => {DNT => 1} => ['v1.proto']);
 
 Versatile L<Mojo::Transaction::HTTP> transaction builder for WebSocket
 handshake requests.

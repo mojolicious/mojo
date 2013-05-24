@@ -3,18 +3,18 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
+use Mojo::Util 'encode';
 
 has handle => sub {
 
   # File
   if (my $path = shift->path) {
     croak qq{Can't open log file "$path": $!}
-      unless open my $file, '>>:utf8', $path;
+      unless open my $file, '>>', $path;
     return $file;
   }
 
   # STDERR
-  binmode STDERR, ':utf8';
   return \*STDERR;
 };
 has level => 'debug';
@@ -63,7 +63,7 @@ sub _message {
 
   flock $handle, LOCK_EX;
   croak "Can't write to log: $!"
-    unless $handle->print($self->format($level, @lines));
+    unless $handle->print(encode 'UTF-8', $self->format($level, @lines));
   flock $handle, LOCK_UN;
 }
 

@@ -15,10 +15,9 @@ $log->fatal('I ♥ Mojolicious.');
 $log->debug('Does not work.');
 undef $log;
 my $content = decode 'UTF-8', slurp($path);
-like $content, qr/\[.*\] \[error\] Just works\.\n/, 'right error message';
-like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\.\n/,
-  'right fatal message';
-unlike $content, qr/\[.*\] \[debug\] Does not work\.\n/, 'no debug message';
+like $content, qr/\[.*\] \[error\] Just works\./,        'right error message';
+like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\./, 'right fatal message';
+unlike $content, qr/\[.*\] \[debug\] Does not work\./, 'no debug message';
 
 # Logging to STDERR
 my $buffer = '';

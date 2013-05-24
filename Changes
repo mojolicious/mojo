@@ -1,4 +1,7 @@
 
+4.06  2013-05-25
+  - Fixed Windows bug in "log.t".
+
 4.05  2013-05-24
   - Fixed encoding bug in Mojo::Log.
 
@@ -2534,7 +2537,7 @@
   - Deprecated Mojo::Transaction::Single, make sure to update all old code to
     use Mojo::Transaction::HTTP instead.
   - MOJO_RELOAD=1 now works with Mojolicious::Lite, have fun!
-  - Allow reloading to be triggered once by a USR1 or WINCH (win32) signal.
+  - Allow reloading to be triggered once by a USR1 or WINCH (Windows) signal.
   - Added --reload flag to all server bindings as an alternative to
     MOJO_RELOAD=1.
   - Added WebSocket support.
@@ -2847,7 +2850,7 @@
   - Added port support to Mojo::Cookie.
   - Made chunk size configurable with MOJO_CHUNK_SIZE environment variable.
   - Simplified script system startup.
-  - Fixed win32 bug where eplite templates would not be detected right.
+  - Fixed Windows bug where eplite templates would not be detected right.
 
 0.991244  2009-07-30
   - Fixed package.
@@ -2857,7 +2860,7 @@
   - Made proxy support more portable.
   - Simplified progress callbacks.
   - Added local host bin address support to Mojo::Server::Daemon.
-  - Fixed layouts on win32 and made templates portable, "/" is now the
+  - Fixed layouts on Windows and made templates portable, "/" is now the
     separator on all platforms. (charsbar)
   - Fixed dependency on Getopt::Long 2.38. (kevinold)
   - Fixed Perl 5.8.1 prereqs. (alias)
@@ -3005,7 +3008,7 @@
   - Fixed tokenizer in MojoX::Routes::Pattern to support "0" values.
     (Anatoly Sharifulin)
   - Fixed parsing of "0" in Mojo::Path. (charsbar)
-  - Fix server tests on win32. (charsbar)
+  - Fix server tests on Windows. (charsbar)
   - Fixed leading whitespace problem in the request parser. (acajou)
   - Fixed broken pipe problem in Mojo::Server::CGI. (vti)
   - Added more diagnostics options to Mojo::HelloWorld. (uwe)
@@ -3125,7 +3128,7 @@
   - Made "daemon.t" developer only.
 
 0.8  2008-10-21
-  - Fixed Mojo::Server::Daemon windows support.
+  - Fixed Mojo::Server::Daemon Windows support.
   - Generated applications now have individually named executables.
   - Changed Mojolicious default application templates to something more sane.
   - Mojo::Base accessors don't take multiple arguments anymore, this results
@@ -3133,7 +3136,7 @@
   - Added MOJO_MAX_MEMORY_SIZE environment variable.
   - Added prepare_parser and prepare_builder callbacks to Mojo::Message.
   - Added done and is_done to Mojo::Stateful.
-  - Fixed many win32 related bugs.
+  - Fixed many Windows related bugs.
   - Fixed keep-alive related bugs in daemon and client. (Pedro Melo)
   - Allow default in Mojo::Base to have false values. (Pedro Melo)
   - Fixed chmod_rel_file in Mojo::Script. (Shu Cho).

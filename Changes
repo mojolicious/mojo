@@ -1,5 +1,6 @@
 
 4.07  2013-05-25
+  - Updated jQuery to version 2.0.1.
   - Fixed format handling in routes command.
 
 4.06  2013-05-25

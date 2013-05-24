@@ -1,4 +1,7 @@
 
+4.07  2013-05-25
+  - Fixed format handling in routes command.
+
 4.06  2013-05-25
   - Fixed Windows bug in "log.t".
 

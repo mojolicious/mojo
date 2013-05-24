@@ -26,64 +26,48 @@ sub run {
 sub _draw {
   my ($self, $routes, $verbose) = @_;
 
-  # Calculate column widths
-  my @length = (0, 0, 0);
+  my @table = (0, 0, 0);
   for my $node (@$routes) {
 
-    # Pattern
-    my $len = length $node->[0];
-    $length[0] = $len if $len > $length[0];
-
     # Methods
-    unless (defined $node->[1]->via) { $len = length '*' }
-    else { $len = length(join ',', @{$node->[1]->via}) }
-    $length[1] = $len if $len > $length[1];
+    my $via = $node->[0]->via;
+    $node->[2] = $via ? uc(join ',', @$via) : '*';
 
     # Name
-    $len = length $node->[1]->name;
-    $len += 2 if $node->[1]->has_custom_name;
-    $length[2] = $len if $len > $length[2];
+    $node->[3] = $node->[0]->name;
+    $node->[3] = qq{"$node->[3]"} if $node->[0]->has_custom_name;
+
+    # Check column width
+    $table[$_] = _max($table[$_], length $node->[$_ + 1]) for 0 .. 2;
   }
 
-  # Draw all routes
   for my $node (@$routes) {
-    my @parts;
+    my @parts = map { _padding($node->[$_ + 1], $table[$_]) } 0 .. 2;
 
-    # Pattern
-    push @parts, $node->[0];
-    $parts[-1] .= ' ' x ($length[0] - length $parts[-1]);
-
-    # Methods
-    my $methods;
-    unless (defined $node->[1]->via) { $methods = '*' }
-    else { $methods = uc join ',', @{$node->[1]->via} }
-    push @parts, $methods . ' ' x ($length[1] - length $methods);
-
-    # Name
-    my $name = $node->[1]->name;
-    $name = qq{"$name"} if $node->[1]->has_custom_name;
-    push @parts, $name . ' ' x ($length[2] - length $name);
-
-    # Regex
-    my $pattern = $node->[1]->pattern;
-    $pattern->match('/', $node->[1]->is_endpoint);
+    # Regex (verbose)
+    my $pattern = $node->[0]->pattern;
+    $pattern->match('/', $node->[0]->is_endpoint);
     my $regex = (regexp_pattern $pattern->regex)[0];
-    my $format = (regexp_pattern $pattern->format_regex || '')[0];
+    my $format = (regexp_pattern($pattern->format_regex || ''))[0];
     my $optional
       = !$pattern->constraints->{format} || $pattern->defaults->{format};
-    $format .= '?' if $format && $optional;
+    $format = "(?:$format)?" if $format && $optional;
     push @parts, $format ? "$regex$format" : $regex if $verbose;
 
     say encode('UTF-8', join('  ', @parts));
   }
 }
 
+sub _max { $_[1] > $_[0] ? $_[1] : $_[0] }
+
+sub _padding { $_[0] . ' ' x ($_[1] - length $_[0]) }
+
 sub _walk {
   my ($self, $node, $depth, $routes) = @_;
 
   my $prefix = '';
   if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
-  push @$routes, [$prefix . ($node->pattern->pattern || '/'), $node];
+  push @$routes, [$node, $prefix . ($node->pattern->pattern || '/')];
 
   $depth++;
   $self->_walk($_, $depth, $routes) for @{$node->children};

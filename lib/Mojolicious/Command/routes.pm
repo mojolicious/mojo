@@ -31,11 +31,11 @@ sub _draw {
 
     # Methods
     my $via = $node->[0]->via;
-    $node->[2] = $via ? uc(join ',', @$via) : '*';
+    $node->[2] = !$via ? '*' : uc join ',', @$via;
 
     # Name
-    $node->[3] = $node->[0]->name;
-    $node->[3] = qq{"$node->[3]"} if $node->[0]->has_custom_name;
+    my $name = $node->[0]->name;
+    $node->[3] = $node->[0]->has_custom_name ? qq{"$name"} : $name;
 
     # Check column width
     $table[$_] = _max($table[$_], length $node->[$_ + 1]) for 0 .. 2;
@@ -51,8 +51,8 @@ sub _draw {
     my $format = (regexp_pattern($pattern->format_regex || ''))[0];
     my $optional
       = !$pattern->constraints->{format} || $pattern->defaults->{format};
-    $format = "(?:$format)?" if $format && $optional;
-    push @parts, $format ? "$regex$format" : $regex if $verbose;
+    $regex .= $optional ? "(?:$format)?" : $format if $format;
+    push @parts, $regex if $verbose;
 
     say encode('UTF-8', join('  ', @parts));
   }
@@ -63,14 +63,14 @@ sub _max { $_[1] > $_[0] ? $_[1] : $_[0] }
 sub _padding { $_[0] . ' ' x ($_[1] - length $_[0]) }
 
 sub _walk {
-  my ($self, $node, $depth, $routes) = @_;
+  my ($self, $route, $depth, $routes) = @_;
 
   my $prefix = '';
   if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
-  push @$routes, [$node, $prefix . ($node->pattern->pattern || '/')];
+  push @$routes, [$route, $prefix . ($route->pattern->pattern || '/')];
 
   $depth++;
-  $self->_walk($_, $depth, $routes) for @{$node->children};
+  $self->_walk($_, $depth, $routes) for @{$route->children};
   $depth--;
 }
 

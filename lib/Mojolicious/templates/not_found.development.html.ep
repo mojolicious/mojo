@@ -85,23 +85,23 @@
           new one?
         </p>
         % my $walk = begin
-          % my ($walk, $node, $depth) = @_;
+          % my ($walk, $route, $depth) = @_;
           <tr>
             <td>
-              % my $pattern = $node->pattern->pattern || '/';
+              % my $pattern = $route->pattern->pattern || '/';
               % $pattern = "+$pattern" if $depth;
               <pre><%= '  ' x $depth %><%= $pattern %></pre>
             </td>
             <td>
-              <pre><%= uc(join ',', @{$node->via || []}) || '*' %></pre>
+              <pre><%= uc(join ',', @{$route->via || []}) || '*' %></pre>
             </td>
             <td>
-              % my $name = $node->name;
-              <pre><%= $node->has_custom_name ? qq{"$name"} : $name %></pre>
+              % my $name = $route->name;
+              <pre><%= $route->has_custom_name ? qq{"$name"} : $name %></pre>
             </td>
           </tr>
           % $depth++;
-          %= $walk->($walk, $_, $depth) for @{$node->children};
+          %= $walk->($walk, $_, $depth) for @{$route->children};
           % $depth--;
         % end
         <table>

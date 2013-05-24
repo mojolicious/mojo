@@ -4,20 +4,37 @@ use Test::More;
 use File::Spec::Functions 'catdir';
 use File::Temp 'tempdir';
 use Mojo::Log;
-use Mojo::Util 'slurp';
+use Mojo::Util qw(decode slurp);
 
 # Logging to file
 my $dir = tempdir CLEANUP => 1;
 my $path = catdir $dir, 'test.log';
 my $log = Mojo::Log->new(level => 'error', path => $path);
 $log->error('Just works.');
-$log->fatal('Works too.');
+$log->fatal('I ♥ Mojolicious.');
 $log->debug('Does not work.');
 undef $log;
-my $content = slurp $path;
-like $content,   qr/\[.*\] \[error\] Just works\.\n/,    'has error message';
-like $content,   qr/\[.*\] \[fatal\] Works too\.\n/,     'has fatal message';
+my $content = decode 'UTF-8', slurp($path);
+like $content, qr/\[.*\] \[error\] Just works\.\n/, 'right error message';
+like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\.\n/,
+  'right fatal message';
 unlike $content, qr/\[.*\] \[debug\] Does not work\.\n/, 'no debug message';
+
+# Logging to STDERR
+my $buffer = '';
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  my $log = Mojo::Log->new;
+  $log->error('Just works.');
+  $log->fatal('I ♥ Mojolicious.');
+  $log->debug('Works too.');
+}
+$content = decode 'UTF-8', $buffer;
+like $content, qr/\[.*\] \[error\] Just works\.\n/, 'right error message';
+like $content, qr/\[.*\] \[fatal\] I ♥ Mojolicious\.\n/,
+  'right fatal message';
+like $content, qr/\[.*\] \[debug\] Works too\.\n/, 'right debug message';
 
 # Formatting
 $log = Mojo::Log->new;

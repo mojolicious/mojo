@@ -1,4 +1,7 @@
 
+4.05  2013-05-24
+  - Fixed encoding bug in Mojo::Log.
+
 4.04  2013-05-23
   - Added WebSocket subprotocol support to Mojo::UserAgent::Transactor.
 

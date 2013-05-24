@@ -63,7 +63,7 @@ sub _message {
 
   flock $handle, LOCK_EX;
   croak "Can't write to log: $!"
-    unless defined $handle->syswrite($self->format($level, @lines));
+    unless $handle->print($self->format($level, @lines));
   flock $handle, LOCK_UN;
 }
 

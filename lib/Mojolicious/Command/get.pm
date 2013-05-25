@@ -109,10 +109,7 @@ sub _json {
   say $json->encode($data);
 }
 
-sub _say {
-  return unless length(my $value = shift);
-  say encode('UTF-8', $value);
-}
+sub _say { say encode('UTF-8', $_[0]) if length $_[0] }
 
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;

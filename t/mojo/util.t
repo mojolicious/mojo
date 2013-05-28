@@ -293,26 +293,7 @@ is unpack('H*', sha1_bytes 'foo bar baz'),
 is sha1_sum('foo bar baz'), 'c7567e8b39e2428e38bf9c9226ac68de4c67dc39',
   'right sha1 checksum';
 
-# hmac_sha1_sum (RFC 2202)
-is hmac_sha1_sum('Hi There', chr(0x0b) x 20),
-  'b617318655057264e28bc0b6fb378c8ef146be00', 'right hmac sha1 checksum';
-is hmac_sha1_sum('what do ya want for nothing?', 'Jefe'),
-  'effcdf6ae5eb2fa2d27416d5f184df9c259a7c79', 'right hmac sha1 checksum';
-is hmac_sha1_sum(chr(0xdd) x 50, chr(0xaa) x 20),
-  '125d7342b9ac11cd91a39af48aa17b4f63f175d3', 'right hmac sha1 checksum';
-is hmac_sha1_sum(chr(0xcd) x 50,
-  pack 'H*' => '0102030405060708090a0b0c0d0e0f10111213141516171819'),
-  '4c9007f4026250c6bc8414f9bf50c86c2d7235da', 'right hmac sha1 checksum';
-is hmac_sha1_sum('Test With Truncation', chr(0x0c) x 20),
-  '4c1a03424b55e07fe7f27be1d58bb9324a9a5a04', 'right hmac sha1 checksum';
-is hmac_sha1_sum('Test Using Larger Than Block-Size Key - Hash Key First',
-  chr(0xaa) x 80),
-  'aa4ae5e15272d00e95705637ce8a3b55ed402112', 'right hmac sha1 checksum';
-is hmac_sha1_sum(
-  'Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data',
-  chr(0xaa) x 80
-  ),
-  'e8e99d0f45237d786d6bbaa7965c7808bbff1a91', 'right hmac sha1 checksum';
+# hmac_sha1_sum
 is hmac_sha1_sum('Hi there', 1234567890),
   '4fd7160f392dc54308608cae6587e137c62c2e39', 'right hmac sha1 checksum';
 

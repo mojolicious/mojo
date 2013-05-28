@@ -1,4 +1,7 @@
 
+4.08  2013-05-28
+  - Improved HMAC-SHA1 performance in Mojo::Util.
+
 4.07  2013-05-26
   - Updated jQuery to version 2.0.1.
   - Fixed format handling in routes command.

@@ -3,7 +3,7 @@ use Mojo::Base 'Exporter';
 
 use Carp qw(carp croak);
 use Digest::MD5 qw(md5 md5_hex);
-use Digest::SHA qw(sha1 sha1_hex);
+use Digest::SHA qw(hmac_sha1 sha1 sha1_hex);
 use Encode 'find_encoding';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
@@ -109,15 +109,7 @@ sub get_line {
   return $line;
 }
 
-sub hmac_sha1_sum {
-  my ($str, $secret) = @_;
-  $secret = $secret ? "$secret" : 'Very insecure!';
-  $secret = sha1 $secret if length $secret > 64;
-
-  my $ipad = $secret ^ (chr(0x36) x 64);
-  my $opad = $secret ^ (chr(0x5c) x 64);
-  return unpack 'H*', sha1($opad . sha1($ipad . $str));
-}
+sub hmac_sha1_sum { unpack 'H*', hmac_sha1(@_) }
 
 sub html_unescape {
   my $str = shift;

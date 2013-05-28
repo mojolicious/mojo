@@ -134,36 +134,32 @@ sub punycode_decode {
   my $input = shift;
   use integer;
 
-  # Delimiter
-  my @output;
-  push @output, split //, $1 if $input =~ s/(.*)\x2d//s;
-
   my $n    = PC_INITIAL_N;
   my $i    = 0;
   my $bias = PC_INITIAL_BIAS;
+  my @output;
+
+  # Consume all code points before the last delimiter
+  push @output, split //, $1 if $input =~ s/(.*)\x2d//s;
+
   while (length $input) {
     my $oldi = $i;
     my $w    = 1;
 
     # Base to infinity in steps of base
     for (my $k = PC_BASE; 1; $k += PC_BASE) {
-
-      # Digit
       my $digit = ord substr $input, 0, 1, '';
       $digit = $digit < 0x40 ? $digit + (26 - 0x30) : ($digit & 0x1f) - 1;
       $i += $digit * $w;
       my $t = $k - $bias;
       $t = $t < PC_TMIN ? PC_TMIN : $t > PC_TMAX ? PC_TMAX : $t;
       last if $digit < $t;
-
-      $w *= (PC_BASE - $t);
+      $w *= PC_BASE - $t;
     }
 
-    # Bias
     $bias = _adapt($i - $oldi, @output + 1, $oldi == 0);
     $n += $i / (@output + 1);
     $i = $i % (@output + 1);
-
     splice @output, $i++, 0, chr $n;
   }
 
@@ -175,35 +171,28 @@ sub punycode_encode {
   my $output = shift;
   use integer;
 
-  # Split input
+  my $n     = PC_INITIAL_N;
+  my $delta = 0;
+  my $bias  = PC_INITIAL_BIAS;
+
+  # Extract basic code points
   my $len   = length $output;
   my @input = map {ord} split //, $output;
   my @chars = sort grep { $_ >= PC_INITIAL_N } @input;
-
-  # Handle non-basic characters
   $output =~ s/[^\x00-\x7f]+//gs;
   my $h = my $b = length $output;
   $output .= "\x2d" if $b > 0;
 
-  my $n     = PC_INITIAL_N;
-  my $delta = 0;
-  my $bias  = PC_INITIAL_BIAS;
   for my $m (@chars) {
-
-    # Basic character
     next if $m < $n;
-
-    # Walk all code points in order
     $delta += ($m - $n) * ($h + 1);
     $n = $m;
+
     for (my $i = 0; $i < $len; $i++) {
       my $c = $input[$i];
 
-      # Basic character
-      $delta++ if $c < $n;
-
-      # Non basic character
-      if ($c == $n) {
+      if ($c < $n) { $delta++ }
+      elsif ($c == $n) {
         my $q = $delta;
 
         # Base to infinity in steps of base
@@ -211,18 +200,12 @@ sub punycode_encode {
           my $t = $k - $bias;
           $t = $t < PC_TMIN ? PC_TMIN : $t > PC_TMAX ? PC_TMAX : $t;
           last if $q < $t;
-
-          # Code point for digit "t"
           my $o = $t + (($q - $t) % (PC_BASE - $t));
           $output .= chr $o + ($o < 26 ? 0x61 : 0x30 - 26);
-
           $q = ($q - $t) / (PC_BASE - $t);
         }
 
-        # Code point for digit "q"
         $output .= chr $q + ($q < 26 ? 0x61 : 0x30 - 26);
-
-        # Bias
         $bias = _adapt($delta, $h + 1, $h == $b);
         $delta = 0;
         $h++;
@@ -334,8 +317,8 @@ sub xor_encode {
 
 sub _adapt {
   my ($delta, $numpoints, $firsttime) = @_;
-
   use integer;
+
   $delta = $firsttime ? $delta / PC_DAMP : $delta / 2;
   $delta += $delta / $numpoints;
   my $k = 0;

@@ -75,8 +75,8 @@ is b('foo bar baz')->sha1_sum, 'c7567e8b39e2428e38bf9c9226ac68de4c67dc39',
   'right sha1 checksum';
 
 # hmac_sha1_sum
-is b('Hi there')->hmac_sha1_sum(1234567890),
-  '4fd7160f392dc54308608cae6587e137c62c2e39', 'right hmac sha1 checksum';
+is b('Hi there')->hmac_sha1_sum('abc1234567890'),
+  '5344f37e1948dd3ffb07243a4d9201a227abd6e1', 'right hmac sha1 checksum';
 
 # secure_compare
 ok b('hello')->secure_compare('hello'), 'values are equal';

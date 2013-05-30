@@ -1,5 +1,6 @@
 
-4.08  2013-05-28
+4.08  2013-05-30
+  - Improved Mojo::Message::Request to allow curly brackets in URLs.
   - Improved HMAC-SHA1 performance in Mojo::Util.
 
 4.07  2013-05-26

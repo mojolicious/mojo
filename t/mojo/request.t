@@ -1941,4 +1941,14 @@ is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/#09azAZ-._~:/?%5B%5D@!$&\'()*+,;=%', 'right URL';
 
+# Parse curly brackets in URL
+$req = Mojo::Message::Request->new;
+$req->parse('GET /%7Bpath-with-curly-brackets%7D?v={value-with-curly-brackets} ');
+$req->parse("HTTP/1.1\x0d\x0a\x0d\x0a");
+ok $req->is_finished, 'request is finished';
+is $req->method,      'GET', 'right http method for curly brackets';
+is $req->version,     '1.1', 'right protocol version for curly brackets';
+is $req->url,         '/%7Bpath-with-curly-brackets%7D?v=%7Bvalue-with-curly-brackets%7D', 'right URL with curly brackets in query string';
+is $req->url->query->param('v'), '{value-with-curly-brackets}', 'right value included curly brackets';
+
 done_testing();

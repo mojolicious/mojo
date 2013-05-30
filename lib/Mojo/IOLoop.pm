@@ -558,6 +558,10 @@ loop object from everywhere inside the process.
   Mojo::IOLoop->timer(2 => sub { Mojo::IOLoop->stop });
   Mojo::IOLoop->start;
 
+  # Restart active timer
+  my $id = Mojo::IOLoop->timer(3 => sub { say 'Timeout!' });
+  Mojo::IOLoop->singleton->reactor->again($id);
+
 =head2 start
 
   Mojo::IOLoop->start;

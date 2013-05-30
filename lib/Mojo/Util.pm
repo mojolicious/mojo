@@ -238,7 +238,7 @@ sub sha1_sum   { sha1_hex(@_) }
 
 sub slurp {
   my $path = shift;
-  croak qq{Can't open file "$path": $!} unless open my $file, '<', $path;
+  croak qq{Can't open file "$path": $!} unless open my $file, '<:raw', $path;
   my $content = '';
   while ($file->sysread(my $buffer, 131072, 0)) { $content .= $buffer }
   return $content;
@@ -246,7 +246,7 @@ sub slurp {
 
 sub spurt {
   my ($content, $path) = @_;
-  croak qq{Can't open file "$path": $!} unless open my $file, '>', $path;
+  croak qq{Can't open file "$path": $!} unless open my $file, '>:raw', $path;
   croak qq{Can't write to file "$path": $!}
     unless defined $file->syswrite($content);
   return $content;

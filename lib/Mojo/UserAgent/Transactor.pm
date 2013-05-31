@@ -394,8 +394,8 @@ requests, with support for content generators.
   });
 
 The C<form> content generator will automatically use query parameters for
-C<GET>/C<HEAD> requests and the "application/x-www-form-urlencoded" content
-type for everything else. Both get upgraded automatically to using the
+GET/HEAD requests and the "application/x-www-form-urlencoded" content type for
+everything else. Both get upgraded automatically to using the
 "multipart/form-data" content type when necessary or when the header has been
 set manually.
 

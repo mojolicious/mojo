@@ -358,8 +358,8 @@ Generate file input element.
     %= submit_button
   % end
 
-Generate portable form for route, path or URL. For routes that allow C<POST>
-but not C<GET>, a C<method> attribute will be automatically added.
+Generate portable form for route, path or URL. For routes that allow POST but
+not GET, a C<method> attribute will be automatically added.
 
   <form action="/path/to/login">
     <input name="first_name" />

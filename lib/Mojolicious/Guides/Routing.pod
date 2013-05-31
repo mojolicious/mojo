@@ -489,7 +489,7 @@ methods to pass.
   $r->route('/bye')->via('GET', 'POST')
     ->to(controller => 'foo', action => 'bye');
 
-With one small exception, C<HEAD> requests are considered equal to C<GET> and
+With one small exception, HEAD requests are considered equal to GET and
 content will not be sent with the response.
 
   # GET /test  -> {controller => 'bar', action => 'test'}
@@ -500,7 +500,7 @@ content will not be sent with the response.
 =head2 WebSockets
 
 With the method L<Mojolicious::Routes::Route/"websocket"> you can restrict
-access to WebSocket handshakes, which are normal C<GET> requests with some
+access to WebSocket handshakes, which are normal GET requests with some
 additional information.
 
   # /echo (WebSocket handshake)

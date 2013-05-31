@@ -49,9 +49,8 @@ sub body_params {
 
   # "multipart/formdata"
   elsif ($type =~ m!multipart/form-data!i) {
-    for my $data (@{$self->_parse_formdata}) {
-      $params->append($data->[0], $data->[2]) unless defined $data->[1];
-    }
+    !defined($_->[1]) && $params->append(@$_[0, 2])
+      for @{$self->_parse_formdata};
   }
 
   return $params;
@@ -427,12 +426,12 @@ Slurp or replace C<content>.
 
   my $params = $msg->body_params;
 
-C<POST> parameters extracted from C<x-application-urlencoded>,
+POST parameters extracted from C<x-application-urlencoded>,
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
 usually a L<Mojo::Parameters> object. Note that this method caches all data,
 so it should not be called before the entire message body has been received.
-Also note that message content needs to be loaded into memory to parse it, so
-you have to make sure it is not excessively large.
+Also note that message content needs to be loaded into memory to parse POST
+parameters, so you have to make sure it is not excessively large.
 
   # Get POST parameter value
   say $msg->body_params->param('foo');
@@ -591,10 +590,10 @@ have to make sure it is not excessively large.
   my $foo   = $msg->param('foo');
   my @foo   = $msg->param('foo');
 
-Access C<POST> parameters. Note that this method caches all data, so it should
+Access POST parameters. Note that this method caches all data, so it should
 not be called before the entire message body has been received. Also note that
-message content needs to be loaded into memory to parse it, so you have to
-make sure it is not excessively large.
+message content needs to be loaded into memory to parse POST parameters, so
+you have to make sure it is not excessively large.
 
 =head2 parse
 

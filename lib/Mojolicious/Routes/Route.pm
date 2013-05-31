@@ -353,7 +353,7 @@ Generate bridge route.
 
   my $route = $r->delete('/:foo' => sub {...});
 
-Generate route matching only C<DELETE> requests. See also the
+Generate route matching only DELETE requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->delete('/user')->to('user#remove');
@@ -381,8 +381,8 @@ generated ones.
 
   my $route = $r->get('/:foo' => sub {...});
 
-Generate route matching only C<GET> requests. See also the
-L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching only GET requests. See also the L<Mojolicious::Lite>
+tutorial for more argument variations.
 
   $r->get('/user')->to('user#show');
 
@@ -431,7 +431,7 @@ the current route.
 
   my $route = $r->options('/:foo' => sub {...});
 
-Generate route matching only C<OPTIONS> requests. See also the
+Generate route matching only OPTIONS requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->options('/user')->to('user#overview');
@@ -460,8 +460,8 @@ Parse pattern.
 
   my $route = $r->patch('/:foo' => sub {...});
 
-Generate route matching only C<PATCH> requests. See also the
-L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching only PATCH requests. See also the L<Mojolicious::Lite>
+tutorial for more argument variations.
 
   $r->patch('/user')->to('user#update');
 
@@ -469,8 +469,8 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   my $route = $r->post('/:foo' => sub {...});
 
-Generate route matching only C<POST> requests. See also the
-L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching only POST requests. See also the L<Mojolicious::Lite>
+tutorial for more argument variations.
 
   $r->post('/user')->to('user#create');
 
@@ -478,8 +478,8 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   my $route = $r->put('/:foo' => sub {...});
 
-Generate route matching only C<PUT> requests. See also the
-L<Mojolicious::Lite> tutorial for more argument variations.
+Generate route matching only PUT requests. See also the L<Mojolicious::Lite>
+tutorial for more argument variations.
 
   $r->put('/user')->to('user#replace');
 

@@ -105,15 +105,15 @@ Turn list into a L<Mojo::Collection> object.
   my $res = d('example.com');
   my $res = d('http://example.com' => {DNT => 1} => 'Hi!');
 
-Perform C<DELETE> request with L<Mojo::UserAgent/"delete"> and return
-resulting L<Mojo::Message::Response> object.
+Perform DELETE request with L<Mojo::UserAgent/"delete"> and return resulting
+L<Mojo::Message::Response> object.
 
 =head2 g
 
   my $res = g('example.com');
   my $res = g('http://example.com' => {DNT => 1} => 'Hi!');
 
-Perform C<GET> request with L<Mojo::UserAgent/"get"> and return resulting
+Perform GET request with L<Mojo::UserAgent/"get"> and return resulting
 L<Mojo::Message::Response> object.
 
   $ perl -Mojo -E 'say g("mojolicio.us")->dom("h1, h2, h3")->pluck("text")'
@@ -123,7 +123,7 @@ L<Mojo::Message::Response> object.
   my $res = h('example.com');
   my $res = h('http://example.com' => {DNT => 1} => 'Hi!');
 
-Perform C<HEAD> request with L<Mojo::UserAgent/"head"> and return resulting
+Perform HEAD request with L<Mojo::UserAgent/"head"> and return resulting
 L<Mojo::Message::Response> object.
 
 =head2 j
@@ -141,15 +141,15 @@ Encode Perl data structure or decode JSON with L<Mojo::JSON>.
   my $res = o('example.com');
   my $res = o('http://example.com' => {DNT => 1} => 'Hi!');
 
-Perform C<OPTIONS> request with L<Mojo::UserAgent/"options"> and return
-resulting L<Mojo::Message::Response> object.
+Perform OPTIONS request with L<Mojo::UserAgent/"options"> and return resulting
+L<Mojo::Message::Response> object.
 
 =head2 p
 
   my $res = p('example.com');
   my $res = p('http://example.com' => {DNT => 1} => 'Hi!');
 
-Perform C<POST> request with L<Mojo::UserAgent/"post"> and return resulting
+Perform POST request with L<Mojo::UserAgent/"post"> and return resulting
 L<Mojo::Message::Response> object.
 
 =head2 r
@@ -165,7 +165,7 @@ Dump a Perl data structure with L<Data::Dumper>.
   my $res = t('example.com');
   my $res = t('http://example.com' => {DNT => 1} => 'Hi!');
 
-Perform C<PATCH> request with L<Mojo::UserAgent/"patch"> and return resulting
+Perform PATCH request with L<Mojo::UserAgent/"patch"> and return resulting
 L<Mojo::Message::Response> object.
 
 =head2 u
@@ -173,7 +173,7 @@ L<Mojo::Message::Response> object.
   my $res = u('example.com');
   my $res = u('http://example.com' => {DNT => 1} => 'Hi!');
 
-Perform C<PUT> request with L<Mojo::UserAgent/"put"> and return resulting
+Perform PUT request with L<Mojo::UserAgent/"put"> and return resulting
 L<Mojo::Message::Response> object.
 
 =head2 x

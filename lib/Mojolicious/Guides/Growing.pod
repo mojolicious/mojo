@@ -77,9 +77,8 @@ all session state is kept client-side.
   |         | <-    200 OK        <- |            |
   +---------+                        +------------+
 
-While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part
-of REST they go very well with it and are commonly used to manipulate
-C<resources>.
+While HTTP methods such as PUT, GET and DELETE are not directly part of REST
+they go very well with it and are commonly used to manipulate C<resources>.
 
 =head2 Sessions
 

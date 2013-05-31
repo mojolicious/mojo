@@ -814,7 +814,7 @@ L<Mojo::UserAgent::Transactor/"websocket">.
   my $tx = $ua->delete(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<DELETE> request and return resulting
+Perform blocking DELETE request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
@@ -840,10 +840,10 @@ enabled with the MOJO_PROXY environment variable.
   my $tx = $ua->get('http://example.com' => {DNT => 1} => form => {a => 'b'});
   my $tx = $ua->get('http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<GET> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking GET request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->get('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -860,10 +860,10 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->head(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<HEAD> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking HEAD request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->head('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -886,7 +886,7 @@ Check if request for domain would use a proxy server.
   my $tx = $ua->options(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<OPTIONS> request and return resulting
+Perform blocking OPTIONS request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
@@ -906,10 +906,10 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->patch(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<PATCH> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking PATCH request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->patch('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -926,10 +926,10 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->post(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<POST> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking POST request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->post('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -944,10 +944,10 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->put('http://example.com' => {DNT => 1} => form => {a => 'b'});
   my $tx = $ua->put('http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<PUT> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking PUT request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->put('http://example.com' => sub {
     my ($ua, $tx) = @_;

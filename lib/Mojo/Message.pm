@@ -41,9 +41,9 @@ sub body_params {
   my $params = $self->{body_params} = Mojo::Parameters->new;
   $params->charset($self->content->charset || $self->default_charset);
 
-  # "x-application-urlencoded" and "application/x-www-form-urlencoded"
+  # "application/x-www-form-urlencoded"
   my $type = $self->headers->content_type // '';
-  if ($type =~ m!(?:x-application|application/x-www-form)-urlencoded!i) {
+  if ($type =~ m!application/x-www-form-urlencoded!i) {
     $params->parse($self->content->asset->slurp);
   }
 
@@ -426,12 +426,12 @@ Slurp or replace C<content>.
 
   my $params = $msg->body_params;
 
-POST parameters extracted from C<x-application-urlencoded>,
-C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
-usually a L<Mojo::Parameters> object. Note that this method caches all data,
-so it should not be called before the entire message body has been received.
-Also note that message content needs to be loaded into memory to parse POST
-parameters, so you have to make sure it is not excessively large.
+POST parameters extracted from C<application/x-www-form-urlencoded> or
+C<multipart/form-data> message body, usually a L<Mojo::Parameters> object.
+Note that this method caches all data, so it should not be called before the
+entire message body has been received. Also note that message content needs to
+be loaded into memory to parse POST parameters, so you have to make sure it is
+not excessively large.
 
   # Get POST parameter value
   say $msg->body_params->param('foo');

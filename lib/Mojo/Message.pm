@@ -431,6 +431,8 @@ C<POST> parameters extracted from C<x-application-urlencoded>,
 C<application/x-www-form-urlencoded> or C<multipart/form-data> message body,
 usually a L<Mojo::Parameters> object. Note that this method caches all data,
 so it should not be called before the entire message body has been received.
+Also note that message content needs to be loaded into memory to parse it, so
+you have to make sure it is not excessively large.
 
   # Get POST parameter value
   say $msg->body_params->param('foo');
@@ -485,7 +487,9 @@ Access message cookies. Meant to be overloaded in a subclass.
 Turns message body into a L<Mojo::DOM> object and takes an optional selector
 to perform a C<find> on it right away, which returns a L<Mojo::Collection>
 object. Note that this method caches all data, so it should not be called
-before the entire message body has been received.
+before the entire message body has been received. Also note that message
+content needs to be loaded into memory to parse it, so you have to make sure
+it is not excessively large.
 
   # Perform "find" right away
   say $msg->dom('h1, h2, h3')->pluck('text');
@@ -573,7 +577,9 @@ Check if message has exceeded C<max_line_size> or C<max_message_size>.
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise. An optional JSON Pointer can be used to extract a specific
 value with L<Mojo::JSON::Pointer>. Note that this method caches all data, so
-it should not be called before the entire message body has been received.
+it should not be called before the entire message body has been received. Also
+note that message content needs to be loaded into memory to parse it, so you
+have to make sure it is not excessively large.
 
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];
@@ -586,7 +592,9 @@ it should not be called before the entire message body has been received.
   my @foo   = $msg->param('foo');
 
 Access C<POST> parameters. Note that this method caches all data, so it should
-not be called before the entire message body has been received.
+not be called before the entire message body has been received. Also note that
+message content needs to be loaded into memory to parse it, so you have to
+make sure it is not excessively large.
 
 =head2 parse
 

@@ -1,4 +1,6 @@
 
+4.10  2013-06-01
+
 4.09  2013-05-31
   - Updated jQuery to version 2.0.2.
   - Increased default max_message_size from 5MB to 10MB in Mojo::Message.

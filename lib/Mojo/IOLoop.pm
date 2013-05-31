@@ -44,7 +44,7 @@ sub acceptor {
   weaken $acceptor->reactor($self->reactor)->{reactor};
   $self->{accepts} = $self->max_accepts if $self->max_accepts;
 
-  # Stop accepting so new acceptor can get picked up
+  # Allow new acceptor to get picked up
   $self->_not_accepting;
 
   return $id;
@@ -65,14 +65,9 @@ sub client {
   weaken $self;
   $client->on(
     connect => sub {
-      my $handle = pop;
-
-      # Turn handle into stream
-      my $c = $self->{connections}{$id};
-      delete $c->{client};
-      my $stream = $c->{stream} = Mojo::IOLoop::Stream->new($handle);
+      delete $self->{connections}{$id}{client};
+      my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->_stream($stream => $id);
-
       $self->$cb(undef, $stream);
     }
   );
@@ -126,19 +121,8 @@ sub server {
   weaken $self;
   $server->on(
     accept => sub {
-      my $handle = pop;
-
-      # Turn handle into stream
-      my $stream = Mojo::IOLoop::Stream->new($handle);
+      my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->$cb($stream, $self->stream($stream));
-
-      # Enforce connection limit (randomize to improve load balancing)
-      $self->max_connections(0)
-        if defined $self->{accepts}
-        && ($self->{accepts} -= int(rand 2) + 1) <= 0;
-
-      # Stop accepting to release accept mutex
-      $self->_not_accepting;
     }
   );
   $server->listen(@_);
@@ -161,7 +145,18 @@ sub stream {
   $self = $self->singleton unless ref $self;
 
   # Connect stream with reactor
-  return $self->_stream($stream, $self->_id) if ref $stream;
+  if (ref $stream) {
+
+    # Enforce connection limit (randomize to improve load balancing)
+    $self->max_connections(0)
+      if defined $self->{accepts}
+      && ($self->{accepts} -= int(rand 2) + 1) <= 0;
+
+    # Release accept mutex
+    $self->_not_accepting;
+
+    return $self->_stream($stream, $self->_id);
+  }
 
   # Find stream for id
   return undef unless my $c = $self->{connections}{$stream};

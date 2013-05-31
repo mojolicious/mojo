@@ -62,7 +62,7 @@ which we already have done in the past.
 To protect your applications from excessively large requests and responses,
 our HTTP parser has a cap after which it will automatically stop accepting new
 data, and in most cases force the connection to be closed. This limit is
-around C<5MB> by default, you can use the MOJO_MAX_MESSAGE_SIZE environment
+around C<10MB> by default, you can use the MOJO_MAX_MESSAGE_SIZE environment
 variable to change this value.
 
 =head2 What does the error "Maximum line size exceeded" mean?

@@ -14,7 +14,7 @@ my $req = Mojo::Message::Request->new;
 my $finished;
 $req->on(finish => sub { $finished = shift->is_finished });
 $req->parse("GET / HTTP/1.1\x0d\x0a");
-$req->parse('Cookie: ' . ('a=b; ' x (1024 * 1024)) . "\x0d\x0a");
+$req->parse('Cookie: ' . ('a=b; ' x (1024 * 1024 * 2)) . "\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
@@ -55,7 +55,7 @@ is $req->body, '', 'no content';
 
 # Parse HTTP 1.1 message with content exceeding line limit
 $req = Mojo::Message::Request->new;
-is $req->max_message_size, 5242880, 'right size';
+is $req->max_message_size, 10485760, 'right size';
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 655360\x0d\x0a\x0d\x0a" . ('a=b; ' x 131072));
 ok $req->is_finished, 'request is finished';

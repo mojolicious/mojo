@@ -14,7 +14,7 @@ use Mojo::Util 'decode';
 has content => sub { Mojo::Content::Single->new };
 has default_charset  => 'UTF-8';
 has max_line_size    => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
-has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 5242880 };
+has max_message_size => sub { $ENV{MOJO_MAX_MESSAGE_SIZE} || 10485760 };
 has version          => '1.1';
 
 sub body {
@@ -399,10 +399,10 @@ MOJO_MAX_LINE_SIZE environment variable or C<10240>.
   $msg     = $msg->max_message_size(1024);
 
 Maximum message size in bytes, defaults to the value of the
-MOJO_MAX_MESSAGE_SIZE environment variable or C<5242880>. Note that increasing
-this value can also drastically increase memory usage, should you for example
-attempt to parse an excessively large message body with the C<body_params>,
-C<dom> or C<json> methods.
+MOJO_MAX_MESSAGE_SIZE environment variable or C<10485760>. Note that
+increasing this value can also drastically increase memory usage, should you
+for example attempt to parse an excessively large message body with the
+C<body_params>, C<dom> or C<json> methods.
 
 =head2 version
 

@@ -273,11 +273,10 @@ sub _parse_formdata {
       next;
     }
 
-    # Extract information from Content-Disposition header
     next unless my $disposition = $part->headers->content_disposition;
-    my ($name)     = $disposition =~ /[; ]name="?([^";]+)"?/;
     my ($filename) = $disposition =~ /[; ]filename="?([^"]*)"?/;
     next if ($upload && !defined $filename) || (!$upload && defined $filename);
+    my ($name) = $disposition =~ /[; ]name="?([^";]+)"?/;
     if ($charset) {
       $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;

@@ -386,9 +386,9 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
   my @foo   = $req->param('foo');
 
 Access GET and POST parameters. Note that this method caches all data, so it
-should not be called before the entire request body has been received. Also
-note that request content needs to be loaded into memory to parse POST
-parameters, so you have to make sure it is not excessively large.
+should not be called before the entire request body has been received. Parts
+of the request body need to be loaded into memory to parse POST parameters, so
+you have to make sure it is not excessively large.
 
 =head2 params
 
@@ -396,9 +396,9 @@ parameters, so you have to make sure it is not excessively large.
 
 All GET and POST parameters, usually a L<Mojo::Parameters> object. Note that
 this method caches all data, so it should not be called before the entire
-request body has been received. Also note that request content needs to be
-loaded into memory to parse POST parameters, so you have to make sure it is
-not excessively large.
+request body has been received. Parts of the request body need to be loaded
+into memory to parse POST parameters, so you have to make sure it is not
+excessively large.
 
   # Get parameter value
   say $req->params->param('foo');

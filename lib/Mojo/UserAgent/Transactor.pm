@@ -268,7 +268,7 @@ Mojo::UserAgent::Transactor - User agent transactor
   # PATCH request with "Do Not Track" header and content
   say $t->tx(PATCH => 'example.com' => {DNT => 1} => 'Hi!')->req->to_string;
 
-  # POST request with form data
+  # POST request with form-data
   say $t->tx(POST => 'example.com' => form => {a => 'b'})->req->to_string;
 
   # PUT request with JSON data

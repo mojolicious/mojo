@@ -47,10 +47,9 @@ sub body_params {
     $params->parse($self->content->asset->slurp);
   }
 
-  # "multipart/formdata"
+  # "multipart/form-data"
   elsif ($type =~ m!multipart/form-data!i) {
-    !defined($_->[1]) && $params->append(@$_[0, 2])
-      for @{$self->_parse_formdata};
+    $params->append(@$_[0, 1]) for @{$self->_parse_formdata};
   }
 
   return $params;
@@ -205,17 +204,12 @@ sub uploads {
   my $self = shift;
 
   my @uploads;
-  for my $data (@{$self->_parse_formdata}) {
-
-    # Just a form value
-    next unless defined $data->[1];
-
-    # Uploaded file
+  for my $data (@{$self->_parse_formdata(1)}) {
     my $upload = Mojo::Upload->new(
       name     => $data->[0],
-      filename => $data->[1],
-      asset    => $data->[2]->asset,
-      headers  => $data->[2]->headers
+      filename => $data->[2],
+      asset    => $data->[1]->asset,
+      headers  => $data->[1]->headers
     );
     push @uploads, $upload;
   }
@@ -263,19 +257,17 @@ sub _limit {
 }
 
 sub _parse_formdata {
-  my $self = shift;
+  my ($self, $upload) = @_;
 
-  # Check for multipart content
   my @formdata;
   my $content = $self->content;
   return \@formdata unless $content->is_multipart;
   my $charset = $content->charset || $self->default_charset;
 
-  # Check all parts for form data
+  # Check all parts recursively
   my @parts = ($content);
   while (my $part = shift @parts) {
 
-    # Nested multipart content
     if ($part->is_multipart) {
       unshift @parts, @{$part->parts};
       next;
@@ -285,19 +277,18 @@ sub _parse_formdata {
     next unless my $disposition = $part->headers->content_disposition;
     my ($name)     = $disposition =~ /[; ]name="?([^";]+)"?/;
     my ($filename) = $disposition =~ /[; ]filename="?([^"]*)"?/;
+    next if ($upload && !defined $filename) || (!$upload && defined $filename);
     if ($charset) {
       $name     = decode($charset, $name)     // $name     if $name;
       $filename = decode($charset, $filename) // $filename if $filename;
     }
 
-    # Check for file upload
-    my $value = $part;
-    unless (defined $filename) {
-      $value = $part->asset->slurp;
-      $value = decode($charset, $value) // $value if $charset;
+    unless ($upload) {
+      $part = $part->asset->slurp;
+      $part = decode($charset, $part) // $part if $charset;
     }
 
-    push @formdata, [$name, $filename, $value];
+    push @formdata, [$name, $part, $filename];
   }
 
   return \@formdata;
@@ -382,7 +373,7 @@ Message content, defaults to a L<Mojo::Content::Single> object.
   my $charset = $msg->default_charset;
   $msg        = $msg->default_charset('UTF-8');
 
-Default charset used for form data parsing, defaults to C<UTF-8>.
+Default charset used for form-data parsing, defaults to C<UTF-8>.
 
 =head2 max_line_size
 
@@ -429,8 +420,8 @@ Slurp or replace C<content>.
 POST parameters extracted from C<application/x-www-form-urlencoded> or
 C<multipart/form-data> message body, usually a L<Mojo::Parameters> object.
 Note that this method caches all data, so it should not be called before the
-entire message body has been received. Also note that message content needs to
-be loaded into memory to parse POST parameters, so you have to make sure it is
+entire message body has been received. Parts of the message body need to be
+loaded into memory to parse POST parameters, so you have to make sure it is
 not excessively large.
 
   # Get POST parameter value
@@ -486,9 +477,9 @@ Access message cookies. Meant to be overloaded in a subclass.
 Turns message body into a L<Mojo::DOM> object and takes an optional selector
 to perform a C<find> on it right away, which returns a L<Mojo::Collection>
 object. Note that this method caches all data, so it should not be called
-before the entire message body has been received. Also note that message
-content needs to be loaded into memory to parse it, so you have to make sure
-it is not excessively large.
+before the entire message body has been received. The whole message body needs
+to be loaded into memory to parse it, so you have to make sure it is not
+excessively large.
 
   # Perform "find" right away
   say $msg->dom('h1, h2, h3')->pluck('text');
@@ -576,9 +567,9 @@ Check if message has exceeded C<max_line_size> or C<max_message_size>.
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns
 C<undef> otherwise. An optional JSON Pointer can be used to extract a specific
 value with L<Mojo::JSON::Pointer>. Note that this method caches all data, so
-it should not be called before the entire message body has been received. Also
-note that message content needs to be loaded into memory to parse it, so you
-have to make sure it is not excessively large.
+it should not be called before the entire message body has been received.
+The whole message body needs to be loaded into memory to parse it, so you have
+to make sure it is not excessively large.
 
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];
@@ -591,9 +582,9 @@ have to make sure it is not excessively large.
   my @foo   = $msg->param('foo');
 
 Access POST parameters. Note that this method caches all data, so it should
-not be called before the entire message body has been received. Also note that
-message content needs to be loaded into memory to parse POST parameters, so
-you have to make sure it is not excessively large.
+not be called before the entire message body has been received. Parts of the
+message body need to be loaded into memory to parse POST parameters, so you
+have to make sure it is not excessively large.
 
 =head2 parse
 

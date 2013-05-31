@@ -601,9 +601,9 @@ L<Mojo::Transaction::WebSocket> object.
 Access GET/POST parameters, file uploads and route placeholder values that are
 not reserved stash values. Note that this method is context sensitive in some
 cases and therefore needs to be used with care, there can always be multiple
-values, which might have unexpected consequences. Also note that request
-content needs to be loaded into memory to parse POST parameters, so you have
-to make sure it is not excessively large.
+values, which might have unexpected consequences. Parts of the request body
+need to be loaded into memory to parse POST parameters, so you have to make
+sure it is not excessively large.
 
   # List context is ambiguous and should be avoided
   my $hash = {foo => $self->param('foo')};

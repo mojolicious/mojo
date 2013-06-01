@@ -10,8 +10,8 @@ my @HEADERS = (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Authorization Cache-Control Connection Content-Disposition),
   qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
-  qw(Date ETag Expect Expires Host If-Modified-Since Last-Modified Location),
-  qw(Origin Proxy-Authenticate Proxy-Authorization Range),
+  qw(Date ETag Expect Expires Host If-Modified-Since Last-Modified Link),
+  qw(Location Origin Proxy-Authenticate Proxy-Authorization Range),
   qw(Sec-WebSocket-Accept Sec-WebSocket-Extensions Sec-WebSocket-Key),
   qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
   qw(TE Trailer Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
@@ -402,6 +402,13 @@ Shortcut for the C<Last-Modified> header.
   my $bytes = $headers->leftovers;
 
 Get leftover data from header parser.
+
+=head2 link
+
+  my $link = $headers->link;
+  $headers = $headers->link('<http://127.0.0.1/foo/3>; rel="next"');
+
+Shortcut for the C<Link> header.
 
 =head2 location
 

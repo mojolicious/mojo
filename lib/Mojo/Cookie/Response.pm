@@ -33,7 +33,7 @@ sub parse {
         my $next = shift @$tree;
         my $rest = shift @$next;
         push @$token, @$next;
-        $value .= ", $rest->[0]";
+        $value .= ", $rest->[0]" if $rest;
       }
 
       # This will only run once

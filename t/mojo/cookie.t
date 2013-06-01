@@ -125,7 +125,7 @@ is $cookies->[1], undef, 'no more cookies';
 
 # Parse multiple cookie request (RFC 2965)
 $cookies = Mojo::Cookie::Request->parse(
-  '$Version=1; foo=bar; $Path=/test; baz=la la; $Path=/tset');
+  '$Version=1; foo=bar; $Path=/test; baz="la la"; $Path=/tset');
 is $cookies->[0]->name,  'foo',   'right name';
 is $cookies->[0]->value, 'bar',   'right value';
 is $cookies->[1]->name,  'baz',   'right name';
@@ -170,7 +170,7 @@ is_deeply(Mojo::Cookie::Response->parse, [], 'no cookies');
 # Parse response cookie (RFC 6265)
 $cookies
   = Mojo::Cookie::Response->parse(
-      'foo=ba r; Domain=example.com; Path=/test; Max-Age=60;'
+      'foo="ba r"; Domain=example.com; Path=/test; Max-Age=60;'
     . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; Secure;');
 is $cookies->[0]->name,    'foo',         'right name';
 is $cookies->[0]->value,   'ba r',        'right value';
@@ -185,7 +185,7 @@ is $cookies->[1], undef, 'no more cookies';
 # Parse response cookie with invalid flag (RFC 6265)
 $cookies
   = Mojo::Cookie::Response->parse(
-      'foo=ba r; Domain=example.com; Path=/test; Max-Age=60;'
+      'foo="ba r"; Domain=example.com; Path=/test; Max-Age=60;'
     . ' Expires=Thu, 07 Aug 2008 07:07:59 GMT; InSecure;');
 is $cookies->[0]->name,    'foo',         'right name';
 is $cookies->[0]->value,   'ba r',        'right value';
@@ -362,11 +362,11 @@ is $cookies->[0]->to_string,
 is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie with broken Expires value
-$cookies = Mojo::Cookie::Response->parse('foo=ba r; Expires=Th');
+$cookies = Mojo::Cookie::Response->parse('foo="ba r"; Expires=Th');
 is $cookies->[0]->name,  'foo',  'right name';
 is $cookies->[0]->value, 'ba r', 'right value';
 is $cookies->[1], undef, 'no more cookies';
-$cookies = Mojo::Cookie::Response->parse('foo=ba r; Expires=Th; Path=/test');
+$cookies = Mojo::Cookie::Response->parse('foo="ba r"; Expires=Th; Path=/test');
 is $cookies->[0]->name,  'foo',  'right name';
 is $cookies->[0]->value, 'ba r', 'right value';
 is $cookies->[1], undef, 'no more cookies';

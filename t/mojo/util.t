@@ -62,6 +62,8 @@ is get_line(\$buffer), undef, 'no line';
 is_deeply parse_header(''), [], 'right result';
 is_deeply parse_header('foo=;bar=""'), [['foo', '', 'bar', '']],
   'right result';
+is_deeply parse_header('foo=bar baz=yada'), [['foo', 'bar', 'baz', 'yada']],
+  'right result';
 is_deeply parse_header('foo,bar,baz'),
   [['foo', undef], ['bar', undef], ['baz', undef]], 'right result';
 is_deeply parse_header('f "o" o , ba  r'),
@@ -76,7 +78,7 @@ my $parsed = [['</foo/bar>', undef, 'rel', 'x', 't*', 'UTF-8\'de\'a%20b']];
 is_deeply parse_header($header), $parsed, 'right result';
 $header = 'a=b c; A=b.c; D=/E; a-b=3; F=Thu, 07 Aug 2008 07:07:59 GMT; Ab;';
 $parsed = [
-  ['a', 'b c', 'A', 'b.c', 'D', '/E', 'a-b', '3', 'F', 'Thu'],
+  ['a', 'b', 'c', undef, 'A', 'b.c', 'D', '/E', 'a-b', '3', 'F', 'Thu'],
   [
     '07',       undef, 'Aug', undef, '2008', undef,
     '07:07:59', undef, 'GMT', undef, 'Ab',   undef

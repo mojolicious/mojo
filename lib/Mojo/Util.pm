@@ -39,7 +39,7 @@ my %CACHE;
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode deprecated encode get_line hmac_sha1_sum html_unescape md5_bytes),
-  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(md5_sum monkey_patch parse_header punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp spurt squish steady_time trim),
   qw(unquote url_escape url_unescape xml_escape xor_encode)
 );
@@ -127,6 +127,27 @@ sub monkey_patch {
   no strict 'refs';
   no warnings 'redefine';
   *{"${class}::$_"} = $patch{$_} for keys %patch;
+}
+
+sub parse_header {
+  my $str = shift;
+
+  # Nibbling parser
+  my (@tree, @token);
+  while ($str =~ s/^\s*([^=;,]*[^=;, ])\s*=?\s*//) {
+    push @token, [$1];
+    $token[-1][1] = unquote($1)
+      if $str =~ s/^("(?:\\\\|\\"|[^"])+"|[^;,]+)\s*//;
+
+    # Separator
+    $str =~ s/^\s*;\s*//;
+    next unless $str =~ s/^\s*,\s*//;
+    push @tree, [@token];
+    @token = ();
+  }
+
+  # Take care of final token
+  return [@token ? (@tree, \@token) : @tree];
 }
 
 # Direct translation of RFC 3492
@@ -496,6 +517,12 @@ Monkey patch functions into package.
     one   => sub { say 'One!' },
     two   => sub { say 'Two!' },
     three => sub { say 'Three!' };
+
+=head2 parse_header
+
+   my $parsed = parse_header 'foo="bar baz"; test=123, yada';
+
+Parse HTTP header value.
 
 =head2 punycode_decode
 

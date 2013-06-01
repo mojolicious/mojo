@@ -18,7 +18,7 @@ sub body_size { croak 'Method "body_size" not implemented by subclass' }
 
 sub boundary {
   return undef unless my $type = shift->headers->content_type;
-  $type =~ m!multipart.*boundary=(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i
+  $type =~ m!multipart.*boundary\s*=\s*(?:"([^"]+)"|([\w'(),.:?\-+/]+))!i
     and return $1 // $2;
   return undef;
 }
@@ -28,7 +28,7 @@ sub build_headers { shift->_build('get_header_chunk') }
 
 sub charset {
   my $type = shift->headers->content_type // '';
-  return $type =~ /charset="?([^"\s;]+)"?/i ? $1 : undef;
+  return $type =~ /charset\s*=\s*"?([^"\s;]+)"?/i ? $1 : undef;
 }
 
 sub clone {

@@ -1,4 +1,8 @@
 
+4.11  2013-06-02
+  - Added parse_header function to Mojo::Util.
+  - Fixed a few small boundary and charset detection bugs in Mojo::Content.
+
 4.10  2013-06-01
   - Added link and vary methods to Mojo::Headers.
 

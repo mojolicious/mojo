@@ -2,7 +2,7 @@ package Mojo::Cookie::Response;
 use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Date;
-use Mojo::Util 'quote';
+use Mojo::Util qw(parse_header quote);
 
 has [qw(domain httponly max_age path secure)];
 
@@ -22,13 +22,23 @@ sub parse {
   my ($self, $str) = @_;
 
   my @cookies;
-  for my $token ($self->_tokenize($str // '')) {
-    for my $i (0 .. $#$token) {
-      my ($name, $value) = @{$token->[$i]};
+  my $tree = parse_header($str // '');
+  while (my $token = shift @$tree) {
+    my $i = 0;
+    while (my $pair = shift @$token) {
+      my ($name, $value) = @$pair;
+
+      # "expires" is a special case, thank you Netscape...
+      if ($name =~ /^expires$/i) {
+        my $next = shift @$tree;
+        my $rest = shift @$next;
+        push @$token, @$next;
+        $value .= ", $rest->[0]";
+      }
 
       # This will only run once
       push @cookies, $self->new(name => $name, value => $value // '') and next
-        unless $i;
+        unless $i++;
 
       # Attributes (Netscape and RFC 6265)
       my @match

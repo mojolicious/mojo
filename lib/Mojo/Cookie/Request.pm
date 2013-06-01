@@ -1,13 +1,13 @@
 package Mojo::Cookie::Request;
 use Mojo::Base 'Mojo::Cookie';
 
-use Mojo::Util 'quote';
+use Mojo::Util qw(parse_header quote);
 
 sub parse {
   my ($self, $str) = @_;
 
   my @cookies;
-  for my $token (map {@$_} $self->_tokenize($str // '')) {
+  for my $token (map {@$_} @{parse_header($str // '')}) {
     my ($name, $value) = @$token;
     next if $name =~ /^\$/;
     push @cookies, $self->new(name => $name, value => $value // '');

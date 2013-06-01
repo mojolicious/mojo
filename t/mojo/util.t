@@ -11,9 +11,9 @@ use Mojo::DeprecationTest;
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
   qw(decode encode get_line hmac_sha1_sum html_unescape md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
-  qw(sha1_bytes sha1_sum slurp spurt squish steady_time trim unquote),
-  qw(url_escape url_unescape xml_escape xor_encode);
+  qw(monkey_patch parse_header punycode_decode punycode_encode quote),
+  qw(secure_compare sha1_bytes sha1_sum slurp spurt squish steady_time trim),
+  qw(unquote url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -57,6 +57,24 @@ is $buffer, "yada\x0d\x0a", 'right buffer content';
 is get_line(\$buffer), 'yada', 'right line';
 is $buffer, '', 'no buffer content';
 is get_line(\$buffer), undef, 'no line';
+
+# parse_header
+is_deeply parse_header(''), [], 'right result';
+is_deeply parse_header('foo,bar,baz'), [[['foo']], [['bar']], [['baz']]],
+  'right result';
+is_deeply parse_header('foo="b a\" r\"\\\\"'), [[['foo', 'b a" r"\\']]],
+  'right result';
+is_deeply parse_header('foo = "b a\" r\"\\\\"'), [[['foo', 'b a" r"\\']]],
+  'right result';
+my $header = q{</foo/bar>; rel="x"; t*=UTF-8'de'a%20b};
+my $parsed = [[['</foo/bar>'], ['rel', 'x'], ['t*', 'UTF-8\'de\'a%20b']]];
+is_deeply parse_header($header), $parsed, 'right result';
+$header = 'a=b c; A=b.c; D=/E; a-b=3; F=Thu, 07 Aug 2008 07:07:59 GMT; Ab;';
+$parsed = [
+  [['a', 'b c'], ['A', 'b.c'], ['D', '/E'], ['a-b', '3'], ['F', 'Thu']],
+  [['07 Aug 2008 07:07:59 GMT'], ['Ab']]
+];
+is_deeply parse_header($header), $parsed, 'right result';
 
 # b64_encode
 is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",

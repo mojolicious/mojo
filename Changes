@@ -1,6 +1,7 @@
 
 4.11  2013-06-02
   - Added parse_header function to Mojo::Util.
+  - Fixed small quality detection bug in Mojolicious::Types.
   - Fixed a few small boundary and charset detection bugs in Mojo::Content.
 
 4.10  2013-06-01

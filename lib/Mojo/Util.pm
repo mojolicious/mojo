@@ -520,7 +520,7 @@ Monkey patch functions into package.
 
 =head2 parse_header
 
-   my $parsed = parse_header 'foo="bar baz"; test=123, yada';
+   my $tree = parse_header 'foo="bar baz"; test=123, yada';
 
 Parse HTTP header value.
 

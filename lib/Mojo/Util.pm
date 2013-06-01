@@ -133,7 +133,7 @@ sub parse_header {
   my $str = shift;
 
   my (@tree, @token);
-  while ($str =~ s/^\s*([^=;, ]+)\s*//) {
+  while ($str =~ s/^[,;\s]*([^=;, ]+)\s*//) {
     push @token, $1, undef;
     $token[-1] = unquote($1)
       if $str =~ s/^=\s*("(?:\\\\|\\"|[^"])*"|[^;, ]*)\s*//;

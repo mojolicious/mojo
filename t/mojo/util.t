@@ -60,6 +60,10 @@ is get_line(\$buffer), undef, 'no line';
 
 # parse_header
 is_deeply parse_header(''), [], 'right result';
+is_deeply parse_header(',,foo,, ,bar'), [['foo', undef], ['bar', undef]],
+  'right result';
+is_deeply parse_header(';;foo; ; ;bar'), [['foo', undef, 'bar', undef]],
+  'right result';
 is_deeply parse_header('foo=;bar=""'), [['foo', '', 'bar', '']],
   'right result';
 is_deeply parse_header('foo=bar baz=yada'), [['foo', 'bar', 'baz', 'yada']],
@@ -69,7 +73,7 @@ is_deeply parse_header('foo,bar,baz'),
 is_deeply parse_header('f "o" o , ba  r'),
   [['f', undef, '"o"', undef, 'o', undef], ['ba', undef, 'r', undef]],
   'right result';
-is_deeply parse_header('foo="b a\" r\"\\\\"'), [['foo', 'b a" r"\\']],
+is_deeply parse_header('foo="b,; a\" r\"\\\\"'), [['foo', 'b,; a" r"\\']],
   'right result';
 is_deeply parse_header('foo = "b a\" r\"\\\\"'), [['foo', 'b a" r"\\']],
   'right result';

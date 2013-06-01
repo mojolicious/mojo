@@ -60,21 +60,27 @@ is get_line(\$buffer), undef, 'no line';
 
 # parse_header
 is_deeply parse_header(''), [], 'right result';
-is_deeply parse_header('foo,bar,baz'), [[['foo']], [['bar']], [['baz']]],
+is_deeply parse_header('foo=;bar=""'), [['foo', '', 'bar', '']],
   'right result';
-is_deeply parse_header('f "o" o , ba  r'), [[['f "o" o']], [['ba  r']]],
+is_deeply parse_header('foo,bar,baz'),
+  [['foo', undef], ['bar', undef], ['baz', undef]], 'right result';
+is_deeply parse_header('f "o" o , ba  r'),
+  [['f', undef, '"o"', undef, 'o', undef], ['ba', undef, 'r', undef]],
   'right result';
-is_deeply parse_header('foo="b a\" r\"\\\\"'), [[['foo', 'b a" r"\\']]],
+is_deeply parse_header('foo="b a\" r\"\\\\"'), [['foo', 'b a" r"\\']],
   'right result';
-is_deeply parse_header('foo = "b a\" r\"\\\\"'), [[['foo', 'b a" r"\\']]],
+is_deeply parse_header('foo = "b a\" r\"\\\\"'), [['foo', 'b a" r"\\']],
   'right result';
 my $header = q{</foo/bar>; rel="x"; t*=UTF-8'de'a%20b};
-my $parsed = [[['</foo/bar>'], ['rel', 'x'], ['t*', 'UTF-8\'de\'a%20b']]];
+my $parsed = [['</foo/bar>', undef, 'rel', 'x', 't*', 'UTF-8\'de\'a%20b']];
 is_deeply parse_header($header), $parsed, 'right result';
 $header = 'a=b c; A=b.c; D=/E; a-b=3; F=Thu, 07 Aug 2008 07:07:59 GMT; Ab;';
 $parsed = [
-  [['a', 'b c'], ['A', 'b.c'], ['D', '/E'], ['a-b', '3'], ['F', 'Thu']],
-  [['07 Aug 2008 07:07:59 GMT'], ['Ab']]
+  ['a', 'b c', 'A', 'b.c', 'D', '/E', 'a-b', '3', 'F', 'Thu'],
+  [
+    '07',       undef, 'Aug', undef, '2008', undef,
+    '07:07:59', undef, 'GMT', undef, 'Ab',   undef
+  ]
 ];
 is_deeply parse_header($header), $parsed, 'right result';
 

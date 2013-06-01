@@ -23,16 +23,16 @@ sub parse {
 
   my @cookies;
   my $tree = parse_header($str // '');
-  while (my $token = shift @$tree) {
+  while (my $pairs = shift @$tree) {
     my $i = 0;
-    while (my $pair = shift @$token) {
-      my ($name, $value) = @$pair;
+    while (@$pairs) {
+      my ($name, $value) = (shift @$pairs, shift @$pairs);
 
       # "expires" is a special case, thank you Netscape...
       if ($name =~ /^expires$/i) {
         my $next = shift @$tree;
-        if (my $rest = shift @$next) { $value .= ", $rest->[0]" }
-        push @$token, @$next;
+        $value .= join ' ', ',', grep {defined} splice @$next, 0, 10;
+        push @$pairs, @$next;
       }
 
       # This will only run once

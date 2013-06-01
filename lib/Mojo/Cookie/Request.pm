@@ -7,8 +7,9 @@ sub parse {
   my ($self, $str) = @_;
 
   my @cookies;
-  for my $token (map {@$_} @{parse_header($str // '')}) {
-    my ($name, $value) = @$token;
+  my @pairs = map {@$_} @{parse_header($str // '')};
+  while (@pairs) {
+    my ($name, $value) = (shift @pairs, shift @pairs);
     next if $name =~ /^\$/;
     push @cookies, $self->new(name => $name, value => $value // '');
   }

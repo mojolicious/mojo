@@ -132,16 +132,15 @@ sub monkey_patch {
 sub parse_header {
   my $str = shift;
 
-  # Nibbling parser
   my (@tree, @token);
-  while ($str =~ s/^\s*([^=;,]*[^=;, ])\s*=?\s*//) {
-    push @token, [$1];
-    $token[-1][1] = unquote($1)
-      if $str =~ s/^("(?:\\\\|\\"|[^"])+"|[^;,]+)\s*//;
+  while ($str =~ s/^\s*([^=;, ]+)\s*//) {
+    push @token, $1, undef;
+    $token[-1] = unquote($1)
+      if $str =~ s/^=\s*("(?:\\\\|\\"|[^"])*"|[^;,]*)\s*//;
 
     # Separator
-    $str =~ s/^\s*;\s*//;
-    next unless $str =~ s/^\s*,\s*//;
+    $str =~ s/^;\s*//;
+    next unless $str =~ s/^,\s*//;
     push @tree, [@token];
     @token = ();
   }

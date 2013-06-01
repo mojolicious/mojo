@@ -31,9 +31,8 @@ sub parse {
       # "expires" is a special case, thank you Netscape...
       if ($name =~ /^expires$/i) {
         my $next = shift @$tree;
-        my $rest = shift @$next;
+        if (my $rest = shift @$next) { $value .= ", $rest->[0]" }
         push @$token, @$next;
-        $value .= ", $rest->[0]" if $rest;
       }
 
       # This will only run once
@@ -41,12 +40,11 @@ sub parse {
         unless $i++;
 
       # Attributes (Netscape and RFC 6265)
-      my @match
-        = $name =~ /^(expires|domain|path|secure|Max-Age|HttpOnly)$/msi;
-      next unless @match;
-      my $attr = lc $match[0];
-      $attr =~ tr/-/_/;
-      $cookies[-1]->$attr($attr =~ /(?:secure|HttpOnly)/i ? 1 : $value);
+      next unless $name =~ /^(expires|domain|path|secure|max-age|httponly)$/i;
+      my $attr = lc $1;
+      $attr = 'max_age' if $attr eq 'max-age';
+      $cookies[-1]
+        ->$attr($attr eq 'secure' || $attr eq 'httponly' ? 1 : $value);
     }
   }
 

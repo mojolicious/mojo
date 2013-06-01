@@ -2,7 +2,7 @@ package Mojo::Cookie::Response;
 use Mojo::Base 'Mojo::Cookie';
 
 use Mojo::Date;
-use Mojo::Util qw(parse_header quote);
+use Mojo::Util qw(quote split_header);
 
 has [qw(domain httponly max_age path secure)];
 
@@ -22,7 +22,7 @@ sub parse {
   my ($self, $str) = @_;
 
   my @cookies;
-  my $tree = parse_header($str // '');
+  my $tree = split_header($str // '');
   while (my $pairs = shift @$tree) {
     my $i = 0;
     while (@$pairs) {

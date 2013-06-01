@@ -1,13 +1,13 @@
 package Mojo::Cookie::Request;
 use Mojo::Base 'Mojo::Cookie';
 
-use Mojo::Util qw(parse_header quote);
+use Mojo::Util qw(quote split_header);
 
 sub parse {
   my ($self, $str) = @_;
 
   my @cookies;
-  my @pairs = map {@$_} @{parse_header($str // '')};
+  my @pairs = map {@$_} @{split_header($str // '')};
   while (@pairs) {
     my ($name, $value) = (shift @pairs, shift @pairs);
     next if $name =~ /^\$/;

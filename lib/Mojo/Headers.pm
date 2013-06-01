@@ -14,7 +14,7 @@ my @HEADERS = (
   qw(Location Origin Proxy-Authenticate Proxy-Authorization Range),
   qw(Sec-WebSocket-Accept Sec-WebSocket-Extensions Sec-WebSocket-Key),
   qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
-  qw(TE Trailer Transfer-Encoding Upgrade User-Agent WWW-Authenticate)
+  qw(TE Trailer Transfer-Encoding Upgrade User-Agent Vary WWW-Authenticate)
 );
 for my $header (@HEADERS) {
   my $name = lc $header;
@@ -577,6 +577,13 @@ Shortcut for the C<Upgrade> header.
   $headers  = $headers->user_agent('Mojo/1.0');
 
 Shortcut for the C<User-Agent> header.
+
+=head2 vary
+
+  my $vary = $headers->vary;
+  $headers = $headers->vary('*');
+
+Shortcut for the C<Vary> header.
 
 =head2 www_authenticate
 

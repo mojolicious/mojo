@@ -93,6 +93,7 @@ is $headers->trailer('foo')->trailer,                     'foo', 'right value';
 is $headers->transfer_encoding('foo')->transfer_encoding, 'foo', 'right value';
 is $headers->upgrade('foo')->upgrade,                     'foo', 'right value';
 is $headers->user_agent('foo')->user_agent,               'foo', 'right value';
+is $headers->vary('foo')->vary,                           'foo', 'right value';
 is $headers->www_authenticate('foo')->www_authenticate,   'foo', 'right value';
 
 # Clone

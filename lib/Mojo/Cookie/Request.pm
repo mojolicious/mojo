@@ -21,7 +21,7 @@ sub to_string {
   my $self = shift;
   return '' unless my $name = $self->name;
   my $value = $self->value // '';
-  $value = $value =~ /[,;"]/ ? quote($value) : $value;
+  $value = $value =~ /[,;" ]/ ? quote($value) : $value;
   return "$name=$value";
 }
 

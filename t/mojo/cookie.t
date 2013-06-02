@@ -8,7 +8,7 @@ use Mojo::Cookie::Response;
 my $cookie = Mojo::Cookie::Request->new;
 $cookie->name('foo');
 $cookie->value('ba =r');
-is $cookie->to_string, 'foo=ba =r', 'right format';
+is $cookie->to_string, 'foo="ba =r"', 'right format';
 
 # Request cookie without value as string
 $cookie = Mojo::Cookie::Request->new;

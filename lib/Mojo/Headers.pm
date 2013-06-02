@@ -240,8 +240,8 @@ Shortcut for the C<Accept-Ranges> header.
 
 Add one or more header values with one or more lines.
 
-  # "Vary: Accept\x0d\x0a"
-  # "Vary: Accept-Encoding\x0d\x0a\x0d\x0a"
+  # "Vary: Accept"
+  # "Vary: Accept-Encoding"
   $headers->vary('Accept')->add(Vary => 'Accept-Encoding')->to_string;
 
 =head2 allow
@@ -257,10 +257,10 @@ Shortcut for the C<Allow> header.
 
 Append value to header and flatten it if necessary.
 
-  # "Vary: Accept\x0d\x0a\x0d\x0a"
+  # "Vary: Accept"
   $headers->append(Vary => 'Accept')->to_string;
 
-  # "Vary: Accept, Accept-Encoding\x0d\x0a\x0d\x0a"
+  # "Vary: Accept, Accept-Encoding"
   $headers->vary('Accept')->append(Vary => 'Accept-Encoding')->to_string;
 
 =head2 authorization

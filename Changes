@@ -2,6 +2,7 @@
 4.11  2013-06-03
   - Added allow and append methods to Mojo::Headers.
   - Added split_header function to Mojo::Util.
+  - Fixed cookie quoting bugs in Mojo::Cookie::Response.
   - Fixed a few small boundary and charset detection bugs in Mojo::Content.
   - Fixed a few small filename detection bugs in Mojo::Message.
   - Fixed small quality detection bug in Mojolicious::Types.

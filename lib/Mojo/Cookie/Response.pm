@@ -57,7 +57,7 @@ sub to_string {
   # Name and value (Netscape)
   return '' unless my $name = $self->name;
   my $value = $self->value // '';
-  $value = $value =~ /[,;"]/ ? quote($value) : $value;
+  $value = $value =~ /[,;" ]/ ? quote($value) : $value;
   my $cookie = "$name=$value";
 
   # "expires" (Netscape)

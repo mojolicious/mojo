@@ -137,7 +137,7 @@ $cookie = Mojo::Cookie::Response->new;
 $cookie->name('foo');
 $cookie->value('ba r');
 $cookie->path('/test');
-is $cookie->to_string, 'foo=ba r; path=/test', 'right format';
+is $cookie->to_string, 'foo="ba r"; path=/test', 'right format';
 
 # Response cookie without value as string
 $cookie = Mojo::Cookie::Response->new;
@@ -161,7 +161,7 @@ $cookie->expires(1218092879);
 $cookie->secure(1);
 $cookie->httponly(1);
 is $cookie->to_string,
-  'foo=ba r; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
+  'foo="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
   . ' path=/test; secure; Max-Age=60; HttpOnly', 'right format';
 
 # Empty response cookie

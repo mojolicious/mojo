@@ -565,6 +565,15 @@ Read all data at once from file.
 
 Split HTTP header value.
 
+  # "one"
+  split_header('one; two="three four", five=six')->[0][0];
+
+  # "three four"
+  split_header('one; two="three four", five=six')->[0][3];
+
+  # "five"
+  split_header('one; two="three four", five=six')->[1][0];
+
 =head2 spurt
 
   $content = spurt $content, '/etc/passwd';

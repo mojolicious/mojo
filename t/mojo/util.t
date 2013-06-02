@@ -79,17 +79,17 @@ is_deeply split_header('foo="b,; a\" r\"\\\\"'), [['foo', 'b,; a" r"\\']],
 is_deeply split_header('foo = "b a\" r\"\\\\"'), [['foo', 'b a" r"\\']],
   'right result';
 my $header = q{</foo/bar>; rel="x"; t*=UTF-8'de'a%20b};
-my $parsed = [['</foo/bar>', undef, 'rel', 'x', 't*', 'UTF-8\'de\'a%20b']];
-is_deeply split_header($header), $parsed, 'right result';
+my $tree = [['</foo/bar>', undef, 'rel', 'x', 't*', 'UTF-8\'de\'a%20b']];
+is_deeply split_header($header), $tree, 'right result';
 $header = 'a=b c; A=b.c; D=/E; a-b=3; F=Thu, 07 Aug 2008 07:07:59 GMT; Ab;';
-$parsed = [
+$tree   = [
   ['a', 'b', 'c', undef, 'A', 'b.c', 'D', '/E', 'a-b', '3', 'F', 'Thu'],
   [
     '07',       undef, 'Aug', undef, '2008', undef,
     '07:07:59', undef, 'GMT', undef, 'Ab',   undef
   ]
 ];
-is_deeply split_header($header), $parsed, 'right result';
+is_deeply split_header($header), $tree, 'right result';
 
 # b64_encode
 is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",

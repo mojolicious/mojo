@@ -807,9 +807,9 @@ C<after_render>.
 
     # Check if user agent accepts GZip compression
     return unless ($self->req->headers->accept_encoding // '') =~ /gzip/i;
+    $self->res->headers->append(Vary => 'Accept-Encoding');
 
     # Compress content with GZip
-    $self->res->headers->append(Vary => 'Accept-Encoding');
     $self->res->headers->content_encoding('gzip');
     gzip $output, \my $compressed;
     $$output = $compressed;

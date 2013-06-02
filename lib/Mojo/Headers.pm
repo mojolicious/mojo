@@ -8,7 +8,7 @@ has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 # Common headers
 my @HEADERS = (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
-  qw(Authorization Cache-Control Connection Content-Disposition),
+  qw(Allow Authorization Cache-Control Connection Content-Disposition),
   qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
   qw(Date ETag Expect Expires Host If-Modified-Since Last-Modified Link),
   qw(Location Origin Proxy-Authenticate Proxy-Authorization Range),
@@ -239,6 +239,13 @@ Shortcut for the C<Accept-Ranges> header.
   $headers = $headers->add(Foo => ['first line', 'second line']);
 
 Add one or more header values with one or more lines.
+
+=head2 allow
+
+  my $allow = $headers->allow;
+  $headers  = $headers->allow('GET, POST');
+
+Shortcut for the C<Allow> header.
 
 =head2 append
 

@@ -664,11 +664,19 @@ You can also add your own shortcuts to make route generation more expressive.
     # Handle GET requests
     $resource->get->to('#show')->name("show_$name");
 
+    # Handle OPTIONS requests
+    $resource->options(sub {
+      my $self = shift;
+      $self->res->headers->allow('GET, POST');
+      $self->render(data => '', status => 204);
+    });
+
     return $resource;
   });
 
-  # POST /user -> {controller => 'user', action => 'create'}
-  # GET  /user -> {controller => 'user', action => 'show'}
+  # POST    /user -> {controller => 'user', action => 'create'}
+  # GET     /user -> {controller => 'user', action => 'show'}
+  # OPTIONS /user
   $r->resource('user');
 
 Shortcuts can lead to anything, routes, bridges or maybe even both. And watch

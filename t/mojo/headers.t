@@ -50,6 +50,7 @@ is $headers->accept_charset('foo')->accept_charset,   'foo', 'right value';
 is $headers->accept_encoding('foo')->accept_encoding, 'foo', 'right value';
 is $headers->accept_language('foo')->accept_language, 'foo', 'right value';
 is $headers->accept_ranges('foo')->accept_ranges,     'foo', 'right value';
+is $headers->allow('foo')->allow,                     'foo', 'right value';
 is $headers->authorization('foo')->authorization,     'foo', 'right value';
 is $headers->connection('foo')->connection,           'foo', 'right value';
 is $headers->cache_control('foo')->cache_control,     'foo', 'right value';

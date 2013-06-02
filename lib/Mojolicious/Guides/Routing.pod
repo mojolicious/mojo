@@ -667,7 +667,7 @@ You can also add your own shortcuts to make route generation more expressive.
     # Handle OPTIONS requests
     $resource->options(sub {
       my $self = shift;
-      $self->res->headers->allow('GET, POST');
+      $self->res->headers->allow('POST, GET, OPTIONS');
       $self->render(data => '', status => 204);
     });
 

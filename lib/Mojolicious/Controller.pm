@@ -627,8 +627,8 @@ For more control you can also access request information directly.
 
 =head2 redirect_to
 
-  $c = $c->redirect_to('named');
   $c = $c->redirect_to('named', foo => 'bar');
+  $c = $c->redirect_to('named', {foo => 'bar'});
   $c = $c->redirect_to('/path');
   $c = $c->redirect_to('http://127.0.0.1/foo/bar');
 

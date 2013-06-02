@@ -359,7 +359,7 @@ get '/redirect_named' => sub {
 };
 
 get '/redirect_no_render' => sub {
-  shift->redirect_to('index', format => 'txt');
+  shift->redirect_to('index', {format => 'txt'});
 };
 
 get '/redirect_callback' => sub {

@@ -426,7 +426,7 @@ Get leftover data from header parser.
   my $link = $headers->link;
   $headers = $headers->link('<http://127.0.0.1/foo/3>; rel="next"');
 
-Shortcut for the C<Link> header.
+Shortcut for the C<Link> header from RFC 5988.
 
 =head2 location
 

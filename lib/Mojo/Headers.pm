@@ -246,6 +246,9 @@ Add one or more header values with one or more lines.
 
 Append value to header and flatten it if necessary.
 
+  # "Accept-Encoding"
+  $headers->append(Vary => 'Accept-Encoding')->vary;
+
   # "Accept, Accept-Encoding"
   $headers->vary('Accept')->append(Vary => 'Accept-Encoding')->vary;
 

@@ -420,7 +420,7 @@ $req->parse(
   PATH_INFO        => '/upload',
   HTTP_CONNECTION  => 'Keep-Alive',
   REQUEST_METHOD   => 'POST',
-  CONTENT_LENGTH   => '135',
+  CONTENT_LENGTH   => '139',
   SCRIPT_FILENAME  => '/tmp/SnLu1cQ3t2/test.fcgi',
   SERVER_SOFTWARE  => 'Apache/2.2.14 (Unix) mod_fastcgi/2.4.2',
   QUERY_STRING     => '',
@@ -443,13 +443,13 @@ is $req->content->progress, 0, 'right progress';
 $req->parse("--8jXGX\x0d\x0a");
 is $req->content->progress, 9, 'right progress';
 $req->parse(
-  "Content-Disposition: form-data; name=\"file\"; filename=\"file\"\x0d\x0a"
+  "Content-Disposition: form-data; name = file; filename = file.txt\x0d\x0a"
     . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
-is $req->content->progress, 113, 'right progress';
+is $req->content->progress, 117, 'right progress';
 $req->parse('11023456789');
-is $req->content->progress, 124, 'right progress';
+is $req->content->progress, 128, 'right progress';
 $req->parse("\x0d\x0a--8jXGX--");
-is $req->content->progress, 135, 'right progress';
+is $req->content->progress, 139, 'right progress';
 ok $req->is_finished, 'request is finished';
 ok $req->content->is_multipart, 'multipart content';
 is $req->method, 'POST', 'right method';
@@ -460,6 +460,7 @@ is $req->version, '1.1', 'right version';
 is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload',
   'right absolute URL';
 my $file = $req->upload('file');
-is $file->slurp, '11023456789', 'right uploaded content';
+is $file->filename, 'file.txt',    'right filename';
+is $file->slurp,    '11023456789', 'right uploaded content';
 
 done_testing();

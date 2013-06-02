@@ -38,6 +38,12 @@ sub add {
   return $self;
 }
 
+sub append {
+  my ($self, $name, $value) = @_;
+  my $old = $self->header($name);
+  return $self->header($name => defined $old ? "$old, $value" : $value);
+}
+
 sub clone {
   my $self = shift;
   return $self->new->from_hash($self->to_hash(1));
@@ -233,6 +239,15 @@ Shortcut for the C<Accept-Ranges> header.
   $headers = $headers->add(Foo => ['first line', 'second line']);
 
 Add one or more header values with one or more lines.
+
+=head2 append
+
+  $headers = $headers->append(Vary => 'Accept-Encoding');
+
+Append value to header and flatten it if necessary.
+
+  # "Accept, Accept-Encoding"
+  $headers->vary('Accept')->append(Vary => 'Accept-Encoding')->vary;
 
 =head2 authorization
 

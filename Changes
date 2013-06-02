@@ -1,5 +1,6 @@
 
 4.11  2013-06-02
+  - Added append method to Mojo::Headers.
   - Added split_header function to Mojo::Util.
   - Fixed small quality detection bug in Mojolicious::Types.
   - Fixed a few small boundary and charset detection bugs in Mojo::Content.

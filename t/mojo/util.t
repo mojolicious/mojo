@@ -60,6 +60,7 @@ is get_line(\$buffer), undef, 'no line';
 
 # split_header
 is_deeply split_header(''), [], 'right result';
+is_deeply split_header('foo=b=a=r'), [['foo', 'b=a=r']], 'right result';
 is_deeply split_header(',,foo,, ,bar'), [['foo', undef], ['bar', undef]],
   'right result';
 is_deeply split_header(';;foo; ; ;bar'), [['foo', undef, 'bar', undef]],

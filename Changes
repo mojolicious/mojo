@@ -1,4 +1,6 @@
 
+4.12  2013-06-04
+
 4.11  2013-06-03
   - Added allow and append methods to Mojo::Headers.
   - Added split_header function to Mojo::Util.

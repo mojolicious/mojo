@@ -394,16 +394,16 @@ L<Mojo::Util> implements the following functions.
 
 =head2 b64_decode
 
-  my $str = b64_decode $b64;
+  my $bytes = b64_decode $b64;
 
 Base64 decode string.
 
 =head2 b64_encode
 
-  my $b64 = b64_encode $str;
-  my $b64 = b64_encode $str, "\n";
+  my $b64 = b64_encode $bytes;
+  my $b64 = b64_encode $bytes, "\n";
 
-Base64 encode string, the line ending defaults to a newline.
+Base64 encode bytes, the line ending defaults to a newline.
 
 =head2 camelize
 
@@ -483,9 +483,9 @@ with C<0x0d 0x0a> or C<0x0a>.
 
 =head2 hmac_sha1_sum
 
-  my $checksum = hmac_sha1_sum $str, 'passw0rd';
+  my $checksum = hmac_sha1_sum $bytes, 'passw0rd';
 
-Generate HMAC-SHA1 checksum for string.
+Generate HMAC-SHA1 checksum for bytes.
 
 =head2 html_unescape
 
@@ -495,15 +495,15 @@ Unescape all HTML entities in string.
 
 =head2 md5_bytes
 
-  my $checksum = md5_bytes $str;
+  my $checksum = md5_bytes $bytes;
 
-Generate binary MD5 checksum for string.
+Generate binary MD5 checksum for bytes.
 
 =head2 md5_sum
 
-  my $checksum = md5_sum $str;
+  my $checksum = md5_sum $bytes;
 
-Generate MD5 checksum for string.
+Generate MD5 checksum for bytes.
 
 =head2 monkey_patch
 
@@ -543,15 +543,15 @@ Constant time comparison algorithm to prevent timing attacks.
 
 =head2 sha1_bytes
 
-  my $checksum = sha1_bytes $str;
+  my $checksum = sha1_bytes $bytes;
 
-Generate binary SHA1 checksum for string.
+Generate binary SHA1 checksum for bytes.
 
 =head2 sha1_sum
 
-  my $checksum = sha1_sum $str;
+  my $checksum = sha1_sum $bytes;
 
-Generate SHA1 checksum for string.
+Generate SHA1 checksum for bytes.
 
 =head2 slurp
 

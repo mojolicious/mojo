@@ -41,6 +41,8 @@ like $log->format(debug => 'Test 123.'), qr/^\[.*\] \[debug\] Test 123\.\n$/,
   'right format';
 like $log->format(qw(debug Test 1 2 3)),
   qr/^\[.*\] \[debug\] Test\n1\n2\n3\n$/, 'right format';
+like decode('UTF-8', $log->format(error => 'I ♥ Mojolicious.')),
+  qr/^\[.*\] \[error\] I ♥ Mojolicious\.\n$/, 'right format';
 
 # Events
 my $msgs = [];

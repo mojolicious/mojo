@@ -35,7 +35,8 @@ sub fatal { shift->log(fatal => @_) }
 
 sub format {
   my ($self, $level, @lines) = @_;
-  return '[' . localtime(time) . "] [$level] " . join("\n", @lines) . "\n";
+  return encode 'UTF-8',
+    '[' . localtime(time) . "] [$level] " . join("\n", @lines, '');
 }
 
 sub info { shift->log(info => @_) }
@@ -57,13 +58,12 @@ sub log { shift->emit('message', lc(shift), @_) }
 sub warn { shift->log(warn => @_) }
 
 sub _message {
-  my ($self, $level, @lines) = @_;
+  my ($self, $level) = (shift, shift);
 
   return unless $self->is_level($level) && (my $handle = $self->handle);
 
   flock $handle, LOCK_EX;
-  croak "Can't write to log: $!"
-    unless $handle->print(encode 'UTF-8', $self->format($level, @lines));
+  $handle->print($self->format($level, @_)) or croak "Can't write to log: $!";
   flock $handle, LOCK_UN;
 }
 
@@ -171,32 +171,36 @@ default logger.
 
 =head2 debug
 
-  $log = $log->debug('You screwed up, but that is ok');
+  $log = $log->debug('You screwed up, but that is ok.');
+  $log = $log->debug('All', 'cool!');
 
 Log debug message.
 
 =head2 error
 
-  $log = $log->error('You really screwed up this time');
+  $log = $log->error('You really screwed up this time.');
+  $log = $log->error('Wow', 'seriously!');
 
 Log error message.
 
 =head2 fatal
 
   $log = $log->fatal('Its over...');
+  $log = $log->fatal('Bye', 'bye!');
 
 Log fatal message.
 
 =head2 format
 
-  my $msg = $log->format('debug', 'Hi there!');
-  my $msg = $log->format('debug', 'Hi', 'there!');
+  my $msg = $log->format(debug => 'Hi there!');
+  my $msg = $log->format(debug => 'Hi', 'there!');
 
 Format log message.
 
 =head2 info
 
-  $log = $log->info('You are bad, but you prolly know already');
+  $log = $log->info('You are bad, but you prolly know already.');
+  $log = $log->info('Ok', 'then!');
 
 Log info message.
 
@@ -238,13 +242,15 @@ Check for warn log level.
 
 =head2 log
 
-  $log = $log->log(debug => 'This should work');
+  $log = $log->log(debug => 'This should work.');
+  $log = $log->log(debug => 'This', 'too!');
 
 Emit C<message> event.
 
 =head2 warn
 
   $log = $log->warn('Dont do that Dave...');
+  $log = $log->warn('No', 'really!');
 
 Log warn message.
 

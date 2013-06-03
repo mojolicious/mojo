@@ -56,7 +56,7 @@ sub run {
     exit 0 if $pid;
     setsid or die "Can't start a new session: $!";
 
-    # Close file handles
+    # Close filehandles
     open STDIN,  '</dev/null';
     open STDOUT, '>/dev/null';
     open STDERR, '>&STDOUT';

@@ -184,7 +184,7 @@ Delete file automatically once it's not used anymore.
   my $handle = $file->handle;
   $file      = $file->handle(IO::File->new);
 
-File handle, created on demand.
+Filehandle, created on demand.
 
 =head2 path
 

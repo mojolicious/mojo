@@ -396,7 +396,7 @@ L<Mojo::Util> implements the following functions.
 
   my $bytes = b64_decode $b64;
 
-Base64 decode string.
+Base64 decode bytes.
 
 =head2 b64_encode
 

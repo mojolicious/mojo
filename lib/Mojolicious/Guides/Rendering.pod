@@ -199,7 +199,7 @@ too.
 Characters can be rendered to bytes with the C<text> stash value, the given
 content will be automatically encoded to bytes.
 
-  $self->render(text => 'Hello Wörld!');
+  $self->render(text => 'I ♥ Mojolicious!');
 
 =head2 Rendering data
 

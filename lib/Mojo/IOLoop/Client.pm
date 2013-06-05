@@ -73,16 +73,15 @@ sub _connect {
 sub _tls {
   my $self = shift;
 
-  # Switch between reading and writing
+  # Connected
   my $handle = $self->{handle};
-  if ($self->{tls} && !$handle->connect_SSL) {
-    my $err = $IO::Socket::SSL::SSL_ERROR;
-    if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
-    elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
-    return;
-  }
+  return $self->_cleanup->emit_safe(connect => $handle)
+    if $handle->connect_SSL;
 
-  $self->_cleanup->emit_safe(connect => $handle);
+  # Switch between reading and writing
+  my $err = $IO::Socket::SSL::SSL_ERROR;
+  if    ($err == TLS_READ)  { $self->reactor->watch($handle, 1, 0) }
+  elsif ($err == TLS_WRITE) { $self->reactor->watch($handle, 1, 1) }
 }
 
 sub _try {
@@ -118,7 +117,6 @@ sub _try {
       SSL_verifycn_name  => $args->{address},
       SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
     );
-    $self->{tls} = 1;
     my $reactor = $self->reactor;
     $reactor->remove($handle);
     return $self->emit_safe(error => 'TLS upgrade failed')

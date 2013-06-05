@@ -16,11 +16,9 @@ sub new { shift->SUPER::new(handle => shift, buffer => '') }
 sub close {
   my $self = shift;
 
-  # Cleanup
-  return unless my $reactor = $self->{reactor};
+  return unless my $reactor = $self->reactor;
   return unless my $handle  = delete $self->timeout(0)->{handle};
   $reactor->remove($handle);
-
   close $handle;
   $self->emit_safe('close');
 }

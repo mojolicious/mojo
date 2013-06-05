@@ -34,7 +34,7 @@ sub connect {
 
 sub _cleanup {
   my $self = shift;
-  return $self unless my $reactor = $self->{reactor};
+  return $self unless my $reactor = $self->reactor;
   $self->{$_} && $reactor->remove(delete $self->{$_})
     for qw(delay timer handle);
   return $self;
@@ -97,34 +97,31 @@ sub _try {
   # Disable Nagle's algorithm
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
 
-  # TLS
-  if ($args->{tls} && !$handle->isa('IO::Socket::SSL')) {
-    return $self->emit_safe(
-      error => 'IO::Socket::SSL 1.75 required for TLS support')
-      unless TLS;
+  return $self->_cleanup->emit_safe(connect => $handle)
+    if !$args->{tls} || $handle->isa('IO::Socket::SSL');
+  return $self->emit_safe(
+    error => 'IO::Socket::SSL 1.75 required for TLS support')
+    unless TLS;
 
-    # Upgrade
-    weaken $self;
-    my %options = (
-      SSL_ca_file => $args->{tls_ca}
-        && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
-      SSL_cert_file      => $args->{tls_cert},
-      SSL_error_trap     => sub { $self->_cleanup->emit_safe(error => $_[1]) },
-      SSL_hostname       => $args->{address},
-      SSL_key_file       => $args->{tls_key},
-      SSL_startHandshake => 0,
-      SSL_verify_mode    => $args->{tls_ca} ? 0x01 : 0x00,
-      SSL_verifycn_name  => $args->{address},
-      SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
-    );
-    my $reactor = $self->reactor;
-    $reactor->remove($handle);
-    return $self->emit_safe(error => 'TLS upgrade failed')
-      unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
-    return $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
-  }
-
-  $self->_cleanup->emit_safe(connect => $handle);
+  # Upgrade
+  weaken $self;
+  my %options = (
+    SSL_ca_file => $args->{tls_ca}
+      && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
+    SSL_cert_file       => $args->{tls_cert},
+    SSL_error_trap      => sub { $self->_cleanup->emit_safe(error => $_[1]) },
+    SSL_hostname        => $args->{address},
+    SSL_key_file        => $args->{tls_key},
+    SSL_startHandshake  => 0,
+    SSL_verify_mode     => $args->{tls_ca} ? 0x01 : 0x00,
+    SSL_verifycn_name   => $args->{address},
+    SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef
+  );
+  my $reactor = $self->reactor;
+  $reactor->remove($handle);
+  return $self->emit_safe(error => 'TLS upgrade failed')
+    unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
+  $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
 }
 
 1;

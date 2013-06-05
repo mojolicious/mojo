@@ -34,7 +34,7 @@ has reactor      => sub {
 sub DESTROY {
   my $self = shift;
   if (my $port = $self->{port}) { $ENV{MOJO_REUSE} =~ s/(?:^|\,)${port}:\d+// }
-  return unless my $reactor = $self->{reactor};
+  return unless my $reactor = $self->reactor;
   $self->stop if $self->{handle};
   $reactor->remove($_) for values %{$self->{handles}};
 }
@@ -139,8 +139,7 @@ sub _tls {
   # Accepted
   if ($handle->accept_SSL) {
     $self->reactor->remove($handle);
-    delete $self->{handles}{$handle};
-    return $self->emit_safe(accept => $handle);
+    return $self->emit_safe(accept => delete $self->{handles}{$handle});
   }
 
   # Switch between reading and writing

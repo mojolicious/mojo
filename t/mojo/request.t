@@ -1893,11 +1893,11 @@ is $req->url->query->params->[0], 'Mojo::Message::Request', 'right value';
 
 # Parse lots of special characters in URL
 $req = Mojo::Message::Request->new;
-$req->parse('GET /#09azAZ-._~:/?[]{}@!$&\'()*+,;=% ');
+$req->parse('GET /#09azAZ-._~:/?[]{}@!$&\'()|*+,;=% ');
 $req->parse("HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '/#09azAZ-._~:/?%5B%5D%7B%7D@!$&\'()*+,;=%', 'right URL';
+is $req->url, '/#09azAZ-._~:/?%5B%5D%7B%7D@!$&\'()%7C*+,;=%', 'right URL';
 
 done_testing();

@@ -1,5 +1,6 @@
 
 4.12  2013-06-06
+  - Improved Mojo::Message::Request to allow pipe symbol in URLs.
 
 4.11  2013-06-03
   - Added allow and append methods to Mojo::Headers.

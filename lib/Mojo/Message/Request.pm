@@ -9,14 +9,14 @@ has env => sub { {} };
 has method => 'GET';
 has url => sub { Mojo::URL->new };
 
-my $START_LINE_RE = qr|
+my $START_LINE_RE = qr/
   ^
-  ([a-zA-Z]+)                                      # Method
+  ([a-zA-Z]+)                                        # Method
   \s+
-  ([0-9a-zA-Z\-._~:/?#[\]\{\}\@!\$&'()*+,;=\%]+)   # Path
-  (?:\s+HTTP/(\d\.\d))?                            # Version
+  ([0-9a-zA-Z\-._~:\/?#[\]\{\}\@!\$&'()|*+,;=\%]+)   # Path
+  (?:\s+HTTP\/(\d\.\d))?                             # Version
   $
-|x;
+/x;
 
 sub clone {
   my $self = shift;

@@ -189,9 +189,7 @@ sub _tokenize {
   my $pattern = $self->pattern;
   my $state   = 'text';
   my (@tree, $quoted);
-  while (length(my $char = substr $pattern, 0, 1, '')) {
-
-    # Inside a placeholder
+  for my $char (split '', $pattern) {
     my $inside = !!grep { $_ eq $state } qw(placeholder relaxed wildcard);
 
     # Quote start
@@ -235,7 +233,6 @@ sub _tokenize {
       # New text element
       push @tree, ['text', $char] and next unless $tree[-1][0] eq 'text';
 
-      # More text
       $tree[-1][-1] .= $char;
     }
   }

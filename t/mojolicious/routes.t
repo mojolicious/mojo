@@ -193,6 +193,10 @@ is $second->render('', {}), '/second', 'right result';
 $target->add_child($first)->add_child($second);
 is $second->render('', {}), '/target/second', 'right result';
 
+# /zero/*/name
+$r->route('/zero/:/name')->to('zero#placeholder');
+$r->route('/zero/*/name')->to('zero#wildcard');
+
 # Cached lookup
 my $fast = $r->route('/fast');
 is $r->find('fast'),   $fast, 'fast route found';
@@ -809,5 +813,21 @@ is $m->path_for, '/source/third', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/target/third'});
 is_deeply $m->stack, [], 'empty stack';
+
+# Nameless placeholder
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/zero/foo/name'});
+is_deeply $m->stack,
+  [{controller => 'zero', action => 'placeholder', '' => 'foo'}],
+  'right structure';
+is $m->path_for, '/zero/foo/name', 'right path';
+is $m->path_for('' => 'bar'), '/zero/bar/name', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/zero/foo/bar/name'});
+is_deeply $m->stack,
+  [{controller => 'zero', action => 'wildcard', '' => 'foo/bar'}],
+  'right structure';
+is $m->path_for, '/zero/foo/bar/name', 'right path';
+is $m->path_for('' => 'bar/baz'), '/zero/bar/baz/name', 'right path';
 
 done_testing();

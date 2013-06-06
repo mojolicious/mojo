@@ -166,4 +166,35 @@ is $pattern->render($result), '/foo/v1.0', 'right result';
 is $pattern->render($result, 1), '/foo/v1.0.txt', 'right result';
 ok !$pattern->match('/foo/v2.0', 1), 'no result';
 
+# Special placeholder names
+$pattern = Mojolicious::Routes::Pattern->new('/:');
+$result = $pattern->match('/foo', 1);
+is_deeply $result, {'' => 'foo'}, 'right structure';
+is $pattern->render($result, 1), '/foo', 'right result';
+is $pattern->render({'' => 'bar'}, 1), '/bar', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('/#');
+$result = $pattern->match('/foo.bar', 1);
+is_deeply $result, {'' => 'foo.bar'}, 'right structure';
+is $pattern->render($result, 1), '/foo.bar', 'right result';
+is $pattern->render({'' => 'bar.baz'}, 1), '/bar.baz', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('/*');
+$result = $pattern->match('/foo/bar', 1);
+is_deeply $result, {'' => 'foo/bar'}, 'right structure';
+is $pattern->render($result, 1), '/foo/bar', 'right result';
+is $pattern->render({'' => 'bar/baz'}, 1), '/bar/baz', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('/:/:0');
+$result = $pattern->match('/foo/bar', 1);
+is_deeply $result, {'' => 'foo', '0' => 'bar'}, 'right structure';
+is $pattern->render($result, 1), '/foo/bar', 'right result';
+is $pattern->render({'' => 'bar', '0' => 'baz'}, 1), '/bar/baz',
+  'right result';
+$pattern = Mojolicious::Routes::Pattern->new('/(:)test/(0)');
+$result = $pattern->match('/footest/bar', 1);
+is_deeply $result, {'' => 'foo', '0' => 'bar'}, 'right structure';
+is $pattern->render($result, 1), '/footest/bar', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('/()test');
+$result = $pattern->match('/footest', 1);
+is_deeply $result, {'' => 'foo'}, 'right structure';
+is $pattern->render($result, 1), '/footest', 'right result';
+
 done_testing();

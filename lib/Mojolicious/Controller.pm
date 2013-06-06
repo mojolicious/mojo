@@ -795,6 +795,12 @@ will be invoked once all data has been written.
   # Send "Ping" frame
   $c->send([1, 0, 0, 0, 9, 'Hello World!']);
 
+  # Make sure previous message has been written before continuing
+  $c->send('First message!' => sub {
+    my $c = shift;
+    $c->send('Second message!');
+  });
+
 For mostly idle WebSockets you might also want to increase the inactivity
 timeout, which usually defaults to C<15> seconds.
 

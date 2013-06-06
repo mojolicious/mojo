@@ -195,8 +195,8 @@ sub _tokenize {
     # Quote start
     if ($char eq $quote_start) {
       $quoted = 1;
-      $state  = 'placeholder';
       push @tree, ['placeholder', ''];
+      $state = 'placeholder';
     }
 
     # Placeholder start
@@ -228,12 +228,9 @@ sub _tokenize {
 
     # Text
     else {
-      $state = 'text';
-
-      # New text element
       push @tree, ['text', $char] and next unless $tree[-1][0] eq 'text';
-
       $tree[-1][-1] .= $char;
+      $state = 'text';
     }
   }
 

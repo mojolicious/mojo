@@ -87,6 +87,11 @@ any time.
   /sebastian -> /:name -> {name => 'sebastian'}
   {name => 'sebastian'} -> /:name -> /sebastian
 
+Every placeholder has a name, even if it's just an empty string.
+
+  /foo/bar -> /:/bar -> {'' => 'foo'}
+  {'' => 'foo'} -> /:/bar -> /foo/bar
+
 =head2 Generic placeholders
 
 Generic placeholders are the simplest form of placeholders and match all
@@ -108,6 +113,11 @@ surrounding text.
   /sebastianhello    -> /(:name)hello -> {name => 'sebastian'}
   /sebastian23hello  -> /(:name)hello -> {name => 'sebastian23'}
   /sebastian 23hello -> /(:name)hello -> {name => 'sebastian 23'}
+
+The colon prefix is optional for generic placeholders that are surrounded by
+parentheses.
+
+  /sebastian/hello -> /(name)/hello -> {name => 'sebastian'}
 
 =head2 Relaxed placeholders
 

@@ -19,6 +19,8 @@ app->log->level($ENV{MOJO_LOG_LEVEL} = 'debug');
 my $log = '';
 app->log->on(message => sub { shift; $log .= join ':', @_ });
 
+helper dead_helper => sub { die "dead helper!\n" };
+
 get '/logger' => sub {
   my $self  = shift;
   my $level = $self->param('level');
@@ -91,6 +93,8 @@ get '/reuse/exception' => {foo => 'bar'} =>
   sub { die "Reusable exception.\n" };
 
 get '/custom' => sub { die "CUSTOM\n" };
+
+get '/dead_helper';
 
 my $t = Test::Mojo->new;
 
@@ -172,6 +176,9 @@ $t->get_ok('/trapped/too')->status_is(200)->content_is('works');
 # Custom exception handling
 $t->get_ok('/custom')->status_is(200)->content_is('Custom handling works!');
 
+# Exception in helper
+$t->get_ok('/dead_helper')->status_is(500)->content_like(qr/dead helper!/);
+
 # Missing template
 $t->get_ok('/missing_template')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8')
@@ -243,3 +250,6 @@ works!
 
 @@ not_found.development.xml.ep
 <somewhat>bad</somewhat>
+
+@@ dead_helper.html.ep
+% dead_helper;

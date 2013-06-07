@@ -89,9 +89,6 @@ any time.
 
 Every placeholder has a name, even if it's just an empty string.
 
-  /foo/bar -> /:/bar -> {'' => 'foo'}
-  {'' => 'foo'} -> /:/bar -> /foo/bar
-
 =head2 Generic placeholders
 
 Generic placeholders are the simplest form of placeholders and match all

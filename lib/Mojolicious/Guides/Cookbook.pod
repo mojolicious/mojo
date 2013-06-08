@@ -262,8 +262,10 @@ incoming requests is also quite common.
       shift @{$self->req->url->path->leading_slash(0)};
   }) if app->mode eq 'production';
 
-L<Mojo::URL> objects are very easy to manipulate, just make sure that the URL
-is always relative to the base URL.
+L<Mojo::URL> objects are very easy to manipulate, just make sure that the URL,
+which represents the routing destination (C<foo/bar?baz=yada>), is always
+relative to the base URL, which represents the deployment location of your
+application (C<http://example.com/myapp/>).
 
 =head2 Application embedding
 

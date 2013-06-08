@@ -167,6 +167,12 @@ There is one big difference though, by calling it manually you can make sure
 that templates use the current controller object, and not the default
 controller specified with the attribute L<Mojolicious/"controller_class">.
 
+  $self->render_later;
+
+You can also disable automatic rendering with the method
+L<Mojolicious::Controller/"render_later">, which can be very useful to delay
+rendering when for example a non-blocking operation has to finish first.
+
 =head2 Rendering templates
 
 The renderer will always try to detect the right template but you can also

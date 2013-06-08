@@ -72,8 +72,7 @@ sub new {
   $r->hide(qw(AUTOLOAD DESTROY app cookie finish flash handler on param));
   $r->hide(qw(redirect_to render render_exception render_maybe));
   $r->hide(qw(render_not_found render_static rendered req res respond_to));
-  $r->hide(qw(send session signed_cookie stash tx ua url_for write));
-  $r->hide('write_chunk');
+  $r->hide(qw(send session signed_cookie stash tx url_for write write_chunk));
 
   # Check if we have a log directory
   my $mode = $self->mode;

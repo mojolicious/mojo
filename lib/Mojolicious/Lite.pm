@@ -839,12 +839,14 @@ variable.
 
 =head2 User agent
 
-With L<Mojolicious::Controller/"ua"> there's a full featured HTTP and
+With L<Mojo::UserAgent>, which is available through the helper
+L<Mojolicious::Plugin::DefaultHelpers/"ua">, there's a full featured HTTP and
 WebSocket user agent built right in. Especially in combination with
 L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
 
   use Mojolicious::Lite;
 
+  # Blocking
   get '/headers' => sub {
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
@@ -852,7 +854,35 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
     $self->render(json => [$dom->find('h1, h2, h3')->pluck('text')->each]);
   };
 
+  # Non-blocking
+  get '/title' => sub {
+    my $self = shift;
+    $self->ua->get('mojolicio.us' => sub {
+      my ($ua, $tx) = @_;
+      $self->render(data => $tx->res->dom->at('title')->text);
+    });
+  };
+
+  # Parallel non-blocking
+  get '/titles' => sub {
+    my $self = shift;
+    my $delay = Mojo::IOLoop->delay(sub {
+      my ($delay, @titles) = @_;
+      $self->render(json => \@titles);
+    });
+    for my $url ('http://mojolicio.us', 'https://metacpan.org') {
+      my $end = $delay->begin(0);
+      $self->ua->get($url => sub {
+        my ($ua, $tx) = @_;
+        $end->($tx->res->dom->html->head->title->text);
+      });
+    }
+  };
+
   app->start;
+
+For more information about the user agent see also
+L<Mojolicious::Guides::Cookbook/"USER AGENT">.
 
 =head2 WebSockets
 

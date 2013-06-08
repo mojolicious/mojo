@@ -1,5 +1,6 @@
 
 4.13  2013-06-09
+  - Replaced ua method in Mojolicious::Controller with a helper.
   - Fixed url_for support for absolute URLs without scheme or authority.
     (bduggan, sri)
 

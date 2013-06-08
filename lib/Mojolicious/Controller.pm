@@ -374,8 +374,6 @@ sub stash {
   return $self;
 }
 
-sub ua { shift->app->ua }
-
 sub url_for {
   my $self = shift;
   my $target = shift // '';
@@ -859,38 +857,6 @@ that all stash values with a C<mojo.*> prefix are reserved for internal use.
 
   # Remove value
   my $foo = delete $c->stash->{foo};
-
-=head2 ua
-
-  my $ua = $c->ua;
-
-Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
-
-  # Longer version
-  my $ua = $c->app->ua;
-
-  # Blocking
-  my $tx = $c->ua->get('http://example.com');
-  my $tx = $c->ua->post('example.com/login' => form => {user => 'mojo'});
-
-  # Non-blocking
-  $c->ua->get('http://example.com' => sub {
-    my ($ua, $tx) = @_;
-    $c->render(data => $tx->res->body);
-  });
-
-  # Parallel non-blocking
-  my $delay = Mojo::IOLoop->delay(sub {
-    my ($delay, @titles) = @_;
-    $c->render(json => \@titles);
-  });
-  for my $url ('http://mojolicio.us', 'https://metacpan.org') {
-    my $end = $delay->begin(0);
-    $c->ua->get($url => sub {
-      my ($ua, $tx) = @_;
-      $end->($tx->res->dom->html->head->title->text);
-    });
-  }
 
 =head2 url_for
 

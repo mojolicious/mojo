@@ -26,12 +26,12 @@ sub register {
   }
 
   $app->helper(config => sub { shift->app->config(@_) });
-
   $app->helper(content       => \&_content);
   $app->helper(content_for   => \&_content_for);
   $app->helper(current_route => \&_current_route);
   $app->helper(dumper        => \&_dumper);
   $app->helper(include       => \&_include);
+  $app->helper(ua            => sub { shift->app->ua });
   $app->helper(url_with      => \&_url_with);
 }
 
@@ -227,6 +227,12 @@ Alias for L<Mojolicious::Controller/"stash">.
   %= title
 
 Page title. All additional values get merged into the C<stash>.
+
+=head2 ua
+
+  %= ua->get('mojolicio.us')->res->dom->at('title')->text
+
+Alias for L<Mojo/"ua">.
 
 =head2 url_for
 

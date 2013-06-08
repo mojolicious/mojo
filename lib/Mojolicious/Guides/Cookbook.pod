@@ -255,7 +255,7 @@ Since reverse proxies generally don't pass along information about path
 prefixes your application might be deployed under, rewriting the base URL of
 incoming requests is also quite common.
 
-  # Change base URL in production mode
+  # Change base URL and remove leading slash from path in production mode
   app->hook(before_dispatch => sub {
     my $self = shift;
     $self->req->url->base(Mojo::URL->new('http://example.com/rebased/'));

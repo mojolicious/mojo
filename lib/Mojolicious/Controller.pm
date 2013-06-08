@@ -629,8 +629,8 @@ For more control you can also access request information directly.
 
   $c = $c->redirect_to('named', foo => 'bar');
   $c = $c->redirect_to('named', {foo => 'bar'});
-  $c = $c->redirect_to('/path');
-  $c = $c->redirect_to('http://127.0.0.1/foo/bar');
+  $c = $c->redirect_to('/perldoc');
+  $c = $c->redirect_to('http://mojolicio.us/perldoc');
 
 Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
 
@@ -900,8 +900,8 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
   my $url = $c->url_for('test', name => 'sebastian');
   my $url = $c->url_for('test', {name => 'sebastian'});
   my $url = $c->url_for('/perldoc');
-  my $url = $c->url_for('http://mojolicio.us/perldoc');
   my $url = $c->url_for('//mojolicio.us/perldoc');
+  my $url = $c->url_for('http://mojolicio.us/perldoc');
   my $url = $c->url_for('mailto:sri@example.com');
 
 Generate a portable L<Mojo::URL> object with base for a route, path or URL.

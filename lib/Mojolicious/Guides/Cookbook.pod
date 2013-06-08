@@ -258,7 +258,7 @@ incoming requests is also quite common.
   # Change base URL and remove leading slash from path in production mode
   app->hook(before_dispatch => sub {
     my $self = shift;
-    $self->req->url->base(Mojo::URL->new('http://example.com/rebased/'));
+    $self->req->url->base(Mojo::URL->new('http://example.com/myapp/'));
     $self->req->url->path->leading_slash(0);
   }) if app->mode eq 'production';
 

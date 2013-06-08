@@ -47,6 +47,7 @@ $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
+<link href="//example.com/base.css" media="screen" rel="stylesheet" />
 http://example.com/rebased
 http://example.com/rebased/foo
 /rebased/foo
@@ -93,6 +94,7 @@ $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
+<link href="//example.com/base.css" media="screen" rel="stylesheet" />
 http://example.com/rebased/baz
 http://example.com/rebased/foo
 /rebased/foo
@@ -110,6 +112,7 @@ __DATA__
 %= $self->req->url->base
 %= javascript '/mojo/jquery/jquery.js'
 %= image '/images/test.png'
+%= stylesheet '//example.com/base.css'
 %= $self->req->url->to_abs
 %= url_for('foo')->to_abs
 %= url_for 'foo'

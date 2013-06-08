@@ -382,7 +382,7 @@ sub url_for {
 
   # Absolute URL
   return $target if Scalar::Util::blessed $target && $target->isa('Mojo::URL');
-  return Mojo::URL->new($target) if $target =~ m!^\w+://!;
+  return Mojo::URL->new($target) if $target =~ m!^(?:\w+:)?//!;
 
   # Base
   my $url  = Mojo::URL->new;
@@ -901,6 +901,7 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
   my $url = $c->url_for('test', {name => 'sebastian'});
   my $url = $c->url_for('/perldoc');
   my $url = $c->url_for('http://mojolicio.us/perldoc');
+  my $url = $c->url_for('//mojolicio.us/perldoc');
 
 Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 

@@ -1,4 +1,6 @@
 
+4.13  2013-06-08
+
 4.12  2013-06-07
   - Improved Mojo::Message::Request to allow a few more ASCII characters in
     URLs.

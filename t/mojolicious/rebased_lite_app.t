@@ -13,7 +13,9 @@ use Test::Mojo;
 # Rebase hook
 app->hook(
   before_dispatch => sub {
-    shift->req->url->base(Mojo::URL->new('http://example.com/rebased/'));
+    my $self = shift;
+    $self->req->url->base(Mojo::URL->new('http://example.com/rebased/'));
+    $self->req->url->path->leading_slash(0);
   }
 );
 
@@ -45,6 +47,7 @@ $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
+http://example.com/rebased
 http://example.com/rebased/foo
 /rebased/foo
 http://example.com/
@@ -58,6 +61,7 @@ $t->get_ok('/foo')->status_is(200)->header_is('X-Route' => 'foo')
 http://example.com/rebased/
 <link href="/rebased/b.css" media="test" rel="stylesheet" />
 <img alt="Test" src="/rebased/images/test.png" />
+http://example.com/rebased/foo
 http://example.com/rebased
 /rebased
 http://example.com/
@@ -76,6 +80,7 @@ $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
 http://example.com/rebased/works!too!
 <link href="/rebased/b.css" media="test" rel="stylesheet" />
 <img alt="Test" src="/rebased/images/test.png" />
+http://example.com/rebased/foo
 http://example.com/rebased
 /rebased
 http://example.com/
@@ -88,6 +93,7 @@ $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
+http://example.com/rebased/baz
 http://example.com/rebased/foo
 /rebased/foo
 http://example.com/
@@ -104,6 +110,7 @@ __DATA__
 %= $self->req->url->base
 %= javascript '/mojo/jquery/jquery.js'
 %= image '/images/test.png'
+%= $self->req->url->to_abs
 %= url_for('foo')->to_abs
 %= url_for 'foo'
 %= url_for('foo')->base
@@ -116,6 +123,7 @@ __DATA__
 <%= $self->req->url->base %><%= flash 'just' || '' %><%= flash 'works' || '' %>
 %= stylesheet '/b.css', media => 'test'
 %= image '/images/test.png', alt => 'Test'
+%= $self->req->url->to_abs
 %= url_for('root')->to_abs
 %= url_for 'root'
 %= url_for('root')->base

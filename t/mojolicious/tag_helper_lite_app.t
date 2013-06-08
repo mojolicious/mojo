@@ -66,6 +66,7 @@ $t->get_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="http://example.com/" title="Foo">Foo</a>
 <a href="//example.com/"><foo>Example</foo></a>
 <a href="mailto:sri@example.com">Contact</a>
+<a href="mailto:sri@example.com">Contact</a>
 <a href="/links">Home</a>
 <a href="/form/23" title="Foo">Foo</a>
 <a href="/form/23" title="Foo">Foo</a>
@@ -74,6 +75,7 @@ $t->post_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/path">Pa&lt;th</a>
 <a href="http://example.com/" title="Foo">Foo</a>
 <a href="//example.com/"><foo>Example</foo></a>
+<a href="mailto:sri@example.com">Contact</a>
 <a href="mailto:sri@example.com">Contact</a>
 <a href="/links">Home</a>
 <a href="/form/23" title="Foo">Foo</a>
@@ -441,6 +443,7 @@ __DATA__
 <%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
 <%= link_to '//example.com/' => begin %><foo>Example</foo><% end %>
 <%= link_to Contact => Mojo::URL->new('mailto:sri@example.com') %>
+<%= link_to Contact => 'mailto:sri@example.com' %>
 <%= link_to Home => 'links' %>
 <%= link_to Foo => 'form', {test => 23}, title => 'Foo' %>
 <%= link_to form => {test => 23} => (title => 'Foo') => begin %>Foo<% end %>

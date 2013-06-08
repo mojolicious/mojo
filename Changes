@@ -1,6 +1,7 @@
 
 4.13  2013-06-08
-  - Fixed url_for to accept absolute URLs without scheme. (bduggan)
+  - Fixed url_for support for absolute URLs without scheme or authority.
+    (bduggan, sri)
 
 4.12  2013-06-07
   - Improved Mojo::Message::Request to allow a few more ASCII characters in

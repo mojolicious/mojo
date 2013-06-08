@@ -43,11 +43,12 @@ my $t = Test::Mojo->new;
 
 # Rebased root
 $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
-  ->content_is(<<EOF);
+  ->content_is(<<'EOF');
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
 <link href="//example.com/base.css" media="screen" rel="stylesheet" />
+<a href="mailto:sri@example.com">Contact</a>
 http://example.com/rebased
 http://example.com/rebased/foo
 /rebased/foo
@@ -90,11 +91,12 @@ EOF
 
 # Rebased route sharing a template
 $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
-  ->content_is(<<EOF);
+  ->content_is(<<'EOF');
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
 <link href="//example.com/base.css" media="screen" rel="stylesheet" />
+<a href="mailto:sri@example.com">Contact</a>
 http://example.com/rebased/baz
 http://example.com/rebased/foo
 /rebased/foo
@@ -113,6 +115,7 @@ __DATA__
 %= javascript '/mojo/jquery/jquery.js'
 %= image '/images/test.png'
 %= stylesheet '//example.com/base.css'
+%= link_to Contact => 'mailto:sri@example.com'
 %= $self->req->url->to_abs
 %= url_for('foo')->to_abs
 %= url_for 'foo'

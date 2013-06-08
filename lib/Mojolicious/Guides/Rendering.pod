@@ -171,7 +171,7 @@ controller specified with the attribute L<Mojolicious/"controller_class">.
 
 You can also disable automatic rendering with the method
 L<Mojolicious::Controller/"render_later">, which can be very useful to delay
-rendering when for example a non-blocking operation has to finish first.
+rendering when a non-blocking operation has to be performed first.
 
 =head2 Rendering templates
 
@@ -188,6 +188,12 @@ Because rendering a specific template is the most common task it also has a
 shortcut.
 
   $self->render('foo/bar');
+
+If you're not sure in advance if a template actually exists, you can also use
+the method L<Mojolicious::Controller/"render_maybe"> to try multiple
+alternatives.
+
+  $self->render_maybe('localized/bar') or $self->render('foo/bar');
 
 =head2 Rendering inline templates
 

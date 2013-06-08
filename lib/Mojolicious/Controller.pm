@@ -382,7 +382,7 @@ sub url_for {
 
   # Absolute URL
   return $target if Scalar::Util::blessed $target && $target->isa('Mojo::URL');
-  return Mojo::URL->new($target) if $target =~ m!^(?:([^:/?#]+:)|//)!;
+  return Mojo::URL->new($target) if $target =~ m!^(?:[^:/?#]+:|//)!;
 
   # Base
   my $url  = Mojo::URL->new;

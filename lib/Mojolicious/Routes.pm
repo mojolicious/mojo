@@ -163,17 +163,18 @@ sub _controller {
   }
 
   # Action
-  elsif (my $method = $self->_method($c, $field)) {
-    $log->debug(qq{Routing to controller "$class" and action "$method".});
+  elsif (my $method = $field->{action}) {
+    if (!$self->is_hidden($method)) {
 
-    # Try to call action
-    if (my $sub = $app->can($method)) {
-      $c->stash->{'mojo.routed'}++ unless $nested;
-      $continue = $app->$sub;
+      $log->debug(qq{Routing to controller "$class" and action "$method".});
+      if (my $sub = $app->can($method)) {
+        $c->stash->{'mojo.routed'}++ unless $nested;
+        $continue = $app->$sub;
+      }
+
+      else { $log->debug('Action not found in controller.') }
     }
-
-    # Action not found
-    else { $log->debug('Action not found in controller.') }
+    else { $log->debug(qq{Action "$method" is not allowed.}) }
   }
 
   return !$nested || $continue ? 1 : undef;
@@ -189,21 +190,6 @@ sub _load {
   # Check base classes
   return 0 unless first { $app->isa($_) } @{$self->base_classes};
   return ++$self->{loaded}{$app};
-}
-
-sub _method {
-  my ($self, $c, $field) = @_;
-
-  # Hidden
-  return undef unless my $method = $field->{action};
-  $c->app->log->debug(qq{Action "$method" is not allowed.}) and return undef
-    if $self->is_hidden($method);
-
-  # Invalid
-  $c->app->log->debug(qq{Action "$method" is invalid.}) and return undef
-    unless $method =~ /^[a-zA-Z0-9_]+$/;
-
-  return $method;
 }
 
 sub _walk {

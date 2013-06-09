@@ -75,6 +75,7 @@ ok $t->app->routes->is_hidden('finish'),           'is hidden';
 ok $t->app->routes->is_hidden('flash'),            'is hidden';
 ok $t->app->routes->is_hidden('handler'),          'is hidden';
 ok $t->app->routes->is_hidden('has'),              'is hidden';
+ok $t->app->routes->is_hidden('match'),            'is hidden';
 ok $t->app->routes->is_hidden('new'),              'is hidden';
 ok $t->app->routes->is_hidden('on'),               'is hidden';
 ok $t->app->routes->is_hidden('param'),            'is hidden';

@@ -1,7 +1,8 @@
 
 4.14  2013-06-10
   - Improved url_for performance slightly.
-  - Fixed bug where render_later method was not hidden from the router.
+  - Fixed bug where match attribute and render_later method were not hidden
+    from the router.
 
 4.13  2013-06-09
   - Replaced ua method in Mojolicious::Controller with a helper.

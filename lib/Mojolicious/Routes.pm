@@ -201,7 +201,7 @@ sub _method {
 
   # Invalid
   $c->app->log->debug(qq{Action "$method" is invalid.}) and return undef
-    unless $method =~ /^[a-zA-Z0-9_:]+$/;
+    unless $method =~ /^[a-zA-Z0-9_]+$/;
 
   return $method;
 }

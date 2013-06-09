@@ -135,7 +135,7 @@ sub startup {
   $r->route('/test10')->to('baz#index');
 
   # /withblock (template with blocks)
-  $r->route('/withblock')->to('foo#withblock');
+  $r->route('/withblock')->to('foo#withBlock');
 
   # /staged (authentication with bridges)
   my $b = $r->bridge('/staged')->to(controller => 'foo', action => 'stage1');

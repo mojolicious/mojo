@@ -226,8 +226,8 @@ $t->get_ok('/foo/withlayout' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Same old in green Seems to work!/);
 
-# Foo::withblock
-$t->get_ok('/foo/withblock.txt' => {'X-Test' => 'Hi there!'})->status_is(200)
+# Foo::withBlock
+$t->get_ok('/withblock.txt' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_type_isnt('text/html')
   ->content_type_is('text/plain')
   ->content_like(qr/Hello Baerbel\.\s+Hello Wolfgang\./);

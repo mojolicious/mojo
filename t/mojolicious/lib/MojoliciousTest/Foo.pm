@@ -74,9 +74,9 @@ sub url_for_missing {
 
 sub willdie { die 'for some reason' }
 
-sub withblock { shift->render(template => 'withblock') }
+sub withBlock { shift->render(template => 'withblock') }
 
-sub withlayout { shift->stash(template => 'withlayout') }
+sub withlayout { shift->stash(template => 'WithGreenLayout') }
 
 1;
 __DATA__

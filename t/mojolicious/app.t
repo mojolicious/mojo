@@ -81,6 +81,7 @@ ok $t->app->routes->is_hidden('param'),            'is hidden';
 ok $t->app->routes->is_hidden('redirect_to'),      'is hidden';
 ok $t->app->routes->is_hidden('render'),           'is hidden';
 ok $t->app->routes->is_hidden('render_exception'), 'is hidden';
+ok $t->app->routes->is_hidden('render_later'),     'is hidden';
 ok $t->app->routes->is_hidden('render_maybe'),     'is hidden';
 ok $t->app->routes->is_hidden('render_not_found'), 'is hidden';
 ok $t->app->routes->is_hidden('render_static'),    'is hidden';

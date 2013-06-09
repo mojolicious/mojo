@@ -70,7 +70,7 @@ sub new {
 
   # Hide controller attributes/methods and "handler"
   $r->hide(qw(AUTOLOAD DESTROY app cookie finish flash handler on param));
-  $r->hide(qw(redirect_to render render_exception render_maybe));
+  $r->hide(qw(redirect_to render render_exception render_later render_maybe));
   $r->hide(qw(render_not_found render_static rendered req res respond_to));
   $r->hide(qw(send session signed_cookie stash tx url_for write write_chunk));
 

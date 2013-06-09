@@ -402,12 +402,6 @@ sub url_for {
   else {
     my ($generated, $ws) = $self->match->path_for($target, @_);
     $path->parse($generated) if $generated;
-
-    # Fix trailing slash
-    $path->trailing_slash(1)
-      if (!$target || $target eq 'current') && $req->url->path->trailing_slash;
-
-    # Fix scheme for WebSockets
     $base->scheme($base->protocol eq 'https' ? 'wss' : 'ws') if $ws;
   }
 

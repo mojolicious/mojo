@@ -1,4 +1,8 @@
 
+4.15  2013-06-11
+  - Fixed a few error reporting bugs in Mojo::IOLoop::Client and
+    Mojo::IOLoop::Server.
+
 4.14  2013-06-10
   - Improved url_for performance slightly.
   - Fixed bug where match attribute and render_later method were not hidden

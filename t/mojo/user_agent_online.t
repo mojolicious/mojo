@@ -89,7 +89,7 @@ ok $tx->error,       'has error';
 $tx = $ua->build_tx(GET => 'http://cdeabcdeffoobarnonexisting.com');
 $ua->start($tx);
 ok $tx->is_finished, 'transaction is finished';
-is $tx->error, "Couldn't connect", 'right error';
+like $tx->error, qr/^Couldn't connect/, 'right error';
 
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;

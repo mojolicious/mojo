@@ -56,7 +56,7 @@ sub _connect {
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    return $self->emit_safe(error => "Couldn't connect")
+    return $self->emit_safe(error => "Couldn't connect: $@")
       unless $self->{handle} = $handle = $class->new(%options);
 
     # Timeout

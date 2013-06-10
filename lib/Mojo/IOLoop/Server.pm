@@ -56,8 +56,8 @@ sub listen {
   my $handle;
   my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
   if (defined $fd) {
-    $handle = $class->new;
-    $handle->fdopen($fd, 'r') or croak "Can't open file descriptor $fd: $!";
+    $handle = $class->new_from_fd($fd, 'r')
+      or croak "Can't open file descriptor $fd: $!";
   }
 
   # New socket
@@ -71,7 +71,7 @@ sub listen {
       Type      => SOCK_STREAM
     );
     $options{LocalAddr} =~ s/[\[\]]//g;
-    $handle = $class->new(%options) or croak "Can't create listen socket: $!";
+    $handle = $class->new(%options) or croak "Can't create listen socket: $@";
     $fd = fileno $handle;
     $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse:$fd" : "$reuse:$fd";
   }

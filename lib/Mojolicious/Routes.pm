@@ -165,8 +165,8 @@ sub _controller {
   # Action
   elsif (my $method = $field->{action}) {
     if (!$self->is_hidden($method)) {
-
       $log->debug(qq{Routing to controller "$class" and action "$method".});
+
       if (my $sub = $app->can($method)) {
         $c->stash->{'mojo.routed'}++ unless $nested;
         $continue = $app->$sub;

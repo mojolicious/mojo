@@ -114,7 +114,7 @@ surrounding text.
 The colon prefix is optional for generic placeholders that are surrounded by
 parentheses.
 
-  /sebastian/hello -> /(name)/hello -> {name => 'sebastian'}
+  /i♥mojolicious -> /(one)♥(two) -> {one => 'i', two => 'mojolicious'}
 
 =head2 Relaxed placeholders
 

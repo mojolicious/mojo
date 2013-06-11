@@ -197,4 +197,10 @@ $result = $pattern->match('/footest', 1);
 is_deeply $result, {'' => 'foo'}, 'right structure';
 is $pattern->render($result, 1), '/footest', 'right result';
 
+# Unicode
+$pattern = Mojolicious::Routes::Pattern->new('/(one)♥(two)');
+$result  = $pattern->match('/i♥mojolicious');
+is_deeply $result, {one => 'i', two => 'mojolicious'}, 'right structure';
+is $pattern->render($result, 1), '/i♥mojolicious', 'right result';
+
 done_testing();

@@ -115,20 +115,21 @@ Mojo::Server::Morbo - DOOOOOOOOOOOOOOOOOOM!
 
 L<Mojo::Server::Morbo> is a full featured, self-restart capable non-blocking
 I/O HTTP and WebSocket server, built around the very well tested and reliable
-L<Mojo::Server::Daemon>, with C<IPv6>, C<TLS>, C<Comet> (long polling),
-C<keep-alive>, connection pooling, timeout, cookie, multipart and multiple
-event loop support. Note that the server uses signals for process management,
-so you should avoid modifying signal handlers in your applications.
+L<Mojo::Server::Daemon>, with IPv6, TLS, Comet (long polling), keep-alive,
+connection pooling, timeout, cookie, multipart and multiple event loop
+support. Note that the server uses signals for process management, so you
+should avoid modifying signal handlers in your applications.
 
 To start applications with it you can use the L<morbo> script.
 
   $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
-Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
-L<IO::Socket::SSL> (1.75+) are supported transparently through
-L<Mojo::IOLoop>, and used if installed. Individual features can also be
-disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
+For better scalability and to provide IPv6 as well as TLS support, the
+optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
+L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
+they are installed. Individual features can also be disabled with the
+MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 

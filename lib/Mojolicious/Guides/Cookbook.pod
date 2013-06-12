@@ -672,27 +672,7 @@ which can be combined to solve some of hardest problems in web development.
 
 Internally the L<Mojo::IOLoop> event loop can use multiple reactor backends,
 L<EV> for example will be automatically used if installed. Which in turn
-allows other event loops like L<IO::Async> to just work.
-
-  use Mojolicious::Lite;
-  use EV;
-  use IO::Async::Loop::EV;
-  use IO::Async::Timer::Absolute;
-
-  my $loop = IO::Async::Loop::EV->new;
-
-  # Wait 3 seconds before rendering a response
-  get '/' => sub {
-    my $self = shift;
-    $loop->add(IO::Async::Timer::Absolute->new(
-      time      => time + 3,
-      on_expire => sub { $self->render(text => 'Delayed by 3 seconds!') }
-    ));
-  };
-
-  app->start;
-
-Same for L<AnyEvent>.
+allows other event loops like L<AnyEvent> to just work.
 
   use Mojolicious::Lite;
   use EV;

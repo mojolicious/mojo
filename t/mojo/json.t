@@ -228,12 +228,12 @@ is_deeply $hash, {foo => 2}, 'decode {"foo": 1, "foo": 2}';
 $bytes = '{"":""}';
 $hash  = $json->decode($bytes);
 is_deeply $hash, {'' => ''}, 'decode {"":""}';
-is $json->encode($hash), $bytes, 'reencode';
+is $json->encode($hash), $bytes, 're-encode';
 $bytes = '[null,false,true,"",0,1]';
 $array = $json->decode($bytes);
 is_deeply $array, [undef, Mojo::JSON->false, Mojo::JSON->true, '', 0, 1],
   'decode [null,false,true,"",0,1]';
-is $json->encode($array), $bytes, 'reencode';
+is $json->encode($array), $bytes, 're-encode';
 $array = [undef, 0, 1, '', Mojo::JSON->true, Mojo::JSON->false];
 $bytes = $json->encode($array);
 ok $bytes, 'defined value';

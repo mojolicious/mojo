@@ -529,9 +529,9 @@ additional information.
   1;
 
 The connection gets established when you respond to the WebSocket handshake
-with a C<101> response status, which happens automatically if you subscribe to
-an event with L<Mojolicious::Controller/"on"> or send a message with
-L<Mojolicious::Controller/"send"> right away.
+request with a C<101> response status, which happens automatically if you
+subscribe to an event with L<Mojolicious::Controller/"on"> or send a message
+with L<Mojolicious::Controller/"send"> right away.
 
 =head2 Bridges
 

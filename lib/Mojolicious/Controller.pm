@@ -555,7 +555,8 @@ Data storage persistent only for the next request, stored in the C<session>.
 
 Subscribe to events of C<tx>, which is usually a L<Mojo::Transaction::HTTP> or
 L<Mojo::Transaction::WebSocket> object. Note that this method will
-automatically respond to WebSocket handshakes with a C<101> response status.
+automatically respond to WebSocket handshake requests with a C<101> response
+status.
 
   # Do something after the transaction has been finished
   $c->on(finish => sub {
@@ -774,7 +775,8 @@ is set to the value C<XMLHttpRequest>.
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
 will be invoked once all data has been written. Note that this method will
-automatically respond to WebSocket handshakes with a C<101> response status.
+automatically respond to WebSocket handshake requests with a C<101> response
+status.
 
   # Send "Text" message
   $c->send('I ♥ Mojolicious!');

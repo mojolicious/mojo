@@ -449,6 +449,7 @@ event, and multiple ones as a chain of steps.
       $end->();
     });
   }
+  $delay->wait unless Mojo::IOLoop->is_running;
 
   # Sequentialize multiple events
   my $delay = Mojo::IOLoop->delay(
@@ -471,8 +472,6 @@ event, and multiple ones as a chain of steps.
     # Third step (the end)
     sub { say 'And done after 5 seconds total.' }
   );
-
-  # Wait for events if necessary
   $delay->wait unless Mojo::IOLoop->is_running;
 
 =head2 generate_port

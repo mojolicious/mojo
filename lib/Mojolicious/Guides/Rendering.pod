@@ -842,10 +842,10 @@ C<after_render>.
 =head2 Chunked transfer encoding
 
 For very dynamic content you might not know the response content length in
-advance, that's where the C<chunked> transfer encoding comes in handy. A
-common use would be to send the C<head> section of an HTML document to the
-browser in advance and speed up preloading of referenced images and
-stylesheets.
+advance, that's where L<Mojolicious::Controller/"write_chunk"> and the
+C<chunked> transfer encoding comes in handy. A common use would be to send the
+C<head> section of an HTML document to the browser in advance and speed up
+preloading of referenced images and stylesheets.
 
   $self->write_chunk('<html><head><title>Example</title></head>' => sub {
     my $self = shift;

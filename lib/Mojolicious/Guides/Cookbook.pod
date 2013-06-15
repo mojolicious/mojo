@@ -550,11 +550,11 @@ L<Test::Mojo> API to be used.
 
 =head2 EventSource web service
 
-EventSource is a special form of long-polling where you can directly send DOM
-events from servers to clients. It is uni-directional, that means you will
-have to use Ajax requests for sending data from clients to servers, the
-advantage however is low infrastructure requirements, since it reuses the HTTP
-protocol for transport.
+EventSource is a special form of long-polling where you can use
+L<Mojolicious::Controller/"write"> to directly send DOM events from servers to
+clients. It is uni-directional, that means you will have to use Ajax requests
+for sending data from clients to servers, the advantage however is low
+infrastructure requirements, since it reuses the HTTP protocol for transport.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;

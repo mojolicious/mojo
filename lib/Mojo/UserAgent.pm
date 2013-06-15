@@ -498,11 +498,10 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
     ->res->json('/results/0');
 
   # Extract data from HTML and XML resources
-  say $ua->get('mojolicio.us')->res->dom->html->head->title->text;
+  say $ua->get('www.perl.org')->res->dom->html->head->title->text;
 
-  # Scrape the latest headlines from a news site
-  say $ua->max_redirects(5)->get('www.reddit.com/r/perl/')
-    ->res->dom('p.title > a.title')->pluck('text')->shuffle;
+  # Scrape information from websites
+  say $ua->get('mojolicio.us')->res->dom('h1, h2')->pluck('text')->shuffle;
 
   # IPv6 PUT request with content
   my $tx
@@ -514,7 +513,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   # TLS certificate authentication and JSON POST
   my $tx = $ua->cert('tls.crt')->key('tls.key')
-    ->post('https://mojolicio.us' => json => {top => 'secret'});
+    ->post('https://example.com' => json => {top => 'secret'});
 
   # Blocking parallel requests (does not work inside a running event loop)
   my $delay = Mojo::IOLoop->delay;

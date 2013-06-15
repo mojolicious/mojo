@@ -322,25 +322,25 @@ latency backend web services.
 
   use Mojolicious::Lite;
 
-  # Search Twitter for "perl"
+  # Search MetaCPAN for "mojolicious"
   get '/' => sub {
     my $self = shift;
-    $self->ua->get('http://search.twitter.com/search.json?q=perl' => sub {
+    $self->ua->get('api.metacpan.org/v0/module/_search?q=mojolicious' => sub {
       my ($ua, $tx) = @_;
-      $self->render('twitter', results => $tx->res->json->{results});
+      $self->render('metacpan', hits => $tx->res->json->{hits}{hits});
     });
   };
 
   app->start;
   __DATA__
 
-  @@ twitter.html.ep
+  @@ metacpan.html.ep
   <!DOCTYPE html>
   <html>
-    <head><title>Twitter results for "perl"</title></head>
+    <head><title>MetaCPAN results for "mojolicious"</title></head>
     <body>
-      % for my $result (@$results) {
-        <p><%= $result->{text} %></p>
+      % for my $hit (@$hits) {
+        <p><%= $hit->{_source}{release} %></p>
       % }
     </body>
   </html>
@@ -352,7 +352,7 @@ L<Mojo::IOLoop> delay.
   use Mojo::IOLoop;
   use Mojo::URL;
 
-  # Search Twitter for "perl" and "python"
+  # Search MetaCPAN for "mojo" and "mango"
   get '/' => sub {
     my $self = shift;
 
@@ -362,17 +362,18 @@ L<Mojo::IOLoop> delay.
       # Parallel requests
       sub {
         my $delay = shift;
-        my $url   = Mojo::URL->new('http://search.twitter.com/search.json');
-        $self->ua->get($url->clone->query({q => 'perl'})   => $delay->begin);
-        $self->ua->get($url->clone->query({q => 'python'}) => $delay->begin);
+        my $url   = Mojo::URL->new('api.metacpan.org/v0/module/_search');
+        $url->query({sort => 'date:desc'});
+        $self->ua->get($url->clone->query({q => 'mojo'})  => $delay->begin);
+        $self->ua->get($url->clone->query({q => 'mango'}) => $delay->begin);
       },
 
       # Delayed rendering
       sub {
-        my ($delay, $perl, $python) = @_;
+        my ($delay, $mojo, $mango) = @_;
         $self->render(json => {
-          perl   => $perl->res->json('/results/0/text'),
-          python => $python->res->json('/results/0/text')
+          mojo => $mojo->res->json('/hits/hits/0/_source/release'),
+          mango => $mango->res->json('/hits/hits/0/_source/release')
         });
       }
     );
@@ -696,12 +697,12 @@ Who actually controls the event loop backend is not important.
   use EV;
   use AnyEvent;
 
-  # Search Twitter for "perl"
+  # Search MetaCPAN for "mojolicious"
   my $cv = AE::cv;
   my $ua = Mojo::UserAgent->new;
-  $ua->get('http://search.twitter.com/search.json?q=perl' => sub {
+  $ua->get('api.metacpan.org/v0/module/_search?q=mojolicious' => sub {
     my ($ua, $tx) = @_;
-    $cv->send($tx->res->json('/results/0/text'));
+    $cv->send($tx->res->json('/hits/hits/0/_source/release'));
   });
   say $cv->recv;
 
@@ -772,23 +773,16 @@ That's why L<Mojolicious> comes with the possibly fastest pure-Perl
 implementation L<Mojo::JSON> built right in.
 
   use Mojo::UserAgent;
-  use Mojo::Util 'encode';
+  use Mojo::URL;
 
   # Fresh user agent
   my $ua = Mojo::UserAgent->new;
 
-  # Fetch the latest news about Mojolicious from Twitter
-  my $search = 'http://search.twitter.com/search.json?q=Mojolicious';
-  for $tweet (@{$ua->get($search)->res->json->{results}}) {
-
-    # Tweet text
-    my $text = $tweet->{text};
-
-    # Twitter user
-    my $user = $tweet->{from_user};
-
-    # Show both
-    say encode('UTF-8', "$text --$user");
+  # Search MetaCPAN for "mojolicious" and list latest releases
+  my $url = Mojo::URL->new('http://api.metacpan.org/v0/release/_search');
+  $url->query({q => 'mojolicious', sort => 'date:desc'});
+  for my $hit (@{$ua->get($url)->res->json->{hits}{hits}}) {
+    say "$hit->{_source}{name} ($hit->{_source}{author})";
   }
 
 =head2 Basic authentication
@@ -1042,7 +1036,7 @@ You can follow redirects and view the headers for all messages.
 
 Extract just the information you really need from JSON data structures.
 
-  $ mojo get http://search.twitter.com/search.json /error
+  $ mojo get mojo get https://api.metacpan.org/v0/author/SRI /name
 
 This can be an invaluable tool for testing your applications.
 

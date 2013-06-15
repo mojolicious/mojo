@@ -494,8 +494,8 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   }
 
   # Quick JSON API request with Basic authentication
-  say $ua->get('https://sri:s3cret@search.twitter.com/search.json?q=perl')
-    ->res->json('/results/0/text');
+  say $ua->get('https://sri:s3cret@example.com/search.json?q=perl')
+    ->res->json('/results/0');
 
   # Extract data from HTML and XML resources
   say $ua->get('mojolicio.us')->res->dom->html->head->title->text;

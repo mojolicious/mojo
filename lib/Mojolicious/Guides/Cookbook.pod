@@ -1036,7 +1036,7 @@ You can follow redirects and view the headers for all messages.
 
 Extract just the information you really need from JSON data structures.
 
-  $ mojo get mojo get https://api.metacpan.org/v0/author/SRI /name
+  $ mojo get https://api.metacpan.org/v0/author/SRI /name
 
 This can be an invaluable tool for testing your applications.
 

@@ -365,12 +365,20 @@ requests, with support for content generators.
   # GET request with query parameters
   my $tx = $t->tx(GET => 'http://example.com' => form => {a => 'b'});
 
-  # PUT request with UTF-8 encoded "application/x-www-form-urlencoded" content
+  # POST request with "application/json" content
+  my $tx = $t->tx(
+    POST => 'http://example.com' => json => {a => 'b', c => [1, 2, 3]});
+
+  # POST request with "application/x-www-form-urlencoded" content
+  my $tx = $t->tx(
+    POST => 'http://example.com' => form => {a => 'b', c => 'd'});
+
+  # PUT request with UTF-8 encoded form values
   my $tx = $t->tx(
     PUT => 'http://example.com' => form => {a => 'b'} => charset => 'UTF-8');
 
-  # PUT request with form values sharing the same name
-  my $tx = $t->tx(PUT => 'http://example.com' => form => {a => [qw(b c d)]});
+  # POST request with form values sharing the same name
+  my $tx = $t->tx(POST => 'http://example.com' => form => {a => [qw(b c d)]});
 
   # POST request with "multipart/form-data" content
   my $tx = $t->tx(

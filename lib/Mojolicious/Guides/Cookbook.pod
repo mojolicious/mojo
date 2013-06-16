@@ -844,11 +844,14 @@ The C<json> and C<form> content generators are always available.
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->patch('http://api.example.com' => json => {foo => 'bar'});
 
+  # Send query parameters via GET
+  my $tx2 = $ua->get('http://search.example.com' => form => {q => 'test'});
+
   # Send "application/x-www-form-urlencoded" content via POST
-  my $tx2 = $ua->post('http://search.example.com' => form => {q => 'test'});
+  my $tx3 = $ua->post('http://search.example.com' => form => {q => 'test'});
 
   # Send "multipart/form-data" content via PUT
-  my $tx3 = $ua->put('http://upload.example.com' =>
+  my $tx4 = $ua->put('http://upload.example.com' =>
     form => {test => {content => 'Hello World!'}});
 
 For more information about available content generators see also

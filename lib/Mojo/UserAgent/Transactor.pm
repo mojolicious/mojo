@@ -354,37 +354,37 @@ requests, with support for content generators.
   # Inspect generated request
   say $t->tx(GET => 'example.com' => {DNT => 1} => 'Bye!')->req->to_string;
 
-  # Streaming response
+  # Stream response content to STDOUT
   my $tx = $t->tx(GET => 'http://example.com');
   $tx->res->content->unsubscribe('read')->on(read => sub { say $_[1] });
 
-  # Custom socket
+  # Use a custom socket for processing this transaction
   my $tx = $t->tx(GET => 'http://example.com');
   $tx->connection($sock);
 
-  # Generate query parameters
+  # GET request with query parameters
   my $tx = $t->tx(GET => 'http://example.com' => form => {a => 'b'});
 
-  # Use form generator with custom charset
+  # PUT request with UTF-8 encoded "application/x-www-form-urlencoded" content
   my $tx = $t->tx(
     PUT => 'http://example.com' => form => {a => 'b'} => charset => 'UTF-8');
 
-  # Multiple form values with the same name
+  # PUT request with form values sharing the same name
   my $tx = $t->tx(PUT => 'http://example.com' => form => {a => [qw(b c d)]});
 
-  # Multipart upload streamed from file
-  my $tx = $t->tx(
-    PUT => 'http://example.com' => form => {mytext => {file => '/foo.txt'}});
-
-  # Multipart upload with in-memory content
+  # POST request with "multipart/form-data" content
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {mytext => {content => 'lala'}});
 
-  # Upload multiple files with same name
+  # POST request with upload streamed from file
+  my $tx = $t->tx(
+    POST => 'http://example.com' => form => {mytext => {file => '/foo.txt'}});
+
+  # POST request with multiple files sharing the same name
   my $tx = $t->tx(POST => 'http://example.com' =>
     form => {mytext => [{content => 'first'}, {content => 'second'}]});
 
-  # Customized upload with filename and header
+  # POST request with custom filename and header for file streamed from asset
   my $tx = $t->tx(POST => 'http://example.com' => form => {
     myzip => {
       file           => Mojo::Asset::Memory->new->add_chunk('lalala'),

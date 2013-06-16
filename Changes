@@ -1,5 +1,5 @@
 
-4.15  2013-06-16
+4.15  2013-06-17
   - Fixed a few error reporting bugs in Mojo::IOLoop::Client and
     Mojo::IOLoop::Server.
 

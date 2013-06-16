@@ -24,7 +24,7 @@ usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
   mojo get mojolicio.us a attr href
   mojo get mojolicio.us '*' attr id
   mojo get mojolicio.us 'h1, h2, h3' 3 text
-  mojo get mojo get https://api.metacpan.org/v0/author/SRI /name
+  mojo get https://api.metacpan.org/v0/author/SRI /name
 
 These options are available:
   -C, --charset <charset>     Charset of HTML/XML content, defaults to auto

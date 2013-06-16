@@ -372,7 +372,7 @@ L<Mojo::IOLoop> delay.
       sub {
         my ($delay, $mojo, $mango) = @_;
         $self->render(json => {
-          mojo => $mojo->res->json('/hits/hits/0/_source/release'),
+          mojo  => $mojo->res->json('/hits/hits/0/_source/release'),
           mango => $mango->res->json('/hits/hits/0/_source/release')
         });
       }

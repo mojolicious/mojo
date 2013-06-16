@@ -495,13 +495,13 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   # Quick JSON API request with Basic authentication
   say $ua->get('https://sri:s3cret@example.com/search.json?q=perl')
-    ->res->json('/results/0');
+    ->res->json('/results/0/title');
 
   # Extract data from HTML and XML resources
   say $ua->get('www.perl.org')->res->dom->html->head->title->text;
 
-  # Scrape information from websites
-  say $ua->get('mojolicio.us')->res->dom('h1, h2')->pluck('text')->shuffle;
+  # Scrape the latest headlines from a news site
+  say $ua->get('perlnews.org')->res->dom('h2 > a')->pluck('text')->shuffle;
 
   # IPv6 PUT request with content
   my $tx

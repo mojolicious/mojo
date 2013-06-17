@@ -840,7 +840,7 @@ The C<json> and C<form> content generators are always available.
 
   use Mojo::UserAgent;
 
-  # Send JSON content via PATCH
+  # Send "application/json" content via PATCH
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->patch('http://api.example.com' => json => {foo => 'bar'});
 

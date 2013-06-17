@@ -354,13 +354,17 @@ requests, with support for content generators.
   # Inspect generated request
   say $t->tx(GET => 'example.com' => {DNT => 1} => 'Bye!')->req->to_string;
 
+  # Use a custom socket for processing this transaction
+  my $tx = $t->tx(GET => 'http://example.com');
+  $tx->connection($sock);
+
   # Stream response content to STDOUT
   my $tx = $t->tx(GET => 'http://example.com');
   $tx->res->content->unsubscribe('read')->on(read => sub { say $_[1] });
 
-  # Use a custom socket for processing this transaction
-  my $tx = $t->tx(GET => 'http://example.com');
-  $tx->connection($sock);
+  # PUT request with content streamed from file
+  my $tx = $t->tx(PUT => 'http://example.com');
+  $tx->req->content->asset(Mojo::Asset::File->new(path => '/foo.txt'));
 
   # GET request with query parameters
   my $tx = $t->tx(GET => 'http://example.com' => form => {a => 'b'});
@@ -388,15 +392,20 @@ requests, with support for content generators.
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {mytext => {file => '/foo.txt'}});
 
+  # POST request with upload streamed from asset
+  my $asset = Mojo::Asset::Memory->new->add_chunk('lalala');
+  my $tx    = $t->tx(
+    POST => 'http://example.com' => form => {mytext => {file => $asset}});
+
   # POST request with multiple files sharing the same name
   my $tx = $t->tx(POST => 'http://example.com' =>
     form => {mytext => [{content => 'first'}, {content => 'second'}]});
 
-  # POST request with custom filename and header for file streamed from asset
+  # POST request with custom filename and header
   my $tx = $t->tx(POST => 'http://example.com' => form => {
-    myzip => {
-      file           => Mojo::Asset::Memory->new->add_chunk('lalala'),
-      filename       => 'foo.zip',
+    mytext => {
+      content        => 'lalala',
+      filename       => 'foo.txt',
       'Content-Type' => 'text/plain'
     }
   });

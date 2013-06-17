@@ -1,10 +1,10 @@
 
-4.15  2013-06-17
+4.15  2013-06-18
   - Improved router to make the current controller object available to actions
     as $_. (jberger, sri)
   - Fixed a few error reporting bugs in Mojo::IOLoop::Client and
     Mojo::IOLoop::Server.
-  - Fixed small chained hook bug.
+  - Fixed small emit_chain bug in Mojolicious::Plugins.
 
 4.14  2013-06-10
   - Improved url_for performance slightly.

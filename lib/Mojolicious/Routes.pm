@@ -146,7 +146,6 @@ sub _controller {
   unless ($new = $self->_class($old, $field)) { return !!defined $new }
 
   # Application
-  my $continue;
   my $class = ref $new;
   my $log   = $old->app->log;
   if (my $sub = $new->can('handler')) {
@@ -168,7 +167,7 @@ sub _controller {
 
       if (my $sub = $new->can($method)) {
         $old->stash->{'mojo.routed'}++ unless $nested;
-        $continue = $sub->(local $_ = $new);
+        return 1 if $sub->(local $_ = $new);
       }
 
       else { $log->debug('Action not found in controller.') }
@@ -176,7 +175,7 @@ sub _controller {
     else { $log->debug(qq{Action "$method" is not allowed.}) }
   }
 
-  return !$nested || $continue;
+  return !$nested;
 }
 
 sub _load {

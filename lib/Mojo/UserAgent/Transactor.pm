@@ -401,8 +401,10 @@ requests, with support for content generators.
   my $tx = $t->tx(POST => 'http://example.com' =>
     form => {mytext => [{content => 'first'}, {content => 'second'}]});
 
-  # POST request with custom filename and header
+  # POST request with form values and customized upload (filename and header)
   my $tx = $t->tx(POST => 'http://example.com' => form => {
+    a      => 'b',
+    c      => 'd',
     mytext => {
       content        => 'lalala',
       filename       => 'foo.txt',

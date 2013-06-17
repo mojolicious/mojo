@@ -116,7 +116,6 @@ is $custom, 3, 'hook has been emitted again';
 $t->app->hook(
   'custom_chain' => sub {
     my ($next, $num) = @_;
-    $next->();
     return $num;
   }
 );

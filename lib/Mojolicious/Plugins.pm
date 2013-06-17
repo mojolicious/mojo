@@ -14,13 +14,13 @@ sub emit_hook {
 sub emit_chain {
   my ($self, $name, @args) = @_;
 
-  my $wrapper = sub { };
+  my $wrapper;
   for my $cb (reverse @{$self->subscribers($name)}) {
     my $next = $wrapper;
     $wrapper = sub { $cb->($next, @args) };
   }
 
-  return $wrapper->();
+  !$wrapper ? return : return $wrapper->();
 }
 
 sub emit_hook_reverse {

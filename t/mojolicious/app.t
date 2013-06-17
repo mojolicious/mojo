@@ -101,12 +101,26 @@ ok $t->app->routes->is_hidden('write'),            'is hidden';
 ok $t->app->routes->is_hidden('write_chunk'),      'is hidden';
 
 # Unknown hooks
-ok !$t->app->plugins->emit_chain('does_not_exist'),
-  'unknown chained hook has been emitted';
-ok !!$t->app->plugins->emit_hook('does_not_exist'),
-  'unknown hook has been emitted';
+ok !$t->app->plugins->emit_chain('does_not_exist'), 'hook has been emitted';
+ok !!$t->app->plugins->emit_hook('does_not_exist'), 'hook has been emitted';
 ok !!$t->app->plugins->emit_hook_reverse('does_not_exist'),
-  'unknown hook has been emitted';
+  'hook has been emitted';
+
+# Custom hooks
+my $custom;
+$t->app->hook('custom_hook' => sub { $custom++ });
+$t->app->plugins->emit_hook('custom_hook');
+is $custom, 1, 'hook has been emitted';
+$t->app->plugins->emit_hook_reverse('custom_hook');
+is $custom, 2, 'hook has been emitted again';
+$t->app->hook(
+  'custom_chain' => sub {
+    my $next = shift;
+    $next->();
+    return 3;
+  }
+);
+is $t->app->plugins->emit_chain('custom_chain'), 3, 'hook has been emitted';
 
 # MojoliciousTest::Command::test_command (with abbreviation)
 is $t->app->start(qw(test_command --to)), 'works too!', 'right result';

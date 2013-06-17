@@ -14,19 +14,10 @@ sub startup {
     }
   );
 
-  $r->get(
-    '/test' => sub {
-      my $self = shift;
-      $self->render(text => $self->config->{whatever});
-    }
-  );
+  $r->get('/test' => sub { $_->render(text => $_->config->{whatever}) });
 
   $r->get(
-    '/secondary' => sub {
-      my $self = shift;
-      $self->render(text => ++$self->session->{secondary});
-    }
-  );
+    '/secondary' => sub { $_->render(text => ++$_->session->{secondary}) });
 }
 
 1;

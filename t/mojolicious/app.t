@@ -100,6 +100,14 @@ ok $t->app->routes->is_hidden('url_for'),          'is hidden';
 ok $t->app->routes->is_hidden('write'),            'is hidden';
 ok $t->app->routes->is_hidden('write_chunk'),      'is hidden';
 
+# Unknown hooks
+ok !$t->app->plugins->emit_chain('does_not_exist'),
+  'unknown chained hook has been emitted';
+ok !!$t->app->plugins->emit_hook('does_not_exist'),
+  'unknown hook has been emitted';
+ok !!$t->app->plugins->emit_hook_reverse('does_not_exist'),
+  'unknown hook has been emitted';
+
 # MojoliciousTest::Command::test_command (with abbreviation)
 is $t->app->start(qw(test_command --to)), 'works too!', 'right result';
 

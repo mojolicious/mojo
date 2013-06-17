@@ -19,9 +19,8 @@ sub emit_chain {
     my $next = $wrapper;
     $wrapper = sub { $cb->($next, @args) };
   }
-  $wrapper->();
 
-  return $self;
+  !$wrapper ? return : return $wrapper->();
 }
 
 sub emit_hook_reverse {
@@ -151,8 +150,8 @@ implements the following new ones.
 
 =head2 emit_chain
 
-  $plugins = $plugins->emit_chain('foo');
-  $plugins = $plugins->emit_chain(foo => 123);
+  $plugins->emit_chain('foo');
+  $plugins->emit_chain(foo => 123);
 
 Emit events as chained hooks.
 

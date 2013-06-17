@@ -139,26 +139,26 @@ sub _class {
 }
 
 sub _controller {
-  my ($self, $c, $field, $nested) = @_;
+  my ($self, $old, $field, $nested) = @_;
 
   # Load and instantiate controller/application
-  my $app;
-  unless ($app = $self->_class($c, $field)) { return defined $app ? 1 : undef }
+  my $new;
+  unless ($new = $self->_class($old, $field)) { return !!defined $new }
 
   # Application
   my $continue;
-  my $class = ref $app;
-  my $log   = $c->app->log;
-  if (my $sub = $app->can('handler')) {
+  my $class = ref $new;
+  my $log   = $old->app->log;
+  if (my $sub = $new->can('handler')) {
     $log->debug(qq{Routing to application "$class".});
 
     # Try to connect routes
-    if (my $sub = $app->can('routes')) {
-      my $r = $app->$sub;
-      weaken $r->parent($c->match->endpoint)->{parent} unless $r->parent;
+    if (my $sub = $new->can('routes')) {
+      my $r = $new->$sub;
+      weaken $r->parent($old->match->endpoint)->{parent} unless $r->parent;
     }
-    $app->$sub($c);
-    $c->stash->{'mojo.routed'}++;
+    $new->$sub($old);
+    $old->stash->{'mojo.routed'}++;
   }
 
   # Action
@@ -166,9 +166,9 @@ sub _controller {
     if (!$self->is_hidden($method)) {
       $log->debug(qq{Routing to controller "$class" and action "$method".});
 
-      if (my $sub = $app->can($method)) {
-        $c->stash->{'mojo.routed'}++ unless $nested;
-        $continue = $sub->(local $_ = $app);
+      if (my $sub = $new->can($method)) {
+        $old->stash->{'mojo.routed'}++ unless $nested;
+        $continue = $sub->(local $_ = $new);
       }
 
       else { $log->debug('Action not found in controller.') }

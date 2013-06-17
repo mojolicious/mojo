@@ -113,13 +113,9 @@ $t->app->plugins->emit_hook(custom_hook => 1);
 is $custom, 1, 'hook has been emitted';
 $t->app->plugins->emit_hook_reverse(custom_hook => 2);
 is $custom, 3, 'hook has been emitted again';
-$t->app->hook(
-  'custom_chain' => sub {
-    my ($next, $num) = @_;
-    return $num;
-  }
-);
-is $t->app->plugins->emit_chain(custom_chain => 4), 4, 'hook has been emitted';
+$t->app->hook('custom_chain' => sub { return shift->() * 2 });
+$t->app->hook('custom_chain' => sub { return pop });
+is $t->app->plugins->emit_chain(custom_chain => 4), 8, 'hook has been emitted';
 
 # MojoliciousTest::Command::test_command (with abbreviation)
 is $t->app->start(qw(test_command --to)), 'works too!', 'right result';

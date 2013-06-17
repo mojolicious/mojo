@@ -43,10 +43,7 @@ get '/☃' => sub {
     text => $self->url_for . $self->url_for({}) . $self->url_for('current'));
 };
 
-get '/uni/aäb' => sub {
-  my $self = shift;
-  $self->render(text => $self->url_for);
-};
+get '/uni/aäb' => sub { $_->render(text => $_->url_for) };
 
 get '/unicode/:stuff' => sub {
   my $self = shift;

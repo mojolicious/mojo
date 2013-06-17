@@ -1,5 +1,7 @@
 
 4.15  2013-06-17
+  - Improved router to make the current controller object available to actions
+    as $_. (jberger, sri)
   - Fixed a few error reporting bugs in Mojo::IOLoop::Client and
     Mojo::IOLoop::Server.
 

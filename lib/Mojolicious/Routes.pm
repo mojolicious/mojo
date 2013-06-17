@@ -95,8 +95,7 @@ sub _callback {
   my ($self, $c, $field, $nested) = @_;
   $c->stash->{'mojo.routed'}++;
   $c->app->log->debug('Routing to a callback.');
-  my $continue = $field->{cb}->($c);
-  return !$nested || $continue ? 1 : undef;
+  return $field->{cb}->(local $_ = $c) || !$nested;
 }
 
 sub _class {
@@ -169,7 +168,7 @@ sub _controller {
 
       if (my $sub = $app->can($method)) {
         $c->stash->{'mojo.routed'}++ unless $nested;
-        $continue = $app->$sub;
+        $continue = $sub->(local $_ = $app);
       }
 
       else { $log->debug('Action not found in controller.') }
@@ -177,7 +176,7 @@ sub _controller {
     else { $log->debug(qq{Action "$method" is not allowed.}) }
   }
 
-  return !$nested || $continue ? 1 : undef;
+  return !$nested || $continue;
 }
 
 sub _load {

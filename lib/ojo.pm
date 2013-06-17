@@ -78,7 +78,7 @@ L<ojo> implements the following functions.
 
 =head2 a
 
-  my $app = a('/hello' => sub { shift->render(json => {hello => 'world'}) });
+  my $app = a('/hello' => sub { $_->render(json => {hello => 'world'}) });
 
 Create a route with L<Mojolicious::Lite/"any"> and return the current
 L<Mojolicious::Lite> object. See also the L<Mojolicious::Lite> tutorial for

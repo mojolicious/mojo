@@ -11,12 +11,8 @@ use Test::More;
 use ojo;
 
 # Application
-a(
-  '/' => sub {
-    my $self = shift;
-    $self->render(data => $self->req->method . $self->req->body);
-  }
-)->secret('foobarbaz');
+a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })
+  ->secret('foobarbaz');
 is a->secret, 'foobarbaz', 'right secret';
 
 # Requests

@@ -84,7 +84,7 @@ sub route {
   shift->add_child(Mojolicious::Routes::Route->new(@_))->children->[-1];
 }
 
-sub _action { $_[0]->emit_chain(around_action => $_[1], $_[2], !$_[3]) }
+sub _action { $_[0]->emit_chain(around_action => $_[1], $_[2], $_[3]) }
 
 sub _add {
   my ($self, $attr, $name, $cb) = @_;
@@ -97,7 +97,7 @@ sub _callback {
   $c->stash->{'mojo.routed'}++;
   my $app = $c->app;
   $app->log->debug('Routing to a callback.');
-  return _action($app->plugins, $c, $field->{cb}, $nested) || !$nested;
+  return _action($app->plugins, $c, $field->{cb}, $nested) || $nested;
 }
 
 sub _class {
@@ -169,7 +169,7 @@ sub _controller {
       $log->debug(qq{Routing to controller "$class" and action "$method".});
 
       if (my $sub = $new->can($method)) {
-        $old->stash->{'mojo.routed'}++ unless $nested;
+        $old->stash->{'mojo.routed'}++ if $nested;
         return 1 if _action($app->plugins, $new, $sub, $nested);
       }
 
@@ -178,7 +178,7 @@ sub _controller {
     else { $log->debug(qq{Action "$method" is not allowed.}) }
   }
 
-  return !$nested;
+  return $nested;
 }
 
 sub _load {
@@ -209,8 +209,8 @@ sub _walk {
 
     my $continue
       = $field->{cb}
-      ? $self->_callback($c, $field, $nested)
-      : $self->_controller($c, $field, $nested);
+      ? $self->_callback($c, $field, !$nested)
+      : $self->_controller($c, $field, !$nested);
 
     # Break the chain
     return undef if $nested && !$continue;

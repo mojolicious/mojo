@@ -657,7 +657,7 @@ Same for monitoring tasks.
     $self->ua->post('https://example.com/bugs' => form => {exception => $e});
   });
 
-Or changes in behavior.
+You can even extend much of the core functionality.
 
   # Make controller object available to actions as $_
   $self->hook(around_action => sub {

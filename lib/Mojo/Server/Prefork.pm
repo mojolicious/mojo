@@ -179,21 +179,21 @@ sub _spawn {
     sub {
 
       # Blocking ("ualarm" can't be imported on Windows)
-      my $l;
+      my $lock;
       if ($_[1]) {
         eval {
           local $SIG{ALRM} = sub { die "alarm\n" };
           my $old = Time::HiRes::ualarm $self->lock_timeout * 1000000;
-          $l = flock $handle, LOCK_EX;
+          $lock = flock $handle, LOCK_EX;
           Time::HiRes::ualarm $old;
         };
-        if ($@) { $l = $@ eq "alarm\n" ? 0 : die($@) }
+        if ($@) { $lock = $@ eq "alarm\n" ? 0 : die($@) }
       }
 
       # Non blocking
-      else { $l = flock $handle, LOCK_EX | LOCK_NB }
+      else { $lock = flock $handle, LOCK_EX | LOCK_NB }
 
-      return $l;
+      return $lock;
     }
   );
   $loop->unlock(sub { flock $handle, LOCK_UN });

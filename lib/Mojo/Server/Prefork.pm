@@ -110,7 +110,8 @@ sub _manage {
   # Manage workers
   $self->emit('wait')->_heartbeat;
   my $log = $self->app->log;
-  while (my ($pid, $w) = each %{$self->{pool}}) {
+  for my $pid (keys %{$self->{pool}}) {
+    my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
     my $interval = $self->heartbeat_interval;

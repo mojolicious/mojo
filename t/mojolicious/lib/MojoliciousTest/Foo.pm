@@ -52,10 +52,7 @@ sub stage1 {
   return undef;
 }
 
-sub stage2 {
-  my $self = shift;
-  $self->render(text => $self->some_plugin);
-}
+sub stage2 { return shift->some_plugin }
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }
 

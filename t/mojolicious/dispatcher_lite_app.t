@@ -6,6 +6,10 @@ BEGIN {
 }
 
 use Test::More;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 use Mojo::Message::Response;
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -81,13 +85,8 @@ hook around_action => sub {
   return $next->();
 };
 
-# Render return value
-hook around_action => sub {
-  my ($next, $c, $action, $last) = @_;
-  my $value = $next->();
-  $c->render(text => $value) if $last && $c->stash->{return};
-  return $value;
-};
+# Plugin for rendering return values
+plugin 'AroundPlugin';
 
 # Pass argument to action
 hook around_action => sub {

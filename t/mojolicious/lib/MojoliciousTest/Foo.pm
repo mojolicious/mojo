@@ -19,7 +19,10 @@ sub index {
   $self->stash(handler => 'xpl', msg => 'Hello World!');
 }
 
-sub plugin_camel_case { $_->render(text => $_->some_plugin) }
+sub plugin_camel_case {
+  my $self = shift;
+  $self->render(text => $self->some_plugin);
+}
 
 sub plugin_upper_case {
   my $self = shift;

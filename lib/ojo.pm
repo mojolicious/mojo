@@ -20,6 +20,7 @@ sub import {
   my $caller = caller;
   eval "package $caller; use Mojolicious::Lite;";
   $UA->app($caller->app);
+  $UA->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
 
   $UA->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
   $UA->detect_proxy unless defined $ENV{MOJO_PROXY};
@@ -81,8 +82,9 @@ L<ojo> implements the following functions.
   my $app = a('/hello' => sub { $_->render(json => {hello => 'world'}) });
 
 Create a route with L<Mojolicious::Lite/"any"> and return the current
-L<Mojolicious::Lite> object. See also the L<Mojolicious::Lite> tutorial for
-more argument variations.
+L<Mojolicious::Lite> object. The current controller object is also available
+to actions as C<$_>. See also the L<Mojolicious::Lite> tutorial for more
+argument variations.
 
   $ perl -Mojo -E 'a("/hello" => {text => "Hello Mojo!"})->start' daemon
 

@@ -154,6 +154,7 @@ sub handler {
 
   # Dispatcher has to be last in the chain
   ++$self->{dispatch}
+    and $self->hook(around_action   => sub { $_[2]->($_[1]) })
     and $self->hook(around_dispatch => sub { $_[1]->app->dispatch($_[1]) })
     unless $self->{dispatch};
 
@@ -540,6 +541,25 @@ applications will only work for the application that is rendering.
 Useful for rewriting outgoing responses and other post-processing tasks.
 (Passed the current controller object)
 
+=item around_action
+
+Emitted right before an action gets invoked and wraps around it, so you have
+to manually forward to the next hook if you want to continue the chain.
+Default action dispatching is the last hook in the chain, yours will run
+before it.
+
+  $app->hook(around_action => sub {
+    my ($next, $c, $action, $last) = @_;
+    ...
+    return $next->();
+  });
+
+This is a very powerful hook and should not be used lightly, it allows you for
+example to pass additional arguments to actions or handle return values
+differently. (Passed a callback leading to the next hook, the current
+controller object, the action callback and a flag indicating if this action is
+an endpoint)
+
 =item around_dispatch
 
 Emitted right before the C<before_dispatch> hook and wraps around the whole
@@ -555,8 +575,8 @@ and a call to C<dispatch> the last, yours will be in between.
     ...
   });
 
-This is a very powerful hook and should not be used lightly, it allows you to
-customize application wide exception handling for example, consider it the
+This is a very powerful hook and should not be used lightly, it allows you for
+example to customize application wide exception handling, consider it the
 sledgehammer in your toolbox. (Passed a callback leading to the next hook and
 the default controller object)
 

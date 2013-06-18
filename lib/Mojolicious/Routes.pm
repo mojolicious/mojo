@@ -59,7 +59,6 @@ sub dispatch {
     }
   }
 
-  # Dispatch
   return undef unless $self->_walk($c);
   $self->auto_render($c);
   return 1;
@@ -85,6 +84,8 @@ sub route {
   shift->add_child(Mojolicious::Routes::Route->new(@_))->children->[-1];
 }
 
+sub _action { $_[0]->emit_chain(around_action => $_[1], $_[2], !$_[3]) }
+
 sub _add {
   my ($self, $attr, $name, $cb) = @_;
   $self->$attr->{$name} = $cb;
@@ -94,8 +95,9 @@ sub _add {
 sub _callback {
   my ($self, $c, $field, $nested) = @_;
   $c->stash->{'mojo.routed'}++;
-  $c->app->log->debug('Routing to a callback.');
-  return $field->{cb}->(local $_ = $c) || !$nested;
+  my $app = $c->app;
+  $app->log->debug('Routing to a callback.');
+  return _action($app->plugins, $c, $field->{cb}, $nested) || !$nested;
 }
 
 sub _class {
@@ -147,7 +149,8 @@ sub _controller {
 
   # Application
   my $class = ref $new;
-  my $log   = $old->app->log;
+  my $app   = $old->app;
+  my $log   = $app->log;
   if (my $sub = $new->can('handler')) {
     $log->debug(qq{Routing to application "$class".});
 
@@ -167,7 +170,7 @@ sub _controller {
 
       if (my $sub = $new->can($method)) {
         $old->stash->{'mojo.routed'}++ unless $nested;
-        return 1 if $sub->(local $_ = $new);
+        return 1 if _action($app->plugins, $new, $sub, $nested);
       }
 
       else { $log->debug('Action not found in controller.') }
@@ -204,7 +207,6 @@ sub _walk {
     my @keys = keys %$field;
     @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
 
-    # Dispatch
     my $continue
       = $field->{cb}
       ? $self->_callback($c, $field, $nested)

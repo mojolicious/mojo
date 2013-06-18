@@ -1,6 +1,7 @@
 
 4.15  2013-06-18
-  - Improved router to make the current controller object available to actions
+  - Added around_action hook.
+  - Improved ojo to make the current controller object available to actions
     as $_. (jberger, sri)
   - Fixed a few error reporting bugs in Mojo::IOLoop::Client and
     Mojo::IOLoop::Server.

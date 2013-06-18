@@ -84,7 +84,7 @@ sub route {
   shift->add_child(Mojolicious::Routes::Route->new(@_))->children->[-1];
 }
 
-sub _action { $_[0]->emit_chain(around_action => $_[1], $_[2], $_[3]) }
+sub _action { shift->plugins->emit_chain(around_action => @_) }
 
 sub _add {
   my ($self, $attr, $name, $cb) = @_;
@@ -97,7 +97,7 @@ sub _callback {
   $c->stash->{'mojo.routed'}++;
   my $app = $c->app;
   $app->log->debug('Routing to a callback.');
-  return _action($app->plugins, $c, $field->{cb}, $nested) || $nested;
+  return _action($app, $c, $field->{cb}, $nested) || $nested;
 }
 
 sub _class {
@@ -170,7 +170,7 @@ sub _controller {
 
       if (my $sub = $new->can($method)) {
         $old->stash->{'mojo.routed'}++ if $nested;
-        return 1 if _action($app->plugins, $new, $sub, $nested);
+        return 1 if _action($app, $new, $sub, $nested);
       }
 
       else { $log->debug('Action not found in controller.') }

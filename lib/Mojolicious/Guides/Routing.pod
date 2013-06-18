@@ -657,6 +657,15 @@ Same for monitoring tasks.
     $self->ua->post('https://example.com/bugs' => form => {exception => $e});
   });
 
+Or changes in behavior.
+
+  # Make controller object available to actions as $_
+  $self->hook(around_action => sub {
+    my ($next, $c, $action, $last) = @_;
+    local $_ = $c;
+    return $next->();
+  });
+
 For a full list of available hooks see L<Mojolicious/"hook">.
 
 =head2 Shortcuts

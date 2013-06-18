@@ -1,5 +1,6 @@
 
 4.16  2013-06-19
+  - Improved Perl 5.10.x and 5.12.x compatibility. (trinitum)
 
 4.15  2013-06-18
   - Added around_action hook.

@@ -64,7 +64,10 @@ sub run {
   # Clean manager environment
   local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
   local $SIG{CHLD} = sub {
-    while ((my $pid = waitpid -1, WNOHANG) > 0) { $self->_reap($pid) }
+    while ((my $pid = waitpid -1, WNOHANG) > 0) {
+      $self->app->log->debug("Worker $pid stopped.")
+        if delete $self->emit(reap => $pid)->{pool}{$pid};
+    }
   };
   local $SIG{QUIT} = sub { $self->_term(1) };
   local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
@@ -111,7 +114,7 @@ sub _manage {
   $self->emit('wait')->_heartbeat;
   my $log = $self->app->log;
   for my $pid (keys %{$self->{pool}}) {
-    my $w = $self->{pool}{$pid};
+    next unless my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
     my $interval = $self->heartbeat_interval;
@@ -150,14 +153,6 @@ sub _pid_file {
     unless open my $handle, '>', $file;
   chmod 0644, $handle;
   print $handle $$;
-}
-
-sub _reap {
-  my ($self, $pid) = @_;
-
-  # Clean up dead worker
-  $self->app->log->debug("Worker $pid stopped.")
-    if delete $self->emit(reap => $pid)->{pool}{$pid};
 }
 
 sub _spawn {

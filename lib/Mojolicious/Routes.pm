@@ -93,11 +93,11 @@ sub _add {
 }
 
 sub _callback {
-  my ($self, $c, $field, $nested) = @_;
+  my ($self, $c, $field, $last) = @_;
   $c->stash->{'mojo.routed'}++;
   my $app = $c->app;
   $app->log->debug('Routing to a callback.');
-  return _action($app, $c, $field->{cb}, $nested) || $nested;
+  return _action($app, $c, $field->{cb}, $last);
 }
 
 sub _class {
@@ -141,7 +141,7 @@ sub _class {
 }
 
 sub _controller {
-  my ($self, $old, $field, $nested) = @_;
+  my ($self, $old, $field, $last) = @_;
 
   # Load and instantiate controller/application
   my $new;
@@ -169,8 +169,8 @@ sub _controller {
       $log->debug(qq{Routing to controller "$class" and action "$method".});
 
       if (my $sub = $new->can($method)) {
-        $old->stash->{'mojo.routed'}++ if $nested;
-        return 1 if _action($app, $new, $sub, $nested);
+        $old->stash->{'mojo.routed'}++ if $last;
+        return 1 if _action($app, $new, $sub, $last);
       }
 
       else { $log->debug('Action not found in controller.') }
@@ -178,7 +178,7 @@ sub _controller {
     else { $log->debug(qq{Action "$method" is not allowed.}) }
   }
 
-  return $nested;
+  return undef;
 }
 
 sub _load {

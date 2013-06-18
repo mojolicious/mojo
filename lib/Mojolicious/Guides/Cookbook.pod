@@ -345,8 +345,8 @@ latency backend web services.
     </body>
   </html>
 
-Multiple events such as parallel requests can be easily synchronized with a
-L<Mojo::IOLoop> delay.
+Multiple events such as parallel requests can be easily synchronized with
+L<Mojo::IOLoop/"delay">.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -973,9 +973,8 @@ You can take full control of the L<Mojo::IOLoop> event loop.
 
 =head2 Parallel blocking requests
 
-You can emulate blocking behavior by using a L<Mojo::IOLoop> delay to
-synchronize multiple non-blocking requests. Just be aware that the resulting
-transactions will be in random order.
+You can emulate blocking behavior by using L<Mojo::IOLoop/"delay"> to
+synchronize multiple non-blocking requests.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
@@ -995,7 +994,8 @@ be able to work standalone as well as inside L<Mojolicious> applications.
 
   # Synchronize non-blocking requests portably
   my $ua    = Mojo::UserAgent->new;
-  my $delay = Mojo::IOLoop->delay(sub {
+  my $delay = Mojo::IOLoop->delay;
+  $delay->on(finish => sub {
     my ($delay, $tx, $tx2) = @_;
     ...
   });

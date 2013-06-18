@@ -13,17 +13,17 @@ use Test::Mojo;
 # Rebase hook
 app->hook(
   before_dispatch => sub {
-    my $self = shift;
-    $self->req->url->base(Mojo::URL->new('http://example.com/rebased/'));
-    $self->req->url->path->leading_slash(0);
+    my $c = shift;
+    $c->req->url->base(Mojo::URL->new('http://example.com/rebased/'));
+    $c->req->url->path->leading_slash(0);
   }
 );
 
 # Current route hook
 app->hook(
   after_dispatch => sub {
-    my $self = shift;
-    $self->res->headers->header('X-Route' => $self->current_route);
+    my $c = shift;
+    $c->res->headers->header('X-Route' => $c->current_route);
   }
 );
 

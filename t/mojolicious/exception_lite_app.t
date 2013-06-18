@@ -74,18 +74,18 @@ get '/trapped/too' => sub {
 # Reuse exception and snapshot
 my ($exception, $snapshot);
 hook after_dispatch => sub {
-  my $self = shift;
-  return unless $self->req->url->path->contains('/reuse/exception');
-  $exception = $self->stash('exception');
-  $snapshot  = $self->stash('snapshot');
+  my $c = shift;
+  return unless $c->req->url->path->contains('/reuse/exception');
+  $exception = $c->stash('exception');
+  $snapshot  = $c->stash('snapshot');
 };
 
 # Custom exception handling
 hook around_dispatch => sub {
-  my ($next, $self) = @_;
+  my ($next, $c) = @_;
   unless (eval { $next->(); 1 }) {
     die $@ unless $@ eq "CUSTOM\n";
-    $self->render(text => 'Custom handling works!');
+    $c->render(text => 'Custom handling works!');
   }
 };
 

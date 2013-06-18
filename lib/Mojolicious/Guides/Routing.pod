@@ -626,9 +626,9 @@ which makes them a very powerful tool especially for plugins.
 
     # Check all requests for a "/test" prefix
     $self->hook(before_dispatch => sub {
-      my $self = shift;
-      $self->render(text => 'This request did not reach the router.')
-        if $self->req->url->path->contains('/test');
+      my $c = shift;
+      $c->render(text => 'This request did not reach the router.')
+        if $c->req->url->path->contains('/test');
     });
 
     # These will not be reached if the hook above renders a response
@@ -644,17 +644,17 @@ common use.
 
   # Make sure static files are cached
   $self->hook(after_static => sub {
-    my $self = shift;
-    $self->res->headers->cache_control('max-age=3600, must-revalidate');
+    my $c = shift;
+    $c->res->headers->cache_control('max-age=3600, must-revalidate');
   });
 
 Same for monitoring tasks.
 
   # Forward exceptions to a web service
   $self->hook(after_dispatch => sub {
-    my $self = shift;
-    return unless my $e = $self->stash('exception');
-    $self->ua->post('https://example.com/bugs' => form => {exception => $e});
+    my $c = shift;
+    return unless my $e = $c->stash('exception');
+    $c->ua->post('https://example.com/bugs' => form => {exception => $e});
   });
 
 You can even extend much of the core functionality.

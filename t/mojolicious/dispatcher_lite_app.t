@@ -89,7 +89,7 @@ plugin 'AroundPlugin';
 # Pass argument to action
 hook around_action => sub {
   my ($next, $c, $action) = @_;
-  return $c->$action('works');
+  return $c->$action($c->current_route);
 };
 
 # Response generating condition "res" for /res.txt
@@ -117,7 +117,8 @@ get '/res.txt' => (res => 1) => sub {
 # Allow rendering of return value
 under '/' => {return => 1} => sub {1};
 
-get sub { return pop };
+# Return and render argument
+get '/' => sub { return pop } => 'works';
 
 my $t = Test::Mojo->new;
 

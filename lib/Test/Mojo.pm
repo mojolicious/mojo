@@ -482,9 +482,9 @@ Access application with L<Mojo::UserAgent/"app">.
 
   # Change application behavior
   $t->app->hook(before_dispatch => sub {
-    my $self = shift;
-    $self->render(text => 'This request did not reach the router.')
-      if $self->req->url->path->contains('/user');
+    my $c = shift;
+    $c->render(text => 'This request did not reach the router.')
+      if $c->req->url->path->contains('/user');
   });
 
   # Extract additional information

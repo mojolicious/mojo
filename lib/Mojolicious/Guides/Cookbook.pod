@@ -891,24 +891,24 @@ Sending a streaming request is almost just as easy.
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://example.com');
 
-  # Prepare content
-  my $content = 'Hello world!';
-  $tx->req->headers->content_length(length $content);
+  # Prepare body
+  my $body = 'Hello world!';
+  $tx->req->headers->content_length(length $body);
 
   # Start writing directly with a drain callback
   my $drain;
   $drain = sub {
-    my $req   = shift;
-    my $chunk = substr $content, 0, 1, '';
-    $drain    = undef unless length $content;
-    $req->write($chunk, $drain);
+    my $content = shift;
+    my $chunk   = substr $body, 0, 1, '';
+    $drain      = undef unless length $body;
+    $content->write($chunk, $drain);
   };
-  $tx->req->$drain;
+  $tx->req->content->$drain;
 
   # Process transaction
   $ua->start($tx);
 
-The drain callback passed to L<Mojo::Message/"write"> will be invoked whenever
+The drain callback passed to L<Mojo::Content/"write"> will be invoked whenever
 the entire previous chunk has actually been written.
 
 =head2 Large file downloads

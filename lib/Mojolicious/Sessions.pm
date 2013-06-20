@@ -61,6 +61,8 @@ sub store {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Sessions - Signed cookie based session manager

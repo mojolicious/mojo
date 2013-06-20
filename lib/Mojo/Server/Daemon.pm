@@ -260,6 +260,8 @@ sub _write {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Server::Daemon - Non-blocking I/O HTTP and WebSocket server

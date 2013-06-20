@@ -142,6 +142,9 @@ and the layout "templates/layouts/default.html.ep",
 <a href="/index.html">here</a> to move forward to a static page.
 
 __END__
+
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command::generate::app - App generator command

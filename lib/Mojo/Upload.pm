@@ -19,6 +19,8 @@ sub slurp { shift->asset->slurp }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Upload - Upload

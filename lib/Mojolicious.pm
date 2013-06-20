@@ -194,6 +194,8 @@ sub _exception {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious - Real-time web framework

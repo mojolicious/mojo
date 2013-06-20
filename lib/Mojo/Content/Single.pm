@@ -53,6 +53,8 @@ sub parse {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Content::Single - HTTP content

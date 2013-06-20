@@ -21,6 +21,8 @@ sub run {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command::cgi - CGI command

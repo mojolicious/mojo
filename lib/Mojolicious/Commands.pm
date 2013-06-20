@@ -117,6 +117,8 @@ sub _command {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Commands - Command line interface

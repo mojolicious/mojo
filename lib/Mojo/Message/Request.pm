@@ -260,6 +260,8 @@ sub _parse_env {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Message::Request - HTTP request

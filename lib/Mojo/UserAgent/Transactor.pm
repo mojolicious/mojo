@@ -253,6 +253,8 @@ sub _proxy {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::UserAgent::Transactor - User agent transactor

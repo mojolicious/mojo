@@ -24,6 +24,9 @@ WriteMakefile(
 );
 
 __END__
+
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command::generate::makefile - Makefile generator command

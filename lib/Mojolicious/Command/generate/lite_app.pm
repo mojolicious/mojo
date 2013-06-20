@@ -42,6 +42,9 @@ Welcome to the Mojolicious real-time web framework!
 </html>
 
 __END__
+
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command::generate::lite_app - Lite app generator command

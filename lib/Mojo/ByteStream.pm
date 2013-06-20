@@ -64,6 +64,8 @@ sub to_string { ${$_[0]} }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::ByteStream - ByteStream

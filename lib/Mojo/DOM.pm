@@ -357,6 +357,8 @@ sub _trim {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors

@@ -84,6 +84,8 @@ sub to_string { catdir(@{shift->{parts} || []}) }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Home - Home sweet home!

@@ -121,6 +121,8 @@ sub _get_file {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Static - Serve static files

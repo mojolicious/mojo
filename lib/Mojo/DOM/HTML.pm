@@ -317,6 +317,8 @@ sub _start {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::DOM::HTML - HTML/XML engine

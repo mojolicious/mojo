@@ -199,6 +199,8 @@ sub _read {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Content::MultiPart - HTTP multipart content

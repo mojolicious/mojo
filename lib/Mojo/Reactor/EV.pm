@@ -72,6 +72,8 @@ sub _timer {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Reactor::EV - Low level event reactor with libev support

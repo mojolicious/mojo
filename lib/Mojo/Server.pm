@@ -55,6 +55,8 @@ sub run { croak 'Method "run" not implemented by subclass' }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Server - HTTP server base class

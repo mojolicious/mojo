@@ -19,6 +19,8 @@ sub set {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Cache - Naive in-memory cache

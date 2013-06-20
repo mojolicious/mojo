@@ -249,6 +249,8 @@ sub _generate_route {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Routes::Route - Route

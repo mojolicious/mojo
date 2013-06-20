@@ -56,6 +56,8 @@ sub register {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::EPRenderer - Embedded Perl renderer plugin

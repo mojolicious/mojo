@@ -140,6 +140,8 @@ sub slurp {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Asset::File - File storage for HTTP content

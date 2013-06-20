@@ -42,6 +42,8 @@ my $morbo = Mojo::Server::Morbo->new;
 $morbo->watch(\@watch) if @watch;
 $morbo->run($app);
 
+=encoding utf8
+
 =head1 NAME
 
 morbo - Morbo HTTP and WebSocket development server

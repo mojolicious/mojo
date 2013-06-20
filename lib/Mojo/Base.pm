@@ -100,6 +100,8 @@ sub tap {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Base - Minimal base class for Mojo projects

@@ -148,6 +148,8 @@ sub _select {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command::get - Get command

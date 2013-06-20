@@ -58,6 +58,8 @@ sub _dict {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo - Duct tape for the HTML5 web!

@@ -14,6 +14,8 @@ sub to_string { croak 'Method "to_string" not implemented by subclass' }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Cookie - HTTP cookie base class

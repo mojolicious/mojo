@@ -295,6 +295,8 @@ sub _parse_formdata {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Message - HTTP message base class

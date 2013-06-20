@@ -37,6 +37,8 @@ sub watch      { croak 'Method "watch" not implemented by subclass' }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Reactor - Low level event reactor base class

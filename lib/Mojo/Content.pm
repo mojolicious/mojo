@@ -306,6 +306,8 @@ sub _uncompress {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Content - HTTP content base class

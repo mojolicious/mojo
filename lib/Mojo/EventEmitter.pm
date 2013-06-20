@@ -86,6 +86,8 @@ sub unsubscribe {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::EventEmitter - Event emitter base class

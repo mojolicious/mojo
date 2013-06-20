@@ -130,6 +130,8 @@ sub _pod_to_html {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::PODRenderer - POD renderer plugin

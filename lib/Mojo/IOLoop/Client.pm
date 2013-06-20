@@ -126,6 +126,8 @@ sub _try {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::IOLoop::Client - Non-blocking TCP client

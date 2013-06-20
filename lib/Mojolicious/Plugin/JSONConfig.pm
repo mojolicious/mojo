@@ -34,6 +34,8 @@ sub render {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::JSONConfig - JSON configuration plugin

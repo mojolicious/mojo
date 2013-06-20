@@ -84,6 +84,8 @@ sub uniq {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Collection - Collection

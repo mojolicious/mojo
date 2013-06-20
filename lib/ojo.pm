@@ -52,6 +52,8 @@ sub _request {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 ojo - Fun oneliners with Mojo!

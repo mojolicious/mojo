@@ -302,6 +302,8 @@ sub _message {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Transaction::WebSocket - WebSocket transaction

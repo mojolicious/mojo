@@ -18,6 +18,8 @@ sub help { shift->run(@_) }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command::generate - Generator command

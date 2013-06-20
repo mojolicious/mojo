@@ -73,6 +73,8 @@ sub _state {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Transaction - Transaction base class

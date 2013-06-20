@@ -232,6 +232,8 @@ sub _text_area {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::TagHelpers - Tag helpers plugin

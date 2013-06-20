@@ -88,6 +88,8 @@ sub write_rel_file {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command - Command base class

@@ -41,6 +41,8 @@ sub register {
 1;
 <% %>__END__
 
+<% %>=encoding utf8
+
 <% %>=head1 NAME
 
 <%= $class %> - Mojolicious Plugin
@@ -110,6 +112,9 @@ WriteMakefile(
 );
 
 __END__
+
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command::generate::plugin - Plugin generator command

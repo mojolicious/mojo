@@ -45,6 +45,8 @@ sub _step {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::IOLoop::Delay - Manage callbacks and control the flow of events

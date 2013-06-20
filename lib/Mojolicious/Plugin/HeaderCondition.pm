@@ -32,6 +32,8 @@ sub _headers {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::HeaderCondition - Header condition plugin

@@ -32,6 +32,8 @@ EOF
 require Mojo::Server::Hypnotoad;
 Mojo::Server::Hypnotoad->new->run($app);
 
+=encoding utf8
+
 =head1 NAME
 
 hypnotoad - Hypnotoad HTTP and WebSocket server

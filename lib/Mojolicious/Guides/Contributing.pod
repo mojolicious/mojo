@@ -1,4 +1,6 @@
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Guides::Contributing - Contributing to Mojolicious

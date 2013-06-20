@@ -250,6 +250,8 @@ sub _timer {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::IOLoop - Minimalistic event loop

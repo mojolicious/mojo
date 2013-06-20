@@ -322,6 +322,8 @@ use overload '0+' => sub { ${$_[0]} }, '""' => sub { ${$_[0]} }, fallback => 1;
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::JSON - Minimalistic JSON

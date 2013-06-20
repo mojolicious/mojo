@@ -377,6 +377,8 @@ sub _unescape {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::DOM::CSS - CSS selector engine

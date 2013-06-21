@@ -114,8 +114,7 @@ sub hmac_sha1_sum { unpack 'H*', hmac_sha1(@_) }
 sub html_unescape {
   my $str = shift;
   return $str if index($str, '&') == -1;
-  $str
-    =~ s/&(?:\#((?:\d{1,7}|x[[:xdigit:]]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
+  $str =~ s/&(?:\#((?:\d{1,7}|x[0-9a-fA-F]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
   return $str;
 }
 
@@ -308,7 +307,7 @@ sub url_escape {
 sub url_unescape {
   my $str = shift;
   return $str if index($str, '%') == -1;
-  $str =~ s/%([[:xdigit:]]{2})/chr(hex($1))/ge;
+  $str =~ s/%([0-9a-fA-F]{2})/chr(hex($1))/ge;
   return $str;
 }
 

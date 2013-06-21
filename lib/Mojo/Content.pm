@@ -220,7 +220,7 @@ sub _parse_chunked {
     # Start new chunk (ignore the chunk extension)
     unless ($self->{chunk_len}) {
       last
-        unless $self->{pre_buffer} =~ s/^(?:\x0d?\x0a)?([[:xdigit:]]+).*\x0a//;
+        unless $self->{pre_buffer} =~ s/^(?:\x0d?\x0a)?([0-9a-fA-F]+).*\x0a//;
       next if $self->{chunk_len} = hex $1;
 
       # Last chunk

@@ -20,15 +20,15 @@ my %ESCAPE = (
   '\\'    => '\\',
   '/'     => '/',
   'b'     => "\x07",
-  'f'     => "\x0C",
-  'n'     => "\x0A",
-  'r'     => "\x0D",
+  'f'     => "\x0c",
+  'n'     => "\x0a",
+  'r'     => "\x0d",
   't'     => "\x09",
   'u2028' => "\x{2028}",
   'u2029' => "\x{2029}"
 );
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
-for (0x00 .. 0x1F, 0x7F) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
+for (0x00 .. 0x1f, 0x7f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
 # Unicode encoding detection
 my $UTF_PATTERNS = {
@@ -166,13 +166,13 @@ sub _decode_string {
   my $pos = pos;
 
   # Extract string with escaped characters
-  m#\G(((?:[^\x00-\x1F\\"]|\\(?:["\\/bfnrt]|u[[:xdigit:]]{4})){0,32766})*)#gc;
+  m!\G((?:(?:[^\x00-\x1f\\"]|\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4})){0,32766})*)!gc;
   my $str = $1;
 
   # Missing quote
   unless (m/\G"/gc) {
     _exception('Unexpected character or invalid escape while parsing string')
-      if m/\G[\x00-\x1F\\]/;
+      if m/\G[\x00-\x1f\\]/;
     _exception('Unterminated string');
   }
 
@@ -195,18 +195,17 @@ sub _decode_string {
       my $ord = hex $3;
 
       # Surrogate pair
-      if (($ord & 0xF800) == 0xD800) {
+      if (($ord & 0xf800) == 0xd800) {
 
         # High surrogate
-        ($ord & 0xFC00) == 0xD800
+        ($ord & 0xfc00) == 0xd800
           or pos($_) = $pos + pos($str), _exception('Missing high-surrogate');
 
         # Low surrogate
         $str =~ m/\G\\u([Dd][C-Fc-f]..)/gc
           or pos($_) = $pos + pos($str), _exception('Missing low-surrogate');
 
-        # Pair
-        $ord = 0x10000 + ($ord - 0xD800) * 0x400 + (hex($1) - 0xDC00);
+        $ord = 0x10000 + ($ord - 0xd800) * 0x400 + (hex($1) - 0xdc00);
       }
 
       # Character
@@ -263,7 +262,7 @@ sub _encode_object {
 
 sub _encode_string {
   my $str = shift;
-  $str =~ s!([\x00-\x1F\x7F\x{2028}\x{2029}\\"/\b\f\n\r\t])!$REVERSE{$1}!gs;
+  $str =~ s!([\x00-\x1f\x7f\x{2028}\x{2029}\\"/\b\f\n\r\t])!$REVERSE{$1}!gs;
   return "\"$str\"";
 }
 

@@ -69,7 +69,7 @@ sub build_frame {
     warn "-- Extended 64bit payload ($len)\n$payload\n" if DEBUG;
     vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
     $frame .= $prefix;
-    $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xFFFFFFFF);
+    $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xffffffff);
   }
 
   # Mask payload

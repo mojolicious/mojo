@@ -96,8 +96,8 @@ sub client_handshake {
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
   # Generate WebSocket challenge
-  $headers->sec_websocket_key(b64_encode(pack('N*', int(rand 9999999)), ''))
-    unless $headers->sec_websocket_key;
+  my $challenge = b64_encode sprintf('%16u', int(rand 9 x 16)), '';
+  $headers->sec_websocket_key($challenge) unless $headers->sec_websocket_key;
 }
 
 sub client_read  { shift->server_read(@_) }

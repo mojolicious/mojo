@@ -1,5 +1,7 @@
 
-4.17  2013-06-22
+4.17  2013-06-24
+  - Fixed Mojo::Transaction::WebSocket to generate RFC 6455 compliant
+    Sec-WebSocket-Key headers. (josh)
 
 4.16  2013-06-19
   - Improved Perl 5.10.x and 5.12.x compatibility. (trinitum)

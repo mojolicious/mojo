@@ -639,8 +639,7 @@ which makes them a very powerful tool especially for plugins.
 
   1;
 
-Post-processing tasks such as setting additional response headers are a very
-common use.
+Post-processing the response to set additional headers is a very common use.
 
   # Make sure static files are cached
   $self->hook(after_static => sub {
@@ -648,7 +647,16 @@ common use.
     $c->res->headers->cache_control('max-age=3600, must-revalidate');
   });
 
-Same for monitoring tasks.
+Same for pre-processing the request.
+
+  # Allow "_method" query parameter to override request method
+  $self->hook(before_dispatch => sub {
+    my $c = shift;
+    return unless my $method = $c->req->url->query->param('_method');
+    $c->req->method($method);
+  });
+
+Or more advanced extensions to add monitoring to your application.
 
   # Forward exceptions to a web service
   $self->hook(after_dispatch => sub {

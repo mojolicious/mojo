@@ -238,7 +238,8 @@ C<partial> stash value.
 No encoding will be performed, making it easy to reuse the result in other
 templates or to generate binary data.
 
-  $self->render(data => $self->render('pdf_invoice', partial => 1));
+  my $pdf = $self->render('invoice', format => 'pdf', partial => 1);
+  $self->render(data => $pdf, format => 'pdf');
 
 =head2 Status code
 

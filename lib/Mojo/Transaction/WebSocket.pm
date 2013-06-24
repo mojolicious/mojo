@@ -74,7 +74,7 @@ sub build_frame {
 
   # Mask payload
   if ($masked) {
-    my $mask = pack 'N', int(rand 9999999);
+    my $mask = pack 'N', int(rand 9 x 7);
     $payload = $mask . xor_encode($payload, $mask x 128);
   }
 
@@ -95,7 +95,7 @@ sub client_handshake {
   $headers->connection('Upgrade')     unless $headers->connection;
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
-  # Generate WebSocket challenge
+  # Generate 16 byte WebSocket challenge
   my $challenge = b64_encode sprintf('%16u', int(rand 9 x 16)), '';
   $headers->sec_websocket_key($challenge) unless $headers->sec_websocket_key;
 }

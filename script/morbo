@@ -15,7 +15,7 @@ GetOptions(
   'w|watch=s'  => \my @watch
 );
 
-die <<"EOF" if $help || !(my $app = shift);
+die <<EOF if $help || !(my $app = shift);
 usage: $0 [OPTIONS] [APPLICATION]
 
   morbo script/myapp

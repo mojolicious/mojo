@@ -6,7 +6,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Util 'encode';
 
 has description => "Show available routes.\n";
-has usage       => <<"EOF";
+has usage       => <<EOF;
 usage: $0 routes [OPTIONS]
 
 These options are available:

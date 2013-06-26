@@ -1,5 +1,5 @@
 
-4.17  2013-06-24
+4.17  2013-06-26
   - Fixed Mojo::Transaction::WebSocket to generate RFC 6455 compliant
     Sec-WebSocket-Key headers. (josh)
 

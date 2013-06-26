@@ -5,7 +5,7 @@ use Getopt::Long 'GetOptions';
 use List::Util 'max';
 use Mojo::Server;
 
-has hint => <<"EOF";
+has hint => <<EOF;
 
 These options are available for all commands:
     -h, --help          Get more information on a specific command.
@@ -16,7 +16,7 @@ These options are available for all commands:
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
-has message => <<"EOF";
+has message => <<EOF;
 usage: $0 COMMAND [OPTIONS]
 
 Tip: CGI and PSGI environments can be automatically detected very often and

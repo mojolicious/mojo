@@ -175,25 +175,29 @@ rendering when a non-blocking operation has to be performed first.
 
 =head2 Rendering templates
 
-The renderer will always try to detect the right template but you can also
-use the C<template> stash value to render a specific one.
+The renderer will always try to detect the right template, but you can also
+use the C<template> stash value to render a specific one. Everything before
+the last slash will be interpreted as the subdirectory path in which to find
+the template.
 
-  $self->render(template => 'foo/bar');
+  # foo/bar/baz.*.*
+  $self->render(template => 'foo/bar/baz');
 
 Choosing a specific C<format> and C<handler> is just as easy.
 
-  $self->render(template => 'foo/bar', format => 'txt', handler => 'epl');
+  # foo/bar/baz.txt.epl
+  $self->render(template => 'foo/bar/baz', format => 'txt', handler => 'epl');
 
 Because rendering a specific template is the most common task it also has a
 shortcut.
 
-  $self->render('foo/bar');
+  $self->render('foo/bar/baz');
 
 If you're not sure in advance if a template actually exists, you can also use
 the method L<Mojolicious::Controller/"render_maybe"> to try multiple
 alternatives.
 
-  $self->render_maybe('localized/bar') or $self->render('foo/bar');
+  $self->render_maybe('localized/baz') or $self->render('foo/bar/baz');
 
 =head2 Rendering inline templates
 

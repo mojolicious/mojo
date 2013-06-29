@@ -147,6 +147,9 @@ every change.
   $ morbo myapp.pl
   Server available at http://127.0.0.1:3000.
 
+For more information about how to deploy your application see also
+L<Mojolicious::Guides::Cookbook/"DEPLOYMENT">.
+
 =head2 Routes
 
 Routes are basically just fancy paths that can contain different kinds of

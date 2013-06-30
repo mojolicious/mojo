@@ -727,7 +727,9 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $host     = $c->req->url->to_abs->host;
   my $agent    = $c->req->headers->user_agent;
   my $body     = $c->req->body;
+  my $hash     = $c->req->json;
   my $foo      = $c->req->json('/23/foo');
+  my $dom      = $c->req->dom;
   my $bar      = $c->req->dom('div.bar')->first->text;
 
 =head2 res

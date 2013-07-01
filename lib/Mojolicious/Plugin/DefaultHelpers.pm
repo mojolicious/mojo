@@ -220,7 +220,7 @@ Alias for L<Mojolicious::Controller/"session">.
 
 Alias for L<Mojolicious::Controller/"stash">.
 
-  %= stash 'name' // 'Somebody'
+  %= stash('name') // 'Somebody'
 
 =head2 title
 

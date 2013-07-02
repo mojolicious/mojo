@@ -243,7 +243,6 @@ Mojo::URL - Uniform Resource Locator
   $url->host('example.com');
   $url->port(3000);
   $url->path('/foo/bar');
-  $url->path('baz');
   $url->query->param(foo => 'bar');
   $url->fragment(23);
   say "$url";

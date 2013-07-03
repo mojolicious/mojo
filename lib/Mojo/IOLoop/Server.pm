@@ -25,6 +25,17 @@ use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 my $CERT = catfile dirname(__FILE__), 'server.crt';
 my $KEY  = catfile dirname(__FILE__), 'server.key';
 
+# Prioritize RC4 to mitigate BEAST attack, use Perfect Forward Secrecy and
+# disable SSLv2
+my $CIPHERS = join ':',
+  qw(!SSLv2 ECDHE-ECDSA-AES256-GCM-SHA384 ECDHE-RSA-AES256-GCM-SHA384),
+  qw(ECDHE-ECDSA-AES256-SHA384 ECDHE-RSA-AES256-SHA384),
+  qw(ECDHE-ECDSA-AES128-GCM-SHA256 ECDHE-RSA-AES128-GCM-SHA256),
+  qw(ECDHE-ECDSA-AES128-SHA256 ECDHE-RSA-AES128-SHA256 ECDHE-ECDSA-RC4-SHA),
+  qw(ECDHE-RSA-RC4-SHA ECDH-ECDSA-RC4-SHA ECDH-RSA-RC4-SHA),
+  qw(ECDHE-RSA-AES256-SHA RC4-SHA HIGH !aNULL !eNULL !LOW !3DES !MD5 !EXP),
+  qw(!CBC !EDH !kEDH !PSK !SRP !kECDH);
+
 has multi_accept => 50;
 has reactor      => sub {
   require Mojo::IOLoop;
@@ -81,11 +92,9 @@ sub listen {
   return unless $args->{tls};
   croak "IO::Socket::SSL 1.75 required for TLS support" unless TLS;
 
-  # Options (Prioritize RC4 to mitigate BEAST attack)
   my $options = $self->{tls} = {
     SSL_cert_file => $args->{tls_cert} || $CERT,
-    SSL_cipher_list =>
-      '!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:!LOW:RC4-SHA:RC4-MD5:ALL',
+    SSL_cipher_list        => $CIPHERS,
     SSL_honor_cipher_order => 1,
     SSL_key_file           => $args->{tls_key} || $KEY,
     SSL_startHandshake     => 0,

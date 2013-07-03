@@ -68,6 +68,7 @@ ok $t->app->routes->is_hidden('bar'),              'is hidden';
 ok $t->app->routes->is_hidden('_foo'),             'is hidden';
 ok $t->app->routes->is_hidden('AUTOLOAD'),         'is hidden';
 ok $t->app->routes->is_hidden('DESTROY'),          'is hidden';
+ok $t->app->routes->is_hidden('FOO_BAR'),          'is hidden';
 ok $t->app->routes->is_hidden('app'),              'is hidden';
 ok $t->app->routes->is_hidden('attr'),             'is hidden';
 ok $t->app->routes->is_hidden('cookie'),           'is hidden';

@@ -69,11 +69,10 @@ sub new {
   my $r = $self->routes->namespaces([ref $self]);
 
   # Hide controller attributes/methods and "handler"
-  $r->hide(qw(AUTOLOAD DESTROY app cookie finish flash handler match on));
-  $r->hide(qw(param redirect_to render render_exception render_later));
-  $r->hide(qw(render_maybe render_not_found render_static rendered req res));
-  $r->hide(qw(respond_to send session signed_cookie stash tx url_for write));
-  $r->hide(qw(write_chunk));
+  $r->hide(qw(app cookie finish flash handler match on param redirect_to));
+  $r->hide(qw(render render_exception render_later render_maybe));
+  $r->hide(qw(render_not_found render_static rendered req res respond_to));
+  $r->hide(qw(send session signed_cookie stash tx url_for write write_chunk));
 
   # Check if we have a log directory
   my $mode = $self->mode;

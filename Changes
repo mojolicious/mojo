@@ -1,7 +1,8 @@
 
-4.17  2013-07-01
+4.17  2013-07-03
   - Fixed Mojo::Transaction::WebSocket to generate RFC 6455 compliant
     Sec-WebSocket-Key headers. (josh)
+  - Fixed bug where not all uppercase methods were hidden from the router.
 
 4.16  2013-06-19
   - Improved Perl 5.10.x and 5.12.x compatibility. (trinitum)

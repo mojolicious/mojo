@@ -1,5 +1,6 @@
 
-4.17  2013-07-03
+4.17  2013-07-04
+  - Updated jQuery to version 2.0.3.
   - Improved Mojo::IOLoop::Server to use Perfect Forward Secrecy for TLS.
   - Fixed Mojo::Transaction::WebSocket to generate RFC 6455 compliant
     Sec-WebSocket-Key headers. (josh)

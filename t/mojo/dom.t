@@ -189,7 +189,7 @@ is $dom->at('[foo=bar]')->text, 'works', 'right text';
 is $dom->at('[foo=ba]'), undef, 'no result';
 is $dom->at('.tset')->text, 'works', 'right text';
 
-# HTML1 (single quotes, upper case tags and whitespace in attributes)
+# HTML1 (single quotes, uppercase tags and whitespace in attributes)
 $dom = Mojo::DOM->new->parse(
   qq{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
 is $dom->at('#test')->text,       'works', 'right text';

@@ -1664,7 +1664,7 @@
     Mojolicious::Plugin::PODRenderer.
 
 1.79  2011-08-17
-  - Added support for upper case relative plugin names. (lammel)
+  - Added support for uppercase relative plugin names. (lammel)
 
 1.78  2011-08-16
   - Added EXPERIMENTAL modules Mojolicious::Command::Cpanify and
@@ -2672,7 +2672,7 @@
     decoding.
   - Fixed format detection bug. (marcus)
   - Fixed named url_for. (marcus)
-  - Fixed decamelize of multiple upper case characters.
+  - Fixed decamelize of multiple uppercase characters.
   - Fixed plugins and commands to work with multiple namespaces and
     reloading.
   - Fixed multiple process calls in Mojo::Client.

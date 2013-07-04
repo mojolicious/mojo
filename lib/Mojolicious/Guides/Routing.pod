@@ -366,7 +366,16 @@ separated by other characters than C</>.
     ->to(controller => 'foo', action => 'bar');
 
 Special stash values like C<controller> and C<action> can also be
-placeholders, this allows for extremely flexible routes constructs.
+placeholders, this allows for extremely flexible route constructs, but should
+be used with care. All uppercase controller methods as well as those starting
+with an underscore are automatically hidden from the router, to hide
+additional ones you can also use L<Mojolicious::Routes/"hide">.
+
+  # Hide "create" method in all controllers
+  $r->hide('create');
+
+This has already been done for all methods and attributes from
+L<Mojolicious::Controller>.
 
 =head2 More restrictive placeholders
 

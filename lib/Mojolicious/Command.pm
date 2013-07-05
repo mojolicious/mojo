@@ -96,7 +96,7 @@ Mojolicious::Command - Command base class
 
 =head1 SYNOPSIS
 
-  # Lower case command name
+  # Lowercase command name
   package Mojolicious::Command::mycommand;
   use Mojo::Base 'Mojolicious::Command';
 

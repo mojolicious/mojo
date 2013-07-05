@@ -15,7 +15,7 @@ Mojolicious::Plugin - Plugin base class
 
 =head1 SYNOPSIS
 
-  # Camel case plugin name
+  # CamelCase plugin name
   package Mojolicious::Plugin::MyPlugin;
   use Mojo::Base 'Mojolicious::Plugin';
 

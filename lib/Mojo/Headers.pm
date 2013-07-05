@@ -22,7 +22,7 @@ for my $header (@HEADERS) {
   monkey_patch __PACKAGE__, $name, sub { scalar shift->header($header => @_) };
 }
 
-# Lower case headers
+# Lowercase headers
 my %NORMALCASE = map { lc($_) => $_ } @HEADERS;
 
 sub add {

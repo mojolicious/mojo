@@ -1,4 +1,6 @@
 
+4.18  2013-07-05
+
 4.17  2013-07-04
   - Updated jQuery to version 2.0.3.
   - Improved Mojo::IOLoop::Server to use Perfect Forward Secrecy for TLS.
@@ -475,7 +477,7 @@
   - Fixed WebSocket bug in Mojo::Content.
 
 3.46  2012-10-11
-  - Improved router and renderer to allow camel case controllers.
+  - Improved router and renderer to allow CamelCase controllers.
 
 3.45  2012-10-10
   - Added multi_accept attribute to Mojo::IOLoop.
@@ -487,7 +489,7 @@
   - Improved documentation browser CSS. (tempire)
 
 3.44  2012-09-29
-  - Improved html_escape to favor lower case entities. (judofyr)
+  - Improved html_escape to favor lowercase entities. (judofyr)
   - Improved javascript and stylesheet helpers to not generate type
     attributes.
 
@@ -1624,8 +1626,7 @@
   - Fixed small route rendering bug.
 
 1.86  2011-08-21
-  - Deprecated camel case command modules and lowercased all the built-in
-    ones.
+  - Deprecated CamelCase command modules and lowercased all the built-in ones.
   - Added EXPERIMENTAL support for testing WebSockets with Test::Mojo.
   - Added GET/POST parameter support to respond_to.
   - Made class_to_file slightly smarter.
@@ -3144,7 +3145,7 @@
 0.8008  2008-11-07
   - Fixed multipart parsing for short requests.
   - Fixed content file storage to specific file.
-  - Fixed lower case appclasses.
+  - Fixed lowercase appclasses.
 
 0.8007  2008-11-07
   - Cleaned up the API some more.

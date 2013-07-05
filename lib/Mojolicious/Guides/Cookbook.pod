@@ -1082,7 +1082,7 @@ that they will be picked up automatically by the command line interface?
 
   1;
 
-There are many more useful methods and attributes in L<Mojolicious::Command>
+There are many more useful attributes and methods in L<Mojolicious::Command>
 that you can use or overload.
 
   $ mojo spy secret

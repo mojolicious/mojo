@@ -375,7 +375,7 @@ L<Mojolicious::Routes/"hide"> to add additional ones.
   # Hide "create" method in all controllers
   $r->hide('create');
 
-This has already been done for all methods and attributes from
+This has already been done for all attributes and methods from
 L<Mojolicious::Controller>.
 
 =head2 More restrictive placeholders

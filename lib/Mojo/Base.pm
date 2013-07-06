@@ -23,9 +23,8 @@ sub import {
   elsif ($flag eq '-strict') { $flag = undef }
 
   # Module
-  else {
-    my $file = $flag;
-    $file =~ s/::|'/\//g;
+  elsif (my $file = $flag) {
+    $file =~ s!::|'!/!g;
     require "$file.pm" unless $flag->can('new');
   }
 

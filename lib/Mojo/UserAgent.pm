@@ -197,7 +197,7 @@ sub _connect_proxy {
       my ($self, $tx) = @_;
 
       # CONNECT failed (connection needs to be kept alive)
-      unless ($tx->keep_alive && ($tx->res->code // '') eq '200') {
+      unless ($tx->keep_alive && $tx->res->is_status_class(200)) {
         $old->req->error('Proxy connection failed');
         return $self->_finish($old, $cb);
       }

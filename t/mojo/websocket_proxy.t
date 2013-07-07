@@ -42,7 +42,7 @@ my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
 my $port = Mojo::IOLoop->new->generate_port;
 $daemon->listen(["http://127.0.0.1:$port"])->start;
 
-# Connect proxy server for testing
+# CONNECT proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;
 my (%buffer, $connected, $read, $sent);
 my $nf

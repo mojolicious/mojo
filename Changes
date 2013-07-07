@@ -1,6 +1,8 @@
 
 4.18  2013-07-07
   - Added --mode option to Morbo.
+  - Fixed bug in Mojo::UserAgent where not all 2xx responses would be accepted
+    for CONNECT requests.
 
 4.17  2013-07-04
   - Updated jQuery to version 2.0.3.

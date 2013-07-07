@@ -124,7 +124,7 @@ Mojo::IOLoop->server(
 my $result;
 $ua->get(
   "http://localhost:$port/" => sub {
-    $result = pop->success->body;
+    $result = pop->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -158,7 +158,7 @@ $ua->get(
   'http://example.com/proxy' => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
-    $result     = $tx->success->body;
+    $result     = $tx->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -190,7 +190,7 @@ is $result, 'test1test2', 'right result';
 # Blocking proxy request
 my $tx = $ua->get('http://example.com/proxy');
 is $tx->res->code, 200, 'right status';
-is $tx->success->body, 'http://example.com/proxy', 'right content';
+is $tx->res->body, 'http://example.com/proxy', 'right content';
 
 # Proxy WebSocket
 $ua = Mojo::UserAgent->new(http_proxy => "http://localhost:$proxy");

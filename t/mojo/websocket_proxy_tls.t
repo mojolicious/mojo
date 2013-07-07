@@ -151,7 +151,7 @@ my $ua = Mojo::UserAgent->new(
 my $result;
 $ua->get(
   "https://localhost:$port/" => sub {
-    $result = pop->success->body;
+    $result = pop->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -171,7 +171,7 @@ my $works;
 $ua->max_redirects(3)->get(
   "https://localhost:$port/broken_redirect" => sub {
     my ($ua, $tx) = @_;
-    $result = $tx->success->body;
+    $result = $tx->res->body;
     $works  = $tx->res->headers->header('X-Works');
     Mojo::IOLoop->stop;
   }
@@ -208,7 +208,7 @@ my ($auth, $kept_alive);
 $ua->get(
   "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
-    $result     = $tx->success->body;
+    $result     = $tx->res->body;
     $auth       = $tx->req->headers->proxy_authorization;
     $kept_alive = $tx->kept_alive;
     Mojo::IOLoop->stop;
@@ -225,7 +225,7 @@ $ua->get(
   "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
-    $result     = $tx->success->body;
+    $result     = $tx->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -262,7 +262,7 @@ ok $sent > 25, 'sent enough';
 $ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
 my $tx = $ua->get("https://localhost:$port/proxy");
 is $tx->res->code, 200, 'right status';
-is $tx->success->body, "https://localhost:$port/proxy", 'right content';
+is $tx->res->body, "https://localhost:$port/proxy", 'right content';
 
 # Proxy WebSocket with bad target
 $ua->https_proxy("http://localhost:$proxy");

@@ -44,7 +44,7 @@ $daemon->listen(["http://127.0.0.1:$port"])->start;
 
 # Connect proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;
-my (%buffer, $connected, $read, $sent, $fail);
+my (%buffer, $connected, $read, $sent);
 my $nf
   = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
@@ -69,7 +69,7 @@ Mojo::IOLoop->server(
           $buffer{$client}{client} = '';
           if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
             $connected = "$1:$2";
-            $fail = 1 if $2 == $port + 1;
+            my $fail = $2 == $port + 1;
 
             # Connection to server
             $buffer{$client}{connection} = Mojo::IOLoop->client(

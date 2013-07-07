@@ -196,7 +196,7 @@ sub _connect_proxy {
     $new => sub {
       my ($self, $tx) = @_;
 
-      # CONNECT failed
+      # CONNECT failed (connection needs to be kept alive)
       unless ($tx->keep_alive && ($tx->res->code // '') eq '200') {
         $old->req->error('Proxy connection failed');
         return $self->_finish($old, $cb);
@@ -354,14 +354,14 @@ sub _remove {
 
   # Close connection
   my $tx = (delete($self->{connections}{$id}) || {})->{tx};
-  unless (!$close && $tx && $tx->keep_alive && !$tx->error) {
+  if ($close || !$tx || !$tx->keep_alive || $tx->error) {
     $self->_cache($id);
     return $self->_loop->remove($id);
   }
 
-  # Keep connection alive
+  # Keep connection alive (CONNECT requests get upgraded)
   $self->_cache(join(':', $self->transactor->endpoint($tx)), $id)
-    unless uc $tx->req->method eq 'CONNECT' && ($tx->res->code // '') eq '200';
+    unless uc $tx->req->method eq 'CONNECT';
 }
 
 sub _redirect {

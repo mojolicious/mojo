@@ -11,6 +11,7 @@ use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 GetOptions(
   'h|help'     => \my $help,
   'l|listen=s' => \my @listen,
+  'm|mode=s'   => sub { $ENV{MOJO_MODE} = $_[1] },
   'v|verbose'  => sub { $ENV{MORBO_VERBOSE} = 1 },
   'w|watch=s'  => \my @watch
 );
@@ -20,6 +21,7 @@ usage: $0 [OPTIONS] [APPLICATION]
 
   morbo script/myapp
   morbo myapp.pl
+  morbo -m production -l https://*:443
   morbo -w /usr/local/lib -w public myapp.pl
 
 These options are available:
@@ -27,6 +29,9 @@ These options are available:
   -l, --listen <location>        Set one or more locations you want to listen
                                  on, defaults to the value of MOJO_LISTEN or
                                  "http://*:3000".
+  -m, --mode <name>              Operating mode for your application, defaults
+                                 to the value of MOJO_MODE/PLACK_ENV or
+                                 "development".
   -v, --verbose                  Print details about what files changed to
                                  STDOUT.
   -w, --watch <directory/file>   Set one or more directories and files to

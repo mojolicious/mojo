@@ -1,4 +1,6 @@
 
+4.19  2013-07-09
+
 4.18  2013-07-08
   - Added --mode option to Morbo.
   - Fixed bug in Mojo::UserAgent where not all 2xx responses would be accepted

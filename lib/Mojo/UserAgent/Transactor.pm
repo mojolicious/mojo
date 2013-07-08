@@ -353,7 +353,7 @@ C<307> or C<308> redirect response if possible.
 Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
 requests, with support for content generators.
 
-  # Inspect generated request
+  # Generate and inspect custom GET request with DNT header and content
   say $t->tx(GET => 'example.com' => {DNT => 1} => 'Bye!')->req->to_string;
 
   # Use a custom socket for processing this transaction

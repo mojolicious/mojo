@@ -23,9 +23,9 @@ sub import {
   elsif ($flag eq '-strict') { $flag = undef }
 
   # Module
-  elsif (my $file = $flag) {
+  elsif ((my $file = $flag) && !$flag->can('new')) {
     $file =~ s!::|'!/!g;
-    require "$file.pm" unless $flag->can('new');
+    require "$file.pm";
   }
 
   # ISA

@@ -358,6 +358,16 @@ stringify them if it doesn't exist.
   [1, -2, 3]     -> [1, -2, 3]
   {"foo": "bar"} -> {foo => 'bar'}
 
+Differentiating between strings and numbers in Perl is hard, depending on how
+it has been used, a C<Scalar> can be both at the same time. Since numeric
+comparisons for strings are very unlikely to happen intentionally, the numeric
+value always gets priority, so any C<Scalar> that has been used in numeric
+context is considered a number.
+
+  23        -> 23
+  "23"      -> "23"
+  "2" + "3" -> 5
+
 Literal names will be translated to and from L<Mojo::JSON> constants or a
 similar native Perl value. In addition C<Scalar> references will be used to
 generate booleans, based on if their values are true or false.

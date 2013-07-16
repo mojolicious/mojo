@@ -108,6 +108,13 @@ sub start_app {
   return Mojo::Server->new->build_app(shift)->start(@_);
 }
 
+sub enable_app {
+  my $self = shift;
+  my $app = Mojo::Server->new->build_app(shift);
+  $app->enable_app(@_) if $app->can('enable_app');
+  return $app->start;
+}
+
 sub _command {
   my ($module, $fatal) = @_;
   return $module->isa('Mojolicious::Command') ? $module : undef
@@ -322,6 +329,19 @@ Load application and start the command line interface for it.
 
   # Always start daemon for application and ignore @ARGV
   Mojolicious::Commands->start_app('MyApp', 'daemon', '-l', 'http://*:8080');
+
+=head2 enable_app
+  
+  # in plack app.psgi
+  use Plack::Builder;
+  use Mojolicious::Commands;
+  
+  builder {
+    ...  # your favourite plack middleware components
+    Mojolicious::Commands->enable_app('MyApp', @params);
+  };
+  
+Load application in plack builder and pass @arguments
 
 =head1 SEE ALSO
 

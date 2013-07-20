@@ -145,6 +145,8 @@ $ua->get(
     Mojo::IOLoop->stop;
   }
 );
+eval { $ua->get('/') };
+like $@, qr/^Non-blocking requests in progress/, 'right error';
 Mojo::IOLoop->start;
 ok $success, 'successful';
 is $code,    200, 'right status';

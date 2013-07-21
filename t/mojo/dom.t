@@ -100,13 +100,14 @@ is "$dom", <<EOF, 'right result';
   <![CDATA[ yada yada]]>
   <?boom lalalala ?>
   <a bit broken little>
-  <very <br broken></very>
+  &lt; very broken
+  <br />
   more text
 </a></foo>
 EOF
 my $simple = $dom->at('foo simple.working[class^="wor"]');
-is $simple->parent->all_text, 'test easy works well yada yada more text',
-  'right text';
+is $simple->parent->all_text,
+  'test easy works well yada yada < very broken more text', 'right text';
 is $simple->type, 'simple', 'right type';
 is $simple->attrs('class'), 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';

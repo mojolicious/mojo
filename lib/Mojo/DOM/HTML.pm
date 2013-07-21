@@ -8,7 +8,7 @@ has 'xml';
 has tree => sub { ['root'] };
 
 my $ATTR_RE = qr/
-  ([^=\s>]+)       # Key
+  ([^<>=\s]+)      # Key
   (?:
     \s*=\s*
     (?:
@@ -78,8 +78,7 @@ my %INLINE = map { $_ => 1 } (
 sub parse {
   my ($self, $html) = @_;
 
-  my $tree    = ['root'];
-  my $current = $tree;
+  my $current = my $tree = ['root'];
   while ($html =~ m/\G$TOKEN_RE/gcs) {
     my ($text, $pi, $comment, $cdata, $doctype, $tag, $runaway)
       = ($1, $2, $3, $4, $5, $6, $11);

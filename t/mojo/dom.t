@@ -1666,11 +1666,11 @@ $dom = Mojo::DOM->new->parse(<<'EOF');
       </div>
       </mt:If>
     </div>
-    <b>lalala</b>
+    <b>la<>la<>la</b>
   </body>
 </html>
 EOF
-is $dom->at('#screw-up > b')->text, 'lalala', 'right text';
+is $dom->at('#screw-up > b')->text, 'la la la', 'right text';
 is $dom->at('#screw-up .ewww > a > img')->attrs('src'), '/test.png',
   'right attribute';
 is $dom->find('#screw-up .ewww > a > img')->[1]->attrs('src'), '/test2.png',

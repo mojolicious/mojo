@@ -40,7 +40,7 @@ my $TOKEN_RE = qr/
   |
     <(
       \s*
-      [^>\s]+                                       # Tag
+      [^>\s]*                                       # Tag
       \s*
       (?:$ATTR_RE)*                                 # Attributes
     )>

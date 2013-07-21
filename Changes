@@ -1,5 +1,6 @@
 
-4.19  2013-07-20
+4.19  2013-07-21
+  - Improved invalid tag handling in Mojo::DOM::HTML.
 
 4.18  2013-07-08
   - Added --mode option to Morbo.

@@ -1,4 +1,6 @@
 
+4.20  2013-07-25
+
 4.19  2013-07-21
   - Improved invalid tag handling in Mojo::DOM::HTML.
 

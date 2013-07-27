@@ -77,6 +77,12 @@ sub need_proxy {
 sub start {
   my ($self, $tx, $cb) = @_;
 
+  # Fork safety
+  unless (($self->{pid} //= $$) eq $$) {
+    $self->_cleanup;
+    delete $self->{$_} for qw(pid port);
+  }
+
   # Non-blocking
   if ($cb) {
     warn "-- Non-blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
@@ -559,6 +565,8 @@ L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
 agent, with IPv6, TLS, SNI, IDNA, Comet (long polling), keep-alive, connection
 pooling, timeout, cookie, multipart, proxy, gzip compression and multiple
 event loop support.
+
+All connections will be reset automatically if a new process has been forked.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
 support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and

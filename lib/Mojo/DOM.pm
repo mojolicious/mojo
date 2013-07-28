@@ -163,13 +163,6 @@ sub replace {
   return $self->_replace($tree, $self->_parse("$new"));
 }
 
-sub strip {
-  my $self = shift;
-  my $tree = $self->tree;
-  return $self if $tree->[0] eq 'root';
-  return $self->_replace($tree, ['root', @$tree[4 .. $#$tree]]);
-}
-
 sub replace_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
@@ -188,6 +181,13 @@ sub root {
   }
 
   return $self->new->tree($root)->xml($self->xml);
+}
+
+sub strip {
+  my $self = shift;
+  my $tree = $self->tree;
+  return $self if $tree->[0] eq 'root';
+  return $self->_replace($tree, ['root', @$tree[4 .. $#$tree]]);
 }
 
 sub text {

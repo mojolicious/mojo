@@ -135,7 +135,7 @@ sub _select {
     # Attribute
     elsif ($command eq 'attr') {
       next unless my $name = shift @args;
-      _say($_->attrs->{$name}) for @$results;
+      _say($_->attr->{$name}) for @$results;
     }
 
     # Unknown

@@ -1,5 +1,6 @@
 
-4.20  2013-07-27
+4.20  2013-07-28
+  - Deprecated Mojo::DOM::attrs in favor of Mojo::DOM::attr.
   - Improved Mojo::UserAgent connection management to be fork-safe.
 
 4.19  2013-07-21

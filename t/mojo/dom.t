@@ -13,8 +13,8 @@ is_deeply \@div, [qw(A B)], 'found all div elements with id';
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, $_->text });
 is_deeply \@div, [qw(A B)], 'found all div elements with id';
-is $dom->at('#a')->attrs('foo'), 0, 'right attribute';
-is $dom->at('#a')->attrs->{foo}, 0, 'right attribute';
+is $dom->at('#a')->attr('foo'), 0, 'right attribute';
+is $dom->at('#a')->attr->{foo}, 0, 'right attribute';
 is "$dom", '<div><div foo="0" id="a">A</div><div id="b">B</div></div>',
   'right result';
 
@@ -85,8 +85,8 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 EOF
 ok !$dom->xml, 'XML mode not detected';
 is $dom->type, '', 'no type';
-is $dom->attrs('foo'), '', 'no attribute';
-is $dom->attrs(foo => 'bar')->attrs('foo'), '', 'no attribute';
+is $dom->attr('foo'), '', 'no attribute';
+is $dom->attr(foo => 'bar')->attr('foo'), '', 'no attribute';
 is $dom->tree->[1][0], 'doctype', 'right element';
 is $dom->tree->[1][1], ' foo',    'right doctype';
 is "$dom", <<EOF, 'right result';
@@ -109,17 +109,17 @@ my $simple = $dom->at('foo simple.working[class^="wor"]');
 is $simple->parent->all_text,
   'test easy works well yada yada < very broken more text', 'right text';
 is $simple->type, 'simple', 'right type';
-is $simple->attrs('class'), 'working', 'right class attribute';
+is $simple->attr('class'), 'working', 'right class attribute';
 is $simple->text, 'easy', 'right text';
 is $simple->parent->type, 'foo', 'right parent type';
-is $simple->parent->attrs->{bar}, 'ba<z', 'right parent attribute';
+is $simple->parent->attr->{bar}, 'ba<z', 'right parent attribute';
 is $simple->parent->children->[1]->type, 'test', 'right sibling';
 is $simple->to_xml, '<simple class="working">easy</simple>',
   'stringified right';
-$simple->parent->attrs(bar => 'baz')->attrs({this => 'works', too => 'yea'});
-is $simple->parent->attrs('bar'),  'baz',   'right parent attribute';
-is $simple->parent->attrs('this'), 'works', 'right parent attribute';
-is $simple->parent->attrs('too'),  'yea',   'right parent attribute';
+$simple->parent->attr(bar => 'baz')->attr({this => 'works', too => 'yea'});
+is $simple->parent->attr('bar'),  'baz',   'right parent attribute';
+is $simple->parent->attr('this'), 'works', 'right parent attribute';
+is $simple->parent->attr('too'),  'yea',   'right parent attribute';
 is $dom->at('test#test')->type,         'test',   'right type';
 is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
 is $dom->at('[class="working"]')->type, 'simple', 'right type';
@@ -162,13 +162,13 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 </html>
 EOF
 my $p = $dom->find('body > #container > div p[id]');
-is $p->[0]->attrs('id'), 'foo', 'right id attribute';
+is $p->[0]->attr('id'), 'foo', 'right id attribute';
 is $p->[1], undef, 'no second result';
 is $p->size, 1, 'right number of elements';
 my @p;
 @div = ();
-$dom->find('div')->each(sub { push @div, $_->attrs('id') });
-$dom->find('p')->each(sub { push @p, $_->attrs('id') });
+$dom->find('div')->each(sub { push @div, $_->attr('id') });
+$dom->find('p')->each(sub { push @p, $_->attr('id') });
 is_deeply \@p, [qw(foo bar)], 'found all p elements';
 my $ids = [qw(container header logo buttons buttons content)];
 is_deeply \@div, $ids, 'found all div elements';
@@ -402,8 +402,8 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 </rss>
 EOF
 ok $dom->xml, 'XML mode detected';
-is $dom->find('rss')->[0]->attrs('version'), '2.0', 'right version';
-is $dom->at('extension')->attrs('foo:id'), 'works', 'right id';
+is $dom->find('rss')->[0]->attr('version'), '2.0', 'right version';
+is $dom->at('extension')->attr('foo:id'), 'works', 'right id';
 like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
 like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
 is $dom->find('description')->[1]->text, '<p>trololololo>', 'right text';
@@ -450,10 +450,10 @@ is $dom->at('k\:book'), undef, 'no result';
 is $dom->at('ook'),     undef, 'no result';
 is $dom->at('[xmlns\:bk]')->{'xmlns:bk'}, 'uri:book-ns', 'right attribute';
 is $dom->at('[bk]')->{'xmlns:bk'},        'uri:book-ns', 'right attribute';
-is $dom->at('[bk]')->attrs('xmlns:bk'), 'uri:book-ns', 'right attribute';
-is $dom->at('[bk]')->attrs('s:bk'),     '',            'no attribute';
-is $dom->at('[bk]')->attrs('bk'),       '',            'no attribute';
-is $dom->at('[bk]')->attrs('k'),        '',            'no attribute';
+is $dom->at('[bk]')->attr('xmlns:bk'), 'uri:book-ns', 'right attribute';
+is $dom->at('[bk]')->attr('s:bk'),     '',            'no attribute';
+is $dom->at('[bk]')->attr('bk'),       '',            'no attribute';
+is $dom->at('[bk]')->attr('k'),        '',            'no attribute';
 is $dom->at('[s\:bk]'), undef, 'no result';
 is $dom->at('[k]'),     undef, 'no result';
 
@@ -562,20 +562,20 @@ is_deeply \@numbers, [1, 1, 2, 2, 3, 3], 'right order';
 
 # Attributes on multiple lines
 $dom = Mojo::DOM->new->parse("<div test=23 id='a' \n class='x' foo=bar />");
-is $dom->at('div.x')->attrs('test'),        23,  'right attribute';
-is $dom->at('[foo="bar"]')->attrs('class'), 'x', 'right attribute';
+is $dom->at('div.x')->attr('test'),        23,  'right attribute';
+is $dom->at('[foo="bar"]')->attr('class'), 'x', 'right attribute';
 
 # Markup characters in attribute values
 $dom = Mojo::DOM->new->parse(
   qq{<div id="<a>" \n test='='>Test<div id='><' /></div>});
-is $dom->at('div[id="<a>"]')->attrs->{test}, '=', 'right attribute';
+is $dom->at('div[id="<a>"]')->attr->{test}, '=', 'right attribute';
 is $dom->at('[id="<a>"]')->text, 'Test', 'right text';
-is $dom->at('[id="><"]')->attrs->{id}, '><', 'right attribute';
+is $dom->at('[id="><"]')->attr->{id}, '><', 'right attribute';
 
 # Empty attributes
 $dom = Mojo::DOM->new->parse(qq{<div test="" test2='' />});
-is $dom->at('div')->attrs->{test},  '', 'empty attribute value';
-is $dom->at('div')->attrs->{test2}, '', 'empty attribute value';
+is $dom->at('div')->attr->{test},  '', 'empty attribute value';
+is $dom->at('div')->attr->{test2}, '', 'empty attribute value';
 
 # Whitespaces before closing bracket
 $dom = Mojo::DOM->new->parse(qq{<div >content</div>});
@@ -677,14 +677,14 @@ is $dom->find(':root')->[0]->type,     'form', 'right type';
 is $dom->find('*:root')->[0]->type,    'form', 'right type';
 is $dom->find('form:root')->[0]->type, 'form', 'right type';
 is $dom->find(':root')->[1], undef, 'no result';
-is $dom->find(':checked')->[0]->attrs->{name},        'groovy', 'right name';
-is $dom->find('option:checked')->[0]->attrs->{value}, 'e',      'right value';
+is $dom->find(':checked')->[0]->attr->{name},        'groovy', 'right name';
+is $dom->find('option:checked')->[0]->attr->{value}, 'e',      'right value';
 is $dom->find(':checked')->[1]->text,  'E', 'right text';
 is $dom->find('*:checked')->[1]->text, 'E', 'right text';
 is $dom->find(':checked')->[2]->text,  'H', 'right name';
-is $dom->find(':checked')->[3]->attrs->{name}, 'I', 'right name';
+is $dom->find(':checked')->[3]->attr->{name}, 'I', 'right name';
 is $dom->find(':checked')->[4], undef, 'no result';
-is $dom->find('option[selected]')->[0]->attrs->{value}, 'e', 'right value';
+is $dom->find('option[selected]')->[0]->attr->{value}, 'e', 'right value';
 is $dom->find('option[selected]')->[1]->text, 'H', 'right text';
 is $dom->find('option[selected]')->[2], undef, 'no result';
 is $dom->find(':checked[value="e"]')->[0]->text,       'E', 'right text';
@@ -697,9 +697,9 @@ is $dom->at('optgroup > :checked[value="e"]')->text,     'E', 'right text';
 is $dom->at('select *:checked[value="e"]')->text,        'E', 'right text';
 is $dom->at('optgroup > *:checked[value="e"]')->text,    'E', 'right text';
 is $dom->find(':checked[value="e"]')->[1], undef, 'no result';
-is $dom->find(':empty')->[0]->attrs->{name},      'user', 'right name';
-is $dom->find('input:empty')->[0]->attrs->{name}, 'user', 'right name';
-is $dom->at(':empty[type^="ch"]')->attrs->{name}, 'groovy', 'right name';
+is $dom->find(':empty')->[0]->attr->{name},      'user', 'right name';
+is $dom->find('input:empty')->[0]->attr->{name}, 'user', 'right name';
+is $dom->at(':empty[type^="ch"]')->attr->{name}, 'groovy', 'right name';
 
 # More pseudo classes
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -1132,7 +1132,7 @@ is $dom->find('div > p')->[4]->text, 'E',   'right text';
 is $dom->find('div > p')->[5]->text, 'F G', 'right text';
 is $dom->find('div > p')->[6]->text, 'H',   'right text';
 is $dom->find('div > p > p')->[0], undef, 'no results';
-is $dom->at('div > p > img')->attrs->{src}, 'foo.png', 'right attribute';
+is $dom->at('div > p > img')->attr->{src}, 'foo.png', 'right attribute';
 is $dom->at('div > div')->text, 'X', 'right text';
 
 # Optional "dt" and "dd" tags
@@ -1205,13 +1205,13 @@ $dom = Mojo::DOM->new->parse(<<EOF);
     <col id=bar>
 </table>
 EOF
-is $dom->find('table > col')->[0]->attrs->{id}, 'morefail', 'right attribute';
-is $dom->find('table > col')->[1]->attrs->{id}, 'fail',     'right attribute';
-is $dom->find('table > colgroup > col')->[0]->attrs->{id}, 'foo',
+is $dom->find('table > col')->[0]->attr->{id}, 'morefail', 'right attribute';
+is $dom->find('table > col')->[1]->attr->{id}, 'fail',     'right attribute';
+is $dom->find('table > colgroup > col')->[0]->attr->{id}, 'foo',
   'right attribute';
-is $dom->find('table > colgroup > col')->[1]->attrs->{class}, 'foo',
+is $dom->find('table > colgroup > col')->[1]->attr->{class}, 'foo',
   'right attribute';
-is $dom->find('table > colgroup > col')->[2]->attrs->{id}, 'bar',
+is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
   'right attribute';
 
 # Optional "thead", "tbody", "tfoot", "tr", "th" and "td" tags
@@ -1254,13 +1254,13 @@ $dom = Mojo::DOM->new->parse(<<EOF);
       <td>B
 </table>
 EOF
-is $dom->find('table > col')->[0]->attrs->{id}, 'morefail', 'right attribute';
-is $dom->find('table > col')->[1]->attrs->{id}, 'fail',     'right attribute';
-is $dom->find('table > colgroup > col')->[0]->attrs->{id}, 'foo',
+is $dom->find('table > col')->[0]->attr->{id}, 'morefail', 'right attribute';
+is $dom->find('table > col')->[1]->attr->{id}, 'fail',     'right attribute';
+is $dom->find('table > colgroup > col')->[0]->attr->{id}, 'foo',
   'right attribute';
-is $dom->find('table > colgroup > col')->[1]->attrs->{class}, 'foo',
+is $dom->find('table > colgroup > col')->[1]->attr->{class}, 'foo',
   'right attribute';
-is $dom->find('table > colgroup > col')->[2]->attrs->{id}, 'bar',
+is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
   'right attribute';
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
 is $dom->find('table > thead > tr > th')->[1]->text, 'D', 'right text';
@@ -1280,11 +1280,11 @@ $dom = Mojo::DOM->new->parse(<<EOF);
       <td>B
 </table>
 EOF
-is $dom->find('table > colgroup > col')->[0]->attrs->{id}, 'foo',
+is $dom->find('table > colgroup > col')->[0]->attr->{id}, 'foo',
   'right attribute';
-is $dom->find('table > colgroup > col')->[1]->attrs->{class}, 'foo',
+is $dom->find('table > colgroup > col')->[1]->attr->{class}, 'foo',
   'right attribute';
-is $dom->find('table > colgroup > col')->[2]->attrs->{id}, 'bar',
+is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
   'right attribute';
 is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
 
@@ -1436,11 +1436,11 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 </html>
 EOF
 is $dom->at('title')->text, 'Foo', 'right text';
-is $dom->find('html > head > script')->[0]->attrs('src'), '/js/one.js',
+is $dom->find('html > head > script')->[0]->attr('src'), '/js/one.js',
   'right attribute';
-is $dom->find('html > head > script')->[1]->attrs('src'), '/js/two.js',
+is $dom->find('html > head > script')->[1]->attr('src'), '/js/two.js',
   'right attribute';
-is $dom->find('html > head > script')->[2]->attrs('src'), '/js/three.js',
+is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js',
   'right attribute';
 is $dom->find('html > head > script')->[2]->text, '', 'no text';
 is $dom->at('html > body')->text, 'Bar', 'right text';
@@ -1459,11 +1459,11 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 </html>
 EOF
 is $dom->at('title')->text, 'Foo', 'right text';
-is $dom->find('html > head > script')->[0]->attrs('src'), '/js/one.js',
+is $dom->find('html > head > script')->[0]->attr('src'), '/js/one.js',
   'right attribute';
-is $dom->find('html > head > script')->[1]->attrs('src'), '/js/two.js',
+is $dom->find('html > head > script')->[1]->attr('src'), '/js/two.js',
   'right attribute';
-is $dom->find('html > head > script')->[2]->attrs('src'), '/js/three.js',
+is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js',
   'right attribute';
 is $dom->find('html > head > script')->[2]->text, '', 'no text';
 is $dom->at('html > body')->text, 'Bar', 'right text';
@@ -1481,7 +1481,7 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 </root>
 EOF
 ok $dom->xml, 'XML mode detected';
-is $dom->at('root')->attrs('att'), 'test', 'right attribute';
+is $dom->at('root')->attr('att'), 'test', 'right attribute';
 is $dom->tree->[5][1], ' root [
   <!ELEMENT root (#PCDATA)>
   <!ATTLIST root att CDATA #REQUIRED>
@@ -1519,7 +1519,7 @@ is $dom->tree->[3][1], ' foo [
   <!ENTITY % e SYSTEM "myentities.ent">
   %myentities;
 ]  ', 'right doctype';
-is $dom->at('foo')->attrs->{'xml:lang'}, 'de', 'right attribute';
+is $dom->at('foo')->attr->{'xml:lang'}, 'de', 'right attribute';
 is $dom->at('foo')->text, 'Check!', 'right text';
 $dom = Mojo::DOM->new->parse(<<EOF);
 <!DOCTYPE TESTSUITE PUBLIC "my.dtd" 'mhhh' [
@@ -1541,7 +1541,7 @@ is $dom->tree->[1][1], ' TESTSUITE PUBLIC "my.dtd" \'mhhh\' [
   <!-- This is a comment -->
   <!NOTATION hmmm SYSTEM "hmmm">
 ]   ', 'right doctype';
-is $dom->at('foo')->attrs('bar'), 'false', 'right attribute';
+is $dom->at('foo')->attr('bar'), 'false', 'right attribute';
 
 # Broken "font" block and useless end tags
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -1672,9 +1672,9 @@ $dom = Mojo::DOM->new->parse(<<'EOF');
 </html>
 EOF
 is $dom->at('#screw-up > b')->text, '>la<>la<<>>la<', 'right text';
-is $dom->at('#screw-up .ewww > a > img')->attrs('src'), '/test.png',
+is $dom->at('#screw-up .ewww > a > img')->attr('src'), '/test.png',
   'right attribute';
-is $dom->find('#screw-up .ewww > a > img')->[1]->attrs('src'), '/test2.png',
+is $dom->find('#screw-up .ewww > a > img')->[1]->attr('src'), '/test2.png',
   'right attribute';
 is $dom->find('#screw-up .ewww > a > img')->[2], undef, 'no result';
 is $dom->find('#screw-up .ewww > a > img')->size, 2,

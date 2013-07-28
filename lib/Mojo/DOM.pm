@@ -46,7 +46,7 @@ sub append { shift->_add(1, @_) }
 sub append_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
-  push @$tree, @{_parent($self->_parse("$new"), $tree)};
+  push @$tree, _link($self->_parse("$new"), $tree);
   return $self;
 }
 
@@ -79,9 +79,8 @@ sub children {
   my ($self, $type) = @_;
 
   my @children;
-  my $xml  = $self->xml;
-  my $tree = $self->tree;
-  for my $e (@$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree]) {
+  my $xml = $self->xml;
+  for my $e (@{_elements($self->tree)}) {
 
     # Make sure child is the right type
     next if $e->[0] ne 'tag' || (defined $type && $e->[1] ne $type);
@@ -93,13 +92,8 @@ sub children {
 
 sub content_xml {
   my $self = shift;
-
-  # Render children individually
-  my $tree = $self->tree;
   my $xml  = $self->xml;
-  return join '',
-    map { Mojo::DOM::HTML->new(tree => $_, xml => $xml)->render }
-    @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
+  return join '', map { _render($_, $xml) } @{_elements($self->tree)};
 }
 
 sub find {
@@ -148,7 +142,7 @@ sub prepend_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   splice @$tree, $tree->[0] eq 'root' ? 1 : 4, 0,
-    @{_parent($self->_parse("$new"), $tree)};
+    _link($self->_parse("$new"), $tree);
   return $self;
 }
 
@@ -167,7 +161,7 @@ sub replace_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   splice @$tree, $tree->[0] eq 'root' ? 1 : 4, $#$tree,
-    @{_parent($self->_parse("$new"), $tree)};
+    _link($self->_parse("$new"), $tree);
   return $self;
 }
 
@@ -187,7 +181,7 @@ sub strip {
   my $self = shift;
   my $tree = $self->tree;
   return $self if $tree->[0] eq 'root';
-  return $self->_replace($tree, ['root', @$tree[4 .. $#$tree]]);
+  return $self->_replace($tree, ['root', @{_elements($tree)}]);
 }
 
 sub text {
@@ -260,7 +254,7 @@ sub _add {
   }
 
   # Add children
-  splice @$parent, $i + $offset, 0, @{_parent($self->_parse("$new"), $parent)};
+  splice @$parent, $i + $offset, 0, _link($self->_parse("$new"), $parent);
 
   return $self;
 }
@@ -277,7 +271,7 @@ sub _html {
   return $self;
 }
 
-sub _parent {
+sub _link {
   my ($children, $parent) = @_;
 
   # Link parent to children
@@ -290,10 +284,12 @@ sub _parent {
     push @new, $e;
   }
 
-  return \@new;
+  return @new;
 }
 
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
+
+sub _render { Mojo::DOM::HTML->new(tree => shift, xml => shift)->render }
 
 sub _replace {
   my ($self, $tree, $new) = @_;
@@ -304,7 +300,7 @@ sub _replace {
     last if $e == $tree;
     $i++;
   }
-  splice @$parent, $i, 1, @{_parent($new, $parent)};
+  splice @$parent, $i, 1, _link($new, $parent);
 
   return $self->parent;
 }

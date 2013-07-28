@@ -1,4 +1,6 @@
 
+4.22  2013-07-30
+
 4.21  2013-07-29
   - Added strip method to Mojo::DOM.
   - Fixed return values of remove and replace methods in Mojo::DOM.

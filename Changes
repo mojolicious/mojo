@@ -1,5 +1,7 @@
 
 4.21  2013-07-29
+  - Added strip method to Mojo::DOM.
+  - Fixed return values of remove and replace methods in Mojo::DOM.
 
 4.20  2013-07-28
   - Deprecated Mojo::DOM::attrs in favor of Mojo::DOM::attr.

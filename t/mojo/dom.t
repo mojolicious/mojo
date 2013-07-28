@@ -292,7 +292,8 @@ is $dom->at('.test')->text, '♥', 'right text';
 
 # Replace elements
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');
-is $dom->at('p')->replace('<foo>bar</foo>'), '<p>lalala</p>', 'right result';
+is $dom->at('p')->replace('<foo>bar</foo>'),
+  '<div>foo<foo>bar</foo>bar</div>', 'right result';
 is "$dom", '<div>foo<foo>bar</foo>bar</div>', 'right result';
 $dom->at('foo')->replace(Mojo::DOM->new->parse('text'));
 is "$dom", '<div>footextbar</div>', 'right result';
@@ -304,7 +305,7 @@ is $dom->replace('♥'), '♥', 'right result';
 is "$dom", '♥', 'right result';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
-is $dom->at('p')->replace(''), '<p>lalala</p>', 'right result';
+is $dom->at('p')->replace(''), '<div>foobar</div>', 'right result';
 is "$dom", '<div>foobar</div>', 'right result';
 is $dom->replace(''), '', 'no result';
 is "$dom", '', 'no result';
@@ -327,6 +328,13 @@ is "$dom", '<p>foo</p><b>whatever</b><p>bar</p>', 'right result';
 is $dom->find('p')->pluck('remove')->first->root->at('b')->text, 'whatever',
   'right result';
 is "$dom", '<b>whatever</b>', 'right result';
+is $dom->at('b')->strip, 'whatever', 'right result';
+is $dom->strip,  'whatever', 'right result';
+is $dom->remove, '',         'right result';
+$dom->replace('A<div>B<p>C<b>D<i><u>E</u></i>F</b>G</p><div>H</div></div>I');
+is $dom->find(':not(div):not(i):not(u)')->pluck('strip')->first->root,
+  'A<div>BCD<i><u>E</u></i>FG<div>H</div></div>I', 'right result';
+is $dom->at('i')->to_xml, '<i><u>E</u></i>', 'right result';
 
 # Replace element content
 $dom = Mojo::DOM->new->parse('<div>foo<p>lalala</p>bar</div>');

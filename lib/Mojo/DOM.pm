@@ -404,6 +404,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Modify
   $dom->div->p->[1]->append('<p id="c">C</p>');
+  $dom->find(':not(p)')->pluck('strip');
 
   # Render
   say "$dom";
@@ -648,7 +649,7 @@ Return L<Mojo::DOM> object for root node.
 
   my $parent = $dom->strip;
 
-Remove element while preserving the content and return L<Mojo::DOM> object for
+Remove element while preserving its content and return L<Mojo::DOM> object for
 parent of element.
 
   # "<div>A</div>"

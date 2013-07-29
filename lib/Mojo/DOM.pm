@@ -107,8 +107,9 @@ sub find {
 sub namespace {
   my $self = shift;
 
-  # Extract namespace prefix and search parents
   return '' if (my $current = $self->tree)->[0] eq 'root';
+
+  # Extract namespace prefix and search parents
   my $ns = $current->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
   while ($current->[0] ne 'root') {
 
@@ -189,8 +190,8 @@ sub text {
 sub text_after {
   my ($self, $trim) = @_;
 
-  # Find following text elements
   return '' if (my $tree = $self->tree)->[0] eq 'root';
+
   my (@elements, $started);
   for my $e (@{_elements($tree->[3])}) {
     ++$started and next if $e eq $tree;
@@ -205,8 +206,8 @@ sub text_after {
 sub text_before {
   my ($self, $trim) = @_;
 
-  # Find preceding text elements
   return '' if (my $tree = $self->tree)->[0] eq 'root';
+
   my @elements;
   for my $e (@{_elements($tree->[3])}) {
     last if $e eq $tree;
@@ -223,14 +224,9 @@ sub tree { shift->_html(tree => @_) }
 
 sub type {
   my ($self, $type) = @_;
-
-  # Get
   return '' if (my $tree = $self->tree)->[0] eq 'root';
   return $tree->[1] unless $type;
-
-  # Set
   $tree->[1] = $type;
-
   return $self;
 }
 
@@ -239,10 +235,8 @@ sub xml { shift->_html(xml => @_) }
 sub _add {
   my ($self, $offset, $new) = @_;
 
-  # Not a tag
   return $self if (my $tree = $self->tree)->[0] eq 'root';
 
-  # Add children
   my $parent = $tree->[3];
   splice @$parent, _parent($parent, $tree) + $offset, 0,
     _link($self->_parse("$new"), $parent);
@@ -383,6 +377,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
   # Find
   say $dom->at('#b')->text;
   say $dom->find('p')->pluck('text');
+  say $dom->find('[id]')->pluck(attr => 'id');
 
   # Walk
   say $dom->div->p->[0]->text;

@@ -36,10 +36,7 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub all_text {
-  my $tree = shift->tree;
-  return _text(_elements($tree), 1, _trim($tree, @_));
-}
+sub all_text { shift->_content(1, @_) }
 
 sub append { shift->_add(1, @_) }
 
@@ -182,10 +179,7 @@ sub strip {
   return $self->_replace($tree, ['root', @{_elements($tree)}]);
 }
 
-sub text {
-  my $tree = shift->tree;
-  return _text(_elements($tree), 0, _trim($tree, @_));
-}
+sub text { shift->_content(0, @_) }
 
 sub text_after {
   my ($self, $trim) = @_;
@@ -242,6 +236,11 @@ sub _add {
     _link($self->_parse("$new"), $parent);
 
   return $self;
+}
+
+sub _content {
+  my $tree = shift->tree;
+  return _text(_elements($tree), shift, _trim($tree, @_));
 }
 
 sub _elements {

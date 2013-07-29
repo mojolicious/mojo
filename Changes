@@ -1,6 +1,7 @@
 
 4.22  2013-07-30
   - Improved Mojo::Server to use FindBin more defensively.
+  - Fixed partial route handling in routes command.
 
 4.21  2013-07-29
   - Added strip method to Mojo::DOM.

@@ -51,7 +51,8 @@ sub _draw {
     my $format = (regexp_pattern($pattern->format_regex || ''))[0];
     my $optional
       = !$pattern->constraints->{format} || $pattern->defaults->{format};
-    $regex .= $optional ? "(?:$format)?" : $format if $format;
+    $regex .= $optional ? "(?:$format)?" : $format
+      if $format && !$node->[0]->partial;
     push @parts, $regex if $verbose;
 
     say encode('UTF-8', join('  ', @parts));

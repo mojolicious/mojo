@@ -87,10 +87,12 @@ any time.
   /sebastian -> /:name -> {name => 'sebastian'}
   {name => 'sebastian'} -> /:name -> /sebastian
 
+Every placeholder has a name, even if it's just an empty string.
+
 =head2 Generic placeholders
 
-Generic placeholders are the simplest form of placeholders and match all
-characters except C</> and C<.>.
+Generic placeholders are the simplest form of placeholders, they use a colon
+prefix and match all characters except C</> and C<.>.
 
   /hello              -> /:name/hello -> undef
   /sebastian/23/hello -> /:name/hello -> undef
@@ -109,10 +111,15 @@ surrounding text.
   /sebastian23hello  -> /(:name)hello -> {name => 'sebastian23'}
   /sebastian 23hello -> /(:name)hello -> {name => 'sebastian 23'}
 
+The colon prefix is optional for generic placeholders that are surrounded by
+parentheses.
+
+  /i♥mojolicious -> /(one)♥(two) -> {one => 'i', two => 'mojolicious'}
+
 =head2 Relaxed placeholders
 
-Relaxed placeholders are just like generic placeholders, but match all
-characters except C</>.
+Relaxed placeholders are just like generic placeholders, but use a hash prefix
+and match all characters except C</>.
 
   /hello              -> /#name/hello -> undef
   /sebastian/23/hello -> /#name/hello -> undef
@@ -123,8 +130,8 @@ characters except C</>.
 
 =head2 Wildcard placeholders
 
-Wildcard placeholders are just like the two placeholders above, but match
-absolutely everything, including C</> and C<.>.
+Wildcard placeholders are just like the two placeholders above, but use an
+asterisk prefix and match absolutely everything, including C</> and C<.>.
 
   /hello              -> /*name/hello -> undef
   /sebastian/23/hello -> /*name/hello -> {name => 'sebastian/23'}
@@ -359,7 +366,17 @@ separated by other characters than C</>.
     ->to(controller => 'foo', action => 'bar');
 
 Special stash values like C<controller> and C<action> can also be
-placeholders, this allows for extremely flexible routes constructs.
+placeholders, which is very convenient especially during development, but
+should only be used very carefully, because every controller method becomes a
+potential route. All uppercase methods as well as those starting with an
+underscore are automatically hidden from the router and you can use
+L<Mojolicious::Routes/"hide"> to add additional ones.
+
+  # Hide "create" method in all controllers
+  $r->hide('create');
+
+This has already been done for all attributes and methods from
+L<Mojolicious::Controller>.
 
 =head2 More restrictive placeholders
 
@@ -489,7 +506,7 @@ methods to pass.
   $r->route('/bye')->via('GET', 'POST')
     ->to(controller => 'foo', action => 'bye');
 
-With one small exception, C<HEAD> requests are considered equal to C<GET> and
+With one small exception, HEAD requests are considered equal to GET and
 content will not be sent with the response.
 
   # GET /test  -> {controller => 'bar', action => 'test'}
@@ -500,7 +517,7 @@ content will not be sent with the response.
 =head2 WebSockets
 
 With the method L<Mojolicious::Routes::Route/"websocket"> you can restrict
-access to WebSocket handshakes, which are normal C<GET> requests with some
+access to WebSocket handshakes, which are normal GET requests with some
 additional information.
 
   # /echo (WebSocket handshake)
@@ -520,6 +537,11 @@ additional information.
   }
 
   1;
+
+The connection gets established when you respond to the WebSocket handshake
+request with a C<101> response status, which happens automatically if you
+subscribe to an event with L<Mojolicious::Controller/"on"> or send a message
+with L<Mojolicious::Controller/"send"> right away.
 
 =head2 Bridges
 
@@ -614,9 +636,9 @@ which makes them a very powerful tool especially for plugins.
 
     # Check all requests for a "/test" prefix
     $self->hook(before_dispatch => sub {
-      my $self = shift;
-      $self->render(text => 'This request did not reach the router.')
-        if $self->req->url->path->contains('/test');
+      my $c = shift;
+      $c->render(text => 'This request did not reach the router.')
+        if $c->req->url->path->contains('/test');
     });
 
     # These will not be reached if the hook above renders a response
@@ -627,22 +649,45 @@ which makes them a very powerful tool especially for plugins.
 
   1;
 
-Post-processing tasks such as setting additional response headers are a very
-common use.
+Post-processing the response to set additional headers is a very common use.
 
   # Make sure static files are cached
   $self->hook(after_static => sub {
-    my $self = shift;
-    $self->res->headers->cache_control('max-age=3600, must-revalidate');
+    my $c = shift;
+    $c->res->headers->cache_control('max-age=3600, must-revalidate');
   });
 
-Same for monitoring tasks.
+Same for pre-processing the request.
+
+  # Allow "_method" query parameter to override request method
+  $self->hook(before_dispatch => sub {
+    my $c = shift;
+    return unless my $method = $c->req->url->query->param('_method');
+    $c->req->method($method);
+  });
+
+Or more advanced extensions to add monitoring to your application.
 
   # Forward exceptions to a web service
   $self->hook(after_dispatch => sub {
-    my $self = shift;
-    return unless my $e = $self->stash('exception');
-    $self->ua->post('https://example.com/bugs' => form => {exception => $e});
+    my $c = shift;
+    return unless my $e = $c->stash('exception');
+    $c->ua->post('https://example.com/bugs' => form => {exception => $e});
+  });
+
+You can even extend much of the core functionality.
+
+  # Make controller object available to actions as $_
+  $self->hook(around_action => sub {
+    my ($next, $c, $action, $last) = @_;
+    local $_ = $c;
+    return $next->();
+  });
+
+  # Pass route name as argument to actions
+  $self->hook(around_action => sub {
+    my ($next, $c, $action, $last) = @_;
+    return $c->$action($c->current_route);
   });
 
 For a full list of available hooks see L<Mojolicious/"hook">.
@@ -664,11 +709,19 @@ You can also add your own shortcuts to make route generation more expressive.
     # Handle GET requests
     $resource->get->to('#show')->name("show_$name");
 
+    # Handle OPTIONS requests
+    $resource->options(sub {
+      my $self = shift;
+      $self->res->headers->allow('POST, GET, OPTIONS');
+      $self->render(data => '', status => 204);
+    });
+
     return $resource;
   });
 
-  # POST /user -> {controller => 'user', action => 'create'}
-  # GET  /user -> {controller => 'user', action => 'show'}
+  # POST    /user -> {controller => 'user', action => 'create'}
+  # GET     /user -> {controller => 'user', action => 'show'}
+  # OPTIONS /user
   $r->resource('user');
 
 Shortcuts can lead to anything, routes, bridges or maybe even both. And watch

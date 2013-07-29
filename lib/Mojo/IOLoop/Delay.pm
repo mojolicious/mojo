@@ -33,18 +33,19 @@ sub _step {
   $self->{args}[$id] = [@_];
   return $self->{pending} if --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
-  my @args = (map {@$_} grep {defined} @{delete($self->{args}) || []});
+  my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
   if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }
 
-  return 0 if $self->{pending};
-  if ($self->{counter}) { $self->ioloop->timer(0 => $self->begin) }
-  else                  { $self->emit(finish => @args) }
+  if (!$self->{counter}) { $self->emit(finish => @args) }
+  elsif (!$self->{pending}) { $self->ioloop->timer(0 => $self->begin) }
   return 0;
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -64,6 +65,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
       $end->();
     });
   }
+  $delay->wait unless Mojo::IOLoop->is_running;
 
   # Sequentialize multiple events
   my $delay = Mojo::IOLoop::Delay->new;
@@ -90,8 +92,6 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
       say 'And done after 5 seconds total.';
     }
   );
-
-  # Wait for events if necessary
   $delay->wait unless Mojo::IOLoop->is_running;
 
 =head1 DESCRIPTION

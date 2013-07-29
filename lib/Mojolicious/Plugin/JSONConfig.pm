@@ -34,13 +34,15 @@ sub render {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::JSONConfig - JSON configuration plugin
 
 =head1 SYNOPSIS
 
-  # myapp.json
+  # myapp.json (it's just JSON with embedded Perl)
   {
     "foo"       : "bar",
     "music_dir" : "<%= app->home->rel_dir('music') %>"
@@ -48,15 +50,18 @@ Mojolicious::Plugin::JSONConfig - JSON configuration plugin
 
   # Mojolicious
   my $config = $self->plugin('JSONConfig');
+  say $config->{foo};
 
   # Mojolicious::Lite
   my $config = plugin 'JSONConfig';
+  say $config->{foo};
 
   # foo.html.ep
   %= $config->{foo}
 
   # The configuration is available application wide
   my $config = app->config;
+  say $config->{foo};
 
   # Everything can be customized with options
   my $config = plugin JSONConfig => {file => '/etc/myapp.conf'};

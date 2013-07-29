@@ -167,21 +167,37 @@ There is one big difference though, by calling it manually you can make sure
 that templates use the current controller object, and not the default
 controller specified with the attribute L<Mojolicious/"controller_class">.
 
+  $self->render_later;
+
+You can also disable automatic rendering with the method
+L<Mojolicious::Controller/"render_later">, which can be very useful to delay
+rendering when a non-blocking operation has to be performed first.
+
 =head2 Rendering templates
 
-The renderer will always try to detect the right template but you can also
-use the C<template> stash value to render a specific one.
+The renderer will always try to detect the right template, but you can also
+use the C<template> stash value to render a specific one. Everything before
+the last slash will be interpreted as the subdirectory path in which to find
+the template.
 
-  $self->render(template => 'foo/bar');
+  # foo/bar/baz.*.*
+  $self->render(template => 'foo/bar/baz');
 
 Choosing a specific C<format> and C<handler> is just as easy.
 
-  $self->render(template => 'foo/bar', format => 'txt', handler => 'epl');
+  # foo/bar/baz.txt.epl
+  $self->render(template => 'foo/bar/baz', format => 'txt', handler => 'epl');
 
 Because rendering a specific template is the most common task it also has a
 shortcut.
 
-  $self->render('foo/bar');
+  $self->render('foo/bar/baz');
+
+If you're not sure in advance if a template actually exists, you can also use
+the method L<Mojolicious::Controller/"render_maybe"> to try multiple
+alternatives.
+
+  $self->render_maybe('localized/baz') or $self->render('foo/bar/baz');
 
 =head2 Rendering inline templates
 
@@ -199,7 +215,7 @@ too.
 Characters can be rendered to bytes with the C<text> stash value, the given
 content will be automatically encoded to bytes.
 
-  $self->render(text => 'Hello Wörld!');
+  $self->render(text => 'I ♥ Mojolicious!');
 
 =head2 Rendering data
 
@@ -226,7 +242,8 @@ C<partial> stash value.
 No encoding will be performed, making it easy to reuse the result in other
 templates or to generate binary data.
 
-  $self->render(data => $self->render('pdf_invoice', partial => 1));
+  my $pdf = $self->render('invoice', format => 'pdf', partial => 1);
+  $self->render(data => $pdf, format => 'pdf');
 
 =head2 Status code
 
@@ -800,16 +817,17 @@ C<after_render>.
   use IO::Compress::Gzip 'gzip';
 
   hook after_render => sub {
-    my ($self, $output, $format) = @_;
+    my ($c, $output, $format) = @_;
 
     # Check if "gzip => 1" has been set in the stash
-    return unless $self->stash->{gzip};
+    return unless $c->stash->{gzip};
 
     # Check if user agent accepts GZip compression
-    return unless ($self->req->headers->accept_encoding // '') =~ /gzip/i;
+    return unless ($c->req->headers->accept_encoding // '') =~ /gzip/i;
+    $c->res->headers->append(Vary => 'Accept-Encoding');
 
     # Compress content with GZip
-    $self->res->headers->content_encoding('gzip');
+    $c->res->headers->content_encoding('gzip');
     gzip $output, \my $compressed;
     $$output = $compressed;
   };
@@ -829,10 +847,10 @@ C<after_render>.
 =head2 Chunked transfer encoding
 
 For very dynamic content you might not know the response content length in
-advance, that's where the C<chunked> transfer encoding comes in handy. A
-common use would be to send the C<head> section of an HTML document to the
-browser in advance and speed up preloading of referenced images and
-stylesheets.
+advance, that's where the C<chunked> transfer encoding and
+L<Mojolicious::Controller/"write_chunk"> come in handy. A common use would be
+to send the C<head> section of an HTML document to the browser in advance and
+speed up preloading of referenced images and stylesheets.
 
   $self->write_chunk('<html><head><title>Example</title></head>' => sub {
     my $self = shift;

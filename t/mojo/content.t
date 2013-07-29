@@ -58,7 +58,7 @@ is $content->build_body,
 $content = Mojo::Content::MultiPart->new;
 is $content->boundary, undef, 'no boundary';
 $content->headers->content_type(
-  'multipart/form-data; boundary="azAZ09\'(),.:?-_+/"');
+  'multipart/form-data; boundary  =  "azAZ09\'(),.:?-_+/"');
 is $content->boundary, "azAZ09\'(),.:?-_+/", 'right boundary';
 is $content->boundary, $content->build_boundary, 'same boundary';
 $content->headers->content_type('multipart/form-data');
@@ -70,12 +70,17 @@ $content->headers->content_type('MultiPart/Form-Data; BounDaRy="foo 123"');
 is $content->boundary, 'foo 123', 'right boundary';
 is $content->boundary, $content->build_boundary, 'same boundary';
 
-# Tainted environment
-$content = Mojo::Content::MultiPart->new;
-'a' =~ /(.)/;
-ok !$content->charset, 'no charset';
-'a' =~ /(.)/;
-ok !$content->boundary, 'no boundary';
+# Charset detection
+$content = Mojo::Content::Single->new;
+is $content->charset, undef, 'no charset';
+$content->headers->content_type('text/plain; charset=UTF-8');
+is $content->charset, 'UTF-8', 'right charset';
+$content->headers->content_type('text/plain; charset="UTF-8"');
+is $content->charset, 'UTF-8', 'right charset';
+$content->headers->content_type('text/plain; charset  =  UTF-8');
+is $content->charset, 'UTF-8', 'right charset';
+$content->headers->content_type('text/plain; charset  =  "UTF-8"');
+is $content->charset, 'UTF-8', 'right charset';
 
 # Partial content with 128bit content length
 $content = Mojo::Content::Single->new;

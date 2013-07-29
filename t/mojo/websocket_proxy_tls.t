@@ -63,12 +63,12 @@ $daemon->listen([$listen])->start;
 
 # Connect proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;
-my (%buffer, $connected, $read, $sent, $fail);
+my (%buffer, $connected, $read, $sent);
 my $nf
-  = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
+  = "HTTP/1.1 501 FOO\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
   . "Connection: close\x0d\x0a\x0d\x0a";
-my $ok = "HTTP/1.0 200 OK\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
+my $ok = "HTTP/1.0 201 BAR\x0d\x0aX-Something: unimportant\x0d\x0a\x0d\x0a";
 Mojo::IOLoop->server(
   {address => '127.0.0.1', port => $proxy} => sub {
     my ($loop, $stream, $client) = @_;
@@ -88,7 +88,7 @@ Mojo::IOLoop->server(
           $buffer{$client}{client} = '';
           if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
             $connected = "$1:$2";
-            $fail = 1 if $2 == $port + 1;
+            my $fail = $2 == $port + 1;
 
             # Connection to server
             $buffer{$client}{connection} = Mojo::IOLoop->client(
@@ -151,7 +151,7 @@ my $ua = Mojo::UserAgent->new(
 my $result;
 $ua->get(
   "https://localhost:$port/" => sub {
-    $result = pop->success->body;
+    $result = pop->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -171,7 +171,7 @@ my $works;
 $ua->max_redirects(3)->get(
   "https://localhost:$port/broken_redirect" => sub {
     my ($ua, $tx) = @_;
-    $result = $tx->success->body;
+    $result = $tx->res->body;
     $works  = $tx->res->headers->header('X-Works');
     Mojo::IOLoop->stop;
   }
@@ -208,7 +208,7 @@ my ($auth, $kept_alive);
 $ua->get(
   "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
-    $result     = $tx->success->body;
+    $result     = $tx->res->body;
     $auth       = $tx->req->headers->proxy_authorization;
     $kept_alive = $tx->kept_alive;
     Mojo::IOLoop->stop;
@@ -225,7 +225,7 @@ $ua->get(
   "https://localhost:$port/proxy" => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
-    $result     = $tx->success->body;
+    $result     = $tx->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -262,7 +262,7 @@ ok $sent > 25, 'sent enough';
 $ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
 my $tx = $ua->get("https://localhost:$port/proxy");
 is $tx->res->code, 200, 'right status';
-is $tx->success->body, "https://localhost:$port/proxy", 'right content';
+is $tx->res->body, "https://localhost:$port/proxy", 'right content';
 
 # Proxy WebSocket with bad target
 $ua->https_proxy("http://localhost:$proxy");
@@ -279,5 +279,11 @@ $ua->websocket(
 Mojo::IOLoop->start;
 ok !$success, 'no success';
 is $err, 'Proxy connection failed', 'right message';
+
+# Blocking proxy request again
+$ua->https_proxy("http://localhost:$proxy");
+$tx = $ua->get("https://localhost:$port/proxy");
+is $tx->res->code, 200, 'right status';
+is $tx->res->body, "https://localhost:$port/proxy", 'right content';
 
 done_testing();

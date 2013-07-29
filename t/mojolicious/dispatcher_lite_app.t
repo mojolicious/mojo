@@ -6,72 +6,90 @@ BEGIN {
 }
 
 use Test::More;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 use Mojo::Message::Response;
 use Mojolicious::Lite;
 use Test::Mojo;
 
 # Internal redirect
 hook around_dispatch => sub {
-  my ($next, $self) = @_;
+  my ($next, $c) = @_;
   $next->();
-  if ($self->res->code == 404) {
-    $self->req->url->path($self->param('wrap') ? '/wrap/again' : '/');
-    delete $self->stash->{$_} for keys %{$self->stash};
-    $self->tx->res(Mojo::Message::Response->new);
+  if ($c->res->code == 404) {
+    $c->req->url->path($c->param('wrap') ? '/wrap/again' : '/');
+    delete $c->stash->{$_} for keys %{$c->stash};
+    $c->tx->res(Mojo::Message::Response->new);
     $next->();
   }
 };
 
 # Wrap whole application
 hook around_dispatch => sub {
-  my ($next, $self) = @_;
-  return $self->render(text => 'Wrapped again!')
-    if $self->req->url->path->contains('/wrap/again');
+  my ($next, $c) = @_;
+  return $c->render(text => 'Wrapped again!')
+    if $c->req->url->path->contains('/wrap/again');
   $next->();
 };
 
 # Wrap whole application again
 hook around_dispatch => sub {
-  my ($next, $self) = @_;
-  return $self->render(text => 'Wrapped!')
-    if $self->req->url->path->contains('/wrap');
+  my ($next, $c) = @_;
+  return $c->render(text => 'Wrapped!')
+    if $c->req->url->path->contains('/wrap');
   $next->();
 };
 
 # Custom dispatcher /hello.txt
 hook before_dispatch => sub {
-  my $self = shift;
-  $self->render(text => 'Custom static file works!')
-    if $self->req->url->path->contains('/hello.txt');
+  my $c = shift;
+  $c->render(text => 'Custom static file works!')
+    if $c->req->url->path->contains('/hello.txt');
 };
 
 # Custom dispatcher /custom
 hook before_dispatch => sub {
-  my $self = shift;
-  $self->render(text => $self->param('a'), status => 205)
-    if $self->req->url->path->contains('/custom');
+  my $c = shift;
+  $c->render(text => $c->param('a'), status => 205)
+    if $c->req->url->path->contains('/custom');
 };
 
 # Custom dispatcher /custom_too
 hook before_routes => sub {
-  my $self = shift;
-  $self->render(text => 'this works too')
-    if $self->req->url->path->contains('/custom_too');
+  my $c = shift;
+  $c->render(text => 'this works too')
+    if $c->req->url->path->contains('/custom_too');
 };
 
 # Cleared response for /res.txt
 hook before_routes => sub {
-  my $self = shift;
-  return
-    unless $self->req->url->path->contains('/res.txt')
-    && $self->param('route');
-  $self->tx->res(Mojo::Message::Response->new);
+  my $c = shift;
+  return unless $c->req->url->path->contains('/res.txt') && $c->param('route');
+  $c->tx->res(Mojo::Message::Response->new);
 };
 
 # Set additional headers for static files
 hook after_static => sub {
-  my $self = shift;
-  $self->res->headers->cache_control('max-age=3600, must-revalidate');
+  my $c = shift;
+  $c->res->headers->cache_control('max-age=3600, must-revalidate');
+};
+
+# Make controller available as $_
+hook around_action => sub {
+  my ($next, $c) = @_;
+  local $_ = $c;
+  return $next->();
+};
+
+# Plugin for rendering return values
+plugin 'AroundPlugin';
+
+# Pass argument to action
+hook around_action => sub {
+  my ($next, $c, $action) = @_;
+  return $c->$action($c->current_route);
 };
 
 # Response generating condition "res" for /res.txt
@@ -86,19 +104,21 @@ app->routes->add_condition(
   }
 );
 
-get '/' => sub { shift->render(text => 'works') };
-
 # Never called if custom dispatchers work
 get '/custom' => sub { shift->render(text => 'does not work') };
 
 # Custom response
 get '/res.txt' => (res => 1) => sub {
-  my $self = shift;
-  my $res
-    = Mojo::Message::Response->new(code => 202)->body('Custom response!');
-  $self->tx->res($res);
-  $self->rendered;
+  $_->tx->res(
+    Mojo::Message::Response->new(code => 202)->body('Custom response!'));
+  $_->rendered;
 };
+
+# Allow rendering of return value
+under '/' => {return => 1} => sub {1};
+
+# Return and render argument
+get '/' => sub { return pop } => 'works';
 
 my $t = Test::Mojo->new;
 

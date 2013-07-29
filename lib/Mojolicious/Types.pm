@@ -37,7 +37,7 @@ sub detect {
 
   # Extract and prioritize MIME types
   my %types;
-  /^\s*([^,; ]+)(?:\s*\;\s*q=(\d+(?:\.\d+)?))?\s*$/i
+  /^\s*([^,; ]+)(?:\s*\;\s*q\s*=\s*(\d+(?:\.\d+)?))?\s*$/i
     and $types{lc $1} = $2 // 1
     for split /,/, $accept // '';
   my @detected = sort { $types{$b} <=> $types{$a} } sort keys %types;
@@ -61,6 +61,8 @@ sub type {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

@@ -26,7 +26,7 @@ has handle => sub {
   my $name = $path // $base;
   until ($handle->open($name, O_CREAT | O_EXCL | O_RDWR)) {
     croak qq{Can't open file "$name": $!} if defined $path || $! != $!{EEXIST};
-    $name = "$base." . md5_sum(time . $$ . rand 9999999);
+    $name = "$base." . md5_sum(time . $$ . rand 9 x 7);
   }
   $self->path($name);
 
@@ -140,6 +140,8 @@ sub slurp {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Asset::File - File storage for HTTP content
@@ -184,7 +186,7 @@ Delete file automatically once it's not used anymore.
   my $handle = $file->handle;
   $file      = $file->handle(IO::File->new);
 
-File handle, created on demand.
+Filehandle, created on demand.
 
 =head2 path
 

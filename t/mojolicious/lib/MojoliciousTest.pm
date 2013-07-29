@@ -33,6 +33,9 @@ sub startup {
   $self->plugin('test-some_plugin2');
   $self->plugin('UPPERCASETestPlugin');
 
+  # Plugin for rendering return values
+  $self->plugin('AroundPlugin');
+
   # Templateless renderer
   $self->renderer->add_handler(
     test => sub {
@@ -135,10 +138,10 @@ sub startup {
   $r->route('/test10')->to('baz#index');
 
   # /withblock (template with blocks)
-  $r->route('/withblock')->to('foo#withblock');
+  $r->route('/withblock')->to('foo#withBlock');
 
   # /staged (authentication with bridges)
-  my $b = $r->bridge('/staged')->to(controller => 'foo', action => 'stage1');
+  my $b = $r->bridge('/staged')->to('foo#stage1', return => 1);
   $b->route->to(action => 'stage2');
 
   # /shortcut/act

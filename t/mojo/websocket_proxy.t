@@ -42,9 +42,9 @@ my $daemon = Mojo::Server::Daemon->new(app => app, silent => 1);
 my $port = Mojo::IOLoop->new->generate_port;
 $daemon->listen(["http://127.0.0.1:$port"])->start;
 
-# Connect proxy server for testing
+# CONNECT proxy server for testing
 my $proxy = Mojo::IOLoop->generate_port;
-my (%buffer, $connected, $read, $sent, $fail);
+my (%buffer, $connected, $read, $sent);
 my $nf
   = "HTTP/1.1 404 NOT FOUND\x0d\x0a"
   . "Content-Length: 0\x0d\x0a"
@@ -69,7 +69,7 @@ Mojo::IOLoop->server(
           $buffer{$client}{client} = '';
           if ($buffer =~ /CONNECT (\S+):(\d+)?/) {
             $connected = "$1:$2";
-            $fail = 1 if $2 == $port + 1;
+            my $fail = $2 == $port + 1;
 
             # Connection to server
             $buffer{$client}{connection} = Mojo::IOLoop->client(
@@ -124,7 +124,7 @@ Mojo::IOLoop->server(
 my $result;
 $ua->get(
   "http://localhost:$port/" => sub {
-    $result = pop->success->body;
+    $result = pop->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -158,7 +158,7 @@ $ua->get(
   'http://example.com/proxy' => sub {
     my ($ua, $tx) = @_;
     $kept_alive = $tx->kept_alive;
-    $result     = $tx->success->body;
+    $result     = $tx->res->body;
     Mojo::IOLoop->stop;
   }
 );
@@ -190,7 +190,7 @@ is $result, 'test1test2', 'right result';
 # Blocking proxy request
 my $tx = $ua->get('http://example.com/proxy');
 is $tx->res->code, 200, 'right status';
-is $tx->success->body, 'http://example.com/proxy', 'right content';
+is $tx->res->body, 'http://example.com/proxy', 'right content';
 
 # Proxy WebSocket
 $ua = Mojo::UserAgent->new(http_proxy => "http://localhost:$proxy");

@@ -1,14 +1,15 @@
 package Mojo::Cookie::Request;
 use Mojo::Base 'Mojo::Cookie';
 
-use Mojo::Util 'quote';
+use Mojo::Util qw(quote split_header);
 
 sub parse {
   my ($self, $str) = @_;
 
   my @cookies;
-  for my $token (map {@$_} $self->_tokenize($str // '')) {
-    my ($name, $value) = @$token;
+  my @pairs = map {@$_} @{split_header($str // '')};
+  while (@pairs) {
+    my ($name, $value) = (shift @pairs, shift @pairs);
     next if $name =~ /^\$/;
     push @cookies, $self->new(name => $name, value => $value // '');
   }
@@ -20,11 +21,13 @@ sub to_string {
   my $self = shift;
   return '' unless my $name = $self->name;
   my $value = $self->value // '';
-  $value = $value =~ /[,;"]/ ? quote($value) : $value;
+  $value = $value =~ /[,;" ]/ ? quote($value) : $value;
   return "$name=$value";
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

@@ -102,6 +102,8 @@ sub _values {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Routes::Match - Find routes

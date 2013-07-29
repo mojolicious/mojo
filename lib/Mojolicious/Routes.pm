@@ -59,7 +59,6 @@ sub dispatch {
     }
   }
 
-  # Dispatch
   return undef unless $self->_walk($c);
   $self->auto_render($c);
   return 1;
@@ -69,8 +68,8 @@ sub hide { push @{shift->hidden}, @_ }
 
 sub is_hidden {
   my ($self, $method) = @_;
-  my $hiding = $self->{hiding} ||= {map { $_ => 1 } @{$self->hidden}};
-  return !!($hiding->{$method} || index($method, '_') == 0);
+  my $h = $self->{hiding} ||= {map { $_ => 1 } @{$self->hidden}};
+  return !!($h->{$method} || index($method, '_') == 0 || $method !~ /[a-z]/);
 }
 
 sub lookup {
@@ -85,6 +84,8 @@ sub route {
   shift->add_child(Mojolicious::Routes::Route->new(@_))->children->[-1];
 }
 
+sub _action { shift->plugins->emit_chain(around_action => @_) }
+
 sub _add {
   my ($self, $attr, $name, $cb) = @_;
   $self->$attr->{$name} = $cb;
@@ -92,11 +93,11 @@ sub _add {
 }
 
 sub _callback {
-  my ($self, $c, $field, $nested) = @_;
+  my ($self, $c, $field, $last) = @_;
   $c->stash->{'mojo.routed'}++;
-  $c->app->log->debug('Routing to a callback.');
-  my $continue = $field->{cb}->($c);
-  return !$nested || $continue ? 1 : undef;
+  my $app = $c->app;
+  $app->log->debug('Routing to a callback.');
+  return _action($app, $c, $field->{cb}, $last);
 }
 
 sub _class {
@@ -140,43 +141,44 @@ sub _class {
 }
 
 sub _controller {
-  my ($self, $c, $field, $nested) = @_;
+  my ($self, $old, $field, $last) = @_;
 
   # Load and instantiate controller/application
-  my $app;
-  unless ($app = $self->_class($c, $field)) { return defined $app ? 1 : undef }
+  my $new;
+  unless ($new = $self->_class($old, $field)) { return !!defined $new }
 
   # Application
-  my $continue;
-  my $class = ref $app;
-  my $log   = $c->app->log;
-  if (my $sub = $app->can('handler')) {
+  my $class = ref $new;
+  my $app   = $old->app;
+  my $log   = $app->log;
+  if (my $sub = $new->can('handler')) {
     $log->debug(qq{Routing to application "$class".});
 
     # Try to connect routes
-    if (my $sub = $app->can('routes')) {
-      my $r = $app->$sub;
-      weaken $r->parent($c->match->endpoint)->{parent} unless $r->parent;
+    if (my $sub = $new->can('routes')) {
+      my $r = $new->$sub;
+      weaken $r->parent($old->match->endpoint)->{parent} unless $r->parent;
     }
-    $app->$sub($c);
-    $c->stash->{'mojo.routed'}++;
+    $new->$sub($old);
+    $old->stash->{'mojo.routed'}++;
   }
 
   # Action
-  elsif (my $method = $self->_method($c, $field)) {
-    $log->debug(qq{Routing to controller "$class" and action "$method".});
+  elsif (my $method = $field->{action}) {
+    if (!$self->is_hidden($method)) {
+      $log->debug(qq{Routing to controller "$class" and action "$method".});
 
-    # Try to call action
-    if (my $sub = $app->can($method)) {
-      $c->stash->{'mojo.routed'}++ unless $nested;
-      $continue = $app->$sub;
+      if (my $sub = $new->can($method)) {
+        $old->stash->{'mojo.routed'}++ if $last;
+        return 1 if _action($app, $new, $sub, $last);
+      }
+
+      else { $log->debug('Action not found in controller.') }
     }
-
-    # Action not found
-    else { $log->debug('Action not found in controller.') }
+    else { $log->debug(qq{Action "$method" is not allowed.}) }
   }
 
-  return !$nested || $continue ? 1 : undef;
+  return undef;
 }
 
 sub _load {
@@ -189,21 +191,6 @@ sub _load {
   # Check base classes
   return 0 unless first { $app->isa($_) } @{$self->base_classes};
   return ++$self->{loaded}{$app};
-}
-
-sub _method {
-  my ($self, $c, $field) = @_;
-
-  # Hidden
-  return undef unless my $method = $field->{action};
-  $c->app->log->debug(qq{Action "$method" is not allowed.}) and return undef
-    if $self->is_hidden($method);
-
-  # Invalid
-  $c->app->log->debug(qq{Action "$method" is invalid.}) and return undef
-    unless $method =~ /^[a-zA-Z0-9_:]+$/;
-
-  return $method;
 }
 
 sub _walk {
@@ -220,11 +207,10 @@ sub _walk {
     my @keys = keys %$field;
     @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
 
-    # Dispatch
     my $continue
       = $field->{cb}
-      ? $self->_callback($c, $field, $nested)
-      : $self->_controller($c, $field, $nested);
+      ? $self->_callback($c, $field, !$nested)
+      : $self->_controller($c, $field, !$nested);
 
     # Break the chain
     return undef if $nested && !$continue;
@@ -235,6 +221,8 @@ sub _walk {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Routes - Always find your destination with routes!
@@ -243,38 +231,15 @@ Mojolicious::Routes - Always find your destination with routes!
 
   use Mojolicious::Routes;
 
-  # New route tree
+  # Simple route
   my $r = Mojolicious::Routes->new;
+  $r->route('/')->to(controller => 'blog', action => 'welcome');
 
-  # Normal route matching "/articles" with parameters "controller" and
-  # "action"
-  $r->route('/articles')->to(controller => 'article', action => 'list');
-
-  # Route with a placeholder matching everything but "/" and "."
-  $r->route('/:controller')->to(action => 'list');
-
-  # Route with a placeholder and regex constraint
-  $r->route('/articles/:id', id => qr/\d+/)
-    ->to(controller => 'article', action => 'view');
-
-  # Route with an optional parameter "year"
-  $r->route('/archive/:year')
-    ->to(controller => 'archive', action => 'list', year => undef);
-
-  # Nested route for two actions sharing the same "controller" parameter
-  my $books = $r->route('/books/:id')->to(controller => 'book');
-  $books->route('/edit')->to(action => 'edit');
-  $books->route('/delete')->to(action => 'delete');
-
-  # Bridges can be used to chain multiple routes
-  $r->bridge->to(controller => 'foo', action =>'auth')
-    ->route('/blog')->to(action => 'list');
-
-  # Simplified Mojolicious::Lite style route generation is also possible
-  $r->get('/')->to(controller => 'blog', action => 'welcome');
+  # More advanced routes
   my $blog = $r->under('/blog');
-  $blog->post('/list')->to('blog#list');
-  $blog->get(sub { shift->render(text => 'Go away!') });
+  $blog->get('/list')->to('blog#list');
+  $blog->get('/:id' => [id => qr/\d+/])->to('blog#show', id => 23);
+  $blog->patch(sub { shift->render(text => 'Go away!', status => 405) });
 
 =head1 DESCRIPTION
 
@@ -317,7 +282,7 @@ Contains all available conditions.
   my $hidden = $r->hidden;
   $r         = $r->hidden([qw(attr has new)]);
 
-Controller methods and attributes that are hidden from router, defaults to
+Controller attributes and methods that are hidden from router, defaults to
 C<attr>, C<has>, C<new> and C<tap>.
 
 =head2 namespaces
@@ -370,13 +335,13 @@ Match routes with L<Mojolicious::Routes::Match> and dispatch.
 
   $r = $r->hide(qw(foo bar));
 
-Hide controller methods and attributes from router.
+Hide controller attributes and methods from router.
 
 =head2 is_hidden
 
   my $success = $r->is_hidden('foo');
 
-Check if controller method or attribute is hidden from router.
+Check if controller attribute or method is hidden from router.
 
 =head2 lookup
 

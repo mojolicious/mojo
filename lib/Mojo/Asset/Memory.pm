@@ -55,6 +55,8 @@ sub slurp { shift->{content} }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Asset::Memory - In-memory storage for HTTP content

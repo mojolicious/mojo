@@ -9,6 +9,8 @@ BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 require Mojolicious::Commands;
 Mojolicious::Commands->start_app('Mojo::HelloWorld');
 
+=encoding utf8
+
 =head1 NAME
 
 mojo - The Mojolicious command system

@@ -46,40 +46,36 @@ sub trace {
 }
 
 sub _context {
-  my ($self, $line, $lines) = @_;
-
-  # Wrong file
-  return unless defined $lines->[0][$line - 1];
+  my ($self, $num, $lines) = @_;
 
   # Line
-  $self->line([$line]);
-  for my $l (@$lines) {
-    chomp(my $code = $l->[$line - 1]);
+  return unless defined $lines->[0][$num - 1];
+  $self->line([$num]);
+  for my $line (@$lines) {
+    chomp(my $code = $line->[$num - 1]);
     push @{$self->line}, $code;
   }
 
   # Before
   for my $i (2 .. 6) {
-    last if ((my $previous = $line - $i) < 0);
-    if (defined $lines->[0][$previous]) {
-      unshift @{$self->lines_before}, [$previous + 1];
-      for my $l (@$lines) {
-        chomp(my $code = $l->[$previous]);
-        push @{$self->lines_before->[0]}, $code;
-      }
+    last if ((my $previous = $num - $i) < 0);
+    next unless defined $lines->[0][$previous];
+    unshift @{$self->lines_before}, [$previous + 1];
+    for my $line (@$lines) {
+      chomp(my $code = $line->[$previous]);
+      push @{$self->lines_before->[0]}, $code;
     }
   }
 
   # After
   for my $i (0 .. 4) {
-    next if ((my $next = $line + $i) < 0);
-    if (defined $lines->[0][$next]) {
-      push @{$self->lines_after}, [$next + 1];
-      for my $l (@$lines) {
-        next unless defined(my $code = $l->[$next]);
-        chomp $code;
-        push @{$self->lines_after->[-1]}, $code;
-      }
+    next if ((my $next = $num + $i) < 0);
+    next unless defined $lines->[0][$next];
+    push @{$self->lines_after}, [$next + 1];
+    for my $line (@$lines) {
+      last unless defined(my $code = $line->[$next]);
+      chomp $code;
+      push @{$self->lines_after->[-1]}, $code;
     }
   }
 }
@@ -112,6 +108,8 @@ sub _detect {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

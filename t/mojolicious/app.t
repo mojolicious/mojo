@@ -61,13 +61,14 @@ is $t->app->static->file('hello.txt')->slurp,
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 is $t->app->secret, $t->app->moniker, 'secret defaults to moniker';
 
-# Hidden controller methods and attributes
+# Hidden controller attributes and methods
 $t->app->routes->hide('bar');
 ok !$t->app->routes->is_hidden('foo'), 'not hidden';
 ok $t->app->routes->is_hidden('bar'),              'is hidden';
 ok $t->app->routes->is_hidden('_foo'),             'is hidden';
 ok $t->app->routes->is_hidden('AUTOLOAD'),         'is hidden';
 ok $t->app->routes->is_hidden('DESTROY'),          'is hidden';
+ok $t->app->routes->is_hidden('FOO_BAR'),          'is hidden';
 ok $t->app->routes->is_hidden('app'),              'is hidden';
 ok $t->app->routes->is_hidden('attr'),             'is hidden';
 ok $t->app->routes->is_hidden('cookie'),           'is hidden';
@@ -75,12 +76,14 @@ ok $t->app->routes->is_hidden('finish'),           'is hidden';
 ok $t->app->routes->is_hidden('flash'),            'is hidden';
 ok $t->app->routes->is_hidden('handler'),          'is hidden';
 ok $t->app->routes->is_hidden('has'),              'is hidden';
+ok $t->app->routes->is_hidden('match'),            'is hidden';
 ok $t->app->routes->is_hidden('new'),              'is hidden';
 ok $t->app->routes->is_hidden('on'),               'is hidden';
 ok $t->app->routes->is_hidden('param'),            'is hidden';
 ok $t->app->routes->is_hidden('redirect_to'),      'is hidden';
 ok $t->app->routes->is_hidden('render'),           'is hidden';
 ok $t->app->routes->is_hidden('render_exception'), 'is hidden';
+ok $t->app->routes->is_hidden('render_later'),     'is hidden';
 ok $t->app->routes->is_hidden('render_maybe'),     'is hidden';
 ok $t->app->routes->is_hidden('render_not_found'), 'is hidden';
 ok $t->app->routes->is_hidden('render_static'),    'is hidden';
@@ -94,10 +97,26 @@ ok $t->app->routes->is_hidden('signed_cookie'),    'is hidden';
 ok $t->app->routes->is_hidden('stash'),            'is hidden';
 ok $t->app->routes->is_hidden('tap'),              'is hidden';
 ok $t->app->routes->is_hidden('tx'),               'is hidden';
-ok $t->app->routes->is_hidden('ua'),               'is hidden';
 ok $t->app->routes->is_hidden('url_for'),          'is hidden';
 ok $t->app->routes->is_hidden('write'),            'is hidden';
 ok $t->app->routes->is_hidden('write_chunk'),      'is hidden';
+
+# Unknown hooks
+ok !$t->app->plugins->emit_chain('does_not_exist'), 'hook has been emitted';
+ok !!$t->app->plugins->emit_hook('does_not_exist'), 'hook has been emitted';
+ok !!$t->app->plugins->emit_hook_reverse('does_not_exist'),
+  'hook has been emitted';
+
+# Custom hooks
+my $custom;
+$t->app->hook('custom_hook' => sub { $custom += shift });
+$t->app->plugins->emit_hook(custom_hook => 1);
+is $custom, 1, 'hook has been emitted';
+$t->app->plugins->emit_hook_reverse(custom_hook => 2);
+is $custom, 3, 'hook has been emitted again';
+$t->app->hook('custom_chain' => sub { return shift->() * 2 });
+$t->app->hook('custom_chain' => sub { return pop });
+is $t->app->plugins->emit_chain(custom_chain => 4), 8, 'hook has been emitted';
 
 # MojoliciousTest::Command::test_command (with abbreviation)
 is $t->app->start(qw(test_command --to)), 'works too!', 'right result';
@@ -225,8 +244,8 @@ $t->get_ok('/foo/withlayout' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Same old in green Seems to work!/);
 
-# Foo::withblock
-$t->get_ok('/foo/withblock.txt' => {'X-Test' => 'Hi there!'})->status_is(200)
+# Foo::withBlock
+$t->get_ok('/withblock.txt' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_type_isnt('text/html')
   ->content_type_is('text/plain')
   ->content_like(qr/Hello Baerbel\.\s+Hello Wolfgang\./);
@@ -405,7 +424,7 @@ $t->get_ok('/plugin/camel_case')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Welcome aboard!');
 
 # MojoliciousTestController::Foo::stage2
-$t->get_ok('/staged' => {'X-Pass' => '1'})->status_is(200)
+$t->get_ok('/staged' => {'X-Pass' => 1})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Welcome aboard!');
 
 # MojoliciousTestController::Foo::stage1

@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 has 'tree';
 
-my $ESCAPE_RE = qr/\\[^[:xdigit:]]|\\[[:xdigit:]]{1,6}/;
+my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
   \[
   ((?:$ESCAPE_RE|[\w\-])+)        # Key
@@ -367,7 +367,7 @@ sub _unescape {
   $value =~ s/\\\n//g;
 
   # Unescape Unicode characters
-  $value =~ s/\\([[:xdigit:]]{1,6})\s?/pack('U', hex $1)/ge;
+  $value =~ s/\\([0-9a-fA-F]{1,6})\s?/pack('U', hex $1)/ge;
 
   # Remove backslash
   $value =~ s/\\//g;
@@ -376,6 +376,8 @@ sub _unescape {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

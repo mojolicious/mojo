@@ -8,7 +8,7 @@ has 'xml';
 has tree => sub { ['root'] };
 
 my $ATTR_RE = qr/
-  ([^=\s>]+)       # Key
+  ([^<>=\s]+)      # Key
   (?:
     \s*=\s*
     (?:
@@ -40,10 +40,12 @@ my $TOKEN_RE = qr/
   |
     <(
       \s*
-      [^>\s]+                                       # Tag
+      [^<>\s]+                                      # Tag
       \s*
       (?:$ATTR_RE)*                                 # Attributes
     )>
+  |
+    (<)                                             # Runaway "<"
   )??
 /xis;
 
@@ -76,14 +78,19 @@ my %INLINE = map { $_ => 1 } (
 sub parse {
   my ($self, $html) = @_;
 
-  my $tree    = ['root'];
-  my $current = $tree;
+  my $current = my $tree = ['root'];
   while ($html =~ m/\G$TOKEN_RE/gcs) {
-    my ($text, $pi, $comment, $cdata, $doctype, $tag)
-      = ($1, $2, $3, $4, $5, $6);
+    my ($text, $pi, $comment, $cdata, $doctype, $tag, $runaway)
+      = ($1, $2, $3, $4, $5, $6, $11);
 
-    # Text
-    if (length $text) { push @$current, ['text', html_unescape($text)] }
+    # Text (and runaway "<")
+    $text .= '<' if defined $runaway;
+    if (length $text) {
+      $text = html_unescape $text;
+      my $sibling = $current->[-1];
+      if (ref $sibling && $sibling->[0] eq 'text') { $sibling->[1] .= $text }
+      else { push @$current, ['text', $text] }
+    }
 
     # DOCTYPE
     if ($doctype) { push @$current, ['doctype', $doctype] }
@@ -316,6 +323,8 @@ sub _start {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

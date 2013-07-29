@@ -374,15 +374,13 @@ sub stash {
   return $self;
 }
 
-sub ua { shift->app->ua }
-
 sub url_for {
   my $self = shift;
   my $target = shift // '';
 
   # Absolute URL
   return $target if Scalar::Util::blessed $target && $target->isa('Mojo::URL');
-  return Mojo::URL->new($target) if $target =~ m!^\w+://!;
+  return Mojo::URL->new($target) if $target =~ m!^(?:[^:/?#]+:|//)!;
 
   # Base
   my $url  = Mojo::URL->new;
@@ -404,12 +402,6 @@ sub url_for {
   else {
     my ($generated, $ws) = $self->match->path_for($target, @_);
     $path->parse($generated) if $generated;
-
-    # Fix trailing slash
-    $path->trailing_slash(1)
-      if (!$target || $target eq 'current') && $req->url->path->trailing_slash;
-
-    # Fix scheme for WebSockets
     $base->scheme($base->protocol eq 'https' ? 'wss' : 'ws') if $ws;
   }
 
@@ -562,7 +554,9 @@ Data storage persistent only for the next request, stored in the C<session>.
   my $cb = $c->on(finish => sub {...});
 
 Subscribe to events of C<tx>, which is usually a L<Mojo::Transaction::HTTP> or
-L<Mojo::Transaction::WebSocket> object.
+L<Mojo::Transaction::WebSocket> object. Note that this method will
+automatically respond to WebSocket handshake requests with a C<101> response
+status.
 
   # Do something after the transaction has been finished
   $c->on(finish => sub {
@@ -601,7 +595,9 @@ L<Mojo::Transaction::WebSocket> object.
 Access GET/POST parameters, file uploads and route placeholder values that are
 not reserved stash values. Note that this method is context sensitive in some
 cases and therefore needs to be used with care, there can always be multiple
-values, which might have unexpected consequences.
+values, which might have unexpected consequences. Parts of the request body
+need to be loaded into memory to parse POST parameters, so you have to make
+sure it is not excessively large.
 
   # List context is ambiguous and should be avoided
   my $hash = {foo => $self->param('foo')};
@@ -625,10 +621,10 @@ For more control you can also access request information directly.
 
 =head2 redirect_to
 
-  $c = $c->redirect_to('named');
   $c = $c->redirect_to('named', foo => 'bar');
-  $c = $c->redirect_to('/path');
-  $c = $c->redirect_to('http://127.0.0.1/foo/bar');
+  $c = $c->redirect_to('named', {foo => 'bar'});
+  $c = $c->redirect_to('/perldoc');
+  $c = $c->redirect_to('http://mojolicio.us/perldoc');
 
 Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
 
@@ -731,7 +727,9 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $host     = $c->req->url->to_abs->host;
   my $agent    = $c->req->headers->user_agent;
   my $body     = $c->req->body;
+  my $hash     = $c->req->json;
   my $foo      = $c->req->json('/23/foo');
+  my $dom      = $c->req->dom;
   my $bar      = $c->req->dom('div.bar')->first->text;
 
 =head2 res
@@ -778,7 +776,9 @@ is set to the value C<XMLHttpRequest>.
   $c = $c->send($chars => sub {...});
 
 Send message or frame non-blocking via WebSocket, the optional drain callback
-will be invoked once all data has been written.
+will be invoked once all data has been written. Note that this method will
+automatically respond to WebSocket handshake requests with a C<101> response
+status.
 
   # Send "Text" message
   $c->send('I ♥ Mojolicious!');
@@ -792,6 +792,12 @@ will be invoked once all data has been written.
 
   # Send "Ping" frame
   $c->send([1, 0, 0, 0, 9, 'Hello World!']);
+
+  # Make sure previous message has been written before continuing
+  $c->send('First message!' => sub {
+    my $c = shift;
+    $c->send('Second message!');
+  });
 
 For mostly idle WebSockets you might also want to increase the inactivity
 timeout, which usually defaults to C<15> seconds.
@@ -852,38 +858,6 @@ that all stash values with a C<mojo.*> prefix are reserved for internal use.
   # Remove value
   my $foo = delete $c->stash->{foo};
 
-=head2 ua
-
-  my $ua = $c->ua;
-
-Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
-
-  # Longer version
-  my $ua = $c->app->ua;
-
-  # Blocking
-  my $tx = $c->ua->get('http://example.com');
-  my $tx = $c->ua->post('example.com/login' => form => {user => 'mojo'});
-
-  # Non-blocking
-  $c->ua->get('http://example.com' => sub {
-    my ($ua, $tx) = @_;
-    $c->render(data => $tx->res->body);
-  });
-
-  # Parallel non-blocking
-  my $delay = Mojo::IOLoop->delay(sub {
-    my ($delay, @titles) = @_;
-    $c->render(json => \@titles);
-  });
-  for my $url ('http://mojolicio.us', 'https://metacpan.org') {
-    my $end = $delay->begin(0);
-    $c->ua->get($url => sub {
-      my ($ua, $tx) = @_;
-      $end->($tx->res->dom->html->head->title->text);
-    });
-  }
-
 =head2 url_for
 
   my $url = $c->url_for;
@@ -892,7 +866,9 @@ Get L<Mojo::UserAgent> object from L<Mojo/"ua">.
   my $url = $c->url_for('test', name => 'sebastian');
   my $url = $c->url_for('test', {name => 'sebastian'});
   my $url = $c->url_for('/perldoc');
+  my $url = $c->url_for('//mojolicio.us/perldoc');
   my $url = $c->url_for('http://mojolicio.us/perldoc');
+  my $url = $c->url_for('mailto:sri@example.com');
 
 Generate a portable L<Mojo::URL> object with base for a route, path or URL.
 

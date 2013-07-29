@@ -162,6 +162,8 @@ sub _write {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Transaction::HTTP - HTTP transaction

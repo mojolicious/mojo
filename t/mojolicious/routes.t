@@ -193,6 +193,14 @@ is $second->render('', {}), '/second', 'right result';
 $target->add_child($first)->add_child($second);
 is $second->render('', {}), '/target/second', 'right result';
 
+# /missing/*/name
+# /missing/too
+# /missing/too/test
+$r->route('/missing/:/name')->to('missing#placeholder');
+$r->route('/missing/*/name')->to('missing#wildcard');
+$r->route('/missing/too/*', '' => ['test'])
+  ->to('missing#too', '' => 'missing');
+
 # Cached lookup
 my $fast = $r->route('/fast');
 is $r->find('fast'),   $fast, 'fast route found';
@@ -809,5 +817,37 @@ is $m->path_for, '/source/third', 'right path';
 $m = Mojolicious::Routes::Match->new(root => $r);
 $m->match($c => {method => 'GET', path => '/target/third'});
 is_deeply $m->stack, [], 'empty stack';
+
+# Nameless placeholder
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/missing/foo/name'});
+is_deeply $m->stack,
+  [{controller => 'missing', action => 'placeholder', '' => 'foo'}],
+  'right structure';
+is $m->path_for, '/missing/foo/name', 'right path';
+is $m->path_for('' => 'bar'), '/missing/bar/name', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/missing/foo/bar/name'});
+is_deeply $m->stack,
+  [{controller => 'missing', action => 'wildcard', '' => 'foo/bar'}],
+  'right structure';
+is $m->path_for, '/missing/foo/bar/name', 'right path';
+is $m->path_for('' => 'bar/baz'), '/missing/bar/baz/name', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/missing/too/test'});
+is_deeply $m->stack,
+  [{controller => 'missing', action => 'too', '' => 'test'}],
+  'right structure';
+is $m->path_for, '/missing/too/test', 'right path';
+is $m->path_for('' => 'bar/baz'), '/missing/too/bar/baz', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/missing/too/tset'});
+is_deeply $m->stack, [], 'empty stack';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/missing/too'});
+is_deeply $m->stack,
+  [{controller => 'missing', action => 'too', '' => 'missing'}],
+  'right structure';
+is $m->path_for, '/missing/too', 'right path';
 
 done_testing();

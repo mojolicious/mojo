@@ -52,10 +52,7 @@ sub stage1 {
   return undef;
 }
 
-sub stage2 {
-  my $self = shift;
-  $self->render(text => $self->some_plugin);
-}
+sub stage2 { return shift->some_plugin }
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }
 
@@ -74,9 +71,9 @@ sub url_for_missing {
 
 sub willdie { die 'for some reason' }
 
-sub withblock { shift->render(template => 'withblock') }
+sub withBlock { shift->render(template => 'withblock') }
 
-sub withlayout { shift->stash(template => 'withlayout') }
+sub withlayout { shift->stash(template => 'WithGreenLayout') }
 
 1;
 __DATA__

@@ -7,13 +7,15 @@ sub register { croak 'Method "register" not implemented by subclass' }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin - Plugin base class
 
 =head1 SYNOPSIS
 
-  # Camel case plugin name
+  # CamelCase plugin name
   package Mojolicious::Plugin::MyPlugin;
   use Mojo::Base 'Mojolicious::Plugin';
 

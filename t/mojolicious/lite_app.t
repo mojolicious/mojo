@@ -39,7 +39,8 @@ app->types->type(txt => 'text/plain;charset=UTF-8');
 
 get '/☃' => sub {
   my $self = shift;
-  $self->render(text => $self->url_for . $self->url_for('current'));
+  $self->render(
+    text => $self->url_for . $self->url_for({}) . $self->url_for('current'));
 };
 
 get '/uni/aäb' => sub {
@@ -359,7 +360,7 @@ get '/redirect_named' => sub {
 };
 
 get '/redirect_no_render' => sub {
-  shift->redirect_to('index', format => 'txt');
+  shift->redirect_to('index', {format => 'txt'});
 };
 
 get '/redirect_callback' => sub {
@@ -443,10 +444,8 @@ is $t->app, app->commands->app, 'applications are equal';
 is $t->app->moniker, 'lite_app', 'right moniker';
 
 # Unicode snowman
-$t->get_ok('/☃')->status_is(200)->content_is('/%E2%98%83/%E2%98%83');
-
-# Unicode snowman with trailing slash
-$t->get_ok('/☃/')->status_is(200)->content_is('/%E2%98%83//%E2%98%83/');
+$t->get_ok('/☃')->status_is(200)
+  ->content_is('/%E2%98%83/%E2%98%83/%E2%98%83');
 
 # Umlaut
 $t->get_ok('/uni/aäb')->status_is(200)->content_is('/uni/a%C3%A4b');

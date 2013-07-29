@@ -88,13 +88,15 @@ sub write_rel_file {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command - Command base class
 
 =head1 SYNOPSIS
 
-  # Lower case command name
+  # Lowercase command name
   package Mojolicious::Command::mycommand;
   use Mojo::Base 'Mojolicious::Command';
 
@@ -102,7 +104,7 @@ Mojolicious::Command - Command base class
   has description => "My first Mojo command.\n";
 
   # Short usage message
-  has usage => <<"EOF";
+  has usage => <<EOF;
   usage: $0 mycommand [OPTIONS]
 
   These options are available:

@@ -8,7 +8,7 @@ use Mojo::Asset::Memory;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::UserAgent::Transactor;
-use Mojo::Util 'encode';
+use Mojo::Util qw(b64_decode encode);
 
 # Custom content generator
 my $t = Mojo::UserAgent::Transactor->new;
@@ -34,24 +34,23 @@ is $tx->req->url->path->to_string, 'foo%2Fbar', 'right path';
 is $tx->req->method, 'GET', 'right method';
 
 # POST with header
-$tx = $t->tx(POST => 'https://mojolicio.us' => {Expect => 'nothing'});
+$tx = $t->tx(POST => 'https://mojolicio.us' => {DNT => 1});
 is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->headers->expect, 'nothing', 'right "Expect" value';
+is $tx->req->headers->dnt, 1, 'right "DNT" value';
 
 # POST with header and content
-$tx
-  = $t->tx(POST => 'https://mojolicio.us' => {Expect => 'nothing'} => 'test');
+$tx = $t->tx(POST => 'https://mojolicio.us' => {DNT => 1} => 'test');
 is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->headers->expect, 'nothing', 'right "Expect" value';
+is $tx->req->headers->dnt, 1, 'right "DNT" value';
 is $tx->req->body, 'test', 'right content';
 
 # DELETE with content
 $tx = $t->tx(DELETE => 'https://mojolicio.us' => 'test');
 is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
 is $tx->req->method, 'DELETE', 'right method';
-is $tx->req->headers->expect, undef, 'no "Expect" value';
+is $tx->req->headers->dnt, undef, 'no "DNT" value';
 is $tx->req->body, 'test', 'right content';
 
 # PUT with custom content generator
@@ -408,9 +407,10 @@ ok !$tx->is_websocket, 'not a WebSocket';
 is $tx->req->url->to_abs, 'http://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
-ok $tx->req->headers->sec_websocket_key, 'has "Sec-WebSocket-Key" value';
-ok $tx->req->headers->sec_websocket_protocol,
-  'has "Sec-WebSocket-Protocol" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
+ok !$tx->req->headers->sec_websocket_protocol,
+  'no "Sec-WebSocket-Protocol" header';
 ok $tx->req->headers->sec_websocket_version,
   'has "Sec-WebSocket-Version" value';
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
@@ -420,14 +420,44 @@ $tx = $t->upgrade($tx);
 ok $tx->is_websocket, 'is a WebSocket';
 
 # WebSocket handshake with header
-$tx = $t->websocket('wss://127.0.0.1:3000/echo' => {Expect => 'foo'});
+$tx = $t->websocket('wss://127.0.0.1:3000/echo' => {DNT => 1});
 is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->headers->expect,     'foo',     'right "Upgrade" value';
+is $tx->req->headers->dnt,        1,         'right "DNT" value';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
-ok $tx->req->headers->sec_websocket_key, 'has "Sec-WebSocket-Key" value';
-ok $tx->req->headers->sec_websocket_protocol,
-  'has "Sec-WebSocket-Protocol" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
+ok !$tx->req->headers->sec_websocket_protocol,
+  'no "Sec-WebSocket-Protocol" header';
+ok $tx->req->headers->sec_websocket_version,
+  'has "Sec-WebSocket-Version" value';
+is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
+
+# WebSocket handshake with protocol
+$tx = $t->websocket('wss://127.0.0.1:3000/echo' => ['foo']);
+is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
+is $tx->req->headers->sec_websocket_protocol, 'foo',
+  'right "Sec-WebSocket-Protocol" value';
+ok $tx->req->headers->sec_websocket_version,
+  'has "Sec-WebSocket-Version" value';
+is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';
+
+# WebSocket handshake with header and protocols
+$tx = $t->websocket('wss://127.0.0.1:3000/echo' => {DNT => 1} =>
+    ['v1.bar.example.com', 'foo', 'v2.baz.example.com']);
+is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->dnt,        1,         'right "DNT" value';
+is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
+is $tx->req->headers->sec_websocket_protocol,
+  'v1.bar.example.com, foo, v2.baz.example.com',
+  'right "Sec-WebSocket-Protocol" value';
 ok $tx->req->headers->sec_websocket_version,
   'has "Sec-WebSocket-Version" value';
 is $tx->req->headers->upgrade, 'websocket', 'right "Upgrade" value';

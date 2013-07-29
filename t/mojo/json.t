@@ -29,10 +29,8 @@ is_deeply $array, ['-122.026020'], 'decode [ -122.026020 ]';
 $array = $json->decode('[ -122.026020 ]');
 is_deeply $array, ['-122.02602'], 'decode [ -122.026020 ]';
 $array = $json->decode('[0.0]');
-isa_ok $array, 'ARRAY', 'decode [0.0]';
 cmp_ok $array->[0], '==', 0, 'value is 0';
 $array = $json->decode('[0e0]');
-isa_ok $array, 'ARRAY', 'decode [0e0]';
 cmp_ok $array->[0], '==', 0, 'value is 0';
 $array = $json->decode('[1,-2]');
 is_deeply $array, [1, -2], 'decode [1,-2]';
@@ -43,7 +41,6 @@ is_deeply $array, [10000000000000, [2]], 'decode [10e12 , [2 ]]';
 $array = $json->decode('[37.7668 , [ 20 ]] ');
 is_deeply $array, [37.7668, [20]], 'decode [37.7668 , [ 20 ]] ';
 $array = $json->decode('[1e3]');
-isa_ok $array, 'ARRAY', 'decode [1e3]';
 cmp_ok $array->[0], '==', 1e3, 'value is 1e3';
 
 # Decode name
@@ -228,10 +225,15 @@ $hash = $json->decode('{"foo": 1, "foo": 2}');
 is_deeply $hash, {foo => 2}, 'decode {"foo": 1, "foo": 2}';
 
 # Complicated roudtrips
+$bytes = '{"":""}';
+$hash  = $json->decode($bytes);
+is_deeply $hash, {'' => ''}, 'decode {"":""}';
+is $json->encode($hash), $bytes, 're-encode';
 $bytes = '[null,false,true,"",0,1]';
 $array = $json->decode($bytes);
-isa_ok $array, 'ARRAY', 'decode [null,false,true,"",0,1]';
-is $json->encode($array), $bytes, 'reencode';
+is_deeply $array, [undef, Mojo::JSON->false, Mojo::JSON->true, '', 0, 1],
+  'decode [null,false,true,"",0,1]';
+is $json->encode($array), $bytes, 're-encode';
 $array = [undef, 0, 1, '', Mojo::JSON->true, Mojo::JSON->false];
 $bytes = $json->encode($array);
 ok $bytes, 'defined value';

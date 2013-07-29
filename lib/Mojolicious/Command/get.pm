@@ -8,9 +8,10 @@ use Mojo::JSON;
 use Mojo::JSON::Pointer;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
+use Scalar::Util 'weaken';
 
 has description => "Perform HTTP request.\n";
-has usage       => <<"EOF";
+has usage       => <<EOF;
 usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
 
   mojo get /
@@ -23,7 +24,7 @@ usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
   mojo get mojolicio.us a attr href
   mojo get mojolicio.us '*' attr id
   mojo get mojolicio.us 'h1, h2, h3' 3 text
-  mojo get http://search.twitter.com/search.json /error
+  mojo get https://api.metacpan.org/v0/author/SRI /name
 
 These options are available:
   -C, --charset <charset>     Charset of HTML/XML content, defaults to auto
@@ -54,52 +55,30 @@ sub run {
   my %headers;
   /^\s*([^:]+)\s*:\s*(.+)$/ and $headers{$1} = $2 for @headers;
 
-  # Use global event loop singleton
+  # Detect proxy for absolute URLs
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+  $url !~ m!^/! ? $ua->detect_proxy : $ua->app($self->app);
   $ua->max_redirects(10) if $redirect;
 
-  # Detect proxy for absolute URLs
-  if   ($url !~ m!^/!) { $ua->detect_proxy }
-  else                 { $ua->app($self->app) }
-
-  # Do the real work with "start" event
-  my $v = my $buffer = '';
+  my $buffer = '';
   $ua->on(
     start => sub {
       my ($ua, $tx) = @_;
 
-      # Verbose callback
-      my $v  = $verbose;
-      my $cb = sub {
-        my $res = shift;
+      # Verbose
+      weaken $tx;
+      $tx->res->content->on(
+        body => sub {
+          warn $tx->req->$_ for qw(build_start_line build_headers);
+          warn $tx->res->$_ for qw(build_start_line build_headers);
+        }
+      ) if $verbose;
 
-        # Wait for headers
-        return unless $v && $res->headers->is_finished;
-        $v = undef;
-
-        # Show request
-        my $req         = $tx->req;
-        my $startline   = $req->build_start_line;
-        my $req_headers = $req->build_headers;
-        warn "$startline$req_headers";
-
-        # Show response
-        my $version     = $res->version;
-        my $code        = $res->code;
-        my $msg         = $res->message;
-        my $res_headers = $res->headers->to_string;
-        warn "HTTP/$version $code $msg\n$res_headers\n\n";
-      };
-      $tx->res->on(progress => $cb);
-
-      # Stream content
+      # Stream content (ignore redirects)
       $tx->res->content->unsubscribe('read')->on(
         read => sub {
-          $cb->(my $res = shift);
-
-          # Ignore intermediate content
-          return if $redirect && $res->is_status_class(300);
-          defined $selector ? ($buffer .= pop) : print(pop);
+          return if $redirect && $tx->res->is_status_class(300);
+          defined $selector ? ($buffer .= pop) : print pop;
         }
       );
     }
@@ -130,10 +109,7 @@ sub _json {
   say $json->encode($data);
 }
 
-sub _say {
-  return unless length(my $value = shift);
-  say encode('UTF-8', $value);
-}
+sub _say { say encode('UTF-8', $_[0]) if length $_[0] }
 
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;
@@ -159,7 +135,7 @@ sub _select {
     # Attribute
     elsif ($command eq 'attr') {
       next unless my $name = shift @args;
-      _say($_->attrs->{$name}) for @$results;
+      _say($_->attr->{$name}) for @$results;
     }
 
     # Unknown
@@ -171,6 +147,8 @@ sub _select {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

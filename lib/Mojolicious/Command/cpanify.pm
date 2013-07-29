@@ -6,7 +6,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::UserAgent;
 
 has description => "Upload distribution to CPAN.\n";
-has usage       => <<"EOF";
+has usage       => <<EOF;
 usage: $0 cpanify [OPTIONS] [FILE]
 
   mojo cpanify -u sri -p secr3t Mojolicious-Plugin-MyPlugin-0.01.tar.gz
@@ -47,6 +47,8 @@ sub run {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

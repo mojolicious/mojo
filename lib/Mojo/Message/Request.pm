@@ -9,14 +9,14 @@ has env => sub { {} };
 has method => 'GET';
 has url => sub { Mojo::URL->new };
 
-my $START_LINE_RE = qr|
+my $START_LINE_RE = qr/
   ^
-  ([a-zA-Z]+)                                  # Method
+  ([a-zA-Z]+)                                            # Method
   \s+
-  ([0-9a-zA-Z\-._~:/?#[\]\@!\$&'()*+,;=\%]+)   # Path
-  (?:\s+HTTP/(\d\.\d))?                        # Version
+  ([0-9a-zA-Z!#\$\%&'()*+,\-.\/:;=?\@[\\\]^_`\{|\}~]+)   # URL
+  (?:\s+HTTP\/(\d\.\d))?                                 # Version
   $
-|x;
+/x;
 
 sub clone {
   my $self = shift;
@@ -260,6 +260,8 @@ sub _parse_env {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Message::Request - HTTP request
@@ -385,16 +387,20 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
   my $foo   = $req->param('foo');
   my @foo   = $req->param('foo');
 
-Access C<GET> and C<POST> parameters. Note that this method caches all data,
-so it should not be called before the entire request body has been received.
+Access GET and POST parameters. Note that this method caches all data, so it
+should not be called before the entire request body has been received. Parts
+of the request body need to be loaded into memory to parse POST parameters, so
+you have to make sure it is not excessively large.
 
 =head2 params
 
   my $params = $req->params;
 
-All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object. Note
-that this method caches all data, so it should not be called before the entire
-request body has been received.
+All GET and POST parameters, usually a L<Mojo::Parameters> object. Note that
+this method caches all data, so it should not be called before the entire
+request body has been received. Parts of the request body need to be loaded
+into memory to parse POST parameters, so you have to make sure it is not
+excessively large.
 
   # Get parameter value
   say $req->params->param('foo');
@@ -422,7 +428,7 @@ Proxy URL for request.
 
   my $params = $req->query_params;
 
-All C<GET> parameters, usually a L<Mojo::Parameters> object.
+All GET parameters, usually a L<Mojo::Parameters> object.
 
   # Turn GET parameters to hash and extract value
   say $req->query_params->to_hash->{foo};

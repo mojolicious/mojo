@@ -8,14 +8,13 @@ BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 
 use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 
-GetOptions(
+GetOptions
   'f|foreground' => sub { $ENV{HYPNOTOAD_FOREGROUND} = 1 },
   'h|help'       => \my $help,
   's|stop'       => sub { $ENV{HYPNOTOAD_STOP}       = 1 },
-  't|test'       => sub { $ENV{HYPNOTOAD_TEST}       = 1 }
-);
+  't|test'       => sub { $ENV{HYPNOTOAD_TEST}       = 1 };
 
-die <<"EOF" if $help || !(my $app = shift || $ENV{HYPNOTOAD_APP});
+die <<EOF if $help || !(my $app = shift || $ENV{HYPNOTOAD_APP});
 usage: $0 [OPTIONS] [APPLICATION]
 
   hypnotoad script/myapp
@@ -31,6 +30,8 @@ EOF
 
 require Mojo::Server::Hypnotoad;
 Mojo::Server::Hypnotoad->new->run($app);
+
+=encoding utf8
 
 =head1 NAME
 

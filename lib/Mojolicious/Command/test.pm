@@ -8,7 +8,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Home;
 
 has description => "Run unit tests.\n";
-has usage       => <<"EOF";
+has usage       => <<EOF;
 usage: $0 test [OPTIONS] [TESTS]
 
 These options are available:
@@ -41,6 +41,8 @@ sub run {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

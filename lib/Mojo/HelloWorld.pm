@@ -7,6 +7,8 @@ any '/*whatever' => {whatever => '', text => 'Your Mojo is working!'};
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::HelloWorld - Hello World!

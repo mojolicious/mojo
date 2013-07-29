@@ -14,7 +14,7 @@ my $req = Mojo::Message::Request->new;
 my $finished;
 $req->on(finish => sub { $finished = shift->is_finished });
 $req->parse("GET / HTTP/1.1\x0d\x0a");
-$req->parse('Cookie: ' . ('a=b; ' x (1024 * 1024)) . "\x0d\x0a");
+$req->parse('Cookie: ' . ('a=b; ' x (1024 * 1024 * 2)) . "\x0d\x0a");
 $req->parse("Content-Length: 0\x0d\x0a\x0d\x0a");
 ok $finished, 'finish event has been emitted';
 ok $req->is_finished, 'request is finished';
@@ -55,7 +55,7 @@ is $req->body, '', 'no content';
 
 # Parse HTTP 1.1 message with content exceeding line limit
 $req = Mojo::Message::Request->new;
-is $req->max_message_size, 5242880, 'right size';
+is $req->max_message_size, 10485760, 'right size';
 $req->parse("GET / HTTP/1.1\x0d\x0a");
 $req->parse("Content-Length: 655360\x0d\x0a\x0d\x0a" . ('a=b; ' x 131072));
 ok $req->is_finished, 'request is finished';
@@ -539,47 +539,6 @@ is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
 is $req->headers->content_length, 13,           'right "Content-Length" value';
 is $req->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $buffer, 'abcdabcdefghi', 'right content';
-
-# Parse HTTP 1.1 "x-application-urlencoded"
-$req = Mojo::Message::Request->new;
-$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
-$req->parse("Content-Length: 25\x0d\x0a");
-$req->parse("Content-Type: x-application-urlencoded\x0d\x0a\x0d\x0a");
-$req->parse('foo=bar& tset=23+&foo=bar');
-ok $req->is_finished, 'request is finished';
-is $req->method,      'POST', 'right method';
-is $req->version,     '1.1', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type, 'x-application-urlencoded',
-  'right "Content-Type" value';
-ok !$req->content->asset->is_file, 'stored in memory';
-is $req->content->asset->size, 25, 'right size';
-is $req->content->asset->slurp, 'foo=bar& tset=23+&foo=bar', 'right content';
-is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
-is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
-is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
-is_deeply $req->params->to_hash->{foo}, [qw(bar bar 13)], 'right values';
-
-# Parse HTTP 1.1 "x-application-urlencoded" (too big for memory)
-$req = Mojo::Message::Request->new;
-$req->content->asset->max_memory_size(10);
-$req->parse("POST /foo/bar/baz.html?foo=13#23 HTTP/1.1\x0d\x0a");
-$req->parse("Content-Length: 25\x0d\x0a");
-$req->parse("Content-Type: x-application-urlencoded\x0d\x0a\x0d\x0a");
-$req->parse('foo=bar& tset=23+&foo=bar');
-ok $req->is_finished, 'request is finished';
-is $req->method,      'POST', 'right method';
-is $req->version,     '1.1', 'right version';
-is $req->url,         '/foo/bar/baz.html?foo=13#23', 'right URL';
-is $req->headers->content_type, 'x-application-urlencoded',
-  'right "Content-Type" value';
-ok $req->content->asset->is_file, 'stored in file';
-is $req->content->asset->size,    25, 'right size';
-is $req->content->asset->slurp,   'foo=bar& tset=23+&foo=bar', 'right content';
-is_deeply $req->body_params->to_hash->{foo}, [qw(bar bar)], 'right values';
-is $req->body_params->to_hash->{' tset'}, '23 ', 'right value';
-is $req->body_params, 'foo=bar&+tset=23+&foo=bar', 'right parameters';
-is_deeply $req->params->to_hash->{foo}, [qw(bar bar 13)], 'right values';
 
 # Parse HTTP 1.1 "application/x-www-form-urlencoded"
 $req = Mojo::Message::Request->new;
@@ -1680,7 +1639,7 @@ is $req->param('Zuname'),  '',  'right value';
 is $req->param('Text'),    '',  'right value';
 is $req->content->parts->[0]->asset->slurp, 'T', 'right content';
 
-# Google Chrome 5 multipart/form-data request (UTF-8)
+# Chrome 5 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;
 my ($fname, $sname, $sex, $avatar, $submit)
   = map { encode 'UTF-8', $_ } 'Иван', 'Иванов', 'мужской',
@@ -1934,11 +1893,12 @@ is $req->url->query->params->[0], 'Mojo::Message::Request', 'right value';
 
 # Parse lots of special characters in URL
 $req = Mojo::Message::Request->new;
-$req->parse('GET /#09azAZ-._~:/?[]@!$&\'()*+,;=% ');
+$req->parse('GET /#09azAZ!$%&\'()*+,-./:;=?@[\\]^_`{|}~ ');
 $req->parse("HTTP/1.1\x0d\x0a\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '/#09azAZ-._~:/?%5B%5D@!$&\'()*+,;=%', 'right URL';
+is $req->url,         '/#09azAZ!$%&\'()*+,-./:;=?@%5B%5C%5D%5E_%60%7B%7C%7D~',
+  'right URL';
 
 done_testing();

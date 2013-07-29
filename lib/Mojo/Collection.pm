@@ -84,6 +84,8 @@ sub uniq {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Collection - Collection
@@ -133,7 +135,8 @@ Construct a new array-based L<Mojo::Collection> object.
   my @elements = $collection->each;
   $collection  = $collection->each(sub {...});
 
-Evaluate callback for each element in collection.
+Evaluate callback for each element in collection. The element will be the
+first argument passed to the callback and is also available as C<$_>.
 
   $collection->each(sub {
     my ($e, $count) = @_;
@@ -148,7 +151,8 @@ Evaluate callback for each element in collection.
 
 Evaluate regular expression or callback for each element in collection and
 return the first one that matched the regular expression, or for which the
-callback returned true.
+callback returned true. The element will be the first argument passed to the
+callback and is also available as C<$_>.
 
   my $five = $collection->first(sub { $_ == 5 });
 
@@ -159,7 +163,8 @@ callback returned true.
 
 Evaluate regular expression or callback for each element in collection and
 create a new collection with all elements that matched the regular expression,
-or for which the callback returned true.
+or for which the callback returned true. The element will be the first
+argument passed to the callback and is also available as C<$_>.
 
   my $interesting = $collection->grep(qr/mojo/i);
 
@@ -176,7 +181,8 @@ Turn collection into L<Mojo::ByteStream>.
   my $new = $collection->map(sub {...});
 
 Evaluate callback for each element in collection and create a new collection
-from the results.
+from the results. The element will be the first argument passed to the
+callback and is also available as C<$_>.
 
   my $doubled = $collection->map(sub { $_ * 2 });
 

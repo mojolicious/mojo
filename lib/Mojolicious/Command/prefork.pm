@@ -6,7 +6,7 @@ use Mojo::Server::Prefork;
 
 has description =>
   "Start application with preforking HTTP and WebSocket server.\n";
-has usage => <<"EOF";
+has usage => <<EOF;
 usage: $0 prefork [OPTIONS]
 
 These options are available:
@@ -71,6 +71,8 @@ sub run {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

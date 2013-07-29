@@ -140,6 +140,8 @@ sub is_status_class {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Message::Response - HTTP response

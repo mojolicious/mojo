@@ -71,6 +71,8 @@ is_deeply $t->detect('text/plain', 1), ['txt'], 'right formats';
 is_deeply $t->detect('text/plain,text/html', 1), ['htm', 'html', 'txt'],
   'right formats';
 is_deeply $t->detect('TEXT/HTML; q=0.8 ', 1), ['htm', 'html'], 'right formats';
+is_deeply $t->detect('TEXT/HTML  ;  q  =  0.8 ', 1), ['htm', 'html'],
+  'right formats';
 is_deeply $t->detect('TEXT/HTML;Q=0.8,text/plain;Q=0.9', 1),
   ['txt', 'htm', 'html'], 'right formats';
 is_deeply $t->detect(' TEXT/HTML , text/plain;Q=0.9', 1),

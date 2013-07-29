@@ -61,6 +61,8 @@ sub store {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Sessions - Signed cookie based session manager
@@ -136,7 +138,7 @@ over HTTPS connections.
 =head1 METHODS
 
 L<Mojolicious::Sessions> inherits all methods from L<Mojo::Base> and
-implements the following ones.
+implements the following new ones.
 
 =head2 load
 

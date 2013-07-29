@@ -5,7 +5,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::CGI;
 
 has description => "Start application with CGI.\n";
-has usage       => <<"EOF";
+has usage       => <<EOF;
 usage: $0 cgi [OPTIONS]
 
 These options are available:
@@ -20,6 +20,8 @@ sub run {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

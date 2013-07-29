@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 
 has description => "Run code against application.\n";
-has usage       => <<"EOF";
+has usage       => <<EOF;
 usage: $0 eval [OPTIONS] CODE
 
   mojo eval 'say app->ua->get("/")->res->body'
@@ -29,6 +29,8 @@ sub run {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

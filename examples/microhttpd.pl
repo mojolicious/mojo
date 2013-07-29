@@ -25,7 +25,7 @@ Mojo::IOLoop->server(
 
           # Write a minimal HTTP response
           # (the "Hello World!" message has been optimized away!)
-          $stream->write("HTTP/1.1 200 OK\x0d\x0a"
+          $stream->write("HTTP/1.1 200 OK\x0d\x0aContent-Length: 0\x0d\x0a"
               . "Connection: keep-alive\x0d\x0a\x0d\x0a");
         }
       }
@@ -36,7 +36,7 @@ Mojo::IOLoop->server(
 
 print <<'EOF';
 Starting server on port 8080.
-Try something like "ab -c 30 -n 100000 -k http://127.0.0.1:8080/" for testing.
+Try something like "wrk -c 100 -d 10s http://127.0.0.1:8080/" for testing.
 On a MacBook Air this results in about 18k req/s.
 EOF
 

@@ -6,41 +6,15 @@ use overload
   fallback => 1;
 
 use Carp 'croak';
-use Mojo::Util 'unquote';
 
 has [qw(name value)];
 
 sub parse     { croak 'Method "parse" not implemented by subclass' }
 sub to_string { croak 'Method "to_string" not implemented by subclass' }
 
-sub _tokenize {
-  my ($self, $str) = @_;
-
-  # Nibbling parser
-  my (@tree, @token);
-  while ($str =~ s/^\s*([^=;,]+)\s*=?\s*//) {
-    my $name = $1;
-
-    # "expires" is a special case, thank you Netscape...
-    $str =~ s/^([^;,]+,?[^;,]+)/"$1"/ if $name =~ /^expires$/i;
-
-    # Value
-    my $value;
-    $value = unquote $1 if $str =~ s/^("(?:\\\\|\\"|[^"])+"|[^;,]+)\s*//;
-    push @token, [$name, $value];
-
-    # Separator
-    $str =~ s/^\s*;\s*//;
-    next unless $str =~ s/^\s*,\s*//;
-    push @tree, [@token];
-    @token = ();
-  }
-
-  # Take care of final token
-  return @token ? (@tree, \@token) : @tree;
-}
-
 1;
+
+=encoding utf8
 
 =head1 NAME
 

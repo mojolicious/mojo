@@ -20,6 +20,8 @@ sub slurp   { croak 'Method "slurp" not implemented by subclass' }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Asset - HTTP content storage base class

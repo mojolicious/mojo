@@ -8,18 +8,19 @@ BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 
 use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 
-GetOptions(
+GetOptions
   'h|help'     => \my $help,
   'l|listen=s' => \my @listen,
+  'm|mode=s'   => sub { $ENV{MOJO_MODE} = $_[1] },
   'v|verbose'  => sub { $ENV{MORBO_VERBOSE} = 1 },
-  'w|watch=s'  => \my @watch
-);
+  'w|watch=s'  => \my @watch;
 
-die <<"EOF" if $help || !(my $app = shift);
+die <<EOF if $help || !(my $app = shift);
 usage: $0 [OPTIONS] [APPLICATION]
 
   morbo script/myapp
   morbo myapp.pl
+  morbo -m production -l https://*:443
   morbo -w /usr/local/lib -w public myapp.pl
 
 These options are available:
@@ -27,6 +28,9 @@ These options are available:
   -l, --listen <location>        Set one or more locations you want to listen
                                  on, defaults to the value of MOJO_LISTEN or
                                  "http://*:3000".
+  -m, --mode <name>              Operating mode for your application, defaults
+                                 to the value of MOJO_MODE/PLACK_ENV or
+                                 "development".
   -v, --verbose                  Print details about what files changed to
                                  STDOUT.
   -w, --watch <directory/file>   Set one or more directories and files to
@@ -41,6 +45,8 @@ require Mojo::Server::Morbo;
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->watch(\@watch) if @watch;
 $morbo->run($app);
+
+=encoding utf8
 
 =head1 NAME
 

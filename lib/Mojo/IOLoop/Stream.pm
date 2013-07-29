@@ -16,11 +16,9 @@ sub new { shift->SUPER::new(handle => shift, buffer => '') }
 sub close {
   my $self = shift;
 
-  # Cleanup
-  return unless my $reactor = $self->{reactor};
+  return unless my $reactor = $self->reactor;
   return unless my $handle  = delete $self->timeout(0)->{handle};
   $reactor->remove($handle);
-
   close $handle;
   $self->emit_safe('close');
 }
@@ -41,7 +39,7 @@ sub is_readable {
 
 sub is_writing {
   my $self = shift;
-  return undef unless exists $self->{handle};
+  return undef unless $self->{handle};
   return !!length($self->{buffer}) || $self->has_subscribers('drain');
 }
 
@@ -138,6 +136,8 @@ sub _write {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

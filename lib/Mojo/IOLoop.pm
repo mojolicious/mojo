@@ -44,7 +44,7 @@ sub acceptor {
   weaken $acceptor->reactor($self->reactor)->{reactor};
   $self->{accepts} = $self->max_accepts if $self->max_accepts;
 
-  # Stop accepting so new acceptor can get picked up
+  # Allow new acceptor to get picked up
   $self->_not_accepting;
 
   return $id;
@@ -55,24 +55,18 @@ sub client {
   $self = $self->singleton unless ref $self;
 
   # Make sure timers are running
-  $self->_timers;
+  $self->_recurring;
 
-  my $id     = $self->_id;
-  my $c      = $self->{connections}{$id} ||= {};
-  my $client = $c->{client} = Mojo::IOLoop::Client->new;
+  my $id = $self->_id;
+  my $client = $self->{connections}{$id}{client} = Mojo::IOLoop::Client->new;
   weaken $client->reactor($self->reactor)->{reactor};
 
   weaken $self;
   $client->on(
     connect => sub {
-      my $handle = pop;
-
-      # Turn handle into stream
-      my $c = $self->{connections}{$id};
-      delete $c->{client};
-      my $stream = $c->{stream} = Mojo::IOLoop::Stream->new($handle);
+      delete $self->{connections}{$id}{client};
+      my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->_stream($stream => $id);
-
       $self->$cb(undef, $stream);
     }
   );
@@ -103,12 +97,7 @@ sub generate_port { Mojo::IOLoop::Server->generate_port }
 sub is_running { (ref $_[0] ? $_[0] : $_[0]->singleton)->reactor->is_running }
 sub one_tick   { (ref $_[0] ? $_[0] : $_[0]->singleton)->reactor->one_tick }
 
-sub recurring {
-  my ($self, $after, $cb) = @_;
-  $self = $self->singleton unless ref $self;
-  weaken $self;
-  return $self->reactor->recurring($after => sub { $self->$cb });
-}
+sub recurring { shift->_timer(recurring => @_) }
 
 sub remove {
   my ($self, $id) = @_;
@@ -126,19 +115,8 @@ sub server {
   weaken $self;
   $server->on(
     accept => sub {
-      my $handle = pop;
-
-      # Turn handle into stream
-      my $stream = Mojo::IOLoop::Stream->new($handle);
+      my $stream = Mojo::IOLoop::Stream->new(pop);
       $self->$cb($stream, $self->stream($stream));
-
-      # Enforce connection limit (randomize to improve load balancing)
-      $self->max_connections(0)
-        if defined $self->{accepts}
-        && ($self->{accepts} -= int(rand 2) + 1) <= 0;
-
-      # Stop accepting to release accept mutex
-      $self->_not_accepting;
     }
   );
   $server->listen(@_);
@@ -160,20 +138,20 @@ sub stream {
   my ($self, $stream) = @_;
   $self = $self->singleton unless ref $self;
 
-  # Connect stream with reactor
-  return $self->_stream($stream, $self->_id) if ref $stream;
-
   # Find stream for id
-  return undef unless my $c = $self->{connections}{$stream};
-  return $c->{stream};
+  return ($self->{connections}{$stream} || {})->{stream} unless ref $stream;
+
+  # Release accept mutex
+  $self->_not_accepting;
+
+  # Enforce connection limit (randomize to improve load balancing)
+  $self->max_connections(0)
+    if defined $self->{accepts} && ($self->{accepts} -= int(rand 2) + 1) <= 0;
+
+  return $self->_stream($stream, $self->_id);
 }
 
-sub timer {
-  my ($self, $after, $cb) = @_;
-  $self = $self->singleton unless ref $self;
-  weaken $self;
-  return $self->reactor->timer($after => sub { $self->$cb });
-}
+sub timer { shift->_timer(timer => @_) }
 
 sub _accepting {
   my $self = shift;
@@ -209,7 +187,7 @@ sub _not_accepting {
   my $self = shift;
 
   # Make sure timers are running
-  $self->_timers;
+  $self->_recurring;
 
   # Release accept mutex
   return unless delete $self->{accepting};
@@ -217,6 +195,12 @@ sub _not_accepting {
   $self->$cb;
 
   $_->stop for values %{$self->{acceptors} || {}};
+}
+
+sub _recurring {
+  my $self = shift;
+  $self->{accept} ||= $self->recurring($self->accept_interval => \&_accepting);
+  $self->{stop} ||= $self->recurring(1 => \&_stop);
 }
 
 sub _remove {
@@ -245,7 +229,7 @@ sub _stream {
   my ($self, $stream, $id) = @_;
 
   # Make sure timers are running
-  $self->_timers;
+  $self->_recurring;
 
   # Connect stream with reactor
   $self->{connections}{$id}{stream} = $stream;
@@ -257,13 +241,16 @@ sub _stream {
   return $id;
 }
 
-sub _timers {
-  my $self = shift;
-  $self->{accept} ||= $self->recurring($self->accept_interval => \&_accepting);
-  $self->{stop} ||= $self->recurring(1 => \&_stop);
+sub _timer {
+  my ($self, $method, $after, $cb) = @_;
+  $self = $self->singleton unless ref $self;
+  weaken $self;
+  return $self->reactor->$method($after => sub { $self->$cb });
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -318,16 +305,17 @@ L<Mojo::IOLoop> is a very minimalistic event loop based on L<Mojo::Reactor>,
 it has been reduced to the absolute minimal feature set required to build
 solid and scalable non-blocking TCP clients and servers.
 
-Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
-L<IO::Socket::SSL> (1.75+) are supported transparently, and used if installed.
-Individual features can also be disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS
-environment variables.
-
 The event loop will be resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>. A TLS certificate and key are also built
 right in, to make writing test servers as easy as possible. Also note that for
 convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop>
 is loaded.
+
+For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
+support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
+L<IO::Socket::SSL> (1.75+) will be used automatically if they are installed.
+Individual features can also be disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS
+environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 
@@ -463,6 +451,7 @@ event, and multiple ones as a chain of steps.
       $end->();
     });
   }
+  $delay->wait unless Mojo::IOLoop->is_running;
 
   # Sequentialize multiple events
   my $delay = Mojo::IOLoop->delay(
@@ -485,8 +474,6 @@ event, and multiple ones as a chain of steps.
     # Third step (the end)
     sub { say 'And done after 5 seconds total.' }
   );
-
-  # Wait for events if necessary
   $delay->wait unless Mojo::IOLoop->is_running;
 
 =head2 generate_port
@@ -557,6 +544,10 @@ loop object from everywhere inside the process.
   # Many methods also allow you to take shortcuts
   Mojo::IOLoop->timer(2 => sub { Mojo::IOLoop->stop });
   Mojo::IOLoop->start;
+
+  # Restart active timer
+  my $id = Mojo::IOLoop->timer(3 => sub { say 'Timeout!' });
+  Mojo::IOLoop->singleton->reactor->again($id);
 
 =head2 start
 

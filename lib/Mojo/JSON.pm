@@ -20,22 +20,22 @@ my %ESCAPE = (
   '\\'    => '\\',
   '/'     => '/',
   'b'     => "\x07",
-  'f'     => "\x0C",
-  'n'     => "\x0A",
-  'r'     => "\x0D",
+  'f'     => "\x0c",
+  'n'     => "\x0a",
+  'r'     => "\x0d",
   't'     => "\x09",
   'u2028' => "\x{2028}",
   'u2029' => "\x{2029}"
 );
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
-for (0x00 .. 0x1F, 0x7F) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
+for (0x00 .. 0x1f, 0x7f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
 # Unicode encoding detection
 my $UTF_PATTERNS = {
-  'UTF-32BE' => qr/^\0\0\0[^\0]/,
-  'UTF-16BE' => qr/^\0[^\0]\0[^\0]/,
-  'UTF-32LE' => qr/^[^\0]\0\0\0/,
-  'UTF-16LE' => qr/^[^\0]\0[^\0]\0/
+  'UTF-32BE' => qr/^\x00{3}[^\x00]/,
+  'UTF-32LE' => qr/^[^\x00]\x00{3}/,
+  'UTF-16BE' => qr/^(?:\x00[^\x00]){2}/,
+  'UTF-16LE' => qr/^(?:[^\x00]\x00){2}/
 };
 
 my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
@@ -166,13 +166,13 @@ sub _decode_string {
   my $pos = pos;
 
   # Extract string with escaped characters
-  m#\G(((?:[^\x00-\x1F\\"]|\\(?:["\\/bfnrt]|u[[:xdigit:]]{4})){0,32766})*)#gc;
+  m!\G((?:(?:[^\x00-\x1f\\"]|\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4})){0,32766})*)!gc;
   my $str = $1;
 
   # Missing quote
   unless (m/\G"/gc) {
     _exception('Unexpected character or invalid escape while parsing string')
-      if m/\G[\x00-\x1F\\]/;
+      if m/\G[\x00-\x1f\\]/;
     _exception('Unterminated string');
   }
 
@@ -195,18 +195,17 @@ sub _decode_string {
       my $ord = hex $3;
 
       # Surrogate pair
-      if (($ord & 0xF800) == 0xD800) {
+      if (($ord & 0xf800) == 0xd800) {
 
         # High surrogate
-        ($ord & 0xFC00) == 0xD800
+        ($ord & 0xfc00) == 0xd800
           or pos($_) = $pos + pos($str), _exception('Missing high-surrogate');
 
         # Low surrogate
         $str =~ m/\G\\u([Dd][C-Fc-f]..)/gc
           or pos($_) = $pos + pos($str), _exception('Missing low-surrogate');
 
-        # Pair
-        $ord = 0x10000 + ($ord - 0xD800) * 0x400 + (hex($1) - 0xDC00);
+        $ord = 0x10000 + ($ord - 0xd800) * 0x400 + (hex($1) - 0xdc00);
       }
 
       # Character
@@ -263,7 +262,7 @@ sub _encode_object {
 
 sub _encode_string {
   my $str = shift;
-  $str =~ s!([\x00-\x1F\x7F\x{2028}\x{2029}\\"/\b\f\n\r\t])!$REVERSE{$1}!gs;
+  $str =~ s!([\x00-\x1f\x7f\x{2028}\x{2029}\\"/\b\f\n\r\t])!$REVERSE{$1}!gs;
   return "\"$str\"";
 }
 
@@ -322,6 +321,8 @@ use overload '0+' => sub { ${$_[0]} }, '""' => sub { ${$_[0]} }, fallback => 1;
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::JSON - Minimalistic JSON
@@ -352,7 +353,11 @@ it for validation.
 
 It supports normal Perl data types like C<Scalar>, C<Array> reference, C<Hash>
 reference and will try to call the C<TO_JSON> method on blessed references, or
-stringify them if it doesn't exist.
+stringify them if it doesn't exist. Differentiating between strings and
+numbers in Perl is hard, depending on how it has been used, a C<Scalar> can be
+both at the same time. Since numeric comparisons on strings are very unlikely
+to happen intentionally, the numeric value always gets priority, so any
+C<Scalar> that has been used in numeric context is considered a number.
 
   [1, -2, 3]     -> [1, -2, 3]
   {"foo": "bar"} -> {foo => 'bar'}

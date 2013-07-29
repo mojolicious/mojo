@@ -1,7 +1,7 @@
 package Mojo::DOM;
 use Mojo::Base -base;
 use overload
-  '%{}'    => sub { shift->attrs },
+  '%{}'    => sub { shift->attr },
   'bool'   => sub {1},
   '""'     => sub { shift->to_xml },
   fallback => 1;
@@ -12,7 +12,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Mojo::Util 'squish';
+use Mojo::Util qw(deprecated squish);
 use Scalar::Util qw(blessed weaken);
 
 sub AUTOLOAD {
@@ -46,13 +46,13 @@ sub append { shift->_add(1, @_) }
 sub append_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
-  push @$tree, @{_parent($self->_parse("$new"), $tree)};
+  push @$tree, _link($self->_parse("$new"), $tree);
   return $self;
 }
 
 sub at { shift->find(@_)->[0] }
 
-sub attrs {
+sub attr {
   my $self = shift;
 
   # Hash
@@ -69,13 +69,18 @@ sub attrs {
   return $self;
 }
 
+# DEPRECATED in Top Hat!
+sub attrs {
+  deprecated 'Mojo::DOM::attrs is DEPRECATED in favor of Mojo::DOM::attr';
+  shift->attr(@_);
+}
+
 sub children {
   my ($self, $type) = @_;
 
   my @children;
-  my $xml  = $self->xml;
-  my $tree = $self->tree;
-  for my $e (@$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree]) {
+  my $xml = $self->xml;
+  for my $e (@{_elements($self->tree)}) {
 
     # Make sure child is the right type
     next if $e->[0] ne 'tag' || (defined $type && $e->[1] ne $type);
@@ -87,13 +92,8 @@ sub children {
 
 sub content_xml {
   my $self = shift;
-
-  # Render children individually
-  my $tree = $self->tree;
   my $xml  = $self->xml;
-  return join '',
-    map { Mojo::DOM::HTML->new(tree => $_, xml => $xml)->render }
-    @$tree[($tree->[0] eq 'root' ? 1 : 4) .. $#$tree];
+  return join '', map { _render($_, $xml) } @{_elements($self->tree)};
 }
 
 sub find {
@@ -142,7 +142,7 @@ sub prepend_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   splice @$tree, $tree->[0] eq 'root' ? 1 : 4, 0,
-    @{_parent($self->_parse("$new"), $tree)};
+    _link($self->_parse("$new"), $tree);
   return $self;
 }
 
@@ -152,27 +152,16 @@ sub remove { shift->replace('') }
 
 sub replace {
   my ($self, $new) = @_;
-
   my $tree = $self->tree;
-  if   ($tree->[0] eq 'root') { return $self->xml(undef)->parse($new) }
-  else                        { $new = $self->_parse("$new") }
-
-  my $parent = $tree->[3];
-  my $i = $parent->[0] eq 'root' ? 1 : 4;
-  for my $e (@$parent[$i .. $#$parent]) {
-    last if $e == $tree;
-    $i++;
-  }
-  splice @$parent, $i, 1, @{_parent($new, $parent)};
-
-  return $self;
+  return $self->xml(undef)->parse($new) if $tree->[0] eq 'root';
+  return $self->_replace($tree, $self->_parse("$new"));
 }
 
 sub replace_content {
   my ($self, $new) = @_;
   my $tree = $self->tree;
   splice @$tree, $tree->[0] eq 'root' ? 1 : 4, $#$tree,
-    @{_parent($self->_parse("$new"), $tree)};
+    _link($self->_parse("$new"), $tree);
   return $self;
 }
 
@@ -186,6 +175,13 @@ sub root {
   }
 
   return $self->new->tree($root)->xml($self->xml);
+}
+
+sub strip {
+  my $self = shift;
+  my $tree = $self->tree;
+  return $self if $tree->[0] eq 'root';
+  return $self->_replace($tree, ['root', @{_elements($tree)}]);
 }
 
 sub text {
@@ -258,7 +254,7 @@ sub _add {
   }
 
   # Add children
-  splice @$parent, $i + $offset, 0, @{_parent($self->_parse("$new"), $parent)};
+  splice @$parent, $i + $offset, 0, _link($self->_parse("$new"), $parent);
 
   return $self;
 }
@@ -275,7 +271,7 @@ sub _html {
   return $self;
 }
 
-sub _parent {
+sub _link {
   my ($children, $parent) = @_;
 
   # Link parent to children
@@ -288,10 +284,26 @@ sub _parent {
     push @new, $e;
   }
 
-  return \@new;
+  return @new;
 }
 
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
+
+sub _render { Mojo::DOM::HTML->new(tree => shift, xml => shift)->render }
+
+sub _replace {
+  my ($self, $tree, $new) = @_;
+
+  my $parent = $tree->[3];
+  my $i = $parent->[0] eq 'root' ? 1 : 4;
+  for my $e (@$parent[$i .. $#$parent]) {
+    last if $e == $tree;
+    $i++;
+  }
+  splice @$parent, $i, 1, _link($new, $parent);
+
+  return $self->parent;
+}
 
 sub _sibling {
   my ($self, $next) = @_;
@@ -357,6 +369,8 @@ sub _trim {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
@@ -386,6 +400,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Modify
   $dom->div->p->[1]->append('<p id="c">C</p>');
+  $dom->find(':not(p)')->pluck('strip');
 
   # Render
   say "$dom";
@@ -399,7 +414,7 @@ use it for validation.
 =head1 CASE SENSITIVITY
 
 L<Mojo::DOM> defaults to HTML semantics, that means all tags and attributes
-are lowercased and selectors need to be lower case as well.
+are lowercased and selectors need to be lowercase as well.
 
   my $dom = Mojo::DOM->new('<P ID="greeting">Hi!</P>');
   say $dom->at('p')->text;
@@ -476,12 +491,12 @@ L<Mojo::DOM::CSS> are supported.
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
 
-=head2 attrs
+=head2 attr
 
-  my $attrs = $dom->attrs;
-  my $foo   = $dom->attrs('foo');
-  $dom      = $dom->attrs({foo => 'bar'});
-  $dom      = $dom->attrs(foo => 'bar');
+  my $attrs = $dom->attr;
+  my $foo   = $dom->attr('foo');
+  $dom      = $dom->attr({foo => 'bar'});
+  $dom      = $dom->attr(foo => 'bar');
 
 Element attributes.
 
@@ -518,6 +533,7 @@ L<Mojo::DOM::CSS> are supported.
 
   # Extract information from multiple elements
   my @headers = $dom->find('h1, h2, h3')->pluck('text')->each;
+  my @links   = $dom->find('a[href]')->pluck(attr => 'href')->each;
 
 =head2 namespace
 
@@ -587,22 +603,22 @@ there are no more siblings.
 
 =head2 remove
 
-  my $old = $dom->remove;
+  my $parent = $dom->remove;
 
-Remove element and return it as a L<Mojo::DOM> object.
+Remove element and return L<Mojo::DOM> object for parent of element.
 
   # "<div></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->remove->root;
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->remove;
 
 =head2 replace
 
-  my $old = $dom->replace('<div>test</div>');
+  my $parent = $dom->replace('<div>test</div>');
 
-Replace element with HTML/XML and return the replaced element as a
-L<Mojo::DOM> object.
+Replace element with HTML/XML and return L<Mojo::DOM> object for parent of
+element.
 
   # "<div><h2>B</h2></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>')->root;
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
 
   # "<div></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('')->root;
@@ -624,6 +640,16 @@ Replace element content with HTML/XML.
   my $root = $dom->root;
 
 Return L<Mojo::DOM> object for root node.
+
+=head2 strip
+
+  my $parent = $dom->strip;
+
+Remove element while preserving its content and return L<Mojo::DOM> object for
+parent of element.
+
+  # "<div>A</div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->strip;
 
 =head2 text
 

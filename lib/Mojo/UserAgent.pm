@@ -77,6 +77,12 @@ sub need_proxy {
 sub start {
   my ($self, $tx, $cb) = @_;
 
+  # Fork safety
+  unless (($self->{pid} //= $$) eq $$) {
+    $self->_cleanup;
+    delete $self->{$_} for qw(pid port);
+  }
+
   # Non-blocking
   if ($cb) {
     warn "-- Non-blocking request (@{[$tx->req->url->to_abs]})\n" if DEBUG;
@@ -196,19 +202,19 @@ sub _connect_proxy {
     $new => sub {
       my ($self, $tx) = @_;
 
-      # CONNECT failed
-      unless (($tx->res->code // '') eq '200') {
+      # CONNECT failed (connection needs to be kept alive)
+      unless ($tx->keep_alive && $tx->res->is_status_class(200)) {
         $old->req->error('Proxy connection failed');
         return $self->_finish($old, $cb);
       }
 
       # Prevent proxy reassignment and start real transaction
       $old->req->proxy(0);
-      return $self->_start($old->connection($tx->connection), $cb)
+      my $id = $tx->connection;
+      return $self->_start($old->connection($id), $cb)
         unless $tx->req->url->protocol eq 'https';
 
       # TLS upgrade
-      return unless my $id = $tx->connection;
       my $loop   = $self->_loop;
       my $handle = $loop->stream($id)->steal_handle;
       my $c      = delete $self->{connections}{$id};
@@ -354,14 +360,14 @@ sub _remove {
 
   # Close connection
   my $tx = (delete($self->{connections}{$id}) || {})->{tx};
-  unless (!$close && $tx && $tx->keep_alive && !$tx->error) {
+  if ($close || !$tx || !$tx->keep_alive || $tx->error) {
     $self->_cache($id);
     return $self->_loop->remove($id);
   }
 
-  # Keep connection alive
+  # Keep connection alive (CONNECT requests get upgraded)
   $self->_cache(join(':', $self->transactor->endpoint($tx)), $id)
-    unless uc $tx->req->method eq 'CONNECT' && ($tx->res->code // '') eq '200';
+    unless uc $tx->req->method eq 'CONNECT';
 }
 
 sub _redirect {
@@ -494,15 +500,14 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   }
 
   # Quick JSON API request with Basic authentication
-  say $ua->get('https://sri:s3cret@search.twitter.com/search.json?q=perl')
-    ->res->json('/results/0/text');
+  say $ua->get('https://sri:s3cret@example.com/search.json?q=perl')
+    ->res->json('/results/0/title');
 
   # Extract data from HTML and XML resources
-  say $ua->get('mojolicio.us')->res->dom->html->head->title->text;
+  say $ua->get('www.perl.org')->res->dom->html->head->title->text;
 
   # Scrape the latest headlines from a news site
-  say $ua->max_redirects(5)->get('www.reddit.com/r/perl/')
-    ->res->dom('p.title > a.title')->pluck('text')->shuffle;
+  say $ua->get('perlnews.org')->res->dom('h2 > a')->pluck('text')->shuffle;
 
   # IPv6 PUT request with content
   my $tx
@@ -514,7 +519,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 
   # TLS certificate authentication and JSON POST
   my $tx = $ua->cert('tls.crt')->key('tls.key')
-    ->post('https://mojolicio.us' => json => {top => 'secret'});
+    ->post('https://example.com' => json => {top => 'secret'});
 
   # Blocking parallel requests (does not work inside a running event loop)
   my $delay = Mojo::IOLoop->delay;
@@ -542,7 +547,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   $delay->wait unless Mojo::IOLoop->is_running;
 
   # Non-blocking WebSocket connection sending and receiving JSON messages
-  $ua->websocket('ws://localhost:3000/echo.json' => sub {
+  $ua->websocket('ws://example.com/echo.json' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(json => sub {
@@ -557,14 +562,19 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 =head1 DESCRIPTION
 
 L<Mojo::UserAgent> is a full featured non-blocking I/O HTTP and WebSocket user
-agent, with C<IPv6>, C<TLS>, C<SNI>, C<IDNA>, C<Comet> (long polling),
-C<keep-alive>, connection pooling, timeout, cookie, multipart, proxy, C<gzip>
-compression and multiple event loop support.
+agent, with IPv6, TLS, SNI, IDNA, Comet (long polling), keep-alive, connection
+pooling, timeout, cookie, multipart, proxy, gzip compression and multiple
+event loop support.
 
-Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
-L<IO::Socket::SSL> (1.75+) are supported transparently through
-L<Mojo::IOLoop>, and used if installed. Individual features can also be
-disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
+All connections will be reset automatically if a new process has been forked,
+this allows multiple processes to share the same L<Mojo::UserAgent> object
+safely.
+
+For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
+support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
+L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
+they are installed. Individual features can also be disabled with the
+MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 
@@ -798,8 +808,9 @@ L<Mojo::UserAgent::Transactor/"tx">.
 
 =head2 build_websocket_tx
 
-  my $tx = $ua->build_websocket_tx('ws://localhost:3000');
-  my $tx = $ua->build_websocket_tx('ws://localhost:3000' => {DNT => 1});
+  my $tx = $ua->build_websocket_tx('ws://example.com');
+  my $tx =
+    $ua->build_websocket_tx('ws://example.com' => {DNT => 1} => ['v1.proto']);
 
 Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"websocket">.
@@ -813,7 +824,7 @@ L<Mojo::UserAgent::Transactor/"websocket">.
   my $tx = $ua->delete(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<DELETE> request and return resulting
+Perform blocking DELETE request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
@@ -839,10 +850,10 @@ enabled with the MOJO_PROXY environment variable.
   my $tx = $ua->get('http://example.com' => {DNT => 1} => form => {a => 'b'});
   my $tx = $ua->get('http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<GET> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking GET request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->get('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -859,10 +870,10 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->head(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<HEAD> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking HEAD request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->head('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -885,7 +896,7 @@ Check if request for domain would use a proxy server.
   my $tx = $ua->options(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<OPTIONS> request and return resulting
+Perform blocking OPTIONS request and return resulting
 L<Mojo::Transaction::HTTP> object, takes the same arguments as
 L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
 append a callback to perform requests non-blocking.
@@ -905,10 +916,10 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->patch(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<PATCH> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking PATCH request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->patch('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -925,10 +936,10 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->post(
     'http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<POST> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking POST request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->post('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -943,10 +954,10 @@ append a callback to perform requests non-blocking.
   my $tx = $ua->put('http://example.com' => {DNT => 1} => form => {a => 'b'});
   my $tx = $ua->put('http://example.com' => {DNT => 1} => json => {a => 'b'});
 
-Perform blocking HTTP C<PUT> request and return resulting
-L<Mojo::Transaction::HTTP> object, takes the same arguments as
-L<Mojo::UserAgent::Transactor/"tx"> (except for the method). You can also
-append a callback to perform requests non-blocking.
+Perform blocking PUT request and return resulting L<Mojo::Transaction::HTTP>
+object, takes the same arguments as L<Mojo::UserAgent::Transactor/"tx">
+(except for the method). You can also append a callback to perform requests
+non-blocking.
 
   $ua->put('http://example.com' => sub {
     my ($ua, $tx) = @_;
@@ -970,15 +981,16 @@ non-blocking.
 
 =head2 websocket
 
-  $ua->websocket('ws://localhost:3000' => sub {...});
-  $ua->websocket('ws://localhost:3000' => {DNT => 1} => sub {...});
+  $ua->websocket('ws://example.com' => sub {...});
+  $ua->websocket(
+    'ws://example.com' => {DNT => 1} => ['v1.proto'] => sub {...});
 
 Open a non-blocking WebSocket connection with transparent handshake, takes the
 same arguments as L<Mojo::UserAgent::Transactor/"websocket">. The callback
 will receive either a L<Mojo::Transaction::WebSocket> or
 L<Mojo::Transaction::HTTP> object.
 
-  $ua->websocket('ws://localhost:3000/echo' => sub {
+  $ua->websocket('ws://example.com/echo' => sub {
     my ($ua, $tx) = @_;
     say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
     $tx->on(finish => sub {

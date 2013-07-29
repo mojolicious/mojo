@@ -255,10 +255,12 @@ sub _write {
       return unless $c->{tx};
     }
   }
-  $stream->write('', $cb);
+  $stream->write('' => $cb);
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -290,14 +292,15 @@ Mojo::Server::Daemon - Non-blocking I/O HTTP and WebSocket server
 =head1 DESCRIPTION
 
 L<Mojo::Server::Daemon> is a full featured, highly portable non-blocking I/O
-HTTP and WebSocket server, with C<IPv6>, C<TLS>, C<Comet> (long polling),
-C<keep-alive>, connection pooling, timeout, cookie, multipart and multiple
-event loop support.
+HTTP and WebSocket server, with IPv6, TLS, Comet (long polling), keep-alive,
+connection pooling, timeout, cookie, multipart and multiple event loop
+support.
 
-Optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
-L<IO::Socket::SSL> (1.75+) are supported transparently through
-L<Mojo::IOLoop>, and used if installed. Individual features can also be
-disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
+For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
+support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
+L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
+they are installed. Individual features can also be disabled with the
+MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 

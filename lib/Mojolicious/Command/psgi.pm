@@ -10,6 +10,8 @@ sub run { Mojo::Server::PSGI->new(app => shift->app)->to_psgi_app }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Command::psgi - PSGI command

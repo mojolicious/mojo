@@ -102,6 +102,8 @@ sub _path { $_[0] eq '/' || $_[0] eq $_[1] || $_[1] =~ m!^\Q$_[0]/! }
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::UserAgent::CookieJar - Cookie jar for HTTP user agents

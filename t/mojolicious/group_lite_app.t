@@ -69,9 +69,9 @@ get '/bridge2stash' =>
 
 # Make sure after_dispatch can make session changes
 hook after_dispatch => sub {
-  my $self = shift;
-  return unless $self->req->url->path->contains('/late/session');
-  $self->session(late => 'works!');
+  my $c = shift;
+  return unless $c->req->url->path->contains('/late/session');
+  $c->session(late => 'works!');
 };
 
 get '/late/session' => sub {

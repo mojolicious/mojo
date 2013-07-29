@@ -17,7 +17,7 @@ sub run {
   my $tls
     = Mojo::IOLoop::Server::TLS ? $IO::Socket::SSL::VERSION : 'not installed';
 
-  print <<"EOF";
+  print <<EOF;
 CORE
   Perl        ($^V, $^O)
   Mojolicious ($Mojolicious::VERSION, $Mojolicious::CODENAME)
@@ -45,6 +45,8 @@ EOF
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

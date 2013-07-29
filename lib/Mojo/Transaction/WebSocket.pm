@@ -69,12 +69,12 @@ sub build_frame {
     warn "-- Extended 64bit payload ($len)\n$payload\n" if DEBUG;
     vec($prefix, 0, 8) = $masked ? (127 | 0b10000000) : 127;
     $frame .= $prefix;
-    $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xFFFFFFFF);
+    $frame .= MODERN ? pack('Q>', $len) : pack('NN', 0, $len & 0xffffffff);
   }
 
   # Mask payload
   if ($masked) {
-    my $mask = pack 'N', int(rand 9999999);
+    my $mask = pack 'N', int(rand 9 x 7);
     $payload = $mask . xor_encode($payload, $mask x 128);
   }
 
@@ -91,15 +91,13 @@ sub client_handshake {
   my $self = shift;
 
   my $headers = $self->req->headers;
-  $headers->upgrade('websocket')  unless $headers->upgrade;
-  $headers->connection('Upgrade') unless $headers->connection;
-  $headers->sec_websocket_protocol('mojo')
-    unless $headers->sec_websocket_protocol;
+  $headers->upgrade('websocket')      unless $headers->upgrade;
+  $headers->connection('Upgrade')     unless $headers->connection;
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
 
-  # Generate WebSocket challenge
-  $headers->sec_websocket_key(b64_encode(pack('N*', int(rand 9999999)), ''))
-    unless $headers->sec_websocket_key;
+  # Generate 16 byte WebSocket challenge
+  my $challenge = b64_encode sprintf('%16u', int(rand 9 x 16)), '';
+  $headers->sec_websocket_key($challenge) unless $headers->sec_websocket_key;
 }
 
 sub client_read  { shift->server_read(@_) }
@@ -303,6 +301,8 @@ sub _message {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

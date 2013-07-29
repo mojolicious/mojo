@@ -51,7 +51,7 @@ sub _perldoc {
   my $perldoc = $self->url_for('/perldoc/');
   $dom->find('a[href]')->each(
     sub {
-      my $attrs = shift->attrs;
+      my $attrs = shift->attr;
       $attrs->{href} =~ s!%3A%3A!/!gi
         if $attrs->{href} =~ s!^http://search\.cpan\.org/perldoc\?!$perldoc!;
     }
@@ -62,7 +62,7 @@ sub _perldoc {
     sub {
       my $e = shift;
       return if $e->all_text =~ /^\s*\$\s+/m;
-      my $attrs = $e->attrs;
+      my $attrs = $e->attr;
       my $class = $attrs->{class};
       $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';
     }
@@ -129,6 +129,8 @@ sub _pod_to_html {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 

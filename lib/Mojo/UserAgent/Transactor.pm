@@ -134,8 +134,11 @@ sub websocket {
   my $self = shift;
 
   # New WebSocket transaction
-  my $tx    = $self->tx(GET => @_);
-  my $url   = $tx->req->url;
+  my $sub = ref $_[-1] eq 'ARRAY' ? pop : [];
+  my $tx = $self->tx(GET => @_);
+  my $req = $tx->req;
+  $req->headers->sec_websocket_protocol(join ', ', @$sub) if @$sub;
+  my $url   = $req->url;
   my $proto = $url->protocol;
   $url->scheme($proto eq 'wss' ? 'https' : 'http') if $proto;
 
@@ -250,6 +253,8 @@ sub _proxy {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::UserAgent::Transactor - User agent transactor
@@ -265,7 +270,7 @@ Mojo::UserAgent::Transactor - User agent transactor
   # PATCH request with "Do Not Track" header and content
   say $t->tx(PATCH => 'example.com' => {DNT => 1} => 'Hi!')->req->to_string;
 
-  # POST request with form data
+  # POST request with form-data
   say $t->tx(POST => 'example.com' => form => {a => 'b'})->req->to_string;
 
   # PUT request with JSON data
@@ -348,51 +353,70 @@ C<307> or C<308> redirect response if possible.
 Versatile general purpose L<Mojo::Transaction::HTTP> transaction builder for
 requests, with support for content generators.
 
-  # Inspect generated request
+  # Generate and inspect custom GET request with DNT header and content
   say $t->tx(GET => 'example.com' => {DNT => 1} => 'Bye!')->req->to_string;
 
-  # Streaming response
-  my $tx = $t->tx(GET => 'http://example.com');
-  $tx->res->content->unsubscribe('read')->on(read => sub { say $_[1] });
-
-  # Custom socket
+  # Use a custom socket for processing this transaction
   my $tx = $t->tx(GET => 'http://example.com');
   $tx->connection($sock);
 
-  # Generate query parameters
+  # Stream response content to STDOUT
+  my $tx = $t->tx(GET => 'http://example.com');
+  $tx->res->content->unsubscribe('read')->on(read => sub { say $_[1] });
+
+  # PUT request with content streamed from file
+  my $tx = $t->tx(PUT => 'http://example.com');
+  $tx->req->content->asset(Mojo::Asset::File->new(path => '/foo.txt'));
+
+  # GET request with query parameters
   my $tx = $t->tx(GET => 'http://example.com' => form => {a => 'b'});
 
-  # Use form generator with custom charset
+  # POST request with "application/json" content
+  my $tx = $t->tx(
+    POST => 'http://example.com' => json => {a => 'b', c => [1, 2, 3]});
+
+  # POST request with "application/x-www-form-urlencoded" content
+  my $tx = $t->tx(
+    POST => 'http://example.com' => form => {a => 'b', c => 'd'});
+
+  # PUT request with UTF-8 encoded form values
   my $tx = $t->tx(
     PUT => 'http://example.com' => form => {a => 'b'} => charset => 'UTF-8');
 
-  # Multiple form values with the same name
-  my $tx = $t->tx(PUT => 'http://example.com' => form => {a => [qw(b c d)]});
+  # POST request with form values sharing the same name
+  my $tx = $t->tx(POST => 'http://example.com' => form => {a => [qw(b c d)]});
 
-  # Multipart upload streamed from file
-  my $tx = $t->tx(
-    PUT => 'http://example.com' => form => {mytext => {file => '/foo.txt'}});
-
-  # Multipart upload with in-memory content
+  # POST request with "multipart/form-data" content
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {mytext => {content => 'lala'}});
 
-  # Upload multiple files with same name
+  # POST request with upload streamed from file
+  my $tx = $t->tx(
+    POST => 'http://example.com' => form => {mytext => {file => '/foo.txt'}});
+
+  # POST request with upload streamed from asset
+  my $asset = Mojo::Asset::Memory->new->add_chunk('lalala');
+  my $tx    = $t->tx(
+    POST => 'http://example.com' => form => {mytext => {file => $asset}});
+
+  # POST request with multiple files sharing the same name
   my $tx = $t->tx(POST => 'http://example.com' =>
     form => {mytext => [{content => 'first'}, {content => 'second'}]});
 
-  # Customized upload with filename and header
+  # POST request with form values and customized upload (filename and header)
   my $tx = $t->tx(POST => 'http://example.com' => form => {
-    myzip => {
-      file           => Mojo::Asset::Memory->new->add_chunk('lalala'),
-      filename       => 'foo.zip',
+    a      => 'b',
+    c      => 'd',
+    mytext => {
+      content        => 'lalala',
+      filename       => 'foo.txt',
       'Content-Type' => 'text/plain'
     }
   });
 
 The C<form> content generator will automatically use query parameters for
-C<GET>/C<HEAD> requests and the "application/x-www-form-urlencoded" content
-type for everything else. Both get upgraded automatically to using the
+GET/HEAD requests and the "application/x-www-form-urlencoded" content type for
+everything else. Both get upgraded automatically to using the
 "multipart/form-data" content type when necessary or when the header has been
 set manually.
 
@@ -409,8 +433,8 @@ handshake if possible.
 
 =head2 websocket
 
-  my $tx = $t->websocket('ws://localhost:3000');
-  my $tx = $t->websocket('ws://localhost:3000' => {DNT => 1});
+  my $tx = $t->websocket('ws://example.com');
+  my $tx = $t->websocket('ws://example.com' => {DNT => 1} => ['v1.proto']);
 
 Versatile L<Mojo::Transaction::HTTP> transaction builder for WebSocket
 handshake requests.

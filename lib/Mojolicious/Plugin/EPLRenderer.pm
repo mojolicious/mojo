@@ -64,6 +64,8 @@ sub _epl {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::EPLRenderer - Embedded Perl Lite renderer plugin

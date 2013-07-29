@@ -20,8 +20,8 @@ app->renderer->paths->[0] = app->home->rel_dir('does_not_exist');
 
 # Reverse filter
 hook after_render => sub {
-  my ($self, $output, $format) = @_;
-  return unless $self->stash->{reverse};
+  my ($c, $output, $format) = @_;
+  return unless $c->stash->{reverse};
   $$output = reverse $$output . $format;
 };
 

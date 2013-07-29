@@ -3,18 +3,18 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
 use Fcntl ':flock';
+use Mojo::Util 'encode';
 
 has handle => sub {
 
   # File
   if (my $path = shift->path) {
     croak qq{Can't open log file "$path": $!}
-      unless open my $file, '>>:utf8', $path;
+      unless open my $file, '>>', $path;
     return $file;
   }
 
   # STDERR
-  binmode STDERR, ':utf8';
   return \*STDERR;
 };
 has level => 'debug';
@@ -35,7 +35,8 @@ sub fatal { shift->log(fatal => @_) }
 
 sub format {
   my ($self, $level, @lines) = @_;
-  return '[' . localtime(time) . "] [$level] " . join("\n", @lines) . "\n";
+  return encode 'UTF-8',
+    '[' . localtime(time) . "] [$level] " . join("\n", @lines, '');
 }
 
 sub info { shift->log(info => @_) }
@@ -57,17 +58,18 @@ sub log { shift->emit('message', lc(shift), @_) }
 sub warn { shift->log(warn => @_) }
 
 sub _message {
-  my ($self, $level, @lines) = @_;
+  my ($self, $level) = (shift, shift);
 
   return unless $self->is_level($level) && (my $handle = $self->handle);
 
   flock $handle, LOCK_EX;
-  croak "Can't write to log: $!"
-    unless defined $handle->syswrite($self->format($level, @lines));
+  $handle->print($self->format($level, @_)) or croak "Can't write to log: $!";
   flock $handle, LOCK_UN;
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -123,7 +125,7 @@ L<Mojo::Log> implements the following attributes.
   my $handle = $log->handle;
   $log       = $log->handle(IO::Handle->new);
 
-Log file handle used by default C<message> event, defaults to opening C<path>
+Log filehandle used by default C<message> event, defaults to opening C<path>
 or C<STDERR>.
 
 =head2 level
@@ -171,32 +173,36 @@ default logger.
 
 =head2 debug
 
-  $log = $log->debug('You screwed up, but that is ok');
+  $log = $log->debug('You screwed up, but that is ok.');
+  $log = $log->debug('All', 'cool!');
 
 Log debug message.
 
 =head2 error
 
-  $log = $log->error('You really screwed up this time');
+  $log = $log->error('You really screwed up this time.');
+  $log = $log->error('Wow', 'seriously!');
 
 Log error message.
 
 =head2 fatal
 
   $log = $log->fatal('Its over...');
+  $log = $log->fatal('Bye', 'bye!');
 
 Log fatal message.
 
 =head2 format
 
-  my $msg = $log->format('debug', 'Hi there!');
-  my $msg = $log->format('debug', 'Hi', 'there!');
+  my $msg = $log->format(debug => 'Hi there!');
+  my $msg = $log->format(debug => 'Hi', 'there!');
 
 Format log message.
 
 =head2 info
 
-  $log = $log->info('You are bad, but you prolly know already');
+  $log = $log->info('You are bad, but you prolly know already.');
+  $log = $log->info('Ok', 'then!');
 
 Log info message.
 
@@ -238,13 +244,15 @@ Check for warn log level.
 
 =head2 log
 
-  $log = $log->log(debug => 'This should work');
+  $log = $log->log(debug => 'This should work.');
+  $log = $log->log(debug => 'This', 'too!');
 
 Emit C<message> event.
 
 =head2 warn
 
   $log = $log->warn('Dont do that Dave...');
+  $log = $log->warn('No', 'really!');
 
 Log warn message.
 

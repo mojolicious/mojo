@@ -124,6 +124,8 @@ sub _timer {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Mojo::Reactor::Poll - Low level event reactor with poll support

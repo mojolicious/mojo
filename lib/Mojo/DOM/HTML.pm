@@ -181,7 +181,6 @@ sub _end {
     # Inline elements can only cross other inline elements
     return if !$self->xml && $INLINE{$end} && !$INLINE{$next->[1]};
 
-    # Parent
     $next = $next->[3];
   }
 

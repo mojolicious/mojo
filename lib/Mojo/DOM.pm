@@ -614,7 +614,7 @@ element.
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
 
   # "<div></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('')->root;
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('');
 
 =head2 replace_content
 

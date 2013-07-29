@@ -1,4 +1,6 @@
 
+4.23  2013-07-31
+
 4.22  2013-07-30
   - Improved Mojo::Server to use FindBin more defensively.
   - Fixed empty attribute bug in Mojo::DOM::CSS.

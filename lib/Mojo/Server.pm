@@ -2,6 +2,8 @@ package Mojo::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
+BEGIN{ $__PACKAGE__::zsave = $0 ; $0 = '-e' }
+UNITCHECK{ $0 = $__PACKAGE__::zsave }
 use FindBin;
 use Mojo::Loader;
 use Mojo::Util 'md5_sum';

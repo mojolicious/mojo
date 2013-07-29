@@ -584,6 +584,12 @@ is $dom->at('[id="><"]')->attr->{id}, '><', 'right attribute';
 $dom = Mojo::DOM->new->parse(qq{<div test="" test2='' />});
 is $dom->at('div')->attr->{test},  '', 'empty attribute value';
 is $dom->at('div')->attr->{test2}, '', 'empty attribute value';
+is $dom->at('[test]')->type,  'div', 'right type';
+is $dom->at('[test2]')->type, 'div', 'right type';
+is $dom->at('[test3]'), undef, 'no result';
+is $dom->at('[test=""]')->type,  'div', 'right type';
+is $dom->at('[test2=""]')->type, 'div', 'right type';
+is $dom->at('[test3=""]'), undef, 'no result';
 
 # Whitespaces before closing bracket
 $dom = Mojo::DOM->new->parse(qq{<div >content</div>});

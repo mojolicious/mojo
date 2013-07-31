@@ -427,10 +427,17 @@ Convert snake_case string to CamelCase and replace C<-> with C<::>.
 
 Convert a class name to a file.
 
-  Foo::Bar -> foo_bar
-  FOO::Bar -> foobar
-  FooBar   -> foo_bar
-  FOOBar   -> foobar
+  # "foo_bar"
+  class_to_file 'Foo::Bar';
+
+  # "foobar"
+  class_to_file 'FOO::Bar';
+
+  # "foo_bar"
+  class_to_file 'FooBar';
+
+  # "foobar"
+  class_to_file 'FOOBar';
 
 =head2 class_to_path
 
@@ -438,8 +445,11 @@ Convert a class name to a file.
 
 Convert class name to path.
 
-  Foo::Bar -> Foo/Bar.pm
-  FooBar   -> FooBar.pm
+  # "Foo/Bar.pm"
+  class_to_path 'Foo::Bar';
+
+  # "FooBar.pm"
+  class_to_path 'FooBar';
 
 =head2 decamelize
 

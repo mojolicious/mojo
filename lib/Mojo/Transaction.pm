@@ -39,10 +39,9 @@ sub is_websocket {undef}
 sub is_writing { (shift->{state} // 'write') eq 'write' }
 
 sub redirects {
-  my $self = shift;
+  my $previous = shift;
   my @redirects;
-  return \@redirects unless my $previous = $self->previous;
-  do { unshift @redirects, $previous } while $previous = $previous->previous;
+  unshift @redirects, $previous while $previous = $previous->previous;
   return \@redirects;
 }
 

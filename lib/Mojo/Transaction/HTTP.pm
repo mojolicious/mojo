@@ -3,6 +3,8 @@ use Mojo::Base 'Mojo::Transaction';
 
 use Mojo::Transaction::WebSocket;
 
+has 'previous';
+
 sub client_read {
   my ($self, $chunk) = @_;
 
@@ -38,6 +40,13 @@ sub keep_alive {
 
   # No keep-alive for 1.0
   return !($req->version eq '1.0' || $res->version eq '1.0');
+}
+
+sub redirects {
+  my $previous = shift;
+  my @redirects;
+  unshift @redirects, $previous while $previous = $previous->previous;
+  return \@redirects;
 }
 
 sub server_read {
@@ -247,7 +256,18 @@ object.
 
 =head1 ATTRIBUTES
 
-L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>.
+L<Mojo::Transaction::HTTP> inherits all attributes from L<Mojo::Transaction>
+and implements the following new ones.
+
+=head2 previous
+
+  my $previous = $tx->previous;
+  $tx          = $tx->previous(Mojo::Transaction->new);
+
+Previous transaction that triggered this followup transaction.
+
+  # Path of previous request
+  say $tx->previous->req->url->path;
 
 =head1 METHODS
 
@@ -277,6 +297,16 @@ Check transaction for C<HEAD> request and C<1xx>, C<204> or C<304> response.
   my $success = $tx->keep_alive;
 
 Check if connection can be kept alive.
+
+=head2 redirects
+
+  my $redirects = $tx->redirects;
+
+Return a list of all previous transactions that preceded this followup
+transaction.
+
+  # Paths of all previous requests
+  say $_->req->url->path for @{$tx->redirects};
 
 =head2 server_read
 

@@ -5,7 +5,7 @@ use Carp 'croak';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-has [qw(kept_alive local_address local_port previous remote_port)];
+has [qw(kept_alive local_address local_port remote_port)];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
@@ -37,13 +37,6 @@ sub is_finished { (shift->{state} // '') eq 'finished' }
 sub is_websocket {undef}
 
 sub is_writing { (shift->{state} // 'write') eq 'write' }
-
-sub redirects {
-  my $previous = shift;
-  my @redirects;
-  unshift @redirects, $previous while $previous = $previous->previous;
-  return \@redirects;
-}
 
 sub remote_address {
   my $self = shift;
@@ -157,16 +150,6 @@ Local interface address.
 
 Local interface port.
 
-=head2 previous
-
-  my $previous = $tx->previous;
-  $tx          = $tx->previous(Mojo::Transaction->new);
-
-Previous transaction that triggered this followup transaction.
-
-  # Path of previous request
-  say $tx->previous->req->url->path;
-
 =head2 remote_port
 
   my $port = $tx->remote_port;
@@ -250,15 +233,6 @@ Check if transaction is writing.
   $tx = $tx->resume;
 
 Resume transaction.
-
-=head2 redirects
-
-  my $redirects = $tx->redirects;
-
-Return a list of all previous transactions that preceded this followup
-transaction.
-
-  say $_->req->url for @{$tx->redirects};
 
 =head2 remote_address
 

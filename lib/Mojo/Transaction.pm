@@ -258,6 +258,8 @@ Resume transaction.
 Return a list of all previous transactions that preceded this followup
 transaction.
 
+  say $_->req->url for @{$tx->redirects};
+
 =head2 remote_address
 
   my $address = $tx->remote_address;

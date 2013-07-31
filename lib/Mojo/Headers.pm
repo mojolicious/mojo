@@ -454,6 +454,8 @@ Shortcut for the C<Location> header.
 
 Return a list of all currently defined headers.
 
+  say for @{$headers->names};
+
 =head2 origin
 
   my $origin = $headers->origin;

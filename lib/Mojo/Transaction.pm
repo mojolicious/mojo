@@ -38,6 +38,14 @@ sub is_websocket {undef}
 
 sub is_writing { (shift->{state} // 'write') eq 'write' }
 
+sub redirects {
+  my $self = shift;
+  my @redirects;
+  return \@redirects unless my $previous = $self->previous;
+  do { unshift @redirects, $previous } while $previous = $previous->previous;
+  return \@redirects;
+}
+
 sub remote_address {
   my $self = shift;
 
@@ -243,6 +251,13 @@ Check if transaction is writing.
   $tx = $tx->resume;
 
 Resume transaction.
+
+=head2 redirects
+
+  my $redirects = $tx->redirects;
+
+Return a list of all previous transactions that preceded this followup
+transaction.
 
 =head2 remote_address
 

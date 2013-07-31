@@ -241,6 +241,10 @@ is $tx->res->code,   200,                                 'right status';
 is $tx->previous->req->method, 'GET', 'right method';
 is $tx->previous->req->url, 'http://www.wikipedia.org/wiki/Perl', 'right url';
 is $tx->previous->res->code, 301, 'right status';
+is $tx->redirects->[-1]->req->method, 'GET', 'right method';
+is $tx->redirects->[-1]->req->url, 'http://www.wikipedia.org/wiki/Perl',
+  'right url';
+is $tx->redirects->[-1]->res->code, 301, 'right status';
 
 # Custom chunked request
 $tx = Mojo::Transaction::HTTP->new;

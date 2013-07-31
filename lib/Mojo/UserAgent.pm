@@ -372,14 +372,9 @@ sub _remove {
 
 sub _redirect {
   my ($self, $c, $old) = @_;
-
-  # Follow redirect unless the maximum has been reached already
   return undef unless my $new = $self->transactor->redirect($old);
-  my $redirects = delete $c->{redirects} || 0;
-  return undef unless $redirects < $self->max_redirects;
-  my $id = $self->_start($new, delete $c->{cb});
-
-  return $self->{connections}{$id}{redirects} = $redirects + 1;
+  return undef unless @{$old->redirects} < $self->max_redirects;
+  return $self->_start($new, delete $c->{cb});
 }
 
 sub _server {

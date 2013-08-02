@@ -216,7 +216,7 @@ full access to all HTTP features and information.
 
   use Mojolicious::Lite;
 
-  # Access request and reponse information
+  # Access request and response information
   get '/agent' => sub {
     my $self = shift;
     my $host = $self->req->url->to_abs->host;

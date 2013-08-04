@@ -1,5 +1,36 @@
 
-4.17  2013-06-22
+4.24  2013-08-03
+
+4.23  2013-08-01
+  - Added redirects method to Mojo::Transaction::HTTP.
+
+4.22  2013-07-30
+  - Improved Mojo::Server to use FindBin more defensively.
+  - Fixed empty attribute bug in Mojo::DOM::CSS.
+  - Fixed partial route handling in routes command.
+
+4.21  2013-07-29
+  - Added strip method to Mojo::DOM.
+  - Fixed return values of remove and replace methods in Mojo::DOM.
+
+4.20  2013-07-28
+  - Deprecated Mojo::DOM::attrs in favor of Mojo::DOM::attr.
+  - Improved Mojo::UserAgent connection management to be fork-safe.
+
+4.19  2013-07-21
+  - Improved invalid tag handling in Mojo::DOM::HTML.
+
+4.18  2013-07-08
+  - Added --mode option to Morbo.
+  - Fixed bug in Mojo::UserAgent where not all 2xx responses would be accepted
+    for CONNECT requests.
+
+4.17  2013-07-04
+  - Updated jQuery to version 2.0.3.
+  - Improved Mojo::IOLoop::Server to use Perfect Forward Secrecy for TLS.
+  - Fixed Mojo::Transaction::WebSocket to generate RFC 6455 compliant
+    Sec-WebSocket-Key headers. (josh)
+  - Fixed bug where not all uppercase methods were hidden from the router.
 
 4.16  2013-06-19
   - Improved Perl 5.10.x and 5.12.x compatibility. (trinitum)
@@ -470,7 +501,7 @@
   - Fixed WebSocket bug in Mojo::Content.
 
 3.46  2012-10-11
-  - Improved router and renderer to allow camel case controllers.
+  - Improved router and renderer to allow CamelCase controllers.
 
 3.45  2012-10-10
   - Added multi_accept attribute to Mojo::IOLoop.
@@ -482,7 +513,7 @@
   - Improved documentation browser CSS. (tempire)
 
 3.44  2012-09-29
-  - Improved html_escape to favor lower case entities. (judofyr)
+  - Improved html_escape to favor lowercase entities. (judofyr)
   - Improved javascript and stylesheet helpers to not generate type
     attributes.
 
@@ -1619,8 +1650,7 @@
   - Fixed small route rendering bug.
 
 1.86  2011-08-21
-  - Deprecated camel case command modules and lowercased all the built-in
-    ones.
+  - Deprecated CamelCase command modules and lowercased all the built-in ones.
   - Added EXPERIMENTAL support for testing WebSockets with Test::Mojo.
   - Added GET/POST parameter support to respond_to.
   - Made class_to_file slightly smarter.
@@ -1659,7 +1689,7 @@
     Mojolicious::Plugin::PODRenderer.
 
 1.79  2011-08-17
-  - Added support for upper case relative plugin names. (lammel)
+  - Added support for uppercase relative plugin names. (lammel)
 
 1.78  2011-08-16
   - Added EXPERIMENTAL modules Mojolicious::Command::Cpanify and
@@ -2667,7 +2697,7 @@
     decoding.
   - Fixed format detection bug. (marcus)
   - Fixed named url_for. (marcus)
-  - Fixed decamelize of multiple upper case characters.
+  - Fixed decamelize of multiple uppercase characters.
   - Fixed plugins and commands to work with multiple namespaces and
     reloading.
   - Fixed multiple process calls in Mojo::Client.
@@ -3139,7 +3169,7 @@
 0.8008  2008-11-07
   - Fixed multipart parsing for short requests.
   - Fixed content file storage to specific file.
-  - Fixed lower case appclasses.
+  - Fixed lowercase appclasses.
 
 0.8007  2008-11-07
   - Cleaned up the API some more.

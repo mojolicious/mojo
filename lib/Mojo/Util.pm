@@ -51,7 +51,7 @@ sub camelize {
   my $str = shift;
   return $str if $str =~ /^[A-Z]/;
 
-  # Camel case words
+  # CamelCase words
   return join '::', map {
     join '', map { ucfirst lc } split /_/, $_
   } split /-/, $str;
@@ -74,7 +74,7 @@ sub decamelize {
   my @parts;
   for my $part (split /::/, $str) {
 
-    # Snake case words
+    # snake_case words
     my @words;
     push @words, lc $1 while $part =~ s/([A-Z]{1}[^A-Z]*)//;
     push @parts, join '_', @words;
@@ -410,7 +410,7 @@ Base64 encode bytes, the line ending defaults to a newline.
 
   my $camelcase = camelize $snakecase;
 
-Convert snake case string to camel case and replace C<-> with C<::>.
+Convert snake_case string to CamelCase and replace C<-> with C<::>.
 
   # "FooBar"
   camelize 'foo_bar';
@@ -427,10 +427,17 @@ Convert snake case string to camel case and replace C<-> with C<::>.
 
 Convert a class name to a file.
 
-  Foo::Bar -> foo_bar
-  FOO::Bar -> foobar
-  FooBar   -> foo_bar
-  FOOBar   -> foobar
+  # "foo_bar"
+  class_to_file 'Foo::Bar';
+
+  # "foobar"
+  class_to_file 'FOO::Bar';
+
+  # "foo_bar"
+  class_to_file 'FooBar';
+
+  # "foobar"
+  class_to_file 'FOOBar';
 
 =head2 class_to_path
 
@@ -438,14 +445,17 @@ Convert a class name to a file.
 
 Convert class name to path.
 
-  Foo::Bar -> Foo/Bar.pm
-  FooBar   -> FooBar.pm
+  # "Foo/Bar.pm"
+  class_to_path 'Foo::Bar';
+
+  # "FooBar.pm"
+  class_to_path 'FooBar';
 
 =head2 decamelize
 
   my $snakecase = decamelize $camelcase;
 
-Convert camel case string to snake case and replace C<::> with C<->.
+Convert CamelCase string to snake_case and replace C<::> with C<->.
 
   # "foo_bar"
   decamelize 'FooBar';

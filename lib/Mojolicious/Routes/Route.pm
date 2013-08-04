@@ -136,7 +136,7 @@ sub render {
 
 sub root {
   my $root = my $parent = shift;
-  while ($parent = $parent->parent) { $root = $parent }
+  $root = $parent while $parent = $parent->parent;
   return $root;
 }
 

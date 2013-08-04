@@ -5,7 +5,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Daemon;
 
 has description => "Start application with HTTP and WebSocket server.\n";
-has usage       => <<"EOF";
+has usage       => <<EOF;
 usage: $0 daemon [OPTIONS]
 
 These options are available:

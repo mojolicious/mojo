@@ -5,7 +5,7 @@ use Carp 'croak';
 use Mojo::Message::Request;
 use Mojo::Message::Response;
 
-has [qw(kept_alive local_address local_port previous remote_port)];
+has [qw(kept_alive local_address local_port remote_port)];
 has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
@@ -149,16 +149,6 @@ Local interface address.
   $tx      = $tx->local_port(8080);
 
 Local interface port.
-
-=head2 previous
-
-  my $previous = $tx->previous;
-  $tx          = $tx->previous(Mojo::Transaction->new);
-
-Previous transaction that triggered this followup transaction.
-
-  # Path of previous request
-  say $tx->previous->req->url->path;
 
 =head2 remote_port
 

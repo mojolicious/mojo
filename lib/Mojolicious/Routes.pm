@@ -68,8 +68,8 @@ sub hide { push @{shift->hidden}, @_ }
 
 sub is_hidden {
   my ($self, $method) = @_;
-  my $hiding = $self->{hiding} ||= {map { $_ => 1 } @{$self->hidden}};
-  return !!($hiding->{$method} || index($method, '_') == 0);
+  my $h = $self->{hiding} ||= {map { $_ => 1 } @{$self->hidden}};
+  return !!($h->{$method} || index($method, '_') == 0 || $method !~ /[a-z]/);
 }
 
 sub lookup {
@@ -282,7 +282,7 @@ Contains all available conditions.
   my $hidden = $r->hidden;
   $r         = $r->hidden([qw(attr has new)]);
 
-Controller methods and attributes that are hidden from router, defaults to
+Controller attributes and methods that are hidden from router, defaults to
 C<attr>, C<has>, C<new> and C<tap>.
 
 =head2 namespaces
@@ -335,13 +335,13 @@ Match routes with L<Mojolicious::Routes::Match> and dispatch.
 
   $r = $r->hide(qw(foo bar));
 
-Hide controller methods and attributes from router.
+Hide controller attributes and methods from router.
 
 =head2 is_hidden
 
   my $success = $r->is_hidden('foo');
 
-Check if controller method or attribute is hidden from router.
+Check if controller attribute or method is hidden from router.
 
 =head2 lookup
 

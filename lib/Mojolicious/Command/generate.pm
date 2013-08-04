@@ -2,11 +2,11 @@ package Mojolicious::Command::generate;
 use Mojo::Base 'Mojolicious::Commands';
 
 has description => "Generate files and directories from templates.\n";
-has hint        => <<"EOF";
+has hint        => <<EOF;
 
 See '$0 generate help GENERATOR' for more information on a specific generator.
 EOF
-has message => <<"EOF";
+has message => <<EOF;
 usage: $0 generate GENERATOR [OPTIONS]
 
 These generators are currently available:

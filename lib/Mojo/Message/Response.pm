@@ -151,7 +151,7 @@ Mojo::Message::Response - HTTP response
   use Mojo::Message::Response;
 
   # Parse
-  my $res = Mojo::Message::Reponse->new;
+  my $res = Mojo::Message::Response->new;
   $res->parse("HTTP/1.0 200 OK\x0a\x0d");
   $res->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
   $res->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");

@@ -10,7 +10,7 @@ my $ATTR_RE   = qr/
   (?:
     (\W)?                         # Operator
     =
-    (?:"((?:\\"|[^"])+)"|(\S+))   # Value
+    (?:"((?:\\"|[^"])*)"|(\S+))   # Value
   )?
   \]
 /x;
@@ -125,7 +125,6 @@ sub _compile {
     my ($separator, $element, $pc, $attrs, $combinator)
       = ($1, $2 // '', $3, $6, $11);
 
-    # Trash
     next unless $separator || $element || $pc || $attrs || $combinator;
 
     # New selector
@@ -251,10 +250,9 @@ sub _pc {
 
     # Siblings
     my $parent = $current->[3];
-    my $start = $parent->[0] eq 'root' ? 1 : 4;
     my @siblings;
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
-    for my $i ($start .. $#$parent) {
+    for my $i (($parent->[0] eq 'root' ? 1 : 4) .. $#$parent) {
       my $sibling = $parent->[$i];
       next unless $sibling->[0] eq 'tag';
       next if defined $type && $type ne $sibling->[1];
@@ -279,8 +277,7 @@ sub _pc {
 
     # Siblings
     my $parent = $current->[3];
-    my $start = $parent->[0] eq 'root' ? 1 : 4;
-    for my $i ($start .. $#$parent) {
+    for my $i (($parent->[0] eq 'root' ? 1 : 4) .. $#$parent) {
       my $sibling = $parent->[$i];
       next if $sibling->[0] ne 'tag' || $sibling eq $current;
       return undef unless defined $type && $sibling->[1] ne $type;
@@ -345,8 +342,7 @@ sub _sibling {
 
   my $parent = $current->[3];
   my $found;
-  my $start = $parent->[0] eq 'root' ? 1 : 4;
-  for my $e (@$parent[$start .. $#$parent]) {
+  for my $e (@$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent]) {
     return $found if $e eq $current;
     next unless $e->[0] eq 'tag';
 

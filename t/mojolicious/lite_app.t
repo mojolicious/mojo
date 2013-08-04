@@ -359,6 +359,8 @@ get '/redirect_named' => sub {
   shift->redirect_to('index', format => 'txt')->render(text => 'Redirecting!');
 };
 
+get '/redirect_twice' => sub { shift->redirect_to('/redirect_named') };
+
 get '/redirect_no_render' => sub {
   shift->redirect_to('index', {format => 'txt'});
 };
@@ -915,6 +917,17 @@ $t->get_ok('/redirect_named')->status_is(302)
   ->header_is(Server           => 'Mojolicious (Perl)')
   ->header_is('Content-Length' => 12)
   ->header_like(Location => qr!/template.txt$!)->content_is('Redirecting!');
+
+# Redirect twice
+$t->ua->max_redirects(3);
+$t->get_ok('/redirect_twice')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->text_is('div#☃' => 'Redirect works!');
+my $redirects = $t->tx->redirects;
+is scalar @$redirects, 2, 'two redirects';
+is $redirects->[0]->req->url->path, '/redirect_twice', 'right path';
+is $redirects->[1]->req->url->path, '/redirect_named', 'right path';
+$t->ua->max_redirects(0);
 
 # Redirect without rendering
 $t->get_ok('/redirect_no_render')->status_is(302)

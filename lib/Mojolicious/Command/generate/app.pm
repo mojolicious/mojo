@@ -12,7 +12,7 @@ sub run {
 
   # Prevent bad applications
   die <<EOF unless $class =~ /^[A-Z](?:\w|::)+$/;
-Your application name has to be a well formed (camel case) Perl module name
+Your application name has to be a well formed (CamelCase) Perl module name
 like "MyApp".
 EOF
 

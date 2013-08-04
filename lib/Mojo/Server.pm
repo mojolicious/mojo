@@ -2,7 +2,6 @@ package Mojo::Server;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp 'croak';
-use FindBin;
 use Mojo::Loader;
 use Mojo::Util 'md5_sum';
 use Scalar::Util 'blessed';
@@ -27,9 +26,10 @@ sub build_tx { shift->app->build_tx }
 sub load_app {
   my ($self, $path) = @_;
 
-  # Clean environment (reset FindBin)
+  # Clean environment (reset FindBin defensively)
   {
     local $0 = $path;
+    require FindBin;
     FindBin->again;
     local $ENV{MOJO_APP_LOADER} = 1;
     local $ENV{MOJO_EXE};

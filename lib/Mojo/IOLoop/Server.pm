@@ -81,11 +81,11 @@ sub listen {
   return unless $args->{tls};
   croak "IO::Socket::SSL 1.75 required for TLS support" unless TLS;
 
-  # Options (Prioritize RC4 to mitigate BEAST attack)
+  # Prioritize RC4 to mitigate BEAST attack and use Perfect Forward Secrecy
   my $options = $self->{tls} = {
     SSL_cert_file => $args->{tls_cert} || $CERT,
     SSL_cipher_list =>
-      '!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:!LOW:RC4-SHA:RC4-MD5:ALL',
+      'ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH',
     SSL_honor_cipher_order => 1,
     SSL_key_file           => $args->{tls_key} || $KEY,
     SSL_startHandshake     => 0,

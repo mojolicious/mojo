@@ -5,18 +5,18 @@ use Getopt::Long 'GetOptions';
 use List::Util 'max';
 use Mojo::Server;
 
-has hint => <<"EOF";
+has hint => <<EOF;
 
 These options are available for all commands:
     -h, --help          Get more information on a specific command.
         --home <path>   Path to your applications home directory, defaults to
                         the value of MOJO_HOME or auto detection.
-    -m, --mode <name>   Run mode of your application, defaults to the value of
-                        MOJO_MODE/PLACK_ENV or "development".
+    -m, --mode <name>   Operating mode for your application, defaults to the
+                        value of MOJO_MODE/PLACK_ENV or "development".
 
 See '$0 help COMMAND' for more information on a specific command.
 EOF
-has message => <<"EOF";
+has message => <<EOF;
 usage: $0 COMMAND [OPTIONS]
 
 Tip: CGI and PSGI environments can be automatically detected very often and

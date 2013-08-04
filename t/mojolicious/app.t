@@ -61,13 +61,14 @@ is $t->app->static->file('hello.txt')->slurp,
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 is $t->app->secret, $t->app->moniker, 'secret defaults to moniker';
 
-# Hidden controller methods and attributes
+# Hidden controller attributes and methods
 $t->app->routes->hide('bar');
 ok !$t->app->routes->is_hidden('foo'), 'not hidden';
 ok $t->app->routes->is_hidden('bar'),              'is hidden';
 ok $t->app->routes->is_hidden('_foo'),             'is hidden';
 ok $t->app->routes->is_hidden('AUTOLOAD'),         'is hidden';
 ok $t->app->routes->is_hidden('DESTROY'),          'is hidden';
+ok $t->app->routes->is_hidden('FOO_BAR'),          'is hidden';
 ok $t->app->routes->is_hidden('app'),              'is hidden';
 ok $t->app->routes->is_hidden('attr'),             'is hidden';
 ok $t->app->routes->is_hidden('cookie'),           'is hidden';

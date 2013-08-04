@@ -22,7 +22,7 @@ for my $header (@HEADERS) {
   monkey_patch __PACKAGE__, $name, sub { scalar shift->header($header => @_) };
 }
 
-# Lower case headers
+# Lowercase headers
 my %NORMALCASE = map { lc($_) => $_ } @HEADERS;
 
 sub add {
@@ -452,7 +452,10 @@ Shortcut for the C<Location> header.
 
   my $names = $headers->names;
 
-Generate a list of all currently defined headers.
+Return a list of all currently defined headers.
+
+  # Names of all headers
+  say for @{$headers->names};
 
 =head2 origin
 

@@ -23,10 +23,9 @@ sub import {
   elsif ($flag eq '-strict') { $flag = undef }
 
   # Module
-  else {
-    my $file = $flag;
-    $file =~ s/::|'/\//g;
-    require "$file.pm" unless $flag->can('new');
+  elsif ((my $file = $flag) && !$flag->can('new')) {
+    $file =~ s!::|'!/!g;
+    require "$file.pm";
   }
 
   # ISA
@@ -220,7 +219,7 @@ argument.
   $object = $object->tap(sub {...});
 
 K combinator, tap into a method chain to perform operations on an object
-within the chain. The object will be the first argument passed to the closure
+within the chain. The object will be the first argument passed to the callback
 and is also available as C<$_>.
 
 =head1 DEBUGGING

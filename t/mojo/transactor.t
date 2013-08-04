@@ -8,7 +8,7 @@ use Mojo::Asset::Memory;
 use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::UserAgent::Transactor;
-use Mojo::Util 'encode';
+use Mojo::Util qw(b64_decode encode);
 
 # Custom content generator
 my $t = Mojo::UserAgent::Transactor->new;
@@ -407,7 +407,8 @@ ok !$tx->is_websocket, 'not a WebSocket';
 is $tx->req->url->to_abs, 'http://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
-ok $tx->req->headers->sec_websocket_key, 'has "Sec-WebSocket-Key" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
 ok !$tx->req->headers->sec_websocket_protocol,
   'no "Sec-WebSocket-Protocol" header';
 ok $tx->req->headers->sec_websocket_version,
@@ -424,7 +425,8 @@ is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->headers->dnt,        1,         'right "DNT" value';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
-ok $tx->req->headers->sec_websocket_key, 'has "Sec-WebSocket-Key" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
 ok !$tx->req->headers->sec_websocket_protocol,
   'no "Sec-WebSocket-Protocol" header';
 ok $tx->req->headers->sec_websocket_version,
@@ -436,7 +438,8 @@ $tx = $t->websocket('wss://127.0.0.1:3000/echo' => ['foo']);
 is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
-ok $tx->req->headers->sec_websocket_key,      'has "Sec-WebSocket-Key" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
 is $tx->req->headers->sec_websocket_protocol, 'foo',
   'right "Sec-WebSocket-Protocol" value';
 ok $tx->req->headers->sec_websocket_version,
@@ -450,7 +453,8 @@ is $tx->req->url->to_abs, 'https://127.0.0.1:3000/echo', 'right URL';
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->headers->dnt,        1,         'right "DNT" value';
 is $tx->req->headers->connection, 'Upgrade', 'right "Connection" value';
-ok $tx->req->headers->sec_websocket_key, 'has "Sec-WebSocket-Key" value';
+is length(b64_decode $tx->req->headers->sec_websocket_key), 16,
+  '16 byte "Sec-WebSocket-Key" value';
 is $tx->req->headers->sec_websocket_protocol,
   'v1.bar.example.com, foo, v2.baz.example.com',
   'right "Sec-WebSocket-Protocol" value';

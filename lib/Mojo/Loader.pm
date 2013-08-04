@@ -130,7 +130,7 @@ Load a class and catch exceptions. Note that classes are checked for a C<new>
 method to see if they are already loaded.
 
   if (my $e = $loader->load('Foo::Bar')) {
-    die ref $e ? "Exception: $e" : 'Already loaded!';
+    die ref $e ? "Exception: $e" : 'Not found!';
   }
 
 =head2 search

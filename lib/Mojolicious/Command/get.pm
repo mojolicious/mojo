@@ -11,7 +11,7 @@ use Mojo::Util qw(decode encode);
 use Scalar::Util 'weaken';
 
 has description => "Perform HTTP request.\n";
-has usage       => <<"EOF";
+has usage       => <<EOF;
 usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
 
   mojo get /
@@ -135,7 +135,7 @@ sub _select {
     # Attribute
     elsif ($command eq 'attr') {
       next unless my $name = shift @args;
-      _say($_->attrs->{$name}) for @$results;
+      _say($_->attr->{$name}) for @$results;
     }
 
     # Unknown

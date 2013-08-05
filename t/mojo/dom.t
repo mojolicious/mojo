@@ -1803,7 +1803,7 @@ $dom->find('b')->each(
 );
 is_deeply \@results, [qw(baz yada)], 'right results';
 
-# Autoload children in XML mode
+# AUTOLOAD children in XML mode
 $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 <a id="one">
   <B class="two" test>
@@ -1820,7 +1820,7 @@ is $dom->a->B->c->[1]->text, 'baz', 'right text';
 is $dom->a->B->c->[2], undef, 'no result';
 is $dom->a->B->c->size, 2, 'right number of elements';
 
-# Autoload children in HTML mode
+# AUTOLOAD children in HTML mode
 $dom = Mojo::DOM->new(<<EOF);
 <a id="one">
   <B class="two" test>
@@ -1836,6 +1836,13 @@ is $dom->a->b->c->[0]->text, 'bar', 'right text';
 is $dom->a->b->c->[1]->text, 'baz', 'right text';
 is $dom->a->b->c->[2], undef, 'no result';
 is $dom->a->b->c->size, 2, 'right number of elements';
+
+# Missing method and function
+eval { Mojo::DOM->new->missing };
+like $@, qr/^Can't locate object method "missing" via package "Mojo::DOM"/,
+  'right error';
+eval { Mojo::DOM::missing() };
+like $@, qr/^Undefined subroutine &Mojo::DOM::missing called/, 'right error';
 
 # Direct hash access to attributes in XML mode
 $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);

@@ -1,5 +1,5 @@
 
-4.24  2013-08-03
+4.24  2013-08-06
 
 4.23  2013-08-01
   - Added redirects method to Mojo::Transaction::HTTP.

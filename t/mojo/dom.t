@@ -1837,7 +1837,7 @@ is $dom->a->b->c->[1]->text, 'baz', 'right text';
 is $dom->a->b->c->[2], undef, 'no result';
 is $dom->a->b->c->size, 2, 'right number of elements';
 
-# Missing method and function
+# Missing method and function (AUTOLOAD)
 eval { Mojo::DOM->new->missing };
 like $@, qr/^Can't locate object method "missing" via package "Mojo::DOM"/,
   'right error';

@@ -61,7 +61,7 @@ is $t->app->static->file('hello.txt')->slurp,
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 is $t->app->secret, $t->app->moniker, 'secret defaults to moniker';
 
-# Missing methods and functions
+# Missing methods and functions (AUTOLOAD)
 eval { $t->app->missing };
 like $@,
   qr/^Can't locate object method "missing" via package "MojoliciousTest"/,
@@ -79,8 +79,8 @@ eval { $t->app->routes->missing };
 like $@,
   qr/^Can't locate object method "missing" via package "Mojolicious::Routes"/,
   'right error';
-eval { Mojolicious::Routes::missing() };
-like $@, qr/^Undefined subroutine &Mojolicious::Routes::missing called/,
+eval { Mojolicious::Route::missing() };
+like $@, qr/^Undefined subroutine &Mojolicious::Route::missing called/,
   'right error';
 
 # Hidden controller attributes and methods

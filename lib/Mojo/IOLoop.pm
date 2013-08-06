@@ -32,8 +32,7 @@ $SIG{PIPE} = 'IGNORE';
 __PACKAGE__->singleton->reactor;
 
 sub acceptor {
-  my ($self, $acceptor) = @_;
-  $self = $self->singleton unless ref $self;
+  my ($self, $acceptor) = (_instance(shift), @_);
 
   # Find acceptor for id
   return $self->{acceptors}{$acceptor} unless ref $acceptor;
@@ -51,8 +50,7 @@ sub acceptor {
 }
 
 sub client {
-  my ($self, $cb) = (shift, pop);
-  $self = $self->singleton unless ref $self;
+  my ($self, $cb) = (_instance(shift), pop);
 
   # Make sure timers are running
   $self->_recurring;
@@ -82,8 +80,7 @@ sub client {
 }
 
 sub delay {
-  my $self = shift;
-  $self = $self->singleton unless ref $self;
+  my $self = _instance(shift);
 
   my $delay = Mojo::IOLoop::Delay->new;
   weaken $delay->ioloop($self)->{ioloop};
@@ -100,16 +97,14 @@ sub one_tick   { (ref $_[0] ? $_[0] : $_[0]->singleton)->reactor->one_tick }
 sub recurring { shift->_timer(recurring => @_) }
 
 sub remove {
-  my ($self, $id) = @_;
-  $self = $self->singleton unless ref $self;
+  my ($self, $id) = (_instance(shift), @_);
   my $c = $self->{connections}{$id};
   if ($c && (my $stream = $c->{stream})) { return $stream->close_gracefully }
   $self->_remove($id);
 }
 
 sub server {
-  my ($self, $cb) = (shift, pop);
-  $self = $self->singleton unless ref $self;
+  my ($self, $cb) = (_instance(shift), pop);
 
   my $server = Mojo::IOLoop::Server->new;
   weaken $self;
@@ -135,8 +130,7 @@ sub start {
 sub stop { (ref $_[0] ? $_[0] : $_[0]->singleton)->reactor->stop }
 
 sub stream {
-  my ($self, $stream) = @_;
-  $self = $self->singleton unless ref $self;
+  my ($self, $stream) = (_instance(shift), @_);
 
   # Find stream for id
   return ($self->{connections}{$stream} || {})->{stream} unless ref $stream;
@@ -182,6 +176,8 @@ sub _id {
     while $self->{connections}{$id} || $self->{acceptors}{$id};
   return $id;
 }
+
+sub _instance { ref $_[0] ? $_[0] : $_[0]->singleton }
 
 sub _not_accepting {
   my $self = shift;
@@ -242,8 +238,7 @@ sub _stream {
 }
 
 sub _timer {
-  my ($self, $method, $after, $cb) = @_;
-  $self = $self->singleton unless ref $self;
+  my ($self, $method, $after, $cb) = (_instance(shift), @_);
   weaken $self;
   return $self->reactor->$method($after => sub { $self->$cb });
 }

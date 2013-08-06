@@ -134,10 +134,9 @@ sub _cache {
   for my $cached (@$old) {
 
     # Search for id/name and remove corrupted connections
-    if (!$found && ($cached->[1] eq $name || $cached->[0] eq $name)) {
-      my $stream = $loop->stream($cached->[1]);
-      if ($stream && !$stream->is_readable) { $found = $cached->[1] }
-      else                                  { $loop->remove($cached->[1]) }
+    if (!$found && first { $_ eq $name } @$cached) {
+      next unless my $stream = $loop->stream($cached->[1]);
+      $stream->is_readable ? $stream->close : ($found = $cached->[1]);
     }
 
     # Requeue

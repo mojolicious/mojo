@@ -46,14 +46,14 @@ sub is_writing {
 sub start {
   my $self = shift;
 
-  my $reactor = $self->reactor;
-  my $cb = sub { pop() ? $self->_write : $self->_read };
-  $reactor->io($self->timeout($self->{timeout})->{handle} => $cb)
-    unless $self->{timer};
-
   # Resume
-  $reactor->watch($self->{handle}, 1, $self->is_writing)
+  my $reactor = $self->reactor;
+  return $reactor->watch($self->{handle}, 1, $self->is_writing)
     if delete $self->{paused};
+
+  weaken $self;
+  my $cb = sub { pop() ? $self->_write : $self->_read };
+  $reactor->io($self->timeout($self->{timeout})->{handle} => $cb);
 }
 
 sub stop {

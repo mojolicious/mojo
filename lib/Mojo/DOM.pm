@@ -38,7 +38,7 @@ sub new {
 
 sub all_text { shift->_content(1, @_) }
 
-sub ancestors { $_[0]->_collection(@{_ancestors($_[0]->tree, 0)}) }
+sub ancestors { $_[0]->_collection(_ancestors($_[0]->tree)) }
 
 sub append { shift->_add(1, @_) }
 
@@ -162,7 +162,7 @@ sub replace_content {
 
 sub root {
   my $self = shift;
-  return $self unless my $tree = _ancestors($self->tree, 1)->[-1];
+  return $self unless my $tree = _ancestors($self->tree, 1);
   return $self->new->tree($tree)->xml($self->xml);
 }
 
@@ -233,14 +233,10 @@ sub _add {
 }
 
 sub _ancestors {
-  my ($parent, $root) = @_;
-
+  my ($tree, $root) = @_;
   my @ancestors;
-  push @ancestors, $parent
-    while ($parent->[0] eq 'tag') && ($parent = $parent->[3]);
-  pop @ancestors unless $root;
-
-  return \@ancestors;
+  push @ancestors, $tree while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
+  return $root ? $ancestors[-1] : @ancestors[0 .. $#ancestors - 1];
 }
 
 sub _collection {
@@ -473,8 +469,8 @@ enabled by default.
 Return a L<Mojo::Collection> object containing the ancestors of this element
 as L<Mojo::DOM> objects, similar to C<children>.
 
-  # Show type of random ancestor element
-  say $dom->ancestors->shuffle->first->type;
+  # List types of ancestor elements
+  say $dom->ancestors->pluck('type');
 
 =head2 append
 

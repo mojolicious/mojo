@@ -287,15 +287,12 @@ sub _finish {
   my $res = $tx->res;
   if (my $err = $res->error) { $res->error($err) }
 
-  else {
+  # Premature connection close
+  elsif ($close && !$res->code) { $res->error('Premature connection close') }
 
-    # Premature connection close
-    if ($close && !$res->code) { $res->error('Premature connection close') }
-
-    # 400/500
-    elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
-      $res->error($res->message, $res->code);
-    }
+  # 400/500
+  elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
+    $res->error($res->message, $res->code);
   }
 
   $self->$cb($tx);

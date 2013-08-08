@@ -38,6 +38,13 @@ sub new {
 
 sub all_text { shift->_content(1, @_) }
 
+sub ancestors {
+  my $self = shift;
+  my $xml  = $self->xml;
+  return Mojo::Collection->new(map { $self->new->tree($_)->xml($xml) }
+      @{$self->_ancestors});
+}
+
 sub append { shift->_add(1, @_) }
 
 sub append_content {
@@ -162,14 +169,8 @@ sub replace_content {
 
 sub root {
   my $self = shift;
-
-  my $root = $self->tree;
-  while ($root->[0] eq 'tag') {
-    last unless my $parent = $root->[3];
-    $root = $parent;
-  }
-
-  return $self->new->tree($root)->xml($self->xml);
+  return $self unless my $tree = $self->_ancestors(1)->[-1];
+  return $self->new->tree($tree)->xml($self->xml);
 }
 
 sub strip {
@@ -236,6 +237,18 @@ sub _add {
     _link($self->_parse("$new"), $parent);
 
   return $self;
+}
+
+sub _ancestors {
+  my ($self, $root) = @_;
+
+  my @ancestors;
+  my $parent = $self->tree;
+  push @ancestors, $parent
+    while ($parent->[0] eq 'tag') && ($parent = $parent->[3]);
+  pop @ancestors unless $root;
+
+  return \@ancestors;
 }
 
 sub _content {
@@ -453,6 +466,16 @@ enabled by default.
 
   # "foo\nbarbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->all_text(0);
+
+=head2 ancestors
+
+  my $collection = $dom->ancestors;
+
+Return a L<Mojo::Collection> object containing the ancestors of this element
+as L<Mojo::DOM> objects, similar to C<children>.
+
+  # Show type of random ancestor element
+  say $dom->ancestors->shuffle->first->type;
 
 =head2 append
 

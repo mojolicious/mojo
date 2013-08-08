@@ -11,7 +11,7 @@ has reactor => sub {
 
 sub DESTROY { shift->close }
 
-sub new { shift->SUPER::new(handle => shift, buffer => '') }
+sub new { shift->SUPER::new(handle => shift, buffer => '', timeout => 15) }
 
 sub close {
   my $self = shift;
@@ -47,8 +47,8 @@ sub start {
   my $self = shift;
 
   my $reactor = $self->reactor;
-  $reactor->io($self->timeout(15)->{handle},
-    sub { pop() ? $self->_write : $self->_read })
+  my $cb = sub { pop() ? $self->_write : $self->_read };
+  $reactor->io($self->timeout($self->{timeout})->{handle} => $cb)
     unless $self->{timer};
 
   # Resume

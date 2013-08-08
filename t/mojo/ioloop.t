@@ -130,6 +130,7 @@ Mojo::IOLoop->client(
 );
 $handle = $delay->wait->steal_handle;
 my $stream = Mojo::IOLoop::Stream->new($handle);
+is $stream->timeout, 15, 'right default';
 $id = Mojo::IOLoop->stream($stream);
 $stream->on(close => sub { Mojo::IOLoop->stop });
 $stream->on(read => sub { $buffer .= pop });

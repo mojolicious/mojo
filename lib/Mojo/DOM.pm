@@ -79,11 +79,11 @@ sub children {
 
   my @children;
   my $xml = $self->xml;
-  for my $e (@{_elements($self->tree)}) {
+  for my $n (@{_nodes($self->tree)}) {
 
     # Make sure child is the right type
-    next if $e->[0] ne 'tag' || (defined $type && $e->[1] ne $type);
-    push @children, $self->new->tree($e)->xml($xml);
+    next if $n->[0] ne 'tag' || (defined $type && $n->[1] ne $type);
+    push @children, $self->new->tree($n)->xml($xml);
   }
 
   return Mojo::Collection->new(@children);
@@ -92,7 +92,7 @@ sub children {
 sub content_xml {
   my $self = shift;
   my $xml  = $self->xml;
-  return join '', map { _render($_, $xml) } @{_elements($self->tree)};
+  return join '', map { _render($_, $xml) } @{_nodes($self->tree)};
 }
 
 sub find {
@@ -170,7 +170,7 @@ sub strip {
   my $self = shift;
   my $tree = $self->tree;
   return $self if $tree->[0] eq 'root';
-  return $self->_replace($tree, ['root', @{_elements($tree)}]);
+  return $self->_replace($tree, ['root', @{_nodes($tree)}]);
 }
 
 sub text { shift->_content(0, @_) }
@@ -180,15 +180,15 @@ sub text_after {
 
   return '' if (my $tree = $self->tree)->[0] eq 'root';
 
-  my (@elements, $started);
-  for my $e (@{_elements($tree->[3])}) {
-    ++$started and next if $e eq $tree;
+  my (@nodes, $started);
+  for my $n (@{_nodes($tree->[3])}) {
+    ++$started and next if $n eq $tree;
     next unless $started;
-    last if $e->[0] eq 'tag';
-    push @elements, $e;
+    last if $n->[0] eq 'tag';
+    push @nodes, $n;
   }
 
-  return _text(\@elements, 0, _trim($tree->[3], $trim));
+  return _text(\@nodes, 0, _trim($tree->[3], $trim));
 }
 
 sub text_before {
@@ -196,14 +196,14 @@ sub text_before {
 
   return '' if (my $tree = $self->tree)->[0] eq 'root';
 
-  my @elements;
-  for my $e (@{_elements($tree->[3])}) {
-    last if $e eq $tree;
-    push @elements, $e;
-    @elements = () if $e->[0] eq 'tag';
+  my @nodes;
+  for my $n (@{_nodes($tree->[3])}) {
+    last if $n eq $tree;
+    push @nodes, $n;
+    @nodes = () if $n->[0] eq 'tag';
   }
 
-  return _text(\@elements, 0, _trim($tree->[3], $trim));
+  return _text(\@nodes, 0, _trim($tree->[3], $trim));
 }
 
 sub to_xml { shift->[0]->render }
@@ -248,12 +248,7 @@ sub _collection {
 
 sub _content {
   my $tree = shift->tree;
-  return _text(_elements($tree), shift, _trim($tree, @_));
-}
-
-sub _elements {
-  return [] unless my $e = shift;
-  return [@$e[_offset($e) .. $#$e]];
+  return _text(_nodes($tree), shift, _trim($tree, @_));
 }
 
 sub _html {
@@ -268,14 +263,19 @@ sub _link {
 
   # Link parent to children
   my @new;
-  for my $e (@$children[1 .. $#$children]) {
-    push @new, $e;
-    next unless $e->[0] eq 'tag';
-    $e->[3] = $parent;
-    weaken $e->[3];
+  for my $n (@$children[1 .. $#$children]) {
+    push @new, $n;
+    next unless $n->[0] eq 'tag';
+    $n->[3] = $parent;
+    weaken $n->[3];
   }
 
   return @new;
+}
+
+sub _nodes {
+  return [] unless my $n = shift;
+  return [@$n[_offset($n) .. $#$n]];
 }
 
 sub _offset { $_[0][0] eq 'root' ? 1 : 4 }
@@ -285,8 +285,8 @@ sub _parent {
 
   # Find parent offset for child
   my $i = _offset($parent);
-  for my $e (@$parent[$i .. $#$parent]) {
-    last if $e == $child;
+  for my $n (@$parent[$i .. $#$parent]) {
+    last if $n == $child;
     $i++;
   }
 
@@ -323,23 +323,23 @@ sub _sibling {
 }
 
 sub _text {
-  my ($elements, $recurse, $trim) = @_;
+  my ($nodes, $recurse, $trim) = @_;
 
   my $text = '';
-  for my $e (@$elements) {
-    my $type = $e->[0];
+  for my $n (@$nodes) {
+    my $type = $n->[0];
 
     # Nested tag
     my $content = '';
     if ($type eq 'tag' && $recurse) {
-      $content = _text(_elements($e), 1, _trim($e, $trim));
+      $content = _text(_nodes($n), 1, _trim($n, $trim));
     }
 
     # Text
-    elsif ($type eq 'text') { $content = $trim ? squish($e->[1]) : $e->[1] }
+    elsif ($type eq 'text') { $content = $trim ? squish($n->[1]) : $n->[1] }
 
     # CDATA or raw text
-    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
+    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $n->[1] }
 
     # Add leading whitespace if punctuation allows it
     $content = " $content" if $text =~ /\S\z/ && $content =~ /^[^.!?,;:\s]+/;

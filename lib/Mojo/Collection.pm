@@ -1,9 +1,6 @@
 package Mojo::Collection;
 use Mojo::Base -base;
-use overload
-  'bool'   => sub {1},
-  '""'     => sub { shift->join("\n") },
-  fallback => 1;
+use overload bool => sub {1}, '""' => sub { shift->join("\n") }, fallback => 1;
 
 use Exporter 'import';
 use List::Util;

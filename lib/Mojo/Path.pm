@@ -2,7 +2,7 @@ package Mojo::Path;
 use Mojo::Base -base;
 use overload
   '@{}'    => sub { shift->parts },
-  'bool'   => sub {1},
+  bool     => sub {1},
   '""'     => sub { shift->to_string },
   fallback => 1;
 

@@ -2,7 +2,7 @@ package Mojo::DOM;
 use Mojo::Base -base;
 use overload
   '%{}'    => sub { shift->attr },
-  'bool'   => sub {1},
+  bool     => sub {1},
   '""'     => sub { shift->to_xml },
   fallback => 1;
 

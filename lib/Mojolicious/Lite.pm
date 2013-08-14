@@ -959,7 +959,7 @@ C<log> directory exists.
 
   $ mkdir log
 
-Mode changes also affects a few other aspects of the framework, such as mode
+Mode changes also affect a few other aspects of the framework, such as mode
 specific C<exception> and C<not_found> templates.
 
 =head2 Testing

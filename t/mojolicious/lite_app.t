@@ -359,6 +359,18 @@ get '/redirect_named' => sub {
   shift->redirect_to('index', format => 'txt')->render(text => 'Redirecting!');
 };
 
+get '/respond_to_redirect' => sub {
+    shift->respond_to(
+        json => { json => { hello => 'world' } },
+        html => { text => "hi there" } );
+};
+
+get '/redirect_303' => sub {
+  my $c = shift;
+  $c->res->code(303);
+  $c->redirect_to('respond_to_redirect');
+};
+
 get '/redirect_twice' => sub { shift->redirect_to('/redirect_named') };
 
 get '/redirect_no_render' => sub {
@@ -959,6 +971,14 @@ $t->ua->max_redirects(0);
 Test::Mojo->new->tx($t->tx->previous)->status_is(302)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_like(Location => qr!/template.txt$!)->content_is('Redirecting!');
+
+# Redirect with 303 and preserve Accept header
+$t->ua->max_redirects(3);
+$t->get_ok('/redirect_303')->status_is(200)
+  ->content_is( "hi there" )->header_is( Location => undef );
+$t->get_ok('/redirect_303' => { Accept => 'application/json' } )->status_is(200)
+  ->json_is( { hello => 'world' } )->header_is( Location => undef );
+$t->ua->max_redirects(0);
 
 # Request with koi8-r content
 my $koi8

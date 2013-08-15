@@ -90,13 +90,13 @@ sub redirect {
   if ($code eq 301 || $code eq 307 || $code eq 308) {
     return undef unless my $req = $req->clone;
     $new->req($req);
-    $method = 'GET' if $code eq 303 and $method ne 'HEAD';
     $req->headers->remove('Host')->remove('Cookie')->remove('Referer');
-  } elsif ($code eq 303) {
-      if (defined(my $accept = $req->headers->accept)) {
-        $new->req->headers->accept($accept);
-      }
-      $method = 'GET' if $method ne 'HEAD';
+  }
+  elsif ($code eq 303) {
+    if (defined(my $accept = $req->headers->accept)) {
+      $new->req->headers->accept($accept);
+    }
+    $method = 'GET' if $method ne 'HEAD';
   }
   elsif ($method ne 'HEAD') { $method = 'GET' }
   $new->req->method($method)->url($location);

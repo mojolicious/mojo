@@ -334,6 +334,12 @@ bytestream with L<Mojo::Util/"xml_escape">.
 
 XOR encode bytestream with L<Mojo::Util/"xor_encode">.
 
+=head1 BYTESTREAM
+
+Direct scalar reference access to the bytestream is also possible.
+
+  $$stream .= 'foo';
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

@@ -272,7 +272,7 @@ In addition to the methods above, you can also call methods provided by all
 elements in the collection directly and create a new collection from the
 results, similar to C<pluck>.
 
-  my $collection = Mojo::Collection->new(map { "/home/sri/$_.txt" } 1 .. 9);
+  push @$collection, Mojo::ByteStream->new("/home/sri/$_.txt") for 1 .. 9;
   say $collection->slurp->b64_encode('');
 
 =head1 ELEMENTS

@@ -263,7 +263,8 @@ Write all data from bytestream at once to file with L<Mojo::Util/"spurt">.
 
   my $collection = $stream->split(',');
 
-Turn bytestream into L<Mojo::Collection>.
+Turn bytestream into L<Mojo::Collection> object containing L<Mojo::ByteStream>
+objects.
 
   b('a,b,c')->split(',')->quote->join(',')->say;
 

@@ -15,6 +15,12 @@ is_deeply [@$collection], [1, 2, 3, 4, 5], 'right result';
 is_deeply [c(1, 2, 3)->tap(sub { $_->[1] += 2 })->each], [1, 4, 3],
   'right result';
 
+# compact
+is_deeply [c(undef, 0, 1, '', 2, 3)->compact->each], [0, 1, 2, 3],
+  'right result';
+is_deeply [c(3, 2, 1)->compact->each], [3, 2, 1], 'right result';
+is_deeply [c()->compact->each], [], 'right result';
+
 # each
 $collection = c(3, 2, 1);
 is_deeply [$collection->each], [3, 2, 1], 'right elements';

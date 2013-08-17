@@ -29,6 +29,10 @@ sub new {
 
 sub c { __PACKAGE__->new(@_) }
 
+sub compact {
+  shift->grep(sub {length});
+}
+
 sub each {
   my ($self, $cb) = @_;
   return @$self unless $cb;
@@ -141,6 +145,13 @@ L<Mojo::Collection> implements the following methods.
   my $collection = Mojo::Collection->new(1, 2, 3);
 
 Construct a new array-based L<Mojo::Collection> object.
+
+=head2 compact
+
+  my $new = $collection->compact;
+
+Create a new collection with all elements that are defined and not an empty
+string.
 
 =head2 each
 

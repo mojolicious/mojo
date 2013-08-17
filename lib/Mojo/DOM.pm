@@ -1,5 +1,5 @@
 package Mojo::DOM;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 use overload
   '%{}'    => sub { shift->attr },
   bool     => sub {1},
@@ -172,6 +172,8 @@ sub strip {
   return $self if $tree->[0] eq 'root';
   return $self->_replace($tree, ['root', @{_nodes($tree)}]);
 }
+
+sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { shift->_content(0, @_) }
 
@@ -383,8 +385,8 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Find
   say $dom->at('#b')->text;
-  say $dom->find('p')->pluck('text');
-  say $dom->find('[id]')->pluck(attr => 'id');
+  say $dom->find('p')->text;
+  say $dom->find('[id]')->attr('id');
 
   # Walk
   say $dom->div->p->[0]->text;
@@ -400,7 +402,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Modify
   $dom->div->p->[1]->append('<p id="c">C</p>');
-  $dom->find(':not(p)')->pluck('strip');
+  $dom->find(':not(p)')->strip;
 
   # Render
   say "$dom";
@@ -437,8 +439,7 @@ XML detection can also be disabled with the C<xml> method.
 
 =head1 METHODS
 
-L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::DOM> implements the following methods.
 
 =head2 new
 
@@ -470,7 +471,7 @@ Return a L<Mojo::Collection> object containing the ancestors of this element
 as L<Mojo::DOM> objects, similar to C<children>.
 
   # List types of ancestor elements
-  say $dom->ancestors->pluck('type');
+  say $dom->ancestors->type;
 
 =head2 append
 
@@ -542,8 +543,8 @@ L<Mojo::DOM::CSS> are supported.
   my $id = $dom->find('div')->[23]{id};
 
   # Extract information from multiple elements
-  my @headers = $dom->find('h1, h2, h3')->pluck('text')->each;
-  my @links   = $dom->find('a[href]')->pluck(attr => 'href')->each;
+  my @headers = $dom->find('h1, h2, h3')->text->each;
+  my @links   = $dom->find('a[href]')->attr('href')->each;
 
 =head2 namespace
 
@@ -661,6 +662,12 @@ parent of element.
   # "<div>A</div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->strip;
 
+=head2 tap
+
+  $dom = $dom->tap(sub {...});
+
+Alias for L<Mojo::Base/"tap">.
+
 =head2 text
 
   my $trimmed   = $dom->text;
@@ -729,7 +736,7 @@ carefully since it is very dynamic.
 Element type.
 
   # List types of child elements
-  say $dom->children->pluck('type');
+  say $dom->children->type;
 
 =head2 xml
 
@@ -747,7 +754,7 @@ L<Mojo::Collection> object, depending on number of children.
 
   say $dom->p->text;
   say $dom->div->[23]->text;
-  say $dom->div->pluck('text');
+  say $dom->div->text;
 
 =head1 ELEMENT ATTRIBUTES
 

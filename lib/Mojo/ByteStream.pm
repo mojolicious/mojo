@@ -1,5 +1,5 @@
 package Mojo::ByteStream;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 use overload '""' => sub { shift->to_string }, fallback => 1;
 
 use Exporter 'import';
@@ -60,6 +60,8 @@ sub split {
   return Mojo::Collection->new(map { $self->new($_) } split $pattern, $$self);
 }
 
+sub tap { shift->Mojo::Base::tap(@_) }
+
 sub to_string { ${$_[0]} }
 
 1;
@@ -103,8 +105,7 @@ Construct a new scalar-based L<Mojo::ByteStream> object.
 
 =head1 METHODS
 
-L<Mojo::ByteStream> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::ByteStream> implements the following methods.
 
 =head2 new
 
@@ -264,7 +265,7 @@ Write all data from bytestream at once to file with L<Mojo::Util/"spurt">.
 
 Turn bytestream into L<Mojo::Collection>.
 
-  b('a,b,c')->split(',')->pluck('quote')->join(',')->say;
+  b('a,b,c')->split(',')->quote->join(',')->say;
 
 =head2 squish
 
@@ -273,6 +274,12 @@ Turn bytestream into L<Mojo::Collection>.
 Trim whitespace characters from both ends of bytestream and then change all
 consecutive groups of whitespace into one space each with
 L<Mojo::Util/"squish">.
+
+=head2 tap
+
+  $stream = $stream->tap(sub {...});
+
+Alias for L<Mojo::Base/"tap">.
 
 =head2 to_string
 

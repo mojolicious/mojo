@@ -6,6 +6,9 @@ use File::Temp 'tempdir';
 use FindBin;
 use Mojo::ByteStream 'b';
 
+# Tap into method chain
+is b('test')->tap(sub { $$_ .= '1' })->camelize, 'Test1', 'right result';
+
 # camelize
 is b('foo_bar_baz')->camelize, 'FooBarBaz', 'right camelized result';
 

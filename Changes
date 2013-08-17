@@ -1,5 +1,6 @@
 
 4.25  2013-08-17
+  - Added support for calling element methods to Mojo::Collection.
 
 4.24  2013-08-08
   - Added ancestors method to Mojo::DOM.

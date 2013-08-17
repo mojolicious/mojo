@@ -854,7 +854,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     my $dom  = $self->ua->get($url)->res->dom;
-    $self->render(json => [$dom->find('h1, h2, h3')->pluck('text')->each]);
+    $self->render(json => [$dom->find('h1, h2, h3')->text->each]);
   };
 
   # Non-blocking

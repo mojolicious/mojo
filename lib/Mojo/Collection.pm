@@ -1,12 +1,26 @@
 package Mojo::Collection;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 use overload bool => sub {1}, '""' => sub { shift->join("\n") }, fallback => 1;
 
+use Carp 'croak';
 use Exporter 'import';
 use List::Util;
 use Mojo::ByteStream;
+use Scalar::Util 'blessed';
 
 our @EXPORT_OK = ('c');
+
+sub AUTOLOAD {
+  my $self = shift;
+
+  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
+  croak "Undefined subroutine &${package}::$method called"
+    unless blessed $self && $self->isa(__PACKAGE__);
+
+  croak qq{Can't locate object method "$method" via package "$package"}
+    unless @$self;
+  return $self->pluck($method, @_);
+}
 
 sub new {
   my $class = shift;
@@ -73,6 +87,8 @@ sub sort {
   return $self->new($cb ? sort { $a->$cb($b) } @$self : sort @$self);
 }
 
+sub tap { shift->Mojo::Base::tap(@_) }
+
 sub uniq {
   my $self = shift;
   my %seen;
@@ -118,8 +134,7 @@ Construct a new array-based L<Mojo::Collection> object.
 
 =head1 METHODS
 
-L<Mojo::Collection> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::Collection> implements the following methods.
 
 =head2 new
 
@@ -228,11 +243,26 @@ from the results.
 
   my $insensitive = $collection->sort(sub { uc(shift) cmp uc(shift) });
 
+=head2 tap
+
+  $collection = $collection->tap(sub {...});
+
+Alias for L<Mojo::Base/"tap">.
+
 =head2 uniq
 
   my $new = $collection->uniq;
 
 Create a new collection without duplicate elements.
+
+=head1 ELEMENT METHODS
+
+In addition to the methods above, you can also call methods provided by all
+elements in the collection directly and create a new collection from the
+results, similar to C<pluck>.
+
+  my $collection = Mojo::Collection->new(map { "/home/sri/$_.txt" } 1 .. 9);
+  say $collection->slurp->b64_encode('');
 
 =head1 ELEMENTS
 

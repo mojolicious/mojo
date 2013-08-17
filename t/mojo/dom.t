@@ -18,6 +18,12 @@ is $dom->at('#a')->attr->{foo}, 0, 'right attribute';
 is "$dom", '<div><div foo="0" id="a">A</div><div id="b">B</div></div>',
   'right result';
 
+# Tap into method chain
+$dom = Mojo::DOM->new->parse('<div id="a">A</div><div id="b">B</div>');
+is_deeply [$dom->find('[id]')->attr('id')->each], [qw(a b)], 'right result';
+is $dom->tap(sub { $_->at('#b')->remove }), '<div id="a">A</div>',
+  'right result';
+
 # Simple nesting with healing (tree structure)
 $dom = Mojo::DOM->new->parse(<<EOF);
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</bar>works</foo>
@@ -132,7 +138,7 @@ is $dom->next,     undef, 'no siblings';
 is $dom->previous, undef, 'no siblings';
 is $dom->at('foo > a')->next,          undef, 'no next sibling';
 is $dom->at('foo > simple')->previous, undef, 'no previous sibling';
-is_deeply [$dom->at('simple')->ancestors->pluck('type')->each], ['foo'],
+is_deeply [$dom->at('simple')->ancestors->type->each], ['foo'],
   'right results';
 ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 
@@ -318,7 +324,7 @@ is $dom->replace(''), '', 'no result';
 is "$dom", '', 'no result';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
-$dom->find('p')->pluck(replace => '');
+$dom->find('p')->replace('');
 is "$dom", '<div>foobar</div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>♥</div>');
 $dom->at('div')->replace_content('☃');

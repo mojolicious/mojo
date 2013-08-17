@@ -8,7 +8,7 @@ my $dom = Mojo::DOM->new->parse(
   '<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');
 is $dom->at('#b')->text, 'B', 'right text';
 my @div;
-push @div, $dom->find('div[id]')->pluck('text')->each;
+push @div, $dom->find('div[id]')->text->each;
 is_deeply \@div, [qw(A B)], 'found all div elements with id';
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, $_->text });
@@ -181,8 +181,8 @@ $dom->find('p')->each(sub { push @p, $_->attr('id') });
 is_deeply \@p, [qw(foo bar)], 'found all p elements';
 my $ids = [qw(container header logo buttons buttons content)];
 is_deeply \@div, $ids, 'found all div elements';
-is_deeply [$dom->at('p')->ancestors->pluck('type')->each],
-  [qw(div div div body html)], 'right results';
+is_deeply [$dom->at('p')->ancestors->type->each], [qw(div div div body html)],
+  'right results';
 is_deeply [$dom->at('html')->ancestors->each], [], 'no results';
 is_deeply [$dom->ancestors->each],             [], 'no results';
 
@@ -193,8 +193,8 @@ EOF
 is $dom->at('script')->text, "alert('lalala');", 'right script content';
 
 # HTML5 (unquoted values)
-$dom = Mojo::DOM->new->parse(
-  qq{<div id = test foo ="bar" class=tset>works</div>});
+$dom
+  = Mojo::DOM->new->parse('<div id = test foo ="bar" class=tset>works</div>');
 is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
@@ -205,7 +205,7 @@ is $dom->at('.tset')->text, 'works', 'right text';
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
 $dom = Mojo::DOM->new->parse(
-  qq{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
+  q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
 is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
@@ -226,7 +226,7 @@ is $dom->at('[id="snowm\000021 an"]'), undef, 'no result';
 
 # Unicode and escaped selectors
 my $html
-  = qq{<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>};
+  = '<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>';
 $dom = Mojo::DOM->new($html);
 is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';
 is $dom->at('#\\2603 x')->text,                       'Snowman', 'right text';
@@ -338,14 +338,14 @@ is $dom->replace('<b>whatever</b>')->root, '<b>whatever</b>', 'right result';
 is $dom->to_xml, '<b>whatever</b>', 'right result';
 $dom->at('b')->prepend('<p>foo</p>')->append('<p>bar</p>');
 is "$dom", '<p>foo</p><b>whatever</b><p>bar</p>', 'right result';
-is $dom->find('p')->pluck('remove')->first->root->at('b')->text, 'whatever',
+is $dom->find('p')->remove->first->root->at('b')->text, 'whatever',
   'right result';
 is "$dom", '<b>whatever</b>', 'right result';
 is $dom->at('b')->strip, 'whatever', 'right result';
 is $dom->strip,  'whatever', 'right result';
 is $dom->remove, '',         'right result';
 $dom->replace('A<div>B<p>C<b>D<i><u>E</u></i>F</b>G</p><div>H</div></div>I');
-is $dom->find(':not(div):not(i):not(u)')->pluck('strip')->first->root,
+is $dom->find(':not(div):not(i):not(u)')->strip->first->root,
   'A<div>BCD<i><u>E</u></i>FG<div>H</div></div>I', 'right result';
 is $dom->at('i')->to_xml, '<i><u>E</u></i>', 'right result';
 
@@ -608,14 +608,14 @@ is $dom->at('[test2=""]')->type, 'div', 'right type';
 is $dom->at('[test3=""]'), undef, 'no result';
 
 # Whitespaces before closing bracket
-$dom = Mojo::DOM->new->parse(qq{<div >content</div>});
+$dom = Mojo::DOM->new->parse('<div >content</div>');
 ok $dom->at('div'), 'tag found';
 is $dom->at('div')->text,        'content', 'right text';
 is $dom->at('div')->content_xml, 'content', 'right text';
 
 # Class with hyphen
 $dom
-  = Mojo::DOM->new->parse(qq{<div class="a">A</div><div class="a-1">A1</div>});
+  = Mojo::DOM->new->parse('<div class="a">A</div><div class="a-1">A1</div>');
 @div = ();
 $dom->find('.a')->each(sub { push @div, shift->text });
 is_deeply \@div, ['A'], 'found first element only';

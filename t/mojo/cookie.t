@@ -422,4 +422,26 @@ is $cookies->[0]->expires->epoch, 0, 'right expires epoch value';
 is $cookies->[0]->secure, 1, 'right secure flag';
 is $cookies->[1], undef, 'no more cookies';
 
+# Parse response cookie with two digit year (RFC 6265)
+$cookies = Mojo::Cookie::Response->parse(
+  'foo=bar; Path=/; Expires=Tuesday, 09-Nov-19 23:12:40 GMT; Secure');
+is $cookies->[0]->name,  'foo', 'right name';
+is $cookies->[0]->value, 'bar', 'right value';
+is $cookies->[0]->path,  '/',   'right path';
+is $cookies->[0]->expires, 'Sat, 09 Nov 2019 23:12:40 GMT',
+  'right expires value';
+is $cookies->[0]->expires->epoch, 1573341160, 'right expires epoch value';
+is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[1], undef, 'no more cookies';
+$cookies = Mojo::Cookie::Response->parse(
+  'foo=bar; Path=/; Expires=Tuesday, 09-Nov-99 23:12:40 GMT; Secure');
+is $cookies->[0]->name,  'foo', 'right name';
+is $cookies->[0]->value, 'bar', 'right value';
+is $cookies->[0]->path,  '/',   'right path';
+is $cookies->[0]->expires, 'Tue, 09 Nov 1999 23:12:40 GMT',
+  'right expires value';
+is $cookies->[0]->expires->epoch, 942189160, 'right expires epoch value';
+is $cookies->[0]->secure, 1, 'right secure flag';
+is $cookies->[1], undef, 'no more cookies';
+
 done_testing();

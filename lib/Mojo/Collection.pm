@@ -22,6 +22,8 @@ sub AUTOLOAD {
   return $self->pluck($method, @_);
 }
 
+sub DESTROY { }
+
 sub new {
   my $class = shift;
   return bless [@_], ref $class || $class;

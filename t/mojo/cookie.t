@@ -424,7 +424,7 @@ is $cookies->[1], undef, 'no more cookies';
 
 # Parse response cookie with two digit year (RFC 6265)
 $cookies = Mojo::Cookie::Response->parse(
-  'foo=bar; Path=/; Expires=Tuesday, 09-Nov-19 23:12:40 GMT; Secure');
+  'foo=bar; Path=/; Expires=Saturday, 09-Nov-19 23:12:40 GMT; Secure');
 is $cookies->[0]->name,  'foo', 'right name';
 is $cookies->[0]->value, 'bar', 'right value';
 is $cookies->[0]->path,  '/',   'right path';

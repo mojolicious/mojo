@@ -1,4 +1,6 @@
 
+4.27  2013-08-19
+
 4.26  2013-08-18
   - Fixed support for Netscape cookies in Mojo::Cookie::Response.
   - Fixed element method bug in Mojo::Collection.

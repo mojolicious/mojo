@@ -511,6 +511,9 @@ L<Mojo::DOM::CSS> are supported.
 
 Element attributes.
 
+  # List id attributes
+  say $dom->find('*')->attr('id')->compact;
+
 =head2 children
 
   my $collection = $dom->children;

@@ -79,74 +79,72 @@ sub parse {
   my ($self, $html) = @_;
 
   my $current = my $tree = ['root'];
-  if($html) {
-    while ($html =~ m/\G$TOKEN_RE/gcs) {
-      my ($text, $pi, $comment, $cdata, $doctype, $tag, $runaway)
-        = ($1, $2, $3, $4, $5, $6, $11);
+  while ($html =~ m/\G$TOKEN_RE/gcs) {
+    my ($text, $pi, $comment, $cdata, $doctype, $tag, $runaway)
+      = ($1, $2, $3, $4, $5, $6, $11);
 
-      # Text (and runaway "<")
-      $text .= '<' if defined $runaway;
-      if (length $text) {
-        $text = html_unescape $text;
-        my $sibling = $current->[-1];
-        if (ref $sibling && $sibling->[0] eq 'text') { $sibling->[1] .= $text }
-        else { push @$current, ['text', $text] }
+    # Text (and runaway "<")
+    $text .= '<' if defined $runaway;
+    if (length $text) {
+      $text = html_unescape $text;
+      my $sibling = $current->[-1];
+      if (ref $sibling && $sibling->[0] eq 'text') { $sibling->[1] .= $text }
+      else { push @$current, ['text', $text] }
+    }
+
+    # DOCTYPE
+    if ($doctype) { push @$current, ['doctype', $doctype] }
+
+    # Comment
+    elsif ($comment) { push @$current, ['comment', $comment] }
+
+    # CDATA
+    elsif ($cdata) { push @$current, ['cdata', $cdata] }
+
+    # Processing instruction (try to detect XML)
+    elsif ($pi) {
+      $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
+      push @$current, ['pi', $pi];
+    }
+
+    # End
+    next unless $tag;
+    my $cs = $self->xml;
+    if ($tag =~ $END_RE) { $self->_end($cs ? $1 : lc($1), \$current) }
+
+    # Start
+    elsif ($tag =~ m!([^\s/]+)([\s\S]*)!) {
+      my ($start, $attr) = ($cs ? $1 : lc($1), $2);
+
+      # Attributes
+      my %attrs;
+      while ($attr =~ /$ATTR_RE/g) {
+        my $key = $cs ? $1 : lc($1);
+        my $value = $2 // $3 // $4;
+
+        # Empty tag
+        next if $key eq '/';
+
+        $attrs{$key} = defined $value ? html_unescape($value) : $value;
       }
 
-      # DOCTYPE
-      if ($doctype) { push @$current, ['doctype', $doctype] }
+      # Tag
+      $self->_start($start, \%attrs, \$current);
 
-      # Comment
-      elsif ($comment) { push @$current, ['comment', $comment] }
+      # Empty element
+      $self->_end($start, \$current)
+        if (!$self->xml && $VOID{$start}) || $attr =~ m!/\s*$!;
 
-      # CDATA
-      elsif ($cdata) { push @$current, ['cdata', $cdata] }
-
-      # Processing instruction (try to detect XML)
-      elsif ($pi) {
-        $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
-        push @$current, ['pi', $pi];
-      }
-
-      # End
-      next unless $tag;
-      my $cs = $self->xml;
-      if ($tag =~ $END_RE) { $self->_end($cs ? $1 : lc($1), \$current) }
-
-      # Start
-      elsif ($tag =~ m!([^\s/]+)([\s\S]*)!) {
-        my ($start, $attr) = ($cs ? $1 : lc($1), $2);
-
-        # Attributes
-        my %attrs;
-        while ($attr =~ /$ATTR_RE/g) {
-          my $key = $cs ? $1 : lc($1);
-          my $value = $2 // $3 // $4;
-
-          # Empty tag
-          next if $key eq '/';
-
-          $attrs{$key} = defined $value ? html_unescape($value) : $value;
-        }
-
-        # Tag
-        $self->_start($start, \%attrs, \$current);
-
-        # Empty element
-        $self->_end($start, \$current)
-          if (!$self->xml && $VOID{$start}) || $attr =~ m!/\s*$!;
-
-        # Relaxed "script" or "style"
-        if ($start eq 'script' || $start eq 'style') {
-          if ($html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi) {
-            push @$current, ['raw', $1];
-            $self->_end($start, \$current);
-          }
+      # Relaxed "script" or "style"
+      if ($start eq 'script' || $start eq 'style') {
+        if ($html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi) {
+          push @$current, ['raw', $1];
+          $self->_end($start, \$current);
         }
       }
     }
   }
-  
+
   return $self->tree($tree);
 }
 

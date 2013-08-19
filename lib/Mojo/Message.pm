@@ -483,11 +483,11 @@ to be loaded into memory to parse it, so you have to make sure it is not
 excessively large.
 
   # Perform "find" right away
-  say $msg->dom('h1, h2, h3')->pluck('text');
+  say $msg->dom('h1, h2, h3')->text;
 
   # Use everything else Mojo::DOM has to offer
   say $msg->dom->at('title')->text;
-  say $msg->dom->html->body->children->pluck('type')->uniq;
+  say $msg->dom->html->body->children->type->uniq;
 
 =head2 error
 

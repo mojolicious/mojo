@@ -144,12 +144,13 @@ is decode('UTF-8', url_unescape 'foo%C3%9F%C4%80bar%E2%98%BA'),
   "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
 
 # html_unescape
-is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x26;&#34;'),
+is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'),
   "<foo>bar<baz>&\"", 'right html unescaped result';
 
 # html_unescape (special entities)
-is html_unescape('foo &CounterClockwiseContourIntegral; bar &sup1baz'),
-  "foo \x{2233} bar \x{00b9}baz", 'right html unescaped result';
+is html_unescape(
+  'foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
+  "foo ☃ \x{2233} bar \x{00b9}baz", 'right html unescaped result';
 
 # html_unescape (multi-character entity)
 is html_unescape(decode 'UTF-8', '&acE;'), "\x{223e}\x{0333}",

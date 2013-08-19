@@ -360,8 +360,8 @@ Generate file input element.
     %= submit_button
   % end
 
-Generate portable form for route, path or URL. For routes that allow POST but
-not GET, a C<method> attribute will be automatically added.
+Generate portable form tag for route, path or URL. For routes that allow POST
+but not GET, a C<method> attribute will be automatically added.
 
   <form action="/path/to/login">
     <input name="first_name" />
@@ -371,7 +371,7 @@ not GET, a C<method> attribute will be automatically added.
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
-  <form action="/login" method="POST">
+  <form action="/path/to/login" method="POST">
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
@@ -395,10 +395,10 @@ Generate hidden input element.
   %= image '/images/foo.png'
   %= image '/images/foo.png', alt => 'Foo'
 
-Generate image tag.
+Generate portable img tag.
 
-  <img src="/images/foo.png" />
-  <img alt="Foo" src="/images/foo.png" />
+  <img src="/path/to/images/foo.png" />
+  <img alt="Foo" src="/path/to/images/foo.png" />
 
 =head2 input_tag
 
@@ -422,7 +422,7 @@ picked up and shown as default.
 
 Generate portable script tag for C<Javascript> asset.
 
-  <script src="/script.js" />
+  <script src="/path/to/script.js" />
   <script><![CDATA[
     var a = 'b';
   ]]></script>
@@ -436,7 +436,7 @@ Generate portable script tag for C<Javascript> asset.
   % end
   %= link_to Contact => 'mailto:sri@example.com'
   <%= link_to index => begin %>Home<% end %>
-  <%= link_to '/path/to/file' => begin %>File<% end %>
+  <%= link_to '/file.txt' => begin %>File<% end %>
   <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => 'bar')->to_abs => begin %>Retry<% end %>
 
@@ -450,7 +450,7 @@ capitalized link target as content.
   </a>
   <a href="mailto:sri@example.com">Contact</a>
   <a href="/path/to/index">Home</a>
-  <a href="/path/to/file">File</a>
+  <a href="/path/to/file.txt">File</a>
   <a href="http://mojolicio.us">Mojolicious</a>
   <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
 
@@ -570,7 +570,7 @@ automatically get picked up and shown as default.
 
 Generate portable style or link tag for C<CSS> asset.
 
-  <link href="/foo.css" media="screen" rel="stylesheet" />
+  <link href="/path/to/foo.css" media="screen" rel="stylesheet" />
   <style><![CDATA[
     body {color: #000}
   ]]></style>

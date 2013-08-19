@@ -1,5 +1,17 @@
 
-4.24  2013-08-06
+4.27  2013-08-19
+
+4.26  2013-08-18
+  - Fixed support for Netscape cookies in Mojo::Cookie::Response.
+  - Fixed element method bug in Mojo::Collection.
+
+4.25  2013-08-17
+  - Added support for calling element methods to Mojo::Collection.
+  - Added compact method to Mojo::Collection.
+
+4.24  2013-08-08
+  - Added ancestors method to Mojo::DOM.
+  - Fixed bug where Mojo::IOLoop::Stream timeout was not always available.
 
 4.23  2013-08-01
   - Added redirects method to Mojo::Transaction::HTTP.

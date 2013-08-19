@@ -854,7 +854,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
     my $self = shift;
     my $url  = $self->param('url') || 'http://mojolicio.us';
     my $dom  = $self->ua->get($url)->res->dom;
-    $self->render(json => [$dom->find('h1, h2, h3')->pluck('text')->each]);
+    $self->render(json => [$dom->find('h1, h2, h3')->text->each]);
   };
 
   # Non-blocking
@@ -959,7 +959,7 @@ C<log> directory exists.
 
   $ mkdir log
 
-Mode changes also affects a few other aspects of the framework, such as mode
+Mode changes also affect a few other aspects of the framework, such as mode
 specific C<exception> and C<not_found> templates.
 
 =head2 Testing

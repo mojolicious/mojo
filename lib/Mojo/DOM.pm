@@ -1,8 +1,8 @@
 package Mojo::DOM;
-use Mojo::Base -base;
+use Mojo::Base -strict;
 use overload
   '%{}'    => sub { shift->attr },
-  'bool'   => sub {1},
+  bool     => sub {1},
   '""'     => sub { shift->to_xml },
   fallback => 1;
 
@@ -37,6 +37,8 @@ sub new {
 }
 
 sub all_text { shift->_content(1, @_) }
+
+sub ancestors { $_[0]->_collection(_ancestors($_[0]->tree)) }
 
 sub append { shift->_add(1, @_) }
 
@@ -77,11 +79,11 @@ sub children {
 
   my @children;
   my $xml = $self->xml;
-  for my $e (@{_elements($self->tree)}) {
+  for my $n (@{_nodes($self->tree)}) {
 
     # Make sure child is the right type
-    next if $e->[0] ne 'tag' || (defined $type && $e->[1] ne $type);
-    push @children, $self->new->tree($e)->xml($xml);
+    next if $n->[0] ne 'tag' || (defined $type && $n->[1] ne $type);
+    push @children, $self->new->tree($n)->xml($xml);
   }
 
   return Mojo::Collection->new(@children);
@@ -90,15 +92,13 @@ sub children {
 sub content_xml {
   my $self = shift;
   my $xml  = $self->xml;
-  return join '', map { _render($_, $xml) } @{_elements($self->tree)};
+  return join '', map { _render($_, $xml) } @{_nodes($self->tree)};
 }
 
 sub find {
-  my ($self, $selector) = @_;
-  my $xml = $self->xml;
-  my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select($selector);
-  return Mojo::Collection->new(map { $self->new->tree($_)->xml($xml) }
-      @$results);
+  my $self = shift;
+  my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select(@_);
+  return $self->_collection(@$results);
 }
 
 sub namespace {
@@ -162,22 +162,18 @@ sub replace_content {
 
 sub root {
   my $self = shift;
-
-  my $root = $self->tree;
-  while ($root->[0] eq 'tag') {
-    last unless my $parent = $root->[3];
-    $root = $parent;
-  }
-
-  return $self->new->tree($root)->xml($self->xml);
+  return $self unless my $tree = _ancestors($self->tree, 1);
+  return $self->new->tree($tree)->xml($self->xml);
 }
 
 sub strip {
   my $self = shift;
   my $tree = $self->tree;
   return $self if $tree->[0] eq 'root';
-  return $self->_replace($tree, ['root', @{_elements($tree)}]);
+  return $self->_replace($tree, ['root', @{_nodes($tree)}]);
 }
+
+sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { shift->_content(0, @_) }
 
@@ -186,15 +182,15 @@ sub text_after {
 
   return '' if (my $tree = $self->tree)->[0] eq 'root';
 
-  my (@elements, $started);
-  for my $e (@{_elements($tree->[3])}) {
-    ++$started and next if $e eq $tree;
+  my (@nodes, $started);
+  for my $n (@{_nodes($tree->[3])}) {
+    ++$started and next if $n eq $tree;
     next unless $started;
-    last if $e->[0] eq 'tag';
-    push @elements, $e;
+    last if $n->[0] eq 'tag';
+    push @nodes, $n;
   }
 
-  return _text(\@elements, 0, _trim($tree->[3], $trim));
+  return _text(\@nodes, 0, _trim($tree->[3], $trim));
 }
 
 sub text_before {
@@ -202,14 +198,14 @@ sub text_before {
 
   return '' if (my $tree = $self->tree)->[0] eq 'root';
 
-  my @elements;
-  for my $e (@{_elements($tree->[3])}) {
-    last if $e eq $tree;
-    push @elements, $e;
-    @elements = () if $e->[0] eq 'tag';
+  my @nodes;
+  for my $n (@{_nodes($tree->[3])}) {
+    last if $n eq $tree;
+    push @nodes, $n;
+    @nodes = () if $n->[0] eq 'tag';
   }
 
-  return _text(\@elements, 0, _trim($tree->[3], $trim));
+  return _text(\@nodes, 0, _trim($tree->[3], $trim));
 }
 
 sub to_xml { shift->[0]->render }
@@ -238,14 +234,23 @@ sub _add {
   return $self;
 }
 
-sub _content {
-  my $tree = shift->tree;
-  return _text(_elements($tree), shift, _trim($tree, @_));
+sub _ancestors {
+  my ($tree, $root) = @_;
+  my @ancestors;
+  push @ancestors, $tree while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
+  return $root ? $ancestors[-1] : @ancestors[0 .. $#ancestors - 1];
 }
 
-sub _elements {
-  return [] unless my $e = shift;
-  return [@$e[_offset($e) .. $#$e]];
+sub _collection {
+  my $self = shift;
+  my $xml  = $self->xml;
+  return Mojo::Collection->new(@_)
+    ->map(sub { $self->new->tree($_)->xml($xml) });
+}
+
+sub _content {
+  my $tree = shift->tree;
+  return _text(_nodes($tree), shift, _trim($tree, @_));
 }
 
 sub _html {
@@ -260,14 +265,19 @@ sub _link {
 
   # Link parent to children
   my @new;
-  for my $e (@$children[1 .. $#$children]) {
-    push @new, $e;
-    next unless $e->[0] eq 'tag';
-    $e->[3] = $parent;
-    weaken $e->[3];
+  for my $n (@$children[1 .. $#$children]) {
+    push @new, $n;
+    next unless $n->[0] eq 'tag';
+    $n->[3] = $parent;
+    weaken $n->[3];
   }
 
   return @new;
+}
+
+sub _nodes {
+  return [] unless my $n = shift;
+  return [@$n[_offset($n) .. $#$n]];
 }
 
 sub _offset { $_[0][0] eq 'root' ? 1 : 4 }
@@ -277,8 +287,8 @@ sub _parent {
 
   # Find parent offset for child
   my $i = _offset($parent);
-  for my $e (@$parent[$i .. $#$parent]) {
-    last if $e == $child;
+  for my $n (@$parent[$i .. $#$parent]) {
+    last if $n == $child;
     $i++;
   }
 
@@ -315,23 +325,23 @@ sub _sibling {
 }
 
 sub _text {
-  my ($elements, $recurse, $trim) = @_;
+  my ($nodes, $recurse, $trim) = @_;
 
   my $text = '';
-  for my $e (@$elements) {
-    my $type = $e->[0];
+  for my $n (@$nodes) {
+    my $type = $n->[0];
 
     # Nested tag
     my $content = '';
     if ($type eq 'tag' && $recurse) {
-      $content = _text(_elements($e), 1, _trim($e, $trim));
+      $content = _text(_nodes($n), 1, _trim($n, $trim));
     }
 
     # Text
-    elsif ($type eq 'text') { $content = $trim ? squish($e->[1]) : $e->[1] }
+    elsif ($type eq 'text') { $content = $trim ? squish($n->[1]) : $n->[1] }
 
     # CDATA or raw text
-    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $e->[1] }
+    elsif ($type eq 'cdata' || $type eq 'raw') { $content = $n->[1] }
 
     # Add leading whitespace if punctuation allows it
     $content = " $content" if $text =~ /\S\z/ && $content =~ /^[^.!?,;:\s]+/;
@@ -375,8 +385,8 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Find
   say $dom->at('#b')->text;
-  say $dom->find('p')->pluck('text');
-  say $dom->find('[id]')->pluck(attr => 'id');
+  say $dom->find('p')->text;
+  say $dom->find('[id]')->attr('id');
 
   # Walk
   say $dom->div->p->[0]->text;
@@ -392,7 +402,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
 
   # Modify
   $dom->div->p->[1]->append('<p id="c">C</p>');
-  $dom->find(':not(p)')->pluck('strip');
+  $dom->find(':not(p)')->strip;
 
   # Render
   say "$dom";
@@ -429,8 +439,7 @@ XML detection can also be disabled with the C<xml> method.
 
 =head1 METHODS
 
-L<Mojo::DOM> inherits all methods from L<Mojo::Base> and implements the
-following new ones.
+L<Mojo::DOM> implements the following methods.
 
 =head2 new
 
@@ -453,6 +462,16 @@ enabled by default.
 
   # "foo\nbarbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->all_text(0);
+
+=head2 ancestors
+
+  my $collection = $dom->ancestors;
+
+Return a L<Mojo::Collection> object containing the ancestors of this element
+as L<Mojo::DOM> objects, similar to C<children>.
+
+  # List types of ancestor elements
+  say $dom->ancestors->type;
 
 =head2 append
 
@@ -492,6 +511,9 @@ L<Mojo::DOM::CSS> are supported.
 
 Element attributes.
 
+  # List id attributes
+  say $dom->find('*')->attr('id')->compact;
+
 =head2 children
 
   my $collection = $dom->children;
@@ -524,8 +546,8 @@ L<Mojo::DOM::CSS> are supported.
   my $id = $dom->find('div')->[23]{id};
 
   # Extract information from multiple elements
-  my @headers = $dom->find('h1, h2, h3')->pluck('text')->each;
-  my @links   = $dom->find('a[href]')->pluck(attr => 'href')->each;
+  my @headers = $dom->find('h1, h2, h3')->text->each;
+  my @links   = $dom->find('a[href]')->attr('href')->each;
 
 =head2 namespace
 
@@ -643,6 +665,12 @@ parent of element.
   # "<div>A</div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->strip;
 
+=head2 tap
+
+  $dom = $dom->tap(sub {...});
+
+Alias for L<Mojo::Base/"tap">.
+
 =head2 text
 
   my $trimmed   = $dom->text;
@@ -711,7 +739,7 @@ carefully since it is very dynamic.
 Element type.
 
   # List types of child elements
-  say $dom->children->pluck('type');
+  say $dom->children->type;
 
 =head2 xml
 
@@ -729,7 +757,7 @@ L<Mojo::Collection> object, depending on number of children.
 
   say $dom->p->text;
   say $dom->div->[23]->text;
-  say $dom->div->pluck('text');
+  say $dom->div->text;
 
 =head1 ELEMENT ATTRIBUTES
 

@@ -1,9 +1,6 @@
 package Mojo::Date;
 use Mojo::Base -base;
-use overload
-  'bool'   => sub {1},
-  '""'     => sub { shift->to_string },
-  fallback => 1;
+use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Time::Local 'timegm';
 

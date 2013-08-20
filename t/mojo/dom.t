@@ -27,7 +27,7 @@ is $dom->tap(sub { $_->at('#b')->remove }), '<div id="a">A</div>',
 # Make sure, when passing in a string without any tags, the dom still looks as expected.
 my $temp_string = "This is a 'html' string without any tags.";
 $dom = Mojo::DOM->new->parse($temp_string);
-is "$dom", $temp_string, 'Same as before, unchanged.'
+is "$dom", $temp_string, 'Same as before, unchanged.';
 
 # Makes sure finding an element that doesn't exist still works.
 my $temp_dom = $dom->find('body');

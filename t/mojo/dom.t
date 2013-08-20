@@ -24,6 +24,15 @@ is_deeply [$dom->find('[id]')->attr('id')->each], [qw(a b)], 'right result';
 is $dom->tap(sub { $_->at('#b')->remove }), '<div id="a">A</div>',
   'right result';
 
+# Make sure, when passing in a string without any tags, the dom still looks as expected.
+my $temp_string = "This is an `html` string without any tags.";
+$dom = Mojo::DOM->new->parse($temp_string);
+is "$dom", $temp_string, 'Same as before, unchanged.';
+
+# Makes sure finding an element that doesn't exist still works.
+my $temp_dom = $dom->find('body');
+is((length "$temp_dom"), 0, "element doesn't exist.");
+
 # Simple nesting with healing (tree structure)
 $dom = Mojo::DOM->new->parse(<<EOF);
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz />t</bar>works</foo>

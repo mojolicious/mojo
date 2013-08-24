@@ -68,6 +68,7 @@ sub listen {
       LocalPort => $port,
       Proto     => 'tcp',
       ReuseAddr => 1,
+      ReusePort => $args->{reuse},
       Type      => SOCK_STREAM
     );
     $options{LocalAddr} =~ s/[\[\]]//g;
@@ -230,33 +231,56 @@ These options are currently available:
 
 =item address
 
+  address => '127.0.0.1'
+
 Local address to listen on, defaults to all.
 
 =item backlog
+
+  backlog => 128
 
 Maximum backlog size, defaults to C<SOMAXCONN>.
 
 =item port
 
+  port => 80
+
 Port to listen on.
 
+=item reuse
+
+  reuse => 1
+
+Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket
+option.
+
 =item tls
+
+  tls => 1
 
 Enable TLS.
 
 =item tls_ca
 
+  tls_ca => '/etc/tls/ca.crt'
+
 Path to TLS certificate authority file.
 
 =item tls_cert
+
+  tls_cert => '/etc/tls/server.crt'
 
 Path to the TLS cert file, defaults to a built-in test certificate.
 
 =item tls_key
 
+  tls_key => '/etc/tls/server.key'
+
 Path to the TLS key file, defaults to a built-in test key.
 
 =item tls_verify
+
+  tls_verify => 0x00
 
 TLS verification mode, defaults to C<0x03>.
 

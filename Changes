@@ -1,5 +1,7 @@
 
-4.27  2013-08-20
+4.27  2013-08-25
+  - Added reuse option to Mojo::IOLoop::Server::listen.
+  - Added reuse parameter to Mojo::Server::Daemon::listen.
 
 4.26  2013-08-18
   - Fixed support for Netscape cookies in Mojo::Cookie::Response.

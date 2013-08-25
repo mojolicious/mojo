@@ -1116,9 +1116,11 @@ that, the application object itself can be accessed via C<app>.
   $ mojo generate lite_app
   $ ./myapp.pl eval 'say for @{app->static->paths}'
 
-The C<verbose> option will automatically print the return value to C<STDOUT>.
+The C<verbose> options will automatically print the return value or returned
+data structure to C<STDOUT>.
 
   $ ./myapp.pl eval -v 'app->static->paths->[0]'
+  $ ./myapp.pl eval -V 'app->static->paths'
 
 =head2 Making your application installable
 

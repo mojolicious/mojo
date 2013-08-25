@@ -2,6 +2,7 @@
 4.27  2013-08-25
   - Added acceptors acceptors to Mojo::Server::Daemon.
   - Added handle method to Mojo::IOLoop::Server.
+  - Added -V option to eval command.
   - Added reuse option to Mojo::IOLoop::Server::listen.
   - Added reuse parameter to Mojo::Server::Daemon::listen.
   - Fixed console message bug in Mojo::Server::Daemon.

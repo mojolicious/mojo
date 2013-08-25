@@ -228,7 +228,7 @@ Local address to bind to.
 
   port => 80
 
-Port to connect to.
+Port to connect to, defaults to C<80> or C<443> with C<tls> option.
 
 =item timeout
 

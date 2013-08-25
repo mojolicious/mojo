@@ -320,7 +320,7 @@ implements the following new ones.
   my $acceptors = $daemon->acceptors;
   $daemon       = $daemon->acceptors([]);
 
-Currently active acceptors.
+Active acceptors.
 
 =head2 backlog
 

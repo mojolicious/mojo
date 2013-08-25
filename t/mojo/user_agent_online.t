@@ -206,9 +206,15 @@ is $tx->req->url,    'https://ipv6.google.com', 'right url';
 is $tx->res->code,   200,                       'right status';
 
 # HTTPS request that requires SNI
-$tx = $ua->get('https://google.de');
-like $ua->ioloop->stream($tx->connection)
-  ->handle->peer_certificate('commonName'), qr/google\.de/, 'right name';
+SKIP: {
+  skip 'SNI support required!', 1
+    unless IO::Socket::SSL->can('can_client_sni')
+    && IO::Socket::SSL->can_client_sni;
+
+  $tx = $ua->get('https://google.de');
+  like $ua->ioloop->stream($tx->connection)
+    ->handle->peer_certificate('commonName'), qr/google\.de/, 'right name';
+}
 
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;

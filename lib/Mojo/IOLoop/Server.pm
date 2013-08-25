@@ -103,6 +103,8 @@ sub generate_port {
     ->sockport;
 }
 
+sub handle { shift->{handle} }
+
 sub start {
   my $self = shift;
   weaken $self;
@@ -291,6 +293,12 @@ TLS verification mode, defaults to C<0x03>.
   my $port = $server->generate_port;
 
 Find a free TCP port, this is a utility function primarily used for tests.
+
+=head2 handle
+
+  my $handle = $server->handle;
+
+Get handle for server.
 
 =head2 start
 

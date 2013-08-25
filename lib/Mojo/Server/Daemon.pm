@@ -9,6 +9,7 @@ use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
+has acceptors => sub { [] };
 has [qw(backlog group silent user)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
@@ -20,7 +21,7 @@ sub DESTROY {
   my $self = shift;
   return unless my $loop = $self->ioloop;
   $self->_remove($_) for keys %{$self->{connections} || {}};
-  $loop->remove($_) for @{$self->{acceptors} || []};
+  $loop->remove($_) for @{$self->acceptors};
 }
 
 sub run {
@@ -54,9 +55,9 @@ sub start {
 
   # Resume accepting connections
   my $loop = $self->ioloop;
-  if (my $acceptors = $self->{acceptors}) {
-    push @$acceptors, $loop->acceptor(delete $self->{servers}{$_})
-      for keys %{$self->{servers}};
+  if (my $servers = $self->{servers}) {
+    push @{$self->acceptors}, $loop->acceptor(delete $servers->{$_})
+      for keys %$servers;
   }
 
   # Start listening
@@ -71,7 +72,7 @@ sub stop {
 
   # Suspend accepting connections but keep listen sockets open
   my $loop = $self->ioloop;
-  while (my $id = shift @{$self->{acceptors}}) {
+  while (my $id = shift @{$self->acceptors}) {
     my $server = $self->{servers}{$id} = $loop->acceptor($id);
     $loop->remove($id);
     $server->stop;
@@ -176,7 +177,7 @@ sub _listen {
   my $tls = $options->{tls} = $url->protocol eq 'https' ? 1 : undef;
 
   weaken $self;
-  push @{$self->{acceptors} ||= []}, $self->ioloop->server(
+  push @{$self->acceptors}, $self->ioloop->server(
     $options => sub {
       my ($loop, $stream, $id) = @_;
 
@@ -313,6 +314,13 @@ L<Mojo::Server::Daemon> inherits all events from L<Mojo::Server>.
 
 L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
+
+=head2 acceptors
+
+  my $acceptors = $daemon->acceptors;
+  $daemon       = $daemon->acceptors([]);
+
+Currently active acceptors.
 
 =head2 backlog
 

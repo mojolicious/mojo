@@ -220,7 +220,7 @@ $daemon = Mojo::Server::Daemon->new(
   listen => ["http://127.0.0.1:$port"],
   silent => 1
 );
-is_deeply $daemon->acceptors, [], 'no active acceptors';
+is scalar @{$daemon->acceptors}, 0, 'no active acceptor';
 $daemon->start;
 is scalar @{$daemon->acceptors}, 1, 'one active acceptor';
 is $daemon->app->moniker, 'mojolicious', 'right moniker';
@@ -229,7 +229,7 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
 $daemon->stop;
-is_deeply $daemon->acceptors, [], 'no active acceptors';
+is scalar @{$daemon->acceptors}, 0, 'no active acceptor';
 $tx = $ua->inactivity_timeout(0.5)
   ->get("http://127.0.0.1:$port/throttle2" => {Connection => 'close'});
 ok !$tx->success, 'not successful';

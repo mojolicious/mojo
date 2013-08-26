@@ -124,9 +124,9 @@ L<Mojolicious::Plugin::JSONConfig> configuration file.
   };
 
 But one of its biggest advantages is the support for effortless zero downtime
-software upgrades. That means you can upgrade L<Mojolicious>, Perl or even
-system libraries at runtime without ever stopping the server or losing a
-single incoming connection, just by running the command above again.
+software upgrades (hot deployment). That means you can upgrade L<Mojolicious>,
+Perl or even system libraries at runtime without ever stopping the server or
+losing a single incoming connection, just by running the command above again.
 
   $ hypnotoad script/myapp
   Starting hot deployment for Hypnotoad server 31841.
@@ -140,10 +140,10 @@ C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
 
 =head2 Zero downtime software upgrades
 
-L<Mojo::Server::Hypnotoad> makes zero downtime software upgrades very simple,
-as you can see above, but on modern operating systems that support the
-C<SO_REUSEPORT> socket option, there is also another method available that
-works with all built-in web servers.
+L<Mojo::Server::Hypnotoad> makes zero downtime software upgrades
+(hot deployment) very simple, as you can see above, but on modern operating
+systems that support the C<SO_REUSEPORT> socket option, there is also another
+method available that works with all built-in web servers.
 
   $ ./script/myapp prefork -P /tmp/first.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080.

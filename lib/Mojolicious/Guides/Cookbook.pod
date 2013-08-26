@@ -145,15 +145,15 @@ as you can see above, but on modern operating systems that support the
 C<SO_REUSEPORT> socket option, there is also another method available that
 works with all built-in web servers.
 
-  $ ./script/myapp prefork -P ./first.pid -l http://*:8080?reuse=1
+  $ ./script/myapp prefork -P /tmp/first.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080.
 
 All you have to do is start a second web server listening to the same port and
 stop the first web server gracefully afterwards.
 
-  $ ./script/myapp prefork -P ./second.pid -l http://*:8080?reuse=1
+  $ ./script/myapp prefork -P /tmp/second.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080.
-  $ kill -s TERM `cat ./first.pid`
+  $ kill -s TERM `cat /tmp/first.pid`
 
 Just remember that both web servers need to be started with the C<reuse>
 parameter.

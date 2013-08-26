@@ -53,6 +53,20 @@ concurrent connections each worker is allowed to handle.
   $ ./script/myapp prefork -m production -w 10 -c 1
   Server available at http://127.0.0.1:3000.
 
+Your application is preloaded in the manager process during startup, to run
+code whenever a new worker process has been forked you can use L<Mojo::IOLoop>
+timers.
+
+  use Mojolicious::Lite;
+
+  Mojo::IOLoop->timer(0 => sub {
+    app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
+  });
+
+  get '/' => {text => 'Hello Wor...ALL GLORY TO THE HYPNOTOAD!'};
+
+  app->start;
+
 =head2 Morbo
 
 After reading the L<Mojolicious::Lite> tutorial, you should already be
@@ -123,20 +137,6 @@ C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
 
   # myapp.conf
   {hypnotoad => {proxy => 1}};
-
-Your application is preloaded in the manager process during startup, to run
-code whenever a new worker process has been forked you can use L<Mojo::IOLoop>
-timers.
-
-  use Mojolicious::Lite;
-
-  Mojo::IOLoop->timer(0 => sub {
-    app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
-  });
-
-  get '/' => {text => 'Hello Wor...ALL GLORY TO THE HYPNOTOAD!'};
-
-  app->start;
 
 =head2 Zero downtime software upgrades
 

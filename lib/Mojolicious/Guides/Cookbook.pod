@@ -140,10 +140,10 @@ C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
 
 =head2 Zero downtime software upgrades
 
-L<Mojo::Server::Hypnotoad> makes zero downtime software upgrades
-(hot deployment) very simple, as you can see above, but on modern operating
-systems that support the C<SO_REUSEPORT> socket option, there is also another
-method available that works with all built-in web servers.
+Hypnotoad makes zero downtime software upgrades (hot deployment) very simple,
+as you can see above, but on modern operating systems that support the
+C<SO_REUSEPORT> socket option, there is also another method available that
+works with all built-in web servers.
 
   $ ./script/myapp prefork -P /tmp/first.pid -l http://*:8080?reuse=1
   Server available at http://127.0.0.1:8080.

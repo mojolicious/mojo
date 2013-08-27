@@ -22,14 +22,14 @@ get '/expiration' => sub {
 
 under('/missing' => sub {1})->route->to('does_not_exist#not_at_all');
 
-under '/delayed' => sub {
+under '/suspended' => sub {
   my $self = shift;
 
   my $continue;
   Mojo::IOLoop->timer(
     0 => sub {
       return $self->render(text => 'stopped!') unless $self->param('ok');
-      $self->stash(delayed => 'delayed!');
+      $self->stash(suspended => 'suspended!');
       $continue->();
     }
   );
@@ -37,7 +37,7 @@ under '/delayed' => sub {
   return \$continue;
 };
 
-get '/' => sub { shift->render(inline => '<%= $delayed %>\\') };
+get '/' => sub { shift->render(inline => '<%= $suspended %>\\') };
 
 under sub {
   my $self = shift;
@@ -206,12 +206,12 @@ $t->reset_session;
 # Missing action behind bridge
 $t->get_ok('/missing')->status_is(404);
 
-# Delayed bridge
-$t->get_ok('/delayed?ok=1')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('delayed!');
+# Suspended bridge
+$t->get_ok('/suspended?ok=1')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('suspended!');
 
-# Delayed bridge (stopped)
-$t->get_ok('/delayed?ok=0')->status_is(200)
+# Suspended bridge (stopped)
+$t->get_ok('/suspended?ok=0')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('stopped!');
 
 # Authenticated with header

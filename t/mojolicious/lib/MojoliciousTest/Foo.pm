@@ -11,20 +11,6 @@ sub config {
   $self->render(text => $self->stash('config')->{test});
 }
 
-sub delayed {
-  my $self = shift;
-
-  my $continue;
-  Mojo::IOLoop->timer(
-    0 => sub {
-      $self->res->headers->append('X-Delayed' => 1);
-      $continue->();
-    }
-  );
-
-  return \$continue;
-}
-
 sub fun { shift->render(text => 'Have fun!') }
 
 sub index {
@@ -67,6 +53,20 @@ sub stage1 {
 }
 
 sub stage2 { return shift->some_plugin }
+
+sub suspended {
+  my $self = shift;
+
+  my $continue;
+  Mojo::IOLoop->timer(
+    0 => sub {
+      $self->res->headers->append('X-Suspended' => 1);
+      $continue->();
+    }
+  );
+
+  return \$continue;
+}
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }
 

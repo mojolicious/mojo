@@ -453,10 +453,10 @@ $t->get_ok('/staged' => {'X-Pass' => 1})->status_is(200)
 $t->get_ok('/staged')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Go away!');
 
-# MojoliciousTestController::Foo::delayed
-$t->get_ok('/delayed')->status_is(200)
-  ->header_is(Server      => 'Mojolicious (Perl)')
-  ->header_is('X-Delayed' => '1, 1')->content_is('Have fun!');
+# MojoliciousTestController::Foo::suspended
+$t->get_ok('/suspended')->status_is(200)
+  ->header_is(Server        => 'Mojolicious (Perl)')
+  ->header_is('X-Suspended' => '1, 1')->content_is('Have fun!');
 
 # MojoliciousTest::Foo::config
 $t->get_ok('/stash_config')->status_is(200)

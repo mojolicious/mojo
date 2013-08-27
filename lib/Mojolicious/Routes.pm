@@ -216,7 +216,7 @@ sub _next {
   # Next
   return $self->_next($c, $stack) unless ref $continue eq 'SCALAR';
 
-  # Delay
+  # Suspend
   $c->render_later;
   $$continue = sub { $self->_next($c, $stack) };
   return 1;

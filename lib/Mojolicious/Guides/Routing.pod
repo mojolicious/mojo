@@ -573,6 +573,34 @@ be broken, this makes bridges a very powerful tool for authentication.
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 
+To allow non-blocking operations to finish before continuing the dispatch
+chain, you can suspend it by returning a C<Scalar> reference. A callback
+leading to the next dispatch cycle will be automatically assigned to it.
+
+  # /foo     -> undef
+  # /foo/bar -> {cb => sub {...}}
+  #          -> {controller => 'foo', action => 'bar'}
+  my $foo = $r->bridge('/foo')->to(cb => sub {
+    my $self = shift;
+
+    # Wait 3 seconds and then give visitors a 50% chance to continue
+    my $continue;
+    Mojo::IOLoop->timer(3 => sub {
+
+      # Loser
+      return $self->render(text => 'No luck.') unless int rand 2;
+
+      # Winner
+      $continue->();
+    });
+
+    return \$continue;
+  });
+  $foo->route('/bar')->to(controller => 'foo', action => 'bar');
+
+Automatic rendering will be disabled after the dispatch chain has been
+suspended.
+
 =head2 More convenient routes
 
 From the tutorial you should already know L<Mojolicious::Lite> routes, which

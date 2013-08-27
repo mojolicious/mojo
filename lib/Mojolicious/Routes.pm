@@ -59,7 +59,8 @@ sub dispatch {
     }
   }
 
-  return undef unless $self->_walk($c);
+  my @copy = @{$c->match->stack};
+  return undef unless @copy && $self->_next($c, \@copy);
   $self->auto_render($c);
   return 1;
 }
@@ -94,7 +95,7 @@ sub _add {
 
 sub _callback {
   my ($self, $c, $field, $last) = @_;
-  $c->stash->{'mojo.routed'}++;
+  $c->stash->{'mojo.routed'}++ if $last;
   my $app = $c->app;
   $app->log->debug('Routing to a callback.');
   return _action($app, $c, $field->{cb}, $last);
@@ -170,7 +171,8 @@ sub _controller {
 
       if (my $sub = $new->can($method)) {
         $old->stash->{'mojo.routed'}++ if $last;
-        return 1 if _action($app, $new, $sub, $last);
+        my $continue = _action($app, $new, $sub, $last);
+        return $continue if $continue;
       }
 
       else { $log->debug('Action not found in controller.') }
@@ -193,29 +195,30 @@ sub _load {
   return ++$self->{loaded}{$app};
 }
 
-sub _walk {
-  my ($self, $c) = @_;
+sub _next {
+  my ($self, $c, $stack) = @_;
 
-  my $stack = $c->match->stack;
-  return undef unless my $nested = @$stack;
+  return 1 unless my $field = shift @$stack;
+
+  # Merge captures into stash
+  my @keys  = keys %$field;
   my $stash = $c->stash;
-  $stash->{'mojo.captures'} ||= {};
-  for my $field (@$stack) {
-    $nested--;
+  @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
 
-    # Merge captures into stash
-    my @keys = keys %$field;
-    @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
+  my $continue
+    = $field->{cb}
+    ? $self->_callback($c, $field, !@$stack)
+    : $self->_controller($c, $field, !@$stack);
 
-    my $continue
-      = $field->{cb}
-      ? $self->_callback($c, $field, !$nested)
-      : $self->_controller($c, $field, !$nested);
+  # Break the chain
+  return undef if !!@$stack && !$continue;
 
-    # Break the chain
-    return undef if $nested && !$continue;
-  }
+  # Next
+  return $self->_next($c, $stack) unless ref $continue eq 'SCALAR';
 
+  # Delay
+  $c->render_later;
+  $$continue = sub { $self->_next($c, $stack) };
   return 1;
 }
 

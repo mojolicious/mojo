@@ -144,6 +144,10 @@ sub startup {
   my $b = $r->bridge('/staged')->to('foo#stage1', return => 1);
   $b->route->to(action => 'stage2');
 
+  # /delayed (delayed bridge)
+  $r->bridge('/delayed')->to('foo#delayed')->bridge->to('foo#delayed')
+    ->route->to('foo#fun');
+
   # /shortcut/act
   # /shortcut/ctrl
   # /shortcut/ctrl-act (shortcuts to controller#action)

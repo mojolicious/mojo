@@ -11,6 +11,20 @@ sub config {
   $self->render(text => $self->stash('config')->{test});
 }
 
+sub delayed {
+  my $self = shift;
+
+  my $continue;
+  Mojo::IOLoop->timer(
+    0 => sub {
+      $self->res->headers->append('X-Delayed' => 1);
+      $continue->();
+    }
+  );
+
+  return \$continue;
+}
+
 sub fun { shift->render(text => 'Have fun!') }
 
 sub index {

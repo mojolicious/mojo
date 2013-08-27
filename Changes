@@ -1,5 +1,8 @@
 
-4.28  2013-08-27
+4.28  2013-08-28
+  - Added support for non-blocking operations in bridges to
+    Mojolicious::Routes.
+  - Fixed automatic rendering bug in Mojolicious::Routes.
 
 4.27  2013-08-26
   - Added acceptors attribute to Mojo::Server::Daemon.

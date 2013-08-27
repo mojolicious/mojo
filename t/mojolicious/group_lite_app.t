@@ -20,6 +20,25 @@ get '/expiration' => sub {
   $self->render(text => $self->session('expiration'));
 };
 
+under('/missing' => sub {1})->route->to('does_not_exist#not_at_all');
+
+under '/delayed' => sub {
+  my $self = shift;
+
+  my $continue;
+  Mojo::IOLoop->timer(
+    0 => sub {
+      return $self->render(text => 'stopped!') unless $self->param('ok');
+      $self->stash(delayed => 'delayed!');
+      $continue->();
+    }
+  );
+
+  return \$continue;
+};
+
+get '/' => sub { shift->render(inline => '<%= $delayed %>\\') };
+
 under sub {
   my $self = shift;
   return undef unless $self->req->headers->header('X-Bender');
@@ -183,6 +202,17 @@ $t->get_ok('/expiration?redirect=1')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('0');
 ok !$t->tx->res->cookie('mojolicious')->expires, 'no expiration';
 $t->reset_session;
+
+# Missing action behind bridge
+$t->get_ok('/missing')->status_is(404);
+
+# Delayed bridge
+$t->get_ok('/delayed?ok=1')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('delayed!');
+
+# Delayed bridge (stopped)
+$t->get_ok('/delayed?ok=0')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('stopped!');
 
 # Authenticated with header
 $t->get_ok('/with_under' => {'X-Bender' => 'Rodriguez'})->status_is(200)

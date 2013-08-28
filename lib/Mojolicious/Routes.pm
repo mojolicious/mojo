@@ -59,8 +59,7 @@ sub dispatch {
     }
   }
 
-  my @stack = @{$c->match->stack};
-  return undef unless @stack && $self->_next($c, \@stack);
+  return undef unless @{$c->match->stack} && $self->_next($c, 0);
   $self->auto_render($c);
   return 1;
 }
@@ -196,9 +195,11 @@ sub _load {
 }
 
 sub _next {
-  my ($self, $c, $stack) = @_;
+  my ($self, $c, $num) = @_;
 
-  return 1 unless my $field = shift @$stack;
+  my $stack = $c->match->stack;
+  return 1 unless my $field = $stack->[$num];
+  my $last = !$stack->[++$num];
 
   # Merge captures into stash
   my @keys  = keys %$field;
@@ -207,18 +208,18 @@ sub _next {
 
   my $continue
     = $field->{cb}
-    ? $self->_callback($c, $field, !@$stack)
-    : $self->_controller($c, $field, !@$stack);
+    ? $self->_callback($c, $field, $last)
+    : $self->_controller($c, $field, $last);
 
   # Break the chain
-  return undef if !!@$stack && !$continue;
+  return undef if !$last && !$continue;
 
   # Next
-  return $self->_next($c, $stack) unless ref $continue eq 'SCALAR';
+  return $self->_next($c, $num) unless ref $continue eq 'SCALAR';
 
   # Suspend
   $c->render_later;
-  $$continue = sub { $self->_next($c, $stack) };
+  $$continue = sub { $self->_next($c, $num) };
   return 1;
 }
 

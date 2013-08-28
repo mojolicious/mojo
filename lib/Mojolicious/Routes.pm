@@ -59,8 +59,8 @@ sub dispatch {
     }
   }
 
-  my @copy = @{$c->match->stack};
-  return undef unless @copy && $self->_next($c, \@copy);
+  my @stack = @{$c->match->stack};
+  return undef unless @stack && $self->_next($c, \@stack);
   $self->auto_render($c);
   return 1;
 }

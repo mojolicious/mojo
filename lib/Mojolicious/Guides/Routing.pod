@@ -584,17 +584,17 @@ leading to the next dispatch cycle will be automatically assigned to it.
     my $self = shift;
 
     # Wait 3 seconds and then give visitors a 50% chance to continue
-    my $continue;
+    my $next;
     Mojo::IOLoop->timer(3 => sub {
 
       # Loser
       return $self->render(text => 'No luck.') unless int rand 2;
 
       # Winner
-      $continue->();
+      $next->();
     });
 
-    return \$continue;
+    return \$next;
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 

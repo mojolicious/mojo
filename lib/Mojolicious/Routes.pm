@@ -24,6 +24,37 @@ sub auto_render {
   $c->render_maybe or $stash->{'mojo.routed'} or $c->render_not_found;
 }
 
+sub continue {
+  my ($self, $c) = @_;
+
+  my $match   = $c->match;
+  my $stack   = $match->stack;
+  my $current = $match->current;
+  return 1 unless my $field = $stack->[$current];
+  my $last = !$stack->[++$current];
+
+  # Merge captures into stash
+  my @keys  = keys %$field;
+  my $stash = $c->stash;
+  @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
+
+  my $continue
+    = $field->{cb}
+    ? $self->_callback($c, $field, $last)
+    : $self->_controller($c, $field, $last);
+  $match->current($current);
+
+  # Break the chain
+  return undef if !$last && !$continue;
+
+  # Continue
+  return $self->continue($c) unless ref $continue eq 'SCALAR';
+
+  # Suspend
+  $c->render_later;
+  return 1;
+}
+
 sub dispatch {
   my ($self, $c) = @_;
 
@@ -59,8 +90,7 @@ sub dispatch {
     }
   }
 
-  my @stack = @{$c->match->stack};
-  return undef unless @stack && $self->_next($c, \@stack);
+  return undef unless @{$c->match->stack} && $self->continue($c);
   $self->auto_render($c);
   return 1;
 }
@@ -195,33 +225,6 @@ sub _load {
   return ++$self->{loaded}{$app};
 }
 
-sub _next {
-  my ($self, $c, $stack) = @_;
-
-  return 1 unless my $field = shift @$stack;
-
-  # Merge captures into stash
-  my @keys  = keys %$field;
-  my $stash = $c->stash;
-  @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
-
-  my $continue
-    = $field->{cb}
-    ? $self->_callback($c, $field, !@$stack)
-    : $self->_controller($c, $field, !@$stack);
-
-  # Break the chain
-  return undef if !!@$stack && !$continue;
-
-  # Next
-  return $self->_next($c, $stack) unless ref $continue eq 'SCALAR';
-
-  # Suspend
-  $c->render_later;
-  $$continue = sub { $self->_next($c, $stack) };
-  return 1;
-}
-
 1;
 
 =encoding utf8
@@ -327,6 +330,12 @@ Add a new shortcut.
   $r->auto_render(Mojolicious::Controller->new);
 
 Automatic rendering.
+
+=head2 continue
+
+  my $success = $r->continue(Mojolicious::Controller->new);
+
+Continue dispatching.
 
 =head2 dispatch
 

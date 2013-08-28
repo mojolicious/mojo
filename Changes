@@ -1,7 +1,10 @@
 
-4.28  2013-08-28
+4.28  2013-08-29
   - Added support for non-blocking operations in bridges to
     Mojolicious::Routes.
+  - Added continue method to Mojolicious::Controller.
+  - Added continue method to Mojolicious::Routes.
+  - Added current attribute to Mojolicious::Routes::Match.
   - Fixed automatic rendering bug in Mojolicious::Routes.
 
 4.27  2013-08-26

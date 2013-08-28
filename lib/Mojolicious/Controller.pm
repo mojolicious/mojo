@@ -39,6 +39,8 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
+sub continue { $_[0]->app->routes->continue($_[0]) }
+
 sub cookie {
   my ($self, $name) = (shift, shift);
 
@@ -515,6 +517,12 @@ L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
 
 L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
+
+=head2 continue
+
+  $c->continue;
+
+Continue dispatching.
 
 =head2 cookie
 

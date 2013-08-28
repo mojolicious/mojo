@@ -93,6 +93,7 @@ ok $t->app->routes->is_hidden('DESTROY'),          'is hidden';
 ok $t->app->routes->is_hidden('FOO_BAR'),          'is hidden';
 ok $t->app->routes->is_hidden('app'),              'is hidden';
 ok $t->app->routes->is_hidden('attr'),             'is hidden';
+ok $t->app->routes->is_hidden('continue'),         'is hidden';
 ok $t->app->routes->is_hidden('cookie'),           'is hidden';
 ok $t->app->routes->is_hidden('finish'),           'is hidden';
 ok $t->app->routes->is_hidden('flash'),            'is hidden';
@@ -456,7 +457,7 @@ $t->get_ok('/staged')->status_is(200)
 # MojoliciousTestController::Foo::suspended
 $t->get_ok('/suspended')->status_is(200)
   ->header_is(Server        => 'Mojolicious (Perl)')
-  ->header_is('X-Suspended' => '1, 1')->content_is('Have fun!');
+  ->header_is('X-Suspended' => '0, 1, 1, 2')->content_is('Have fun!');
 
 # MojoliciousTest::Foo::config
 $t->get_ok('/stash_config')->status_is(200)

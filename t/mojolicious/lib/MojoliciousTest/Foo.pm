@@ -57,15 +57,15 @@ sub stage2 { return shift->some_plugin }
 sub suspended {
   my $self = shift;
 
-  my $next;
+  $self->res->headers->append('X-Suspended' => $self->match->current);
   Mojo::IOLoop->timer(
     0 => sub {
-      $self->res->headers->append('X-Suspended' => 1);
-      $next->();
+      $self->res->headers->append('X-Suspended' => $self->match->current);
+      $self->continue;
     }
   );
 
-  return \$next;
+  return \1;
 }
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }

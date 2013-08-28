@@ -574,8 +574,9 @@ be broken, this makes bridges a very powerful tool for authentication.
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 
 To allow non-blocking operations to finish before continuing the dispatch
-chain, you can suspend it by returning a C<Scalar> reference. A callback
-leading to the next dispatch cycle will be automatically assigned to it.
+chain, you can suspend it by returning a C<Scalar> reference. The next
+dispatch cycle can be reached by calling the method
+L<Mojolicious::Controller/"continue">.
 
   # /foo     -> undef
   # /foo/bar -> {cb => sub {...}}
@@ -584,17 +585,16 @@ leading to the next dispatch cycle will be automatically assigned to it.
     my $self = shift;
 
     # Wait 3 seconds and then give visitors a 50% chance to continue
-    my $next;
     Mojo::IOLoop->timer(3 => sub {
 
       # Loser
       return $self->render(text => 'No luck.') unless int rand 2;
 
       # Winner
-      $next->();
+      $self->continue;
     });
 
-    return \$next;
+    return \1;
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 

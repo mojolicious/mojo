@@ -522,7 +522,7 @@ implements the following new ones.
 
   $c->continue;
 
-Continue dispatching.
+Continue dispatch chain after finishing non-blocking operations.
 
 =head2 cookie
 

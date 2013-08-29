@@ -593,7 +593,7 @@ operations to finish before reaching the next dispatch cycle.
       $self->continue;
     });
 
-    return 0;
+    return undef;
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 

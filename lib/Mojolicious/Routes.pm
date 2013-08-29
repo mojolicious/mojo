@@ -43,11 +43,7 @@ sub continue {
   else { $continue = $self->_controller($c, $field, $last) }
   $match->current($current);
 
-  # Break the chain
-  return undef if !$last && !$continue;
-
-  # Continue
-  return $self->continue($c);
+  return $last || $continue ? $self->continue($c) : undef;
 }
 
 sub dispatch {

@@ -45,8 +45,8 @@ is $t->app->routes->find('something')->to_string, '/test4/:something',
   'right pattern';
 is $t->app->routes->find('test3')->pattern->defaults->{namespace},
   'MojoliciousTestController', 'right namespace';
-is $t->app->routes->find('authenticated')->pattern->defaults->{controller},
-  'foo', 'right controller';
+is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',
+  'right controller';
 is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route',
   'right class';
 is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',
@@ -223,16 +223,6 @@ $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_is(200)
 $t->get_ok('/happy/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Have fun!');
-
-# Foo::authenticated (authentication bridge)
-$t->get_ok('/auth/authenticated' => {'X-Bender' => 'Hi there!'})
-  ->status_is(200)->header_is('X-Bender' => undef)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('authenticated');
-
-# Foo::authenticated (authentication bridge)
-$t->get_ok('/auth/authenticated')->status_is(401)
-  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('Unauthorized!');
 
 # Foo::test
 $t->get_ok('/foo/test' => {'X-Test' => 'Hi there!'})->status_is(200)

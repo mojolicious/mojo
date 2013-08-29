@@ -103,29 +103,10 @@ get '/late/session' => sub {
 my $under;
 under sub {
   shift->res->headers->header('X-Under' => ++$under);
-  1;
+  !!1;
 };
 
 get '/with/under/count';
-
-# Everything gets past this
-under sub {
-  shift->res->headers->header('X-Possible' => 1);
-  1;
-};
-
-get '/possible' => 'possible';
-
-# Nothing gets past this
-under sub {
-  my $self = shift;
-  $self->res->headers->header('X-Impossible' => 1);
-  $self->res->code(401);
-  $self->tx->resume;
-  0;
-};
-
-get '/impossible' => {text => 'Impossible!'};
 
 # Prefix
 under '/prefix';
@@ -173,7 +154,7 @@ group {
     my $self = shift;
     return 1 if $self->req->param('ok');
     $self->render(text => "You're not ok.");
-    return undef;
+    return !!0;
   };
 
   get '/authgroup' => {text => "You're ok."};
@@ -337,17 +318,6 @@ $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
   "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!\n");
 
-# Reachable route
-$t->get_ok('/possible')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->header_is('X-Possible' => 1)
-  ->header_is('X-Impossible' => undef)->content_is("Possible!\n");
-
-# Unreachable route
-$t->get_ok('/impossible')->status_is(401)
-  ->header_is(Server => 'Mojolicious (Perl)')
-  ->header_is('X-Possible' => undef)->header_is('X-Impossible' => 1)
-  ->content_is('');
-
 # Prefix
 $t->get_ok('/prefix')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
@@ -470,6 +440,3 @@ Not Bender!
 
 @@ withundercount.html.ep
 counter
-
-@@ possible.html.ep
-Possible!

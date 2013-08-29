@@ -78,18 +78,6 @@ sub startup {
   # /happy/fun/time
   $r->route('/happy')->fun('/time')->to('foo#fun');
 
-  # /auth (authentication bridge)
-  my $auth = $r->bridge('/auth')->to(
-    cb => sub {
-      my $self = shift;
-      return 1 if $self->req->headers->header('X-Bender');
-      $self->render(text => 'Unauthorized!', status => 401) and return undef;
-    }
-  );
-
-  # /auth/authenticated
-  $auth->route('/authenticated')->to('foo#authenticated');
-
   # /stash_config
   $r->route('/stash_config')
     ->to(controller => 'foo', action => 'config', config => {test => 123});

@@ -1,11 +1,6 @@
 package MojoliciousTest::Foo;
 use Mojo::Base 'Mojolicious::Controller';
 
-sub authenticated {
-  my $self = shift;
-  $self->render(text => $self->stash('action'));
-}
-
 sub config {
   my $self = shift;
   $self->render(text => $self->stash('config')->{test});

@@ -20,8 +20,8 @@ is $t->app->routes->find('something')->to_string, '/test4/:something',
   'right pattern';
 is $t->app->routes->find('test3')->pattern->defaults->{namespace},
   'MojoliciousTestController', 'right namespace';
-is $t->app->routes->find('authenticated')->pattern->defaults->{controller},
-  'foo', 'right controller';
+is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',
+  'right controller';
 is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route',
   'right class';
 is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',

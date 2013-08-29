@@ -1,4 +1,6 @@
 
+4.29  2013-08-30
+
 4.28  2013-08-29
   - Added support for non-blocking operations in bridges to
     Mojolicious::Routes.

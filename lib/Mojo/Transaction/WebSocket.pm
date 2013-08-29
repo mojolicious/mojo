@@ -211,8 +211,8 @@ sub send {
       : [1, 0, 0, 0, BINARY, $frame->{binary}];
   }
 
-  # Text or object (forcing stringification)
-  $frame = [1, 0, 0, 0, TEXT, encode('UTF-8', "$frame")]
+  # Text
+  $frame = [1, 0, 0, 0, TEXT, encode('UTF-8', $frame)]
     if ref $frame ne 'ARRAY';
 
   $self->once(drain => $cb) if $cb;
@@ -617,7 +617,6 @@ Resume C<handshake> transaction.
   $ws = $ws->send({text   => $bytes});
   $ws = $ws->send({json   => {test => [1, 2, 3]}});
   $ws = $ws->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
-  $ws = $ws->send(Mojo::ByteStream->new($chars));
   $ws = $ws->send($chars);
   $ws = $ws->send($chars => sub {...});
 

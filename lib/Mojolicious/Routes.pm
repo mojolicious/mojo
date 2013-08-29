@@ -38,10 +38,9 @@ sub continue {
   my $stash = $c->stash;
   @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
 
-  my $continue
-    = $field->{cb}
-    ? $self->_callback($c, $field, $last)
-    : $self->_controller($c, $field, $last);
+  my $continue;
+  if (my $cb = $field->{cb}) { $continue = $self->_callback($c, $cb, $last) }
+  else { $continue = $self->_controller($c, $field, $last) }
   $match->current($current);
 
   # Break the chain
@@ -120,11 +119,11 @@ sub _add {
 }
 
 sub _callback {
-  my ($self, $c, $field, $last) = @_;
+  my ($self, $c, $cb, $last) = @_;
   $c->stash->{'mojo.routed'}++ if $last;
   my $app = $c->app;
   $app->log->debug('Routing to a callback.');
-  return _action($app, $c, $field->{cb}, $last);
+  return _action($app, $c, $cb, $last);
 }
 
 sub _class {

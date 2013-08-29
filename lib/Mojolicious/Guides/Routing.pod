@@ -573,10 +573,9 @@ be broken, this makes bridges a very powerful tool for authentication.
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 
-To allow non-blocking operations to finish before continuing the dispatch
-chain, you can suspend it by returning a C<Scalar> reference. The next
-dispatch cycle can be reached by calling the method
-L<Mojolicious::Controller/"continue">.
+Broken dispatch chains can be continued by calling the method
+L<Mojolicious::Controller/"continue">, this allows for example non-blocking
+operations to finish before reaching the next dispatch cycle.
 
   # /foo     -> undef
   # /foo/bar -> {cb => sub {...}}
@@ -594,12 +593,9 @@ L<Mojolicious::Controller/"continue">.
       $self->continue;
     });
 
-    return \1;
+    return 0;
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
-
-Automatic rendering will be disabled after the dispatch chain has been
-suspended.
 
 =head2 More convenient routes
 

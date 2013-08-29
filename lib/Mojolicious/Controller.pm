@@ -520,9 +520,9 @@ implements the following new ones.
 
 =head2 continue
 
-  $c->continue;
+  my $success = $c->continue;
 
-Continue dispatch chain after finishing non-blocking operations.
+Continue dispatch chain.
 
 =head2 cookie
 

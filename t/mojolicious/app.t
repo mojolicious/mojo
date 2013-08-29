@@ -230,9 +230,9 @@ $t->get_ok('/auth/authenticated' => {'X-Bender' => 'Hi there!'})
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('authenticated');
 
 # Foo::authenticated (authentication bridge)
-$t->get_ok('/auth/authenticated')->status_is(404)
+$t->get_ok('/auth/authenticated')->status_is(401)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
+  ->content_is('Unauthorized!');
 
 # Foo::test
 $t->get_ok('/foo/test' => {'X-Test' => 'Hi there!'})->status_is(200)

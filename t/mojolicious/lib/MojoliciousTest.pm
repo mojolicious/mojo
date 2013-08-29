@@ -81,8 +81,9 @@ sub startup {
   # /auth (authentication bridge)
   my $auth = $r->bridge('/auth')->to(
     cb => sub {
-      return 1 if shift->req->headers->header('X-Bender');
-      return undef;
+      my $self = shift;
+      return 1 if $self->req->headers->header('X-Bender');
+      $self->render(text => 'Unauthorized!', status => 401) and return undef;
     }
   );
 

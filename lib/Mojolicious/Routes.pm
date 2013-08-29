@@ -48,11 +48,7 @@ sub continue {
   return undef if !$last && !$continue;
 
   # Continue
-  return $self->continue($c) unless ref $continue eq 'SCALAR';
-
-  # Suspend
-  $c->render_later;
-  return 1;
+  return $self->continue($c);
 }
 
 sub dispatch {
@@ -90,8 +86,8 @@ sub dispatch {
     }
   }
 
-  return undef unless @{$c->match->stack} && $self->continue($c);
-  $self->auto_render($c);
+  return undef unless @{$c->match->stack};
+  $self->auto_render($c) if $self->continue($c);
   return 1;
 }
 
@@ -333,9 +329,9 @@ Automatic rendering.
 
 =head2 continue
 
-  my $success = $r->continue(Mojolicious::Controller->new);
+  $r->continue(Mojolicious::Controller->new);
 
-Continue dispatching.
+Continue dispatch chain.
 
 =head2 dispatch
 

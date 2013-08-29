@@ -33,14 +33,15 @@ under '/suspended' => sub {
     }
   );
 
-  return \1;
+  return 0;
 };
 
 get '/' => sub { shift->render(inline => '<%= $suspended %>\\') };
 
 under sub {
   my $self = shift;
-  return undef unless $self->req->headers->header('X-Bender');
+  $self->render(text => 'Unauthorized!', status => 401) and return undef
+    unless $self->req->headers->header('X-Bender');
   $self->res->headers->add('X-Under' => 23);
   $self->res->headers->add('X-Under' => 24);
   1;
@@ -117,11 +118,14 @@ get '/possible' => 'possible';
 
 # Nothing gets past this
 under sub {
-  shift->res->headers->header('X-Impossible' => 1);
+  my $self = shift;
+  $self->res->headers->header('X-Impossible' => 1);
+  $self->res->code(401);
+  $self->tx->resume;
   0;
 };
 
-get '/impossible' => 'impossible';
+get '/impossible' => {text => 'Impossible!'};
 
 # Prefix
 under '/prefix';
@@ -203,7 +207,7 @@ ok !$t->tx->res->cookie('mojolicious')->expires, 'no expiration';
 $t->reset_session;
 
 # Missing action behind bridge
-$t->get_ok('/missing')->status_is(404);
+$t->get_ok('/missing')->status_is(404)->content_is("Oops!\n");
 
 # Suspended bridge
 $t->get_ok('/suspended?ok=1')->status_is(200)
@@ -226,8 +230,8 @@ $t->get_ok('/with_under_too' => {'X-Bender' => 'Rodriguez'})->status_is(200)
   ->content_is('Unders are cool too!');
 
 # Not authenticated with header
-$t->get_ok('/with_under_too')->status_is(404)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Oops!/);
+$t->get_ok('/with_under_too')->status_is(401)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/Unauthorized/);
 
 # Not authenticated with parameter
 $t->get_ok('/param_auth')->status_is(200)
@@ -339,10 +343,10 @@ $t->get_ok('/possible')->status_is(200)
   ->header_is('X-Impossible' => undef)->content_is("Possible!\n");
 
 # Unreachable route
-$t->get_ok('/impossible')->status_is(404)
+$t->get_ok('/impossible')->status_is(401)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('X-Possible' => undef)->header_is('X-Impossible' => 1)
-  ->content_is("Oops!\n");
+  ->content_is('');
 
 # Prefix
 $t->get_ok('/prefix')->status_is(200)
@@ -368,7 +372,7 @@ $t->get_ok('/prefix2/bar')->status_is(200)->content_is("also prefixed!\n");
 $t->get_ok('/reset')->status_is(200)->content_is('reset works!');
 
 # Not reachable with prefix
-$t->get_ok('/prefix/reset')->status_is(404);
+$t->get_ok('/prefix/reset')->status_is(404)->content_is("Oops!\n");
 
 # Group
 $t->get_ok('/group')->status_is(200)->content_is("onetwo!\n");
@@ -381,7 +385,7 @@ $t->get_ok('/group/nested/whatever')->status_is(200)
   ->content_is("onetwothree!\n");
 
 # Another GET request to nested group
-$t->get_ok('/group/nested/something')->status_is(404);
+$t->get_ok('/group/nested/something')->status_is(404)->content_is("Oops!\n");
 
 # Authenticated by group
 $t->get_ok('/authgroup?ok=1')->status_is(200)->content_is("You're ok.");
@@ -399,11 +403,11 @@ $t->get_ok('/no_format')->status_is(200)
 
 # Invalid format
 $t->get_ok('/no_format.txt')->status_is(404)
-  ->content_type_is('text/html;charset=UTF-8');
+  ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # Invalid format
 $t->get_ok('/some_formats')->status_is(404)
-  ->content_type_is('text/html;charset=UTF-8');
+  ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # Format "txt" has been detected
 $t->get_ok('/some_formats.txt')->status_is(200)->content_type_is('text/plain')
@@ -415,11 +419,11 @@ $t->get_ok('/some_formats.json')->status_is(200)
 
 # Invalid format
 $t->get_ok('/some_formats.xml')->status_is(404)
-  ->content_type_is('text/html;charset=UTF-8');
+  ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # Invalid format
 $t->get_ok('/no_real_format')->status_is(404)
-  ->content_type_is('text/html;charset=UTF-8');
+  ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # No format detected
 $t->get_ok('/no_real_format.xml')->status_is(200)
@@ -427,11 +431,11 @@ $t->get_ok('/no_real_format.xml')->status_is(200)
 
 # Invalid format
 $t->get_ok('/no_real_format.txt')->status_is(404)
-  ->content_type_is('text/html;charset=UTF-8');
+  ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # Invalid format
 $t->get_ok('/one_format')->status_is(404)
-  ->content_type_is('text/html;charset=UTF-8');
+  ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # Format "xml" detected
 $t->get_ok('/one_format.xml')->status_is(200)
@@ -439,7 +443,7 @@ $t->get_ok('/one_format.xml')->status_is(200)
 
 # Invalid format
 $t->get_ok('/one_format.txt')->status_is(404)
-  ->content_type_is('text/html;charset=UTF-8');
+  ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 done_testing();
 
@@ -469,6 +473,3 @@ counter
 
 @@ possible.html.ep
 Possible!
-
-@@ impossible.html.ep
-Impossible

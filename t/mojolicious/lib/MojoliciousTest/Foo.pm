@@ -65,7 +65,7 @@ sub suspended {
     }
   );
 
-  return \1;
+  return 0;
 }
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }

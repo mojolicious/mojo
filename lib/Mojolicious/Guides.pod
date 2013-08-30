@@ -22,12 +22,6 @@ available in many formats. Both are excellent introductions to the language.
 For more books and documentation, check out
 L<learn.perl.org|http://learn.perl.org/>.
 
-=head1 SCREENCASTS
-
-Before starting with the tutorial below, you should take a look at the
-wonderful L<Mojocasts|http://mojocasts.com/e1>, they will give you a general
-overview of what L<Mojolicious> is all about.
-
 =head1 TUTORIAL
 
 =over 2

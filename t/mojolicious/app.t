@@ -180,9 +180,19 @@ $t->get_ok('/syntax_error/foo')->status_is(500)
   ->content_like(qr/Missing right curly/);
 
 # Foo::syntaxerror (syntax error in template)
+my $log = '';
+my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo/syntaxerror')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Missing right curly/);
+like $log, qr/Rendering template "syntaxerror.html.epl"./, 'right message';
+like $log, qr/Missing right curly/, 'right message';
+like $log, qr/Template "exception.development.html.ep" not found./,
+  'right message';
+like $log, qr/Rendering cached template "exception.html.epl"./,
+  'right message';
+like $log, qr/500 Internal Server Error/, 'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # Exceptional::this_one_dies (action dies)
 $t->get_ok('/exceptional/this_one_dies')->status_is(500)
@@ -445,9 +455,21 @@ $t->get_ok('/staged')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Go away!');
 
 # MojoliciousTestController::Foo::suspended
+$log = '';
+$cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended')->status_is(200)
   ->header_is(Server        => 'Mojolicious (Perl)')
   ->header_is('X-Suspended' => '0, 1, 1, 2')->content_is('Have fun!');
+like $log, qr!GET "/suspended".!, 'right message';
+like $log,
+  qr/Routing to controller "MojoliciousTest::Foo" and action "suspended"./,
+  'right message';
+like $log, qr/Routing to controller "MojoliciousTest::Foo" and action "fun"./,
+  'right message';
+like $log, qr!Rendering template "foo/fun.html.ep" from DATA section.!,
+  'right message';
+like $log, qr/200 OK/, 'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # MojoliciousTest::Foo::config
 $t->get_ok('/stash_config')->status_is(200)

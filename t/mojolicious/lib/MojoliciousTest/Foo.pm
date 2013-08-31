@@ -6,7 +6,7 @@ sub config {
   $self->render(text => $self->stash('config')->{test});
 }
 
-sub fun { shift->render(text => 'Have fun!') }
+sub fun { shift->render }
 
 sub index {
   my $self = shift;
@@ -86,6 +86,9 @@ sub withlayout { shift->stash(template => 'WithGreenLayout') }
 
 1;
 __DATA__
+
+@@ foo/fun.html.ep
+Have fun!\
 
 @@ just/some/template.html.epl
 Development template with high precedence.

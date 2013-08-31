@@ -192,12 +192,12 @@ $t->get_ok('/missing')->status_is(404)->content_is("Oops!\n");
 
 # Suspended bridge
 my $log = '';
-my $cb = $t->ua->app->log->on(message => sub { $log .= pop });
+my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended?ok=1')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('suspended!');
 like $log, qr/Nothing has been rendered, expecting delayed response./,
   'right message';
-$t->ua->app->log->unsubscribe(message => $cb);
+$t->app->log->unsubscribe(message => $cb);
 
 # Suspended bridge (stopped)
 $t->get_ok('/suspended?ok=0')->status_is(200)

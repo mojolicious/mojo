@@ -444,6 +444,11 @@ my $t = Test::Mojo->new;
 is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
 is $t->app, app->commands->app, 'applications are equal';
 is $t->app->moniker, 'lite_app', 'right moniker';
+my $log = '';
+my $cb = $t->app->log->on(message => sub { $log .= pop });
+is $t->app->secret, $t->app->moniker, 'secret defaults to moniker';
+like $log, qr/Your secret passphrase needs to be changed!!!/, 'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # Unicode snowman
 $t->get_ok('/☃')->status_is(200)

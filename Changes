@@ -1,4 +1,6 @@
 
+4.30  2013-09-01
+
 4.29  2013-08-31
   - Fixed automatic rendering to work after non-blocking operations have been
     performed in bridges.

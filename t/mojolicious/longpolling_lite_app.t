@@ -347,16 +347,18 @@ is $longpoll_nolength_delayed, 'finished!', 'finished';
 
 # Delayed static file (with log message)
 my $log = '';
-my $cb = $t->ua->app->log->on(message => sub { $log .= pop });
+my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/longpoll/static/delayed')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_type_is('text/plain')
   ->content_is("Hello Mojo from a static file!\n");
 is $longpoll_static_delayed, 'finished!', 'finished';
 like $log, qr/Nothing has been rendered, expecting delayed response./,
   'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # Delayed static file with cookies and session (without log message)
 $log = '';
+$cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_like('Set-Cookie' => qr/bar=baz/)
@@ -366,7 +368,7 @@ $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
 is $longpoll_static_delayed_too, 'finished!', 'finished';
 unlike $log, qr/Nothing has been rendered, expecting delayed response./,
   'right message';
-$t->ua->app->log->unsubscribe(message => $cb);
+$t->app->log->unsubscribe(message => $cb);
 
 # Delayed custom response
 $t->get_ok('/longpoll/dynamic/delayed')->status_is(201)

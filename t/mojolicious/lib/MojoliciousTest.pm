@@ -78,17 +78,6 @@ sub startup {
   # /happy/fun/time
   $r->route('/happy')->fun('/time')->to('foo#fun');
 
-  # /auth (authentication bridge)
-  my $auth = $r->bridge('/auth')->to(
-    cb => sub {
-      return 1 if shift->req->headers->header('X-Bender');
-      return undef;
-    }
-  );
-
-  # /auth/authenticated
-  $auth->route('/authenticated')->to('foo#authenticated');
-
   # /stash_config
   $r->route('/stash_config')
     ->to(controller => 'foo', action => 'config', config => {test => 123});
@@ -143,6 +132,10 @@ sub startup {
   # /staged (authentication with bridges)
   my $b = $r->bridge('/staged')->to('foo#stage1', return => 1);
   $b->route->to(action => 'stage2');
+
+  # /suspended (suspended bridge)
+  $r->bridge('/suspended')->to('foo#suspended')->bridge->to('foo#suspended')
+    ->route->to('foo#fun');
 
   # /shortcut/act
   # /shortcut/ctrl

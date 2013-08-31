@@ -573,6 +573,30 @@ be broken, this makes bridges a very powerful tool for authentication.
   });
   $foo->route('/bar')->to(controller => 'foo', action => 'bar');
 
+Broken dispatch chains can be continued by calling the method
+L<Mojolicious::Controller/"continue">, this allows for example non-blocking
+operations to finish before reaching the next dispatch cycle.
+
+  # /foo     -> undef
+  # /foo/bar -> {cb => sub {...}}
+  #          -> {controller => 'foo', action => 'bar'}
+  my $foo = $r->bridge('/foo')->to(cb => sub {
+    my $self = shift;
+
+    # Wait 3 seconds and then give visitors a 50% chance to continue
+    Mojo::IOLoop->timer(3 => sub {
+
+      # Loser
+      return $self->render(text => 'No luck.') unless int rand 2;
+
+      # Winner
+      $self->continue;
+    });
+
+    return undef;
+  });
+  $foo->route('/bar')->to(controller => 'foo', action => 'bar');
+
 =head2 More convenient routes
 
 From the tutorial you should already know L<Mojolicious::Lite> routes, which

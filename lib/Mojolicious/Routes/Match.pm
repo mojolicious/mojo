@@ -1,6 +1,7 @@
 package Mojolicious::Routes::Match;
 use Mojo::Base -base;
 
+has current => 0;
 has [qw(endpoint root)];
 has stack => sub { [] };
 
@@ -138,6 +139,13 @@ structures.
 =head1 ATTRIBUTES
 
 L<Mojolicious::Routes::Match> implements the following attributes.
+
+=head2 current
+
+  my $current = $match->current;
+  $match      = $match->current(2);
+
+Current position on the C<stack>, defaults to C<0>.
 
 =head2 endpoint
 

@@ -8,7 +8,7 @@ my $dom = Mojo::DOM->new->parse(
   '<div><div FOO="0" id="a">A</div><div id="b">B</div></div>');
 is $dom->at('#b')->text, 'B', 'right text';
 my @div;
-push @div, $dom->find('div[id]')->pluck('text')->each;
+push @div, $dom->find('div[id]')->text->each;
 is_deeply \@div, [qw(A B)], 'found all div elements with id';
 @div = ();
 $dom->find('div[id]')->each(sub { push @div, $_->text });
@@ -16,6 +16,12 @@ is_deeply \@div, [qw(A B)], 'found all div elements with id';
 is $dom->at('#a')->attr('foo'), 0, 'right attribute';
 is $dom->at('#a')->attr->{foo}, 0, 'right attribute';
 is "$dom", '<div><div foo="0" id="a">A</div><div id="b">B</div></div>',
+  'right result';
+
+# Tap into method chain
+$dom = Mojo::DOM->new->parse('<div id="a">A</div><div id="b">B</div>');
+is_deeply [$dom->find('[id]')->attr('id')->each], [qw(a b)], 'right result';
+is $dom->tap(sub { $_->at('#b')->remove }), '<div id="a">A</div>',
   'right result';
 
 # Simple nesting with healing (tree structure)
@@ -132,6 +138,9 @@ is $dom->next,     undef, 'no siblings';
 is $dom->previous, undef, 'no siblings';
 is $dom->at('foo > a')->next,          undef, 'no next sibling';
 is $dom->at('foo > simple')->previous, undef, 'no previous sibling';
+is_deeply [$dom->at('simple')->ancestors->type->each], ['foo'],
+  'right results';
+ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 
 # Class and ID
 $dom = Mojo::DOM->new->parse('<div id="id" class="class">a</div>');
@@ -172,6 +181,10 @@ $dom->find('p')->each(sub { push @p, $_->attr('id') });
 is_deeply \@p, [qw(foo bar)], 'found all p elements';
 my $ids = [qw(container header logo buttons buttons content)];
 is_deeply \@div, $ids, 'found all div elements';
+is_deeply [$dom->at('p')->ancestors->type->each], [qw(div div div body html)],
+  'right results';
+is_deeply [$dom->at('html')->ancestors->each], [], 'no results';
+is_deeply [$dom->ancestors->each],             [], 'no results';
 
 # Script tag
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -180,8 +193,8 @@ EOF
 is $dom->at('script')->text, "alert('lalala');", 'right script content';
 
 # HTML5 (unquoted values)
-$dom = Mojo::DOM->new->parse(
-  qq{<div id = test foo ="bar" class=tset>works</div>});
+$dom
+  = Mojo::DOM->new->parse('<div id = test foo ="bar" class=tset>works</div>');
 is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
@@ -192,7 +205,7 @@ is $dom->at('.tset')->text, 'works', 'right text';
 
 # HTML1 (single quotes, uppercase tags and whitespace in attributes)
 $dom = Mojo::DOM->new->parse(
-  qq{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
+  q{<DIV id = 'test' foo ='bar' class= "tset">works</DIV>});
 is $dom->at('#test')->text,       'works', 'right text';
 is $dom->at('div')->text,         'works', 'right text';
 is $dom->at('[foo="bar"]')->text, 'works', 'right text';
@@ -213,7 +226,7 @@ is $dom->at('[id="snowm\000021 an"]'), undef, 'no result';
 
 # Unicode and escaped selectors
 my $html
-  = qq{<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>};
+  = '<html><div id="☃x">Snowman</div><div class="x ♥">Heart</div></html>';
 $dom = Mojo::DOM->new($html);
 is $dom->at("#\\\n\\002603x")->text,                  'Snowman', 'right text';
 is $dom->at('#\\2603 x')->text,                       'Snowman', 'right text';
@@ -311,7 +324,7 @@ is $dom->replace(''), '', 'no result';
 is "$dom", '', 'no result';
 $dom->replace('<div>foo<p>lalala</p>bar</div>');
 is "$dom", '<div>foo<p>lalala</p>bar</div>', 'right result';
-$dom->find('p')->pluck(replace => '');
+$dom->find('p')->replace('');
 is "$dom", '<div>foobar</div>', 'right result';
 $dom = Mojo::DOM->new->parse('<div>♥</div>');
 $dom->at('div')->replace_content('☃');
@@ -325,14 +338,14 @@ is $dom->replace('<b>whatever</b>')->root, '<b>whatever</b>', 'right result';
 is $dom->to_xml, '<b>whatever</b>', 'right result';
 $dom->at('b')->prepend('<p>foo</p>')->append('<p>bar</p>');
 is "$dom", '<p>foo</p><b>whatever</b><p>bar</p>', 'right result';
-is $dom->find('p')->pluck('remove')->first->root->at('b')->text, 'whatever',
+is $dom->find('p')->remove->first->root->at('b')->text, 'whatever',
   'right result';
 is "$dom", '<b>whatever</b>', 'right result';
 is $dom->at('b')->strip, 'whatever', 'right result';
 is $dom->strip,  'whatever', 'right result';
 is $dom->remove, '',         'right result';
 $dom->replace('A<div>B<p>C<b>D<i><u>E</u></i>F</b>G</p><div>H</div></div>I');
-is $dom->find(':not(div):not(i):not(u)')->pluck('strip')->first->root,
+is $dom->find(':not(div):not(i):not(u)')->strip->first->root,
   'A<div>BCD<i><u>E</u></i>FG<div>H</div></div>I', 'right result';
 is $dom->at('i')->to_xml, '<i><u>E</u></i>', 'right result';
 
@@ -411,6 +424,8 @@ $dom = Mojo::DOM->new->parse(<<EOF);
 EOF
 ok $dom->xml, 'XML mode detected';
 is $dom->find('rss')->[0]->attr('version'), '2.0', 'right version';
+is_deeply [$dom->at('title')->ancestors->pluck('type')->each],
+  [qw(channel rss)], 'right results';
 is $dom->at('extension')->attr('foo:id'), 'works', 'right id';
 like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
 like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
@@ -424,6 +439,7 @@ ok $dom->at('rss')->xml,             'XML mode active';
 ok $dom->at('extension')->parent->xml, 'XML mode active';
 ok $dom->at('extension')->root->xml,   'XML mode active';
 ok $dom->children('rss')->first->xml,  'XML mode active';
+ok $dom->at('title')->ancestors->first->xml, 'XML mode active';
 
 # Namespace
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -592,14 +608,14 @@ is $dom->at('[test2=""]')->type, 'div', 'right type';
 is $dom->at('[test3=""]'), undef, 'no result';
 
 # Whitespaces before closing bracket
-$dom = Mojo::DOM->new->parse(qq{<div >content</div>});
+$dom = Mojo::DOM->new->parse('<div >content</div>');
 ok $dom->at('div'), 'tag found';
 is $dom->at('div')->text,        'content', 'right text';
 is $dom->at('div')->content_xml, 'content', 'right text';
 
 # Class with hyphen
 $dom
-  = Mojo::DOM->new->parse(qq{<div class="a">A</div><div class="a-1">A1</div>});
+  = Mojo::DOM->new->parse('<div class="a">A</div><div class="a-1">A1</div>');
 @div = ();
 $dom->find('.a')->each(sub { push @div, shift->text });
 is_deeply \@div, ['A'], 'found first element only';
@@ -1803,7 +1819,7 @@ $dom->find('b')->each(
 );
 is_deeply \@results, [qw(baz yada)], 'right results';
 
-# Autoload children in XML mode
+# AUTOLOAD children in XML mode
 $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);
 <a id="one">
   <B class="two" test>
@@ -1820,7 +1836,7 @@ is $dom->a->B->c->[1]->text, 'baz', 'right text';
 is $dom->a->B->c->[2], undef, 'no result';
 is $dom->a->B->c->size, 2, 'right number of elements';
 
-# Autoload children in HTML mode
+# AUTOLOAD children in HTML mode
 $dom = Mojo::DOM->new(<<EOF);
 <a id="one">
   <B class="two" test>
@@ -1836,6 +1852,13 @@ is $dom->a->b->c->[0]->text, 'bar', 'right text';
 is $dom->a->b->c->[1]->text, 'baz', 'right text';
 is $dom->a->b->c->[2], undef, 'no result';
 is $dom->a->b->c->size, 2, 'right number of elements';
+
+# Missing method and function (AUTOLOAD)
+eval { Mojo::DOM->new->missing };
+like $@, qr/^Can't locate object method "missing" via package "Mojo::DOM"/,
+  'right error';
+eval { Mojo::DOM::missing() };
+like $@, qr/^Undefined subroutine &Mojo::DOM::missing called/, 'right error';
 
 # Direct hash access to attributes in XML mode
 $dom = Mojo::DOM->new->xml(1)->parse(<<EOF);

@@ -12,8 +12,3 @@ install:
   - "cpanm -n --installdeps ."
 notifications:
   email: false
-  irc:
-    on_success: change
-    on_failure: always
-    channels:
-      - "irc.perl.org#mojo"

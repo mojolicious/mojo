@@ -9,6 +9,7 @@ use Scalar::Util 'weaken';
 
 use constant DEBUG => $ENV{MOJO_DAEMON_DEBUG} || 0;
 
+has acceptors => sub { [] };
 has [qw(backlog group silent user)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
@@ -20,7 +21,7 @@ sub DESTROY {
   my $self = shift;
   return unless my $loop = $self->ioloop;
   $self->_remove($_) for keys %{$self->{connections} || {}};
-  $loop->remove($_) for @{$self->{acceptors} || []};
+  $loop->remove($_) for @{$self->acceptors};
 }
 
 sub run {
@@ -54,9 +55,9 @@ sub start {
 
   # Resume accepting connections
   my $loop = $self->ioloop;
-  if (my $acceptors = $self->{acceptors}) {
-    push @$acceptors, $loop->acceptor(delete $self->{servers}{$_})
-      for keys %{$self->{servers}};
+  if (my $servers = $self->{servers}) {
+    push @{$self->acceptors}, $loop->acceptor(delete $servers->{$_})
+      for keys %$servers;
   }
 
   # Start listening
@@ -71,7 +72,7 @@ sub stop {
 
   # Suspend accepting connections but keep listen sockets open
   my $loop = $self->ioloop;
-  while (my $id = shift @{$self->{acceptors}}) {
+  while (my $id = shift @{$self->acceptors}) {
     my $server = $self->{servers}{$id} = $loop->acceptor($id);
     $loop->remove($id);
     $server->stop;
@@ -165,6 +166,7 @@ sub _listen {
     address  => $url->host,
     backlog  => $self->backlog,
     port     => $url->port,
+    reuse    => scalar $query->param('reuse'),
     tls_ca   => scalar $query->param('ca'),
     tls_cert => scalar $query->param('cert'),
     tls_key  => scalar $query->param('key')
@@ -175,7 +177,7 @@ sub _listen {
   my $tls = $options->{tls} = $url->protocol eq 'https' ? 1 : undef;
 
   weaken $self;
-  my $id = $self->ioloop->server(
+  push @{$self->acceptors}, $self->ioloop->server(
     $options => sub {
       my ($loop, $stream, $id) = @_;
 
@@ -196,12 +198,12 @@ sub _listen {
           sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
     }
   );
-  push @{$self->{acceptors} ||= []}, $id;
 
   return if $self->silent;
-  $self->app->log->info(qq{Listening at "$listen".});
-  $listen =~ s!//\*!//127.0.0.1!i;
-  say "Server available at $listen.";
+  $self->app->log->info(qq{Listening at "$url".});
+  $query->params([]);
+  $url->host('127.0.0.1') if $url->host eq '*';
+  say "Server available at $url.";
 }
 
 sub _read {
@@ -313,6 +315,13 @@ L<Mojo::Server::Daemon> inherits all events from L<Mojo::Server>.
 L<Mojo::Server::Daemon> inherits all attributes from L<Mojo::Server> and
 implements the following new ones.
 
+=head2 acceptors
+
+  my $acceptors = $daemon->acceptors;
+  $daemon       = $daemon->acceptors([]);
+
+Active acceptors.
+
 =head2 backlog
 
   my $backlog = $daemon->backlog;
@@ -353,6 +362,9 @@ L<Mojo::IOLoop> singleton.
 List of one or more locations to listen on, defaults to the value of the
 MOJO_LISTEN environment variable or C<http://*:3000>.
 
+  # Allow multiple servers to use the same port (SO_REUSEPORT)
+  $daemon->listen(['http://*:8080?reuse=1']);
+
   # Listen on IPv6 interface
   $daemon->listen(['http://[::1]:4000']);
 
@@ -372,17 +384,32 @@ These parameters are currently available:
 
 =item ca
 
+  ca=/etc/tls/ca.crt
+
 Path to TLS certificate authority file.
 
 =item cert
+
+  cert=/etc/tls/server.crt
 
 Path to the TLS cert file, defaults to a built-in test certificate.
 
 =item key
 
+  key=/etc/tls/server.key
+
 Path to the TLS key file, defaults to a built-in test key.
 
+=item reuse
+
+  reuse=1
+
+Allow multiple servers to use the same port with the C<SO_REUSEPORT> socket
+option.
+
 =item verify
+
+  verify=0x00
 
 TLS verification mode, defaults to C<0x03>.
 

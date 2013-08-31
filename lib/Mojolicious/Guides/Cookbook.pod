@@ -53,6 +53,20 @@ concurrent connections each worker is allowed to handle.
   $ ./script/myapp prefork -m production -w 10 -c 1
   Server available at http://127.0.0.1:3000.
 
+Your application is preloaded in the manager process during startup, to run
+code whenever a new worker process has been forked you can use L<Mojo::IOLoop>
+timers.
+
+  use Mojolicious::Lite;
+
+  Mojo::IOLoop->timer(0 => sub {
+    app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
+  });
+
+  get '/' => {text => 'Hello Wor...ALL GLORY TO THE HYPNOTOAD!'};
+
+  app->start;
+
 =head2 Morbo
 
 After reading the L<Mojolicious::Lite> tutorial, you should already be
@@ -110,9 +124,9 @@ L<Mojolicious::Plugin::JSONConfig> configuration file.
   };
 
 But one of its biggest advantages is the support for effortless zero downtime
-software upgrades. That means you can upgrade L<Mojolicious>, Perl or even
-system libraries at runtime without ever stopping the server or losing a
-single incoming connection, just by running the command above again.
+software upgrades (hot deployment). That means you can upgrade L<Mojolicious>,
+Perl or even system libraries at runtime without ever stopping the server or
+losing a single incoming connection, just by running the command above again.
 
   $ hypnotoad script/myapp
   Starting hot deployment for Hypnotoad server 31841.
@@ -124,19 +138,25 @@ C<X-Forwarded-For> and C<X-Forwarded-HTTPS> headers.
   # myapp.conf
   {hypnotoad => {proxy => 1}};
 
-Your application is preloaded in the manager process during startup, to run
-code whenever a new worker process has been forked you can use L<Mojo::IOLoop>
-timers.
+=head2 Zero downtime software upgrades
 
-  use Mojolicious::Lite;
+Hypnotoad makes zero downtime software upgrades (hot deployment) very simple,
+as you can see above, but on modern operating systems that support the
+C<SO_REUSEPORT> socket option, there is also another method available that
+works with all built-in web servers.
 
-  Mojo::IOLoop->timer(0 => sub {
-    app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
-  });
+  $ ./script/myapp prefork -P /tmp/first.pid -l http://*:8080?reuse=1
+  Server available at http://127.0.0.1:8080.
 
-  get '/' => {text => 'Hello Wor...ALL GLORY TO THE HYPNOTOAD!'};
+All you have to do is start a second web server listening to the same port and
+stop the first web server gracefully afterwards.
 
-  app->start;
+  $ ./script/myapp prefork -P /tmp/second.pid -l http://*:8080?reuse=1
+  Server available at http://127.0.0.1:8080.
+  $ kill -s TERM `cat /tmp/first.pid`
+
+Just remember that both web servers need to be started with the C<reuse>
+parameter.
 
 =head2 Nginx
 
@@ -1116,9 +1136,11 @@ that, the application object itself can be accessed via C<app>.
   $ mojo generate lite_app
   $ ./myapp.pl eval 'say for @{app->static->paths}'
 
-The C<verbose> option will automatically print the return value to C<STDOUT>.
+The C<verbose> options will automatically print the return value or returned
+data structure to C<STDOUT>.
 
   $ ./myapp.pl eval -v 'app->static->paths->[0]'
+  $ ./myapp.pl eval -V 'app->static->paths'
 
 =head2 Making your application installable
 

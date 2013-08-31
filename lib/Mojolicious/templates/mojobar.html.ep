@@ -61,7 +61,6 @@
   </div>
   <div id="mojobar-links">
     %= link_to Documentation => 'http://mojolicio.us/perldoc'
-    %= link_to Screencasts => 'http://mojocasts.com'
     %= link_to Wiki => 'https://github.com/kraih/mojo/wiki'
     %= link_to GitHub => 'https://github.com/kraih/mojo'
     %= link_to CPAN => 'http://metacpan.org/release/Mojolicious/'

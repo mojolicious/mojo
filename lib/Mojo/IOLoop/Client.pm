@@ -208,38 +208,56 @@ These options are currently available:
 
 =item address
 
+  address => 'mojolicio.us'
+
 Address or host name of the peer to connect to, defaults to C<localhost>.
 
 =item handle
+
+  handle => $handle
 
 Use an already prepared handle.
 
 =item local_address
 
+  local_address => '127.0.0.1'
+
 Local address to bind to.
 
 =item port
 
-Port to connect to.
+  port => 80
+
+Port to connect to, defaults to C<80> or C<443> with C<tls> option.
 
 =item timeout
+
+  timeout => 15
 
 Maximum amount of time in seconds establishing connection may take before
 getting canceled, defaults to C<10>.
 
 =item tls
 
+  tls => 1
+
 Enable TLS.
 
 =item tls_ca
+
+  tls_ca => '/etc/tls/ca.crt'
 
 Path to TLS certificate authority file. Also activates hostname verification.
 
 =item tls_cert
 
+  tls_cert => '/etc/tls/client.crt'
+
 Path to the TLS certificate file.
 
 =item tls_key
+
+  tls_key => '/etc/tls/client.key'
 
 Path to the TLS key file.
 

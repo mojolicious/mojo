@@ -41,7 +41,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.24';
+our $VERSION  = '4.29';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -69,8 +69,8 @@ sub new {
   my $r = $self->routes->namespaces([ref $self]);
 
   # Hide controller attributes/methods and "handler"
-  $r->hide(qw(app cookie finish flash handler match on param redirect_to));
-  $r->hide(qw(render render_exception render_later render_maybe));
+  $r->hide(qw(app continue cookie finish flash handler match on param));
+  $r->hide(qw(redirect_to render render_exception render_later render_maybe));
   $r->hide(qw(render_not_found render_static rendered req res respond_to));
   $r->hide(qw(send session signed_cookie stash tx url_for write write_chunk));
 

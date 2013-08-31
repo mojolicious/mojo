@@ -45,8 +45,8 @@ is $t->app->routes->find('something')->to_string, '/test4/:something',
   'right pattern';
 is $t->app->routes->find('test3')->pattern->defaults->{namespace},
   'MojoliciousTestController', 'right namespace';
-is $t->app->routes->find('authenticated')->pattern->defaults->{controller},
-  'foo', 'right controller';
+is $t->app->routes->find('withblock')->pattern->defaults->{controller}, 'foo',
+  'right controller';
 is ref $t->app->routes->find('something'), 'Mojolicious::Routes::Route',
   'right class';
 is ref $t->app->routes->find('something')->root, 'Mojolicious::Routes',
@@ -61,6 +61,28 @@ is $t->app->static->file('hello.txt')->slurp,
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 is $t->app->secret, $t->app->moniker, 'secret defaults to moniker';
 
+# Missing methods and functions (AUTOLOAD)
+eval { $t->app->missing };
+like $@,
+  qr/^Can't locate object method "missing" via package "MojoliciousTest"/,
+  'right error';
+eval { Mojolicious::missing() };
+like $@, qr/^Undefined subroutine &Mojolicious::missing called/, 'right error';
+my $c = $t->app->controller_class->new;
+eval { $c->missing };
+like $@, qr/^Can't locate object method "missing" via package "@{[ref $c]}"/,
+  'right error';
+eval { Mojolicious::Controller::missing() };
+like $@, qr/^Undefined subroutine &Mojolicious::Controller::missing called/,
+  'right error';
+eval { $t->app->routes->missing };
+like $@,
+  qr/^Can't locate object method "missing" via package "Mojolicious::Routes"/,
+  'right error';
+eval { Mojolicious::Route::missing() };
+like $@, qr/^Undefined subroutine &Mojolicious::Route::missing called/,
+  'right error';
+
 # Hidden controller attributes and methods
 $t->app->routes->hide('bar');
 ok !$t->app->routes->is_hidden('foo'), 'not hidden';
@@ -71,6 +93,7 @@ ok $t->app->routes->is_hidden('DESTROY'),          'is hidden';
 ok $t->app->routes->is_hidden('FOO_BAR'),          'is hidden';
 ok $t->app->routes->is_hidden('app'),              'is hidden';
 ok $t->app->routes->is_hidden('attr'),             'is hidden';
+ok $t->app->routes->is_hidden('continue'),         'is hidden';
 ok $t->app->routes->is_hidden('cookie'),           'is hidden';
 ok $t->app->routes->is_hidden('finish'),           'is hidden';
 ok $t->app->routes->is_hidden('flash'),            'is hidden';
@@ -200,16 +223,6 @@ $t->get_ok($url => {'X-Test' => 'Hi there!'})->status_is(200)
 $t->get_ok('/happy/fun/time' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is('Have fun!');
-
-# Foo::authenticated (authentication bridge)
-$t->get_ok('/auth/authenticated' => {'X-Bender' => 'Hi there!'})
-  ->status_is(200)->header_is('X-Bender' => undef)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('authenticated');
-
-# Foo::authenticated (authentication bridge)
-$t->get_ok('/auth/authenticated')->status_is(404)
-  ->header_is('X-Bender' => undef)->header_is(Server => 'Mojolicious (Perl)')
-  ->content_like(qr/Page not found/);
 
 # Foo::test
 $t->get_ok('/foo/test' => {'X-Test' => 'Hi there!'})->status_is(200)
@@ -430,6 +443,11 @@ $t->get_ok('/staged' => {'X-Pass' => 1})->status_is(200)
 # MojoliciousTestController::Foo::stage1
 $t->get_ok('/staged')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('Go away!');
+
+# MojoliciousTestController::Foo::suspended
+$t->get_ok('/suspended')->status_is(200)
+  ->header_is(Server        => 'Mojolicious (Perl)')
+  ->header_is('X-Suspended' => '0, 1, 1, 2')->content_is('Have fun!');
 
 # MojoliciousTest::Foo::config
 $t->get_ok('/stash_config')->status_is(200)

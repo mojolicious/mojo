@@ -1,5 +1,36 @@
 
-4.24  2013-08-03
+4.29  2013-08-31
+  - Fixed automatic rendering to work after non-blocking operations have been
+    performed in bridges.
+
+4.28  2013-08-29
+  - Added support for non-blocking operations in bridges to
+    Mojolicious::Routes.
+  - Added continue method to Mojolicious::Controller.
+  - Added continue method to Mojolicious::Routes.
+  - Added current attribute to Mojolicious::Routes::Match.
+  - Fixed automatic rendering bug in Mojolicious::Routes.
+
+4.27  2013-08-26
+  - Added acceptors attribute to Mojo::Server::Daemon.
+  - Added handle method to Mojo::IOLoop::Server.
+  - Added -V option to eval command.
+  - Added reuse option to Mojo::IOLoop::Server::listen.
+  - Added reuse parameter to Mojo::Server::Daemon::listen.
+  - Fixed console message bug in Mojo::Server::Daemon.
+  - Fixed SNI bug in online tests.
+
+4.26  2013-08-18
+  - Fixed support for Netscape cookies in Mojo::Cookie::Response.
+  - Fixed element method bug in Mojo::Collection.
+
+4.25  2013-08-17
+  - Added support for calling element methods to Mojo::Collection.
+  - Added compact method to Mojo::Collection.
+
+4.24  2013-08-08
+  - Added ancestors method to Mojo::DOM.
+  - Fixed bug where Mojo::IOLoop::Stream timeout was not always available.
 
 4.23  2013-08-01
   - Added redirects method to Mojo::Transaction::HTTP.

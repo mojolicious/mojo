@@ -12,6 +12,7 @@ use Mojo::Log;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious;
+use Socket qw(SO_REUSEPORT SOL_SOCKET);
 
 # Timeout
 {
@@ -219,13 +220,16 @@ $daemon = Mojo::Server::Daemon->new(
   listen => ["http://127.0.0.1:$port"],
   silent => 1
 );
+is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
 $daemon->start;
+is scalar @{$daemon->acceptors}, 1, 'one active acceptor';
 is $daemon->app->moniker, 'mojolicious', 'right moniker';
 $tx = $ua->get("http://127.0.0.1:$port/throttle1" => {Connection => 'close'});
 ok $tx->success, 'successful';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
 $daemon->stop;
+is scalar @{$daemon->acceptors}, 0, 'no active acceptors';
 $tx = $ua->inactivity_timeout(0.5)
   ->get("http://127.0.0.1:$port/throttle2" => {Connection => 'close'});
 ok !$tx->success, 'not successful';
@@ -236,5 +240,27 @@ $tx = $ua->inactivity_timeout(10)
 ok $tx->success, 'successful';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
+
+# SO_REUSEPORT
+SKIP: {
+  skip 'SO_REUSEPORT support required!', 2 unless eval {SO_REUSEPORT};
+
+  $port   = Mojo::IOLoop->generate_port;
+  $daemon = Mojo::Server::Daemon->new(
+    listen => ["http://127.0.0.1:$port"],
+    silent => 1
+  )->start;
+  ok !$daemon->ioloop->acceptor($daemon->acceptors->[0])
+    ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
+    'no SO_REUSEPORT socket option';
+  $daemon = Mojo::Server::Daemon->new(
+    listen => ["http://127.0.0.1:$port?reuse=1"],
+    silent => 1
+  );
+  $daemon->start;
+  ok $daemon->ioloop->acceptor($daemon->acceptors->[0])
+    ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
+    'SO_REUSEPORT socket option';
+}
 
 done_testing();

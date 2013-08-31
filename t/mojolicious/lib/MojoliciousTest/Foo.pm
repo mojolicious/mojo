@@ -1,11 +1,6 @@
 package MojoliciousTest::Foo;
 use Mojo::Base 'Mojolicious::Controller';
 
-sub authenticated {
-  my $self = shift;
-  $self->render(text => $self->stash('action'));
-}
-
 sub config {
   my $self = shift;
   $self->render(text => $self->stash('config')->{test});
@@ -53,6 +48,20 @@ sub stage1 {
 }
 
 sub stage2 { return shift->some_plugin }
+
+sub suspended {
+  my $self = shift;
+
+  $self->res->headers->append('X-Suspended' => $self->match->current);
+  Mojo::IOLoop->timer(
+    0 => sub {
+      $self->res->headers->append('X-Suspended' => $self->match->current);
+      $self->continue;
+    }
+  );
+
+  return 0;
+}
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }
 

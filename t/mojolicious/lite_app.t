@@ -733,8 +733,13 @@ $t->get_ok('/source')->status_is(200)->header_isnt('X-Missing' => 1)
   ->content_like(qr!get_ok\('/source!);
 
 # File does not exist
+$log = '';
+$cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/source?fail=1')->status_is(404)->header_is('X-Missing' => 1)
   ->content_is("Oops!\n");
+like $log, qr/File "does_not_exist.txt" not found, public directory missing\?/,
+  'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # With body and max message size
 {

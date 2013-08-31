@@ -130,6 +130,15 @@ ok !!$t->app->plugins->emit_hook('does_not_exist'), 'hook has been emitted';
 ok !!$t->app->plugins->emit_hook_reverse('does_not_exist'),
   'hook has been emitted';
 
+# Replaced helper
+my $log = '';
+my $cb = $t->app->log->on(message => sub { $log .= pop });
+$t->app->helper(replaced_helper => sub { });
+$t->app->helper(replaced_helper => sub { });
+like $log, qr/Helper "replaced_helper" already exists, replacing\./,
+  'right message';
+$t->app->log->unsubscribe(message => $cb);
+
 # Custom hooks
 my $custom;
 $t->app->hook('custom_hook' => sub { $custom += shift });
@@ -150,8 +159,8 @@ $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
   ->content_unlike(qr/Something/)->content_like(qr/Page not found/);
 
 # Plugin::Test::SomePlugin2::register (security violation again)
-my $log = '';
-my $cb = $t->app->log->on(message => sub { $log .= pop });
+$log = '';
+$cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/plugin-test-some_plugin2/register')->status_isnt(500)
   ->status_is(404)->header_is(Server => 'Mojolicious (Perl)')
   ->content_unlike(qr/Something/)->content_like(qr/Page not found/);
@@ -259,9 +268,13 @@ $t->get_ok('/foo/test' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server     => 'Mojolicious (Perl)')->content_like(qr!/bar/test!);
 
 # Foo::index
+$log = '';
+$cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr|<body>\s+23\nHello Mojo from the template /foo! He|);
+like $log, qr/Careful, "handler" is a reserved stash value\./, 'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # Foo::Bar::index
 $t->get_ok('/foo-bar' => {'X-Test' => 'Hi there!'})->status_is(200)

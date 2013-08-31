@@ -52,6 +52,8 @@ $prefork->once(
 );
 $prefork->on(reap => sub { push @reap, pop });
 $prefork->on(finish => sub { $graceful = pop });
+my $log = '';
+my $cb = $prefork->app->log->on(message => sub { $log .= pop });
 $prefork->run;
 is scalar @spawn, 4, 'four workers spawned';
 is scalar @reap,  4, 'four workers reaped';
@@ -60,6 +62,12 @@ ok $graceful, 'server has been stopped gracefully';
 is_deeply [sort @spawn], [sort @reap], 'same process ids';
 is $tx->res->code, 200,           'right status';
 is $tx->res->body, 'just works!', 'right content';
+like $log, qr/Listening at/,                                 'right message';
+like $log, qr/Manager $$ started\./,                         'right message';
+like $log, qr/Creating process id file/,                     'right message';
+like $log, qr/Trying to stop worker $spawn[0] gracefully\./, 'right message';
+like $log, qr/Worker $spawn[0] stopped\./,                   'right message';
+$prefork->app->log->unsubscribe(message => $cb);
 
 # Process id and lock files
 is $prefork->check_pid, $$, 'right process id';

@@ -42,7 +42,18 @@ is_deeply [$r->render($c)], ['Hello Mojo!', 'test'],
   'rendering a path with dots';
 
 # Unrecognized handler
+my $log = '';
+my $cb = $c->app->log->on(message => sub { $log .= pop });
 $c->stash->{handler} = 'not_defined';
 is $r->render($c), undef, 'return undef for unrecognized handler';
+like $log, qr/No handler for "not_defined" available\./, 'right message';
+$c->app->log->unsubscribe(message => $cb);
+
+# Big cookie
+$log = '';
+$cb = $c->app->log->on(message => sub { $log .= pop });
+$c->cookie(foo => 'x' x 4097);
+like $log, qr/Cookie "foo" is bigger than 4096 bytes\./, 'right message';
+$c->app->log->unsubscribe(message => $cb);
 
 done_testing();

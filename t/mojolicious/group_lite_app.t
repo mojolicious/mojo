@@ -195,11 +195,11 @@ my $log = '';
 my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended?ok=1')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('suspended!');
-like $log, qr!GET "/suspended".!,      'right message';
-like $log, qr/Routing to a callback./, 'right message';
-like $log, qr/Nothing has been rendered, expecting delayed response./,
+like $log, qr!GET "/suspended"\.!,      'right message';
+like $log, qr/Routing to a callback\./, 'right message';
+like $log, qr/Nothing has been rendered, expecting delayed response\./,
   'right message';
-like $log, qr/Rendering inline template./, 'right message';
+like $log, qr/Rendering inline template\./, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Suspended bridge (stopped)

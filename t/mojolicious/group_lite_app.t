@@ -36,7 +36,7 @@ under '/suspended' => sub {
   return 0;
 };
 
-get '/' => sub { shift->render(inline => '<%= $suspended %>\\') };
+get '/' => {inline => '<%= $suspended %>\\'};
 
 under sub {
   my $self = shift;

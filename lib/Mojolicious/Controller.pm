@@ -520,7 +520,7 @@ implements the following new ones.
 
 =head2 continue
 
-  my $success = $c->continue;
+  $c->continue;
 
 Continue dispatch chain.
 

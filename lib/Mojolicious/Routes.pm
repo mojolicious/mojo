@@ -30,8 +30,7 @@ sub continue {
   my $match   = $c->match;
   my $stack   = $match->stack;
   my $current = $match->current;
-  return 1 unless my $field = $stack->[$current];
-  my $last = !$stack->[++$current];
+  return $self->auto_render($c) unless my $field = $stack->[$current];
 
   # Merge captures into stash
   my @keys  = keys %$field;
@@ -39,11 +38,11 @@ sub continue {
   @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
 
   my $continue;
+  my $last = !$stack->[++$current];
   if (my $cb = $field->{cb}) { $continue = $self->_callback($c, $cb, $last) }
   else { $continue = $self->_controller($c, $field, $last) }
   $match->current($current);
-
-  return $last || $continue ? $self->continue($c) : undef;
+  $self->continue($c) if $last || $continue;
 }
 
 sub dispatch {
@@ -82,7 +81,7 @@ sub dispatch {
   }
 
   return undef unless @{$c->match->stack};
-  $self->auto_render($c) if $self->continue($c);
+  $self->continue($c);
   return 1;
 }
 

@@ -773,6 +773,9 @@ is set to the value C<XMLHttpRequest>.
     any  => {data => '', status => 204}
   );
 
+See L<Mojolicious::Types> for predifened list and L<Mojolicious::App/types> to
+manipulate types.
+
 =head2 send
 
   $c = $c->send({binary => $bytes});

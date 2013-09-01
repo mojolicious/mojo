@@ -153,7 +153,9 @@ sub _class {
     }
 
     # Success
-    return $class->new($c);
+    my $new = $class->new($c);
+    weaken $new->{$_} for qw(app tx);
+    return $new;
   }
 
   # Nothing found

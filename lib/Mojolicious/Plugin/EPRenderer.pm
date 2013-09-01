@@ -33,7 +33,7 @@ sub register {
 
         # Helpers
         $prepend .= 'my $_H = $self->app->renderer->helpers;';
-        $prepend .= "sub $_; *$_ = sub { \$_H->{'$_'}->(\$self, \@_) };"
+        $prepend .= "sub $_; local *$_ = sub { \$_H->{'$_'}->(\$self, \@_) };"
           for grep {/^\w+$/} keys %{$renderer->helpers};
 
         # Be less relaxed for everything else

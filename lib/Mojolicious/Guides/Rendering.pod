@@ -256,7 +256,11 @@ Response status codes can be changed with the C<status> stash value.
 The C<Content-Type> header of the response is actually based on the MIME type
 mapping of the C<format> stash value.
 
+  # Content-Type: text/plain
   $self->render(text => 'Hello.', format => 'txt');
+
+  # Content-Type: image/png
+  $self->render(data => $bytes, format => 'png');
 
 These mappings can be easily extended or changed with L<Mojolicious/"types">.
 

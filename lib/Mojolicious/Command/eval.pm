@@ -25,7 +25,7 @@ sub run {
   # Run code against application
   my $app = $self->app;
   no warnings;
-  my $result = eval "package main; sub app { \$app }; $code";
+  my $result = eval "package main; sub app; local *app = sub { \$app }; $code";
   return $@ ? die $@ : $result unless defined $result && ($v1 || $v2);
   $v2 ? print($app->dumper($result)) : say $result;
 }

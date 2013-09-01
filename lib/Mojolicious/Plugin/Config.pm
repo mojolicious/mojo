@@ -14,8 +14,9 @@ sub parse {
   my ($self, $content, $file, $conf, $app) = @_;
 
   # Run Perl code
-  my $config = eval 'package Mojolicious::Plugin::Config::Sandbox;'
-    . "no warnings; sub app { \$app }; use Mojo::Base -strict; $content";
+  my $config
+    = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
+    . "sub app; local *app = sub { \$app }; use Mojo::Base -strict; $content";
   die qq{Couldn't load configuration from file "$file": $@} if !$config && $@;
   die qq{Config file "$file" did not return a hash reference.\n}
     unless ref $config eq 'HASH';

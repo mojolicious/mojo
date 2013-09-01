@@ -165,11 +165,10 @@ get '/stream' => sub {
   $self->rendered;
 };
 
-my $finished;
 get '/finished' => sub {
   my $self = shift;
-  $self->on(finish => sub { $finished += 2 });
-  $finished = 1;
+  $self->on(finish => sub { shift->stash->{finished} *= 2 });
+  $self->stash->{finished} = 1;
   $self->render(text => 'so far so good!');
 };
 
@@ -666,9 +665,11 @@ $t->get_ok('/maybe/ajax' => {'X-Requested-With' => 'XMLHttpRequest'})
   ->content_is('is ajax');
 
 # With finish event
+my $stash;
+$t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $t->get_ok('/finished')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('so far so good!');
-is $finished, 3, 'finished';
+is $stash->{finished}, 2, 'finish event has been emitted once';
 
 # IRI
 $t->get_ok('/привет/мир')->status_is(200)

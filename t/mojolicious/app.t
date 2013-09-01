@@ -513,6 +513,14 @@ like $log, qr!Rendering template "foo/fun.html.ep" from DATA section\.!,
 like $log, qr/200 OK/, 'right message';
 $t->app->log->unsubscribe(message => $cb);
 
+# MojoliciousTest::Foo::longpoll
+my $stash;
+$t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
+$t->get_ok('/longpoll')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Poll!');
+ok $stash->{finished},  'finish event has been emitted';
+ok $stash->{destroyed}, 'controller has been destroyed';
+
 # MojoliciousTest::Foo::config
 $t->get_ok('/stash_config')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('123');

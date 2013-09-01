@@ -137,6 +137,9 @@ sub startup {
   $r->bridge('/suspended')->to('foo#suspended')->bridge->to('foo#suspended')
     ->route->to('foo#fun');
 
+  # /longpoll (long polling)
+  $r->route('/longpoll')->to('foo#longpoll');
+
   # /shortcut/act
   # /shortcut/ctrl
   # /shortcut/ctrl-act (shortcuts to controller#action)

@@ -1,6 +1,8 @@
 package MojoliciousTest::Foo;
 use Mojo::Base 'Mojolicious::Controller';
 
+sub DESTROY { shift->stash->{destroyed} = 1 }
+
 sub config {
   my $self = shift;
   $self->render(text => $self->stash('config')->{test});
@@ -12,6 +14,16 @@ sub index {
   my $self = shift;
   $self->layout('default');
   $self->stash(handler => 'xpl', msg => 'Hello World!');
+}
+
+sub longpoll {
+  my $self = shift;
+  $self->on(finish => sub { shift->stash->{finished} = 1 });
+  $self->write_chunk(
+    sub {
+      shift->write_chunk('Poll!' => sub { shift->write_chunk('') });
+    }
+  );
 }
 
 sub plugin_camel_case {

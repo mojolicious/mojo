@@ -3,22 +3,21 @@ use Mojo::Base 'Mojolicious';
 
 use MojoliciousTest::Foo;
 
-sub development_mode {
-  my $self = shift;
-
-  # Template and static file class with higher precedence for development
-  unshift @{$self->static->classes},   'MojoliciousTest::Foo';
-  unshift @{$self->renderer->classes}, 'MojoliciousTest::Foo';
-
-  # Static root for development
-  unshift @{$self->static->paths}, $self->home->rel_dir('public_dev');
-
-  # Development namespace
-  unshift @{$self->routes->namespaces}, 'MojoliciousTest3';
-}
-
 sub startup {
   my $self = shift;
+
+  if ($self->mode eq 'development') {
+
+    # Template and static file class with higher precedence for development
+    unshift @{$self->static->classes},   'MojoliciousTest::Foo';
+    unshift @{$self->renderer->classes}, 'MojoliciousTest::Foo';
+
+    # Static root for development
+    unshift @{$self->static->paths}, $self->home->rel_dir('public_dev');
+
+    # Development namespace
+    unshift @{$self->routes->namespaces}, 'MojoliciousTest3';
+  }
 
   # Template and static file class with lower precedence for production
   push @{$self->static->classes},   'MojoliciousTest';

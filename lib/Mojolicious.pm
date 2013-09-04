@@ -88,8 +88,12 @@ sub new {
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';
 
-  # Run mode before startup
-  if (my $sub = $self->can("${mode}_mode")) { $self->$sub(@_) }
+  # DEPRECATED in Top Hat!
+  if (my $sub = $self->can("${mode}_mode")) {
+    warn qq{"sub ${mode}_mode {...}" in application class is DEPRECATED.\n};
+    $self->$sub(@_);
+  }
+
   $self->startup(@_);
 
   return $self;
@@ -255,24 +259,10 @@ L<Mojolicious::Controller>.
   $app     = $app->mode('production');
 
 The operating mode for your application, defaults to a value from the
-MOJO_MODE and PLACK_ENV environment variables or C<development>. You can also
-add per mode logic to your application by defining methods named
-C<${mode}_mode> in the application class, which will be called right before
-C<startup>.
-
-  sub development_mode {
-    my $self = shift;
-    ...
-  }
-
-  sub production_mode {
-    my $self = shift;
-    ...
-  }
-
-Right before calling C<startup> and mode specific methods, L<Mojolicious>
-will pick up the current mode, name the log file after it and raise the log
-level from C<debug> to C<info> if it has a value other than C<development>.
+MOJO_MODE and PLACK_ENV environment variables or C<development>. Right before
+calling C<startup>, L<Mojolicious> will pick up the current mode, name the log
+file after it and raise the log level from C<debug> to C<info> if it has a
+value other than C<development>.
 
 =head2 moniker
 

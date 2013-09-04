@@ -934,11 +934,12 @@ L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
 
 You can use the L<Mojo::Log> object from L<Mojo/"log"> to portably collect
 debug messages and automatically disable them later in a production setup by
-changing the Mojolicious operating mode, which can be retrieved from the
+changing the Mojolicious operating mode, which can also be retrieved from the
 attribute L<Mojolicious/"mode">.
 
   use Mojolicious::Lite;
 
+  # Prepare mode specific message during startup
   my $msg = app->mode eq 'development' ? 'Development!' : 'Something else!';
 
   get '/' => sub {

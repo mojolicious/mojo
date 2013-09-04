@@ -133,8 +133,8 @@ implements the following new ones.
 
 =head2 begin
 
-  my $cb = $delay->begin;
-  my $cb = $delay->begin(0);
+  my $without_first_arg = $delay->begin;
+  my $with_first_arg    = $delay->begin(0);
 
 Increment active event counter, the returned callback can be used to decrement
 the active event counter again. Arguments passed to the callback are queued in

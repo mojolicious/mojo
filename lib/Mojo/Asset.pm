@@ -60,7 +60,7 @@ Pretend file ends earlier.
 =head2 start_range
 
   my $start = $asset->start_range;
-  $asset    = $asset->start_range(0);
+  $asset    = $asset->start_range(3);
 
 Pretend file starts later.
 

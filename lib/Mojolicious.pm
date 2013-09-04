@@ -41,7 +41,7 @@ has static   => sub { Mojolicious::Static->new };
 has types    => sub { Mojolicious::Types->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.31';
+our $VERSION  = '4.32';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -260,7 +260,7 @@ L<Mojolicious::Controller>.
 
 The operating mode for your application, defaults to a value from the
 MOJO_MODE and PLACK_ENV environment variables or C<development>. Right before
-calling C<startup>, L<Mojolicious> will pick up the current mode, name the log
+calling C<startup>, Mojolicious will pick up the current mode, name the log
 file after it and raise the log level from C<debug> to C<info> if it has a
 value other than C<development>.
 
@@ -436,8 +436,8 @@ and the application object, as well as a function in C<ep> templates.
 
   $app->hook(after_dispatch => sub {...});
 
-Extend L<Mojolicious> with hooks, which allow code to be shared with all
-requests indiscriminately.
+Extend Mojolicious with hooks, which allow code to be shared with all requests
+indiscriminately.
 
   # Dispatchers will not run if there's already a response code defined
   $app->hook(before_dispatch => sub {
@@ -585,8 +585,8 @@ the default controller object)
   $app->plugin('MyApp::Plugin::SomeThing', foo => 23);
   $app->plugin('MyApp::Plugin::SomeThing', {foo => 23});
 
-Load a plugin, for a full list of example plugins included in the
-L<Mojolicious> distribution see L<Mojolicious::Plugins/"PLUGINS">.
+Load a plugin, for a full list of example plugins included in the Mojolicious
+distribution see L<Mojolicious::Plugins/"PLUGINS">.
 
 =head2 start
 
@@ -624,8 +624,8 @@ request, response and stash.
 
 =head1 BUNDLED FILES
 
-The L<Mojolicious> distribution includes a few files with different licenses
-that have been bundled for internal use.
+The Mojolicious distribution includes a few files with different licenses that
+have been bundled for internal use.
 
 =head2 Mojolicious Artwork
 
@@ -649,7 +649,7 @@ L<http://www.apache.org/licenses/LICENSE-2.0>.
 
 =head1 CODE NAMES
 
-Every major release of L<Mojolicious> has a code name, these are the ones that
+Every major release of Mojolicious has a code name, these are the ones that
 have been used in the past.
 
 4.0, C<Top Hat> (u1F3A9)

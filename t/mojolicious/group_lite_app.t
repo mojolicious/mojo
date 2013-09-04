@@ -117,11 +117,11 @@ post sub { shift->render(text => 'prefixed POST works!') };
 
 get '/works' => sub { shift->render(text => 'prefix works!') };
 
-under '/prefix2' => {message => 'prefixed'};
+under '/prefix2' => {msg => 'prefixed'};
 
-get '/foo' => {inline => '<%= $message %>!'};
+get '/foo' => {inline => '<%= $msg %>!'};
 
-get '/bar' => {inline => 'also <%= $message %>!'};
+get '/bar' => {inline => 'also <%= $msg %>!'};
 
 # Reset
 under '/' => {foo => 'one'};

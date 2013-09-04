@@ -567,10 +567,10 @@ Prefixing multiple routes is another good use for C<under>.
   get '/baz' => {text => 'foo baz'};
 
   # / (reset)
-  under '/' => {message => 'whatever'};
+  under '/' => {msg => 'whatever'};
 
   # /bar
-  get '/bar' => {inline => '<%= $message %> works'};
+  get '/bar' => {inline => '<%= $msg %> works'};
 
   app->start;
 
@@ -934,14 +934,17 @@ L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
 
 You can use the L<Mojo::Log> object from L<Mojo/"log"> to portably collect
 debug messages and automatically disable them later in a production setup by
-changing the L<Mojolicious> operating mode.
+changing the Mojolicious operating mode, which can be retrieved from the
+attribute L<Mojolicious/"mode">.
 
   use Mojolicious::Lite;
 
+  my $msg = app->mode eq 'development' ? 'Development!' : 'Something else!';
+
   get '/' => sub {
     my $self = shift;
-    $self->app->log->debug('Rendering "Hello World!" message.');
-    $self->render(text => 'Hello World!');
+    $self->app->log->debug('Rendering mode specific message.');
+    $self->render(text => $msg);
   };
 
   app->log->debug('Starting application.');

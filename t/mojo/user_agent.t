@@ -504,13 +504,4 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';
 
-# Premature connection close
-$port = Mojo::IOLoop->generate_port;
-Mojo::IOLoop->server(
-  {address => '127.0.0.1', port => $port} => sub { Mojo::IOLoop->remove(pop) }
-);
-$tx = $ua->get("http://localhost:$port/");
-ok !$tx->success, 'not successful';
-is $tx->error, 'Premature connection close', 'right error';
-
 done_testing();

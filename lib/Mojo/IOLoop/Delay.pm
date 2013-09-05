@@ -137,9 +137,10 @@ implements the following new ones.
   my $with_first_arg    = $delay->begin(0);
 
 Increment active event counter, the returned callback can be used to decrement
-the active event counter again. Arguments passed to the callback are queued in
-the right order for the next step or C<finish> event and C<wait> method, the
-first argument will be ignored by default.
+the active event counter again and will return the number of remaining active
+events. Arguments passed to the callback are queued in the right order for the
+next step or C<finish> event and C<wait> method, the first argument will be
+ignored by default.
 
   # Capture all arguments
   my $delay = Mojo::IOLoop->delay;

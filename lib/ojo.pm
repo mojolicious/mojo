@@ -8,10 +8,10 @@ use Mojo::JSON 'j';
 use Mojo::UserAgent;
 use Mojo::Util 'monkey_patch';
 
-# Silent oneliners
+# Silent one-liners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 
-# Singleton user agent for oneliners
+# Singleton user agent for one-liners
 my $UA = Mojo::UserAgent->new;
 
 sub import {
@@ -56,7 +56,7 @@ sub _request {
 
 =head1 NAME
 
-ojo - Fun oneliners with Mojo!
+ojo - Fun one-liners with Mojo!
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ ojo - Fun oneliners with Mojo!
 
 =head1 DESCRIPTION
 
-A collection of automatically exported functions for fun Perl oneliners. Ten
+A collection of automatically exported functions for fun Perl one-liners. Ten
 redirects will be followed by default, you can change this behavior with the
 MOJO_MAX_REDIRECTS environment variable.
 

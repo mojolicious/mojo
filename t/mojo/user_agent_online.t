@@ -145,7 +145,7 @@ ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 301, 'right status';
 like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
 
-# Oneliner
+# One-liner
 is g('mojolicio.us')->code,          200, 'right status';
 is h('mojolicio.us')->code,          200, 'right status';
 is h('mojolicio.us')->body,          '',  'no content';

@@ -34,7 +34,7 @@
 
 ## Installation
 
-  All you need is a oneliner, it takes less than a minute.
+  All you need is a one-liner, it takes less than a minute.
 
     $ curl get.mojolicio.us | sh
 

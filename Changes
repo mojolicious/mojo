@@ -2441,7 +2441,7 @@
   - Added EXPERIMENTAL attribute partial to MojoX::Routes.
   - Added EXPERIMENTAL CSS3 selector tests to Test::Mojo.
   - Added EXPERIMENTAL method test_server to Mojo::Client.
-  - Added EXPERIMENTAL oneliner module ojo.
+  - Added EXPERIMENTAL one-liner module ojo.
   - Added EXPERIMENTAL support for static files in the DATA section of
     Mojolicious applications.
   - Added EXPERIMENTAL Bonjour support.

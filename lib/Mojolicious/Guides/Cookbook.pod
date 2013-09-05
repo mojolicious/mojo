@@ -1067,9 +1067,9 @@ This can be an invaluable tool for testing your applications.
 
   $ ./myapp.pl get /welcome 'head > title'
 
-=head2 Oneliners
+=head2 One-liners
 
-For quick hacks and especially testing, L<ojo> oneliners are also a great
+For quick hacks and especially testing, L<ojo> one-liners are also a great
 choice.
 
   $ perl -Mojo -E 'say g("mojolicio.us")->dom->html->head->title->text'
@@ -1129,7 +1129,7 @@ namespace.
 
 =head2 Running code against your application
 
-Ever thought about running a quick oneliner against your L<Mojolicious>
+Ever thought about running a quick one-liner against your L<Mojolicious>
 application to test something? Thanks to the C<eval> command you can do just
 that, the application object itself can be accessed via C<app>.
 
@@ -1213,10 +1213,10 @@ rendering kicks in even if no actual code gets executed by the router. The
 renderer just picks up the C<text> value from the stash and generates a
 response.
 
-=head2 Hello World oneliners
+=head2 Hello World one-liners
 
 The C<Hello World> example above can get even a little bit shorter in an
-L<ojo> oneliner.
+L<ojo> one-liner.
 
   $ perl -Mojo -E 'a({text => "Hello World!"})->start' daemon
 

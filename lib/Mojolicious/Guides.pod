@@ -118,7 +118,7 @@ Test driven development toolkit for web applications.
 
 =item L<ojo>
 
-Fun oneliners using everything above.
+Fun one-liners using everything above.
 
 =back
 

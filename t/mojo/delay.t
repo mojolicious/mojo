@@ -18,8 +18,8 @@ for my $i (1, 1) {
 }
 my $end  = $delay->begin;
 my $end2 = $delay->begin;
-is $end->(),  3, 'three remaining';
-is $end2->(), 2, 'two remaining';
+$end->();
+$end2->();
 is_deeply [$delay->wait], [], 'no return values';
 is_deeply \@results, [1, 1], 'right results';
 
@@ -78,23 +78,21 @@ is $finished, 1,         'finish event has been emitted once';
 is $result,   'success', 'right result';
 
 # End chain after third step
-my $remaining;
 ($finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
 $delay->on(finish => sub { $finished++ });
 $delay->steps(
   sub { Mojo::IOLoop->timer(0 => shift->begin) },
   sub {
-    $result    = 'fail';
-    $remaining = shift->begin->();
+    $result = 'fail';
+    shift->begin->();
   },
   sub { $result = 'success' },
   sub { $result = 'fail' }
 );
 is_deeply [$delay->wait], [], 'no return values';
-is $remaining, 0,         'none remaining';
-is $finished,  1,         'finish event has been emitted once';
-is $result,    'success', 'right result';
+is $finished, 1,         'finish event has been emitted once';
+is $result,   'success', 'right result';
 
 # End chain after second step
 @results = ();
@@ -164,5 +162,53 @@ $delay = Mojo::IOLoop->delay(
 is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6, 23], 'right return values';
 is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23], 'right results';
+
+# Exception in first step
+my $failed;
+($finished, $result) = undef;
+$delay = Mojo::IOLoop::Delay->new;
+$delay->on(error => sub { $failed = pop });
+$delay->on(finish => sub { $finished++ });
+$delay->steps(sub { die 'First step!' }, sub { $result = 'failed' });
+eval { $delay->wait };
+like $@,      qr/^First step!/, 'right error';
+like $failed, qr/^First step!/, 'right error';
+ok !$finished, 'finish event has not been emitted';
+ok !$result,   'no result';
+
+# Exception in second step
+($failed, $finished, $result) = undef;
+$delay = Mojo::IOLoop::Delay->new;
+$delay->on(error => sub { $failed = pop });
+$delay->on(finish => sub { $finished++ });
+$delay->steps(
+  sub { Mojo::IOLoop->timer(0 => shift->begin) },
+  sub { die 'Second step!' },
+  sub { $result = 'failed' }
+);
+eval { $delay->wait };
+like $@,      qr/^Second step!/, 'right error';
+like $failed, qr/^Second step!/, 'right error';
+ok !$finished, 'finish event has not been emitted';
+ok !$result,   'no result';
+
+# Exception in second step (with active event)
+($failed, $finished, $result) = undef;
+$delay = Mojo::IOLoop::Delay->new;
+$delay->on(error => sub { $failed = pop });
+$delay->on(finish => sub { $finished++ });
+$delay->steps(
+  sub { Mojo::IOLoop->timer(0 => shift->begin) },
+  sub {
+    Mojo::IOLoop->timer(0 => sub { Mojo::IOLoop->stop });
+    Mojo::IOLoop->timer(0 => shift->begin);
+    die 'Second step!';
+  },
+  sub { $result = 'failed' }
+);
+Mojo::IOLoop->start;
+like $failed, qr/^Second step!/, 'right error';
+ok !$finished, 'finish event has not been emitted';
+ok !$result,   'no result';
 
 done_testing();

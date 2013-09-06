@@ -15,15 +15,19 @@ sub begin {
 sub steps {
   my $self = shift;
   $self->{steps} = [@_];
-  $self->begin->();
+  $self->ioloop->timer(0 => $self->begin);
   return $self;
 }
 
 sub wait {
   my $self = shift;
-  my @args;
+
+  my ($err, @args);
+  $self->once(error  => sub { shift->ioloop->stop; $err  = shift });
   $self->once(finish => sub { shift->ioloop->stop; @args = @_ });
   $self->ioloop->start;
+  die $err if defined $err;
+
   return wantarray ? @args : $args[0];
 }
 
@@ -31,16 +35,18 @@ sub _step {
   my ($self, $id) = (shift, shift);
 
   $self->{args}[$id] = [@_];
-  return $self->{pending} if --$self->{pending} || $self->{lock};
+  return if $self->{failed} || --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
-  if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }
+  if (my $cb = shift @{$self->{steps} ||= []}) {
+    return $self->emit(error => $@)->{failed}++
+      unless eval { $self->$cb(@args); 1 };
+  }
 
   if (!$self->{counter}) { $self->emit(finish => @args) }
   elsif (!$self->{pending}) { $self->ioloop->timer(0 => $self->begin) }
-  return 0;
 }
 
 1;
@@ -104,6 +110,16 @@ L<Mojo::IOLoop>.
 L<Mojo::IOLoop::Delay> inherits all events from L<Mojo::EventEmitter> and can
 emit the following new ones.
 
+=head2 error
+
+  $delay->on(error => sub {
+    my ($delay, $err) = @_;
+    ...
+  });
+
+Emitted if an error occurs in one of the steps and no more steps will be
+reached.
+
 =head2 finish
 
   $delay->on(finish => sub {
@@ -137,10 +153,9 @@ implements the following new ones.
   my $with_first_arg    = $delay->begin(0);
 
 Increment active event counter, the returned callback can be used to decrement
-the active event counter again and will return the number of remaining active
-events. Arguments passed to the callback are queued in the right order for the
-next step or C<finish> event and C<wait> method, the first argument will be
-ignored by default.
+the active event counter again. Arguments passed to the callback are queued in
+the right order for the next step or C<finish> event and C<wait> method, the
+first argument will be ignored by default.
 
   # Capture all arguments
   my $delay = Mojo::IOLoop->delay;

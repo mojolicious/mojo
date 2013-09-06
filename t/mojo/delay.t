@@ -176,6 +176,18 @@ like $failed, qr/^First step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';
 ok !$result,   'no result';
 
+# Exception in last step
+($failed, $finished) = ();
+$delay = Mojo::IOLoop::Delay->new;
+$delay->on(error => sub { $failed = pop });
+$delay->on(finish => sub { $finished++ });
+$delay->steps(sub { Mojo::IOLoop->timer(0 => shift->begin) },
+  sub { die 'Last step!' });
+eval { $delay->wait };
+like $@,      qr/^Last step!/, 'right error';
+like $failed, qr/^Last step!/, 'right error';
+ok !$finished, 'finish event has not been emitted';
+
 # Exception in second step
 ($failed, $finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;

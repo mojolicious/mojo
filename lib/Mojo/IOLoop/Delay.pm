@@ -116,8 +116,7 @@ emit the following new ones.
     ...
   });
 
-Emitted if an error occurs in one of the steps and no more steps will be
-reached.
+Emitted if an error occurs in one of the steps, breaking the chain.
 
 =head2 finish
 
@@ -166,16 +165,16 @@ first argument will be ignored by default.
   $delay = $delay->steps(sub {...}, sub {...});
 
 Sequentialize multiple events, the first callback will run right away, and the
-next one once the active event counter reaches zero, this chain will continue
-until there are no more callbacks or a callback does not increment the active
-event counter.
+next one once the active event counter reaches zero. This chain will continue
+until there are no more callbacks, a callback does not increment the active
+event counter or an error occurs in a callback.
 
 =head2 wait
 
   my @args = $delay->wait;
 
-Start C<ioloop> and stop it again once the C<finish> event gets emitted, only
-works when C<ioloop> is not running already.
+Start C<ioloop> and stop it again once an C<error> or C<finish> event gets
+emitted, only works when C<ioloop> is not running already.
 
   # Use the "finish" event to synchronize portably
   $delay->on(finish => sub {

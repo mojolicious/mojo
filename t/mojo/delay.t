@@ -165,7 +165,7 @@ is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23], 'right results';
 
 # Exception in first step
 my $failed;
-($finished, $result) = undef;
+($finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
 $delay->on(error => sub { $failed = pop });
 $delay->on(finish => sub { $finished++ });
@@ -177,7 +177,7 @@ ok !$finished, 'finish event has not been emitted';
 ok !$result,   'no result';
 
 # Exception in second step
-($failed, $finished, $result) = undef;
+($failed, $finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
 $delay->on(error => sub { $failed = pop });
 $delay->on(finish => sub { $finished++ });
@@ -193,7 +193,7 @@ ok !$finished, 'finish event has not been emitted';
 ok !$result,   'no result';
 
 # Exception in second step (with active event)
-($failed, $finished, $result) = undef;
+($failed, $finished, $result) = ();
 $delay = Mojo::IOLoop::Delay->new;
 $delay->on(error => sub { $failed = pop });
 $delay->on(finish => sub { $finished++ });

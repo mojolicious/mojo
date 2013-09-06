@@ -26,9 +26,8 @@ sub wait {
   $self->once(error  => sub { shift->ioloop->stop; $err  = shift });
   $self->once(finish => sub { shift->ioloop->stop; @args = @_ });
   $self->ioloop->start;
-  die $err if defined $err;
 
-  return wantarray ? @args : $args[0];
+  return defined $err ? die $err : wantarray ? @args : $args[0];
 }
 
 sub _step {

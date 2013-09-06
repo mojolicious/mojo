@@ -34,18 +34,17 @@ sub _step {
   my ($self, $id) = (shift, shift);
 
   $self->{args}[$id] = [@_];
-  return if $self->{failed} || --$self->{pending} || $self->{lock};
+  return if $self->{fail} || --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
   if (my $cb = shift @{$self->{steps} ||= []}) {
-    return $self->emit(error => $@)->{failed}++
-      unless eval { $self->$cb(@args); 1 };
+    eval { $self->$cb(@args); 1 } or return $self->emit(error => $@)->{fail}++;
   }
 
-  if (!$self->{counter}) { $self->emit(finish => @args) }
-  elsif (!$self->{pending}) { $self->ioloop->timer(0 => $self->begin) }
+  return $self->emit(finish => @args) unless $self->{counter};
+  $self->ioloop->timer(0 => $self->begin) unless $self->{pending};
 }
 
 1;

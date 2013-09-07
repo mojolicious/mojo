@@ -170,8 +170,7 @@ $delay = Mojo::IOLoop::Delay->new;
 $delay->on(error => sub { $failed = pop });
 $delay->on(finish => sub { $finished++ });
 $delay->steps(sub { die 'First step!' }, sub { $result = 'failed' });
-eval { $delay->wait };
-like $@,      qr/^First step!/, 'right error';
+is_deeply [$delay->wait], [], 'no return values';
 like $failed, qr/^First step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';
 ok !$result,   'no result';
@@ -183,8 +182,7 @@ $delay->on(error => sub { $failed = pop });
 $delay->on(finish => sub { $finished++ });
 $delay->steps(sub { Mojo::IOLoop->timer(0 => shift->begin) },
   sub { die 'Last step!' });
-eval { $delay->wait };
-like $@,      qr/^Last step!/, 'right error';
+is scalar $delay->wait, undef, 'no return value';
 like $failed, qr/^Last step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';
 
@@ -198,8 +196,7 @@ $delay->steps(
   sub { die 'Second step!' },
   sub { $result = 'failed' }
 );
-eval { $delay->wait };
-like $@,      qr/^Second step!/, 'right error';
+$delay->wait;
 like $failed, qr/^Second step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';
 ok !$result,   'no result';

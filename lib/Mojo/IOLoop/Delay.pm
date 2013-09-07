@@ -22,12 +22,12 @@ sub steps {
 sub wait {
   my $self = shift;
 
-  my ($err, @args);
-  $self->once(error  => sub { shift->ioloop->stop; $err  = shift });
+  my @args;
+  $self->once(error => sub { shift->ioloop->stop });
   $self->once(finish => sub { shift->ioloop->stop; @args = @_ });
   $self->ioloop->start;
 
-  return defined $err ? die $err : wantarray ? @args : $args[0];
+  return wantarray ? @args : $args[0];
 }
 
 sub _step {
@@ -170,7 +170,8 @@ event counter or an error occurs in a callback.
 
 =head2 wait
 
-  my @args = $delay->wait;
+  my @args  = $delay->wait;
+  my $first = $delay->wait;
 
 Start C<ioloop> and stop it again once an C<error> or C<finish> event gets
 emitted, only works when C<ioloop> is not running already.

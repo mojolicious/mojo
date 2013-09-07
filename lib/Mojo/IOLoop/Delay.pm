@@ -170,8 +170,8 @@ event counter or an error occurs in a callback.
 
 =head2 wait
 
-  my @args  = $delay->wait;
-  my $first = $delay->wait;
+  my $arg  = $delay->wait;
+  my @args = $delay->wait;
 
 Start C<ioloop> and stop it again once an C<error> or C<finish> event gets
 emitted, only works when C<ioloop> is not running already.

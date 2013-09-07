@@ -934,8 +934,8 @@ L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
 
 You can use the L<Mojo::Log> object from L<Mojo/"log"> to portably collect
 debug messages and automatically disable them later in a production setup by
-changing the Mojolicious operating mode, which can also be retrieved from the
-attribute L<Mojolicious/"mode">.
+changing the L<Mojolicious> operating mode, which can also be retrieved from
+the attribute L<Mojolicious/"mode">.
 
   use Mojolicious::Lite;
 

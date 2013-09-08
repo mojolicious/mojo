@@ -979,12 +979,12 @@ can keep many parallel connections active at the same time.
 
   # Parallel non-blocking requests
   my $ua = Mojo::UserAgent->new;
-  $ua->get('http://mojolicio.us' => sub {
-    my ($ua, $tx) = @_;
+  $ua->get('http://metacpan.org/search?q=mojo' => sub {
+    my ($ua, $mojo) = @_;
     ...
   });
-  $ua->get('http://mojolicio.us/perldoc' => sub {
-    my ($ua, $tx) = @_;
+  $ua->get('http://metacpan.org/search?q=mango' => sub {
+    my ($ua, $mango) = @_;
     ...
   });
 
@@ -1001,15 +1001,15 @@ synchronize multiple non-blocking requests.
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  # Synchronize non-blocking requests and capture result
+  # Synchronize non-blocking requests and capture results
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay;
-  $ua->get('http://mojolicio.us'         => $delay->begin);
-  $ua->get('http://mojolicio.us/perldoc' => $delay->begin);
-  my ($tx, $tx2) = $delay->wait;
+  $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
+  $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
+  my ($mojo, $mango) = $delay->wait;
 
 The event L<Mojo::IOLoop::Delay/"finish"> can be used for code that needs to
-be able to work standalone as well as inside L<Mojolicious> applications.
+be able to work standalone as well as inside an already running event loop.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
@@ -1018,11 +1018,11 @@ be able to work standalone as well as inside L<Mojolicious> applications.
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay;
   $delay->on(finish => sub {
-    my ($delay, $tx, $tx2) = @_;
+    my ($delay, $mojo, $mango) = @_;
     ...
   });
-  $ua->get('http://mojolicio.us'         => $delay->begin);
-  $ua->get('http://mojolicio.us/perldoc' => $delay->begin);
+  $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
+  $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
   $delay->wait unless Mojo::IOLoop->is_running;
 
 =head2 Command line

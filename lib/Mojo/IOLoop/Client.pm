@@ -50,8 +50,7 @@ sub _connect {
     my %options = (
       Blocking => 0,
       PeerAddr => $address eq 'localhost' ? '127.0.0.1' : $address,
-      PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
-      Proto    => 'tcp'
+      PeerPort => $args->{port} || ($args->{tls} ? 443 : 80)
     );
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};

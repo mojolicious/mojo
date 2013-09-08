@@ -36,8 +36,7 @@ my $port   = Mojo::IOLoop->generate_port;
 my $listen = IO::Socket::INET->new(
   Listen    => 5,
   LocalAddr => '127.0.0.1',
-  LocalPort => $port,
-  Proto     => 'tcp'
+  LocalPort => $port
 );
 my ($readable, $writable);
 $reactor->io($listen => sub { pop() ? $writable++ : $readable++ })

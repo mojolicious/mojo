@@ -66,7 +66,6 @@ sub listen {
       Listen => $args->{backlog} // SOMAXCONN,
       LocalAddr => $args->{address} || '0.0.0.0',
       LocalPort => $port,
-      Proto     => 'tcp',
       ReuseAddr => 1,
       ReusePort => $args->{reuse},
       Type      => SOCK_STREAM
@@ -99,8 +98,7 @@ sub listen {
 }
 
 sub generate_port {
-  IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1', Proto => 'tcp')
-    ->sockport;
+  IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1')->sockport;
 }
 
 sub handle { shift->{handle} }

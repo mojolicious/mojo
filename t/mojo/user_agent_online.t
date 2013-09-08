@@ -51,11 +51,7 @@ $ua = Mojo::UserAgent->new;
 
 # Local address
 $ua->app(app);
-my $sock = IO::Socket::INET->new(
-  PeerAddr => 'mojolicio.us',
-  PeerPort => 80,
-  Proto    => 'tcp'
-);
+my $sock = IO::Socket::INET->new(PeerAddr => 'mojolicio.us', PeerPort => 80);
 my $address = $sock->sockhost;
 isnt $address, '127.0.0.1', 'different address';
 $ua->local_address('127.0.0.1')->max_connections(0);

@@ -117,12 +117,6 @@ is $tx->res->body, 'Hello!', 'right content';
 kill 'INT', $pid;
 sleep 1 while _port($port);
 
-sub _port {
-  IO::Socket::INET->new(
-    Proto    => 'tcp',
-    PeerAddr => '127.0.0.1',
-    PeerPort => shift
-  );
-}
+sub _port { IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => shift) }
 
 done_testing();

@@ -39,6 +39,12 @@ sub DESTROY {
   $reactor->remove($_) for values %{$self->{handles}};
 }
 
+sub generate_port {
+  IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1')->sockport;
+}
+
+sub handle { shift->{handle} }
+
 sub listen {
   my $self = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
@@ -96,12 +102,6 @@ sub listen {
   $options->{SSL_verify_mode}
     = defined $args->{tls_verify} ? $args->{tls_verify} : 0x03;
 }
-
-sub generate_port {
-  IO::Socket::INET->new(Listen => 5, LocalAddr => '127.0.0.1')->sockport;
-}
-
-sub handle { shift->{handle} }
 
 sub start {
   my $self = shift;
@@ -218,6 +218,18 @@ global L<Mojo::IOLoop> singleton.
 L<Mojo::IOLoop::Server> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
+=head2 generate_port
+
+  my $port = $server->generate_port;
+
+Find a free TCP port, this is a utility function primarily used for tests.
+
+=head2 handle
+
+  my $handle = $server->handle;
+
+Get handle for server.
+
 =head2 listen
 
   $server->listen(port => 3000);
@@ -285,18 +297,6 @@ Path to the TLS key file, defaults to a built-in test key.
 TLS verification mode, defaults to C<0x03>.
 
 =back
-
-=head2 generate_port
-
-  my $port = $server->generate_port;
-
-Find a free TCP port, this is a utility function primarily used for tests.
-
-=head2 handle
-
-  my $handle = $server->handle;
-
-Get handle for server.
 
 =head2 start
 

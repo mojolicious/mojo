@@ -6,6 +6,7 @@ BEGIN {
 }
 
 use Test::More;
+use IO::Socket::INET;
 use Mojo;
 use Mojo::IOLoop;
 use Mojo::Log;
@@ -243,7 +244,7 @@ is $tx->res->body, 'Whatever!', 'right content';
 
 # SO_REUSEPORT
 SKIP: {
-  skip 'SO_REUSEPORT support required!', 2 unless eval {SO_REUSEPORT};
+  skip 'SO_REUSEPORT support required!', 2 unless eval { _probe() };
 
   $port   = Mojo::IOLoop->generate_port;
   $daemon = Mojo::Server::Daemon->new(
@@ -261,6 +262,14 @@ SKIP: {
   ok $daemon->ioloop->acceptor($daemon->acceptors->[0])
     ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
     'SO_REUSEPORT socket option';
+}
+
+sub _probe {
+  IO::Socket::INET->new(
+    Listen    => 1,
+    LocalPort => Mojo::IOLoop->generate_port,
+    ReusePort => 1
+  );
 }
 
 done_testing();

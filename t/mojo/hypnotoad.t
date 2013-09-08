@@ -50,12 +50,7 @@ EOF
 my $prefix = "$FindBin::Bin/../../script";
 open my $start, '-|', $^X, "$prefix/hypnotoad", $script;
 sleep 3;
-sleep 1
-  while !IO::Socket::INET->new(
-  Proto    => 'tcp',
-  PeerAddr => '127.0.0.1',
-  PeerPort => $port2
-  );
+sleep 1 while !_port($port2);
 my $old = _pid();
 
 my $ua = Mojo::UserAgent->new;
@@ -176,12 +171,7 @@ is $tx->res->body, 'Hello World!', 'right content';
 
 # Stop
 open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '-s';
-sleep 1
-  while IO::Socket::INET->new(
-  Proto    => 'tcp',
-  PeerAddr => '127.0.0.1',
-  PeerPort => $port2
-  );
+sleep 1 while _port($port2);
 
 # Check log
 $log = slurp $log;
@@ -194,6 +184,14 @@ sub _pid {
   my $pid = <$file>;
   chomp $pid;
   return $pid;
+}
+
+sub _port {
+  IO::Socket::INET->new(
+    Proto    => 'tcp',
+    PeerAddr => '127.0.0.1',
+    PeerPort => shift
+  );
 }
 
 done_testing();

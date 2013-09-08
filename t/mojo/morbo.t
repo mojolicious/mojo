@@ -39,12 +39,7 @@ my $port   = Mojo::IOLoop->generate_port;
 my $prefix = "$FindBin::Bin/../../script";
 my $pid    = open my $server, '-|', $^X, "$prefix/morbo", '-l',
   "http://127.0.0.1:$port", $script;
-sleep 1
-  while !IO::Socket::INET->new(
-  Proto    => 'tcp',
-  PeerAddr => '127.0.0.1',
-  PeerPort => $port
-  );
+sleep 1 while !_port($port);
 
 my $ua = Mojo::UserAgent->new;
 
@@ -120,11 +115,14 @@ is $tx->res->body, 'Hello!', 'right content';
 
 # Stop
 kill 'INT', $pid;
-sleep 1
-  while IO::Socket::INET->new(
-  Proto    => 'tcp',
-  PeerAddr => '127.0.0.1',
-  PeerPort => $port
+sleep 1 while _port($port);
+
+sub _port {
+  IO::Socket::INET->new(
+    Proto    => 'tcp',
+    PeerAddr => '127.0.0.1',
+    PeerPort => shift
   );
+}
 
 done_testing();

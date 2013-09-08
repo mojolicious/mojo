@@ -122,6 +122,19 @@ Fun one-liners using everything above.
 
 =back
 
+=head1 SPIN-OFF PROJECTS
+
+These modules are not part of the L<Mojolicious> distribution, but have been
+designed to be used with it and follow the same rules.
+
+=over 2
+
+=item L<Mango>
+
+Pure-Perl non-blocking I/O MongoDB driver.
+
+=back
+
 =head1 MORE
 
 A lot more documentation and examples by many different authors can be found

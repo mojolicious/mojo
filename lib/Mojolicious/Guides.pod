@@ -122,10 +122,10 @@ Fun one-liners using everything above.
 
 =back
 
-=head1 SPIN-OFF PROJECTS
+=head1 SPIN-OFFS
 
 These modules are not part of the L<Mojolicious> distribution, but have been
-designed to be used with it and follow the same rules.
+designed to be used with it and are being developed under the same umbrella.
 
 =over 2
 

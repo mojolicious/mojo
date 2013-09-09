@@ -19,7 +19,7 @@ sub add {
     next if length($cookie->value // '') > $size;
 
     # Replace cookie
-    my $domain = $cookie->domain;
+    my $domain = lc($cookie->domain // $cookie->origin);
     $domain =~ s/^\.//;
     my $path = $cookie->path;
     my $name = $cookie->name;
@@ -44,11 +44,10 @@ sub extract {
 
     # Validate domain
     my $host = $url->ihost;
-    my $domain = lc($cookie->domain // $host);
+    my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
     $domain =~ s/^\.//;
     next
       if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
-    $cookie->domain($domain);
 
     # Validate path
     my $path = $cookie->path // $url->path->to_dir->to_abs_string;
@@ -61,7 +60,7 @@ sub extract {
 sub find {
   my ($self, $url) = @_;
 
-  return unless my $domain = $url->ihost;
+  return unless my $domain = my $host = $url->ihost;
   my $path = $url->path->to_abs_string;
   my @found;
   while ($domain =~ /[^.]+\.[^.]+|localhost$/) {
@@ -70,6 +69,7 @@ sub find {
     # Grab cookies
     my $new = $self->{jar}{$domain} = [];
     for my $cookie (@$old) {
+      if (my $origin = $cookie->origin) { next unless $host eq $origin }
 
       # Check if cookie has expired
       my $expires = $cookie->expires;

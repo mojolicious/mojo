@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_header);
 
-has [qw(domain httponly max_age path secure)];
+has [qw(domain httponly max_age origin path secure)];
 
 sub expires {
   my $self = shift;
@@ -129,6 +129,13 @@ cookie.
   $cookie     = $cookie->max_age(60);
 
 Max age for cookie.
+
+=head2 origin
+
+  my $origin = $cookie->origin;
+  $cookie    = $cookie->origin('mojolicio.us');
+
+Origin of the cookie.
 
 =head2 path
 

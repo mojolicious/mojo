@@ -69,7 +69,7 @@ sub find {
     # Grab cookies
     my $new = $self->{jar}{$domain} = [];
     for my $cookie (@$old) {
-      if (my $origin = $cookie->origin) { next unless $host eq $origin }
+      next unless $cookie->domain || $host eq $cookie->origin;
 
       # Check if cookie has expired
       my $expires = $cookie->expires;

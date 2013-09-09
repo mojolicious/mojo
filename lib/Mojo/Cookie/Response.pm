@@ -57,8 +57,7 @@ sub to_string {
   # Name and value (Netscape)
   return '' unless length(my $name = $self->name // '');
   my $value = $self->value // '';
-  $value = $value =~ /[,;" ]/ ? quote($value) : $value;
-  my $cookie = "$name=$value";
+  my $cookie = join '=', $name, $value =~ /[,;" ]/ ? quote($value) : $value;
 
   # "expires" (Netscape)
   if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
@@ -70,13 +69,13 @@ sub to_string {
   if (my $path = $self->path) { $cookie .= "; path=$path" }
 
   # "secure" (Netscape)
-  if (my $secure = $self->secure) { $cookie .= "; secure" }
+  $cookie .= "; secure" if $self->secure;
 
   # "Max-Age" (RFC 6265)
-  if (defined(my $m = $self->max_age)) { $cookie .= "; Max-Age=$m" }
+  if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
 
   # "HttpOnly" (RFC 6265)
-  if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
+  $cookie .= "; HttpOnly" if $self->httponly;
 
   return $cookie;
 }

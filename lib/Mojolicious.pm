@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Util 'decamelize';
+use Mojo::Util qw(decamelize deprecated);
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -90,7 +90,7 @@ sub new {
 
   # DEPRECATED in Top Hat!
   if (my $sub = $self->can("${mode}_mode")) {
-    warn qq{"sub ${mode}_mode {...}" in application class is DEPRECATED.\n};
+    deprecated qq{"sub ${mode}_mode {...}" in application class is DEPRECATED};
     $self->$sub(@_);
   }
 

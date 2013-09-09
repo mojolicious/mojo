@@ -47,9 +47,6 @@ sub new {
   bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 }
 
-# Performance is very important for something as often used as accessors,
-# so we optimize them by compiling our own code, don't be scared, we have
-# tests for every single case
 sub attr {
   my ($class, $attrs, $default) = @_;
   return unless ($class = ref $class || $class) && $attrs;

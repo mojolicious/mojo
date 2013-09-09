@@ -4,11 +4,15 @@ use Test::More;
 use Mojo::Cookie::Request;
 use Mojo::Cookie::Response;
 
+# Missing name
+is(Mojo::Cookie::Request->new,  '', 'right format');
+is(Mojo::Cookie::Response->new, '', 'right format');
+
 # Request cookie as string
 my $cookie = Mojo::Cookie::Request->new;
-$cookie->name('foo');
+$cookie->name('0');
 $cookie->value('ba =r');
-is $cookie->to_string, 'foo="ba =r"', 'right format';
+is $cookie->to_string, '0="ba =r"', 'right format';
 
 # Request cookie without value as string
 $cookie = Mojo::Cookie::Request->new;
@@ -152,7 +156,7 @@ is $cookie->to_string, 'foo=; path=/test', 'right format';
 
 # Full response cookie as string
 $cookie = Mojo::Cookie::Response->new;
-$cookie->name('foo');
+$cookie->name('0');
 $cookie->value('ba r');
 $cookie->domain('example.com');
 $cookie->path('/test');
@@ -161,7 +165,7 @@ $cookie->expires(1218092879);
 $cookie->secure(1);
 $cookie->httponly(1);
 is $cookie->to_string,
-  'foo="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
+  '0="ba r"; expires=Thu, 07 Aug 2008 07:07:59 GMT; domain=example.com;'
   . ' path=/test; secure; Max-Age=60; HttpOnly', 'right format';
 
 # Empty response cookie

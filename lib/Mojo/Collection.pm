@@ -32,7 +32,7 @@ sub new {
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
-  shift->grep(sub {length});
+  shift->grep(sub { length($_ // '') });
 }
 
 sub each {

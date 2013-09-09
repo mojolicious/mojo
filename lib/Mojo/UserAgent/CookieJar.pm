@@ -19,12 +19,13 @@ sub add {
     next if length($cookie->value // '') > $size;
 
     # Replace cookie
-    my $domain = lc($cookie->domain // $cookie->origin);
+    my $origin = $cookie->origin;
+    next unless my $domain = $cookie->domain // $origin;
     $domain =~ s/^\.//;
-    my $path = $cookie->path;
-    my $name = $cookie->name;
-    my $jar  = $self->{jar}{$domain} ||= [];
-    @$jar = (grep({$_->path ne $path || $_->name ne $name} @$jar), $cookie);
+    next unless my $path = $cookie->path;
+    next unless length(my $name = $cookie->name // '');
+    my $jar = $self->{jar}{lc $domain} ||= [];
+    @$jar = (grep({_compare($_, $path, $name, $origin)} @$jar), $cookie);
   }
 
   return $self;
@@ -69,7 +70,7 @@ sub find {
     # Grab cookies
     my $new = $self->{jar}{$domain} = [];
     for my $cookie (@$old) {
-      next unless $cookie->domain || $host eq $cookie->origin;
+      if (my $origin = $cookie->origin) { next unless $host eq $origin }
 
       # Check if cookie has expired
       my $expires = $cookie->expires;
@@ -96,6 +97,12 @@ sub inject {
   return unless keys %{$self->{jar}};
   my $req = $tx->req;
   $req->cookies($self->find($req->url));
+}
+
+sub _compare {
+  my ($cookie, $path, $name, $origin) = @_;
+  return 1 if $cookie->path ne $path || $cookie->name ne $name;
+  return ($cookie->origin // '') ne ($origin // '');
 }
 
 sub _path { $_[0] eq '/' || $_[0] eq $_[1] || $_[1] =~ m!^\Q$_[0]/! }

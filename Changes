@@ -1,7 +1,8 @@
 
 4.35  2013-09-09
   - Added origin attribute to Mojo::Cookie::Response.
-  - Fixed RFC 6265 compliance bug in Mojo::UserAgent::CookieJar.
+  - Fixed RFC 6265 compliance bugs in Mojo::Cookie::Request,
+    Mojo::Cookie::Response and Mojo::UserAgent::CookieJar.
 
 4.34  2013-09-08
   - Fixed portability bug in SO_REUSEPORT tests.

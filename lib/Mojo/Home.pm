@@ -49,10 +49,7 @@ sub lib_dir {
 sub list_files {
   my ($self, $dir) = @_;
 
-  # Files relative to directory
-  my $parts = $self->{parts} || [];
-  my $root = catdir @$parts;
-  $dir = catdir $root, split '/', ($dir || '');
+  $dir = catdir @{$self->{parts} || []}, split '/', ($dir // '');
   return [] unless -d $dir;
   my @files;
   find {

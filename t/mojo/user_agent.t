@@ -23,7 +23,6 @@ get '/timeout' => sub {
   Mojo::IOLoop->stream($self->tx->connection)
     ->timeout($self->param('timeout'));
   $self->on(finish => sub { $timeout = 1 });
-  $self->render_later;
 };
 
 get '/no_length' => sub {

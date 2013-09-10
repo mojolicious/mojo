@@ -1,4 +1,7 @@
 
+4.36  2013-09-11
+  - Improved compatibility with different object systems.
+
 4.35  2013-09-10
   - Added origin attribute to Mojo::Cookie::Response.
   - Fixed RFC 6265 compliance bugs in Mojo::Cookie::Request,

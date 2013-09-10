@@ -231,6 +231,8 @@ get '/too_long' => sub {
 my $t = Test::Mojo->new;
 
 # Stream without delay and finish
+my $log = '';
+my $cb = $t->app->log->on(message => sub { $log .= pop });
 my $stash;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $t->get_ok('/shortpoll')->status_is(200)
@@ -240,6 +242,9 @@ ok !$t->tx->kept_alive, 'connection was not kept alive';
 ok !$t->tx->keep_alive, 'connection will not be kept alive';
 is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';
+unlike $log, qr/Nothing has been rendered, expecting delayed response\./,
+  'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # Stream without delay and content length
 $stash = undef;
@@ -369,9 +374,9 @@ $t->get_ok('/longpoll/nolength/delayed')->status_is(200)
 is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';
 
-# Delayed static file (with log message)
-my $log = '';
-my $cb = $t->app->log->on(message => sub { $log .= pop });
+# Delayed static file
+$log   = '';
+$cb    = $t->app->log->on(message => sub { $log .= pop });
 $stash = undef;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
 $t->get_ok('/longpoll/static/delayed')->status_is(200)
@@ -383,7 +388,7 @@ like $log, qr/Nothing has been rendered, expecting delayed response\./,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 
-# Delayed static file with cookies and session (without log message)
+# Delayed static file with cookies and session
 $log   = '';
 $cb    = $t->app->log->on(message => sub { $log .= pop });
 $stash = undef;
@@ -396,7 +401,7 @@ $t->get_ok('/longpoll/static/delayed_too')->status_is(200)
   ->content_is("Hello Mojo from a static file!\n");
 is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';
-unlike $log, qr/Nothing has been rendered, expecting delayed response\./,
+like $log, qr/Nothing has been rendered, expecting delayed response\./,
   'right message';
 $t->app->log->unsubscribe(message => $cb);
 

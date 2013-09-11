@@ -2,8 +2,6 @@
 <html>
   <head>
     <title>Page not found</title>
-    %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo.css'
     %= stylesheet begin
       body {
         background-color: #f5f6f8;

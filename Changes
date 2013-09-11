@@ -4,6 +4,7 @@
   - Added match method to Mojo::DOM::CSS.
   - Improved ancestors and children methods in Mojo::DOM to support all CSS
     selectors.
+  - Improved syntax highlighting in documentation browser.
   - Improved compatibility with different object systems.
 
 4.35  2013-09-10

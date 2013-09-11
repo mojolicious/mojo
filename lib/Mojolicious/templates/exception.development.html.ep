@@ -6,7 +6,7 @@
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
     %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo.css'
+    %= stylesheet '/mojo/prettify/prettify-mojo-dark.css'
     %= stylesheet begin
       a img { border: 0 }
       body {

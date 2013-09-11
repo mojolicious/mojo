@@ -3,7 +3,7 @@
   <head>
     <title><%= $title %></title>
     %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo.css'
+    %= stylesheet '/mojo/prettify/prettify-mojo-light.css'
     %= stylesheet begin
       a { color: inherit }
       a:hover { color: #2a2a2a }
@@ -23,17 +23,16 @@
       }
       h1 a, h2 a, h3 a { text-decoration: none }
       pre {
-        background-color: #eee;
-        background: url(<%= url_for '/mojo/pinstripe.gif' %>);
+        border: 1px solid #eee;
         -moz-border-radius: 5px;
         border-radius: 5px;
-        color: #eee;
+        color: #4d4d4c;
         font: 0.8em Consolas, Menlo, Monaco, Courier, monospace;
         line-height: 1.7em;
-        text-align: left;
-        text-shadow: #333 0 1px 0;
         padding-bottom: 1.5em;
         padding-top: 1.5em;
+        text-align: left;
+        text-shadow: #ddd 0 1px 0;
         white-space: pre-wrap;
       }
       #footer {

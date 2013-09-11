@@ -833,7 +833,7 @@ You can also package your conditions as reusable plugins.
     $app->routes->add_condition(werewolf => sub {
       my ($route, $c, $captures, $days) = @_;
 
-      # Keep the werewolfs out!
+      # Keep the werewolves out!
       return undef if abs(14 - (phase(time))[2]) > ($days / 2);
 
       # It's ok, no werewolf

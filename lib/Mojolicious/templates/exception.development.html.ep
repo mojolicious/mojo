@@ -31,8 +31,6 @@
       td { padding: 0.5em }
       .box {
         background-color: #fff;
-        -moz-box-shadow: 0px 0px 2px #ccc;
-        -webkit-box-shadow: 0px 0px 2px #ccc;
         box-shadow: 0px 0px 2px #ccc;
         overflow: hidden;
         padding: 1em;
@@ -78,16 +76,12 @@
       }
       #showcase .key { padding-right: 0 }
       #more, #trace {
-        -moz-border-radius-bottomleft: 5px;
         border-bottom-left-radius: 5px;
-        -moz-border-radius-bottomright: 5px;
         border-bottom-right-radius: 5px;
       }
       #more .tap, #trace .tap { text-shadow: #ddd 0 1px 0 }
       #request {
-        -moz-border-radius-topleft: 5px;
         border-top-left-radius: 5px;
-        -moz-border-radius-topright: 5px;
         border-top-right-radius: 5px;
         margin-top: 1em;
       }

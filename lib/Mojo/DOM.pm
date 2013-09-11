@@ -38,7 +38,7 @@ sub new {
 
 sub all_text { shift->_content(1, @_) }
 
-sub ancestors { $_[0]->_collection(_ancestors($_[0]->tree)) }
+sub ancestors { _select($_[1], $_[0]->_collection(_ancestors($_[0]->tree))) }
 
 sub append { shift->_add(1, @_) }
 
@@ -75,18 +75,9 @@ sub attrs {
 }
 
 sub children {
-  my ($self, $type) = @_;
-
-  my @children;
-  my $xml = $self->xml;
-  for my $n (@{_nodes($self->tree)}) {
-
-    # Make sure child is the right type
-    next if $n->[0] ne 'tag' || (defined $type && $n->[1] ne $type);
-    push @children, $self->new->tree($n)->xml($xml);
-  }
-
-  return Mojo::Collection->new(@children);
+  my $self = shift;
+  return _select(shift,
+    $self->_collection(grep { $_->[0] eq 'tag' } @{_nodes($self->tree)}));
 }
 
 sub content_xml {
@@ -99,6 +90,12 @@ sub find {
   my $self = shift;
   my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select(@_);
   return $self->_collection(@$results);
+}
+
+sub match {
+  my $self = shift;
+  return undef unless Mojo::DOM::CSS->new(tree => $self->tree)->match(@_);
+  return $self;
 }
 
 sub namespace {
@@ -306,6 +303,11 @@ sub _replace {
   return $self->parent;
 }
 
+sub _select {
+  my $selector = shift;
+  return defined $selector ? shift->grep(sub { $_->match($selector) }) : shift;
+}
+
 sub _sibling {
   my ($self, $next) = @_;
 
@@ -466,9 +468,11 @@ enabled by default.
 =head2 ancestors
 
   my $collection = $dom->ancestors;
+  my $collection = $dom->ancestors('div');
 
-Return a L<Mojo::Collection> object containing the ancestors of this element
-as L<Mojo::DOM> objects, similar to C<children>.
+Find all ancestors of this element matching the CSS selector and return a
+L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS> are supported.
 
   # List types of ancestor elements
   say $dom->ancestors->type;
@@ -519,8 +523,9 @@ Element attributes.
   my $collection = $dom->children;
   my $collection = $dom->children('div');
 
-Return a L<Mojo::Collection> object containing the children of this element as
-L<Mojo::DOM> objects, similar to C<find>.
+Find all children of this element matching the CSS selector and return a
+L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS> are supported.
 
   # Show type of random child element
   say $dom->children->shuffle->first->type;
@@ -548,6 +553,14 @@ L<Mojo::DOM::CSS> are supported.
   # Extract information from multiple elements
   my @headers = $dom->find('h1, h2, h3')->text->each;
   my @links   = $dom->find('a[href]')->attr('href')->each;
+
+=head2 match
+
+  my $result = $dom->match('html title');
+
+Match the CSS selector against this element and return it as a L<Mojo::DOM>
+object or return C<undef> if it didn't match. All selectors from
+L<Mojo::DOM::CSS> are supported.
 
 =head2 namespace
 

@@ -33,6 +33,13 @@ my $TOKEN_RE        = qr/
   )?
 /x;
 
+sub match {
+  my $self = shift;
+  my $tree = $self->tree;
+  return undef if $tree->[0] eq 'root';
+  return $self->_match($self->_compile(shift), $tree, $tree);
+}
+
 sub select {
   my $self = shift;
 
@@ -49,12 +56,7 @@ sub select {
     # Tag
     elsif ($type eq 'tag') {
       unshift @queue, @$current[4 .. $#$current];
-
-      # Try all selectors with element
-      for my $part (@$pattern) {
-        push @results, $current and last
-          if $self->_combinator([reverse @$part], $current, $tree);
-      }
+      push @results, $current if $self->_match($pattern, $current, $tree);
     }
   }
 
@@ -201,6 +203,13 @@ sub _equation {
   }
 
   return $num;
+}
+
+sub _match {
+  my ($self, $pattern, $current, $tree) = @_;
+  $self->_combinator([reverse @$_], $current, $tree) and return 1
+    for @$pattern;
+  return undef;
 }
 
 sub _parent {
@@ -607,6 +616,12 @@ carefully since it is very dynamic.
 
 L<Mojo::DOM::CSS> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 match
+
+  my $success = $css->match('head > title');
+
+Match CSS selector against first node in C<tree>.
 
 =head2 select
 

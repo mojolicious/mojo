@@ -1,5 +1,9 @@
 
 4.36  2013-09-11
+  - Added match method to Mojo::DOM.
+  - Added match method to Mojo::DOM::CSS.
+  - Improved ancestors and children methods in Mojo::DOM to support all CSS
+    selectors.
   - Improved compatibility with different object systems.
 
 4.35  2013-09-10

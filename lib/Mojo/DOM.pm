@@ -38,7 +38,7 @@ sub new {
 
 sub all_text { shift->_content(1, @_) }
 
-sub ancestors { _select($_[1], $_[0]->_collection(_ancestors($_[0]->tree))) }
+sub ancestors { _select($_[0]->_collect(_ancestors($_[0]->tree)), $_[1]) }
 
 sub append { shift->_add(1, @_) }
 
@@ -76,20 +76,20 @@ sub attrs {
 
 sub children {
   my $self = shift;
-  return _select(shift,
-    $self->_collection(grep { $_->[0] eq 'tag' } @{_nodes($self->tree)}));
+  return _select(
+    $self->_collect(grep { $_->[0] eq 'tag' } _nodes($self->tree)), @_);
 }
 
 sub content_xml {
   my $self = shift;
   my $xml  = $self->xml;
-  return join '', map { _render($_, $xml) } @{_nodes($self->tree)};
+  return join '', map { _render($_, $xml) } _nodes($self->tree);
 }
 
 sub find {
   my $self = shift;
   my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select(@_);
-  return $self->_collection(@$results);
+  return $self->_collect(@$results);
 }
 
 sub match {
@@ -167,7 +167,7 @@ sub strip {
   my $self = shift;
   my $tree = $self->tree;
   return $self if $tree->[0] eq 'root';
-  return $self->_replace($tree, ['root', @{_nodes($tree)}]);
+  return $self->_replace($tree, ['root', _nodes($tree)]);
 }
 
 sub tap { shift->Mojo::Base::tap(@_) }
@@ -180,7 +180,7 @@ sub text_after {
   return '' if (my $tree = $self->tree)->[0] eq 'root';
 
   my (@nodes, $started);
-  for my $n (@{_nodes($tree->[3])}) {
+  for my $n (_nodes($tree->[3])) {
     ++$started and next if $n eq $tree;
     next unless $started;
     last if $n->[0] eq 'tag';
@@ -196,7 +196,7 @@ sub text_before {
   return '' if (my $tree = $self->tree)->[0] eq 'root';
 
   my @nodes;
-  for my $n (@{_nodes($tree->[3])}) {
+  for my $n (_nodes($tree->[3])) {
     last if $n eq $tree;
     push @nodes, $n;
     @nodes = () if $n->[0] eq 'tag';
@@ -238,7 +238,7 @@ sub _ancestors {
   return $root ? $ancestors[-1] : @ancestors[0 .. $#ancestors - 1];
 }
 
-sub _collection {
+sub _collect {
   my $self = shift;
   my $xml  = $self->xml;
   return Mojo::Collection->new(@_)
@@ -247,7 +247,7 @@ sub _collection {
 
 sub _content {
   my $tree = shift->tree;
-  return _text(_nodes($tree), shift, _trim($tree, @_));
+  return _text([_nodes($tree)], shift, _trim($tree, @_));
 }
 
 sub _html {
@@ -273,8 +273,8 @@ sub _link {
 }
 
 sub _nodes {
-  return [] unless my $n = shift;
-  return [@$n[_offset($n) .. $#$n]];
+  return unless my $n = shift;
+  return @$n[_offset($n) .. $#$n];
 }
 
 sub _offset { $_[0][0] eq 'root' ? 1 : 4 }
@@ -304,8 +304,8 @@ sub _replace {
 }
 
 sub _select {
-  my $selector = shift;
-  return defined $selector ? shift->grep(sub { $_->match($selector) }) : shift;
+  my ($self, $selector) = @_;
+  return defined $selector ? $self->grep(sub { $_->match($selector) }) : $self;
 }
 
 sub _sibling {
@@ -336,7 +336,7 @@ sub _text {
     # Nested tag
     my $content = '';
     if ($type eq 'tag' && $recurse) {
-      $content = _text(_nodes($n), 1, _trim($n, $trim));
+      $content = _text([_nodes($n)], 1, _trim($n, $trim));
     }
 
     # Text

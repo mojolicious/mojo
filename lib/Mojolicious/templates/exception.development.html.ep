@@ -18,7 +18,7 @@
         margin: 0;
       }
       pre {
-        font: 0.8em Consolas, Menlo, Monaco, Courier, monospace;
+        font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
         margin: 0;
         white-space: pre-wrap;
       }

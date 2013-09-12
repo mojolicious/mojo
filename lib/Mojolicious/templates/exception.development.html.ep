@@ -37,7 +37,7 @@
       }
       .code {
         background-color: #1a1a1a;
-        background: url(<%= url_for '/mojo/pinstripe.gif' %>);
+        background: url(<%= url_for '/mojo/pinstripe-dark.gif' %>);
         color: #eee;
         text-shadow: #333 0 1px 0;
       }

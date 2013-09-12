@@ -27,8 +27,6 @@
         color: #4d4d4c;
         font: 0.8em Consolas, Menlo, Monaco, Courier, monospace;
         line-height: 1.7em;
-        padding-bottom: 1.5em;
-        padding-top: 1.5em;
         text-align: left;
         white-space: pre-wrap;
       }

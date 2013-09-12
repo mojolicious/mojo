@@ -226,9 +226,9 @@ $t->get_ok('/mojo/logo-white.png')->status_is(200)
   ->content_type_is('image/png');
 $t->get_ok('/mojo/noraptor.png')->status_is(200)->content_type_is('image/png');
 $t->get_ok('/mojo/notfound.png')->status_is(200)->content_type_is('image/png');
-$t->get_ok('/mojo/pinstripe-dark.gif')->status_is(200)
+$t->get_ok('/mojo/pinstripe-dark.png')->status_is(200)
   ->content_type_is('image/gif');
-$t->get_ok('/mojo/pinstripe-light.gif')->status_is(200)
+$t->get_ok('/mojo/pinstripe-light.png')->status_is(200)
   ->content_type_is('image/gif');
 
 done_testing();

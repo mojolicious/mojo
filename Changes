@@ -1,4 +1,7 @@
 
+4.37  2013-09-13
+  - Improved design of built-in templates.
+
 4.36  2013-09-12
   - Added match method to Mojo::DOM.
   - Added match method to Mojo::DOM::CSS.

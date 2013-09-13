@@ -9,7 +9,7 @@
       a:hover { color: #2a2a2a }
       a img { border: 0 }
       body {
-        background-color: #f5f6f8;
+        background: url(<%= url_for '/mojo/pinstripe-light.png' %>);
         color: #445555;
         font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
         font-weight: normal;
@@ -23,9 +23,9 @@
       }
       h1 a, h2 a, h3 a { text-decoration: none }
       pre {
-        background: url(<%= url_for '/mojo/pinstripe-light.png' %>);
+        background: url(<%= url_for '/mojo/stripes.png' %>);
         border: 1px solid #d1d1d1;
-        box-shadow: 0 1px #fff, inset -1px 1px 2px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px #fff, inset -1px 1px 4px rgba(0, 0, 0, 0.1);
         color: #4d4d4c;
         font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
         line-height: 1.5em;

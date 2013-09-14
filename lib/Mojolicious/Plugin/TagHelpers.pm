@@ -178,7 +178,7 @@ sub _stylesheet {
   # "link" or "style" tag
   my $href = @_ % 2 ? $self->url_for(shift) : undef;
   return $href
-    ? _tag('link', rel => 'stylesheet', href => $href, media => 'screen', @_)
+    ? _tag('link', rel => 'stylesheet', href => $href, @_)
     : _tag('style', @_, $cb);
 }
 
@@ -570,7 +570,7 @@ automatically get picked up and shown as default.
 
 Generate portable style or link tag for C<CSS> asset.
 
-  <link href="/path/to/foo.css" media="screen" rel="stylesheet" />
+  <link href="/path/to/foo.css" rel="stylesheet" />
   <style><![CDATA[
     body {color: #000}
   ]]></style>

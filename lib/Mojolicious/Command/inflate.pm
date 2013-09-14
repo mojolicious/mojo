@@ -15,7 +15,8 @@ sub run {
   my $app    = $self->app;
   my $loader = Mojo::Loader->new;
   for my $class (@{$app->renderer->classes}, @{$app->static->classes}) {
-    while (my ($name, $data) = each %{$loader->data($class)}) {
+    for my $name (keys %{$loader->data($class)}) {
+      my $data = $loader->data($class, $name);
       $all{$name}
         = $loader->is_binary($class, $name) ? $data : encode('UTF-8', $data);
     }

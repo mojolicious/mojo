@@ -8,15 +8,9 @@ use Mojo::Util qw(b64_decode class_to_path);
 
 my (%BIN, %CACHE);
 
-sub data {
-  my ($self, $class, $name) = @_;
-  return $class ? $name ? _all($class)->{$name} : _all($class) : undef;
-}
+sub data { $_[1] ? $_[2] ? _all($_[1])->{$_[2]} : _all($_[1]) : undef }
 
-sub is_binary {
-  my ($self, $class, $name) = @_;
-  return keys %{_all($class)} ? !!$BIN{$class}{$name} : undef;
-}
+sub is_binary { keys %{_all($_[1])} ? !!$BIN{$_[1]}{$_[2]} : undef }
 
 sub load {
   my ($self, $module) = @_;

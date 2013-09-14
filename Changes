@@ -1,4 +1,8 @@
 
+4.38  2013-09-14
+  - Added is_binary method to Mojo::Loader.
+  - Fixed support for binary files in inflate command.
+
 4.37  2013-09-13
   - Improved design of built-in templates.
 

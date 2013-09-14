@@ -82,45 +82,66 @@ is $loader->load('::Mojolicious::Lite::'), 1,     'nothing to load';
 is $loader->load('Mojolicious::Lite'),     undef, 'loaded successfully';
 
 # UNIX DATA templates
-my $unix = "@@ template1\nFirst Template\n@@ template2\r\nSecond Template\n";
-open my $data, '<', \$unix;
-no strict 'refs';
-*{"Example::Package::UNIX::DATA"} = $data;
-is $loader->data('Example::Package::UNIX', 'template1'), "First Template\n",
-  'right template';
-is $loader->data('Example::Package::UNIX', 'template2'), "Second Template\n",
-  'right template';
-is_deeply [sort keys %{$loader->data('Example::Package::UNIX')}],
-  [qw(template1 template2)], 'right DATA files';
-close $data;
+{
+  my $unix = "@@ template1\nFirst Template\n@@ template2\r\nSecond Template\n";
+  open my $data, '<', \$unix;
+  no strict 'refs';
+  *{"Example::Package::UNIX::DATA"} = $data;
+  ok !$loader->is_binary('Example::Package::UNIX', 'template1'),
+    'file is not binary';
+  is $loader->data('Example::Package::UNIX', 'template1'), "First Template\n",
+    'right template';
+  is $loader->data('Example::Package::UNIX', 'template2'),
+    "Second Template\n", 'right template';
+  is_deeply [sort keys %{$loader->data('Example::Package::UNIX')}],
+    [qw(template1 template2)], 'right DATA files';
+}
 
 # Windows DATA templates
-my $windows
-  = "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
-open $data, '<', \$windows;
-no strict 'refs';
-*{"Example::Package::Windows::DATA"} = $data;
-is $loader->data('Example::Package::Windows', 'template3'),
-  "Third Template\r\n", 'right template';
-is $loader->data('Example::Package::Windows', 'template4'),
-  "Fourth Template\r\n", 'right template';
-is_deeply [sort keys %{$loader->data('Example::Package::Windows')}],
-  [qw(template3 template4)], 'right DATA files';
-close $data;
+{
+  my $windows
+    = "@@ template3\r\nThird Template\r\n@@ template4\r\nFourth Template\r\n";
+  open my $data, '<', \$windows;
+  no strict 'refs';
+  *{"Example::Package::Windows::DATA"} = $data;
+  is $loader->data('Example::Package::Windows', 'template3'),
+    "Third Template\r\n", 'right template';
+  is $loader->data('Example::Package::Windows', 'template4'),
+    "Fourth Template\r\n", 'right template';
+  is_deeply [sort keys %{$loader->data('Example::Package::Windows')}],
+    [qw(template3 template4)], 'right DATA files';
+}
 
 # Mixed whitespace
-my $mixed = "@\@template5\n5\n\n@@  template6\n6\n@@     template7\n7";
-open $data, '<', \$mixed;
-no strict 'refs';
-*{"Example::Package::Mixed::DATA"} = $data;
-is $loader->data('Example::Package::Mixed', 'template5'), "5\n\n",
-  'right template';
-is $loader->data('Example::Package::Mixed', 'template6'), "6\n",
-  'right template';
-is $loader->data('Example::Package::Mixed', 'template7'), '7',
-  'right template';
-is_deeply [sort keys %{$loader->data('Example::Package::Mixed')}],
-  [qw(template5 template6 template7)], 'right DATA files';
-close $data;
+{
+  my $mixed = "@\@template5\n5\n\n@@  template6\n6\n@@     template7\n7";
+  open my $data, '<', \$mixed;
+  no strict 'refs';
+  *{"Example::Package::Mixed::DATA"} = $data;
+  is $loader->data('Example::Package::Mixed', 'template5'), "5\n\n",
+    'right template';
+  is $loader->data('Example::Package::Mixed', 'template6'), "6\n",
+    'right template';
+  is $loader->data('Example::Package::Mixed', 'template7'), '7',
+    'right template';
+  is_deeply [sort keys %{$loader->data('Example::Package::Mixed')}],
+    [qw(template5 template6 template7)], 'right DATA files';
+}
+
+# Base64
+{
+  my $b64 = "@\@test.bin (base64)\n4pml";
+  open my $data, '<', \$b64;
+  no strict 'refs';
+  *{"Example::Package::Base64::DATA"} = $data;
+  ok !$loader->is_binary('Example::Package::DoesNotExist', 'test.bin'),
+    'file is not binary';
+  ok $loader->is_binary('Example::Package::Base64', 'test.bin'),
+    'file is binary';
+  is $loader->data('Example::Package::Base64', 'test.bin'), "\xe2\x99\xa5",
+    'right template';
+  is_deeply [sort keys %{$loader->data('Example::Package::Base64')}],
+    ['test.bin'], 'right DATA files';
+}
 
 done_testing();

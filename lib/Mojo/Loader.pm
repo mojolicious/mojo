@@ -22,8 +22,7 @@ sub load {
   return undef if $module->can('new') || eval "require $module; 1";
 
   # Exists
-  my $path = class_to_path $module;
-  return 1 if $@ =~ /^Can't locate $path in \@INC/;
+  return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $module]}\E in \@INC/;
 
   # Real error
   return Mojo::Exception->new($@);

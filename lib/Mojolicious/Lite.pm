@@ -224,7 +224,7 @@ full access to all HTTP features and information.
     $self->render(text => "Request by $ua reached $host.");
   };
 
-  # Echo the request body and send additional header with response
+  # Echo the request body and send custom header with response
   get '/echo' => sub {
     my $self = shift;
     $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');

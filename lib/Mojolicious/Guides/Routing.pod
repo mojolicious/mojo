@@ -775,8 +775,9 @@ unescaped and decoded from bytes to characters.
 =head2 Rearranging routes
 
 Until the first request has been handled, all routes can still be moved around
-or even removed. Especially for rearranging routes created by plugins this can
-be very useful.
+or even removed with methods like L<Mojolicious::Routes::Route/"add_child">
+and L<Mojolicious::Routes::Route/"remove">. Especially for rearranging routes
+created by plugins this can be very useful.
 
   # GET /example/show -> {controller => 'example', action => 'show'}
   my $show = $r->get('/show')->to('example#show');
@@ -785,6 +786,8 @@ be very useful.
   # Nothing
   $r->get('/secrets/show')->to('secrets#show')->name('show_secrets');
   $r->find('show_secrets')->remove;
+
+To find routes by their name you can use L<Mojolicious::Routes::Route/"find">.
 
 =head2 Conditions
 

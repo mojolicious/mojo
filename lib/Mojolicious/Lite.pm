@@ -289,6 +289,9 @@ L<Mojolicious::Plugin::DefaultHelpers/"content">.
     <body><%= content %></body>
   </html>
 
+The stash or helpers like L<Mojolicious::Plugin::DefaultHelpers/"title"> can
+be used to pass additional information to the layout.
+
 =head2 Blocks
 
 Template blocks can be used like normal Perl functions and are always

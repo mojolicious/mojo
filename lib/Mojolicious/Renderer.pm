@@ -271,7 +271,9 @@ detection doesn't work, like for C<inline> templates.
   my $encoding = $renderer->encoding;
   $renderer    = $renderer->encoding('koi8-r');
 
-Will encode the content if set, defaults to C<UTF-8>.
+Will encode generated content if set, defaults to C<UTF-8>. Note that many
+renderers such as L<Mojolicious::Plugin::EPRenderer> also use this value to
+determine if template files should be decoded before processing.
 
 =head2 handlers
 

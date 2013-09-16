@@ -880,7 +880,7 @@ might not work perfectly in all deployment environments.
 =head2 Encoding
 
 Templates stored in files are expected to be C<UTF-8> by default, but that can
-be easily changed.
+be easily changed with L<Mojolicious::Renderer/"encoding">.
 
   # Application
   package MyApp;

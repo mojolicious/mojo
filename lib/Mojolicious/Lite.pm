@@ -225,6 +225,12 @@ full access to all HTTP features and information.
     $self->render(text => "Request by $ua reached $host.");
   };
 
+  # Echo the request body
+  get '/echo' => sub {
+    my $self = shift;
+    $self->render(data => $self->req->body);
+  };
+
   app->start;
 
 =head2 Route names

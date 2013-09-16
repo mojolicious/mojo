@@ -216,18 +216,18 @@ full access to all HTTP features and information.
 
   use Mojolicious::Lite;
 
-  # Access request and response information
+  # Access request information
   get '/agent' => sub {
     my $self = shift;
     my $host = $self->req->url->to_abs->host;
     my $ua   = $self->req->headers->user_agent;
-    $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
     $self->render(text => "Request by $ua reached $host.");
   };
 
-  # Echo the request body
+  # Echo the request body and send additional header with response
   get '/echo' => sub {
     my $self = shift;
+    $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
     $self->render(data => $self->req->body);
   };
 

@@ -1,4 +1,6 @@
 
+4.39  2013-09-17
+
 4.38  2013-09-16
   - Added is_binary method to Mojo::Loader.
   - Fixed support for binary files in inflate command.

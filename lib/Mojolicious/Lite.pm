@@ -290,7 +290,7 @@ L<Mojolicious::Plugin::DefaultHelpers/"content">.
   </html>
 
 The stash or helpers like L<Mojolicious::Plugin::DefaultHelpers/"title"> can
-be used to pass additional information to the layout.
+be used to pass additional data to the layout.
 
 =head2 Blocks
 

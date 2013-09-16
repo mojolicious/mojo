@@ -1007,6 +1007,32 @@ the renderer provides methods to help you with that.
   @@ index.html.mine
   ...
 
+=head2 Adding a handler to generate binary data
+
+By default the renderer assumes that every C<handler> generates characters
+that need to be automatically encoded, but this can be be easily disabled if
+you're generating bytes instead.
+
+  use Mojolicious::Lite;
+  use Mango::BSON ':bson';
+
+  # Add "bson" handler
+  app->renderer->add_handler(bson => sub {
+    my ($renderer, $c, $output, $options) = @_;
+
+    # Disable automatic encoding
+    delete $options->{encoding};
+
+    # Encode BSON data from stash value
+    $$output = bson_encode delete $c->stash->{bson};
+
+    return 1;
+  });
+
+  get '/' => {bson => {i => '♥ mojolicious'}, handler => 'bson'};
+
+  app->start;
+
 =head1 MORE
 
 You can continue with L<Mojolicious::Guides> now or take a look at the

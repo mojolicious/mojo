@@ -56,7 +56,7 @@ my %OPTIONAL = map { $_ => 1 }
 # Elements that break HTML paragraphs
 my %PARAGRAPH = map { $_ => 1 } (
   qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
-  qw(h3 h4 h5 h6 header hgroup hr menu nav ol p pre section table ul)
+  qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul)
 );
 
 # HTML table elements
@@ -64,7 +64,7 @@ my %TABLE = map { $_ => 1 } qw(col colgroup tbody td th thead tr);
 
 # HTML void elements
 my %VOID = map { $_ => 1 } (
-  qw(area base br col command embed hr img input keygen link meta param),
+  qw(area base br col embed hr img input keygen link menuitem meta param),
   qw(source track wbr)
 );
 

@@ -44,10 +44,9 @@ sub _perldoc {
   my $path = Pod::Simple::Search->new->find($module, @PATHS);
   return $self->redirect_to("http://metacpan.org/module/$module")
     unless $path && -r $path;
-  my $html = _pod_to_html(slurp $path);
 
   # Rewrite links
-  my $dom     = Mojo::DOM->new("$html");
+  my $dom     = Mojo::DOM->new(_pod_to_html(slurp $path));
   my $perldoc = $self->url_for('/perldoc/');
   $dom->find('a[href]')->each(
     sub {
@@ -108,7 +107,7 @@ sub _perldoc {
 }
 
 sub _pod_to_html {
-  return undef unless defined(my $pod = shift);
+  return '' unless defined(my $pod = shift);
 
   # Block
   $pod = $pod->() if ref $pod eq 'CODE';

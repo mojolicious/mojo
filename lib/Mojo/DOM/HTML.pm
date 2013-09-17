@@ -56,7 +56,7 @@ my %PARAGRAPH = map { $_ => 1 } (
 );
 
 # HTML table elements with optional end tags
-my %TABLE = map { $_ => 1 } qw(col colgroup tbody td tfoot th thead tr);
+my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
 
 # HTML elements without end tags
 my %VOID = map { $_ => 1 } (
@@ -150,11 +150,11 @@ sub parse {
 sub render { $_[0]->_render($_[0]->tree) }
 
 sub _close {
-  my ($self, $current, $allowed, $target) = @_;
+  my ($self, $current, $allowed, $scope) = @_;
 
-  # Close allowed parent elements until reaching target tag
+  # Close allowed parent elements in scope
   my $parent = $$current;
-  while ($parent->[0] ne 'root' && $parent->[1] ne $target) {
+  while ($parent->[0] ne 'root' && $parent->[1] ne $scope) {
     $self->_end($parent->[1], $current) if $allowed->{$parent->[1]};
     $parent = $parent->[3];
   }

@@ -64,12 +64,15 @@ my %VOID = map { $_ => 1 } (
   qw(source track wbr)
 );
 
-# HTML inline elements
-my %INLINE = map { $_ => 1 } (
-  qw(a abbr acronym applet b basefont bdo big br button cite code del dfn em),
-  qw(font i iframe img ins input kbd label map object q s samp script select),
-  qw(small span strike strong sub sup textarea tt u var)
+# HTML elements categorized as phrasing content (and obsolete inline elements)
+my @PHRASING = (
+  qw(a abbr area audio b bdo br button canvas cite code data datalist del),
+  qw(dfn em embed i iframe img input ins kbd keygen label link map mark math),
+  qw(meta meter noscript object output progress q ruby s samp script select),
+  qw(small span strong sub sup svg template textarea time u var video wbr)
 );
+my @OBSOLETE = qw(acronym applet basefont big font strike tt);
+my %PHRASING = map { $_ => 1 } @OBSOLETE, @PHRASING;
 
 sub parse {
   my ($self, $html) = @_;
@@ -174,8 +177,8 @@ sub _end {
     # Right tag
     ++$found and last if $next->[1] eq $end;
 
-    # Inline elements can only cross other inline elements
-    return if !$self->xml && $INLINE{$end} && !$INLINE{$next->[1]};
+    # Elements with text-level semantics can only cross similar elements
+    return if !$self->xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
 
     $next = $next->[3];
   }

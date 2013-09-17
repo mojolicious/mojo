@@ -1255,12 +1255,12 @@ $dom = Mojo::DOM->new->parse(<<EOF);
     <tr>
       <th>A</th>
       <th>D
-  <tbody>
-    <tr>
-      <td>B
   <tfoot>
     <tr>
       <td>C
+  <tbody>
+    <tr>
+      <td>B
 </table>
 EOF
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
@@ -1286,6 +1286,9 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   <tbody>
     <tr>
       <td>B
+  <tbody>
+    <tr>
+      <td>E
 </table>
 EOF
 is $dom->find('table > col')->[0]->attr->{id}, 'morefail', 'right attribute';
@@ -1298,7 +1301,8 @@ is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
   'right attribute';
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
 is $dom->find('table > thead > tr > th')->[1]->text, 'D', 'right text';
-is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
+is $dom->at('table > tbody > tr > td')->text,   'B',    'right text';
+is $dom->find('table > tbody > tr > td')->text, "B\nE", 'right text';
 
 # Optional "colgroup", "tbody", "tr", "th" and "td" tags
 $dom = Mojo::DOM->new->parse(<<EOF);

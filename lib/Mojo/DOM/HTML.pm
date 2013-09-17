@@ -49,14 +49,14 @@ my $TOKEN_RE = qr/
   )??
 /xis;
 
-# Elements that break HTML paragraphs
+# HTML elements that break paragraphs
 my %PARAGRAPH = map { $_ => 1 } (
   qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
   qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul)
 );
 
-# HTML table elements
-my %TABLE = map { $_ => 1 } qw(col colgroup tbody td th thead tr);
+# HTML table elements with optional end tags
+my %TABLE = map { $_ => 1 } qw(col colgroup tbody td tfoot th thead tr);
 
 # HTML elements without end tags
 my %VOID = map { $_ => 1 } (
@@ -150,18 +150,12 @@ sub parse {
 sub render { $_[0]->_render($_[0]->tree) }
 
 sub _close {
-  my ($self, $current, $tags, $stop) = @_;
-  $tags ||= \%TABLE;
-  $stop ||= 'table';
+  my ($self, $current, $allowed, $target) = @_;
 
-  # Check if parents need to be closed
+  # Close allowed parent elements until reaching target tag
   my $parent = $$current;
-  while ($parent->[0] ne 'root' && $parent->[1] ne $stop) {
-
-    # Close
-    $tags->{$parent->[1]} and $self->_end($parent->[1], $current);
-
-    # Try next
+  while ($parent->[0] ne 'root' && $parent->[1] ne $target) {
+    $self->_end($parent->[1], $current) if $allowed->{$parent->[1]};
     $parent = $parent->[3];
   }
 }
@@ -195,7 +189,7 @@ sub _end {
     if ($end eq $$current->[1]) { return $$current = $$current->[3] }
 
     # Table
-    elsif ($end eq 'table') { $self->_close($current) }
+    elsif ($end eq 'table') { $self->_close($current, \%TABLE, $end) }
 
     # Missing end tag
     $self->_end($$current->[1], $current);
@@ -271,40 +265,40 @@ sub _start {
   # Autoclose optional HTML elements
   if (!$self->xml && $$current->[0] ne 'root') {
 
-    # "<li>"
+    # "li"
     if ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
 
-    # "<p>"
+    # "p"
     elsif ($PARAGRAPH{$start}) { $self->_end('p', $current) }
 
-    # "<head>"
+    # "head"
     elsif ($start eq 'body') { $self->_end('head', $current) }
 
-    # "<optgroup>"
+    # "optgroup"
     elsif ($start eq 'optgroup') { $self->_end('optgroup', $current) }
 
-    # "<option>"
+    # "option"
     elsif ($start eq 'option') { $self->_end('option', $current) }
 
-    # "<colgroup>", "<thead>", "tbody" and "tfoot"
+    # "colgroup", "thead", "tbody" and "tfoot"
     elsif (grep { $_ eq $start } qw(colgroup thead tbody tfoot)) {
-      $self->_close($current);
+      $self->_close($current, \%TABLE, 'table');
     }
 
-    # "<tr>"
-    elsif ($start eq 'tr') { $self->_close($current, {tr => 1}) }
+    # "tr"
+    elsif ($start eq 'tr') { $self->_close($current, {tr => 1}, 'table') }
 
-    # "<th>" and "<td>"
+    # "th" and "td"
     elsif ($start eq 'th' || $start eq 'td') {
-      $self->_close($current, {$_ => 1}) for qw(th td);
+      $self->_close($current, {$_ => 1}, 'table') for qw(th td);
     }
 
-    # "<dt>" and "<dd>"
+    # "dt" and "dd"
     elsif ($start eq 'dt' || $start eq 'dd') {
       $self->_end($_, $current) for qw(dt dd);
     }
 
-    # "<rt>" and "<rp>"
+    # "rt" and "rp"
     elsif ($start eq 'rt' || $start eq 'rp') {
       $self->_end($_, $current) for qw(rt rp);
     }

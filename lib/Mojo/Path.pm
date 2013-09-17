@@ -189,6 +189,9 @@ Canonicalize path.
   # "/foo/baz"
   Mojo::Path->new('/foo/./bar/../baz')->canonicalize;
 
+  # "../foo/baz"
+  Mojo::Path->new('/foo/../bar/../../baz')->canonicalize;
+
 =head2 clone
 
   my $clone = $path->clone;

@@ -177,7 +177,7 @@ sub _end {
     # Right tag
     ++$found and last if $next->[1] eq $end;
 
-    # Elements with text-level semantics can only cross similar elements
+    # Phrasing content can only cross phrasing content
     return if !$self->xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
 
     $next = $next->[3];

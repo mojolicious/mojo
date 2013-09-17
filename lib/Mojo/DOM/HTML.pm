@@ -49,10 +49,6 @@ my $TOKEN_RE = qr/
   )??
 /xis;
 
-# Optional HTML elements
-my %OPTIONAL = map { $_ => 1 }
-  qw(body colgroup dd head li optgroup option p rt rp tbody td tfoot th);
-
 # Elements that break HTML paragraphs
 my %PARAGRAPH = map { $_ => 1 } (
   qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
@@ -62,7 +58,7 @@ my %PARAGRAPH = map { $_ => 1 } (
 # HTML table elements
 my %TABLE = map { $_ => 1 } qw(col colgroup tbody td th thead tr);
 
-# HTML void elements
+# HTML elements without end tags
 my %VOID = map { $_ => 1 } (
   qw(area base br col embed hr img input keygen link menuitem meta param),
   qw(source track wbr)
@@ -194,9 +190,6 @@ sub _end {
 
     # Match
     if ($end eq $$current->[1]) { return $$current = $$current->[3] }
-
-    # Optional elements
-    elsif ($OPTIONAL{$$current->[1]}) { $self->_end($$current->[1], $current) }
 
     # Table
     elsif ($end eq 'table') { $self->_close($current) }

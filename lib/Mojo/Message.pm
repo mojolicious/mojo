@@ -412,7 +412,8 @@ implements the following new ones.
   my $bytes = $msg->body;
   $msg      = $msg->body('Hello!');
 
-Slurp or replace C<content>.
+Slurp or replace C<content>, L<Mojo::Content::MultiPart> will be automatically
+downgraded to L<Mojo::Content::Single>.
 
 =head2 body_params
 

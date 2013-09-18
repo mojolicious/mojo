@@ -448,7 +448,7 @@ L<Mojo::DOM> implements the following methods.
   my $dom = Mojo::DOM->new;
   my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
 
-Construct a new array-based L<Mojo::DOM> object and C<parse> HTML/XML document
+Construct a new array-based L<Mojo::DOM> object and C<parse> HTML/XML fragment
 if necessary.
 
 =head2 all_text
@@ -595,7 +595,7 @@ has no parent.
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
-Parse HTML/XML document with L<Mojo::DOM::HTML>.
+Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   # Parse XML
   my $dom = Mojo::DOM->new->xml(1)->parse($xml);

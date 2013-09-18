@@ -361,7 +361,7 @@ following new ones.
 
   $html = $html->parse('<foo bar="baz">test</foo>');
 
-Parse HTML/XML document.
+Parse HTML/XML fragment.
 
 =head2 render
 

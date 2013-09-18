@@ -50,14 +50,14 @@ sub select {
   while (my $current = shift @queue) {
     my $type = $current->[0];
 
-    # Root
-    if ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
-
     # Tag
-    elsif ($type eq 'tag') {
+    if ($type eq 'tag') {
       unshift @queue, @$current[4 .. $#$current];
       push @results, $current if $self->_match($pattern, $current, $tree);
     }
+
+    # Root
+    elsif ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
   }
 
   return \@results;
@@ -150,12 +150,8 @@ sub _compile {
 
     # Class or ID
     while ($element =~ /$CLASS_ID_RE/g) {
-
-      # Class
       push @$selector, ['attr', 'class', $self->_regex('~', $1)] if defined $1;
-
-      # ID
-      push @$selector, ['attr', 'id', $self->_regex('', $2)] if defined $2;
+      push @$selector, ['attr', 'id',    $self->_regex('',  $2)] if defined $2;
     }
 
     # Pseudo classes
@@ -188,20 +184,18 @@ sub _equation {
   my ($self, $equation) = @_;
 
   # "even"
-  my $num = [1, 1];
-  if ($equation =~ /^even$/i) { $num = [2, 2] }
+  return [2, 2] if $equation =~ /^even$/i;
 
   # "odd"
-  elsif ($equation =~ /^odd$/i) { $num = [2, 1] }
+  return [2, 1] if $equation =~ /^odd$/i;
 
   # Equation
-  elsif ($equation =~ /(?:(-?(?:\d+)?)?(n))?\s*\+?\s*(-?\s*\d+)?\s*$/i) {
-    $num->[0] = defined($1) && length($1) ? $1 : $2 ? 1 : 0;
-    $num->[0] = -1 if $num->[0] eq '-';
-    $num->[1] = $3 // 0;
-    $num->[1] =~ s/\s+//g;
-  }
-
+  my $num = [1, 1];
+  return $num if $equation !~ /(?:(-?(?:\d+)?)?(n))?\s*\+?\s*(-?\s*\d+)?\s*$/i;
+  $num->[0] = defined($1) && length($1) ? $1 : $2 ? 1 : 0;
+  $num->[0] = -1 if $num->[0] eq '-';
+  $num->[1] = $3 // 0;
+  $num->[1] =~ s/\s+//g;
   return $num;
 }
 

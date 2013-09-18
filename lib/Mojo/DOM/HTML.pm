@@ -130,7 +130,7 @@ sub parse {
       # Tag
       $self->_start($start, \%attrs, \$current);
 
-      # Empty element
+      # Element without end tag
       $self->_end($start, \$current)
         if (!$self->xml && $VOID{$start}) || $attr =~ m!/\s*$!;
 
@@ -242,7 +242,7 @@ sub _render {
     my $attrs = join ' ', @attrs;
     $content .= " $attrs" if $attrs;
 
-    # Empty tag
+    # Element without end tag
     return $self->xml || $VOID{$tag} ? "$content />" : "$content></$tag>"
       unless $tree->[4];
 

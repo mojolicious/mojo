@@ -481,7 +481,7 @@ All selectors from L<Mojo::DOM::CSS> are supported.
 
   $dom = $dom->append('<p>Hi!</p>');
 
-Append HTML/XML to element.
+Append HTML/XML fragment to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
@@ -490,7 +490,7 @@ Append HTML/XML to element.
 
   $dom = $dom->append_content('<p>Hi!</p>');
 
-Append HTML/XML to element content.
+Append HTML/XML fragment to element content.
 
   # "<div><h1>AB</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
@@ -604,7 +604,7 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   $dom = $dom->prepend('<p>Hi!</p>');
 
-Prepend HTML/XML to element.
+Prepend HTML/XML fragment to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
@@ -613,7 +613,7 @@ Prepend HTML/XML to element.
 
   $dom = $dom->prepend_content('<p>Hi!</p>');
 
-Prepend HTML/XML to element content.
+Prepend HTML/XML fragment to element content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
@@ -641,8 +641,8 @@ Remove element and return L<Mojo::DOM> object for parent of element.
 
   my $parent = $dom->replace('<div>test</div>');
 
-Replace element with HTML/XML and return L<Mojo::DOM> object for parent of
-element.
+Replace element with HTML/XML fragment and return L<Mojo::DOM> object for
+parent of element.
 
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
@@ -654,7 +654,7 @@ element.
 
   $dom = $dom->replace_content('<p>test</p>');
 
-Replace element content with HTML/XML.
+Replace element content with HTML/XML fragment.
 
   # "<div><h1>B</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B')->root;

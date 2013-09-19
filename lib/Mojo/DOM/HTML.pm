@@ -219,7 +219,7 @@ sub _render {
   return '<?' . $tree->[1] . '?>' if $e eq 'pi';
 
   # Start tag
-  my $start = $e eq 'root' ? 1 : 2;
+  my $start   = 1;
   my $content = '';
   if ($e eq 'tag') {
     $start = 4;

@@ -697,9 +697,9 @@ is $url->host, 'foo.1.1.1.1.de', 'right host';
 $url = Mojo::URL->new('http://1.1.1.1.1.1/');
 is $url->host, '1.1.1.1.1.1', 'right host';
 
-# Heavily escaped path
+# Heavily escaped path and empty fragment
 $url = Mojo::URL->new(
-  'http://example.com/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb');
+  'http://example.com/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb#');
 ok $url->is_abs,   'is absolute';
 is $url->scheme,   'http', 'right scheme';
 is $url->userinfo, undef, 'no userinfo';
@@ -707,13 +707,13 @@ is $url->host,     'example.com', 'right host';
 is $url->port,     undef, 'no port';
 is $url->path,     '/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb',
   'right path';
-is $url->query,    '',    'no query';
-is $url->fragment, undef, 'no fragment';
+is $url->query,    '', 'no query';
+is $url->fragment, '', 'right fragment';
 is "$url",
-  'http://example.com/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb',
+  'http://example.com/mojo%2Fg%2B%2B-4%2E2_4%2E2%2E3-2ubuntu7_i386%2Edeb#',
   'right format';
 $url->path->canonicalize;
-is "$url", 'http://example.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb',
+is "$url", 'http://example.com/mojo/g++-4.2_4.2.3-2ubuntu7_i386.deb#',
   'right format';
 
 # "%" in path

@@ -84,12 +84,7 @@ sub parse {
 
     # Text (and runaway "<")
     $text .= '<' if defined $runaway;
-    if (length $text) {
-      $text = html_unescape $text;
-      my $sibling = $current->[-1];
-      if (ref $sibling && $sibling->[0] eq 'text') { $sibling->[1] .= $text }
-      else { push @$current, ['text', $text] }
-    }
+    push @$current, ['text', html_unescape $text] if length $text;
 
     # DOCTYPE
     if ($doctype) { push @$current, ['doctype', $doctype] }

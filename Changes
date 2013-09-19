@@ -1,5 +1,6 @@
 
 4.40  2013-09-19
+  - Fixed smart whitespace trimming bug in Mojo::DOM.
   - Fixed table parsing bug in Mojo::DOM::HTML.
 
 4.39  2013-09-17

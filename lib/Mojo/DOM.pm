@@ -329,6 +329,13 @@ sub _sibling {
 sub _text {
   my ($nodes, $recurse, $trim) = @_;
 
+  # Merge successing text nodes
+  my $i = 0;
+  while (my $next = $nodes->[$i + 1]) {
+    ++$i and next unless $nodes->[$i][0] eq 'text' && $next->[0] eq 'text';
+    splice @$nodes, $i, 2, ['text', $nodes->[$i][1] . $next->[1]];
+  }
+
   my $text = '';
   for my $n (@$nodes) {
     my $type = $n->[0];

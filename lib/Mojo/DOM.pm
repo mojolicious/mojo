@@ -329,7 +329,7 @@ sub _sibling {
 sub _text {
   my ($nodes, $recurse, $trim) = @_;
 
-  # Merge successing text nodes
+  # Merge successive text nodes
   my $i = 0;
   while (my $next = $nodes->[$i + 1]) {
     ++$i and next unless $nodes->[$i][0] eq 'text' && $next->[0] eq 'text';

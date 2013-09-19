@@ -1109,13 +1109,14 @@ is "$dom", <<EOF, 'right result';
 </ul>
 <div>D</div>works
 EOF
-$dom->find('li')->[1]->append_content('<p>C2</p>C3')->append_content(' C4');
-is $dom->find('li')->[1]->text, 'C C3 C4', 'right text';
+$dom->find('li')->[1]->append_content('<p>C2</p>C3')->append_content(' C4')
+  ->append_content('C5');
+is $dom->find('li')->[1]->text, 'C C3 C4C5', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
     <p>B</p>
-    <li>C<p>C2</p>C3 C4</li>
+    <li>C<p>C2</p>C3 C4C5</li>
 </ul>
 <div>D</div>works
 EOF

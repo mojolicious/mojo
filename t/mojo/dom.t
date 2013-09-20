@@ -185,6 +185,14 @@ is_deeply [$dom->at('p')->ancestors->type->each], [qw(div div div body html)],
   'right results';
 is_deeply [$dom->at('html')->ancestors->each], [], 'no results';
 is_deeply [$dom->ancestors->each],             [], 'no results';
+is_deeply [$dom->siblings->each],              [], 'no results';
+ok $dom->at('form')->siblings->[0]->match('#header'),  'right sibling';
+ok $dom->at('form')->siblings->[1]->match('#content'), 'right sibling';
+is $dom->at('form')->siblings('#content')->first->text, 'More stuff',
+  'right text';
+is_deeply [$dom->at('form')->siblings('#nothing')->each], [], 'no results';
+is_deeply [$dom->at('#header')->siblings->type->each], [qw(form div)],
+  'right results';
 
 # Script tag
 $dom = Mojo::DOM->new->parse(<<EOF);

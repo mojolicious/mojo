@@ -120,7 +120,7 @@ sub namespace {
   return '';
 }
 
-sub next { shift->_sibling(1) }
+sub next { shift->_siblings->[1][0] }
 
 sub parent {
   my $self = shift;
@@ -139,7 +139,7 @@ sub prepend_content {
   return $self;
 }
 
-sub previous { shift->_sibling(0) }
+sub previous { shift->_siblings->[0][-1] }
 
 sub remove { shift->replace('') }
 
@@ -162,6 +162,8 @@ sub root {
   return $self unless my $tree = _ancestors($self->tree, 1);
   return $self->new->tree($tree)->xml($self->xml);
 }
+
+sub siblings { _select(Mojo::Collection->new(@{_siblings($_[0], 1)}), $_[1]) }
 
 sub strip {
   my $self = shift;
@@ -308,22 +310,19 @@ sub _select {
   return defined $selector ? $self->grep(sub { $_->match($selector) }) : $self;
 }
 
-sub _sibling {
-  my ($self, $next) = @_;
+sub _siblings {
+  my ($self, $merge) = @_;
 
-  # Make sure we have a parent
-  return undef unless my $parent = $self->parent;
+  return $merge ? [] : [[], []] unless my $parent = $self->parent;
 
-  # Find previous or next sibling
-  my ($previous, $current);
+  my $tree = $self->tree;
+  my (@before, @after, $match);
   for my $child ($parent->children->each) {
-    ++$current and next if $child->tree eq $self->tree;
-    return $next ? $child : $previous if $current;
-    $previous = $child;
+    ++$match and next if $child->tree eq $tree;
+    $match ? push @after, $child : push @before, $child;
   }
 
-  # No siblings
-  return undef;
+  return $merge ? [@before, @after] : [\@before, \@after];
 }
 
 sub _text {
@@ -674,6 +673,18 @@ Replace element content with HTML/XML fragment.
   my $root = $dom->root;
 
 Return L<Mojo::DOM> object for root node.
+
+=head2 siblings
+
+  my $collection = $dom->siblings;
+  my $collection = $dom->siblings('div');
+
+Find all siblings of this element matching the CSS selector and return a
+L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS> are supported.
+
+  # List types of sibling elements
+  say $dom->siblings->type;
 
 =head2 strip
 

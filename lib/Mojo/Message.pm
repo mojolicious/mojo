@@ -477,7 +477,8 @@ Access message cookies. Meant to be overloaded in a subclass.
 
   my $str = $msg->decoded_body;
 
-Slurp C<content> and try to decode it if a charset could be detected.
+Slurp C<content> and try to decode it if a charset could be extracted with
+L<Mojo::Content/"charset">.
 
 =head2 dom
 

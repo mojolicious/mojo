@@ -67,7 +67,7 @@
         <div id="source">
           % my $path;
           % for my $part (split '/', $module) {
-            /
+            %= '::' if $path
             % $path .= "/$part";
             %= link_to $part => url_for("/perldoc$path")
           % }

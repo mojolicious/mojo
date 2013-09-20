@@ -94,7 +94,7 @@ frameworks. It provides all the basic tools and helpers needed to write
 simple web applications and higher level web frameworks, such as
 L<Mojolicious>.
 
-See L<Mojolicious> for more!
+See L<Mojolicious::Guides> for more!
 
 =head1 ATTRIBUTES
 

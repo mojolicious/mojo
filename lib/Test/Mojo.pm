@@ -38,25 +38,25 @@ sub app {
 sub content_is {
   my ($self, $value, $desc) = @_;
   $desc ||= 'exact match for content';
-  return $self->_test('is', $self->_get_content($self->tx), $value, $desc);
+  return $self->_test('is', $self->tx->res->decoded_body, $value, $desc);
 }
 
 sub content_isnt {
   my ($self, $value, $desc) = @_;
   $desc ||= 'no match for content';
-  return $self->_test('isnt', $self->_get_content($self->tx), $value, $desc);
+  return $self->_test('isnt', $self->tx->res->decoded_body, $value, $desc);
 }
 
 sub content_like {
   my ($self, $regex, $desc) = @_;
   $desc ||= 'content is similar';
-  return $self->_test('like', $self->_get_content($self->tx), $regex, $desc);
+  return $self->_test('like', $self->tx->res->decoded_body, $regex, $desc);
 }
 
 sub content_unlike {
   my ($self, $regex, $desc) = @_;
   $desc ||= 'content is not similar';
-  return $self->_test('unlike', $self->_get_content($self->tx), $regex, $desc);
+  return $self->_test('unlike', $self->tx->res->decoded_body, $regex, $desc);
 }
 
 sub content_type_is {
@@ -301,13 +301,6 @@ sub websocket_ok {
   return $self->_test('ok', $self->tx->res->code eq 101, $desc);
 }
 
-sub _get_content {
-  my ($self, $tx) = @_;
-  my $content = $tx->res->body;
-  my $charset = $tx->res->content->charset;
-  return $charset ? decode($charset, $content) : $content;
-}
-
 sub _json {
   my ($self, $method, $p) = @_;
   return Mojo::JSON::Pointer->new->$method(
@@ -496,7 +489,8 @@ Access application with L<Mojo::UserAgent/"app">.
   $t = $t->content_is('working!');
   $t = $t->content_is('working!', 'right content');
 
-Check response content for exact match.
+Check response content for exact match after retrieving it from
+L<Mojo::Message/"decoded_body">.
 
 =head2 content_isnt
 
@@ -510,7 +504,8 @@ Opposite of C<content_is>.
   $t = $t->content_like(qr/working!/);
   $t = $t->content_like(qr/working!/, 'right content');
 
-Check response content for similar match.
+Check response content for similar match after retrieving it from
+L<Mojo::Message/"decoded_body">.
 
 =head2 content_unlike
 

@@ -65,15 +65,17 @@ sub cookie { shift->_cache(cookies => @_) }
 
 sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
+sub decoded_body {
+  my $self    = shift;
+  my $content = $self->body;
+  my $charset = $self->content->charset;
+  return $charset ? decode($charset, $content) // $content : $content;
+}
+
 sub dom {
   my $self = shift;
-
   return undef if $self->content->is_multipart;
-  my $html    = $self->body;
-  my $charset = $self->content->charset;
-  $html = decode($charset, $html) // $html if $charset;
-  my $dom = $self->{dom} ||= Mojo::DOM->new($html);
-
+  my $dom = $self->{dom} ||= Mojo::DOM->new($self->decoded_body);
   return @_ ? $dom->find(@_) : $dom;
 }
 
@@ -470,6 +472,12 @@ it should not be called before all headers have been received.
   my $cookies = $msg->cookies;
 
 Access message cookies. Meant to be overloaded in a subclass.
+
+=head2 decoded_body
+
+  my $str = $msg->decoded_body;
+
+Slurp C<content> and try to decode it if a charset could be detected.
 
 =head2 dom
 

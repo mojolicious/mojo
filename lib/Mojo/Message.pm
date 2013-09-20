@@ -65,17 +65,10 @@ sub cookie { shift->_cache(cookies => @_) }
 
 sub cookies { croak 'Method "cookies" not implemented by subclass' }
 
-sub decoded_body {
-  my $self    = shift;
-  my $content = $self->body;
-  my $charset = $self->content->charset;
-  return $charset ? decode($charset, $content) // $content : $content;
-}
-
 sub dom {
   my $self = shift;
   return undef if $self->content->is_multipart;
-  my $dom = $self->{dom} ||= Mojo::DOM->new($self->decoded_body);
+  my $dom = $self->{dom} ||= Mojo::DOM->new($self->text);
   return @_ ? $dom->find(@_) : $dom;
 }
 
@@ -194,6 +187,13 @@ sub parse {
 }
 
 sub start_line_size { length shift->build_start_line }
+
+sub text {
+  my $self    = shift;
+  my $content = $self->body;
+  my $charset = $self->content->charset;
+  return $charset ? decode($charset, $content) // $content : $content;
+}
 
 sub to_string {
   my $self = shift;
@@ -473,13 +473,6 @@ it should not be called before all headers have been received.
 
 Access message cookies. Meant to be overloaded in a subclass.
 
-=head2 decoded_body
-
-  my $str = $msg->decoded_body;
-
-Slurp C<content> and try to decode it if a charset could be extracted with
-L<Mojo::Content/"charset">.
-
 =head2 dom
 
   my $dom        = $msg->dom;
@@ -608,6 +601,13 @@ Parse message chunk.
   my $size = $msg->start_line_size;
 
 Size of the start line in bytes.
+
+=head2 text
+
+  my $str = $msg->text;
+
+Retrieve C<body> and try to decode it if a charset could be extracted with
+L<Mojo::Content/"charset">.
 
 =head2 to_string
 

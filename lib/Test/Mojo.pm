@@ -38,25 +38,25 @@ sub app {
 sub content_is {
   my ($self, $value, $desc) = @_;
   $desc ||= 'exact match for content';
-  return $self->_test('is', $self->tx->res->decoded_body, $value, $desc);
+  return $self->_test('is', $self->tx->res->text, $value, $desc);
 }
 
 sub content_isnt {
   my ($self, $value, $desc) = @_;
   $desc ||= 'no match for content';
-  return $self->_test('isnt', $self->tx->res->decoded_body, $value, $desc);
+  return $self->_test('isnt', $self->tx->res->text, $value, $desc);
 }
 
 sub content_like {
   my ($self, $regex, $desc) = @_;
   $desc ||= 'content is similar';
-  return $self->_test('like', $self->tx->res->decoded_body, $regex, $desc);
+  return $self->_test('like', $self->tx->res->text, $regex, $desc);
 }
 
 sub content_unlike {
   my ($self, $regex, $desc) = @_;
   $desc ||= 'content is not similar';
-  return $self->_test('unlike', $self->tx->res->decoded_body, $regex, $desc);
+  return $self->_test('unlike', $self->tx->res->text, $regex, $desc);
 }
 
 sub content_type_is {
@@ -490,7 +490,7 @@ Access application with L<Mojo::UserAgent/"app">.
   $t = $t->content_is('working!', 'right content');
 
 Check response content for exact match after retrieving it from
-L<Mojo::Message/"decoded_body">.
+L<Mojo::Message/"text">.
 
 =head2 content_isnt
 
@@ -505,7 +505,7 @@ Opposite of C<content_is>.
   $t = $t->content_like(qr/working!/, 'right content');
 
 Check response content for similar match after retrieving it from
-L<Mojo::Message/"decoded_body">.
+L<Mojo::Message/"text">.
 
 =head2 content_unlike
 

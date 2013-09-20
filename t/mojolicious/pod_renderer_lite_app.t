@@ -62,6 +62,10 @@ $t->get_ok('/perldoc/Mojolicious')->status_is(200)
   ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
   ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
 
+# Perldoc browser (Mojolicious source)
+$t->get_ok('/perldoc/Mojolicious?source=1')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/\$VERSION/);
+
 done_testing();
 
 __DATA__

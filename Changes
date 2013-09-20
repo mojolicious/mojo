@@ -2,8 +2,11 @@
 4.40  2013-09-20
   - Added siblings method to Mojo::DOM.
   - Added flatten method to Mojo::Collection.
+  - Improved documentation browser with source links.
   - Fixed smart whitespace trimming bug in Mojo::DOM.
   - Fixed table parsing bug in Mojo::DOM::HTML.
+  - Fixed bug in Mojolicious::Types where txt MIME type did not specify a
+    charset.
 
 4.39  2013-09-17
   - Improved HTML5.1 compliance of Mojo::DOM::HTML.

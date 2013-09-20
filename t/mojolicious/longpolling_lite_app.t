@@ -377,7 +377,7 @@ $t->get_ok('/longpoll/static/delayed')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_like('Set-Cookie' => qr/bar=baz/)
   ->header_like('Set-Cookie' => qr/mojolicious=/)
-  ->content_type_is('text/plain')
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_is("Hello Mojo from a static file!\n");
 is $stash->{finished}, 1, 'finish event has been emitted once';
 ok $stash->{destroyed}, 'controller has been destroyed';

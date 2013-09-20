@@ -123,7 +123,8 @@ $t->get_ok('/works?blue=1')->status_is(200)
   ->content_is("BlueJust worksThis <template> just works!\n\n");
 
 # Mixed formats
-$t->get_ok('/mixed')->status_is(200)->content_type_is('text/plain')
+$t->get_ok('/mixed')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_is("Mixed formats\n\n");
 
 # Missing template

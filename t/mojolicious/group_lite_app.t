@@ -394,7 +394,8 @@ $t->get_ok('/some_formats')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # Format "txt" has been detected
-$t->get_ok('/some_formats.txt')->status_is(200)->content_type_is('text/plain')
+$t->get_ok('/some_formats.txt')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_is('Some format detection.');
 
 # Format "json" has been detected

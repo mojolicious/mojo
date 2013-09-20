@@ -302,7 +302,7 @@ $t->get_ok('/foo/withlayout' => {'X-Test' => 'Hi there!'})->status_is(200)
 # Foo::withBlock
 $t->get_ok('/withblock.txt' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_type_isnt('text/html')
-  ->content_type_is('text/plain')
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_like(qr/Hello Baerbel\.\s+Hello Wolfgang\./);
 
 # MojoliciousTest2::Foo::test
@@ -372,7 +372,7 @@ my $mtime = Mojo::Date->new((stat $path)[9])->to_string;
 $t->get_ok('/hello.txt')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->header_is('Last-Modified' => $mtime)->header_is('Content-Length' => $size)
-  ->content_type_is('text/plain')
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_like(qr/Hello Mojo from a development static file!/);
 
 # Try to access a file which is not under the web root via path

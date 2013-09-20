@@ -45,55 +45,48 @@ sub _perldoc {
   return $self->redirect_to("http://metacpan.org/module/$module")
     unless $path && -r $path;
 
+  # Source
+  my $source = slurp $path;
+  return $self->render(data => $source, format => 'txt')
+    if $self->param('source');
+
   # Rewrite links
-  my $dom     = Mojo::DOM->new(_pod_to_html(slurp $path));
+  my $dom     = Mojo::DOM->new(_pod_to_html($source));
   my $perldoc = $self->url_for('/perldoc/');
-  $dom->find('a[href]')->each(
-    sub {
-      my $attrs = shift->attr;
-      $attrs->{href} =~ s!%3A%3A!/!gi
-        if $attrs->{href} =~ s!^http://search\.cpan\.org/perldoc\?!$perldoc!;
-    }
-  );
+  for my $e ($dom->find('a[href]')->each) {
+    my $attrs = $e->attr;
+    $attrs->{href} =~ s!%3A%3A!/!gi
+      if $attrs->{href} =~ s!^http://search\.cpan\.org/perldoc\?!$perldoc!;
+  }
 
   # Rewrite code blocks for syntax highlighting
-  $dom->find('pre')->each(
-    sub {
-      my $e = shift;
-      return if $e->all_text =~ /^\s*\$\s+/m;
-      my $attrs = $e->attr;
-      my $class = $attrs->{class};
-      $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';
-    }
-  );
+  for my $e ($dom->find('pre')->each) {
+    next if $e->all_text =~ /^\s*\$\s+/m;
+    my $attrs = $e->attr;
+    my $class = $attrs->{class};
+    $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';
+  }
 
   # Rewrite headers
   my $url = $self->req->url->clone;
   my (%anchors, @parts);
-  $dom->find('h1, h2, h3')->each(
-    sub {
-      my $e = shift;
+  for my $e ($dom->find('h1, h2, h3')->each) {
 
-      # Anchor and text
-      my $name = my $text = $e->all_text;
-      $name =~ s/\s+/_/g;
-      $name =~ s/[^\w\-]//g;
-      my $anchor = $name;
-      my $i      = 1;
-      $anchor = $name . $i++ while $anchors{$anchor}++;
+    # Anchor and text
+    my $name = my $text = $e->all_text;
+    $name =~ s/\s+/_/g;
+    $name =~ s/[^\w\-]//g;
+    my $anchor = $name;
+    my $i      = 1;
+    $anchor = $name . $i++ while $anchors{$anchor}++;
 
-      # Rewrite
-      push @parts, [] if $e->type eq 'h1' || !@parts;
-      push @{$parts[-1]}, $text, $url->fragment($anchor)->to_abs;
-      $e->replace_content(
-        $self->link_to(
-          $text => $url->fragment('toc')->to_abs,
-          class => 'mojoscroll',
-          id    => $anchor
-        )
-      );
-    }
-  );
+    # Rewrite
+    push @parts, [] if $e->type eq 'h1' || !@parts;
+    push @{$parts[-1]}, $text, $url->to_abs->fragment($anchor);
+    my $toc = $url->to_abs->fragment('toc');
+    $e->replace_content(
+      $self->link_to($text => $toc, class => 'mojoscroll', id => $anchor));
+  }
 
   # Try to find a title
   my $title = 'Perldoc';

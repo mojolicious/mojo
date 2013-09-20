@@ -50,6 +50,7 @@
         padding-top: 70px;
       }
       #perldoc > ul:first-of-type a { text-decoration: none }
+      #source { padding-bottom: 1em }
       #wrapperlicious {
         max-width: 1000px;
         margin: 0 auto;
@@ -63,6 +64,15 @@
     % end
     <div id="wrapperlicious">
       <div id="perldoc">
+        <div id="source">
+          % my $path;
+          % for my $part (split '/', $module) {
+            /
+            % $path .= "/$part";
+            %= link_to $part => url_for("/perldoc$path")
+          % }
+          (<%= link_to 'source' => url_for->query({source => 1}) %>)
+        </div>
         <h1><a id="toc">TABLE OF CONTENTS</a></h1>
         <ul>
           % for my $part (@$parts) {

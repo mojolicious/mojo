@@ -1,6 +1,7 @@
 
 4.40  2013-09-20
   - Added siblings method to Mojo::DOM.
+  - Added flatten method to Mojo::Collection.
   - Fixed smart whitespace trimming bug in Mojo::DOM.
   - Fixed table parsing bug in Mojo::DOM::HTML.
 

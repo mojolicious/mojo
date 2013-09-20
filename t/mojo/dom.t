@@ -1390,6 +1390,10 @@ is $dom->find('tbody > tr > .gamma')->[0]->text, '',            'no text';
 is $dom->find('tbody > tr > .gamma > a')->[0]->text, 'Gamma',     'right text';
 is $dom->find('tbody > tr > .alpha')->[1]->text,     'Alpha Two', 'right text';
 is $dom->find('tbody > tr > .gamma > a')->[1]->text, 'Gamma Two', 'right text';
+my @siblings = $dom->find('tr > td:nth-child(1)')->siblings(':nth-child(even)')
+  ->flatten->all_text->each;
+is_deeply \@siblings, ['Beta', 'Delta', 'Beta Two', 'Delta Two'],
+  'right results';
 
 # Real world list
 $dom = Mojo::DOM->new->parse(<<EOF);

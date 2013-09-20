@@ -50,16 +50,15 @@ sub first {
   return List::Util::first { $_ =~ $cb } @$self;
 }
 
+sub flatten { $_[0]->new(_flatten(@{$_[0]})) }
+
 sub grep {
   my ($self, $cb) = @_;
   return $self->new(grep { $cb->($_) } @$self) if ref $cb eq 'CODE';
   return $self->new(grep { $_ =~ $cb } @$self);
 }
 
-sub join {
-  my ($self, $expr) = @_;
-  return Mojo::ByteStream->new(join $expr, map({"$_"} @$self));
-}
+sub join { Mojo::ByteStream->new(join $_[1], map({"$_"} @{$_[0]})) }
 
 sub map {
   my ($self, $cb) = @_;
@@ -71,15 +70,9 @@ sub pluck {
   return $self->map(sub { $_->$method(@args) });
 }
 
-sub reverse {
-  my $self = shift;
-  return $self->new(reverse @$self);
-}
+sub reverse { $_[0]->new(reverse @{$_[0]}) }
 
-sub shuffle {
-  my $self = shift;
-  return $self->new(List::Util::shuffle @$self);
-}
+sub shuffle { $_[0]->new(List::Util::shuffle @{$_[0]}) }
 
 sub size { scalar @{$_[0]} }
 
@@ -100,6 +93,12 @@ sub uniq {
   my %seen;
   return $self->grep(sub { !$seen{$_}++ });
 }
+
+sub _flatten {
+  map { _ref($_) ? _flatten(@$_) : $_ } @_;
+}
+
+sub _ref { defined $_[0] && (ref $_[0] eq 'ARRAY' || $_[0]->isa(__PACKAGE__)) }
 
 1;
 
@@ -160,8 +159,9 @@ string.
   my @elements = $collection->each;
   $collection  = $collection->each(sub {...});
 
-Evaluate callback for each element in collection. The element will be the
-first argument passed to the callback and is also available as C<$_>.
+Evaluate callback for each element in collection or return all elements as a
+list if none has been provided. The element will be the first argument passed
+to the callback and is also available as C<$_>.
 
   $collection->each(sub {
     my ($e, $count) = @_;
@@ -180,6 +180,13 @@ callback returned true. The element will be the first argument passed to the
 callback and is also available as C<$_>.
 
   my $five = $collection->first(sub { $_ == 5 });
+
+=head2 flatten
+
+  my $new = $collection->flatten;
+
+Flatten nested collections/arrays recursively and create a new collection with
+all elements.
 
 =head2 grep
 

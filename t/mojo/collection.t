@@ -21,6 +21,12 @@ is_deeply [c(undef, 0, 1, '', 2, 3)->compact->each], [0, 1, 2, 3],
 is_deeply [c(3, 2, 1)->compact->each], [3, 2, 1], 'right result';
 is_deeply [c()->compact->each], [], 'right result';
 
+# flatten
+is_deeply [c(1, 2, [3, 4], 5, c(6, 7))->flatten->each], [1, 2, 3, 4, 5, 6, 7],
+  'right result';
+is_deeply [c(undef, 1, [2, [3, c(4, 5)]], undef, 6)->flatten->each],
+  [undef, 1, 2, 3, 4, 5, undef, 6], 'right result';
+
 # each
 $collection = c(3, 2, 1);
 is_deeply [$collection->each], [3, 2, 1], 'right elements';

@@ -190,9 +190,9 @@ sub start_line_size { length shift->build_start_line }
 
 sub text {
   my $self    = shift;
-  my $content = $self->body;
+  my $body    = $self->body;
   my $charset = $self->content->charset;
-  return $charset ? decode($charset, $content) // $content : $content;
+  return $charset ? decode($charset, $body) // $body : $body;
 }
 
 sub to_string {

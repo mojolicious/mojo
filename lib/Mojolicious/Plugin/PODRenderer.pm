@@ -8,9 +8,6 @@ use Mojo::Util qw(slurp url_escape);
 use Pod::Simple::HTML;
 use Pod::Simple::Search;
 
-# Paths to search
-my @PATHS = map { $_, "$_/pods" } @INC;
-
 sub register {
   my ($self, $app, $conf) = @_;
 
@@ -31,10 +28,9 @@ sub register {
 
   # Perldoc browser
   return if $conf->{no_perldoc};
-  my $defaults    = {module => 'Mojolicious/Guides', format => 'html'};
-  my $constraints = [module => qr/[^.]+/,            format => [qw(html txt)]];
+  my $defaults = {module => 'Mojolicious/Guides', format => 'html'};
   return $app->routes->any(
-    '/perldoc/:module' => $defaults => $constraints => \&_perldoc);
+    '/perldoc/:module' => $defaults => [module => qr/[^.]+/] => \&_perldoc);
 }
 
 sub _html {
@@ -94,7 +90,8 @@ sub _perldoc {
   # Find module or redirect to CPAN
   my $module = $self->param('module');
   $module =~ s!/!::!g;
-  my $path = Pod::Simple::Search->new->find($module, @PATHS);
+  my $path
+    = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
   return $self->redirect_to("http://metacpan.org/module/$module")
     unless $path && -r $path;
 

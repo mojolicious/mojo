@@ -1,5 +1,6 @@
 
 4.41  2013-09-22
+  - Fixed flatten to work with older versions of Perl. (jamadam)
 
 4.40  2013-09-21
   - Added text method to Mojo::Message.
@@ -8,7 +9,7 @@
   - Improved documentation browser with source links.
   - Fixed smart whitespace trimming bug in Mojo::DOM.
   - Fixed table parsing bug in Mojo::DOM::HTML.
-  - Fixed bug in Mojolicious::Types where txt MIME type did not specify a
+  - Fixed bug in Mojolicious::Types where the txt MIME type did not specify a
     charset.
 
 4.39  2013-09-17

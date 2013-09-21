@@ -7,6 +7,7 @@ use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::JSON;
 use Mojo::Message::Response;
+use Mojo::Util 'encode';
 
 # Common status codes
 my $res = Mojo::Message::Response->new;
@@ -934,6 +935,10 @@ is $res->body('hello!')->body, 'hello!', 'right content';
 $res->content(Mojo::Content::MultiPart->new);
 $res->body('hi!');
 is $res->body, 'hi!', 'right content';
+is $res->body(encode('UTF-8', '☃'))->text, encode('UTF-8', '☃'),
+  'right content';
+$res->headers->content_type('text/plain;charset=UTF-8');
+is $res->body(encode('UTF-8', '☃'))->text, '☃', 'right content';
 
 # Body exceeding memory limit (no upgrade)
 {

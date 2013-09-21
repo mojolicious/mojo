@@ -1,4 +1,6 @@
 
+4.41  2013-09-22
+
 4.40  2013-09-21
   - Added text method to Mojo::Message.
   - Added siblings method to Mojo::DOM.

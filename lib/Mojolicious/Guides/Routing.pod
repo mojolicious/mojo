@@ -465,6 +465,9 @@ L<Mojolicious::Controller/"url_for"> for this.
   # Generate URL "/foo/sebastian" for route "test"
   my $url = $self->url_for('test', name => 'sebastian');
 
+  # Generate URL "http://127.0.0.1:3000/foo/sebastian" for route "test"
+  my $url = $self->url_for('test', name => 'sebastian')->to_abs;
+
 Nameless routes get an automatically generated one assigned that is simply
 equal to the route itself without non-word characters.
 

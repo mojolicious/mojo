@@ -80,6 +80,9 @@ $t->get_ok('/perldoc/Mojolicious.txt')->status_is(200)
 $t->get_ok('/perldoc/Mojolicious' => {Accept => 'text/plain'})->status_is(200)
   ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/\$VERSION/);
 
+# Perldoc browser (unsupported format)
+$t->get_ok('/perldoc/Mojolicious.json')->status_is(204);
+
 done_testing();
 
 __DATA__

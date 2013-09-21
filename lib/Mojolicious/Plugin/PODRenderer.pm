@@ -96,7 +96,7 @@ sub _perldoc {
     unless $path && -r $path;
 
   my $src = slurp $path;
-  $self->respond_to(txt => {data => $src}, any => sub { _html($self, $src) });
+  $self->respond_to(txt => {data => $src}, html => sub { _html($self, $src) });
 }
 
 sub _pod_to_html {

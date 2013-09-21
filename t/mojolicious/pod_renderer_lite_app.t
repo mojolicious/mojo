@@ -63,7 +63,11 @@ $t->get_ok('/perldoc/Mojolicious')->status_is(200)
   ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
 
 # Perldoc browser (Mojolicious source)
-$t->get_ok('/perldoc/Mojolicious?source=1')->status_is(200)
+$t->get_ok('/perldoc/Mojolicious.txt')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/\$VERSION/);
+
+# Perldoc browser (negotiated Mojolicious source)
+$t->get_ok('/perldoc/Mojolicious' => {Accept => 'text/plain'})->status_is(200)
   ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/\$VERSION/);
 
 done_testing();

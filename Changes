@@ -1,5 +1,6 @@
 
 4.41  2013-09-22
+  - Improved documentation browser to be a little more RESTful.
   - Fixed flatten to work with older versions of Perl. (jamadam)
 
 4.40  2013-09-21

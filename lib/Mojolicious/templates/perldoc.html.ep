@@ -71,7 +71,7 @@
             % $path .= "/$part";
             %= link_to $part => url_for("/perldoc$path")
           % }
-          (<%= link_to 'source' => url_for->query({source => 1}) %>)
+          (<%= link_to 'source' => url_for("/perldoc$path.txt") %>)
         </div>
         <h1><a id="toc">TABLE OF CONTENTS</a></h1>
         <ul>

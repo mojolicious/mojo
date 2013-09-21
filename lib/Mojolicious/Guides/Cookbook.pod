@@ -293,7 +293,7 @@ deployment location of your application.
 
 From time to time you might want to reuse parts of L<Mojolicious> applications
 like configuration files, database connection or helpers for other scripts,
-with this little mock server you can just embed them.
+with this little L<Mojo::Server> based mock server you can just embed them.
 
   use Mojo::Server;
 
@@ -308,8 +308,9 @@ with this little mock server you can just embed them.
 
 =head2 Web server embedding
 
-You can also use the built-in web server to embed L<Mojolicious> applications
-into alien environments like foreign event loops.
+You can also use L<Mojo::IOLoop/"one_tick"> to embed the built-in web server
+L<Mojo::Server::Daemon> into alien environments like foreign event loops that
+for some reason can't just be integrated with a new reactor backend.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;

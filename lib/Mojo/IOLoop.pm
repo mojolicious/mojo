@@ -495,6 +495,11 @@ Check if event loop is running.
 Run event loop until an event occurs. Note that this method can recurse back
 into the reactor, so you need to be careful.
 
+  # Don't block longer than 0.5 seconds
+  my $id = Mojo::IOLoop->timer(0.5 => sub {});
+  Mojo::IOLoop->one_tick;
+  Mojo::IOLoop->remove($id);
+
 =head2 recurring
 
   my $id = Mojo::IOLoop->recurring(0.5 => sub {...});

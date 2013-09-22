@@ -184,7 +184,7 @@ sub to_rel {
   $path->parts([('..') x @base_parts, @parts]);
   $path->trailing_slash(1) if $self->path->trailing_slash;
 
-  return $rel;
+  return $path;
 }
 
 sub to_string {

@@ -566,7 +566,7 @@ Generate SHA1 checksum for bytes.
 
 =head2 slurp
 
-  my $content = slurp '/etc/passwd';
+  my $bytes = slurp '/etc/passwd';
 
 Read all data at once from file.
 
@@ -587,7 +587,7 @@ Split HTTP header value.
 
 =head2 spurt
 
-  $content = spurt $content, '/etc/passwd';
+  $bytes = spurt $bytes, '/etc/passwd';
 
 Write all data at once to file.
 

@@ -13,6 +13,7 @@ use Mojolicious::Routes;
 use Mojolicious::Sessions;
 use Mojolicious::Static;
 use Mojolicious::Types;
+use Mojolicious::Validator;
 use Scalar::Util qw(blessed weaken);
 use Time::HiRes 'gettimeofday';
 
@@ -36,9 +37,10 @@ has secret   => sub {
   # Default to moniker
   return $self->moniker;
 };
-has sessions => sub { Mojolicious::Sessions->new };
-has static   => sub { Mojolicious::Static->new };
-has types    => sub { Mojolicious::Types->new };
+has sessions  => sub { Mojolicious::Sessions->new };
+has static    => sub { Mojolicious::Static->new };
+has types     => sub { Mojolicious::Types->new };
+has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Top Hat';
 our $VERSION  = '4.42';
@@ -363,6 +365,14 @@ L<Mojolicious::Types> object.
 
   # Add custom MIME type
   $app->types->type(twt => 'text/tweet');
+
+=head2 validator
+
+  my $validator = $app->validator;
+  $app          = $app->validator(Mojolicious::Validator->new);
+
+Validate form data, defaults to a L<Mojolicious::Validator> object. Note that
+this attribute is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

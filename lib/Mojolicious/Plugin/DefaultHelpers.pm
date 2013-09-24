@@ -33,6 +33,7 @@ sub register {
   $app->helper(include       => \&_include);
   $app->helper(ua            => sub { shift->app->ua });
   $app->helper(url_with      => \&_url_with);
+  $app->helper(validation    => \&_validation);
 }
 
 sub _content {
@@ -86,6 +87,12 @@ sub _include {
 sub _url_with {
   my $self = shift;
   return $self->url_for(@_)->query($self->req->url->query->clone);
+}
+
+sub _validation {
+  my $self = shift;
+  return $self->stash->{'mojo.validation'}
+    ||= $self->app->validator->validation->input($self->req->params->to_hash);
 }
 
 1;
@@ -250,6 +257,13 @@ Does the same as C<url_for>, but inherits query parameters from the current
 request.
 
   %= url_with->query([page => 2])
+
+=head2 validation
+
+  %= validation
+
+Get L<Mojolicious::Validator::Validation> object for current request. Note
+that this helper is EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

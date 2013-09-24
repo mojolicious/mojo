@@ -279,7 +279,8 @@ determine if template files should be decoded before processing.
   my $handlers = $renderer->handlers;
   $renderer    = $renderer->handlers({epl => sub {...}});
 
-Registered handlers.
+Registered handlers, by default only C<data>, C<text> and C<json> are already
+defined.
 
 =head2 helpers
 

@@ -36,8 +36,8 @@ ok !$validation->has_errors, 'no errors';
 ok !$validation->required('does_not_exist')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
 ok $validation->has_errors, 'has errors';
-is_deeply [$validation->errors('does_not_exist')], ['Value is required.'],
-  'right error';
+is_deeply [$validation->errors('does_not_exist')->each],
+  ['Value is required.'], 'right error';
 
 # Range
 $validation = $t->app->validation;
@@ -48,36 +48,41 @@ ok !$validation->has_errors, 'no errors';
 ok !$validation->required('baz')->range(1, 3)->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_errors, 'has errors';
-is_deeply [$validation->errors('baz')],
+is_deeply [$validation->errors('baz')->each],
   ['Value needs to be 1-3 characters long.'], 'right error';
 ok !$validation->required('yada')->range(5, 10)->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_errors, 'has errors';
-is_deeply [$validation->errors('yada')],
+is_deeply [$validation->errors('yada')->each],
   ['Value needs to be 5-10 characters long.'], 'right error';
 
 # Custom errors
 $validation = $t->app->validation;
+ok !$validation->has_errors('bar'), 'no errors';
 $validation->input({foo => 'bar', yada => 'yada'});
 ok !$validation->error('Bar is required.')->required('bar')->is_valid,
   'not valid';
 is_deeply $validation->output, {}, 'right result';
 ok $validation->has_errors, 'has errors';
-is_deeply [$validation->errors('bar')], ['Bar is required.'], 'right error';
+is_deeply [$validation->errors('bar')->each], ['Bar is required.'],
+  'right error';
 ok !$validation->required('baz')->is_valid, 'not valid';
 ok $validation->has_errors, 'has errors';
-is_deeply [$validation->errors('baz')], ['Value is required.'], 'right error';
+is_deeply [$validation->errors('baz')->each], ['Value is required.'],
+  'right error';
 ok !$validation->required('foo')->error('Foo is too small.')->range(25, 100)
   ->is_valid, 'not valid';
 ok $validation->has_errors, 'has errors';
-is_deeply [$validation->errors('foo')], ['Foo is too small.'], 'right error';
+is_deeply [$validation->errors('foo')->each], ['Foo is too small.'],
+  'right error';
 is $validation->topic, 'foo', 'right topic';
 ok !$validation->error('Failed!')->required('yada')->range(25, 100)->is_valid,
   'not valid';
 ok $validation->has_errors, 'has errors';
-is_deeply [$validation->errors('yada')],
+is_deeply [$validation->errors('yada')->each],
   ['Value needs to be 25-100 characters long.'], 'right error';
 is $validation->topic, 'yada', 'right topic';
+ok $validation->has_errors('bar'), 'has errors';
 
 # Successful validation
 $t->get_ok('/?name=sri')->status_is(200)->content_is("\n");
@@ -91,4 +96,4 @@ done_testing();
 __DATA__
 
 @@ index.html.ep
-%= $_ for validation->errors('name')
+%= $_ for validation->errors('name')->each

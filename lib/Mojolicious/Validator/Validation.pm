@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Scalar::Util 'blessed';
+use Mojo::Collection;
 
 has [qw(input output)] => sub { {} };
 has [qw(topic validator)];
@@ -42,9 +43,11 @@ sub error {
   return $self;
 }
 
-sub errors { @{shift->{errors}{shift()} // []} }
+sub errors { Mojo::Collection->new(@{shift->{errors}{shift()} // []}) }
 
-sub has_errors { !!keys %{shift->{errors}} }
+sub has_errors {
+  $_[1] ? exists $_[0]{errors}{$_[1]} : !!keys %{$_[0]{errors}};
+}
 
 sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 
@@ -167,22 +170,25 @@ Set custom error message for next validation check.
 
 =head2 errors
 
-  my @messages = $validation->errors('foo');
+  my $collection = $validation->errors('foo');
 
-Get error messages for failed validation checks.
+Return L<Mojo::Collection> object containing all error messages for failed
+validation checks.
 
 =head2 has_errors
 
   my $success = $validation->has_errors;
+  my $success = $validation->has_errors('foo');
 
-Check if this validation has error messages.
+Check if validation resulted in errors, defaults to checking all fields.
 
 =head2 is_valid
 
   my $success = $validation->is_valid;
   my $success = $validation->is_valid('foo');
 
-Check if validation was successful, defaults to checking the current C<topic>.
+Check if validation was successful and field has a value, defaults to checking
+the current C<topic>.
 
 =head2 optional
 

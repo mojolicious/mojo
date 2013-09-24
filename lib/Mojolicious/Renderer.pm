@@ -13,22 +13,21 @@ has classes => sub { ['main'] };
 has default_format => 'html';
 has 'default_handler';
 has encoding => 'UTF-8';
-has [qw(handlers helpers)] => sub { {} };
-has paths => sub { [] };
+has handlers => sub {
+  {
+    data => sub { ${$_[2]} = $_[3]{data} },
+    text => sub { ${$_[2]} = $_[3]{text} },
+    json => sub { ${$_[2]} = Mojo::JSON->new->encode($_[3]{json}) }
+  };
+};
+has helpers => sub { {} };
+has paths   => sub { [] };
 
 # Bundled templates
 my $HOME = Mojo::Home->new;
 $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
-
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->add_handler(data => sub { ${$_[2]} = $_[3]{data} });
-  $self->add_handler(text => sub { ${$_[2]} = $_[3]{text} });
-  return $self->add_handler(
-    json => sub { ${$_[2]} = Mojo::JSON->new->encode($_[3]{json}) });
-}
 
 sub add_handler { shift->_add(handlers => @_) }
 sub add_helper  { shift->_add(helpers  => @_) }
@@ -303,13 +302,6 @@ Directories to look for templates in, first one has the highest precedence.
 
 L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
-
-=head2 new
-
-  my $renderer = Mojolicious::Renderer->new;
-
-Construct a new renderer and register C<data>, C<json> as well as C<text>
-handlers.
 
 =head2 add_handler
 

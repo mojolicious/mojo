@@ -3,10 +3,10 @@ use Mojo::Base -base;
 
 use Mojolicious::Validator::Validation;
 
-has checks => sub { {range => \&_range} };
+has checks => sub { {size => \&_size} };
 has errors => sub {
   {
-    range    => sub {qq{Value needs to be $_[3]-$_[4] characters long.}},
+    size     => sub {qq{Value needs to be $_[3]-$_[4] characters long.}},
     required => sub {qq{Value is required.}}
   };
 };
@@ -24,7 +24,7 @@ sub _add {
   return $self;
 }
 
-sub _range {
+sub _size {
   my ($validation, $name, $value, $min, $max) = @_;
   my $len = length $value;
   return $len >= $min && $len <= $max;
@@ -56,16 +56,16 @@ L<Mojolicious::Validator> implements the following attributes.
 =head2 checks
 
   my $checks = $validator->checks;
-  $validator = $validator->checks({range => sub {...}});
+  $validator = $validator->checks({size => sub {...}});
 
-Registered checks, by default only C<range> is already defined.
+Registered checks, by default only C<size> is already defined.
 
 =head2 errors
 
   my $errors = $validator->errors;
-  $validator = $validator->errors({range => sub {...}});
+  $validator = $validator->errors({size => sub {...}});
 
-Registered error generators, by default only C<range> and C<required> are
+Registered error generators, by default only C<required> and C<size> are
 already defined.
 
 =head1 METHODS
@@ -75,13 +75,13 @@ implements the following new ones.
 
 =head2 add_check
 
-  $validator = $validator->add_check(range => sub {...});
+  $validator = $validator->add_check(size => sub {...});
 
 Register a new check.
 
 =head2 add_error
 
-  $validator = $validator->add_error(range => sub {...});
+  $validator = $validator->add_error(size => sub {...});
 
 Register a new error generator.
 

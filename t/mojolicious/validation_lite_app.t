@@ -10,8 +10,11 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 get '/' => sub {
-  my $self = shift;
-  $self->validation->required('name')->range(2, 5);
+  my $self       = shift;
+  my $validation = $self->validation;
+  $validation->required('foo')->size(2, 5);
+  $validation->optional('bar')->size(2, 5);
+  $validation->optional('baz')->size(2, 5);
 } => 'index';
 
 my $t = Test::Mojo->new;
@@ -39,18 +42,18 @@ ok $validation->has_errors, 'has errors';
 is_deeply [$validation->errors('does_not_exist')->each],
   ['Value is required.'], 'right error';
 
-# Range
+# Size
 $validation = $t->app->validation;
 $validation->input({foo => 'bar', baz => 'yada', yada => 'yada'});
-ok $validation->required('foo')->range(1, 3)->is_valid, 'valid';
+ok $validation->required('foo')->size(1, 3)->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok !$validation->has_errors, 'no errors';
-ok !$validation->required('baz')->range(1, 3)->is_valid, 'not valid';
+ok !$validation->required('baz')->size(1, 3)->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_errors, 'has errors';
 is_deeply [$validation->errors('baz')->each],
   ['Value needs to be 1-3 characters long.'], 'right error';
-ok !$validation->required('yada')->range(5, 10)->is_valid, 'not valid';
+ok !$validation->required('yada')->size(5, 10)->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_errors, 'has errors';
 is_deeply [$validation->errors('yada')->each],
@@ -70,13 +73,13 @@ ok !$validation->required('baz')->is_valid, 'not valid';
 ok $validation->has_errors, 'has errors';
 is_deeply [$validation->errors('baz')->each], ['Value is required.'],
   'right error';
-ok !$validation->required('foo')->error('Foo is too small.')->range(25, 100)
+ok !$validation->required('foo')->error('Foo is too small.')->size(25, 100)
   ->is_valid, 'not valid';
 ok $validation->has_errors, 'has errors';
 is_deeply [$validation->errors('foo')->each], ['Foo is too small.'],
   'right error';
 is $validation->topic, 'foo', 'right topic';
-ok !$validation->error('Failed!')->required('yada')->range(25, 100)->is_valid,
+ok !$validation->error('Failed!')->required('yada')->size(25, 100)->is_valid,
   'not valid';
 ok $validation->has_errors, 'has errors';
 is_deeply [$validation->errors('yada')->each],
@@ -85,15 +88,25 @@ is $validation->topic, 'yada', 'right topic';
 ok $validation->has_errors('bar'), 'has errors';
 
 # Successful validation
-$t->get_ok('/?name=sri')->status_is(200)->content_is("\n");
+$t->get_ok('/?foo=ok')->status_is(200)->element_exists('form > input')
+  ->element_exists('form > textarea')->element_exists('form > select');
 
 # Failed validation
-$t->get_ok('/?name=sebastian')->status_is(200)
-  ->content_is("Value needs to be 2-5 characters long.\n");
+$t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long')->status_is(200)
+  ->element_exists_not('form > input')
+  ->element_exists('form > div.fields_with_errors > input')
+  ->element_exists_not('form > textarea')
+  ->element_exists('form > div.fields_with_errors > textarea')
+  ->element_exists_not('form > select')
+  ->element_exists('form > div.fields_with_errors > select');
 
 done_testing();
 
 __DATA__
 
 @@ index.html.ep
-%= $_ for validation->errors('name')->each
+%= form_for index => begin
+  %= text_field 'foo'
+  %= text_area 'bar'
+  %= select_field baz => [qw(yada yada)]
+% end

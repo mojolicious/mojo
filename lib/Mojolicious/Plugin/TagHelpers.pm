@@ -82,12 +82,9 @@ sub _input {
 
     # Others
     else { $attrs{value} = $values[0] }
-
-    return _tag('input', name => $name, %attrs);
   }
 
-  # Empty tag
-  return _tag('input', name => $name, %attrs);
+  return _wrap($self, $name, _tag('input', name => $name, %attrs));
 }
 
 sub _javascript {
@@ -162,7 +159,7 @@ sub _select_field {
     return $parts;
   };
 
-  return _tag('select', name => $name, %attrs, $optgroup);
+  return _wrap($self, $name, _tag('select', name => $name, %attrs, $optgroup));
 }
 
 sub _stylesheet {
@@ -227,7 +224,13 @@ sub _text_area {
     $cb = sub { xml_escape $content }
   }
 
-  return _tag('textarea', name => $name, @_, $cb);
+  return _wrap($self, $name, _tag('textarea', name => $name, @_, $cb));
+}
+
+sub _wrap {
+  my ($self, $name, $html) = @_;
+  return $html unless $self->validation->has_errors($name);
+  return _tag('div', class => 'fields_with_errors', sub {$html});
 }
 
 1;

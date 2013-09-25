@@ -8,7 +8,7 @@ sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  for my $name (qw(app flash param stash session url_for)) {
+  for my $name (qw(app flash param stash session url_for validation)) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -33,7 +33,6 @@ sub register {
   $app->helper(include       => \&_include);
   $app->helper(ua            => sub { shift->app->ua });
   $app->helper(url_with      => \&_url_with);
-  $app->helper(validation    => \&_validation);
 }
 
 sub _content {
@@ -87,12 +86,6 @@ sub _include {
 sub _url_with {
   my $self = shift;
   return $self->url_for(@_)->query($self->req->url->query->clone);
-}
-
-sub _validation {
-  my $self = shift;
-  return $self->stash->{'mojo.validation'}
-    ||= $self->app->validator->validation->input($self->req->params->to_hash);
 }
 
 1;
@@ -262,8 +255,8 @@ request.
 
   %= validation
 
-Get L<Mojolicious::Validator::Validation> object for current request. Note
-that this helper is EXPERIMENTAL and might change without warning!
+Alias for L<Mojolicious::Controller/"validation">. Note that this helper is
+EXPERIMENTAL and might change without warning!
 
 =head1 METHODS
 

@@ -415,6 +415,12 @@ sub url_for {
   return $url;
 }
 
+sub validation {
+  my $self = shift;
+  return $self->stash->{'mojo.validation'}
+    ||= $self->app->validator->validation->input($self->req->params->to_hash);
+}
+
 sub write {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
@@ -894,6 +900,13 @@ to inherit query parameters from the current request.
 
   # "/list?q=mojo&page=2" if current request was for "/list?q=mojo&page=1"
   $c->url_with->query([page => 2]);
+
+=head2 validation
+
+  my $validation = $c->validation;
+
+Get L<Mojolicious::Validator::Validation> object for current request. Note
+that this method is EXPERIMENTAL and might change without warning!
 
 =head2 write
 

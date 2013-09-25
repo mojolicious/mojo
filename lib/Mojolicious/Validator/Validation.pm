@@ -158,7 +158,7 @@ and implements the following new ones.
 
 =head2 check
 
-  $validation = $validation->check('range', 2, 7);
+  $validation = $validation->check('size', 2, 7);
 
 Perform validation check.
 

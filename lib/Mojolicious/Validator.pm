@@ -6,8 +6,8 @@ use Mojolicious::Validator::Validation;
 has checks => sub { {size => \&_size} };
 has errors => sub {
   {
-    size     => sub {qq{Value needs to be $_[3]-$_[4] characters long.}},
-    required => sub {qq{Value is required.}}
+    required => sub {qq{Value is required.}},
+    size     => sub {qq{Value needs to be $_[3]-$_[4] characters long.}}
   };
 };
 

@@ -29,16 +29,16 @@ ok $validation->required('foo')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 is $validation->param('foo'), 'bar', 'right value';
 is_deeply [$validation->param], ['foo'], 'right names';
-ok !$validation->has_error, 'no errors';
+ok !$validation->has_error, 'no error';
 ok $validation->optional('baz')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
 is $validation->param('baz'), 'yada', 'right value';
 is_deeply [$validation->param], [qw(baz foo)], 'right names';
 is_deeply [$validation->param([qw(foo baz)])], [qw(bar yada)], 'right values';
-ok !$validation->has_error, 'no errors';
+ok !$validation->has_error, 'no error';
 ok !$validation->optional('does_not_exist')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
-ok !$validation->has_error, 'no errors';
+ok !$validation->has_error, 'no error';
 ok !$validation->required('does_not_exist')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar', baz => 'yada'}, 'right result';
 ok $validation->has_error, 'has error';
@@ -50,7 +50,7 @@ $validation = $t->app->validation;
 $validation->input({foo => 'bar', baz => 'yada', yada => 'yada'});
 ok $validation->required('foo')->size(1, 3)->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
-ok !$validation->has_error, 'no errors';
+ok !$validation->has_error, 'no error';
 ok !$validation->required('baz')->size(1, 3)->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
@@ -64,7 +64,7 @@ is_deeply [$validation->errors('yada')->each],
 
 # Custom errors
 $validation = $t->app->validation;
-ok !$validation->has_error('bar'), 'no errors';
+ok !$validation->has_error('bar'), 'no error';
 $validation->input({foo => 'bar', yada => 'yada'});
 ok !$validation->error('Bar is required.')->required('bar')->is_valid,
   'not valid';

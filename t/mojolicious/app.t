@@ -121,6 +121,7 @@ ok $t->app->routes->is_hidden('stash'),            'is hidden';
 ok $t->app->routes->is_hidden('tap'),              'is hidden';
 ok $t->app->routes->is_hidden('tx'),               'is hidden';
 ok $t->app->routes->is_hidden('url_for'),          'is hidden';
+ok $t->app->routes->is_hidden('validation'),       'is hidden';
 ok $t->app->routes->is_hidden('write'),            'is hidden';
 ok $t->app->routes->is_hidden('write_chunk'),      'is hidden';
 

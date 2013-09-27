@@ -9,16 +9,20 @@ use Test::More;
 use Mojolicious::Lite;
 use Test::Mojo;
 
+# Custom check
+app->validator->add_check(two => sub { length $_[2] == 2 });
+app->validator->add_error(two => sub {'My error.'});
+
 get '/' => sub {
   my $self = shift;
 
   my $validation = $self->validation;
   return $self->render unless $validation->has_data;
 
-  $validation->required('foo')->size(2, 5);
-  $validation->optional('bar')->size(2, 5);
-  $validation->optional('baz')->size(2, 5);
-  $validation->optional('yada')->size(2, 5);
+  $validation->required('foo')->two;
+  $validation->optional('bar')->two;
+  $validation->optional('baz')->two;
+  $validation->optional('yada')->two;
 } => 'index';
 
 my $t = Test::Mojo->new;
@@ -146,7 +150,8 @@ $t->get_ok('/?foo=ok')->status_is(200)
 
 # Failed validation
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
-  ->status_is(200)->element_exists_not('form > input[type="text"]')
+  ->text_is('div:root' => 'My error.')->status_is(200)
+  ->element_exists_not('form > input[type="text"]')
   ->element_exists('form > div.fields_with_errors > input[type="text"]')
   ->element_exists_not('form > textarea')
   ->element_exists('form > div.fields_with_errors > textarea')
@@ -160,6 +165,9 @@ done_testing();
 __DATA__
 
 @@ index.html.ep
+% if (validation->has_error('foo')) {
+  <div><%= validation->errors('foo') %></div>
+% }
 %= form_for index => begin
   %= text_field 'foo'
   %= text_area 'bar'

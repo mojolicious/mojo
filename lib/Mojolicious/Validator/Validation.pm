@@ -28,12 +28,16 @@ sub check {
   my $err = delete $self->{error};
   return $self unless $self->is_valid;
 
-  my $cb   = $self->validator->checks->{$check};
-  my $name = $self->topic;
-  return $self if $self->_check($name, $self->input->{$name}, $cb, @_);
+  my $cb    = $self->validator->checks->{$check};
+  my $name  = $self->topic;
+  my $input = $self->input->{$name};
+  for my $value (ref $input eq 'ARRAY' ? @$input : $input) {
+    next if $self->$cb($name, $value, @_);
+    delete $self->output->{$name};
+    $self->_error($check, $err, $name, $value, @_);
+    last;
+  }
 
-  delete $self->output->{$name};
-  $self->_error($check, $err, $name, delete $self->input->{$name}, @_);
   return $self;
 }
 
@@ -53,9 +57,12 @@ sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 
 sub optional {
   my ($self, $name) = @_;
+
   my $input = $self->input->{$name};
+  my @input = ref $input eq 'ARRAY' ? @$input : $input;
   $self->output->{$name} = $input
-    if $self->_check($name, $input, sub { defined $_[2] && length $_[2] });
+    unless grep { !defined($_) || !length($_) } @input;
+
   return $self->topic($name);
 }
 
@@ -77,25 +84,15 @@ sub required {
   my ($self, $name) = @_;
   $self->optional($name);
   my $err = delete $self->{error};
-  $self->_error('required', $err, $name, $self->input->{$name})
-    unless $self->is_valid;
+  $self->_error('required', $err, $name) unless $self->is_valid;
   return $self;
 }
 
-sub _check {
-  my ($self, $name, $input, $cb) = (shift, shift, shift, shift);
-  for my $value (ref $input eq 'ARRAY' ? @$input : $input) {
-    return undef unless $self->$cb($name, $value, @_);
-  }
-  return 1;
-}
-
 sub _error {
-  my ($self, $check, $err, $name, $input)
+  my ($self, $check, $err, $name, $value)
     = (shift, shift, shift, shift, shift);
   my $cb = $self->validator->errors->{$check} // sub {'Value is not valid.'};
-  push @{$self->{errors}{$name}}, $err // $self->$cb($name, $_, @_)
-    for ref $input eq 'ARRAY' ? @$input : $input;
+  push @{$self->{errors}{$name}}, $err // $self->$cb($name, $value, @_);
 }
 
 1;

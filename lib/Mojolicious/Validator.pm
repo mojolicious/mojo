@@ -3,8 +3,9 @@ use Mojo::Base -base;
 
 use Mojolicious::Validator::Validation;
 
-has checks =>
-  sub { {equal_to => \&_equal_to, regex => \&_regex, size => \&_size} };
+has checks => sub {
+  {equal_to => \&_equal_to, in => \&_in, regex => \&_regex, size => \&_size};
+};
 has errors => sub {
   {
     equal_to => sub {'Values are not equal.'},
@@ -30,6 +31,12 @@ sub _equal_to {
   my ($validation, $name, $value, $to) = @_;
   return undef unless defined(my $other = $validation->input->{$to});
   return $value eq $other;
+}
+
+sub _in {
+  my ($validation, $name, $value) = (shift, shift, shift);
+  $value eq $_ && return 1 for @_;
+  return undef;
 }
 
 sub _regex { $_[2] =~ $_[3] }
@@ -68,8 +75,8 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered checks, by default only C<equal_to>, C<regex> and C<size> are
-already defined.
+Registered checks, by default only C<equal_to>, C<in>, C<regex> and C<size>
+are already defined.
 
 =head2 errors
 

@@ -63,6 +63,18 @@ ok $validation->has_error, 'has error';
 is_deeply [$validation->errors('yada')->each], ['Values are not equal.'],
   'right error';
 
+# In
+$validation = $t->app->validation;
+$validation->input({foo => [qw(bar whatever)], baz => [qw(yada ohoh)]});
+ok $validation->required('foo')->in(qw(23 bar whatever))->is_valid, 'valid';
+is_deeply $validation->output, {foo => [qw(bar whatever)]}, 'right result';
+ok !$validation->has_error, 'no error';
+ok !$validation->required('baz')->in(qw(yada whatever))->is_valid, 'not valid';
+is_deeply $validation->output, {foo => [qw(bar whatever)]}, 'right result';
+ok $validation->has_error, 'has error';
+is_deeply [$validation->errors('baz')->each], ['Value is not valid.'],
+  'right error';
+
 # Regex
 $validation = $t->app->validation;
 $validation->input({foo => 'bar', baz => 'yada'});

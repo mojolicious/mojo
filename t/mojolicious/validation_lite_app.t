@@ -12,7 +12,7 @@ use Test::Mojo;
 get '/' => sub {
   my $self       = shift;
   my $validation = $self->validation;
-  return $self->render unless $validation->is_submitted;
+  return $self->render unless $validation->has_data;
   $validation->required('foo')->size(2, 5);
   $validation->optional('bar')->size(2, 5);
   $validation->optional('baz')->size(2, 5);

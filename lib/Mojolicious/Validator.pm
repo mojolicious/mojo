@@ -3,10 +3,12 @@ use Mojo::Base -base;
 
 use Mojolicious::Validator::Validation;
 
-has checks => sub { {regex => \&_regex, size => \&_size} };
+has checks =>
+  sub { {equal_to => \&_equal_to, regex => \&_regex, size => \&_size} };
 has errors => sub {
   {
-    required => sub {qq{Value is required.}},
+    equal_to => sub {'Values are not equal.'},
+    required => sub {'Value is required.'},
     size     => sub {qq{Value needs to be $_[3]-$_[4] characters long.}}
   };
 };
@@ -22,6 +24,12 @@ sub _add {
   my ($self, $attr, $name, $cb) = @_;
   $self->$attr->{$name} = $cb;
   return $self;
+}
+
+sub _equal_to {
+  my ($validation, $name, $value, $to) = @_;
+  return undef unless defined(my $other = $validation->input->{$to});
+  return $value eq $other;
 }
 
 sub _regex { $_[2] =~ $_[3] }
@@ -60,15 +68,16 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered checks, by default only C<regex> and C<size> are already defined.
+Registered checks, by default only C<equal_to>, C<regex> and C<size> are
+already defined.
 
 =head2 errors
 
   my $errors = $validator->errors;
   $validator = $validator->errors({size => sub {...}});
 
-Registered error generators, by default only C<required> and C<size> are
-already defined.
+Registered error generators, by default only C<equal_to>, C<required> and
+C<size> are already defined.
 
 =head1 METHODS
 

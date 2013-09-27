@@ -45,6 +45,19 @@ ok $validation->has_error, 'has error';
 is_deeply [$validation->errors('does_not_exist')->each],
   ['Value is required.'], 'right error';
 
+# Equal to
+$validation = $t->app->validation;
+$validation->input({foo => 'bar', baz => 'bar', yada => 'yada'});
+ok $validation->optional('foo')->optional('baz')->equal_to('foo')->is_valid,
+  'valid';
+is_deeply $validation->output, {foo => 'bar', baz => 'bar'}, 'right result';
+ok !$validation->has_error, 'no error';
+ok !$validation->optional('yada')->equal_to('foo')->is_valid, 'not valid';
+is_deeply $validation->output, {foo => 'bar', baz => 'bar'}, 'right result';
+ok $validation->has_error, 'has error';
+is_deeply [$validation->errors('yada')->each], ['Values are not equal.'],
+  'right error';
+
 # Regex
 $validation = $t->app->validation;
 $validation->input({foo => 'bar', baz => 'yada'});

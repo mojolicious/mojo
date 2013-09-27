@@ -12,6 +12,7 @@ use Test::Mojo;
 get '/' => sub {
   my $self       = shift;
   my $validation = $self->validation;
+  return $self->render unless $validation->is_submitted;
   $validation->required('foo')->size(2, 5);
   $validation->optional('bar')->size(2, 5);
   $validation->optional('baz')->size(2, 5);
@@ -86,6 +87,10 @@ is_deeply [$validation->errors('yada')->each],
   ['Value needs to be 25-100 characters long.'], 'right error';
 is $validation->topic, 'yada', 'right topic';
 ok $validation->has_errors('bar'), 'has errors';
+
+# No validation
+$t->get_ok('/')->status_is(200)->element_exists('form > input')
+  ->element_exists('form > textarea')->element_exists('form > select');
 
 # Successful validation
 $t->get_ok('/?foo=ok')->status_is(200)->element_exists('form > input')

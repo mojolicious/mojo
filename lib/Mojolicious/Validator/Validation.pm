@@ -49,6 +49,8 @@ sub has_errors {
   $_[1] ? exists $_[0]{errors}{$_[1]} : !!keys %{$_[0]{errors}};
 }
 
+sub is_submitted { !!keys %{shift->input} }
+
 sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 
 sub optional {
@@ -181,6 +183,12 @@ validation checks.
   my $success = $validation->has_errors('foo');
 
 Check if validation resulted in errors, defaults to checking all fields.
+
+=head2 is_submitted
+
+  my $success = $validation->is_submitted;
+
+Check if data has been submitted for validation.
 
 =head2 is_valid
 

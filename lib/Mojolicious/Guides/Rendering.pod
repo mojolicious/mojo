@@ -674,7 +674,7 @@ values and wrap fields that failed validation with C<div> blocks, to make
 styling with CSS easier.
 
   <div class="fields_with_errors">
-    <input type="text" name="number" value="hello" />
+    <input type="text" name="user" value="sri" />
   </div>
 
 For a full list of available checks see also

@@ -48,12 +48,17 @@ is_deeply [$validation->errors('does_not_exist')->each],
 # Equal to
 $validation = $t->app->validation;
 $validation->input({foo => 'bar', baz => 'bar', yada => 'yada'});
-ok $validation->optional('foo')->optional('baz')->equal_to('foo')->is_valid,
-  'valid';
-is_deeply $validation->output, {foo => 'bar', baz => 'bar'}, 'right result';
+ok $validation->optional('foo')->equal_to('baz')->is_valid, 'valid';
+is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok !$validation->has_error, 'no error';
+ok !$validation->optional('baz')->equal_to('does_not_exist')->is_valid,
+  'not valid';
+is_deeply $validation->output, {foo => 'bar'}, 'right result';
+ok $validation->has_error, 'has error';
+is_deeply [$validation->errors('baz')->each], ['Values are not equal.'],
+  'right error';
 ok !$validation->optional('yada')->equal_to('foo')->is_valid, 'not valid';
-is_deeply $validation->output, {foo => 'bar', baz => 'bar'}, 'right result';
+is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply [$validation->errors('yada')->each], ['Values are not equal.'],
   'right error';

@@ -9,6 +9,7 @@ has checks => sub {
 has errors => sub {
   {
     equal_to => sub {'Values are not equal.'},
+    in       => sub {'Value is not allowed.'},
     required => sub {'Value is required.'},
     size     => sub {qq{Value needs to be $_[3]-$_[4] characters long.}}
   };
@@ -83,8 +84,8 @@ are already defined.
   my $errors = $validator->errors;
   $validator = $validator->errors({size => sub {...}});
 
-Registered error generators, by default only C<equal_to>, C<required> and
-C<size> are already defined.
+Registered error generators, by default only C<equal_to>, C<in>, C<required>
+and C<size> are already defined.
 
 =head1 METHODS
 

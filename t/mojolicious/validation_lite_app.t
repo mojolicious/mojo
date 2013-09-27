@@ -72,7 +72,7 @@ ok !$validation->has_error, 'no error';
 ok !$validation->required('baz')->in(qw(yada whatever))->is_valid, 'not valid';
 is_deeply $validation->output, {foo => [qw(bar whatever)]}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply [$validation->errors('baz')->each], ['Value is not valid.'],
+is_deeply [$validation->errors('baz')->each], ['Value is not allowed.'],
   'right error';
 
 # Regex

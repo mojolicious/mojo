@@ -138,19 +138,20 @@ is $validation->topic, 'yada', 'right topic';
 ok $validation->has_error('bar'), 'has error';
 
 # No validation
-$t->get_ok('/')->status_is(200)->element_exists('form > input[type="text"]')
+$t->get_ok('/')->status_is(200)->element_exists_not('div:root')
+  ->element_exists('form > input[type="text"]')
   ->element_exists('form > textarea')->element_exists('form > select')
   ->element_exists('form > input[type="password"]');
 
 # Successful validation
-$t->get_ok('/?foo=ok')->status_is(200)
+$t->get_ok('/?foo=ok')->status_is(200)->element_exists_not('div:root')
   ->element_exists('form > input[type="password"]')
   ->element_exists('form > textarea')->element_exists('form > select')
   ->element_exists('form > input[type="password"]');
 
 # Failed validation
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
-  ->text_is('div:root' => 'My error.')->status_is(200)
+  ->status_is(200)->text_is('div:root' => 'My error.')
   ->element_exists_not('form > input[type="text"]')
   ->element_exists('form > div.fields_with_errors > input[type="text"]')
   ->element_exists_not('form > textarea')

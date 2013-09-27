@@ -114,7 +114,8 @@ Mojolicious::Validator::Validation - Perform validations
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Validator::Validation> performs validations.
+L<Mojolicious::Validator::Validation> performs validations. Note that this
+module is EXPERIMENTAL and might change without warning!
 
 =head1 ATTRIBUTES
 
@@ -213,6 +214,16 @@ Access validated parameters.
   $validation = $validation->required('foo');
 
 Change validation C<topic> and make sure a value is present.
+
+=head1 CHECKS
+
+In addition to the methods above, you can also call checks provided by
+L<Mojolicious::Validator> on L<Mojolicious::Validator::Validation> objects,
+similar to C<check>.
+
+  $validation->required('foo')->size(2, 5)->regex(qr/^[A-Z]/);
+  $validation->optional('bar')->equal_to('foo');
+  $validation->optional('baz')->in(qw(test 123));
 
 =head1 SEE ALSO
 

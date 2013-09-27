@@ -614,6 +614,72 @@ template with named blocks that child templates can override.
 
 This chain could go on and on to allow a very high level of template reuse.
 
+=head2 Form validation
+
+You can use L<Mojolicious::Controller/"validation"> to validate GET/POST
+parameters submitted to your application. All unknown fields will be ignored
+by default, so you have to decide which should be required or optional before
+you can perform checks on their values.
+
+  use Mojolicious::Lite;
+
+  get '/' => sub {
+    my $self = shift;
+
+    # Check if parameters have been submitted
+    my $validation = $self->validation;
+    return $self->render unless $validation->has_data;
+
+    # Validate parameters
+    $validation->required('user')->regex(qr/^[e-t]$/);
+    $validation->optional('pass')->size(7, 500);
+    $validation->optional('pass_again')->equal_to('pass');
+
+    # Render confirmation if validation was successful
+    $self->render('thanks') unless $validation->has_error;
+  } => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head>
+      %= stylesheet begin
+        .fields_with_errors { display: inline }
+        .fields_with_errors input { background-color: #ffbbbb }
+      % end
+    </head>
+    <body>
+      %= form_for index => begin
+        <p>Username (required, can only contain the characters e-t)</p>
+        %= text_field 'user'
+        %= submit_button
+        <p>Password (optional, needs to be 7-500 characters long)</p>
+        %= password_field 'pass'
+        <p>Password again (needs to be equal to the value above)</p>
+        %= password_field 'pass_again'
+      % end
+    </html>
+  </html>
+
+  @@ thanks.html.ep
+  <!DOCTYPE html>
+  <html><body>Thank you <%= validation->param('user') %>.</body></html>
+
+Form elements generated with tag helpers from
+L<Mojolicious::Plugin::TagHelpers> will automatically remember their previous
+values and wrap fields that failed validation with C<div> blocks, to make
+styling with CSS easier.
+
+  <div class="fields_with_errors">
+    <input type="text" name="number" value="hello" />
+  </div>
+
+For a full list of available checks see also
+L<Mojolicious::Validator/"CHECKS">.
+
 =head2 Adding helpers
 
 Adding and redefining helpers is very easy, you can use them to do pretty much

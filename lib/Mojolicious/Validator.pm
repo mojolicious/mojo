@@ -65,7 +65,36 @@ Mojolicious::Validator - Validate form data
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Validator> validates form data.
+L<Mojolicious::Validator> validates form data. Note that this module is
+EXPERIMENTAL and might change without warning!
+
+=head1 CHECKS
+
+These checks are available for validation by default.
+
+=head2 equal_to
+
+  $validation->equal_to('foo');
+
+Value needs to be equal to the value of another field.
+
+=head2 in
+
+  $validation->in('foo', 'bar', 'baz');
+
+Value needs to match one of the values in the list.
+
+=head2 regex
+
+  $validation->regex(qr/^[A-Z]/);
+
+Value needs to match the regular expression.
+
+=head2 size
+
+  $validation->size(2, 5);
+
+Value length in characters needs to be between these two values.
 
 =head1 ATTRIBUTES
 

@@ -25,8 +25,7 @@ sub register {
   $app->helper(javascript => \&_javascript);
   $app->helper(link_to    => \&_link_to);
 
-  $app->helper(password_field =>
-      sub { shift; _tag('input', name => shift, @_, type => 'password') });
+  $app->helper(password_field => \&_password_field);
   $app->helper(radio_button =>
       sub { _input(shift, shift, value => shift, @_, type => 'radio') });
 
@@ -117,6 +116,12 @@ sub _link_to {
   push @url, shift if ref $_[0] eq 'HASH';
 
   return _tag('a', href => $self->url_for(@url), @_);
+}
+
+sub _password_field {
+  my ($self, $name) = (shift, shift);
+  return _wrap($self, $name,
+    _tag('input', name => $name, @_, type => 'password'));
 }
 
 sub _select_field {

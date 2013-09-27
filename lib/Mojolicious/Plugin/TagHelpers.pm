@@ -229,7 +229,7 @@ sub _text_area {
 
 sub _wrap {
   my ($self, $name, $html) = @_;
-  return $html unless $self->validation->has_errors($name);
+  return $html unless $self->validation->has_error($name);
   return _tag('div', class => 'fields_with_errors', sub {$html});
 }
 

@@ -47,9 +47,7 @@ sub errors { Mojo::Collection->new(@{shift->{errors}{shift()} // []}) }
 
 sub has_data { !!keys %{shift->input} }
 
-sub has_errors {
-  $_[1] ? exists $_[0]{errors}{$_[1]} : !!keys %{$_[0]{errors}};
-}
+sub has_error { $_[1] ? exists $_[0]{errors}{$_[1]} : !!keys %{$_[0]{errors}} }
 
 sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 
@@ -168,7 +166,7 @@ Perform validation check.
 
   $validation = $validation->error('This went wrong.');
 
-Set custom error message for next validation check.
+Set custom error message for next validation C<check> or C<topic> change.
 
 =head2 errors
 
@@ -183,10 +181,10 @@ validation checks.
 
 Check if C<input> is available for validation.
 
-=head2 has_errors
+=head2 has_error
 
-  my $success = $validation->has_errors;
-  my $success = $validation->has_errors('foo');
+  my $success = $validation->has_error;
+  my $success = $validation->has_error('foo');
 
 Check if validation resulted in errors, defaults to checking all fields.
 

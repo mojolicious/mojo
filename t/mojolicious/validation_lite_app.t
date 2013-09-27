@@ -45,6 +45,18 @@ ok $validation->has_error, 'has error';
 is_deeply [$validation->errors('does_not_exist')->each],
   ['Value is required.'], 'right error';
 
+# Regex
+$validation = $t->app->validation;
+$validation->input({foo => 'bar', baz => 'yada'});
+ok $validation->required('foo')->regex(qr/^b/)->is_valid, 'valid';
+is_deeply $validation->output, {foo => 'bar'}, 'right result';
+ok !$validation->has_error, 'no error';
+ok !$validation->required('baz')->regex(qr/ar$/)->is_valid, 'not valid';
+is_deeply $validation->output, {foo => 'bar'}, 'right result';
+ok $validation->has_error, 'has error';
+is_deeply [$validation->errors('baz')->each], ['Value is not valid.'],
+  'right error';
+
 # Size
 $validation = $t->app->validation;
 $validation->input({foo => 'bar', baz => 'yada', yada => 'yada'});

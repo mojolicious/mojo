@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use Mojolicious::Validator::Validation;
 
-has checks => sub { {size => \&_size} };
+has checks => sub { {regex => \&_regex, size => \&_size} };
 has errors => sub {
   {
     required => sub {qq{Value is required.}},
@@ -23,6 +23,8 @@ sub _add {
   $self->$attr->{$name} = $cb;
   return $self;
 }
+
+sub _regex { $_[2] =~ $_[3] }
 
 sub _size {
   my ($validation, $name, $value, $min, $max) = @_;
@@ -58,7 +60,7 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered checks, by default only C<size> is already defined.
+Registered checks, by default only C<regex> and C<size> are already defined.
 
 =head2 errors
 

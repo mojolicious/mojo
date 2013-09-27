@@ -93,7 +93,7 @@ sub _check {
 sub _error {
   my ($self, $check, $err, $name, $input)
     = (shift, shift, shift, shift, shift);
-  my $cb = $self->validator->errors->{$check} // sub {'Value is invalid.'};
+  my $cb = $self->validator->errors->{$check} // sub {'Value is not valid.'};
   push @{$self->{errors}{$name}}, $err // $self->$cb($name, $_, @_)
     for ref $input eq 'ARRAY' ? @$input : $input;
 }

@@ -690,10 +690,10 @@ L<Mojolicious::Validator/"CHECKS">.
 
 =head2 Adding form validation checks
 
-There are two parts to every validation check, the check itself and an
-optional generator for dynamic error messages, they can be added with the
-methods L<Mojolicious::Validator::Validation/"add_check"> and
-L<Mojolicious::Validator::Validation/"add_error">.
+There are two parts to every validation check, the check itself, returning
+true or false, and an optional generator for dynamic error messages. Both look
+very similar and can be registered with L<Mojolicious::Validator/"add_check">
+and L<Mojolicious::Validator/"add_error">.
 
   use Mojolicious::Lite;
 
@@ -726,11 +726,6 @@ L<Mojolicious::Validator::Validation/"add_error">.
   @@ index.html.ep
   <!DOCTYPE html>
   <html>
-    <head>
-      %= stylesheet begin
-        input.field-with-error { background-color: #fd9e7e }
-      % end
-    </head>
     <body>
       %= form_for index => begin
         % if (validation->has_error('test')) {

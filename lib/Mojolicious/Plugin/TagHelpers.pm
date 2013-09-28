@@ -92,8 +92,7 @@ sub _javascript {
 
   # CDATA
   my $cb = sub {''};
-  if (ref $_[-1] eq 'CODE') {
-    my $old = pop;
+  if (ref $_[-1] eq 'CODE' && (my $old = pop)) {
     $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
   }
 
@@ -114,7 +113,7 @@ sub _link_to {
   my @url = ($content);
 
   # Content
-  unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
+  unless (ref $_[-1] eq 'CODE') {
     @url = (shift);
     push @_, $content;
   }
@@ -179,8 +178,7 @@ sub _stylesheet {
 
   # CDATA
   my $cb;
-  if (ref $_[-1] eq 'CODE') {
-    my $old = pop;
+  if (ref $_[-1] eq 'CODE' && (my $old = pop)) {
     $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
   }
 
@@ -208,17 +206,13 @@ sub _tag {
 
   # Attributes
   my %attrs = @_;
-  for my $key (sort keys %attrs) {
-    $tag .= qq{ $key="} . xml_escape($attrs{$key} // '') . '"';
-  }
-
-  # End tag
-  if ($cb || defined $content) {
-    $tag .= '>' . ($cb ? $cb->() : xml_escape($content)) . "</$name>";
-  }
+  $tag .= qq{ $_="} . xml_escape($attrs{$_} // '') . '"' for sort keys %attrs;
 
   # Empty element
-  else { $tag .= ' />' }
+  unless ($cb || defined $content) { $tag .= ' />' }
+
+  # End tag
+  else { $tag .= '>' . ($cb ? $cb->() : xml_escape($content)) . "</$name>" }
 
   # Prevent escaping
   return Mojo::ByteStream->new($tag);
@@ -244,7 +238,7 @@ sub _validation {
   my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
   $attrs{class} .= $attrs{class} ? ' field-with-error' : 'field-with-error'
     if $self->validation->has_error($name);
-  return _tag($tag, %attrs, $content ? $content : ());
+  return _tag($tag, %attrs, defined $content ? $content : ());
 }
 
 1;

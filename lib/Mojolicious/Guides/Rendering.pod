@@ -619,7 +619,9 @@ This chain could go on and on to allow a very high level of template reuse.
 You can use L<Mojolicious::Controller/"validation"> to validate GET/POST
 parameters submitted to your application. All unknown fields will be ignored
 by default, so you have to decide which should be required or optional before
-you can perform checks on their values.
+you can perform checks on their values. Every check is performed right away,
+so you can use the results immediately to build more advanced validation logic
+with methods like L<Mojolicious::Validator::Validation/"is_valid">.
 
   use Mojolicious::Lite;
 
@@ -630,10 +632,10 @@ you can perform checks on their values.
     my $validation = $self->validation;
     return $self->render unless $validation->has_data;
 
-    # Validate parameters
+    # Validate parameters ("pass_again" depends on "pass")
     $validation->required('user')->regex(qr/^[e-t]+$/);
-    $validation->optional('pass')->size(7, 500);
-    $validation->optional('pass_again')->equal_to('pass');
+    $validation->required('pass_again')->equal_to('pass')
+      if $validation->optional('pass')->size(7, 500)->is_valid;
 
     # Render confirmation if validation was successful
     $self->render('thanks') unless $validation->has_error;
@@ -682,40 +684,6 @@ to make styling with CSS easier.
     Username (required, only characters e-t)
   </label>
   <input class="field-with-error" type="text" name="user" value="sri" />
-
-Every check is performed right away, so you can use the results immediately to
-build more advanced validation logic with methods like
-L<Mojolicious::Validator::Validation/"is_valid">.
-
-  use Mojolicious::Lite;
-
-  # /test                 -> "No data."
-  # /test?foo=one         -> "First choice won with one."
-  # /test?bar=two         -> "Alternative won with two."
-  # /test?foo=o&bar=three -> "Alternative won with three."
-  # /test?baz=four        -> "Try again."
-  get '/test' => sub {
-    my $self = shift;
-
-    my $validation = $self->validation;
-    return $self->render(text => 'No data.') unless $validation->has_data;
-
-    # First choice
-    if ($validation->optional('foo')->size(3, 5)->is_valid) {
-      my $foo = $validation->param('foo');
-      $self->render(text => "First choice won with $foo.");
-    }
-
-    # Alternative
-    elsif ($validation->optional('bar')->in(qw(one two three))->is_valid) {
-      my $bar = $validation->param('bar');
-      $self->render(text => "Alternative won with $bar.");
-    }
-
-    else { $self->render(text => 'Try again.') }
-  };
-
-  app->start;
 
 For a full list of available checks see also
 L<Mojolicious::Validator/"CHECKS">.

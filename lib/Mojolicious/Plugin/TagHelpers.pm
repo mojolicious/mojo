@@ -83,7 +83,7 @@ sub _input {
     else { $attrs{value} = $values[0] }
   }
 
-  return _wrap($self, $name, _tag('input', name => $name, %attrs));
+  return _validation($self, $name, 'input', %attrs);
 }
 
 sub _javascript {
@@ -120,8 +120,7 @@ sub _link_to {
 
 sub _password_field {
   my ($self, $name) = (shift, shift);
-  return _wrap($self, $name,
-    _tag('input', name => $name, @_, type => 'password'));
+  return _validation($self, $name, 'input', @_, type => 'password');
 }
 
 sub _select_field {
@@ -164,7 +163,7 @@ sub _select_field {
     return $parts;
   };
 
-  return _wrap($self, $name, _tag('select', name => $name, %attrs, $optgroup));
+  return _validation($self, $name, 'select', %attrs, $optgroup);
 }
 
 sub _stylesheet {
@@ -229,13 +228,20 @@ sub _text_area {
     $cb = sub { xml_escape $content }
   }
 
-  return _wrap($self, $name, _tag('textarea', name => $name, @_, $cb));
+  return _validation($self, $name, 'textarea', @_, $cb);
 }
 
-sub _wrap {
-  my ($self, $name, $html) = @_;
-  return $html unless $self->validation->has_error($name);
-  return _tag('div', class => 'fields_with_errors', sub {$html});
+sub _validation {
+  my ($self, $name, $tag, @args) = @_;
+  return _tag($tag, name => $name, @args) unless $self->validation->has_error($name);
+  my @cb = ref $args[-1] eq 'CODE' ? (pop @args) : ();
+  my $tag_class = 'field-with-error';
+  for my $i (0..@args-1) {
+    next unless $args[$i] eq 'class';
+    $tag_class .= ' ' .$args[$i+1];
+    last;
+  }
+  return _tag($tag, name => $name, @args, class => $tag_class, @cb);
 }
 
 1;

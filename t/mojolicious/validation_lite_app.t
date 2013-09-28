@@ -152,14 +152,10 @@ $t->get_ok('/?foo=ok')->status_is(200)->element_exists_not('div:root')
 # Failed validation
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
   ->status_is(200)->text_is('div:root' => 'My error.')
-  ->element_exists_not('form > input[type="text"]')
-  ->element_exists('form > div.fields_with_errors > input[type="text"]')
-  ->element_exists_not('form > textarea')
-  ->element_exists('form > div.fields_with_errors > textarea')
-  ->element_exists_not('form > select')
-  ->element_exists('form > div.fields_with_errors > select')
-  ->element_exists_not('form > input[type="password"]')
-  ->element_exists('form > div.fields_with_errors > input[type="password"]');
+  ->element_exists('form > input[type="text"][class="field-with-error custom"]')
+  ->element_exists('form > textarea[class="field-with-error"]')
+  ->element_exists('form > select[class="field-with-error"]')
+  ->element_exists('form > input[type="password"][class="field-with-error"]');
 
 done_testing();
 
@@ -170,7 +166,7 @@ __DATA__
   <div><%= validation->errors('foo') %></div>
 % }
 %= form_for index => begin
-  %= text_field 'foo'
+  %= text_field 'foo', class => 'custom'
   %= text_area 'bar'
   %= select_field baz => [qw(yada yada)]
   %= password_field 'yada'

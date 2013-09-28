@@ -1,5 +1,12 @@
 
-4.42  2013-09-23
+4.42  2013-09-28
+  - Added EXPERIMENTAL form validation support.
+  - Added EXPERIMENTAL modules Mojolicious::Validator and
+    Mojolicious::Validator::Validation.
+  - Added EXPERIMENTAL validation method to Mojolicious::Controller.
+  - Added EXPERIMENTAL validator attribute to Mojolicious.
+  - Added EXPERIMENTAL validation helper to
+    Mojolicious::Plugin::DefaultHelpers.
 
 4.41  2013-09-22
   - Improved documentation browser to be a little more RESTful.

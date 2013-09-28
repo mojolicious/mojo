@@ -272,6 +272,12 @@ necessary attributes always be generated automatically.
   <%= radio_button country => 'france'  %> France
   <%= radio_button country => 'uk'      %> UK
 
+For fields that failed validation with L<Mojolicious::Controller/"validation">
+the C<field-with-error> class will be automatically set to make styling with
+CSS easier.
+
+  <input class="field-with-error" name="age" type="text" value="250" />
+
 This is a core plugin, that means it is always enabled and its code a good
 example for learning how to build new plugins, you're welcome to fork it.
 

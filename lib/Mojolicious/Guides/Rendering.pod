@@ -327,7 +327,7 @@ header you can use L<Mojolicious/"types">.
   $self->respond_to(
     json => {json => {hello => 'world'}},
     html => sub {
-      $self->content_for(head => '<meta name="author" content="sri" />');
+      $self->content_for(head => '<meta name="author" content="sri">');
       $self->render(template => 'hello', message => 'world')
     }
   );

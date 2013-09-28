@@ -166,8 +166,8 @@ Perform validation check.
 
 Set custom error message for next validation C<check> or C<topic> change.
 
-  $validation->optional('foo')
-    ->error('Name needs to be between 3 and 50 characters.')->size(3, 50);
+  $validation->optional('name')
+    ->error('Name needs to be between 3 and 9 characters long.')->size(3, 9);
 
 =head2 errors
 

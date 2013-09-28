@@ -124,6 +124,18 @@ sub _link_to {
   return _tag('a', href => $self->url_for(@url), @_);
 }
 
+sub _option {
+  my ($values, $pair) = @_;
+  $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
+
+  # Attributes
+  my %attrs = (value => $pair->[1]);
+  $attrs{selected} = 'selected' if exists $values->{$pair->[1]};
+  %attrs = (%attrs, @$pair[2 .. $#$pair]);
+
+  return _tag('option', %attrs, sub { xml_escape $pair->[0] });
+}
+
 sub _password_field {
   my ($self, $name) = (shift, shift);
   return _validation($self, $name, 'input', @_, name => $name,
@@ -133,44 +145,24 @@ sub _password_field {
 sub _select_field {
   my ($self, $name, $options, %attrs) = (shift, shift, shift, @_);
 
-  # "option" callback
   my %values = map { $_ => 1 } $self->param($name);
-  my $option = sub {
 
-    # Pair
-    my $pair = shift;
-    $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
+  my $groups = '';
+  for my $group (@$options) {
 
-    # Attributes
-    my %attrs = (value => $pair->[1]);
-    $attrs{selected} = 'selected' if exists $values{$pair->[1]};
-    %attrs = (%attrs, @$pair[2 .. $#$pair]);
-
-    return _tag('option', %attrs, sub { xml_escape $pair->[0] });
-  };
-
-  # "optgroup" callback
-  my $optgroup = sub {
-
-    # Parts
-    my $parts = '';
-    for my $group (@$options) {
-
-      # "optgroup" tag
-      if (ref $group eq 'HASH') {
-        my ($label, $values) = each %$group;
-        my $content = join '', map { $option->($_) } @$values;
-        $parts .= _tag('optgroup', label => $label, sub {$content});
-      }
-
-      # "option" tag
-      else { $parts .= $option->($group) }
+    # "optgroup" tag
+    if (ref $group eq 'HASH') {
+      my ($label, $values) = each %$group;
+      my $content = join '', map { _option(\%values, $_) } @$values;
+      $groups .= _tag('optgroup', label => $label, sub {$content});
     }
 
-    return $parts;
-  };
+    # "option" tag
+    else { $groups .= _option(\%values, $group) }
+  }
 
-  return _validation($self, $name, 'select', %attrs, name => $name, $optgroup);
+  return _validation($self, $name, 'select', %attrs, name => $name,
+    sub {$groups});
 }
 
 sub _stylesheet {
@@ -221,14 +213,11 @@ sub _tag {
 sub _text_area {
   my ($self, $name) = (shift, shift);
 
-  # Content
+  # Make sure content is wrapped
   my $cb = ref $_[-1] eq 'CODE' ? pop : sub {''};
   my $content = @_ % 2 ? shift : undef;
-
-  # Make sure content is wrapped
-  if (defined($content = $self->param($name) // $content)) {
-    $cb = sub { xml_escape $content }
-  }
+  $cb = sub { xml_escape $content }
+    if defined($content = $self->param($name) // $content);
 
   return _validation($self, $name, 'textarea', @_, name => $name, $cb);
 }

@@ -70,7 +70,7 @@ EXPERIMENTAL and might change without warning!
 
 =head1 CHECKS
 
-These checks are available for validation by default.
+These validation checks are available by default.
 
 =head2 equal_to
 

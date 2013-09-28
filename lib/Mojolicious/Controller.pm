@@ -910,7 +910,7 @@ that this method is EXPERIMENTAL and might change without warning!
 
   my $validation = $c->validation;
   $validation->required('title')->size(3, 50);
-  $validation->optional('description')->size(1, 250);
+  my $title = $validation->param('title');
 
 =head2 write
 

@@ -648,7 +648,7 @@ you can perform checks on their values.
     <head>
       %= stylesheet begin
         .fields_with_errors { display: inline }
-        .fields_with_errors input { background-color: #ffbbbb }
+        .fields_with_errors input { background-color: #fd9e7e }
       % end
     </head>
     <body>
@@ -677,8 +677,97 @@ styling with CSS easier.
     <input type="text" name="user" value="sri" />
   </div>
 
+Every check is performed right away, so you can use the results immediately to
+build more advanced validation logic with methods like
+L<Mojolicious::Validator::Validation/"is_valid">.
+
+  use Mojolicious::Lite;
+
+  # /test                 -> "No data."
+  # /test?foo=one         -> "First choice won with one."
+  # /test?bar=two         -> "Alternative won with two."
+  # /test?foo=o&bar=three -> "Alternative won with three."
+  # /test?baz=four        -> "Try again."
+  get '/test' => sub {
+    my $self = shift;
+
+    my $validation = $self->validation;
+    return $self->render(text => 'No data.') unless $validation->has_data;
+
+    # First choice
+    if ($validation->optional('foo')->size(3, 5)->is_valid) {
+      my $foo = $validation->param('foo');
+      $self->render(text => "First choice won with $foo.");
+    }
+
+    # Alternative
+    elsif ($validation->optional('bar')->in(qw(one two three))->is_valid) {
+      my $bar = $validation->param('bar');
+      $self->render(text => "Alternative won with $bar.");
+    }
+
+    else { $self->render(text => 'Try again.') }
+  };
+
+  app->start;
+
 For a full list of available checks see also
 L<Mojolicious::Validator/"CHECKS">.
+
+=head2 Adding form validation checks
+
+There are two parts to every validation check, the check itself and an
+optional generator for dynamic error messages, they can be added with the
+methods L<Mojolicious::Validator::Validation/"add_check"> and
+L<Mojolicious::Validator::Validation/"add_error">.
+
+  use Mojolicious::Lite;
+
+  # Add "range" check
+  app->validator->add_check(range => sub {
+    my ($validation, $name, $value, $min, $max) = @_;
+    return $value >= $min && $value <= $max;
+  });
+
+  # Add "range" error generator
+  app->validator->add_error(range => sub {
+    my ($validation, $name, $value, $min, $max) = @_;
+    return "Value needs to be between $min and $max.";
+  });
+
+  get '/' => sub {
+    my $self = shift;
+
+    my $validation = $self->validation;
+    return $self->render unless $validation->has_data;
+
+    $validation->required('test')->range(3, 23);
+
+    $self->render(text => 'Success!') unless $validation->has_error;
+  } => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head>
+      %= stylesheet begin
+        .fields_with_errors { display: inline }
+        .fields_with_errors input { background-color: #fd9e7e }
+      % end
+    </head>
+    <body>
+      %= form_for index => begin
+        % if (validation->has_error('test')) {
+          <p><%= validation->errors('test') %></p>
+        % }
+        %= text_field 'test'
+        %= submit_button
+      % end
+    </html>
+  </html>
 
 =head2 Adding helpers
 

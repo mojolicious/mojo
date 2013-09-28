@@ -721,7 +721,8 @@ For a full list of available hooks see L<Mojolicious/"hook">.
 
 =head2 Shortcuts
 
-You can also add your own shortcuts to make route generation more expressive.
+You can also add your own shortcuts with L<Mojolicious::Routes/"add_shortcut">
+to make route generation more expressive.
 
   # Simple "resource" shortcut
   $r->add_shortcut(resource => sub {

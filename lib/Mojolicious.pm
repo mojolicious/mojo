@@ -806,6 +806,8 @@ Ilya Chesnokov
 
 James Duncan
 
+Jan Henning Thorsen
+
 Jan Jona Javorsek
 
 Jan Schmidt

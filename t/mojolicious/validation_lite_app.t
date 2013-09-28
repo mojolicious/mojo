@@ -139,27 +139,21 @@ ok $validation->has_error('bar'), 'has error';
 
 # No validation
 $t->get_ok('/')->status_is(200)->element_exists_not('div:root')
-  ->element_exists('form > input[type="text"]')
-  ->element_exists('form > textarea')->element_exists('form > select')
-  ->element_exists('form > input[type="password"]');
+  ->element_exists('input[type="text"]')->element_exists('textarea')
+  ->element_exists('select')->element_exists('input[type="password"]');
 
 # Successful validation
 $t->get_ok('/?foo=ok')->status_is(200)->element_exists_not('div:root')
-  ->element_exists('form > input[type="password"]')
-  ->element_exists('form > textarea')->element_exists('form > select')
-  ->element_exists('form > input[type="password"]');
+  ->element_exists('input[type="password"]')->element_exists('textarea')
+  ->element_exists('select')->element_exists('input[type="password"]');
 
 # Failed validation
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
   ->status_is(200)->text_is('div:root' => 'My error.')
-  ->element_exists_not('form > input[type="text"]')
-  ->element_exists('form > div.fields_with_errors > input[type="text"]')
-  ->element_exists_not('form > textarea')
-  ->element_exists('form > div.fields_with_errors > textarea')
-  ->element_exists_not('form > select')
-  ->element_exists('form > div.fields_with_errors > select')
-  ->element_exists_not('form > input[type="password"]')
-  ->element_exists('form > div.fields_with_errors > input[type="password"]');
+  ->element_exists('input[type="text"][class="custom field-with-error"]')
+  ->element_exists('textarea[class="field-with-error"]')
+  ->element_exists('select[class="field-with-error"]')
+  ->element_exists('input[type="password"][class="field-with-error"]');
 
 done_testing();
 
@@ -170,7 +164,7 @@ __DATA__
   <div><%= validation->errors('foo') %></div>
 % }
 %= form_for index => begin
-  %= text_field 'foo'
+  %= text_field 'foo', class => 'custom'
   %= text_area 'bar'
   %= select_field baz => [qw(yada yada)]
   %= password_field 'yada'

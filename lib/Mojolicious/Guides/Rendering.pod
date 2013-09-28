@@ -631,7 +631,7 @@ you can perform checks on their values.
     return $self->render unless $validation->has_data;
 
     # Validate parameters
-    $validation->required('user')->regex(qr/^[e-t]$/);
+    $validation->required('user')->regex(qr/^[e-t]+$/);
     $validation->optional('pass')->size(7, 500);
     $validation->optional('pass_again')->equal_to('pass');
 
@@ -647,8 +647,7 @@ you can perform checks on their values.
   <html>
     <head>
       %= stylesheet begin
-        .fields_with_errors { display: inline }
-        .fields_with_errors input { background-color: #fd9e7e }
+        input.field-with-error { background-color: #fd9e7e }
       % end
     </head>
     <body>
@@ -670,12 +669,10 @@ you can perform checks on their values.
 
 Form elements generated with tag helpers from
 L<Mojolicious::Plugin::TagHelpers> will automatically remember their previous
-values and wrap fields that failed validation with C<div> blocks, to make
-styling with CSS easier.
+values and add the class C<field-with-error> for fields that failed validation
+to make styling with CSS easier.
 
-  <div class="fields_with_errors">
-    <input type="text" name="user" value="sri" />
-  </div>
+  <input class="field-with-error" type="text" name="user" value="sri" />
 
 Every check is performed right away, so you can use the results immediately to
 build more advanced validation logic with methods like
@@ -754,8 +751,7 @@ L<Mojolicious::Validator::Validation/"add_error">.
   <html>
     <head>
       %= stylesheet begin
-        .fields_with_errors { display: inline }
-        .fields_with_errors input { background-color: #fd9e7e }
+        input.field-with-error { background-color: #fd9e7e }
       % end
     </head>
     <body>

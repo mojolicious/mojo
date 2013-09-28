@@ -647,17 +647,23 @@ you can perform checks on their values.
   <html>
     <head>
       %= stylesheet begin
+        label.field-with-error { color: #dd7e5e }
         input.field-with-error { background-color: #fd9e7e }
       % end
     </head>
     <body>
       %= form_for index => begin
-        <p>Username (required, can only contain the characters e-t)</p>
+        %= label_for user => 'Username (required, only characters e-t)'
+        <br>
         %= text_field 'user'
         %= submit_button
-        <p>Password (optional, needs to be 7-500 characters long)</p>
+        <br>
+        %= label_for pass => 'Password (optional, 7-500 characters long)'
+        <br>
         %= password_field 'pass'
-        <p>Password again (needs to be equal to the value above)</p>
+        <br>
+        %= label_for pass_again => 'Password again (equal to the value above)'
+        <br>
         %= password_field 'pass_again'
       % end
     </html>
@@ -672,6 +678,9 @@ L<Mojolicious::Plugin::TagHelpers> will automatically remember their previous
 values and add the class C<field-with-error> for fields that failed validation
 to make styling with CSS easier.
 
+  <label class="field-with-error" for="user">
+    Username (required, only characters e-t)
+  </label>
   <input class="field-with-error" type="text" name="user" value="sri" />
 
 Every check is performed right away, so you can use the results immediately to

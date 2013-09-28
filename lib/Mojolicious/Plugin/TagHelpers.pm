@@ -23,10 +23,10 @@ sub register {
   $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
   $app->helper(input_tag => sub { _input(@_) });
   $app->helper(javascript => \&_javascript);
+  $app->helper(label_for  => \&_label_for);
   $app->helper(link_to    => \&_link_to);
 
-  $app->helper(password_field =>
-      sub { _validation(shift, shift, 'input', @_, type => 'password') });
+  $app->helper(password_field => \&_password_field);
   $app->helper(radio_button =>
       sub { _input(shift, shift, value => shift, @_, type => 'radio') });
 
@@ -84,7 +84,7 @@ sub _input {
     else { $attrs{value} = $values[0] }
   }
 
-  return _validation($self, $name, 'input', %attrs);
+  return _validation($self, $name, 'input', %attrs, name => $name);
 }
 
 sub _javascript {
@@ -103,6 +103,12 @@ sub _javascript {
   return _tag('script', @_, $src ? (src => $src) : (), $cb);
 }
 
+sub _label_for {
+  my ($self, $name) = (shift, shift);
+  my $content = ref $_[-1] eq 'CODE' ? pop : shift;
+  return _validation($self, $name, 'label', for => $name, @_, $content);
+}
+
 sub _link_to {
   my ($self, $content) = (shift, shift);
   my @url = ($content);
@@ -117,6 +123,12 @@ sub _link_to {
   push @url, shift if ref $_[0] eq 'HASH';
 
   return _tag('a', href => $self->url_for(@url), @_);
+}
+
+sub _password_field {
+  my ($self, $name) = (shift, shift);
+  return _validation($self, $name, 'input', @_, name => $name,
+    type => 'password');
 }
 
 sub _select_field {
@@ -159,7 +171,7 @@ sub _select_field {
     return $parts;
   };
 
-  return _validation($self, $name, 'select', %attrs, $optgroup);
+  return _validation($self, $name, 'select', %attrs, name => $name, $optgroup);
 }
 
 sub _stylesheet {
@@ -224,7 +236,7 @@ sub _text_area {
     $cb = sub { xml_escape $content }
   }
 
-  return _validation($self, $name, 'textarea', @_, $cb);
+  return _validation($self, $name, 'textarea', @_, name => $name, $cb);
 }
 
 sub _validation {
@@ -232,7 +244,7 @@ sub _validation {
   my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
   $attrs{class} .= $attrs{class} ? ' field-with-error' : 'field-with-error'
     if $self->validation->has_error($name);
-  return _tag($tag, name => $name, %attrs, $content ? $content : ());
+  return _tag($tag, %attrs, $content ? $content : ());
 }
 
 1;
@@ -431,6 +443,29 @@ Generate portable script tag for C<Javascript> asset.
   <script><![CDATA[
     var a = 'b';
   ]]></script>
+
+=head2 label_for
+
+  %= label_for first_name => 'First name'
+  %= label_for first_name => 'First name, class => 'labels'
+  %= label_for first_name => begin
+    First name
+  % end
+  %= label_for first_name => (class => 'labels') => begin
+    First name
+  % end
+
+Generate label. Note that this helper is EXPERIMENTAL and might change without
+warning!
+
+  <label for="first_name">First name</label>
+  <label class="labels" for="first_name">First name</label>
+  <label for="first_name">
+    First name
+  </label>
+  <label class="labels" for="first_name">
+    First name
+  </label>
 
 =head2 link_to
 

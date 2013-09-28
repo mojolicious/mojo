@@ -5,7 +5,7 @@
     Mojolicious::Validator::Validation.
   - Added EXPERIMENTAL validation method to Mojolicious::Controller.
   - Added EXPERIMENTAL validator attribute to Mojolicious.
-  - Added EXPERIMENTAL validation helper to
+  - Added EXPERIMENTAL label_for and validation helpers to
     Mojolicious::Plugin::DefaultHelpers.
 
 4.41  2013-09-22

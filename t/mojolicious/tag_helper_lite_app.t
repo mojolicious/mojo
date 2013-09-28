@@ -115,6 +115,7 @@ EOF
 # Basic form
 $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 <form action="/links">
+  <label for="foo">&lt;Foo&gt;</label>
   <input name="foo" type="text" value="bar" />
   <input class="test" name="bar" type="text" value="baz" />
   <input name="yada" type="text" value="" />
@@ -468,6 +469,7 @@ __DATA__
 
 @@ basicform.html.ep
 %= form_for links => begin
+  %= label_for foo => '<Foo>'
   %= text_field foo => 'bar'
   %= text_field bar => 'baz', class => 'test'
   %= text_field yada => undef

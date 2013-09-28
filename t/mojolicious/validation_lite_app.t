@@ -139,21 +139,27 @@ ok $validation->has_error('bar'), 'has error';
 
 # No validation
 $t->get_ok('/')->status_is(200)->element_exists_not('div:root')
+  ->text_is('label[for="foo"]' => '<Foo>')
   ->element_exists('input[type="text"]')->element_exists('textarea')
-  ->element_exists('select')->element_exists('input[type="password"]');
+  ->text_is('label[for="baz"]' => 'Baz')->element_exists('select')
+  ->element_exists('input[type="password"]');
 
 # Successful validation
 $t->get_ok('/?foo=ok')->status_is(200)->element_exists_not('div:root')
+  ->text_is('label[for="foo"]' => '<Foo>')
   ->element_exists('input[type="password"]')->element_exists('textarea')
-  ->element_exists('select')->element_exists('input[type="password"]');
+  ->text_is('label[for="baz"]' => 'Baz')->element_exists('select')
+  ->element_exists('input[type="password"]');
 
 # Failed validation
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
   ->status_is(200)->text_is('div:root' => 'My error.')
-  ->element_exists('input[type="text"][class="custom field-with-error"]')
-  ->element_exists('textarea[class="field-with-error"]')
-  ->element_exists('select[class="field-with-error"]')
-  ->element_exists('input[type="password"][class="field-with-error"]');
+  ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
+  ->element_exists('input.custom.field-with-error[type="text"]')
+  ->element_exists('textarea.field-with-error')
+  ->text_is('label.custom.field-with-error[for="baz"]' => 'Baz')
+  ->element_exists('select.field-with-error')
+  ->element_exists('input.field-with-error[type="password"]');
 
 done_testing();
 
@@ -164,8 +170,12 @@ __DATA__
   <div><%= validation->errors('foo') %></div>
 % }
 %= form_for index => begin
+  %= label_for foo => '<Foo>', class => 'custom'
   %= text_field 'foo', class => 'custom'
   %= text_area 'bar'
+  %= label_for baz => (class => 'custom') => begin
+    Baz
+  % end
   %= select_field baz => [qw(yada yada)]
   %= password_field 'yada'
 % end

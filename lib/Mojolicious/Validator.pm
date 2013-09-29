@@ -113,8 +113,8 @@ C<size> are already defined.
   my $errors = $validator->errors;
   $validator = $validator->errors({size => sub {...}});
 
-Registered error generators, by default only C<equal_to>, C<in>, C<required>
-and C<size> are already defined.
+Registered generators for dynamic error messages, by default only C<equal_to>,
+C<in>, C<required> and C<size> are already defined.
 
 =head1 METHODS
 
@@ -131,7 +131,7 @@ Register a new validation check.
 
   $validator = $validator->add_error(size => sub {...});
 
-Register a new error generator.
+Register a new generator for dynamic error messages.
 
 =head2 validation
 

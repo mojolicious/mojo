@@ -514,7 +514,10 @@ L<Mojolicious::Routes::Match> object.
   $c     = $c->tx(Mojo::Transaction::HTTP->new);
 
 The transaction that is currently being processed, usually a
-L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
+L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Note
+that this reference is usually weakened, so the object needs to be referenced
+elsewhere as well when you're performing non-blocking operations and the
+underlying connection might get closed early.
 
   # Check peer information
   my $address = $c->tx->remote_address;

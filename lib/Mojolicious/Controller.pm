@@ -497,6 +497,9 @@ defaults to a L<Mojolicious> object.
   # Use application logger
   $c->app->log->debug('Hello Mojo!');
 
+  # Generate path
+  my $path = $c->app->home->rel_file('templates/foo/bar.html.ep');
+
 =head2 match
 
   my $m = $c->match;
@@ -507,6 +510,7 @@ L<Mojolicious::Routes::Match> object.
 
   # Introspect
   my $foo = $c->match->endpoint->pattern->defaults->{foo};
+  my $bar = $c->match->stack->[-1]{bar};
 
 =head2 tx
 
@@ -521,6 +525,7 @@ underlying connection might get closed early.
 
   # Check peer information
   my $address = $c->tx->remote_address;
+  my $port    = $c->tx->remote_port;
 
 =head1 METHODS
 

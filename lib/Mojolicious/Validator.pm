@@ -137,7 +137,12 @@ Register a new generator for dynamic error messages.
 
   my $validation = $validator->validation;
 
-Get a new L<Mojolicious::Validator::Validation> object to perform validations.
+Build L<Mojolicious::Validator::Validation> object to perform validations.
+
+  my $validation = $validator->validation;
+  $validation->input({foo => 'bar'});
+  $validation->required('foo')->size(1, 5);
+  say $validation->param('foo');
 
 =head1 SEE ALSO
 

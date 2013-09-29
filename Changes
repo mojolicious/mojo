@@ -1,5 +1,5 @@
 
-4.42  2013-09-28
+4.42  2013-09-29
   - Added EXPERIMENTAL form validation support.
   - Added EXPERIMENTAL modules Mojolicious::Validator and
     Mojolicious::Validator::Validation.

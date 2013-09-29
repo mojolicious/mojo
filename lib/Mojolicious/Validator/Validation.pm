@@ -220,8 +220,8 @@ Change validation C<topic> and make sure a value is present.
 
 =head1 CHECKS
 
-In addition to the methods above, you can also call checks provided by
-L<Mojolicious::Validator> on L<Mojolicious::Validator::Validation> objects,
+In addition to the methods above, you can also call validation checks provided
+by L<Mojolicious::Validator> on L<Mojolicious::Validator::Validation> objects,
 similar to C<check>.
 
   $validation->required('foo')->size(2, 5)->regex(qr/^[A-Z]/);

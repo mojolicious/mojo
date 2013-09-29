@@ -105,8 +105,8 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered checks, by default only C<equal_to>, C<in>, C<regex> and C<size>
-are already defined.
+Registered validation checks, by default only C<equal_to>, C<in>, C<regex> and
+C<size> are already defined.
 
 =head2 errors
 
@@ -125,7 +125,7 @@ implements the following new ones.
 
   $validator = $validator->add_check(size => sub {...});
 
-Register a new check.
+Register a new validation check.
 
 =head2 add_error
 

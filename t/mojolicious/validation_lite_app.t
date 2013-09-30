@@ -19,7 +19,7 @@ get '/' => sub {
   my $validation = $self->validation;
   return $self->render unless $validation->has_data;
 
-  $validation->required('foo')->two;
+  $validation->required('foo')->two->in('☃☃');
   $validation->optional('bar')->two;
   $validation->optional('baz')->two;
   $validation->optional('yada')->two;
@@ -164,13 +164,23 @@ $t->get_ok('/')->status_is(200)->element_exists_not('div:root')
   ->element_exists('input[type="password"]');
 
 # Successful validation
-$t->get_ok('/?foo=ok')->status_is(200)->element_exists_not('div:root')
-  ->text_is('label[for="foo"]' => '<Foo>')
-  ->element_exists('input[type="password"]')->element_exists('textarea')
+$t->get_ok('/' => form => {foo => '☃☃'})->status_is(200)
+  ->element_exists_not('div:root')->text_is('label[for="foo"]' => '<Foo>')
+  ->element_exists('input[type="text"]')->element_exists('textarea')
   ->text_is('label[for="baz"]' => 'Baz')->element_exists('select')
   ->element_exists('input[type="password"]');
 
-# Failed validation
+# Validation failed for required fields
+$t->get_ok('/' => form => {foo => 'no'})->status_is(200)
+  ->text_is('div:root' => 'Value is not allowed.')
+  ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
+  ->element_exists('input.custom.field-with-error[type="text"][value="no"]')
+  ->element_exists_not('textarea.field-with-error')
+  ->text_is('label[for="baz"]' => 'Baz')
+  ->element_exists_not('select.field-with-error')
+  ->element_exists_not('input.field-with-error[type="password"]');
+
+# Failed validation for all fields
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
   ->status_is(200)->text_is('div:root' => 'My error.')
   ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')

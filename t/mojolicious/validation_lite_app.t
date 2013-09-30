@@ -148,6 +148,14 @@ ok $validation->has_error, 'has error';
 is_deeply [$validation->errors('foo')->each], ['Value is required.'],
   'right error';
 
+# Missing method and function (AUTOLOAD)
+eval { $t->app->validation->missing };
+my $package = 'Mojolicious::Validator::Validation';
+like $@, qr/^Can't locate object method "missing" via package "$package"/,
+  'right error';
+eval { Mojolicious::Validator::Validation::missing() };
+like $@, qr/^Undefined subroutine &${package}::missing called/, 'right error';
+
 # No validation
 $t->get_ok('/')->status_is(200)->element_exists_not('div:root')
   ->text_is('label[for="foo"]' => '<Foo>')

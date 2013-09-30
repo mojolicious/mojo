@@ -709,29 +709,34 @@ and L<Mojolicious::Validator/"add_error">.
     return "Value needs to be between $min and $max.";
   });
 
-  get '/' => sub {
+  get '/' => 'form';
+
+  post '/test' => sub {
     my $self = shift;
 
     my $validation = $self->validation;
-    return $self->render unless $validation->has_data;
+    $validation->required('number')->range(3, 23);
 
-    $validation->required('test')->range(3, 23);
+    return $self->render('form') if $validation->has_error;
 
-    $self->render(text => 'Success!') unless $validation->has_error;
-  } => 'index';
+    $self->flash(number => $validation->param('number'));
+    $self->redirect_to('number');
+  };
+
+  get '/number' => {inline => "Your value was <%= flash 'number' %>."};
 
   app->start;
   __DATA__
 
-  @@ index.html.ep
+  @@ form.html.ep
   <!DOCTYPE html>
   <html>
     <body>
-      %= form_for index => begin
-        % if (validation->has_error('test')) {
-          <p><%= validation->errors('test') %></p>
+      %= form_for test => begin
+        % if (validation->has_error('number')) {
+          <p><%= validation->errors('number') %></p>
         % }
-        %= text_field 'test'
+        %= text_field 'number'
         %= submit_button
       % end
     </html>

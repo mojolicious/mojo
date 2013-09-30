@@ -176,7 +176,7 @@ $t->get_ok('/' => form => {foo => 'no'})->status_is(200)
   ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
   ->element_exists('input.custom.field-with-error[type="text"][value="no"]')
   ->element_exists_not('textarea.field-with-error')
-  ->text_is('label[for="baz"]' => 'Baz')
+  ->element_exists_not('label.custom.field-with-error[for="baz"]')
   ->element_exists_not('select.field-with-error')
   ->element_exists_not('input.field-with-error[type="password"]');
 

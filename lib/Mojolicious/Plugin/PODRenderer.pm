@@ -27,7 +27,7 @@ sub register {
   $app->helper(pod_to_html => sub { shift; b(_pod_to_html(@_)) });
 
   # Perldoc browser
-  return if $conf->{no_perldoc};
+  return undef if $conf->{no_perldoc};
   my $defaults = {module => 'Mojolicious/Guides', format => 'html'};
   return $app->routes->any(
     '/perldoc/:module' => $defaults => [module => qr/[^.]+/] => \&_perldoc);

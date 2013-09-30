@@ -137,6 +137,17 @@ is_deeply [$validation->errors('yada')->each],
 is $validation->topic, 'yada', 'right topic';
 ok $validation->has_error('bar'), 'has error';
 
+# Multiple empty values
+$validation = $t->app->validation;
+ok !$validation->has_data, 'no data';
+$validation->input({foo => ['', 'bar', '']});
+ok $validation->has_data, 'has data';
+ok !$validation->required('foo')->is_valid, 'not valid';
+is_deeply $validation->output, {}, 'right result';
+ok $validation->has_error, 'has error';
+is_deeply [$validation->errors('foo')->each], ['Value is required.'],
+  'right error';
+
 # No validation
 $t->get_ok('/')->status_is(200)->element_exists_not('div:root')
   ->text_is('label[for="foo"]' => '<Foo>')

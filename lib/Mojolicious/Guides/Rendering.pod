@@ -714,16 +714,17 @@ and L<Mojolicious::Validator/"add_error">.
   post '/test' => sub {
     my $self = shift;
 
+    # Validate parameters with custom check
     my $validation = $self->validation;
     $validation->required('number')->range(3, 23);
 
+    # Render form again if validation failed
     return $self->render('form') if $validation->has_error;
 
+    # Prevent double submit with redirect
     $self->flash(number => $validation->param('number'));
-    $self->redirect_to('number');
+    $self->redirect_to('form');
   };
-
-  get '/number' => {inline => "Your value was <%= flash 'number' %>."};
 
   app->start;
   __DATA__
@@ -732,6 +733,9 @@ and L<Mojolicious::Validator/"add_error">.
   <!DOCTYPE html>
   <html>
     <body>
+      % if (my $number = flash 'number') {
+        <p>Thanks, the number <%= $number %> was valid.</p>
+      % }
       %= form_for test => begin
         % if (validation->has_error('number')) {
           <p><%= validation->errors('number') %></p>

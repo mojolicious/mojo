@@ -480,8 +480,8 @@ Find a free TCP port, this is a utility function primarily used for tests.
 
 =head2 is_running
 
-  my $success = Mojo::IOLoop->is_running;
-  my $success = $loop->is_running;
+  my $bool = Mojo::IOLoop->is_running;
+  my $bool = $loop->is_running;
 
 Check if event loop is running.
 

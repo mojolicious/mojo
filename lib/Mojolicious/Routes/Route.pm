@@ -390,31 +390,31 @@ tutorial for more argument variations.
 
 =head2 has_conditions
 
-  my $success = $r->has_conditions;
+  my $bool = $r->has_conditions;
 
 Check if this route has active conditions.
 
 =head2 has_custom_name
 
-  my $success = $r->has_custom_name;
+  my $bool = $r->has_custom_name;
 
 Check if this route has a custom name.
 
 =head2 has_websocket
 
-  my $success = $r->has_websocket;
+  my $bool = $r->has_websocket;
 
 Check if this route has a WebSocket ancestor.
 
 =head2 is_endpoint
 
-  my $success = $r->is_endpoint;
+  my $bool = $r->is_endpoint;
 
 Check if this route qualifies as an endpoint.
 
 =head2 is_websocket
 
-  my $success = $r->is_websocket;
+  my $bool = $r->is_websocket;
 
 Check if this route is a WebSocket.
 

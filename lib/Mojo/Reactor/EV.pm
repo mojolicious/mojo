@@ -129,7 +129,7 @@ Restart active timer.
 
 =head2 is_running
 
-  my $success = $reactor->is_running;
+  my $bool = $reactor->is_running;
 
 Check if reactor is running.
 

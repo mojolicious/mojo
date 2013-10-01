@@ -330,7 +330,7 @@ Continue dispatch chain.
 
 =head2 dispatch
 
-  my $success = $r->dispatch(Mojolicious::Controller->new);
+  my $bool = $r->dispatch(Mojolicious::Controller->new);
 
 Match routes with L<Mojolicious::Routes::Match> and dispatch.
 
@@ -342,7 +342,7 @@ Hide controller attributes and methods from router.
 
 =head2 is_hidden
 
-  my $success = $r->is_hidden('foo');
+  my $bool = $r->is_hidden('foo');
 
 Check if controller attribute or method is hidden from router.
 

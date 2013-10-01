@@ -430,7 +430,7 @@ implements the following new ones.
 
 =head2 body_contains
 
-  my $success = $content->body_contains('foo bar baz');
+  my $bool = $content->body_contains('foo bar baz');
 
 Check if content contains a specific string. Meant to be overloaded in a
 subclass.
@@ -498,32 +498,32 @@ Size of headers in bytes.
 
 =head2 is_chunked
 
-  my $success = $content->is_chunked;
+  my $bool = $content->is_chunked;
 
 Check if content is chunked.
 
 =head2 is_compressed
 
-  my $success = $content->is_compressed;
+  my $bool = $content->is_compressed;
 
 Check if content is C<gzip> compressed.
 
 =head2 is_dynamic
 
-  my $success = $content->is_dynamic;
+  my $bool = $content->is_dynamic;
 
 Check if content will be dynamically generated, which prevents C<clone> from
 working.
 
 =head2 is_finished
 
-  my $success = $content->is_finished;
+  my $bool = $content->is_finished;
 
 Check if parser is finished.
 
 =head2 is_limit_exceeded
 
-  my $success = $content->is_limit_exceeded;
+  my $bool = $content->is_limit_exceeded;
 
 Check if buffer has exceeded C<max_buffer_size>.
 
@@ -535,7 +535,7 @@ False.
 
 =head2 is_parsing_body
 
-  my $success = $content->is_parsing_body;
+  my $bool = $content->is_parsing_body;
 
 Check if body parsing started yet.
 

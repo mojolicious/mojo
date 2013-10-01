@@ -874,7 +874,7 @@ non-blocking.
 
 =head2 need_proxy
 
-  my $success = $ua->need_proxy('intranet.example.com');
+  my $bool = $ua->need_proxy('intranet.example.com');
 
 Check if request for domain would use a proxy server.
 

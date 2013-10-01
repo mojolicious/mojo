@@ -353,7 +353,7 @@ Access request cookies, usually L<Mojo::Cookie::Request> objects.
 
 =head2 extract_start_line
 
-  my $success = $req->extract_start_line(\$str);
+  my $bool = $req->extract_start_line(\$str);
 
 Extract request line from string.
 
@@ -371,13 +371,13 @@ Get a chunk of request line data starting from a specific position.
 
 =head2 is_secure
 
-  my $success = $req->is_secure;
+  my $bool = $req->is_secure;
 
 Check if connection is secure.
 
 =head2 is_xhr
 
-  my $success = $req->is_xhr;
+  my $bool = $req->is_xhr;
 
 Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 

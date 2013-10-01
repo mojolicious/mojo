@@ -178,21 +178,21 @@ validation checks.
 
 =head2 has_data
 
-  my $success = $validation->has_data;
+  my $bool = $validation->has_data;
 
 Check if C<input> is available for validation.
 
 =head2 has_error
 
-  my $success = $validation->has_error;
-  my $success = $validation->has_error('foo');
+  my $bool = $validation->has_error;
+  my $bool = $validation->has_error('foo');
 
 Check if validation resulted in errors, defaults to checking all fields.
 
 =head2 is_valid
 
-  my $success = $validation->is_valid;
-  my $success = $validation->is_valid('foo');
+  my $bool = $validation->is_valid;
+  my $bool = $validation->is_valid('foo');
 
 Check if validation was successful and field has a value, defaults to checking
 the current C<topic>.

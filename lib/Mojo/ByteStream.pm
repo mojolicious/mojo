@@ -219,7 +219,7 @@ Print bytestream to handle and append a newline, defaults to C<STDOUT>.
 
 =head2 secure_compare
 
-  my $success = $stream->secure_compare($str);
+  my $bool = $stream->secure_compare($str);
 
 Compare bytestream with L<Mojo::Util/"secure_compare">.
 

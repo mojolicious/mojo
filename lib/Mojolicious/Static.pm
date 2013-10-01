@@ -172,7 +172,7 @@ the following new ones.
 
 =head2 dispatch
 
-  my $success = $static->dispatch(Mojolicious::Controller->new);
+  my $bool = $static->dispatch(Mojolicious::Controller->new);
 
 Serve static file for L<Mojolicious::Controller> object.
 
@@ -189,10 +189,8 @@ traversing to parent directories.
 
 =head2 serve
 
-  my $success =
-    $static->serve(Mojolicious::Controller->new, 'images/logo.png');
-  my $success =
-    $static->serve(Mojolicious::Controller->new, '../lib/MyApp.pm');
+  my $bool = $static->serve(Mojolicious::Controller->new, 'images/logo.png');
+  my $bool = $static->serve(Mojolicious::Controller->new, '../lib/MyApp.pm');
 
 Serve a specific file, relative to C<paths> or from C<classes>. Note that this
 method does not protect from traversing to parent directories.

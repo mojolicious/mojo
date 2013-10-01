@@ -127,7 +127,7 @@ with default content parser.
 
 =head2 body_contains
 
-  my $success = $single->body_contains('1234567');
+  my $bool = $single->body_contains('1234567');
 
 Check if content contains a specific string.
 

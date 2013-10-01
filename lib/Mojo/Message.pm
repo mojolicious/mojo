@@ -503,7 +503,7 @@ Error and code.
 
 =head2 extract_start_line
 
-  my $success = $msg->extract_start_line(\$str);
+  my $bool = $msg->extract_start_line(\$str);
 
 Extract start line from string. Meant to be overloaded in a subclass.
 
@@ -552,13 +552,13 @@ Message headers, usually a L<Mojo::Headers> object.
 
 =head2 is_finished
 
-  my $success = $msg->is_finished;
+  my $bool = $msg->is_finished;
 
 Check if message parser/generator is finished.
 
 =head2 is_limit_exceeded
 
-  my $success = $msg->is_limit_exceeded;
+  my $bool = $msg->is_limit_exceeded;
 
 Check if message has exceeded C<max_line_size> or C<max_message_size>.
 

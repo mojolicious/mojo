@@ -216,7 +216,7 @@ Generate default response message for code.
 
 =head2 extract_start_line
 
-  my $success = $res->extract_start_line(\$str);
+  my $bool = $res->extract_start_line(\$str);
 
 Extract status line from string.
 
@@ -234,13 +234,13 @@ Get a chunk of status line data starting from a specific position.
 
 =head2 is_empty
 
-  my $success = $res->is_empty;
+  my $bool = $res->is_empty;
 
 Check if this is a C<1xx>, C<204> or C<304> response.
 
 =head2 is_status_class
 
-  my $success = $res->is_status_class(200);
+  my $bool = $res->is_status_class(200);
 
 Check response status class.
 

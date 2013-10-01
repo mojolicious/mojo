@@ -548,7 +548,7 @@ Quote string.
 
 =head2 secure_compare
 
-  my $success = secure_compare $str1, $str2;
+  my $bool = secure_compare $str1, $str2;
 
 Constant time comparison algorithm to prevent timing attacks.
 

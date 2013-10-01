@@ -212,7 +212,7 @@ Error and code.
 
 =head2 is_finished
 
-  my $success = $tx->is_finished;
+  my $bool = $tx->is_finished;
 
 Check if transaction is finished.
 
@@ -224,7 +224,7 @@ False.
 
 =head2 is_writing
 
-  my $success = $tx->is_writing;
+  my $bool = $tx->is_writing;
 
 Check if transaction is writing.
 

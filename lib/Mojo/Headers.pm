@@ -411,13 +411,13 @@ Shortcut for the C<If-Modified-Since> header.
 
 =head2 is_finished
 
-  my $success = $headers->is_finished;
+  my $bool = $headers->is_finished;
 
 Check if header parser is finished.
 
 =head2 is_limit_exceeded
 
-  my $success = $headers->is_limit_exceeded;
+  my $bool = $headers->is_limit_exceeded;
 
 Check if a header has exceeded C<max_line_size>.
 

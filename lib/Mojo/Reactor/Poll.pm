@@ -182,7 +182,7 @@ readable or writable.
 
 =head2 is_running
 
-  my $success = $reactor->is_running;
+  my $bool = $reactor->is_running;
 
 Check if reactor is running.
 
@@ -202,8 +202,8 @@ amount of time in seconds.
 
 =head2 remove
 
-  my $success = $reactor->remove($handle);
-  my $success = $reactor->remove($id);
+  my $bool = $reactor->remove($handle);
+  my $bool = $reactor->remove($id);
 
 Remove handle or timer.
 

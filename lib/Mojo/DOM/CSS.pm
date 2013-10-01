@@ -613,7 +613,7 @@ following new ones.
 
 =head2 match
 
-  my $success = $css->match('head > title');
+  my $bool = $css->match('head > title');
 
 Match CSS selector against first node in C<tree>.
 

@@ -505,7 +505,7 @@ Build WebSocket frame.
 
 =head2 client_challenge
 
-  my $success = $ws->client_challenge;
+  my $bool = $ws->client_challenge;
 
 Check WebSocket handshake challenge client-side, used to implement user
 agents.

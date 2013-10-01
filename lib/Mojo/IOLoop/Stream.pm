@@ -277,14 +277,14 @@ Get handle for stream.
 
 =head2 is_readable
 
-  my $success = $stream->is_readable;
+  my $bool = $stream->is_readable;
 
 Quick non-blocking check if stream is readable, useful for identifying tainted
 sockets.
 
 =head2 is_writing
 
-  my $success = $stream->is_writing;
+  my $bool = $stream->is_writing;
 
 Check if stream is writing.
 

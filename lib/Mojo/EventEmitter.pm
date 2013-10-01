@@ -156,7 +156,7 @@ Emit event safely and emit C<error> event on failure.
 
 =head2 has_subscribers
 
-  my $success = $e->has_subscribers('foo');
+  my $bool = $e->has_subscribers('foo');
 
 Check if event has subscribers.
 

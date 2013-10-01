@@ -122,7 +122,7 @@ Extract embedded file from the C<DATA> section of a class.
 
 =head2 is_binary
 
-  my $success = $loader->is_binary('Foo::Bar', 'test.png');
+  my $bool = $loader->is_binary('Foo::Bar', 'test.png');
 
 Check if embedded file from the C<DATA> section of a class was Base64 encoded.
 

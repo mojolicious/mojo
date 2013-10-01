@@ -659,15 +659,15 @@ Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
 
 =head2 render
 
-  my $success = $c->render;
-  my $success = $c->render(controller => 'foo', action => 'bar');
-  my $success = $c->render(template => 'foo/index');
-  my $success = $c->render(template => 'index', format => 'html');
-  my $success = $c->render(data => $bytes);
-  my $success = $c->render(text => 'Hello!');
-  my $success = $c->render(json => {foo => 'bar'});
-  my $success = $c->render(handler => 'something');
-  my $success = $c->render('foo/index');
+  my $bool    = $c->render;
+  my $bool    = $c->render(controller => 'foo', action => 'bar');
+  my $bool    = $c->render(template => 'foo/index');
+  my $bool    = $c->render(template => 'index', format => 'html');
+  my $bool    = $c->render(data => $bytes);
+  my $bool    = $c->render(text => 'Hello!');
+  my $bool    = $c->render(json => {foo => 'bar'});
+  my $bool    = $c->render(handler => 'something');
+  my $bool    = $c->render('foo/index');
   my $output  = $c->render('foo/index', partial => 1);
 
 Render content using L<Mojolicious::Renderer/"render"> and emit
@@ -700,9 +700,9 @@ automatic rendering would result in a response.
 
 =head2 render_maybe
 
-  my $success = $c->render_maybe;
-  my $success = $c->render_maybe(controller => 'foo', action => 'bar');
-  my $success = $c->render_maybe('foo/index', format => 'html');
+  my $bool = $c->render_maybe;
+  my $bool = $c->render_maybe(controller => 'foo', action => 'bar');
+  my $bool = $c->render_maybe('foo/index', format => 'html');
 
 Try to render content but do not call C<render_not_found> if no response could
 be generated, takes the same arguments as C<render>.
@@ -719,8 +719,8 @@ C<not_found.$format.*> and set the response status code to C<404>.
 
 =head2 render_static
 
-  my $success = $c->render_static('images/logo.png');
-  my $success = $c->render_static('../lib/MyApp.pm');
+  my $bool = $c->render_static('images/logo.png');
+  my $bool = $c->render_static('../lib/MyApp.pm');
 
 Render a static file using L<Mojolicious::Static/"serve">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this

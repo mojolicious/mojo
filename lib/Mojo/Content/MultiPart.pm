@@ -265,7 +265,7 @@ event with default content parser.
 
 =head2 body_contains
 
-  my $success = $multi->body_contains('foobarbaz');
+  my $bool = $multi->body_contains('foobarbaz');
 
 Check if content parts contain a specific string.
 

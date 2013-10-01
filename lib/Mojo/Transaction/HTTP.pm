@@ -288,13 +288,13 @@ Write data client-side, used to implement user agents.
 
 =head2 is_empty
 
-  my $success = $tx->is_empty;
+  my $bool = $tx->is_empty;
 
 Check transaction for C<HEAD> request and C<1xx>, C<204> or C<304> response.
 
 =head2 keep_alive
 
-  my $success = $tx->keep_alive;
+  my $bool = $tx->keep_alive;
 
 Check if connection can be kept alive.
 

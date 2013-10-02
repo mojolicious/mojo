@@ -11,8 +11,8 @@ sub AUTOLOAD {
   my $self = shift;
 
   my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
-  Carp::croak "Undefined subroutine &${package}::$method called"
-    unless Scalar::Util::blessed $self && $self->isa(__PACKAGE__);
+  croak "Undefined subroutine &${package}::$method called"
+    unless blessed $self && $self->isa(__PACKAGE__);
 
   croak qq{Can't locate object method "$method" via package "$package"}
     unless $self->validator->checks->{$method};
@@ -94,6 +94,9 @@ Mojolicious::Validator::Validation - Perform validations
   my $validator = Mojolicious::Validator->new;
   my $validation
     = Mojolicious::Validator::Validation->new(validator => $validator);
+  $validation->input({foo => 'bar'});
+  $validation->required('foo')->in(qw(bar baz));
+  say $validation->param('foo');
 
 =head1 DESCRIPTION
 

@@ -52,6 +52,9 @@ Mojolicious::Validator - Validate form data
 
   my $validator  = Mojolicious::Validator->new;
   my $validation = $validator->validation;
+  $validation->input({foo => 'bar'});
+  $validation->required('foo')->regex(qr/ar$/);
+  say $validation->param('foo');
 
 =head1 DESCRIPTION
 
@@ -70,7 +73,7 @@ Value needs to be equal to the value of another field.
 
 =head2 in
 
-  $validation->in('foo', 'bar', 'baz');
+  $validation->in(qw(foo bar baz));
 
 Value needs to match one of the values in the list.
 

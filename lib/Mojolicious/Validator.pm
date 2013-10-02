@@ -6,26 +6,16 @@ use Mojolicious::Validator::Validation;
 has checks => sub {
   {equal_to => \&_equal_to, in => \&_in, regex => \&_regex, size => \&_size};
 };
-has errors => sub {
-  {
-    equal_to => sub {'Values are not equal.'},
-    in       => sub {'Value is not allowed.'},
-    required => sub {'Value is required.'},
-    size     => sub {qq{Value needs to be $_[3]-$_[4] characters long.}}
-  };
-};
 
-sub add_check { shift->_add(checks => @_) }
-sub add_error { shift->_add(errors => @_) }
+sub add_check {
+  my ($self, $name, $cb) = @_;
+  $self->checks->{$name} = $cb;
+  return $self;
+}
+
 
 sub validation {
   Mojolicious::Validator::Validation->new(validator => shift);
-}
-
-sub _add {
-  my ($self, $attr, $name, $cb) = @_;
-  $self->$attr->{$name} = $cb;
-  return $self;
 }
 
 sub _equal_to {
@@ -108,14 +98,6 @@ L<Mojolicious::Validator> implements the following attributes.
 Registered validation checks, by default only C<equal_to>, C<in>, C<regex> and
 C<size> are already defined.
 
-=head2 errors
-
-  my $errors = $validator->errors;
-  $validator = $validator->errors({size => sub {...}});
-
-Registered generators for dynamic error messages, by default only C<equal_to>,
-C<in>, C<required> and C<size> are already defined.
-
 =head1 METHODS
 
 L<Mojolicious::Validator> inherits all methods from L<Mojo::Base> and
@@ -126,12 +108,6 @@ implements the following new ones.
   $validator = $validator->add_check(size => sub {...});
 
 Register a new validation check.
-
-=head2 add_error
-
-  $validator = $validator->add_error(size => sub {...});
-
-Register a new generator for dynamic error messages.
 
 =head2 validation
 

@@ -690,10 +690,8 @@ L<Mojolicious::Validator/"CHECKS">.
 
 =head2 Adding form validation checks
 
-There are two parts to every validation check, the check itself, returning
-true or false, and an optional generator for dynamic error messages. Both look
-very similar and can be registered with L<Mojolicious::Validator/"add_check">
-and L<Mojolicious::Validator/"add_error">.
+Validation checks only have to return true or false and can be registered with
+L<Mojolicious::Validator/"add_check">.
 
   use Mojolicious::Lite;
 
@@ -701,12 +699,6 @@ and L<Mojolicious::Validator/"add_error">.
   app->validator->add_check(range => sub {
     my ($validation, $name, $value, $min, $max) = @_;
     return $value >= $min && $value <= $max;
-  });
-
-  # Add "range" error generator
-  app->validator->add_error(range => sub {
-    my ($validation, $name, $value, $min, $max) = @_;
-    return "Value needs to be between $min and $max.";
   });
 
   get '/' => 'form';
@@ -737,8 +729,11 @@ and L<Mojolicious::Validator/"add_error">.
         <p>Thanks, the number <%= $number %> was valid.</p>
       % }
       %= form_for test => begin
-        % if (validation->has_error('number')) {
-          <p><%= validation->errors('number') %></p>
+        % if (my $err = validation->error('number')) {
+          <p>
+            %= 'Value is required.' if $err->[0] eq 'required'
+            %= 'Value needs to be between 3 and 23.' if $err->[0] eq 'range'
+          </p>
         % }
         %= text_field 'number'
         %= submit_button

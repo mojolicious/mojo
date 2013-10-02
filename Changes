@@ -1,5 +1,6 @@
 
 4.43  2013-10-02
+  - Removed generators for dynamic error messages from Mojolicious::Validator.
 
 4.42  2013-09-30
   - Added EXPERIMENTAL form validation support.

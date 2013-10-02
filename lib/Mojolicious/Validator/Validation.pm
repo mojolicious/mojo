@@ -3,7 +3,6 @@ use Mojo::Base -base;
 
 use Carp 'croak';
 use Scalar::Util 'blessed';
-use Mojo::Collection;
 
 has [qw(input output)] => sub { {} };
 has [qw(topic validator)];
@@ -25,7 +24,6 @@ sub DESTROY { }
 sub check {
   my ($self, $check) = (shift, shift);
 
-  my $err = delete $self->{error};
   return $self unless $self->is_valid;
 
   my $cb    = $self->validator->checks->{$check};
@@ -34,20 +32,14 @@ sub check {
   for my $value (ref $input eq 'ARRAY' ? @$input : $input) {
     next if $self->$cb($name, $value, @_);
     delete $self->output->{$name};
-    $self->_error($check, $err, $name, $value, @_);
+    $self->{errors}{$name} = [$check, $value, @_];
     last;
   }
 
   return $self;
 }
 
-sub error {
-  my $self = shift;
-  $self->{error} = shift;
-  return $self;
-}
-
-sub errors { Mojo::Collection->new(@{shift->{errors}{shift()} // []}) }
+sub error { shift->{errors}{shift()} }
 
 sub has_data { !!keys %{shift->input} }
 
@@ -83,16 +75,8 @@ sub param {
 sub required {
   my ($self, $name) = @_;
   $self->optional($name);
-  my $err = delete $self->{error};
-  $self->_error('required', $err, $name) unless $self->is_valid;
+  $self->{errors}{$name} = ['required'] unless $self->is_valid;
   return $self;
-}
-
-sub _error {
-  my ($self, $check, $err, $name, $value)
-    = (shift, shift, shift, shift, shift);
-  my $cb = $self->validator->errors->{$check} // sub {'Value is not valid.'};
-  push @{$self->{errors}{$name}}, $err // $self->$cb($name, $value, @_);
 }
 
 1;
@@ -162,19 +146,9 @@ Perform validation check.
 
 =head2 error
 
-  $validation = $validation->error('This went wrong.');
+  my $err = $validation->error('foo');
 
-Set custom error message for next validation C<check> or C<topic> change.
-
-  $validation->optional('name')
-    ->error('Name needs to be between 3 and 9 characters long.')->size(3, 9);
-
-=head2 errors
-
-  my $collection = $validation->errors('foo');
-
-Return L<Mojo::Collection> object containing all error messages for failed
-validation checks.
+Return details about failed validation check.
 
 =head2 has_data
 

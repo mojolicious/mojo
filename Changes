@@ -1,4 +1,6 @@
 
+4.44  2013-10-03
+
 4.43  2013-10-02
   - Removed generators for dynamic error messages from Mojolicious::Validator.
 

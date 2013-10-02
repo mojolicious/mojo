@@ -74,8 +74,7 @@ sub param {
 
 sub required {
   my ($self, $name) = @_;
-  $self->optional($name);
-  $self->{error}{$name} = ['required'] unless $self->is_valid;
+  $self->{error}{$name} = ['required'] unless $self->optional($name)->is_valid;
   return $self;
 }
 

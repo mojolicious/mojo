@@ -32,18 +32,18 @@ sub check {
   for my $value (ref $input eq 'ARRAY' ? @$input : $input) {
     next if $self->$cb($name, $value, @_);
     delete $self->output->{$name};
-    $self->{errors}{$name} = [$check, $value, @_];
+    $self->{error}{$name} = [$check, @_];
     last;
   }
 
   return $self;
 }
 
-sub error { shift->{errors}{shift()} }
+sub error { shift->{error}{shift()} }
 
 sub has_data { !!keys %{shift->input} }
 
-sub has_error { $_[1] ? exists $_[0]{errors}{$_[1]} : !!keys %{$_[0]{errors}} }
+sub has_error { $_[1] ? exists $_[0]{error}{$_[1]} : !!keys %{$_[0]{error}} }
 
 sub is_valid { exists $_[0]->output->{$_[1] // $_[0]->topic} }
 
@@ -75,7 +75,7 @@ sub param {
 sub required {
   my ($self, $name) = @_;
   $self->optional($name);
-  $self->{errors}{$name} = ['required'] unless $self->is_valid;
+  $self->{error}{$name} = ['required'] unless $self->is_valid;
   return $self;
 }
 
@@ -150,7 +150,7 @@ Perform validation check.
 
 Return details about failed validation check.
 
-  my ($check, $value, @args) = @{$validation->error('foo')};
+  my ($check, @args) = @{$validation->error('foo')};
 
 =head2 has_data
 

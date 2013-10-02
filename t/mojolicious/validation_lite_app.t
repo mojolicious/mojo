@@ -58,12 +58,12 @@ ok !$validation->optional('baz')->equal_to('does_not_exist')->is_valid,
   'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('baz'), [qw(equal_to bar does_not_exist)],
+is_deeply $validation->error('baz'), [qw(equal_to does_not_exist)],
   'right error';
 ok !$validation->optional('yada')->equal_to('foo')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('yada'), [qw(equal_to yada foo)], 'right error';
+is_deeply $validation->error('yada'), [qw(equal_to foo)], 'right error';
 
 # In
 $validation = $t->app->validation;
@@ -74,8 +74,7 @@ ok !$validation->has_error, 'no error';
 ok !$validation->required('baz')->in(qw(yada whatever))->is_valid, 'not valid';
 is_deeply $validation->output, {foo => [qw(bar whatever)]}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('baz'), [qw(in ohoh yada whatever)],
-  'right error';
+is_deeply $validation->error('baz'), [qw(in yada whatever)], 'right error';
 
 # Regex
 $validation = $t->app->validation;
@@ -87,7 +86,7 @@ my $re = qr/ar$/;
 ok !$validation->required('baz')->regex($re)->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('baz'), [qw(regex yada), $re], 'right error';
+is_deeply $validation->error('baz'), ['regex', $re], 'right error';
 
 # Size
 $validation = $t->app->validation;
@@ -98,12 +97,13 @@ ok !$validation->has_error, 'no error';
 ok !$validation->required('baz')->size(1, 3)->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('baz'), [qw(size yada 1 3)], 'right error';
+is_deeply $validation->error('baz'), [qw(size 1 3)], 'right error';
 ok !$validation->required('yada')->size(5, 10)->is_valid, 'not valid';
 is $validation->topic, 'yada', 'right topic';
+ok $validation->has_error('baz'), 'has error';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('yada'), [qw(size yada 5 10)], 'right error';
+is_deeply $validation->error('yada'), [qw(size 5 10)], 'right error';
 
 # Multiple empty values
 $validation = $t->app->validation;

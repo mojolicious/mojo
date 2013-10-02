@@ -741,6 +741,9 @@ L<Mojolicious::Validator/"add_check">.
     </html>
   </html>
 
+Details about failed validation checks can be retrieved with
+L<Mojolicious::Validator::Validation/"error">.
+
 =head2 Adding helpers
 
 Adding and redefining helpers is very easy, you can use them to do pretty much

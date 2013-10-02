@@ -58,13 +58,12 @@ ok !$validation->optional('baz')->equal_to('does_not_exist')->is_valid,
   'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('baz'), ['equal_to', 'bar', 'does_not_exist'],
+is_deeply $validation->error('baz'), [qw(equal_to bar does_not_exist)],
   'right error';
 ok !$validation->optional('yada')->equal_to('foo')->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('yada'), ['equal_to', 'yada', 'foo'],
-  'right error';
+is_deeply $validation->error('yada'), [qw(equal_to yada foo)], 'right error';
 
 # In
 $validation = $t->app->validation;

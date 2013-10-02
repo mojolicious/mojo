@@ -150,6 +150,8 @@ Perform validation check.
 
 Return details about failed validation check.
 
+  my ($check, $value, @args) = @{$validation->error('foo')};
+
 =head2 has_data
 
   my $bool = $validation->has_data;

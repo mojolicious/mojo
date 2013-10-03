@@ -436,31 +436,30 @@ Generate portable script tag for C<Javascript> asset.
 =head2 label_for
 
   %= label_for first_name => 'First name'
-  %= label_for first_name => 'First name, class => 'labels'
+  %= label_for first_name => 'First name, class => 'user'
   %= label_for first_name => begin
     First name
   % end
-  %= label_for first_name => (class => 'labels') => begin
+  %= label_for first_name => (class => 'user') => begin
     First name
   % end
 
-Generate label. Note that this helper is EXPERIMENTAL and might change without
-warning!
+Generate label.
 
   <label for="first_name">First name</label>
-  <label class="labels" for="first_name">First name</label>
+  <label class="user" for="first_name">First name</label>
   <label for="first_name">
     First name
   </label>
-  <label class="labels" for="first_name">
+  <label class="user" for="first_name">
     First name
   </label>
 
 =head2 link_to
 
   %= link_to Home => 'index'
-  %= link_to Home => 'index' => {format => 'txt'} => (class => 'links')
-  %= link_to index => {format => 'txt'} => (class => 'links') => begin
+  %= link_to Home => 'index' => {format => 'txt'} => (class => 'menu')
+  %= link_to index => {format => 'txt'} => (class => 'menu') => begin
     Home
   % end
   %= link_to Contact => 'mailto:sri@example.com'
@@ -473,8 +472,8 @@ Generate portable link to route, path or URL, defaults to using the
 capitalized link target as content.
 
   <a href="/path/to/index">Home</a>
-  <a class="links" href="/path/to/index.txt">Home</a>
-  <a class="links" href="/path/to/index.txt">
+  <a class="menu" href="/path/to/index.txt">Home</a>
+  <a class="menu" href="/path/to/index.txt">
     Home
   </a>
   <a href="mailto:sri@example.com">Contact</a>

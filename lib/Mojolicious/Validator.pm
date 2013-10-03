@@ -13,7 +13,6 @@ sub add_check {
   return $self;
 }
 
-
 sub validation {
   Mojolicious::Validator::Validation->new(validator => shift);
 }

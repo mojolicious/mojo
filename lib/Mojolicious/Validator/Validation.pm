@@ -188,7 +188,7 @@ Change validation C<topic>.
   my @foo         = $c->param('foo');
   my ($foo, $bar) = $c->param(['foo', 'bar']);
 
-Access validated parameters.
+Access validated parameters, similar to L<Mojolicious::Controller/"param">.
 
 =head2 required
 

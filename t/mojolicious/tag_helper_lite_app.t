@@ -117,7 +117,9 @@ $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 <form action="/links">
   <label for="foo">&lt;Foo&gt;</label>
   <input name="foo" type="text" value="bar" />
-  <input class="test" name="bar" type="text" value="baz" />
+  <label for="bar">
+    Bar<br>
+</label>  <input class="test" name="bar" type="text" value="baz" />
   <input name="yada" type="text" value="" />
   <input class="tset" name="baz" value="yada" />
   <input type="submit" value="Ok" />
@@ -471,6 +473,9 @@ __DATA__
 %= form_for links => begin
   %= label_for foo => '<Foo>'
   %= text_field foo => 'bar'
+  %= label_for bar => begin
+    Bar<br>
+  % end
   %= text_field bar => 'baz', class => 'test'
   %= text_field yada => undef
   %= input_tag baz => 'yada', class => 'tset'

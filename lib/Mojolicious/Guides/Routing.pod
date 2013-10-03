@@ -619,11 +619,13 @@ and also part of the normal router.
   # * /yada.json -> {controller => 'foo', action => 'yada', format => 'json'}
   $r->any('/yada' => [format => [qw(txt json)]])->to('foo#yada');
 
-  # GET /foo/bar  -> {controller => 'foo', action => 'bar'}
-  # PUT /foo/baz  -> {controller => 'foo', action => 'baz'}
+  # GET   /foo/bar  -> {controller => 'foo', action => 'bar'}
+  # PUT   /foo/baz  -> {controller => 'foo', action => 'baz'}
+  # PATCH /foo      -> {controller => 'foo', action => 'yada'}
   my $foo = $r->any('/foo')->to('foo#');
   $foo->get('/bar')->to('#bar');
   $foo->put('/baz')->to('#baz');
+  $foo->patch->to('#yada');
 
 This makes the process of growing your L<Mojolicious::Lite> prototypes into
 full L<Mojolicious> applications very straightforward.

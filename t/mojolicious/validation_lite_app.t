@@ -12,7 +12,7 @@ use Test::Mojo;
 # Custom check
 app->validator->add_check(two => sub { length $_[2] == 2 });
 
-get '/' => sub {
+any '/' => sub {
   my $self = shift;
 
   my $validation = $self->validation;
@@ -138,7 +138,7 @@ $t->get_ok('/' => form => {foo => '☃☃'})->status_is(200)
   ->element_exists('input[type="password"]');
 
 # Validation failed for required fields
-$t->get_ok('/' => form => {foo => 'no'})->status_is(200)
+$t->post_ok('/' => form => {foo => 'no'})->status_is(200)
   ->text_is('div:root'                                 => 'in')
   ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
   ->element_exists('input.custom.field-with-error[type="text"][value="no"]')

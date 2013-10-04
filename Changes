@@ -1,6 +1,7 @@
 
 4.44  2013-10-04
   - Removed experimental status from label_for helper.
+  - Renamed regex check in Mojolicious::Validator to like.
 
 4.43  2013-10-02
   - Removed generators for dynamic error messages from Mojolicious::Validator.

@@ -76,17 +76,17 @@ is_deeply $validation->output, {foo => [qw(bar whatever)]}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('baz'), [qw(in yada whatever)], 'right error';
 
-# Regex
+# Like
 $validation = $t->app->validation;
 $validation->input({foo => 'bar', baz => 'yada'});
-ok $validation->required('foo')->regex(qr/^b/)->is_valid, 'valid';
+ok $validation->required('foo')->like(qr/^b/)->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok !$validation->has_error, 'no error';
 my $re = qr/ar$/;
-ok !$validation->required('baz')->regex($re)->is_valid, 'not valid';
+ok !$validation->required('baz')->like($re)->is_valid, 'not valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->has_error, 'has error';
-is_deeply $validation->error('baz'), ['regex', $re], 'right error';
+is_deeply $validation->error('baz'), ['like', $re], 'right error';
 
 # Size
 $validation = $t->app->validation;

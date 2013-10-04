@@ -633,7 +633,7 @@ with methods like L<Mojolicious::Validator::Validation/"is_valid">.
     return $self->render unless $validation->has_data;
 
     # Validate parameters ("pass_again" depends on "pass")
-    $validation->required('user')->size(1, 20)->regex(qr/^[e-t]+$/);
+    $validation->required('user')->size(1, 20)->like(qr/^[e-t]+$/);
     $validation->required('pass_again')->equal_to('pass')
       if $validation->optional('pass')->size(7, 500)->is_valid;
 

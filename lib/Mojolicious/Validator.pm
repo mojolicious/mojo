@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Mojolicious::Validator::Validation;
 
 has checks => sub {
-  {equal_to => \&_equal_to, in => \&_in, regex => \&_regex, size => \&_size};
+  {equal_to => \&_equal_to, in => \&_in, like => \&_like, size => \&_size};
 };
 
 sub add_check {
@@ -29,7 +29,7 @@ sub _in {
   return undef;
 }
 
-sub _regex { $_[2] =~ $_[3] }
+sub _like { $_[2] =~ $_[3] }
 
 sub _size {
   my ($validation, $name, $value, $min, $max) = @_;
@@ -52,7 +52,7 @@ Mojolicious::Validator - Validate form data
   my $validator  = Mojolicious::Validator->new;
   my $validation = $validator->validation;
   $validation->input({foo => 'bar'});
-  $validation->required('foo')->regex(qr/ar$/);
+  $validation->required('foo')->like(qr/ar$/);
   say $validation->param('foo');
 
 =head1 DESCRIPTION
@@ -76,9 +76,9 @@ Value needs to be equal to the value of another field.
 
 Value needs to match one of the values in the list.
 
-=head2 regex
+=head2 like
 
-  $validation->regex(qr/^[A-Z]/);
+  $validation->like(qr/^[A-Z]/);
 
 Value needs to match the regular expression.
 
@@ -97,7 +97,7 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered validation checks, by default only C<equal_to>, C<in>, C<regex> and
+Registered validation checks, by default only C<equal_to>, C<in>, C<like> and
 C<size> are already defined.
 
 =head1 METHODS

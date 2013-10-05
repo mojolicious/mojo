@@ -1,4 +1,6 @@
 
+4.45  2013-10-05
+
 4.44  2013-10-04
   - Removed experimental status from label_for helper.
   - Renamed regex check in Mojolicious::Validator to like.

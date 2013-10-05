@@ -281,8 +281,8 @@ In addition to the methods above, you can also call methods provided by all
 elements in the collection directly and create a new collection from the
 results, similar to C<pluck>.
 
-  push @$collection, Mojo::ByteStream->new("/home/sri/$_.txt") for 1 .. 9;
-  say $collection->slurp->b64_encode('');
+  push @$collection, Mojo::DOM->new("<div><h1>$_</h1></div>") for 1 .. 9;
+  say $collection->at('h1')->type('h2')->prepend_content('Test ')->root;
 
 =head1 ELEMENTS
 

@@ -6,11 +6,11 @@ has 'tree';
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
   \[
-  ((?:$ESCAPE_RE|[\w\-])+)        # Key
+  ((?:$ESCAPE_RE|[\w\-])+)           # Key
   (?:
-    (\W)?                         # Operator
+    (\W)?                            # Operator
     =
-    (?:"((?:\\"|[^"])*)"|(\S+))   # Value
+    (?:"((?:\\"|[^"])*)"|([^\]]+))   # Value
   )?
   \]
 /x;

@@ -34,7 +34,7 @@ sub _like { $_[2] !~ $_[3] }
 sub _size {
   my ($validation, $name, $value, $min, $max) = @_;
   my $len = length $value;
-  return !($len >= $min && $len <= $max);
+  return $len < $min || $len > $max;
 }
 
 1;

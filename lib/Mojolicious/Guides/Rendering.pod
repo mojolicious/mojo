@@ -690,15 +690,17 @@ L<Mojolicious::Validator/"CHECKS">.
 
 =head2 Adding form validation checks
 
-Validation checks only have to return true or false and can be registered with
-L<Mojolicious::Validator/"add_check">.
+Validation checks can be registered with L<Mojolicious::Validator/"add_check">
+and return a false value if they were successful. A true value may be used to
+pass along additional information which can then be retrieved with
+L<Mojolicious::Validator::Validation/"error">.
 
   use Mojolicious::Lite;
 
   # Add "range" check
   app->validator->add_check(range => sub {
     my ($validation, $name, $value, $min, $max) = @_;
-    return $value >= $min && $value <= $max;
+    return $value < $min || $value > $max;
   });
 
   get '/' => 'form';
@@ -740,9 +742,6 @@ L<Mojolicious::Validator/"add_check">.
       % end
     </html>
   </html>
-
-Details about failed validation checks can be retrieved with
-L<Mojolicious::Validator::Validation/"error">.
 
 =head2 Adding helpers
 

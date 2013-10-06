@@ -30,9 +30,9 @@ sub check {
   my $name  = $self->topic;
   my $input = $self->input->{$name};
   for my $value (ref $input eq 'ARRAY' ? @$input : $input) {
-    next if $self->$cb($name, $value, @_);
+    next unless my $result = $self->$cb($name, $value, @_);
     delete $self->output->{$name};
-    $self->{error}{$name} = [$check, @_];
+    $self->{error}{$name} = [$check, $result, @_];
     last;
   }
 
@@ -152,7 +152,7 @@ Perform validation check.
 
 Return details about failed validation check.
 
-  my ($check, @args) = @{$validation->error('foo')};
+  my ($check, $result, @args) = @{$validation->error('foo')};
 
 =head2 has_data
 

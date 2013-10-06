@@ -19,22 +19,22 @@ sub validation {
 
 sub _equal_to {
   my ($validation, $name, $value, $to) = @_;
-  return undef unless defined(my $other = $validation->input->{$to});
-  return $value eq $other;
+  return 1 unless defined(my $other = $validation->input->{$to});
+  return $value ne $other;
 }
 
 sub _in {
   my ($validation, $name, $value) = (shift, shift, shift);
-  $value eq $_ && return 1 for @_;
-  return undef;
+  $value eq $_ && return undef for @_;
+  return 1;
 }
 
-sub _like { $_[2] =~ $_[3] }
+sub _like { $_[2] !~ $_[3] }
 
 sub _size {
   my ($validation, $name, $value, $min, $max) = @_;
   my $len = length $value;
-  return $len >= $min && $len <= $max;
+  return !($len >= $min && $len <= $max);
 }
 
 1;

@@ -1,5 +1,6 @@
 
 4.45  2013-10-06
+  - Changed return values of validation checks in Mojolicious::Validator.
   - Fixed unquoted attribute selector bug in Mojo::DOM::CSS.
 
 4.44  2013-10-04

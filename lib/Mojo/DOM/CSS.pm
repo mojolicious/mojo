@@ -592,7 +592,7 @@ Elements of type C<E>, C<F> and C<G>.
 
 An C<E> element whose attributes match all following attribute selectors.
 
-  my $links = $css->select('a[foo^="b"][foo$="ar"]');
+  my $links = $css->select('a[foo^=b][foo$=ar]');
 
 =head1 ATTRIBUTES
 

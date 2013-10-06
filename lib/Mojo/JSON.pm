@@ -363,12 +363,17 @@ C<Scalar> that has been used in numeric context is considered a number.
   {"foo": "bar"} -> {foo => 'bar'}
 
 Literal names will be translated to and from L<Mojo::JSON> constants or a
-similar native Perl value. In addition C<Scalar> references will be used to
-generate booleans, based on if their values are true or false.
+similar native Perl value.
 
   true  -> Mojo::JSON->true
   false -> Mojo::JSON->false
   null  -> undef
+
+In addition C<Scalar> references will be used to generate booleans, based on
+if their values are true or false.
+
+  \1 -> true
+  \0 -> false
 
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
 encoding will only generate UTF-8. The two Unicode whitespace characters

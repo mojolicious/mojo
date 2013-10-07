@@ -744,33 +744,36 @@ is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 is $t->redirect($tx), undef, 'unsupported redirect';
 
-# 302 redirect (relative path)
+# 302 redirect (relative path and query)
 $tx = $t->tx(
-  POST => 'http://mojolicio.us/foo/bar' => {Accept => 'application/json'});
+  POST => 'http://mojolicio.us/foo/bar?a=b' => {Accept => 'application/json'});
 $tx->res->code(302);
-$tx->res->headers->location('baz');
+$tx->res->headers->location('baz?f%23oo=bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://mojolicio.us/foo/baz', 'right URL';
-is $tx->req->headers->accept,   undef, 'no "Accept" value';
-is $tx->req->headers->location, undef, 'no "Location" value';
+is $tx->req->url->to_abs, 'http://mojolicio.us/foo/baz?f%23oo=bar',
+  'right URL';
+is $tx->req->url->query,        'f%23oo=bar', 'right query';
+is $tx->req->headers->accept,   undef,        'no "Accept" value';
+is $tx->req->headers->location, undef,        'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
-# 302 redirect (absolute path)
+# 302 redirect (absolute path and query)
 $tx = $t->tx(
-  POST => 'http://mojolicio.us/foo/bar' => {Accept => 'application/json'});
+  POST => 'http://mojolicio.us/foo/bar?a=b' => {Accept => 'application/json'});
 $tx->res->code(302);
-$tx->res->headers->location('/baz');
+$tx->res->headers->location('/baz?f%23oo=bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://mojolicio.us/baz', 'right URL';
-is $tx->req->headers->accept, undef, 'no "Accept" value';
+is $tx->req->url->to_abs, 'http://mojolicio.us/baz?f%23oo=bar', 'right URL';
+is $tx->req->url->query, 'f%23oo=bar', 'right query';
+is $tx->req->headers->accept,   undef, 'no "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';

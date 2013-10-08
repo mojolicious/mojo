@@ -1,5 +1,5 @@
 
-4.46  2013-10-07
+4.46  2013-10-08
 
 4.45  2013-10-06
   - Changed return values of validation checks in Mojolicious::Validator.

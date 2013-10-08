@@ -1134,7 +1134,7 @@ Ever thought about running a quick one-liner against your L<Mojolicious>
 application to test something? Thanks to the C<eval> command you can do just
 that, the application object itself can be accessed via C<app>.
 
-  $ mojo generate lite_app
+  $ mojo generate lite_app myapp.pl
   $ ./myapp.pl eval 'say for @{app->static->paths}'
 
 The C<verbose> options will automatically print the return value or returned
@@ -1148,16 +1148,16 @@ data structure to C<STDOUT>.
 Ever thought about releasing your L<Mojolicious> application to CPAN? It's
 actually much easier than you might think.
 
-  $ mojo generate app
-  $ cd my_mojolicious_app
-  $ mv public lib/MyMojoliciousApp/
-  $ mv templates lib/MyMojoliciousApp/
+  $ mojo generate app MyApp
+  $ cd my_app
+  $ mv public lib/MyApp/
+  $ mv templates lib/MyApp/
 
 The trick is to move the C<public> and C<templates> directories so they can
 get automatically installed with the modules.
 
   # Application
-  package MyMojoliciousApp;
+  package MyApp;
   use Mojo::Base 'Mojolicious';
 
   use File::Basename 'dirname';
@@ -1170,7 +1170,7 @@ get automatically installed with the modules.
     my $self = shift;
 
     # Switch to installable home directory
-    $self->home->parse(catdir(dirname(__FILE__), 'MyMojoliciousApp'));
+    $self->home->parse(catdir(dirname(__FILE__), 'MyApp'));
 
     # Switch to installable "public" directory
     $self->static->paths->[0] = $self->home->rel_dir('public');
@@ -1189,7 +1189,7 @@ get automatically installed with the modules.
 That's really everything, now you can package your application like any other
 CPAN module.
 
-  $ ./script/my_mojolicious_app generate makefile
+  $ ./script/my_app generate makefile
   $ perl Makefile.PL
   $ make test
   $ make manifest
@@ -1198,7 +1198,7 @@ CPAN module.
 And if you have a C<PAUSE> account (which can be requested at
 L<http://pause.perl.org>) even upload it.
 
-  $ mojo cpanify -u USER -p PASS MyMojoliciousApp-0.01.tar.gz
+  $ mojo cpanify -u USER -p PASS MyApp-0.01.tar.gz
 
 =head2 Hello World
 

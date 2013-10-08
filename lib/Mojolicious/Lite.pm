@@ -112,7 +112,7 @@ featured web application.
 
 There is also a helper command to generate a small example application.
 
-  $ mojo generate lite_app
+  $ mojo generate lite_app myapp.pl
 
 =head2 Commands
 

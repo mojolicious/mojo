@@ -8,7 +8,7 @@ has usage       => "usage: $0 generate app [NAME]\n";
 
 sub run {
   my ($self, $class) = @_;
-  $class ||= 'MyMojoliciousApp';
+  $class ||= 'MyApp';
 
   # Prevent bad applications
   die <<EOF unless $class =~ /^[A-Z](?:\w|::)+$/;

@@ -66,10 +66,11 @@ my %VOID = map { $_ => 1 } (
 
 # HTML elements categorized as phrasing content (and obsolete inline elements)
 my @PHRASING = (
-  qw(a abbr area audio b bdo br button canvas cite code data datalist del),
-  qw(dfn em embed i iframe img input ins kbd keygen label link map mark math),
-  qw(meta meter noscript object output progress q ruby s samp script select),
-  qw(small span strong sub sup svg template textarea time u var video wbr)
+  qw(a abbr area audio b bdi bdo br button canvas cite code data datalist),
+  qw(del dfn em embed i iframe img input ins kbd keygen label link map mark),
+  qw(math meta meter noscript object output progress q ruby s samp script),
+  qw(select small span strong sub sup svg template textarea time u var video),
+  qw(wbr)
 );
 my @OBSOLETE = qw(acronym applet basefont big font strike tt);
 my %PHRASING = map { $_ => 1 } @OBSOLETE, @PHRASING;

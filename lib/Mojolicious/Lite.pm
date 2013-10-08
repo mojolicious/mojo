@@ -112,7 +112,11 @@ featured web application.
 
 There is also a helper command to generate a small example application.
 
-  $ mojo generate lite_app
+  $ mojo generate app lite_app
+
+If you installed Mojolicious to a local::lib with carton, try this:
+
+  $ perl -Ilocal/lib/perl5 local/bin/mojo generate app lite_app  
 
 =head2 Commands
 

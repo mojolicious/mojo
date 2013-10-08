@@ -25,7 +25,7 @@ use constant {
   PC_INITIAL_N    => 128
 };
 
-# To update HTML5 entities run this command
+# To update HTML entities run this command
 # perl examples/entities.pl > lib/Mojo/entities.txt
 my %ENTITIES;
 for my $line (split "\x0a", slurp(catfile dirname(__FILE__), 'entities.txt')) {

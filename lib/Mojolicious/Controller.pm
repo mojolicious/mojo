@@ -527,6 +527,12 @@ underlying connection might get closed early.
   my $address = $c->tx->remote_address;
   my $port    = $c->tx->remote_port;
 
+  # Perform non-blocking operation without knowing the connection status
+  my $tx = $c->tx;
+  Mojo::IOLoop->timer(2 => sub {
+    $c->app->log->debug($tx->is_finished ? 'Finished.' : 'In progress.');
+  });
+
 =head1 METHODS
 
 L<Mojolicious::Controller> inherits all methods from L<Mojo::Base> and

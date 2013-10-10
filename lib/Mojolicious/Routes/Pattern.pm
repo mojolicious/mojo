@@ -28,7 +28,7 @@ sub match_partial {
 
   # Match
   return undef unless my @captures = $$pathref =~ $regex;
-  $$pathref =~ s/$regex//;
+  $$pathref = $';
 
   # Merge captures
   my $captures = {%{$self->defaults}};

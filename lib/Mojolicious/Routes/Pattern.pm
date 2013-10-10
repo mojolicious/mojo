@@ -28,7 +28,7 @@ sub match_partial {
 
   # Match
   return undef unless my @captures = $$pathref =~ $regex;
-  $$pathref = $';
+  $$pathref = ${^POSTMATCH};
 
   # Merge captures
   my $captures = {%{$self->defaults}};
@@ -152,7 +152,7 @@ sub _compile {
   # Not rooted with a slash
   $regex = "$block$regex" if $block;
 
-  return $self->regex(qr/^$regex/s)->regex;
+  return $self->regex(qr/^$regex/ps)->regex;
 }
 
 sub _compile_format {

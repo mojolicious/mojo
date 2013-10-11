@@ -548,7 +548,7 @@ An C<E> element whose class is "warning".
 
 =head2 E#myid
 
-  my $foo = $css->select('div#foo');
+  my $foo = $css->select('div#myid');
 
 An C<E> element with C<ID> equal to "myid".
 

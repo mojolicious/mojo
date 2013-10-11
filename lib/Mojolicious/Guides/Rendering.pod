@@ -812,7 +812,8 @@ applications, plugins make that very simple.
 
   1;
 
-The C<register> method will be called when you load the plugin.
+The C<register> method will be called when you load the plugin and to add your
+helper to the application you can use L<Mojolicious/"helper">.
 
   use Mojolicious::Lite;
 
@@ -1084,7 +1085,8 @@ L<Mojo::Template> contains the whole list of available options.
 
 Maybe you would prefer a different template system than C<ep>, and there is
 not already a plugin on CPAN for your favorite one, all you have to do is add
-a new C<handler> when C<register> is called.
+a new C<handler> with L<Mojolicious::Renderer/"add_handler"> when C<register>
+is called.
 
   package Mojolicious::Plugin::MyRenderer;
   use Mojo::Base 'Mojolicious::Plugin';

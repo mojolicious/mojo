@@ -146,8 +146,9 @@ Most commonly used features every L<Mojolicious> developer should know about.
 
 =head2 Minimal route
 
-Every L<Mojolicious> application has a router object you can use to generate
-route structures, that match in the same order in which they were defined.
+The attribute L<Mojolicious/"routes"> contains a router you can use to
+generate route structures, they match in the same order in which they were
+defined.
 
   # Application
   package MyApp;
@@ -165,8 +166,8 @@ route structures, that match in the same order in which they were defined.
 
   1;
 
-The minimal static route above will load and instantiate the class
-C<MyApp::Foo> and call its C<welcome> method.
+The minimal route above will load and instantiate the class C<MyApp::Foo> and
+call its C<welcome> method.
 
   # Controller
   package MyApp::Foo;
@@ -548,9 +549,9 @@ with L<Mojolicious::Controller/"send"> right away.
 
 =head2 Bridges
 
-Bridge routes can be used to share code with multiple nested routes, because
-unlike normal nested routes, they always match and result in additional
-dispatch cycles.
+Bridge routes created with the method L<Mojolicious::Routes::Route/"bridge">
+can be used to share code with multiple nested routes, because unlike normal
+nested routes, they always match and result in additional dispatch cycles.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'baz'}
@@ -604,7 +605,8 @@ operations to finish before reaching the next dispatch cycle.
 
 From the tutorial you should already know L<Mojolicious::Lite> routes, which
 are in fact just a small convenience layer around everything described above
-and also part of the normal router.
+and accessible through methods like L<Mojolicious::Routes::Route/"get"> as
+part of the normal router.
 
   # POST /foo -> {controller => 'foo', action => 'abc'}
   $r->post('/foo')->to(controller => 'foo', action => 'abc');
@@ -636,7 +638,8 @@ full L<Mojolicious> applications very straightforward.
     $self->render(text => 'Just like a Mojolicious::Lite action.');
   });
 
-Even the more abstract concepts are available.
+Even the more abstract concepts are available with methods like
+L<Mojolicious::Routes::Route/"under">.
 
   # GET  /yada
   # POST /yada

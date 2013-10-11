@@ -1,5 +1,5 @@
 
-4.46  2013-10-10
+4.46  2013-10-11
   - Changed default name for generated applications from MyMojoliciousApp to
     MyApp.
   - Improved performance of route matching in Mojolicious::Routes::Pattern.

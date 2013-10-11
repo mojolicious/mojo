@@ -266,7 +266,8 @@ and implements the following new ones.
 
 Previous transaction that triggered this followup transaction.
 
-  # Path of previous request
+  # Paths of previous requests
+  say $tx->previous->previous->req->url->path;
   say $tx->previous->req->url->path;
 
 =head1 METHODS

@@ -18,7 +18,7 @@ my $cwd = cwd;
 my $dir = tempdir CLEANUP => 1;
 chdir $dir;
 $command->create_rel_dir('foo/bar');
-ok -d catdir($dir, qw(foo bar)), 'directory exists';
+ok -d catdir(qw(foo bar)), 'directory exists';
 my $template = "@@ foo_bar\njust <%= 'works' %>!\n";
 open my $data, '<', \$template;
 no strict 'refs';

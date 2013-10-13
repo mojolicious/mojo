@@ -484,7 +484,7 @@ MOJO_FATAL_DEPRECATIONS environment variable to make them die instead.
 
 =head2 dumper
 
-  my $str = dumper {some => 'data'};
+  my $perl = dumper {some => 'data'};
 
 Dump a Perl data structure with L<Data::Dumper>.
 

@@ -165,7 +165,7 @@ Check or get name of current route.
 
   %= dumper {some => 'data'}
 
-Alias for L<Mojo::Util/"dumper">.
+Dump a Perl data structure with L<Mojo::Util/"dumper">.
 
 =head2 extends
 

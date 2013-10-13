@@ -160,7 +160,7 @@ L<Mojo::Message::Response> object.
 
   my $perl = r({data => 'structure'});
 
-Dump a Perl data structure with L<Data::Dumper>.
+Dump a Perl data structure with L<Mojo::Util/"dumper">.
 
   perl -Mojo -E 'say r(g("example.com")->headers->to_hash)'
 

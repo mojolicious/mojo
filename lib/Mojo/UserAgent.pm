@@ -80,7 +80,7 @@ sub start {
   # Fork safety
   unless (($self->{pid} //= $$) eq $$) {
     $self->_cleanup;
-    delete $self->{$_} for qw(pid port);
+    delete @$self{qw(pid port)};
   }
 
   # Non-blocking

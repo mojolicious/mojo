@@ -134,7 +134,7 @@ sub _reap {
   # Clean up failed upgrade
   return unless ($self->{new} || '') eq $pid;
   $self->{prefork}->app->log->info('Zero downtime software upgrade failed.');
-  delete $self->{$_} for qw(new upgrade);
+  delete @$self{qw(new upgrade)};
 }
 
 sub _stop {

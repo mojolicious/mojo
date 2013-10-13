@@ -72,7 +72,7 @@ sub _match {
   if (($endpoint && $empty) || $r->inline) {
     push @{$self->stack}, {%$captures};
     return $self->endpoint($r) if $endpoint && $empty;
-    delete $captures->{$_} for qw(app cb);
+    delete @$captures{qw(app cb)};
   }
 
   # Match children

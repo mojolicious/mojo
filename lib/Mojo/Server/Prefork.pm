@@ -206,7 +206,7 @@ sub _spawn {
   # Clean worker environment
   $SIG{$_} = 'DEFAULT' for qw(INT TERM CHLD TTIN TTOU);
   $SIG{QUIT} = sub { $loop->max_connections(0) };
-  delete $self->{$_} for qw(poll reader);
+  delete @$self{qw(poll reader)};
 
   $self->app->log->debug("Worker $$ started.");
   $loop->start;

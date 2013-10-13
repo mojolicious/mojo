@@ -449,7 +449,7 @@ sub _fallbacks {
   # Inline template
   my $stash = $self->stash;
   return undef unless $stash->{format} eq 'html';
-  delete $stash->{$_} for qw(extends layout);
+  delete @$stash{qw(extends layout)};
   return $self->render_maybe(%$options, inline => $inline, handler => 'ep');
 }
 

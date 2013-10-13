@@ -1,8 +1,8 @@
 package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Data::Dumper ();
 use Mojo::ByteStream;
+use Mojo::Util 'dumper';
 
 sub register {
   my ($self, $app) = @_;
@@ -29,10 +29,10 @@ sub register {
   $app->helper(content       => \&_content);
   $app->helper(content_for   => \&_content_for);
   $app->helper(current_route => \&_current_route);
-  $app->helper(dumper        => \&_dumper);
+  $app->helper(dumper        => sub { shift; dumper(@_) });
   $app->helper(include       => \&_include);
-  $app->helper(ua            => sub { shift->app->ua });
-  $app->helper(url_with      => \&_url_with);
+  $app->helper(ua => sub { shift->app->ua });
+  $app->helper(url_with => \&_url_with);
 }
 
 sub _content {
@@ -59,11 +59,6 @@ sub _current_route {
   return '' unless my $endpoint = shift->match->endpoint;
   return $endpoint->name unless @_;
   return $endpoint->name eq shift;
-}
-
-sub _dumper {
-  my $self = shift;
-  return Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Dump;
 }
 
 sub _include {
@@ -170,7 +165,7 @@ Check or get name of current route.
 
   %= dumper {some => 'data'}
 
-Dump a Perl data structure with L<Data::Dumper>.
+Alias for L<Mojo::Util/"dumper">.
 
 =head2 extends
 

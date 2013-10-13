@@ -2,6 +2,7 @@ package Mojo::Util;
 use Mojo::Base 'Exporter';
 
 use Carp qw(carp croak);
+use Data::Dumper ();
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(hmac_sha1 sha1 sha1_hex);
 use Encode 'find_encoding';
@@ -38,8 +39,8 @@ my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated encode get_line hmac_sha1_sum html_unescape md5_bytes),
-  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(decode deprecated dumper encode get_line hmac_sha1_sum html_unescape),
+  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
   qw(steady_time trim unquote url_escape url_unescape xml_escape xor_encode)
 );
@@ -94,6 +95,8 @@ sub deprecated {
   local $Carp::CarpLevel = 1;
   $ENV{MOJO_FATAL_DEPRECATIONS} ? croak(@_) : carp(@_);
 }
+
+sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Dump }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
 
@@ -478,6 +481,12 @@ Decode bytes to characters and return C<undef> if decoding failed.
 
 Warn about deprecated feature from perspective of caller. You can also set the
 MOJO_FATAL_DEPRECATIONS environment variable to make them die instead.
+
+=head2 dumper
+
+  my $str = dumper {some => 'data'};
+
+Dump a Perl data structure with L<Data::Dumper>.
 
 =head2 encode
 

@@ -1,4 +1,7 @@
 
+4.47  2013-10-13
+  - Added dumper function to Mojo::Util.
+
 4.46  2013-10-11
   - Changed default name for generated applications from MyMojoliciousApp to
     MyApp.

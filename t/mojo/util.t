@@ -10,10 +10,10 @@ use Mojo::DeprecationTest;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode encode get_line hmac_sha1_sum html_unescape md5_bytes md5_sum),
-  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
-  qw(sha1_bytes sha1_sum slurp split_header spurt squish steady_time trim),
-  qw(unquote url_escape url_unescape xml_escape xor_encode);
+  qw(decode dumper encode get_line hmac_sha1_sum html_unescape md5_bytes),
+  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
+  qw(steady_time trim unquote url_escape url_unescape xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -412,5 +412,8 @@ is MojoMonkeyTest::yang(), 'yang', 'right result';
   ok !$warn, 'no warning';
   like $die, qr/foo is DEPRECATED at .*util\.t line \d+/, 'right exception';
 }
+
+# dumper
+is dumper([1, 2]), "[\n  1,\n  2\n]\n", 'right result';
 
 done_testing();

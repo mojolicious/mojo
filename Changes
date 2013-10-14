@@ -1,6 +1,7 @@
 
-4.47  2013-10-13
+4.47  2013-10-14
   - Added dumper function to Mojo::Util.
+  - Improved IIS compatibility of Mojo::Server::CGI.
 
 4.46  2013-10-11
   - Changed default name for generated applications from MyMojoliciousApp to

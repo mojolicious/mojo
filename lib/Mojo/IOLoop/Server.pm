@@ -97,6 +97,8 @@ sub listen {
     SSL_startHandshake     => 0,
     SSL_verify_mode        => 0x00
   };
+  $options->{SSL_ecdh_curve} = 'prime256v1'
+    if Net::SSLeay::OPENSSL_VERSION_NUMBER() >= 0x01000000;
   return unless $args->{tls_ca};
   $options->{SSL_ca_file} = -T $args->{tls_ca} ? $args->{tls_ca} : undef;
   $options->{SSL_verify_mode}

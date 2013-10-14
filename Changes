@@ -1,6 +1,7 @@
 
-4.47  2013-10-14
+4.47  2013-10-15
   - Added dumper function to Mojo::Util.
+  - Improved compatibility with IO::Socket::SSL 1.955.
   - Improved IIS compatibility of Mojo::Server::CGI.
 
 4.46  2013-10-11

@@ -10,7 +10,7 @@ sub run {
   my $req = $tx->req->parse(\%ENV);
   $tx->local_port($ENV{SERVER_PORT})->remote_address($ENV{REMOTE_ADDR});
 
-  # Request body (read can block if we try to read too much)
+  # Request body (may block if we try to read too much)
   binmode STDIN;
   my $len = $req->headers->content_length;
   until ($req->is_finished) {

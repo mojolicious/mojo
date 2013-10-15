@@ -235,7 +235,7 @@ sub _parse_env {
   }
 
   # HTTPS
-  $base->scheme('https') if $env->{HTTPS};
+  $base->scheme('https') if ($env->{HTTPS} // 'off') =~ /^(?:on|1)$/i;
 
   # Path
   my $path = $url->path->parse($env->{PATH_INFO} ? $env->{PATH_INFO} : '');

@@ -1,5 +1,6 @@
 
 4.48  2013-10-16
+  - Fixed support for Net::SSLeay 1.55.
 
 4.47  2013-10-15
   - Added dumper function to Mojo::Util.

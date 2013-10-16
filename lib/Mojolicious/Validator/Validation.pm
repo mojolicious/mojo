@@ -65,7 +65,7 @@ sub param {
   return map { scalar $self->param($_) } @$name if ref $name eq 'ARRAY';
 
   # List names
-  return sort keys %{$self->output} unless $name;
+  return sort keys %{$self->output} unless defined $name;
 
   my $value = $self->output->{$name};
   my @values = ref $value eq 'ARRAY' ? @$value : ($value);

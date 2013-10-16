@@ -48,9 +48,9 @@ get '/uni/aäb' => sub {
   $self->render(text => $self->url_for);
 };
 
-get '/unicode/:stuff' => sub {
+get '/unicode/:0' => sub {
   my $self = shift;
-  $self->render(text => $self->param('stuff') . $self->url_for);
+  $self->render(text => $self->param('0') . $self->url_for);
 };
 
 get '/' => 'root';

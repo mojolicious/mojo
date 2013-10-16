@@ -27,8 +27,7 @@ any '/' => sub {
 my $t = Test::Mojo->new;
 
 # Required and optional values
-my $validation = $t->app->validation;
-$validation->input({foo => 'bar', baz => 'yada'});
+my $validation = $t->app->validation->input({foo => 'bar', baz => 'yada'});
 ok $validation->required('foo')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 is $validation->param('foo'), 'bar', 'right value';
@@ -49,8 +48,8 @@ ok $validation->has_error, 'has error';
 is_deeply $validation->error('does_not_exist'), ['required'], 'right error';
 
 # Equal to
-$validation = $t->app->validation;
-$validation->input({foo => 'bar', baz => 'bar', yada => 'yada'});
+$validation
+  = $t->app->validation->input({foo => 'bar', baz => 'bar', yada => 'yada'});
 ok $validation->optional('foo')->equal_to('baz')->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok !$validation->has_error, 'no error';
@@ -66,8 +65,8 @@ ok $validation->has_error, 'has error';
 is_deeply $validation->error('yada'), [qw(equal_to 1 foo)], 'right error';
 
 # In
-$validation = $t->app->validation;
-$validation->input({foo => [qw(bar whatever)], baz => [qw(yada ohoh)]});
+$validation = $t->app->validation->input(
+  {foo => [qw(bar whatever)], baz => [qw(yada ohoh)]});
 ok $validation->required('foo')->in(qw(23 bar whatever))->is_valid, 'valid';
 is_deeply $validation->output, {foo => [qw(bar whatever)]}, 'right result';
 ok !$validation->has_error, 'no error';
@@ -77,8 +76,7 @@ ok $validation->has_error, 'has error';
 is_deeply $validation->error('baz'), [qw(in 1 yada whatever)], 'right error';
 
 # Like
-$validation = $t->app->validation;
-$validation->input({foo => 'bar', baz => 'yada'});
+$validation = $t->app->validation->input({foo => 'bar', baz => 'yada'});
 ok $validation->required('foo')->like(qr/^b/)->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok !$validation->has_error, 'no error';
@@ -89,8 +87,8 @@ ok $validation->has_error, 'has error';
 is_deeply $validation->error('baz'), ['like', 1, $re], 'right error';
 
 # Size
-$validation = $t->app->validation;
-$validation->input({foo => 'bar', baz => 'yada', yada => 'yada'});
+$validation
+  = $t->app->validation->input({foo => 'bar', baz => 'yada', yada => 'yada'});
 ok $validation->required('foo')->size(1, 3)->is_valid, 'valid';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok !$validation->has_error, 'no error';
@@ -114,6 +112,13 @@ ok !$validation->required('foo')->is_valid, 'not valid';
 is_deeply $validation->output, {}, 'right result';
 ok $validation->has_error, 'has error';
 is_deeply $validation->error('foo'), ['required'], 'right error';
+
+# "0"
+$validation = $t->app->validation->input({0 => 0});
+ok $validation->has_data, 'has data';
+ok $validation->required('0')->size(1, 1)->is_valid, 'valid';
+is_deeply $validation->output, {0 => 0}, 'right result';
+is $validation->param('0'), 0, 'right value';
 
 # Missing method and function (AUTOLOAD)
 eval { $t->app->validation->missing };

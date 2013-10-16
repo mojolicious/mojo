@@ -90,8 +90,8 @@ sub listen {
   # Prioritize RC4 to mitigate BEAST attack
   my $options = $self->{tls} = {
     SSL_cert_file => $args->{tls_cert} || $CERT,
-    SSL_cipher_list =>
-      'ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH',
+    SSL_cipher_list => $args->{tls_ciphers}
+      // 'ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH',
     SSL_honor_cipher_order => 1,
     SSL_key_file           => $args->{tls_key} || $KEY,
     SSL_startHandshake     => 0,
@@ -283,6 +283,12 @@ Path to TLS certificate authority file.
   tls_cert => '/etc/tls/server.crt'
 
 Path to the TLS cert file, defaults to a built-in test certificate.
+
+=item tls_ciphers
+
+  tls_ciphers => 'AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH'
+
+Cipher specification string.
 
 =item tls_key
 

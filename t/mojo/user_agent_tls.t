@@ -128,6 +128,7 @@ $listen
   . '?cert=t/mojo/certs/server.crt'
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt'
+  . '&ciphers=RC4-MD5:ALL'
   . '&verify=0x00';
 $daemon->listen([$listen])->start;
 
@@ -137,5 +138,7 @@ $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key');
 $tx = $ua->get("https://localhost:$port");
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';
+is $ua->ioloop->stream($tx->connection)->handle->get_cipher, 'RC4-MD5',
+  'RC4-MD5 has been negotiatied';
 
 done_testing();

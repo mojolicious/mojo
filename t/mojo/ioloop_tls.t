@@ -311,15 +311,17 @@ ok $client_err, 'has error';
 # Ignore invalid client certificate
 $loop = Mojo::IOLoop->new;
 $port = Mojo::IOLoop->generate_port;
+my $cipher;
 ($server, $client, $client_err) = ();
 $loop->server(
-  address    => '127.0.0.1',
-  port       => $port,
-  tls        => 1,
-  tls_ca     => 't/mojo/certs/ca.crt',
-  tls_cert   => 't/mojo/certs/server.crt',
-  tls_key    => 't/mojo/certs/server.key',
-  tls_verify => 0x00,
+  address     => '127.0.0.1',
+  port        => $port,
+  tls         => 1,
+  tls_ca      => 't/mojo/certs/ca.crt',
+  tls_cert    => 't/mojo/certs/server.crt',
+  tls_ciphers => 'RC4-MD5:ALL',
+  tls_key     => 't/mojo/certs/server.key',
+  tls_verify  => 0x00,
   sub {
     my ($loop, $stream) = @_;
     $stream->on(close => sub { $loop->stop });
@@ -336,11 +338,13 @@ $loop->client(
     $stream->timeout(0.5);
     $client_err = $err;
     $client     = 'connected';
+    $cipher     = $stream->handle->get_cipher;
   }
 );
 $loop->start;
 is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
+is $cipher, 'RC4-MD5', 'RC4-MD5 has been negotiatied';
 
 done_testing();

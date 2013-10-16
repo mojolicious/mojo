@@ -1,4 +1,8 @@
 
+4.49  2013-10-17
+  - Added tls_ciphers option to Mojo::IOLoop::Server::listen.
+  - Added ciphers parameter to Mojo::Server::Daemon::listen.
+
 4.48  2013-10-16
   - Fixed support for Net::SSLeay 1.55.
 

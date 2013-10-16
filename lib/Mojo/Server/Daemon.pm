@@ -163,15 +163,12 @@ sub _listen {
   my $url     = Mojo::URL->new($listen);
   my $query   = $url->query;
   my $options = {
-    address     => $url->host,
-    backlog     => $self->backlog,
-    port        => $url->port,
-    reuse       => scalar $query->param('reuse'),
-    tls_ca      => scalar $query->param('ca'),
-    tls_cert    => scalar $query->param('cert'),
-    tls_ciphers => scalar $query->param('ciphers'),
-    tls_key     => scalar $query->param('key')
+    address => $url->host,
+    backlog => $self->backlog,
+    port    => $url->port,
+    reuse   => scalar $query->param('reuse'),
   };
+  $options->{"tls_$_"} = scalar $query->param($_) for qw(ca cert ciphers key);
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
   delete $options->{address} if $options->{address} eq '*';

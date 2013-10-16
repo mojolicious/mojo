@@ -144,8 +144,8 @@ and implements the following new ones.
 
   $validation = $validation->check('size', 2, 7);
 
-Perform validation check, no more checks will be performend for the current
-C<topic> after the first one failed.
+Perform validation check on all values of the current C<topic>, no more checks
+will be performend on them after the first one failed.
 
 =head2 error
 

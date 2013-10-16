@@ -248,10 +248,9 @@ request.
 
 =head2 validation
 
-  %= validation->errors('description')
+  %= validation->param('foo')
 
-Alias for L<Mojolicious::Controller/"validation">. Note that this helper is
-EXPERIMENTAL and might change without warning!
+Alias for L<Mojolicious::Controller/"validation">.
 
 =head1 METHODS
 

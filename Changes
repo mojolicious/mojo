@@ -2,6 +2,13 @@
 4.49  2013-10-17
   - Added tls_ciphers option to Mojo::IOLoop::Server::listen.
   - Added ciphers parameter to Mojo::Server::Daemon::listen.
+  - Removed experimental status from Mojolicioua::Validator.
+  - Removed experimental status from Mojolicioua::Validator::Validation.
+  - Removed experimental status from validation method in
+    Mojolicious::Controller.
+  - Removed experimental status from validator attribute in Mojolicious.
+  - Removed experimental status from validation helper in
+    Mojolicious::Plugin::DefaultHelpers.
   - Fixed parameter bug in Mojolicious::Validator::Validation.
 
 4.48  2013-10-16

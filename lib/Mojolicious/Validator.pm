@@ -57,8 +57,7 @@ Mojolicious::Validator - Validate form data
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Validator> validates form data. Note that this module is
-EXPERIMENTAL and might change without warning!
+L<Mojolicious::Validator> validates form data for L<Mojolicious>.
 
 =head1 CHECKS
 

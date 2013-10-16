@@ -919,8 +919,8 @@ to inherit query parameters from the current request.
 
   my $validation = $c->validation;
 
-Get L<Mojolicious::Validator::Validation> object for current request. Note
-that this method is EXPERIMENTAL and might change without warning!
+Get L<Mojolicious::Validator::Validation> object for current request to
+validate GET/POST parameters.
 
   my $validation = $c->validation;
   $validation->required('title')->size(3, 50);

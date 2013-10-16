@@ -100,8 +100,8 @@ Mojolicious::Validator::Validation - Perform validations
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Validator::Validation> performs validations. Note that this
-module is EXPERIMENTAL and might change without warning!
+L<Mojolicious::Validator::Validation> performs L<Mojolicious::Validator>
+validation checks.
 
 =head1 ATTRIBUTES
 

@@ -195,7 +195,8 @@ Access validated parameters, similar to L<Mojolicious::Controller/"param">.
 
   $validation = $validation->required('foo');
 
-Change validation C<topic> and make sure a value is present.
+Change validation C<topic> and make sure a value is present and not an empty
+string.
 
 =head1 CHECKS
 

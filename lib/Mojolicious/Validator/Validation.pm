@@ -110,7 +110,7 @@ L<Mojolicious::Validator::Validation> implements the following attributes.
 =head2 input
 
   my $input   = $validation->input;
-  $validation = $validation->input({});
+  $validation = $validation->input({foo => 'bar', baz => [123, 'yada']});
 
 Data to be validated.
 
@@ -126,7 +126,7 @@ Validated data.
   my $topic   = $validation->topic;
   $validation = $validation->topic('foo');
 
-Current validation topic.
+Name of field currently being validated.
 
 =head2 validator
 
@@ -151,7 +151,8 @@ will be performend on them after the first one failed.
 
   my $err = $validation->error('foo');
 
-Return details about failed validation check.
+Return details about failed validation check, at any given time there can only
+be one per field.
 
   my ($check, $result, @args) = @{$validation->error('foo')};
 

@@ -194,6 +194,7 @@ is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.0', 'right version';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27,           'right "Content-Length" value';
+is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 
 # Parse full HTTP 1.0 response (no limit)
 {
@@ -211,6 +212,7 @@ is $res->headers->content_length, 27,           'right "Content-Length" value';
   is $res->version, '1.0',                   'right version';
   is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
   is $res->headers->content_length, 27, 'right "Content-Length" value';
+  is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 }
 
 # Parse full HTTP 1.0 response (missing Content-Length)

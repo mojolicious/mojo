@@ -620,12 +620,12 @@ status.
   $c              = $c->param(foo => 'ba;r');
   $c              = $c->param(foo => qw(ba;r ba;z));
 
-Access GET/POST parameters, file uploads and route placeholder values that are
-not reserved stash values. Note that this method is context sensitive in some
-cases and therefore needs to be used with care, there can always be multiple
-values, which might have unexpected consequences. Parts of the request body
-need to be loaded into memory to parse POST parameters, so you have to make
-sure it is not excessively large.
+Access route placeholder values that are not reserved stash values, file
+uploads and GET/POST parameters, in that order. Note that this method is
+context sensitive in some cases and therefore needs to be used with care,
+there can always be multiple values, which might have unexpected consequences.
+Parts of the request body need to be loaded into memory to parse POST
+parameters, so you have to make sure it is not excessively large.
 
   # List context is ambiguous and should be avoided
   my $hash = {foo => $self->param('foo')};

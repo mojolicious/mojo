@@ -1090,8 +1090,8 @@ requests. See also the tutorial above for more argument variations.
 
 =head2 under
 
-  my $route = under sub {...};
-  my $route = under '/:foo';
+  my $bridge = under sub {...};
+  my $bridge = under '/:foo';
 
 Generate bridge route with L<Mojolicious::Routes::Route/"under">, to which all
 following routes are automatically appended. See also the tutorial above for

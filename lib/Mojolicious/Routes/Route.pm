@@ -546,8 +546,8 @@ Stringify the whole route.
 
 =head2 under
 
-  my $route = $r->under(sub {...});
-  my $route = $r->under('/:foo');
+  my $bridge = $r->under(sub {...});
+  my $bridge = $r->under('/:foo');
 
 Generate bridge route. See also the L<Mojolicious::Lite> tutorial for more
 argument variations.

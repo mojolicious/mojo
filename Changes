@@ -1,4 +1,7 @@
 
+4.50  2013-10-18
+  - Improved Mojo::Message to allow max_message_size check to be disabled.
+
 4.49  2013-10-17
   - Added tls_ciphers option to Mojo::IOLoop::Server::listen.
   - Added ciphers parameter to Mojo::Server::Daemon::listen.

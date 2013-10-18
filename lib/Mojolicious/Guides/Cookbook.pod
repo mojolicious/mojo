@@ -880,6 +880,40 @@ The C<json> and C<form> content generators are always available.
 For more information about available content generators see also
 L<Mojo::UserAgent::Transactor/"tx">.
 
+=head2 Large file downloads
+
+When downloading large files with L<Mojo::UserAgent> you don't have to worry
+about memory usage at all, because it will automatically stream everything
+above C<250KB> into a temporary file.
+
+  use Mojo::UserAgent;
+
+  # Lets fetch the latest Mojolicious tarball
+  my $ua = Mojo::UserAgent->new(max_redirects => 5);
+  my $tx = $ua->get('latest.mojolicio.us');
+  $tx->res->content->asset->move_to('mojo.tar.gz');
+
+To protect you from excessively large files there is also a limit of C<10MB>
+by default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
+variable.
+
+  # Increase limit to 1GB
+  $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
+
+=head2 Large file upload
+
+Uploading a large file is even easier.
+
+  use Mojo::UserAgent;
+
+  # Upload file via POST and "multipart/form-data"
+  my $ua = Mojo::UserAgent->new;
+  $ua->post('example.com/upload' =>
+    form => {image => {file => '/home/sri/hello.png'}});
+
+And once again you don't have to worry about memory usage, all data will be
+streamed directly from the file.
+
 =head2 Streaming response
 
 Receiving a streaming response can be really tricky in most HTTP clients, but
@@ -890,6 +924,9 @@ L<Mojo::UserAgent> makes it actually easy.
   # Build a normal transaction
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://example.com');
+
+  # Allow responses of indefinite size
+  $tx->res->max_message_size(0);
 
   # Replace "read" events to disable default content parser
   $tx->res->content->unsubscribe('read')->on(read => sub {
@@ -933,40 +970,6 @@ Sending a streaming request is almost just as easy.
 
 The drain callback passed to L<Mojo::Content/"write"> will be invoked whenever
 the entire previous chunk has actually been written.
-
-=head2 Large file downloads
-
-When downloading large files with L<Mojo::UserAgent> you don't have to worry
-about memory usage at all, because it will automatically stream everything
-above C<250KB> into a temporary file.
-
-  use Mojo::UserAgent;
-
-  # Lets fetch the latest Mojolicious tarball
-  my $ua = Mojo::UserAgent->new(max_redirects => 5);
-  my $tx = $ua->get('latest.mojolicio.us');
-  $tx->res->content->asset->move_to('mojo.tar.gz');
-
-To protect you from excessively large files there is also a limit of C<10MB>
-by default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
-variable.
-
-  # Increase limit to 1GB
-  $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
-
-=head2 Large file upload
-
-Uploading a large file is even easier.
-
-  use Mojo::UserAgent;
-
-  # Upload file via POST and "multipart/form-data"
-  my $ua = Mojo::UserAgent->new;
-  $ua->post('example.com/upload' =>
-    form => {image => {file => '/home/sri/hello.png'}});
-
-And once again you don't have to worry about memory usage, all data will be
-streamed directly from the file.
 
 =head2 Non-blocking
 

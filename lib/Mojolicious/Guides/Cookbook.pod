@@ -925,7 +925,7 @@ L<Mojo::UserAgent> makes it actually easy.
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://example.com');
 
-  # Allow responses of indefinite size
+  # Accept response of indefinite size
   $tx->res->max_message_size(0);
 
   # Replace "read" events to disable default content parser

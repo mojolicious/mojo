@@ -272,9 +272,9 @@ Mojo::Message::Request - HTTP request
 
   # Parse
   my $req = Mojo::Message::Request->new;
-  $req->parse("GET /foo HTTP/1.0\x0a\x0d");
-  $req->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
-  $req->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");
+  $req->parse("GET /foo HTTP/1.0\x0d\x0a");
+  $req->parse("Content-Length: 12\x0d\x0a");
+  $req->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
   $req->parse('Hello World!');
   say $req->method;
   say $req->headers->content_type;

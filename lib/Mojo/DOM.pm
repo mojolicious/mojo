@@ -12,7 +12,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Mojo::Util qw(deprecated squish);
+use Mojo::Util 'squish';
 use Scalar::Util qw(blessed weaken);
 
 sub AUTOLOAD {
@@ -66,12 +66,6 @@ sub attr {
   %$attrs = (%$attrs, %{ref $_[0] ? $_[0] : {@_}});
 
   return $self;
-}
-
-# DEPRECATED in Top Hat!
-sub attrs {
-  deprecated 'Mojo::DOM::attrs is DEPRECATED in favor of Mojo::DOM::attr';
-  shift->attr(@_);
 }
 
 sub children {

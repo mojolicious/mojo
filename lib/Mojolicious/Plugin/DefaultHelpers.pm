@@ -135,6 +135,13 @@ Alias for L<Mojo/"config">.
 
 Store partial rendered content in named buffer and retrieve it.
 
+When storing content, if the named buffer has already been set, new content
+is silently ignored.
+
+The default buffer name is content. The first template that returns non-blank
+content sets the default content buffer, if it has not already been set to
+non-blank content.
+
 =head2 content_for
 
   % content_for foo => begin

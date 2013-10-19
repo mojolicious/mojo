@@ -99,6 +99,8 @@ get '/withblocklayout' => sub {
 
 get '/content_for';
 
+get '/content_first_come';
+
 get '/inline' => {inline => '<%= "inline!" %>'};
 
 get '/inline/again' => {inline => 0};
@@ -219,6 +221,11 @@ $t->get_ok('/withblocklayout')->status_is(200)
 $t->get_ok('/content_for')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("DefaultThis\n\nseems\nto\nHello    world!\n\nwork!\n\n");
+
+# Content first come
+$t->get_ok('/content_first_come')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("DefaultJust worksHelloThis <template> just works!\n\n");
 
 # Inline template
 $t->get_ok('/inline')->status_is(200)
@@ -363,3 +370,11 @@ seems
 to
 <%= content_for 'message' %>
 work!
+
+@@ content_first_come.html.ep
+% title 'Just works';
+<% content message => begin %>Hello<% end =%>
+<% content message => begin %> world!<% end =%>
+<%= content 'message' =%>
+This <template> just works!
+

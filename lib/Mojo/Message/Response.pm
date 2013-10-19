@@ -152,9 +152,9 @@ Mojo::Message::Response - HTTP response
 
   # Parse
   my $res = Mojo::Message::Response->new;
-  $res->parse("HTTP/1.0 200 OK\x0a\x0d");
-  $res->parse("Content-Length: 12\x0a\x0d\x0a\x0d");
-  $res->parse("Content-Type: text/plain\x0a\x0d\x0a\x0d");
+  $res->parse("HTTP/1.0 200 OK\x0d\x0a");
+  $res->parse("Content-Length: 12\x0d\x0a");
+  $res->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
   $res->parse('Hello World!');
   say $res->code;
   say $res->headers->content_type;

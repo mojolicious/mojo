@@ -129,8 +129,8 @@ C<expiration> and C<expires> session values.
 
 =head2 secure
 
-  my $secure = $sessions->secure;
-  $sessions  = $sessions->secure(1);
+  my $bool  = $sessions->secure;
+  $sessions = $sessions->secure($bool);
 
 Set the secure flag on all session cookies, so that browsers send them only
 over HTTPS connections.

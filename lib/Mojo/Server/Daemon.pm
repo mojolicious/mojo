@@ -435,8 +435,8 @@ Maximum number of keep-alive requests per connection, defaults to C<25>.
 
 =head2 silent
 
-  my $silent = $daemon->silent;
-  $daemon    = $daemon->silent(1);
+  my $bool = $daemon->silent;
+  $daemon  = $daemon->silent($bool);
 
 Disable console messages.
 

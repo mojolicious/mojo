@@ -1,5 +1,5 @@
 
-4.50  2013-10-20
+4.50  2013-10-21
   - Removed deprecated attrs method from Mojo::DOM.
   - Improved Mojo::Message to allow max_message_size check to be disabled.
   - Fixed small assignment bug in content helper.

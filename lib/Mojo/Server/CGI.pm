@@ -114,8 +114,8 @@ implements the following new ones.
 
 =head2 nph
 
-  my $nph = $cgi->nph;
-  $cgi    = $cgi->nph(1);
+  my $bool = $cgi->nph;
+  $cgi     = $cgi->nph($bool);
 
 Activate non-parsed header mode.
 

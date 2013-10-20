@@ -70,18 +70,14 @@ sub detect_proxy {
 }
 
 sub need_proxy {
-  my ($self, $host) = @_;
-  return !first { $host =~ /\Q$_\E$/ } @{$self->no_proxy || []};
+  !first { $_[1] =~ /\Q$_\E$/ } @{$_[0]->no_proxy || []};
 }
 
 sub start {
   my ($self, $tx, $cb) = @_;
 
   # Fork safety
-  unless (($self->{pid} //= $$) eq $$) {
-    $self->_cleanup;
-    delete @$self{qw(pid port)};
-  }
+  delete @{$self->_cleanup}{qw(pid port)} unless ($self->{pid} //= $$) eq $$;
 
   # Non-blocking
   if ($cb) {
@@ -89,8 +85,7 @@ sub start {
     unless ($self->{nb}) {
       croak 'Blocking request in progress' if keys %{$self->{connections}};
       warn "-- Switching to non-blocking mode\n" if DEBUG;
-      $self->_cleanup;
-      $self->{nb}++;
+      $self->_cleanup->{nb}++;
     }
     return $self->_start($tx, $cb);
   }
@@ -100,8 +95,7 @@ sub start {
   if ($self->{nb}) {
     croak 'Non-blocking requests in progress' if keys %{$self->{connections}};
     warn "-- Switching to blocking mode\n" if DEBUG;
-    $self->_cleanup;
-    delete $self->{nb};
+    delete $self->_cleanup->{nb};
   }
   $self->_start($tx => sub { shift->ioloop->stop; $tx = shift });
   $self->ioloop->start;
@@ -158,6 +152,8 @@ sub _cleanup {
 
   # Stop server
   delete $self->{server};
+
+  return $self;
 }
 
 sub _connect {

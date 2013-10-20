@@ -768,8 +768,8 @@ Element type.
 
 =head2 xml
 
-  my $xml = $dom->xml;
-  $dom    = $dom->xml(1);
+  my $bool = $dom->xml;
+  $dom     = $dom->xml($bool);
 
 Disable HTML semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.

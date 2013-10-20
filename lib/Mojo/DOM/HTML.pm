@@ -342,8 +342,8 @@ carefully since it is very dynamic.
 
 =head2 xml
 
-  my $xml = $html->xml;
-  $html   = $html->xml(1);
+  my $bool = $html->xml;
+  $html    = $html->xml($bool);
 
 Disable HTML semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.

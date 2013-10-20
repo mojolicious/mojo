@@ -454,8 +454,8 @@ L<Mojo::Template> implements the following attributes.
 
 =head2 auto_escape
 
-  my $escape = $mt->auto_escape;
-  $mt        = $mt->auto_escape(1);
+  my $bool = $mt->auto_escape;
+  $mt      = $mt->auto_escape($bool);
 
 Activate automatic escaping.
 

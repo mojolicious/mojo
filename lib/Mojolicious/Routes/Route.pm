@@ -279,8 +279,8 @@ The children of this route, used for nesting routes.
 
 =head2 inline
 
-  my $inline = $r->inline;
-  $r         = $r->inline(1);
+  my $bool = $r->inline;
+  $r       = $r->inline($bool);
 
 Allow C<bridge> semantics for this route.
 
@@ -293,8 +293,8 @@ The parent of this route, used for nesting routes.
 
 =head2 partial
 
-  my $partial = $r->partial;
-  $r          = $r->partial(1);
+  my $bool = $r->partial;
+  $r       = $r->partial($bool);
 
 Route has no specific end, remaining characters will be captured in C<path>.
 

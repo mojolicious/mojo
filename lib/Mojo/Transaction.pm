@@ -193,7 +193,8 @@ implements the following new ones.
   $tx->client_close;
   $tx->client_close(1);
 
-Transaction closed client-side, used to implement user agents.
+Transaction closed client-side, no actual connection close is assumed by
+default, used to implement user agents.
 
 =head2 client_read
 

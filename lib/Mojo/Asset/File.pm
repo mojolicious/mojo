@@ -176,8 +176,8 @@ implements the following new ones.
 
 =head2 cleanup
 
-  my $cleanup = $file->cleanup;
-  $file       = $file->cleanup(1);
+  my $bool = $file->cleanup;
+  $file    = $file->cleanup($bool);
 
 Delete file automatically once it's not used anymore.
 

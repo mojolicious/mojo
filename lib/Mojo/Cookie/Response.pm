@@ -116,8 +116,8 @@ Cookie domain.
 
 =head2 httponly
 
-  my $httponly = $cookie->httponly;
-  $cookie      = $cookie->httponly(1);
+  my $bool = $cookie->httponly;
+  $cookie  = $cookie->httponly($bool);
 
 HttpOnly flag, which can prevent client-side scripts from accessing this
 cookie.
@@ -145,8 +145,8 @@ Cookie path.
 
 =head2 secure
 
-  my $secure = $cookie->secure;
-  $cookie    = $cookie->secure(1);
+  my $bool = $cookie->secure;
+  $cookie  = $cookie->secure($bool);
 
 Secure flag, which instructs browsers to only send this cookie over HTTPS
 connections.

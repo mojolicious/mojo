@@ -380,8 +380,8 @@ L<Mojo::Content> implements the following attributes.
 
 =head2 auto_relax
 
-  my $relax = $content->auto_relax;
-  $content  = $content->auto_relax(1);
+  my $bool = $content->auto_relax;
+  $content = $content->auto_relax($bool);
 
 Try to detect when relaxed parsing is necessary.
 
@@ -410,16 +410,16 @@ value of the MOJO_MAX_LEFTOVER_SIZE environment variable or C<262144>.
 
 =head2 relaxed
 
-  my $relaxed = $content->relaxed;
-  $content    = $content->relaxed(1);
+  my $bool = $content->relaxed;
+  $content = $content->relaxed($bool);
 
 Activate relaxed parsing for responses that are terminated with a connection
 close.
 
 =head2 skip_body
 
-  my $skip = $content->skip_body;
-  $content = $content->skip_body(1);
+  my $bool = $content->skip_body;
+  $content = $content->skip_body($bool);
 
 Skip body parsing and finish after headers.
 

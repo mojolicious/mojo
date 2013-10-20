@@ -453,8 +453,8 @@ object.
 
 =head2 masked
 
-  my $masked = $ws->masked;
-  $ws        = $ws->masked(1);
+  my $bool = $ws->masked;
+  $ws      = $ws->masked($bool);
 
 Mask outgoing frames with XOR cipher and a random 32bit key.
 

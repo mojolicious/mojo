@@ -107,6 +107,13 @@ get '/data' => {data => 0};
 
 my $t = Test::Mojo->new;
 
+# "0" content reassignment
+my $c = $t->app->controller_class->new(app => $t->app);
+$c->content(foo => '0');
+is $c->content('foo'), '0', 'right content';
+$c->content(foo => '1');
+is $c->content('foo'), '0', 'right content';
+
 # Template with layout
 $t->get_ok('/works')->status_is(200)
   ->content_type_is('text/html;charset=UTF-8')

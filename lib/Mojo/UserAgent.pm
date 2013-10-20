@@ -204,7 +204,7 @@ sub _connect_proxy {
       # CONNECT failed (connection needs to be kept alive)
       unless ($tx->keep_alive && $tx->res->is_status_class(200)) {
         $old->req->error('Proxy connection failed');
-        return $self->_finish($old, $cb);
+        return $self->$cb($old);
       }
 
       # Prevent proxy reassignment and start real transaction
@@ -280,24 +280,6 @@ sub _error {
   $self->_handle($id => $err);
 }
 
-sub _finish {
-  my ($self, $tx, $cb, $close) = @_;
-
-  # Remove code from parser errors
-  my $res = $tx->res;
-  if (my $err = $res->error) { $res->error($err) }
-
-  # Premature connection close
-  elsif ($close && !$res->code) { $res->error('Premature connection close') }
-
-  # 400/500
-  elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
-    $res->error($res->message, $res->code);
-  }
-
-  $self->$cb($tx);
-}
-
 sub _handle {
   my ($self, $id, $close) = @_;
 
@@ -318,7 +300,7 @@ sub _handle {
   elsif ($old && (my $new = $self->_upgrade($id))) {
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
     $old->client_close;
-    $self->_finish($new, $c->{cb});
+    $c->{cb}->($self, $new);
     $new->client_read($old->res->content->leftovers);
   }
 
@@ -327,11 +309,10 @@ sub _handle {
     $self->_remove($id, $close);
     return unless $old;
     if (my $jar = $self->cookie_jar) { $jar->extract($old) }
-    $old->client_close;
+    $old->client_close($close);
 
     # Handle redirects
-    $self->_finish($new || $old, $c->{cb}, $close)
-      unless $self->_redirect($c, $old);
+    $c->{cb}->($self, $new || $old) unless $self->_redirect($c, $old);
   }
 }
 

@@ -10,8 +10,20 @@ has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
 sub client_close {
-  my $self = shift;
-  $self->res->finish;
+  my ($self, $close) = @_;
+
+  # Remove code from parser errors
+  my $res = $self->res->finish;
+  if (my $err = $res->error) { $res->error($err) }
+
+  # Premature connection close
+  elsif ($close && !$res->code) { $res->error('Premature connection close') }
+
+  # 400/500
+  elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
+    $res->error($res->message, $res->code);
+  }
+
   return $self->server_close;
 }
 
@@ -179,6 +191,7 @@ implements the following new ones.
 =head2 client_close
 
   $tx->client_close;
+  $tx->client_close(1);
 
 Transaction closed client-side, used to implement user agents.
 

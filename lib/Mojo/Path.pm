@@ -81,7 +81,7 @@ sub to_abs_string {
 sub to_dir {
   my $clone = shift->clone;
   pop @{$clone->parts} unless $clone->trailing_slash;
-  return $clone->trailing_slash(@{$clone->parts} ? 1 : 0);
+  return $clone->trailing_slash(!!@{$clone->parts});
 }
 
 sub to_route {
@@ -216,8 +216,8 @@ Check if path contains given prefix.
 
 =head2 leading_slash
 
-  my $slash = $path->leading_slash;
-  $path     = $path->leading_slash(1);
+  my $bool = $path->leading_slash;
+  $path    = $path->leading_slash($bool);
 
 Path has a leading slash. Note that this method will normalize the path and
 that C<%2F> will be treated as C</> for security reasons.
@@ -304,8 +304,8 @@ Turn path into a string.
 
 =head2 trailing_slash
 
-  my $slash = $path->trailing_slash;
-  $path     = $path->trailing_slash(1);
+  my $bool = $path->trailing_slash;
+  $path    = $path->trailing_slash($bool);
 
 Path has a trailing slash. Note that this method will normalize the path and
 that C<%2F> will be treated as C</> for security reasons.

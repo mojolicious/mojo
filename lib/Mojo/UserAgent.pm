@@ -171,7 +171,7 @@ sub _connect {
     local_address => $self->local_address,
     port          => $port,
     timeout       => $self->connect_timeout,
-    tls           => $proto eq 'https' ? 1 : 0,
+    tls           => $proto eq 'https',
     tls_ca        => $self->ca,
     tls_cert      => $self->cert,
     tls_key       => $self->key,

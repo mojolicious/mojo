@@ -133,7 +133,9 @@ Alias for L<Mojo/"config">.
   %= content 'bar'
   %= content
 
-Store partial rendered content in named buffer and retrieve it.
+Store partial rendered content in named buffer and retrieve it, defaults to
+retrieving the named buffer C<content>, which is commonly used for the
+renderers C<layout> and C<extends> features.
 
 =head2 content_for
 

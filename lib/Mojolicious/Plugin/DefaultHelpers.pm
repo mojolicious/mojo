@@ -145,7 +145,8 @@ ignored if the named buffer is already in use.
   % end
   %= content_for 'foo'
 
-Append partial rendered content to named buffer and retrieve it.
+Append partial rendered content to named buffer and retrieve it. Note that
+named buffers are shared with the C<content> helper.
 
   % content_for message => begin
     Hello

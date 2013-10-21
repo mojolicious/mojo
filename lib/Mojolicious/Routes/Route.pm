@@ -345,8 +345,7 @@ also the L<Mojolicious::Lite> tutorial for more argument variations.
   my $bridge = $r->bridge('/:action', action => qr/\w+/);
   my $bridge = $r->bridge(format => 0);
 
-Generate bridge route matching all HTTP request methods with optional pattern
-and restrictive placeholders.
+Generate bridge route with optional pattern and restrictive placeholders.
 
   my $auth = $r->bridge('/user')->to('user#auth');
   $auth->get('/show')->to('#show');

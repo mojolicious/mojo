@@ -7,7 +7,7 @@
   - Deprecated Mojo::UserAgent::https_proxy in favor of
     Mojo::UserAgent::Proxy::https.
   - Deprecated Mojo::UserAgent::no_proxy in favor of
-    Mojo::UserAgent::Proxy::no.
+    Mojo::UserAgent::Proxy::not.
   - Deprecated Mojo::UserAgent::need_proxy in favor of
     Mojo::UserAgent::Proxy::is_needed.
   - Deprecated Mojo::UserAgent::name in favor of

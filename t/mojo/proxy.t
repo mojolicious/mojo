@@ -24,6 +24,8 @@ use Mojo::UserAgent::Proxy;
   local $ENV{https_proxy} = 'tunnel.example.com';
   local $ENV{no_proxy}    = 'localhost,localdomain,foo.com,example.com';
   $proxy->detect;
+  is_deeply $proxy->not,
+    ['localhost', 'localdomain', 'foo.com', 'example.com'], 'right list';
   is $proxy->http,  'proxy.example.com',  'right proxy';
   is $proxy->https, 'tunnel.example.com', 'right proxy';
   ok $proxy->is_needed('dummy.mojolicio.us'), 'proxy needed';

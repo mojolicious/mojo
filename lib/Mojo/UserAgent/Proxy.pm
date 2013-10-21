@@ -3,13 +3,13 @@ use Mojo::Base -base;
 
 use List::Util 'first';
 
-has [qw(http https no)];
+has [qw(http https not)];
 
 sub detect {
   my $self = shift;
   $self->http($ENV{HTTP_PROXY}   || $ENV{http_proxy});
   $self->https($ENV{HTTPS_PROXY} || $ENV{https_proxy});
-  return $self->no([split /,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
+  return $self->not([split /,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
 }
 
 sub inject {
@@ -31,7 +31,7 @@ sub inject {
 }
 
 sub is_needed {
-  !first { $_[1] =~ /\Q$_\E$/ } @{$_[0]->no || []};
+  !first { $_[1] =~ /\Q$_\E$/ } @{$_[0]->not || []};
 }
 
 1;
@@ -72,10 +72,10 @@ Proxy server to use for HTTP and WebSocket requests.
 
 Proxy server to use for HTTPS and WebSocket requests.
 
-=head2 no
+=head2 not
 
-  my $no = $proxy->no;
-  $ua    = $proxy->no([qw(localhost intranet.mojolicio.us)]);
+  my $not = $proxy->not;
+  $ua     = $proxy->not([qw(localhost intranet.mojolicio.us)]);
 
 Domains that don't require a proxy server to be used.
 

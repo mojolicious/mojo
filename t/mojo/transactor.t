@@ -23,6 +23,9 @@ $t->add_generator(
 my $tx = $t->tx(GET => 'mojolicio.us/foo.html?bar=baz');
 is $tx->req->url->to_abs, 'http://mojolicio.us/foo.html?bar=baz', 'right URL';
 is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->accept_encoding, 'gzip', 'right "Accept-Encoding" value';
+is $tx->req->headers->user_agent, 'Mojolicious (Perl)',
+  'right "User-Agent" value';
 
 # GET with escaped slash
 my $url = Mojo::URL->new('http://mojolicio.us');
@@ -34,10 +37,13 @@ is $tx->req->url->path->to_string, 'foo%2Fbar', 'right path';
 is $tx->req->method, 'GET', 'right method';
 
 # POST with header
+$t->name('MyUA 1.0');
 $tx = $t->tx(POST => 'https://mojolicio.us' => {DNT => 1});
 is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->headers->dnt, 1, 'right "DNT" value';
+is $tx->req->headers->dnt,             1,      'right "DNT" value';
+is $tx->req->headers->accept_encoding, 'gzip', 'right "Accept-Encoding" value';
+is $tx->req->headers->user_agent, 'MyUA 1.0', 'right "User-Agent" value';
 
 # POST with header and content
 $tx = $t->tx(POST => 'https://mojolicio.us' => {DNT => 1} => 'test');

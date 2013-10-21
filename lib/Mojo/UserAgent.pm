@@ -406,8 +406,7 @@ sub _start {
   my ($self, $tx, $cb) = @_;
 
   # Embedded server (update application if necessary)
-  my $req = $tx->req;
-  my $url = $req->url;
+  my $url = $tx->req->url;
   if ($self->{port} || !$url->is_abs) {
     if (my $app = $self->app) { $self->_server->app($app) }
     my $base = $self->app_url;

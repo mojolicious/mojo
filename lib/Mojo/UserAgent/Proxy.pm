@@ -18,16 +18,16 @@ sub inject {
   $self->detect if $ENV{MOJO_PROXY};
   my $req = $tx->req;
   my $url = $req->url;
-  return unless $self->is_needed($url->host);
+  return if !$self->is_needed($url->host) || defined $req->proxy;
 
   # HTTP proxy
   my $proto = $url->protocol;
   my $http  = $self->http;
-  $req->proxy($http) if $http && !defined $req->proxy && $proto eq 'http';
+  $req->proxy($http) if $http && $proto eq 'http';
 
   # HTTPS proxy
   my $https = $self->https;
-  $req->proxy($https) if $https && !defined $req->proxy && $proto eq 'https';
+  $req->proxy($https) if $https && $proto eq 'https';
 }
 
 sub is_needed {

@@ -8,8 +8,9 @@ use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::URL;
-use Mojo::Util 'monkey_patch';
+use Mojo::Util qw(deprecated monkey_patch);
 use Mojo::UserAgent::CookieJar;
+use Mojo::UserAgent::Proxy;
 use Mojo::UserAgent::Transactor;
 use Scalar::Util 'weaken';
 
@@ -19,13 +20,13 @@ has ca              => sub { $ENV{MOJO_CA_FILE} };
 has cert            => sub { $ENV{MOJO_CERT_FILE} };
 has connect_timeout => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
 has cookie_jar      => sub { Mojo::UserAgent::CookieJar->new };
-has [qw(http_proxy https_proxy local_address no_proxy)];
+has 'local_address';
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };
 has ioloop             => sub { Mojo::IOLoop->new };
 has key                => sub { $ENV{MOJO_KEY_FILE} };
 has max_connections    => 5;
 has max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
-has name => 'Mojolicious (Perl)';
+has proxy => sub { Mojo::UserAgent::Proxy->new };
 has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 
@@ -36,6 +37,26 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
     my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
     return $self->start($self->build_tx($name, @_), $cb);
   };
+}
+
+# DEPRECATED in Top Hat!
+for my $name (qw(http https no)) {
+  monkey_patch __PACKAGE__, "${name}_proxy", sub {
+    deprecated "Mojo::UserAgent::${name}_proxy is DEPRECATED in favor of"
+      . " Mojo::UserAgent::Proxy::$name";
+
+    my $self = shift;
+    return $self->proxy->$name unless @_;
+    $self->proxy->$name(@_);
+    return $self;
+  };
+}
+
+# DEPRECATED in Top Hat!
+sub new {
+  my $self = shift->SUPER::new;
+  while (my $name = shift) { $self->$name(shift) }
+  return $self;
 }
 
 sub DESTROY { shift->_cleanup }
@@ -62,15 +83,28 @@ sub app_url {
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
 
+# DEPRECATED in Top Hat!
 sub detect_proxy {
-  my $self = shift;
-  $self->http_proxy($ENV{HTTP_PROXY}   || $ENV{http_proxy});
-  $self->https_proxy($ENV{HTTPS_PROXY} || $ENV{https_proxy});
-  return $self->no_proxy([split /,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
+  deprecated "Mojo::UserAgent::detect_proxy is DEPRECATED in favor of"
+    . " Mojo::UserAgent::Proxy::detect";
+  shift->tap(sub { $_->proxy->detect });
 }
 
+# DEPRECATED in Top Hat!
+sub name {
+  deprecated "Mojo::UserAgent::name is DEPRECATED in favor of"
+    . " Mojo::UserAgent::Transactor::name";
+  my $self = shift;
+  return $self->transactor->name unless @_;
+  $self->transactor->name(@_);
+  return $self;
+}
+
+# DEPRECATED in Top Hat!
 sub need_proxy {
-  !first { $_[1] =~ /\Q$_\E$/ } @{$_[0]->no_proxy || []};
+  deprecated "Mojo::UserAgent::need_proxy is DEPRECATED in favor of"
+    . " Mojo::UserAgent::Proxy::is_needed";
+  shift->proxy->is_needed(@_);
 }
 
 sub start {
@@ -381,24 +415,7 @@ sub _start {
       unless $url->is_abs;
   }
 
-  # Proxy
-  $self->detect_proxy if $ENV{MOJO_PROXY};
-  my $proto = $url->protocol;
-  if ($self->need_proxy($url->host)) {
-
-    # HTTP proxy
-    my $http = $self->http_proxy;
-    $req->proxy($http) if $http && !defined $req->proxy && $proto eq 'http';
-
-    # HTTPS proxy
-    my $https = $self->https_proxy;
-    $req->proxy($https) if $https && !defined $req->proxy && $proto eq 'https';
-  }
-
-  # We identify ourselves and accept gzip compression
-  my $headers = $req->headers;
-  $headers->user_agent($self->name) unless $headers->user_agent;
-  $headers->accept_encoding('gzip') unless $headers->accept_encoding;
+  $self->proxy->inject($tx);
   if (my $jar = $self->cookie_jar) { $jar->inject($tx) }
 
   # Connect and add request timeout if necessary
@@ -624,20 +641,6 @@ L<Mojo::UserAgent::CookieJar> object.
   # Disable cookie jar
   $ua->cookie_jar(0);
 
-=head2 http_proxy
-
-  my $proxy = $ua->http_proxy;
-  $ua       = $ua->http_proxy('http://sri:secret@127.0.0.1:8080');
-
-Proxy server to use for HTTP and WebSocket requests.
-
-=head2 https_proxy
-
-  my $proxy = $ua->https_proxy;
-  $ua       = $ua->https_proxy('http://sri:secret@127.0.0.1:8080');
-
-Proxy server to use for HTTPS and WebSocket requests.
-
 =head2 inactivity_timeout
 
   my $timeout = $ua->inactivity_timeout;
@@ -687,19 +690,15 @@ before it starts closing the oldest cached ones, defaults to C<5>.
 Maximum number of redirects the user agent will follow before it fails,
 defaults to the value of the MOJO_MAX_REDIRECTS environment variable or C<0>.
 
-=head2 name
+=head2 proxy
 
-  my $name = $ua->name;
-  $ua      = $ua->name('Mojolicious');
+  my $proxy = $ua->proxy;
+  $ua       = $ua->proxy(Mojo::UserAgent::Proxy->new);
 
-Value for C<User-Agent> request header, defaults to C<Mojolicious (Perl)>.
+Proxy manager, defaults to a L<Mojo::UserAgent::Proxy> object.
 
-=head2 no_proxy
-
-  my $no_proxy = $ua->no_proxy;
-  $ua          = $ua->no_proxy([qw(localhost intranet.mojolicio.us)]);
-
-Domains that don't require a proxy server to be used.
+  # Detect proxy servers from environment
+  $ua->proxy->detect;
 
 =head2 request_timeout
 
@@ -721,6 +720,9 @@ indefinitely. The timeout will reset for every followed redirect.
   $ua   = $ua->transactor(Mojo::UserAgent::Transactor->new);
 
 Transaction builder, defaults to a L<Mojo::UserAgent::Transactor> object.
+
+  # Change name of user agent
+  $ua->transactor->name('MyUA 1.0');
 
 =head1 METHODS
 
@@ -803,14 +805,6 @@ append a callback to perform requests non-blocking.
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-=head2 detect_proxy
-
-  $ua = $ua->detect_proxy;
-
-Check environment variables HTTP_PROXY, http_proxy, HTTPS_PROXY, https_proxy,
-NO_PROXY and no_proxy for proxy information. Automatic proxy detection can be
-enabled with the MOJO_PROXY environment variable.
-
 =head2 get
 
   my $tx = $ua->get('example.com');
@@ -848,12 +842,6 @@ non-blocking.
     say $tx->res->body;
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-
-=head2 need_proxy
-
-  my $bool = $ua->need_proxy('intranet.example.com');
-
-Check if request for domain would use a proxy server.
 
 =head2 options
 

@@ -14,6 +14,7 @@ use Mojo::URL;
 use Mojo::Util 'encode';
 
 has generators => sub { {} };
+has name => 'Mojolicious (Perl)';
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -107,8 +108,11 @@ sub tx {
   $url = "http://$url" unless $url =~ m!^/|://!;
   ref $url ? $req->url($url) : $req->url->parse($url);
 
-  # Headers
-  $req->headers->from_hash(shift) if ref $_[0] eq 'HASH';
+  # Headers (we identify ourselves and accept gzip compression)
+  my $headers = $req->headers;
+  $headers->from_hash(shift) if ref $_[0] eq 'HASH';
+  $headers->user_agent($self->name) unless $headers->user_agent;
+  $headers->accept_encoding('gzip') unless $headers->accept_encoding;
 
   # Generator
   if (@_ > 1) {
@@ -291,6 +295,14 @@ L<Mojo::UserAgent::Transactor> implements the following attributes.
   $t             = $t->generators({foo => sub {...}});
 
 Registered content generators.
+
+=head2 name
+
+  my $name = $t->name;
+  $t       = $t->name('Mojolicious');
+
+Value for C<User-Agent> request header of generated transactions, defaults to
+C<Mojolicious (Perl)>.
 
 =head1 METHODS
 

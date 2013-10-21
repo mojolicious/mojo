@@ -202,7 +202,7 @@ Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
 # Non-blocking proxy request
-$ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
+$ua->proxy->https("http://sri:secr3t\@localhost:$proxy");
 $result = undef;
 my ($auth, $kept_alive);
 $ua->get(
@@ -234,7 +234,7 @@ is $result, "https://localhost:$port/proxy", 'right content';
 ok $kept_alive, 'connection was kept alive';
 
 # Kept alive proxy WebSocket
-$ua->https_proxy("http://localhost:$proxy");
+$ua->proxy->https("http://localhost:$proxy");
 ($kept_alive, $result) = ();
 $ua->websocket(
   "wss://localhost:$port/test" => sub {
@@ -259,13 +259,13 @@ ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
 # Blocking proxy request
-$ua->https_proxy("http://sri:secr3t\@localhost:$proxy");
+$ua->proxy->https("http://sri:secr3t\@localhost:$proxy");
 my $tx = $ua->get("https://localhost:$port/proxy");
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, "https://localhost:$port/proxy", 'right content';
 
 # Proxy WebSocket with bad target
-$ua->https_proxy("http://localhost:$proxy");
+$ua->proxy->https("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $err);
 $ua->websocket(
@@ -281,7 +281,7 @@ ok !$success, 'no success';
 is $err, 'Proxy connection failed', 'right message';
 
 # Blocking proxy request again
-$ua->https_proxy("http://localhost:$proxy");
+$ua->proxy->https("http://localhost:$proxy");
 $tx = $ua->get("https://localhost:$port/proxy");
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, "https://localhost:$port/proxy", 'right content';

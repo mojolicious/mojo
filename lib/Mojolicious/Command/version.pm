@@ -31,7 +31,8 @@ EOF
 
   # Check latest version on CPAN
   my $latest = eval {
-    my $ua = Mojo::UserAgent->new(max_redirects => 10)->detect_proxy;
+    my $ua = Mojo::UserAgent->new(max_redirects => 10);
+    $ua->proxy->detect;
     $ua->get('api.metacpan.org/v0/release/Mojolicious')->res->json->{version};
   };
 

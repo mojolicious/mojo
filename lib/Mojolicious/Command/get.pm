@@ -57,7 +57,7 @@ sub run {
 
   # Detect proxy for absolute URLs
   my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
-  $url !~ m!^/! ? $ua->detect_proxy : $ua->app($self->app);
+  $url !~ m!^/! ? $ua->proxy->detect : $ua->app($self->app);
   $ua->max_redirects(10) if $redirect;
 
   my $buffer = '';

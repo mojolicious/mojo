@@ -45,39 +45,6 @@ post '/echo' => sub {
   $self->render(data => $self->req->body);
 };
 
-# Proxy detection
-{
-  my $ua = Mojo::UserAgent->new;
-  local $ENV{HTTP_PROXY}  = 'http://127.0.0.1';
-  local $ENV{HTTPS_PROXY} = 'http://127.0.0.1:8080';
-  local $ENV{NO_PROXY}    = 'mojolicio.us';
-  $ua->detect_proxy;
-  is $ua->http_proxy,  'http://127.0.0.1',      'right proxy';
-  is $ua->https_proxy, 'http://127.0.0.1:8080', 'right proxy';
-  $ua->http_proxy(undef);
-  $ua->https_proxy(undef);
-  is $ua->http_proxy,  undef, 'right proxy';
-  is $ua->https_proxy, undef, 'right proxy';
-  ok !$ua->need_proxy('dummy.mojolicio.us'), 'no proxy needed';
-  ok $ua->need_proxy('icio.us'),   'proxy needed';
-  ok $ua->need_proxy('localhost'), 'proxy needed';
-  ($ENV{HTTP_PROXY}, $ENV{HTTPS_PROXY}, $ENV{NO_PROXY}) = ();
-  local $ENV{http_proxy}  = 'proxy.example.com';
-  local $ENV{https_proxy} = 'tunnel.example.com';
-  local $ENV{no_proxy}    = 'localhost,localdomain,foo.com,example.com';
-  $ua->detect_proxy;
-  is $ua->http_proxy,  'proxy.example.com',  'right proxy';
-  is $ua->https_proxy, 'tunnel.example.com', 'right proxy';
-  ok $ua->need_proxy('dummy.mojolicio.us'), 'proxy needed';
-  ok $ua->need_proxy('icio.us'),            'proxy needed';
-  ok !$ua->need_proxy('localhost'),             'proxy needed';
-  ok !$ua->need_proxy('localhost.localdomain'), 'no proxy needed';
-  ok !$ua->need_proxy('foo.com'),               'no proxy needed';
-  ok !$ua->need_proxy('example.com'),           'no proxy needed';
-  ok !$ua->need_proxy('www.example.com'),       'no proxy needed';
-  ok $ua->need_proxy('www.example.com.com'), 'proxy needed';
-}
-
 # Max redirects
 {
   local $ENV{MOJO_MAX_REDIRECTS} = 25;

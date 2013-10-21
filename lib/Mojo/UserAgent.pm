@@ -145,7 +145,7 @@ sub _cleanup {
   return unless my $loop = $self->_loop;
 
   # Clean up active connections (by closing them)
-  $self->_handle($_ => 1) for keys %{$self->{connections} || {}};
+  $self->_handle($_, 1) for keys %{$self->{connections} || {}};
 
   # Clean up keep-alive connections
   $loop->remove($_->[1]) for @{delete $self->{cache} || []};
@@ -180,9 +180,9 @@ sub _connect {
 
       # Connection established
       $stream->on(timeout => sub { $self->_error($id, 'Inactivity timeout') });
-      $stream->on(close => sub { $self->_handle($id => 1) });
-      $stream->on(error => sub { $self && $self->_error($id, pop, 1) });
-      $stream->on(read => sub { $self->_read($id => pop) });
+      $stream->on(close => sub { $self->_handle($id, 1) });
+      $stream->on(error => sub { $self && $self->_error($id, pop) });
+      $stream->on(read => sub { $self->_read($id, pop) });
       $cb->();
     }
   );
@@ -270,10 +270,10 @@ sub _connection {
 }
 
 sub _error {
-  my ($self, $id, $err, $emit) = @_;
+  my ($self, $id, $err) = @_;
   if (my $tx = $self->{connections}{$id}{tx}) { $tx->res->error($err) }
-  $self->emit(error => $err) if $emit;
-  $self->_handle($id => $err);
+  else { return $self->emit(error => $err) }
+  $self->_handle($id, !!$err);
 }
 
 sub _handle {
@@ -406,7 +406,7 @@ sub _start {
   if (my $timeout = $self->request_timeout) {
     weaken $self;
     $self->{connections}{$id}{timeout} = $self->_loop->timer(
-      $timeout => sub { $self->_error($id => 'Request timeout') });
+      $timeout => sub { $self->_error($id, 'Request timeout') });
   }
 
   return $id;

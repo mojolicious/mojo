@@ -38,19 +38,6 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
   };
 }
 
-# DEPRECATED in Top Hat!
-for my $name (qw(http https no)) {
-  monkey_patch __PACKAGE__, "${name}_proxy", sub {
-    deprecated "Mojo::UserAgent::${name}_proxy is DEPRECATED in favor of"
-      . " Mojo::UserAgent::Proxy::$name";
-
-    my $self = shift;
-    return $self->proxy->$name unless @_;
-    $self->proxy->$name(@_);
-    return $self;
-  };
-}
-
 sub DESTROY { shift->_cleanup }
 
 # DEPRECATED in Top Hat!
@@ -90,13 +77,31 @@ sub detect_proxy {
 }
 
 # DEPRECATED in Top Hat!
+sub http_proxy {
+  deprecated "Mojo::UserAgent::http_proxy is DEPRECATED in favor of"
+    . " Mojo::UserAgent::Proxy::http";
+  shift->_proxy('proxy', 'http', @_);
+}
+
+# DEPRECATED in Top Hat!
+sub https_proxy {
+  deprecated "Mojo::UserAgent::https_proxy is DEPRECATED in favor of"
+    . " Mojo::UserAgent::Proxy::https";
+  shift->_proxy('proxy', 'https', @_);
+}
+
+# DEPRECATED in Top Hat!
 sub name {
   deprecated "Mojo::UserAgent::name is DEPRECATED in favor of"
     . " Mojo::UserAgent::Transactor::name";
-  my $self = shift;
-  return $self->transactor->name unless @_;
-  $self->transactor->name(@_);
-  return $self;
+  shift->_proxy('transactor', 'name', @_);
+}
+
+# DEPRECATED in Top Hat!
+sub no_proxy {
+  deprecated "Mojo::UserAgent::no_proxy is DEPRECATED in favor of"
+    . " Mojo::UserAgent::Proxy::not";
+  shift->_proxy('proxy', 'not', @_);
 }
 
 # DEPRECATED in Top Hat!
@@ -346,6 +351,14 @@ sub _handle {
 }
 
 sub _loop { $_[0]{nb} ? Mojo::IOLoop->singleton : $_[0]->ioloop }
+
+# DEPRECATED in Top Hat!
+sub _proxy {
+  my ($self, $attr, $name) = (shift, shift, shift);
+  return $self->$attr->$name unless @_;
+  $self->$attr->$name(@_);
+  return $self;
+}
 
 sub _read {
   my ($self, $id, $chunk) = @_;

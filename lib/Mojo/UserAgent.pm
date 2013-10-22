@@ -5,11 +5,11 @@ use Mojo::Base 'Mojo::EventEmitter';
 #  Bender: August 6, 1991."
 use Carp 'croak';
 use Mojo::IOLoop;
-use Mojo::Server::Daemon;
 use Mojo::URL;
 use Mojo::Util qw(deprecated monkey_patch);
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Proxy;
+use Mojo::UserAgent::Server;
 use Mojo::UserAgent::Transactor;
 use Scalar::Util 'weaken';
 
@@ -27,6 +27,7 @@ has max_connections    => 5;
 has max_redirects => sub { $ENV{MOJO_MAX_REDIRECTS} || 0 };
 has proxy => sub { Mojo::UserAgent::Proxy->new };
 has request_timeout => sub { $ENV{MOJO_REQUEST_TIMEOUT} // 0 };
+has server => sub { Mojo::UserAgent::Server->new(ioloop => shift->ioloop) };
 has transactor => sub { Mojo::UserAgent::Transactor->new };
 
 # Common HTTP methods
@@ -47,23 +48,18 @@ sub new {
   return $self;
 }
 
+# DEPRECATED in Top Hat!
 sub app {
-  my ($self, $app) = @_;
-
-  # Singleton application
-  state $singleton;
-  return $singleton = $app ? $app : $singleton unless ref $self;
-
-  # Default to singleton application
-  return $self->{app} || $singleton unless $app;
-  $self->{app} = $app;
-  return $self;
+  deprecated "Mojo::UserAgent::app is DEPRECATED in favor of"
+    . " Mojo::UserAgent::Server::app";
+  shift->_delegate('server', 'app', @_);
 }
 
+# DEPRECATED in Top Hat!
 sub app_url {
-  my $self = shift;
-  $self->_server(@_);
-  return Mojo::URL->new("$self->{proto}://localhost:$self->{port}/");
+  deprecated "Mojo::UserAgent::app_url is DEPRECATED in favor of"
+    . " Mojo::UserAgent::Server::url";
+  shift->_delegate('server', 'url', @_);
 }
 
 sub build_tx           { shift->transactor->tx(@_) }
@@ -80,28 +76,28 @@ sub detect_proxy {
 sub http_proxy {
   deprecated "Mojo::UserAgent::http_proxy is DEPRECATED in favor of"
     . " Mojo::UserAgent::Proxy::http";
-  shift->_proxy('proxy', 'http', @_);
+  shift->_delegate('proxy', 'http', @_);
 }
 
 # DEPRECATED in Top Hat!
 sub https_proxy {
   deprecated "Mojo::UserAgent::https_proxy is DEPRECATED in favor of"
     . " Mojo::UserAgent::Proxy::https";
-  shift->_proxy('proxy', 'https', @_);
+  shift->_delegate('proxy', 'https', @_);
 }
 
 # DEPRECATED in Top Hat!
 sub name {
   deprecated "Mojo::UserAgent::name is DEPRECATED in favor of"
     . " Mojo::UserAgent::Transactor::name";
-  shift->_proxy('transactor', 'name', @_);
+  shift->_delegate('transactor', 'name', @_);
 }
 
 # DEPRECATED in Top Hat!
 sub no_proxy {
   deprecated "Mojo::UserAgent::no_proxy is DEPRECATED in favor of"
     . " Mojo::UserAgent::Proxy::not";
-  shift->_proxy('proxy', 'not', @_);
+  shift->_delegate('proxy', 'not', @_);
 }
 
 # DEPRECATED in Top Hat!
@@ -115,7 +111,10 @@ sub start {
   my ($self, $tx, $cb) = @_;
 
   # Fork safety
-  delete @{$self->_cleanup}{qw(pid port)} unless ($self->{pid} //= $$) eq $$;
+  unless (($self->{pid} //= $$) eq $$) {
+    delete $self->_cleanup->{pid};
+    $self->server->restart;
+  }
 
   # Non-blocking
   if ($cb) {
@@ -123,6 +122,7 @@ sub start {
     unless ($self->{nb}) {
       croak 'Blocking request in progress' if keys %{$self->{connections}};
       warn "-- Switching to non-blocking mode\n" if DEBUG;
+      $self->server->ioloop(Mojo::IOLoop->singleton);
       $self->_cleanup->{nb}++;
     }
     return $self->_start($tx, $cb);
@@ -133,6 +133,7 @@ sub start {
   if ($self->{nb}) {
     croak 'Non-blocking requests in progress' if keys %{$self->{connections}};
     warn "-- Switching to blocking mode\n" if DEBUG;
+    $self->server->ioloop($self->ioloop);
     delete $self->_cleanup->{nb};
   }
   $self->_start($tx => sub { shift->ioloop->stop; $tx = shift });
@@ -187,9 +188,6 @@ sub _cleanup {
 
   # Clean up keep-alive connections
   $loop->remove($_->[1]) for @{delete $self->{cache} || []};
-
-  # Stop server
-  delete $self->{server};
 
   return $self;
 }
@@ -307,6 +305,14 @@ sub _connection {
   return $id;
 }
 
+# DEPRECATED in Top Hat!
+sub _delegate {
+  my ($self, $attr, $name) = (shift, shift, shift);
+  return $self->$attr->$name unless @_;
+  $self->$attr->$name(@_);
+  return $self;
+}
+
 sub _error {
   my ($self, $id, $err) = @_;
   if (my $tx = $self->{connections}{$id}{tx}) { $tx->res->error($err) }
@@ -352,14 +358,6 @@ sub _handle {
 
 sub _loop { $_[0]{nb} ? Mojo::IOLoop->singleton : $_[0]->ioloop }
 
-# DEPRECATED in Top Hat!
-sub _proxy {
-  my ($self, $attr, $name) = (shift, shift, shift);
-  return $self->$attr->$name unless @_;
-  $self->$attr->$name(@_);
-  return $self;
-}
-
 sub _read {
   my ($self, $id, $chunk) = @_;
 
@@ -396,34 +394,14 @@ sub _redirect {
   return $self->_start($new, delete $c->{cb});
 }
 
-sub _server {
-  my ($self, $proto) = @_;
-
-  # Reuse server
-  return $self->{server} if $self->{server} && !$proto;
-
-  # Start application server
-  my $loop   = $self->_loop;
-  my $server = $self->{server}
-    = Mojo::Server::Daemon->new(ioloop => $loop, silent => 1);
-  my $port = $self->{port} ||= $loop->generate_port;
-  die "Couldn't find a free TCP port for application.\n" unless $port;
-  $self->{proto} = $proto ||= 'http';
-  $server->listen(["$proto://127.0.0.1:$port"])->start;
-  warn "-- Application server started ($proto://127.0.0.1:$port)\n" if DEBUG;
-  return $server;
-}
-
 sub _start {
   my ($self, $tx, $cb) = @_;
 
-  # Embedded server (update application if necessary)
+  # Application server
   my $url = $tx->req->url;
-  if ($self->{port} || !$url->is_abs) {
-    if (my $app = $self->app) { $self->_server->app($app) }
-    my $base = $self->app_url;
-    $url->scheme($base->scheme)->authority($base->authority)
-      unless $url->is_abs;
+  unless ($url->is_abs) {
+    my $base = $self->server->url;
+    $url->scheme($base->scheme)->authority($base->authority);
   }
 
   $self->proxy->inject($tx);
@@ -725,6 +703,23 @@ indefinitely. The timeout will reset for every followed redirect.
   # Total limit of 5 seconds, of which 3 seconds may be spent connecting
   $ua->max_redirects(0)->connect_timeout(3)->request_timeout(5);
 
+=head2 server
+
+  my $server = $ua->server;
+  $ua        = $ua->server(Mojo::UserAgent::Server->new);
+
+Application server relative URLs will be processed with, defaults to a
+L<Mojo::UserAgent::Server> object.
+
+  # Introspect
+  say $ua->server->app->secret;
+
+  # Change log level
+  $ua->server->app->log->level('fatal');
+
+  # Port currently used for processing relative URLs
+  say $ua->server->url->port;
+
 =head2 transactor
 
   my $t = $ua->transactor;
@@ -739,36 +734,6 @@ Transaction builder, defaults to a L<Mojo::UserAgent::Transactor> object.
 
 L<Mojo::UserAgent> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
-
-=head2 app
-
-  my $app = Mojo::UserAgent->app;
-            Mojo::UserAgent->app(MyApp->new);
-  my $app = $ua->app;
-  $ua     = $ua->app(MyApp->new);
-
-Application relative URLs will be processed with, instance specific
-applications override the global default.
-
-  # Introspect
-  say $ua->app->secret;
-
-  # Change log level
-  $ua->app->log->level('fatal');
-
-  # Change application behavior
-  $ua->app->defaults(testing => 'oh yea!');
-
-=head2 app_url
-
-  my $url = $ua->app_url;
-  my $url = $ua->app_url('http');
-  my $url = $ua->app_url('https');
-
-Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
-
-  # Port currently used for processing relative URLs
-  say $ua->app_url->port;
 
 =head2 build_tx
 

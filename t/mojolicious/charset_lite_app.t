@@ -105,7 +105,8 @@ $t->get_ok('/привет/мир')->status_is(200)
   ->content_type_is('application/json')->json_is({foo => $yatta});
 
 # Shift_JIS parameters
-my $url = $t->ua->app_url->path('/params')->query(foo => 3, yatta => $yatta);
+my $url
+  = $t->ua->server->url->path('/params')->query(foo => 3, yatta => $yatta);
 $url->query->charset('shift_jis');
 $t->get_ok($url)->status_is(200)
   ->json_is({params => {foo => 3, yatta => $yatta}, yatta => $yatta});

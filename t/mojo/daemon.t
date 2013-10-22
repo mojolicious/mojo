@@ -60,8 +60,8 @@ isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';
 
 # Fresh application
 $app = Mojolicious->new;
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app($app);
-is $ua->app->moniker, 'mojolicious', 'right moniker';
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+is $ua->server->app($app)->app->moniker, 'mojolicious', 'right moniker';
 
 # Silence
 $app->log->level('fatal');
@@ -166,7 +166,7 @@ for my $i (1 .. 10) { $params{"test$i"} = $i }
 my $result = '';
 for my $key (sort keys %params) { $result .= $params{$key} }
 my ($code, $body);
-my $port = $ua->app_url->port;
+my $port = $ua->server->url->port;
 $tx = $ua->post("http://127.0.0.1:$port/chunked" => form => \%params);
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';

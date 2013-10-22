@@ -650,9 +650,9 @@ $t->get_ok('/regex/in/template')->status_is(200)
   ->content_is("test(test)(\\Qtest\\E)(\n");
 
 # Chunked response with basic auth
-$t->get_ok(
-  $t->ua->app_url->userinfo('sri:foo')->path('/stream')->query(foo => 'bar'))
-  ->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
+my $url = $t->ua->server->url->userinfo('sri:foo')->path('/stream')
+  ->query(foo => 'bar');
+$t->get_ok($url)->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr!^foobarsri:foohttp://localhost:\d+/stream$!);
 
 # Not ajax

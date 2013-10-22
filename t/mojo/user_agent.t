@@ -10,6 +10,7 @@ use IO::Compress::Gzip 'gzip';
 use Mojo::IOLoop;
 use Mojo::Message::Request;
 use Mojo::UserAgent;
+use Mojo::UserAgent::Server;
 use Mojolicious::Lite;
 
 # Silence
@@ -71,19 +72,19 @@ post '/echo' => sub {
 }
 
 # Default application
-is(Mojo::UserAgent->app,      app, 'applications are equal');
-is(Mojo::UserAgent->new->app, app, 'applications are equal');
-Mojo::UserAgent->app(app);
-is(Mojo::UserAgent->app, app, 'applications are equal');
+is(Mojo::UserAgent::Server->app,      app, 'applications are equal');
+is(Mojo::UserAgent->new->server->app, app, 'applications are equal');
+Mojo::UserAgent::Server->app(app);
+is(Mojo::UserAgent::Server->app, app, 'applications are equal');
 my $dummy = Mojolicious::Lite->new;
-isnt(Mojo::UserAgent->new->app($dummy)->app, app,
-  'applications are not equal');
-is(Mojo::UserAgent->app, app, 'applications are still equal');
-Mojo::UserAgent->app($dummy);
-isnt(Mojo::UserAgent->app, app, 'applications are not equal');
-is(Mojo::UserAgent->app, $dummy, 'application are equal');
-Mojo::UserAgent->app(app);
-is(Mojo::UserAgent->app, app, 'applications are equal again');
+isnt(Mojo::UserAgent->new->server->app($dummy)->app,
+  app, 'applications are not equal');
+is(Mojo::UserAgent::Server->app, app, 'applications are still equal');
+Mojo::UserAgent::Server->app($dummy);
+isnt(Mojo::UserAgent::Server->app, app, 'applications are not equal');
+is(Mojo::UserAgent::Server->app, $dummy, 'application are equal');
+Mojo::UserAgent::Server->app(app);
+is(Mojo::UserAgent::Server->app, app, 'applications are equal again');
 
 # Clean up non-blocking requests
 my $ua = Mojo::UserAgent->new;
@@ -129,7 +130,7 @@ app->log->unsubscribe(message => $msg);
 like $err, qr/error event works/, 'right error';
 
 # HTTPS request without TLS support
-my $tx = $ua->get($ua->app_url->scheme('https'));
+my $tx = $ua->get($ua->server->url->scheme('https'));
 ok $tx->error, 'has error';
 
 # Blocking
@@ -297,23 +298,23 @@ is(($tx->error)[1], 404,         'right status');
 $tx = $ua->get('/');
 is $tx->res->body, 'works!', 'right content';
 my $last = $tx->connection;
-my $port = $ua->app_url->port;
+my $port = $ua->server->url->port;
 $tx = $ua->get('/');
 is $tx->res->body, 'works!', 'right content';
 is $tx->connection, $last, 'same connection';
-is $ua->app_url->port, $port, 'same port';
+is $ua->server->url->port, $port, 'same port';
 {
   local $$ = -23;
   $tx = $ua->get('/');
   is $tx->res->body, 'works!', 'right content';
   isnt $tx->connection, $last, 'new connection';
-  isnt $ua->app_url->port, $port, 'new port';
-  $port = $ua->app_url->port;
+  isnt $ua->server->url->port, $port, 'new port';
+  $port = $ua->server->url->port;
   $last = $tx->connection;
   $tx   = $ua->get('/');
   is $tx->res->body, 'works!', 'right content';
   is $tx->connection, $last, 'same connection';
-  is $ua->app_url->port, $port, 'same port';
+  is $ua->server->url->port, $port, 'same port';
 }
 
 # Introspect
@@ -392,7 +393,7 @@ is $stream, 1, 'no leaking subscribers';
 # Nested non-blocking requests after blocking one, with custom URL
 my @kept_alive;
 $ua->get(
-  $ua->app_url => sub {
+  $ua->server->url => sub {
     my ($self, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
     $self->get(
@@ -400,7 +401,7 @@ $ua->get(
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
         $self->get(
-          $ua->app_url => sub {
+          $ua->server->url => sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             Mojo::IOLoop->stop;
@@ -434,7 +435,7 @@ Mojo::IOLoop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';
 
 # Blocking request after non-blocking one, with custom URL
-$tx = $ua->get($ua->app_url);
+$tx = $ua->get($ua->server->url);
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';

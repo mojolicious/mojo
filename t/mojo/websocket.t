@@ -182,7 +182,7 @@ ok $body =~ /^(\d+)failed!$/, 'right content';
 is $1, 15, 'right timeout';
 
 # Using an already prepared socket
-my $port = $ua->app_url->port;
+my $port = $ua->server->url->port;
 my $tx   = $ua->build_websocket_tx('ws://lalala/socket');
 my $finished;
 $tx->on(finish => sub { $finished++ });

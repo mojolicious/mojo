@@ -19,15 +19,15 @@ sub import {
   # Mojolicious::Lite
   my $caller = caller;
   eval "package $caller; use Mojolicious::Lite;";
-  $UA->app($caller->app);
-  $UA->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
+  my $server = $UA->server->app($caller->app);
+  $server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
 
   $UA->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
   $UA->proxy->detect unless defined $ENV{MOJO_PROXY};
 
   # The ojo DSL
   monkey_patch $caller,
-    a => sub { $caller->can('any')->(@_) and return $UA->app },
+    a => sub { $caller->can('any')->(@_) and return $UA->server->app },
     b => \&b,
     c => \&c,
     d => sub { _request($UA->build_tx(DELETE  => @_)) },

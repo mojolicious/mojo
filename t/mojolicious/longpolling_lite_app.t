@@ -277,7 +277,7 @@ ok $stash->{destroyed}, 'controller has been destroyed';
 # Interrupted by closing the connection
 $stash = undef;
 $t->app->plugins->once(before_dispatch => sub { $stash = shift->stash });
-my $port = $t->ua->app_url->port;
+my $port = $t->ua->server->url->port;
 Mojo::IOLoop->client(
   {port => $port} => sub {
     my ($loop, $err, $stream) = @_;

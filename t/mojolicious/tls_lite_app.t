@@ -46,7 +46,7 @@ get '/logout' => sub {
 # Use HTTPS
 my $t = Test::Mojo->new;
 $t->ua->max_redirects(5);
-$t->reset_session->ua->app_url('https');
+$t->reset_session->ua->server->url('https');
 
 # Login
 $t->get_ok('/login?name=sri' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
@@ -71,7 +71,7 @@ $t->get_ok('/logout' => {'X-Forwarded-HTTPS' => 1})->status_is(200)
   ->content_is('Welcome anonymous!');
 
 # Use HTTP
-$t->reset_session->ua->app_url('http');
+$t->reset_session->ua->server->url('http');
 
 # Login again
 $t->reset_session->get_ok('/login?name=sri')->status_is(200)
@@ -81,7 +81,7 @@ $t->reset_session->get_ok('/login?name=sri')->status_is(200)
 $t->get_ok('/again')->status_is(200)->content_is('Welcome back anonymous!');
 
 # Use HTTPS again (without expiration)
-$t->reset_session->ua->app_url('https');
+$t->reset_session->ua->server->url('https');
 app->sessions->default_expiration(0);
 
 # Login again

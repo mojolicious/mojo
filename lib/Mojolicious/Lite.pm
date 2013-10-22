@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious';
 # "Bender: Bite my shiny metal ass!"
 use File::Basename qw(basename dirname);
 use File::Spec::Functions 'catdir';
-use Mojo::UserAgent;
+use Mojo::UserAgent::Server;
 use Mojo::Util 'monkey_patch';
 
 sub import {
@@ -53,7 +53,7 @@ sub import {
     under  => sub { $routes = $root->under(@_) };
 
   # Make sure there's a default application for testing
-  Mojo::UserAgent->app($app) unless Mojo::UserAgent->app;
+  Mojo::UserAgent::Server->app($app) unless Mojo::UserAgent::Server->app;
 
   # Lite apps are strict!
   Mojo::Base->import(-strict);

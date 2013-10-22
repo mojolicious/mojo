@@ -4,7 +4,6 @@ use Mojo::Base 'Mojo::EventEmitter';
 # "Fry: Since when is the Internet about robbing people of their privacy?
 #  Bender: August 6, 1991."
 use Carp 'croak';
-use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojo::URL;
@@ -52,14 +51,14 @@ for my $name (qw(http https no)) {
   };
 }
 
+sub DESTROY { shift->_cleanup }
+
 # DEPRECATED in Top Hat!
 sub new {
   my $self = shift->SUPER::new;
   while (my $name = shift) { $self->$name(shift) }
   return $self;
 }
-
-sub DESTROY { shift->_cleanup }
 
 sub app {
   my ($self, $app) = @_;
@@ -152,7 +151,7 @@ sub _cache {
     my $max = $self->max_connections;
     $self->_remove(shift(@$old)->[1]) while @$old > $max;
     push @$old, [$name, $id] if $max;
-    return undef;
+    return;
   }
 
   # Dequeue
@@ -162,7 +161,7 @@ sub _cache {
   for my $cached (@$old) {
 
     # Search for id/name and remove corrupted connections
-    if (!$found && first { $_ eq $name } @$cached) {
+    if (!$found && grep { $_ eq $name } @$cached) {
       next unless my $stream = $loop->stream($cached->[1]);
       $stream->is_readable ? $stream->close : ($found = $cached->[1]);
     }

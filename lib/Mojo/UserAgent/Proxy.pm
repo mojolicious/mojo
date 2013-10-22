@@ -1,8 +1,6 @@
 package Mojo::UserAgent::Proxy;
 use Mojo::Base -base;
 
-use List::Util 'first';
-
 has [qw(http https not)];
 
 sub detect {
@@ -31,7 +29,7 @@ sub inject {
 }
 
 sub is_needed {
-  !first { $_[1] =~ /\Q$_\E$/ } @{$_[0]->not || []};
+  !grep { $_[1] =~ /\Q$_\E$/ } @{$_[0]->not || []};
 }
 
 1;

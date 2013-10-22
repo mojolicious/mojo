@@ -10,7 +10,6 @@ use Test::More;
 plan skip_all => 'set TEST_PREFORK to enable this test (developer only!)'
   unless $ENV{TEST_PREFORK};
 
-use List::Util 'first';
 use Mojo::IOLoop;
 use Mojo::Server::Prefork;
 use Mojo::UserAgent;
@@ -57,7 +56,7 @@ my $cb = $prefork->app->log->on(message => sub { $log .= pop });
 $prefork->run;
 is scalar @spawn, 4, 'four workers spawned';
 is scalar @reap,  4, 'four workers reaped';
-ok !!first { $worker eq $_ } @spawn, 'worker has a heartbeat';
+ok !!grep { $worker eq $_ } @spawn, 'worker has a heartbeat';
 ok $graceful, 'server has been stopped gracefully';
 is_deeply [sort @spawn], [sort @reap], 'same process ids';
 is $tx->res->code, 200,           'right status';

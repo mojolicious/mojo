@@ -16,7 +16,7 @@
     Mojo::UserAgent::Proxy::is_needed.
   - Deprecated Mojo::UserAgent::name in favor of
     Mojo::UserAgent::Transactor::name.
-  - Added modules Mojo::UserAgent::Server and Mojo::UserAgent::Proxy.
+  - Added modules Mojo::UserAgent::Proxy and Mojo::UserAgent::Server.
   - Added proxy and server attributes to Mojo::UserAgent.
   - Removed deprecated attrs method from Mojo::DOM.
   - Improved Mojo::Message to allow max_message_size check to be disabled.

@@ -19,27 +19,24 @@ sub app {
   return $self;
 }
 
-sub restart {
-  my $self = shift;
-  delete $self->{port};
-  $self->_restart;
-}
+sub restart { shift->_restart(1) }
 
 sub url {
   my $self = shift;
-  $self->_restart(@_)
+  $self->_restart(0, @_)
     if !$self->{server} || $self->{server}->ioloop ne $self->ioloop || @_;
   return Mojo::URL->new("$self->{proto}://localhost:$self->{port}/");
 }
 
 sub _restart {
-  my ($self, $proto) = @_;
+  my ($self, $full, $proto) = @_;
 
   my $server = $self->{server} = Mojo::Server::Daemon->new(
     app    => $self->app,
     ioloop => $self->ioloop,
     silent => 1
   );
+  delete $self->{port} if $full;
   die "Couldn't find a free TCP port for application.\n"
     unless my $port = $self->{port} ||= Mojo::IOLoop->generate_port;
   $self->{proto} = $proto ||= 'http';

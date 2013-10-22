@@ -92,7 +92,7 @@ enabled with the MOJO_PROXY environment variable.
 
 =head2 inject
 
-  $proxy->inject($tx);
+  $proxy->inject(Mojo::Transaction::HTTP->new);
 
 Inject proxy server information into transaction.
 

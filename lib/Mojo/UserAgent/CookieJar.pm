@@ -178,19 +178,19 @@ Empty the jar.
 
 =head2 extract
 
-  $jar->extract($tx);
+  $jar->extract(Mojo::Transaction::HTTP->new);
 
 Extract response cookies from transaction.
 
 =head2 find
 
-  my @cookies = $jar->find($url);
+  my @cookies = $jar->find(Mojo::URL->new);
 
 Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 
 =head2 inject
 
-  $jar->inject($tx);
+  $jar->inject(Mojo::Transaction::HTTP->new);
 
 Inject request cookies into transaction.
 

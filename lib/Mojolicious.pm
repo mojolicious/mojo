@@ -94,10 +94,10 @@ sub new {
   # DEPRECATED in Top Hat!
   if (my $sub = $self->can("${mode}_mode")) {
     deprecated qq{"sub ${mode}_mode {...}" in application class is DEPRECATED};
-    $self->$sub(@_);
+    $self->$sub;
   }
 
-  $self->startup(@_);
+  $self->startup;
 
   return $self;
 }

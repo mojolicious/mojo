@@ -225,12 +225,8 @@ sub _text_area {
 sub _validation {
   my ($self, $name, $tag) = (shift, shift, shift);
   my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
-
-  my $class = $self->app->config->{validation_error_class}
-    // 'field-with-error';
-  $attrs{class} .= $attrs{class} ? " $class" : $class
+  $attrs{class} .= $attrs{class} ? ' field-with-error' : 'field-with-error'
     if $self->validation->has_error($name);
-
   return _tag($tag, %attrs, defined $content ? $content : ());
 }
 

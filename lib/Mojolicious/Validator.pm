@@ -108,7 +108,8 @@ implements the following new ones.
 
   $validator = $validator->add_check(size => sub {...});
 
-Register a new validation check.
+Register a new validation check. The callback should return undef to pass the
+check.
 
 =head2 validation
 

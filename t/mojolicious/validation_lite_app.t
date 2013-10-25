@@ -142,15 +142,17 @@ $t->get_ok('/' => form => {foo => '☃☃'})->status_is(200)
   ->text_is('label[for="baz"]' => 'Baz')->element_exists('select')
   ->element_exists('input[type="password"]');
 
-# Validation failed for required fields
+# Validation failed for required fields (custom error class)
+$t->app->config(validation_error_class => 'my-field-with-error');
 $t->post_ok('/' => form => {foo => 'no'})->status_is(200)
-  ->text_is('div:root'                                 => 'in 1')
-  ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
-  ->element_exists('input.custom.field-with-error[type="text"][value="no"]')
-  ->element_exists_not('textarea.field-with-error')
-  ->element_exists_not('label.custom.field-with-error[for="baz"]')
-  ->element_exists_not('select.field-with-error')
-  ->element_exists_not('input.field-with-error[type="password"]');
+  ->text_is('div:root'                                    => 'in 1')
+  ->text_is('label.custom.my-field-with-error[for="foo"]' => '<Foo>')
+  ->element_exists('input.custom.my-field-with-error[type="text"][value="no"]')
+  ->element_exists_not('textarea.my-field-with-error')
+  ->element_exists_not('label.custom.my-field-with-error[for="baz"]')
+  ->element_exists_not('select.my-field-with-error')
+  ->element_exists_not('input.my-field-with-error[type="password"]');
+delete $t->app->config->{validation_error_class};
 
 # Failed validation for all fields
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')

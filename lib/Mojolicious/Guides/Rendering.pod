@@ -685,6 +685,11 @@ to make styling with CSS easier.
   </label>
   <input class="field-with-error" type="text" name="user" value="sri" />
 
+The class can also be changed with the C<validation_error_class> configuration
+setting and L<Mojo/"config">.
+
+  app->config(validation_error_class => 'my-field-with-error');
+
 For a full list of available checks see also
 L<Mojolicious::Validator/"CHECKS">.
 

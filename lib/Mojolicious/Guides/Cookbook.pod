@@ -101,8 +101,9 @@ environments out of the box.
   $ hypnotoad script/myapp
   Server available at http://127.0.0.1:8080.
 
-You can tweak many configuration settings right from within your application,
-for a full list see L<Mojo::Server::Hypnotoad/"SETTINGS">.
+You can tweak many configuration settings right from within your application
+with L<Mojo/"config">, for a full list see
+L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   use Mojolicious::Lite;
 

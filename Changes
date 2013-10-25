@@ -1,4 +1,7 @@
 
+4.51  2013-10-25
+  - Added validation_error_class configuration setting.
+
 4.50  2013-10-22
   - Deprecated Mojo::UserAgent::app in favor of
     Mojo::UserAgent::Server::app.

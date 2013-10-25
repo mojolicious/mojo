@@ -846,8 +846,9 @@ This even works for proxy C<CONNECT> requests.
 
 =head2 Content generators
 
-Generate the same type of content repeatedly for multiple requests with
-L<Mojo::UserAgent::Transactor/"add_generator">.
+Content generators can be registered with
+L<Mojo::UserAgent::Transactor/"add_generator"> to generate the same type of
+content repeatedly for multiple requests.
 
   use Mojo::UserAgent;
   use Mojo::Asset::File;

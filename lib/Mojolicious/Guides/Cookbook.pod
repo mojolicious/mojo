@@ -756,8 +756,10 @@ When we say L<Mojolicious> is a web framework we actually mean it.
 =head2 Web scraping
 
 Scraping information from web sites has never been this much fun before. The
-built-in HTML/XML parser L<Mojo::DOM> supports all CSS selectors that make
-sense for a standalone parser.
+built-in HTML/XML parser L<Mojo::DOM> is accessible through
+L<Mojo::Message/"dom"> and supports all CSS selectors that make sense for a
+standalone parser, it can be a very powerful tool especially for unit testing
+web application.
 
   use Mojo::UserAgent;
 
@@ -787,14 +789,14 @@ sense for a standalone parser.
     print $e->text_after(0) unless $e->next;
   }
 
-Especially for unit testing your L<Mojolicious> applications this can be a
-very powerful tool.
+For a full list of available CSS selectors see L<Mojo::DOM::CSS/"SELECTORS">.
 
 =head2 JSON web services
 
 Most web services these days are based on the JSON data-interchange format.
 That's why L<Mojolicious> comes with the possibly fastest pure-Perl
-implementation L<Mojo::JSON> built right in.
+implementation L<Mojo::JSON> built right in, it is accessible through
+L<Mojo::Message/"json">.
 
   use Mojo::UserAgent;
   use Mojo::URL;
@@ -844,7 +846,8 @@ This even works for proxy C<CONNECT> requests.
 
 =head2 Content generators
 
-Generate the same type of content repeatedly for multiple requests.
+Generate the same type of content repeatedly for multiple requests with
+L<Mojo::UserAgent::Transactor/"add_generator">.
 
   use Mojo::UserAgent;
   use Mojo::Asset::File;
@@ -885,7 +888,8 @@ L<Mojo::UserAgent::Transactor/"tx">.
 
 When downloading large files with L<Mojo::UserAgent> you don't have to worry
 about memory usage at all, because it will automatically stream everything
-above C<250KB> into a temporary file.
+above C<250KB> into a temporary file, which can then be moved into a permanent
+file with L<Mojo::Asset::File/"move_to">.
 
   use Mojo::UserAgent;
 

@@ -13,13 +13,8 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util 'encode';
 
-has generators => sub { {} };
+has generators => sub { {form => \&_form, json => \&_json} };
 has name => 'Mojolicious (Perl)';
-
-sub new {
-  my $self = shift->SUPER::new(@_);
-  return $self->add_generator(form => \&_form)->add_generator(json => \&_json);
-}
 
 sub add_generator {
   my ($self, $name, $cb) = @_;
@@ -294,7 +289,8 @@ L<Mojo::UserAgent::Transactor> implements the following attributes.
   my $generators = $t->generators;
   $t             = $t->generators({foo => sub {...}});
 
-Registered content generators.
+Registered content generators, by default only C<form> and C<json> are already
+defined.
 
 =head2 name
 
@@ -308,13 +304,6 @@ C<Mojolicious (Perl)>.
 
 L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
-
-=head2 new
-
-  my $t = Mojo::UserAgent::Transactor->new;
-
-Construct a new transactor and register C<form> and C<json> content
-generators.
 
 =head2 add_generator
 

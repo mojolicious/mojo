@@ -1667,7 +1667,7 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
 is $req->upload('foo %22bar%22 baz')->filename, 'fo%22o%22.txt',
   'right filename';
-is $req->upload('foo %22bar%22 baz')->slurp, 'test', 'right value';
+is $req->upload('foo %22bar%22 baz')->slurp, 'test', 'right content';
 
 # Firefox 24 multipart/form-data request (with quotation marks)
 $req = Mojo::Message::Request->new;
@@ -1696,7 +1696,7 @@ is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
 is $req->upload('foo \"bar\" baz')->filename, 'fo\\"o\\".txt',
   'right filename';
-is $req->upload('foo \"bar\" baz')->slurp, 'test', 'right value';
+is $req->upload('foo \"bar\" baz')->slurp, 'test', 'right content';
 
 # Chrome 5 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;

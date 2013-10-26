@@ -1,5 +1,6 @@
 
-4.51  2013-10-25
+4.51  2013-10-26
+  - Fixed case sensitivity bug in multipart form handling.
 
 4.50  2013-10-22
   - Deprecated Mojo::UserAgent::app in favor of

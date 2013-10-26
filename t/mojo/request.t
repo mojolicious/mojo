@@ -1644,7 +1644,7 @@ $req = Mojo::Message::Request->new;
 $req->parse("POST / HTTP/1.1\x0d\x0a");
 $req->parse("Host: 127.0.0.1:3000\x0d\x0a");
 $req->parse("Connection: keep-alive\x0d\x0a");
-$req->parse("Content-Length: 178\x0d\x0a");
+$req->parse("Content-Length: 180\x0d\x0a");
 $req->parse('Accept: text/html,application/xhtml+xml,application/xml;q=');
 $req->parse("0.9,image/webp,*/*;q=0.8\x0d\x0a");
 $req->parse("Origin: http://127.0.0.1:3000\x0d\x0a");
@@ -1658,16 +1658,16 @@ $req->parse("Accept-Encoding: gzip,deflate,sdch\x0d\x0a");
 $req->parse("Accept-Language: en-US,en;q=0.8\x0d\x0a\x0d\x0a");
 $req->parse("------WebKitFormBoundaryMTelhBLWA9N3KXAR\x0d\x0a");
 $req->parse('Content-Disposition: form-data; na');
-$req->parse('me="foo %22bar%22 baz"; filename="fo%22o%22.txt"');
+$req->parse('me="foo \\%22bar%22 baz"; filename="fo\\%22o%22.txt"');
 $req->parse("\x0d\x0a\x0d\x0atest\x0d\x0a");
 $req->parse("------WebKitFormBoundaryMTelhBLWA9N3KXAR--\x0d\x0a");
 ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->upload('foo %22bar%22 baz')->filename, 'fo%22o%22.txt',
+is $req->upload('foo \\%22bar%22 baz')->filename, 'fo\\%22o%22.txt',
   'right filename';
-is $req->upload('foo %22bar%22 baz')->slurp, 'test', 'right content';
+is $req->upload('foo \\%22bar%22 baz')->slurp, 'test', 'right content';
 
 # Firefox 24 multipart/form-data request (with quotation marks)
 $req = Mojo::Message::Request->new;
@@ -1683,10 +1683,10 @@ $req->parse("Referer: http://127.0.0.1:3000/\x0d\x0a");
 $req->parse("Connection: keep-alive\x0d\x0a");
 $req->parse('Content-Type: multipart/form-data; boundary=-----------------');
 $req->parse("----------20773201241877674789807986058\x0d\x0a");
-$req->parse("Content-Length: 210\x0d\x0a\x0d\x0a");
+$req->parse("Content-Length: 212\x0d\x0a\x0d\x0a");
 $req->parse('-----------------------------2077320124187767478980');
 $req->parse("7986058\x0d\x0aContent-Disposition: form-data; na");
-$req->parse('me="foo \\"bar\\" baz"; filename="fo\\"o\\".txt"');
+$req->parse('me="foo \\\\"bar\\" baz"; filename="fo\\\\"o\\".txt"');
 $req->parse("\x0d\x0a\x0d\x0atest\x0d\x0a");
 $req->parse('-----------------------------2077320124187767');
 $req->parse("4789807986058--\x0d\x0a");
@@ -1694,9 +1694,9 @@ ok $req->is_finished, 'request is finished';
 is $req->method,      'POST', 'right method';
 is $req->version,     '1.1', 'right version';
 is $req->url,         '/', 'right URL';
-is $req->upload('foo \"bar\" baz')->filename, 'fo\\"o\\".txt',
+is $req->upload('foo \\\"bar\" baz')->filename, 'fo\\\\"o\\".txt',
   'right filename';
-is $req->upload('foo \"bar\" baz')->slurp, 'test', 'right content';
+is $req->upload('foo \\\"bar\" baz')->slurp, 'test', 'right content';
 
 # Chrome 5 multipart/form-data request (UTF-8)
 $req = Mojo::Message::Request->new;

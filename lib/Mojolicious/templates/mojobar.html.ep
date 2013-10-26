@@ -38,6 +38,14 @@
       transition: all 200ms ease-in-out;
     }
     #mojobar-links a:hover { color: #fff }
+    #mojobar-links input {
+      border: 0;
+      border-radius: 10px;
+      display: inline;
+      margin-left: 0.5em;
+      padding: 3px;
+    }
+    #mojobar-links form { display: inline }
   % end
   <div id="mojobar-logo">
     %= link_to 'http://mojolicio.us' => begin
@@ -52,6 +60,11 @@
     %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
     %= link_to Blog => 'http://blog.kraih.com'
     %= link_to Twitter => 'http://twitter.com/kraih'
+    %= form_for 'http://google.com/cse' => (target => '_blank') => begin
+      %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
+      %= hidden_field ie => 'UTF-8'
+      %= search_field 'q', placeholder => 'Search'
+    %= end
   </div>
 </div>
 %= javascript begin

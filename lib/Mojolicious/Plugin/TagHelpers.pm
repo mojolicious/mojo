@@ -46,7 +46,7 @@ sub _form_for {
 
   # POST detection
   my @post;
-  if (my $r = $self->app->routes->find($url[0])) {
+  if (my $r = $self->app->routes->lookup($url[0])) {
     my %methods = (GET => 1, POST => 1);
     do {
       my @via = @{$r->via || []};

@@ -68,6 +68,11 @@
   </div>
 </div>
 %= javascript begin
+  $('#mojobar-links form').submit(function (e) {
+    e.preventDefault();
+    this.submit();
+    $('#mojobar-links input[type="search"]').val('');
+  });
   $(window).load(function () {
     if (window.location.hash) {
       var tweak = $(window.location.hash).offset().top - 50;

@@ -18,25 +18,24 @@ sub register {
       # Generate name
       my $path = $options->{inline} || $renderer->template_path($options);
       return undef unless defined $path;
-      my $stash = $c->stash;
-      my $id    = encode 'UTF-8', join(', ', $path, sort keys %$stash);
-      my $key   = $options->{cache} = md5_sum $id;
+      my @keys = sort grep {/^\w+$/} keys %{$c->stash};
+      my $id = encode 'UTF-8', join(',', $path, @keys);
+      my $key = $options->{cache} = md5_sum $id;
 
-      # Compile helpers and stash values
+      # Cache template for "epl" handler
       my $cache = $renderer->cache;
       my $mt    = $cache->get($key);
       unless ($mt) {
         $mt = Mojo::Template->new($template);
 
-        # Helpers
+        # Helpers (only once)
         ++$self->{helpers} and _helpers($mt->namespace, $renderer->helpers)
           unless $self->{helpers};
 
-        # Stash values
+        # Stash values (every time)
         my $prepend = 'my $self = shift; my $_S = $self->stash;';
-        $prepend .= " my \$$_ = \$_S->{'$_'};" for grep {/^\w+$/} keys %$stash;
+        $prepend .= " my \$$_ = \$_S->{'$_'};" for @keys;
 
-        # Cache
         $cache->set($key => $mt->prepend($prepend . $mt->prepend));
       }
 

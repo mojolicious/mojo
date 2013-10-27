@@ -436,7 +436,7 @@ Generate portable script tag for C<Javascript> asset.
 =head2 label_for
 
   %= label_for first_name => 'First name'
-  %= label_for first_name => 'First name, class => 'user'
+  %= label_for first_name => 'First name', class => 'user'
   %= label_for first_name => begin
     First name
   % end

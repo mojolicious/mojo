@@ -187,7 +187,7 @@
           %= $kv->(Stash => dumper $snapshot)
           %= $kv->(Session => dumper session)
           %= $kv->(Version => $req->version)
-          % for my $name (@{$self->req->headers->names}) {
+          % for my $name (sort @{$self->req->headers->names}) {
             % my $value = $self->req->headers->header($name);
             %= $kv->($name, $value)
           % }

@@ -25,15 +25,13 @@
       float: right;
       height: 60px;
       margin-right: 5em;
-      margin-top: 1em;
+      margin-top: 0.8em;
     }
     #mojobar-links a {
       color: #ccc;
       font: 1em 'Helvetica Neue', Helvetica, sans-serif;
       font-weight: 300;
       margin-left: 0.5em;
-      padding-bottom: 1em;
-      padding-top: 1em;
       text-decoration: none;
       transition: all 200ms ease-in-out;
     }
@@ -42,7 +40,7 @@
       border: 0;
       border-radius: 10px;
       display: inline;
-      margin-left: 0.5em;
+      margin-left: 1em;
       padding: 3px;
     }
     #mojobar-links form { display: inline }

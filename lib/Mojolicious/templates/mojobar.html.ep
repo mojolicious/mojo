@@ -43,6 +43,7 @@
       margin-left: 1em;
       padding: 3px;
     }
+    #mojobar-links input:focus { outline: 0 }
     #mojobar-links form { display: inline }
   % end
   <div id="mojobar-logo">

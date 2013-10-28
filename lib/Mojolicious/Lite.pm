@@ -476,7 +476,8 @@ Routes can be restricted to specific request methods with different keywords.
 
 =head2 Optional placeholders
 
-Routes allow default values to make placeholders optional.
+All placeholders require a value, but by assigning them default values you can
+make capturing optional.
 
   use Mojolicious::Lite;
 

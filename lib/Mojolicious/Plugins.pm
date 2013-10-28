@@ -55,7 +55,7 @@ sub _load {
   if (my $e = Mojo::Loader->new->load($module)) {
     ref $e ? die $e : return undef;
   }
-  return $module->isa('Mojolicious::Plugin') ? 1 : undef;
+  return $module->isa('Mojolicious::Plugin');
 }
 
 1;

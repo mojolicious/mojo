@@ -210,7 +210,7 @@ sub _parent {
   my ($self, $selectors, $current, $tree) = @_;
   return undef unless my $parent = $current->[3];
   return undef if $parent->[0] eq 'root';
-  return $self->_combinator($selectors, $parent, $tree) ? 1 : undef;
+  return $self->_combinator($selectors, $parent, $tree);
 }
 
 sub _pc {

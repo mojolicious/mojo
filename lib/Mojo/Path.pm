@@ -119,9 +119,9 @@ sub _parse {
     my $path = url_unescape delete($self->{path}) // '';
     my $charset = $self->charset;
     $path = decode($charset, $path) // $path if $charset;
-    $self->{leading_slash}  = $path =~ s!^/!! ? 1 : undef;
-    $self->{trailing_slash} = $path =~ s!/$!! ? 1 : undef;
-    $self->{parts} = [split '/', $path, -1];
+    $self->{leading_slash}  = $path =~ s!^/!!;
+    $self->{trailing_slash} = $path =~ s!/$!!;
+    $self->{parts}          = [split '/', $path, -1];
   }
 
   return $self->{$name} unless @_;

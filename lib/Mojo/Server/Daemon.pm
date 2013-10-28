@@ -172,7 +172,7 @@ sub _listen {
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
   delete $options->{address} if $options->{address} eq '*';
-  my $tls = $options->{tls} = $url->protocol eq 'https' ? 1 : undef;
+  my $tls = $options->{tls} = $url->protocol eq 'https';
 
   weaken $self;
   push @{$self->acceptors}, $self->ioloop->server(

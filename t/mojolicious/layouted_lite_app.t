@@ -69,11 +69,12 @@ get '/plain/reverse' => {text => 'Hello!', format => 'foo', reverse => 1};
 
 get '/outerlayout' => sub {
   my $self = shift;
-  $self->render(
-    template => 'outerlayout',
-    layout   => 'layout',
-    handler  => 'ep'
-  );
+  $self->render(template => 'outerlayout', layout => 'layout');
+};
+
+get '/outerextends' => sub {
+  my $self = shift;
+  $self->render(template => 'outerlayout', extends => 'layouts/layout');
 };
 
 get '/outerlayouttwo' => {layout => 'layout'} => sub {
@@ -204,6 +205,11 @@ $t->get_ok('/plain/reverse')->status_is(200)
 
 # Layout in render call
 $t->get_ok('/outerlayout')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
+
+# Extends in render call
+$t->get_ok('/outerextends')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 

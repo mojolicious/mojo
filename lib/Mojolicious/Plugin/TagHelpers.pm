@@ -626,7 +626,7 @@ Alias for C<tag>.
   %= tag 'div'
   %= tag 'div', id => 'foo'
   %= tag div => 'some & content'
-  %= tag div => 'some & content', id => 'foo'
+  %= tag div => (id => 'foo') => 'some & content'
   %= tag div => begin
     some & content
   % end

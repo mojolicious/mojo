@@ -320,18 +320,18 @@ layout_with_template
 Nested <%= include 'outerlayout' %>
 
 @@ localized.html.ep
-% layout 'localized1';
+% extends 'localized1';
 <%= $test %>
-<%= include 'localized_partial', test => 321, layout => 'localized2' %>
+<%= include 'localized_partial', test => 321, extends => 'localized2' %>
 <%= $test %>
 
 @@ localized_partial.html.ep
 <%= $test %>
 
-@@ layouts/localized1.html.ep
+@@ localized1.html.ep
 localized1 <%= content %>
 
-@@ layouts/localized2.html.ep
+@@ localized2.html.ep
 localized2 <%= content %>
 
 @@ outerlayout.html.ep

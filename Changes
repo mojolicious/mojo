@@ -5,6 +5,7 @@
     longer has any effect. (jberger, sri)
   - Improved form_for performance.
   - Improved built-in templates with documentation search.
+  - Fixed template inheritance bug in include helper.
   - Fixed a few multipart form handling bugs.
 
 4.50  2013-10-22

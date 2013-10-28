@@ -64,8 +64,7 @@ sub _current_route {
 sub _include {
   my $self     = shift;
   my $template = @_ % 2 ? shift : undef;
-  my $args     = {@_};
-  $args->{template} = $template if defined $template;
+  my $args     = {@_, defined $template ? (template => $template) : ()};
 
   # "layout" and "extends" can't be localized
   my $layout  = delete $args->{layout};
@@ -75,7 +74,7 @@ sub _include {
   my @keys = keys %$args;
   local @{$self->stash}{@keys} = @{$args}{@keys};
 
-  return $self->render(partial => 1, layout => $layout, extend => $extends);
+  return $self->render(partial => 1, layout => $layout, extends => $extends);
 }
 
 sub _url_with {

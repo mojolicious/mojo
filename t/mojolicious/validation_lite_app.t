@@ -152,15 +152,24 @@ $t->post_ok('/' => form => {foo => 'no'})->status_is(200)
   ->element_exists_not('select.field-with-error')
   ->element_exists_not('input.field-with-error[type="password"]');
 
-# Failed validation for all fields
+# Failed validation for all fields (with custom helper)
+$t->app->helper(
+  tag_with_error => sub {
+    my ($self, $tag) = (shift, shift);
+    my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
+    $attrs{class}
+      .= $attrs{class} ? ' my-field-with-error' : 'my-field-with-error';
+    return $self->tag($tag, %attrs, defined $content ? $content : ());
+  }
+);
 $t->get_ok('/?foo=too_long&bar=too_long_too&baz=way_too_long&yada=whatever')
   ->status_is(200)->text_is('div:root' => 'two ohoh')
-  ->text_is('label.custom.field-with-error[for="foo"]' => '<Foo>')
-  ->element_exists('input.custom.field-with-error[type="text"]')
-  ->element_exists('textarea.field-with-error')
-  ->text_is('label.custom.field-with-error[for="baz"]' => 'Baz')
-  ->element_exists('select.field-with-error')
-  ->element_exists('input.field-with-error[type="password"]');
+  ->text_is('label.custom.my-field-with-error[for="foo"]' => '<Foo>')
+  ->element_exists('input.custom.my-field-with-error[type="text"]')
+  ->element_exists('textarea.my-field-with-error')
+  ->text_is('label.custom.my-field-with-error[for="baz"]' => 'Baz')
+  ->element_exists('select.my-field-with-error')
+  ->element_exists('input.my-field-with-error[type="password"]');
 
 done_testing();
 

@@ -626,14 +626,22 @@ Alias for C<tag>.
   %= tag 'div'
   %= tag 'div', id => 'foo'
   %= tag div => 'some & content'
-  <%= tag div => begin %>some & content<% end %>
+  %= tag div => 'some & content', id => 'foo'
+  %= tag div => begin
+    some & content
+  % end
+  <%= tag div => (id => 'foo') => begin %>some & content<% end %>
 
 HTML tag generator.
 
   <div />
   <div id="foo" />
   <div>some &amp; content</div>
-  <div>some & content</div>
+  <div id="foo">some &amp; content</div>
+  <div>
+    some & content
+  </div>
+  <div id="foo">some & content</div>
 
 Very useful for reuse in more specific tag helpers.
 

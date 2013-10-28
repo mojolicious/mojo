@@ -37,7 +37,8 @@ sub register {
   # "t" is just a shortcut for the "tag" helper
   $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);
 
-  $app->helper(text_area => \&_text_area);
+  $app->helper(tag_with_error => \&_tag_with_error);
+  $app->helper(text_area      => \&_text_area);
 }
 
 sub _form_for {
@@ -210,6 +211,13 @@ sub _tag {
   return Mojo::ByteStream->new($tag);
 }
 
+sub _tag_with_error {
+  my ($self, $tag) = (shift, shift);
+  my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
+  $attrs{class} .= $attrs{class} ? ' field-with-error' : 'field-with-error';
+  return _tag($tag, %attrs, defined $content ? $content : ());
+}
+
 sub _text_area {
   my ($self, $name) = (shift, shift);
 
@@ -223,11 +231,9 @@ sub _text_area {
 }
 
 sub _validation {
-  my ($self, $name, $tag) = (shift, shift, shift);
-  my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
-  $attrs{class} .= $attrs{class} ? ' field-with-error' : 'field-with-error'
-    if $self->validation->has_error($name);
-  return _tag($tag, %attrs, defined $content ? $content : ());
+  my ($self, $name) = (shift, shift);
+  return _tag(@_) unless $self->validation->has_error($name);
+  return $self->tag_with_error(@_);
 }
 
 1;
@@ -262,8 +268,8 @@ necessary attributes always be generated automatically.
   <%= radio_button country => 'uk'      %> UK
 
 For fields that failed validation with L<Mojolicious::Controller/"validation">
-the C<field-with-error> class will be automatically added to make styling with
-CSS easier.
+the C<field-with-error> class will be automatically added through the
+C<tag_with_error> helper, to make styling with CSS easier.
 
   <input class="field-with-error" name="age" type="text" value="250" />
 
@@ -651,6 +657,14 @@ Very useful for reuse in more specific tag helpers.
 
 Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
 accidental double escaping.
+
+=head2 tag_with_error
+
+  %= tag_with_error 'input', class => 'foo'
+
+Same as C<tag>, but adds the class C<field-with-error>.
+
+  <input class="foo field-with-error" />
 
 =head2 tel_field
 

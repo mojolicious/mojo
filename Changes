@@ -1,5 +1,6 @@
 
 4.51  2013-10-28
+  - Added tag_with_error helper to Mojolicious::Plugin::TagHelpers.
   - Improved .ep template performance significantly, the number of helpers no
     longer has any effect. (jberger, sri)
   - Improved form_for performance.

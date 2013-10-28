@@ -15,6 +15,8 @@ patch 'more_tags';
 
 get 'small_tags';
 
+get 'tags_with_error';
+
 any [qw(GET POST)] => 'links';
 
 get 'script';
@@ -58,6 +60,15 @@ $t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
   <p>0</p>
 </div>
 <div>works</div>
+EOF
+
+# Tags with error
+$t->get_ok('/tags_with_error')->status_is(200)->content_is(<<EOF);
+<bar class="field-with-error">0</bar>
+<bar class="test field-with-error">0</bar>
+<bar class="test field-with-error">
+  0
+</bar>
 EOF
 
 # Links
@@ -441,6 +452,13 @@ __DATA__
   %=t p => 0
 %= end
 %=t div => 'works'
+
+@@ tags_with_error.html.ep
+%= tag_with_error bar => 0
+%= tag_with_error 'bar', class => 'test', 0
+%= tag_with_error 'bar', (class => 'test') => begin
+  0
+%= end
 
 @@ links.html.ep
 <%= link_to 'Pa<th' => '/path' %>

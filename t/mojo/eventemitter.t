@@ -22,10 +22,7 @@ eval { $e->emit_safe(error => 'works') };
 like $@, qr/^Mojo::EventEmitter: works/, 'right error';
 
 # Exception in error event
-ok !$e->has_subscribers('error'), 'no subscribers';
 $e->once(error => sub { die "$_[1]entional" });
-$e->unsubscribe(error => sub { });
-ok $e->has_subscribers('error'), 'has subscribers';
 eval { $e->emit(error => 'int') };
 like $@, qr/^intentional/, 'right error';
 $e->once(error => sub { die "$_[1]entional" });
@@ -72,6 +69,8 @@ is $called, 3, 'event was not emitted again';
 # One-time event
 my $once;
 $e->once(one_time => sub { $once++ });
+is scalar @{$e->subscribers('one_time')}, 1, 'one subscriber';
+$e->unsubscribe(one_time => sub { });
 is scalar @{$e->subscribers('one_time')}, 1, 'one subscriber';
 $e->emit('one_time');
 is $once, 1, 'event was emitted once';

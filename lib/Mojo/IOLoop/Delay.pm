@@ -115,7 +115,8 @@ emit the following new ones.
     ...
   });
 
-Emitted if an error occurs in one of the steps, breaking the chain.
+Emitted if an error occurs in one of the steps, breaking the chain, fatal if
+unhandled.
 
 =head2 finish
 

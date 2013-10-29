@@ -564,7 +564,8 @@ the following new ones.
     ...
   });
 
-Emitted if an error occurs that can't be associated with a transaction.
+Emitted if an error occurs that can't be associated with a transaction, fatal
+if unhandled.
 
   $ua->on(error => sub {
     my ($ua, $err) = @_;

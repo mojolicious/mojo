@@ -204,7 +204,7 @@ Emitted safely once all data has been written.
     ...
   });
 
-Emitted if an error occurs on the stream.
+Emitted if an error occurs on the stream, fatal if unhandled.
 
 =head2 read
 

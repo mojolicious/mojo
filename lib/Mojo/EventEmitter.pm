@@ -68,8 +68,9 @@ sub unsubscribe {
   my ($self, $name, $cb) = @_;
 
   # One
-  if ($cb && @{$self->{events}{$name}} > 1) {
+  if ($cb) {
     $self->{events}{$name} = [grep { $cb ne $_ } @{$self->{events}{$name}}];
+    delete $self->{events}{$name} unless @{$self->{events}{$name}};
   }
 
   # All

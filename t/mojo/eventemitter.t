@@ -20,10 +20,11 @@ my $error;
 {
   local *STDERR;
   open STDERR, '>', \$error;
-  $e->emit(error => "just\n");
-  $e->emit_safe(error => "works\n");
+  local $SIG{__DIE__} = sub { warn pop };
+  ok !eval { $e->emit(error => "just\n"); 1 }, 'got exception';
+  ok !eval { $e->emit_safe(error => "works\n"); 1 }, 'got exception';
 }
-is $error, "just\nworks\n", 'right error';
+is $error, "Mojo::EventEmitter: just\nMojo::EventEmitter: works\n", 'right error';
 
 # Error fallback
 my ($echo, $err);

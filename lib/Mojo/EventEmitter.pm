@@ -14,7 +14,7 @@ sub emit {
   }
   else {
     warn "-- Emit $name in @{[blessed($self)]} (0)\n" if DEBUG;
-    warn $_[0] if $name eq 'error';
+    die qq{${\ref $self}: $_[0]} if $name eq 'error';
   }
 
   return $self;
@@ -30,7 +30,7 @@ sub emit_safe {
       unless (eval { $self->$cb(@_); 1 }) {
 
         # Error event failed
-        if ($name eq 'error') { warn qq{Event "error" failed: $@} }
+        if ($name eq 'error') { local $SIG{__DIE__}; die $@ }
 
         # Normal event failed
         else { $self->emit_safe('error', qq{Event "$name" failed: $@}) }
@@ -39,7 +39,7 @@ sub emit_safe {
   }
   else {
     warn "-- Emit $name in @{[blessed($self)]} safely (0)\n" if DEBUG;
-    warn $_[0] if $name eq 'error';
+    die qq{${\ref $self}: $_[0]} if $name eq 'error';
   }
 
   return $self;

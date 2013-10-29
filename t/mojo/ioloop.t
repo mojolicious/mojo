@@ -262,7 +262,7 @@ is $loop->max_accepts, 1, 'right value';
   local *STDERR;
   open STDERR, '>', \my $err;
   my $loop = Mojo::IOLoop->new;
-  $loop->timer(0 => sub { die "Bye!" });
+  $loop->timer(0 => sub { die 'Bye!' });
   $loop->start;
   like $err, qr/Bye!/, 'right error';
 }

@@ -1,4 +1,6 @@
 
+4.53  2013-10-30
+
 4.52  2013-10-29
   - Improved Mojo::EventEmitter to allow unhandled error events to be fatal.
     (powerman, sri)

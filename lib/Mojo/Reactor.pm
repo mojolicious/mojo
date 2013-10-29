@@ -77,7 +77,8 @@ the following new ones.
     ...
   });
 
-Emitted for exceptions caught in callbacks.
+Emitted for exceptions caught in callbacks. Note that if this event fails it
+might kill your program, so you need to be careful.
 
   $reactor->on(error => sub {
     my ($reactor, $err) = @_;

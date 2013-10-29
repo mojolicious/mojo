@@ -107,7 +107,7 @@ sub _error {
   return $self->close if $! == ECONNRESET || $! == EPIPE;
 
   # Error
-  $self->emit_safe(error => $!)->close;
+  $self->emit(error => $!)->close;
 }
 
 sub _read {
@@ -204,7 +204,7 @@ Emitted safely once all data has been written.
     ...
   });
 
-Emitted safely if an error occurs on the stream.
+Emitted if an error occurs on the stream.
 
 =head2 read
 

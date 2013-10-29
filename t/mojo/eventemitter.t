@@ -23,8 +23,12 @@ like $@, qr/^Mojo::EventEmitter: works/, 'right error';
 
 # Exception in error event
 $e->once(error => sub { die "$_[1]entional" });
+eval { $e->emit(error => 'int') };
+like $@, qr/^intentional/, 'right error';
+$e->once(error => sub { die "$_[1]entional" });
 eval { $e->emit_safe(error => 'int') };
-like $@, qr/^Mojo::EventEmitter: intentional/, 'right error';
+like $@, qr/^Mojo::EventEmitter: Event "error" failed: intentional/,
+  'right error';
 
 # Error fallback
 my ($echo, $err);

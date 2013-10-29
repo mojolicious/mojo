@@ -106,7 +106,7 @@ sub _poll { shift->{poll} ||= IO::Poll->new }
 
 sub _sandbox {
   my ($self, $desc, $cb) = (shift, shift, shift);
-  eval { $self->$cb(@_); 1 } or $self->emit_safe(error => "$desc failed: $@");
+  eval { $self->$cb(@_); 1 } or $self->emit(error => "$desc failed: $@");
 }
 
 sub _timer {

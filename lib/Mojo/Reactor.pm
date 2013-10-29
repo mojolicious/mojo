@@ -77,7 +77,7 @@ the following new ones.
     ...
   });
 
-Emitted safely for exceptions caught in callbacks.
+Emitted for exceptions caught in callbacks.
 
   $reactor->on(error => sub {
     my ($reactor, $err) = @_;

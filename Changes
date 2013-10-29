@@ -1,5 +1,7 @@
 
 4.52  2013-10-29
+  - Improved Mojo::EventEmitter to allow unhandled error events to be fatal.
+    (powerman, sri)
 
 4.51  2013-10-28
   - Added tag_with_error helper to Mojolicious::Plugin::TagHelpers.

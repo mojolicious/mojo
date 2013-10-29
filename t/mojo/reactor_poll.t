@@ -200,7 +200,7 @@ ok $last,   'timers were triggered in the right order';
 
 # Error
 my $err;
-$reactor->on(
+$reactor->unsubscribe('error')->on(
   error => sub {
     shift->stop;
     $err = pop;

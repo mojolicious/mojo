@@ -22,7 +22,9 @@ has multi_accept    => 50;
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
-  return $class->new;
+  my $reactor = $class->new;
+  $reactor->on(error => sub { warn $_[1] });
+  return $reactor;
 };
 
 # Ignore PIPE signal
@@ -378,7 +380,7 @@ Number of connections to accept at once, defaults to C<50>.
   $loop       = $loop->reactor(Mojo::Reactor->new);
 
 Low level event reactor, usually a L<Mojo::Reactor::Poll> or
-L<Mojo::Reactor::EV> object.
+L<Mojo::Reactor::EV> object with a default C<error> event.
 
   # Watch if handle becomes readable or writable
   $loop->reactor->io($handle => sub {

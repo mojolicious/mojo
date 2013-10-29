@@ -49,8 +49,8 @@ sub watch {
 sub _io {
   my ($self, $fd, $w, $revents) = @_;
   my $io = $self->{io}{$fd};
-  $self->_sandbox('Read', $io->{cb}, 0) if EV::READ &$revents;
-  $self->_sandbox('Write', $io->{cb}, 1)
+  $self->_sandbox('read', $io->{cb}, 0) if EV::READ &$revents;
+  $self->_sandbox('write', $io->{cb}, 1)
     if EV::WRITE &$revents && $self->{io}{$fd};
 }
 
@@ -62,7 +62,7 @@ sub _timer {
   weaken $self;
   $self->{timers}{$id}{watcher} = EV::timer(
     $after => $after => sub {
-      $self->_sandbox("Timer $id", $self->{timers}{$id}{cb});
+      $self->_sandbox("timer $id", $self->{timers}{$id}{cb});
       delete $self->{timers}{$id} unless $recurring;
     }
   );

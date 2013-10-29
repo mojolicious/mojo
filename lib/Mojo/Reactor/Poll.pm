@@ -42,9 +42,9 @@ sub one_tick {
     # I/O
     if (keys %{$self->{io}}) {
       $poll->poll($timeout);
-      ++$i and $self->_sandbox('Read', $self->{io}{fileno $_}{cb}, 0)
+      ++$i and $self->_sandbox('read', $self->{io}{fileno $_}{cb}, 0)
         for $poll->handles(POLLIN | POLLHUP | POLLERR);
-      ++$i and $self->_sandbox('Write', $self->{io}{fileno $_}{cb}, 1)
+      ++$i and $self->_sandbox('write', $self->{io}{fileno $_}{cb}, 1)
         for $poll->handles(POLLOUT);
     }
 
@@ -63,7 +63,7 @@ sub one_tick {
       # Normal timer
       else { $self->remove($id) }
 
-      ++$i and $self->_sandbox("Timer $id", $t->{cb}) if $t->{cb};
+      ++$i and $self->_sandbox("timer $id", $t->{cb}) if $t->{cb};
     }
   }
 
@@ -105,8 +105,9 @@ sub watch {
 sub _poll { shift->{poll} ||= IO::Poll->new }
 
 sub _sandbox {
-  my ($self, $desc, $cb) = (shift, shift, shift);
-  eval { $self->$cb(@_); 1 } or $self->emit(error => "$desc failed: $@");
+  my ($self, $event, $cb) = (shift, shift, shift);
+  $self->emit(error => "Reactor $event failed: $@")
+    unless eval { $self->$cb(@_); 1 };
 }
 
 sub _timer {

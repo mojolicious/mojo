@@ -33,7 +33,7 @@ sub emit_safe {
         if ($name eq 'error') { warn qq{Event "error" failed: $@} }
 
         # Normal event failed
-        else { $self->emit_safe('error', qq{Event "$name" failed: $@}) }
+        else { $self->emit_safe(error => qq{Event "$name" failed: $@}) }
       }
     }
   }

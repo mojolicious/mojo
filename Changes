@@ -1,4 +1,6 @@
 
+4.52  2013-10-29
+
 4.51  2013-10-28
   - Added tag_with_error helper to Mojolicious::Plugin::TagHelpers.
   - Improved .ep template performance significantly, the number of helpers no

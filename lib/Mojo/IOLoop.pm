@@ -10,7 +10,7 @@ use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
 use Mojo::Util qw(md5_sum steady_time);
-use Scalar::Util 'weaken';
+use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
@@ -23,7 +23,7 @@ has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
   my $reactor = $class->new;
-  $reactor->on(error => sub { warn $_[1] });
+  $reactor->on(error => sub { warn "@{[blessed $_[0]]}: $_[1]" });
   return $reactor;
 };
 

@@ -264,7 +264,7 @@ is $loop->max_accepts, 1, 'right value';
   my $loop = Mojo::IOLoop->new;
   $loop->timer(0 => sub { die 'Bye!' });
   $loop->start;
-  like $err, qr/Bye!/, 'right error';
+  like $err, qr/^MyReactor:.*Bye!/, 'right error';
 }
 
 # Defaults

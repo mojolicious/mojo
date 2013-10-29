@@ -9,7 +9,7 @@ sub emit {
   my ($self, $name) = (shift, shift);
 
   if (my $s = $self->{events}{$name}) {
-    warn "-- Emit $name in @{[blessed $self]} (@{[scalar(@$s)]})\n" if DEBUG;
+    warn "-- Emit $name in @{[blessed $self]} (@{[scalar @$s]})\n" if DEBUG;
     for my $cb (@$s) { $self->$cb(@_) }
   }
   else {
@@ -24,7 +24,7 @@ sub emit_safe {
   my ($self, $name) = (shift, shift);
 
   if (my $s = $self->{events}{$name}) {
-    warn "-- Emit $name in @{[blessed $self]} safely (@{[scalar(@$s)]})\n"
+    warn "-- Emit $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
       if DEBUG;
     for my $cb (@$s) {
       unless (eval { $self->$cb(@_); 1 }) {

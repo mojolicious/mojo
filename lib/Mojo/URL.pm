@@ -176,8 +176,7 @@ sub to_rel {
   my @base_parts = @{$base_path->parts};
   pop @base_parts unless $base_path->trailing_slash;
   while (@parts && @base_parts && $parts[0] eq $base_parts[0]) {
-    shift @parts;
-    shift @base_parts;
+    shift @$_ for \@parts, \@base_parts;
   }
   my $path = $rel->path(Mojo::Path->new)->path;
   $path->leading_slash(1) if $rel->authority;

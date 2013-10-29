@@ -132,17 +132,17 @@ $t->post_ok('/does_not_exist')->status_is(404)
   ->content_like(qr!/does_not_exist!);
 
 # Dead template
-$t->get_ok('/dead_template')->status_is(500)->content_like(qr/1\./)
-  ->content_like(qr/dead template!/);
+$t->get_ok('/dead_template')->status_is(500)->content_like(qr/dead template!/)
+  ->content_like(qr/line 1/);
 like $log, qr/dead template!/, 'right result';
 
 # Dead partial template
-$t->get_ok('/dead_included_template')->status_is(500)->content_like(qr/1\./)
-  ->content_like(qr/dead template!/);
+$t->get_ok('/dead_included_template')->status_is(500)
+  ->content_like(qr/dead template!/)->content_like(qr/line 1/);
 
 # Dead template with layout
 $t->get_ok('/dead_template_with_layout')->status_is(500)
-  ->content_like(qr/2\./)->content_like(qr/dead template with layout!/);
+  ->content_like(qr/dead template with layout!/)->content_like(qr/line 2/);
 like $log, qr/dead template with layout!/, 'right result';
 
 # Dead action

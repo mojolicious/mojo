@@ -14,7 +14,6 @@ use IO::Handle ();
 sub import {
   my $class = shift;
   return unless my $flag = shift;
-  no strict 'refs';
 
   # Base
   if ($flag eq '-base') { $flag = $class }
@@ -31,6 +30,7 @@ sub import {
   # ISA
   if ($flag) {
     my $caller = caller;
+    no strict 'refs';
     push @{"${caller}::ISA"}, $flag;
     *{"${caller}::has"} = sub { attr($caller, @_) };
   }
@@ -54,7 +54,6 @@ sub attr {
   Carp::croak 'Default has to be a code reference or constant value'
     if ref $default && ref $default ne 'CODE';
 
-  # Compile attributes
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
     Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
 
@@ -81,8 +80,6 @@ sub attr {
     # Footer (return invocant)
     $code .= "  \$_[0];\n}";
 
-    # We compile custom attribute code for speed
-    no strict 'refs';
     warn "-- Attribute $attr in $class\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
     Carp::croak "Mojo::Base error: $@" unless eval "$code;1";
   }

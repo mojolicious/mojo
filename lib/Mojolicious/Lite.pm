@@ -20,17 +20,14 @@ sub import {
   my $caller = caller;
   no strict 'refs';
   push @{"${caller}::ISA"}, 'Mojo';
-  my $app = shift->new;
 
   # Generate moniker based on filename
   my $moniker = basename $ENV{MOJO_EXE};
   $moniker =~ s/\.(?:pl|pm|t)$//i;
-  $app->moniker($moniker);
+  my $app = shift->new(moniker => $moniker);
 
   # Initialize routes without namespaces
   my $routes = $app->routes->namespaces([]);
-
-  # Default static and template class
   $app->static->classes->[0] = $app->renderer->classes->[0] = $caller;
 
   # The Mojolicious::Lite DSL

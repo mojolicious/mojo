@@ -28,7 +28,7 @@ sub body {
   # Get
   return $content->asset->slurp unless @_;
 
-  # Set raw content
+  # Set
   $content->asset(Mojo::Asset::Memory->new->add_chunk(@_));
 
   return $self;

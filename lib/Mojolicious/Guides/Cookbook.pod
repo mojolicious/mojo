@@ -34,7 +34,8 @@ works on.
 
 Another huge advantage is that it supports TLS and WebSockets out of the box,
 a development certificate for testing purposes is built right in, so it just
-works.
+works, but you can specify all listen locations supported by
+L<Mojo::Server::Daemon/"listen">.
 
   $ ./script/myapp daemon -l https://*:3000
   Server available at https://127.0.0.1:3000.

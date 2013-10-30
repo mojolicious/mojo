@@ -1,4 +1,6 @@
 
+4.54  2013-10-31
+
 4.53  2013-10-30
   - Fixed a few unsubscribe and error event bugs in Mojo::EventEmitter.
 

@@ -266,7 +266,8 @@ But you could even use middleware right in your application.
 Sometimes you might have to deploy your application in a blackbox environment
 where you can't just change the server configuration or behind a reverse proxy
 that passes along additional information with C<X-*> headers. In such cases
-you can use a C<before_dispatch> hook to rewrite incoming requests.
+you can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming
+requests.
 
   # Change scheme if "X-Forwarded-Protocol" header is set to "https"
   app->hook(before_dispatch => sub {

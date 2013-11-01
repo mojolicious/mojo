@@ -656,8 +656,9 @@ L<Mojolicious::Routes::Route/"under">.
 =head2 Hooks
 
 Hooks operate outside the routing system and allow you to extend
-L<Mojolicious> itself by sharing code with all requests indiscriminately,
-which makes them a very powerful tool especially for plugins.
+the framework itself by sharing code with all requests indiscriminately
+through L<Mojolicious/"hook">, which makes them a very powerful tool
+especially for plugins.
 
   # Application
   package MyApp;
@@ -722,7 +723,7 @@ You can even extend much of the core functionality.
     return $c->$action($c->current_route);
   });
 
-For a full list of available hooks see L<Mojolicious/"hook">.
+For a full list of available hooks see L<Mojolicious/"HOOKS">.
 
 =head2 Shortcuts
 

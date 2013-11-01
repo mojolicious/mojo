@@ -677,9 +677,9 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
   my $bool    = $c->render('foo/index');
   my $output  = $c->render('foo/index', partial => 1);
 
-Render content using L<Mojolicious::Renderer/"render"> and emit
-C<after_render> hook unless the result is C<partial>. If no template is
-provided a default one based on controller and action or route name will be
+Render content using L<Mojolicious::Renderer/"render"> and emit hook
+L<Mojolicious/"after_render"> unless the result is C<partial>. If no template
+is provided a default one based on controller and action or route name will be
 generated, all additional values get merged into the L</"stash">.
 
 =head2 render_exception
@@ -738,8 +738,8 @@ method does not protect from traversing to parent directories.
   $c = $c->rendered;
   $c = $c->rendered(302);
 
-Finalize response and emit C<after_dispatch> hook, defaults to using a C<200>
-response code.
+Finalize response and emit hook L<Mojolicious/"after_dispatch">, defaults to
+using a C<200> response code.
 
 =head2 req
 

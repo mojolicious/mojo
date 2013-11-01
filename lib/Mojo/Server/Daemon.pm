@@ -378,7 +378,7 @@ MOJO_LISTEN environment variable or C<http://*:3000>.
 
 These parameters are currently available:
 
-=over 4
+=over 2
 
 =item ca
 

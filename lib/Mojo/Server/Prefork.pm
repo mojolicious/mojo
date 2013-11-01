@@ -267,46 +267,39 @@ MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 
-=head1 SIGNALS
+=head1 MANAGER SIGNALS
 
-L<Mojo::Server::Prefork> can be controlled at runtime with the following
-signals.
+The L<Mojo::Server::Prefork> manager process can be controlled at runtime with
+the following signals.
 
-=head2 Manager
-
-=over 2
-
-=item INT, TERM
+=head2 INT, TERM
 
 Shutdown server immediately.
 
-=item QUIT
+=head2 QUIT
 
 Shutdown server gracefully.
 
-=item TTIN
+=head2 TTIN
 
 Increase worker pool by one.
 
-=item TTOU
+=head2 TTOU
 
 Decrease worker pool by one.
 
-=back
+=head1 WORKER SIGNALS
 
-=head2 Worker
+L<Mojo::Server::Prefork> worker processes can be controlled at runtime with
+the following signals.
 
-=over 2
-
-=item INT, TERM
+=head2 INT, TERM
 
 Stop worker immediately.
 
-=item QUIT
+=head2 QUIT
 
 Stop worker gracefully.
-
-=back
 
 =head1 EVENTS
 

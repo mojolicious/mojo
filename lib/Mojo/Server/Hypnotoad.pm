@@ -193,32 +193,28 @@ MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 
-=head1 SIGNALS
+=head1 MANAGER SIGNALS
 
-L<Mojo::Server::Hypnotoad> can be controlled at runtime with the following
-signals.
+The L<Mojo::Server::Hypnotoad> manager process can be controlled at runtime
+with the following signals.
 
-=head2 Manager
-
-=over 2
-
-=item INT, TERM
+=head2 INT, TERM
 
 Shutdown server immediately.
 
-=item QUIT
+=head2 QUIT
 
 Shutdown server gracefully.
 
-=item TTIN
+=head2 TTIN
 
 Increase worker pool by one.
 
-=item TTOU
+=head2 TTOU
 
 Decrease worker pool by one.
 
-=item USR2
+=head2 USR2
 
 Attempt zero downtime software upgrade (hot deployment) without losing any
 incoming connections.
@@ -234,24 +230,21 @@ incoming connections.
      |- Worker [3]
      +- Worker [4]
 
-The new manager will automatically send a C<QUIT> signal to the old manager
+The new manager will automatically send a L</"QUIT"> signal to the old manager
 and take over serving requests after starting up successfully.
 
-=back
+=head1 WORKER SIGNALS
 
-=head2 Worker
+L<Mojo::Server::Hypnotoad> worker processes can be controlled at runtime with
+the following signals.
 
-=over 2
-
-=item INT, TERM
+=head2 INT, TERM
 
 Stop worker immediately.
 
-=item QUIT
+=head2 QUIT
 
 Stop worker gracefully.
-
-=back
 
 =head1 SETTINGS
 

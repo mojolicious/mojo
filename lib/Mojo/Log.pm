@@ -133,24 +133,9 @@ L</"path"> or C<STDERR>.
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Active log level, defaults to C<debug>. Note that the MOJO_LOG_LEVEL
-environment variable can override this value.
-
-These levels are currently available:
-
-=over 2
-
-=item debug
-
-=item info
-
-=item warn
-
-=item error
-
-=item fatal
-
-=back
+Active log level, defaults to C<debug>. Available log levels are C<debug>,
+C<info>, <warn>, C<error> and C<fatal>, in that order. Note that the
+MOJO_LOG_LEVEL environment variable can override this value.
 
 =head2 path
 

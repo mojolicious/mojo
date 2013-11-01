@@ -74,6 +74,9 @@ sub _html {
       $self->link_to($text => $toc, class => 'mojoscroll', id => $anchor));
   }
 
+  # Rewrite anchors in documentation
+  $_->{class} .= ' mojoscroll' for $dom->find('a.podlinkpod[href^="#"]')->each;
+
   # Try to find a title
   my $title = 'Perldoc';
   $dom->find('h1 + p')->first(sub { $title = shift->text });

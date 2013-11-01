@@ -169,6 +169,9 @@ loop and hot deployment support that just works. Note that the server uses
 signals for process management, so you should avoid modifying signal handlers
 in your applications.
 
+For L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
+C<production> mode.
+
 To start applications with it you can use the L<hypnotoad> script.
 
   $ hypnotoad myapp.pl
@@ -179,8 +182,8 @@ You can run the same command again for automatic hot deployment.
   $ hypnotoad myapp.pl
   Starting hot deployment for Hypnotoad server 31841.
 
-For L<Mojolicious> and L<Mojolicious::Lite> applications it will default to
-C<production> mode.
+This second invocation will load the application again, detect the process id
+file with it, and send a C<USR2> signal to the already running server.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
 support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and

@@ -4,6 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Asset::File;
 use Mojo::ByteStream 'b';
 use Mojo::DOM;
+use Mojo::URL;
 use Mojo::Util qw(slurp url_escape);
 use Pod::Simple::HTML;
 use Pod::Simple::Search;
@@ -54,7 +55,7 @@ sub _html {
   }
 
   # Rewrite headers
-  my $url = $self->req->url->clone;
+  my $toc = Mojo::URL->new->fragment('toc');
   my (%anchors, @parts);
   for my $e ($dom->find('h1, h2, h3')->each) {
 
@@ -68,14 +69,9 @@ sub _html {
 
     # Rewrite
     push @parts, [] if $e->type eq 'h1' || !@parts;
-    push @{$parts[-1]}, $text, $url->to_abs->fragment($anchor);
-    my $toc = $url->to_abs->fragment('toc');
-    $e->replace_content(
-      $self->link_to($text => $toc, class => 'mojoscroll', id => $anchor));
+    push @{$parts[-1]}, $text, Mojo::URL->new->fragment($anchor);
+    $e->replace_content($self->link_to($text => $toc, id => $anchor));
   }
-
-  # Rewrite anchors in documentation
-  $_->{class} .= ' mojoscroll' for $dom->find('a.podlinkpod[href^="#"]')->each;
 
   # Try to find a title
   my $title = 'Perldoc';

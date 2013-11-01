@@ -59,9 +59,6 @@
   </head>
   <body>
     %= include inline => app->renderer->_bundled('mojobar')
-    % my $link = begin
-      %= link_to shift, shift, class => "mojoscroll"
-    % end
     <div id="wrapperlicious">
       <div id="perldoc">
         <div id="source">
@@ -77,11 +74,11 @@
         <ul>
           % for my $part (@$parts) {
             <li>
-              %= $link->(splice @$part, 0, 2)
+              %= link_to splice(@$part, 0, 2)
               % if (@$part) {
                 <ul>
                   % while (@$part) {
-                    <li><%= $link->(splice @$part, 0, 2) %></li>
+                    <li><%= link_to splice(@$part, 0, 2) %></li>
                   % }
                 </ul>
               % }

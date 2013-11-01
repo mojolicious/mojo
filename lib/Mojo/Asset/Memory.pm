@@ -102,7 +102,7 @@ implements the following new ones.
   my $bool = $mem->auto_upgrade;
   $mem     = $mem->auto_upgrade($bool);
 
-Try to detect if content size exceeds C<max_memory_size> limit and
+Try to detect if content size exceeds L</"max_memory_size"> limit and
 automatically upgrade to a L<Mojo::Asset::File> object.
 
 =head2 max_memory_size

@@ -147,7 +147,7 @@ Emit event.
   $e = $e->emit_safe('foo');
   $e = $e->emit_safe('foo', 123);
 
-Emit event safely and emit C<error> event on failure.
+Emit event safely and emit L</"error"> event on failure.
 
 =head2 has_subscribers
 

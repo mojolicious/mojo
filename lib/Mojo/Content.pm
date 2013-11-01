@@ -512,8 +512,8 @@ Check if content is C<gzip> compressed.
 
   my $bool = $content->is_dynamic;
 
-Check if content will be dynamically generated, which prevents C<clone> from
-working.
+Check if content will be dynamically generated, which prevents L</"clone">
+from working.
 
 =head2 is_finished
 
@@ -525,7 +525,7 @@ Check if parser is finished.
 
   my $bool = $content->is_limit_exceeded;
 
-Check if buffer has exceeded C<max_buffer_size>.
+Check if buffer has exceeded L</"max_buffer_size">.
 
 =head2 is_multipart
 

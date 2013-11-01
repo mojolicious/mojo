@@ -396,8 +396,8 @@ Maximum message size in bytes, defaults to the value of the
 MOJO_MAX_MESSAGE_SIZE environment variable or C<10485760>. Setting the value
 to C<0> will allow messages of indefinite size. Note that increasing this
 value can also drastically increase memory usage, should you for example
-attempt to parse an excessively large message body with the C<body_params>,
-C<dom> or C<json> methods.
+attempt to parse an excessively large message body with the L</"body_params">,
+L</"dom"> or L</"json"> methods.
 
 =head2 version
 
@@ -416,8 +416,8 @@ implements the following new ones.
   my $bytes = $msg->body;
   $msg      = $msg->body('Hello!');
 
-Slurp or replace C<content>, L<Mojo::Content::MultiPart> will be automatically
-downgraded to L<Mojo::Content::Single>.
+Slurp or replace L</"content">, L<Mojo::Content::MultiPart> will be
+automatically downgraded to L<Mojo::Content::Single>.
 
 =head2 body_params
 
@@ -562,7 +562,7 @@ Check if message parser/generator is finished.
 
   my $bool = $msg->is_limit_exceeded;
 
-Check if message has exceeded C<max_line_size> or C<max_message_size>.
+Check if message has exceeded L</"max_line_size"> or L</"max_message_size">.
 
 =head2 json
 
@@ -608,7 +608,7 @@ Size of the start line in bytes.
 
   my $str = $msg->text;
 
-Retrieve C<body> and try to decode it if a charset could be extracted with
+Retrieve L</"body"> and try to decode it if a charset could be extracted with
 L<Mojo::Content/"charset">.
 
 =head2 to_string

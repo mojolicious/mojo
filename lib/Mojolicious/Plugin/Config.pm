@@ -140,7 +140,7 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
   $plugin->load($file, $conf, $app);
 
-Loads configuration file and passes the content to C<parse>.
+Loads configuration file and passes the content to L</"parse">.
 
   sub load {
     my ($self, $file, $conf, $app) = @_;

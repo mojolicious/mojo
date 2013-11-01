@@ -623,7 +623,7 @@ Generate submit input element.
 
   %=t div => 'some & content'
 
-Alias for C<tag>.
+Alias for L</"tag">.
 
   <div>some &amp; content</div>
 
@@ -662,7 +662,7 @@ accidental double escaping.
 
   %= tag_with_error 'input', class => 'foo'
 
-Same as C<tag>, but adds the class C<field-with-error>.
+Same as L</"tag">, but adds the class C<field-with-error>.
 
   <input class="foo field-with-error" />
 

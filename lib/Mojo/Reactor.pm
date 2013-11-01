@@ -167,7 +167,7 @@ Remove handle or timer. Meant to be overloaded in a subclass.
 
   $reactor->start;
 
-Start watching for I/O and timer events, this will block until C<stop> is
+Start watching for I/O and timer events, this will block until L</"stop"> is
 called. Note that some reactors stop automatically if there are no events
 being watched anymore. Meant to be overloaded in a subclass.
 

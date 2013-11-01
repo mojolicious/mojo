@@ -431,7 +431,7 @@ into XML mode and everything becomes case sensitive.
   say $dom->at('P')->text;
   say $dom->P->{ID};
 
-XML detection can also be disabled with the C<xml> method.
+XML detection can also be disabled with the L</"xml"> method.
 
   # Force XML semantics
   $dom->xml(1);
@@ -448,8 +448,8 @@ L<Mojo::DOM> implements the following methods.
   my $dom = Mojo::DOM->new;
   my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
 
-Construct a new array-based L<Mojo::DOM> object and C<parse> HTML/XML fragment
-if necessary.
+Construct a new array-based L<Mojo::DOM> object and L</"parse"> HTML/XML
+fragment if necessary.
 
 =head2 all_text
 

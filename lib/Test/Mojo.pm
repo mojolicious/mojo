@@ -497,7 +497,7 @@ L<Mojo::Message/"text">.
   $t = $t->content_isnt('working!');
   $t = $t->content_isnt('working!', 'different content');
 
-Opposite of C<content_is>.
+Opposite of L</"content_is">.
 
 =head2 content_like
 
@@ -512,7 +512,7 @@ L<Mojo::Message/"text">.
   $t = $t->content_unlike(qr/working!/);
   $t = $t->content_unlike(qr/working!/, 'different content');
 
-Opposite of C<content_like>.
+Opposite of L</"content_like">.
 
 =head2 content_type_is
 
@@ -526,7 +526,7 @@ Check response C<Content-Type> header for exact match.
   $t = $t->content_type_isnt('text/html');
   $t = $t->content_type_isnt('text/html', 'different content type');
 
-Opposite of C<content_type_is>.
+Opposite of L</"content_type_is">.
 
 =head2 content_type_like
 
@@ -540,7 +540,7 @@ Check response C<Content-Type> header for similar match.
   $t = $t->content_type_unlike(qr/text/);
   $t = $t->content_type_unlike(qr/text/, 'different content type');
 
-Opposite of C<content_type_like>.
+Opposite of L</"content_type_like">.
 
 =head2 delete_ok
 
@@ -565,7 +565,7 @@ L<Mojo::DOM>.
   $t = $t->element_exists_not('div.foo[x=y]');
   $t = $t->element_exists_not('html head title', 'has no title');
 
-Opposite of C<element_exists>.
+Opposite of L</"element_exists">.
 
 =head2 finish_ok
 
@@ -613,7 +613,7 @@ Check response header for exact match.
   $t = $t->header_isnt(Expect => 'fun');
   $t = $t->header_isnt(Expect => 'fun', 'different header');
 
-Opposite of C<header_is>.
+Opposite of L</"header_is">.
 
 =head2 header_like
 
@@ -627,7 +627,7 @@ Check response header for similar match.
   $t = $t->header_like(Expect => qr/fun/);
   $t = $t->header_like(Expect => qr/fun/, 'different header');
 
-Opposite of C<header_like>.
+Opposite of L</"header_like">.
 
 =head2 json_has
 
@@ -642,7 +642,7 @@ JSON Pointer with L<Mojo::JSON::Pointer>.
   $t = $t->json_hasnt('/foo');
   $t = $t->json_hasnt('/minibar', 'no minibar');
 
-Opposite of C<json_has>.
+Opposite of L</"json_has">.
 
 =head2 json_is
 
@@ -667,7 +667,7 @@ the given JSON Pointer with L<Mojo::JSON::Pointer>.
   $t = $t->json_message_hasnt('/foo');
   $t = $t->json_message_hasnt('/minibar', 'no minibar');
 
-Opposite of C<json_message_has>.
+Opposite of L</"json_message_has">.
 
 =head2 json_message_is
 
@@ -696,7 +696,7 @@ Check WebSocket message for exact match.
   $t = $t->message_isnt('working!');
   $t = $t->message_isnt('working!', 'different message');
 
-Opposite of C<message_is>.
+Opposite of L</"message_is">.
 
 =head2 message_like
 
@@ -728,7 +728,7 @@ Wait for next WebSocket message to arrive.
   $t = $t->message_unlike(qr/working!/);
   $t = $t->message_unlike(qr/working!/, 'different message');
 
-Opposite of C<message_like>.
+Opposite of L</"message_like">.
 
 =head2 options_ok
 
@@ -836,7 +836,7 @@ Check response status for exact match.
   $t = $t->status_isnt(200);
   $t = $t->status_isnt(200, 'different status');
 
-Opposite of C<status_is>.
+Opposite of L</"status_is">.
 
 =head2 text_is
 
@@ -851,7 +851,7 @@ exact match with L<Mojo::DOM>.
   $t = $t->text_isnt('div.foo[x=y]' => 'Hello!');
   $t = $t->text_isnt('html head title' => 'Hello!', 'different title');
 
-Opposite of C<text_is>.
+Opposite of L</"text_is">.
 
 =head2 text_like
 
@@ -866,7 +866,7 @@ similar match with L<Mojo::DOM>.
   $t = $t->text_unlike('div.foo[x=y]' => qr/Hello/);
   $t = $t->text_unlike('html head title' => qr/Hello/, 'different title');
 
-Opposite of C<text_like>.
+Opposite of L</"text_like">.
 
 =head2 websocket_ok
 

@@ -145,7 +145,7 @@ ignored if the named buffer is already in use.
   %= content_for 'foo'
 
 Append partial rendered content to named buffer and retrieve it. Note that
-named buffers are shared with the C<content> helper.
+named buffers are shared with the L</"content"> helper.
 
   % content_for message => begin
     Hello
@@ -175,7 +175,7 @@ Dump a Perl data structure with L<Mojo::Util/"dumper">.
   % extends 'blue';
   % extends 'blue', title => 'Blue!';
 
-Extend a template. All additional values get merged into the C<stash>.
+Extend a template. All additional values get merged into the L</"stash">.
 
 =head2 flash
 
@@ -197,7 +197,7 @@ only available in the partial template.
   % layout 'green', title => 'Green!';
 
 Render this template with a layout. All additional values get merged into the
-C<stash>.
+L</"stash">.
 
 =head2 param
 
@@ -226,7 +226,7 @@ Alias for L<Mojolicious::Controller/"stash">.
   % title 'Welcome!', foo => 'bar';
   %= title
 
-Page title. All additional values get merged into the C<stash>.
+Page title. All additional values get merged into the L</"stash">.
 
 =head2 ua
 
@@ -244,7 +244,7 @@ Alias for L<Mojolicious::Controller/"url_for">.
 
   %= url_with 'named', controller => 'bar', action => 'baz'
 
-Does the same as C<url_for>, but inherits query parameters from the current
+Does the same as L</"url_for">, but inherits query parameters from the current
 request.
 
   %= url_with->query([page => 2])

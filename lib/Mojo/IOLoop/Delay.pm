@@ -152,8 +152,8 @@ implements the following new ones.
 
 Increment active event counter, the returned callback can be used to decrement
 the active event counter again. Arguments passed to the callback are queued in
-the right order for the next step or C<finish> event and C<wait> method, the
-first argument will be ignored by default.
+the right order for the next step or L</"finish"> event and L</"wait"> method,
+the first argument will be ignored by default.
 
   # Capture all arguments
   my $delay = Mojo::IOLoop->delay;
@@ -174,8 +174,8 @@ event counter or an error occurs in a callback.
   my $arg  = $delay->wait;
   my @args = $delay->wait;
 
-Start C<ioloop> and stop it again once an C<error> or C<finish> event gets
-emitted, only works when C<ioloop> is not running already.
+Start L</"ioloop"> and stop it again once an L</"error"> or L</"finish"> event
+gets emitted, only works when L</"ioloop"> is not running already.
 
   # Use the "finish" event to synchronize portably
   $delay->on(finish => sub {

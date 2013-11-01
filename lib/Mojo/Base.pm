@@ -176,7 +176,7 @@ flag or a base class.
   has [qw(name1 name2 name3)] => 'foo';
   has [qw(name1 name2 name3)] => sub {...};
 
-Create attributes for hash-based objects, just like the C<attr> method.
+Create attributes for hash-based objects, just like the L</"attr"> method.
 
 =head1 METHODS
 

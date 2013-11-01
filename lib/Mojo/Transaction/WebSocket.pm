@@ -476,7 +476,7 @@ L<Mojo::Transaction> and implements the following new ones.
   my $ws = Mojo::Transaction::WebSocket->new;
 
 Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
-C<frame> event with default message parser, which also handles C<PING> and
+L</"frame"> event with default message parser, which also handles C<PING> and
 C<CLOSE> frames automatically.
 
 =head2 build_frame
@@ -609,7 +609,7 @@ Handshake response, usually a L<Mojo::Message::Response> object.
 
   $ws = $ws->resume;
 
-Resume C<handshake> transaction.
+Resume L</"handshake"> transaction.
 
 =head2 send
 

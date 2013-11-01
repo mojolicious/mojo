@@ -279,9 +279,9 @@ in a subclass.
 
   my $res = $tx->success;
 
-Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
-successful or C<undef> otherwise. Connection and parser errors have only a
-message in C<error>, 400 and 500 responses also a code.
+Returns the L<Mojo::Message::Response> object from L</"res"> if transaction
+was successful or C<undef> otherwise. Connection and parser errors have only a
+message in L</"error">, 400 and 500 responses also a code.
 
   # Sensible exception handling
   if (my $res = $tx->success) { say $res->body }
@@ -289,9 +289,6 @@ message in C<error>, 400 and 500 responses also a code.
     my ($err, $code) = $tx->error;
     say $code ? "$code response: $err" : "Connection error: $err";
   }
-
-Error messages can be accessed with the C<error> method of the transaction
-object.
 
 =head1 SEE ALSO
 

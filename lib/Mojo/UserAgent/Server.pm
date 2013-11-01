@@ -105,7 +105,8 @@ Restart server with new port.
   my $url = $ua->url('http');
   my $url = $ua->url('https');
 
-Get absolute L<Mojo::URL> object for C<app> and switch protocol if necessary.
+Get absolute L<Mojo::URL> object for L</"app"> and switch protocol if
+necessary.
 
 =head1 SEE ALSO
 

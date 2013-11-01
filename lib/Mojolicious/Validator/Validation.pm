@@ -144,8 +144,8 @@ and implements the following new ones.
 
   $validation = $validation->check('size', 2, 7);
 
-Perform validation check on all values of the current C<topic>, no more checks
-will be performend on them after the first one failed.
+Perform validation check on all values of the current L</"topic">, no more
+checks will be performend on them after the first one failed.
 
 =head2 error
 
@@ -160,7 +160,7 @@ be one per field.
 
   my $bool = $validation->has_data;
 
-Check if C<input> is available for validation.
+Check if L</"input"> is available for validation.
 
 =head2 has_error
 
@@ -175,13 +175,13 @@ Check if validation resulted in errors, defaults to checking all fields.
   my $bool = $validation->is_valid('foo');
 
 Check if validation was successful and field has a value, defaults to checking
-the current C<topic>.
+the current L</"topic">.
 
 =head2 optional
 
   $validation = $validation->optional('foo');
 
-Change validation C<topic>.
+Change validation L</"topic">.
 
 =head2 param
 
@@ -196,14 +196,14 @@ Access validated parameters, similar to L<Mojolicious::Controller/"param">.
 
   $validation = $validation->required('foo');
 
-Change validation C<topic> and make sure a value is present and not an empty
-string.
+Change validation L</"topic"> and make sure a value is present and not an
+empty string.
 
 =head1 CHECKS
 
 In addition to the methods above, you can also call validation checks provided
 by L<Mojolicious::Validator> on L<Mojolicious::Validator::Validation> objects,
-similar to C<check>.
+similar to L</"check">.
 
   $validation->required('foo')->size(2, 5)->like(qr/^[A-Z]/);
   $validation->optional('bar')->equal_to('foo');

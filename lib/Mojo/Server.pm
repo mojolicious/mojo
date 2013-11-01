@@ -123,8 +123,8 @@ the following new ones.
 
   my $server = Mojo::Server->new;
 
-Construct a new L<Mojo::Server> object and subscribe to C<request> event with
-default request handling.
+Construct a new L<Mojo::Server> object and subscribe to L</"request"> event
+with default request handling.
 
 =head2 build_app
 

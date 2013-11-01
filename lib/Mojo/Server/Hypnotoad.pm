@@ -183,7 +183,7 @@ You can run the same command again for automatic hot deployment.
   Starting hot deployment for Hypnotoad server 31841.
 
 This second invocation will load the application again, detect the process id
-file with it, and send a C<USR2> signal to the already running server.
+file with it, and send a L</"USR2"> signal to the already running server.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
 support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
@@ -288,7 +288,7 @@ Listen backlog size, defaults to C<SOMAXCONN>.
 
 Maximum number of parallel client connections per worker process, defaults to
 C<1000>. Note that depending on how much your application may block, you might
-want to decrease this value and increase C<workers> instead for better
+want to decrease this value and increase L</"workers"> instead for better
 performance.
 
 =head2 graceful_timeout

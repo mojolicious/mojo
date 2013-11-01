@@ -361,8 +361,8 @@ implements the following new ones.
     = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
   my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
 
-Construct a new L<Mojolicious::Routes::Pattern> object and C<parse> pattern if
-necessary.
+Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern
+if necessary.
 
 =head2 match
 

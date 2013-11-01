@@ -478,8 +478,8 @@ Mojolicious::Controller - Controller base class
 =head1 DESCRIPTION
 
 L<Mojolicious::Controller> is the base class for your L<Mojolicious>
-controllers. It is also the default controller class for L<Mojolicious>
-unless you set C<controller_class> in your application.
+controllers. It is also the default controller class unless you set
+L<Mojolicious/"controller_class">.
 
 =head1 ATTRIBUTES
 
@@ -571,7 +571,8 @@ Close WebSocket connection or long poll stream gracefully.
   $c      = $c->flash({foo => 'bar'});
   $c      = $c->flash(foo => 'bar');
 
-Data storage persistent only for the next request, stored in the C<session>.
+Data storage persistent only for the next request, stored in the
+L</"session">.
 
   # Show message after redirect
   $c->flash(message => 'User created successfully!');
@@ -581,8 +582,8 @@ Data storage persistent only for the next request, stored in the C<session>.
 
   my $cb = $c->on(finish => sub {...});
 
-Subscribe to events of C<tx>, which is usually a L<Mojo::Transaction::HTTP> or
-L<Mojo::Transaction::WebSocket> object. Note that this method will
+Subscribe to events of L</"tx">, which is usually a L<Mojo::Transaction::HTTP>
+or L<Mojo::Transaction::WebSocket> object. Note that this method will
 automatically respond to WebSocket handshake requests with a C<101> response
 status.
 
@@ -654,7 +655,7 @@ For more control you can also access request information directly.
   $c = $c->redirect_to('/perldoc');
   $c = $c->redirect_to('http://mojolicio.us/perldoc');
 
-Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
+Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 
   # Conditional redirect
   return $c->redirect_to('login') unless $c->session('user');
@@ -679,7 +680,7 @@ Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
 Render content using L<Mojolicious::Renderer/"render"> and emit
 C<after_render> hook unless the result is C<partial>. If no template is
 provided a default one based on controller and action or route name will be
-generated, all additional values get merged into the C<stash>.
+generated, all additional values get merged into the L</"stash">.
 
 =head2 render_exception
 
@@ -689,7 +690,7 @@ generated, all additional values get merged into the C<stash>.
 Render the exception template C<exception.$mode.$format.*> or
 C<exception.$format.*> and set the response status code to C<500>. Also sets
 the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot>
-to a copy of the C<stash> for use in the templates.
+to a copy of the L</"stash"> for use in the templates.
 
 =head2 render_later
 
@@ -710,8 +711,8 @@ automatic rendering would result in a response.
   my $bool = $c->render_maybe(controller => 'foo', action => 'bar');
   my $bool = $c->render_maybe('foo/index', format => 'html');
 
-Try to render content but do not call C<render_not_found> if no response could
-be generated, takes the same arguments as C<render>.
+Try to render content but do not call L</"render_not_found"> if no response
+could be generated, takes the same arguments as L</"render">.
 
   # Render template "index_local" only if it exists
   $self->render_maybe('index_local') or $self->render('index');
@@ -979,7 +980,7 @@ optional drain callback will be invoked once all data has been written.
     });
   });
 
-You can call C<finish> at any time to end the stream.
+You can call L</"finish"> at any time to end the stream.
 
   2
   He

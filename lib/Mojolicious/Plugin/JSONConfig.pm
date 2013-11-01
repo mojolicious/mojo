@@ -101,7 +101,7 @@ L<Mojolicious::Plugin::Config> and implements the following new ones.
 
   $plugin->parse($content, $file, $conf, $app);
 
-Process content with C<render> and parse it with L<Mojo::JSON>.
+Process content with L</"render"> and parse it with L<Mojo::JSON>.
 
   sub parse {
     my ($self, $content, $file, $conf, $app) = @_;

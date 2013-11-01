@@ -556,8 +556,8 @@ loop object from everywhere inside the process.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the event loop, this will block until C<stop> is called. Note that some
-reactors stop automatically if there are no events being watched anymore.
+Start the event loop, this will block until L</"stop"> is called. Note that
+some reactors stop automatically if there are no events being watched anymore.
 
   # Start event loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
@@ -568,7 +568,7 @@ reactors stop automatically if there are no events being watched anymore.
   $loop->stop;
 
 Stop the event loop, this will not interrupt any existing connections and the
-event loop can be restarted by running C<start> again.
+event loop can be restarted by running L</"start"> again.
 
 =head2 stream
 

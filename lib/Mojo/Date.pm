@@ -108,7 +108,7 @@ following new ones.
   my $date = Mojo::Date->new;
   my $date = Mojo::Date->new('Sun Nov  6 08:49:37 1994');
 
-Construct a new L<Mojo::Date> object and C<parse> date if necessary.
+Construct a new L<Mojo::Date> object and L</"parse"> date if necessary.
 
 =head2 parse
 

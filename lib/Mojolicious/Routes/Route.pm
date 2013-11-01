@@ -282,7 +282,7 @@ The children of this route, used for nesting routes.
   my $bool = $r->inline;
   $r       = $r->inline($bool);
 
-Allow C<bridge> semantics for this route.
+Allow L</"bridge"> semantics for this route.
 
 =head2 parent
 
@@ -368,7 +368,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
   $r = $r->detour('MyApp', {foo => 'bar'});
 
 Set default parameters for this route and allow partial matching to simplify
-application embedding, takes the same arguments as C<to>.
+application embedding, takes the same arguments as L</"to">.
 
 =head2 find
 

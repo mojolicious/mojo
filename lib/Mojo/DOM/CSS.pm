@@ -615,13 +615,13 @@ following new ones.
 
   my $bool = $css->match('head > title');
 
-Match CSS selector against first node in C<tree>.
+Match CSS selector against first node in L</"tree">.
 
 =head2 select
 
   my $results = $css->select('head > title');
 
-Run CSS selector against C<tree>.
+Run CSS selector against L</"tree">.
 
 =head1 SEE ALSO
 

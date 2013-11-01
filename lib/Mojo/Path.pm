@@ -178,7 +178,7 @@ following new ones.
   my $path = Mojo::Path->new;
   my $path = Mojo::Path->new('/foo%2Fbar%3B/baz.html');
 
-Construct a new L<Mojo::Path> object and C<parse> path if necessary.
+Construct a new L<Mojo::Path> object and L</"parse"> path if necessary.
 
 =head2 canonicalize
 

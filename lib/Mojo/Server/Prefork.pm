@@ -480,8 +480,8 @@ implements the following new ones.
 
   my $pid = $prefork->check_pid;
 
-Get process id for running server from C<pid_file> or delete it if server is
-not running.
+Get process id for running server from L</"pid_file"> or delete it if server
+is not running.
 
   say 'Server is not running' unless $prefork->check_pid;
 

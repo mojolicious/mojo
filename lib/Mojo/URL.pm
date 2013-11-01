@@ -304,7 +304,7 @@ following new ones.
   my $url = Mojo::URL->new;
   my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
 
-Construct a new L<Mojo::URL> object and C<parse> URL if necessary.
+Construct a new L<Mojo::URL> object and L</"parse"> URL if necessary.
 
 =head2 authority
 
@@ -373,7 +373,7 @@ defaults to a L<Mojo::Path> object.
 
   my $proto = $url->protocol;
 
-Normalized version of C<scheme>.
+Normalized version of L</"scheme">.
 
   # "http"
   Mojo::URL->new('HtTp://example.com')->protocol;
@@ -412,8 +412,8 @@ appended, defaults to a L<Mojo::Parameters> object.
   my $abs = $url->to_abs;
   my $abs = $url->to_abs(Mojo::URL->new('http://example.com/foo'));
 
-Clone relative URL and turn it into an absolute one using C<base> or provided
-base URL.
+Clone relative URL and turn it into an absolute one using L</"base"> or
+provided base URL.
 
   # "http://example.com/foo/baz.xml?test=123"
   Mojo::URL->new('baz.xml?test=123')
@@ -432,8 +432,8 @@ base URL.
   my $rel = $url->to_rel;
   my $rel = $url->to_rel(Mojo::URL->new('http://example.com/foo'));
 
-Clone absolute URL and turn it into a relative one using C<base> or provided
-base URL.
+Clone absolute URL and turn it into a relative one using L</"base"> or
+provided base URL.
 
   # "foo/bar.html?test=123"
   Mojo::URL->new('http://example.com/foo/bar.html?test=123')

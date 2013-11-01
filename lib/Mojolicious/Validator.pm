@@ -96,8 +96,8 @@ L<Mojolicious::Validator> implements the following attributes.
   my $checks = $validator->checks;
   $validator = $validator->checks({size => sub {...}});
 
-Registered validation checks, by default only C<equal_to>, C<in>, C<like> and
-C<size> are already defined.
+Registered validation checks, by default only L</"equal_to">, L</"in">,
+L</"like"> and L</"size"> are already defined.
 
 =head1 METHODS
 

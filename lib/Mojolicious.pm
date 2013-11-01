@@ -263,8 +263,8 @@ L<Mojolicious::Controller>.
 
 The operating mode for your application, defaults to a value from the
 MOJO_MODE and PLACK_ENV environment variables or C<development>. Right before
-calling C<startup>, L<Mojolicious> will pick up the current mode, name the log
-file after it and raise the log level from C<debug> to C<info> if it has a
+calling L</"startup">, L<Mojolicious> will pick up the current mode, name the
+log file after it and raise the log level from C<debug> to C<info> if it has a
 value other than C<development>.
 
 =head2 moniker
@@ -282,7 +282,7 @@ L<Mojo::Util/"decamelize">.
   $app        = $app->plugins(Mojolicious::Plugins->new);
 
 The plugin manager, defaults to a L<Mojolicious::Plugins> object. See the
-C<plugin> method below if you want to load a plugin.
+L</"plugin"> method below if you want to load a plugin.
 
   # Add another namespace to load plugins from
   push @{$app->plugins->namespaces}, 'MyApp::Plugin';
@@ -325,8 +325,8 @@ startup method to define the url endpoints for your application.
   $app       = $app->secret('passw0rd');
 
 A secret passphrase used for signed cookies and the like, defaults to the
-C<moniker> of this application, which is not very secure, so you should change
-it!!! As long as you are using the insecure default there will be debug
+L</"moniker"> of this application, which is not very secure, so you should
+change it!!! As long as you are using the insecure default there will be debug
 messages in the log file reminding you to change your passphrase.
 
 =head2 sessions
@@ -384,8 +384,8 @@ new ones.
   my $app = Mojolicious->new;
 
 Construct a new L<Mojolicious> application, calling C<${mode}_mode> and
-C<startup> in the process. Will automatically detect your home directory and
-set up logging based on your current operating mode. Also sets up the
+L</"startup"> in the process. Will automatically detect your home directory
+and set up logging based on your current operating mode. Also sets up the
 renderer, static file server, a default set of plugins and an
 C<around_dispatch> hook with the default exception handling.
 
@@ -413,8 +413,8 @@ request.
 
   $app->dispatch(Mojolicious::Controller->new);
 
-The heart of every L<Mojolicious> application, calls the C<static> and
-C<routes> dispatchers for every request and passes them a
+The heart of every L<Mojolicious> application, calls the L</"static"> and
+L</"routes"> dispatchers for every request and passes them a
 L<Mojolicious::Controller> object.
 
 =head2 handler

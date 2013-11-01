@@ -260,7 +260,7 @@ implements the following new ones.
 
   my $multi = Mojo::Content::MultiPart->new;
 
-Construct a new L<Mojo::Content::MultiPart> object and subscribe to C<read>
+Construct a new L<Mojo::Content::MultiPart> object and subscribe to L</"read">
 event with default content parser.
 
 =head2 body_contains

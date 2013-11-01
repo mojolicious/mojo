@@ -151,7 +151,7 @@ amount of time in seconds.
 
   $reactor->start;
 
-Start watching for I/O and timer events, this will block until C<stop> is
+Start watching for I/O and timer events, this will block until L</"stop"> is
 called or no events are being watched anymore.
 
 =head2 stop

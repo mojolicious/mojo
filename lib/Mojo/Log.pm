@@ -134,7 +134,7 @@ L</"path"> or C<STDERR>.
   $log      = $log->level('debug');
 
 Active log level, defaults to C<debug>. Available log levels are C<debug>,
-C<info>, <warn>, C<error> and C<fatal>, in that order. Note that the
+C<info>, C<warn>, C<error> and C<fatal>, in that order. Note that the
 MOJO_LOG_LEVEL environment variable can override this value.
 
 =head2 path

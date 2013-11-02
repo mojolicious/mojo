@@ -343,7 +343,7 @@ Emitted right before the L</"before_dispatch"> hook and wraps around the whole
 dispatch process, so you have to manually forward to the next hook if you want
 to continue the chain. Default exception handling with
 L<Mojolicious::Controller/"render_exception"> is the first hook in the chain
-and a call to C<dispatch> the last, yours will be in between.
+and a call to L</"dispatch"> the last, yours will be in between.
 
   $app->hook(around_dispatch => sub {
     my ($next, $c) = @_;

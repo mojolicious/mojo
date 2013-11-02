@@ -13,26 +13,46 @@ use IO::Handle ();
 
 sub import {
   my $class = shift;
-  return unless my $flag = shift;
+  my @flags = grep {defined $_ and length $_ } @_;
+  return unless scalar @flags;
 
-  # Base
-  if ($flag eq '-base') { $flag = $class }
-
-  # Strict
-  elsif ($flag eq '-strict') { $flag = undef }
-
-  # Module
-  elsif ((my $file = $flag) && !$flag->can('new')) {
-    $file =~ s!::|'!/!g;
-    require "$file.pm";
+  my $base_cnt = 0;
+  my $strict_cnt = 0;
+  my $class_cnt = 0;
+  foreach my $flag (@flags) {
+    if ($flag eq '-base') { $base_cnt++ }
+    elsif ($flag eq '-strict') { $strict_cnt++ }
+    else { $class_cnt++ }
   }
 
-  # ISA
-  if ($flag) {
-    my $caller = caller;
+  die 'only one flag [-strict or -base] allowed' if ($base_cnt and $strict_cnt);
+
+  my $caller;
+  if ($base_cnt or $class_cnt) {
+    $caller = caller;
     no strict 'refs';
-    push @{"${caller}::ISA"}, $flag;
     *{"${caller}::has"} = sub { attr($caller, @_) };
+  }
+
+  foreach my $flag (@flags) {
+
+    # Base
+    if ($flag eq '-base') { $flag = $class }
+
+    # Strict
+    elsif ($flag eq '-strict') { $flag = undef }
+
+    # Module
+    elsif ((my $file = $flag) && !$flag->can('new')) {
+      $file =~ s!::|'!/!g;
+      require "$file.pm";
+    }
+
+    # ISA
+    if ($flag) {
+      no strict 'refs';
+      push @{"${caller}::ISA"}, $flag;
+    }
   }
 
   # Mojo modules are strict!

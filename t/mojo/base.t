@@ -90,6 +90,26 @@ is $monkey->bananas, undef, 'monkey has no bananas';
 $monkey->bananas(3);
 is $monkey->bananas, 3, 'monkey has 3 bananas';
 
+# Inherit: array flags
+package Mojo::Base::InheritTestA;
+sub new {}; sub A {'A'};
+package Mojo::Base::InheritTestB;
+sub new {}; sub B {'B'};
+package Mojo::Base::InheritTestC;
+sub new {}; sub C {'C'};
+package Mojo::Base::InheritTestArray1;
+use Mojo::Base qw/Mojo::Base::InheritTestA Mojo::Base::InheritTestB Mojo::Base::InheritTestC/;
+package Mojo::Base::InheritTestArray2;
+use Mojo::Base qw/Mojo::Base::InheritTestB Mojo::Base::InheritTestC/;
+package main;
+ok(Mojo::Base::InheritTestArray1->can('A'), 'base classes ABC does have A method');
+ok(Mojo::Base::InheritTestArray1->can('B'), 'base classes ABC does have B method');
+ok(Mojo::Base::InheritTestArray1->can('C'), 'base classes ABC does have C method');
+ok(!Mojo::Base::InheritTestArray2->can('A'), 'base classes BC does not have A method');
+ok(Mojo::Base::InheritTestArray2->can('B'), 'base classes BC does have B method');
+ok(Mojo::Base::InheritTestArray2->can('C'), 'base classes BC does have C method');
+
+
 # Exceptions
 eval { Mojo::BaseTest->attr(foo => []) };
 like $@, qr/Default has to be a code reference or constant value/,

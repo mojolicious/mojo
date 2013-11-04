@@ -62,7 +62,7 @@
     %= form_for 'http://google.com/cse' => (target => '_blank') => begin
       %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
       %= hidden_field ie => 'UTF-8'
-      %= search_field 'q', placeholder => 'Search'
+      %= search_field 'q', placeholder => 'Search', id => 'mojosearch'
     %= end
   </div>
 </div>
@@ -85,6 +85,9 @@
         mojobar.css('top', start + 'px');
         fixed = false;
       }
+    });
+    $(window).keydown(function () {
+      $("#mojosearch").focus();
     });
   });
   $(document).ready(function() {

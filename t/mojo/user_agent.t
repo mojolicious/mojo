@@ -276,7 +276,9 @@ ok !$tx->success, 'not successful';
 is $tx->error, 'Inactivity timeout', 'right error';
 
 # Keep alive connection times out
-my $id;
+my ($fail, $id);
+my $error = $ua->on(error => sub { $fail++ });
+ok $ua->has_subscribers('error'), 'has subscribers';
 $ua->get(
   '/' => sub {
     my ($ua, $tx) = @_;
@@ -286,7 +288,10 @@ $ua->get(
   }
 );
 Mojo::IOLoop->start;
+ok !$fail, 'error event has not been emitted';
 ok !Mojo::IOLoop->stream($id), 'connection timed out';
+$ua->unsubscribe(error => $error);
+ok !$ua->has_subscribers('error'), 'unsubscribed successfully';
 
 # Response exceeding message size limit
 $ua->once(

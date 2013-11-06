@@ -39,10 +39,9 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
   );
 }
 
-# Logger
-my $logger = Mojo::Log->new;
-my $app = Mojo->new({log => $logger});
-is $app->log, $logger, 'right logger';
+# Optional home detection
+my $app = Mojo->new(home => Mojo::Home->new('/will/never-ever/exist'));
+is $app->home, '/will/never-ever/exist', 'right home directory';
 
 # Config
 is $app->config('foo'), undef, 'no value';

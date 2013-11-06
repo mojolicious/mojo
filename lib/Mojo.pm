@@ -27,7 +27,8 @@ sub new {
   my $self = shift->SUPER::new(@_);
 
   # Check if we have a log directory
-  my $home = $self->home->detect(ref $self);
+  my $home = $self->home;
+  $home->detect(ref $self) unless @{$home->parts};
   $self->log->path($home->rel_file('log/mojo.log'))
     if -w $home->rel_file('log');
 
@@ -144,7 +145,8 @@ new ones.
   my $app = Mojo->new;
 
 Construct a new L<Mojo> application. Will automatically detect your home
-directory and set up logging to C<log/mojo.log> if there's a C<log> directory.
+directory if necessary and set up logging to C<log/mojo.log> if there's a
+C<log> directory.
 
 =head2 build_tx
 

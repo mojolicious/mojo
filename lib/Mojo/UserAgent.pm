@@ -291,14 +291,11 @@ sub _dequeue {
   my $old  = $self->{queue} || [];
   my $new  = $self->{queue} = [];
   for my $queued (@$old) {
+    push @$new, $queued and next if $found || !grep { $_ eq $name } @$queued;
 
     # Search for id/name and sort out corrupted connections if necessary
-    if (!$found && grep { $_ eq $name } @$queued) {
-      next unless my $stream = $loop->stream($queued->[1]);
-      $test && $stream->is_readable ? $stream->close : ($found = $queued->[1]);
-    }
-
-    else { push @$new, $queued }
+    next unless my $stream = $loop->stream($queued->[1]);
+    $test && $stream->is_readable ? $stream->close : ($found = $queued->[1]);
   }
 
   return $found;

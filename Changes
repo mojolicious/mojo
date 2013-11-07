@@ -1,5 +1,5 @@
 
-4.54  2013-11-06
+4.54  2013-11-07
   - Added parts attribute to Mojo::Home.
   - Fixed keep alive connection timeout bug in Mojo::UserAgent.
   - Fixed support for links within a page in Mojolicious::Plugin::PODRenderer.

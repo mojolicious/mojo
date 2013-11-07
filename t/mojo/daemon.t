@@ -6,6 +6,7 @@ BEGIN {
 }
 
 use Test::More;
+use File::Spec::Functions 'catdir';
 use IO::Socket::INET;
 use Mojo;
 use Mojo::IOLoop;
@@ -40,8 +41,9 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
 }
 
 # Optional home detection
-my $app = Mojo->new(home => Mojo::Home->new('/will/never-ever/exist'));
-is $app->home, '/will/never-ever/exist', 'right home directory';
+my @path = qw(th is mojo dir wil l never-ever exist);
+my $app = Mojo->new(home => Mojo::Home->new(catdir @path));
+is $app->home, catdir(@path), 'right home directory';
 
 # Config
 is $app->config('foo'), undef, 'no value';

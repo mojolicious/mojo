@@ -70,6 +70,8 @@ $array = $json->decode('[" 0"]');
 is_deeply $array, [' 0'], 'decode [" 0"]';
 $array = $json->decode('["1"]');
 is_deeply $array, ['1'], 'decode ["1"]';
+$array = $json->decode('["\u0007\b"]');
+is_deeply $array, ["\a\b"], 'decode ["\u0007\b"]';
 
 # Decode object
 my $hash = $json->decode('{}');
@@ -129,6 +131,8 @@ is b($bytes)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
   'encode ["hello\x{0003}\x{0152}world\x{0152}!"]';
 $bytes = $json->encode(["123abc"]);
 is $bytes, '["123abc"]', 'encode ["123abc"]';
+$bytes = $json->encode(["\a\b"]);
+is $bytes, '["\\u0007\\b"]', 'encode ["\a\b"]';
 
 # Encode object
 $bytes = $json->encode({});

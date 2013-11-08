@@ -1,4 +1,7 @@
 
+4.56  2013-11-09
+  - Fixed backspace escaping bug in Mojo::JSON. (ig3)
+
 4.55  2013-11-07
   - Fixed Windows bug in "daemon.t".
 

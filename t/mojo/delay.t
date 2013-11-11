@@ -220,4 +220,13 @@ like $failed, qr/^Second step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';
 ok !$result,   'no result';
 
+# Fatal exception in second step
+Mojo::IOLoop->singleton->reactor->unsubscribe('error');
+$delay = Mojo::IOLoop::Delay->new;
+ok !$delay->has_subscribers('error'), 'no subscribers';
+$delay->steps(sub { Mojo::IOLoop->timer(0 => shift->begin) },
+  sub { die 'Oops!' });
+eval { $delay->wait };
+like $@, qr/Oops!/, 'right error';
+
 done_testing();

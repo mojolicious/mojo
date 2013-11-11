@@ -23,12 +23,14 @@ sub wait {
   my $self = shift;
 
   my @args;
-  $self->once(error => sub { shift->ioloop->stop });
+  $self->once(error => \&_die);
   $self->once(finish => sub { shift->ioloop->stop; @args = @_ });
   $self->ioloop->start;
 
   return wantarray ? @args : $args[0];
 }
+
+sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
 
 sub _step {
   my ($self, $id) = (shift, shift);

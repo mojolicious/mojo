@@ -1,4 +1,7 @@
 
+4.57  2013-11-11
+  - Improved compatibility with IO::Socket::SSL 1.957.
+
 4.56  2013-11-09
   - Fixed backspace escaping bug in Mojo::JSON. (ig3)
 

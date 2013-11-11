@@ -95,25 +95,10 @@ $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
   is $tx->res->body, 'works!', 'right content';
 }
 
-# Empty certificate authority
-$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
-$ua->ca('t/mojo/certs/empty.crt')->cert('t/mojo/certs/client.crt')
-  ->key('t/mojo/certs/client.key');
-$tx = $ua->get("https://localhost:$port");
-ok !$tx->success, 'not successful';
-ok $tx->error, 'has error';
-
 # Invalid certificate
 $ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
 $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key');
 $tx = $ua->get("https://localhost:$port");
-ok !$tx->success, 'not successful';
-ok $tx->error, 'has error';
-
-# Empty certificate
-$ua = Mojo::UserAgent->new(ioloop => $ua->ioloop);
-$tx = $ua->cert('t/mojo/certs/empty.crt')->key('t/mojo/certs/empty.crt')
-  ->get("https://localhost:$port");
 ok !$tx->success, 'not successful';
 ok $tx->error, 'has error';
 
@@ -128,7 +113,7 @@ $listen
   . '?cert=t/mojo/certs/server.crt'
   . '&key=t/mojo/certs/server.key'
   . '&ca=t/mojo/certs/ca.crt'
-  . '&ciphers=RC4-MD5:ALL'
+  . '&ciphers=RC4-SHA:ALL'
   . '&verify=0x00';
 $daemon->listen([$listen])->start;
 
@@ -138,7 +123,7 @@ $ua->cert('t/mojo/certs/badclient.crt')->key('t/mojo/certs/badclient.key');
 $tx = $ua->get("https://localhost:$port");
 ok $tx->success, 'successful';
 ok !$tx->error, 'no error';
-is $ua->ioloop->stream($tx->connection)->handle->get_cipher, 'RC4-MD5',
-  'RC4-MD5 has been negotiatied';
+is $ua->ioloop->stream($tx->connection)->handle->get_cipher, 'RC4-SHA',
+  'RC4-SHA has been negotiatied';
 
 done_testing();

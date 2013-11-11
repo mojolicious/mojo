@@ -319,7 +319,7 @@ $loop->server(
   tls         => 1,
   tls_ca      => 't/mojo/certs/ca.crt',
   tls_cert    => 't/mojo/certs/server.crt',
-  tls_ciphers => 'RC4-MD5:ALL',
+  tls_ciphers => 'RC4-SHA:ALL',
   tls_key     => 't/mojo/certs/server.key',
   tls_verify  => 0x00,
   sub {
@@ -345,6 +345,6 @@ $loop->start;
 is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
-is $cipher, 'RC4-MD5', 'RC4-MD5 has been negotiatied';
+is $cipher, 'RC4-SHA', 'RC4-SHA has been negotiatied';
 
 done_testing();

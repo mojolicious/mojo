@@ -42,11 +42,8 @@ sub parse {
   else { return $self }
 
   # Prevent crash
-  my $epoch;
-  $epoch = eval { timegm($s, $m, $h, $day, $month, $year) };
-  $self->epoch($epoch) if !$@ && $epoch >= 0;
-
-  return $self;
+  my $epoch = eval { timegm($s, $m, $h, $day, $month, $year) };
+  return defined $epoch && $epoch >= 0 ? $self->epoch($epoch) : $self;
 }
 
 sub to_string {

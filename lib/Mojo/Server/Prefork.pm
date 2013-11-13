@@ -182,8 +182,8 @@ sub _spawn {
           my $old = Time::HiRes::ualarm $self->lock_timeout * 1000000;
           $lock = flock $handle, LOCK_EX;
           Time::HiRes::ualarm $old;
-        };
-        if ($@) { $lock = $@ eq "alarm\n" ? 0 : die($@) }
+          1;
+        } or $lock = $@ eq "alarm\n" ? 0 : die $@;
       }
 
       # Non blocking

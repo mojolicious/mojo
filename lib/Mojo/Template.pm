@@ -118,8 +118,8 @@ sub interpret {
   };
 
   return undef unless my $compiled = $self->compiled;
-  my $output = eval { $compiled->(@_) };
-  return $output unless $@;
+  my $output;
+  return $output if eval { $output = $compiled->(@_); 1 };
 
   # Exception with template context
   return Mojo::Exception->new($@, [$self->template])->verbose(1);

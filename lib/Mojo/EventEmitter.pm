@@ -27,8 +27,9 @@ sub emit_safe {
     warn "-- Emit $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
       if DEBUG;
     for my $cb (@$s) {
-      $self->emit(error => qq{Event "$name" failed: $@})
-        unless eval { $self->$cb(@_); 1 };
+      if (my $err = _safe_eval($self, $cb, \@_)) {
+        $self->emit(error => qq{Event "$name" failed: $err});
+      }
     }
   }
   else {
@@ -37,6 +38,13 @@ sub emit_safe {
   }
 
   return $self;
+}
+
+sub _safe_eval {
+  my ($self, $cb, $args) = @_;
+  local $@;
+  eval { $self->$cb(@$args); 1 } or return $@;
+  return;
 }
 
 sub has_subscribers { !!@{shift->subscribers(shift)} }

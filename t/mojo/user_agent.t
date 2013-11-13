@@ -489,4 +489,13 @@ ok $tx->success, 'successful';
 is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';
 
+# Destructor doesn't clobber $@
+sub deadly {
+  my $e = Mojo::UserAgent->new;
+  $e->get('/');
+  die 'original-exception';
+}
+eval { deadly() };
+like $@, qr/^original-exception/, 'got correct exception';
+
 done_testing();

@@ -372,8 +372,9 @@ Generate file input element.
     %= submit_button
   % end
 
-Generate portable form tag for route, path or URL. For routes that allow POST
-but not GET, a C<method> attribute will be automatically added.
+Generate portable form tag with L<Mojolicious::Controller/"url_for">. For
+routes that allow POST but not GET, a C<method> attribute will be
+automatically added.
 
   <form action="/path/to/login">
     <input name="first_name" />
@@ -474,8 +475,8 @@ Generate label.
   <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => 'bar')->to_abs => begin %>Retry<% end %>
 
-Generate portable link to route, path or URL, defaults to using the
-capitalized link target as content.
+Generate portable link with L<Mojolicious::Controller/"url_for">, defaults to
+using the capitalized link target as content.
 
   <a href="/path/to/index">Home</a>
   <a class="menu" href="/path/to/index.txt">Home</a>

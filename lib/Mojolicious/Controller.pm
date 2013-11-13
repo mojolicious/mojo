@@ -899,7 +899,7 @@ that all stash values with a C<mojo.*> prefix are reserved for internal use.
   my $url = $c->url_for('http://mojolicio.us/perldoc');
   my $url = $c->url_for('mailto:sri@example.com');
 
-Generate a portable L<Mojo::URL> object with base for a route, path or URL.
+Generate a portable L<Mojo::URL> object with base for a path, URL or route.
 
   # "http://127.0.0.1:3000/perldoc" if application has been started with Morbo
   $c->url_for('/perldoc')->to_abs;

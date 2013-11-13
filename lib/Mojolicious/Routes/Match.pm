@@ -152,14 +152,15 @@ Current position on the L</"stack">, defaults to C<0>.
   my $endpoint = $match->endpoint;
   $match       = $match->endpoint(Mojolicious::Routes::Route->new);
 
-The route endpoint that matched.
+The route endpoint that matched, usually a L<Mojolicious::Routes::Route>
+objects.
 
 =head2 root
 
   my $root = $match->root;
   $match   = $match->root(Mojolicious::Routes->new);
 
-The root of the route structure.
+The root of the route structure, usually a L<Mojolicious::Routes> object.
 
 =head2 stack
 

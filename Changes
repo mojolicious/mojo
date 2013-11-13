@@ -3435,10 +3435,10 @@
   - Countless small bugs fixed and tests added.
 
 0.6  2008-09-24
-  - Many more bugfixes.
+  - Many more bug fixes.
 
 0.5  2008-09-24
-  - Many small bugfixes.
+  - Many small bug fixes.
 
 0.4  2008-09-24
   - Moved everything into the Mojo namespace.

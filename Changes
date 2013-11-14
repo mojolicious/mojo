@@ -1,5 +1,6 @@
 
-4.58  2013-11-13
+4.58  2013-11-14
+  - Improved IIS and WebSphere compatibility of Mojo::Message::Request.
 
 4.57  2013-11-11
   - Improved compatibility with IO::Socket::SSL 1.957.

@@ -43,8 +43,8 @@ sub DESTROY { shift->_cleanup }
 
 # DEPRECATED in Top Hat!
 sub new {
-  my $self = shift->SUPER::new;
-  while (my $name = shift) { $self->$name(shift) }
+  my $self = shift->SUPER::new(@_);
+  for my $key (keys %$self) { $self->$key(delete $self->{$key}) }
   return $self;
 }
 

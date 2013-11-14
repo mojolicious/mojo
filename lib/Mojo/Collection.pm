@@ -282,7 +282,7 @@ elements in the collection directly and create a new collection from the
 results, similar to L</"pluck">.
 
   push @$collection, Mojo::DOM->new("<div><h1>$_</h1></div>") for 1 .. 9;
-  say $collection->at('h1')->type('h2')->prepend_content('Test ')->root;
+  say $collection->find('h1')->type('h2')->prepend_content('Test ')->root;
 
 =head1 ELEMENTS
 

@@ -463,4 +463,29 @@ my $file = $req->upload('file');
 is $file->filename, 'file.txt',    'right filename';
 is $file->slurp,    '11023456789', 'right uploaded content';
 
+# Parse IIS 7.5 like CGI environment (HTTPS=off)
+$req = Mojo::Message::Request->new;
+$req->parse(
+  CONTENT_LENGTH => 0,
+  CONTENT_TYPE    => '',
+  PATH_INFO       => '/index.pl/',
+  PATH_TRANSLATED => 'C:\\inetpub\\wwwroot\\test\\www\\index.pl\\',
+  SERVER_SOFTWARE => 'Microsoft-IIS/7.5',
+  QUERY_STRING    => '',
+  REQUEST_METHOD  => 'GET',
+  SCRIPT_NAME     => '/index.pl',
+  HTTP_HOST       => 'test',
+  HTTPS           => 'off',
+  SERVER_PROTOCOL => 'HTTP/1.1'
+);
+ok $req->is_finished, 'request is done';
+is $req->method, 'GET', 'right method';
+ok !$req->is_secure, 'not secure';
+is $req->url->base->protocol, 'http', 'right protocol';
+is $req->url->path, '', 'right URL';
+is $req->url->base->path, '/index.pl/', 'right path';
+is $req->url->base->host, 'test',       'right host';
+ok !$req->url->query->to_string, 'no query';
+is $req->version, '1.1', 'right version';
+
 done_testing();

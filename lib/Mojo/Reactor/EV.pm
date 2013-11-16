@@ -62,8 +62,9 @@ sub _timer {
   weaken $self;
   $self->{timers}{$id}{watcher} = EV::timer(
     $after => $after => sub {
-      $self->_sandbox("Timer $id", $self->{timers}{$id}{cb});
-      delete $self->{timers}{$id} unless $recurring;
+      my $timer = $self->{timers}{$id};
+      delete delete($self->{timers}{$id})->{watcher} unless $recurring;
+      $self->_sandbox("Timer $id", $timer->{cb});
     }
   );
 

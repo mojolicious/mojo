@@ -212,6 +212,13 @@ $reactor->timer(0 => sub { die "works!\n" });
 $reactor->start;
 like $err, qr/works!/, 'right error';
 
+# Recursion
+$timer   = undef;
+$reactor = $reactor->new;
+$reactor->timer(0 => sub { ++$timer and shift->one_tick });
+$reactor->one_tick;
+is $timer, 1, 'timer was triggered once';
+
 # Detection
 is(Mojo::Reactor->detect, 'Mojo::Reactor::EV', 'right class');
 

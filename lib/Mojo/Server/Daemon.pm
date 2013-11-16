@@ -36,14 +36,14 @@ sub setuidgid {
   # Group
   if (my $group = $self->group) {
     croak qq{Group "$group" does not exist}
-      unless defined(my $gid = (getgrnam($group))[2]);
+      unless defined(my $gid = getgrnam $group);
     POSIX::setgid($gid) or croak qq{Can't switch to group "$group": $!};
   }
 
   # User
   if (my $user = $self->user) {
     croak qq{User "$user" does not exist}
-      unless defined(my $uid = (getpwnam($self->user))[2]);
+      unless defined(my $uid = getpwnam $user);
     POSIX::setuid($uid) or croak qq{Can't switch to user "$user": $!};
   }
 

@@ -271,7 +271,7 @@ sub _start {
 
   # Autoclose optional HTML elements
   if (!$self->xml && $$current->[0] ne 'root') {
-    if ($END{$start}) { $self->_end($_, $current) for @{$END{$start}} }
+    if (my $end = $END{$start}) { $self->_end($_, $current) for @$end }
 
     # "li"
     elsif ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }

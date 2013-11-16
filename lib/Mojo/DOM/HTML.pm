@@ -50,10 +50,21 @@ my $TOKEN_RE = qr/
 /xis;
 
 # HTML elements that break paragraphs
-my %PARAGRAPH = map { $_ => 1 } (
+my @PARAGRAPH = (
   qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
   qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul)
 );
+
+# HTML elements with optional end tags
+my %END = (
+  body => ['head'],
+  dd   => [qw(dt dd)],
+  dt   => [qw(dt dd)],
+  rp   => [qw(rt rp)],
+  rt   => [qw(rt rp)]
+);
+$END{$_} = [$_]  for qw(optgroup option);
+$END{$_} = ['p'] for @PARAGRAPH;
 
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
@@ -260,21 +271,10 @@ sub _start {
 
   # Autoclose optional HTML elements
   if (!$self->xml && $$current->[0] ne 'root') {
+    if ($END{$start}) { $self->_end($_, $current) for @{$END{$start}} }
 
     # "li"
-    if ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
-
-    # "p"
-    elsif ($PARAGRAPH{$start}) { $self->_end('p', $current) }
-
-    # "head"
-    elsif ($start eq 'body') { $self->_end('head', $current) }
-
-    # "optgroup"
-    elsif ($start eq 'optgroup') { $self->_end('optgroup', $current) }
-
-    # "option"
-    elsif ($start eq 'option') { $self->_end('option', $current) }
+    elsif ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
 
     # "colgroup", "thead", "tbody" and "tfoot"
     elsif (grep { $_ eq $start } qw(colgroup thead tbody tfoot)) {
@@ -287,16 +287,6 @@ sub _start {
     # "th" and "td"
     elsif ($start eq 'th' || $start eq 'td') {
       $self->_close($current, {$_ => 1}, 'table') for qw(th td);
-    }
-
-    # "dt" and "dd"
-    elsif ($start eq 'dt' || $start eq 'dd') {
-      $self->_end($_, $current) for qw(dt dd);
-    }
-
-    # "rt" and "rp"
-    elsif ($start eq 'rt' || $start eq 'rp') {
-      $self->_end($_, $current) for qw(rt rp);
     }
   }
 

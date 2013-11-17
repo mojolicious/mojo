@@ -1,6 +1,7 @@
 
 4.58  2013-11-17
   - Improved IIS and WebSphere compatibility of Mojo::Message::Request.
+  - Improved Mojo::Collection to allow join without arguments.
   - Improved Mojo::DOM::HTML performance.
   - Fixed recursion bug in Mojo::Reactor::EV where timers could run more than
     once.

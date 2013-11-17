@@ -65,6 +65,7 @@ is_deeply [$collection->grep(sub { $_ > 9 })->each], [], 'no elements';
 
 # join
 $collection = c(1, 2, 3);
+is $collection->join, '123', 'right result';
 is $collection->join(''),    '123',       'right result';
 is $collection->join('---'), '1---2---3', 'right result';
 is $collection->join("\n"),  "1\n2\n3",   'right result';

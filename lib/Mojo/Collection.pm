@@ -58,7 +58,7 @@ sub grep {
   return $self->new(grep { $_ =~ $cb } @$self);
 }
 
-sub join { Mojo::ByteStream->new(join $_[1], map({"$_"} @{$_[0]})) }
+sub join { Mojo::ByteStream->new(join $_[1] // '', map({"$_"} @{$_[0]})) }
 
 sub map {
   my ($self, $cb) = @_;
@@ -202,6 +202,7 @@ argument passed to the callback and is also available as C<$_>.
 
 =head2 join
 
+  my $stream = $collection->join;
   my $stream = $collection->join("\n");
 
 Turn collection into L<Mojo::ByteStream>.

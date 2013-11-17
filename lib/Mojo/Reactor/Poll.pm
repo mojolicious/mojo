@@ -82,7 +82,7 @@ sub remove {
 
 sub start {
   my $self = shift;
-  return if $self->{running}++;
+  $self->{running}++;
   $self->one_tick while $self->{running};
 }
 

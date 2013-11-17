@@ -1,9 +1,10 @@
 
-4.58  2013-11-16
+4.58  2013-11-17
   - Improved IIS and WebSphere compatibility of Mojo::Message::Request.
   - Improved Mojo::DOM::HTML performance.
   - Fixed recursion bug in Mojo::Reactor::EV where timers could run more than
     once.
+  - Fixed a few "0" value bugs in Mojo::DOM::HTML.
 
 4.57  2013-11-11
   - Improved compatibility with IO::Socket::SSL 1.957.

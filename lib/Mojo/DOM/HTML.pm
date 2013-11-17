@@ -99,16 +99,16 @@ sub parse {
     push @$current, ['text', html_unescape $text] if length $text;
 
     # DOCTYPE
-    if ($doctype) { push @$current, ['doctype', $doctype] }
+    if (defined $doctype) { push @$current, ['doctype', $doctype] }
 
     # Comment
-    elsif ($comment) { push @$current, ['comment', $comment] }
+    elsif (defined $comment) { push @$current, ['comment', $comment] }
 
     # CDATA
-    elsif ($cdata) { push @$current, ['cdata', $cdata] }
+    elsif (defined $cdata) { push @$current, ['cdata', $cdata] }
 
     # Processing instruction (try to detect XML)
-    elsif ($pi) {
+    elsif (defined $pi) {
       $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
       push @$current, ['pi', $pi];
     }

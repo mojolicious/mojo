@@ -1,4 +1,6 @@
 
+4.59  2013-11-20
+
 4.58  2013-11-19
   - Improved IIS and WebSphere compatibility of Mojo::Message::Request.
   - Improved Mojo::Collection to allow join without arguments.

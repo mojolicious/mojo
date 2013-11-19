@@ -119,6 +119,10 @@ Mojo::Collection - Collection
     say "$count: $word";
   });
 
+  # Stringify collection
+  say $collection->join("\n");
+  say "$collection";
+
   # Use the alternative constructor
   use Mojo::Collection 'c';
   c(qw(a b c))->join('/')->url_escape->say;

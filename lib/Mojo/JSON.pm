@@ -329,8 +329,9 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 SYNOPSIS
 
-  # Encode and decode JSON
   use Mojo::JSON;
+
+  # Encode and decode JSON
   my $json  = Mojo::JSON->new;
   my $bytes = $json->encode({foo => [1, 2], bar => 'hello!', baz => \1});
   my $hash  = $json->decode($bytes);

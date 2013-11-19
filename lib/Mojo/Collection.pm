@@ -110,11 +110,14 @@ Mojo::Collection - Collection
 
 =head1 SYNOPSIS
 
-  # Manipulate collections
   use Mojo::Collection;
+
+  # Manipulate collection
   my $collection = Mojo::Collection->new(qw(just works));
   unshift @$collection, 'it';
-  $collection->map(sub { ucfirst })->each(sub {
+
+  # Chain methods
+  $collection->map(sub { ucfirst })->shuffle->each(sub {
     my ($word, $count) = @_;
     say "$count: $word";
   });

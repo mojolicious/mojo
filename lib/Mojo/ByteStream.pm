@@ -74,8 +74,9 @@ Mojo::ByteStream - ByteStream
 
 =head1 SYNOPSIS
 
-  # Manipulate bytestreams
   use Mojo::ByteStream;
+
+  # Manipulate bytestream
   my $stream = Mojo::ByteStream->new('foo_bar_baz');
   say $stream->camelize;
 

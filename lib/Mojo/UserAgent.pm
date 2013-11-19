@@ -458,9 +458,9 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
 =head1 SYNOPSIS
 
   use Mojo::UserAgent;
-  my $ua = Mojo::UserAgent->new;
 
   # Say hello to the Unicode snowman with "Do Not Track" header
+  my $ua = Mojo::UserAgent->new;
   say $ua->get('www.☃.net?hello=there' => {DNT => 1})->res->body;
 
   # Form POST with exception handling

@@ -326,9 +326,9 @@ Mojo::Template - Perl-ish templates!
 =head1 SYNOPSIS
 
   use Mojo::Template;
-  my $mt = Mojo::Template->new;
 
   # Simple
+  my $mt = Mojo::Template->new;
   my $output = $mt->render(<<'EOF');
   % use Time::Piece;
   <!DOCTYPE html>

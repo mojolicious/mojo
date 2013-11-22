@@ -34,7 +34,8 @@ works on.
 
 Another huge advantage is that it supports TLS and WebSockets out of the box,
 a development certificate for testing purposes is built right in, so it just
-works.
+works, but you can specify all listen locations supported by
+L<Mojo::Server::Daemon/"listen">.
 
   $ ./script/myapp daemon -l https://*:3000
   Server available at https://127.0.0.1:3000.
@@ -101,8 +102,9 @@ environments out of the box.
   $ hypnotoad script/myapp
   Server available at http://127.0.0.1:8080.
 
-You can tweak many configuration settings right from within your application,
-for a full list see L<Mojo::Server::Hypnotoad/"SETTINGS">.
+You can tweak many configuration settings right from within your application
+with L<Mojo/"config">, for a full list see
+L<Mojo::Server::Hypnotoad/"SETTINGS">.
 
   use Mojolicious::Lite;
 
@@ -264,7 +266,8 @@ But you could even use middleware right in your application.
 Sometimes you might have to deploy your application in a blackbox environment
 where you can't just change the server configuration or behind a reverse proxy
 that passes along additional information with C<X-*> headers. In such cases
-you can use a C<before_dispatch> hook to rewrite incoming requests.
+you can use the hook L<Mojolicious/"before_dispatch"> to rewrite incoming
+requests.
 
   # Change scheme if "X-Forwarded-Protocol" header is set to "https"
   app->hook(before_dispatch => sub {
@@ -293,7 +296,7 @@ deployment location of your application.
 
 From time to time you might want to reuse parts of L<Mojolicious> applications
 like configuration files, database connection or helpers for other scripts,
-with this little mock server you can just embed them.
+with this little L<Mojo::Server> based mock server you can just embed them.
 
   use Mojo::Server;
 
@@ -308,8 +311,9 @@ with this little mock server you can just embed them.
 
 =head2 Web server embedding
 
-You can also use the built-in web server to embed L<Mojolicious> applications
-into alien environments like foreign event loops.
+You can also use L<Mojo::IOLoop/"one_tick"> to embed the built-in web server
+L<Mojo::Server::Daemon> into alien environments like foreign event loops that
+for some reason can't just be integrated with a new reactor backend.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -754,8 +758,10 @@ When we say L<Mojolicious> is a web framework we actually mean it.
 =head2 Web scraping
 
 Scraping information from web sites has never been this much fun before. The
-built-in HTML/XML parser L<Mojo::DOM> supports all CSS selectors that make
-sense for a standalone parser.
+built-in HTML/XML parser L<Mojo::DOM> is accessible through
+L<Mojo::Message/"dom"> and supports all CSS selectors that make sense for a
+standalone parser, it can be a very powerful tool especially for unit testing
+web application.
 
   use Mojo::UserAgent;
 
@@ -785,14 +791,14 @@ sense for a standalone parser.
     print $e->text_after(0) unless $e->next;
   }
 
-Especially for unit testing your L<Mojolicious> applications this can be a
-very powerful tool.
+For a full list of available CSS selectors see L<Mojo::DOM::CSS/"SELECTORS">.
 
 =head2 JSON web services
 
 Most web services these days are based on the JSON data-interchange format.
 That's why L<Mojolicious> comes with the possibly fastest pure-Perl
-implementation L<Mojo::JSON> built right in.
+implementation L<Mojo::JSON> built right in, it is accessible through
+L<Mojo::Message/"json">.
 
   use Mojo::UserAgent;
   use Mojo::URL;
@@ -842,7 +848,9 @@ This even works for proxy C<CONNECT> requests.
 
 =head2 Content generators
 
-Generate the same type of content repeatedly for multiple requests.
+Content generators can be registered with
+L<Mojo::UserAgent::Transactor/"add_generator"> to generate the same type of
+content repeatedly for multiple requests.
 
   use Mojo::UserAgent;
   use Mojo::Asset::File;
@@ -879,6 +887,41 @@ The C<json> and C<form> content generators are always available.
 For more information about available content generators see also
 L<Mojo::UserAgent::Transactor/"tx">.
 
+=head2 Large file downloads
+
+When downloading large files with L<Mojo::UserAgent> you don't have to worry
+about memory usage at all, because it will automatically stream everything
+above C<250KB> into a temporary file, which can then be moved into a permanent
+file with L<Mojo::Asset::File/"move_to">.
+
+  use Mojo::UserAgent;
+
+  # Lets fetch the latest Mojolicious tarball
+  my $ua = Mojo::UserAgent->new(max_redirects => 5);
+  my $tx = $ua->get('latest.mojolicio.us');
+  $tx->res->content->asset->move_to('mojo.tar.gz');
+
+To protect you from excessively large files there is also a limit of C<10MB>
+by default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
+variable.
+
+  # Increase limit to 1GB
+  $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
+
+=head2 Large file upload
+
+Uploading a large file is even easier.
+
+  use Mojo::UserAgent;
+
+  # Upload file via POST and "multipart/form-data"
+  my $ua = Mojo::UserAgent->new;
+  $ua->post('example.com/upload' =>
+    form => {image => {file => '/home/sri/hello.png'}});
+
+And once again you don't have to worry about memory usage, all data will be
+streamed directly from the file.
+
 =head2 Streaming response
 
 Receiving a streaming response can be really tricky in most HTTP clients, but
@@ -889,6 +932,9 @@ L<Mojo::UserAgent> makes it actually easy.
   # Build a normal transaction
   my $ua = Mojo::UserAgent->new;
   my $tx = $ua->build_tx(GET => 'http://example.com');
+
+  # Accept response of indefinite size
+  $tx->res->max_message_size(0);
 
   # Replace "read" events to disable default content parser
   $tx->res->content->unsubscribe('read')->on(read => sub {
@@ -933,40 +979,6 @@ Sending a streaming request is almost just as easy.
 The drain callback passed to L<Mojo::Content/"write"> will be invoked whenever
 the entire previous chunk has actually been written.
 
-=head2 Large file downloads
-
-When downloading large files with L<Mojo::UserAgent> you don't have to worry
-about memory usage at all, because it will automatically stream everything
-above C<250KB> into a temporary file.
-
-  use Mojo::UserAgent;
-
-  # Lets fetch the latest Mojolicious tarball
-  my $ua = Mojo::UserAgent->new(max_redirects => 5);
-  my $tx = $ua->get('latest.mojolicio.us');
-  $tx->res->content->asset->move_to('mojo.tar.gz');
-
-To protect you from excessively large files there is also a limit of C<10MB>
-by default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
-variable.
-
-  # Increase limit to 1GB
-  $ENV{MOJO_MAX_MESSAGE_SIZE} = 1073741824;
-
-=head2 Large file upload
-
-Uploading a large file is even easier.
-
-  use Mojo::UserAgent;
-
-  # Upload file via POST and "multipart/form-data"
-  my $ua = Mojo::UserAgent->new;
-  $ua->post('example.com/upload' =>
-    form => {image => {file => '/home/sri/hello.png'}});
-
-And once again you don't have to worry about memory usage, all data will be
-streamed directly from the file.
-
 =head2 Non-blocking
 
 L<Mojo::UserAgent> has been designed from the ground up to be non-blocking,
@@ -979,12 +991,12 @@ can keep many parallel connections active at the same time.
 
   # Parallel non-blocking requests
   my $ua = Mojo::UserAgent->new;
-  $ua->get('http://mojolicio.us' => sub {
-    my ($ua, $tx) = @_;
+  $ua->get('http://metacpan.org/search?q=mojo' => sub {
+    my ($ua, $mojo) = @_;
     ...
   });
-  $ua->get('http://mojolicio.us/perldoc' => sub {
-    my ($ua, $tx) = @_;
+  $ua->get('http://metacpan.org/search?q=mango' => sub {
+    my ($ua, $mango) = @_;
     ...
   });
 
@@ -1001,15 +1013,15 @@ synchronize multiple non-blocking requests.
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  # Synchronize non-blocking requests and capture result
+  # Synchronize non-blocking requests and capture results
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay;
-  $ua->get('http://mojolicio.us'         => $delay->begin);
-  $ua->get('http://mojolicio.us/perldoc' => $delay->begin);
-  my ($tx, $tx2) = $delay->wait;
+  $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
+  $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
+  my ($mojo, $mango) = $delay->wait;
 
 The event L<Mojo::IOLoop::Delay/"finish"> can be used for code that needs to
-be able to work standalone as well as inside L<Mojolicious> applications.
+be able to work standalone as well as inside an already running event loop.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;
@@ -1018,11 +1030,11 @@ be able to work standalone as well as inside L<Mojolicious> applications.
   my $ua    = Mojo::UserAgent->new;
   my $delay = Mojo::IOLoop->delay;
   $delay->on(finish => sub {
-    my ($delay, $tx, $tx2) = @_;
+    my ($delay, $mojo, $mango) = @_;
     ...
   });
-  $ua->get('http://mojolicio.us'         => $delay->begin);
-  $ua->get('http://mojolicio.us/perldoc' => $delay->begin);
+  $ua->get('http://metacpan.org/search?q=mojo'  => $delay->begin);
+  $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
   $delay->wait unless Mojo::IOLoop->is_running;
 
 =head2 Command line
@@ -1067,9 +1079,9 @@ This can be an invaluable tool for testing your applications.
 
   $ ./myapp.pl get /welcome 'head > title'
 
-=head2 Oneliners
+=head2 One-liners
 
-For quick hacks and especially testing, L<ojo> oneliners are also a great
+For quick hacks and especially testing, L<ojo> one-liners are also a great
 choice.
 
   $ perl -Mojo -E 'say g("mojolicio.us")->dom->html->head->title->text'
@@ -1129,11 +1141,11 @@ namespace.
 
 =head2 Running code against your application
 
-Ever thought about running a quick oneliner against your L<Mojolicious>
+Ever thought about running a quick one-liner against your L<Mojolicious>
 application to test something? Thanks to the C<eval> command you can do just
 that, the application object itself can be accessed via C<app>.
 
-  $ mojo generate lite_app
+  $ mojo generate lite_app myapp.pl
   $ ./myapp.pl eval 'say for @{app->static->paths}'
 
 The C<verbose> options will automatically print the return value or returned
@@ -1147,16 +1159,16 @@ data structure to C<STDOUT>.
 Ever thought about releasing your L<Mojolicious> application to CPAN? It's
 actually much easier than you might think.
 
-  $ mojo generate app
-  $ cd my_mojolicious_app
-  $ mv public lib/MyMojoliciousApp/
-  $ mv templates lib/MyMojoliciousApp/
+  $ mojo generate app MyApp
+  $ cd my_app
+  $ mv public lib/MyApp/
+  $ mv templates lib/MyApp/
 
 The trick is to move the C<public> and C<templates> directories so they can
 get automatically installed with the modules.
 
   # Application
-  package MyMojoliciousApp;
+  package MyApp;
   use Mojo::Base 'Mojolicious';
 
   use File::Basename 'dirname';
@@ -1169,7 +1181,7 @@ get automatically installed with the modules.
     my $self = shift;
 
     # Switch to installable home directory
-    $self->home->parse(catdir(dirname(__FILE__), 'MyMojoliciousApp'));
+    $self->home->parse(catdir(dirname(__FILE__), 'MyApp'));
 
     # Switch to installable "public" directory
     $self->static->paths->[0] = $self->home->rel_dir('public');
@@ -1188,7 +1200,7 @@ get automatically installed with the modules.
 That's really everything, now you can package your application like any other
 CPAN module.
 
-  $ ./script/my_mojolicious_app generate makefile
+  $ ./script/my_app generate makefile
   $ perl Makefile.PL
   $ make test
   $ make manifest
@@ -1197,7 +1209,7 @@ CPAN module.
 And if you have a C<PAUSE> account (which can be requested at
 L<http://pause.perl.org>) even upload it.
 
-  $ mojo cpanify -u USER -p PASS MyMojoliciousApp-0.01.tar.gz
+  $ mojo cpanify -u USER -p PASS MyApp-0.01.tar.gz
 
 =head2 Hello World
 
@@ -1213,10 +1225,10 @@ rendering kicks in even if no actual code gets executed by the router. The
 renderer just picks up the C<text> value from the stash and generates a
 response.
 
-=head2 Hello World oneliners
+=head2 Hello World one-liners
 
 The C<Hello World> example above can get even a little bit shorter in an
-L<ojo> oneliner.
+L<ojo> one-liner.
 
   $ perl -Mojo -E 'a({text => "Hello World!"})->start' daemon
 

@@ -1,14 +1,14 @@
 package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use Data::Dumper ();
 use Mojo::ByteStream;
+use Mojo::Util 'dumper';
 
 sub register {
   my ($self, $app) = @_;
 
   # Controller alias helpers
-  for my $name (qw(app flash param stash session url_for)) {
+  for my $name (qw(app flash param stash session url_for validation)) {
     $app->helper($name => sub { shift->$name(@_) });
   }
 
@@ -29,10 +29,10 @@ sub register {
   $app->helper(content       => \&_content);
   $app->helper(content_for   => \&_content_for);
   $app->helper(current_route => \&_current_route);
-  $app->helper(dumper        => \&_dumper);
+  $app->helper(dumper        => sub { shift; dumper(@_) });
   $app->helper(include       => \&_include);
-  $app->helper(ua            => sub { shift->app->ua });
-  $app->helper(url_with      => \&_url_with);
+  $app->helper(ua => sub { shift->app->ua });
+  $app->helper(url_with => \&_url_with);
 }
 
 sub _content {
@@ -41,7 +41,7 @@ sub _content {
 
   # Set (first come)
   my $c = $self->stash->{'mojo.content'} ||= {};
-  $c->{$name} ||= ref $content eq 'CODE' ? $content->() : $content
+  $c->{$name} //= ref $content eq 'CODE' ? $content->() : $content
     if defined $content;
 
   # Get
@@ -61,16 +61,10 @@ sub _current_route {
   return $endpoint->name eq shift;
 }
 
-sub _dumper {
-  my $self = shift;
-  return Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Dump;
-}
-
 sub _include {
   my $self     = shift;
   my $template = @_ % 2 ? shift : undef;
-  my $args     = {@_};
-  $args->{template} = $template if defined $template;
+  my $args     = {@_, defined $template ? (template => $template) : ()};
 
   # "layout" and "extends" can't be localized
   my $layout  = delete $args->{layout};
@@ -80,7 +74,7 @@ sub _include {
   my @keys = keys %$args;
   local @{$self->stash}{@keys} = @{$args}{@keys};
 
-  return $self->render(partial => 1, layout => $layout, extend => $extends);
+  return $self->render(partial => 1, layout => $layout, extends => $extends);
 }
 
 sub _url_with {
@@ -138,7 +132,10 @@ Alias for L<Mojo/"config">.
   %= content 'bar'
   %= content
 
-Store partial rendered content in named buffer and retrieve it.
+Store partial rendered content in named buffer and retrieve it, defaults to
+retrieving the named buffer C<content>, which is commonly used for the
+renderers C<layout> and C<extends> features. Note that new content will be
+ignored if the named buffer is already in use.
 
 =head2 content_for
 
@@ -147,7 +144,8 @@ Store partial rendered content in named buffer and retrieve it.
   % end
   %= content_for 'foo'
 
-Append partial rendered content to named buffer and retrieve it.
+Append partial rendered content to named buffer and retrieve it. Note that
+named buffers are shared with the L</"content"> helper.
 
   % content_for message => begin
     Hello
@@ -170,14 +168,14 @@ Check or get name of current route.
 
   %= dumper {some => 'data'}
 
-Dump a Perl data structure with L<Data::Dumper>.
+Dump a Perl data structure with L<Mojo::Util/"dumper">.
 
 =head2 extends
 
   % extends 'blue';
   % extends 'blue', title => 'Blue!';
 
-Extend a template. All additional values get merged into the C<stash>.
+Extend a template. All additional values get merged into the L</"stash">.
 
 =head2 flash
 
@@ -199,7 +197,7 @@ only available in the partial template.
   % layout 'green', title => 'Green!';
 
 Render this template with a layout. All additional values get merged into the
-C<stash>.
+L</"stash">.
 
 =head2 param
 
@@ -228,7 +226,7 @@ Alias for L<Mojolicious::Controller/"stash">.
   % title 'Welcome!', foo => 'bar';
   %= title
 
-Page title. All additional values get merged into the C<stash>.
+Page title. All additional values get merged into the L</"stash">.
 
 =head2 ua
 
@@ -246,10 +244,16 @@ Alias for L<Mojolicious::Controller/"url_for">.
 
   %= url_with 'named', controller => 'bar', action => 'baz'
 
-Does the same as C<url_for>, but inherits query parameters from the current
+Does the same as L</"url_for">, but inherits query parameters from the current
 request.
 
   %= url_with->query([page => 2])
+
+=head2 validation
+
+  %= validation->param('foo')
+
+Alias for L<Mojolicious::Controller/"validation">.
 
 =head1 METHODS
 

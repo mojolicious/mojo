@@ -126,11 +126,11 @@ $simple->parent->attr(bar => 'baz')->attr({this => 'works', too => 'yea'});
 is $simple->parent->attr('bar'),  'baz',   'right parent attribute';
 is $simple->parent->attr('this'), 'works', 'right parent attribute';
 is $simple->parent->attr('too'),  'yea',   'right parent attribute';
-is $dom->at('test#test')->type,         'test',   'right type';
-is $dom->at('[class$="ing"]')->type,    'simple', 'right type';
-is $dom->at('[class="working"]')->type, 'simple', 'right type';
-is $dom->at('[class$=ing]')->type,      'simple', 'right type';
-is $dom->at('[class=working]')->type,   'simple', 'right type';
+is $dom->at('test#test')->type,              'test',   'right type';
+is $dom->at('[class$="ing"]')->type,         'simple', 'right type';
+is $dom->at('[class="working"]')->type,      'simple', 'right type';
+is $dom->at('[class$=ing]')->type,           'simple', 'right type';
+is $dom->at('[class=working][class]')->type, 'simple', 'right type';
 is $dom->at('foo > simple')->next->type, 'test', 'right type';
 is $dom->at('foo > simple')->next->next->type, 'a', 'right type';
 is $dom->at('foo > test')->previous->type, 'simple', 'right type';
@@ -185,6 +185,14 @@ is_deeply [$dom->at('p')->ancestors->type->each], [qw(div div div body html)],
   'right results';
 is_deeply [$dom->at('html')->ancestors->each], [], 'no results';
 is_deeply [$dom->ancestors->each],             [], 'no results';
+is_deeply [$dom->siblings->each],              [], 'no results';
+ok $dom->at('form')->siblings->[0]->match('#header'),  'right sibling';
+ok $dom->at('form')->siblings->[1]->match('#content'), 'right sibling';
+is $dom->at('form')->siblings('#content')->first->text, 'More stuff',
+  'right text';
+is_deeply [$dom->at('form')->siblings('#nothing')->each], [], 'no results';
+is_deeply [$dom->at('#header')->siblings->type->each], [qw(form div)],
+  'right results';
 
 # Script tag
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -195,9 +203,9 @@ is $dom->at('script')->text, "alert('lalala');", 'right script content';
 # HTML5 (unquoted values)
 $dom
   = Mojo::DOM->new->parse('<div id = test foo ="bar" class=tset>works</div>');
-is $dom->at('#test')->text,       'works', 'right text';
-is $dom->at('div')->text,         'works', 'right text';
-is $dom->at('[foo="bar"]')->text, 'works', 'right text';
+is $dom->at('#test')->text,                'works', 'right text';
+is $dom->at('div')->text,                  'works', 'right text';
+is $dom->at('[foo=bar][foo="bar"]')->text, 'works', 'right text';
 is $dom->at('[foo="ba"]'), undef, 'no result';
 is $dom->at('[foo=bar]')->text, 'works', 'right text';
 is $dom->at('[foo=ba]'), undef, 'no result';
@@ -465,11 +473,11 @@ is $dom->at('book nons section')->namespace, '',            'no namespace';
 is $dom->at('book nons section')->text,      'Nothing',     'right text';
 is $dom->at('book meta number')->namespace,  'uri:isbn-ns', 'right namespace';
 is $dom->at('book meta number')->text, '978-0596000271', 'right text';
-is $dom->children('bk:book')->first->{xmlns}, 'uri:default-ns',
+is $dom->children('bk\:book')->first->{xmlns}, 'uri:default-ns',
   'right attribute';
-is $dom->children('k:book')->first, undef, 'no result';
-is $dom->children('book')->first,   undef, 'no result';
-is $dom->children('ook')->first,    undef, 'no result';
+is $dom->children('book')->first->{xmlns}, 'uri:default-ns', 'right attribute';
+is $dom->children('k\:book')->first, undef, 'no result';
+is $dom->children('ook')->first,     undef, 'no result';
 is $dom->at('k\:book'), undef, 'no result';
 is $dom->at('ook'),     undef, 'no result';
 is $dom->at('[xmlns\:bk]')->{'xmlns:bk'}, 'uri:book-ns', 'right attribute';
@@ -480,6 +488,10 @@ is $dom->at('[bk]')->attr('bk'),       '',            'no attribute';
 is $dom->at('[bk]')->attr('k'),        '',            'no attribute';
 is $dom->at('[s\:bk]'), undef, 'no result';
 is $dom->at('[k]'),     undef, 'no result';
+is $dom->at('number')->ancestors('meta')->first->{xmlns}, 'uri:meta-ns',
+  'right attribute';
+ok !!$dom->at('nons')->match('book > nons'),           'element did match';
+ok !$dom->at('title')->match('book > nons > section'), 'element did not match';
 
 # Namespace with dot
 $dom = Mojo::DOM->new(<<EOF);
@@ -1096,7 +1108,7 @@ is "$dom", <<EOF, 'right result';
 <div>D</div>works
 EOF
 $dom->at('li')->prepend_content('A3<p>A2</p>')->prepend_content('A4');
-is $dom->at('li')->text, 'A4 A3 A', 'right text';
+is $dom->at('li')->text, 'A4A3 A', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
@@ -1105,13 +1117,14 @@ is "$dom", <<EOF, 'right result';
 </ul>
 <div>D</div>works
 EOF
-$dom->find('li')->[1]->append_content('<p>C2</p>C3')->append_content('C4');
-is $dom->find('li')->[1]->text, 'C C3 C4', 'right text';
+$dom->find('li')->[1]->append_content('<p>C2</p>C3')->append_content(' C4')
+  ->append_content('C5');
+is $dom->find('li')->[1]->text, 'C C3 C4C5', 'right text';
 is "$dom", <<EOF, 'right result';
 <ul>
     24<div>A-1</div>works25<li>A4A3<p>A2</p>A</li><p>A1</p>23
     <p>B</p>
-    <li>C<p>C2</p>C3C4</li>
+    <li>C<p>C2</p>C3 C4C5</li>
 </ul>
 <div>D</div>works
 EOF
@@ -1251,12 +1264,12 @@ $dom = Mojo::DOM->new->parse(<<EOF);
     <tr>
       <th>A</th>
       <th>D
-  <tbody>
-    <tr>
-      <td>B
   <tfoot>
     <tr>
       <td>C
+  <tbody>
+    <tr>
+      <td>B
 </table>
 EOF
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
@@ -1282,6 +1295,9 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   <tbody>
     <tr>
       <td>B
+  <tbody>
+    <tr>
+      <td>E
 </table>
 EOF
 is $dom->find('table > col')->[0]->attr->{id}, 'morefail', 'right attribute';
@@ -1294,7 +1310,8 @@ is $dom->find('table > colgroup > col')->[2]->attr->{id}, 'bar',
   'right attribute';
 is $dom->at('table > thead > tr > th')->text, 'A', 'right text';
 is $dom->find('table > thead > tr > th')->[1]->text, 'D', 'right text';
-is $dom->at('table > tbody > tr > td')->text, 'B', 'right text';
+is $dom->at('table > tbody > tr > td')->text,   'B',    'right text';
+is $dom->find('table > tbody > tr > td')->text, "B\nE", 'right text';
 
 # Optional "colgroup", "tbody", "tr", "th" and "td" tags
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -1373,6 +1390,10 @@ is $dom->find('tbody > tr > .gamma')->[0]->text, '',            'no text';
 is $dom->find('tbody > tr > .gamma > a')->[0]->text, 'Gamma',     'right text';
 is $dom->find('tbody > tr > .alpha')->[1]->text,     'Alpha Two', 'right text';
 is $dom->find('tbody > tr > .gamma > a')->[1]->text, 'Gamma Two', 'right text';
+my @siblings = $dom->find('tr > td:nth-child(1)')->siblings(':nth-child(even)')
+  ->flatten->all_text->each;
+is_deeply \@siblings, ['Beta', 'Delta', 'Beta Two', 'Delta Two'],
+  'right results';
 
 # Real world list
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -2185,6 +2206,10 @@ $dom = Mojo::DOM->new('0');
 is "$dom", '0', 'right result';
 $dom->append_content('☃');
 is "$dom", '0☃', 'right result';
+is $dom->parse('<!DOCTYPE 0>'),  '<!DOCTYPE 0>',  'successful roundtrip';
+is $dom->parse('<!--0-->'),      '<!--0-->',      'successful roundtrip';
+is $dom->parse('<![CDATA[0]]>'), '<![CDATA[0]]>', 'successful roundtrip';
+is $dom->parse('<?0?>'),         '<?0?>',         'successful roundtrip';
 
 # Comments
 $dom = Mojo::DOM->new(<<EOF);

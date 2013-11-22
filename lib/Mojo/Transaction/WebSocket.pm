@@ -453,8 +453,8 @@ object.
 
 =head2 masked
 
-  my $masked = $ws->masked;
-  $ws        = $ws->masked(1);
+  my $bool = $ws->masked;
+  $ws      = $ws->masked($bool);
 
 Mask outgoing frames with XOR cipher and a random 32bit key.
 
@@ -476,7 +476,7 @@ L<Mojo::Transaction> and implements the following new ones.
   my $ws = Mojo::Transaction::WebSocket->new;
 
 Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
-C<frame> event with default message parser, which also handles C<PING> and
+L</"frame"> event with default message parser, which also handles C<PING> and
 C<CLOSE> frames automatically.
 
 =head2 build_frame
@@ -505,7 +505,7 @@ Build WebSocket frame.
 
 =head2 client_challenge
 
-  my $success = $ws->client_challenge;
+  my $bool = $ws->client_challenge;
 
 Check WebSocket handshake challenge client-side, used to implement user
 agents.
@@ -609,7 +609,7 @@ Handshake response, usually a L<Mojo::Message::Response> object.
 
   $ws = $ws->resume;
 
-Resume C<handshake> transaction.
+Resume L</"handshake"> transaction.
 
 =head2 send
 

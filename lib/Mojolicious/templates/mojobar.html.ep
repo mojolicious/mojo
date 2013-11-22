@@ -3,21 +3,9 @@
   %= stylesheet scoped => 'scoped', begin
     #mojobar {
       background-color: #1a1a1a;
-      background: -webkit-gradient(
-        linear,
-        0% 0%,
-        0% 100%,
-        color-stop(0%, #2a2a2a),
-        color-stop(100%, #000)
-      );
-      background: -moz-linear-gradient(
-        top,
-        #2a2a2a 0%,
-        #000 100%
-      );
+      background: -webkit-linear-gradient(top, #2a2a2a 0%, #000 100%);
+      background: -moz-linear-gradient(top, #2a2a2a 0%, #000 100%);
       background: linear-gradient(top, #2a2a2a 0%, #000 100%);
-      -moz-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.6);
-      -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.6);
       box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.6);
       height: 46px;
       overflow: hidden;
@@ -37,22 +25,26 @@
       float: right;
       height: 60px;
       margin-right: 5em;
-      margin-top: 1em;
+      margin-top: 0.8em;
     }
     #mojobar-links a {
       color: #ccc;
       font: 1em 'Helvetica Neue', Helvetica, sans-serif;
       font-weight: 300;
       margin-left: 0.5em;
-      padding-bottom: 1em;
-      padding-top: 1em;
       text-decoration: none;
-      -webkit-transition: all 200ms ease-in-out;
-      -moz-transition: all 200ms ease-in-out;
-      -o-transition: all 200ms ease-in-out;
       transition: all 200ms ease-in-out;
     }
     #mojobar-links a:hover { color: #fff }
+    #mojobar-links input {
+      border: 0;
+      border-radius: 10px;
+      display: inline;
+      margin-left: 1em;
+      padding: 3px;
+    }
+    #mojobar-links input:focus { outline: 0 }
+    #mojobar-links form { display: inline }
   % end
   <div id="mojobar-logo">
     %= link_to 'http://mojolicio.us' => begin
@@ -67,6 +59,11 @@
     %= link_to MailingList => 'http://groups.google.com/group/mojolicious'
     %= link_to Blog => 'http://blog.kraih.com'
     %= link_to Twitter => 'http://twitter.com/kraih'
+    %= form_for 'http://google.com/cse' => (target => '_blank') => begin
+      %= hidden_field cx => '014527573091551588235:pwfplkjpgbi'
+      %= hidden_field ie => 'UTF-8'
+      %= search_field 'q', placeholder => 'Search'
+    %= end
   </div>
 </div>
 %= javascript begin
@@ -91,6 +88,7 @@
     });
   });
   $(document).ready(function() {
+    $('a[href^="#"]').addClass('mojoscroll');
     $(".mojoscroll").click(function(e) {
       e.preventDefault();
       e.stopPropagation();

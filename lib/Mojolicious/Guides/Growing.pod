@@ -164,8 +164,8 @@ organized CPAN distribution to maximize maintainability.
 
 Both application skeletons can be automatically generated.
 
-  $ mojo generate lite_app
-  $ mojo generate app
+  $ mojo generate lite_app myapp.pl
+  $ mojo generate app MyApp
 
 =head2 Foundation
 

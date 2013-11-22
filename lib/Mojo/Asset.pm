@@ -60,7 +60,7 @@ Pretend file ends earlier.
 =head2 start_range
 
   my $start = $asset->start_range;
-  $asset    = $asset->start_range(0);
+  $asset    = $asset->start_range(3);
 
 Pretend file starts later.
 
@@ -98,9 +98,9 @@ False.
 
 =head2 is_range
 
-  my $success = $asset->is_range;
+  my $bool = $asset->is_range;
 
-Check if asset has a C<start_range> or C<end_range>.
+Check if asset has a L</"start_range"> or L</"end_range">.
 
 =head2 move_to
 

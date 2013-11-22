@@ -6,8 +6,15 @@ use Mojo::Transaction::HTTP;
 use Mojo::URL;
 use Mojo::UserAgent::CookieJar;
 
-# Session cookie
+# Missing values
 my $jar = Mojo::UserAgent::CookieJar->new;
+$jar->add(Mojo::Cookie::Response->new(domain => 'example.com'));
+$jar->add(Mojo::Cookie::Response->new(name   => 'foo'));
+$jar->add(Mojo::Cookie::Response->new(name => 'foo', domain => 'example.com'));
+$jar->add(Mojo::Cookie::Response->new(domain => 'example.com', path => '/'));
+is_deeply [$jar->all], [], 'no cookies';
+
+# Session cookie
 $jar->add(
   Mojo::Cookie::Response->new(
     domain => 'example.com',
@@ -313,9 +320,43 @@ $jar->inject($tx);
 is $tx->req->cookie('foo')->name,  'foo',     'right name';
 is $tx->req->cookie('foo')->value, 'without', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://www.mojolicio.us/perldoc');
+$jar->inject($tx);
+is $tx->req->cookie('foo'), undef, 'no cookie';
+$tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://mojolicio.us/whatever');
 $jar->inject($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
+
+# Extract and inject cookies with same name (with and without domain)
+$jar = Mojo::UserAgent::CookieJar->new;
+$tx  = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://example.com/test');
+$tx->res->cookies(
+  Mojo::Cookie::Response->new(name => 'foo', value => 'without'),
+  Mojo::Cookie::Response->new(
+    name   => 'foo',
+    value  => 'with',
+    domain => 'example.com'
+  )
+);
+$jar->extract($tx);
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://example.com/test');
+$jar->inject($tx);
+@cookies = $tx->req->cookie('foo');
+is $cookies[0]->name,  'foo',     'right name';
+is $cookies[0]->value, 'without', 'right value';
+is $cookies[1]->name,  'foo',     'right name';
+is $cookies[1]->value, 'with',    'right value';
+is $cookies[2], undef, 'no third cookie';
+$tx = Mojo::Transaction::HTTP->new;
+$tx->req->url->parse('http://www.example.com/test');
+$jar->inject($tx);
+@cookies = $tx->req->cookie('foo');
+is $cookies[0]->name,  'foo',  'right name';
+is $cookies[0]->value, 'with', 'right value';
+is $cookies[1], undef, 'no second cookie';
 
 # Extract and inject cookies for "localhost" (valid and invalid)
 $jar = Mojo::UserAgent::CookieJar->new;
@@ -359,7 +400,7 @@ $tx->res->cookies(
     path   => '/'
   ),
   Mojo::Cookie::Response->new(
-    name   => 'baz',
+    name   => '0',
     value  => 'with',
     domain => '.xn--bcher-kva.cOm',
     path   => '/%70erldoc/Mojolicious/'
@@ -373,16 +414,16 @@ is $tx->req->cookie('foo')->name,  'foo',  'right name';
 is $tx->req->cookie('foo')->value, 'with', 'right value';
 is $tx->req->cookie('bar')->name,  'bar',  'right name';
 is $tx->req->cookie('bar')->value, 'with', 'right value';
-is $tx->req->cookie('baz')->name,  'baz',  'right name';
-is $tx->req->cookie('baz')->value, 'with', 'right value';
+is $tx->req->cookie('0')->name,    '0',    'right name';
+is $tx->req->cookie('0')->value,   'with', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://bücher.COM/perldoc/Mojolicious/Lite');
 $jar->inject($tx);
 is $tx->req->cookie('foo'), undef, 'no cookie';
 is $tx->req->cookie('bar')->name,  'bar',  'right name';
 is $tx->req->cookie('bar')->value, 'with', 'right value';
-is $tx->req->cookie('baz')->name,  'baz',  'right name';
-is $tx->req->cookie('baz')->value, 'with', 'right value';
+is $tx->req->cookie('0')->name,    '0',    'right name';
+is $tx->req->cookie('0')->value,   'with', 'right value';
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->url->parse('http://labs.bücher.COM/Perldoc');
 $jar->inject($tx);

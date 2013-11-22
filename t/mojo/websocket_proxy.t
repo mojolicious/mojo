@@ -151,7 +151,7 @@ Mojo::IOLoop->start;
 is $result, 'test1test2', 'right result';
 
 # Non-blocking proxy request
-$ua->http_proxy("http://localhost:$port");
+$ua->proxy->http("http://localhost:$port");
 my $kept_alive;
 $result = undef;
 $ua->get(
@@ -193,7 +193,8 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->body, 'http://example.com/proxy', 'right content';
 
 # Proxy WebSocket
-$ua = Mojo::UserAgent->new(http_proxy => "http://localhost:$proxy");
+$ua = Mojo::UserAgent->new;
+$ua->proxy->http("http://localhost:$proxy");
 $result = undef;
 $ua->websocket(
   "ws://localhost:$port/test" => sub {
@@ -216,7 +217,7 @@ ok $read > 25, 'read enough';
 ok $sent > 25, 'sent enough';
 
 # Proxy WebSocket with bad target
-$ua->http_proxy("http://localhost:$proxy");
+$ua->proxy->http("http://localhost:$proxy");
 my $port2 = $port + 1;
 my ($success, $err);
 $ua->websocket(

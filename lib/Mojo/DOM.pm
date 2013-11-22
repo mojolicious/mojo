@@ -12,7 +12,7 @@ use Carp 'croak';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
-use Mojo::Util qw(deprecated squish);
+use Mojo::Util 'squish';
 use Scalar::Util qw(blessed weaken);
 
 sub AUTOLOAD {
@@ -38,7 +38,7 @@ sub new {
 
 sub all_text { shift->_content(1, @_) }
 
-sub ancestors { $_[0]->_collection(_ancestors($_[0]->tree)) }
+sub ancestors { _select($_[0]->_collect(_ancestors($_[0]->tree)), $_[1]) }
 
 sub append { shift->_add(1, @_) }
 
@@ -68,37 +68,28 @@ sub attr {
   return $self;
 }
 
-# DEPRECATED in Top Hat!
-sub attrs {
-  deprecated 'Mojo::DOM::attrs is DEPRECATED in favor of Mojo::DOM::attr';
-  shift->attr(@_);
-}
-
 sub children {
-  my ($self, $type) = @_;
-
-  my @children;
-  my $xml = $self->xml;
-  for my $n (@{_nodes($self->tree)}) {
-
-    # Make sure child is the right type
-    next if $n->[0] ne 'tag' || (defined $type && $n->[1] ne $type);
-    push @children, $self->new->tree($n)->xml($xml);
-  }
-
-  return Mojo::Collection->new(@children);
+  my $self = shift;
+  return _select(
+    $self->_collect(grep { $_->[0] eq 'tag' } _nodes($self->tree)), @_);
 }
 
 sub content_xml {
   my $self = shift;
   my $xml  = $self->xml;
-  return join '', map { _render($_, $xml) } @{_nodes($self->tree)};
+  return join '', map { _render($_, $xml) } _nodes($self->tree);
 }
 
 sub find {
   my $self = shift;
   my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select(@_);
-  return $self->_collection(@$results);
+  return $self->_collect(@$results);
+}
+
+sub match {
+  my $self = shift;
+  return undef unless Mojo::DOM::CSS->new(tree => $self->tree)->match(@_);
+  return $self;
 }
 
 sub namespace {
@@ -123,7 +114,7 @@ sub namespace {
   return '';
 }
 
-sub next { shift->_sibling(1) }
+sub next { shift->_siblings->[1][0] }
 
 sub parent {
   my $self = shift;
@@ -131,7 +122,7 @@ sub parent {
   return $self->new->tree($tree->[3])->xml($self->xml);
 }
 
-sub parse { shift->_html(parse => shift) }
+sub parse { shift->_delegate(parse => shift) }
 
 sub prepend { shift->_add(0, @_) }
 
@@ -142,7 +133,7 @@ sub prepend_content {
   return $self;
 }
 
-sub previous { shift->_sibling(0) }
+sub previous { shift->_siblings->[0][-1] }
 
 sub remove { shift->replace('') }
 
@@ -166,11 +157,13 @@ sub root {
   return $self->new->tree($tree)->xml($self->xml);
 }
 
+sub siblings { _select(Mojo::Collection->new(@{_siblings($_[0], 1)}), $_[1]) }
+
 sub strip {
   my $self = shift;
   my $tree = $self->tree;
   return $self if $tree->[0] eq 'root';
-  return $self->_replace($tree, ['root', @{_nodes($tree)}]);
+  return $self->_replace($tree, ['root', _nodes($tree)]);
 }
 
 sub tap { shift->Mojo::Base::tap(@_) }
@@ -183,7 +176,7 @@ sub text_after {
   return '' if (my $tree = $self->tree)->[0] eq 'root';
 
   my (@nodes, $started);
-  for my $n (@{_nodes($tree->[3])}) {
+  for my $n (_nodes($tree->[3])) {
     ++$started and next if $n eq $tree;
     next unless $started;
     last if $n->[0] eq 'tag';
@@ -199,7 +192,7 @@ sub text_before {
   return '' if (my $tree = $self->tree)->[0] eq 'root';
 
   my @nodes;
-  for my $n (@{_nodes($tree->[3])}) {
+  for my $n (_nodes($tree->[3])) {
     last if $n eq $tree;
     push @nodes, $n;
     @nodes = () if $n->[0] eq 'tag';
@@ -210,7 +203,7 @@ sub text_before {
 
 sub to_xml { shift->[0]->render }
 
-sub tree { shift->_html(tree => @_) }
+sub tree { shift->_delegate(tree => @_) }
 
 sub type {
   my ($self, $type) = @_;
@@ -220,7 +213,7 @@ sub type {
   return $self;
 }
 
-sub xml { shift->_html(xml => @_) }
+sub xml { shift->_delegate(xml => @_) }
 
 sub _add {
   my ($self, $offset, $new) = @_;
@@ -241,7 +234,7 @@ sub _ancestors {
   return $root ? $ancestors[-1] : @ancestors[0 .. $#ancestors - 1];
 }
 
-sub _collection {
+sub _collect {
   my $self = shift;
   my $xml  = $self->xml;
   return Mojo::Collection->new(@_)
@@ -250,10 +243,10 @@ sub _collection {
 
 sub _content {
   my $tree = shift->tree;
-  return _text(_nodes($tree), shift, _trim($tree, @_));
+  return _text([_nodes($tree)], shift, _trim($tree, @_));
 }
 
-sub _html {
+sub _delegate {
   my ($self, $method) = (shift, shift);
   return $self->[0]->$method unless @_;
   $self->[0]->$method(@_);
@@ -276,8 +269,8 @@ sub _link {
 }
 
 sub _nodes {
-  return [] unless my $n = shift;
-  return [@$n[_offset($n) .. $#$n]];
+  return unless my $n = shift;
+  return @$n[_offset($n) .. $#$n];
 }
 
 sub _offset { $_[0][0] eq 'root' ? 1 : 4 }
@@ -306,26 +299,35 @@ sub _replace {
   return $self->parent;
 }
 
-sub _sibling {
-  my ($self, $next) = @_;
+sub _select {
+  my ($self, $selector) = @_;
+  return defined $selector ? $self->grep(sub { $_->match($selector) }) : $self;
+}
 
-  # Make sure we have a parent
-  return undef unless my $parent = $self->parent;
+sub _siblings {
+  my ($self, $merge) = @_;
 
-  # Find previous or next sibling
-  my ($previous, $current);
+  return $merge ? [] : [[], []] unless my $parent = $self->parent;
+
+  my $tree = $self->tree;
+  my (@before, @after, $match);
   for my $child ($parent->children->each) {
-    ++$current and next if $child->tree eq $self->tree;
-    return $next ? $child : $previous if $current;
-    $previous = $child;
+    ++$match and next if $child->tree eq $tree;
+    $match ? push @after, $child : push @before, $child;
   }
 
-  # No siblings
-  return undef;
+  return $merge ? [@before, @after] : [\@before, \@after];
 }
 
 sub _text {
   my ($nodes, $recurse, $trim) = @_;
+
+  # Merge successive text nodes
+  my $i = 0;
+  while (my $next = $nodes->[$i + 1]) {
+    ++$i and next unless $nodes->[$i][0] eq 'text' && $next->[0] eq 'text';
+    splice @$nodes, $i, 2, ['text', $nodes->[$i][1] . $next->[1]];
+  }
 
   my $text = '';
   for my $n (@$nodes) {
@@ -334,7 +336,7 @@ sub _text {
     # Nested tag
     my $content = '';
     if ($type eq 'tag' && $recurse) {
-      $content = _text(_nodes($n), 1, _trim($n, $trim));
+      $content = _text([_nodes($n)], 1, _trim($n, $trim));
     }
 
     # Text
@@ -429,7 +431,7 @@ into XML mode and everything becomes case sensitive.
   say $dom->at('P')->text;
   say $dom->P->{ID};
 
-XML detection can also be disabled with the C<xml> method.
+XML detection can also be disabled with the L</"xml"> method.
 
   # Force XML semantics
   $dom->xml(1);
@@ -446,8 +448,8 @@ L<Mojo::DOM> implements the following methods.
   my $dom = Mojo::DOM->new;
   my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
 
-Construct a new array-based L<Mojo::DOM> object and C<parse> HTML/XML document
-if necessary.
+Construct a new array-based L<Mojo::DOM> object and L</"parse"> HTML/XML
+fragment if necessary.
 
 =head2 all_text
 
@@ -466,9 +468,11 @@ enabled by default.
 =head2 ancestors
 
   my $collection = $dom->ancestors;
+  my $collection = $dom->ancestors('div');
 
-Return a L<Mojo::Collection> object containing the ancestors of this element
-as L<Mojo::DOM> objects, similar to C<children>.
+Find all ancestors of this element matching the CSS selector and return a
+L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS> are supported.
 
   # List types of ancestor elements
   say $dom->ancestors->type;
@@ -477,7 +481,7 @@ as L<Mojo::DOM> objects, similar to C<children>.
 
   $dom = $dom->append('<p>Hi!</p>');
 
-Append HTML/XML to element.
+Append HTML/XML fragment to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
@@ -486,7 +490,7 @@ Append HTML/XML to element.
 
   $dom = $dom->append_content('<p>Hi!</p>');
 
-Append HTML/XML to element content.
+Append HTML/XML fragment to element content.
 
   # "<div><h1>AB</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
@@ -519,8 +523,9 @@ Element attributes.
   my $collection = $dom->children;
   my $collection = $dom->children('div');
 
-Return a L<Mojo::Collection> object containing the children of this element as
-L<Mojo::DOM> objects, similar to C<find>.
+Find all children of this element matching the CSS selector and return a
+L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS> are supported.
 
   # Show type of random child element
   say $dom->children->shuffle->first->type;
@@ -548,6 +553,14 @@ L<Mojo::DOM::CSS> are supported.
   # Extract information from multiple elements
   my @headers = $dom->find('h1, h2, h3')->text->each;
   my @links   = $dom->find('a[href]')->attr('href')->each;
+
+=head2 match
+
+  my $result = $dom->match('html title');
+
+Match the CSS selector against this element and return it as a L<Mojo::DOM>
+object or return C<undef> if it didn't match. All selectors from
+L<Mojo::DOM::CSS> are supported.
 
 =head2 namespace
 
@@ -582,7 +595,7 @@ has no parent.
 
   $dom = $dom->parse('<foo bar="baz">test</foo>');
 
-Parse HTML/XML document with L<Mojo::DOM::HTML>.
+Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   # Parse XML
   my $dom = Mojo::DOM->new->xml(1)->parse($xml);
@@ -591,7 +604,7 @@ Parse HTML/XML document with L<Mojo::DOM::HTML>.
 
   $dom = $dom->prepend('<p>Hi!</p>');
 
-Prepend HTML/XML to element.
+Prepend HTML/XML fragment to element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
@@ -600,7 +613,7 @@ Prepend HTML/XML to element.
 
   $dom = $dom->prepend_content('<p>Hi!</p>');
 
-Prepend HTML/XML to element content.
+Prepend HTML/XML fragment to element content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
@@ -628,8 +641,8 @@ Remove element and return L<Mojo::DOM> object for parent of element.
 
   my $parent = $dom->replace('<div>test</div>');
 
-Replace element with HTML/XML and return L<Mojo::DOM> object for parent of
-element.
+Replace element with HTML/XML fragment and return L<Mojo::DOM> object for
+parent of element.
 
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
@@ -641,7 +654,7 @@ element.
 
   $dom = $dom->replace_content('<p>test</p>');
 
-Replace element content with HTML/XML.
+Replace element content with HTML/XML fragment.
 
   # "<div><h1>B</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B')->root;
@@ -654,6 +667,18 @@ Replace element content with HTML/XML.
   my $root = $dom->root;
 
 Return L<Mojo::DOM> object for root node.
+
+=head2 siblings
+
+  my $collection = $dom->siblings;
+  my $collection = $dom->siblings('div');
+
+Find all siblings of this element matching the CSS selector and return a
+L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS> are supported.
+
+  # List types of sibling elements
+  say $dom->siblings->type;
 
 =head2 strip
 
@@ -743,8 +768,8 @@ Element type.
 
 =head2 xml
 
-  my $xml = $dom->xml;
-  $dom    = $dom->xml(1);
+  my $bool = $dom->xml;
+  $dom     = $dom->xml($bool);
 
 Disable HTML semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.

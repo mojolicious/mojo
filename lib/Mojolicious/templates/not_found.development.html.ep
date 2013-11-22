@@ -2,11 +2,9 @@
 <html>
   <head>
     <title>Page not found</title>
-    %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo.css'
     %= stylesheet begin
       body {
-        background-color: #f5f6f8;
+        background: url(<%= url_for '/mojo/pinstripe-light.png' %>);
         color: #445555;
         font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
         font-weight: normal;
@@ -16,10 +14,9 @@
       code {
         background-color: #eef9ff;
         border: solid #cce4ff 1px;
-        -moz-border-radius: 5px;
         border-radius: 5px;
         color: #333;
-        font: 0.8em Consolas, Menlo, Monaco, Courier, monospace;
+        font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
         padding: 0.4em;
       }
       h1 {
@@ -28,7 +25,7 @@
         margin: 0;
       }
       pre {
-        font: 0.8em Consolas, Menlo, Monaco, Courier, monospace;
+        font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
         margin: 0;
         white-space: pre-wrap;
       }
@@ -55,13 +52,9 @@
       }
       #routes {
         background-color: #fff;
-        -moz-border-radius-bottomleft: 5px;
         border-bottom-left-radius: 5px;
-        -moz-border-radius-bottomright: 5px;
         border-bottom-right-radius: 5px;
-        -moz-box-shadow: 0px 0px 2px #ccc;
-        -webkit-box-shadow: 0px 0px 2px #ccc;
-        box-shadow: 0px 0px 2px #ccc;
+        box-shadow: 0px 0px 2px #999;
         margin-left: 5em;
         margin-right: 5em;
         padding: 1em;

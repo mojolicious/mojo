@@ -2,8 +2,7 @@ package Mojolicious::Plugin::EPRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Template;
-use Mojo::Util qw(encode md5_sum);
-use Scalar::Util ();
+use Mojo::Util qw(encode md5_sum monkey_patch);
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -19,39 +18,44 @@ sub register {
       # Generate name
       my $path = $options->{inline} || $renderer->template_path($options);
       return undef unless defined $path;
-      my $id = encode 'UTF-8', join(', ', $path, sort keys %{$c->stash});
+      my @keys = sort grep {/^\w+$/} keys %{$c->stash};
+      my $id = encode 'UTF-8', join(',', $path, @keys);
       my $key = $options->{cache} = md5_sum $id;
 
-      # Compile helpers and stash values
+      # Cache template for "epl" handler
       my $cache = $renderer->cache;
-      unless ($cache->get($key)) {
-        my $mt = Mojo::Template->new($template);
+      my $mt    = $cache->get($key);
+      unless ($mt) {
+        $mt = Mojo::Template->new($template);
 
-        # Be a bit more relaxed for helpers
-        my $prepend = 'my $self = shift; Scalar::Util::weaken $self;'
-          . q[no strict 'refs'; no warnings 'redefine';];
+        # Helpers (only once)
+        ++$self->{helpers} and _helpers($mt->namespace, $renderer->helpers)
+          unless $self->{helpers};
 
-        # Helpers
-        $prepend .= 'my $_H = $self->app->renderer->helpers;';
-        $prepend .= "sub $_; *$_ = sub { \$_H->{'$_'}->(\$self, \@_) };"
-          for grep {/^\w+$/} keys %{$renderer->helpers};
+        # Stash values (every time)
+        my $prepend = 'my $self = shift; my $_S = $self->stash;';
+        $prepend .= " my \$$_ = \$_S->{'$_'};" for @keys;
 
-        # Be less relaxed for everything else
-        $prepend .= 'use strict;';
-
-        # Stash values
-        $prepend .= 'my $_S = $self->stash;';
-        $prepend .= " my \$$_ = \$_S->{'$_'};"
-          for grep {/^\w+$/} keys %{$c->stash};
-
-        # Cache
         $cache->set($key => $mt->prepend($prepend . $mt->prepend));
       }
+
+      # Make current controller available
+      no strict 'refs';
+      no warnings 'redefine';
+      local *{"@{[$mt->namespace]}::_C"} = sub {$c};
 
       # Render with "epl" handler
       return $renderer->handlers->{epl}->($renderer, $c, $output, $options);
     }
   );
+}
+
+sub _helpers {
+  my ($namespace, $helpers) = @_;
+  for my $name (grep {/^\w+$/} keys %$helpers) {
+    monkey_patch $namespace, $name,
+      sub { $helpers->{$name}->($namespace->_C, @_) };
+  }
 }
 
 1;

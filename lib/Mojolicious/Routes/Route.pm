@@ -279,10 +279,10 @@ The children of this route, used for nesting routes.
 
 =head2 inline
 
-  my $inline = $r->inline;
-  $r         = $r->inline(1);
+  my $bool = $r->inline;
+  $r       = $r->inline($bool);
 
-Allow C<bridge> semantics for this route.
+Allow L</"bridge"> semantics for this route.
 
 =head2 parent
 
@@ -293,8 +293,8 @@ The parent of this route, used for nesting routes.
 
 =head2 partial
 
-  my $partial = $r->partial;
-  $r          = $r->partial(1);
+  my $bool = $r->partial;
+  $r       = $r->partial($bool);
 
 Route has no specific end, remaining characters will be captured in C<path>.
 
@@ -345,7 +345,7 @@ also the L<Mojolicious::Lite> tutorial for more argument variations.
   my $bridge = $r->bridge('/:action', action => qr/\w+/);
   my $bridge = $r->bridge(format => 0);
 
-Generate bridge route.
+Generate bridge route with optional pattern and restrictive placeholders.
 
   my $auth = $r->bridge('/user')->to('user#auth');
   $auth->get('/show')->to('#show');
@@ -368,7 +368,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
   $r = $r->detour('MyApp', {foo => 'bar'});
 
 Set default parameters for this route and allow partial matching to simplify
-application embedding, takes the same arguments as C<to>.
+application embedding, takes the same arguments as L</"to">.
 
 =head2 find
 
@@ -390,31 +390,31 @@ tutorial for more argument variations.
 
 =head2 has_conditions
 
-  my $success = $r->has_conditions;
+  my $bool = $r->has_conditions;
 
 Check if this route has active conditions.
 
 =head2 has_custom_name
 
-  my $success = $r->has_custom_name;
+  my $bool = $r->has_custom_name;
 
 Check if this route has a custom name.
 
 =head2 has_websocket
 
-  my $success = $r->has_websocket;
+  my $bool = $r->has_websocket;
 
 Check if this route has a WebSocket ancestor.
 
 =head2 is_endpoint
 
-  my $success = $r->is_endpoint;
+  my $bool = $r->is_endpoint;
 
 Check if this route qualifies as an endpoint.
 
 =head2 is_websocket
 
-  my $success = $r->is_websocket;
+  my $bool = $r->is_websocket;
 
 Check if this route is a WebSocket.
 
@@ -519,7 +519,8 @@ The L<Mojolicious::Routes> object this route is an descendent of.
   my $route = $r->route('/:action', action => qr/\w+/);
   my $route = $r->route(format => 0);
 
-Generate route matching all HTTP request methods.
+Generate route matching all HTTP request methods with optional pattern and
+restrictive placeholders.
 
 =head2 to
 
@@ -546,8 +547,8 @@ Stringify the whole route.
 
 =head2 under
 
-  my $route = $r->under(sub {...});
-  my $route = $r->under('/:foo');
+  my $bridge = $r->under(sub {...});
+  my $bridge = $r->under('/:foo');
 
 Generate bridge route. See also the L<Mojolicious::Lite> tutorial for more
 argument variations.

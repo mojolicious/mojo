@@ -118,8 +118,8 @@ sub interpret {
   };
 
   return undef unless my $compiled = $self->compiled;
-  my $output = eval { $compiled->(@_) };
-  return $output unless $@;
+  my $output;
+  return $output if eval { $output = $compiled->(@_); 1 };
 
   # Exception with template context
   return Mojo::Exception->new($@, [$self->template])->verbose(1);
@@ -326,9 +326,9 @@ Mojo::Template - Perl-ish templates!
 =head1 SYNOPSIS
 
   use Mojo::Template;
-  my $mt = Mojo::Template->new;
 
   # Simple
+  my $mt = Mojo::Template->new;
   my $output = $mt->render(<<'EOF');
   % use Time::Piece;
   <!DOCTYPE html>
@@ -384,8 +384,8 @@ automatically enabled.
   %# Comment line, useful for debugging
   %% Replaced with "%", useful for generating templates
 
-Escaping behavior can be reversed with the C<auto_escape> attribute, this is
-the default in L<Mojolicious> C<.ep> templates for example.
+Escaping behavior can be reversed with the L</"auto_escape"> attribute, this
+is the default in L<Mojolicious> C<.ep> templates for example.
 
   <%= Perl expression, replaced with XML escaped result %>
   <%== Perl expression, replaced with result %>
@@ -454,8 +454,8 @@ L<Mojo::Template> implements the following attributes.
 
 =head2 auto_escape
 
-  my $escape = $mt->auto_escape;
-  $mt        = $mt->auto_escape(1);
+  my $bool = $mt->auto_escape;
+  $mt      = $mt->auto_escape($bool);
 
 Activate automatic escaping.
 

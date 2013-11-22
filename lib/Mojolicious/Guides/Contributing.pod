@@ -83,7 +83,7 @@ without them, and update relevant documentation.
 
 While the L<Mojolicious> distribution covers a wide range of features, we are
 rather conservative when it comes to adding new ones. So if your contribution
-is not a bugfix, you can drastically increase its chances of getting accepted
+is not a bug fix, you can drastically increase its chances of getting accepted
 by discussing it in advance on the
 L<mailing-list|http://groups.google.com/group/mojolicious> or the official IRC
 channel C<#mojo> on C<irc.perl.org>.
@@ -102,8 +102,8 @@ All components should be reusable in other projects, and in a UNIXish way only
 loosely coupled.
 
 Especially for people new to Perl it should be as easy as possible to install
-Mojolicious and get started. Writing web applications can be one of the most
-fun ways to learn a language!
+L<Mojolicious> and get started. Writing web applications can be one of the
+most fun ways to learn a language!
 
 For developers of other web frameworks, it should be possible to reuse all the
 infrastructure and just consider the higher levels of the L<Mojolicious>

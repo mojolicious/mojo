@@ -23,10 +23,10 @@ sub register {
   $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
   $app->helper(input_tag => sub { _input(@_) });
   $app->helper(javascript => \&_javascript);
+  $app->helper(label_for  => \&_label_for);
   $app->helper(link_to    => \&_link_to);
 
-  $app->helper(password_field =>
-      sub { shift; _tag('input', name => shift, @_, type => 'password') });
+  $app->helper(password_field => \&_password_field);
   $app->helper(radio_button =>
       sub { _input(shift, shift, value => shift, @_, type => 'radio') });
 
@@ -37,7 +37,8 @@ sub register {
   # "t" is just a shortcut for the "tag" helper
   $app->helper($_ => sub { shift; _tag(@_) }) for qw(t tag);
 
-  $app->helper(text_area => \&_text_area);
+  $app->helper(tag_with_error => \&_tag_with_error);
+  $app->helper(text_area      => \&_text_area);
 }
 
 sub _form_for {
@@ -46,7 +47,7 @@ sub _form_for {
 
   # POST detection
   my @post;
-  if (my $r = $self->app->routes->find($url[0])) {
+  if (my $r = $self->app->routes->lookup($url[0])) {
     my %methods = (GET => 1, POST => 1);
     do {
       my @via = @{$r->via || []};
@@ -82,12 +83,9 @@ sub _input {
 
     # Others
     else { $attrs{value} = $values[0] }
-
-    return _tag('input', name => $name, %attrs);
   }
 
-  # Empty tag
-  return _tag('input', name => $name, %attrs);
+  return _validation($self, $name, 'input', %attrs, name => $name);
 }
 
 sub _javascript {
@@ -95,8 +93,7 @@ sub _javascript {
 
   # CDATA
   my $cb = sub {''};
-  if (ref $_[-1] eq 'CODE') {
-    my $old = pop;
+  if (ref $_[-1] eq 'CODE' && (my $old = pop)) {
     $cb = sub { "//<![CDATA[\n" . $old->() . "\n//]]>" }
   }
 
@@ -106,12 +103,18 @@ sub _javascript {
   return _tag('script', @_, $src ? (src => $src) : (), $cb);
 }
 
+sub _label_for {
+  my ($self, $name) = (shift, shift);
+  my $content = ref $_[-1] eq 'CODE' ? pop : shift;
+  return _validation($self, $name, 'label', for => $name, @_, $content);
+}
+
 sub _link_to {
   my ($self, $content) = (shift, shift);
   my @url = ($content);
 
   # Content
-  unless (defined $_[-1] && ref $_[-1] eq 'CODE') {
+  unless (ref $_[-1] eq 'CODE') {
     @url = (shift);
     push @_, $content;
   }
@@ -122,47 +125,45 @@ sub _link_to {
   return _tag('a', href => $self->url_for(@url), @_);
 }
 
+sub _option {
+  my ($values, $pair) = @_;
+  $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
+
+  # Attributes
+  my %attrs = (value => $pair->[1]);
+  $attrs{selected} = 'selected' if exists $values->{$pair->[1]};
+  %attrs = (%attrs, @$pair[2 .. $#$pair]);
+
+  return _tag('option', %attrs, sub { xml_escape $pair->[0] });
+}
+
+sub _password_field {
+  my ($self, $name) = (shift, shift);
+  return _validation($self, $name, 'input', @_, name => $name,
+    type => 'password');
+}
+
 sub _select_field {
   my ($self, $name, $options, %attrs) = (shift, shift, shift, @_);
 
-  # "option" callback
   my %values = map { $_ => 1 } $self->param($name);
-  my $option = sub {
 
-    # Pair
-    my $pair = shift;
-    $pair = [$pair => $pair] unless ref $pair eq 'ARRAY';
+  my $groups = '';
+  for my $group (@$options) {
 
-    # Attributes
-    my %attrs = (value => $pair->[1]);
-    $attrs{selected} = 'selected' if exists $values{$pair->[1]};
-    %attrs = (%attrs, @$pair[2 .. $#$pair]);
-
-    return _tag('option', %attrs, sub { xml_escape $pair->[0] });
-  };
-
-  # "optgroup" callback
-  my $optgroup = sub {
-
-    # Parts
-    my $parts = '';
-    for my $group (@$options) {
-
-      # "optgroup" tag
-      if (ref $group eq 'HASH') {
-        my ($label, $values) = each %$group;
-        my $content = join '', map { $option->($_) } @$values;
-        $parts .= _tag('optgroup', label => $label, sub {$content});
-      }
-
-      # "option" tag
-      else { $parts .= $option->($group) }
+    # "optgroup" tag
+    if (ref $group eq 'HASH') {
+      my ($label, $values) = each %$group;
+      my $content = join '', map { _option(\%values, $_) } @$values;
+      $groups .= _tag('optgroup', label => $label, sub {$content});
     }
 
-    return $parts;
-  };
+    # "option" tag
+    else { $groups .= _option(\%values, $group) }
+  }
 
-  return _tag('select', name => $name, %attrs, $optgroup);
+  return _validation($self, $name, 'select', %attrs, name => $name,
+    sub {$groups});
 }
 
 sub _stylesheet {
@@ -170,15 +171,14 @@ sub _stylesheet {
 
   # CDATA
   my $cb;
-  if (ref $_[-1] eq 'CODE') {
-    my $old = pop;
+  if (ref $_[-1] eq 'CODE' && (my $old = pop)) {
     $cb = sub { "/*<![CDATA[*/\n" . $old->() . "\n/*]]>*/" }
   }
 
   # "link" or "style" tag
   my $href = @_ % 2 ? $self->url_for(shift) : undef;
   return $href
-    ? _tag('link', rel => 'stylesheet', href => $href, media => 'screen', @_)
+    ? _tag('link', rel => 'stylesheet', href => $href, @_)
     : _tag('style', @_, $cb);
 }
 
@@ -199,35 +199,41 @@ sub _tag {
 
   # Attributes
   my %attrs = @_;
-  for my $key (sort keys %attrs) {
-    $tag .= qq{ $key="} . xml_escape($attrs{$key} // '') . '"';
-  }
-
-  # End tag
-  if ($cb || defined $content) {
-    $tag .= '>' . ($cb ? $cb->() : xml_escape($content)) . "</$name>";
-  }
+  $tag .= qq{ $_="} . xml_escape($attrs{$_} // '') . '"' for sort keys %attrs;
 
   # Empty element
-  else { $tag .= ' />' }
+  unless ($cb || defined $content) { $tag .= ' />' }
+
+  # End tag
+  else { $tag .= '>' . ($cb ? $cb->() : xml_escape($content)) . "</$name>" }
 
   # Prevent escaping
   return Mojo::ByteStream->new($tag);
 }
 
+sub _tag_with_error {
+  my ($self, $tag) = (shift, shift);
+  my ($content, %attrs) = (@_ % 2 ? pop : undef, @_);
+  $attrs{class} .= $attrs{class} ? ' field-with-error' : 'field-with-error';
+  return _tag($tag, %attrs, defined $content ? $content : ());
+}
+
 sub _text_area {
   my ($self, $name) = (shift, shift);
 
-  # Content
+  # Make sure content is wrapped
   my $cb = ref $_[-1] eq 'CODE' ? pop : sub {''};
   my $content = @_ % 2 ? shift : undef;
+  $cb = sub { xml_escape $content }
+    if defined($content = $self->param($name) // $content);
 
-  # Make sure content is wrapped
-  if (defined($content = $self->param($name) // $content)) {
-    $cb = sub { xml_escape $content }
-  }
+  return _validation($self, $name, 'textarea', @_, name => $name, $cb);
+}
 
-  return _tag('textarea', name => $name, @_, $cb);
+sub _validation {
+  my ($self, $name) = (shift, shift);
+  return _tag(@_) unless $self->validation->has_error($name);
+  return $self->tag_with_error(@_);
 }
 
 1;
@@ -260,6 +266,12 @@ necessary attributes always be generated automatically.
   <%= radio_button country => 'germany' %> Germany
   <%= radio_button country => 'france'  %> France
   <%= radio_button country => 'uk'      %> UK
+
+For fields that failed validation with L<Mojolicious::Controller/"validation">
+the C<field-with-error> class will be automatically added through the
+C<tag_with_error> helper, to make styling with CSS easier.
+
+  <input class="field-with-error" name="age" type="text" value="250" />
 
 This is a core plugin, that means it is always enabled and its code a good
 example for learning how to build new plugins, you're welcome to fork it.
@@ -360,8 +372,9 @@ Generate file input element.
     %= submit_button
   % end
 
-Generate portable form tag for route, path or URL. For routes that allow POST
-but not GET, a C<method> attribute will be automatically added.
+Generate portable form tag with L<Mojolicious::Controller/"url_for">. For
+routes that allow POST but not GET, a C<method> attribute will be
+automatically added.
 
   <form action="/path/to/login">
     <input name="first_name" />
@@ -427,11 +440,33 @@ Generate portable script tag for C<Javascript> asset.
     var a = 'b';
   ]]></script>
 
+=head2 label_for
+
+  %= label_for first_name => 'First name'
+  %= label_for first_name => 'First name', class => 'user'
+  %= label_for first_name => begin
+    First name
+  % end
+  %= label_for first_name => (class => 'user') => begin
+    First name
+  % end
+
+Generate label.
+
+  <label for="first_name">First name</label>
+  <label class="user" for="first_name">First name</label>
+  <label for="first_name">
+    First name
+  </label>
+  <label class="user" for="first_name">
+    First name
+  </label>
+
 =head2 link_to
 
   %= link_to Home => 'index'
-  %= link_to Home => 'index' => {format => 'txt'} => (class => 'links')
-  %= link_to index => {format => 'txt'} => (class => 'links') => begin
+  %= link_to Home => 'index' => {format => 'txt'} => (class => 'menu')
+  %= link_to index => {format => 'txt'} => (class => 'menu') => begin
     Home
   % end
   %= link_to Contact => 'mailto:sri@example.com'
@@ -440,12 +475,12 @@ Generate portable script tag for C<Javascript> asset.
   <%= link_to 'http://mojolicio.us' => begin %>Mojolicious<% end %>
   <%= link_to url_for->query(foo => 'bar')->to_abs => begin %>Retry<% end %>
 
-Generate portable link to route, path or URL, defaults to using the
-capitalized link target as content.
+Generate portable link with L<Mojolicious::Controller/"url_for">, defaults to
+using the capitalized link target as content.
 
   <a href="/path/to/index">Home</a>
-  <a class="links" href="/path/to/index.txt">Home</a>
-  <a class="links" href="/path/to/index.txt">
+  <a class="menu" href="/path/to/index.txt">Home</a>
+  <a class="menu" href="/path/to/index.txt">
     Home
   </a>
   <a href="mailto:sri@example.com">Contact</a>
@@ -570,7 +605,7 @@ automatically get picked up and shown as default.
 
 Generate portable style or link tag for C<CSS> asset.
 
-  <link href="/path/to/foo.css" media="screen" rel="stylesheet" />
+  <link href="/path/to/foo.css" rel="stylesheet" />
   <style><![CDATA[
     body {color: #000}
   ]]></style>
@@ -589,7 +624,7 @@ Generate submit input element.
 
   %=t div => 'some & content'
 
-Alias for C<tag>.
+Alias for L</"tag">.
 
   <div>some &amp; content</div>
 
@@ -598,14 +633,22 @@ Alias for C<tag>.
   %= tag 'div'
   %= tag 'div', id => 'foo'
   %= tag div => 'some & content'
-  <%= tag div => begin %>some & content<% end %>
+  %= tag div => (id => 'foo') => 'some & content'
+  %= tag div => begin
+    some & content
+  % end
+  <%= tag div => (id => 'foo') => begin %>some & content<% end %>
 
 HTML tag generator.
 
   <div />
   <div id="foo" />
   <div>some &amp; content</div>
-  <div>some & content</div>
+  <div id="foo">some &amp; content</div>
+  <div>
+    some & content
+  </div>
+  <div id="foo">some & content</div>
 
 Very useful for reuse in more specific tag helpers.
 
@@ -615,6 +658,14 @@ Very useful for reuse in more specific tag helpers.
 
 Results are automatically wrapped in L<Mojo::ByteStream> objects to prevent
 accidental double escaping.
+
+=head2 tag_with_error
+
+  %= tag_with_error 'input', class => 'foo'
+
+Same as L</"tag">, but adds the class C<field-with-error>.
+
+  <input class="foo field-with-error" />
 
 =head2 tel_field
 

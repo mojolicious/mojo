@@ -42,11 +42,8 @@ sub parse {
   else { return $self }
 
   # Prevent crash
-  my $epoch;
-  $epoch = eval { timegm($s, $m, $h, $day, $month, $year) };
-  $self->epoch($epoch) if !$@ && $epoch >= 0;
-
-  return $self;
+  my $epoch = eval { timegm($s, $m, $h, $day, $month, $year) };
+  return defined $epoch && $epoch >= 0 ? $self->epoch($epoch) : $self;
 }
 
 sub to_string {
@@ -108,7 +105,7 @@ following new ones.
   my $date = Mojo::Date->new;
   my $date = Mojo::Date->new('Sun Nov  6 08:49:37 1994');
 
-Construct a new L<Mojo::Date> object and C<parse> date if necessary.
+Construct a new L<Mojo::Date> object and L</"parse"> date if necessary.
 
 =head2 parse
 

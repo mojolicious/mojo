@@ -8,7 +8,7 @@ has usage       => "usage: $0 generate app [NAME]\n";
 
 sub run {
   my ($self, $class) = @_;
-  $class ||= 'MyMojoliciousApp';
+  $class ||= 'MyApp';
 
   # Prevent bad applications
   die <<EOF unless $class =~ /^[A-Z](?:\w|::)+$/;
@@ -94,8 +94,7 @@ sub welcome {
   my $self = shift;
 
   # Render template "example/welcome.html.ep" with message
-  $self->render(
-    message => 'Welcome to the Mojolicious real-time web framework!');
+  $self->render(msg => 'Welcome to the Mojolicious real-time web framework!');
 }
 
 1;
@@ -135,7 +134,7 @@ done_testing();
 @@ welcome
 %% layout 'default';
 %% title 'Welcome';
-<h2><%%= $message %></h2>
+<h2><%%= $msg %></h2>
 This page was generated from the template "templates/example/welcome.html.ep"
 and the layout "templates/layouts/default.html.ep",
 <a href="<%%== url_for %>">click here</a> to reload the page or

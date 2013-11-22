@@ -107,7 +107,7 @@ sub _error {
   return $self->close if $! == ECONNRESET || $! == EPIPE;
 
   # Error
-  $self->emit_safe(error => $!)->close;
+  $self->emit(error => $!)->close;
 }
 
 sub _read {
@@ -204,7 +204,7 @@ Emitted safely once all data has been written.
     ...
   });
 
-Emitted safely if an error occurs on the stream.
+Emitted if an error occurs on the stream, fatal if unhandled.
 
 =head2 read
 
@@ -277,14 +277,14 @@ Get handle for stream.
 
 =head2 is_readable
 
-  my $success = $stream->is_readable;
+  my $bool = $stream->is_readable;
 
 Quick non-blocking check if stream is readable, useful for identifying tainted
 sockets.
 
 =head2 is_writing
 
-  my $success = $stream->is_writing;
+  my $bool = $stream->is_writing;
 
 Check if stream is writing.
 

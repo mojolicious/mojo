@@ -36,14 +36,14 @@ sub setuidgid {
   # Group
   if (my $group = $self->group) {
     croak qq{Group "$group" does not exist}
-      unless defined(my $gid = (getgrnam($group))[2]);
+      unless defined(my $gid = getgrnam $group);
     POSIX::setgid($gid) or croak qq{Can't switch to group "$group": $!};
   }
 
   # User
   if (my $user = $self->user) {
     croak qq{User "$user" does not exist}
-      unless defined(my $uid = (getpwnam($self->user))[2]);
+      unless defined(my $uid = getpwnam $user);
     POSIX::setuid($uid) or croak qq{Can't switch to user "$user": $!};
   }
 
@@ -163,18 +163,16 @@ sub _listen {
   my $url     = Mojo::URL->new($listen);
   my $query   = $url->query;
   my $options = {
-    address  => $url->host,
-    backlog  => $self->backlog,
-    port     => $url->port,
-    reuse    => scalar $query->param('reuse'),
-    tls_ca   => scalar $query->param('ca'),
-    tls_cert => scalar $query->param('cert'),
-    tls_key  => scalar $query->param('key')
+    address => $url->host,
+    backlog => $self->backlog,
+    port    => $url->port,
+    reuse   => scalar $query->param('reuse'),
   };
+  $options->{"tls_$_"} = scalar $query->param($_) for qw(ca cert ciphers key);
   my $verify = $query->param('verify');
   $options->{tls_verify} = hex $verify if defined $verify;
   delete $options->{address} if $options->{address} eq '*';
-  my $tls = $options->{tls} = $url->protocol eq 'https' ? 1 : undef;
+  my $tls = $options->{tls} = $url->protocol eq 'https';
 
   weaken $self;
   push @{$self->acceptors}, $self->ioloop->server(
@@ -380,7 +378,7 @@ MOJO_LISTEN environment variable or C<http://*:3000>.
 
 These parameters are currently available:
 
-=over 4
+=over 2
 
 =item ca
 
@@ -393,6 +391,12 @@ Path to TLS certificate authority file.
   cert=/etc/tls/server.crt
 
 Path to the TLS cert file, defaults to a built-in test certificate.
+
+=item ciphers
+
+  ciphers=AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
+
+Cipher specification string.
 
 =item key
 
@@ -431,8 +435,8 @@ Maximum number of keep-alive requests per connection, defaults to C<25>.
 
 =head2 silent
 
-  my $silent = $daemon->silent;
-  $daemon    = $daemon->silent(1);
+  my $bool = $daemon->silent;
+  $daemon  = $daemon->silent($bool);
 
 Disable console messages.
 

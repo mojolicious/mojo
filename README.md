@@ -15,9 +15,9 @@
     file [Mojolicious::Lite](http://mojolicio.us/perldoc/Mojolicious/Lite)
     prototypes into well structured web applications.
     * Powerful out of the box with RESTful routes, plugins, commands, Perl-ish
-      templates, content negotiation, session management, testing framework,
-      static file server, first class Unicode support and much more for you to
-      discover.
+      templates, content negotiation, session management, form validation,
+      testing framework, static file server, first class Unicode support and
+      much more for you to discover.
   * Very clean, portable and Object Oriented pure-Perl API without any hidden
     magic and no requirements besides Perl 5.10.1 (although 5.16+ is
     recommended, and optional CPAN modules will be used to provide advanced
@@ -34,7 +34,7 @@
 
 ## Installation
 
-  All you need is a oneliner, it takes less than a minute.
+  All you need is a one-liner, it takes less than a minute.
 
     $ curl get.mojolicio.us | sh
 

@@ -47,7 +47,7 @@ $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
-<link href="//example.com/base.css" media="screen" rel="stylesheet" />
+<link href="//example.com/base.css" rel="stylesheet" />
 <a href="mailto:sri@example.com">Contact</a>
 http://example.com/rebased
 http://example.com/rebased/foo
@@ -71,11 +71,12 @@ foo
 EOF
 
 # Rebased route with flash
-ok !$t->ua->cookie_jar->find($t->ua->app_url->path('/foo')),
+ok !$t->ua->cookie_jar->find($t->ua->server->url->path('/foo')),
   'no session cookie';
 $t->get_ok('/bar')->status_is(302)->header_is('X-Route' => 'bar')
   ->header_is(Location => 'http://example.com/rebased/foo');
-ok $t->ua->cookie_jar->find($t->ua->app_url->path('/foo')), 'session cookie';
+ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo')),
+  'session cookie';
 
 # Rebased route with message from flash
 $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
@@ -95,7 +96,7 @@ $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
-<link href="//example.com/base.css" media="screen" rel="stylesheet" />
+<link href="//example.com/base.css" rel="stylesheet" />
 <a href="mailto:sri@example.com">Contact</a>
 http://example.com/rebased/baz
 http://example.com/rebased/foo

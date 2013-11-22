@@ -257,6 +257,16 @@ $loop->start;
 ok !$err, 'no error';
 is $loop->max_accepts, 1, 'right value';
 
+# Exception in timer
+{
+  local *STDERR;
+  open STDERR, '>', \my $err;
+  my $loop = Mojo::IOLoop->new;
+  $loop->timer(0 => sub { die 'Bye!' });
+  $loop->start;
+  like $err, qr/^MyReactor:.*Bye!/, 'right error';
+}
+
 # Defaults
 is(
   Mojo::IOLoop::Client->new->reactor,

@@ -3,13 +3,13 @@
   <head>
     <title><%= $title %></title>
     %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo.css'
+    %= stylesheet '/mojo/prettify/prettify-mojo-light.css'
     %= stylesheet begin
       a { color: inherit }
       a:hover { color: #2a2a2a }
       a img { border: 0 }
       body {
-        background-color: #f5f6f8;
+        background: url(<%= url_for '/mojo/pinstripe-light.png' %>);
         color: #445555;
         font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
         font-weight: normal;
@@ -23,17 +23,16 @@
       }
       h1 a, h2 a, h3 a { text-decoration: none }
       pre {
-        background-color: #eee;
-        background: url(<%= url_for '/mojo/pinstripe.gif' %>);
-        -moz-border-radius: 5px;
-        border-radius: 5px;
-        color: #eee;
-        font: 0.8em Consolas, Menlo, Monaco, Courier, monospace;
-        line-height: 1.7em;
-        text-align: left;
-        text-shadow: #333 0 1px 0;
+        background: url(<%= url_for '/mojo/stripes.png' %>);
+        border: 1px solid #d1d1d1;
+        box-shadow: 0 1px #fff, inset -1px 1px 4px rgba(0, 0, 0, 0.1);
+        color: #4d4d4c;
+        font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
+        line-height: 1.5em;
         padding-bottom: 1.5em;
         padding-top: 1.5em;
+        text-align: left;
+        text-shadow: #eee 0 1px 0;
         white-space: pre-wrap;
       }
       #footer {
@@ -42,19 +41,16 @@
       }
       #perldoc {
         background-color: #fff;
-        -moz-border-radius-bottomleft: 5px;
         border-bottom-left-radius: 5px;
-        -moz-border-radius-bottomright: 5px;
         border-bottom-right-radius: 5px;
-        -moz-box-shadow: 0px 0px 2px #ccc;
-        -webkit-box-shadow: 0px 0px 2px #ccc;
-        box-shadow: 0px 0px 2px #ccc;
+        box-shadow: 0px 0px 2px #999;
         margin-left: 5em;
         margin-right: 5em;
         padding: 3em;
         padding-top: 70px;
       }
       #perldoc > ul:first-of-type a { text-decoration: none }
+      #source { padding-bottom: 1em }
       #wrapperlicious {
         max-width: 1000px;
         margin: 0 auto;
@@ -63,20 +59,26 @@
   </head>
   <body>
     %= include inline => app->renderer->_bundled('mojobar')
-    % my $link = begin
-      %= link_to shift, shift, class => "mojoscroll"
-    % end
     <div id="wrapperlicious">
       <div id="perldoc">
+        <div id="source">
+          % my $path;
+          % for my $part (split '/', $module) {
+            %= '::' if $path
+            % $path .= "/$part";
+            %= link_to $part => url_for("/perldoc$path")
+          % }
+          (<%= link_to 'source' => url_for("/perldoc$path.txt") %>)
+        </div>
         <h1><a id="toc">TABLE OF CONTENTS</a></h1>
         <ul>
           % for my $part (@$parts) {
             <li>
-              %= $link->(splice @$part, 0, 2)
+              %= link_to splice(@$part, 0, 2)
               % if (@$part) {
                 <ul>
                   % while (@$part) {
-                    <li><%= $link->(splice @$part, 0, 2) %></li>
+                    <li><%= link_to splice(@$part, 0, 2) %></li>
                   % }
                 </ul>
               % }

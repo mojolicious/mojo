@@ -6,11 +6,11 @@ has 'tree';
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
   \[
-  ((?:$ESCAPE_RE|[\w\-])+)        # Key
+  ((?:$ESCAPE_RE|[\w\-])+)           # Key
   (?:
-    (\W)?                         # Operator
+    (\W)?                            # Operator
     =
-    (?:"((?:\\"|[^"])*)"|(\S+))   # Value
+    (?:"((?:\\"|[^"])*)"|([^\]]+))   # Value
   )?
   \]
 /x;
@@ -33,6 +33,13 @@ my $TOKEN_RE        = qr/
   )?
 /x;
 
+sub match {
+  my $self = shift;
+  my $tree = $self->tree;
+  return undef if $tree->[0] eq 'root';
+  return $self->_match($self->_compile(shift), $tree, $tree);
+}
+
 sub select {
   my $self = shift;
 
@@ -43,19 +50,14 @@ sub select {
   while (my $current = shift @queue) {
     my $type = $current->[0];
 
-    # Root
-    if ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
-
     # Tag
-    elsif ($type eq 'tag') {
+    if ($type eq 'tag') {
       unshift @queue, @$current[4 .. $#$current];
-
-      # Try all selectors with element
-      for my $part (@$pattern) {
-        push @results, $current and last
-          if $self->_combinator([reverse @$part], $current, $tree);
-      }
+      push @results, $current if $self->_match($pattern, $current, $tree);
     }
+
+    # Root
+    elsif ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
   }
 
   return \@results;
@@ -148,12 +150,8 @@ sub _compile {
 
     # Class or ID
     while ($element =~ /$CLASS_ID_RE/g) {
-
-      # Class
       push @$selector, ['attr', 'class', $self->_regex('~', $1)] if defined $1;
-
-      # ID
-      push @$selector, ['attr', 'id', $self->_regex('', $2)] if defined $2;
+      push @$selector, ['attr', 'id',    $self->_regex('',  $2)] if defined $2;
     }
 
     # Pseudo classes
@@ -186,28 +184,33 @@ sub _equation {
   my ($self, $equation) = @_;
 
   # "even"
-  my $num = [1, 1];
-  if ($equation =~ /^even$/i) { $num = [2, 2] }
+  return [2, 2] if $equation =~ /^even$/i;
 
   # "odd"
-  elsif ($equation =~ /^odd$/i) { $num = [2, 1] }
+  return [2, 1] if $equation =~ /^odd$/i;
 
   # Equation
-  elsif ($equation =~ /(?:(-?(?:\d+)?)?(n))?\s*\+?\s*(-?\s*\d+)?\s*$/i) {
-    $num->[0] = defined($1) && length($1) ? $1 : $2 ? 1 : 0;
-    $num->[0] = -1 if $num->[0] eq '-';
-    $num->[1] = $3 // 0;
-    $num->[1] =~ s/\s+//g;
-  }
-
+  my $num = [1, 1];
+  return $num if $equation !~ /(?:(-?(?:\d+)?)?(n))?\s*\+?\s*(-?\s*\d+)?\s*$/i;
+  $num->[0] = defined($1) && length($1) ? $1 : $2 ? 1 : 0;
+  $num->[0] = -1 if $num->[0] eq '-';
+  $num->[1] = $3 // 0;
+  $num->[1] =~ s/\s+//g;
   return $num;
+}
+
+sub _match {
+  my ($self, $pattern, $current, $tree) = @_;
+  $self->_combinator([reverse @$_], $current, $tree) and return 1
+    for @$pattern;
+  return undef;
 }
 
 sub _parent {
   my ($self, $selectors, $current, $tree) = @_;
   return undef unless my $parent = $current->[3];
   return undef if $parent->[0] eq 'root';
-  return $self->_combinator($selectors, $parent, $tree) ? 1 : undef;
+  return $self->_combinator($selectors, $parent, $tree);
 }
 
 sub _pc {
@@ -589,7 +592,7 @@ Elements of type C<E>, C<F> and C<G>.
 
 An C<E> element whose attributes match all following attribute selectors.
 
-  my $links = $css->select('a[foo^="b"][foo$="ar"]');
+  my $links = $css->select('a[foo^=b][foo$=ar]');
 
 =head1 ATTRIBUTES
 
@@ -608,11 +611,17 @@ carefully since it is very dynamic.
 L<Mojo::DOM::CSS> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 match
+
+  my $bool = $css->match('head > title');
+
+Match CSS selector against first node in L</"tree">.
+
 =head2 select
 
   my $results = $css->select('head > title');
 
-Run CSS selector against C<tree>.
+Run CSS selector against L</"tree">.
 
 =head1 SEE ALSO
 

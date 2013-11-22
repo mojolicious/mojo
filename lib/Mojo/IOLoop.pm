@@ -10,7 +10,7 @@ use Mojo::IOLoop::Server;
 use Mojo::IOLoop::Stream;
 use Mojo::Reactor::Poll;
 use Mojo::Util qw(md5_sum steady_time);
-use Scalar::Util 'weaken';
+use Scalar::Util qw(blessed weaken);
 
 use constant DEBUG => $ENV{MOJO_IOLOOP_DEBUG} || 0;
 
@@ -22,7 +22,9 @@ has multi_accept    => 50;
 has reactor         => sub {
   my $class = Mojo::Reactor::Poll->detect;
   warn "-- Reactor initialized ($class)\n" if DEBUG;
-  return $class->new;
+  my $reactor = $class->new;
+  $reactor->on(error => sub { warn "@{[blessed $_[0]]}: $_[1]" });
+  return $reactor;
 };
 
 # Ignore PIPE signal
@@ -378,7 +380,7 @@ Number of connections to accept at once, defaults to C<50>.
   $loop       = $loop->reactor(Mojo::Reactor->new);
 
 Low level event reactor, usually a L<Mojo::Reactor::Poll> or
-L<Mojo::Reactor::EV> object.
+L<Mojo::Reactor::EV> object with a default C<error> event.
 
   # Watch if handle becomes readable or writable
   $loop->reactor->io($handle => sub {
@@ -480,8 +482,8 @@ Find a free TCP port, this is a utility function primarily used for tests.
 
 =head2 is_running
 
-  my $success = Mojo::IOLoop->is_running;
-  my $success = $loop->is_running;
+  my $bool = Mojo::IOLoop->is_running;
+  my $bool = $loop->is_running;
 
 Check if event loop is running.
 
@@ -494,6 +496,11 @@ Check if event loop is running.
 
 Run event loop until an event occurs. Note that this method can recurse back
 into the reactor, so you need to be careful.
+
+  # Don't block longer than 0.5 seconds
+  my $id = Mojo::IOLoop->timer(0.5 => sub {});
+  Mojo::IOLoop->one_tick;
+  Mojo::IOLoop->remove($id);
 
 =head2 recurring
 
@@ -549,8 +556,8 @@ loop object from everywhere inside the process.
   Mojo::IOLoop->start;
   $loop->start;
 
-Start the event loop, this will block until C<stop> is called. Note that some
-reactors stop automatically if there are no events being watched anymore.
+Start the event loop, this will block until L</"stop"> is called. Note that
+some reactors stop automatically if there are no events being watched anymore.
 
   # Start event loop only if it is not running already
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
@@ -561,7 +568,7 @@ reactors stop automatically if there are no events being watched anymore.
   $loop->stop;
 
 Stop the event loop, this will not interrupt any existing connections and the
-event loop can be restarted by running C<start> again.
+event loop can be restarted by running L</"start"> again.
 
 =head2 stream
 

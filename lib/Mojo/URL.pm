@@ -176,8 +176,7 @@ sub to_rel {
   my @base_parts = @{$base_path->parts};
   pop @base_parts unless $base_path->trailing_slash;
   while (@parts && @base_parts && $parts[0] eq $base_parts[0]) {
-    shift @parts;
-    shift @base_parts;
+    shift @$_ for \@parts, \@base_parts;
   }
   my $path = $rel->path(Mojo::Path->new)->path;
   $path->leading_slash(1) if $rel->authority;
@@ -305,7 +304,7 @@ following new ones.
   my $url = Mojo::URL->new;
   my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
 
-Construct a new L<Mojo::URL> object and C<parse> URL if necessary.
+Construct a new L<Mojo::URL> object and L</"parse"> URL if necessary.
 
 =head2 authority
 
@@ -332,7 +331,7 @@ Host part of this URL in punycode format.
 
 =head2 is_abs
 
-  my $success = $url->is_abs;
+  my $bool = $url->is_abs;
 
 Check if URL is absolute.
 
@@ -374,7 +373,7 @@ defaults to a L<Mojo::Path> object.
 
   my $proto = $url->protocol;
 
-Normalized version of C<scheme>.
+Normalized version of L</"scheme">.
 
   # "http"
   Mojo::URL->new('HtTp://example.com')->protocol;
@@ -413,14 +412,40 @@ appended, defaults to a L<Mojo::Parameters> object.
   my $abs = $url->to_abs;
   my $abs = $url->to_abs(Mojo::URL->new('http://example.com/foo'));
 
-Clone relative URL and turn it into an absolute one.
+Clone relative URL and turn it into an absolute one using L</"base"> or
+provided base URL.
+
+  # "http://example.com/foo/baz.xml?test=123"
+  Mojo::URL->new('baz.xml?test=123')
+    ->to_abs(Mojo::URL->new('http://example.com/foo/bar.html'));
+
+  # "http://example.com/baz.xml?test=123"
+  Mojo::URL->new('/baz.xml?test=123')
+    ->to_abs(Mojo::URL->new('http://example.com/foo/bar.html'));
+
+  # "http://example.com/foo/baz.xml?test=123"
+  Mojo::URL->new('//example.com/foo/baz.xml?test=123')
+    ->to_abs(Mojo::URL->new('http://example.com/foo/bar.html'));
 
 =head2 to_rel
 
   my $rel = $url->to_rel;
   my $rel = $url->to_rel(Mojo::URL->new('http://example.com/foo'));
 
-Clone absolute URL and turn it into a relative one.
+Clone absolute URL and turn it into a relative one using L</"base"> or
+provided base URL.
+
+  # "foo/bar.html?test=123"
+  Mojo::URL->new('http://example.com/foo/bar.html?test=123')
+    ->to_rel(Mojo::URL->new('http://example.com'));
+
+  # "bar.html?test=123"
+  Mojo::URL->new('http://example.com/foo/bar.html?test=123')
+    ->to_rel(Mojo::URL->new('http://example.com/foo/'));
+
+  # "//example.com/foo/bar.html?test=123"
+  Mojo::URL->new('http://example.com/foo/bar.html?test=123')
+    ->to_rel(Mojo::URL->new('http://'));
 
 =head2 to_string
 

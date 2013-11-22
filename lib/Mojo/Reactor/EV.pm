@@ -62,8 +62,9 @@ sub _timer {
   weaken $self;
   $self->{timers}{$id}{watcher} = EV::timer(
     $after => $after => sub {
-      $self->_sandbox("Timer $id", $self->{timers}{$id}{cb});
-      delete $self->{timers}{$id} unless $recurring;
+      my $timer = $self->{timers}{$id};
+      delete delete($self->{timers}{$id})->{watcher} unless $recurring;
+      $self->_sandbox("Timer $id", $timer->{cb});
     }
   );
 
@@ -129,7 +130,7 @@ Restart active timer.
 
 =head2 is_running
 
-  my $success = $reactor->is_running;
+  my $bool = $reactor->is_running;
 
 Check if reactor is running.
 
@@ -151,7 +152,7 @@ amount of time in seconds.
 
   $reactor->start;
 
-Start watching for I/O and timer events, this will block until C<stop> is
+Start watching for I/O and timer events, this will block until L</"stop"> is
 called or no events are being watched anymore.
 
 =head2 stop

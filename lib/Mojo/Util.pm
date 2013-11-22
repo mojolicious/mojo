@@ -2,6 +2,7 @@ package Mojo::Util;
 use Mojo::Base 'Exporter';
 
 use Carp qw(carp croak);
+use Data::Dumper ();
 use Digest::MD5 qw(md5 md5_hex);
 use Digest::SHA qw(hmac_sha1 sha1 sha1_hex);
 use Encode 'find_encoding';
@@ -25,7 +26,7 @@ use constant {
   PC_INITIAL_N    => 128
 };
 
-# To update HTML5 entities run this command
+# To update HTML entities run this command
 # perl examples/entities.pl > lib/Mojo/entities.txt
 my %ENTITIES;
 for my $line (split "\x0a", slurp(catfile dirname(__FILE__), 'entities.txt')) {
@@ -38,8 +39,8 @@ my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated encode get_line hmac_sha1_sum html_unescape md5_bytes),
-  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(decode deprecated dumper encode get_line hmac_sha1_sum html_unescape),
+  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
   qw(steady_time trim unquote url_escape url_unescape xml_escape xor_encode)
 );
@@ -94,6 +95,8 @@ sub deprecated {
   local $Carp::CarpLevel = 1;
   $ENV{MOJO_FATAL_DEPRECATIONS} ? croak(@_) : carp(@_);
 }
+
+sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Dump }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
 
@@ -479,6 +482,12 @@ Decode bytes to characters and return C<undef> if decoding failed.
 Warn about deprecated feature from perspective of caller. You can also set the
 MOJO_FATAL_DEPRECATIONS environment variable to make them die instead.
 
+=head2 dumper
+
+  my $perl = dumper {some => 'data'};
+
+Dump a Perl data structure with L<Data::Dumper>.
+
 =head2 encode
 
   my $bytes = encode 'UTF-8', $chars;
@@ -548,7 +557,7 @@ Quote string.
 
 =head2 secure_compare
 
-  my $success = secure_compare $str1, $str2;
+  my $bool = secure_compare $str1, $str2;
 
 Constant time comparison algorithm to prevent timing attacks.
 
@@ -566,7 +575,7 @@ Generate SHA1 checksum for bytes.
 
 =head2 slurp
 
-  my $content = slurp '/etc/passwd';
+  my $bytes = slurp '/etc/passwd';
 
 Read all data at once from file.
 
@@ -587,7 +596,7 @@ Split HTTP header value.
 
 =head2 spurt
 
-  $content = spurt $content, '/etc/passwd';
+  $bytes = spurt $bytes, '/etc/passwd';
 
 Write all data at once to file.
 

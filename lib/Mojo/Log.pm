@@ -125,39 +125,24 @@ L<Mojo::Log> implements the following attributes.
   my $handle = $log->handle;
   $log       = $log->handle(IO::Handle->new);
 
-Log filehandle used by default C<message> event, defaults to opening C<path>
-or C<STDERR>.
+Log filehandle used by default L</"message"> event, defaults to opening
+L</"path"> or C<STDERR>.
 
 =head2 level
 
   my $level = $log->level;
   $log      = $log->level('debug');
 
-Active log level, defaults to C<debug>. Note that the MOJO_LOG_LEVEL
-environment variable can override this value.
-
-These levels are currently available:
-
-=over 2
-
-=item debug
-
-=item info
-
-=item warn
-
-=item error
-
-=item fatal
-
-=back
+Active log level, defaults to C<debug>. Available log levels are C<debug>,
+C<info>, C<warn>, C<error> and C<fatal>, in that order. Note that the
+MOJO_LOG_LEVEL environment variable can override this value.
 
 =head2 path
 
   my $path = $log->path
   $log     = $log->path('/var/log/mojo.log');
 
-Log file path used by C<handle>.
+Log file path used by L</"handle">.
 
 =head1 METHODS
 
@@ -168,7 +153,7 @@ the following new ones.
 
   my $log = Mojo::Log->new;
 
-Construct a new L<Mojo::Log> object and subscribe to C<message> event with
+Construct a new L<Mojo::Log> object and subscribe to L</"message"> event with
 default logger.
 
 =head2 debug
@@ -208,37 +193,37 @@ Log info message.
 
 =head2 is_level
 
-  my $success = $log->is_level('debug');
+  my $bool = $log->is_level('debug');
 
 Check log level.
 
 =head2 is_debug
 
-  my $success = $log->is_debug;
+  my $bool = $log->is_debug;
 
 Check for debug log level.
 
 =head2 is_error
 
-  my $success = $log->is_error;
+  my $bool = $log->is_error;
 
 Check for error log level.
 
 =head2 is_fatal
 
-  my $success = $log->is_fatal;
+  my $bool = $log->is_fatal;
 
 Check for fatal log level.
 
 =head2 is_info
 
-  my $success = $log->is_info;
+  my $bool = $log->is_info;
 
 Check for info log level.
 
 =head2 is_warn
 
-  my $success = $log->is_warn;
+  my $bool = $log->is_warn;
 
 Check for warn log level.
 
@@ -247,7 +232,7 @@ Check for warn log level.
   $log = $log->log(debug => 'This should work.');
   $log = $log->log(debug => 'This', 'too!');
 
-Emit C<message> event.
+Emit L</"message"> event.
 
 =head2 warn
 

@@ -4,12 +4,10 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Asset::File;
 use Mojo::ByteStream 'b';
 use Mojo::DOM;
+use Mojo::URL;
 use Mojo::Util qw(slurp url_escape);
 use Pod::Simple::HTML;
 use Pod::Simple::Search;
-
-# Paths to search
-my @PATHS = map { $_, "$_/pods" } @INC;
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -30,71 +28,50 @@ sub register {
   $app->helper(pod_to_html => sub { shift; b(_pod_to_html(@_)) });
 
   # Perldoc browser
-  return if $conf->{no_perldoc};
+  return undef if $conf->{no_perldoc};
+  my $defaults = {module => 'Mojolicious/Guides', format => 'html'};
   return $app->routes->any(
-    '/perldoc/*module' => {module => 'Mojolicious/Guides'} => \&_perldoc);
+    '/perldoc/:module' => $defaults => [module => qr/[^.]+/] => \&_perldoc);
 }
 
-sub _perldoc {
-  my $self = shift;
-
-  # Find module or redirect to CPAN
-  my $module = $self->param('module');
-  $module =~ s!/!::!g;
-  my $path = Pod::Simple::Search->new->find($module, @PATHS);
-  return $self->redirect_to("http://metacpan.org/module/$module")
-    unless $path && -r $path;
-  my $html = _pod_to_html(slurp $path);
+sub _html {
+  my ($self, $src) = @_;
 
   # Rewrite links
-  my $dom     = Mojo::DOM->new("$html");
+  my $dom     = Mojo::DOM->new(_pod_to_html($src));
   my $perldoc = $self->url_for('/perldoc/');
-  $dom->find('a[href]')->each(
-    sub {
-      my $attrs = shift->attr;
-      $attrs->{href} =~ s!%3A%3A!/!gi
-        if $attrs->{href} =~ s!^http://search\.cpan\.org/perldoc\?!$perldoc!;
-    }
-  );
+  for my $e ($dom->find('a[href]')->each) {
+    my $attrs = $e->attr;
+    $attrs->{href} =~ s!%3A%3A!/!gi
+      if $attrs->{href} =~ s!^http://search\.cpan\.org/perldoc\?!$perldoc!;
+  }
 
   # Rewrite code blocks for syntax highlighting
-  $dom->find('pre')->each(
-    sub {
-      my $e = shift;
-      return if $e->all_text =~ /^\s*\$\s+/m;
-      my $attrs = $e->attr;
-      my $class = $attrs->{class};
-      $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';
-    }
-  );
+  for my $e ($dom->find('pre')->each) {
+    next if $e->all_text =~ /^\s*\$\s+/m;
+    my $attrs = $e->attr;
+    my $class = $attrs->{class};
+    $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';
+  }
 
   # Rewrite headers
-  my $url = $self->req->url->clone;
+  my $toc = Mojo::URL->new->fragment('toc');
   my (%anchors, @parts);
-  $dom->find('h1, h2, h3')->each(
-    sub {
-      my $e = shift;
+  for my $e ($dom->find('h1, h2, h3')->each) {
 
-      # Anchor and text
-      my $name = my $text = $e->all_text;
-      $name =~ s/\s+/_/g;
-      $name =~ s/[^\w\-]//g;
-      my $anchor = $name;
-      my $i      = 1;
-      $anchor = $name . $i++ while $anchors{$anchor}++;
+    # Anchor and text
+    my $name = my $text = $e->all_text;
+    $name =~ s/\s+/_/g;
+    $name =~ s/[^\w\-]//g;
+    my $anchor = $name;
+    my $i      = 1;
+    $anchor = $name . $i++ while $anchors{$anchor}++;
 
-      # Rewrite
-      push @parts, [] if $e->type eq 'h1' || !@parts;
-      push @{$parts[-1]}, $text, $url->fragment($anchor)->to_abs;
-      $e->replace_content(
-        $self->link_to(
-          $text => $url->fragment('toc')->to_abs,
-          class => 'mojoscroll',
-          id    => $anchor
-        )
-      );
-    }
-  );
+    # Rewrite
+    push @parts, [] if $e->type eq 'h1' || !@parts;
+    push @{$parts[-1]}, $text, Mojo::URL->new->fragment($anchor);
+    $e->replace_content($self->link_to($text => $toc, id => $anchor));
+  }
 
   # Try to find a title
   my $title = 'Perldoc';
@@ -104,11 +81,25 @@ sub _perldoc {
   $self->content_for(perldoc => "$dom");
   my $template = $self->app->renderer->_bundled('perldoc');
   $self->render(inline => $template, title => $title, parts => \@parts);
-  $self->res->headers->content_type('text/html;charset="UTF-8"');
+}
+
+sub _perldoc {
+  my $self = shift;
+
+  # Find module or redirect to CPAN
+  my $module = $self->param('module');
+  $module =~ s!/!::!g;
+  my $path
+    = Pod::Simple::Search->new->find($module, map { $_, "$_/pods" } @INC);
+  return $self->redirect_to("http://metacpan.org/module/$module")
+    unless $path && -r $path;
+
+  my $src = slurp $path;
+  $self->respond_to(txt => {data => $src}, html => sub { _html($self, $src) });
 }
 
 sub _pod_to_html {
-  return undef unless defined(my $pod = shift);
+  return '' unless defined(my $pod = shift);
 
   # Block
   $pod = $pod->() if ref $pod eq 'CODE';

@@ -117,11 +117,11 @@ post sub { shift->render(text => 'prefixed POST works!') };
 
 get '/works' => sub { shift->render(text => 'prefix works!') };
 
-under '/prefix2' => {message => 'prefixed'};
+under '/prefix2' => {msg => 'prefixed'};
 
-get '/foo' => {inline => '<%= $message %>!'};
+get '/foo' => {inline => '<%= $msg %>!'};
 
-get '/bar' => {inline => 'also <%= $message %>!'};
+get '/bar' => {inline => 'also <%= $msg %>!'};
 
 # Reset
 under '/' => {foo => 'one'};
@@ -192,12 +192,15 @@ $t->get_ok('/missing')->status_is(404)->content_is("Oops!\n");
 
 # Suspended bridge
 my $log = '';
-my $cb = $t->ua->app->log->on(message => sub { $log .= pop });
+my $cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/suspended?ok=1')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('suspended!');
-like $log, qr/Nothing has been rendered, expecting delayed response./,
+like $log, qr!GET "/suspended"\.!,      'right message';
+like $log, qr/Routing to a callback\./, 'right message';
+like $log, qr/Nothing has been rendered, expecting delayed response\./,
   'right message';
-$t->ua->app->log->unsubscribe(message => $cb);
+like $log, qr/Rendering inline template\./, 'right message';
+$t->app->log->unsubscribe(message => $cb);
 
 # Suspended bridge (stopped)
 $t->get_ok('/suspended?ok=0')->status_is(200)
@@ -239,37 +242,43 @@ $t->get_ok('/param_auth/too?name=Bender')->status_is(200)
 
 # No cookies, session or flash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!\n");
+  ->content_is("stash too!!!!!!!!\n");
 ok $t->tx->res->cookie('mojolicious')->expires, 'has expiration';
 is $stash->{_name}, 'stash', 'right "_name" value';
 
 # Cookies, session and flash
+$log = '';
+$cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!\n");
+  "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
+like $log, qr/Cookie "foo" not signed\./, 'right message';
+like $log, qr/Bad signed cookie "bad", possible hacking attempt\./,
+  'right message';
 ok $t->tx->res->cookie('mojolicious')->httponly,
   'session cookie has HttpOnly flag';
+$t->app->log->unsubscribe(message => $cb);
 
 # Broken session cookie
 $t->reset_session;
 my $session = b("☃☃☃☃☃")->encode->b64_encode('');
 my $hmac    = $session->clone->hmac_sha1_sum($t->app->secret);
 $t->get_ok('/bridge2stash' => {Cookie => "mojolicious=$session--$hmac"})
-  ->status_is(200)->content_is("stash too!!!!!!!\n");
+  ->status_is(200)->content_is("stash too!!!!!!!!\n");
 
 # Without cookie jar
 $t->ua->cookie_jar(0);
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!\n");
+  ->content_is("stash too!!!!!!!!\n");
 
 # Again without cookie jar
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!\n");
+  ->content_is("stash too!!!!!!!!\n");
 $t->reset_session->ua->cookie_jar(Mojo::UserAgent::CookieJar->new);
 
 # Fresh start without cookies, session or flash
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
-  ->content_is("stash too!!!!!!!\n");
+  ->content_is("stash too!!!!!!!!\n");
 
 # Random static requests
 $t->get_ok('/mojo/logo-white.png')->status_is(200);
@@ -280,18 +289,18 @@ $t->get_ok('/mojo/logo-black.png')->status_is(200);
 # With cookies, session and flash again
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!\n");
+  "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
 
 # With cookies and session but no flash
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!\n");
+  "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!!\n");
 ok $t->tx->res->cookie('mojolicious')->expires->epoch < time,
   'session cookie expires';
 
 # With cookies and session cleared
 $t->get_ok('/bridge2stash')->status_is(200)
-  ->content_is("stash too!cookie!signed_cookie!!bad_cookie--12345678!!!\n");
+  ->content_is("stash too!cookie!!signed_cookie!!bad_cookie--12345678!!!\n");
 
 # Late session does not affect rendering
 $t->get_ok('/late/session')->status_is(200)->content_is('not yet!');
@@ -311,17 +320,17 @@ is $stash->{_name}, undef, 'no "_name" value';
 # Cookies, session and no flash again
 $t->get_ok('/bridge2stash' => {'X-Flash' => 1})->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!\n");
+  "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!!\n");
 
 # With cookies, session and flash
 $t->get_ok('/bridge2stash')->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!flash!\n");
+  "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!flash!\n");
 
 # With cookies and session but no flash
 $t->get_ok('/bridge2stash' => {'X-Flash2' => 1})->status_is(200)
   ->content_is(
-  "stash too!cookie!signed_cookie!!bad_cookie--12345678!session!!\n");
+  "stash too!cookie!!signed_cookie!!bad_cookie--12345678!session!!\n");
 
 # Prefix
 $t->get_ok('/prefix')->status_is(200)
@@ -385,7 +394,8 @@ $t->get_ok('/some_formats')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8')->content_is("Oops!\n");
 
 # Format "txt" has been detected
-$t->get_ok('/some_formats.txt')->status_is(200)->content_type_is('text/plain')
+$t->get_ok('/some_formats.txt')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_is('Some format detection.');
 
 # Format "json" has been detected
@@ -435,6 +445,7 @@ Not Bender!
 @@ bridge2stash.html.ep
 % my $cookie = $self->req->cookie('mojolicious');
 <%= stash('_name') %> too!<%= $self->cookie('foo') %>!\
+<%= $self->signed_cookie('foo') %>!\
 <%= $self->signed_cookie('bar')%>!<%= $self->signed_cookie('bad')%>!\
 <%= $self->cookie('bad') %>!<%= session 'foo' %>!\
 <%= flash 'foo' %>!

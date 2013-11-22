@@ -67,7 +67,7 @@ sub merge {
 sub parse {
   my $self = shift;
   $self->{path} = shift;
-  delete $self->{$_} for qw(leading_slash parts trailing_slash);
+  delete @$self{qw(leading_slash parts trailing_slash)};
   return $self;
 }
 
@@ -81,7 +81,7 @@ sub to_abs_string {
 sub to_dir {
   my $clone = shift->clone;
   pop @{$clone->parts} unless $clone->trailing_slash;
-  return $clone->trailing_slash(@{$clone->parts} ? 1 : 0);
+  return $clone->trailing_slash(!!@{$clone->parts});
 }
 
 sub to_route {
@@ -119,9 +119,9 @@ sub _parse {
     my $path = url_unescape delete($self->{path}) // '';
     my $charset = $self->charset;
     $path = decode($charset, $path) // $path if $charset;
-    $self->{leading_slash}  = $path =~ s!^/!! ? 1 : undef;
-    $self->{trailing_slash} = $path =~ s!/$!! ? 1 : undef;
-    $self->{parts} = [split '/', $path, -1];
+    $self->{leading_slash}  = $path =~ s!^/!!;
+    $self->{trailing_slash} = $path =~ s!/$!!;
+    $self->{parts}          = [split '/', $path, -1];
   }
 
   return $self->{$name} unless @_;
@@ -178,7 +178,7 @@ following new ones.
   my $path = Mojo::Path->new;
   my $path = Mojo::Path->new('/foo%2Fbar%3B/baz.html');
 
-Construct a new L<Mojo::Path> object and C<parse> path if necessary.
+Construct a new L<Mojo::Path> object and L</"parse"> path if necessary.
 
 =head2 canonicalize
 
@@ -189,6 +189,9 @@ Canonicalize path.
   # "/foo/baz"
   Mojo::Path->new('/foo/./bar/../baz')->canonicalize;
 
+  # "/../baz"
+  Mojo::Path->new('/foo/../bar/../../baz')->canonicalize;
+
 =head2 clone
 
   my $clone = $path->clone;
@@ -197,7 +200,7 @@ Clone path.
 
 =head2 contains
 
-  my $success = $path->contains('/i/♥/mojolicious');
+  my $bool = $path->contains('/i/♥/mojolicious');
 
 Check if path contains given prefix.
 
@@ -213,8 +216,8 @@ Check if path contains given prefix.
 
 =head2 leading_slash
 
-  my $slash = $path->leading_slash;
-  $path     = $path->leading_slash(1);
+  my $bool = $path->leading_slash;
+  $path    = $path->leading_slash($bool);
 
 Path has a leading slash. Note that this method will normalize the path and
 that C<%2F> will be treated as C</> for security reasons.
@@ -301,8 +304,8 @@ Turn path into a string.
 
 =head2 trailing_slash
 
-  my $slash = $path->trailing_slash;
-  $path     = $path->trailing_slash(1);
+  my $bool = $path->trailing_slash;
+  $path    = $path->trailing_slash($bool);
 
 Path has a trailing slash. Note that this method will normalize the path and
 that C<%2F> will be treated as C</> for security reasons.

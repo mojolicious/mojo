@@ -294,7 +294,7 @@ is_deeply $req->param('hello'), 'world', 'right parameters';
 is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload',
   'right absolute URL';
 
-# Parse Apache 2.2.11 CGI environment variables and body (HTTPS)
+# Parse Apache 2.2.11 CGI environment variables and body (HTTPS=ON)
 $req = Mojo::Message::Request->new;
 $req->parse(
   CONTENT_LENGTH  => 11,
@@ -304,7 +304,7 @@ $req->parse(
   REQUEST_METHOD  => 'GET',
   SCRIPT_NAME     => '/test/index.cgi',
   HTTP_HOST       => 'localhost',
-  HTTPS           => 'on',
+  HTTPS           => 'ON',
   SERVER_PROTOCOL => 'HTTP/1.0'
 );
 $req->parse('hello=world');
@@ -443,7 +443,7 @@ is $req->content->progress, 0, 'right progress';
 $req->parse("--8jXGX\x0d\x0a");
 is $req->content->progress, 9, 'right progress';
 $req->parse(
-  "Content-Disposition: form-data; name = file; filename = file.txt\x0d\x0a"
+  "Content-Disposition: Form-Data; Name = file; Filename = file.txt\x0d\x0a"
     . "Content-Type: application/octet-stream\x0d\x0a\x0d\x0a");
 is $req->content->progress, 117, 'right progress';
 $req->parse('11023456789');
@@ -462,5 +462,28 @@ is $req->url->to_abs->to_string, 'http://127.0.0.1:13028/upload',
 my $file = $req->upload('file');
 is $file->filename, 'file.txt',    'right filename';
 is $file->slurp,    '11023456789', 'right uploaded content';
+
+# Parse IIS 7.5 like CGI environment (HTTPS=off)
+$req = Mojo::Message::Request->new;
+$req->parse(
+  CONTENT_LENGTH  => 0,
+  PATH_INFO       => '/index.pl/',
+  SERVER_SOFTWARE => 'Microsoft-IIS/7.5',
+  QUERY_STRING    => '',
+  REQUEST_METHOD  => 'GET',
+  SCRIPT_NAME     => '/index.pl',
+  HTTP_HOST       => 'test',
+  HTTPS           => 'off',
+  SERVER_PROTOCOL => 'HTTP/1.1'
+);
+ok $req->is_finished, 'request is finished';
+is $req->method, 'GET', 'right method';
+is $req->url->path, '', 'right URL';
+is $req->url->base->protocol, 'http',       'right base protocol';
+is $req->url->base->path,     '/index.pl/', 'right base path';
+is $req->url->base->host,     'test',       'right base host';
+ok !$req->url->query->to_string, 'no query';
+is $req->version, '1.1', 'right version';
+ok !$req->is_secure, 'not secure';
 
 done_testing();

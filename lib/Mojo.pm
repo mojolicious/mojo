@@ -15,10 +15,10 @@ has log  => sub { Mojo::Log->new };
 has ua   => sub {
   my $self = shift;
 
-  my $ua = Mojo::UserAgent->new->app($self);
+  my $ua = Mojo::UserAgent->new;
+  weaken $ua->server->app($self)->{app};
   weaken $self;
   $ua->on(error => sub { $self->log->error($_[1]) });
-  weaken $ua->{app};
 
   return $ua;
 };
@@ -27,7 +27,8 @@ sub new {
   my $self = shift->SUPER::new(@_);
 
   # Check if we have a log directory
-  my $home = $self->home->detect(ref $self);
+  my $home = $self->home;
+  $home->detect(ref $self) unless @{$home->parts};
   $self->log->path($home->rel_file('log/mojo.log'))
     if -w $home->rel_file('log');
 
@@ -94,7 +95,7 @@ frameworks. It provides all the basic tools and helpers needed to write
 simple web applications and higher level web frameworks, such as
 L<Mojolicious>.
 
-See L<Mojolicious> for more!
+See L<Mojolicious::Guides> for more!
 
 =head1 ATTRIBUTES
 
@@ -132,7 +133,7 @@ plugins, since non-blocking requests that are already in progress will
 interfere with new blocking ones.
 
   # Perform blocking request
-  my $body = $app->ua->get('example.com')->res->body;
+  say $app->ua->get('example.com')->res->body;
 
 =head1 METHODS
 
@@ -144,7 +145,8 @@ new ones.
   my $app = Mojo->new;
 
 Construct a new L<Mojo> application. Will automatically detect your home
-directory and set up logging to C<log/mojo.log> if there's a C<log> directory.
+directory if necessary and set up logging to C<log/mojo.log> if there's a
+C<log> directory.
 
 =head2 build_tx
 

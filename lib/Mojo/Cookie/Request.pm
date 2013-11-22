@@ -19,10 +19,9 @@ sub parse {
 
 sub to_string {
   my $self = shift;
-  return '' unless my $name = $self->name;
+  return '' unless length(my $name = $self->name // '');
   my $value = $self->value // '';
-  $value = $value =~ /[,;" ]/ ? quote($value) : $value;
-  return "$name=$value";
+  return join '=', $name, $value =~ /[,;" ]/ ? quote($value) : $value;
 }
 
 1;

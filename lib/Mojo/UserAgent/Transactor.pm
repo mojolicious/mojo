@@ -13,12 +13,8 @@ use Mojo::Transaction::WebSocket;
 use Mojo::URL;
 use Mojo::Util 'encode';
 
-has generators => sub { {} };
-
-sub new {
-  my $self = shift->SUPER::new(@_);
-  return $self->add_generator(form => \&_form)->add_generator(json => \&_json);
-}
+has generators => sub { {form => \&_form, json => \&_json} };
+has name => 'Mojolicious (Perl)';
 
 sub add_generator {
   my ($self, $name, $cb) = @_;
@@ -107,8 +103,11 @@ sub tx {
   $url = "http://$url" unless $url =~ m!^/|://!;
   ref $url ? $req->url($url) : $req->url->parse($url);
 
-  # Headers
-  $req->headers->from_hash(shift) if ref $_[0] eq 'HASH';
+  # Headers (we identify ourselves and accept gzip compression)
+  my $headers = $req->headers;
+  $headers->from_hash(shift) if ref $_[0] eq 'HASH';
+  $headers->user_agent($self->name) unless $headers->user_agent;
+  $headers->accept_encoding('gzip') unless $headers->accept_encoding;
 
   # Generator
   if (@_ > 1) {
@@ -290,19 +289,21 @@ L<Mojo::UserAgent::Transactor> implements the following attributes.
   my $generators = $t->generators;
   $t             = $t->generators({foo => sub {...}});
 
-Registered content generators.
+Registered content generators, by default only C<form> and C<json> are already
+defined.
+
+=head2 name
+
+  my $name = $t->name;
+  $t       = $t->name('Mojolicious');
+
+Value for C<User-Agent> request header of generated transactions, defaults to
+C<Mojolicious (Perl)>.
 
 =head1 METHODS
 
 L<Mojo::UserAgent::Transactor> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
-
-=head2 new
-
-  my $t = Mojo::UserAgent::Transactor->new;
-
-Construct a new transactor and register C<form> and C<json> content
-generators.
 
 =head2 add_generator
 

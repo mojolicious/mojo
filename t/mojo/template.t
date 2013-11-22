@@ -909,10 +909,10 @@ $output = $mt->render(<<'EOF');
 EOF
 is $output, "<html>\n</html>\n", 'commented out tags';
 
-# Oneliner
+# One-liner
 $mt     = Mojo::Template->new;
 $output = $mt->render('<html><%= 3 * 3 %></html>\\');
-is $output, '<html>9</html>', 'oneliner';
+is $output, '<html>9</html>', 'one-liner';
 
 # Different line start
 $mt = Mojo::Template->new;

@@ -6,12 +6,11 @@ use File::Spec::Functions qw(catdir catfile splitdir);
 use Mojo::Exception;
 use Mojo::Util qw(b64_decode class_to_path);
 
-my %CACHE;
+my (%BIN, %CACHE);
 
-sub data {
-  my ($self, $class, $data) = @_;
-  return $class ? $data ? _all($class)->{$data} : _all($class) : undef;
-}
+sub data { $_[1] ? $_[2] ? _all($_[1])->{$_[2]} : _all($_[1]) : undef }
+
+sub is_binary { keys %{_all($_[1])} ? !!$BIN{$_[1]}{$_[2]} : undef }
 
 sub load {
   my ($self, $module) = @_;
@@ -23,8 +22,7 @@ sub load {
   return undef if $module->can('new') || eval "require $module; 1";
 
   # Exists
-  my $path = class_to_path $module;
-  return 1 if $@ =~ /^Can't locate $path in \@INC/;
+  return 1 if $@ =~ /^Can't locate \Q@{[class_to_path $module]}\E in \@INC/;
 
   # Real error
   return Mojo::Exception->new($@);
@@ -52,29 +50,26 @@ sub search {
 sub _all {
   my $class = shift;
 
-  # Refresh or use cached data
   my $handle = do { no strict 'refs'; \*{"${class}::DATA"} };
-  return $CACHE{$class} || {} unless fileno $handle;
+  return $CACHE{$class} || {} if $CACHE{$class} || !fileno $handle;
   seek $handle, 0, 0;
-  my $content = join '', <$handle>;
-  close $handle;
+  my $data = join '', <$handle>;
 
   # Ignore everything before __DATA__ (Windows will seek to start of file)
-  $content =~ s/^.*\n__DATA__\r?\n/\n/s;
+  $data =~ s/^.*\n__DATA__\r?\n/\n/s;
 
   # Ignore everything after __END__
-  $content =~ s/\n__END__\r?\n.*$/\n/s;
+  $data =~ s/\n__END__\r?\n.*$/\n/s;
 
   # Split files
-  my @data = split /^@@\s*(.+?)\s*\r?\n/m, $content;
-  shift @data;
+  (undef, my @files) = split /^@@\s*(.+?)\s*\r?\n/m, $data;
 
   # Find data
   my $all = $CACHE{$class} = {};
-  while (@data) {
-    my ($name, $content) = splice @data, 0, 2;
-    $content = b64_decode $content if $name =~ s/\s*\(\s*base64\s*\)$//;
-    $all->{$name} = $content;
+  while (@files) {
+    my ($name, $data) = splice @files, 0, 2;
+    $all->{$name} = $name =~ s/\s*\(\s*base64\s*\)$//
+      && ++$BIN{$class}{$name} ? b64_decode($data) : $data;
   }
 
   return $all;
@@ -121,6 +116,12 @@ following new ones.
 Extract embedded file from the C<DATA> section of a class.
 
   say for keys %{$loader->data('Foo::Bar')};
+
+=head2 is_binary
+
+  my $bool = $loader->is_binary('Foo::Bar', 'test.png');
+
+Check if embedded file from the C<DATA> section of a class was Base64 encoded.
 
 =head2 load
 

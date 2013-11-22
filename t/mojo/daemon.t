@@ -6,6 +6,8 @@ BEGIN {
 }
 
 use Test::More;
+use File::Spec::Functions 'catdir';
+use IO::Socket::INET;
 use Mojo;
 use Mojo::IOLoop;
 use Mojo::Log;
@@ -38,10 +40,10 @@ use Socket qw(SO_REUSEPORT SOL_SOCKET);
   );
 }
 
-# Logger
-my $logger = Mojo::Log->new;
-my $app = Mojo->new({log => $logger});
-is $app->log, $logger, 'right logger';
+# Optional home detection
+my @path = qw(th is mojo dir wil l never-ever exist);
+my $app = Mojo->new(home => Mojo::Home->new(catdir @path));
+is $app->home, catdir(@path), 'right home directory';
 
 # Config
 is $app->config('foo'), undef, 'no value';
@@ -59,8 +61,8 @@ isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';
 
 # Fresh application
 $app = Mojolicious->new;
-my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton)->app($app);
-is $ua->app->moniker, 'mojolicious', 'right moniker';
+my $ua = Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
+is $ua->server->app($app)->app->moniker, 'mojolicious', 'right moniker';
 
 # Silence
 $app->log->level('fatal');
@@ -165,7 +167,7 @@ for my $i (1 .. 10) { $params{"test$i"} = $i }
 my $result = '';
 for my $key (sort keys %params) { $result .= $params{$key} }
 my ($code, $body);
-my $port = $ua->app_url->port;
+my $port = $ua->server->url->port;
 $tx = $ua->post("http://127.0.0.1:$port/chunked" => form => \%params);
 is $tx->res->code, 200, 'right status';
 is $tx->res->body, $result, 'right content';
@@ -243,7 +245,7 @@ is $tx->res->body, 'Whatever!', 'right content';
 
 # SO_REUSEPORT
 SKIP: {
-  skip 'SO_REUSEPORT support required!', 2 unless eval {SO_REUSEPORT};
+  skip 'SO_REUSEPORT support required!', 2 unless eval { _probe() };
 
   $port   = Mojo::IOLoop->generate_port;
   $daemon = Mojo::Server::Daemon->new(
@@ -261,6 +263,14 @@ SKIP: {
   ok $daemon->ioloop->acceptor($daemon->acceptors->[0])
     ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
     'SO_REUSEPORT socket option';
+}
+
+sub _probe {
+  IO::Socket::INET->new(
+    Listen    => 1,
+    LocalPort => Mojo::IOLoop->generate_port,
+    ReusePort => 1
+  );
 }
 
 done_testing();

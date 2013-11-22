@@ -57,10 +57,31 @@ $t->get_ok('/perldoc/')->status_is(200)->text_is('h1 a[id="NAME"]', 'NAME')
   ->text_is('a[id="GUIDES"]',   'GUIDES')->content_like(qr/galaxy/)
   ->content_unlike(qr/Gray/);
 
-# Perldoc browser (Mojolicious)
+# Perldoc browser (Mojolicious documentation)
 $t->get_ok('/perldoc/Mojolicious')->status_is(200)
   ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
   ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
+
+# Perldoc browser (Mojolicious documentation with format)
+$t->get_ok('/perldoc/Mojolicious.html')->status_is(200)
+  ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
+  ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
+
+# Perldoc browser (negotiated Mojolicious documentation)
+$t->get_ok('/perldoc/Mojolicious' => {Accept => 'text/html'})->status_is(200)
+  ->text_is('h1 a[id="NAME"]', 'NAME')->text_is('a[id="handler"]', 'handler')
+  ->text_like('p', qr/Mojolicious/)->content_like(qr/Sebastian Riedel/);
+
+# Perldoc browser (Mojolicious source with format)
+$t->get_ok('/perldoc/Mojolicious.txt')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/\$VERSION/);
+
+# Perldoc browser (negotiated Mojolicious source again)
+$t->get_ok('/perldoc/Mojolicious' => {Accept => 'text/plain'})->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')->content_like(qr/\$VERSION/);
+
+# Perldoc browser (unsupported format)
+$t->get_ok('/perldoc/Mojolicious.json')->status_is(204);
 
 done_testing();
 

@@ -172,24 +172,28 @@ the following new ones.
 
 =head2 dispatch
 
-  my $success = $static->dispatch(Mojolicious::Controller->new);
+  my $bool = $static->dispatch(Mojolicious::Controller->new);
 
 Serve static file for L<Mojolicious::Controller> object.
 
 =head2 file
 
-  my $asset = $static->file('foo/bar.html');
+  my $asset = $static->file('images/logo.png');
+  my $asset = $static->file('../lib/MyApp.pm');
 
 Get L<Mojo::Asset::File> or L<Mojo::Asset::Memory> object for a file, relative
-to C<paths> or from C<classes>.
+to L</"paths"> or from L</"classes">. Note that this method does not protect
+from traversing to parent directories.
 
   my $content = $static->file('foo/bar.html')->slurp;
 
 =head2 serve
 
-  my $success = $static->serve(Mojolicious::Controller->new, 'foo/bar.html');
+  my $bool = $static->serve(Mojolicious::Controller->new, 'images/logo.png');
+  my $bool = $static->serve(Mojolicious::Controller->new, '../lib/MyApp.pm');
 
-Serve a specific file, relative to C<paths> or from C<classes>.
+Serve a specific file, relative to L</"paths"> or from L</"classes">. Note
+that this method does not protect from traversing to parent directories.
 
 =head2 serve_asset
 

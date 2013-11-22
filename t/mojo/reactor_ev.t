@@ -36,8 +36,7 @@ my $port   = Mojo::IOLoop->generate_port;
 my $listen = IO::Socket::INET->new(
   Listen    => 5,
   LocalAddr => '127.0.0.1',
-  LocalPort => $port,
-  Proto     => 'tcp'
+  LocalPort => $port
 );
 my ($readable, $writable);
 $reactor->io($listen => sub { pop() ? $writable++ : $readable++ })
@@ -203,7 +202,7 @@ ok $last,   'timers were triggered in the right order';
 
 # Error
 my $err;
-$reactor->on(
+$reactor->unsubscribe('error')->on(
   error => sub {
     shift->stop;
     $err = pop;
@@ -212,6 +211,13 @@ $reactor->on(
 $reactor->timer(0 => sub { die "works!\n" });
 $reactor->start;
 like $err, qr/works!/, 'right error';
+
+# Recursion
+$timer   = undef;
+$reactor = $reactor->new;
+$reactor->timer(0 => sub { ++$timer and shift->one_tick });
+$reactor->one_tick;
+is $timer, 1, 'timer was triggered once';
 
 # Detection
 is(Mojo::Reactor->detect, 'Mojo::Reactor::EV', 'right class');

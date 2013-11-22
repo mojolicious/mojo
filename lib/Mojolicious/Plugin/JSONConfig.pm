@@ -24,7 +24,7 @@ sub render {
 
   # Application instance and helper
   my $prepend = q[my $app = shift; no strict 'refs'; no warnings 'redefine';];
-  $prepend .= q[sub app; *app = sub { $app }; use Mojo::Base -strict;];
+  $prepend .= q[sub app; local *app = sub { $app }; use Mojo::Base -strict;];
 
   # Render and encode for JSON decoding
   my $mt = Mojo::Template->new($conf->{template} || {})->name($file);
@@ -101,7 +101,7 @@ L<Mojolicious::Plugin::Config> and implements the following new ones.
 
   $plugin->parse($content, $file, $conf, $app);
 
-Process content with C<render> and parse it with L<Mojo::JSON>.
+Process content with L</"render"> and parse it with L<Mojo::JSON>.
 
   sub parse {
     my ($self, $content, $file, $conf, $app) = @_;

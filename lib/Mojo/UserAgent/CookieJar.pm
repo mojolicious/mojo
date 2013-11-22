@@ -19,12 +19,13 @@ sub add {
     next if length($cookie->value // '') > $size;
 
     # Replace cookie
-    my $domain = $cookie->domain;
+    my $origin = $cookie->origin // '';
+    next unless my $domain = lc($cookie->domain // $origin);
     $domain =~ s/^\.//;
-    my $path = $cookie->path;
-    my $name = $cookie->name;
-    my $jar  = $self->{jar}{$domain} ||= [];
-    @$jar = (grep({$_->path ne $path || $_->name ne $name} @$jar), $cookie);
+    next unless my $path = $cookie->path;
+    next unless length(my $name = $cookie->name // '');
+    my $jar = $self->{jar}{$domain} ||= [];
+    @$jar = (grep({_compare($_, $path, $name, $origin)} @$jar), $cookie);
   }
 
   return $self;
@@ -44,11 +45,10 @@ sub extract {
 
     # Validate domain
     my $host = $url->ihost;
-    my $domain = lc($cookie->domain // $host);
+    my $domain = lc($cookie->domain // $cookie->origin($host)->origin);
     $domain =~ s/^\.//;
     next
       if $host ne $domain && ($host !~ /\Q.$domain\E$/ || $host =~ /\.\d+$/);
-    $cookie->domain($domain);
 
     # Validate path
     my $path = $cookie->path // $url->path->to_dir->to_abs_string;
@@ -61,7 +61,7 @@ sub extract {
 sub find {
   my ($self, $url) = @_;
 
-  return unless my $domain = $url->ihost;
+  return unless my $domain = my $host = $url->ihost;
   my $path = $url->path->to_abs_string;
   my @found;
   while ($domain =~ /[^.]+\.[^.]+|localhost$/) {
@@ -70,6 +70,7 @@ sub find {
     # Grab cookies
     my $new = $self->{jar}{$domain} = [];
     for my $cookie (@$old) {
+      next unless $cookie->domain || $host eq $cookie->origin;
 
       # Check if cookie has expired
       my $expires = $cookie->expires;
@@ -96,6 +97,12 @@ sub inject {
   return unless keys %{$self->{jar}};
   my $req = $tx->req;
   $req->cookies($self->find($req->url));
+}
+
+sub _compare {
+  my ($cookie, $path, $name, $origin) = @_;
+  return 1 if $cookie->path ne $path || $cookie->name ne $name;
+  return ($cookie->origin // '') ne $origin;
 }
 
 sub _path { $_[0] eq '/' || $_[0] eq $_[1] || $_[1] =~ m!^\Q$_[0]/! }
@@ -171,19 +178,19 @@ Empty the jar.
 
 =head2 extract
 
-  $jar->extract($tx);
+  $jar->extract(Mojo::Transaction::HTTP->new);
 
 Extract response cookies from transaction.
 
 =head2 find
 
-  my @cookies = $jar->find($url);
+  my @cookies = $jar->find(Mojo::URL->new);
 
 Find L<Mojo::Cookie::Request> objects in the jar for L<Mojo::URL> object.
 
 =head2 inject
 
-  $jar->inject($tx);
+  $jar->inject(Mojo::Transaction::HTTP->new);
 
 Inject request cookies into transaction.
 

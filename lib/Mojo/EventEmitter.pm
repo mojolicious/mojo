@@ -9,12 +9,12 @@ sub emit {
   my ($self, $name) = (shift, shift);
 
   if (my $s = $self->{events}{$name}) {
-    warn "-- Emit $name in @{[blessed($self)]} (@{[scalar(@$s)]})\n" if DEBUG;
+    warn "-- Emit $name in @{[blessed $self]} (@{[scalar @$s]})\n" if DEBUG;
     for my $cb (@$s) { $self->$cb(@_) }
   }
   else {
-    warn "-- Emit $name in @{[blessed($self)]} (0)\n" if DEBUG;
-    warn $_[0] if $name eq 'error';
+    warn "-- Emit $name in @{[blessed $self]} (0)\n" if DEBUG;
+    die "@{[blessed $self]}: $_[0]" if $name eq 'error';
   }
 
   return $self;
@@ -24,22 +24,16 @@ sub emit_safe {
   my ($self, $name) = (shift, shift);
 
   if (my $s = $self->{events}{$name}) {
-    warn "-- Emit $name in @{[blessed($self)]} safely (@{[scalar(@$s)]})\n"
+    warn "-- Emit $name in @{[blessed $self]} safely (@{[scalar @$s]})\n"
       if DEBUG;
     for my $cb (@$s) {
-      unless (eval { $self->$cb(@_); 1 }) {
-
-        # Error event failed
-        if ($name eq 'error') { warn qq{Event "error" failed: $@} }
-
-        # Normal event failed
-        else { $self->emit_safe('error', qq{Event "$name" failed: $@}) }
-      }
+      $self->emit(error => qq{Event "$name" failed: $@})
+        unless eval { $self->$cb(@_); 1 };
     }
   }
   else {
-    warn "-- Emit $name in @{[blessed($self)]} safely (0)\n" if DEBUG;
-    warn $_[0] if $name eq 'error';
+    warn "-- Emit $name in @{[blessed $self]} safely (0)\n" if DEBUG;
+    die "@{[blessed $self]}: $_[0]" if $name eq 'error';
   }
 
   return $self;
@@ -76,6 +70,7 @@ sub unsubscribe {
   # One
   if ($cb) {
     $self->{events}{$name} = [grep { $cb ne $_ } @{$self->{events}{$name}}];
+    delete $self->{events}{$name} unless @{$self->{events}{$name}};
   }
 
   # All
@@ -128,7 +123,7 @@ L<Mojo::EventEmitter> can emit the following events.
     ...
   });
 
-Emitted safely for event errors.
+Emitted for event errors, fatal if unhandled.
 
   $e->on(error => sub {
     my ($e, $err) = @_;
@@ -152,11 +147,11 @@ Emit event.
   $e = $e->emit_safe('foo');
   $e = $e->emit_safe('foo', 123);
 
-Emit event safely and emit C<error> event on failure.
+Emit event safely and emit L</"error"> event on failure.
 
 =head2 has_subscribers
 
-  my $success = $e->has_subscribers('foo');
+  my $bool = $e->has_subscribers('foo');
 
 Check if event has subscribers.
 

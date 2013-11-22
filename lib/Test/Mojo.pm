@@ -30,33 +30,33 @@ sub new {
 
 sub app {
   my ($self, $app) = @_;
-  return $self->ua->app unless $app;
-  $self->ua->app($app);
+  return $self->ua->server->app unless $app;
+  $self->ua->server->app($app);
   return $self;
 }
 
 sub content_is {
   my ($self, $value, $desc) = @_;
   $desc ||= 'exact match for content';
-  return $self->_test('is', $self->_get_content($self->tx), $value, $desc);
+  return $self->_test('is', $self->tx->res->text, $value, $desc);
 }
 
 sub content_isnt {
   my ($self, $value, $desc) = @_;
   $desc ||= 'no match for content';
-  return $self->_test('isnt', $self->_get_content($self->tx), $value, $desc);
+  return $self->_test('isnt', $self->tx->res->text, $value, $desc);
 }
 
 sub content_like {
   my ($self, $regex, $desc) = @_;
   $desc ||= 'content is similar';
-  return $self->_test('like', $self->_get_content($self->tx), $regex, $desc);
+  return $self->_test('like', $self->tx->res->text, $regex, $desc);
 }
 
 sub content_unlike {
   my ($self, $regex, $desc) = @_;
   $desc ||= 'content is not similar';
-  return $self->_test('unlike', $self->_get_content($self->tx), $regex, $desc);
+  return $self->_test('unlike', $self->tx->res->text, $regex, $desc);
 }
 
 sub content_type_is {
@@ -301,13 +301,6 @@ sub websocket_ok {
   return $self->_test('ok', $self->tx->res->code eq 101, $desc);
 }
 
-sub _get_content {
-  my ($self, $tx) = @_;
-  my $content = $tx->res->body;
-  my $charset = $tx->res->content->charset;
-  return $charset ? decode($charset, $content) : $content;
-}
-
 sub _json {
   my ($self, $method, $p) = @_;
   return Mojo::JSON::Pointer->new->$method(
@@ -442,7 +435,7 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
   $t->ua->max_redirects(10);
 
   # Use absolute URL for request with Basic authentication
-  my $url = $t->ua->app_url->userinfo('sri:secr3t')->path('/secrets.json');
+  my $url = $t->ua->server->url->userinfo('sri:secr3t')->path('/secrets.json');
   $t->post_ok($url => json => {limit => 10})
     ->status_is(200)
     ->json_is('/1/content', 'Mojo rocks!');
@@ -496,28 +489,30 @@ Access application with L<Mojo::UserAgent/"app">.
   $t = $t->content_is('working!');
   $t = $t->content_is('working!', 'right content');
 
-Check response content for exact match.
+Check response content for exact match after retrieving it from
+L<Mojo::Message/"text">.
 
 =head2 content_isnt
 
   $t = $t->content_isnt('working!');
   $t = $t->content_isnt('working!', 'different content');
 
-Opposite of C<content_is>.
+Opposite of L</"content_is">.
 
 =head2 content_like
 
   $t = $t->content_like(qr/working!/);
   $t = $t->content_like(qr/working!/, 'right content');
 
-Check response content for similar match.
+Check response content for similar match after retrieving it from
+L<Mojo::Message/"text">.
 
 =head2 content_unlike
 
   $t = $t->content_unlike(qr/working!/);
   $t = $t->content_unlike(qr/working!/, 'different content');
 
-Opposite of C<content_like>.
+Opposite of L</"content_like">.
 
 =head2 content_type_is
 
@@ -531,7 +526,7 @@ Check response C<Content-Type> header for exact match.
   $t = $t->content_type_isnt('text/html');
   $t = $t->content_type_isnt('text/html', 'different content type');
 
-Opposite of C<content_type_is>.
+Opposite of L</"content_type_is">.
 
 =head2 content_type_like
 
@@ -545,7 +540,7 @@ Check response C<Content-Type> header for similar match.
   $t = $t->content_type_unlike(qr/text/);
   $t = $t->content_type_unlike(qr/text/, 'different content type');
 
-Opposite of C<content_type_like>.
+Opposite of L</"content_type_like">.
 
 =head2 delete_ok
 
@@ -570,7 +565,7 @@ L<Mojo::DOM>.
   $t = $t->element_exists_not('div.foo[x=y]');
   $t = $t->element_exists_not('html head title', 'has no title');
 
-Opposite of C<element_exists>.
+Opposite of L</"element_exists">.
 
 =head2 finish_ok
 
@@ -618,7 +613,7 @@ Check response header for exact match.
   $t = $t->header_isnt(Expect => 'fun');
   $t = $t->header_isnt(Expect => 'fun', 'different header');
 
-Opposite of C<header_is>.
+Opposite of L</"header_is">.
 
 =head2 header_like
 
@@ -632,7 +627,7 @@ Check response header for similar match.
   $t = $t->header_like(Expect => qr/fun/);
   $t = $t->header_like(Expect => qr/fun/, 'different header');
 
-Opposite of C<header_like>.
+Opposite of L</"header_like">.
 
 =head2 json_has
 
@@ -647,7 +642,7 @@ JSON Pointer with L<Mojo::JSON::Pointer>.
   $t = $t->json_hasnt('/foo');
   $t = $t->json_hasnt('/minibar', 'no minibar');
 
-Opposite of C<json_has>.
+Opposite of L</"json_has">.
 
 =head2 json_is
 
@@ -672,7 +667,7 @@ the given JSON Pointer with L<Mojo::JSON::Pointer>.
   $t = $t->json_message_hasnt('/foo');
   $t = $t->json_message_hasnt('/minibar', 'no minibar');
 
-Opposite of C<json_message_has>.
+Opposite of L</"json_message_has">.
 
 =head2 json_message_is
 
@@ -701,7 +696,7 @@ Check WebSocket message for exact match.
   $t = $t->message_isnt('working!');
   $t = $t->message_isnt('working!', 'different message');
 
-Opposite of C<message_is>.
+Opposite of L</"message_is">.
 
 =head2 message_like
 
@@ -733,7 +728,7 @@ Wait for next WebSocket message to arrive.
   $t = $t->message_unlike(qr/working!/);
   $t = $t->message_unlike(qr/working!/, 'different message');
 
-Opposite of C<message_like>.
+Opposite of L</"message_like">.
 
 =head2 options_ok
 
@@ -841,7 +836,7 @@ Check response status for exact match.
   $t = $t->status_isnt(200);
   $t = $t->status_isnt(200, 'different status');
 
-Opposite of C<status_is>.
+Opposite of L</"status_is">.
 
 =head2 text_is
 
@@ -856,7 +851,7 @@ exact match with L<Mojo::DOM>.
   $t = $t->text_isnt('div.foo[x=y]' => 'Hello!');
   $t = $t->text_isnt('html head title' => 'Hello!', 'different title');
 
-Opposite of C<text_is>.
+Opposite of L</"text_is">.
 
 =head2 text_like
 
@@ -871,7 +866,7 @@ similar match with L<Mojo::DOM>.
   $t = $t->text_unlike('div.foo[x=y]' => qr/Hello/);
   $t = $t->text_unlike('html head title' => qr/Hello/, 'different title');
 
-Opposite of C<text_like>.
+Opposite of L</"text_like">.
 
 =head2 websocket_ok
 

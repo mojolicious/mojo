@@ -182,8 +182,8 @@ sub _spawn {
           my $old = Time::HiRes::ualarm $self->lock_timeout * 1000000;
           $lock = flock $handle, LOCK_EX;
           Time::HiRes::ualarm $old;
-        };
-        if ($@) { $lock = $@ eq "alarm\n" ? 0 : die($@) }
+          1;
+        } or $lock = $@ eq "alarm\n" ? 0 : die $@;
       }
 
       # Non blocking
@@ -206,7 +206,7 @@ sub _spawn {
   # Clean worker environment
   $SIG{$_} = 'DEFAULT' for qw(INT TERM CHLD TTIN TTOU);
   $SIG{QUIT} = sub { $loop->max_connections(0) };
-  delete $self->{$_} for qw(poll reader);
+  delete @$self{qw(poll reader)};
 
   $self->app->log->debug("Worker $$ started.");
   $loop->start;
@@ -267,46 +267,39 @@ MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 
-=head1 SIGNALS
+=head1 MANAGER SIGNALS
 
-L<Mojo::Server::Prefork> can be controlled at runtime with the following
-signals.
+The L<Mojo::Server::Prefork> manager process can be controlled at runtime with
+the following signals.
 
-=head2 Manager
-
-=over 2
-
-=item INT, TERM
+=head2 INT, TERM
 
 Shutdown server immediately.
 
-=item QUIT
+=head2 QUIT
 
 Shutdown server gracefully.
 
-=item TTIN
+=head2 TTIN
 
 Increase worker pool by one.
 
-=item TTOU
+=head2 TTOU
 
 Decrease worker pool by one.
 
-=back
+=head1 WORKER SIGNALS
 
-=head2 Worker
+L<Mojo::Server::Prefork> worker processes can be controlled at runtime with
+the following signals.
 
-=over 2
-
-=item INT, TERM
+=head2 INT, TERM
 
 Stop worker immediately.
 
-=item QUIT
+=head2 QUIT
 
 Stop worker gracefully.
-
-=back
 
 =head1 EVENTS
 
@@ -480,8 +473,8 @@ implements the following new ones.
 
   my $pid = $prefork->check_pid;
 
-Get process id for running server from C<pid_file> or delete it if server is
-not running.
+Get process id for running server from L</"pid_file"> or delete it if server
+is not running.
 
   say 'Server is not running' unless $prefork->check_pid;
 

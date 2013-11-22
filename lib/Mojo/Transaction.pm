@@ -10,8 +10,20 @@ has req => sub { Mojo::Message::Request->new };
 has res => sub { Mojo::Message::Response->new };
 
 sub client_close {
-  my $self = shift;
-  $self->res->finish;
+  my ($self, $close) = @_;
+
+  # Remove code from parser errors
+  my $res = $self->res->finish;
+  if (my $err = $res->error) { $res->error($err) }
+
+  # Premature connection close
+  elsif ($close && !$res->code) { $res->error('Premature connection close') }
+
+  # 400/500
+  elsif ($res->is_status_class(400) || $res->is_status_class(500)) {
+    $res->error($res->message, $res->code);
+  }
+
   return $self->server_close;
 }
 
@@ -179,8 +191,10 @@ implements the following new ones.
 =head2 client_close
 
   $tx->client_close;
+  $tx->client_close(1);
 
-Transaction closed client-side, used to implement user agents.
+Transaction closed client-side, no actual connection close is assumed by
+default, used to implement user agents.
 
 =head2 client_read
 
@@ -212,7 +226,7 @@ Error and code.
 
 =head2 is_finished
 
-  my $success = $tx->is_finished;
+  my $bool = $tx->is_finished;
 
 Check if transaction is finished.
 
@@ -224,7 +238,7 @@ False.
 
 =head2 is_writing
 
-  my $success = $tx->is_writing;
+  my $bool = $tx->is_writing;
 
 Check if transaction is writing.
 
@@ -265,9 +279,9 @@ in a subclass.
 
   my $res = $tx->success;
 
-Returns the L<Mojo::Message::Response> object (C<res>) if transaction was
-successful or C<undef> otherwise. Connection and parser errors have only a
-message in C<error>, 400 and 500 responses also a code.
+Returns the L<Mojo::Message::Response> object from L</"res"> if transaction
+was successful or C<undef> otherwise. Connection and parser errors have only a
+message in L</"error">, 400 and 500 responses also a code.
 
   # Sensible exception handling
   if (my $res = $tx->success) { say $res->body }
@@ -275,9 +289,6 @@ message in C<error>, 400 and 500 responses also a code.
     my ($err, $code) = $tx->error;
     say $code ? "$code response: $err" : "Connection error: $err";
   }
-
-Error messages can be accessed with the C<error> method of the transaction
-object.
 
 =head1 SEE ALSO
 

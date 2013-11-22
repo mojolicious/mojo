@@ -24,7 +24,7 @@ sub run {
     'u|user=s'     => \(my $user     = '');
   die $self->usage unless my $file = shift @args;
 
-  my $tx = Mojo::UserAgent->new->detect_proxy->post(
+  my $tx = Mojo::UserAgent->new->tap(sub { $_->proxy->detect })->post(
     "https://$user:$password\@pause.perl.org/pause/authenquery" => form => {
       HIDDENNAME                        => $user,
       CAN_MULTIPART                     => 1,

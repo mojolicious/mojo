@@ -23,6 +23,9 @@ $t->add_generator(
 my $tx = $t->tx(GET => 'mojolicio.us/foo.html?bar=baz');
 is $tx->req->url->to_abs, 'http://mojolicio.us/foo.html?bar=baz', 'right URL';
 is $tx->req->method, 'GET', 'right method';
+is $tx->req->headers->accept_encoding, 'gzip', 'right "Accept-Encoding" value';
+is $tx->req->headers->user_agent, 'Mojolicious (Perl)',
+  'right "User-Agent" value';
 
 # GET with escaped slash
 my $url = Mojo::URL->new('http://mojolicio.us');
@@ -34,10 +37,13 @@ is $tx->req->url->path->to_string, 'foo%2Fbar', 'right path';
 is $tx->req->method, 'GET', 'right method';
 
 # POST with header
+$t->name('MyUA 1.0');
 $tx = $t->tx(POST => 'https://mojolicio.us' => {DNT => 1});
 is $tx->req->url->to_abs, 'https://mojolicio.us', 'right URL';
 is $tx->req->method, 'POST', 'right method';
-is $tx->req->headers->dnt, 1, 'right "DNT" value';
+is $tx->req->headers->dnt,             1,      'right "DNT" value';
+is $tx->req->headers->accept_encoding, 'gzip', 'right "Accept-Encoding" value';
+is $tx->req->headers->user_agent, 'MyUA 1.0', 'right "User-Agent" value';
 
 # POST with header and content
 $tx = $t->tx(POST => 'https://mojolicio.us' => {DNT => 1} => 'test');
@@ -744,33 +750,36 @@ is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 is $t->redirect($tx), undef, 'unsupported redirect';
 
-# 302 redirect (relative path)
+# 302 redirect (relative path and query)
 $tx = $t->tx(
-  POST => 'http://mojolicio.us/foo/bar' => {Accept => 'application/json'});
+  POST => 'http://mojolicio.us/foo/bar?a=b' => {Accept => 'application/json'});
 $tx->res->code(302);
-$tx->res->headers->location('baz');
+$tx->res->headers->location('baz?f%23oo=bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://mojolicio.us/foo/baz', 'right URL';
-is $tx->req->headers->accept,   undef, 'no "Accept" value';
-is $tx->req->headers->location, undef, 'no "Location" value';
+is $tx->req->url->to_abs, 'http://mojolicio.us/foo/baz?f%23oo=bar',
+  'right URL';
+is $tx->req->url->query,        'f%23oo=bar', 'right query';
+is $tx->req->headers->accept,   undef,        'no "Accept" value';
+is $tx->req->headers->location, undef,        'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
-# 302 redirect (absolute path)
+# 302 redirect (absolute path and query)
 $tx = $t->tx(
-  POST => 'http://mojolicio.us/foo/bar' => {Accept => 'application/json'});
+  POST => 'http://mojolicio.us/foo/bar?a=b' => {Accept => 'application/json'});
 $tx->res->code(302);
-$tx->res->headers->location('/baz');
+$tx->res->headers->location('/baz?f%23oo=bar');
 is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://mojolicio.us/baz', 'right URL';
-is $tx->req->headers->accept, undef, 'no "Accept" value';
+is $tx->req->url->to_abs, 'http://mojolicio.us/baz?f%23oo=bar', 'right URL';
+is $tx->req->url->query, 'f%23oo=bar', 'right query';
+is $tx->req->headers->accept,   undef, 'no "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';

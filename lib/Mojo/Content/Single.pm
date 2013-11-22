@@ -46,7 +46,7 @@ sub parse {
 
   # Content needs to be upgraded to multipart
   $self->unsubscribe(read => $self->{read});
-  my $multi = Mojo::Content::MultiPart->new($self);
+  my $multi = Mojo::Content::MultiPart->new(%$self);
   $self->emit(upgrade => $multi);
   return $multi->parse;
 }
@@ -122,12 +122,12 @@ implements the following new ones.
 
   my $single = Mojo::Content::Single->new;
 
-Construct a new L<Mojo::Content::Single> object and subscribe to C<read> event
-with default content parser.
+Construct a new L<Mojo::Content::Single> object and subscribe to L</"read">
+event with default content parser.
 
 =head2 body_contains
 
-  my $success = $single->body_contains('1234567');
+  my $bool = $single->body_contains('1234567');
 
 Check if content contains a specific string.
 

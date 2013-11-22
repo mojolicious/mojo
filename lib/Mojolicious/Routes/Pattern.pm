@@ -28,7 +28,7 @@ sub match_partial {
 
   # Match
   return undef unless my @captures = $$pathref =~ $regex;
-  $$pathref =~ s/$regex//;
+  $$pathref = ${^POSTMATCH};
 
   # Merge captures
   my $captures = {%{$self->defaults}};
@@ -152,7 +152,7 @@ sub _compile {
   # Not rooted with a slash
   $regex = "$block$regex" if $block;
 
-  return $self->regex(qr/^$regex/s)->regex;
+  return $self->regex(qr/^$regex/ps)->regex;
 }
 
 sub _compile_format {
@@ -361,8 +361,8 @@ implements the following new ones.
     = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
   my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
 
-Construct a new L<Mojolicious::Routes::Pattern> object and C<parse> pattern if
-necessary.
+Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern
+if necessary.
 
 =head2 match
 

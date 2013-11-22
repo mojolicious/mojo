@@ -155,7 +155,7 @@ the following new ones.
 
 =head2 check_file
 
-  my $success = $morbo->check_file('/home/sri/lib/MyApp.pm');
+  my $bool = $morbo->check_file('/home/sri/lib/MyApp.pm');
 
 Check if file has been modified since last check.
 

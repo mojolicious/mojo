@@ -16,14 +16,19 @@ eval { $e->emit('die') };
 is $@, "works!\n", 'right error';
 
 # Unhandled error event
-my $error;
-{
-  local *STDERR;
-  open STDERR, '>', \$error;
-  $e->emit(error => "just\n");
-  $e->emit_safe(error => "works\n");
-}
-is $error, "just\nworks\n", 'right error';
+eval { $e->emit(error => 'just') };
+like $@, qr/^Mojo::EventEmitter: just/, 'right error';
+eval { $e->emit_safe(error => 'works') };
+like $@, qr/^Mojo::EventEmitter: works/, 'right error';
+
+# Exception in error event
+$e->once(error => sub { die "$_[1]entional" });
+eval { $e->emit(error => 'int') };
+like $@, qr/^intentional/, 'right error';
+$e->once(error => sub { die "$_[1]entional" });
+eval { $e->emit_safe(error => 'int') };
+like $@, qr/^Mojo::EventEmitter: Event "error" failed: intentional/,
+  'right error';
 
 # Error fallback
 my ($echo, $err);
@@ -64,6 +69,8 @@ is $called, 3, 'event was not emitted again';
 # One-time event
 my $once;
 $e->once(one_time => sub { $once++ });
+is scalar @{$e->subscribers('one_time')}, 1, 'one subscriber';
+$e->unsubscribe(one_time => sub { });
 is scalar @{$e->subscribers('one_time')}, 1, 'one subscriber';
 $e->emit('one_time');
 is $once, 1, 'event was emitted once';

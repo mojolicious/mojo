@@ -24,7 +24,7 @@ has types => sub {
     png      => ['image/png'],
     rss      => ['application/rss+xml'],
     svg      => ['image/svg+xml'],
-    txt      => ['text/plain'],
+    txt      => ['text/plain;charset=UTF-8'],
     webm     => ['video/webm'],
     woff     => ['application/font-woff'],
     xml      => ['application/xml', 'text/xml'],
@@ -101,7 +101,7 @@ L<Mojolicious::Types> manages MIME types for L<Mojolicious>.
   png      -> image/png
   rss      -> application/rss+xml
   svg      -> image/svg+xml
-  txt      -> text/plain
+  txt      -> text/plain;charset=UTF-8
   webm     -> video/webm
   woff     -> application/font-woff
   xml      -> application/xml,text/xml

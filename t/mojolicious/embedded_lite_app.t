@@ -37,8 +37,8 @@ get '/bye' => sub {
   my $self = shift;
   my $name = $self->stash('name');
   my $nb   = '';
-  $self->render_later;
-  $self->ua->app(main::app())->get(
+  $self->ua->server->app(main::app());
+  $self->ua->get(
     '/hello/hello' => sub {
       my ($ua, $tx) = @_;
       $self->render(text => $tx->res->body . "$name! $nb");

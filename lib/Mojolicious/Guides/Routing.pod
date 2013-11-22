@@ -146,8 +146,9 @@ Most commonly used features every L<Mojolicious> developer should know about.
 
 =head2 Minimal route
 
-Every L<Mojolicious> application has a router object you can use to generate
-route structures, that match in the same order in which they were defined.
+The attribute L<Mojolicious/"routes"> contains a router you can use to
+generate route structures, they match in the same order in which they were
+defined.
 
   # Application
   package MyApp;
@@ -165,8 +166,8 @@ route structures, that match in the same order in which they were defined.
 
   1;
 
-The minimal static route above will load and instantiate the class
-C<MyApp::Foo> and call its C<welcome> method.
+The minimal route above will load and instantiate the class C<MyApp::Foo> and
+call its C<welcome> method.
 
   # Controller
   package MyApp::Foo;
@@ -465,6 +466,9 @@ L<Mojolicious::Controller/"url_for"> for this.
   # Generate URL "/foo/sebastian" for route "test"
   my $url = $self->url_for('test', name => 'sebastian');
 
+  # Generate URL "http://127.0.0.1:3000/foo/sebastian" for route "test"
+  my $url = $self->url_for('test', name => 'sebastian')->to_abs;
+
 Nameless routes get an automatically generated one assigned that is simply
 equal to the route itself without non-word characters.
 
@@ -545,9 +549,9 @@ with L<Mojolicious::Controller/"send"> right away.
 
 =head2 Bridges
 
-Bridge routes can be used to share code with multiple nested routes, because
-unlike normal nested routes, they always match and result in additional
-dispatch cycles.
+Bridge routes created with the method L<Mojolicious::Routes::Route/"bridge">
+can be used to share code with multiple nested routes, because unlike normal
+nested routes, they always match and result in additional dispatch cycles.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'baz'}
@@ -601,7 +605,8 @@ operations to finish before reaching the next dispatch cycle.
 
 From the tutorial you should already know L<Mojolicious::Lite> routes, which
 are in fact just a small convenience layer around everything described above
-and also part of the normal router.
+and accessible through methods like L<Mojolicious::Routes::Route/"get"> as
+part of the normal router.
 
   # POST /foo -> {controller => 'foo', action => 'abc'}
   $r->post('/foo')->to(controller => 'foo', action => 'abc');
@@ -616,11 +621,13 @@ and also part of the normal router.
   # * /yada.json -> {controller => 'foo', action => 'yada', format => 'json'}
   $r->any('/yada' => [format => [qw(txt json)]])->to('foo#yada');
 
-  # GET /foo/bar  -> {controller => 'foo', action => 'bar'}
-  # PUT /foo/baz  -> {controller => 'foo', action => 'baz'}
+  # GET   /foo/bar  -> {controller => 'foo', action => 'bar'}
+  # PUT   /foo/baz  -> {controller => 'foo', action => 'baz'}
+  # PATCH /foo      -> {controller => 'foo', action => 'yada'}
   my $foo = $r->any('/foo')->to('foo#');
   $foo->get('/bar')->to('#bar');
   $foo->put('/baz')->to('#baz');
+  $foo->patch->to('#yada');
 
 This makes the process of growing your L<Mojolicious::Lite> prototypes into
 full L<Mojolicious> applications very straightforward.
@@ -631,7 +638,8 @@ full L<Mojolicious> applications very straightforward.
     $self->render(text => 'Just like a Mojolicious::Lite action.');
   });
 
-Even the more abstract concepts are available.
+Even the more abstract concepts are available with methods like
+L<Mojolicious::Routes::Route/"under">.
 
   # GET  /yada
   # POST /yada
@@ -648,8 +656,9 @@ Even the more abstract concepts are available.
 =head2 Hooks
 
 Hooks operate outside the routing system and allow you to extend
-L<Mojolicious> itself by sharing code with all requests indiscriminately,
-which makes them a very powerful tool especially for plugins.
+the framework itself by sharing code with all requests indiscriminately
+through L<Mojolicious/"hook">, which makes them a very powerful tool
+especially for plugins.
 
   # Application
   package MyApp;
@@ -714,11 +723,12 @@ You can even extend much of the core functionality.
     return $c->$action($c->current_route);
   });
 
-For a full list of available hooks see L<Mojolicious/"hook">.
+For a full list of available hooks see L<Mojolicious/"HOOKS">.
 
 =head2 Shortcuts
 
-You can also add your own shortcuts to make route generation more expressive.
+You can also add your own shortcuts with L<Mojolicious::Routes/"add_shortcut">
+to make route generation more expressive.
 
   # Simple "resource" shortcut
   $r->add_shortcut(resource => sub {
@@ -775,8 +785,9 @@ unescaped and decoded from bytes to characters.
 =head2 Rearranging routes
 
 Until the first request has been handled, all routes can still be moved around
-or even removed. Especially for rearranging routes created by plugins this can
-be very useful.
+or even removed with methods like L<Mojolicious::Routes::Route/"add_child">
+and L<Mojolicious::Routes::Route/"remove">. Especially for rearranging routes
+created by plugins this can be very useful.
 
   # GET /example/show -> {controller => 'example', action => 'show'}
   my $show = $r->get('/show')->to('example#show');
@@ -785,6 +796,8 @@ be very useful.
   # Nothing
   $r->get('/secrets/show')->to('secrets#show')->name('show_secrets');
   $r->find('show_secrets')->remove;
+
+To find routes by their name you can use L<Mojolicious::Routes::Route/"find">.
 
 =head2 Conditions
 
@@ -833,7 +846,7 @@ You can also package your conditions as reusable plugins.
     $app->routes->add_condition(werewolf => sub {
       my ($route, $c, $captures, $days) = @_;
 
-      # Keep the werewolfs out!
+      # Keep the werewolves out!
       return undef if abs(14 - (phase(time))[2]) > ($days / 2);
 
       # It's ok, no werewolf

@@ -15,7 +15,7 @@ sub reset_state {
   my $self = shift;
   $self->render_called(0);
   my $stash = $self->stash;
-  delete $stash->{$_} for keys %$stash;
+  delete @$stash{keys %$stash};
 }
 
 package main;

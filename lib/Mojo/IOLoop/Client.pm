@@ -50,18 +50,17 @@ sub _connect {
     my %options = (
       Blocking => 0,
       PeerAddr => $address eq 'localhost' ? '127.0.0.1' : $address,
-      PeerPort => $args->{port} || ($args->{tls} ? 443 : 80),
-      Proto    => 'tcp'
+      PeerPort => $args->{port} || ($args->{tls} ? 443 : 80)
     );
     $options{LocalAddr} = $args->{local_address} if $args->{local_address};
     $options{PeerAddr} =~ s/[\[\]]//g if $options{PeerAddr};
     my $class = IPV6 ? 'IO::Socket::IP' : 'IO::Socket::INET';
-    return $self->emit_safe(error => "Couldn't connect: $@")
+    return $self->emit(error => "Couldn't connect: $@")
       unless $self->{handle} = $handle = $class->new(%options);
 
     # Timeout
     $self->{timer} = $reactor->timer($args->{timeout} || 10,
-      sub { $self->emit_safe(error => 'Connect timeout') });
+      sub { $self->emit(error => 'Connect timeout') });
   }
   $handle->blocking(0);
 
@@ -89,9 +88,9 @@ sub _try {
 
   # Retry or handle exceptions
   my $handle = $self->{handle};
-  return $! == EINPROGRESS ? undef : $self->emit_safe(error => $!)
+  return $! == EINPROGRESS ? undef : $self->emit(error => $!)
     if IPV6 && !$handle->connect;
-  return $self->emit_safe(error => $! = $handle->sockopt(SO_ERROR))
+  return $self->emit(error => $! = $handle->sockopt(SO_ERROR))
     if !IPV6 && !$handle->connected;
 
   # Disable Nagle's algorithm
@@ -99,8 +98,7 @@ sub _try {
 
   return $self->_cleanup->emit_safe(connect => $handle)
     if !$args->{tls} || $handle->isa('IO::Socket::SSL');
-  return $self->emit_safe(
-    error => 'IO::Socket::SSL 1.75 required for TLS support')
+  return $self->emit(error => 'IO::Socket::SSL 1.75 required for TLS support')
     unless TLS;
 
   # Upgrade
@@ -109,7 +107,7 @@ sub _try {
     SSL_ca_file => $args->{tls_ca}
       && -T $args->{tls_ca} ? $args->{tls_ca} : undef,
     SSL_cert_file       => $args->{tls_cert},
-    SSL_error_trap      => sub { $self->_cleanup->emit_safe(error => $_[1]) },
+    SSL_error_trap      => sub { $self->_cleanup->emit(error => $_[1]) },
     SSL_hostname        => $args->{address},
     SSL_key_file        => $args->{tls_key},
     SSL_startHandshake  => 0,
@@ -119,7 +117,7 @@ sub _try {
   );
   my $reactor = $self->reactor;
   $reactor->remove($handle);
-  return $self->emit_safe(error => 'TLS upgrade failed')
+  return $self->emit(error => 'TLS upgrade failed')
     unless $handle = IO::Socket::SSL->start_SSL($handle, %options);
   $reactor->io($handle => sub { $self->_tls })->watch($handle, 0, 1);
 }
@@ -176,7 +174,7 @@ Emitted safely once the connection is established.
     ...
   });
 
-Emitted safely if an error occurs on the connection.
+Emitted if an error occurs on the connection, fatal if unhandled.
 
 =head1 ATTRIBUTES
 

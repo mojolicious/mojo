@@ -8,7 +8,7 @@ sub run {
   my $req = $tx->req->parse($env);
   $tx->local_port($env->{SERVER_PORT})->remote_address($env->{REMOTE_ADDR});
 
-  # Request body
+  # Request body (may block if we try to read too much)
   my $len = $env->{CONTENT_LENGTH};
   until ($req->is_finished) {
     my $chunk = ($len && $len < 131072) ? $len : 131072;

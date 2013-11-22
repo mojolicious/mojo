@@ -1,17 +1,29 @@
 package MojoliciousTest::Foo;
 use Mojo::Base 'Mojolicious::Controller';
 
+sub DESTROY { shift->stash->{destroyed} = 1 }
+
 sub config {
   my $self = shift;
   $self->render(text => $self->stash('config')->{test});
 }
 
-sub fun { shift->render(text => 'Have fun!') }
+sub fun { shift->render }
 
 sub index {
   my $self = shift;
   $self->layout('default');
   $self->stash(handler => 'xpl', msg => 'Hello World!');
+}
+
+sub longpoll {
+  my $self = shift;
+  $self->on(finish => sub { shift->stash->{finished} = 1 });
+  $self->write_chunk(
+    sub {
+      shift->write_chunk('Poll!' => sub { shift->write_chunk('') });
+    }
+  );
 }
 
 sub plugin_camel_case {
@@ -86,6 +98,9 @@ sub withlayout { shift->stash(template => 'WithGreenLayout') }
 
 1;
 __DATA__
+
+@@ foo/fun.html.ep
+Have fun!\
 
 @@ just/some/template.html.epl
 Development template with high precedence.

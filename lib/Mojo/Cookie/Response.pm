@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo::Cookie';
 use Mojo::Date;
 use Mojo::Util qw(quote split_header);
 
-has [qw(domain httponly max_age path secure)];
+has [qw(domain httponly max_age origin path secure)];
 
 sub expires {
   my $self = shift;
@@ -55,10 +55,9 @@ sub to_string {
   my $self = shift;
 
   # Name and value (Netscape)
-  return '' unless my $name = $self->name;
+  return '' unless length(my $name = $self->name // '');
   my $value = $self->value // '';
-  $value = $value =~ /[,;" ]/ ? quote($value) : $value;
-  my $cookie = "$name=$value";
+  my $cookie = join '=', $name, $value =~ /[,;" ]/ ? quote($value) : $value;
 
   # "expires" (Netscape)
   if (defined(my $e = $self->expires)) { $cookie .= "; expires=$e" }
@@ -70,13 +69,13 @@ sub to_string {
   if (my $path = $self->path) { $cookie .= "; path=$path" }
 
   # "secure" (Netscape)
-  if (my $secure = $self->secure) { $cookie .= "; secure" }
+  $cookie .= "; secure" if $self->secure;
 
   # "Max-Age" (RFC 6265)
-  if (defined(my $m = $self->max_age)) { $cookie .= "; Max-Age=$m" }
+  if (defined(my $max = $self->max_age)) { $cookie .= "; Max-Age=$max" }
 
   # "HttpOnly" (RFC 6265)
-  if (my $httponly = $self->httponly) { $cookie .= "; HttpOnly" }
+  $cookie .= "; HttpOnly" if $self->httponly;
 
   return $cookie;
 }
@@ -117,8 +116,8 @@ Cookie domain.
 
 =head2 httponly
 
-  my $httponly = $cookie->httponly;
-  $cookie      = $cookie->httponly(1);
+  my $bool = $cookie->httponly;
+  $cookie  = $cookie->httponly($bool);
 
 HttpOnly flag, which can prevent client-side scripts from accessing this
 cookie.
@@ -130,6 +129,13 @@ cookie.
 
 Max age for cookie.
 
+=head2 origin
+
+  my $origin = $cookie->origin;
+  $cookie    = $cookie->origin('mojolicio.us');
+
+Origin of the cookie.
+
 =head2 path
 
   my $path = $cookie->path;
@@ -139,8 +145,8 @@ Cookie path.
 
 =head2 secure
 
-  my $secure = $cookie->secure;
-  $cookie    = $cookie->secure(1);
+  my $bool = $cookie->secure;
+  $cookie  = $cookie->secure($bool);
 
 Secure flag, which instructs browsers to only send this cookie over HTTPS
 connections.

@@ -167,8 +167,8 @@ Exception message.
 
 =head2 verbose
 
-  my $verbose = $e->verbose;
-  $e          = $e->verbose(1);
+  my $bool = $e->verbose;
+  $e       = $e->verbose($bool);
 
 Render exception with context.
 

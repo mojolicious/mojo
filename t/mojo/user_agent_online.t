@@ -50,12 +50,8 @@ is $code, 301, 'right status';
 $ua = Mojo::UserAgent->new;
 
 # Local address
-$ua->app(app);
-my $sock = IO::Socket::INET->new(
-  PeerAddr => 'mojolicio.us',
-  PeerPort => 80,
-  Proto    => 'tcp'
-);
+$ua->server->app(app);
+my $sock = IO::Socket::INET->new(PeerAddr => 'mojolicio.us', PeerPort => 80);
 my $address = $sock->sockhost;
 isnt $address, '127.0.0.1', 'different address';
 $ua->local_address('127.0.0.1')->max_connections(0);
@@ -145,7 +141,7 @@ ok $tx->is_finished, 'transaction is finished';
 is $tx->res->code, 301, 'right status';
 like $tx->res->headers->connection, qr/close/i, 'right "Connection" header';
 
-# Oneliner
+# One-liner
 is g('mojolicio.us')->code,          200, 'right status';
 is h('mojolicio.us')->code,          200, 'right status';
 is h('mojolicio.us')->body,          '',  'no content';

@@ -10,6 +10,7 @@ use IO::Compress::Gzip 'gzip';
 use Mojo::IOLoop;
 use Mojo::Message::Request;
 use Mojo::UserAgent;
+use Mojo::UserAgent::Server;
 use Mojolicious::Lite;
 
 # Silence
@@ -23,7 +24,6 @@ get '/timeout' => sub {
   Mojo::IOLoop->stream($self->tx->connection)
     ->timeout($self->param('timeout'));
   $self->on(finish => sub { $timeout = 1 });
-  $self->render_later;
 };
 
 get '/no_length' => sub {
@@ -45,39 +45,6 @@ post '/echo' => sub {
   my $self = shift;
   $self->render(data => $self->req->body);
 };
-
-# Proxy detection
-{
-  my $ua = Mojo::UserAgent->new;
-  local $ENV{HTTP_PROXY}  = 'http://127.0.0.1';
-  local $ENV{HTTPS_PROXY} = 'http://127.0.0.1:8080';
-  local $ENV{NO_PROXY}    = 'mojolicio.us';
-  $ua->detect_proxy;
-  is $ua->http_proxy,  'http://127.0.0.1',      'right proxy';
-  is $ua->https_proxy, 'http://127.0.0.1:8080', 'right proxy';
-  $ua->http_proxy(undef);
-  $ua->https_proxy(undef);
-  is $ua->http_proxy,  undef, 'right proxy';
-  is $ua->https_proxy, undef, 'right proxy';
-  ok !$ua->need_proxy('dummy.mojolicio.us'), 'no proxy needed';
-  ok $ua->need_proxy('icio.us'),   'proxy needed';
-  ok $ua->need_proxy('localhost'), 'proxy needed';
-  ($ENV{HTTP_PROXY}, $ENV{HTTPS_PROXY}, $ENV{NO_PROXY}) = ();
-  local $ENV{http_proxy}  = 'proxy.example.com';
-  local $ENV{https_proxy} = 'tunnel.example.com';
-  local $ENV{no_proxy}    = 'localhost,localdomain,foo.com,example.com';
-  $ua->detect_proxy;
-  is $ua->http_proxy,  'proxy.example.com',  'right proxy';
-  is $ua->https_proxy, 'tunnel.example.com', 'right proxy';
-  ok $ua->need_proxy('dummy.mojolicio.us'), 'proxy needed';
-  ok $ua->need_proxy('icio.us'),            'proxy needed';
-  ok !$ua->need_proxy('localhost'),             'proxy needed';
-  ok !$ua->need_proxy('localhost.localdomain'), 'no proxy needed';
-  ok !$ua->need_proxy('foo.com'),               'no proxy needed';
-  ok !$ua->need_proxy('example.com'),           'no proxy needed';
-  ok !$ua->need_proxy('www.example.com'),       'no proxy needed';
-  ok $ua->need_proxy('www.example.com.com'), 'proxy needed';
-}
 
 # Max redirects
 {
@@ -105,19 +72,19 @@ post '/echo' => sub {
 }
 
 # Default application
-is(Mojo::UserAgent->app,      app, 'applications are equal');
-is(Mojo::UserAgent->new->app, app, 'applications are equal');
-Mojo::UserAgent->app(app);
-is(Mojo::UserAgent->app, app, 'applications are equal');
+is(Mojo::UserAgent::Server->app,      app, 'applications are equal');
+is(Mojo::UserAgent->new->server->app, app, 'applications are equal');
+Mojo::UserAgent::Server->app(app);
+is(Mojo::UserAgent::Server->app, app, 'applications are equal');
 my $dummy = Mojolicious::Lite->new;
-isnt(Mojo::UserAgent->new->app($dummy)->app, app,
-  'applications are not equal');
-is(Mojo::UserAgent->app, app, 'applications are still equal');
-Mojo::UserAgent->app($dummy);
-isnt(Mojo::UserAgent->app, app, 'applications are not equal');
-is(Mojo::UserAgent->app, $dummy, 'application are equal');
-Mojo::UserAgent->app(app);
-is(Mojo::UserAgent->app, app, 'applications are equal again');
+isnt(Mojo::UserAgent->new->server->app($dummy)->app,
+  app, 'applications are not equal');
+is(Mojo::UserAgent::Server->app, app, 'applications are still equal');
+Mojo::UserAgent::Server->app($dummy);
+isnt(Mojo::UserAgent::Server->app, app, 'applications are not equal');
+is(Mojo::UserAgent::Server->app, $dummy, 'application are equal');
+Mojo::UserAgent::Server->app(app);
+is(Mojo::UserAgent::Server->app, app, 'applications are equal again');
 
 # Clean up non-blocking requests
 my $ua = Mojo::UserAgent->new;
@@ -163,7 +130,7 @@ app->log->unsubscribe(message => $msg);
 like $err, qr/error event works/, 'right error';
 
 # HTTPS request without TLS support
-my $tx = $ua->get($ua->app_url->scheme('https'));
+my $tx = $ua->get($ua->server->url->scheme('https'));
 ok $tx->error, 'has error';
 
 # Blocking
@@ -308,6 +275,24 @@ $tx = $ua->get('/timeout?timeout=5');
 ok !$tx->success, 'not successful';
 is $tx->error, 'Inactivity timeout', 'right error';
 
+# Keep alive connection times out
+my ($fail, $id);
+my $error = $ua->on(error => sub { $fail++ });
+ok $ua->has_subscribers('error'), 'has subscribers';
+$ua->get(
+  '/' => sub {
+    my ($ua, $tx) = @_;
+    Mojo::IOLoop->timer(0.5 => sub { Mojo::IOLoop->stop });
+    $id = $tx->connection;
+    Mojo::IOLoop->stream($id)->timeout(0.25);
+  }
+);
+Mojo::IOLoop->start;
+ok !$fail, 'error event has not been emitted';
+ok !Mojo::IOLoop->stream($id), 'connection timed out';
+$ua->unsubscribe(error => $error);
+ok !$ua->has_subscribers('error'), 'unsubscribed successfully';
+
 # Response exceeding message size limit
 $ua->once(
   start => sub {
@@ -331,23 +316,23 @@ is(($tx->error)[1], 404,         'right status');
 $tx = $ua->get('/');
 is $tx->res->body, 'works!', 'right content';
 my $last = $tx->connection;
-my $port = $ua->app_url->port;
+my $port = $ua->server->url->port;
 $tx = $ua->get('/');
 is $tx->res->body, 'works!', 'right content';
 is $tx->connection, $last, 'same connection';
-is $ua->app_url->port, $port, 'same port';
+is $ua->server->url->port, $port, 'same port';
 {
   local $$ = -23;
   $tx = $ua->get('/');
   is $tx->res->body, 'works!', 'right content';
   isnt $tx->connection, $last, 'new connection';
-  isnt $ua->app_url->port, $port, 'new port';
-  $port = $ua->app_url->port;
+  isnt $ua->server->url->port, $port, 'new port';
+  $port = $ua->server->url->port;
   $last = $tx->connection;
   $tx   = $ua->get('/');
   is $tx->res->body, 'works!', 'right content';
   is $tx->connection, $last, 'same connection';
-  is $ua->app_url->port, $port, 'same port';
+  is $ua->server->url->port, $port, 'same port';
 }
 
 # Introspect
@@ -426,7 +411,7 @@ is $stream, 1, 'no leaking subscribers';
 # Nested non-blocking requests after blocking one, with custom URL
 my @kept_alive;
 $ua->get(
-  $ua->app_url => sub {
+  $ua->server->url => sub {
     my ($self, $tx) = @_;
     push @kept_alive, $tx->kept_alive;
     $self->get(
@@ -434,7 +419,7 @@ $ua->get(
         my ($self, $tx) = @_;
         push @kept_alive, $tx->kept_alive;
         $self->get(
-          $ua->app_url => sub {
+          $ua->server->url => sub {
             my ($self, $tx) = @_;
             push @kept_alive, $tx->kept_alive;
             Mojo::IOLoop->stop;
@@ -468,7 +453,7 @@ Mojo::IOLoop->start;
 is_deeply \@kept_alive, [1, 1], 'connections kept alive';
 
 # Blocking request after non-blocking one, with custom URL
-$tx = $ua->get($ua->app_url);
+$tx = $ua->get($ua->server->url);
 ok $tx->success, 'successful';
 ok !$tx->kept_alive, 'kept connection not alive';
 is $tx->res->code, 200,      'right status';
@@ -503,14 +488,5 @@ is $unexpected[1]->code, 101, 'right status';
 ok $tx->success, 'successful';
 is $tx->res->code, 200,   'right status';
 is $tx->res->body, 'Hi!', 'right content';
-
-# Premature connection close
-$port = Mojo::IOLoop->generate_port;
-Mojo::IOLoop->server(
-  {address => '127.0.0.1', port => $port} => sub { Mojo::IOLoop->remove(pop) }
-);
-$tx = $ua->get("http://localhost:$port/");
-ok !$tx->success, 'not successful';
-is $tx->error, 'Premature connection close', 'right error';
 
 done_testing();

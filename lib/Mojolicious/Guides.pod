@@ -118,7 +118,20 @@ Test driven development toolkit for web applications.
 
 =item L<ojo>
 
-Fun oneliners using everything above.
+Fun one-liners using everything above.
+
+=back
+
+=head1 SPIN-OFFS
+
+These modules are not part of the L<Mojolicious> distribution, but have been
+designed to be used with it and are being developed under the same umbrella.
+
+=over 2
+
+=item L<Mango>
+
+Pure-Perl non-blocking I/O MongoDB driver.
 
 =back
 

@@ -415,6 +415,12 @@ sub url_for {
   return $url;
 }
 
+sub validation {
+  my $self = shift;
+  return $self->stash->{'mojo.validation'}
+    ||= $self->app->validator->validation->input($self->req->params->to_hash);
+}
+
 sub write {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
@@ -443,7 +449,7 @@ sub _fallbacks {
   # Inline template
   my $stash = $self->stash;
   return undef unless $stash->{format} eq 'html';
-  delete $stash->{$_} for qw(extends layout);
+  delete @$stash{qw(extends layout)};
   return $self->render_maybe(%$options, inline => $inline, handler => 'ep');
 }
 
@@ -472,8 +478,8 @@ Mojolicious::Controller - Controller base class
 =head1 DESCRIPTION
 
 L<Mojolicious::Controller> is the base class for your L<Mojolicious>
-controllers. It is also the default controller class for L<Mojolicious>
-unless you set C<controller_class> in your application.
+controllers. It is also the default controller class unless you set
+L<Mojolicious/"controller_class">.
 
 =head1 ATTRIBUTES
 
@@ -491,6 +497,9 @@ defaults to a L<Mojolicious> object.
   # Use application logger
   $c->app->log->debug('Hello Mojo!');
 
+  # Generate path
+  my $path = $c->app->home->rel_file('templates/foo/bar.html.ep');
+
 =head2 match
 
   my $m = $c->match;
@@ -501,6 +510,7 @@ L<Mojolicious::Routes::Match> object.
 
   # Introspect
   my $foo = $c->match->endpoint->pattern->defaults->{foo};
+  my $bar = $c->match->stack->[-1]{bar};
 
 =head2 tx
 
@@ -508,10 +518,20 @@ L<Mojolicious::Routes::Match> object.
   $c     = $c->tx(Mojo::Transaction::HTTP->new);
 
 The transaction that is currently being processed, usually a
-L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object.
+L<Mojo::Transaction::HTTP> or L<Mojo::Transaction::WebSocket> object. Note
+that this reference is usually weakened, so the object needs to be referenced
+elsewhere as well when you're performing non-blocking operations and the
+underlying connection might get closed early.
 
   # Check peer information
   my $address = $c->tx->remote_address;
+  my $port    = $c->tx->remote_port;
+
+  # Perform non-blocking operation without knowing the connection status
+  my $tx = $c->tx;
+  Mojo::IOLoop->timer(2 => sub {
+    $c->app->log->debug($tx->is_finished ? 'Finished.' : 'In progress.');
+  });
 
 =head1 METHODS
 
@@ -551,7 +571,8 @@ Close WebSocket connection or long poll stream gracefully.
   $c      = $c->flash({foo => 'bar'});
   $c      = $c->flash(foo => 'bar');
 
-Data storage persistent only for the next request, stored in the C<session>.
+Data storage persistent only for the next request, stored in the
+L</"session">.
 
   # Show message after redirect
   $c->flash(message => 'User created successfully!');
@@ -561,8 +582,8 @@ Data storage persistent only for the next request, stored in the C<session>.
 
   my $cb = $c->on(finish => sub {...});
 
-Subscribe to events of C<tx>, which is usually a L<Mojo::Transaction::HTTP> or
-L<Mojo::Transaction::WebSocket> object. Note that this method will
+Subscribe to events of L</"tx">, which is usually a L<Mojo::Transaction::HTTP>
+or L<Mojo::Transaction::WebSocket> object. Note that this method will
 automatically respond to WebSocket handshake requests with a C<101> response
 status.
 
@@ -600,12 +621,12 @@ status.
   $c              = $c->param(foo => 'ba;r');
   $c              = $c->param(foo => qw(ba;r ba;z));
 
-Access GET/POST parameters, file uploads and route placeholder values that are
-not reserved stash values. Note that this method is context sensitive in some
-cases and therefore needs to be used with care, there can always be multiple
-values, which might have unexpected consequences. Parts of the request body
-need to be loaded into memory to parse POST parameters, so you have to make
-sure it is not excessively large.
+Access route placeholder values that are not reserved stash values, file
+uploads and GET/POST parameters, in that order. Note that this method is
+context sensitive in some cases and therefore needs to be used with care,
+there can always be multiple values, which might have unexpected consequences.
+Parts of the request body need to be loaded into memory to parse POST
+parameters, so you have to make sure it is not excessively large.
 
   # List context is ambiguous and should be avoided
   my $hash = {foo => $self->param('foo')};
@@ -634,7 +655,7 @@ For more control you can also access request information directly.
   $c = $c->redirect_to('/perldoc');
   $c = $c->redirect_to('http://mojolicio.us/perldoc');
 
-Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
+Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 
   # Conditional redirect
   return $c->redirect_to('login') unless $c->session('user');
@@ -645,21 +666,21 @@ Prepare a C<302> redirect response, takes the same arguments as C<url_for>.
 
 =head2 render
 
-  my $success = $c->render;
-  my $success = $c->render(controller => 'foo', action => 'bar');
-  my $success = $c->render(template => 'foo/index');
-  my $success = $c->render(template => 'index', format => 'html');
-  my $success = $c->render(data => $bytes);
-  my $success = $c->render(text => 'Hello!');
-  my $success = $c->render(json => {foo => 'bar'});
-  my $success = $c->render(handler => 'something');
-  my $success = $c->render('foo/index');
+  my $bool    = $c->render;
+  my $bool    = $c->render(controller => 'foo', action => 'bar');
+  my $bool    = $c->render(template => 'foo/index');
+  my $bool    = $c->render(template => 'index', format => 'html');
+  my $bool    = $c->render(data => $bytes);
+  my $bool    = $c->render(text => 'Hello!');
+  my $bool    = $c->render(json => {foo => 'bar'});
+  my $bool    = $c->render(handler => 'something');
+  my $bool    = $c->render('foo/index');
   my $output  = $c->render('foo/index', partial => 1);
 
-Render content using L<Mojolicious::Renderer/"render"> and emit
-C<after_render> hook unless the result is C<partial>. If no template is
-provided a default one based on controller and action or route name will be
-generated, all additional values get merged into the C<stash>.
+Render content using L<Mojolicious::Renderer/"render"> and emit hook
+L<Mojolicious/"after_render"> unless the result is C<partial>. If no template
+is provided a default one based on controller and action or route name will be
+generated, all additional values get merged into the L</"stash">.
 
 =head2 render_exception
 
@@ -669,7 +690,7 @@ generated, all additional values get merged into the C<stash>.
 Render the exception template C<exception.$mode.$format.*> or
 C<exception.$format.*> and set the response status code to C<500>. Also sets
 the stash values C<exception> to a L<Mojo::Exception> object and C<snapshot>
-to a copy of the C<stash> for use in the templates.
+to a copy of the L</"stash"> for use in the templates.
 
 =head2 render_later
 
@@ -686,12 +707,12 @@ automatic rendering would result in a response.
 
 =head2 render_maybe
 
-  my $success = $c->render_maybe;
-  my $success = $c->render_maybe(controller => 'foo', action => 'bar');
-  my $success = $c->render_maybe('foo/index', format => 'html');
+  my $bool = $c->render_maybe;
+  my $bool = $c->render_maybe(controller => 'foo', action => 'bar');
+  my $bool = $c->render_maybe('foo/index', format => 'html');
 
-Try to render content but do not call C<render_not_found> if no response could
-be generated, takes the same arguments as C<render>.
+Try to render content but do not call L</"render_not_found"> if no response
+could be generated, takes the same arguments as L</"render">.
 
   # Render template "index_local" only if it exists
   $self->render_maybe('index_local') or $self->render('index');
@@ -705,8 +726,8 @@ C<not_found.$format.*> and set the response status code to C<404>.
 
 =head2 render_static
 
-  my $success = $c->render_static('images/logo.png');
-  my $success = $c->render_static('../lib/MyApp.pm');
+  my $bool = $c->render_static('images/logo.png');
+  my $bool = $c->render_static('../lib/MyApp.pm');
 
 Render a static file using L<Mojolicious::Static/"serve">, usually from the
 C<public> directories or C<DATA> sections of your application. Note that this
@@ -717,8 +738,8 @@ method does not protect from traversing to parent directories.
   $c = $c->rendered;
   $c = $c->rendered(302);
 
-Finalize response and emit C<after_dispatch> hook, defaults to using a C<200>
-response code.
+Finalize response and emit hook L<Mojolicious/"after_dispatch">, defaults to
+using a C<200> response code.
 
 =head2 req
 
@@ -734,7 +755,8 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $userinfo = $c->req->url->to_abs->userinfo;
   my $host     = $c->req->url->to_abs->host;
   my $agent    = $c->req->headers->user_agent;
-  my $body     = $c->req->body;
+  my $bytes    = $c->req->body;
+  my $str      = $c->req->text;
   my $hash     = $c->req->json;
   my $foo      = $c->req->json('/23/foo');
   my $dom      = $c->req->dom;
@@ -856,7 +878,7 @@ discarded.
   $c       = $c->stash(foo => 'bar');
 
 Non persistent data storage and exchange, application wide default values can
-be set with L<Mojolicious/"defaults">. Many stash values have a special
+be set with L<Mojolicious/"defaults">. Some stash values have a special
 meaning and are reserved, the full list is currently C<action>, C<app>, C<cb>,
 C<controller>, C<data>, C<extends>, C<format>, C<handler>, C<json>, C<layout>,
 C<namespace>, C<partial>, C<path>, C<status>, C<template> and C<text>. Note
@@ -877,7 +899,10 @@ that all stash values with a C<mojo.*> prefix are reserved for internal use.
   my $url = $c->url_for('http://mojolicio.us/perldoc');
   my $url = $c->url_for('mailto:sri@example.com');
 
-Generate a portable L<Mojo::URL> object with base for a route, path or URL.
+Generate a portable L<Mojo::URL> object with base for a path, URL or route.
+
+  # "http://127.0.0.1:3000/perldoc" if application has been started with Morbo
+  $c->url_for('/perldoc')->to_abs;
 
   # "/perldoc?foo=bar" if application is deployed under "/"
   $c->url_for('/perldoc')->query(foo => 'bar');
@@ -890,6 +915,19 @@ to inherit query parameters from the current request.
 
   # "/list?q=mojo&page=2" if current request was for "/list?q=mojo&page=1"
   $c->url_with->query([page => 2]);
+
+=head2 validation
+
+  my $validation = $c->validation;
+
+Get L<Mojolicious::Validator::Validation> object for current request to
+validate GET/POST parameters. Parts of the request body need to be loaded into
+memory to parse POST parameters, so you have to make sure it is not
+excessively large.
+
+  my $validation = $c->validation;
+  $validation->required('title')->size(3, 50);
+  my $title = $validation->param('title');
 
 =head2 write
 
@@ -942,7 +980,7 @@ optional drain callback will be invoked once all data has been written.
     });
   });
 
-You can call C<finish> at any time to end the stream.
+You can call L</"finish"> at any time to end the stream.
 
   2
   He

@@ -20,8 +20,13 @@ is_deeply app->config, {it => 'works'}, 'right value';
 # Load plugins
 my $config
   = plugin j_s_o_n_config => {default => {foo => 'baz', hello => 'there'}};
-plugin JSONConfig => {file =>
-    abs_path(catfile(dirname(__FILE__), 'json_config_lite_app_abs.json'))};
+my $log = '';
+my $cb = app->log->on(message => sub { $log .= pop });
+my $path
+  = abs_path(catfile(dirname(__FILE__), 'json_config_lite_app_abs.json'));
+plugin JSONConfig => {file => $path};
+like $log, qr/Reading config file "\Q$path\E"\./, 'right message';
+app->log->unsubscribe(message => $cb);
 is $config->{foo},          'bar',            'right value';
 is $config->{hello},        'there',          'right value';
 is $config->{utf},          'утф',         'right value';

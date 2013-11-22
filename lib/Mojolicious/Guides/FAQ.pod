@@ -59,6 +59,16 @@ and installation times without giving us anything in return. It would only
 make sense if we wanted to pass ownership of a module to a new maintainer,
 which we already have done in the past.
 
+=head2 Which versions of Perl are supported by Mojolicious?
+
+First of all, you need to be aware that according to the L<perlpolicy>, only
+the two most recent stable release series of Perl are supported by the
+community and receive bug fixes, which are currently 5.18.x and 5.16.x.
+L<Mojolicious> follows this model and fully supports these two release series.
+In addition we will also keep the distribution installable up to a certain
+legacy version that we deem worthy of supporting, but not specifically
+optimize for it, this is currently 5.10.1.
+
 =head2 What does the error "Maximum message size exceeded" mean?
 
 To protect your applications from excessively large requests and responses,
@@ -123,7 +133,8 @@ tweak it for applications that take a long time to process a request.
 
 This error message is often related to the one above, and means that the web
 server closed the connection before the user agent could receive the whole
-response.
+response or that the user agent got destroyed, which forces all connections to
+be closed immediately.
 
 =head2 What does "Worker 31842 has no heartbeat, restarting" mean?
 

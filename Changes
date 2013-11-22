@@ -1,4 +1,171 @@
 
+4.59  2013-11-22
+
+4.58  2013-11-19
+  - Improved IIS and WebSphere compatibility of Mojo::Message::Request.
+  - Improved Mojo::Collection to allow join without arguments.
+  - Improved Mojo::DOM::HTML performance.
+  - Fixed recursion bug in Mojo::Reactor::EV where timers could run more than
+    once.
+  - Fixed a few "0" value bugs in Mojo::DOM::HTML.
+
+4.57  2013-11-11
+  - Improved compatibility with IO::Socket::SSL 1.957.
+  - Fixed error event bug in Mojo::IOLoop::Delay.
+
+4.56  2013-11-09
+  - Fixed backspace escaping bug in Mojo::JSON. (ig3)
+
+4.55  2013-11-07
+  - Fixed Windows bug in "daemon.t".
+
+4.54  2013-11-07
+  - Added parts attribute to Mojo::Home.
+  - Fixed keep alive connection timeout bug in Mojo::UserAgent.
+  - Fixed support for links within a page in Mojolicious::Plugin::PODRenderer.
+  - Fixed home detection bug in Mojo.
+
+4.53  2013-10-30
+  - Fixed a few unsubscribe and error event bugs in Mojo::EventEmitter.
+
+4.52  2013-10-29
+  - Improved Mojo::EventEmitter to allow unhandled error events to be fatal.
+    (powerman, sri)
+
+4.51  2013-10-28
+  - Added tag_with_error helper to Mojolicious::Plugin::TagHelpers.
+  - Improved .ep template performance significantly, the number of helpers no
+    longer has any effect. (jberger, sri)
+  - Improved form_for performance.
+  - Improved built-in templates with documentation search.
+  - Fixed template inheritance bug in include helper.
+  - Fixed a few multipart form handling bugs.
+
+4.50  2013-10-22
+  - Deprecated Mojo::UserAgent::app in favor of
+    Mojo::UserAgent::Server::app.
+  - Deprecated Mojo::UserAgent::app_url in favor of
+    Mojo::UserAgent::Server::url.
+  - Deprecated Mojo::UserAgent::detect_proxy in favor of
+    Mojo::UserAgent::Proxy::detect.
+  - Deprecated Mojo::UserAgent::http_proxy in favor of
+    Mojo::UserAgent::Proxy::http.
+  - Deprecated Mojo::UserAgent::https_proxy in favor of
+    Mojo::UserAgent::Proxy::https.
+  - Deprecated Mojo::UserAgent::no_proxy in favor of
+    Mojo::UserAgent::Proxy::not.
+  - Deprecated Mojo::UserAgent::need_proxy in favor of
+    Mojo::UserAgent::Proxy::is_needed.
+  - Deprecated Mojo::UserAgent::name in favor of
+    Mojo::UserAgent::Transactor::name.
+  - Added modules Mojo::UserAgent::Proxy and Mojo::UserAgent::Server.
+  - Added proxy and server attributes to Mojo::UserAgent.
+  - Removed deprecated attrs method from Mojo::DOM.
+  - Improved Mojo::Message to allow max_message_size check to be disabled.
+  - Fixed small assignment bug in content helper.
+
+4.49  2013-10-17
+  - Added tls_ciphers option to Mojo::IOLoop::Server::listen.
+  - Added ciphers parameter to Mojo::Server::Daemon::listen.
+  - Removed experimental status from Mojolicioua::Validator.
+  - Removed experimental status from Mojolicioua::Validator::Validation.
+  - Removed experimental status from validation method in
+    Mojolicious::Controller.
+  - Removed experimental status from validator attribute in Mojolicious.
+  - Removed experimental status from validation helper in
+    Mojolicious::Plugin::DefaultHelpers.
+  - Fixed parameter bug in Mojolicious::Validator::Validation.
+
+4.48  2013-10-16
+  - Fixed support for Net::SSLeay 1.55.
+
+4.47  2013-10-15
+  - Added dumper function to Mojo::Util.
+  - Improved compatibility with IO::Socket::SSL 1.955.
+  - Improved IIS compatibility of Mojo::Server::CGI.
+
+4.46  2013-10-11
+  - Changed default name for generated applications from MyMojoliciousApp to
+    MyApp.
+  - Improved performance of route matching in Mojolicious::Routes::Pattern.
+  - Improved HTML Living Standard compliance of Mojo::DOM::HTML.
+
+4.45  2013-10-06
+  - Changed return values of validation checks in Mojolicious::Validator.
+  - Fixed unquoted attribute selector bug in Mojo::DOM::CSS.
+
+4.44  2013-10-04
+  - Removed experimental status from label_for helper.
+  - Renamed regex check in Mojolicious::Validator to like.
+
+4.43  2013-10-02
+  - Removed generators for dynamic error messages from Mojolicious::Validator.
+
+4.42  2013-09-30
+  - Added EXPERIMENTAL form validation support.
+  - Added EXPERIMENTAL modules Mojolicious::Validator and
+    Mojolicious::Validator::Validation.
+  - Added EXPERIMENTAL validation method to Mojolicious::Controller.
+  - Added EXPERIMENTAL validator attribute to Mojolicious.
+  - Added EXPERIMENTAL label_for and validation helpers to
+    Mojolicious::Plugin::DefaultHelpers.
+
+4.41  2013-09-22
+  - Improved documentation browser to be a little more RESTful.
+  - Fixed flatten to work with older versions of Perl. (jamadam)
+
+4.40  2013-09-21
+  - Added text method to Mojo::Message.
+  - Added siblings method to Mojo::DOM.
+  - Added flatten method to Mojo::Collection.
+  - Improved documentation browser with source links.
+  - Fixed smart whitespace trimming bug in Mojo::DOM.
+  - Fixed table parsing bug in Mojo::DOM::HTML.
+  - Fixed bug in Mojolicious::Types where the txt MIME type did not specify a
+    charset.
+
+4.39  2013-09-17
+  - Improved HTML5.1 compliance of Mojo::DOM::HTML.
+
+4.38  2013-09-16
+  - Added is_binary method to Mojo::Loader.
+  - Fixed support for binary files in inflate command.
+  - Fixed stylesheet helper not to enforce a media attribute.
+
+4.37  2013-09-13
+  - Improved design of built-in templates.
+
+4.36  2013-09-12
+  - Added match method to Mojo::DOM.
+  - Added match method to Mojo::DOM::CSS.
+  - Improved ancestors and children methods in Mojo::DOM to support all CSS
+    selectors.
+  - Improved syntax highlighting in documentation browser.
+  - Improved compatibility with different object systems.
+
+4.35  2013-09-10
+  - Added origin attribute to Mojo::Cookie::Response.
+  - Fixed RFC 6265 compliance bugs in Mojo::Cookie::Request,
+    Mojo::Cookie::Response and Mojo::UserAgent::CookieJar.
+
+4.34  2013-09-08
+  - Fixed portability bug in SO_REUSEPORT tests.
+
+4.33  2013-09-07
+  - Fixed portability bug in Mojo::IOLoop::Delay.
+
+4.32  2013-09-06
+  - Added error event to Mojo::IOLoop::Delay.
+
+4.31  2013-09-04
+  - Deprecated mode specific methods in application class.
+      sub production_mode {...}
+    becomes (in the startup method)
+      if ($app->mode eq 'production') {...}
+
+4.30  2013-09-01
+  - Fixed memory leak in Mojolicious::Routes.
+
 4.29  2013-08-31
   - Fixed automatic rendering to work after non-blocking operations have been
     performed in bridges.
@@ -2430,7 +2597,7 @@
   - Added EXPERIMENTAL attribute partial to MojoX::Routes.
   - Added EXPERIMENTAL CSS3 selector tests to Test::Mojo.
   - Added EXPERIMENTAL method test_server to Mojo::Client.
-  - Added EXPERIMENTAL oneliner module ojo.
+  - Added EXPERIMENTAL one-liner module ojo.
   - Added EXPERIMENTAL support for static files in the DATA section of
     Mojolicious applications.
   - Added EXPERIMENTAL Bonjour support.
@@ -3276,10 +3443,10 @@
   - Countless small bugs fixed and tests added.
 
 0.6  2008-09-24
-  - Many more bugfixes.
+  - Many more bug fixes.
 
 0.5  2008-09-24
-  - Many small bugfixes.
+  - Many small bug fixes.
 
 0.4  2008-09-24
   - Moved everything into the Mojo namespace.

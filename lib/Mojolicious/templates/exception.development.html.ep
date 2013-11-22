@@ -6,11 +6,11 @@
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
     %= javascript '/mojo/prettify/run_prettify.js'
-    %= stylesheet '/mojo/prettify/prettify-mojo.css'
+    %= stylesheet '/mojo/prettify/prettify-mojo-dark.css'
     %= stylesheet begin
       a img { border: 0 }
       body {
-        background-color: #f5f6f8;
+        background: url(<%= url_for '/mojo/pinstripe-light.png' %>);
         color: #445555;
         font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
         font-weight: normal;
@@ -18,7 +18,7 @@
         margin: 0;
       }
       pre {
-        font: 0.8em Consolas, Menlo, Monaco, Courier, monospace;
+        font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
         margin: 0;
         white-space: pre-wrap;
       }
@@ -31,15 +31,13 @@
       td { padding: 0.5em }
       .box {
         background-color: #fff;
-        -moz-box-shadow: 0px 0px 2px #ccc;
-        -webkit-box-shadow: 0px 0px 2px #ccc;
-        box-shadow: 0px 0px 2px #ccc;
+        box-shadow: 0px 0px 2px #999;
         overflow: hidden;
         padding: 1em;
       }
       .code {
         background-color: #1a1a1a;
-        background: url(<%= url_for '/mojo/pinstripe.gif' %>);
+        background: url(<%= url_for '/mojo/pinstripe-dark.png' %>);
         color: #eee;
         text-shadow: #333 0 1px 0;
       }
@@ -78,16 +76,12 @@
       }
       #showcase .key { padding-right: 0 }
       #more, #trace {
-        -moz-border-radius-bottomleft: 5px;
         border-bottom-left-radius: 5px;
-        -moz-border-radius-bottomright: 5px;
         border-bottom-right-radius: 5px;
       }
       #more .tap, #trace .tap { text-shadow: #ddd 0 1px 0 }
       #request {
-        -moz-border-radius-topleft: 5px;
         border-top-left-radius: 5px;
-        -moz-border-radius-topright: 5px;
         border-top-right-radius: 5px;
         margin-top: 1em;
       }
@@ -193,7 +187,7 @@
           %= $kv->(Stash => dumper $snapshot)
           %= $kv->(Session => dumper session)
           %= $kv->(Version => $req->version)
-          % for my $name (@{$self->req->headers->names}) {
+          % for my $name (sort @{$self->req->headers->names}) {
             % my $value = $self->req->headers->header($name);
             %= $kv->($name, $value)
           % }

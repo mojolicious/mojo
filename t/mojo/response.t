@@ -7,6 +7,7 @@ use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::JSON;
 use Mojo::Message::Response;
+use Mojo::Util 'encode';
 
 # Common status codes
 my $res = Mojo::Message::Response->new;
@@ -193,6 +194,26 @@ is $res->message,     'Internal Server Error', 'right message';
 is $res->version,     '1.0', 'right version';
 is $res->headers->content_type,   'text/plain', 'right "Content-Type" value';
 is $res->headers->content_length, 27,           'right "Content-Length" value';
+is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+
+# Parse full HTTP 1.0 response (no limit)
+{
+  local $ENV{MOJO_MAX_MESSAGE_SIZE} = 0;
+  $res = Mojo::Message::Response->new;
+  is $res->max_message_size, 0, 'right size';
+  $res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
+  $res->parse("Content-Type: text/plain\x0d\x0a");
+  $res->parse("Content-Length: 27\x0d\x0a\x0d\x0a");
+  $res->parse("Hello World!\n1234\nlalalala\n");
+  ok $res->is_finished, 'response is finished';
+  ok !$res->error, 'no error';
+  is $res->code,    500,                     'right status';
+  is $res->message, 'Internal Server Error', 'right message';
+  is $res->version, '1.0',                   'right version';
+  is $res->headers->content_type, 'text/plain', 'right "Content-Type" value';
+  is $res->headers->content_length, 27, 'right "Content-Length" value';
+  is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
+}
 
 # Parse full HTTP 1.0 response (missing Content-Length)
 $res = Mojo::Message::Response->new;
@@ -934,6 +955,10 @@ is $res->body('hello!')->body, 'hello!', 'right content';
 $res->content(Mojo::Content::MultiPart->new);
 $res->body('hi!');
 is $res->body, 'hi!', 'right content';
+is $res->body(encode('UTF-8', '☃'))->text, encode('UTF-8', '☃'),
+  'right content';
+$res->headers->content_type('text/plain;charset=UTF-8');
+is $res->body(encode('UTF-8', '☃'))->text, '☃', 'right content';
 
 # Body exceeding memory limit (no upgrade)
 {

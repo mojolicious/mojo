@@ -261,7 +261,11 @@ Response status codes can be changed with the C<status> stash value.
 The C<Content-Type> header of the response is actually based on the MIME type
 mapping of the C<format> stash value.
 
+  # Content-Type: text/plain
   $self->render(text => 'Hello.', format => 'txt');
+
+  # Content-Type: image/png
+  $self->render(data => $bytes, format => 'png');
 
 These mappings can be easily extended or changed with L<Mojolicious/"types">.
 
@@ -321,12 +325,14 @@ L<Mojolicious::Controller/"render">.
 
 The best possible representation will be automatically selected from the
 C<Accept> request header, C<format> stash value or C<format> GET/POST
-parameter.
+parameter and stored in the C<format> stash value. To change MIME type
+mappings for the C<Accept> request header or the C<Content-Type> response
+header you can use L<Mojolicious/"types">.
 
   $self->respond_to(
     json => {json => {hello => 'world'}},
     html => sub {
-      $self->content_for(head => '<meta name="author" content="sri" />');
+      $self->content_for(head => '<meta name="author" content="sri">');
       $self->render(template => 'hello', message => 'world')
     }
   );
@@ -613,6 +619,135 @@ template with named blocks that child templates can override.
 
 This chain could go on and on to allow a very high level of template reuse.
 
+=head2 Form validation
+
+You can use L<Mojolicious::Controller/"validation"> to validate GET/POST
+parameters submitted to your application. All unknown fields will be ignored
+by default, so you have to decide which should be required or optional before
+you can perform checks on their values. Every check is performed right away,
+so you can use the results immediately to build more advanced validation logic
+with methods like L<Mojolicious::Validator::Validation/"is_valid">.
+
+  use Mojolicious::Lite;
+
+  get '/' => sub {
+    my $self = shift;
+
+    # Check if parameters have been submitted
+    my $validation = $self->validation;
+    return $self->render unless $validation->has_data;
+
+    # Validate parameters ("pass_again" depends on "pass")
+    $validation->required('user')->size(1, 20)->like(qr/^[e-t]+$/);
+    $validation->required('pass_again')->equal_to('pass')
+      if $validation->optional('pass')->size(7, 500)->is_valid;
+
+    # Render confirmation if validation was successful
+    $self->render('thanks') unless $validation->has_error;
+  } => 'index';
+
+  app->start;
+  __DATA__
+
+  @@ index.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head>
+      %= stylesheet begin
+        label.field-with-error { color: #dd7e5e }
+        input.field-with-error { background-color: #fd9e7e }
+      % end
+    </head>
+    <body>
+      %= form_for index => begin
+        %= label_for user => 'Username (required, 1-20 characters, only e-t)'
+        <br>
+        %= text_field 'user'
+        %= submit_button
+        <br>
+        %= label_for pass => 'Password (optional, 7-500 characters)'
+        <br>
+        %= password_field 'pass'
+        <br>
+        %= label_for pass_again => 'Password again (equal to the value above)'
+        <br>
+        %= password_field 'pass_again'
+      % end
+    </body>
+  </html>
+
+  @@ thanks.html.ep
+  <!DOCTYPE html>
+  <html><body>Thank you <%= validation->param('user') %>.</body></html>
+
+Form elements generated with tag helpers from
+L<Mojolicious::Plugin::TagHelpers> will automatically remember their previous
+values and add the class C<field-with-error> for fields that failed validation
+to make styling with CSS easier.
+
+  <label class="field-with-error" for="user">
+    Username (required, only characters e-t)
+  </label>
+  <input class="field-with-error" type="text" name="user" value="sri" />
+
+For a full list of available checks see also
+L<Mojolicious::Validator/"CHECKS">.
+
+=head2 Adding form validation checks
+
+Validation checks can be registered with L<Mojolicious::Validator/"add_check">
+and return a false value if they were successful. A true value may be used to
+pass along additional information which can then be retrieved with
+L<Mojolicious::Validator::Validation/"error">.
+
+  use Mojolicious::Lite;
+
+  # Add "range" check
+  app->validator->add_check(range => sub {
+    my ($validation, $name, $value, $min, $max) = @_;
+    return $value < $min || $value > $max;
+  });
+
+  get '/' => 'form';
+
+  post '/test' => sub {
+    my $self = shift;
+
+    # Validate parameters with custom check
+    my $validation = $self->validation;
+    $validation->required('number')->range(3, 23);
+
+    # Render form again if validation failed
+    return $self->render('form') if $validation->has_error;
+
+    # Prevent double submit with redirect
+    $self->flash(number => $validation->param('number'));
+    $self->redirect_to('form');
+  };
+
+  app->start;
+  __DATA__
+
+  @@ form.html.ep
+  <!DOCTYPE html>
+  <html>
+    <body>
+      % if (my $number = flash 'number') {
+        <p>Thanks, the number <%= $number %> was valid.</p>
+      % }
+      %= form_for test => begin
+        % if (my $err = validation->error('number')) {
+          <p>
+            %= 'Value is required.' if $err->[0] eq 'required'
+            %= 'Value needs to be between 3 and 23.' if $err->[0] eq 'range'
+          </p>
+        % }
+        %= text_field 'number'
+        %= submit_button
+      % end
+    </html>
+  </html>
+
 =head2 Adding helpers
 
 Adding and redefining helpers is very easy, you can use them to do pretty much
@@ -682,7 +817,8 @@ applications, plugins make that very simple.
 
   1;
 
-The C<register> method will be called when you load the plugin.
+The C<register> method will be called when you load the plugin and to add your
+helper to the application you can use L<Mojolicious/"helper">.
 
   use Mojolicious::Lite;
 
@@ -879,7 +1015,7 @@ might not work perfectly in all deployment environments.
 =head2 Encoding
 
 Templates stored in files are expected to be C<UTF-8> by default, but that can
-be easily changed.
+be easily changed with L<Mojolicious::Renderer/"encoding">.
 
   # Application
   package MyApp;
@@ -954,7 +1090,8 @@ L<Mojo::Template> contains the whole list of available options.
 
 Maybe you would prefer a different template system than C<ep>, and there is
 not already a plugin on CPAN for your favorite one, all you have to do is add
-a new C<handler> when C<register> is called.
+a new C<handler> with L<Mojolicious::Renderer/"add_handler"> when C<register>
+is called.
 
   package Mojolicious::Plugin::MyRenderer;
   use Mojo::Base 'Mojolicious::Plugin';
@@ -1005,6 +1142,32 @@ the renderer provides methods to help you with that.
 
   @@ index.html.mine
   ...
+
+=head2 Adding a handler to generate binary data
+
+By default the renderer assumes that every C<handler> generates characters
+that need to be automatically encoded, but this can be be easily disabled if
+you're generating bytes instead.
+
+  use Mojolicious::Lite;
+  use Mango::BSON ':bson';
+
+  # Add "bson" handler
+  app->renderer->add_handler(bson => sub {
+    my ($renderer, $c, $output, $options) = @_;
+
+    # Disable automatic encoding
+    delete $options->{encoding};
+
+    # Encode BSON data from stash value
+    $$output = bson_encode delete $c->stash->{bson};
+
+    return 1;
+  });
+
+  get '/' => {bson => {i => '♥ mojolicious'}, handler => 'bson'};
+
+  app->start;
 
 =head1 MORE
 

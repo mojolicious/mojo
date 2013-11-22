@@ -380,8 +380,8 @@ L<Mojo::Content> implements the following attributes.
 
 =head2 auto_relax
 
-  my $relax = $content->auto_relax;
-  $content  = $content->auto_relax(1);
+  my $bool = $content->auto_relax;
+  $content = $content->auto_relax($bool);
 
 Try to detect when relaxed parsing is necessary.
 
@@ -410,16 +410,16 @@ value of the MOJO_MAX_LEFTOVER_SIZE environment variable or C<262144>.
 
 =head2 relaxed
 
-  my $relaxed = $content->relaxed;
-  $content    = $content->relaxed(1);
+  my $bool = $content->relaxed;
+  $content = $content->relaxed($bool);
 
 Activate relaxed parsing for responses that are terminated with a connection
 close.
 
 =head2 skip_body
 
-  my $skip = $content->skip_body;
-  $content = $content->skip_body(1);
+  my $bool = $content->skip_body;
+  $content = $content->skip_body($bool);
 
 Skip body parsing and finish after headers.
 
@@ -430,7 +430,7 @@ implements the following new ones.
 
 =head2 body_contains
 
-  my $success = $content->body_contains('foo bar baz');
+  my $bool = $content->body_contains('foo bar baz');
 
 Check if content contains a specific string. Meant to be overloaded in a
 subclass.
@@ -498,34 +498,34 @@ Size of headers in bytes.
 
 =head2 is_chunked
 
-  my $success = $content->is_chunked;
+  my $bool = $content->is_chunked;
 
 Check if content is chunked.
 
 =head2 is_compressed
 
-  my $success = $content->is_compressed;
+  my $bool = $content->is_compressed;
 
 Check if content is C<gzip> compressed.
 
 =head2 is_dynamic
 
-  my $success = $content->is_dynamic;
+  my $bool = $content->is_dynamic;
 
-Check if content will be dynamically generated, which prevents C<clone> from
-working.
+Check if content will be dynamically generated, which prevents L</"clone">
+from working.
 
 =head2 is_finished
 
-  my $success = $content->is_finished;
+  my $bool = $content->is_finished;
 
 Check if parser is finished.
 
 =head2 is_limit_exceeded
 
-  my $success = $content->is_limit_exceeded;
+  my $bool = $content->is_limit_exceeded;
 
-Check if buffer has exceeded C<max_buffer_size>.
+Check if buffer has exceeded L</"max_buffer_size">.
 
 =head2 is_multipart
 
@@ -535,7 +535,7 @@ False.
 
 =head2 is_parsing_body
 
-  my $success = $content->is_parsing_body;
+  my $bool = $content->is_parsing_body;
 
 Check if body parsing started yet.
 

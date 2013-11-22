@@ -9,16 +9,15 @@ use File::Spec::Functions qw(abs2rel catdir catfile splitdir);
 use FindBin;
 use Mojo::Util qw(class_to_path slurp);
 
+has parts => sub { [] };
+
 sub new { shift->SUPER::new->parse(@_) }
 
 sub detect {
   my $self = shift;
 
   # Environment variable
-  if ($ENV{MOJO_HOME}) {
-    $self->{parts} = [splitdir(abs_path $ENV{MOJO_HOME})];
-    return $self;
-  }
+  return $self->parts([splitdir(abs_path $ENV{MOJO_HOME})]) if $ENV{MOJO_HOME};
 
   # Try to find home from lib directory
   if (my $class = @_ ? shift : 'Mojo::HelloWorld') {
@@ -31,28 +30,23 @@ sub detect {
       pop @home while @home && ($home[-1] =~ /^b?lib$/ || $home[-1] eq '');
 
       # Turn into absolute path
-      $self->{parts} = [splitdir(abs_path(catdir(@home) || '.'))];
+      return $self->parts([splitdir(abs_path(catdir(@home) || '.'))]);
     }
   }
 
   # FindBin fallback
-  $self->{parts} = [split /\//, $FindBin::Bin] unless $self->{parts};
-
-  return $self;
+  return $self->parts([split /\//, $FindBin::Bin]);
 }
 
 sub lib_dir {
-  my $path = catdir @{shift->{parts} || []}, 'lib';
+  my $path = catdir @{shift->parts}, 'lib';
   return -d $path ? $path : undef;
 }
 
 sub list_files {
   my ($self, $dir) = @_;
 
-  # Files relative to directory
-  my $parts = $self->{parts} || [];
-  my $root = catdir @$parts;
-  $dir = catdir $root, split '/', ($dir || '');
+  $dir = catdir @{$self->parts}, split '/', ($dir // '');
   return [] unless -d $dir;
   my @files;
   find {
@@ -70,14 +64,13 @@ sub mojo_lib_dir { catdir(dirname(__FILE__), '..') }
 
 sub parse {
   my ($self, $path) = @_;
-  $self->{parts} = [splitdir $path] if defined $path;
-  return $self;
+  return defined $path ? $self->parts([splitdir $path]) : $self;
 }
 
-sub rel_dir { catdir(@{shift->{parts} || []}, split '/', shift) }
-sub rel_file { catfile(@{shift->{parts} || []}, split '/', shift) }
+sub rel_dir { catdir(@{shift->parts}, split '/', shift) }
+sub rel_file { catfile(@{shift->parts}, split '/', shift) }
 
-sub to_string { catdir(@{shift->{parts} || []}) }
+sub to_string { catdir(@{shift->parts}) }
 
 1;
 
@@ -102,6 +95,17 @@ Mojo::Home - Home sweet home!
 
 L<Mojo::Home> is a container for home directories.
 
+=head1 ATTRIBUTES
+
+L<Mojo::Home> implements the following attributes.
+
+=head2 parts
+
+  my $parts = $home->parts;
+  $home     = $home->parts([]);
+
+Home directory parts.
+
 =head1 METHODS
 
 L<Mojo::Home> inherits all methods from L<Mojo::Base> and implements the
@@ -112,7 +116,8 @@ following new ones.
   my $home = Mojo::Home->new;
   my $home = Mojo::Home->new('/home/sri/myapp');
 
-Construct a new L<Mojo::Home> object and C<parse> home directory if necessary.
+Construct a new L<Mojo::Home> object and L</"parse"> home directory if
+necessary.
 
 =head2 detect
 

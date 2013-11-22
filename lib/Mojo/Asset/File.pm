@@ -176,8 +176,8 @@ implements the following new ones.
 
 =head2 cleanup
 
-  my $cleanup = $file->cleanup;
-  $file       = $file->cleanup(1);
+  my $bool = $file->cleanup;
+  $file    = $file->cleanup($bool);
 
 Delete file automatically once it's not used anymore.
 
@@ -193,7 +193,7 @@ Filehandle, created on demand.
   my $path = $file->path;
   $file    = $file->path('/home/sri/foo.txt');
 
-File path used to create C<handle>, can also be automatically generated if
+File path used to create L</"handle">, can also be automatically generated if
 necessary.
 
 =head2 tmpdir
@@ -201,7 +201,7 @@ necessary.
   my $tmpdir = $file->tmpdir;
   $file      = $file->tmpdir('/tmp');
 
-Temporary directory used to generate C<path>, defaults to the value of the
+Temporary directory used to generate L</"path">, defaults to the value of the
 MOJO_TMPDIR environment variable or auto detection.
 
 =head1 METHODS
@@ -239,7 +239,7 @@ True.
 
   $file = $file->move_to('/home/sri/bar.txt');
 
-Move asset data into a specific file and disable C<cleanup>.
+Move asset data into a specific file and disable L</"cleanup">.
 
 =head2 size
 

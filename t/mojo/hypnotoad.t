@@ -16,15 +16,18 @@ use FindBin;
 use IO::Socket::INET;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
-use Mojo::Util 'spurt';
+use Mojo::Util qw(slurp spurt);
 
 # Prepare script
 my $dir = tempdir CLEANUP => 1;
 my $script = catdir $dir, 'myapp.pl';
+my $log    = catdir $dir, 'mojo.log';
 my $port1  = Mojo::IOLoop->generate_port;
 my $port2  = Mojo::IOLoop->generate_port;
 spurt <<EOF, $script;
 use Mojolicious::Lite;
+
+app->log->path('$log');
 
 plugin Config => {
   default => {
@@ -36,7 +39,7 @@ plugin Config => {
   }
 };
 
-app->log->level('fatal');
+app->log->level('debug');
 
 get '/hello' => {text => 'Hello Hypnotoad!'};
 
@@ -47,12 +50,7 @@ EOF
 my $prefix = "$FindBin::Bin/../../script";
 open my $start, '-|', $^X, "$prefix/hypnotoad", $script;
 sleep 3;
-sleep 1
-  while !IO::Socket::INET->new(
-  Proto    => 'tcp',
-  PeerAddr => '127.0.0.1',
-  PeerPort => $port2
-  );
+sleep 1 while !_port($port2);
 my $old = _pid();
 
 my $ua = Mojo::UserAgent->new;
@@ -93,6 +91,8 @@ is $tx->res->body, 'Hello Hypnotoad!', 'right content';
 spurt <<EOF, $script;
 use Mojolicious::Lite;
 
+app->log->path('$log');
+
 plugin Config => {
   default => {
     hypnotoad => {
@@ -103,7 +103,7 @@ plugin Config => {
   }
 };
 
-app->log->level('fatal');
+app->log->level('debug');
 
 get '/hello' => {text => 'Hello World!'};
 
@@ -171,12 +171,13 @@ is $tx->res->body, 'Hello World!', 'right content';
 
 # Stop
 open my $stop, '-|', $^X, "$prefix/hypnotoad", $script, '-s';
-sleep 1
-  while IO::Socket::INET->new(
-  Proto    => 'tcp',
-  PeerAddr => '127.0.0.1',
-  PeerPort => $port2
-  );
+sleep 1 while _port($port2);
+
+# Check log
+$log = slurp $log;
+like $log, qr/Worker \d+ started\./,                      'right message';
+like $log, qr/Starting zero downtime software upgrade\./, 'right message';
+like $log, qr/Upgrade successful, stopping $old\./,       'right message';
 
 sub _pid {
   return undef unless open my $file, '<', catdir($dir, 'hypnotoad.pid');
@@ -184,5 +185,7 @@ sub _pid {
   chomp $pid;
   return $pid;
 }
+
+sub _port { IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => shift) }
 
 done_testing();

@@ -77,7 +77,9 @@ the following new ones.
     ...
   });
 
-Emitted safely for exceptions caught in callbacks.
+Emitted for exceptions caught in callbacks, fatal if unhandled. Note that if
+this event is unhandled or fails it might kill your program, so you need to be
+careful.
 
   $reactor->on(error => sub {
     my ($reactor, $err) = @_;
@@ -121,14 +123,14 @@ readable or writable. Meant to be overloaded in a subclass.
 
 =head2 is_readable
 
-  my $success = $reactor->is_readable($handle);
+  my $bool = $reactor->is_readable($handle);
 
 Quick non-blocking check if a handle is readable, useful for identifying
 tainted sockets.
 
 =head2 is_running
 
-  my $success = $reactor->is_running;
+  my $bool = $reactor->is_running;
 
 Check if reactor is running. Meant to be overloaded in a subclass.
 
@@ -156,8 +158,8 @@ amount of time in seconds. Meant to be overloaded in a subclass.
 
 =head2 remove
 
-  my $success = $reactor->remove($handle);
-  my $success = $reactor->remove($id);
+  my $bool = $reactor->remove($handle);
+  my $bool = $reactor->remove($id);
 
 Remove handle or timer. Meant to be overloaded in a subclass.
 
@@ -165,7 +167,7 @@ Remove handle or timer. Meant to be overloaded in a subclass.
 
   $reactor->start;
 
-Start watching for I/O and timer events, this will block until C<stop> is
+Start watching for I/O and timer events, this will block until L</"stop"> is
 called. Note that some reactors stop automatically if there are no events
 being watched anymore. Meant to be overloaded in a subclass.
 

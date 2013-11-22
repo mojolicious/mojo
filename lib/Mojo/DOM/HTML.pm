@@ -49,31 +49,42 @@ my $TOKEN_RE = qr/
   )??
 /xis;
 
-# Optional HTML elements
-my %OPTIONAL = map { $_ => 1 }
-  qw(body colgroup dd head li optgroup option p rt rp tbody td tfoot th);
-
-# Elements that break HTML paragraphs
-my %PARAGRAPH = map { $_ => 1 } (
+# HTML elements that break paragraphs
+my @PARAGRAPH = (
   qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
-  qw(h3 h4 h5 h6 header hgroup hr menu nav ol p pre section table ul)
+  qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul)
 );
 
-# HTML table elements
-my %TABLE = map { $_ => 1 } qw(col colgroup tbody td th thead tr);
+# HTML elements with optional end tags
+my %END = (
+  body => ['head'],
+  dd   => [qw(dt dd)],
+  dt   => [qw(dt dd)],
+  rp   => [qw(rt rp)],
+  rt   => [qw(rt rp)]
+);
+$END{$_} = [$_]  for qw(optgroup option);
+$END{$_} = ['p'] for @PARAGRAPH;
 
-# HTML void elements
+# HTML table elements with optional end tags
+my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
+
+# HTML elements without end tags
 my %VOID = map { $_ => 1 } (
-  qw(area base br col command embed hr img input keygen link meta param),
+  qw(area base br col embed hr img input keygen link menuitem meta param),
   qw(source track wbr)
 );
 
-# HTML inline elements
-my %INLINE = map { $_ => 1 } (
-  qw(a abbr acronym applet b basefont bdo big br button cite code del dfn em),
-  qw(font i iframe img ins input kbd label map object q s samp script select),
-  qw(small span strike strong sub sup textarea tt u var)
+# HTML elements categorized as phrasing content (and obsolete inline elements)
+my @PHRASING = (
+  qw(a abbr area audio b bdi bdo br button canvas cite code data datalist),
+  qw(del dfn em embed i iframe img input ins kbd keygen label link map mark),
+  qw(math meta meter noscript object output progress q ruby s samp script),
+  qw(select small span strong sub sup svg template textarea time u var video),
+  qw(wbr)
 );
+my @OBSOLETE = qw(acronym applet basefont big font strike tt);
+my %PHRASING = map { $_ => 1 } @OBSOLETE, @PHRASING;
 
 sub parse {
   my ($self, $html) = @_;
@@ -85,24 +96,19 @@ sub parse {
 
     # Text (and runaway "<")
     $text .= '<' if defined $runaway;
-    if (length $text) {
-      $text = html_unescape $text;
-      my $sibling = $current->[-1];
-      if (ref $sibling && $sibling->[0] eq 'text') { $sibling->[1] .= $text }
-      else { push @$current, ['text', $text] }
-    }
+    push @$current, ['text', html_unescape $text] if length $text;
 
     # DOCTYPE
-    if ($doctype) { push @$current, ['doctype', $doctype] }
+    if (defined $doctype) { push @$current, ['doctype', $doctype] }
 
     # Comment
-    elsif ($comment) { push @$current, ['comment', $comment] }
+    elsif (defined $comment) { push @$current, ['comment', $comment] }
 
     # CDATA
-    elsif ($cdata) { push @$current, ['cdata', $cdata] }
+    elsif (defined $cdata) { push @$current, ['cdata', $cdata] }
 
     # Processing instruction (try to detect XML)
-    elsif ($pi) {
+    elsif (defined $pi) {
       $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
       push @$current, ['pi', $pi];
     }
@@ -131,7 +137,7 @@ sub parse {
       # Tag
       $self->_start($start, \%attrs, \$current);
 
-      # Empty element
+      # Element without end tag
       $self->_end($start, \$current)
         if (!$self->xml && $VOID{$start}) || $attr =~ m!/\s*$!;
 
@@ -151,18 +157,12 @@ sub parse {
 sub render { $_[0]->_render($_[0]->tree) }
 
 sub _close {
-  my ($self, $current, $tags, $stop) = @_;
-  $tags ||= \%TABLE;
-  $stop ||= 'table';
+  my ($self, $current, $allowed, $scope) = @_;
 
-  # Check if parents need to be closed
+  # Close allowed parent elements in scope
   my $parent = $$current;
-  while ($parent->[0] ne 'root' && $parent->[1] ne $stop) {
-
-    # Close
-    $tags->{$parent->[1]} and $self->_end($parent->[1], $current);
-
-    # Try next
+  while ($parent->[0] ne 'root' && $parent->[1] ne $scope) {
+    $self->_end($parent->[1], $current) if $allowed->{$parent->[1]};
     $parent = $parent->[3];
   }
 }
@@ -178,8 +178,8 @@ sub _end {
     # Right tag
     ++$found and last if $next->[1] eq $end;
 
-    # Inline elements can only cross other inline elements
-    return if !$self->xml && $INLINE{$end} && !$INLINE{$next->[1]};
+    # Phrasing content can only cross phrasing content
+    return if !$self->xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
 
     $next = $next->[3];
   }
@@ -195,11 +195,8 @@ sub _end {
     # Match
     if ($end eq $$current->[1]) { return $$current = $$current->[3] }
 
-    # Optional elements
-    elsif ($OPTIONAL{$$current->[1]}) { $self->_end($$current->[1], $current) }
-
     # Table
-    elsif ($end eq 'table') { $self->_close($current) }
+    elsif ($end eq 'table') { $self->_close($current, \%TABLE, $end) }
 
     # Missing end tag
     $self->_end($$current->[1], $current);
@@ -229,7 +226,7 @@ sub _render {
   return '<?' . $tree->[1] . '?>' if $e eq 'pi';
 
   # Start tag
-  my $start = $e eq 'root' ? 1 : 2;
+  my $start   = 1;
   my $content = '';
   if ($e eq 'tag') {
     $start = 4;
@@ -252,7 +249,7 @@ sub _render {
     my $attrs = join ' ', @attrs;
     $content .= " $attrs" if $attrs;
 
-    # Empty tag
+    # Element without end tag
     return $self->xml || $VOID{$tag} ? "$content />" : "$content></$tag>"
       unless $tree->[4];
 
@@ -274,43 +271,22 @@ sub _start {
 
   # Autoclose optional HTML elements
   if (!$self->xml && $$current->[0] ne 'root') {
+    if (my $end = $END{$start}) { $self->_end($_, $current) for @$end }
 
-    # "<li>"
-    if ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
+    # "li"
+    elsif ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
 
-    # "<p>"
-    elsif ($PARAGRAPH{$start}) { $self->_end('p', $current) }
-
-    # "<head>"
-    elsif ($start eq 'body') { $self->_end('head', $current) }
-
-    # "<optgroup>"
-    elsif ($start eq 'optgroup') { $self->_end('optgroup', $current) }
-
-    # "<option>"
-    elsif ($start eq 'option') { $self->_end('option', $current) }
-
-    # "<colgroup>", "<thead>", "tbody" and "tfoot"
+    # "colgroup", "thead", "tbody" and "tfoot"
     elsif (grep { $_ eq $start } qw(colgroup thead tbody tfoot)) {
-      $self->_close($current);
+      $self->_close($current, \%TABLE, 'table');
     }
 
-    # "<tr>"
-    elsif ($start eq 'tr') { $self->_close($current, {tr => 1}) }
+    # "tr"
+    elsif ($start eq 'tr') { $self->_close($current, {tr => 1}, 'table') }
 
-    # "<th>" and "<td>"
+    # "th" and "td"
     elsif ($start eq 'th' || $start eq 'td') {
-      $self->_close($current, {$_ => 1}) for qw(th td);
-    }
-
-    # "<dt>" and "<dd>"
-    elsif ($start eq 'dt' || $start eq 'dd') {
-      $self->_end($_, $current) for qw(dt dd);
-    }
-
-    # "<rt>" and "<rp>"
-    elsif ($start eq 'rt' || $start eq 'rp') {
-      $self->_end($_, $current) for qw(rt rp);
+      $self->_close($current, {$_ => 1}, 'table') for qw(th td);
     }
   }
 
@@ -356,8 +332,8 @@ carefully since it is very dynamic.
 
 =head2 xml
 
-  my $xml = $html->xml;
-  $html   = $html->xml(1);
+  my $bool = $html->xml;
+  $html    = $html->xml($bool);
 
 Disable HTML semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.
@@ -371,7 +347,7 @@ following new ones.
 
   $html = $html->parse('<foo bar="baz">test</foo>');
 
-Parse HTML/XML document.
+Parse HTML/XML fragment.
 
 =head2 render
 

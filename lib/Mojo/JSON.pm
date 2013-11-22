@@ -19,7 +19,7 @@ my %ESCAPE = (
   '"'     => '"',
   '\\'    => '\\',
   '/'     => '/',
-  'b'     => "\x07",
+  'b'     => "\x08",
   'f'     => "\x0c",
   'n'     => "\x0a",
   'r'     => "\x0d",
@@ -75,7 +75,7 @@ sub decode {
     # Object
     elsif (m/\G\{/gc) { $ref = _decode_object() }
 
-    # Unexpected
+    # Invalid character
     else { _exception('Expected array or object') }
 
     # Leftover data
@@ -169,7 +169,7 @@ sub _decode_string {
   m!\G((?:(?:[^\x00-\x1f\\"]|\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4})){0,32766})*)!gc;
   my $str = $1;
 
-  # Missing quote
+  # Invalid character
   unless (m/\G"/gc) {
     _exception('Unexpected character or invalid escape while parsing string')
       if m/\G[\x00-\x1f\\]/;
@@ -244,7 +244,7 @@ sub _decode_value {
   # Null
   return undef if m/\Gnull/gc;
 
-  # Invalid data
+  # Invalid character
   _exception('Expected string, array, object, number, boolean or null');
 }
 
@@ -329,8 +329,9 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 SYNOPSIS
 
-  # Encode and decode JSON
   use Mojo::JSON;
+
+  # Encode and decode JSON
   my $json  = Mojo::JSON->new;
   my $bytes = $json->encode({foo => [1, 2], bar => 'hello!', baz => \1});
   my $hash  = $json->decode($bytes);
@@ -347,9 +348,8 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 DESCRIPTION
 
-L<Mojo::JSON> is a minimalistic and relaxed implementation of RFC 4627. While
-it is possibly the fastest pure-Perl JSON parser available, you should not use
-it for validation.
+L<Mojo::JSON> is a minimalistic and possibly the fastest pure-Perl
+implementation of RFC 4627.
 
 It supports normal Perl data types like C<Scalar>, C<Array> reference, C<Hash>
 reference and will try to call the C<TO_JSON> method on blessed references, or
@@ -363,12 +363,17 @@ C<Scalar> that has been used in numeric context is considered a number.
   {"foo": "bar"} -> {foo => 'bar'}
 
 Literal names will be translated to and from L<Mojo::JSON> constants or a
-similar native Perl value. In addition C<Scalar> references will be used to
-generate booleans, based on if their values are true or false.
+similar native Perl value.
 
   true  -> Mojo::JSON->true
   false -> Mojo::JSON->false
   null  -> undef
+
+In addition C<Scalar> references will be used to generate booleans, based on
+if their values are true or false.
+
+  \1 -> true
+  \0 -> false
 
 Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
 encoding will only generate UTF-8. The two Unicode whitespace characters

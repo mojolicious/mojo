@@ -53,7 +53,7 @@ L<Mojo::JSON::Pointer> is a relaxed implementation of RFC 6901.
 
 =head2 contains
 
-  my $success = $pointer->contains($data, '/foo/1');
+  my $bool = $pointer->contains($data, '/foo/1');
 
 Check if data structure contains a value that can be identified with the given
 JSON Pointer.

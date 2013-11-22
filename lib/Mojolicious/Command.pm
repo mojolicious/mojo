@@ -147,8 +147,8 @@ Short description of command, used for the command list.
 
 =head2 quiet
 
-  my $quiet = $command->quiet;
-  $command  = $command->quiet(1);
+  my $bool = $command->quiet;
+  $command = $command->quiet($bool);
 
 Limited command output.
 

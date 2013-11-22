@@ -10,11 +10,14 @@ sub run {
   my $req = $tx->req->parse(\%ENV);
   $tx->local_port($ENV{SERVER_PORT})->remote_address($ENV{REMOTE_ADDR});
 
-  # Request body
+  # Request body (may block if we try to read too much)
   binmode STDIN;
+  my $len = $req->headers->content_length;
   until ($req->is_finished) {
-    last unless my $read = STDIN->read(my $buffer, 131072, 0);
+    my $chunk = ($len && $len < 131072) ? $len : 131072;
+    last unless my $read = STDIN->read(my $buffer, $chunk, 0);
     $req->parse($buffer);
+    last if ($len -= $read) <= 0;
   }
 
   # Handle request
@@ -111,8 +114,8 @@ implements the following new ones.
 
 =head2 nph
 
-  my $nph = $cgi->nph;
-  $cgi    = $cgi->nph(1);
+  my $bool = $cgi->nph;
+  $cgi     = $cgi->nph($bool);
 
 Activate non-parsed header mode.
 

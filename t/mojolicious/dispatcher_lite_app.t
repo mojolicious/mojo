@@ -20,7 +20,7 @@ hook around_dispatch => sub {
   $next->();
   if ($c->res->code == 404) {
     $c->req->url->path($c->param('wrap') ? '/wrap/again' : '/');
-    delete $c->stash->{$_} for keys %{$c->stash};
+    delete @{$c->stash}{keys %{$c->stash}};
     $c->tx->res(Mojo::Message::Response->new);
     $next->();
   }

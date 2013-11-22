@@ -82,8 +82,8 @@ $t->post_ok('/' => {'Content-Type' => 'multipart/form-data'} => form =>
   ->content_type_like(qr/Shift_JIS/)->content_like(qr/$yatta/);
 
 # Unicode renderer
-$t->get_ok('/unicode')->status_is(200)->content_type_is('text/plain')
-  ->content_is(b($yatta)->encode('UTF-8')->to_string);
+$t->get_ok('/unicode')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')->content_is($yatta);
 
 # Templates in the DATA section should be written in UTF-8,
 # and those in separate files in Shift_JIS (Mojo will do the decoding)
@@ -105,7 +105,8 @@ $t->get_ok('/привет/мир')->status_is(200)
   ->content_type_is('application/json')->json_is({foo => $yatta});
 
 # Shift_JIS parameters
-my $url = $t->ua->app_url->path('/params')->query(foo => 3, yatta => $yatta);
+my $url
+  = $t->ua->server->url->path('/params')->query(foo => 3, yatta => $yatta);
 $url->query->charset('shift_jis');
 $t->get_ok($url)->status_is(200)
   ->json_is({params => {foo => 3, yatta => $yatta}, yatta => $yatta});

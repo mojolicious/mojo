@@ -15,6 +15,8 @@ patch 'more_tags';
 
 get 'small_tags';
 
+get 'tags_with_error';
+
 any [qw(GET POST)] => 'links';
 
 get 'script';
@@ -60,6 +62,15 @@ $t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
 <div>works</div>
 EOF
 
+# Tags with error
+$t->get_ok('/tags_with_error')->status_is(200)->content_is(<<EOF);
+<bar class="field-with-error">0</bar>
+<bar class="test field-with-error">0</bar>
+<bar class="test field-with-error">
+  0
+</bar>
+EOF
+
 # Links
 $t->get_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/path">Pa&lt;th</a>
@@ -99,7 +110,7 @@ EOF
 
 # Stylesheets
 $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
-<link href="/foo.css" media="screen" rel="stylesheet" />
+<link href="/foo.css" rel="stylesheet" />
 <style>/*<![CDATA[*/
 
   body {color: #000}
@@ -115,7 +126,11 @@ EOF
 # Basic form
 $t->get_ok('/basicform')->status_is(200)->content_is(<<EOF);
 <form action="/links">
+  <label for="foo">&lt;Foo&gt;</label>
   <input name="foo" type="text" value="bar" />
+  <label for="bar">
+    Bar<br>
+  </label>
   <input class="test" name="bar" type="text" value="baz" />
   <input name="yada" type="text" value="" />
   <input class="tset" name="baz" value="yada" />
@@ -438,6 +453,13 @@ __DATA__
 %= end
 %=t div => 'works'
 
+@@ tags_with_error.html.ep
+%= tag_with_error bar => 0
+%= tag_with_error 'bar', class => 'test', 0
+%= tag_with_error 'bar', (class => 'test') => begin
+  0
+%= end
+
 @@ links.html.ep
 <%= link_to 'Pa<th' => '/path' %>
 <%= link_to 'http://example.com/', title => 'Foo', sub { 'Foo' } %>
@@ -468,7 +490,11 @@ __DATA__
 
 @@ basicform.html.ep
 %= form_for links => begin
+  %= label_for foo => '<Foo>'
   %= text_field foo => 'bar'
+  %= label_for bar => begin
+    Bar<br>
+  %= end
   %= text_field bar => 'baz', class => 'test'
   %= text_field yada => undef
   %= input_tag baz => 'yada', class => 'tset'

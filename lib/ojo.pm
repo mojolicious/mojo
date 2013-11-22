@@ -6,12 +6,12 @@ use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::JSON 'j';
 use Mojo::UserAgent;
-use Mojo::Util 'monkey_patch';
+use Mojo::Util qw(dumper monkey_patch);
 
-# Silent oneliners
+# Silent one-liners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
 
-# Singleton user agent for oneliners
+# Singleton user agent for one-liners
 my $UA = Mojo::UserAgent->new;
 
 sub import {
@@ -19,15 +19,15 @@ sub import {
   # Mojolicious::Lite
   my $caller = caller;
   eval "package $caller; use Mojolicious::Lite;";
-  $UA->app($caller->app);
-  $UA->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
+  my $server = $UA->server->app($caller->app);
+  $server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
 
   $UA->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
-  $UA->detect_proxy unless defined $ENV{MOJO_PROXY};
+  $UA->proxy->detect unless defined $ENV{MOJO_PROXY};
 
   # The ojo DSL
   monkey_patch $caller,
-    a => sub { $caller->can('any')->(@_) and return $UA->app },
+    a => sub { $caller->can('any')->(@_) and return $UA->server->app },
     b => \&b,
     c => \&c,
     d => sub { _request($UA->build_tx(DELETE  => @_)) },
@@ -36,9 +36,9 @@ sub import {
     j => \&j,
     o => sub { _request($UA->build_tx(OPTIONS => @_)) },
     p => sub { _request($UA->build_tx(POST    => @_)) },
-    r => sub { $UA->app->dumper(@_) },
-    t => sub { _request($UA->build_tx(PATCH => @_)) },
-    u => sub { _request($UA->build_tx(PUT => @_)) },
+    r => \&dumper,
+    t => sub { _request($UA->build_tx(PATCH   => @_)) },
+    u => sub { _request($UA->build_tx(PUT     => @_)) },
     x => sub { Mojo::DOM->new(@_) };
 }
 
@@ -56,7 +56,7 @@ sub _request {
 
 =head1 NAME
 
-ojo - Fun oneliners with Mojo!
+ojo - Fun one-liners with Mojo!
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ ojo - Fun oneliners with Mojo!
 
 =head1 DESCRIPTION
 
-A collection of automatically exported functions for fun Perl oneliners. Ten
+A collection of automatically exported functions for fun Perl one-liners. Ten
 redirects will be followed by default, you can change this behavior with the
 MOJO_MAX_REDIRECTS environment variable.
 
@@ -160,7 +160,7 @@ L<Mojo::Message::Response> object.
 
   my $perl = r({data => 'structure'});
 
-Dump a Perl data structure with L<Data::Dumper>.
+Dump a Perl data structure with L<Mojo::Util/"dumper">.
 
   perl -Mojo -E 'say r(g("example.com")->headers->to_hash)'
 

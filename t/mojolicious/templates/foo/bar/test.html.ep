@@ -1,1 +1,1 @@
-Class <%= $message %>!
+Class <%= $msg %>!

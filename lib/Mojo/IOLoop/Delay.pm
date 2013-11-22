@@ -15,32 +15,38 @@ sub begin {
 sub steps {
   my $self = shift;
   $self->{steps} = [@_];
-  $self->begin->();
+  $self->ioloop->timer(0 => $self->begin);
   return $self;
 }
 
 sub wait {
   my $self = shift;
+
   my @args;
+  $self->once(error => \&_die);
   $self->once(finish => sub { shift->ioloop->stop; @args = @_ });
   $self->ioloop->start;
+
   return wantarray ? @args : $args[0];
 }
+
+sub _die { $_[0]->has_subscribers('error') ? $_[0]->ioloop->stop : die $_[1] }
 
 sub _step {
   my ($self, $id) = (shift, shift);
 
   $self->{args}[$id] = [@_];
-  return $self->{pending} if --$self->{pending} || $self->{lock};
+  return if $self->{fail} || --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
-  if (my $cb = shift @{$self->{steps} ||= []}) { $self->$cb(@args) }
+  if (my $cb = shift @{$self->{steps} ||= []}) {
+    eval { $self->$cb(@args); 1 } or return $self->emit(error => $@)->{fail}++;
+  }
 
-  if (!$self->{counter}) { $self->emit(finish => @args) }
-  elsif (!$self->{pending}) { $self->ioloop->timer(0 => $self->begin) }
-  return 0;
+  return $self->emit(finish => @args) unless $self->{counter};
+  $self->ioloop->timer(0 => $self->begin) unless $self->{pending};
 }
 
 1;
@@ -104,6 +110,16 @@ L<Mojo::IOLoop>.
 L<Mojo::IOLoop::Delay> inherits all events from L<Mojo::EventEmitter> and can
 emit the following new ones.
 
+=head2 error
+
+  $delay->on(error => sub {
+    my ($delay, $err) = @_;
+    ...
+  });
+
+Emitted if an error occurs in one of the steps, breaking the chain, fatal if
+unhandled.
+
 =head2 finish
 
   $delay->on(finish => sub {
@@ -133,13 +149,13 @@ implements the following new ones.
 
 =head2 begin
 
-  my $cb = $delay->begin;
-  my $cb = $delay->begin(0);
+  my $without_first_arg = $delay->begin;
+  my $with_first_arg    = $delay->begin(0);
 
 Increment active event counter, the returned callback can be used to decrement
 the active event counter again. Arguments passed to the callback are queued in
-the right order for the next step or C<finish> event and C<wait> method, the
-first argument will be ignored by default.
+the right order for the next step or L</"finish"> event and L</"wait"> method,
+the first argument will be ignored by default.
 
   # Capture all arguments
   my $delay = Mojo::IOLoop->delay;
@@ -151,16 +167,17 @@ first argument will be ignored by default.
   $delay = $delay->steps(sub {...}, sub {...});
 
 Sequentialize multiple events, the first callback will run right away, and the
-next one once the active event counter reaches zero, this chain will continue
-until there are no more callbacks or a callback does not increment the active
-event counter.
+next one once the active event counter reaches zero. This chain will continue
+until there are no more callbacks, a callback does not increment the active
+event counter or an error occurs in a callback.
 
 =head2 wait
 
+  my $arg  = $delay->wait;
   my @args = $delay->wait;
 
-Start C<ioloop> and stop it again once the C<finish> event gets emitted, only
-works when C<ioloop> is not running already.
+Start L</"ioloop"> and stop it again once an L</"error"> or L</"finish"> event
+gets emitted, only works when L</"ioloop"> is not running already.
 
   # Use the "finish" event to synchronize portably
   $delay->on(finish => sub {

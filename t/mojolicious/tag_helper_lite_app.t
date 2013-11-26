@@ -15,6 +15,8 @@ patch 'more_tags';
 
 get 'small_tags';
 
+get 'circle';
+
 get 'tags_with_error';
 
 any [qw(GET POST)] => 'links';
@@ -60,6 +62,13 @@ $t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
   <p>0</p>
 </div>
 <div>works</div>
+EOF
+
+# XML
+$t->get_ok('/circle.svg')->status_is(200)->content_is(<<EOF);
+<svg>
+<circle cx="75" cy="55" fill="red" r="35" stroke="black" stroke-width="2" />
+</svg>
 EOF
 
 # Tags with error
@@ -458,6 +467,14 @@ __DATA__
 %= tag_with_error 'bar', class => 'test', 0
 %= tag_with_error 'bar', (class => 'test') => begin
   0
+%= end
+
+@@ circle.svg.ep
+%= tag svg => begin
+<%=
+  tag 'circle', cx => 75, cy => 55, r => 35, stroke => 'black',
+    'stroke-width' => 2, fill => 'red'
+%>
 %= end
 
 @@ links.html.ep

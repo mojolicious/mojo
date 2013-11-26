@@ -639,7 +639,7 @@ Alias for L</"tag">.
   % end
   <%= tag div => (id => 'foo') => begin %>some & content<% end %>
 
-HTML tag generator.
+HTML/XML tag generator.
 
   <div />
   <div id="foo" />

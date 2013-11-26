@@ -1,5 +1,5 @@
 
-4.59  2013-11-24
+4.59  2013-11-26
 
 4.58  2013-11-19
   - Improved IIS and WebSphere compatibility of Mojo::Message::Request.

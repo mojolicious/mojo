@@ -639,8 +639,8 @@ that have been bundled for internal use.
 
   Copyright (C) 2010-2013, Sebastian Riedel.
 
-Licensed under the CC-SA License, Version 3.0
-L<http://creativecommons.org/licenses/by-sa/3.0>.
+Licensed under the CC-SA License, Version 4.0
+L<http://creativecommons.org/licenses/by-sa/4.0>.
 
 =head2 jQuery
 

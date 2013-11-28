@@ -110,7 +110,7 @@ $t->websocket_ok('/echo')->send_ok('hello again')
   ->message_ok->message_is('echo: hello again')->send_ok('and one more time')
   ->message_ok->message_is('echo: and one more time')->finish_ok;
 
-# Custom headers and protocols with compression
+# Custom headers and protocols
 my $headers = {DNT => 1, 'Sec-WebSocket-Key' => 'NTA2MDAyMDU1NjMzNjkwMg=='};
 $t->websocket_ok('/echo' => $headers => ['foo', 'bar', 'baz'])
   ->header_is('Sec-WebSocket-Accept'   => 'I+x5C3/LJxrmDrWw42nMP4pCSes=')
@@ -119,10 +119,6 @@ $t->websocket_ok('/echo' => $headers => ['foo', 'bar', 'baz'])
 is $t->tx->req->headers->dnt, 1, 'right "DNT" value';
 is $t->tx->req->headers->sec_websocket_protocol, 'foo, bar, baz',
   'right "Sec-WebSocket-Protocol" value';
-is $t->tx->req->headers->sec_websocket_extensions, 'permessage-deflate',
-  'right "Sec-WebSocket-Extensions" value';
-is $t->tx->res->headers->sec_websocket_extensions, 'permessage-deflate',
-  'right "Sec-WebSocket-Extensions" value';
 
 # Bytes
 $t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})
@@ -135,8 +131,8 @@ $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
   ->send_ok(0)->message_ok->message_like({text => qr/0/})->finish_ok(1000)
   ->finished_ok(1000);
 
-# 64bit binary message (extended limit)
-$t->websocket_ok('/echo');
+# 64bit binary message (extended limit and no compression)
+$t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'nothing'});
 is $t->tx->max_websocket_size, 262144, 'right size';
 $t->tx->max_websocket_size(262145);
 $t->send_ok({binary => 'a' x 262145})
@@ -146,6 +142,24 @@ $t->send_ok({binary => 'a' x 262145})
 # 64bit binary message (too large and no compression)
 $t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'nothing'})
   ->send_ok({binary => 'b' x 262145})->finished_ok(1009);
+
+# Compressed message ("permessage-deflate")
+$t->websocket_ok('/echo');
+$t->send_ok({binary => 'a' x 50000});
+is $t->tx->req->headers->sec_websocket_extensions, 'permessage-deflate',
+  'right "Sec-WebSocket-Extensions" value';
+is $t->tx->res->headers->sec_websocket_extensions, 'permessage-deflate',
+  'right "Sec-WebSocket-Extensions" value';
+my $payload;
+$t->tx->once(
+  frame => sub {
+    my ($tx, $frame) = @_;
+    $payload = $frame->[5];
+  }
+);
+$t->message_ok->message_is({binary => 'a' x 50000});
+ok length $payload < 262145, 'message has been compressed';
+$t->finish_ok->finished_ok(1005);
 
 # Binary message in two 64bit frames without FIN bit (too large)
 $t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'c' x 100000])

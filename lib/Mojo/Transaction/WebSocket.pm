@@ -26,8 +26,8 @@ use constant {
   PONG         => 10
 };
 
-has handshake => sub { Mojo::Transaction::HTTP->new };
 has [qw(compressed masked)];
+has handshake => sub { Mojo::Transaction::HTTP->new };
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
 sub new {
@@ -207,21 +207,30 @@ sub resume {
 sub send {
   my ($self, $frame, $cb) = @_;
 
+  # Text
+  $frame = {text => encode('UTF-8', $frame)}
+    if ref $frame ne 'HASH' && ref $frame ne 'ARRAY';
+
   if (ref $frame eq 'HASH') {
 
     # JSON
     $frame->{text} = Mojo::JSON->new->encode($frame->{json}) if $frame->{json};
 
-    # Binary or raw text
-    $frame
-      = exists $frame->{text}
-      ? $self->_compress([1, 0, 0, 0, TEXT,   $frame->{text}])
-      : $self->_compress([1, 0, 0, 0, BINARY, $frame->{binary}]);
-  }
+    # Raw text or binary
+    if (exists $frame->{text}) { $frame = [1, 0, 0, 0, TEXT, $frame->{text}] }
+    else { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
 
-  # Text
-  $frame = $self->_compress([1, 0, 0, 0, TEXT, encode('UTF-8', $frame)])
-    if ref $frame ne 'ARRAY';
+    # "permessage-deflate" extension
+    if ($self->compressed) {
+      $frame->[1] = 1;
+      my $deflate = $self->{deflate}
+        ||= Compress::Raw::Zlib::Deflate->new(WindowBits => -15,
+        MemLevel => 8);
+      $deflate->deflate(\$frame->[5], my $out);
+      $deflate->flush($out, Z_SYNC_FLUSH);
+      $frame->[5] = substr $out, 0, length($out) - 4;
+    }
+  }
 
   $self->once(drain => $cb) if $cb;
   $self->{write} .= $self->build_frame(@$frame);
@@ -275,23 +284,6 @@ sub server_write {
 }
 
 sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
-
-sub _compress {
-  my ($self, $frame) = @_;
-
-  # No compression negotiated
-  return $frame unless $self->compressed;
-
-  # "permessage-deflate" extension
-  $frame->[1] = 1;
-  my $deflate = $self->{deflate}
-    ||= Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
-  $deflate->deflate(\$frame->[5], my $out);
-  $deflate->flush($out, Z_SYNC_FLUSH);
-  $frame->[5] = substr $out, 0, length($out) - 4;
-
-  return $frame;
-}
 
 sub _deflate { ($_[1] // '') =~ /permessage-deflate/i && $_[0]->compressed(1) }
 

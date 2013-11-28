@@ -83,6 +83,37 @@ sub build_frame {
   return $frame . $payload;
 }
 
+sub build_message {
+  my ($self, $frame) = @_;
+
+  # Text
+  $frame = {text => encode('UTF-8', $frame)}
+    if ref $frame ne 'HASH' && ref $frame ne 'ARRAY';
+
+  if (ref $frame eq 'HASH') {
+
+    # JSON
+    $frame->{text} = Mojo::JSON->new->encode($frame->{json}) if $frame->{json};
+
+    # Raw text or binary
+    if (exists $frame->{text}) { $frame = [1, 0, 0, 0, TEXT, $frame->{text}] }
+    else { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
+
+    # "permessage-deflate" extension
+    if ($self->compressed) {
+      $frame->[1] = 1;
+      my $deflate = $self->{deflate}
+        || Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
+      $self->{deflate} = $deflate if $self->context_takeover;
+      $deflate->deflate(\$frame->[5], my $out);
+      $deflate->flush($out, Z_SYNC_FLUSH);
+      $frame->[5] = substr $out, 0, length($out) - 4;
+    }
+  }
+
+  return $self->build_frame(@$frame);
+}
+
 sub client_challenge {
   my $self = shift;
 
@@ -209,37 +240,10 @@ sub resume {
 }
 
 sub send {
-  my ($self, $frame, $cb) = @_;
-
-  # Text
-  $frame = {text => encode('UTF-8', $frame)}
-    if ref $frame ne 'HASH' && ref $frame ne 'ARRAY';
-
-  if (ref $frame eq 'HASH') {
-
-    # JSON
-    $frame->{text} = Mojo::JSON->new->encode($frame->{json}) if $frame->{json};
-
-    # Raw text or binary
-    if (exists $frame->{text}) { $frame = [1, 0, 0, 0, TEXT, $frame->{text}] }
-    else { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
-
-    # "permessage-deflate" extension
-    if ($self->compressed) {
-      $frame->[1] = 1;
-      my $deflate = $self->{deflate}
-        || Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
-      $self->{deflate} = $deflate if $self->context_takeover;
-      $deflate->deflate(\$frame->[5], my $out);
-      $deflate->flush($out, Z_SYNC_FLUSH);
-      $frame->[5] = substr $out, 0, length($out) - 4;
-    }
-  }
-
+  my ($self, $msg, $cb) = @_;
   $self->once(drain => $cb) if $cb;
-  $self->{write} .= $self->build_frame(@$frame);
+  $self->{write} .= $self->build_message($msg);
   $self->{state} = 'write';
-
   return $self->emit('resume');
 }
 
@@ -552,6 +556,16 @@ Build WebSocket frame.
 
   # Pong frame with FIN bit and payload
   say $ws->build_frame(1, 0, 0, 0, 10, 'Test 123');
+
+=head2 build_message
+
+  my $bytes = $ws->build_message({binary => $bytes});
+  my $bytes = $ws->build_message({text   => $bytes});
+  my $bytes = $ws->build_message({json   => {test => [1, 2, 3]}});
+  my $bytes = $ws->build_message([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
+  my $bytes = $ws->build_message($chars);
+
+Build WebSocket message.
 
 =head2 client_challenge
 

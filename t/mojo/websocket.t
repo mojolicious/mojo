@@ -456,16 +456,16 @@ like $log, qr/Inactivity timeout\./, 'right log message';
 app->log->unsubscribe(message => $msg);
 
 # Ping/pong (with negotiated compression)
-my ($pong, $compression, $extensions);
+my ($pong, $compressed, $extensions);
 $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
     $tx->on(
       frame => sub {
         my ($tx, $frame) = @_;
-        $pong        = $frame->[5] if $frame->[4] == 10;
-        $compression = $tx->has_compression;
-        $extensions  = $tx->res->headers->sec_websocket_extensions;
+        $pong       = $frame->[5] if $frame->[4] == 10;
+        $compressed = $tx->compressed;
+        $extensions = $tx->res->headers->sec_websocket_extensions;
         Mojo::IOLoop->stop;
       }
     );
@@ -474,7 +474,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 is $pong, 'test', 'received pong with payload';
-ok $compression, 'WebSocket has compression';
+ok $compressed, 'WebSocket has compression';
 is $extensions, 'permessage-deflate', 'right "Sec-WebSocket-Extensions" value';
 
 done_testing();

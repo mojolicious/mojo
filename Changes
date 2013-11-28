@@ -1,7 +1,8 @@
 
 4.59  2013-11-28
   - Added support for permessage-deflate WebSocket compression.
-  - Added has_compression method to Mojo::Transaction::WebSocket.
+  - Added compressed and context_takeover attributes to
+    Mojo::Transaction::WebSocket.
   - Relicensed all artwork to CC-SA version 4.0.
 
 4.58  2013-11-19

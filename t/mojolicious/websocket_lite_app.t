@@ -55,6 +55,14 @@ websocket '/unicode' => sub {
   );
 };
 
+websocket '/no_context_takeover' => sub {
+  my $self = shift;
+  $self->tx->context_takeover(0);
+  $self->res->headers->sec_websocket_extensions(
+    'permessage-deflate;client_no_context_takeover');
+  $self->on(binary => sub { shift->send({binary => shift}) });
+};
+
 websocket '/bytes' => sub {
   my $self = shift;
   $self->on(
@@ -120,8 +128,11 @@ is $t->tx->req->headers->dnt, 1, 'right "DNT" value';
 is $t->tx->req->headers->sec_websocket_protocol, 'foo, bar, baz',
   'right "Sec-WebSocket-Protocol" value';
 
-# Bytes
-$t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})
+# Bytes with compression
+$t->websocket_ok('/echo');
+ok $t->tx->compressed,       'WebSocket has compression';
+ok $t->tx->context_takeover, 'with context takeover';
+$t->send_ok({binary => 'bytes!'})
   ->message_ok->message_is({binary => 'bytes!'})
   ->send_ok({binary => 'bytes!'})
   ->message_ok->message_isnt({text => 'bytes!'})->finish_ok;
@@ -212,10 +223,19 @@ $t->websocket_ok('/unicode')->send_ok('hello again')
   ->send_ok('and one ☃ more time')
   ->message_ok->message_is('♥: and one ☃ more time')->finish_ok;
 
+# Compression with forced "client_no_context_takeover"
+$t->websocket_ok('/no_context_takeover');
+ok $t->tx->compressed, 'WebSocket has compression';
+ok !$t->tx->context_takeover, 'no context takeover';
+$t->send_ok({binary => 'a' x 500})
+  ->message_ok->message_is({binary => 'a' x 500})
+  ->send_ok({binary => 'a' x 500})
+  ->message_ok->message_is({binary => 'a' x 500})->finish_ok;
+
 # Binary frame and events (no compression)
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
 $t->websocket_ok('/bytes' => {'Sec-WebSocket-Extensions' => 'nothing'});
-ok !$t->tx->has_compression, 'WebSocket has no compression';
+ok !$t->tx->compressed, 'WebSocket has no compression';
 ok !$t->tx->res->headers->sec_websocket_extensions,
   'no "Sec-WebSocket-Extensions" value';
 my $binary;

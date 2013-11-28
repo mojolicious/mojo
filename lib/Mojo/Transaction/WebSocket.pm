@@ -26,8 +26,9 @@ use constant {
   PONG         => 10
 };
 
-has handshake => sub { Mojo::Transaction::HTTP->new };
-has 'masked';
+has [qw(compressed masked)];
+has context_takeover   => 1;
+has handshake          => sub { Mojo::Transaction::HTTP->new };
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
 sub new {
@@ -87,7 +88,10 @@ sub client_challenge {
 
   # "permessage-deflate" extension
   my $headers = $self->res->headers;
-  $self->_deflate($headers->sec_websocket_extensions);
+  my $extensions = $headers->sec_websocket_extensions // '';
+  $self->context_takeover(0)
+    if $self->_deflate($extensions)
+    && $extensions =~ /client_no_context_takeover/i;
 
   return _challenge($self->req->headers->sec_websocket_key) eq
     $headers->sec_websocket_accept;
@@ -124,8 +128,6 @@ sub finish {
 
   return $self;
 }
-
-sub has_compression { !!shift->{compress} }
 
 sub is_websocket {1}
 
@@ -223,11 +225,11 @@ sub send {
     else { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
 
     # "permessage-deflate" extension
-    if ($self->has_compression) {
+    if ($self->compressed) {
       $frame->[1] = 1;
       my $deflate = $self->{deflate}
-        ||= Compress::Raw::Zlib::Deflate->new(WindowBits => -15,
-        MemLevel => 8);
+        || Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
+      $self->{deflate} = $deflate if $self->context_takeover;
       $deflate->deflate(\$frame->[5], my $out);
       $deflate->flush($out, Z_SYNC_FLUSH);
       $frame->[5] = substr $out, 0, length($out) - 4;
@@ -260,7 +262,7 @@ sub server_handshake {
 
   # "permessage-deflate" extension
   $res_headers->sec_websocket_extensions('permessage-deflate')
-    if $self->_deflate($req_headers->sec_websocket_extensions);
+    if $self->_deflate($req_headers->sec_websocket_extensions // '');
 }
 
 sub server_read {
@@ -287,7 +289,7 @@ sub server_write {
 
 sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
 
-sub _deflate { ($_[1] // '') =~ /permessage-deflate/i && ++$_[0]->{compress} }
+sub _deflate { $_[1] =~ /permessage-deflate/i && $_[0]->compressed(1) }
 
 sub _message {
   my ($self, $frame) = @_;
@@ -317,9 +319,10 @@ sub _message {
 
   # "permessage-deflate" extension (handshake and RSV1)
   my $msg = delete $self->{message};
-  if ($self->has_compression && $frame->[1]) {
+  if ($self->compressed && $frame->[1]) {
     my $inflate = $self->{inflate}
-      ||= Compress::Raw::Zlib::Inflate->new(WindowBits => -15);
+      || Compress::Raw::Zlib::Inflate->new(WindowBits => -15);
+    $self->{inflate} = $inflate if $self->context_takeover;
     $inflate->inflate(\($msg .= "\x00\x00\xff\xff"), my $out);
     $msg = $out;
   }
@@ -475,6 +478,21 @@ Emitted when a complete WebSocket text message has been received.
 L<Mojo::Transaction::WebSocket> inherits all attributes from
 L<Mojo::Transaction> and implements the following new ones.
 
+=head2 compressed
+
+  my $bool = $ws->compressed;
+  $ws      = $ws->compressed(1);
+
+Messages will be compressed with C<permessage-deflate> extension.
+
+=head2 context_takeover
+
+  my $bool = $ws->context_takeover;
+  $ws      = $ws->context_takeover(0);
+
+Reuse LZ77 sliding window for C<permessage-deflate> extension, defaults to
+true.
+
 =head2 handshake
 
   my $handshake = $ws->handshake;
@@ -573,12 +591,6 @@ Connection identifier or socket.
   $ws = $ws->finish(1003 => 'Cannot accept data!');
 
 Close WebSocket connection gracefully.
-
-=head2 has_compression
-
-  my $bool = $ws->has_compression;
-
-Check if messages will be compressed with C<permessage-deflate> extension.
 
 =head2 is_websocket
 

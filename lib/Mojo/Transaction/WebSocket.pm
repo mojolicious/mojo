@@ -87,30 +87,23 @@ sub build_message {
   my ($self, $frame) = @_;
 
   # Text
-  $frame = {text => encode('UTF-8', $frame)}
-    if ref $frame ne 'HASH' && ref $frame ne 'ARRAY';
+  $frame = {text => encode('UTF-8', $frame)} if ref $frame ne 'HASH';
 
-  if (ref $frame eq 'HASH') {
+  # JSON
+  $frame->{text} = Mojo::JSON->new->encode($frame->{json}) if $frame->{json};
 
-    # JSON
-    $frame->{text} = Mojo::JSON->new->encode($frame->{json}) if $frame->{json};
+  # Raw text or binary
+  if (exists $frame->{text}) { $frame = [1, 0, 0, 0, TEXT, $frame->{text}] }
+  else { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
 
-    # Raw text or binary
-    if (exists $frame->{text}) { $frame = [1, 0, 0, 0, TEXT, $frame->{text}] }
-    else { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
-
-    # "permessage-deflate" extension
-    if ($self->compressed) {
-      $frame->[1] = 1;
-      my $deflate = $self->{deflate}
-        || Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
-      $self->{deflate} = $deflate if $self->context_takeover;
-      $deflate->deflate(\$frame->[5], my $out);
-      $deflate->flush($out, Z_SYNC_FLUSH);
-      $frame->[5] = substr $out, 0, length($out) - 4;
-    }
-  }
-
+  # "permessage-deflate" extension
+  return $self->build_frame(@$frame) unless $self->compressed;
+  my $deflate = $self->{deflate}
+    || Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
+  $self->{deflate} = $deflate if $self->context_takeover;
+  $deflate->deflate(\$frame->[5], my $out);
+  $deflate->flush($out, Z_SYNC_FLUSH);
+  @$frame[1, 5] = (1, substr($out, 0, length($out) - 4));
   return $self->build_frame(@$frame);
 }
 
@@ -241,9 +234,12 @@ sub resume {
 
 sub send {
   my ($self, $msg, $cb) = @_;
+
   $self->once(drain => $cb) if $cb;
-  $self->{write} .= $self->build_message($msg);
+  if   (ref $msg eq 'ARRAY') { $self->{write} .= $self->build_frame(@$msg) }
+  else                       { $self->{write} .= $self->build_message($msg) }
   $self->{state} = 'write';
+
   return $self->emit('resume');
 }
 
@@ -562,7 +558,6 @@ Build WebSocket frame.
   my $bytes = $ws->build_message({binary => $bytes});
   my $bytes = $ws->build_message({text   => $bytes});
   my $bytes = $ws->build_message({json   => {test => [1, 2, 3]}});
-  my $bytes = $ws->build_message([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
   my $bytes = $ws->build_message($chars);
 
 Build WebSocket message.
@@ -680,7 +675,7 @@ Resume L</"handshake"> transaction.
   $ws = $ws->send({binary => $bytes});
   $ws = $ws->send({text   => $bytes});
   $ws = $ws->send({json   => {test => [1, 2, 3]}});
-  $ws = $ws->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
+  $ws = $ws->send([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
   $ws = $ws->send($chars);
   $ws = $ws->send($chars => sub {...});
 

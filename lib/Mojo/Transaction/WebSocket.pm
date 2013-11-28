@@ -483,7 +483,7 @@ L<Mojo::Transaction> and implements the following new ones.
   my $bool = $ws->compressed;
   $ws      = $ws->compressed(1);
 
-Messages will be compressed with C<permessage-deflate> extension.
+Compress messages with C<permessage-deflate> extension.
 
 =head2 context_takeover
 

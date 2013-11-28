@@ -128,8 +128,9 @@ is $t->tx->req->headers->dnt, 1, 'right "DNT" value';
 is $t->tx->req->headers->sec_websocket_protocol, 'foo, bar, baz',
   'right "Sec-WebSocket-Protocol" value';
 
-# Bytes with compression
-$t->websocket_ok('/echo');
+# Bytes with compression (offer "client_no_context_takeover")
+my $extensions = 'permessage-deflate;client_no_context_takeover';
+$t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => $extensions});
 ok $t->tx->compressed,       'WebSocket has compression';
 ok $t->tx->context_takeover, 'with context takeover';
 $t->send_ok({binary => 'bytes!'})
@@ -156,10 +157,9 @@ $t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'nothing'})
 
 # Compressed message ("permessage-deflate")
 $t->websocket_ok('/echo');
-$t->send_ok({binary => 'a' x 50000});
+$t->send_ok({binary => 'a' x 50000})
+  ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate');
 is $t->tx->req->headers->sec_websocket_extensions, 'permessage-deflate',
-  'right "Sec-WebSocket-Extensions" value';
-is $t->tx->res->headers->sec_websocket_extensions, 'permessage-deflate',
   'right "Sec-WebSocket-Extensions" value';
 my $payload;
 $t->tx->once(
@@ -234,10 +234,9 @@ $t->send_ok({binary => 'a' x 500})
 
 # Binary frame and events (no compression)
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
-$t->websocket_ok('/bytes' => {'Sec-WebSocket-Extensions' => 'nothing'});
+$t->websocket_ok('/bytes' => {'Sec-WebSocket-Extensions' => 'nothing'})
+  ->header_isnt('Sec-WebSocket-Extensions' => 'permessage-deflate');
 ok !$t->tx->compressed, 'WebSocket has no compression';
-ok !$t->tx->res->headers->sec_websocket_extensions,
-  'no "Sec-WebSocket-Extensions" value';
 my $binary;
 $t->tx->on(
   frame => sub {

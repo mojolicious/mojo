@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Util qw(decamelize deprecated);
+use Mojo::Util 'decamelize';
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -90,12 +90,6 @@ sub new {
 
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';
-
-  # DEPRECATED in Top Hat!
-  if (my $sub = $self->can("${mode}_mode")) {
-    deprecated qq{"sub ${mode}_mode {...}" in application class is DEPRECATED};
-    $self->$sub;
-  }
 
   $self->startup;
 

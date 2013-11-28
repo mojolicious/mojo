@@ -1,9 +1,10 @@
 
-4.59  2013-11-28
+4.59  2013-11-29
   - Added support for permessage-deflate WebSocket compression.
   - Added build_message method to Mojo::Transaction::WebSocket.
   - Added compressed and context_takeover attributes to
     Mojo::Transaction::WebSocket.
+  - Removed deprecated mode specific methods in application class.
   - Relicensed all artwork to CC-SA version 4.0.
 
 4.58  2013-11-19

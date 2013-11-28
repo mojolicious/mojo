@@ -215,6 +215,7 @@ $t->websocket_ok('/unicode')->send_ok('hello again')
 # Binary frame and events (no compression)
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
 $t->websocket_ok('/bytes' => {'Sec-WebSocket-Extensions' => 'nothing'});
+ok !$t->tx->has_compression, 'WebSocket has no compression';
 ok !$t->tx->res->headers->sec_websocket_extensions,
   'no "Sec-WebSocket-Extensions" value';
 my $binary;

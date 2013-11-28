@@ -26,8 +26,8 @@ use constant {
   PONG         => 10
 };
 
-has [qw(compressed masked)];
 has handshake => sub { Mojo::Transaction::HTTP->new };
+has 'masked';
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
 sub new {
@@ -125,6 +125,8 @@ sub finish {
   return $self;
 }
 
+sub has_compression { !!shift->{compress} }
+
 sub is_websocket {1}
 
 sub kept_alive    { shift->handshake->kept_alive }
@@ -221,7 +223,7 @@ sub send {
     else { $frame = [1, 0, 0, 0, BINARY, $frame->{binary}] }
 
     # "permessage-deflate" extension
-    if ($self->compressed) {
+    if ($self->has_compression) {
       $frame->[1] = 1;
       my $deflate = $self->{deflate}
         ||= Compress::Raw::Zlib::Deflate->new(WindowBits => -15,
@@ -285,7 +287,7 @@ sub server_write {
 
 sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
 
-sub _deflate { ($_[1] // '') =~ /permessage-deflate/i && $_[0]->compressed(1) }
+sub _deflate { ($_[1] // '') =~ /permessage-deflate/i && ++$_[0]->{compress} }
 
 sub _message {
   my ($self, $frame) = @_;
@@ -315,7 +317,7 @@ sub _message {
 
   # "permessage-deflate" extension (handshake and RSV1)
   my $msg = delete $self->{message};
-  if ($self->compressed && $frame->[1]) {
+  if ($self->has_compression && $frame->[1]) {
     my $inflate = $self->{inflate}
       ||= Compress::Raw::Zlib::Inflate->new(WindowBits => -15);
     $inflate->inflate(\($msg .= "\x00\x00\xff\xff"), my $out);
@@ -473,13 +475,6 @@ Emitted when a complete WebSocket text message has been received.
 L<Mojo::Transaction::WebSocket> inherits all attributes from
 L<Mojo::Transaction> and implements the following new ones.
 
-=head2 compressed
-
-  my $bool = $ws->compressed;
-  $ws      = $ws->compressed(1);
-
-Compress messages with C<permessage-deflate> extension.
-
 =head2 handshake
 
   my $handshake = $ws->handshake;
@@ -578,6 +573,12 @@ Connection identifier or socket.
   $ws = $ws->finish(1003 => 'Cannot accept data!');
 
 Close WebSocket connection gracefully.
+
+=head2 has_compression
+
+  my $bool = $ws->has_compression;
+
+Check if messages will be compressed with C<permessage-deflate> extension.
 
 =head2 is_websocket
 

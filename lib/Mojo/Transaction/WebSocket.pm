@@ -1,6 +1,7 @@
 package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
+use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
 use Config;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
@@ -26,7 +27,7 @@ use constant {
 };
 
 has handshake => sub { Mojo::Transaction::HTTP->new };
-has 'masked';
+has [qw(compressed masked)];
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
 sub new {
@@ -83,8 +84,13 @@ sub build_frame {
 
 sub client_challenge {
   my $self = shift;
+
+  # "permessage-deflate" extension
+  my $headers = $self->res->headers;
+  $self->_deflate($headers->sec_websocket_extensions);
+
   return _challenge($self->req->headers->sec_websocket_key) eq
-    $self->res->headers->sec_websocket_accept;
+    $headers->sec_websocket_accept;
 }
 
 sub client_handshake {
@@ -94,6 +100,8 @@ sub client_handshake {
   $headers->upgrade('websocket')      unless $headers->upgrade;
   $headers->connection('Upgrade')     unless $headers->connection;
   $headers->sec_websocket_version(13) unless $headers->sec_websocket_version;
+  $headers->sec_websocket_extensions('permessage-deflate')
+    unless $headers->sec_websocket_extensions;
 
   # Generate 16 byte WebSocket challenge
   my $challenge = b64_encode sprintf('%16u', int(rand 9 x 16)), '';
@@ -207,12 +215,12 @@ sub send {
     # Binary or raw text
     $frame
       = exists $frame->{text}
-      ? [1, 0, 0, 0, TEXT, $frame->{text}]
-      : [1, 0, 0, 0, BINARY, $frame->{binary}];
+      ? $self->_compress([1, 0, 0, 0, TEXT,   $frame->{text}])
+      : $self->_compress([1, 0, 0, 0, BINARY, $frame->{binary}]);
   }
 
   # Text
-  $frame = [1, 0, 0, 0, TEXT, encode('UTF-8', $frame)]
+  $frame = $self->_compress([1, 0, 0, 0, TEXT, encode('UTF-8', $frame)])
     if ref $frame ne 'ARRAY';
 
   $self->once(drain => $cb) if $cb;
@@ -238,6 +246,10 @@ sub server_handshake {
     and $res_headers->sec_websocket_protocol($1);
   $res_headers->sec_websocket_accept(
     _challenge($req_headers->sec_websocket_key));
+
+  # "permessage-deflate" extension
+  $res_headers->sec_websocket_extensions('permessage-deflate')
+    if $self->_deflate($req_headers->sec_websocket_extensions);
 }
 
 sub server_read {
@@ -263,6 +275,25 @@ sub server_write {
 }
 
 sub _challenge { b64_encode(sha1_bytes(($_[0] || '') . GUID), '') }
+
+sub _compress {
+  my ($self, $frame) = @_;
+
+  # No compression negotiated
+  return $frame unless $self->compressed;
+
+  # "permessage-deflate" extension
+  $frame->[1] = 1;
+  my $deflate = $self->{deflate}
+    ||= Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
+  $deflate->deflate(\$frame->[5], my $out);
+  $deflate->flush($out, Z_SYNC_FLUSH);
+  $frame->[5] = substr $out, 0, length($out) - 4;
+
+  return $frame;
+}
+
+sub _deflate { ($_[1] // '') =~ /permessage-deflate/i && $_[0]->compressed(1) }
 
 sub _message {
   my ($self, $frame) = @_;
@@ -290,8 +321,15 @@ sub _message {
   # No FIN bit (Continuation)
   return unless $frame->[0];
 
-  # Whole message
+  # "permessage-deflate" extension (handshake and RSV1)
   my $msg = delete $self->{message};
+  if ($self->compressed && $frame->[1]) {
+    my $inflate = $self->{inflate}
+      ||= Compress::Raw::Zlib::Inflate->new(WindowBits => -15);
+    $inflate->inflate(\($msg .= "\x00\x00\xff\xff"), my $out);
+    $msg = $out;
+  }
+
   $self->emit(json => Mojo::JSON->new->decode($msg))
     if $self->has_subscribers('json');
   $op = delete $self->{op};
@@ -442,6 +480,13 @@ Emitted when a complete WebSocket text message has been received.
 
 L<Mojo::Transaction::WebSocket> inherits all attributes from
 L<Mojo::Transaction> and implements the following new ones.
+
+=head2 compressed
+
+  my $bool = $ws->compressed;
+  $ws      = $ws->compressed(1);
+
+Compress messages with C<permessage-deflate> extension.
 
 =head2 handshake
 

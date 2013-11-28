@@ -110,7 +110,7 @@ $t->websocket_ok('/echo')->send_ok('hello again')
   ->message_ok->message_is('echo: hello again')->send_ok('and one more time')
   ->message_ok->message_is('echo: and one more time')->finish_ok;
 
-# Custom headers and protocols
+# Custom headers and protocols with compression
 my $headers = {DNT => 1, 'Sec-WebSocket-Key' => 'NTA2MDAyMDU1NjMzNjkwMg=='};
 $t->websocket_ok('/echo' => $headers => ['foo', 'bar', 'baz'])
   ->header_is('Sec-WebSocket-Accept'   => 'I+x5C3/LJxrmDrWw42nMP4pCSes=')
@@ -119,6 +119,10 @@ $t->websocket_ok('/echo' => $headers => ['foo', 'bar', 'baz'])
 is $t->tx->req->headers->dnt, 1, 'right "DNT" value';
 is $t->tx->req->headers->sec_websocket_protocol, 'foo, bar, baz',
   'right "Sec-WebSocket-Protocol" value';
+is $t->tx->req->headers->sec_websocket_extensions, 'permessage-deflate',
+  'right "Sec-WebSocket-Extensions" value';
+is $t->tx->res->headers->sec_websocket_extensions, 'permessage-deflate',
+  'right "Sec-WebSocket-Extensions" value';
 
 # Bytes
 $t->websocket_ok('/echo')->send_ok({binary => 'bytes!'})
@@ -139,9 +143,9 @@ $t->send_ok({binary => 'a' x 262145})
   ->message_ok->message_is({binary => 'a' x 262145})
   ->finish_ok->finished_ok(1005);
 
-# 64bit binary message (too large)
-$t->websocket_ok('/echo')->send_ok({binary => 'b' x 262145})
-  ->finished_ok(1009);
+# 64bit binary message (too large and no compression)
+$t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'nothing'})
+  ->send_ok({binary => 'b' x 262145})->finished_ok(1009);
 
 # Binary message in two 64bit frames without FIN bit (too large)
 $t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'c' x 100000])
@@ -194,9 +198,11 @@ $t->websocket_ok('/unicode')->send_ok('hello again')
   ->send_ok('and one ☃ more time')
   ->message_ok->message_is('♥: and one ☃ more time')->finish_ok;
 
-# Binary frame and events
+# Binary frame and events (no compression)
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
-$t->websocket_ok('/bytes');
+$t->websocket_ok('/bytes' => {'Sec-WebSocket-Extensions' => 'nothing'});
+ok !$t->tx->res->headers->sec_websocket_extensions,
+  'no "Sec-WebSocket-Extensions" value';
 my $binary;
 $t->tx->on(
   frame => sub {
@@ -214,10 +220,10 @@ ok !$binary, 'received text frame';
 $t->finish_ok(1000 => 'Have a nice day!');
 is_deeply $close, [1000, 'Have a nice day!'], 'right status and message';
 
-# Binary roundtrips
-$t->websocket_ok('/bytes')->send_ok({binary => $bytes})
-  ->message_ok->message_is($bytes)->send_ok({binary => $bytes})
-  ->message_ok->message_is($bytes)->finish_ok;
+# Binary roundtrips (no compression)
+$t->websocket_ok('/bytes' => {'Sec-WebSocket-Extensions' => 'nothing'})
+  ->send_ok({binary => $bytes})->message_ok->message_is($bytes)
+  ->send_ok({binary => $bytes})->message_ok->message_is($bytes)->finish_ok;
 
 # Two responses
 $t->websocket_ok('/once')->send_ok('hello')

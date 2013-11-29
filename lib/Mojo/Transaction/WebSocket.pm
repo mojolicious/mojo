@@ -481,14 +481,14 @@ L<Mojo::Transaction> and implements the following new ones.
 =head2 compressed
 
   my $bool = $ws->compressed;
-  $ws      = $ws->compressed(1);
+  $ws      = $ws->compressed($bool);
 
 Compress messages with C<permessage-deflate> extension.
 
 =head2 context_takeover
 
   my $bool = $ws->context_takeover;
-  $ws      = $ws->context_takeover(0);
+  $ws      = $ws->context_takeover($bool);
 
 Reuse LZ77 sliding window for C<permessage-deflate> extension, defaults to
 true.

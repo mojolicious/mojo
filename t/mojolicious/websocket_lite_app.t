@@ -63,6 +63,13 @@ websocket '/no_context_takeover' => sub {
   $self->on(binary => sub { shift->send({binary => shift}) });
 };
 
+websocket '/no_compression' => sub {
+  my $self = shift;
+  $self->tx->compressed(0);
+  $self->res->headers->remove('Sec-WebSocket-Extensions');
+  $self->on(binary => sub { shift->send({binary => shift}) });
+};
+
 websocket '/bytes' => sub {
   my $self = shift;
   $self->on(
@@ -230,6 +237,14 @@ ok !$t->tx->context_takeover, 'no context takeover';
 $t->send_ok({binary => 'a' x 500})
   ->message_ok->message_is({binary => 'a' x 500})
   ->send_ok({binary => 'a' x 500})
+  ->message_ok->message_is({binary => 'a' x 500})->finish_ok;
+
+# Compression denied by the server
+$t->websocket_ok('/no_compression');
+is $t->tx->req->headers->sec_websocket_extensions, 'permessage-deflate',
+  'right "Sec-WebSocket-Extensions" value';
+ok !$t->tx->compressed, 'WebSocket has no compression';
+$t->send_ok({binary => 'a' x 500})
   ->message_ok->message_is({binary => 'a' x 500})->finish_ok;
 
 # Binary frame and events (no compression)

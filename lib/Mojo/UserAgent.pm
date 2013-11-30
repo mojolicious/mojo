@@ -754,8 +754,8 @@ L<Mojo::UserAgent::Transactor/"tx">.
 =head2 build_websocket_tx
 
   my $tx = $ua->build_websocket_tx('ws://example.com');
-  my $tx =
-    $ua->build_websocket_tx('ws://example.com' => {DNT => 1} => ['v1.proto']);
+  my $tx = $ua->build_websocket_tx(
+    'ws://example.com' => {DNT => 1} => ['v1.proto']);
 
 Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"websocket">.

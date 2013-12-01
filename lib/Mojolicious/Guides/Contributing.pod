@@ -128,7 +128,7 @@ pumpkin-holder.
 Any core developer may nominate a new one, who must then be accepted by a 2/3
 majority vote.
 
-The pumpkin-holder has veto rights and may select its successor.
+The pumpkin-holder has veto rights and may select their successor.
 
 It's not a feature without a test and documentation.
 

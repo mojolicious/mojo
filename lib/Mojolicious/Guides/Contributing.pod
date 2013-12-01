@@ -128,7 +128,7 @@ pumpking.
 Any core developer may nominate a new one, who must then be accepted by a 2/3
 majority vote.
 
-The pumpking has veto rights and may select his successor.
+The pumpking has veto rights and may select its successor.
 
 It's not a feature without a test and documentation.
 

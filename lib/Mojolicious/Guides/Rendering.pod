@@ -760,9 +760,8 @@ validate it with L<Mojolicious::Validator::Validation/"csrf_protect">.
     return $self->render unless $validation->has_data;
 
     # Check CSRF token
-    $validation->csrf_protect;
     return $self->render(text => 'Bad CSRF token!', status => 403)
-      if $validation->has_error('csrf_token');
+      if $validation->csrf_protect->has_error('csrf_token');
 
     my $city = $validation->required('city')->param('city');
     $self->render(text => "Low orbit ion cannon pointed at $city!")

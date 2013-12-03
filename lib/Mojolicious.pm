@@ -491,7 +491,7 @@ L<Mojolicious::Types> object.
   my $validator = $app->validator;
   $app          = $app->validator(Mojolicious::Validator->new);
 
-Validate form data, defaults to a L<Mojolicious::Validator> object.
+Validate parameters, defaults to a L<Mojolicious::Validator> object.
 
 =head1 METHODS
 

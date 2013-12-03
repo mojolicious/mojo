@@ -24,6 +24,13 @@ any '/' => sub {
   $validation->optional('yada')->two;
 } => 'index';
 
+any '/forgery' => sub {
+  my $self       = shift;
+  my $validation = $self->validation->csrf_protect;
+  return $self->render unless $validation->has_data;
+  $validation->required('foo');
+};
+
 my $t = Test::Mojo->new;
 
 # Required and optional values
@@ -120,6 +127,20 @@ ok $validation->required('0')->size(1, 1)->is_valid, 'valid';
 is_deeply $validation->output, {0 => 0}, 'right result';
 is $validation->param('0'), 0, 'right value';
 
+# CSRF protection
+$validation = $t->app->validation->input({foo => 'bar'})->csrf_protect;
+ok $validation->has_error, 'has error';
+is_deeply $validation->error('csrf_token'), ['csrf_protect'], 'right error';
+$validation = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})
+  ->csrf_token('cba')->csrf_protect;
+ok $validation->has_error, 'has error';
+is_deeply $validation->error('csrf_token'), ['csrf_protect'], 'right error';
+$validation = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})
+  ->csrf_token('abc')->csrf_protect;
+ok !$validation->has_error, 'no error';
+ok $validation->required('foo')->is_valid, 'valid';
+is_deeply $validation->output, {foo => 'bar'}, 'right result';
+
 # Missing method and function (AUTOLOAD)
 eval { $t->app->validation->missing };
 my $package = 'Mojolicious::Validator::Validation';
@@ -151,6 +172,21 @@ $t->post_ok('/' => form => {foo => 'no'})->status_is(200)
   ->element_exists_not('label.custom.field-with-error[for="baz"]')
   ->element_exists_not('select.field-with-error')
   ->element_exists_not('input.field-with-error[type="password"]');
+
+# Missing CSRF token
+$t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
+  ->content_like(qr/Wrong or missing CSRF token!/);
+
+# Correct CSRF token
+my $token
+  = $t->ua->get('/forgery')->res->dom->at('[name=csrf_token]')->{value};
+$t->post_ok('/forgery' => form => {csrf_token => $token, foo => 'bar'})
+  ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
+  ->element_exists('[value=bar]');
+
+# Missing CSRF token again
+$t->post_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
+  ->content_like(qr/Wrong or missing CSRF token!/);
 
 # Failed validation for all fields (with custom helper)
 $t->app->helper(
@@ -192,3 +228,10 @@ __DATA__
   %= select_field baz => [qw(yada yada)]
   %= password_field 'yada'
 % end
+
+@@ forgery.html.ep
+%= form_for forgery => begin
+  %= 'Wrong or missing CSRF token!' if validation->has_error('csrf_token')
+  %= csrf_field
+  %= text_field 'foo'
+%= end

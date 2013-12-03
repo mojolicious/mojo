@@ -4,8 +4,8 @@ use Mojo::Base -base;
 use Carp 'croak';
 use Scalar::Util 'blessed';
 
+has [qw(csrf_token topic validator)];
 has [qw(input output)] => sub { {} };
-has [qw(topic validator)];
 
 sub AUTOLOAD {
   my $self = shift;
@@ -36,6 +36,14 @@ sub check {
     last;
   }
 
+  return $self;
+}
+
+sub csrf_protect {
+  my $self  = shift;
+  my $token = delete $self->input->{csrf_token};
+  $self->{error}{csrf_token} = ['csrf_protect']
+    unless $token && $token eq $self->csrf_token;
   return $self;
 }
 
@@ -107,6 +115,13 @@ validation checks.
 
 L<Mojolicious::Validator::Validation> implements the following attributes.
 
+=head2 csrf_token
+
+  my $token   = $validation->token;
+  $validation = $validation->token('fa6a08...');
+
+CSRF token.
+
 =head2 input
 
   my $input   = $validation->input;
@@ -146,6 +161,12 @@ and implements the following new ones.
 
 Perform validation check on all values of the current L</"topic">, no more
 checks will be performend on them after the first one failed.
+
+=head2 csrf_protect
+
+  $validation = $validation->csrf_protect;
+
+Validate C<csrf_token> and protect from cross-site request forgery.
 
 =head2 error
 

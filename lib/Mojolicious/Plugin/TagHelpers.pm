@@ -15,6 +15,7 @@ sub register {
 
   $app->helper(check_box =>
       sub { _input(shift, shift, value => shift, @_, type => 'checkbox') });
+  $app->helper(csrf_field => \&_csrf_field);
   $app->helper(file_field =>
       sub { shift; _tag('input', name => shift, @_, type => 'file') });
 
@@ -39,6 +40,11 @@ sub register {
 
   $app->helper(tag_with_error => \&_tag_with_error);
   $app->helper(text_area      => \&_text_area);
+}
+
+sub _csrf_field {
+  my $self = shift;
+  return $self->hidden_field(csrf_token => $self->csrf_token, @_);
 }
 
 sub _form_for {
@@ -303,6 +309,14 @@ picked up and shown as default.
   <input name="background" type="color" />
   <input name="background" type="color" value="#ffffff" />
   <input id="foo" name="background" type="color" value="#ffffff" />
+
+=head2 csrf_field
+
+  %= csrf_field
+
+Generate hidden input element with CSRF token.
+
+  <input name="csrf_token" type="hidden" value="fa6a08..." />
 
 =head2 date_field
 

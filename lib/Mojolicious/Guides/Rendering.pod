@@ -740,7 +740,49 @@ L<Mojolicious::Validator::Validation/"error">.
         %= text_field 'number'
         %= submit_button
       % end
-    </html>
+    </body>
+  </html>
+
+=head2 Cross-site request forgery
+
+Cross-site request forgery is a very common attack on web applications that
+trick your logged in users to submit forms they did not intend to send. All
+you have to do to protect your users from this, is to add an additional hidden
+field to your forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field"> and
+validate it with L<Mojolicious::Validator::Validation/"csrf_protect">.
+
+  use Mojolicious::Lite;
+
+  get '/' => sub {
+    my $self = shift;
+
+    my $validation = $self->validation;
+    return $self->render unless $validation->has_data;
+
+    # Check CSRF token
+    $validation->csrf_protect;
+    return $self->render(text => 'Bad CSRF token!', status => 403)
+      if $validation->has_error('csrf_token');
+
+    my $city = $validation->required('city')->param('city');
+    $self->render(text => "Low orbit ion cannon pointed at $city!")
+      unless $validation->has_error;
+  } => 'target';
+
+  app->start;
+  __DATA__
+
+  @@ target.html.ep
+  <!DOCTYPE html>
+  <html>
+    <body>
+      %= form_for target => begin
+        %= csrf_field
+        %= label_for city => 'Which city to point low orbit ion cannon at?'
+        %= text_field 'city'
+        %= submit_button
+      %= end
+    </body>
   </html>
 
 =head2 Adding helpers

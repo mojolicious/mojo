@@ -1,9 +1,14 @@
 
-4.59  2013-11-30
+4.59  2013-12-04
+  - Added CSRF protection support.
   - Added support for permessage-deflate WebSocket compression.
+  - Added csrf_protect method to Mojolicious::Validator::Validation.
   - Added build_message method to Mojo::Transaction::WebSocket.
+  - Added csrf_token attribute to Mojolicious::Validator::Validation.
   - Added compressed and context_takeover attributes to
     Mojo::Transaction::WebSocket.
+  - Added csrf_token helper to Mojolicious::Plugin::DefaultHelpers.
+  - Added csrf_field helper to Mojolicious::Plugin::TagHelpers.
   - Removed deprecated mode specific methods in application class.
   - Relicensed all artwork to CC-SA version 4.0.
 

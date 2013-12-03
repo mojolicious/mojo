@@ -416,9 +416,11 @@ sub url_for {
 }
 
 sub validation {
-  my $self = shift;
+  my $self  = shift;
+  my $token = $self->session->{csrf_token};
   return $self->stash->{'mojo.validation'}
-    ||= $self->app->validator->validation->input($self->req->params->to_hash);
+    ||= $self->app->validator->validation->input($self->req->params->to_hash)
+    ->csrf_token($token);
 }
 
 sub write {

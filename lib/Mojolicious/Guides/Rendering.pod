@@ -753,13 +753,13 @@ validate it with L<Mojolicious::Validator::Validation/"csrf_protect">.
 
   use Mojolicious::Lite;
 
-  get '/' => sub {
+  get '/' => sub { shift->render('target') };
+
+  post '/' => sub {
     my $self = shift;
 
-    my $validation = $self->validation;
-    return $self->render unless $validation->has_data;
-
     # Check CSRF token
+    my $validation = $self->validation;
     return $self->render(text => 'Bad CSRF token!', status => 403)
       if $validation->csrf_protect->has_error('csrf_token');
 

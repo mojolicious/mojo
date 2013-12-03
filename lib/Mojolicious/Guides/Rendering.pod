@@ -753,7 +753,7 @@ validate it with L<Mojolicious::Validator::Validation/"csrf_protect">.
 
   use Mojolicious::Lite;
 
-  get '/' => sub { shift->render('target') };
+  get '/' => {template => 'target'};
 
   post '/' => sub {
     my $self = shift;

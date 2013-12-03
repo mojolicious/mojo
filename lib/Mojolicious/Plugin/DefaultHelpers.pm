@@ -166,7 +166,7 @@ named buffers are shared with the L</"content"> helper.
 
   %= csrf_token
 
-Get CSRF token from L</"session">, and if none exists generate one.
+Get CSRF token from L</"session">, and generate one if none exists.
 
 =head2 current_route
 

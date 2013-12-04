@@ -129,7 +129,13 @@ is $validation->param('0'), 0, 'right value';
 
 # CSRF protection
 $validation = $t->app->validation->input({foo => 'bar'})->csrf_protect;
+ok $validation->has_data,  'has data';
 ok $validation->has_error, 'has error';
+is_deeply $validation->error('csrf_token'), ['csrf_protect'], 'right error';
+$validation = $t->app->validation->input({csrf_token => 'abc'});
+ok $validation->has_data, 'has data';
+ok $validation->csrf_protect->has_error, 'has error';
+ok $validation->has_data, 'has data';
 is_deeply $validation->error('csrf_token'), ['csrf_protect'], 'right error';
 $validation = $t->app->validation->input({csrf_token => 'abc', foo => 'bar'})
   ->csrf_token('cba')->csrf_protect;

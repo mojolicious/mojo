@@ -43,7 +43,7 @@ sub csrf_protect {
   my $self  = shift;
   my $token = $self->input->{csrf_token};
   $self->{error}{csrf_token} = ['csrf_protect']
-    unless $token && $token eq $self->csrf_token;
+    unless $token && $token eq ($self->csrf_token // '');
   return $self;
 }
 

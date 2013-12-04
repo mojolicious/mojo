@@ -26,9 +26,9 @@ any '/' => sub {
 
 any '/forgery' => sub {
   my $self       = shift;
-  my $validation = $self->validation->csrf_protect;
+  my $validation = $self->validation;
   return $self->render unless $validation->has_data;
-  $validation->required('foo');
+  $validation->csrf_protect->required('foo');
 };
 
 my $t = Test::Mojo->new;
@@ -176,29 +176,29 @@ $t->post_ok('/' => form => {foo => 'no'})->status_is(200)
 # Missing CSRF token
 $t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
   ->content_like(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]');
+  ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
 
 # Correct CSRF token
 my $token
   = $t->ua->get('/forgery')->res->dom->at('[name=csrf_token]')->{value};
 $t->post_ok('/forgery' => form => {csrf_token => $token, foo => 'bar'})
   ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]');
+  ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
 
 # Correct CSRF token (header)
 $t->post_ok('/forgery' => {'X-CSRF-Token' => $token} => form => {foo => 'bar'})
   ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]');
+  ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
 
 # Wrong CSRF token (header)
 $t->post_ok('/forgery' => {'X-CSRF-Token' => 'abc'} => form => {foo => 'bar'})
   ->status_is(200)->content_like(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]');
+  ->element_exists('[value=bar]')->element_exists_not('.field-with-error');
 
-# Missing CSRF token again
-$t->post_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
-  ->content_like(qr/Wrong or missing CSRF token!/)
-  ->element_exists('[value=bar]');
+# Missing CSRF token and form
+$t->get_ok('/forgery')->status_is(200)
+  ->content_unlike(qr/Wrong or missing CSRF token!/)
+  ->element_exists_not('.field-with-error');
 
 # Failed validation for all fields (with custom helper)
 $t->app->helper(

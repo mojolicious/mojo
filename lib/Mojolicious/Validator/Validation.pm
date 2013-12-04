@@ -41,7 +41,7 @@ sub check {
 
 sub csrf_protect {
   my $self  = shift;
-  my $token = delete $self->input->{csrf_token};
+  my $token = $self->input->{csrf_token};
   $self->{error}{csrf_token} = ['csrf_protect']
     unless $token && $token eq $self->csrf_token;
   return $self;

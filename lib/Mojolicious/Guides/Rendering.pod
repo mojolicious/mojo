@@ -745,11 +745,11 @@ L<Mojolicious::Validator::Validation/"error">.
 
 =head2 Cross-site request forgery
 
-Cross-site request forgery is a very common attack on web applications that
-trick your logged in users to submit forms they did not intend to send. All
-you have to do to protect your users from this, is to add an additional hidden
-field to your forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field"> and
-validate it with L<Mojolicious::Validator::Validation/"csrf_protect">.
+CSRF is a very common attack on web applications that trick your logged in
+users to submit forms they did not intend to send. All you have to do to
+protect your users from this, is to add an additional hidden field to your
+forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field"> and validate it
+with L<Mojolicious::Validator::Validation/"csrf_protect">.
 
   use Mojolicious::Lite;
 

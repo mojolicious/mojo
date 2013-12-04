@@ -175,7 +175,8 @@ $t->post_ok('/' => form => {foo => 'no'})->status_is(200)
 
 # Missing CSRF token
 $t->get_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
-  ->content_like(qr/Wrong or missing CSRF token!/);
+  ->content_like(qr/Wrong or missing CSRF token!/)
+  ->element_exists('[value=bar]');
 
 # Correct CSRF token
 my $token
@@ -191,11 +192,13 @@ $t->post_ok('/forgery' => {'X-CSRF-Token' => $token} => form => {foo => 'bar'})
 
 # Wrong CSRF token (header)
 $t->post_ok('/forgery' => {'X-CSRF-Token' => 'abc'} => form => {foo => 'bar'})
-  ->status_is(200)->content_like(qr/Wrong or missing CSRF token!/);
+  ->status_is(200)->content_like(qr/Wrong or missing CSRF token!/)
+  ->element_exists('[value=bar]');
 
 # Missing CSRF token again
 $t->post_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
-  ->content_like(qr/Wrong or missing CSRF token!/);
+  ->content_like(qr/Wrong or missing CSRF token!/)
+  ->element_exists('[value=bar]');
 
 # Failed validation for all fields (with custom helper)
 $t->app->helper(

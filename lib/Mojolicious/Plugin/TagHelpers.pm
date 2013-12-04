@@ -314,7 +314,7 @@ picked up and shown as default.
 
   %= csrf_field
 
-Generate hidden input element with CSRF token from
+Generate hidden input element with
 L<Mojolicious::Plugin::DefaultHelpers/"csrf_token">.
 
   <input name="csrf_token" type="hidden" value="fa6a08..." />

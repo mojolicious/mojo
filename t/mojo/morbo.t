@@ -15,9 +15,11 @@ use File::Temp 'tempdir';
 use FindBin;
 use IO::Socket::INET;
 use Mojo::IOLoop;
+use Mojo::Server::Daemon;
 use Mojo::Server::Morbo;
 use Mojo::UserAgent;
 use Mojo::Util 'spurt';
+use Socket qw(SO_REUSEPORT SOL_SOCKET);
 
 # Prepare script
 my $dir = tempdir CLEANUP => 1;
@@ -117,6 +119,36 @@ is $tx->res->body, 'Hello!', 'right content';
 kill 'INT', $pid;
 sleep 1 while _port($port);
 
+# SO_REUSEPORT
+SKIP: {
+  skip 'SO_REUSEPORT support required!', 2 unless eval { _reuse_port() };
+
+  my $port   = Mojo::IOLoop->generate_port;
+  my $daemon = Mojo::Server::Daemon->new(
+    listen => ["http://127.0.0.1:$port"],
+    silent => 1
+  )->start;
+  ok !$daemon->ioloop->acceptor($daemon->acceptors->[0])
+    ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
+    'no SO_REUSEPORT socket option';
+  $daemon = Mojo::Server::Daemon->new(
+    listen => ["http://127.0.0.1:$port?reuse=1"],
+    silent => 1
+  );
+  $daemon->start;
+  ok $daemon->ioloop->acceptor($daemon->acceptors->[0])
+    ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
+    'SO_REUSEPORT socket option';
+}
+
 sub _port { IO::Socket::INET->new(PeerAddr => '127.0.0.1', PeerPort => shift) }
+
+sub _reuse_port {
+  IO::Socket::INET->new(
+    Listen    => 1,
+    LocalPort => Mojo::IOLoop->generate_port,
+    ReusePort => 1
+  );
+}
 
 done_testing();

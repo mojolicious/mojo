@@ -784,6 +784,8 @@ validate it with L<Mojolicious::Validator::Validation/"csrf_protect">.
     </body>
   </html>
 
+The token can also be submitted with the C<X-CSRF-Token> request header.
+
 =head2 Adding helpers
 
 Adding and redefining helpers is very easy, you can use them to do pretty much

@@ -184,6 +184,15 @@ $t->post_ok('/forgery' => form => {csrf_token => $token, foo => 'bar'})
   ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
   ->element_exists('[value=bar]');
 
+# Correct CSRF token (header)
+$t->post_ok('/forgery' => {'X-CSRF-Token' => $token} => form => {foo => 'bar'})
+  ->status_is(200)->content_unlike(qr/Wrong or missing CSRF token!/)
+  ->element_exists('[value=bar]');
+
+# Wrong CSRF token (header)
+$t->post_ok('/forgery' => {'X-CSRF-Token' => 'abc'} => form => {foo => 'bar'})
+  ->status_is(200)->content_like(qr/Wrong or missing CSRF token!/);
+
 # Missing CSRF token again
 $t->post_ok('/forgery' => form => {foo => 'bar'})->status_is(200)
   ->content_like(qr/Wrong or missing CSRF token!/);

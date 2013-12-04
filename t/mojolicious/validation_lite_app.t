@@ -200,6 +200,11 @@ $t->get_ok('/forgery')->status_is(200)
   ->content_unlike(qr/Wrong or missing CSRF token!/)
   ->element_exists_not('.field-with-error');
 
+# Correct CSRF token and missing form
+$t->post_ok('/forgery' => {'X-CSRF-Token' => $token})->status_is(200)
+  ->content_unlike(qr/Wrong or missing CSRF token!/)
+  ->element_exists('.field-with-error');
+
 # Failed validation for all fields (with custom helper)
 $t->app->helper(
   tag_with_error => sub {

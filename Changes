@@ -1,4 +1,6 @@
 
+4.60  2013-12-07
+
 4.59  2013-12-04
   - Added CSRF protection support.
   - Added support for permessage-deflate WebSocket compression.

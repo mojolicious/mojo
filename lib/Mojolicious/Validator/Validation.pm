@@ -160,7 +160,7 @@ and implements the following new ones.
   $validation = $validation->check('size', 2, 7);
 
 Perform validation check on all values of the current L</"topic">, no more
-checks will be performend on them after the first one failed.
+checks will be performed on them after the first one failed.
 
 =head2 csrf_protect
 

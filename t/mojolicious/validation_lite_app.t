@@ -127,6 +127,14 @@ ok $validation->required('0')->size(1, 1)->is_valid, 'valid';
 is_deeply $validation->output, {0 => 0}, 'right result';
 is $validation->param('0'), 0, 'right value';
 
+# Custom error
+$validation = $t->app->validation->input({foo => 'bar'});
+ok !$validation->required('foo')->has_error, 'no error';
+is_deeply $validation->output, {foo => 'bar'}, 'right result';
+ok $validation->error(foo => ['custom_check'])->has_error, 'has error';
+is_deeply $validation->output, {}, 'right result';
+is_deeply $validation->error('foo'), ['custom_check'], 'right error';
+
 # CSRF protection
 $validation = $t->app->validation->input({foo => 'bar'})->csrf_protect;
 ok $validation->has_data,  'has data';

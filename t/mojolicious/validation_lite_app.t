@@ -133,7 +133,8 @@ ok !$validation->required('foo')->has_error, 'no error';
 is_deeply $validation->output, {foo => 'bar'}, 'right result';
 ok $validation->error(foo => ['custom_check'])->has_error, 'has error';
 is_deeply $validation->output, {}, 'right result';
-is_deeply $validation->error('foo'), ['custom_check'], 'right error';
+is_deeply $validation->size(1, 2)->error('foo'), ['custom_check'],
+  'right error';
 
 # CSRF protection
 $validation = $t->app->validation->input({foo => 'bar'})->csrf_protect;

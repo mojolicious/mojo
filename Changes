@@ -2,6 +2,7 @@
 4.60  2013-12-11
   - Improved Mojolicious::Validator::Validation to allow custom validation
     errors.
+  - Documentation improvements. (dsteinbrunner)
 
 4.59  2013-12-04
   - Added CSRF protection support.

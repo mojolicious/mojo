@@ -68,7 +68,9 @@ One of the easiest ways to contribute to L<Mojolicious> is through
 documentation improvements. While the L<Mojolicious::Guides> are carefully
 curated by the core team, everybody with a (free) GitHub account can make
 changes and add new information to the
-L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
+L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>. Pull requests with
+additions or changes to the documentation included in the L<Mojolicious>
+distribution follow the same rules as code contributions.
 
 =head1 CONTRIBUTING CODE
 

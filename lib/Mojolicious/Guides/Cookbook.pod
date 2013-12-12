@@ -919,6 +919,10 @@ Uploading a large file is even easier.
   $ua->post('example.com/upload' =>
     form => {image => {file => '/home/sri/hello.png'}});
 
+  # Upload file via with predefined filename
+  $ua->post('example.com/upload' => form => {image => {
+    file => '/home/sri/hello.png', filename => "world.png"}});
+
 And once again you don't have to worry about memory usage, all data will be
 streamed directly from the file.
 

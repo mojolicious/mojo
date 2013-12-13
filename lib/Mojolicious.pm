@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Util qw(decamelize deprecated);
+use Mojo::Util 'decamelize';
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.59';
+our $VERSION  = '4.61';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -90,12 +90,6 @@ sub new {
 
   # Reduced log output outside of development mode
   $self->log->level('info') unless $mode eq 'development';
-
-  # DEPRECATED in Top Hat!
-  if (my $sub = $self->can("${mode}_mode")) {
-    deprecated qq{"sub ${mode}_mode {...}" in application class is DEPRECATED};
-    $self->$sub;
-  }
 
   $self->startup;
 
@@ -497,7 +491,7 @@ L<Mojolicious::Types> object.
   my $validator = $app->validator;
   $app          = $app->validator(Mojolicious::Validator->new);
 
-Validate form data, defaults to a L<Mojolicious::Validator> object.
+Validate parameters, defaults to a L<Mojolicious::Validator> object.
 
 =head1 METHODS
 
@@ -639,8 +633,8 @@ that have been bundled for internal use.
 
   Copyright (C) 2010-2013, Sebastian Riedel.
 
-Licensed under the CC-SA License, Version 3.0
-L<http://creativecommons.org/licenses/by-sa/3.0>.
+Licensed under the CC-SA License, Version 4.0
+L<http://creativecommons.org/licenses/by-sa/4.0>.
 
 =head2 jQuery
 

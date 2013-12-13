@@ -417,8 +417,17 @@ sub url_for {
 
 sub validation {
   my $self = shift;
-  return $self->stash->{'mojo.validation'}
-    ||= $self->app->validator->validation->input($self->req->params->to_hash);
+
+  my $stash = $self->stash;
+  return $stash->{'mojo.validation'} if $stash->{'mojo.validation'};
+
+  my $req    = $self->req;
+  my $token  = $self->session->{csrf_token};
+  my $header = $req->headers->header('X-CSRF-Token');
+  my $hash   = $req->params->to_hash;
+  $hash->{csrf_token} //= $header if $token && $header;
+  my $validation = $self->app->validator->validation->input($hash);
+  return $stash->{'mojo.validation'} = $validation->csrf_token($token);
 }
 
 sub write {
@@ -800,7 +809,7 @@ is set to the value C<XMLHttpRequest>.
   $c = $c->send({binary => $bytes});
   $c = $c->send({text   => $bytes});
   $c = $c->send({json   => {test => [1, 2, 3]}});
-  $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $bytes]);
+  $c = $c->send([$fin, $rsv1, $rsv2, $rsv3, $op, $payload]);
   $c = $c->send($chars);
   $c = $c->send($chars => sub {...});
 

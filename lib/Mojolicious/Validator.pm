@@ -43,7 +43,7 @@ sub _size {
 
 =head1 NAME
 
-Mojolicious::Validator - Validate form data
+Mojolicious::Validator - Validate parameter
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Mojolicious::Validator - Validate form data
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Validator> validates form data for L<Mojolicious>.
+L<Mojolicious::Validator> validates parameters for L<Mojolicious>.
 
 =head1 CHECKS
 

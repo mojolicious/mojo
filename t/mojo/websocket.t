@@ -455,15 +455,17 @@ is $stash->{finished}, 1, 'finish event has been emitted once';
 like $log, qr/Inactivity timeout\./, 'right log message';
 app->log->unsubscribe(message => $msg);
 
-# Ping/pong
-my $pong;
+# Ping/pong (with negotiated compression)
+my ($pong, $compressed, $extensions);
 $ua->websocket(
   '/echo' => sub {
     my ($ua, $tx) = @_;
     $tx->on(
       frame => sub {
         my ($tx, $frame) = @_;
-        $pong = $frame->[5] if $frame->[4] == 10;
+        $pong       = $frame->[5] if $frame->[4] == 10;
+        $compressed = $tx->compressed;
+        $extensions = $tx->res->headers->sec_websocket_extensions;
         Mojo::IOLoop->stop;
       }
     );
@@ -472,5 +474,7 @@ $ua->websocket(
 );
 Mojo::IOLoop->start;
 is $pong, 'test', 'received pong with payload';
+ok $compressed, 'WebSocket has compression';
+is $extensions, 'permessage-deflate', 'right "Sec-WebSocket-Extensions" value';
 
 done_testing();

@@ -35,7 +35,7 @@ issue.
 =head2 Reporting security issues
 
 Please report security issues directly to the CPAN email address of the
-pumpking, which is currently C<sri@cpan.org>, and give us a few days to
+pumpkin-holder, which is currently C<sri@cpan.org>, and give us a few days to
 develop and release a proper fix.
 
 =head2 Feature requests
@@ -68,7 +68,9 @@ One of the easiest ways to contribute to L<Mojolicious> is through
 documentation improvements. While the L<Mojolicious::Guides> are carefully
 curated by the core team, everybody with a (free) GitHub account can make
 changes and add new information to the
-L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>.
+L<Mojolicious wiki|http://github.com/kraih/mojo/wiki>. Pull requests with
+additions or changes to the documentation included in the L<Mojolicious>
+distribution follow the same rules as code contributions.
 
 =head1 CONTRIBUTING CODE
 
@@ -123,12 +125,12 @@ The installation process should be as fast and painless as possible. (Less
 than a minute on most common hardware is a good rule of thumb)
 
 The addition and modification of features is decided by majority vote or the
-pumpking.
+pumpkin-holder.
 
 Any core developer may nominate a new one, who must then be accepted by a 2/3
 majority vote.
 
-The pumpking has veto rights and may select his successor.
+The pumpkin-holder has veto rights and may select their successor.
 
 It's not a feature without a test and documentation.
 

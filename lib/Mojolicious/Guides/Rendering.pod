@@ -745,8 +745,51 @@ L<Mojolicious::Validator::Validation/"error">.
         %= text_field 'number'
         %= submit_button
       % end
-    </html>
+    </body>
   </html>
+
+=head2 Cross-site request forgery
+
+CSRF is a very common attack on web applications that trick your logged in
+users to submit forms they did not intend to send. All you have to do to
+protect your users from this, is to add an additional hidden field to your
+forms with L<Mojolicious::Plugin::TagHelpers/"csrf_field"> and validate it
+with L<Mojolicious::Validator::Validation/"csrf_protect">.
+
+  use Mojolicious::Lite;
+
+  get '/' => {template => 'target'};
+
+  post '/' => sub {
+    my $self = shift;
+
+    # Check CSRF token
+    my $validation = $self->validation;
+    return $self->render(text => 'Bad CSRF token!', status => 403)
+      if $validation->csrf_protect->has_error('csrf_token');
+
+    my $city = $validation->required('city')->param('city');
+    $self->render(text => "Low orbit ion cannon pointed at $city!")
+      unless $validation->has_error;
+  } => 'target';
+
+  app->start;
+  __DATA__
+
+  @@ target.html.ep
+  <!DOCTYPE html>
+  <html>
+    <body>
+      %= form_for target => begin
+        %= csrf_field
+        %= label_for city => 'Which city to point low orbit ion cannon at?'
+        %= text_field 'city'
+        %= submit_button
+      %= end
+    </body>
+  </html>
+
+The token can also be submitted with the C<X-CSRF-Token> request header.
 
 =head2 Adding helpers
 
@@ -1146,7 +1189,7 @@ the renderer provides methods to help you with that.
 =head2 Adding a handler to generate binary data
 
 By default the renderer assumes that every C<handler> generates characters
-that need to be automatically encoded, but this can be be easily disabled if
+that need to be automatically encoded, but this can be easily disabled if
 you're generating bytes instead.
 
   use Mojolicious::Lite;

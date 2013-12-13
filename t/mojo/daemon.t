@@ -7,14 +7,12 @@ BEGIN {
 
 use Test::More;
 use File::Spec::Functions 'catdir';
-use IO::Socket::INET;
 use Mojo;
 use Mojo::IOLoop;
 use Mojo::Log;
 use Mojo::Server::Daemon;
 use Mojo::UserAgent;
 use Mojolicious;
-use Socket qw(SO_REUSEPORT SOL_SOCKET);
 
 # Timeout
 {
@@ -242,35 +240,5 @@ $tx = $ua->inactivity_timeout(10)
 ok $tx->success, 'successful';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
-
-# SO_REUSEPORT
-SKIP: {
-  skip 'SO_REUSEPORT support required!', 2 unless eval { _probe() };
-
-  $port   = Mojo::IOLoop->generate_port;
-  $daemon = Mojo::Server::Daemon->new(
-    listen => ["http://127.0.0.1:$port"],
-    silent => 1
-  )->start;
-  ok !$daemon->ioloop->acceptor($daemon->acceptors->[0])
-    ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
-    'no SO_REUSEPORT socket option';
-  $daemon = Mojo::Server::Daemon->new(
-    listen => ["http://127.0.0.1:$port?reuse=1"],
-    silent => 1
-  );
-  $daemon->start;
-  ok $daemon->ioloop->acceptor($daemon->acceptors->[0])
-    ->handle->getsockopt(SOL_SOCKET, SO_REUSEPORT),
-    'SO_REUSEPORT socket option';
-}
-
-sub _probe {
-  IO::Socket::INET->new(
-    Listen    => 1,
-    LocalPort => Mojo::IOLoop->generate_port,
-    ReusePort => 1
-  );
-}
 
 done_testing();

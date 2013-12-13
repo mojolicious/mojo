@@ -36,9 +36,7 @@ sub import {
   }
 
   # Mojo modules are strict!
-  strict->import;
-  warnings->import;
-  utf8->import;
+  $_->import for qw(strict warnings utf8);
   feature->import(':5.10');
 }
 

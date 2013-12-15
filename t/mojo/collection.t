@@ -80,13 +80,6 @@ is_deeply [@$collection], [1, 2, 3], 'right elements';
 is $collection->map(sub { shift() + 2 })->join(''), '345', 'right result';
 is_deeply [@$collection], [1, 2, 3], 'right elements';
 
-# reduce
-$collection = c(1, 2, 3);
-is $collection->reduce(sub { shift() + shift() }), 6, 'right result';
-is $collection->reduce(sub { $_[1] . $_[0] })->quote, '"321"', 'right result';
-is $collection->reduce(sub { $_[0] > $_[1] ? $_[0] : $_[1] }), 3,
-  'right result';
-
 # reverse
 $collection = c(3, 2, 1);
 is_deeply [$collection->reverse->each], [1, 2, 3], 'right order';

@@ -70,11 +70,6 @@ sub pluck {
   return $self->map(sub { $_->$method(@args) });
 }
 
-sub reduce {
-  my ($self, $cb) = @_;
-  return Mojo::ByteStream->new(List::Util::reduce { $a->$cb($b) } @$self);
-}
-
 sub reverse { $_[0]->new(reverse @{$_[0]}) }
 
 sub shuffle { $_[0]->new(List::Util::shuffle @{$_[0]}) }
@@ -241,14 +236,6 @@ results.
 
   # Equal to but more convenient than
   my $new = $collection->map(sub { $_->$method(@args) });
-
-=head2 reduce
-
-  my $stream = $collection->reduce(sub {...});
-
-Reduce collection to L<Mojo::ByteStream>.
-
-  my $sum = $collection->reduce(sub { shift() + shift() });
 
 =head2 reverse
 

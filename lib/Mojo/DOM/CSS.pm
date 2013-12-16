@@ -33,8 +33,6 @@ my $TOKEN_RE        = qr/
   )?
 /x;
 
-sub first { shift->_select(1, @_) }
-
 sub match {
   my $self = shift;
   my $tree = $self->tree;
@@ -42,7 +40,8 @@ sub match {
   return $self->_match($self->_compile(shift), $tree, $tree);
 }
 
-sub select { shift->_select(0, @_) }
+sub select     { shift->_select(0, @_) }
+sub select_one { shift->_select(1, @_) }
 
 sub _ancestor {
   my ($self, $selectors, $current, $tree) = @_;
@@ -296,10 +295,10 @@ sub _regex {
 }
 
 sub _select {
-  my ($self, $first) = (shift, shift);
+  my ($self, $one, $selector) = @_;
 
   my @results;
-  my $pattern = $self->_compile(shift);
+  my $pattern = $self->_compile($selector);
   my $tree    = $self->tree;
   my @queue   = ($tree);
   while (my $current = shift @queue) {
@@ -309,14 +308,14 @@ sub _select {
     if ($type eq 'tag') {
       unshift @queue, @$current[4 .. $#$current];
       next unless $self->_match($pattern, $current, $tree);
-      $first ? return $current : push @results, $current;
+      $one ? return $current : push @results, $current;
     }
 
     # Root
     elsif ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
   }
 
-  return $first ? undef : \@results;
+  return $one ? undef : \@results;
 }
 
 sub _selector {
@@ -616,13 +615,6 @@ carefully since it is very dynamic.
 L<Mojo::DOM::CSS> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 first
-
-  my $result = $css->first('head > title');
-
-Run CSS selector against L</"tree"> and stop immediately after the first node
-matched.
-
 =head2 match
 
   my $bool = $css->match('head > title');
@@ -634,6 +626,13 @@ Match CSS selector against first node in L</"tree">.
   my $results = $css->select('head > title');
 
 Run CSS selector against L</"tree">.
+
+=head2 select_one
+
+  my $result = $css->select_one('head > title');
+
+Run CSS selector against L</"tree"> and stop as soon as the first node
+matched.
 
 =head1 SEE ALSO
 

@@ -51,7 +51,7 @@ sub append_content {
 
 sub at {
   my $self = shift;
-  return undef unless my $result = $self->_css->first(@_);
+  return undef unless my $result = $self->_css->select_one(@_);
   return $self->new->tree($result)->xml($self->xml);
 }
 

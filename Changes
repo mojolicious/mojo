@@ -1,6 +1,6 @@
 
 4.61  2013-12-16
-  - Added first method to Mojo::DOM::CSS.
+  - Added select_one method to Mojo::DOM::CSS.
   - Improved performance of Mojo::DOM::at significantly.
 
 4.60  2013-12-11

@@ -136,7 +136,7 @@ sub _select {
     }
 
     # Unknown
-    else { die qq{Unknown command "$command".\n} }
+    die qq{Unknown command "$command".\n};
   }
 
   _say(@$results);

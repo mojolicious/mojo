@@ -49,7 +49,11 @@ sub append_content {
   return $self;
 }
 
-sub at { shift->find(@_)->[0] }
+sub at {
+  my $self = shift;
+  return undef unless my $result = $self->_css->first(@_);
+  return $self->new->tree($result)->xml($self->xml);
+}
 
 sub attr {
   my $self = shift;
@@ -80,17 +84,9 @@ sub content_xml {
   return join '', map { _render($_, $xml) } _nodes($self->tree);
 }
 
-sub find {
-  my $self = shift;
-  my $results = Mojo::DOM::CSS->new(tree => $self->tree)->select(@_);
-  return $self->_collect(@$results);
-}
+sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
 
-sub match {
-  my $self = shift;
-  return undef unless Mojo::DOM::CSS->new(tree => $self->tree)->match(@_);
-  return $self;
-}
+sub match { $_[0]->_css->match($_[1]) ? $_[0] : undef }
 
 sub namespace {
   my $self = shift;
@@ -245,6 +241,8 @@ sub _content {
   my $tree = shift->tree;
   return _text([_nodes($tree)], shift, _trim($tree, @_));
 }
+
+sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
 
 sub _delegate {
   my ($self, $method) = (shift, shift);

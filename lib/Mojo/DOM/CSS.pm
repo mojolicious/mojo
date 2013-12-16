@@ -33,6 +33,8 @@ my $TOKEN_RE        = qr/
   )?
 /x;
 
+sub first { shift->_select(1, @_) }
+
 sub match {
   my $self = shift;
   my $tree = $self->tree;
@@ -40,28 +42,7 @@ sub match {
   return $self->_match($self->_compile(shift), $tree, $tree);
 }
 
-sub select {
-  my $self = shift;
-
-  my @results;
-  my $pattern = $self->_compile(shift);
-  my $tree    = $self->tree;
-  my @queue   = ($tree);
-  while (my $current = shift @queue) {
-    my $type = $current->[0];
-
-    # Tag
-    if ($type eq 'tag') {
-      unshift @queue, @$current[4 .. $#$current];
-      push @results, $current if $self->_match($pattern, $current, $tree);
-    }
-
-    # Root
-    elsif ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
-  }
-
-  return \@results;
-}
+sub select { shift->_select(0, @_) }
 
 sub _ancestor {
   my ($self, $selectors, $current, $tree) = @_;
@@ -312,6 +293,30 @@ sub _regex {
 
   # Everything else
   return qr/^$value$/;
+}
+
+sub _select {
+  my ($self, $first) = (shift, shift);
+
+  my @results;
+  my $pattern = $self->_compile(shift);
+  my $tree    = $self->tree;
+  my @queue   = ($tree);
+  while (my $current = shift @queue) {
+    my $type = $current->[0];
+
+    # Tag
+    if ($type eq 'tag') {
+      unshift @queue, @$current[4 .. $#$current];
+      next unless $self->_match($pattern, $current, $tree);
+      $first ? return $current : push @results, $current;
+    }
+
+    # Root
+    elsif ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
+  }
+
+  return $first ? undef : \@results;
 }
 
 sub _selector {
@@ -610,6 +615,13 @@ carefully since it is very dynamic.
 
 L<Mojo::DOM::CSS> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
+
+=head2 first
+
+  my $result = $css->first('head > title');
+
+Run CSS selector against L</"tree"> and stop immediately after the first node
+matched.
 
 =head2 match
 

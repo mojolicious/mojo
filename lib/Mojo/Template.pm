@@ -642,20 +642,20 @@ following new ones.
 
   $mt = $mt->build;
 
-Build Perl code from tree.
+Build Perl L</"code"> from L</"tree">.
 
 =head2 compile
 
   my $exception = $mt->compile;
 
-Compile Perl code for template.
+Compile Perl L</"code"> for template.
 
 =head2 interpret
 
   my $output = $mt->interpret;
   my $output = $mt->interpret(@args);
 
-Interpret compiled template code.
+Interpret L</"compiled"> template code.
 
   # Reuse template
   say $mt->render('Hello <%= $_[0] %>!', 'Bender');
@@ -666,7 +666,7 @@ Interpret compiled template code.
 
   $mt = $mt->parse($template);
 
-Parse template into tree.
+Parse template into L</"tree">.
 
 =head2 render
 

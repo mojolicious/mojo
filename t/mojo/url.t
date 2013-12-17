@@ -175,10 +175,6 @@ is "$url", 'foo?foo=bar#23', 'right relative version';
 $url = Mojo::URL->new('/foo?foo=bar#23');
 ok !$url->is_abs, 'is not absolute';
 is "$url", '/foo?foo=bar#23', 'right relative version';
-$url = Mojo::URL->new('http://sri:foobar@example.com:8080/foo?foo=bar#23');
-$url->base->parse('http://sri:foobar@example.com:8080/');
-ok $url->is_abs, 'is absolute';
-is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
 
 # Relative without scheme
 $url = Mojo::URL->new('//localhost/23/');
@@ -206,88 +202,6 @@ ok !$url->is_abs, 'is not absolute';
 is $url->host, '',           'no host';
 is $url->path, '//bar//23/', 'right path';
 is "$url", '////bar//23/', 'right relative version';
-
-# Relative (base without trailing slash)
-$url = Mojo::URL->new('http://sri:foobar@example.com:8080/baz/foo?foo=bar#23');
-$url->base->parse('http://sri:foobar@example.com:8080');
-is $url->to_rel, 'baz/foo?foo=bar#23', 'right relative version';
-is $url->to_rel->to_abs,
-  'http://sri:foobar@example.com:8080/baz/foo?foo=bar#23',
-  'right absolute version';
-$url = Mojo::URL->new('http://sri:foobar@example.com:8080/baz/foo?foo=bar#23');
-$url->base->parse('http://sri:foobar@example.com:8080/baz');
-is $url->to_rel, 'baz/foo?foo=bar#23', 'right relative version';
-is $url->to_rel->to_abs,
-  'http://sri:foobar@example.com:8080/baz/foo?foo=bar#23',
-  'right absolute version';
-
-# Relative (base without authority)
-$url = Mojo::URL->new('http://sri:foobar@example.com:8080/baz/foo?foo=bar#23');
-$url->base->parse('http://');
-is $url->to_rel, '//sri:foobar@example.com:8080/baz/foo?foo=bar#23',
-  'right relative version';
-is $url->to_rel->to_abs,
-  'http://sri:foobar@example.com:8080/baz/foo?foo=bar#23',
-  'right absolute version';
-
-# Relative with path
-$url = Mojo::URL->new('http://example.com/foo/index.html?foo=bar#23');
-$url->base->parse('http://example.com/foo/');
-my $rel = $url->to_rel;
-is $rel, 'index.html?foo=bar#23', 'right format';
-ok !$rel->is_abs, 'not absolute';
-is $rel->to_abs, 'http://example.com/foo/index.html?foo=bar#23',
-  'right absolute version';
-
-# Relative (base argument)
-$url = Mojo::URL->new('http://example.com/');
-$rel = $url->to_rel($url->clone);
-is $rel, '', 'right relative version';
-is $rel->to_abs, 'http://example.com/', 'right absolute version';
-is $rel->to_abs->to_rel, '', 'right relative version';
-$rel = $url->to_rel(Mojo::URL->new('http://example.com/a/'));
-is $rel, '..', 'right relative version';
-is $rel->to_abs, 'http://example.com/', 'right absolute version';
-is $rel->to_abs->to_rel, '..', 'right relative version';
-$rel = $url->to_rel(Mojo::URL->new('http://example.com/a/b/'));
-is $rel, '../..', 'right relative version';
-is $rel->to_abs, 'http://example.com/', 'right absolute version';
-is $rel->to_abs->to_rel, '../..', 'right relative version';
-$url = Mojo::URL->new('http://example.com/index.html');
-$rel = $url->to_rel(Mojo::URL->new('http://example.com/'));
-is $rel, 'index.html', 'right relative version';
-is $rel->to_abs, 'http://example.com/index.html', 'right absolute version';
-is $rel->to_abs->to_rel, 'index.html', 'right relative version';
-$url = Mojo::URL->new('http://example.com/index.html');
-$rel = $url->to_rel(Mojo::URL->new('http://example.com/a/'));
-is $rel, '../index.html', 'right relative version';
-is $rel->to_abs, 'http://example.com/index.html', 'right absolute version';
-is $rel->to_abs->to_rel, '../index.html', 'right relative version';
-$url = Mojo::URL->new('http://example.com/index.html');
-$rel = $url->to_rel(Mojo::URL->new('http://example.com/a/b/'));
-is $rel, '../../index.html', 'right relative version';
-is $rel->to_abs, 'http://example.com/index.html', 'right absolute version';
-is $rel->to_abs->to_rel, '../../index.html', 'right relative version';
-$url = Mojo::URL->new('http://example.com/a/b/c/index.html');
-$rel = $url->to_rel(Mojo::URL->new('http://example.com/a/b/'));
-is $rel, 'c/index.html', 'right relative version';
-is $rel->to_abs, 'http://example.com/a/b/c/index.html',
-  'right absolute version';
-is $rel->to_abs->to_rel, 'c/index.html', 'right relative version';
-$url = Mojo::URL->new('http://example.com/a/b/c/d/index.html');
-$rel = $url->to_rel(Mojo::URL->new('http://example.com/a/b/'));
-is $rel, 'c/d/index.html', 'right relative version';
-is $rel->to_abs, 'http://example.com/a/b/c/d/index.html',
-  'right absolute version';
-is $rel->to_abs->to_rel, 'c/d/index.html', 'right relative version';
-$url = Mojo::URL->new('/foo');
-is $url->base, '', 'no base';
-is $url->to_abs(Mojo::URL->new('http://example.com'))->base,
-  'http://example.com', 'right base';
-$url = Mojo::URL->new('http://example.com/foo');
-is $url->base, '', 'no base';
-is $url->to_rel(Mojo::URL->new('http://example.com'))->base,
-  'http://example.com', 'right base';
 
 # Relative path
 $url = Mojo::URL->new('http://example.com/foo/?foo=bar#23');
@@ -328,11 +242,6 @@ is $url->to_abs, 'http://www.aviary.com/cages/birds.gif',
 $url = Mojo::URL->new('../foo?foo=bar#23');
 $url->base->parse('http://example.com/bar/baz/');
 ok !$url->is_abs, 'not absolute';
-is $url->to_abs, 'http://example.com/bar/foo?foo=bar#23',
-  'right absolute version';
-is $url->to_abs->to_rel, '../foo?foo=bar#23', 'right relative version';
-is $url->to_abs->to_rel->to_abs, 'http://example.com/bar/foo?foo=bar#23',
-  'right absolute version';
 is $url->to_abs, 'http://example.com/bar/foo?foo=bar#23',
   'right absolute version';
 is $url->to_abs->base, 'http://example.com/bar/baz/', 'right base';
@@ -472,28 +381,19 @@ is "$url", 'http://xn--n3h.net/%E2%99%A5/%E2%99%A5/?%E2%99%A5=%E2%98%83',
 $url = Mojo::URL->new('http://foo.com/');
 is $url->to_abs, 'http://foo.com/', 'right absolute version';
 
-# Already relative
-$url = Mojo::URL->new('http://sri:foobar@example.com:8080/foo?foo=bar#23');
-$url->base->parse('http://sri:foobar@example.com:8080/');
-my $url2 = $url->to_rel;
-is $url->to_rel, 'foo?foo=bar#23', 'right relative version';
-
 # Empty path elements
 $url = Mojo::URL->new('http://example.com/foo//bar/23/');
-$url->base->parse('http://example.com/');
 ok $url->is_abs, 'is absolute';
-is $url->to_rel, 'foo//bar/23/', 'right relative version';
+is $url->path, '/foo//bar/23/', 'right path';
+is "$url", 'http://example.com/foo//bar/23/', 'right format';
 $url = Mojo::URL->new('http://example.com//foo//bar/23/');
-$url->base->parse('http://example.com/');
 ok $url->is_abs, 'is absolute';
-is $url->to_rel, '/foo//bar/23/', 'right relative version';
+is $url->path, '//foo//bar/23/', 'right path';
+is "$url", 'http://example.com//foo//bar/23/', 'right format';
 $url = Mojo::URL->new('http://example.com/foo///bar/23/');
-$url->base->parse('http://example.com/');
 ok $url->is_abs, 'is absolute';
-is $url->to_rel, 'foo///bar/23/', 'right relative version';
-is $url->to_abs, 'http://example.com/foo///bar/23/', 'right absolute version';
-ok $url->is_abs, 'is absolute';
-is $url->to_rel, 'foo///bar/23/', 'right relative version';
+is $url->path, '/foo///bar/23/', 'right path';
+is "$url", 'http://example.com/foo///bar/23/', 'right format';
 
 # Merge relative path
 $url = Mojo::URL->new('http://foo.bar/baz?yada');

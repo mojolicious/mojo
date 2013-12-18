@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.62';
+our $VERSION  = '4.63';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -541,7 +541,8 @@ L<Mojolicious::Controller> object.
   $app->handler(Mojo::Transaction::HTTP->new);
   $app->handler(Mojolicious::Controller->new);
 
-Sets up the default controller and calls process for every request.
+Sets up the default controller and emits the L</"around_dispatch"> hook for
+every request.
 
 =head2 helper
 

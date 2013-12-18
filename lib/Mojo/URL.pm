@@ -260,7 +260,7 @@ L<Mojo::URL> implements the following attributes.
   my $base = $url->base;
   $url     = $url->base(Mojo::URL->new);
 
-Base of this URL.
+Base of this URL, defaults to a L<Mojo::URL> object.
 
 =head2 fragment
 

@@ -456,9 +456,11 @@ startup method to define the url endpoints for your application.
 Secret passphrases used for signed cookies and the like, defaults to the
 L</"moniker"> of this application, which is not very secure, so you should
 change it!!! As long as you are using the insecure default there will be debug
-messages in the log file reminding you to change your passphrase. The first
-passphrase is used to create new signatures and all of them for verification,
-so you can have rotating passphrases for increased security.
+messages in the log file reminding you to change your passphrase. Only the
+first passphrase is used to create new signatures, but all of them for
+verification. So you can increase security without invalidating all your
+signed cookies by rotating passphrases, just add new ones to the front and
+remove old ones from the back.
 
   # Rotate passphrases
   $app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);

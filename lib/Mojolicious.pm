@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.63';
+our $VERSION  = '4.64';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -459,8 +459,8 @@ change it!!! As long as you are using the insecure default there will be debug
 messages in the log file reminding you to change your passphrase. Only the
 first passphrase is used to create new signatures, but all of them for
 verification. So you can increase security without invalidating all your
-signed cookies by rotating passphrases, just add new ones to the front and
-remove old ones from the back.
+existing signed cookies by rotating passphrases, just add new ones to the
+front and remove old ones from the back.
 
   # Rotate passphrases
   $app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);

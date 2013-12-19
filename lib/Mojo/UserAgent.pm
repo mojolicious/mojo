@@ -711,7 +711,7 @@ Application server relative URLs will be processed with, defaults to a
 L<Mojo::UserAgent::Server> object.
 
   # Introspect
-  say for $ua->server->app->secrets;
+  say for @{$ua->server->app->secrets};
 
   # Change log level
   $ua->server->app->log->level('fatal');

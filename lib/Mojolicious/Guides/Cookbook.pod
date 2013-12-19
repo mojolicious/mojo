@@ -1106,7 +1106,7 @@ that they will be picked up automatically by the command line interface?
     my ($self, $target) = @_;
 
     # Leak secret passphrases
-    say for $self->app->secrets if $target eq 'secrets';
+    say for @{$self->app->secrets} if $target eq 'secrets';
   }
 
   1;

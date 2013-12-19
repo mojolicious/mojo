@@ -10,7 +10,7 @@ plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!'
 # DEPRECATED in Top Hat!
 my @tophat = (
   qw(app app_url detect_proxy http_proxy https_proxy name need_proxy new),
-  qw(no_proxy to_rel)
+  qw(no_proxy secret to_rel)
 );
 
 # False positive constants

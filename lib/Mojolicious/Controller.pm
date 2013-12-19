@@ -195,8 +195,8 @@ sub render_exception {
   };
   my $inline = $renderer->_bundled(
     $mode eq 'development' ? 'exception.development' : 'exception');
-  return $self if $self->_fallbacks($options, 'exception', $inline);
-  $self->_fallbacks({%$options, format => 'html'}, 'exception', $inline);
+  return $self if $self->__fallbacks($options, 'exception', $inline);
+  $self->__fallbacks({%$options, format => 'html'}, 'exception', $inline);
   return $self;
 }
 
@@ -216,8 +216,8 @@ sub render_not_found {
     = {template => "not_found.$mode", format => $format, status => 404};
   my $inline = $renderer->_bundled(
     $mode eq 'development' ? 'not_found.development' : 'not_found');
-  return $self if $self->_fallbacks($options, 'not_found', $inline);
-  $self->_fallbacks({%$options, format => 'html'}, 'not_found', $inline);
+  return $self if $self->__fallbacks($options, 'not_found', $inline);
+  $self->__fallbacks({%$options, format => 'html'}, 'not_found', $inline);
   return $self;
 }
 
@@ -324,9 +324,9 @@ sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
 
   # Response cookie
-  my $secret = $self->stash->{'mojo.secret'};
+  my $secrets = $self->stash->{'mojo.secrets'};
   return $self->cookie($name,
-    "$value--" . Mojo::Util::hmac_sha1_sum($value, $secret), $options)
+    "$value--" . Mojo::Util::hmac_sha1_sum($value, $secrets->[0]), $options)
     if defined $value;
 
   # Request cookies
@@ -335,20 +335,13 @@ sub signed_cookie {
 
     # Check signature
     if ($value =~ s/--([^\-]+)$//) {
-      my $sig = $1;
-
-      # Verified
-      my $check = Mojo::Util::hmac_sha1_sum $value, $secret;
-      if (Mojo::Util::secure_compare $sig, $check) { push @results, $value }
-
-      # Bad cookie
+      if (__signature($value, $1, @$secrets)) { push @results, $value }
       else {
         $self->app->log->debug(
           qq{Bad signed cookie "$name", possible hacking attempt.});
       }
     }
 
-    # Not signed
     else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
   }
 
@@ -446,7 +439,7 @@ sub write_chunk {
   return $self->rendered;
 }
 
-sub _fallbacks {
+sub __fallbacks {
   my ($self, $options, $template, $inline) = @_;
 
   # Mode specific template
@@ -460,6 +453,14 @@ sub _fallbacks {
   return undef unless $stash->{format} eq 'html';
   delete @$stash{qw(extends layout)};
   return $self->render_maybe(%$options, inline => $inline, handler => 'ep');
+}
+
+sub __signature {
+  my ($value, $signature) = (shift, shift);
+  Mojo::Util::secure_compare($signature, Mojo::Util::hmac_sha1_sum($value, $_))
+    and return 1
+    for @_;
+  return undef;
 }
 
 1;

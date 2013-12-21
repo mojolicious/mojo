@@ -349,9 +349,9 @@ Or perform quick requests right from the command line.
 Sessions in L<Mojolicious> pretty much just work out of the box once you start
 using the method L<Mojolicious::Controller/"session">, there is no setup
 required, but we suggest setting a more secure passphrase with
-L<Mojolicious/"secret">.
+L<Mojolicious/"secrets">.
 
-  app->secret('Mojolicious rocks');
+  app->secrets(['Mojolicious rocks']);
 
 This passphrase is used by the C<HMAC-SHA1> algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.
@@ -392,7 +392,7 @@ like this.
   use MyUsers;
 
   # Make signed cookies secure
-  app->secret('Mojolicious rocks');
+  app->secrets(['Mojolicious rocks']);
 
   helper users => sub { state $users = MyUsers->new };
 
@@ -513,7 +513,7 @@ actual action code needs to be changed.
   sub startup {
     my $self = shift;
 
-    $self->secret('Mojolicious rocks');
+    $self->secrets(['Mojolicious rocks']);
     $self->helper(users => sub { state $users = MyUsers->new });
 
     my $r = $self->routes;
@@ -620,7 +620,7 @@ information.
   sub startup {
     my $self = shift;
 
-    $self->secret('Mojolicious rocks');
+    $self->secrets(['Mojolicious rocks']);
     $self->helper(users => sub { state $users = MyUsers->new });
 
     my $r = $self->routes;

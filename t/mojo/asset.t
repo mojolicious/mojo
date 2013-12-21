@@ -36,20 +36,22 @@ $mem = Mojo::Asset::Memory->new;
 ok !$mem->is_range, 'no range';
 is $mem->contains('a'), -1, 'does not contain "a"';
 
-# File asset range support (a[bcdef])
+# File asset range support (a[bcdefabc])
 $file = Mojo::Asset::File->new(start_range => 1);
 ok $file->is_range, 'has range';
-$file->add_chunk('abcdef');
+$file->add_chunk('abcdefabc');
 is $file->contains('bcdef'), 0,  '"bcdef" at position 0';
 is $file->contains('cdef'),  1,  '"cdef" at position 1';
+is $file->contains('abc'),   5,  '"abc" at position 5';
 is $file->contains('db'),    -1, 'does not contain "db"';
 
-# Memory asset range support (a[bcdef])
+# Memory asset range support (a[bcdefabc])
 $mem = Mojo::Asset::Memory->new(start_range => 1);
 ok $mem->is_range, 'has range';
-$mem->add_chunk('abcdef');
+$mem->add_chunk('abcdefabc');
 is $mem->contains('bcdef'), 0,  '"bcdef" at position 0';
 is $mem->contains('cdef'),  1,  '"cdef" at position 1';
+is $mem->contains('abc'),   5,  '"abc" at position 5';
 is $mem->contains('db'),    -1, 'does not contain "db"';
 
 # File asset range support (ab[cdefghi]jk)

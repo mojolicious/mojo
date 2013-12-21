@@ -109,7 +109,7 @@ sub _json {
   say $json->encode($data);
 }
 
-sub _say { say encode('UTF-8', $_[0]) if length $_[0] }
+sub _say { length && say encode('UTF-8', $_) for @_ }
 
 sub _select {
   my ($buffer, $selector, $charset, @args) = @_;
@@ -117,33 +117,29 @@ sub _select {
   $buffer = decode($charset, $buffer) // $buffer if $charset;
   my $results = Mojo::DOM->new($buffer)->find($selector);
 
-  my $finished;
   while (defined(my $command = shift @args)) {
 
     # Number
-    if ($command =~ /^\d+$/) {
-      return unless ($results = [$results->[$command]])->[0];
-      next;
-    }
+    ($results = [$results->[$command]])->[0] ? next : return
+      if $command =~ /^\d+$/;
 
     # Text
-    elsif ($command eq 'text') { _say($_->text) for @$results }
+    return _say(map { $_->text } @$results) if $command eq 'text';
 
     # All text
-    elsif ($command eq 'all') { _say($_->all_text) for @$results }
+    return _say(map { $_->all_text } @$results) if $command eq 'all';
 
     # Attribute
-    elsif ($command eq 'attr') {
-      next unless my $name = shift @args;
-      _say($_->attr->{$name}) for @$results;
+    if ($command eq 'attr') {
+      return unless my $name = shift @args;
+      return _say(map { $_->attr->{$name} } @$results);
     }
 
     # Unknown
-    else { die qq{Unknown command "$command".\n} }
-    $finished++;
+    die qq{Unknown command "$command".\n};
   }
 
-  unless ($finished) { _say($_) for @$results }
+  _say(@$results);
 }
 
 1;

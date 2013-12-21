@@ -105,12 +105,12 @@ to use the MOJO_REACTOR environment variable to enforce a more portable one.
 
 =head2 What does "Your secret passphrase needs to be changed" mean?
 
-L<Mojolicious> uses a secret passphrase for security features such as signed
-cookies. It defaults to the moniker of your application, which is not very
-secure, so we added this log message as a reminder. You can change the
-passphrase with the attribute L<Mojolicious/"secret">.
+L<Mojolicious> uses secret passphrases for security features such as signed
+cookies. It defaults to using the moniker of your application, which is not
+very secure, so we added this log message as a reminder. You can change the
+passphrase with the attribute L<Mojolicious/"secrets">.
 
-  app->secret('My very secret passphrase.');
+  app->secrets(['My very secret passphrase.']);
 
 =head2 What does "Nothing has been rendered, expecting delayed response" mean?
 

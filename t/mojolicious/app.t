@@ -59,7 +59,7 @@ is $t->app, $t->app->commands->app, 'applications are equal';
 is $t->app->static->file('hello.txt')->slurp,
   "Hello Mojo from a development static file!\n", 'right content';
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
-is $t->app->secret, $t->app->moniker, 'secret defaults to moniker';
+is $t->app->secrets->[0], $t->app->moniker, 'secret defaults to moniker';
 
 # Missing methods and functions (AUTOLOAD)
 eval { $t->app->missing };

@@ -12,8 +12,8 @@ use ojo;
 
 # Application
 a('/' => sub { $_->render(data => $_->req->method . $_->req->body) })
-  ->secret('foobarbaz');
-is a->secret, 'foobarbaz', 'right secret';
+  ->secrets(['foobarbaz']);
+is a->secrets->[0], 'foobarbaz', 'right secret';
 
 # Requests
 is g('/')->body, 'GET',     'right content';

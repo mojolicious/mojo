@@ -324,31 +324,32 @@ sub signed_cookie {
   my ($self, $name, $value, $options) = @_;
 
   # Response cookie
-  my $secret = $self->stash->{'mojo.secret'};
+  my $secrets = $self->stash->{'mojo.secrets'};
   return $self->cookie($name,
-    "$value--" . Mojo::Util::hmac_sha1_sum($value, $secret), $options)
+    "$value--" . Mojo::Util::hmac_sha1_sum($value, $secrets->[0]), $options)
     if defined $value;
 
   # Request cookies
   my @results;
   for my $value ($self->cookie($name)) {
 
-    # Check signature
+    # Check signature with rotating secrets
     if ($value =~ s/--([^\-]+)$//) {
-      my $sig = $1;
+      my $signature = $1;
 
-      # Verified
-      my $check = Mojo::Util::hmac_sha1_sum $value, $secret;
-      if (Mojo::Util::secure_compare $sig, $check) { push @results, $value }
+      my $valid;
+      for my $secret (@$secrets) {
+        my $check = Mojo::Util::hmac_sha1_sum($value, $secret);
+        ++$valid and last if Mojo::Util::secure_compare($signature, $check);
+      }
+      if ($valid) { push @results, $value }
 
-      # Bad cookie
       else {
         $self->app->log->debug(
           qq{Bad signed cookie "$name", possible hacking attempt.});
       }
     }
 
-    # Not signed
     else { $self->app->log->debug(qq{Cookie "$name" not signed.}) }
   }
 

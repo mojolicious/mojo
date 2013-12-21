@@ -59,7 +59,7 @@ sub _content_for {
 sub _csrf_token {
   my $self = shift;
   $self->session->{csrf_token}
-    ||= sha1_sum($self->app->secret . steady_time . rand 999);
+    ||= sha1_sum($self->app->secrets->[0] . steady_time . rand 999);
 }
 
 sub _current_route {
@@ -119,7 +119,7 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
 
 =head2 app
 
-  %= app->secret
+  %= app->secrets->[0]
 
 Alias for L<Mojolicious::Controller/"app">.
 

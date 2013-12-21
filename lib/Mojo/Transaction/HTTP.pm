@@ -262,9 +262,10 @@ and implements the following new ones.
 =head2 previous
 
   my $previous = $tx->previous;
-  $tx          = $tx->previous(Mojo::Transaction->new);
+  $tx          = $tx->previous(Mojo::Transaction::HTTP->new);
 
-Previous transaction that triggered this followup transaction.
+Previous transaction that triggered this followup transaction, usually a
+L<Mojo::Transaction::HTTP> object.
 
   # Paths of previous requests
   say $tx->previous->previous->req->url->path;

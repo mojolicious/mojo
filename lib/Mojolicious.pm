@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Util 'decamelize';
+use Mojo::Util qw(decamelize deprecated);
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -28,14 +28,14 @@ has moniker  => sub { decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };
 has routes   => sub { Mojolicious::Routes->new };
-has secret   => sub {
+has secrets  => sub {
   my $self = shift;
 
   # Warn developers about insecure default
   $self->log->debug('Your secret passphrase needs to be changed!!!');
 
   # Default to moniker
-  return $self->moniker;
+  return [$self->moniker];
 };
 has sessions  => sub { Mojolicious::Sessions->new };
 has static    => sub { Mojolicious::Static->new };
@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.61';
+our $VERSION  = '4.64';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -143,7 +143,7 @@ sub handler {
   # Embedded application
   my $stash = {};
   if (my $sub = $tx->can('stash')) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
-  $stash->{'mojo.secret'} //= $self->secret;
+  $stash->{'mojo.secrets'} //= $self->secrets;
 
   # Build default controller
   my $defaults = $self->defaults;
@@ -179,6 +179,16 @@ sub hook { shift->plugins->on(@_) }
 sub plugin {
   my $self = shift;
   $self->plugins->register_plugin(shift, $self, @_);
+}
+
+# DEPRECATED in Top Hat!
+sub secret {
+  deprecated
+    'Mojolicious::secret is DEPRECATED in favor of Mojolicious::secrets';
+  my $self = shift;
+  return $self->secrets->[0] unless @_;
+  $self->secrets->[0] = shift;
+  return $self;
 }
 
 sub start { shift->commands->run(@_ ? @_ : @ARGV) }
@@ -438,15 +448,22 @@ startup method to define the url endpoints for your application.
   # Add another namespace to load controllers from
   push @{$app->routes->namespaces}, 'MyApp::Controller';
 
-=head2 secret
+=head2 secrets
 
-  my $secret = $app->secret;
-  $app       = $app->secret('passw0rd');
+  my $secrets = $app->secrets;
+  $app        = $app->secrets(['passw0rd']);
 
-A secret passphrase used for signed cookies and the like, defaults to the
+Secret passphrases used for signed cookies and the like, defaults to the
 L</"moniker"> of this application, which is not very secure, so you should
 change it!!! As long as you are using the insecure default there will be debug
-messages in the log file reminding you to change your passphrase.
+messages in the log file reminding you to change your passphrase. Only the
+first passphrase is used to create new signatures, but all of them for
+verification. So you can increase security without invalidating all your
+existing signed cookies by rotating passphrases, just add new ones to the
+front and remove old ones from the back.
+
+  # Rotate passphrases
+  $app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);
 
 =head2 sessions
 
@@ -541,7 +558,8 @@ L<Mojolicious::Controller> object.
   $app->handler(Mojo::Transaction::HTTP->new);
   $app->handler(Mojolicious::Controller->new);
 
-Sets up the default controller and calls process for every request.
+Sets up the default controller and emits the L</"around_dispatch"> hook for
+every request.
 
 =head2 helper
 

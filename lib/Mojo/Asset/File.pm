@@ -26,7 +26,7 @@ has handle => sub {
   my $name = $path // $base;
   until ($handle->open($name, O_CREAT | O_EXCL | O_RDWR)) {
     croak qq{Can't open file "$name": $!} if defined $path || $! != $!{EEXIST};
-    $name = "$base." . md5_sum(time . $$ . rand 9 x 7);
+    $name = "$base." . md5_sum(time . $$ . rand 999);
   }
   $self->path($name);
 

@@ -4,7 +4,8 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Parameters;
 use Mojo::Path;
-use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
+use Mojo::Util
+  qw(deprecated punycode_decode punycode_encode url_escape url_unescape);
 
 has base => sub { Mojo::URL->new };
 has [qw(fragment host port scheme userinfo)];
@@ -159,7 +160,9 @@ sub to_abs {
   return $abs;
 }
 
+# DEPRECATED in Top Hat!
 sub to_rel {
+  deprecated 'Mojo::URL::to_rel is DEPRECATED';
   my $self = shift;
 
   my $rel = $self->clone;
@@ -257,7 +260,7 @@ L<Mojo::URL> implements the following attributes.
   my $base = $url->base;
   $url     = $url->base(Mojo::URL->new);
 
-Base of this URL.
+Base of this URL, defaults to a L<Mojo::URL> object.
 
 =head2 fragment
 
@@ -426,26 +429,6 @@ provided base URL.
   # "http://example.com/foo/baz.xml?test=123"
   Mojo::URL->new('//example.com/foo/baz.xml?test=123')
     ->to_abs(Mojo::URL->new('http://example.com/foo/bar.html'));
-
-=head2 to_rel
-
-  my $rel = $url->to_rel;
-  my $rel = $url->to_rel(Mojo::URL->new('http://example.com/foo'));
-
-Clone absolute URL and turn it into a relative one using L</"base"> or
-provided base URL.
-
-  # "foo/bar.html?test=123"
-  Mojo::URL->new('http://example.com/foo/bar.html?test=123')
-    ->to_rel(Mojo::URL->new('http://example.com'));
-
-  # "bar.html?test=123"
-  Mojo::URL->new('http://example.com/foo/bar.html?test=123')
-    ->to_rel(Mojo::URL->new('http://example.com/foo/'));
-
-  # "//example.com/foo/bar.html?test=123"
-  Mojo::URL->new('http://example.com/foo/bar.html?test=123')
-    ->to_rel(Mojo::URL->new('http://'));
 
 =head2 to_string
 

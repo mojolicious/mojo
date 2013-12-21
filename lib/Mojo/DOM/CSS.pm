@@ -40,28 +40,8 @@ sub match {
   return $self->_match($self->_compile(shift), $tree, $tree);
 }
 
-sub select {
-  my $self = shift;
-
-  my @results;
-  my $pattern = $self->_compile(shift);
-  my $tree    = $self->tree;
-  my @queue   = ($tree);
-  while (my $current = shift @queue) {
-    my $type = $current->[0];
-
-    # Tag
-    if ($type eq 'tag') {
-      unshift @queue, @$current[4 .. $#$current];
-      push @results, $current if $self->_match($pattern, $current, $tree);
-    }
-
-    # Root
-    elsif ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
-  }
-
-  return \@results;
-}
+sub select     { shift->_select(0, @_) }
+sub select_one { shift->_select(1, @_) }
 
 sub _ancestor {
   my ($self, $selectors, $current, $tree) = @_;
@@ -312,6 +292,30 @@ sub _regex {
 
   # Everything else
   return qr/^$value$/;
+}
+
+sub _select {
+  my ($self, $one, $selector) = @_;
+
+  my @results;
+  my $pattern = $self->_compile($selector);
+  my $tree    = $self->tree;
+  my @queue   = ($tree);
+  while (my $current = shift @queue) {
+    my $type = $current->[0];
+
+    # Tag
+    if ($type eq 'tag') {
+      unshift @queue, @$current[4 .. $#$current];
+      next unless $self->_match($pattern, $current, $tree);
+      $one ? return $current : push @results, $current;
+    }
+
+    # Root
+    elsif ($type eq 'root') { unshift @queue, @$current[1 .. $#$current] }
+  }
+
+  return $one ? undef : \@results;
 }
 
 sub _selector {
@@ -622,6 +626,13 @@ Match CSS selector against first node in L</"tree">.
   my $results = $css->select('head > title');
 
 Run CSS selector against L</"tree">.
+
+=head2 select_one
+
+  my $result = $css->select_one('head > title');
+
+Run CSS selector against L</"tree"> and stop as soon as the first node
+matched.
 
 =head1 SEE ALSO
 

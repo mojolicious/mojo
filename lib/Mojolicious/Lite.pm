@@ -792,10 +792,10 @@ session data gets serialized with L<Mojo::JSON>.
   @@ counter.html.ep
   Counter: <%= session 'counter' %>
 
-Note that you should use a custom L<Mojolicious/"secret"> to make signed
+Note that you should use custom L<Mojolicious/"secrets"> to make signed
 cookies really secure.
 
-  app->secret('My secret passphrase here');
+  app->secrets(['My secret passphrase here']);
 
 =head2 File uploads
 

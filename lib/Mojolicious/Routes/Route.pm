@@ -289,7 +289,7 @@ Allow L</"bridge"> semantics for this route.
   my $parent = $r->parent;
   $r         = $r->parent(Mojolicious::Routes::Route->new);
 
-The parent of this route, used for nesting routes.
+The parent of this route, usually a L<Mojolicious::Routes::Route> object.
 
 =head2 partial
 

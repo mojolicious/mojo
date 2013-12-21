@@ -11,7 +11,7 @@ use Mojolicious::Lite;
 use Test::Mojo;
 
 # Custom secret
-app->secret('very secr3t!');
+app->secrets(['very secr3t!']);
 
 # Mount full external application a few times
 use FindBin;

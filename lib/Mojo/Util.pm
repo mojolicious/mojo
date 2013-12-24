@@ -4,7 +4,7 @@ use Mojo::Base 'Exporter';
 use Carp qw(carp croak);
 use Data::Dumper ();
 use Digest::MD5 qw(md5 md5_hex);
-use Digest::SHA qw(hmac_sha1 sha1 sha1_hex);
+use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
@@ -112,7 +112,7 @@ sub get_line {
   return $line;
 }
 
-sub hmac_sha1_sum { unpack 'H*', hmac_sha1(@_) }
+sub hmac_sha1_sum { hmac_sha1_hex(@_) }
 
 sub html_unescape {
   my $str = shift;

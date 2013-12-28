@@ -130,7 +130,7 @@ sub parse {
 
   # Normal content
   else {
-    my $len = $headers->content_length || 0;
+    my $len = $headers->content_length || length $self->{buffer} || 0;
     $self->{size} ||= 0;
     if ((my $need = $len - $self->{size}) > 0) {
       my $len = length $self->{buffer};

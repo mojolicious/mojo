@@ -88,4 +88,9 @@ $content->parse(
   "Content-Length: 18446744073709551616\x0d\x0a\x0d\x0aHello World!");
 is $content->asset->size, 12, 'right size';
 
+# Content without a content_length header
+$content = Mojo::Content::Single->new;
+$content->parse("X-Header: anything\x0d\x0a\x0d\x0aHello World!");
+is $content->build_body, "Hello World!", 'Right body';
+
 done_testing();

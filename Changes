@@ -1,5 +1,5 @@
 
-4.64  2013-12-24
+4.64  2013-12-29
 
 4.63  2013-12-19
   - Deprecated Mojolicious::secret in favor of Mojolicious::secrets.

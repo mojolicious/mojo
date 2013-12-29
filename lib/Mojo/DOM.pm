@@ -190,8 +190,7 @@ sub text_before {
   my @nodes;
   for my $n (_nodes($tree->[3])) {
     last if $n eq $tree;
-    push @nodes, $n;
-    @nodes = () if $n->[0] eq 'tag';
+    @nodes = $n->[0] eq 'tag' ? () : (@nodes, $n);
   }
 
   return _text(\@nodes, 0, _trim($tree->[3], $trim));
@@ -267,22 +266,16 @@ sub _link {
 }
 
 sub _nodes {
-  return unless my $n = shift;
-  return @$n[_offset($n) .. $#$n];
+  return unless my $tree = shift;
+  return @$tree[_offset($tree) .. $#$tree];
 }
 
 sub _offset { $_[0][0] eq 'root' ? 1 : 4 }
 
 sub _parent {
   my ($parent, $child) = @_;
-
-  # Find parent offset for child
   my $i = _offset($parent);
-  for my $n (@$parent[$i .. $#$parent]) {
-    last if $n == $child;
-    $i++;
-  }
-
+  $_ eq $child ? last : $i++ for @$parent[$i .. $#$parent];
   return $i;
 }
 

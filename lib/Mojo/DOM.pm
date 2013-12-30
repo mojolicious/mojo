@@ -347,15 +347,15 @@ sub _text {
 }
 
 sub _trim {
-  my ($e, $trim) = @_;
+  my ($n, $trim) = @_;
 
   # Disabled
-  return 0 unless $e && ($trim = defined $trim ? $trim : 1);
+  return 0 unless $n && ($trim = defined $trim ? $trim : 1);
 
   # Detect "pre" tag
-  while ($e->[0] eq 'tag') {
-    return 0 if $e->[1] eq 'pre';
-    last unless $e = $e->[3];
+  while ($n->[0] eq 'tag') {
+    return 0 if $n->[1] eq 'pre';
+    last unless $n = $n->[3];
   }
 
   return 1;

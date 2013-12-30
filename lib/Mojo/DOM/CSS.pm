@@ -349,15 +349,15 @@ sub _sibling {
 
   my $parent = $current->[3];
   my $found;
-  for my $e (@$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent]) {
-    return $found if $e eq $current;
-    next unless $e->[0] eq 'tag';
+  for my $n (@$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent]) {
+    return $found if $n eq $current;
+    next unless $n->[0] eq 'tag';
 
     # "+" (immediately preceding sibling)
-    if ($immediate) { $found = $self->_combinator($selectors, $e, $tree) }
+    if ($immediate) { $found = $self->_combinator($selectors, $n, $tree) }
 
     # "~" (preceding sibling)
-    else { return 1 if $self->_combinator($selectors, $e, $tree) }
+    else { return 1 if $self->_combinator($selectors, $n, $tree) }
   }
 
   return undef;

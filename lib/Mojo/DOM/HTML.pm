@@ -207,28 +207,28 @@ sub _render {
   my ($self, $tree) = @_;
 
   # Text (escaped)
-  my $e = $tree->[0];
-  return xml_escape $tree->[1] if $e eq 'text';
+  my $type = $tree->[0];
+  return xml_escape $tree->[1] if $type eq 'text';
 
   # Raw text
-  return $tree->[1] if $e eq 'raw';
+  return $tree->[1] if $type eq 'raw';
 
   # DOCTYPE
-  return '<!DOCTYPE' . $tree->[1] . '>' if $e eq 'doctype';
+  return '<!DOCTYPE' . $tree->[1] . '>' if $type eq 'doctype';
 
   # Comment
-  return '<!--' . $tree->[1] . '-->' if $e eq 'comment';
+  return '<!--' . $tree->[1] . '-->' if $type eq 'comment';
 
   # CDATA
-  return '<![CDATA[' . $tree->[1] . ']]>' if $e eq 'cdata';
+  return '<![CDATA[' . $tree->[1] . ']]>' if $type eq 'cdata';
 
   # Processing instruction
-  return '<?' . $tree->[1] . '?>' if $e eq 'pi';
+  return '<?' . $tree->[1] . '?>' if $type eq 'pi';
 
   # Start tag
   my $start   = 1;
   my $content = '';
-  if ($e eq 'tag') {
+  if ($type eq 'tag') {
     $start = 4;
 
     # Open tag
@@ -246,8 +246,7 @@ sub _render {
       # Key and value
       push @attrs, qq{$key="} . xml_escape($value) . '"';
     }
-    my $attrs = join ' ', @attrs;
-    $content .= " $attrs" if $attrs;
+    $content .= join ' ', '', @attrs if @attrs;
 
     # Element without end tag
     return $self->xml || $VOID{$tag} ? "$content />" : "$content></$tag>"
@@ -261,7 +260,7 @@ sub _render {
   $content .= $self->_render($tree->[$_]) for $start .. $#$tree;
 
   # End tag
-  $content .= '</' . $tree->[1] . '>' if $e eq 'tag';
+  $content .= '</' . $tree->[1] . '>' if $type eq 'tag';
 
   return $content;
 }

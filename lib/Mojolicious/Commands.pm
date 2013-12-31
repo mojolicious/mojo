@@ -84,10 +84,10 @@ sub run {
   # Find all available commands
   my (@commands, %seen);
   my $loader = Mojo::Loader->new;
-  for my $namespace (@{$self->namespaces}) {
-    for my $module (@{$loader->search($namespace)}) {
+  for my $ns (@{$self->namespaces}) {
+    for my $module (@{$loader->search($ns)}) {
       next unless my $command = _command($module);
-      $command =~ s/^${namespace}:://;
+      $command =~ s/^${ns}:://;
       push @commands, [$command => $module] unless $seen{$command}++;
     }
   }

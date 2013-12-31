@@ -1,5 +1,6 @@
 
-4.64  2013-12-30
+4.64  2014-01-01
+  - Fixed helper export bug in Mojolicious::Plugin::EPRenderer.
 
 4.63  2013-12-19
   - Deprecated Mojolicious::secret in favor of Mojolicious::secrets.

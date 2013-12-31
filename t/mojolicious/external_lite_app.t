@@ -17,6 +17,7 @@ my $t = Test::Mojo->new;
 
 # Template from myapp.pl
 $t->get_ok('/')->status_is(200)->content_is(<<'EOF');
+myapp
 works ♥!Insecure!Insecure!
 
 too!works!!!Mojolicious::Plugin::Config::Sandbox

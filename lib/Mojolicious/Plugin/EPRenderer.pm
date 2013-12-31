@@ -2,7 +2,7 @@ package Mojolicious::Plugin::EPRenderer;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Template;
-use Mojo::Util qw(encode md5_sum monkey_patch);
+use Mojo::Util qw(encode md5_sum monkey_patch steady_time);
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -51,10 +51,10 @@ sub register {
 }
 
 sub _helpers {
-  my ($namespace, $helpers) = @_;
+  my ($ns, $helpers) = @_;
   for my $name (grep {/^\w+$/} keys %$helpers) {
-    monkey_patch $namespace, $name,
-      sub { $helpers->{$name}->($namespace->_C, @_) };
+    monkey_patch $ns, $name,
+      sub { $ns->_C->app->renderer->helpers->{$name}->($ns->_C, @_) };
   }
 }
 

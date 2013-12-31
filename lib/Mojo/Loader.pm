@@ -29,17 +29,17 @@ sub load {
 }
 
 sub search {
-  my ($self, $namespace) = @_;
+  my ($self, $ns) = @_;
 
   my (@modules, %found);
   for my $directory (@INC) {
-    next unless -d (my $path = catdir $directory, split(/::|'/, $namespace));
+    next unless -d (my $path = catdir $directory, split(/::|'/, $ns));
 
     # List "*.pm" files in directory
     opendir(my $dir, $path);
     for my $file (grep /\.pm$/, readdir $dir) {
       next if -d catfile splitdir($path), $file;
-      my $class = "${namespace}::" . fileparse $file, qr/\.pm/;
+      my $class = "${ns}::" . fileparse $file, qr/\.pm/;
       push @modules, $class unless $found{$class}++;
     }
   }

@@ -581,6 +581,7 @@ picked up and shown as default.
 
   %= select_field language => [qw(de en)]
   %= select_field language => [qw(de en)], id => 'lang'
+  %= select_field language => [{Europe => [qw(de en)]}, {Asia => [qw(cn jp)]}]
   %= select_field country => [[Germany => 'de'], 'en']
   %= select_field country => [{Europe => [[Germany => 'de'], 'en']}]
   %= select_field country => [[Germany => 'de', class => 'europe'], 'en']
@@ -596,11 +597,21 @@ automatically get picked up and shown as default.
     <option value="de">de</option>
     <option value="en">en</option>
   </select>
+  <select id="lang" name="language">
+    <optgroup label="Europe">
+      <option value="de">de</option>
+      <option value="en">en</option>
+    </optgroup>
+    <optgroup label="Asia">
+      <option value="cn">cn</option>
+      <option value="jp">jp</option>
+    </optgroup>
+  </select>
   <select name="country">
     <option value="de">Germany</option>
     <option value="en">en</option>
   </select>
-  <select id="lang" name="language">
+  <select id="lang" name="country">
     <optgroup label="Europe">
       <option value="de">Germany</option>
       <option value="en">en</option>

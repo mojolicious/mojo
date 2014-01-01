@@ -1,4 +1,6 @@
 
+4.65  2014-01-02
+
 4.64  2014-01-01
   - Fixed helper export bug in Mojolicious::Plugin::EPRenderer.
 

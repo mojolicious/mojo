@@ -597,7 +597,7 @@ automatically get picked up and shown as default.
     <option value="de">de</option>
     <option value="en">en</option>
   </select>
-  <select id="lang" name="language">
+  <select name="language">
     <optgroup label="Europe">
       <option value="de">de</option>
       <option value="en">en</option>
@@ -611,7 +611,7 @@ automatically get picked up and shown as default.
     <option value="de">Germany</option>
     <option value="en">en</option>
   </select>
-  <select id="lang" name="country">
+  <select name="country">
     <optgroup label="Europe">
       <option value="de">Germany</option>
       <option value="en">en</option>

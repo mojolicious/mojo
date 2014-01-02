@@ -588,9 +588,8 @@ picked up and shown as default.
 =head2 select_field
 
   %= select_field country => [qw(de en)]
-  %= select_field country => [qw(de en)], id => 'eu'
-  %= select_field country => [c(Europe => [qw(de en)]), c(Asia => [qw(cn jp)])]
-  %= select_field country => [[Germany => 'de'], 'en']
+  %= select_field country => [c(EU => [qw(de en)]), c(Asia => [qw(cn jp)])]
+  %= select_field country => [[Germany => 'de'], 'en'], id => 'eu'
   %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
   %= select_field country => [[Germany => 'de', class => 'eu'], 'en']
 
@@ -602,12 +601,8 @@ automatically get picked up and shown as default.
     <option value="de">de</option>
     <option value="en">en</option>
   </select>
-  <select id="eu" name="country">
-    <option value="de">de</option>
-    <option value="en">en</option>
-  </select>
   <select name="country">
-    <optgroup label="Europe">
+    <optgroup label="EU">
       <option value="de">de</option>
       <option value="en">en</option>
     </optgroup>
@@ -616,7 +611,7 @@ automatically get picked up and shown as default.
       <option value="jp">jp</option>
     </optgroup>
   </select>
-  <select name="country">
+  <select id="eu" name="country">
     <option value="de">Germany</option>
     <option value="en">en</option>
   </select>

@@ -2,7 +2,8 @@ package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
-use Mojo::Util 'xml_escape';
+use Mojo::Util qw(deprecated xml_escape);
+use Scalar::Util 'blessed';
 
 sub register {
   my ($self, $app) = @_;
@@ -157,11 +158,18 @@ sub _select_field {
   my $groups = '';
   for my $group (@$options) {
 
-    # "optgroup" tag
+    # DEPRECATED in Top Hat!
     if (ref $group eq 'HASH') {
-      my ($label, $values) = each %$group;
+      deprecated
+        'hash references are DEPRECATED in favor of Mojo::Collection objects';
+      $group = Mojo::Collection->new(each %$group);
+    }
+
+    # "optgroup" tag
+    if (blessed $group && $group->isa('Mojo::Collection')) {
+      my ($label, $values) = splice @$group, 0, 2;
       my $content = join '', map { _option(\%values, $_) } @$values;
-      $groups .= _tag('optgroup', label => $label, sub {$content});
+      $groups .= _tag('optgroup', label => $label, @$group, sub {$content});
     }
 
     # "option" tag
@@ -579,25 +587,25 @@ picked up and shown as default.
 
 =head2 select_field
 
-  %= select_field language => [qw(de en)]
-  %= select_field language => [qw(de en)], id => 'lang'
-  %= select_field language => [{Europe => [qw(de en)]}, {Asia => [qw(cn jp)]}]
+  %= select_field country => [qw(de en)]
+  %= select_field country => [qw(de en)], id => 'eu'
+  %= select_field country => [c(Europe => [qw(de en)]), c(Asia => [qw(cn jp)])]
   %= select_field country => [[Germany => 'de'], 'en']
-  %= select_field country => [{Europe => [[Germany => 'de'], 'en']}]
-  %= select_field country => [[Germany => 'de', class => 'europe'], 'en']
+  %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
+  %= select_field country => [[Germany => 'de', class => 'eu'], 'en']
 
 Generate select, option and optgroup elements. Previous input values will
 automatically get picked up and shown as default.
 
-  <select name="language">
+  <select name="country">
     <option value="de">de</option>
     <option value="en">en</option>
   </select>
-  <select id="lang" name="language">
+  <select id="eu" name="country">
     <option value="de">de</option>
     <option value="en">en</option>
   </select>
-  <select name="language">
+  <select name="country">
     <optgroup label="Europe">
       <option value="de">de</option>
       <option value="en">en</option>
@@ -612,13 +620,13 @@ automatically get picked up and shown as default.
     <option value="en">en</option>
   </select>
   <select name="country">
-    <optgroup label="Europe">
+    <optgroup id="eu" label="EU">
       <option value="de">Germany</option>
       <option value="en">en</option>
     </optgroup>
   </select>
   <select name="country">
-    <option class="europe" value="de">Germany</option>
+    <option class="eu" value="de">Germany</option>
     <option value="en">en</option>
   </select>
 

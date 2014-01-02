@@ -896,7 +896,7 @@ $t->get_ok('/helper' => {'User-Agent' => 'Explorer'})->status_is(200)
 
 # Exception in EP template
 $t->get_ok('/eperror')->status_is(500)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/\$c/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/\$unknown/);
 
 # Subrequest
 $t->get_ok('/subrequest')->status_is(200)
@@ -1108,7 +1108,7 @@ app layout <%= content %><%= app->mode %>
 (<%= agent %>)\
 
 @@ eperror.html.ep
-%= $c->foo('bar');
+%= $unknown->foo('bar');
 
 @@ favicon.ico
 Not a favicon!

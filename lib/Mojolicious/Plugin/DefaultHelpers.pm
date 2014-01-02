@@ -2,6 +2,7 @@ package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
+use Mojo::Collection;
 use Mojo::Util qw(dumper sha1_sum steady_time);
 
 sub register {
@@ -25,6 +26,8 @@ sub register {
     );
   }
 
+  $app->helper(b => sub { shift; Mojo::ByteStream->new(@_) });
+  $app->helper(c => sub { shift; Mojo::Collection->new(@_) });
   $app->helper(config => sub { shift->app->config(@_) });
   $app->helper(content       => \&_content);
   $app->helper(content_for   => \&_content_for);
@@ -122,6 +125,18 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
   %= app->secrets->[0]
 
 Alias for L<Mojolicious::Controller/"app">.
+
+=head2 b
+
+  %= b('test 123')->b64_encode
+
+Turn string into a L<Mojo::ByteStream> object.
+
+=head2 c
+
+  %= c(qw(a b c))->shuffle->join
+
+Turn list into a L<Mojo::Collection> object.
 
 =head2 config
 

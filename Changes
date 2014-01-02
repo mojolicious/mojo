@@ -3,6 +3,7 @@
   - Deprecated use of hash references for optgroup generation with
     select_field helper in favor of Mojo::Collection objects.
   - Added b and c helpers to Mojolicious::Plugin::DefaultHelpers.
+  - Fixed reference handling bug in Mojo::Collection.
 
 4.64  2014-01-01
   - Fixed helper export bug in Mojolicious::Plugin::EPRenderer.

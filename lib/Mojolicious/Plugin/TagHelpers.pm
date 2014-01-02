@@ -588,10 +588,10 @@ picked up and shown as default.
 =head2 select_field
 
   %= select_field country => [qw(de en)]
-  %= select_field country => [c(EU => [qw(de en)]), c(Asia => [qw(cn jp)])]
   %= select_field country => [[Germany => 'de'], 'en'], id => 'eu'
-  %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
   %= select_field country => [[Germany => 'de', class => 'eu'], 'en']
+  %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
+  %= select_field country => [c(EU => [qw(de en)]), c(Asia => [qw(cn jp)])]
 
 Generate select and option elements from array references and optgroup
 elements from L<Mojo::Collection> objects. Previous input values will
@@ -600,6 +600,20 @@ automatically get picked up and shown as default.
   <select name="country">
     <option value="de">de</option>
     <option value="en">en</option>
+  </select>
+  <select id="eu" name="country">
+    <option value="de">Germany</option>
+    <option value="en">en</option>
+  </select>
+  <select name="country">
+    <option class="eu" value="de">Germany</option>
+    <option value="en">en</option>
+  </select>
+  <select name="country">
+    <optgroup id="eu" label="EU">
+      <option value="de">Germany</option>
+      <option value="en">en</option>
+    </optgroup>
   </select>
   <select name="country">
     <optgroup label="EU">
@@ -610,20 +624,6 @@ automatically get picked up and shown as default.
       <option value="cn">cn</option>
       <option value="jp">jp</option>
     </optgroup>
-  </select>
-  <select id="eu" name="country">
-    <option value="de">Germany</option>
-    <option value="en">en</option>
-  </select>
-  <select name="country">
-    <optgroup id="eu" label="EU">
-      <option value="de">Germany</option>
-      <option value="en">en</option>
-    </optgroup>
-  </select>
-  <select name="country">
-    <option class="eu" value="de">Germany</option>
-    <option value="en">en</option>
   </select>
 
 =head2 stylesheet

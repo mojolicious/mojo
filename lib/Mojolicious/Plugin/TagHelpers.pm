@@ -594,7 +594,8 @@ picked up and shown as default.
   %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
   %= select_field country => [[Germany => 'de', class => 'eu'], 'en']
 
-Generate select, option and optgroup elements. Previous input values will
+Generate select and option elements from array references and optgroup
+elements from L<Mojo::Collection> objects. Previous input values will
 automatically get picked up and shown as default.
 
   <select name="country">

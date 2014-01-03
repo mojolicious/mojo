@@ -13,17 +13,17 @@ use lib "$FindBin::Bin/lib";
 
 use Test::Mojo;
 
-my $t    = Test::Mojo->new('MojoliciousTest');
-my $mode = '';
-$t->or(sub { $mode .= $t->app->mode })->or(sub { $mode .= shift->app->mode });
-is $mode, 'testingtesting', 'both callbacks have been invoked';
+my $t       = Test::Mojo->new('MojoliciousTest');
+my $success = '';
+$t->or(sub { $success .= 'one' })->success(1)->or(sub { $success .= 'two' })
+  ->success(!1)->or(sub { $success .= shift->app->mode });
+is $success, 'onetesting', 'two callbacks have been invoked';
+ok $t->get_ok('/')->success, 'test was successful';
 
 # SyntaxError::foo in testing mode (syntax error in controller)
 $t->get_ok('/syntax_error/foo')->status_is(500)
-  ->or(sub { $mode .= $t->app->mode })
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr/Testing Missing/);
-is $mode, 'testingtesting', 'callback has not been invoked';
 
 # Foo::syntaxerror in testing mode (syntax error in template)
 $t->get_ok('/foo/syntaxerror')->status_is(500)

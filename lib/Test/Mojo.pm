@@ -16,7 +16,7 @@ use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
 use Test::More ();
 
-has [qw(message tx)];
+has [qw(message success tx)];
 has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
 
 # Silent or loud tests
@@ -215,7 +215,7 @@ sub options_ok { shift->_request_ok(options => @_) }
 
 sub or {
   my ($self, $cb) = @_;
-  $self->$cb unless $self->{latest};
+  $self->$cb unless $self->success;
   return $self;
 }
 
@@ -339,8 +339,7 @@ sub _request_ok {
 sub _test {
   my ($self, $name, @args) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 2;
-  $self->{latest} = Test::More->can($name)->(@args);
-  return $self;
+  return $self->success(!!Test::More->can($name)->(@args));
 }
 
 sub _text {
@@ -409,6 +408,13 @@ Current WebSocket message.
     ->json_message_has('/foo/bar')
     ->json_message_hasnt('/bar')
     ->json_message_is('/foo/baz' => {yada => [1, 2, 3]});
+
+=head2 success
+
+  my $bool = $t->success;
+  $t       = $t->success($bool);
+
+True if the last test was successful.
 
 =head2 tx
 
@@ -744,7 +750,7 @@ arguments as L<Mojo::UserAgent/"options">, except for the callback.
 
   $t = $t->or(sub {...});
 
-Invoke callback if previous test failed.
+Invoke callback if the value of L</"success"> is false.
 
   # Diagnostics
   $t->get_ok('/bad')->or(sub { diag 'Must have been Glen!' })

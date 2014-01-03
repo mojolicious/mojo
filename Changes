@@ -1,5 +1,6 @@
 
 4.66  2014-01-03
+  - Added success attribute to Test::Mojo.
 
 4.65  2014-01-02
   - Deprecated use of hash references for optgroup generation with

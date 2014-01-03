@@ -426,7 +426,7 @@ True if the last test was successful.
   $t->get_ok('/')
     ->status_is(302)
     ->$location_is('http://mojolicio.us')
-    ->or(sub { note shift->tx->res->headers->location });
+    ->or(sub { diag 'Must have been Joel!' });
 
 =head2 tx
 

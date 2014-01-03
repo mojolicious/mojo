@@ -421,7 +421,7 @@ True if the last test was successful.
     my ($t, $value, $desc) = @_;
     $desc ||= "Location: $value";
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    return $t->success(is($value, $t->tx->res->headers->location, $desc));
+    return $t->success(is($t->tx->res->headers->location, $value, $desc));
   };
   $t->get_ok('/')
     ->status_is(302)

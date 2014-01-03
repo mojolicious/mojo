@@ -416,6 +416,18 @@ Current WebSocket message.
 
 True if the last test was successful.
 
+  # Build custom tests
+  my $location_is = sub {
+    my ($t, $value, $desc) = @_;
+    $desc ||= "Location: $value";
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return $t->success(is($location, $t->tx->res->headers->location, $desc));
+  };
+  $t->get_ok('/')
+    ->status_is(302)
+    ->$location_is('http://mojolicio.us')
+    ->or(sub { note shift->tx->res->headers->location });
+
 =head2 tx
 
   my $tx = $t->tx;

@@ -1753,6 +1753,8 @@ is $dom, '<XMLTest2 />', 'right result';
 $dom = Mojo::DOM->new->xml(0)
   ->parse('<?xml version="1.0" encoding="UTF-8"?><br><div>Test</div>');
 is $dom->at('div:root')->text, 'Test', 'right text';
+ok !Mojo::DOM->new->xml(undef)->parse('<?xml version="1.0"?>')->xml,
+  'XML mode not detected';
 
 # Ensure XML semantics
 $dom = Mojo::DOM->new->parse(<<'EOF');

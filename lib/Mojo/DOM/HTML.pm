@@ -145,7 +145,7 @@ sub parse {
 
     # Processing instruction (try to detect XML)
     elsif (defined $pi) {
-      $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
+      $self->xml(1) if !exists $self->{xml} && $pi =~ /xml/i;
       push @$current, ['pi', $pi];
     }
   }

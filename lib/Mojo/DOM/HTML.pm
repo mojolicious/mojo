@@ -98,8 +98,44 @@ sub parse {
     $text .= '<' if defined $runaway;
     push @$current, ['text', html_unescape $text] if length $text;
 
+    # Tag
+    if ($tag) {
+
+      # End
+      my $xml = $self->xml;
+      if ($tag =~ $END_RE) { _end($xml ? $1 : lc($1), $xml, \$current) }
+
+      # Start
+      elsif ($tag =~ m!([^\s/]+)([\s\S]*)!) {
+        my ($start, $attr) = ($xml ? $1 : lc($1), $2);
+
+        # Attributes
+        my %attrs;
+        while ($attr =~ /$ATTR_RE/g) {
+          my ($key, $value) = ($xml ? $1 : lc($1), $2 // $3 // $4);
+
+          # Empty tag
+          next if $key eq '/';
+
+          $attrs{$key} = defined $value ? html_unescape($value) : $value;
+        }
+
+        _start($start, \%attrs, $xml, \$current);
+
+        # Element without end tag
+        _end($start, $xml, \$current)
+          if (!$xml && $VOID{$start}) || $attr =~ m!/\s*$!;
+
+        # Relaxed "script" or "style"
+        next unless $start eq 'script' || $start eq 'style';
+        next unless $html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi;
+        push @$current, ['raw', $1];
+        _end($start, $xml, \$current);
+      }
+    }
+
     # DOCTYPE
-    if (defined $doctype) { push @$current, ['doctype', $doctype] }
+    elsif (defined $doctype) { push @$current, ['doctype', $doctype] }
 
     # Comment
     elsif (defined $comment) { push @$current, ['comment', $comment] }
@@ -111,43 +147,6 @@ sub parse {
     elsif (defined $pi) {
       $self->xml(1) if !defined $self->xml && $pi =~ /xml/i;
       push @$current, ['pi', $pi];
-    }
-
-    # End
-    next unless $tag;
-    my $xml = $self->xml;
-    if ($tag =~ $END_RE) { _end($xml ? $1 : lc($1), $xml, \$current) }
-
-    # Start
-    elsif ($tag =~ m!([^\s/]+)([\s\S]*)!) {
-      my ($start, $attr) = ($xml ? $1 : lc($1), $2);
-
-      # Attributes
-      my %attrs;
-      while ($attr =~ /$ATTR_RE/g) {
-        my $key = $xml ? $1 : lc($1);
-        my $value = $2 // $3 // $4;
-
-        # Empty tag
-        next if $key eq '/';
-
-        $attrs{$key} = defined $value ? html_unescape($value) : $value;
-      }
-
-      # Tag
-      _start($start, \%attrs, $xml, \$current);
-
-      # Element without end tag
-      _end($start, $xml, \$current)
-        if (!$self->xml && $VOID{$start}) || $attr =~ m!/\s*$!;
-
-      # Relaxed "script" or "style"
-      if ($start eq 'script' || $start eq 'style') {
-        if ($html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi) {
-          push @$current, ['raw', $1];
-          _end($start, $xml, \$current);
-        }
-      }
     }
   }
 

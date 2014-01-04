@@ -23,7 +23,7 @@ my $ATTR_RE = qr/
 /x;
 my $END_RE   = qr!^\s*/\s*(.+)\s*!;
 my $TOKEN_RE = qr/
-  ([^<]*)                                           # Text
+  ([^<]+)?                                          # Text
   (?:
     <\?(.*?)\?>                                     # Processing Instruction
   |
@@ -96,10 +96,10 @@ sub parse {
 
     # Text (and runaway "<")
     $text .= '<' if defined $runaway;
-    push @$current, ['text', html_unescape $text] if length $text;
+    push @$current, ['text', html_unescape $text] if defined $text;
 
     # Tag
-    if ($tag) {
+    if (defined $tag) {
 
       # End
       my $xml = $self->xml;

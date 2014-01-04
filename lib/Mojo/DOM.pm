@@ -136,7 +136,7 @@ sub remove { shift->replace('') }
 sub replace {
   my ($self, $new) = @_;
   my $tree = $self->tree;
-  return $self->xml(undef)->parse($new) if $tree->[0] eq 'root';
+  return $self->parse($new) if $tree->[0] eq 'root';
   return $self->_replace($tree, $self->_parse("$new"));
 }
 

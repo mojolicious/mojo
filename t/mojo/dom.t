@@ -1746,14 +1746,13 @@ is $element->type, 'Element', 'right child';
 is $element->parent->type, 'XMLTest', 'right parent';
 ok $element->root->xml, 'XML mode active';
 $dom->replace('<XMLTest2 />');
-ok !$dom->xml, 'XML mode not detected';
-is $dom->children->[0], '<xmltest2></xmltest2>', 'right result';
-$dom->replace(<<EOF);
-<?xml version='1.0' encoding='UTF-8'?>
-<XMLTest3 />
-EOF
-ok $dom->xml, 'XML mode detected';
-is $dom->children->[0], '<XMLTest3 />', 'right result';
+ok $dom->xml, 'XML mode active';
+is $dom, '<XMLTest2 />', 'right result';
+
+# Ensure HTML semantics
+$dom = Mojo::DOM->new->xml(0)
+  ->parse('<?xml version="1.0" encoding="UTF-8"?><br><div>Test</div>');
+is $dom->at('div:root')->text, 'Test', 'right text';
 
 # Ensure XML semantics
 $dom = Mojo::DOM->new->parse(<<'EOF');

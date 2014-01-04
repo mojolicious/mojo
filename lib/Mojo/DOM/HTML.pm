@@ -115,17 +115,17 @@ sub parse {
 
     # End
     next unless $tag;
-    my $cs = $self->xml;
-    if ($tag =~ $END_RE) { $self->_end($cs ? $1 : lc($1), \$current) }
+    my $xml = $self->xml;
+    if ($tag =~ $END_RE) { _end($xml ? $1 : lc($1), $xml, \$current) }
 
     # Start
     elsif ($tag =~ m!([^\s/]+)([\s\S]*)!) {
-      my ($start, $attr) = ($cs ? $1 : lc($1), $2);
+      my ($start, $attr) = ($xml ? $1 : lc($1), $2);
 
       # Attributes
       my %attrs;
       while ($attr =~ /$ATTR_RE/g) {
-        my $key = $cs ? $1 : lc($1);
+        my $key = $xml ? $1 : lc($1);
         my $value = $2 // $3 // $4;
 
         # Empty tag
@@ -135,17 +135,17 @@ sub parse {
       }
 
       # Tag
-      $self->_start($start, \%attrs, \$current);
+      _start($start, \%attrs, $xml, \$current);
 
       # Element without end tag
-      $self->_end($start, \$current)
+      _end($start, $xml, \$current)
         if (!$self->xml && $VOID{$start}) || $attr =~ m!/\s*$!;
 
       # Relaxed "script" or "style"
       if ($start eq 'script' || $start eq 'style') {
         if ($html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi) {
           push @$current, ['raw', $1];
-          $self->_end($start, \$current);
+          _end($start, $xml, \$current);
         }
       }
     }
@@ -154,21 +154,21 @@ sub parse {
   return $self->tree($tree);
 }
 
-sub render { $_[0]->_render($_[0]->tree) }
+sub render { _render($_[0]->tree, $_[0]->xml) }
 
 sub _close {
-  my ($self, $current, $allowed, $scope) = @_;
+  my ($xml, $current, $allowed, $scope) = @_;
 
   # Close allowed parent elements in scope
   my $parent = $$current;
   while ($parent->[0] ne 'root' && $parent->[1] ne $scope) {
-    $self->_end($parent->[1], $current) if $allowed->{$parent->[1]};
+    _end($parent->[1], $xml, $current) if $allowed->{$parent->[1]};
     $parent = $parent->[3];
   }
 }
 
 sub _end {
-  my ($self, $end, $current) = @_;
+  my ($end, $xml, $current) = @_;
 
   # Search stack for start tag
   my $found = 0;
@@ -179,7 +179,7 @@ sub _end {
     ++$found and last if $next->[1] eq $end;
 
     # Phrasing content can only cross phrasing content
-    return if !$self->xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
+    return if !$xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
 
     $next = $next->[3];
   }
@@ -196,15 +196,15 @@ sub _end {
     if ($end eq $$current->[1]) { return $$current = $$current->[3] }
 
     # Table
-    elsif ($end eq 'table') { $self->_close($current, \%TABLE, $end) }
+    elsif ($end eq 'table') { _close($xml, $current, \%TABLE, $end) }
 
     # Missing end tag
-    $self->_end($$current->[1], $current);
+    _end($$current->[1], $xml, $current);
   }
 }
 
 sub _render {
-  my ($self, $tree) = @_;
+  my ($tree, $xml) = @_;
 
   # Text (escaped)
   my $type = $tree->[0];
@@ -249,7 +249,7 @@ sub _render {
     $content .= join ' ', '', @attrs if @attrs;
 
     # Element without end tag
-    return $self->xml || $VOID{$tag} ? "$content />" : "$content></$tag>"
+    return $xml || $VOID{$tag} ? "$content />" : "$content></$tag>"
       unless $tree->[4];
 
     # Close tag
@@ -257,7 +257,7 @@ sub _render {
   }
 
   # Render whole tree
-  $content .= $self->_render($tree->[$_]) for $start .. $#$tree;
+  $content .= _render($tree->[$_], $xml) for $start .. $#$tree;
 
   # End tag
   $content .= '</' . $tree->[1] . '>' if $type eq 'tag';
@@ -266,26 +266,26 @@ sub _render {
 }
 
 sub _start {
-  my ($self, $start, $attrs, $current) = @_;
+  my ($start, $attrs, $xml, $current) = @_;
 
   # Autoclose optional HTML elements
-  if (!$self->xml && $$current->[0] ne 'root') {
-    if (my $end = $END{$start}) { $self->_end($_, $current) for @$end }
+  if (!$xml && $$current->[0] ne 'root') {
+    if (my $end = $END{$start}) { _end($_, 0, $current) for @$end }
 
     # "li"
-    elsif ($start eq 'li') { $self->_close($current, {li => 1}, 'ul') }
+    elsif ($start eq 'li') { _close(0, $current, {li => 1}, 'ul') }
 
     # "colgroup", "thead", "tbody" and "tfoot"
     elsif (grep { $_ eq $start } qw(colgroup thead tbody tfoot)) {
-      $self->_close($current, \%TABLE, 'table');
+      _close(0, $current, \%TABLE, 'table');
     }
 
     # "tr"
-    elsif ($start eq 'tr') { $self->_close($current, {tr => 1}, 'table') }
+    elsif ($start eq 'tr') { _close(0, $current, {tr => 1}, 'table') }
 
     # "th" and "td"
     elsif ($start eq 'th' || $start eq 'td') {
-      $self->_close($current, {$_ => 1}, 'table') for qw(th td);
+      _close(0, $current, {$_ => 1}, 'table') for qw(th td);
     }
   }
 

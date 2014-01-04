@@ -3,6 +3,7 @@
   - Added success attribute to Test::Mojo.
   - Improved Mojo::DOM::CSS and Mojo::DOM::HTML performance.
   - Fixed XML detection bug in Mojo::DOM.
+  - Fixed escaping bugs in Mojo::DOM::CSS.
 
 4.65  2014-01-02
   - Deprecated use of hash references for optgroup generation with

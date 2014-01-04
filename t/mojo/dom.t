@@ -493,21 +493,23 @@ is $dom->at('number')->ancestors('meta')->first->{xmlns}, 'uri:meta-ns',
 ok !!$dom->at('nons')->match('book > nons'),           'element did match';
 ok !$dom->at('title')->match('book > nons > section'), 'element did not match';
 
-# Namespace with dot
+# Dots
 $dom = Mojo::DOM->new(<<EOF);
 <?xml version="1.0"?>
 <foo xmlns:foo.bar="uri:first">
   <bar xmlns:fooxbar="uri:second">
     <foo.bar:baz>First</fooxbar:baz>
-    <fooxbar:yada>Second</foo.bar:yada>
+    <fooxbar:ya.da>Second</foo.bar:ya.da>
   </bar>
 </foo>
 EOF
-is $dom->at('foo bar baz')->text,  'First',      'right text';
-is $dom->at('baz')->namespace,     'uri:first',  'right namespace';
-is $dom->at('foo bar yada')->text, 'Second',     'right text';
-is $dom->at('yada')->namespace,    'uri:second', 'right namespace';
-is $dom->at('foo')->namespace,     '',           'no namespace';
+is $dom->at('foo bar baz')->text,    'First',      'right text';
+is $dom->at('baz')->namespace,       'uri:first',  'right namespace';
+is $dom->at('foo bar ya\.da')->text, 'Second',     'right text';
+is $dom->at('ya\.da')->namespace,    'uri:second', 'right namespace';
+is $dom->at('foo')->namespace,       '',           'no namespace';
+is $dom->at('[xml\.s]'), undef, 'no result';
+is $dom->at('b\.z'),     undef, 'no result';
 
 # Yadis
 $dom = Mojo::DOM->new->parse(<<'EOF');

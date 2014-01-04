@@ -57,7 +57,7 @@ sub _attr {
   # Ignore namespace prefix
   my $attrs = $current->[2];
   for my $name (keys %$attrs) {
-    next unless $name =~ /(?:^|:)$key$/;
+    next unless $name =~ /(?:^|:)\Q$key\E$/;
     return 1 unless defined $attrs->{$name} && defined $regex;
     return 1 if $attrs->{$name} =~ $regex;
   }
@@ -317,7 +317,7 @@ sub _selector {
     # Tag (ignore namespace prefix)
     if ($type eq 'tag') {
       my $tag = $s->[1];
-      return undef unless $tag eq '*' || $current->[1] =~ /(?:^|:)$tag$/;
+      return undef unless $tag eq '*' || $current->[1] =~ /(?:^|:)\Q$tag\E$/;
     }
 
     # Attribute

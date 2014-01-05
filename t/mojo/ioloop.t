@@ -136,7 +136,7 @@ $id = Mojo::IOLoop->stream($stream);
 $stream->on(close => sub { Mojo::IOLoop->stop });
 $stream->on(read => sub { $buffer .= pop });
 $stream->write('hello');
-ok(Mojo::IOLoop->stream($id), 'stream exists');
+ok !!Mojo::IOLoop->stream($id), 'stream exists';
 is $stream->timeout, 16, 'right timeout';
 Mojo::IOLoop->start;
 Mojo::IOLoop->timer(0.25 => sub { Mojo::IOLoop->stop });

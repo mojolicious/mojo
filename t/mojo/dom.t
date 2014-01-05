@@ -1752,13 +1752,14 @@ ok $dom->xml, 'XML mode active';
 is $dom, '<XMLTest2 />', 'right result';
 
 # Ensure HTML semantics
-$dom = Mojo::DOM->new->xml(0)
-  ->parse('<?xml version="1.0" encoding="UTF-8"?><br><div>Test</div>');
-is $dom->at('div:root')->text, 'Test', 'right text';
 ok !Mojo::DOM->new->xml(undef)->parse('<?xml version="1.0"?>')->xml,
   'XML mode not detected';
+$dom
+  = Mojo::DOM->new->xml(0)->parse('<?xml version="1.0"?><br><div>Test</div>');
+is $dom->at('div:root')->text, 'Test', 'right text';
 
 # Ensure XML semantics
+ok !!Mojo::DOM->new->xml(1)->parse('<foo />')->xml, 'XML mode active';
 $dom = Mojo::DOM->new->parse(<<'EOF');
 <?xml version='1.0' encoding='UTF-8'?>
 <table>

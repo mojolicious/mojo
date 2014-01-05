@@ -96,10 +96,7 @@ sub decode {
   return $res;
 }
 
-sub encode {
-  my ($self, $ref) = @_;
-  return Mojo::Util::encode 'UTF-8', _encode_value($ref);
-}
+sub encode { Mojo::Util::encode 'UTF-8', _encode_value($_[1]) }
 
 sub false {$FALSE}
 

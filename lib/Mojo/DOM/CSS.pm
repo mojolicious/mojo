@@ -129,10 +129,7 @@ sub _compile {
     while ($pc =~ /$PSEUDO_CLASS_RE/g) {
 
       # "not"
-      if ($1 eq 'not') {
-        my $subpattern = _compile($2)->[-1][-1];
-        push @$selector, ['pc', 'not', $subpattern];
-      }
+      if ($1 eq 'not') { push @$selector, ['pc', 'not', _compile($2)] }
 
       # Everything else
       else { push @$selector, ['pc', $1, $2] }
@@ -213,7 +210,7 @@ sub _pc {
   }
 
   # ":not"
-  elsif ($class eq 'not') { return 1 if !_selector($args, $current) }
+  elsif ($class eq 'not') { return 1 if !_match($args, $current, $current) }
 
   # ":nth-*"
   elsif ($class =~ /^nth-/) {

@@ -1,5 +1,6 @@
 
 4.67  2014-01-06
+  - Improved not found page with a more generic message.
 
 4.66  2014-01-04
   - Added success attribute to Test::Mojo.

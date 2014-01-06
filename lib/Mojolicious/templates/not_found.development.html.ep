@@ -72,7 +72,7 @@
       <div id="routes">
         <h1>Page not found... yet!</h1>
         <p>
-          None of these routes was able to generate a response for your
+          None of these routes could generate a response for your
           <code><%= $self->req->method %></code> request for
           <code><%= $self->req->url->path %></code>, maybe you need to add a
           new one?

@@ -201,6 +201,10 @@
             % my $codename = $Mojolicious::CODENAME;
             %= $kv->(Mojolicious => "$version ($codename)")
             %= $kv->(Home => app->home)
+            %= $kv->('Template paths' => dumper app->renderer->paths)
+            %= $kv->('Template classes' => dumper app->renderer->classes)
+            %= $kv->('Static paths' => dumper app->static->paths)
+            %= $kv->('Static classes' => dumper app->static->classes)
             %= $kv->(Include => dumper \@INC)
             %= $kv->(PID => $$)
             %= $kv->(Name => $0)

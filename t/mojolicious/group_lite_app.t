@@ -201,7 +201,8 @@ like $log, qr!GET "/suspended"\.!,      'right message';
 like $log, qr/Routing to a callback\./, 'right message';
 like $log, qr/Nothing has been rendered, expecting delayed response\./,
   'right message';
-like $log, qr/Rendering inline template\./, 'right message';
+like $log, qr/Rendering inline template "f75d6f5993c626fa8049366389f77928"\./,
+  'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Suspended bridge (stopped)

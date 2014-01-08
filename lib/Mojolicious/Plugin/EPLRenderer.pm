@@ -31,8 +31,8 @@ sub _epl {
 
     # Inline
     if (defined $inline) {
-      $log->debug('Rendering inline template.');
-      $$output = $mt->name('inline template')->render($inline, $c);
+      $log->debug(qq{Rendering inline template "$path".});
+      $$output = $mt->name(qq{inline template "$path"})->render($inline, $c);
     }
 
     # File

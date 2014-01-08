@@ -582,7 +582,8 @@ $t->get_ok('/reserved?data=just-works&json=test')->status_is(200)
 # Exception in inline template
 $t->get_ok('/inline/exception')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("Died at inline template line 1.\n\n");
+  ->content_is(
+  "Died at inline template 6635c7011166fa11bb23c21912900ea9 line 1.\n\n");
 
 # Exception in template from data section
 $t->get_ok('/data/exception')->status_is(500)

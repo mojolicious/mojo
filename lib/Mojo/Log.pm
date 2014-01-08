@@ -17,7 +17,9 @@ has handle => sub {
   # STDERR
   return \*STDERR;
 };
+has history => sub { [] };
 has level => 'debug';
+has max_history_size => 10;
 has 'path';
 
 # Supported log level
@@ -61,6 +63,11 @@ sub _message {
   my ($self, $level) = (shift, shift);
 
   return unless $self->is_level($level) && (my $handle = $self->handle);
+
+  my $max     = $self->max_history_size;
+  my $history = $self->history;
+  push @$history, [time, $level, @_];
+  shift @$history while @$history > $max;
 
   flock $handle, LOCK_EX;
   $handle->print($self->format($level, @_)) or croak "Can't write to log: $!";
@@ -128,6 +135,13 @@ L<Mojo::Log> implements the following attributes.
 Log filehandle used by default L</"message"> event, defaults to opening
 L</"path"> or C<STDERR>.
 
+=head2 history
+
+  my $history = $log->history;
+  $log        = $log->history([[time, 'debug', 'That went wrong.']]);
+
+The last few logged messages.
+
 =head2 level
 
   my $level = $log->level;
@@ -136,6 +150,14 @@ L</"path"> or C<STDERR>.
 Active log level, defaults to C<debug>. Available log levels are C<debug>,
 C<info>, C<warn>, C<error> and C<fatal>, in that order. Note that the
 MOJO_LOG_LEVEL environment variable can override this value.
+
+=head2 max_history_size
+
+  my $size = $log->max_history_size;
+  $log     = $log->max_history_size(5);
+
+Maximum number of logged messages to store in L</"history">, defaults to
+C<10>.
 
 =head2 path
 

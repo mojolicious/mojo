@@ -75,6 +75,10 @@
         padding-bottom: 0;
       }
       #showcase .key { padding-right: 0 }
+      #log {
+        border-radius: 5px;
+        margin-top: 1em;
+      }
       #more, #trace {
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
@@ -156,7 +160,7 @@
       </div>
       <div id="trace" class="box spaced">
         % if (@{$exception->frames}) {
-          <div class="infobox" id="frames">
+          <div id="frames" class="infobox">
             <table>
               % for my $frame (@{$exception->frames}) {
                 <tr>
@@ -214,6 +218,22 @@
         </div>
         <div class="tap">tap for more</div>
       </div>
+      % if (@{app->log->history}) {
+        <div id="log" class="box infobox spaced">
+          <table>
+            % for my $msg (@{app->log->history}) {
+              % my ($time, $level, @lines) = @$msg;
+              % $time = localtime($time);
+              % my $lines = join "\n", @lines;
+              <tr>
+                <td class="striped value">
+                  <pre>[<%= $time %>] [<%= $level %>] <%= $lines %></pre>
+                </td>
+              </tr>
+            % }
+          </table>
+        </div>
+      % }
     </div>
     <div id="footer">
       %= link_to 'http://mojolicio.us' => begin

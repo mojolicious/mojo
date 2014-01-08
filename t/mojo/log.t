@@ -70,6 +70,31 @@ $msgs = [];
 $log->log('fatal', 'Test', 1, 2, 3);
 is_deeply $msgs, [qw(fatal Test 1 2 3)], 'right message';
 
+# History
+$buffer = '';
+my $history;
+{
+  open my $handle, '>', \$buffer;
+  local *STDERR = $handle;
+  my $log = Mojo::Log->new->max_history_size(2)->level('info');
+  $log->error('First.');
+  $log->fatal('Second.');
+  $log->debug('Third.');
+  $log->info('Fourth.', 'Fifth.');
+  $history = $log->history;
+}
+$content = decode 'UTF-8', $buffer;
+like $content,   qr/\[.*\] \[error\] First\.\n/,         'right error message';
+like $content,   qr/\[.*\] \[info\] Fourth\.\nFifth.\n/, 'right info message';
+unlike $content, qr/debug/,                              'no debug message';
+like $history->[0][0], qr/^\d+$/, 'right epoch time';
+is $history->[0][1],   'fatal',   'right level';
+is $history->[0][2],   'Second.', 'right message';
+is $history->[1][1],   'info',    'right level';
+is $history->[1][2],   'Fourth.', 'right message';
+is $history->[1][3],   'Fifth.',  'right message';
+ok !$history->[2], 'no more messages';
+
 # "debug"
 is $log->level('debug')->level, 'debug', 'right level';
 ok $log->is_level('debug'), '"debug" log level is active';

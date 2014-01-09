@@ -102,11 +102,13 @@
           % $depth--;
         % end
         <table>
-          <tr>
-            <th>Pattern</th>
-            <th>Methods</th>
-            <th>Name</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Methods</th>
+              <th>Name</th>
+            </tr>
+          </thead>
           %= $walk->($walk, $_, 0) for @{app->routes->children};
         </table>
       </div>

@@ -297,13 +297,13 @@ L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
 =head2 check_box
 
   %= check_box employed => 1
-  %= check_box employed => 1, id => 'foo'
+  %= check_box employed => 1, disabled => 'disabled'
 
 Generate checkbox input element. Previous input values will automatically get
 picked up and shown as default.
 
   <input name="employed" type="checkbox" value="1" />
-  <input id="foo" name="employed" type="checkbox" value="1" />
+  <input disabled="disabled" name="employed" type="checkbox" value="1" />
 
 =head2 color_field
 
@@ -386,8 +386,8 @@ Generate file input element.
     %= text_field 'first_name'
     %= submit_button
   % end
-  %= form_for '/login' => (method => 'POST') => begin
-    %= text_field 'first_name'
+  %= form_for '/login' => (enctype => 'multipart/form-data') => begin
+    %= text_field 'first_name', disabled => 'disabled'
     %= submit_button
   % end
   %= form_for 'http://example.com/login' => (method => 'POST') => begin
@@ -407,8 +407,8 @@ automatically added.
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
-  <form action="/path/to/login" method="POST">
-    <input name="first_name" />
+  <form action="/path/to/login" enctype="multipart/form-data">
+    <input disabled="disabled" name="first_name" />
     <input value="Ok" type="submit" />
   </form>
   <form action="http://example.com/login" method="POST">
@@ -589,7 +589,7 @@ picked up and shown as default.
 
   %= select_field country => [qw(de en)]
   %= select_field country => [[Germany => 'de'], 'en'], id => 'eu'
-  %= select_field country => [[Germany => 'de', class => 'eu'], 'en']
+  %= select_field country => [[Germany => 'de', disabled => 'disabled'], 'en']
   %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
   %= select_field country => [c(EU => [qw(de en)]), c(Asia => [qw(cn jp)])]
 
@@ -606,7 +606,7 @@ automatically get picked up and shown as default.
     <option value="en">en</option>
   </select>
   <select name="country">
-    <option class="eu" value="de">Germany</option>
+    <option disabled="disabled" value="de">Germany</option>
     <option value="en">en</option>
   </select>
   <select name="country">

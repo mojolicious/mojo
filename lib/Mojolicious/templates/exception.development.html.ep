@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Server error</title>
+    <title>Server error (<%= app->mode %> mode)</title>
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
@@ -223,7 +223,7 @@
           <table>
             % for my $msg (@{app->log->history}) {
               % my ($time, $level, @lines) = @$msg;
-              % $time = localtime($time);
+              % $time = localtime $time;
               % my $lines = join "\n", @lines;
               <tr>
                 <td class="striped value">

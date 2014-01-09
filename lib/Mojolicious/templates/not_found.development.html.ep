@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Page not found</title>
+    <title>Page not found (<%= app->mode %> mode)</title>
     %= stylesheet begin
       body {
         background: url(<%= url_for '/mojo/pinstripe-light.png' %>);
@@ -115,7 +115,7 @@
           <table>
             % for my $msg (@{app->log->history}) {
               % my ($time, $level, @lines) = @$msg;
-              % $time = localtime($time);
+              % $time = localtime $time;
               % my $lines = join "\n", @lines;
               <tr>
                 <td class="striped value">

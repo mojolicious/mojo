@@ -298,7 +298,7 @@ sub websocket_ok {
   Mojo::IOLoop->start;
 
   my $desc = encode 'UTF-8', "WebSocket $url";
-  return $self->_test('ok', $self->tx->res->code eq 101, $desc);
+  return $self->_test('ok', $self->tx->is_websocket, $desc);
 }
 
 sub _json {

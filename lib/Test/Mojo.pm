@@ -609,6 +609,9 @@ Wait for WebSocket connection to be closed gracefully and check status.
 Perform a GET request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"get">, except for the callback.
 
+  # Run tests against remote host
+  $t->get_ok('http://mojolicio.us/perldoc')->status_is(200);
+
 =head2 head_ok
 
   $t = $t->head_ok('/foo');

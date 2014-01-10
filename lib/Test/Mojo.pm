@@ -796,7 +796,7 @@ arguments as L<Mojo::UserAgent/"post">, except for the callback.
     ->status_is(200);
 
   # Test JSON API
-  $t->post_json_ok('/hello.json' => json => {hello => 'world'})
+  $t->post_ok('/hello.json' => json => {hello => 'world'})
     ->status_is(200)
     ->json_is({bye => 'world'});
 

@@ -81,26 +81,6 @@ sub stop {
   return $self;
 }
 
-sub _accept {
-  my ($self, $tls, $stream, $id) = @_;
-
-  my $c = $self->{connections}{$id} = {tls => $tls};
-  warn "-- Accept (@{[$stream->handle->peerhost]})\n" if DEBUG;
-  $stream->timeout($self->inactivity_timeout);
-
-  $stream->on(close => sub { $self->_close($id) });
-  $stream->on(
-    error => sub {
-      return unless $self;
-      $self->app->log->error(pop);
-      $self->_close($id);
-    }
-  );
-  $stream->on(read => sub { $self->_read($id => pop) });
-  $stream->on(timeout =>
-      sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
-}
-
 sub _build_tx {
   my ($self, $id, $c) = @_;
 
@@ -195,8 +175,27 @@ sub _listen {
   my $tls = $options->{tls} = $url->protocol eq 'https';
 
   weaken $self;
-  push @{$self->acceptors},
-    $self->ioloop->server($options => sub { shift; $self->_accept($tls, @_) });
+  push @{$self->acceptors}, $self->ioloop->server(
+    $options => sub {
+      my ($loop, $stream, $id) = @_;
+
+      my $c = $self->{connections}{$id} = {tls => $tls};
+      warn "-- Accept (@{[$stream->handle->peerhost]})\n" if DEBUG;
+      $stream->timeout($self->inactivity_timeout);
+
+      $stream->on(close => sub { $self->_close($id) });
+      $stream->on(
+        error => sub {
+          return unless $self;
+          $self->app->log->error(pop);
+          $self->_close($id);
+        }
+      );
+      $stream->on(read => sub { $self->_read($id => pop) });
+      $stream->on(timeout =>
+          sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
+    }
+  );
 
   return if $self->silent;
   $self->app->log->info(qq{Listening at "$url".});

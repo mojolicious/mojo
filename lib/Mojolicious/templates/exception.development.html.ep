@@ -79,6 +79,7 @@
         border-radius: 5px;
         margin-top: 1em;
       }
+      #log table { margin: 0 }
       #more, #trace {
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;

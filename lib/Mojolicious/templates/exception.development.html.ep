@@ -69,6 +69,7 @@
         margin: 0;
         text-shadow: #333 0 1px 0;
       }
+      #showcase table { margin-top: 1em }
       #showcase td {
         padding-top: 0;
         padding-bottom: 0;

@@ -1,5 +1,5 @@
 
-4.67  2014-01-10
+4.67  2014-01-11
   - Added history and max_history_size attributes to Mojo::Log.
   - Improved exception and not found pages with log messages.
   - Improved exception page with more information.

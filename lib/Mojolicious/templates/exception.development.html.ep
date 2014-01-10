@@ -98,6 +98,14 @@
   </head>
   <body>
     %= include inline => app->renderer->_bundled('mojobar')
+    %= javascript begin
+      function mojoDrawer (handle, drawer) {
+        $(handle).click(function() {
+          $(drawer).slideToggle('slow');
+        });
+        $(drawer).toggle();
+      }
+    % end
     <div id="wrapperlicious">
       <div id="nothing" class="box spaced"></div>
       % my $cv = begin
@@ -173,12 +181,7 @@
             </table>
           </div>
           <div class="tap">tap for more</div>
-          %= javascript begin
-            $('#trace').click(function() {
-              $('#frames').slideToggle('slow');
-            });
-            $('#frames').toggle();
-          % end
+          <%= javascript begin%>mojoDrawer('#trace', '#frames')<% end %>
         % }
       </div>
       <div id="request" class="box infobox spaced">
@@ -241,11 +244,6 @@
         %= image '/mojo/logo-black.png', alt => 'Mojolicious logo'
       % end
     </div>
-    %= javascript begin
-      $('#more').click(function() {
-        $('#infos').slideToggle('slow');
-      });
-      $('#infos').toggle();
-    % end
+    <%= javascript begin%>mojoDrawer('#more', '#infos')<% end %>
   </body>
 </html>

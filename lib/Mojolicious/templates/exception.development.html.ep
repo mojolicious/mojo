@@ -24,8 +24,6 @@
       }
       table {
         border-collapse: collapse;
-        margin-top: 1em;
-        margin-bottom: 1em;
         width: 100%;
       }
       td { padding: 0.5em }
@@ -46,6 +44,7 @@
       .infobox tr:nth-child(odd) .value { background-color: #ddeeff }
       .infobox tr:nth-child(even) .value { background-color: #eef9ff }
       .key { text-align: right }
+      .more table { margin-bottom: 1em }
       .spaced {
         margin-left: 5em;
         margin-right: 5em;
@@ -116,7 +115,7 @@
       % end
       <div id="showcase" class="box code spaced">
         <pre><%= $exception->message %></pre>
-        <div id="context">
+        <div id="context" class="more">
           <table>
             % for my $line (@{$exception->lines_before}) {
               %= $cv->($line->[0], $line->[1])
@@ -130,7 +129,7 @@
           </table>
         </div>
         % if (defined $exception->line->[2]) {
-          <div id="insight">
+          <div id="insight" class="more">
             <table>
               % for my $line (@{$exception->lines_before}) {
                 %= $cv->($line->[0], $line->[2])
@@ -161,7 +160,7 @@
       </div>
       <div id="trace" class="box spaced">
         % if (@{$exception->frames}) {
-          <div id="frames" class="infobox">
+          <div id="frames" class="infobox more">
             <table>
               % for my $frame (@{$exception->frames}) {
                 <tr>
@@ -198,7 +197,7 @@
           % }
         </table>
       </div>
-      <div id="more" class="box infobox spaced">
+      <div id="more" class="box infobox more spaced">
         <div id="infos">
           <table>
             %= $kv->(Perl => "$^V ($^O)")

@@ -220,9 +220,10 @@
             %= $kv->('Static paths' => dumper app->static->paths)
             %= $kv->('Static classes' => dumper app->static->classes)
             %= $kv->(Include => dumper \@INC)
-            %= $kv->(PID => $$)
+            %= $kv->(Moniker => app->moniker)
             %= $kv->(Name => $0)
             %= $kv->(Executable => $^X)
+            %= $kv->(PID => $$)
             %= $kv->(Time => scalar localtime(time))
           </table>
         </div>

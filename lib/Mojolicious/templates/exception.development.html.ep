@@ -102,9 +102,16 @@
       function mojoDrawer (handle, drawer) {
         $(handle).click(function() {
           $(drawer).slideToggle('slow');
+          var text = $(handle + ' div.tap').text();
+          text = text == "tap for more" ? "tap for less" : "tap for more";
+          $(handle + ' div.tap').text(text);
         });
         $(drawer).toggle();
       }
+      $(document).ready(function() {
+        mojoDrawer('#trace', '#frames');
+        mojoDrawer('#more', '#infos');
+      });
     % end
     <div id="wrapperlicious">
       <div id="nothing" class="box spaced"></div>
@@ -181,7 +188,6 @@
             </table>
           </div>
           <div class="tap">tap for more</div>
-          <%= javascript begin%>mojoDrawer('#trace', '#frames')<% end %>
         % }
       </div>
       <div id="request" class="box infobox spaced">
@@ -244,6 +250,5 @@
         %= image '/mojo/logo-black.png', alt => 'Mojolicious logo'
       % end
     </div>
-    <%= javascript begin%>mojoDrawer('#more', '#infos')<% end %>
   </body>
 </html>

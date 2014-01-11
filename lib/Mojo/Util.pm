@@ -541,13 +541,15 @@ Monkey patch functions into package.
 
   my $str = punycode_decode $punycode;
 
-Punycode decode string.
+Punycode decode string as described in
+L<RFC 3492|http://tools.ietf.org/search/rfc3492>.
 
 =head2 punycode_encode
 
   my $punycode = punycode_encode $str;
 
-Punycode encode string.
+Punycode encode string as described in
+L<RFC 3492|http://tools.ietf.org/search/rfc3492>.
 
 =head2 quote
 

@@ -99,7 +99,8 @@ Mojo::Server::CGI - CGI server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::CGI> is a simple and portable implementation of RFC 3875.
+L<Mojo::Server::CGI> is a simple and portable implementation of
+L<RFC 3875|http://tools.ietf.org/search/rfc3875>.
 
 See L<Mojolicious::Guides::Cookbook> for more.
 

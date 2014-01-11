@@ -216,7 +216,7 @@ Mojo::Content::MultiPart - HTTP multipart content
 =head1 DESCRIPTION
 
 L<Mojo::Content::MultiPart> is a container for HTTP multipart content as
-described in RFC 2616.
+described in L<RFC 2616|http://tools.ietf.org/search/rfc2616>.
 
 =head1 EVENTS
 

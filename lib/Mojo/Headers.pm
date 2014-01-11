@@ -180,7 +180,8 @@ Mojo::Headers - Headers
 
 =head1 DESCRIPTION
 
-L<Mojo::Headers> is a container for HTTP headers as described in RFC 2616.
+L<Mojo::Headers> is a container for HTTP headers as described in
+L<RFC 2616|http://tools.ietf.org/search/rfc2616>.
 
 =head1 ATTRIBUTES
 
@@ -332,7 +333,8 @@ Shortcut for the C<Content-Type> header.
   my $cookie = $headers->cookie;
   $headers   = $headers->cookie('f=b');
 
-Shortcut for the C<Cookie> header from RFC 6265.
+Shortcut for the C<Cookie> header from
+L<RFC 6265|http://tools.ietf.org/search/rfc6265>.
 
 =head2 date
 
@@ -439,7 +441,8 @@ Get leftover data from header parser.
   my $link = $headers->link;
   $headers = $headers->link('<http://127.0.0.1/foo/3>; rel="next"');
 
-Shortcut for the C<Link> header from RFC 5988.
+Shortcut for the C<Link> header from
+L<RFC 5988|http://tools.ietf.org/search/rfc5988>.
 
 =head2 location
 
@@ -462,7 +465,8 @@ Return a list of all currently defined headers.
   my $origin = $headers->origin;
   $headers   = $headers->origin('http://example.com');
 
-Shortcut for the C<Origin> header from RFC 6454.
+Shortcut for the C<Origin> header from
+L<RFC 6454|http://tools.ietf.org/search/rfc6454>.
 
 =head2 parse
 
@@ -496,8 +500,9 @@ Shortcut for the C<Range> header.
   my $referrer = $headers->referrer;
   $headers     = $headers->referrer('http://example.com');
 
-Shortcut for the C<Referer> header, there was a typo in RFC 2068 which
-resulted in C<Referer> becoming an official header.
+Shortcut for the C<Referer> header, there was a typo in
+L<RFC 2068|http://tools.ietf.org/search/rfc2068> which resulted in C<Referer>
+becoming an official header.
 
 =head2 remove
 
@@ -510,35 +515,40 @@ Remove a header.
   my $accept = $headers->sec_websocket_accept;
   $headers   = $headers->sec_websocket_accept('s3pPLMBiTxaQ9kYGzzhZRbK+xOo=');
 
-Shortcut for the C<Sec-WebSocket-Accept> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Accept> header from
+L<RFC 6455|http://tools.ietf.org/search/rfc6455>.
 
 =head2 sec_websocket_extensions
 
   my $extensions = $headers->sec_websocket_extensions;
   $headers       = $headers->sec_websocket_extensions('foo');
 
-Shortcut for the C<Sec-WebSocket-Extensions> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Extensions> header from
+L<RFC 6455|http://tools.ietf.org/search/rfc6455>.
 
 =head2 sec_websocket_key
 
   my $key  = $headers->sec_websocket_key;
   $headers = $headers->sec_websocket_key('dGhlIHNhbXBsZSBub25jZQ==');
 
-Shortcut for the C<Sec-WebSocket-Key> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Key> header from
+L<RFC 6455|http://tools.ietf.org/search/rfc6455>.
 
 =head2 sec_websocket_protocol
 
   my $proto = $headers->sec_websocket_protocol;
   $headers  = $headers->sec_websocket_protocol('sample');
 
-Shortcut for the C<Sec-WebSocket-Protocol> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Protocol> header from
+L<RFC 6455|http://tools.ietf.org/search/rfc6455>.
 
 =head2 sec_websocket_version
 
   my $version = $headers->sec_websocket_version;
   $headers    = $headers->sec_websocket_version(13);
 
-Shortcut for the C<Sec-WebSocket-Version> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Version> header from
+L<RFC 6455|http://tools.ietf.org/search/rfc6455>.
 
 =head2 server
 
@@ -552,14 +562,16 @@ Shortcut for the C<Server> header.
   my $cookie = $headers->set_cookie;
   $headers   = $headers->set_cookie('f=b; path=/');
 
-Shortcut for the C<Set-Cookie> header from RFC 6265.
+Shortcut for the C<Set-Cookie> header from
+L<RFC 6265|http://tools.ietf.org/search/rfc6265>.
 
 =head2 status
 
   my $status = $headers->status;
   $headers   = $headers->status('200 OK');
 
-Shortcut for the C<Status> header from RFC 3875.
+Shortcut for the C<Status> header from
+L<RFC 3875|http://tools.ietf.org/search/rfc3875>.
 
 =head2 te
 

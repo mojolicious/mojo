@@ -77,8 +77,8 @@ Mojo::Date - HTTP date
 
 =head1 DESCRIPTION
 
-L<Mojo::Date> implements HTTP date and time functions as described in RFC
-2616.
+L<Mojo::Date> implements HTTP date and time functions as described in
+L<RFC 2616|http://tools.ietf.org/search/rfc2616>.
 
   Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
   Sunday, 06-Nov-94 08:49:37 GMT ; RFC 850, obsoleted by RFC 1036

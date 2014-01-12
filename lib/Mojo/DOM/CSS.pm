@@ -108,15 +108,11 @@ sub _compile {
     push @$part, [combinator => ' ']
       if $part->[-1] && $part->[-1][0] ne 'combinator';
 
-    # Selector
+    # Tag
     push @$part, ['element'];
     my $selector = $part->[-1];
-
-    # Element
-    my $tag = '*';
+    my $tag      = '*';
     $element =~ s/^((?:\\\.|\\\#|[^.#])+)// and $tag = _unescape($1);
-
-    # Tag
     push @$selector, ['tag', $tag];
 
     # Class or ID
@@ -206,28 +202,15 @@ sub _pc {
 
   # ":nth-*"
   elsif ($class =~ /^nth-/) {
-
-    # Numbers
-    $args = _equation($args) unless ref $args;
-
-    # Siblings
-    my $parent = $current->[3];
-    my @siblings;
     my $type = $class =~ /of-type$/ ? $current->[1] : undef;
-    for my $i (($parent->[0] eq 'root' ? 1 : 4) .. $#$parent) {
-      my $sibling = $parent->[$i];
-      next unless $sibling->[0] eq 'tag';
-      next if defined $type && $type ne $sibling->[1];
-      push @siblings, $sibling;
-    }
+    my @siblings = @{_siblings($current, $type)};
 
-    # Reverse
+    # ":nth-last-*"
     @siblings = reverse @siblings if $class =~ /^nth-last/;
 
-    # Find
+    $args = _equation($args) unless ref $args;
     for my $i (0 .. $#siblings) {
-      my $result = $args->[0] * $i + $args->[1];
-      next if $result < 1;
+      next if (my $result = $args->[0] * $i + $args->[1]) < 1;
       last unless my $sibling = $siblings[$result - 1];
       return 1 if $sibling eq $current;
     }
@@ -235,17 +218,8 @@ sub _pc {
 
   # ":only-*"
   elsif ($class =~ /^only-(?:child|(of-type))$/) {
-    my $type = $1 ? $current->[1] : undef;
-
-    # Siblings
-    my $parent = $current->[3];
-    for my $i (($parent->[0] eq 'root' ? 1 : 4) .. $#$parent) {
-      my $sibling = $parent->[$i];
-      next if $sibling->[0] ne 'tag' || $sibling eq $current;
-      return undef unless defined $type && $sibling->[1] ne $type;
-    }
-
-    # No siblings
+    $_ ne $current and return undef
+      for @{_siblings($current, $1 ? $current->[1] : undef)};
     return 1;
   }
 
@@ -338,6 +312,19 @@ sub _sibling {
   }
 
   return undef;
+}
+
+sub _siblings {
+  my ($current, $type) = @_;
+
+  my @siblings;
+  my $parent = $current->[3];
+  for my $sibling (@$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent]) {
+    next if $sibling->[0] ne 'tag';
+    push @siblings, $sibling unless defined $type && $type ne $sibling->[1];
+  }
+
+  return \@siblings;
 }
 
 sub _unescape {

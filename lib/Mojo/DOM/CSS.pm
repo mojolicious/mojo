@@ -298,17 +298,15 @@ sub _selector {
 sub _sibling {
   my ($selectors, $current, $tree, $immediate) = @_;
 
-  my $parent = $current->[3];
   my $found;
-  for my $n (@$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent]) {
-    return $found if $n eq $current;
-    next unless $n->[0] eq 'tag';
+  for my $sibling (@{_siblings($current)}) {
+    return $found if $sibling eq $current;
 
     # "+" (immediately preceding sibling)
-    if ($immediate) { $found = _combinator($selectors, $n, $tree) }
+    if ($immediate) { $found = _combinator($selectors, $sibling, $tree) }
 
     # "~" (preceding sibling)
-    else { return 1 if _combinator($selectors, $n, $tree) }
+    else { return 1 if _combinator($selectors, $sibling, $tree) }
   }
 
   return undef;
@@ -317,12 +315,10 @@ sub _sibling {
 sub _siblings {
   my ($current, $type) = @_;
 
-  my @siblings;
   my $parent = $current->[3];
-  for my $sibling (@$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent]) {
-    next if $sibling->[0] ne 'tag';
-    push @siblings, $sibling unless defined $type && $type ne $sibling->[1];
-  }
+  my @siblings = grep { $_->[0] eq 'tag' }
+    @$parent[($parent->[0] eq 'root' ? 1 : 4) .. $#$parent];
+  @siblings = grep { $type eq $_->[1] } @siblings if defined $type;
 
   return \@siblings;
 }

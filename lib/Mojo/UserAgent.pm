@@ -6,7 +6,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::URL;
-use Mojo::Util qw(deprecated monkey_patch);
+use Mojo::Util 'monkey_patch';
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Proxy;
 use Mojo::UserAgent::Server;
@@ -41,71 +41,8 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
 
 sub DESTROY { shift->_cleanup }
 
-# DEPRECATED in Top Hat!
-sub new {
-  my $self = shift->SUPER::new(@_);
-  for my $key (keys %$self) { $self->$key(delete $self->{$key}) }
-  return $self;
-}
-
-# DEPRECATED in Top Hat!
-sub app {
-  deprecated 'Mojo::UserAgent::app is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Server::app';
-  shift->_delegate('server', 'app', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub app_url {
-  deprecated 'Mojo::UserAgent::app_url is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Server::url';
-  shift->_delegate('server', 'url', @_);
-}
-
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
-
-# DEPRECATED in Top Hat!
-sub detect_proxy {
-  deprecated 'Mojo::UserAgent::detect_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::detect';
-  shift->tap(sub { $_->proxy->detect });
-}
-
-# DEPRECATED in Top Hat!
-sub http_proxy {
-  deprecated 'Mojo::UserAgent::http_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::http';
-  shift->_delegate('proxy', 'http', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub https_proxy {
-  deprecated 'Mojo::UserAgent::https_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::https';
-  shift->_delegate('proxy', 'https', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub name {
-  deprecated 'Mojo::UserAgent::name is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Transactor::name';
-  shift->_delegate('transactor', 'name', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub no_proxy {
-  deprecated 'Mojo::UserAgent::no_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::not';
-  shift->_delegate('proxy', 'not', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub need_proxy {
-  deprecated 'Mojo::UserAgent::need_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::is_needed';
-  shift->proxy->is_needed(@_);
-}
 
 sub start {
   my ($self, $tx, $cb) = @_;
@@ -273,14 +210,6 @@ sub _connection {
   $self->{connections}{$id} = {cb => $cb, tx => $tx};
 
   return $id;
-}
-
-# DEPRECATED in Top Hat!
-sub _delegate {
-  my ($self, $attr, $name) = (shift, shift, shift);
-  return $self->$attr->$name unless @_;
-  $self->$attr->$name(@_);
-  return $self;
 }
 
 sub _dequeue {

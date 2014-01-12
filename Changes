@@ -1,5 +1,13 @@
 
 4.68  2014-01-12
+  - Removed deprecated http_proxy attribute from Mojo::UserAgent.
+  - Removed deprecated https_proxy attribute from Mojo::UserAgent.
+  - Removed deprecated name attribute from Mojo::UserAgent.
+  - Removed deprecated no_proxy attribute from Mojo::UserAgent.
+  - Removed deprecated app method from Mojo::UserAgent.
+  - Removed deprecated app_url method from Mojo::UserAgent.
+  - Removed deprecated detect_proxy method from Mojo::UserAgent.
+  - Removed deprecated need_proxy method from Mojo::UserAgent.
   - Improved list of available commands to be alphabetical. (jberger)
 
 4.67  2014-01-11

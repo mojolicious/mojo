@@ -1,5 +1,6 @@
 
 4.68  2014-01-12
+  - Improved list of available commands to be alphabetical. (jberger)
 
 4.67  2014-01-11
   - Added history and max_history_size attributes to Mojo::Log.

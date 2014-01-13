@@ -633,14 +633,16 @@ Unquote string.
   my $escaped = url_escape $str;
   my $escaped = url_escape $str, '^A-Za-z0-9\-._~';
 
-Percent encode unsafe characters in string, the pattern used defaults to
+Percent encode unsafe characters in string as described in
+L<RFC 3986|http://tools.ietf.org/search/rfc3986>, the pattern used defaults to
 C<^A-Za-z0-9\-._~>.
 
 =head2 url_unescape
 
   my $str = url_unescape $escaped;
 
-Decode percent encoded characters in string.
+Decode percent encoded characters in string as described in
+L<RFC 3986|http://tools.ietf.org/search/rfc3986>.
 
 =head2 xml_escape
 

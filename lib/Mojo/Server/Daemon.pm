@@ -360,17 +360,20 @@ L<Mojo::IOLoop> singleton.
 List of one or more locations to listen on, defaults to the value of the
 MOJO_LISTEN environment variable or C<http://*:3000>.
 
-  # Allow multiple servers to use the same port (SO_REUSEPORT)
-  $daemon->listen(['http://*:8080?reuse=1']);
+  # Listen on all IPv4 interfaces
+  $daemon->listen(['http://*:3000']);
+
+  # Listen on all IPv4 and IPv6 interfaces
+  $daemon->listen(['http://[::]:3000']);
 
   # Listen on IPv6 interface
   $daemon->listen(['http://[::1]:4000']);
 
-  # Listen on all interfaces (IPv4 and IPv6)
-  $daemon->listen(['http://[::]:3000']);
-
   # Listen on IPv4 and IPv6 interfaces
   $daemon->listen(['http://127.0.0.1:3000', 'http://[::1]:3000']);
+
+  # Allow multiple servers to use the same port (SO_REUSEPORT)
+  $daemon->listen(['http://*:8080?reuse=1']);
 
   # Listen on two ports with HTTP and HTTPS at the same time
   $daemon->listen([qw(http://*:3000 https://*:4000)]);

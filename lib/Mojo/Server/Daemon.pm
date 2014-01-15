@@ -366,6 +366,9 @@ MOJO_LISTEN environment variable or C<http://*:3000>.
   # Listen on IPv6 interface
   $daemon->listen(['http://[::1]:4000']);
 
+  # Listen on all interfaces (IPv4 and IPv6)
+  $daemon->listen(['http://[::]:3000']);
+
   # Listen on IPv4 and IPv6 interfaces
   $daemon->listen(['http://127.0.0.1:3000', 'http://[::1]:3000']);
 

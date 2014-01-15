@@ -156,9 +156,11 @@ $loop->client(
     $connected = 1;
   }
 );
-like $ENV{MOJO_REUSE}, qr/(?:^|\,)${port}:/, 'file descriptor can be reused';
+like $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:${port}:/,
+  'file descriptor can be reused';
 $loop->start;
-unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)${port}:/, 'environment is clean';
+unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:${port}:/,
+  'environment is clean';
 ok $connected, 'connected';
 $err = undef;
 $loop->client(

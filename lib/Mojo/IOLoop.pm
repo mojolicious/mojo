@@ -380,7 +380,8 @@ Number of connections to accept at once, defaults to C<50>.
   $loop       = $loop->reactor(Mojo::Reactor->new);
 
 Low level event reactor, usually a L<Mojo::Reactor::Poll> or
-L<Mojo::Reactor::EV> object with a default C<error> event.
+L<Mojo::Reactor::EV> object with a default subscriber to the event
+L<Mojo::Reactor/"error">.
 
   # Watch if handle becomes readable or writable
   $loop->reactor->io($handle => sub {
@@ -438,7 +439,8 @@ L<Mojo::IOLoop::Client/"connect">.
 Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow
 of events, which can help you avoid deep nested closures that often result
 from continuation-passing style. A single callback will be treated as a
-subscriber to the C<finish> event, and multiple ones as a chain of steps.
+subscriber to the event L<Mojo::IOLoop::Delay/"finish">, and multiple ones as
+a chain for L<Mojo::IOLoop::Delay/"steps">.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });

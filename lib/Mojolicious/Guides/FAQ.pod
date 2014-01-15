@@ -69,6 +69,15 @@ In addition we will also keep the distribution installable up to a certain
 legacy version that we deem worthy of supporting, but not specifically
 optimize for it, this is currently 5.10.1.
 
+=head2 Will my code magically become non-blocking with Mojolicious?
+
+No, it is not possible to magically make code non-blocking. While
+L<Mojolicious> has been designed from the ground up for non-blocking I/O and
+event loops, taking advantage of this requires specialized code available
+through modules like L<Mojo::IOLoop> and L<Mojo::UserAgent>, or third-party
+event loops. In the documentation we often refer to this as real-time web, for
+more information see also L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
+
 =head2 What does the error "Maximum message size exceeded" mean?
 
 To protect your applications from excessively large requests and responses,

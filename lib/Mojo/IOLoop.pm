@@ -435,9 +435,10 @@ L<Mojo::IOLoop::Client/"connect">.
   my $delay = $loop->delay(sub {...});
   my $delay = $loop->delay(sub {...}, sub {...});
 
-Get L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow of
-events. A single callback will be treated as a subscriber to the C<finish>
-event, and multiple ones as a chain of steps.
+Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow
+of events, which can help you avoid deep nested closures that often result
+from continuation-passing style. A single callback will be treated as a
+subscriber to the C<finish> event, and multiple ones as a chain of steps.
 
   # Synchronize multiple events
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });

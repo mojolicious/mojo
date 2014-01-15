@@ -50,8 +50,8 @@ sub listen {
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # Look for reusable file descriptor
-  my $port    = $args->{port}    || 3000;
   my $address = $args->{address} || '0.0.0.0';
+  my $port    = $args->{port}    || 3000;
   my $reuse = $self->{reuse} = "$address:$port";
   $ENV{MOJO_REUSE} ||= '';
   my $fd;

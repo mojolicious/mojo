@@ -213,6 +213,12 @@ sub _tag {
 
   # Attributes
   my %attrs = @_;
+  
+  if ($attrs{data} && ref($attrs{data}) eq 'HASH') {
+      $attrs{"data-$_"} = $attrs{data}{$_} for sort keys $attrs{data};
+      delete $attrs{data} ;
+  }
+  
   $tag .= qq{ $_="} . xml_escape($attrs{$_} // '') . '"' for sort keys %attrs;
 
   # Empty element

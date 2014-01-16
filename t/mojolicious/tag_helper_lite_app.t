@@ -267,6 +267,8 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   <input id="foo" name="h" type="password" />
   <input type="submit" value="Ok!" />
   <input id="bar" type="submit" value="Ok too!" />
+  <input data-id="1" data-name="ok" type="text" />
+  <input data="ok" type="text" />
 </form>
 <form action="/">
   <input name="foo" />
@@ -583,6 +585,8 @@ __DATA__
   %= password_field 'h', id => 'foo'
   %= submit_button 'Ok!'
   %= submit_button 'Ok too!', id => 'bar'
+  %= text_field data => {id => 1, name => 'ok'}
+  %= text_field data => 'ok'
 %= end
 <%= form_for '/' => begin %>
   <%= input_tag 'foo' %>

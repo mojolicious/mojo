@@ -69,9 +69,28 @@ In addition we will also keep the distribution installable up to a certain
 legacy version that we deem worthy of supporting, but not specifically
 optimize for it, this is currently 5.10.1.
 
+=head2 What is the difference between blocking and non-blocking operations?
+
+A C<blocking> operation is a subroutine that blocks the execution of the
+calling subroutine until the subroutine is finished.
+
+  my $result = blocking_subroutine();
+  ...
+
+A <non-blocking> operation on the other hand lets the calling subroutine
+continue execution even though the subroutine is not yet finished. Instead of
+waiting, the calling subroutine passes along a callback to be executed once
+the subroutine is finished, this is called continuation-passing style.
+
+  non_blocking_subroutine(sub {
+    my $result = shift;
+    ...
+  });
+  ...
+
 =head2 Will my code magically become non-blocking with Mojolicious?
 
-No, it is not possible to magically make code non-blocking. While
+No, it is not possible to magically make Perl code non-blocking. While
 L<Mojolicious> has been designed from the ground up for non-blocking I/O and
 event loops, taking advantage of this requires specialized code available
 through modules like L<Mojo::IOLoop> and L<Mojo::UserAgent>, or third-party

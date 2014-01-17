@@ -97,6 +97,28 @@ through modules like L<Mojo::IOLoop> and L<Mojo::UserAgent>, or third-party
 event loops. In the documentation we often refer to this as real-time web, for
 more information see also L<Mojolicious::Guides::Cookbook/"REAL-TIME WEB">.
 
+=head2 What is an event loop?
+
+An event loop is basically a loop that continually tests for external events
+and executes the appropriate callbacks to handle them, it is often the main
+loop in a program. Non-blocking tests for readability/writability of file
+descriptors and timers are commonly used events for highly scalable network
+servers, because they allow a single process to handle thousands of client
+connections concurrently.
+
+  while (1) {
+    my @readable = test_fds_for_readability();
+    handle_readable_fds(@readable);
+
+    my @writable = test_fds_for_writability();
+    handle_writable_fds(@writable);
+
+    my @expired = test_timers();
+    handle_timers(@expired);
+  }
+
+In L<Mojolicious> this event loop is L<Mojo::IOLoop>.
+
 =head2 What does the error "Maximum message size exceeded" mean?
 
 To protect your applications from excessively large requests and responses,

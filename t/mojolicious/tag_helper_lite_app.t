@@ -41,6 +41,19 @@ post '/no_snowman';
 
 my $t = Test::Mojo->new;
 
+# Reuse values
+my $values = [app->c(EU => [qw(de en)])];
+is app->select_field(country => $values),
+    '<select name="country"><optgroup label="EU">'
+  . '<option value="de">de</option>'
+  . '<option value="en">en</option>'
+  . '</optgroup></select>', 'right result';
+is app->select_field(country => $values),
+    '<select name="country"><optgroup label="EU">'
+  . '<option value="de">de</option>'
+  . '<option value="en">en</option>'
+  . '</optgroup></select>', 'right result';
+
 # Basic tags
 $t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />

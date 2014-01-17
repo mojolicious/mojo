@@ -167,9 +167,9 @@ sub _select_field {
 
     # "optgroup" tag
     if (blessed $group && $group->isa('Mojo::Collection')) {
-      my ($label, $values) = splice @$group, 0, 2;
+      my ($label, $values, %attrs) = @$group;
       my $content = join '', map { _option(\%values, $_) } @$values;
-      $groups .= _tag('optgroup', label => $label, @$group, sub {$content});
+      $groups .= _tag('optgroup', label => $label, %attrs, sub {$content});
     }
 
     # "option" tag

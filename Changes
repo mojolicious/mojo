@@ -11,6 +11,7 @@
   - Improved Mojo::IOLoop::Server to use address and port for descriptor
     inheritance.
   - Improved list of available commands to be alphabetical. (jberger)
+  - Fixed select_field helper to be nondestructive.
 
 4.67  2014-01-11
   - Added history and max_history_size attributes to Mojo::Log.

@@ -1,5 +1,5 @@
 
-4.68  2014-01-17
+4.68  2014-01-18
   - Removed deprecated http_proxy attribute from Mojo::UserAgent.
   - Removed deprecated https_proxy attribute from Mojo::UserAgent.
   - Removed deprecated name attribute from Mojo::UserAgent.

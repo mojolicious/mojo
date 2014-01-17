@@ -126,6 +126,9 @@ just work without commands.
   $ ./myapp.pl cgi
   ...CGI output...
 
+  $ ./myapp.pl get /
+  Hello World!
+
   $ ./myapp.pl
   ...List of available commands (or automatically detected environment)...
 

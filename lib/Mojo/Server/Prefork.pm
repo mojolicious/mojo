@@ -463,7 +463,8 @@ Full path of process id file, defaults to a random temporary path.
 
 Number of worker processes, defaults to C<4>. A good rule of thumb is two
 worker processes per CPU core for applications that perform mostly
-non-blocking operations, blocking operations often require more.
+non-blocking operations, blocking operations often require more and profit
+from decreasing the number of concurrent L<Mojo::Server::Daemon/"clients">.
 
 =head1 METHODS
 

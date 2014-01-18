@@ -20,24 +20,23 @@ usage: $0 [OPTIONS] [APPLICATION]
 
   morbo script/myapp
   morbo myapp.pl
-  morbo -m production -l https://*:443
+  morbo -m production -l https://*:443 -l http://[::]:3000
   morbo -w /usr/local/lib -w public myapp.pl
 
 These options are available:
   -h, --help                     Show this message.
-  -l, --listen <location>        Set one or more locations you want to listen
-                                 on, defaults to the value of MOJO_LISTEN or
+  -l, --listen <location>        One or more locations you want to listen on,
+                                 defaults to the value of MOJO_LISTEN or
                                  "http://*:3000".
   -m, --mode <name>              Operating mode for your application, defaults
                                  to the value of MOJO_MODE/PLACK_ENV or
                                  "development".
   -v, --verbose                  Print details about what files changed to
                                  STDOUT.
-  -w, --watch <directory/file>   Set one or more directories and files to
-                                 watch for changes, defaults to the
-                                 application script as well as the "lib" and
-                                 "templates" directories in the current
-                                 working directory.
+  -w, --watch <directory/file>   One or more directories and files to watch
+                                 for changes, defaults to the application
+                                 script as well as the "lib" and "templates"
+                                 directories in the current working directory.
 EOF
 
 $ENV{MOJO_LISTEN} = join(',', @listen) if @listen;

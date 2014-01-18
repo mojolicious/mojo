@@ -316,7 +316,9 @@ sub _request_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
 
   # Establish WebSocket connection
+  my $method = uc $tx->req->method;
   if (lc($tx->req->headers->upgrade // '') eq 'websocket') {
+    $method           = 'WebSocket';
     $self->{messages} = [];
     $self->{finished} = undef;
     $self->ua->start(
@@ -330,17 +332,15 @@ sub _request_ok {
       }
     );
     Mojo::IOLoop->start;
-
-    my $desc = encode 'UTF-8', "WebSocket $url";
-    return $self->_test('ok', $self->tx->is_websocket, $desc);
   }
 
   # Perform request
-  $self->tx($self->ua->start($tx));
+  else { $self->tx($self->ua->start($tx)) }
+
   my ($err, $code) = $self->tx->error;
-  Test::More::diag $err if !(my $ok = !$err || $code) && $err;
-  return $self->_test('ok', $ok,
-    encode('UTF-8', "@{[uc $tx->req->method]} $url"));
+  my $ok = $self->tx->is_websocket || !$err || $code;
+  Test::More::diag $err if !$ok && $err;
+  return $self->_test('ok', $ok, encode('UTF-8', "$method $url"));
 }
 
 sub _test {

@@ -433,7 +433,7 @@ TLS verification mode, defaults to C<0x03>.
   my $max = $daemon->max_clients;
   $daemon = $daemon->max_clients(1000);
 
-Maximum number of parallel client connections, defaults to C<1000>.
+Maximum number of concurrent client connections, defaults to C<1000>.
 
 =head2 max_requests
 

@@ -278,10 +278,11 @@ Listen backlog size, defaults to C<SOMAXCONN>.
 
   clients => 100
 
-Maximum number of parallel client connections per worker process, defaults to
-C<1000>. Note that depending on how many blocking operations your application
-may perform, you might want to decrease this value and increase L</"workers">
-instead for better performance.
+Maximum number of concurrent client connections per worker process, defaults
+to C<1000>. Note that high concurrency works best with applications that
+perform mostly non-blocking operations, to optimize for blocking operations
+you can decrease this value and increase L</"workers"> instead for better
+performance.
 
 =head2 graceful_timeout
 
@@ -386,8 +387,8 @@ Username for worker processes.
 
 Number of worker processes, defaults to C<4>. A good rule of thumb is two
 worker processes per CPU core for applications that perform mostly
-non-blocking operations, blocking operations often require more and profit
-from decreasing the number of concurrent L</"clients">.
+non-blocking operations, blocking operations often require more and benefit
+from decreasing the number of concurrent L</"clients"> (often as low as C<1>).
 
 =head1 METHODS
 

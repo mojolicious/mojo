@@ -361,7 +361,7 @@ randomly to improve load balancing between multiple server processes.
   my $max = $loop->max_connections;
   $loop   = $loop->max_connections(1000);
 
-The maximum number of parallel connections this event loop is allowed to
+The maximum number of concurrent connections this event loop is allowed to
 handle before stopping to accept new incoming connections, defaults to
 C<1000>. Setting the value to C<0> will make this event loop stop accepting
 new connections and allow it to shut down gracefully without interrupting

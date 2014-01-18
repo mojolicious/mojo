@@ -985,7 +985,7 @@ the entire previous chunk has actually been written.
 L<Mojo::UserAgent> has been designed from the ground up to be non-blocking,
 the whole blocking API is just a simple convenience wrapper. Especially for
 high latency tasks like web crawling this can be extremely useful, because you
-can keep many parallel connections active at the same time.
+can keep many concurrent connections active at the same time.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;

@@ -87,7 +87,7 @@ sub content_type_unlike {
     $regex, $desc);
 }
 
-sub delete_ok { shift->_request_ok(delete => @_) }
+sub delete_ok { shift->_build_ok(DELETE => @_) }
 
 sub element_exists {
   my ($self, $selector, $desc) = @_;
@@ -116,8 +116,8 @@ sub finished_ok {
   return $self->_test('ok', $ok, "WebSocket closed with status $code");
 }
 
-sub get_ok  { shift->_request_ok(get  => @_) }
-sub head_ok { shift->_request_ok(head => @_) }
+sub get_ok  { shift->_build_ok(GET  => @_) }
+sub head_ok { shift->_build_ok(HEAD => @_) }
 
 sub header_is {
   my ($self, $name, $value, $desc) = @_;
@@ -211,7 +211,7 @@ sub message_unlike {
   return $self->_message('unlike', $regex, $desc || 'message is not similar');
 }
 
-sub options_ok { shift->_request_ok(options => @_) }
+sub options_ok { shift->_build_ok(OPTIONS => @_) }
 
 sub or {
   my ($self, $cb) = @_;
@@ -219,15 +219,11 @@ sub or {
   return $self;
 }
 
-sub patch_ok { shift->_request_ok(patch => @_) }
-sub post_ok  { shift->_request_ok(post  => @_) }
-sub put_ok   { shift->_request_ok(put   => @_) }
+sub patch_ok { shift->_build_ok(PATCH => @_) }
+sub post_ok  { shift->_build_ok(POST  => @_) }
+sub put_ok   { shift->_build_ok(PUT   => @_) }
 
-sub request_ok {
-  my $self = shift;
-  my $tx   = $self->tx($self->ua->start(shift))->tx;
-  return $self->_test('ok', $tx->is_finished, shift || 'perform request');
-}
+sub request_ok { shift->_request_ok(@_) }
 
 sub reset_session {
   my $self = shift;
@@ -280,25 +276,14 @@ sub text_unlike {
 }
 
 sub websocket_ok {
-  my ($self, $url) = (shift, shift);
+  my $self = shift;
+  return $self->_request_ok($self->ua->build_websocket_tx(@_));
+}
 
-  # Establish WebSocket connection
-  $self->{messages} = [];
-  $self->{finished} = undef;
-  $self->ua->websocket(
-    $url => @_ => sub {
-      my ($ua, $tx) = @_;
-      $self->tx($tx);
-      $tx->on(finish => sub { shift; $self->{finished} = [@_] });
-      $tx->on(binary => sub { push @{$self->{messages}}, [binary => pop] });
-      $tx->on(text   => sub { push @{$self->{messages}}, [text   => pop] });
-      Mojo::IOLoop->stop;
-    }
-  );
-  Mojo::IOLoop->start;
-
-  my $desc = encode 'UTF-8', "WebSocket $url";
-  return $self->_test('ok', $self->tx->is_websocket, $desc);
+sub _build_ok {
+  my $self = shift;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  return $self->_request_ok($self->ua->build_tx(@_));
 }
 
 sub _json {
@@ -326,14 +311,36 @@ sub _message {
 }
 
 sub _request_ok {
-  my ($self, $method, $url) = (shift, shift, shift);
+  my ($self, $tx) = @_;
+
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+  # Establish WebSocket connection
+  if (lc($tx->req->headers->upgrade // '') eq 'websocket') {
+    $self->{messages} = [];
+    $self->{finished} = undef;
+    $self->ua->start(
+      $tx => sub {
+        my ($ua, $tx) = @_;
+        $self->tx($tx);
+        $tx->on(finish => sub { shift; $self->{finished} = [@_] });
+        $tx->on(binary => sub { push @{$self->{messages}}, [binary => pop] });
+        $tx->on(text   => sub { push @{$self->{messages}}, [text   => pop] });
+        Mojo::IOLoop->stop;
+      }
+    );
+    Mojo::IOLoop->start;
+
+    my $desc = encode 'UTF-8', "WebSocket @{[$tx->req->url]}";
+    return $self->_test('ok', $self->tx->is_websocket, $desc);
+  }
 
   # Perform request against application
-  $self->tx($self->ua->$method($url, @_));
-  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  $self->tx($self->ua->start($tx));
   my ($err, $code) = $self->tx->error;
   Test::More::diag $err if !(my $ok = !$err || $code) && $err;
-  return $self->_test('ok', $ok, encode('UTF-8', "@{[uc $method]} $url"));
+  return $self->_test('ok', $ok,
+    encode('UTF-8', "@{[uc $tx->req->method]} @{[$tx->req->url]}"));
 }
 
 sub _test {
@@ -820,6 +827,11 @@ Perform request and check for transport errors.
   # Request with custom method
   my $tx = $t->ua->build_tx(FOO => '/test.json' => json => {foo => 1});
   $t->request_ok($tx)->status_is(200)->json_is({success => 1});
+
+  # WebSocket handshake without extensions
+  my $tx = $t->ua->build_websocket_tx('/foo');
+  $tx->req->headers->remove('Sec-WebSocket-Extensions');
+  $t->request_ok($tx)->message_ok->message_is('bar')->finish_ok;
 
 =head2 reset_session
 

@@ -151,7 +151,9 @@ $t->websocket_ok('/echo')->send_ok(0)->message_ok->message_is('echo: 0')
   ->finished_ok(1000);
 
 # 64bit binary message (extended limit and no compression)
-$t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'nothing'});
+my $tx = $t->ua->build_websocket_tx('/echo');
+$tx->req->headers->remove('Sec-WebSocket-Extensions');
+$t->request_ok($tx);
 is $t->tx->max_websocket_size, 262144, 'right size';
 $t->tx->max_websocket_size(262145);
 $t->send_ok({binary => 'a' x 262145})
@@ -159,8 +161,9 @@ $t->send_ok({binary => 'a' x 262145})
   ->finish_ok->finished_ok(1005);
 
 # 64bit binary message (too large and no compression)
-$t->websocket_ok('/echo' => {'Sec-WebSocket-Extensions' => 'nothing'})
-  ->send_ok({binary => 'b' x 262145})->finished_ok(1009);
+$tx = $t->ua->build_websocket_tx('/echo');
+$tx->req->headers->remove('Sec-WebSocket-Extensions');
+$t->request_ok($tx)->send_ok({binary => 'b' x 262145})->finished_ok(1009);
 
 # Compressed message ("permessage-deflate")
 $t->websocket_ok('/echo');
@@ -249,7 +252,9 @@ $t->send_ok({binary => 'a' x 500})
 
 # Binary frame and events (no compression)
 my $bytes = b("I ♥ Mojolicious")->encode('UTF-16LE')->to_string;
-$t->websocket_ok('/bytes' => {'Sec-WebSocket-Extensions' => 'nothing'})
+$tx = $t->ua->build_websocket_tx('/bytes');
+$tx->req->headers->remove('Sec-WebSocket-Extensions');
+$t->request_ok($tx)
   ->header_isnt('Sec-WebSocket-Extensions' => 'permessage-deflate');
 ok !$t->tx->compressed, 'WebSocket has no compression';
 my $binary;
@@ -270,9 +275,11 @@ $t->finish_ok(1000 => 'Have a nice day!');
 is_deeply $close, [1000, 'Have a nice day!'], 'right status and message';
 
 # Binary roundtrips (no compression)
-$t->websocket_ok('/bytes' => {'Sec-WebSocket-Extensions' => 'nothing'})
-  ->send_ok({binary => $bytes})->message_ok->message_is($bytes)
-  ->send_ok({binary => $bytes})->message_ok->message_is($bytes)->finish_ok;
+$tx = $t->ua->build_websocket_tx('/bytes');
+$tx->req->headers->remove('Sec-WebSocket-Extensions');
+$t->request_ok($tx)->send_ok({binary => $bytes})
+  ->message_ok->message_is($bytes)->send_ok({binary => $bytes})
+  ->message_ok->message_is($bytes)->finish_ok;
 
 # Two responses
 $t->websocket_ok('/once')->send_ok('hello')

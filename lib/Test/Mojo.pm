@@ -335,7 +335,7 @@ sub _request_ok {
     return $self->_test('ok', $self->tx->is_websocket, $desc);
   }
 
-  # Perform request against application
+  # Perform request
   $self->tx($self->ua->start($tx));
   my ($err, $code) = $self->tx->error;
   Test::More::diag $err if !(my $ok = !$err || $code) && $err;

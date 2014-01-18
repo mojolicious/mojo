@@ -56,8 +56,8 @@ $t->request_ok($tx)->status_is(200)->content_type_is('application/json')
 # Array with "json" format
 $tx = $t->ua->build_tx(
   PUT => '/json/echo' => {Accept => 'application/json'} => json => [1, 2, 3]);
-$t->request_ok($tx, 'request succesful')->status_is(200)
-  ->content_type_is('application/json')->json_is([1, 2, 3]);
+$t->request_ok($tx)->status_is(200)->content_type_is('application/json')
+  ->json_is([1, 2, 3]);
 
 # Nothing
 $t->get_ok('/rest')->status_is(200)

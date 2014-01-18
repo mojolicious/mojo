@@ -223,7 +223,7 @@ sub patch_ok { shift->_build_ok(PATCH => @_) }
 sub post_ok  { shift->_build_ok(POST  => @_) }
 sub put_ok   { shift->_build_ok(PUT   => @_) }
 
-sub request_ok { shift->_request_ok(@_) }
+sub request_ok { shift->_request_ok($_[0], $_[0]->req->url->to_string) }
 
 sub reset_session {
   my $self = shift;
@@ -277,13 +277,13 @@ sub text_unlike {
 
 sub websocket_ok {
   my $self = shift;
-  return $self->_request_ok($self->ua->build_websocket_tx(@_));
+  return $self->_request_ok($self->ua->build_websocket_tx(@_), $_[0]);
 }
 
 sub _build_ok {
-  my $self = shift;
+  my ($self, $method, $url) = (shift, shift, shift);
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  return $self->_request_ok($self->ua->build_tx(@_));
+  return $self->_request_ok($self->ua->build_tx($method, $url, @_), $url);
 }
 
 sub _json {
@@ -311,7 +311,7 @@ sub _message {
 }
 
 sub _request_ok {
-  my ($self, $tx) = @_;
+  my ($self, $tx, $url) = @_;
 
   local $Test::Builder::Level = $Test::Builder::Level + 1;
 
@@ -331,7 +331,7 @@ sub _request_ok {
     );
     Mojo::IOLoop->start;
 
-    my $desc = encode 'UTF-8', "WebSocket @{[$tx->req->url]}";
+    my $desc = encode 'UTF-8', "WebSocket $url";
     return $self->_test('ok', $self->tx->is_websocket, $desc);
   }
 
@@ -340,7 +340,7 @@ sub _request_ok {
   my ($err, $code) = $self->tx->error;
   Test::More::diag $err if !(my $ok = !$err || $code) && $err;
   return $self->_test('ok', $ok,
-    encode('UTF-8', "@{[uc $tx->req->method]} @{[$tx->req->url]}"));
+    encode('UTF-8', "@{[uc $tx->req->method]} $url"));
 }
 
 sub _test {
@@ -820,7 +820,6 @@ arguments as L<Mojo::UserAgent/"put">, except for the callback.
 =head2 request_ok
 
   $t = $t->request_ok(Mojo::Transaction::HTTP->new);
-  $t = $t->request_ok(Mojo::Transaction::HTTP->new, 'request successful');
 
 Perform request and check for transport errors.
 

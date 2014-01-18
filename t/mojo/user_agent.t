@@ -46,6 +46,8 @@ post '/echo' => sub {
   $self->render(data => $self->req->body);
 };
 
+any '/method' => {inline => '<%= $self->req->method =%>'};
+
 # Max redirects
 {
   local $ENV{MOJO_MAX_REDIRECTS} = 25;
@@ -150,6 +152,15 @@ $tx = $ua->get('/');
 ok $tx->success, 'successful';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
+
+# Shortcuts for common request methods
+is $ua->delete('/method')->res->body,  'DELETE',  'right content';
+is $ua->get('/method')->res->body,     'GET',     'right content';
+is $ua->head('/method')->res->body,    '',        'no content';
+is $ua->options('/method')->res->body, 'OPTIONS', 'right method';
+is $ua->patch('/method')->res->body,   'PATCH',   'right method';
+is $ua->post('/method')->res->body,    'POST',    'right method';
+is $ua->put('/method')->res->body,     'PUT',     'right method';
 
 # Events
 my ($finished_req, $finished_tx, $finished_res);

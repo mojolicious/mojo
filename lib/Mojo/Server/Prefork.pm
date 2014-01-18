@@ -462,7 +462,8 @@ Full path of process id file, defaults to a random temporary path.
   $prefork    = $prefork->workers(10);
 
 Number of worker processes, defaults to C<4>. A good rule of thumb is two
-worker processes per CPU core.
+worker processes per CPU core for applications that perform mostly
+non-blocking operations, blocking operations often require more.
 
 =head1 METHODS
 

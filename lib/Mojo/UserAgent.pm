@@ -407,14 +407,14 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Extract data from HTML and XML resources
   say $ua->get('www.perl.org')->res->dom->html->head->title->text;
 
-  # Scrape the latest headlines from a news site
+  # Scrape the latest headlines from a news site with CSS selectors
   say $ua->get('perlnews.org')->res->dom('h2 > a')->text->shuffle;
 
   # IPv6 PUT request with content
   my $tx
     = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hello!');
 
-  # Grab the latest Mojolicious release :)
+  # Follow redirects to grab the latest Mojolicious release :)
   $ua->max_redirects(5)->get('latest.mojolicio.us')
     ->res->content->asset->move_to('/Users/sri/mojo.tar.gz');
 

@@ -20,7 +20,7 @@ usage: $0 [OPTIONS] [APPLICATION]
 
   morbo script/myapp
   morbo myapp.pl
-  morbo -m production -l https://*:443 -l http://[::]:3000
+  morbo -m production -l https://*:443 -l http://[::]:3000 myapp.pl
   morbo -w /usr/local/lib -w public myapp.pl
 
 These options are available:
@@ -39,7 +39,7 @@ These options are available:
                                  directories in the current working directory.
 EOF
 
-$ENV{MOJO_LISTEN} = join(',', @listen) if @listen;
+$ENV{MOJO_LISTEN} = join ',', @listen if @listen;
 require Mojo::Server::Morbo;
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->watch(\@watch) if @watch;

@@ -127,7 +127,7 @@ sub parse {
           if (!$xml && $VOID{$start}) || $attr =~ m!/\s*$!;
 
         # Relaxed "script" or "style" HTML elements
-        next unless !$xml && ($start eq 'script' || $start eq 'style');
+        next if $xml || ($start ne 'script' && $start ne 'style');
         next unless $html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi;
         push @$current, ['raw', $1];
         _end($start, 0, \$current);

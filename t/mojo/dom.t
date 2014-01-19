@@ -1789,17 +1789,20 @@ is $dom->at('div:root')->text, 'Test', 'right text';
 ok !!Mojo::DOM->new->xml(1)->parse('<foo />')->xml, 'XML mode active';
 $dom = Mojo::DOM->new->parse(<<'EOF');
 <?xml version='1.0' encoding='UTF-8'?>
-<table>
-  <td>
-    <tr><thead>foo<thead></tr>
-  </td>
-  <td>
-    <tr><thead>bar<thead></tr>
-  </td>
-</table>
+<script>
+  <table>
+    <td>
+      <tr><thead>foo<thead></tr>
+    </td>
+    <td>
+      <tr><thead>bar<thead></tr>
+    </td>
+  </table>
+</script>
 EOF
 is $dom->find('table > td > tr > thead')->[0]->text, 'foo', 'right text';
-is $dom->find('table > td > tr > thead')->[1]->text, 'bar', 'right text';
+is $dom->find('script > table > td > tr > thead')->[1]->text, 'bar',
+  'right text';
 is $dom->find('table > td > tr > thead')->[2], undef, 'no result';
 is $dom->find('table > td > tr > thead')->size, 2, 'right number of elements';
 

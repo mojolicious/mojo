@@ -159,10 +159,11 @@ is $dom->contents->first->value, ' before', 'right value';
 is $dom->contents->[2]->node,  'pi',    'right node';
 is $dom->contents->[2]->value, 'after', 'right value';
 is $dom->contents->first->value(' again')->value, ' again', 'right value';
-is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p><?after?>',
+is $dom->contents->grep(sub { $_->node eq 'pi' })->remove->first->node,
+  'root', 'right node';
+is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>',
   'right result';
 $dom = Mojo::DOM->new('<script>la<la>la</script>');
-is $dom->node, 'root', 'right node';
 is $dom->at('script')->node, 'tag', 'right node';
 is $dom->at('script')->contents->first->node,  'raw',      'right node';
 is $dom->at('script')->contents->first->value, 'la<la>la', 'right value';

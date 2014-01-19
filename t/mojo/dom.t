@@ -142,6 +142,32 @@ is_deeply [$dom->at('simple')->ancestors->type->each], ['foo'],
   'right results';
 ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 
+# Nodes
+$dom = Mojo::DOM->new(
+  '<!DOCTYPE before><p>test<![CDATA[123]]><!-- 456 --></p><?after?>');
+is $dom->contents->[1]->contents->first->parent->type, 'p', 'right type';
+is $dom->contents->[1]->contents->first->value, 'test', 'right value';
+is $dom->contents->[1]->contents->first, 'test', 'right value';
+is $dom->at('p')->contents->first->node, 'text', 'right node';
+is $dom->at('p')->contents->first->remove->type, 'p', 'right type';
+is $dom->at('p')->contents->first->node,  'cdata', 'right node';
+is $dom->at('p')->contents->first->value, '123',   'right value';
+is $dom->at('p')->contents->[1]->node,  'comment', 'right node';
+is $dom->at('p')->contents->[1]->value, ' 456 ',   'right value';
+is $dom->contents->first->node,  'doctype', 'right node';
+is $dom->contents->first->value, ' before', 'right value';
+is $dom->contents->[2]->node,  'pi',    'right node';
+is $dom->contents->[2]->value, 'after', 'right value';
+is $dom->contents->first->value(' again')->value, ' again', 'right value';
+is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p><?after?>',
+  'right result';
+$dom = Mojo::DOM->new('<script>la<la>la</script>');
+is $dom->node, 'root', 'right node';
+is $dom->at('script')->node, 'tag', 'right node';
+is $dom->at('script')->contents->first->node,  'raw',      'right node';
+is $dom->at('script')->contents->first->value, 'la<la>la', 'right value';
+is "$dom", '<script>la<la>la</script>', 'right result';
+
 # Class and ID
 $dom = Mojo::DOM->new->parse('<div id="id" class="class">a</div>');
 is $dom->at('div#id.class')->text, 'a', 'right text';

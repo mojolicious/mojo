@@ -53,7 +53,7 @@ sub append_content {
 sub at {
   my $self = shift;
   return undef unless my $result = $self->_css->select_one(@_);
-  return $self->new->tree($result)->xml($self->xml);
+  return _tag($self, $result, $self->xml);
 }
 
 sub attr {
@@ -120,7 +120,7 @@ sub node { shift->tree->[0] }
 sub parent {
   my $self = shift;
   return undef if (my $tree = $self->tree)->[0] eq 'root';
-  return $self->new->tree($tree->[3])->xml($self->xml);
+  return _tag($self, $tree->[3], $self->xml);
 }
 
 sub parse { shift->_delegate(parse => shift) }
@@ -155,7 +155,7 @@ sub replace_content {
 sub root {
   my $self = shift;
   return $self unless my $tree = _ancestors($self->tree, 1);
-  return $self->new->tree($tree)->xml($self->xml);
+  return _tag($self, $tree, $self->xml);
 }
 
 sub siblings { _select(Mojo::Collection->new(@{_siblings($_[0], 1)}), $_[1]) }
@@ -236,15 +236,9 @@ sub _ancestors {
 
 sub _collect {
   my $self = shift;
-
-  my $xml = $self->xml;
-  return Mojo::Collection->new(@_)->map(
-    sub {
-      $_->[0] eq 'tag'
-        ? $self->new->tree($_)->xml($xml)
-        : Mojo::DOM::Node->new(parent => $self, tree => $_);
-    }
-  );
+  my $xml  = $self->xml;
+  return Mojo::Collection->new(@_)
+    ->map(sub { $_->[0] eq 'tag' ? _tag($self, $_, $xml) : _node($self, $_) });
 }
 
 sub _content {
@@ -275,6 +269,8 @@ sub _link {
 
   return @new;
 }
+
+sub _node { Mojo::DOM::Node->new(parent => $_[0], tree => $_[1]) }
 
 sub _nodes {
   return unless my $tree = shift;
@@ -320,6 +316,8 @@ sub _siblings {
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }
+
+sub _tag { $_[0]->new->tree($_[1])->xml($_[2]) }
 
 sub _text {
   my ($nodes, $recurse, $trim) = @_;

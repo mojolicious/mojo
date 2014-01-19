@@ -146,27 +146,28 @@ ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 $dom = Mojo::DOM->new(
   '<!DOCTYPE before><p>test<![CDATA[123]]><!-- 456 --></p><?after?>');
 is $dom->contents->[1]->contents->first->parent->type, 'p', 'right type';
-is $dom->contents->[1]->contents->first->value, 'test', 'right value';
-is $dom->contents->[1]->contents->first, 'test', 'right value';
+is $dom->contents->[1]->contents->first->content, 'test', 'right content';
+is $dom->contents->[1]->contents->first, 'test', 'right content';
 is $dom->at('p')->contents->first->node, 'text', 'right node';
 is $dom->at('p')->contents->first->remove->type, 'p', 'right type';
-is $dom->at('p')->contents->first->node,  'cdata', 'right node';
-is $dom->at('p')->contents->first->value, '123',   'right value';
-is $dom->at('p')->contents->[1]->node,  'comment', 'right node';
-is $dom->at('p')->contents->[1]->value, ' 456 ',   'right value';
-is $dom->contents->first->node,  'doctype', 'right node';
-is $dom->contents->first->value, ' before', 'right value';
-is $dom->contents->[2]->node,  'pi',    'right node';
-is $dom->contents->[2]->value, 'after', 'right value';
-is $dom->contents->first->value(' again')->value, ' again', 'right value';
+is $dom->at('p')->contents->first->node,    'cdata', 'right node';
+is $dom->at('p')->contents->first->content, '123',   'right content';
+is $dom->at('p')->contents->[1]->node,    'comment', 'right node';
+is $dom->at('p')->contents->[1]->content, ' 456 ',   'right content';
+is $dom->contents->first->node,    'doctype', 'right node';
+is $dom->contents->first->content, ' before', 'right content';
+is $dom->contents->[2]->node,    'pi',    'right node';
+is $dom->contents->[2]->content, 'after', 'right content';
+is $dom->contents->first->content(' again')->content, ' again',
+  'right content';
 is $dom->contents->grep(sub { $_->node eq 'pi' })->remove->first->node,
   'root', 'right node';
 is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>',
   'right result';
 $dom = Mojo::DOM->new('<script>la<la>la</script>');
 is $dom->at('script')->node, 'tag', 'right node';
-is $dom->at('script')->contents->first->node,  'raw',      'right node';
-is $dom->at('script')->contents->first->value, 'la<la>la', 'right value';
+is $dom->at('script')->contents->first->node,    'raw',      'right node';
+is $dom->at('script')->contents->first->content, 'la<la>la', 'right content';
 is "$dom", '<script>la<la>la</script>', 'right result';
 
 # Class and ID

@@ -1,8 +1,15 @@
 package Mojo::DOM::Node;
 use Mojo::Base -base;
-use overload bool => sub {1}, '""' => sub { shift->value }, fallback => 1;
+use overload bool => sub {1}, '""' => sub { shift->content }, fallback => 1;
 
 has [qw(parent tree)];
+
+sub content {
+  my $self = shift;
+  return $self->tree->[1] unless @_;
+  $self->tree->[1] = shift;
+  return $self;
+}
 
 sub node { shift->tree->[0] }
 
@@ -18,13 +25,6 @@ sub remove {
   return $parent;
 }
 
-sub value {
-  my $self = shift;
-  return $self->tree->[1] unless @_;
-  $self->tree->[1] = shift;
-  return $self;
-}
-
 1;
 
 =encoding utf8
@@ -38,7 +38,7 @@ Mojo::DOM::Node - DOM Node
   use Mojo::DOM::Node;
 
   my $node = Mojo::DOM::Node->new(parent => $parent, tree => $tree);
-  say $node->value;
+  say $node->content;
 
 =head1 DESCRIPTION
 
@@ -68,6 +68,14 @@ carefully since it is very dynamic.
 L<Mojo::DOM::Node> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
+=head2 content
+
+  my $content = $node->content;
+  $node       = $node->content('foo');
+  my $content = "$node";
+
+Node content.
+
 =head2 node
 
   my $type = $node->node;
@@ -79,14 +87,6 @@ Node type, usually C<cdata>, C<comment>, C<doctype>, C<pi>, C<raw> or C<text>.
   my $parent = $node->remove;
 
 Remove node and return L<Mojo::DOM> object for parent of node.
-
-=head2 value
-
-  my $value = $node->value;
-  $node     = $node->value('foo');
-  my $value = "$node";
-
-Node value.
 
 =head1 SEE ALSO
 

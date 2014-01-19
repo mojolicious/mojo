@@ -1,5 +1,5 @@
 
-4.68  2014-01-19
+4.68  2014-01-20
   - Added Mojo::DOM::Node.
   - Added contents and node methods to Mojo::DOM.
   - Removed deprecated http_proxy attribute from Mojo::UserAgent.

@@ -53,7 +53,7 @@ L<Mojo::DOM::Node> implements the following attributes.
   my $parent = $node->parent;
   $node      = $node->parent(Mojo::DOM->new);
 
-Return L<Mojo::DOM> object for parent of this node.
+L<Mojo::DOM> object for parent of this node.
 
 =head2 tree
 

@@ -225,10 +225,8 @@ sub _render {
   return '<?' . $tree->[1] . '?>' if $type eq 'pi';
 
   # Start tag
-  my $start   = 1;
   my $content = '';
   if ($type eq 'tag') {
-    $start = 4;
 
     # Open tag
     my $tag = $tree->[1];
@@ -237,10 +235,9 @@ sub _render {
     # Attributes
     my @attrs;
     for my $key (sort keys %{$tree->[2]}) {
-      my $value = $tree->[2]{$key};
 
       # No value
-      push @attrs, $key and next unless defined $value;
+      push @attrs, $key and next unless defined(my $value = $tree->[2]{$key});
 
       # Key and value
       push @attrs, qq{$key="} . xml_escape($value) . '"';
@@ -256,7 +253,8 @@ sub _render {
   }
 
   # Render whole tree
-  $content .= _render($tree->[$_], $xml) for $start .. $#$tree;
+  $content .= _render($tree->[$_], $xml)
+    for ($type eq 'root' ? 1 : 4) .. $#$tree;
 
   # End tag
   $content .= '</' . $tree->[1] . '>' if $type eq 'tag';

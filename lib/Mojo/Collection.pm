@@ -89,9 +89,8 @@ sub sort {
 sub tap { shift->Mojo::Base::tap(@_) }
 
 sub uniq {
-  my $self = shift;
   my %seen;
-  return $self->grep(sub { !$seen{$_}++ });
+  return shift->grep(sub { !$seen{$_}++ });
 }
 
 sub _flatten {

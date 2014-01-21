@@ -356,9 +356,9 @@ there is already a stash value of the same name present.
   $r->route('/:mymessage')
     ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
 
-  # /test123    -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
-  # /testbye123 -> {controller => 'foo', action => 'bar', mymessage => 'bye'}
-  $r->route('/test(:mymessage)123')
+  # /test/123     -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
+  # /test/bye/123 -> {controller => 'foo', action => 'bar', mymessage => 'bye'}
+  $r->route('/test/:mymessage/123')
     ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
 
 This is also the case if multiple placeholders are right after another and not

@@ -112,8 +112,9 @@ sub _compile {
 
     # Slash
     if ($op eq 'slash') {
-      $regex = ($optional ? "(?:/$block)?" : "/$block") . $regex;
-      $block = '';
+      $regex    = ($optional ? "(?:/$block)?" : "/$block") . $regex;
+      $optional = 1;
+      $block    = '';
       next;
     }
 

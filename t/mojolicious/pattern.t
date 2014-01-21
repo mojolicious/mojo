@@ -27,6 +27,13 @@ is $pattern->render({name => 'bar'}), '/testbar123', 'right result';
 $pattern->defaults({name => ''});
 is_deeply $pattern->match('/test123', 1), {name => ''}, 'right structure';
 is $pattern->render, '/test123', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('/test/:name/123');
+$pattern->defaults({name => 'foo'});
+is_deeply $pattern->match('/test/123', 1), {name => 'foo'}, 'right structure';
+is_deeply $pattern->match('/test/bar/123', 1), {name => 'bar'},
+  'right structure';
+is $pattern->render, '/test/foo/123', 'right result';
+is $pattern->render({name => 'bar'}), '/test/bar/123', 'right result';
 
 # Root
 $pattern = Mojolicious::Routes::Pattern->new('/');

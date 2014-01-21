@@ -60,8 +60,8 @@ get '/alternatives/:char' => [char => [qw(☃ ♥)]] => sub {
   $self->render(text => $self->url_for);
 };
 
-get '/an(:optional)placeholder' =>
-  {optional => 'none', inline => '<%= $optional %>-<%= url_for =%>'};
+get '/optional/:middle/placeholder' =>
+  {middle => 'none', inline => '<%= $middle %>-<%= url_for =%>'};
 
 get '/alterformat' => [format => ['json']] => {format => 'json'} => sub {
   my $self = shift;
@@ -523,14 +523,14 @@ $t->get_ok('/alternatives/test')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is("Oops!\n");
 
 # Optional placeholder in the middle
-$t->get_ok('/anoptionalplaceholder')->status_is(200)
+$t->get_ok('/optional/test/placeholder')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('optional-/anoptionalplaceholder');
+  ->content_is('test-/optional/test/placeholder');
 
 # Optional placeholder in the middle without value
-$t->get_ok('/anplaceholder')->status_is(200)
+$t->get_ok('/optional/placeholder')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is('none-/annoneplaceholder');
+  ->content_is('none-/optional/none/placeholder');
 
 # No format
 $t->get_ok('/alterformat')->status_is(200)

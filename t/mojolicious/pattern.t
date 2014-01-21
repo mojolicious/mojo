@@ -32,6 +32,7 @@ $pattern->defaults({name => 'foo'});
 is_deeply $pattern->match('/test/123', 1), {name => 'foo'}, 'right structure';
 is_deeply $pattern->match('/test/bar/123', 1), {name => 'bar'},
   'right structure';
+ok !$pattern->match('/test'), 'no result';
 is $pattern->render, '/test/foo/123', 'right result';
 is $pattern->render({name => 'bar'}), '/test/bar/123', 'right result';
 

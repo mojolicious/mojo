@@ -97,7 +97,7 @@ Mojo::Server::PSGI - PSGI server
 
 =head1 DESCRIPTION
 
-L<Mojo::Server::PSGI> allows L<Mojo> applications to run on all PSGI
+L<Mojo::Server::PSGI> allows L<Mojolicious> applications to run on all L<PSGI>
 compatible servers.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.

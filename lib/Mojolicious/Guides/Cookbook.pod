@@ -37,8 +37,8 @@ a development certificate for testing purposes is built right in, so it just
 works, but you can specify all listen locations supported by
 L<Mojo::Server::Daemon/"listen">.
 
-  $ ./script/myapp daemon -l https://*:3000
-  Server available at https://127.0.0.1:3000.
+  $ ./script/myapp daemon -l https://[::]:3000
+  Server available at https://[::]:3000.
 
 On UNIX platforms you can also add preforking with L<Mojo::Server::Prefork>.
 

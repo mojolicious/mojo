@@ -100,7 +100,7 @@ Mojo::Server::PSGI - PSGI server
 L<Mojo::Server::PSGI> allows L<Mojo> applications to run on all PSGI
 compatible servers.
 
-See L<Mojolicious::Guides::Cookbook> for more.
+See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
 =head1 EVENTS
 

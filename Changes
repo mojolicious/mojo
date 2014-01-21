@@ -1,5 +1,5 @@
 
-4.68  2014-01-21
+4.68  2014-01-22
   - Added Mojo::DOM::Node.
   - Added contents and node methods to Mojo::DOM.
   - Removed deprecated http_proxy attribute from Mojo::UserAgent.
@@ -12,6 +12,8 @@
   - Removed deprecated need_proxy method from Mojo::UserAgent.
   - Improved router to allow placeholders anywhere in a pattern to become
     optional.
+      "get '/foo/:bar/baz' => {bar => 'bar'};" now matches "/foo/baz"
+      "get '/foo(:bar)baz' => {bar => 'bar'};" now matches "/foobaz"
   - Improved request_ok method in Test::Mojo to handle WebSocket handshakes.
   - Improved Mojo::IOLoop::Server to use address and port for descriptor
     inheritance.
@@ -1716,7 +1718,7 @@
     Mojolicious::Controller::on.
   - Removed Mojolicious::Controller::on_message, you can now use
     Mojolicious::Controller::on instead.
-      $c->on(message => sub {...})
+      $c->on(message => sub {...});
   - Added EXPERIMENTAL message event to Mojo::Log.
 
 2.14  2011-10-29
@@ -3131,9 +3133,9 @@
     Handler can no longer be detected, that means "default_handler" or the
     "handler" argument are required. The template argument can no longer
     contain format or handler.
-      $self->render(template => 'foo.html.epl')
+      $self->render(template => 'foo.html.epl');
     becomes
-      $self->render('foo', format => 'html', handler => 'epl')
+      $self->render('foo', format => 'html', handler => 'epl');
     The following forms are available now.
       $self->render;
       $self->render(controller => 'foo', action => 'bar');

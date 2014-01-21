@@ -22,6 +22,7 @@ $pattern->defaults({name => 'foo'});
 is_deeply $pattern->match('/test123', 1), {name => 'foo'}, 'right structure';
 is_deeply $pattern->match('/testbar123', 1), {name => 'bar'},
   'right structure';
+ok !$pattern->match('/test/123'), 'no result';
 is $pattern->render, '/testfoo123', 'right result';
 is $pattern->render({name => 'bar'}), '/testbar123', 'right result';
 $pattern->defaults({name => ''});
@@ -35,6 +36,22 @@ is_deeply $pattern->match('/test/bar/123', 1), {name => 'bar'},
 ok !$pattern->match('/test'), 'no result';
 is $pattern->render, '/test/foo/123', 'right result';
 is $pattern->render({name => 'bar'}), '/test/bar/123', 'right result';
+
+# Multiple optional placeholders in the middle
+$pattern = Mojolicious::Routes::Pattern->new('/test/:a/123/:b/456');
+$pattern->defaults({a => 'a', b => 'b'});
+is_deeply $pattern->match('/test/123/456', 1), {a => 'a', b => 'b'},
+  'right structure';
+is_deeply $pattern->match('/test/c/123/456', 1), {a => 'c', b => 'b'},
+  'right structure';
+is_deeply $pattern->match('/test/123/c/456', 1), {a => 'a', b => 'c'},
+  'right structure';
+is_deeply $pattern->match('/test/c/123/d/456', 1), {a => 'c', b => 'd'},
+  'right structure';
+is $pattern->render, '/test/a/123/b/456', 'right result';
+is $pattern->render({a => 'c'}), '/test/c/123/b/456', 'right result';
+is $pattern->render({b => 'c'}), '/test/a/123/c/456', 'right result';
+is $pattern->render({a => 'c', b => 'd'}), '/test/c/123/d/456', 'right result';
 
 # Root
 $pattern = Mojolicious::Routes::Pattern->new('/');

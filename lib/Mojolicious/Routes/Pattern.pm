@@ -102,51 +102,52 @@ sub render {
 sub _compile {
   my $self = shift;
 
+  my $placeholders = $self->placeholders;
+  my $constraints  = $self->constraints;
+  my $defaults     = $self->defaults;
+
   my $block = my $regex = '';
-  my $optional    = 1;
-  my $constraints = $self->constraints;
-  my $defaults    = $self->defaults;
+  my $optional = 1;
   for my $token (reverse @{$self->tree}) {
     my $op       = $token->[0];
-    my $compiled = '';
+    my $fragment = '';
 
     # Slash
     if ($op eq 'slash') {
       $regex    = ($optional ? "(?:/$block)?" : "/$block") . $regex;
-      $optional = 1;
       $block    = '';
+      $optional = 1;
       next;
     }
 
     # Text
     elsif ($op eq 'text') {
-      $compiled = quotemeta $token->[1];
+      $fragment = quotemeta $token->[1];
       $optional = 0;
     }
 
     # Placeholder
     elsif ($op eq 'placeholder' || $op eq 'relaxed' || $op eq 'wildcard') {
-      my $name = $token->[1];
-      unshift @{$self->placeholders}, $name;
+      unshift @$placeholders, my $name = $token->[1];
 
       # Placeholder
-      if ($op eq 'placeholder') { $compiled = '([^\/\.]+)' }
+      if ($op eq 'placeholder') { $fragment = '([^\/\.]+)' }
 
       # Relaxed
-      elsif ($op eq 'relaxed') { $compiled = '([^\/]+)' }
+      elsif ($op eq 'relaxed') { $fragment = '([^\/]+)' }
 
       # Wildcard
-      elsif ($op eq 'wildcard') { $compiled = '(.+)' }
+      elsif ($op eq 'wildcard') { $fragment = '(.+)' }
 
       # Custom regex
       my $constraint = $constraints->{$name};
-      $compiled = _compile_req($constraint) if $constraint;
+      $fragment = _compile_req($constraint) if $constraint;
 
       # Optional placeholder
-      exists $defaults->{$name} ? ($compiled .= '?') : ($optional = 0);
+      exists $defaults->{$name} ? ($fragment .= '?') : ($optional = 0);
     }
 
-    $block = "$compiled$block";
+    $block = "$fragment$block";
   }
 
   # Not rooted with a slash
@@ -186,10 +187,9 @@ sub _tokenize {
   my $relaxed     = $self->relaxed_start;
   my $wildcard    = $self->wildcard_start;
 
-  my $pattern = $self->pattern;
-  my $state   = 'text';
+  my $state = 'text';
   my (@tree, $quoted);
-  for my $char (split '', $pattern) {
+  for my $char (split '', $self->pattern) {
     my $inside = !!grep { $_ eq $state } qw(placeholder relaxed wildcard);
 
     # Quote start

@@ -142,8 +142,7 @@ sub _compile {
       $compiled = _compile_req($constraint) if $constraint;
 
       # Optional placeholder
-      $optional = 0 unless exists $defaults->{$name};
-      $compiled .= '?' if $optional;
+      exists $defaults->{$name} ? ($compiled .= '?') : ($optional = 0);
     }
 
     $block = "$compiled$block";

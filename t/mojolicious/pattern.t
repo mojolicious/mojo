@@ -16,6 +16,18 @@ is_deeply $pattern->match('/test/foo/'),
 ok !$pattern->match('/test/'), 'no result';
 is $pattern->render({controller => 'foo'}), '/test/foo', 'right result';
 
+# Optional placeholder in the middle
+$pattern = Mojolicious::Routes::Pattern->new('/test(name)123');
+$pattern->defaults({name => 'foo'});
+is_deeply $pattern->match('/test123', 1), {name => 'foo'}, 'right structure';
+is_deeply $pattern->match('/testbar123', 1), {name => 'bar'},
+  'right structure';
+is $pattern->render, '/testfoo123', 'right result';
+is $pattern->render({name => 'bar'}), '/testbar123', 'right result';
+$pattern->defaults({name => ''});
+is_deeply $pattern->match('/test123', 1), {name => ''}, 'right structure';
+is $pattern->render, '/test123', 'right result';
+
 # Root
 $pattern = Mojolicious::Routes::Pattern->new('/');
 $pattern->defaults({action => 'index'});

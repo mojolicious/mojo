@@ -10,6 +10,8 @@
   - Removed deprecated app_url method from Mojo::UserAgent.
   - Removed deprecated detect_proxy method from Mojo::UserAgent.
   - Removed deprecated need_proxy method from Mojo::UserAgent.
+  - Improved router to allow placeholders anywhere in a pattern to become
+    optional.
   - Improved request_ok method in Test::Mojo to handle WebSocket handshakes.
   - Improved Mojo::IOLoop::Server to use address and port for descriptor
     inheritance.

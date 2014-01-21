@@ -349,9 +349,8 @@ already exist.
   $r->route('/:mymessage')
     ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
 
-One more interesting effect, if a placeholder is at the end of a route and
-there is already a stash value of the same name present, it automatically
-becomes optional.
+One more interesting effect, a placeholder automatically becomes optional if
+there is already a stash value of the same name present.
 
   # / -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
   $r->route('/:mymessage')

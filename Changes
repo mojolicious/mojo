@@ -1,4 +1,6 @@
 
+4.69  2014-01-23
+
 4.68  2014-01-22
   - Added Mojo::DOM::Node.
   - Added contents and node methods to Mojo::DOM.

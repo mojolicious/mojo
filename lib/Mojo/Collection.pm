@@ -300,8 +300,8 @@ Stringify elements in collection and L</"join"> them with newlines.
 
 =head1 ELEMENT METHODS
 
-In addition to the methods above, you can also call methods provided by all
-elements in the collection directly and create a new collection from the
+In addition to the L</"METHODS"> above, you can also call methods provided by
+all elements in the collection directly and create a new collection from the
 results, similar to L</"pluck">.
 
   push @$collection, Mojo::DOM->new("<div><h1>$_</h1></div>") for 1 .. 9;

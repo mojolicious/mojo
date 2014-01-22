@@ -633,8 +633,8 @@ startup. Meant to be overloaded in a subclass.
 
 =head1 HELPERS
 
-In addition to the attributes and methods above you can also call helpers on
-L<Mojolicious> objects. This includes all helpers from
+In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
+helpers on L<Mojolicious> objects. This includes all helpers from
 L<Mojolicious::Plugin::DefaultHelpers> and L<Mojolicious::Plugin::TagHelpers>.
 Note that application helpers are always called with a new default controller
 object, so they can't depend on or change controller state, which includes

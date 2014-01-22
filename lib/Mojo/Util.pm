@@ -542,14 +542,14 @@ Monkey patch functions into package.
   my $str = punycode_decode $punycode;
 
 Punycode decode string as described in
-L<RFC 3492|http://tools.ietf.org/search/rfc3492>.
+L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
 
 =head2 punycode_encode
 
   my $punycode = punycode_encode $str;
 
 Punycode encode string as described in
-L<RFC 3492|http://tools.ietf.org/search/rfc3492>.
+L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
 
 =head2 quote
 
@@ -634,7 +634,7 @@ Unquote string.
   my $escaped = url_escape $str, '^A-Za-z0-9\-._~';
 
 Percent encode unsafe characters in string as described in
-L<RFC 3986|http://tools.ietf.org/search/rfc3986>, the pattern used defaults to
+L<RFC 3986|http://tools.ietf.org/html/rfc3986>, the pattern used defaults to
 C<^A-Za-z0-9\-._~>.
 
 =head2 url_unescape
@@ -642,7 +642,7 @@ C<^A-Za-z0-9\-._~>.
   my $str = url_unescape $escaped;
 
 Decode percent encoded characters in string as described in
-L<RFC 3986|http://tools.ietf.org/search/rfc3986>.
+L<RFC 3986|http://tools.ietf.org/html/rfc3986>.
 
 =head2 xml_escape
 

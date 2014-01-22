@@ -170,7 +170,7 @@ Mojo::Message::Response - HTTP response
 =head1 DESCRIPTION
 
 L<Mojo::Message::Response> is a container for HTTP responses as described in
-L<RFC 2616|http://tools.ietf.org/search/rfc2616>.
+L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
 
 =head1 EVENTS
 

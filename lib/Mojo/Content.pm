@@ -324,7 +324,7 @@ Mojo::Content - HTTP content base class
 =head1 DESCRIPTION
 
 L<Mojo::Content> is an abstract base class for HTTP content as described in
-L<RFC 2616|http://tools.ietf.org/search/rfc2616>.
+L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
 
 =head1 EVENTS
 

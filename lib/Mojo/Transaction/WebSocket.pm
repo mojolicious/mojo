@@ -362,7 +362,7 @@ Mojo::Transaction::WebSocket - WebSocket transaction
 =head1 DESCRIPTION
 
 L<Mojo::Transaction::WebSocket> is a container for WebSocket transactions as
-described in L<RFC 6455|http://tools.ietf.org/search/rfc6455>. Note that 64bit
+described in L<RFC 6455|http://tools.ietf.org/html/rfc6455>. Note that 64bit
 frames require a Perl with support for quads or they are limited to 32bit.
 
 =head1 EVENTS

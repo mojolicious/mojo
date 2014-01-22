@@ -48,7 +48,7 @@ Mojo::JSON::Pointer - JSON Pointers
 =head1 DESCRIPTION
 
 L<Mojo::JSON::Pointer> is a relaxed implementation of
-L<RFC 6901|http://tools.ietf.org/search/rfc6901>.
+L<RFC 6901|http://tools.ietf.org/html/rfc6901>.
 
 =head1 METHODS
 

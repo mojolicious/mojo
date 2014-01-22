@@ -346,7 +346,7 @@ Mojo::JSON - Minimalistic JSON
 =head1 DESCRIPTION
 
 L<Mojo::JSON> is a minimalistic and possibly the fastest pure-Perl
-implementation of L<RFC 4627|http://tools.ietf.org/search/rfc4627>.
+implementation of L<RFC 4627|http://tools.ietf.org/html/rfc4627>.
 
 It supports normal Perl data types like C<Scalar>, C<Array> reference, C<Hash>
 reference and will try to call the C<TO_JSON> method on blessed references, or

@@ -189,7 +189,6 @@ Throw exception with stacktrace.
 =head2 to_string
 
   my $str = $e->to_string;
-  my $str = "$e";
 
 Render exception.
 
@@ -199,6 +198,22 @@ Render exception.
   $e = $e->trace(2);
 
 Store stacktrace.
+
+=head1 OPERATORS
+
+L<Mojo::Exception> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$e;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$e";
+
+Alias for L</to_string>.
 
 =head1 SEE ALSO
 

@@ -435,9 +435,24 @@ provided base URL.
 =head2 to_string
 
   my $str = $url->to_string;
-  my $str = "$url";
 
 Turn URL into a string.
+
+=head1 OPERATORS
+
+L<Mojo::URL> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$url;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$url";
+
+Alias for L</to_string>.
 
 =head1 SEE ALSO
 

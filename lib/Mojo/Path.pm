@@ -292,7 +292,6 @@ Turn path into a route.
 =head2 to_string
 
   my $str = $path->to_string;
-  my $str = "$path";
 
 Turn path into a string.
 
@@ -310,14 +309,31 @@ Turn path into a string.
 Path has a trailing slash. Note that this method will normalize the path and
 that C<%2F> will be treated as C</> for security reasons.
 
-=head1 PATH PARTS
+=head1 OPERATORS
 
-Direct array reference access to path parts is also possible. Note that this
-will normalize the path and that C<%2F> will be treated as C</> for security
-reasons.
+L<Mojo::Path> overloads the following operators.
+
+=head2 array
+
+  my @parts = @$path;
+
+Alias for L</"parts">. Note that this will normalize the path and that C<%2F>
+will be treated as C</> for security reasons.
 
   say $path->[0];
   say for @$path;
+
+=head2 bool
+
+  my $bool = !!$path;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$path";
+
+Alias for L</"to_string">.
 
 =head1 SEE ALSO
 

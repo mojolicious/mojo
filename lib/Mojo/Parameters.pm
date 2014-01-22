@@ -312,17 +312,33 @@ the parameters.
 =head2 to_string
 
   my $str = $params->to_string;
-  my $str = "$params";
 
 Turn parameters into a string.
 
-=head1 PARAMETERS
+=head1 OPERATORS
 
-Direct array reference access to the parsed parameters is also possible. Note
-that this will normalize the parameters.
+L<Mojo::Parameters> overloads the following operators.
+
+=head2 array
+
+  my @params = @$params;
+
+Alias for L</"params">. Note that this will normalize the parameters.
 
   say $params->[0];
   say for @$params;
+
+=head2 bool
+
+  my $bool = !!$params;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$params";
+
+Alias for L</"to_string">.
 
 =head1 SEE ALSO
 

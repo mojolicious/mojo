@@ -286,7 +286,6 @@ Alias for L<Mojo::Base/"tap">.
 =head2 to_string
 
   my $str = $stream->to_string;
-  my $str = "$stream";
 
 Stringify bytestream.
 
@@ -334,6 +333,22 @@ bytestream with L<Mojo::Util/"xml_escape">.
   $stream = $stream->xor_encode($key);
 
 XOR encode bytestream with L<Mojo::Util/"xor_encode">.
+
+=head1 OPERATORS
+
+L<Mojo::ByteStream> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$bytestream;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$bytestream";
+
+Alias for L</to_string>.
 
 =head1 BYTESTREAM
 

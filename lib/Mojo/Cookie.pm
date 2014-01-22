@@ -62,9 +62,24 @@ Parse cookies. Meant to be overloaded in a subclass.
 =head2 to_string
 
   my $str = $cookie->to_string;
-  my $str = "$cookie";
 
 Render cookie. Meant to be overloaded in a subclass.
+
+=head1 OPERATORS
+
+L<Mojo::Cookie> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$cookie;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$cookie";
+
+Alias for L</to_string>.
 
 =head1 SEE ALSO
 

@@ -171,9 +171,24 @@ Portably generate an absolute path for a file relative to the home directory.
 =head2 to_string
 
   my $str = $home->to_string;
-  my $str = "$home";
 
 Home directory.
+
+=head1 OPERATORS
+
+L<Mojo::Home> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$home;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$home";
+
+Alias for L</to_string>.
 
 =head1 SEE ALSO
 

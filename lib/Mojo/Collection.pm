@@ -282,6 +282,22 @@ Alias for L<Mojo::Base/"tap">.
 
 Create a new collection without duplicate elements.
 
+=head1 OPERATORS
+
+L<Mojo::Collection> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$collection;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$collection";
+
+Stringify elements in collection and L</"join"> them with newlines.
+
 =head1 ELEMENT METHODS
 
 In addition to the methods above, you can also call methods provided by all

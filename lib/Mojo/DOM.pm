@@ -757,7 +757,6 @@ is enabled by default.
 =head2 to_xml
 
   my $xml = $dom->to_xml;
-  my $xml = "$dom";
 
 Render this element and its content to XML.
 
@@ -790,6 +789,31 @@ Element type.
 Disable HTML semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.
 
+=head1 OPERATORS
+
+L<Mojo::DOM> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$dom;
+
+Always true.
+
+=head2 hash
+
+  my %attrs = %$dom;
+
+Alias for L</"attr">.
+
+  say $dom->{foo};
+  say $dom->div->{id};
+
+=head2 stringify
+
+  my $xml = "$dom";
+
+Alias for L</"to_xml">.
+
 =head1 CHILD ELEMENTS
 
 In addition to the methods above, many child elements are also automatically
@@ -799,13 +823,6 @@ L<Mojo::Collection> object, depending on number of children.
   say $dom->p->text;
   say $dom->div->[23]->text;
   say $dom->div->text;
-
-=head1 ELEMENT ATTRIBUTES
-
-Direct hash reference access to element attributes is also possible.
-
-  say $dom->{foo};
-  say $dom->div->{id};
 
 =head1 SEE ALSO
 

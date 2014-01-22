@@ -72,7 +72,6 @@ following new ones.
 
   my $content = $node->content;
   $node       = $node->content('foo');
-  my $content = "$node";
 
 Node content.
 
@@ -87,6 +86,22 @@ Node type, usually C<cdata>, C<comment>, C<doctype>, C<pi>, C<raw> or C<text>.
   my $parent = $node->remove;
 
 Remove node and return L<Mojo::DOM> object for parent of node.
+
+=head1 OPERATORS
+
+L<Mojo::DOM::Node> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$node;
+
+Always true.
+
+=head2 stringify
+
+  my $content = "$node";
+
+Alias for L</content>.
 
 =head1 SEE ALSO
 

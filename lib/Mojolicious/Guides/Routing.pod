@@ -555,7 +555,7 @@ with L<Mojolicious::Controller/"send"> right away.
 
 Bridge routes created with the method L<Mojolicious::Routes::Route/"bridge">
 can be used to share code with multiple nested routes, because unlike normal
-nested routes, they always match and result in additional dispatch cycles.
+nested routes, they result in additional dispatch cycles when they match.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'baz'}

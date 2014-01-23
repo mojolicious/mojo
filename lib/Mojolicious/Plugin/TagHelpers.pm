@@ -27,6 +27,7 @@ sub register {
   $app->helper(javascript => \&_javascript);
   $app->helper(label_for  => \&_label_for);
   $app->helper(link_to    => \&_link_to);
+  $app->helper(link_to_if => \&_link_to_if);
 
   $app->helper(password_field => \&_password_field);
   $app->helper(radio_button =>
@@ -130,6 +131,12 @@ sub _link_to {
   push @url, shift if ref $_[0] eq 'HASH';
 
   return _tag('a', href => $self->url_for(@url), @_);
+}
+
+sub _link_to_if {
+  my ($self, $condition) = (shift, shift);
+  return '' unless $condition;
+  return _link_to($self, @_);
 }
 
 sub _option {

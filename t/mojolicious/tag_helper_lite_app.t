@@ -103,6 +103,7 @@ $t->get_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/links">Home</a>
 <a href="/form/23" title="Foo">Foo</a>
 <a href="/form/23" title="Foo">Foo</a>
+<a href="/links">Bar</a>
 EOF
 $t->post_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/path">Pa&lt;th</a>
@@ -113,6 +114,7 @@ $t->post_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/links">Home</a>
 <a href="/form/23" title="Foo">Foo</a>
 <a href="/form/23" title="Foo">Foo</a>
+<a href="/links">Bar</a>
 EOF
 
 # Scripts
@@ -520,6 +522,7 @@ __DATA__
 <%= link_to Home => 'links' %>
 <%= link_to Foo => 'form', {test => 23}, title => 'Foo' %>
 <%= link_to form => {test => 23} => (title => 'Foo') => begin %>Foo<% end %>
+<%= link_to_if 2 > 1, Bar => 'links' %>
 
 @@ script.html.ep
 <%= javascript '/script.js' %>

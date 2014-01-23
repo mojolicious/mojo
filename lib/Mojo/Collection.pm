@@ -131,7 +131,12 @@ Mojo::Collection - Collection
 
 =head1 DESCRIPTION
 
-L<Mojo::Collection> is a container for collections.
+L<Mojo::Collection> is an array-based container for collections.
+
+  # Access array directly to manipulate collection
+  my $collection = Mojo::Collection->new(1 .. 25);
+  $collection->[23] += 100;
+  say for @$collection;
 
 =head1 FUNCTIONS
 
@@ -298,7 +303,7 @@ Always true.
 
 Stringify elements in collection and L</"join"> them with newlines.
 
-=head1 ELEMENT METHODS
+=head1 AUTOLOAD
 
 In addition to the L</"METHODS"> above, you can also call methods provided by
 all elements in the collection directly and create a new collection from the
@@ -306,13 +311,6 @@ results, similar to L</"pluck">.
 
   push @$collection, Mojo::DOM->new("<div><h1>$_</h1></div>") for 1 .. 9;
   say $collection->find('h1')->type('h2')->prepend_content('Test ')->root;
-
-=head1 ELEMENTS
-
-Direct array reference access to elements is also possible.
-
-  say $collection->[23];
-  say for @$collection;
 
 =head1 SEE ALSO
 

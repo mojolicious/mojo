@@ -578,7 +578,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->websocket('/echo')->to('example#echo');
 
-=head1 SHORTCUTS
+=head1 AUTOLOAD
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 shortcuts on L<Mojolicious::Routes::Route> objects.

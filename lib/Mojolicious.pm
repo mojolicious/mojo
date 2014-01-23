@@ -631,7 +631,7 @@ startup. Meant to be overloaded in a subclass.
     ...
   }
 
-=head1 HELPERS
+=head1 AUTOLOAD
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 helpers on L<Mojolicious> objects. This includes all helpers from

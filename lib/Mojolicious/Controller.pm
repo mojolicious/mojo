@@ -1000,7 +1000,7 @@ You can call L</"finish"> at any time to end the stream.
   o!
   0
 
-=head1 HELPERS
+=head1 AUTOLOAD
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
 helpers on L<Mojolicious::Controller> objects. This includes all helpers from

@@ -225,7 +225,7 @@ Access validated parameters, similar to L<Mojolicious::Controller/"param">.
 Change validation L</"topic"> and make sure a value is present and not an
 empty string.
 
-=head1 CHECKS
+=head1 AUTOLOAD
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call
 validation checks provided by L<Mojolicious::Validator> on

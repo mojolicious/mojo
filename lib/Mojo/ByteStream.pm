@@ -91,8 +91,12 @@ Mojo::ByteStream - ByteStream
 
 =head1 DESCRIPTION
 
-L<Mojo::ByteStream> provides a more friendly API for the bytestream
-manipulation functions in L<Mojo::Util>.
+L<Mojo::ByteStream> is a scalar-based container for bytestreams that provides
+a more friendly API for many of the functions in L<Mojo::Util>.
+
+  # Access scalar directly to manipulate bytestream
+  my $stream = Mojo::ByteStream->new('foo');
+  $$stream .= 'bar';
 
 =head1 FUNCTIONS
 
@@ -349,12 +353,6 @@ Always true.
   my $str = "$bytestream";
 
 Alias for L</to_string>.
-
-=head1 BYTESTREAM
-
-Direct scalar reference access to the bytestream is also possible.
-
-  $$stream .= 'foo';
 
 =head1 SEE ALSO
 

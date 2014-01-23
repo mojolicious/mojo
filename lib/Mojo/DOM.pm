@@ -814,7 +814,7 @@ Alias for L</"attr">.
 
 Alias for L</"to_xml">.
 
-=head1 CHILD ELEMENTS
+=head1 AUTOLOAD
 
 In addition to the L</"METHODS"> above, many child elements are also
 automatically available as object methods, which return a L<Mojo::DOM> or

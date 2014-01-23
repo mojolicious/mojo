@@ -71,7 +71,11 @@ sub _match {
   my $endpoint = $r->is_endpoint;
   if (($endpoint && $empty) || $r->inline) {
     push @{$self->stack}, {%$captures};
-    return $self->endpoint($r) if $endpoint && $empty;
+    if ($endpoint && $empty) {
+      my $format = $captures->{format};
+      if ($format) { $_->{format} = $format for @{$self->stack} }
+      return $self->endpoint($r);
+    }
     delete @$captures{qw(app cb)};
   }
 

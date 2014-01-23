@@ -383,6 +383,14 @@ $m->match($c => {method => 'GET', path => '/articles/1/delete'});
 );
 is_deeply $m->stack, \@stack, 'right structure';
 is $m->path_for, '/articles/1/delete', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/articles/1/delete.json'});
+@stack = (
+  {controller => 'articles', action => 'load',   id => 1, format => 'json'},
+  {controller => 'articles', action => 'delete', id => 1, format => 'json'}
+);
+is_deeply $m->stack, \@stack, 'right structure';
+is $m->path_for, '/articles/1/delete', 'right path';
 
 # Root
 $m = Mojolicious::Routes::Match->new(root => $r);

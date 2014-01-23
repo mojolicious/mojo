@@ -356,10 +356,10 @@ used or an empty C<204> response rendered automatically.
 
 By now you've probably already encountered the built-in 404 (Not Found) and
 500 (Server Error) pages, that get rendered automatically when you make a
-mistake. Especially during development they can be a great help, you can
-render them manually with the methods
-L<Mojolicious::Controller/"render_exception"> and
-L<Mojolicious::Controller/"render_not_found">.
+mistake. Those are fallbacks for when your own exception handling fails, but
+especially during development they can also be a great help, you can render
+them manually with the methods L<Mojolicious::Controller/"render_exception">
+and L<Mojolicious::Controller/"render_not_found">.
 
   use Mojolicious::Lite;
   use Scalar::Util 'looks_like_number';

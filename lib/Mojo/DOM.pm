@@ -789,6 +789,16 @@ Element type.
 Disable HTML semantics in parser and activate case sensitivity, defaults to
 auto detection based on processing instructions.
 
+=head1 AUTOLOAD
+
+In addition to the L</"METHODS"> above, many child elements are also
+automatically available as object methods, which return a L<Mojo::DOM> or
+L<Mojo::Collection> object, depending on number of children.
+
+  say $dom->p->text;
+  say $dom->div->[23]->text;
+  say $dom->div->text;
+
 =head1 OPERATORS
 
 L<Mojo::DOM> overloads the following operators.
@@ -813,16 +823,6 @@ Alias for L</"attr">.
   my $xml = "$dom";
 
 Alias for L</"to_xml">.
-
-=head1 AUTOLOAD
-
-In addition to the L</"METHODS"> above, many child elements are also
-automatically available as object methods, which return a L<Mojo::DOM> or
-L<Mojo::Collection> object, depending on number of children.
-
-  say $dom->p->text;
-  say $dom->div->[23]->text;
-  say $dom->div->text;
 
 =head1 SEE ALSO
 

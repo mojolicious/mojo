@@ -287,6 +287,15 @@ Alias for L<Mojo::Base/"tap">.
 
 Create a new collection without duplicate elements.
 
+=head1 AUTOLOAD
+
+In addition to the L</"METHODS"> above, you can also call methods provided by
+all elements in the collection directly and create a new collection from the
+results, similar to L</"pluck">.
+
+  push @$collection, Mojo::DOM->new("<div><h1>$_</h1></div>") for 1 .. 9;
+  say $collection->find('h1')->type('h2')->prepend_content('Test ')->root;
+
 =head1 OPERATORS
 
 L<Mojo::Collection> overloads the following operators.
@@ -302,15 +311,6 @@ Always true.
   my $str = "$collection";
 
 Stringify elements in collection and L</"join"> them with newlines.
-
-=head1 AUTOLOAD
-
-In addition to the L</"METHODS"> above, you can also call methods provided by
-all elements in the collection directly and create a new collection from the
-results, similar to L</"pluck">.
-
-  push @$collection, Mojo::DOM->new("<div><h1>$_</h1></div>") for 1 .. 9;
-  say $collection->find('h1')->type('h2')->prepend_content('Test ')->root;
 
 =head1 SEE ALSO
 

@@ -1,5 +1,6 @@
 
 4.70  2014-01-25
+  - Updated jQuery to version 2.1.
   - Improved tag helpers to make data attributes more convenient. (ravengerUA)
       %= tag 'div', data => {id => 1, name => 'ok'} => 'some content'
     is equivalent to

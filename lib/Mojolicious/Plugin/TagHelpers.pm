@@ -213,8 +213,12 @@ sub _tag {
 
   # Attributes
   my %attrs = @_;
-  if ((my $data = $attrs{data}) && ref $attrs{data} eq 'HASH') {
-    $attrs{"data-$_"} = $data->{$_} for keys %{delete $attrs{data}};
+  if ($attrs{data} && ref $attrs{data} eq 'HASH') {
+    while (my ($key, $value) = each %{$attrs{data}}) {
+      $key =~ tr/_/-/;
+      $attrs{lc("data-$key")} = $value;
+    }
+    delete $attrs{data};
   }
   $tag .= qq{ $_="} . xml_escape($attrs{$_} // '') . '"' for sort keys %attrs;
 
@@ -655,35 +659,35 @@ Generate submit input element.
 
 =head2 t
 
-  %=t div => 'some & content'
+  %=t div => 'test & 123'
 
 Alias for L</"tag">.
 
-  <div>some &amp; content</div>
+  <div>test &amp; 123</div>
 
 =head2 tag
 
   %= tag 'div'
   %= tag 'div', id => 'foo'
-  %= tag div => 'some & content'
-  %= tag div => (id => 'foo') => 'some & content'
-  %= tag div => (data => {id => 1, name => 'test'}) => 'some & content'
+  %= tag div => 'test & 123'
+  %= tag div => (id => 'foo') => 'test & 123'
+  %= tag div => (data => {my_id => 1, Name => 'test'}) => 'test & 123'
   %= tag div => begin
-    some & content
+    test & 123
   % end
-  <%= tag div => (id => 'foo') => begin %>some & content<% end %>
+  <%= tag div => (id => 'foo') => begin %>test & 123<% end %>
 
 HTML/XML tag generator.
 
   <div />
   <div id="foo" />
-  <div>some &amp; content</div>
-  <div id="foo">some &amp; content</div>
-  <div data-id="1" data-name="test">some &amp; content</div>
+  <div>test &amp; 123</div>
+  <div id="foo">test &amp; 123</div>
+  <div data-my-id="1" data-name="test">test &amp; 123</div>
   <div>
-    some & content
+    test & 123
   </div>
-  <div id="foo">some & content</div>
+  <div id="foo">test & 123</div>
 
 Very useful for reuse in more specific tag helpers.
 

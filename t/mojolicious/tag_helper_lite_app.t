@@ -59,7 +59,7 @@ $t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="t&lt;wo" three="four">Hello</foo>
-<div data-id="1" data-name="test">some content</div>
+<div data-my-test-id="1" data-name="test">some content</div>
 <div data="bar">some content</div>
 EOF
 $t->patch_ok('/more_tags')->status_is(200)->content_is(<<EOF);
@@ -71,7 +71,7 @@ EOF
 
 # Shortcut
 $t->get_ok('/small_tags')->status_is(200)->content_is(<<EOF);
-<div>some &amp; content</div>
+<div>test &amp; 123</div>
 <div>
   <p id="0">just</p>
   <p>0</p>
@@ -487,7 +487,7 @@ __DATA__
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
 <%= tag 'foo', one => 't<wo', three => 'four' => begin %>Hello<% end %>
-<%= tag 'div', data => {id => 1, name => 'test'} => 'some content' %>
+<%= tag 'div', data => {my_test_ID => 1, naMe => 'test'} => 'some content' %>
 <%= tag 'div', data => 'bar' => 'some content' %>
 
 @@ more_tags.html.ep
@@ -497,7 +497,7 @@ __DATA__
 %= tag 'bar', class => 'test', ''
 
 @@ small_tags.html.ep
-%=t div => 'some & content'
+%=t div => 'test & 123'
 %=t div => begin
   %=t p => (id => 0) => 'just'
   %=t p => 0

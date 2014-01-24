@@ -28,8 +28,8 @@ sub register {
   $app->helper(label_for    => \&_label_for);
   $app->helper(link_to      => \&_link_to);
   $app->helper(link_to_if   => \&_link_to_if);
-  $app->helper(botton_to    => \&_botton_to);
-  $app->helper(botton_to_if => \&_botton_to_if);
+  $app->helper(button_to    => \&_button_to);
+  $app->helper(button_to_if => \&_button_to_if);
 
   $app->helper(password_field => \&_password_field);
   $app->helper(radio_button =>
@@ -141,7 +141,7 @@ sub _link_to_if {
   return _link_to($self, @_);
 }
 
-sub _botton_to {
+sub _button_to {
   my ($self, $submit_value) = (shift, shift);
   my %opt = @_;
 
@@ -166,7 +166,7 @@ sub _botton_to {
   return Mojo::ByteStream->new(_tag('form', %opt, $input_tags))->html_unescape;
 }
 
-sub _botton_to_if {
+sub _button_to_if {
   my ($self, $condition) = (shift, shift);
   return '' unless $condition;
   return _botton_to($self, @_);

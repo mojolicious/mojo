@@ -39,7 +39,7 @@ any [qw(PATCH POST)] => '/☃' => 'snowman';
 
 post '/no_snowman';
 
-get '/botton_to';
+get '/button_to';
 
 my $t = Test::Mojo->new;
 
@@ -480,8 +480,8 @@ $t->post_ok('/no_snowman?foo=1')->status_is(200)->content_is(<<'EOF');
 </form>
 EOF
 
-# botton_to helper
-$t->get_ok('/botton_to')->status_is(200)
+# button_to helper
+$t->get_ok('/button_to')->status_is(200)
   ->content_is('<form action="/" method="post">'
     . '<input type="submit" value="Click" />'
     . '</form>' . "\n"
@@ -657,9 +657,9 @@ __DATA__
   %= submit_button 'whatever'
 %= end
 
-@@ botton_to.html.ep
-%= botton_to 'Click'
-%= botton_to 'Click', data => [qw/uid 23 gid 47/]
-%= botton_to 'Click', data => [qw/uid 23 gid 47/], form_class => 'form-controll'
-%= botton_to 'Click', data => [qw/uid 23 gid 47/], form_class => 'form-controll', submit_class => 'btn'
-%= botton_to_if 2 < 1, 'Click'
+@@ button_to.html.ep
+%= button_to 'Click'
+%= button_to 'Click', data => [qw/uid 23 gid 47/]
+%= button_to 'Click', data => [qw/uid 23 gid 47/], form_class => 'form-controll'
+%= button_to 'Click', data => [qw/uid 23 gid 47/], form_class => 'form-controll', submit_class => 'btn'
+%= button_to_if 2 < 1, 'Click'

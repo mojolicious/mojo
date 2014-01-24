@@ -2,9 +2,9 @@
 4.70  2014-01-25
   - Updated jQuery to version 2.1.
   - Improved tag helpers to make data attributes more convenient. (ravengerUA)
-      %= tag 'div', data => {id => 1, name => 'ok'} => 'some content'
+      %= tag 'div', data => {id => 1, name => 'test'} => 'some content'
     is equivalent to
-      %= tag 'div', data-id => 1, data-name => 'ok' => 'some content'
+      %= tag 'div', data-id => 1, data-name => 'test' => 'some content'
 
 4.69  2014-01-24
   - Improved router to allow format detection for bridges.

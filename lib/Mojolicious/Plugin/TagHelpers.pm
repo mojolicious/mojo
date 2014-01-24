@@ -686,7 +686,6 @@ HTML/XML tag generator.
     some & content
   </div>
   <div id="foo">some & content</div>
-  <%= tag div => (id => 'foo') => begin %>some & content<% end %>
   <div data-id="1" data-name="ok">some content</div>
 
 Very useful for reuse in more specific tag helpers.

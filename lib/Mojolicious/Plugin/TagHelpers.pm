@@ -667,7 +667,7 @@ Alias for L</"tag">.
   %= tag 'div', id => 'foo'
   %= tag div => 'some & content'
   %= tag div => (id => 'foo') => 'some & content'
-  %= tag div => (data => {id => 1, name => 'ok'}) => 'some & content'
+  %= tag div => (data => {id => 1, name => 'test'}) => 'some & content'
   %= tag div => begin
     some & content
   % end
@@ -679,7 +679,7 @@ HTML/XML tag generator.
   <div id="foo" />
   <div>some &amp; content</div>
   <div id="foo">some &amp; content</div>
-  <div data-id="1" data-name="ok">some &amp; content</div>
+  <div data-id="1" data-name="test">some &amp; content</div>
   <div>
     some & content
   </div>

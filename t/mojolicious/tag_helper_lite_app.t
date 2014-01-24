@@ -59,7 +59,7 @@ $t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="t&lt;wo" three="four">Hello</foo>
-<div data-id="1" data-name="ok">some content</div>
+<div data-id="1" data-name="test">some content</div>
 <div data="bar">some content</div>
 EOF
 $t->patch_ok('/more_tags')->status_is(200)->content_is(<<EOF);
@@ -268,7 +268,7 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 </form>
 <form action="/form/24" method="post">
   <input name="foo" type="text" />
-  <input data-id="1" data-name="ok" name="foo" type="text" value="1" />
+  <input data-id="1" data-name="test" name="foo" type="text" value="1" />
   <input data="ok" name="foo" type="text" value="1" />
   <input name="foo" type="checkbox" value="1" />
   <input checked="checked" name="a" type="checkbox" value="2" />
@@ -300,7 +300,7 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
 </form>
 <form action="/form/24" method="post">
   <input name="foo" type="text" />
-  <input data-id="1" data-name="ok" name="foo" type="text" value="1" />
+  <input data-id="1" data-name="test" name="foo" type="text" value="1" />
   <input data="ok" name="foo" type="text" value="1" />
   <input name="foo" type="checkbox" value="1" />
   <input name="a" type="checkbox" value="2" />
@@ -487,7 +487,7 @@ __DATA__
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
 <%= tag 'foo', one => 't<wo', three => 'four' => begin %>Hello<% end %>
-<%= tag 'div', data => {id => 1, name => 'ok'} => 'some content' %>
+<%= tag 'div', data => {id => 1, name => 'test'} => 'some content' %>
 <%= tag 'div', data => 'bar' => 'some content' %>
 
 @@ more_tags.html.ep
@@ -590,7 +590,7 @@ __DATA__
 <% end %>
 %= form_for 'form', {test => 24}, method => 'post' => begin
   %= text_field 'foo'
-  %= text_field foo => 1, data => {id => 1, name => 'ok'}
+  %= text_field foo => 1, data => {id => 1, name => 'test'}
   %= text_field foo => 1, data => 'ok'
   %= check_box foo => 1
   %= check_box a => 2

@@ -1,8 +1,6 @@
 
 4.69  2014-01-24
   - Improved router to allow format detection for bridges.
-  - Improved Mojo::Template to allow trimming of whitespace characters around
-    tags to be limited to one side.
 
 4.68  2014-01-22
   - Added Mojo::DOM::Node.

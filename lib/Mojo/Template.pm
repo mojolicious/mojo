@@ -144,17 +144,17 @@ sub parse {
 
   my $token_re = qr/
     (
-      \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                    # Replace
+      \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                   # Replace
     |
-      \Q$tag$expr\E(?:\Q$escp\E)?(?:\s*\Q$cpen\E(?!\w))?    # Expression
+      \Q$tag$expr\E(?:\Q$escp\E)?(?:\s*\Q$cpen\E(?!\w))?   # Expression
     |
-      \Q$tag\E(?:\s*\Q$cpen\E(?!\w))?                       # Code
+      \Q$tag\E(?:\s*\Q$cpen\E(?!\w))?                      # Code
     |
-      (?:(?<!\w)\Q$cpst\E\s*)?(?:\Q$trim\E{1,3})?\Q$end\E   # End
+      (?:(?<!\w)\Q$cpst\E\s*)?(?:\Q$trim\E)?\Q$end\E       # End
     )
   /x;
   my $cpen_re = qr/^(\Q$tag\E)(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E/;
-  my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E{1,3})?\Q$end\E$/;
+  my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
 
   # Split lines
   my $state = 'text';
@@ -193,9 +193,8 @@ sub parse {
 
         # Trim left side
         if ($2) {
-          $trimming = length($2) / length($trim);
-          $self->_trim(\@token) if $trimming eq 1 || $trimming eq 2;
-          $trimming = 0 if $trimming eq 2;
+          $trimming = 1;
+          $self->_trim(\@token);
         }
 
         # Hint at end
@@ -390,9 +389,7 @@ backslash.
 
 Whitespace characters around tags can be trimmed with a special tag ending.
 
-  <%= Trim whitespace characters on both sides of this expression       =%>
-  <%= Trim whitespace characters on the left side of this expression   ==%>
-  <%= Trim whitespace characters on the right side of this expression ===%>
+  <%= All whitespace characters around this expression will be trimmed =%>
 
 You can capture whole template blocks for reuse later with the C<begin> and
 C<end> keywords.

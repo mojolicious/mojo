@@ -128,14 +128,12 @@ backslash.
   in multiple\\
   lines
 
-You can also add additional equal signs to the end of a tag to have it
-automatically remove surrounding whitespace, this allows you to freely indent
-your code without ruining the result.
+You can also add an additional equal sign to the end of a tag to have it
+automatically remove all surrounding whitespace, this allows you to freely
+indent your code without ruining the result.
 
   <% for (1 .. 3) { %>
-    <%= 'trim both sides'   =%>
-    <%= 'trim left side'   ==%>
-    <%= 'trim right side' ===%>
+    <%= $foo =%>
   <% } %>
 
 Stash values that don't have invalid characters in their name get

@@ -144,33 +144,17 @@ sub parse {
 
   my $token_re = qr/
     (
-      \Q$tag$replace\E                       # Replace
+      \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                    # Replace
     |
-      \Q$tag$expr$escp\E\s*\Q$cpen\E(?!\w)   # Escaped expression (end)
+      \Q$tag$expr\E(?:\Q$escp\E)?(?:\s*\Q$cpen\E(?!\w))?    # Expression
     |
-      \Q$tag$expr$escp\E                     # Escaped expression
+      \Q$tag\E(?:\s*\Q$cpen\E(?!\w))?                       # Code
     |
-      \Q$tag$expr\E\s*\Q$cpen\E(?!\w)        # Expression (end)
-    |
-      \Q$tag$expr\E                          # Expression
-    |
-      \Q$tag$cmnt\E                          # Comment
-    |
-      \Q$tag\E\s*\Q$cpen\E(?!\w)             # Code (end)
-    |
-      \Q$tag\E                               # Code
-    |
-      (?<!\w)\Q$cpst\E\s*\Q$trim$end\E       # Trim end (start)
-    |
-      \Q$trim$end\E                          # Trim end
-    |
-      (?<!\w)\Q$cpst\E\s*\Q$end\E            # End (start)
-    |
-      \Q$end\E                               # End
+      (?:(?<!\w)\Q$cpst\E\s*)?(?:\Q$trim\E{1,3})?\Q$end\E   # End
     )
   /x;
   my $cpen_re = qr/^(\Q$tag\E)(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E/;
-  my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E)?\Q$end\E$/;
+  my $end_re  = qr/^(?:(\Q$cpst\E)\s*)?(\Q$trim\E{1,3})?\Q$end\E$/;
 
   # Split lines
   my $state = 'text';
@@ -207,10 +191,11 @@ sub parse {
         # Capture start
         splice @token, -2, 0, 'cpst', undef if $1;
 
-        # Trim previous text
+        # Trim left side
         if ($2) {
-          $trimming = 1;
-          $self->_trim(\@token);
+          $trimming = length($2) / length($trim);
+          $self->_trim(\@token) if $trimming eq 1 || $trimming eq 2;
+          $trimming = 0 if $trimming eq 2;
         }
 
         # Hint at end
@@ -235,7 +220,7 @@ sub parse {
         # Replace
         $token = $tag if $token eq "$tag$replace";
 
-        # Convert whitespace text to line noise
+        # Trim right side (convert whitespace to line noise)
         if ($trimming && $token =~ s/^(\s+)//) {
           push @token, 'code', $1;
           $trimming = 0;
@@ -283,14 +268,10 @@ sub _trim {
     return unless $line->[$j] eq 'text';
 
     # Convert whitespace text to line noise
-    my $value = $line->[$j + 1];
-    if ($line->[$j + 1] =~ s/(\s+)$//) {
-      $value = $line->[$j + 1];
-      splice @$line, $j, 0, 'code', $1;
-    }
+    splice @$line, $j, 0, 'code', $1 if $line->[$j + 1] =~ s/(\s+)$//;
 
     # Text left
-    return if length $value;
+    return if length $line->[$j + 1];
   }
 }
 
@@ -409,7 +390,9 @@ backslash.
 
 Whitespace characters around tags can be trimmed with a special tag ending.
 
-  <%= All whitespace characters around this expression will be trimmed =%>
+  <%= Trim whitespace characters on both sides of this expression       =%>
+  <%= Trim whitespace characters on the left side of this expression   ==%>
+  <%= Trim whitespace characters on the right side of this expression ===%>
 
 You can capture whole template blocks for reuse later with the C<begin> and
 C<end> keywords.

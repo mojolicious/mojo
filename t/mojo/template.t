@@ -29,10 +29,20 @@ $mt->prepend('my @foo = (3, 4);')->parse('<%= @foo %>:<%== @foo %>');
 my $output = $mt->build->compile || $mt->interpret;
 is $output, "2:2\n", 'same context';
 
-# Trim tag
+# Trim tag (both sides)
 $mt     = Mojo::Template->new;
 $output = $mt->render(" ♥    <%= 'test♥' =%> \n");
 is $output, ' ♥test♥', 'tag trimmed';
+
+# Trim tag (left side)
+$mt     = Mojo::Template->new;
+$output = $mt->render(" ♥    <%= 'test♥' ==%> \n");
+is $output, " ♥test♥ \n", 'tag trimmed';
+
+# Trim tag (right side)
+$mt     = Mojo::Template->new;
+$output = $mt->render(" ♥    <%= 'test♥' ===%> \n");
+is $output, ' ♥    test♥', 'tag trimmed';
 
 # Trim expression
 $mt     = Mojo::Template->new;

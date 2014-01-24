@@ -59,6 +59,8 @@ $t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="t&lt;wo" three="four">Hello</foo>
+<div data-id="1" data-name="ok">some content</div>
+<div data="bar">some content</div>
 EOF
 $t->patch_ok('/more_tags')->status_is(200)->content_is(<<EOF);
 <bar>b&lt;a&gt;z</bar>
@@ -280,6 +282,8 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   <input id="foo" name="h" type="password" />
   <input type="submit" value="Ok!" />
   <input id="bar" type="submit" value="Ok too!" />
+  <input data-id="1" data-name="ok" name="foo" type="text" value="1" />
+  <input data="ok" name="foo" type="text" value="1" />
 </form>
 <form action="/">
   <input name="foo" />
@@ -308,6 +312,8 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
   <input id="foo" name="h" type="password" />
   <input type="submit" value="Ok!" />
   <input id="bar" type="submit" value="Ok too!" />
+  <input data-id="1" data-name="ok" name="foo" type="text" value="1" />
+  <input data="ok" name="foo" type="text" value="1" />
 </form>
 <form action="/">
   <input name="foo" />
@@ -481,6 +487,8 @@ __DATA__
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
 <%= tag 'foo', one => 't<wo', three => 'four' => begin %>Hello<% end %>
+<%= tag 'div', data => {id => 1, name => 'ok'} => 'some content' %>
+<%= tag 'div', data => 'bar' => 'some content' %>
 
 @@ more_tags.html.ep
 %= tag bar => 'b<a>z'
@@ -596,6 +604,8 @@ __DATA__
   %= password_field 'h', id => 'foo'
   %= submit_button 'Ok!'
   %= submit_button 'Ok too!', id => 'bar'
+  %= text_field foo => 1, data => {id => 1, name => 'ok'}
+  %= text_field foo => 1, data => 'ok'
 %= end
 <%= form_for '/' => begin %>
   <%= input_tag 'foo' %>

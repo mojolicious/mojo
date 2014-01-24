@@ -519,6 +519,14 @@ using the capitalized link target as content.
   <a href="http://mojolicio.us">Mojolicious</a>
   <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
 
+=head2 link_to_if
+
+  <%= link_to_if 2 > 1, Bar => 'links' %>
+
+  Create link tag if condition is true
+
+  <a href="/links">Bar</a>
+
 =head2 month_field
 
   %= month_field 'vacation'

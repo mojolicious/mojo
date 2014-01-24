@@ -24,9 +24,12 @@ sub register {
   $app->helper(hidden_field => \&_hidden_field);
   $app->helper(image => sub { _tag('img', src => shift->url_for(shift), @_) });
   $app->helper(input_tag => sub { _input(@_) });
-  $app->helper(javascript => \&_javascript);
-  $app->helper(label_for  => \&_label_for);
-  $app->helper(link_to    => \&_link_to);
+  $app->helper(javascript   => \&_javascript);
+  $app->helper(label_for    => \&_label_for);
+  $app->helper(link_to      => \&_link_to);
+  $app->helper(link_to_if   => \&_link_to_if);
+  $app->helper(button_to    => \&_button_to);
+  $app->helper(button_to_if => \&_button_to_if);
 
   $app->helper(password_field => \&_password_field);
   $app->helper(radio_button =>
@@ -41,6 +44,37 @@ sub register {
 
   $app->helper(tag_with_error => \&_tag_with_error);
   $app->helper(text_area      => \&_text_area);
+}
+
+sub _button_to {
+  my ($self, $submit_value) = (shift, shift);
+  my %opt = @_;
+
+  $opt{data}         ||= [];
+  $opt{action}       ||= '/';
+  $opt{method}       ||= 'post';
+  $opt{submit_class} ||= '';
+
+  $opt{class} = $opt{form_class} if $opt{form_class};
+
+  my @submit_args = ($self, $submit_value);
+  push @submit_args, 'class', $opt{submit_class} if $opt{submit_class};
+  my $input_tags = _submit_button(@submit_args);
+  while (@{$opt{data}}) {
+    my $name  = shift @{$opt{data}};
+    my $value = shift @{$opt{data}};
+    $input_tags .= _input($self, $name, type => 'hidden', value => $value);
+  }
+
+  map { delete $opt{$_} } qw/submit_class form_class data/;
+
+  return Mojo::ByteStream->new(_tag('form', %opt, $input_tags))->html_unescape;
+}
+
+sub _button_to_if {
+  my ($self, $condition) = (shift, shift);
+  return '' unless $condition;
+  return _button_to($self, @_);
 }
 
 sub _csrf_field {
@@ -130,6 +164,12 @@ sub _link_to {
   push @url, shift if ref $_[0] eq 'HASH';
 
   return _tag('a', href => $self->url_for(@url), @_);
+}
+
+sub _link_to_if {
+  my ($self, $condition) = (shift, shift);
+  return '' unless $condition;
+  return _link_to($self, @_);
 }
 
 sub _option {
@@ -299,6 +339,27 @@ example for learning how to build new plugins, you're welcome to fork it.
 =head1 HELPERS
 
 L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
+
+=head2 button_to
+
+  %= button_to 'Click', data => [qw/uid 23/], form_class => 'form-controll'
+
+Generates a form containing a single button that submits to the URL created by the set of options.
+
+  <form action="/" class="form-controll" method="post">
+    <input class="btn" type="submit" value="Click" />
+    <input name="uid" type="hidden" value="23" />
+  </form>
+
+=head2 button_to_if
+
+  %= button_to is_admin(), 'Click'
+
+Create single button if condition is true
+
+  <form action="/" method="post">
+    <input type="submit" value="Click" />
+  </form>
 
 =head2 check_box
 
@@ -517,6 +578,14 @@ using the capitalized link target as content.
   <a href="/path/to/file.txt">File</a>
   <a href="http://mojolicio.us">Mojolicious</a>
   <a href="http://127.0.0.1:3000/current/path?foo=bar">Retry</a>
+
+=head2 link_to_if
+
+  <%= link_to_if 2 > 1, Bar => 'links' %>
+
+  Create link tag if condition is true
+
+  <a href="/links">Bar</a>
 
 =head2 month_field
 

@@ -673,6 +673,7 @@ Alias for L</"tag">.
   %= tag div => begin
     some & content
   % end
+  <%= tag div => (id => 'foo') => begin %>some & content<% end %>
   %= tag 'div', data => {id => 1, name => 'ok'} => 'some content'
 
 HTML/XML tag generator.

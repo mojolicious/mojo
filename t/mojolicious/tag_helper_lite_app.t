@@ -268,6 +268,8 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
 </form>
 <form action="/form/24" method="post">
   <input name="foo" type="text" />
+  <input data-id="1" data-name="ok" name="foo" type="text" value="1" />
+  <input data="ok" name="foo" type="text" value="1" />
   <input name="foo" type="checkbox" value="1" />
   <input checked="checked" name="a" type="checkbox" value="2" />
   <input name="b" type="radio" value="1" />
@@ -282,8 +284,6 @@ $t->get_ok('/form/lala?a=2&b=0&c=2&d=3&escaped=1%22+%222')->status_is(200)
   <input id="foo" name="h" type="password" />
   <input type="submit" value="Ok!" />
   <input id="bar" type="submit" value="Ok too!" />
-  <input data-id="1" data-name="ok" name="foo" type="text" value="1" />
-  <input data="ok" name="foo" type="text" value="1" />
 </form>
 <form action="/">
   <input name="foo" />
@@ -300,6 +300,8 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
 </form>
 <form action="/form/24" method="post">
   <input name="foo" type="text" />
+  <input data-id="1" data-name="ok" name="foo" type="text" value="1" />
+  <input data="ok" name="foo" type="text" value="1" />
   <input name="foo" type="checkbox" value="1" />
   <input name="a" type="checkbox" value="2" />
   <input name="b" type="radio" value="1" />
@@ -312,8 +314,6 @@ $t->get_ok('/form/lala?c=b&d=3&e=4&f=<5')->status_is(200)->content_is(<<EOF);
   <input id="foo" name="h" type="password" />
   <input type="submit" value="Ok!" />
   <input id="bar" type="submit" value="Ok too!" />
-  <input data-id="1" data-name="ok" name="foo" type="text" value="1" />
-  <input data="ok" name="foo" type="text" value="1" />
 </form>
 <form action="/">
   <input name="foo" />
@@ -590,6 +590,8 @@ __DATA__
 <% end %>
 %= form_for 'form', {test => 24}, method => 'post' => begin
   %= text_field 'foo'
+  %= text_field foo => 1, data => {id => 1, name => 'ok'}
+  %= text_field foo => 1, data => 'ok'
   %= check_box foo => 1
   %= check_box a => 2
   %= radio_button b => '1'
@@ -604,8 +606,6 @@ __DATA__
   %= password_field 'h', id => 'foo'
   %= submit_button 'Ok!'
   %= submit_button 'Ok too!', id => 'bar'
-  %= text_field foo => 1, data => {id => 1, name => 'ok'}
-  %= text_field foo => 1, data => 'ok'
 %= end
 <%= form_for '/' => begin %>
   <%= input_tag 'foo' %>

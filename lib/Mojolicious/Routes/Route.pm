@@ -24,8 +24,6 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-sub new { shift->SUPER::new->parse(@_) }
-
 sub add_child {
   my ($self, $route) = @_;
   weaken $route->remove->parent($self)->{parent};
@@ -88,6 +86,8 @@ sub name {
   $self->{custom} = 1;
   return $self;
 }
+
+sub new { shift->SUPER::new->parse(@_) }
 
 sub options { shift->_generate_route(OPTIONS => @_) }
 
@@ -310,14 +310,6 @@ Pattern for this route, defaults to a L<Mojolicious::Routes::Pattern> object.
 L<Mojolicious::Routes::Route> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 new
-
-  my $r = Mojolicious::Routes::Route->new;
-  my $r = Mojolicious::Routes::Route->new('/:controller/:action');
-
-Construct a new L<Mojolicious::Routes::Route> object and <parse> pattern if
-necessary.
-
 =head2 add_child
 
   $r = $r->add_child(Mojolicious::Routes::Route->new);
@@ -428,6 +420,14 @@ the route pattern. Note that the name C<current> is reserved for referring to
 the current route.
 
   $r->get('/user')->to('user#show')->name('show_user');
+
+=head2 new
+
+  my $r = Mojolicious::Routes::Route->new;
+  my $r = Mojolicious::Routes::Route->new('/:controller/:action');
+
+Construct a new L<Mojolicious::Routes::Route> object and <parse> pattern if
+necessary.
 
 =head2 options
 

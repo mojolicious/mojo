@@ -24,11 +24,6 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-sub new {
-  my $class = shift;
-  return bless [@_], ref $class || $class;
-}
-
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
@@ -63,6 +58,11 @@ sub join { Mojo::ByteStream->new(join $_[1] // '', map({"$_"} @{$_[0]})) }
 sub map {
   my ($self, $cb) = @_;
   return $self->new(map { $_->$cb } @$self);
+}
+
+sub new {
+  my $class = shift;
+  return bless [@_], ref $class || $class;
 }
 
 sub pluck {
@@ -152,12 +152,6 @@ Construct a new array-based L<Mojo::Collection> object.
 
 L<Mojo::Collection> implements the following methods.
 
-=head2 new
-
-  my $collection = Mojo::Collection->new(1, 2, 3);
-
-Construct a new array-based L<Mojo::Collection> object.
-
 =head2 compact
 
   my $new = $collection->compact;
@@ -229,6 +223,12 @@ from the results. The element will be the first argument passed to the
 callback and is also available as C<$_>.
 
   my $doubled = $collection->map(sub { $_ * 2 });
+
+=head2 new
+
+  my $collection = Mojo::Collection->new(1, 2, 3);
+
+Construct a new array-based L<Mojo::Collection> object.
 
 =head2 pluck
 

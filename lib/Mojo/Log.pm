@@ -25,12 +25,6 @@ has 'path';
 # Supported log level
 my $LEVEL = {debug => 1, info => 2, warn => 3, error => 4, fatal => 5};
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->on(message => \&_message);
-  return $self;
-}
-
 sub debug { shift->log(debug => @_) }
 sub error { shift->log(error => @_) }
 sub fatal { shift->log(fatal => @_) }
@@ -56,6 +50,12 @@ sub is_level {
 sub is_warn { shift->is_level('warn') }
 
 sub log { shift->emit('message', lc(shift), @_) }
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->on(message => \&_message);
+  return $self;
+}
 
 sub warn { shift->log(warn => @_) }
 
@@ -171,13 +171,6 @@ Log file path used by L</"handle">.
 L<Mojo::Log> inherits all methods from L<Mojo::EventEmitter> and implements
 the following new ones.
 
-=head2 new
-
-  my $log = Mojo::Log->new;
-
-Construct a new L<Mojo::Log> object and subscribe to L</"message"> event with
-default logger.
-
 =head2 debug
 
   $log = $log->debug('You screwed up, but that is ok.');
@@ -255,6 +248,13 @@ Check for warn log level.
   $log = $log->log(debug => 'This', 'too!');
 
 Emit L</"message"> event.
+
+=head2 new
+
+  my $log = Mojo::Log->new;
+
+Construct a new L<Mojo::Log> object and subscribe to L</"message"> event with
+default logger.
 
 =head2 warn
 

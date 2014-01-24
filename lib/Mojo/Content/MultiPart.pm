@@ -5,12 +5,6 @@ use Mojo::Util 'b64_encode';
 
 has parts => sub { [] };
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->on(read => \&_read);
-  return $self;
-}
-
 sub body_contains {
   my ($self, $chunk) = @_;
   for my $part (@{$self->parts}) {
@@ -110,6 +104,12 @@ sub get_body_chunk {
 }
 
 sub is_multipart {1}
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->on(read => \&_read);
+  return $self;
+}
 
 sub _parse_multipart_body {
   my ($self, $boundary) = @_;
@@ -256,13 +256,6 @@ L<Mojo::Content::Single> objects.
 L<Mojo::Content::MultiPart> inherits all methods from L<Mojo::Content> and
 implements the following new ones.
 
-=head2 new
-
-  my $multi = Mojo::Content::MultiPart->new;
-
-Construct a new L<Mojo::Content::MultiPart> object and subscribe to L</"read">
-event with default content parser.
-
 =head2 body_contains
 
   my $bool = $multi->body_contains('foobarbaz');
@@ -298,6 +291,13 @@ Get a chunk of content starting from a specific position.
   my $true = $multi->is_multipart;
 
 True.
+
+=head2 new
+
+  my $multi = Mojo::Content::MultiPart->new;
+
+Construct a new L<Mojo::Content::MultiPart> object and subscribe to L</"read">
+event with default content parser.
 
 =head1 SEE ALSO
 

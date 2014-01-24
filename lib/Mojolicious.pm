@@ -60,42 +60,6 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-
-  my $home = $self->home;
-  push @{$self->renderer->paths}, $home->rel_dir('templates');
-  push @{$self->static->paths},   $home->rel_dir('public');
-
-  # Default to application namespace
-  my $r = $self->routes->namespaces([ref $self]);
-
-  # Hide controller attributes/methods and "handler"
-  $r->hide(qw(app continue cookie finish flash handler match on param));
-  $r->hide(qw(redirect_to render render_exception render_later render_maybe));
-  $r->hide(qw(render_not_found render_static rendered req res respond_to));
-  $r->hide(qw(send session signed_cookie stash tx url_for validation write));
-  $r->hide(qw(write_chunk));
-
-  # Check if we have a log directory
-  my $mode = $self->mode;
-  $self->log->path($home->rel_file("log/$mode.log"))
-    if -w $home->rel_file('log');
-
-  $self->plugin($_)
-    for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
-
-  # Exception handling should be first in chain
-  $self->hook(around_dispatch => \&_exception);
-
-  # Reduced log output outside of development mode
-  $self->log->level('info') unless $mode eq 'development';
-
-  $self->startup;
-
-  return $self;
-}
-
 sub build_tx {
   my $self = shift;
   my $tx   = Mojo::Transaction::HTTP->new;
@@ -175,6 +139,42 @@ sub helper {
 }
 
 sub hook { shift->plugins->on(@_) }
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+
+  my $home = $self->home;
+  push @{$self->renderer->paths}, $home->rel_dir('templates');
+  push @{$self->static->paths},   $home->rel_dir('public');
+
+  # Default to application namespace
+  my $r = $self->routes->namespaces([ref $self]);
+
+  # Hide controller attributes/methods and "handler"
+  $r->hide(qw(app continue cookie finish flash handler match on param));
+  $r->hide(qw(redirect_to render render_exception render_later render_maybe));
+  $r->hide(qw(render_not_found render_static rendered req res respond_to));
+  $r->hide(qw(send session signed_cookie stash tx url_for validation write));
+  $r->hide(qw(write_chunk));
+
+  # Check if we have a log directory
+  my $mode = $self->mode;
+  $self->log->path($home->rel_file("log/$mode.log"))
+    if -w $home->rel_file('log');
+
+  $self->plugin($_)
+    for qw(HeaderCondition DefaultHelpers TagHelpers EPLRenderer EPRenderer);
+
+  # Exception handling should be first in chain
+  $self->hook(around_dispatch => \&_exception);
+
+  # Reduced log output outside of development mode
+  $self->log->level('info') unless $mode eq 'development';
+
+  $self->startup;
+
+  return $self;
+}
 
 sub plugin {
   my $self = shift;
@@ -515,16 +515,6 @@ Validate parameters, defaults to a L<Mojolicious::Validator> object.
 L<Mojolicious> inherits all methods from L<Mojo> and implements the following
 new ones.
 
-=head2 new
-
-  my $app = Mojolicious->new;
-
-Construct a new L<Mojolicious> application, calling C<${mode}_mode> and
-L</"startup"> in the process. Will automatically detect your home directory
-and set up logging based on your current operating mode. Also sets up the
-renderer, static file server, a default set of plugins and an
-L</"around_dispatch"> hook with the default exception handling.
-
 =head2 build_tx
 
   my $tx = $app->build_tx;
@@ -592,6 +582,16 @@ requests indiscriminately, for a full list of available hooks see L</"HOOKS">.
     $c->render(text => 'Skipped static file server and router!')
       if $c->req->url->path->to_route =~ /do_not_dispatch/;
   });
+
+=head2 new
+
+  my $app = Mojolicious->new;
+
+Construct a new L<Mojolicious> application, calling C<${mode}_mode> and
+L</"startup"> in the process. Will automatically detect your home directory
+and set up logging based on your current operating mode. Also sets up the
+renderer, static file server, a default set of plugins and an
+L</"around_dispatch"> hook with the default exception handling.
 
 =head2 plugin
 

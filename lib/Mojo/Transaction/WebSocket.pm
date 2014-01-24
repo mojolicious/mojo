@@ -31,12 +31,6 @@ has context_takeover   => 1;
 has handshake          => sub { Mojo::Transaction::HTTP->new };
 has max_websocket_size => sub { $ENV{MOJO_MAX_WEBSOCKET_SIZE} || 262144 };
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->on(frame => sub { shift->_message(@_) });
-  return $self;
-}
-
 sub build_frame {
   my ($self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload) = @_;
   warn "-- Building frame ($fin, $rsv1, $rsv2, $rsv3, $op)\n" if DEBUG;
@@ -158,6 +152,12 @@ sub is_websocket {1}
 sub kept_alive    { shift->handshake->kept_alive }
 sub local_address { shift->handshake->local_address }
 sub local_port    { shift->handshake->local_port }
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->on(frame => sub { shift->_message(@_) });
+  return $self;
+}
 
 sub parse_frame {
   my ($self, $buffer) = @_;
@@ -521,14 +521,6 @@ MOJO_MAX_WEBSOCKET_SIZE environment variable or C<262144>.
 L<Mojo::Transaction::WebSocket> inherits all methods from
 L<Mojo::Transaction> and implements the following new ones.
 
-=head2 new
-
-  my $ws = Mojo::Transaction::WebSocket->new;
-
-Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
-L</"frame"> event with default message parser, which also handles C<PING> and
-C<CLOSE> frames automatically.
-
 =head2 build_frame
 
   my $bytes = $ws->build_frame($fin, $rsv1, $rsv2, $rsv3, $op, $payload);
@@ -624,6 +616,14 @@ Local interface address.
   my $port = $ws->local_port;
 
 Local interface port.
+
+=head2 new
+
+  my $ws = Mojo::Transaction::WebSocket->new;
+
+Construct a new L<Mojo::Transaction::WebSocket> object and subscribe to
+L</"frame"> event with default message parser, which also handles C<PING> and
+C<CLOSE> frames automatically.
 
 =head2 parse_frame
 

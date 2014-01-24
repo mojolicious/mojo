@@ -10,8 +10,6 @@ use Mojo::Util
 has base => sub { Mojo::URL->new };
 has [qw(fragment host port scheme userinfo)];
 
-sub new { shift->SUPER::new->parse(@_) }
-
 sub authority {
   my $self = shift;
 
@@ -72,6 +70,8 @@ sub ihost {
 }
 
 sub is_abs { !!shift->scheme }
+
+sub new { shift->SUPER::new->parse(@_) }
 
 sub parse {
   my ($self, $url) = @_;
@@ -304,13 +304,6 @@ Userinfo part of this URL.
 L<Mojo::URL> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 new
-
-  my $url = Mojo::URL->new;
-  my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
-
-Construct a new L<Mojo::URL> object and L</"parse"> URL if necessary.
-
 =head2 authority
 
   my $authority = $url->authority;
@@ -339,6 +332,13 @@ Host part of this URL in punycode format.
   my $bool = $url->is_abs;
 
 Check if URL is absolute.
+
+=head2 new
+
+  my $url = Mojo::URL->new;
+  my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
+
+Construct a new L<Mojo::URL> object and L</"parse"> URL if necessary.
 
 =head2 parse
 

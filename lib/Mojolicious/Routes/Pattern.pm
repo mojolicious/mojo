@@ -10,8 +10,6 @@ has quote_start    => '(';
 has relaxed_start  => '#';
 has wildcard_start => '*';
 
-sub new { shift->SUPER::new->parse(@_) }
-
 sub match {
   my ($self, $path, $detect) = @_;
   my $captures = $self->match_partial(\$path, $detect);
@@ -46,6 +44,8 @@ sub match_partial {
 
   return $captures;
 }
+
+sub new { shift->SUPER::new->parse(@_) }
 
 sub parse {
   my $self = shift;
@@ -354,16 +354,6 @@ Character indicating the start of a wildcard placeholder, defaults to C<*>.
 L<Mojolicious::Routes::Pattern> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 new
-
-  my $pattern = Mojolicious::Routes::Pattern->new('/:action');
-  my $pattern
-    = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
-  my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
-
-Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern
-if necessary.
-
 =head2 match
 
   my $captures = $pattern->match('/foo/bar');
@@ -378,6 +368,16 @@ Match pattern against entire path, format detection is disabled by default.
 
 Match pattern against path and remove matching parts, format detection is
 disabled by default.
+
+=head2 new
+
+  my $pattern = Mojolicious::Routes::Pattern->new('/:action');
+  my $pattern
+    = Mojolicious::Routes::Pattern->new('/:action', action => qr/\w+/);
+  my $pattern = Mojolicious::Routes::Pattern->new(format => 0);
+
+Construct a new L<Mojolicious::Routes::Pattern> object and L</"parse"> pattern
+if necessary.
 
 =head2 parse
 

@@ -40,11 +40,6 @@ sub import {
   feature->import(':5.10');
 }
 
-sub new {
-  my $class = shift;
-  bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
-}
-
 sub attr {
   my ($class, $attrs, $default) = @_;
   return unless ($class = ref $class || $class) && $attrs;
@@ -81,6 +76,11 @@ sub attr {
     warn "-- Attribute $attr in $class\n$code\n\n" if $ENV{MOJO_BASE_DEBUG};
     Carp::croak "Mojo::Base error: $@" unless eval "$code;1";
   }
+}
+
+sub new {
+  my $class = shift;
+  bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 }
 
 sub tap {
@@ -180,15 +180,6 @@ Create attributes for hash-based objects, just like the L</"attr"> method.
 
 L<Mojo::Base> implements the following methods.
 
-=head2 new
-
-  my $object = BaseSubClass->new;
-  my $object = BaseSubClass->new(name => 'value');
-  my $object = BaseSubClass->new({name => 'value'});
-
-This base class provides a basic constructor for hash-based objects. You can
-pass it either a hash or a hash reference with attribute values.
-
 =head2 attr
 
   $object->attr('name');
@@ -205,6 +196,15 @@ set a default value, it should be a constant or a callback. The callback will
 be executed at accessor read time if there's no set value. Accessors can be
 chained, that means they return their invocant when they are called with an
 argument.
+
+=head2 new
+
+  my $object = BaseSubClass->new;
+  my $object = BaseSubClass->new(name => 'value');
+  my $object = BaseSubClass->new({name => 'value'});
+
+This base class provides a basic constructor for hash-based objects. You can
+pass it either a hash or a hash reference with attribute values.
 
 =head2 tap
 

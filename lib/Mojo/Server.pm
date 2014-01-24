@@ -8,12 +8,6 @@ use Scalar::Util 'blessed';
 
 has app => sub { shift->build_app('Mojo::HelloWorld') };
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->on(request => sub { shift->app->handler(shift) });
-  return $self;
-}
-
 sub build_app {
   my ($self, $app) = @_;
   local $ENV{MOJO_EXE};
@@ -49,6 +43,12 @@ EOF
   FindBin->again;
 
   return $self->app;
+}
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->on(request => sub { shift->app->handler(shift) });
+  return $self;
 }
 
 sub run { croak 'Method "run" not implemented by subclass' }
@@ -119,13 +119,6 @@ Application this server handles, defaults to a L<Mojo::HelloWorld> object.
 L<Mojo::Server> inherits all methods from L<Mojo::EventEmitter> and implements
 the following new ones.
 
-=head2 new
-
-  my $server = Mojo::Server->new;
-
-Construct a new L<Mojo::Server> object and subscribe to L</"request"> event
-with default request handling.
-
 =head2 build_app
 
   my $app = $server->build_app('Mojo::HelloWorld');
@@ -145,6 +138,13 @@ Let application build a transaction.
 Load application from script.
 
   say Mojo::Server->new->load_app('./myapp.pl')->home;
+
+=head2 new
+
+  my $server = Mojo::Server->new;
+
+Construct a new L<Mojo::Server> object and subscribe to L</"request"> event
+with default request handling.
 
 =head2 run
 

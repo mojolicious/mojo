@@ -22,12 +22,6 @@ has ua => sub { Mojo::UserAgent->new->ioloop(Mojo::IOLoop->singleton) };
 # Silent or loud tests
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : 'fatal';
 
-sub new {
-  my $self = shift->SUPER::new;
-  return $self unless my $app = shift;
-  return $self->app(ref $app ? $app : Mojo::Server->new->build_app($app));
-}
-
 sub app {
   my ($self, $app) = @_;
   return $self->ua->server->app unless $app;
@@ -209,6 +203,12 @@ sub message_ok {
 sub message_unlike {
   my ($self, $regex, $desc) = @_;
   return $self->_message('unlike', $regex, $desc || 'message is not similar');
+}
+
+sub new {
+  my $self = shift->SUPER::new;
+  return $self unless my $app = shift;
+  return $self->app(ref $app ? $app : Mojo::Server->new->build_app($app));
 }
 
 sub options_ok { shift->_build_ok(OPTIONS => @_) }
@@ -475,14 +475,6 @@ User agent used for testing, defaults to a L<Mojo::UserAgent> object.
 
 L<Test::Mojo> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
-
-=head2 new
-
-  my $t = Test::Mojo->new;
-  my $t = Test::Mojo->new('MyApp');
-  my $t = Test::Mojo->new(MyApp->new);
-
-Construct a new L<Test::Mojo> object.
 
 =head2 app
 
@@ -757,6 +749,14 @@ Wait for next WebSocket message to arrive.
   $t = $t->message_unlike(qr/working!/, 'different message');
 
 Opposite of L</"message_like">.
+
+=head2 new
+
+  my $t = Test::Mojo->new;
+  my $t = Test::Mojo->new('MyApp');
+  my $t = Test::Mojo->new(MyApp->new);
+
+Construct a new L<Test::Mojo> object.
 
 =head2 options_ok
 

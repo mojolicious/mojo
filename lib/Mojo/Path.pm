@@ -10,8 +10,6 @@ use Mojo::Util qw(decode encode url_escape url_unescape);
 
 has charset => 'UTF-8';
 
-sub new { shift->SUPER::new->parse(@_) }
-
 sub canonicalize {
   my $self = shift;
 
@@ -63,6 +61,8 @@ sub merge {
   push @{$self->parts}, @{$path->parts};
   return $self->trailing_slash($path->trailing_slash);
 }
+
+sub new { shift->SUPER::new->parse(@_) }
 
 sub parse {
   my $self = shift;
@@ -173,13 +173,6 @@ Charset used for encoding and decoding, defaults to C<UTF-8>.
 L<Mojo::Path> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 new
-
-  my $path = Mojo::Path->new;
-  my $path = Mojo::Path->new('/foo%2Fbar%3B/baz.html');
-
-Construct a new L<Mojo::Path> object and L</"parse"> path if necessary.
-
 =head2 canonicalize
 
   $path = $path->canonicalize;
@@ -239,6 +232,13 @@ that C<%2F> will be treated as C</> for security reasons.
 
   # "/foo/bar/baz/yada"
   Mojo::Path->new('/foo/bar/')->merge('baz/yada');
+
+=head2 new
+
+  my $path = Mojo::Path->new;
+  my $path = Mojo::Path->new('/foo%2Fbar%3B/baz.html');
+
+Construct a new L<Mojo::Path> object and L</"parse"> path if necessary.
 
 =head2 parse
 

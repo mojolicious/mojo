@@ -24,11 +24,6 @@ for my $name (@UTILS) {
   };
 }
 
-sub new {
-  my $class = shift;
-  return bless \(my $dummy = join '', @_), ref $class || $class;
-}
-
 sub b { __PACKAGE__->new(@_) }
 
 sub clone { $_[0]->new(${$_[0]}) }
@@ -43,6 +38,11 @@ sub encode {
   my $self = shift;
   $$self = Mojo::Util::encode shift || 'UTF-8', $$self;
   return $self;
+}
+
+sub new {
+  my $class = shift;
+  return bless \(my $dummy = join '', @_), ref $class || $class;
 }
 
 sub say {
@@ -111,12 +111,6 @@ Construct a new scalar-based L<Mojo::ByteStream> object.
 =head1 METHODS
 
 L<Mojo::ByteStream> implements the following methods.
-
-=head2 new
-
-  my $stream = Mojo::ByteStream->new('test123');
-
-Construct a new scalar-based L<Mojo::ByteStream> object.
 
 =head2 b64_decode
 
@@ -196,6 +190,12 @@ Generate binary MD5 checksum for bytestream with L<Mojo::Util/"md5_bytes">.
   $stream = $stream->md5_sum;
 
 Generate MD5 checksum for bytestream with L<Mojo::Util/"md5_sum">.
+
+=head2 new
+
+  my $stream = Mojo::ByteStream->new('test123');
+
+Construct a new scalar-based L<Mojo::ByteStream> object.
 
 =head2 punycode_decode
 

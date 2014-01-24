@@ -7,13 +7,6 @@ use Mojo::Content::MultiPart;
 has asset => sub { Mojo::Asset::Memory->new(auto_upgrade => 1) };
 has auto_upgrade => 1;
 
-sub new {
-  my $self = shift->SUPER::new(@_);
-  $self->{read}
-    = $self->on(read => sub { $_[0]->asset($_[0]->asset->add_chunk($_[1])) });
-  return $self;
-}
-
 sub body_contains { shift->asset->contains(shift) >= 0 }
 
 sub body_size {
@@ -32,6 +25,13 @@ sub get_body_chunk {
   my ($self, $offset) = @_;
   return $self->generate_body_chunk($offset) if $self->{dynamic};
   return $self->asset->get_chunk($offset);
+}
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->{read}
+    = $self->on(read => sub { $_[0]->asset($_[0]->asset->add_chunk($_[1])) });
+  return $self;
 }
 
 sub parse {
@@ -118,13 +118,6 @@ L<Mojo::Content::MultiPart> object, defaults to C<1>.
 L<Mojo::Content::Single> inherits all methods from L<Mojo::Content> and
 implements the following new ones.
 
-=head2 new
-
-  my $single = Mojo::Content::Single->new;
-
-Construct a new L<Mojo::Content::Single> object and subscribe to L</"read">
-event with default content parser.
-
 =head2 body_contains
 
   my $bool = $single->body_contains('1234567');
@@ -148,6 +141,13 @@ Clone content if possible, otherwise return C<undef>.
   my $bytes = $single->get_body_chunk(0);
 
 Get a chunk of content starting from a specific position.
+
+=head2 new
+
+  my $single = Mojo::Content::Single->new;
+
+Construct a new L<Mojo::Content::Single> object and subscribe to L</"read">
+event with default content parser.
 
 =head2 parse
 

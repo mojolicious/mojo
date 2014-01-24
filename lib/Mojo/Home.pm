@@ -11,8 +11,6 @@ use Mojo::Util qw(class_to_path slurp);
 
 has parts => sub { [] };
 
-sub new { shift->SUPER::new->parse(@_) }
-
 sub detect {
   my $self = shift;
 
@@ -61,6 +59,8 @@ sub list_files {
 }
 
 sub mojo_lib_dir { catdir(dirname(__FILE__), '..') }
+
+sub new { shift->SUPER::new->parse(@_) }
 
 sub parse {
   my ($self, $path) = @_;
@@ -111,14 +111,6 @@ Home directory parts.
 L<Mojo::Home> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 new
-
-  my $home = Mojo::Home->new;
-  my $home = Mojo::Home->new('/home/sri/myapp');
-
-Construct a new L<Mojo::Home> object and L</"parse"> home directory if
-necessary.
-
 =head2 detect
 
   $home = $home->detect;
@@ -148,6 +140,14 @@ directory.
   my $path = $home->mojo_lib_dir;
 
 Path to C<lib> directory in which L<Mojolicious> is installed.
+
+=head2 new
+
+  my $home = Mojo::Home->new;
+  my $home = Mojo::Home->new('/home/sri/myapp');
+
+Construct a new L<Mojo::Home> object and L</"parse"> home directory if
+necessary.
 
 =head2 parse
 

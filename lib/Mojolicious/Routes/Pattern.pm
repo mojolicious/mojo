@@ -70,31 +70,30 @@ sub render {
 
   my $str = '';
   for my $token (reverse @{$self->tree}) {
-    my $op       = $token->[0];
-    my $rendered = '';
+    my ($op, $value) = @$token[0, 1];
+    my $fragment = '';
 
     # Slash
-    if ($op eq 'slash') { $rendered = '/' unless $optional }
+    if ($op eq 'slash') { $fragment = '/' unless $optional }
 
     # Text
     elsif ($op eq 'text') {
-      $rendered = $token->[1];
+      $fragment = $value;
       $optional = 0;
     }
 
     # Placeholder, relaxed or wildcard
     elsif ($op eq 'placeholder' || $op eq 'relaxed' || $op eq 'wildcard') {
-      my $name = $token->[1];
-      $rendered = $values->{$name} // '';
-      my $default = $self->defaults->{$name};
-      if (!defined $default || ($default ne $rendered)) { $optional = 0 }
-      elsif ($optional) { $rendered = '' }
+      $fragment = $values->{$value} // '';
+      my $default = $self->defaults->{$value};
+      if (!defined $default || ($default ne $fragment)) { $optional = 0 }
+      elsif ($optional) { $fragment = '' }
     }
 
-    $str = "$rendered$str";
+    $str = "$fragment$str";
   }
 
-  # Format is optional
+  # Format can be optional
   $str ||= '/';
   return $render && $format ? "$str.$format" : $str;
 }
@@ -109,7 +108,7 @@ sub _compile {
   my $block = my $regex = '';
   my $optional = 1;
   for my $token (reverse @{$self->tree}) {
-    my $op       = $token->[0];
+    my ($op, $value) = @$token[0, 1];
     my $fragment = '';
 
     # Slash
@@ -122,13 +121,13 @@ sub _compile {
 
     # Text
     elsif ($op eq 'text') {
-      $fragment = quotemeta $token->[1];
+      $fragment = quotemeta $value;
       $optional = 0;
     }
 
     # Placeholder
     elsif ($op eq 'placeholder' || $op eq 'relaxed' || $op eq 'wildcard') {
-      unshift @$placeholders, my $name = $token->[1];
+      unshift @$placeholders, $value;
 
       # Placeholder
       if ($op eq 'placeholder') { $fragment = '([^\/\.]+)' }
@@ -140,11 +139,11 @@ sub _compile {
       elsif ($op eq 'wildcard') { $fragment = '(.+)' }
 
       # Custom regex
-      my $constraint = $constraints->{$name};
+      my $constraint = $constraints->{$value};
       $fragment = _compile_req($constraint) if $constraint;
 
       # Optional placeholder
-      exists $defaults->{$name} ? ($fragment .= '?') : ($optional = 0);
+      exists $defaults->{$value} ? ($fragment .= '?') : ($optional = 0);
     }
 
     $block = "$fragment$block";
@@ -194,9 +193,9 @@ sub _tokenize {
 
     # Quote start
     if ($char eq $quote_start) {
-      $quoted = 1;
       push @tree, ['placeholder', ''];
-      $state = 'placeholder';
+      $state  = 'placeholder';
+      $quoted = 1;
     }
 
     # Placeholder start
@@ -213,8 +212,8 @@ sub _tokenize {
 
     # Quote end
     elsif ($char eq $quote_end) {
-      $quoted = 0;
       $state  = 'text';
+      $quoted = 0;
     }
 
     # Slash

@@ -31,14 +31,11 @@ sub build {
   for my $line (@{$self->tree}) {
     push @lines, '';
     for (my $j = 0; $j < @{$line}; $j += 2) {
-      my $type    = $line->[$j];
-      my $value   = $line->[$j + 1] || '';
-      my $newline = chomp $value;
+      my ($op, $value) = @$line[$j, $j + 1];
+      my $newline = chomp($value //= '');
 
       # Capture end
-      if ($type eq 'cpen') {
-
-        # End block
+      if ($op eq 'cpen') {
         $lines[-1] .= 'return Mojo::ByteStream->new($_M) }';
 
         # No following code
@@ -46,26 +43,23 @@ sub build {
         $lines[-1] .= ';' if !defined $next || $next =~ /^\s*$/;
       }
 
-      # Text
-      if ($type eq 'text') {
-
-        # Quote and fix line ending
-        $value = quotemeta $value;
-        $value .= '\n' if $newline;
+      # Text (quote and fix line ending)
+      if ($op eq 'text') {
+        $value = $newline ? quotemeta($value) . '\n' : quotemeta $value;
         $lines[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
       }
 
       # Code or multiline expression
-      if ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
+      if ($op eq 'code' || $multi) { $lines[-1] .= "$value" }
 
       # Expression
-      if ($type eq 'expr' || $type eq 'escp') {
+      if ($op eq 'expr' || $op eq 'escp') {
 
         # Start
         unless ($multi) {
 
           # Escaped
-          if (($type eq 'escp' && !$escape) || ($type eq 'expr' && $escape)) {
+          if (($op eq 'escp' && !$escape) || ($op eq 'expr' && $escape)) {
             $lines[-1] .= "\$_M .= _escape";
             $lines[-1] .= " scalar $value" if length $value;
           }
@@ -79,7 +73,7 @@ sub build {
           && ($line->[$j + 3] // '') eq '');
 
         # Append semicolon
-        $lines[-1] .= ';' if !$multi && !$cpst;
+        $lines[-1] .= ';' unless $multi || $cpst;
       }
 
       # Capture start
@@ -87,7 +81,7 @@ sub build {
         $lines[-1] .= $cpst;
         $cpst = undef;
       }
-      $cpst = " sub { my \$_M = ''; " if $type eq 'cpst';
+      $cpst = " sub { my \$_M = ''; " if $op eq 'cpst';
     }
   }
 

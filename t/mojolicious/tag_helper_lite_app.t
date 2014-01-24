@@ -46,6 +46,8 @@ $t->options_ok('/tags')->status_is(200)->content_is(<<EOF);
 <foo />
 <foo bar="baz" />
 <foo one="t&lt;wo" three="four">Hello</foo>
+<div data-id="1" data-name="ok">some content</div>
+<div data="bar">some content</div>
 EOF
 $t->patch_ok('/more_tags')->status_is(200)->content_is(<<EOF);
 <bar>b&lt;a&gt;z</bar>
@@ -472,6 +474,8 @@ __DATA__
 <%= tag 'foo' %>
 <%= tag 'foo', bar => 'baz' %>
 <%= tag 'foo', one => 't<wo', three => 'four' => begin %>Hello<% end %>
+<%= tag 'div', data => {id => 1, name => 'ok'} => 'some content' %>
+<%= tag 'div', data => 'bar' => 'some content' %>
 
 @@ more_tags.html.ep
 %= tag bar => 'b<a>z'

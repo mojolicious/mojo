@@ -216,7 +216,7 @@ sub _tag {
   
   if ($attrs{data} && ref($attrs{data}) eq 'HASH') {
       $attrs{"data-$_"} = $attrs{data}{$_} for sort keys %{$attrs{data}};
-      delete $attrs{data} ;
+      delete $attrs{data};
   }
   
   $tag .= qq{ $_="} . xml_escape($attrs{$_} // '') . '"' for sort keys %attrs;
@@ -673,7 +673,7 @@ Alias for L</"tag">.
   %= tag div => begin
     some & content
   % end
-  <%= tag div => (id => 'foo') => begin %>some & content<% end %>
+  %= tag 'div', data => {id => 1, name => 'ok'} => 'some content'
 
 HTML/XML tag generator.
 
@@ -685,6 +685,7 @@ HTML/XML tag generator.
     some & content
   </div>
   <div id="foo">some & content</div>
+  <div data-id="1" data-name="ok">some content</div>
 
 Very useful for reuse in more specific tag helpers.
 

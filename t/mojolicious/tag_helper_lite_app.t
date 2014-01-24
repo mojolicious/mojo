@@ -39,6 +39,8 @@ any [qw(PATCH POST)] => '/☃' => 'snowman';
 
 post '/no_snowman';
 
+get '/botton_to';
+
 my $t = Test::Mojo->new;
 
 # Reuse values
@@ -103,6 +105,8 @@ $t->get_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/links">Home</a>
 <a href="/form/23" title="Foo">Foo</a>
 <a href="/form/23" title="Foo">Foo</a>
+<a href="/links">Bar</a>
+
 EOF
 $t->post_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/path">Pa&lt;th</a>
@@ -113,6 +117,8 @@ $t->post_ok('/links')->status_is(200)->content_is(<<'EOF');
 <a href="/links">Home</a>
 <a href="/form/23" title="Foo">Foo</a>
 <a href="/form/23" title="Foo">Foo</a>
+<a href="/links">Bar</a>
+
 EOF
 
 # Scripts
@@ -474,6 +480,28 @@ $t->post_ok('/no_snowman?foo=1')->status_is(200)->content_is(<<'EOF');
 </form>
 EOF
 
+# botton_to helper
+$t->get_ok('/botton_to')->status_is(200)
+  ->content_is('<form action="/" method="post">'
+    . '<input type="submit" value="Click" />'
+    . '</form>' . "\n"
+    . '<form action="/" method="post">'
+    . '<input type="submit" value="Click" />'
+    . '<input name="uid" type="hidden" value="23" />'
+    . '<input name="gid" type="hidden" value="47" />'
+    . '</form>' . "\n"
+    . '<form action="/" class="form-controll" method="post">'
+    . '<input type="submit" value="Click" />'
+    . '<input name="uid" type="hidden" value="23" />'
+    . '<input name="gid" type="hidden" value="47" />'
+    . '</form>' . "\n"
+    . '<form action="/" class="form-controll" method="post">'
+    . '<input class="btn" type="submit" value="Click" />'
+    . '<input name="uid" type="hidden" value="23" />'
+    . '<input name="gid" type="hidden" value="47" />'
+    . '</form>'
+    . "\n\n");
+
 done_testing();
 
 __DATA__
@@ -520,6 +548,8 @@ __DATA__
 <%= link_to Home => 'links' %>
 <%= link_to Foo => 'form', {test => 23}, title => 'Foo' %>
 <%= link_to form => {test => 23} => (title => 'Foo') => begin %>Foo<% end %>
+<%= link_to_if 2 > 1, Bar => 'links' %>
+<%= link_to_if 2 < 1, Bar => 'links' %>
 
 @@ script.html.ep
 <%= javascript '/script.js' %>
@@ -626,3 +656,10 @@ __DATA__
   %= text_area 'bar', cols => 40
   %= submit_button 'whatever'
 %= end
+
+@@ botton_to.html.ep
+%= botton_to 'Click'
+%= botton_to 'Click', data => [qw/uid 23 gid 47/]
+%= botton_to 'Click', data => [qw/uid 23 gid 47/], form_class => 'form-controll'
+%= botton_to 'Click', data => [qw/uid 23 gid 47/], form_class => 'form-controll', submit_class => 'btn'
+%= botton_to_if 2 < 1, 'Click'

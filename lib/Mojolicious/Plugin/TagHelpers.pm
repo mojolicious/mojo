@@ -215,7 +215,7 @@ sub _tag {
   my %attrs = @_;
   
   if ($attrs{data} && ref($attrs{data}) eq 'HASH') {
-      $attrs{"data-$_"} = $attrs{data}{$_} for sort keys $attrs{data};
+      $attrs{"data-$_"} = $attrs{data}{$_} for sort keys %{$attrs{data}};
       delete $attrs{data} ;
   }
   

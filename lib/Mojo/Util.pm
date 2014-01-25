@@ -42,7 +42,8 @@ our @EXPORT_OK = (
   qw(decode deprecated dumper encode get_line hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time trim unquote url_escape url_unescape xml_escape xor_encode)
+  qw(steady_time trim unindent unquote url_escape url_unescape xml_escape),
+  qw(xor_encode)
 );
 
 sub b64_decode { decode_base64($_[0]) }
@@ -289,6 +290,13 @@ sub steady_time () {
 sub trim {
   my $str = shift;
   $str =~ s/^\s+|\s+$//g;
+  return $str;
+}
+
+sub unindent {
+  my $str = shift;
+  my ($whitespace) = $str =~ /^\n*(\s+)/;
+  $str =~ s/^$whitespace//gm;
   return $str;
 }
 
@@ -622,6 +630,12 @@ available through L<Time::HiRes>.
   my $trimmed = trim $str;
 
 Trim whitespace characters from both ends of string.
+
+=head2 unindent
+
+  my $unindented = unindent $str;
+
+Unindent multiline text.
 
 =head2 unquote
 

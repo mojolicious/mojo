@@ -1,6 +1,8 @@
 
-4.70  2014-01-25
+4.70  2014-01-26
   - Added extract_usage method to Mojolicious::Command.
+  - Added unindent method to Mojo::ByteStream.
+  - Added unindent function to Mojo::Util.
   - Updated jQuery to version 2.1.
   - Improved all built-in commands to show usage information in their SYNOPSIS
     sections.
@@ -8,6 +10,7 @@
       %= tag 'div', data => {my_id => 1, Name => 'test'} => 'some content'
     is equivalent to
       %= tag 'div', data-my-id => 1, data-name => 'test' => 'some content'
+  - Fixed indentation of code in documentation browser.
 
 4.69  2014-01-24
   - Improved router to allow format detection for bridges.

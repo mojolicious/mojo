@@ -15,6 +15,10 @@ is b('foo_bar_baz')->camelize, 'FooBarBaz', 'right camelized result';
 # decamelize
 is b('FooBarBaz')->decamelize, 'foo_bar_baz', 'right decamelized result';
 
+# unindent
+is b(" test\n  123\n 456\n")->unindent, "test\n 123\n456\n",
+  'right unindented result';
+
 # b64_encode
 is b('foobar$%^&3217')->b64_encode, "Zm9vYmFyJCVeJjMyMTc=\n",
   'right base64 encoded result';

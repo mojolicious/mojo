@@ -9,7 +9,7 @@ use File::Spec::Functions qw(catdir catfile);
 use Mojo::Loader;
 use Mojo::Server;
 use Mojo::Template;
-use Mojo::Util 'spurt';
+use Mojo::Util qw(spurt unindent);
 use Pod::Usage 'pod2usage';
 
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
@@ -54,9 +54,8 @@ sub extract_usage {
   pod2usage -exitval => 'noexit', -input => (caller)[1], -output => $fh;
   $output =~ s/^.*\n//;
   $output =~ s/\n$//;
-  $output =~ s/^\ {6}//gm;
 
-  return $output;
+  return unindent $output;
 }
 
 sub help {

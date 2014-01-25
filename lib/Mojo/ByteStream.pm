@@ -12,8 +12,8 @@ our @EXPORT_OK = ('b');
 my @UTILS = (
   qw(b64_decode b64_encode camelize decamelize hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum punycode_decode punycode_encode quote sha1_bytes),
-  qw(sha1_sum slurp spurt squish trim unquote url_escape url_unescape),
-  qw(xml_escape xor_encode)
+  qw(sha1_sum slurp spurt squish trim unindent unquote url_escape),
+  qw(url_unescape xml_escape xor_encode)
 );
 for my $name (@UTILS) {
   my $sub = Mojo::Util->can($name);
@@ -300,6 +300,12 @@ Stringify bytestream.
 
 Trim whitespace characters from both ends of bytestream with
 L<Mojo::Util/"trim">.
+
+=head2 unindent
+
+  $stream = $stream->unindent;
+
+Unindent bytestream with C<Mojo::Util/"unindent">.
 
 =head2 unquote
 

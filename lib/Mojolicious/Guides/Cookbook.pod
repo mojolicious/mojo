@@ -26,8 +26,9 @@ for small to mid sized applications.
   $ ./script/myapp daemon
   Server available at http://127.0.0.1:3000.
 
-It has many configuration options and is known to work on every platform Perl
-works on.
+It is available to every application through the command
+L<Mojolicious::Command::daemon>, which has many configuration options and is
+known to work on every platform Perl works on.
 
   $ ./script/myapp daemon -h
   ...List of available options...
@@ -40,7 +41,8 @@ L<Mojo::Server::Daemon/"listen">.
   $ ./script/myapp daemon -l https://[::]:3000
   Server available at https://[::]:3000.
 
-On UNIX platforms you can also add preforking with L<Mojo::Server::Prefork>.
+On UNIX platforms you can also add preforking with
+L<Mojolicious::Command::prefork>.
 
   $ ./script/myapp prefork
   Server available at http://127.0.0.1:3000.

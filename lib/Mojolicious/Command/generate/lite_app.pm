@@ -2,7 +2,7 @@ package Mojolicious::Command::generate::lite_app;
 use Mojo::Base 'Mojolicious::Command';
 
 has description => "Generate Mojolicious::Lite application.\n";
-has usage       => "usage: $0 generate lite_app [NAME]\n";
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, $name) = @_;
@@ -51,10 +51,7 @@ Mojolicious::Command::generate::lite_app - Lite app generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate::lite_app;
-
-  my $app = Mojolicious::Command::generate::lite_app->new;
-  $app->run(@ARGV);
+  Usage: APPLICATION generate lite_app [NAME]
 
 =head1 DESCRIPTION
 

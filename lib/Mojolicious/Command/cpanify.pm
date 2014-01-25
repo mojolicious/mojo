@@ -6,15 +6,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::UserAgent;
 
 has description => "Upload distribution to CPAN.\n";
-has usage       => <<EOF;
-usage: $0 cpanify [OPTIONS] [FILE]
-
-  mojo cpanify -u sri -p secr3t Mojolicious-Plugin-MyPlugin-0.01.tar.gz
-
-These options are available:
-  -p, --password <password>   PAUSE password.
-  -u, --user <name>           PAUSE username.
-EOF
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -56,10 +48,13 @@ Mojolicious::Command::cpanify - Cpanify command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::cpanify;
+  Usage: APPLICATION cpanify [OPTIONS] [FILE]
 
-  my $cpanify = Mojolicious::Command::cpanify->new;
-  $cpanify->run(@ARGV);
+    mojo cpanify -u sri -p secr3t Mojolicious-Plugin-MyPlugin-0.01.tar.gz
+
+  Options:
+    -p, --password <password>   PAUSE password.
+    -u, --user <name>           PAUSE username.
 
 =head1 DESCRIPTION
 

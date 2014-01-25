@@ -4,15 +4,16 @@ use Mojo::Base 'Mojolicious::Commands';
 has description => "Generate files and directories from templates.\n";
 has hint        => <<EOF;
 
-See '$0 generate help GENERATOR' for more information on a specific generator.
+See 'APPLICATION generate help GENERATOR' for more information on a specific
+generator.
 EOF
 has message => <<EOF;
-usage: $0 generate GENERATOR [OPTIONS]
+Usage: APPLICATION generate GENERATOR [OPTIONS]
 
-These generators are currently available:
+Generators:
 EOF
 has namespaces => sub { ['Mojolicious::Command::generate'] };
-has usage => "usage: $0 generate GENERATOR [OPTIONS]\n";
+has usage      => sub { shift->extract_usage };
 
 sub help { shift->run(@_) }
 
@@ -26,10 +27,7 @@ Mojolicious::Command::generate - Generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate;
-
-  my $generator = Mojolicious::Command::generate->new;
-  $generator->run(@ARGV);
+  Usage: APPLICATION generate GENERATOR [OPTIONS]
 
 =head1 DESCRIPTION
 

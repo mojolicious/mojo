@@ -8,12 +8,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Home;
 
 has description => "Run unit tests.\n";
-has usage       => <<EOF;
-usage: $0 test [OPTIONS] [TESTS]
-
-These options are available:
-  -v, --verbose   Print verbose debug information to STDERR.
-EOF
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -50,10 +45,10 @@ Mojolicious::Command::test - Test command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::test;
+  Usage: APPLICATION test [OPTIONS] [TESTS]
 
-  my $test = Mojolicious::Command::test->new;
-  $test->run(@ARGV);
+  Options:
+    -v, --verbose   Print verbose debug information to STDERR.
 
 =head1 DESCRIPTION
 

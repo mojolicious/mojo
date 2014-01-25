@@ -11,30 +11,7 @@ use Mojo::Util qw(decode encode);
 use Scalar::Util 'weaken';
 
 has description => "Perform HTTP request.\n";
-has usage       => <<EOF;
-usage: $0 get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
-
-  mojo get /
-  mojo get mojolicio.us
-  mojo get -v -r google.com
-  mojo get -M POST -c 'trololo' mojolicio.us
-  mojo get -H 'X-Bender: Bite my shiny metal ass!' mojolicio.us
-  mojo get mojolicio.us 'head > title' text
-  mojo get mojolicio.us .footer all
-  mojo get mojolicio.us a attr href
-  mojo get mojolicio.us '*' attr id
-  mojo get mojolicio.us 'h1, h2, h3' 3 text
-  mojo get https://api.metacpan.org/v0/author/SRI /name
-
-These options are available:
-  -C, --charset <charset>     Charset of HTML/XML content, defaults to auto
-                              detection.
-  -c, --content <content>     Content to send with request.
-  -H, --header <name:value>   Additional HTTP header.
-  -M, --method <method>       HTTP method to use, defaults to "GET".
-  -r, --redirect              Follow up to 10 redirects.
-  -v, --verbose               Print request and response headers to STDERR.
-EOF
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -152,10 +129,28 @@ Mojolicious::Command::get - Get command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::get;
+  Usage: APPLICATION get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
 
-  my $get = Mojolicious::Command::get->new;
-  $get->run(@ARGV);
+    mojo get /
+    mojo get mojolicio.us
+    mojo get -v -r google.com
+    mojo get -M POST -c 'trololo' mojolicio.us
+    mojo get -H 'X-Bender: Bite my shiny metal ass!' mojolicio.us
+    mojo get mojolicio.us 'head > title' text
+    mojo get mojolicio.us .footer all
+    mojo get mojolicio.us a attr href
+    mojo get mojolicio.us '*' attr id
+    mojo get mojolicio.us 'h1, h2, h3' 3 text
+    mojo get https://api.metacpan.org/v0/author/SRI /name
+
+  Options:
+    -C, --charset <charset>     Charset of HTML/XML content, defaults to auto
+                                detection.
+    -c, --content <content>     Content to send with request.
+    -H, --header <name:value>   Additional HTTP header.
+    -M, --method <method>       HTTP method to use, defaults to "GET".
+    -r, --redirect              Follow up to 10 redirects.
+    -v, --verbose               Print request and response headers to STDERR.
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Util qw(class_to_file class_to_path);
 
 has description => "Generate Mojolicious application directory structure.\n";
-has usage       => "usage: $0 generate app [NAME]\n";
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, $class) = @_;
@@ -150,10 +150,7 @@ Mojolicious::Command::generate::app - App generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate::app;
-
-  my $app = Mojolicious::Command::generate::app->new;
-  $app->run(@ARGV);
+  Usage: APPLICATION generate app [NAME]
 
 =head1 DESCRIPTION
 

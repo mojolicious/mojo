@@ -10,11 +10,12 @@ use Mojo::Loader;
 use Mojo::Server;
 use Mojo::Template;
 use Mojo::Util 'spurt';
+use Pod::Usage 'pod2usage';
 
 has app => sub { Mojo::Server->new->build_app('Mojo::HelloWorld') };
 has description => 'No description.';
 has quiet       => 0;
-has usage       => "usage: $0\n";
+has usage       => "Usage: APPLICATION\n";
 
 sub chmod_file {
   my ($self, $path, $mod) = @_;
@@ -44,6 +45,18 @@ sub create_dir {
 sub create_rel_dir {
   my ($self, $path) = @_;
   $self->create_dir($self->rel_dir($path));
+}
+
+sub extract_usage {
+  my $self = shift;
+
+  open my $fh, '>', \my $output;
+  pod2usage -exitval => 'noexit', -input => (caller)[1], -output => $fh;
+  $output =~ s/^.*\n//;
+  $output =~ s/\n$//;
+  $output =~ s/^\ {6}//gm;
+
+  return $output;
 }
 
 sub help {
@@ -105,9 +118,9 @@ Mojolicious::Command - Command base class
 
   # Short usage message
   has usage => <<EOF;
-  usage: $0 mycommand [OPTIONS]
+  Usage: APPLICATION mycommand [OPTIONS]
 
-  These options are available:
+  Options:
     -s, --something   Does something.
   EOF
 
@@ -188,6 +201,13 @@ Create a directory.
 
 Portably create a directory relative to the current working directory.
 
+=head2 extract_usage
+
+  my $usage = $command->extract_usage;
+
+Extract usage message from the SYNOPSIS section of the file this method was
+called from.
+
 =head2 help
 
   $command->help;
@@ -209,7 +229,6 @@ Portably generate an absolute path for a file relative to the current working
 directory.
 
 =head2 render_data
-
 
   my $data = $command->render_data('foo_bar');
   my $data = $command->render_data('foo_bar', @args);

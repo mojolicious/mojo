@@ -5,12 +5,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::CGI;
 
 has description => "Start application with CGI.\n";
-has usage       => <<EOF;
-usage: $0 cgi [OPTIONS]
-
-These options are available:
-  --nph   Enable non-parsed-header mode.
-EOF
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -29,10 +24,10 @@ Mojolicious::Command::cgi - CGI command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::CGI;
+  Usage: APPLICATION cgi [OPTIONS]
 
-  my $cgi = Mojolicious::Command::CGI->new;
-  $cgi->run(@ARGV);
+  Options:
+    --nph   Enable non-parsed-header mode.
 
 =head1 DESCRIPTION
 

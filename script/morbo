@@ -16,14 +16,14 @@ GetOptions
   'w|watch=s'  => \my @watch;
 
 die <<EOF if $help || !(my $app = shift);
-usage: $0 [OPTIONS] [APPLICATION]
+Usage: morbo [OPTIONS] [APPLICATION]
 
   morbo script/myapp
   morbo myapp.pl
   morbo -m production -l https://*:443 -l http://[::]:3000 myapp.pl
   morbo -w /usr/local/lib -w public myapp.pl
 
-These options are available:
+Options:
   -h, --help                     Show this message.
   -l, --listen <location>        One or more locations you want to listen on,
                                  defaults to the value of MOJO_LISTEN or

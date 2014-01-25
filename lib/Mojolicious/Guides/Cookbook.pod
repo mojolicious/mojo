@@ -1101,7 +1101,7 @@ that they will be picked up automatically by the command line interface?
   use Mojo::Base 'Mojolicious::Command';
 
   has description => "Spy on application.\n";
-  has usage       => "usage: $0 spy [TARGET]\n";
+  has usage       => "Usage: APPLICATION spy [TARGET]\n";
 
   sub run {
     my ($self, $target) = @_;

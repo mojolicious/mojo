@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Server::PSGI;
 
 has description => "Start application with PSGI.\n";
-has usage       => "usage: $0 psgi\n";
+has usage => sub { shift->extract_usage };
 
 sub run { Mojo::Server::PSGI->new(app => shift->app)->to_psgi_app }
 
@@ -18,10 +18,7 @@ Mojolicious::Command::psgi - PSGI command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::psgi;
-
-  my $psgi = Mojolicious::Command::psgi->new;
-  my $app  = $psgi->run;
+  Usage: APPLICATION psgi
 
 =head1 DESCRIPTION
 

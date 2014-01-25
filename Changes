@@ -1,6 +1,9 @@
 
 4.70  2014-01-25
+  - Added extract_usage method to Mojolicious::Command.
   - Updated jQuery to version 2.1.
+  - Improved all built-in commands to show usage information in their SYNOPSIS
+    sections.
   - Improved tag helpers to make data attributes more convenient. (ravengerUA)
       %= tag 'div', data => {my_id => 1, Name => 'test'} => 'some content'
     is equivalent to

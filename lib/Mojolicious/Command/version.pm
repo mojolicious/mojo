@@ -6,7 +6,7 @@ use Mojo::UserAgent;
 use Mojolicious;
 
 has description => "Show versions of installed modules.\n";
-has usage       => "usage: $0 version\n";
+has usage => sub { shift->extract_usage };
 
 sub run {
   my $self = shift;
@@ -55,10 +55,7 @@ Mojolicious::Command::version - Version command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::version;
-
-  my $v = Mojolicious::Command::version->new;
-  $v->run(@ARGV);
+  Usage: APPLICATION version
 
 =head1 DESCRIPTION
 

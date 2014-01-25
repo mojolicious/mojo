@@ -6,12 +6,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Util 'encode';
 
 has description => "Show available routes.\n";
-has usage       => <<EOF;
-usage: $0 routes [OPTIONS]
-
-These options are available:
-  -v, --verbose   Print additional details about routes.
-EOF
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -85,10 +80,10 @@ Mojolicious::Command::routes - Routes command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::routes;
+  Usage: APPLICATION routes [OPTIONS]
 
-  my $routes = Mojolicious::Command::routes->new;
-  $routes->run(@ARGV);
+  Options:
+    -v, --verbose   Print additional details about routes.
 
 =head1 DESCRIPTION
 

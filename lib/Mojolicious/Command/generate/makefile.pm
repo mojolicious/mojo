@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojolicious;
 
 has description => qq{Generate "Makefile.PL".\n};
-has usage       => "usage: $0 generate makefile\n";
+has usage => sub { shift->extract_usage };
 
 sub run { shift->render_to_rel_file('makefile', 'Makefile.PL') }
 
@@ -33,10 +33,7 @@ Mojolicious::Command::generate::makefile - Makefile generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate::makefile;
-
-  my $makefile = Mojolicious::Command::generate::makefile->new;
-  $makefile->run(@ARGV);
+  Usage: APPLICATION generate makefile
 
 =head1 DESCRIPTION
 

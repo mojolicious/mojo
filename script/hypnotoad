@@ -15,13 +15,13 @@ GetOptions
   't|test'       => sub { $ENV{HYPNOTOAD_TEST}       = 1 };
 
 die <<EOF if $help || !(my $app = shift || $ENV{HYPNOTOAD_APP});
-usage: $0 [OPTIONS] [APPLICATION]
+Usage: hypnotoad [OPTIONS] [APPLICATION]
 
   hypnotoad script/myapp
   hypnotoad myapp.pl
   hypnotoad -f myapp.pl
 
-These options are available:
+Options:
   -f, --foreground   Keep manager process in foreground.
   -h, --help         Show this message.
   -s, --stop         Stop server gracefully.

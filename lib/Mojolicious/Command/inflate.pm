@@ -5,7 +5,7 @@ use Mojo::Loader;
 use Mojo::Util 'encode';
 
 has description => "Inflate embedded files to real files.\n";
-has usage       => "usage: $0 inflate\n";
+has usage => sub { shift->extract_usage };
 
 sub run {
   my $self = shift;
@@ -39,10 +39,7 @@ Mojolicious::Command::inflate - Inflate command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::inflate;
-
-  my $inflate = Mojolicious::Command::inflate->new;
-  $inflate->run(@ARGV);
+  Usage: APPLICATION inflate
 
 =head1 DESCRIPTION
 

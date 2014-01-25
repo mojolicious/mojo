@@ -15,29 +15,11 @@ GetOptions
   'v|verbose'  => sub { $ENV{MORBO_VERBOSE} = 1 },
   'w|watch=s'  => \my @watch;
 
-die <<EOF if $help || !(my $app = shift);
-Usage: morbo [OPTIONS] [APPLICATION]
-
-  morbo script/myapp
-  morbo myapp.pl
-  morbo -m production -l https://*:443 -l http://[::]:3000 myapp.pl
-  morbo -w /usr/local/lib -w public myapp.pl
-
-Options:
-  -h, --help                     Show this message.
-  -l, --listen <location>        One or more locations you want to listen on,
-                                 defaults to the value of MOJO_LISTEN or
-                                 "http://*:3000".
-  -m, --mode <name>              Operating mode for your application, defaults
-                                 to the value of MOJO_MODE/PLACK_ENV or
-                                 "development".
-  -v, --verbose                  Print details about what files changed to
-                                 STDOUT.
-  -w, --watch <directory/file>   One or more directories and files to watch
-                                 for changes, defaults to the application
-                                 script as well as the "lib" and "templates"
-                                 directories in the current working directory.
-EOF
+my $app = shift;
+if ($help || !$app) {
+  require Mojolicious::Command;
+  die Mojolicious::Command->new->extract_usage;
+}
 
 $ENV{MOJO_LISTEN} = join ',', @listen if @listen;
 require Mojo::Server::Morbo;
@@ -53,8 +35,28 @@ morbo - Morbo HTTP and WebSocket development server
 
 =head1 SYNOPSIS
 
-  $ morbo --help
-  $ morbo myapp.pl
+  Usage: morbo [OPTIONS] [APPLICATION]
+
+    morbo script/myapp
+    morbo myapp.pl
+    morbo -m production -l https://*:443 -l http://[::]:3000 myapp.pl
+    morbo -w /usr/local/lib -w public myapp.pl
+
+  Options:
+    -h, --help                     Show this message.
+    -l, --listen <location>        One or more locations you want to listen
+                                   on, defaults to the value of MOJO_LISTEN or
+                                   "http://*:3000".
+    -m, --mode <name>              Operating mode for your application,
+                                   defaults to the value of
+                                   MOJO_MODE/PLACK_ENV or "development".
+    -v, --verbose                  Print details about what files changed to
+                                   STDOUT.
+    -w, --watch <directory/file>   One or more directories and files to watch
+                                   for changes, defaults to the application
+                                   script as well as the "lib" and "templates"
+                                   directories in the current working
+                                   directory.
 
 =head1 DESCRIPTION
 

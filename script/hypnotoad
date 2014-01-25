@@ -14,19 +14,11 @@ GetOptions
   's|stop'       => sub { $ENV{HYPNOTOAD_STOP}       = 1 },
   't|test'       => sub { $ENV{HYPNOTOAD_TEST}       = 1 };
 
-die <<EOF if $help || !(my $app = shift || $ENV{HYPNOTOAD_APP});
-Usage: hypnotoad [OPTIONS] [APPLICATION]
-
-  hypnotoad script/myapp
-  hypnotoad myapp.pl
-  hypnotoad -f myapp.pl
-
-Options:
-  -f, --foreground   Keep manager process in foreground.
-  -h, --help         Show this message.
-  -s, --stop         Stop server gracefully.
-  -t, --test         Test application and exit.
-EOF
+my $app = shift || $ENV{HYPNOTOAD_APP};
+if ($help || !$app) {
+  require Mojolicious::Command;
+  die Mojolicious::Command->new->extract_usage;
+}
 
 require Mojo::Server::Hypnotoad;
 Mojo::Server::Hypnotoad->new->run($app);
@@ -39,8 +31,17 @@ hypnotoad - Hypnotoad HTTP and WebSocket server
 
 =head1 SYNOPSIS
 
-  $ hypnotoad --help
-  $ hypnotoad myapp.pl
+  Usage: hypnotoad [OPTIONS] [APPLICATION]
+
+    hypnotoad script/myapp
+    hypnotoad myapp.pl
+    hypnotoad -f myapp.pl
+
+  Options:
+    -f, --foreground   Keep manager process in foreground.
+    -h, --help         Show this message.
+    -s, --stop         Stop server gracefully.
+    -t, --test         Test application and exit.
 
 =head1 DESCRIPTION
 

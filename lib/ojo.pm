@@ -77,7 +77,7 @@ MOJO_PROXY environment variable.
 
 =head1 FUNCTIONS
 
-L<ojo> implements the following functions.
+L<ojo> implements the following functions, which are automatically exported.
 
 =head2 a
 

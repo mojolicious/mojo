@@ -162,8 +162,8 @@ All three forms save a lot of typing.
 
 =head1 FUNCTIONS
 
-L<Mojo::Base> exports the following functions if imported with the C<-base>
-flag or a base class.
+L<Mojo::Base> implements the following functions, which can be imported with
+the C<-base> flag or by setting a base class.
 
 =head2 has
 

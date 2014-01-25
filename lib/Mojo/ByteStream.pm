@@ -100,7 +100,8 @@ a more friendly API for many of the functions in L<Mojo::Util>.
 
 =head1 FUNCTIONS
 
-L<Mojo::ByteStream> implements the following functions.
+L<Mojo::ByteStream> implements the following functions, which can be imported
+individually.
 
 =head2 b
 

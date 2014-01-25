@@ -1005,7 +1005,8 @@ fun!
 
 =head1 FUNCTIONS
 
-L<Mojolicious::Lite> implements the following functions.
+L<Mojolicious::Lite> implements the following functions, which are
+automatically exported.
 
 =head2 any
 

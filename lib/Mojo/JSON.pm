@@ -378,7 +378,8 @@ C<u2028> and C<u2029> will always be escaped to make JSONP easier.
 
 =head1 FUNCTIONS
 
-L<Mojo::JSON> implements the following functions.
+L<Mojo::JSON> implements the following functions, which can be imported
+individually.
 
 =head2 j
 

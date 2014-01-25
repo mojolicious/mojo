@@ -394,7 +394,8 @@ L<Mojo::Util> provides portable utility functions for L<Mojo>.
 
 =head1 FUNCTIONS
 
-L<Mojo::Util> implements the following functions.
+L<Mojo::Util> implements the following functions, which can be imported
+individually.
 
 =head2 b64_decode
 

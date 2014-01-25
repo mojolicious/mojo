@@ -140,7 +140,8 @@ L<Mojo::Collection> is an array-based container for collections.
 
 =head1 FUNCTIONS
 
-L<Mojo::Collection> implements the following functions.
+L<Mojo::Collection> implements the following functions, which can be imported
+individually.
 
 =head2 c
 

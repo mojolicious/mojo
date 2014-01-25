@@ -635,7 +635,7 @@ Trim whitespace characters from both ends of string.
 
   my $unindented = unindent $str;
 
-Unindent multiline text.
+Unindent multiline string.
 
 =head2 unquote
 

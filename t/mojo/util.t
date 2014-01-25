@@ -97,6 +97,8 @@ is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",
   'right unindented result';
 is unindent("\ttest\n\t\t123\n\t456\n"), "test\n\t123\n456\n",
   'right unindented result';
+is unindent("\t \ttest\n\t \t\t123\n\t \t456\n"), "test\n\t123\n456\n",
+  'right unindented result';
 is unindent("\n\n\n test\n  123\n 456\n"), "\n\n\ntest\n 123\n456\n",
   'right unindented result';
 is unindent("   test\n    123\n   456\n"), "test\n 123\n456\n",

@@ -50,8 +50,8 @@ sub create_rel_dir {
 sub extract_usage {
   my $self = shift;
 
-  open my $fh, '>', \my $output;
-  pod2usage -exitval => 'noexit', -input => (caller)[1], -output => $fh;
+  open my $handle, '>', \my $output;
+  pod2usage -exitval => 'noexit', -input => (caller)[1], -output => $handle;
   $output =~ s/^.*\n//;
   $output =~ s/\n$//;
 

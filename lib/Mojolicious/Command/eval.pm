@@ -32,9 +32,9 @@ Mojolicious::Command::eval - Eval command
 
   Usage: APPLICATION eval [OPTIONS] CODE
 
-    mojo eval 'say app->ua->get("/")->res->body'
-    mojo eval -v 'app->home'
-    mojo eval -V 'app->renderer->paths'
+    ./myapp.pl eval 'say app->ua->get("/")->res->body'
+    ./myapp.pl eval -v 'app->home'
+    ./myapp.pl eval -V 'app->renderer->paths'
 
   Options:
     -v, --verbose   Print return value to STDOUT.

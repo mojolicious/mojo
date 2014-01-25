@@ -37,6 +37,9 @@ Mojolicious::Command::daemon - Daemon command
 
   Usage: APPLICATION daemon [OPTIONS]
 
+    ./myapp.pl daemon -m production -l http://*:8080
+    ./myapp.pl daemon -l http://127.0.0.1:8080 -l https://[::]:8081
+
   Options:
     -b, --backlog <size>         Listen backlog size, defaults to SOMAXCONN.
     -c, --clients <number>       Maximum number of concurrent clients,

@@ -131,7 +131,7 @@ Mojolicious::Command::get - Get command
 
   Usage: APPLICATION get [OPTIONS] URL [SELECTOR|JSON-POINTER] [COMMANDS]
 
-    mojo get /
+    ./myapp.pl get /
     mojo get mojolicio.us
     mojo get -v -r google.com
     mojo get -M POST -c 'trololo' mojolicio.us

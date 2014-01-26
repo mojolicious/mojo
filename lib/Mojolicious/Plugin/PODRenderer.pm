@@ -48,8 +48,8 @@ sub _html {
 
   # Rewrite code blocks for syntax highlighting and correct indentation
   for my $e ($dom->find('pre')->each) {
-    $e->replace_content(my $content = unindent $e->content_xml);
-    next if $content =~ /^\s*\$\s+/m || $content !~ /[\$\@\%]\w|-&gt;\w/m;
+    $e->replace_content(my $xml = unindent $e->content_xml);
+    next if $xml =~ /^\s*(?:\$|Usage:)\s+/m || $xml !~ /[\$\@\%]\w|-&gt;\w/m;
     my $attrs = $e->attr;
     my $class = $attrs->{class};
     $attrs->{class} = defined $class ? "$class prettyprint" : 'prettyprint';

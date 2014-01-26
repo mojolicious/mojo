@@ -162,15 +162,7 @@ $loop->start;
 unlike $ENV{MOJO_REUSE}, qr/(?:^|\,)127\.0\.0\.1:${port}:/,
   'environment is clean';
 ok $connected, 'connected';
-$err = undef;
-$loop->client(
-  (port => $port) => sub {
-    shift->stop;
-    $err = shift;
-  }
-);
-$loop->start;
-ok $err, 'has error';
+ok !$loop->acceptor($id), 'acceptor has been removed';
 
 # Removed connection (with delay)
 my $removed;

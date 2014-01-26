@@ -141,19 +141,6 @@ the C<Mojolicious::Command> namespace.
 
 These commands are available by default.
 
-=head2 help
-
-  $ mojo
-  $ mojo help
-  $ ./myapp.pl help
-
-List available commands with short descriptions.
-
-  $ mojo help <command>
-  $ ./myapp.pl help <command>
-
-List available options for the command with short descriptions.
-
 =head2 cgi
 
   $ ./myapp.pl cgi
@@ -229,6 +216,19 @@ for a fully functional L<Mojolicious> plugin.
 
 Use L<Mojolicious::Command::get> to perform requests to remote host or local
 application.
+
+=head2 help
+
+  $ mojo
+  $ mojo help
+  $ ./myapp.pl help
+
+List available commands with short descriptions.
+
+  $ mojo help <command>
+  $ ./myapp.pl help <command>
+
+List available options for the command with short descriptions.
 
 =head2 inflate
 

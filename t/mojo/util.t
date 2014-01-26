@@ -105,7 +105,11 @@ is unindent("   test\n    123\n   456\n"), "test\n 123\n456\n",
   'right unindented result';
 is unindent("    test\n  123\n   456\n"), "  test\n123\n 456\n",
   'right unindented result';
-is unindent("test\n123\n"), "test\n123\n", 'right unindented result';
+is unindent("test\n123\n"),     "test\n123\n",   'right unindented result';
+is unindent(" test\n\n 123\n"), "test\n\n123\n", 'right unindented result';
+is unindent('  test'),          'test',          'right unindented result';
+is unindent(" te st\r\n\r\n  1 2 3\r\n 456\r\n"),
+  "te st\r\n\r\n 1 2 3\r\n456\r\n", 'right unindented result';
 
 # b64_encode
 is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",

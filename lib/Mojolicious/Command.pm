@@ -25,10 +25,7 @@ sub chmod_file {
   return $self;
 }
 
-sub chmod_rel_file {
-  my ($self, $path, $mod) = @_;
-  $self->chmod_file($self->rel_file($path), $mod);
-}
+sub chmod_rel_file { $_[0]->chmod_file($_[0]->rel_file($_[1]), $_[2]) }
 
 sub create_dir {
   my ($self, $path) = @_;
@@ -42,10 +39,7 @@ sub create_dir {
   return $self;
 }
 
-sub create_rel_dir {
-  my ($self, $path) = @_;
-  $self->create_dir($self->rel_dir($path));
-}
+sub create_rel_dir { $_[0]->create_dir($_[0]->rel_dir($_[1])) }
 
 sub extract_usage {
   my $self = shift;
@@ -93,10 +87,7 @@ sub write_file {
   return $self;
 }
 
-sub write_rel_file {
-  my ($self, $path, $data) = @_;
-  $self->write_file($self->rel_file($path), $data);
-}
+sub write_rel_file { $_[0]->write_file($_[0]->rel_file($_[1]), $_[2]) }
 
 1;
 

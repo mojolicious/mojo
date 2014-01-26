@@ -8,6 +8,7 @@ use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
+use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Time::HiRes ();
 
@@ -295,8 +296,8 @@ sub trim {
 
 sub unindent {
   my $str = shift;
-  my ($whitespace) = $str =~ /^\n*(\s+)/;
-  $str =~ s/^$whitespace//gm;
+  my $min = min map { m/^([ \t]*)/; length $1 || () } split /\n/, $str;
+  $str =~ s/^[ \t]{0,$min}//gm if $min;
   return $str;
 }
 

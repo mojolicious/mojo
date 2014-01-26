@@ -103,6 +103,9 @@ is unindent("\n\n\n test\n  123\n 456\n"), "\n\n\ntest\n 123\n456\n",
   'right unindented result';
 is unindent("   test\n    123\n   456\n"), "test\n 123\n456\n",
   'right unindented result';
+is unindent("    test\n  123\n   456\n"), "  test\n123\n 456\n",
+  'right unindented result';
+is unindent("test\n123\n"), "test\n123\n", 'right unindented result';
 
 # b64_encode
 is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",

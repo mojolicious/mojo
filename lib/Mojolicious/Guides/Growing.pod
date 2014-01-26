@@ -99,7 +99,7 @@ information across several HTTP requests.
 
   GET /protected HTTP/1.1
   Host: mojolicio.us
-  Cookie: $Version=1; sessionid=987654321
+  Cookie: sessionid=987654321
 
   HTTP/1.1 200 OK
   Set-Cookie: sessionid=987654321

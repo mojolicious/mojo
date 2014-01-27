@@ -154,7 +154,8 @@ Mojolicious::Command::get - Get command
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Command::get> is a command interface to L<Mojo::UserAgent>.
+L<Mojolicious::Command::get> is a command line interface to
+L<Mojo::UserAgent>.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.

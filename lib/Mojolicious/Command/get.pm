@@ -134,8 +134,8 @@ Mojolicious::Command::get - Get command
     ./myapp.pl get /
     mojo get mojolicio.us
     mojo get -v -r google.com
+    mojo get -v -H 'Host: mojolicious.org' -H 'DNT: 1' mojolicio.us
     mojo get -M POST -c 'trololo' mojolicio.us
-    mojo get -H 'X-Bender: Bite my shiny metal ass!' mojolicio.us
     mojo get mojolicio.us 'head > title' text
     mojo get mojolicio.us .footer all
     mojo get mojolicio.us a attr href

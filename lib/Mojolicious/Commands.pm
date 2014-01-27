@@ -133,7 +133,7 @@ Mojolicious::Commands - Command line interface
 
 =head1 DESCRIPTION
 
-L<Mojolicious::Commands> is the interactive command line interface to the
+L<Mojolicious::Commands> is the interactive command line interface for the
 L<Mojolicious> framework. It will automatically detect available commands in
 the C<Mojolicious::Command> namespace.
 

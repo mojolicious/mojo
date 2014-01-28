@@ -182,6 +182,11 @@ $t->message_ok->message_is({binary => 'a' x 50000});
 ok length $payload < 262145, 'message has been compressed';
 $t->finish_ok->finished_ok(1005);
 
+# Compressed message exceeding the limit when uncompressed
+$t->websocket_ok('/echo')
+  ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate')
+  ->send_ok({binary => 'a' x 1000000})->finished_ok(1009);
+
 # Binary message in two 64bit frames without FIN bit (too large)
 $t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'c' x 100000])
   ->send_ok([0, 0, 0, 0, 0, 'c' x 162146])->finished_ok(1009);

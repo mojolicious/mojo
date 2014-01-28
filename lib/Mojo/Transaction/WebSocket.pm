@@ -1,7 +1,7 @@
 package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
-use Compress::Raw::Zlib qw(Z_OK Z_SYNC_FLUSH);
+use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
 use Config;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
@@ -326,8 +326,8 @@ sub _message {
       WindowBits  => -15
     );
     $self->{inflate} = $inflate if $self->context_takeover;
-    return $self->finish(1009)
-      if $inflate->inflate(\($msg .= "\x00\x00\xff\xff"), my $out) != Z_OK;
+    $inflate->inflate(\($msg .= "\x00\x00\xff\xff"), my $out);
+    return $self->finish(1009) if length $msg;
     $msg = $out;
   }
 

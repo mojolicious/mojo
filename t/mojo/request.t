@@ -3,6 +3,7 @@ use Mojo::Base -strict;
 use Test::More;
 use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
+use IO::Compress::Gzip 'gzip';
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
 use Mojo::Cookie::Request;
@@ -479,6 +480,25 @@ is $req->headers->content_type, 'application/x-www-form-urlencoded',
   'right "Content-Type" value';
 is $req->headers->content_length, 14, 'right "Content-Length" value';
 is $req->param('name'), '☃', 'right value';
+
+# Parse HTTP 1.1 gzip compressed request (no decompression)
+gzip \(my $uncompressed = 'abc' x 1000), \my $compressed;
+$req = Mojo::Message::Request->new;
+$req->parse("POST /foo HTTP/1.1\x0d\x0a");
+$req->parse("Content-Type: text/plain\x0d\x0a");
+$req->parse("Content-Length: @{[length $compressed]}\x0d\x0a");
+$req->parse("Content-Encoding: GZip\x0d\x0a\x0d\x0a");
+ok $req->content->is_compressed, 'content is compressed';
+$req->parse($compressed);
+ok $req->content->is_compressed, 'content is still compressed';
+ok $req->is_finished, 'request is finished';
+is $req->method,      'POST', 'right method';
+is $req->version,     '1.1', 'right version';
+is $req->url,         '/foo', 'right URL';
+is $req->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $req->headers->content_length, length($compressed),
+  'right "Content-Length" value';
+is $req->body, $compressed, 'right content';
 
 # Parse HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;

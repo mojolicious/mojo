@@ -1,7 +1,7 @@
 package Mojo::Transaction::WebSocket;
 use Mojo::Base 'Mojo::Transaction';
 
-use Compress::Raw::Zlib 'Z_SYNC_FLUSH';
+use Compress::Raw::Zlib qw(Z_OK Z_SYNC_FLUSH);
 use Config;
 use Mojo::JSON;
 use Mojo::Transaction::HTTP;
@@ -311,8 +311,8 @@ sub _message {
   # Append chunk and check message size
   $self->{op} = $op unless exists $self->{op};
   $self->{message} .= $frame->[5];
-  return $self->finish(1009)
-    if length $self->{message} > $self->max_websocket_size;
+  my $max = $self->max_websocket_size;
+  return $self->finish(1009) if length $self->{message} > $max;
 
   # No FIN bit (Continuation)
   return unless $frame->[0];
@@ -320,10 +320,14 @@ sub _message {
   # "permessage-deflate" extension (handshake and RSV1)
   my $msg = delete $self->{message};
   if ($self->compressed && $frame->[1]) {
-    my $inflate = $self->{inflate}
-      || Compress::Raw::Zlib::Inflate->new(WindowBits => -15);
+    my $inflate = $self->{inflate} || Compress::Raw::Zlib::Inflate->new(
+      Bufsize     => $max,
+      LimitOutput => 1,
+      WindowBits  => -15
+    );
     $self->{inflate} = $inflate if $self->context_takeover;
-    $inflate->inflate(\($msg .= "\x00\x00\xff\xff"), my $out);
+    return $self->finish(1009)
+      if $inflate->inflate(\($msg .= "\x00\x00\xff\xff"), my $out) != Z_OK;
     $msg = $out;
   }
 

@@ -1,5 +1,7 @@
 
-4.71  2014-01-27
+4.71  2014-01-28
+  - Fixed a few compression bugs in Mojo::Transaction::WebSocket and
+    Mojo::Content.
 
 4.70  2014-01-26
   - Added extract_usage method to Mojolicious::Command.

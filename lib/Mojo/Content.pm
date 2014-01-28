@@ -286,7 +286,8 @@ sub _uncompress {
   my ($self, $chunk) = @_;
 
   # No compression
-  return $self->emit(read => $chunk) unless $self->is_compressed;
+  return $self->emit(read => $chunk)
+    unless $self->is_compressed && $self->auto_relax;
 
   # Uncompress
   $self->{post_buffer} .= $chunk;

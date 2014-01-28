@@ -195,8 +195,8 @@ sub render_exception {
   };
   my $inline = $renderer->_bundled(
     $mode eq 'development' ? 'exception.development' : 'exception');
-  return $self if $self->_fallbacks($options, 'exception', $inline);
-  $self->_fallbacks({%$options, format => 'html'}, 'exception', $inline);
+  return $self if _fallbacks($self, $options, 'exception', $inline);
+  _fallbacks($self, {%$options, format => 'html'}, 'exception', $inline);
   return $self;
 }
 
@@ -216,8 +216,8 @@ sub render_not_found {
     = {template => "not_found.$mode", format => $format, status => 404};
   my $inline = $renderer->_bundled(
     $mode eq 'development' ? 'not_found.development' : 'not_found');
-  return $self if $self->_fallbacks($options, 'not_found', $inline);
-  $self->_fallbacks({%$options, format => 'html'}, 'not_found', $inline);
+  return $self if _fallbacks($self, $options, 'not_found', $inline);
+  _fallbacks($self, {%$options, format => 'html'}, 'not_found', $inline);
   return $self;
 }
 

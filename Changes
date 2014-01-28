@@ -1,4 +1,6 @@
 
+4.72  2014-01-29
+
 4.71  2014-01-28
   - Fixed a few compression bugs in Mojo::Transaction::WebSocket and
     Mojo::Content.

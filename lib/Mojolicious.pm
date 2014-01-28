@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.71';
+our $VERSION  = '4.72';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -587,11 +587,11 @@ requests indiscriminately, for a full list of available hooks see L</"HOOKS">.
 
   my $app = Mojolicious->new;
 
-Construct a new L<Mojolicious> application, calling C<${mode}_mode> and
-L</"startup"> in the process. Will automatically detect your home directory
-and set up logging based on your current operating mode. Also sets up the
-renderer, static file server, a default set of plugins and an
-L</"around_dispatch"> hook with the default exception handling.
+Construct a new L<Mojolicious> application and call L</"startup">. Will
+automatically detect your home directory and set up logging based on your
+current operating mode. Also sets up the renderer, static file server, a
+default set of plugins and an L</"around_dispatch"> hook with the default
+exception handling.
 
 =head2 plugin
 

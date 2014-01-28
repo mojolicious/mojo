@@ -93,8 +93,8 @@ sub delay {
 
 sub generate_port { Mojo::IOLoop::Server->generate_port }
 
-sub is_running { (ref $_[0] ? $_[0] : $_[0]->singleton)->reactor->is_running }
-sub one_tick   { (ref $_[0] ? $_[0] : $_[0]->singleton)->reactor->one_tick }
+sub is_running { _instance(shift)->reactor->is_running }
+sub one_tick   { _instance(shift)->reactor->one_tick }
 
 sub recurring { shift->_timer(recurring => @_) }
 
@@ -126,10 +126,10 @@ sub singleton { state $loop = shift->SUPER::new }
 sub start {
   my $self = shift;
   croak 'Mojo::IOLoop already running' if $self->is_running;
-  (ref $self ? $self : $self->singleton)->reactor->start;
+  _instance($self)->reactor->start;
 }
 
-sub stop { (ref $_[0] ? $_[0] : $_[0]->singleton)->reactor->stop }
+sub stop { _instance(shift)->reactor->stop }
 
 sub stream {
   my ($self, $stream) = (_instance(shift), @_);

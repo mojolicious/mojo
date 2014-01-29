@@ -50,7 +50,7 @@ sub accepts {
     next unless my $first = first { $ext eq $_ } @_;
     return $first;
   }
-  return shift;
+  return @exts ? undef : shift;
 }
 
 sub detect {

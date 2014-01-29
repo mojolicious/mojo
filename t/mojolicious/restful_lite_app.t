@@ -67,6 +67,9 @@ $t->request_ok($tx)->status_is(200)->content_type_is('application/json')
 # Nothing
 $t->get_ok('/accepts')->status_is(200)->json_is({best => 'html'});
 
+# Unsupported
+$t->get_ok('/accepts.xml')->status_is(200)->json_is({best => undef});
+
 # "json" format
 $t->get_ok('/accepts.json')->status_is(200)->json_is({best => 'json'});
 

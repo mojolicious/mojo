@@ -29,6 +29,24 @@ $HOME->parse(
   $HOME->parse($HOME->mojo_lib_dir)->rel_dir('Mojolicious/templates'));
 my %TEMPLATES = map { $_ => slurp $HOME->rel_file($_) } @{$HOME->list_files};
 
+sub accepts {
+  my ($self, $c) = (shift, shift);
+
+  # List representations
+  my $req = $c->req;
+  my @exts = @{$c->app->types->detect($req->headers->accept, $req->is_xhr)};
+  if (!@exts && (my $format = $c->stash->{format} || $req->param('format'))) {
+    push @exts, $format;
+  }
+  return \@exts unless @_;
+
+  # Find best representation
+  for my $ext (@exts) {
+    return $ext if grep { $ext eq $_ } @_;
+  }
+  return @exts ? undef : shift;
+}
+
 sub add_handler { shift->_add(handlers => @_) }
 sub add_helper  { shift->_add(helpers  => @_) }
 
@@ -300,6 +318,18 @@ Directories to look for templates in, first one has the highest precedence.
 
 L<Mojolicious::Renderer> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
+
+=head2 accepts
+
+  my $all  = $renderer->accepts(Mojolicious::Controller->new);
+  my $best = $renderer->accepts(Mojolicious::Controller->new, 'html', 'json');
+
+Select best possible representation for resource from C<Accept> request
+header, C<format> stash value or C<format> GET/POST parameter, defaults to
+returning the first extension if no preference could be detected. Since
+browsers often don't really know what they actually want, unspecific C<Accept>
+request headers with more than one MIME type will be ignored, unless the
+C<X-Requested-With> header is set to the value C<XMLHttpRequest>.
 
 =head2 add_handler
 

@@ -32,24 +32,6 @@ has types => sub {
   };
 };
 
-sub accepts {
-  my ($self, $c) = (shift, shift);
-
-  # List representations
-  my $req = $c->req;
-  my @exts = @{$self->detect($req->headers->accept, $req->is_xhr)};
-  if (!@exts && (my $format = $c->stash->{format} || $req->param('format'))) {
-    push @exts, $format;
-  }
-  return \@exts unless @_;
-
-  # Find best representation
-  for my $ext (@exts) {
-    return $ext if grep { $ext eq $_ } @_;
-  }
-  return @exts ? undef : shift;
-}
-
 sub detect {
   my ($self, $accept, $prioritize) = @_;
 
@@ -142,18 +124,6 @@ List of MIME types.
 
 L<Mojolicious::Types> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
-
-=head2 accepts
-
-  my $all  = $types->accepts(Mojolicious::Controller->new);
-  my $best = $types->accepts(Mojolicious::Controller->new, 'html', 'json');
-
-Select best possible representation for resource from C<Accept> request
-header, C<format> stash value or C<format> GET/POST parameter, defaults to
-returning the first extension if no preference could be detected. Since
-browsers often don't really know what they actually want, unspecific C<Accept>
-request headers with more than one MIME type will be ignored, unless the
-C<X-Requested-With> header is set to the value C<XMLHttpRequest>.
 
 =head2 detect
 

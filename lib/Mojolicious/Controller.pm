@@ -268,9 +268,9 @@ sub respond_to {
 
   # Find target
   my $target;
-  my $app     = $self->app;
-  my @formats = @{$app->types->accepts($self)};
-  for my $format (@formats ? @formats : ($app->renderer->default_format)) {
+  my $renderer = $self->app->renderer;
+  my @formats  = @{$renderer->accepts($self)};
+  for my $format (@formats ? @formats : ($renderer->default_format)) {
     next unless $target = $args->{$format};
     $self->stash->{format} = $format;
     last;

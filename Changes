@@ -1,7 +1,7 @@
 
 4.72  2014-01-29
   - Added template_for and template_handler methods to Mojolicious::Renderer.
-  - Added accepts method to Mojolicious::Types.
+  - Added accepts method to Mojolicious::Renderer.
   - Added accepts helper to Mojolicious::Plugin::DefaultHelpers.
   - Added before_render hook.
   - Fixed bug in Mojo::Transaction::WebSocket that prevented decompression

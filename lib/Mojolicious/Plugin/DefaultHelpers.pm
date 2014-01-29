@@ -42,7 +42,7 @@ sub register {
 
 sub _accepts {
   my $self = shift;
-  return $self->app->types->accepts($self, @_);
+  return $self->app->renderer->accepts($self, @_);
 }
 
 sub _content {
@@ -136,8 +136,8 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
 
 Select best possible representation for resource from C<Accept> request
 header, C<format> stash value or C<format> GET/POST parameter with
-L<Mojolicious::Types/"accepts">, defaults to returning the first extension if
-no preference could be detected.
+L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension
+if no preference could be detected.
 
   $self->render(json => {hello => 'world'}) if $self->accepts('json');
 

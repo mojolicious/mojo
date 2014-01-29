@@ -29,6 +29,9 @@ Mojolicious::Plugin - Plugin base class
 
 L<Mojolicious::Plugin> is an abstract base class for L<Mojolicious> plugins.
 
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
+by default.
+
 =head1 METHODS
 
 L<Mojolicious::Plugin> inherits all methods from L<Mojo::Base> and implements

@@ -297,6 +297,9 @@ C<tag_with_error> helper, to make styling with CSS easier.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning how to build new plugins, you're welcome to fork it.
 
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
+by default.
+
 =head1 HELPERS
 
 L<Mojolicious::Plugin::TagHelpers> implements the following helpers.

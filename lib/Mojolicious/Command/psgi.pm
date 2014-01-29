@@ -28,6 +28,9 @@ backend.
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
 
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
+
 =head1 ATTRIBUTES
 
 L<Mojolicious::Command::psgi> inherits all attributes from

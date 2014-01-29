@@ -86,6 +86,9 @@ templates are pretty much just raw L<Mojo::Template>.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins, you're welcome to fork it.
 
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
+by default.
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::EPLRenderer> inherits all methods from

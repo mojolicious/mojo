@@ -124,8 +124,8 @@ Mojolicious::Command - Command base class
 
 L<Mojolicious::Command> is an abstract base class for L<Mojolicious> commands.
 
-See L<Mojolicious::Commands> for a list of commands that are available by
-default.
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

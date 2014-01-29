@@ -49,6 +49,10 @@ is $r->render($c), undef, 'return undef for unrecognized handler';
 like $log, qr/No handler for "not_defined" available\./, 'right message';
 $c->app->log->unsubscribe(message => $cb);
 
+# Default template name
+$c->stash(controller => 'foo', action => 'bar');
+is $c->app->renderer->template_for($c), 'foo/bar', 'right template name';
+
 # Big cookie
 $log = '';
 $cb = $c->app->log->on(message => sub { $log .= pop });

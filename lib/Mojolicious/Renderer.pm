@@ -91,7 +91,7 @@ sub render {
 
   # Template or templateless handler
   else {
-    $options->{template} ||= $self->_generate_template($c);
+    $options->{template} ||= $self->template_for($c);
     return unless $self->_render_template($c, \$output, $options);
   }
 
@@ -112,6 +112,43 @@ sub render {
     if !$partial && $options->{encoding} && $output;
 
   return $output, $options->{format};
+}
+
+sub template_for {
+  my ($self, $c) = @_;
+
+  # Normal default template
+  my $stash = $c->stash;
+  my ($controller, $action) = @$stash{qw(controller action)};
+  return join '/', split(/-/, decamelize($controller)), $action
+    if $controller && $action;
+
+  # Try the route name if we don't have controller and action
+  return undef unless my $endpoint = $c->match->endpoint;
+  return $endpoint->name;
+}
+
+sub template_handler {
+  my ($self, $options) = @_;
+
+  # Templates
+  return undef unless my $file = $self->template_name($options);
+  unless ($self->{templates}) {
+    s/\.(\w+)$// and $self->{templates}{$_} ||= $1
+      for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
+  }
+  return $self->{templates}{$file} if exists $self->{templates}{$file};
+
+  # DATA templates
+  unless ($self->{data}) {
+    my $loader = Mojo::Loader->new;
+    my @templates = map { sort keys %{$loader->data($_)} } @{$self->classes};
+    s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
+  }
+  return $self->{data}{$file} if exists $self->{data}{$file};
+
+  # Default
+  return $self->default_handler;
 }
 
 sub template_name {
@@ -146,29 +183,6 @@ sub _add {
 
 sub _bundled { $TEMPLATES{"@{[pop]}.html.ep"} }
 
-sub _detect_handler {
-  my ($self, $options) = @_;
-
-  # Templates
-  return undef unless my $file = $self->template_name($options);
-  unless ($self->{templates}) {
-    s/\.(\w+)$// and $self->{templates}{$_} ||= $1
-      for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
-  }
-  return $self->{templates}{$file} if exists $self->{templates}{$file};
-
-  # DATA templates
-  unless ($self->{data}) {
-    my $loader = Mojo::Loader->new;
-    my @templates = map { sort keys %{$loader->data($_)} } @{$self->classes};
-    s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
-  }
-  return $self->{data}{$file} if exists $self->{data}{$file};
-
-  # Nothing
-  return undef;
-}
-
 sub _extends {
   my ($self, $stash) = @_;
   my $layout = delete $stash->{layout};
@@ -176,27 +190,11 @@ sub _extends {
   return delete $stash->{extends};
 }
 
-sub _generate_template {
-  my ($self, $c) = @_;
-
-  # Normal default template
-  my $stash      = $c->stash;
-  my $controller = $stash->{controller};
-  my $action     = $stash->{action};
-  return join '/', split(/-/, decamelize($controller)), $action
-    if $controller && $action;
-
-  # Try the route name if we don't have controller and action
-  return undef unless my $endpoint = $c->match->endpoint;
-  return $endpoint->name;
-}
-
 sub _render_template {
   my ($self, $c, $output, $options) = @_;
 
   # Find handler and render
-  my $handler = $options->{handler} || $self->_detect_handler($options);
-  $options->{handler} = $handler ||= $self->default_handler;
+  my $handler = $options->{handler} ||= $self->template_handler($options);
   if (my $renderer = $self->handlers->{$handler}) {
     return 1 if $renderer->($self, $c, $output, $options);
   }
@@ -336,6 +334,22 @@ Get a C<DATA> section template by name, usually used by handlers.
 
 Render output through one of the renderers. See
 L<Mojolicious::Controller/"render"> for a more user-friendly interface.
+
+=head2 template_for
+
+  my $name = $renderer->template_for(Mojolicious::Controller->new);
+
+Generate default template name for L<Mojolicious::Controller> object.
+
+=head2 template_handler
+
+  my $handler = $renderer->template_handler({
+    template => 'foo/bar',
+    format   => 'html'
+  });
+
+Detect handler based on an options hash reference with C<template> and
+C<format>.
 
 =head2 template_name
 

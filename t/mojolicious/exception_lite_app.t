@@ -21,6 +21,13 @@ app->log->on(message => sub { shift; $log .= join ':', @_ });
 
 helper dead_helper => sub { die "dead helper!\n" };
 
+# Custom rendering for missing "txt" template
+hook before_render => sub {
+  my ($self, $args) = @_;
+  $args->{text} = 'Missing template.'
+    if ($args->{template} // '') eq 'not_found' && $args->{format} eq 'txt';
+};
+
 get '/logger' => sub {
   my $self  = shift;
   my $level = $self->param('level');
@@ -193,6 +200,11 @@ $t->get_ok('/missing_template.xml')->status_is(404)
 $t->get_ok('/missing_template.json')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_like(qr/Page not found/);
+
+# Missing template with custom rendering
+$t->get_ok('/missing_template.txt')->status_is(404)
+  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_is('Missing template.');
 
 # Missing template (failed rendering)
 $t->get_ok('/missing_template/too')->status_is(404)

@@ -152,10 +152,11 @@ sub render {
   # Template may be first argument
   my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
   $args->{template} = $template if $template;
-  my $maybe = delete $args->{'mojo.maybe'};
+  my $app     = $self->app;
+  my $plugins = $app->plugins->emit_hook(before_render => $self, $args);
+  my $maybe   = delete $args->{'mojo.maybe'};
 
   # Render
-  my $app = $self->app;
   my ($output, $format) = $app->renderer->render($self, $args);
   return defined $output ? Mojo::ByteStream->new($output) : undef
     if $args->{partial};
@@ -164,7 +165,7 @@ sub render {
   return $maybe ? undef : !$self->render_not_found unless defined $output;
 
   # Prepare response
-  $app->plugins->emit_hook(after_render => $self, \$output, $format);
+  $plugins->emit_hook(after_render => $self, \$output, $format);
   my $headers = $self->res->body($output)->headers;
   $headers->content_type($app->types->type($format) || 'text/plain')
     unless $headers->content_type;
@@ -687,10 +688,12 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
   my $bool    = $c->render('foo/index');
   my $output  = $c->render('foo/index', partial => 1);
 
-Render content using L<Mojolicious::Renderer/"render"> and emit hook
-L<Mojolicious/"after_render"> unless the result is C<partial>. If no template
-is provided a default one based on controller and action or route name will be
-generated, all additional values get merged into the L</"stash">.
+Render content using L<Mojolicious::Renderer/"render"> and emit hooks
+L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render"> if the
+result is not C<partial>. If no template is provided a default one based on
+controller and action or route name will be generated with
+L<Mojolicious::Renderer/"template_for">, all additional values get merged into
+the L</"stash">.
 
 =head2 render_exception
 

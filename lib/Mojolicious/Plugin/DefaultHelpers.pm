@@ -129,15 +129,12 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
 =head2 accepts
 
   %= accepts->[0] // 'html'
-  %= accepts('html', 'json', 'txt')
+  %= accepts('html', 'json', 'txt') // 'html'
 
 Select best possible representation for resource from C<Accept> request
 header, C<format> stash value or C<format> GET/POST parameter with
 L<Mojolicious::Types/"accepts">, defaults to returning the first extension if
-no preference could be detected. Since browsers often don't really know what
-they actually want, unspecific C<Accept> request headers with more than one
-MIME type will be ignored, unless the C<X-Requested-With> header is set to the
-value C<XMLHttpRequest>.
+no preference could be detected.
 
   return $self->render(json => {hello => 'world'}) if $self->accepts('json');
 

@@ -153,7 +153,7 @@ the following new ones.
 
 Select best possible representation for resource from C<Accept> request
 header, C<format> stash value or C<format> GET/POST parameter, defaults to
-returning the first extension if no preference could be detected.. Since
+returning the first extension if no preference could be detected. Since
 browsers often don't really know what they actually want, unspecific C<Accept>
 request headers with more than one MIME type will be ignored, unless the
 C<X-Requested-With> header is set to the value C<XMLHttpRequest>.

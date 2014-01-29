@@ -367,7 +367,7 @@ used or an empty C<204> response rendered automatically.
   }
 
 For even more advanced negotiation logic you can also use the helper
-L<Mojolicious::DefaultHelpers/"accepts"> directly.
+L<Mojolicious::DefaultHelpers/"accepts">.
 
 =head2 Rendering C<exception> and C<not_found> pages
 

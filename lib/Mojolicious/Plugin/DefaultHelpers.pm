@@ -139,7 +139,7 @@ header, C<format> stash value or C<format> GET/POST parameter with
 L<Mojolicious::Types/"accepts">, defaults to returning the first extension if
 no preference could be detected.
 
-  return $self->render(json => {hello => 'world'}) if $self->accepts('json');
+  $self->render(json => {hello => 'world'}) if $self->accepts('json');
 
 =head2 app
 

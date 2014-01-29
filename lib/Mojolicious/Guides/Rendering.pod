@@ -352,6 +352,20 @@ single render call.
 And if no viable representation could be found, the C<any> fallback will be
 used or an empty C<204> response rendered automatically.
 
+  # /hello                     -> "html"
+  # /hello (Accept: text/html) -> "html"
+  # /hello (Accept: text/xml)  -> "xml"
+  # /hello.html                -> "html"
+  # /hello.xml                 -> "xml"
+  # /hello?format=html         -> "html"
+  # /hello?format=xml          -> "xml"
+  if (my $format = $self->accepts('html', 'xml')) {
+    ...
+  }
+
+For even more advanced negotiation logic you can also use the helper
+L<Mojolicious::DefaultHelpers/"accepts"> directly.
+
 =head2 Rendering C<exception> and C<not_found> pages
 
 By now you've probably already encountered the built-in 404 (Not Found) and

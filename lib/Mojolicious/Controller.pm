@@ -266,28 +266,20 @@ sub respond_to {
   my $self = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
 
-  # Detect formats
-  my $app     = $self->app;
-  my $req     = $self->req;
-  my @formats = @{$app->types->detect($req->headers->accept, $req->is_xhr)};
-  my $stash   = $self->stash;
-  unless (@formats) {
-    my $format = $stash->{format} || $req->param('format');
-    push @formats, $format ? $format : $app->renderer->default_format;
-  }
-
   # Find target
   my $target;
-  for my $format (@formats) {
+  my $app     = $self->app;
+  my @formats = @{$app->types->accepts($self)};
+  for my $format (@formats ? @formats : ($app->renderer->default_format)) {
     next unless $target = $args->{$format};
-    $stash->{format} = $format;
+    $self->stash->{format} = $format;
     last;
   }
 
   # Fallback
   unless ($target) {
     return $self->rendered(204) unless $target = $args->{any};
-    delete $stash->{format};
+    delete $self->stash->{format};
   }
 
   # Dispatch

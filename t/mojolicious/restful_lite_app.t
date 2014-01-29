@@ -14,6 +14,11 @@ any [qw(POST PUT)] => '/json/echo' => sub {
   $self->respond_to(json => {json => $self->req->json});
 };
 
+get '/accepts' => sub {
+  my $self = shift;
+  $self->render(json => {best => $self->accepts('html', 'json', 'txt')});
+};
+
 under '/rest';
 
 get sub {
@@ -58,6 +63,29 @@ $tx = $t->ua->build_tx(
   PUT => '/json/echo' => {Accept => 'application/json'} => json => [1, 2, 3]);
 $t->request_ok($tx)->status_is(200)->content_type_is('application/json')
   ->json_is([1, 2, 3]);
+
+# Nothing
+$t->get_ok('/accepts')->status_is(200)->json_is({best => 'html'});
+
+# "json" format
+$t->get_ok('/accepts.json')->status_is(200)->json_is({best => 'json'});
+
+# "txt" query
+$t->get_ok('/accepts?format=txt')->status_is(200)->json_is({best => 'txt'});
+
+# Accept "txt"
+$t->get_ok('/accepts' => {Accept => 'text/plain'})->status_is(200)
+  ->json_is({best => 'txt'});
+
+# Accept "txt" with everything
+$t->get_ok('/accepts.html?format=json' => {Accept => 'text/plain'})
+  ->status_is(200)->json_is({best => 'txt'});
+
+# Ajax
+my $ajax = 'text/html;q=0.1,application/json';
+$t->get_ok(
+  '/accepts' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})
+  ->status_is(200)->json_is({best => 'json'});
 
 # Nothing
 $t->get_ok('/rest')->status_is(200)
@@ -421,7 +449,7 @@ $t->post_ok('/rest.png?format=json')->status_is(201)
 $t->get_ok('/nothing' => {Accept => 'image/png'})->status_is(404);
 
 # Ajax
-my $ajax = 'text/html;q=0.1,application/xml';
+$ajax = 'text/html;q=0.1,application/xml';
 $t->get_ok(
   '/rest' => {Accept => $ajax, 'X-Requested-With' => 'XMLHttpRequest'})
   ->status_is(200)->content_type_is('application/xml')

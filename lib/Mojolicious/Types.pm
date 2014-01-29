@@ -1,8 +1,6 @@
 package Mojolicious::Types;
 use Mojo::Base -base;
 
-use List::Util 'first';
-
 has types => sub {
   {
     appcache => ['text/cache-manifest'],
@@ -47,8 +45,7 @@ sub accepts {
 
   # Find best representation
   for my $ext (@exts) {
-    next unless my $first = first { $ext eq $_ } @_;
-    return $first;
+    return $ext if grep { $ext eq $_ } @_;
   }
   return @exts ? undef : shift;
 }

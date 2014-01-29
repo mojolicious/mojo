@@ -352,13 +352,16 @@ single render call.
 And if no viable representation could be found, the C<any> fallback will be
 used or an empty C<204> response rendered automatically.
 
-  # /hello                     -> "html"
-  # /hello (Accept: text/html) -> "html"
-  # /hello (Accept: text/xml)  -> "xml"
-  # /hello.html                -> "html"
-  # /hello.xml                 -> "xml"
-  # /hello?format=html         -> "html"
-  # /hello?format=xml          -> "xml"
+  # /hello                      -> "html"
+  # /hello (Accept: text/html)  -> "html"
+  # /hello (Accept: text/xml)   -> "xml"
+  # /hello (Accept: text/plain) -> undef
+  # /hello.html                 -> "html"
+  # /hello.xml                  -> "xml"
+  # /hello.txt                  -> undef
+  # /hello?format=html          -> "html"
+  # /hello?format=xml           -> "xml"
+  # /hello?format=txt           -> undef
   if (my $format = $self->accepts('html', 'xml')) {
     ...
   }

@@ -388,7 +388,7 @@ sub url_for {
   if ($target =~ m!^/!) {
     if (my $prefix = $self->stash->{path}) {
       my $real = $req->url->path->to_route;
-      $real =~ s!/?$prefix$!$target!;
+      $real =~ s!/?\Q$prefix\E$!$target!;
       $target = $real;
     }
     $url->parse($target);

@@ -99,9 +99,8 @@ sub render {
   my $content = $stash->{'mojo.content'} ||= {};
   local $content->{content} = $output if $stash->{extends} || $stash->{layout};
   while ((my $extends = $self->_extends($stash)) && !defined $inline) {
-    $options->{handler}  = $stash->{handler};
-    $options->{format}   = $stash->{format} || $self->default_format;
-    $options->{template} = $extends;
+    @$options{qw(handler template)} = ($stash->{handler}, $extends);
+    $options->{format} = $stash->{format} || $self->default_format;
     $self->_render_template($c, \$output, $options);
     $content->{content} = $output
       if $content->{content} !~ /\S/ && $output =~ /\S/;

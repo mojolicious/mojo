@@ -324,12 +324,13 @@ implements the following new ones.
   my $all  = $renderer->accepts(Mojolicious::Controller->new);
   my $best = $renderer->accepts(Mojolicious::Controller->new, 'html', 'json');
 
-Select best possible representation for resource from C<Accept> request
-header, C<format> stash value or C<format> GET/POST parameter, defaults to
-returning the first extension if no preference could be detected. Since
-browsers often don't really know what they actually want, unspecific C<Accept>
-request headers with more than one MIME type will be ignored, unless the
-C<X-Requested-With> header is set to the value C<XMLHttpRequest>.
+Select best possible representation for L<Mojolicious::Controller> object from
+C<Accept> request header, C<format> stash value or C<format> GET/POST
+parameter, defaults to returning the first extension if no preference could be
+detected. Since browsers often don't really know what they actually want,
+unspecific C<Accept> request headers with more than one MIME type will be
+ignored, unless the C<X-Requested-With> header is set to the value
+C<XMLHttpRequest>.
 
 =head2 add_handler
 

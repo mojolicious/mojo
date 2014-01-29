@@ -55,6 +55,11 @@ is $app->start('test_command'), 'works!', 'right result';
     'works!', 'right result');
 }
 
+# mojo
+ok $commands->description, 'has a description';
+like $commands->message,   qr/COMMAND/, 'has a message';
+like $commands->hint,      qr/help/, 'has a hint';
+
 # cgi
 require Mojolicious::Command::cgi;
 my $cgi = Mojolicious::Command::cgi->new;
@@ -83,7 +88,8 @@ like $eval->usage, qr/eval/, 'has usage information';
 require Mojolicious::Command::generate;
 my $generator = Mojolicious::Command::generate->new;
 ok $generator->description, 'has a description';
-like $generator->usage, qr/generate/, 'has usage information';
+like $generator->message,   qr/generate/, 'has a message';
+like $commands->hint,       qr/help/, 'has a hint';
 
 # generate app
 require Mojolicious::Command::generate::app;

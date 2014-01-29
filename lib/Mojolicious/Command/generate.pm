@@ -7,13 +7,8 @@ has hint        => <<EOF;
 See 'APPLICATION generate help GENERATOR' for more information on a specific
 generator.
 EOF
-has message => <<EOF;
-Usage: APPLICATION generate GENERATOR [OPTIONS]
-
-Generators:
-EOF
+has message    => sub { shift->extract_usage . "\nGenerators:\n" };
 has namespaces => sub { ['Mojolicious::Command::generate'] };
-has usage      => sub { shift->extract_usage };
 
 sub help { shift->run(@_) }
 
@@ -54,13 +49,6 @@ Short description of this command, used for the command list.
   $generator = $generator->hint('Foo!');
 
 Short hint shown after listing available generator commands.
-
-=head2 usage
-
-  my $usage  = $generator->usage;
-  $generator = $generator->usage('Foo!');
-
-Usage information for this command, used for the help screen.
 
 =head2 message
 

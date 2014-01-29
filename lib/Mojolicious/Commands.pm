@@ -7,23 +7,9 @@ use Mojo::Server;
 
 has hint => <<EOF;
 
-Options (for all commands):
-    -h, --help          Get more information on a specific command.
-        --home <path>   Path to your applications home directory, defaults to
-                        the value of MOJO_HOME or auto detection.
-    -m, --mode <name>   Operating mode for your application, defaults to the
-                        value of MOJO_MODE/PLACK_ENV or "development".
-
 See 'APPLICATION help COMMAND' for more information on a specific command.
 EOF
-has message => <<EOF;
-Usage: APPLICATION COMMAND [OPTIONS]
-
-Tip: CGI and PSGI environments can be automatically detected very often and
-     work without commands.
-
-Commands:
-EOF
+has message    => sub { shift->extract_usage . "\nCommands:\n" };
 has namespaces => sub { ['Mojolicious::Command'] };
 
 sub detect {
@@ -125,11 +111,17 @@ Mojolicious::Commands - Command line interface
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Commands;
+  Usage: APPLICATION COMMAND [OPTIONS]
 
-  my $commands = Mojolicious::Commands->new;
-  push @{$commands->namespaces}, 'MyApp::Command';
-  $commands->run('daemon');
+  Tip: CGI and PSGI environments can be automatically detected very often and
+       work without commands.
+
+  Options (for all commands):
+    -h, --help          Get more information on a specific command.
+        --home <path>   Path to your applications home directory, defaults to
+                        the value of MOJO_HOME or auto detection.
+    -m, --mode <name>   Operating mode for your application, defaults to the
+                        value of MOJO_MODE/PLACK_ENV or "development".
 
 =head1 DESCRIPTION
 

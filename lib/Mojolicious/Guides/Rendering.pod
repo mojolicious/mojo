@@ -226,7 +226,7 @@ performed.
 =head2 Rendering JSON
 
 The C<json> stash value allows you to pass Perl data structures to the
-renderer which get directly encoded to JSON.
+renderer which get directly encoded to JSON with L<Mojo::JSON>.
 
   $self->render(json => {foo => [1, 'test', 3]});
 

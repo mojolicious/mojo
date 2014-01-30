@@ -28,6 +28,13 @@ hook before_render => sub {
     if ($args->{template} // '') eq 'not_found' && $args->{format} eq 'txt';
 };
 
+# Custom exception rendering for "txt"
+hook before_render => sub {
+  my ($self, $args) = @_;
+  @$args{qw(text format)} = ($self->stash('exception'), 'txt')
+    if ($args->{template} // '') eq 'exception' && $self->accepts('txt');
+};
+
 get '/logger' => sub {
   my $self  = shift;
   my $level = $self->param('level');
@@ -42,7 +49,7 @@ get '/dead_included_template';
 
 get '/dead_template_with_layout';
 
-get '/dead_action' => sub { die 'dead action!' };
+get '/dead_action' => sub { die "dead action!\n" };
 
 get '/double_dead_action_☃' => sub {
   eval { die 'double dead action!' };
@@ -168,6 +175,10 @@ $t->get_ok('/dead_action.json')->status_is(500)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_like(qr!get &#39;/dead_action&#39;!)
   ->content_like(qr/dead action!/);
+
+# Dead action with custom exception rendering
+$t->get_ok('/dead_action' => {Accept => 'text/plain'})->status_is(500)
+  ->content_type_is('text/plain;charset=UTF-8')->content_is("dead action!\n");
 
 # Action dies twice
 $t->get_ok('/double_dead_action_☃')->status_is(500)

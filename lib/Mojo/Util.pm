@@ -35,6 +35,15 @@ for my $line (split "\x0a", slurp(catfile dirname(__FILE__), 'entities.txt')) {
   $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
 }
 
+# Characters that should be escaped in XML
+my %XML = (
+  '&'  => '&amp;',
+  '<'  => '&lt;',
+  '>'  => '&gt;',
+  '"'  => '&quot;',
+  '\'' => '&#39;'
+);
+
 # Encoding cache
 my %CACHE;
 
@@ -325,14 +334,7 @@ sub url_unescape {
 
 sub xml_escape {
   my $str = shift;
-
-  return $str unless $str =~ /[&<>"']/;
-  $str =~ s/&/&amp;/g;
-  $str =~ s/</&lt;/g;
-  $str =~ s/>/&gt;/g;
-  $str =~ s/"/&quot;/g;
-  $str =~ s/'/&#39;/g;
-
+  $str =~ s/([&<>"'])/$XML{$1}/ge;
   return $str;
 }
 

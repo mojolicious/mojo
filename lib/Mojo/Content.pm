@@ -240,7 +240,7 @@ sub _parse_chunked {
     if ($self->{chunk_state} // '') eq 'trailing_headers';
 
   # Check buffer size
-  $self->{limit} = $self->{state} = 'finished'
+  @$self{qw(state limit)} = ('finished', 1)
     if length($self->{pre_buffer} // '') > $self->max_buffer_size;
 }
 
@@ -301,7 +301,7 @@ sub _uncompress {
     if $status == Z_STREAM_END;
 
   # Check buffer size
-  $self->{limit} = $self->{state} = 'finished'
+  @$self{qw(state limit)} = ('finished', 1)
     if length($self->{post_buffer} // '') > $self->max_buffer_size;
 }
 

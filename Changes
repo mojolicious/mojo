@@ -1,5 +1,5 @@
 
-4.73  2014-01-30
+4.73  2014-01-31
   - Improved xml_escape performance significantly.
   - Improved html_unescape and url_unescape performance.
 

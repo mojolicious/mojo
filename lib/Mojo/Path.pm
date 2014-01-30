@@ -62,7 +62,7 @@ sub merge {
   return $self->trailing_slash($path->trailing_slash);
 }
 
-sub new { shift->SUPER::new->parse(@_) }
+sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub parse {
   my $self = shift;

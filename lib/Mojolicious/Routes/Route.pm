@@ -426,8 +426,8 @@ the current route.
   my $r = Mojolicious::Routes::Route->new;
   my $r = Mojolicious::Routes::Route->new('/:controller/:action');
 
-Construct a new L<Mojolicious::Routes::Route> object and <parse> pattern if
-necessary.
+Construct a new L<Mojolicious::Routes::Route> object and L</"parse"> pattern
+if necessary.
 
 =head2 options
 

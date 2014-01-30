@@ -45,7 +45,7 @@ sub match_partial {
   return $captures;
 }
 
-sub new { shift->SUPER::new->parse(@_) }
+sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub parse {
   my $self = shift;

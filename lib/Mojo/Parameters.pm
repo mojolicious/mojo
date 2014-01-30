@@ -44,7 +44,7 @@ sub merge {
   return $self;
 }
 
-sub new { shift->SUPER::new->parse(@_) }
+sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub param {
   my ($self, $name) = (shift, shift);
@@ -109,7 +109,7 @@ sub parse {
   if (@_ > 1) { $self->append(@_) }
 
   # String
-  else { $self->{string} = $_[0] }
+  else { $self->{string} = shift }
 
   return $self;
 }

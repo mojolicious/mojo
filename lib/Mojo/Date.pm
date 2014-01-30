@@ -11,13 +11,10 @@ my @MONTHS = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 my %MONTHS;
 @MONTHS{@MONTHS} = (0 .. 11);
 
-sub new { shift->SUPER::new->parse(@_) }
+sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub parse {
   my ($self, $date) = @_;
-
-  # Invalid
-  return $self unless defined $date;
 
   # epoch (784111777)
   return $self->epoch($date) if $date =~ /^\d+$/;

@@ -60,12 +60,9 @@ sub list_files {
 
 sub mojo_lib_dir { catdir(dirname(__FILE__), '..') }
 
-sub new { shift->SUPER::new->parse(@_) }
+sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
-sub parse {
-  my ($self, $path) = @_;
-  return defined $path ? $self->parts([splitdir $path]) : $self;
-}
+sub parse { shift->parts([splitdir shift]) }
 
 sub rel_dir { catdir(@{shift->parts}, split '/', shift) }
 sub rel_file { catfile(@{shift->parts}, split '/', shift) }

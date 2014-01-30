@@ -1043,9 +1043,9 @@ be able to work standalone as well as inside an already running event loop.
 =head2 Command line
 
 Don't you hate checking huge HTML files from the command line? Thanks to the
-C<mojo get> command that is about to change. You can just pick the parts that
-actually matter with the CSS selectors from L<Mojo::DOM> and JSON Pointers
-from L<Mojo::JSON::Pointer>.
+command L<Mojolicious::Command::get> that is about to change. You can just
+pick the parts that actually matter with the CSS selectors from L<Mojo::DOM>
+and JSON Pointers from L<Mojo::JSON::Pointer>.
 
   $ mojo get http://mojolicio.us 'head > title'
 
@@ -1142,8 +1142,9 @@ namespace.
 =head2 Running code against your application
 
 Ever thought about running a quick one-liner against your L<Mojolicious>
-application to test something? Thanks to the C<eval> command you can do just
-that, the application object itself can be accessed via C<app>.
+application to test something? Thanks to the command
+L<Mojolicious::Command::eval> you can do just that, the application object
+itself can be accessed via C<app>.
 
   $ mojo generate lite_app myapp.pl
   $ ./myapp.pl eval 'say for @{app->static->paths}'

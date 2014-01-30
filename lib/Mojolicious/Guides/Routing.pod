@@ -767,8 +767,9 @@ out for quicksand!
 
 =head2 Introspection
 
-The C<routes> command can be used from the command line to list all available
-routes together with name and underlying regular expressions.
+The command L<Mojolicious::Command::routes> can be used from the command line
+to list all available routes together with name and underlying regular
+expressions.
 
   $ ./myapp.pl routes -v
   /foo/:name  GET   fooname  ^/foo/([^/\.]+))(?:\.([^/]+)$)?

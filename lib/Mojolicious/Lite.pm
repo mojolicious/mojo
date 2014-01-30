@@ -993,7 +993,7 @@ L<Test::Mojo>.
 
   done_testing();
 
-Run all unit tests with the C<test> command.
+Run all unit tests with the command L<Mojolicious::Command::test>.
 
   $ ./myapp.pl test
   $ ./myapp.pl test -v

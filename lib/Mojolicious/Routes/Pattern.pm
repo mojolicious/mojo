@@ -49,13 +49,10 @@ sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub parse {
   my $self = shift;
-
-  # Make sure we have a viable pattern
   my $pattern = @_ % 2 ? (shift || '/') : '/';
-  $pattern = "/$pattern" unless $pattern =~ m!^/!;
-  $self->constraints({@_});
-
-  return $pattern eq '/' ? $self : $self->pattern($pattern)->_tokenize;
+  $self->_tokenize($pattern =~ m!^/! ? $pattern : "/$pattern")
+    if $pattern ne '/';
+  return $self->constraints({@_});
 }
 
 sub render {
@@ -178,7 +175,7 @@ sub _compile_req {
 }
 
 sub _tokenize {
-  my $self = shift;
+  my ($self, $pattern) = @_;
 
   my $quote_end   = $self->quote_end;
   my $quote_start = $self->quote_start;
@@ -188,7 +185,7 @@ sub _tokenize {
 
   my $state = 'text';
   my (@tree, $quoted);
-  for my $char (split '', $self->pattern) {
+  for my $char (split '', $pattern) {
     my $inside = !!grep { $_ eq $state } qw(placeholder relaxed wildcard);
 
     # Quote start
@@ -233,7 +230,7 @@ sub _tokenize {
     }
   }
 
-  return $self->tree(\@tree);
+  $self->pattern($pattern)->tree(\@tree);
 }
 
 1;

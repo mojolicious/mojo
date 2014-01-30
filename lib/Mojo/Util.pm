@@ -326,6 +326,7 @@ sub url_unescape {
 sub xml_escape {
   my $str = shift;
 
+  return $str unless $str =~ /[&<>"']/;
   $str =~ s/&/&amp;/g;
   $str =~ s/</&lt;/g;
   $str =~ s/>/&gt;/g;

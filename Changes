@@ -1,5 +1,7 @@
 
 4.73  2014-01-30
+  - Improved xml_escape performance significantly when no escaping is
+    necessary.
 
 4.72  2014-01-29
   - Added accepts, template_for and template_handler methods to

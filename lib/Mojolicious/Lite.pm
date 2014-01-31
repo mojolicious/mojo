@@ -311,7 +311,8 @@ be used to pass additional data to the layout.
 =head2 Blocks
 
 Template blocks can be used like normal Perl functions and are always
-delimited by the C<begin> and C<end> keywords.
+delimited by the C<begin> and C<end> keywords, they are the foundation for
+many helpers.
 
   use Mojolicious::Lite;
 

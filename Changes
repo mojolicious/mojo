@@ -1,5 +1,5 @@
 
-4.73  2014-01-31
+4.73  2014-02-01
   - Improved xml_escape performance significantly.
   - Improved html_unescape and url_unescape performance.
   - Fixed Mojo::UserAgent::Transactor to handle redirects more like most

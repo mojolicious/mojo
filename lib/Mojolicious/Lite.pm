@@ -462,13 +462,14 @@ Routes can be restricted to specific request methods with different keywords.
 =head2 Optional placeholders
 
 All placeholders require a value, but by assigning them default values you can
-make capturing optional.
+make capturing optional. Default values that don't belong to a placeholder
+simply get merged into the stash all the time.
 
   use Mojolicious::Lite;
 
   # /hello
   # /hello/Sara
-  get '/hello/:name' => {name => 'Sebastian'} => sub {
+  get '/hello/:name' => {name => 'Sebastian', day => 'Monday'} => sub {
     my $self = shift;
     $self->render('groovy', format => 'txt');
   };
@@ -477,7 +478,7 @@ make capturing optional.
   __DATA__
 
   @@ groovy.txt.ep
-  My name is <%= $name %>.
+  My name is <%= $name %> and it is <%= $day %>.
 
 =head2 Restrictive placeholders
 

@@ -233,6 +233,22 @@ full access to all HTTP features and information.
 
   app->start;
 
+=head2 Built-in C<exception> and C<not_found> pages
+
+During development you will encounter these pages whenever you make a mistake,
+they are gorgeous and contain a lot of valuable information that will aid you
+in debugging your application.
+
+  use Mojolicious::Lite;
+
+  # Not found (404)
+  get '/missing' => sub { shift->render('does_not_exist') };
+
+  # Exception (500)
+  get '/dies' => sub { die 'Intentional error' };
+
+  app->start;
+
 =head2 Route names
 
 All routes can have a name associated with them, this allows automatic

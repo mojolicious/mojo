@@ -334,38 +334,6 @@ delimited by the C<begin> and C<end> keywords.
     </body>
   </html>
 
-=head2 Captured content
-
-The helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> can be used to
-pass around blocks of captured content.
-
-  use Mojolicious::Lite;
-
-  get '/captured';
-
-  app->start;
-  __DATA__
-
-  @@ captured.html.ep
-  % layout 'blue', title => 'Green';
-  % content_for header => begin
-    <meta http-equiv="Pragma" content="no-cache">
-  % end
-  Hello World!
-  % content_for header => begin
-    <meta http-equiv="Expires" content="-1">
-  % end
-
-  @@ layouts/blue.html.ep
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <title><%= title %></title>
-      %= content_for 'header'
-    </head>
-    <body><%= content %></body>
-  </html>
-
 =head2 Helpers
 
 You can also extend L<Mojolicious> with your own helpers, a list of all

@@ -83,7 +83,7 @@ sub redirect {
   my $new    = Mojo::Transaction::HTTP->new;
   my $req    = $old->req;
   my $method = uc $req->method;
-  if ($code eq 301 || $code eq 307 || $code eq 308) {
+  if ($code eq 307 || $code eq 308) {
     return undef unless my $clone = $req->clone;
     $new->req($clone);
   }

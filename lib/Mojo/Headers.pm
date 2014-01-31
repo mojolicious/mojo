@@ -44,10 +44,7 @@ sub append {
   return $self->header($name => defined $old ? "$old, $value" : $value);
 }
 
-sub clone {
-  my $self = shift;
-  return $self->new->from_hash($self->to_hash(1));
-}
+sub clone { $_[0]->new->from_hash($_[0]->to_hash(1)) }
 
 sub from_hash {
   my ($self, $hash) = @_;

@@ -2,6 +2,8 @@
 4.73  2014-01-31
   - Improved xml_escape performance significantly.
   - Improved html_unescape and url_unescape performance.
+  - Fixed Mojo::UserAgent::Transactor to handle redirects more like most
+    common browsers.
 
 4.72  2014-01-29
   - Added accepts, template_for and template_handler methods to

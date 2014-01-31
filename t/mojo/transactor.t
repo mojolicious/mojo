@@ -504,8 +504,8 @@ is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, undef, 'no "Accept" value';
+is $tx->req->url->to_abs,     'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept, 'application/json',       'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
@@ -538,6 +538,27 @@ is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
+# 302 redirect with content
+$tx = $t->tx(
+  POST => 'http://mojolicio.us/foo' => {Accept => '*/*'} => 'whatever');
+$tx->req->fix_headers->headers->content_type('text/plain');
+$tx->res->code(302);
+$tx->res->headers->location('http://example.com/bar');
+is $tx->req->headers->accept,       '*/*',        'right "Accept" value';
+is $tx->req->headers->content_type, 'text/plain', 'right "Content-Type" value';
+is $tx->req->headers->content_length, 8, 'right "Content-Length" value';
+is $tx->req->body, 'whatever', 'right content';
+$tx = $t->redirect($tx);
+is $tx->req->method, 'GET', 'right method';
+is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->headers->content_type,   undef, 'no "Content-Type" value';
+is $tx->req->headers->content_length, undef, 'no "Content-Length" value';
+is $tx->req->headers->location,       undef, 'no "Location" value';
+is $tx->req->body, '',    'no content';
+is $tx->res->code, undef, 'no status';
+is $tx->res->headers->location, undef, 'no "Location" value';
+
 # Simple 303 redirect
 $tx = $t->tx(
   POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});
@@ -547,8 +568,8 @@ is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
-is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, undef, 'no "Accept" value';
+is $tx->req->url->to_abs,     'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept, 'application/json',       'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
@@ -571,27 +592,30 @@ is $tx->res->headers->location, undef, 'no "Location" value';
 # 303 redirect (additional headers)
 $tx = $t->tx(
   POST => 'http://mojolicio.us/foo' => {
-    Accept  => 'application/json',
-    Cookie  => 'one',
-    Host    => 'two',
-    Referer => 'three'
+    Accept        => 'application/json',
+    Authorization => 'one',
+    Cookie        => 'two',
+    Host          => 'three',
+    Referer       => 'four'
   }
 );
 $tx->res->code(303);
 $tx->res->headers->location('http://example.com/bar');
-is $tx->req->headers->accept,   'application/json', 'right "Accept" value';
-is $tx->req->headers->cookie,   'one',              'right "Cookie" value';
-is $tx->req->headers->host,     'two',              'right "Host" value';
-is $tx->req->headers->referrer, 'three',            'right "Referer" value';
+is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
+is $tx->req->headers->authorization, 'one',   'right "Authorization" value';
+is $tx->req->headers->cookie,        'two',   'right "Cookie" value';
+is $tx->req->headers->host,          'three', 'right "Host" value';
+is $tx->req->headers->referrer,      'four',  'right "Referer" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->url->to_abs,     'http://example.com/bar', 'right URL';
-is $tx->req->headers->accept, undef,                    'no "Accept" value';
-is $tx->req->headers->cookie, undef,                    'no "Cookie" value';
-is $tx->req->headers->host,   undef,                    'no "Host" value';
-is $tx->req->headers->location, undef, 'no "Location" value';
-is $tx->req->headers->referrer, undef, 'no "Referer" value';
+is $tx->req->headers->accept, 'application/json',       'right "Accept" value';
+is $tx->req->headers->authorization, undef, 'no "Authorization" value';
+is $tx->req->headers->cookie,        undef, 'no "Cookie" value';
+is $tx->req->headers->host,          undef, 'no "Host" value';
+is $tx->req->headers->location,      undef, 'no "Location" value';
+is $tx->req->headers->referrer,      undef, 'no "Referer" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -677,27 +701,30 @@ is $t->redirect($tx), undef, 'unsupported redirect';
 # 307 redirect (additional headers)
 $tx = $t->tx(
   POST => 'http://mojolicio.us/foo' => {
-    Accept  => 'application/json',
-    Cookie  => 'one',
-    Host    => 'two',
-    Referer => 'three'
+    Accept        => 'application/json',
+    Authorization => 'one',
+    Cookie        => 'two',
+    Host          => 'three',
+    Referer       => 'four'
   }
 );
 $tx->res->code(307);
 $tx->res->headers->location('http://example.com/bar');
-is $tx->req->headers->accept,   'application/json', 'right "Accept" value';
-is $tx->req->headers->cookie,   'one',              'right "Cookie" value';
-is $tx->req->headers->host,     'two',              'right "Host" value';
-is $tx->req->headers->referrer, 'three',            'right "Referer" value';
+is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
+is $tx->req->headers->authorization, 'one',   'right "Authorization" value';
+is $tx->req->headers->cookie,        'two',   'right "Cookie" value';
+is $tx->req->headers->host,          'three', 'right "Host" value';
+is $tx->req->headers->referrer,      'four',  'right "Referer" value';
 is $tx->req->body, '', 'no content';
 $tx = $t->redirect($tx);
 is $tx->req->method, 'POST', 'right method';
 is $tx->req->url->to_abs,     'http://example.com/bar', 'right URL';
 is $tx->req->headers->accept, 'application/json',       'right "Accept" value';
-is $tx->req->headers->cookie, undef,                    'no "Cookie" value';
-is $tx->req->headers->host,   undef,                    'no "Host" value';
-is $tx->req->headers->location, undef, 'no "Location" value';
-is $tx->req->headers->referrer, undef, 'no "Referer" value';
+is $tx->req->headers->authorization, undef, 'no "Authorization" value';
+is $tx->req->headers->cookie,        undef, 'no "Cookie" value';
+is $tx->req->headers->host,          undef, 'no "Host" value';
+is $tx->req->headers->location,      undef, 'no "Location" value';
+is $tx->req->headers->referrer,      undef, 'no "Referer" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -761,9 +788,9 @@ $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->url->to_abs, 'http://mojolicio.us/foo/baz?f%23oo=bar',
   'right URL';
-is $tx->req->url->query,        'f%23oo=bar', 'right query';
-is $tx->req->headers->accept,   undef,        'no "Accept" value';
-is $tx->req->headers->location, undef,        'no "Location" value';
+is $tx->req->url->query,        'f%23oo=bar',       'right query';
+is $tx->req->headers->accept,   'application/json', 'right "Accept" value';
+is $tx->req->headers->location, undef,              'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
@@ -779,7 +806,7 @@ $tx = $t->redirect($tx);
 is $tx->req->method, 'GET', 'right method';
 is $tx->req->url->to_abs, 'http://mojolicio.us/baz?f%23oo=bar', 'right URL';
 is $tx->req->url->query, 'f%23oo=bar', 'right query';
-is $tx->req->headers->accept,   undef, 'no "Accept" value';
+is $tx->req->headers->accept, 'application/json', 'right "Accept" value';
 is $tx->req->headers->location, undef, 'no "Location" value';
 is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';

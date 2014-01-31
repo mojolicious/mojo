@@ -84,12 +84,16 @@ sub redirect {
   my $req    = $old->req;
   my $method = uc $req->method;
   if ($code eq 301 || $code eq 307 || $code eq 308) {
-    return undef unless my $req = $req->clone;
-    $new->req($req);
-    $req->headers->remove('Host')->remove('Cookie')->remove('Referer');
+    return undef unless my $clone = $req->clone;
+    $new->req($clone);
   }
-  elsif ($method ne 'HEAD') { $method = 'GET' }
-  $new->req->method($method)->url($location);
+  else {
+    $method = 'GET' if $method ne 'HEAD';
+    my $headers = $new->req->content->headers($req->headers->clone)->headers;
+    $headers->remove($_) for grep {/^content-/i} @{$headers->names};
+  }
+  my $headers = $new->req->method($method)->url($location)->headers;
+  $headers->remove($_) for qw(Authorization Cookie Host Referer);
   return $new->previous($old);
 }
 

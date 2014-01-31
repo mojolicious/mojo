@@ -21,7 +21,7 @@ my $ATTR_RE = qr/
   )?
   \s*
 /x;
-my $END_RE   = qr!^\s*/\s*(.+)\s*!;
+my $END_RE   = qr!^\s*/\s*(.+)!;
 my $TOKEN_RE = qr/
   ([^<]+)?                                          # Text
   (?:
@@ -89,6 +89,7 @@ my %PHRASING = map { $_ => 1 } @OBSOLETE, @PHRASING;
 sub parse {
   my ($self, $html) = @_;
 
+  my $xml = $self->xml;
   my $current = my $tree = ['root'];
   while ($html =~ m/\G$TOKEN_RE/gcs) {
     my ($text, $pi, $comment, $cdata, $doctype, $tag, $runaway)
@@ -102,7 +103,6 @@ sub parse {
     if (defined $tag) {
 
       # End
-      my $xml = $self->xml;
       if ($tag =~ $END_RE) { _end($xml ? $1 : lc($1), $xml, \$current) }
 
       # Start
@@ -145,7 +145,7 @@ sub parse {
 
     # Processing instruction (try to detect XML)
     elsif (defined $pi) {
-      $self->xml(1) if !exists $self->{xml} && $pi =~ /xml/i;
+      $self->xml($xml = 1) if !exists $self->{xml} && $pi =~ /xml/i;
       push @$current, ['pi', $pi];
     }
   }

@@ -675,9 +675,18 @@ implements the following new ones.
 Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"tx">.
 
-  # Request with cookie
+  # Request with custom cookie
   my $tx = $ua->build_tx(GET => 'example.com');
   $tx->req->cookies({name => 'foo', value => 'bar'});
+  $ua->start($tx);
+
+  # Interrupt transaction by raising an error
+  my $tx = $ua->build_tx(GET => 'example.com');
+  $tx->res->on(progress => sub {
+    my $res = shift;
+    return unless my $server = $res->headers->server;
+    $res->error('Oh noes, it is IIS!') if $server =~ /IIS/;
+  });
   $ua->start($tx);
 
 =head2 build_websocket_tx

@@ -471,7 +471,7 @@ All selectors from L<Mojo::DOM::CSS> are supported.
 
 =head2 append
 
-  $dom = $dom->append('<p>Hi!</p>');
+  $dom = $dom->append('<p>I ♥ Mojolicious!</p>');
 
 Append HTML/XML fragment to element.
 
@@ -480,7 +480,7 @@ Append HTML/XML fragment to element.
 
 =head2 append_content
 
-  $dom = $dom->append_content('<p>Hi!</p>');
+  $dom = $dom->append_content('<p>I ♥ Mojolicious!</p>');
 
 Append HTML/XML fragment to element content.
 
@@ -618,7 +618,7 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
 =head2 prepend
 
-  $dom = $dom->prepend('<p>Hi!</p>');
+  $dom = $dom->prepend('<p>I ♥ Mojolicious!</p>');
 
 Prepend HTML/XML fragment to element.
 
@@ -627,7 +627,7 @@ Prepend HTML/XML fragment to element.
 
 =head2 prepend_content
 
-  $dom = $dom->prepend_content('<p>Hi!</p>');
+  $dom = $dom->prepend_content('<p>I ♥ Mojolicious!</p>');
 
 Prepend HTML/XML fragment to element content.
 

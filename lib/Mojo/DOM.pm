@@ -579,7 +579,7 @@ Find element namespace.
 =head2 new
 
   my $dom = Mojo::DOM->new;
-  my $dom = Mojo::DOM->new('<foo bar="baz">test</foo>');
+  my $dom = Mojo::DOM->new('<foo bar="baz">I ♥ Mojolicious!</foo>');
 
 Construct a new array-based L<Mojo::DOM> object and L</"parse"> HTML/XML
 fragment if necessary.
@@ -609,7 +609,7 @@ has no parent.
 
 =head2 parse
 
-  $dom = $dom->parse('<foo bar="baz">test</foo>');
+  $dom = $dom->parse('<foo bar="baz">I ♥ Mojolicious!</foo>');
 
 Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
@@ -655,7 +655,7 @@ Remove element and return L<Mojo::DOM> object for parent of element.
 
 =head2 replace
 
-  my $parent = $dom->replace('<div>test</div>');
+  my $parent = $dom->replace('<div>I ♥ Mojolicious!</div>');
 
 Replace element with HTML/XML fragment and return L<Mojo::DOM> object for
 parent of element.
@@ -668,7 +668,7 @@ parent of element.
 
 =head2 replace_content
 
-  $dom = $dom->replace_content('<p>test</p>');
+  $dom = $dom->replace_content('<p>I ♥ Mojolicious!</p>');
 
 Replace element content with HTML/XML fragment.
 

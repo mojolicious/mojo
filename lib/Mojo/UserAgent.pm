@@ -680,7 +680,7 @@ L<Mojo::UserAgent::Transactor/"tx">.
   $tx->req->cookies({name => 'foo', value => 'bar'});
   $ua->start($tx);
 
-  # Interrupt transaction by raising an error
+  # Interrupt response by raising an error
   my $tx = $ua->build_tx(GET => 'example.com');
   $tx->res->on(progress => sub {
     my $res = shift;

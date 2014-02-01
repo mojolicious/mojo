@@ -343,7 +343,7 @@ following new ones.
 
 =head2 parse
 
-  $html = $html->parse('<foo bar="baz">test</foo>');
+  $html = $html->parse('<foo bar="baz">I ♥ Mojolicious!</foo>');
 
 Parse HTML/XML fragment.
 

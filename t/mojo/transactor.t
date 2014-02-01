@@ -527,6 +527,22 @@ is $tx->req->body, '',    'no content';
 is $tx->res->code, undef, 'no status';
 is $tx->res->headers->location, undef, 'no "Location" value';
 
+# 301 redirect with content (DELETE)
+$tx = $t->tx(
+  DELETE => 'http://mojolicio.us/foo' => {Accept => '*/*'} => 'whatever');
+$tx->res->code(301);
+$tx->res->headers->location('http://example.com/bar');
+is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->body, 'whatever', 'right content';
+$tx = $t->redirect($tx);
+is $tx->req->method, 'DELETE', 'right method';
+is $tx->req->url->to_abs, 'http://example.com/bar', 'right URL';
+is $tx->req->headers->accept, '*/*', 'right "Accept" value';
+is $tx->req->headers->location, undef, 'no "Location" value';
+is $tx->req->body, '',    'no content';
+is $tx->res->code, undef, 'no status';
+is $tx->res->headers->location, undef, 'no "Location" value';
+
 # Simple 302 redirect
 $tx = $t->tx(
   POST => 'http://mojolicio.us/foo' => {Accept => 'application/json'});

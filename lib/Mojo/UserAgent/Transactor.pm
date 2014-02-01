@@ -80,19 +80,19 @@ sub redirect {
   $location = $location->base($old->req->url)->to_abs unless $location->is_abs;
 
   # Clone request if necessary
-  my $new    = Mojo::Transaction::HTTP->new;
-  my $req    = $old->req;
-  my $method = uc $req->method;
+  my $new = Mojo::Transaction::HTTP->new;
+  my $req = $old->req;
   if ($code eq 307 || $code eq 308) {
     return undef unless my $clone = $req->clone;
     $new->req($clone);
   }
   else {
-    $method = 'GET' if $method ne 'HEAD';
-    my $headers = $new->req->content->headers($req->headers->clone)->headers;
+    my $method = uc $req->method;
+    my $headers = $new->req->method($method eq 'POST' ? 'GET' : $method)
+      ->content->headers($req->headers->clone)->headers;
     $headers->remove($_) for grep {/^content-/i} @{$headers->names};
   }
-  my $headers = $new->req->method($method)->url($location)->headers;
+  my $headers = $new->req->url($location)->headers;
   $headers->remove($_) for qw(Authorization Cookie Host Referer);
   return $new->previous($old);
 }

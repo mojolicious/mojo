@@ -93,11 +93,10 @@ sub build_message {
   # "permessage-deflate" extension
   return $self->build_frame(@$frame) unless $self->compressed;
   my $deflate = $self->{deflate}
-    || Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
+    || Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8, AppendOutput => 1);
   $self->{deflate} = $deflate if $self->context_takeover;
   $deflate->deflate(\$frame->[5], my $out);
-  $deflate->flush(my $rest, Z_SYNC_FLUSH);
-  $out .= $rest;
+  $deflate->flush($out, Z_SYNC_FLUSH);
   @$frame[1, 5] = (1, substr($out, 0, length($out) - 4));
   return $self->build_frame(@$frame);
 }

@@ -678,12 +678,12 @@ L<Mojo::UserAgent::Transactor/"tx">.
   # Request with custom cookie
   my $tx = $ua->build_tx(GET => 'example.com');
   $tx->req->cookies({name => 'foo', value => 'bar'});
-  $ua->start($tx);
+  $tx = $ua->start($tx);
 
   # Deactivate gzip compression
   my $tx = $ua->build_tx(GET => 'example.com');
   $tx->req->headers->remove('Accept-Encoding');
-  $ua->start($tx);
+  $tx = $ua->start($tx);
 
   # Interrupt response by raising an error
   my $tx = $ua->build_tx(GET => 'example.com');
@@ -692,7 +692,7 @@ L<Mojo::UserAgent::Transactor/"tx">.
     return unless my $server = $res->headers->server;
     $res->error('Oh noes, it is IIS!') if $server =~ /IIS/;
   });
-  $ua->start($tx);
+  $tx = $ua->start($tx);
 
 =head2 build_websocket_tx
 

@@ -946,7 +946,7 @@ L<Mojo::UserAgent> makes it actually easy.
   });
 
   # Process transaction
-  $ua->start($tx);
+  $tx = $ua->start($tx);
 
 The event L<Mojo::Content/"read"> will be emitted for every chunk of data that
 is received, even C<chunked> encoding will be handled transparently if
@@ -977,7 +977,7 @@ Sending a streaming request is almost just as easy.
   $tx->req->content->$drain;
 
   # Process transaction
-  $ua->start($tx);
+  $tx = $ua->start($tx);
 
 The drain callback passed to L<Mojo::Content/"write"> will be invoked whenever
 the entire previous chunk has actually been written.

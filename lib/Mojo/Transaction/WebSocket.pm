@@ -96,7 +96,8 @@ sub build_message {
     || Compress::Raw::Zlib::Deflate->new(WindowBits => -15, MemLevel => 8);
   $self->{deflate} = $deflate if $self->context_takeover;
   $deflate->deflate(\$frame->[5], my $out);
-  $deflate->flush($out, Z_SYNC_FLUSH);
+  $deflate->flush(my $rest, Z_SYNC_FLUSH);
+  $out .= $rest;
   @$frame[1, 5] = (1, substr($out, 0, length($out) - 4));
   return $self->build_frame(@$frame);
 }

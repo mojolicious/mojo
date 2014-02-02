@@ -905,9 +905,9 @@ arguments as L<Mojo::UserAgent/"websocket">, except for the callback.
 
   # WebSocket with permessage-deflate compression
   $t->websocket('/x' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
-    ->send_ok('y')
+    ->send_ok('y' x 50000)
     ->message_ok
-    ->message_is('z')
+    ->message_is('z' x 50000)
     ->finish_ok;
 
 =head1 SEE ALSO

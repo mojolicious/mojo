@@ -239,8 +239,8 @@ sub _ancestors {
 sub _collect {
   my $self = shift;
   my $xml  = $self->xml;
-  return Mojo::Collection->new(@_)
-    ->map(sub { $_->[0] eq 'tag' ? _tag($self, $_, $xml) : _node($self, $_) });
+  return Mojo::Collection->new(
+    map { $_->[0] eq 'tag' ? _tag($self, $_, $xml) : _node($self, $_) } @_);
 }
 
 sub _content {

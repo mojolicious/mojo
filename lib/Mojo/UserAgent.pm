@@ -875,6 +875,12 @@ L<Mojo::Transaction::HTTP> object.
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
+You can activate C<permessage-deflate> compression by setting the
+C<Sec-WebSocket-Extensions> header.
+
+  my $headers = {'Sec-WebSocket-Extensions' => 'permessage-deflate'};
+  $ua->websocket('ws://example.com/foo' => $headers => sub {...});
+
 =head1 DEBUGGING
 
 You can set the MOJO_USERAGENT_DEBUG environment variable to get some advanced

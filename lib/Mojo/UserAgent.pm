@@ -680,6 +680,11 @@ L<Mojo::UserAgent::Transactor/"tx">.
   $tx->req->cookies({name => 'foo', value => 'bar'});
   $ua->start($tx);
 
+  # Deactivate gzip compression
+  my $tx = $ua->build_tx(GET => 'example.com');
+  $tx->req->headers->remove('Accept-Encoding');
+  $ua->start($tx);
+
   # Interrupt response by raising an error
   my $tx = $ua->build_tx(GET => 'example.com');
   $tx->res->on(progress => sub {

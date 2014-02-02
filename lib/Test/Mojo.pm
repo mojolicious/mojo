@@ -829,7 +829,7 @@ Perform request and check for transport errors.
 
   # Custom WebSocket handshake
  my $tx = $t->ua->build_websocket_tx('/foo');
- $tx->req->headers->remove('UserAgent');
+ $tx->req->headers->remove('User-Agent');
  $t->request_ok($tx)->message_ok->message_is('bar')->finish_ok;
 
 =head2 reset_session

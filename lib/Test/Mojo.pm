@@ -903,6 +903,13 @@ Opposite of L</"text_like">.
 Open a WebSocket connection with transparent handshake, takes the same
 arguments as L<Mojo::UserAgent/"websocket">, except for the callback.
 
+  # WebSocket with permessage-deflate compression
+  $t->websocket('/x' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
+    ->send_ok('y')
+    ->message_ok
+    ->message_is('z')
+    ->finish_ok;
+
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.

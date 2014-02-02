@@ -25,6 +25,13 @@ websocket '/echo' => sub {
 
 get '/echo' => {text => 'plain echo!'};
 
+websocket '/no_compression' => sub {
+  my $self = shift;
+  $self->tx->compressed(0);
+  $self->res->headers->remove('Sec-WebSocket-Extensions');
+  $self->on(binary => sub { shift->send({binary => shift}) });
+};
+
 websocket '/json' => sub {
   my $self = shift;
   $self->on(
@@ -149,6 +156,40 @@ $t->websocket_ok('/echo')->send_ok([0, 0, 0, 0, 2, 'c' x 100000])
 
 # Plain alternative
 $t->get_ok('/echo')->status_is(200)->content_is('plain echo!');
+
+# Compression denied by the server
+$t->websocket_ok(
+  '/no_compression' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'});
+is $t->tx->req->headers->sec_websocket_extensions, 'permessage-deflate',
+  'right "Sec-WebSocket-Extensions" value';
+ok !$t->tx->compressed, 'WebSocket has no compression';
+$t->send_ok({binary => 'a' x 500})
+  ->message_ok->message_is({binary => 'a' x 500})->finish_ok;
+
+# Compressed message ("permessage-deflate")
+$t->websocket_ok(
+  '/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'});
+ok $t->tx->compressed, 'WebSocket has compression';
+$t->send_ok({binary => 'a' x 50000})
+  ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate');
+is $t->tx->req->headers->sec_websocket_extensions, 'permessage-deflate',
+  'right "Sec-WebSocket-Extensions" value';
+my $payload;
+$t->tx->once(
+  frame => sub {
+    my ($tx, $frame) = @_;
+    $payload = $frame->[5];
+  }
+);
+$t->message_ok->message_is({binary => 'a' x 50000});
+ok length $payload < 262145, 'message has been compressed';
+$t->finish_ok->finished_ok(1005);
+
+# Compressed message exceeding the limit when uncompressed
+$t->websocket_ok(
+  '/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
+  ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate')
+  ->send_ok({binary => 'a' x 1000000})->finished_ok(1009);
 
 # JSON roundtrips
 $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})

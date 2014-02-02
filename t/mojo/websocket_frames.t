@@ -206,15 +206,18 @@ is $frame->[5], '', 'no payload';
 isnt(Mojo::Transaction::WebSocket->new->build_frame(1, 0, 0, 0, 2, ''),
   $bytes, 'frames are not equal');
 
-# Binary message roundtrip
-$ws    = Mojo::Transaction::WebSocket->new;
+# Compressed binary message roundtrip
+$ws = Mojo::Transaction::WebSocket->new(compressed => 1);
 $bytes = $ws->build_message({binary => 'just works'});
 $frame = $ws->parse_frame(\($dummy = $bytes));
 is $frame->[0], 1, 'fin flag is set';
-is $frame->[1], 0, 'rsv1 flag is not set';
+is $frame->[1], 1, 'rsv1 flag is set';
 is $frame->[2], 0, 'rsv2 flag is not set';
 is $frame->[3], 0, 'rsv3 flag is not set';
 is $frame->[4], 2, 'binary frame';
 ok $frame->[5], 'has payload';
+isnt(
+  Mojo::Transaction::WebSocket->new->build_message({binary => 'just works'}),
+  $bytes, 'messages are not equal');
 
 done_testing();

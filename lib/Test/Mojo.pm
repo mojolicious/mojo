@@ -289,13 +289,13 @@ sub _build_ok {
 sub _json {
   my ($self, $method, $p) = @_;
   return Mojo::JSON::Pointer->new->$method(
-    Mojo::JSON->new->decode(@{$self->message}[1]), $p);
+    Mojo::JSON->new->decode(@{$self->message // []}[1]), $p);
 }
 
 sub _message {
   my ($self, $name, $value, $desc) = @_;
   local $Test::Builder::Level = $Test::Builder::Level + 1;
-  my ($type, $msg) = @{$self->message};
+  my ($type, $msg) = @{$self->message // []};
 
   # Type check
   if (ref $value eq 'HASH') {

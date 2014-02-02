@@ -191,6 +191,13 @@ $t->websocket_ok(
   ->header_is('Sec-WebSocket-Extensions' => 'permessage-deflate')
   ->send_ok({binary => 'a' x 1000000})->finished_ok(1009);
 
+# Huge message that doesn't compress very well
+my $huge = join '', map { int rand(9) } 1 .. 262144;
+$t->websocket_ok(
+  '/echo' => {'Sec-WebSocket-Extensions' => 'permessage-deflate'})
+  ->send_ok({binary => $huge})->message_ok->message_is({binary => $huge})
+  ->finish_ok;
+
 # JSON roundtrips
 $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})
   ->message_ok->json_message_is('' => {test => 24, snowman => '☃'})

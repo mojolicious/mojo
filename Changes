@@ -1,6 +1,8 @@
 
 4.74  2014-02-02
   - Added all_contents method to Mojo::DOM.
+  - Removed support for permessage-deflate WebSocket compression, since there
+    have been too many problems with Chrome.
 
 4.73  2014-02-01
   - Improved xml_escape performance significantly.

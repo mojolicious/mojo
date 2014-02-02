@@ -827,11 +827,6 @@ Perform request and check for transport errors.
   my $tx = $t->ua->build_tx(FOO => '/test.json' => json => {foo => 1});
   $t->request_ok($tx)->status_is(200)->json_is({success => 1});
 
-  # WebSocket handshake without extensions
-  my $tx = $t->ua->build_websocket_tx('/foo');
-  $tx->req->headers->remove('Sec-WebSocket-Extensions');
-  $t->request_ok($tx)->message_ok->message_is('bar')->finish_ok;
-
 =head2 reset_session
 
   $t = $t->reset_session;

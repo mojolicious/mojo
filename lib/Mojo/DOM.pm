@@ -31,6 +31,8 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
+sub all_contents { $_[0]->_collect(_contents(_nodes($_[0]->tree))) }
+
 sub all_text { shift->_content(1, @_) }
 
 sub ancestors { _select($_[0]->_collect(_ancestors($_[0]->tree)), $_[1]) }
@@ -246,6 +248,10 @@ sub _content {
   return _text([_nodes($tree)], shift, _trim($tree, @_));
 }
 
+sub _contents {
+  map { $_->[0] eq 'tag' ? ($_, _contents(_nodes($_))) : ($_) } @_;
+}
+
 sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
 
 sub _delegate {
@@ -442,6 +448,17 @@ XML detection can also be disabled with the L</"xml"> method.
 =head1 METHODS
 
 L<Mojo::DOM> implements the following methods.
+
+=head2 all_contents
+
+  my $collection = $dom->all_contents;
+
+Return a L<Mojo::Collection> object containing all nodes in DOM structure as
+L<Mojo::DOM> and L<Mojo::DOM::Node> objects.
+
+  "<p><b>123</b></p>"
+  $dom->parse('<p><!-- test --><b>123<!-- 456 --></b></p>')
+    ->all_contents->grep(sub { $_->node eq 'comment' })->remove->first;
 
 =head2 all_text
 

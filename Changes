@@ -1,5 +1,6 @@
 
 4.74  2014-02-02
+  - Added all_contents method to Mojo::DOM.
 
 4.73  2014-02-01
   - Improved xml_escape performance significantly.

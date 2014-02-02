@@ -145,6 +145,17 @@ ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 # Nodes
 $dom = Mojo::DOM->new(
   '<!DOCTYPE before><p>test<![CDATA[123]]><!-- 456 --></p><?after?>');
+is $dom->all_contents->[0]->node,    'doctype', 'right node';
+is $dom->all_contents->[0]->content, ' before', 'right content';
+is $dom->all_contents->[1]->type,    'p',       'right type';
+is $dom->all_contents->[2]->node,    'text',    'right node';
+is $dom->all_contents->[2]->content, 'test',    'right content';
+is $dom->all_contents->[5]->node,    'pi',      'right node';
+is $dom->all_contents->[5]->content, 'after',   'right content';
+is $dom->at('p')->all_contents->[0]->node,     'text',    'right node';
+is $dom->at('p')->all_contents->[0]->content,  'test',    'right node';
+is $dom->at('p')->all_contents->[-1]->node,    'comment', 'right node';
+is $dom->at('p')->all_contents->[-1]->content, ' 456 ',   'right node';
 is $dom->contents->[1]->contents->first->parent->type, 'p', 'right type';
 is $dom->contents->[1]->contents->first->content, 'test', 'right content';
 is $dom->contents->[1]->contents->first, 'test', 'right content';

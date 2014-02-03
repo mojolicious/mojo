@@ -89,9 +89,9 @@ sub _try {
   # Retry or handle exceptions
   my $handle = $self->{handle};
   return $! == EINPROGRESS ? undef : $self->emit(error => $!)
-    if IPV6 && !$handle->connect;
+    if $handle->isa('IO::Socket::IP') && !$handle->connect;
   return $self->emit(error => $! = $handle->sockopt(SO_ERROR))
-    if !IPV6 && !$handle->connected;
+    if !$handle->connected;
 
   # Disable Nagle's algorithm
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;

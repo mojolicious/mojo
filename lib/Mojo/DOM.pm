@@ -477,7 +477,7 @@ enabled by default.
 =head2 ancestors
 
   my $collection = $dom->ancestors;
-  my $collection = $dom->ancestors('div');
+  my $collection = $dom->ancestors('div > p');
 
 Find all ancestors of this element matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
@@ -530,7 +530,7 @@ Element attributes.
 =head2 children
 
   my $collection = $dom->children;
-  my $collection = $dom->children('div');
+  my $collection = $dom->children('div > p');
 
 Find all children of this element matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
@@ -704,7 +704,7 @@ Return L<Mojo::DOM> object for root node.
 =head2 siblings
 
   my $collection = $dom->siblings;
-  my $collection = $dom->siblings('div');
+  my $collection = $dom->siblings('div > p');
 
 Find all siblings of this element matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.

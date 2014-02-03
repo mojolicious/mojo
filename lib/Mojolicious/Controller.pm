@@ -698,10 +698,13 @@ the L</"stash">.
   $c->render(json => {test => 'I ♥ Mojolicious!'});
 
   # Render template "foo/bar.html.ep"
-  $c->render('foo/bar', format => 'html', handler => 'ep');
+  $c->render(template => 'foo/bar', format => 'html', handler => 'ep');
 
   # Render template "foo/bar.*.*"
-  $c->render('foo/bar');
+  $c->render(template => 'foo/bar');
+
+  # Render template "test.xml.*"
+  $c->render('test', format => 'xml');
 
 =head2 render_exception
 

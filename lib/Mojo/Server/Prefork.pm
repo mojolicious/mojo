@@ -186,7 +186,7 @@ sub _spawn {
         } or $lock = $@ eq "alarm\n" ? 0 : die $@;
       }
 
-      # Non blocking
+      # Non-blocking
       else { $lock = flock $handle, LOCK_EX | LOCK_NB }
 
       return $lock;

@@ -3094,7 +3094,7 @@
   - Optimized buffering a bit.
   - Fixed a case where multiple clients would taint the shared ioloop.
     (ferreira)
-  - Fixed a case where non existing actions were considered a server error.
+  - Fixed a case where non-existing actions were considered a server error.
     (Andre Vieth)
 
 0.999901  2009-09-01
@@ -3126,7 +3126,7 @@
   - Fixed a few cases where exceptions and not found events would result in
     empty pages.
   - Fixed layouts with partial templates.
-  - Fixed encoding of non utf8 form-data.
+  - Fixed encoding of non-utf8 form-data.
   - Fixed body callbacks to get automatic buffering.
   - Fixed a case where Mojo::Server::Daemon and Mojo::Client were too
     defensive and made them in turn 20 times faster.

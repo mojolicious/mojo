@@ -865,9 +865,10 @@ timeout, which usually defaults to C<15> seconds.
   $c          = $c->session({foo => 'bar'});
   $c          = $c->session(foo => 'bar');
 
-Persistent data storage, all session data gets serialized with L<Mojo::JSON>
-and stored C<Base64> encoded in C<HMAC-SHA1> signed cookies. Note that cookies
-usually have a 4096 byte limit, depending on browser.
+Persistent data storage for the next few requests, all session data gets
+serialized with L<Mojo::JSON> and stored C<Base64> encoded in C<HMAC-SHA1>
+signed cookies. Note that cookies usually have a 4096 byte limit, depending on
+browser.
 
   # Manipulate session
   $c->session->{foo} = 'bar';
@@ -901,12 +902,13 @@ discarded.
   $c       = $c->stash({foo => 'bar'});
   $c       = $c->stash(foo => 'bar');
 
-Non persistent data storage and exchange, application wide default values can
-be set with L<Mojolicious/"defaults">. Some stash values have a special
-meaning and are reserved, the full list is currently C<action>, C<app>, C<cb>,
-C<controller>, C<data>, C<extends>, C<format>, C<handler>, C<json>, C<layout>,
-C<namespace>, C<partial>, C<path>, C<status>, C<template> and C<text>. Note
-that all stash values with a C<mojo.*> prefix are reserved for internal use.
+Non-persistent data storage and exchange for the current request, application
+wide default values can be set with L<Mojolicious/"defaults">. Some stash
+values have a special meaning and are reserved, the full list is currently
+C<action>, C<app>, C<cb>, C<controller>, C<data>, C<extends>, C<format>,
+C<handler>, C<json>, C<layout>, C<namespace>, C<partial>, C<path>, C<status>,
+C<template> and C<text>. Note that all stash values with a C<mojo.*> prefix
+are reserved for internal use.
 
   # Remove value
   my $foo = delete $c->stash->{foo};

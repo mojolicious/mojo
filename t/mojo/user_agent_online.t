@@ -131,7 +131,7 @@ is_deeply \@kept_alive, [1, 1, 1], 'connections kept alive';
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;
 
-# Custom non keep-alive request
+# Custom non-keep-alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://metacpan.org');

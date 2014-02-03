@@ -645,6 +645,9 @@ For more control you can also access request information directly.
   # Only GET parameters
   my $foo = $c->req->url->query->param('foo');
 
+  # Only POST parameters
+  my $foo = $c->req->body_params->param('foo');
+
   # Only GET and POST parameters
   my $foo = $c->req->param('foo');
 
@@ -781,6 +784,7 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $agent    = $c->req->headers->user_agent;
   my $bytes    = $c->req->body;
   my $str      = $c->req->text;
+  my $hash     = $c->req->params->to_hash;
   my $hash     = $c->req->json;
   my $foo      = $c->req->json('/23/foo');
   my $dom      = $c->req->dom;

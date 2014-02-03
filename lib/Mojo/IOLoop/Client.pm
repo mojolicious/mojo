@@ -91,7 +91,7 @@ sub _try {
   return $! == EINPROGRESS ? undef : $self->emit(error => $!)
     if $handle->isa('IO::Socket::IP') && !$handle->connect;
   return $self->emit(error => $! = $handle->sockopt(SO_ERROR))
-    if !$handle->connected;
+    unless $handle->connected;
 
   # Disable Nagle's algorithm
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;

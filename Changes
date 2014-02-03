@@ -1,5 +1,6 @@
 
 4.76  2014-02-03
+  - Updated IO::Socket::IP requirement to 0.20 for certain bug fixes.
 
 4.75  2014-02-02
   - Fixed and readded support for permessage-deflate WebSocket compression.

@@ -45,7 +45,7 @@ sub register {
 
 sub _csrf_field {
   my $self = shift;
-  return $self->hidden_field(csrf_token => $self->csrf_token, @_);
+  return _hidden_field($self, csrf_token => $self->csrf_token, @_);
 }
 
 sub _form_for {
@@ -68,8 +68,7 @@ sub _form_for {
 
 sub _hidden_field {
   my $self = shift;
-  my %attrs = (name => shift, value => shift, @_, type => 'hidden');
-  return _tag('input', %attrs);
+  return _tag('input', name => shift, value => shift, @_, type => 'hidden');
 }
 
 sub _input {

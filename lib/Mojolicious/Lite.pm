@@ -233,6 +233,11 @@ full access to all HTTP features and information.
 
   app->start;
 
+You can test the more advanced examples right from the command line with
+L<Mojolicious::Command::get>.
+
+  $ ./myapp.pl get -M POST -c 'test' /echo
+
 =head2 Built-in C<exception> and C<not_found> pages
 
 During development you will encounter these pages whenever you make a mistake,

@@ -669,16 +669,16 @@ Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 
 =head2 render
 
-  my $bool    = $c->render;
-  my $bool    = $c->render(controller => 'foo', action => 'bar');
-  my $bool    = $c->render(template => 'foo/index');
-  my $bool    = $c->render(template => 'index', format => 'html');
-  my $bool    = $c->render(data => $bytes);
-  my $bool    = $c->render(text => 'Hello!');
-  my $bool    = $c->render(json => {foo => 'bar'});
-  my $bool    = $c->render(handler => 'something');
-  my $bool    = $c->render('foo/index');
-  my $output  = $c->render('foo/index', partial => 1);
+  my $bool   = $c->render;
+  my $bool   = $c->render(controller => 'foo', action => 'bar');
+  my $bool   = $c->render(template => 'foo/index');
+  my $bool   = $c->render(template => 'index', format => 'html');
+  my $bool   = $c->render(data => $bytes);
+  my $bool   = $c->render(text => 'Hello!');
+  my $bool   = $c->render(json => {foo => 'bar'});
+  my $bool   = $c->render(handler => 'something');
+  my $bool   = $c->render('foo/index');
+  my $output = $c->render('foo/index', partial => 1);
 
 Render content using L<Mojolicious::Renderer/"render"> and emit hooks
 L<Mojolicious/"before_render"> as well as L<Mojolicious/"after_render"> if the

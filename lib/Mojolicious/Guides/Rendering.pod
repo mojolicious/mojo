@@ -234,7 +234,7 @@ renderer which get directly encoded to JSON with L<Mojo::JSON>.
 
 Sometimes you might want to use the rendered result directly instead of
 generating a response, for example to send emails, this can be done using the
-C<partial> stash value.
+C<partial> render argument (not the stash value).
 
   my $html = $self->render('mail', partial => 1);
 

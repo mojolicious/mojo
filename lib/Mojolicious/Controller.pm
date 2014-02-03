@@ -687,6 +687,16 @@ controller and action or route name will be generated with
 L<Mojolicious::Renderer/"template_for">, all additional values get merged into
 the L</"stash">.
 
+  # Render characters
+  $c->render(text => 'I ♥ Mojolicious!');
+
+  # Render binary data
+  use Mojo::JSON 'j';
+  $c->render(data => j({test => 'I ♥ Mojolicious!'}));
+
+  # Render JSON
+  $c->render(json => {test => 'I ♥ Mojolicious!'});
+
 =head2 render_exception
 
   $c = $c->render_exception('Oops!');

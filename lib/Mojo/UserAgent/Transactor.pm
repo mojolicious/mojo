@@ -384,9 +384,9 @@ requests, with support for content generators.
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {a => 'b', c => 'd'});
 
-  # PUT request with UTF-8 encoded form values
+  # PUT request with Shift_JIS encoded form values
   my $tx = $t->tx(
-    PUT => 'http://example.com' => form => {a => 'b'} => charset => 'UTF-8');
+    PUT => 'example.com' => form => {a => 'b'} => charset => 'Shift_JIS');
 
   # POST request with form values sharing the same name
   my $tx = $t->tx(POST => 'http://example.com' => form => {a => [qw(b c d)]});

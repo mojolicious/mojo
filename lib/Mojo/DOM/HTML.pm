@@ -70,7 +70,7 @@ $END{$_} = ['p'] for @PARAGRAPH;
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
 
 # HTML elements without end tags
-my %VOID = map { $_ => 1 } (
+my %EMPTY = map { $_ => 1 } (
   qw(area base br col embed hr img input keygen link menuitem meta param),
   qw(source track wbr)
 );
@@ -124,7 +124,7 @@ sub parse {
 
         # Element without end tag
         _end($start, $xml, \$current)
-          if (!$xml && $VOID{$start}) || $attr =~ m!/\s*$!;
+          if (!$xml && $EMPTY{$start}) || $attr =~ m!/\s*$!;
 
         # Relaxed "script" or "style" HTML elements
         next if $xml || ($start ne 'script' && $start ne 'style');
@@ -225,12 +225,12 @@ sub _render {
   return '<?' . $tree->[1] . '?>' if $type eq 'pi';
 
   # Start tag
-  my $content = '';
+  my $result = '';
   if ($type eq 'tag') {
 
     # Open tag
     my $tag = $tree->[1];
-    $content .= "<$tag";
+    $result .= "<$tag";
 
     # Attributes
     my @attrs;
@@ -242,24 +242,24 @@ sub _render {
       # Key and value
       push @attrs, qq{$key="} . xml_escape($value) . '"';
     }
-    $content .= join ' ', '', @attrs if @attrs;
+    $result .= join ' ', '', @attrs if @attrs;
 
     # Element without end tag
-    return $xml || $VOID{$tag} ? "$content />" : "$content></$tag>"
+    return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
       unless $tree->[4];
 
     # Close tag
-    $content .= '>';
+    $result .= '>';
   }
 
   # Render whole tree
-  $content .= _render($tree->[$_], $xml)
+  $result .= _render($tree->[$_], $xml)
     for ($type eq 'root' ? 1 : 4) .. $#$tree;
 
   # End tag
-  $content .= '</' . $tree->[1] . '>' if $type eq 'tag';
+  $result .= '</' . $tree->[1] . '>' if $type eq 'tag';
 
-  return $content;
+  return $result;
 }
 
 sub _start {

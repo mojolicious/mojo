@@ -236,7 +236,7 @@ full access to all HTTP features and information.
 You can test the more advanced examples right from the command line with
 L<Mojolicious::Command::get>.
 
-  $ ./myapp.pl get -M POST -c 'test' /echo
+  $ ./myapp.pl get -v -M POST -c 'test' /echo
 
 =head2 Built-in C<exception> and C<not_found> pages
 

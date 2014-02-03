@@ -552,8 +552,8 @@ Render content of this element to XML.
 
   my $collection = $dom->contents;
 
-Return a L<Mojo::Collection> object containing the children of this element as
-L<Mojo::DOM> and L<Mojo::DOM::Node> objects.
+Return a L<Mojo::Collection> object containing the child nodes of this element
+as L<Mojo::DOM> and L<Mojo::DOM::Node> objects.
 
   "<p><b>123</b></p>"
   $dom->parse('<p>test<b>123</b></p>')->at('p')->contents->first->remove;

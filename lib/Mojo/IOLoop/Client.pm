@@ -12,9 +12,9 @@ use constant IPV6 => $ENV{MOJO_NO_IPV6}
   : eval 'use IO::Socket::IP 0.20 (); 1';
 
 # TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS} ? 0
-  : eval(IPV6 ? 'use IO::Socket::SSL 1.75 (); 1'
-  : 'use IO::Socket::SSL 1.75 "inet4"; 1');
+use constant TLS => $ENV{MOJO_NO_TLS}
+  ? 0
+  : eval 'use IO::Socket::SSL 1.75 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 

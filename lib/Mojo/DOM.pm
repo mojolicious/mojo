@@ -212,7 +212,7 @@ sub wrap {
 
   # Wrap element
   $self->_replace($tree, $new);
-  splice @$current, _start($current), 0, _link(['root', $tree], $current);
+  push @$current, _link(['root', $tree], $current);
 
   return $self;
 }
@@ -816,11 +816,14 @@ This element's type.
 
 Wrap HTML/XML fragment around this element.
 
-  # "<div><h1>A</h1>B</div>"
+  # "<div>B<h1>A</h1></div>"
   $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div>B</div>')->root;
 
   # "<div><div><h1>A</h1></div>B</div>"
   $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div><div></div>B</div>')->root;
+
+  # "<div><h1>A</h1></div><div>B</div>"
+  $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div></div><div>B</div>')->root;
 
 =head2 xml
 

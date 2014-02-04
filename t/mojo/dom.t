@@ -2019,7 +2019,7 @@ is $dom->at('a')->wrap('<b></b>')->type, 'a', 'right element';
 is "$dom", '<b><a>Test</a></b>', 'right result';
 is $dom->at('a')->wrap('C<c><d>D</d><e>E</e></c>F')->parent->type, 'd',
   'right element';
-is "$dom", '<b>C<c><d><a>Test</a>D</d><e>E</e></c>F</b>', 'right result';
+is "$dom", '<b>C<c><d>D<a>Test</a></d><e>E</e></c>F</b>', 'right result';
 
 # Broken "div" in "td"
 $dom = Mojo::DOM->new(<<EOF);

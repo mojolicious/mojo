@@ -517,6 +517,11 @@ L<Mojolicious/"defaults">.
 
   1;
 
+Layouts can also be used with C<partial> templates, but the C<layout> value
+needs to be passed as a render argument.
+
+  my $html = $self->render('reminder', layout => 'mail', partial => 1);
+
 =head2 Including partial templates
 
 Like most helpers L<Mojolicious::Plugin::DefaultHelpers/"include"> is just a

@@ -78,19 +78,15 @@ sub _current_route {
 }
 
 sub _include {
-  my $self     = shift;
-  my $template = @_ % 2 ? shift : undef;
-  my $args     = {@_, defined $template ? (template => $template) : ()};
+  my $self = shift;
 
-  # "layout" and "extends" can't be localized
-  my $layout  = delete $args->{layout};
-  my $extends = delete $args->{extends};
+  # Template may be first argument
+  my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
+  $args->{template} = $template if $template;
 
   # Localize arguments
-  my @keys = keys %$args;
-  local @{$self->stash}{@keys} = @{$args}{@keys};
-
-  return $self->render(partial => 1, layout => $layout, extends => $extends);
+  local @{$self->stash}{keys %$args};
+  return $self->render(partial => 1, %$args);
 }
 
 sub _url_with {
@@ -145,10 +141,6 @@ if no preference could be detected.
   # Unsupported representation
   $self->render(data => '', status => 204)
     unless my $format = $self->accepts('html', 'json');
-
-  # List requested representations
-  my $formats = join(', ', @{$self->accepts}) || 'everything';
-  $self->app->log->debug("User agent wants $fortmats.");
 
 =head2 app
 

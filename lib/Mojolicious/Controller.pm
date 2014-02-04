@@ -157,9 +157,9 @@ sub render {
   my $maybe   = delete $args->{'mojo.maybe'};
 
   # Render
+  my $partial = $args->{partial};
   my ($output, $format) = $app->renderer->render($self, $args);
-  return defined $output ? Mojo::ByteStream->new($output) : undef
-    if $args->{partial};
+  return defined $output ? Mojo::ByteStream->new($output) : undef if $partial;
 
   # Maybe
   return $maybe ? undef : !$self->render_not_found unless defined $output;
@@ -545,7 +545,7 @@ implements the following new ones.
 
   $c->continue;
 
-Continue dispatch chain.
+Continue dispatch chain with L<Mojolicious::Routes/"continue">.
 
 =head2 cookie
 

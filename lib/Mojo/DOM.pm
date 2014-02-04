@@ -31,15 +31,15 @@ sub AUTOLOAD {
 
 sub DESTROY { }
 
-sub all_contents { $_[0]->_collect(_contents(_nodes($_[0]->tree))) }
+sub all_contents { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
-sub all_text { shift->_content(1, @_) }
+sub all_text { shift->_extract(1, @_) }
 
 sub ancestors { _select($_[0]->_collect(_ancestors($_[0]->tree)), $_[1]) }
 
 sub append { shift->_add(1, @_) }
 
-sub append_content { $_[0]->_replace_content($_[1], 0, $#{$_[0]->tree} + 1) }
+sub append_content { shift->_content(1, 0, @_) }
 
 sub at {
   my $self = shift;
@@ -124,7 +124,7 @@ sub parse { shift->_delegate(parse => shift) }
 
 sub prepend { shift->_add(0, @_) }
 
-sub prepend_content { $_[0]->_replace_content($_[1], 0) }
+sub prepend_content { shift->_content(0, 0, @_) }
 
 sub previous { shift->_siblings->[0][-1] }
 
@@ -137,7 +137,7 @@ sub replace {
   return $self->_replace($tree, $self->_parse("$new"));
 }
 
-sub replace_content { $_[0]->_replace_content($_[1], $#{$_[0]->tree}) }
+sub replace_content { shift->_content(0, 1, @_) }
 
 sub root {
   my $self = shift;
@@ -156,7 +156,7 @@ sub strip {
 
 sub tap { shift->Mojo::Base::tap(@_) }
 
-sub text { shift->_content(0, @_) }
+sub text { shift->_extract(0, @_) }
 
 sub text_after {
   my ($self, $trim) = @_;
@@ -214,6 +214,10 @@ sub _add {
   return $self;
 }
 
+sub _all {
+  map { $_->[0] eq 'tag' ? ($_, _all(_nodes($_))) : ($_) } @_;
+}
+
 sub _ancestors {
   my ($tree, $root) = @_;
   my @ancestors;
@@ -229,12 +233,14 @@ sub _collect {
 }
 
 sub _content {
-  my $tree = shift->tree;
-  return _text([_nodes($tree)], shift, _trim($tree, @_));
-}
+  my ($self, $start, $offset, $new) = @_;
 
-sub _contents {
-  map { $_->[0] eq 'tag' ? ($_, _contents(_nodes($_))) : ($_) } @_;
+  my $tree = $self->tree;
+  $start  = $start  ? ($#$tree + 1) : _start($tree);
+  $offset = $offset ? $#$tree       : 0;
+  splice @$tree, $start, $offset, _link($self->_parse("$new"), $tree);
+
+  return $self;
 }
 
 sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
@@ -244,6 +250,11 @@ sub _delegate {
   return $self->[0]->$method unless @_;
   $self->[0]->$method(@_);
   return $self;
+}
+
+sub _extract {
+  my $tree = shift->tree;
+  return _text([_nodes($tree)], shift, _trim($tree, @_));
 }
 
 sub _link {
@@ -284,14 +295,6 @@ sub _replace {
   my $parent = $tree->[3];
   splice @$parent, _offset($parent, $tree), 1, _link($new, $parent);
   return $self->parent;
-}
-
-sub _replace_content {
-  my ($self, $new, $offset, $start) = @_;
-  my $tree = $self->tree;
-  splice @$tree, $start // _start($tree), $offset,
-    _link($self->_parse("$new"), $tree);
-  return $self;
 }
 
 sub _select {

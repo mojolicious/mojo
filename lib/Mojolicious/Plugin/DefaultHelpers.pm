@@ -139,7 +139,12 @@ header, C<format> stash value or C<format> GET/POST parameter with
 L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension
 if no preference could be detected.
 
+  # Check if JSON is acceptable
   $self->render(json => {hello => 'world'}) if $self->accepts('json');
+
+  # Unsupported representation
+  $self->render(data => '', status => 204)
+    unless my $format = $self->accepts('html', 'json');
 
 =head2 app
 

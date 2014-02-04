@@ -142,6 +142,9 @@ if no preference could be detected.
   $self->render(data => '', status => 204)
     unless my $format = $self->accepts('html', 'json');
 
+  # Detected representations to select from
+  my @formats = @{$self->accepts};
+
 =head2 app
 
   %= app->secrets->[0]

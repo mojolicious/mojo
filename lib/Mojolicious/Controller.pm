@@ -825,6 +825,9 @@ is set to the value C<XMLHttpRequest>.
     any  => {data => '', status => 204}
   );
 
+For more advanced negotiation logic you can also use the helper
+L<Mojolicious::Plugin::DefaultHelper/"accepts">.
+
 =head2 send
 
   $c = $c->send({binary => $bytes});

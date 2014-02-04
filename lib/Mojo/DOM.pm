@@ -814,8 +814,8 @@ This element's type.
 
   $dom = $dom->wrap('<p></p>');
 
-Wrap HTML/XML fragment around this element using the first innermost element,
-which may contain text content.
+Wrap HTML/XML fragment around this element, placing it as the last child of
+the first innermost element.
 
   # "<div>B<h1>A</h1></div>"
   $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div>B</div>')->root;

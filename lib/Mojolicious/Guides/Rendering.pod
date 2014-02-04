@@ -518,7 +518,7 @@ L<Mojolicious/"defaults">.
   1;
 
 Layouts can also be used with C<partial> templates, but the C<layout> value
-needs to be passed as a render argument.
+needs to be passed as a render argument (not a stash value).
 
   my $html = $self->render('reminder', layout => 'mail', partial => 1);
 

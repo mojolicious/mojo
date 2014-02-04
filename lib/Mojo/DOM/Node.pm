@@ -73,19 +73,20 @@ following new ones.
   my $content = $node->content;
   $node       = $node->content('foo');
 
-Node content.
+This node's content.
 
 =head2 node
 
   my $type = $node->node;
 
-Node type, usually C<cdata>, C<comment>, C<doctype>, C<pi>, C<raw> or C<text>.
+This node's type, usually C<cdata>, C<comment>, C<doctype>, C<pi>, C<raw> or
+C<text>.
 
 =head2 remove
 
   my $parent = $node->remove;
 
-Remove node and return L<Mojo::DOM> object for parent of node.
+Remove this node and return L</"parent">.
 
 =head1 OPERATORS
 

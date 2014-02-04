@@ -490,7 +490,7 @@ All selectors from L<Mojo::DOM::CSS> are supported.
 
   $dom = $dom->append('<p>I ♥ Mojolicious!</p>');
 
-Append HTML/XML fragment to element.
+Append HTML/XML fragment to this element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
@@ -499,7 +499,7 @@ Append HTML/XML fragment to element.
 
   $dom = $dom->append_content('<p>I ♥ Mojolicious!</p>');
 
-Append HTML/XML fragment to element content.
+Append HTML/XML fragment to this element's content.
 
   # "<div><h1>AB</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
@@ -508,9 +508,9 @@ Append HTML/XML fragment to element content.
 
   my $result = $dom->at('html title');
 
-Find first element matching the CSS selector and return it as a L<Mojo::DOM>
-object or return C<undef> if none could be found. All selectors from
-L<Mojo::DOM::CSS> are supported.
+Find first element in DOM structure matching the CSS selector and return it as
+a L<Mojo::DOM> object or return C<undef> if none could be found. All selectors
+from L<Mojo::DOM::CSS> are supported.
 
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
@@ -522,7 +522,7 @@ L<Mojo::DOM::CSS> are supported.
   $dom      = $dom->attr({foo => 'bar'});
   $dom      = $dom->attr(foo => 'bar');
 
-Element attributes.
+This element's attributes.
 
   # List id attributes
   say $dom->find('*')->attr('id')->compact;
@@ -562,9 +562,9 @@ as L<Mojo::DOM> and L<Mojo::DOM::Node> objects.
 
   my $collection = $dom->find('html title');
 
-Find all elements matching the CSS selector and return a L<Mojo::Collection>
-object containing these elements as L<Mojo::DOM> objects. All selectors from
-L<Mojo::DOM::CSS> are supported.
+Find all elements in DOM structure matching the CSS selector and return a
+L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
+All selectors from L<Mojo::DOM::CSS> are supported.
 
   # Find a specific element and extract information
   my $id = $dom->find('div')->[23]{id};
@@ -585,7 +585,7 @@ L<Mojo::DOM::CSS> are supported.
 
   my $namespace = $dom->namespace;
 
-Find element namespace.
+Find this element's namespace.
 
   # Find namespace for an element with namespace prefix
   my $namespace = $dom->at('svg > svg\:circle')->namespace;
@@ -605,8 +605,8 @@ fragment if necessary.
 
   my $sibling = $dom->next;
 
-Return L<Mojo::DOM> object for next sibling of element or C<undef> if there
-are no more siblings.
+Return L<Mojo::DOM> object for next sibling of this element or C<undef> if
+there are no more siblings.
 
   # "<h2>B</h2>"
   $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h1')->next;
@@ -615,14 +615,14 @@ are no more siblings.
 
   my $type = $dom->node;
 
-Node type, usually C<root> or C<tag>.
+This element's node type, usually C<root> or C<tag>.
 
 =head2 parent
 
   my $parent = $dom->parent;
 
-Return L<Mojo::DOM> object for parent of element or C<undef> if this element
-has no parent.
+Return L<Mojo::DOM> object for parent of this element or C<undef> if this
+element has no parent.
 
 =head2 parse
 
@@ -637,7 +637,7 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   $dom = $dom->prepend('<p>I ♥ Mojolicious!</p>');
 
-Prepend HTML/XML fragment to element.
+Prepend HTML/XML fragment to this element.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
@@ -646,7 +646,7 @@ Prepend HTML/XML fragment to element.
 
   $dom = $dom->prepend_content('<p>I ♥ Mojolicious!</p>');
 
-Prepend HTML/XML fragment to element content.
+Prepend HTML/XML fragment to this element's content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
@@ -655,7 +655,7 @@ Prepend HTML/XML fragment to element content.
 
   my $sibling = $dom->previous;
 
-Return L<Mojo::DOM> object for previous sibling of element or C<undef> if
+Return L<Mojo::DOM> object for previous sibling of this element or C<undef> if
 there are no more siblings.
 
   # "<h1>A</h1>"
@@ -665,7 +665,7 @@ there are no more siblings.
 
   my $parent = $dom->remove;
 
-Remove element and return L<Mojo::DOM> object for parent of element.
+Remove this element and return L</"parent">.
 
   # "<div></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->remove;
@@ -674,8 +674,7 @@ Remove element and return L<Mojo::DOM> object for parent of element.
 
   my $parent = $dom->replace('<div>I ♥ Mojolicious!</div>');
 
-Replace element with HTML/XML fragment and return L<Mojo::DOM> object for
-parent of element.
+Replace this element with HTML/XML fragment and return L</"parent">.
 
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
@@ -687,7 +686,7 @@ parent of element.
 
   $dom = $dom->replace_content('<p>I ♥ Mojolicious!</p>');
 
-Replace element content with HTML/XML fragment.
+Replace this element's content with HTML/XML fragment.
 
   # "<div><h1>B</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B')->root;
@@ -717,8 +716,7 @@ All selectors from L<Mojo::DOM::CSS> are supported.
 
   my $parent = $dom->strip;
 
-Remove element while preserving its content and return L<Mojo::DOM> object for
-parent of element.
+Remove this element while preserving its content and return L</"parent">.
 
   # "<div>A</div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->strip;
@@ -734,8 +732,8 @@ Alias for L<Mojo::Base/"tap">.
   my $trimmed   = $dom->text;
   my $untrimmed = $dom->text(0);
 
-Extract text content from element only (not including child elements), smart
-whitespace trimming is enabled by default.
+Extract text content from this element only (not including child elements),
+smart whitespace trimming is enabled by default.
 
   # "foo baz"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->text;
@@ -748,8 +746,8 @@ whitespace trimming is enabled by default.
   my $trimmed   = $dom->text_after;
   my $untrimmed = $dom->text_after(0);
 
-Extract text content immediately following element, smart whitespace trimming
-is enabled by default.
+Extract text content immediately following this element, smart whitespace
+trimming is enabled by default.
 
   # "baz"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_after;
@@ -762,8 +760,8 @@ is enabled by default.
   my $trimmed   = $dom->text_before;
   my $untrimmed = $dom->text_before(0);
 
-Extract text content immediately preceding element, smart whitespace trimming
-is enabled by default.
+Extract text content immediately preceding this element, smart whitespace
+trimming is enabled by default.
 
   # "foo"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_before;
@@ -793,7 +791,7 @@ carefully since it is very dynamic.
   my $type = $dom->type;
   $dom     = $dom->type('div');
 
-Element type.
+This element's type.
 
   # List types of child elements
   say $dom->children->type;

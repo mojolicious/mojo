@@ -39,12 +39,7 @@ sub ancestors { _select($_[0]->_collect(_ancestors($_[0]->tree)), $_[1]) }
 
 sub append { shift->_add(1, @_) }
 
-sub append_content {
-  my ($self, $new) = @_;
-  my $tree = $self->tree;
-  push @$tree, _link($self->_parse("$new"), $tree);
-  return $self;
-}
+sub append_content { $_[0]->_replace_content($_[1], 0, $#{$_[0]->tree} + 1) }
 
 sub at {
   my $self = shift;
@@ -129,12 +124,7 @@ sub parse { shift->_delegate(parse => shift) }
 
 sub prepend { shift->_add(0, @_) }
 
-sub prepend_content {
-  my ($self, $new) = @_;
-  my $tree = $self->tree;
-  splice @$tree, _start($tree), 0, _link($self->_parse("$new"), $tree);
-  return $self;
-}
+sub prepend_content { $_[0]->_replace_content($_[1], 0) }
 
 sub previous { shift->_siblings->[0][-1] }
 
@@ -147,12 +137,7 @@ sub replace {
   return $self->_replace($tree, $self->_parse("$new"));
 }
 
-sub replace_content {
-  my ($self, $new) = @_;
-  my $tree = $self->tree;
-  splice @$tree, _start($tree), $#$tree, _link($self->_parse("$new"), $tree);
-  return $self;
-}
+sub replace_content { $_[0]->_replace_content($_[1], $#{$_[0]->tree}) }
 
 sub root {
   my $self = shift;
@@ -301,9 +286,18 @@ sub _replace {
   return $self->parent;
 }
 
+sub _replace_content {
+  my ($self, $new, $offset, $start) = @_;
+  my $tree = $self->tree;
+  splice @$tree, $start // _start($tree), $offset,
+    _link($self->_parse("$new"), $tree);
+  return $self;
+}
+
 sub _select {
-  my ($self, $selector) = @_;
-  return defined $selector ? $self->grep(sub { $_->match($selector) }) : $self;
+  my ($collection, $selector) = @_;
+  return $collection unless $selector;
+  return $collection->new(grep { $_->match($selector) } @$collection);
 }
 
 sub _siblings {

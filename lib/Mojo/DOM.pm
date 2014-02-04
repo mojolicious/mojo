@@ -133,8 +133,7 @@ sub remove { shift->replace('') }
 
 sub replace {
   my ($self, $new) = @_;
-  my $tree = $self->tree;
-  return $self->parse($new) if $tree->[0] eq 'root';
+  return $self->parse($new) if (my $tree = $self->tree)->[0] eq 'root';
   return $self->_replace($tree, $self->_parse("$new"));
 }
 
@@ -150,8 +149,7 @@ sub siblings { _select(Mojo::Collection->new(@{_siblings($_[0], 1)}), $_[1]) }
 
 sub strip {
   my $self = shift;
-  my $tree = $self->tree;
-  return $self if $tree->[0] eq 'root';
+  return $self if (my $tree = $self->tree)->[0] eq 'root';
   return $self->_replace($tree, ['root', _nodes($tree)]);
 }
 
@@ -204,10 +202,9 @@ sub type {
 sub wrap {
   my ($self, $new) = @_;
 
-  my $tree = $self->tree;
-  return $self if $tree->[0] eq 'root';
+  return $self if (my $tree = $self->tree)->[0] eq 'root';
 
-  # Find innermost tag
+  # Find inmost tag
   my $current;
   my $first = $new = $self->_parse("$new");
   $current = $first while $first = first { $_->[0] eq 'tag' } _nodes($first);
@@ -815,12 +812,15 @@ This element's type.
 
 =head2 wrap
 
-  $dom = $dom->wrap('<div></div>');
+  $dom = $dom->wrap('<p></p>');
 
 Wrap HTML/XML fragment around this element.
 
   # "<div><h1>A</h1>B</div>"
   $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div>B</div>')->root;
+
+  # "<div><div><h1>A</h1></div>B</div>"
+  $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div><div></div>B</div>')->root;
 
 =head2 xml
 

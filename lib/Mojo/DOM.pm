@@ -204,7 +204,7 @@ sub wrap {
 
   return $self if (my $tree = $self->tree)->[0] eq 'root';
 
-  # Find inmost tag
+  # Find innermost tag
   my $current;
   my $first = $new = $self->_parse("$new");
   $current = $first while $first = first { $_->[0] eq 'tag' } _nodes($first);
@@ -814,7 +814,8 @@ This element's type.
 
   $dom = $dom->wrap('<p></p>');
 
-Wrap HTML/XML fragment around this element.
+Wrap HTML/XML fragment around this element using the first innermost element,
+which may contain text content.
 
   # "<div>B<h1>A</h1></div>"
   $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div>B</div>')->root;

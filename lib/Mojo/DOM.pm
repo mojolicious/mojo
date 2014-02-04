@@ -481,7 +481,7 @@ enabled by default.
 
 Find all ancestors of this element matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
-All selectors from L<Mojo::DOM::CSS> are supported.
+All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of ancestor elements
   say $dom->ancestors->type;
@@ -510,7 +510,7 @@ Append HTML/XML fragment to this element's content.
 
 Find first element in DOM structure matching the CSS selector and return it as
 a L<Mojo::DOM> object or return C<undef> if none could be found. All selectors
-from L<Mojo::DOM::CSS> are supported.
+from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # Find first element with "svg" namespace definition
   my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
@@ -534,7 +534,7 @@ This element's attributes.
 
 Find all children of this element matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
-All selectors from L<Mojo::DOM::CSS> are supported.
+All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # Show type of random child element
   say $dom->children->shuffle->first->type;
@@ -564,7 +564,7 @@ as L<Mojo::DOM> and L<Mojo::DOM::Node> objects.
 
 Find all elements in DOM structure matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
-All selectors from L<Mojo::DOM::CSS> are supported.
+All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # Find a specific element and extract information
   my $id = $dom->find('div')->[23]{id};
@@ -579,7 +579,7 @@ All selectors from L<Mojo::DOM::CSS> are supported.
 
 Match the CSS selector against this element and return it as a L<Mojo::DOM>
 object or return C<undef> if it didn't match. All selectors from
-L<Mojo::DOM::CSS> are supported.
+L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
 =head2 namespace
 
@@ -707,7 +707,7 @@ Return L<Mojo::DOM> object for root node.
 
 Find all siblings of this element matching the CSS selector and return a
 L<Mojo::Collection> object containing these elements as L<Mojo::DOM> objects.
-All selectors from L<Mojo::DOM::CSS> are supported.
+All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   # List types of sibling elements
   say $dom->siblings->type;

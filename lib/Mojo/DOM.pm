@@ -9,6 +9,7 @@ use overload
 # "Fry: This snow is beautiful. I'm glad global warming never happened.
 #  Leela: Actually, it did. But thank God nuclear winter canceled it out."
 use Carp 'croak';
+use List::Util 'first';
 use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
@@ -197,6 +198,25 @@ sub type {
   return '' if (my $tree = $self->tree)->[0] eq 'root';
   return $tree->[1] unless $type;
   $tree->[1] = $type;
+  return $self;
+}
+
+sub wrap {
+  my ($self, $new) = @_;
+
+  my $tree = $self->tree;
+  return $self if $tree->[0] eq 'root';
+
+  # Find innermost tag
+  my $current;
+  my $first = $new = $self->_parse("$new");
+  $current = $first while $first = first { $_->[0] eq 'tag' } _nodes($first);
+  return $self unless $current;
+
+  # Wrap element
+  $self->_replace($tree, $new);
+  splice @$current, _start($current), 0, _link(['root', $tree], $current);
+
   return $self;
 }
 
@@ -792,6 +812,15 @@ This element's type.
 
   # List types of child elements
   say $dom->children->type;
+
+=head2 wrap
+
+  $dom = $dom->wrap('<div></div>');
+
+Wrap HTML/XML fragment around this element.
+
+  # "<div><h1>A</h1>B</div>"
+  $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div>B</div>')->root;
 
 =head2 xml
 

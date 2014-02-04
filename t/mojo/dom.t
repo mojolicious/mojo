@@ -2010,6 +2010,17 @@ $dom->at('b')->prepend_content('<e>Mojo</e>');
 is $dom->at('e')->parent->type, 'b', 'right element';
 is $dom->all_text, 'Mojo Test', 'right text';
 
+# Wrap elements
+$dom = Mojo::DOM->new('<a>Test</a>');
+is $dom->wrap('<no></no>')->root->to_xml, '<a>Test</a>', 'right result';
+is $dom->at('a')->wrap('A')->type, 'a', 'right element';
+is "$dom", '<a>Test</a>', 'right result';
+is $dom->at('a')->wrap('<b></b>')->type, 'a', 'right element';
+is "$dom", '<b><a>Test</a></b>', 'right result';
+is $dom->at('a')->wrap('C<c><d>D</d><e>E</e></c>F')->parent->type, 'd',
+  'right element';
+is "$dom", '<b>C<c><d><a>Test</a>D</d><e>E</e></c>F</b>', 'right result';
+
 # Broken "div" in "td"
 $dom = Mojo::DOM->new(<<EOF);
 <table>

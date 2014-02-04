@@ -146,6 +146,10 @@ if no preference could be detected.
   $self->render(data => '', status => 204)
     unless my $format = $self->accepts('html', 'json');
 
+  # List requested representations
+  my $formats = join(', ', @{$self->accepts}) || 'everything';
+  $self->app->log->debug("User agent wants $fortmats.");
+
 =head2 app
 
   %= app->secrets->[0]

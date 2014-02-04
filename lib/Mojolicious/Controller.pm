@@ -663,9 +663,6 @@ For more control you can also access request information directly.
 
 Prepare a C<302> redirect response, takes the same arguments as L</"url_for">.
 
-  # Conditional redirect
-  return $c->redirect_to('login') unless $c->session('user');
-
   # Moved permanently
   $c->res->code(301);
   $c->redirect_to('some_route');
@@ -767,6 +764,11 @@ method does not protect from traversing to parent directories.
 
 Finalize response and emit hook L<Mojolicious/"after_dispatch">, defaults to
 using a C<200> response code.
+
+  # Custom response
+  $self->res->headers->content_type('text/plain');
+  $self->res->body('Hello World!');
+  $self->rendered(200);
 
 =head2 req
 

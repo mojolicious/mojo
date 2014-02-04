@@ -812,19 +812,19 @@ This element's type.
 
 =head2 wrap
 
-  $dom = $dom->wrap('<p></p>');
+  $dom = $dom->wrap('<div></div>');
 
 Wrap HTML/XML fragment around this element, placing it as the last child of
 the first innermost element.
 
-  # "<div>B<h1>A</h1></div>"
-  $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div>B</div>')->root;
+  # "<p>B<b>A</b></p>"
+  $dom->parse('<b>A</b>')->at('b')->wrap('<p>B</p>')->root;
 
-  # "<div><div><h1>A</h1></div>B</div>"
-  $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div><div></div>B</div>')->root;
+  # "<div><p><b>A</b></p>B</div>"
+  $dom->parse('<b>A</b>')->at('b')->wrap('<div><p></p>B</div>')->root;
 
-  # "<div><h1>A</h1></div><div>B</div>"
-  $dom->parse('<h1>A</h1>')->at('h1')->wrap('<div></div><div>B</div>')->root;
+  # "<p><b>A</b></p><p>B</p>"
+  $dom->parse('<b>A</b>')->at('b')->wrap('<p></p><p>B</p>')->root;
 
 =head2 xml
 

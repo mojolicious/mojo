@@ -1,4 +1,6 @@
 
+4.77  2014-02-05
+
 4.76  2014-02-04
   - Added wrap method to Mojo::DOM.
   - Updated IO::Socket::IP requirement to 0.20 for certain bug fixes.

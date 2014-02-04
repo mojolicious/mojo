@@ -351,7 +351,7 @@ Parse HTML/XML fragment.
 
   my $xml = $html->render;
 
-Render DOM to XML.
+Render DOM to HTML/XML.
 
 =head1 SEE ALSO
 

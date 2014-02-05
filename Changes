@@ -1,5 +1,6 @@
 
 4.77  2014-02-05
+  - Added wrap_content method to Mojo::DOM.
 
 4.76  2014-02-04
   - Added wrap method to Mojo::DOM.

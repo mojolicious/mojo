@@ -199,23 +199,8 @@ sub type {
   return $self;
 }
 
-sub wrap {
-  my ($self, $new) = @_;
-
-  return $self if (my $tree = $self->tree)->[0] eq 'root';
-
-  # Find innermost tag
-  my $current;
-  my $first = $new = $self->_parse("$new");
-  $current = $first while $first = first { $_->[0] eq 'tag' } _nodes($first);
-  return $self unless $current;
-
-  # Wrap element
-  $self->_replace($tree, $new);
-  push @$current, _link(['root', $tree], $current);
-
-  return $self;
-}
+sub wrap         { shift->_wrap(0, @_) }
+sub wrap_content { shift->_wrap(1, @_) }
 
 sub xml { shift->_delegate(xml => @_) }
 
@@ -388,6 +373,30 @@ sub _trim {
   }
 
   return 1;
+}
+
+sub _wrap {
+  my ($self, $content, $new) = @_;
+
+  return $self if (my $tree = $self->tree)->[0] eq 'root' && !$content;
+
+  # Find innermost tag
+  my $current;
+  my $first = $new = $self->_parse("$new");
+  $current = $first while $first = first { $_->[0] eq 'tag' } _nodes($first);
+  return $self unless $current;
+
+  # Wrap content
+  if ($content) {
+    push @$current, _link(['root', _nodes($tree)], $current);
+    splice @$tree, _start($tree), $#$tree, _link($new, $tree);
+    return $self;
+  }
+
+  # Wrap element
+  $self->_replace($tree, $new);
+  push @$current, _link(['root', $tree], $current);
+  return $self;
 }
 
 1;
@@ -825,6 +834,16 @@ the first innermost element.
 
   # "<p><b>A</b></p><p>B</p>"
   $dom->parse('<b>A</b>')->at('b')->wrap('<p></p><p>B</p>')->root;
+
+=head2 wrap_content
+
+  $dom = $dom->wrap_content('<div></div>');
+
+Wrap HTML/XML fragment around this element's content, placing it as the last
+children of the first innermost element.
+
+  # "<p><b>BA</b></p>"
+  $dom->parse('<p>A<p>')->at('p')->wrap_content('<b>B</b>')->root;
 
 =head2 xml
 

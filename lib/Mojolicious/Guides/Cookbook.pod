@@ -784,20 +784,17 @@ web application.
   # Extract headings
   $tx->res->dom('h1, h2, h3')->each(sub { say 'Heading: ', shift->all_text });
 
-  # Visit all elements recursively to extract more than just text
-  for my $e ($tx->res->dom('*')->each) {
+  # Visit all nodes recursively to extract more than just text
+  for my $n ($tx->res->dom->all_contents->each) {
 
-    # Text before this element
-    print $e->text_before(0);
+    # Text or CDATA node
+    print $n->content if $n->node eq 'text' || $n->node eq 'cdata';
+
+    # Make sure we have a tag node
+    next unless $n->node eq 'tag';
 
     # Also include alternate text for images
-    print $e->{alt} if $e->type eq 'img';
-
-    # Text for elements without children
-    print $e->text(0) unless $e->children->size;
-
-    # Text after last element
-    print $e->text_after(0) unless $e->next;
+    print $n->{alt} if $n->type eq 'img';
   }
 
 For a full list of available CSS selectors see L<Mojo::DOM::CSS/"SELECTORS">.

@@ -14,7 +14,7 @@ use Mojo::Collection;
 use Mojo::DOM::CSS;
 use Mojo::DOM::HTML;
 use Mojo::DOM::Node;
-use Mojo::Util 'squish';
+use Mojo::Util qw(deprecated squish);
 use Scalar::Util qw(blessed weaken);
 
 sub AUTOLOAD {
@@ -155,8 +155,41 @@ sub tap { shift->Mojo::Base::tap(@_) }
 
 sub text { shift->_all_text(0, @_) }
 
-sub text_after  { shift->_sibling_text(1, @_) }
-sub text_before { shift->_sibling_text(0, @_) }
+# DEPRECATED in Top Hat!
+sub text_after {
+  deprecated
+    'Mojo::DOM::text_after is DEPRECATED in favor of Mojo::DOM::contents';
+  my ($self, $trim) = @_;
+
+  return '' if (my $tree = $self->tree)->[0] eq 'root';
+
+  my (@nodes, $started);
+  for my $n (_nodes($tree->[3])) {
+    ++$started and next if $n eq $tree;
+    next unless $started;
+    last if $n->[0] eq 'tag';
+    push @nodes, $n;
+  }
+
+  return _text(\@nodes, 0, _trim($tree->[3], $trim));
+}
+
+# DEPRECATED in Top Hat!
+sub text_before {
+  deprecated
+    'Mojo::DOM::text_before is DEPRECATED in favor of Mojo::DOM::contents';
+  my ($self, $trim) = @_;
+
+  return '' if (my $tree = $self->tree)->[0] eq 'root';
+
+  my @nodes;
+  for my $n (_nodes($tree->[3])) {
+    last if $n eq $tree;
+    @nodes = $n->[0] eq 'tag' ? () : (@nodes, $n);
+  }
+
+  return _text(\@nodes, 0, _trim($tree->[3], $trim));
+}
 
 sub to_xml { shift->[0]->render }
 
@@ -274,24 +307,6 @@ sub _select {
   my ($collection, $selector) = @_;
   return $collection unless $selector;
   return $collection->new(grep { $_->match($selector) } @$collection);
-}
-
-sub _sibling_text {
-  my ($self, $after, $trim) = @_;
-
-  return '' if (my $tree = $self->tree)->[0] eq 'root';
-
-  my (@before, @after, $match);
-  for my $n (_nodes($tree->[3])) {
-    if ($after && $match) {
-      last if $n->[0] eq 'tag';
-      push @after, $n;
-    }
-    $match++ if $n eq $tree;
-    @before = $n->[0] eq 'tag' ? () : (@before, $n) unless $after || $match;
-  }
-
-  return _text($after ? \@after : \@before, 0, _trim($tree->[3], $trim));
 }
 
 sub _siblings {
@@ -752,34 +767,6 @@ smart whitespace trimming is enabled by default.
 
   # "foo\nbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->text(0);
-
-=head2 text_after
-
-  my $trimmed   = $dom->text_after;
-  my $untrimmed = $dom->text_after(0);
-
-Extract text content immediately following this element, smart whitespace
-trimming is enabled by default.
-
-  # "baz"
-  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_after;
-
-  # "baz\n"
-  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_after(0);
-
-=head2 text_before
-
-  my $trimmed   = $dom->text_before;
-  my $untrimmed = $dom->text_before(0);
-
-Extract text content immediately preceding this element, smart whitespace
-trimming is enabled by default.
-
-  # "foo"
-  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_before;
-
-  # "foo\n"
-  $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->p->text_before(0);
 
 =head2 to_xml
 

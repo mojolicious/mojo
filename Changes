@@ -1,5 +1,7 @@
 
 4.77  2014-02-05
+  - Deprecated Mojo::DOM::text_after and Mojo::DOM::text_before in favor of
+    Mojo::DOM::contents.
   - Added wrap_content method to Mojo::DOM.
   - Improved wrap method in Mojo::DOM to allow wrapping of the root node.
 

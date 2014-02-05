@@ -378,7 +378,7 @@ sub _trim {
 sub _wrap {
   my ($self, $content, $new) = @_;
 
-  return $self if (my $tree = $self->tree)->[0] eq 'root' && !$content;
+  $content = 1 if (my $tree = $self->tree)->[0] eq 'root';
 
   # Find innermost tag
   my $current;

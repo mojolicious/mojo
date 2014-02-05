@@ -2012,8 +2012,9 @@ is $dom->all_text, 'Mojo Test', 'right text';
 
 # Wrap elements
 $dom = Mojo::DOM->new('<a>Test</a>');
-is $dom->wrap('<no></no>')->root->to_xml, '<a>Test</a>', 'right result';
-is $dom->at('a')->wrap('A')->type, 'a', 'right element';
+is $dom->wrap('<b></b>')->node, 'root', 'right node';
+is "$dom", '<b><a>Test</a></b>', 'right result';
+is $dom->at('b')->strip->at('a')->wrap('A')->type, 'a', 'right element';
 is "$dom", '<a>Test</a>', 'right result';
 is $dom->at('a')->wrap('<b></b>')->type, 'a', 'right element';
 is "$dom", '<b><a>Test</a></b>', 'right result';

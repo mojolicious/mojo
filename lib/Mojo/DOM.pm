@@ -34,7 +34,7 @@ sub DESTROY { }
 
 sub all_contents { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
-sub all_text { shift->_extract(1, @_) }
+sub all_text { shift->_all_text(1, @_) }
 
 sub ancestors { _select($_[0]->_collect(_ancestors($_[0]->tree)), $_[1]) }
 
@@ -155,37 +155,10 @@ sub strip {
 
 sub tap { shift->Mojo::Base::tap(@_) }
 
-sub text { shift->_extract(0, @_) }
+sub text { shift->_all_text(0, @_) }
 
-sub text_after {
-  my ($self, $trim) = @_;
-
-  return '' if (my $tree = $self->tree)->[0] eq 'root';
-
-  my (@nodes, $started);
-  for my $n (_nodes($tree->[3])) {
-    ++$started and next if $n eq $tree;
-    next unless $started;
-    last if $n->[0] eq 'tag';
-    push @nodes, $n;
-  }
-
-  return _text(\@nodes, 0, _trim($tree->[3], $trim));
-}
-
-sub text_before {
-  my ($self, $trim) = @_;
-
-  return '' if (my $tree = $self->tree)->[0] eq 'root';
-
-  my @nodes;
-  for my $n (_nodes($tree->[3])) {
-    last if $n eq $tree;
-    @nodes = $n->[0] eq 'tag' ? () : (@nodes, $n);
-  }
-
-  return _text(\@nodes, 0, _trim($tree->[3], $trim));
-}
+sub text_after  { shift->_sibling_text(1, @_) }
+sub text_before { shift->_sibling_text(0, @_) }
 
 sub to_xml { shift->[0]->render }
 
@@ -220,6 +193,11 @@ sub _all {
   map { $_->[0] eq 'tag' ? ($_, _all(_nodes($_))) : ($_) } @_;
 }
 
+sub _all_text {
+  my $tree = shift->tree;
+  return _text([_nodes($tree)], shift, _trim($tree, @_));
+}
+
 sub _ancestors {
   my ($tree, $root) = @_;
   my @ancestors;
@@ -252,11 +230,6 @@ sub _delegate {
   return $self->[0]->$method unless @_;
   $self->[0]->$method(@_);
   return $self;
-}
-
-sub _extract {
-  my $tree = shift->tree;
-  return _text([_nodes($tree)], shift, _trim($tree, @_));
 }
 
 sub _link {
@@ -303,6 +276,24 @@ sub _select {
   my ($collection, $selector) = @_;
   return $collection unless $selector;
   return $collection->new(grep { $_->match($selector) } @$collection);
+}
+
+sub _sibling_text {
+  my ($self, $after, $trim) = @_;
+
+  return '' if (my $tree = $self->tree)->[0] eq 'root';
+
+  my (@before, @after, $match);
+  for my $n (_nodes($tree->[3])) {
+    if ($after && $match) {
+      last if $n->[0] eq 'tag';
+      push @after, $n;
+    }
+    $match++ if $n eq $tree;
+    @before = $n->[0] eq 'tag' ? () : (@before, $n) unless $after || $match;
+  }
+
+  return _text($after ? \@after : \@before, 0, _trim($tree->[3], $trim));
 }
 
 sub _siblings {

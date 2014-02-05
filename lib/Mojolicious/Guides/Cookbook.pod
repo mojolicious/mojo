@@ -60,8 +60,8 @@ C<1>).
   Server available at http://127.0.0.1:3000.
 
 Your application is preloaded in the manager process during startup, to run
-code whenever a new worker process has been forked you can use L<Mojo::IOLoop>
-timers.
+code whenever a new worker process has been forked you can use
+L<Mojo::IOLoop/"timer">.
 
   use Mojolicious::Lite;
 
@@ -91,8 +91,9 @@ used during development.
 =head2 Hypnotoad
 
 For bigger applications L<Mojolicious> contains the UNIX optimized preforking
-web server L<Mojo::Server::Hypnotoad> that will allow you to take advantage of
-multiple CPU cores and copy-on-write.
+web server L<Mojo::Server::Hypnotoad>, which can take advantage of multiple
+CPU cores and copy-on-write to scale up to thousands of concurrent client
+connections.
 
   Mojo::Server::Hypnotoad
   |- Mojo::Server::Daemon [1]
@@ -415,9 +416,10 @@ often result from continuation-passing style.
 
 =head2 Timers
 
-Another primary feature of the L<Mojo::IOLoop> event loop are timers, which
-can for example be used to delay rendering of a response, and unlike C<sleep>,
-won't block any other requests that might be processed in parallel.
+Another primary feature of the event loop are timers, which are created with
+L<Mojo::IOLoop/"timer"> and can for example be used to delay rendering of a
+response, and unlike C<sleep>, won't block any other requests that might be
+processed in parallel.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -432,8 +434,9 @@ won't block any other requests that might be processed in parallel.
 
   app->start;
 
-Recurring timers are slightly more powerful, but need to be stopped manually,
-or they would just keep getting emitted.
+Recurring timers created with L<Mojo::IOLoop/"recurring"> are slightly more
+powerful, but need to be stopped manually, or they would just keep getting
+emitted.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;

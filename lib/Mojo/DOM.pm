@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use overload
   '%{}'    => sub { shift->attr },
   bool     => sub {1},
-  '""'     => sub { shift->to_xml },
+  '""'     => sub { shift->to_string },
   fallback => 1;
 
 # "Fry: This snow is beautiful. I'm glad global warming never happened.
@@ -71,10 +71,18 @@ sub children {
     $self->_collect(grep { $_->[0] eq 'tag' } _nodes($self->tree)), @_);
 }
 
-sub content_xml {
+sub content {
   my $self = shift;
-  my $xml  = $self->xml;
-  return join '', map { _render($_, $xml) } _nodes($self->tree);
+  return $self->_content(0, 1, @_) if @_;
+  my $html = Mojo::DOM::HTML->new(xml => $self->xml);
+  return join '', map { $html->tree($_)->render } _nodes($self->tree);
+}
+
+# DEPRECATED in Top Hat!
+sub content_xml {
+  deprecated
+    'Mojo::DOM::content_xml is DEPRECATED in favor of Mojo::DOM::content';
+  shift->content;
 }
 
 sub contents { $_[0]->_collect(_nodes($_[0]->tree)) }
@@ -135,7 +143,12 @@ sub replace {
   return $self->_replace($tree, $self->_parse("$new"));
 }
 
-sub replace_content { shift->_content(0, 1, @_) }
+# DEPRECATED in Top Hat!
+sub replace_content {
+  deprecated
+    'Mojo::DOM::replace_content is DEPRECATED in favor of Mojo::DOM::content';
+  shift->content(@_);
+}
 
 sub root {
   my $self = shift;
@@ -191,7 +204,14 @@ sub text_before {
   return _text(\@nodes, 0, _trim($tree->[3], $trim));
 }
 
-sub to_xml { shift->[0]->render }
+sub to_string { shift->[0]->render }
+
+# DEPRECATED in Top Hat!
+sub to_xml {
+  deprecated
+    'Mojo::DOM::to_xml is DEPRECATED in favor of Mojo::DOM::to_string';
+  shift->to_string;
+}
 
 sub tree { shift->_delegate(tree => @_) }
 
@@ -293,8 +313,6 @@ sub _offset {
 }
 
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
-
-sub _render { Mojo::DOM::HTML->new(tree => shift, xml => shift)->render }
 
 sub _replace {
   my ($self, $tree, $new) = @_;
@@ -566,14 +584,22 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   # Show type of random child element
   say $dom->children->shuffle->first->type;
 
-=head2 content_xml
+=head2 content
 
-  my $str = $dom->content_xml;
+  my $str = $dom->content;
+  $dom    = $dom->content('<p>I ♥ Mojolicious!</p>');
 
-Render content of this element to HTML/XML.
+Render content of this element to HTML/XML or replace this element's content
+with HTML/XML fragment.
 
   # "<b>test</b>"
-  $dom->parse('<div><b>test</b></div>')->div->content_xml;
+  $dom->parse('<div><b>test</b></div>')->div->content;
+
+  # "<div><h1>B</h1></div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->content('B')->root;
+
+  # "<div><h1></h1></div>"
+  $dom->parse('<div><h1>A</h1></div>')->at('h1')->content('')->root;
 
 =head2 contents
 
@@ -709,18 +735,6 @@ Replace this element with HTML/XML fragment and return L</"parent">.
   # "<div></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('');
 
-=head2 replace_content
-
-  $dom = $dom->replace_content('<p>I ♥ Mojolicious!</p>');
-
-Replace this element's content with HTML/XML fragment.
-
-  # "<div><h1>B</h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('B')->root;
-
-  # "<div><h1></h1></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace_content('')->root;
-
 =head2 root
 
   my $root = $dom->root;
@@ -768,14 +782,14 @@ smart whitespace trimming is enabled by default.
   # "foo\nbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->div->text(0);
 
-=head2 to_xml
+=head2 to_string
 
-  my $str = $dom->to_xml;
+  my $str = $dom->to_string;
 
 Render this element and its content to HTML/XML.
 
   # "<b>test</b>"
-  $dom->parse('<div><b>test</b></div>')->div->b->to_xml;
+  $dom->parse('<div><b>test</b></div>')->div->b->to_string;
 
 =head2 tree
 
@@ -865,7 +879,7 @@ Alias for L</"attr">.
 
   my $str = "$dom";
 
-Alias for L</"to_xml">.
+Alias for L</"to_string">.
 
 =head1 SEE ALSO
 

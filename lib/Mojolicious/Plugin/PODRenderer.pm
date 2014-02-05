@@ -48,7 +48,7 @@ sub _html {
 
   # Rewrite code blocks for syntax highlighting and correct indentation
   for my $e ($dom->find('pre')->each) {
-    $e->replace_content(my $str = unindent $e->content_xml);
+    $e->content(my $str = unindent $e->content);
     next if $str =~ /^\s*(?:\$|Usage:)\s+/m || $str !~ /[\$\@\%]\w|-&gt;\w/m;
     my $attrs = $e->attr;
     my $class = $attrs->{class};
@@ -71,7 +71,7 @@ sub _html {
     # Rewrite
     push @parts, [] if $e->type eq 'h1' || !@parts;
     push @{$parts[-1]}, $text, Mojo::URL->new->fragment($anchor);
-    $e->replace_content($self->link_to($text => $toc, id => $anchor));
+    $e->content($self->link_to($text => $toc, id => $anchor));
   }
 
   # Try to find a title

@@ -73,7 +73,7 @@ following new ones.
   my $content = $node->content;
   $node       = $node->content('foo');
 
-This node's content.
+Return or replace this node's content.
 
 =head2 node
 

@@ -86,20 +86,18 @@ sub match { $_[0]->_css->match($_[1]) ? $_[0] : undef }
 sub namespace {
   my $self = shift;
 
-  return '' if (my $current = $self->tree)->[0] eq 'root';
+  return '' if (my $tree = $self->tree)->[0] eq 'root';
 
   # Extract namespace prefix and search parents
-  my $ns = $current->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
-  while ($current->[0] ne 'root') {
+  my $ns = $tree->[1] =~ /^(.*?):/ ? "xmlns:$1" : undef;
+  for my $n ($tree, _ancestors($tree)) {
 
     # Namespace for prefix
-    my $attrs = $current->[2];
+    my $attrs = $n->[2];
     if ($ns) { /^\Q$ns\E$/ and return $attrs->{$_} for keys %$attrs }
 
     # Namespace attribute
     elsif (defined $attrs->{xmlns}) { return $attrs->{xmlns} }
-
-    $current = $current->[3];
   }
 
   return '';

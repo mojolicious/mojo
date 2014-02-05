@@ -589,8 +589,8 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   my $str = $dom->content;
   $dom    = $dom->content('<p>I ♥ Mojolicious!</p>');
 
-Render content of this element to HTML/XML or replace this element's content
-with HTML/XML fragment.
+Render this element's content to HTML/XML or replace it with HTML/XML
+fragment.
 
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->content;

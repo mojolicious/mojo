@@ -42,7 +42,8 @@ L<Mojo::Server::Daemon/"listen">.
   Server available at https://[::]:3000.
 
 On UNIX platforms you can also add preforking with
-L<Mojolicious::Command::prefork>.
+L<Mojolicious::Command::prefork> to take advantage of multiple CPU cores and
+copy-on-write.
 
   $ ./script/myapp prefork
   Server available at http://127.0.0.1:3000.
@@ -51,7 +52,8 @@ Since all built-in web servers are based on the L<Mojo::IOLoop> event loop,
 they scale best with non-blocking operations. But if your application for some
 reason needs to perform many blocking operations, you can improve performance
 by increasing the number of worker processes and decreasing the number of
-concurrent connections each worker is allowed to handle.
+concurrent connections each worker is allowed to handle (often as low as
+C<1>).
 
   $ ./script/myapp prefork -m production -w 10 -c 1
   Server available at http://127.0.0.1:3000.

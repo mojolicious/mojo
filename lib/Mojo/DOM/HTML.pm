@@ -349,7 +349,7 @@ Parse HTML/XML fragment.
 
 =head2 render
 
-  my $xml = $html->render;
+  my $str = $html->render;
 
 Render DOM to HTML/XML.
 

@@ -553,7 +553,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
 =head2 content_xml
 
-  my $xml = $dom->content_xml;
+  my $str = $dom->content_xml;
 
 Render content of this element to HTML/XML.
 
@@ -783,7 +783,7 @@ trimming is enabled by default.
 
 =head2 to_xml
 
-  my $xml = $dom->to_xml;
+  my $str = $dom->to_xml;
 
 Render this element and its content to HTML/XML.
 
@@ -873,7 +873,7 @@ Alias for L</"attr">.
 
 =head2 stringify
 
-  my $xml = "$dom";
+  my $str = "$dom";
 
 Alias for L</"to_xml">.
 

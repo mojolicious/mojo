@@ -269,7 +269,7 @@ is $stash->{finished}, 1, 'finish event has been emitted once';
 is $code,   101,          'right status';
 is $result, 'test0test1', 'right result';
 
-# Parallel subrequests
+# Concurrent subrequests
 my $delay = Mojo::IOLoop->delay;
 ($code, $result) = ();
 my ($code2, $result2);

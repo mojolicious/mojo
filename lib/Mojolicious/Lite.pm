@@ -867,7 +867,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
     });
   };
 
-  # Parallel non-blocking
+  # Concurrent non-blocking
   get '/titles' => sub {
     my $self = shift;
     my $delay = Mojo::IOLoop->delay(sub {

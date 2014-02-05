@@ -84,7 +84,7 @@ Mojo::IOLoop::Delay - Manage callbacks and control the flow of events
       say 'Second step in 2 seconds.';
     },
 
-    # Second step (parallel timers)
+    # Second step (concurrent timers)
     sub {
       my ($delay, @args) = @_;
       Mojo::IOLoop->timer(1 => $delay->begin);

@@ -377,7 +377,7 @@ latency backend web services.
     </body>
   </html>
 
-Multiple events such as parallel requests can be easily synchronized with
+Multiple events such as concurrent requests can be easily synchronized with
 L<Mojo::IOLoop/"delay">, which can help you avoid deep nested closures that
 often result from continuation-passing style.
 
@@ -392,7 +392,7 @@ often result from continuation-passing style.
     # Prepare response in two steps
     Mojo::IOLoop->delay(
 
-      # Parallel requests
+      # Concurrent requests
       sub {
         my $delay = shift;
         my $url   = Mojo::URL->new('api.metacpan.org/v0/module/_search');
@@ -419,7 +419,7 @@ often result from continuation-passing style.
 Another primary feature of the event loop are timers, which are created with
 L<Mojo::IOLoop/"timer"> and can for example be used to delay rendering of a
 response, and unlike C<sleep>, won't block any other requests that might be
-processed in parallel.
+processed concurrently.
 
   use Mojolicious::Lite;
   use Mojo::IOLoop;
@@ -998,7 +998,7 @@ can keep many concurrent connections active at the same time.
   use Mojo::UserAgent;
   use Mojo::IOLoop;
 
-  # Parallel non-blocking requests
+  # Concurrent non-blocking requests
   my $ua = Mojo::UserAgent->new;
   $ua->get('http://metacpan.org/search?q=mojo' => sub {
     my ($ua, $mojo) = @_;
@@ -1014,7 +1014,7 @@ can keep many concurrent connections active at the same time.
 
 You can take full control of the L<Mojo::IOLoop> event loop.
 
-=head2 Parallel blocking requests
+=head2 Concurrent blocking requests
 
 You can emulate blocking behavior by using L<Mojo::IOLoop/"delay"> to
 synchronize multiple non-blocking requests.

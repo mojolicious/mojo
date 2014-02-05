@@ -153,7 +153,7 @@ ok !$writable, 'io event was not triggered again';
 my $reactor2 = Mojo::Reactor::EV->new;
 is ref $reactor2, 'Mojo::Reactor::Poll', 'right object';
 
-# Parallel reactors
+# Concurrent reactors
 $timer = 0;
 $reactor->recurring(0 => sub { $timer++ });
 my $timer2;

@@ -273,7 +273,7 @@ sub _start {
     elsif ($start eq 'li') { _close(0, $current, {li => 1}, 'ul') }
 
     # "colgroup", "thead", "tbody" and "tfoot"
-    elsif (grep { $_ eq $start } qw(colgroup thead tbody tfoot)) {
+    elsif ($start eq 'colgroup' || $start =~ /^t(?:head|body|foot)$/) {
       _close(0, $current, \%TABLE, 'table');
     }
 

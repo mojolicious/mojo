@@ -2023,6 +2023,8 @@ is "$dom", '<b>C<c><d>D<a>Test</a></d><e>E</e></c>F</b>', 'right result';
 
 # Wrap content
 $dom = Mojo::DOM->new('<a>Test</a>');
+is $dom->at('a')->wrap_content('A')->type, 'a', 'right element';
+is "$dom", '<a>Test</a>', 'right result';
 is $dom->wrap_content('<b></b>')->node, 'root', 'right node';
 is "$dom", '<b><a>Test</a></b>', 'right result';
 is $dom->at('b')->strip->at('a')->wrap_content('1<b c="d"></b>')->type, 'a',

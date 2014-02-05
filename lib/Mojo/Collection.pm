@@ -27,7 +27,7 @@ sub DESTROY { }
 sub c { __PACKAGE__->new(@_) }
 
 sub compact {
-  shift->grep(sub { length($_ // '') });
+  shift->grep(sub { ($_ // '') ne '' });
 }
 
 sub each {

@@ -81,7 +81,7 @@ sub listen {
     $options{LocalAddr} =~ s/[\[\]]//g;
     $handle = $class->new(%options) or croak "Can't create listen socket: $@";
     $fd = fileno $handle;
-    $ENV{MOJO_REUSE} .= length $ENV{MOJO_REUSE} ? ",$reuse:$fd" : "$reuse:$fd";
+    $ENV{MOJO_REUSE} .= $ENV{MOJO_REUSE} ne '' ? ",$reuse:$fd" : "$reuse:$fd";
   }
   $handle->blocking(0);
   $self->{handle} = $handle;

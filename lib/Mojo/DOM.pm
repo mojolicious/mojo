@@ -821,6 +821,9 @@ children of the first innermost element.
   # "<p><b>BA</b></p>"
   $dom->parse('<p>A<p>')->at('p')->wrap_content('<b>B</b>')->root;
 
+  # "<p><b>A</b></p><p>B</p>"
+  $dom->parse('<b>A</b>')->wrap_content('<p></p><p>B</p>');
+
 =head2 xml
 
   my $bool = $dom->xml;

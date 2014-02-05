@@ -46,7 +46,7 @@ sub build {
       # Text (quote and fix line ending)
       if ($op eq 'text') {
         $value = $newline ? quotemeta($value) . '\n' : quotemeta $value;
-        $lines[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
+        $lines[-1] .= "\$_M .= \"" . $value . "\";" if $value ne '';
       }
 
       # Code or multiline expression
@@ -61,7 +61,7 @@ sub build {
           # Escaped
           if (($op eq 'escp' && !$escape) || ($op eq 'expr' && $escape)) {
             $lines[-1] .= "\$_M .= _escape";
-            $lines[-1] .= " scalar $value" if length $value;
+            $lines[-1] .= " scalar $value" if $value ne '';
           }
 
           # Raw
@@ -264,7 +264,7 @@ sub _trim {
     splice @$line, $j, 0, 'code', $1 if $line->[$j + 1] =~ s/(\s+)$//;
 
     # Text left
-    return if length $line->[$j + 1];
+    return if $line->[$j + 1] ne '';
   }
 }
 

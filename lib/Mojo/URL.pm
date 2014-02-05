@@ -149,7 +149,7 @@ sub to_abs {
       = $abs->path($base_path->clone)->path->trailing_slash(0)->canonicalize;
 
     # Query
-    return $abs if length $abs->query->to_string;
+    return $abs if $abs->query->to_string ne '';
     $abs->query($base->query->clone);
   }
 

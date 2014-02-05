@@ -790,11 +790,8 @@ web application.
     # Text or CDATA node
     print $n->content if $n->node eq 'text' || $n->node eq 'cdata';
 
-    # Make sure we have a tag node
-    next unless $n->node eq 'tag';
-
     # Also include alternate text for images
-    print $n->{alt} if $n->type eq 'img';
+    print $n->{alt} if $n->node eq 'tag' && $n->type eq 'img';
   }
 
 For a full list of available CSS selectors see L<Mojo::DOM::CSS/"SELECTORS">.
@@ -974,7 +971,7 @@ Sending a streaming request is almost just as easy.
   $drain = sub {
     my $content = shift;
     my $chunk   = substr $body, 0, 1, '';
-    $drain      = undef unless length $body;
+    $drain      = undef if $body eq '';
     $content->write($chunk, $drain);
   };
   $tx->req->content->$drain;

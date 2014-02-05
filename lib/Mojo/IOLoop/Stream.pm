@@ -88,7 +88,7 @@ sub write {
 
   $self->{buffer} .= $chunk;
   if ($cb) { $self->once(drain => $cb) }
-  else     { return $self unless length $self->{buffer} }
+  elsif ($self->{buffer} eq '') { return $self }
   $self->reactor->watch($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};
 
@@ -122,16 +122,16 @@ sub _write {
   my $self = shift;
 
   my $handle = $self->{handle};
-  if (length $self->{buffer}) {
+  if ($self->{buffer} ne '') {
     my $written = $handle->syswrite($self->{buffer});
     return $self->_error unless defined $written;
     $self->emit_safe(write => substr($self->{buffer}, 0, $written, ''));
     $self->_again;
   }
 
-  $self->emit_safe('drain') unless length $self->{buffer};
-  return if $self->is_writing;
-  return $self->close if $self->{graceful};
+  $self->emit_safe('drain') if $self->{buffer} eq '';
+  return                    if $self->is_writing;
+  return $self->close       if $self->{graceful};
   $self->reactor->watch($handle, !$self->{paused}, 0) if $self->{handle};
 }
 

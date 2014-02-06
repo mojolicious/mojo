@@ -419,8 +419,8 @@ ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';
 is MojoMonkeyTest::yang(), 'yang', 'right result';
 
 # tablify
-is tablify([["f\r\no o", 'bar']]),     "fo o  bar\n",      'right result';
-is tablify([["  foo",    '  b a r']]), "  foo    b a r\n", 'right result';
+is tablify([["f\r\no o\r\n", 'bar']]),     "fo o  bar\n",      'right result';
+is tablify([["  foo",        '  b a r']]), "  foo    b a r\n", 'right result';
 is tablify([['foo']]), "foo\n", 'right result';
 is tablify([['foo', 'yada'], ['yada', 'yada']]), "foo   yada\nyada  yada\n",
   'right result';

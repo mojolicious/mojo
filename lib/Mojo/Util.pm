@@ -308,8 +308,7 @@ sub tablify {
     }
   }
 
-  my $format = join '  ', map {"\%-${_}s"} @spec[0 .. $#spec - 1];
-  $format .= $format ? '  %s' : '%s';
+  my $format = join '  ', map({"\%-${_}s"} @spec[0 .. $#spec - 1]), '%s';
   return join '', map { sprintf "$format\n", @$_ } @$rows;
 }
 
@@ -648,7 +647,7 @@ available through L<Time::HiRes>.
 
   my $table = tablify [['foo', 'bar'], ['baz', 'yada']];
 
-Row-oriented text table builder.
+Row-oriented generator for text tables.
 
   # "foo   bar\nyada  yada\nbaz   yada\n"
   tablify [['foo', 'bar'], ['yada', 'yada'], ['baz', 'yada']];

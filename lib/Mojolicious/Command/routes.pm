@@ -14,12 +14,12 @@ sub run {
   GetOptionsFromArray \@args, 'v|verbose' => \my $verbose;
 
   my $rows = [];
-  $self->_walk($_, 0, $rows, $verbose) for @{$self->app->routes->children};
+  _walk($_, 0, $rows, $verbose) for @{$self->app->routes->children};
   print encode('UTF-8', tablify($rows));
 }
 
 sub _walk {
-  my ($self, $route, $depth, $rows, $verbose) = @_;
+  my ($route, $depth, $rows, $verbose) = @_;
 
   # Pattern
   my $prefix = '';
@@ -46,7 +46,7 @@ sub _walk {
   push @$row, $regex if $verbose;
 
   $depth++;
-  $self->_walk($_, $depth, $rows, $verbose) for @{$route->children};
+  _walk($_, $depth, $rows, $verbose) for @{$route->children};
   $depth--;
 }
 

@@ -76,10 +76,10 @@ get '/time' => 'clock';
 
 # Scrape information from remote sites
 post '/title' => sub {
-  my $self = shift;
-  my $url  = $self->param('url') || 'http://mojolicio.us';
-  $self->render(
-    json => {title => $self->ua->get($url)->res->dom->at('title')->text});
+  my $self  = shift;
+  my $url   = $self->param('url') || 'http://mojolicio.us';
+  my $title = $self->ua->get($url)->res->dom->at('title')->text;
+  $self->render(json => {url => $url, title => $title});
 };
 
 # WebSocket echo service

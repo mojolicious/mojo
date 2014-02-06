@@ -116,7 +116,7 @@ sub get_body_chunk {
 
   $self->emit('progress', 'body', $offset);
   my $chunk = $self->content->get_body_chunk($offset);
-  return $chunk if !defined $chunk || $chunk ne '';
+  return $chunk if !defined $chunk || length $chunk;
   $self->finish;
 
   return $chunk;

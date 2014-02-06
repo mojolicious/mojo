@@ -60,7 +60,7 @@ sub _match {
   return if $r->is_websocket && !$options->{websocket};
 
   # Partial
-  my $empty = $path eq '' || $path eq '/';
+  my $empty = !length $path || $path eq '/';
   if ($r->partial) {
     $captures->{path} = $path;
     $self->endpoint($r);

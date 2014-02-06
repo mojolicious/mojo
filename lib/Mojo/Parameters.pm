@@ -79,7 +79,7 @@ sub params {
   # Parse string
   if (defined(my $str = delete $self->{string})) {
     my $params = $self->{params} = [];
-    return $params if $str eq '';
+    return $params unless length $str;
 
     # W3C suggests to also accept ";" as a separator
     my $charset = $self->charset;

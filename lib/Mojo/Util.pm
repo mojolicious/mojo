@@ -648,10 +648,10 @@ available through L<Time::HiRes>.
 
   my $table = tablify [['foo', 'bar'], ['baz', 'yada']];
 
-Simple row-oriented table builder for command line tools.
+Row-oriented text table builder.
 
-  # "foo   bar\nyada  yada\n"
-  tablify [['foo', 'bar'], ['yada', 'yada']];
+  # "foo   bar\nyada  yada\nbaz   yada\n"
+  tablify [['foo', 'bar'], ['yada', 'yada'], ['baz', 'yada']];
 
 =head2 trim
 

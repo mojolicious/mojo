@@ -8,7 +8,7 @@ use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
-use List::Util qw(max min);
+use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Time::HiRes ();
 
@@ -52,7 +52,7 @@ our @EXPORT_OK = (
   qw(decode deprecated dumper encode get_line hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time table trim unindent unquote url_escape url_unescape),
+  qw(steady_time tablify trim unindent unquote url_escape url_unescape),
   qw(xml_escape xor_encode)
 );
 
@@ -296,24 +296,21 @@ sub steady_time () {
     : Time::HiRes::time;
 }
 
-sub table {
-  my $columns = shift;
+sub tablify {
+  my $rows = shift;
 
-  my $spec = shift @$columns;
-  for my $i (0 .. $#$spec) {
-    my @len;
-    for my $j (0 .. $#$columns) {
-      $columns->[$j][$i] =~ s/[\r\n]//g;
-      push @len, length $columns->[$j][$i];
+  my @spec;
+  for my $row (@$rows) {
+    for my $i (0 .. $#$row) {
+      $row->[$i] =~ s/[\r\n]//g;
+      my $len = length $row->[$i];
+      $spec[$i] = $len if $len > ($spec[$i] // 0);
     }
-    next unless $spec->[$i + 1] && (my $max = max @len) < $spec->[$i];
-    $spec->[$i + 1] += $spec->[$i] - $max;
-    $spec->[$i] = $max;
   }
 
-  my $format = join '  ', map {"\%-${_}.${_}s"} @$spec[0 .. $#$spec - 1];
-  $format .= ($format ? '  %.' : '%.') . $spec->[-1] . "s\n";
-  return join '', map { sprintf $format, @$_ } @$columns;
+  my $format = join '  ', map {"\%-${_}s"} @spec[0 .. $#spec - 1];
+  $format .= $format ? '  %s' : '%s';
+  return join '', map { sprintf "$format\n", @$_ } @$rows;
 }
 
 sub trim {
@@ -647,19 +644,14 @@ consecutive groups of whitespace into one space each.
 High resolution time, resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>.
 
-=head2 table
+=head2 tablify
 
-  my $table = table [[20, 20], ['foo', 'bar'], ['baz', 'yada']];
+  my $table = tablify [['foo', 'bar'], ['baz', 'yada']];
 
-Simple row-oriented table builder for command line tools, the first row
-contains the maximum width for each column, if one column doesn't require its
-full quota, the next one inherits the rest.
+Simple row-oriented table builder for command line tools.
 
-  # "foo  bar\nbaz  yad\n"
-  table [[3, 3], ['foo', 'bar'], ['baz', 'yada']];
-
-  # "foo  bar\nbaz  yada\n"
-  table [[4, 3], ['foo', 'bar'], ['baz', 'yada']];
+  # "foo   bar\nyada  yada\n"
+  tablify [['foo', 'bar'], ['yada', 'yada']];
 
 =head2 trim
 

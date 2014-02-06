@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long 'GetOptions';
 use Mojo::Server;
-use Mojo::Util 'table';
+use Mojo::Util 'tablify';
 
 has hint => <<EOF;
 
@@ -79,10 +79,10 @@ sub run {
   }
 
   # Print list of all available commands
-  my $table = [[30, 48]];
-  push @$table, [' ' . $_->[0], $_->[1]->new->description]
+  my $rows = [];
+  push @$rows, [' ' . $_->[0], $_->[1]->new->description]
     for sort { $a->[0] cmp $b->[0] } @commands;
-  return print $self->message, table($table), $self->hint;
+  return print $self->message, tablify($rows), $self->hint;
 }
 
 sub start_app {

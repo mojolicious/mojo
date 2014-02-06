@@ -6,7 +6,7 @@
     of Mojo::DOM::content.
   - Deprecated Mojo::DOM::to_xml in favor of Mojo::DOM::to_string.
   - Added wrap_content method to Mojo::DOM.
-  - Added table function to Mojo::Util.
+  - Added tablify function to Mojo::Util.
   - Improved wrap method in Mojo::DOM to allow wrapping of the root node.
 
 4.76  2014-02-04

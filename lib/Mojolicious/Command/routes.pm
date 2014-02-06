@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use re 'regexp_pattern';
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
-use Mojo::Util qw(encode table);
+use Mojo::Util qw(encode tablify);
 
 has description => 'Show available routes.';
 has usage => sub { shift->extract_usage };
@@ -13,18 +13,18 @@ sub run {
 
   GetOptionsFromArray \@args, 'v|verbose' => \my $verbose;
 
-  my $table = $verbose ? [[20, 16, 18, 20]] : [[26, 25, 25]];
-  $self->_walk($_, 0, $table, $verbose) for @{$self->app->routes->children};
-  print encode('UTF-8', table($table));
+  my $rows = [];
+  $self->_walk($_, 0, $rows, $verbose) for @{$self->app->routes->children};
+  print encode('UTF-8', tablify($rows));
 }
 
 sub _walk {
-  my ($self, $route, $depth, $table, $verbose) = @_;
+  my ($self, $route, $depth, $rows, $verbose) = @_;
 
   # Pattern
   my $prefix = '';
   if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
-  push @$table, my $row = [$prefix . ($route->pattern->pattern || '/')];
+  push @$rows, my $row = [$prefix . ($route->pattern->pattern || '/')];
 
   # Methods
   my $via = $route->via;
@@ -46,7 +46,7 @@ sub _walk {
   push @$row, $regex if $verbose;
 
   $depth++;
-  $self->_walk($_, $depth, $table, $verbose) for @{$route->children};
+  $self->_walk($_, $depth, $rows, $verbose) for @{$route->children};
   $depth--;
 }
 

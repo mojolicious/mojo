@@ -653,7 +653,13 @@ available through L<Time::HiRes>.
 
 Simple row-oriented table builder for command line tools, the first row
 contains the maximum width for each column, if one column doesn't require its
-full quota, the next one inherits it.
+full quota, the next one inherits the rest.
+
+  # "foo  bar\nbaz  yad\n"
+  table [[3, 3], ['foo', 'bar'], ['baz', 'yada']];
+
+  # "foo  bar\nbaz  yada\n"
+  table [[4, 3], ['foo', 'bar'], ['baz', 'yada']];
 
 =head2 trim
 

@@ -464,14 +464,19 @@ created at startup time.
   use Mojolicious::Lite;
   use Mojo::IOLoop;
 
-  # Count seconds since startup
-  my $i = 0;
-  Mojo::IOLoop->recurring(1 => sub { $i++ });
+  # Check title in the background every 10 seconds
+  my $title = 'Got no title yet.';
+  Mojo::IOLoop->recurring(10 => sub {
+    app->ua->get('http://mojolicio.us' => sub {
+      my ($ua, $tx) = @_;
+      $title = $tx->res->dom->at('title')->text;
+    });
+  });
 
-  # Show counter
+  # Show current title
   get '/' => sub {
     my $self = shift;
-    $self->render(text => "About $i seconds running!");
+    $self->render(json => {title => $title});
   };
 
   app->start;

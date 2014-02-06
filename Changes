@@ -1,4 +1,6 @@
 
+4.78  2014-02-07
+
 4.77  2014-02-06
   - Deprecated Mojo::DOM::text_after and Mojo::DOM::text_before in favor of
     Mojo::DOM::contents.

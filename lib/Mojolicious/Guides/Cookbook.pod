@@ -344,7 +344,7 @@ to consumers with long-lived connections as soon as it is generated, instead
 of relying on the more traditional pull model. All built-in web servers use
 non-blocking I/O and are based on the L<Mojo::IOLoop> event loop, which
 provides many very powerful features that allow real-time web applications to
-scale up to thousands of clients.
+scale up to thousands of concurrent client connections.
 
 =head2 Backend web services
 

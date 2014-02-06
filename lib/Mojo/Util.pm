@@ -8,7 +8,7 @@ use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
-use List::Util 'min';
+use List::Util qw(max min);
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Time::HiRes ();
 
@@ -52,8 +52,8 @@ our @EXPORT_OK = (
   qw(decode deprecated dumper encode get_line hmac_sha1_sum html_unescape),
   qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time trim unindent unquote url_escape url_unescape xml_escape),
-  qw(xor_encode)
+  qw(steady_time table trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode)
 );
 
 sub b64_decode { decode_base64($_[0]) }
@@ -294,6 +294,26 @@ sub steady_time () {
   MONOTONIC
     ? Time::HiRes::clock_gettime(Time::HiRes::CLOCK_MONOTONIC())
     : Time::HiRes::time;
+}
+
+sub table {
+  my $columns = shift;
+
+  my $spec = shift @$columns;
+  for my $i (0 .. $#$spec) {
+    my @len;
+    for my $j (0 .. $#$columns) {
+      $columns->[$j][$i] =~ s/[\r\n]//g;
+      push @len, length $columns->[$j][$i];
+    }
+    next unless $spec->[$i + 1] && (my $max = max @len) < $spec->[$i];
+    $spec->[$i + 1] += $spec->[$i] - $max;
+    $spec->[$i] = $max;
+  }
+
+  my $format = join '  ', map {"\%-${_}.${_}s"} @$spec[0 .. $#$spec - 1];
+  $format .= ($format ? '  %.' : '%.') . $spec->[-1] . "s\n";
+  return join '', map { sprintf $format, @$_ } @$columns;
 }
 
 sub trim {
@@ -626,6 +646,14 @@ consecutive groups of whitespace into one space each.
 
 High resolution time, resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>.
+
+=head2 table
+
+  my $table = table [[20, 20], ['foo', 'bar'], ['baz', 'yada']];
+
+Simple row-oriented table builder for command line tools, the first row
+contains the maximum width for each column, if one column doesn't require its
+full quota, the next one inherits it.
 
 =head2 trim
 

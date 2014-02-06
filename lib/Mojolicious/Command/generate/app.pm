@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path);
 
-has description => "Generate Mojolicious application directory structure.\n";
+has description => 'Generate Mojolicious application directory structure.';
 has usage => sub { shift->extract_usage };
 
 sub run {

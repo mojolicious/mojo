@@ -5,7 +5,7 @@ use Mojo::IOLoop::Server;
 use Mojo::UserAgent;
 use Mojolicious;
 
-has description => "Show versions of installed modules.\n";
+has description => 'Show versions of installed modules.';
 has usage => sub { shift->extract_usage };
 
 sub run {

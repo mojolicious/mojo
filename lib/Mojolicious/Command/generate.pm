@@ -1,7 +1,7 @@
 package Mojolicious::Command::generate;
 use Mojo::Base 'Mojolicious::Commands';
 
-has description => "Generate files and directories from templates.\n";
+has description => 'Generate files and directories from templates.';
 has hint        => <<EOF;
 
 See 'APPLICATION generate help GENERATOR' for more information on a specific

@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Loader;
 use Mojo::Util 'encode';
 
-has description => "Inflate embedded files to real files.\n";
+has description => 'Inflate embedded files to real files.';
 has usage => sub { shift->extract_usage };
 
 sub run {

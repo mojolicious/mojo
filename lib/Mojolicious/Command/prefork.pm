@@ -5,7 +5,7 @@ use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Prefork;
 
 has description =>
-  "Start application with preforking HTTP and WebSocket server.\n";
+  'Start application with preforking HTTP and WebSocket server.';
 has usage => sub { shift->extract_usage };
 
 sub run {

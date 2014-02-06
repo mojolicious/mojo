@@ -13,8 +13,8 @@ use Mojo::Util
   qw(decode dumper encode get_line hmac_sha1_sum html_unescape md5_bytes),
   qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time trim unindent unquote url_escape url_unescape xml_escape),
-  qw(xor_encode);
+  qw(steady_time table trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -417,6 +417,17 @@ ok !!MojoMonkeyTest->can('yin'), 'function "yin" exists';
 is MojoMonkeyTest::yin(), 'yin', 'right result';
 ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';
 is MojoMonkeyTest::yang(), 'yang', 'right result';
+
+# table
+is table([[5, 5], ["f\r\no o", 'bar']]), "fo o  bar\n", 'right result';
+is table([[50], ['foo']]), "foo\n", 'right result';
+is table([[3], ['foo'], ['bar'], ['yada']]), "foo\nbar\nyad\n", 'right result';
+is table([[3, 3], ['yada', 'yada'], ['foo', 'yada']]), "yad  yad\nfoo  yad\n",
+  'right result';
+is table([[5, 3], ['foo', 'bar'], ['baz', 'yada']]), "foo  bar\nbaz  yada\n",
+  'right result';
+is table([[10, 3, 1], ['foo', 'bar', 'baz'], ['yada', 'yada', 'yada']]),
+  "foo   bar   baz\nyada  yada  yada\n", 'right result';
 
 # deprecated
 {

@@ -1,7 +1,7 @@
 package Mojolicious::Command::generate::lite_app;
 use Mojo::Base 'Mojolicious::Command';
 
-has description => "Generate Mojolicious::Lite application.\n";
+has description => 'Generate Mojolicious::Lite application.';
 has usage => sub { shift->extract_usage };
 
 sub run {

@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojolicious;
 
-has description => qq{Generate "Makefile.PL".\n};
+has description => 'Generate "Makefile.PL".';
 has usage => sub { shift->extract_usage };
 
 sub run { shift->render_to_rel_file('makefile', 'Makefile.PL') }

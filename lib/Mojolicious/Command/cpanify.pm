@@ -5,7 +5,7 @@ use File::Basename 'basename';
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::UserAgent;
 
-has description => "Upload distribution to CPAN.\n";
+has description => 'Upload distribution to CPAN.';
 has usage => sub { shift->extract_usage };
 
 sub run {

@@ -104,7 +104,7 @@ Mojolicious::Command - Command base class
   use Mojo::Base 'Mojolicious::Command';
 
   # Short description
-  has description => "My first Mojo command.\n";
+  has description => 'My first Mojo command.';
 
   # Short usage message
   has usage => <<EOF;

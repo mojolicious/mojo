@@ -2,8 +2,8 @@ package Mojolicious::Commands;
 use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long 'GetOptions';
-use List::Util 'max';
 use Mojo::Server;
+use Mojo::Util 'table';
 
 has hint => <<EOF;
 
@@ -79,14 +79,10 @@ sub run {
   }
 
   # Print list of all available commands
-  my $max = max map { length $_->[0] } @commands;
-  print $self->message;
-  for my $command (sort { $a->[0] cmp $b->[0] } @commands) {
-    my $name        = $command->[0];
-    my $description = $command->[1]->new->description;
-    print "  $name", (' ' x ($max - length $name)), "   $description";
-  }
-  return print $self->hint;
+  my $table = [[30, 48]];
+  push @$table, [' ' . $_->[0], $_->[1]->new->description]
+    for sort { $a->[0] cmp $b->[0] } @commands;
+  return print $self->message, table($table), $self->hint;
 }
 
 sub start_app {

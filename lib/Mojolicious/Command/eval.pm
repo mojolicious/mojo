@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 
-has description => "Run code against application.\n";
+has description => 'Run code against application.';
 has usage => sub { shift->extract_usage };
 
 sub run {

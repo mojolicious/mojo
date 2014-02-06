@@ -10,7 +10,7 @@ use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
 use Scalar::Util 'weaken';
 
-has description => "Perform HTTP request.\n";
+has description => 'Perform HTTP request.';
 has usage => sub { shift->extract_usage };
 
 sub run {

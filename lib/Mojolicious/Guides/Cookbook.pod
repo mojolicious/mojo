@@ -1102,7 +1102,7 @@ that they will be picked up automatically by the command line interface?
   package Mojolicious::Command::spy;
   use Mojo::Base 'Mojolicious::Command';
 
-  has description => "Spy on application.\n";
+  has description => 'Spy on application.';
   has usage       => "Usage: APPLICATION spy [TARGET]\n";
 
   sub run {

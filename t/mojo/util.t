@@ -419,7 +419,8 @@ ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';
 is MojoMonkeyTest::yang(), 'yang', 'right result';
 
 # table
-is table([[5, 5], ["f\r\no o", 'bar']]), "fo o  bar\n", 'right result';
+is table([[5, 5], ["f\r\no o", 'bar']]),     "fo o  bar\n",    'right result';
+is table([[5, 5], ["  foo",    '  b a r']]), "  foo    b a\n", 'right result';
 is table([[50], ['foo']]), "foo\n", 'right result';
 is table([[3], ['foo'], ['bar'], ['yada']]), "foo\nbar\nyad\n", 'right result';
 is table([[3, 3], ['yada', 'yada'], ['foo', 'yada']]), "yad  yad\nfoo  yad\n",

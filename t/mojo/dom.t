@@ -641,6 +641,8 @@ is_deeply \@numbers, [1, 1, 2, 2, 3, 3], 'right order';
 $dom = Mojo::DOM->new->parse("<div test=23 id='a' \n class='x' foo=bar />");
 is $dom->at('div.x')->attr('test'),        23,  'right attribute';
 is $dom->at('[foo="bar"]')->attr('class'), 'x', 'right attribute';
+is $dom->at('div')->attr(baz => undef)->root->to_string,
+  '<div baz class="x" foo="bar" id="a" test="23"></div>', 'right result';
 
 # Markup characters in attribute values
 $dom = Mojo::DOM->new->parse(

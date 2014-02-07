@@ -289,6 +289,10 @@ is $json->encode({false => \!!$bytes}), '{"false":false}',
 is $json->encode({false => \$bytes}), '{"false":false}',
   'encode false boolean from reference';
 
+# Stringify booleans
+is(Mojo::JSON->true,  1, 'right value');
+is(Mojo::JSON->false, 0, 'right value');
+
 # Upgraded numbers
 my $num = 3;
 my $str = "$num";

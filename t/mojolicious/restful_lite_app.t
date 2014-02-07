@@ -19,6 +19,11 @@ get '/accepts' => sub {
   $self->render(json => {best => $self->accepts('html', 'json', 'txt')});
 };
 
+get '/wants_json' => sub {
+  my $self = shift;
+  $self->render(json => {wants_json => \$self->accepts('', 'json')});
+};
+
 under '/rest';
 
 get sub {
@@ -83,6 +88,16 @@ $t->get_ok('/accepts' => {Accept => 'text/plain'})->status_is(200)
 # Accept "txt" with everything
 $t->get_ok('/accepts.html?format=json' => {Accept => 'text/plain'})
   ->status_is(200)->json_is({best => 'txt'});
+
+# Nothing
+$t->get_ok('/wants_json')->status_is(200)->json_is({wants_json => 0});
+
+# Unsupported
+$t->get_ok('/wants_json.xml')->status_is(200)->json_is({wants_json => 0});
+
+# Accept "json"
+$t->get_ok('/wants_json' => {Accept => 'application/json'})->status_is(200)
+  ->json_is({wants_json => 1});
 
 # Ajax
 my $ajax = 'text/html;q=0.1,application/json';

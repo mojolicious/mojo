@@ -138,6 +138,9 @@ if no preference could be detected.
   # Check if JSON is acceptable
   $self->render(json => {hello => 'world'}) if $self->accepts('json');
 
+  # Check if JSON was specifically requested
+  $self->render(json => {hello => 'world'}) if $self->accepts('', 'json');
+
   # Unsupported representation
   $self->render(data => '', status => 204)
     unless my $format = $self->accepts('html', 'json');

@@ -84,8 +84,7 @@ sub params {
     my $charset = $self->charset;
     for my $pair (split '&', $str) {
       next unless $pair =~ /^([^=]+)(?:=(.*))?$/;
-      my $name = $1;
-      my $value = $2 // '';
+      my ($name, $value) = ($1, $2 // '');
 
       # Replace "+" with whitespace, unescape and decode
       s/\+/ /g for $name, $value;
@@ -157,9 +156,8 @@ sub to_string {
     return url_escape $str, '^A-Za-z0-9\-._~!$&\'()*+,;=%:@/?';
   }
 
-  # Build pairs
-  my $params = $self->params;
-  return '' unless @$params;
+  # Build pairs;
+  return '' unless @{my $params = $self->params};
   my @pairs;
   for (my $i = 0; $i < @$params; $i += 2) {
     my ($name, $value) = @{$params}[$i, $i + 1];

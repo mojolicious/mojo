@@ -157,7 +157,8 @@ sub to_string {
   }
 
   # Build pairs;
-  return '' unless @{my $params = $self->params};
+  my $params = $self->params;
+  return '' unless @$params;
   my @pairs;
   for (my $i = 0; $i < @$params; $i += 2) {
     my ($name, $value) = @{$params}[$i, $i + 1];

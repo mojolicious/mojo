@@ -68,21 +68,19 @@ sub run {
   return 1 if $ENV{HARNESS_ACTIVE};
 
   # Find all available commands
-  my (@commands, %seen);
+  my (@rows, %seen);
   my $loader = Mojo::Loader->new;
   for my $ns (@{$self->namespaces}) {
     for my $module (@{$loader->search($ns)}) {
       next unless my $command = _command($module);
-      $command =~ s/^${ns}:://;
-      push @commands, [$command => $module] unless $seen{$command}++;
+      $command =~ s/^\Q$ns\E:://;
+      next if $seen{$command}++;
+      push @rows, [" $command", $module->new->description];
     }
   }
+  @rows = sort { $a->[0] cmp $b->[0] } @rows;
 
-  # Print list of all available commands
-  my $rows = [];
-  push @$rows, [' ' . $_->[0], $_->[1]->new->description]
-    for sort { $a->[0] cmp $b->[0] } @commands;
-  return print $self->message, tablify($rows), $self->hint;
+  print $self->message, tablify(\@rows), $self->hint;
 }
 
 sub start_app {

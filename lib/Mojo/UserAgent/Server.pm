@@ -91,7 +91,7 @@ Application this server handles, instance specific applications override the
 global default.
 
   # Change application behavior
-  $server->defaults(testing => 'oh yea!');
+  $server->app->defaults(testing => 'oh yea!');
 
 =head2 restart
 

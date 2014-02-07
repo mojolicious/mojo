@@ -153,7 +153,7 @@ sub parse {
   # Split lines
   my $state = 'text';
   my ($trimming, @capture_token);
-  for my $line (split /\n/, $template) {
+  for my $line (split "\n", $template) {
     $trimming = 0 if $state eq 'text';
 
     # Turn Perl line into mixed line

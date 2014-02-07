@@ -33,7 +33,7 @@ sub detect {
   }
 
   # FindBin fallback
-  return $self->parts([split /\//, $FindBin::Bin]);
+  return $self->parts([split '/', $FindBin::Bin]);
 }
 
 sub lib_dir {

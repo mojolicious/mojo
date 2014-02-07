@@ -65,8 +65,8 @@ sub camelize {
 
   # CamelCase words
   return join '::', map {
-    join '', map { ucfirst lc } split /_/, $_
-  } split /-/, $str;
+    join '', map { ucfirst lc } split '_', $_
+  } split '-', $str;
 }
 
 sub class_to_file {
@@ -84,7 +84,7 @@ sub decamelize {
 
   # Module parts
   my @parts;
-  for my $part (split /::/, $str) {
+  for my $part (split '::', $str) {
 
     # snake_case words
     my @words;
@@ -152,7 +152,7 @@ sub punycode_decode {
   my @output;
 
   # Consume all code points before the last delimiter
-  push @output, split //, $1 if $input =~ s/(.*)\x2d//s;
+  push @output, split '', $1 if $input =~ s/(.*)\x2d//s;
 
   while (length $input) {
     my $oldi = $i;
@@ -189,7 +189,7 @@ sub punycode_encode {
 
   # Extract basic code points
   my $len   = length $output;
-  my @input = map {ord} split //, $output;
+  my @input = map {ord} split '', $output;
   my @chars = sort grep { $_ >= PC_INITIAL_N } @input;
   $output =~ s/[^\x00-\x7f]+//gs;
   my $h = my $b = length $output;
@@ -320,7 +320,7 @@ sub trim {
 
 sub unindent {
   my $str = shift;
-  my $min = min map { m/^([ \t]*)/; length $1 || () } split /\n/, $str;
+  my $min = min map { m/^([ \t]*)/; length $1 || () } split "\n", $str;
   $str =~ s/^[ \t]{0,$min}//gm if $min;
   return $str;
 }

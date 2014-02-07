@@ -94,7 +94,7 @@ sub _detect {
   }
 
   # More context
-  $self->_context($trace[0][1], [map { [split /\n/] } @$files]) if $files;
+  $self->_context($trace[0][1], [map { [split "\n"] } @$files]) if $files;
 
   return $self;
 }

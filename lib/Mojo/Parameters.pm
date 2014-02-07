@@ -81,9 +81,8 @@ sub params {
     my $params = $self->{params} = [];
     return $params unless length $str;
 
-    # W3C suggests to also accept ";" as a separator
     my $charset = $self->charset;
-    for my $pair (split /&|;/, $str) {
+    for my $pair (split '&', $str) {
       next unless $pair =~ /^([^=]+)(?:=(.*))?$/;
       my $name = $1;
       my $value = $2 // '';
@@ -201,7 +200,9 @@ Mojo::Parameters - Parameters
 
 =head1 DESCRIPTION
 
-L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL>.
+L<Mojo::Parameters> is a container for form parameters used by L<Mojo::URL>
+and based on L<RFC 3986|http://tools.ietf.org/html/rfc3986> as well as the
+L<HTML Living Standard|http://www.whatwg.org/html>.
 
 =head1 ATTRIBUTES
 
@@ -224,9 +225,9 @@ following new ones.
 
 =head2 append
 
-  $params = $params->append(foo => 'ba;r');
-  $params = $params->append(foo => ['ba;r', 'b;az']);
-  $params = $params->append(foo => ['ba;r', 'b;az'], bar => 23);
+  $params = $params->append(foo => 'ba&r');
+  $params = $params->append(foo => ['ba&r', 'baz']);
+  $params = $params->append(foo => ['bar', 'baz'], bar => 23);
 
 Append parameters. Note that this method will normalize the parameters.
 
@@ -247,7 +248,7 @@ Clone parameters.
 
 =head2 merge
 
-  $params = $params->merge(Mojo::Parameters->new(foo => 'b;ar', baz => 23));
+  $params = $params->merge(Mojo::Parameters->new(foo => 'b&ar', baz => 23));
 
 Merge L<Mojo::Parameters> objects. Note that this method will normalize the
 parameters.
@@ -256,9 +257,9 @@ parameters.
 
   my $params = Mojo::Parameters->new;
   my $params = Mojo::Parameters->new('foo=b%3Bar&baz=23');
-  my $params = Mojo::Parameters->new(foo => 'b;ar');
-  my $params = Mojo::Parameters->new(foo => ['ba;r', 'b;az']);
-  my $params = Mojo::Parameters->new(foo => ['ba;r', 'b;az'], bar => 23);
+  my $params = Mojo::Parameters->new(foo => 'b&ar');
+  my $params = Mojo::Parameters->new(foo => ['ba&r', 'baz']);
+  my $params = Mojo::Parameters->new(foo => ['bar', 'baz'], bar => 23);
 
 Construct a new L<Mojo::Parameters> object and L</"parse"> parameters if
 necessary.
@@ -268,8 +269,8 @@ necessary.
   my @names = $params->param;
   my $foo   = $params->param('foo');
   my @foo   = $params->param('foo');
-  my $foo   = $params->param(foo => 'ba;r');
-  my @foo   = $params->param(foo => qw(ba;r ba;z));
+  my $foo   = $params->param(foo => 'ba&r');
+  my @foo   = $params->param(foo => qw(ba&r baz));
 
 Check and replace parameter value. Be aware that if you request a parameter by
 name in scalar context, you will receive only the I<first> value for that
@@ -280,7 +281,7 @@ normalize the parameters.
 =head2 params
 
   my $array = $params->params;
-  $params   = $params->params([foo => 'b;ar', baz => 23]);
+  $params   = $params->params([foo => 'b&ar', baz => 23]);
 
 Parsed parameters. Note that this method will normalize the parameters.
 

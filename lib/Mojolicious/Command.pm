@@ -57,9 +57,9 @@ sub help {
   exit 0;
 }
 
-sub rel_dir { catdir(getcwd(), split /\//, pop) }
+sub rel_dir { catdir(getcwd(), split '/', pop) }
 
-sub rel_file { catfile(getcwd(), split /\//, pop) }
+sub rel_file { catfile(getcwd(), split '/', pop) }
 
 sub render_data {
   my ($self, $name) = (shift, shift);

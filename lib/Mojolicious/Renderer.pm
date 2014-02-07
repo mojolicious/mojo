@@ -138,7 +138,7 @@ sub template_for {
   # Normal default template
   my $stash = $c->stash;
   my ($controller, $action) = @$stash{qw(controller action)};
-  return join '/', split(/-/, decamelize($controller)), $action
+  return join '/', split('-', decamelize($controller)), $action
     if $controller && $action;
 
   # Try the route name if we don't have controller and action

@@ -1,5 +1,7 @@
 
 4.78  2014-02-07
+  - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML
+    Living Standard.
 
 4.77  2014-02-06
   - Deprecated Mojo::DOM::text_after and Mojo::DOM::text_before in favor of

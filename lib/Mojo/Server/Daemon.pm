@@ -13,7 +13,7 @@ has acceptors => sub { [] };
 has [qw(backlog group silent user)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
-has listen => sub { [split /,/, $ENV{MOJO_LISTEN} || 'http://*:3000'] };
+has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
 has max_clients  => 1000;
 has max_requests => 25;
 

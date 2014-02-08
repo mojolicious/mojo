@@ -3,6 +3,7 @@
   - Deprecated Mojo::Util::get_line.
   - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML
     Living Standard.
+  - Fixed case sensitivity bug in Mojolicious::Types.
 
 4.77  2014-02-06
   - Deprecated Mojo::DOM::text_after and Mojo::DOM::text_before in favor of

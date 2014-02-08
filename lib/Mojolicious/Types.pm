@@ -55,8 +55,8 @@ sub detect {
 
 sub type {
   my ($self, $ext, $type) = @_;
-  return $self->types->{$ext}[0] unless $type;
-  $self->types->{$ext} = ref $type ? $type : [$type];
+  return $self->types->{lc $ext}[0] unless $type;
+  $self->types->{lc $ext} = ref $type ? $type : [$type];
   return $self;
 }
 

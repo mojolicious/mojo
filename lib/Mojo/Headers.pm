@@ -31,8 +31,6 @@ sub add {
   # Make sure we have a normal case entry for name
   my $key = lc $name;
   $self->{normalcase}{$key} //= $name unless $NORMALCASE{$key};
-
-  # Add lines
   push @{$self->{headers}{$key}}, map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
 
   return $self;
@@ -131,10 +129,8 @@ sub remove {
 
 sub to_hash {
   my ($self, $multi) = @_;
-  my %hash;
-  $hash{$_} = $multi ? [$self->header($_)] : scalar $self->header($_)
-    for @{$self->names};
-  return \%hash;
+  return {map { $_ => $multi ? [$self->header($_)] : scalar $self->header($_) }
+      @{$self->names}};
 }
 
 sub to_string {

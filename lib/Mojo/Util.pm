@@ -111,17 +111,7 @@ sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Dump }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
 
-sub get_line {
-
-  # Locate line ending
-  return undef if (my $pos = index ${$_[0]}, "\x0a") == -1;
-
-  # Extract line and ending
-  my $line = substr ${$_[0]}, 0, $pos + 1, '';
-  $line =~ s/\x0d?\x0a$//;
-
-  return $line;
-}
+sub get_line { ${$_[0]} =~ s/^(.*?)\x0d?\x0a// ? $1 : undef }
 
 sub hmac_sha1_sum { hmac_sha1_hex(@_) }
 

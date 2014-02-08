@@ -2,7 +2,7 @@ package Mojo::Message::Request;
 use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Request;
-use Mojo::Util qw(b64_encode b64_decode get_line);
+use Mojo::Util qw(b64_encode b64_decode);
 use Mojo::URL;
 
 has env => sub { {} };
@@ -57,12 +57,11 @@ sub extract_start_line {
   my ($self, $bufref) = @_;
 
   # Ignore any leading empty lines
-  $$bufref =~ s/^\s+//;
-  return undef unless defined(my $line = get_line $bufref);
+  return undef unless $$bufref =~ s/^\s*(.*?)\x0d?\x0a//;
 
   # We have a (hopefully) full request line
   $self->error('Bad request start line', 400) and return undef
-    unless $line =~ $START_LINE_RE;
+    unless $1 =~ $START_LINE_RE;
   my $url = $self->method($1)->version($3)->url;
   return !!($1 eq 'CONNECT' ? $url->authority($2) : $url->parse($2));
 }

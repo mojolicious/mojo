@@ -3,7 +3,6 @@ use Mojo::Base 'Mojo::Message';
 
 use Mojo::Cookie::Response;
 use Mojo::Date;
-use Mojo::Util 'get_line';
 
 has [qw(code message)];
 
@@ -95,9 +94,9 @@ sub extract_start_line {
   my ($self, $bufref) = @_;
 
   # We have a full response line
-  return undef unless defined(my $line = get_line $bufref);
+  return undef unless $$bufref =~ s/^(.*?)\x0d?\x0a//;
   $self->error('Bad response start line') and return undef
-    unless $line =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
+    unless $1 =~ m!^\s*HTTP/(\d\.\d)\s+(\d\d\d)\s*(.+)?$!;
   $self->content->skip_body(1) if $self->code($2)->is_empty;
   return !!$self->version($1)->message($3)->content->auto_relax(1);
 }

@@ -10,8 +10,8 @@ use Mojo::DeprecationTest;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode dumper encode get_line hmac_sha1_sum html_unescape md5_bytes),
-  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(decode dumper encode hmac_sha1_sum html_unescape md5_bytes md5_sum),
+  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
   qw(steady_time tablify trim unindent unquote url_escape url_unescape),
   qw(xml_escape xor_encode);
@@ -48,16 +48,6 @@ is class_to_path("Foo'Bar::Baz"),  'Foo/Bar/Baz.pm', 'right path';
 is class_to_path("Foo::Bar'Baz"),  'Foo/Bar/Baz.pm', 'right path';
 is class_to_path("Foo::Bar::Baz"), 'Foo/Bar/Baz.pm', 'right path';
 is class_to_path("Foo'Bar'Baz"),   'Foo/Bar/Baz.pm', 'right path';
-
-# get_line
-my $buffer = "foo\x0d\x0abar\x0dbaz\x0ayada\x0d\x0a";
-is get_line(\$buffer), 'foo', 'right line';
-is $buffer, "bar\x0dbaz\x0ayada\x0d\x0a", 'right buffer content';
-is get_line(\$buffer), "bar\x0dbaz", 'right line';
-is $buffer, "yada\x0d\x0a", 'right buffer content';
-is get_line(\$buffer), 'yada', 'right line';
-is $buffer, '', 'no buffer content';
-is get_line(\$buffer), undef, 'no line';
 
 # split_header
 is_deeply split_header(''), [], 'right result';

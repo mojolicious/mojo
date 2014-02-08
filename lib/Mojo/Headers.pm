@@ -1,7 +1,7 @@
 package Mojo::Headers;
 use Mojo::Base -base;
 
-use Mojo::Util qw(get_line monkey_patch);
+use Mojo::Util 'monkey_patch';
 
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 
@@ -31,8 +31,6 @@ sub add {
   # Make sure we have a normal case entry for name
   my $key = lc $name;
   $self->{normalcase}{$key} //= $name unless $NORMALCASE{$key};
-
-  # Add lines
   push @{$self->{headers}{$key}}, map { ref $_ eq 'ARRAY' ? $_ : [$_] } @_;
 
   return $self;
@@ -44,10 +42,7 @@ sub append {
   return $self->header($name => defined $old ? "$old, $value" : $value);
 }
 
-sub clone {
-  my $self = shift;
-  return $self->new->from_hash($self->to_hash(1));
-}
+sub clone { $_[0]->new->from_hash($_[0]->to_hash(1)) }
 
 sub from_hash {
   my ($self, $hash) = @_;
@@ -96,11 +91,12 @@ sub parse {
   $self->{buffer} .= shift // '';
   my $headers = $self->{cache} ||= [];
   my $max = $self->max_line_size;
-  while (defined(my $line = get_line \$self->{buffer})) {
+  while ($self->{buffer} =~ s/^(.*?)\x0d?\x0a//) {
+    my $line = $1;
 
     # Check line size limit
     if (length $line > $max) {
-      $self->{limit} = $self->{state} = 'finished';
+      @$self{qw(state limit)} = ('finished', 1);
       return $self;
     }
 
@@ -119,8 +115,7 @@ sub parse {
   }
 
   # Check line size limit
-  $self->{limit} = $self->{state} = 'finished'
-    if length $self->{buffer} > $max;
+  @$self{qw(state limit)} = ('finished', 1) if length $self->{buffer} > $max;
 
   return $self;
 }
@@ -135,10 +130,8 @@ sub remove {
 
 sub to_hash {
   my ($self, $multi) = @_;
-  my %hash;
-  $hash{$_} = $multi ? [$self->header($_)] : scalar $self->header($_)
-    for @{$self->names};
-  return \%hash;
+  return {map { $_ => $multi ? [$self->header($_)] : scalar $self->header($_) }
+      @{$self->names}};
 }
 
 sub to_string {
@@ -180,7 +173,8 @@ Mojo::Headers - Headers
 
 =head1 DESCRIPTION
 
-L<Mojo::Headers> is a container for HTTP headers as described in RFC 2616.
+L<Mojo::Headers> is a container for HTTP headers based on
+L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
 
 =head1 ATTRIBUTES
 
@@ -332,7 +326,8 @@ Shortcut for the C<Content-Type> header.
   my $cookie = $headers->cookie;
   $headers   = $headers->cookie('f=b');
 
-Shortcut for the C<Cookie> header from RFC 6265.
+Shortcut for the C<Cookie> header from
+L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
 =head2 date
 
@@ -372,7 +367,8 @@ Shortcut for the C<Expires> header.
 
 =head2 from_hash
 
-  $headers = $headers->from_hash({'Content-Type' => 'text/html'});
+  $headers = $headers->from_hash({'Cookie' => 'a=b'});
+  $headers = $headers->from_hash({'Cookie' => ['a=b', 'c=d']});
   $headers = $headers->from_hash({});
 
 Parse headers from a hash reference, an empty hash removes all headers.
@@ -439,7 +435,8 @@ Get leftover data from header parser.
   my $link = $headers->link;
   $headers = $headers->link('<http://127.0.0.1/foo/3>; rel="next"');
 
-Shortcut for the C<Link> header from RFC 5988.
+Shortcut for the C<Link> header from
+L<RFC 5988|http://tools.ietf.org/html/rfc5988>.
 
 =head2 location
 
@@ -462,7 +459,8 @@ Return a list of all currently defined headers.
   my $origin = $headers->origin;
   $headers   = $headers->origin('http://example.com');
 
-Shortcut for the C<Origin> header from RFC 6454.
+Shortcut for the C<Origin> header from
+L<RFC 6454|http://tools.ietf.org/html/rfc6454>.
 
 =head2 parse
 
@@ -496,8 +494,9 @@ Shortcut for the C<Range> header.
   my $referrer = $headers->referrer;
   $headers     = $headers->referrer('http://example.com');
 
-Shortcut for the C<Referer> header, there was a typo in RFC 2068 which
-resulted in C<Referer> becoming an official header.
+Shortcut for the C<Referer> header, there was a typo in
+L<RFC 2068|http://tools.ietf.org/html/rfc2068> which resulted in C<Referer>
+becoming an official header.
 
 =head2 remove
 
@@ -510,35 +509,40 @@ Remove a header.
   my $accept = $headers->sec_websocket_accept;
   $headers   = $headers->sec_websocket_accept('s3pPLMBiTxaQ9kYGzzhZRbK+xOo=');
 
-Shortcut for the C<Sec-WebSocket-Accept> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Accept> header from
+L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_extensions
 
   my $extensions = $headers->sec_websocket_extensions;
   $headers       = $headers->sec_websocket_extensions('foo');
 
-Shortcut for the C<Sec-WebSocket-Extensions> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Extensions> header from
+L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_key
 
   my $key  = $headers->sec_websocket_key;
   $headers = $headers->sec_websocket_key('dGhlIHNhbXBsZSBub25jZQ==');
 
-Shortcut for the C<Sec-WebSocket-Key> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Key> header from
+L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_protocol
 
   my $proto = $headers->sec_websocket_protocol;
   $headers  = $headers->sec_websocket_protocol('sample');
 
-Shortcut for the C<Sec-WebSocket-Protocol> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Protocol> header from
+L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 sec_websocket_version
 
   my $version = $headers->sec_websocket_version;
   $headers    = $headers->sec_websocket_version(13);
 
-Shortcut for the C<Sec-WebSocket-Version> header from RFC 6455.
+Shortcut for the C<Sec-WebSocket-Version> header from
+L<RFC 6455|http://tools.ietf.org/html/rfc6455>.
 
 =head2 server
 
@@ -552,14 +556,16 @@ Shortcut for the C<Server> header.
   my $cookie = $headers->set_cookie;
   $headers   = $headers->set_cookie('f=b; path=/');
 
-Shortcut for the C<Set-Cookie> header from RFC 6265.
+Shortcut for the C<Set-Cookie> header from
+L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
 =head2 status
 
   my $status = $headers->status;
   $headers   = $headers->status('200 OK');
 
-Shortcut for the C<Status> header from RFC 3875.
+Shortcut for the C<Status> header from
+L<RFC 3875|http://tools.ietf.org/html/rfc3875>.
 
 =head2 te
 
@@ -574,7 +580,7 @@ Shortcut for the C<TE> header.
   my $multi  = $headers->to_hash(1);
 
 Turn headers into hash reference, nested array references to represent
-multiline values are disabled by default.
+multiple headers with the same name are disabled by default.
 
   say $headers->to_hash->{DNT};
 

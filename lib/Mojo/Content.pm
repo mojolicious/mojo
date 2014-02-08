@@ -115,10 +115,10 @@ sub parse {
   # Relaxed parsing
   my $headers = $self->headers;
   if ($self->auto_relax) {
-    my $connection = $headers->connection     // '';
-    my $len        = $headers->content_length // '';
+    my $connection = lc($headers->connection // '');
+    my $len = $headers->content_length // '';
     $self->relaxed(1)
-      if !length $len && ($connection =~ /close/i || $headers->content_type);
+      if !length $len && ($connection eq 'close' || $headers->content_type);
   }
 
   # Chunked or relaxed content
@@ -201,7 +201,7 @@ sub _build_chunk {
   my ($self, $chunk) = @_;
 
   # End
-  return "\x0d\x0a0\x0d\x0a\x0d\x0a" if length $chunk == 0;
+  return "\x0d\x0a0\x0d\x0a\x0d\x0a" unless length $chunk;
 
   # First chunk has no leading CRLF
   my $crlf = $self->{chunks}++ ? "\x0d\x0a" : '';
@@ -240,7 +240,7 @@ sub _parse_chunked {
     if ($self->{chunk_state} // '') eq 'trailing_headers';
 
   # Check buffer size
-  $self->{limit} = $self->{state} = 'finished'
+  @$self{qw(state limit)} = ('finished', 1)
     if length($self->{pre_buffer} // '') > $self->max_buffer_size;
 }
 
@@ -286,7 +286,8 @@ sub _uncompress {
   my ($self, $chunk) = @_;
 
   # No compression
-  return $self->emit(read => $chunk) unless $self->is_compressed;
+  return $self->emit(read => $chunk)
+    unless $self->is_compressed && $self->auto_relax;
 
   # Uncompress
   $self->{post_buffer} .= $chunk;
@@ -300,7 +301,7 @@ sub _uncompress {
     if $status == Z_STREAM_END;
 
   # Check buffer size
-  $self->{limit} = $self->{state} = 'finished'
+  @$self{qw(state limit)} = ('finished', 1)
     if length($self->{post_buffer} // '') > $self->max_buffer_size;
 }
 
@@ -323,8 +324,8 @@ Mojo::Content - HTTP content base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Content> is an abstract base class for HTTP content as described in
-RFC 2616.
+L<Mojo::Content> is an abstract base class for HTTP content based on
+L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
 
 =head1 EVENTS
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Server error</title>
+    <title>Server error (<%= app->mode %> mode)</title>
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
@@ -24,8 +24,6 @@
       }
       table {
         border-collapse: collapse;
-        margin-top: 1em;
-        margin-bottom: 1em;
         width: 100%;
       }
       td { padding: 0.5em }
@@ -46,6 +44,7 @@
       .infobox tr:nth-child(odd) .value { background-color: #ddeeff }
       .infobox tr:nth-child(even) .value { background-color: #eef9ff }
       .key { text-align: right }
+      .more table { margin-bottom: 1em }
       .spaced {
         margin-left: 5em;
         margin-right: 5em;
@@ -70,11 +69,17 @@
         margin: 0;
         text-shadow: #333 0 1px 0;
       }
+      #showcase table { margin-top: 1em }
       #showcase td {
         padding-top: 0;
         padding-bottom: 0;
       }
       #showcase .key { padding-right: 0 }
+      #log {
+        border-radius: 5px;
+        margin-top: 1em;
+      }
+      #log table { margin: 0 }
       #more, #trace {
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
@@ -93,6 +98,21 @@
   </head>
   <body>
     %= include inline => app->renderer->_bundled('mojobar')
+    %= javascript begin
+      function mojoDrawer (handle, drawer) {
+        $(handle).click(function() {
+          $(drawer).slideToggle('slow');
+          var text = $(handle + ' div.tap').text();
+          text = text == "tap for more" ? "tap for less" : "tap for more";
+          $(handle + ' div.tap').text(text);
+        });
+        $(drawer).toggle();
+      }
+      $(document).ready(function() {
+        mojoDrawer('#trace', '#frames');
+        mojoDrawer('#more', '#infos');
+      });
+    % end
     <div id="wrapperlicious">
       <div id="nothing" class="box spaced"></div>
       % my $cv = begin
@@ -111,7 +131,7 @@
       % end
       <div id="showcase" class="box code spaced">
         <pre><%= $exception->message %></pre>
-        <div id="context">
+        <div id="context" class="more">
           <table>
             % for my $line (@{$exception->lines_before}) {
               %= $cv->($line->[0], $line->[1])
@@ -125,7 +145,7 @@
           </table>
         </div>
         % if (defined $exception->line->[2]) {
-          <div id="insight">
+          <div id="insight" class="more">
             <table>
               % for my $line (@{$exception->lines_before}) {
                 %= $cv->($line->[0], $line->[2])
@@ -156,7 +176,7 @@
       </div>
       <div id="trace" class="box spaced">
         % if (@{$exception->frames}) {
-          <div class="infobox" id="frames">
+          <div id="frames" class="infobox more">
             <table>
               % for my $frame (@{$exception->frames}) {
                 <tr>
@@ -168,12 +188,6 @@
             </table>
           </div>
           <div class="tap">tap for more</div>
-          %= javascript begin
-            $('#trace').click(function() {
-              $('#frames').slideToggle('slow');
-            });
-            $('#frames').toggle();
-          % end
         % }
       </div>
       <div id="request" class="box infobox spaced">
@@ -193,7 +207,7 @@
           % }
         </table>
       </div>
-      <div id="more" class="box infobox spaced">
+      <div id="more" class="box infobox more spaced">
         <div id="infos">
           <table>
             %= $kv->(Perl => "$^V ($^O)")
@@ -201,26 +215,42 @@
             % my $codename = $Mojolicious::CODENAME;
             %= $kv->(Mojolicious => "$version ($codename)")
             %= $kv->(Home => app->home)
+            %= $kv->('Template paths' => dumper app->renderer->paths)
+            %= $kv->('Template classes' => dumper app->renderer->classes)
+            %= $kv->('Static paths' => dumper app->static->paths)
+            %= $kv->('Static classes' => dumper app->static->classes)
             %= $kv->(Include => dumper \@INC)
-            %= $kv->(PID => $$)
+            %= $kv->(Config => dumper app->config)
+            %= $kv->(Moniker => app->moniker)
             %= $kv->(Name => $0)
             %= $kv->(Executable => $^X)
+            %= $kv->(PID => $$)
             %= $kv->(Time => scalar localtime(time))
           </table>
         </div>
         <div class="tap">tap for more</div>
       </div>
+      % if (@{app->log->history}) {
+        <div id="log" class="box infobox spaced">
+          <table>
+            % for my $msg (@{app->log->history}) {
+              % my ($time, $level, @lines) = @$msg;
+              % $time = localtime $time;
+              % my $lines = join "\n", @lines;
+              <tr>
+                <td class="striped value">
+                  <pre>[<%= $time %>] [<%= $level %>] <%= $lines %></pre>
+                </td>
+              </tr>
+            % }
+          </table>
+        </div>
+      % }
     </div>
     <div id="footer">
       %= link_to 'http://mojolicio.us' => begin
         %= image '/mojo/logo-black.png', alt => 'Mojolicious logo'
       % end
     </div>
-    %= javascript begin
-      $('#more').click(function() {
-        $('#infos').slideToggle('slow');
-      });
-      $('#infos').toggle();
-    % end
   </body>
 </html>

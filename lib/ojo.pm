@@ -77,7 +77,7 @@ MOJO_PROXY environment variable.
 
 =head1 FUNCTIONS
 
-L<ojo> implements the following functions.
+L<ojo> implements the following functions, which are automatically exported.
 
 =head2 a
 
@@ -136,7 +136,7 @@ L<Mojo::Message::Response> object.
   my $array = j($bytes);
   my $hash  = j($bytes);
 
-Encode Perl data structure or decode JSON with L<Mojo::JSON>.
+Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
 
   $ perl -Mojo -E 'b(j({hello => "world!"}))->spurt("hello.json")'
 

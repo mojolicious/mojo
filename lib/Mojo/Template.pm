@@ -31,14 +31,11 @@ sub build {
   for my $line (@{$self->tree}) {
     push @lines, '';
     for (my $j = 0; $j < @{$line}; $j += 2) {
-      my $type    = $line->[$j];
-      my $value   = $line->[$j + 1] || '';
-      my $newline = chomp $value;
+      my ($op, $value) = @$line[$j, $j + 1];
+      my $newline = chomp($value //= '');
 
       # Capture end
-      if ($type eq 'cpen') {
-
-        # End block
+      if ($op eq 'cpen') {
         $lines[-1] .= 'return Mojo::ByteStream->new($_M) }';
 
         # No following code
@@ -46,26 +43,23 @@ sub build {
         $lines[-1] .= ';' if !defined $next || $next =~ /^\s*$/;
       }
 
-      # Text
-      if ($type eq 'text') {
-
-        # Quote and fix line ending
-        $value = quotemeta $value;
-        $value .= '\n' if $newline;
+      # Text (quote and fix line ending)
+      if ($op eq 'text') {
+        $value = $newline ? quotemeta($value) . '\n' : quotemeta $value;
         $lines[-1] .= "\$_M .= \"" . $value . "\";" if length $value;
       }
 
       # Code or multiline expression
-      if ($type eq 'code' || $multi) { $lines[-1] .= "$value" }
+      if ($op eq 'code' || $multi) { $lines[-1] .= "$value" }
 
       # Expression
-      if ($type eq 'expr' || $type eq 'escp') {
+      if ($op eq 'expr' || $op eq 'escp') {
 
         # Start
         unless ($multi) {
 
           # Escaped
-          if (($type eq 'escp' && !$escape) || ($type eq 'expr' && $escape)) {
+          if (($op eq 'escp' && !$escape) || ($op eq 'expr' && $escape)) {
             $lines[-1] .= "\$_M .= _escape";
             $lines[-1] .= " scalar $value" if length $value;
           }
@@ -79,7 +73,7 @@ sub build {
           && ($line->[$j + 3] // '') eq '');
 
         # Append semicolon
-        $lines[-1] .= ';' if !$multi && !$cpst;
+        $lines[-1] .= ';' unless $multi || $cpst;
       }
 
       # Capture start
@@ -87,7 +81,7 @@ sub build {
         $lines[-1] .= $cpst;
         $cpst = undef;
       }
-      $cpst = " sub { my \$_M = ''; " if $type eq 'cpst';
+      $cpst = " sub { my \$_M = ''; " if $op eq 'cpst';
     }
   }
 
@@ -144,29 +138,13 @@ sub parse {
 
   my $token_re = qr/
     (
-      \Q$tag$replace\E                       # Replace
+      \Q$tag\E(?:\Q$replace\E|\Q$cmnt\E)                   # Replace
     |
-      \Q$tag$expr$escp\E\s*\Q$cpen\E(?!\w)   # Escaped expression (end)
+      \Q$tag$expr\E(?:\Q$escp\E)?(?:\s*\Q$cpen\E(?!\w))?   # Expression
     |
-      \Q$tag$expr$escp\E                     # Escaped expression
+      \Q$tag\E(?:\s*\Q$cpen\E(?!\w))?                      # Code
     |
-      \Q$tag$expr\E\s*\Q$cpen\E(?!\w)        # Expression (end)
-    |
-      \Q$tag$expr\E                          # Expression
-    |
-      \Q$tag$cmnt\E                          # Comment
-    |
-      \Q$tag\E\s*\Q$cpen\E(?!\w)             # Code (end)
-    |
-      \Q$tag\E                               # Code
-    |
-      (?<!\w)\Q$cpst\E\s*\Q$trim$end\E       # Trim end (start)
-    |
-      \Q$trim$end\E                          # Trim end
-    |
-      (?<!\w)\Q$cpst\E\s*\Q$end\E            # End (start)
-    |
-      \Q$end\E                               # End
+      (?:(?<!\w)\Q$cpst\E\s*)?(?:\Q$trim\E)?\Q$end\E       # End
     )
   /x;
   my $cpen_re = qr/^(\Q$tag\E)(?:\Q$expr\E)?(?:\Q$escp\E)?\s*\Q$cpen\E/;
@@ -175,7 +153,7 @@ sub parse {
   # Split lines
   my $state = 'text';
   my ($trimming, @capture_token);
-  for my $line (split /\n/, $template) {
+  for my $line (split "\n", $template) {
     $trimming = 0 if $state eq 'text';
 
     # Turn Perl line into mixed line
@@ -207,7 +185,7 @@ sub parse {
         # Capture start
         splice @token, -2, 0, 'cpst', undef if $1;
 
-        # Trim previous text
+        # Trim left side
         if ($2) {
           $trimming = 1;
           $self->_trim(\@token);
@@ -235,7 +213,7 @@ sub parse {
         # Replace
         $token = $tag if $token eq "$tag$replace";
 
-        # Convert whitespace text to line noise
+        # Trim right side (convert whitespace to line noise)
         if ($trimming && $token =~ s/^(\s+)//) {
           push @token, 'code', $1;
           $trimming = 0;
@@ -283,14 +261,10 @@ sub _trim {
     return unless $line->[$j] eq 'text';
 
     # Convert whitespace text to line noise
-    my $value = $line->[$j + 1];
-    if ($line->[$j + 1] =~ s/(\s+)$//) {
-      $value = $line->[$j + 1];
-      splice @$line, $j, 0, 'code', $1;
-    }
+    splice @$line, $j, 0, 'code', $1 if $line->[$j + 1] =~ s/(\s+)$//;
 
     # Text left
-    return if length $value;
+    return if length $line->[$j + 1];
   }
 }
 

@@ -201,7 +201,8 @@ like $log, qr!GET "/suspended"\.!,      'right message';
 like $log, qr/Routing to a callback\./, 'right message';
 like $log, qr/Nothing has been rendered, expecting delayed response\./,
   'right message';
-like $log, qr/Rendering inline template\./, 'right message';
+like $log, qr/Rendering inline template "f75d6f5993c626fa8049366389f77928"\./,
+  'right message';
 $t->app->log->unsubscribe(message => $cb);
 
 # Suspended bridge (stopped)
@@ -376,10 +377,20 @@ $t->get_ok('/group/nested/whatever')->status_is(200)
 $t->get_ok('/group/nested/something')->status_is(404)->content_is("Oops!\n");
 
 # Authenticated by group
-$t->get_ok('/authgroup?ok=1')->status_is(200)->content_is("You're ok.");
+$t->get_ok('/authgroup?ok=1')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')->content_is("You're ok.");
 
 # Not authenticated by group
-$t->get_ok('/authgroup')->status_is(200)->content_is("You're not ok.");
+$t->get_ok('/authgroup')->status_is(200)
+  ->content_type_is('text/html;charset=UTF-8')->content_is("You're not ok.");
+
+# Authenticated by group (with format)
+$t->get_ok('/authgroup.txt?ok=1')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')->content_is("You're ok.");
+
+# Not authenticated by group (with format)
+$t->get_ok('/authgroup.txt')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')->content_is("You're not ok.");
 
 # Bypassed group authentication
 $t->get_ok('/noauthgroup')->status_is(200)->content_is("Whatever one.\n");

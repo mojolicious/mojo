@@ -23,6 +23,12 @@ has ua   => sub {
   return $ua;
 };
 
+sub build_tx { Mojo::Transaction::HTTP->new }
+
+sub config { shift->_dict(config => @_) }
+
+sub handler { croak 'Method "handler" not implemented in subclass' }
+
 sub new {
   my $self = shift->SUPER::new(@_);
 
@@ -34,12 +40,6 @@ sub new {
 
   return $self;
 }
-
-sub build_tx { Mojo::Transaction::HTTP->new }
-
-sub config { shift->_dict(config => @_) }
-
-sub handler { croak 'Method "handler" not implemented in subclass' }
 
 sub _dict {
   my ($self, $name) = (shift, shift);
@@ -140,14 +140,6 @@ interfere with new blocking ones.
 L<Mojo> inherits all methods from L<Mojo::Base> and implements the following
 new ones.
 
-=head2 new
-
-  my $app = Mojo->new;
-
-Construct a new L<Mojo> application. Will automatically detect your home
-directory if necessary and set up logging to C<log/mojo.log> if there's a
-C<log> directory.
-
 =head2 build_tx
 
   my $tx = $app->build_tx;
@@ -180,6 +172,14 @@ be overloaded in a subclass.
     my ($self, $tx) = @_;
     ...
   }
+
+=head2 new
+
+  my $app = Mojo->new;
+
+Construct a new L<Mojo> application. Will automatically detect your home
+directory if necessary and set up logging to C<log/mojo.log> if there's a
+C<log> directory.
 
 =head1 SEE ALSO
 

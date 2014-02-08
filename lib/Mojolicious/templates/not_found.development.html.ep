@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Page not found</title>
+    <title>Page not found (<%= app->mode %> mode)</title>
     %= stylesheet begin
       body {
         background: url(<%= url_for '/mojo/pinstripe-light.png' %>);
@@ -31,33 +31,35 @@
       }
       table {
         border-collapse: collapse;
-        color: #333;
-        margin-top: 1em;
-        margin-bottom: 1em;
         width: 100%;
       }
-      td {
-        border-top: solid #cce4ff 1px;
-        padding: 0.5em;
+      td { padding: 0.5em }
+      .box {
+        background-color: #fff;
+        box-shadow: 0px 0px 2px #999;
+        overflow: hidden;
+        padding: 1em;
       }
-      th {
-        padding: 0.5em;
-        text-align: left;
+      .infobox { color: #333 }
+      .infobox tr:nth-child(odd) .value { background-color: #ddeeff }
+      .infobox tr:nth-child(even) .value { background-color: #eef9ff }
+      .spaced {
+        margin-left: 5em;
+        margin-right: 5em;
       }
-      tr:nth-child(even) td { background-color: #ddeeff }
-      tr:nth-child(odd) td { background-color: #eef9ff }
+      .striped { border-top: solid #cce4ff 1px }
+      .value { padding-left: 1em }
       #footer {
         padding-top: 1em;
         text-align: center;
       }
+      #log {
+        border-radius: 5px;
+        margin-top: 1em;
+      }
       #routes {
-        background-color: #fff;
         border-bottom-left-radius: 5px;
         border-bottom-right-radius: 5px;
-        box-shadow: 0px 0px 2px #999;
-        margin-left: 5em;
-        margin-right: 5em;
-        padding: 1em;
         padding-top: 70px;
       }
       #wrapperlicious {
@@ -69,10 +71,10 @@
   <body>
     %= include inline => app->renderer->_bundled('mojobar')
     <div id="wrapperlicious">
-      <div id="routes">
+      <div id="routes" class="box infobox spaced">
         <h1>Page not found... yet!</h1>
         <p>
-          None of these routes matched your
+          None of these routes could generate a response for your
           <code><%= $self->req->method %></code> request for
           <code><%= $self->req->url->path %></code>, maybe you need to add a
           new one?
@@ -80,15 +82,15 @@
         % my $walk = begin
           % my ($walk, $route, $depth) = @_;
           <tr>
-            <td>
+            <td class="striped value">
               % my $pattern = $route->pattern->pattern || '/';
               % $pattern = "+$pattern" if $depth;
               <pre><%= '  ' x $depth %><%= $pattern %></pre>
             </td>
-            <td>
+            <td class="striped value">
               <pre><%= uc(join ',', @{$route->via || []}) || '*' %></pre>
             </td>
-            <td>
+            <td class="striped value">
               % my $name = $route->name;
               <pre><%= $route->has_custom_name ? qq{"$name"} : $name %></pre>
             </td>
@@ -98,14 +100,32 @@
           % $depth--;
         % end
         <table>
-          <tr>
-            <th>Pattern</th>
-            <th>Methods</th>
-            <th>Name</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Methods</th>
+              <th>Name</th>
+            </tr>
+          </thead>
           %= $walk->($walk, $_, 0) for @{app->routes->children};
         </table>
       </div>
+      % if (@{app->log->history}) {
+        <div id="log" class="box infobox spaced">
+          <table>
+            % for my $msg (@{app->log->history}) {
+              % my ($time, $level, @lines) = @$msg;
+              % $time = localtime $time;
+              % my $lines = join "\n", @lines;
+              <tr>
+                <td class="striped value">
+                  <pre>[<%= $time %>] [<%= $level %>] <%= $lines %></pre>
+                </td>
+              </tr>
+            % }
+          </table>
+        </div>
+      % }
     </div>
     <div id="footer">
       %= link_to 'http://mojolicio.us' => begin

@@ -43,10 +43,10 @@ my $monkey = Mojo::BaseTestTestTest->new;
 $monkey->attr('mojo');
 $monkey->mojo(23);
 is $monkey->mojo, 23, 'monkey has mojo';
-ok !Mojo::BaseTestTest->can('mojo'), 'base class does not have mojo';
-ok(Mojo::BaseTestTest->can('heads'), 'base class has heads');
-ok !Mojo::BaseTest->can('mojo'), 'base class does not have mojo';
-ok(Mojo::BaseTest->can('heads'), 'base class has heads');
+ok !Mojo::BaseTestTest->can('mojo'),   'base class does not have mojo';
+ok !!Mojo::BaseTestTest->can('heads'), 'base class has heads';
+ok !Mojo::BaseTest->can('mojo'),       'base class does not have mojo';
+ok !!Mojo::BaseTest->can('heads'),     'base class has heads';
 
 # Default value defined but false
 my $m = $monkeys[1];

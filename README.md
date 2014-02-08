@@ -44,11 +44,13 @@
 
   These three lines are a whole web application.
 
-    use Mojolicious::Lite;
+```perl
+use Mojolicious::Lite;
 
-    get '/' => {text => 'Hello World!'};
+get '/' => {text => 'Hello World!'};
 
-    app->start;
+app->start;
+```
 
   To run this example with the built-in development web server just put the
   code into a file and start it with `morbo`.
@@ -63,48 +65,40 @@
 
   Web development for humans, making hard things possible and everything fun.
 
-    use Mojolicious::Lite;
+```perl
+use Mojolicious::Lite;
 
-    # Simple plain text response
-    get '/' => {text => 'I ♥ Mojolicious!'};
+# Simple plain text response
+get '/' => {text => 'I ♥ Mojolicious!'};
 
-    # Route associating "/time" with template in DATA section
-    get '/time' => 'clock';
+# Route associating "/time" with template in DATA section
+get '/time' => 'clock';
 
-    # RESTful web service with JSON and text representation
-    get '/list/:offset' => sub {
-      my $self    = shift;
-      my $numbers = [0 .. $self->param('offset')];
-      $self->respond_to(
-        json => {json => $numbers},
-        txt  => {text => join(',', @$numbers)}
-      );
-    };
+# Scrape information from remote sites
+post '/title' => sub {
+  my $self  = shift;
+  my $url   = $self->param('url') || 'http://mojolicio.us';
+  my $title = $self->ua->get($url)->res->dom->at('title')->text;
+  $self->render(json => {url => $url, title => $title});
+};
 
-    # Scrape information from remote sites
-    post '/title' => sub {
-      my $self = shift;
-      my $url  = $self->param('url') || 'http://mojolicio.us';
-      $self->render(
-        text => $self->ua->get($url)->res->dom->at('title')->text);
-    };
+# WebSocket echo service
+websocket '/echo' => sub {
+  my $self = shift;
+  $self->on(message => sub {
+    my ($self, $msg) = @_;
+    $self->send("echo: $msg");
+  });
+};
 
-    # WebSocket echo service
-    websocket '/echo' => sub {
-      my $self = shift;
-      $self->on(message => sub {
-        my ($self, $msg) = @_;
-        $self->send("echo: $msg");
-      });
-    };
+app->start;
+__DATA__
 
-    app->start;
-    __DATA__
-
-    @@ clock.html.ep
-    % use Time::Piece;
-    % my $now = localtime;
-    The time is <%= $now->hms %>.
+@@ clock.html.ep
+% use Time::Piece;
+% my $now = localtime;
+The time is <%= $now->hms %>.
+```
 
   Single file prototypes like this one can easily grow into well-structured
   applications.

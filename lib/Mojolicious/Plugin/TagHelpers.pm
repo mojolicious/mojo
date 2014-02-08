@@ -2,7 +2,8 @@ package Mojolicious::Plugin::TagHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
-use Mojo::Util 'xml_escape';
+use Mojo::Util qw(deprecated xml_escape);
+use Scalar::Util 'blessed';
 
 sub register {
   my ($self, $app) = @_;
@@ -44,7 +45,7 @@ sub register {
 
 sub _csrf_field {
   my $self = shift;
-  return $self->hidden_field(csrf_token => $self->csrf_token, @_);
+  return _hidden_field($self, csrf_token => $self->csrf_token, @_);
 }
 
 sub _form_for {
@@ -67,8 +68,7 @@ sub _form_for {
 
 sub _hidden_field {
   my $self = shift;
-  my %attrs = (name => shift, value => shift, @_, type => 'hidden');
-  return _tag('input', %attrs);
+  return _tag('input', name => shift, value => shift, @_, type => 'hidden');
 }
 
 sub _input {
@@ -157,11 +157,18 @@ sub _select_field {
   my $groups = '';
   for my $group (@$options) {
 
-    # "optgroup" tag
+    # DEPRECATED in Top Hat!
     if (ref $group eq 'HASH') {
-      my ($label, $values) = each %$group;
+      deprecated
+        'hash references are DEPRECATED in favor of Mojo::Collection objects';
+      $group = Mojo::Collection->new(each %$group);
+    }
+
+    # "optgroup" tag
+    if (blessed $group && $group->isa('Mojo::Collection')) {
+      my ($label, $values, %attrs) = @$group;
       my $content = join '', map { _option(\%values, $_) } @$values;
-      $groups .= _tag('optgroup', label => $label, sub {$content});
+      $groups .= _tag('optgroup', label => $label, %attrs, sub {$content});
     }
 
     # "option" tag
@@ -205,6 +212,13 @@ sub _tag {
 
   # Attributes
   my %attrs = @_;
+  if ($attrs{data} && ref $attrs{data} eq 'HASH') {
+    while (my ($key, $value) = each %{$attrs{data}}) {
+      $key =~ tr/_/-/;
+      $attrs{lc("data-$key")} = $value;
+    }
+    delete $attrs{data};
+  }
   $tag .= qq{ $_="} . xml_escape($attrs{$_} // '') . '"' for sort keys %attrs;
 
   # Empty element
@@ -282,6 +296,9 @@ C<tag_with_error> helper, to make styling with CSS easier.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning how to build new plugins, you're welcome to fork it.
 
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
+by default.
+
 =head1 HELPERS
 
 L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
@@ -289,13 +306,13 @@ L<Mojolicious::Plugin::TagHelpers> implements the following helpers.
 =head2 check_box
 
   %= check_box employed => 1
-  %= check_box employed => 1, id => 'foo'
+  %= check_box employed => 1, disabled => 'disabled'
 
 Generate checkbox input element. Previous input values will automatically get
 picked up and shown as default.
 
   <input name="employed" type="checkbox" value="1" />
-  <input id="foo" name="employed" type="checkbox" value="1" />
+  <input disabled="disabled" name="employed" type="checkbox" value="1" />
 
 =head2 color_field
 
@@ -378,8 +395,8 @@ Generate file input element.
     %= text_field 'first_name'
     %= submit_button
   % end
-  %= form_for '/login' => (method => 'POST') => begin
-    %= text_field 'first_name'
+  %= form_for '/login' => (enctype => 'multipart/form-data') => begin
+    %= text_field 'first_name', disabled => 'disabled'
     %= submit_button
   % end
   %= form_for 'http://example.com/login' => (method => 'POST') => begin
@@ -399,8 +416,8 @@ automatically added.
     <input name="first_name" />
     <input value="Ok" type="submit" />
   </form>
-  <form action="/path/to/login" method="POST">
-    <input name="first_name" />
+  <form action="/path/to/login" enctype="multipart/form-data">
+    <input disabled="disabled" name="first_name" />
     <input value="Ok" type="submit" />
   </form>
   <form action="http://example.com/login" method="POST">
@@ -579,36 +596,43 @@ picked up and shown as default.
 
 =head2 select_field
 
-  %= select_field language => [qw(de en)]
-  %= select_field language => [qw(de en)], id => 'lang'
-  %= select_field country => [[Germany => 'de'], 'en']
-  %= select_field country => [{Europe => [[Germany => 'de'], 'en']}]
-  %= select_field country => [[Germany => 'de', class => 'europe'], 'en']
+  %= select_field country => [qw(de en)]
+  %= select_field country => [[Germany => 'de'], 'en'], id => 'eu'
+  %= select_field country => [[Germany => 'de', disabled => 'disabled'], 'en']
+  %= select_field country => [c(EU => [[Germany => 'de'], 'en'], id => 'eu')]
+  %= select_field country => [c(EU => [qw(de en)]), c(Asia => [qw(cn jp)])]
 
-Generate select, option and optgroup elements. Previous input values will
+Generate select and option elements from array references and optgroup
+elements from L<Mojo::Collection> objects. Previous input values will
 automatically get picked up and shown as default.
 
-  <select name="language">
-    <option value="de">de</option>
-    <option value="en">en</option>
-  </select>
-  <select id="lang" name="language">
-    <option value="de">de</option>
-    <option value="en">en</option>
-  </select>
   <select name="country">
+    <option value="de">de</option>
+    <option value="en">en</option>
+  </select>
+  <select id="eu" name="country">
     <option value="de">Germany</option>
     <option value="en">en</option>
   </select>
-  <select id="lang" name="language">
-    <optgroup label="Europe">
+  <select name="country">
+    <option disabled="disabled" value="de">Germany</option>
+    <option value="en">en</option>
+  </select>
+  <select name="country">
+    <optgroup id="eu" label="EU">
       <option value="de">Germany</option>
       <option value="en">en</option>
     </optgroup>
   </select>
   <select name="country">
-    <option class="europe" value="de">Germany</option>
-    <option value="en">en</option>
+    <optgroup label="EU">
+      <option value="de">de</option>
+      <option value="en">en</option>
+    </optgroup>
+    <optgroup label="Asia">
+      <option value="cn">cn</option>
+      <option value="jp">jp</option>
+    </optgroup>
   </select>
 
 =head2 stylesheet
@@ -637,33 +661,35 @@ Generate submit input element.
 
 =head2 t
 
-  %=t div => 'some & content'
+  %=t div => 'test & 123'
 
 Alias for L</"tag">.
 
-  <div>some &amp; content</div>
+  <div>test &amp; 123</div>
 
 =head2 tag
 
   %= tag 'div'
   %= tag 'div', id => 'foo'
-  %= tag div => 'some & content'
-  %= tag div => (id => 'foo') => 'some & content'
+  %= tag div => 'test & 123'
+  %= tag div => (id => 'foo') => 'test & 123'
+  %= tag div => (data => {my_id => 1, Name => 'test'}) => 'test & 123'
   %= tag div => begin
-    some & content
+    test & 123
   % end
-  <%= tag div => (id => 'foo') => begin %>some & content<% end %>
+  <%= tag div => (id => 'foo') => begin %>test & 123<% end %>
 
 HTML/XML tag generator.
 
   <div />
   <div id="foo" />
-  <div>some &amp; content</div>
-  <div id="foo">some &amp; content</div>
+  <div>test &amp; 123</div>
+  <div id="foo">test &amp; 123</div>
+  <div data-my-id="1" data-name="test">test &amp; 123</div>
   <div>
-    some & content
+    test & 123
   </div>
-  <div id="foo">some & content</div>
+  <div id="foo">test & 123</div>
 
 Very useful for reuse in more specific tag helpers.
 

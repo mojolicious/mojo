@@ -73,7 +73,7 @@ sub _body {
   my $buffer = $msg->get_body_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
   $self->{write} = $msg->content->is_dynamic ? 1 : ($self->{write} - $written);
-  $self->{offset} = $self->{offset} + $written;
+  $self->{offset} += $written;
   if (defined $buffer) { delete $self->{delay} }
 
   # Delayed
@@ -95,8 +95,8 @@ sub _headers {
   # Prepare header chunk
   my $buffer = $msg->get_header_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $self->{write}  = $self->{write} - $written;
-  $self->{offset} = $self->{offset} + $written;
+  $self->{write} -= $written;
+  $self->{offset} += $written;
 
   # Switch to body
   if ($self->{write} <= 0) {
@@ -121,15 +121,12 @@ sub _start_line {
   # Prepare start line chunk
   my $buffer = $msg->get_start_line_chunk($self->{offset});
   my $written = defined $buffer ? length $buffer : 0;
-  $self->{write}  = $self->{write} - $written;
-  $self->{offset} = $self->{offset} + $written;
+  $self->{write} -= $written;
+  $self->{offset} += $written;
 
   # Switch to headers
-  if ($self->{write} <= 0) {
-    $self->{http_state} = 'headers';
-    $self->{write}      = $msg->header_size;
-    $self->{offset}     = 0;
-  }
+  @$self{qw(http_state write offset)} = ('headers', $msg->header_size, 0)
+    if $self->{write} <= 0;
 
   return $buffer;
 }
@@ -152,8 +149,7 @@ sub _write {
       unless $headers->connection;
 
     # Switch to start line
-    $self->{http_state} = 'start_line';
-    $self->{write}      = $msg->start_line_size;
+    @$self{qw(http_state write)} = ('start_line', $msg->start_line_size);
   }
 
   # Start line
@@ -203,8 +199,8 @@ Mojo::Transaction::HTTP - HTTP transaction
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::HTTP> is a container for HTTP transactions as described
-in RFC 2616.
+L<Mojo::Transaction::HTTP> is a container for HTTP transactions based on
+L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
 
 =head1 EVENTS
 

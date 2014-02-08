@@ -233,7 +233,9 @@ is $res->body, "Hello World!\n1234\nlalalala\n", 'right content';
 $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.0 500 Internal Server Error\x0d\x0a");
 $res->parse("Content-Type: text/plain\x0d\x0a\x0d\x0a");
-$res->parse("Hello World!\n1234\nlalalala\n");
+$res->parse("Hello World!\n1");
+$res->parse("234\nlala");
+$res->parse("lala\n");
 ok !$res->is_finished, 'response is not finished';
 is $res->code,    500,                     'right status';
 is $res->message, 'Internal Server Error', 'right message';
@@ -1003,13 +1005,14 @@ is $res->dom->at('p > a')->text, 'bar', 'right value';
 is $res->dom('p')->first->text, 'foo', 'right value';
 is_deeply [$res->dom('p > a')->pluck('text')->each], [qw(bar baz)],
   'right values';
-my @text = $res->dom('a')->pluck(replace_content => 'yada')
-  ->first->root->find('p > a')->pluck('text')->each;
+my @text = $res->dom('a')->pluck(content => 'yada')->first->root->find('p > a')
+  ->pluck('text')->each;
 is_deeply \@text, [qw(yada yada)], 'right values';
 is_deeply [$res->dom('p > a')->pluck('text')->each], [qw(yada yada)],
   'right values';
-@text = $res->dom->find('a')->pluck(replace_content => 'test')
-  ->first->root->find('p > a')->pluck('text')->each;
+@text
+  = $res->dom->find('a')->pluck(content => 'test')->first->root->find('p > a')
+  ->pluck('text')->each;
 is_deeply \@text, [qw(test test)], 'right values';
 is_deeply [$res->dom->find('p > a')->pluck('text')->each], [qw(test test)],
   'right values';

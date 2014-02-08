@@ -1,5 +1,107 @@
 
-4.64  2013-12-22
+4.78  2014-02-08
+  - Deprecated Mojo::Util::get_line.
+  - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML
+    Living Standard.
+  - Fixed case sensitivity bug in Mojolicious::Types.
+
+4.77  2014-02-06
+  - Deprecated Mojo::DOM::text_after and Mojo::DOM::text_before in favor of
+    Mojo::DOM::contents.
+  - Deprecated Mojo::DOM::content_xml and Mojo::DOM::replace_content in favor
+    of Mojo::DOM::content.
+  - Deprecated Mojo::DOM::to_xml in favor of Mojo::DOM::to_string.
+  - Added wrap_content method to Mojo::DOM.
+  - Added tablify function to Mojo::Util.
+  - Improved wrap method in Mojo::DOM to allow wrapping of the root node.
+
+4.76  2014-02-04
+  - Added wrap method to Mojo::DOM.
+  - Updated IO::Socket::IP requirement to 0.20 for certain bug fixes.
+  - Improved Mojo::DOM::HTML to generate better HTML.
+
+4.75  2014-02-02
+  - Fixed and readded support for permessage-deflate WebSocket compression.
+    (Mikey, sri)
+
+4.74  2014-02-02
+  - Added all_contents method to Mojo::DOM.
+  - Removed support for permessage-deflate WebSocket compression, since there
+    have been too many problems with Chrome.
+
+4.73  2014-02-01
+  - Improved xml_escape performance significantly.
+  - Improved html_unescape and url_unescape performance.
+  - Fixed Mojo::UserAgent::Transactor to handle redirects more like most
+    common browsers.
+
+4.72  2014-01-29
+  - Added accepts, template_for and template_handler methods to
+    Mojolicious::Renderer.
+  - Added accepts helper to Mojolicious::Plugin::DefaultHelpers.
+  - Added before_render hook.
+  - Fixed bug in Mojo::Transaction::WebSocket that prevented decompression
+    errors from being handled gracefully.
+
+4.71  2014-01-28
+  - Fixed a few compression bugs in Mojo::Transaction::WebSocket and
+    Mojo::Content.
+
+4.70  2014-01-26
+  - Added extract_usage method to Mojolicious::Command.
+  - Added unindent method to Mojo::ByteStream.
+  - Added unindent function to Mojo::Util.
+  - Updated jQuery to version 2.1.
+  - Improved all built-in commands to show usage information in their SYNOPSIS
+    sections.
+  - Improved tag helpers to make data attributes more convenient. (ravengerUA)
+      %= tag 'div', data => {my_id => 1, Name => 'test'} => 'some content'
+    is equivalent to
+      %= tag 'div', data-my-id => 1, data-name => 'test' => 'some content'
+  - Fixed indentation of code in documentation browser.
+
+4.69  2014-01-24
+  - Improved router to allow format detection for bridges.
+
+4.68  2014-01-22
+  - Added Mojo::DOM::Node.
+  - Added contents and node methods to Mojo::DOM.
+  - Removed deprecated http_proxy, https_proxy, name and no_proxy attributes
+    from Mojo::UserAgent.
+  - Removed deprecated app, app_url, detect_proxy and need_proxy methods from
+    Mojo::UserAgent.
+  - Improved router to allow placeholders anywhere in a pattern to become
+    optional.
+      "get '/foo/:bar/baz' => {bar => 'bar'};" now matches "/foo/baz"
+      "get '/foo(:bar)baz' => {bar => 'bar'};" now matches "/foobaz"
+  - Improved request_ok method in Test::Mojo to handle WebSocket handshakes.
+  - Improved Mojo::IOLoop::Server to use address and port for descriptor
+    inheritance.
+  - Improved list of available commands to be alphabetical. (jberger)
+  - Fixed select_field helper to be nondestructive.
+  - Fixed XML semantics bug in Mojo::DOM::HTML.
+
+4.67  2014-01-11
+  - Added history and max_history_size attributes to Mojo::Log.
+  - Improved exception and not found pages with log messages.
+  - Improved exception page with more information.
+  - Improved not found page with a more generic message.
+  - Improved inline templates to use their checksum as name.
+
+4.66  2014-01-04
+  - Added success attribute to Test::Mojo.
+  - Improved Mojo::DOM::CSS and Mojo::DOM::HTML performance.
+  - Fixed XML detection bug in Mojo::DOM.
+  - Fixed escaping bugs in Mojo::DOM::CSS.
+
+4.65  2014-01-02
+  - Deprecated use of hash references for optgroup generation with
+    select_field helper in favor of Mojo::Collection objects.
+  - Added b and c helpers to Mojolicious::Plugin::DefaultHelpers.
+  - Fixed reference handling bug in Mojo::Collection.
+
+4.64  2014-01-01
+  - Fixed helper export bug in Mojolicious::Plugin::EPRenderer.
 
 4.63  2013-12-19
   - Deprecated Mojolicious::secret in favor of Mojolicious::secrets.
@@ -1676,7 +1778,7 @@
     Mojolicious::Controller::on.
   - Removed Mojolicious::Controller::on_message, you can now use
     Mojolicious::Controller::on instead.
-      $c->on(message => sub {...})
+      $c->on(message => sub {...});
   - Added EXPERIMENTAL message event to Mojo::Log.
 
 2.14  2011-10-29
@@ -2876,7 +2978,8 @@
   - Added version command.
   - Added after_build_tx plugin hook.
   - Added timer support to Mojo::IOLoop.
-  - Added the ability to run multiple parallel ioloops that block each other.
+  - Added the ability to run multiple concurrent ioloops that block each
+    other.
   - Added default_template_class attribute to MojoX::Renderer.
   - Added render_static method to Mojolicious::Controller.
   - Added support for embedded Mojolicious applications.
@@ -3010,7 +3113,7 @@
   - Optimized buffering a bit.
   - Fixed a case where multiple clients would taint the shared ioloop.
     (ferreira)
-  - Fixed a case where non existing actions were considered a server error.
+  - Fixed a case where non-existing actions were considered a server error.
     (Andre Vieth)
 
 0.999901  2009-09-01
@@ -3042,7 +3145,7 @@
   - Fixed a few cases where exceptions and not found events would result in
     empty pages.
   - Fixed layouts with partial templates.
-  - Fixed encoding of non utf8 form-data.
+  - Fixed encoding of non-utf8 form-data.
   - Fixed body callbacks to get automatic buffering.
   - Fixed a case where Mojo::Server::Daemon and Mojo::Client were too
     defensive and made them in turn 20 times faster.
@@ -3091,9 +3194,9 @@
     Handler can no longer be detected, that means "default_handler" or the
     "handler" argument are required. The template argument can no longer
     contain format or handler.
-      $self->render(template => 'foo.html.epl')
+      $self->render(template => 'foo.html.epl');
     becomes
-      $self->render('foo', format => 'html', handler => 'epl')
+      $self->render('foo', format => 'html', handler => 'epl');
     The following forms are available now.
       $self->render;
       $self->render(controller => 'foo', action => 'bar');

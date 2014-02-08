@@ -10,7 +10,7 @@ use Mojo::IOLoop::Server;
 
 plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
-plan skip_all => 'IO::Socket::IP 0.16 required for this test!'
+plan skip_all => 'IO::Socket::IP 0.20 required for this test!'
   unless Mojo::IOLoop::Server::IPV6;
 plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
@@ -131,7 +131,7 @@ is_deeply \@kept_alive, [1, 1, 1], 'connections kept alive';
 # Fresh user agent again
 $ua = Mojo::UserAgent->new;
 
-# Custom non keep-alive request
+# Custom non-keep-alive request
 $tx = Mojo::Transaction::HTTP->new;
 $tx->req->method('GET');
 $tx->req->url->parse('http://metacpan.org');

@@ -6,6 +6,9 @@ use Mojo::IOLoop;
 # Default for config file tests
 app->defaults(secret => 'Insecure too!');
 
+# Helpers sharing the same name in different embedded applications
+helper same_name => sub {'myapp2'};
+
 # Caching helper for state variable test
 helper my_cache => sub { state $cache = shift->param('cache') };
 
@@ -30,4 +33,5 @@ app->start;
 __DATA__
 
 @@ menubar.html.ep
+%= same_name
 %= stash('message') || 'works 4!'

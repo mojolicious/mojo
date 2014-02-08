@@ -3,8 +3,8 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojolicious;
 
-has description => qq{Generate "Makefile.PL".\n};
-has usage       => "usage: $0 generate makefile\n";
+has description => 'Generate "Makefile.PL".';
+has usage => sub { shift->extract_usage };
 
 sub run { shift->render_to_rel_file('makefile', 'Makefile.PL') }
 
@@ -33,10 +33,7 @@ Mojolicious::Command::generate::makefile - Makefile generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate::makefile;
-
-  my $makefile = Mojolicious::Command::generate::makefile->new;
-  $makefile->run(@ARGV);
+  Usage: APPLICATION generate makefile
 
 =head1 DESCRIPTION
 
@@ -45,6 +42,9 @@ applications.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

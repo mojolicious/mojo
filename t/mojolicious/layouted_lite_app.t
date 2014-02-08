@@ -190,7 +190,7 @@ $t->get_ok('/plugin_with_template')->status_is(200)
 # Nested partial templates
 $t->get_ok('/nested-includes')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("layouted Nested Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
+  ->content_is("layouted Nested <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n\n");
 
 # Partial template with localized stash values
 $t->get_ok('/localized/include')->status_is(200)
@@ -206,17 +206,17 @@ $t->get_ok('/plain/reverse')->status_is(200)
 # Layout in render call
 $t->get_ok('/outerlayout')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
+  ->content_is("layouted <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 
 # Extends in render call
 $t->get_ok('/outerextends')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
+  ->content_is("layouted <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 
 # Layout in route
 $t->get_ok('/outerlayouttwo')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("layouted Hello\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
+  ->content_is("layouted <Hello>\n[\n  1,\n  2\n]\nthere<br>!\n\n\n");
 
 # Partial template with layout
 $t->get_ok('/outerinnerlayout')->status_is(200)
@@ -283,7 +283,6 @@ Exception happened!
 Not found happened!
 
 @@ template_inheritance.html.ep
-% use Mojo::ByteStream 'b';
 % layout 'template_inheritance';
 % title 'Works!';
 <% content header => begin =%>
@@ -341,7 +340,7 @@ localized1 <%= content %>
 localized2 <%= content %>
 
 @@ outerlayout.html.ep
-Hello
+%= c(qw(> o l l e H <))->reverse->join
 <%= $self->render('outermenu', partial => 1) %>
 
 @@ outermenu.html.ep

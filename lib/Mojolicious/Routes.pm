@@ -133,9 +133,9 @@ sub _class {
   if ($field->{app}) { push @classes, $field->{app} }
 
   # Specific namespace
-  elsif (defined(my $namespace = $field->{namespace})) {
-    if ($class) { push @classes, $namespace ? "${namespace}::$class" : $class }
-    elsif ($namespace) { push @classes, $namespace }
+  elsif (defined(my $ns = $field->{namespace})) {
+    if ($class) { push @classes, $ns ? "${ns}::$class" : $class }
+    elsif ($ns) { push @classes, $ns }
   }
 
   # All namespaces

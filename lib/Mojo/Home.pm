@@ -11,8 +11,6 @@ use Mojo::Util qw(class_to_path slurp);
 
 has parts => sub { [] };
 
-sub new { shift->SUPER::new->parse(@_) }
-
 sub detect {
   my $self = shift;
 
@@ -23,7 +21,7 @@ sub detect {
   if (my $class = @_ ? shift : 'Mojo::HelloWorld') {
     my $file = class_to_path $class;
     if (my $path = $INC{$file}) {
-      $path =~ s/$file$//;
+      $path =~ s/\Q$file\E$//;
       my @home = splitdir $path;
 
       # Remove "lib" and "blib"
@@ -35,7 +33,7 @@ sub detect {
   }
 
   # FindBin fallback
-  return $self->parts([split /\//, $FindBin::Bin]);
+  return $self->parts([split '/', $FindBin::Bin]);
 }
 
 sub lib_dir {
@@ -62,10 +60,9 @@ sub list_files {
 
 sub mojo_lib_dir { catdir(dirname(__FILE__), '..') }
 
-sub parse {
-  my ($self, $path) = @_;
-  return defined $path ? $self->parts([splitdir $path]) : $self;
-}
+sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
+
+sub parse { shift->parts([splitdir shift]) }
 
 sub rel_dir { catdir(@{shift->parts}, split '/', shift) }
 sub rel_file { catfile(@{shift->parts}, split '/', shift) }
@@ -111,14 +108,6 @@ Home directory parts.
 L<Mojo::Home> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 new
-
-  my $home = Mojo::Home->new;
-  my $home = Mojo::Home->new('/home/sri/myapp');
-
-Construct a new L<Mojo::Home> object and L</"parse"> home directory if
-necessary.
-
 =head2 detect
 
   $home = $home->detect;
@@ -149,6 +138,14 @@ directory.
 
 Path to C<lib> directory in which L<Mojolicious> is installed.
 
+=head2 new
+
+  my $home = Mojo::Home->new;
+  my $home = Mojo::Home->new('/home/sri/myapp');
+
+Construct a new L<Mojo::Home> object and L</"parse"> home directory if
+necessary.
+
 =head2 parse
 
   $home = $home->parse('/home/sri/myapp');
@@ -171,9 +168,24 @@ Portably generate an absolute path for a file relative to the home directory.
 =head2 to_string
 
   my $str = $home->to_string;
-  my $str = "$home";
 
 Home directory.
+
+=head1 OPERATORS
+
+L<Mojo::Home> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$home;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$home";
+
+Alias for L</to_string>.
 
 =head1 SEE ALSO
 

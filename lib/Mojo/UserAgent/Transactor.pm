@@ -80,16 +80,20 @@ sub redirect {
   $location = $location->base($old->req->url)->to_abs unless $location->is_abs;
 
   # Clone request if necessary
-  my $new    = Mojo::Transaction::HTTP->new;
-  my $req    = $old->req;
-  my $method = uc $req->method;
-  if ($code eq 301 || $code eq 307 || $code eq 308) {
-    return undef unless my $req = $req->clone;
-    $new->req($req);
-    $req->headers->remove('Host')->remove('Cookie')->remove('Referer');
+  my $new = Mojo::Transaction::HTTP->new;
+  my $req = $old->req;
+  if ($code eq 307 || $code eq 308) {
+    return undef unless my $clone = $req->clone;
+    $new->req($clone);
   }
-  elsif ($method ne 'HEAD') { $method = 'GET' }
-  $new->req->method($method)->url($location);
+  else {
+    my $method = uc $req->method;
+    my $headers = $new->req->method($method eq 'POST' ? 'GET' : $method)
+      ->content->headers($req->headers->clone)->headers;
+    $headers->remove($_) for grep {/^content-/i} @{$headers->names};
+  }
+  my $headers = $new->req->url($location)->headers;
+  $headers->remove($_) for qw(Authorization Cookie Host Referer);
   return $new->previous($old);
 }
 
@@ -380,9 +384,9 @@ requests, with support for content generators.
   my $tx = $t->tx(
     POST => 'http://example.com' => form => {a => 'b', c => 'd'});
 
-  # PUT request with UTF-8 encoded form values
+  # PUT request with Shift_JIS encoded form values
   my $tx = $t->tx(
-    PUT => 'http://example.com' => form => {a => 'b'} => charset => 'UTF-8');
+    PUT => 'example.com' => form => {a => 'b'} => charset => 'Shift_JIS');
 
   # POST request with form values sharing the same name
   my $tx = $t->tx(POST => 'http://example.com' => form => {a => [qw(b c d)]});

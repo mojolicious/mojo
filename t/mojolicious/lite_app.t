@@ -60,6 +60,9 @@ get '/alternatives/:char' => [char => [qw(☃ ♥)]] => sub {
   $self->render(text => $self->url_for);
 };
 
+get '/optional/:middle/placeholder' =>
+  {middle => 'none', inline => '<%= $middle %>-<%= url_for =%>'};
+
 get '/alterformat' => [format => ['json']] => {format => 'json'} => sub {
   my $self = shift;
   $self->render(text => $self->stash('format'));
@@ -519,6 +522,16 @@ $t->get_ok('/alternatives')->status_is(404)
 $t->get_ok('/alternatives/test')->status_is(404)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is("Oops!\n");
 
+# Optional placeholder in the middle
+$t->get_ok('/optional/test/placeholder')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is('test-/optional/test/placeholder');
+
+# Optional placeholder in the middle without value
+$t->get_ok('/optional/placeholder')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is('none-/optional/none/placeholder');
+
 # No format
 $t->get_ok('/alterformat')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')->content_is('json');
@@ -582,7 +595,8 @@ $t->get_ok('/reserved?data=just-works&json=test')->status_is(200)
 # Exception in inline template
 $t->get_ok('/inline/exception')->status_is(500)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_is("Died at inline template line 1.\n\n");
+  ->content_is(
+  "Died at inline template 6635c7011166fa11bb23c21912900ea9 line 1.\n\n");
 
 # Exception in template from data section
 $t->get_ok('/data/exception')->status_is(500)
@@ -896,7 +910,7 @@ $t->get_ok('/helper' => {'User-Agent' => 'Explorer'})->status_is(200)
 
 # Exception in EP template
 $t->get_ok('/eperror')->status_is(500)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/\$c/);
+  ->header_is(Server => 'Mojolicious (Perl)')->content_like(qr/\$unknown/);
 
 # Subrequest
 $t->get_ok('/subrequest')->status_is(200)
@@ -1108,7 +1122,7 @@ app layout <%= content %><%= app->mode %>
 (<%= agent %>)\
 
 @@ eperror.html.ep
-%= $c->foo('bar');
+%= $unknown->foo('bar');
 
 @@ favicon.ico
 Not a favicon!

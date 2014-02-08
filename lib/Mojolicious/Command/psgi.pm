@@ -3,8 +3,8 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Server::PSGI;
 
-has description => "Start application with PSGI.\n";
-has usage       => "usage: $0 psgi\n";
+has description => 'Start application with PSGI.';
+has usage => sub { shift->extract_usage };
 
 sub run { Mojo::Server::PSGI->new(app => shift->app)->to_psgi_app }
 
@@ -18,10 +18,7 @@ Mojolicious::Command::psgi - PSGI command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::psgi;
-
-  my $psgi = Mojolicious::Command::psgi->new;
-  my $app  = $psgi->run;
+  Usage: APPLICATION psgi
 
 =head1 DESCRIPTION
 
@@ -30,6 +27,9 @@ backend.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

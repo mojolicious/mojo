@@ -3,75 +3,50 @@ use Mojo::Base 'Mojolicious::Command';
 
 use re 'regexp_pattern';
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
-use Mojo::Util 'encode';
+use Mojo::Util qw(encode tablify);
 
-has description => "Show available routes.\n";
-has usage       => <<EOF;
-usage: $0 routes [OPTIONS]
-
-These options are available:
-  -v, --verbose   Print additional details about routes.
-EOF
+has description => 'Show available routes.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
 
   GetOptionsFromArray \@args, 'v|verbose' => \my $verbose;
 
-  my $routes = [];
-  $self->_walk($_, 0, $routes) for @{$self->app->routes->children};
-  $self->_draw($routes, $verbose);
+  my $rows = [];
+  _walk($_, 0, $rows, $verbose) for @{$self->app->routes->children};
+  print encode('UTF-8', tablify($rows));
 }
-
-sub _draw {
-  my ($self, $routes, $verbose) = @_;
-
-  my @table = (0, 0, 0);
-  for my $node (@$routes) {
-
-    # Methods
-    my $via = $node->[0]->via;
-    $node->[2] = !$via ? '*' : uc join ',', @$via;
-
-    # Name
-    my $name = $node->[0]->name;
-    $node->[3] = $node->[0]->has_custom_name ? qq{"$name"} : $name;
-
-    # Check column width
-    $table[$_] = _max($table[$_], length $node->[$_ + 1]) for 0 .. 2;
-  }
-
-  for my $node (@$routes) {
-    my @parts = map { _padding($node->[$_ + 1], $table[$_]) } 0 .. 2;
-
-    # Regex (verbose)
-    my $pattern = $node->[0]->pattern;
-    $pattern->match('/', $node->[0]->is_endpoint);
-    my $regex = (regexp_pattern $pattern->regex)[0];
-    my $format = (regexp_pattern($pattern->format_regex || ''))[0];
-    my $optional
-      = !$pattern->constraints->{format} || $pattern->defaults->{format};
-    $regex .= $optional ? "(?:$format)?" : $format
-      if $format && !$node->[0]->partial;
-    push @parts, $regex if $verbose;
-
-    say encode('UTF-8', join('  ', @parts));
-  }
-}
-
-sub _max { $_[1] > $_[0] ? $_[1] : $_[0] }
-
-sub _padding { $_[0] . ' ' x ($_[1] - length $_[0]) }
 
 sub _walk {
-  my ($self, $route, $depth, $routes) = @_;
+  my ($route, $depth, $rows, $verbose) = @_;
 
+  # Pattern
   my $prefix = '';
   if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
-  push @$routes, [$route, $prefix . ($route->pattern->pattern || '/')];
+  push @$rows, my $row = [$prefix . ($route->pattern->pattern || '/')];
+
+  # Methods
+  my $via = $route->via;
+  push @$row, !$via ? '*' : uc join ',', @$via;
+
+  # Name
+  my $name = $route->name;
+  push @$row, $route->has_custom_name ? qq{"$name"} : $name;
+
+  # Regex (verbose)
+  my $pattern = $route->pattern;
+  $pattern->match('/', $route->is_endpoint);
+  my $regex = (regexp_pattern $pattern->regex)[0];
+  my $format = (regexp_pattern($pattern->format_regex || ''))[0];
+  my $optional
+    = !$pattern->constraints->{format} || $pattern->defaults->{format};
+  $regex .= $optional ? "(?:$format)?" : $format
+    if $format && !$route->partial;
+  push @$row, $regex if $verbose;
 
   $depth++;
-  $self->_walk($_, $depth, $routes) for @{$route->children};
+  _walk($_, $depth, $rows, $verbose) for @{$route->children};
   $depth--;
 }
 
@@ -85,10 +60,10 @@ Mojolicious::Command::routes - Routes command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::routes;
+  Usage: APPLICATION routes [OPTIONS]
 
-  my $routes = Mojolicious::Command::routes->new;
-  $routes->run(@ARGV);
+  Options:
+    -v, --verbose   Print additional details about routes.
 
 =head1 DESCRIPTION
 
@@ -96,6 +71,9 @@ L<Mojolicious::Command::routes> lists all your application routes.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

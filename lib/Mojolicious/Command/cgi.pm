@@ -4,13 +4,8 @@ use Mojo::Base 'Mojolicious::Command';
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::CGI;
 
-has description => "Start application with CGI.\n";
-has usage       => <<EOF;
-usage: $0 cgi [OPTIONS]
-
-These options are available:
-  --nph   Enable non-parsed-header mode.
-EOF
+has description => 'Start application with CGI.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -29,10 +24,10 @@ Mojolicious::Command::cgi - CGI command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::CGI;
+  Usage: APPLICATION cgi [OPTIONS]
 
-  my $cgi = Mojolicious::Command::CGI->new;
-  $cgi->run(@ARGV);
+  Options:
+    --nph   Enable non-parsed-header mode.
 
 =head1 DESCRIPTION
 
@@ -41,6 +36,9 @@ backend.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

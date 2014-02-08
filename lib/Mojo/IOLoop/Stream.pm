@@ -11,8 +11,6 @@ has reactor => sub {
 
 sub DESTROY { shift->close }
 
-sub new { shift->SUPER::new(handle => shift, buffer => '', timeout => 15) }
-
 sub close {
   my $self = shift;
 
@@ -42,6 +40,8 @@ sub is_writing {
   return undef unless $self->{handle};
   return !!length($self->{buffer}) || $self->has_subscribers('drain');
 }
+
+sub new { shift->SUPER::new(handle => shift, buffer => '', timeout => 15) }
 
 sub start {
   my $self = shift;
@@ -88,7 +88,7 @@ sub write {
 
   $self->{buffer} .= $chunk;
   if ($cb) { $self->once(drain => $cb) }
-  else     { return $self unless length $self->{buffer} }
+  elsif (!length $self->{buffer}) { return $self }
   $self->reactor->watch($self->{handle}, !$self->{paused}, 1)
     if $self->{handle};
 
@@ -129,9 +129,9 @@ sub _write {
     $self->_again;
   }
 
-  $self->emit_safe('drain') unless length $self->{buffer};
-  return if $self->is_writing;
-  return $self->close if $self->{graceful};
+  $self->emit_safe('drain') if !length $self->{buffer};
+  return                    if $self->is_writing;
+  return $self->close       if $self->{graceful};
   $self->reactor->watch($handle, !$self->{paused}, 0) if $self->{handle};
 }
 
@@ -251,12 +251,6 @@ global L<Mojo::IOLoop> singleton.
 L<Mojo::IOLoop::Stream> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
-=head2 new
-
-  my $stream = Mojo::IOLoop::Stream->new($handle);
-
-Construct a new L<Mojo::IOLoop::Stream> object.
-
 =head2 close
 
   $stream->close;
@@ -287,6 +281,12 @@ sockets.
   my $bool = $stream->is_writing;
 
 Check if stream is writing.
+
+=head2 new
+
+  my $stream = Mojo::IOLoop::Stream->new($handle);
+
+Construct a new L<Mojo::IOLoop::Stream> object.
 
 =head2 start
 

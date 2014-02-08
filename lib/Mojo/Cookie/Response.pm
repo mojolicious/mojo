@@ -99,8 +99,8 @@ Mojo::Cookie::Response - HTTP response cookie
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie::Response> is a container for HTTP response cookies as
-described in RFC 6265.
+L<Mojo::Cookie::Response> is a container for HTTP response cookies based on
+L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
 =head1 ATTRIBUTES
 

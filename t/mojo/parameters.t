@@ -39,11 +39,8 @@ is_deeply [$params->param('foo')], ['bar'], 'right structure';
 $params->param(foo => qw(baz yada));
 is_deeply [$params->param('foo')], [qw(baz yada)], 'right structure';
 
-# Parse with ";" separator
-$params->parse('q=1;w=2;e=3;e=4;r=6;t=7');
-is $params->to_string, 'q=1;w=2;e=3;e=4;r=6;t=7', 'right format';
-
 # Remove
+$params->parse('q=1&w=2&e=3&e=4&r=6&t=7');
 is $params->remove('r')->to_string, 'q=1&w=2&e=3&e=4&t=7', 'right format';
 $params->remove('e');
 is $params->to_string, 'q=1&w=2&t=7', 'right format';
@@ -76,10 +73,10 @@ is $params->to_string, 'foo=0', 'right format';
 # Semicolon
 $params = Mojo::Parameters->new('foo=bar;baz');
 is $params->to_string, 'foo=bar;baz', 'right format';
-is_deeply $params->params, [foo => 'bar', baz => ''], 'right structure';
-is_deeply $params->to_hash, {foo => 'bar', baz => ''}, 'right structure';
-is $params->to_string, 'foo=bar&baz=', 'right format';
-$params = Mojo::Parameters->new('foo=bar%3Bbaz');
+is_deeply $params->params, [foo => 'bar;baz'], 'right structure';
+is_deeply $params->to_hash, {foo => 'bar;baz'}, 'right structure';
+is $params->to_string, 'foo=bar%3Bbaz', 'right format';
+$params = Mojo::Parameters->new($params->to_string);
 is_deeply $params->params, [foo => 'bar;baz'], 'right structure';
 is_deeply $params->to_hash, {foo => 'bar;baz'}, 'right structure';
 is $params->to_string, 'foo=bar%3Bbaz', 'right format';
@@ -94,11 +91,11 @@ is "$params", 'foo=bar;baz=23', 'right format';
 $params = Mojo::Parameters->new('c=');
 is $params->to_hash->{c}, '', 'right value';
 is_deeply $params->to_hash, {c => ''}, 'right structure';
-$params = Mojo::Parameters->new('c=&c=&d=');
+$params = Mojo::Parameters->new('c=&c=&d');
 is_deeply $params->to_hash->{c}, ['', ''], 'right values';
 is $params->to_hash->{d}, '', 'right value';
 is_deeply $params->to_hash, {c => ['', ''], d => ''}, 'right structure';
-$params = Mojo::Parameters->new('c=&d=0&e=');
+$params = Mojo::Parameters->new('c&d=0&e=');
 is $params->to_hash->{c}, '', 'right value';
 is $params->to_hash->{d}, 0,  'right value';
 is $params->to_hash->{e}, '', 'right value';
@@ -146,9 +143,9 @@ is_deeply [$params->param('foo')], [qw(ba;r b;az)], 'right values';
 # Unicode
 $params = Mojo::Parameters->new;
 $params->parse('input=say%20%22%C2%AB~%22;');
-is_deeply $params->params, ['input', 'say "«~"'], 'right structure';
-is $params->param('input'), 'say "«~"', 'right value';
-is "$params", 'input=say+%22%C2%AB~%22', 'right result';
+is_deeply $params->params, ['input', 'say "«~";'], 'right structure';
+is $params->param('input'), 'say "«~";', 'right value';
+is "$params", 'input=say+%22%C2%AB~%22%3B', 'right result';
 $params = Mojo::Parameters->new('♥=☃');
 is_deeply $params->params, ['♥', '☃'], 'right structure';
 is $params->param('♥'), '☃', 'right value';

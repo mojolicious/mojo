@@ -126,6 +126,9 @@ just work without commands.
   $ ./myapp.pl cgi
   ...CGI output...
 
+  $ ./myapp.pl get /
+  Hello World!
+
   $ ./myapp.pl
   ...List of available commands (or automatically detected environment)...
 
@@ -222,11 +225,32 @@ full access to all HTTP features and information.
   };
 
   # Echo the request body and send custom header with response
-  get '/echo' => sub {
+  post '/echo' => sub {
     my $self = shift;
     $self->res->headers->header('X-Bender' => 'Bite my shiny metal ass!');
     $self->render(data => $self->req->body);
   };
+
+  app->start;
+
+You can test the more advanced examples right from the command line with
+L<Mojolicious::Command::get>.
+
+  $ ./myapp.pl get -v -M POST -c 'test' /echo
+
+=head2 Built-in C<exception> and C<not_found> pages
+
+During development you will encounter these pages whenever you make a mistake,
+they are gorgeous and contain a lot of valuable information that will aid you
+in debugging your application.
+
+  use Mojolicious::Lite;
+
+  # Not found (404)
+  get '/missing' => sub { shift->render('does_not_exist') };
+
+  # Exception (500)
+  get '/dies' => sub { die 'Intentional error' };
 
   app->start;
 
@@ -292,7 +316,8 @@ be used to pass additional data to the layout.
 =head2 Blocks
 
 Template blocks can be used like normal Perl functions and are always
-delimited by the C<begin> and C<end> keywords.
+delimited by the C<begin> and C<end> keywords, they are the foundation for
+many helpers.
 
   use Mojolicious::Lite;
 
@@ -313,38 +338,6 @@ delimited by the C<begin> and C<end> keywords.
       %= $link->('http://mojolicio.us', 'Mojolicious')
       %= $link->('http://catalystframework.org', 'Catalyst')
     </body>
-  </html>
-
-=head2 Captured content
-
-The helper L<Mojolicious::Plugin::DefaultHelpers/"content_for"> can be used to
-pass around blocks of captured content.
-
-  use Mojolicious::Lite;
-
-  get '/captured';
-
-  app->start;
-  __DATA__
-
-  @@ captured.html.ep
-  % layout 'blue', title => 'Green';
-  % content_for header => begin
-    <meta http-equiv="Pragma" content="no-cache">
-  % end
-  Hello World!
-  % content_for header => begin
-    <meta http-equiv="Expires" content="-1">
-  % end
-
-  @@ layouts/blue.html.ep
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <title><%= title %></title>
-      %= content_for 'header'
-    </head>
-    <body><%= content %></body>
   </html>
 
 =head2 Helpers
@@ -474,13 +467,14 @@ Routes can be restricted to specific request methods with different keywords.
 =head2 Optional placeholders
 
 All placeholders require a value, but by assigning them default values you can
-make capturing optional.
+make capturing optional. Default values that don't belong to a placeholder
+simply get merged into the stash all the time.
 
   use Mojolicious::Lite;
 
   # /hello
   # /hello/Sara
-  get '/hello/:name' => {name => 'Sebastian'} => sub {
+  get '/hello/:name' => {name => 'Sebastian', day => 'Monday'} => sub {
     my $self = shift;
     $self->render('groovy', format => 'txt');
   };
@@ -489,7 +483,7 @@ make capturing optional.
   __DATA__
 
   @@ groovy.txt.ep
-  My name is <%= $name %>.
+  My name is <%= $name %> and it is <%= $day %>.
 
 =head2 Restrictive placeholders
 
@@ -873,7 +867,7 @@ L<Mojo::JSON> and L<Mojo::DOM> this can be a very powerful tool.
     });
   };
 
-  # Parallel non-blocking
+  # Concurrent non-blocking
   get '/titles' => sub {
     my $self = shift;
     my $delay = Mojo::IOLoop->delay(sub {
@@ -990,7 +984,7 @@ L<Test::Mojo>.
 
   done_testing();
 
-Run all unit tests with the C<test> command.
+Run all unit tests with the command L<Mojolicious::Command::test>.
 
   $ ./myapp.pl test
   $ ./myapp.pl test -v
@@ -1002,7 +996,8 @@ fun!
 
 =head1 FUNCTIONS
 
-L<Mojolicious::Lite> implements the following functions.
+L<Mojolicious::Lite> implements the following functions, which are
+automatically exported.
 
 =head2 any
 

@@ -27,8 +27,8 @@ Mojo::Cookie - HTTP cookie base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Cookie> is an abstract base class for HTTP cookies as described in RFC
-6265.
+L<Mojo::Cookie> is an abstract base class for HTTP cookies based on
+L<RFC 6265|http://tools.ietf.org/html/rfc6265>.
 
 =head1 ATTRIBUTES
 
@@ -62,9 +62,24 @@ Parse cookies. Meant to be overloaded in a subclass.
 =head2 to_string
 
   my $str = $cookie->to_string;
-  my $str = "$cookie";
 
 Render cookie. Meant to be overloaded in a subclass.
+
+=head1 OPERATORS
+
+L<Mojo::Cookie> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$cookie;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$cookie";
+
+Alias for L</to_string>.
 
 =head1 SEE ALSO
 

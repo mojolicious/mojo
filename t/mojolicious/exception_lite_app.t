@@ -21,6 +21,20 @@ app->log->on(message => sub { shift; $log .= join ':', @_ });
 
 helper dead_helper => sub { die "dead helper!\n" };
 
+# Custom rendering for missing "txt" template
+hook before_render => sub {
+  my ($self, $args) = @_;
+  $args->{text} = 'Missing template.'
+    if ($args->{template} // '') eq 'not_found' && $args->{format} eq 'txt';
+};
+
+# Custom exception rendering for "txt"
+hook before_render => sub {
+  my ($self, $args) = @_;
+  @$args{qw(text format)} = ($self->stash('exception'), 'txt')
+    if ($args->{template} // '') eq 'exception' && $self->accepts('txt');
+};
+
 get '/logger' => sub {
   my $self  = shift;
   my $level = $self->param('level');
@@ -35,7 +49,7 @@ get '/dead_included_template';
 
 get '/dead_template_with_layout';
 
-get '/dead_action' => sub { die 'dead action!' };
+get '/dead_action' => sub { die "dead action!\n" };
 
 get '/double_dead_action_☃' => sub {
   eval { die 'double dead action!' };
@@ -162,6 +176,10 @@ $t->get_ok('/dead_action.json')->status_is(500)
   ->content_like(qr!get &#39;/dead_action&#39;!)
   ->content_like(qr/dead action!/);
 
+# Dead action with custom exception rendering
+$t->get_ok('/dead_action' => {Accept => 'text/plain'})->status_is(500)
+  ->content_type_is('text/plain;charset=UTF-8')->content_is("dead action!\n");
+
 # Action dies twice
 $t->get_ok('/double_dead_action_☃')->status_is(500)
   ->content_like(qr!get &#39;/double_dead_action_☃&#39;.*lite_app\.t:\d!s)
@@ -193,6 +211,11 @@ $t->get_ok('/missing_template.xml')->status_is(404)
 $t->get_ok('/missing_template.json')->status_is(404)
   ->content_type_is('text/html;charset=UTF-8')
   ->content_like(qr/Page not found/);
+
+# Missing template with custom rendering
+$t->get_ok('/missing_template.txt')->status_is(404)
+  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_is('Missing template.');
 
 # Missing template (failed rendering)
 $t->get_ok('/missing_template/too')->status_is(404)

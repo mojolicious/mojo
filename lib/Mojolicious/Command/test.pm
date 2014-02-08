@@ -7,13 +7,8 @@ use File::Spec::Functions qw(abs2rel catdir splitdir);
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Home;
 
-has description => "Run unit tests.\n";
-has usage       => <<EOF;
-usage: $0 test [OPTIONS] [TESTS]
-
-These options are available:
-  -v, --verbose   Print verbose debug information to STDERR.
-EOF
+has description => 'Run unit tests.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -50,10 +45,14 @@ Mojolicious::Command::test - Test command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::test;
+  Usage: APPLICATION test [OPTIONS] [TESTS]
 
-  my $test = Mojolicious::Command::test->new;
-  $test->run(@ARGV);
+    ./myapp.pl test -v
+    ./myapp.pl test t/foo.t
+    ./myapp.pl test t/foo/*.t
+
+  Options:
+    -v, --verbose   Print verbose debug information to STDERR.
 
 =head1 DESCRIPTION
 
@@ -61,6 +60,9 @@ L<Mojolicious::Command::test> runs application tests from the C<t> directory.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

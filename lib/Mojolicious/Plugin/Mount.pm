@@ -59,6 +59,9 @@ L<Mojolicious> applications.
 The code of this plugin is a good example for learning to build new plugins,
 you're welcome to fork it.
 
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
+by default.
+
 =head1 METHODS
 
 L<Mojolicious::Plugin::Mount> inherits all methods from L<Mojolicious::Plugin>

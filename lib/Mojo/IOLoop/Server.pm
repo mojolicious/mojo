@@ -11,12 +11,12 @@ use Socket qw(IPPROTO_TCP TCP_NODELAY);
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval 'use IO::Socket::IP 0.16 (); 1';
+  : eval 'use IO::Socket::IP 0.20 (); 1';
 
 # TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS} ? 0
-  : eval(IPV6 ? 'use IO::Socket::SSL 1.75 (); 1'
-  : 'use IO::Socket::SSL 1.75 "inet4"; 1');
+use constant TLS => $ENV{MOJO_NO_TLS}
+  ? 0
+  : eval 'use IO::Socket::SSL 1.75 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -33,7 +33,7 @@ has reactor      => sub {
 
 sub DESTROY {
   my $self = shift;
-  if (my $port = $self->{port}) { $ENV{MOJO_REUSE} =~ s/(?:^|\,)${port}:\d+// }
+  $ENV{MOJO_REUSE} =~ s/(?:^|\,)\Q$self->{reuse}\E:\d+// if $self->{reuse};
   return unless my $reactor = $self->reactor;
   $self->stop if $self->{handle};
   $reactor->remove($_) for values %{$self->{handles}};
@@ -50,10 +50,12 @@ sub listen {
   my $args = ref $_[0] ? $_[0] : {@_};
 
   # Look for reusable file descriptor
-  my $reuse = my $port = $self->{port} = $args->{port} || 3000;
+  my $address = $args->{address} || '0.0.0.0';
+  my $port    = $args->{port}    || 3000;
+  my $reuse = $self->{reuse} = "$address:$port";
   $ENV{MOJO_REUSE} ||= '';
   my $fd;
-  if ($ENV{MOJO_REUSE} =~ /(?:^|\,)${reuse}:(\d+)/) { $fd = $1 }
+  if ($ENV{MOJO_REUSE} =~ /(?:^|\,)\Q$reuse\E:(\d+)/) { $fd = $1 }
 
   # Allow file descriptor inheritance
   local $^F = 1000;
@@ -70,7 +72,7 @@ sub listen {
   else {
     my %options = (
       Listen => $args->{backlog} // SOMAXCONN,
-      LocalAddr => $args->{address} || '0.0.0.0',
+      LocalAddr => $address,
       LocalPort => $port,
       ReuseAddr => 1,
       ReusePort => $args->{reuse},
@@ -233,7 +235,7 @@ Get handle for server.
   $server->listen(port => 3000);
 
 Create a new listen socket. Note that TLS support depends on
-L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.16+).
+L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.20+).
 
 These options are currently available:
 
@@ -286,7 +288,8 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 
   tls_ciphers => 'AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH'
 
-Cipher specification string.
+Cipher specification string, defaults to
+C<ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH>.
 
 =item tls_key
 

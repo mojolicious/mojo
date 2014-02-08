@@ -1,18 +1,14 @@
 package Mojolicious::Command::generate;
 use Mojo::Base 'Mojolicious::Commands';
 
-has description => "Generate files and directories from templates.\n";
+has description => 'Generate files and directories from templates.';
 has hint        => <<EOF;
 
-See '$0 generate help GENERATOR' for more information on a specific generator.
+See 'APPLICATION generate help GENERATOR' for more information on a specific
+generator.
 EOF
-has message => <<EOF;
-usage: $0 generate GENERATOR [OPTIONS]
-
-These generators are currently available:
-EOF
+has message    => sub { shift->extract_usage . "\nGenerators:\n" };
 has namespaces => sub { ['Mojolicious::Command::generate'] };
-has usage => "usage: $0 generate GENERATOR [OPTIONS]\n";
 
 sub help { shift->run(@_) }
 
@@ -26,10 +22,7 @@ Mojolicious::Command::generate - Generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate;
-
-  my $generator = Mojolicious::Command::generate->new;
-  $generator->run(@ARGV);
+  Usage: APPLICATION generate GENERATOR [OPTIONS]
 
 =head1 DESCRIPTION
 
@@ -37,6 +30,9 @@ L<Mojolicious::Command::generate> lists available generators.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 
@@ -56,13 +52,6 @@ Short description of this command, used for the command list.
   $generator = $generator->hint('Foo!');
 
 Short hint shown after listing available generator commands.
-
-=head2 usage
-
-  my $usage  = $generator->usage;
-  $generator = $generator->usage('Foo!');
-
-Usage information for this command, used for the help screen.
 
 =head2 message
 

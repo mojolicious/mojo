@@ -3,8 +3,8 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Mojo::Util qw(class_to_file class_to_path);
 
-has description => "Generate Mojolicious application directory structure.\n";
-has usage       => "usage: $0 generate app [NAME]\n";
+has description => 'Generate Mojolicious application directory structure.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, $class) = @_;
@@ -150,10 +150,7 @@ Mojolicious::Command::generate::app - App generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate::app;
-
-  my $app = Mojolicious::Command::generate::app->new;
-  $app->run(@ARGV);
+  Usage: APPLICATION generate app [NAME]
 
 =head1 DESCRIPTION
 
@@ -162,6 +159,9 @@ structures for fully functional L<Mojolicious> applications.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

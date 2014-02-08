@@ -110,7 +110,7 @@ ok $tx->kept_alive, 'was kept alive';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
 
-# Non keep-alive request
+# Non-keep-alive request
 $tx = $ua->get('/close/' => {Connection => 'close'});
 ok !$tx->keep_alive, 'will not be kept alive';
 ok $tx->kept_alive, 'was kept alive';
@@ -118,7 +118,7 @@ is $tx->res->code, 200, 'right status';
 is $tx->res->headers->connection, 'close', 'right "Connection" value';
 is $tx->res->body, 'Whatever!', 'right content';
 
-# Second non keep-alive request
+# Second non-keep-alive request
 $tx = $ua->get('/close/' => {Connection => 'close'});
 ok !$tx->keep_alive, 'will not be kept alive';
 ok !$tx->kept_alive, 'was not kept alive';
@@ -142,12 +142,12 @@ ok defined $tx->connection, 'has connection id';
 is $tx->res->code, 200,         'right status';
 is $tx->res->body, 'Whatever!', 'right content';
 
-# Parallel requests
+# Concurrent requests
 my $delay = Mojo::IOLoop->delay;
-$ua->get('/parallel1/' => $delay->begin);
-$ua->post(
-  '/parallel2/' => {Expect => 'fun'} => 'bar baz foo' x 128 => $delay->begin);
-$ua->get('/parallel3/' => $delay->begin);
+$ua->get('/concurrent1/' => $delay->begin);
+$ua->post('/concurrent2/' => {Expect => 'fun'} => 'bar baz foo' x 128 =>
+    $delay->begin);
+$ua->get('/concurrent3/' => $delay->begin);
 ($tx, my $tx2, my $tx3) = $delay->wait;
 ok $tx->is_finished, 'transaction is finished';
 is $tx->res->body, 'Whatever!', 'right content';

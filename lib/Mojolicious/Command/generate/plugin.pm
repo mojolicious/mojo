@@ -4,8 +4,8 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Util qw(camelize class_to_path);
 use Mojolicious;
 
-has description => "Generate Mojolicious plugin directory structure.\n";
-has usage       => "usage: $0 generate plugin [NAME]\n";
+has description => 'Generate Mojolicious plugin directory structure.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, $name) = @_;
@@ -121,10 +121,7 @@ Mojolicious::Command::generate::plugin - Plugin generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate::plugin;
-
-  my $plugin = Mojolicious::Command::generate::plugin->new;
-  $plugin->run(@ARGV);
+  Usage: APPLICATION generate plugin [NAME]
 
 =head1 DESCRIPTION
 
@@ -133,6 +130,9 @@ fully functional L<Mojolicious> plugins.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

@@ -131,8 +131,9 @@ is b($bytes)->decode('UTF-8'), "[\"hello\\u0003\x{0152}world\x{0152}!\"]",
   'encode ["hello\x{0003}\x{0152}world\x{0152}!"]';
 $bytes = $json->encode(["123abc"]);
 is $bytes, '["123abc"]', 'encode ["123abc"]';
-$bytes = $json->encode(["\a\b/\f\r"]);
-is $bytes, '["\\u0007\\b\/\f\r"]', 'encode ["\a\b/\f\r"]';
+$bytes = $json->encode(["\x00\x1f \a\b/\f\r"]);
+is $bytes, '["\\u0000\\u001F \\u0007\\b\/\f\r"]',
+  'encode ["\x00\x1f \a\b/\f\r"]';
 
 # Encode object
 $bytes = $json->encode({});
@@ -287,6 +288,10 @@ is $json->encode({false => \!!$bytes}), '{"false":false}',
   'encode false boolean from double negated reference';
 is $json->encode({false => \$bytes}), '{"false":false}',
   'encode false boolean from reference';
+
+# Stringify booleans
+is(Mojo::JSON->true,  1, 'right value');
+is(Mojo::JSON->false, 0, 'right value');
 
 # Upgraded numbers
 my $num = 3;

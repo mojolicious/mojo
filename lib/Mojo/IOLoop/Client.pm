@@ -9,12 +9,12 @@ use Socket qw(IPPROTO_TCP SO_ERROR TCP_NODELAY);
 # IPv6 support requires IO::Socket::IP
 use constant IPV6 => $ENV{MOJO_NO_IPV6}
   ? 0
-  : eval 'use IO::Socket::IP 0.16 (); 1';
+  : eval 'use IO::Socket::IP 0.20 (); 1';
 
 # TLS support requires IO::Socket::SSL
-use constant TLS => $ENV{MOJO_NO_TLS} ? 0
-  : eval(IPV6 ? 'use IO::Socket::SSL 1.75 (); 1'
-  : 'use IO::Socket::SSL 1.75 "inet4"; 1');
+use constant TLS => $ENV{MOJO_NO_TLS}
+  ? 0
+  : eval 'use IO::Socket::SSL 1.75 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -89,9 +89,9 @@ sub _try {
   # Retry or handle exceptions
   my $handle = $self->{handle};
   return $! == EINPROGRESS ? undef : $self->emit(error => $!)
-    if IPV6 && !$handle->connect;
+    if $handle->isa('IO::Socket::IP') && !$handle->connect;
   return $self->emit(error => $! = $handle->sockopt(SO_ERROR))
-    if !IPV6 && !$handle->connected;
+    unless $handle->connected;
 
   # Disable Nagle's algorithm
   setsockopt $handle, IPPROTO_TCP, TCP_NODELAY, 1;
@@ -198,7 +198,7 @@ implements the following new ones.
   $client->connect(address => '127.0.0.1', port => 3000);
 
 Open a socket connection to a remote host. Note that TLS support depends on
-L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.16+).
+L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.20+).
 
 These options are currently available:
 

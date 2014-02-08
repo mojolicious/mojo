@@ -8,6 +8,7 @@ use Digest::SHA qw(hmac_sha1_hex sha1 sha1_hex);
 use Encode 'find_encoding';
 use File::Basename 'dirname';
 use File::Spec::Functions 'catfile';
+use List::Util 'min';
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Time::HiRes ();
 
@@ -34,16 +35,29 @@ for my $line (split "\x0a", slurp(catfile dirname(__FILE__), 'entities.txt')) {
   $ENTITIES{$1} = defined $3 ? (chr(hex $2) . chr(hex $3)) : chr(hex $2);
 }
 
+# Characters that should be escaped in XML
+my %XML = (
+  '&'  => '&amp;',
+  '<'  => '&lt;',
+  '>'  => '&gt;',
+  '"'  => '&quot;',
+  '\'' => '&#39;'
+);
+
 # Encoding cache
 my %CACHE;
 
 our @EXPORT_OK = (
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode deprecated dumper encode get_line hmac_sha1_sum html_unescape),
-  qw(md5_bytes md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(decode deprecated dumper encode hmac_sha1_sum html_unescape md5_bytes),
+  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time trim unquote url_escape url_unescape xml_escape xor_encode)
+  qw(steady_time tablify trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode)
 );
+
+# DEPRECATED in Top Hat!
+push @EXPORT_OK, 'get_line';
 
 sub b64_decode { decode_base64($_[0]) }
 sub b64_encode { encode_base64($_[0], $_[1]) }
@@ -54,8 +68,8 @@ sub camelize {
 
   # CamelCase words
   return join '::', map {
-    join '', map { ucfirst lc } split /_/, $_
-  } split /-/, $str;
+    join '', map { ucfirst lc } split '_', $_
+  } split '-', $str;
 }
 
 sub class_to_file {
@@ -73,7 +87,7 @@ sub decamelize {
 
   # Module parts
   my @parts;
-  for my $part (split /::/, $str) {
+  for my $part (split '::', $str) {
 
     # snake_case words
     my @words;
@@ -100,23 +114,16 @@ sub dumper { Data::Dumper->new([@_])->Indent(1)->Sortkeys(1)->Terse(1)->Dump }
 
 sub encode { _encoding($_[0])->encode("$_[1]") }
 
+# DEPRECATED in Top Hat!
 sub get_line {
-
-  # Locate line ending
-  return undef if (my $pos = index ${$_[0]}, "\x0a") == -1;
-
-  # Extract line and ending
-  my $line = substr ${$_[0]}, 0, $pos + 1, '';
-  $line =~ s/\x0d?\x0a$//;
-
-  return $line;
+  deprecated 'Mojo::Util::get_line is DEPRECATED';
+  ${$_[0]} =~ s/^(.*?)\x0d?\x0a// ? $1 : undef;
 }
 
 sub hmac_sha1_sum { hmac_sha1_hex(@_) }
 
 sub html_unescape {
   my $str = shift;
-  return $str if index($str, '&') == -1;
   $str =~ s/&(?:\#((?:\d{1,7}|x[0-9a-fA-F]{1,6}));|(\w+;?))/_decode($1, $2)/ge;
   return $str;
 }
@@ -142,7 +149,7 @@ sub punycode_decode {
   my @output;
 
   # Consume all code points before the last delimiter
-  push @output, split //, $1 if $input =~ s/(.*)\x2d//s;
+  push @output, split '', $1 if $input =~ s/(.*)\x2d//s;
 
   while (length $input) {
     my $oldi = $i;
@@ -179,7 +186,7 @@ sub punycode_encode {
 
   # Extract basic code points
   my $len   = length $output;
-  my @input = map {ord} split //, $output;
+  my @input = map {ord} split '', $output;
   my @chars = sort grep { $_ >= PC_INITIAL_N } @input;
   $output =~ s/[^\x00-\x7f]+//gs;
   my $h = my $b = length $output;
@@ -286,9 +293,32 @@ sub steady_time () {
     : Time::HiRes::time;
 }
 
+sub tablify {
+  my $rows = shift;
+
+  my @spec;
+  for my $row (@$rows) {
+    for my $i (0 .. $#$row) {
+      $row->[$i] =~ s/[\r\n]//g;
+      my $len = length $row->[$i];
+      $spec[$i] = $len if $len > ($spec[$i] // 0);
+    }
+  }
+
+  my $format = join '  ', map({"\%-${_}s"} @spec[0 .. $#spec - 1]), '%s';
+  return join '', map { sprintf "$format\n", @$_ } @$rows;
+}
+
 sub trim {
   my $str = shift;
   $str =~ s/^\s+|\s+$//g;
+  return $str;
+}
+
+sub unindent {
+  my $str = shift;
+  my $min = min map { m/^([ \t]*)/; length $1 || () } split "\n", $str;
+  $str =~ s/^[ \t]{0,$min}//gm if $min;
   return $str;
 }
 
@@ -309,20 +339,13 @@ sub url_escape {
 
 sub url_unescape {
   my $str = shift;
-  return $str if index($str, '%') == -1;
   $str =~ s/%([0-9a-fA-F]{2})/chr(hex($1))/ge;
   return $str;
 }
 
 sub xml_escape {
   my $str = shift;
-
-  $str =~ s/&/&amp;/g;
-  $str =~ s/</&lt;/g;
-  $str =~ s/>/&gt;/g;
-  $str =~ s/"/&quot;/g;
-  $str =~ s/'/&#39;/g;
-
+  $str =~ s/([&<>"'])/$XML{$1}/ge;
   return $str;
 }
 
@@ -394,7 +417,8 @@ L<Mojo::Util> provides portable utility functions for L<Mojo>.
 
 =head1 FUNCTIONS
 
-L<Mojo::Util> implements the following functions.
+L<Mojo::Util> implements the following functions, which can be imported
+individually.
 
 =head2 b64_decode
 
@@ -494,13 +518,6 @@ Dump a Perl data structure with L<Data::Dumper>.
 
 Encode characters to bytes.
 
-=head2 get_line
-
-  my $line = get_line \$str;
-
-Extract whole line from string or return C<undef>. Lines are expected to end
-with C<0x0d 0x0a> or C<0x0a>.
-
 =head2 hmac_sha1_sum
 
   my $checksum = hmac_sha1_sum $bytes, 'passw0rd';
@@ -541,13 +558,15 @@ Monkey patch functions into package.
 
   my $str = punycode_decode $punycode;
 
-Punycode decode string.
+Punycode decode string as described in
+L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
 
 =head2 punycode_encode
 
   my $punycode = punycode_encode $str;
 
-Punycode encode string.
+Punycode encode string as described in
+L<RFC 3492|http://tools.ietf.org/html/rfc3492>.
 
 =head2 quote
 
@@ -614,11 +633,26 @@ consecutive groups of whitespace into one space each.
 High resolution time, resilient to time jumps if a monotonic clock is
 available through L<Time::HiRes>.
 
+=head2 tablify
+
+  my $table = tablify [['foo', 'bar'], ['baz', 'yada']];
+
+Row-oriented generator for text tables.
+
+  # "foo   bar\nyada  yada\nbaz   yada\n"
+  tablify [['foo', 'bar'], ['yada', 'yada'], ['baz', 'yada']];
+
 =head2 trim
 
   my $trimmed = trim $str;
 
 Trim whitespace characters from both ends of string.
+
+=head2 unindent
+
+  my $unindented = unindent $str;
+
+Unindent multiline string.
 
 =head2 unquote
 
@@ -631,14 +665,16 @@ Unquote string.
   my $escaped = url_escape $str;
   my $escaped = url_escape $str, '^A-Za-z0-9\-._~';
 
-Percent encode unsafe characters in string, the pattern used defaults to
+Percent encode unsafe characters in string as described in
+L<RFC 3986|http://tools.ietf.org/html/rfc3986>, the pattern used defaults to
 C<^A-Za-z0-9\-._~>.
 
 =head2 url_unescape
 
   my $str = url_unescape $escaped;
 
-Decode percent encoded characters in string.
+Decode percent encoded characters in string as described in
+L<RFC 3986|http://tools.ietf.org/html/rfc3986>.
 
 =head2 xml_escape
 

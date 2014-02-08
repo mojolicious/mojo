@@ -13,7 +13,7 @@ has acceptors => sub { [] };
 has [qw(backlog group silent user)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop => sub { Mojo::IOLoop->singleton };
-has listen => sub { [split /,/, $ENV{MOJO_LISTEN} || 'http://*:3000'] };
+has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
 has max_clients  => 1000;
 has max_requests => 25;
 
@@ -297,12 +297,12 @@ connection pooling, timeout, cookie, multipart and multiple event loop
 support.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
+support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
 L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
 they are installed. Individual features can also be disabled with the
 MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
-See L<Mojolicious::Guides::Cookbook> for more.
+See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
 =head1 EVENTS
 
@@ -360,11 +360,20 @@ L<Mojo::IOLoop> singleton.
 List of one or more locations to listen on, defaults to the value of the
 MOJO_LISTEN environment variable or C<http://*:3000>.
 
-  # Allow multiple servers to use the same port (SO_REUSEPORT)
-  $daemon->listen(['http://*:8080?reuse=1']);
+  # Listen on all IPv4 interfaces
+  $daemon->listen(['http://*:3000']);
+
+  # Listen on all IPv4 and IPv6 interfaces
+  $daemon->listen(['http://[::]:3000']);
 
   # Listen on IPv6 interface
   $daemon->listen(['http://[::1]:4000']);
+
+  # Listen on IPv4 and IPv6 interfaces
+  $daemon->listen(['http://127.0.0.1:3000', 'http://[::1]:3000']);
+
+  # Allow multiple servers to use the same port (SO_REUSEPORT)
+  $daemon->listen(['http://*:8080?reuse=1']);
 
   # Listen on two ports with HTTP and HTTPS at the same time
   $daemon->listen([qw(http://*:3000 https://*:4000)]);
@@ -396,7 +405,8 @@ Path to the TLS cert file, defaults to a built-in test certificate.
 
   ciphers=AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
 
-Cipher specification string.
+Cipher specification string, defaults to
+C<ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH>.
 
 =item key
 
@@ -424,7 +434,7 @@ TLS verification mode, defaults to C<0x03>.
   my $max = $daemon->max_clients;
   $daemon = $daemon->max_clients(1000);
 
-Maximum number of parallel client connections, defaults to C<1000>.
+Maximum number of concurrent client connections, defaults to C<1000>.
 
 =head2 max_requests
 

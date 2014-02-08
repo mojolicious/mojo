@@ -315,8 +315,9 @@ Mojo::Message - HTTP message base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Message> is an abstract base class for HTTP messages as described in
-RFC 2616 and RFC 2388.
+L<Mojo::Message> is an abstract base class for HTTP messages based on
+L<RFC 2616|http://tools.ietf.org/html/rfc2616> as well as
+L<RFC 2388|http://tools.ietf.org/html/rfc2388>.
 
 =head1 EVENTS
 

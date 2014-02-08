@@ -10,10 +10,11 @@ use Mojo::DeprecationTest;
 
 use Mojo::Util
   qw(b64_decode b64_encode camelize class_to_file class_to_path decamelize),
-  qw(decode dumper encode get_line hmac_sha1_sum html_unescape md5_bytes),
-  qw(md5_sum monkey_patch punycode_decode punycode_encode quote),
+  qw(decode dumper encode hmac_sha1_sum html_unescape md5_bytes md5_sum),
+  qw(monkey_patch punycode_decode punycode_encode quote secure_compare),
   qw(secure_compare sha1_bytes sha1_sum slurp split_header spurt squish),
-  qw(steady_time trim unquote url_escape url_unescape xml_escape xor_encode);
+  qw(steady_time tablify trim unindent unquote url_escape url_unescape),
+  qw(xml_escape xor_encode);
 
 # camelize
 is camelize('foo_bar_baz'), 'FooBarBaz', 'right camelized result';
@@ -48,16 +49,6 @@ is class_to_path("Foo::Bar'Baz"),  'Foo/Bar/Baz.pm', 'right path';
 is class_to_path("Foo::Bar::Baz"), 'Foo/Bar/Baz.pm', 'right path';
 is class_to_path("Foo'Bar'Baz"),   'Foo/Bar/Baz.pm', 'right path';
 
-# get_line
-my $buffer = "foo\x0d\x0abar\x0dbaz\x0ayada\x0d\x0a";
-is get_line(\$buffer), 'foo', 'right line';
-is $buffer, "bar\x0dbaz\x0ayada\x0d\x0a", 'right buffer content';
-is get_line(\$buffer), "bar\x0dbaz", 'right line';
-is $buffer, "yada\x0d\x0a", 'right buffer content';
-is get_line(\$buffer), 'yada', 'right line';
-is $buffer, '', 'no buffer content';
-is get_line(\$buffer), undef, 'no line';
-
 # split_header
 is_deeply split_header(''), [], 'right result';
 is_deeply split_header('foo=b=a=r'), [['foo', 'b=a=r']], 'right result';
@@ -90,6 +81,25 @@ $tree   = [
   ]
 ];
 is_deeply split_header($header), $tree, 'right result';
+
+# unindent
+is unindent(" test\n  123\n 456\n"), "test\n 123\n456\n",
+  'right unindented result';
+is unindent("\ttest\n\t\t123\n\t456\n"), "test\n\t123\n456\n",
+  'right unindented result';
+is unindent("\t \ttest\n\t \t\t123\n\t \t456\n"), "test\n\t123\n456\n",
+  'right unindented result';
+is unindent("\n\n\n test\n  123\n 456\n"), "\n\n\ntest\n 123\n456\n",
+  'right unindented result';
+is unindent("   test\n    123\n   456\n"), "test\n 123\n456\n",
+  'right unindented result';
+is unindent("    test\n  123\n   456\n"), "  test\n123\n 456\n",
+  'right unindented result';
+is unindent("test\n123\n"),     "test\n123\n",   'right unindented result';
+is unindent(" test\n\n 123\n"), "test\n\n123\n", 'right unindented result';
+is unindent('  test'),          'test',          'right unindented result';
+is unindent(" te st\r\n\r\n  1 2 3\r\n 456\r\n"),
+  "te st\r\n\r\n 1 2 3\r\n456\r\n", 'right unindented result';
 
 # b64_encode
 is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",
@@ -397,6 +407,15 @@ ok !!MojoMonkeyTest->can('yin'), 'function "yin" exists';
 is MojoMonkeyTest::yin(), 'yin', 'right result';
 ok !!MojoMonkeyTest->can('yang'), 'function "yang" exists';
 is MojoMonkeyTest::yang(), 'yang', 'right result';
+
+# tablify
+is tablify([["f\r\no o\r\n", 'bar']]),     "fo o  bar\n",      'right result';
+is tablify([["  foo",        '  b a r']]), "  foo    b a r\n", 'right result';
+is tablify([['foo']]), "foo\n", 'right result';
+is tablify([['foo', 'yada'], ['yada', 'yada']]), "foo   yada\nyada  yada\n",
+  'right result';
+is tablify([['foo', 'bar', 'baz'], ['yada', 'yada', 'yada']]),
+  "foo   bar   baz\nyada  yada  yada\n", 'right result';
 
 # deprecated
 {

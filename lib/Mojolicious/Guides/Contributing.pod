@@ -160,7 +160,8 @@ Documentation belongs to the guides, module POD is just an API reference.
 The main focus of the included documentation should be on examples, no walls
 of text. (An example for every one or two sentences is a good rule of thumb)
 
-Everything should be ordered alphabetically if possible.
+Everything should be ordered alphabetically if possible, or at least be
+consistent if not.
 
 The master source code repository should always be kept in a stable state, use
 feature branches for actual development.

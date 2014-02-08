@@ -4,8 +4,8 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Loader;
 use Mojo::Util 'encode';
 
-has description => "Inflate embedded files to real files.\n";
-has usage       => "usage: $0 inflate\n";
+has description => 'Inflate embedded files to real files.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my $self = shift;
@@ -39,10 +39,7 @@ Mojolicious::Command::inflate - Inflate command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::inflate;
-
-  my $inflate = Mojolicious::Command::inflate->new;
-  $inflate->run(@ARGV);
+  Usage: APPLICATION inflate
 
 =head1 DESCRIPTION
 
@@ -51,6 +48,9 @@ the C<DATA> sections of your application into real files.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

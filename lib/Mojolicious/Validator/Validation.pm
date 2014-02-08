@@ -10,7 +10,7 @@ has [qw(input output)] => sub { {} };
 sub AUTOLOAD {
   my $self = shift;
 
-  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
+  my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 
@@ -225,11 +225,11 @@ Access validated parameters, similar to L<Mojolicious::Controller/"param">.
 Change validation L</"topic"> and make sure a value is present and not an
 empty string.
 
-=head1 CHECKS
+=head1 AUTOLOAD
 
-In addition to the methods above, you can also call validation checks provided
-by L<Mojolicious::Validator> on L<Mojolicious::Validator::Validation> objects,
-similar to L</"check">.
+In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call
+validation checks provided by L<Mojolicious::Validator> on
+L<Mojolicious::Validator::Validation> objects, similar to L</"check">.
 
   $validation->required('foo')->size(2, 5)->like(qr/^[A-Z]/);
   $validation->optional('bar')->equal_to('foo');

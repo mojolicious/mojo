@@ -34,8 +34,8 @@ sub load_plugin {
 
   # Try all namespaces
   my $class = $name =~ /^[a-z]/ ? camelize($name) : $name;
-  for my $namespace (@{$self->namespaces}) {
-    my $module = "${namespace}::$class";
+  for my $ns (@{$self->namespaces}) {
+    my $module = "${ns}::$class";
     return $module->new if _load($module);
   }
 

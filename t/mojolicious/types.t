@@ -9,6 +9,8 @@ is $t->type('json'), 'application/json', 'right type';
 is $t->type('foo'), undef, 'no type';
 $t->type(foo => 'foo/bar');
 is $t->type('foo'), 'foo/bar', 'right type';
+$t->type(BAR => 'bar/baz');
+is $t->type('Bar'), 'bar/baz', 'right type';
 
 # Detect common MIME types
 is_deeply $t->detect('text/cache-manifest'),  ['appcache'], 'right formats';

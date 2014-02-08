@@ -42,26 +42,25 @@ sub trace {
   return $self->frames(\@frames);
 }
 
+sub _append {
+  my ($stack, $line) = @_;
+  chomp $line;
+  push @$stack, $line;
+}
+
 sub _context {
   my ($self, $num, $lines) = @_;
 
   # Line
   return unless defined $lines->[0][$num - 1];
   $self->line([$num]);
-  for my $line (@$lines) {
-    chomp(my $code = $line->[$num - 1]);
-    push @{$self->line}, $code;
-  }
+  _append($self->line, $_->[$num - 1]) for @$lines;
 
   # Before
   for my $i (2 .. 6) {
     last if ((my $previous = $num - $i) < 0);
-    next unless defined $lines->[0][$previous];
     unshift @{$self->lines_before}, [$previous + 1];
-    for my $line (@$lines) {
-      chomp(my $code = $line->[$previous]);
-      push @{$self->lines_before->[0]}, $code;
-    }
+    _append($self->lines_before->[0], $_->[$previous]) for @$lines;
   }
 
   # After
@@ -69,11 +68,7 @@ sub _context {
     next if ((my $next = $num + $i) < 0);
     next unless defined $lines->[0][$next];
     push @{$self->lines_after}, [$next + 1];
-    for my $line (@$lines) {
-      last unless defined(my $code = $line->[$next]);
-      chomp $code;
-      push @{$self->lines_after->[-1]}, $code;
-    }
+    _append($self->lines_after->[-1], $_->[$next]) for @$lines;
   }
 }
 
@@ -99,7 +94,7 @@ sub _detect {
   }
 
   # More context
-  $self->_context($trace[0][1], [map { [split /\n/] } @$files]) if $files;
+  $self->_context($trace[0][1], [map { [split "\n"] } @$files]) if $files;
 
   return $self;
 }
@@ -194,7 +189,6 @@ Throw exception with stacktrace.
 =head2 to_string
 
   my $str = $e->to_string;
-  my $str = "$e";
 
 Render exception.
 
@@ -204,6 +198,22 @@ Render exception.
   $e = $e->trace(2);
 
 Store stacktrace.
+
+=head1 OPERATORS
+
+L<Mojo::Exception> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$e;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$e";
+
+Alias for L</to_string>.
 
 =head1 SEE ALSO
 

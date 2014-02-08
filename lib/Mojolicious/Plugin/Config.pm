@@ -104,6 +104,9 @@ filename will be generated from the value of L<Mojolicious/"moniker">.
 The code of this plugin is a good example for learning to build new plugins,
 you're welcome to fork it.
 
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
+by default.
+
 =head1 OPTIONS
 
 L<Mojolicious::Plugin::Config> supports the following options.

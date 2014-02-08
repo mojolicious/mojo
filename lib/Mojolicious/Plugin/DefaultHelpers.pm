@@ -2,6 +2,7 @@ package Mojolicious::Plugin::DefaultHelpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::ByteStream;
+use Mojo::Collection;
 use Mojo::Util qw(dumper sha1_sum steady_time);
 
 sub register {
@@ -25,6 +26,9 @@ sub register {
     );
   }
 
+  $app->helper(accepts => \&_accepts);
+  $app->helper(b       => sub { shift; Mojo::ByteStream->new(@_) });
+  $app->helper(c       => sub { shift; Mojo::Collection->new(@_) });
   $app->helper(config => sub { shift->app->config(@_) });
   $app->helper(content       => \&_content);
   $app->helper(content_for   => \&_content_for);
@@ -34,6 +38,11 @@ sub register {
   $app->helper(include       => \&_include);
   $app->helper(ua => sub { shift->app->ua });
   $app->helper(url_with => \&_url_with);
+}
+
+sub _accepts {
+  my $self = shift;
+  return $self->app->renderer->accepts($self, @_);
 }
 
 sub _content {
@@ -69,19 +78,15 @@ sub _current_route {
 }
 
 sub _include {
-  my $self     = shift;
-  my $template = @_ % 2 ? shift : undef;
-  my $args     = {@_, defined $template ? (template => $template) : ()};
+  my $self = shift;
 
-  # "layout" and "extends" can't be localized
-  my $layout  = delete $args->{layout};
-  my $extends = delete $args->{extends};
+  # Template may be first argument
+  my ($template, $args) = (@_ % 2 ? shift : undef, {@_});
+  $args->{template} = $template if $template;
 
   # Localize arguments
-  my @keys = keys %$args;
-  local @{$self->stash}{@keys} = @{$args}{@keys};
-
-  return $self->render(partial => 1, layout => $layout, extends => $extends);
+  local @{$self->stash}{keys %$args};
+  return $self->render(partial => 1, %$args);
 }
 
 sub _url_with {
@@ -113,15 +118,53 @@ L<Mojolicious>.
 This is a core plugin, that means it is always enabled and its code a good
 example for learning to build new plugins, you're welcome to fork it.
 
+See L<Mojolicious::Plugins/"PLUGINS"> for a list of plugins that are available
+by default.
+
 =head1 HELPERS
 
 L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
+
+=head2 accepts
+
+  %= accepts->[0] // 'html'
+  %= accepts('html', 'json', 'txt') // 'html'
+
+Select best possible representation for resource from C<Accept> request
+header, C<format> stash value or C<format> GET/POST parameter with
+L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension
+if no preference could be detected.
+
+  # Check if JSON is acceptable
+  $self->render(json => {hello => 'world'}) if $self->accepts('json');
+
+  # Check if JSON was specifically requested
+  $self->render(json => {hello => 'world'}) if $self->accepts('', 'json');
+
+  # Unsupported representation
+  $self->render(data => '', status => 204)
+    unless my $format = $self->accepts('html', 'json');
+
+  # Detected representations to select from
+  my @formats = @{$self->accepts};
 
 =head2 app
 
   %= app->secrets->[0]
 
 Alias for L<Mojolicious::Controller/"app">.
+
+=head2 b
+
+  %= b('test 123')->b64_encode
+
+Turn string into a L<Mojo::ByteStream> object.
+
+=head2 c
+
+  %= c(qw(a b c))->shuffle->join
+
+Turn list into a L<Mojo::Collection> object.
 
 =head2 config
 

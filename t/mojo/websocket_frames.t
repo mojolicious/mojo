@@ -211,7 +211,7 @@ $ws = Mojo::Transaction::WebSocket->new(compressed => 1);
 $bytes = $ws->build_message({binary => 'just works'});
 $frame = $ws->parse_frame(\($dummy = $bytes));
 is $frame->[0], 1, 'fin flag is set';
-is $frame->[1], 1, 'rsv1 flag is not set';
+is $frame->[1], 1, 'rsv1 flag is set';
 is $frame->[2], 0, 'rsv2 flag is not set';
 is $frame->[3], 0, 'rsv3 flag is not set';
 is $frame->[4], 2, 'binary frame';
@@ -219,18 +219,5 @@ ok $frame->[5], 'has payload';
 isnt(
   Mojo::Transaction::WebSocket->new->build_message({binary => 'just works'}),
   $bytes, 'messages are not equal');
-
-# Compressed binary message roundtrip with context takeover
-$ws = Mojo::Transaction::WebSocket->new(compressed => 1);
-my $first  = $ws->build_message({binary => 'just works'});
-my $second = $ws->build_message({binary => 'just works'});
-isnt $first, $second, 'messages are not equal';
-
-# Compressed binary message roundtrip without context takeover
-$ws
-  = Mojo::Transaction::WebSocket->new(compressed => 1, context_takeover => 0);
-$first  = $ws->build_message({binary => 'just works'});
-$second = $ws->build_message({binary => 'just works'});
-is $first, $second, 'messages are equal';
 
 done_testing();

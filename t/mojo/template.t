@@ -1071,6 +1071,16 @@ is $output->lines_before->[0][1], '☃', 'right line';
 is $output->line->[1], '% die;♥', 'right line';
 is $output->lines_after->[0][1], '☃', 'right line';
 
+# Exception in first line with bad message
+$mt     = Mojo::Template->new;
+$output = $mt->render('<% die "Test at template line 99\n"; %>');
+isa_ok $output, 'Mojo::Exception', 'right exception';
+is $output->message, "Test at template line 99\n", 'right message';
+is $output->lines_before->[0], undef, 'no lines before';
+is $output->line->[0],         1,     'right number';
+is $output->line->[1], '<% die "Test at template line 99\n"; %>', 'right line';
+is $output->lines_after->[0], undef, 'no lines after';
+
 # Different encodings
 $mt = Mojo::Template->new(encoding => 'shift_jis');
 $file = catfile(splitdir($FindBin::Bin), qw(templates utf8_exception.mt));

@@ -186,7 +186,7 @@ sub _spawn {
         } or $lock = $@ eq "alarm\n" ? 0 : die $@;
       }
 
-      # Non blocking
+      # Non-blocking
       else { $lock = flock $handle, LOCK_EX | LOCK_NB }
 
       return $lock;
@@ -260,12 +260,12 @@ loop support. Note that the server uses signals for process management, so you
 should avoid modifying signal handlers in your applications.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
+support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
 L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
 they are installed. Individual features can also be disabled with the
 MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
-See L<Mojolicious::Guides::Cookbook> for more.
+See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
 =head1 MANAGER SIGNALS
 
@@ -462,7 +462,10 @@ Full path of process id file, defaults to a random temporary path.
   $prefork    = $prefork->workers(10);
 
 Number of worker processes, defaults to C<4>. A good rule of thumb is two
-worker processes per CPU core.
+worker processes per CPU core for applications that perform mostly
+non-blocking operations, blocking operations often require more and benefit
+from decreasing the number of concurrent L<Mojo::Server::Daemon/"clients">
+(often as low as C<1>).
 
 =head1 METHODS
 

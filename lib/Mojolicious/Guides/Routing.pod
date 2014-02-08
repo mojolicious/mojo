@@ -349,12 +349,16 @@ already exist.
   $r->route('/:mymessage')
     ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
 
-One more interesting effect, if a placeholder is at the end of a route and
-there is already a stash value of the same name present, it automatically
-becomes optional.
+One more interesting effect, a placeholder automatically becomes optional if
+there is already a stash value of the same name present.
 
   # / -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
   $r->route('/:mymessage')
+    ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
+
+  # /test/123     -> {controller => 'foo', action => 'bar', mymessage => 'hi'}
+  # /test/bye/123 -> {controller => 'foo', action => 'bar', mymessage => 'bye'}
+  $r->route('/test/:mymessage/123')
     ->to(controller => 'foo', action => 'bar', mymessage => 'hi');
 
 This is also the case if multiple placeholders are right after another and not
@@ -551,7 +555,7 @@ with L<Mojolicious::Controller/"send"> right away.
 
 Bridge routes created with the method L<Mojolicious::Routes::Route/"bridge">
 can be used to share code with multiple nested routes, because unlike normal
-nested routes, they always match and result in additional dispatch cycles.
+nested routes, they result in additional dispatch cycles when they match.
 
   # /foo     -> undef
   # /foo/bar -> {controller => 'foo', action => 'baz'}
@@ -763,8 +767,9 @@ out for quicksand!
 
 =head2 Introspection
 
-The C<routes> command can be used from the command line to list all available
-routes together with name and underlying regular expressions.
+The command L<Mojolicious::Command::routes> can be used from the command line
+to list all available routes together with name and underlying regular
+expressions.
 
   $ ./myapp.pl routes -v
   /foo/:name  GET   fooname  ^/foo/([^/\.]+))(?:\.([^/]+)$)?

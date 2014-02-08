@@ -185,12 +185,12 @@ This second invocation will load the application again, detect the process id
 file with it, and send a L</"USR2"> signal to the already running server.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
+support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
 L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
 they are installed. Individual features can also be disabled with the
 MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
-See L<Mojolicious::Guides::Cookbook> for more.
+See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
 =head1 MANAGER SIGNALS
 
@@ -278,9 +278,10 @@ Listen backlog size, defaults to C<SOMAXCONN>.
 
   clients => 100
 
-Maximum number of parallel client connections per worker process, defaults to
-C<1000>. Note that depending on how much your application may block, you might
-want to decrease this value and increase L</"workers"> instead for better
+Maximum number of concurrent client connections per worker process, defaults
+to C<1000>. Note that high concurrency works best with applications that
+perform mostly non-blocking operations, to optimize for blocking operations
+you can decrease this value and increase L</"workers"> instead for better
 performance.
 
 =head2 graceful_timeout
@@ -385,7 +386,9 @@ Username for worker processes.
   workers => 10
 
 Number of worker processes, defaults to C<4>. A good rule of thumb is two
-worker processes per CPU core.
+worker processes per CPU core for applications that perform mostly
+non-blocking operations, blocking operations often require more and benefit
+from decreasing the number of concurrent L</"clients"> (often as low as C<1>).
 
 =head1 METHODS
 

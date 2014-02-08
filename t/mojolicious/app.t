@@ -60,6 +60,8 @@ is $t->app->static->file('hello.txt')->slurp,
   "Hello Mojo from a development static file!\n", 'right content';
 is $t->app->moniker, 'mojolicious_test', 'right moniker';
 is $t->app->secrets->[0], $t->app->moniker, 'secret defaults to moniker';
+is $t->app->renderer->template_handler(
+  {template => 'foo/bar/index', format => 'html'}), 'epl', 'right handler';
 
 # Missing methods and functions (AUTOLOAD)
 eval { $t->app->missing };

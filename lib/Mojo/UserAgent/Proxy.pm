@@ -7,7 +7,7 @@ sub detect {
   my $self = shift;
   $self->http($ENV{HTTP_PROXY}   || $ENV{http_proxy});
   $self->https($ENV{HTTPS_PROXY} || $ENV{https_proxy});
-  return $self->not([split /,/, $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
+  return $self->not([split ',', $ENV{NO_PROXY} || $ENV{no_proxy} || '']);
 }
 
 sub inject {

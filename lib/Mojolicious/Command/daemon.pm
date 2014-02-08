@@ -4,26 +4,8 @@ use Mojo::Base 'Mojolicious::Command';
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Server::Daemon;
 
-has description => "Start application with HTTP and WebSocket server.\n";
-has usage       => <<EOF;
-usage: $0 daemon [OPTIONS]
-
-These options are available:
-  -b, --backlog <size>         Listen backlog size, defaults to SOMAXCONN.
-  -c, --clients <number>       Maximum number of concurrent clients, defaults
-                               to 1000.
-  -g, --group <name>           Group name for process.
-  -i, --inactivity <seconds>   Inactivity timeout, defaults to the value of
-                               MOJO_INACTIVITY_TIMEOUT or 15.
-  -l, --listen <location>      One or more locations you want to listen on,
-                               defaults to the value of MOJO_LISTEN or
-                               "http://*:3000".
-  -p, --proxy                  Activate reverse proxy support, defaults to
-                               the value of MOJO_REVERSE_PROXY.
-  -r, --requests <number>      Maximum number of requests per keep-alive
-                               connection, defaults to 25.
-  -u, --user <name>            Username for process.
-EOF
+has description => 'Start application with HTTP and WebSocket server.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -53,10 +35,26 @@ Mojolicious::Command::daemon - Daemon command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::daemon;
+  Usage: APPLICATION daemon [OPTIONS]
 
-  my $daemon = Mojolicious::Command::daemon->new;
-  $daemon->run(@ARGV);
+    ./myapp.pl daemon -m production -l http://*:8080
+    ./myapp.pl daemon -l http://127.0.0.1:8080 -l https://[::]:8081
+
+  Options:
+    -b, --backlog <size>         Listen backlog size, defaults to SOMAXCONN.
+    -c, --clients <number>       Maximum number of concurrent clients,
+                                 defaults to 1000.
+    -g, --group <name>           Group name for process.
+    -i, --inactivity <seconds>   Inactivity timeout, defaults to the value of
+                                 MOJO_INACTIVITY_TIMEOUT or 15.
+    -l, --listen <location>      One or more locations you want to listen on,
+                                 defaults to the value of MOJO_LISTEN or
+                                 "http://*:3000".
+    -p, --proxy                  Activate reverse proxy support, defaults to
+                                 the value of MOJO_REVERSE_PROXY.
+    -r, --requests <number>      Maximum number of requests per keep-alive
+                                 connection, defaults to 25.
+    -u, --user <name>            Username for process.
 
 =head1 DESCRIPTION
 
@@ -65,6 +63,9 @@ L<Mojo::Server::Daemon> backend.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

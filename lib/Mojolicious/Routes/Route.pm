@@ -12,7 +12,7 @@ has pattern    => sub { Mojolicious::Routes::Pattern->new };
 sub AUTOLOAD {
   my $self = shift;
 
-  my ($package, $method) = our $AUTOLOAD =~ /^([\w:]+)::(\w+)$/;
+  my ($package, $method) = split /::(\w+)$/, our $AUTOLOAD;
   croak "Undefined subroutine &${package}::$method called"
     unless blessed $self && $self->isa(__PACKAGE__);
 
@@ -23,8 +23,6 @@ sub AUTOLOAD {
 }
 
 sub DESTROY { }
-
-sub new { shift->SUPER::new->parse(@_) }
 
 sub add_child {
   my ($self, $route) = @_;
@@ -88,6 +86,8 @@ sub name {
   $self->{custom} = 1;
   return $self;
 }
+
+sub new { shift->SUPER::new->parse(@_) }
 
 sub options { shift->_generate_route(OPTIONS => @_) }
 
@@ -310,14 +310,6 @@ Pattern for this route, defaults to a L<Mojolicious::Routes::Pattern> object.
 L<Mojolicious::Routes::Route> inherits all methods from L<Mojo::Base> and
 implements the following new ones.
 
-=head2 new
-
-  my $r = Mojolicious::Routes::Route->new;
-  my $r = Mojolicious::Routes::Route->new('/:controller/:action');
-
-Construct a new L<Mojolicious::Routes::Route> object and <parse> pattern if
-necessary.
-
 =head2 add_child
 
   $r = $r->add_child(Mojolicious::Routes::Route->new);
@@ -428,6 +420,14 @@ the route pattern. Note that the name C<current> is reserved for referring to
 the current route.
 
   $r->get('/user')->to('user#show')->name('show_user');
+
+=head2 new
+
+  my $r = Mojolicious::Routes::Route->new;
+  my $r = Mojolicious::Routes::Route->new('/:controller/:action');
+
+Construct a new L<Mojolicious::Routes::Route> object and L</"parse"> pattern
+if necessary.
 
 =head2 options
 
@@ -578,10 +578,10 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->websocket('/echo')->to('example#echo');
 
-=head1 SHORTCUTS
+=head1 AUTOLOAD
 
-In addition to the attributes and methods above you can also call shortcuts
-on L<Mojolicious::Routes::Route> objects.
+In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
+shortcuts on L<Mojolicious::Routes::Route> objects.
 
   $r->root->add_shortcut(firefox => sub {
     my ($r, $path) = @_;

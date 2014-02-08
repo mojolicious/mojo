@@ -10,8 +10,6 @@ use Mojo::Util
 has base => sub { Mojo::URL->new };
 has [qw(fragment host port scheme userinfo)];
 
-sub new { shift->SUPER::new->parse(@_) }
-
 sub authority {
   my $self = shift;
 
@@ -46,8 +44,7 @@ sub clone {
 
   my $clone = $self->new;
   $clone->$_($self->$_) for qw(scheme userinfo host port fragment);
-  $clone->path($self->path->clone);
-  $clone->query($self->query->clone);
+  $clone->path($self->path->clone)->query($self->query->clone);
   $clone->base($self->base->clone) if $self->{base};
 
   return $clone;
@@ -73,9 +70,10 @@ sub ihost {
 
 sub is_abs { !!shift->scheme }
 
+sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
+
 sub parse {
   my ($self, $url) = @_;
-  return $self unless $url;
 
   # Official regex from RFC 3986
   $url =~ m!^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?!;
@@ -248,8 +246,10 @@ Mojo::URL - Uniform Resource Locator
 
 =head1 DESCRIPTION
 
-L<Mojo::URL> implements a subset of RFC 3986 and RFC 3987 for Uniform
-Resource Locators with support for IDNA and IRIs.
+L<Mojo::URL> implements a subset of
+L<RFC 3986|http://tools.ietf.org/html/rfc3986> and
+L<RFC 3987|http://tools.ietf.org/html/rfc3987> for Uniform Resource Locators
+with support for IDNA and IRIs.
 
 =head1 ATTRIBUTES
 
@@ -302,13 +302,6 @@ Userinfo part of this URL.
 L<Mojo::URL> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
-=head2 new
-
-  my $url = Mojo::URL->new;
-  my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
-
-Construct a new L<Mojo::URL> object and L</"parse"> URL if necessary.
-
 =head2 authority
 
   my $authority = $url->authority;
@@ -337,6 +330,13 @@ Host part of this URL in punycode format.
   my $bool = $url->is_abs;
 
 Check if URL is absolute.
+
+=head2 new
+
+  my $url = Mojo::URL->new;
+  my $url = Mojo::URL->new('http://127.0.0.1:3000/foo?f=b&baz=2#foo');
+
+Construct a new L<Mojo::URL> object and L</"parse"> URL if necessary.
 
 =head2 parse
 
@@ -433,9 +433,24 @@ provided base URL.
 =head2 to_string
 
   my $str = $url->to_string;
-  my $str = "$url";
 
 Turn URL into a string.
+
+=head1 OPERATORS
+
+L<Mojo::URL> overloads the following operators.
+
+=head2 bool
+
+  my $bool = !!$url;
+
+Always true.
+
+=head2 stringify
+
+  my $str = "$url";
+
+Alias for L</to_string>.
 
 =head1 SEE ALSO
 

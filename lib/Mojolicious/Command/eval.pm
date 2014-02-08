@@ -3,18 +3,8 @@ use Mojo::Base 'Mojolicious::Command';
 
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 
-has description => "Run code against application.\n";
-has usage       => <<EOF;
-usage: $0 eval [OPTIONS] CODE
-
-  mojo eval 'say app->ua->get("/")->res->body'
-  mojo eval -v 'app->home'
-  mojo eval -V 'app->renderer->paths'
-
-These options are available:
-  -v, --verbose   Print return value to STDOUT.
-  -V              Print returned data structure to STDOUT.
-EOF
+has description => 'Run code against application.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, @args) = @_;
@@ -40,10 +30,15 @@ Mojolicious::Command::eval - Eval command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::eval;
+  Usage: APPLICATION eval [OPTIONS] CODE
 
-  my $eval = Mojolicious::Command::eval->new;
-  $eval->run(@ARGV);
+    ./myapp.pl eval 'say app->ua->get("/")->res->body'
+    ./myapp.pl eval -v 'app->home'
+    ./myapp.pl eval -V 'app->renderer->paths'
+
+  Options:
+    -v, --verbose   Print return value to STDOUT.
+    -V              Print returned data structure to STDOUT.
 
 =head1 DESCRIPTION
 
@@ -51,6 +46,9 @@ L<Mojolicious::Command::eval> runs code against applications.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

@@ -5,6 +5,9 @@ use Mojolicious::Lite;
 # Default for config file tests
 app->defaults(secret => 'Insecure!');
 
+# Helpers sharing the same name in different embedded applications
+helper same_name => sub {'myapp'};
+
 # Load plugin
 plugin 'Config';
 
@@ -54,4 +57,5 @@ app->start;
 __DATA__
 
 @@ menubar.html.ep
+%= same_name
 <%= $config->{just} %><%= $config->{one} %><%= $config->{two} %>

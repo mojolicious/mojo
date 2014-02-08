@@ -5,8 +5,8 @@ use Mojo::IOLoop::Server;
 use Mojo::UserAgent;
 use Mojolicious;
 
-has description => "Show versions of installed modules.\n";
-has usage       => "usage: $0 version\n";
+has description => 'Show versions of installed modules.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my $self = shift;
@@ -24,7 +24,7 @@ CORE
 
 OPTIONAL
   EV 4.0+               ($ev)
-  IO::Socket::IP 0.16+  ($ipv6)
+  IO::Socket::IP 0.20+  ($ipv6)
   IO::Socket::SSL 1.75+ ($tls)
 
 EOF
@@ -55,10 +55,7 @@ Mojolicious::Command::version - Version command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::version;
-
-  my $v = Mojolicious::Command::version->new;
-  $v->run(@ARGV);
+  Usage: APPLICATION version
 
 =head1 DESCRIPTION
 
@@ -67,6 +64,9 @@ and optional modules.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

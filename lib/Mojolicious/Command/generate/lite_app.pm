@@ -1,8 +1,8 @@
 package Mojolicious::Command::generate::lite_app;
 use Mojo::Base 'Mojolicious::Command';
 
-has description => "Generate Mojolicious::Lite application.\n";
-has usage       => "usage: $0 generate lite_app [NAME]\n";
+has description => 'Generate Mojolicious::Lite application.';
+has usage => sub { shift->extract_usage };
 
 sub run {
   my ($self, $name) = @_;
@@ -51,10 +51,7 @@ Mojolicious::Command::generate::lite_app - Lite app generator command
 
 =head1 SYNOPSIS
 
-  use Mojolicious::Command::generate::lite_app;
-
-  my $app = Mojolicious::Command::generate::lite_app->new;
-  $app->run(@ARGV);
+  Usage: APPLICATION generate lite_app [NAME]
 
 =head1 DESCRIPTION
 
@@ -63,6 +60,9 @@ L<Mojolicious::Lite> applications.
 
 This is a core command, that means it is always enabled and its code a good
 example for learning to build new commands, you're welcome to fork it.
+
+See L<Mojolicious::Commands/"COMMANDS"> for a list of commands that are
+available by default.
 
 =head1 ATTRIBUTES
 

@@ -6,7 +6,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::URL;
-use Mojo::Util qw(deprecated monkey_patch);
+use Mojo::Util 'monkey_patch';
 use Mojo::UserAgent::CookieJar;
 use Mojo::UserAgent::Proxy;
 use Mojo::UserAgent::Server;
@@ -41,71 +41,8 @@ for my $name (qw(DELETE GET HEAD OPTIONS PATCH POST PUT)) {
 
 sub DESTROY { shift->_cleanup }
 
-# DEPRECATED in Top Hat!
-sub new {
-  my $self = shift->SUPER::new(@_);
-  for my $key (keys %$self) { $self->$key(delete $self->{$key}) }
-  return $self;
-}
-
-# DEPRECATED in Top Hat!
-sub app {
-  deprecated 'Mojo::UserAgent::app is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Server::app';
-  shift->_delegate('server', 'app', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub app_url {
-  deprecated 'Mojo::UserAgent::app_url is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Server::url';
-  shift->_delegate('server', 'url', @_);
-}
-
 sub build_tx           { shift->transactor->tx(@_) }
 sub build_websocket_tx { shift->transactor->websocket(@_) }
-
-# DEPRECATED in Top Hat!
-sub detect_proxy {
-  deprecated 'Mojo::UserAgent::detect_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::detect';
-  shift->tap(sub { $_->proxy->detect });
-}
-
-# DEPRECATED in Top Hat!
-sub http_proxy {
-  deprecated 'Mojo::UserAgent::http_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::http';
-  shift->_delegate('proxy', 'http', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub https_proxy {
-  deprecated 'Mojo::UserAgent::https_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::https';
-  shift->_delegate('proxy', 'https', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub name {
-  deprecated 'Mojo::UserAgent::name is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Transactor::name';
-  shift->_delegate('transactor', 'name', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub no_proxy {
-  deprecated 'Mojo::UserAgent::no_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::not';
-  shift->_delegate('proxy', 'not', @_);
-}
-
-# DEPRECATED in Top Hat!
-sub need_proxy {
-  deprecated 'Mojo::UserAgent::need_proxy is DEPRECATED in favor of'
-    . ' Mojo::UserAgent::Proxy::is_needed';
-  shift->proxy->is_needed(@_);
-}
 
 sub start {
   my ($self, $tx, $cb) = @_;
@@ -273,14 +210,6 @@ sub _connection {
   $self->{connections}{$id} = {cb => $cb, tx => $tx};
 
   return $id;
-}
-
-# DEPRECATED in Top Hat!
-sub _delegate {
-  my ($self, $attr, $name) = (shift, shift, shift);
-  return $self->$attr->$name unless @_;
-  $self->$attr->$name(@_);
-  return $self;
 }
 
 sub _dequeue {
@@ -478,14 +407,14 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   # Extract data from HTML and XML resources
   say $ua->get('www.perl.org')->res->dom->html->head->title->text;
 
-  # Scrape the latest headlines from a news site
+  # Scrape the latest headlines from a news site with CSS selectors
   say $ua->get('perlnews.org')->res->dom('h2 > a')->text->shuffle;
 
   # IPv6 PUT request with content
   my $tx
     = $ua->put('[::1]:3000' => {'Content-Type' => 'text/plain'} => 'Hello!');
 
-  # Grab the latest Mojolicious release :)
+  # Follow redirects to grab the latest Mojolicious release :)
   $ua->max_redirects(5)->get('latest.mojolicio.us')
     ->res->content->asset->move_to('/Users/sri/mojo.tar.gz');
 
@@ -493,7 +422,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   my $tx = $ua->cert('tls.crt')->key('tls.key')
     ->post('https://example.com' => json => {top => 'secret'});
 
-  # Blocking parallel requests (does not work inside a running event loop)
+  # Blocking concurrent requests (does not work inside a running event loop)
   my $delay = Mojo::IOLoop->delay;
   for my $url ('mojolicio.us', 'cpan.org') {
     my $end = $delay->begin(0);
@@ -504,7 +433,7 @@ Mojo::UserAgent - Non-blocking I/O HTTP and WebSocket user agent
   }
   my @titles = $delay->wait;
 
-  # Non-blocking parallel requests (does work inside a running event loop)
+  # Non-blocking concurrent requests (does work inside a running event loop)
   my $delay = Mojo::IOLoop->delay(sub {
     my ($delay, @titles) = @_;
     ...
@@ -543,12 +472,12 @@ this allows multiple processes to share the same L<Mojo::UserAgent> object
 safely.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.16+) and
+support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
 L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
 they are installed. Individual features can also be disabled with the
 MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
 
-See L<Mojolicious::Guides::Cookbook> for more.
+See L<Mojolicious::Guides::Cookbook/"USER AGENT"> for more.
 
 =head1 EVENTS
 
@@ -746,10 +675,24 @@ implements the following new ones.
 Generate L<Mojo::Transaction::HTTP> object with
 L<Mojo::UserAgent::Transactor/"tx">.
 
-  # Request with cookie
+  # Request with custom cookie
   my $tx = $ua->build_tx(GET => 'example.com');
   $tx->req->cookies({name => 'foo', value => 'bar'});
-  $ua->start($tx);
+  $tx = $ua->start($tx);
+
+  # Deactivate gzip compression
+  my $tx = $ua->build_tx(GET => 'example.com');
+  $tx->req->headers->remove('Accept-Encoding');
+  $tx = $ua->start($tx);
+
+  # Interrupt response by raising an error
+  my $tx = $ua->build_tx(GET => 'example.com');
+  $tx->res->on(progress => sub {
+    my $res = shift;
+    return unless my $server = $res->headers->server;
+    $res->error('Oh noes, it is IIS!') if $server =~ /IIS/;
+  });
+  $tx = $ua->start($tx);
 
 =head2 build_websocket_tx
 
@@ -936,6 +879,12 @@ L<Mojo::Transaction::HTTP> object.
     $tx->send('Hi!');
   });
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+You can activate C<permessage-deflate> compression by setting the
+C<Sec-WebSocket-Extensions> header.
+
+  my $headers = {'Sec-WebSocket-Extensions' => 'permessage-deflate'};
+  $ua->websocket('ws://example.com/foo' => $headers => sub {...});
 
 =head1 DEBUGGING
 

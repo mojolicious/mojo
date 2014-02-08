@@ -115,10 +115,10 @@ sub parse {
   # Relaxed parsing
   my $headers = $self->headers;
   if ($self->auto_relax) {
-    my $connection = $headers->connection     // '';
-    my $len        = $headers->content_length // '';
+    my $connection = lc($headers->connection // '');
+    my $len = $headers->content_length // '';
     $self->relaxed(1)
-      if !length $len && ($connection =~ /close/i || $headers->content_type);
+      if !length $len && ($connection eq 'close' || $headers->content_type);
   }
 
   # Chunked or relaxed content

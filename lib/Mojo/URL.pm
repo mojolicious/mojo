@@ -44,8 +44,7 @@ sub clone {
 
   my $clone = $self->new;
   $clone->$_($self->$_) for qw(scheme userinfo host port fragment);
-  $clone->path($self->path->clone);
-  $clone->query($self->query->clone);
+  $clone->path($self->path->clone)->query($self->query->clone);
   $clone->base($self->base->clone) if $self->{base};
 
   return $clone;

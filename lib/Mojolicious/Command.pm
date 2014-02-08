@@ -52,10 +52,7 @@ sub extract_usage {
   return unindent $output;
 }
 
-sub help {
-  print shift->usage;
-  exit 0;
-}
+sub help { print shift->usage }
 
 sub rel_dir { catdir(getcwd(), split '/', pop) }
 

@@ -80,7 +80,7 @@ sub run {
   }
   @rows = sort { $a->[0] cmp $b->[0] } @rows;
 
-  print $self->message, tablify(\@rows), $self->hint;
+  return print $self->message, tablify(\@rows), $self->hint;
 }
 
 sub start_app {

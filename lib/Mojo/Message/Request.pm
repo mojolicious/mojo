@@ -288,7 +288,7 @@ Mojo::Message::Request - HTTP request
 
 =head1 DESCRIPTION
 
-L<Mojo::Message::Request> is a container for HTTP requests as described in
+L<Mojo::Message::Request> is a container for HTTP requests based on
 L<RFC 2616|http://tools.ietf.org/html/rfc2616> and
 L<RFC 2817|http://tools.ietf.org/html/rfc2817>.
 

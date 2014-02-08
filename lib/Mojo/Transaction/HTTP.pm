@@ -199,8 +199,8 @@ Mojo::Transaction::HTTP - HTTP transaction
 
 =head1 DESCRIPTION
 
-L<Mojo::Transaction::HTTP> is a container for HTTP transactions as described
-in L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
+L<Mojo::Transaction::HTTP> is a container for HTTP transactions based on
+L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
 
 =head1 EVENTS
 

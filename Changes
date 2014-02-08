@@ -1,5 +1,5 @@
 
-4.78  2014-02-07
+4.78  2014-02-08
   - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML
     Living Standard.
 

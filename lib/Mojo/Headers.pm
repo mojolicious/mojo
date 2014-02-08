@@ -176,7 +176,7 @@ Mojo::Headers - Headers
 
 =head1 DESCRIPTION
 
-L<Mojo::Headers> is a container for HTTP headers as described in
+L<Mojo::Headers> is a container for HTTP headers based on
 L<RFC 2616|http://tools.ietf.org/html/rfc2616>.
 
 =head1 ATTRIBUTES

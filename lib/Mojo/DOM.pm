@@ -850,7 +850,8 @@ auto detection based on processing instructions.
 
 In addition to the L</"METHODS"> above, many child elements are also
 automatically available as object methods, which return a L<Mojo::DOM> or
-L<Mojo::Collection> object, depending on number of children.
+L<Mojo::Collection> object, depending on number of children. For more power
+and consistent results you can also use L</"children">.
 
   say $dom->p->text;
   say $dom->div->[23]->text;

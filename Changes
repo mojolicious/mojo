@@ -1,4 +1,6 @@
 
+4.79  2014-02-09
+
 4.78  2014-02-08
   - Deprecated Mojo::Util::get_line.
   - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML

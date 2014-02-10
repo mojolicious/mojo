@@ -1,5 +1,6 @@
 
 4.79  2014-02-10
+  - Improved not found page to show the exact path used for route matching.
 
 4.78  2014-02-08
   - Deprecated Mojo::Util::get_line.
@@ -1549,7 +1550,7 @@
   - Fixed typo in exception template.
 
 2.44  2012-01-18
-  - Added new not_found page for development mode.
+  - Added new not found page for development mode.
   - Added EXPERIMENTAL url_with helper to
     Mojolicious::Plugin::DefaultHelpers. (diegok, marcus, judofyr, sri)
   - Added EXPERIMENTAL support for removing query parameters while merging to
@@ -2457,7 +2458,7 @@
   - Added EXPERIMENTAL support for route shortcuts.
   - Added EXPERIMENTAL support for NO_PROXY. (l0b0)
   - Added EXPERIMENTAL user_agent attribute to Mojo::Client.
-  - Added EXPERIMENTAL support for mode specific not_found and exception
+  - Added EXPERIMENTAL support for mode specific not found and exception
     templates.
   - Added EXPERIMENTAL support for route caching.
   - Added EXPERIMENTAL support for CSS3 selectors to the get command.
@@ -2521,7 +2522,7 @@
   - Code name "Snowflake", this is a major release.
   - Deprecated session method in Mojolicious.
   - Deprecated handler and helper attributes in Mojolicious::Renderer.
-  - Added new exception and not_found templates.
+  - Added new exception and not found templates.
   - Added documentation browser to Mojolicious::Plugin::PodRenderer.
   - Added EXPERIMENTAL content_for helper.
   - Disabled debug log messages for static files.
@@ -2539,7 +2540,7 @@
 
 0.999950  2010-11-30
   - Added EXPERIMENTAL Hypnotoad web server.
-  - Added EXPERIMENTAL built-in exception and not_found templates.
+  - Added EXPERIMENTAL built-in exception and not found templates.
   - Added put and del functions to Mojolicious::Lite.
   - Added on_idle and on_tick event handlers to Mojo::IOLoop.
   - Added "*" query support to the Mojo::IOLoop resolver.

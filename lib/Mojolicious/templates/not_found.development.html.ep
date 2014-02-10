@@ -76,8 +76,8 @@
         <p>
           None of these routes could generate a response for your
           <code><%= $self->req->method %></code> request for
-          <code><%= $self->req->url->path %></code>, maybe you need to add a
-          new one?
+          <code><%= $self->req->url->path->to_route %></code>, maybe you need
+          to add a new one?
         </p>
         % my $walk = begin
           % my ($walk, $route, $depth) = @_;

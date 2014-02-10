@@ -1010,8 +1010,8 @@ plugin.
 
 Adding a configuration file to your application is as easy as adding a file to
 its home directory and loading the plugin L<Mojolicious::Plugin::Config>. The
-default name is the same as that of your application script (C<myapp.pl>), but
-with a C<.conf> extension (C<myapp.conf>).
+default name is based on L<Mojolicious/"moniker">, appended with a C<.conf>
+extension (C<myapp.conf>).
 
   $ echo '{name => "my Mojolicious application"};' > myapp.conf
 
@@ -1037,7 +1037,7 @@ the helper L<Mojolicious::Plugin::DefaultHelpers/"config">
     <body>Welcome to <%= config 'name' %></body>
   </html>
 
-Alternatively you can also have configuration files in the JSON format with
+Alternatively you can also use configuration files in the JSON format with
 L<Mojolicious::Plugin::JSONConfig>.
 
 =head1 ADVANCED

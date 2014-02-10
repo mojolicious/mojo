@@ -97,8 +97,8 @@ L<Mojolicious::Plugin::Config> is a Perl-ish configuration plugin.
 
 The application object can be accessed via C<$app> or the C<app> function,
 L<strict>, L<warnings>, L<utf8> and Perl 5.10 features are automatically
-enabled. You can extend the normal configuration file C<myapp.conf> with
-C<mode> specific ones like C<myapp.$mode.conf>. A default configuration
+enabled. You can extend the normal configuration file C<$moniker.conf> with
+C<mode> specific ones like C<$moniker.$mode.conf>. A default configuration
 filename will be generated from the value of L<Mojolicious/"moniker">.
 
 The code of this plugin is a good example for learning to build new plugins,
@@ -132,7 +132,7 @@ File extension for generated configuration filenames, defaults to C<conf>.
   plugin Config => {file => '/etc/foo.stuff'};
 
 Full path to configuration file, defaults to the value of the MOJO_CONFIG
-environment variable or C<myapp.conf> in the application home directory.
+environment variable or C<$moniker.conf> in the application home directory.
 
 =head1 METHODS
 

@@ -1010,9 +1010,13 @@ plugin.
 
 Adding a configuration file to your application is as easy as adding a file to
 its home directory and loading the plugin L<Mojolicious::Plugin::Config>. The
-default name is based on L<Mojolicious/"moniker">, appended with a C<.conf>
-extension (C<myapp.conf>).
+default name is based on the value of L<Mojolicious/"moniker"> (C<myapp>),
+appended with a C<.conf> extension (C<myapp.conf>).
 
+  $ mkdir myapp
+  $ cd myapp
+  $ touch myapp.pl
+  $ chmod 744 myapp.pl
   $ echo '{name => "my Mojolicious application"};' > myapp.conf
 
 Configuration files themselves are just Perl scripts that return a hash

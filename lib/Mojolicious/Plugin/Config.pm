@@ -6,7 +6,7 @@ use Mojo::Util qw(decode slurp);
 
 sub load {
   my ($self, $file, $conf, $app) = @_;
-  $app->log->debug(qq{Reading config file "$file".});
+  $app->log->debug(qq{Reading configuration file "$file".});
   return $self->parse(decode('UTF-8', slurp $file), $file, $conf, $app);
 }
 
@@ -18,7 +18,7 @@ sub parse {
     = eval 'package Mojolicious::Plugin::Config::Sandbox; no warnings;'
     . "sub app; local *app = sub { \$app }; use Mojo::Base -strict; $content";
   die qq{Couldn't load configuration from file "$file": $@} if !$config && $@;
-  die qq{Config file "$file" did not return a hash reference.\n}
+  die qq{Configuration file "$file" did not return a hash reference.\n}
     unless ref $config eq 'HASH';
 
   return $config;
@@ -45,7 +45,7 @@ sub register {
 
   # Check for default and mode specific config file
   elsif (!$conf->{default} && !$mode) {
-    die qq{Config file "$file" missing, maybe you need to create it?\n};
+    die qq{Configuration file "$file" missing, maybe you need to create it?\n};
   }
 
   # Merge everything

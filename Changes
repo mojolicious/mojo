@@ -1,5 +1,5 @@
 
-4.79  2014-02-10
+4.79  2014-02-11
   - Improved not found page to show the exact path used for route matching.
 
 4.78  2014-02-08
@@ -888,8 +888,8 @@
 3.35  2012-08-28
   - Deprecated Mojolicious::Controller::render_content in favor of content
     helper.
-  - Improved Mojolicious::Plugin::Config to accept mode specific config files
-    without a normal config file. (alexbyk, sri)
+  - Improved Mojolicious::Plugin::Config to accept mode specific configuration
+    files without a normal configuration file. (alexbyk, sri)
 
 3.34  2012-08-24
   - Improved documentation.
@@ -1025,11 +1025,12 @@
   - Fixed small Mojo::Template bug.
 
 3.07  2012-07-13
-  - Improved template error messages for generator commands and config files.
+  - Improved template error messages for generator commands and configuration
+    files.
   - Fixed small bug in Mojolicious::Plugin::EPRenderer that prevented code to
     be added to templates.
   - Fixed small bug in Mojolicious::Plugin::JSONConfig that prevented code to
-    be added to config files.
+    be added to configuration files.
 
 3.06  2012-07-11
   - Added tls_verify option to Mojo::IOLoop::Server::listen. (scottw)
@@ -1140,7 +1141,7 @@
   - Added remove method to Mojolicious::Routes::Route.
   - Improved 32bit Perl support of Mojo::Transaction::WebSocket.
     (mikemagowan, sri)
-  - Improved exception handling of application and config file loaders.
+  - Improved exception handling of application and configuration file loaders.
   - Improved exception handling of Mojolicious::Plugin::I18N.
   - Improved renderer log messages.
   - Fixed bug that prevented helper names from starting with "end". (Akron)

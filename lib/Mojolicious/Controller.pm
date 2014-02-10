@@ -770,6 +770,9 @@ using a C<200> response code.
   $self->res->body('Hello World!');
   $self->rendered(200);
 
+  # Accept WebSocket handshake without subscribing to an event
+  $self->rendered(101);
+
 =head2 req
 
   my $req = $c->req;

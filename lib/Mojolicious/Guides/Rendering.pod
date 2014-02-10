@@ -1006,44 +1006,6 @@ plugin.
   @@ alertassets.html.ep
   %= javascript "/alertassets.js"
 
-=head2 Adding a configuration file
-
-Adding a configuration file to your application is as easy as adding a file to
-its home directory and loading the plugin L<Mojolicious::Plugin::Config>. The
-default name is based on the value of L<Mojolicious/"moniker"> (C<myapp>),
-appended with a C<.conf> extension (C<myapp.conf>).
-
-  $ mkdir myapp
-  $ cd myapp
-  $ touch myapp.pl
-  $ chmod 744 myapp.pl
-  $ echo '{name => "my Mojolicious application"};' > myapp.conf
-
-Configuration files themselves are just Perl scripts that return a hash
-reference, all settings are available through the method L<Mojo/"config"> and
-the helper L<Mojolicious::Plugin::DefaultHelpers/"config">
-
-  use Mojolicious::Lite;
-
-  plugin 'Config';
-
-  my $name = app->config('name');
-  app->log->debug("Welcome to $name.");
-
-  get '/' => 'with_config';
-
-  app->start;
-  __DATA__
-  @@ with_config.html.ep
-  <!DOCTYPE html>
-  <html>
-    <head><title><%= config 'name' %></title></head>
-    <body>Welcome to <%= config 'name' %></body>
-  </html>
-
-Alternatively you can also use configuration files in the JSON format with
-L<Mojolicious::Plugin::JSONConfig>.
-
 =head1 ADVANCED
 
 Less commonly used and more powerful features.

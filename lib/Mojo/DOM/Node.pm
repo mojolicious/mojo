@@ -2,6 +2,8 @@ package Mojo::DOM::Node;
 use Mojo::Base -base;
 use overload bool => sub {1}, '""' => sub { shift->content }, fallback => 1;
 
+use Mojo::DOM;
+
 has [qw(parent tree)];
 
 sub content {
@@ -11,7 +13,11 @@ sub content {
   return $self;
 }
 
+sub next_sibling { Mojo::DOM::_siblings(shift, 0, 1)->[1][0] }
+
 sub node { shift->tree->[0] }
+
+sub previous_sibling { Mojo::DOM::_siblings(shift, 0, 1)->[0][-1] }
 
 sub remove {
   my $self = shift;
@@ -75,12 +81,26 @@ following new ones.
 
 Return or replace this node's content.
 
+=head2 next_sibling
+
+  my $sibling = $node->next_sibling;
+
+Return L<Mojo::DOM> or L<Mojo::DOM::Node> object for next sibling node or
+C<undef> if there are no more siblings.
+
 =head2 node
 
   my $type = $node->node;
 
 This node's type, usually C<cdata>, C<comment>, C<doctype>, C<pi>, C<raw> or
 C<text>.
+
+=head2 previous_sibling
+
+  my $sibling = $node->previous_sibling;
+
+Return L<Mojo::DOM> or L<Mojo::DOM::Node> object for previous sibling node or
+C<undef> if there are no more siblings.
 
 =head2 remove
 

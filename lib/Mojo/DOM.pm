@@ -117,7 +117,8 @@ sub new {
   return @_ ? $self->parse(@_) : $self;
 }
 
-sub next { shift->_siblings->[1][0] }
+sub next { _siblings(shift)->[1][0] }
+sub next_sibling { _siblings(shift, 0, 1)->[1][0] }
 
 sub node { shift->tree->[0] }
 
@@ -133,7 +134,8 @@ sub prepend { shift->_add(0, @_) }
 
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous { shift->_siblings->[0][-1] }
+sub previous { _siblings(shift)->[0][-1] }
+sub previous_sibling { _siblings(shift, 0, 1)->[0][-1] }
 
 sub remove { shift->replace('') }
 
@@ -328,13 +330,13 @@ sub _select {
 }
 
 sub _siblings {
-  my ($self, $merge) = @_;
+  my ($start, $merge, $all) = @_;
 
-  return $merge ? [] : [[], []] unless my $parent = $self->parent;
+  return $merge ? [] : [[], []] unless my $parent = $start->parent;
 
-  my $tree = $self->tree;
+  my $tree = $start->tree;
   my (@before, @after, $match);
-  for my $child ($parent->children->each) {
+  for my $child ($all ? $parent->contents->each : $parent->children->each) {
     ++$match and next if $child->tree eq $tree;
     $match ? push @after, $child : push @before, $child;
   }
@@ -501,7 +503,7 @@ L<Mojo::DOM> implements the following methods.
 Return a L<Mojo::Collection> object containing all nodes in DOM structure as
 L<Mojo::DOM> and L<Mojo::DOM::Node> objects.
 
-  "<p><b>123</b></p>"
+  # "<p><b>123</b></p>"
   $dom->parse('<p><!-- test --><b>123<!-- 456 --></b></p>')
     ->all_contents->grep(sub { $_->node eq 'comment' })->remove->first;
 
@@ -608,7 +610,7 @@ fragment.
 Return a L<Mojo::Collection> object containing the child nodes of this element
 as L<Mojo::DOM> and L<Mojo::DOM::Node> objects.
 
-  "<p><b>123</b></p>"
+  # "<p><b>123</b></p>"
   $dom->parse('<p>test<b>123</b></p>')->at('p')->contents->first->remove;
 
 =head2 find
@@ -658,11 +660,22 @@ fragment if necessary.
 
   my $sibling = $dom->next;
 
-Return L<Mojo::DOM> object for next sibling of this element or C<undef> if
-there are no more siblings.
+Return L<Mojo::DOM> object for next sibling element or C<undef> if there are
+no more siblings.
 
   # "<h2>B</h2>"
   $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h1')->next;
+
+=head2 next_sibling
+
+  my $sibling = $dom->next_sibling;
+
+Return L<Mojo::DOM> or L<Mojo::DOM::Node> object for next sibling node or
+C<undef> if there are no more siblings.
+
+  # "456"
+  $dom->parse('<p><b>123</b><!-- test -->456</p>')->at('b')
+    ->next_sibling->next_sibling;
 
 =head2 node
 
@@ -708,11 +721,22 @@ Prepend HTML/XML fragment to this element's content.
 
   my $sibling = $dom->previous;
 
-Return L<Mojo::DOM> object for previous sibling of this element or C<undef> if
-there are no more siblings.
+Return L<Mojo::DOM> object for previous sibling element or C<undef> if there
+are no more siblings.
 
   # "<h1>A</h1>"
   $dom->parse('<div><h1>A</h1><h2>B</h2></div>')->at('h2')->previous;
+
+=head2 previous_sibling
+
+  my $sibling = $dom->previous_sibling;
+
+Return L<Mojo::DOM> or L<Mojo::DOM::Node> object for previous sibling node or
+C<undef> if there are no more siblings.
+
+  # "123"
+  $dom->parse('<p>123<!-- test --><b>456</b></p>')->at('b')
+    ->previous_sibling->previous_sibling;
 
 =head2 remove
 

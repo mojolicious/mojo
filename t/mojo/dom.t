@@ -145,6 +145,15 @@ ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 # Nodes
 $dom = Mojo::DOM->new(
   '<!DOCTYPE before><p>test<![CDATA[123]]><!-- 456 --></p><?after?>');
+is $dom->at('p')->previous_sibling->content, ' before', 'right content';
+is $dom->at('p')->previous_sibling->previous_sibling, undef,
+  'no more siblings';
+is $dom->at('p')->next_sibling->content,      'after', 'right content';
+is $dom->at('p')->next_sibling->next_sibling, undef,   'no more siblings';
+is $dom->at('p')->contents->[-1]->previous_sibling->previous_sibling->content,
+  'test', 'right content';
+is $dom->at('p')->contents->first->next_sibling->next_sibling->content,
+  ' 456 ', 'right content';
 is $dom->all_contents->[0]->node,    'doctype', 'right node';
 is $dom->all_contents->[0]->content, ' before', 'right content';
 is $dom->all_contents->[1]->type,    'p',       'right type';
@@ -1185,6 +1194,11 @@ is $dom->at('html > body')->text,         'bar', 'right text';
 # Optional "li" tag
 $dom = Mojo::DOM->new->parse(<<EOF);
 <ul>
+  <li>
+    <ol>
+      <li>F
+      <li>G
+    </ol>
   <li>A</li>
   <LI>B
   <li>C</li>
@@ -1192,11 +1206,13 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   <li>E
 </ul>
 EOF
-is $dom->find('ul > li')->[0]->text, 'A', 'right text';
-is $dom->find('ul > li')->[1]->text, 'B', 'right text';
-is $dom->find('ul > li')->[2]->text, 'C', 'right text';
-is $dom->find('ul > li')->[3]->text, 'D', 'right text';
-is $dom->find('ul > li')->[4]->text, 'E', 'right text';
+is $dom->find('ul > li > ol > li')->[0]->text, 'F', 'right text';
+is $dom->find('ul > li > ol > li')->[1]->text, 'G', 'right text';
+is $dom->find('ul > li')->[1]->text,           'A', 'right text';
+is $dom->find('ul > li')->[2]->text,           'B', 'right text';
+is $dom->find('ul > li')->[3]->text,           'C', 'right text';
+is $dom->find('ul > li')->[4]->text,           'D', 'right text';
+is $dom->find('ul > li')->[5]->text,           'E', 'right text';
 
 # Optional "p" tag
 $dom = Mojo::DOM->new->parse(<<EOF);

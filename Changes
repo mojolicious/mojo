@@ -1,5 +1,8 @@
 
 4.80  2014-02-12
+  - Added next_sibling and previous_sibling methods to Mojo::DOM.
+  - Added next_sibling and previous_sibling methods to Mojo::DOM::Node.
+  - Fixed list parsing bug in Mojo::DOM::HTML.
 
 4.79  2014-02-11
   - Improved not found page to show request information and the exact path

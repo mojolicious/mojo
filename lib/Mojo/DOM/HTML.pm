@@ -156,12 +156,12 @@ sub parse {
 sub render { _render($_[0]->tree, $_[0]->xml) }
 
 sub _close {
-  my ($xml, $current, $allowed, $scope) = @_;
+  my ($current, $allowed, $scope) = @_;
 
   # Close allowed parent elements in scope
   my $parent = $$current;
-  while ($parent->[0] ne 'root' && $parent->[1] ne $scope) {
-    _end($parent->[1], $xml, $current) if $allowed->{$parent->[1]};
+  while ($parent->[0] ne 'root' && !$scope->{$parent->[1]}) {
+    _end($parent->[1], 0, $current) if $allowed->{$parent->[1]};
     $parent = $parent->[3];
   }
 }
@@ -192,10 +192,7 @@ sub _end {
     $next = $$current->[3];
 
     # Match
-    if ($end eq $$current->[1]) { return $$current = $$current->[3] }
-
-    # Table
-    elsif ($end eq 'table') { _close($xml, $current, \%TABLE, $end) }
+    return $$current = $$current->[3] if $end eq $$current->[1];
 
     # Missing end tag
     _end($$current->[1], $xml, $current);
@@ -270,19 +267,19 @@ sub _start {
     if (my $end = $END{$start}) { _end($_, 0, $current) for @$end }
 
     # "li"
-    elsif ($start eq 'li') { _close(0, $current, {li => 1}, 'ul') }
+    elsif ($start eq 'li') { _close($current, {li => 1}, {ul => 1, ol => 1}) }
 
     # "colgroup", "thead", "tbody" and "tfoot"
     elsif ($start eq 'colgroup' || $start =~ /^t(?:head|body|foot)$/) {
-      _close(0, $current, \%TABLE, 'table');
+      _close($current, \%TABLE, {table => 1});
     }
 
     # "tr"
-    elsif ($start eq 'tr') { _close(0, $current, {tr => 1}, 'table') }
+    elsif ($start eq 'tr') { _close($current, {tr => 1}, {table => 1}) }
 
     # "th" and "td"
     elsif ($start eq 'th' || $start eq 'td') {
-      _close(0, $current, {$_ => 1}, 'table') for qw(th td);
+      _close($current, {$_ => 1}, {table => 1}) for qw(th td);
     }
   }
 

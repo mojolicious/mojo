@@ -191,7 +191,7 @@ sub _stylesheet {
   # "link" or "style" tag
   my $href = @_ % 2 ? $self->url_for(shift) : undef;
   return $href
-    ? _tag('link', rel => 'stylesheet', href => $href, @_)
+    ? _tag('link', rel => 'stylesheet', href => $href, type=>"text/css", @_)
     : _tag('style', @_, $cb);
 }
 

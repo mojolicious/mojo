@@ -308,10 +308,10 @@ is $json->encode({test => [$num, $str]}), '{"test":[1,0]}',
   'upgraded number detected';
 
 # Ensure numbers and strings are not upgraded
-my @values = (3, 'three', '3');
-is $json->encode(\@values), '[3,"three","3"]',
+my $mixed = [3, 'three', '3', 0, "0"];
+is $json->encode($mixed), '[3,"three","3",0,"0"]',
   'all have been detected correctly';
-is $json->encode(\@values), '[3,"three","3"]',
+is $json->encode($mixed), '[3,"three","3",0,"0"]',
   'all have been detected correctly again';
 
 # "inf" and "nan"

@@ -420,8 +420,7 @@ sub _development {
     status   => $page eq 'exception' ? 500 : 404
   };
   $options->{exception} = $e if $page eq 'exception';
-  my $inline
-    = $renderer->_bundled($mode eq 'development' ? 'development' : $page);
+  my $inline = $renderer->_bundled($mode eq 'development' ? $mode : $page);
   return $self if _fallbacks($self, $options, $page, $inline);
   _fallbacks($self, {%$options, format => 'html'}, $page, $inline);
   return $self;

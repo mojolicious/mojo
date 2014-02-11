@@ -575,7 +575,7 @@ arguments as L<Mojo::UserAgent/"delete">, except for the callback.
   $t = $t->element_exists('html head title', 'has a title');
 
 Checks for existence of the CSS selectors first matching HTML/XML element with
-L<Mojo::DOM>.
+L<Mojo::DOM/"at">.
 
 =head2 element_exists_not
 
@@ -876,7 +876,7 @@ Opposite of L</"status_is">.
   $t = $t->text_is('html head title' => 'Hello!', 'right title');
 
 Checks text content of the CSS selectors first matching HTML/XML element for
-exact match with L<Mojo::DOM>.
+exact match with L<Mojo::DOM/"at">.
 
 =head2 text_isnt
 
@@ -891,7 +891,7 @@ Opposite of L</"text_is">.
   $t = $t->text_like('html head title' => qr/Hello/, 'right title');
 
 Checks text content of the CSS selectors first matching HTML/XML element for
-similar match with L<Mojo::DOM>.
+similar match with L<Mojo::DOM/"at">.
 
 =head2 text_unlike
 

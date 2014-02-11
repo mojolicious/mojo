@@ -413,13 +413,13 @@ sub _development {
   my $mode     = $app->mode;
   my $renderer = $app->renderer;
   my $options  = {
-    snapshot => \%snapshot,
-    template => "$page.$mode",
-    format   => $stash->{format} || $renderer->default_format,
+    exception => $page eq 'exception' ? $e : undef,
+    format => $stash->{format} || $renderer->default_format,
     handler  => undef,
-    status   => $page eq 'exception' ? 500 : 404
+    snapshot => \%snapshot,
+    status   => $page eq 'exception' ? 500 : 404,
+    template => "$page.$mode"
   };
-  $options->{exception} = $e if $page eq 'exception';
   my $inline = $renderer->_bundled($mode eq 'development' ? $mode : $page);
   return $self if _fallbacks($self, $options, $page, $inline);
   _fallbacks($self, {%$options, format => 'html'}, $page, $inline);

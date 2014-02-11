@@ -25,8 +25,8 @@ helper dead_helper => sub { die "dead helper!\n" };
 hook before_render => sub {
   my ($self, $args) = @_;
   return unless ($args->{template} // '') eq 'not_found';
-  my $format = $self->stash('snapshot')->{format};
-  $args->{text} = "Missing $format template." if $args->{format} eq 'txt';
+  my $exception = $self->stash('snapshot')->{exception};
+  $args->{text} = "Missing template, $exception." if $args->{format} eq 'txt';
 };
 
 # Custom exception rendering for "txt"
@@ -63,7 +63,7 @@ get '/trapped' => sub {
   $self->render(text => $@->{foo} || 'failed');
 };
 
-get '/missing_template';
+get '/missing_template' => {exception => 'whatever'};
 
 get '/missing_template/too' => sub {
   my $self = shift;
@@ -216,7 +216,7 @@ $t->get_ok('/missing_template.json')->status_is(404)
 # Missing template with custom rendering
 $t->get_ok('/missing_template.txt')->status_is(404)
   ->content_type_is('text/plain;charset=UTF-8')
-  ->content_is('Missing txt template.');
+  ->content_is('Missing template, whatever.');
 
 # Missing template (failed rendering)
 $t->get_ok('/missing_template/too')->status_is(404)

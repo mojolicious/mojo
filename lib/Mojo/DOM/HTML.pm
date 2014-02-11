@@ -170,33 +170,19 @@ sub _end {
   my ($end, $xml, $current) = @_;
 
   # Search stack for start tag
-  my $found = 0;
-  my $next  = $$current;
-  while ($next->[0] ne 'root') {
+  my $next = $$current;
+  do {
+
+    # Ignore useless end tag
+    return if $next->[0] eq 'root';
 
     # Right tag
-    ++$found and last if $next->[1] eq $end;
+    return $$current = $next->[3] if $next->[1] eq $end;
 
     # Phrasing content can only cross phrasing content
     return if !$xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
 
-    $next = $next->[3];
-  }
-
-  # Ignore useless end tag
-  return unless $found;
-
-  # Walk backwards
-  $next = $$current;
-  while (($$current = $next) && $$current->[0] ne 'root') {
-    $next = $$current->[3];
-
-    # Match
-    return $$current = $$current->[3] if $end eq $$current->[1];
-
-    # Missing end tag
-    _end($$current->[1], $xml, $current);
-  }
+  } while $next = $next->[3];
 }
 
 sub _render {

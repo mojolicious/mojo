@@ -1,6 +1,7 @@
 
 4.79  2014-02-11
-  - Improved not found page to show the exact path used for route matching.
+  - Improved not found page to show request information and the exact path
+    used for route matching.
 
 4.78  2014-02-08
   - Deprecated Mojo::Util::get_line.

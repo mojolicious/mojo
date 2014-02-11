@@ -172,55 +172,13 @@ sub render {
   return !!$self->rendered($self->stash->{status});
 }
 
-sub render_exception {
-  my ($self, $e) = @_;
-
-  my $app = $self->app;
-  $app->log->error($e = Mojo::Exception->new($e));
-
-  # Filtered stash snapshot
-  my $stash = $self->stash;
-  my %snapshot = map { $_ => $stash->{$_} }
-    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
-
-  # Render with fallbacks
-  my $mode     = $app->mode;
-  my $renderer = $app->renderer;
-  my $options  = {
-    exception => $e,
-    snapshot  => \%snapshot,
-    template  => "exception.$mode",
-    format    => $stash->{format} || $renderer->default_format,
-    handler   => undef,
-    status    => 500
-  };
-  my $inline = $renderer->_bundled(
-    $mode eq 'development' ? 'exception.development' : 'exception');
-  return $self if _fallbacks($self, $options, 'exception', $inline);
-  _fallbacks($self, {%$options, format => 'html'}, 'exception', $inline);
-  return $self;
-}
+sub render_exception { _development('exception', @_) }
 
 sub render_later { shift->stash('mojo.rendered' => 1) }
 
 sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
-sub render_not_found {
-  my $self = shift;
-
-  # Render with fallbacks
-  my $app      = $self->app;
-  my $mode     = $app->mode;
-  my $renderer = $app->renderer;
-  my $format   = $self->stash->{format} || $renderer->default_format;
-  my $options
-    = {template => "not_found.$mode", format => $format, status => 404};
-  my $inline = $renderer->_bundled(
-    $mode eq 'development' ? 'not_found.development' : 'not_found');
-  return $self if _fallbacks($self, $options, 'not_found', $inline);
-  _fallbacks($self, {%$options, format => 'html'}, 'not_found', $inline);
-  return $self;
-}
+sub render_not_found { _development('not_found', @_) }
 
 sub render_static {
   my ($self, $file) = @_;
@@ -438,6 +396,35 @@ sub write_chunk {
   my $content = $self->res->content;
   $content->write_chunk($chunk => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered;
+}
+
+sub _development {
+  my ($page, $self, $e) = @_;
+
+  my $app = $self->app;
+  $app->log->error($e = Mojo::Exception->new($e)) if $page eq 'exception';
+
+  # Filtered stash snapshot
+  my $stash = $self->stash;
+  my %snapshot = map { $_ => $stash->{$_} }
+    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
+
+  # Render with fallbacks
+  my $mode     = $app->mode;
+  my $renderer = $app->renderer;
+  my $options  = {
+    snapshot => \%snapshot,
+    template => "$page.$mode",
+    format   => $stash->{format} || $renderer->default_format,
+    handler  => undef,
+    status   => $page eq 'exception' ? 500 : 404
+  };
+  $options->{exception} = $e if $page eq 'exception';
+  my $inline
+    = $renderer->_bundled($mode eq 'development' ? 'development' : $page);
+  return $self if _fallbacks($self, $options, $page, $inline);
+  _fallbacks($self, {%$options, format => 'html'}, $page, $inline);
+  return $self;
 }
 
 sub _fallbacks {
@@ -746,7 +733,9 @@ could be generated, takes the same arguments as L</"render">.
   $c = $c->render_not_found;
 
 Render the not found template C<not_found.$mode.$format.*> or
-C<not_found.$format.*> and set the response status code to C<404>.
+C<not_found.$format.*> and set the response status code to C<404>. Also sets
+the stash value C<snapshot> to a copy of the L</"stash"> for use in the
+templates.
 
 =head2 render_static
 

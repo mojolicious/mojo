@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Server error (<%= app->mode %> mode)</title>
+    % my $title = stash('exception') ? 'Server error' : 'Page not found';
+    <title><%= $title %> (<%= app->mode %> mode)</title>
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="-1">
     %= javascript '/mojo/jquery/jquery.js'
@@ -15,6 +16,19 @@
         font: 0.9em 'Helvetica Neue', Helvetica, sans-serif;
         font-weight: normal;
         line-height: 1.5em;
+        margin: 0;
+      }
+      code {
+        background-color: #eef9ff;
+        border: solid #cce4ff 1px;
+        border-radius: 5px;
+        color: #333;
+        font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
+        padding: 0.4em;
+      }
+      h1 {
+        color: #2a2a2a;
+        font-size: 1.5em;
         margin: 0;
       }
       pre {
@@ -54,10 +68,8 @@
         font: 0.5em Verdana, sans-serif;
         text-align: center;
       }
-      .value {
-        padding-left: 1em;
-        width: 100%;
-      }
+      .value { padding-left: 1em }
+      .wide { width: 100% }
       #footer {
         padding-top: 1em;
         text-align: center;
@@ -90,6 +102,11 @@
         border-top-right-radius: 5px;
         margin-top: 1em;
       }
+      #routes {
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        padding-top: 70px;
+      }
       #wrapperlicious {
         max-width: 1000px;
         margin: 0 auto;
@@ -114,82 +131,127 @@
       });
     % end
     <div id="wrapperlicious">
-      <div id="nothing" class="box spaced"></div>
-      % my $cv = begin
-        % my ($key, $value, $i) = @_;
-        %= tag 'tr', $i ? (class => 'important') : undef, begin
-          <td class="key"><%= $key %></td>
-          <td class="value"><pre class="prettyprint"><%= $value %></pre></td>
-        % end
-      % end
       % my $kv = begin
         % my ($key, $value) = @_;
         <tr>
           <td class="key"><%= $key %>:</td>
-          <td class="striped value"><pre><%= $value %></pre></td>
+          <td class="striped value wide"><pre><%= $value %></pre></td>
         </tr>
       % end
-      <div id="showcase" class="box code spaced">
-        <pre><%= $exception->message %></pre>
-        <div id="context" class="more">
-          <table>
-            % for my $line (@{$exception->lines_before}) {
-              %= $cv->($line->[0], $line->[1])
-            % }
-            % if (defined $exception->line->[1]) {
-              %= $cv->($exception->line->[0], $exception->line->[1], 1)
-            % }
-            % for my $line (@{$exception->lines_after}) {
-              %= $cv->($line->[0], $line->[1])
-            % }
-          </table>
-        </div>
-        % if (defined $exception->line->[2]) {
-          <div id="insight" class="more">
+      % if (my $exception = stash 'exception') {
+        <div id="nothing" class="box spaced"></div>
+        % my $cv = begin
+          % my ($key, $value, $i) = @_;
+          %= tag 'tr', $i ? (class => 'important') : undef, begin
+            <td class="key"><%= $key %></td>
+            <td class="value wide">
+              <pre class="prettyprint"><%= $value %></pre>
+            </td>
+          % end
+        % end
+        <div id="showcase" class="box code spaced">
+          <pre><%= $exception->message %></pre>
+          <div id="context" class="more">
             <table>
               % for my $line (@{$exception->lines_before}) {
-                %= $cv->($line->[0], $line->[2])
+                %= $cv->($line->[0], $line->[1])
               % }
-              %= $cv->($exception->line->[0], $exception->line->[2], 1)
+              % if (defined $exception->line->[1]) {
+                %= $cv->($exception->line->[0], $exception->line->[1], 1)
+              % }
               % for my $line (@{$exception->lines_after}) {
-                %= $cv->($line->[0], $line->[2])
+                %= $cv->($line->[0], $line->[1])
               % }
             </table>
           </div>
-          <div class="tap">tap for more</div>
-          %= javascript begin
-            var current = '#context';
-            $('#showcase').click(function() {
-              $(current).slideToggle('slow', function() {
-                if (current == '#context') {
-                  current = '#insight';
-                }
-                else {
-                  current = '#context';
-                }
-                $(current).slideToggle('slow');
+          % if (defined $exception->line->[2]) {
+            <div id="insight" class="more">
+              <table>
+                % for my $line (@{$exception->lines_before}) {
+                  %= $cv->($line->[0], $line->[2])
+                % }
+                %= $cv->($exception->line->[0], $exception->line->[2], 1)
+                % for my $line (@{$exception->lines_after}) {
+                  %= $cv->($line->[0], $line->[2])
+                % }
+              </table>
+            </div>
+            <div class="tap">tap for more</div>
+            %= javascript begin
+              var current = '#context';
+              $('#showcase').click(function() {
+                $(current).slideToggle('slow', function() {
+                  if (current == '#context') {
+                    current = '#insight';
+                  }
+                  else {
+                    current = '#context';
+                  }
+                  $(current).slideToggle('slow');
+                });
               });
-            });
-            $('#insight').toggle();
+              $('#insight').toggle();
+            % end
+          % }
+        </div>
+        <div id="trace" class="box spaced">
+          % if (@{$exception->frames}) {
+            <div id="frames" class="infobox more">
+              <table>
+                % for my $frame (@{$exception->frames}) {
+                  <tr>
+                    <td class="striped value wide">
+                      <pre><%= $frame->[1] . ':' . $frame->[2] %></pre>
+                    </td>
+                  </tr>
+                % }
+              </table>
+            </div>
+            <div class="tap">tap for more</div>
+          % }
+        </div>
+      % }
+      % else {
+        <div id="routes" class="box infobox spaced">
+          <h1>Page not found... yet!</h1>
+          <p>
+            None of these routes could generate a response for your
+            <code><%= $self->req->method %></code> request for
+            <code><%= $self->req->url->path->to_route %></code>, maybe you need
+            to add a new one?
+          </p>
+          % my $walk = begin
+            % my ($walk, $route, $depth) = @_;
+            <tr>
+              <td class="striped value">
+                % my $pattern = $route->pattern->pattern || '/';
+                % $pattern = "+$pattern" if $depth;
+                <pre><%= '  ' x $depth %><%= $pattern %></pre>
+              </td>
+              <td class="striped value">
+                <pre><%= uc(join ',', @{$route->via || []}) || '*' %></pre>
+              </td>
+              <td class="striped value">
+                % my $name = $route->name;
+                <pre><%= $route->has_custom_name ? qq{"$name"} : $name %></pre>
+              </td>
+            </tr>
+            % $depth++;
+            %= $walk->($walk, $_, $depth) for @{$route->children};
+            % $depth--;
           % end
-        % }
-      </div>
-      <div id="trace" class="box spaced">
-        % if (@{$exception->frames}) {
-          <div id="frames" class="infobox more">
-            <table>
-              % for my $frame (@{$exception->frames}) {
-                <tr>
-                  <td class="striped value">
-                    <pre><%= $frame->[1] . ':' . $frame->[2] %></pre>
-                  </td>
-                </tr>
-              % }
-            </table>
-          </div>
-          <div class="tap">tap for more</div>
-        % }
-      </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Pattern</th>
+                <th>Methods</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            %= $walk->($walk, $_, 0) for @{app->routes->children};
+          </table>
+        </div>
+      % }
       <div id="request" class="box infobox spaced">
         <table>
           % my $req = $self->req;
@@ -238,7 +300,7 @@
               % $time = localtime $time;
               % my $lines = join "\n", @lines;
               <tr>
-                <td class="striped value">
+                <td class="striped value wide">
                   <pre>[<%= $time %>] [<%= $level %>] <%= $lines %></pre>
                 </td>
               </tr>

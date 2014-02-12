@@ -554,7 +554,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   $dom = $dom->append('<p>I ♥ Mojolicious!</p>');
 
-Append new content to this node.
+Append HTML/XML fragment to this node.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
@@ -735,7 +735,7 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   $dom = $dom->prepend('<p>I ♥ Mojolicious!</p>');
 
-Prepend new content to this node.
+Prepend HTML/XML fragment to this node.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;

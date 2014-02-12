@@ -482,7 +482,7 @@ Mojo::DOM - Minimalistic HTML/XML DOM parser with CSS selectors
   }
 
   # Modify
-  $dom->div->p->[1]->append('<p id="c">C</p>');
+  $dom->div->p->last->append('<p id="c">C</p>');
   $dom->find(':not(p)')->strip;
 
   # Render

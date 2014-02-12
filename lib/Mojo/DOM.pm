@@ -554,7 +554,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
 
   $dom = $dom->append('<p>I ♥ Mojolicious!</p>');
 
-Append HTML/XML fragment to this node.
+Append new content to this node.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
@@ -566,7 +566,7 @@ Append HTML/XML fragment to this node.
 
   $dom = $dom->append_content('<p>I ♥ Mojolicious!</p>');
 
-Append HTML/XML fragment to this node's content.
+Append new content to this node's content.
 
   # "<div><h1>AB</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
@@ -614,7 +614,7 @@ All selectors from L<Mojo::DOM::CSS/"SELECTORS"> are supported.
   my $str = $dom->content;
   $dom    = $dom->content('<p>I ♥ Mojolicious!</p>');
 
-Render this node's content to HTML/XML or replace it with HTML/XML fragment.
+Return this node's content or replace it with new content.
 
   # "<b>test</b>"
   $dom->parse('<div><b>test</b></div>')->div->content;
@@ -732,7 +732,7 @@ Parse HTML/XML fragment with L<Mojo::DOM::HTML>.
 
   $dom = $dom->prepend('<p>I ♥ Mojolicious!</p>');
 
-Prepend HTML/XML fragment to this node.
+Prepend new content to this node.
 
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
@@ -744,7 +744,7 @@ Prepend HTML/XML fragment to this node.
 
   $dom = $dom->prepend_content('<p>I ♥ Mojolicious!</p>');
 
-Prepend HTML/XML fragment to this node's content.
+Prepend new content to this node's content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;

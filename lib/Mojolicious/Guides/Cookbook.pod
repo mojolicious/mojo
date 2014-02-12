@@ -1051,8 +1051,8 @@ WebSockets are not just for the server-side, you can use
 L<Mojo::UserAgent/"websocket"> to open new connections, which are always
 non-blocking. The handshake is a normal HTTP request with a few additional
 headers, it can even contain cookies, followed by a C<101> response from the
-server instructing our user agent to switch to the bi-directional WebSocket
-protocol.
+server notifying our user agent that the connection has been established and
+it can start using the bi-directional WebSocket protocol.
 
   use Mojo::UserAgent;
   use Mojo::IOLoop;

@@ -2,7 +2,6 @@
 4.80  2014-02-12
   - Merged Mojo::DOM::Node into Mojo::DOM.
   - Added next_sibling and previous_sibling methods to Mojo::DOM.
-  - Added next_sibling and previous_sibling methods to Mojo::DOM::Node.
   - Improved Mojo::DOM::HTML performance.
   - Fixed list parsing bug in Mojo::DOM::HTML.
 

@@ -267,12 +267,12 @@ sub _all_text {
 sub _ancestors {
   my ($self, $root) = @_;
 
-  my $node    = $self->node;
-  my $element = $node eq 'root' || $node eq 'tag';
-  my $tree    = $element ? $self->tree : ['tag', 'dummy', {}, $self->_parent];
+  return if $self->node eq 'root';
 
   my @ancestors;
-  push @ancestors, $tree while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
+  my $tree = $self->_parent;
+  do { push @ancestors, $tree }
+    while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
   return $root ? $ancestors[-1] : @ancestors[0 .. $#ancestors - 1];
 }
 
@@ -280,7 +280,7 @@ sub _collect {
   my $self = shift;
   my $xml  = $self->xml;
   return Mojo::Collection->new(
-    map { $_->[0] eq 'tag' ? _tag($self, $_, $xml) : _node($_, $self) } @_);
+    map { $_->[0] eq 'tag' ? _tag($self, $_, $xml) : _node($self, $_) } @_);
 }
 
 sub _content {
@@ -321,8 +321,9 @@ sub _link {
 }
 
 sub _node {
-  my $dom = Mojo::DOM->new->tree(shift);
-  $dom->[1] = shift;
+  my ($self, $tree) = @_;
+  my $dom = $self->new->xml($self->xml)->tree($tree);
+  $dom->[1] = $self;
   return $dom;
 }
 

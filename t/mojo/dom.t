@@ -212,6 +212,13 @@ is $dom->at('i')->contents->first->wrap_content('<b></b>')->root,
 is $dom->at('b')->contents->first->ancestors->type->join(','), 'b,i,script',
   'right result';
 
+# XML nodes
+$dom = Mojo::DOM->new->xml(1)->parse('<b>test</b>');
+ok $dom->at('b')->contents->first->xml, 'XML mode active';
+ok $dom->at('b')->contents->first->replace('<br>')->contents->first->xml,
+  'XML mode active';
+is "$dom", '<b><br /></b>', 'right result';
+
 # Treating nodes as elements
 $dom = Mojo::DOM->new('foo<b>bar</b>baz');
 is $dom->contents->first->contents->size,     0, 'no contents';

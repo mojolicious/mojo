@@ -39,20 +39,24 @@ is_deeply $dom->tree->[1][4][2], {a => 'b<c'}, 'right attributes';
 is $dom->tree->[1][4][3], $dom->tree->[1], 'right parent';
 is $dom->tree->[1][4][4][0], 'text', 'right element';
 is $dom->tree->[1][4][4][1], 'ju',   'right text';
-is $dom->tree->[1][4][5][0], 'tag',  'right element';
-is $dom->tree->[1][4][5][1], 'baz',  'right tag';
+is $dom->tree->[1][4][4][2], $dom->tree->[1][4], 'right parent';
+is $dom->tree->[1][4][5][0], 'tag', 'right element';
+is $dom->tree->[1][4][5][1], 'baz', 'right tag';
 is_deeply $dom->tree->[1][4][5][2], {a23 => undef}, 'right attributes';
 is $dom->tree->[1][4][5][3], $dom->tree->[1][4], 'right parent';
 is $dom->tree->[1][4][5][4][0], 'text', 'right element';
 is $dom->tree->[1][4][5][4][1], 's',    'right text';
+is $dom->tree->[1][4][5][4][2], $dom->tree->[1][4][5], 'right parent';
 is $dom->tree->[1][4][5][5][0], 'tag',  'right element';
 is $dom->tree->[1][4][5][5][1], 'bazz', 'right tag';
 is_deeply $dom->tree->[1][4][5][5][2], {}, 'empty attributes';
 is $dom->tree->[1][4][5][5][3], $dom->tree->[1][4][5], 'right parent';
 is $dom->tree->[1][4][5][6][0], 'text', 'right element';
 is $dom->tree->[1][4][5][6][1], 't',    'right text';
+is $dom->tree->[1][4][5][6][2], $dom->tree->[1][4][5], 'right parent';
 is $dom->tree->[1][5][0], 'text',  'right element';
 is $dom->tree->[1][5][1], 'works', 'right text';
+is $dom->tree->[1][5][2], $dom->tree->[1], 'right parent';
 is "$dom", <<EOF, 'right result';
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz></bazz>t</baz></bar>works</foo>
 EOF

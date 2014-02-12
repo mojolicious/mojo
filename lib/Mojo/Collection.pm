@@ -55,6 +55,8 @@ sub grep {
 
 sub join { Mojo::ByteStream->new(join $_[1] // '', map({"$_"} @{$_[0]})) }
 
+sub last { shift->[-1] }
+
 sub map {
   my ($self, $cb) = @_;
   return $self->new(map { $_->$cb } @$self);
@@ -214,6 +216,12 @@ argument passed to the callback and is also available as C<$_>.
 Turn collection into L<Mojo::ByteStream>.
 
   $collection->join("\n")->say;
+
+=head2 last
+
+  my $last = $collection->last;
+
+Return the last element in collection.
 
 =head2 map
 

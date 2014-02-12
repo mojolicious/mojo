@@ -150,7 +150,7 @@ is $dom->at('p')->previous_sibling->previous_sibling, undef,
   'no more siblings';
 is $dom->at('p')->next_sibling->content,      'after', 'right content';
 is $dom->at('p')->next_sibling->next_sibling, undef,   'no more siblings';
-is $dom->at('p')->contents->[-1]->previous_sibling->previous_sibling->content,
+is $dom->at('p')->contents->last->previous_sibling->previous_sibling->content,
   'test', 'right content';
 is $dom->at('p')->contents->first->next_sibling->next_sibling->content,
   ' 456 ', 'right content';
@@ -162,10 +162,10 @@ is $dom->all_contents->[2]->node,    'text',  'right node';
 is $dom->all_contents->[2]->content, 'test',  'right content';
 is $dom->all_contents->[5]->node,    'pi',    'right node';
 is $dom->all_contents->[5]->content, 'after', 'right content';
-is $dom->at('p')->all_contents->[0]->node,     'text',    'right node';
-is $dom->at('p')->all_contents->[0]->content,  'test',    'right node';
-is $dom->at('p')->all_contents->[-1]->node,    'comment', 'right node';
-is $dom->at('p')->all_contents->[-1]->content, ' 456 ',   'right node';
+is $dom->at('p')->all_contents->[0]->node,    'text', 'right node';
+is $dom->at('p')->all_contents->[0]->content, 'test', 'right node';
+is $dom->at('p')->all_contents->last->node,    'comment', 'right node';
+is $dom->at('p')->all_contents->last->content, ' 456 ',   'right node';
 is $dom->contents->[1]->contents->first->parent->type, 'p', 'right type';
 is $dom->contents->[1]->contents->first->content, 'test', 'right content';
 is $dom->contents->[1]->contents->first, 'test', 'right content';
@@ -865,14 +865,14 @@ is_deeply \@li, [qw(A C E G)], 'found all odd li elements';
 @li = ();
 $dom->find('li:nth-last-child(odd)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw(B D F H)], 'found all odd li elements';
-is $dom->find(':nth-child(odd)')->[0]->type,       'ul', 'right type';
-is $dom->find(':nth-child(odd)')->[1]->text,       'A',  'right text';
-is $dom->find(':nth-child(1)')->[0]->type,         'ul', 'right type';
-is $dom->find(':nth-child(1)')->[1]->text,         'A',  'right text';
-is $dom->find(':nth-last-child(odd)')->[0]->type,  'ul', 'right type';
-is $dom->find(':nth-last-child(odd)')->[-1]->text, 'H',  'right text';
-is $dom->find(':nth-last-child(1)')->[0]->type,    'ul', 'right type';
-is $dom->find(':nth-last-child(1)')->[1]->text,    'H',  'right text';
+is $dom->find(':nth-child(odd)')->[0]->type,      'ul', 'right type';
+is $dom->find(':nth-child(odd)')->[1]->text,      'A',  'right text';
+is $dom->find(':nth-child(1)')->[0]->type,        'ul', 'right type';
+is $dom->find(':nth-child(1)')->[1]->text,        'A',  'right text';
+is $dom->find(':nth-last-child(odd)')->[0]->type, 'ul', 'right type';
+is $dom->find(':nth-last-child(odd)')->last->text, 'H', 'right text';
+is $dom->find(':nth-last-child(1)')->[0]->type, 'ul', 'right type';
+is $dom->find(':nth-last-child(1)')->[1]->text, 'H',  'right text';
 @li = ();
 $dom->find('li:nth-child(2n+1)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw(A C E G)], 'found all odd li elements';

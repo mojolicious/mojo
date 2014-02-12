@@ -50,6 +50,10 @@ $collection = c();
 is $collection->first, undef, 'no result';
 is $collection->first(sub { defined $_ }), undef, 'no result';
 
+# last
+is c(5, 4, 3)->last, 3, 'right result';
+is c(5, 4, 3)->reverse->last, 5, 'right result';
+
 # grep
 $collection = c(1, 2, 3, 4, 5, 6, 7, 8, 9);
 is_deeply [$collection->grep(qr/[6-9]/)->each], [6, 7, 8, 9], 'right elements';

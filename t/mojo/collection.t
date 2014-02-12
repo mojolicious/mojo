@@ -53,6 +53,7 @@ is $collection->first(sub { defined $_ }), undef, 'no result';
 # last
 is c(5, 4, 3)->last, 3, 'right result';
 is c(5, 4, 3)->reverse->last, 5, 'right result';
+is c()->last, undef, 'no result';
 
 # grep
 $collection = c(1, 2, 3, 4, 5, 6, 7, 8, 9);

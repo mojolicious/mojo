@@ -744,7 +744,7 @@ Prepend HTML/XML fragment to this node.
 
   $dom = $dom->prepend_content('<p>I ♥ Mojolicious!</p>');
 
-Prepend HTML/XML fragment to this element's content.
+Prepend HTML/XML fragment to this node's content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;

@@ -162,12 +162,7 @@ sub replace_content {
 
 sub root {
   my $self = shift;
-
-  my $tree = $self->tree;
-  return $self->parent->root
-    unless $tree->[0] eq 'root' || $tree->[0] eq 'tag';
-
-  return $self unless $tree = $self->_ancestors(1);
+  return $self unless my $tree = $self->_ancestors(1);
   return _tag($self, $tree, $self->xml);
 }
 

@@ -2298,7 +2298,7 @@ is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
 # Slash between attributes
-$dom = Mojo::DOM->new('<input /type=checkbox/ value="/a/" checked/><br/>');
+$dom = Mojo::DOM->new('<input /type=checkbox/value="/a/" checked/><br/>');
 is_deeply $dom->at('input')->attr,
   {type => 'checkbox', value => '/a/', checked => undef}, 'right attributes';
 is "$dom", '<input checked type="checkbox" value="/a/"><br>', 'right result';

@@ -280,7 +280,10 @@ sub _content {
   my ($self, $start, $offset, $new) = @_;
 
   my $tree = $self->tree;
-  return $self unless $tree->[0] eq 'root' || $tree->[0] eq 'tag';
+  unless ($tree->[0] eq 'root' || $tree->[0] eq 'tag') {
+    my $old = $self->content;
+    return $self->content($start ? "$old$new" : "$new$old");
+  }
 
   $start  = $start  ? ($#$tree + 1) : _start($tree);
   $offset = $offset ? $#$tree       : 0;
@@ -563,10 +566,13 @@ Append HTML/XML fragment to this node.
 
   $dom = $dom->append_content('<p>I ♥ Mojolicious!</p>');
 
-Append HTML/XML fragment to this element's content.
+Append HTML/XML fragment to this node's content.
 
   # "<div><h1>AB</h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append_content('B')->root;
+
+  # "<!-- A B --><br>"
+  $dom->parse('<!-- A --><br>')->contents->first->append_content('B ')->root;
 
 =head2 at
 
@@ -618,6 +624,12 @@ Render this node's content to HTML/XML or replace it with HTML/XML fragment.
 
   # "<div><h1></h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->content('')->root;
+
+  # "A"
+  $dom->parse('<!-- A --><br>')->contents->first->content;
+
+  # "<!-- B --><br>"
+  $dom->parse('<!-- A --><br>')->contents->first->content(' B ')->root;
 
 =head2 contents
 
@@ -736,6 +748,9 @@ Prepend HTML/XML fragment to this element's content.
 
   # "<div><h2>AB</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend_content('A')->root;
+
+  # "<!-- A B --><br>"
+  $dom->parse('<!-- B --><br>')->contents->first->prepend_content(' A')->root;
 
 =head2 previous
 

@@ -215,6 +215,12 @@ is $dom->at('i')->contents->first->wrap_content('<b></b>')->root,
   '<script><i><b>:)</b>a</i><b>fce</b>1<b>d</b></script>', 'right result';
 is $dom->at('b')->contents->first->ancestors->type->join(','), 'b,i,script',
   'right result';
+is $dom->at('b')->contents->first->append_content('g')->content, ':)g',
+  'right content';
+is $dom->at('b')->contents->first->prepend_content('h')->content, 'h:)g',
+  'right content';
+is "$dom", '<script><i><b>h:)g</b>a</i><b>fce</b>1<b>d</b></script>',
+  'right result';
 
 # XML nodes
 $dom = Mojo::DOM->new->xml(1)->parse('<b>test</b>');
@@ -228,10 +234,6 @@ $dom = Mojo::DOM->new('foo<b>bar</b>baz');
 is $dom->contents->first->contents->size,     0, 'no contents';
 is $dom->contents->first->all_contents->size, 0, 'no contents';
 is $dom->contents->first->children->size,     0, 'no children';
-is $dom->contents->first->append_content('test')->parent, 'foo<b>bar</b>baz',
-  'no changes';
-is $dom->contents->first->prepend_content('test')->parent, 'foo<b>bar</b>baz',
-  'no changes';
 is $dom->contents->first->strip->parent, 'foo<b>bar</b>baz', 'no changes';
 is $dom->contents->first->at('b'), undef, 'no result';
 is $dom->contents->first->find('*')->size, 0, 'no results';

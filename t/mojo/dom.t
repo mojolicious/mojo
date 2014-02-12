@@ -2295,6 +2295,14 @@ is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
 
+# Slash between attributes
+$dom = Mojo::DOM->new('<input /type=checkbox/ value="/a/" checked/><br/>');
+is $dom->at('input')->{type},  'checkbox', 'right attribute';
+is $dom->at('input')->{value}, '/a/',      'right attribute';
+ok exists $dom->at('input')->{checked}, 'attribute exists';
+is $dom->at('input')->{checked}, undef, 'right attribute';
+is "$dom", '<input checked type="checkbox" value="/a/"><br>', 'right result';
+
 # Extra whitespace
 $dom = Mojo::DOM->new('< span>a< /span><b >b</b><span >c</ span>');
 is $dom->at('span')->text,     'a', 'right text';

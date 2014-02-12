@@ -625,7 +625,7 @@ Render this node's content to HTML/XML or replace it with HTML/XML fragment.
   # "<div><h1></h1></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->content('')->root;
 
-  # "A"
+  # " A "
   $dom->parse('<!-- A --><br>')->contents->first->content;
 
   # "<!-- B --><br>"

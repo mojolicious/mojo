@@ -641,6 +641,9 @@ as L<Mojo::DOM> objects.
   # "<p><b>123</b></p>"
   $dom->parse('<p>test<b>123</b></p>')->at('p')->contents->first->remove;
 
+  # "<!-- test -->"
+  $dom->parse('<!-- test --><b>123</b>')->contents->first;
+
 =head2 find
 
   my $collection = $dom->find('html title');

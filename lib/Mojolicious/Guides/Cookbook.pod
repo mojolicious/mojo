@@ -1045,6 +1045,46 @@ be able to work standalone as well as inside an already running event loop.
   $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
   $delay->wait unless Mojo::IOLoop->is_running;
 
+=head2 WebSockets
+
+WebSockets are not just for the server-side, you can use
+L<Mojo::UserAgent/"websocket"> to open new connections, which are always
+non-blocking. The handshake is a normal HTTP request with a few additional
+headers, it can even contain cookies, followed by a C<101> response from the
+server instructing our user agent to switch to the bi-directional WebSocket
+protocol.
+
+  use Mojo::UserAgent;
+  use Mojo::IOLoop;
+
+  # Open WebSocket to echo service
+  my $ua = Mojo::UserAgent->new;
+  $ua->websocket('ws://echo.websocket.org' => sub {
+    my ($ua, $tx) = @_;
+
+    # Check if WebSocket handshake was successful
+    say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
+
+    # Wait for WebSocket to be closed
+    $tx->on(finish => sub {
+      my ($tx, $code, $reason) = @_;
+      say "WebSocket closed with status $code.";
+    });
+
+    # Close WebSocket after receiving one message
+    $tx->on(message => sub {
+      my ($tx, $msg) = @_;
+      say "WebSocket message: $msg";
+      $tx->finish;
+    });
+
+    # Send a message to the server
+    $tx->send('Hi!');
+  });
+
+  # Start event loop if necessary
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
 =head2 Command line
 
 Don't you hate checking huge HTML files from the command line? Thanks to the

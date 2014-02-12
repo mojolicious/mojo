@@ -568,6 +568,9 @@ Append HTML/XML fragment to this node.
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->append('<h2>B</h2>')->root;
 
+  # "<p>test 123</p>"
+  $dom->parse('<p>test</p>')->at('p')->contents->first->append(' 123')->root;
+
 =head2 append_content
 
   $dom = $dom->append_content('<p>I ♥ Mojolicious!</p>');
@@ -734,6 +737,9 @@ Prepend HTML/XML fragment to this node.
   # "<div><h1>A</h1><h2>B</h2></div>"
   $dom->parse('<div><h2>B</h2></div>')->at('h2')->prepend('<h1>A</h1>')->root;
 
+  # "<p>test 123</p>"
+  $dom->parse('<p>123</p>')->at('p')->contents->first->prepend('test ')->root;
+
 =head2 prepend_content
 
   $dom = $dom->prepend_content('<p>I ♥ Mojolicious!</p>');
@@ -773,6 +779,9 @@ Remove this node and return L</"parent">.
   # "<div></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->remove;
 
+  # "<p><b>456</b></p>"
+  $dom->parse('<p>123<b>456</b></p>')->at('p')->contents->first->remove->root;
+
 =head2 replace
 
   my $parent = $dom->replace('<div>I ♥ Mojolicious!</div>');
@@ -782,8 +791,8 @@ Replace this node with HTML/XML fragment and return L</"parent">.
   # "<div><h2>B</h2></div>"
   $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('<h2>B</h2>');
 
-  # "<div></div>"
-  $dom->parse('<div><h1>A</h1></div>')->at('h1')->replace('');
+  # "<p><b>B</b></p>"
+  $dom->parse('<p>A</p>')->at('p')->contents->[0]->replace('<b>B</b>')->root;
 
 =head2 root
 
@@ -874,6 +883,9 @@ first innermost element.
 
   # "<p><b>A</b></p><p>B</p>"
   $dom->parse('<b>A</b>')->at('b')->wrap('<p></p><p>B</p>')->root;
+
+  # "<p><b>A</b></p>"
+  $dom->parse('<p>A</p>')->at('p')->contents->first->wrap('<b>')->root;
 
 =head2 wrap_content
 

@@ -156,11 +156,12 @@ is $dom->at('p')->contents->first->next_sibling->next_sibling->content,
   ' 456 ', 'right content';
 is $dom->all_contents->[0]->node,    'doctype', 'right node';
 is $dom->all_contents->[0]->content, ' before', 'right content';
-is $dom->all_contents->[1]->type,    'p',       'right type';
-is $dom->all_contents->[2]->node,    'text',    'right node';
-is $dom->all_contents->[2]->content, 'test',    'right content';
-is $dom->all_contents->[5]->node,    'pi',      'right node';
-is $dom->all_contents->[5]->content, 'after',   'right content';
+is $dom->all_contents->[0], '<!DOCTYPE before>', 'right content';
+is $dom->all_contents->[1]->type,    'p',     'right type';
+is $dom->all_contents->[2]->node,    'text',  'right node';
+is $dom->all_contents->[2]->content, 'test',  'right content';
+is $dom->all_contents->[5]->node,    'pi',    'right node';
+is $dom->all_contents->[5]->content, 'after', 'right content';
 is $dom->at('p')->all_contents->[0]->node,     'text',    'right node';
 is $dom->at('p')->all_contents->[0]->content,  'test',    'right node';
 is $dom->at('p')->all_contents->[-1]->node,    'comment', 'right node';
@@ -184,11 +185,51 @@ is $dom->contents->grep(sub { $_->node eq 'pi' })->remove->first->node,
   'root', 'right node';
 is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>',
   'right result';
+
+# Modify nodes
 $dom = Mojo::DOM->new('<script>la<la>la</script>');
 is $dom->at('script')->node, 'tag', 'right node';
 is $dom->at('script')->contents->first->node,    'raw',      'right node';
 is $dom->at('script')->contents->first->content, 'la<la>la', 'right content';
 is "$dom", '<script>la<la>la</script>', 'right result';
+is $dom->at('script')->contents->first->replace('a<b>c</b>1<b>d</b>')->type,
+  'script', 'right type';
+is "$dom", '<script>a<b>c</b>1<b>d</b></script>', 'right result';
+is $dom->at('b')->contents->first->append('e')->content, 'c', 'right content';
+is $dom->at('b')->contents->first->prepend('f')->node, 'text', 'right node';
+is "$dom", '<script>a<b>fce</b>1<b>d</b></script>', 'right result';
+is $dom->at('script')->contents->first->siblings->first->type, 'b',
+  'right type';
+is $dom->at('script')->contents->first->next->content, 'fce', 'right content';
+is $dom->at('script')->contents->first->previous, undef, 'no siblings';
+is $dom->at('script')->contents->[2]->previous->content, 'fce',
+  'right content';
+is $dom->at('b')->contents->[1]->next, undef, 'no siblings';
+is $dom->at('script')->contents->first->wrap('<i>:)</i>')->root,
+  '<script><i>:)a</i><b>fce</b>1<b>d</b></script>', 'right result';
+is $dom->at('i')->contents->first->wrap_content('<b></b>')->root,
+  '<script><i><b>:)</b>a</i><b>fce</b>1<b>d</b></script>', 'right result';
+is $dom->at('b')->contents->first->ancestors->type->join(','), 'b,i,script',
+  'right result';
+
+# Treating nodes as elements
+$dom = Mojo::DOM->new('foo<b>bar</b>baz');
+is $dom->contents->first->contents->size,     0, 'no contents';
+is $dom->contents->first->all_contents->size, 0, 'no contents';
+is $dom->contents->first->children->size,     0, 'no children';
+is $dom->contents->first->append_content('test')->parent, 'foo<b>bar</b>baz',
+  'no changes';
+is $dom->contents->first->prepend_content('test')->parent, 'foo<b>bar</b>baz',
+  'no changes';
+is $dom->contents->first->strip->parent, 'foo<b>bar</b>baz', 'no changes';
+is $dom->contents->first->at('b'), undef, 'no result';
+is $dom->contents->first->find('*')->size, 0, 'no results';
+is $dom->contents->first->match('*'), undef, 'no match';
+is_deeply $dom->contents->first->attr, {}, 'no attributes';
+is $dom->contents->first->namespace, '', 'no namespace';
+is $dom->contents->first->type,      '', 'no type';
+is $dom->contents->first->text,      '', 'no text';
+is $dom->contents->first->all_text,  '', 'no text';
 
 # Class and ID
 $dom = Mojo::DOM->new->parse('<div id="id" class="class">a</div>');

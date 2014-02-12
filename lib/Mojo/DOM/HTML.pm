@@ -97,7 +97,7 @@ sub parse {
 
     # Text (and runaway "<")
     $text .= '<' if defined $runaway;
-    push @$current, ['text', html_unescape $text] if defined $text;
+    _node($current, 'text', html_unescape $text) if defined $text;
 
     # Tag
     if (defined $tag) {
@@ -129,24 +129,24 @@ sub parse {
         # Relaxed "script" or "style" HTML elements
         next if $xml || ($start ne 'script' && $start ne 'style');
         next unless $html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi;
-        push @$current, ['raw', $1];
+        _node($current, 'raw', $1);
         _end($start, 0, \$current);
       }
     }
 
     # DOCTYPE
-    elsif (defined $doctype) { push @$current, ['doctype', $doctype] }
+    elsif (defined $doctype) { _node($current, 'doctype', $doctype) }
 
     # Comment
-    elsif (defined $comment) { push @$current, ['comment', $comment] }
+    elsif (defined $comment) { _node($current, 'comment', $comment) }
 
     # CDATA
-    elsif (defined $cdata) { push @$current, ['cdata', $cdata] }
+    elsif (defined $cdata) { _node($current, 'cdata', $cdata) }
 
     # Processing instruction (try to detect XML)
     elsif (defined $pi) {
       $self->xml($xml = 1) if !exists $self->{xml} && $pi =~ /xml/i;
-      push @$current, ['pi', $pi];
+      _node($current, 'pi', $pi);
     }
   }
 
@@ -183,6 +183,13 @@ sub _end {
     return if !$xml && $PHRASING{$end} && !$PHRASING{$next->[1]};
 
   } while $next = $next->[3];
+}
+
+sub _node {
+  my ($current, $type, $content) = @_;
+  my $new = [$type, $content, $current];
+  weaken $new->[2];
+  push @$current, $new;
 }
 
 sub _render {

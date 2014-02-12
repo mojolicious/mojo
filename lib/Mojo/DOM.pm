@@ -131,9 +131,8 @@ sub node { shift->tree->[0] }
 
 sub parent {
   my $self = shift;
-  return undef if (my $tree = $self->tree)->[0] eq 'root';
-  return _tag($self, $tree->[3], $self->xml) if $tree->[0] eq 'tag';
-  return $self->[1];
+  return undef if $self->tree->[0] eq 'root';
+  return _tag($self, $self->_parent, $self->xml);
 }
 
 sub parse { shift->_delegate(parse => shift) }
@@ -274,8 +273,7 @@ sub _ancestors {
 sub _collect {
   my $self = shift;
   my $xml  = $self->xml;
-  return Mojo::Collection->new(
-    map { $_->[0] eq 'tag' ? _tag($self, $_, $xml) : _node($self, $_) } @_);
+  return Mojo::Collection->new(map { _tag($self, $_, $xml) } @_);
 }
 
 sub _content {
@@ -307,19 +305,12 @@ sub _link {
   my @new;
   for my $n (@$children[1 .. $#$children]) {
     push @new, $n;
-    next unless $n->[0] eq 'tag';
-    $n->[3] = $parent;
-    weaken $n->[3];
+    my $offset = $n->[0] eq 'tag' ? 3 : 2;
+    $n->[$offset] = $parent;
+    weaken $n->[$offset];
   }
 
   return @new;
-}
-
-sub _node {
-  my ($self, $tree) = @_;
-  my $dom = $self->new->xml($self->xml)->tree($tree);
-  $dom->[1] = $self;
-  return $dom;
 }
 
 sub _nodes {
@@ -334,10 +325,7 @@ sub _offset {
   return $i;
 }
 
-sub _parent {
-  my $self = shift;
-  return $self->node eq 'tag' ? $self->tree->[3] : $self->[1]->tree;
-}
+sub _parent { $_[0]->tree->[$_[0]->node eq 'tag' ? 3 : 2] }
 
 sub _parse { Mojo::DOM::HTML->new(xml => shift->xml)->parse(shift)->tree }
 

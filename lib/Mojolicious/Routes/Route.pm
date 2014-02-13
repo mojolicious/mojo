@@ -596,4 +596,3 @@ on L<Mojolicious::Routes::Route> objects.
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =cut
-/user

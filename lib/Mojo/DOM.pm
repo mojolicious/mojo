@@ -120,7 +120,7 @@ sub namespace {
 
 sub new {
   my $class = shift;
-  my $self = bless [Mojo::DOM::HTML->new], ref $class || $class;
+  my $self = bless \Mojo::DOM::HTML->new, ref $class || $class;
   return @_ ? $self->parse(@_) : $self;
 }
 
@@ -213,7 +213,7 @@ sub text_before {
   return _text(\@nodes, 0, _trim($tree->[3], $trim));
 }
 
-sub to_string { shift->[0]->render }
+sub to_string { shift->_delegate('render') }
 
 # DEPRECATED in Top Hat!
 sub to_xml {
@@ -296,8 +296,8 @@ sub _css { Mojo::DOM::CSS->new(tree => shift->tree) }
 
 sub _delegate {
   my ($self, $method) = (shift, shift);
-  return $self->[0]->$method unless @_;
-  $self->[0]->$method(@_);
+  return $$self->$method unless @_;
+  $$self->$method(@_);
   return $self;
 }
 
@@ -684,7 +684,7 @@ Find this element's namespace.
   my $dom = Mojo::DOM->new;
   my $dom = Mojo::DOM->new('<foo bar="baz">I ♥ Mojolicious!</foo>');
 
-Construct a new array-based L<Mojo::DOM> object and L</"parse"> HTML/XML
+Construct a new scalar-based L<Mojo::DOM> object and L</"parse"> HTML/XML
 fragment if necessary.
 
 =head2 next

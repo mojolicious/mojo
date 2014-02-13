@@ -1,5 +1,5 @@
 
-4.80  2014-02-12
+4.80  2014-02-13
   - Merged Mojo::DOM::Node into Mojo::DOM.
   - Added next_sibling and previous_sibling methods to Mojo::DOM.
   - Added last method to Mojo::Collection.

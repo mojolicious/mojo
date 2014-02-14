@@ -74,7 +74,7 @@ experience.
 
   /user/show/:id -> qr/(?-xism:^\/user\/show/([^\/\.]+))/
 
-A trailing slash is always optional.
+A trailing slash in the path is always optional.
 
   /user/show/23/ -> /user/:action/:id -> {action => 'show', id => 23}
 

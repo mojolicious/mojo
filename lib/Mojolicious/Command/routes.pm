@@ -25,12 +25,10 @@ sub _walk {
   my $prefix = '';
   if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
   push @$rows, my $row = [$prefix . ($route->pattern->pattern || '/')];
-  $row->[-1] .= ' (~)' if $verbose && @{$route->over || []};
 
   # Methods
   my $via = $route->via;
   push @$row, !$via ? '*' : uc join ',', @$via;
-  $row->[-1] .= ' (WS)' if $verbose && $route->is_websocket;
 
   # Name
   my $name = $route->name;

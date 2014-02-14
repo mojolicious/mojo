@@ -1,6 +1,7 @@
 package Mojo::DOM;
 use Mojo::Base -strict;
 use overload
+  '@{}'    => sub { shift->contents },
   '%{}'    => sub { shift->attr },
   bool     => sub {1},
   '""'     => sub { shift->to_string },
@@ -929,6 +930,15 @@ and consistent results you can also use L</"children">.
 
 L<Mojo::DOM> overloads the following operators.
 
+=head2 array
+
+  my @contents = @$dom;
+
+Alias for L</"contents">.
+
+  # "<!-- test -->"
+  $dom->parse('<!-- test --><b>123</b>')->[0];
+
 =head2 bool
 
   my $bool = !!$dom;
@@ -941,8 +951,8 @@ Always true.
 
 Alias for L</"attr">.
 
-  say $dom->{foo};
-  say $dom->div->{id};
+  # "test"
+  $dom->parse('<div id="test">A</div>')->at('div')->{id};
 
 =head2 stringify
 

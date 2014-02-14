@@ -179,8 +179,8 @@ is $dom->at('p')->contents->first->node,    'cdata', 'right node';
 is $dom->at('p')->contents->first->content, '123',   'right content';
 is $dom->at('p')->contents->[1]->node,    'comment', 'right node';
 is $dom->at('p')->contents->[1]->content, ' 456 ',   'right content';
-is $dom->contents->first->node,    'doctype', 'right node';
-is $dom->contents->first->content, ' before', 'right content';
+is $dom->[0]->node,    'doctype', 'right node';
+is $dom->[0]->content, ' before', 'right content';
 is $dom->contents->[2]->node,    'pi',    'right node';
 is $dom->contents->[2]->content, 'after', 'right content';
 is $dom->contents->first->content(' again')->content, ' again',
@@ -193,8 +193,8 @@ is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>',
 # Modify nodes
 $dom = Mojo::DOM->new('<script>la<la>la</script>');
 is $dom->at('script')->node, 'tag', 'right node';
-is $dom->at('script')->contents->first->node,    'raw',      'right node';
-is $dom->at('script')->contents->first->content, 'la<la>la', 'right content';
+is $dom->at('script')->[0]->node,    'raw',      'right node';
+is $dom->at('script')->[0]->content, 'la<la>la', 'right content';
 is "$dom", '<script>la<la>la</script>', 'right result';
 is $dom->at('script')->contents->first->replace('a<b>c</b>1<b>d</b>')->type,
   'script', 'right type';

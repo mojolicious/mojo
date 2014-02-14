@@ -772,8 +772,8 @@ to list all available routes together with name and underlying regular
 expressions.
 
   $ ./myapp.pl routes -v
-  /foo/:name  GET   fooname  ^/foo/([^/\.]+))(?:\.([^/]+)$)?
-  /bar        POST  bar      ^/bar(?:\.([^/]+)$)?
+  /foo/:name  ....  GET   fooname  ^/foo/([^/\.]+))(?:\.([^/]+)$)?
+  /bar        ....  POST  bar      ^/bar(?:\.([^/]+)$)?
 
 =head1 ADVANCED
 

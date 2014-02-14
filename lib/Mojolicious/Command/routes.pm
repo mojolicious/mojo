@@ -26,6 +26,14 @@ sub _walk {
   if (my $i = $depth * 2) { $prefix .= ' ' x $i . '+' }
   push @$rows, my $row = [$prefix . ($route->pattern->pattern || '/')];
 
+  # Flags
+  my @flags;
+  push @flags, $route->inline ? 'B' : '.';
+  push @flags, @{$route->over || []} ? 'C' : '.';
+  push @flags, (my $partial = $route->partial) ? 'D' : '.';
+  push @flags, $route->is_websocket ? 'W' : '.';
+  push @$row, join('', @flags) if $verbose;
+
   # Methods
   my $via = $route->via;
   push @$row, !$via ? '*' : uc join ',', @$via;
@@ -41,8 +49,7 @@ sub _walk {
   my $format = (regexp_pattern($pattern->format_regex || ''))[0];
   my $optional
     = !$pattern->constraints->{format} || $pattern->defaults->{format};
-  $regex .= $optional ? "(?:$format)?" : $format
-    if $format && !$route->partial;
+  $regex .= $optional ? "(?:$format)?" : $format if $format && !$partial;
   push @$row, $regex if $verbose;
 
   $depth++;

@@ -70,7 +70,8 @@ Mojolicious::Command::routes - Routes command
   Usage: APPLICATION routes [OPTIONS]
 
   Options:
-    -v, --verbose   Print additional details about routes.
+    -v, --verbose   Print additional details about routes, flags indicate
+                    B=Bridge, C=Conditions, D=Detour and W=WebSocket.
 
 =head1 DESCRIPTION
 

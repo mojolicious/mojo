@@ -932,7 +932,7 @@ L<Mojo::DOM> overloads the following operators.
 
 =head2 array
 
-  my @contents = @$dom;
+  my @nodes = @$dom;
 
 Alias for L</"contents">.
 

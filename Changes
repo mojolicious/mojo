@@ -1,6 +1,6 @@
 
 4.81  2014-02-14
-  - Added direct array access for contents to Mojo::DOM.
+  - Added direct array access for child nodes to Mojo::DOM.
 
 4.80  2014-02-13
   - Merged Mojo::DOM::Node into Mojo::DOM.

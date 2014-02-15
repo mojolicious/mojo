@@ -243,6 +243,14 @@ $pattern = Mojolicious::Routes::Pattern->new('//:foo//bar//');
 $result = $pattern->match('/foo/bar', 1);
 is_deeply $result, {'foo' => 'foo'}, 'right structure';
 is $pattern->render($result, 1), '/foo/bar', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('//');
+$result = $pattern->match('/', 1);
+is_deeply $result, {}, 'right structure';
+is $pattern->render($result, 1), '/', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('0');
+$result = $pattern->match('/0', 1);
+is_deeply $result, {}, 'right structure';
+is $pattern->render($result, 1), '/0', 'right result';
 
 # Unicode
 $pattern = Mojolicious::Routes::Pattern->new('/(one)♥(two)');

@@ -50,13 +50,12 @@ sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 sub parse {
   my $self = shift;
 
-  # Normalize pattern
-  my $pattern = @_ % 2 ? (shift || '/') : '/';
-  $pattern =~ s!/+!/!g;
-  $pattern ne '/' ? $self->constraints({@_}) : return $self->constraints({@_});
+  my $pattern = @_ % 2 ? (shift // '/') : '/';
+  $pattern =~ s!^/*|/+!/!g;
+  return $self->constraints({@_}) if $pattern eq '/';
   $pattern =~ s!/$!!;
 
-  return $self->_tokenize($pattern =~ m!^/! ? $pattern : "/$pattern");
+  return $self->constraints({@_})->_tokenize($pattern);
 }
 
 sub render {

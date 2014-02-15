@@ -1,4 +1,6 @@
 
+4.82  2014-02-16
+
 4.81  2014-02-15
   - Added direct array access for child nodes to Mojo::DOM.
   - Improved Mojolicious::Routes::Pattern to normalize more route variations.

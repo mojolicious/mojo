@@ -1,6 +1,7 @@
 
 4.82  2014-02-19
   - Added decode_json and encode_json functions to Mojo::JSON.
+  - Fixed small decoding error bug in Mojo::JSON.
   - Fixed bug in "user_agent_online.t".
 
 4.81  2014-02-15

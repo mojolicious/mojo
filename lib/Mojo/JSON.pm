@@ -41,23 +41,21 @@ my $UTF_PATTERNS = {
 my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 
 sub decode {
-  my ($self, $bytes) = @_;
+  my $self = shift->error(undef);
 
-  $self->error(undef);
-  my $res = eval { decode_json($bytes) };
-  if (!$res && (my $e = $@)) {
-    chomp $e;
-    $self->error($e);
-  }
+  my $ref = eval { decode_json(shift) };
+  return $ref if $ref;
 
-  return $res;
+  chomp(my $e = $@);
+  $self->error($e);
+  return undef;
 }
 
 sub decode_json {
   my $bytes = shift;
 
   # Missing input
-  die "Missing or empty input\n" unless $bytes;
+  die "Missing or empty input\n" unless length $bytes;
 
   # Remove BOM
   $bytes =~ s/^(?:\357\273\277|\377\376\0\0|\0\0\376\377|\376\377|\377\376)//g;
@@ -68,10 +66,9 @@ sub decode_json {
   # Detect and decode Unicode
   my $encoding = 'UTF-8';
   $bytes =~ $UTF_PATTERNS->{$_} and $encoding = $_ for keys %$UTF_PATTERNS;
-  $bytes = Mojo::Util::decode $encoding, $bytes;
+  local $_ = Mojo::Util::decode $encoding, $bytes;
 
   # Leading whitespace
-  local $_ = $bytes;
   m/\G$WHITESPACE_RE/gc;
 
   # Array

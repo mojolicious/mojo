@@ -6,7 +6,7 @@ use Mojo::Asset::File;
 use Mojo::Asset::Memory;
 use Mojo::Content::MultiPart;
 use Mojo::Content::Single;
-use Mojo::JSON;
+use Mojo::JSON 'encode_json';
 use Mojo::Parameters;
 use Mojo::Transaction::HTTP;
 use Mojo::Transaction::WebSocket;
@@ -185,8 +185,7 @@ sub _form {
 
 sub _json {
   my ($self, $tx, $data) = @_;
-  $tx->req->body(Mojo::JSON->new->encode($data));
-  my $headers = $tx->req->headers;
+  my $headers = $tx->req->body(encode_json($data))->headers;
   $headers->content_type('application/json') unless $headers->content_type;
   return $tx;
 }

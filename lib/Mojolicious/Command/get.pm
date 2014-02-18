@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::DOM;
 use Mojo::IOLoop;
-use Mojo::JSON;
+use Mojo::JSON qw(encode_json j);
 use Mojo::JSON::Pointer;
 use Mojo::UserAgent;
 use Mojo::Util qw(decode encode);
@@ -79,11 +79,10 @@ sub run {
 }
 
 sub _json {
-  my $json = Mojo::JSON->new;
-  return unless my $data = $json->decode(shift);
+  return unless my $data = j(shift);
   return unless defined($data = Mojo::JSON::Pointer->new->get($data, shift));
   return _say($data) unless ref $data eq 'HASH' || ref $data eq 'ARRAY';
-  say $json->encode($data);
+  say encode_json($data);
 }
 
 sub _say { length && say encode('UTF-8', $_) for @_ }

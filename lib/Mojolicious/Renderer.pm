@@ -3,7 +3,7 @@ use Mojo::Base -base;
 
 use File::Spec::Functions 'catfile';
 use Mojo::Cache;
-use Mojo::JSON;
+use Mojo::JSON 'encode_json';
 use Mojo::Home;
 use Mojo::Loader;
 use Mojo::Util qw(decamelize encode slurp);
@@ -17,7 +17,7 @@ has handlers => sub {
   {
     data => sub { ${$_[2]} = $_[3]{data} },
     text => sub { ${$_[2]} = $_[3]{text} },
-    json => sub { ${$_[2]} = Mojo::JSON->new->encode($_[3]{json}) }
+    json => sub { ${$_[2]} = encode_json($_[3]{json}) }
   };
 };
 has helpers => sub { {} };

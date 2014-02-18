@@ -9,7 +9,7 @@ use Mojo::Base -base;
 #  Bender: You're better off dead, I'm telling you, dude.
 #  Fry: Santa Claus is gunning you down!"
 use Mojo::IOLoop;
-use Mojo::JSON;
+use Mojo::JSON 'j';
 use Mojo::JSON::Pointer;
 use Mojo::Server;
 use Mojo::UserAgent;
@@ -288,8 +288,7 @@ sub _build_ok {
 
 sub _json {
   my ($self, $method, $p) = @_;
-  return Mojo::JSON::Pointer->new->$method(
-    Mojo::JSON->new->decode(@{$self->message // []}[1]), $p);
+  return Mojo::JSON::Pointer->new->$method(j(@{$self->message // []}[1]), $p);
 }
 
 sub _message {

@@ -5,7 +5,7 @@ use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::Content::Single;
 use Mojo::DOM;
-use Mojo::JSON;
+use Mojo::JSON 'j';
 use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
@@ -143,7 +143,7 @@ sub is_limit_exceeded { !!shift->{limit} }
 sub json {
   my ($self, $pointer) = @_;
   return undef if $self->content->is_multipart;
-  my $data = $self->{json} ||= Mojo::JSON->new->decode($self->body);
+  my $data = $self->{json} ||= j($self->body);
   return $pointer ? Mojo::JSON::Pointer->new->get($data, $pointer) : $data;
 }
 

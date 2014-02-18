@@ -1,5 +1,6 @@
 
-4.82  2014-02-16
+4.82  2014-02-18
+  - Fixed bug in "user_agent_online.t".
 
 4.81  2014-02-15
   - Added direct array access for child nodes to Mojo::DOM.

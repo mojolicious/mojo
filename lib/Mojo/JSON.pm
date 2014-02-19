@@ -326,19 +326,18 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 SYNOPSIS
 
-  use Mojo::JSON;
+  use Mojo::JSON qw(decode_json encode_json);
 
-  # Encode and decode JSON
-  my $json  = Mojo::JSON->new;
-  my $bytes = $json->encode({foo => [1, 2], bar => 'hello!', baz => \1});
-  my $hash  = $json->decode($bytes);
+  # Encode and decode JSON (die on errors)
+  my $bytes = encode_json({foo => [1, 2], bar => 'hello!', baz => \1});
+  my $hash  = decode_json($bytes);
 
-  # Check for errors
+  # Handle errors
   my $json = Mojo::JSON->new;
   if (defined(my $hash = $json->decode($bytes))) { say $hash->{message} }
   else { say 'Error: ', $json->error }
 
-  # Use the alternative interface
+  # Ignore errors
   use Mojo::JSON 'j';
   my $bytes = j({foo => [1, 2], bar => 'hello!', baz => \1});
   my $hash  = j($bytes);

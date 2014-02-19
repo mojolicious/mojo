@@ -52,10 +52,9 @@ sub decode {
 }
 
 sub decode_json {
-  my $bytes = shift;
 
   # Missing input
-  die "Missing or empty input\n" unless length $bytes;
+  die "Missing or empty input\n" unless length(my $bytes = shift);
 
   # Remove BOM
   $bytes =~ s/^(?:\357\273\277|\377\376\0\0|\0\0\376\377|\376\377|\377\376)//g;
@@ -97,9 +96,8 @@ sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
 sub false {$FALSE}
 
 sub j {
-  my $data = shift;
-  return encode_json($data) if ref $data eq 'ARRAY' || ref $data eq 'HASH';
-  return eval { decode_json($data) };
+  return encode_json($_[0]) if ref $_[0] eq 'ARRAY' || ref $_[0] eq 'HASH';
+  return eval { decode_json($_[0]) };
 }
 
 sub true {$TRUE}

@@ -1,7 +1,7 @@
 
 4.82  2014-02-19
-  - Added data attribute to Mojo::JSON::Pointer.
   - Added decode_json and encode_json functions to Mojo::JSON.
+  - Added data attribute to Mojo::JSON::Pointer.
   - Fixed small decoding error bug in Mojo::JSON.
   - Fixed bug in "user_agent_online.t".
 

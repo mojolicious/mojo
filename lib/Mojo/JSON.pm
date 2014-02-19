@@ -2,6 +2,7 @@ package Mojo::JSON;
 use Mojo::Base -base;
 
 use B;
+use Carp 'croak';
 use Exporter 'import';
 use Mojo::Util;
 use Scalar::Util 'blessed';
@@ -43,15 +44,33 @@ my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 sub decode {
   my $self = shift->error(undef);
 
-  my $ref = eval { decode_json(shift) };
+  my $ref = eval { _decode(shift) };
   return $ref if $ref;
 
-  chomp(my $e = $@);
-  $self->error($e);
+  $self->error(_chomp($@));
   return undef;
 }
 
 sub decode_json {
+  eval { _decode(shift) } // croak _chomp($@);
+}
+
+sub encode { encode_json($_[1]) }
+
+sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
+
+sub false {$FALSE}
+
+sub j {
+  return encode_json($_[0]) if ref $_[0] eq 'ARRAY' || ref $_[0] eq 'HASH';
+  return eval { _decode($_[0]) };
+}
+
+sub true {$TRUE}
+
+sub _chomp { chomp $_[0] ? $_[0] : $_[0] }
+
+sub _decode {
 
   # Missing input
   die "Missing or empty input\n" unless length(my $bytes = shift);
@@ -88,19 +107,6 @@ sub decode_json {
 
   return $ref;
 }
-
-sub encode { encode_json($_[1]) }
-
-sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
-
-sub false {$FALSE}
-
-sub j {
-  return encode_json($_[0]) if ref $_[0] eq 'ARRAY' || ref $_[0] eq 'HASH';
-  return eval { decode_json($_[0]) };
-}
-
-sub true {$TRUE}
 
 sub _decode_array {
   my @array;

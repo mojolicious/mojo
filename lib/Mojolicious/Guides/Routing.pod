@@ -941,7 +941,7 @@ self-contained applications under a prefix.
 =head2 Application plugins
 
 Embedding L<Mojolicious> applications is easy, but it gets even easier if you
-package the whole thing as a self contained reusable plugin.
+package the whole thing as a self-contained reusable plugin.
 
   # Plugin
   package Mojolicious::Plugin::MyEmbeddedApp;

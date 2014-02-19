@@ -31,7 +31,7 @@ sub load {
 sub search {
   my ($self, $ns) = @_;
 
-  my (@modules, %found);
+  my %modules;
   for my $directory (@INC) {
     next unless -d (my $path = catdir $directory, split(/::|'/, $ns));
 
@@ -39,19 +39,19 @@ sub search {
     opendir(my $dir, $path);
     for my $file (grep /\.pm$/, readdir $dir) {
       next if -d catfile splitdir($path), $file;
-      my $class = "${ns}::" . fileparse $file, qr/\.pm/;
-      push @modules, $class unless $found{$class}++;
+      $modules{"${ns}::" . fileparse $file, qr/\.pm/}++;
     }
   }
 
-  return \@modules;
+  return [keys %modules];
 }
 
 sub _all {
   my $class = shift;
 
+  return $CACHE{$class} if $CACHE{$class};
   my $handle = do { no strict 'refs'; \*{"${class}::DATA"} };
-  return $CACHE{$class} || {} if $CACHE{$class} || !fileno $handle;
+  return {} unless fileno $handle;
   seek $handle, 0, 0;
   my $data = join '', <$handle>;
 
@@ -113,7 +113,8 @@ following new ones.
   my $all   = $loader->data('Foo::Bar');
   my $index = $loader->data('Foo::Bar', 'index.html');
 
-Extract embedded file from the C<DATA> section of a class.
+Extract embedded file from the C<DATA> section of a class, all files will be
+cached once they have been accessed for the first time.
 
   say for keys %{$loader->data('Foo::Bar')};
 

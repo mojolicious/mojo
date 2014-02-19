@@ -144,7 +144,7 @@ sub json {
   my ($self, $pointer) = @_;
   return undef if $self->content->is_multipart;
   my $data = $self->{json} ||= j($self->body);
-  return $pointer ? Mojo::JSON::Pointer->new->get($data, $pointer) : $data;
+  return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
 }
 
 sub param { shift->body_params->param(@_) }

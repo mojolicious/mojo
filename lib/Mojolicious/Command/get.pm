@@ -80,7 +80,7 @@ sub run {
 
 sub _json {
   return unless my $data = j(shift);
-  return unless defined($data = Mojo::JSON::Pointer->new->get($data, shift));
+  return unless defined($data = Mojo::JSON::Pointer->new($data)->get(shift));
   return _say($data) unless ref $data eq 'HASH' || ref $data eq 'ARRAY';
   say encode_json($data);
 }

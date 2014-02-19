@@ -11,6 +11,7 @@ use Mojo::Base -strict;
 use Test::More;
 use Mojo::ByteStream 'b';
 use Mojo::JSON qw(decode_json encode_json j);
+use Mojo::Util 'encode';
 
 # Decode array
 my $json  = Mojo::JSON->new;
@@ -369,6 +370,10 @@ is $json->error,
   'Malformed JSON: Unexpected data after array at line 3, offset 8',
   'right error';
 is $json->decode('0'), undef, 'syntax error';
+is $json->error,
+  'Malformed JSON: Expected array or object at line 0, offset 0',
+  'right error';
+is $json->decode(encode('Shift_JIS', 'やった')), undef, 'invalid encoding';
 is $json->error,
   'Malformed JSON: Expected array or object at line 0, offset 0',
   'right error';

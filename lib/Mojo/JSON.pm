@@ -65,7 +65,7 @@ sub decode_json {
   # Detect and decode Unicode
   my $encoding = 'UTF-8';
   $bytes =~ $UTF_PATTERNS->{$_} and $encoding = $_ for keys %$UTF_PATTERNS;
-  local $_ = Mojo::Util::decode $encoding, $bytes;
+  local $_ = Mojo::Util::decode($encoding, $bytes) // '';
 
   # Leading whitespace
   m/\G$WHITESPACE_RE/gc;

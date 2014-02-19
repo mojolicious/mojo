@@ -43,10 +43,8 @@ my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 
 sub decode {
   my $self = shift->error(undef);
-
   my $ref = eval { _decode(shift) };
   return $ref if $ref;
-
   $self->error(_chomp($@));
   return undef;
 }

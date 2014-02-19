@@ -6,7 +6,7 @@ use Mojo::Util 'monkey_patch';
 has max_line_size => sub { $ENV{MOJO_MAX_LINE_SIZE} || 10240 };
 
 # Common headers
-my @HEADERS = (
+my %NORMALCASE = map { lc($_) => $_ } (
   qw(Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges),
   qw(Allow Authorization Cache-Control Connection Content-Disposition),
   qw(Content-Encoding Content-Length Content-Range Content-Type Cookie DNT),
@@ -16,14 +16,11 @@ my @HEADERS = (
   qw(Sec-WebSocket-Protocol Sec-WebSocket-Version Server Set-Cookie Status),
   qw(TE Trailer Transfer-Encoding Upgrade User-Agent Vary WWW-Authenticate)
 );
-for my $header (@HEADERS) {
+for my $header (values %NORMALCASE) {
   my $name = lc $header;
   $name =~ s/-/_/g;
   monkey_patch __PACKAGE__, $name, sub { scalar shift->header($header => @_) };
 }
-
-# Lowercase headers
-my %NORMALCASE = map { lc($_) => $_ } @HEADERS;
 
 sub add {
   my ($self, $name) = (shift, shift);

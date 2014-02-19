@@ -49,12 +49,6 @@ my $TOKEN_RE = qr/
   )??
 /xis;
 
-# HTML elements that break paragraphs
-my @PARAGRAPH = (
-  qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
-  qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul)
-);
-
 # HTML elements with optional end tags
 my %END = (
   body => ['head'],
@@ -63,8 +57,13 @@ my %END = (
   rp   => [qw(rt rp)],
   rt   => [qw(rt rp)]
 );
-$END{$_} = [$_]  for qw(optgroup option);
-$END{$_} = ['p'] for @PARAGRAPH;
+$END{$_} = [$_] for qw(optgroup option);
+
+# HTML elements that break paragraphs
+map { $END{$_} = ['p'] } (
+  qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
+  qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul)
+);
 
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);

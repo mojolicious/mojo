@@ -73,6 +73,16 @@ L<Mojo::IOLoop/"timer">.
 
   app->start;
 
+To combine multiple applications into one and deploy them together, you can
+use the plugin L<Mojolicious::Plugin::Mount>.
+
+  use Mojolicious::Lite;
+
+  plugin Mount => {'test1.example.com' => '/home/sri/myapp1.pl'};
+  plugin Mount => {'test2.example.com' => '/home/sri/myapp2.pl'};
+
+  app->start;
+
 =head2 Morbo
 
 After reading the L<Mojolicious::Lite> tutorial, you should already be

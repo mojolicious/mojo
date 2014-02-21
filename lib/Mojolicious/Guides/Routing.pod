@@ -926,12 +926,15 @@ containing a C<handler> method accepting L<Mojolicious::Controller> objects.
   1;
 
 You can also just use L<Mojolicious::Plugin::Mount> to mount whole
-self-contained applications under a prefix.
+self-contained applications under a domain and/or prefix.
 
   use Mojolicious::Lite;
 
   # Whole application mounted under "/prefix"
   plugin Mount => {'/prefix' => '/home/sri/myapp.pl'};
+
+  # Mount application with subdomain
+  plugin Mount => {'test.example.com' => '/home/sri/myapp2.pl'};
 
   # Normal route
   get '/' => sub { shift->render(text => 'Hello World!') };

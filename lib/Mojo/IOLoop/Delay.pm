@@ -189,6 +189,7 @@ Data shared between all L</"steps">.
 
 =head2 pass
 
+  $delay->pass;
   $delay->pass(@args);
 
 Increment active event counter and decrement it again right away to pass

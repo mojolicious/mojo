@@ -37,8 +37,7 @@ sub store {
 
   # Don't reset flash for static files
   my $old = delete $session->{flash};
-  @{$session->{new_flash}}{keys %$old} = values %$old
-    if $stash->{'mojo.static'};
+  $session->{new_flash} = $old if $stash->{'mojo.static'};
   delete $session->{new_flash} unless keys %{$session->{new_flash}};
 
   # Generate "expires" value from "expiration" if necessary

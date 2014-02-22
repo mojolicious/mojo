@@ -110,8 +110,7 @@ sub handler {
   $stash->{'mojo.secrets'} //= $self->secrets;
 
   # Build default controller
-  my $defaults = $self->defaults;
-  @{$stash}{keys %$defaults} = values %$defaults;
+  %$stash = (%$stash, %{$self->defaults});
   my $c
     = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{$_} for qw(app tx);

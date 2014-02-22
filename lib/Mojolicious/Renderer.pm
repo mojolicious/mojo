@@ -79,7 +79,7 @@ sub render {
     if my $partial = delete $args->{partial};
 
   # Merge stash and arguments
-  @{$stash}{keys %$args} = values %$args;
+  %$stash = (%$stash, %$args);
 
   my $options = {
     encoding => $self->encoding,

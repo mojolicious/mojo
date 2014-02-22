@@ -16,6 +16,8 @@ sub begin {
 
 sub data { shift->Mojo::_dict(data => @_) }
 
+sub pass { $_[0]->begin->(@_) }
+
 sub steps {
   my $self = shift->remaining([@_]);
   $self->ioloop->timer(0 => $self->begin);
@@ -184,6 +186,16 @@ Data shared between all L</"steps">.
 
   # Remove value
   my $foo = delete $delay->data->{foo};
+
+=head2 pass
+
+  $delay->pass(@args);
+
+Increment active event counter and decrement it again right away to pass
+values to the next step.
+
+  # Longer version
+  $delay->begin(0)->(@args);
 
 =head2 steps
 

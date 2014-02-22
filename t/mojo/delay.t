@@ -96,7 +96,7 @@ $delay->steps(
   sub { Mojo::IOLoop->timer(0 => shift->begin) },
   sub {
     $result = 'fail';
-    shift->begin->();
+    shift->pass;
   },
   sub { $result = 'success' },
   sub { $result = 'fail' }
@@ -110,7 +110,7 @@ is $result,   'success', 'right result';
 $delay   = Mojo::IOLoop::Delay->new;
 $delay->on(finish => sub { shift; push @results, [@_] });
 $delay->steps(
-  sub { shift->begin(0)->(23) },
+  sub { shift->pass(23) },
   sub { shift; push @results, [@_] },
   sub { push @results, 'fail' }
 );
@@ -163,7 +163,7 @@ $delay = Mojo::IOLoop->delay(
     $end2->(4);
     $end3->(5, 6);
     $end->(1, 2, 3);
-    $first->begin(0)->(23);
+    $first->pass(23);
   },
   sub {
     my ($first, @numbers) = @_;

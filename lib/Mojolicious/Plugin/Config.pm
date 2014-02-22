@@ -51,10 +51,7 @@ sub register {
   # Merge everything
   $config = {%$config, %{$self->load($mode, $conf, $app)}} if $mode;
   $config = {%{$conf->{default}}, %$config} if $conf->{default};
-  my $current = $app->defaults(config => $app->config)->config;
-  %$current = (%$current, %$config);
-
-  return $current;
+  return $app->defaults(config => $app->config)->config($config)->config;
 }
 
 1;

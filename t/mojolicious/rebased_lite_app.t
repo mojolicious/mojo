@@ -47,7 +47,7 @@ $t->get_ok('/')->status_is(200)->header_is('X-Route' => 'root')
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
-<link href="//example.com/base.css" rel="stylesheet" />
+<link href="//example.com/base.css" rel="stylesheet" type="text/css" />
 <a href="mailto:sri@example.com">Contact</a>
 http://example.com/rebased
 http://example.com/rebased/foo
@@ -61,7 +61,7 @@ EOF
 $t->get_ok('/foo')->status_is(200)->header_is('X-Route' => 'foo')
   ->content_is(<<EOF);
 http://example.com/rebased/
-<link href="/rebased/b.css" media="test" rel="stylesheet" />
+<link href="/rebased/b.css" media="test" rel="stylesheet" type="text/css" />
 <img alt="Test" src="/rebased/images/test.png" />
 http://example.com/rebased/foo
 http://example.com/rebased
@@ -81,7 +81,7 @@ ok $t->ua->cookie_jar->find($t->ua->server->url->path('/foo')),
 # Rebased route with message from flash
 $t->get_ok('/foo')->status_is(200)->content_is(<<EOF);
 http://example.com/rebased/works!too!
-<link href="/rebased/b.css" media="test" rel="stylesheet" />
+<link href="/rebased/b.css" media="test" rel="stylesheet" type="text/css" />
 <img alt="Test" src="/rebased/images/test.png" />
 http://example.com/rebased/foo
 http://example.com/rebased
@@ -96,7 +96,7 @@ $t->get_ok('/baz')->status_is(200)->header_is('X-Route' => 'baz')
 http://example.com/rebased/
 <script src="/rebased/mojo/jquery/jquery.js"></script>
 <img src="/rebased/images/test.png" />
-<link href="//example.com/base.css" rel="stylesheet" />
+<link href="//example.com/base.css" rel="stylesheet" type="text/css" />
 <a href="mailto:sri@example.com">Contact</a>
 http://example.com/rebased/baz
 http://example.com/rebased/foo

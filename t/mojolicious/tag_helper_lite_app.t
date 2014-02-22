@@ -134,7 +134,7 @@ EOF
 
 # Stylesheets
 $t->get_ok('/style')->status_is(200)->content_is(<<EOF);
-<link href="/foo.css" rel="stylesheet" />
+<link href="/foo.css" rel="stylesheet" type="text/css" />
 <style>/*<![CDATA[*/
 
   body {color: #000}

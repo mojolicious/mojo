@@ -271,13 +271,9 @@ $t->get_ok('/foo/test' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server     => 'Mojolicious (Perl)')->content_like(qr!/bar/test!);
 
 # Foo::index
-$log = '';
-$cb = $t->app->log->on(message => sub { $log .= pop });
 $t->get_ok('/foo' => {'X-Test' => 'Hi there!'})->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_like(qr|<body>\s+23\nHello Mojo from the template /foo! He|);
-like $log, qr/Careful, "handler" is a reserved stash value\./, 'right message';
-$t->app->log->unsubscribe(message => $cb);
 
 # Foo::Bar::index
 $t->get_ok('/foo-bar' => {'X-Test' => 'Hi there!'})->status_is(200)

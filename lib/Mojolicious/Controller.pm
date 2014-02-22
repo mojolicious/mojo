@@ -307,26 +307,7 @@ sub signed_cookie {
   return wantarray ? @results : $results[0];
 }
 
-sub stash {
-  my $self = shift;
-
-  # Hash
-  my $stash = $self->{stash} ||= {};
-  return $stash unless @_;
-
-  # Get
-  return $stash->{$_[0]} unless @_ > 1 || ref $_[0];
-
-  # Set
-  my $values = ref $_[0] ? $_[0] : {@_};
-  for my $key (keys %$values) {
-    $self->app->log->debug(qq{Careful, "$key" is a reserved stash value.})
-      if $RESERVED{$key};
-    $stash->{$key} = $values->{$key};
-  }
-
-  return $self;
-}
+sub stash { shift->Mojolicious::_dict(stash => @_) }
 
 sub url_for {
   my $self = shift;

@@ -1,6 +1,7 @@
 package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
+use Mojo;
 use Mojo::IOLoop;
 
 has ioloop    => sub { Mojo::IOLoop->singleton };
@@ -13,21 +14,7 @@ sub begin {
   return sub { $ignore // 1 and shift; $self->_step($id, @_) };
 }
 
-sub data {
-  my $self = shift;
-
-  # Hash
-  my $data = $self->{data} ||= {};
-  return $data unless @_;
-
-  # Get
-  return $data->{$_[0]} unless @_ > 1 || ref $_[0];
-
-  # Set
-  %$data = (%$data, %{ref $_[0] ? $_[0] : {@_}});
-
-  return $self;
-}
+sub data { shift->Mojo::_dict(data => @_) }
 
 sub steps {
   my $self = shift->remaining([@_]);

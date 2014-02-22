@@ -71,6 +71,8 @@ get '/missing_template/too' => sub {
     or $self->res->headers->header('X-Not-Found' => 1);
 };
 
+get '/missing_helper' => sub { shift->missing_helper };
+
 # Dummy exception object
 package MyException;
 use Mojo::Base -base;
@@ -222,6 +224,11 @@ $t->get_ok('/missing_template.txt')->status_is(404)
 $t->get_ok('/missing_template/too')->status_is(404)
   ->header_is('X-Not-Found' => 1)->content_type_is('text/html;charset=UTF-8')
   ->content_like(qr/Page not found/);
+
+# Missing helper (correct context)
+$t->get_ok('/missing_helper')->status_is(500)
+  ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Server error/)
+  ->content_like(qr/shift-&gt;missing_helper/);
 
 # Reuse exception
 ok !$exception, 'no exception';

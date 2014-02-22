@@ -13,6 +13,22 @@ sub begin {
   return sub { $ignore // 1 and shift; $self->_step($id, @_) };
 }
 
+sub data {
+  my $self = shift;
+
+  # Hash
+  my $data = $self->{data} ||= {};
+  return $data unless @_;
+
+  # Get
+  return $data->{$_[0]} unless @_ > 1 || ref $_[0];
+
+  # Set
+  %$data = (%$data, %{ref $_[0] ? $_[0] : {@_}});
+
+  return $self;
+}
+
 sub steps {
   my $self = shift->remaining([@_]);
   $self->ioloop->timer(0 => $self->begin);
@@ -169,6 +185,18 @@ the first argument will be ignored by default.
   my $delay = Mojo::IOLoop->delay;
   Mojo::IOLoop->client({port => 3000} => $delay->begin(0));
   my ($loop, $err, $stream) = $delay->wait;
+
+=head2 data
+
+  my $hash = $delay->data;
+  my $foo  = $delay->data('foo');
+  $delay   = $delay->data({foo => 'bar'});
+  $delay   = $delay->data(foo => 'bar');
+
+Data shared between all L</"steps">.
+
+  # Remove value
+  my $foo = delete $delay->data->{foo};
 
 =head2 steps
 

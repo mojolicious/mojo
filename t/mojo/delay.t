@@ -23,6 +23,17 @@ $end2->();
 is_deeply [$delay->wait], [], 'no return values';
 is_deeply \@results, [1, 1], 'right results';
 
+# Data
+is $delay->data('foo'), undef, 'no value';
+is_deeply $delay->data(foo => 'bar')->data, {foo => 'bar'}, 'right value';
+is $delay->data('foo'), 'bar', 'right value';
+delete $delay->data->{foo};
+is $delay->data('foo'), undef, 'no value';
+$delay->data(foo => 'bar', baz => 'yada');
+is $delay->data({test => 23})->data->{test}, 23, 'right value';
+is_deeply $delay->data, {foo => 'bar', baz => 'yada', test => 23},
+  'right value';
+
 # Arguments
 $delay = Mojo::IOLoop::Delay->new;
 my $result;
@@ -170,11 +181,11 @@ my $double = sub {
   Mojo::IOLoop->timer(0 => sub { $end->($num * 2) });
 };
 $result = undef;
-$delay  = Mojo::IOLoop::Delay->new->steps(
+$delay = Mojo::IOLoop::Delay->new->data(num => 9)->steps(
   sub {
     my $delay = shift;
     my $end   = $delay->begin(0);
-    Mojo::IOLoop->timer(0 => sub { $end->(9) });
+    Mojo::IOLoop->timer(0 => sub { $end->($delay->data('num')) });
     unshift @{$delay->remaining}, $double;
   },
   sub {
@@ -185,6 +196,7 @@ $delay  = Mojo::IOLoop::Delay->new->steps(
 is scalar @{$delay->remaining}, 2, 'two steps remaining';
 is_deeply [$delay->wait], [18], 'right return values';
 is scalar @{$delay->remaining}, 0, 'no steps remaining';
+is $delay->data('num'), 9, 'right value';
 is $result, 18, 'right result';
 
 # Exception in first step

@@ -1,6 +1,7 @@
 
 4.84  2014-02-22
   - Added remaining attribute to Mojo::IOLoop::Delay.
+  - Added data method to Mojo::IOLoop::Delay.
 
 4.83  2014-02-19
   - Improved Mojo::JSON to handle encoding errors more gracefully.

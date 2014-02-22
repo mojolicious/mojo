@@ -163,6 +163,30 @@ is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6, 23], 'right return values';
 is $finished, 1, 'finish event has been emitted once';
 is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23], 'right results';
 
+# Dynamic step
+my $double = sub {
+  my ($delay, $num) = @_;
+  my $end = $delay->begin(0);
+  Mojo::IOLoop->timer(0 => sub { $end->($num * 2) });
+};
+$result = undef;
+$delay  = Mojo::IOLoop::Delay->new->steps(
+  sub {
+    my $delay = shift;
+    my $end   = $delay->begin(0);
+    Mojo::IOLoop->timer(0 => sub { $end->(9) });
+    unshift @{$delay->remaining}, $double;
+  },
+  sub {
+    my ($delay, $num) = @_;
+    $result = $num;
+  }
+);
+is scalar @{$delay->remaining}, 2, 'two steps remaining';
+is_deeply [$delay->wait], [18], 'right return values';
+is scalar @{$delay->remaining}, 0, 'no steps remaining';
+is $result, 18, 'right result';
+
 # Exception in first step
 my $failed;
 ($finished, $result) = ();

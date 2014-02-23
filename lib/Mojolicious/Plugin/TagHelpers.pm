@@ -214,7 +214,7 @@ sub _tag {
   my %attrs = @_;
   if ($attrs{data} && ref $attrs{data} eq 'HASH') {
     while (my ($key, $value) = each %{$attrs{data}}) {
-      $key =~ tr/_/-/;
+      $key =~ y/_/-/;
       $attrs{lc("data-$key")} = $value;
     }
     delete $attrs{data};

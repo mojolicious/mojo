@@ -94,7 +94,7 @@ sub compile {
   # Compile with line directive
   return undef unless my $code = $self->code;
   my $name = $self->name;
-  $name =~ s/"//g;
+  $name =~ y/"//d;
   my $compiled = eval qq{#line 1 "$name"\n$code};
   $self->compiled($compiled) and return undef unless $@;
 

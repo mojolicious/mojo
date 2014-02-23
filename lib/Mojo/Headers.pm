@@ -18,7 +18,7 @@ my %NORMALCASE = map { lc($_) => $_ } (
 );
 for my $header (values %NORMALCASE) {
   my $name = lc $header;
-  $name =~ s/-/_/g;
+  $name =~ y/-/_/;
   monkey_patch __PACKAGE__, $name, sub { scalar shift->header($header => @_) };
 }
 

@@ -13,7 +13,7 @@ sub load {
   my ($self, $c) = @_;
 
   return unless my $value = $c->signed_cookie($self->cookie_name);
-  $value =~ s/-/=/g;
+  $value =~ y/-/=/;
   return unless my $session = j(b64_decode $value);
 
   # "expiration" value is inherited
@@ -47,7 +47,7 @@ sub store {
     if $expiration || $default;
 
   my $value = b64_encode(encode_json($session), '');
-  $value =~ s/=/-/g;
+  $value =~ y/=/-/;
   my $options = {
     domain   => $self->cookie_domain,
     expires  => $session->{expires},

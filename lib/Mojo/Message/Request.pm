@@ -204,7 +204,7 @@ sub _parse_env {
   my $base    = $url->base;
   while (my ($name, $value) = each %$env) {
     next unless $name =~ s/^HTTP_//i;
-    $name =~ s/_/-/g;
+    $name =~ y/_/-/;
     $headers->header($name => $value);
 
     # Host/Port

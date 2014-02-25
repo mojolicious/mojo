@@ -1,5 +1,6 @@
 
-4.85  2014-02-24
+4.85  2014-02-25
+  - Improved Mojo::Reactor::EV responsiveness.
 
 4.84  2014-02-22
   - Added remaining attribute to Mojo::IOLoop::Delay.

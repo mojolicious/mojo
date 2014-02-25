@@ -1,6 +1,5 @@
 
 4.85  2014-02-26
-  - Updated EV requirement to 4.15 for certain bug fixes.
   - Improved Mojo::Reactor::EV responsiveness.
 
 4.84  2014-02-22

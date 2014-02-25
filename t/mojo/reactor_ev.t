@@ -6,8 +6,7 @@ use Test::More;
 
 plan skip_all => 'set TEST_EV to enable this test (developer only!)'
   unless $ENV{TEST_EV};
-plan skip_all => 'EV 4.15 required for this test!'
-  unless eval 'use EV 4.15; 1';
+plan skip_all => 'EV 4.0 required for this test!' unless eval 'use EV 4.0; 1';
 
 use IO::Socket::INET;
 

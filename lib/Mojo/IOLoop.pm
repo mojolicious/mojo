@@ -309,7 +309,7 @@ convenience the C<PIPE> signal will be set to C<IGNORE> when L<Mojo::IOLoop>
 is loaded.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
-support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
+support, the optional modules L<EV> (4.15+), L<IO::Socket::IP> (0.20+) and
 L<IO::Socket::SSL> (1.75+) will be used automatically if they are installed.
 Individual features can also be disabled with the MOJO_NO_IPV6 and MOJO_NO_TLS
 environment variables.

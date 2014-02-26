@@ -41,8 +41,8 @@ sub import {
 }
 
 sub attr {
-  my ($class, $attrs, $default) = @_;
-  return unless ($class = ref $class || $class) && $attrs;
+  my ($self, $attrs, $default) = @_;
+  return unless (my $class = ref $self || $self) && $attrs;
 
   Carp::croak 'Default has to be a code reference or constant value'
     if ref $default && ref $default ne 'CODE';

@@ -306,12 +306,13 @@ is "$url", 'wss://[::1]:3000/', 'right format';
 
 # IDNA
 $url = Mojo::URL->new('http://bücher.ch:3000/foo');
-ok $url->is_abs, 'is absolute';
-is $url->scheme, 'http', 'right scheme';
-is $url->host,   'bücher.ch', 'right host';
-is $url->ihost,  'xn--bcher-kva.ch', 'right internationalized host';
-is $url->port,   3000, 'right port';
-is $url->path,   '/foo', 'right path';
+ok $url->is_abs,    'is absolute';
+is $url->scheme,    'http', 'right scheme';
+is $url->host,      'bücher.ch', 'right host';
+is $url->ihost,     'xn--bcher-kva.ch', 'right internationalized host';
+is $url->port,      3000, 'right port';
+is $url->host_port, 'xn--bcher-kva.ch:3000', 'right host and port';
+is $url->path,      '/foo', 'right path';
 is "$url", 'http://xn--bcher-kva.ch:3000/foo', 'right format';
 $url = Mojo::URL->new('http://bücher.bücher.ch:3000/foo');
 ok $url->is_abs, 'is absolute';

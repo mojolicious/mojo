@@ -85,9 +85,7 @@ sub fix_headers {
   }
 
   # Host
-  my $host = $url->ihost;
-  my $port = $url->port;
-  $headers->host($port ? "$host:$port" : $host) unless $headers->host;
+  $headers->host($url->host_port) unless $headers->host;
 
   return $self;
 }

@@ -29,14 +29,16 @@ sub authority {
   }
 
   # Build authority
-  return undef unless defined(my $authority = $self->ihost);
-  if (my $userinfo = $self->userinfo) {
-    $userinfo = url_escape $userinfo, '^A-Za-z0-9\-._~!$&\'()*+,;=:';
-    $authority = $userinfo . '@' . $authority;
-  }
-  if (my $port = $self->port) { $authority .= ":$port" }
+  return undef unless defined(my $authority = $self->host_port);
+  return $authority unless my $info = $self->userinfo;
+  return url_escape($info, '^A-Za-z0-9\-._~!$&\'()*+,;=:') . '@' . $authority;
+}
 
-  return $authority;
+sub host_port {
+  my $self = shift;
+  return undef unless defined(my $host = $self->ihost);
+  return $host unless my $port = $self->port;
+  return "$host:$port";
 }
 
 sub clone {
@@ -292,8 +294,8 @@ Scheme part of this URL.
 
 =head2 userinfo
 
-  my $userinfo = $url->userinfo;
-  $url         = $url->userinfo('root:pass%3Bw0rd');
+  my $info = $url->userinfo;
+  $url     = $url->userinfo('root:pass%3Bw0rd');
 
 Userinfo part of this URL.
 
@@ -314,6 +316,15 @@ Authority part of this URL.
   my $url2 = $url->clone;
 
 Clone this URL.
+
+=head2 host_port
+
+  my $host_port = $url->host_port;
+
+Normalized version of L</"host"> and L</"port">.
+
+  # "xn--da5b0n.net:8080"
+  Mojo::URL->new('http://☃.net:8080/test')->host_port;
 
 =head2 ihost
 

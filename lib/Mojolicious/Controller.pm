@@ -752,17 +752,17 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $req = $c->tx->req;
 
   # Extract request information
-  my $url      = $c->req->url->to_abs;
-  my $userinfo = $c->req->url->to_abs->userinfo;
-  my $host     = $c->req->url->to_abs->host;
-  my $agent    = $c->req->headers->user_agent;
-  my $bytes    = $c->req->body;
-  my $str      = $c->req->text;
-  my $hash     = $c->req->params->to_hash;
-  my $hash     = $c->req->json;
-  my $foo      = $c->req->json('/23/foo');
-  my $dom      = $c->req->dom;
-  my $bar      = $c->req->dom('div.bar')->first->text;
+  my $url   = $c->req->url->to_abs;
+  my $info  = $c->req->url->to_abs->userinfo;
+  my $host  = $c->req->url->to_abs->host;
+  my $agent = $c->req->headers->user_agent;
+  my $bytes = $c->req->body;
+  my $str   = $c->req->text;
+  my $hash  = $c->req->params->to_hash;
+  my $hash  = $c->req->json;
+  my $foo   = $c->req->json('/23/foo');
+  my $dom   = $c->req->dom;
+  my $bar   = $c->req->dom('div.bar')->first->text;
 
 =head2 res
 

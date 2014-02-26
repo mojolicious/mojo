@@ -1,6 +1,7 @@
 
 4.85  2014-02-26
   - Added next_tick method to Mojo::IOLoop and Mojo::Reactor.
+  - Added host_port method to Mojo::URL.
   - Improved Mojo::Reactor::EV responsiveness.
 
 4.84  2014-02-22

@@ -501,6 +501,12 @@ Check if event loop is running.
 Invoke callback as soon as possible, but not before returning, always returns
 C<undef>.
 
+  # Perform operation on next reactor tick
+  Mojo::IOLoop->next_tick(sub {
+    my $loop = shift;
+    ...
+  });
+
 =head2 one_tick
 
   Mojo::IOLoop->one_tick;
@@ -516,11 +522,18 @@ into the reactor, so you need to be careful.
 
 =head2 recurring
 
-  my $id = Mojo::IOLoop->recurring(0.5 => sub {...});
-  my $id = $loop->recurring(3 => sub {...});
+  my $id = Mojo::IOLoop->recurring(3 => sub {...});
+  my $id = $loop->recurring(0 => sub {...});
+  my $id = $loop->recurring(0.25 => sub {...});
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
+
+  # Perform operation every 5 seconds
+  Mojo::IOLoop->recurring(5 => sub {
+    my $loop = shift;
+    ...
+  });
 
 =head2 remove
 
@@ -592,12 +605,18 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
 =head2 timer
 
-  my $id = Mojo::IOLoop->timer(5 => sub {...});
-  my $id = $loop->timer(5 => sub {...});
+  my $id = Mojo::IOLoop->timer(3 => sub {...});
+  my $id = $loop->timer(0 => sub {...});
   my $id = $loop->timer(0.25 => sub {...});
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds.
+
+  # Perform operation in 5 seconds
+  Mojo::IOLoop->timer(5 => sub {
+    my $loop = shift;
+    ...
+  });
 
 =head1 DEBUGGING
 

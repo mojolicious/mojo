@@ -107,9 +107,8 @@ sub get_start_line_chunk {
 
     # Proxy
     elsif ($self->proxy) {
-      $url = $url->clone->userinfo(undef);
-      my $upgrade = lc($self->headers->upgrade // '');
-      $path = $url unless $upgrade eq 'websocket' || $url->protocol eq 'https';
+      $path = $url->clone->userinfo(undef)
+        unless $self->is_handshake || $url->protocol eq 'https';
     }
 
     $self->{start_buffer} = "$method $path HTTP/@{[$self->version]}\x0d\x0a";
@@ -118,6 +117,8 @@ sub get_start_line_chunk {
   $self->emit(progress => 'start_line', $offset);
   return substr $self->{start_buffer}, $offset, 131072;
 }
+
+sub is_handshake { lc($_[0]->headers->upgrade // '') eq 'websocket' }
 
 sub is_secure {
   my $url = shift->url;
@@ -361,6 +362,12 @@ Make sure request has all required headers.
   my $bytes = $req->get_start_line_chunk($offset);
 
 Get a chunk of request line data starting from a specific position.
+
+=head2 is_handshake
+
+  my $bool = $req->is_handshake;
+
+Check C<Upgrade> header for C<websocket> value.
 
 =head2 is_secure
 

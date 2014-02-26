@@ -2,6 +2,7 @@
 4.85  2014-02-26
   - Added next_tick method to Mojo::IOLoop and Mojo::Reactor.
   - Added host_port and path_query methods to Mojo::URL.
+  - Added is_handshake method to Mojo::Message::Request.
   - Improved Mojo::Reactor::EV responsiveness.
   - Fixed IDNA support for CONNECT requests.
   - Fixed "0" value bug in Mojo::Message::Request.

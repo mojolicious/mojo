@@ -315,7 +315,7 @@ sub _request_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
 
   # Establish WebSocket connection
-  if (lc($tx->req->headers->upgrade // '') eq 'websocket') {
+  if ($tx->req->is_handshake) {
     $self->{messages} = [];
     $self->{finished} = undef;
     $self->ua->start(

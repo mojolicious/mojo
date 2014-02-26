@@ -60,7 +60,7 @@ sub server_read {
   # Generate response
   return unless $req->is_finished && !$self->{handled}++;
   $self->emit(upgrade => Mojo::Transaction::WebSocket->new(handshake => $self))
-    if lc($req->headers->upgrade // '') eq 'websocket';
+    if $req->is_handshake;
   $self->emit('request');
 }
 

@@ -34,7 +34,7 @@ sub endpoint {
 
   # Proxy for normal HTTP requests
   return $self->_proxy($tx, $proto, $host, $port)
-    if $proto eq 'http' && lc($req->headers->upgrade // '') ne 'websocket';
+    if $proto eq 'http' && !$req->is_handshake;
 
   return $proto, $host, $port;
 }
@@ -56,8 +56,7 @@ sub proxy_connect {
 
   # WebSocket and/or HTTPS
   my $url = $req->url;
-  my $upgrade = lc($req->headers->upgrade // '');
-  return undef unless $upgrade eq 'websocket' || $url->protocol eq 'https';
+  return undef unless $req->is_handshake || $url->protocol eq 'https';
 
   # CONNECT request
   my $new = $self->tx(CONNECT => $url->clone->userinfo(undef));
@@ -128,7 +127,7 @@ sub tx {
 sub upgrade {
   my ($self, $tx) = @_;
   my $code = $tx->res->code // '';
-  return undef unless $tx->req->headers->upgrade && $code eq '101';
+  return undef unless $tx->req->is_handshake && $code eq '101';
   my $ws = Mojo::Transaction::WebSocket->new(handshake => $tx, masked => 1);
   return $ws->client_challenge ? $ws : undef;
 }

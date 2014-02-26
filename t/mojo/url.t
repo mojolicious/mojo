@@ -172,9 +172,11 @@ is "$url", 'foo:0', 'right format';
 
 # Relative
 $url = Mojo::URL->new('foo?foo=bar#23');
+is $url->path_query, 'foo?foo=bar', 'right path and query';
 ok !$url->is_abs, 'is not absolute';
 is "$url", 'foo?foo=bar#23', 'right relative version';
 $url = Mojo::URL->new('/foo?foo=bar#23');
+is $url->path_query, '/foo?foo=bar', 'right path and query';
 ok !$url->is_abs, 'is not absolute';
 is "$url", '/foo?foo=bar#23', 'right relative version';
 

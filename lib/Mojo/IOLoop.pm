@@ -501,15 +501,6 @@ Check if event loop is running.
 Invoke callback as soon as possible, but not before returning, always returns
 C<undef>.
 
-=head2 timer
-
-  my $id = Mojo::IOLoop->timer(5 => sub {...});
-  my $id = $loop->timer(5 => sub {...});
-  my $id = $loop->timer(0.25 => sub {...});
-
-Create a new timer, invoking the callback after a given amount of time in
-seconds.
-
 =head2 one_tick
 
   Mojo::IOLoop->one_tick;

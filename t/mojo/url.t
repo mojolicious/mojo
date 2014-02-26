@@ -15,16 +15,17 @@ is "$url", 'http://example.com', 'right format';
 # Advanced
 $url = Mojo::URL->new(
   'https://sri:foobar@example.com:8080/x/index.html?monkey=biz&foo=1#/!%?@3');
-ok $url->is_abs,    'is absolute';
-is $url->scheme,    'https', 'right scheme';
-is $url->protocol,  'https', 'right protocol';
-is $url->userinfo,  'sri:foobar', 'right userinfo';
-is $url->host,      'example.com', 'right host';
-is $url->port,      '8080', 'right port';
-is $url->authority, 'sri:foobar@example.com:8080', 'right authority';
-is $url->path,      '/x/index.html', 'right path';
-is $url->query,     'monkey=biz&foo=1', 'right query';
-is $url->fragment,  '/!%?@3', 'right fragment';
+ok $url->is_abs,     'is absolute';
+is $url->scheme,     'https', 'right scheme';
+is $url->protocol,   'https', 'right protocol';
+is $url->userinfo,   'sri:foobar', 'right userinfo';
+is $url->host,       'example.com', 'right host';
+is $url->port,       '8080', 'right port';
+is $url->authority,  'sri:foobar@example.com:8080', 'right authority';
+is $url->path,       '/x/index.html', 'right path';
+is $url->query,      'monkey=biz&foo=1', 'right query';
+is $url->path_query, '/x/index.html?monkey=biz&foo=1', 'right path and query';
+is $url->fragment,   '/!%?@3', 'right fragment';
 is "$url",
   'https://sri:foobar@example.com:8080/x/index.html?monkey=biz&foo=1#/!%?@3',
   'right format';
@@ -98,14 +99,15 @@ is $url->fragment, '23', 'right fragment';
 is "$url", 'wss://sri:foobar@example.com:8080?_monkeybiz%3B=&_monkey%3B23=#23',
   'right format';
 $url = Mojo::URL->new('https://example.com/0?0#0');
-ok $url->is_abs,   'is absolute';
-is $url->scheme,   'https', 'right scheme';
-is $url->userinfo, undef, 'no userinfo';
-is $url->host,     'example.com', 'right host';
-is $url->port,     undef, 'no port';
-is $url->path,     '/0', 'no path';
-is $url->query,    '0', 'right query';
-is $url->fragment, '0', 'right fragment';
+ok $url->is_abs,    'is absolute';
+is $url->scheme,    'https', 'right scheme';
+is $url->userinfo,  undef, 'no userinfo';
+is $url->host,      'example.com', 'right host';
+is $url->port,      undef, 'no port';
+is $url->host_port, 'example.com', 'right host and port';
+is $url->path,      '/0', 'no path';
+is $url->query,     '0', 'right query';
+is $url->fragment,  '0', 'right fragment';
 is "$url", 'https://example.com/0?0#0', 'right format';
 
 # No authority
@@ -306,13 +308,14 @@ is "$url", 'wss://[::1]:3000/', 'right format';
 
 # IDNA
 $url = Mojo::URL->new('http://bücher.ch:3000/foo');
-ok $url->is_abs,    'is absolute';
-is $url->scheme,    'http', 'right scheme';
-is $url->host,      'bücher.ch', 'right host';
-is $url->ihost,     'xn--bcher-kva.ch', 'right internationalized host';
-is $url->port,      3000, 'right port';
-is $url->host_port, 'xn--bcher-kva.ch:3000', 'right host and port';
-is $url->path,      '/foo', 'right path';
+ok $url->is_abs,     'is absolute';
+is $url->scheme,     'http', 'right scheme';
+is $url->host,       'bücher.ch', 'right host';
+is $url->ihost,      'xn--bcher-kva.ch', 'right internationalized host';
+is $url->port,       3000, 'right port';
+is $url->host_port,  'xn--bcher-kva.ch:3000', 'right host and port';
+is $url->path,       '/foo', 'right path';
+is $url->path_query, '/foo', 'right path and query';
 is "$url", 'http://xn--bcher-kva.ch:3000/foo', 'right format';
 $url = Mojo::URL->new('http://bücher.bücher.ch:3000/foo');
 ok $url->is_abs, 'is absolute';

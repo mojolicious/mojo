@@ -96,6 +96,12 @@ sub path {
   return $self;
 }
 
+sub path_query {
+  my $self  = shift;
+  my $query = $self->query->to_string;
+  return $self->path->to_string . (length $query ? "?$query" : '');
+}
+
 sub protocol { lc(shift->scheme // '') }
 
 sub query {
@@ -200,12 +206,9 @@ sub to_string {
   my $authority = $self->authority;
   $url .= "//$authority" if defined $authority;
 
-  # Path
-  my $path = $self->path->to_string;
-  $url .= !$authority || $path eq '' || $path =~ m!^/! ? $path : "/$path";
-
-  # Query
-  if (length(my $query = $self->query->to_string)) { $url .= "?$query" }
+  # Path and query
+  my $path = $self->path_query;
+  $url .= !$authority || $path eq '' || $path =~ m!^[/?]! ? $path : "/$path";
 
   # Fragment
   return $url unless defined(my $fragment = $self->fragment);
@@ -382,6 +385,12 @@ defaults to a L<Mojo::Path> object.
 
   # "http://example.com/perldoc/Mojo/DOM/HTML"
   Mojo::URL->new('http://example.com/perldoc/Mojo/')->path('DOM/HTML');
+
+=head2 path_query
+
+  my $path_query = $url->path_query;
+
+Normalized version of L</"path"> and L</"query">.
 
 =head2 protocol
 

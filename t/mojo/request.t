@@ -1388,20 +1388,20 @@ is $clone->body, "Hello World!\n", 'right content';
 # Build full HTTP 1.1 proxy connect request with basic authentication
 $req = Mojo::Message::Request->new;
 $req->method('CONNECT');
-$req->url->parse('http://Aladdin:open%20sesame@127.0.0.1:3000/foo/bar');
+$req->url->parse('http://Aladdin:open%20sesame@bücher.ch:3000/foo/bar');
 $req->proxy('http://Aladdin:open%20sesame@127.0.0.2:8080');
 $req = Mojo::Message::Request->new->parse($req->to_string);
 ok $req->is_finished, 'request is finished';
 is $req->method,      'CONNECT', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '//127.0.0.1:3000', 'right URL';
-is $req->url->host,       '127.0.0.1',             'right host';
-is $req->url->port,       '3000',                  'right port';
-is $req->url->to_abs,     'http://127.0.0.1:3000', 'right absolute URL';
-is $req->proxy->userinfo, 'Aladdin:open sesame',   'right proxy userinfo';
+is $req->url,         '//xn--bcher-kva.ch:3000', 'right URL';
+is $req->url->host,   'xn--bcher-kva.ch',             'right host';
+is $req->url->port,   '3000',                         'right port';
+is $req->url->to_abs, 'http://xn--bcher-kva.ch:3000', 'right absolute URL';
+is $req->proxy->userinfo, 'Aladdin:open sesame', 'right proxy userinfo';
 is $req->headers->authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Authorization" value';
-is $req->headers->host, '127.0.0.1:3000', 'right "Host" value';
+is $req->headers->host, 'xn--bcher-kva.ch:3000', 'right "Host" value';
 is $req->headers->proxy_authorization, 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
   'right "Proxy-Authorization" value';
 
@@ -1512,7 +1512,7 @@ ok $counter, 'right counter';
 # Build HTTP 1.1 chunked request
 $req = Mojo::Message::Request->new;
 $req->method('GET');
-$req->url->parse('http://127.0.0.1/foo/bar');
+$req->url->parse('http://127.0.0.1');
 $req->content->write_chunk('hello world!');
 $req->content->write_chunk("hello world2!\n\n");
 $req->content->write_chunk('');
@@ -1521,8 +1521,8 @@ $req = Mojo::Message::Request->new->parse($req->to_string);
 ok $req->is_finished, 'request is finished';
 is $req->method,      'GET', 'right method';
 is $req->version,     '1.1', 'right version';
-is $req->url,         '/foo/bar', 'right URL';
-is $req->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req->url,         '/', 'right URL';
+is $req->url->to_abs, 'http://127.0.0.1/', 'right absolute URL';
 is $req->headers->host, '127.0.0.1', 'right "Host" value';
 is $req->headers->transfer_encoding, undef, 'no "Transfer-Encoding" value';
 is $req->body, "hello world!hello world2!\n\n", 'right content';
@@ -1530,7 +1530,7 @@ is $req->body, "hello world!hello world2!\n\n", 'right content';
 # Build full HTTP 1.1 request with cookies
 $req = Mojo::Message::Request->new;
 $req->method('GET');
-$req->url->parse('http://127.0.0.1/foo/bar');
+$req->url->parse('http://127.0.0.1/foo/bar?0');
 $req->headers->expect('100-continue');
 $req->cookies({name => 'foo', value => 'bar'},
   {name => 'bar', value => 'baz'});
@@ -1547,8 +1547,8 @@ is $req2->headers->host,   '127.0.0.1',    'right "Host" value';
 is $req2->headers->content_length, 13, 'right "Content-Length" value';
 is $req2->headers->cookie, 'foo=bar; bar=baz; baz=yada',
   'right "Cookie" value';
-is $req2->url, '/foo/bar', 'right URL';
-is $req2->url->to_abs, 'http://127.0.0.1/foo/bar', 'right absolute URL';
+is $req2->url, '/foo/bar?0', 'right URL';
+is $req2->url->to_abs, 'http://127.0.0.1/foo/bar?0', 'right absolute URL';
 ok defined $req2->cookie('foo'),   'cookie "foo" exists';
 ok defined $req2->cookie('bar'),   'cookie "bar" exists';
 ok defined $req2->cookie('baz'),   'cookie "baz" exists';

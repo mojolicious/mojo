@@ -210,7 +210,7 @@ get '/finish' => sub {
   my $stream = Mojo::IOLoop->stream($self->tx->connection);
   $self->on(finish => sub { shift->stash->{writing} = $stream->is_writing });
   $self->render_later;
-  Mojo::IOLoop->timer(0 => sub { $self->render(msg => 'Finish!') });
+  Mojo::IOLoop->next_tick(sub { $self->render(msg => 'Finish!') });
 };
 
 get '/too_long' => sub {

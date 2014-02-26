@@ -94,6 +94,7 @@ sub delay {
 sub generate_port { Mojo::IOLoop::Server->generate_port }
 
 sub is_running { _instance(shift)->reactor->is_running }
+sub next_tick  { _instance(shift)->reactor->next_tick(@_) }
 sub one_tick   { _instance(shift)->reactor->one_tick }
 
 sub recurring { shift->_timer(recurring => @_) }
@@ -492,6 +493,23 @@ Check if event loop is running.
 
   exit unless Mojo::IOLoop->is_running;
 
+=head2 next_tick
+
+  my $undef = Mojo::IOLoop->next_tick(sub {...});
+  my $undef = $loop->next_tick(sub {...});
+
+Invoke callback as soon as possible, but not before returning, always returns
+C<undef>.
+
+=head2 timer
+
+  my $id = Mojo::IOLoop->timer(5 => sub {...});
+  my $id = $loop->timer(5 => sub {...});
+  my $id = $loop->timer(0.25 => sub {...});
+
+Create a new timer, invoking the callback after a given amount of time in
+seconds.
+
 =head2 one_tick
 
   Mojo::IOLoop->one_tick;
@@ -512,9 +530,6 @@ into the reactor, so you need to be careful.
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds.
-
-  # Invoke as soon as possible
-  Mojo::IOLoop->recurring(0 => sub { say 'Reactor tick.' });
 
 =head2 remove
 
@@ -592,9 +607,6 @@ Get L<Mojo::IOLoop::Stream> object for id or turn object into a connection.
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds.
-
-  # Invoke as soon as possible
-  Mojo::IOLoop->timer(0 => sub { say 'Next tick.' });
 
 =head1 DEBUGGING
 

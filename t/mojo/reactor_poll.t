@@ -21,7 +21,7 @@ is ref $reactor, 'Mojo::Reactor::Poll', 'right object';
 
 # Make sure it stops automatically when not watching for events
 my $triggered;
-Mojo::IOLoop->timer(0.25 => sub { $triggered++ });
+Mojo::IOLoop->next_tick(sub { $triggered++ });
 Mojo::IOLoop->start;
 ok $triggered, 'reactor waited for one event';
 my $time = time;
@@ -133,7 +133,7 @@ ok !$timer, 'timer was not triggered';
 ok $recurring, 'recurring was triggered again';
 $reactor->remove($id);
 ($readable, $writable, $timer, $recurring) = ();
-$reactor->timer(0.025 => sub { shift->stop });
+$reactor->next_tick(sub { shift->stop });
 $reactor->start;
 ok $readable, 'handle is readable again';
 ok $writable, 'handle is writable again';

@@ -61,11 +61,11 @@ C<1>).
 
 Your application is preloaded in the manager process during startup, to run
 code whenever a new worker process has been forked you can use
-L<Mojo::IOLoop/"timer">.
+L<Mojo::IOLoop/"next_tick">.
 
   use Mojolicious::Lite;
 
-  Mojo::IOLoop->timer(0 => sub {
+  Mojo::IOLoop->next_tick(sub {
     app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
   });
 

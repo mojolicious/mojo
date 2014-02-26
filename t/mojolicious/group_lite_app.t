@@ -27,8 +27,8 @@ under('/missing' => sub {1})->route->to('does_not_exist#not_at_all');
 under '/suspended' => sub {
   my $self = shift;
 
-  Mojo::IOLoop->timer(
-    0 => sub {
+  Mojo::IOLoop->next_tick(
+    sub {
       return $self->render(text => 'stopped!') unless $self->param('ok');
       $self->stash(suspended => 'suspended!');
       $self->continue;

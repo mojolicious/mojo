@@ -15,7 +15,7 @@ helper my_cache => sub { state $cache = shift->param('cache') };
 # Delay dispatching
 hook around_dispatch => sub {
   my ($next, $c) = @_;
-  Mojo::IOLoop->timer(0 => sub { $next->() });
+  Mojo::IOLoop->next_tick(sub { $next->() });
 };
 
 get '/' => sub {

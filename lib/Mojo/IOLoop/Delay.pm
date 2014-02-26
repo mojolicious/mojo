@@ -20,7 +20,7 @@ sub pass { $_[0]->begin->(@_) }
 
 sub steps {
   my $self = shift->remaining([@_]);
-  $self->ioloop->timer(0 => $self->begin);
+  $self->ioloop->next_tick($self->begin);
   return $self;
 }
 
@@ -51,7 +51,7 @@ sub _step {
   }
 
   return $self->emit(finish => @args) unless $self->{counter};
-  $self->ioloop->timer(0 => $self->begin) unless $self->{pending};
+  $self->ioloop->next_tick($self->begin) unless $self->{pending};
 }
 
 1;

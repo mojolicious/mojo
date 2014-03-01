@@ -33,9 +33,10 @@ sub continue {
   return $self->auto_render($c) unless my $field = $stack->[$current];
 
   # Merge captures into stash
-  my @keys  = keys %$field;
   my $stash = $c->stash;
-  @{$stash}{@keys} = @{$stash->{'mojo.captures'}}{@keys} = values %$field;
+  my $captures = $stash->{'mojo.captures'} //= {};
+  %$captures = (%$captures, %$field);
+  %$stash    = (%$stash,    %$field);
 
   my $continue;
   my $last = !$stack->[++$current];

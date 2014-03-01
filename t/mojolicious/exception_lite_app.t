@@ -24,8 +24,9 @@ helper dead_helper => sub { die "dead helper!\n" };
 # Custom rendering for missing "txt" template
 hook before_render => sub {
   my ($self, $args) = @_;
-  $args->{text} = 'Missing template.'
-    if ($args->{template} // '') eq 'not_found' && $args->{format} eq 'txt';
+  return unless ($args->{template} // '') eq 'not_found';
+  my $exception = $self->stash('snapshot')->{exception};
+  $args->{text} = "Missing template, $exception." if $args->{format} eq 'txt';
 };
 
 # Custom exception rendering for "txt"
@@ -62,13 +63,15 @@ get '/trapped' => sub {
   $self->render(text => $@->{foo} || 'failed');
 };
 
-get '/missing_template';
+get '/missing_template' => {exception => 'whatever'};
 
 get '/missing_template/too' => sub {
   my $self = shift;
   $self->render('does_not_exist')
     or $self->res->headers->header('X-Not-Found' => 1);
 };
+
+get '/missing_helper' => sub { shift->missing_helper };
 
 # Dummy exception object
 package MyException;
@@ -215,12 +218,17 @@ $t->get_ok('/missing_template.json')->status_is(404)
 # Missing template with custom rendering
 $t->get_ok('/missing_template.txt')->status_is(404)
   ->content_type_is('text/plain;charset=UTF-8')
-  ->content_is('Missing template.');
+  ->content_is('Missing template, whatever.');
 
 # Missing template (failed rendering)
 $t->get_ok('/missing_template/too')->status_is(404)
   ->header_is('X-Not-Found' => 1)->content_type_is('text/html;charset=UTF-8')
   ->content_like(qr/Page not found/);
+
+# Missing helper (correct context)
+$t->get_ok('/missing_helper')->status_is(500)
+  ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Server error/)
+  ->content_like(qr/shift-&gt;missing_helper/);
 
 # Reuse exception
 ok !$exception, 'no exception';

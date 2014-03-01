@@ -39,20 +39,24 @@ is_deeply $dom->tree->[1][4][2], {a => 'b<c'}, 'right attributes';
 is $dom->tree->[1][4][3], $dom->tree->[1], 'right parent';
 is $dom->tree->[1][4][4][0], 'text', 'right element';
 is $dom->tree->[1][4][4][1], 'ju',   'right text';
-is $dom->tree->[1][4][5][0], 'tag',  'right element';
-is $dom->tree->[1][4][5][1], 'baz',  'right tag';
+is $dom->tree->[1][4][4][2], $dom->tree->[1][4], 'right parent';
+is $dom->tree->[1][4][5][0], 'tag', 'right element';
+is $dom->tree->[1][4][5][1], 'baz', 'right tag';
 is_deeply $dom->tree->[1][4][5][2], {a23 => undef}, 'right attributes';
 is $dom->tree->[1][4][5][3], $dom->tree->[1][4], 'right parent';
 is $dom->tree->[1][4][5][4][0], 'text', 'right element';
 is $dom->tree->[1][4][5][4][1], 's',    'right text';
+is $dom->tree->[1][4][5][4][2], $dom->tree->[1][4][5], 'right parent';
 is $dom->tree->[1][4][5][5][0], 'tag',  'right element';
 is $dom->tree->[1][4][5][5][1], 'bazz', 'right tag';
 is_deeply $dom->tree->[1][4][5][5][2], {}, 'empty attributes';
 is $dom->tree->[1][4][5][5][3], $dom->tree->[1][4][5], 'right parent';
 is $dom->tree->[1][4][5][6][0], 'text', 'right element';
 is $dom->tree->[1][4][5][6][1], 't',    'right text';
+is $dom->tree->[1][4][5][6][2], $dom->tree->[1][4][5], 'right parent';
 is $dom->tree->[1][5][0], 'text',  'right element';
 is $dom->tree->[1][5][1], 'works', 'right text';
+is $dom->tree->[1][5][2], $dom->tree->[1], 'right parent';
 is "$dom", <<EOF, 'right result';
 <foo><bar a="b&lt;c">ju<baz a23>s<bazz></bazz>t</baz></bar>works</foo>
 EOF
@@ -145,17 +149,27 @@ ok !$dom->at('simple')->ancestors->first->xml, 'XML mode not active';
 # Nodes
 $dom = Mojo::DOM->new(
   '<!DOCTYPE before><p>test<![CDATA[123]]><!-- 456 --></p><?after?>');
+is $dom->at('p')->previous_sibling->content, ' before', 'right content';
+is $dom->at('p')->previous_sibling->previous_sibling, undef,
+  'no more siblings';
+is $dom->at('p')->next_sibling->content,      'after', 'right content';
+is $dom->at('p')->next_sibling->next_sibling, undef,   'no more siblings';
+is $dom->at('p')->contents->last->previous_sibling->previous_sibling->content,
+  'test', 'right content';
+is $dom->at('p')->contents->first->next_sibling->next_sibling->content,
+  ' 456 ', 'right content';
 is $dom->all_contents->[0]->node,    'doctype', 'right node';
 is $dom->all_contents->[0]->content, ' before', 'right content';
-is $dom->all_contents->[1]->type,    'p',       'right type';
-is $dom->all_contents->[2]->node,    'text',    'right node';
-is $dom->all_contents->[2]->content, 'test',    'right content';
-is $dom->all_contents->[5]->node,    'pi',      'right node';
-is $dom->all_contents->[5]->content, 'after',   'right content';
-is $dom->at('p')->all_contents->[0]->node,     'text',    'right node';
-is $dom->at('p')->all_contents->[0]->content,  'test',    'right node';
-is $dom->at('p')->all_contents->[-1]->node,    'comment', 'right node';
-is $dom->at('p')->all_contents->[-1]->content, ' 456 ',   'right node';
+is $dom->all_contents->[0], '<!DOCTYPE before>', 'right content';
+is $dom->all_contents->[1]->type,    'p',     'right type';
+is $dom->all_contents->[2]->node,    'text',  'right node';
+is $dom->all_contents->[2]->content, 'test',  'right content';
+is $dom->all_contents->[5]->node,    'pi',    'right node';
+is $dom->all_contents->[5]->content, 'after', 'right content';
+is $dom->at('p')->all_contents->[0]->node,    'text', 'right node';
+is $dom->at('p')->all_contents->[0]->content, 'test', 'right node';
+is $dom->at('p')->all_contents->last->node,    'comment', 'right node';
+is $dom->at('p')->all_contents->last->content, ' 456 ',   'right node';
 is $dom->contents->[1]->contents->first->parent->type, 'p', 'right type';
 is $dom->contents->[1]->contents->first->content, 'test', 'right content';
 is $dom->contents->[1]->contents->first, 'test', 'right content';
@@ -165,8 +179,8 @@ is $dom->at('p')->contents->first->node,    'cdata', 'right node';
 is $dom->at('p')->contents->first->content, '123',   'right content';
 is $dom->at('p')->contents->[1]->node,    'comment', 'right node';
 is $dom->at('p')->contents->[1]->content, ' 456 ',   'right content';
-is $dom->contents->first->node,    'doctype', 'right node';
-is $dom->contents->first->content, ' before', 'right content';
+is $dom->[0]->node,    'doctype', 'right node';
+is $dom->[0]->content, ' before', 'right content';
 is $dom->contents->[2]->node,    'pi',    'right node';
 is $dom->contents->[2]->content, 'after', 'right content';
 is $dom->contents->first->content(' again')->content, ' again',
@@ -175,11 +189,60 @@ is $dom->contents->grep(sub { $_->node eq 'pi' })->remove->first->node,
   'root', 'right node';
 is "$dom", '<!DOCTYPE again><p><![CDATA[123]]><!-- 456 --></p>',
   'right result';
+
+# Modify nodes
 $dom = Mojo::DOM->new('<script>la<la>la</script>');
 is $dom->at('script')->node, 'tag', 'right node';
-is $dom->at('script')->contents->first->node,    'raw',      'right node';
-is $dom->at('script')->contents->first->content, 'la<la>la', 'right content';
+is $dom->at('script')->[0]->node,    'raw',      'right node';
+is $dom->at('script')->[0]->content, 'la<la>la', 'right content';
 is "$dom", '<script>la<la>la</script>', 'right result';
+is $dom->at('script')->contents->first->replace('a<b>c</b>1<b>d</b>')->type,
+  'script', 'right type';
+is "$dom", '<script>a<b>c</b>1<b>d</b></script>', 'right result';
+is $dom->at('b')->contents->first->append('e')->content, 'c', 'right content';
+is $dom->at('b')->contents->first->prepend('f')->node, 'text', 'right node';
+is "$dom", '<script>a<b>fce</b>1<b>d</b></script>', 'right result';
+is $dom->at('script')->contents->first->siblings->first->type, 'b',
+  'right type';
+is $dom->at('script')->contents->first->next->content, 'fce', 'right content';
+is $dom->at('script')->contents->first->previous, undef, 'no siblings';
+is $dom->at('script')->contents->[2]->previous->content, 'fce',
+  'right content';
+is $dom->at('b')->contents->[1]->next, undef, 'no siblings';
+is $dom->at('script')->contents->first->wrap('<i>:)</i>')->root,
+  '<script><i>:)a</i><b>fce</b>1<b>d</b></script>', 'right result';
+is $dom->at('i')->contents->first->wrap_content('<b></b>')->root,
+  '<script><i><b>:)</b>a</i><b>fce</b>1<b>d</b></script>', 'right result';
+is $dom->at('b')->contents->first->ancestors->type->join(','), 'b,i,script',
+  'right result';
+is $dom->at('b')->contents->first->append_content('g')->content, ':)g',
+  'right content';
+is $dom->at('b')->contents->first->prepend_content('h')->content, 'h:)g',
+  'right content';
+is "$dom", '<script><i><b>h:)g</b>a</i><b>fce</b>1<b>d</b></script>',
+  'right result';
+
+# XML nodes
+$dom = Mojo::DOM->new->xml(1)->parse('<b>test</b>');
+ok $dom->at('b')->contents->first->xml, 'XML mode active';
+ok $dom->at('b')->contents->first->replace('<br>')->contents->first->xml,
+  'XML mode active';
+is "$dom", '<b><br /></b>', 'right result';
+
+# Treating nodes as elements
+$dom = Mojo::DOM->new('foo<b>bar</b>baz');
+is $dom->contents->first->contents->size,     0, 'no contents';
+is $dom->contents->first->all_contents->size, 0, 'no contents';
+is $dom->contents->first->children->size,     0, 'no children';
+is $dom->contents->first->strip->parent, 'foo<b>bar</b>baz', 'no changes';
+is $dom->contents->first->at('b'), undef, 'no result';
+is $dom->contents->first->find('*')->size, 0, 'no results';
+is $dom->contents->first->match('*'), undef, 'no match';
+is_deeply $dom->contents->first->attr, {}, 'no attributes';
+is $dom->contents->first->namespace, '', 'no namespace';
+is $dom->contents->first->type,      '', 'no type';
+is $dom->contents->first->text,      '', 'no text';
+is $dom->contents->first->all_text,  '', 'no text';
 
 # Class and ID
 $dom = Mojo::DOM->new->parse('<div id="id" class="class">a</div>');
@@ -808,14 +871,14 @@ is_deeply \@li, [qw(A C E G)], 'found all odd li elements';
 @li = ();
 $dom->find('li:nth-last-child(odd)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw(B D F H)], 'found all odd li elements';
-is $dom->find(':nth-child(odd)')->[0]->type,       'ul', 'right type';
-is $dom->find(':nth-child(odd)')->[1]->text,       'A',  'right text';
-is $dom->find(':nth-child(1)')->[0]->type,         'ul', 'right type';
-is $dom->find(':nth-child(1)')->[1]->text,         'A',  'right text';
-is $dom->find(':nth-last-child(odd)')->[0]->type,  'ul', 'right type';
-is $dom->find(':nth-last-child(odd)')->[-1]->text, 'H',  'right text';
-is $dom->find(':nth-last-child(1)')->[0]->type,    'ul', 'right type';
-is $dom->find(':nth-last-child(1)')->[1]->text,    'H',  'right text';
+is $dom->find(':nth-child(odd)')->[0]->type,      'ul', 'right type';
+is $dom->find(':nth-child(odd)')->[1]->text,      'A',  'right text';
+is $dom->find(':nth-child(1)')->[0]->type,        'ul', 'right type';
+is $dom->find(':nth-child(1)')->[1]->text,        'A',  'right text';
+is $dom->find(':nth-last-child(odd)')->[0]->type, 'ul', 'right type';
+is $dom->find(':nth-last-child(odd)')->last->text, 'H', 'right text';
+is $dom->find(':nth-last-child(1)')->[0]->type, 'ul', 'right type';
+is $dom->find(':nth-last-child(1)')->[1]->text, 'H',  'right text';
 @li = ();
 $dom->find('li:nth-child(2n+1)')->each(sub { push @li, shift->text });
 is_deeply \@li, [qw(A C E G)], 'found all odd li elements';
@@ -1185,6 +1248,11 @@ is $dom->at('html > body')->text,         'bar', 'right text';
 # Optional "li" tag
 $dom = Mojo::DOM->new->parse(<<EOF);
 <ul>
+  <li>
+    <ol>
+      <li>F
+      <li>G
+    </ol>
   <li>A</li>
   <LI>B
   <li>C</li>
@@ -1192,11 +1260,13 @@ $dom = Mojo::DOM->new->parse(<<EOF);
   <li>E
 </ul>
 EOF
-is $dom->find('ul > li')->[0]->text, 'A', 'right text';
-is $dom->find('ul > li')->[1]->text, 'B', 'right text';
-is $dom->find('ul > li')->[2]->text, 'C', 'right text';
-is $dom->find('ul > li')->[3]->text, 'D', 'right text';
-is $dom->find('ul > li')->[4]->text, 'E', 'right text';
+is $dom->find('ul > li > ol > li')->[0]->text, 'F', 'right text';
+is $dom->find('ul > li > ol > li')->[1]->text, 'G', 'right text';
+is $dom->find('ul > li')->[1]->text,           'A', 'right text';
+is $dom->find('ul > li')->[2]->text,           'B', 'right text';
+is $dom->find('ul > li')->[3]->text,           'C', 'right text';
+is $dom->find('ul > li')->[4]->text,           'D', 'right text';
+is $dom->find('ul > li')->[5]->text,           'E', 'right text';
 
 # Optional "p" tag
 $dom = Mojo::DOM->new->parse(<<EOF);
@@ -2030,12 +2100,12 @@ is $dom->at('a')->wrap_content('A')->type, 'a', 'right element';
 is "$dom", '<a>Test</a>', 'right result';
 is $dom->wrap_content('<b></b>')->node, 'root', 'right node';
 is "$dom", '<b><a>Test</a></b>', 'right result';
-is $dom->at('b')->strip->at('a')->wrap_content('1<b c="d"></b>')->type, 'a',
-  'right element';
-is "$dom", '<a>1<b c="d">Test</b></a>', 'right result';
+is $dom->at('b')->strip->at('a')->type('e:a')->wrap_content('1<b c="d"></b>')
+  ->type, 'e:a', 'right element';
+is "$dom", '<e:a>1<b c="d">Test</b></e:a>', 'right result';
 is $dom->at('a')->wrap_content('C<c><d>D</d><e>E</e></c>F')->parent->node,
   'root', 'right node';
-is "$dom", '<a>C<c><d>D1<b c="d">Test</b></d><e>E</e></c>F</a>',
+is "$dom", '<e:a>C<c><d>D1<b c="d">Test</b></d><e>E</e></c>F</e:a>',
   'right result';
 
 # Broken "div" in "td"
@@ -2226,6 +2296,12 @@ is $dom->find('div > ul li')->[1]->text, 'B', 'right text';
 is $dom->find('div > ul li')->[2], undef, 'no result';
 is $dom->find('div > ul ul')->[0]->text, 'C', 'right text';
 is $dom->find('div > ul ul')->[1], undef, 'no result';
+
+# Slash between attributes
+$dom = Mojo::DOM->new('<input /type=checkbox/value="/a/" checked/><br/>');
+is_deeply $dom->at('input')->attr,
+  {type => 'checkbox', value => '/a/', checked => undef}, 'right attributes';
+is "$dom", '<input checked type="checkbox" value="/a/"><br>', 'right result';
 
 # Extra whitespace
 $dom = Mojo::DOM->new('< span>a< /span><b >b</b><span >c</ span>');

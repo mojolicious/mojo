@@ -422,7 +422,9 @@ like this.
       my $self = shift;
 
       # Redirect to main page with a 302 response if user is not logged in
-      return $self->session('user') || !$self->redirect_to('index');
+      return 1 if $self->session('user');
+      $self->redirect_to('index');
+      return undef;
     };
 
     # A protected page auto rendering "protected.html.ep"
@@ -531,7 +533,9 @@ actual action code needs to be changed.
 
     my $logged_in = $r->under(sub {
       my $self = shift;
-      return $self->session('user') || !$self->redirect_to('index');
+      return 1 if $self->session('user');
+      $self->redirect_to('index');
+      return undef;
     });
     $logged_in->get('/protected');
 
@@ -592,7 +596,9 @@ Once again the actual action code does not change at all.
 
   sub logged_in {
     my $self = shift;
-    return $self->session('user') || !$self->redirect_to('index');
+    return 1 if $self->session('user');
+    $self->redirect_to('index');
+    return undef;
   }
 
   sub logout {

@@ -12,13 +12,12 @@ ok $pointer->contains({foo => {bar => undef}}, '/foo/bar'),
   'contains "/foo/bar"';
 
 # "contains" (mixed)
-ok $pointer->contains({foo => [0, 1, 2]}, ''),       'contains ""';
-ok $pointer->contains({foo => [0, 1, 2]}, '/foo/0'), 'contains "/foo/0"';
-ok !$pointer->contains({foo => [0, 1, 2]}, '/foo/9'),
-  'does not contain "/foo/9"';
-ok !$pointer->contains({foo => [0, 1, 2]}, '/foo/bar'),
-  'does not contain "/foo/bar"';
-ok !$pointer->contains({foo => [0, 1, 2]}, '/0'), 'does not contain "/0"';
+$pointer = Mojo::JSON::Pointer->new({foo => [0, 1, 2]});
+ok $pointer->contains(''),       'contains ""';
+ok $pointer->contains('/foo/0'), 'contains "/foo/0"';
+ok !$pointer->contains('/foo/9'),   'does not contain "/foo/9"';
+ok !$pointer->contains('/foo/bar'), 'does not contain "/foo/bar"';
+ok !$pointer->contains('/0'),       'does not contain "/0"';
 
 # "get" (hash)
 is_deeply $pointer->get({foo => 'bar'}, ''), {foo => 'bar'},
@@ -31,14 +30,11 @@ is_deeply $pointer->get({foo => {23 => {baz => 0}}}, '/foo/23'), {baz => 0},
 # "get" (mixed)
 is_deeply $pointer->get({foo => {bar => [1, 2, 3]}}, '/foo/bar'), [1, 2, 3],
   '"/foo/bar" is "[1, 2, 3]"';
-is $pointer->get({foo => {bar => [0, undef, 3]}}, '/foo/bar/0'), 0,
-  '"/foo/bar/0" is "0"';
-is $pointer->get({foo => {bar => [0, undef, 3]}}, '/foo/bar/1'), undef,
-  '"/foo/bar/1" is "undef"';
-is $pointer->get({foo => {bar => [0, undef, 3]}}, '/foo/bar/2'), 3,
-  '"/foo/bar/2" is "3"';
-is $pointer->get({foo => {bar => [0, undef, 3]}}, '/foo/bar/6'), undef,
-  '"/foo/bar/6" is "undef"';
+$pointer = Mojo::JSON::Pointer->new({foo => {bar => [0, undef, 3]}});
+is $pointer->get('/foo/bar/0'), 0,     '"/foo/bar/0" is "0"';
+is $pointer->get('/foo/bar/1'), undef, '"/foo/bar/1" is "undef"';
+is $pointer->get('/foo/bar/2'), 3,     '"/foo/bar/2" is "3"';
+is $pointer->get('/foo/bar/6'), undef, '"/foo/bar/6" is "undef"';
 
 # "get" (encoded)
 is $pointer->get([{'foo/bar' => 'bar'}], '/0/foo~1bar'), 'bar',
@@ -69,18 +65,18 @@ my $hash = {
   ' '    => 7,
   'm~n'  => 8
 };
-is_deeply $pointer->get($hash, ''), $hash, 'empty pointer is whole document';
-is_deeply $pointer->get($hash, '/foo'), ['bar', 'baz'],
-  '"/foo" is "["bar", "baz"]"';
-is $pointer->get($hash, '/foo/0'), 'bar', '"/foo/0" is "bar"';
-is $pointer->get($hash, '/'),      0,     '"/" is 0';
-is $pointer->get($hash, '/a~1b'),  1,     '"/a~1b" is 1';
-is $pointer->get($hash, '/c%d'),   2,     '"/c%d" is 2';
-is $pointer->get($hash, '/e^f'),   3,     '"/e^f" is 3';
-is $pointer->get($hash, '/g|h'),   4,     '"/g|h" is 4';
-is $pointer->get($hash, '/i\\j'),  5,     '"/i\\\\j" is 5';
-is $pointer->get($hash, '/k"l'),   6,     '"/k\\"l" is 6';
-is $pointer->get($hash, '/ '),     7,     '"/ " is 7';
-is $pointer->get($hash, '/m~0n'),  8,     '"/m~0n" is 8';
+$pointer = Mojo::JSON::Pointer->new($hash);
+is_deeply $pointer->get(''), $hash, 'empty pointer is whole document';
+is_deeply $pointer->get('/foo'), ['bar', 'baz'], '"/foo" is "["bar", "baz"]"';
+is $pointer->get('/foo/0'), 'bar', '"/foo/0" is "bar"';
+is $pointer->get('/'),      0,     '"/" is 0';
+is $pointer->get('/a~1b'),  1,     '"/a~1b" is 1';
+is $pointer->get('/c%d'),   2,     '"/c%d" is 2';
+is $pointer->get('/e^f'),   3,     '"/e^f" is 3';
+is $pointer->get('/g|h'),   4,     '"/g|h" is 4';
+is $pointer->get('/i\\j'),  5,     '"/i\\\\j" is 5';
+is $pointer->get('/k"l'),   6,     '"/k\\"l" is 6';
+is $pointer->get('/ '),     7,     '"/ " is 7';
+is $pointer->get('/m~0n'),  8,     '"/m~0n" is 8';
 
 done_testing();

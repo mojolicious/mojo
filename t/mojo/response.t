@@ -5,7 +5,7 @@ use IO::Compress::Gzip 'gzip';
 use Mojo::Asset::File;
 use Mojo::Content::Single;
 use Mojo::Content::MultiPart;
-use Mojo::JSON;
+use Mojo::JSON 'encode_json';
 use Mojo::Message::Response;
 use Mojo::Util 'encode';
 
@@ -978,7 +978,7 @@ $res = Mojo::Message::Response->new;
 $res->parse("HTTP/1.1 200 OK\x0a");
 $res->parse("Content-Type: application/json\x0a");
 $res->parse("Content-Length: 27\x0a\x0a");
-$res->parse(Mojo::JSON->new->encode({foo => 'bar', baz => [1, 2, 3]}));
+$res->parse(encode_json({foo => 'bar', baz => [1, 2, 3]}));
 ok $res->is_finished, 'response is finished';
 is $res->code,        200, 'right status';
 is $res->message,     'OK', 'right message';

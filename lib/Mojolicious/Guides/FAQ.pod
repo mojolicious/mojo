@@ -77,7 +77,7 @@ calling subroutine until the subroutine is finished.
   my $result = blocking_subroutine();
   ...
 
-A <non-blocking> operation on the other hand lets the calling subroutine
+A C<non-blocking> operation on the other hand lets the calling subroutine
 continue execution even though the subroutine is not yet finished. Instead of
 waiting, the calling subroutine passes along a callback to be executed once
 the subroutine is finished, this is called continuation-passing style.

@@ -50,9 +50,9 @@ is $app->config('foo'), 'bar', 'right value';
 delete $app->config->{foo};
 is $app->config('foo'), undef, 'no value';
 $app->config(foo => 'bar', baz => 'yada');
-is_deeply $app->config, {foo => 'bar', baz => 'yada'}, 'right value';
-$app->config({test => 23});
-is $app->config->{test}, 23, 'right value';
+is $app->config({test => 23})->config->{test}, 23, 'right value';
+is_deeply $app->config, {foo => 'bar', baz => 'yada', test => 23},
+  'right value';
 
 # Transaction
 isa_ok $app->build_tx, 'Mojo::Transaction::HTTP', 'right class';

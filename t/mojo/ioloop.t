@@ -28,8 +28,8 @@ is ref $loop->reactor, 'MyReactor', 'right class';
 
 # Double start
 my $err;
-Mojo::IOLoop->timer(
-  0 => sub {
+Mojo::IOLoop->next_tick(
+  sub {
     eval { Mojo::IOLoop->start };
     $err = $@;
     Mojo::IOLoop->stop;

@@ -49,10 +49,13 @@ sub new { @_ > 1 ? shift->SUPER::new->parse(@_) : shift->SUPER::new }
 
 sub parse {
   my $self = shift;
-  my $pattern = @_ % 2 ? (shift || '/') : '/';
-  $self->_tokenize($pattern =~ m!^/! ? $pattern : "/$pattern")
-    if $pattern ne '/';
-  return $self->constraints({@_});
+
+  my $pattern = @_ % 2 ? (shift // '/') : '/';
+  $pattern =~ s!^/*|/+!/!g;
+  return $self->constraints({@_}) if $pattern eq '/';
+  $pattern =~ s!/$!!;
+
+  return $self->constraints({@_})->_tokenize($pattern);
 }
 
 sub render {
@@ -230,7 +233,7 @@ sub _tokenize {
     }
   }
 
-  $self->pattern($pattern)->tree(\@tree);
+  return $self->pattern($pattern)->tree(\@tree);
 }
 
 1;

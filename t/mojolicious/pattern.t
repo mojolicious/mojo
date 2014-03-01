@@ -234,6 +234,24 @@ $result = $pattern->match('/footest', 1);
 is_deeply $result, {'' => 'foo'}, 'right structure';
 is $pattern->render($result, 1), '/footest', 'right result';
 
+# Normalize slashes
+$pattern = Mojolicious::Routes::Pattern->new(':foo/');
+$result = $pattern->match('/bar', 1);
+is_deeply $result, {'foo' => 'bar'}, 'right structure';
+is $pattern->render($result, 1), '/bar', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('//:foo//bar//');
+$result = $pattern->match('/foo/bar', 1);
+is_deeply $result, {'foo' => 'foo'}, 'right structure';
+is $pattern->render($result, 1), '/foo/bar', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('//');
+$result = $pattern->match('/', 1);
+is_deeply $result, {}, 'right structure';
+is $pattern->render($result, 1), '/', 'right result';
+$pattern = Mojolicious::Routes::Pattern->new('0');
+$result = $pattern->match('/0', 1);
+is_deeply $result, {}, 'right structure';
+is $pattern->render($result, 1), '/0', 'right result';
+
 # Unicode
 $pattern = Mojolicious::Routes::Pattern->new('/(one)♥(two)');
 $result  = $pattern->match('/i♥mojolicious');

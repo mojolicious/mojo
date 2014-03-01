@@ -9,7 +9,7 @@ use Mojo::Base -base;
 #  Bender: You're better off dead, I'm telling you, dude.
 #  Fry: Santa Claus is gunning you down!"
 use Mojo::IOLoop;
-use Mojo::JSON;
+use Mojo::JSON 'j';
 use Mojo::JSON::Pointer;
 use Mojo::Server;
 use Mojo::UserAgent;
@@ -144,14 +144,14 @@ sub json_has {
   my ($self, $p, $desc) = @_;
   $desc ||= qq{has value for JSON Pointer "$p"};
   return $self->_test('ok',
-    !!Mojo::JSON::Pointer->new->contains($self->tx->res->json, $p), $desc);
+    !!Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
 }
 
 sub json_hasnt {
   my ($self, $p, $desc) = @_;
   $desc ||= qq{has no value for JSON Pointer "$p"};
   return $self->_test('ok',
-    !Mojo::JSON::Pointer->new->contains($self->tx->res->json, $p), $desc);
+    !Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
 }
 
 sub json_is {
@@ -288,8 +288,7 @@ sub _build_ok {
 
 sub _json {
   my ($self, $method, $p) = @_;
-  return Mojo::JSON::Pointer->new->$method(
-    Mojo::JSON->new->decode(@{$self->message // []}[1]), $p);
+  return Mojo::JSON::Pointer->new(j(@{$self->message // []}[1]))->$method($p);
 }
 
 sub _message {
@@ -316,7 +315,7 @@ sub _request_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
 
   # Establish WebSocket connection
-  if (lc($tx->req->headers->upgrade // '') eq 'websocket') {
+  if ($tx->req->is_handshake) {
     $self->{messages} = [];
     $self->{finished} = undef;
     $self->ua->start(
@@ -575,7 +574,7 @@ arguments as L<Mojo::UserAgent/"delete">, except for the callback.
   $t = $t->element_exists('html head title', 'has a title');
 
 Checks for existence of the CSS selectors first matching HTML/XML element with
-L<Mojo::DOM>.
+L<Mojo::DOM/"at">.
 
 =head2 element_exists_not
 
@@ -876,7 +875,7 @@ Opposite of L</"status_is">.
   $t = $t->text_is('html head title' => 'Hello!', 'right title');
 
 Checks text content of the CSS selectors first matching HTML/XML element for
-exact match with L<Mojo::DOM>.
+exact match with L<Mojo::DOM/"at">.
 
 =head2 text_isnt
 
@@ -891,7 +890,7 @@ Opposite of L</"text_is">.
   $t = $t->text_like('html head title' => qr/Hello/, 'right title');
 
 Checks text content of the CSS selectors first matching HTML/XML element for
-similar match with L<Mojo::DOM>.
+similar match with L<Mojo::DOM/"at">.
 
 =head2 text_unlike
 

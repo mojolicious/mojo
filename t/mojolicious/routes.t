@@ -13,7 +13,7 @@ $r->route('/clean')->to(clean => 1)->name('very_clean');
 $r->route('/clean/too')->to(something => 1);
 
 # /0
-$r->route('/0')->to(null => 1);
+$r->route('0')->to(null => 1);
 
 # /alternatives
 # /alternatives/0
@@ -24,7 +24,7 @@ $r->route('/alternatives/:foo', foo => [qw(0 test 23)])->to(foo => 11);
 # /alternatives2/0
 # /alternatives2/test
 # /alternatives2/23
-$r->route('/alternatives2/:foo', foo => [qw(0 test 23)]);
+$r->route('/alternatives2/:foo/', foo => [qw(0 test 23)]);
 
 # /alternatives3/foo
 # /alternatives3/foobar
@@ -51,7 +51,7 @@ $r->route('/:controller/testedit')->to(action => 'testedit');
 $test->route('/delete/(id)', id => qr/\d+/)->to(action => 'delete', id => 23);
 
 # /test2
-my $test2 = $r->bridge('/test2')->to(controller => 'test2');
+my $test2 = $r->bridge('/test2/')->to(controller => 'test2');
 
 # /test2 (inline)
 my $test4 = $test2->bridge('/')->to(controller => 'index');
@@ -137,13 +137,6 @@ $r->route('/method/post_get')->via(qw(POST get))
 
 # /simple/form
 $r->route('/simple/form')->to('test-test#test');
-
-# /edge/gift
-my $edge = $r->route('/edge');
-my $auth = $edge->bridge('/auth')->to('auth#check');
-$auth->route('/about/')->to('pref#about');
-$auth->bridge->to('album#allow')->route('/album/create/')->to('album#create');
-$auth->route('/gift/')->to('gift#index')->name('gift');
 
 # /regex/alternatives/*
 $r->route('/regex/alternatives/:alternatives', alternatives => qr/foo|bar|baz/)
@@ -443,6 +436,9 @@ $m->match($c => {method => 'GET', path => '/test2/baz'});
 @stack = ({controller => 'test2'}, {controller => 'just', action => 'works'});
 is_deeply $m->stack, \@stack, 'right structure';
 is $m->path_for, '/test2/baz', 'right path';
+$m = Mojolicious::Routes::Match->new(root => $r);
+$m->match($c => {method => 'GET', path => '/test2baz'});
+is_deeply $m->stack, [], 'empty stack';
 
 # Named path_for
 $m = Mojolicious::Routes::Match->new(root => $r);
@@ -662,18 +658,6 @@ is_deeply $m->stack, [{controller => 'test-test', action => 'test'}],
   'right structure';
 is $m->path_for, '/simple/form', 'right path';
 is $m->path_for('current'), '/simple/form', 'right path';
-
-# Special edge case with nested bridges
-$m = Mojolicious::Routes::Match->new(root => $r);
-$m->match($c => {method => 'GET', path => '/edge/auth/gift'});
-@stack = (
-  {controller => 'auth', action => 'check'},
-  {controller => 'gift', action => 'index'}
-);
-is_deeply $m->stack, \@stack, 'right structure';
-is $m->path_for, '/edge/auth/gift', 'right path';
-is $m->path_for('gift'),    '/edge/auth/gift', 'right path';
-is $m->path_for('current'), '/edge/auth/gift', 'right path';
 
 # Special edge case with nested bridges (regex)
 $m = Mojolicious::Routes::Match->new(root => $r);

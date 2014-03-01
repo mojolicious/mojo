@@ -2,13 +2,14 @@ package Mojo::JSON;
 use Mojo::Base -base;
 
 use B;
+use Carp 'croak';
 use Exporter 'import';
 use Mojo::Util;
 use Scalar::Util 'blessed';
 
 has 'error';
 
-our @EXPORT_OK = ('j');
+our @EXPORT_OK = qw(decode_json encode_json j);
 
 # Literal names
 my $FALSE = bless \(my $false = 0), 'Mojo::JSON::_Bool';
@@ -41,72 +42,69 @@ my $UTF_PATTERNS = {
 my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 
 sub decode {
-  my ($self, $bytes) = @_;
+  my $self = shift->error(undef);
+  my $ref = eval { _decode(shift) };
+  return $ref if $ref;
+  $self->error(_chomp($@));
+  return undef;
+}
 
-  # Clean start
-  $self->error(undef);
+sub decode_json {
+  eval { _decode(shift) } // croak _chomp($@);
+}
+
+sub encode { encode_json($_[1]) }
+
+sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
+
+sub false {$FALSE}
+
+sub j {
+  return encode_json($_[0]) if ref $_[0] eq 'ARRAY' || ref $_[0] eq 'HASH';
+  return eval { _decode($_[0]) };
+}
+
+sub true {$TRUE}
+
+sub _chomp { chomp $_[0] ? $_[0] : $_[0] }
+
+sub _decode {
 
   # Missing input
-  $self->error('Missing or empty input') and return undef unless $bytes;
+  die "Missing or empty input\n" unless length(my $bytes = shift);
 
   # Remove BOM
   $bytes =~ s/^(?:\357\273\277|\377\376\0\0|\0\0\376\377|\376\377|\377\376)//g;
 
   # Wide characters
-  $self->error('Wide character in input') and return undef
-    unless utf8::downgrade($bytes, 1);
+  die "Wide character in input\n" unless utf8::downgrade($bytes, 1);
 
   # Detect and decode Unicode
   my $encoding = 'UTF-8';
   $bytes =~ $UTF_PATTERNS->{$_} and $encoding = $_ for keys %$UTF_PATTERNS;
-  $bytes = Mojo::Util::decode $encoding, $bytes;
+  local $_ = Mojo::Util::decode($encoding, $bytes) // '';
 
-  # Object or array
-  my $res = eval {
-    local $_ = $bytes;
+  # Leading whitespace
+  m/\G$WHITESPACE_RE/gc;
 
-    # Leading whitespace
-    m/\G$WHITESPACE_RE/gc;
+  # Array
+  my $ref;
+  if (m/\G\[/gc) { $ref = _decode_array() }
 
-    # Array
-    my $ref;
-    if (m/\G\[/gc) { $ref = _decode_array() }
+  # Object
+  elsif (m/\G\{/gc) { $ref = _decode_object() }
 
-    # Object
-    elsif (m/\G\{/gc) { $ref = _decode_object() }
+  # Invalid character
+  else { _exception('Expected array or object') }
 
-    # Invalid character
-    else { _exception('Expected array or object') }
-
-    # Leftover data
-    unless (m/\G$WHITESPACE_RE\z/gc) {
-      my $got = ref $ref eq 'ARRAY' ? 'array' : 'object';
-      _exception("Unexpected data after $got");
-    }
-
-    $ref;
-  };
-
-  # Exception
-  if (!$res && (my $e = $@)) {
-    chomp $e;
-    $self->error($e);
+  # Leftover data
+  unless (m/\G$WHITESPACE_RE\z/gc) {
+    my $got = ref $ref eq 'ARRAY' ? 'array' : 'object';
+    _exception("Unexpected data after $got");
   }
 
-  return $res;
+  return $ref;
 }
-
-sub encode { Mojo::Util::encode 'UTF-8', _encode_value($_[1]) }
-
-sub false {$FALSE}
-
-sub j {
-  my $d = shift;
-  return __PACKAGE__->new->encode($d) if ref $d eq 'ARRAY' || ref $d eq 'HASH';
-  return __PACKAGE__->new->decode($d);
-}
-
-sub true {$TRUE}
 
 sub _decode_array {
   my @array;
@@ -326,19 +324,18 @@ Mojo::JSON - Minimalistic JSON
 
 =head1 SYNOPSIS
 
-  use Mojo::JSON;
+  use Mojo::JSON qw(decode_json encode_json);
 
-  # Encode and decode JSON
-  my $json  = Mojo::JSON->new;
-  my $bytes = $json->encode({foo => [1, 2], bar => 'hello!', baz => \1});
-  my $hash  = $json->decode($bytes);
+  # Encode and decode JSON (die on errors)
+  my $bytes = encode_json({foo => [1, 2], bar => 'hello!', baz => \1});
+  my $hash  = decode_json($bytes);
 
-  # Check for errors
+  # Handle errors
   my $json = Mojo::JSON->new;
   if (defined(my $hash = $json->decode($bytes))) { say $hash->{message} }
   else { say 'Error: ', $json->error }
 
-  # Use the alternative interface
+  # Ignore errors
   use Mojo::JSON 'j';
   my $bytes = j({foo => [1, 2], bar => 'hello!', baz => \1});
   my $hash  = j($bytes);
@@ -380,6 +377,20 @@ C<u2028> and C<u2029> will always be escaped to make JSONP easier.
 
 L<Mojo::JSON> implements the following functions, which can be imported
 individually.
+
+=head2 decode_json
+
+  my $array = decode_json($bytes);
+  my $hash  = decode_json($bytes);
+
+Decode JSON to Perl data structure and die if decoding fails.
+
+=head2 encode_json
+
+  my $bytes = encode_json([1, 2, 3]);
+  my $bytes = encode_json({foo => 'bar'});
+
+Encode Perl data structure to JSON.
 
 =head2 j
 

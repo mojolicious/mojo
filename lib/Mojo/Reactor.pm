@@ -27,13 +27,16 @@ sub is_readable {
 }
 
 sub is_running { croak 'Method "is_running" not implemented by subclass' }
-sub one_tick   { croak 'Method "one_tick" not implemented by subclass' }
-sub recurring  { croak 'Method "recurring" not implemented by subclass' }
-sub remove     { croak 'Method "remove" not implemented by subclass' }
-sub start      { croak 'Method "start" not implemented by subclass' }
-sub stop       { croak 'Method "stop" not implemented by subclass' }
-sub timer      { croak 'Method "timer" not implemented by subclass' }
-sub watch      { croak 'Method "watch" not implemented by subclass' }
+
+sub next_tick { shift->timer(0 => @_) and return undef }
+
+sub one_tick  { croak 'Method "one_tick" not implemented by subclass' }
+sub recurring { croak 'Method "recurring" not implemented by subclass' }
+sub remove    { croak 'Method "remove" not implemented by subclass' }
+sub start     { croak 'Method "start" not implemented by subclass' }
+sub stop      { croak 'Method "stop" not implemented by subclass' }
+sub timer     { croak 'Method "timer" not implemented by subclass' }
+sub watch     { croak 'Method "watch" not implemented by subclass' }
 
 1;
 
@@ -134,6 +137,13 @@ tainted sockets.
 
 Check if reactor is running. Meant to be overloaded in a subclass.
 
+=head2 next_tick
+
+  my $undef = $reactor->next_tick(sub {...});
+
+Invoke callback as soon as possible, but not before returning, always returns
+C<undef>.
+
 =head2 one_tick
 
   $reactor->one_tick;
@@ -152,9 +162,6 @@ the reactor, so you need to be careful. Meant to be overloaded in a subclass.
 
 Create a new recurring timer, invoking the callback repeatedly after a given
 amount of time in seconds. Meant to be overloaded in a subclass.
-
-  # Invoke as soon as possible
-  $reactor->recurring(0 => sub { say 'Reactor tick.' });
 
 =head2 remove
 
@@ -183,9 +190,6 @@ Stop watching for I/O and timer events. Meant to be overloaded in a subclass.
 
 Create a new timer, invoking the callback after a given amount of time in
 seconds. Meant to be overloaded in a subclass.
-
-  # Invoke as soon as possible
-  $reactor->timer(0 => sub { say 'Next tick.' });
 
 =head2 watch
 

@@ -65,8 +65,8 @@ sub suspended {
   my $self = shift;
 
   $self->res->headers->append('X-Suspended' => $self->match->current);
-  Mojo::IOLoop->timer(
-    0 => sub {
+  Mojo::IOLoop->next_tick(
+    sub {
       $self->res->headers->append('X-Suspended' => $self->match->current);
       $self->continue;
     }

@@ -448,12 +448,12 @@ is_deeply \@kept_alive, [undef, 1, 1], 'connections kept alive';
 $ua->get(
   '/' => sub {
     push @kept_alive, pop->kept_alive;
-    Mojo::IOLoop->timer(
-      0 => sub {
+    Mojo::IOLoop->next_tick(
+      sub {
         $ua->get(
           '/' => sub {
             push @kept_alive, pop->kept_alive;
-            Mojo::IOLoop->timer(0 => sub { Mojo::IOLoop->stop });
+            Mojo::IOLoop->next_tick(sub { Mojo::IOLoop->stop });
           }
         );
       }

@@ -56,7 +56,7 @@ sub _io {
 
 sub _timer {
   my ($self, $recurring, $after, $cb) = @_;
-  $after ||= '0.0001';
+  $after ||= 0.0001 if $recurring;
 
   my $id = $self->SUPER::_timer(0, 0, $cb);
   weaken $self;

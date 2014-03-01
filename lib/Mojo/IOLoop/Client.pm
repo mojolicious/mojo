@@ -29,14 +29,13 @@ sub connect {
   my $self = shift;
   my $args = ref $_[0] ? $_[0] : {@_};
   weaken $self;
-  $self->{delay} = $self->reactor->timer(0 => sub { $self->_connect($args) });
+  $self->reactor->next_tick(sub { $self && $self->_connect($args) });
 }
 
 sub _cleanup {
   my $self = shift;
   return $self unless my $reactor = $self->reactor;
-  $self->{$_} && $reactor->remove(delete $self->{$_})
-    for qw(delay timer handle);
+  $self->{$_} && $reactor->remove(delete $self->{$_}) for qw(timer handle);
   return $self;
 }
 

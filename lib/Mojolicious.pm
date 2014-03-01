@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.78';
+our $VERSION  = '4.86';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -110,8 +110,7 @@ sub handler {
   $stash->{'mojo.secrets'} //= $self->secrets;
 
   # Build default controller
-  my $defaults = $self->defaults;
-  @{$stash}{keys %$defaults} = values %$defaults;
+  %$stash = (%$stash, %{$self->defaults});
   my $c
     = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
   weaken $c->{$_} for qw(app tx);

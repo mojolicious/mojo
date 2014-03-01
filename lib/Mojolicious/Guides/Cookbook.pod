@@ -61,11 +61,11 @@ C<1>).
 
 Your application is preloaded in the manager process during startup, to run
 code whenever a new worker process has been forked you can use
-L<Mojo::IOLoop/"timer">.
+L<Mojo::IOLoop/"next_tick">.
 
   use Mojolicious::Lite;
 
-  Mojo::IOLoop->timer(0 => sub {
+  Mojo::IOLoop->next_tick(sub {
     app->log->info("Worker $$ star...ALL GLORY TO THE HYPNOTOAD!");
   });
 
@@ -314,6 +314,16 @@ with this little L<Mojo::Server> based mock server you can just embed them.
   say for @{$app->static->paths};
   say $app->config->{secret_identity};
   say $app->dumper({just => 'a helper test'});
+
+The plugin L<Mojolicious::Plugin::Mount> uses this functionality to allow you
+to combine multiple applications into one and deploy them together.
+
+  use Mojolicious::Lite;
+
+  plugin Mount => {'test1.example.com' => '/home/sri/myapp1.pl'};
+  plugin Mount => {'test2.example.com' => '/home/sri/myapp2.pl'};
+
+  app->start;
 
 =head2 Web server embedding
 
@@ -1045,6 +1055,46 @@ be able to work standalone as well as inside an already running event loop.
   $ua->get('http://metacpan.org/search?q=mango' => $delay->begin);
   $delay->wait unless Mojo::IOLoop->is_running;
 
+=head2 WebSockets
+
+WebSockets are not just for the server-side, you can use
+L<Mojo::UserAgent/"websocket"> to open new connections, which are always
+non-blocking. The handshake is a normal HTTP request with a few additional
+headers, it can even contain cookies, followed by a C<101> response from the
+server notifying our user agent that the connection has been established and
+it can start using the bi-directional WebSocket protocol.
+
+  use Mojo::UserAgent;
+  use Mojo::IOLoop;
+
+  # Open WebSocket to echo service
+  my $ua = Mojo::UserAgent->new;
+  $ua->websocket('ws://echo.websocket.org' => sub {
+    my ($ua, $tx) = @_;
+
+    # Check if WebSocket handshake was successful
+    say 'WebSocket handshake failed!' and return unless $tx->is_websocket;
+
+    # Wait for WebSocket to be closed
+    $tx->on(finish => sub {
+      my ($tx, $code, $reason) = @_;
+      say "WebSocket closed with status $code.";
+    });
+
+    # Close WebSocket after receiving one message
+    $tx->on(message => sub {
+      my ($tx, $msg) = @_;
+      say "WebSocket message: $msg";
+      $tx->finish;
+    });
+
+    # Send a message to the server
+    $tx->send('Hi!');
+  });
+
+  # Start event loop if necessary
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
 =head2 Command line
 
 Don't you hate checking huge HTML files from the command line? Thanks to the
@@ -1094,9 +1144,47 @@ choice.
 
   $ perl -Mojo -E 'say g("mojolicio.us")->dom->html->head->title->text'
 
-=head1 HACKS
+=head1 APPLICATIONS
 
-Fun hacks you might not use very often but that might come in handy some day.
+Fun L<Mojolicious> application hacks for all occasions.
+
+=head2 Adding a configuration file
+
+Adding a configuration file to your application is as easy as adding a file to
+its home directory and loading the plugin L<Mojolicious::Plugin::Config>. The
+default name is based on the value of L<Mojolicious/"moniker"> (C<myapp>),
+appended with a C<.conf> extension (C<myapp.conf>).
+
+  $ mkdir myapp
+  $ cd myapp
+  $ touch myapp.pl
+  $ chmod 744 myapp.pl
+  $ echo '{name => "my Mojolicious application"};' > myapp.conf
+
+Configuration files themselves are just Perl scripts that return a hash
+reference, all settings are available through the method L<Mojo/"config"> and
+the helper L<Mojolicious::Plugin::DefaultHelpers/"config">
+
+  use Mojolicious::Lite;
+
+  plugin 'Config';
+
+  my $name = app->config('name');
+  app->log->debug("Welcome to $name.");
+
+  get '/' => 'with_config';
+
+  app->start;
+  __DATA__
+  @@ with_config.html.ep
+  <!DOCTYPE html>
+  <html>
+    <head><title><%= config 'name' %></title></head>
+    <body>Welcome to <%= config 'name' %></body>
+  </html>
+
+Alternatively you can also use configuration files in the JSON format with
+L<Mojolicious::Plugin::JSONConfig>.
 
 =head2 Adding commands to Mojolicious
 

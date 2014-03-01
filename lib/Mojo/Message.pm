@@ -5,7 +5,7 @@ use Carp 'croak';
 use Mojo::Asset::Memory;
 use Mojo::Content::Single;
 use Mojo::DOM;
-use Mojo::JSON;
+use Mojo::JSON 'j';
 use Mojo::JSON::Pointer;
 use Mojo::Parameters;
 use Mojo::Upload;
@@ -143,8 +143,8 @@ sub is_limit_exceeded { !!shift->{limit} }
 sub json {
   my ($self, $pointer) = @_;
   return undef if $self->content->is_multipart;
-  my $data = $self->{json} ||= Mojo::JSON->new->decode($self->body);
-  return $pointer ? Mojo::JSON::Pointer->new->get($data, $pointer) : $data;
+  my $data = $self->{json} ||= j($self->body);
+  return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
 }
 
 sub param { shift->body_params->param(@_) }
@@ -482,11 +482,11 @@ Access message cookies. Meant to be overloaded in a subclass.
   my $collection = $msg->dom('a[href]');
 
 Turns message body into a L<Mojo::DOM> object and takes an optional selector
-to perform a C<find> on it right away, which returns a L<Mojo::Collection>
-object. Note that this method caches all data, so it should not be called
-before the entire message body has been received. The whole message body needs
-to be loaded into memory to parse it, so you have to make sure it is not
-excessively large.
+to call the method L<Mojo::DOM/"find"> on it right away, which returns a
+L<Mojo::Collection> object. Note that this method caches all data, so it
+should not be called before the entire message body has been received. The
+whole message body needs to be loaded into memory to parse it, so you have to
+make sure it is not excessively large.
 
   # Perform "find" right away
   say $msg->dom('h1, h2, h3')->text;

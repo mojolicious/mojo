@@ -1,9 +1,11 @@
 package Mojo::IOLoop::Delay;
 use Mojo::Base 'Mojo::EventEmitter';
 
+use Mojo;
 use Mojo::IOLoop;
 
-has ioloop => sub { Mojo::IOLoop->singleton };
+has ioloop    => sub { Mojo::IOLoop->singleton };
+has remaining => sub { [] };
 
 sub begin {
   my ($self, $ignore) = @_;
@@ -12,10 +14,13 @@ sub begin {
   return sub { $ignore // 1 and shift; $self->_step($id, @_) };
 }
 
+sub data { shift->Mojo::_dict(data => @_) }
+
+sub pass { $_[0]->begin->(@_) }
+
 sub steps {
-  my $self = shift;
-  $self->{steps} = [@_];
-  $self->ioloop->timer(0 => $self->begin);
+  my $self = shift->remaining([@_]);
+  $self->ioloop->next_tick($self->begin);
   return $self;
 }
 
@@ -41,12 +46,12 @@ sub _step {
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
-  if (my $cb = shift @{$self->{steps} ||= []}) {
+  if (my $cb = shift @{$self->remaining}) {
     eval { $self->$cb(@args); 1 } or return $self->emit(error => $@)->{fail}++;
   }
 
   return $self->emit(finish => @args) unless $self->{counter};
-  $self->ioloop->timer(0 => $self->begin) unless $self->{pending};
+  $self->ioloop->next_tick($self->begin) unless $self->{pending};
 }
 
 1;
@@ -143,6 +148,13 @@ L<Mojo::IOLoop::Delay> implements the following attributes.
 Event loop object to control, defaults to the global L<Mojo::IOLoop>
 singleton.
 
+=head2 remaining
+
+  my $remaining = $delay->remaining;
+  $delay        = $delay->remaining([sub {...}]);
+
+Remaining L</"steps"> in chain.
+
 =head1 METHODS
 
 L<Mojo::IOLoop::Delay> inherits all methods from L<Mojo::EventEmitter> and
@@ -162,6 +174,29 @@ the first argument will be ignored by default.
   my $delay = Mojo::IOLoop->delay;
   Mojo::IOLoop->client({port => 3000} => $delay->begin(0));
   my ($loop, $err, $stream) = $delay->wait;
+
+=head2 data
+
+  my $hash = $delay->data;
+  my $foo  = $delay->data('foo');
+  $delay   = $delay->data({foo => 'bar'});
+  $delay   = $delay->data(foo => 'bar');
+
+Data shared between all L</"steps">.
+
+  # Remove value
+  my $foo = delete $delay->data->{foo};
+
+=head2 pass
+
+  $delay->pass;
+  $delay->pass(@args);
+
+Increment active event counter and decrement it again right away to pass
+values to the next step.
+
+  # Longer version
+  $delay->begin(0)->(@args);
 
 =head2 steps
 

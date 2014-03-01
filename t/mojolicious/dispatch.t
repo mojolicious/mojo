@@ -79,6 +79,29 @@ is $c->param(foo => undef)->param('foo'), undef, 'no value';
 is $c->param(foo => Mojo::Upload->new(name => 'bar'))->param('foo')->name,
   'bar', 'right value';
 
+# Reserved stash values are hidden
+$c = Mojolicious::Controller->new;
+is $c->param(action => 'test')->param('action'), undef, 'value is reserved';
+is $c->param(app    => 'test')->param('app'),    undef, 'value is reserved';
+is $c->param(cb     => 'test')->param('cb'),     undef, 'value is reserved';
+is $c->param(controller => 'test')->param('controller'), undef,
+  'value is reserved';
+is $c->param(data    => 'test')->param('data'),    undef, 'value is reserved';
+is $c->param(extends => 'test')->param('extends'), undef, 'value is reserved';
+is $c->param(format  => 'test')->param('format'),  undef, 'value is reserved';
+is $c->param(handler => 'test')->param('handler'), undef, 'value is reserved';
+is $c->param(json    => 'test')->param('json'),    undef, 'value is reserved';
+is $c->param(layout  => 'test')->param('layout'),  undef, 'value is reserved';
+is $c->param(namespace => 'test')->param('namespace'), undef,
+  'value is reserved';
+is $c->param(partial => 'test')->param('partial'), undef, 'value is reserved';
+is $c->param(path    => 'test')->param('path'),    undef, 'value is reserved';
+is $c->param(status  => 'test')->param('status'),  undef, 'value is reserved';
+is $c->param(template => 'test')->param('template'), undef,
+  'value is reserved';
+is $c->param(text => 'test')->param('text'), undef, 'value is reserved';
+is_deeply [$c->param], [], 'values are hidden';
+
 # Controller with application and routes
 $c = Test::Controller->new;
 $c->app->log->level('fatal');
@@ -133,7 +156,6 @@ is $c->stash->{controller}, 'foo',   'right value';
 is $c->stash->{action},     'bar',   'right value';
 is $c->stash->{capture},    'hello', 'right value';
 is $c->stash->{test},       23,      'right value';
-isa_ok $c->stash->{'mojo.captures'}, 'HASH', 'right captures';
 is $c->param('controller'), undef,   'no value';
 is $c->param('action'),     undef,   'no value';
 is $c->param('capture'),    'hello', 'right value';
@@ -180,7 +202,6 @@ ok $d->dispatch($c), 'dispatched';
 is $c->stash->{controller}, 'foo',         'right value';
 is $c->stash->{action},     'bar',         'right value';
 is $c->stash->{capture},    'hello there', 'right value';
-isa_ok $c->stash->{'mojo.captures'}, 'HASH', 'right captures';
 is $c->param('controller'), undef,         'no value';
 is $c->param('action'),     undef,         'no value';
 is $c->param('capture'),    'hello there', 'right value';
@@ -196,7 +217,6 @@ ok $d->dispatch($c), 'dispatched';
 is $c->stash->{controller}, 'foo',          'right value';
 is $c->stash->{action},     'bar',          'right value';
 is $c->stash->{capture},    'привет', 'right value';
-isa_ok $c->stash->{'mojo.captures'}, 'HASH', 'right captures';
 is $c->param('controller'), undef,          'no value';
 is $c->param('action'),     undef,          'no value';
 is $c->param('capture'),    'привет', 'right value';

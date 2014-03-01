@@ -172,55 +172,13 @@ sub render {
   return !!$self->rendered($self->stash->{status});
 }
 
-sub render_exception {
-  my ($self, $e) = @_;
-
-  my $app = $self->app;
-  $app->log->error($e = Mojo::Exception->new($e));
-
-  # Filtered stash snapshot
-  my $stash = $self->stash;
-  my %snapshot = map { $_ => $stash->{$_} }
-    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
-
-  # Render with fallbacks
-  my $mode     = $app->mode;
-  my $renderer = $app->renderer;
-  my $options  = {
-    exception => $e,
-    snapshot  => \%snapshot,
-    template  => "exception.$mode",
-    format    => $stash->{format} || $renderer->default_format,
-    handler   => undef,
-    status    => 500
-  };
-  my $inline = $renderer->_bundled(
-    $mode eq 'development' ? 'exception.development' : 'exception');
-  return $self if _fallbacks($self, $options, 'exception', $inline);
-  _fallbacks($self, {%$options, format => 'html'}, 'exception', $inline);
-  return $self;
-}
+sub render_exception { _development('exception', @_) }
 
 sub render_later { shift->stash('mojo.rendered' => 1) }
 
 sub render_maybe { shift->render(@_, 'mojo.maybe' => 1) }
 
-sub render_not_found {
-  my $self = shift;
-
-  # Render with fallbacks
-  my $app      = $self->app;
-  my $mode     = $app->mode;
-  my $renderer = $app->renderer;
-  my $format   = $self->stash->{format} || $renderer->default_format;
-  my $options
-    = {template => "not_found.$mode", format => $format, status => 404};
-  my $inline = $renderer->_bundled(
-    $mode eq 'development' ? 'not_found.development' : 'not_found');
-  return $self if _fallbacks($self, $options, 'not_found', $inline);
-  _fallbacks($self, {%$options, format => 'html'}, 'not_found', $inline);
-  return $self;
-}
+sub render_not_found { _development('not_found', @_) }
 
 sub render_static {
   my ($self, $file) = @_;
@@ -349,26 +307,7 @@ sub signed_cookie {
   return wantarray ? @results : $results[0];
 }
 
-sub stash {
-  my $self = shift;
-
-  # Hash
-  my $stash = $self->{stash} ||= {};
-  return $stash unless @_;
-
-  # Get
-  return $stash->{$_[0]} unless @_ > 1 || ref $_[0];
-
-  # Set
-  my $values = ref $_[0] ? $_[0] : {@_};
-  for my $key (keys %$values) {
-    $self->app->log->debug(qq{Careful, "$key" is a reserved stash value.})
-      if $RESERVED{$key};
-    $stash->{$key} = $values->{$key};
-  }
-
-  return $self;
-}
+sub stash { shift->Mojolicious::_dict(stash => @_) }
 
 sub url_for {
   my $self = shift;
@@ -438,6 +377,34 @@ sub write_chunk {
   my $content = $self->res->content;
   $content->write_chunk($chunk => sub { shift and $self->$cb(@_) if $cb });
   return $self->rendered;
+}
+
+sub _development {
+  my ($page, $self, $e) = @_;
+
+  my $app = $self->app;
+  $app->log->error($e = Mojo::Exception->new($e)) if $page eq 'exception';
+
+  # Filtered stash snapshot
+  my $stash = $self->stash;
+  my %snapshot = map { $_ => $stash->{$_} }
+    grep { !/^mojo\./ and defined $stash->{$_} } keys %$stash;
+
+  # Render with fallbacks
+  my $mode     = $app->mode;
+  my $renderer = $app->renderer;
+  my $options  = {
+    exception => $page eq 'exception' ? $e : undef,
+    format => $stash->{format} || $renderer->default_format,
+    handler  => undef,
+    snapshot => \%snapshot,
+    status   => $page eq 'exception' ? 500 : 404,
+    template => "$page.$mode"
+  };
+  my $inline = $renderer->_bundled($mode eq 'development' ? $mode : $page);
+  return $self if _fallbacks($self, $options, $page, $inline);
+  _fallbacks($self, {%$options, format => 'html'}, $page, $inline);
+  return $self;
 }
 
 sub _fallbacks {
@@ -746,7 +713,9 @@ could be generated, takes the same arguments as L</"render">.
   $c = $c->render_not_found;
 
 Render the not found template C<not_found.$mode.$format.*> or
-C<not_found.$format.*> and set the response status code to C<404>.
+C<not_found.$format.*> and set the response status code to C<404>. Also sets
+the stash value C<snapshot> to a copy of the L</"stash"> for use in the
+templates.
 
 =head2 render_static
 
@@ -770,6 +739,9 @@ using a C<200> response code.
   $self->res->body('Hello World!');
   $self->rendered(200);
 
+  # Accept WebSocket handshake without subscribing to an event
+  $self->rendered(101);
+
 =head2 req
 
   my $req = $c->req;
@@ -780,17 +752,17 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $req = $c->tx->req;
 
   # Extract request information
-  my $url      = $c->req->url->to_abs;
-  my $userinfo = $c->req->url->to_abs->userinfo;
-  my $host     = $c->req->url->to_abs->host;
-  my $agent    = $c->req->headers->user_agent;
-  my $bytes    = $c->req->body;
-  my $str      = $c->req->text;
-  my $hash     = $c->req->params->to_hash;
-  my $hash     = $c->req->json;
-  my $foo      = $c->req->json('/23/foo');
-  my $dom      = $c->req->dom;
-  my $bar      = $c->req->dom('div.bar')->first->text;
+  my $url   = $c->req->url->to_abs;
+  my $info  = $c->req->url->to_abs->userinfo;
+  my $host  = $c->req->url->to_abs->host;
+  my $agent = $c->req->headers->user_agent;
+  my $bytes = $c->req->body;
+  my $str   = $c->req->text;
+  my $hash  = $c->req->params->to_hash;
+  my $hash  = $c->req->json;
+  my $foo   = $c->req->json('/23/foo');
+  my $dom   = $c->req->dom;
+  my $bar   = $c->req->dom('div.bar')->first->text;
 
 =head2 res
 

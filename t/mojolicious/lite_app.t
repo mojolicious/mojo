@@ -369,8 +369,8 @@ get '/redirect_no_render' => sub {
 
 get '/redirect_callback' => sub {
   my $self = shift;
-  Mojo::IOLoop->timer(
-    0 => sub {
+  Mojo::IOLoop->next_tick(
+    sub {
       $self->res->code(301);
       $self->res->body('Whatever!');
       $self->redirect_to('http://127.0.0.1/foo');

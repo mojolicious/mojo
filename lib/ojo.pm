@@ -5,48 +5,47 @@ use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::DOM;
 use Mojo::JSON 'j';
-use Mojo::UserAgent;
 use Mojo::Util qw(dumper monkey_patch);
 
 # Silent one-liners
 $ENV{MOJO_LOG_LEVEL} ||= 'fatal';
-
-# Singleton user agent for one-liners
-my $UA = Mojo::UserAgent->new;
 
 sub import {
 
   # Mojolicious::Lite
   my $caller = caller;
   eval "package $caller; use Mojolicious::Lite;";
-  my $server = $UA->server->app($caller->app);
-  $server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
+  my $ua = $caller->app->ua;
+  $ua->server->app->hook(around_action => sub { local $_ = $_[1]; $_[0]->() });
 
-  $UA->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
-  $UA->proxy->detect unless defined $ENV{MOJO_PROXY};
+  $ua->max_redirects(10) unless defined $ENV{MOJO_MAX_REDIRECTS};
+  $ua->proxy->detect unless defined $ENV{MOJO_PROXY};
 
   # The ojo DSL
   monkey_patch $caller,
-    a => sub { $caller->can('any')->(@_) and return $UA->server->app },
+    a => sub { $caller->can('any')->(@_) and return $ua->server->app },
     b => \&b,
     c => \&c,
-    d => sub { _request($UA->build_tx(DELETE  => @_)) },
-    g => sub { _request($UA->build_tx(GET     => @_)) },
-    h => sub { _request($UA->build_tx(HEAD    => @_)) },
+    d => sub { _request($ua, 'DELETE',  @_) },
+    g => sub { _request($ua, 'GET',     @_) },
+    h => sub { _request($ua, 'HEAD',    @_) },
     j => \&j,
-    o => sub { _request($UA->build_tx(OPTIONS => @_)) },
-    p => sub { _request($UA->build_tx(POST    => @_)) },
+    o => sub { _request($ua, 'OPTIONS', @_) },
+    p => sub { _request($ua, 'POST',    @_) },
     r => \&dumper,
-    t => sub { _request($UA->build_tx(PATCH   => @_)) },
-    u => sub { _request($UA->build_tx(PUT     => @_)) },
+    t => sub { _request($ua, 'PATCH',   @_) },
+    u => sub { _request($ua, 'PUT',     @_) },
     x => sub { Mojo::DOM->new(@_) };
 }
 
 sub _request {
-  my $tx = $UA->start(@_);
+  my $ua = shift;
+
+  my $tx = $ua->start($ua->build_tx(@_));
   my ($err, $code) = $tx->error;
   warn qq/Problem loading URL "@{[$tx->req->url->to_abs]}". ($err)\n/
     if $err && !$code;
+
   return $tx->res;
 }
 

@@ -84,7 +84,7 @@ sub _detect {
 
   # Extract file and line from stacktrace
   my $first = $self->frames->[0];
-  unshift @trace, [$first->[1], $first->[2]] if $first;
+  push @trace, [$first->[1], $first->[2]] if $first;
 
   # Search for context in files
   for my $frame (@trace) {
@@ -94,7 +94,7 @@ sub _detect {
   }
 
   # More context
-  $self->_context($trace[0][1], [map { [split "\n"] } @$files]) if $files;
+  $self->_context($trace[-1][1], [map { [split "\n"] } @$files]) if $files;
 
   return $self;
 }

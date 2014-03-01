@@ -589,7 +589,7 @@ shortcuts on L<Mojolicious::Routes::Route> objects.
   });
 
   $r->firefox('/welcome')->to('firefox#welcome');
-  $r->firefox('/bye')->to('firefox#bye);
+  $r->firefox('/bye')->to('firefox#bye');
 
 =head1 SEE ALSO
 

@@ -1,4 +1,49 @@
 
+4.86  2014-03-01
+
+4.85  2014-02-26
+  - Added next_tick method to Mojo::IOLoop and Mojo::Reactor.
+  - Added host_port and path_query methods to Mojo::URL.
+  - Added is_handshake method to Mojo::Message::Request.
+  - Improved Mojo::Reactor::EV responsiveness.
+  - Fixed IDNA support for CONNECT requests.
+  - Fixed "0" value bug in Mojo::Message::Request.
+
+4.84  2014-02-22
+  - Added remaining attribute to Mojo::IOLoop::Delay.
+  - Added data and pass methods to Mojo::IOLoop::Delay.
+  - Improved Mojo::Exception context detection to better line up with user
+    expectations.
+
+4.83  2014-02-19
+  - Improved Mojo::JSON to handle encoding errors more gracefully.
+  - Fixed line numbers in Mojo::JSON error messages.
+
+4.82  2014-02-19
+  - Added decode_json and encode_json functions to Mojo::JSON.
+  - Added data attribute to Mojo::JSON::Pointer.
+  - Fixed bug in "user_agent_online.t".
+  - Fixed small decoding bug in Mojo::JSON.
+
+4.81  2014-02-15
+  - Added direct array access for child nodes to Mojo::DOM.
+  - Improved Mojolicious::Routes::Pattern to normalize more route variations.
+  - Improved routes command to show which routes are using certain features
+    with flags.
+
+4.80  2014-02-13
+  - Merged Mojo::DOM::Node into Mojo::DOM.
+  - Added next_sibling and previous_sibling methods to Mojo::DOM.
+  - Added last method to Mojo::Collection.
+  - Improved many methods in Mojo::DOM to work with all node types.
+  - Improved Mojo::DOM::HTML to handle slashes between attributes more
+    gracefully.
+  - Fixed list parsing bug in Mojo::DOM::HTML.
+
+4.79  2014-02-11
+  - Improved not found page to show request information and the exact path
+    used for route matching.
+
 4.78  2014-02-08
   - Deprecated Mojo::Util::get_line.
   - Fixed ";" handling in Mojo::Parameters to be compliant with the HTML
@@ -885,8 +930,8 @@
 3.35  2012-08-28
   - Deprecated Mojolicious::Controller::render_content in favor of content
     helper.
-  - Improved Mojolicious::Plugin::Config to accept mode specific config files
-    without a normal config file. (alexbyk, sri)
+  - Improved Mojolicious::Plugin::Config to accept mode specific configuration
+    files without a normal configuration file. (alexbyk, sri)
 
 3.34  2012-08-24
   - Improved documentation.
@@ -1022,11 +1067,12 @@
   - Fixed small Mojo::Template bug.
 
 3.07  2012-07-13
-  - Improved template error messages for generator commands and config files.
+  - Improved template error messages for generator commands and configuration
+    files.
   - Fixed small bug in Mojolicious::Plugin::EPRenderer that prevented code to
     be added to templates.
   - Fixed small bug in Mojolicious::Plugin::JSONConfig that prevented code to
-    be added to config files.
+    be added to configuration files.
 
 3.06  2012-07-11
   - Added tls_verify option to Mojo::IOLoop::Server::listen. (scottw)
@@ -1137,7 +1183,7 @@
   - Added remove method to Mojolicious::Routes::Route.
   - Improved 32bit Perl support of Mojo::Transaction::WebSocket.
     (mikemagowan, sri)
-  - Improved exception handling of application and config file loaders.
+  - Improved exception handling of application and configuration file loaders.
   - Improved exception handling of Mojolicious::Plugin::I18N.
   - Improved renderer log messages.
   - Fixed bug that prevented helper names from starting with "end". (Akron)
@@ -1547,7 +1593,7 @@
   - Fixed typo in exception template.
 
 2.44  2012-01-18
-  - Added new not_found page for development mode.
+  - Added new not found page for development mode.
   - Added EXPERIMENTAL url_with helper to
     Mojolicious::Plugin::DefaultHelpers. (diegok, marcus, judofyr, sri)
   - Added EXPERIMENTAL support for removing query parameters while merging to
@@ -2455,7 +2501,7 @@
   - Added EXPERIMENTAL support for route shortcuts.
   - Added EXPERIMENTAL support for NO_PROXY. (l0b0)
   - Added EXPERIMENTAL user_agent attribute to Mojo::Client.
-  - Added EXPERIMENTAL support for mode specific not_found and exception
+  - Added EXPERIMENTAL support for mode specific not found and exception
     templates.
   - Added EXPERIMENTAL support for route caching.
   - Added EXPERIMENTAL support for CSS3 selectors to the get command.
@@ -2519,7 +2565,7 @@
   - Code name "Snowflake", this is a major release.
   - Deprecated session method in Mojolicious.
   - Deprecated handler and helper attributes in Mojolicious::Renderer.
-  - Added new exception and not_found templates.
+  - Added new exception and not found templates.
   - Added documentation browser to Mojolicious::Plugin::PodRenderer.
   - Added EXPERIMENTAL content_for helper.
   - Disabled debug log messages for static files.
@@ -2537,7 +2583,7 @@
 
 0.999950  2010-11-30
   - Added EXPERIMENTAL Hypnotoad web server.
-  - Added EXPERIMENTAL built-in exception and not_found templates.
+  - Added EXPERIMENTAL built-in exception and not found templates.
   - Added put and del functions to Mojolicious::Lite.
   - Added on_idle and on_tick event handlers to Mojo::IOLoop.
   - Added "*" query support to the Mojo::IOLoop resolver.

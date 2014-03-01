@@ -137,7 +137,8 @@ Pure-Perl non-blocking I/O MongoDB driver.
 
 =head1 REFERENCE
 
-This is the class hierarchy of the L<Mojolicious> distribution.
+This is the fully documented class hierarchy of the L<Mojolicious>
+distribution.
 
 =over 2
 
@@ -231,9 +232,13 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =over 2
 
+=item * L<Mojo::Reactor::Poll>
+
+=over 2
+
 =item * L<Mojo::Reactor::EV>
 
-=item * L<Mojo::Reactor::Poll>
+=back
 
 =back
 
@@ -266,6 +271,8 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 =back
 
 =item * L<Mojo::UserAgent>
+
+=item * L<Mojolicious::Plugins>
 
 =back
 
@@ -339,13 +346,13 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 
 =item * L<Mojolicious::Command::version>
 
-=back
-
 =item * L<Mojolicious::Commands>
 
 =over 2
 
 =item * L<Mojolicious::Command::generate>
+
+=back
 
 =back
 
@@ -380,8 +387,6 @@ This is the class hierarchy of the L<Mojolicious> distribution.
 =item * L<Mojolicious::Plugin::TagHelpers>
 
 =back
-
-=item * L<Mojolicious::Plugins>
 
 =item * L<Mojolicious::Renderer>
 

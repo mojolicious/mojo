@@ -860,7 +860,7 @@ Render this node and its content to HTML/XML.
 =head2 tree
 
   my $tree = $dom->tree;
-  $dom     = $dom->tree(['root', ['text', 'foo']]);
+  $dom     = $dom->tree(['root']);
 
 Document Object Model. Note that this structure should only be used very
 carefully since it is very dynamic.

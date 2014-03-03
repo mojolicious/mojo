@@ -349,7 +349,7 @@ for some reason can't just be integrated with a new reactor backend.
 =head1 REAL-TIME WEB
 
 The real-time web is a collection of technologies that include Comet
-(long-polling), EventSource and WebSockets, which allow content to be pushed
+(long polling), EventSource and WebSockets, which allow content to be pushed
 to consumers with long-lived connections as soon as it is generated, instead
 of relying on the more traditional pull model. All built-in web servers use
 non-blocking I/O and are based on the L<Mojo::IOLoop> event loop, which
@@ -600,7 +600,7 @@ L<Test::Mojo> API to be used.
 
 =head2 EventSource web service
 
-EventSource is a special form of long-polling where you can use
+EventSource is a special form of long polling where you can use
 L<Mojolicious::Controller/"write"> to directly send DOM events from servers to
 clients. It is uni-directional, that means you will have to use Ajax requests
 for sending data from clients to servers, the advantage however is low

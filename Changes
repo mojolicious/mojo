@@ -1,6 +1,7 @@
 
 4.86  2014-03-03
   - Improved Mojo::IOLoop::Delay to allow more method chaining.
+  - Improved WebSocket and long poll performance.
 
 4.85  2014-02-26
   - Added next_tick method to Mojo::IOLoop and Mojo::Reactor.
@@ -2734,7 +2735,7 @@
   - Improved Mojo::Parameters performance. (kimoto)
   - Improved Mojo::Message::Response parser resilience.
   - Improved template class handling in MojoX::Renderer. (vti)
-  - Fixed a serious design flaw in Mojo::Message and made long poll much
+  - Fixed a serious design flaw in Mojo::Message and made long polling much
     easier.
   - Fixed a bug where Mojo::IOLoop connections could be closed too early.
   - Fixed a bug where a broken renderer could cause a fatal exception.

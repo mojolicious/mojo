@@ -31,20 +31,12 @@ my %ESCAPE = (
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
 for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
 
-# Unicode encoding detection
-my $UTF_PATTERNS = {
-  'UTF-32BE' => qr/^\x00{3}[^\x00]/,
-  'UTF-32LE' => qr/^[^\x00]\x00{3}/,
-  'UTF-16BE' => qr/^(?:\x00[^\x00]){2}/,
-  'UTF-16LE' => qr/^(?:[^\x00]\x00){2}/
-};
-
 my $WHITESPACE_RE = qr/[\x20\x09\x0a\x0d]*/;
 
 sub decode {
   my $self = shift->error(undef);
-  my $ref = eval { _decode(shift) };
-  return $ref if $ref;
+  my $value;
+  return $value if eval { $value = _decode(shift); 1 };
   $self->error(_chomp($@));
   return undef;
 }
@@ -73,37 +65,23 @@ sub _decode {
   # Missing input
   die "Missing or empty input\n" unless length(my $bytes = shift);
 
-  # Remove BOM
-  $bytes =~ s/^(?:\357\273\277|\377\376\0\0|\0\0\376\377|\376\377|\377\376)//g;
-
   # Wide characters
   die "Wide character in input\n" unless utf8::downgrade($bytes, 1);
 
-  # Detect and decode Unicode
-  my $encoding = 'UTF-8';
-  $bytes =~ $UTF_PATTERNS->{$_} and $encoding = $_ for keys %$UTF_PATTERNS;
-  local $_ = Mojo::Util::decode($encoding, $bytes) // '';
+  # UTF-8
+  die "Input is not UTF-8 encoded\n"
+    unless defined(local $_ = Mojo::Util::decode('UTF-8', $bytes));
 
   # Leading whitespace
   m/\G$WHITESPACE_RE/gc;
 
-  # Array
-  my $ref;
-  if (m/\G\[/gc) { $ref = _decode_array() }
-
-  # Object
-  elsif (m/\G\{/gc) { $ref = _decode_object() }
-
-  # Invalid character
-  else { _exception('Expected array or object') }
+  # Value
+  my $value = _decode_value();
 
   # Leftover data
-  unless (m/\G$WHITESPACE_RE\z/gc) {
-    my $got = ref $ref eq 'ARRAY' ? 'array' : 'object';
-    _exception("Unexpected data after $got");
-  }
+  _exception('Unexpected data') unless m/\G$WHITESPACE_RE\z/gc;
 
-  return $ref;
+  return $value;
 }
 
 sub _decode_array {
@@ -333,17 +311,12 @@ Mojo::JSON - Minimalistic JSON
   # Handle errors
   my $json = Mojo::JSON->new;
   if (defined(my $hash = $json->decode($bytes))) { say $hash->{message} }
-  else { say 'Error: ', $json->error }
-
-  # Ignore errors
-  use Mojo::JSON 'j';
-  my $bytes = j({foo => [1, 2], bar => 'hello!', baz => \1});
-  my $hash  = j($bytes);
+  elsif (my $err = $json->error) { say "Error: $err" }
 
 =head1 DESCRIPTION
 
 L<Mojo::JSON> is a minimalistic and possibly the fastest pure-Perl
-implementation of L<RFC 4627|http://tools.ietf.org/html/rfc4627>.
+implementation of L<RFC 7159|http://tools.ietf.org/html/rfc7159>.
 
 It supports normal Perl data types like C<Scalar>, C<Array> reference, C<Hash>
 reference and will try to call the C<TO_JSON> method on blessed references, or
@@ -369,9 +342,8 @@ if their values are true or false.
   \1 -> true
   \0 -> false
 
-Decoding UTF-16 (LE/BE) and UTF-32 (LE/BE) will be handled transparently,
-encoding will only generate UTF-8. The two Unicode whitespace characters
-C<u2028> and C<u2029> will always be escaped to make JSONP easier.
+The two Unicode whitespace characters C<u2028> and C<u2029> will always be
+escaped to make JSONP easier.
 
 =head1 FUNCTIONS
 
@@ -380,14 +352,12 @@ individually.
 
 =head2 decode_json
 
-  my $array = decode_json($bytes);
-  my $hash  = decode_json($bytes);
+  my $value = decode_json($bytes);
 
 Decode JSON to Perl data structure and die if decoding fails.
 
 =head2 encode_json
 
-  my $bytes = encode_json([1, 2, 3]);
   my $bytes = encode_json({foo => 'bar'});
 
 Encode Perl data structure to JSON.
@@ -396,11 +366,10 @@ Encode Perl data structure to JSON.
 
   my $bytes = j([1, 2, 3]);
   my $bytes = j({foo => 'bar'});
-  my $array = j($bytes);
-  my $hash  = j($bytes);
+  my $value = j($bytes);
 
-Encode Perl data structure or decode JSON and return C<undef> if decoding
-fails.
+Encode Perl data structure, which may only be an C<Array> reference or C<Hash>
+reference, or decode JSON and return C<undef> if decoding fails.
 
 =head1 ATTRIBUTES
 
@@ -420,14 +389,12 @@ following new ones.
 
 =head2 decode
 
-  my $array = $json->decode($bytes);
-  my $hash  = $json->decode($bytes);
+  my $value = $json->decode($bytes);
 
 Decode JSON to Perl data structure and return C<undef> if decoding fails.
 
 =head2 encode
 
-  my $bytes = $json->encode([1, 2, 3]);
   my $bytes = $json->encode({foo => 'bar'});
 
 Encode Perl data structure to JSON.

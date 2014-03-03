@@ -755,7 +755,7 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $bytes = $c->req->body;
   my $str   = $c->req->text;
   my $hash  = $c->req->params->to_hash;
-  my $hash  = $c->req->json;
+  my $value = $c->req->json;
   my $foo   = $c->req->json('/23/foo');
   my $dom   = $c->req->dom;
   my $bar   = $c->req->dom('div.bar')->first->text;

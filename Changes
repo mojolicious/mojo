@@ -1,4 +1,7 @@
 
+4.87  2014-03-04
+  - Fixed RFC 7159 support in Mojo::JSON.
+
 4.86  2014-03-03
   - Improved Mojo::IOLoop::Delay to allow more method chaining.
   - Improved WebSocket and long poll performance.

@@ -567,8 +567,7 @@ Check if message has exceeded L</"max_line_size"> or L</"max_message_size">.
 
 =head2 json
 
-  my $hash  = $msg->json;
-  my $array = $msg->json;
+  my $value = $msg->json;
   my $value = $msg->json('/foo/bar');
 
 Decode JSON message body directly using L<Mojo::JSON> if possible, returns

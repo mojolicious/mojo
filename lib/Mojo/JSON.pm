@@ -382,7 +382,7 @@ L<Mojo::JSON> implements the following attributes.
   my $err = $json->error;
   $json   = $json->error('Parser error');
 
-Parser errors.
+Parser error.
 
 =head1 METHODS
 
@@ -393,8 +393,7 @@ following new ones.
 
   my $value = $json->decode($bytes);
 
-Decode JSON to Perl value, an C<undef> return value indicates a bare C<null>
-or that decoding failed.
+Decode JSON to Perl value and set L</"error"> if decoding failed.
 
 =head2 encode
 

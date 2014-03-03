@@ -368,8 +368,8 @@ Encode Perl value to JSON.
   my $bytes = j({foo => 'bar'});
   my $value = j($bytes);
 
-Encode Perl data structure, which may only be an C<Array> reference or C<Hash>
-reference, to JSON or decode JSON and return C<undef> if decoding fails.
+Encode Perl data structure (which may only be an C<Array> reference or C<
+reference) to JSON or decode JSON and return C<undef> if decoding fails.
 
 =head1 ATTRIBUTES
 

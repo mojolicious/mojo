@@ -354,13 +354,13 @@ individually.
 
   my $value = decode_json($bytes);
 
-Decode JSON to Perl data structure and die if decoding fails.
+Decode JSON to Perl value and die if decoding fails.
 
 =head2 encode_json
 
   my $bytes = encode_json({foo => 'bar'});
 
-Encode Perl data structure to JSON.
+Encode Perl value to JSON.
 
 =head2 j
 
@@ -369,7 +369,7 @@ Encode Perl data structure to JSON.
   my $value = j($bytes);
 
 Encode Perl data structure, which may only be an C<Array> reference or C<Hash>
-reference, or decode JSON and return C<undef> if decoding fails.
+reference, to JSON or decode JSON and return C<undef> if decoding fails.
 
 =head1 ATTRIBUTES
 
@@ -391,13 +391,13 @@ following new ones.
 
   my $value = $json->decode($bytes);
 
-Decode JSON to Perl data structure and return C<undef> if decoding fails.
+Decode JSON to Perl value and return C<undef> if decoding fails.
 
 =head2 encode
 
   my $bytes = $json->encode({foo => 'bar'});
 
-Encode Perl data structure to JSON.
+Encode Perl value to JSON.
 
 =head2 false
 

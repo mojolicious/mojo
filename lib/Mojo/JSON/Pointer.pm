@@ -76,8 +76,8 @@ the following new ones.
   my $bool = $pointer->contains('/foo/1');
   my $bool = $pointer->contains($data, '/foo/1');
 
-Check if data structure contains a value that can be identified with the given
-JSON Pointer, defaults to using L</data>.
+Check if Perl data structure contains a value that can be identified with the
+given JSON Pointer, defaults to using L</data>.
 
   # True
   $pointer->contains({'♥' => 'mojolicious'}, '/♥');

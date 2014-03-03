@@ -157,7 +157,7 @@ sub json_hasnt {
 sub json_is {
   my $self = shift;
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
-  my $desc = encode 'UTF-8', qq{exact match for JSON Pointer "$p"};
+  my $desc = encode 'UTF-8', shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 
@@ -176,7 +176,7 @@ sub json_message_hasnt {
 sub json_message_is {
   my $self = shift;
   my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
-  my $desc = encode 'UTF-8', qq{exact match for JSON Pointer "$p"};
+  my $desc = encode 'UTF-8', shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->_json(get => $p), $data, $desc);
 }
 
@@ -667,7 +667,7 @@ Opposite of L</"json_has">.
 
   $t = $t->json_is({foo => [1, 2, 3]});
   $t = $t->json_is('/foo' => [1, 2, 3]);
-  $t = $t->json_is('/foo/1' => 2);
+  $t = $t->json_is('/foo/1' => 2, 'right value');
 
 Check the value extracted from JSON response using the given JSON Pointer with
 L<Mojo::JSON::Pointer>, which defaults to the root value if it is omitted.
@@ -691,7 +691,7 @@ Opposite of L</"json_message_has">.
 
   $t = $t->json_message_is({foo => [1, 2, 3]});
   $t = $t->json_message_is('/foo' => [1, 2, 3]);
-  $t = $t->json_message_is('/foo/1' => 2);
+  $t = $t->json_message_is('/foo/1' => 2, 'right value');
 
 Check the value extracted from JSON WebSocket message using the given JSON
 Pointer with L<Mojo::JSON::Pointer>, which defaults to the root value if it is

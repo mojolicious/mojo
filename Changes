@@ -1,6 +1,9 @@
 
 4.87  2014-03-04
   - Fixed RFC 7159 support in Mojo::JSON.
+  - Fixed RFC 7159 compliance bugs in Mojo::Transaction::WebSocket and
+    Test::Mojo.
+  - Fixed Unicode bugs in Test::Mojo.
 
 4.86  2014-03-03
   - Improved Mojo::IOLoop::Delay to allow more method chaining.

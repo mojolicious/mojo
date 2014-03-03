@@ -370,8 +370,8 @@ Encode Perl value to JSON.
   my $value = j($bytes);
 
 Encode Perl data structure (which may only be an C<Array> reference or C<Hash>
-reference) to JSON or decode JSON, an C<undef> return value indicates a bare
-C<null> or that decoding failed.
+reference) or decode JSON, an C<undef> return value indicates a bare C<null>
+or that decoding failed.
 
 =head1 ATTRIBUTES
 

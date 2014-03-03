@@ -654,8 +654,8 @@ the L</"stash">.
   $c->render(text => 'I ♥ Mojolicious!');
 
   # Render binary data
-  use Mojo::JSON 'j';
-  $c->render(data => j({test => 'I ♥ Mojolicious!'}));
+  use Mojo::JSON 'encode_json';
+  $c->render(data => encode_json({test => 'I ♥ Mojolicious!'}));
 
   # Render JSON
   $c->render(json => {test => 'I ♥ Mojolicious!'});
@@ -817,8 +817,8 @@ status.
   $c->send({json => {test => 'I ♥ Mojolicious!'}});
 
   # Send JSON object as "Binary" message
-  use Mojo::JSON 'j';
-  $c->send({binary => j({test => 'I ♥ Mojolicious!'})});
+  use Mojo::JSON 'encode_json';
+  $c->send({binary => encode_json({test => 'I ♥ Mojolicious!'})});
 
   # Send "Ping" frame
   $c->send([1, 0, 0, 0, 9, 'Hello World!']);

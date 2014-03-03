@@ -143,7 +143,7 @@ sub is_limit_exceeded { !!shift->{limit} }
 sub json {
   my ($self, $pointer) = @_;
   return undef if $self->content->is_multipart;
-  my $data = $self->{json} ||= j($self->body);
+  my $data = $self->{json} //= j($self->body);
   return $pointer ? Mojo::JSON::Pointer->new($data)->get($pointer) : $data;
 }
 
@@ -570,12 +570,13 @@ Check if message has exceeded L</"max_line_size"> or L</"max_message_size">.
   my $value = $msg->json;
   my $value = $msg->json('/foo/bar');
 
-Decode JSON message body directly using L<Mojo::JSON> if possible, returns
-C<undef> otherwise. An optional JSON Pointer can be used to extract a specific
-value with L<Mojo::JSON::Pointer>. Note that this method caches all data, so
-it should not be called before the entire message body has been received.
-The whole message body needs to be loaded into memory to parse it, so you have
-to make sure it is not excessively large.
+Decode JSON message body directly using L<Mojo::JSON> if possible, an C<undef>
+return value indicates a bare C<null> or that decoding failed. An optional
+JSON Pointer can be used to extract a specific value with
+L<Mojo::JSON::Pointer>. Note that this method caches all data, so it should
+not be called before the entire message body has been received. The whole
+message body needs to be loaded into memory to parse it, so you have to make
+sure it is not excessively large.
 
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];

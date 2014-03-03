@@ -310,8 +310,9 @@ Mojo::JSON - Minimalistic JSON
 
   # Handle errors
   my $json = Mojo::JSON->new;
-  if (defined(my $hash = $json->decode($bytes))) { say $hash->{message} }
-  elsif (my $err = $json->error) { say "Error: $err" }
+  my $hash = $json->decode($bytes);
+  my $err  = $json->error;
+  say $err ? "Error: $err" : $hash->{message};
 
 =head1 DESCRIPTION
 
@@ -369,7 +370,8 @@ Encode Perl value to JSON.
   my $value = j($bytes);
 
 Encode Perl data structure (which may only be an C<Array> reference or C<Hash>
-reference) to JSON or decode JSON and return C<undef> if decoding fails.
+reference) to JSON or decode JSON, an C<undef> return value indicates a bare
+C<null> or that decoding failed.
 
 =head1 ATTRIBUTES
 
@@ -391,7 +393,8 @@ following new ones.
 
   my $value = $json->decode($bytes);
 
-Decode JSON to Perl value and return C<undef> if decoding fails.
+Decode JSON to Perl value, an C<undef> return value indicates a bare C<null>
+or that decoding failed.
 
 =head2 encode
 

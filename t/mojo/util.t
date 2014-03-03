@@ -310,6 +310,8 @@ is unquote('"foo 23 \"bar"'),     'foo 23 "bar',   'right unquoted result';
 is unquote('"\"foo 23 \"bar\""'), '"foo 23 "bar"', 'right unquoted result';
 
 # trim
+is trim(''), '', 'right trimmed result';
+is trim(undef), undef, 'right trimmed result';
 is trim(' la la  la '),      'la la  la', 'right trimmed result';
 is trim(" \n la la la \n "), 'la la la',  'right trimmed result';
 is trim("\n la\nla la \n"),  "la\nla la", 'right trimmed result';

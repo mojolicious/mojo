@@ -311,7 +311,9 @@ sub tablify {
 
 sub trim {
   my $str = shift;
-  $str =~ s/^\s+|\s+$//g;
+  return $str unless defined $str;
+  $str =~ s/\A\s+//;
+  $str =~ s/\s+\z//g;
   return $str;
 }
 

@@ -1,5 +1,6 @@
 
 4.86  2014-03-03
+  - Improved Mojo::IOLoop::Delay to allow more method chaining.
 
 4.85  2014-02-26
   - Added next_tick method to Mojo::IOLoop and Mojo::Reactor.

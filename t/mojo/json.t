@@ -208,6 +208,10 @@ is b($bytes)->decode('UTF-8'), "[\"\x{10346}\"]", 'encode ["\x{10346}"]';
 $array = j($bytes);
 is_deeply $array, ["\x{10346}"], 'successful roundtrip';
 
+# Decode faihu surrogate pair
+$array = $json->decode('["\\ud800\\udf46"]');
+is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
+
 # Decode object with duplicate keys
 $hash = $json->decode('{"foo": 1, "foo": 2}');
 is_deeply $hash, {foo => 2}, 'decode {"foo": 1, "foo": 2}';

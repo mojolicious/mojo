@@ -72,9 +72,6 @@ sub _decode {
   die "Input is not UTF-8 encoded\n"
     unless defined(local $_ = Mojo::Util::decode('UTF-8', $bytes));
 
-  # Leading whitespace
-  m/\G$WHITESPACE_RE/gc;
-
   # Value
   my $value = _decode_value();
 

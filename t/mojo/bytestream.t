@@ -21,29 +21,29 @@ is b(" test\n  123\n 456\n")->unindent, "test\n 123\n456\n",
 
 # b64_encode
 is b('foobar$%^&3217')->b64_encode, "Zm9vYmFyJCVeJjMyMTc=\n",
-  'right base64 encoded result';
+  'right Base64 encoded result';
 
 # b64_decode
 is b("Zm9vYmFyJCVeJjMyMTc=\n")->b64_decode, 'foobar$%^&3217',
-  'right base64 decoded result';
+  'right Base64 decoded result';
 
 # url_escape
-is b('business;23')->url_escape, 'business%3B23', 'right url escaped result';
+is b('business;23')->url_escape, 'business%3B23', 'right URL escaped result';
 
 # url_unescape
 is b('foo%C3%9F%C4%80bar%E2%98%BA')->url_unescape->decode,
-  "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
+  "foo\x{df}\x{0100}bar\x{263a}", 'right URL unescaped result';
 is b('foo%C3%9F%C4%80bar%E2%98%BA')->url_unescape->decode('UTF-8'),
-  "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
+  "foo\x{df}\x{0100}bar\x{263a}", 'right URL unescaped result';
 
 # html_unescape
 is b('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x26;&#34;')->html_unescape,
-  "<foo>bar<baz>&\"", 'right html unescaped result';
+  "<foo>bar<baz>&\"", 'right HTML unescaped result';
 
 # xml_escape
 is b(qq{la<f>\nbar"baz"'yada\n'&lt;la})->xml_escape,
   "la&lt;f&gt;\nbar&quot;baz&quot;&#39;yada\n&#39;&amp;lt;la",
-  'right xml escaped result';
+  'right XML escaped result';
 
 # punycode_encode
 is b('bücher')->punycode_encode, 'bcher-kva', 'right punycode encoded result';

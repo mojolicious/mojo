@@ -103,23 +103,23 @@ is unindent(" te st\r\n\r\n  1 2 3\r\n 456\r\n"),
 
 # b64_encode
 is b64_encode('foobar$%^&3217'), "Zm9vYmFyJCVeJjMyMTc=\n",
-  'right base64 encoded result';
+  'right Base64 encoded result';
 
 # b64_decode
 is b64_decode("Zm9vYmFyJCVeJjMyMTc=\n"), 'foobar$%^&3217',
-  'right base64 decoded result';
+  'right Base64 decoded result';
 
 # b64_encode (UTF-8)
 is b64_encode(encode 'UTF-8', "foo\x{df}\x{0100}bar%23\x{263a}"),
-  "Zm9vw5/EgGJhciUyM+KYug==\n", 'right base64 encoded result';
+  "Zm9vw5/EgGJhciUyM+KYug==\n", 'right Base64 encoded result';
 
 # b64_decode (UTF-8)
 is decode('UTF-8', b64_decode "Zm9vw5/EgGJhciUyM+KYug==\n"),
-  "foo\x{df}\x{0100}bar%23\x{263a}", 'right base64 decoded result';
+  "foo\x{df}\x{0100}bar%23\x{263a}", 'right Base64 decoded result';
 
 # b64_encode (custom line ending)
 is b64_encode('foobar$%^&3217', ''), 'Zm9vYmFyJCVeJjMyMTc=',
-  'right base64 encoded result';
+  'right Base64 encoded result';
 
 # decode (invalid UTF-8)
 is decode('UTF-8', "\x{1000}"), undef, 'decoding invalid UTF-8 worked';
@@ -133,65 +133,65 @@ eval { encode('does_not_exist', '') };
 like $@, qr/Unknown encoding 'does_not_exist'/, 'right error';
 
 # url_escape
-is url_escape('business;23'), 'business%3B23', 'right url escaped result';
+is url_escape('business;23'), 'business%3B23', 'right URL escaped result';
 
 # url_escape (custom pattern)
 is url_escape('&business;23', 's&'), '%26bu%73ine%73%73;23',
-  'right url escaped result';
+  'right URL escaped result';
 
 # url_escape (nothing to escape)
-is url_escape('foobar123-._~'), 'foobar123-._~', 'right url escaped result';
+is url_escape('foobar123-._~'), 'foobar123-._~', 'right URL escaped result';
 
 # url_unescape
-is url_unescape('business%3B23'), 'business;23', 'right url unescaped result';
+is url_unescape('business%3B23'), 'business;23', 'right URL unescaped result';
 
 # UTF-8 url_escape
 is url_escape(encode 'UTF-8', "foo\x{df}\x{0100}bar\x{263a}"),
-  'foo%C3%9F%C4%80bar%E2%98%BA', 'right url escaped result';
+  'foo%C3%9F%C4%80bar%E2%98%BA', 'right URL escaped result';
 
 # UTF-8 url_unescape
 is decode('UTF-8', url_unescape 'foo%C3%9F%C4%80bar%E2%98%BA'),
-  "foo\x{df}\x{0100}bar\x{263a}", 'right url unescaped result';
+  "foo\x{df}\x{0100}bar\x{263a}", 'right URL unescaped result';
 
 # html_unescape
 is html_unescape('&#x3c;foo&#x3E;bar&lt;baz&gt;&#x0026;&#34;'),
-  "<foo>bar<baz>&\"", 'right html unescaped result';
+  "<foo>bar<baz>&\"", 'right HTML unescaped result';
 
 # html_unescape (special entities)
 is html_unescape(
   'foo &#x2603; &CounterClockwiseContourIntegral; bar &sup1baz'),
-  "foo ☃ \x{2233} bar \x{00b9}baz", 'right html unescaped result';
+  "foo ☃ \x{2233} bar \x{00b9}baz", 'right HTML unescaped result';
 
 # html_unescape (multi-character entity)
 is html_unescape(decode 'UTF-8', '&acE;'), "\x{223e}\x{0333}",
-  'right html unescaped result';
+  'right HTML unescaped result';
 
 # html_unescape (apos)
 is html_unescape('foobar&apos;&lt;baz&gt;&#x26;&#34;'), "foobar'<baz>&\"",
-  'right html unescaped result';
+  'right HTML unescaped result';
 
 # html_unescape (nothing to unescape)
-is html_unescape('foobar'), 'foobar', 'right html unescaped result';
+is html_unescape('foobar'), 'foobar', 'right HTML unescaped result';
 
 # html_unescape (relaxed)
 is html_unescape('&0&Ltf&amp&0oo&nbspba;&ltr'), "&0&Ltf&&0oo\x{00a0}ba;<r",
-  'right html unescaped result';
+  'right HTML unescaped result';
 
 # html_unescape (UTF-8)
 is html_unescape(decode 'UTF-8', 'foo&lt;baz&gt;&#x26;&#34;&OElig;&Foo;'),
-  "foo<baz>&\"\x{152}&Foo;", 'right html unescaped result';
+  "foo<baz>&\"\x{152}&Foo;", 'right HTML unescaped result';
 
 # xml_escape
 is xml_escape(qq{la<f>\nbar"baz"'yada\n'&lt;la}),
   "la&lt;f&gt;\nbar&quot;baz&quot;&#39;yada\n&#39;&amp;lt;la",
-  'right xml escaped result';
+  'right XML escaped result';
 
 # xml_escape (UTF-8 with nothing to escape)
-is xml_escape('привет'), 'привет', 'right xml escaped result';
+is xml_escape('привет'), 'привет', 'right XML escaped result';
 
 # xml_escape (UTF-8)
 is xml_escape('привет<foo>'), 'привет&lt;foo&gt;',
-  'right xml escaped result';
+  'right XML escaped result';
 
 # punycode_encode
 is punycode_encode('bücher'), 'bcher-kva', 'right punycode encoded result';

@@ -1,4 +1,6 @@
 
+4.88  2014-03-05
+
 4.87  2014-03-04
   - Improved Mojo::ByteStream to allow more method chaining.
   - Fixed RFC 7159 support in Mojo::JSON.

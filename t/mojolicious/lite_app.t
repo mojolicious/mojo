@@ -317,7 +317,8 @@ post '/malformed_utf8' => sub {
 
 get '/json' => sub {
   my $self = shift;
-  return $self->render(json => undef) if $self->param('null');
+  return $self->render(json => $self->req->json)
+    if ($self->req->headers->content_type // '') eq 'application/json';
   $self->render(json => {foo => [1, -2, 3, 'b☃r']}, layout => 'layout');
 };
 
@@ -895,7 +896,7 @@ $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->json_hasnt('/bar');
 
 # JSON ("null")
-$t->get_ok('/json?null=1')->status_is(200)
+$t->get_ok('/json' => json => undef)->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
   ->content_type_is('application/json')->json_is(undef)->content_is('null');
 

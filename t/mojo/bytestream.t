@@ -134,9 +134,9 @@ open my $handle, '>', \$buffer;
 b('te', 'st')->say($handle);
 {
   local *STDOUT = $handle;
-  b(1, 2, 3)->say;
+  b(1, 2, 3)->say->quote->say;
 }
-is $buffer, "test\n123\n", 'right output';
+is $buffer, "test\n123\n\"123\"\n", 'right output';
 
 # slurp
 my $file = catfile splitdir($FindBin::Bin), qw(templates exception.mt);

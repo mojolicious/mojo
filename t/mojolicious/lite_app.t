@@ -897,7 +897,7 @@ $t->get_ok('/json')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
 # JSON ("null")
 $t->get_ok('/json?null=1')->status_is(200)
   ->header_is(Server => 'Mojolicious (Perl)')
-  ->content_type_is('application/json')->json_is(undef);
+  ->content_type_is('application/json')->json_is(undef)->content_is('null');
 
 # Stash values in template
 $t->get_ok('/autostash?bar=23')->status_is(200)

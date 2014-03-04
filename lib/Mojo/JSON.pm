@@ -42,7 +42,8 @@ sub decode {
 }
 
 sub decode_json {
-  eval { _decode(shift) } // croak _chomp($@);
+  my $value;
+  return eval { $value = _decode(shift); 1 } ? $value : croak _chomp($@);
 }
 
 sub encode { encode_json($_[1]) }

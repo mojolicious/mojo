@@ -195,11 +195,11 @@ sub _decode_value {
   # String
   return _decode_string() if m/\G"/gc;
 
-  # Array
-  return _decode_array() if m/\G\[/gc;
-
   # Object
   return _decode_object() if m/\G\{/gc;
+
+  # Array
+  return _decode_array() if m/\G\[/gc;
 
   # Number
   return 0 + $1
@@ -242,11 +242,11 @@ sub _encode_value {
   # Reference
   if (my $ref = ref $value) {
 
-    # Array
-    return _encode_array($value) if $ref eq 'ARRAY';
-
     # Object
     return _encode_object($value) if $ref eq 'HASH';
+
+    # Array
+    return _encode_array($value) if $ref eq 'ARRAY';
 
     # True or false
     return $$value ? 'true' : 'false' if $ref eq 'SCALAR';

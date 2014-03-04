@@ -308,6 +308,9 @@ like $json->encode({test => -sin(9**9**9)}), qr/^{"test":".*"}$/,
   'encode "nan" as string';
 
 # Errors
+is $json->decode('test'), undef, 'syntax error';
+is $json->error, 'Malformed JSON: Expected string, array, object, number,'
+  . ' boolean or null at line 0, offset 0', 'right error';
 is $json->decode('["♥"]'), undef, 'wide character in input';
 is $json->error, 'Wide character in input', 'right error';
 is $json->decode(b('["\\ud800"]')->encode), undef, 'syntax error';

@@ -113,7 +113,7 @@ sub _try {
     SSL_verify_mode     => $args->{tls_ca} ? 0x01 : 0x00,
     SSL_verifycn_name   => $args->{address},
     SSL_verifycn_scheme => $args->{tls_ca} ? 'http' : undef,
-    SSL_passwd_cb       => sub { $args->{password} }
+    SSL_passwd_cb       => $args->{password} ? sub { $args->{password} } : undef
   );
   my $reactor = $self->reactor;
   $reactor->remove($handle);

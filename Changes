@@ -1,5 +1,5 @@
 
-4.88  2014-03-05
+4.88  2014-03-06
 
 4.87  2014-03-04
   - Improved Mojo::ByteStream to allow more method chaining.

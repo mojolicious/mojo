@@ -322,7 +322,7 @@ reference and will try to call the C<TO_JSON> method on blessed references, or
 stringify them if it doesn't exist. Differentiating between strings and
 numbers in Perl is hard, depending on how it has been used, a C<Scalar> can be
 both at the same time. Since numeric comparisons on strings are very unlikely
-to happen intentionally, the numeric value always gets priority, so any
+to happen unintentionally, the numeric value always gets priority, so any
 C<Scalar> that has been used in numeric context is considered a number.
 
   [1, -2, 3]     -> [1, -2, 3]

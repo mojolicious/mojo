@@ -1,5 +1,7 @@
 
-4.88  2014-03-06
+4.88  2014-03-07
+  - Improved exception page to show better context information for templates.
+  - Fixed comment on last line bug in Mojo::Template.
 
 4.87  2014-03-04
   - Improved Mojo::ByteStream to allow more method chaining.

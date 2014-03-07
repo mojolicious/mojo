@@ -85,7 +85,7 @@ sub build {
     }
   }
 
-  return $self->code($self->_wrap(\@lines))->tree([]);
+  return $self->code(join "\n", @lines)->tree([]);
 }
 
 sub compile {
@@ -93,9 +93,7 @@ sub compile {
 
   # Compile with line directive
   return undef unless my $code = $self->code;
-  my $name = $self->name;
-  $name =~ y/"//d;
-  my $compiled = eval qq{#line 1 "$name"\n$code};
+  my $compiled = eval $self->_wrap($code);
   $self->compiled($compiled) and return undef unless $@;
 
   # Use local stacktrace for compile exceptions
@@ -248,6 +246,12 @@ sub render_file {
   return $self->render($template, @_);
 }
 
+sub _line {
+  my $name = shift->name;
+  $name =~ y/"//d;
+  return qq{#line @{[shift]} "$name"};
+}
+
 sub _trim {
   my ($self, $line) = @_;
 
@@ -269,7 +273,7 @@ sub _trim {
 }
 
 sub _wrap {
-  my ($self, $lines) = @_;
+  my ($self, $code) = @_;
 
   # Escape function
   my $escape = $self->escape;
@@ -279,12 +283,12 @@ sub _wrap {
   };
 
   # Wrap lines
-  my $first = $lines->[0] ||= '';
-  $lines->[0] = "package @{[$self->namespace]}; use Mojo::Base -strict;";
-  $lines->[0]  .= "sub { my \$_M = ''; @{[$self->prepend]}; do { $first";
-  $lines->[-1] .= "@{[$self->append]}; \$_M } };";
+  my $last = scalar split "\n", $code;
+  my $head = $self->_line(1);
+  $head .= "\npackage @{[$self->namespace]}; use Mojo::Base -strict;";
+  $code = "$head sub { my \$_M = ''; @{[$self->prepend]}; do { $code\n";
+  $code .= $self->_line($last) . "\n@{[$self->append]}; \$_M } };";
 
-  my $code = join "\n", @$lines;
   warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
   return $code;
 }

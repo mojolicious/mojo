@@ -772,7 +772,7 @@ picked up and shown as default.
   %= url_field address => 'http://mojolicio.us'
   %= url_field address => 'http://mojolicio.us', id => 'foo'
 
-Generate url input element. Previous input values will automatically get
+Generate URL input element. Previous input values will automatically get
 picked up and shown as default.
 
   <input name="address" type="url" />

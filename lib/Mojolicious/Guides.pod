@@ -137,8 +137,7 @@ Pure-Perl non-blocking I/O MongoDB driver.
 
 =head1 REFERENCE
 
-This is the fully documented class hierarchy of the L<Mojolicious>
-distribution.
+This is the class hierarchy of the L<Mojolicious> distribution.
 
 =over 2
 

@@ -41,17 +41,19 @@ sub _step {
   my ($self, $id) = (shift, shift);
 
   $self->{args}[$id] = [@_];
-  return if $self->{fail} || --$self->{pending} || $self->{lock};
+  return $self if $self->{fail} || --$self->{pending} || $self->{lock};
   local $self->{lock} = 1;
   my @args = map {@$_} @{delete $self->{args}};
 
   $self->{counter} = 0;
   if (my $cb = shift @{$self->remaining}) {
-    eval { $self->$cb(@args); 1 } or return $self->emit(error => $@)->{fail}++;
+    eval { $self->$cb(@args); 1 }
+      or (++$self->{fail} and return $self->emit(error => $@));
   }
 
   return $self->emit(finish => @args) unless $self->{counter};
   $self->ioloop->next_tick($self->begin) unless $self->{pending};
+  return $self;
 }
 
 1;
@@ -189,8 +191,8 @@ Data shared between all L</"steps">.
 
 =head2 pass
 
-  $delay->pass;
-  $delay->pass(@args);
+  $delay = $delay->pass;
+  $delay = $delay->pass(@args);
 
 Increment active event counter and decrement it again right away to pass
 values to the next step.

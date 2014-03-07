@@ -1,5 +1,20 @@
 
-4.86  2014-03-01
+4.88  2014-03-07
+  - Improved Mojo::Server::Daemon to handle setuid/setgid errors more
+    gracefully.
+  - Improved exception page to show better context information for templates.
+  - Fixed comment on last line bug in Mojo::Template.
+
+4.87  2014-03-04
+  - Improved Mojo::ByteStream to allow more method chaining.
+  - Fixed RFC 7159 support in Mojo::JSON.
+  - Fixed RFC 7159 compliance bugs in Mojo::Transaction::WebSocket and
+    Test::Mojo.
+  - Fixed Unicode bugs in Test::Mojo.
+
+4.86  2014-03-03
+  - Improved Mojo::IOLoop::Delay to allow more method chaining.
+  - Improved WebSocket and long poll performance.
 
 4.85  2014-02-26
   - Added next_tick method to Mojo::IOLoop and Mojo::Reactor.
@@ -66,7 +81,7 @@
   - Improved Mojo::DOM::HTML to generate better HTML.
 
 4.75  2014-02-02
-  - Fixed and readded support for permessage-deflate WebSocket compression.
+  - Fixed and re-added support for permessage-deflate WebSocket compression.
     (Mikey, sri)
 
 4.74  2014-02-02
@@ -2733,7 +2748,7 @@
   - Improved Mojo::Parameters performance. (kimoto)
   - Improved Mojo::Message::Response parser resilience.
   - Improved template class handling in MojoX::Renderer. (vti)
-  - Fixed a serious design flaw in Mojo::Message and made long poll much
+  - Fixed a serious design flaw in Mojo::Message and made long polling much
     easier.
   - Fixed a bug where Mojo::IOLoop connections could be closed too early.
   - Fixed a bug where a broken renderer could cause a fatal exception.

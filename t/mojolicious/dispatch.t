@@ -222,4 +222,8 @@ is $c->param('action'),     undef,          'no value';
 is $c->param('capture'),    'привет', 'right value';
 ok $c->render_called, 'rendered';
 
+# Not a WebSocket transaction
+eval { $c->send('test') };
+like $@, qr/^No WebSocket connection to send message to/, 'right error';
+
 done_testing();

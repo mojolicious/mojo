@@ -1,7 +1,6 @@
 package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
-use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::URL;
 use POSIX;
@@ -35,17 +34,18 @@ sub setuidgid {
 
   # Group
   if (my $group = $self->group) {
-    croak qq{Group "$group" does not exist}
+    return $self->_log(error => qq{Group "$group" does not exist.})
       unless defined(my $gid = getgrnam $group);
-    POSIX::setgid($gid) or croak qq{Can't switch to group "$group": $!};
+    return $self->_log(error => qq{Can't switch to group "$group": $!})
+      unless POSIX::setgid($gid);
   }
 
   # User
-  if (my $user = $self->user) {
-    croak qq{User "$user" does not exist}
-      unless defined(my $uid = getpwnam $user);
-    POSIX::setuid($uid) or croak qq{Can't switch to user "$user": $!};
-  }
+  return $self unless my $user = $self->user;
+  return $self->_log(error => qq{User "$user" does not exist.})
+    unless defined(my $uid = getpwnam $user);
+  return $self->_log(error => qq{Can't switch to user "$user": $!})
+    unless POSIX::setuid($uid);
 
   return $self;
 }
@@ -185,24 +185,21 @@ sub _listen {
 
       $stream->on(close => sub { $self->_close($id) });
       $stream->on(
-        error => sub {
-          return unless $self;
-          $self->app->log->error(pop);
-          $self->_close($id);
-        }
-      );
+        error => sub { $self && $self->_log(error => pop)->_close($id) });
       $stream->on(read => sub { $self->_read($id => pop) });
       $stream->on(timeout =>
-          sub { $self->app->log->debug('Inactivity timeout.') if $c->{tx} });
+          sub { $self->_log(debug => 'Inactivity timeout.') if $c->{tx} });
     }
   );
 
   return if $self->silent;
-  $self->app->log->info(qq{Listening at "$url".});
+  $self->_log(info => qq{Listening at "$url".});
   $query->params([]);
   $url->host('127.0.0.1') if $url->host eq '*';
   say "Server available at $url.";
 }
+
+sub _log { $_[0]->app->log->log(@_[1, 2]) and return $_[0] }
 
 sub _read {
   my ($self, $id, $chunk) = @_;

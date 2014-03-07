@@ -63,21 +63,23 @@ $delay->steps(
     my $delay = shift;
     my $end   = $delay->begin;
     $delay->begin->(3, 2, 1);
-    Mojo::IOLoop->next_tick(sub { $end->(1, 2, 3) });
+    Mojo::IOLoop->next_tick(sub { $end->(1, 2, 3)->pass(5) });
   },
   sub {
     my ($delay, @numbers) = @_;
     my $end = $delay->begin;
-    Mojo::IOLoop->next_tick(sub { $end->(undef, @numbers, 4) });
+    Mojo::IOLoop->next_tick(
+      sub { $end->(undef, @numbers, 4)->data(foo => 'bar') });
   },
   sub {
     my ($delay, @numbers) = @_;
     $result = \@numbers;
   }
 );
-is_deeply [$delay->wait], [2, 3, 2, 1, 4], 'right return values';
+is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5], 'right return values';
 is $finished, 1, 'finish event has been emitted once';
-is_deeply $result, [2, 3, 2, 1, 4], 'right results';
+is_deeply $result, [2, 3, 2, 1, 4, 5], 'right results';
+is $delay->data('foo'), 'bar', 'right value';
 
 # End chain after first step
 ($finished, $result) = ();
@@ -162,17 +164,17 @@ $delay = Mojo::IOLoop->delay(
     my $end3 = $first->begin(0);
     $end2->(4);
     $end3->(5, 6);
+    $first->pass(23)->pass(24);
     $end->(1, 2, 3);
-    $first->pass(23);
   },
   sub {
     my ($first, @numbers) = @_;
     push @$result, @numbers;
   }
 );
-is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6, 23], 'right return values';
+is_deeply [$delay->wait], [2, 3, 2, 1, 4, 5, 6, 23, 24], 'right return values';
 is $finished, 1, 'finish event has been emitted once';
-is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23], 'right results';
+is_deeply $result, [1, 2, 3, 2, 3, 2, 1, 4, 5, 6, 23, 24], 'right results';
 
 # Dynamic step
 my $double = sub {
@@ -228,7 +230,10 @@ $delay = Mojo::IOLoop::Delay->new;
 $delay->on(error => sub { $failed = pop });
 $delay->on(finish => sub { $finished++ });
 $delay->steps(
-  sub { Mojo::IOLoop->next_tick(shift->begin) },
+  sub {
+    my $end = shift->begin;
+    Mojo::IOLoop->next_tick(sub { $end->()->data(foo => 'bar') });
+  },
   sub { die 'Second step!' },
   sub { $result = 'failed' }
 );
@@ -236,6 +241,7 @@ $delay->wait;
 like $failed, qr/^Second step!/, 'right error';
 ok !$finished, 'finish event has not been emitted';
 ok !$result,   'no result';
+is $delay->data('foo'), 'bar', 'right value';
 
 # Exception in second step (with active event)
 ($failed, $finished, $result) = ();

@@ -7,7 +7,7 @@ BEGIN {
 
 use Test::More;
 use Mojo::ByteStream 'b';
-use Mojo::JSON 'j';
+use Mojo::JSON 'encode_json';
 use Mojolicious::Lite;
 use Test::Mojo;
 
@@ -37,6 +37,7 @@ websocket '/json' => sub {
   $self->on(
     json => sub {
       my ($self, $json) = @_;
+      return $self->send({json => $json}) unless ref $json;
       return $self->send({json => [@$json, 4]}) if ref $json eq 'ARRAY';
       $json->{test} += 1;
       $self->send({json => $json});
@@ -201,15 +202,18 @@ $t->websocket_ok(
 # JSON roundtrips
 $t->websocket_ok('/json')->send_ok({json => {test => 23, snowman => '☃'}})
   ->message_ok->json_message_is('' => {test => 24, snowman => '☃'})
-  ->json_message_is('' => {test => 24, snowman => '☃'}, 'right content')
+  ->json_message_is('' => {test => 24, snowman => '☃'})
   ->json_message_has('/test')->json_message_hasnt('/test/2')
-  ->send_ok({binary => j([1, 2, 3])})
-  ->message_ok->json_message_is([1, 2, 3, 4])
-  ->json_message_is([1, 2, 3, 4], 'right content')
-  ->send_ok({binary => j([1, 2, 3])})
+  ->send_ok({binary => encode_json([1, 2, 3])})
+  ->message_ok->json_message_is([1, 2, 3, 4])->json_message_is([1, 2, 3, 4])
+  ->send_ok({binary => encode_json([1, 2, 3])})
   ->message_ok->json_message_has('/2', 'has two elements')
-  ->json_message_is('/2' => 3)->json_message_hasnt('/5', 'not five elements')
-  ->finish_ok;
+  ->json_message_is('/2' => 3, 'right value')
+  ->json_message_hasnt('/5', 'not five elements')
+  ->send_ok({json => {'☃' => [1, 2, 3]}})
+  ->message_ok->json_message_is('/☃', [1, 2, 3])->send_ok({json => 'works'})
+  ->message_ok->json_message_is('works')->send_ok({json => undef})
+  ->message_ok->json_message_is(undef)->finish_ok;
 
 # Plain request
 $t->get_ok('/plain')->status_is(200)->content_is('Nothing to see here!');

@@ -142,41 +142,41 @@ sub header_unlike {
 
 sub json_has {
   my ($self, $p, $desc) = @_;
-  $desc ||= qq{has value for JSON Pointer "$p"};
+  $desc ||= encode 'UTF-8', qq{has value for JSON Pointer "$p"};
   return $self->_test('ok',
     !!Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
 }
 
 sub json_hasnt {
   my ($self, $p, $desc) = @_;
-  $desc ||= qq{has no value for JSON Pointer "$p"};
+  $desc ||= encode 'UTF-8', qq{has no value for JSON Pointer "$p"};
   return $self->_test('ok',
     !Mojo::JSON::Pointer->new($self->tx->res->json)->contains($p), $desc);
 }
 
 sub json_is {
   my $self = shift;
-  my ($p, $data) = ref $_[0] ? ('', shift) : (shift, shift);
-  my $desc = shift || qq{exact match for JSON Pointer "$p"};
+  my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
+  my $desc = encode 'UTF-8', shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->tx->res->json($p), $data, $desc);
 }
 
 sub json_message_has {
   my ($self, $p, $desc) = @_;
-  $desc ||= qq{has value for JSON Pointer "$p"};
+  $desc ||= encode 'UTF-8', qq{has value for JSON Pointer "$p"};
   return $self->_test('ok', $self->_json(contains => $p), $desc);
 }
 
 sub json_message_hasnt {
   my ($self, $p, $desc) = @_;
-  $desc ||= qq{has no value for JSON Pointer "$p"};
+  $desc ||= encode 'UTF-8', qq{has no value for JSON Pointer "$p"};
   return $self->_test('ok', !$self->_json(contains => $p), $desc);
 }
 
 sub json_message_is {
   my $self = shift;
-  my ($p, $data) = ref $_[0] ? ('', shift) : (shift, shift);
-  my $desc = shift || qq{exact match for JSON Pointer "$p"};
+  my ($p, $data) = @_ > 1 ? (shift, shift) : ('', shift);
+  my $desc = encode 'UTF-8', shift || qq{exact match for JSON Pointer "$p"};
   return $self->_test('is_deeply', $self->_json(get => $p), $data, $desc);
 }
 
@@ -666,7 +666,6 @@ Opposite of L</"json_has">.
 =head2 json_is
 
   $t = $t->json_is({foo => [1, 2, 3]});
-  $t = $t->json_is({foo => [1, 2, 3]}, 'right content');
   $t = $t->json_is('/foo' => [1, 2, 3]);
   $t = $t->json_is('/foo/1' => 2, 'right value');
 
@@ -691,7 +690,6 @@ Opposite of L</"json_message_has">.
 =head2 json_message_is
 
   $t = $t->json_message_is({foo => [1, 2, 3]});
-  $t = $t->json_message_is({foo => [1, 2, 3]}, 'right content');
   $t = $t->json_message_is('/foo' => [1, 2, 3]);
   $t = $t->json_message_is('/foo/1' => 2, 'right value');
 

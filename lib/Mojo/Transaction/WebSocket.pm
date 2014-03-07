@@ -83,7 +83,7 @@ sub build_message {
   $frame = {text => encode('UTF-8', $frame)} if ref $frame ne 'HASH';
 
   # JSON
-  $frame->{text} = encode_json($frame->{json}) if $frame->{json};
+  $frame->{text} = encode_json($frame->{json}) if exists $frame->{json};
 
   # Raw text or binary
   if (exists $frame->{text}) { $frame = [1, 0, 0, 0, TEXT, $frame->{text}] }

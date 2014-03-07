@@ -49,6 +49,7 @@ sub say {
   my ($self, $handle) = @_;
   $handle ||= \*STDOUT;
   say $handle $$self;
+  return $self;
 }
 
 sub secure_compare { Mojo::Util::secure_compare ${shift()}, @_ }
@@ -218,8 +219,8 @@ Quote bytestream with L<Mojo::Util/"quote">.
 
 =head2 say
 
-  $stream->say;
-  $stream->say(*STDERR);
+  $stream = $stream->say;
+  $stream = $stream->say(*STDERR);
 
 Print bytestream to handle and append a newline, defaults to C<STDOUT>.
 

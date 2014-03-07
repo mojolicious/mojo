@@ -98,7 +98,8 @@ sub render {
   }
 
   # JSON
-  elsif (my $json = delete $stash->{json}) {
+  elsif (exists $stash->{json}) {
+    my $json = delete $stash->{json};
     $self->handlers->{json}->($self, $c, \$output, {json => $json});
     return $output, 'json';
   }

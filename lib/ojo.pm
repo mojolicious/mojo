@@ -131,9 +131,9 @@ L<Mojo::Message::Response> object.
 
 =head2 j
 
+  my $bytes = j([1, 2, 3]);
   my $bytes = j({foo => 'bar'});
-  my $array = j($bytes);
-  my $hash  = j($bytes);
+  my $value = j($bytes);
 
 Encode Perl data structure or decode JSON with L<Mojo::JSON/"j">.
 

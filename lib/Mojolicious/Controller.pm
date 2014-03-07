@@ -70,14 +70,11 @@ sub finish {
   $tx->finish(@_) and return $self if $tx->is_websocket;
 
   # Chunked stream
-  if ($tx->res->content->is_chunked) {
-    $self->write_chunk(@_) if @_;
-    return $self->write_chunk('');
-  }
+  return @_ ? $self->write_chunk(@_)->write_chunk('') : $self->write_chunk('')
+    if $tx->res->content->is_chunked;
 
   # Normal stream
-  $self->write(@_) if @_;
-  return $self->write('');
+  return @_ ? $self->write(@_)->write('') : $self->write('');
 }
 
 sub flash {
@@ -99,7 +96,7 @@ sub on {
   my ($self, $name, $cb) = @_;
   my $tx = $self->tx;
   $self->rendered(101) if $tx->is_websocket;
-  return $tx->on($name => sub { shift and $self->$cb(@_) });
+  return $tx->on($name => sub { shift; $self->$cb(@_) });
 }
 
 sub param {
@@ -251,7 +248,7 @@ sub send {
   my $tx = $self->tx;
   Carp::croak 'No WebSocket connection to send message to'
     unless $tx->is_websocket;
-  $tx->send($msg => sub { shift and $self->$cb(@_) if $cb });
+  $tx->send($msg, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered(101);
 }
 
@@ -366,8 +363,7 @@ sub validation {
 sub write {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
-  my $content = $self->res->content;
-  $content->write($chunk => sub { shift and $self->$cb(@_) if $cb });
+  $self->res->content->write($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
 }
 
@@ -375,7 +371,7 @@ sub write_chunk {
   my ($self, $chunk, $cb) = @_;
   ($cb, $chunk) = ($chunk, undef) if ref $chunk eq 'CODE';
   my $content = $self->res->content;
-  $content->write_chunk($chunk => sub { shift and $self->$cb(@_) if $cb });
+  $content->write_chunk($chunk, $cb ? sub { shift; $self->$cb(@_) } : ());
   return $self->rendered;
 }
 
@@ -658,8 +654,8 @@ the L</"stash">.
   $c->render(text => 'I ♥ Mojolicious!');
 
   # Render binary data
-  use Mojo::JSON 'j';
-  $c->render(data => j({test => 'I ♥ Mojolicious!'}));
+  use Mojo::JSON 'encode_json';
+  $c->render(data => encode_json({test => 'I ♥ Mojolicious!'}));
 
   # Render JSON
   $c->render(json => {test => 'I ♥ Mojolicious!'});
@@ -759,7 +755,7 @@ Get L<Mojo::Message::Request> object from L<Mojo::Transaction/"req">.
   my $bytes = $c->req->body;
   my $str   = $c->req->text;
   my $hash  = $c->req->params->to_hash;
-  my $hash  = $c->req->json;
+  my $value = $c->req->json;
   my $foo   = $c->req->json('/23/foo');
   my $dom   = $c->req->dom;
   my $bar   = $c->req->dom('div.bar')->first->text;
@@ -821,8 +817,8 @@ status.
   $c->send({json => {test => 'I ♥ Mojolicious!'}});
 
   # Send JSON object as "Binary" message
-  use Mojo::JSON 'j';
-  $c->send({binary => j({test => 'I ♥ Mojolicious!'})});
+  use Mojo::JSON 'encode_json';
+  $c->send({binary => encode_json({test => 'I ♥ Mojolicious!'})});
 
   # Send "Ping" frame
   $c->send([1, 0, 0, 0, 9, 'Hello World!']);

@@ -33,19 +33,19 @@ sub setuidgid {
   my $self = shift;
 
   # Group
-  my $log = $self->app->log;
   if (my $group = $self->group) {
-    $log->error(qq{Group "$group" does not exist.}) and return $self
+    return $self->_log(qq{Group "$group" does not exist.})
       unless defined(my $gid = getgrnam $group);
-    POSIX::setgid($gid) or $log->error(qq{Can't switch to group "$group": $!});
+    return $self->_log(qq{Can't switch to group "$group": $!})
+      unless POSIX::setgid($gid);
   }
 
   # User
-  if (my $user = $self->user) {
-    $log->error(qq{User "$user" does not exist.}) and return $self
-      unless defined(my $uid = getpwnam $user);
-    POSIX::setuid($uid) or $log->error(qq{Can't switch to user "$user": $!});
-  }
+  return $self unless my $user = $self->user;
+  return $self->_log(qq{User "$user" does not exist.})
+    unless defined(my $uid = getpwnam $user);
+  return $self->_log(qq{Can't switch to user "$user": $!})
+    unless POSIX::setuid($uid);
 
   return $self;
 }
@@ -203,6 +203,8 @@ sub _listen {
   $url->host('127.0.0.1') if $url->host eq '*';
   say "Server available at $url.";
 }
+
+sub _log { $_[0]->app->log->error($_[1]) and return $_[0] }
 
 sub _read {
   my ($self, $id, $chunk) = @_;

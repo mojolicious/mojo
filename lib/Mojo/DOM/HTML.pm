@@ -234,7 +234,7 @@ sub _render {
     $result .= join ' ', '', @attrs if @attrs;
 
     # Element without end tag
-    return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
+    return $EMPTY{$tag} ? $xml ? "$result />" : "$result>" : "$result></$tag>"
       unless $tree->[4];
 
     # Close tag

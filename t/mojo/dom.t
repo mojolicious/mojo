@@ -752,6 +752,11 @@ is_deeply \@div, [qw(A B 0)], 'found all div elements with id';
 $dom = Mojo::DOM->new->parse('<hr /><br/><br id="br"/><br />');
 is "$dom", '<hr><br><br id="br"><br>', 'right result';
 is $dom->at('br')->content, '', 'empty result';
+$dom = Mojo::DOM->new->parse('<script></script>');
+ok !$dom->xml, 'XML mode not detected';
+is "$dom", '<script></script>', 'right result';
+$dom->xml(1);
+is "$dom", '<script></script>', 'right result';
 
 # Inner XML
 $dom = Mojo::DOM->new->parse('<a>xxx<x>x</x>xxx</a>');
@@ -1860,7 +1865,8 @@ is $element->parent->type, 'XMLTest', 'right parent';
 ok $element->root->xml, 'XML mode active';
 $dom->replace('<XMLTest2 /><XMLTest3 just="works" />');
 ok $dom->xml, 'XML mode active';
-is $dom, '<XMLTest2 /><XMLTest3 just="works" />', 'right result';
+is $dom, '<XMLTest2></XMLTest2><XMLTest3 just="works"></XMLTest3>',
+  'right result';
 
 # Ensure HTML semantics
 ok !Mojo::DOM->new->xml(undef)->parse('<?xml version="1.0"?>')->xml,

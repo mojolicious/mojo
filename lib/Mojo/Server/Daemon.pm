@@ -1,7 +1,6 @@
 package Mojo::Server::Daemon;
 use Mojo::Base 'Mojo::Server';
 
-use Carp 'croak';
 use Mojo::IOLoop;
 use Mojo::URL;
 use POSIX;
@@ -34,17 +33,18 @@ sub setuidgid {
   my $self = shift;
 
   # Group
+  my $log = $self->app->log;
   if (my $group = $self->group) {
-    croak qq{Group "$group" does not exist}
+    $log->error(qq{Group "$group" does not exist}) and return $self
       unless defined(my $gid = getgrnam $group);
-    POSIX::setgid($gid) or croak qq{Can't switch to group "$group": $!};
+    POSIX::setgid($gid) or $log->error(qq{Can't switch to group "$group": $!});
   }
 
   # User
   if (my $user = $self->user) {
-    croak qq{User "$user" does not exist}
+    $log->error(qq{User "$user" does not exist}) and return $self
       unless defined(my $uid = getpwnam $user);
-    POSIX::setuid($uid) or croak qq{Can't switch to user "$user": $!};
+    POSIX::setuid($uid) or $log->error(qq{Can't switch to user "$user": $!});
   }
 
   return $self;

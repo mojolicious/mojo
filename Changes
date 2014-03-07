@@ -1,5 +1,7 @@
 
 4.88  2014-03-07
+  - Improved Mojo::Server::Daemon to handle setuid/setgid errors more
+    gracefully.
   - Improved exception page to show better context information for templates.
   - Fixed comment on last line bug in Mojo::Template.
 

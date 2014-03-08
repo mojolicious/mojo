@@ -546,6 +546,9 @@ new ones.
 Build default controller object with L</"defaults">, which is usually a
 L<Mojolicious::Controller> object.
 
+  # Render template from application
+  my $foo = $app->build_controller->render(template => 'foo', partial => 1);
+
 =head2 build_tx
 
   my $tx = $app->build_tx;

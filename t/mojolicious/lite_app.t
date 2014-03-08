@@ -455,6 +455,7 @@ my $t = Test::Mojo->new;
 # Application is already available
 is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
 is $t->app->moniker, 'lite_app', 'right moniker';
+is $t->app->stash->{default}, 23, 'right value';
 is $t->app, app->build_controller->app->commands->app,
   'applications are equal';
 is $t->app->build_controller->req->url, '', 'no URL';

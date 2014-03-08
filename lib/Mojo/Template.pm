@@ -283,11 +283,11 @@ sub _wrap {
   };
 
   # Wrap lines
-  my $last = scalar split "\n", $code;
+  my $num = () = $code =~ /\n/g;
   my $head = $self->_line(1);
   $head .= "\npackage @{[$self->namespace]}; use Mojo::Base -strict;";
   $code = "$head sub { my \$_M = ''; @{[$self->prepend]}; do { $code\n";
-  $code .= $self->_line($last) . "\n@{[$self->append]}; \$_M } };";
+  $code .= $self->_line($num + 1) . "\n@{[$self->append]}; \$_M } };";
 
   warn "-- Code for @{[$self->name]}\n@{[encode 'UTF-8', $code]}\n\n" if DEBUG;
   return $code;

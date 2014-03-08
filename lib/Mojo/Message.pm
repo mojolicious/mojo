@@ -98,15 +98,14 @@ sub finish {
 
 sub fix_headers {
   my $self = shift;
+  return $self if $self->{fix}++;
 
   # Content-Length or Connection (unless chunked transfer encoding is used)
   my $content = $self->content;
-  return $self if $self->{fix}++ || $content->is_chunked;
-  my $headers = $self->headers;
-  $content->is_dynamic
-    ? $headers->connection('close')
-    : $headers->content_length($self->body_size)
-    unless $headers->content_length;
+  my $headers = $content->headers;
+  return $self if $content->is_chunked || $headers->content_length;
+  if   ($content->is_dynamic) { $headers->connection('close') }
+  else                        { $headers->content_length($self->body_size) }
 
   return $self;
 }

@@ -21,6 +21,13 @@ is $@, qq{Plugin "does_not_exist" missing, maybe you need to install it?\n},
 # Default
 app->defaults(default => 23);
 
+# Secret
+my $log = '';
+my $cb = app->log->on(message => sub { $log .= pop });
+is app->secrets->[0], app->moniker, 'secret defaults to moniker';
+like $log, qr/Your secret passphrase needs to be changed!!!/, 'right message';
+app->log->unsubscribe(message => $cb);
+
 # Test helpers
 helper test_helper  => sub { shift->param(@_) };
 helper test_helper2 => sub { shift->app->controller_class };
@@ -447,13 +454,15 @@ my $t = Test::Mojo->new;
 
 # Application is already available
 is $t->app->test_helper2, 'Mojolicious::Controller', 'right class';
-is $t->app, app->commands->app, 'applications are equal';
 is $t->app->moniker, 'lite_app', 'right moniker';
-my $log = '';
-my $cb = $t->app->log->on(message => sub { $log .= pop });
-is $t->app->secrets->[0], $t->app->moniker, 'secret defaults to moniker';
-like $log, qr/Your secret passphrase needs to be changed!!!/, 'right message';
-$t->app->log->unsubscribe(message => $cb);
+is $t->app, app->build_controller->app->commands->app,
+  'applications are equal';
+is $t->app->build_controller->req->url, '', 'no URL';
+is $t->app->build_controller->stash->{default}, 23, 'right value';
+is $t->app->build_controller($t->app->ua->build_tx(GET => '/foo'))->req->url,
+  '/foo', 'right URL';
+is $t->app->build_controller->render('index', handler => 'epl', partial => 1),
+  'Just works!', 'right result';
 
 # Unicode snowman
 $t->get_ok('/☃')->status_is(200)

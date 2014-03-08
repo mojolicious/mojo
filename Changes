@@ -1,5 +1,6 @@
 
 4.88  2014-03-08
+  - Added build_controller method to Mojolicious.
   - Improved Mojo::Server::Daemon to handle setuid/setgid errors more
     gracefully.
   - Improved Mojo::Server::Prefork to handle lock file errors more gracefully.

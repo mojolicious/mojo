@@ -55,10 +55,28 @@ sub AUTOLOAD {
   # Call helper with fresh controller
   croak qq{Can't locate object method "$method" via package "$package"}
     unless my $helper = $self->renderer->helpers->{$method};
-  return $self->controller_class->new(app => $self)->$helper(@_);
+  return $self->build_controller->$helper(@_);
 }
 
 sub DESTROY { }
+
+sub build_controller {
+  my ($self, $tx) = @_;
+  $tx ||= $self->build_tx;
+
+  # Embedded application
+  my $stash = {};
+  if (my $sub = $tx->can('stash')) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
+  $stash->{'mojo.secrets'} //= $self->secrets;
+
+  # Build default controller
+  %$stash = (%$stash, %{$self->defaults});
+  my $c
+    = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
+  weaken $c->{app};
+
+  return $c;
+}
 
 sub build_tx {
   my $self = shift;
@@ -102,18 +120,7 @@ sub dispatch {
 }
 
 sub handler {
-  my ($self, $tx) = @_;
-
-  # Embedded application
-  my $stash = {};
-  if (my $sub = $tx->can('stash')) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
-  $stash->{'mojo.secrets'} //= $self->secrets;
-
-  # Build default controller
-  %$stash = (%$stash, %{$self->defaults});
-  my $c
-    = $self->controller_class->new(app => $self, stash => $stash, tx => $tx);
-  weaken $c->{$_} for qw(app tx);
+  my $self = shift;
 
   # Dispatcher has to be last in the chain
   ++$self->{dispatch}
@@ -122,11 +129,13 @@ sub handler {
     unless $self->{dispatch};
 
   # Process with chain
+  my $c = $self->build_controller(@_);
+  weaken $c->{tx};
   $self->plugins->emit_chain(around_dispatch => $c);
 
   # Delayed response
   $self->log->debug('Nothing has been rendered, expecting delayed response.')
-    unless $tx->is_writing;
+    unless $c->tx->is_writing;
 }
 
 sub helper {
@@ -528,12 +537,20 @@ Validate parameters, defaults to a L<Mojolicious::Validator> object.
 L<Mojolicious> inherits all methods from L<Mojo> and implements the following
 new ones.
 
+=head2 build_controller
+
+  my $c = $app->build_controller;
+  my $c = $app->build_controller(Mojo::Transaction::HTTP->new);
+  my $c = $app->build_controller(Mojolicious::Controller->new);
+
+Build default controller object with L</"defaults">, which is usually a
+L<Mojolicious::Controller> object.
+
 =head2 build_tx
 
   my $tx = $app->build_tx;
 
-Transaction builder, defaults to building a L<Mojo::Transaction::HTTP>
-object.
+Build L<Mojo::Transaction::HTTP> object and emit L</"after_build_tx"> hook.
 
 =head2 defaults
 

@@ -333,7 +333,8 @@ Continue dispatch chain.
 
   my $bool = $r->dispatch(Mojolicious::Controller->new);
 
-Match routes with L<Mojolicious::Routes::Match> and dispatch.
+Match routes with L<Mojolicious::Routes::Match> and dispatch, emits the hook
+L<Mojolicious/"around_action"> for every action.
 
 =head2 hide
 

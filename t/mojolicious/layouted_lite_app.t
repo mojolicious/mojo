@@ -109,7 +109,7 @@ get '/data' => {data => 0};
 my $t = Test::Mojo->new;
 
 # "0" content reassignment
-my $c = $t->app->controller_class->new;
+my $c = $t->app->build_controller;
 $c->content(foo => '0');
 is $c->content('foo'), '0', 'right content';
 $c->content(foo => '1');

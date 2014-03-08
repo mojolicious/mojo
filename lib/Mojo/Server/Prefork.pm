@@ -165,7 +165,8 @@ sub _spawn {
 
   # Prepare lock file
   my $file = $self->{lock_file};
-  die qq{Can't open lock file "$file": $!} unless open my $handle, '>', $file;
+  $self->app->log->error(qq{Can't open lock file "$file": $!})
+    unless open my $handle, '>', $file;
 
   # Change user/group
   my $loop = $self->setuidgid->ioloop;

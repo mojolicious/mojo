@@ -1,7 +1,8 @@
 
-4.88  2014-03-07
+4.88  2014-03-08
   - Improved Mojo::Server::Daemon to handle setuid/setgid errors more
     gracefully.
+  - Improved Mojo::Server::Prefork to handle lock file errors more gracefully.
   - Improved exception page to show better context information for templates.
   - Fixed comment on last line bug in Mojo::Template.
 

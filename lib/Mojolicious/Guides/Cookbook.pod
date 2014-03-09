@@ -778,7 +778,9 @@ application.
 
 =head1 USER AGENT
 
-When we say L<Mojolicious> is a web framework we actually mean it.
+When we say L<Mojolicious> is a web framework we actually mean it, with
+L<Mojo::UserAgent> there's a full featured HTTP and WebSocket user agent built
+right in.
 
 =head2 Web scraping
 

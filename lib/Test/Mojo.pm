@@ -488,6 +488,10 @@ Access application with L<Mojo::UserAgent/"app">.
   # Test application directly
   is $t->app->defaults->{foo}, 'bar', 'right value';
   ok $t->app->routes->find('echo')->is_websocket, 'WebSocket route';
+  my $c = $t->app->build_controller;
+  ok $c->render(template => 'foo'), 'rendering was successful';
+  is $c->res->status, 200, 'right status';
+  is $c->res->body, 'Foo!', 'right content';
 
   # Change application behavior
   $t->app->hook(before_dispatch => sub {

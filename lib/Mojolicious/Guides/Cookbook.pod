@@ -787,8 +787,8 @@ right in.
 Scraping information from web sites has never been this much fun before. The
 built-in HTML/XML parser L<Mojo::DOM> is accessible through
 L<Mojo::Message/"dom"> and supports all CSS selectors that make sense for a
-standalone parser, it can be a very powerful tool especially for unit testing
-web application.
+standalone parser, it can be a very powerful tool especially for testing web
+application.
 
   use Mojo::UserAgent;
 

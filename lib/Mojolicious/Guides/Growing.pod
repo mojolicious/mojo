@@ -384,8 +384,8 @@ depending on browser.
 
 =head2 Final prototype
 
-A final C<myapp.pl> prototype passing all of the unit tests above could look
-like this.
+A final C<myapp.pl> prototype passing all of the tests above could look like
+this.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;
@@ -558,7 +558,7 @@ applications can use nested routes they have no need for C<group> blocks.
 =head2 Simplified application script
 
 C<myapp.pl> itself can now be turned into a simplified application script to
-allow running unit tests again.
+allow running tests again.
 
   #!/usr/bin/env perl
 

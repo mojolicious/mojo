@@ -970,8 +970,7 @@ specific C<exception> and C<not_found> templates.
 =head2 Testing
 
 Testing your application is as easy as creating a C<t> directory and filling
-it with normal Perl unit tests, which can be a lot of fun thanks to
-L<Test::Mojo>.
+it with normal Perl tests, which can be a lot of fun thanks to L<Test::Mojo>.
 
   use Test::More;
   use Test::Mojo;
@@ -984,7 +983,7 @@ L<Test::Mojo>.
 
   done_testing();
 
-Run all unit tests with the command L<Mojolicious::Command::test>.
+Run all tests with the command L<Mojolicious::Command::test>.
 
   $ ./myapp.pl test
   $ ./myapp.pl test -v

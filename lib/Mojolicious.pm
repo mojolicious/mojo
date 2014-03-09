@@ -543,8 +543,7 @@ new ones.
   my $c = $app->build_controller(Mojo::Transaction::HTTP->new);
   my $c = $app->build_controller(Mojolicious::Controller->new);
 
-Build default controller object with L</"defaults">, which is usually a
-L<Mojolicious::Controller> object.
+Build default controller object with L</"controller_class">.
 
   # Render template from application
   my $foo = $app->build_controller->render(template => 'foo', partial => 1);

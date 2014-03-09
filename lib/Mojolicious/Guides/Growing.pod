@@ -161,7 +161,9 @@ organized CPAN distribution to maximize maintainability.
      +- example              # Template directory for "Example" controller
         +- welcome.html.ep   # Template for "welcome" action
 
-Both application skeletons can be automatically generated.
+Both application skeletons can be automatically generated with the commands
+L<Mojolicious::Command::generate::lite_app> and
+L<Mojolicious::Command::generate::app>.
 
   $ mojo generate lite_app myapp.pl
   $ mojo generate app MyApp
@@ -314,14 +316,15 @@ on L<Mojo::DOM>.
 
   done_testing();
 
-From now on you can always check your progress by running these unit tests
-against your application.
+Your application won't pass these tests, but from now on you can use them to
+check your progress with the command L<Mojolicious::Command::test>.
 
   $ ./myapp.pl test
   $ ./myapp.pl test t/login.t
   $ ./myapp.pl test -v t/login.t
 
-Or perform quick requests right from the command line.
+Or perform quick requests right from the command line with
+L<Mojolicious::Command::get>.
 
   $ ./myapp.pl get /
   Wrong username or password.
@@ -487,7 +490,7 @@ possibilities.
 
 All templates and static files inlined in the C<DATA> section can be
 automatically turned into separate files in the C<templates> and C<public>
-directories.
+directories with the command L<Mojolicious::Command::inflate>.
 
   $ ./myapp.pl inflate
 

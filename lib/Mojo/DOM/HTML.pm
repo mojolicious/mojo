@@ -90,10 +90,10 @@ my %BLOCK = map { $_ => 1 } (
   qw(a address applet article aside b big blockquote body button caption),
   qw(center code col colgroup dd details dialog dir div dl dt em fieldset),
   qw(figcaption figure font footer form frameset h1 h2 h3 h4 h5 h6 head),
-  qw(header hgroup html i iframe image li listing main marquee menu nav nobr),
-  qw(noframes noscript object ol optgroup option p plaintext pre rp rt s),
-  qw(script section select small strike strong style summary table tbody td),
-  qw(template textarea tfoot th thead title tr tt u ul xmp)
+  qw(header hgroup html i iframe li listing main marquee menu nav nobr),
+  qw(noembed noframes noscript object ol optgroup option p plaintext pre rp),
+  qw(rt s script section select small strike strong style summary table),
+  qw(tbody td template textarea tfoot th thead title tr tt u ul xmp)
 );
 
 sub parse {
@@ -130,6 +130,8 @@ sub parse {
           $attrs{$key} = defined $value ? html_unescape($value) : $value;
         }
 
+        # "image" is an alias for "img"
+        $start = 'img' if !$xml && $start eq 'image';
         _start($start, \%attrs, $xml, \$current);
 
         # Element without end tag (self-closing)

@@ -223,11 +223,11 @@ is "$dom", '<script><i><b>h:)g</b>a</i><b>fce</b>1<b>d</b></script>',
   'right result';
 
 # XML nodes
-$dom = Mojo::DOM->new->xml(1)->parse('<b>test</b>');
+$dom = Mojo::DOM->new->xml(1)->parse('<b>test<image /></b>');
 ok $dom->at('b')->contents->first->xml, 'XML mode active';
 ok $dom->at('b')->contents->first->replace('<br>')->contents->first->xml,
   'XML mode active';
-is "$dom", '<b><br /></b>', 'right result';
+is "$dom", '<b><br /><image /></b>', 'right result';
 
 # Treating nodes as elements
 $dom = Mojo::DOM->new('foo<b>bar</b>baz');
@@ -2328,6 +2328,11 @@ $dom = Mojo::DOM->new('<p /><svg><circle /><circle /></svg>');
 is $dom->find('p > svg > circle')->size, 2, 'two circles';
 is "$dom", '<p><svg><circle></circle><circle></circle></svg></p>',
   'right result';
+
+# "image"
+$dom = Mojo::DOM->new('<image src="foo.png">test');
+is $dom->at('img')->{src}, 'foo.png', 'right attribute';
+is "$dom", '<img src="foo.png">test', 'right result';
 
 # Comments
 $dom = Mojo::DOM->new(<<EOF);

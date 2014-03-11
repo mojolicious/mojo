@@ -85,6 +85,17 @@ my @PHRASING = (
 my @OBSOLETE = qw(acronym applet basefont big font strike tt);
 my %PHRASING = map { $_ => 1 } @OBSOLETE, @PHRASING;
 
+# HTML elements that don't get their self-closing flag acknowledged
+my %BLOCK = map { $_ => 1 } (
+  qw(a address applet article aside b big blockquote body button caption),
+  qw(center code col colgroup dd details dialog dir div dl dt em fieldset),
+  qw(figcaption figure font footer form frameset h1 h2 h3 h4 h5 h6 head),
+  qw(header hgroup html i iframe image li listing main marquee menu nav nobr),
+  qw(noframes noscript object ol optgroup option p plaintext pre rp rt s),
+  qw(script section select small strike strong style summary table tbody td),
+  qw(template textarea tfoot th thead title tr tt u ul xmp)
+);
+
 sub parse {
   my ($self, $html) = @_;
 
@@ -121,9 +132,10 @@ sub parse {
 
         _start($start, \%attrs, $xml, \$current);
 
-        # Element without end tag
+        # Element without end tag (self-closing)
         _end($start, $xml, \$current)
-          if (!$xml && $EMPTY{$start}) || $attr =~ m!/\s*$!;
+          if !$xml && $EMPTY{$start}
+          or ($xml || !$BLOCK{$start}) && $attr =~ m!/\s*$!;
 
         # Relaxed "script" or "style" HTML elements
         next if $xml || ($start ne 'script' && $start ne 'style');

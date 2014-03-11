@@ -2320,6 +2320,11 @@ is $dom->parse('<!--0-->'),      '<!--0-->',      'successful roundtrip';
 is $dom->parse('<![CDATA[0]]>'), '<![CDATA[0]]>', 'successful roundtrip';
 is $dom->parse('<?0?>'),         '<?0?>',         'successful roundtrip';
 
+# Not self-closing
+$dom = Mojo::DOM->new('<div /><div><pre />test</div>');
+is $dom->at('div > div > pre')->text, 'test', 'right text';
+is "$dom", '<div><div><pre>test</pre></div></div>', 'right result';
+
 # Comments
 $dom = Mojo::DOM->new(<<EOF);
 <!-- HTML5 -->

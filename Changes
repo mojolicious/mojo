@@ -1,5 +1,7 @@
 
-4.89  2014-03-10
+4.89  2014-03-11
+  - Fixed bug in Mojo::DOM::HTML where non-self-closing elements were not
+    handled correctly.
 
 4.88  2014-03-09
   - Added build_controller method to Mojolicious.

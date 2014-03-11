@@ -2324,6 +2324,9 @@ is $dom->parse('<?0?>'),         '<?0?>',         'successful roundtrip';
 $dom = Mojo::DOM->new('<div /><div><pre />test</div>');
 is $dom->at('div > div > pre')->text, 'test', 'right text';
 is "$dom", '<div><div><pre>test</pre></div></div>', 'right result';
+$dom = Mojo::DOM->new('<p /><svg><circle /></svg>');
+is $dom->at('p > svg')->contents->first->type, 'circle', 'right type';
+is "$dom", '<p><svg><circle></circle></svg></p>', 'right result';
 
 # Comments
 $dom = Mojo::DOM->new(<<EOF);

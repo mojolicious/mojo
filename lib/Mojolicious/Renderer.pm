@@ -150,23 +150,20 @@ sub template_for {
 sub template_handler {
   my ($self, $options) = @_;
 
-  # Templates
   return undef unless my $file = $self->template_name($options);
   unless ($self->{templates}) {
+
+    # Templates
     s/\.(\w+)$// and $self->{templates}{$_} ||= $1
       for map { sort @{Mojo::Home->new($_)->list_files} } @{$self->paths};
-  }
-  return $self->{templates}{$file} if exists $self->{templates}{$file};
 
-  # DATA templates
-  unless ($self->{data}) {
+    # DATA templates
     my $loader = Mojo::Loader->new;
-    my @templates = map { sort keys %{$loader->data($_)} } @{$self->classes};
-    s/\.(\w+)$// and $self->{data}{$_} ||= $1 for @templates;
+    s/\.(\w+)$// and $self->{templates}{$_} ||= $1
+      for map { sort keys %{$loader->data($_)} } @{$self->classes};
   }
-  return $self->{data}{$file} if exists $self->{data}{$file};
 
-  # Default
+  return $self->{templates}{$file} if exists $self->{templates}{$file};
   return $self->default_handler;
 }
 

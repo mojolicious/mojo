@@ -201,12 +201,15 @@ alternatives.
 =head2 Template variants
 
 To make your application look great on many different devices you can also
-select a C<variant> for your templates, it only applies when a template with
-the correct name actually exists and falls back to the generic one otherwise.
+use the C<variant> stash value to choose between different variants of your
+templates.
 
   # foo/bar/baz.html+phone.ep
   # foo/bar/baz.html.ep
   $self->render('foo/bar/baz', variant => 'phone');
+
+This can be done very liberally since it only applies when a template with the
+correct name actually exists and falls back to the generic one otherwise.
 
 =head2 Rendering inline templates
 

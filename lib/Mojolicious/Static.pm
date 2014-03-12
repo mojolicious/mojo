@@ -4,6 +4,7 @@ use Mojo::Base -base;
 use File::Spec::Functions 'catfile';
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
+use Mojo::Date;
 use Mojo::Home;
 use Mojo::Loader;
 

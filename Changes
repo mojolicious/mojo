@@ -1,5 +1,6 @@
 
 4.89  2014-03-12
+  - Added support for template variants.
   - Fixed bug in Mojo::DOM::HTML where non-self-closing elements were not
     handled correctly.
   - Fixed bug in Mojo::DOM::HTML where <image> was not treated as an alias for

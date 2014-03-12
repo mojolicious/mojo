@@ -96,7 +96,8 @@ is $c->param(path    => 'test')->param('path'),    undef, 'value is reserved';
 is $c->param(status  => 'test')->param('status'),  undef, 'value is reserved';
 is $c->param(template => 'test')->param('template'), undef,
   'value is reserved';
-is $c->param(text => 'test')->param('text'), undef, 'value is reserved';
+is $c->param(text    => 'test')->param('text'),    undef, 'value is reserved';
+is $c->param(variant => 'test')->param('variant'), undef, 'value is reserved';
 is_deeply [$c->param], [], 'values are hidden';
 
 # Controller with application and routes

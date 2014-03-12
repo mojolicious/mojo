@@ -21,7 +21,7 @@ has tx => sub { Mojo::Transaction::HTTP->new };
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
   qw(action app cb controller data extends format handler json layout),
-  qw(namespace partial path status template text)
+  qw(namespace partial path status template text variant)
 );
 
 sub AUTOLOAD {
@@ -884,8 +884,8 @@ wide default values can be set with L<Mojolicious/"defaults">. Some stash
 values have a special meaning and are reserved, the full list is currently
 C<action>, C<app>, C<cb>, C<controller>, C<data>, C<extends>, C<format>,
 C<handler>, C<json>, C<layout>, C<namespace>, C<partial>, C<path>, C<status>,
-C<template> and C<text>. Note that all stash values with a C<mojo.*> prefix
-are reserved for internal use.
+C<template>, C<text> and C<variant>. Note that all stash values with a
+C<mojo.*> prefix are reserved for internal use.
 
   # Remove value
   my $foo = delete $c->stash->{foo};

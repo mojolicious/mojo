@@ -106,6 +106,12 @@ get '/inline/again' => {inline => 0};
 
 get '/data' => {data => 0};
 
+get '/variants' => {layout => 'variants'} => sub {
+  my $self = shift;
+  $self->stash->{variant} = $self->param('device');
+  $self->render('variants');
+};
+
 my $t = Test::Mojo->new;
 
 # "0" content reassignment
@@ -245,6 +251,23 @@ $t->get_ok('/inline/again')->status_is(200)
 $t->get_ok('/data')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is(0);
 
+# Variants (desktop)
+$t->get_ok('/variants')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Variant: Desktop!');
+
+# Variants (tablet)
+$t->get_ok('/variants?device=tablet')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Variant: Tablet!');
+
+# Variants (desktop fallback)
+$t->get_ok('/variants?device=phone')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Variant: Desktop!');
+
+# Variants ("0")
+$t->get_ok('/variants?device=0')->status_is(200)
+  ->header_is(Server => 'Mojolicious (Perl)')
+  ->content_is('Another variant: Desktop!');
+
 done_testing();
 
 __DATA__
@@ -375,3 +398,15 @@ seems
 to
 <%= content_for 'message' %>
 work!
+
+@@ layouts/variants.html.ep
+Variant: <%= content %>\
+
+@@ layouts/variants.html+0.ep
+Another variant: <%= content %>\
+
+@@ variants.html.ep
+Desktop!\
+
+@@ variants.html+tablet.epl
+Tablet!\

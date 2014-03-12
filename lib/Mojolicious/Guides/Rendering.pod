@@ -198,6 +198,16 @@ alternatives.
 
   $self->render_maybe('localized/baz') or $self->render('foo/bar/baz');
 
+=head2 Template variants
+
+To make your application look great on many different devices you can also
+select a C<variant> for your templates, it only applies when a template with
+the correct name actually exists and falls back to the generic one otherwise.
+
+  # foo.html+phone.ep
+  # foo.html.ep
+  $self->render('foo', format => 'html', variant => 'phone', handler => 'ep');
+
 =head2 Rendering inline templates
 
 Some renderers such as C<ep> allow templates to be passed inline.

@@ -120,12 +120,12 @@ sub parse {
         my ($start, $attr) = ($xml ? $1 : lc($1), $2);
 
         # Attributes
-        my %attrs;
+        my (%attrs, $closing);
         while ($attr =~ /$ATTR_RE/g) {
           my ($key, $value) = ($xml ? $1 : lc($1), $2 // $3 // $4);
 
           # Empty tag
-          next if $key eq '/';
+          ++$closing and next if $key eq '/';
 
           $attrs{$key} = defined $value ? html_unescape($value) : $value;
         }
@@ -136,11 +136,10 @@ sub parse {
 
         # Element without end tag (self-closing)
         _end($start, $xml, \$current)
-          if !$xml && $EMPTY{$start}
-          or ($xml || !$BLOCK{$start}) && $attr =~ m!/\s*$!;
+          if !$xml && $EMPTY{$start} || ($xml || !$BLOCK{$start}) && $closing;
 
         # Relaxed "script" or "style" HTML elements
-        next if $xml || ($start ne 'script' && $start ne 'style');
+        next if $xml || $start ne 'script' && $start ne 'style';
         next unless $html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi;
         _node($current, 'raw', $1);
         _end($start, 0, \$current);

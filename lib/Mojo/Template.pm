@@ -59,7 +59,7 @@ sub build {
         unless ($multi) {
 
           # Escaped
-          if (($op eq 'escp' && !$escape) || ($op eq 'expr' && $escape)) {
+          if ($op eq 'escp' && !$escape || $op eq 'expr' && $escape) {
             $lines[-1] .= "\$_M .= _escape";
             $lines[-1] .= " scalar $value" if length $value;
           }

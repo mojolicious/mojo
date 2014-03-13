@@ -45,6 +45,7 @@
     }
     #mojobar-links input:focus { outline: 0 }
     #mojobar-links form { display: inline }
+    .animated { transition: top 0.2s ease-in-out }
   % end
   <div id="mojobar-logo">
     %= link_to 'http://mojolicio.us' => begin
@@ -67,23 +68,36 @@
   </div>
 </div>
 %= javascript begin
+  var mojobar = $('#mojobar');
+  var mojobarHeight = mojobar.outerHeight();
   $(window).load(function () {
     if (window.location.hash) {
-      var tweak = $(window.location.hash).offset().top - 50;
+      var tweak = $(window.location.hash).offset().top - mojobarHeight;
       $('html, body').animate({scrollTop:tweak}, 1);
     }
-    var mojobar = $('#mojobar');
-    var start   = mojobar.offset().top;
+    var start = mojobar.offset().top;
     var fixed;
+    var lastScrollTop = start;
     $(window).scroll(function () {
-      if (!fixed && (mojobar.offset().top - $(window).scrollTop() < 0)) {
-        mojobar.css('top', 0);
-        mojobar.css('position', 'fixed');
+      var st = $(window).scrollTop();
+      if (!fixed && st > start) {
         fixed = true;
-      } else if (fixed && $(window).scrollTop() <= start) {
-        mojobar.css('position', 'absolute');
-        mojobar.css('top', start + 'px');
+        mojobar.css('position', 'fixed').css('top', 0);
+      } else if (fixed && st <= start) {
         fixed = false;
+        mojobar.removeClass('animated');
+        mojobar.css('position', 'absolute').css('top', start + 'px');
+      }
+      if (fixed && (Math.abs(lastScrollTop - st) > 50)) {
+        if (!mojobar.hasClass('animated')) {
+          mojobar.addClass('animated');
+        }
+        if (st > lastScrollTop && st > (mojobarHeight + start + 250)){
+          mojobar.css('top', 0 - (mojobarHeight + 5));
+        } else if (st + $(window).height() < $(document).height()) {
+          mojobar.css('top', 0);
+        }
+        lastScrollTop = st;
       }
     });
   });
@@ -95,7 +109,7 @@
       var parts  = this.href.split("#");
       var hash   = "#" + parts[1];
       var target = $(hash);
-      var top    = target.offset().top - 50;
+      var top    = target.offset().top - mojobarHeight;
       var old    = target.attr('id');
       target.attr('id', '');
       location.hash = hash;

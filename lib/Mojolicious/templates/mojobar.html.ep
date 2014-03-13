@@ -88,7 +88,7 @@
         mojobar.removeClass('animated');
         mojobar.css('position', 'absolute').css('top', start + 'px');
       }
-      else if (fixed && (Math.abs(lastScrollTop - st) > 50)) {
+      else if (fixed && (Math.abs(lastScrollTop - st) > 100)) {
         if (!mojobar.hasClass('animated')) {
           mojobar.addClass('animated');
         }

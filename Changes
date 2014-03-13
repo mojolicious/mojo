@@ -1,5 +1,5 @@
 
-4.89  2014-03-12
+4.89  2014-03-13
   - Added support for template variants.
   - Fixed bug in Mojo::DOM::HTML where non-self-closing elements were not
     handled correctly.

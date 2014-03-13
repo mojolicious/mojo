@@ -252,20 +252,23 @@ $t->get_ok('/data')->status_is(200)->header_is(Server => 'Mojolicious (Perl)')
   ->content_is(0);
 
 # Variants (desktop)
-$t->get_ok('/variants')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Variant: Desktop!');
+$t->get_ok('/variants.txt')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_is('Variant: Desktop!');
 
 # Variants (tablet)
-$t->get_ok('/variants?device=tablet')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Variant: Tablet!');
+$t->get_ok('/variants.txt?device=tablet')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_is('Variant: Tablet!');
 
 # Variants (desktop fallback)
-$t->get_ok('/variants?device=phone')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')->content_is('Variant: Desktop!');
+$t->get_ok('/variants.txt?device=phone')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
+  ->content_is('Variant: Desktop!');
 
 # Variants ("0")
-$t->get_ok('/variants?device=0')->status_is(200)
-  ->header_is(Server => 'Mojolicious (Perl)')
+$t->get_ok('/variants.txt?device=0')->status_is(200)
+  ->content_type_is('text/plain;charset=UTF-8')
   ->content_is('Another variant: Desktop!');
 
 done_testing();
@@ -399,14 +402,14 @@ to
 <%= content_for 'message' %>
 work!
 
-@@ layouts/variants.html.ep
+@@ layouts/variants.txt.ep
 Variant: <%= content %>\
 
-@@ layouts/variants.html+0.ep
+@@ layouts/variants.txt+0.ep
 Another variant: <%= content %>\
 
-@@ variants.html.ep
+@@ variants.txt.ep
 Desktop!\
 
-@@ variants.html+tablet.epl
+@@ variants.txt+tablet.epl
 Tablet!\

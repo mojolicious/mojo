@@ -703,6 +703,13 @@ Same for pre-processing the request.
     $c->req->method($method);
   });
 
+  # Choose template variant based on request headers
+  $self->hook(before_dispatch => sub {
+    my $c = shift;
+    return unless my $agent = $c->req->headers->user_agent;
+    $c->stash(variant => 'ie') if $agent =~ /Internet Explorer/;
+  });
+
 Or more advanced extensions to add monitoring to your application.
 
   # Forward exceptions to a web service

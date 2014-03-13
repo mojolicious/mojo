@@ -817,7 +817,8 @@ To find routes by their name you can use L<Mojolicious::Routes::Route/"find">.
 
 Sometimes you might need a little more power, for example to check the
 C<User-Agent> header in multiple routes. This is where conditions come into
-play, they are basically router plugins.
+play, they are basically router plugins and need to return a true value for
+the route to match.
 
   # Simple "User-Agent" condition
   $r->add_condition(

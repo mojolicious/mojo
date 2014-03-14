@@ -16,7 +16,12 @@
         line-height: 1.5em;
         margin: 0;
       }
-      code { font: 0.9em Consolas, Menlo, Monaco, Courier, monospace }
+      code {
+        background-color: rgba(0, 0, 0, 0.04);
+        border-radius: 3px;
+        font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
+        padding: 0.3em;
+      }
       h1, h2, h3 {
         color: #2a2a2a;
         font-size: 1.5em;

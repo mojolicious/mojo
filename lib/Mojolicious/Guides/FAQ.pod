@@ -20,7 +20,7 @@ real-time web and new technologies such as WebSockets, we are facing new
 challenges that go way beyond what commonly used modules like L<LWP> were
 designed for. Because of this, L<Mojolicious> contains a whole new HTTP
 client/server stack called L<Mojo>, which was heavily inspired by the original
-C<LWPng> effort and carefully designed with these new requirements in mind. So
+LWPng effort and carefully designed with these new requirements in mind. So
 while some of the higher abstraction layers might look similar to other web
 frameworks, it actually defines a whole new category and could even be the
 foundation for more advanced ones in the future.
@@ -71,13 +71,13 @@ optimize for it, this is currently 5.10.1.
 
 =head2 What is the difference between blocking and non-blocking operations?
 
-A C<blocking> operation is a subroutine that blocks the execution of the
+A I<blocking> operation is a subroutine that blocks the execution of the
 calling subroutine until the subroutine is finished.
 
   my $result = blocking_subroutine();
   ...
 
-A C<non-blocking> operation on the other hand lets the calling subroutine
+A I<non-blocking> operation on the other hand lets the calling subroutine
 continue execution even though the subroutine is not yet finished. Instead of
 waiting, the calling subroutine passes along a callback to be executed once
 the subroutine is finished, this is called continuation-passing style.

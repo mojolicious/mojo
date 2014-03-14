@@ -12,6 +12,8 @@ L<Mojolicious>.
 
 =head1 QUESTIONS
 
+We hope these answers are to your satisfaction.
+
 =head2 How does Mojolicious compare to other Perl web frameworks?
 
 The short answer is "it doesn't", because we interpret the words

@@ -2334,6 +2334,16 @@ $dom = Mojo::DOM->new('<image src="foo.png">test');
 is $dom->at('img')->{src}, 'foo.png', 'right attribute';
 is "$dom", '<img src="foo.png">test', 'right result';
 
+# "title"
+$dom = Mojo::DOM->new('<title> <p>test&lt;</title>');
+is $dom->at('title')->text, ' <p>test<', 'right text';
+is "$dom", '<title> <p>test<</title>', 'right result';
+
+# "textarea"
+$dom = Mojo::DOM->new('<textarea id="a"> <p>test&lt;</textarea>');
+is $dom->at('textarea#a')->text, ' <p>test<', 'right text';
+is "$dom", '<textarea id="a"> <p>test<</textarea>', 'right result';
+
 # Comments
 $dom = Mojo::DOM->new(<<EOF);
 <!-- HTML5 -->

@@ -49,6 +49,10 @@ my $TOKEN_RE = qr/
   )??
 /xis;
 
+# HTML elements that only contain raw text
+my %RAW    = map { $_ => 1 } qw(script style);
+my %RCDATA = map { $_ => 1 } qw(title textarea);
+
 # HTML elements with optional end tags
 my %END = (
   body => ['head'],
@@ -138,10 +142,10 @@ sub parse {
         _end($start, $xml, \$current)
           if !$xml && $EMPTY{$start} || ($xml || !$BLOCK{$start}) && $closing;
 
-        # Relaxed "script" or "style" HTML elements
-        next if $xml || $start ne 'script' && $start ne 'style';
+        # Raw text elements
+        next if $xml || !$RAW{$start} && !$RCDATA{$start};
         next unless $html =~ m!\G(.*?)<\s*/\s*$start\s*>!gcsi;
-        _node($current, 'raw', $1);
+        _node($current, 'raw', $RCDATA{$start} ? html_unescape $1 : $1);
         _end($start, 0, \$current);
       }
     }

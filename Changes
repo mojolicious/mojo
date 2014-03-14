@@ -1,4 +1,7 @@
 
+4.90  2014-03-14
+  - Fixed textarea and title parsing bugs in Mojo::DOM::HTML.
+
 4.89  2014-03-13
   - Added support for template variants.
   - Improved built-in templates with unobtrusive menu bar.

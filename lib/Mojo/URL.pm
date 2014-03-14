@@ -4,8 +4,7 @@ use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
 use Mojo::Parameters;
 use Mojo::Path;
-use Mojo::Util
-  qw(deprecated punycode_decode punycode_encode url_escape url_unescape);
+use Mojo::Util qw(punycode_decode punycode_encode url_escape url_unescape);
 
 has base => sub { Mojo::URL->new };
 has [qw(fragment host port scheme userinfo)];
@@ -164,35 +163,6 @@ sub to_abs {
   else { $abs->path($base_path->clone->merge($path)->canonicalize) }
 
   return $abs;
-}
-
-# DEPRECATED in Top Hat!
-sub to_rel {
-  deprecated 'Mojo::URL::to_rel is DEPRECATED';
-  my $self = shift;
-
-  my $rel = $self->clone;
-  return $rel unless $rel->is_abs;
-
-  # Scheme and authority
-  my $base = shift || $rel->base;
-  $rel->base($base)->scheme(undef);
-  $rel->userinfo(undef)->host(undef)->port(undef) if $base->authority;
-
-  # Path
-  my @parts      = @{$rel->path->parts};
-  my $base_path  = $base->path;
-  my @base_parts = @{$base_path->parts};
-  pop @base_parts unless $base_path->trailing_slash;
-  while (@parts && @base_parts && $parts[0] eq $base_parts[0]) {
-    shift @$_ for \@parts, \@base_parts;
-  }
-  my $path = $rel->path(Mojo::Path->new)->path;
-  $path->leading_slash(1) if $rel->authority;
-  $path->parts([('..') x @base_parts, @parts]);
-  $path->trailing_slash(1) if $self->path->trailing_slash;
-
-  return $rel;
 }
 
 sub to_string {

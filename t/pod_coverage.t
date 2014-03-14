@@ -10,7 +10,7 @@ plan skip_all => 'Test::Pod::Coverage 1.04 required for this test!'
 # DEPRECATED in Top Hat!
 my @tophat = (
   qw(content_xml get_line replace_content secret text_after text_before),
-  qw(to_rel to_xml)
+  qw(to_xml)
 );
 
 # False positive constants

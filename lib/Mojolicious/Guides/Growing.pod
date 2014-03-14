@@ -26,7 +26,7 @@ presentation and input.
            +------------+    +-------+    +------+
 
 A slightly modified version of the pattern moving some application logic into
-the B<controller> is the foundation of pretty much every web framework these
+the I<controller> is the foundation of pretty much every web framework these
 days, including L<Mojolicious>.
 
               +----------------+     +-------+
@@ -37,9 +37,9 @@ days, including L<Mojolicious>.
   Response <- |                | <-> | View  |
               +----------------+     +-------+
 
-The B<controller> receives a request from a user, passes incoming data to the
-B<model> and retrieves data from it, which then gets turned into an actual
-response by the B<view>. But note that this pattern is just a guideline that
+The I<controller> receives a request from a user, passes incoming data to the
+I<model> and retrieves data from it, which then gets turned into an actual
+response by the I<view>. But note that this pattern is just a guideline that
 most of the time results in cleaner more maintainable code, not a rule that
 should be followed at all costs.
 
@@ -48,9 +48,9 @@ should be followed at all costs.
 REST is a software architectural style for distributed hypermedia systems such
 as the web. While it can be applied to many protocols it is most commonly used
 with HTTP these days. In REST terms, when you are opening a URL like
-B<http://mojolicio.us/foo> with your browser, you are basically asking the web
-server for the HTML B<representation> of the B<http://mojolicio.us/foo>
-B<resource>.
+C<http://mojolicio.us/foo> with your browser, you are basically asking the web
+server for the HTML I<representation> of the C<http://mojolicio.us/foo>
+I<resource>.
 
   +--------+                                +--------+
   |        | -> http://mojolicio.us/foo  -> |        |
@@ -80,7 +80,7 @@ all session state is kept client-side.
   +---------+                        +------------+
 
 While HTTP methods such as PUT, GET and DELETE are not directly part of REST
-they go very well with it and are commonly used to manipulate B<resources>.
+they go very well with it and are commonly used to manipulate I<resources>.
 
 =head2 Sessions
 

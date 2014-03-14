@@ -316,7 +316,7 @@ Since everything is just Perl normal control structures just work.
 =head2 Content negotiation
 
 For resources with different representations and that require truly
-C<RESTful> content negotiation you can also use
+RESTful content negotiation you can also use
 L<Mojolicious::Controller/"respond_to"> instead of
 L<Mojolicious::Controller/"render">.
 

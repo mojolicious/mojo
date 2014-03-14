@@ -669,7 +669,7 @@ Or you can just disable format detection.
 
 =head2 Content negotiation
 
-For resources with different representations and that require truly C<RESTful>
+For resources with different representations and that require truly RESTful
 content negotiation you can also use L<Mojolicious::Controller/"respond_to">.
 
   use Mojolicious::Lite;
@@ -795,7 +795,7 @@ cookies really secure.
 
 All files uploaded via C<multipart/form-data> request are automatically
 available as L<Mojo::Upload> objects. And you don't have to worry about memory
-usage, because all files above C<250KB> will be automatically streamed into a
+usage, because all files above 250KB will be automatically streamed into a
 temporary file.
 
   use Mojolicious::Lite;
@@ -834,8 +834,8 @@ temporary file.
     </body>
   </html>
 
-To protect you from excessively large files there is also a limit of C<10MB>
-by default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
+To protect you from excessively large files there is also a limit of 10MB by
+default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
 variable.
 
   # Increase limit to 1GB

@@ -26,7 +26,7 @@ presentation and input.
            +------------+    +-------+    +------+
 
 A slightly modified version of the pattern moving some application logic into
-the C<controller> is the foundation of pretty much every web framework these
+the B<controller> is the foundation of pretty much every web framework these
 days, including L<Mojolicious>.
 
               +----------------+     +-------+
@@ -37,9 +37,9 @@ days, including L<Mojolicious>.
   Response <- |                | <-> | View  |
               +----------------+     +-------+
 
-The C<controller> receives a request from a user, passes incoming data to the
-C<model> and retrieves data from it, which then gets turned into an actual
-response by the C<view>. But note that this pattern is just a guideline that
+The B<controller> receives a request from a user, passes incoming data to the
+B<model> and retrieves data from it, which then gets turned into an actual
+response by the B<view>. But note that this pattern is just a guideline that
 most of the time results in cleaner more maintainable code, not a rule that
 should be followed at all costs.
 
@@ -48,9 +48,9 @@ should be followed at all costs.
 REST is a software architectural style for distributed hypermedia systems such
 as the web. While it can be applied to many protocols it is most commonly used
 with HTTP these days. In REST terms, when you are opening a URL like
-C<http://mojolicio.us/foo> with your browser, you are basically asking the web
-server for the HTML C<representation> of the C<http://mojolicio.us/foo>
-C<resource>.
+B<http://mojolicio.us/foo> with your browser, you are basically asking the web
+server for the HTML B<representation> of the B<http://mojolicio.us/foo>
+B<resource>.
 
   +--------+                                +--------+
   |        | -> http://mojolicio.us/foo  -> |        |
@@ -80,7 +80,7 @@ all session state is kept client-side.
   +---------+                        +------------+
 
 While HTTP methods such as PUT, GET and DELETE are not directly part of REST
-they go very well with it and are commonly used to manipulate C<resources>.
+they go very well with it and are commonly used to manipulate B<resources>.
 
 =head2 Sessions
 
@@ -237,8 +237,8 @@ logic related to matching usernames and passwords.
   1;
 
 A simple helper can be registered with the function
-L<Mojolicious::Lite/"helper"> to make our C<model> available to all actions
-and templates.
+L<Mojolicious::Lite/"helper"> to make our model available to all actions and
+templates.
 
   #!/usr/bin/env perl
   use Mojolicious::Lite;

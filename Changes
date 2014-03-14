@@ -1,5 +1,5 @@
 
-4.90  2014-03-14
+4.90  2014-03-15
   - Removed deprecated to_rel method from Mojo::URL.
   - Fixed textarea and title parsing bugs in Mojo::DOM::HTML.
 

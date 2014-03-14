@@ -16,6 +16,10 @@
         line-height: 1.5em;
         margin: 0;
       }
+      code {
+        color: #333;
+        font: 0.9em Consolas, Menlo, Monaco, Courier, monospace;
+      }
       h1, h2, h3 {
         color: #2a2a2a;
         font-size: 1.5em;

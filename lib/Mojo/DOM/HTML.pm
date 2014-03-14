@@ -50,7 +50,9 @@ my $TOKEN_RE = qr/
 /xis;
 
 # HTML elements that only contain raw text
-my %RAW    = map { $_ => 1 } qw(script style);
+my %RAW = map { $_ => 1 } qw(script style);
+
+# HTML elements that only contain raw text and entities
 my %RCDATA = map { $_ => 1 } qw(title textarea);
 
 # HTML elements with optional end tags

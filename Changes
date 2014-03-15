@@ -1,5 +1,5 @@
 
-4.90  2014-03-15
+4.90  2014-03-16
   - Removed deprecated to_rel method from Mojo::URL.
   - Improved documentation browser with more accessible links and readable
     inline code.

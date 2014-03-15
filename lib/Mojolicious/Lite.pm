@@ -835,7 +835,8 @@ temporary file.
   </html>
 
 To protect you from excessively large files there is also a limit of 10MB by
-default, which you can tweak with the C<MOJO_MAX_MESSAGE_SIZE> environment
+default, which you can tweak with the attribute
+L<Mojo::Message/"max_message_size"> or C<MOJO_MAX_MESSAGE_SIZE> environment
 variable.
 
   # Increase limit to 1GB

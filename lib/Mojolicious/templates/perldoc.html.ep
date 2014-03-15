@@ -66,7 +66,6 @@
         margin: 0 auto;
       }
       .permalink {
-        color: rgba(0, 0, 0, 0.25);
         display: none;
         left: -0.75em;
         position: absolute;

@@ -82,8 +82,7 @@ sub is_websocket { !!shift->{websocket} }
 sub name {
   my $self = shift;
   return $self->{name} unless @_;
-  $self->{name}   = shift;
-  $self->{custom} = 1;
+  @$self{qw(name custom)} = (shift, 1);
   return $self;
 }
 
@@ -212,7 +211,7 @@ sub _defaults {
 sub _generate_route {
   my ($self, $methods, @args) = @_;
 
-  my ($cb, @conditions, @constraints, %defaults, $name, $pattern);
+  my (@conditions, @constraints, %defaults, $name, $pattern);
   while (defined(my $arg = shift @args)) {
 
     # First scalar is the pattern
@@ -225,17 +224,14 @@ sub _generate_route {
     elsif (!ref $arg) { $name = $arg }
 
     # Callback
-    elsif (ref $arg eq 'CODE') { $cb = $arg }
+    elsif (ref $arg eq 'CODE') { $defaults{cb} = $arg }
 
     # Constraints
-    elsif (ref $arg eq 'ARRAY') { @constraints = @$arg }
+    elsif (ref $arg eq 'ARRAY') { push @constraints, @$arg }
 
     # Defaults
-    elsif (ref $arg eq 'HASH') { %defaults = %$arg }
+    elsif (ref $arg eq 'HASH') { %defaults = (%defaults, %$arg) }
   }
-
-  # Callback
-  $defaults{cb} = $cb if $cb;
 
   # Create bridge or route
   my $route

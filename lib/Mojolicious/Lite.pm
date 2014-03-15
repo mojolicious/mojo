@@ -835,7 +835,7 @@ temporary file.
   </html>
 
 To protect you from excessively large files there is also a limit of 10MB by
-default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
+default, which you can tweak with the C<MOJO_MAX_MESSAGE_SIZE> environment
 variable.
 
   # Increase limit to 1GB
@@ -953,7 +953,7 @@ the attribute L<Mojolicious/"mode">.
   app->start;
 
 The default operating mode will usually be C<development> and can be changed
-with command line options or the MOJO_MODE and PLACK_ENV environment
+with command line options or the C<MOJO_MODE> and C<PLACK_ENV> environment
 variables. A mode other than C<development> will raise the log level from
 C<debug> to C<info>.
 

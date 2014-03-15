@@ -506,7 +506,7 @@ Decode bytes to characters and return C<undef> if decoding failed.
   deprecated 'foo is DEPRECATED in favor of bar';
 
 Warn about deprecated feature from perspective of caller. You can also set the
-MOJO_FATAL_DEPRECATIONS environment variable to make them die instead.
+C<MOJO_FATAL_DEPRECATIONS> environment variable to make them die instead.
 
 =head2 dumper
 

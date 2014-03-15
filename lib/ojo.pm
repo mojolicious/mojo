@@ -65,12 +65,12 @@ ojo - Fun one-liners with Mojo!
 
 A collection of automatically exported functions for fun Perl one-liners. Ten
 redirects will be followed by default, you can change this behavior with the
-MOJO_MAX_REDIRECTS environment variable.
+C<MOJO_MAX_REDIRECTS> environment variable.
 
   $ MOJO_MAX_REDIRECTS=0 perl -Mojo -E 'say g("example.com")->code'
 
 Proxy detection is enabled by default, but you can disable it with the
-MOJO_PROXY environment variable.
+C<MOJO_PROXY> environment variable.
 
   $ MOJO_PROXY=0 perl -Mojo -E 'say g("example.com")->body'
 

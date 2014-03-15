@@ -188,7 +188,7 @@ For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
 support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
 L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
 they are installed. Individual features can also be disabled with the
-MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
+C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 
@@ -366,7 +366,7 @@ the server has been stopped.
 
 Activate reverse proxy support, which allows for the C<X-Forwarded-For> and
 C<X-Forwarded-HTTPS> headers to be picked up automatically, defaults to the
-value of the MOJO_REVERSE_PROXY environment variable.
+value of the C<MOJO_REVERSE_PROXY> environment variable.
 
 =head2 upgrade_timeout
 

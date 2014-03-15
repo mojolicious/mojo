@@ -113,8 +113,8 @@ following new ones.
   $home = $home->detect;
   $home = $home->detect('My::App');
 
-Detect home directory from the value of the MOJO_HOME environment variable or
-application class.
+Detect home directory from the value of the C<MOJO_HOME> environment variable
+or application class.
 
 =head2 lib_dir
 

@@ -112,7 +112,7 @@ automatically upgrade to a L<Mojo::Asset::File> object.
 
 Maximum size in bytes of data to keep in memory before automatically upgrading
 to a L<Mojo::Asset::File> object, defaults to the value of the
-MOJO_MAX_MEMORY_SIZE environment variable or C<262144>.
+C<MOJO_MAX_MEMORY_SIZE> environment variable or C<262144>.
 
 =head1 METHODS
 

@@ -385,7 +385,7 @@ Default charset used for form-data parsing, defaults to C<UTF-8>.
   $msg     = $msg->max_line_size(1024);
 
 Maximum start line size in bytes, defaults to the value of the
-MOJO_MAX_LINE_SIZE environment variable or C<10240>.
+C<MOJO_MAX_LINE_SIZE> environment variable or C<10240>.
 
 =head2 max_message_size
 
@@ -393,9 +393,9 @@ MOJO_MAX_LINE_SIZE environment variable or C<10240>.
   $msg     = $msg->max_message_size(1024);
 
 Maximum message size in bytes, defaults to the value of the
-MOJO_MAX_MESSAGE_SIZE environment variable or C<10485760>. Setting the value
-to C<0> will allow messages of indefinite size. Note that increasing this
-value can also drastically increase memory usage, should you for example
+C<MOJO_MAX_MESSAGE_SIZE> environment variable or C<10485760>. Setting the
+value to C<0> will allow messages of indefinite size. Note that increasing
+this value can also drastically increase memory usage, should you for example
 attempt to parse an excessively large message body with the L</"body_params">,
 L</"dom"> or L</"json"> methods.
 

@@ -462,9 +462,9 @@ Helpers are little functions you can use in templates and controller code.
 
 The helper L<Mojolicious::Plugin::DefaultHelpers/"dumper"> for example will
 use L<Data::Dumper> to serialize whatever data structure you pass it, this can
-be very useful for debugging. We differentiate between C<default helpers>
-which are more general purpose like C<dumper> and C<tag helpers>, which are
-template specific and mostly used to generate C<HTML> tags.
+be very useful for debugging. We differentiate between default helpers which
+are more general purpose like C<dumper> and tag helpers, which are template
+specific and mostly used to generate HTML tags.
 
   %= javascript '/script.js'
 

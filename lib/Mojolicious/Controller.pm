@@ -794,7 +794,7 @@ is set to the value C<XMLHttpRequest>.
   );
 
 For more advanced negotiation logic you can also use the helper
-L<Mojolicious::Plugin::DefaultHelper/"accepts">.
+L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
 
 =head2 send
 

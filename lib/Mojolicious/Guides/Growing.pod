@@ -113,8 +113,8 @@ ids were exchanged between browser and web server in the form of cookies.
   Set-Cookie: session=hmac-sha1(base64(json($session)))
 
 In L<Mojolicious> however we are taking this concept one step further by
-storing everything C<JSON> serialized and C<Base64> encoded in C<HMAC-SHA1>
-signed cookies, which is more compatible with the REST philosophy and reduces
+storing everything JSON serialized and Base64 encoded in HMAC-SHA1 signed
+cookies, which is more compatible with the REST philosophy and reduces
 infrastructure requirements.
 
 =head2 Test Driven Development
@@ -357,7 +357,7 @@ L<Mojolicious/"secrets">.
 
   app->secrets(['Mojolicious rocks']);
 
-This passphrase is used by the C<HMAC-SHA1> algorithm to make signed cookies
+This passphrase is used by the HMAC-SHA1 algorithm to make signed cookies
 secure and can be changed at any time to invalidate all existing sessions.
 
   $self->session(user => 'sri');
@@ -381,7 +381,7 @@ method L<Mojolicious::Controller/"flash">.
   $self->redirect_to('goodbye');
 
 Just remember that all session data gets serialized with L<Mojo::JSON> and
-stored in C<HMAC-SHA1> signed cookies, which usually have a 4096 byte limit,
+stored in HMAC-SHA1 signed cookies, which usually have a 4096 byte limit,
 depending on browser.
 
 =head2 Final prototype

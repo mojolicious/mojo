@@ -70,8 +70,10 @@ sub _html {
 
     # Rewrite
     push @parts, [] if $e->type eq 'h1' || !@parts;
-    push @{$parts[-1]}, $text, Mojo::URL->new->fragment($anchor);
-    $e->content($self->link_to($text => $toc, id => $anchor));
+    my $link = Mojo::URL->new->fragment($anchor);
+    push @{$parts[-1]}, $text, $link;
+    my $permalink = $self->link_to('#' => $link, class => 'permalink');
+    $e->content($permalink . $self->link_to($text => $toc, id => $anchor));
   }
 
   # Try to find a title

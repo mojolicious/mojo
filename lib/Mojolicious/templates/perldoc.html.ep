@@ -26,6 +26,7 @@
         color: #2a2a2a;
         font-size: 1.5em;
         margin: 0;
+        position: relative;
       }
       h1 a, h2 a, h3 a { text-decoration: none }
       pre {
@@ -63,6 +64,15 @@
       #wrapperlicious {
         max-width: 1000px;
         margin: 0 auto;
+      }
+      .permalink {
+        display: none;
+        left: -0.75em;
+        position: absolute;
+        padding-right: 0.25em;
+      }
+      h1:hover .permalink, h2:hover .permalink, h3:hover .permalink {
+        display: block;
       }
     % end
   </head>

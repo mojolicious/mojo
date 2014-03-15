@@ -588,10 +588,10 @@ status.
   $c              = $c->param(foo => qw(ba;r ba;z));
 
 Access route placeholder values that are not reserved stash values, file
-uploads and GET/POST parameters, in that order. Note that this method is
+uploads and C<GET>/C<POST> parameters, in that order. Note that this method is
 context sensitive in some cases and therefore needs to be used with care,
 there can always be multiple values, which might have unexpected consequences.
-Parts of the request body need to be loaded into memory to parse POST
+Parts of the request body need to be loaded into memory to parse C<POST>
 parameters, so you have to make sure it is not excessively large.
 
   # List context is ambiguous and should be avoided
@@ -781,7 +781,7 @@ Get L<Mojo::Message::Response> object from L<Mojo::Transaction/"res">.
   );
 
 Automatically select best possible representation for resource from C<Accept>
-request header, C<format> stash value or C<format> GET/POST parameter,
+request header, C<format> stash value or C<format> C<GET>/C<POST> parameter,
 defaults to rendering an empty C<204> response. Since browsers often don't
 really know what they actually want, unspecific C<Accept> request headers with
 more than one MIME type will be ignored, unless the C<X-Requested-With> header
@@ -924,9 +924,9 @@ to inherit query parameters from the current request.
   my $validation = $c->validation;
 
 Get L<Mojolicious::Validator::Validation> object for current request to
-validate GET/POST parameters. Parts of the request body need to be loaded into
-memory to parse POST parameters, so you have to make sure it is not
-excessively large.
+validate C<GET>/C<POST> parameters. Parts of the request body need to be
+loaded into memory to parse C<POST> parameters, so you have to make sure it is
+not excessively large.
 
   my $validation = $c->validation;
   $validation->required('title')->size(3, 50);

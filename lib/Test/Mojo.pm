@@ -569,7 +569,7 @@ Opposite of L</"content_type_like">.
   $t = $t->delete_ok('/foo' => {DNT => 1} => form => {a => 'b'});
   $t = $t->delete_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
-Perform a DELETE request and check for transport errors, takes the same
+Perform a C<DELETE> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"delete">, except for the callback.
 
 =head2 element_exists
@@ -608,7 +608,7 @@ Wait for WebSocket connection to be closed gracefully and check status.
   $t = $t->get_ok('/foo' => {DNT => 1} => form => {a => 'b'});
   $t = $t->get_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
-Perform a GET request and check for transport errors, takes the same
+Perform a C<GET> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"get">, except for the callback.
 
   # Run tests against remote host
@@ -621,7 +621,7 @@ arguments as L<Mojo::UserAgent/"get">, except for the callback.
   $t = $t->head_ok('/foo' => {DNT => 1} => form => {a => 'b'});
   $t = $t->head_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
-Perform a HEAD request and check for transport errors, takes the same
+Perform a C<HEAD> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"head">, except for the callback.
 
 =head2 header_is
@@ -766,7 +766,7 @@ Construct a new L<Test::Mojo> object.
   $t = $t->options_ok('/foo' => {DNT => 1} => form => {a => 'b'});
   $t = $t->options_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
-Perform a OPTIONS request and check for transport errors, takes the same
+Perform a C<OPTIONS> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"options">, except for the callback.
 
 =head2 or
@@ -786,7 +786,7 @@ Invoke callback if the value of L</"success"> is false.
   $t = $t->patch_ok('/foo' => {DNT => 1} => form => {a => 'b'});
   $t = $t->patch_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
-Perform a PATCH request and check for transport errors, takes the same
+Perform a C<PATCH> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"patch">, except for the callback.
 
 =head2 post_ok
@@ -796,7 +796,7 @@ arguments as L<Mojo::UserAgent/"patch">, except for the callback.
   $t = $t->post_ok('/foo' => {DNT => 1} => form => {a => 'b'});
   $t = $t->post_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
-Perform a POST request and check for transport errors, takes the same
+Perform a C<POST> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"post">, except for the callback.
 
   # Test file upload
@@ -815,7 +815,7 @@ arguments as L<Mojo::UserAgent/"post">, except for the callback.
   $t = $t->put_ok('/foo' => {DNT => 1} => form => {a => 'b'});
   $t = $t->put_ok('/foo' => {DNT => 1} => json => {a => 'b'});
 
-Perform a PUT request and check for transport errors, takes the same
+Perform a C<PUT> request and check for transport errors, takes the same
 arguments as L<Mojo::UserAgent/"put">, except for the callback.
 
 =head2 request_ok

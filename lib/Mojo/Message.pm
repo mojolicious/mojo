@@ -423,11 +423,11 @@ automatically downgraded to L<Mojo::Content::Single>.
 
   my $params = $msg->body_params;
 
-POST parameters extracted from C<application/x-www-form-urlencoded> or
+C<POST> parameters extracted from C<application/x-www-form-urlencoded> or
 C<multipart/form-data> message body, usually a L<Mojo::Parameters> object.
 Note that this method caches all data, so it should not be called before the
 entire message body has been received. Parts of the message body need to be
-loaded into memory to parse POST parameters, so you have to make sure it is
+loaded into memory to parse C<POST> parameters, so you have to make sure it is
 not excessively large.
 
   # Get POST parameter value
@@ -587,9 +587,9 @@ sure it is not excessively large.
   my $foo   = $msg->param('foo');
   my @foo   = $msg->param('foo');
 
-Access POST parameters. Note that this method caches all data, so it should
+Access C<POST> parameters. Note that this method caches all data, so it should
 not be called before the entire message body has been received. Parts of the
-message body need to be loaded into memory to parse POST parameters, so you
+message body need to be loaded into memory to parse C<POST> parameters, so you
 have to make sure it is not excessively large.
 
 =head2 parse

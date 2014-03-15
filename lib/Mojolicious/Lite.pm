@@ -172,7 +172,7 @@ L<Mojolicious::Controller/"render">, but more about that later.
 
 =head2 GET/POST parameters
 
-All GET and POST parameters sent with the request are accessible via
+All C<GET> and C<POST> parameters sent with the request are accessible via
 L<Mojolicious::Controller/"param">.
 
   use Mojolicious::Lite;
@@ -1018,13 +1018,13 @@ The L<Mojolicious::Lite> application.
   my $route = del '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"delete">, matching only
-DELETE requests. See also the tutorial above for more argument variations.
+C<DELETE> requests. See also the tutorial above for more argument variations.
 
 =head2 get
 
   my $route = get '/:foo' => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"get">, matching only GET
+Generate route with L<Mojolicious::Routes::Route/"get">, matching only C<GET>
 requests. See also the tutorial above for more argument variations.
 
 =head2 group
@@ -1050,7 +1050,7 @@ Share code with L<Mojolicious/"hook">.
   my $route = options '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"options">, matching only
-OPTIONS requests. See also the tutorial above for more argument
+C<OPTIONS> requests. See also the tutorial above for more argument
 variations.
 
 =head2 patch
@@ -1058,7 +1058,7 @@ variations.
   my $route = patch '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"patch">, matching only
-PATCH requests. See also the tutorial above for more argument variations.
+C<PATCH> requests. See also the tutorial above for more argument variations.
 
 =head2 plugin
 
@@ -1071,13 +1071,13 @@ Load a plugin with L<Mojolicious/"plugin">.
   my $route = post '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"post">, matching only
-POST requests. See also the tutorial above for more argument variations.
+C<POST> requests. See also the tutorial above for more argument variations.
 
 =head2 put
 
   my $route = put '/:foo' => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"put">, matching only PUT
+Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT>
 requests. See also the tutorial above for more argument variations.
 
 =head2 under

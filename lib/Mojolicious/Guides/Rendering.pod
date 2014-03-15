@@ -332,7 +332,7 @@ L<Mojolicious::Controller/"render">.
   );
 
 The best possible representation will be automatically selected from the
-C<Accept> request header, C<format> stash value or C<format> GET/POST
+C<Accept> request header, C<format> stash value or C<format> C<GET>/C<POST>
 parameter and stored in the C<format> stash value. To change MIME type
 mappings for the C<Accept> request header or the C<Content-Type> response
 header you can use L<Mojolicious/"types">.
@@ -673,7 +673,7 @@ This chain could go on and on to allow a very high level of template reuse.
 
 =head2 Form validation
 
-You can use L<Mojolicious::Controller/"validation"> to validate GET/POST
+You can use L<Mojolicious::Controller/"validation"> to validate C<GET>/C<POST>
 parameters submitted to your application. All unknown fields will be ignored
 by default, so you have to decide which should be required or optional before
 you can perform checks on their values. Every check is performed right away,

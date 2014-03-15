@@ -79,8 +79,9 @@ all session state is kept client-side.
   |         | <-    200 OK        <- |            |
   +---------+                        +------------+
 
-While HTTP methods such as PUT, GET and DELETE are not directly part of REST
-they go very well with it and are commonly used to manipulate I<resources>.
+While HTTP methods such as C<PUT>, C<GET> and C<DELETE> are not directly part
+of REST they go very well with it and are commonly used to manipulate
+I<resources>.
 
 =head2 Sessions
 
@@ -268,7 +269,8 @@ templates.
   app->start;
 
 The method L<Mojolicious::Controller/"param"> is used to access query
-parameters, POST parameters, file uploads and route placeholders, all at once.
+parameters, C<POST> parameters, file uploads and route placeholders, all at
+once.
 
 =head2 Testing
 

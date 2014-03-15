@@ -317,13 +317,13 @@ Mojo::JSON - Minimalistic JSON
 L<Mojo::JSON> is a minimalistic and possibly the fastest pure-Perl
 implementation of L<RFC 7159|http://tools.ietf.org/html/rfc7159>.
 
-It supports normal Perl data types like C<Scalar>, C<Array> reference, C<Hash>
+It supports normal Perl data types like scalar, array reference, hash
 reference and will try to call the C<TO_JSON> method on blessed references, or
 stringify them if it doesn't exist. Differentiating between strings and
-numbers in Perl is hard, depending on how it has been used, a C<Scalar> can be
+numbers in Perl is hard, depending on how it has been used, a scalar can be
 both at the same time. Since numeric comparisons on strings are very unlikely
 to happen intentionally, the numeric value always gets priority, so any
-C<Scalar> that has been used in numeric context is considered a number.
+scalar that has been used in numeric context is considered a number.
 
   [1, -2, 3]     -> [1, -2, 3]
   {"foo": "bar"} -> {foo => 'bar'}
@@ -335,8 +335,8 @@ similar native Perl value.
   false -> Mojo::JSON->false
   null  -> undef
 
-In addition C<Scalar> references will be used to generate booleans, based on
-if their values are true or false.
+In addition scalar references will be used to generate booleans, based on if
+their values are true or false.
 
   \1 -> true
   \0 -> false
@@ -367,7 +367,7 @@ Encode Perl value to JSON.
   my $bytes = j({foo => 'bar'});
   my $value = j($bytes);
 
-Encode Perl data structure (which may only be an C<Array> reference or C<Hash>
+Encode Perl data structure (which may only be an array reference or hash
 reference) or decode JSON, an C<undef> return value indicates a bare C<null>
 or that decoding failed.
 

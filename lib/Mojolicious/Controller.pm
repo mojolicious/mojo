@@ -594,7 +594,8 @@ there can always be multiple values, which might have unexpected consequences.
 Parts of the request body need to be loaded into memory to parse C<POST>
 parameters, so you have to make sure it is not excessively large.
 
-  # List context is ambiguous and should be avoided
+  # List context is ambiguous and should be avoided, you can get multiple
+  # values returned for a query string like "?foo=bar&foo=baz&foo=yada"
   my $hash = {foo => $self->param('foo')};
 
   # Better enforce scalar context

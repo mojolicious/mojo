@@ -70,10 +70,13 @@
 %= javascript begin
   var mojobar = $('#mojobar');
   var mojobarHeight = mojobar.outerHeight();
+  function fixOffset() {
+    var tweak = $(window.location.hash).offset().top - mojobarHeight;
+    $('html, body').animate({scrollTop: tweak}, 1);
+  }
   $(window).load(function () {
     if (window.location.hash) {
-      var tweak = $(window.location.hash).offset().top - mojobarHeight;
-      $('html, body').animate({scrollTop:tweak}, 1);
+      fixOffset();
     }
     var start = mojobar.offset().top;
     var fixed;
@@ -92,7 +95,7 @@
         if (!mojobar.hasClass('animated')) {
           mojobar.addClass('animated');
         }
-        if (st > lastScrollTop && st > (mojobarHeight + start + 250)){
+        if (st > lastScrollTop && st > (mojobarHeight + start + 250)) {
           mojobar.css('top', 0 - (mojobarHeight + 5));
         } else if (st + $(window).height() < $(document).height()) {
           mojobar.css('top', 0);
@@ -106,15 +109,13 @@
     $(".mojoscroll").click(function(e) {
       e.preventDefault();
       e.stopPropagation();
-      var parts  = this.href.split("#");
-      var hash   = "#" + parts[1];
+      var hash   = "#" + this.href.split("#")[1];
       var target = $(hash);
-      var top    = target.offset().top - mojobarHeight;
       var old    = target.attr('id');
       target.attr('id', '');
       location.hash = hash;
       target.attr('id', old);
-      $('html, body').animate({scrollTop:top}, 1);
+      fixOffset();
     });
   });
 % end

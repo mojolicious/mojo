@@ -21,7 +21,7 @@ has tx => sub { Mojo::Transaction::HTTP->new };
 # Reserved stash values
 my %RESERVED = map { $_ => 1 } (
   qw(action app cb controller data extends format handler json layout),
-  qw(namespace partial path status template text)
+  qw(namespace partial path status template text variant)
 );
 
 sub AUTOLOAD {
@@ -588,10 +588,10 @@ status.
   $c              = $c->param(foo => qw(ba;r ba;z));
 
 Access route placeholder values that are not reserved stash values, file
-uploads and GET/POST parameters, in that order. Note that this method is
+uploads and C<GET>/C<POST> parameters, in that order. Note that this method is
 context sensitive in some cases and therefore needs to be used with care,
 there can always be multiple values, which might have unexpected consequences.
-Parts of the request body need to be loaded into memory to parse POST
+Parts of the request body need to be loaded into memory to parse C<POST>
 parameters, so you have to make sure it is not excessively large.
 
   # List context is ambiguous and should be avoided
@@ -781,7 +781,7 @@ Get L<Mojo::Message::Response> object from L<Mojo::Transaction/"res">.
   );
 
 Automatically select best possible representation for resource from C<Accept>
-request header, C<format> stash value or C<format> GET/POST parameter,
+request header, C<format> stash value or C<format> C<GET>/C<POST> parameter,
 defaults to rendering an empty C<204> response. Since browsers often don't
 really know what they actually want, unspecific C<Accept> request headers with
 more than one MIME type will be ignored, unless the C<X-Requested-With> header
@@ -794,7 +794,7 @@ is set to the value C<XMLHttpRequest>.
   );
 
 For more advanced negotiation logic you can also use the helper
-L<Mojolicious::Plugin::DefaultHelper/"accepts">.
+L<Mojolicious::Plugin::DefaultHelpers/"accepts">.
 
 =head2 send
 
@@ -843,8 +843,8 @@ timeout, which usually defaults to C<15> seconds.
   $c          = $c->session(foo => 'bar');
 
 Persistent data storage for the next few requests, all session data gets
-serialized with L<Mojo::JSON> and stored C<Base64> encoded in C<HMAC-SHA1>
-signed cookies. Note that cookies usually have a 4096 byte limit, depending on
+serialized with L<Mojo::JSON> and stored Base64 encoded in HMAC-SHA1 signed
+cookies. Note that cookies usually have a C<4096> byte limit, depending on
 browser.
 
   # Manipulate session
@@ -869,7 +869,7 @@ browser.
   $c         = $c->signed_cookie(foo => 'bar', {path => '/'});
 
 Access signed request cookie values and create new signed response cookies.
-Cookies failing C<HMAC-SHA1> signature verification will be automatically
+Cookies failing HMAC-SHA1 signature verification will be automatically
 discarded.
 
 =head2 stash
@@ -884,8 +884,8 @@ wide default values can be set with L<Mojolicious/"defaults">. Some stash
 values have a special meaning and are reserved, the full list is currently
 C<action>, C<app>, C<cb>, C<controller>, C<data>, C<extends>, C<format>,
 C<handler>, C<json>, C<layout>, C<namespace>, C<partial>, C<path>, C<status>,
-C<template> and C<text>. Note that all stash values with a C<mojo.*> prefix
-are reserved for internal use.
+C<template>, C<text> and C<variant>. Note that all stash values with a
+C<mojo.*> prefix are reserved for internal use.
 
   # Remove value
   my $foo = delete $c->stash->{foo};
@@ -924,9 +924,9 @@ to inherit query parameters from the current request.
   my $validation = $c->validation;
 
 Get L<Mojolicious::Validator::Validation> object for current request to
-validate GET/POST parameters. Parts of the request body need to be loaded into
-memory to parse POST parameters, so you have to make sure it is not
-excessively large.
+validate C<GET>/C<POST> parameters. Parts of the request body need to be
+loaded into memory to parse C<POST> parameters, so you have to make sure it is
+not excessively large.
 
   my $validation = $c->validation;
   $validation->required('title')->size(3, 50);

@@ -165,7 +165,8 @@ sub _spawn {
 
   # Prepare lock file
   my $file = $self->{lock_file};
-  die qq{Can't open lock file "$file": $!} unless open my $handle, '>', $file;
+  $self->app->log->error(qq{Can't open lock file "$file": $!})
+    unless open my $handle, '>', $file;
 
   # Change user/group
   my $loop = $self->setuidgid->ioloop;
@@ -261,9 +262,9 @@ should avoid modifying signal handlers in your applications.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
 support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.75+) will be used automatically by L<Mojo::IOLoop> if
+L<IO::Socket::SSL> (1.84+) will be used automatically by L<Mojo::IOLoop> if
 they are installed. Individual features can also be disabled with the
-MOJO_NO_IPV6 and MOJO_NO_TLS environment variables.
+C<MOJO_NO_IPV6> and C<MOJO_NO_TLS> environment variables.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
 

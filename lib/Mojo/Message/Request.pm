@@ -387,19 +387,19 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
   my $foo   = $req->param('foo');
   my @foo   = $req->param('foo');
 
-Access GET and POST parameters. Note that this method caches all data, so it
-should not be called before the entire request body has been received. Parts
-of the request body need to be loaded into memory to parse POST parameters, so
-you have to make sure it is not excessively large.
+Access C<GET> and C<POST> parameters. Note that this method caches all data,
+so it should not be called before the entire request body has been received.
+Parts of the request body need to be loaded into memory to parse C<POST>
+parameters, so you have to make sure it is not excessively large.
 
 =head2 params
 
   my $params = $req->params;
 
-All GET and POST parameters, usually a L<Mojo::Parameters> object. Note that
-this method caches all data, so it should not be called before the entire
+All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object. Note
+that this method caches all data, so it should not be called before the entire
 request body has been received. Parts of the request body need to be loaded
-into memory to parse POST parameters, so you have to make sure it is not
+into memory to parse C<POST> parameters, so you have to make sure it is not
 excessively large.
 
   # Get parameter value
@@ -428,7 +428,7 @@ Proxy URL for request.
 
   my $params = $req->query_params;
 
-All GET parameters, usually a L<Mojo::Parameters> object.
+All C<GET> parameters, usually a L<Mojo::Parameters> object.
 
   # Turn GET parameters to hash and extract value
   say $req->query_params->to_hash->{foo};

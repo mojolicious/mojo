@@ -149,7 +149,7 @@ The last few logged messages.
 
 Active log level, defaults to C<debug>. Available log levels are C<debug>,
 C<info>, C<warn>, C<error> and C<fatal>, in that order. Note that the
-MOJO_LOG_LEVEL environment variable can override this value.
+C<MOJO_LOG_LEVEL> environment variable can override this value.
 
 =head2 max_history_size
 

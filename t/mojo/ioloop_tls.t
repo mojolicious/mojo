@@ -10,7 +10,7 @@ use Mojo::IOLoop::Server;
 
 plan skip_all => 'set TEST_TLS to enable this test (developer only!)'
   unless $ENV{TEST_TLS};
-plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
+plan skip_all => 'IO::Socket::SSL 1.84 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
 
 # To regenerate all required certificates run these commands (18.04.2012)

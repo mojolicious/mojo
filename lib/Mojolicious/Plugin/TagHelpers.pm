@@ -405,7 +405,7 @@ Generate file input element.
   % end
 
 Generate portable form tag with L<Mojolicious::Controller/"url_for">. For
-routes that allow POST but not GET, a C<method> attribute will be
+routes that allow C<POST> but not C<GET>, a C<method> attribute will be
 automatically added.
 
   <form action="/path/to/login">

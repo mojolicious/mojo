@@ -172,7 +172,7 @@ L<Mojolicious::Controller/"render">, but more about that later.
 
 =head2 GET/POST parameters
 
-All GET and POST parameters sent with the request are accessible via
+All C<GET> and C<POST> parameters sent with the request are accessible via
 L<Mojolicious::Controller/"param">.
 
   use Mojolicious::Lite;
@@ -669,7 +669,7 @@ Or you can just disable format detection.
 
 =head2 Content negotiation
 
-For resources with different representations and that require truly C<RESTful>
+For resources with different representations and that require truly RESTful
 content negotiation you can also use L<Mojolicious::Controller/"respond_to">.
 
   use Mojolicious::Lite;
@@ -795,7 +795,7 @@ cookies really secure.
 
 All files uploaded via C<multipart/form-data> request are automatically
 available as L<Mojo::Upload> objects. And you don't have to worry about memory
-usage, because all files above C<250KB> will be automatically streamed into a
+usage, because all files above 250KB will be automatically streamed into a
 temporary file.
 
   use Mojolicious::Lite;
@@ -834,8 +834,9 @@ temporary file.
     </body>
   </html>
 
-To protect you from excessively large files there is also a limit of C<10MB>
-by default, which you can tweak with the MOJO_MAX_MESSAGE_SIZE environment
+To protect you from excessively large files there is also a limit of 10MB by
+default, which you can tweak with the attribute
+L<Mojo::Message/"max_message_size"> or C<MOJO_MAX_MESSAGE_SIZE> environment
 variable.
 
   # Increase limit to 1GB
@@ -953,7 +954,7 @@ the attribute L<Mojolicious/"mode">.
   app->start;
 
 The default operating mode will usually be C<development> and can be changed
-with command line options or the MOJO_MODE and PLACK_ENV environment
+with command line options or the C<MOJO_MODE> and C<PLACK_ENV> environment
 variables. A mode other than C<development> will raise the log level from
 C<debug> to C<info>.
 
@@ -970,8 +971,7 @@ specific C<exception> and C<not_found> templates.
 =head2 Testing
 
 Testing your application is as easy as creating a C<t> directory and filling
-it with normal Perl unit tests, which can be a lot of fun thanks to
-L<Test::Mojo>.
+it with normal Perl tests, which can be a lot of fun thanks to L<Test::Mojo>.
 
   use Test::More;
   use Test::Mojo;
@@ -984,7 +984,7 @@ L<Test::Mojo>.
 
   done_testing();
 
-Run all unit tests with the command L<Mojolicious::Command::test>.
+Run all tests with the command L<Mojolicious::Command::test>.
 
   $ ./myapp.pl test
   $ ./myapp.pl test -v
@@ -1019,13 +1019,13 @@ The L<Mojolicious::Lite> application.
   my $route = del '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"delete">, matching only
-DELETE requests. See also the tutorial above for more argument variations.
+C<DELETE> requests. See also the tutorial above for more argument variations.
 
 =head2 get
 
   my $route = get '/:foo' => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"get">, matching only GET
+Generate route with L<Mojolicious::Routes::Route/"get">, matching only C<GET>
 requests. See also the tutorial above for more argument variations.
 
 =head2 group
@@ -1051,7 +1051,7 @@ Share code with L<Mojolicious/"hook">.
   my $route = options '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"options">, matching only
-OPTIONS requests. See also the tutorial above for more argument
+C<OPTIONS> requests. See also the tutorial above for more argument
 variations.
 
 =head2 patch
@@ -1059,7 +1059,7 @@ variations.
   my $route = patch '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"patch">, matching only
-PATCH requests. See also the tutorial above for more argument variations.
+C<PATCH> requests. See also the tutorial above for more argument variations.
 
 =head2 plugin
 
@@ -1072,13 +1072,13 @@ Load a plugin with L<Mojolicious/"plugin">.
   my $route = post '/:foo' => sub {...};
 
 Generate route with L<Mojolicious::Routes::Route/"post">, matching only
-POST requests. See also the tutorial above for more argument variations.
+C<POST> requests. See also the tutorial above for more argument variations.
 
 =head2 put
 
   my $route = put '/:foo' => sub {...};
 
-Generate route with L<Mojolicious::Routes::Route/"put">, matching only PUT
+Generate route with L<Mojolicious::Routes::Route/"put">, matching only C<PUT>
 requests. See also the tutorial above for more argument variations.
 
 =head2 under

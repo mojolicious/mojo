@@ -82,8 +82,7 @@ sub is_websocket { !!shift->{websocket} }
 sub name {
   my $self = shift;
   return $self->{name} unless @_;
-  $self->{name}   = shift;
-  $self->{custom} = 1;
+  @$self{qw(name custom)} = (shift, 1);
   return $self;
 }
 
@@ -212,7 +211,7 @@ sub _defaults {
 sub _generate_route {
   my ($self, $methods, @args) = @_;
 
-  my ($cb, @conditions, @constraints, %defaults, $name, $pattern);
+  my (@conditions, @constraints, %defaults, $name, $pattern);
   while (defined(my $arg = shift @args)) {
 
     # First scalar is the pattern
@@ -225,17 +224,14 @@ sub _generate_route {
     elsif (!ref $arg) { $name = $arg }
 
     # Callback
-    elsif (ref $arg eq 'CODE') { $cb = $arg }
+    elsif (ref $arg eq 'CODE') { $defaults{cb} = $arg }
 
     # Constraints
-    elsif (ref $arg eq 'ARRAY') { @constraints = @$arg }
+    elsif (ref $arg eq 'ARRAY') { push @constraints, @$arg }
 
     # Defaults
-    elsif (ref $arg eq 'HASH') { %defaults = %$arg }
+    elsif (ref $arg eq 'HASH') { %defaults = (%defaults, %$arg) }
   }
-
-  # Callback
-  $defaults{cb} = $cb if $cb;
 
   # Create bridge or route
   my $route
@@ -347,7 +343,7 @@ Generate bridge route with optional pattern and restrictive placeholders.
 
   my $route = $r->delete('/:foo' => sub {...});
 
-Generate route matching only DELETE requests. See also the
+Generate route matching only C<DELETE> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->delete('/user')->to('user#remove');
@@ -375,8 +371,8 @@ generated ones.
 
   my $route = $r->get('/:foo' => sub {...});
 
-Generate route matching only GET requests. See also the L<Mojolicious::Lite>
-tutorial for more argument variations.
+Generate route matching only C<GET> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->get('/user')->to('user#show');
 
@@ -433,7 +429,7 @@ if necessary.
 
   my $route = $r->options('/:foo' => sub {...});
 
-Generate route matching only OPTIONS requests. See also the
+Generate route matching only C<OPTIONS> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->options('/user')->to('user#overview');
@@ -462,8 +458,8 @@ Parse pattern.
 
   my $route = $r->patch('/:foo' => sub {...});
 
-Generate route matching only PATCH requests. See also the L<Mojolicious::Lite>
-tutorial for more argument variations.
+Generate route matching only C<PATCH> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->patch('/user')->to('user#update');
 
@@ -471,8 +467,8 @@ tutorial for more argument variations.
 
   my $route = $r->post('/:foo' => sub {...});
 
-Generate route matching only POST requests. See also the L<Mojolicious::Lite>
-tutorial for more argument variations.
+Generate route matching only C<POST> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->post('/user')->to('user#create');
 
@@ -480,8 +476,8 @@ tutorial for more argument variations.
 
   my $route = $r->put('/:foo' => sub {...});
 
-Generate route matching only PUT requests. See also the L<Mojolicious::Lite>
-tutorial for more argument variations.
+Generate route matching only C<PUT> requests. See also the
+L<Mojolicious::Lite> tutorial for more argument variations.
 
   $r->put('/user')->to('user#replace');
 

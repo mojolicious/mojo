@@ -7,7 +7,7 @@ use File::Spec::Functions qw(abs2rel catdir splitdir);
 use Getopt::Long qw(GetOptionsFromArray :config no_auto_abbrev no_ignore_case);
 use Mojo::Home;
 
-has description => 'Run unit tests.';
+has description => 'Run tests.';
 has usage => sub { shift->extract_usage };
 
 sub run {

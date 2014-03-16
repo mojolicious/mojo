@@ -131,7 +131,7 @@ L<Mojolicious::Plugin::DefaultHelpers> implements the following helpers.
   %= accepts('html', 'json', 'txt') // 'html'
 
 Select best possible representation for resource from C<Accept> request
-header, C<format> stash value or C<format> GET/POST parameter with
+header, C<format> stash value or C<format> C<GET>/C<POST> parameter with
 L<Mojolicious::Renderer/"accepts">, defaults to returning the first extension
 if no preference could be detected.
 

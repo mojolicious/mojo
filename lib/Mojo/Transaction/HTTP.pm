@@ -84,7 +84,7 @@ sub _body {
 
   # Finished
   $self->{state} = $finish ? 'finished' : 'read'
-    if $self->{write} <= 0 || (defined $buffer && !length $buffer);
+    if $self->{write} <= 0 || defined $buffer && !length $buffer;
 
   return defined $buffer ? $buffer : '';
 }

@@ -70,8 +70,10 @@ sub _html {
 
     # Rewrite
     push @parts, [] if $e->type eq 'h1' || !@parts;
-    push @{$parts[-1]}, $text, Mojo::URL->new->fragment($anchor);
-    $e->content($self->link_to($text => $toc, id => $anchor));
+    my $link = Mojo::URL->new->fragment($anchor);
+    push @{$parts[-1]}, $text, $link;
+    my $permalink = $self->link_to('#' => $link, class => 'permalink');
+    $e->content($permalink . $self->link_to($text => $toc, id => $anchor));
   }
 
   # Try to find a title
@@ -100,16 +102,11 @@ sub _perldoc {
 }
 
 sub _pod_to_html {
-  return '' unless defined(my $pod = shift);
-
-  # Block
-  $pod = $pod->() if ref $pod eq 'CODE';
+  return '' unless defined(my $pod = ref $_[0] eq 'CODE' ? shift->() : shift);
 
   my $parser = Pod::Simple::HTML->new;
-  $parser->force_title('');
-  $parser->html_header_before_title('');
-  $parser->html_header_after_title('');
-  $parser->html_footer('');
+  $parser->$_('') for qw(force_title html_header_before_title);
+  $parser->$_('') for qw(html_header_after_title html_footer);
   $parser->output_string(\(my $output));
   return $@ unless eval { $parser->parse_string_document("$pod"); 1 };
 

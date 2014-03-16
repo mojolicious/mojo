@@ -12,7 +12,7 @@ plan skip_all => 'set TEST_ONLINE to enable this test (developer only!)'
   unless $ENV{TEST_ONLINE};
 plan skip_all => 'IO::Socket::IP 0.20 required for this test!'
   unless Mojo::IOLoop::Server::IPV6;
-plan skip_all => 'IO::Socket::SSL 1.75 required for this test!'
+plan skip_all => 'IO::Socket::SSL 1.84 required for this test!'
   unless Mojo::IOLoop::Server::TLS;
 
 use IO::Socket::INET;
@@ -203,9 +203,7 @@ is $tx->res->code,   200,                       'right status';
 
 # HTTPS request that requires SNI
 SKIP: {
-  skip 'SNI support required!', 1
-    unless IO::Socket::SSL->can('can_client_sni')
-    && IO::Socket::SSL->can_client_sni;
+  skip 'SNI support required!', 1 unless IO::Socket::SSL->can_client_sni;
 
   $tx = $ua->get('https://google.de');
   like $ua->ioloop->stream($tx->connection)

@@ -31,8 +31,9 @@ or the route name, C<format> defaulting to C<html> and C<handler> to C<ep>.
   {name => 'foo', format => 'txt'}          -> 'foo.txt.ep'
   {name => 'foo', handler => 'epl'}         -> 'foo.html.epl'
 
-All templates should be in the C<templates> directories of the application or
-the C<DATA> section of the class C<main>.
+All templates should be in the C<templates> directories of the application,
+which can be customized with L<Mojolicious::Renderer/"paths">, or one of the
+the C<DATA> sections from L<Mojolicious::Renderer/"classes">.
 
   __DATA__
 
@@ -198,6 +199,19 @@ alternatives.
 
   $self->render_maybe('localized/baz') or $self->render('foo/bar/baz');
 
+=head2 Template variants
+
+To make your application look great on many different devices you can also
+use the C<variant> stash value to choose between different variants of your
+templates.
+
+  # foo/bar/baz.html+phone.ep
+  # foo/bar/baz.html.ep
+  $self->render('foo/bar/baz', variant => 'phone');
+
+This can be done very liberally since it only applies when a template with the
+correct name actually exists and falls back to the generic one otherwise.
+
 =head2 Rendering inline templates
 
 Some renderers such as C<ep> allow templates to be passed inline.
@@ -307,7 +321,7 @@ Since everything is just Perl normal control structures just work.
 =head2 Content negotiation
 
 For resources with different representations and that require truly
-C<RESTful> content negotiation you can also use
+RESTful content negotiation you can also use
 L<Mojolicious::Controller/"respond_to"> instead of
 L<Mojolicious::Controller/"render">.
 
@@ -323,7 +337,7 @@ L<Mojolicious::Controller/"render">.
   );
 
 The best possible representation will be automatically selected from the
-C<Accept> request header, C<format> stash value or C<format> GET/POST
+C<Accept> request header, C<format> stash value or C<format> C<GET>/C<POST>
 parameter and stored in the C<format> stash value. To change MIME type
 mappings for the C<Accept> request header or the C<Content-Type> response
 header you can use L<Mojolicious/"types">.
@@ -453,9 +467,9 @@ Helpers are little functions you can use in templates and controller code.
 
 The helper L<Mojolicious::Plugin::DefaultHelpers/"dumper"> for example will
 use L<Data::Dumper> to serialize whatever data structure you pass it, this can
-be very useful for debugging. We differentiate between C<default helpers>
-which are more general purpose like C<dumper> and C<tag helpers>, which are
-template specific and mostly used to generate C<HTML> tags.
+be very useful for debugging. We differentiate between default helpers which
+are more general purpose like C<dumper> and tag helpers, which are template
+specific and mostly used to generate HTML tags.
 
   %= javascript '/script.js'
 
@@ -664,7 +678,7 @@ This chain could go on and on to allow a very high level of template reuse.
 
 =head2 Form validation
 
-You can use L<Mojolicious::Controller/"validation"> to validate GET/POST
+You can use L<Mojolicious::Controller/"validation"> to validate C<GET>/C<POST>
 parameters submitted to your application. All unknown fields will be ignored
 by default, so you have to decide which should be required or optional before
 you can perform checks on their values. Every check is performed right away,

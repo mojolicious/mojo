@@ -105,7 +105,7 @@ Restart active timer. Meant to be overloaded in a subclass.
   my $class = Mojo::Reactor->detect;
 
 Detect and load the best reactor implementation available, will try the value
-of the MOJO_REACTOR environment variable, L<Mojo::Reactor::EV> or
+of the C<MOJO_REACTOR> environment variable, L<Mojo::Reactor::EV> or
 L<Mojo::Reactor::Poll>.
 
   # Instantiate best reactor implementation available

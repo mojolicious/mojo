@@ -16,7 +16,7 @@ use constant IPV6 => $ENV{MOJO_NO_IPV6}
 # TLS support requires IO::Socket::SSL
 use constant TLS => $ENV{MOJO_NO_TLS}
   ? 0
-  : eval 'use IO::Socket::SSL 1.75 (); 1';
+  : eval 'use IO::Socket::SSL 1.84 (); 1';
 use constant TLS_READ  => TLS ? IO::Socket::SSL::SSL_WANT_READ()  : 0;
 use constant TLS_WRITE => TLS ? IO::Socket::SSL::SSL_WANT_WRITE() : 0;
 
@@ -87,7 +87,7 @@ sub listen {
   $self->{handle} = $handle;
 
   return unless $args->{tls};
-  croak "IO::Socket::SSL 1.75 required for TLS support" unless TLS;
+  croak "IO::Socket::SSL 1.84 required for TLS support" unless TLS;
 
   # Prioritize RC4 to mitigate BEAST attack
   $self->{tls} = {
@@ -235,7 +235,7 @@ Get handle for server.
   $server->listen(port => 3000);
 
 Create a new listen socket. Note that TLS support depends on
-L<IO::Socket::SSL> (1.75+) and IPv6 support on L<IO::Socket::IP> (0.20+).
+L<IO::Socket::SSL> (1.84+) and IPv6 support on L<IO::Socket::IP> (0.20+).
 
 These options are currently available:
 

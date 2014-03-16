@@ -329,7 +329,7 @@ Actual peer for transaction.
 
   my $tx = $t->proxy_connect(Mojo::Transaction::HTTP->new);
 
-Build L<Mojo::Transaction::HTTP> proxy connect request for transaction if
+Build L<Mojo::Transaction::HTTP> proxy C<CONNECT> request for transaction if
 possible.
 
 =head2 redirect
@@ -418,9 +418,9 @@ requests, with support for content generators.
   });
 
 The C<form> content generator will automatically use query parameters for
-GET/HEAD requests and the "application/x-www-form-urlencoded" content type for
-everything else. Both get upgraded automatically to using the
-"multipart/form-data" content type when necessary or when the header has been
+C<GET>/C<HEAD> requests and the C<application/x-www-form-urlencoded> content
+type for everything else. Both get upgraded automatically to using the
+C<multipart/form-data> content type when necessary or when the header has been
 set manually.
 
   # Force "multipart/form-data"

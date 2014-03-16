@@ -428,7 +428,7 @@ C<multipart/form-data> message body, usually a L<Mojo::Parameters> object.
 Note that this method caches all data, so it should not be called before the
 entire message body has been received. Parts of the message body need to be
 loaded into memory to parse C<POST> parameters, so you have to make sure it is
-not excessively large.
+not excessively large, there's a 10MB limit by default.
 
   # Get POST parameter value
   say $msg->body_params->param('foo');
@@ -485,7 +485,7 @@ to call the method L<Mojo::DOM/"find"> on it right away, which returns a
 L<Mojo::Collection> object. Note that this method caches all data, so it
 should not be called before the entire message body has been received. The
 whole message body needs to be loaded into memory to parse it, so you have to
-make sure it is not excessively large.
+make sure it is not excessively large, there's a 10MB limit by default.
 
   # Perform "find" right away
   say $msg->dom('h1, h2, h3')->text;
@@ -575,7 +575,7 @@ JSON Pointer can be used to extract a specific value with
 L<Mojo::JSON::Pointer>. Note that this method caches all data, so it should
 not be called before the entire message body has been received. The whole
 message body needs to be loaded into memory to parse it, so you have to make
-sure it is not excessively large.
+sure it is not excessively large, there's a 10MB limit by default.
 
   # Extract JSON values
   say $msg->json->{foo}{bar}[23];
@@ -590,7 +590,8 @@ sure it is not excessively large.
 Access C<POST> parameters. Note that this method caches all data, so it should
 not be called before the entire message body has been received. Parts of the
 message body need to be loaded into memory to parse C<POST> parameters, so you
-have to make sure it is not excessively large.
+have to make sure it is not excessively large, there's a 10MB limit by
+default.
 
 =head2 parse
 

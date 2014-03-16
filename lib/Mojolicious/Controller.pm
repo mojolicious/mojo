@@ -592,7 +592,8 @@ uploads and C<GET>/C<POST> parameters, in that order. Note that this method is
 context sensitive in some cases and therefore needs to be used with care,
 there can always be multiple values, which might have unexpected consequences.
 Parts of the request body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large.
+parameters, so you have to make sure it is not excessively large, there's a
+10MB limit by default.
 
   # List context is ambiguous and should be avoided, you can get multiple
   # values returned for a query string like "?foo=bar&foo=baz&foo=yada"
@@ -927,7 +928,7 @@ to inherit query parameters from the current request.
 Get L<Mojolicious::Validator::Validation> object for current request to
 validate C<GET>/C<POST> parameters. Parts of the request body need to be
 loaded into memory to parse C<POST> parameters, so you have to make sure it is
-not excessively large.
+not excessively large, there's a 10MB limit by default.
 
   my $validation = $c->validation;
   $validation->required('title')->size(3, 50);

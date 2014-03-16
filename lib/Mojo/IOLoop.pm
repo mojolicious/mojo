@@ -311,7 +311,7 @@ is loaded.
 
 For better scalability (epoll, kqueue) and to provide IPv6 as well as TLS
 support, the optional modules L<EV> (4.0+), L<IO::Socket::IP> (0.20+) and
-L<IO::Socket::SSL> (1.75+) will be used automatically if they are installed.
+L<IO::Socket::SSL> (1.84+) will be used automatically if they are installed.
 Individual features can also be disabled with the C<MOJO_NO_IPV6> and
 C<MOJO_NO_TLS> environment variables.
 

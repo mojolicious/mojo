@@ -71,8 +71,10 @@
   var mojobar = $('#mojobar');
   var mojobarHeight = mojobar.outerHeight();
   function fixOffset() {
-    var tweak = $(window.location.hash).offset().top - mojobarHeight;
-    $('html, body').animate({scrollTop: tweak}, 1);
+    var offset = $(window.location.hash).offset();
+    if (offset) {
+      $('html, body').animate({scrollTop: offset.top - mojobarHeight}, 1);
+    }
   }
   $(window).load(function () {
     if (window.location.hash) {

@@ -228,7 +228,7 @@ empty string.
 =head1 AUTOLOAD
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above, you can also call
-validation checks provided by L<Mojolicious::Validator> on
+validation checks provided by L</"validator"> on
 L<Mojolicious::Validator::Validation> objects, similar to L</"check">.
 
   $validation->required('foo')->size(2, 5)->like(qr/^[A-Z]/);

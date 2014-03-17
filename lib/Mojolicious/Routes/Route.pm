@@ -577,7 +577,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 =head1 AUTOLOAD
 
 In addition to the L</"ATTRIBUTES"> and L</"METHODS"> above you can also call
-shortcuts on L<Mojolicious::Routes::Route> objects.
+shortcuts provided by L</"root"> on L<Mojolicious::Routes::Route> objects.
 
   $r->root->add_shortcut(firefox => sub {
     my ($r, $path) = @_;

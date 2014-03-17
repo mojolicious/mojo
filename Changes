@@ -3595,7 +3595,7 @@
     versions of formerly aliased attributes.
   - Fixed application/x-www-form-urlencoded.
   - Fixed support for query strings.
-  - Fixed support for multiple query parameters with same name.
+  - Fixed multi query parameter support.
   - Added a context class to the Mojolicious generator.
   - Cleaned up Mojo::Server API. (Mark Stosberg)
   - Increased Mojo::Template performance. (Pedro Melo)

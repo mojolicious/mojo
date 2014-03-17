@@ -211,10 +211,10 @@ Change validation L</"topic">.
 
 =head2 param
 
-  my @names       = $c->param;
-  my $foo         = $c->param('foo');
-  my @foo         = $c->param('foo');
-  my ($foo, $bar) = $c->param(['foo', 'bar']);
+  my @names       = $validation->param;
+  my $foo         = $validation->param('foo');
+  my @foo         = $validation->param('foo');
+  my ($foo, $bar) = $validation->param(['foo', 'bar']);
 
 Access validated parameters, similar to L<Mojolicious::Controller/"param">.
 

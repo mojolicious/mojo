@@ -2682,7 +2682,7 @@
   - Fixed connection reset handling in Mojo::IOLoop.
 
 0.999935  2010-11-03
-  - Added EXPERIMENTAL module Mojo::Util as a faster low level alternative to
+  - Added EXPERIMENTAL module Mojo::Util as a faster low-level alternative to
     Mojo::ByteStream and rewrote many internals to use it instead.
   - Improved Mojo::IOLoop performance by about 20%.
   - Made automatic file storage upgrade smarter.

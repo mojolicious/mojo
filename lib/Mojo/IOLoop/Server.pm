@@ -210,7 +210,7 @@ Number of connections to accept at once, defaults to C<50>.
   my $reactor = $server->reactor;
   $server     = $server->reactor(Mojo::Reactor::Poll->new);
 
-Low level event reactor, defaults to the C<reactor> attribute value of the
+Low-level event reactor, defaults to the C<reactor> attribute value of the
 global L<Mojo::IOLoop> singleton.
 
 =head1 METHODS

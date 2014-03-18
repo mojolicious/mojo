@@ -77,7 +77,7 @@ sub _timer {
 
 =head1 NAME
 
-Mojo::Reactor::EV - Low level event reactor with libev support
+Mojo::Reactor::EV - Low-level event reactor with libev support
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ Mojo::Reactor::EV - Low level event reactor with libev support
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::EV> is a low level event reactor based on L<EV> (4.0+).
+L<Mojo::Reactor::EV> is a low-level event reactor based on L<EV> (4.0+).
 
 =head1 EVENTS
 

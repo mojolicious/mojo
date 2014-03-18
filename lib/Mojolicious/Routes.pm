@@ -366,7 +366,7 @@ Match routes with L<Mojolicious::Routes::Match>.
   my $route = $r->route('/:action', action => qr/\w+/);
   my $route = $r->route(format => 0);
 
-Generate route matching all HTTP request methods.
+Low-level generator for routes matching all HTTP request methods.
 
 =head1 SEE ALSO
 

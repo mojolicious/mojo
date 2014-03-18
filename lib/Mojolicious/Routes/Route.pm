@@ -333,7 +333,7 @@ also the L<Mojolicious::Lite> tutorial for more argument variations.
   my $bridge = $r->bridge('/:action', action => qr/\w+/);
   my $bridge = $r->bridge(format => 0);
 
-Generate bridge route with optional pattern and restrictive placeholders.
+Low-level generator for bridge routes.
 
   my $auth = $r->bridge('/user')->to('user#auth');
   $auth->get('/show')->to('#show');
@@ -515,8 +515,7 @@ The L<Mojolicious::Routes> object this route is an descendent of.
   my $route = $r->route('/:action', action => qr/\w+/);
   my $route = $r->route(format => 0);
 
-Generate route matching all HTTP request methods with optional pattern and
-restrictive placeholders.
+Low-level generator for routes matching all HTTP request methods.
 
 =head2 to
 

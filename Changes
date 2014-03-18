@@ -1,5 +1,6 @@
 
-4.91  2014-03-18
+4.91  2014-03-19
+  - Removed deprecated secret method from Mojolicious.
 
 4.90  2014-03-16
   - Removed deprecated to_rel method from Mojo::URL.

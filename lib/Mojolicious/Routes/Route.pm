@@ -318,7 +318,7 @@ current parent if necessary.
 
 =head2 any
 
-  my $route = $r->any('/:foo' => sub {...});
+  my $route = $r->any('/:foo' => [foo => qr/\w+/] => sub {...});
   my $route = $r->any([qw(GET POST)] => '/:foo' => sub {...});
 
 Generate route matching any of the listed HTTP request methods or all. See
@@ -341,7 +341,7 @@ Generate bridge route with optional pattern and restrictive placeholders.
 
 =head2 delete
 
-  my $route = $r->delete('/:foo' => sub {...});
+  my $route = $r->delete('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate route matching only C<DELETE> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -369,7 +369,7 @@ generated ones.
 
 =head2 get
 
-  my $route = $r->get('/:foo' => sub {...});
+  my $route = $r->get('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate route matching only C<GET> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -427,7 +427,7 @@ if necessary.
 
 =head2 options
 
-  my $route = $r->options('/:foo' => sub {...});
+  my $route = $r->options('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate route matching only C<OPTIONS> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -456,7 +456,7 @@ Parse pattern.
 
 =head2 patch
 
-  my $route = $r->patch('/:foo' => sub {...});
+  my $route = $r->patch('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate route matching only C<PATCH> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -465,7 +465,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 post
 
-  my $route = $r->post('/:foo' => sub {...});
+  my $route = $r->post('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate route matching only C<POST> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -474,7 +474,7 @@ L<Mojolicious::Lite> tutorial for more argument variations.
 
 =head2 put
 
-  my $route = $r->put('/:foo' => sub {...});
+  my $route = $r->put('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate route matching only C<PUT> requests. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.
@@ -567,7 +567,7 @@ restrictions.
 
 =head2 websocket
 
-  my $ws = $r->websocket('/:foo' => sub {...});
+  my $route = $r->websocket('/:foo' => [foo => qr/\w+/] => sub {...});
 
 Generate route matching only WebSocket handshakes. See also the
 L<Mojolicious::Lite> tutorial for more argument variations.

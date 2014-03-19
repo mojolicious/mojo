@@ -380,7 +380,7 @@ Number of connections to accept at once, defaults to C<50>.
   my $reactor = $loop->reactor;
   $loop       = $loop->reactor(Mojo::Reactor->new);
 
-Low level event reactor, usually a L<Mojo::Reactor::Poll> or
+Low-level event reactor, usually a L<Mojo::Reactor::Poll> or
 L<Mojo::Reactor::EV> object with a default subscriber to the event
 L<Mojo::Reactor/"error">.
 

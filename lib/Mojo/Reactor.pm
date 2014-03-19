@@ -44,7 +44,7 @@ sub watch     { croak 'Method "watch" not implemented by subclass' }
 
 =head1 NAME
 
-Mojo::Reactor - Low level event reactor base class
+Mojo::Reactor - Low-level event reactor base class
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Mojo::Reactor - Low level event reactor base class
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor> is an abstract base class for low level event reactors.
+L<Mojo::Reactor> is an abstract base class for low-level event reactors.
 
 =head1 EVENTS
 

@@ -128,7 +128,7 @@ sub _timer {
 
 =head1 NAME
 
-Mojo::Reactor::Poll - Low level event reactor with poll support
+Mojo::Reactor::Poll - Low-level event reactor with poll support
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ Mojo::Reactor::Poll - Low level event reactor with poll support
 
 =head1 DESCRIPTION
 
-L<Mojo::Reactor::Poll> is a low level event reactor based on L<IO::Poll>.
+L<Mojo::Reactor::Poll> is a low-level event reactor based on L<IO::Poll>.
 
 =head1 EVENTS
 

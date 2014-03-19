@@ -390,7 +390,8 @@ Check C<X-Requested-With> header for C<XMLHttpRequest> value.
 Access C<GET> and C<POST> parameters. Note that this method caches all data,
 so it should not be called before the entire request body has been received.
 Parts of the request body need to be loaded into memory to parse C<POST>
-parameters, so you have to make sure it is not excessively large.
+parameters, so you have to make sure it is not excessively large, there's a
+10MB limit by default.
 
 =head2 params
 
@@ -400,7 +401,7 @@ All C<GET> and C<POST> parameters, usually a L<Mojo::Parameters> object. Note
 that this method caches all data, so it should not be called before the entire
 request body has been received. Parts of the request body need to be loaded
 into memory to parse C<POST> parameters, so you have to make sure it is not
-excessively large.
+excessively large, there's a 10MB limit by default.
 
   # Get parameter value
   say $req->params->param('foo');

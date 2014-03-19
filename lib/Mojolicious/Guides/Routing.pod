@@ -188,9 +188,10 @@ class, but the router can be accessed from everywhere (even at runtime).
 
 =head2 Routing destination
 
-After you start a new route with the method L<Mojolicious::Routes/"route">,
-you can also give it a destination in the form of a hash using the chained
-method L<Mojolicious::Routes::Route/"to">.
+After you start a new route with the method
+L<Mojolicious::Routes::Route/"route">, you can also give it a destination in
+the form of a hash using the chained method
+L<Mojolicious::Routes::Route/"to">.
 
   # /welcome -> {controller => 'foo', action => 'welcome'}
   $r->route('/welcome')->to(controller => 'foo', action => 'welcome');
@@ -294,7 +295,7 @@ C<controller#action>.
   # /bye -> {controller => 'foo', action => 'bye', mymessage => 'Bye'}
   $r->route('/bye')->to('foo#bye', mymessage => 'Bye');
 
-During camelization C<-> gets replaced with C<::>, this allows multi level
+During camelization C<-> gets replaced with C<::>, this allows multi-level
 C<controller> hierarchies.
 
   # / -> {controller => 'foo-bar', action => 'hi'} -> MyApp::Foo::Bar->hi

@@ -4,7 +4,7 @@ use Mojo::Base 'Mojo';
 # "Fry: Shut up and take my money!"
 use Carp 'croak';
 use Mojo::Exception;
-use Mojo::Util qw(decamelize deprecated);
+use Mojo::Util 'decamelize';
 use Mojolicious::Commands;
 use Mojolicious::Controller;
 use Mojolicious::Plugins;
@@ -43,7 +43,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Top Hat';
-our $VERSION  = '4.90';
+our $VERSION  = '4.91';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -187,16 +187,6 @@ sub new {
 sub plugin {
   my $self = shift;
   $self->plugins->register_plugin(shift, $self, @_);
-}
-
-# DEPRECATED in Top Hat!
-sub secret {
-  deprecated
-    'Mojolicious::secret is DEPRECATED in favor of Mojolicious::secrets';
-  my $self = shift;
-  return $self->secrets->[0] unless @_;
-  $self->secrets->[0] = shift;
-  return $self;
 }
 
 sub start { shift->commands->run(@_ ? @_ : @ARGV) }

@@ -10,13 +10,13 @@ sub _epl {
   my ($renderer, $c, $output, $options) = @_;
 
   # Template
+  my $name   = $renderer->template_name($options);
   my $inline = $options->{inline};
-  my $path   = $renderer->template_path($options);
-  $path = md5_sum encode('UTF-8', $inline) if defined $inline;
-  return undef unless defined $path;
+  $name = md5_sum encode('UTF-8', $inline) if defined $inline;
+  return undef unless defined $name;
 
   # Cached
-  my $key   = delete $options->{cache} || $path;
+  my $key   = delete $options->{cache} || $name;
   my $cache = $renderer->cache;
   my $mt    = $cache->get($key);
   $mt ||= $cache->set($key => Mojo::Template->new)->get($key);
@@ -31,30 +31,29 @@ sub _epl {
 
     # Inline
     if (defined $inline) {
-      $log->debug(qq{Rendering inline template "$path".});
-      $$output = $mt->name(qq{inline template "$path"})->render($inline, $c);
+      $log->debug(qq{Rendering inline template "$name".});
+      $$output = $mt->name(qq{inline template "$name"})->render($inline, $c);
     }
 
     # File
     else {
       $mt->encoding($renderer->encoding) if $renderer->encoding;
-      return undef unless my $t = $renderer->template_name($options);
 
       # Try template
-      if (-r $path) {
-        $log->debug(qq{Rendering template "$t".});
-        $$output = $mt->name(qq{template "$t"})->render_file($path, $c);
+      if (defined(my $path = $renderer->template_path($options))) {
+        $log->debug(qq{Rendering template "$name".});
+        $$output = $mt->name(qq{template "$name"})->render_file($path, $c);
       }
 
       # Try DATA section
       elsif (my $d = $renderer->get_data_template($options)) {
-        $log->debug(qq{Rendering template "$t" from DATA section.});
+        $log->debug(qq{Rendering template "$name" from DATA section.});
         $$output
-          = $mt->name(qq{template "$t" from DATA section})->render($d, $c);
+          = $mt->name(qq{template "$name" from DATA section})->render($d, $c);
       }
 
       # No template
-      else { $log->debug(qq{Template "$t" not found.}) and return undef }
+      else { $log->debug(qq{Template "$name" not found.}) and return undef }
     }
   }
 

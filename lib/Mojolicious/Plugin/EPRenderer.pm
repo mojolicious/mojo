@@ -16,10 +16,10 @@ sub register {
       my ($renderer, $c, $output, $options) = @_;
 
       # Generate name
-      my $path = $options->{inline} || $renderer->template_path($options);
-      return undef unless defined $path;
+      my $name = $options->{inline} || $renderer->template_name($options);
+      return undef unless defined $name;
       my @keys = sort grep {/^\w+$/} keys %{$c->stash};
-      my $id = encode 'UTF-8', join(',', $path, @keys);
+      my $id = encode 'UTF-8', join(',', $name, @keys);
       my $key = $options->{cache} = md5_sum $id;
 
       # Cache template for "epl" handler

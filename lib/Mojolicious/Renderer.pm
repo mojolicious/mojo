@@ -186,8 +186,7 @@ sub template_path {
     return $file if -r $file;
   }
 
-  # Fall back to first path
-  return catfile($self->paths->[0], split '/', $name);
+  return undef;
 }
 
 sub _add {

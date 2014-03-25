@@ -3,6 +3,7 @@
   - Removed deprecated secret method from Mojolicious.
   - Improved performance of Mojolicious::Plugin::EPRenderer and
     Mojolicious::Plugin::EPLRenderer.
+  - Improved Mojo::Reactor::Poll portability with POLLPRI support.
 
 4.90  2014-03-16
   - Removed deprecated to_rel method from Mojo::URL.

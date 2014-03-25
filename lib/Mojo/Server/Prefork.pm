@@ -3,7 +3,7 @@ use Mojo::Base 'Mojo::Server::Daemon';
 
 use Fcntl ':flock';
 use File::Spec::Functions qw(catfile tmpdir);
-use IO::Poll 'POLLIN';
+use IO::Poll qw(POLLIN POLLPRI);
 use List::Util 'shuffle';
 use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
@@ -59,7 +59,7 @@ sub run {
   # Pipe for worker communication
   pipe($self->{reader}, $self->{writer}) or die "Can't create pipe: $!";
   $self->{poll} = IO::Poll->new;
-  $self->{poll}->mask($self->{reader}, POLLIN);
+  $self->{poll}->mask($self->{reader}, POLLIN | POLLPRI);
 
   # Clean manager environment
   local $SIG{INT} = local $SIG{TERM} = sub { $self->_term };
@@ -89,7 +89,7 @@ sub _heartbeat {
   # Poll for heartbeats
   my $poll = $self->{poll};
   $poll->poll(1);
-  return unless $poll->handles(POLLIN);
+  return unless $poll->handles(POLLIN | POLLPRI);
   return unless $self->{reader}->sysread(my $chunk, 4194304);
 
   # Update heartbeats

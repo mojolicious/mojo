@@ -1,5 +1,5 @@
 
-4.91  2014-03-26
+4.91  2014-03-27
   - Removed deprecated secret method from Mojolicious.
   - Improved performance of Mojolicious::Plugin::EPRenderer and
     Mojolicious::Plugin::EPLRenderer.

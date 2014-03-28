@@ -45,6 +45,20 @@ sub check_pid {
   return undef;
 }
 
+sub ensure_pid_file {
+  my $self = shift;
+
+  # Check if PID file already exists
+  return if -e (my $file = $self->pid_file);
+
+  # Create PID file
+  $self->app->log->info(qq{Creating process id file "$file".});
+  die qq{Can't create process id file "$file": $!}
+    unless open my $handle, '>', $file;
+  chmod 0644, $handle;
+  print $handle $$;
+}
+
 sub run {
   my $self = shift;
 
@@ -104,7 +118,7 @@ sub _manage {
   # Spawn more workers and check PID file
   if (!$self->{finished}) {
     $self->_spawn while keys %{$self->{pool}} < $self->workers;
-    $self->_pid_file;
+    $self->ensure_pid_file;
   }
 
   # Shutdown
@@ -139,20 +153,6 @@ sub _manage {
       kill 'KILL', $pid;
     }
   }
-}
-
-sub _pid_file {
-  my $self = shift;
-
-  # Check if PID file already exists
-  return if -e (my $file = $self->pid_file);
-
-  # Create PID file
-  $self->app->log->info(qq{Creating process id file "$file".});
-  die qq{Can't create process id file "$file": $!}
-    unless open my $handle, '>', $file;
-  chmod 0644, $handle;
-  print $handle $$;
 }
 
 sub _spawn {
@@ -481,6 +481,12 @@ Get process id for running server from L</"pid_file"> or delete it if server
 is not running.
 
   say 'Server is not running' unless $prefork->check_pid;
+
+=head2 ensure_pid_file
+
+  $prefork->ensure_pid_file;
+
+Ensure L</"pid_file"> exists.
 
 =head2 run
 

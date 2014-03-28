@@ -1,5 +1,7 @@
 
-4.91  2014-03-27
+4.91  2014-03-29
+  - Added daemonize method to Mojo::Server.
+  - Added ensure_pid_file method to Mojo::Server::Prefork.
   - Removed deprecated secret method from Mojolicious.
   - Improved performance of Mojolicious::Plugin::EPRenderer and
     Mojolicious::Plugin::EPLRenderer.

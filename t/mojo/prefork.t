@@ -15,10 +15,13 @@ use Mojo::Server::Prefork;
 use Mojo::UserAgent;
 use Mojo::Util 'spurt';
 
-# Clean up PID file
+# Manage and clean up PID file
 my $prefork = Mojo::Server::Prefork->new;
 my $file    = $prefork->pid_file;
 ok !$prefork->check_pid, 'no process id';
+$prefork->ensure_pid_file;
+ok -e $file, 'file exists';
+is $prefork->check_pid, $$, 'right process id';
 spurt "\n", $file;
 ok -e $file, 'file exists';
 ok !$prefork->check_pid, 'no process id';
